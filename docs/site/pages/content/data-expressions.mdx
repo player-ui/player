@@ -1,0 +1,182 @@
+---
+title: Data & Expressions
+---
+
+# Data
+
+Data is central to a lot of the functionality and features of Player. The easiest way to deal with data is to supply it in the initial payload when starting a flow. This will _seed_ the model with data and allow you to easily reference values
+
+## Bindings
+
+A binding is a representation of a path within the data-model. In simple terms, it's a dot (`.`) separated string showing the path of the properties within the data object.
+
+Given the following data model:
+
+```js
+data: {
+  foo: {
+    bar: {
+      baz: "hello world!"
+    },
+    array: [
+      {
+        property: "another value"
+      }
+    ]
+  },
+}
+```
+
+Then the binding `foo.bar.baz` will reference the value `"hello world!"`. Assets that write data to the data model would overwrite `"hello world"` when setting to that binding. Using brackets instead of the dot-notation is accepted, similar to accessig properties in real Javascript objects. Unlike Javascript, when using the bracket-notation, surrounding quotes are only required if you need a literal `[` or `]` in your property name.
+
+The following bindings are all equivalent:
+
+- `foo.bar.baz`
+- `foo['bar']["baz"]`
+- `foo[bar].baz`
+
+For most bindings, it is recommended to use the dot-notation for all properties when possible. Doing so is consistent, simpler, and the most performant.
+
+Note that you can also use integers to access into arrays in the data model. `foo.bar.array.0.property` will reference `"another value"`.
+
+### Query Syntax
+
+Bindings also allow for query access into arrays using a `key`/`value` pair to find the first matching item in the array.
+
+The query syntax takes the form `array[key=value]`. Where `key` is the property name you want to compare and `value` is the value you want to match against. The binding resolves to the first item in the array that has a matching property and value.
+
+```js
+data: {
+  model: {
+    array: [
+      {
+        name: 'alpha',
+        foo: 'bar',
+      },
+      {
+        name: 'bravo',
+        foo: 'baz',
+      },
+      {
+        name: 'charlie',
+        foo: 'qux',
+      },
+    ];
+  }
+}
+```
+
+For the given data, the following bindings are all equivalent and will point to the first element in the array:
+
+- `model.array[0]`
+- `model.array[name="alpha"]`
+- `model.array[foo="bar"]`
+
+Quotes around the key or the value of the query are only required when needing to use ambiguous literal characters, such as `[`, `]`, or `=`.
+
+Note that the query syntax resolves to the object of the matching query, not to any specific property on the object. If you want to access a specific property, add additional path information after the query. E.g., `model.array[name=bravo].name`.
+
+### Nested Bindings
+
+Nested bindings allow you to construct a binding path that is relative to a 2nd path or based on some dynamic property. This behavior follows similar model lookup rules that can be used elsewhere in Player.
+
+The syntax for a nested binding is a subpath that is wrapped in double curly braces. E.g., `normal.path.{{nested.path}}.more.normal.path`.
+
+```js
+data: {
+  colors: {
+    yellow: {
+      hex: "#ffff00"
+      rgb: "rgb(255, 255, 0)"
+    },
+    red: {
+      hex: "#ff0000",
+      rgb: "rgb(255, 0, 0)"
+    }
+  },
+  favorites: {
+    color: "yellow",
+    food: "tacos",
+    nestedPath: "colors.yellow"
+  }
+}
+```
+
+With this data model, `colors.{{favorite.color}}.hex` will return the hex value for yellow, `"#ffff00"`. Any syntax for a regular binding is also valid as part of a nested binding, including further nesting.
+
+References to bindings that contains sub-paths `{{favorite.nestedPath}}.hex` will expand to `colors.yellow.hex`.
+
+### Nested Expressions
+
+Just like binding segments can contain other bindings, segments can also contain expressions. For this, they use a segment surrounded by `:
+
+Suppose there exists a `getFavoriteColor()` expression that returns `yellow`. The following path would resolve to `colors.yellow.hex`.
+
+```
+colors.`getFavoriteColor()`.hex
+```
+
+Similar to the bracket notation: `[]`. Paths can use brackets instead of dots for paths:
+
+```
+colors[`getFavoriteColor()`].hex
+```
+
+# Expressions
+
+Expressions are callable functions that allow for dynamic behavior of Player and it's views.
+
+These functions can be used in `ACTION` nodes in the navigation section, calculated values in a property of an asset, or anywhere else expressions are valid.
+
+Check out the [Expression Plugin](../plugins/expression) for registering custom functions.
+
+## Using Expressions and Data in a View
+
+Expressions in the view are strings wrapped in: `@[` and `]@`.
+
+For instance, to call a `sum` expression you may use:
+
+```json
+{
+  "value": "The sum is @[ sum(1, 2, 3) ]@ dollars"
+}
+```
+
+Player will handle resolving that value into the proper string before handing it to the UI layers to render. (`{ "value": "The sum is 6 dollars" }`)
+
+If an expression is the sole property value:
+
+```json
+{
+  "value": "@[ sum(1, 2, 3) ]@"
+}
+```
+
+The _raw_ value of the expression will replace that property rather than being wrapped in a string: `{ "value": 6 }`
+
+Data is referenced by wrapping the binding in `{{` and `}}`. This can be used in an expression: `@[ {{foo.bar}} + {{foo.baz}} ]@` or within a string: `{ "value": "Hello {{foo.name}}" }`
+
+Similar to expressions, any property only consisting of a data value lookup, will get replaced by the raw value.
+
+## Using Expressions for Inline Text Formatting
+
+`format` expression is used to replace provided value with appropriate format.
+For instance, to format a number into `currency`, you may use:
+
+```json
+{
+  "value": "Total amount is: @[ format('12122016', 'currency') ]@"
+}
+```
+
+To see the list of currently supported format types, check out [Common Types Plugin](../plugins/common-types.md).
+
+## Built-in Expressions
+
+There are a few expressions built into Player. These are pretty basic, so if you're looking for extend this -- check out the [Common Expressions Plugin](../plugins/common-expressions) or the [Expression Plugin](../plugins/expression) to add more.
+
+| name            | description                                                                           | arguments          |
+| --------------- | ------------------------------------------------------------------------------------- | ------------------ |
+| `getDataval`    | Fetches a value from the model. This is equivalent to using the `{{foo.bar}}` syntax. | `binding`          |
+| `setDataVal`    | Sets a value from the model. This is equivalent to using `{{foo.bar}} = 'value'`      | `binding`, `value` |
+| `deleteDataVal` | Clears a value from the model.                                                        | `binding`          |

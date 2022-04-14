@@ -1,0 +1,28 @@
+{
+  "id": "generated-flow",
+  "views": [
+    {
+      "id": "text",
+      "type": "text",
+      "value": "Some text content"
+    }
+  ],
+  "data": {},
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "text",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}

@@ -1,0 +1,404 @@
+---
+title: TSX DSL
+---
+
+# TSX/JSX Content Authoring
+
+While Player content _can_ be written directly in JSON, it's not always the preferable authoring format. To take advantage of existing developer tool-chains, Player provides a mechanism for authoring content in (J/T)SX as React components. This is paired with a `cli` to transpile the React tree into a JSON content.
+
+One thing to note is that the paths in the input folder should match the expected paths in your config file. E.g if the `pages` option is set to `topics`, the source TSX/JSX files should be under a `topics` directory in your input directory. Similarly if the schema option is set to `topic_schema.json` the ts file containing the schema object should be in the root directory and named `topic_schema.ts`.
+
+## Writing JSX Content
+
+In order to use the JSX-variant to write content, your asset library should ship a JSX component package to leverage. These will define the primitive _components_ to use to build up the tree.
+
+In the examples below, we will assume one exists.
+
+### Bindings and Expressions
+
+Both `binding` and `expression` in the JSX authoring leverages a tagged template, typically abbreviated as `b` and `e` respectively. In a similar fashion to using `css` or `graphql` in a JS file, this enables syntax-highlighting and validation of bindings and expressions within a JS file.
+
+To create a binding, or expression:
+
+```tsx
+import { binding as b, expression as e } from '@player-ui/dsl';
+
+const myBinding = b`foo.bar`;
+const myExpression = e`foo()`;
+```
+
+The binding and expression instances can also automatically dereference themselves when used inside of another string:
+
+```tsx
+const stringWithBinding = `Some text: ${myBinding}`; // 'Some text: {{foo.bar}}'
+const stringWithExp = `Some expr: ${myExpression}`; // 'Some expr: @[foo()]@'
+```
+
+### Assets/Views
+
+Writing assets or views is as simple as creating a React element:
+
+```tsx
+import { Input, Text, Collection } from 'my-assets';
+
+const view = (
+  <Collection>
+    <Text>Some value</Text>
+    <Input>
+      <Input.Label>Some label</Input.Label>
+    </Input>
+  </Collection>
+);
+```
+
+this would generate something similar to:
+
+```json
+{
+  "id": "root",
+  "type": "collection",
+  "values": [
+    {
+      "asset": {
+        "id": "root-values-1",
+        "type": "text",
+        "value": "Some value"
+      }
+    },
+    {
+      "asset": {
+        "id": "root-values-2",
+        "type": "input",
+        "label": {
+          "asset": {
+            "id": "root-values-2-label",
+            "type": "text",
+            "value": "Some label"
+          }
+        }
+      }
+    }
+  ]
+}
+```
+
+#### IDs
+
+Any asset can accept an `id` property (just like the JSON version), however ids will automatically be generated for assets missing them.
+
+#### Collection/Text Creation
+
+In the event that an asset object is expected, but a `string` or `number` is found, Player will attempt to automatically create a text node, provided the asset-library has a text-asset-factory configured.
+
+Similarly, if a single asset is expected but a list of them is found instead, Player will attempt to create a _collection_ asset provided the library has the proper configuration set.
+
+### Templates
+
+Templates are included via the `@player-ui/dsl` package. This can be used in any asset slot:
+
+```tsx
+<Collection>
+  <Collection.Values>
+    <Template data={b`foo.bar`}>
+      <Text>Template Value</Text>
+    </Template>
+    <Text id="static">Value 1</Text>
+  </Collection.Values>
+</Collection>
+```
+
+Templates can be nested within one another, and the auto-id generation will handle adding the `_index_` information to any generated `id`.
+
+### Switches
+
+The `@player-ui/dsl` module also includes support for _static_ and _dynamic_ switches.
+
+Use the `isDynamic` flag to denote this should be a `dynamicSwitch` instead of a `staticSwitch`:
+
+```tsx
+<Collection>
+  <Collection.Label>
+    <Switch isDynamic>
+      <Switch.Case exp={e`foo() = bar()`}>
+        <Text>Text 1</Text>
+      </Switch.Case>
+      <Switch.Case>
+        <Text>Text 1</Text>
+      </Switch.Case>
+    </Switch>
+  </Collection.Label>
+</Collection>
+```
+
+### Navigation
+
+At this time the `navigation` section is a basic JS object. The `@player-ui/types` package provides typescript typings for these.
+
+```tsx
+import { Navigation, Schema } from '@player-ui/types';
+
+const navigation: Navigation = {
+  BEGIN: 'Start',
+  Start: {
+    startState: 'VIEW_1',
+    VIEW_1: {
+      state_type: 'VIEW',
+      ref: 'view-1',
+      transitions: {
+        '*': 'END_Done',
+      },
+    },
+    END_Done: {
+      state_type: 'END',
+      outcome: 'done',
+    },
+  },
+};
+```
+
+### Schema
+
+To author a schema object you should first start by constructing a standard typescript object where the nested paths correlate to the paths on your desired schema. At the final conversion to a Player `Schema` object during the serialization phase the intermediate types and ROOT elements will automatically be constructed. A basic example would be:
+
+```typescript
+const mySchema = {
+  foo: {
+    bar: {
+      baz: //somevalue
+      faz: //somevalue
+    }
+  }
+}
+```
+
+which correlates to a schema of:
+
+```json
+{
+  "ROOT": {
+    "foo": {
+      "type": "fooType"
+    }
+  },
+  "fooType": {
+    "bar": {
+      "type": "barType"
+    }
+  },
+  "barType": {
+    "baz": {
+      "type": ""
+    },
+    "faz": {
+      "type": ""
+    }
+  }
+}
+```
+
+#### Arrays
+
+A single object array can be used to indicate an array type, for example:
+
+```typescript
+const mySchema = {
+  foo: [
+    {
+      bar: //some type
+    }
+  ]
+}
+```
+
+will generate the schema:
+
+```json
+{
+  "ROOT": {
+    "foo": {
+      "type": "fooType",
+      "isArray": true
+    }
+  },
+  "fooType": {
+    "bar": {
+      "type": "barType"
+    }
+  },
+  "barType": {
+    "baz": {
+      "type": ""
+    },
+    "faz": {
+      "type": ""
+    }
+  }
+}
+```
+
+#### Changing the Name of a Generated Type
+
+To change the name of the generated type at any point in the tree, import the `SchemaTypeName` symbol from the `@player-ui/dsl` and use it as a key to change the name like so:
+
+```typescript
+const mySchema = {
+  foo: {
+    bar: {
+      [SchemaTypeName]: "buzz",
+      baz: //somevalue
+      faz: //somevalue
+    }
+  }
+}
+```
+
+#### Defining Data Types
+
+The leaf nodes of the data structure will need some concrete definition of what data exists at that point of the schema. There are two ways to provide this data.
+
+##### Data Refs
+
+The `common-types-plugin` package exposes the types it provides to Player when used and _references_ to those types as well. Using these `Language.DataTypeRef` values you can indicate what the data type will be at that node and that it will be a type explicitly defined in the Player so no additional information needs to be provided (e.g. validations nor formats)
+
+Various plugins in the `@cg-player` scope also expose similar `DataTypeRef` objects that include common tax types. For convenience the `@cg-player/components` package reexports all the data references for one convenient import. It is important to note that there will be an issue if you use a `DataTypeRef` from a plugin but run the content in a Player that doesn't have that plugin loaded.
+
+##### Local Data Types
+
+Sometimes you need to define specific data types that extend existing types for certain pieces of data in a schema, whether that be for specific validations, formatting or both. In this case, in your DSL project you can define an object of type `Schema.DataType` and provide that value to a leaf node. That will indicate that this unique type needs to be included in its entirety to Player as it has information not already contained in Player.
+
+##### What that Looks Like
+
+Using our previous example we can fill in the values with some types now to look like this in the ts object:
+
+```typescript
+
+import { Schema, BooleanTypeRef } from '@player-ui/types'
+
+const mycustombooleantype: Schema.DataType = {
+  type: "BooleanType",
+  validation: [
+    {
+      type: 'oneOf',
+      message: 'Value has to be true or false',
+      options: [true, false],
+    },
+  ],
+}
+
+const mySchema = {
+  foo: {
+    bar: {
+      baz: BooleanTypeRef
+      faz: mycustombooleantype
+    }
+  }
+}
+
+export default mySchema
+```
+
+and like this in the final schema:
+
+```json
+{
+  "ROOT":{
+    "foo":{
+      "type": "fooType"
+    }
+  },
+  "fooType":{
+    "bar": {
+      "type":"barType"
+    }
+  },
+  "barType":{
+    "baz":{
+      "type": "BooleanType"
+    },
+    "faz":{
+      "type": "BooleanType",
+      "validation": [
+        {
+          "type": "oneOf",
+          "message": "Value has to be true or false",
+          "options": [true, false],
+        },
+      ],
+    }
+  }
+}
+
+It should be noted that unless the schema object is a default export the `schema.json` will not be created in the output folder.
+```
+
+#### Using the Schema Object in JSX/TSX Content
+
+There is one important function that enables us to use our schema object in content.`makeBindingsForObject()` takes your schema object and constructs the bindings opaquely so that you can use the native object path with functions like `.toString()`, `.toValue()`, and `toRefString()` like you could with regular string template bindings.
+
+Using these functions we can use the schema directly in content:
+
+```jsx
+
+const schema = makeBindings(mySchema)
+
+const baz = schema.foo.bar.baz
+
+const view = (
+  <Input applicability={isMfj} binding={baz}>
+    <Input.Label>
+      <Text>
+        The current value is {baz.toString()}
+      </Text>
+    </Input.Label>
+  </Input>
+)
+
+const validations = [
+  {
+    type: "requiredIf",
+    ref: baz.toRefString(),
+    message: "This is required",
+  },
+];
+
+const navigation = {...}
+
+export default {
+  id: "example-topic",
+  topic: "exampletopic",
+  views: [view],
+  navigation,
+};
+
+```
+
+### Custom Assets
+
+If you need to make use of a custom asset or an asset that is in Player but not yet implemented in the Player DSL there are a couple of ways you can do this.
+
+Define Asset
+```typescript
+const customAsset = {
+  asset: {
+    id: 'id',
+    type: 'custom', (use the type of the asset you want to use)
+    ...
+  }
+}
+```
+Pass asset into an existing asset
+```
+<Input label={customAsset} binding={b`test`}/>
+```
+Pass asset in as child
+```jsx
+<Notification.Title>
+  <obj>{toJsonProperties(customAsset)}</obj>
+</Notification.Title>
+```
+OR
+
+You can create an Asset using the `<Asset>` component from `@player-ui/dsl`. 
+```jsx
+<Asset id={"foo"} type={'foo'} foo={"bar"} ... />
+```

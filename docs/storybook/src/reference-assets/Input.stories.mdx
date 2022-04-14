@@ -1,0 +1,33 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs';
+import { Input } from '@player-ui/reference-assets-plugin-react';
+import { StoryWrapper } from '../components';
+import { PlayerStory } from '@player-ui/storybook';
+import inputValidationFlow from '@player-ui/reference-assets-plugin-mocks/input/input-validation.json';
+import inputTransitionFlow from '@player-ui/reference-assets-plugin-mocks/input/input-transition.json';
+
+<Meta title="Reference Assets/Input" component={Input} />
+
+# Input Asset
+
+The text asset is the core means of rendering text.
+Modifiers can be used to customize the display, including making text a hyperlink.
+
+<Canvas>
+  <Story name="Input">
+    <StoryWrapper>
+      <PlayerStory flow={inputValidationFlow} />
+    </StoryWrapper>
+  </Story>
+</Canvas>
+
+## Validation
+
+User input can include validations, with `errors` preventing users from advancing the flow.
+
+<Canvas>
+  <Story name="Validation">
+    <StoryWrapper>
+      <PlayerStory flow={inputTransitionFlow} />
+    </StoryWrapper>
+  </Story>
+</Canvas>

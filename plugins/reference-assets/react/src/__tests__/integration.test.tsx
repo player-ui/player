@@ -1,0 +1,64 @@
+import React from 'react';
+import {
+  screen,
+  render,
+  act,
+  fireEvent,
+  waitFor,
+  configure,
+} from '@testing-library/react';
+import { BeaconPlugin } from '@player-ui/beacon-plugin-react';
+import { WebPlayer } from '@player-ui/react';
+import { makeFlow } from '@player-ui/make-flow';
+import { ReferenceAssetsPlugin } from '../plugin';
+
+configure({
+  testIdAttribute: 'id',
+});
+
+describe('Integration tests', () => {
+  test('input beacons the correct custom data value', async () => {
+    const handler = jest.fn();
+    const beaconPlugin = new BeaconPlugin({ callback: handler });
+
+    const wp = new WebPlayer({
+      plugins: [beaconPlugin, new ReferenceAssetsPlugin()],
+    });
+
+    const flow = makeFlow({
+      id: 'first_view',
+      type: 'input',
+      binding: 'foo.bar',
+      metaData: { beacon: { custom_data: '{{foo.bar}}' } },
+    });
+
+    render(
+      <React.Suspense fallback="fallback">
+        <wp.Component />
+      </React.Suspense>
+    );
+
+    await act(async () => {
+      wp.start(flow);
+    });
+
+    const viewNode = await screen.findByTestId('first_view');
+
+    act(() => {
+      fireEvent.change(viewNode, { target: { value: 'new value' } });
+    });
+
+    act(() => {
+      fireEvent.blur(viewNode, { target: { value: 'new value' } });
+    });
+
+    await waitFor(() => {
+      expect(handler.mock.calls).toHaveLength(2);
+    });
+
+    expect(handler.mock.calls[1][0]).toMatchObject({
+      assetId: 'first_view',
+      data: { custom_data: 'new value' },
+    });
+  });
+});

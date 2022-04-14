@@ -1,0 +1,315 @@
+version: 2.1
+
+parameters:
+  GHA_Actor:
+    type: string
+    default: ""
+  GHA_Action:
+    type: string
+    default: ""
+  GHA_Event:
+    type: string
+    default: ""
+  GHA_Meta:
+    type: string
+    default: ""
+
+orbs:
+  macos: circleci/macos@2
+  codecov: codecov/codecov@3.2.2
+
+executors:
+  base:
+    docker:
+      - image: docker.io/sugarmanz/bazel-common
+    working_directory: ~/player
+    resource_class: xlarge
+    environment:
+      TZ: "/usr/share/zoneinfo/America/Los_Angeles"
+  ios:
+    working_directory: ~/player
+    resource_class: macos.x86.medium.gen2
+    macos:
+      xcode: 13.2.1
+    environment:
+      TZ: "/usr/share/zoneinfo/America/Los_Angeles"
+
+jobs:
+  setup:
+    executor: base
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{ { checksum "package.json" }}
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  build:
+    executor: base
+    steps:
+      - attach_workspace:
+          at: ~/player
+
+      - restore_cache:
+          keys: 
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }} 
+            - v1-bazel-cache-core-{{ .Branch }} 
+            - v1-bazel-cache-core-main 
+
+      - run: bazel build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci --config=skip-ios -- //...
+     
+      - save_cache:
+          paths:  
+            - node_modules
+          key: v1-dependencies-{ { checksum "package.json" }}
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+  
+  build_ios:
+    executor: ios
+    steps:
+      - attach_workspace:
+          at: ~/player
+
+      - run: HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@8
+
+      - restore_cache:
+          keys:
+            - android-tools-{{ arch }}-{{ checksum "scripts/install-android-tools.sh" }}
+
+      - run: echo 'export ANDROID_HOME=~/android-tools'  >> $BASH_ENV 
+
+      - run:
+          name: Install Android tools
+          command: |
+            sh scripts/install-android-tools.sh
+            echo 'export ANDROID_SDK_HOME=$ANDROID_HOME'  >> $BASH_ENV
+            echo 'export ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk/21.4.7075529'  >> $BASH_ENV
+            echo 'export PATH=$ANDROID_SDK_HOME/tools/bin:$PATH'  >> $BASH_ENV
+            echo 'export PATH=$ANDROID_SDK_HOME/tools:$PATH'  >> $BASH_ENV
+            echo 'export PATH=$ANDROID_SDK_HOME/platform-tools:$PATH'  >> $BASH_ENV
+            echo 'export PATH=$ANDROID_SDK_HOME/emulator:$PATH'  >> $BASH_ENV
+            source $BASH_ENV
+          environment:
+            JAVA_HOME: /usr/local/opt/openjdk@8
+
+      - save_cache:
+          key: android-tools-{{ arch }}-{{ checksum "scripts/install-android-tools.sh" }}
+          paths:
+            - ~/android-tools
+
+      - run: gem install bundler
+
+      - restore_cache:
+          keys:
+            - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+            - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
+
+      - run: bundle install
+
+      - save_cache:
+          key: gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+          paths:
+            - ~/.gem/ruby/2.7.5
+      
+      - macos/preboot-simulator:
+          version: "15.2"
+          platform: "iOS"
+          device: "iPhone 13"
+
+      - run: bazel sync
+
+      - run: |
+          BUNDLE_TARGETS=$(bazel query "attr(name, '_Bundles', //...)" --output label 2>/dev/null | tr '\n' ' ')
+          bazel build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci $BUNDLE_TARGETS
+
+      - run: bazel shutdown
+      - run: cd xcode && bundle exec pod install
+      - run: bazel build --config=ci --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} -- //:PlayerUI //:PlayerUI-Demo
+      # TODO: the timeout should be added to the test itself
+      - run: bazel test --test_timeout=600 --jobs=1 --verbose_failures --config=ci  --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
+
+      - run: 
+          when: always
+          command: |
+            RESULTS_DIR=_test_results
+            find -L ./bazel-testlogs -name test.xml | while read line
+            do
+              mkdir -p $RESULTS_DIR/$(dirname $line)
+              cp $line $RESULTS_DIR/$(dirname $line)
+            done
+
+      - store_test_results:
+          path: _test_results
+
+  test:
+    executor: base
+    steps:
+      - attach_workspace:
+          at: ~/player
+
+      - restore_cache:
+          keys: 
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }} 
+            - v1-bazel-cache-core-{{ .Branch }} 
+            - v1-bazel-cache-core-main 
+
+      - run: bazel test --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=skip-ios --config=ci -- //...
+
+      - save_cache:
+          when: always 
+          key: v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }} 
+          paths:  
+            - ~/.cache/bazel-disk-cache
+
+      - run: 
+          when: always
+          command: |
+            RESULTS_DIR=_test_results
+            find -L ./bazel-testlogs -name test.xml | while read line
+            do
+              mkdir -p $RESULTS_DIR/$(dirname $line)
+              cp $line $RESULTS_DIR/$(dirname $line)
+            done
+
+      - store_test_results:
+          path: _test_results
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  coverage:
+    executor: base
+    steps:
+      - attach_workspace:
+          at: ~/player
+
+      - restore_cache:
+          keys: 
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }} 
+            - v1-bazel-cache-core-{{ .Branch }} 
+            - v1-bazel-cache-core-main 
+
+      - run: |
+          BUNDLE_TARGETS=$(bazel query "kind(nodejs_test, //...)" --output label 2>/dev/null | tr '\n' ' ')
+          bazel coverage --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci -- $BUNDLE_TARGETS
+
+      - codecov/upload:
+          file: ./bazel-out/_coverage/_coverage_report.dat
+
+  ship_it:
+    executor: base
+    steps:
+      - attach_workspace:
+          at: ~/player
+
+      - restore_cache:
+          keys: 
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }} 
+            - v1-bazel-cache-core-{{ .Branch }} 
+            - v1-bazel-cache-core-main 
+
+      - run: yarn auto shipit --only-graduate-with-release-label -vv
+
+workflows: 
+  build_and_test_pr:
+    jobs:
+      - setup:
+          filters:
+            branches:
+              ignore: 
+                - main
+                - /version-.*/
+            tags:
+              ignore: /.*/
+
+      - build:
+          requires:
+            - setup
+
+      - build_ios:
+          requires:
+            - setup
+
+      - test:
+          requires:
+            - build
+
+      - coverage:
+          requires:
+            - build
+
+  build_and_test_main:
+    when:
+      equal: [ "", << pipeline.parameters.GHA_Action >> ]
+    jobs:
+      - setup:
+          filters:
+            branches:
+              only: 
+                - main
+                - /version-.*/
+
+      - build:
+          requires:
+            - setup
+
+      - build_ios:
+          requires:
+            - setup
+
+      - test:
+          requires:
+            - build
+
+      - coverage:
+          requires:
+            - build
+
+      - ship_it:
+          context:
+            - Publish
+          requires:
+            - test
+            - coverage
+            - build_ios
+
+  release:
+    when:
+      equal: [ release, << pipeline.parameters.GHA_Action >> ]
+    jobs:
+      - setup
+
+      - build:
+          requires:
+            - setup
+
+      - build_ios:
+          requires:
+            - setup
+
+      - test:
+          requires:
+            - build
+
+      - coverage:
+          requires:
+            - build
+
+      - ship_it:
+          context:
+            - Publish
+          requires:
+            - test
+            - coverage
+            - build_ios

@@ -1,0 +1,39 @@
+---
+title: Meta
+platform: core
+---
+
+# Meta Plugin
+
+The Meta Plugin is an easy way to combine multiple _other_ plugins into 1 group. It is often used when sharing a set of plugins across platforms (each platform registering 1 common set of _core_ plugins).
+
+# Usage
+
+<PlatformTabs>
+  <core>
+
+Create a grouping of other plugins:
+
+```js
+import { MetaPlugin } from '@player-ui/meta-plugin';
+
+const pluginGroup = new MetaPlugin([
+  new Plugin1(),
+  new Plugin2()
+]);
+```
+
+Add the plugin to Player:
+
+```js
+import { Player } from '@player-ui/player';
+
+const player = new Player({
+  plugins: [pluginGroup],
+});
+```
+
+You can share `pluginGroup` with others as an easy way to group multiple plugin features together.
+
+  </core>
+</PlatformTabs>

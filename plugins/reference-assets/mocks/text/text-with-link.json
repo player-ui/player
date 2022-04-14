@@ -1,0 +1,14 @@
+{
+  "id": "text",
+  "type": "text",
+  "value": "A Link",
+  "modifiers": [
+    {
+      "type": "link",
+      "metaData": {
+        "mime-type": "text/html",
+        "ref": "http://www.intuit.com"
+      }
+    }
+  ]
+}

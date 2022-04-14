@@ -1,0 +1,14 @@
+{
+  "name": "@player-ui/cli",
+  "files": [
+    "bin",
+    "dist",
+    "oclif.manifest.json"
+  ],
+  "oclif": {
+    "bin": "player",
+    "dirname": "player",
+    "topicSeparator": " ",
+    "commands": "./dist/commands"
+  }
+}

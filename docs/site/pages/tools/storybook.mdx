@@ -1,0 +1,84 @@
+---
+title: Player + Storybook Integration
+---
+
+## Reference Assets
+
+The reference asset set, complete with the storybook-plugin integration below is available [here](/storybook-demo)
+
+## Storybook Plugin
+
+The `@player-ui/storybook` package is a storybook addon + wrapper that provides easy-to-use mechanisms for integrating Player flows into storybook.
+
+
+### Installation
+
+There are a few different parts required to integrate with storybook.
+
+Start by installing `@player-ui/storybook`:
+
+```bash
+yarn add @player-ui/storybook
+```
+
+Next, add `@player-ui/storybook` to the `addons` section in `.storybook/main.js`
+
+```js
+module.exports = {
+  addons: [
+    '@player-ui/storybook'
+  ]
+}
+```
+
+In `.storybook/preview.js` add the `PlayerDecorator`:
+
+```jsx
+import { PlayerDecorator } from '@player-ui/storybook';
+
+export const decorators = [
+  PlayerDecorator
+];
+```
+
+Lastly use the `PlayerStory` component to render a flow:
+
+```jsx
+import { PlayerStory } from '@player-ui/storybook';
+
+export const MyStory = (
+  <PlayerStory flow={initialFlow} />
+)
+```
+
+The `webplayerPlugins` story parameter allows you to add any custom plugins (like asset providers) to a story. This can also be set in the `.storybook/preview.js` file as a global option: 
+
+```js
+import { ReferenceAssetsPlugin } from '@player-ui/reference-assets-plugin-react';
+
+export const parameters = {
+  webplayerPlugins: [
+    new ReferenceAssetsPlugin()
+  ],
+}
+```
+
+### Panels
+
+#### Events
+
+The events panel addon shows a timeline of events as the flow is processed. Here you will see logs, render/update metrics, data mutations, and more. 
+
+![Events Addon Panel](/tools/storybook/events-addon.gif)
+
+#### Flow
+
+The flow panel addon enables users to view and edit the JSON content in the running Player. 
+
+![Flow Addon Panel](/tools/storybook/flow-addon.gif)
+
+#### Reset
+
+The reset button in the toolbar will reset the running Player with the initial content. This is useful for clearing any data or validation state, or for resetting a completed flow.
+
+![Flow Reset Button](/tools/storybook/flow-reset.gif)

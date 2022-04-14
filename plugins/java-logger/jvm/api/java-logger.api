@@ -1,0 +1,35 @@
+public final class com/intuit/player/jvm/plugins/logging/jul/JavaLoggerConfig : com/intuit/player/jvm/core/plugins/logging/PlayerLoggingConfig {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getLogger ()Lkotlin/jvm/functions/Function1;
+	public final fun getName ()Ljava/lang/String;
+	public final fun setLogger (Lkotlin/jvm/functions/Function1;)V
+	public final fun setName (Ljava/lang/String;)V
+}
+
+public final class com/intuit/player/jvm/plugins/logging/jul/JavaLoggerFactory : com/intuit/player/jvm/core/plugins/logging/PlayerLoggingFactory {
+	public static final field INSTANCE Lcom/intuit/player/jvm/plugins/logging/jul/JavaLoggerFactory;
+	public synthetic fun create (Lkotlin/jvm/functions/Function1;)Lcom/intuit/player/jvm/core/plugins/LoggerPlugin;
+	public fun create (Lkotlin/jvm/functions/Function1;)Lcom/intuit/player/jvm/plugins/logging/jul/JavaLoggerPlugin;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/intuit/player/jvm/plugins/logging/jul/JavaLoggerPlugin : com/intuit/player/jvm/core/plugins/LoggerPlugin {
+	public fun <init> (Lcom/intuit/player/jvm/plugins/logging/jul/JavaLoggerConfig;)V
+	public fun apply (Lcom/intuit/player/jvm/core/player/Player;)V
+	public fun debug ([Ljava/lang/Object;)V
+	public fun error ([Ljava/lang/Object;)V
+	public final fun getConfig ()Lcom/intuit/player/jvm/plugins/logging/jul/JavaLoggerConfig;
+	public final fun getLogger ()Ljava/util/logging/Logger;
+	public fun info ([Ljava/lang/Object;)V
+	public fun trace ([Ljava/lang/Object;)V
+	public fun warn ([Ljava/lang/Object;)V
+}
+
+public final class com/intuit/player/jvm/plugins/logging/jul/JavaLoggingContainer : com/intuit/player/jvm/core/plugins/logging/PlayerLoggingContainer {
+	public fun <init> ()V
+	public fun getFactory ()Lcom/intuit/player/jvm/core/plugins/logging/PlayerLoggingFactory;
+	public fun toString ()Ljava/lang/String;
+}
+

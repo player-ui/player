@@ -1,0 +1,32 @@
+package com.intuit.player.jvm.j2v8.extensions
+
+import com.intuit.player.jvm.j2v8.base.J2V8Test
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Test
+import kotlin.concurrent.thread
+
+internal class UnlockTest : J2V8Test() {
+
+    @Test
+    fun `cannot unlock when another thread has the lock`() {
+        thread { v8.locker.acquire() }.join()
+        assertThrows(Error::class.java) { v8.unlock() }
+    }
+
+    @Test
+    fun `unlock when no thread has the lock`() {
+        assertNull(v8.locker.thread)
+        v8.unlock()
+        assertNull(v8.locker.thread)
+    }
+
+    @Test
+    fun `unlock when current thread has the lock`() {
+        v8.locker.acquire()
+        assertNotNull(v8.locker.thread)
+        v8.unlock()
+        assertNull(v8.locker.thread)
+    }
+}

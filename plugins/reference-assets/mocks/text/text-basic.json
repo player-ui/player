@@ -1,0 +1,28 @@
+{
+  "id": "view-1",
+  "type": "collection",
+  "values": [
+    {
+      "asset": {
+        "id": "text-1",
+        "type": "text",
+        "value": "This is some text."
+      }
+    },
+    {
+      "asset": {
+        "id": "text-2",
+        "type": "text",
+        "value": "This is some text that is a link",
+        "modifiers": [
+          {
+            "type": "link",
+            "metaData": {
+              "ref": "https://intuit.com"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

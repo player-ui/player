@@ -1,0 +1,19 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs';
+import { Collection } from '@player-ui/reference-assets-plugin-react'
+import { StoryWrapper } from '../components'
+import { PlayerStory } from '@player-ui/storybook';
+import collectionFlow from '@player-ui/reference-assets-plugin-mocks/collection/collection-basic.json';
+
+<Meta title="Reference Assets/Collection" component={Collection} />
+
+# Collection Asset
+
+The collection asset can group similar assets together. 
+
+<Canvas>
+  <Story name="Collection">
+    <StoryWrapper>
+      <PlayerStory flow={collectionFlow} />
+    </StoryWrapper>
+  </Story>
+</Canvas>

@@ -1,0 +1,83 @@
+{
+  "id": "minimal",
+  "views": [
+    {
+      "id": "view-1",
+      "type": "collection",
+      "values": [
+        {
+          "asset": {
+            "id": "text1",
+            "type": "text",
+            "value": "text {{test}}",
+            "metaData": {
+              "unmaskable": true
+            }
+          }
+        },
+        {
+          "asset": {
+            "id": "input",
+            "type": "input",
+            "binding": "test",
+            "label": {
+              "asset": {
+                "id": "input-label",
+                "type": "text",
+                "value": "Input for test"
+              }
+            }
+          }
+        },
+        {
+          "asset": {
+            "id": "input2",
+            "type": "input",
+            "binding": "test2",
+            "label": {
+              "asset": {
+                "id": "input-label2",
+                "type": "text",
+                "value": "Input for test2"
+              }
+            }
+          }
+        },
+        {
+          "asset": {
+            "id": "text2",
+            "type": "text",
+            "value": "text {{test2}}"
+          }
+        }
+      ]
+    }
+  ],
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "VIEW_1": {
+        "ref": "view-1",
+        "state_type": "VIEW",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "startState": "VIEW_1"
+    }
+  },
+  "data": {
+    "test": "1234 5678 1234 5678",
+    "test2": "1234 5678 1234 5678"
+  },
+  "schema": {
+    "ROOT": {
+      "test": {
+        "type": "StringType",
+        "metaData": {
+          "sensitive": true
+        }
+      }
+    }
+  }
+}

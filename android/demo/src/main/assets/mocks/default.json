@@ -1,0 +1,49 @@
+{
+  "id": "default-flow",
+  "views": [
+    {
+      "id": "view-1",
+      "type": "info",
+      "title": {
+        "asset": {
+          "id": "view-title",
+          "type": "text",
+          "value": "Android Reference Assets"
+        }
+      },
+      "actions": [
+        {
+          "asset": {
+            "id": "action-1",
+            "type": "action",
+            "value": "randomize",
+            "label": {
+              "asset": {
+                "id": "action-1-label",
+                "type": "text",
+                "value": "Random Mock"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "view-1",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "randomize"
+      }
+    }
+  }
+}

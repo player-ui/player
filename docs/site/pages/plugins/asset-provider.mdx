@@ -1,0 +1,41 @@
+---
+title: Asset Provider Plugin
+platform: react
+---
+
+# Asset Provider
+
+The Asset Provider Plugin enables users to easily register UI components to render their assets. It's used internally by the [Reference Assets](./reference-assets). The matches follow the same rules as asset transforms (more specific matches take priority).
+
+### Usage
+
+<PlatformTabs>
+  <react>
+
+Install the plugin:
+
+```bash
+yarn add @player-ui/asset-provider-plugin-react
+```
+
+Create an instance, and add it to your Player instance. 
+The API is similar to the JavaScript `Map`, and takes a list of `[match, Component]` tuples.
+
+```tsx
+import { WebPlayer } from '@player-ui/react';
+import { AssetProviderPlugin } from '@player-ui/asset-provider-plugin-react';
+
+const player = new WebPlayer({
+  plugins: [
+    new AssetProviderPlugin({
+      ['custom-asset', () => <div>Hello World!</div>],
+      [{ type: 'custom', key: 'asset' }, () => <div>Other Custom Asset</div>],
+    })
+  ]
+})
+```
+
+This will register a match on `{ type: 'custom-asset' }` and `{ type: 'custom', key: 'asset' }` in the view to use your React components.
+
+  </react>
+</PlatformTabs>

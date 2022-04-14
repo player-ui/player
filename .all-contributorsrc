@@ -1,0 +1,104 @@
+{
+  "projectName": "player",
+  "projectOwner": "intuit",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "badgeTemplate": "[![All Contributors](https://img.shields.io/badge/all_contributors-<%= contributors.length %>-orange.svg)](#contributors)",
+  "commitConvention": "eslint",
+  "contributors": [
+    {
+      "login": "adierkens",
+      "name": "Adam Dierkens",
+      "avatar_url": "https://avatars.githubusercontent.com/u/13004162?v=4",
+      "profile": "https://github.com/adierkens",
+      "contributions": [
+        "code",
+        "doc",
+        "example",
+        "maintenance",
+        "platform",
+        "test",
+        "tool"
+      ]
+    },
+    {
+      "login": "spentacular",
+      "name": "Spencer Hamm",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1043478?v=4",
+      "profile": "https://github.com/spentacular",
+      "contributions": [
+        "code",
+        "doc",
+        "example",
+        "maintenance",
+        "platform",
+        "test",
+        "tool"
+      ]
+    },
+    {
+      "login": "hborawski",
+      "name": "Harris Borawski",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1325154?v=4",
+      "profile": "https://github.com/hborawski",
+      "contributions": [
+        "code",
+        "design",
+        "doc",
+        "example",
+        "maintenance"
+      ]
+    },
+    {
+      "login": "sugarmanz",
+      "name": "Jeremiah Zucker",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9255651?v=4",
+      "profile": "https://github.com/sugarmanz",
+      "contributions": [
+        "code",
+        "content",
+        "design",
+        "doc"
+      ]
+    },
+    {
+      "login": "KetanReddy",
+      "name": "Ketan Reddy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8703262?v=4",
+      "profile": "https://github.com/KetanReddy",
+      "contributions": [
+        "code",
+        "doc",
+        "ideas",
+        "infra"
+      ]
+    },
+    {
+      "login": "brocollie08",
+      "name": "Brocollie08",
+      "avatar_url": "https://avatars.githubusercontent.com/u/13474011?v=4",
+      "profile": "https://github.com/brocollie08",
+      "contributions": [
+        "code",
+        "doc",
+        "ideas",
+        "infra"
+      ]
+    },
+    {
+      "login": "kharrop",
+      "name": "Kelly Harrop",
+      "avatar_url": "https://avatars.githubusercontent.com/u/24794756?v=4",
+      "profile": "https://github.com/kharrop",
+      "contributions": [
+        "design"
+      ]
+    }
+  ],
+  "contributorsPerLine": 6
+}

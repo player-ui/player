@@ -1,0 +1,12 @@
+{
+  "id": "input",
+  "type": "input",
+  "binding": "foo.bar",
+  "label": {
+    "asset": {
+      "id": "input-label",
+      "type": "text",
+      "value": "This is an input"
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "id": "collection",
+  "type": "collection",
+  "label": {
+    "asset": {
+      "id": "collection-label",
+      "type": "text",
+      "value": "Test item applicability"
+    }
+  },
+  "resultText": {
+    "asset": {
+      "id": "collection-result",
+      "type": "text",
+      "value": "{{foo.bar}}"
+    }
+  },
+  "values": [
+    {
+      "asset": {
+        "id": "item-1",
+        "type": "text",
+        "value": "Type 'hide' to hide me",
+        "applicability": "{{foo.bar}} != 'hide'"
+      }
+    },
+    {
+      "asset": {
+        "id": "item-2",
+        "type": "input",
+        "placeholder": "Dynamic input",
+        "binding": "foo.bar",
+        "applicability": "{{showInput}} == true"
+      }
+    },
+    {
+      "asset": {
+        "id": "item-3",
+        "type": "action",
+        "exp": "{{showInput}} = !{{showInput}}",
+        "label": {
+          "asset": {
+            "id": "item-3-action-label",
+            "type": "text",
+            "value": "Toggle input"
+          }
+        }
+      }
+    },
+    {
+      "asset": {
+        "id": "item-4",
+        "type": "input",
+        "placeholder": "Persistent input",
+        "binding": "foo.bar"
+      }
+    }
+  ]
+}

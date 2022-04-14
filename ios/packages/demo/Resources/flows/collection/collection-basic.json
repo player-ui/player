@@ -1,0 +1,43 @@
+{
+  "id": "generated-flow",
+  "views": [
+    {
+      "id": "collection",
+      "type": "collection",
+      "values": [
+        {
+          "asset": {
+            "id": "col-1",
+            "type": "text",
+            "value": "Item 1"
+          }
+        },
+        {
+          "asset": {
+            "id": "col-2",
+            "type": "text",
+            "value": "Item 2"
+          }
+        }
+      ]
+    }
+  ],
+  "data": {},
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "collection",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "id": "generated-flow",
+  "views": [
+    {
+      "id": "input",
+      "type": "input",
+      "binding": "foo.bar",
+      "label": {
+        "asset": {
+          "id": "input-label",
+          "type": "text",
+          "value": "This is an input"
+        }
+      }
+    }
+  ],
+  "data": {},
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "input",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}

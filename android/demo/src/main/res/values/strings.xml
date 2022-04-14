@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Reference Assets Player Demo</string>
+    <string name="title_activity_main">Reference Assets Player Demo</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="player_fragment_label">Player</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="title_instant">Reference Assets Player Instant Demo</string>
+    <string name="title_base">Reference Assets Player Demo</string>
+</resources>

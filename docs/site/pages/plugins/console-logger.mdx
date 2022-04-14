@@ -1,0 +1,59 @@
+---
+title: Console Logger
+platform: react,core,ios
+---
+
+# Console Logger Plugin
+
+A plugin to easily enable logs to be written to the JS console. Extremely helpful for local Player development and debugging.
+
+## Usage
+
+<PlatformTabs>
+  <core>
+
+Install the plugin:
+
+```js
+import { Player } from '@player-ui/player';
+import { ConsoleLoggerPlugin } from '@player-ui/console-logger-plugin';
+
+const consoleLogger = new ConsoleLoggerPlugin();
+
+const player = new Player({
+  plugins: [consoleLogger]
+});
+```
+
+To change the severity:
+
+```js
+consoleLogger.setSeverity('warn');
+```
+
+  </core>
+  <ios>
+
+Add the subspec:
+
+```ruby
+pod 'PlayerUI/PrintLoggerPlugin'
+```
+
+Construct the plugin:
+
+```swift
+SwiftUIPlayer(
+  flow: flow,
+  plugins: [PrintLoggerPlugin()],
+  result: $result
+)
+```
+
+To change the severity:
+```swift
+PrintLoggerPlugin(level: .warn)
+```
+
+  </ios>
+</PlatformTabs>

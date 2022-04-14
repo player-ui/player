@@ -1,0 +1,22 @@
+value                      ::= segment_and_bracket (SEGMENT_SEPARATOR segment_and_bracket)*
+segment                    ::= concatenated | expression | modelRef | identifier  
+concatenated               ::= (expression | modelRef | identifier)+
+modelRef                   ::= OPEN_CURL OPEN_CURL value CLOSE_CURL CLOSE_CURL 
+identifier                 ::= [\\w\\-@]+
+query                      ::= WHITESPACE* optionally_quoted_segment WHITESPACE* EQUALS EQUALS? EQUALS? WHITESPACE* optionally_quoted_segment WHITESPACE*
+brackets                   ::= OPEN_BRACKET WHITESPACE* (query | optionally_quoted_segment) WHITESPACE* CLOSE_BRACKET 
+segment_and_bracket        ::= segment brackets*
+quoted_value               ::= [^"']*
+optionally_quoted_segment  ::= WHITESPACE* SINGLE_QUOTE quoted_value SINGLE_QUOTE WHITESPACE* | WHITESPACE* DOUBLE_QUOTE quoted_value DOUBLE_QUOTE WHITESPACE* | WHITESPACE* segment WHITESPACE*
+expression_value           ::= [^`]*
+expression                 ::= BACK_TICK expression_value BACK_TICK
+EQUALS                     ::= "="
+SEGMENT_SEPARATOR          ::= "."
+SINGLE_QUOTE               ::= "'"
+DOUBLE_QUOTE               ::= '"'
+WHITESPACE                 ::= " "
+OPEN_CURL                  ::= "{"
+CLOSE_CURL                 ::= "}" 
+OPEN_BRACKET               ::= "[" 
+CLOSE_BRACKET              ::= "]" 
+BACK_TICK                  ::= "`"

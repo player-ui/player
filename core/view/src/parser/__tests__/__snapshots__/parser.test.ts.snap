@@ -1,0 +1,378 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`generates the correct AST parses a nested switch 1`] = `
+Object {
+  "children": Array [
+    Object {
+      "path": Array [
+        "fields",
+      ],
+      "value": Object {
+        "cases": Array [
+          Object {
+            "case": "{{bar}}",
+            "value": Object {
+              "children": Array [
+                Object {
+                  "path": Array [
+                    "asset",
+                  ],
+                  "value": Object {
+                    "parent": [Circular],
+                    "type": "asset",
+                    "value": Object {
+                      "id": "input-1",
+                      "type": "input",
+                    },
+                  },
+                },
+              ],
+              "parent": [Circular],
+              "type": "value",
+              "value": undefined,
+            },
+          },
+          Object {
+            "case": "{{foo.bar}}",
+            "value": Object {
+              "children": Array [
+                Object {
+                  "path": Array [
+                    "asset",
+                  ],
+                  "value": Object {
+                    "parent": [Circular],
+                    "type": "asset",
+                    "value": Object {
+                      "id": "input-2",
+                      "type": "input",
+                    },
+                  },
+                },
+              ],
+              "parent": [Circular],
+              "type": "value",
+              "value": undefined,
+            },
+          },
+        ],
+        "dynamic": false,
+        "parent": [Circular],
+        "type": "switch",
+      },
+    },
+  ],
+  "type": "value",
+  "value": Object {
+    "id": "foo",
+  },
+}
+`;
+
+exports[`generates the correct AST parses a switch 1`] = `
+Object {
+  "cases": Array [
+    Object {
+      "case": "{{foo.bar}}",
+      "value": Object {
+        "children": Array [
+          Object {
+            "path": Array [
+              "asset",
+            ],
+            "value": Object {
+              "parent": [Circular],
+              "type": "asset",
+              "value": Object {
+                "type": "foo",
+              },
+            },
+          },
+        ],
+        "parent": [Circular],
+        "type": "value",
+        "value": undefined,
+      },
+    },
+  ],
+  "dynamic": false,
+  "type": "switch",
+}
+`;
+
+exports[`generates the correct AST parses a template 1`] = `
+Object {
+  "children": Array [
+    Object {
+      "path": Array [
+        "asset",
+      ],
+      "value": Object {
+        "children": Array [
+          Object {
+            "path": Array [
+              "values",
+            ],
+            "value": Object {
+              "data": "foo.bar",
+              "depth": 0,
+              "parent": [Circular],
+              "template": Object {
+                "value": "{{foo.bar._index_}}",
+              },
+              "type": "template",
+            },
+          },
+        ],
+        "parent": [Circular],
+        "type": "asset",
+        "value": Object {
+          "type": "collection",
+        },
+      },
+    },
+  ],
+  "type": "value",
+  "value": undefined,
+}
+`;
+
+exports[`generates the correct AST parses an exp array 1`] = `
+Object {
+  "children": Array [
+    Object {
+      "path": Array [
+        "exp",
+      ],
+      "value": Object {
+        "override": true,
+        "parent": [Circular],
+        "type": "multi-node",
+        "values": Array [
+          Object {
+            "parent": [Circular],
+            "type": "value",
+            "value": "{{please}} = \\"work\\"",
+          },
+        ],
+      },
+    },
+  ],
+  "type": "asset",
+  "value": Object {
+    "id": "foo",
+    "type": "action",
+  },
+}
+`;
+
+exports[`generates the correct AST parses an object 1`] = `
+Object {
+  "children": Array [
+    Object {
+      "path": Array [
+        "asset",
+      ],
+      "value": Object {
+        "parent": [Circular],
+        "type": "asset",
+        "value": Object {
+          "type": "bar",
+        },
+      },
+    },
+  ],
+  "type": "value",
+  "value": undefined,
+}
+`;
+
+exports[`generates the correct AST parses nested templates 1`] = `
+Object {
+  "children": Array [
+    Object {
+      "path": Array [
+        "values",
+      ],
+      "value": Object {
+        "data": "foo.pets",
+        "depth": 0,
+        "parent": [Circular],
+        "template": Object {
+          "asset": Object {
+            "id": "outer-collection-_index_",
+            "template": Array [
+              Object {
+                "data": "foo.people",
+                "output": "values",
+                "value": Object {
+                  "text": "{{foo.pets._index_}} + {{foo.people._index1_}}",
+                },
+              },
+            ],
+            "type": "collection",
+          },
+        },
+        "type": "template",
+      },
+    },
+  ],
+  "type": "value",
+  "value": Object {
+    "id": "foo",
+    "type": "collection",
+  },
+}
+`;
+
+exports[`generates the correct AST works with applicability things 1`] = `
+Object {
+  "expression": "{{baz}}",
+  "type": "applicability",
+  "value": Object {
+    "parent": [Circular],
+    "type": "value",
+    "value": Object {
+      "foo": "bar",
+    },
+  },
+}
+`;
+
+exports[`generates the correct AST works with applicability things 2`] = `
+Object {
+  "children": Array [
+    Object {
+      "path": Array [
+        "asset",
+      ],
+      "value": Object {
+        "children": Array [
+          Object {
+            "path": Array [
+              "values",
+            ],
+            "value": Object {
+              "override": true,
+              "parent": [Circular],
+              "type": "multi-node",
+              "values": Array [
+                Object {
+                  "expression": "{{foo}}",
+                  "parent": [Circular],
+                  "type": "applicability",
+                  "value": Object {
+                    "parent": [Circular],
+                    "type": "value",
+                    "value": Object {
+                      "value": "foo",
+                    },
+                  },
+                },
+                Object {
+                  "parent": [Circular],
+                  "type": "value",
+                  "value": Object {
+                    "value": "bar",
+                  },
+                },
+              ],
+            },
+          },
+        ],
+        "parent": [Circular],
+        "type": "asset",
+        "value": undefined,
+      },
+    },
+  ],
+  "type": "value",
+  "value": undefined,
+}
+`;
+
+exports[`parseView parses a simple view 1`] = `
+Object {
+  "children": Array [
+    Object {
+      "path": Array [
+        "fields",
+        "asset",
+      ],
+      "value": Object {
+        "children": Array [
+          Object {
+            "path": Array [
+              "values",
+            ],
+            "value": Object {
+              "override": true,
+              "parent": [Circular],
+              "type": "multi-node",
+              "values": Array [
+                Object {
+                  "children": Array [
+                    Object {
+                      "path": Array [
+                        "asset",
+                      ],
+                      "value": Object {
+                        "parent": [Circular],
+                        "type": "asset",
+                        "value": Object {
+                          "id": "text-asset",
+                          "type": "text",
+                          "value": "bar",
+                        },
+                      },
+                    },
+                  ],
+                  "parent": [Circular],
+                  "type": "value",
+                  "value": undefined,
+                },
+                Object {
+                  "children": Array [
+                    Object {
+                      "path": Array [
+                        "asset",
+                      ],
+                      "value": Object {
+                        "expression": "foo.bar",
+                        "parent": [Circular],
+                        "type": "applicability",
+                        "value": Object {
+                          "parent": [Circular],
+                          "type": "asset",
+                          "value": Object {
+                            "id": "input-asset",
+                            "type": "input",
+                          },
+                        },
+                      },
+                    },
+                  ],
+                  "parent": [Circular],
+                  "type": "value",
+                  "value": undefined,
+                },
+              ],
+            },
+          },
+        ],
+        "parent": [Circular],
+        "type": "asset",
+        "value": Object {
+          "id": "foo-asset",
+          "type": "collection",
+        },
+      },
+    },
+  ],
+  "type": "view",
+  "value": Object {
+    "id": "foo-view",
+    "type": "viewtype",
+  },
+}
+`;

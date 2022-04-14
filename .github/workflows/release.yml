@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  trigger-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Branch name
+        run: echo running on branch ${GITHUB_REF##*/}
+
+      - name: Create and checkout release branch
+        run: |
+          git config --global user.email "opensource-svc@intuit.com"
+          git config --global user.name "intuit-svc"
+          git checkout -b release-${GITHUB_REF##*/}
+          git commit --allow-empty -m "Release ${GITHUB_REF##*/}"
+          echo "SOURCE_RELEASE_BRANCH=release-${GITHUB_REF##*/}" >> $GITHUB_ENV
+          git push origin release-${GITHUB_REF##*/}
+          
+      - name: create-pr
+        id: open-pr
+        uses: repo-sync/pull-request@v2
+        with:
+          source_branch: ${{ env.SOURCE_RELEASE_BRANCH }}
+          destination_branch: "main"
+          pr_allow_empty: true
+          pr_title: "Release ${GITHUB_REF##*/}"
+          pr_label: "release"
+          github_token: ${{ secrets.GH_TOKEN }}
+
+      - name: Merge release PR
+        uses: sudo-bot/action-pull-request-merge@v1.1.1
+        with:
+            github-token: ${{ secrets.GH_TOKEN }}
+            number: ${{ steps.open-pr.outputs.pr_number }}

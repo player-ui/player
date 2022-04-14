@@ -1,0 +1,158 @@
+---
+title: Templates
+---
+
+# Templates
+
+Templates provide a way to dynamically create a list of assets, or _any_ object, based on data from the model. All of the templating semantics are removed by the time it reaches an asset's transform or UI layer.
+
+## Usage
+
+Within any asset, specify a `template` property as an array of:
+
+- `data` - A binding that points to an array in the model
+- `output` - A property to put the mapped objects
+- `value` - The template to use for each object/item in the data array.
+
+Within a template, the `_index_` string can be used to substitute the array-index of the item being mapped.
+
+### Example
+
+**Authored**
+
+```json
+{
+  "asset": {
+    "id": "top-level",
+    "type": "collection",
+    "template": [
+      {
+        "data": "list.of.names",
+        "output": "values",
+        "value": {
+          "asset": {
+            "id": "value-_index_",
+            "type": "text",
+            "value": "{{list.of.names._index_}}"
+          }
+        }
+      }
+    ]
+  }
+}
+```
+
+**Output**
+
+```json
+{
+  "asset": {
+    "id": "top-level",
+    "type": "collection",
+    "values": [
+      {
+        "asset": {
+          "id": "value-0",
+          "type": "text",
+          "value": "Adam"
+        }
+      },
+      {
+        "asset": {
+          "id": "value-1",
+          "type": "text",
+          "value": "Margie"
+        }
+      }
+    ]
+  }
+}
+```
+
+## Multiple templates
+
+There's a few ways to leverage multiple templates within a single asset. Templates can be _nested_ or multiple used on a single node. These can also be combined to build out super complicated nested expansion.
+
+### Nested Templates
+
+Templates can contain other templates. When referencing a nested template, append the template depth to the `_index_` string to reference the correct data-item.
+
+For example, if 1 template contains another, use `_index_` to reference the outer-loop, and `_index1_` to reference the inner loop.
+
+### Multiple Templates - Single Output
+
+Templates will, by default, create an array, if needed, for the `output` property of each template. If that array already exits (either by manually writing it in the JSON, or from a previous template run), each item will be appended to the end of the existing array.
+
+This can be leveraged by combining multiple template directives that use the same `output` property, or by having an `output` use an existing array:
+
+**_Example_**
+
+Both templates in the example below output to the `values` array on the parent object. Since no `values` array exists, the first template will create said array, and the second will append to that.
+
+```json
+{
+  "asset": {
+    "id": "top-level",
+    "type": "collection",
+    "template": [
+      {
+        "data": "list.of.names",
+        "output": "values",
+        "value": {
+          "asset": {
+            "id": "name-_index_",
+            "type": "text",
+            "value": "{{list.of.names._index_}}"
+          }
+        }
+      },
+      {
+        "data": "list.of.other-names",
+        "output": "values",
+        "value": {
+          "asset": {
+            "id": "other-name-_index_",
+            "type": "text",
+            "value": "{{list.of.names._index_}}"
+          }
+        }
+      }
+    ]
+  }
+}
+```
+
+**_Example_**
+
+The template below will append it's values to the pre-existing `values` array.
+
+```json
+{
+  "asset": {
+    "id": "top-level",
+    "type": "collection",
+    "values": [
+      {
+        "asset": {
+          "id": "existing-name",
+          "type": "text",
+          "value": "Something hard-coded"
+        }
+      }
+    ],
+    "template": [
+      {
+        "data": "list.of.names",
+        "output": "values",
+        "value": {
+          "asset": {
+            "id": "name-_index_",
+            "type": "text",
+            "value": "{{list.of.names._index_}}"
+          }
+        }
+      }
+    ]
+  }
+}
+```

@@ -1,0 +1,15 @@
+{
+  "author": "intuit-svc <opensource-svc@intuit.com>",
+  "baseBranch": "main",
+  "versionBranches": true,
+  "plugins": [
+    "./scripts/delete-old-prerelease.js",
+    [
+      "version-file",
+      {
+        "versionFile": "./VERSION",
+        "publishScript": "./scripts/release.sh"
+      }
+    ]
+  ]
+}

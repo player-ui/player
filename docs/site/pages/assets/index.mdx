@@ -1,0 +1,40 @@
+---
+title: 'Assets'
+---
+
+# Assets
+
+An asset is a generic term given to a semantic bit of information that we wish to convey to the user. Assets are the backbone that make up the content that Player renders. Though there are many different types of assets, they all follow the same basic principles:
+
+- Assets are uniquely identified within their view
+- Assets are semantically meaningful in and of themselves, not relying on any other asset to have meaning
+
+In some cases assets will contain other assets, however the contained assets can also stand on their own. If a complex asset requires information that is specific to itself, then that information is expressed as an object, not an asset.
+
+## Building Blocks of Assets
+
+There are a few key components that make up an asset:
+
+- How it is described in the source content
+- How it interacts with Player
+- How it should render
+
+![Asset Parts](/asset-parts.png?darkModeInvert)
+
+With few exceptions, an asset requires all three of these to be defined to fully function.
+
+#### JSON Contract
+
+The schema of an asset describes the contract between the input content (what user's will ultimately author) and your asset. These are often described through interfaces extending the base `Asset` interface, which can take advantage of the language or validator tooling.
+
+#### Data Interaction
+
+The next logical step is the contract between Player (it's data-model, validation rules, etc.) and an instance of an asset in a view. These are described through transform functions, which are stateless mapping functions orchestrated during the view reconciliation processing. You can read more about asset transforms [here](./assets/transforms)
+
+#### UI Rendering
+
+The last step of the puzzle is how the asset is physically displayed to a user. Given the output of the transform, it presents the user with data to display, or an interactive element to capture a response. Unlike the first 2 parts, the rendering is platform dependent and requires an implementation for each platform you're using Player with.
+
+# Asset Bundles
+
+In many cases, sets of assets are bundled together and loaded via a single [plugin](../plugins/asset-provider). For the three platforms we support (iOS, Android, and React), a reference set is created as an example. These provide a variety of common types of assets users may end up creating. While they _are_ capable of being used in a production application, they shouldn't be viewed as a standard set -- but merely an example for teams and apps to create their own standard set. To read more about the reference assets check out the [reference](./assets/reference) section.

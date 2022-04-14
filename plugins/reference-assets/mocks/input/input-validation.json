@@ -1,0 +1,59 @@
+{
+  "id": "generated-flow",
+  "views": [
+    {
+      "id": "input-1",
+      "type": "input",
+      "label": {
+        "asset": {
+          "id": "input-1-label",
+          "type": "text",
+          "value": "Input with validation and formatting"
+        }
+      },
+      "note": {
+        "asset": {
+          "id": "input-1-note",
+          "type": "text",
+          "value": "It expects a positive integer"
+        }
+      },
+      "binding": "foo.bar"
+    }
+  ],
+  "data": {},
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "input-1",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  },
+  "schema": {
+    "ROOT": {
+      "foo": {
+        "type": "FooType"
+      }
+    },
+    "FooType": {
+      "bar": {
+        "type": "IntegerPosType",
+        "validation": [
+          {
+            "type": "required"
+          }
+        ]
+      }
+    }
+  }
+}

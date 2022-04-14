@@ -1,0 +1,21 @@
+---
+title: setTimeout Plugin
+platform: android
+---
+
+# setTimeout Plugin
+
+The only explicit runtime plugin in the core Android plugin set, the `SetTimeoutPlugin` is a `RuntimePlugin` written to provide the global `setTimeout` method to the runtime.
+
+## Usage 
+
+```kotlin
+class PluginThatNeedsSetTimeout : RuntimePlugin {
+
+    override fun apply(runtime: Runtime) {
+        SetTimeoutPlugin().apply(runtime)
+        // do other plugin setup
+    }
+
+}
+```

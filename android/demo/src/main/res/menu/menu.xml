@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_reset"
+        android:title="Reset"
+        android:icon="@android:drawable/ic_menu_revert"
+        app:iconTint="@android:color/white"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_toggle_private_data_masking"
+        android:title="Toggle Data Masking"
+        app:showAsAction="never" />
+</menu>

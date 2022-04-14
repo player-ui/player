@@ -1,0 +1,46 @@
+---
+title: Partial Match
+platform: core
+---
+
+# Partial Match Plugin
+
+This plugin enables users to map matches of assets to any arbitrary value in a partial-match-registry. 
+For each asset in a resolved view, the matches will be computed. 
+
+
+## Usage
+
+<PlatformTabs>
+  <core>
+
+Create a registry and add matches:
+
+```ts
+import { Registry } from '@player-ui/partial-match-registry';
+
+const registry = new Registry([
+  [{ type: 'action' }, 'ABC']
+])
+```
+
+Add the registy to a plugin:
+
+```ts
+import { Player } from '@player-ui/player';
+import { PartialMatchFingerprintPlugin } from '@player-ui/partial-match-fingerprint-plugin';
+
+const matchPlugin = new PartialMatchFingerprintPlugin(registry);
+
+const player = new Player({
+  plugins: [matchPlugin]
+})
+```
+
+Query the plugin for matches:
+
+```ts
+const value = matchPlugin.get('asset-id') // 'ABC'
+```
+  </core>
+</PlatformTabs>

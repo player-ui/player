@@ -1,0 +1,20 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs';
+import { Text } from '@player-ui/reference-assets-plugin-react';
+import { PlayerStory } from '@player-ui/storybook';
+import { StoryWrapper } from '../components';
+import textFlow from '@player-ui/reference-assets-plugin-mocks/text/text-basic.json';
+
+<Meta title="Reference Assets/Text" component={Text} />
+
+# Text Asset
+
+The text asset is the core means of rendering text.
+Modifiers can be used to customize the display, including making text a hyperlink.
+
+<Canvas>
+  <Story name="Text">
+    <StoryWrapper>
+      <PlayerStory flow={textFlow} />
+    </StoryWrapper>
+  </Story>
+</Canvas>

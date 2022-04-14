@@ -1,0 +1,80 @@
+public final class com/intuit/player/jvm/plugins/metrics/CompletedTiming : com/intuit/player/jvm/plugins/metrics/Timing {
+	public static final field Companion Lcom/intuit/player/jvm/plugins/metrics/CompletedTiming$Companion;
+	public final fun getCompleted ()Z
+	public final fun getDuration ()Ljava/lang/Integer;
+	public final fun getEndTime ()Ljava/lang/Double;
+	public fun getNode ()Lcom/intuit/player/jvm/core/bridge/Node;
+}
+
+public final class com/intuit/player/jvm/plugins/metrics/CompletedTiming$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/intuit/player/jvm/plugins/metrics/IncompleteTiming : com/intuit/player/jvm/plugins/metrics/Timing {
+	public static final field Companion Lcom/intuit/player/jvm/plugins/metrics/IncompleteTiming$Companion;
+	public final fun getCompleted ()Z
+	public fun getNode ()Lcom/intuit/player/jvm/core/bridge/Node;
+}
+
+public final class com/intuit/player/jvm/plugins/metrics/IncompleteTiming$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/intuit/player/jvm/plugins/metrics/MetricsFlow : com/intuit/player/jvm/core/bridge/NodeWrapper {
+	public fun <init> (Lcom/intuit/player/jvm/core/bridge/Node;)V
+	public final fun getId ()Ljava/lang/String;
+	public final fun getInteractive ()Lcom/intuit/player/jvm/plugins/metrics/Timing;
+	public fun getNode ()Lcom/intuit/player/jvm/core/bridge/Node;
+	public final fun getRequestTime ()Ljava/lang/Integer;
+}
+
+public final class com/intuit/player/jvm/plugins/metrics/MetricsPlugin : com/intuit/player/jvm/core/plugins/JSScriptPluginWrapper {
+	public fun <init> (Lkotlin/jvm/functions/Function3;)V
+	public fun apply (Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;)V
+	public final fun renderEnd ()V
+}
+
+public final class com/intuit/player/jvm/plugins/metrics/MetricsPluginKt {
+	public static final fun getMetricsPlugin (Lcom/intuit/player/jvm/core/player/Player;)Lcom/intuit/player/jvm/plugins/metrics/MetricsPlugin;
+}
+
+public abstract class com/intuit/player/jvm/plugins/metrics/NodeMetrics : com/intuit/player/jvm/plugins/metrics/Timing {
+	public synthetic fun <init> (Lcom/intuit/player/jvm/core/bridge/Node;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun getNode ()Lcom/intuit/player/jvm/core/bridge/Node;
+	public final fun getStateName ()Ljava/lang/String;
+	public final fun getStateType ()Ljava/lang/String;
+}
+
+public final class com/intuit/player/jvm/plugins/metrics/PlayerFlowMetrics : com/intuit/player/jvm/plugins/metrics/Timing {
+	public static final field Companion Lcom/intuit/player/jvm/plugins/metrics/PlayerFlowMetrics$Companion;
+	public fun <init> (Lcom/intuit/player/jvm/core/bridge/Node;)V
+	public final fun getFlow ()Lcom/intuit/player/jvm/plugins/metrics/MetricsFlow;
+	public fun getNode ()Lcom/intuit/player/jvm/core/bridge/Node;
+}
+
+public final class com/intuit/player/jvm/plugins/metrics/PlayerFlowMetrics$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/intuit/player/jvm/plugins/metrics/RenderMetrics : com/intuit/player/jvm/plugins/metrics/NodeMetrics {
+	public static final field Companion Lcom/intuit/player/jvm/plugins/metrics/RenderMetrics$Companion;
+	public fun <init> (Lcom/intuit/player/jvm/core/bridge/Node;)V
+	public fun getNode ()Lcom/intuit/player/jvm/core/bridge/Node;
+	public final fun getRender ()Lcom/intuit/player/jvm/plugins/metrics/Timing;
+}
+
+public final class com/intuit/player/jvm/plugins/metrics/RenderMetrics$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public abstract class com/intuit/player/jvm/plugins/metrics/Timing : com/intuit/player/jvm/core/bridge/NodeWrapper {
+	public static final field Companion Lcom/intuit/player/jvm/plugins/metrics/Timing$Companion;
+	public synthetic fun <init> (Lcom/intuit/player/jvm/core/bridge/Node;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun getNode ()Lcom/intuit/player/jvm/core/bridge/Node;
+	public final fun getStartTime ()Ljava/lang/Double;
+}
+
+public final class com/intuit/player/jvm/plugins/metrics/Timing$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+

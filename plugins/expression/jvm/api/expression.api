@@ -1,0 +1,7 @@
+public final class com/intuit/player/plugins/expression/ExpressionPlugin : com/intuit/player/jvm/core/plugins/JSScriptPluginWrapper {
+	public fun <init> (Ljava/util/Map;)V
+	public fun <init> ([Lkotlin/Pair;)V
+	public fun apply (Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;)V
+	public final fun getMap ()Ljava/util/Map;
+}
+

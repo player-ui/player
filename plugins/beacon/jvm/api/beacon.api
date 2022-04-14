@@ -1,0 +1,17 @@
+public final class com/intuit/player/plugins/beacon/BeaconPlugin : com/intuit/player/jvm/core/plugins/JSScriptPluginWrapper, com/intuit/player/jvm/core/plugins/Pluggable {
+	public fun <init> (Ljava/util/List;)V
+	public fun <init> ([Lcom/intuit/player/jvm/core/plugins/JSPluginWrapper;)V
+	public fun apply (Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;)V
+	public final fun beacon (Ljava/lang/String;Ljava/lang/String;Lcom/intuit/player/jvm/core/asset/Asset;Ljava/lang/Object;)V
+	public static synthetic fun beacon$default (Lcom/intuit/player/plugins/beacon/BeaconPlugin;Ljava/lang/String;Ljava/lang/String;Lcom/intuit/player/jvm/core/asset/Asset;Ljava/lang/Object;ILjava/lang/Object;)V
+	public fun getPlugins ()Ljava/util/List;
+	public final fun registerHandler (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class com/intuit/player/plugins/beacon/BeaconPluginKt {
+	public static final fun beacon (Lcom/intuit/player/jvm/core/player/Player;Ljava/lang/String;Ljava/lang/String;Lcom/intuit/player/jvm/core/asset/Asset;Ljava/lang/Object;)V
+	public static synthetic fun beacon$default (Lcom/intuit/player/jvm/core/player/Player;Ljava/lang/String;Ljava/lang/String;Lcom/intuit/player/jvm/core/asset/Asset;Ljava/lang/Object;ILjava/lang/Object;)V
+	public static final fun getBeaconPlugin (Lcom/intuit/player/jvm/core/player/Player;)Lcom/intuit/player/plugins/beacon/BeaconPlugin;
+	public static final fun onBeacon (Lcom/intuit/player/jvm/core/player/Player;Lkotlin/jvm/functions/Function1;)V
+}
+

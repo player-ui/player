@@ -1,0 +1,47 @@
+public final class com/intuit/player/plugins/coroutines/FlowScopePlugin : com/intuit/player/jvm/core/plugins/PlayerPlugin {
+	public fun <init> ()V
+	public fun apply (Lcom/intuit/player/jvm/core/player/Player;)V
+	public final fun getFlowScope ()Lkotlinx/coroutines/CoroutineScope;
+	public final fun subScope (Lkotlin/coroutines/CoroutineContext;)Lkotlinx/coroutines/CoroutineScope;
+	public static synthetic fun subScope$default (Lcom/intuit/player/plugins/coroutines/FlowScopePlugin;Lkotlin/coroutines/CoroutineContext;ILjava/lang/Object;)Lkotlinx/coroutines/CoroutineScope;
+}
+
+public final class com/intuit/player/plugins/coroutines/FlowScopePlugin$FlowContext : kotlin/coroutines/CoroutineContext$Element {
+	public static final field Key Lcom/intuit/player/plugins/coroutines/FlowScopePlugin$FlowContext$Key;
+	public fun <init> (Lcom/intuit/player/jvm/core/flow/Flow;)V
+	public fun fold (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun get (Lkotlin/coroutines/CoroutineContext$Key;)Lkotlin/coroutines/CoroutineContext$Element;
+	public final fun getFlow ()Lcom/intuit/player/jvm/core/flow/Flow;
+	public fun getKey ()Lkotlin/coroutines/CoroutineContext$Key;
+	public fun minusKey (Lkotlin/coroutines/CoroutineContext$Key;)Lkotlin/coroutines/CoroutineContext;
+	public fun plus (Lkotlin/coroutines/CoroutineContext;)Lkotlin/coroutines/CoroutineContext;
+}
+
+public final class com/intuit/player/plugins/coroutines/FlowScopePlugin$FlowContext$Key : kotlin/coroutines/CoroutineContext$Key {
+}
+
+public final class com/intuit/player/plugins/coroutines/FlowScopePluginKt {
+	public static final fun getFlow (Lkotlinx/coroutines/CoroutineScope;)Lcom/intuit/player/jvm/core/flow/Flow;
+	public static final fun getFlowScope (Lcom/intuit/player/jvm/core/player/Player;)Lkotlinx/coroutines/CoroutineScope;
+	public static final fun getFlowScopePlugin (Lcom/intuit/player/jvm/core/player/Player;)Lcom/intuit/player/plugins/coroutines/FlowScopePlugin;
+	public static final fun subScope (Lcom/intuit/player/jvm/core/player/Player;Lkotlin/coroutines/CoroutineContext;)Lkotlinx/coroutines/CoroutineScope;
+	public static synthetic fun subScope$default (Lcom/intuit/player/jvm/core/player/Player;Lkotlin/coroutines/CoroutineContext;ILjava/lang/Object;)Lkotlinx/coroutines/CoroutineScope;
+}
+
+public final class com/intuit/player/plugins/coroutines/UpdatesPlugin : com/intuit/player/jvm/core/plugins/PlayerPlugin {
+	public fun <init> ()V
+	public fun apply (Lcom/intuit/player/jvm/core/player/Player;)V
+	public final fun flush ()V
+	public final fun getUpdates ()Lkotlinx/coroutines/channels/ReceiveChannel;
+	public final fun waitForUpdates ()Lcom/intuit/player/jvm/core/asset/Asset;
+	public final fun waitForUpdates (J)Lcom/intuit/player/jvm/core/asset/Asset;
+	public static synthetic fun waitForUpdates$default (Lcom/intuit/player/plugins/coroutines/UpdatesPlugin;JILjava/lang/Object;)Lcom/intuit/player/jvm/core/asset/Asset;
+}
+
+public final class com/intuit/player/plugins/coroutines/UpdatesPluginKt {
+	public static final fun getUpdatesPlugin (Lcom/intuit/player/jvm/core/player/Player;)Lcom/intuit/player/plugins/coroutines/UpdatesPlugin;
+	public static final fun waitForUpdates (Lcom/intuit/player/jvm/core/player/Player;)Lcom/intuit/player/jvm/core/asset/Asset;
+	public static final fun waitForUpdates (Lcom/intuit/player/jvm/core/player/Player;J)Lcom/intuit/player/jvm/core/asset/Asset;
+	public static synthetic fun waitForUpdates$default (Lcom/intuit/player/jvm/core/player/Player;JILjava/lang/Object;)Lcom/intuit/player/jvm/core/asset/Asset;
+}
+

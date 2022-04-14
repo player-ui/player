@@ -1,0 +1,10 @@
+public final class com/intuit/player/plugins/checkpath/CheckPathPlugin : com/intuit/player/jvm/core/plugins/JSScriptPluginWrapper {
+	public fun <init> ()V
+	public final fun getAsset (Ljava/lang/String;)Lcom/intuit/player/jvm/core/asset/Asset;
+}
+
+public final class com/intuit/player/plugins/checkpath/CheckPathPluginKt {
+	public static final fun getAsset (Lcom/intuit/player/jvm/core/player/Player;Ljava/lang/String;)Lcom/intuit/player/jvm/core/asset/Asset;
+	public static final fun getCheckPathPlugin (Lcom/intuit/player/jvm/core/player/Player;)Lcom/intuit/player/plugins/checkpath/CheckPathPlugin;
+}
+

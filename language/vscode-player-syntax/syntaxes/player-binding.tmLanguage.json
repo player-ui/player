@@ -1,0 +1,95 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Player Binding",
+  "patterns": [{ "include": "#binding" }],
+  "scopeName": "source.player.binding",
+  "repository": {
+    "binding": {
+      "patterns": [
+        { "include": "#modelRef" },
+        { "include": "#separator" },
+        { "include": "#optionallyQuotedSegment" },
+        { "include": "#identifier" }
+      ]
+    },
+    "bracketSegment": {
+      "begin": "\\[",
+      "end": "\\]",
+      "beginCaptures": { "0": { "name": "keyword.operator.eq" } },
+      "endCaptures": { "0": { "name": "keyword.operator.eq" } },
+
+      "patterns": [
+        { "include": "#optionallyQuotedSegment" },
+        { "name": "keyword.operator.eq", "match": "={1,3}" },
+        { "include": "#optionallyQuotedSegment" }
+      ]
+    },
+    "expressionRef": {
+      "begin": "`",
+      "end": "`",
+      "patterns": [{ "include": "source.player.expression" }]
+    },
+    "identifier": {
+      "name": "entity.other.attribute-name",
+      "match": "[\\w\\-@]+"
+    },
+    "modelRef": {
+      "begin": "{{",
+      "end": "}}",
+      "patterns": [{ "include": "source.player.binding" }]
+    },
+    "separator": {
+      "name": "keyword.control",
+      "match": "\\."
+    },
+    "optionallyQuotedSegment": {
+      "patterns": [
+        {
+          "name": "string.quoted.single.js",
+          "begin": "'",
+          "end": "'",
+          "beginCaptures": {
+            "0": { "name": "punctuation.definition.string.begin.js" }
+          },
+          "endCaptures": {
+            "0": { "name": "punctuation.definition.string.end.js" }
+          },
+          "patterns": [
+            { "include": "#escapes" },
+            {
+              "name": "constant.character.escape.newline.js",
+              "match": "\\\n"
+            },
+            {
+              "name": "invalid.illegal.character-not-allowed-here.js",
+              "match": "\n"
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.double.js",
+          "begin": "\"",
+          "end": "\"",
+          "beginCaptures": {
+            "0": { "name": "punctuation.definition.string.begin.js" }
+          },
+          "endCaptures": {
+            "0": { "name": "punctuation.definition.string.end.js" }
+          },
+          "patterns": [
+            { "include": "#escapes" },
+            {
+              "name": "constant.character.escape.newline.js",
+              "match": "\\\n"
+            },
+            {
+              "name": "invalid.illegal.character-not-allowed-here.js",
+              "match": "\n"
+            }
+          ]
+        },
+        { "include": "#identifier" }
+      ]
+    }
+  }
+}

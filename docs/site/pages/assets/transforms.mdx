@@ -1,0 +1,33 @@
+---
+title: 'Transforms'
+---
+
+# Assets and Transforms
+
+This guide will walk through a few of the core concepts of assets, transforms and how they come together with the UI to create an experience.
+
+You can read more about what an asset is [here](../content/assets-views). In short:
+
+> An asset is a generic term given to a semantic bit of information that we wish to convey to the user. Assets are the primitive elements that make up the content that players present as user experiences.
+
+For all intents and purposes, views are equivalent to assets for this guide.
+
+## Assets and the UI
+
+In general, the pipeline for user-content is something like:
+
+![Simple Asset Pipeline](/simple-diagram-asset.png?darkModeInvert)
+
+Player will do minimal processing of each asset in the tree, resolving [data in strings](../content/data-and-expressions), [applicability](../content/assets-views#applicability) and any other generic processing it can. The processed tree is then sent to the rendering layer, where it is turned into a native component on the system Player is running on.
+
+For simple Assets, like text, there's no need for any asset specific processing. The output of Player is enough to successfully render and display the content to the user.
+
+![Asset Without Transform](/no-transform.png?darkModeInvert)
+
+## Transforms
+
+When dealing with user interactions(`inputs`, `selections`) or some further data/communication is needed with Player, we expose a mechanism for individual assets to augment Player's processing with it's own custom data. By breaking this out into it's own discrete step (outside of the UI), we allow asset state to exist outside on an individual rendering, and thus sharable across platforms. These augmentations are processed through a stateless function called a transform.
+
+![Asset With Transform](/pipeline-with-transform.png?darkModeInvert)
+
+Transforms can be added through the [asset-transform](../plugins/asset-transform) plugin, and they run as part of the core player's reconciliation step. This improves performance, as the transforms are cached between updates to the view, and re-usable as they can be registered across platforms to share common logic for assets. You can refer to the [cross-platform](../architecture/cross-platform) guide on sharing Player logic across multiple platforms.

@@ -1,0 +1,34 @@
+{
+  "id": "collection",
+  "type": "collection",
+  "values": [
+    {
+      "asset": {
+        "id": "action-good",
+        "type": "action",
+        "value": "Next",
+        "label": {
+          "asset": {
+            "id": "action-good-label",
+            "type": "text",
+            "value": "End the flow (success)"
+          }
+        }
+      }
+    },
+    {
+      "asset": {
+        "id": "action-bad",
+        "type": "action",
+        "exp": "{{foo.bar..}",
+        "label": {
+          "asset": {
+            "id": "action-bad-label",
+            "type": "text",
+            "value": "End the flow (error)"
+          }
+        }
+      }
+    }
+  ]
+}

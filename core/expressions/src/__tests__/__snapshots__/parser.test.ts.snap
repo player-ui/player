@@ -1,0 +1,390 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`expression parser objects- in parser 1`] = `
+Object {
+  "__id": Symbol(Expression Node ID),
+  "attributes": Array [
+    Object {
+      "key": Object {
+        "__id": Symbol(Expression Node ID),
+        "raw": "\\"foo\\"",
+        "type": "Literal",
+        "value": "foo",
+      },
+      "value": Object {
+        "__id": Symbol(Expression Node ID),
+        "raw": "\\"value\\"",
+        "type": "Literal",
+        "value": "value",
+      },
+    },
+  ],
+  "type": "Object",
+}
+`;
+
+exports[`expression parser objects- in parser 2`] = `
+Object {
+  "__id": Symbol(Expression Node ID),
+  "attributes": Array [
+    Object {
+      "key": Object {
+        "__id": Symbol(Expression Node ID),
+        "raw": "\\"foo\\"",
+        "type": "Literal",
+        "value": "foo",
+      },
+      "value": Object {
+        "__id": Symbol(Expression Node ID),
+        "ref": "some.binding",
+        "type": "ModelRef",
+      },
+    },
+  ],
+  "type": "Object",
+}
+`;
+
+exports[`expression parser objects- in parser 3`] = `
+Object {
+  "__id": Symbol(Expression Node ID),
+  "attributes": Array [
+    Object {
+      "key": Object {
+        "__id": Symbol(Expression Node ID),
+        "raw": "\\"foo\\"",
+        "type": "Literal",
+        "value": "foo",
+      },
+      "value": Object {
+        "__id": Symbol(Expression Node ID),
+        "left": Object {
+          "__id": Symbol(Expression Node ID),
+          "raw": "1",
+          "type": "Literal",
+          "value": 1,
+        },
+        "operator": "+",
+        "right": Object {
+          "__id": Symbol(Expression Node ID),
+          "raw": "2",
+          "type": "Literal",
+          "value": 2,
+        },
+        "type": "BinaryExpression",
+      },
+    },
+  ],
+  "type": "Object",
+}
+`;
+
+exports[`expression parser objects- in parser 4`] = `
+Object {
+  "__id": Symbol(Expression Node ID),
+  "attributes": Array [
+    Object {
+      "key": Object {
+        "__id": Symbol(Expression Node ID),
+        "raw": "\\"foo\\"",
+        "type": "Literal",
+        "value": "foo",
+      },
+      "value": Object {
+        "__id": Symbol(Expression Node ID),
+        "raw": "\\"value\\"",
+        "type": "Literal",
+        "value": "value",
+      },
+    },
+    Object {
+      "key": Object {
+        "__id": Symbol(Expression Node ID),
+        "raw": "\\"bar\\"",
+        "type": "Literal",
+        "value": "bar",
+      },
+      "value": Object {
+        "__id": Symbol(Expression Node ID),
+        "raw": "\\"baz\\"",
+        "type": "Literal",
+        "value": "baz",
+      },
+    },
+  ],
+  "type": "Object",
+}
+`;
+
+exports[`expression parser objects- in parser 5`] = `
+Object {
+  "__id": Symbol(Expression Node ID),
+  "attributes": Array [
+    Object {
+      "key": Object {
+        "__id": Symbol(Expression Node ID),
+        "raw": "\\"foo\\"",
+        "type": "Literal",
+        "value": "foo",
+      },
+      "value": Object {
+        "__id": Symbol(Expression Node ID),
+        "raw": "\\"value\\"",
+        "type": "Literal",
+        "value": "value",
+      },
+    },
+    Object {
+      "key": Object {
+        "__id": Symbol(Expression Node ID),
+        "raw": "\\"bar\\"",
+        "type": "Literal",
+        "value": "bar",
+      },
+      "value": Object {
+        "__id": Symbol(Expression Node ID),
+        "attributes": Array [
+          Object {
+            "key": Object {
+              "__id": Symbol(Expression Node ID),
+              "raw": "\\"baz\\"",
+              "type": "Literal",
+              "value": "baz",
+            },
+            "value": Object {
+              "__id": Symbol(Expression Node ID),
+              "raw": "\\"foo\\"",
+              "type": "Literal",
+              "value": "foo",
+            },
+          },
+        ],
+        "type": "Object",
+      },
+    },
+  ],
+  "type": "Object",
+}
+`;
+
+exports[`expression parser objects- in parser 6`] = `
+Object {
+  "__id": Symbol(Expression Node ID),
+  "args": Array [
+    Object {
+      "__id": Symbol(Expression Node ID),
+      "raw": "\\"test\\"",
+      "type": "Literal",
+      "value": "test",
+    },
+    Object {
+      "__id": Symbol(Expression Node ID),
+      "attributes": Array [
+        Object {
+          "key": Object {
+            "__id": Symbol(Expression Node ID),
+            "raw": "\\"key\\"",
+            "type": "Literal",
+            "value": "key",
+          },
+          "value": Object {
+            "__id": Symbol(Expression Node ID),
+            "raw": "\\"value\\"",
+            "type": "Literal",
+            "value": "value",
+          },
+        },
+      ],
+      "type": "Object",
+    },
+  ],
+  "callTarget": Object {
+    "__id": Symbol(Expression Node ID),
+    "name": "publish",
+    "type": "Identifier",
+  },
+  "type": "CallExpression",
+}
+`;
+
+exports[`the happy stuff 1`] = `
+Object {
+  "__id": Symbol(Expression Node ID),
+  "name": "foo",
+  "type": "Identifier",
+}
+`;
+
+exports[`the happy stuff 2`] = `
+Object {
+  "__id": Symbol(Expression Node ID),
+  "left": Object {
+    "__id": Symbol(Expression Node ID),
+    "name": "foo",
+    "type": "Identifier",
+  },
+  "operator": "===",
+  "right": Object {
+    "__id": Symbol(Expression Node ID),
+    "name": "bar",
+    "type": "Identifier",
+  },
+  "type": "BinaryExpression",
+}
+`;
+
+exports[`the happy stuff 3`] = `
+Object {
+  "__id": Symbol(Expression Node ID),
+  "left": Object {
+    "__id": Symbol(Expression Node ID),
+    "name": "foo",
+    "type": "Identifier",
+  },
+  "operator": "||",
+  "right": Object {
+    "__id": Symbol(Expression Node ID),
+    "name": "bar",
+    "type": "Identifier",
+  },
+  "type": "LogicalExpression",
+}
+`;
+
+exports[`the happy stuff 4`] = `
+Object {
+  "__id": Symbol(Expression Node ID),
+  "args": Array [
+    Object {
+      "__id": Symbol(Expression Node ID),
+      "name": "bar",
+      "type": "Identifier",
+    },
+  ],
+  "callTarget": Object {
+    "__id": Symbol(Expression Node ID),
+    "name": "foo",
+    "type": "Identifier",
+  },
+  "type": "CallExpression",
+}
+`;
+
+exports[`the happy stuff 5`] = `
+Object {
+  "__id": Symbol(Expression Node ID),
+  "left": Object {
+    "__id": Symbol(Expression Node ID),
+    "ref": "foo",
+    "type": "ModelRef",
+  },
+  "operator": "=",
+  "right": Object {
+    "__id": Symbol(Expression Node ID),
+    "raw": "\\"bar\\"",
+    "type": "Literal",
+    "value": "bar",
+  },
+  "type": "Assignment",
+}
+`;
+
+exports[`the happy stuff 6`] = `
+Object {
+  "__id": Symbol(Expression Node ID),
+  "alternate": Object {
+    "__id": Symbol(Expression Node ID),
+    "raw": "\\"baz\\"",
+    "type": "Literal",
+    "value": "baz",
+  },
+  "consequent": Object {
+    "__id": Symbol(Expression Node ID),
+    "raw": "\\"bar\\"",
+    "type": "Literal",
+    "value": "bar",
+  },
+  "test": Object {
+    "__id": Symbol(Expression Node ID),
+    "ref": "foo",
+    "type": "ModelRef",
+  },
+  "type": "ConditionalExpression",
+}
+`;
+
+exports[`the happy stuff 7`] = `
+Object {
+  "__id": Symbol(Expression Node ID),
+  "computed": true,
+  "object": Object {
+    "__id": Symbol(Expression Node ID),
+    "name": "foo",
+    "type": "Identifier",
+  },
+  "property": Object {
+    "__id": Symbol(Expression Node ID),
+    "name": "bar",
+    "type": "Identifier",
+  },
+  "type": "MemberExpression",
+}
+`;
+
+exports[`the happy stuff 8`] = `
+Object {
+  "__id": Symbol(Expression Node ID),
+  "left": Object {
+    "__id": Symbol(Expression Node ID),
+    "ref": "foo",
+    "type": "ModelRef",
+  },
+  "operator": "==",
+  "right": Object {
+    "__id": Symbol(Expression Node ID),
+    "raw": "\\"string
+with	breaks\\"",
+    "type": "Literal",
+    "value": "string
+with	breaks",
+  },
+  "type": "BinaryExpression",
+}
+`;
+
+exports[`the happy stuff 9`] = `
+Object {
+  "__id": Symbol(Expression Node ID),
+  "left": Object {
+    "__id": Symbol(Expression Node ID),
+    "name": "foo",
+    "type": "Identifier",
+  },
+  "operator": "=",
+  "right": Object {
+    "__id": Symbol(Expression Node ID),
+    "elements": Array [
+      Object {
+        "__id": Symbol(Expression Node ID),
+        "raw": "1",
+        "type": "Literal",
+        "value": 1,
+      },
+      Object {
+        "__id": Symbol(Expression Node ID),
+        "raw": "2",
+        "type": "Literal",
+        "value": 2,
+      },
+      Object {
+        "__id": Symbol(Expression Node ID),
+        "raw": "3",
+        "type": "Literal",
+        "value": 3,
+      },
+    ],
+    "type": "ArrayExpression",
+  },
+  "type": "Assignment",
+}
+`;

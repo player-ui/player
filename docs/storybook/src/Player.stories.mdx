@@ -1,0 +1,103 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs';
+import { ErrorHandler, StoryWrapper } from './components';
+import { ManagedPlayer } from '@player-ui/react';
+import { PlayerStory } from '@player-ui/storybook';
+import basicFlow from './flows/basic-action';
+import { ReferenceAssetsPlugin } from '@player-ui/reference-assets-plugin-react';
+import {
+  createFlowManager,
+  SIMPLE_FLOWS,
+  ERROR_CONTENT_FLOW,
+  ERROR_ASSET_FLOW,
+} from './flows/managed';
+
+<Meta title="Player" />
+
+# React Player
+
+This shows the most basic way of rendering Player in a React app.
+
+Create a React Player using the `useWebPlayer` hook, pass it a flow to render, and use the `webPlayer.Component` to render the component in your app:
+
+```tsx
+const App = () => {
+  const { webPlayer } = useWebPlayer({
+    plugins: [new ReferenceAssetsPlugin()],
+  });
+
+  React.useEffect(() => {
+    webPlayer.start(/** Add content here */);
+  }, []);
+
+  return <webPlayer.Component />;
+};
+```
+
+<Canvas>
+  <Story name="Web Player">
+    <StoryWrapper>
+      <PlayerStory flow={basicFlow} />
+    </StoryWrapper>
+  </Story>
+</Canvas>
+
+# Managed React Player
+
+The Managed Player is a way of orchestrating chained flows through a React Player.
+It will step through each flow in the sequence, and enable users to respond after each one.
+
+Between loading each flow, the `ManagedPlayer` will trigger `React.Suspense` and wait for the next flow to be returned.
+
+<Canvas>
+  <Story name="Managed Web Player">
+    <StoryWrapper>
+      <React.Suspense fallback="Loading...">
+        <ManagedPlayer
+          plugins={[new ReferenceAssetsPlugin()]}
+          manager={createFlowManager(SIMPLE_FLOWS)}
+        />
+      </React.Suspense>
+    </StoryWrapper>
+  </Story>
+</Canvas>
+
+## Error Handling
+
+Within Player there are 2 ways of triggering an error, either sent from the UI (custom assets) or from the core Player library (invalid expressions, etc).
+In either scenario, the `ManagedPlayer` will trigger a `fallbackComponent` that can be used to render an error screen. The `fallbackComponent` gets props for either _restarting_ the current flow, which will retry the last flow that Player ran, or _resetting_ the current series of flows (starting over from the very begining)
+
+### Content Errors
+
+This is an example of a flow that triggers an error with an issue within the content itself -- in this case trying to evaluate an invalid expression.
+
+<Canvas>
+  <Story name="Content Errors">
+    <StoryWrapper>
+    <React.Suspense fallback="Loading...">
+      <ManagedPlayer
+        fallbackComponent={ErrorHandler}
+        plugins={[new ReferenceAssetsPlugin()]}
+        manager={createFlowManager(ERROR_CONTENT_FLOW)}
+      />
+    </React.Suspense>
+    </StoryWrapper>
+  </Story>
+</Canvas>
+
+### Asset Errors
+
+This is an example of a flow that triggers an error from the UI -- in this case trying to render as asset type that has no registered handler.
+
+<Canvas>
+  <Story name="Asset Errors">       
+    <StoryWrapper>
+      <React.Suspense fallback="Loading...">
+        <ManagedPlayer
+          fallbackComponent={ErrorHandler}
+          plugins={[new ReferenceAssetsPlugin()]}
+          manager={createFlowManager(ERROR_ASSET_FLOW)}
+        />
+      </React.Suspense>
+    </StoryWrapper>
+  </Story>
+</Canvas>

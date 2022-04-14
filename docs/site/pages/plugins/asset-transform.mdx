@@ -1,0 +1,115 @@
+---
+title: Asset Transform
+platform: core,react
+---
+
+# Asset Transform Plugin
+
+## What are _transforms_?
+
+Transforms are functions that map the authored JSON representation of an asset into a stateful JavaScript object, including all of the properties required for that asset to interact with the data-model, navigation, and the rest of Player. This allows UI implementations to have consistent treatment and behavior. While the transform plugin is registered in the _core_ layer, it can be wrapped by the native platforms. 
+
+## Partial Matching
+
+The transform plugin makes use of the `partial-match-registry` which ranks matching templates by the number of matching key-value pairs. This allows users to overwrite the implementation of the lookup, if more specific search criteria is provided. This registry/lookup pattern is also utilized in the web-player for the React Component to Asset mapping.
+
+## Usage
+
+
+<PlatformTabs>
+  <core>
+
+## Transform Arguments
+
+Each `transform` is a function that is passed 3 arguments: the current `asset` node, and an _options_ object containing a data-model, expression-evaluator, binding-parser, and a flow transition function, and a store for state management. The transforms should return an immutable representation of the asset, including any means of interacting with the _player_.
+
+
+```javascript
+import { Player } from '@player-ui/player';
+import { AssetTransformPlugin } from '@player-ui/asset-transform-plugin';
+
+// Add it to Player
+
+const player = new Player({
+  plugins: [
+    new AssetTransformPlugin(
+      new Registry([
+        // Register a match for any _action_ type with a custom transform.
+        [
+          { type: 'action' },
+          value => {
+            return {
+              ...value,
+              hello: () => console.log('hello world')
+            };
+          }
+        ]
+      ])
+    )
+  ]
+});
+```
+
+
+### State Management
+
+Often times node transforms require some state to be stored between updates. Historically this state was put in the data-model under `local` (to not send it back to the server), but updates became difficult to manage, and namespace collisions under _local_ were up to the transforms to discern.
+
+The third argument to the transform functions expose a store for data, that mirrors the usage of `React` hooks. This allow transforms to store state information in an automatically scoped store outside of the normal data tree.
+
+A simple transform to manage a counter might look like:
+
+```javascript
+const transform = (asset, options, store) => {
+  const [count, setCount] = store.useState(0);
+  return {
+    ...asset,
+    count,
+    increment() {
+      setCount(count + 1);
+    }
+  };
+};
+```
+
+  </core>
+</PlatformTabs>
+
+## Example
+
+<PlatformTabs>
+  <core>
+
+If the authored JSON is:
+
+```json
+{
+  "actions": [
+    {
+      "asset": {
+        "id": "foo",
+        "type": "action"
+      }
+    }
+  ]
+}
+```
+
+the transform-plugin would run the transform on the `action` asset, attaching a new `hello()` method. This can be invoked by any consumer of the current _view_, as a means of interacting with the _player_.
+
+```javascript
+{
+  actions: [
+    {
+      asset: {
+        id: 'foo',
+        type: 'action',
+        hello: () => console.log('hello world')
+      }
+    }
+  ];
+}
+```
+
+  </core>
+</PlatformTabs>

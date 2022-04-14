@@ -1,0 +1,49 @@
+{
+  "id": "transition-between-pages",
+  "views": [
+    {
+      "id": "view-1",
+      "type": "action",
+      "value": "next",
+      "label": {
+        "asset": {
+          "id": "view-1-label",
+          "type": "text",
+          "value": "Go to View 2"
+        }
+      }
+    },
+    {
+      "id": "view-2",
+      "type": "action",
+      "value": "prev",
+      "label": {
+        "asset": {
+          "id": "view-2-label",
+          "type": "text",
+          "value": "Go to View 1"
+        }
+      }
+    }
+  ],
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "ref": "view-1",
+        "state_type": "VIEW",
+        "transitions": {
+          "next": "VIEW_2"
+        }
+      },
+      "VIEW_2": {
+        "ref": "view-2",
+        "state_type": "VIEW",
+        "transitions": {
+          "prev": "VIEW_1"
+        }
+      }
+    }
+  }
+}

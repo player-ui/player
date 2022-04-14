@@ -1,0 +1,168 @@
+{
+  "id": "modal-flow",
+  "views": [
+    {
+      "id": "view-1",
+      "type": "info",
+      "title": {
+        "asset": {
+          "id": "view-title",
+          "type": "text",
+          "value": "View 1"
+        }
+      },
+      "actions": [
+        {
+          "asset": {
+            "id": "action-1",
+            "type": "action",
+            "value": "Next",
+            "label": {
+              "asset": {
+                "id": "action-1-label",
+                "type": "text",
+                "value": "Next"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "view-2",
+      "type": "info",
+      "title": {
+        "asset": {
+          "id": "view-title",
+          "type": "text",
+          "value": "View 2"
+        }
+      },
+      "actions": [
+        {
+          "asset": {
+            "id": "action-1",
+            "type": "action",
+            "value": "Next",
+            "label": {
+              "asset": {
+                "id": "action-1-label",
+                "type": "text",
+                "value": "Next"
+              }
+            }
+          }
+        },
+        {
+          "asset": {
+            "id": "action-2",
+            "type": "action",
+            "value": "Dismiss",
+            "label": {
+              "asset": {
+                "id": "action-1-label",
+                "type": "text",
+                "value": "Dismiss"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "view-3",
+      "type": "info",
+      "title": {
+        "asset": {
+          "id": "view-3-title",
+          "type": "text",
+          "value": "View 3"
+        }
+      },
+      "actions": [
+        {
+          "asset": {
+            "id": "action-3",
+            "type": "action",
+            "value": "Next",
+            "label": {
+              "asset": {
+                "id": "action-3-label",
+                "type": "text",
+                "value": "Next"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "view-4",
+      "type": "info",
+      "title": {
+        "asset": {
+          "id": "view-4-title",
+          "type": "text",
+          "value": "View 4"
+        }
+      },
+      "actions": [
+        {
+          "asset": {
+            "id": "action-4",
+            "type": "action",
+            "value": "Next",
+            "label": {
+              "asset": {
+                "id": "action-4-label",
+                "type": "text",
+                "value": "Next"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "data": {
+    "viewRef": "VIEW_3"
+  },
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "view-1",
+        "transitions": {
+          "*": "VIEW_2"
+        }
+      },
+      "VIEW_2": {
+        "state_type": "VIEW",
+        "ref": "view-2",
+        "attributes": {
+          "stacked": true
+        },
+        "transitions": {
+          "Next": "{{viewRef}}",
+          "Dismiss": "VIEW_1"
+        }
+      },
+      "VIEW_3": {
+        "state_type": "VIEW",
+        "ref": "view-3",
+        "transitions": {
+          "*": "VIEW_1"
+        }
+      },
+      "VIEW_4": {
+        "state_type": "VIEW",
+        "ref": "view-4",
+        "transitions": {
+          "*": "VIEW_1"
+        }
+      }
+    }
+  }
+}

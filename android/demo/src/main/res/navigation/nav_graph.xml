@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/StartFragment">
+
+    <fragment
+        android:id="@+id/StartFragment"
+        android:name="com.intuit.player.android.reference.demo.ui.start.StartFragment"
+        android:label="@string/player_fragment_label"
+        tools:layout="@layout/fragment_player">
+
+        <action
+            android:id="@+id/action_launch_player"
+            app:destination="@id/PlayerFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/PlayerFragment"
+        android:name="com.intuit.player.android.reference.demo.ui.player.DemoPlayerFragment"
+        android:label="{name}"
+        tools:layout="@layout/fragment_player">
+
+        <action
+            android:id="@+id/action_launch_player"
+            app:destination="@id/PlayerFragment" />
+    </fragment>
+</navigation>

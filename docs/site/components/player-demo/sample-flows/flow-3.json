@@ -1,0 +1,68 @@
+{
+  "id": "flow-3",
+  "views": [
+    {
+      "id": "view-1",
+      "type": "info",
+      "title": {
+        "asset": {
+          "id": "info-title",
+          "type": "text",
+          "value": "This is the 3nd and final flow in the series."
+        }
+      },
+      "actions": [
+        {
+          "asset": {
+            "id": "action-back",
+            "type": "action",
+            "value": "Prev",
+            "label": {
+              "asset": {
+                "id": "action-back-label",
+                "type": "text",
+                "value": "Back"
+              }
+            }
+          }
+        },
+        {
+          "asset": {
+            "id": "action-next",
+            "type": "action",
+            "value": "Next",
+            "label": {
+              "asset": {
+                "id": "action-next-label",
+                "type": "text",
+                "value": "Finish"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "view-1",
+        "transitions": {
+          "Prev": "END_Back",
+          "Next": "END_Done"
+        }
+      },
+      "END_Back": {
+        "state_type": "END",
+        "outcome": "back"
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}

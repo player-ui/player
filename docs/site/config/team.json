@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Adam Dierkens",
+    "domain": ["React", "Core"],
+    "avatar": "https://avatars.githubusercontent.com/u/13004162?v=4"
+  },
+  {
+    "name": "Harris Borawski",
+    "domain": ["iOS"],
+    "avatar": "https://avatars.githubusercontent.com/u/1325154?v=4"
+  },
+  {
+    "name": "Jeremiah Zucker",
+    "domain": ["Android"],
+    "avatar": "https://avatars.githubusercontent.com/u/9255651?&v=4"
+  },
+  {
+    "name": "Ketan Reddy",
+    "domain": ["React", "Core"],
+    "avatar": "https://avatars.githubusercontent.com/u/8703262?v=4"
+  },
+  {
+    "name": "Nilesh Chaturvedi",
+    "domain": ["Core", "Tooling"],
+    "avatar": "https://avatars.githubusercontent.com/u/53176612?v=4"
+  },
+  {
+    "name": "Spencer Hamm",
+    "domain": ["React", "Core"],
+    "avatar": "https://avatars.githubusercontent.com/u/1043478?v=4"
+  },
+  {
+    "name": "Tony Lin",
+    "domain": ["Android"],
+    "avatar": "https://avatars.githubusercontent.com/u/13474011?v=4"
+  }
+]

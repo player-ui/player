@@ -1,0 +1,71 @@
+---
+title: 'Assets & Views'
+---
+
+# Assets
+
+An asset is a generic term given to a semantic bit of information that we wish to convey to the user. Assets are the primitive elements that make up the content Player presents as user experiences. Though there are many different types of assets, they all follow the same basic principles:
+
+- assets are uniquely identified within their view
+- assets are semantically meaningful in and of themselves, not relying on any other asset to have meaning
+
+In some cases assets will contain other assets, however the contained assets can also stand on their own. If a complex asset requires information that is specific to itself, then that information is expressed as an object, not an asset.
+
+Each asset must have 2 properties: an `id` and `type`:
+
+- `id` - Unique ID for the asset. It must be unique per view.
+- `type` - A descriptive name for the asset type. This is used for handling rendering and transforms.
+
+Nested assets are represented as objects containing an `asset` property. For example:
+
+```json
+{
+  "id": "parent",
+  "type": "parent",
+  "label": {
+    "asset": {
+      "id": "child-asset",
+      "type": "child"
+    }
+  }
+}
+```
+
+The `label` of the parent contains a nested asset reference. These are _slots_ that can usually contain any asset type.
+
+## Applicability
+
+Any object in the tree (including _assets_) may contain an `applicability` property. This is an _expression_ that may conditionally show or hide an asset (and all of it's children) from the view tree. Applicability is dynamically calculated and will automatically update as data changes on the page.
+
+# Views
+
+Views are _assets_ that exist at the top level of the tree. They typically include the navigation actions, a title, or other top-level information.
+
+The `id` of the views are used in the navigation section to reference a specific view from the list.
+
+## Cross-field validation
+
+The other special property of a `view` vs. an `asset` is the addition of a `validation` property on the view. These contains [`validation` objects](../guides/validation) that are used for validations crossing multiple fields, and are ran on user navigation rather than data change.
+
+Example:
+
+```json
+{
+  ...
+  "views": [
+    {
+      "id": "view-1",
+      "validation": [
+        {
+          "type": "expression",
+          "ref": "foo.data.thing1",
+          "message": "Both need to equal 100",
+          "exp": "{{foo.data.thing1}} + {{foo.data.thing2}} == 100",
+        }
+      ]
+    }
+  ]
+}
+```
+
+They follow the same guidelines for normal validation references, with the addition of a `ref` property that points to the binding that this validation is tied to.

@@ -1,0 +1,24 @@
+{
+  "fileTypes": ["js", "jsx", "ts", "tsx", "vue"],
+  "injectionSelector": "L:source -string -comment",
+  "patterns": [
+    {
+      "name": "taggedTemplates",
+      "contentName": "meta.embedded.block.binding",
+      "begin": "b(`)",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.definition.string.template.begin.js"
+        }
+      },
+      "end": "`",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.template.end.js"
+        }
+      },
+      "patterns": [{ "include": "source.player.binding" }]
+    }
+  ],
+  "scopeName": "inline.player.binding"
+}

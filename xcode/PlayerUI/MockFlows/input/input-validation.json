@@ -1,0 +1,86 @@
+{
+  "id": "generated-flow",
+  "views": [
+    {
+      "id": "view-1",
+      "type": "collection",
+      "values": [
+        {
+          "asset": {
+            "id": "input-1",
+            "type": "input",
+            "binding": "person.age",
+            "label": {
+              "asset": {
+                "id": "input-1-label",
+                "type": "text",
+                "value": "Age"
+              }
+            }
+          }
+        },
+        {
+          "asset": {
+            "id": "input-2",
+            "type": "input",
+            "binding": "person.name",
+            "label": {
+              "asset": {
+                "id": "input-2-label",
+                "type": "text",
+                "value": "Name"
+              }
+            }
+          }
+        },
+        {
+          "asset": {
+            "id": "values",
+            "type": "text",
+            "value": "Name: \"{{person.name}}\". Age: \"{{person.age}}\""
+          }
+        }
+      ]
+    }
+  ],
+  "data": {},
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "view-1",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  },
+  "schema": {
+    "ROOT": {
+      "person": {
+        "type": "PersonType"
+      }
+    },
+    "PersonType": {
+      "age": {
+        "type": "IntegerType"
+      },
+      "name": {
+        "type": "StringType",
+        "validation": [
+          {
+            "type": "length",
+            "min": 1,
+            "max": 10
+          }
+        ]
+      }
+    }
+  }
+}
