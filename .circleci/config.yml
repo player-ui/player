@@ -207,7 +207,7 @@ jobs:
       - codecov/upload:
           file: ./bazel-out/_coverage/_coverage_report.dat
 
-  ship_it:
+  release:
     executor: base
     steps:
       - attach_workspace:
@@ -219,7 +219,8 @@ jobs:
             - v1-bazel-cache-core-{{ .Branch }} 
             - v1-bazel-cache-core-main 
 
-      - run: yarn auto shipit --only-graduate-with-release-label -vv
+      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      - run: npx auto shipit --only-graduate-with-release-label -vv
 
 workflows: 
   build_and_test_pr:
@@ -276,7 +277,7 @@ workflows:
           requires:
             - build
 
-      - ship_it:
+      - release:
           context:
             - Publish
           requires:
@@ -306,7 +307,7 @@ workflows:
           requires:
             - build
 
-      - ship_it:
+      - release:
           context:
             - Publish
           requires:
