@@ -117,7 +117,8 @@ pkg_npm(
     deps = [":cli-build", ":cli-manifest", ":cli-package_json", ":README.md", "bin/run"],
     substitutions = {
         "__VERSION__": "{STABLE_VERSION}",
-        "0.0.0-PLACEHOLDER": "{STABLE_VERSION}"
+        "0.0.0-PLACEHOLDER": "{STABLE_VERSION}",
+        "__GIT_COMMIT__": "{STABLE_GIT_COMMIT}",
     },
     validate = False,
 )
