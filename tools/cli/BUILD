@@ -56,6 +56,7 @@ create_package_json(
     bin_entry = "bin/run",
     bin_name = "player",
     out_dir = "dist",
+    registry = "https://registry.npmjs.org",
     placeholder_version = PLACEHOLDER_VERSION,
     dependencies = BUILD_DATA,
     peer_dependencies = None,
