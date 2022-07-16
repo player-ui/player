@@ -1,9 +1,9 @@
 load("@rules_player//javascript:js_library_pipeline.bzl", "PLACEHOLDER_VERSION")
 load("@rules_player//javascript/package_json:package_json.bzl", "create_package_json")
 load("@rules_player//javascript:utils.bzl", "filter_empty", "without_tests", "remove_duplicates", "include_exts")
+load("@build_bazel_rules_nodejs//:index.bzl", "js_library", "pkg_npm")
 load("@npm//jest-cli:index.bzl", "jest_test")
 load("@npm//eslint:index.bzl", "eslint_test")
-load("@rules_player//javascript:npm.bzl", "publish_npm")
 load("//:index.bzl", "expand_ts_outputs", "TEST_DATA", "LINT_DATA", "lint_exts")
 load("@npm//oclif:index.bzl", "oclif")
 load("@npm//typescript:index.bzl", "tsc")
@@ -112,8 +112,13 @@ jest_test(
     data = remove_duplicates(filter_empty(["//:jest.config.js", "package.json"] + BUILD_DATA + TEST_DATA + ALL_SRCS)),
 )
 
-publish_npm(
+pkg_npm(
     name = "cli-publish",
-    version = "//:VERSION",
-    bundle = [":cli-build", ":cli-manifest", ":cli-package_json", ":README.md", "bin/run"],
+    deps = [":cli-build", ":cli-manifest", ":cli-package_json", ":README.md", "bin/run"],
+    substitutions = {
+        "__VERSION__": "{STABLE_VERSION}",
+        "0.0.0-PLACEHOLDER": "{STABLE_VERSION}",
+        "__GIT_COMMIT__": "{STABLE_GIT_COMMIT}",
+    },
+    validate = False,
 )
