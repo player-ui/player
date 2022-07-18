@@ -1,8 +1,25 @@
-# List of source code paths and code owners
-# common services & repos
+# Fallback
 * @adierkens
-* @spentacular
-* @hborawski
-* @sugarmanz
-* @KetanReddy
-* @Brocollie08
+
+# Android/JVM
+
+jvm/ @sugarmanz @Brocollie08
+android/ @sugarmanz @Brocollie08
+language/ @KetanReddy
+
+# iOS
+xcode/ @hborawski
+ios/ @hborawski
+
+# Web
+react/ @spentacular @adierkens
+tools/storybook/ @adierkens
+
+# Core
+core/ @KetanReddy @adierkens
+
+# Language
+language/ @KetanReddy @adierkens
+
+# Other
+/docs/ @KetanReddy @adierkens
