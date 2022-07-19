@@ -39,7 +39,8 @@ data = [
   "@npm//rehype-autolink-headings",
   "@npm//remove-markdown",
   "@npm//github-slugger",
-  "@npm//gray-matter"
+  "@npm//gray-matter",
+  "@npm//nextjs-google-analytics"
 ]
 
 next_export(
