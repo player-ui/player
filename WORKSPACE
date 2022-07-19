@@ -136,6 +136,24 @@ maven_aar(
     artifact = "com.eclipsesource.j2v8:j2v8:6.1.0",
 )
 
+maven_aar(
+    name = "android_eyes_espresso",
+    artifact = "com.applitools:eyes-android-espresso:4.7.6",
+    settings = "//:settings.xml"
+)
+
+maven_aar(
+    name = "android_eyes_components",
+    artifact = "com.applitools:eyes-android-components:4.7.6",
+    settings = "//:settings.xml"
+)
+
+maven_aar(
+    name = "androidx_eyes_components",
+    artifact = "com.applitools:eyes-android-components-androidx:4.7.6",
+    settings = "//:settings.xml"
+)
+
 android_ndk_repository(name = "androidndk")
 register_toolchains("@androidndk//:all")
 
@@ -168,6 +186,7 @@ maven_install(
         "https://repo1.maven.org/maven2",
         "https://maven.google.com/",
         "https://plugins.gradle.org/m2/",
+        "https://jcenter.bintray.com/"
     ],
 )
 

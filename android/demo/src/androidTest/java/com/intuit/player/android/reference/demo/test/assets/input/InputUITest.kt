@@ -17,6 +17,7 @@ import com.intuit.player.android.reference.demo.R
 import com.intuit.player.android.reference.demo.test.base.AssetUITest
 import com.intuit.player.android.reference.demo.test.base.shouldBePlayerState
 import com.intuit.player.jvm.core.player.state.InProgressState
+import com.intuit.player.jvm.core.player.state.dataModel
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers.allOf
 import org.junit.Assert.assertEquals

@@ -16,12 +16,13 @@ parameters:
 
 orbs:
   macos: circleci/macos@2
+  android: circleci/android@2.0
   codecov: codecov/codecov@3.2.2
 
 executors:
   base:
     docker:
-      - image: docker.io/sugarmanz/bazel-common
+      - image: docker.io/playerui/bazel-docker
     working_directory: ~/player
     resource_class: xlarge
     environment:
@@ -31,6 +32,13 @@ executors:
     resource_class: macos.x86.medium.gen2
     macos:
       xcode: 13.2.1
+    environment:
+      TZ: "/usr/share/zoneinfo/America/Los_Angeles"
+  android:
+    machine:
+      image: android:202102-01
+    working_directory: ~/player
+    resource_class: large
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
 
@@ -56,17 +64,23 @@ jobs:
           at: ~/player
 
       - run: bazel build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci --config=skip-ios -- //...
-     
+
       - save_cache:
-          paths:  
+          paths:
             - node_modules
           key: v1-dependencies-{ { checksum "package.json" }}
+
+      - save_cache:
+          when: always
+          key: v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ~/.cache/bazel-disk-cache
 
       - persist_to_workspace:
           root: .
           paths:
             - .
-  
+
   build_ios:
     executor: ios
     steps:
@@ -79,7 +93,7 @@ jobs:
           keys:
             - android-tools-{{ arch }}-{{ checksum "scripts/install-android-tools.sh" }}
 
-      - run: echo 'export ANDROID_HOME=~/android-tools'  >> $BASH_ENV 
+      - run: echo 'export ANDROID_HOME=~/android-tools'  >> $BASH_ENV
 
       - run:
           name: Install Android tools
@@ -113,7 +127,7 @@ jobs:
           key: gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
           paths:
             - ~/.gem/ruby/2.7.5
-      
+
       - macos/preboot-simulator:
           version: "15.2"
           platform: "iOS"
@@ -131,7 +145,7 @@ jobs:
       # TODO: the timeout should be added to the test itself
       - run: bazel test --test_timeout=600 --jobs=1 --verbose_failures --config=ci  --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
 
-      - run: 
+      - run:
           when: always
           command: |
             RESULTS_DIR=_test_results
@@ -150,9 +164,9 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel test --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=skip-ios --config=ci -- //... -//docs/site
+      - run: bazel test --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=skip-ios --config=ci -- //... -//docs/site -//android/demo:android_instrumentation_test
 
-      - run: 
+      - run:
           when: always
           command: |
             RESULTS_DIR=_test_results
@@ -170,6 +184,63 @@ jobs:
           paths:
             - .
 
+  android_test:
+    executor: android
+    steps:
+      - checkout
+
+      - attach_workspace:
+          at: ~/player
+
+      - restore_cache:
+          keys:
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+            - v1-bazel-cache-core-{{ .Branch }}
+            - v1-bazel-cache-core-main
+
+      - run:
+          name: Install Bazel
+          command: |
+            wget -q https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-linux-amd64 -O bazelisk && \
+            chmod +x bazelisk && \
+            sudo mkdir /opt/bazelisk-v1.11.0 && \
+            sudo mv bazelisk /opt/bazelisk-v1.11.0 && \
+            sudo ln -s /opt/bazelisk-v1.11.0/bazelisk /usr/local/bin/bazel
+
+      - run:
+          name: Create avd
+          command: |
+            sdkmanager "system-images;android-29;default;x86"
+            echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-29;default;x86"
+
+      - run:
+          name: Launch emulator
+          command: |
+            emulator -avd test -delay-adb -verbose -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          background: true
+
+      - run:
+          name: Wait for emulator to start
+          command: |
+            circle-android wait-for-boot
+
+      - run:
+          name: Install APKs
+          command: |
+            adb install bazel-bin/android/demo/demo_test_app.apk
+            adb install bazel-bin/android/demo/demo.apk
+
+      - run: bazel test --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=skip-ios --config=ci -- //android/demo:android_instrumentation_test
+
+      - save_cache:
+          when: always
+          key: v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ~/.cache/bazel-disk-cache
+
+      - store_artifacts:
+          path: screenshots
+
   coverage:
     executor: base
     steps:
@@ -177,10 +248,10 @@ jobs:
           at: ~/player
 
       - restore_cache:
-          keys: 
-            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }} 
-            - v1-bazel-cache-core-{{ .Branch }} 
-            - v1-bazel-cache-core-main 
+          keys:
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+            - v1-bazel-cache-core-{{ .Branch }}
+            - v1-bazel-cache-core-main
 
       - run: |
           BUNDLE_TARGETS=$(bazel query "kind(nodejs_test, //...)" --output label 2>/dev/null | tr '\n' ' ')
@@ -196,22 +267,22 @@ jobs:
           at: ~/player
 
       - restore_cache:
-          keys: 
-            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }} 
-            - v1-bazel-cache-core-{{ .Branch }} 
-            - v1-bazel-cache-core-main 
+          keys:
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+            - v1-bazel-cache-core-{{ .Branch }}
+            - v1-bazel-cache-core-main
 
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
       - run: echo -e $GPG_KEY | gpg --import --batch
       - run: npx auto shipit --only-graduate-with-release-label -vv
 
-workflows: 
+workflows:
   build_and_test_pr:
     jobs:
       - setup:
           filters:
             branches:
-              ignore: 
+              ignore:
                 - main
                 - /version-.*/
             tags:
@@ -229,6 +300,12 @@ workflows:
           requires:
             - build
 
+      - android_test:
+          context:
+            - applitools
+          requires:
+            - build
+
       - coverage:
           requires:
             - build
@@ -240,7 +317,7 @@ workflows:
       - setup:
           filters:
             branches:
-              only: 
+              only:
                 - main
                 - /version-.*/
 
@@ -253,6 +330,12 @@ workflows:
             - setup
 
       - test:
+          requires:
+            - build
+
+      - android_test:
+          context:
+            - applitools
           requires:
             - build
 
@@ -283,6 +366,12 @@ workflows:
             - setup
 
       - test:
+          requires:
+            - build
+
+      - android_test:
+          context:
+            - applitools
           requires:
             - build
 

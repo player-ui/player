@@ -1,6 +1,6 @@
 load(":common.bzl", common = "maven")
 load("//android/player:deps.bzl", android = "maven")
-load("//android/demo:deps.bzl", demo = "maven")
+load("//android/demo:deps.bzl", demo = "maven", demo_test = "maven_test")
 load("//jvm/core:deps.bzl", core = "maven")
 load("//jvm/graaljs:deps.bzl", graaljs = "maven")
 load("//jvm/j2v8:deps.bzl", j2v8 = "maven")
@@ -13,4 +13,4 @@ load("@grab_bazel_common//:workspace_defs.bzl", grab = "GRAB_BAZEL_COMMON_ARTIFA
 
 tooling = distribution + grab
 
-maven = common + core + graaljs + j2v8 + utils + testutils + perf + plugins + tooling + android + demo
+maven = common + core + graaljs + j2v8 + utils + testutils + perf + plugins + tooling + android + demo + demo_test

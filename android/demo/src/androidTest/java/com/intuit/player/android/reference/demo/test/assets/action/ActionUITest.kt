@@ -10,6 +10,7 @@ import com.intuit.player.android.reference.demo.test.base.shouldBePlayerState
 import com.intuit.player.jvm.core.player.state.CompletedState
 import com.intuit.player.jvm.core.player.state.ErrorState
 import com.intuit.player.jvm.core.player.state.InProgressState
+import com.intuit.player.jvm.core.player.state.dataModel
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

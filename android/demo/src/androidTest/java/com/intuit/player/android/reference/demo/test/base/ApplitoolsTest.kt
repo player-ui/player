@@ -9,8 +9,7 @@ import com.applitools.eyes.android.common.config.Configuration
 import com.applitools.eyes.android.components.androidx.AndroidXComponentsProvider
 import com.applitools.eyes.android.espresso.Eyes
 import com.applitools.eyes.android.espresso.fluent.Target
-import com.intuit.player.android.reference.demo.BuildConfig.APPLITOOLS_API_KEY
-import com.intuit.player.android.reference.demo.BuildConfig.APPLITOOLS_BATCH_ID
+import com.intuit.player.android.reference.demo.ApplitoolsConfig
 import com.intuit.player.android.reference.demo.R
 
 abstract class ApplitoolsTest {
@@ -25,7 +24,7 @@ abstract class ApplitoolsTest {
             componentsProvider = AndroidXComponentsProvider()
             configuration = Configuration().apply {
                 batch = batchInfo
-                apiKey = APPLITOOLS_API_KEY
+                apiKey = ApplitoolsConfig.APPLITOOLS_KEY
                 setFeatures(Feature.PIXEL_COPY_SCREENSHOT)
                 setServerUrl("https://intuiteyesapi.applitools.com")
             }
@@ -45,6 +44,6 @@ abstract class ApplitoolsTest {
     fun Eyes.checkPlayer(name: String) = check(name, Target.region(ViewMatchers.withId(R.id.player_canvas)))
 
     companion object {
-        val batchInfo = BatchInfo("android-reference-assets@$APPLITOOLS_BATCH_ID")
+        val batchInfo = BatchInfo("android-reference-assets@local")
     }
 }
