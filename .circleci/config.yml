@@ -207,6 +207,10 @@ jobs:
             sudo mv bazelisk /opt/bazelisk-v1.11.0 && \
             sudo ln -s /opt/bazelisk-v1.11.0/bazelisk /usr/local/bin/bazel
 
+      # This is done because the outputs from the prev build can't be used due to lack of flag
+      # .bazelrc doesn't currently support string interpolation
+      - run: bazel build --define=APPLITOOLS_KEY=${APPLITOOLS_KEY} //android/demo:android_instrumentation_test
+
       - run:
           name: Create avd
           command: |
