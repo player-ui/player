@@ -34,6 +34,7 @@ build:ci --build_metadata=ROLE=CI --workspace_status_command=./scripts/workspace
 build:ci --local_cpu_resources=8
 build:ci --local_ram_resources=15000
 build:ci --config="release"
+build:ci --action_env=NEXT_PUBLIC_GA_MEASUREMENT_ID=$NEXT_PUBLIC_GA_MEASUREMENT_ID
 
 build:release --stamp --workspace_status_command=./scripts/workspace-status.sh
 
