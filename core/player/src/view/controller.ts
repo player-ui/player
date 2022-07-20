@@ -1,4 +1,4 @@
-import { SyncHook, SyncWaterfallHook } from 'tapable';
+import { SyncHook, SyncWaterfallHook } from 'tapable-ts';
 import type { Resolve } from '@player-ui/view';
 import { ViewInstance } from '@player-ui/view';
 import type { Logger } from '@player-ui/logger';
@@ -27,14 +27,12 @@ export interface ViewControllerOptions {
 export class ViewController {
   public readonly hooks = {
     /** Do any processing before the `View` instance is created */
-    resolveView: new SyncWaterfallHook<View, string, NavigationFlowViewState>([
-      'view',
-      'viewRef',
-      'viewState',
-    ]),
+    resolveView: new SyncWaterfallHook<
+      [View | undefined, string, NavigationFlowViewState]
+    >(),
 
     // The hook right before the View starts resolving. Attach anything custom here
-    view: new SyncHook<ViewInstance>(['view']),
+    view: new SyncHook<[ViewInstance]>(),
   };
 
   private readonly viewMap: Record<string, View>;

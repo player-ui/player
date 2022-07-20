@@ -9,7 +9,7 @@ javascript_pipeline(
         "//core/expressions:@player-ui/expressions",
         "//core/logger:@player-ui/logger",
         "//core/types:@player-ui/types",
-        "@npm//tapable",
+        "@npm//tapable-ts",
         "@npm//timm",
     ],
     test_data = [

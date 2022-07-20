@@ -1,4 +1,4 @@
-import type { SyncHook } from 'tapable';
+import type { SyncHook } from 'tapable-ts';
 import type { Resolver } from '../resolver';
 import type { Parser } from '../parser';
 
@@ -7,10 +7,10 @@ export interface View {
   /** The hooks for a view */
   hooks: {
     /** A hook when a parser is created for this view */
-    parser: SyncHook<Parser>;
+    parser: SyncHook<[Parser]>;
 
     /** A hook when a resolver is created for this view */
-    resolver: SyncHook<Resolver>;
+    resolver: SyncHook<[Resolver]>;
   };
 }
 

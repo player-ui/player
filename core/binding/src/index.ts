@@ -1,4 +1,4 @@
-import { SyncBailHook, SyncWaterfallHook } from 'tapable';
+import { SyncBailHook, SyncWaterfallHook } from 'tapable-ts';
 import NestedError from 'nested-error-stacks';
 import type { ParserResult, AnyNode } from '@player-ui/binding-grammar';
 import {
@@ -35,11 +35,10 @@ export class BindingParser {
   private parserOptions: BindingParserOptions;
 
   public hooks = {
-    skipOptimization: new SyncBailHook<string, void, void, boolean>(['path']),
+    skipOptimization: new SyncBailHook<[string], boolean>(),
     beforeResolveNode: new SyncWaterfallHook<
-      AnyNode,
-      Required<NormalizedResult> & ResolveBindingASTOptions
-    >(['node', 'context']),
+      [AnyNode, Required<NormalizedResult> & ResolveBindingASTOptions]
+    >(),
   };
 
   constructor(options?: Partial<BindingParserOptions>) {

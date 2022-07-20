@@ -1,4 +1,4 @@
-import { SyncWaterfallHook } from 'tapable';
+import { SyncWaterfallHook } from 'tapable-ts';
 import type { Parser, Node } from '../parser';
 import { NodeType } from '../parser';
 import type { ViewPlugin } from '.';
@@ -32,9 +32,8 @@ export default class TemplatePlugin implements ViewPlugin {
 
   hooks = {
     resolveTemplateSubstitutions: new SyncWaterfallHook<
-      TemplateSubstitution[],
-      TemplateItemInfo
-    >(['currentSubstitutions', 'templateItemInfo']),
+      [TemplateSubstitution[], TemplateItemInfo]
+    >(),
   };
 
   constructor(options: Options) {

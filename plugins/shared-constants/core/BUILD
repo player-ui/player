@@ -3,8 +3,7 @@ load("//:index.bzl", "javascript_pipeline")
 javascript_pipeline(
     name = "@player-ui/shared-constants-plugin",
     dependencies = [
-        "@npm//tapable",
-        "@npm//@types/tapable",
+        "@npm//tapable-ts",
         "@npm//dlv",
     ],
     test_data = [

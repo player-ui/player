@@ -1,15 +1,15 @@
-import { SyncHook } from 'tapable';
+import { SyncHook } from 'tapable-ts';
 import type { Logger, Severity } from './types';
 
 /** A logger that has a tapable subscriptions to callbacks */
 export default class TapableLogger implements Logger {
   public readonly hooks = {
-    trace: new SyncHook<Array<any>>(['args']),
-    debug: new SyncHook<Array<any>>(['args']),
-    info: new SyncHook<Array<any>>(['args']),
-    warn: new SyncHook<Array<any>>(['args']),
-    error: new SyncHook<Array<any>>(['args']),
-    log: new SyncHook<Severity, Array<any>>(['severity', 'args']),
+    trace: new SyncHook<[Array<any>]>(),
+    debug: new SyncHook<[Array<any>]>(),
+    info: new SyncHook<[Array<any>]>(),
+    warn: new SyncHook<[Array<any>]>(),
+    error: new SyncHook<[Array<any>]>(),
+    log: new SyncHook<[Severity, Array<any>]>(),
   };
 
   private logHandlers: Set<Logger> = new Set();

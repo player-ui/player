@@ -4,7 +4,6 @@ import { BeaconPlugin } from '@player-ui/beacon-plugin';
 import type { InProgressState } from '@player-ui/player';
 import { Player } from '@player-ui/player';
 import type { Flow } from '@player-ui/types';
-import type { Tap } from 'tapable';
 import type { NodeRenderMetrics } from '.';
 import {
   MetricsCorePlugin,
@@ -173,9 +172,9 @@ test('handles double updates', async () => {
 
 class MyBeaconPluginPlugin implements BeaconPluginPlugin {
   apply(beaconPlugin: BeaconPlugin) {
-    beaconPlugin.hooks.buildBeacon.tapPromise(
-      { name: 'my-beacon-plugin', context: true } as Tap,
-      async (context, beacon) => {
+    beaconPlugin.hooks.buildBeacon.tap(
+      { name: 'my-beacon-plugin', context: true },
+      async (context, beacon: any) => {
         const { renderTime } =
           (await (context as any)[MetricsViewBeaconPlugin.Symbol]) || {};
 

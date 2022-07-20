@@ -20,7 +20,7 @@ javascript_pipeline(
         "@npm//dequal",
         "@npm//p-defer",
         "@npm//queue-microtask",
-        "@npm//tapable",
+        "@npm//tapable-ts",
         "@npm//timm",
     ],
     test_data = [

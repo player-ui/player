@@ -5,7 +5,7 @@ import type {
   ValidationObject,
 } from '@player-ui/validator';
 import type { Logger } from '@player-ui/logger';
-import { SyncHook } from 'tapable';
+import { SyncHook } from 'tapable-ts';
 import type { Resolve } from './resolver';
 import { Resolver, toNodeResolveOptions } from './resolver';
 import type { Node } from './parser';
@@ -83,10 +83,10 @@ class CrossfieldProvider implements ValidationProvider {
 /** A stateful view instance from an content */
 export class ViewInstance implements ValidationProvider {
   public hooks = {
-    onUpdate: new SyncHook<ViewType>(['view']),
-    parser: new SyncHook<Parser>(['parser']),
-    resolver: new SyncHook<Resolver>(['resolver']),
-    templatePlugin: new SyncHook<TemplatePlugin>(['templatePlugin']),
+    onUpdate: new SyncHook<[ViewType]>(),
+    parser: new SyncHook<[Parser]>(),
+    resolver: new SyncHook<[Resolver]>(),
+    templatePlugin: new SyncHook<[TemplatePlugin]>(),
   };
 
   private resolver?: Resolver;

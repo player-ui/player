@@ -1,5 +1,5 @@
 import type { Logger } from '@player-ui/logger';
-import { SyncHook } from 'tapable';
+import { SyncHook } from 'tapable-ts';
 import type { Navigation, NavigationFlowEndState } from '@player-ui/types';
 import type { NamedState, TransitionOptions } from './flow';
 import { FlowInstance } from './flow';
@@ -7,7 +7,7 @@ import { FlowInstance } from './flow';
 /** A manager for the navigation section of a Content blob */
 export class FlowController {
   public readonly hooks = {
-    flow: new SyncHook<FlowInstance>(['flow']),
+    flow: new SyncHook<[FlowInstance]>(),
   };
 
   private readonly log?: Logger;

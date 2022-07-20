@@ -1,4 +1,4 @@
-import { SyncBailHook, SyncHook, SyncWaterfallHook } from 'tapable';
+import { SyncBailHook, SyncHook, SyncWaterfallHook } from 'tapable-ts';
 import type { Logger } from '@player-ui/logger';
 import type { DeferredPromise } from 'p-defer';
 import defer from 'p-defer';
@@ -34,37 +34,30 @@ export class FlowInstance {
   public readonly id: string;
   public currentState?: NamedState;
   public readonly hooks = {
-    beforeStart: new SyncBailHook<NavigationFlow, NavigationFlow>(['flow']),
+    beforeStart: new SyncBailHook<[NavigationFlow], NavigationFlow>(),
 
     /** A callback when the onStart node was present */
-    onStart: new SyncHook<any>(['onStart']),
+    onStart: new SyncHook<[any]>(),
 
     /** A callback when the onEnd node was present */
-    onEnd: new SyncHook<any>(['onEnd']),
+    onEnd: new SyncHook<[any]>(),
 
     /** A hook to intercept and block a transition */
     skipTransition: new SyncBailHook<
-      NamedState | undefined,
-      string,
+      [NamedState | undefined, string],
       boolean | undefined
-    >(['oldState', 'transitionName']),
+    >(),
 
     /** A chance to manipulate the flow-node used to calculate the given transition used  */
     beforeTransition: new SyncWaterfallHook<
-      Exclude<NavigationFlowState, NavigationFlowEndState>,
-      string
-    >(['currentState', 'transitionName']),
+      [Exclude<NavigationFlowState, NavigationFlowEndState>, string]
+    >(),
 
     /** A chance to manipulate the flow-node calculated after a transition */
-    resolveTransitionNode: new SyncWaterfallHook<NavigationFlowState>([
-      'newState',
-    ]),
+    resolveTransitionNode: new SyncWaterfallHook<[NavigationFlowState]>(),
 
     /** A callback when a transition from 1 state to another was made */
-    transition: new SyncHook<NamedState | undefined, NamedState>([
-      'oldState',
-      'newState',
-    ]),
+    transition: new SyncHook<[NamedState | undefined, NamedState]>(),
   };
 
   constructor(

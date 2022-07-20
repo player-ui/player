@@ -1,6 +1,6 @@
 import type { PathNode, AnyNode } from '@player-ui/binding-grammar';
 import NestedError from 'nested-error-stacks';
-import type { SyncWaterfallHook } from 'tapable';
+import type { SyncWaterfallHook } from 'tapable-ts';
 import { maybeConvertToNum } from '.';
 import { findInArray } from './utils';
 
@@ -26,8 +26,7 @@ export interface ResolveBindingASTOptions {
 export interface ResolveBindingASTHooks {
   /** A hook for transforming a node before fully resolving it */
   beforeResolveNode: SyncWaterfallHook<
-    AnyNode,
-    Required<NormalizedResult> & ResolveBindingASTOptions
+    [AnyNode, Required<NormalizedResult> & ResolveBindingASTOptions]
   >;
 }
 

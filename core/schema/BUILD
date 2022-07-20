@@ -7,7 +7,7 @@ javascript_pipeline(
         "//core/data:@player-ui/data",
         "//core/types:@player-ui/types",
         "//core/validator:@player-ui/validator",
-        "@npm//tapable",
+        "@npm//tapable-ts",
     ],
     test_data = [
         "//core/expressions:@player-ui/expressions",

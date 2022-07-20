@@ -22,7 +22,7 @@ import type {
   ExpressionEvaluatorOptions,
   ExpressionType,
 } from '@player-ui/expressions';
-import { SyncHook, SyncWaterfallHook } from 'tapable';
+import { SyncHook, SyncWaterfallHook } from 'tapable-ts';
 import type { BindingTracker } from './binding-tracker';
 import { ValidationBindingTrackerViewPlugin } from './binding-tracker';
 
@@ -279,18 +279,17 @@ class ValidatedBinding {
 export class ValidationController implements BindingTracker {
   public readonly hooks = {
     /** A hook called to tap into the validator registry for adding more validators */
-    createValidatorRegistry: new SyncHook<ValidatorRegistry>(['registry']),
+    createValidatorRegistry: new SyncHook<[ValidatorRegistry]>(),
 
     /** A callback/event when a new validation is added to the view */
-    onAddValidation: new SyncWaterfallHook<ValidationResponse, BindingInstance>(
-      ['validation', 'binding']
-    ),
+    onAddValidation: new SyncWaterfallHook<
+      [ValidationResponse, BindingInstance]
+    >(),
 
     /** The inverse of onAddValidation, this is called when a validation is removed from the list */
     onRemoveValidation: new SyncWaterfallHook<
-      ValidationResponse,
-      BindingInstance
-    >(['validation', 'binding']),
+      [ValidationResponse, BindingInstance]
+    >(),
   };
 
   private tracker: BindingTracker | undefined;

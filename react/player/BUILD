@@ -11,8 +11,7 @@ javascript_pipeline(
         "//react/subscribe:@player-ui/react-subscribe",
         "//react/utils:@player-ui/react-utils",
         "@npm//react-error-boundary",
-        "@npm//tapable",
-        "@npm//@types/tapable",
+        "@npm//tapable-ts"
     ],
     test_data = [
         "//core/make-flow:@player-ui/make-flow",

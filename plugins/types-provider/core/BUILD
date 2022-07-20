@@ -3,8 +3,7 @@ load("//:index.bzl", "javascript_pipeline")
 javascript_pipeline(
     name = "@player-ui/types-provider-plugin",
     dependencies = [
-        "@npm//tapable",
-        "@npm//@types/tapable",
+        "@npm//tapable-ts",
     ],
     test_data = [
         "//core/make-flow:@player-ui/make-flow",

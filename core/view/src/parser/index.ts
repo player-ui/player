@@ -1,5 +1,5 @@
 import { omit, setIn } from 'timm';
-import { SyncWaterfallHook } from 'tapable';
+import { SyncWaterfallHook } from 'tapable-ts';
 import type { Template, AssetSwitch } from '@player-ui/types';
 import type { Node, AnyAssetType } from './types';
 import { NodeType } from './types';
@@ -30,10 +30,7 @@ export class Parser {
      *  If undefined, the original value is used.
      *  If null, we stop parsing this node.
      */
-    onParseObject: new SyncWaterfallHook<object, NodeType>([
-      'value',
-      'nodeType',
-    ]),
+    onParseObject: new SyncWaterfallHook<[object, NodeType]>(),
 
     /**
      * A callback to interact with an AST _after_ we parse it into the AST
@@ -45,9 +42,8 @@ export class Parser {
      *   If null, we ignore this node all together
      */
     onCreateASTNode: new SyncWaterfallHook<
-      Node.Node | undefined | null,
-      object
-    >(['node', 'value']),
+      [Node.Node | undefined | null, object]
+    >(),
   };
 
   public parseView(value: AnyAssetType): Node.View {
