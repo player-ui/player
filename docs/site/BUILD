@@ -47,8 +47,12 @@ next_export(
   name = "site",
   data = data,
   srcs = srcs,
+  substitutions ={
+    "NEXT_PUBLIC_GA_MEASUREMENT_ID": "STABLE_GA_MEASUREMENT_ID"
+  },
   env = {
-    "DOCS_BASE_PATH": "/next"
+    "DOCS_BASE_PATH": "/next",
+    "NEXT_PUBLIC_GA_MEASUREMENT_ID": "NEXT_PUBLIC_GA_MEASUREMENT_ID",
   },
 )
 

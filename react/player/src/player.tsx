@@ -19,8 +19,8 @@ import type { WebPlayerProps } from './app';
 import PlayerComp from './app';
 import OnUpdatePlugin from './plugins/onupdate-plugin';
 
-const WEB_PLAYER_VERSION = '!!STABLE_VERSION!!';
-const COMMIT = '!!STABLE_GIT_COMMIT!!';
+const WEB_PLAYER_VERSION = '__VERSION__';
+const COMMIT = '__GIT_COMMIT__';
 
 export interface DevtoolsGlobals {
   /** A global for a plugin to load to Player for devtools */
