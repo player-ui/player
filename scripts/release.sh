@@ -25,3 +25,5 @@ done
 
 # Running this here because it will still have the pre-release version in the VERSION file before auto cleans it up
 bazel run --config=release //docs:deploy_docs
+
+bazel run @rules_player//distribution:staged-maven-deploy -- "$RELEASE_TYPE" --package-group=com.intuit.player --legacy

@@ -82,8 +82,8 @@ def distribution(
         scm_url = None):
     _distribution(
         name = name,
-        release_repo = "https://s01.oss.sonatype.org/service/local/",
-        snapshot_repo = "https://s01.oss.sonatype.org/content/repositories/snapshots/",
+        release_repo = "https://oss.sonatype.org/service/local/staging/deploy/maven2/",
+        snapshot_repo = "https://oss.sonatype.org/content/repositories/snapshots/",
         version_file = "//:VERSION",
         project_name = project_name,
         project_description = project_description,
