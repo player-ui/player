@@ -6,8 +6,7 @@ javascript_pipeline(
         "//core/binding:@player-ui/binding",
         "@npm//@types/dlv",
         "@npm//dlv",
-        "@npm//@types/tapable",
-        "@npm//tapable",
+        "@npm//tapable-ts",
         "@npm//timm",
     ],
 )

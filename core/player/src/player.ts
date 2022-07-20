@@ -1,4 +1,4 @@
-import { SyncHook, SyncWaterfallHook } from 'tapable';
+import { SyncHook, SyncWaterfallHook } from 'tapable-ts';
 import type { FlowInstance } from '@player-ui/flow';
 import { FlowController } from '@player-ui/flow';
 import type { Logger } from '@player-ui/logger';
@@ -78,43 +78,39 @@ export class Player {
 
   public readonly hooks = {
     /** The hook that fires every time we create a new flowController (a new Content blob is passed in) */
-    flowController: new SyncHook<FlowController>(['flowController']),
+    flowController: new SyncHook<[FlowController]>(),
 
     /** The hook that updates/handles views */
-    viewController: new SyncHook<ViewController>(['viewController']),
+    viewController: new SyncHook<[ViewController]>(),
 
     /** A hook called every-time there's a new view. This is equivalent to the view hook on the view-controller */
-    view: new SyncHook<ViewInstance>(['view']),
+    view: new SyncHook<[ViewInstance]>(),
 
     /** Called when an expression evaluator was created */
-    expressionEvaluator: new SyncHook<ExpressionEvaluator>([
-      'expressionEvaluator',
-    ]),
+    expressionEvaluator: new SyncHook<[ExpressionEvaluator]>(),
 
     /** The hook that creates and manages data */
-    dataController: new SyncHook<DataController>(['dataController']),
+    dataController: new SyncHook<[DataController]>(),
 
     /** Called after the schema is created for a flow */
-    schema: new SyncHook<SchemaController>(['schema']),
+    schema: new SyncHook<[SchemaController]>(),
 
     /** Manages validations (schema and x-field ) */
-    validationController: new SyncHook<ValidationController>([
-      'validationController',
-    ]),
+    validationController: new SyncHook<[ValidationController]>(),
 
     /** Manages parsing binding */
-    bindingParser: new SyncHook<BindingParser>(['bindingParser']),
+    bindingParser: new SyncHook<[BindingParser]>(),
 
     /** A that's called for state changes in the flow execution */
-    state: new SyncHook<PlayerFlowState>(['state']),
+    state: new SyncHook<[PlayerFlowState]>(),
 
     /** A hook to access the current flow */
-    onStart: new SyncHook<FlowType>(['flow']),
+    onStart: new SyncHook<[FlowType]>(),
 
     /** A hook for when the flow ends either in success or failure */
-    onEnd: new SyncHook(),
+    onEnd: new SyncHook<[]>(),
     /** Mutate the Content flow before starting */
-    resolveFlowContent: new SyncWaterfallHook<FlowType>(['content']),
+    resolveFlowContent: new SyncWaterfallHook<[FlowType]>(),
   };
 
   constructor(config?: PlayerConfigOptions) {

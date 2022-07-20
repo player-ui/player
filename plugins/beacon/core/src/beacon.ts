@@ -1,4 +1,4 @@
-import { SyncBailHook, AsyncSeriesWaterfallHook, SyncHook } from 'tapable';
+import { SyncBailHook, AsyncSeriesWaterfallHook, SyncHook } from 'tapable-ts';
 import type {
   Player,
   PlayerPlugin,
@@ -85,12 +85,9 @@ export class BeaconPlugin implements PlayerPlugin {
   private expressionEvaluator?: ExpressionEvaluator;
 
   public hooks = {
-    buildBeacon: new AsyncSeriesWaterfallHook<unknown, HookArgs>([
-      'beacon',
-      'beaconArguments',
-    ]),
-    cancelBeacon: new SyncBailHook<HookArgs, boolean>(['args']),
-    publishBeacon: new SyncHook(['beacon']),
+    buildBeacon: new AsyncSeriesWaterfallHook<[unknown, HookArgs]>(),
+    cancelBeacon: new SyncBailHook<[HookArgs], boolean>(),
+    publishBeacon: new SyncHook<[any]>(),
   };
 
   constructor(options?: BeaconPluginOptions) {
@@ -102,7 +99,9 @@ export class BeaconPlugin implements PlayerPlugin {
 
     if (options?.callback) {
       this.hooks.publishBeacon.tap('BeaconCallback', (beacon: any) => {
-        if (options.callback) options.callback(beacon);
+        if (options.callback) {
+          options.callback(beacon);
+        }
       });
     }
   }
@@ -204,7 +203,7 @@ export class BeaconPlugin implements PlayerPlugin {
         logger: this.logger as Logger,
       };
       const beacon =
-        (await this.hooks.buildBeacon.promise(defaultBeacon, hookArgs)) ||
+        (await this.hooks.buildBeacon.call(defaultBeacon, hookArgs)) ||
         defaultBeacon;
       const shouldCancel = this.hooks.cancelBeacon.call(hookArgs) || false;
 

@@ -10,6 +10,7 @@ import type {
   ExpressionEvaluator,
 } from '@player-ui/expressions';
 import type { BindingInstance, BindingParser } from '@player-ui/binding';
+import { Interceptor } from 'tapable-ts';
 
 const LISTENER_TYPES = {
   dataChange: 'dataChange.',
@@ -242,11 +243,10 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
      * 3) view -> resolve ->  : all resolve hooks are called every update - the listeners should not change between data updates.
      */
     const resolveViewInterceptor = {
-      context: false,
-      call: (view: View) => {
+      call: (view: View | undefined) => {
         const playerState = player.getState();
 
-        if (playerState.status !== 'in-progress') {
+        if (playerState.status !== 'in-progress' || !view) {
           return;
         }
 

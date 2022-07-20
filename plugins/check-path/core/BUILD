@@ -5,8 +5,7 @@ javascript_pipeline(
     dependencies = [
         "//core/partial-match-registry:@player-ui/partial-match-registry",
         "@npm//dlv",
-        "@npm//tapable",
-        "@npm//@types/tapable",
+        "@npm//tapable-ts",
     ],
     test_data = [
         "//core/make-flow:@player-ui/make-flow",

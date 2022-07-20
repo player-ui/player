@@ -13,7 +13,7 @@ javascript_pipeline(
         "//core/logger:@player-ui/logger",
         "//core/string-resolver:@player-ui/string-resolver",
         "//core/validator:@player-ui/validator",
-        "@npm//tapable",
+        "@npm//tapable-ts",
         "@npm//timm",
         "@npm//dlv",
         "@npm//dequal",

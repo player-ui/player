@@ -3,9 +3,8 @@ load("//:index.bzl", "javascript_pipeline")
 javascript_pipeline(
     name = "@player-ui/beacon-plugin",
     dependencies = [
-        "@npm//tapable",
+        "@npm//tapable-ts",
         "@npm//timm",
-        "@npm//@types/tapable",
     ],
     peer_dependencies = [
         "//core/player:@player-ui/player",

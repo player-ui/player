@@ -5,7 +5,7 @@ javascript_pipeline(
     dependencies = [
         "//core/logger:@player-ui/logger",
         "//core/types:@player-ui/types",
-        "@npm//tapable",
+        "@npm//tapable-ts",
         "@npm//p-defer",
     ],
 )

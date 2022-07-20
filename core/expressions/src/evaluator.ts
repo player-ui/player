@@ -1,4 +1,4 @@
-import { SyncWaterfallHook, SyncBailHook } from 'tapable';
+import { SyncWaterfallHook, SyncBailHook } from 'tapable-ts';
 import parse from './parser';
 import * as DEFAULT_EXPRESSION_HANDLERS from './evaluator-functions';
 import type {
@@ -90,17 +90,13 @@ export class ExpressionEvaluator {
   private readonly vars: Record<string, any> = {};
   public readonly hooks = {
     /** Resolve an AST node for an expression to a value */
-    resolve: new SyncWaterfallHook<any, ExpressionNode, HookOptions>([
-      'value',
-      'node',
-      'options',
-    ]),
+    resolve: new SyncWaterfallHook<[any, ExpressionNode, HookOptions]>(),
 
     /**
      * An optional means of handling an error in the expression execution
      * Return true if handled, to stop propagation of the error
      */
-    onError: new SyncBailHook<Error, never, never, true>(['error']),
+    onError: new SyncBailHook<[Error], true>(),
   };
 
   private readonly expressionsCache: Map<string, ExpressionNode> = new Map();

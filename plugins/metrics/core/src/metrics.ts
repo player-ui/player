@@ -1,5 +1,5 @@
 import type { Player, PlayerPlugin } from '@player-ui/player';
-import { SyncHook, SyncBailHook } from 'tapable';
+import { SyncHook, SyncBailHook } from 'tapable-ts';
 import type { BeaconPluginPlugin, BeaconArgs } from '@player-ui/beacon-plugin';
 import { BeaconPlugin } from '@player-ui/beacon-plugin';
 import {
@@ -112,7 +112,7 @@ export class MetricsViewBeaconPlugin implements BeaconPluginPlugin {
   apply(beaconPlugin: BeaconPlugin) {
     beaconPlugin.hooks.buildBeacon.intercept({
       context: true,
-      call: (context, beacon) => {
+      call: (context: any, beacon) => {
         if (context && (beacon as BeaconArgs).action === 'viewed') {
           context[this.symbol] = this.buildContext();
         }
@@ -251,48 +251,27 @@ export class MetricsCorePlugin implements PlayerPlugin {
   protected getTime: () => number;
 
   public readonly hooks = {
-    resolveRequestTime: new SyncBailHook<number>(['requestTime']),
+    resolveRequestTime: new SyncBailHook<[], number>(),
 
-    onFlowBegin: new SyncHook<PlayerFlowMetrics>(['update']),
-    onFlowEnd: new SyncHook<PlayerFlowMetrics>(['update']),
+    onFlowBegin: new SyncHook<[PlayerFlowMetrics]>(),
+    onFlowEnd: new SyncHook<[PlayerFlowMetrics]>(),
 
-    onInteractive: new SyncHook<Timing, PlayerFlowMetrics>([
-      'timing',
-      'update',
-    ]),
+    onInteractive: new SyncHook<[Timing, PlayerFlowMetrics]>(),
 
-    onNodeStart: new SyncHook<NodeMetrics | NodeRenderMetrics>([
-      'nodeMetrics',
-      'update',
-    ]),
-    onNodeEnd: new SyncHook<NodeMetrics | NodeRenderMetrics>([
-      'nodeMetrics',
-      'update',
-    ]),
+    onNodeStart: new SyncHook<[NodeMetrics | NodeRenderMetrics]>(),
+    onNodeEnd: new SyncHook<[NodeMetrics | NodeRenderMetrics]>(),
 
-    onRenderStart: new SyncHook<Timing, NodeRenderMetrics, PlayerFlowMetrics>([
-      'timing',
-      'nodeMetrics',
-      'update',
-    ]),
-    onRenderEnd: new SyncHook<Timing, NodeRenderMetrics, PlayerFlowMetrics>([
-      'timing',
-      'nodeMetrics',
-      'update',
-    ]),
+    onRenderStart: new SyncHook<
+      [Timing, NodeRenderMetrics, PlayerFlowMetrics]
+    >(),
+    onRenderEnd: new SyncHook<[Timing, NodeRenderMetrics, PlayerFlowMetrics]>(),
 
-    onUpdateStart: new SyncHook<Timing, NodeRenderMetrics, PlayerFlowMetrics>([
-      'timing',
-      'nodeMetrics',
-      'update',
-    ]),
-    onUpdateEnd: new SyncHook<Timing, NodeRenderMetrics, PlayerFlowMetrics>([
-      'timing',
-      'nodeMetrics',
-      'update',
-    ]),
+    onUpdateStart: new SyncHook<
+      [Timing, NodeRenderMetrics, PlayerFlowMetrics]
+    >(),
+    onUpdateEnd: new SyncHook<[Timing, NodeRenderMetrics, PlayerFlowMetrics]>(),
 
-    onUpdate: new SyncHook<PlayerFlowMetrics>(['update']),
+    onUpdate: new SyncHook<[PlayerFlowMetrics]>(),
   };
 
   private metrics: PlayerFlowMetrics = {};
@@ -321,7 +300,7 @@ export class MetricsCorePlugin implements PlayerPlugin {
 
     callbacks.forEach((hookName) => {
       if (options?.[hookName] !== undefined) {
-        this.hooks[hookName].tap('options', options?.[hookName] as any);
+        (this.hooks[hookName] as any).tap('options', options?.[hookName]);
       }
     });
   }
@@ -472,7 +451,7 @@ export class MetricsCorePlugin implements PlayerPlugin {
       this.metrics = {
         flow: {
           id: flow.id,
-          requestTime,
+          requestTime: requestTime ?? undefined,
           timeline: [],
           startTime,
           completed: false,

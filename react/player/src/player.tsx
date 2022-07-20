@@ -11,7 +11,7 @@ import type { AssetRegistryType } from '@player-ui/react-asset';
 import { AssetContext } from '@player-ui/react-asset';
 import { ErrorBoundary } from 'react-error-boundary';
 import { PlayerContext } from '@player-ui/react-utils';
-import { SyncWaterfallHook, AsyncParallelHook } from 'tapable';
+import { SyncWaterfallHook, AsyncParallelHook } from 'tapable-ts';
 import { Subscribe, useSubscribedState } from '@player-ui/react-subscribe';
 import { Registry } from '@player-ui/partial-match-registry';
 
@@ -84,20 +84,21 @@ export class WebPlayer {
     /**
      * A hook to create a React Component to be used for Player, regardless of the current flow state
      */
-    webComponent: new SyncWaterfallHook<React.ComponentType>(['webComponent']),
+    webComponent: new SyncWaterfallHook<[React.ComponentType]>(),
 
     /**
      * A hook to create a React Component that's used to render a specific view.
      * It will be called for each view update from the core player.
      * Typically this will just be `Asset`
      */
-    playerComponent: new SyncWaterfallHook<React.ComponentType<WebPlayerProps>>(
-      ['playerComponent']
-    ),
+    playerComponent: new SyncWaterfallHook<
+      [React.ComponentType<WebPlayerProps>]
+    >(),
+
     /**
      * A hook to execute async tasks before the view resets to undefined
      */
-    onBeforeViewReset: new AsyncParallelHook(),
+    onBeforeViewReset: new AsyncParallelHook<[]>(),
   };
 
   private viewUpdateSubscription = new Subscribe<View>();
@@ -229,7 +230,7 @@ export class WebPlayer {
       this.options.suspend && this.hooks.onBeforeViewReset.isUsed();
 
     return this.viewUpdateSubscription.reset(
-      shouldCallResetHook ? this.hooks.onBeforeViewReset.promise() : undefined
+      shouldCallResetHook ? this.hooks.onBeforeViewReset.call() : undefined
     );
   }
 

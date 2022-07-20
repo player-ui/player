@@ -1,4 +1,4 @@
-import { SyncWaterfallHook } from 'tapable';
+import { SyncWaterfallHook } from 'tapable-ts';
 import type { BindingInstance } from '@player-ui/binding';
 import type { Schema as SchemaType, Formatting } from '@player-ui/types';
 import type {
@@ -94,9 +94,8 @@ export class SchemaController implements ValidationProvider {
 
   public readonly hooks = {
     resolveTypeForBinding: new SyncWaterfallHook<
-      SchemaType.DataType | undefined,
-      BindingInstance
-    >(['dataType', 'binding']),
+      [SchemaType.DataType | undefined, BindingInstance]
+    >(),
   };
 
   constructor(schema?: SchemaType.Schema) {

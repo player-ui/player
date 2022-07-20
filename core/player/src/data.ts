@@ -1,4 +1,4 @@
-import { SyncHook, SyncWaterfallHook, SyncBailHook } from 'tapable';
+import { SyncHook, SyncWaterfallHook, SyncBailHook } from 'tapable-ts';
 import type { Logger } from '@player-ui/logger';
 import { omit, removeAt } from 'timm';
 import { dequal } from 'dequal';
@@ -18,21 +18,21 @@ import type { RawSetTransaction } from './types';
 /** The orchestrator for player data */
 export class DataController implements DataModelWithParser<DataModelOptions> {
   public hooks = {
-    resolve: new SyncWaterfallHook(['binding']),
-    resolveDataStages: new SyncWaterfallHook<DataPipeline>(['pipeline']),
+    resolve: new SyncWaterfallHook(),
+    resolveDataStages: new SyncWaterfallHook<[DataPipeline]>(),
 
     // On any set or get of an undefined value, redirect the value to be the default
-    resolveDefaultValue: new SyncBailHook<BindingInstance, any>(['binding']),
+    resolveDefaultValue: new SyncBailHook<[BindingInstance], any>(),
 
-    onDelete: new SyncHook<any, void>(['binding']),
-    onSet: new SyncHook<BatchSetTransaction, void>(['transaction']),
-    onGet: new SyncHook<any, any, void>(['binding', 'result']),
-    onUpdate: new SyncHook<Updates>(['updates']),
+    onDelete: new SyncHook<[any]>(),
+    onSet: new SyncHook<[BatchSetTransaction]>(),
+    onGet: new SyncHook<[any, any]>(),
+    onUpdate: new SyncHook<[Updates]>(),
 
-    format: new SyncWaterfallHook<any, BindingInstance>(['value', 'binding']),
-    deformat: new SyncWaterfallHook<any, BindingInstance>(['value', 'binding']),
+    format: new SyncWaterfallHook<[any, BindingInstance]>(),
+    deformat: new SyncWaterfallHook<[any, BindingInstance]>(),
 
-    serialize: new SyncWaterfallHook<any>(['data']),
+    serialize: new SyncWaterfallHook<[any]>(),
   };
 
   private model?: PipelinedDataModel;

@@ -8,6 +8,6 @@ javascript_pipeline(
         "//core/string-resolver:@player-ui/string-resolver",
         "//core/types:@player-ui/types",
         "//core/logger:@player-ui/logger",
-        "@npm//tapable",
+        "@npm//tapable-ts",
     ],
 )

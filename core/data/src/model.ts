@@ -1,4 +1,4 @@
-import { SyncHook } from 'tapable';
+import { SyncHook } from 'tapable-ts';
 import type { BindingLike, BindingFactory } from '@player-ui/binding';
 import { BindingInstance, isBinding } from '@player-ui/binding';
 import { NOOP_MODEL } from './noop-model';
@@ -170,7 +170,7 @@ export class PipelinedDataModel implements DataModelImpl {
   private effectiveDataModel: DataModelImpl;
 
   public readonly hooks = {
-    onSet: new SyncHook<BatchSetTransaction>(['transaction']),
+    onSet: new SyncHook<[BatchSetTransaction]>(),
   };
 
   constructor(pipeline: DataPipeline = []) {

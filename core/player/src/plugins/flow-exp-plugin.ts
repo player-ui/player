@@ -1,4 +1,8 @@
-import type { Expression, ExpressionObject } from '@player-ui/types';
+import type {
+  Expression,
+  ExpressionObject,
+  NavigationFlowState,
+} from '@player-ui/types';
 import type { ExpressionEvaluator } from '@player-ui/expressions';
 import type { FlowInstance } from '@player-ui/flow';
 import type { Player, PlayerPlugin } from '../player';
@@ -42,7 +46,7 @@ export class FlowExpPlugin implements PlayerPlugin {
         flow.hooks.onEnd.tap(this.name, (exp) => handleEval(exp));
         // Eval state nodes
         flow.hooks.resolveTransitionNode.intercept({
-          call: (nextState) => {
+          call: (nextState: NavigationFlowState) => {
             /** Get the current state of Player */
             const currentState = () => player.getState() as InProgressState;
 
