@@ -27,8 +27,8 @@ import type {
 import { NOT_STARTED_STATE } from './types';
 
 // Variables injected at build time
-const PLAYER_VERSION = '!!STABLE_VERSION!!';
-const COMMIT = '!!STABLE_GIT_COMMIT!!';
+const PLAYER_VERSION = '__VERSION__';
+const COMMIT = '__GIT_COMMIT__';
 
 export interface PlayerPlugin {
   /**

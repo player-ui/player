@@ -24,4 +24,4 @@ for pkg in $PKG_NPM_LABELS ; do
 done
 
 # Running this here because it will still have the pre-release version in the VERSION file before auto cleans it up
-bazel run //docs:deploy_docs
+bazel run --config=release //docs:deploy_docs
