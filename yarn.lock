@@ -92,6 +92,20 @@
     io-ts "^2.1.2"
     tslib "2.1.0"
 
+"@auto-it/upload-assets@^10.37.2":
+  version "10.37.2"
+  resolved "https://registry.yarnpkg.com/@auto-it/upload-assets/-/upload-assets-10.37.2.tgz#fbb3922d066b967b694e75de3d22d1c3c3d09859"
+  integrity sha512-sVroqS8FqnZfH2R1uWSvw5x8RsDK/41YYR3Z3UbY9KDqLo2xe5Gtnbc/rQdIyR9fWerBcb4lgMj1x6YX/J6AdA==
+  dependencies:
+    "@auto-it/core" "10.37.2"
+    endent "^2.1.0"
+    fast-glob "^3.1.1"
+    file-type "^16.0.0"
+    fp-ts "^2.5.3"
+    io-ts "^2.1.2"
+    terminal-link "^2.1.1"
+    tslib "2.1.0"
+
 "@auto-it/version-file@10.37.2", "@auto-it/version-file@^10.37.2":
   version "10.37.2"
   resolved "https://registry.yarnpkg.com/@auto-it/version-file/-/version-file-10.37.2.tgz#5a5dd7e879497ff85f90eead1c82cead404617d0"
@@ -4175,6 +4189,11 @@
   integrity sha512-5Kwtbo3Y/NowpkbRuSepbyMFkZmHgD+vPzYB/RJ4oxt5Gj/avFFBYjhw27cqSVPVw/3a67NK1PbiIr9k4Gwmdg==
   dependencies:
     "@babel/runtime" "^7.12.5"
+
+"@tokenizer/token@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@tokenizer/token/-/token-0.3.0.tgz#fe98a93fe789247e998c75e74e9c7c63217aa276"
+  integrity sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A==
 
 "@tootallnate/once@1":
   version "1.1.2"
@@ -9278,6 +9297,15 @@ file-system-cache@^1.0.5:
     fs-extra "^0.30.0"
     ramda "^0.21.0"
 
+file-type@^16.0.0:
+  version "16.5.3"
+  resolved "https://registry.yarnpkg.com/file-type/-/file-type-16.5.3.tgz#474b7e88c74724046abb505e9b8ed4db30c4fc06"
+  integrity sha512-uVsl7iFhHSOY4bEONLlTK47iAHtNsFHWP5YE4xJfZ4rnX7S1Q3wce09XgqSC7E/xh8Ncv/be1lNoyprlUH/x6A==
+  dependencies:
+    readable-web-to-node-stream "^3.0.0"
+    strtok3 "^6.2.4"
+    token-types "^4.1.1"
+
 file-uri-to-path@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/file-uri-to-path/-/file-uri-to-path-1.0.0.tgz#553a7b8446ff6f684359c445f1e37a05dacc33dd"
@@ -10735,7 +10763,7 @@ ieee754@1.1.13:
   resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.1.13.tgz#ec168558e95aa181fd87d37f55c32bbcb6708b84"
   integrity sha512-4vf7I2LYV/HaWerSo3XmlMkp5eZ83i+/CDluXi/IGTs/O1sejBNhTtnxzmRZfvOUqj7lZjqHkeTvpgSFDlWZTg==
 
-ieee754@^1.1.13, ieee754@^1.1.4:
+ieee754@^1.1.13, ieee754@^1.1.4, ieee754@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.2.1.tgz#8eb7a10a63fff25d15a57b001586d177d1b0d352"
   integrity sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==
@@ -14733,6 +14761,11 @@ pbkdf2@^3.0.3:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
+peek-readable@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/peek-readable/-/peek-readable-4.1.0.tgz#4ece1111bf5c2ad8867c314c81356847e8a62e72"
+  integrity sha512-ZI3LnwUv5nOGbQzD9c2iDG6toheuXSZP5esSHBjopsXH4dg19soufvpUGA3uohi5anFtGb2lhAVdHzH6R/Evvg==
+
 pegjs@^0.10.0:
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/pegjs/-/pegjs-0.10.0.tgz#cf8bafae6eddff4b5a7efb185269eaaf4610ddbd"
@@ -15966,6 +15999,13 @@ readable-stream@^3.1.1, readable-stream@^3.4.0, readable-stream@^3.5.0, readable
     inherits "^2.0.3"
     string_decoder "^1.1.1"
     util-deprecate "^1.0.1"
+
+readable-web-to-node-stream@^3.0.0:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/readable-web-to-node-stream/-/readable-web-to-node-stream-3.0.2.tgz#5d52bb5df7b54861fd48d015e93a2cb87b3ee0bb"
+  integrity sha512-ePeK6cc1EcKLEhJFt/AebMCLL+GgSKhuygrZ/GLaKZYEecIgIECf4UaUuaByiGtzckwR4ain9VzUh95T1exYGw==
+  dependencies:
+    readable-stream "^3.6.0"
 
 readdir-scoped-modules@^1.1.0:
   version "1.1.0"
@@ -17737,6 +17777,14 @@ strip-outer@^1.0.1:
   dependencies:
     escape-string-regexp "^1.0.2"
 
+strtok3@^6.2.4:
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/strtok3/-/strtok3-6.3.0.tgz#358b80ffe6d5d5620e19a073aa78ce947a90f9a0"
+  integrity sha512-fZtbhtvI9I48xDSywd/somNqgUHl2L2cstmXCCif0itOf96jeW18MBSyrLuNicYQVkvpOxkZtkzujiTJ9LW5Jw==
+  dependencies:
+    "@tokenizer/token" "^0.3.0"
+    peek-readable "^4.1.0"
+
 style-loader@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/style-loader/-/style-loader-1.3.0.tgz#828b4a3b3b7e7aa5847ce7bae9e874512114249e"
@@ -18230,6 +18278,14 @@ toidentifier@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/toidentifier/-/toidentifier-1.0.1.tgz#3be34321a88a820ed1bd80dfaa33e479fbb8dd35"
   integrity sha512-o5sSPKEkg/DIQNmH43V0/uerLrpzVedkUh8tGNvaeXpfpuwjKenlSox/2O/BTlZUtEe+JG7s5YhEz608PlAHRA==
+
+token-types@^4.1.1:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/token-types/-/token-types-4.2.0.tgz#b66bc3d67420c6873222a424eee64a744f4c2f13"
+  integrity sha512-P0rrp4wUpefLncNamWIef62J0v0kQR/GfDVji9WKY7GDCWy5YbVSrKUTam07iWPZQGy0zWNOfstYTykMmPNR7w==
+  dependencies:
+    "@tokenizer/token" "^0.3.0"
+    ieee754 "^1.2.1"
 
 toml@^3.0.0:
   version "3.0.0"

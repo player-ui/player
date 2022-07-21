@@ -18,7 +18,7 @@ and display it as a SwiftUI view comprised of registered assets.
   s.homepage         = 'https://github.com/player-ui/player'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'hborawski' => 'harris_borawski@intuit.com' }
-  s.source           = { :git => 'https://github.com/player-ui/player.git', :tag => s.version.to_s }
+  s.source           = { :http => "https://github.com/player-ui/player/releases/download/#{s.version.to_s}/PlayerUI_Pod.zip" }
 
   s.ios.deployment_target = '13.0'
 

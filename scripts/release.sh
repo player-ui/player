@@ -23,6 +23,8 @@ for pkg in $PKG_NPM_LABELS ; do
   bazel run --config=release -- ${pkg}.publish --access public --tag ${NPM_TAG}
 done
 
+bazel run //:PlayerUI_Pod_Push
+
 # Running this here because it will still have the pre-release version in the VERSION file before auto cleans it up
 bazel run --config=release //docs:deploy_docs
 

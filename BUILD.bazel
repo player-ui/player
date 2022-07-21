@@ -67,3 +67,20 @@ assemble_pod(
     },
     podspec = ":PlayerUI_Podspec",
 )
+
+# Push podspec to specs repo
+# tag must exist in github first
+pod_push(
+    name = "PlayerUI_Pod_Push",
+    podspec = ':PlayerUI_Podspec',
+    executable = 'bundle exec pod',
+    pushFlags = [
+        # skip tests because it never runs them right
+        # and they're run as part of the build pipeline anyway
+        "--skip-tests"
+    ],
+    globalFlags = [
+        # because jenkins runs as root
+        "--allow-root"
+    ]
+)

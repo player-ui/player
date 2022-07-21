@@ -133,7 +133,7 @@ jobs:
 
       - run: bazel shutdown
       - run: cd xcode && bundle exec pod install
-      - run: bazel build --config=ci --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} -- //:PlayerUI //:PlayerUI-Demo
+      - run: bazel build --config=ci --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} -- //:PlayerUI //:PlayerUI-Demo //:PlayerUI_Pod
       # TODO: the timeout should be added to the test itself
       - run: bazel test --test_timeout=600 --jobs=1 --verbose_failures --config=ci  --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
 
@@ -147,6 +147,9 @@ jobs:
               cp $line $RESULTS_DIR/$(dirname $line)
             done
 
+      - store_artifacts:
+        path: bazel-bin/PlayerUI_Pod.zip
+        
       - store_test_results:
           path: _test_results
 
