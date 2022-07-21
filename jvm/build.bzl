@@ -2,6 +2,15 @@ load("@rules_player//kotlin:kt_jvm.bzl", _kt_jvm = "kt_jvm")
 load("@rules_player//kotlin:distribution.bzl", _distribution = "distribution")
 load("//jvm/dependencies:common.bzl", common_main_deps = "main_deps", common_test_deps = "test_deps")
 
+DEFAULT_PROJECT_NAME = "Player"
+DEFAUTL_PROJECT_DESCRIPTION = "A cross-platform semantic rendering engine"
+DEFAUTL_PROJECT_URL = "https://player-ui.github.io/"
+DEFAUTL_SCM_URL = "https://github.com/player-ui/player.git"
+DEFAULT_DEVELOPERS = {
+   "sugarmanz": ["name=Jeremiah Zucker", "email=zucker.jeremiah@gmail.com"],
+   "brocollie08": ["name=Tony Lin"]
+}
+
 def kt_player_module(
         *,
 
@@ -14,11 +23,12 @@ def kt_player_module(
         # Distribution config
         group = "com.intuit.player",
 
-        # (optional) TODO: Maybe hardcode these
-        project_name = None,
-        project_description = None,
-        project_url = None,
-        scm_url = None,
+        # (optional)
+        project_name = DEFAULT_PROJECT_NAME,
+        project_description = DEFAUTL_PROJECT_DESCRIPTION,
+        project_url = DEFAUTL_PROJECT_URL,
+        scm_url = DEFAUTL_SCM_URL,
+        developers = DEFAULT_DEVELOPERS,
 
         # Package level config
         module_name = None,
@@ -49,6 +59,7 @@ def kt_player_module(
         project_description = project_description,
         project_url = project_url,
         scm_url = scm_url,
+        developers = developers,
         workspace_refs = "@plugin_workspace_refs//:refs.json",
         module_name = module_name,
         main_opts = "//jvm:main_options",
@@ -76,10 +87,11 @@ def distribution(
         name,
 
         # (optional)
-        project_name = None,
-        project_description = None,
-        project_url = None,
-        scm_url = None):
+        project_name = DEFAULT_PROJECT_NAME,
+        project_description = DEFAUTL_PROJECT_DESCRIPTION,
+        project_url = DEFAUTL_PROJECT_URL,
+        scm_url = DEFAUTL_SCM_URL,
+        developers = DEFAULT_DEVELOPERS,):
     _distribution(
         name = name,
         release_repo = "https://oss.sonatype.org/service/local/staging/deploy/maven2/",
@@ -89,5 +101,6 @@ def distribution(
         project_description = project_description,
         project_url = project_url,
         scm_url = scm_url,
+        developers = developers,
         workspace_refs = "@plugin_workspace_refs//:refs.json",
     )
