@@ -162,7 +162,7 @@ jobs:
             - v1-bazel-cache-core-{{ .Branch }} 
             - v1-bazel-cache-core-main 
 
-      - run: bazel test --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=skip-ios --config=ci -- //...
+      - run: bazel test --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=skip-ios --config=ci -- //... -//:docs/site
 
       - save_cache:
           when: always 
