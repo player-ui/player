@@ -10,6 +10,8 @@ DEFAULT_DEVELOPERS = {
    "sugarmanz": ["name=Jeremiah Zucker", "email=zucker.jeremiah@gmail.com"],
    "brocollie08": ["name=Tony Lin"]
 }
+DEFAULT_RELEASE_REPO = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+DEFAULT_SNAPSHOT_REPO = "https://oss.sonatype.org/content/repositories/snapshots/"
 
 def kt_player_module(
         *,
@@ -52,8 +54,8 @@ def kt_player_module(
         name = name,
         lint_config = "//jvm:lint_config",
         group = group,
-        release_repo = "https://s01.oss.sonatype.org/service/local/",
-        snapshot_repo = "https://s01.oss.sonatype.org/content/repositories/snapshots/",
+        release_repo = DEFAULT_RELEASE_REPO,
+        snapshot_repo = DEFAULT_SNAPSHOT_REPO,
         version_file = "//:VERSION",
         project_name = project_name,
         project_description = project_description,
@@ -94,8 +96,8 @@ def distribution(
         developers = DEFAULT_DEVELOPERS,):
     _distribution(
         name = name,
-        release_repo = "https://oss.sonatype.org/service/local/staging/deploy/maven2/",
-        snapshot_repo = "https://oss.sonatype.org/content/repositories/snapshots/",
+        release_repo = DEFAULT_RELEASE_REPO,
+        snapshot_repo = DEFAULT_SNAPSHOT_REPO,
         version_file = "//:VERSION",
         project_name = project_name,
         project_description = project_description,
