@@ -4,6 +4,12 @@ load("@rules_player//player/bundle:bundle.bzl", "bundle")
 
 lint_exts = [".ts", ".js", ".jsx", ".tsx", ".json", ".snap"]
 
+GIT_REPO = "https://github.com/player-ui/player-ui.git"
+LICENSE = "MIT"
+DOCS_URL = "https://player-ui.github.io"
+REPO_URL = "https://github.com/player-ui/player-ui"
+ISSUES_URL = "%s/issues" % REPO_URL
+
 DATA = []
 BUILD_DATA = []
 TEST_DATA = [
