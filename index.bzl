@@ -109,7 +109,7 @@ def javascript_pipeline(
         lint_data = include_if_unique(LINT_DATA + lint_data, DATA + data + TEST_DATA + test_data),
         out_dir = out_dir,
         create_package_json_opts = {
-            "base_package_json": "//tools:package-template.json",
+            "base_package_json": "//tools:pkg_json_template",
         },
         **kwargs
     )

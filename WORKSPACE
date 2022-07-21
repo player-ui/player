@@ -22,6 +22,11 @@ git_repository(
     remote = "https://github.com/player-ui/rules_player.git",
 )
 
+# local_repository(
+#     name = "rules_player",
+#     path = "../rules_player",
+# )
+
 load("@rules_player//:workspace.bzl", "deps")
 
 deps()
