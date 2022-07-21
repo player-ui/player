@@ -148,8 +148,8 @@ jobs:
             done
 
       - store_artifacts:
-        path: bazel-bin/PlayerUI_Pod.zip
-        
+          path: bazel-bin/PlayerUI_Pod.zip
+
       - store_test_results:
           path: _test_results
 
