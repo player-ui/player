@@ -87,7 +87,7 @@ internal class GraalObjectClassDecoder(override val format: GraalFormat, overrid
     }
 
     override val keys: List<String> = value.blockingLock {
-        memberKeys.toList()
+        memberKeys.toList().filter { getMember(it) != context.undefined }
     }
 
     override fun decodeValueElement(descriptor: SerialDescriptor, index: Int): Any? =

@@ -18,6 +18,8 @@ import kotlinx.serialization.builtins.serializer
 @Serializable(FlowInstance.Serializer::class)
 public class FlowInstance(override val node: Node) : NodeWrapper, Transition {
 
+    public val id: String by NodeSerializableField()
+
     public val hooks: Hooks by NodeSerializableField(Hooks.serializer())
 
     public val currentState: NamedState? get() = node.getSerializable("currentState", NamedState.serializer())

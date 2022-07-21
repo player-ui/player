@@ -14,7 +14,7 @@ import com.intuit.player.jvm.graaljs.bridge.serialization.format.GraalFormatConf
 import com.intuit.player.jvm.graaljs.bridge.serialization.serializers.GraalValueSerializer
 import com.intuit.player.jvm.graaljs.extensions.blockingLock
 import com.intuit.player.jvm.graaljs.extensions.handleValue
-import com.intuit.player.jvm.graaljs.player.PlayerContextFactory.context
+import com.intuit.player.jvm.graaljs.player.PlayerContextFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -48,7 +48,7 @@ internal class GraalRuntime(
         val Context.isReleased: Boolean
             get() = contextRuntimeMap[this]?.released ?: throw PlayerException("Graal Context is not associated with a runtime")
         val Context.undefined: Value
-            get() = context.eval("js", "undefined")
+            get() = eval("js", "undefined")
         private val contextRuntimeMap: MutableMap<Context, GraalRuntime> = hashMapOf()
         val Context.runtime: GraalRuntime get() = contextRuntimeMap[this] as GraalRuntime
     }
@@ -123,7 +123,7 @@ public object GraalJS : PlayerRuntimeFactory<GraalRuntimeConfig> {
 }
 
 public data class GraalRuntimeConfig(
-    var graalContext: Context = context
+    var graalContext: Context = PlayerContextFactory.context
 ) : PlayerRuntimeConfig()
 
 public class GraalRuntimeContainer : PlayerRuntimeContainer {
