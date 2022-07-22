@@ -55,12 +55,6 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - restore_cache:
-          keys: 
-            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }} 
-            - v1-bazel-cache-core-{{ .Branch }} 
-            - v1-bazel-cache-core-main 
-
       - run: bazel build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci --config=skip-ios -- //...
      
       - save_cache:
@@ -156,19 +150,7 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - restore_cache:
-          keys: 
-            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }} 
-            - v1-bazel-cache-core-{{ .Branch }} 
-            - v1-bazel-cache-core-main 
-
-      - run: bazel test --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=skip-ios --config=ci -- //...
-
-      - save_cache:
-          when: always 
-          key: v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }} 
-          paths:  
-            - ~/.cache/bazel-disk-cache
+      - run: bazel test --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=skip-ios --config=ci -- //... -//docs/site
 
       - run: 
           when: always
