@@ -206,6 +206,8 @@ jobs:
       - run: |
           BUNDLE_TARGETS=$(bazel query "kind(nodejs_test, //...)" --output label 2>/dev/null | tr '\n' ' ')
           bazel coverage --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci -- $BUNDLE_TARGETS
+      - run: bundle install
+      - run: ./scripts/specLint.sh
 
       - codecov/upload:
           file: ./bazel-out/_coverage/_coverage_report.dat
@@ -227,7 +229,6 @@ jobs:
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
       - run: echo -e $GPG_KEY | gpg --import --batch
       - run: bundle install
-      - run: ./scripts/specLint.sh
       - run: npx auto shipit --only-graduate-with-release-label -vv
 
 workflows: 
