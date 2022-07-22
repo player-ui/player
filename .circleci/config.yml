@@ -221,9 +221,12 @@ jobs:
             - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }} 
             - v1-bazel-cache-core-{{ .Branch }} 
             - v1-bazel-cache-core-main 
+            - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+            - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
 
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
       - run: echo -e $GPG_KEY | gpg --import --batch
+      - run: bundle install
       - run: npx auto shipit --only-graduate-with-release-label -vv
 
 workflows: 
