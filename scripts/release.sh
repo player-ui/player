@@ -23,6 +23,16 @@ for pkg in $PKG_NPM_LABELS ; do
   bazel run --config=release -- ${pkg}.publish --access public --tag ${NPM_TAG}
 done
 
+
+# Rebuild to stamp
+bazel build //:PlayerUI_Pod
+
+# Fetch artifacts from this build
+./fetchArtifacts.sh > /tmp/$CIRCLE_BUILD_NUMBER/artifacts.json
+
+# Find the pod zip url
+export CIRCLE_CI_ZIP=$(./parseArtifactJson.js /tmp/$CIRCLE_BUILD_NUMER/artifacts.json)
+
 bazel run //:PlayerUI_Pod_Push
 
 # Running this here because it will still have the pre-release version in the VERSION file before auto cleans it up
