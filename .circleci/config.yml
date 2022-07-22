@@ -21,7 +21,7 @@ orbs:
 executors:
   base:
     docker:
-      - image: docker.io/sugarmanz/bazel-common
+      - image: docker.io/sugarmanz/bazel-common:ruby
     working_directory: ~/player
     resource_class: xlarge
     environment:
@@ -285,6 +285,7 @@ workflows:
       - coverage:
           requires:
             - build
+            - build_ios
 
       - release:
           context:
