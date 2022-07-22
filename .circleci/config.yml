@@ -220,6 +220,8 @@ workflows:
               ignore: /.*/
 
       - build:
+          context:
+            - Publish
           requires:
             - setup
 
