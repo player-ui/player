@@ -6,7 +6,8 @@ def _applitools_config_impl(ctx, **kwargs):
   head = [
     "package %s;" % ctx.attr.package,
     "public object ApplitoolsConfig {",
-    "    public val APPLITOOLS_KEY = \"" + ctx.var["APPLITOOLS_KEY"] + "\""
+    "    public val APPLITOOLS_KEY = ",
+             "\"" + ctx.var["APPLITOOLS_KEY"] + "\"" if "APPLITOOLS_KEY" in ctx.var else "\"UNSET\""
   ]
   last = ["}"]
   values = ctx.attr.values

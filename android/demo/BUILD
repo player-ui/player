@@ -67,7 +67,7 @@ kt_android_library(
 android_binary(
     name = "demo_test_app",
     custom_package = "com.intuit.player.android.reference.demo",
-    manifest = ":src/androidTest/java/com/intuit/player/android/reference/demo/test/AndroidManifest.xml",
+    manifest = ":src/androidTest/AndroidManifest.xml",
     instruments = ":demo",
     deps = ["demo_ui_test"],
 )

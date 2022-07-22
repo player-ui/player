@@ -1,7 +1,7 @@
 load("//jvm/dependencies:versions.bzl", "versions")
 load("@rules_player//maven:parse_coordinates.bzl", "parse_coordinates")
 
-maven = [
+maven_main = [
     "androidx.appcompat:appcompat:1.2.0",
     "androidx.core:core-ktx:1.3.2",
     "androidx.constraintlayout:constraintlayout:2.0.4",
@@ -24,6 +24,8 @@ maven_test = [
     "androidx.test.espresso:espresso-intents:3.3.0",
     "androidx.test.ext:junit-ktx:1.1.2"
 ]
+
+maven = maven_main + maven_test
 
 main_deps = parse_coordinates(maven) + [
     "//android/player",
