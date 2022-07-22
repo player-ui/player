@@ -1,4 +1,4 @@
-workspace(
+asdfworkspace(
     name = "player",
     managed_directories = {
         "@npm": ["node_modules"],
