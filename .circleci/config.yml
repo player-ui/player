@@ -55,6 +55,8 @@ jobs:
       - attach_workspace:
           at: ~/player
 
+      - run: echo -n $GPG_KEY | gpg --import --batch
+
       - run: bazel build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci --config=skip-ios -- //...
      
       - save_cache:
