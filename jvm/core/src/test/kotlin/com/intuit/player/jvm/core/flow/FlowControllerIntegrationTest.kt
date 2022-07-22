@@ -4,6 +4,7 @@ import com.intuit.player.jvm.core.flow.state.NavigationFlowTransitionableState
 import com.intuit.player.jvm.core.player.state.NamedState
 import com.intuit.player.jvm.core.player.state.inProgressState
 import com.intuit.player.jvm.utils.test.PlayerTest
+import com.intuit.player.jvm.utils.test.runBlockingTest
 import com.intuit.player.jvm.utils.test.simpleFlowString
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -46,5 +47,76 @@ internal class FlowControllerIntegrationTest : PlayerTest() {
         assertEquals("*", pendingTransition?.second)
         assertEquals("VIEW_1", completedTransition?.first?.name)
         assertEquals("END_Done", completedTransition?.second?.name)
+    }
+
+    @TestTemplate
+    fun `test flow id`() = runBlockingTest {
+        val completable = player.start(
+            """
+{
+  "id": "flow",
+  "views": [
+    {
+      "id": "foo",
+      "type": "text",
+      "value": "hello"
+    },
+    {
+      "id": "bar",
+      "type": "text",
+      "value": "bar"
+    }
+  ],
+  "navigation": {
+    "BEGIN": "foo",
+    "foo": {
+      "startState": "View1",
+      "View1": {
+        "state_type": "VIEW",
+        "ref": "foo",
+        "transitions": {
+          "foo-1": "Flow2"
+        }
+      },
+      "Flow2": {
+        "state_type": "FLOW",
+        "ref": "bar",
+        "transitions": {
+          "yay": "End"
+        }
+      },
+      "End": {
+        "state_type": "END",
+        "outcome": "yay"
+      }
+    },
+    "bar": {
+      "startState": "View2",
+      "View2": {
+        "state_type": "VIEW",
+        "ref": "bar",
+        "transitions": {
+          "foo-2": "Done"
+        }
+      },
+      "Done": {
+        "state_type": "END",
+        "outcome": "yay"
+      }
+    }
+  }
+}
+"""
+        )
+
+        val controller = player.inProgressState!!.controllers.flow
+        assertEquals("foo", controller.current?.id)
+        controller.transition("foo-1")
+        assertEquals("bar", controller.current?.id)
+        controller.transition("foo-2")
+
+        val completedState = completable.await()
+        assertEquals("yay", completedState.endState.outcome)
+        assertEquals("foo", controller.current?.id)
     }
 }

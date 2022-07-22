@@ -1,12 +1,14 @@
 package com.intuit.player.jvm.j2v8.bridge.serialization.encoding
 
-import com.eclipsesource.v8.*
+import com.eclipsesource.v8.V8Array
+import com.eclipsesource.v8.V8Object
+import com.eclipsesource.v8.V8Value
 import com.intuit.player.jvm.core.bridge.serialization.encoding.*
 import com.intuit.player.jvm.j2v8.*
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.J2V8Format
 import com.intuit.player.jvm.j2v8.extensions.blockingLock
 import com.intuit.player.jvm.j2v8.extensions.handleValue
-import kotlinx.serialization.*
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.CompositeDecoder
@@ -72,7 +74,7 @@ internal class V8ArrayListDecoder(override val format: J2V8Format, override val 
 internal class V8ObjectClassDecoder(override val format: J2V8Format, override val value: V8Object) : AbstractRuntimeObjectClassDecoder<V8Value>(), NodeDecoder by V8ValueDecoder(format, value) {
 
     override val keys: List<String> = value.blockingLock {
-        keys.toList()
+        keys.toList().filter { !value.getV8Value(it).isUndefined }
     }
 
     override fun getElementAtIndex(index: Int): V8Value = value.getV8Value(getKeyAtIndex(index))
