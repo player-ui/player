@@ -16,6 +16,7 @@ describe('Schema Bindings Generate Properly', () => {
       },
       sub2: [
         {
+          [SchemaTypeName]: 'sub2a',
           val: LocalBazType,
         },
       ],
@@ -67,13 +68,13 @@ describe('Schema Bindings Generate Properly', () => {
           },
           "sub2": Object {
             "isArray": true,
-            "type": "sub2Type",
+            "type": "sub2aType",
           },
           "sub4": Object {
             "type": "sub3Type",
           },
         },
-        "sub2Type": Object {
+        "sub2aType": Object {
           "val": Object {
             "default": false,
             "type": "BazType",
@@ -122,13 +123,13 @@ describe('Schema Bindings Generate Properly', () => {
           },
           "sub2": Object {
             "isArray": true,
-            "type": "sub2Type",
+            "type": "sub2aType",
           },
           "sub4": Object {
             "type": "sub3Type",
           },
         },
-        "sub2Type": Object {
+        "sub2aType": Object {
           "val": Object {
             "default": false,
             "type": "BazType",

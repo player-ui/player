@@ -66,9 +66,8 @@ export class SchemaGenerator {
 
     Object.keys(schema).forEach((property) => {
       const subType = schema[property] as SchemaNode;
-      const subTypeName: string = subType[SchemaTypeName] ?? property;
       newSchema.ROOT[property] = this.hooks.createSchemaNode.call(
-        this.processChildren(subTypeName, subType),
+        this.processChildren(property, subType),
         subType as any
       );
     });
@@ -84,9 +83,8 @@ export class SchemaGenerator {
 
       Object.keys(child).forEach((property) => {
         const subType = (child as any)[property] as SchemaNode;
-        const subTypeName: string = subType[SchemaTypeName] ?? property;
         typeDef[property] = this.hooks.createSchemaNode.call(
-          this.processChildren(subTypeName, subType),
+          this.processChildren(property, subType),
           subType as any
         );
       });
@@ -117,10 +115,12 @@ export class SchemaGenerator {
         );
       }
 
-      intermediateType = this.makePlaceholderArrayType(property);
+      const subTypeName = subType[0][SchemaTypeName] ?? property;
+      intermediateType = this.makePlaceholderArrayType(subTypeName);
       this.children.push({ name: intermediateType.type, child: subType[0] });
     } else {
-      intermediateType = this.makePlaceholderType(property);
+      const subTypeName = subType[SchemaTypeName] ?? property;
+      intermediateType = this.makePlaceholderType(subTypeName);
       this.children.push({ name: intermediateType.type, child: subType });
     }
 
