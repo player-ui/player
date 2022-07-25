@@ -222,6 +222,7 @@ jobs:
             - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
 
       - run: echo $PATH
+      - run: whoami
       - run: bundle install
       - run: ./scripts/specLint.sh
 
