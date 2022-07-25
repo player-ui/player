@@ -4,6 +4,7 @@ import { LocalModel, withParser } from '@player-ui/data';
 import { ExpressionEvaluator } from '@player-ui/expressions';
 import { SchemaController } from '@player-ui/schema';
 import { Parser } from '../../parser';
+import { ViewInstance } from '../../view';
 import type { Options } from '../options';
 import TemplatePlugin from '../template-plugin';
 
@@ -88,5 +89,146 @@ describe('templates', () => {
         ],
       })
     ).toMatchSnapshot();
+  });
+});
+
+describe('dynamic templates', () => {
+  it('static - nodes are not updated', () => {
+    const petNames = ['Ginger', 'Vokey'];
+    const model = withParser(new LocalModel({}), parseBinding);
+    const evaluator = new ExpressionEvaluator({ model });
+    const schema = new SchemaController();
+
+    const view = new ViewInstance(
+      {
+        id: 'my-view',
+        asset: {
+          id: 'foo',
+          type: 'collection',
+          template: [
+            {
+              dynamic: false,
+              data: 'foo.bar',
+              output: 'values',
+              value: {
+                value: '{{foo.bar._index_}}',
+              },
+            },
+          ],
+        },
+      } as any,
+      {
+        model,
+        parseBinding,
+        evaluator,
+        schema,
+      }
+    );
+
+    model.set([['foo.bar', petNames]]);
+
+    const resolved = view.update();
+
+    expect(resolved).toStrictEqual({
+      id: 'my-view',
+      asset: {
+        id: 'foo',
+        type: 'collection',
+        values: ['Ginger', 'Vokey'].map((value) => ({ value })),
+      },
+    });
+
+    model.set([['foo.bar', ['Ginger', 'Vokey', 'Harry']]]);
+
+    let updated = view.update();
+    expect(updated).toStrictEqual({
+      id: 'my-view',
+      asset: {
+        id: 'foo',
+        type: 'collection',
+        values: ['Ginger', 'Vokey'].map((value) => ({ value })),
+      },
+    });
+
+    model.set([['foo.bar', ['Ginger']]]);
+    updated = view.update();
+    expect(updated).toStrictEqual({
+      id: 'my-view',
+      asset: {
+        id: 'foo',
+        type: 'collection',
+        values: ['Ginger', undefined].map((value) => ({ value })),
+      },
+    });
+  });
+
+  it('dynamic - nodes are updated', () => {
+    const petNames = ['Ginger', 'Vokey'];
+    const model = withParser(new LocalModel({}), parseBinding);
+    const evaluator = new ExpressionEvaluator({ model });
+    const schema = new SchemaController();
+
+    const view = new ViewInstance(
+      {
+        id: 'my-view',
+        asset: {
+          id: 'foo',
+          type: 'collection',
+          template: [
+            {
+              dynamic: true,
+              data: 'foo.bar',
+              output: 'values',
+              value: {
+                value: '{{foo.bar._index_}}',
+              },
+            },
+          ],
+        },
+      } as any,
+      {
+        model,
+        parseBinding,
+        evaluator,
+        schema,
+      }
+    );
+
+    model.set([['foo.bar', petNames]]);
+
+    const resolved = view.update();
+
+    expect(resolved).toStrictEqual({
+      id: 'my-view',
+      asset: {
+        id: 'foo',
+        type: 'collection',
+        values: ['Ginger', 'Vokey'].map((value) => ({ value })),
+      },
+    });
+
+    const barBinding = parseBinding('foo.bar');
+    model.set([[barBinding, ['Vokey', 'Louis', 'Bob']]]);
+
+    let updated = view.update();
+    expect(updated).toStrictEqual({
+      id: 'my-view',
+      asset: {
+        id: 'foo',
+        type: 'collection',
+        values: ['Vokey', 'Louis', 'Bob'].map((value) => ({ value })),
+      },
+    });
+
+    model.set([[barBinding, ['Nuri']]]);
+    updated = view.update();
+    expect(updated).toStrictEqual({
+      id: 'my-view',
+      asset: {
+        id: 'foo',
+        type: 'collection',
+        values: ['Nuri'].map((value) => ({ value })),
+      },
+    });
   });
 });

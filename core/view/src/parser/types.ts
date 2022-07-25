@@ -72,6 +72,9 @@ export declare namespace Node {
 
     /** The number of nested templates so far */
     depth: number;
+
+    /** should the template recomputed when data changes */
+    dynamic?: boolean;
   }
 
   export interface Value
