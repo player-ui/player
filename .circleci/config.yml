@@ -207,10 +207,6 @@ jobs:
             sudo mv bazelisk /opt/bazelisk-v1.11.0 && \
             sudo ln -s /opt/bazelisk-v1.11.0/bazelisk /usr/local/bin/bazel
 
-      # This is done because the outputs from the prev build can't be used due to lack of flag
-      # .bazelrc doesn't currently support string interpolation
-      - run: bazel build --define=APPLITOOLS_KEY=${APPLITOOLS_KEY} //android/demo:android_instrumentation_test
-
       - run:
           name: Create avd
           command: |
@@ -227,12 +223,6 @@ jobs:
           name: Wait for emulator to start
           command: |
             circle-android wait-for-boot
-
-      - run:
-          name: Install APKs
-          command: |
-            adb install bazel-bin/android/demo/demo_test_app.apk
-            adb install bazel-bin/android/demo/demo.apk
 
       - run: bazel test --define=APPLITOOLS_KEY=${APPLITOOLS_KEY} --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=skip-ios --config=ci -- //android/demo:android_instrumentation_test
 

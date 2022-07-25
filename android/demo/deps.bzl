@@ -22,7 +22,10 @@ maven_test = [
     "androidx.test.espresso:espresso-core:3.3.0",
     "androidx.test.espresso:espresso-contrib:3.3.0",
     "androidx.test.espresso:espresso-intents:3.3.0",
-    "androidx.test.ext:junit-ktx:1.1.2"
+    "androidx.test.ext:junit-ktx:1.1.2",
+    #"com.applitools:eyes-android-espresso:aar:4.7.6",
+    #"com.applitools:eyes-android-components:aar:4.7.6",
+    #"com.applitools:eyes-android-components-androidx:aar:4.7.6"
 ]
 
 maven = maven_main + maven_test

@@ -139,19 +139,19 @@ maven_aar(
 maven_aar(
     name = "android_eyes_espresso",
     artifact = "com.applitools:eyes-android-espresso:4.7.6",
-    settings = "//:settings.xml"
+    settings = "//android/demo:androidsettings.xml"
 )
 
 maven_aar(
     name = "android_eyes_components",
     artifact = "com.applitools:eyes-android-components:4.7.6",
-    settings = "//:settings.xml"
+    settings = "//android/demo:androidsettings.xml"
 )
 
 maven_aar(
     name = "androidx_eyes_components",
     artifact = "com.applitools:eyes-android-components-androidx:4.7.6",
-    settings = "//:settings.xml"
+    settings = "//android/demo:androidsettings.xml"
 )
 
 android_ndk_repository(name = "androidndk")
