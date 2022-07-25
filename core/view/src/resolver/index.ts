@@ -229,6 +229,7 @@ export class Resolver {
         },
         evaluate: (exp) =>
           this.options.evaluator.evaluate(exp, { model: depModelWithParser }),
+        node,
       },
       node
     );
@@ -289,6 +290,8 @@ export class Resolver {
     const resolvedAST = this.hooks.beforeResolve.call(node, resolveOptions) ?? {
       type: NodeType.Empty,
     };
+
+    resolveOptions.node = resolvedAST;
 
     this.ASTMap.set(resolvedAST, node);
 

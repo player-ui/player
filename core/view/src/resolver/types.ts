@@ -104,6 +104,9 @@ export declare namespace Resolve {
 
     /** The data dependencies that were requested during the resolution */
     getDependencies?(scope?: 'core' | 'children'): Set<BindingInstance>;
+
+    /** original node */
+    node?: Node.Node;
   };
 
   export type ResolverOptions = BaseOptions & {
