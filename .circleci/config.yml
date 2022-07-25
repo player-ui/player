@@ -237,7 +237,7 @@ jobs:
       - run: echo $PATH
       - run: whoami
       - run: source ~/.bashrc && bundle install
-      - run: source ~/.bashrc && cd scripts && CIRCLE_BUILD_NUMBER=$(cat .ios-build-number) ./specLint.sh
+      - run: source ~/.bashrc && cd scripts && CIRCLE_BUILD_NUMBER=$(cat ../.ios-build-number) ./specLint.sh
 
   release:
     executor: base
