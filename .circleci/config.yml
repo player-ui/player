@@ -160,6 +160,7 @@ jobs:
           root: .
           paths:
             - .
+            - .ios-build-number
 
   test:
     executor: base
