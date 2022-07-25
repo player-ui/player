@@ -138,8 +138,7 @@ jobs:
       - run: bazel test --test_timeout=600 --jobs=1 --verbose_failures --config=ci  --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
 
       # Save the build number of this step to fetch artifacts later
-      # - run: echo 'export IOS_BUILD_NUMBER="$CIRCLE_BUILD_NUMBER"' >> $BASH_ENV
-      - run: echo $CIRCLE_BUILD_NUMBER > IOS_BUILD_NUMBER
+      - run: echo $CIRCLE_BUILD_NUM > .ios-build-number
 
       - run: 
           when: always
@@ -232,13 +231,13 @@ jobs:
 
       - run: cat ~/.bashrc
       - run: ls -la
-      - run: cat IOS_BUILD_NUMBER
+      - run: cat .ios-build-number
       - run: ls -la ~/
       - run: source ~/.bashrc
       - run: echo $PATH
       - run: whoami
       - run: bundle install
-      - run: cd scripts && CIRCLE_BUILD_NUMBER=$(cat IOS_BUILD_NUMBER) ./specLint.sh
+      - run: cd scripts && CIRCLE_BUILD_NUMBER=$(cat .ios-build-number) ./specLint.sh
 
   release:
     executor: base
