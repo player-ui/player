@@ -8,8 +8,11 @@ import type {
   DataModelImpl,
   DataModelOptions,
 } from '@player-ui/data';
-import type { Schema, Formatting } from '@player-ui/types';
-import { Validation as ValidationTypes } from '@player-ui/types';
+import type {
+  Schema,
+  Formatting,
+  Validation as ValidationTypes,
+} from '@player-ui/types';
 import type { TransitionFunction } from '@player-ui/flow';
 import type {
   ExpressionEvaluator,
