@@ -8,4 +8,4 @@
 export CIRCLE_CI_ZIP=$(./parseArtifactJson.js /tmp/$CIRCLE_BUILD_NUMER/artifacts.json)
 
 
-bundle exec pod spec lint PlayerUI.podspec
+bundle exec pod spec lint ../PlayerUI.podspec
