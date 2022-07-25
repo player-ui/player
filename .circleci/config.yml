@@ -138,7 +138,7 @@ jobs:
       - run: bazel test --test_timeout=600 --jobs=1 --verbose_failures --config=ci  --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
 
       # Save the build number of this step to fetch artifacts later
-      - run: echo $CIRCLE_BUILD_NUMBER > .ios-build-number
+      - run: echo 'export IOS_BUILD_NUMBER="$CIRCLE_BUILD_NUMBER"' >> $BASH_ENV
 
       - run: 
           when: always
@@ -155,12 +155,6 @@ jobs:
 
       - store_test_results:
           path: _test_results
-
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
-            - .ios-build-number
 
   test:
     executor: base
@@ -230,9 +224,9 @@ jobs:
             - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
             - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
 
-      - run: export IOS_BUILD=$(cat .ios-build-number)
-      - run: echo $IOS_BUILD
+      - run: echo $IOS_BUILD_NUMBER
       - run: cat ~/.bashrc
+      - run: ls -la
       - run: ls -la ~/
       - run: source ~/.bashrc
       - run: echo $PATH
