@@ -206,11 +206,24 @@ jobs:
       - run: |
           BUNDLE_TARGETS=$(bazel query "kind(nodejs_test, //...)" --output label 2>/dev/null | tr '\n' ' ')
           bazel coverage --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci -- $BUNDLE_TARGETS
-      - run: bundle install
-      - run: ./scripts/specLint.sh
 
       - codecov/upload:
           file: ./bazel-out/_coverage/_coverage_report.dat
+    
+  speclint:
+    executor: base
+    steps:
+      - attach_workspace:
+          at: ~/player
+
+      - restore_cache:
+          keys:
+            - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+            - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
+
+      - run: echo $PATH
+      - run: bundle install
+      - run: ./scripts/specLint.sh
 
   release:
     executor: base
@@ -250,6 +263,10 @@ workflows:
       - build_ios:
           requires:
             - setup
+      
+      - speclint:
+          requires:
+            - build_ios
 
       - test:
           requires:
@@ -285,7 +302,6 @@ workflows:
       - coverage:
           requires:
             - build
-            - build_ios
 
       - release:
           context:
