@@ -224,6 +224,7 @@ jobs:
             - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
             - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
 
+      - run: source $BASH_ENV
       - run: echo $IOS_BUILD_NUMBER
       - run: cat ~/.bashrc
       - run: ls -la
