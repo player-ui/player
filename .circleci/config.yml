@@ -22,7 +22,7 @@ orbs:
 executors:
   base:
     docker:
-      - image: docker.io/playerui/bazel-docker
+      - image: docker.io/sugarmanz/bazel-common
     working_directory: ~/player
     resource_class: xlarge
     environment:
