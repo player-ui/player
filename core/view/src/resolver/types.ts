@@ -9,7 +9,7 @@ import type {
   DataModelOptions,
 } from '@player-ui/data';
 import type { Schema, Formatting } from '@player-ui/types';
-import { Validation } from '@player-ui/types';
+import { Validation as ValidationTypes } from '@player-ui/types';
 import type { TransitionFunction } from '@player-ui/flow';
 import type {
   ExpressionEvaluator,
@@ -43,7 +43,7 @@ export declare namespace Resolve {
     ): ValidationResponse | undefined;
 
     /** Get errors for all children regardless of section */
-    getChildren(type: Validation.DisplayTarget): Array<ValidationResponse>;
+    getChildren(type: ValidationTypes.DisplayTarget): Array<ValidationResponse>;
 
     /** Get errors for all children solely in this section */
     getValidationsForSection(): Array<ValidationResponse>;
@@ -54,7 +54,7 @@ export declare namespace Resolve {
     /** Register node as a section */
     register: (options?: {
       /** While type of Display Target group it should register as */
-      type: Exclude<Validation.DisplayTarget, 'field'>;
+      type: Exclude<ValidationTypes.DisplayTarget, 'field'>;
     }) => void;
   }
 
