@@ -221,6 +221,7 @@ jobs:
             - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
             - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
 
+      - run: source ~/.bashrc
       - run: echo $PATH
       - run: whoami
       - run: bundle install
