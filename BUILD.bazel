@@ -49,7 +49,6 @@ assemble_pod(
         # Core
         "//core/player:Player_Bundles_bundle_prod": "ios/packages/core/Resources/",
         "//plugins/partial-match-fingerprint/core:PartialMatchFingerprintPlugin_Bundles_bundle_prod": "ios/packages/core/Resources/",
-        "//plugins/check-path/core:CheckPathPlugin_Bundles_bundle_prod": "ios/packages/core/Resources/",
         "//core/partial-match-registry:Registry_Bundles_bundle_prod": "ios/packages/core/Resources/",
 
         # Packages
@@ -57,6 +56,7 @@ assemble_pod(
         "//plugins/reference-assets/core:ReferenceAssetsPlugin_Bundles_bundle_prod": "ios/packages/reference-assets/Resources/js/",
         # Plugins
         "//plugins/beacon/core:BeaconPlugin_Bundles_bundle_prod": "ios/plugins/BaseBeaconPlugin/Resources/",
+        "//plugins/check-path/core:CheckPathPlugin_Bundles_bundle_prod": "ios/plugins/CheckPathPlugin/Resources/",
         "//plugins/common-types/core:CommonTypesPlugin_Bundles_bundle_prod": "ios/plugins/CommonTypesPlugin/Resources/",
         "//plugins/common-expressions/core:CommonExpressionsPlugin_Bundles_bundle_prod": "ios/plugins/CommonExpressionsPlugin/Resources/",
         "//plugins/expression/core:ExpressionPlugin_Bundles_bundle_prod": "ios/plugins/ExpressionPlugin/Resources/",
