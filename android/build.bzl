@@ -6,7 +6,8 @@ def _applitools_config_impl(ctx, **kwargs):
   head = [
     "package %s;" % ctx.attr.package,
     "public object ApplitoolsConfig {",
-    "    public val APPLITOOLS_KEY = " + ("\"" + ctx.var["APPLITOOLS_KEY"] + "\"" if "APPLITOOLS_KEY" in ctx.var else "\"UNSET\"")
+    "    public val APPLITOOLS_KEY = " + ("\"" + ctx.var["APPLITOOLS_KEY"] + "\"" if "APPLITOOLS_KEY" in ctx.var else "\"UNSET\""),
+    "    public val BATCH_ID = " + ("\"" + ctx.var["CIRCLE_BUILD_NUM"] + "\"" if "CIRCLE_BUILD_NUM" in ctx.var else "\"local\"")
   ]
   last = ["}"]
   values = ctx.attr.values

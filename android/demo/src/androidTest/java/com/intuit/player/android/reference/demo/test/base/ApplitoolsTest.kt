@@ -44,6 +44,6 @@ abstract class ApplitoolsTest {
     fun Eyes.checkPlayer(name: String) = check(name, Target.region(ViewMatchers.withId(R.id.player_canvas)))
 
     companion object {
-        val batchInfo = BatchInfo("android-reference-assets@local")
+        val batchInfo = BatchInfo("android-reference-assets@${ApplitoolsConfig.BATCH_ID}")
     }
 }

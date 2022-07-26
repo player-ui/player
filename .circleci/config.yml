@@ -224,7 +224,7 @@ jobs:
           command: |
             circle-android wait-for-boot
 
-      - run: bazel test --define=APPLITOOLS_KEY=${APPLITOOLS_KEY} --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=skip-ios --config=ci -- //android/demo:android_instrumentation_test
+      - run: bazel test --define=APPLITOOLS_KEY=${APPLITOOLS_KEY} --define=CIRCLE_BUILD_NUM=${CIRCLE_BUILD_NUM} --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=skip-ios --config=ci -- //android/demo:android_instrumentation_test
 
       - save_cache:
           when: always
