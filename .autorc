@@ -4,10 +4,10 @@
   "versionBranches": true,
   "plugins": [
     [
-      [
-        "upload-assets",
-        { "assets": ["./bazel-bin/PlayerUI_Pod.zip"] }
-      ],
+      "upload-assets",
+      { "assets": ["./bazel-bin/PlayerUI_Pod.zip"] }
+    ],
+    [
       "version-file",
       {
         "versionFile": "./VERSION",
