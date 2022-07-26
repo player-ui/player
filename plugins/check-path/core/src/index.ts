@@ -95,7 +95,10 @@ export class CheckPathPlugin implements PlayerPlugin {
           this.viewInfo = viewInfo;
 
           resolver.hooks.afterResolve.tap(this.name, (value, node) => {
-            const sourceNode = resolver.getSourceNode(node);
+            let sourceNode = resolver.getSourceNode(node);
+            if (sourceNode?.type === 'applicability') {
+              sourceNode = sourceNode.value;
+            }
 
             if (sourceNode) {
               viewInfo.resolvedMap.set(sourceNode, {

@@ -75,6 +75,21 @@ const applicableFlow = makeFlow({
             type: 'asset',
           },
         },
+        {
+          asset: {
+            id: 'asset-4',
+            applicability: '{{foo.baz}}',
+            type: 'asset',
+            values: [
+              {
+                asset: {
+                  id: 'asset-4a',
+                  type: 'asset',
+                },
+              },
+            ],
+          },
+        },
       ],
     },
   },
@@ -295,7 +310,10 @@ describe('works with applicability', () => {
       'asset',
     ]);
 
-    dataController.set([['foo.bar', true]]);
+    dataController.set([
+      ['foo.bar', true],
+      ['foo.baz', true],
+    ]);
     await waitFor(() =>
       expect(checkPathPlugin.getPath('asset-2')).toStrictEqual([
         'fields',
@@ -311,6 +329,16 @@ describe('works with applicability', () => {
       'asset',
       'values',
       2,
+      'asset',
+    ]);
+    expect(checkPathPlugin.getPath('asset-4a')).toStrictEqual([
+      'fields',
+      'asset',
+      'values',
+      3,
+      'asset',
+      'values',
+      0,
       'asset',
     ]);
   });

@@ -9,6 +9,8 @@ import { Registry } from '@player-ui/partial-match-registry';
 import { compose } from './utils';
 
 export * from './utils';
+export * from './propertiesToSkip';
+
 export type TransformType = TransformFunction<any> | TransformFunctions;
 export type TransformRegistryEntries = Array<[any, TransformType]>;
 export type AssetTransformInit =
