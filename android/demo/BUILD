@@ -53,11 +53,6 @@ applitools_config(
     package = "com.intuit.player.android.reference.demo"
 )
 
-sh_binary(
-    name = "app_config",
-    srcs = ["scripts/configgen.sh"],
-)
-
 kt_android_library(
     name = "demo_ui_test",
     srcs = glob(["src/androidTest/**/*.kt"]) + [":applitools_config"],

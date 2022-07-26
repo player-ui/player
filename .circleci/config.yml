@@ -70,12 +70,6 @@ jobs:
             - node_modules
           key: v1-dependencies-{ { checksum "package.json" }}
 
-      - save_cache:
-          when: always
-          key: v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
-          paths:
-            - ~/.cache/bazel-disk-cache
-
       - persist_to_workspace:
           root: .
           paths:
@@ -192,12 +186,6 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - restore_cache:
-          keys:
-            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
-            - v1-bazel-cache-core-{{ .Branch }}
-            - v1-bazel-cache-core-main
-
       - run:
           name: Install Bazel
           command: |
@@ -225,12 +213,6 @@ jobs:
             circle-android wait-for-boot
 
       - run: bazel test --define=APPLITOOLS_KEY=${APPLITOOLS_KEY} --define=CIRCLE_BUILD_NUM=${CIRCLE_BUILD_NUM} --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=skip-ios --config=ci -- //android/demo:android_instrumentation_test
-
-      - save_cache:
-          when: always
-          key: v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
-          paths:
-            - ~/.cache/bazel-disk-cache
 
       - store_artifacts:
           path: screenshots
