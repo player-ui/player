@@ -15,14 +15,13 @@ maven_main = [
 ]
 
 maven_test = [
-    "com.applitools:eyes-android-common:4.7.6",
-    "com.applitools:eyes-android-core:4.7.6",
+    "com.applitools:eyes-android-espresso:4.7.6",
     "androidx.test:runner:1.3.0",
     "androidx.test:rules:1.3.0",
     "androidx.test.espresso:espresso-core:3.3.0",
     "androidx.test.espresso:espresso-contrib:3.3.0",
     "androidx.test.espresso:espresso-intents:3.3.0",
-    "androidx.test.ext:junit-ktx:1.1.2"
+    "androidx.test.ext:junit-ktx:1.1.2",
 ]
 
 maven = maven_main + maven_test
@@ -37,5 +36,6 @@ main_deps = parse_coordinates(maven) + [
 ]
 
 test_deps = parse_coordinates(maven_test) + [
-    "//jvm/utils"
+    "//jvm/utils",
+    "@androidx_eyes_components//aar",
 ]

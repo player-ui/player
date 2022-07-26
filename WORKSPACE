@@ -131,30 +131,22 @@ overridden_targets = {
 }
 
 load("@bazel_tools//tools/build_defs/repo:maven_rules.bzl", "maven_aar")
+
+# Because J2V8 is published as type `aar.asc`
 maven_aar(
     name = "android_j2v8",
     artifact = "com.eclipsesource.j2v8:j2v8:6.1.0",
 )
 
-maven_aar(
-    name = "android_eyes_espresso",
-    artifact = "com.applitools:eyes-android-espresso:4.7.6",
-    settings = "//android/demo:androidsettings.xml"
-)
-
-maven_aar(
-    name = "android_eyes_components",
-    artifact = "com.applitools:eyes-android-components:4.7.6",
-    settings = "//android/demo:androidsettings.xml"
-)
-
+# Because eyes androidx components is published as type `pom`
 maven_aar(
     name = "androidx_eyes_components",
     artifact = "com.applitools:eyes-android-components-androidx:4.7.6",
-    settings = "//android/demo:androidsettings.xml"
+    settings = "//android/demo:androidsettings.xml",
 )
 
 android_ndk_repository(name = "androidndk")
+
 register_toolchains("@androidndk//:all")
 
 ######################

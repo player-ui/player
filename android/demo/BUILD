@@ -61,12 +61,7 @@ sh_binary(
 kt_android_library(
     name = "demo_ui_test",
     srcs = glob(["src/androidTest/**/*.kt"]) + [":applitools_config"],
-    deps = test_deps + [
-        ":demo_lib",
-        "@android_eyes_espresso//aar",
-        "@android_eyes_components//aar",
-        "@androidx_eyes_components//aar",
-    ]
+    deps = test_deps + [":demo_lib"],
 )
 
 android_binary(

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -u -e -o pipefail
+
 adb install android/demo/demo.apk
 adb install android/demo/demo_test_app.apk
 
