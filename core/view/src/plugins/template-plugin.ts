@@ -4,6 +4,7 @@ import { NodeType } from '../parser';
 import type { ViewPlugin } from '.';
 import type { View } from './plugin';
 import type { Options } from './options';
+import type { Resolver } from '../resolver';
 
 export interface TemplateItemInfo {
   /** The index of the data for the current iteration of the template */
@@ -40,9 +41,13 @@ export default class TemplatePlugin implements ViewPlugin {
     this.options = options;
   }
 
-  private parseTemplate(parser: Parser, node: Node.Template): Node.Node | null {
+  private parseTemplate(
+    parseObject: any,
+    node: Node.Template,
+    options: Options
+  ): Node.Node | null {
     const { template, depth } = node;
-    const data = this.options.data.model.get(node.data);
+    const data = options.data.model.get(node.data);
 
     if (!data) {
       return null;
@@ -80,11 +85,9 @@ export default class TemplatePlugin implements ViewPlugin {
         templateStr = templateStr.replace(new RegExp(expression, flags), value);
       }
 
-      const parsed = parser.parseObject(
-        JSON.parse(templateStr),
-        NodeType.Value,
-        { templateDepth: node.depth + 1 }
-      );
+      const parsed = parseObject(JSON.parse(templateStr), NodeType.Value, {
+        templateDepth: node.depth + 1,
+      });
 
       if (parsed) {
         values.push(parsed);
@@ -107,8 +110,22 @@ export default class TemplatePlugin implements ViewPlugin {
 
   applyParserHooks(parser: Parser) {
     parser.hooks.onCreateASTNode.tap('template', (node) => {
-      if (node && node.type === NodeType.Template) {
-        return this.parseTemplate(parser, node);
+      if (node && node.type === NodeType.Template && !node.dynamic) {
+        return this.parseTemplate(
+          parser.parseObject.bind(parser),
+          node,
+          this.options
+        );
+      }
+
+      return node;
+    });
+  }
+
+  applyResolverHooks(resolver: Resolver) {
+    resolver.hooks.beforeResolve.tap('template', (node, options) => {
+      if (node && node.type === NodeType.Template && node.dynamic) {
+        return this.parseTemplate(options.parseNode, node, options);
       }
 
       return node;
@@ -117,5 +134,6 @@ export default class TemplatePlugin implements ViewPlugin {
 
   apply(view: View) {
     view.hooks.parser.tap('template', this.applyParserHooks.bind(this));
+    view.hooks.resolver.tap('template', this.applyResolverHooks.bind(this));
   }
 }

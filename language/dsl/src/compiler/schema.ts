@@ -1,5 +1,6 @@
 import type { Schema, Language } from '@player-ui/types';
 import signale from 'signale';
+import { dequal } from 'dequal';
 import { SyncWaterfallHook } from 'tapable-ts';
 import { binding as b } from '..';
 import type { BindingTemplateInstance } from '../string-templates';
@@ -35,7 +36,7 @@ const isTypeDef = (property: SchemaNode): property is Schema.DataType => {
  */
 export class SchemaGenerator {
   private children: Array<SchemaChildren>;
-  private generatedDataTypeNames: Set<string>;
+  private generatedDataTypeNames: Map<string, SchemaNode>;
 
   public hooks = {
     createSchemaNode: new SyncWaterfallHook<
@@ -48,7 +49,7 @@ export class SchemaGenerator {
 
   constructor() {
     this.children = [];
-    this.generatedDataTypeNames = new Set();
+    this.generatedDataTypeNames = new Map();
   }
 
   /**
@@ -65,9 +66,8 @@ export class SchemaGenerator {
 
     Object.keys(schema).forEach((property) => {
       const subType = schema[property] as SchemaNode;
-      const subTypeName: string = subType[SchemaTypeName] ?? property;
       newSchema.ROOT[property] = this.hooks.createSchemaNode.call(
-        this.processChildren(subTypeName, subType),
+        this.processChildren(property, subType),
         subType as any
       );
     });
@@ -83,9 +83,8 @@ export class SchemaGenerator {
 
       Object.keys(child).forEach((property) => {
         const subType = (child as any)[property] as SchemaNode;
-        const subTypeName: string = subType[SchemaTypeName] ?? property;
         typeDef[property] = this.hooks.createSchemaNode.call(
-          this.processChildren(subTypeName, subType),
+          this.processChildren(property, subType),
           subType as any
         );
       });
@@ -116,20 +115,32 @@ export class SchemaGenerator {
         );
       }
 
-      intermediateType = this.makePlaceholderArrayType(property);
+      const subTypeName = subType[0][SchemaTypeName] ?? property;
+      intermediateType = this.makePlaceholderArrayType(subTypeName);
       this.children.push({ name: intermediateType.type, child: subType[0] });
     } else {
-      intermediateType = this.makePlaceholderType(property);
+      const subTypeName = subType[SchemaTypeName] ?? property;
+      intermediateType = this.makePlaceholderType(subTypeName);
       this.children.push({ name: intermediateType.type, child: subType });
     }
 
     if (this.generatedDataTypeNames.has(intermediateType.type)) {
-      throw new Error(
-        `Error: Generated two intermediate types with the name: ${intermediateType.type}`
-      );
+      if (
+        !dequal(
+          subType,
+          this.generatedDataTypeNames.get(intermediateType.type) as object
+        )
+      ) {
+        throw new Error(
+          `Error: Generated two intermediate types with the name: ${intermediateType.type} that are of different shapes`
+        );
+      }
+
+      // remove last added type since we don't need to reprocess it
+      this.children.pop();
     }
 
-    this.generatedDataTypeNames.add(intermediateType.type);
+    this.generatedDataTypeNames.set(intermediateType.type, subType);
     return intermediateType;
   }
 

@@ -116,6 +116,7 @@ Object {
             "value": Object {
               "data": "foo.bar",
               "depth": 0,
+              "dynamic": false,
               "parent": [Circular],
               "template": Object {
                 "value": "{{foo.bar._index_}}",
@@ -197,6 +198,7 @@ Object {
       "value": Object {
         "data": "foo.pets",
         "depth": 0,
+        "dynamic": false,
         "parent": [Circular],
         "template": Object {
           "asset": Object {

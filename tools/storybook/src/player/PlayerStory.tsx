@@ -1,5 +1,10 @@
 import React from 'react';
-import type { WebPlayerPlugin, PlayerFlowStatus, Flow } from '@player-ui/react';
+import type {
+  WebPlayerPlugin,
+  PlayerFlowStatus,
+  Flow,
+  WebPlayerOptions,
+} from '@player-ui/react';
 import { WebPlayer } from '@player-ui/react';
 import { ChakraProvider, Spinner } from '@chakra-ui/react';
 import { makeFlow } from '@player-ui/make-flow';
@@ -15,12 +20,12 @@ interface LocalPlayerStory {
   /** the mock to load */
   flow: Flow;
 
-  /** plugins to the player */
+  /** Web plugins to load into Player */
   webPlugins?: Array<WebPlayerPlugin>;
 }
 
 export const WebPlayerPluginContext = React.createContext<{
-  /** Plugins to use for the player */
+  /** Web plugins to load into Player */
   plugins?: Array<WebPlayerPlugin>;
 }>({ plugins: [] });
 
@@ -35,6 +40,11 @@ export const StorybookControlsContext = React.createContext<{
   controls: {},
 });
 
+export const PlayerOptionsContext = React.createContext<{
+  /**  these are options such as suspend, or plugins */
+  options?: WebPlayerOptions;
+}>({ options: {} });
+
 /** A component to render a player + flow */
 const LocalPlayerStory = (props: LocalPlayerStory) => {
   let flow = useEditorFlow(props.flow);
@@ -42,6 +52,8 @@ const LocalPlayerStory = (props: LocalPlayerStory) => {
   const renderContext = React.useContext(PlayerRenderContext);
   const pluginContext = React.useContext(WebPlayerPluginContext);
   const controlsContext = React.useContext(StorybookControlsContext);
+  const optionsContext = React.useContext(PlayerOptionsContext);
+  const options = { ...optionsContext?.options };
   const stateActions = useStateActions(addons.getChannel());
   const plugins = props.webPlugins ?? pluginContext?.plugins ?? [];
   const [playerState, setPlayerState] =
@@ -49,7 +61,12 @@ const LocalPlayerStory = (props: LocalPlayerStory) => {
 
   const wp = React.useMemo(() => {
     return new WebPlayer({
-      plugins: [new StorybookPlayerPlugin(stateActions), ...plugins],
+      ...options,
+      plugins: [
+        new StorybookPlayerPlugin(stateActions),
+        ...plugins,
+        ...(options?.plugins ?? []),
+      ],
     });
   }, [plugins]);
 
@@ -167,6 +184,8 @@ export interface PlayerStoryProps {
   data?: Flow['data'];
   /** props from storybook controls */
   storybookControls?: Flow['data'];
+  /**  options, like suspend and plugins */
+  options?: WebPlayerOptions;
 }
 
 /**
@@ -174,7 +193,8 @@ export interface PlayerStoryProps {
  * This handles all of the wiring of the mock into the flow editor, events, etc
  */
 export const PlayerStory = (props: PlayerStoryProps) => {
-  const { flow, storybookControls, ...other } = props;
+  const { flow, storybookControls, options, ...other } = props;
+
   const MockComp = React.useMemo(
     () => wrapInLazy(LocalPlayerStory, flow, other),
     []
@@ -189,7 +209,13 @@ export const PlayerStory = (props: PlayerStoryProps) => {
               ...storybookControls,
             }}
           >
-            <MockComp />
+            <PlayerOptionsContext.Provider
+              value={{
+                options,
+              }}
+            >
+              <MockComp />
+            </PlayerOptionsContext.Provider>{' '}
           </StorybookControlsContext.Provider>
         </React.Suspense>
       </ChakraProvider>

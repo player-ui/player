@@ -1,10 +1,38 @@
 import React from 'react';
 import type { JsonType } from 'react-json-reconciler';
 import { render } from 'react-json-reconciler';
-import type { Flow, View } from '@player-ui/types';
+import type { Flow, View, Navigation as PlayerNav } from '@player-ui/types';
 import { SyncHook } from 'tapable-ts';
 import type { SerializeType } from './types';
+import type { Navigation } from '../types';
 import { SchemaGenerator } from './schema';
+
+/** Recursively find BindingTemplateInstance and call toValue on them */
+const parseNavigationExpressions = (nav: Navigation): PlayerNav => {
+  /** Same as above but signature changed */
+  function replaceExpWithStr(obj: any): any {
+    /** call toValue if BindingTemplateInstance otherwise continue  */
+    function convExp(value: any): any {
+      return value && typeof value === 'object' && value.__type === 'expression'
+        ? value.toValue() // exp, onStart, and onEnd don't need to be wrapped in @[]@
+        : replaceExpWithStr(value);
+    }
+
+    if (Array.isArray(obj)) {
+      return obj.map(convExp);
+    }
+
+    if (typeof obj === 'object') {
+      return Object.fromEntries(
+        Object.entries(obj).map(([key, value]) => [key, convExp(value)])
+      );
+    }
+
+    return obj;
+  }
+
+  return replaceExpWithStr(nav);
+};
 
 /** A compiler for transforming DSL content into JSON */
 export class DSLCompiler {
@@ -47,6 +75,7 @@ export class DSLCompiler {
           if (typeof node === 'object') {
             Object.entries(node).forEach(([nodeKey, flowNode]) => {
               if (
+                flowNode &&
                 typeof flowNode === 'object' &&
                 'state_type' in flowNode &&
                 flowNode.state_type === 'VIEW' &&
@@ -66,6 +95,10 @@ export class DSLCompiler {
             });
           }
         });
+
+        copiedValue.navigation = parseNavigationExpressions(
+          copiedValue.navigation
+        );
       }
 
       if (value) {
