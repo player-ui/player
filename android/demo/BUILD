@@ -1,8 +1,8 @@
 load("@build_bazel_rules_android//android:rules.bzl", "android_binary")
 load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_import")
 load("@io_bazel_rules_kotlin//kotlin:android.bzl", "kt_android_library")
-
-load(":deps.bzl", "main_deps")
+load(":deps.bzl", "main_deps", "test_deps")
+load("//android:build.bzl", "applitools_config")
 
 kt_android_library(
     name = "demo_lib",
@@ -46,6 +46,36 @@ java_library(
     name = "sun_dependencies_neverlink",
     srcs = ["SignalHandler.java", "Signal.java"],
     neverlink = True
+)
+
+applitools_config(
+    name = "applitools_config",
+    package = "com.intuit.player.android.reference.demo"
+)
+
+kt_android_library(
+    name = "demo_ui_test",
+    srcs = glob(["src/androidTest/**/*.kt"]) + [":applitools_config"],
+    deps = test_deps + [":demo_lib"],
+)
+
+android_binary(
+    name = "demo_test_app",
+    custom_package = "com.intuit.player.android.reference.demo",
+    manifest = ":src/androidTest/AndroidManifest.xml",
+    instruments = ":demo",
+    deps = ["demo_ui_test"],
+)
+
+sh_test(
+    name = "android_instrumentation_test",
+    srcs = ["scripts/androidtest.sh"],
+    size = "large",
+    timeout = "long",
+    data = [
+        ":demo_test_app",
+        ":demo"
+    ]
 )
 
 

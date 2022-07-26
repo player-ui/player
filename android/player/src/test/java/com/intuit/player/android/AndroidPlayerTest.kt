@@ -71,6 +71,15 @@ internal class AndroidPlayerTest {
     }
 
     @Test
+    fun `test registering same asset implementation multiple times`() = runBlockingTest {
+        val player = AndroidPlayer()
+        player.registerAsset("simple", ::SimpleAsset)
+        player.registerAsset("complex", ::SimpleAsset)
+
+        assertTrue(player.awaitFirstView(SimpleAsset.sampleFlow) is SimpleAsset)
+    }
+
+    @Test
     fun `test registration helper`() = runBlockingTest {
         val player = AndroidPlayer()
         player.registerAsset("simple", ::SimpleAsset)
