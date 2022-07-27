@@ -103,7 +103,7 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
             // View not found. Create and hydrate.
             cachedView == null -> initView().also(::rehydrate)
             // View found, but contexts are out of sync. Remove cached view and create and hydrate.
-            cachedAssetContext?.context != context -> {
+            cachedAssetContext?.context != context || cachedAssetContext?.asset?.type != asset.type -> {
                 cachedView.removeSelf()
                 initView().also(::rehydrate)
             }
@@ -111,7 +111,7 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
             // implementation to throw [StaleViewException] to signify that the view is out of sync.
             // This can only be done from invalidateView, so we have a guarantee that the view has
             // already been removed from the cache.
-            !cachedAssetContext!!.asset.nativeReferenceEquals(asset) ->
+            !cachedAssetContext.asset.nativeReferenceEquals(asset) ->
                 try {
                     cachedView.also(::rehydrate)
                 } catch (exception: StaleViewException) {
@@ -199,6 +199,9 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
 
     /** Expansion helpers */
 
+    /** Unwraps the [AssetWrapper] extracting [asset] as a [RenderableAsset] */
+    public fun AssetWrapper.asRenderableAsset(): RenderableAsset? = player.expandAsset(this.asset)
+
     /** Expand [name] as a [RenderableAsset] from the base [asset] */
     @Deprecated(DEPRECATED_WITH_DECODABLEASSET, level = DeprecationLevel.ERROR)
     @Suppress("DEPRECATION_ERROR")
@@ -269,11 +272,11 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
 
         /** Conform this [Serializer] to cast the expanded asset to [T] */
         public inline fun <reified T : RenderableAsset> conform(): KSerializer<T> = object : KSerializer<T> by this as KSerializer<T> {
-            override fun deserialize(decoder: Decoder): T = this@Serializer.deserialize(decoder) as T
+            override fun deserialize(decoder: Decoder) = this@Serializer.deserialize(decoder) as T
         }
 
         public fun <T : RenderableAsset> conform(klass: KClass<T>): KSerializer<T> = object : KSerializer<T> by this as KSerializer<T> {
-            override fun deserialize(decoder: Decoder): T = klass.javaObjectType.cast(this@Serializer.deserialize(decoder))!!
+            override fun deserialize(decoder: Decoder) = klass.javaObjectType.cast(this@Serializer.deserialize(decoder))
         }
     }
 }
