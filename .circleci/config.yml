@@ -234,8 +234,11 @@ jobs:
 
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
       - run: echo -e $GPG_KEY | gpg --import --batch
-      - run: source ~/.bashrc && bundle install
-      - run: source ~/.bashrc && CIRCLE_BUILD_NUMBER=$(cat .ios-build-number) npx auto shipit --only-graduate-with-release-label -vv
+      - run: |
+            source ~/.bashrc
+            bundle install
+            export CIRCLE_BUILD_NUMBER=$(cat .ios-build-number)
+            npx auto shipit --only-graduate-with-release-label -vv
 
 workflows: 
   build_and_test_pr:
