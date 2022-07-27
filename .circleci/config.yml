@@ -184,11 +184,6 @@ jobs:
       - store_test_results:
           path: _test_results
 
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
-
   android_test:
     executor: android
     steps:
@@ -340,6 +335,7 @@ workflows:
           context:
             - Publish
           requires:
+            - android_test
             - test
             - coverage
             - build_ios
@@ -376,6 +372,7 @@ workflows:
           context:
             - Publish
           requires:
+            - android_test
             - test
             - coverage
             - build_ios
