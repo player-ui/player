@@ -23,6 +23,8 @@ abstract class ApplitoolsTest {
         Eyes().apply {
             componentsProvider = AndroidXComponentsProvider()
             configuration = Configuration().apply {
+                appName = "Android Reference Assets"
+                addProperty("platform", "android")
                 batch = batchInfo
                 apiKey = ApplitoolsConfig.APPLITOOLS_KEY
                 setFeatures(Feature.PIXEL_COPY_SCREENSHOT)
@@ -44,6 +46,6 @@ abstract class ApplitoolsTest {
     fun Eyes.checkPlayer(name: String) = check(name, Target.region(ViewMatchers.withId(R.id.player_canvas)))
 
     companion object {
-        val batchInfo = BatchInfo("android-reference-assets@${ApplitoolsConfig.BATCH_ID}")
+        val batchInfo = BatchInfo(ApplitoolsConfig.BATCH_ID)
     }
 }
