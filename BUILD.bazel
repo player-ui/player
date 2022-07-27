@@ -79,8 +79,5 @@ pod_push(
         # and they're run as part of the build pipeline anyway
         "--skip-tests"
     ],
-    globalFlags = [
-        # because jenkins runs as root
-        "--allow-root"
-    ]
+    globalFlags = []
 )

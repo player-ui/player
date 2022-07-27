@@ -4,7 +4,6 @@ set -eo pipefail # exit immediately if any command fails.
 
 echo STABLE_GIT_COMMIT $(git rev-parse HEAD)
 echo STABLE_VERSION $(cat VERSION)
-echo VERSION $(cat VERSION)
 
 commit_sha=$(git rev-parse HEAD)
 echo "COMMIT_SHA $commit_sha"
