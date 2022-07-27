@@ -218,7 +218,11 @@ jobs:
           command: |
             circle-android wait-for-boot
 
-      - run: bazel test --define=APPLITOOLS_KEY=${APPLITOOLS_KEY} --define=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=skip-ios --config=ci -- //android/demo:android_instrumentation_test
+      - run:
+          command: |
+            export APPLITOOLS_API_KEY=${APPLITOOLS_KEY}
+            export APPLITOOLS_BATCH_ID=${CIRCLE_SHA1}
+            bazel test --define=APPLITOOLS_KEY=${APPLITOOLS_API_KEY} --define=APPLITOOLS_BATCH_ID=${APPLITOOLS_BATCH_ID} --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=skip-ios --config=ci -- //android/demo:android_instrumentation_test
 
       - store_artifacts:
           path: screenshots
