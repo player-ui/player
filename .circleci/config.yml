@@ -155,7 +155,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - .
+            - .ios-build-number
 
       - store_artifacts:
           path: bazel-bin/PlayerUI_Pod.zip
