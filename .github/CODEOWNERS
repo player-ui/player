@@ -1,6 +1,9 @@
 # Fallback
 * @adierkens
 
+# Other
+/docs/ @KetanReddy @adierkens
+
 # Android/JVM
 
 jvm/ @sugarmanz @Brocollie08
@@ -20,6 +23,3 @@ core/ @KetanReddy @adierkens
 
 # Language
 language/ @KetanReddy @adierkens
-
-# Other
-/docs/ @KetanReddy @adierkens

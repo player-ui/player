@@ -184,6 +184,7 @@ export class Parser {
                 depth: options.templateDepth ?? 0,
                 data: template.data,
                 template: template.value,
+                dynamic: template.dynamic ?? false,
               },
               template
             );

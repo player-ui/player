@@ -115,7 +115,8 @@ public class AndroidPlayer private constructor(
     /** Helper provided to reduce overhead for asset registrations with metaData */
     public fun <T : RenderableAsset> registerAsset(klass: KClass<T>, props: Map<String, Any>, factory: (AssetContext) -> RenderableAsset) {
         assetRegistry.register(props, factory)
-        player.format.registerContextualSerializer(klass, assetSerializer.conform(klass))
+        if (player.format.serializersModule.getContextual(klass) == null)
+            player.format.registerContextualSerializer(klass, assetSerializer.conform(klass))
     }
 
     /** Apply [AndroidPlayerPlugin]s last */

@@ -11,9 +11,9 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 http_archive(
     name = "rules_player",
-    strip_prefix = "rules_player-0.4.1",
-    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.4.1.tar.gz"],
-    sha256 = "c05930fcf75bf5c8ceca63313646cdee8d2db34567664aa358d457f612bb0fb8"
+    strip_prefix = "rules_player-0.5.0",
+    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.5.0.tar.gz"],
+    sha256 = "76291ffd332cee690db7b91ae37b7b2388104b09230f7063bfd104a48a926f8b"
 )
 
 load("@rules_player//:workspace.bzl", "deps")
@@ -131,12 +131,22 @@ overridden_targets = {
 }
 
 load("@bazel_tools//tools/build_defs/repo:maven_rules.bzl", "maven_aar")
+
+# Because J2V8 is published as type `aar.asc`
 maven_aar(
     name = "android_j2v8",
     artifact = "com.eclipsesource.j2v8:j2v8:6.1.0",
 )
 
+# Because eyes androidx components is published as type `pom`
+maven_aar(
+    name = "androidx_eyes_components",
+    artifact = "com.applitools:eyes-android-components-androidx:4.7.6",
+    settings = "//android/demo:androidsettings.xml",
+)
+
 android_ndk_repository(name = "androidndk")
+
 register_toolchains("@androidndk//:all")
 
 ######################
@@ -168,6 +178,7 @@ maven_install(
         "https://repo1.maven.org/maven2",
         "https://maven.google.com/",
         "https://plugins.gradle.org/m2/",
+        "https://jcenter.bintray.com/"
     ],
 )
 

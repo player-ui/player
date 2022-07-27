@@ -1,11 +1,10 @@
 load("@rules_player//kotlin:kt_jvm.bzl", _kt_jvm = "kt_jvm")
 load("@rules_player//kotlin:distribution.bzl", _distribution = "distribution")
 load("//jvm/dependencies:common.bzl", common_main_deps = "main_deps", common_test_deps = "test_deps")
+load("//:index.bzl", "GIT_REPO", "DOCS_URL")
 
 DEFAULT_PROJECT_NAME = "Player"
 DEFAUTL_PROJECT_DESCRIPTION = "A cross-platform semantic rendering engine"
-DEFAUTL_PROJECT_URL = "https://player-ui.github.io/"
-DEFAUTL_SCM_URL = "https://github.com/player-ui/player.git"
 DEFAULT_DEVELOPERS = {
    "sugarmanz": ["name=Jeremiah Zucker", "email=zucker.jeremiah@gmail.com"],
    "brocollie08": ["name=Tony Lin"]
@@ -28,8 +27,8 @@ def kt_player_module(
         # (optional)
         project_name = DEFAULT_PROJECT_NAME,
         project_description = DEFAUTL_PROJECT_DESCRIPTION,
-        project_url = DEFAUTL_PROJECT_URL,
-        scm_url = DEFAUTL_SCM_URL,
+        project_url = DOCS_URL,
+        scm_url = GIT_REPO,
         developers = DEFAULT_DEVELOPERS,
 
         # Package level config
@@ -91,8 +90,8 @@ def distribution(
         # (optional)
         project_name = DEFAULT_PROJECT_NAME,
         project_description = DEFAUTL_PROJECT_DESCRIPTION,
-        project_url = DEFAUTL_PROJECT_URL,
-        scm_url = DEFAUTL_SCM_URL,
+        project_url = DOCS_URL,
+        scm_url = GIT_REPO,
         developers = DEFAULT_DEVELOPERS,):
     _distribution(
         name = name,

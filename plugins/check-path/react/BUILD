@@ -8,4 +8,7 @@ javascript_pipeline(
     peer_dependencies = [
         "//react/player:@player-ui/react",
     ],
+    test_data = [
+        "//core/make-flow:@player-ui/make-flow"
+    ],
 )

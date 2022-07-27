@@ -1,9 +1,12 @@
-import type { Asset } from '@player-ui/types';
+import type {
+  Asset,
+  Expression,
+  Navigation as PlayerNav,
+} from '@player-ui/types';
 import type {
   BindingTemplateInstance,
   ExpressionTemplateInstance,
 } from './string-templates';
-import { binding } from './string-templates';
 
 export type WithChildren<T = Record<string, unknown>> = T & {
   /** child nodes */
@@ -51,3 +54,28 @@ export type WithTemplateTypes<T> = T extends Record<any, any>
       [P in keyof T]: WithTemplateTypes<T[P]>;
     }
   : T | BindingTemplateInstance | ExpressionTemplateInstance;
+
+type ValidKeys = 'exp' | 'onStart' | 'onEnd';
+
+type DeepReplace<T, Old, New> = {
+  [P in keyof T]: T[P] extends Old
+    ? P extends ValidKeys
+      ? New
+      : DeepReplace<T[P], Old, New> // Set to new if one of the valid keys: replace with `? New` for all keys
+    : T[P] extends (infer R)[] // Is this a Tuple or array
+    ? DeepReplace<R, Old, New>[] // Replace the type of the tuple/array
+    : T[P] extends object
+    ? DeepReplace<T[P], Old, New>
+    : Extract<T[P], Old> extends Old // Is this a union with the searched for type?
+    ?
+        | DeepReplace<Extract<T[P], object>, Old, New> // Replace all object types of the union
+        | Exclude<T[P], Old | object> // Get all types that are not objects (handled above) or Old (handled below
+        | New // Direct Replacement of Old
+    : T[P];
+};
+
+export type Navigation = DeepReplace<
+  PlayerNav,
+  Expression,
+  ExpressionTemplateInstance | ExpressionTemplateInstance[] | Expression
+>;

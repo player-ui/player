@@ -18,7 +18,8 @@ javascript_pipeline(
       "@npm//signale",
       "@npm//ts-node",
       "@npm//typescript",
-      "@npm//tapable-ts"
+      "@npm//tapable-ts",
+      "@npm//dequal"
     ],
     peer_dependencies = [
       "@npm//react"

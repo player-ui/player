@@ -20,6 +20,11 @@ data class SomeData(
     val maybeNode: Node? = null,
 )
 
+@Serializable
+data class SomeDataWithDefaults(
+    val name: String = "default"
+)
+
 internal class NodeSerializationTest : RuntimeTest() {
 
     private val name get() = "some name"
@@ -85,5 +90,33 @@ internal class NodeSerializationTest : RuntimeTest() {
 
         assertNull(someData.maybeGenericInvokable)
         assertNull(someData.maybeNode)
+    }
+
+    @TestTemplate
+    fun `handles undefined`() {
+        val someDataObj = runtime.serialize(
+            mapOf(
+                "name" to name,
+                "node" to node,
+                "genericInvokable" to genericInvokable,
+                "specificInvokableWithNode" to specificInvokableWithNode,
+                "specificInvokable" to specificInvokable,
+                "maybeNode" to Unit,
+            )
+        ) as Node
+
+        val someData = someDataObj.deserialize(SomeData.serializer()) as SomeData
+        assertNull(someData.maybeNode)
+    }
+
+    @TestTemplate fun `can use default value`() {
+        val someDataObj = runtime.serialize(
+            mapOf(
+                "name" to Unit,
+            )
+        ) as Node
+
+        val someData = someDataObj.deserialize(SomeDataWithDefaults.serializer())
+        assertEquals("default", someData.name)
     }
 }

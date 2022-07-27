@@ -16,6 +16,7 @@ describe('Schema Bindings Generate Properly', () => {
       },
       sub2: [
         {
+          [SchemaTypeName]: 'sub2a',
           val: LocalBazType,
         },
       ],
@@ -67,13 +68,13 @@ describe('Schema Bindings Generate Properly', () => {
           },
           "sub2": Object {
             "isArray": true,
-            "type": "sub2Type",
+            "type": "sub2aType",
           },
           "sub4": Object {
             "type": "sub3Type",
           },
         },
-        "sub2Type": Object {
+        "sub2aType": Object {
           "val": Object {
             "default": false,
             "type": "BazType",
@@ -107,7 +108,7 @@ describe('Schema Bindings Generate Properly', () => {
   });
 
   it('is able to serialize to a schema object with a custom array indicator', () => {
-    const g = new SchemaGenerator('isArray');
+    const g = new SchemaGenerator();
     const schema = g.toSchema(testObj);
     expect(schema).toMatchInlineSnapshot(`
       Object {
@@ -122,13 +123,13 @@ describe('Schema Bindings Generate Properly', () => {
           },
           "sub2": Object {
             "isArray": true,
-            "type": "sub2Type",
+            "type": "sub2aType",
           },
           "sub4": Object {
             "type": "sub3Type",
           },
         },
-        "sub2Type": Object {
+        "sub2aType": Object {
           "val": Object {
             "default": false,
             "type": "BazType",
@@ -161,7 +162,31 @@ describe('Schema Bindings Generate Properly', () => {
     `);
   });
 
-  it('throws errors if keys are duplicated', () => {
+  it('throws errors if two types have the same name but are different', () => {
+    const g = new SchemaGenerator();
+
+    const badObj = {
+      main: {
+        sub: {
+          a: FooTypeRef,
+          b: BarTypeRef,
+          c: BarTypeRef,
+        },
+        sub2: {
+          sub: {
+            a: FooTypeRef,
+            b: BarTypeRef,
+          },
+        },
+      },
+    };
+
+    expect(() => g.toSchema(badObj)).toThrowError(
+      'Error: Generated two intermediate types with the name: subType'
+    );
+  });
+
+  it('doesnt throw errors if two types have the same name and are the same', () => {
     const g = new SchemaGenerator();
 
     const badObj = {
@@ -179,9 +204,36 @@ describe('Schema Bindings Generate Properly', () => {
       },
     };
 
-    expect(() => g.toSchema(badObj)).toThrowError(
-      'Error: Generated two intermediate types with the name: subType'
-    );
+    expect(g.toSchema(badObj)).toMatchInlineSnapshot(`
+      Object {
+        "ROOT": Object {
+          "main": Object {
+            "type": "mainType",
+          },
+        },
+        "mainType": Object {
+          "sub": Object {
+            "type": "subType",
+          },
+          "sub2": Object {
+            "type": "sub2Type",
+          },
+        },
+        "sub2Type": Object {
+          "sub": Object {
+            "type": "subType",
+          },
+        },
+        "subType": Object {
+          "a": Object {
+            "type": "FooType",
+          },
+          "b": Object {
+            "type": "BarType",
+          },
+        },
+      }
+    `);
   });
 
   it('works when used as a jsx element', async () => {

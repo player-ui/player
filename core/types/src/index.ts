@@ -246,6 +246,9 @@ export interface Template<ValueType = unknown, Key extends string = string> {
    */
   value: ValueType;
 
+  /** should the template be recomputed when data changes */
+  dynamic?: boolean;
+
   /**
    * A property on the parent object to store the new map under.
    * If it already exists, values are appended to the end.
