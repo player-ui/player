@@ -76,4 +76,7 @@ xcui.json
 # Bundles used by cocoapods for development
 ios/*/*/Resources/**/*.js
 
+# File used in CI to pass build number between iOS and release stage
+.ios-build-number
+
 .bazelrc.local

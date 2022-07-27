@@ -51,7 +51,6 @@ assemble_pod(
         # Core
         "//core/player:Player_Bundles_bundle_prod": "ios/packages/core/Resources/",
         "//plugins/partial-match-fingerprint/core:PartialMatchFingerprintPlugin_Bundles_bundle_prod": "ios/packages/core/Resources/",
-        "//plugins/check-path/core:CheckPathPlugin_Bundles_bundle_prod": "ios/packages/core/Resources/",
         "//core/partial-match-registry:Registry_Bundles_bundle_prod": "ios/packages/core/Resources/",
 
         # Packages
@@ -59,6 +58,7 @@ assemble_pod(
         "//plugins/reference-assets/core:ReferenceAssetsPlugin_Bundles_bundle_prod": "ios/packages/reference-assets/Resources/js/",
         # Plugins
         "//plugins/beacon/core:BeaconPlugin_Bundles_bundle_prod": "ios/plugins/BaseBeaconPlugin/Resources/",
+        "//plugins/check-path/core:CheckPathPlugin_Bundles_bundle_prod": "ios/plugins/CheckPathPlugin/Resources/",
         "//plugins/common-types/core:CommonTypesPlugin_Bundles_bundle_prod": "ios/plugins/CommonTypesPlugin/Resources/",
         "//plugins/common-expressions/core:CommonExpressionsPlugin_Bundles_bundle_prod": "ios/plugins/CommonExpressionsPlugin/Resources/",
         "//plugins/expression/core:ExpressionPlugin_Bundles_bundle_prod": "ios/plugins/ExpressionPlugin/Resources/",
@@ -68,4 +68,18 @@ assemble_pod(
         "//plugins/types-provider/core:TypesProviderPlugin_Bundles_bundle_prod": "ios/plugins/TypesProviderPlugin/Resources/",
     },
     podspec = ":PlayerUI_Podspec",
+)
+
+# Push podspec to specs repo
+# tag must exist in github first
+pod_push(
+    name = "PlayerUI_Pod_Push",
+    podspec = ':PlayerUI_Podspec',
+    executable = 'bundle exec pod',
+    pushFlags = [
+        # skip tests because it never runs them right
+        # and they're run as part of the build pipeline anyway
+        "--skip-tests"
+    ],
+    globalFlags = []
 )
