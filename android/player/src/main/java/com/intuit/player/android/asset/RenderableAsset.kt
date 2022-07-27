@@ -272,11 +272,11 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
 
         /** Conform this [Serializer] to cast the expanded asset to [T] */
         public inline fun <reified T : RenderableAsset> conform(): KSerializer<T> = object : KSerializer<T> by this as KSerializer<T> {
-            override fun deserialize(decoder: Decoder) = this@Serializer.deserialize(decoder) as T
+            override fun deserialize(decoder: Decoder): T = this@Serializer.deserialize(decoder) as T
         }
 
         public fun <T : RenderableAsset> conform(klass: KClass<T>): KSerializer<T> = object : KSerializer<T> by this as KSerializer<T> {
-            override fun deserialize(decoder: Decoder) = klass.javaObjectType.cast(this@Serializer.deserialize(decoder))
+            override fun deserialize(decoder: Decoder): T = klass.javaObjectType.cast(this@Serializer.deserialize(decoder))!!
         }
     }
 }
