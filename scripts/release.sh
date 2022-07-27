@@ -28,10 +28,10 @@ done
 # CIRCLE_BUILD_NUMBER is for the iOS Stage of the build
 # and populated by a .ios-build-number file that is written in that stage
 mkdir -p /tmp/$CIRCLE_BUILD_NUMBER
-./fetchArtifacts.sh > /tmp/$CIRCLE_BUILD_NUMBER/artifacts.json
+$(dirname -- "$0")/fetchArtifacts.sh > /tmp/$CIRCLE_BUILD_NUMBER/artifacts.json
 
 # Find the pod zip url
-export CIRCLE_CI_ZIP=$(./parseArtifactJson.js /tmp/$CIRCLE_BUILD_NUMBER/artifacts.json)
+export CIRCLE_CI_ZIP=$($(dirname -- "$0")/parseArtifactJson.js /tmp/$CIRCLE_BUILD_NUMBER/artifacts.json)
 
 # Rebuild to stamp the release pod
 bazel build //:PlayerUI_Pod
