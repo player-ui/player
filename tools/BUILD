@@ -12,6 +12,7 @@ genrule(
     outs = ["pkg_json_base.json"],
     cmd = """
         echo '{
+            "sideEffects": false,
             "license": "%s",
             "repository": {
                 "type": "git",
