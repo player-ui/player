@@ -48,7 +48,8 @@ abstract class ApplitoolsTest {
 
     companion object {
         val batchInfo = BatchInfo("android-reference-assets@${BATCH_ID}").apply {
-            id = BATCH_ID
+            // Only manually set the batch ID if it's not a hardcoded fallback
+            if (BATCH_ID != "local") id = BATCH_ID
         }
     }
 }
