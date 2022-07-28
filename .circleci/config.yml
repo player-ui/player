@@ -218,7 +218,7 @@ jobs:
           command: |
             circle-android wait-for-boot
 
-      - run: bazel test --define=APPLITOOLS_KEY=${APPLITOOLS_KEY} --define=CIRCLE_BUILD_NUM=${CIRCLE_BUILD_NUM} --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=skip-ios --config=ci -- //android/demo:android_instrumentation_test
+      - run: bazel test --define=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --define=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci -- //android/demo:android_instrumentation_test
 
       - store_artifacts:
           path: screenshots
@@ -264,6 +264,20 @@ jobs:
             export CIRCLE_BUILD_NUMBER=$(cat .ios-build-number)
             npx auto shipit --only-graduate-with-release-label -vv
 
+  applitools_init:
+    executor: base
+    steps:
+      - run:
+          name: Initialize Applitools
+          command: curl -L -d '' -X POST "$APPLITOOLS_SERVER_URL/api/externals/github/push?apiKey=$APPLITOOLS_API_KEY&CommitSha=$CIRCLE_SHA1&BranchName=$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/$CIRCLE_BRANCH"
+
+  applitools_cleanup:
+    executor: base
+    steps:
+      - run:
+          name: Cleanup Applitools
+          command: "curl -X POST \"$APPLITOOLS_SERVER_URL/api/externals/github/servers/github.com/commit/$CIRCLE_SHA1/complete?apiKey=$APPLITOOLS_API_KEY\" -H Content-Type:application/json --data '{\"serverId\": \"github.com\", \"commitSha\": \"$CIRCLE_SHA1\"}' -v -L"
+
 workflows:
   build_and_test_pr:
     jobs:
@@ -276,12 +290,19 @@ workflows:
             tags:
               ignore: /.*/
 
+      - applitools_init:
+          context:
+            - applitools
+          requires:
+            - setup
+
       - build:
           requires:
             - setup
 
       - build_ios:
           requires:
+            - applitools_init
             - setup
 
       - test:
@@ -292,11 +313,19 @@ workflows:
           context:
             - applitools
           requires:
+            - applitools_init
             - build
 
       - coverage:
           requires:
             - build
+
+      - applitools_cleanup:
+          context:
+            - applitools
+          requires:
+            - android_test
+            - build_ios
 
   build_and_test_main:
     when:
