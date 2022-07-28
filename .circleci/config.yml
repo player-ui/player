@@ -295,6 +295,8 @@ workflows:
               ignore: /.*/
 
       - applitools_init:
+          context:
+            - applitools
           requires:
             - setup
 
