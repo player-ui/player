@@ -280,7 +280,7 @@ jobs:
     steps:
       - run:
           name: Cleanup Applitools
-          command: "curl -X POST \"$APPLITOOLS_SERVER_URL/api/externals/github/servers/github.com/commit/$CIRCLE_SHA1/complete?apiKey=$APPLITOOLS_API_KEY\" -H Content-Type: application/json --data `{\"serverId\": \"github.com\", \"commitSha\": \"$CIRCLE_SHA1\"}` -v -L"
+          command: "curl -X POST \"$APPLITOOLS_SERVER_URL/api/externals/github/servers/github.com/commit/$CIRCLE_SHA1/complete?apiKey=$APPLITOOLS_API_KEY\" -H Content-Type: application/json --data '{\"serverId\": \"github.com\", \"commitSha\": \"$CIRCLE_SHA1\"}' -v -L"
 
 workflows:
   build_and_test_pr:
@@ -304,10 +304,10 @@ workflows:
           requires:
             - setup
 
-      - build_ios:
-          requires:
-            - applitools_init
-            - setup
+#      - build_ios:
+#          requires:
+#            - applitools_init
+#            - setup
 
       - test:
           requires:
@@ -329,7 +329,7 @@ workflows:
             - applitools
           requires:
             - android_test
-            - build_ios
+#            - build_ios
 
   build_and_test_main:
     when:
