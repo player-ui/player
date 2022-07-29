@@ -35,7 +35,7 @@ export CIRCLE_CI_ZIP=$($(dirname -- "$0")/parseArtifactJson.js /tmp/$CIRCLE_BUIL
 
 
 # Rebuild to stamp the release podspec
-bazel build //:PlayerUI_Podspec
+bazel build --config=release //:PlayerUI_Podspec
 
 # Push the podspec to cocoapods, verifying against the zip in the iOS stage artifacts
 # so there is a URL to verify
