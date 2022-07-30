@@ -39,7 +39,7 @@ bazel build --config=release //:PlayerUI_Podspec
 
 # Push the podspec to cocoapods, verifying against the zip in the iOS stage artifacts
 # so there is a URL to verify
-bazel run //:PlayerUI_Pod_Push
+bazel run --config=release //:PlayerUI_Pod_Push
 
 # Running this here because it will still have the pre-release version in the VERSION file before auto cleans it up
 bazel run --config=release //docs:deploy_docs
