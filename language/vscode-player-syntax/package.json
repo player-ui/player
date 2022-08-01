@@ -2,7 +2,7 @@
   "name": "player-ui-vscode-syntax",
   "displayName": "Player VSCode Syntax",
   "description": "",
-  "publisher": "player-team",
+  "publisher": "player-oss",
   "version": "0.0.0-PLACEHOLDER",
   "engines": {
     "vscode": "^1.56.0"

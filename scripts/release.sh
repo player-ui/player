@@ -41,6 +41,9 @@ bazel build --config=release //:PlayerUI_Podspec
 # so there is a URL to verify
 bazel run --config=release //:PlayerUI_Pod_Push
 
+# VScode extension publishing
+bazel run --config=release //language/vscode-player-syntax:vscode-plugin.publish
+
 # Running this here because it will still have the pre-release version in the VERSION file before auto cleans it up
 bazel run --config=release //docs:deploy_docs
 

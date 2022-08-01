@@ -1,12 +1,15 @@
-load("@rules_player//player/vsce:package.bzl", "package")
+load("@rules_player//player/vsce:index.bzl", "vsce")
 
-package(
-    name = "player-syntax",
+vsce(
+    name = "vscode-plugin",
+    substitutions = {
+        "__VERSION__": "{STABLE_VERSION}",
+        "0.0.0-PLACEHOLDER": "{STABLE_VERSION}",
+        "__GIT_COMMIT__": "{STABLE_GIT_COMMIT}",
+    },
     data = [
         "package.json",
         ".vscodeignore",
-        "language-configuration.json",
-        # When version gets stamped the build needs to rerun since Bazel can't stamp the binary output 
-        "//:VERSION"
+        "language-configuration.json"
     ] + glob(["syntaxes/*"])
 )
