@@ -11,9 +11,9 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 http_archive(
     name = "rules_player",
-    strip_prefix = "rules_player-0.6.0",
-    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.6.0.tar.gz"],
-    sha256 = "b391a39da689710796c0f88c911b5d03ec832166f72b329899c0a9ec404ae34e"
+    strip_prefix = "rules_player-0.6.1",
+    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.6.1.tar.gz"],
+    sha256 = "841642d964e0d686df55ba30e1402234f6285b078b447f146fb6a27946a7bc3c"
 )
 
 # local_repository(
