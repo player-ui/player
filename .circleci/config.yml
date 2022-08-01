@@ -156,6 +156,7 @@ jobs:
           root: .
           paths:
             - .ios-build-number
+            - bazel-bin/PlayerUI_Pod.zip
 
       - store_artifacts:
           path: bazel-bin/PlayerUI_Pod.zip
