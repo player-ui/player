@@ -20,7 +20,7 @@ elif [ "$RELEASE_TYPE" == "release" ] && [ "$CURRENT_BRANCH" == "main" ]; then
 fi
 
 for pkg in $PKG_NPM_LABELS ; do
-  bazel run --config=release -- ${pkg}.publish --access public --tag ${NPM_TAG}
+  bazel run -- ${pkg}.publish --access public --tag ${NPM_TAG}
 done
 
 
@@ -35,16 +35,16 @@ export CIRCLE_CI_ZIP=$($(dirname -- "$0")/parseArtifactJson.js /tmp/$CIRCLE_BUIL
 
 
 # Rebuild to stamp the release podspec
-bazel build --config=release //:PlayerUI_Podspec //:PlayerUI_Pod
+bazel build //:PlayerUI_Podspec //:PlayerUI_Pod
 
 # Push the podspec to cocoapods, verifying against the zip in the iOS stage artifacts
 # so there is a URL to verify
-bazel run --config=release //:PlayerUI_Pod_Push
+bazel run //:PlayerUI_Pod_Push
 
 # VScode extension publishing
-bazel run --config=release //language/vscode-player-syntax:vscode-plugin.publish
+bazel run //language/vscode-player-syntax:vscode-plugin.publish
 
 # Running this here because it will still have the pre-release version in the VERSION file before auto cleans it up
-bazel run --config=release //docs:deploy_docs
+bazel run //docs:deploy_docs
 
 bazel run @rules_player//distribution:staged-maven-deploy -- "$RELEASE_TYPE" --package-group=com.intuit.player --legacy
