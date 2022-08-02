@@ -53,17 +53,9 @@ jobs:
             - v1-dependencies-{ { checksum "package.json" }}
 
       - run: |
-          echo "build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
-          echo "build --config=ci >> .bazelrc.local
-
-          echo "run --config=ci" >> .bazelrc.local
-
-          echo "test --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
+          echo "common --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
+          echo "common --config=ci >> .bazelrc.local
           echo "test --define=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --define=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1}" >> .bazelrc.local
-          echo "test --config=ci" >> .bazelrc.local
-
-          echo "coverage --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
-          echo "coverage --config=ci" >> .bazelrc.local
 
       - persist_to_workspace:
           root: .
