@@ -54,7 +54,7 @@ jobs:
 
       - run: |
           echo "common --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
-          echo "common --config=ci >> .bazelrc.local
+          echo "common --config=ci" >> .bazelrc.local
           echo "test --define=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --define=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1}" >> .bazelrc.local
 
       - persist_to_workspace:
