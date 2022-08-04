@@ -1,11 +1,14 @@
 package com.intuit.player.jvm.core.player.state
 
 import com.intuit.player.jvm.core.NodeBaseTest
+import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeFormat
 import com.intuit.player.jvm.core.flow.Flow
 import com.intuit.player.jvm.core.player.PlayerException
 import com.intuit.player.jvm.core.player.PlayerFlowStatus
 import io.mockk.every
+import io.mockk.mockk
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.modules.EmptySerializersModule
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -20,20 +23,27 @@ internal class ErrorStateTest : NodeBaseTest() {
     fun setUpMocks() {
         every { node.getString("ref") } returns "someRef"
         every { node.getSerializable("flow", Flow.serializer()) } returns Flow("flowId")
-        every { node.getSerializable("error", any<KSerializer<Throwable>>()) } returns null
-        every { node.getString("error") } returns "hello"
+
+        val mockFormat: RuntimeFormat<*> = mockk()
+        every { node.format } returns mockFormat
+        every { mockFormat.serializersModule } returns EmptySerializersModule
     }
 
     @Test
     fun errorFromObject() {
-        val someException = PlayerException("yooo")
-        every { node.getSerializable("error", any<KSerializer<Throwable>>()) } returns someException
+        val someException = PlayerException("hello")
+
+        every { node["error"] } returns node
+        every { node.deserialize(any<KSerializer<Throwable>>()) } returns someException
+
         assertEquals(someException, errorState.error)
     }
 
     @Test
     fun errorFromString() {
-        assertEquals("hello", errorState.error.message)
+        val message = "hello"
+        every { node["error"] } returns message
+        assertEquals(message, errorState.error.message)
     }
 
     @Test
