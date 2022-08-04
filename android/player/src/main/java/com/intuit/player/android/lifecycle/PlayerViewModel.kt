@@ -1,7 +1,9 @@
 package com.intuit.player.android.lifecycle
 
 import android.app.Application
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.intuit.player.android.AndroidPlayer
 import com.intuit.player.android.AndroidPlayerPlugin
 import com.intuit.player.android.asset.RenderableAsset
@@ -88,7 +90,7 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
             )
             it.isFailure -> player.logger.error(
                 "Error in Flow!",
-                it.exceptionOrNull()
+                it.exceptionOrNull()?.stackTraceToString()
             )
         }
     }
