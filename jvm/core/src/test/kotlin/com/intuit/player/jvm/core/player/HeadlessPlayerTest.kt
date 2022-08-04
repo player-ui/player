@@ -255,6 +255,25 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
     }
 
     @TestTemplate
+    fun `test player error state from an unhandled JVM exception`() {
+        val message = "oh no!"
+        player.hooks.viewController.tap { _ ->
+            // Different runtimes might actually handle this differently, i.e.
+            // J2V8 will just serialize [message] but Graal will actually serialize this instance
+            throw Exception(message)
+        }
+
+        val exception = assertThrows(Exception::class.java) {
+            runBlocking {
+                player.start(simpleFlowString).await()
+            }
+        }
+
+        assertEquals(message, exception.message)
+        assertEquals(message, player.errorState?.error?.message)
+    }
+
+    @TestTemplate
     fun `test player onComplete success handling`() = runBlockingTest {
         val result = suspendCancellableCoroutine<Result<CompletedState>> { cont ->
             player.start(simpleFlowString).onComplete {
