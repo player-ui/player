@@ -275,7 +275,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         // w/o the fix in PlayerFlowState
         assertEquals(message, player.errorState?.error?.message)
     }
-    
+
     @TestTemplate
     fun `test player onComplete success handling`() = runBlockingTest {
         val result = suspendCancellableCoroutine<Result<CompletedState>> { cont ->
