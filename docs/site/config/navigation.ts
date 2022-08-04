@@ -77,6 +77,10 @@ const navigation: Navigation = {
               title: 'Navigation',
               path: '/content/navigation',
             },
+            {
+              title: 'Templates',
+              path: '/content/templates'
+            }
           ],
         },
         {
