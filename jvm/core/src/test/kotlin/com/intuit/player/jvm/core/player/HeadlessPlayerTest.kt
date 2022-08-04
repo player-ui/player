@@ -258,6 +258,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
     fun `test player error state from an unhandled JVM exception`() {
         val message = "oh no!"
         player.hooks.viewController.tap { _ ->
+            // Different runtimes might actually handle this differently, i.e.
             // J2V8 will just serialize [message] but Graal will actually serialize this instance
             throw Exception(message)
         }
@@ -269,10 +270,6 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         }
 
         assertEquals(message, exception.message)
-
-        // This'll throw an error for J2V8:
-        // `Element class com.intuit.player.jvm.j2v8.V8Primitive is not a V8Object`
-        // w/o the fix in PlayerFlowState
         assertEquals(message, player.errorState?.error?.message)
     }
 
