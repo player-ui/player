@@ -1,5 +1,7 @@
 load("@npm//next:index.bzl", "next")
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 load("@rules_player//javascript/next:next_build.bzl", "next_export")
+
 package(default_visibility = ["//visibility:public"])
 
 srcs = glob([
@@ -47,13 +49,21 @@ next_export(
   name = "site",
   data = data,
   srcs = srcs,
-  substitutions ={
-    "NEXT_PUBLIC_GA_MEASUREMENT_ID": "STABLE_GA_MEASUREMENT_ID"
-  },
   env = {
-    "DOCS_BASE_PATH": "/next",
+    "NODE_ENV": "production",
+    # Need this b/c next will pull from env directly 
+    # This just maps to a value we can stamp w/ later on
     "NEXT_PUBLIC_GA_MEASUREMENT_ID": "NEXT_PUBLIC_GA_MEASUREMENT_ID",
   },
+)
+
+pkg_tar(
+  name = "site_tar",
+  srcs = [
+    ":site"
+  ],
+  mode = "0755",
+  strip_prefix = "site"
 )
 
 next(

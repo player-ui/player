@@ -6,7 +6,10 @@ import { URL } from 'url';
 
 const __dirname = new URL('.', import.meta.url).pathname;
 
-export const BASE_PREFIX = process.env.DOCS_BASE_PATH || undefined;
+// This will be replaced during the build stamping
+export const BASE_PREFIX = process.env.NODE_ENV === 'production' ? '/DOCS_BASE_PATH' : undefined;
+
+console.log({ BASE_PREFIX})
 
 export default {
   reactStrictMode: true,
