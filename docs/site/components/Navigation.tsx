@@ -186,7 +186,7 @@ const useGetReleasedVersions = () => {
 
       const data = await response.json();
       const versions = data
-        .filter((d) => d.type === 'dir' && d.name.match(/^v\d$/))
+        .filter((d) => d.type === 'dir' && d.name.match(/^v\d/))
         .map((d) => ({
           label: d.name,
           path: d.name,
