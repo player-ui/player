@@ -15,3 +15,4 @@ git_tree_status=$(git diff-index --quiet HEAD -- && echo 'Clean' || echo 'Modifi
 echo "GIT_TREE_STATUS $git_tree_status"
 
 echo "STABLE_GA_MEASUREMENT_ID $NEXT_PUBLIC_GA_MEASUREMENT_ID"
+echo "STABLE_DOCS_BASE_PATH $STABLE_DOCS_BASE_PATH"

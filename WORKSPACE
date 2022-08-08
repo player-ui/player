@@ -10,16 +10,11 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 http_archive(
-    name = "rules_player",
-    sha256 = "841642d964e0d686df55ba30e1402234f6285b078b447f146fb6a27946a7bc3c",
-    strip_prefix = "rules_player-0.6.1",
-    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.6.1.tar.gz"],
+  name = "rules_player",
+  strip_prefix = "rules_player-0.7.0",
+  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.7.0.tar.gz"],
+  sha256 = "44af0c717c0bfe12e3d2c13fff3fbd429830fda26ec439d9b06e012a9517c02b"
 )
-
-# local_repository(
-#     name = "rules_player",
-#     path = "../rules_player",
-# )
 
 load("@rules_player//:workspace.bzl", "deps")
 
