@@ -303,7 +303,6 @@ def unit_tests(
             "ios/packages/*/Tests/**/*.swift",
             "ios/plugins/*/Tests/**/*.swift",
         ]),
-        flaky = True,
         deps = [":PlayerUI"],
         minimum_os_version = "13.0",
         test_host = ":PlayerUI-Demo",

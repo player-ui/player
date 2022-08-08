@@ -1,72 +1,72 @@
 PODS:
   - EyesXCUI (8.8.8)
-  - PlayerUI (4.1.8):
-    - PlayerUI/Main (= 4.1.8)
-  - PlayerUI/BaseBeaconPlugin (4.1.8):
+  - PlayerUI (0.0.1-placeholder):
+    - PlayerUI/Main (= 0.0.1-placeholder)
+  - PlayerUI/BaseBeaconPlugin (0.0.1-placeholder):
     - PlayerUI/Core
-  - PlayerUI/BeaconPlugin (4.1.8):
+  - PlayerUI/BeaconPlugin (0.0.1-placeholder):
     - PlayerUI/BaseBeaconPlugin
     - PlayerUI/Core
     - PlayerUI/SwiftUI
-  - PlayerUI/CheckPathPlugin (4.1.8):
+  - PlayerUI/CheckPathPlugin (0.0.1-placeholder):
     - PlayerUI/Core
-  - PlayerUI/CommonExpressionsPlugin (4.1.8):
+  - PlayerUI/CommonExpressionsPlugin (0.0.1-placeholder):
     - PlayerUI/Core
-  - PlayerUI/CommonTypesPlugin (4.1.8):
+  - PlayerUI/CommonTypesPlugin (0.0.1-placeholder):
     - PlayerUI/Core
-  - PlayerUI/Core (4.1.8):
+  - PlayerUI/Core (0.0.1-placeholder):
     - PlayerUI/Logger
     - SwiftHooks (>= 0.1.0, ~> 0)
-  - PlayerUI/Demo (4.1.8):
+  - PlayerUI/Demo (0.0.1-placeholder):
     - PlayerUI/BeaconPlugin
     - PlayerUI/MetricsPlugin
     - PlayerUI/ReferenceAssets
     - PlayerUI/SwiftUI
     - PlayerUI/TransitionPlugin
-  - PlayerUI/ExpressionPlugin (4.1.8):
+  - PlayerUI/ExpressionPlugin (0.0.1-placeholder):
     - PlayerUI/Core
-  - PlayerUI/ExternalActionPlugin (4.1.8):
+  - PlayerUI/ExternalActionPlugin (0.0.1-placeholder):
     - PlayerUI/Core
-  - PlayerUI/ExternalActionViewModifierPlugin (4.1.8):
+  - PlayerUI/ExternalActionViewModifierPlugin (0.0.1-placeholder):
     - PlayerUI/Core
     - PlayerUI/ExternalActionPlugin
     - PlayerUI/SwiftUI
-  - PlayerUI/InternalUnitTestUtilities (4.1.8):
+  - PlayerUI/InternalUnitTestUtilities (0.0.1-placeholder):
     - PlayerUI/Core
-  - PlayerUI/Logger (4.1.8):
+  - PlayerUI/Logger (0.0.1-placeholder):
     - SwiftHooks (>= 0.1.0, ~> 0)
-  - PlayerUI/Main (4.1.8):
+  - PlayerUI/Main (0.0.1-placeholder):
     - PlayerUI/SwiftUI
-  - PlayerUI/MetricsPlugin (4.1.8):
+  - PlayerUI/MetricsPlugin (0.0.1-placeholder):
     - PlayerUI/Core
     - PlayerUI/SwiftUI
-  - PlayerUI/PrintLoggerPlugin (4.1.8):
+  - PlayerUI/PrintLoggerPlugin (0.0.1-placeholder):
     - PlayerUI/Core
-  - PlayerUI/PubSubPlugin (4.1.8):
+  - PlayerUI/PubSubPlugin (0.0.1-placeholder):
     - PlayerUI/Core
-  - PlayerUI/ReferenceAssets (4.1.8):
+  - PlayerUI/ReferenceAssets (0.0.1-placeholder):
     - PlayerUI/BeaconPlugin
     - PlayerUI/Core
     - PlayerUI/SwiftUI
-  - PlayerUI/SwiftUI (4.1.8):
+  - PlayerUI/SwiftUI (0.0.1-placeholder):
     - PlayerUI/Core
-  - PlayerUI/TestUtilities (4.1.8):
-    - PlayerUI/Core
-    - PlayerUI/SwiftUI
-  - PlayerUI/TransitionPlugin (4.1.8):
+  - PlayerUI/TestUtilities (0.0.1-placeholder):
     - PlayerUI/Core
     - PlayerUI/SwiftUI
-  - PlayerUI/TypesProviderPlugin (4.1.8):
+  - PlayerUI/TransitionPlugin (0.0.1-placeholder):
     - PlayerUI/Core
-  - PlayerUI/Unit (4.1.8):
+    - PlayerUI/SwiftUI
+  - PlayerUI/TypesProviderPlugin (0.0.1-placeholder):
+    - PlayerUI/Core
+  - PlayerUI/Unit (0.0.1-placeholder):
     - PlayerUI/Demo
     - PlayerUI/InternalUnitTestUtilities
     - PlayerUI/TestUtilities
-  - PlayerUI/ViewInspectorTests (4.1.8):
+  - PlayerUI/ViewInspectorTests (0.0.1-placeholder):
     - PlayerUI/Demo
     - PlayerUI/InternalUnitTestUtilities
     - ViewInspector (= 0.9.0)
-  - PlayerUI/XCUITests (4.1.8):
+  - PlayerUI/XCUITests (0.0.1-placeholder):
     - EyesXCUI (= 8.8.8)
     - PlayerUI/Demo
     - PlayerUI/InternalUnitTestUtilities
@@ -113,7 +113,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   EyesXCUI: bbb10a48b8bd1a15d541f2bc1f4d18f4db654ef1
-  PlayerUI: a7a4fc435d09db1f3b1a094f5fe6c01e7358b352
+  PlayerUI: 56261b220ac9bf2aa4620162f97313e3663ac266
   SwiftHooks: 3ecc67c23da335d44914a8a74bd1dd23c7c149e6
   SwiftLint: 4fa9579c63416865179bc416f0a92d55f009600d
   ViewInspector: 53313c757eddc5c4842bc7943a66821a68d02d3e

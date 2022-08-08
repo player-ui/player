@@ -15,7 +15,7 @@ exports_files([
     "webpack.config.js",
     ".editorconfig",
     ".all-contributorsrc",
-    "README.md"
+    "README.md",
 ])
 
 filegroup(
@@ -74,12 +74,12 @@ assemble_pod(
 # tag must exist in github first
 pod_push(
     name = "PlayerUI_Pod_Push",
-    podspec = ':PlayerUI_Podspec',
-    executable = 'bundle exec pod',
+    executable = "bundle exec pod",
+    globalFlags = [],
+    podspec = ":PlayerUI_Podspec",
     pushFlags = [
         # skip tests because it never runs them right
         # and they're run as part of the build pipeline anyway
-        "--skip-tests"
+        "--skip-tests",
     ],
-    globalFlags = []
 )

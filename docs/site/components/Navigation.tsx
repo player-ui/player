@@ -21,13 +21,14 @@ import {
   DrawerContent,
   AlertTitle,
   AlertDescription,
+  Select,
 } from '@chakra-ui/react';
 import { FaReact, FaApple, FaAndroid, FaPuzzlePiece } from 'react-icons/fa';
 import { HamburgerIcon } from '@chakra-ui/icons';
 import type { Route } from '../config/navigation';
 import NAV, { PATH_TO_NAV, Platform } from '../config/navigation';
 import { ColorSchemeSwitch } from './ColorSchemeSwitch';
-import { GITHUB_URL } from '../config/constants';
+import { DOCS_BASE_URL, GITHUB_URL } from '../config/constants';
 import { withBasePrefix } from './Image';
 import { SearchInput } from './Search';
 import { GithubIcon } from './gh-icon';
@@ -169,6 +170,65 @@ export const GitHubButton = () => {
   );
 };
 
+const useGetReleasedVersions = () => {
+  const [releasedVersions, setReleasedVersions] = React.useState<
+    {
+      label: string;
+      path: string;
+    }[]
+  >([]);
+
+  React.useEffect(() => {
+    const send = async () => {
+      const response = await fetch(
+        'https://api.github.com/repos/player-ui/player-ui.github.io/contents/'
+      );
+
+      const data = await response.json();
+      const versions = data
+        .filter((d) => d.type === 'dir' && d.name.match(/^v\d$/))
+        .map((d) => ({
+          label: d.name,
+          path: d.name,
+        }));
+
+      setReleasedVersions(versions);
+    };
+
+    send().catch(() => {});
+  }, []);
+
+  return releasedVersions;
+};
+
+export const VersionSelector = () => {
+  const router = useRouter();
+  const released = useGetReleasedVersions();
+
+  return (
+    <Select
+      aria-label="Select the version of the Player docs you with to see"
+      variant="unstyled"
+      rootProps={{
+        width: 'auto',
+        display: 'flex',
+      }}
+      value={router.basePath || 'latest'}
+      onChange={(e) => {
+        router.push(`${DOCS_BASE_URL}/${e.target.value}`);
+      }}
+    >
+      <option value="latest">Latest</option>
+      <option value="next">Next</option>
+      {released.map((r) => (
+        <option key={r.label} value={r.path}>
+          {r.label}
+        </option>
+      ))}
+    </Select>
+  );
+};
+
 export const TopNavigation = () => {
   const { pathname } = useRouter();
   const subRoutes = PATH_TO_NAV.get(pathname);
@@ -232,6 +292,7 @@ export const TopNavigation = () => {
                 </Link>
               );
             })}
+            <VersionSelector />
             <ColorSchemeSwitch />
             <GitHubButton />
           </HStack>

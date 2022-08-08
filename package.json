@@ -11,7 +11,8 @@
     "test": "bazel test -- $(bazel query \"kind(nodejs_test, //...)\" --output label 2>/dev/null | tr '\\n' ' ')",
     "lint": "eslint --cache --ext .js,.jsx,.ts,.tsx $(scripts/pkg-roots.sh)",
     "prepare": "is-ci || husky install",
-    "postinstall": "patch-package && node ./scripts/yarn-link-setup.js"
+    "postinstall": "patch-package && node ./scripts/yarn-link-setup.js",
+    "dev:docs": "ibazel run //docs:site:start"
   },
   "dependencies": {
     "@auto-it/upload-assets": "^10.37.2",

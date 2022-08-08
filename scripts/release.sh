@@ -55,7 +55,7 @@ fi
 # Also deploy to the versioned folder for main releases
 if [ "$RELEASE_TYPE" == "release" ]; then
   SEMVER_MAJOR=$(cat VERSION | cut -d. -f1)
-  STABLE_DOCS_BASE_PATH=$SEMVER_MAJOR bazel run --config=release //docs:deploy_docs -- --dest_dir "$SEMVER_MAJOR"
+  STABLE_DOCS_BASE_PATH=$SEMVER_MAJOR bazel run --config=release //docs:deploy_docs -- --dest_dir "v$SEMVER_MAJOR"
 fi
 
 bazel run @rules_player//distribution:staged-maven-deploy -- "$RELEASE_TYPE" --package-group=com.intuit.player --legacy
