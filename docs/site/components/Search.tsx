@@ -124,7 +124,7 @@ export const SearchInput = () => {
     <Box ref={searchRef}>
       <Popover initialFocusRef={inputRef} isOpen={searchActive} onClose={reset}>
         <PopoverAnchor>
-          <InputGroup w="md">
+          <InputGroup>
             <InputLeftElement pointerEvents="none">
               <SearchIcon />
             </InputLeftElement>

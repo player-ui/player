@@ -212,6 +212,7 @@ export const VersionSelector = () => {
       rootProps={{
         width: 'auto',
         display: 'flex',
+        flexShrink: '0',
       }}
       value={router.basePath || 'latest'}
       onChange={(e) => {
@@ -263,7 +264,13 @@ export const TopNavigation = () => {
             onClick={mobileNavDisclosure.onOpen}
           />
           <Link passHref href="/">
-            <CLink py="2">
+            <CLink
+              display={{
+                base: 'none',
+                md: 'block',
+              }}
+              py="2"
+            >
               <Image alt="Player Logo" height="48px" src={logoSrc} />
             </CLink>
           </Link>
@@ -286,6 +293,7 @@ export const TopNavigation = () => {
                     colorScheme={isSelected ? 'blue' : 'gray'}
                     color={isSelected ? selectedButtonColor : undefined}
                     size="md"
+                    ml="0"
                   >
                     {topRoute.title}
                   </Button>
