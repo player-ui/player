@@ -10,10 +10,10 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 http_archive(
-    name = "rules_player",
-    strip_prefix = "rules_player-0.5.0",
-    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.5.0.tar.gz"],
-    sha256 = "76291ffd332cee690db7b91ae37b7b2388104b09230f7063bfd104a48a926f8b"
+  name = "rules_player",
+  strip_prefix = "rules_player-0.7.0",
+  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.7.0.tar.gz"],
+  sha256 = "44af0c717c0bfe12e3d2c13fff3fbd429830fda26ec439d9b06e012a9517c02b"
 )
 
 load("@rules_player//:workspace.bzl", "deps")
@@ -78,13 +78,14 @@ junit5()
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 grab_remote = "https://github.com/sugarmanz/grab-bazel-common.git"
+
 grab_commit = "a3fe2daf2965b439c8c2a4c2cce1f13beba446b1"
 
 git_repository(
     name = "grab_bazel_common",
-    remote = grab_remote,
     commit = grab_commit,
-    shallow_since = "1654123549 -0400"
+    remote = grab_remote,
+    shallow_since = "1654123549 -0400",
 )
 
 # Optional patched Android Tools
@@ -93,7 +94,7 @@ load("@grab_bazel_common//:workspace_defs.bzl", "android_tools")
 android_tools(
     commit = grab_commit,
     remote = grab_remote,
-    shallow_since = "1654123549 -0400"
+    shallow_since = "1654123549 -0400",
 )
 
 DAGGER_TAG = "2.28.1"
@@ -109,8 +110,8 @@ http_archive(
 
 http_archive(
     name = "robolectric",
-    strip_prefix = "robolectric-bazel-4.8",
     sha256 = "4e002cbe712c8abd9c3b565eb165787a2a7a92dfafb117e0d84b6767c2053189",
+    strip_prefix = "robolectric-bazel-4.8",
     urls = ["https://github.com/robolectric/robolectric-bazel/archive/4.8.tar.gz"],
 )
 
@@ -120,9 +121,9 @@ robolectric_repositories()
 
 http_archive(
     name = "build_bazel_rules_android",
-    urls = ["https://github.com/bazelbuild/rules_android/archive/v0.1.1.zip"],
     sha256 = "cd06d15dd8bb59926e4d65f9003bfc20f9da4b2519985c27e190cddc8b7a7806",
     strip_prefix = "rules_android-0.1.1",
+    urls = ["https://github.com/bazelbuild/rules_android/archive/v0.1.1.zip"],
 )
 
 overridden_targets = {
@@ -156,7 +157,6 @@ load("//jvm/dependencies:deps.bzl", artifacts = "maven")
 load("@rules_jvm_external//:defs.bzl", "maven_install")
 
 maven_install(
-    override_targets = overridden_targets,
     artifacts = artifacts + [
         "androidx.databinding:databinding-adapters:7.1.0",
         "androidx.databinding:databinding-common:7.1.0",
@@ -171,24 +171,25 @@ maven_install(
         "androidx.test:core:1.4.0",
         "androidx.test.ext:junit-ktx:1.1.3",
         "junit:junit:4.12",
-        "org.junit.vintage:junit-vintage-engine:5.6.0"
+        "org.junit.vintage:junit-vintage-engine:5.6.0",
     ],
     fetch_sources = True,
+    override_targets = overridden_targets,
     repositories = [
         "https://repo1.maven.org/maven2",
         "https://maven.google.com/",
         "https://plugins.gradle.org/m2/",
-        "https://jcenter.bintray.com/"
+        "https://jcenter.bintray.com/",
     ],
 )
 
 maven_install(
     name = "kotlinx_coroutines_core_fixed",
     artifacts = [
-        "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:jar:1.5.2"
+        "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:jar:1.5.2",
     ],
     repositories = [
-        "https://repo1.maven.org/maven2"
+        "https://repo1.maven.org/maven2",
     ],
 )
 

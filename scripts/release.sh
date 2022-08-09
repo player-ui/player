@@ -28,19 +28,34 @@ done
 # CIRCLE_BUILD_NUMBER is for the iOS Stage of the build
 # and populated by a .ios-build-number file that is written in that stage
 mkdir -p /tmp/$CIRCLE_BUILD_NUMBER
-./fetchArtifacts.sh > /tmp/$CIRCLE_BUILD_NUMBER/artifacts.json
+$(dirname -- "$0")/fetchArtifacts.sh > /tmp/$CIRCLE_BUILD_NUMBER/artifacts.json
 
 # Find the pod zip url
-export CIRCLE_CI_ZIP=$(./parseArtifactJson.js /tmp/$CIRCLE_BUILD_NUMBER/artifacts.json)
+export CIRCLE_CI_ZIP=$($(dirname -- "$0")/parseArtifactJson.js /tmp/$CIRCLE_BUILD_NUMBER/artifacts.json)
 
-# Rebuild to stamp the release pod
-bazel build //:PlayerUI_Pod
+
+# Rebuild to stamp the release podspec
+bazel build --config=release //:PlayerUI_Podspec //:PlayerUI_Pod
 
 # Push the podspec to cocoapods, verifying against the zip in the iOS stage artifacts
 # so there is a URL to verify
-bazel run //:PlayerUI_Pod_Push
+bazel run --config=release //:PlayerUI_Pod_Push
+
+# VScode extension publishing
+bazel run --config=release //language/vscode-player-syntax:vscode-plugin.publish
 
 # Running this here because it will still have the pre-release version in the VERSION file before auto cleans it up
-bazel run --config=release //docs:deploy_docs
+# Make sure to re-stamp the outputs with the BASE_PATH so nextjs knows what to do with links
+if [ "$RELEASE_TYPE" == "snapshot" ] && [ "$CURRENT_BRANCH" == "main" ]; then
+  STABLE_DOCS_BASE_PATH=next bazel run --config=release //docs:deploy_docs -- --dest_dir next
+elif [ "$RELEASE_TYPE" == "release" ] && [ "$CURRENT_BRANCH" == "main" ]; then
+  STABLE_DOCS_BASE_PATH=latest bazel run --config=release //docs:deploy_docs -- --dest_dir latest
+fi
+
+# Also deploy to the versioned folder for main releases
+if [ "$RELEASE_TYPE" == "release" ]; then
+  SEMVER_MAJOR=$(cat VERSION | cut -d. -f1)
+  STABLE_DOCS_BASE_PATH=$SEMVER_MAJOR bazel run --config=release //docs:deploy_docs -- --dest_dir "v$SEMVER_MAJOR"
+fi
 
 bazel run @rules_player//distribution:staged-maven-deploy -- "$RELEASE_TYPE" --package-group=com.intuit.player --legacy

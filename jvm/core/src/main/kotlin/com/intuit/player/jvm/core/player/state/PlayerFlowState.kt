@@ -99,8 +99,13 @@ internal class ErroneousState(override val node: Node) :
 
     override val flow: Flow get() = node.getSerializable("flow", Flow.serializer()) ?: Flow()
 
-    override val error: PlayerException get() = node.getSerializable("error", PlayerException.serializer())
-        ?: PlayerException(node.getString("error") ?: "unable to determine error")
+    override val error: PlayerException get() = when (val rawError = node["error"]) {
+        is PlayerException -> rawError
+        is Exception -> PlayerException(rawError.message ?: "", rawError)
+        is Node -> rawError.deserialize()
+        is String -> PlayerException(rawError)
+        else -> PlayerException("unable to determine error")
+    }
 
     internal object Serializer : NodeWrapperSerializer<ErroneousState>(::ErroneousState)
 }

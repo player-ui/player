@@ -2,6 +2,7 @@
   "author": "intuit-svc <opensource-svc@intuit.com>",
   "baseBranch": "main",
   "versionBranches": true,
+  "noVersionPrefix": true,
   "plugins": [
     [
       "upload-assets",

@@ -11,11 +11,12 @@
     "test": "bazel test -- $(bazel query \"kind(nodejs_test, //...)\" --output label 2>/dev/null | tr '\\n' ' ')",
     "lint": "eslint --cache --ext .js,.jsx,.ts,.tsx $(scripts/pkg-roots.sh)",
     "prepare": "is-ci || husky install",
-    "postinstall": "patch-package && node ./scripts/yarn-link-setup.js"
+    "postinstall": "patch-package && node ./scripts/yarn-link-setup.js",
+    "dev:docs": "ibazel run //docs/site:start"
   },
   "dependencies": {
-    "@auto-it/version-file": "^10.37.2",
     "@auto-it/upload-assets": "^10.37.2",
+    "@auto-it/version-file": "^10.37.2",
     "@babel/cli": "^7.15.7",
     "@babel/core": "^7.15.5",
     "@babel/eslint-parser": "^7.15.8",
@@ -110,6 +111,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.26.1",
     "eslint-plugin-react-hooks": "^4.2.1-alpha-5ca4b0433-20211020",
+    "extract-zip": "^2.0.1",
     "figures": "^3.0.0",
     "framer-motion": "^4",
     "fs-extra": "^10.0.0",
@@ -188,7 +190,8 @@
     "vscode-languageserver-textdocument": "^1.0.3",
     "vscode-languageserver-types": "^3.16.0",
     "webpack": "^4.41.0",
-    "webpack-cli": "^3.3.9"
+    "webpack-cli": "^3.3.9",
+    "zip-folder": "^1.0.0"
   },
   "volta": {
     "node": "16.14.0"
