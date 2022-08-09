@@ -48,7 +48,7 @@ import kotlin.reflect.KClass
  * to a new instance. However, it is recommended just propagate the
  * [AssetContext] in the constructor as to keep asset registration simple.
  */
-//@Serializable(ContextualSerializer::class)
+@Serializable(RenderableAsset.ContextualSerializer::class)
 public abstract class RenderableAsset
 @Deprecated(
     "RenderableAssets should be migrated to DecodableAsset",
@@ -279,4 +279,7 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
             override fun deserialize(decoder: Decoder): T = klass.javaObjectType.cast(this@Serializer.deserialize(decoder))!!
         }
     }
+
+    // Seemingly needed to prevent stack overflow: https://github.com/Kotlin/kotlinx.serialization/issues/1776
+    internal object ContextualSerializer : KSerializer<RenderableAsset> by ContextualSerializer(RenderableAsset::class)
 }

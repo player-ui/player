@@ -8,16 +8,15 @@ import com.intuit.player.android.asset.RenderableAsset
 import com.intuit.player.android.extensions.into
 import com.intuit.player.android.reference.assets.R
 import com.intuit.player.android.reference.assets.text.Text
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 
 class Info(assetContext: AssetContext) : DecodableAsset<Info.Data>(assetContext, Data.serializer()) {
 
     @Serializable
     data class Data(
-        val title: @Contextual RenderableAsset? = null,
-        val primaryInfo: @Contextual RenderableAsset? = null,
-        val actions: List<@Contextual RenderableAsset?> = emptyList(),
+        val title: RenderableAsset? = null,
+        val primaryInfo: RenderableAsset? = null,
+        val actions: List<RenderableAsset?> = emptyList(),
     )
 
     override fun initView() = LayoutInflater.from(context).inflate(R.layout.info, null).rootView

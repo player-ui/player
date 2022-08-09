@@ -7,7 +7,6 @@ import com.intuit.player.android.AssetContext
 import com.intuit.player.android.asset.DecodableAsset
 import com.intuit.player.android.asset.RenderableAsset
 import com.intuit.player.android.extensions.into
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 
 /** Asset that renders a group of assets as children with little semantic meaning */
@@ -16,7 +15,7 @@ open class Collection(assetContext: AssetContext) : DecodableAsset<Collection.Da
     @Serializable
     data class Data(
         /** Required [values] is the collection of asset */
-        val values: List<@Contextual RenderableAsset>
+        val values: List<RenderableAsset>
     )
 
     override fun initView(): View = LinearLayout(context).apply {
