@@ -23,12 +23,12 @@ class BaseTestCase: AssetUITestCase {
         if let id = ProcessInfo.processInfo.environment["APPLITOOLS_BATCH_ID"], id != "", id != "$(APPLITOOLS_BATCH_ID)" {
             print("Got APPLITOOLS_BATCH_ID from environment: \(id)")
             let info = BatchInfo(name: "iOS@\(id)")
-            info?.batchId = "iOS@\(id)"
+            info?.batchId = id
             eyes.batch = info
         } else {
             print("Unable to fetch APPLITOOLS_BATCH_ID from environment")
             let info = BatchInfo(name: "iOS@local")
-            info?.batchId = "iOS@local"
+            info?.batchId = "local"
             eyes.batch = info
         }
         if let key = ProcessInfo.processInfo.environment["APPLITOOLS_API_KEY"], key != "", key != "$(APPLITOOLS_API_KEY)" {
