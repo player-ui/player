@@ -49,9 +49,11 @@ class BaseTestCase: AssetUITestCase {
         }
 
         let info = BatchInfo(name: "reference-assets@\(prNumber)")
-        info?.batchId = "reference-assets@\(batchId)"
+        info?.batchId = batchId
         eyes.addProperty("platform", value: "ios")
         eyes.batch = info
+
+        eyes.configuration.appName = "iOS Reference Assets"
 
         super.setUp()
     }
@@ -69,7 +71,7 @@ class BaseTestCase: AssetUITestCase {
     func withEyes(_ mockName: String, testName: String? = nil, body: (Eyes?) -> Void) {
         openFlow(mockName)
         guard key != nil else { return body(nil) }
-        eyes.open(withApplicationName: "iOS PlayerUI Demo", testName: "\(testName ?? mockName)")
+        eyes.open(withApplicationName: "iOS Reference Assets", testName: "\(testName ?? mockName)")
         body(eyes)
     }
 
