@@ -8,6 +8,7 @@ def _applitools_config_impl(ctx, **kwargs):
         "public object ApplitoolsConfig {",
         "    public val API_KEY = " + ("\"" + ctx.var["APPLITOOLS_API_KEY"] + "\"" if "APPLITOOLS_API_KEY" in ctx.var else "\"UNSET\""),
         "    public val BATCH_ID = " + ("\"" + ctx.var["APPLITOOLS_BATCH_ID"] + "\"" if "APPLITOOLS_BATCH_ID" in ctx.var else "\"local\""),
+        "    public val PR_NUMBER = " + ("\"" + ctx.var["APPLITOOLS_PR_NUMBER"] + "\"" if "APPLITOOLS_PR_NUMBER" in ctx.var else "\"UNSET\""),
     ]
     last = ["}"]
     values = ctx.attr.values
