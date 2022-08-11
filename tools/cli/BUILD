@@ -53,29 +53,13 @@ create_package_json(
     name = "cli-package_json",
     package_name = "@player-ui/cli",
     entry = "./src/index.ts",
-    bin_entry = "bin/run",
-    bin_name = "player",
     out_dir = "dist",
     registry = "https://registry.npmjs.org",
     placeholder_version = PLACEHOLDER_VERSION,
     dependencies = BUILD_DATA,
     peer_dependencies = None,
     root_package_json = "//:package.json",
-    additional_properties = """
-    {
-        "files": [
-            "bin",
-            "dist",
-            "oclif.manifest.json"
-        ],
-        "oclif": {
-            "bin": "player",
-            "dirname": "player",
-            "topicSeparator": " ",
-            "commands": "./dist/commands"
-        }
-    }
-    """
+    base_package_json = "package.json",
 )
 
 oclif(
