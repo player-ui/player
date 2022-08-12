@@ -1,5 +1,6 @@
 {
   "name": "@player-ui/cli",
+  "main": "./dist/index.js",
   "files": [
     "bin",
     "dist",
@@ -10,5 +11,8 @@
     "dirname": "player",
     "topicSeparator": " ",
     "commands": "./dist/commands"
+  },
+  "bin": {
+    "player": "bin/run"
   }
 }
