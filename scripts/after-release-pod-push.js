@@ -17,7 +17,7 @@ class AfterReleasePodPush {
           const { data } = await auto.git?.github.repos.listReleases({owner: auto.config.owner, repo: auto.config.repo})
           const release = data.find(element => element.name === newVersion)
           const { data: releaseData } = await auto.git?.github.repos.getRelease({owner: auto.config.owner, repo: auto.config.repo, release_id: release.id})
-          const zip = releaseData.find(element => element.name === 'PlayerUI_Pod.zip' && element.state == 'uploaded')
+          const zip = releaseData.assets.find(element => element.name === 'PlayerUI_Pod.zip' && element.state == 'uploaded')
 
           found = !!zip
           if (!found) {
