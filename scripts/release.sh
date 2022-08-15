@@ -23,23 +23,8 @@ for pkg in $PKG_NPM_LABELS ; do
   bazel run --config=release -- ${pkg}.publish --access public --tag ${NPM_TAG}
 done
 
-
-# Fetch artifacts from the iOS stage of this build
-# CIRCLE_BUILD_NUMBER is for the iOS Stage of the build
-# and populated by a .ios-build-number file that is written in that stage
-mkdir -p /tmp/$CIRCLE_BUILD_NUMBER
-$(dirname -- "$0")/fetchArtifacts.sh > /tmp/$CIRCLE_BUILD_NUMBER/artifacts.json
-
-# Find the pod zip url
-export CIRCLE_CI_ZIP=$($(dirname -- "$0")/parseArtifactJson.js /tmp/$CIRCLE_BUILD_NUMBER/artifacts.json)
-
-
 # Rebuild to stamp the release podspec
 bazel build --config=release //:PlayerUI_Podspec //:PlayerUI_Pod
-
-# Push the podspec to cocoapods, verifying against the zip in the iOS stage artifacts
-# so there is a URL to verify
-bazel run --config=release //:PlayerUI_Pod_Push
 
 # VScode extension publishing
 bazel run --config=release //language/vscode-player-syntax:vscode-plugin.publish

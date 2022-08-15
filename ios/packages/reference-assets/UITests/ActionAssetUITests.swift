@@ -8,6 +8,7 @@ class ActionAssetUITests: BaseTestCase {
             eyes?.checkApp(withTag: "Page Load")
 
             tap(app.buttons["action"])
+            waitFor(app.buttons["action"])
 
             let buttonText = app.buttons["action"].label
 
