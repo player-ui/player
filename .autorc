@@ -15,7 +15,6 @@
         "publishScript": "./scripts/release.sh"
       }
     ],
-    "./scripts/delete-old-prerelease.js",
     "./scripts/after-release-pod-push.js"
   ]
 }
