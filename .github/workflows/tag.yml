@@ -1,0 +1,19 @@
+name: Tag
+
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Define env name'     
+        required: true
+        default: 'v0.0.0'
+jobs:
+  create-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: rickstaa/action-create-tag@v1
+        with:
+          tag: "${{ github.event.inputs.version }}"
+          message: "Latest release"
