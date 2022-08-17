@@ -29,7 +29,13 @@ class AfterShipItPodPush {
           }
         }
 
-        execSync('bazel run --config=release //:PlayerUI_Pod_Push')
+        auto.logger.log.info('Pushing Pod to trunk')
+        try {
+          execSync('bazel run --config=release //:PlayerUI_Pod_Push')
+        } catch(e) {
+          auto.logger.log.error('Pod push failed: ', e && e.stderr && e.stderr.toString())
+          throw e
+        }
       }
     });
   }
