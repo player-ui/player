@@ -94,6 +94,10 @@ export class Parser {
       });
     }
 
+    if (switchAST?.type === NodeType.Empty) {
+      return null;
+    }
+
     return switchAST ?? null;
   }
 
