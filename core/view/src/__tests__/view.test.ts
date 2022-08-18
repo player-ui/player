@@ -70,6 +70,58 @@ describe('view', () => {
       expect(updated).toBe(resolved);
     });
 
+    it('does not return a field object if the case does not resolve an asset', () => {
+      const model = withParser(
+        new LocalModel({
+          foo: {
+            bar: true,
+            baz: false,
+          },
+        }),
+        parseBinding
+      );
+      const evaluator = new ExpressionEvaluator({ model });
+      const schema = new SchemaController();
+
+      const view = new ViewInstance(
+        {
+          id: 'foo',
+          fields: {
+            staticSwitch: [
+              {
+                case: '{{foo.baz}}',
+                asset: {
+                  id: 'input-1',
+                  type: 'input',
+                },
+              },
+              {
+                case: '{{foo.bar}}',
+              },
+            ],
+          },
+        } as any,
+        {
+          model,
+          parseBinding,
+          evaluator,
+          schema,
+        }
+      );
+
+      const resolved = view.update();
+
+      expect(resolved).toStrictEqual({
+        id: 'foo',
+      });
+
+      const bazBinding = parseBinding('foo.baz');
+      model.set([[bazBinding, true]]);
+
+      const updated = view.update(new Set([bazBinding]));
+      expect(updated).toBe(resolved);
+    });
+    
     it('works with default case', () => {
       const model = withParser(
         new LocalModel({
