@@ -137,10 +137,7 @@ jobs:
       - run: cd xcode && bundle exec pod install
       - run: bazel build --config=ci --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} -- //:PlayerUI //:PlayerUI-Demo //:PlayerUI_Pod
       # TODO: the timeout should be added to the test itself
-      - run: bazel test --test_timeout=600 --jobs=1 --verbose_failures --config=ci  --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
-
-      # Save the build number of this step to fetch artifacts later
-      - run: echo $CIRCLE_BUILD_NUM > .ios-build-number
+      - run: bazel test --test_env=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --test_env=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --test_env=APPLITOOLS_PR_NUMBER=${CIRCLE_PULL_REQUEST##*/} --test_timeout=600 --jobs=1 --verbose_failures --config=ci  --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
 
       - run: 
           when: always
@@ -151,14 +148,6 @@ jobs:
               mkdir -p $RESULTS_DIR/$(dirname $line)
               cp $line $RESULTS_DIR/$(dirname $line)
             done
-
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .ios-build-number
-
-      - store_artifacts:
-          path: bazel-bin/PlayerUI_Pod.zip
 
       - store_test_results:
           path: _test_results
@@ -218,7 +207,7 @@ jobs:
           command: |
             circle-android wait-for-boot
 
-      - run: bazel test --define=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --define=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci -- //android/demo:android_instrumentation_test
+      - run: bazel test --define=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --define=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --define=APPLITOOLS_PR_NUMBER=${CIRCLE_PULL_REQUEST##*/} --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci -- //android/demo:android_instrumentation_test
 
       - store_artifacts:
           path: screenshots
@@ -261,7 +250,6 @@ jobs:
       - run: |
             source ~/.bashrc
             bundle install
-            export CIRCLE_BUILD_NUMBER=$(cat .ios-build-number)
             npx auto shipit --only-graduate-with-release-label -vv
 
   applitools_init:
@@ -301,6 +289,8 @@ workflows:
             - setup
 
       - build_ios:
+          context:
+            - applitools
           requires:
             - applitools_init
             - setup
@@ -343,6 +333,8 @@ workflows:
             - setup
 
       - build_ios:
+          context:
+            - applitools
           requires:
             - setup
 
@@ -380,6 +372,8 @@ workflows:
             - setup
 
       - build_ios:
+          context:
+            - applitools
           requires:
             - setup
 

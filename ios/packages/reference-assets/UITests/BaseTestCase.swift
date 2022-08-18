@@ -16,28 +16,44 @@ class BaseTestCase: AssetUITestCase {
     private var eyes = Eyes()
     var key: String?
 
+    func envOrDefault(_ key: String, fallback: String = "local") -> String {
+        guard let value = fromEnv(key) else {
+            print("Unable to fetch \(key) from the environment. Using fallback value: \(fallback)")
+            return fallback
+        }
+        return value
+    }
+
+    func fromEnv(_ key: String) -> String? {
+        guard
+            let value = ProcessInfo.processInfo.environment[key],
+            !value.isEmpty,
+            value != "$(\(key))"
+        else {
+            return nil
+        }
+        return value
+    }
+
     override func setUp() {
         continueAfterFailure = false
         eyes.serverURL = "https://intuiteyesapi.applitools.com"
 
-        if let id = ProcessInfo.processInfo.environment["APPLITOOLS_BATCH_ID"], id != "", id != "$(APPLITOOLS_BATCH_ID)" {
-            print("Got APPLITOOLS_BATCH_ID from environment: \(id)")
-            let info = BatchInfo(name: "iOS@\(id)")
-            info?.batchId = "iOS@\(id)"
-            eyes.batch = info
-        } else {
-            print("Unable to fetch APPLITOOLS_BATCH_ID from environment")
-            let info = BatchInfo(name: "iOS@local")
-            info?.batchId = "iOS@local"
-            eyes.batch = info
-        }
-        if let key = ProcessInfo.processInfo.environment["APPLITOOLS_API_KEY"], key != "", key != "$(APPLITOOLS_API_KEY)" {
-            print("Got APPLITOOLS_API_KEY from environment: \(key)")
+        let prNumber = envOrDefault("APPLITOOLS_PR_NUMBER")
+        let batchId = envOrDefault("APPLITOOLS_BATCH_ID")
+        if let key = fromEnv("APPLITOOLS_API_KEY") {
             eyes.apiKey = key
             self.key = key
         } else {
             print("Unable to fetch APPLITOOLS_API_KEY from environment")
         }
+
+        let info = BatchInfo(name: "reference-assets@\(prNumber)")
+        info?.batchId = batchId
+        eyes.addProperty("platform", value: "ios")
+        eyes.batch = info
+
+        eyes.configuration.appName = "iOS Reference Assets"
 
         super.setUp()
     }
@@ -55,7 +71,7 @@ class BaseTestCase: AssetUITestCase {
     func withEyes(_ mockName: String, testName: String? = nil, body: (Eyes?) -> Void) {
         openFlow(mockName)
         guard key != nil else { return body(nil) }
-        eyes.open(withApplicationName: "iOS PlayerUI Demo", testName: "\(testName ?? mockName)")
+        eyes.open(withApplicationName: "iOS Reference Assets", testName: "\(testName ?? mockName)")
         body(eyes)
     }
 

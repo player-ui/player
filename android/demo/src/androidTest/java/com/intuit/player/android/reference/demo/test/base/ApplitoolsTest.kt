@@ -11,6 +11,7 @@ import com.applitools.eyes.android.espresso.Eyes
 import com.applitools.eyes.android.espresso.fluent.Target
 import com.intuit.player.android.reference.demo.ApplitoolsConfig.API_KEY
 import com.intuit.player.android.reference.demo.ApplitoolsConfig.BATCH_ID
+import com.intuit.player.android.reference.demo.ApplitoolsConfig.PR_NUMBER
 import com.intuit.player.android.reference.demo.R
 
 abstract class ApplitoolsTest {
@@ -47,7 +48,7 @@ abstract class ApplitoolsTest {
     fun Eyes.checkPlayer(name: String) = check(name, Target.region(ViewMatchers.withId(R.id.player_canvas)))
 
     companion object {
-        val batchInfo = BatchInfo("android-reference-assets@${BATCH_ID}").apply {
+        val batchInfo = BatchInfo("reference-assets@${PR_NUMBER}").apply {
             // Only manually set the batch ID if it's not a hardcoded fallback
             if (BATCH_ID != "local") id = BATCH_ID
         }

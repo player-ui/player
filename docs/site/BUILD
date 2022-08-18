@@ -1,5 +1,6 @@
 load("@npm//next:index.bzl", "next")
 load("@rules_player//javascript/next:next_build.bzl", "next_export")
+
 package(default_visibility = ["//visibility:public"])
 
 srcs = glob([
@@ -47,11 +48,10 @@ next_export(
   name = "site",
   data = data,
   srcs = srcs,
-  substitutions ={
-    "NEXT_PUBLIC_GA_MEASUREMENT_ID": "STABLE_GA_MEASUREMENT_ID"
-  },
   env = {
-    "DOCS_BASE_PATH": "/next",
+    "NODE_ENV": "production",
+    # Need this b/c next will pull from env directly 
+    # This just maps to a value we can stamp w/ later on
     "NEXT_PUBLIC_GA_MEASUREMENT_ID": "NEXT_PUBLIC_GA_MEASUREMENT_ID",
   },
 )

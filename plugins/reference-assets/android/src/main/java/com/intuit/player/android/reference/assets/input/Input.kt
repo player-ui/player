@@ -11,7 +11,6 @@ import com.intuit.player.android.reference.assets.R
 import com.intuit.player.android.reference.assets.text.Text
 import com.intuit.player.plugins.transactions.commitPendingTransaction
 import com.intuit.player.plugins.transactions.registerPendingTransaction
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 
 class Input(assetContext: AssetContext) : DecodableAsset<Input.Data>(assetContext, Data.serializer()) {
@@ -27,7 +26,7 @@ class Input(assetContext: AssetContext) : DecodableAsset<Input.Data>(assetContex
         val format: (String?) -> String?,
 
         /** Optional [label] that gives some semantic meaning to the field asset */
-        val label: @Contextual RenderableAsset? = null,
+        val label: RenderableAsset? = null,
 
         /** The current value of the input from the data-model */
         val value: String? = null,

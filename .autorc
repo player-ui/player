@@ -3,6 +3,8 @@
   "baseBranch": "main",
   "versionBranches": true,
   "noVersionPrefix": true,
+  "owner": "player-ui",
+  "repo": "player",
   "plugins": [
     [
       "upload-assets",
@@ -15,6 +17,7 @@
         "publishScript": "./scripts/release.sh"
       }
     ],
+    "./scripts/after-shipit-pod-push.js",
     "./scripts/delete-old-prerelease.js"
   ]
 }

@@ -22,6 +22,11 @@
             value = "$(APPLITOOLS_BATCH_ID)"
             isEnabled = "YES">
          </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "APPLITOOLS_PR_NUMBER"
+            value = "$(APPLITOOLS_PR_NUMBER)"
+            isEnabled = "YES">
+         </EnvironmentVariable>
       </EnvironmentVariables>
       <Testables>
          <TestableReference
