@@ -48,7 +48,7 @@ test('works with a Component that returns a Fragment of items', async () => {
     </Collection>
   );
 
-  expect(contentWithFragment).toStrictEqual(expected);
+  expect(contentWithFragment.jsonValue).toStrictEqual(expected);
 
   const contentWithoutFragment = await render(
     <Collection>
@@ -60,5 +60,5 @@ test('works with a Component that returns a Fragment of items', async () => {
     </Collection>
   );
 
-  expect(contentWithoutFragment).toStrictEqual(expected);
+  expect(contentWithoutFragment.jsonValue).toStrictEqual(expected);
 });

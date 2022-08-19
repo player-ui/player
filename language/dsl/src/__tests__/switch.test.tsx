@@ -21,7 +21,7 @@ describe('staticSwitch', () => {
       </Collection>
     );
 
-    expect(await render(element)).toStrictEqual({
+    expect((await render(element)).jsonValue).toStrictEqual({
       id: 'root',
       type: 'collection',
       label: {
@@ -71,7 +71,7 @@ describe('staticSwitch', () => {
       </Collection>
     );
 
-    expect(await render(element)).toMatchInlineSnapshot(`
+    expect((await render(element)).jsonValue).toMatchInlineSnapshot(`
       Object {
         "id": "root",
         "label": Object {
@@ -126,7 +126,7 @@ describe('staticSwitch', () => {
       </Collection>
     );
 
-    expect(await render(element)).toStrictEqual({
+    expect((await render(element)).jsonValue).toStrictEqual({
       id: 'root',
       type: 'collection',
       label: {
@@ -168,7 +168,7 @@ describe('staticSwitch', () => {
       </Collection>
     );
 
-    expect(await render(element)).toStrictEqual({
+    expect((await render(element)).jsonValue).toStrictEqual({
       id: 'root',
       type: 'collection',
       label: {
@@ -214,7 +214,7 @@ describe('generates ids', () => {
       </Collection>
     );
 
-    expect(await render(content)).toMatchInlineSnapshot(`
+    expect((await render(content)).jsonValue).toMatchInlineSnapshot(`
       Object {
         "id": "root",
         "type": "collection",

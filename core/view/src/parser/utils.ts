@@ -7,3 +7,8 @@ export function hasSwitch(obj: object): obj is AssetSwitch<Asset> {
     Object.prototype.hasOwnProperty.call(obj, 'staticSwitch')
   );
 }
+
+/** Check to see if the object contains applicability */
+export function hasApplicability(obj: object): boolean {
+  return Object.prototype.hasOwnProperty.call(obj, 'applicability');
+}

@@ -130,6 +130,11 @@ export class Player {
     });
   }
 
+  /**  Returns currently registered plugins */
+  public getPlugins(): PlayerPlugin[] {
+    return this.config.plugins ?? [];
+  }
+
   /** Find instance of [Plugin] that has been registered to Player */
   public findPlugin<Plugin extends PlayerPlugin>(
     symbol: symbol
@@ -278,6 +283,17 @@ export class Player {
 
     flowController.hooks.flow.tap('player', (flow: FlowInstance) => {
       flow.hooks.beforeTransition.tap('player', (state, transitionVal) => {
+        if (
+          state.onEnd &&
+          (state.transitions[transitionVal] || state.transitions['*'])
+        ) {
+          if (typeof state.onEnd === 'object' && 'exp' in state.onEnd) {
+            expressionEvaluator?.evaluate(state.onEnd.exp);
+          } else {
+            expressionEvaluator?.evaluate(state.onEnd);
+          }
+        }
+
         if (!('transitions' in state) || !state.transitions[transitionVal]) {
           return state;
         }

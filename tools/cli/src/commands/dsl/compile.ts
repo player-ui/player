@@ -86,7 +86,11 @@ export default class DSLCompile extends BaseCommand {
         return;
       }
 
-      const relativePath = path.relative(input, file);
+      let relativePath = path.relative(input, file);
+      if (!relativePath) {
+        relativePath = path.basename(file);
+      }
+
       const outputFile = path.join(
         output,
         path.format({
@@ -102,12 +106,18 @@ export default class DSLCompile extends BaseCommand {
         normalizePath(outputFile)
       );
 
-      const { value, contentType } = await compiler.serialize(defaultExport);
+      const { value, contentType, sourceMap } = await compiler.serialize(
+        defaultExport
+      );
 
       const contentStr = JSON.stringify(value, null, 2);
 
       await mkdirp(path.dirname(outputFile));
       await fs.writeFile(outputFile, contentStr);
+
+      if (sourceMap) {
+        await fs.writeFile(`${outputFile}.map`, sourceMap);
+      }
 
       return {
         contentType,

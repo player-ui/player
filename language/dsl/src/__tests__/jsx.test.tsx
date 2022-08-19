@@ -44,7 +44,9 @@ it('works with JSX', async () => {
     </Collection>
   );
 
-  expect(await render(element)).toStrictEqual(expectedBasicCollection);
+  expect((await render(element)).jsonValue).toStrictEqual(
+    expectedBasicCollection
+  );
 });
 
 it('works for any json props', async () => {
@@ -54,7 +56,7 @@ it('works for any json props', async () => {
     other: '',
   };
   expect(
-    await render(<object>{toJsonProperties(testObj)}</object>)
+    (await render(<object>{toJsonProperties(testObj)}</object>)).jsonValue
   ).toStrictEqual(testObj);
 });
 
@@ -64,7 +66,7 @@ it('works for BindingTemplateInstances and ExpressionTemplateInstances', async (
     page_experience: e`foo.bar.GetDataResult`,
   };
   expect(
-    await render(<object>{toJsonProperties(testObj)}</object>)
+    (await render(<object>{toJsonProperties(testObj)}</object>)).jsonValue
   ).toStrictEqual(expectedTemplateInstanceObjects);
 });
 
@@ -79,7 +81,7 @@ it('handles array props', async () => {
 
   const element = <ArrayProp stuff={things} />;
 
-  expect(await render(element)).toStrictEqual(expected);
+  expect((await render(element)).jsonValue).toStrictEqual(expected);
 });
 
 test('flattens fragments', async () => {
@@ -99,5 +101,7 @@ test('flattens fragments', async () => {
     </Collection>
   );
 
-  expect(await render(element)).toStrictEqual(expectedBasicCollection);
+  expect((await render(element)).jsonValue).toStrictEqual(
+    expectedBasicCollection
+  );
 });

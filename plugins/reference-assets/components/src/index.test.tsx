@@ -5,7 +5,7 @@ import { Text, Action, Info, Collection, Input } from '.';
 describe('JSON serialization', () => {
   describe('text', () => {
     it('works for basic text', async () => {
-      expect(await render(<Text>Hello World</Text>)).toStrictEqual({
+      expect((await render(<Text>Hello World</Text>)).jsonValue).toStrictEqual({
         id: 'root',
         type: 'text',
         value: 'Hello World',
@@ -13,7 +13,9 @@ describe('JSON serialization', () => {
     });
 
     it('works for value prop', async () => {
-      expect(await render(<Text value="Hello World" />)).toStrictEqual({
+      expect(
+        (await render(<Text value="Hello World" />)).jsonValue
+      ).toStrictEqual({
         id: 'root',
         type: 'text',
         value: 'Hello World',
@@ -24,11 +26,13 @@ describe('JSON serialization', () => {
   describe('collection', () => {
     it('adds a label', async () => {
       expect(
-        await render(
-          <Collection id="test-id">
-            <Collection.Label>Test</Collection.Label>
-          </Collection>
-        )
+        (
+          await render(
+            <Collection id="test-id">
+              <Collection.Label>Test</Collection.Label>
+            </Collection>
+          )
+        ).jsonValue
       ).toStrictEqual({
         id: 'test-id',
         type: 'collection',
@@ -44,14 +48,16 @@ describe('JSON serialization', () => {
 
     it('adds values', async () => {
       expect(
-        await render(
-          <Collection>
-            <Collection.Values>
-              <Text>First</Text>
-              <Text>Second</Text>
-            </Collection.Values>
-          </Collection>
-        )
+        (
+          await render(
+            <Collection>
+              <Collection.Values>
+                <Text>First</Text>
+                <Text>Second</Text>
+              </Collection.Values>
+            </Collection>
+          )
+        ).jsonValue
       ).toStrictEqual({
         id: 'root',
         type: 'collection',
@@ -78,22 +84,24 @@ describe('JSON serialization', () => {
   describe('info', () => {
     it('works for a large view', async () => {
       expect(
-        await render(
-          <Info id="info-view">
-            <Info.Title>Info Title</Info.Title>
-            <Info.PrimaryInfo>
-              <Input binding={b`foo.bar`}>
-                <Input.Label>Input Label</Input.Label>
-              </Input>
-              <Text id="input-result" value={b`foo.bar`.toString()} />
-            </Info.PrimaryInfo>
-            <Info.Actions>
-              <Action value="next">
-                <Action.Label>Continue</Action.Label>
-              </Action>
-            </Info.Actions>
-          </Info>
-        )
+        (
+          await render(
+            <Info id="info-view">
+              <Info.Title>Info Title</Info.Title>
+              <Info.PrimaryInfo>
+                <Input binding={b`foo.bar`}>
+                  <Input.Label>Input Label</Input.Label>
+                </Input>
+                <Text id="input-result" value={b`foo.bar`.toString()} />
+              </Info.PrimaryInfo>
+              <Info.Actions>
+                <Action value="next">
+                  <Action.Label>Continue</Action.Label>
+                </Action>
+              </Info.Actions>
+            </Info>
+          )
+        ).jsonValue
       ).toStrictEqual({
         id: 'info-view',
         type: 'info',

@@ -15,6 +15,7 @@ javascript_pipeline(
       "@npm//react-flatten-children",
       "@npm//react-json-reconciler",
       "@npm//react-merge-refs",
+      "@npm//source-map-js",
       "@npm//signale",
       "@npm//ts-node",
       "@npm//typescript",

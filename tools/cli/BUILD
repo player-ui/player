@@ -13,6 +13,7 @@ BUILD_DATA = [
     "@npm//@babel/preset-env",
     "@npm//@babel/preset-react",
     "@npm//@babel/preset-typescript",
+    "@npm//@babel/plugin-transform-react-jsx-source",
     "@npm//@babel/register",
     "@npm//@types/babel__register",
     "@npm//@oclif/core",

@@ -10,5 +10,6 @@ export const registerForPaths = () => {
       '@babel/preset-typescript',
       '@babel/preset-react',
     ],
+    plugins: ['@babel/plugin-transform-react-jsx-source'],
   });
 };

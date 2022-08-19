@@ -91,7 +91,7 @@ export class ViewInstance implements ValidationProvider {
 
   private resolver?: Resolver;
   public readonly initialView: ViewType;
-  private readonly resolverOptions: Resolve.ResolverOptions;
+  public readonly resolverOptions: Resolve.ResolverOptions;
   private rootNode?: Node.Node;
 
   private validationProvider?: CrossfieldProvider;

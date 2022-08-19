@@ -61,6 +61,33 @@ describe('applicability', () => {
     });
   });
 
+  it('removes asset wrappers', () => {
+    const root = parser.parseObject({
+      asset: {
+        title: {
+          applicability: '{{foo}}',
+          asset: {
+            value: 'foo',
+          },
+        },
+        value: 'Hello World',
+      },
+    });
+    model.set([['foo', true]]);
+    const resolver = new Resolver(root!, resolverOptions);
+
+    new ApplicabilityPlugin().applyResolver(resolver);
+    new StringResolverPlugin().applyResolver(resolver);
+
+    expect(resolver.update()).toStrictEqual({
+      asset: { title: { asset: { value: 'foo' } }, value: 'Hello World' },
+    });
+    model.set([['foo', false]]);
+    expect(resolver.update()).toStrictEqual({
+      asset: { value: 'Hello World' },
+    });
+  });
+
   it('handles empty models', () => {
     const root = parser.parseObject({
       asset: {

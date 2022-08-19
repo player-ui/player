@@ -308,6 +308,56 @@ describe('state node expression tests', () => {
     });
   });
 
+  test('evaluates onEnd before transition', () => {
+    player.start({
+      ...minimal,
+      data: {
+        ...minimal.data,
+        viewRef: 'initial-view',
+      },
+      navigation: {
+        BEGIN: 'FLOW_1',
+        FLOW_1: {
+          startState: 'ACTION_1',
+          ACTION_1: {
+            state_type: 'ACTION',
+            exp: "{{viewRef}} = 'view-exp'",
+            onStart: "{{viewRef}} = 'view-onStart'",
+            onEnd: "{{viewRef}} = 'VIEW_1'",
+            transitions: {
+              Next: '{{viewRef}}',
+            },
+          },
+          VIEW_1: {
+            state_type: 'VIEW',
+            ref: 'view-1',
+            transitions: {},
+          },
+        },
+      },
+    });
+    jest.runOnlyPendingTimers();
+    flowController?.transition('Next');
+
+    /**
+     * Expected eval order:
+     * 1. onStart
+     * 2. exp
+     * 3. onEnd
+     */
+    expect(getView()).toStrictEqual({
+      id: 'view-1',
+      type: 'view',
+      label: {
+        asset: {
+          id: 'action-label',
+          type: 'text',
+          value: 'Clicked 0 times',
+        },
+      },
+    });
+  });
+
   test('triggers onStart before resolving view IDs', () => {
     player.start({
       id: 'resolve-view-flow',

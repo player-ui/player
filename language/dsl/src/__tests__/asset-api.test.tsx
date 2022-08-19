@@ -19,7 +19,7 @@ describe('components', () => {
       </Collection>
     );
 
-    expect(await render(element)).toStrictEqual({
+    expect((await render(element)).jsonValue).toStrictEqual({
       id: 'root',
       type: 'collection',
       label: {
@@ -50,7 +50,7 @@ describe('components', () => {
       </Collection>
     );
 
-    expect(await render(element)).toStrictEqual({
+    expect((await render(element)).jsonValue).toStrictEqual({
       id: 'root',
       type: 'collection',
       label: {
@@ -87,7 +87,7 @@ describe('components', () => {
       </Collection>
     );
 
-    expect(await render(element)).toStrictEqual({
+    expect((await render(element)).jsonValue).toStrictEqual({
       id: 'root',
       type: 'collection',
       label: { asset: { id: 'label', type: 'text', value: 'Label' } },
@@ -142,7 +142,7 @@ describe('components', () => {
         </Text>
       );
 
-      expect(element).toMatchInlineSnapshot(`
+      expect(element.jsonValue).toMatchInlineSnapshot(`
         Object {
           "id": "root",
           "modifiers": Array [
@@ -163,7 +163,7 @@ describe('components', () => {
     it('converts just a binding node into a ref', async () => {
       const element = await render(<Text>{b`foo.bar`.toString()}</Text>);
 
-      expect(element).toStrictEqual({
+      expect(element.jsonValue).toStrictEqual({
         id: 'root',
         type: 'text',
         value: '{{foo.bar}}',
@@ -175,7 +175,7 @@ describe('components', () => {
         <Text>Label {b`foo.bar`.toString()} End</Text>
       );
 
-      expect(element).toStrictEqual({
+      expect(element.jsonValue).toStrictEqual({
         id: 'root',
         type: 'text',
         value: 'Label {{foo.bar}} End',
@@ -189,7 +189,7 @@ describe('components', () => {
         </Input>
       );
 
-      expect(element).toStrictEqual({
+      expect(element.jsonValue).toStrictEqual({
         id: 'root',
         type: 'input',
         binding: 'foo.bar.baz',
@@ -212,7 +212,7 @@ describe('components', () => {
         </Input>
       );
 
-      expect(element).toStrictEqual({
+      expect(element.jsonValue).toStrictEqual({
         id: 'custom-id',
         type: 'input',
         applicability: '{{foo.bar.baz}}',
@@ -233,7 +233,7 @@ describe('components', () => {
         </Input>
       );
 
-      expect(element).toStrictEqual({
+      expect(element.jsonValue).toStrictEqual({
         id: 'custom-id',
         type: 'input',
         applicability: false,
@@ -255,7 +255,7 @@ describe('components', () => {
       </Collection>
     );
 
-    expect(await render(element)).toStrictEqual({
+    expect((await render(element)).jsonValue).toStrictEqual({
       id: 'first-thing',
       type: 'collection',
       label: {
@@ -281,7 +281,7 @@ describe('components', () => {
       />
     );
 
-    expect(await render(element)).toStrictEqual({
+    expect((await render(element)).jsonValue).toStrictEqual({
       id: 'root',
       metaData: {
         optionalUnion: {
@@ -305,7 +305,7 @@ describe('allows other props to be added to a slot', () => {
       </Input>
     );
 
-    expect(element).toStrictEqual({
+    expect(element.jsonValue).toStrictEqual({
       id: 'custom-id',
       type: 'input',
       label: {
@@ -332,7 +332,7 @@ describe('allows other props to be added to a slot', () => {
       </Input>
     );
 
-    expect(element).toStrictEqual({
+    expect(element.jsonValue).toStrictEqual({
       id: 'custom-id',
       type: 'input',
       label: {

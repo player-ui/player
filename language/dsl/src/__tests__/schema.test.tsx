@@ -245,7 +245,7 @@ describe('Schema Bindings Generate Properly', () => {
       </obj>
     );
 
-    expect(content).toMatchInlineSnapshot(`
+    expect(content.jsonValue).toMatchInlineSnapshot(`
       Object {
         "test": "{{main.sub.a}}",
       }

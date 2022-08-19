@@ -87,7 +87,7 @@ export class SchemaController implements ValidationProvider {
     new Map();
 
   private types: Map<string, SchemaType.DataType<any>> = new Map();
-  private schema: Map<string, SchemaType.DataType> = new Map();
+  public readonly schema: Map<string, SchemaType.DataType> = new Map();
 
   private bindingSchemaNormalizedCache: Map<BindingInstance, string> =
     new Map();
