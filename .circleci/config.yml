@@ -48,6 +48,10 @@ jobs:
     steps:
       - checkout
 
+      - run: |
+          echo "common --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
+          echo "common --config=ci" >> .bazelrc.local
+
       - restore_cache:
           keys:
             - v1-dependencies-{ { checksum "package.json" }}
@@ -63,7 +67,7 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci --config=skip-ios -- //...
+      - run: bazel build --config=skip-ios -- //...
 
       - save_cache:
           paths:
@@ -131,7 +135,7 @@ jobs:
 
       - run: |
           BUNDLE_TARGETS=$(bazel query "attr(name, '_Bundles', //...)" --output label 2>/dev/null | tr '\n' ' ')
-          bazel build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci $BUNDLE_TARGETS
+          bazel build $BUNDLE_TARGETS
 
       - run: bazel shutdown
       - run: cd xcode && bundle exec pod install
@@ -158,7 +162,7 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel test --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=skip-ios --config=ci -- //... -//docs/site -//android/demo:android_instrumentation_test
+      - run: bazel test --config=skip-ios -- //... -//docs/site -//android/demo:android_instrumentation_test
 
       - run:
           when: always
@@ -207,7 +211,7 @@ jobs:
           command: |
             circle-android wait-for-boot
 
-      - run: bazel test --define=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --define=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --define=APPLITOOLS_PR_NUMBER=${CIRCLE_PULL_REQUEST##*/} --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci -- //android/demo:android_instrumentation_test
+      - run: bazel test --define=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --define=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --define=APPLITOOLS_PR_NUMBER=${CIRCLE_PULL_REQUEST##*/} -- //android/demo:android_instrumentation_test
 
       - store_artifacts:
           path: screenshots
@@ -226,7 +230,7 @@ jobs:
 
       - run: |
           BUNDLE_TARGETS=$(bazel query "kind(nodejs_test, //...)" --output label 2>/dev/null | tr '\n' ' ')
-          bazel coverage --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci -- $BUNDLE_TARGETS
+          bazel coverage -- $BUNDLE_TARGETS
 
       - codecov/upload:
           file: ./bazel-out/_coverage/_coverage_report.dat
