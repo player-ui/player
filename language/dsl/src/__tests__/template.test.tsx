@@ -18,7 +18,7 @@ test('finds output property based on array context', async () => {
     </obj>
   );
 
-  expect(await render(element)).toStrictEqual({
+  expect((await render(element)).jsonValue).toStrictEqual({
     foo: ['Foo'],
     template: [
       {
@@ -42,7 +42,7 @@ test('works if already in a template array', async () => {
       </property>
     </obj>
   );
-  expect(await render(element)).toStrictEqual({
+  expect((await render(element)).jsonValue).toStrictEqual({
     template: [{ output: 'output', data: 'foo.output', value: 'bar' }],
   });
 });
@@ -82,7 +82,7 @@ test('template will delete empty arrays related to the template only', async () 
       </Collection.Values>
     </Collection>
   );
-  expect(await render(element)).toStrictEqual({
+  expect((await render(element)).jsonValue).toStrictEqual({
     id: 'root',
     type: 'collection',
     template: [
@@ -174,7 +174,7 @@ describe('template auto id', () => {
       </Collection>
     );
 
-    const actual = await render(element);
+    const actual = (await render(element)).jsonValue;
 
     expect(actual).toStrictEqual({
       id: 'root',
@@ -222,7 +222,7 @@ describe('template auto id', () => {
       </Collection>
     );
 
-    const actual = await render(element);
+    const actual = (await render(element)).jsonValue;
 
     expect(actual).toStrictEqual({
       id: 'root',

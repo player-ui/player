@@ -95,10 +95,7 @@ export class CheckPathPlugin implements PlayerPlugin {
           this.viewInfo = viewInfo;
 
           resolver.hooks.afterResolve.tap(this.name, (value, node) => {
-            let sourceNode = resolver.getSourceNode(node);
-            if (sourceNode?.type === 'applicability') {
-              sourceNode = sourceNode.value;
-            }
+            const sourceNode = this.getSourceAssetNode(node);
 
             if (sourceNode) {
               viewInfo.resolvedMap.set(sourceNode, {
@@ -225,6 +222,16 @@ export class CheckPathPlugin implements PlayerPlugin {
     return undefined;
   }
 
+  /** Given a node, return itself, or the nested asset if the node is an applicability node */
+  private getSourceAssetNode(node: Node.Node) {
+    let sourceNode = this.viewInfo?.resolver.getSourceNode(node);
+    if (sourceNode?.type === 'applicability') {
+      sourceNode = sourceNode.value;
+    }
+
+    return sourceNode;
+  }
+
   /**
    * Given the starting node, check to verify that the supplied queries are relevant to the current asset's parents.
    *
@@ -308,7 +315,7 @@ export class CheckPathPlugin implements PlayerPlugin {
     const assetNode = this.viewInfo?.assetIdMap.get(id);
     if (!assetNode) return;
 
-    const sourceNode = this.viewInfo?.resolver.getSourceNode(assetNode);
+    const sourceNode = this.getSourceAssetNode(assetNode);
     if (!sourceNode) return;
 
     return this.viewInfo?.resolvedMap.get(sourceNode)?.value;

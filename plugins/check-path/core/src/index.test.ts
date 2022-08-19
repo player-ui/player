@@ -342,6 +342,15 @@ describe('works with applicability', () => {
       'asset',
     ]);
   });
+
+  test('getAsset', async () => {
+    expect(checkPathPlugin.getAsset('asset-4')).toBeUndefined();
+
+    dataController.set([['foo.baz', true]]);
+    await waitFor(() => {
+      expect(checkPathPlugin.getAsset('asset-4')).toBeDefined();
+    });
+  });
 });
 
 describe('handles non-initialized player', () => {

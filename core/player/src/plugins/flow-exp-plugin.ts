@@ -47,17 +47,6 @@ export class FlowExpPlugin implements PlayerPlugin {
         // Eval state nodes
         flow.hooks.resolveTransitionNode.intercept({
           call: (nextState: NavigationFlowState) => {
-            /** Get the current state of Player */
-            const currentState = () => player.getState() as InProgressState;
-
-            /** Get the current flow state */
-            const currentFlowState =
-              currentState().controllers.flow.current?.currentState;
-
-            if (currentFlowState?.value.onEnd) {
-              handleEval(currentFlowState.value.onEnd);
-            }
-
             if (nextState?.onStart) {
               handleEval(nextState.onStart);
             }

@@ -3,7 +3,7 @@ import { SyncWaterfallHook } from 'tapable-ts';
 import type { Template, AssetSwitch } from '@player-ui/types';
 import type { Node, AnyAssetType } from './types';
 import { NodeType } from './types';
-import { hasSwitch } from './utils';
+import { hasSwitch, hasApplicability } from './utils';
 
 export * from './types';
 
@@ -54,6 +54,36 @@ export class Parser {
     }
 
     return viewNode as Node.View;
+  }
+
+  private parseApplicability(
+    obj: object,
+    type: Node.ChildrenTypes,
+    options: ParseObjectOptions
+  ): Node.Node | null {
+    const parsedApplicability = this.parseObject(
+      omit(obj, 'applicability'),
+      type,
+      options
+    );
+    if (parsedApplicability !== null) {
+      const applicabilityNode = this.createASTNode(
+        {
+          type: NodeType.Applicability,
+          expression: (obj as any).applicability,
+          value: parsedApplicability,
+        },
+        obj
+      );
+
+      if (applicabilityNode?.type === NodeType.Applicability) {
+        applicabilityNode.value.parent = applicabilityNode;
+      }
+
+      return applicabilityNode;
+    }
+
+    return null;
   }
 
   private parseSwitch(
@@ -116,29 +146,8 @@ export class Parser {
     type: Node.ChildrenTypes = NodeType.Value,
     options: ParseObjectOptions = { templateDepth: 0 }
   ): Node.Node | null {
-    if (Object.prototype.hasOwnProperty.call(obj, 'applicability')) {
-      const parsedApplicability = this.parseObject(
-        omit(obj, 'applicability'),
-        type,
-        options
-      );
-
-      if (parsedApplicability !== null) {
-        const applicabilityNode = this.createASTNode(
-          {
-            type: NodeType.Applicability,
-            expression: (obj as any).applicability,
-            value: parsedApplicability,
-          },
-          obj
-        );
-
-        if (applicabilityNode?.type === NodeType.Applicability) {
-          applicabilityNode.value.parent = applicabilityNode;
-        }
-
-        return applicabilityNode;
-      }
+    if (hasApplicability(obj)) {
+      return this.parseApplicability(obj, type, options);
     }
 
     if (hasSwitch(obj)) {
@@ -249,7 +258,21 @@ export class Parser {
             }
           }
         } else if (localValue && typeof localValue === 'object') {
-          parseLocalObject(localValue, [...path, localKey]);
+          if (hasApplicability(localValue)) {
+            const applicabilityNode = this.parseApplicability(
+              localValue,
+              type,
+              options
+            );
+            if (applicabilityNode) {
+              children.push({
+                path: [...path, localKey],
+                value: applicabilityNode,
+              });
+            }
+          } else {
+            parseLocalObject(localValue, [...path, localKey]);
+          }
         } else {
           value = setIn(value, [...path, localKey], localValue);
         }

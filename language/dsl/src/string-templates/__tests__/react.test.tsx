@@ -5,12 +5,14 @@ import { Switch } from '../../switch';
 import { Collection } from '../../__tests__/helpers/asset-library';
 
 test('can be used as a react child element', async () => {
-  const content = await render(
-    <object>
-      <property name="expression">{e`test()`}</property>
-      <property name="binding">{b`foo.bar`}</property>
-    </object>
-  );
+  const content = (
+    await render(
+      <object>
+        <property name="expression">{e`test()`}</property>
+        <property name="binding">{b`foo.bar`}</property>
+      </object>
+    )
+  ).jsonValue;
 
   expect(content).toStrictEqual({
     expression: '@[test()]@',
@@ -19,11 +21,13 @@ test('can be used as a react child element', async () => {
 });
 
 test('Works when used as a child asset', async () => {
-  const content = await render(
-    <Collection>
-      <Collection.Label>{b`foo.bar`}</Collection.Label>
-    </Collection>
-  );
+  const content = (
+    await render(
+      <Collection>
+        <Collection.Label>{b`foo.bar`}</Collection.Label>
+      </Collection>
+    )
+  ).jsonValue;
 
   expect(content).toStrictEqual({
     id: 'root',
@@ -39,15 +43,17 @@ test('Works when used as a child asset', async () => {
 });
 
 test('Works as a switch child', async () => {
-  const content = await render(
-    <Collection>
-      <Collection.Label>
-        <Switch>
-          <Switch.Case>Testing 123 {b`foo.bar`}</Switch.Case>
-        </Switch>
-      </Collection.Label>
-    </Collection>
-  );
+  const content = (
+    await render(
+      <Collection>
+        <Collection.Label>
+          <Switch>
+            <Switch.Case>Testing 123 {b`foo.bar`}</Switch.Case>
+          </Switch>
+        </Collection.Label>
+      </Collection>
+    )
+  ).jsonValue;
 
   expect(content).toStrictEqual({
     id: 'root',

@@ -553,7 +553,7 @@ export class ValidationController implements BindingTracker {
     );
   }
 
-  private getValidator(type: string) {
+  public getValidator(type: string) {
     if (this.validatorRegistry) {
       return this.validatorRegistry.get(type);
     }

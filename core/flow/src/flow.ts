@@ -44,7 +44,7 @@ export class FlowInstance {
 
     /** A hook to intercept and block a transition */
     skipTransition: new SyncBailHook<
-      [NamedState | undefined, string],
+      [NamedState | undefined],
       boolean | undefined
     >(),
 
@@ -124,6 +124,19 @@ export class FlowInstance {
       throw new Error("Cannot transition when there's no current state");
     }
 
+    if (options?.force) {
+      this.log?.debug(`Forced transition. Skipping validation checks`);
+    } else {
+      const skipTransition = this.hooks.skipTransition.call(this.currentState);
+
+      if (skipTransition) {
+        this.log?.debug(
+          `Skipping transition from ${this.currentState} b/c hook told us to`
+        );
+        return;
+      }
+    }
+
     const state = this.hooks.beforeTransition.call(
       this.currentState.value,
       transitionValue
@@ -169,23 +182,6 @@ export class FlowInstance {
     }
 
     const prevState = this.currentState;
-
-    if (options?.force) {
-      this.log?.debug(`Forced transition. Skipping validation checks`);
-    } else {
-      const skipTransition = this.hooks.skipTransition.call(
-        prevState,
-        stateName
-      );
-
-      if (skipTransition) {
-        this.log?.debug(
-          `Skipping transition to ${stateName} b/c hook told us to`
-        );
-
-        return;
-      }
-    }
 
     nextState = this.hooks.resolveTransitionNode.call(nextState);
 
