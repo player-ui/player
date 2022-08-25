@@ -19,7 +19,7 @@ class TextAssetTests: SwiftUIAssetUnitTestCase {
     override func register(registry: SwiftUIRegistry) {
         registry.register("text", asset: TextAsset.self)
     }
-    func testAssetDecoding() throws {
+    func testAssetDecoding() async throws {
         let json = """
         {
           "id": "text",
@@ -28,7 +28,7 @@ class TextAssetTests: SwiftUIAssetUnitTestCase {
         }
         """
 
-        guard let text: TextAsset = getAsset(json) else { return XCTFail("could not get asset") }
+        guard let text: TextAsset = await getAsset(json) else { return XCTFail("could not get asset") }
 
         _ = try text.view.inspect().find(TextAssetView.self).text()
 

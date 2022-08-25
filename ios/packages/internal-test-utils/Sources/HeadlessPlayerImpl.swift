@@ -40,14 +40,17 @@ class TestAssetType: PlayerAsset, Decodable {
     var rawValue: JSValue?
     var id: String
     var type: String
+    var value: String?
     struct Data: Decodable {
         var id: String
         var type: String
+        var value: String?
     }
     required init(from decoder: Decoder) throws {
         let data = try decoder.singleValueContainer().decode(Data.self)
         id = data.id
         type = data.type
+        value = data.value
     }
 }
 

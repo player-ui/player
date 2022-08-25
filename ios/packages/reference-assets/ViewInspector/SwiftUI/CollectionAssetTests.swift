@@ -21,7 +21,7 @@ class CollectionAssetTests: SwiftUIAssetUnitTestCase {
         registry.register("text", asset: TextAsset.self)
     }
 
-    func testDecoding() throws {
+    func testDecoding() async throws {
         let json = """
         {
           "id": "collection",
@@ -45,15 +45,15 @@ class CollectionAssetTests: SwiftUIAssetUnitTestCase {
         }
         """
 
-        guard let collection: CollectionAsset = getAsset(json) else { return XCTFail("could not get asset") }
+        guard let collection: CollectionAsset = await getAsset(json) else { return XCTFail("could not get asset") }
 
         _ = try collection.view.inspect().find(CollectionAssetView.self).vStack()
     }
 
-    func testView() throws {
+    func testView() async throws {
         guard
-            let text1: TextAsset = getAsset("{\"id\": \"text\", \"type\": \"text\", \"value\":\"hello world\"}"),
-            let text2: TextAsset = getAsset("{\"id\": \"text2\", \"type\": \"text\", \"value\":\"goodbye world\"}")
+            let text1: TextAsset = await getAsset("{\"id\": \"text\", \"type\": \"text\", \"value\":\"hello world\"}"),
+            let text2: TextAsset = await getAsset("{\"id\": \"text2\", \"type\": \"text\", \"value\":\"goodbye world\"}")
         else { return XCTFail("could not get assets") }
         let model = AssetViewModel<CollectionData>(
             CollectionData(
@@ -66,7 +66,7 @@ class CollectionAssetTests: SwiftUIAssetUnitTestCase {
             )
         )
 
-        let view = CollectionAssetView(model: model)
+        let view = await CollectionAssetView(model: model)
 
         let stack = try view.inspect().vStack()
 
