@@ -165,16 +165,26 @@ and display it as a SwiftUI view comprised of registered assets.
     }
   end
 
-  s.subspec 'TestUtilities' do |utils|
+  s.subspec 'TestUtilitiesCore' do |utils|
     utils.dependency 'PlayerUI/Core'
     utils.dependency 'PlayerUI/SwiftUI'
 
     utils.ios.deployment_target = '13.0'
 
-    utils.source_files = 'ios/packages/test-utils/Sources/**/*'
+    utils.source_files = 'ios/packages/test-utils-core/Sources/**/*'
     utils.resource_bundles = {
       'TestUtilities' => ['ios/packages/test-utils/Resources/**/*.js']
     }
+  end
+
+  s.subspec 'TestUtilities' do |utils|
+    utils.dependency 'PlayerUI/Core'
+    utils.dependency 'PlayerUI/SwiftUI'
+    utils.dependency 'PlayerUI/TestUtilitiesCore'
+
+    utils.ios.deployment_target = '13.0'
+
+    utils.source_files = 'ios/packages/test-utils/Sources/**/*'
 
     utils.weak_framework = 'XCTest'
     utils.pod_target_xcconfig = {

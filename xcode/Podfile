@@ -10,6 +10,7 @@ target 'PlayerUI_Example' do
 
   # Packages
   pod 'PlayerUI/Core', :path => '../'
+  pod 'PlayerUI/TestUtilitiesCore', :path => '../'
   pod 'PlayerUI/TestUtilities', :path => '../'
   pod 'PlayerUI/ReferenceAssets', :path => '../'
   pod 'PlayerUI/SwiftUI', :path => '../'

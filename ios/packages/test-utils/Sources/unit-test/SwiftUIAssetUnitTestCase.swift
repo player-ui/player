@@ -9,11 +9,12 @@ import Foundation
 import JavaScriptCore
 import SwiftUI
 import Combine
+import XCTest
 
 /**
  A base class to use for SwiftUIAsset unit tests
  */
-open class SwiftUIAssetUnitTestCase: AssetUnitTestCaseBase, NativePlugin {
+open class SwiftUIAssetUnitTestCase: XCTestCase, NativePlugin {
     // MARK: NativePlugin protocol adherence
 
     /// The name of this plugin
@@ -44,36 +45,19 @@ open class SwiftUIAssetUnitTestCase: AssetUnitTestCaseBase, NativePlugin {
      */
     open func plugins() -> [NativePlugin] { [] }
 
+    public var helper = AssetTestHelper.swiftui
+
+    public var context: JSContext { helper.context }
+
     /**
      Gets an asset from the given JSON if it is decodable
      - parameters:
         - json: The JSON definition for the asset you want to construct
+        - plugins: Additional plugins to include when resolving the asset
      - returns: The decoded asset if it was possible to decode
      */
-    public func getAsset<T>(_ json: String, plugins: [NativePlugin] = []) -> T? {
-        guard let flow = makeFlow(json) else { return nil }
-        let player = TestPlayer<WrappedAsset, SwiftUIRegistry>(plugins: plugins + self.plugins() + [self], registry: SwiftUIRegistry(logger: TapableLogger()))
-        let update = expectation(description: "initial view update")
-        var rootVal: JSValue?
-        player.hooks?.viewController.tap({ (viewController) in
-            viewController.hooks.view.tap { (view) in
-                view.hooks.onUpdate.tap { val in
-                    rootVal = val
-                    update.fulfill()
-                }
-            }
-        })
-        player.start(flow: flow) {_ in }
-        wait(for: [update], timeout: 2)
-        let jsValue = context.createAssetJsValue(string: json)
-        do {
-            return try player.assetRegistry.decode(jsValue) as? T
-        } catch {
-            // If the user passed in an entire flow, decode the asset that was the root of
-            // the flow
-            guard let root = rootVal else { return nil }
-            return try? player.assetRegistry.decode(root) as? T
-        }
+    public func getAsset<T>(_ json: String, plugins: [NativePlugin] = []) async -> T? {
+        await helper.getAsset(json, plugins: plugins + self.plugins() + [self])
     }
 
     /**
@@ -84,14 +68,6 @@ open class SwiftUIAssetUnitTestCase: AssetUnitTestCaseBase, NativePlugin {
      - returns: A WrappedFunction that will call your completion handler
      */
     public func getWrappedFunction<T>(completion: @escaping () -> Void) -> WrappedFunction<T>? {
-        let callback: @convention(block) (JSValue) -> JSValue = { value in
-            completion()
-            return value
-        }
-
-        guard
-            let function = JSValue(object: callback, in: context)
-        else { return nil }
-        return WrappedFunction(rawValue: function)
+        helper.getWrappedFunction(completion: completion)
     }
 }
