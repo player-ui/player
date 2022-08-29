@@ -2,9 +2,9 @@ import XCTest
 
 class CollectionAssetUITests: BaseTestCase {
     func testBasicCollection() {
-        withEyes("collection basic") { eyes in
+        withEyes("collection basic") { check in
             waitFor(app.otherElements["view-1"])
-            eyes?.checkApp(withTag: "Page Load")
+            check("Page Load")
             let value1 = app.staticTexts["text-1"].label
             let value2 = app.staticTexts["text-2"].label
 

@@ -2,9 +2,9 @@ import XCTest
 
 class TextAssetUITests: BaseTestCase {
     func testBasicText() {
-        withEyes("text basic") { eyes in
+        withEyes("text basic") { check in
             waitFor(app.staticTexts["text-1"])
-            eyes?.checkApp(withTag: "Page Load")
+            check("Page Load")
             let text = app.staticTexts["text-1"].label
             XCTAssertEqual(text, "This is some text.")
 

@@ -68,17 +68,22 @@ class BaseTestCase: AssetUITestCase {
         }
     }
 
-    func withEyes(_ mockName: String, testName: String? = nil, body: (Eyes?) -> Void) {
+    func withEyes(_ mockName: String, testName: String? = nil, body: (ApplitoolsCheck) -> Void) {
         openFlow(mockName)
-        guard key != nil else { return body(nil) }
+        guard key != nil else { return body({ _ in }) }
         eyes.open(withApplicationName: "iOS Reference Assets", testName: "\(testName ?? mockName)")
-        body(eyes)
+        body({ tag in
+            XCTWaiter.delay()
+            eyes.checkApp(withTag: tag)
+        })
     }
 
     func withOutEyes(_ mockName: String, body: () -> Void) {
         openFlow(mockName)
         body()
     }
+
+    public typealias ApplitoolsCheck = (String) -> Void
 }
 
 extension Eyes {
@@ -88,5 +93,12 @@ extension Eyes {
         } else {
             self.checkWindow(withTag: tag)
         }
+    }
+}
+
+extension XCTWaiter {
+    @discardableResult
+    static func delay(ms duration: TimeInterval = 0.5) -> XCTWaiter.Result {
+        wait(for: [XCTestExpectation(description: "Fixed Delay")], timeout: duration)
     }
 }
