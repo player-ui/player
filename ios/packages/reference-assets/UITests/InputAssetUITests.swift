@@ -2,18 +2,18 @@ import XCTest
 
 class InputAssetUITests: BaseTestCase {
     func testBasicInput() {
-        withEyes("input basic") { eyes in
+        withEyes("input basic") { check in
             let enteredValue = "Hello World"
 
             waitFor(app.textFields["input"])
-            eyes?.checkApp(withTag: "Page Load")
+            check("Page Load")
             app.textFields["input"].firstMatch.tap()
             app.textFields["input"].firstMatch.typeText(enteredValue)
             app.textFields["input"].firstMatch.typeText("\n")
 
             waitFor(app.textFields["input"])
 
-            eyes?.checkApp(withTag: "Text Entered")
+            check("Text Entered")
 
             let labelValue = app.textFields["input"].firstMatch.value as? String
 
@@ -22,12 +22,12 @@ class InputAssetUITests: BaseTestCase {
     }
 
     func testInputValidation() {
-        withEyes("input validation") { eyes in
+        withEyes("input validation") { check in
             let enteredValue = "Hello World"
 
             waitFor(app.textFields["input-1"])
 
-            eyes?.checkApp(withTag: "Page Load")
+            check("Page Load")
 
             app.textFields["input-1"].firstMatch.tap()
             app.textFields["input-1"].firstMatch.typeText(enteredValue)
@@ -36,7 +36,7 @@ class InputAssetUITests: BaseTestCase {
             waitFor(app.textFields["input-1"])
             XCTAssertTrue(app.staticTexts["input-1-validation"].firstMatch.exists)
 
-            eyes?.checkApp(withTag: "input 1 validation active")
+            check("input 1 validation active")
 
             app.textFields["input-1"].firstMatch.tap()
             app.textFields["input-1"].firstMatch.typeText("55")
@@ -44,7 +44,7 @@ class InputAssetUITests: BaseTestCase {
 
             waitFor(app.textFields["input-1"])
             XCTAssertFalse(app.staticTexts["input-1-validation"].firstMatch.exists)
-            eyes?.checkApp(withTag: "input 1 validation inactive")
+            check("input 1 validation inactive")
         }
     }
 }
