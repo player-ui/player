@@ -12,7 +12,7 @@ def kt_asset_test(
         custom_package = "com.intuit.player.android.reference.assets",
         test_class = test_class,
         deps = deps + [
-            "//plugins/reference-assets/android/src/test/java/com/intuit/player/android/reference/assets/test",
+            "//plugins/reference-assets/android/src/androidTest/java/com/intuit/player/android/reference/assets/test",
             "//jvm/j2v8:j2v8-all",
         ],
         resources = [

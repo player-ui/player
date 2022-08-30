@@ -1,5 +1,5 @@
 load("@io_bazel_rules_kotlin//kotlin:android.bzl", "kt_android_library")
-load(":deps.bzl", "main_deps")
+load(":deps.bzl", "main_deps", "main_exports")
 
 kt_android_library(
     name = "assets",
@@ -8,5 +8,6 @@ kt_android_library(
     manifest = ":src/main/AndroidManifest.xml",
     resource_files = glob(["src/main/res/**"]),
     deps = main_deps,
+    exports = main_exports,
     visibility = ["//visibility:public"],
 )

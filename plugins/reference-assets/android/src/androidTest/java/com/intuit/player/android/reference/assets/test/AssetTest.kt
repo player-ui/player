@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Build.VERSION_CODES.P
 import android.view.View
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.runner.AndroidJUnit4
 import com.intuit.player.android.AndroidPlayer
 import com.intuit.player.android.asset.RenderableAsset
 import com.intuit.player.android.reference.assets.ReferenceAssetsPlugin
@@ -25,10 +25,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TestName
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
-@Config(sdk = [P])
 abstract class AssetTest(val group: String? = null) {
 
     @get:Rule
