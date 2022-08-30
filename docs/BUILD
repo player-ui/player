@@ -27,7 +27,8 @@ stamp_tar_files(
     tar = ":full_site",
     substitutions = {
       "NEXT_PUBLIC_GA_MEASUREMENT_ID": "{STABLE_GA_MEASUREMENT_ID}",
-      "DOCS_BASE_PATH": "{STABLE_DOCS_BASE_PATH}"
+      "DOCS_BASE_PATH": "{STABLE_DOCS_BASE_PATH}",
+      "ALGOLIA_SEARCH_API_KEY": "{STABLE_ALGOLIA_SEARCH_API_KEY}",
   },
 )
 

@@ -26,6 +26,7 @@ data = [
   "@npm//@chakra-ui/react",
   "@npm//@chakra-ui/skip-nav",
   "@npm//@chakra-ui/icons",
+  "@npm//@docsearch/react",
   "@npm//lunr",
   "@npm//globby",
   "@npm//react-icons",
