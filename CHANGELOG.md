@@ -1,3 +1,47 @@
+# 0.2.0 (Tue Aug 30 2022)
+
+#### 🚀 Enhancement
+
+- Sync changes up to 57537b9 [#69](https://github.com/player-ui/player/pull/69) ([@adierkens](https://github.com/adierkens))
+
+#### 🐛 Bug Fix
+
+- Remove exit on error flag in release script [#75](https://github.com/player-ui/player/pull/75) ([@adierkens](https://github.com/adierkens))
+- Release main [#73](https://github.com/player-ui/player/pull/73) ([@intuit-svc](https://github.com/intuit-svc))
+- add delay before screenshotting for animations to finish [#72](https://github.com/player-ui/player/pull/72) ([@hborawski](https://github.com/hborawski))
+- Release main [#71](https://github.com/player-ui/player/pull/71) ([@intuit-svc](https://github.com/intuit-svc))
+- split out test helper functionality so XCTest isn't a hard requirement [#70](https://github.com/player-ui/player/pull/70) ([@hborawski](https://github.com/hborawski))
+- Remove unused react-types package [#68](https://github.com/player-ui/player/pull/68) ([@adierkens](https://github.com/adierkens))
+- switch removal from empty node [#67](https://github.com/player-ui/player/pull/67) (marlon_ercillo@intuit.com [@mercillo](https://github.com/mercillo))
+- upgrade to xcode 13.4.1 [#65](https://github.com/player-ui/player/pull/65) ([@hborawski](https://github.com/hborawski))
+- dont use bazel to push since the stamping wont work after shipit [#63](https://github.com/player-ui/player/pull/63) ([@hborawski](https://github.com/hborawski))
+- try/catch pod push in plugin [#62](https://github.com/player-ui/player/pull/62) ([@hborawski](https://github.com/hborawski))
+- move pod push to afterShipIt to have upload-assets finish first [#61](https://github.com/player-ui/player/pull/61) ([@hborawski](https://github.com/hborawski))
+- Add workflow for fixing tags after failed release [#60](https://github.com/player-ui/player/pull/60) ([@adierkens](https://github.com/adierkens))
+- fix pod release plugin [#59](https://github.com/player-ui/player/pull/59) ([@hborawski](https://github.com/hborawski))
+- add local auto plugin to run bazel pod push after release [#57](https://github.com/player-ui/player/pull/57) ([@hborawski](https://github.com/hborawski))
+- Fix the bin entry for the cli [#58](https://github.com/player-ui/player/pull/58) ([@adierkens](https://github.com/adierkens))
+- allow caching ios tests again [#56](https://github.com/player-ui/player/pull/56) ([@hborawski](https://github.com/hborawski))
+- set applitools env variables for iOS tests [#27](https://github.com/player-ui/player/pull/27) ([@hborawski](https://github.com/hborawski))
+- fix IR backend for kotlinx serialization [#55](https://github.com/player-ui/player/pull/55) ([@sugarmanz](https://github.com/sugarmanz))
+- Add subpath support for published docs [#54](https://github.com/player-ui/player/pull/54) ([@adierkens](https://github.com/adierkens))
+- enhance error state deserialization & stacktrace logging in player view model [#50](https://github.com/player-ui/player/pull/50) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### 📝 Documentation
+
+- added templates to content navigation, fixed the link to reference as… [#51](https://github.com/player-ui/player/pull/51) (marlon_ercillo@intuit.com [@mercillo](https://github.com/mercillo))
+
+#### Authors: 6
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Marlon Ercillo ([@mercillo](https://github.com/mercillo))
+- mercillo (marlon_ercillo@intuit.com)
+
+---
+
 # 0.1.0 (Tue Aug 02 2022)
 
 ### Release Notes
