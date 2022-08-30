@@ -18,6 +18,7 @@ import {
 import { SearchIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import Link from 'next/link';
 import lunr from 'lunr';
+import { AlgoliaSearch } from './AlgoliaSearch';
 
 interface SearchIndex {
   /** The title of the page */
@@ -102,7 +103,7 @@ const SearchResult = (props: SearchIndex) => {
   );
 };
 
-export const SearchInput = () => {
+export const FallbackSearchInput = () => {
   const { search, results, clear } = useSearch();
   const [searchActive, setSearchActive] = React.useState(false);
   const [query, setQuery] = React.useState('');
@@ -159,4 +160,17 @@ export const SearchInput = () => {
       </Popover>
     </Box>
   );
+};
+
+export const SearchInput = () => {
+  // Only use algolia search if we're on the /latest/ version
+  // it's the only one that's indexed
+  if (
+    typeof window !== 'undefined' &&
+    window.location.pathname.includes('/latest/')
+  ) {
+    return <AlgoliaSearch />;
+  }
+
+  return <FallbackSearchInput />;
 };

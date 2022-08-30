@@ -1,7 +1,7 @@
 import React from 'react';
 import type { AppProps, NextWebVitalsMetric } from 'next/app';
 import { GoogleAnalytics, event, usePageViews } from 'nextjs-google-analytics';
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, useColorMode } from '@chakra-ui/react';
 import { theme } from '../components/chakra-theme';
 import { Context } from '../components/Context';
 import './global.css';
@@ -21,6 +21,18 @@ export function reportWebVitals({
   });
 }
 
+// algolia uses data-theme to swap in CSS
+// Sync the chakra theme w/ the document
+const HTMLThemeSetter = () => {
+  const { colorMode } = useColorMode();
+
+  React.useEffect(() => {
+    document.documentElement.setAttribute('data-theme', colorMode);
+  }, [colorMode]);
+
+  return null;
+};
+
 const MyApp = ({ Component, pageProps }: AppProps) => {
   usePageViews();
 
@@ -29,6 +41,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
       <GoogleAnalytics />
       <ChakraProvider theme={theme}>
         <Context>
+          <HTMLThemeSetter />
           <Component {...pageProps} />
         </Context>
       </ChakraProvider>
