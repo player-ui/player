@@ -22,10 +22,11 @@ versions = struct(
     jmh = "1.21",
     androidx = struct(
         activity = "1.2.3",
-        appcompat = "1.3.0",
-        constraintlayout = "2.1.4",
-        core = "1.8.0",
+        appcompat = "1.2.0",
+        constraintlayout = "2.0.4",
+        core = "1.3.2",
         databinding = "7.2.2",
+        fragment = "1.3.4",
         lifecycle = "2.4.0",
         navigation = "2.3.3",
         test = struct(
@@ -38,4 +39,5 @@ versions = struct(
     javax = struct(
         inject = "1",
     ),
+    material_dialogs = "3.3.0",
 )

@@ -3,43 +3,50 @@ load("@rules_player//maven:parse_coordinates.bzl", "parse_coordinates")
 load("@rules_jvm_external//:specs.bzl", _maven = "maven")
 
 maven_main = [
-        "androidx.appcompat:appcompat:1.2.0",
-        "androidx.core:core-ktx:1.3.2",
-        "androidx.constraintlayout:constraintlayout:2.0.4",
-#        "androidx.navigation:navigation-fragment-ktx:2.3.3",
-#        "androidx.navigation:navigation-ui-ktx:2.3.3",
-#        "androidx.navigation:navigation-fragment:2.3.3",
-#        "androidx.navigation:navigation-ui:2.3.3",
-#        "androidx.navigation:navigation-runtime:2.3.3",
-        "com.afollestad.material-dialogs:core:3.3.0",
+    "androidx.appcompat:appcompat:%s" % versions.androidx.appcompat,
+    "androidx.core:core-ktx:%s" % versions.androidx.core,
+    "androidx.constraintlayout:constraintlayout:%s" % versions.androidx.constraintlayout,
 
-    "androidx.lifecycle:lifecycle-runtime-ktx:%s" % versions.androidx.lifecycle,
-    "androidx.lifecycle:lifecycle-viewmodel-ktx:%s" % versions.androidx.lifecycle,
-    #"com.squareup.leakcanary:leakcanary-android:2.2",
+#    "androidx.lifecycle:lifecycle-runtime:%s" % versions.androidx.lifecycle,
+#    "androidx.lifecycle:lifecycle-viewmodel:%s" % versions.androidx.lifecycle,
 
-    "androidx.activity:activity-ktx:%s" % versions.androidx.activity,
+#    "androidx.lifecycle:lifecycle-runtime-ktx:%s" % versions.androidx.lifecycle,
+#    "androidx.lifecycle:lifecycle-viewmodel-ktx:%s" % versions.androidx.lifecycle,
 
-    _maven.artifact(
-        group = "androidx.navigation",
-        artifact = "navigation-runtime-ktx",
-        version = versions.androidx.navigation,
-#        exclusions = ["androidx.activity:activity-ktx","androidx.activity:activity"],
-    ),
+    "androidx.navigation:navigation-runtime:%s" % versions.androidx.navigation,
+    "androidx.navigation:navigation-ui:%s" % versions.androidx.navigation,
+    "androidx.navigation:navigation-fragment:%s" % versions.androidx.navigation,
 
-    _maven.artifact(
-        group = "androidx.navigation",
-        artifact = "navigation-ui-ktx",
-        version = versions.androidx.navigation,
+    "androidx.navigation:navigation-runtime-ktx:%s" % versions.androidx.navigation,
+    "androidx.navigation:navigation-ui-ktx:%s" % versions.androidx.navigation,
+    "androidx.navigation:navigation-fragment-ktx:%s" % versions.androidx.navigation,
+
+#    "androidx.fragment:fragment:%s" % versions.androidx.fragment,
+#    "androidx.fragment:fragment-ktx:%s" % versions.androidx.fragment,
+#
+#    "androidx.activity:activity:%s" % versions.androidx.activity,
+#    "androidx.activity:activity-ktx:%s" % versions.androidx.activity,
+#    _maven.artifact(
+#        group = "androidx.navigation",
+#        artifact = "navigation-runtime-ktx",
+#        version = versions.androidx.navigation,
+#        #        exclusions = ["androidx.activity:activity-ktx","androidx.activity:activity"],
+#    ),
+#    _maven.artifact(
+#        group = "androidx.navigation",
+#        artifact = "navigation-ui-ktx",
+#        version = versions.androidx.navigation,
+#        #        exclusions = ["androidx.fragment:fragment-ktx"],
+#    ),
+#    _maven.artifact(
+#        group = "androidx.navigation",
+#        artifact = "navigation-fragment-ktx",
+#        version = versions.androidx.navigation,
 #        exclusions = ["androidx.fragment:fragment-ktx"],
-    ),
+#    ),
 
-    _maven.artifact(
-        group = "androidx.navigation",
-        artifact = "navigation-fragment-ktx",
-        version = versions.androidx.navigation,
-        exclusions = ["androidx.fragment:fragment-ktx"],
-    ),
-#    "androidx.window:window:1.0.0"
+    "com.afollestad.material-dialogs:core:%s" % versions.material_dialogs,
+    #"com.squareup.leakcanary:leakcanary-android:2.2",
 ]
 
 maven_test = [
