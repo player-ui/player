@@ -6,7 +6,8 @@ import com.intuit.player.android.AssetContext
 import com.intuit.player.android.asset.DecodableAsset
 import com.intuit.player.android.reference.assets.text.Text
 import com.intuit.player.plugins.transactions.commitPendingTransaction
-import kotlinx.serialization.*
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
 
 class Action(assetContext: AssetContext) : DecodableAsset<Action.Data>(assetContext, Data.serializer()) {
 

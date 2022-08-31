@@ -1,7 +1,6 @@
 package com.intuit.player.android.reference.assets.test
 
 import android.content.Context
-import android.os.Build.VERSION_CODES.P
 import android.view.View
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.runner.AndroidJUnit4
