@@ -177,7 +177,7 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
         private val factory: (AsyncFlowIterator) -> T = { i -> PlayerViewModel(i) as T }
     ) : ViewModelProvider.Factory {
 
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return factory(iterator).apply(PlayerViewModel::start) as T
         }
     }

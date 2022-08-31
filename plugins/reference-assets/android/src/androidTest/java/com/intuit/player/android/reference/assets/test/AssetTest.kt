@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Build.VERSION_CODES.P
 import android.view.View
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.runner.AndroidJUnit4
 import com.intuit.player.android.AndroidPlayer
 import com.intuit.player.android.asset.RenderableAsset
 import com.intuit.player.android.reference.assets.ReferenceAssetsPlugin
