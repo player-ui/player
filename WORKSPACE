@@ -156,8 +156,6 @@ register_toolchains("@androidndk//:all")
 load("//jvm/dependencies:deps.bzl", artifacts = "maven")
 load("@rules_jvm_external//:defs.bzl", "maven_install")
 
-print(artifacts)
-
 maven_install(
     artifacts = artifacts,
     fetch_sources = True,

@@ -13,6 +13,7 @@ versions = struct(
     ),
     hooks = "0.11.1",
     testing = struct(
+        applitools = "4.7.6",
         junit = "4.12",
         jupiter = "5.6.0",
         kluent = "1.68",
@@ -31,6 +32,7 @@ versions = struct(
         navigation = "2.3.3",
         test = struct(
             core = "1.4.0",
+            espresso = "3.3.0",
             junit = "1.1.3",
         ),
         transition = "1.4.1",

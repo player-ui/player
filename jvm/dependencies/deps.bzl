@@ -1,3 +1,4 @@
+load("@rules_player//javascript:utils.bzl", "remove_duplicates")
 load(":common.bzl", common = "maven")
 load("//android:deps.bzl", android = "maven")
 load("//jvm/core:deps.bzl", core = "maven")
@@ -12,4 +13,4 @@ load("@grab_bazel_common//:workspace_defs.bzl", grab = "GRAB_BAZEL_COMMON_ARTIFA
 
 tooling = distribution + grab
 
-maven = common + core + graaljs + j2v8 + utils + testutils + perf + plugins + tooling + android
+maven = remove_duplicates(common + core + graaljs + j2v8 + utils + testutils + perf + plugins + tooling + android)
