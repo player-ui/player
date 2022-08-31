@@ -42,5 +42,5 @@ versions = struct(
         inject = "1",
     ),
     material_dialogs = "3.3.0",
-    material = "1.5.0",
+    material = "1.4.0",
 )
