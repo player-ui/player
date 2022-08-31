@@ -1,4 +1,5 @@
 load("@io_bazel_rules_kotlin//kotlin:android.bzl", "kt_android_library")
+load("@rules_player//kotlin:lint.bzl", "lint")
 load(":deps.bzl", "main_deps", "main_exports")
 
 kt_android_library(
@@ -11,3 +12,10 @@ kt_android_library(
     exports = main_exports,
     visibility = ["//visibility:public"],
 )
+
+lint(
+    name = "assets",
+    srcs = glob(["src/main/**/*.kt"]),
+    lint_config = "//jvm:lint_config",
+)
+

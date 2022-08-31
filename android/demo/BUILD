@@ -3,6 +3,7 @@ load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_import")
 load("@io_bazel_rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load(":deps.bzl", "main_deps", "test_deps")
 load("//android:build.bzl", "applitools_config")
+load("@rules_player//kotlin:lint.bzl", "lint")
 
 kt_android_library(
     name = "demo_lib",
@@ -79,4 +80,10 @@ sh_test(
         ":demo",
         ":demo_test_app",
     ],
+)
+
+lint(
+    name = "demo",
+    srcs = glob(["src/**/*.kt"]),
+    lint_config = "//jvm:lint_config",
 )

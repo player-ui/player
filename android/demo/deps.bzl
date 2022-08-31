@@ -1,6 +1,5 @@
 load("//jvm/dependencies:versions.bzl", "versions")
 load("@rules_player//maven:parse_coordinates.bzl", "parse_coordinates")
-load("@rules_jvm_external//:specs.bzl", _maven = "maven")
 
 maven_main = [
     "androidx.navigation:navigation-runtime:%s" % versions.androidx.navigation,

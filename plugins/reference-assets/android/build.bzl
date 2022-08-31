@@ -1,4 +1,5 @@
 load("@io_bazel_rules_kotlin//kotlin:android.bzl", "kt_android_local_test")
+load("@rules_player//kotlin:lint.bzl", "lint")
 
 def kt_asset_test(
         name,
@@ -21,4 +22,10 @@ def kt_asset_test(
         manifest_values = {
             "minSdkVersion": "14",
         },
+    )
+
+    lint(
+        name = name,
+        srcs = native.glob(["**/*.kt"]),
+        lint_config = "//jvm:lint_config",
     )
