@@ -8,14 +8,11 @@ maven = [
     "androidx.transition:transition:%s" % versions.androidx.transition,
 
     # Lifecycle
-#    "androidx.lifecycle:lifecycle-runtime-ktx:%s" % versions.androidx.lifecycle,
-#    "androidx.lifecycle:lifecycle-viewmodel-ktx:%s" % versions.androidx.lifecycle,
+    "androidx.lifecycle:lifecycle-runtime-ktx:%s" % versions.androidx.lifecycle,
+    "androidx.lifecycle:lifecycle-viewmodel-ktx:%s" % versions.androidx.lifecycle,
 
     # Default fallback
     "androidx.constraintlayout:constraintlayout:%s" % versions.androidx.constraintlayout,
-
-    "androidx.navigation:navigation-ui-ktx:%s" % versions.androidx.navigation,
-    "androidx.navigation:navigation-fragment-ktx:%s" % versions.androidx.navigation,
 ]
 
 main_exports = [

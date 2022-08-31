@@ -6,14 +6,16 @@ android = [
     # Grab Databinding
     "androidx.databinding:databinding-adapters:%s" % versions.androidx.databinding,
     "androidx.databinding:databinding-common:%s" % versions.androidx.databinding,
-#    "androidx.databinding:databinding-compiler:%s" % versions.androidx.databinding,
     "androidx.databinding:databinding-runtime:%s" % versions.androidx.databinding,
 
     # Grab Dagger
     "com.google.dagger:dagger:%s" % versions.dagger,
     "com.google.dagger:dagger-compiler:%s" % versions.dagger,
-#    "com.google.dagger:dagger-producers:%s" % versions.dagger,
     "javax.inject:javax.inject:%s" % versions.javax.inject,
+
+    # AndroidX Resolutions
+    "androidx.activity:activity-ktx:%s" % versions.androidx.activity,
+    "androidx.fragment:fragment-ktx:%s" % versions.androidx.fragment,
 ]
 
 maven = android + player + demo
