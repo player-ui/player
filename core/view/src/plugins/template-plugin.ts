@@ -1,5 +1,5 @@
 import { SyncWaterfallHook } from 'tapable-ts';
-import type { Parser, Node } from '../parser';
+import type { Node, ParseObjectOptions, Parser } from '../parser';
 import { NodeType } from '../parser';
 import type { ViewPlugin } from '.';
 import type { View } from './plugin';
@@ -120,6 +120,34 @@ export default class TemplatePlugin implements ViewPlugin {
 
       return node;
     });
+
+    parser.hooks.determineNodeType.tap('template', (obj: any) => {
+      if (obj === 'template') {
+        return NodeType.Template;
+      }
+    });
+
+    parser.hooks.parseNode.tap(
+      'template',
+      (obj: any, nodeType: null | NodeType, options: ParseObjectOptions) => {
+        if (nodeType === NodeType.Template) {
+          const templateNode = parser.hooks.onCreateASTNode.call(
+            {
+              type: NodeType.Template,
+              depth: options.templateDepth ?? 0,
+              data: obj.data,
+              template: obj.value,
+              dynamic: obj.dynamic ?? false,
+            },
+            obj
+          );
+
+          if (templateNode) {
+            return templateNode;
+          }
+        }
+      }
+    );
   }
 
   applyResolverHooks(resolver: Resolver) {

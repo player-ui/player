@@ -33,6 +33,7 @@ describe('applicability', () => {
   });
 
   it('removes empty objects', () => {
+    new ApplicabilityPlugin().applyParser(parser);
     const root = parser.parseObject({
       asset: {
         values: [
@@ -55,13 +56,17 @@ describe('applicability', () => {
     expect(resolver.update()).toStrictEqual({
       asset: { values: [{ value: 'foo' }, { value: 'bar' }] },
     });
+    console.log('resolver.update 1:', resolver.update());
+
     model.set([['foo', false]]);
     expect(resolver.update()).toStrictEqual({
       asset: { values: [{ value: 'bar' }] },
     });
+    console.log('resolver.update 2:', resolver.update());
   });
 
   it('removes asset wrappers', () => {
+    new ApplicabilityPlugin().applyParser(parser);
     const root = parser.parseObject({
       asset: {
         title: {
@@ -89,6 +94,7 @@ describe('applicability', () => {
   });
 
   it('handles empty models', () => {
+    new ApplicabilityPlugin().applyParser(parser);
     const root = parser.parseObject({
       asset: {
         values: [
