@@ -130,7 +130,6 @@ export default class TemplatePlugin implements ViewPlugin {
     parser.hooks.parseNode.tap(
       'template',
       (obj: any, nodeType: null | NodeType, options: ParseObjectOptions) => {
-        console.log('calling parseNode with template', obj);
         if (nodeType === NodeType.Template) {
           const templateNode = parser.createASTNode(
             {
@@ -143,10 +142,7 @@ export default class TemplatePlugin implements ViewPlugin {
             obj
           );
 
-          console.log('created templateNode', templateNode);
-
           if (templateNode) {
-            console.log('returning templateNode', templateNode);
             return templateNode;
           }
         }

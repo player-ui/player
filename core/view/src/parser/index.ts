@@ -77,13 +77,12 @@ export class Parser {
     type: Node.ChildrenTypes = NodeType.Value,
     options: ParseObjectOptions = { templateDepth: 0 }
   ): Node.Node | null {
-    console.log('calling parseObj on obj: ', obj);
+
     const nodeType = this.hooks.determineNodeType.call(obj);
 
     if (nodeType !== undefined) {
       const parsedNode = this.hooks.parseNode.call(obj, nodeType, options);
       if (parsedNode) {
-        console.log('returning parsedNode', parsedNode);
         return parsedNode;
       }
     }
@@ -91,7 +90,6 @@ export class Parser {
     let children: Node.Child[] = [];
 
     const parseLocalObject = (objToParse: unknown, path: string[] = []) => {
-      console.log('times parseLocalObject is called');
       if (typeof objToParse !== 'object' || objToParse === null) {
         value = objToParse;
         return;
@@ -108,7 +106,6 @@ export class Parser {
         : Object.entries(localObj);
 
       objEntries.forEach(([localKey, localValue]) => {
-        console.log('running for each entry');
         if (localKey === 'asset' && typeof localValue === 'object') {
           const assetAST = this.parseObject(
             localValue,

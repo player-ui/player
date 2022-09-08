@@ -59,7 +59,6 @@ export default class ApplicabilityPlugin implements ViewPlugin {
               applicabilityNode.value.parent = applicabilityNode;
             }
 
-            console.log('creating applicabilityNode', applicabilityNode);
             return applicabilityNode;
           }
 
