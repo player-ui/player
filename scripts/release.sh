@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # See https://github.com/bazelbuild/rules_nodejs/blob/stable/scripts/publish_release.sh 
 
-set -u -e -o pipefail
+set -u -o pipefail
 
 readonly PKG_NPM_LABELS=`bazel query --output=label 'kind("pkg_npm rule", //...) - attr("tags", "\[.*do-not-publish.*\]", //...)'`
 NPM_TAG=canary

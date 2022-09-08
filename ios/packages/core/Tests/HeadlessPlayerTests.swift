@@ -155,6 +155,25 @@ class HeadlessPlayerTests: XCTestCase {
         XCTAssertNotNil(state.controllers)
     }
 
+    func testRegisterPlugin() {
+        class RegisterMePlugin: JSBasePlugin {
+            convenience init() {
+                self.init(fileName: "", pluginName: "")
+            }
+
+            override func setup(context: JSContext) {}
+        }
+        let player = HeadlessPlayerImpl(plugins: [])
+
+        player.start(flow: FlowData.COUNTER) { _ in  }
+
+        let plugin = RegisterMePlugin()
+
+        player.registerPlugin(plugin)
+
+        XCTAssertNotNil(plugin.context)
+    }
+
     func testEmptyFlowObject() {
         let player = HeadlessPlayerImpl(plugins: [])
         player.start(flow: "{}") { (result) in

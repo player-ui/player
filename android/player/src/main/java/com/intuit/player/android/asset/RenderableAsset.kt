@@ -10,7 +10,6 @@ import com.intuit.player.android.extensions.Styles
 import com.intuit.player.android.extensions.removeSelf
 import com.intuit.player.jvm.core.asset.Asset
 import com.intuit.player.jvm.core.asset.AssetWrapper
-import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
 import com.intuit.player.jvm.core.bridge.serialization.encoding.requireNodeDecoder

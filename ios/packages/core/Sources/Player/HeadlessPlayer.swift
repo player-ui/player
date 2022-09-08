@@ -202,6 +202,15 @@ public extension HeadlessPlayer {
             ]])
     }
 
+    /// Registers a plugin with player after instantiation
+    /// Primarily for plugins to be able to add other plugins to player
+    /// - Parameter plugin: The plugin to register
+    func registerPlugin<P: JSBasePlugin>(_ plugin: P) {
+        assert(jsPlayerReference != nil, "Cannot register plugins before setuPlayer(context:plugins:) is called")
+        plugin.context = jsPlayerReference?.context
+        jsPlayerReference?.invokeMethod("registerPlugin", withArguments: [plugin.pluginRef as Any])
+    }
+
     /**
      Starts Player for the given flow
      - parameters:

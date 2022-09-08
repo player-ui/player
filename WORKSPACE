@@ -157,22 +157,7 @@ load("//jvm/dependencies:deps.bzl", artifacts = "maven")
 load("@rules_jvm_external//:defs.bzl", "maven_install")
 
 maven_install(
-    artifacts = artifacts + [
-        "androidx.databinding:databinding-adapters:7.1.0",
-        "androidx.databinding:databinding-common:7.1.0",
-        "androidx.databinding:databinding-compiler:7.1.0",
-        "androidx.databinding:databinding-runtime:7.1.0",
-        "androidx.annotation:annotation:1.3.0",
-        "com.google.dagger:dagger:2.35.1",
-        "com.google.dagger:dagger-compiler:2.35.1",
-        "com.google.dagger:dagger-producers:2.35.1",
-        "javax.inject:javax.inject:1",
-        "org.robolectric:robolectric:4.8",
-        "androidx.test:core:1.4.0",
-        "androidx.test.ext:junit-ktx:1.1.3",
-        "junit:junit:4.12",
-        "org.junit.vintage:junit-vintage-engine:5.6.0",
-    ],
+    artifacts = artifacts,
     fetch_sources = True,
     override_targets = overridden_targets,
     repositories = [

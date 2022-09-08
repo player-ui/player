@@ -30,7 +30,6 @@ class ExampleAsset: UncontrolledAsset<ExampleAssetData> {
     override var view: AnyView { AnyView(ExampleAssetView(model: model)) }
 }
 
-
 class AssetUnitTestDefaultTests: SwiftUIAssetUnitTestCase {
     func testDefaultRegister() {
         let player = TestPlayer<WrappedAsset, SwiftUIRegistry>(plugins: [self], registry: SwiftUIRegistry(logger: TapableLogger()))
@@ -52,19 +51,19 @@ class AssetUnitTestCaseTests: SwiftUIAssetUnitTestCase {
         XCTAssertEqual(0, self.plugins().count)
     }
 
-    func testShouldNotDecode() {
+    func testShouldNotDecode() async {
         let assetJSON = """
         {
             "id": "test-id",
             "type": "test"
         }
         """
-        let asset: ExampleAsset? = getAsset(assetJSON)
+        let asset: ExampleAsset? = await getAsset(assetJSON)
 
         XCTAssertNil(asset)
     }
 
-    func testShouldDecode() {
+    func testShouldDecode() async {
         let assetJSON = """
         {
             "id": "test-id",
@@ -72,13 +71,13 @@ class AssetUnitTestCaseTests: SwiftUIAssetUnitTestCase {
             "value": "test value"
         }
         """
-        let asset: ExampleAsset? = getAsset(assetJSON)
+        let asset: ExampleAsset? = await getAsset(assetJSON)
 
         XCTAssertNotNil(asset)
         XCTAssertEqual("test value", asset?.model.data.value)
     }
 
-    func testShouldDecodeFlow() {
+    func testShouldDecodeFlow() async {
         let assetJSON = """
         {
           "id": "generated-flow",
@@ -109,13 +108,13 @@ class AssetUnitTestCaseTests: SwiftUIAssetUnitTestCase {
           }
         }
         """
-        let asset: ExampleAsset? = getAsset(assetJSON)
+        let asset: ExampleAsset? = await getAsset(assetJSON)
 
         XCTAssertNotNil(asset)
         XCTAssertEqual("test value", asset?.model.data.value)
     }
 
-    func testShouldRunFunction() {
+    func testShouldRunFunction() async {
         let assetJSON = """
         {
             "id": "test-id",
@@ -125,7 +124,7 @@ class AssetUnitTestCaseTests: SwiftUIAssetUnitTestCase {
         """
         let functionExpecation = expectation(description: "FunctionWrapper called")
         guard
-            let asset: ExampleAsset = getAsset(assetJSON),
+            let asset: ExampleAsset = await getAsset(assetJSON),
             let function: WrappedFunction<Void> = getWrappedFunction(completion: {
                 functionExpecation.fulfill()
             })

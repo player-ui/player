@@ -24,7 +24,7 @@ class InputAssetTests: SwiftUIAssetUnitTestCase {
         registry.register("text", asset: TextAsset.self)
     }
 
-    func testDecoding() throws {
+    func testDecoding() async throws {
         let json = """
         {
           "id": "input",
@@ -41,7 +41,7 @@ class InputAssetTests: SwiftUIAssetUnitTestCase {
         }
         """
 
-        guard let input: InputAsset = getAsset(json) else { return XCTFail("could not get asset") }
+        guard let input: InputAsset = await getAsset(json) else { return XCTFail("could not get asset") }
 
         _ = try input.view.inspect().find(InputAssetView.self).vStack().textField(1)
     }
@@ -123,9 +123,9 @@ class InputAssetTests: SwiftUIAssetUnitTestCase {
         XCTAssertEqual(Color(red: 0.729, green: 0.745, blue: 0.773), try background.foregroundColor())
     }
 
-    func testViewWithLabel() throws {
+    func testViewWithLabel() async throws {
         guard
-            let label: TextAsset = getAsset("{\"id\": \"text\", \"type\": \"text\", \"value\":\"hello world\"}")
+            let label: TextAsset = await getAsset("{\"id\": \"text\", \"type\": \"text\", \"value\":\"hello world\"}")
         else { return XCTFail("could not get asset") }
         let val = context.evaluateScript("('a')")
         let modelRef = ModelReference(rawValue: val)
@@ -142,7 +142,7 @@ class InputAssetTests: SwiftUIAssetUnitTestCase {
 
         let model = InputAssetViewModel(data)
 
-        let view = InputAssetView(model: model)
+        let view = await InputAssetView(model: model)
 
         let stack = try view.inspect().vStack()
 

@@ -59,19 +59,19 @@ class SwiftUIAssetUnitTestCaseTests: SwiftUIAssetUnitTestCase {
         XCTAssertEqual(0, self.plugins().count)
     }
 
-    func testShouldNotDecode() {
+    func testShouldNotDecode() async {
         let assetJSON = """
         {
             "id": "test-id",
             "type": "test"
         }
         """
-        let asset: ExampleSwiftUIAsset? = getAsset(assetJSON)
+        let asset: ExampleSwiftUIAsset? = await getAsset(assetJSON)
 
         XCTAssertNil(asset)
     }
 
-    func testShouldDecode() {
+    func testShouldDecode() async {
         let assetJSON = """
         {
             "id": "test-id",
@@ -79,13 +79,13 @@ class SwiftUIAssetUnitTestCaseTests: SwiftUIAssetUnitTestCase {
             "value": "test value"
         }
         """
-        let asset: ExampleSwiftUIAsset? = getAsset(assetJSON)
+        let asset: ExampleSwiftUIAsset? = await getAsset(assetJSON)
 
         XCTAssertNotNil(asset)
         XCTAssertEqual("test value", asset?.model.data.value)
     }
 
-    func testShouldDecodeFlow() {
+    func testShouldDecodeFlow() async {
         let assetJSON = """
         {
           "id": "generated-flow",
@@ -116,7 +116,7 @@ class SwiftUIAssetUnitTestCaseTests: SwiftUIAssetUnitTestCase {
           }
         }
         """
-        let asset: ExampleSwiftUIAsset? = getAsset(assetJSON)
+        let asset: ExampleSwiftUIAsset? = await getAsset(assetJSON)
 
         XCTAssertNotNil(asset)
         XCTAssertEqual("test value", asset?.model.data.value)

@@ -1,7 +1,6 @@
 package com.intuit.player.android.reference.assets.input
 
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.get
@@ -12,7 +11,6 @@ import com.intuit.player.android.reference.assets.test.shouldBeView
 import com.intuit.player.jvm.core.player.state.InProgressState
 import com.intuit.player.jvm.core.player.state.dataModel
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Test
 
 class InputTest : AssetTest("input") {

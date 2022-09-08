@@ -48,7 +48,7 @@ abstract class ApplitoolsTest {
     fun Eyes.checkPlayer(name: String) = check(name, Target.region(ViewMatchers.withId(R.id.player_canvas)))
 
     companion object {
-        val batchInfo = BatchInfo("reference-assets@${PR_NUMBER}").apply {
+        val batchInfo = BatchInfo("reference-assets@$PR_NUMBER").apply {
             // Only manually set the batch ID if it's not a hardcoded fallback
             if (BATCH_ID != "local") id = BATCH_ID
         }

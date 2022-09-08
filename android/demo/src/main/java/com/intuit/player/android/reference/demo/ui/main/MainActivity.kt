@@ -14,7 +14,6 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.*
 import com.google.android.material.navigation.NavigationView
 import com.intuit.player.android.reference.demo.R
-import com.intuit.player.android.reference.demo.lifecycle.DemoPlayerViewModel
 import com.intuit.player.android.reference.demo.model.AssetMock
 import com.intuit.player.android.reference.demo.model.StringMock
 import com.intuit.player.android.ui.PlayerFragment

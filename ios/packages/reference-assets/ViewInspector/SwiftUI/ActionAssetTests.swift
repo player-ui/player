@@ -24,7 +24,7 @@ class ActionAssetTests: SwiftUIAssetUnitTestCase {
     func setup() {
         XCUIApplication().terminate()
     }
-    func testAssetDecoding() throws {
+    func testAssetDecoding() async throws {
         let json = """
         {
           "id": "action",
@@ -40,7 +40,7 @@ class ActionAssetTests: SwiftUIAssetUnitTestCase {
         }
         """
 
-        guard let action: ActionAsset = getAsset(json) else {
+        guard let action: ActionAsset = await getAsset(json) else {
             return XCTFail("unable to get asset")
         }
 
@@ -57,8 +57,8 @@ class ActionAssetTests: SwiftUIAssetUnitTestCase {
         _ = try view.inspect().button()
     }
 
-    func testViewWithLabel() throws {
-        guard let text: TextAsset = getAsset("""
+    func testViewWithLabel() async throws {
+        guard let text: TextAsset = await getAsset("""
         {"id": "text", "type": "text", "value":"hello world"}
         """)
         else { return XCTFail("unable to get asset") }
@@ -66,7 +66,7 @@ class ActionAssetTests: SwiftUIAssetUnitTestCase {
 
         let model = AssetViewModel<ActionData>(data)
 
-        let view = ActionAssetView(model: model)
+        let view = await ActionAssetView(model: model)
 
         _ = try view.inspect().button()
 

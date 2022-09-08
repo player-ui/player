@@ -22,7 +22,7 @@ class InfoAssetTests: SwiftUIAssetUnitTestCase {
         registry.register("action", asset: ActionAsset.self)
     }
 
-    func testDecoding() throws {
+    func testDecoding() async throws {
         let json = """
         {
           "id": "view-1",
@@ -53,16 +53,16 @@ class InfoAssetTests: SwiftUIAssetUnitTestCase {
         }
         """
 
-        guard let info: InfoAsset = getAsset(json) else { return XCTFail("could not get asset") }
+        guard let info: InfoAsset = await getAsset(json) else { return XCTFail("could not get asset") }
 
         _ = try info.view.inspect().find(InfoAssetView.self)
     }
 
-    func testView() throws {
+    func testView() async throws {
         guard
-            let title: TextAsset = getAsset("{\"id\": \"text\", \"type\": \"text\", \"value\":\"hello world\"}"),
-            let action1: ActionAsset = getAsset("{\"id\": \"action1\", \"type\": \"action\", \"value\":\"next\"}"),
-            let action2: ActionAsset = getAsset("{\"id\": \"action2\", \"type\": \"action\", \"value\":\"prev\"}")
+            let title: TextAsset = await getAsset("{\"id\": \"text\", \"type\": \"text\", \"value\":\"hello world\"}"),
+            let action1: ActionAsset = await getAsset("{\"id\": \"action1\", \"type\": \"action\", \"value\":\"next\"}"),
+            let action2: ActionAsset = await getAsset("{\"id\": \"action2\", \"type\": \"action\", \"value\":\"prev\"}")
         else { return XCTFail("could not get assets") }
 
         let data = InfoData(
@@ -75,7 +75,7 @@ class InfoAssetTests: SwiftUIAssetUnitTestCase {
             ]
         )
         let model = AssetViewModel<InfoData>(data)
-        let view = InfoAssetView(model: model)
+        let view = await InfoAssetView(model: model)
 
         let stack = try view.inspect().vStack()
 
