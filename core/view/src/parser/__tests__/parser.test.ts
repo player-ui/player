@@ -2,7 +2,7 @@ import { BindingParser } from '@player-ui/binding';
 import { LocalModel, withParser } from '@player-ui/data';
 import { SchemaController } from '@player-ui/schema';
 import { NodeType, Parser } from '../index';
-import { SwitchPlugin, ApplicabilityPlugin, TemplatePlugin, ViewInstance } from '../..';
+import { SwitchPlugin, ApplicabilityPlugin, TemplatePlugin } from '../..';
 import type { Options } from '../../plugins/options';
 import { ExpressionEvaluator } from '../../../../expressions/src';
 import type { DataModelWithParser } from '../../../../player/src';
@@ -70,7 +70,7 @@ describe('generates the correct AST', () => {
   });
 
   test('parses a template', () => {
-    const petNames = ['Ginger',];
+    const petNames = ['Ginger'];
     model.set([['foo.bar', petNames]]);
 
     expect(

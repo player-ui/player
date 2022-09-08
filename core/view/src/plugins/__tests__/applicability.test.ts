@@ -56,13 +56,11 @@ describe('applicability', () => {
     expect(resolver.update()).toStrictEqual({
       asset: { values: [{ value: 'foo' }, { value: 'bar' }] },
     });
-    console.log('resolver.update 1:', resolver.update());
 
     model.set([['foo', false]]);
     expect(resolver.update()).toStrictEqual({
       asset: { values: [{ value: 'bar' }] },
     });
-    console.log('resolver.update 2:', resolver.update());
   });
 
   it('removes asset wrappers', () => {

@@ -2,7 +2,7 @@ import { omit } from 'timm';
 import type { ViewPlugin, View } from './plugin';
 import type { Options } from './options';
 import type { Resolver } from '../resolver';
-import type { Node, Parser } from '../parser';
+import type { Node, ParseObjectOptions, Parser } from '../parser';
 import { NodeType } from '../parser';
 
 /** A view plugin to remove inapplicable assets from the tree */
@@ -38,20 +38,12 @@ export default class ApplicabilityPlugin implements ViewPlugin {
 
     parser.hooks.parseNode.tap(
       'applicability',
-      (obj: any, nodeType: NodeType, options: any) => {
+      (obj: any, nodeType: null | NodeType, options: ParseObjectOptions) => {
         if (nodeType === NodeType.Applicability) {
-          console.log(
-            'CALLING PARSEOBJECT ON OBJ WITHOUT APPLICABILITY::',
-            obj
-          );
           const parsedApplicability = parser.parseObject(
             omit(obj, 'applicability'),
             NodeType.Value,
             options
-          );
-          console.log(
-            'in parsedNode parsedApplicablity: ',
-            parsedApplicability
           );
           if (parsedApplicability !== null) {
             const applicabilityNode = parser.createASTNode(
@@ -67,6 +59,7 @@ export default class ApplicabilityPlugin implements ViewPlugin {
               applicabilityNode.value.parent = applicabilityNode;
             }
 
+            console.log('creating applicabilityNode', applicabilityNode);
             return applicabilityNode;
           }
 
