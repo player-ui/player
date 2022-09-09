@@ -154,28 +154,39 @@ export class Parser {
       return this.parseSwitch(obj, options);
     }
 
-    let value: any;
-    const children: Node.Child[] = [];
+    interface Obj {
+      children: Node.Child[];
 
-    /** Parse a nested child and add it to the parent */
-    const parseLocalObject = (objToParse: unknown, path: string[] = []) => {
+      value: any;
+    }
+
+    const parseLocalObj = (
+      currentValue: any,
+      objToParse: unknown,
+      path: string[] = []
+    ): Obj => {
       if (typeof objToParse !== 'object' || objToParse === null) {
-        value = objToParse;
-
-        return;
+        return { value: objToParse, children: [] };
       }
 
       const localObj = this.hooks.onParseObject.call(objToParse, type);
 
       if (!localObj) {
-        return;
+        return currentValue;
       }
 
       const objEntries = Array.isArray(localObj)
         ? localObj.map((v, i) => [i, v])
         : Object.entries(localObj);
 
-      objEntries.forEach(([localKey, localValue]) => {
+      const defaultValue: Obj = {
+        children: [],
+        value: currentValue,
+      };
+
+      const newValue = objEntries.reduce((accumulation, current): Obj => {
+        const { children, ...rest } = accumulation;
+        const [localKey, localValue] = current;
         if (localKey === 'asset' && typeof localValue === 'object') {
           const assetAST = this.parseObject(
             localValue,
@@ -184,54 +195,69 @@ export class Parser {
           );
 
           if (assetAST) {
-            children.push({
-              path: [...path, 'asset'],
-              value: assetAST,
-            });
+            return {
+              ...rest,
+              children: [
+                ...children,
+                {
+                  path: [...path, 'asset'],
+                  value: assetAST,
+                },
+              ],
+            };
           }
         } else if (localKey === 'template' && Array.isArray(localValue)) {
-          localValue.forEach((template: Template) => {
-            const templateAST = this.hooks.onCreateASTNode.call(
-              {
-                type: NodeType.Template,
-                depth: options.templateDepth ?? 0,
-                data: template.data,
-                template: template.value,
-                dynamic: template.dynamic ?? false,
-              },
-              template
-            );
+          const templateChildren = localValue
+            .map((template: Template) => {
+              const templateAST = this.hooks.onCreateASTNode.call(
+                {
+                  type: NodeType.Template,
+                  depth: options.templateDepth ?? 0,
+                  data: template.data,
+                  template: template.value,
+                  dynamic: template.dynamic ?? false,
+                },
+                template
+              );
 
-            if (templateAST) {
-              children.push({
-                path: [...path, template.output],
-                value: templateAST,
-              });
-            }
-          });
+              if (templateAST) {
+                return {
+                  path: [...path, template.output],
+                  value: templateAST,
+                };
+              }
+
+              // eslint-disable-next-line no-useless-return
+              return;
+            })
+            .filter((element) => !!element);
+
+          return {
+            ...rest,
+            children: [...children, ...templateChildren],
+          } as Obj;
         } else if (localValue && hasSwitch(localValue)) {
           const localSwitch = this.parseSwitch(localValue, options);
-
+          
+          // this was just if(localSwitch) but somehow undefined was sneaking through
           if (localSwitch) {
-            children.push({
-              path: [...path, localKey],
-              value: localSwitch,
-            });
+            return {
+              ...rest,
+              children: [
+                ...children,
+                {
+                  path: [...path, localKey],
+                  value: localSwitch,
+                },
+              ],
+            };
           }
         } else if (localValue && Array.isArray(localValue)) {
-          const childValues: Node.Node[] = [];
-
-          localValue.forEach((childVal) => {
-            const parsedChild = this.parseObject(
-              childVal,
-              NodeType.Value,
-              options
-            );
-
-            if (parsedChild) {
-              childValues.push(parsedChild);
-            }
-          });
+          const childValues = localValue
+            .map((childVal) =>
+              this.parseObject(childVal, NodeType.Value, options)
+            )
+            .filter((child): child is Node.Node => !!child);
 
           if (childValues.length > 0) {
             const multiNode = this.hooks.onCreateASTNode.call(
@@ -251,10 +277,16 @@ export class Parser {
             }
 
             if (multiNode) {
-              children.push({
-                path: [...path, localKey],
-                value: multiNode,
-              });
+              return {
+                ...rest,
+                children: [
+                  ...children,
+                  {
+                    path: [...path, localKey],
+                    value: multiNode,
+                  },
+                ],
+              };
             }
           }
         } else if (localValue && typeof localValue === 'object') {
@@ -265,21 +297,42 @@ export class Parser {
               options
             );
             if (applicabilityNode) {
-              children.push({
-                path: [...path, localKey],
-                value: applicabilityNode,
-              });
+              return {
+                ...rest,
+                children: [
+                  ...children,
+                  {
+                    path: [...path, localKey],
+                    value: applicabilityNode,
+                  },
+                ],
+              };
             }
           } else {
-            parseLocalObject(localValue, [...path, localKey]);
+            const result = parseLocalObj(accumulation.value, localValue, [
+              ...path,
+              localKey,
+            ]);
+            return {
+              value: result.value,
+              children: [...children, ...result.children],
+            };
           }
         } else {
-          value = setIn(value, [...path, localKey], localValue);
+          const value = setIn(accumulation.value, [...path, localKey], localValue);
+
+          return {
+            children,
+            value,
+          };
         }
-      });
+        return accumulation
+      }, defaultValue);
+
+      return newValue;
     };
 
-    parseLocalObject(obj);
+    const { value, children } = parseLocalObj(undefined, obj);
 
     const baseAst =
       value === undefined && children.length === 0
