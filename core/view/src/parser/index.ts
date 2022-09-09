@@ -326,7 +326,8 @@ export class Parser {
             value,
           };
         }
-        return accumulation
+        console.log('Somehow missed the else case')
+        // return accumulation
       }, defaultValue);
 
       return newValue;

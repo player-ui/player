@@ -71,7 +71,6 @@ describe('view', () => {
     });
 
     it('does not return a field object if the case does not resolve an asset', () => {
-      console.log('start-------------------------------------------------------')
       const model = withParser(
         new LocalModel({
           foo: {
@@ -112,7 +111,6 @@ describe('view', () => {
 
       const resolved = view.update();
 
-      console.log('end-------------------------------------------------------', resolved)
       expect(resolved).toStrictEqual({
         id: 'foo',
       });

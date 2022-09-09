@@ -13,19 +13,14 @@ export default class SwitchPlugin implements ViewPlugin {
   }
 
   private resolveSwitch(node: Node.Switch, options: Options): Node.Node {
-    console.log('cases', node.cases.length)
     for (const switchCase of node.cases) {
       const isApplicable = options.evaluate(switchCase.case);
-      console.log('evaluating switch case: ', isApplicable, switchCase)
 
       if (isApplicable) {
-        console.log(`${isApplicable}returning switch: `, switchCase, "children: ", switchCase.value.children)
-        switchCase.value.children.forEach(console.log)
         return switchCase.value;
       }
     }
 
-    console.log("returning empty node")
     return EMPTY_NODE;
   }
 
