@@ -3,6 +3,7 @@ import { SyncBailHook, SyncWaterfallHook } from 'tapable-ts';
 import type { Template } from '@player-ui/types';
 import type { Node, AnyAssetType } from './types';
 import { NodeType } from './types';
+import { Children } from 'react';
 
 export * from './types';
 
@@ -77,7 +78,6 @@ export class Parser {
     type: Node.ChildrenTypes = NodeType.Value,
     options: ParseObjectOptions = { templateDepth: 0 }
   ): Node.Node | null {
-
     const nodeType = this.hooks.determineNodeType.call(obj);
 
     if (nodeType !== undefined) {
@@ -86,26 +86,43 @@ export class Parser {
         return parsedNode;
       }
     }
-    let value: any;
-    let children: Node.Child[] = [];
+    // let value: any;
+    // let children: Node.Child[] = [];
 
-    const parseLocalObject = (objToParse: unknown, path: string[] = []) => {
+    interface Obj {
+      children: Node.Child[];
+
+      value: any;
+    }
+
+    const parseLocalObject = (
+      currentValue: any,
+      objToParse: unknown,
+      path: string[] = []
+    ): Obj => {
       if (typeof objToParse !== 'object' || objToParse === null) {
-        value = objToParse;
-        return;
+        // value = objToParse;
+        return { value: objToParse, children: [] };
       }
 
       const localObj = this.hooks.onParseObject.call(objToParse, type);
 
       if (!localObj) {
-        return;
+        return currentValue;
       }
 
       const objEntries = Array.isArray(localObj)
         ? localObj.map((v, i) => [i, v])
         : Object.entries(localObj);
 
-      objEntries.forEach(([localKey, localValue]) => {
+      const defaultValue: Obj = {
+        children: [],
+        value: currentValue,
+      };
+
+      const newValue = objEntries.reduce((accumulation, current): Obj => {
+        const { children, ...rest } = accumulation;
+        const [localKey, localValue] = current;
         if (localKey === 'asset' && typeof localValue === 'object') {
           const assetAST = this.parseObject(
             localValue,
@@ -114,31 +131,50 @@ export class Parser {
           );
 
           if (assetAST) {
-            children = [
-              ...children,
-              { path: [...path, 'asset'], value: assetAST },
-            ];
+            return {
+              ...rest,
+              children: [
+                ...children,
+                {
+                  path: [...path, 'asset'],
+                  value: assetAST,
+                },
+              ],
+            };
           }
         } else if (
           this.hooks.determineNodeType.call(localKey) === NodeType.Template &&
           Array.isArray(localValue)
         ) {
-          localValue.forEach((template: Template) => {
-            const templateAST = this.hooks.parseNode.call(
-              template,
-              NodeType.Template,
-              options
-            );
-            if (templateAST) {
-              children = [
-                ...children,
+          const templateChildren = localValue
+            .map((template: Template) => {
+              const templateAST = this.hooks.onCreateASTNode.call(
                 {
+                  type: NodeType.Template,
+                  depth: options.templateDepth ?? 0,
+                  data: template.data,
+                  template: template.value,
+                  dynamic: template.dynamic ?? false,
+                },
+                template
+              );
+
+              if (templateAST) {
+                return {
                   path: [...path, template.output],
                   value: templateAST,
-                },
-              ];
-            }
-          });
+                };
+              }
+
+              // eslint-disable-next-line no-useless-return
+              return;
+            })
+            .filter((element) => !!element);
+
+          return {
+            ...rest,
+            children: [...children, ...templateChildren],
+          } as Obj;
         } else if (
           localValue &&
           this.hooks.determineNodeType.call(localValue) === NodeType.Switch
@@ -150,28 +186,23 @@ export class Parser {
           );
 
           if (localSwitch) {
-            children = [
-              ...children,
-              {
-                path: [...path, localKey],
-                value: localSwitch,
-              },
-            ];
+            return {
+              ...rest,
+              children: [
+                ...children,
+                {
+                  path: [...path, localKey],
+                  value: localSwitch,
+                },
+              ],
+            };
           }
         } else if (localValue && Array.isArray(localValue)) {
-          const childValues: Node.Node[] = [];
-
-          localValue.forEach((childVal) => {
-            const parsedChild = this.parseObject(
-              childVal,
-              NodeType.Value,
-              options
-            );
-
-            if (parsedChild) {
-              childValues.push(parsedChild);
-            }
-          });
+          const childValues = localValue
+            .map((childVal) =>
+              this.parseObject(childVal, NodeType.Value, options)
+            )
+            .filter((child): child is Node.Node => !!child);
 
           if (childValues.length > 0) {
             const multiNode = this.hooks.onCreateASTNode.call(
@@ -191,13 +222,16 @@ export class Parser {
             }
 
             if (multiNode) {
-              children = [
-                ...children,
-                {
-                  path: [...path, localKey],
-                  value: multiNode,
-                },
-              ];
+              return {
+                ...rest,
+                children: [
+                  ...children,
+                  {
+                    path: [...path, localKey],
+                    value: multiNode,
+                  },
+                ],
+              };
             }
           }
         } else if (localValue && typeof localValue === 'object') {
@@ -205,30 +239,53 @@ export class Parser {
             this.hooks.determineNodeType.call(localValue);
 
           if (determineNodeType === NodeType.Applicability) {
-            const parseNode = this.hooks.parseNode.call(
+            const parsedNode = this.hooks.parseNode.call(
               localValue,
               NodeType.Applicability,
               options
             );
-            if (parseNode) {
-              children = [
-                ...children,
-                {
-                  path: [...path, localKey],
-                  value: parseNode,
-                },
-              ];
+            if (parsedNode) {
+              return {
+                ...rest,
+                children: [
+                  ...children,
+                  {
+                    path: [...path, localKey],
+                    value: parsedNode,
+                  },
+                ],
+              };
             }
           } else {
-            parseLocalObject(localValue, [...path, localKey]);
+            const result = parseLocalObject(accumulation.value, localValue, [
+              ...path,
+              localKey,
+            ]);
+            return {
+              value: result.value,
+              children: [...children, ...result.children],
+            };
           }
         } else {
-          value = setIn(value, [...path, localKey], localValue);
+          const value = setIn(
+            accumulation.value,
+            [...path, localKey],
+            localValue
+          );
+
+          return {
+            children,
+            value,
+          };
         }
-      });
+
+        return accumulation;
+      }, defaultValue);
+
+      return newValue;
     };
 
-    parseLocalObject(obj);
+    const { value, children } = parseLocalObject(undefined, obj);
 
     const baseAst =
       value === undefined && children.length === 0
