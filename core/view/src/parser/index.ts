@@ -3,7 +3,6 @@ import { SyncBailHook, SyncWaterfallHook } from 'tapable-ts';
 import type { Template } from '@player-ui/types';
 import type { Node, AnyAssetType } from './types';
 import { NodeType } from './types';
-import { Children } from 'react';
 
 export * from './types';
 
