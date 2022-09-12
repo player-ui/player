@@ -1,6 +1,6 @@
 import type { View, ViewPlugin } from './plugin';
 import type { Options } from './options';
-import type { Parser, Node } from '../parser';
+import type { Parser, Node, ParseObjectOptions } from '../parser';
 import { EMPTY_NODE, NodeType } from '../parser';
 import type { Resolver } from '../resolver';
 
@@ -43,49 +43,58 @@ export default class SwitchPlugin implements ViewPlugin {
       }
     });
 
-    parser.hooks.parseNode.tap('switch', (obj, nodeType, options) => {
-      if (nodeType === NodeType.Switch) {
-        const dynamic = 'dynamicSwitch' in obj;
-        const switchContent =
-          'dynamicSwitch' in obj ? obj.dynamicSwitch : obj.staticSwitch;
+    parser.hooks.parseNode.tap(
+      'switch',
+      (obj: any, nodeType: null | NodeType, options: ParseObjectOptions) => {
+        if (nodeType === NodeType.Switch) {
+          const dynamic = 'dynamicSwitch' in obj;
+          const switchContent =
+            'dynamicSwitch' in obj ? obj.dynamicSwitch : obj.staticSwitch;
 
-        const cases: Node.SwitchCase[] = [];
+          const cases: Node.SwitchCase[] = [];
 
-        switchContent.forEach((switchCase: { [x: string]: any; case: any; }) => {
-          const { case: switchCaseExpr, ...switchBody } = switchCase;
-          const value = parser.parseObject(switchBody, NodeType.Value, options);
+          switchContent.forEach(
+            (switchCase: { [x: string]: any; case: any }) => {
+              const { case: switchCaseExpr, ...switchBody } = switchCase;
+              const value = parser.parseObject(
+                switchBody,
+                NodeType.Value,
+                options
+              );
 
-          if (value) {
-            cases.push({
-              case: switchCaseExpr,
-              value: value as Node.Value,
+              if (value) {
+                cases.push({
+                  case: switchCaseExpr,
+                  value: value as Node.Value,
+                });
+              }
+            }
+          );
+
+          const switchAST = parser.hooks.onCreateASTNode.call(
+            {
+              type: NodeType.Switch,
+              dynamic,
+              cases,
+            },
+            obj
+          );
+
+          if (switchAST?.type === NodeType.Switch) {
+            switchAST.cases.forEach((sCase) => {
+              // eslint-disable-next-line no-param-reassign
+              sCase.value.parent = switchAST;
             });
           }
-        });
 
-        const switchAST = parser.hooks.onCreateASTNode.call(
-          {
-            type: NodeType.Switch,
-            dynamic,
-            cases,
-          },
-          obj
-        );
+          if (switchAST?.type === NodeType.Empty) {
+            return null;
+          }
 
-        if (switchAST?.type === NodeType.Switch) {
-          switchAST.cases.forEach((sCase: { value: { parent: any } }) => {
-            // eslint-disable-next-line no-param-reassign
-            sCase.value.parent = switchAST;
-          });
+          return switchAST ?? null;
         }
-
-        if (switchAST?.type === NodeType.Empty) {
-          return null;
-        }
-
-        return switchAST ?? null;
       }
-    });
+    );
   }
 
   applyResolver(resolver: Resolver) {
