@@ -94,8 +94,30 @@ describe('generates the correct AST', () => {
 });
 
 describe('parseView', () => {
-  const parser = new Parser();
-  new ApplicabilityPlugin().applyParser(parser);
+  let model: DataModelWithParser;
+  let expressionEvaluator: ExpressionEvaluator;
+  let options: Options;
+  let parser: Parser;
+
+  beforeEach(() => {
+    model = withParser(new LocalModel(), parseBinding);
+    expressionEvaluator = new ExpressionEvaluator({
+      model,
+    });
+    parser = new Parser();
+    options = {
+      evaluate: expressionEvaluator.evaluate,
+      schema: new SchemaController(),
+      data: {
+        format: (binding, val) => val,
+        formatValue: (val) => val,
+        model,
+      },
+    };
+    new TemplatePlugin(options).applyParserHooks(parser);
+    new ApplicabilityPlugin().applyParser(parser);
+    new SwitchPlugin(options).applyParser(parser);
+  });
 
   test('parses a simple view', () => {
     expect(
