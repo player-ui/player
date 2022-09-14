@@ -6,7 +6,6 @@ import { makeFlow } from '@player-ui/make-flow';
 import { AssetTransformPlugin } from '@player-ui/asset-transform-plugin';
 import type { Asset, AssetWrapper } from '@player-ui/types';
 import { CheckPathPlugin } from '.';
-import { ApplicabilityPlugin } from '../../../../core/view/src';
 
 const nestedAssetFlow = makeFlow({
   id: 'view-1',
