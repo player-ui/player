@@ -38,11 +38,16 @@ export default class ApplicabilityPlugin implements ViewPlugin {
 
     parser.hooks.parseNode.tap(
       'applicability',
-      (obj: any, nodeType: null | NodeType, options: ParseObjectOptions) => {
-        if (nodeType === NodeType.Applicability) {
+      (
+        obj: any,
+        nodeType: Node.ChildrenTypes,
+        options: ParseObjectOptions,
+        determinedNodeType: null | NodeType
+      ) => {
+        if (determinedNodeType === NodeType.Applicability) {
           const parsedApplicability = parser.parseObject(
             omit(obj, 'applicability'),
-            NodeType.Value,
+            nodeType,
             options
           );
           if (parsedApplicability !== null) {

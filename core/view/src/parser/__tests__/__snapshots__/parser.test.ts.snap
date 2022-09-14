@@ -345,7 +345,7 @@ Object {
                         "type": "applicability",
                         "value": Object {
                           "parent": [Circular],
-                          "type": "value",
+                          "type": "asset",
                           "value": Object {
                             "id": "input-asset",
                             "type": "input",

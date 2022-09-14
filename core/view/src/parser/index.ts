@@ -47,7 +47,7 @@ export class Parser {
     determineNodeType: new SyncBailHook<[object], NodeType>(),
 
     parseNode: new SyncBailHook<
-      [object | null, NodeType | null, ParseObjectOptions],
+      [object | null, Node.ChildrenTypes, ParseObjectOptions, NodeType | null],
       Node.Node
     >(),
   };
@@ -80,13 +80,16 @@ export class Parser {
     const nodeType = this.hooks.determineNodeType.call(obj);
 
     if (nodeType !== undefined) {
-      const parsedNode = this.hooks.parseNode.call(obj, nodeType, options);
+      const parsedNode = this.hooks.parseNode.call(
+        obj,
+        type,
+        options,
+        nodeType
+      );
       if (parsedNode) {
         return parsedNode;
       }
     }
-    // let value: any;
-    // let children: Node.Child[] = [];
 
     interface Obj {
       children: Node.Child[];
@@ -180,8 +183,9 @@ export class Parser {
         ) {
           const localSwitch = this.hooks.parseNode.call(
             localValue,
-            NodeType.Switch,
-            options
+            NodeType.Value,
+            options,
+            NodeType.Switch
           );
 
           if (localSwitch) {
@@ -240,8 +244,9 @@ export class Parser {
           if (determineNodeType === NodeType.Applicability) {
             const parsedNode = this.hooks.parseNode.call(
               localValue,
-              NodeType.Applicability,
-              options
+              type,
+              options,
+              determineNodeType
             );
             if (parsedNode) {
               return {

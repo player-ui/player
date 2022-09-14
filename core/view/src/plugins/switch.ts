@@ -45,8 +45,13 @@ export default class SwitchPlugin implements ViewPlugin {
 
     parser.hooks.parseNode.tap(
       'switch',
-      (obj: any, nodeType: null | NodeType, options: ParseObjectOptions) => {
-        if (nodeType === NodeType.Switch) {
+      (
+        obj: any,
+        nodeType: Node.ChildrenTypes,
+        options: ParseObjectOptions,
+        determinedNodeType: null | NodeType
+      ) => {
+        if (determinedNodeType === NodeType.Switch) {
           const dynamic = 'dynamicSwitch' in obj;
           const switchContent =
             'dynamicSwitch' in obj ? obj.dynamicSwitch : obj.staticSwitch;

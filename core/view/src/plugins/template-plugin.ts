@@ -129,11 +129,16 @@ export default class TemplatePlugin implements ViewPlugin {
 
     parser.hooks.parseNode.tap(
       'template',
-      (obj: any, nodeType: null | NodeType, options: ParseObjectOptions) => {
-        if (nodeType === NodeType.Template) {
+      (
+        obj: any,
+        nodeType: Node.ChildrenTypes,
+        options: ParseObjectOptions,
+        determinedNodeType: null | NodeType
+      ) => {
+        if (determinedNodeType === NodeType.Template) {
           const templateNode = parser.createASTNode(
             {
-              type: nodeType,
+              type: NodeType.Template,
               depth: options.templateDepth ?? 0,
               data: obj.data,
               template: obj.value,
