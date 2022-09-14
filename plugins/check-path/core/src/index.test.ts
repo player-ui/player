@@ -287,6 +287,73 @@ describe('check path plugin', () => {
   });
 });
 
+describe('works with applicability', () => {
+  let player: Player;
+  let checkPathPlugin: CheckPathPlugin;
+  let dataController: DataController;
+
+  beforeEach(() => {
+    checkPathPlugin = new CheckPathPlugin();
+    player = new Player({
+      plugins: [checkPathPlugin],
+    });
+    player.start(applicableFlow);
+    dataController = (player.getState() as InProgressState).controllers.data;
+  });
+
+  test('path', async () => {
+    expect(checkPathPlugin.getPath('asset-2')).toBeUndefined();
+    expect(checkPathPlugin.getPath('asset-3')).toStrictEqual([
+      'fields',
+      'asset',
+      'values',
+      1,
+      'asset',
+    ]);
+
+    dataController.set([
+      ['foo.bar', true],
+      ['foo.baz', true],
+    ]);
+    await waitFor(() =>
+      expect(checkPathPlugin.getPath('asset-2')).toStrictEqual([
+        'fields',
+        'asset',
+        'values',
+        1,
+        'asset',
+      ])
+    );
+
+    expect(checkPathPlugin.getPath('asset-3')).toStrictEqual([
+      'fields',
+      'asset',
+      'values',
+      2,
+      'asset',
+    ]);
+    expect(checkPathPlugin.getPath('asset-4a')).toStrictEqual([
+      'fields',
+      'asset',
+      'values',
+      3,
+      'asset',
+      'values',
+      0,
+      'asset',
+    ]);
+  });
+
+  test('getAsset', async () => {
+    expect(checkPathPlugin.getAsset('asset-4')).toBeUndefined();
+
+    dataController.set([['foo.baz', true]]);
+    await waitFor(() => {
+      expect(checkPathPlugin.getAsset('asset-4')).toBeDefined();
+    });
+  });
+});
+
 describe('handles non-initialized player', () => {
   let checkPathPlugin: CheckPathPlugin;
 
