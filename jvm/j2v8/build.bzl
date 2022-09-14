@@ -19,7 +19,7 @@ def j2v8_platform(platform):
     native.java_library(
         name = name,
         exports = [":j2v8"] + deps[platform],
-        tags = ["maven_coordinates=%s:%s:{pom_version}" % ("com.intuit.player.jvm", name)],
+        tags = ["maven_coordinates=%s:%s:{pom_version}" % ("com.intuit.player", name)],
         visibility = ["//visibility:public"],
     )
 

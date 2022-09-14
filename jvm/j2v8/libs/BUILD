@@ -3,6 +3,7 @@ package(default_visibility = ["//jvm/j2v8:__pkg__"])
 java_import(
     name = "j2v8_empty",
     jars = [":j2v8_empty-6.1.0.jar"],
+    neverlink = True
 )
 
 java_import(
