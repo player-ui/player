@@ -44,7 +44,7 @@ export class Parser {
       [Node.Node | undefined | null, object]
     >(),
 
-    determineNodeType: new SyncBailHook<[object], NodeType>(),
+    determineNodeType: new SyncBailHook<[object | string], NodeType>(),
 
     parseNode: new SyncBailHook<
       [object | null, Node.ChildrenTypes, ParseObjectOptions, NodeType | null],

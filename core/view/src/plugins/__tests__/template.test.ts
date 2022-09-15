@@ -90,6 +90,20 @@ describe('templates', () => {
       })
     ).toMatchSnapshot();
   });
+
+  it('determines if nodeType is template', () => {
+    const nodeTest = 'template';
+    const nodeType = parser.hooks.determineNodeType.call(nodeTest);
+    expect(nodeType).toStrictEqual('template');
+  });
+
+  it('Does not return a nodeType', () => {
+    const nodeTest = {
+      value: 'foo',
+    };
+    const nodeType = parser.hooks.determineNodeType.call(nodeTest);
+    expect(nodeType).toBe(undefined);
+  });
 });
 
 describe('dynamic templates', () => {
