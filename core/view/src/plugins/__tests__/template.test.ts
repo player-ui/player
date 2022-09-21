@@ -3,7 +3,6 @@ import type { DataModelWithParser } from '@player-ui/data';
 import { LocalModel, withParser } from '@player-ui/data';
 import { ExpressionEvaluator } from '@player-ui/expressions';
 import { SchemaController } from '@player-ui/schema';
-import { FooTypeRef } from '../../../../../language/dsl/src/__tests__/helpers/mock-data-refs';
 import { NodeType } from '../../parser';
 import { Parser } from '../../parser';
 import { ViewInstance } from '../../view';
