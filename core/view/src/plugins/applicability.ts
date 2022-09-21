@@ -66,8 +66,6 @@ export default class ApplicabilityPlugin implements ViewPlugin {
 
             return applicabilityNode;
           }
-
-          return null;
         }
       }
     );

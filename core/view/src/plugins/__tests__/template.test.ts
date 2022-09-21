@@ -3,6 +3,8 @@ import type { DataModelWithParser } from '@player-ui/data';
 import { LocalModel, withParser } from '@player-ui/data';
 import { ExpressionEvaluator } from '@player-ui/expressions';
 import { SchemaController } from '@player-ui/schema';
+import { FooTypeRef } from '../../../../../language/dsl/src/__tests__/helpers/mock-data-refs';
+import { NodeType } from '../../parser';
 import { Parser } from '../../parser';
 import { ViewInstance } from '../../view';
 import type { Options } from '../options';
@@ -103,6 +105,62 @@ describe('templates', () => {
     };
     const nodeType = parser.hooks.determineNodeType.call(nodeTest);
     expect(nodeType).toBe(undefined);
+  });
+
+  it('returns templateNode if template exists', () => {
+    const obj = {
+      dynamic: true,
+      data: 'foo.bar',
+      output: 'values',
+      value: {
+        value: '{{foo.bar._index_}}',
+      },
+    };
+    const nodeOptions = {
+      templateDepth: 1,
+    };
+    const parsedNode = parser.hooks.parseNode.call(
+      obj,
+      NodeType.Value,
+      nodeOptions,
+      NodeType.Template
+    );
+    expect(parsedNode).toStrictEqual({
+      data: 'foo.bar',
+      depth: 1,
+      dynamic: true,
+      template: {
+        value: '{{foo.bar._index_}}',
+      },
+      type: 'template',
+    });
+  });
+
+  it('returns templateNode if template exists, and templateDepth is not set', () => {
+    const obj = {
+      data: 'foo.bar2',
+      output: 'values',
+      dynamic: true,
+      value: {
+        value: '{{foo.bar2._index_}}',
+      },
+    };
+    const nodeOptions = {};
+    const parsedNode = parser.hooks.parseNode.call(
+      obj,
+      NodeType.Value,
+      nodeOptions,
+      NodeType.Template
+    );
+    expect(parsedNode).toStrictEqual({
+      data: 'foo.bar2',
+      depth: 0,
+      dynamic: true,
+      template: {
+        value: '{{foo.bar2._index_}}',
+      },
+      type: 'template',
+    });
   });
 });
 
