@@ -32,7 +32,7 @@ describe('templates', () => {
         model,
       },
     };
-    new TemplatePlugin(options).applyParserHooks(parser);
+    new TemplatePlugin(options).applyParser(parser);
   });
 
   it('works with simple ones', () => {

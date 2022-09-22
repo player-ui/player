@@ -15,6 +15,12 @@ export interface ParseObjectOptions {
   templateDepth?: number;
 }
 
+interface NestedObj {
+  /** The values of a nested local object */
+  children: Node.Child[];
+
+  value: any;
+}
 /**
  * The Parser is the way to take an incoming view from the user and parse it into an AST.
  * It provides a few ways to interact with the parsing, including mutating an object before and after creation of an AST node
@@ -47,7 +53,12 @@ export class Parser {
     determineNodeType: new SyncBailHook<[object | string], NodeType>(),
 
     parseNode: new SyncBailHook<
-      [object | null, Node.ChildrenTypes, ParseObjectOptions, NodeType | null],
+      [
+        obj: object,
+        nodeType: Node.ChildrenTypes,
+        parseOptions: ParseObjectOptions,
+        determinedNodeType: NodeType | null
+      ],
       Node.Node
     >(),
   };
@@ -91,17 +102,11 @@ export class Parser {
       }
     }
 
-    interface Obj {
-      children: Node.Child[];
-
-      value: any;
-    }
-
     const parseLocalObject = (
       currentValue: any,
       objToParse: unknown,
       path: string[] = []
-    ): Obj => {
+    ): NestedObj => {
       if (typeof objToParse !== 'object' || objToParse === null) {
         // value = objToParse;
         return { value: objToParse, children: [] };
@@ -117,12 +122,12 @@ export class Parser {
         ? localObj.map((v, i) => [i, v])
         : Object.entries(localObj);
 
-      const defaultValue: Obj = {
+      const defaultValue: NestedObj = {
         children: [],
         value: currentValue,
       };
 
-      const newValue = objEntries.reduce((accumulation, current): Obj => {
+      const newValue = objEntries.reduce((accumulation, current): NestedObj => {
         const { children, ...rest } = accumulation;
         const [localKey, localValue] = current;
         if (localKey === 'asset' && typeof localValue === 'object') {
@@ -176,7 +181,7 @@ export class Parser {
           return {
             ...rest,
             children: [...children, ...templateChildren],
-          } as Obj;
+          } as NestedObj;
         } else if (
           localValue &&
           this.hooks.determineNodeType.call(localValue) === NodeType.Switch

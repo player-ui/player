@@ -108,7 +108,7 @@ export default class TemplatePlugin implements ViewPlugin {
     return result;
   }
 
-  applyParserHooks(parser: Parser) {
+  applyParser(parser: Parser) {
     parser.hooks.onCreateASTNode.tap('template', (node) => {
       if (node && node.type === NodeType.Template && !node.dynamic) {
         return this.parseTemplate(
@@ -166,7 +166,7 @@ export default class TemplatePlugin implements ViewPlugin {
   }
 
   apply(view: View) {
-    view.hooks.parser.tap('template', this.applyParserHooks.bind(this));
+    view.hooks.parser.tap('template', this.applyParser.bind(this));
     view.hooks.resolver.tap('template', this.applyResolverHooks.bind(this));
   }
 }

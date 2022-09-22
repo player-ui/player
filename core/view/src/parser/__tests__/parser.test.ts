@@ -29,7 +29,7 @@ describe('generates the correct AST', () => {
         model,
       },
     };
-    new TemplatePlugin(options).applyParserHooks(parser);
+    new TemplatePlugin(options).applyParser(parser);
     new ApplicabilityPlugin().applyParser(parser);
     new SwitchPlugin(options).applyParser(parser);
   });
@@ -114,7 +114,7 @@ describe('parseView', () => {
         model,
       },
     };
-    new TemplatePlugin(options).applyParserHooks(parser);
+    new TemplatePlugin(options).applyParser(parser);
     new ApplicabilityPlugin().applyParser(parser);
     new SwitchPlugin(options).applyParser(parser);
   });

@@ -1,4 +1,4 @@
-import { DataModelWithParser, LocalModel, withParser } from '@player-ui/data';
+import { LocalModel, withParser } from '@player-ui/data';
 import { ExpressionEvaluator } from '@player-ui/expressions';
 import { BindingParser } from '@player-ui/binding';
 import { SchemaController } from '@player-ui/schema';
