@@ -23,7 +23,6 @@ public struct AssetBeacon: Codable {
     /// Any additional data to add to the beacon payload
     public var data: AnyType?
 
-
     /// Constructs an AssetBeacon
     /// - Parameters:
     ///   - action: The action taken for the beacon
@@ -53,7 +52,6 @@ public struct BeaconableAsset: Codable {
 
     /// The metaData of the asset that fired the beacon
     public var metaData: MetaData?
-
 
     /// Constructs a BeaconableAsset
     /// - Parameters:
