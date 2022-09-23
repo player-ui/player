@@ -33,7 +33,7 @@ public struct AssetBeacon: Codable {
         action: String,
         element: String,
         asset: BeaconableAsset,
-        data: AnyType?
+        data: AnyType? = nil
     ) {
         self.action = action
         self.element = element
@@ -60,8 +60,8 @@ public struct BeaconableAsset: Codable {
     ///   - metaData: Beacon applicable metaData from the asset that fired the beacon
     public init(
         id: String,
-        type: String?,
-        metaData: MetaData?
+        type: String? = nil,
+        metaData: MetaData? = nil
     ) {
         self.id = id
         self.type = type

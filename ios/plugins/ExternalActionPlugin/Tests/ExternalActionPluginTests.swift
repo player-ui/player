@@ -114,9 +114,8 @@ class ExternalActionPluginTests: XCTestCase {
         let player = HeadlessPlayerImpl(plugins: [plugin])
 
         player.start(flow: json) { (result) in
-            guard result != nil else { return }
             switch result {
-            case .success(let state):
+            case .success:
                 XCTFail("flow should have failed")
             case .failure:
                 completionExpectation.fulfill()
