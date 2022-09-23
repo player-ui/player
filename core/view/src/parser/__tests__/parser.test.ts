@@ -1,7 +1,38 @@
+import { BindingParser } from '@player-ui/binding';
+import { LocalModel, withParser } from '@player-ui/data';
+import { SchemaController } from '@player-ui/schema';
 import { NodeType, Parser } from '../index';
+import { SwitchPlugin, ApplicabilityPlugin, TemplatePlugin } from '../..';
+import type { Options } from '../../plugins/options';
+import { ExpressionEvaluator } from '../../../../expressions/src';
+import type { DataModelWithParser } from '../../../../player/src';
 
+const parseBinding = new BindingParser().parse;
 describe('generates the correct AST', () => {
-  const parser = new Parser();
+  let model: DataModelWithParser;
+  let expressionEvaluator: ExpressionEvaluator;
+  let options: Options;
+  let parser: Parser;
+
+  beforeEach(() => {
+    model = withParser(new LocalModel(), parseBinding);
+    expressionEvaluator = new ExpressionEvaluator({
+      model,
+    });
+    parser = new Parser();
+    options = {
+      evaluate: expressionEvaluator.evaluate,
+      schema: new SchemaController(),
+      data: {
+        format: (binding, val) => val,
+        formatValue: (val) => val,
+        model,
+      },
+    };
+    new TemplatePlugin(options).applyParser(parser);
+    new ApplicabilityPlugin().applyParser(parser);
+    new SwitchPlugin(options).applyParser(parser);
+  });
 
   test('works with basic objects', () => {
     expect(parser.parseObject({ foo: 'bar' })).toStrictEqual({
@@ -38,96 +69,6 @@ describe('generates the correct AST', () => {
     expect(parser.parseObject({ asset: { type: 'bar' } })).toMatchSnapshot();
   });
 
-  test('parses a template', () => {
-    expect(
-      parser.parseObject({
-        asset: {
-          type: 'collection',
-          template: [
-            {
-              data: 'foo.bar',
-              output: 'values',
-              value: {
-                value: '{{foo.bar._index_}}',
-              },
-            },
-          ],
-        },
-      })
-    ).toMatchSnapshot();
-  });
-
-  test('parses nested templates', () => {
-    expect(
-      parser.parseObject({
-        id: 'foo',
-        type: 'collection',
-        template: [
-          {
-            data: 'foo.pets',
-            output: 'values',
-            value: {
-              asset: {
-                type: 'collection',
-                id: 'outer-collection-_index_',
-                template: [
-                  {
-                    data: 'foo.people',
-                    output: 'values',
-                    value: {
-                      text: '{{foo.pets._index_}} + {{foo.people._index1_}}',
-                    },
-                  },
-                ],
-              },
-            },
-          },
-        ],
-      })
-    ).toMatchSnapshot();
-  });
-
-  test('parses a switch', () => {
-    expect(
-      parser.parseObject({
-        staticSwitch: [
-          {
-            case: '{{foo.bar}}',
-            asset: {
-              type: 'foo',
-            },
-          },
-        ],
-      })
-    ).toMatchSnapshot();
-  });
-
-  test('parses a nested switch', () => {
-    expect(
-      parser.parseObject({
-        id: 'foo',
-        fields: {
-          staticSwitch: [
-            {
-              case: '{{bar}}',
-              asset: {
-                id: 'input-1',
-                type: 'input',
-              },
-            },
-            {
-              case: '{{foo.bar}}',
-              asset: {
-                id: 'input-2',
-                type: 'input',
-              },
-            },
-          ],
-        },
-      })
-    ).toMatchSnapshot();
-  });
-
   test('parses an exp array', () => {
     expect(
       parser.parseObject(
@@ -153,7 +94,30 @@ describe('generates the correct AST', () => {
 });
 
 describe('parseView', () => {
-  const parser = new Parser();
+  let model: DataModelWithParser;
+  let expressionEvaluator: ExpressionEvaluator;
+  let options: Options;
+  let parser: Parser;
+
+  beforeEach(() => {
+    model = withParser(new LocalModel(), parseBinding);
+    expressionEvaluator = new ExpressionEvaluator({
+      model,
+    });
+    parser = new Parser();
+    options = {
+      evaluate: expressionEvaluator.evaluate,
+      schema: new SchemaController(),
+      data: {
+        format: (binding, val) => val,
+        formatValue: (val) => val,
+        model,
+      },
+    };
+    new TemplatePlugin(options).applyParser(parser);
+    new ApplicabilityPlugin().applyParser(parser);
+    new SwitchPlugin(options).applyParser(parser);
+  });
 
   test('parses a simple view', () => {
     expect(

@@ -1,6 +1,6 @@
 import type { View, ViewPlugin } from './plugin';
 import type { Options } from './options';
-import type { Parser, Node } from '../parser';
+import type { Parser, Node, ParseObjectOptions } from '../parser';
 import { EMPTY_NODE, NodeType } from '../parser';
 import type { Resolver } from '../resolver';
 
@@ -33,6 +33,73 @@ export default class SwitchPlugin implements ViewPlugin {
 
       return node;
     });
+
+    parser.hooks.determineNodeType.tap('switch', (obj) => {
+      if (
+        Object.prototype.hasOwnProperty.call(obj, 'dynamicSwitch') ||
+        Object.prototype.hasOwnProperty.call(obj, 'staticSwitch')
+      ) {
+        return NodeType.Switch;
+      }
+    });
+
+    parser.hooks.parseNode.tap(
+      'switch',
+      (
+        obj: any,
+        nodeType: Node.ChildrenTypes,
+        options: ParseObjectOptions,
+        determinedNodeType: null | NodeType
+      ) => {
+        if (determinedNodeType === NodeType.Switch) {
+          const dynamic = 'dynamicSwitch' in obj;
+          const switchContent =
+            'dynamicSwitch' in obj ? obj.dynamicSwitch : obj.staticSwitch;
+
+          const cases: Node.SwitchCase[] = [];
+
+          switchContent.forEach(
+            (switchCase: { [x: string]: any; case: any }) => {
+              const { case: switchCaseExpr, ...switchBody } = switchCase;
+              const value = parser.parseObject(
+                switchBody,
+                NodeType.Value,
+                options
+              );
+
+              if (value) {
+                cases.push({
+                  case: switchCaseExpr,
+                  value: value as Node.Value,
+                });
+              }
+            }
+          );
+
+          const switchAST = parser.hooks.onCreateASTNode.call(
+            {
+              type: NodeType.Switch,
+              dynamic,
+              cases,
+            },
+            obj
+          );
+
+          if (switchAST?.type === NodeType.Switch) {
+            switchAST.cases.forEach((sCase) => {
+              // eslint-disable-next-line no-param-reassign
+              sCase.value.parent = switchAST;
+            });
+          }
+
+          if (switchAST?.type === NodeType.Empty) {
+            return null;
+          }
+
+          return switchAST ?? null;
+        }
+      }
+    );
   }
 
   applyResolver(resolver: Resolver) {

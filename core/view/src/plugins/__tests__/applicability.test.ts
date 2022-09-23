@@ -33,6 +33,7 @@ describe('applicability', () => {
   });
 
   it('removes empty objects', () => {
+    new ApplicabilityPlugin().applyParser(parser);
     const root = parser.parseObject({
       asset: {
         values: [
@@ -55,6 +56,7 @@ describe('applicability', () => {
     expect(resolver.update()).toStrictEqual({
       asset: { values: [{ value: 'foo' }, { value: 'bar' }] },
     });
+
     model.set([['foo', false]]);
     expect(resolver.update()).toStrictEqual({
       asset: { values: [{ value: 'bar' }] },
@@ -62,6 +64,7 @@ describe('applicability', () => {
   });
 
   it('removes asset wrappers', () => {
+    new ApplicabilityPlugin().applyParser(parser);
     const root = parser.parseObject({
       asset: {
         title: {
@@ -89,6 +92,7 @@ describe('applicability', () => {
   });
 
   it('handles empty models', () => {
+    new ApplicabilityPlugin().applyParser(parser);
     const root = parser.parseObject({
       asset: {
         values: [
@@ -203,5 +207,23 @@ describe('applicability', () => {
         ],
       },
     });
+  });
+
+  it('determines if nodeType is applicability', () => {
+    new ApplicabilityPlugin().applyParser(parser);
+    const nodeTest = {
+      applicability: '{{bar}} == true',
+    };
+    const nodeType = parser.hooks.determineNodeType.call(nodeTest);
+    expect(nodeType).toStrictEqual('applicability');
+  });
+
+  it('Does not return a nodeType', () => {
+    new ApplicabilityPlugin().applyParser(parser);
+    const nodeTest = {
+      value: 'foo',
+    };
+    const nodeType = parser.hooks.determineNodeType.call(nodeTest);
+    expect(nodeType).toBe(undefined);
   });
 });

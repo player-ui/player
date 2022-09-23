@@ -1,5 +1,5 @@
 import { SyncWaterfallHook } from 'tapable-ts';
-import type { Parser, Node } from '../parser';
+import type { Node, ParseObjectOptions, Parser } from '../parser';
 import { NodeType } from '../parser';
 import type { ViewPlugin } from '.';
 import type { View } from './plugin';
@@ -108,7 +108,7 @@ export default class TemplatePlugin implements ViewPlugin {
     return result;
   }
 
-  applyParserHooks(parser: Parser) {
+  applyParser(parser: Parser) {
     parser.hooks.onCreateASTNode.tap('template', (node) => {
       if (node && node.type === NodeType.Template && !node.dynamic) {
         return this.parseTemplate(
@@ -120,6 +120,39 @@ export default class TemplatePlugin implements ViewPlugin {
 
       return node;
     });
+
+    parser.hooks.determineNodeType.tap('template', (obj: any) => {
+      if (obj === 'template') {
+        return NodeType.Template;
+      }
+    });
+
+    parser.hooks.parseNode.tap(
+      'template',
+      (
+        obj: any,
+        nodeType: Node.ChildrenTypes,
+        options: ParseObjectOptions,
+        determinedNodeType: null | NodeType
+      ) => {
+        if (determinedNodeType === NodeType.Template) {
+          const templateNode = parser.createASTNode(
+            {
+              type: NodeType.Template,
+              depth: options.templateDepth ?? 0,
+              data: obj.data,
+              template: obj.value,
+              dynamic: obj.dynamic ?? false,
+            },
+            obj
+          );
+
+          if (templateNode) {
+            return templateNode;
+          }
+        }
+      }
+    );
   }
 
   applyResolverHooks(resolver: Resolver) {
@@ -133,7 +166,7 @@ export default class TemplatePlugin implements ViewPlugin {
   }
 
   apply(view: View) {
-    view.hooks.parser.tap('template', this.applyParserHooks.bind(this));
+    view.hooks.parser.tap('template', this.applyParser.bind(this));
     view.hooks.resolver.tap('template', this.applyResolverHooks.bind(this));
   }
 }
