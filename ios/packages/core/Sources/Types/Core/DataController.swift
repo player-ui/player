@@ -14,7 +14,7 @@ A wrapper around the JS DataController in the core player
 open class BaseDataController {
 
     /// The JSValue that backs this wrapper
-    let value: JSValue
+    public let value: JSValue
 
     /**
     Construct a DataController from a JSValue
