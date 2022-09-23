@@ -34,9 +34,10 @@ public struct DefaultBeacon: Decodable {
  */
 open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
     /// The callback to call when a beacon is fired from the plugin
-    var callback: ((BeaconStruct) -> Void)?
+    public var callback: ((BeaconStruct) -> Void)?
 
-    var plugins: [JSBasePlugin] = []
+    /// BeaconPluginPlugin's to use for this BeaconPlugin
+    public var plugins: [JSBasePlugin] = []
 
     /**
      Constructs a BeaconPlugin

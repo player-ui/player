@@ -22,6 +22,25 @@ public struct AssetBeacon: Codable {
 
     /// Any additional data to add to the beacon payload
     public var data: AnyType?
+
+
+    /// Constructs an AssetBeacon
+    /// - Parameters:
+    ///   - action: The action taken for the beacon
+    ///   - element: The kind of element that fired the beacon
+    ///   - asset: A minimal representation of the asset that fired the beacon
+    ///   - data: Arbitrary additional data to add to the beacon payload
+    public init(
+        action: String,
+        element: String,
+        asset: BeaconableAsset,
+        data: AnyType?
+    ) {
+        self.action = action
+        self.element = element
+        self.asset = asset
+        self.data = data
+    }
 }
 
 /// Container Object for matching the data type for the JS Beacon Plugin
@@ -34,6 +53,22 @@ public struct BeaconableAsset: Codable {
 
     /// The metaData of the asset that fired the beacon
     public var metaData: MetaData?
+
+
+    /// Constructs a BeaconableAsset
+    /// - Parameters:
+    ///   - id: The ID of the asset that fired the beacon
+    ///   - type: The type of the asset that fired the beacon
+    ///   - metaData: Beacon applicable metaData from the asset that fired the beacon
+    public init(
+        id: String,
+        type: String?,
+        metaData: MetaData?
+    ) {
+        self.id = id
+        self.type = type
+        self.metaData = metaData
+    }
 }
 
 /**

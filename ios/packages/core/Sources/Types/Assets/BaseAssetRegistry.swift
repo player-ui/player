@@ -174,10 +174,10 @@ open class BaseAssetRegistry<WrapperType>: PlayerRegistry where
     }
 }
 
-struct RegistryDecodeShim<Asset>: Decodable {
+public struct RegistryDecodeShim<Asset>: Decodable {
     let asset: Asset
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let decodeFunction: DecodeAssetFunction<Asset> = try decoder.getDecodeAssetFunction()
         asset = try decodeFunction(decoder)
     }
@@ -213,7 +213,7 @@ typealias DecodeAssetFunction<Asset> = ((Decoder) throws -> Asset)
 
 extension Decoder {
     /// A logger that can be used to track useful decoding details
-    var logger: TapableLogger? { userInfo[.logger] as? TapableLogger }
+    public var logger: TapableLogger? { userInfo[.logger] as? TapableLogger }
 
     /**
      Retrieves a `DecodeAssetFunction<Asset>` if the decoder has one
@@ -228,7 +228,7 @@ extension Decoder {
 
     /// Returns the JSValue found at the current coding path, or throws an error if decoding was not started
     /// with `JSONDecoder.decoder(_:from:)` provided a `JSValue` value.
-    func getJSValue() throws -> JSValue {
+    public func getJSValue() throws -> JSValue {
         guard let rootJS = userInfo[.rootJS] as? JSValue else {
             throw DecodingError.decoderNotAnAssetDecoder
         }
