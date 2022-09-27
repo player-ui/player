@@ -175,7 +175,7 @@ open class BaseAssetRegistry<WrapperType>: PlayerRegistry where
 }
 
 public struct RegistryDecodeShim<Asset>: Decodable {
-    let asset: Asset
+    public let asset: Asset
 
     public init(from decoder: Decoder) throws {
         let decodeFunction: DecodeAssetFunction<Asset> = try decoder.getDecodeAssetFunction()

@@ -17,7 +17,7 @@ public class JSUtilities {
      - parameters:
         - context: The context to polyfill
      */
-    static func polyfill(_ context: JSContext) {
+    public static func polyfill(_ context: JSContext) {
         let setTimeout: @convention(block) (JSValue?, JSValue?) -> Void = { (function, timeout) in
             guard let function = function, let timeout = timeout?.toInt32() else { return }
             DispatchQueue

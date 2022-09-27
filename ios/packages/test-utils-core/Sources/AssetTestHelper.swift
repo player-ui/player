@@ -1,5 +1,4 @@
 import Foundation
-import XCTest
 import JavaScriptCore
 
 extension JSContext {
