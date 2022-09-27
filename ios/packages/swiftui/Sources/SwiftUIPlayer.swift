@@ -41,7 +41,9 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
         public init(contextBuilder: @escaping () -> JSContext = { JSContext() }) {
             self.contextBuilder = contextBuilder
             registryWatch = registry.objectWillChange.sink { [weak self] in
-                self?.objectWillChange.send()
+                DispatchQueue.main.async {
+                    self?.objectWillChange.send()
+                }
             }
         }
 
@@ -65,7 +67,7 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             self.player = playerValue
             self.flow = flow
             self.hooks = hooks
-            self.result = nil
+            DispatchQueue.main.async { self.result = nil }
 
             for plugin in allPlugins { plugin.apply(player: player) }
             registry.partialMatchRegistry = partialMatchPlugin
@@ -86,7 +88,7 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
 
             player.start(flow: flow) { [weak self] (result) in
                 guard let self = self, self.player == playerValue else { return }
-                self.result = result
+                DispatchQueue.main.async { self.result = result }
             }
         }
 
@@ -96,7 +98,7 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             player = nil
             hooks = nil
             flow = nil
-            result = nil
+            DispatchQueue.main.async { self.result = nil }
             registry.resetView()
         }
 
