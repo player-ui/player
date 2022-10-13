@@ -12,5 +12,6 @@ javascript_pipeline(
     peer_dependencies = [
         "//core/player:@player-ui/player",
     ],
-    library_name = "ReferenceAssetsPlugin"
+    library_name = "ReferenceAssetsPlugin",
+    xlr_mode = "plugin"
 )

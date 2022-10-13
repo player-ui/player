@@ -1,6 +1,7 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_player//:index.bzl", "js_library_pipeline")
 load("@rules_player//player/bundle:bundle.bzl", "bundle")
+load("@rules_player//player/cli:xlr.bzl", "xlr_compile")
 
 lint_exts = [".ts", ".js", ".jsx", ".tsx", ".json", ".snap"]
 
@@ -93,11 +94,11 @@ def javascript_pipeline(
         test_data = [],
         lint_data = [],
         other_srcs = [],
+        xlr_mode = "",
         **kwargs
         ):
     #Derive target specific sources
     srcs = native.glob([paths.join(root_dir, "**/*"), "README.md"]) + other_srcs
-
     resolved_entry = entry if entry else _find_entry(root_dir, srcs)
 
     js_library_pipeline(
@@ -117,6 +118,7 @@ def javascript_pipeline(
         create_package_json_opts = {
             "base_package_json": "//tools:pkg_json_template",
         },
+        js_library_data = [] if not xlr_mode else [":%s_XLR" % name],
         **kwargs
     )
 
@@ -134,4 +136,14 @@ def javascript_pipeline(
             },
             visibility = ["//visibility:public"],
             bundle_name = name.split('/')[1]
+        )
+    
+    if(xlr_mode):
+        data = BUILD_DATA + build_data + dependencies + peer_dependencies
+        xlr_compile(
+            name = "%s_XLR" % name,
+            data = data,
+            input_root = root_dir,
+            srcs = srcs,
+            mode = xlr_mode
         )
