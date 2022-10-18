@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, binding as b } from '@player-ui/dsl';
+import { render, binding as b } from '@player-tools/dsl';
 import { Text, Action, Info, Collection, Input } from '.';
 
 describe('JSON serialization', () => {

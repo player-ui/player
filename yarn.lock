@@ -3311,7 +3311,7 @@
     vscode-languageserver-textdocument "^1.0.1"
     vscode-languageserver-types "^3.15.1"
 
-"@player-tools/dsl@0.1.0":
+"@player-tools/dsl@0.1.0", "@player-tools/dsl@^0.1.0":
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@player-tools/dsl/-/dsl-0.1.0.tgz#babbc0033dde503787e7f62613c4525d5ed2e96b"
   integrity sha512-id3+CNTRgF67mDC6eLzyX2ZEI7X38wAEBG06K6Ql6BjZbJsObukxc/qcI6aUEyQzXtKvJ5fQiqCJ8se5sm4JRA==
