@@ -42,6 +42,12 @@ public struct AssetBeacon: Codable {
     }
 }
 
+/// MetaData requirements for `BaseBeaconPlugin` and its extensions
+public protocol BeaconableMetaData {
+    /// Additional data to include when beaconing this asset
+    var beacon: AnyType? { get set }
+}
+
 /// Container Object for matching the data type for the JS Beacon Plugin
 public struct BeaconableAsset: Codable {
     /// The ID of the asset that fired the beacon
@@ -58,16 +64,31 @@ public struct BeaconableAsset: Codable {
     ///   - id: The ID of the asset that fired the beacon
     ///   - type: The type of the asset that fired the beacon
     ///   - metaData: Beacon applicable metaData from the asset that fired the beacon
-    public init(
+    public init<MetaDataType: BeaconableMetaData>(
         id: String,
         type: String? = nil,
-        metaData: MetaData? = nil
+        metaData: MetaDataType? = nil
     ) {
         self.id = id
         self.type = type
-        self.metaData = metaData
+        self.metaData = MetaData(beacon: metaData?.beacon)
+    }
+
+    /// Constructs a BeaconableAsset
+    /// - Parameters:
+    ///   - id: The ID of the asset that fired the beacon
+    ///   - type: The type of the asset that fired the beacon
+    public init(
+        id: String,
+        type: String? = nil
+    ) {
+        self.id = id
+        self.type = type
+        self.metaData = nil
     }
 }
+
+extension MetaData: BeaconableMetaData {}
 
 /**
  All potential Beacon Element types
