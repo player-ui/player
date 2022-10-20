@@ -1,7 +1,8 @@
-import type { ViewInstance } from '@player-ui/view';
 import { waitFor } from '@testing-library/react';
-import { NodeType } from '@player-ui/view';
 import { makeFlow } from '@player-ui/make-flow';
+
+import type { ViewInstance } from '../view';
+import { NodeType } from '../view';
 import { Player } from '..';
 import type { ViewController } from '..';
 import actionsFlow from './helpers/actions.flow';

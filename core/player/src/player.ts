@@ -1,22 +1,25 @@
-import { SyncHook, SyncWaterfallHook } from 'tapable-ts';
-import type { FlowInstance } from '@player-ui/flow';
-import { FlowController } from '@player-ui/flow';
-import type { Logger } from '@player-ui/logger';
-import { TapableLogger } from '@player-ui/logger';
-import type { ExpressionHandler } from '@player-ui/expressions';
-import { ExpressionEvaluator } from '@player-ui/expressions';
-import { SchemaController } from '@player-ui/schema';
-import { BindingParser } from '@player-ui/binding';
-import type { ViewInstance } from '@player-ui/view';
 import { setIn } from 'timm';
 import deferred from 'p-defer';
-import type { Flow as FlowType, FlowResult } from '@player-ui/types';
-import { resolveDataRefs } from '@player-ui/string-resolver';
-import { ConstantsController } from '@player-ui/constants';
 import queueMicrotask from 'queue-microtask';
-import { ViewController } from './view';
-import { DataController } from './data';
-import { ValidationController } from './validation';
+import type { Flow as FlowType, FlowResult } from '@player-ui/types';
+
+import { SyncHook, SyncWaterfallHook } from 'tapable-ts';
+import type { Logger } from './logger';
+import { TapableLogger } from './logger';
+import type { ExpressionHandler } from './expressions';
+import { ExpressionEvaluator } from './expressions';
+import { SchemaController } from './schema';
+import { BindingParser } from './binding';
+import type { ViewInstance } from './view';
+import { resolveDataRefs } from './string-resolver';
+import type { FlowInstance } from './controllers';
+import {
+  ConstantsController,
+  ViewController,
+  DataController,
+  ValidationController,
+  FlowController,
+} from './controllers';
 import { FlowExpPlugin } from './plugins/flow-exp-plugin';
 import type {
   PlayerFlowState,

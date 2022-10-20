@@ -1,6 +1,6 @@
-import { BindingParser } from '@player-ui/binding';
-import { LocalModel } from '@player-ui/data';
-import { ValidationMiddleware } from '@player-ui/validator';
+import { BindingParser } from '../binding';
+import { LocalModel } from '../data';
+import { ValidationMiddleware } from '../validator';
 import { DataController } from '..';
 
 test('works with basic data', () => {

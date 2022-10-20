@@ -2,11 +2,11 @@ import { omit } from 'timm';
 import { makeFlow } from '@player-ui/make-flow';
 import { waitFor } from '@testing-library/react';
 import type { Flow } from '@player-ui/types';
-import type { SchemaController } from '@player-ui/schema';
-import type { BindingParser } from '@player-ui/binding';
+import type { SchemaController } from '../schema';
+import type { BindingParser } from '../binding';
 import TrackBindingPlugin, { addValidator } from './helpers/binding.plugin';
 import { Player } from '..';
-import type { ValidationController } from '../validation';
+import type { ValidationController } from '../controllers/validation';
 import type { InProgressState } from '../types';
 import TestExpressionPlugin from './helpers/expression.plugin';
 

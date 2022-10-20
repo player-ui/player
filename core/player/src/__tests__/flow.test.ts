@@ -1,5 +1,6 @@
-import type { FlowController } from '@player-ui/flow';
 import { waitFor } from '@testing-library/react';
+
+import type { FlowController } from '../controllers';
 import type { DataController } from '..';
 import { Player } from '..';
 import type { InProgressState } from '../types';
