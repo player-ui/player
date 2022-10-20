@@ -1,5 +1,8 @@
 /* eslint-disable react/no-this-in-sfc */
 import React from 'react';
+import { SyncWaterfallHook, AsyncParallelHook } from 'tapable-ts';
+import { Subscribe, useSubscribedState } from '@player-ui/react-subscribe';
+import { Registry } from '@player-ui/partial-match-registry';
 import type {
   CompletedState,
   PlayerPlugin,
@@ -7,13 +10,10 @@ import type {
   View,
 } from '@player-ui/player';
 import { Player } from '@player-ui/player';
-import type { AssetRegistryType } from '@player-ui/react-asset';
-import { AssetContext } from '@player-ui/react-asset';
 import { ErrorBoundary } from 'react-error-boundary';
-import { PlayerContext } from '@player-ui/react-utils';
-import { SyncWaterfallHook, AsyncParallelHook } from 'tapable-ts';
-import { Subscribe, useSubscribedState } from '@player-ui/react-subscribe';
-import { Registry } from '@player-ui/partial-match-registry';
+import type { AssetRegistryType } from './asset';
+import { AssetContext } from './asset';
+import { PlayerContext } from './utils';
 
 import type { WebPlayerProps } from './app';
 import PlayerComp from './app';
