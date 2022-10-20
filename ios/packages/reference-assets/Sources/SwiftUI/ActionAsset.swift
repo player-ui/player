@@ -13,6 +13,9 @@ struct ActionData: AssetData {
     var label: WrappedAsset?
     /// A function to run in the core when this action is invoked
     var run: WrappedFunction<Void>?
+
+    /// Additional metaData for beaconing
+    var metaData: MetaData?
 }
 
 /**
@@ -40,7 +43,7 @@ struct ActionAssetView: View {
     var body: some View {
         Button(
             action: {
-                beaconContext?.beacon(action: "clicked", element: "button", id: model.data.id)
+                beaconContext?.beacon(action: "clicked", element: "button", id: model.data.id, metaData: model.data.metaData)
                 self.model.data.run?()
             },
             label: {

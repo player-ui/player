@@ -54,14 +54,47 @@ public class BeaconContext: ObservableObject {
         - action: The type of action that occurred
         - element: The type of element in the asset that triggered the beacon
         - id: The ID of the asset that triggered the beacon
+        - metaData: `BeaconableMetaData` to include as extra data to the core BeaconPlugin
         - data: Additional arbitrary data to include in the beacon
      */
-    public func beacon(action: String, element: String, id: String, type: String? = nil, metaData: MetaData? = nil, data: AnyType? = nil) {
+    public func beacon<MetaDataType: BeaconableMetaData>(
+        action: String,
+        element: String,
+        id: String,
+        type: String? = nil,
+        metaData: MetaDataType? = nil,
+        data: AnyType? = nil
+    ) {
         self.beaconFn(
             AssetBeacon(
                 action: action,
                 element: element,
-                asset: BeaconableAsset(id: id, type: type, metaData: metaData),
+                asset: BeaconableAsset(id: id, type: type, metaData: metaData.map { MetaData(beacon: $0.beacon) }),
+                data: data
+            )
+        )
+    }
+
+    /**
+     Sends a beacon through the JavaScript beacon plugin
+     - parameters:
+        - action: The type of action that occurred
+        - element: The type of element in the asset that triggered the beacon
+        - id: The ID of the asset that triggered the beacon
+        - data: Additional arbitrary data to include in the beacon
+     */
+    public func beacon(
+        action: String,
+        element: String,
+        id: String,
+        type: String? = nil,
+        data: AnyType? = nil
+    ) {
+        self.beaconFn(
+            AssetBeacon(
+                action: action,
+                element: element,
+                asset: BeaconableAsset(id: id, type: type),
                 data: data
             )
         )
