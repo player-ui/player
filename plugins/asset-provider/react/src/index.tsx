@@ -1,13 +1,13 @@
 import React from 'react';
-import type { WebPlayer, WebPlayerPlugin } from '@player-ui/react';
-import { AssetContext } from '@player-ui/react-asset';
+import type { ReactPlayer, ReactPlayerPlugin } from '@player-ui/react';
+import { AssetContext } from '@player-ui/react';
 
 export type AssetRegistryEntries = Array<[any, React.ComponentType<any>]>;
 
 /**
  * A streamlined way of registering custom assets with the web-player
  */
-export class AssetProviderPlugin implements WebPlayerPlugin {
+export class AssetProviderPlugin implements ReactPlayerPlugin {
   name = 'web-asset-provider-plugin';
 
   private readonly entries: AssetRegistryEntries;
@@ -22,7 +22,7 @@ export class AssetProviderPlugin implements WebPlayerPlugin {
     this.entries = entries;
   }
 
-  applyWeb(wp: WebPlayer) {
+  applyReact(rp: ReactPlayer) {
     this.entries.forEach(([match, comp]) => {
       const normalizedMatch =
         typeof match === 'string' ? { type: match } : match;

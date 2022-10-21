@@ -1,4 +1,4 @@
-import type { WebPlayer, Player, WebPlayerPlugin } from '@player-ui/react';
+import type { ReactPlayer, Player, ReactPlayerPlugin } from '@player-ui/react';
 import type { Timing } from '@player-ui/metrics-plugin-react';
 import { MetricsPlugin } from '@player-ui/metrics-plugin-react';
 import type {
@@ -14,7 +14,7 @@ import { createEvent } from '../state';
  *
  * A web plugin for interacting with storybook
  */
-export class StorybookPlayerPlugin implements WebPlayerPlugin {
+export class StorybookPlayerPlugin implements ReactPlayerPlugin {
   public readonly name = 'Storybook';
 
   private actions: StateActions;
@@ -39,10 +39,10 @@ export class StorybookPlayerPlugin implements WebPlayerPlugin {
     player.registerPlugin(this.metricsPlugin);
   }
 
-  applyWeb(wp: WebPlayer) {
-    wp.registerPlugin(this.metricsPlugin);
+  applyReact(rp: ReactPlayer) {
+    rp.registerPlugin(this.metricsPlugin);
 
-    wp.player.hooks.dataController.tap(this.name, (dc) => {
+    rp.player.hooks.dataController.tap(this.name, (dc) => {
       this.actions.clearEvents();
 
       dc.hooks.onUpdate.tap(this.name, (dataUpdates) => {
@@ -59,7 +59,7 @@ export class StorybookPlayerPlugin implements WebPlayerPlugin {
       });
     });
 
-    wp.player.logger.hooks.log.tap(this.name, (severity, data) => {
+    rp.player.logger.hooks.log.tap(this.name, (severity, data) => {
       this.actions.addEvents([
         createEvent<LogEventType>({
           type: 'log',
@@ -69,7 +69,7 @@ export class StorybookPlayerPlugin implements WebPlayerPlugin {
       ]);
     });
 
-    wp.player.hooks.state.tap(this.name, (newState) => {
+    rp.player.hooks.state.tap(this.name, (newState) => {
       if ('error' in newState) {
         this.actions.addEvents([
           createEvent<StateChangeEventType>({

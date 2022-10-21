@@ -1,18 +1,18 @@
 import React from 'react';
 import type {
-  WebPlayerPlugin,
+  ReactPlayerPlugin,
   PlayerFlowStatus,
   Flow,
-  WebPlayerOptions,
+  ReactPlayerOptions,
 } from '@player-ui/react';
-import { WebPlayer } from '@player-ui/react';
+import { ReactPlayer } from '@player-ui/react';
 import { ChakraProvider, Spinner } from '@chakra-ui/react';
 import { makeFlow } from '@player-ui/make-flow';
 import addons from '@storybook/addons';
 import type { AsyncImportFactory, RenderTarget } from '../types';
 import { useEditorFlow } from './hooks';
 import { Appetize } from './Appetize';
-import { StorybookPlayerPlugin } from './storybookWebPlayerPlugin';
+import { StorybookPlayerPlugin } from './storybookReactPlayerPlugin';
 import { useStateActions, subscribe } from '../state/hooks';
 import { PlayerFlowSummary } from './PlayerFlowSummary';
 
@@ -21,12 +21,12 @@ interface LocalPlayerStory {
   flow: Flow;
 
   /** Web plugins to load into Player */
-  webPlugins?: Array<WebPlayerPlugin>;
+  webPlugins?: Array<ReactPlayerPlugin>;
 }
 
-export const WebPlayerPluginContext = React.createContext<{
+export const ReactPlayerPluginContext = React.createContext<{
   /** Web plugins to load into Player */
-  plugins?: Array<WebPlayerPlugin>;
+  plugins?: Array<ReactPlayerPlugin>;
 }>({ plugins: [] });
 
 export const PlayerRenderContext = React.createContext<RenderTarget>({
@@ -42,7 +42,7 @@ export const StorybookControlsContext = React.createContext<{
 
 export const PlayerOptionsContext = React.createContext<{
   /**  these are options such as suspend, or plugins */
-  options?: WebPlayerOptions;
+  options?: ReactPlayerOptions;
 }>({ options: {} });
 
 /** A component to render a player + flow */
@@ -50,7 +50,7 @@ const LocalPlayerStory = (props: LocalPlayerStory) => {
   let flow = useEditorFlow(props.flow);
 
   const renderContext = React.useContext(PlayerRenderContext);
-  const pluginContext = React.useContext(WebPlayerPluginContext);
+  const pluginContext = React.useContext(ReactPlayerPluginContext);
   const controlsContext = React.useContext(StorybookControlsContext);
   const optionsContext = React.useContext(PlayerOptionsContext);
   const options = { ...optionsContext?.options };
@@ -60,7 +60,7 @@ const LocalPlayerStory = (props: LocalPlayerStory) => {
     React.useState<PlayerFlowStatus>('not-started');
 
   const wp = React.useMemo(() => {
-    return new WebPlayer({
+    return new ReactPlayer({
       ...options,
       plugins: [
         new StorybookPlayerPlugin(stateActions),
@@ -185,7 +185,7 @@ export interface PlayerStoryProps {
   /** props from storybook controls */
   storybookControls?: Flow['data'];
   /**  options, like suspend and plugins */
-  options?: WebPlayerOptions;
+  options?: ReactPlayerOptions;
 }
 
 /**

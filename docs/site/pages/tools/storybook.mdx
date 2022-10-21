@@ -51,13 +51,13 @@ export const MyStory = (
 )
 ```
 
-The `webplayerPlugins` story parameter allows you to add any custom plugins (like asset providers) to a story. This can also be set in the `.storybook/preview.js` file as a global option: 
+The `reactPlayerPlugins` story parameter allows you to add any custom plugins (like asset providers) to a story. This can also be set in the `.storybook/preview.js` file as a global option: 
 
 ```js
 import { ReferenceAssetsPlugin } from '@player-ui/reference-assets-plugin-react';
 
 export const parameters = {
-  webplayerPlugins: [
+  reactPlayerPlugins: [
     new ReferenceAssetsPlugin()
   ],
 }

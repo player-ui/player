@@ -3,7 +3,7 @@ import type { DecoratorFn } from '@storybook/react';
 import addons from '@storybook/addons';
 import type { PlatformSetType } from '../state/hooks';
 import { subscribe } from '../state/hooks';
-import { WebPlayerPluginContext, PlayerRenderContext } from '../player';
+import { ReactPlayerPluginContext, PlayerRenderContext } from '../player';
 import type { PlayerParametersType, RenderTarget } from '../types';
 
 /**
@@ -36,11 +36,11 @@ export const PlayerDecorator: DecoratorFn = (story, ctx) => {
         appetizeVersions: playerParams.appetizeVersions,
       }}
     >
-      <WebPlayerPluginContext.Provider
-        value={{ plugins: playerParams.webplayerPlugins }}
+      <ReactPlayerPluginContext.Provider
+        value={{ plugins: playerParams.reactPlayerPlugins }}
       >
         {story()}
-      </WebPlayerPluginContext.Provider>
+      </ReactPlayerPluginContext.Provider>
     </PlayerRenderContext.Provider>
   );
 };

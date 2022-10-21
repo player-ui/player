@@ -1,5 +1,5 @@
 import React from 'react';
-import type { WebPlayer, WebPlayerPlugin } from '@player-ui/react';
+import type { ReactPlayer, ReactPlayerPlugin } from '@player-ui/react';
 import { CheckPathPlugin as CheckPathCorePlugin } from '@player-ui/check-path-plugin';
 import { CheckPathContext } from './context';
 
@@ -11,11 +11,11 @@ export * from './context';
  */
 export class CheckPathPlugin
   extends CheckPathCorePlugin
-  implements WebPlayerPlugin
+  implements ReactPlayerPlugin
 {
   name = 'check-path-web';
 
-  applyWeb(wp: WebPlayer) {
+  applyReact(rp: ReactPlayer) {
     wp.hooks.webComponent.tap(this.name, (Comp) => {
       return () => (
         <CheckPathContext.Provider value={{ plugin: this }}>

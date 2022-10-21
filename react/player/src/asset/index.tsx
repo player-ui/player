@@ -16,7 +16,7 @@ export const AssetContext = React.createContext<ContextType>({});
 /**
  * A React Component that looks up an implementation from a registry
  */
-export const Asset = (
+export const ReactAsset = (
   props: AssetType<string> | AssetWrapper<AssetType<string>>
 ) => {
   const { registry } = React.useContext(AssetContext);

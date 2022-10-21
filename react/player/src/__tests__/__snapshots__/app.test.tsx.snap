@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`WebPlayer React renders into a react comp 1`] = `
+exports[`ReactPlayer React renders into a react comp 1`] = `
 Object {
   "asFragment": [Function],
   "baseElement": <body>

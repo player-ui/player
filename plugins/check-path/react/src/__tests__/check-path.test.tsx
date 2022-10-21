@@ -1,13 +1,13 @@
 import React from 'react';
 import { Asset } from '@player-ui/react-asset';
-import { WebPlayer } from '@player-ui/react';
+import { ReactPlayer } from '@player-ui/react';
 import { findByTestId, render } from '@testing-library/react';
 import { makeFlow } from '@player-ui/make-flow';
 import { CheckPathPlugin, useGetParentProp } from '..';
 
 describe('beacon web plugin', () => {
   test('loads in a player', async () => {
-    const wp = new WebPlayer({
+    const wp = new ReactPlayer({
       plugins: [new CheckPathPlugin()],
     });
 

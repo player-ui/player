@@ -19,22 +19,22 @@ Each of the Asset components follows the same basic pattern:
 To import and use these Assets in your App, simply import the `plugin` and attach it to Player:
 
 ```tsx
-import { useWebPlayer, WebPlayerPlugin } from '@player-ui/react';
+import { useReactPlayer, ReactPlayerPlugin } from '@player-ui/react';
 import ReferenceAssetsPlugin from '@player-ui/reference-assets/plugin-react';
 
-const plugins: Array<WebPlayerPlugin> = [new ReferenceAssetsPlugin()];
+const plugins: Array<ReactPlayerPlugin> = [new ReferenceAssetsPlugin()];
 
 export const App = () => {
   // Create Player with our plugins
-  const { webPlayer } = useWebPlayer({ plugins });
+  const { reactPlayer } = useReactPlayer({ plugins });
 
   // Start the flow.
 
   React.useEffect(() => {
-    webPlayer.start(/** Insert your player content */);
+    reactPlayer.start(/** Insert your player content */);
   }, []);
 
   // Render Player
-  return <webPlayer.Component />;
+  return <ReactPlayer.Component />;
 };
 ```

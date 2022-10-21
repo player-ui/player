@@ -5,10 +5,10 @@ import type {
   PlayerFlowState,
   DataController,
   ExpressionEvaluator,
+  Logger,
 } from '@player-ui/player';
 import { resolveDataRefs } from '@player-ui/player';
 import type { Asset, View } from '@player-ui/types';
-import type { Logger } from '@player-ui/logger';
 import { setIn } from 'timm';
 import { BeaconPluginSymbol } from './symbols';
 

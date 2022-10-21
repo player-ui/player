@@ -1,5 +1,5 @@
 import React from 'react';
-import { WebPlayer } from '@player-ui/react';
+import { ReactPlayer } from '@player-ui/react';
 import { findByTestId, render } from '@testing-library/react';
 import { makeFlow } from '@player-ui/make-flow';
 import { BeaconPlugin, useBeacon } from '..';
@@ -8,7 +8,7 @@ describe('beacon web plugin', () => {
   test('loads in a player', async () => {
     const beaconCallback = jest.fn();
 
-    const wp = new WebPlayer({
+    const wp = new ReactPlayer({
       plugins: [
         new BeaconPlugin({
           callback: beaconCallback,

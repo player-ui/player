@@ -8,16 +8,16 @@ import {
 } from '@testing-library/react';
 import type { InProgressState } from '@player-ui/player';
 import { makeFlow } from '@player-ui/make-flow';
-import { WebPlayer } from '..';
+import { ReactPlayer } from '..';
 import { simpleFlow, SimpleAssetPlugin } from './helpers/simple-asset-plugin';
 
 configure({
   testIdAttribute: 'id',
 });
 
-describe('WebPlayer React', () => {
+describe('ReactPlayer React', () => {
   test('renders into a react comp', async () => {
-    const wp = new WebPlayer({ plugins: [new SimpleAssetPlugin()] });
+    const wp = new ReactPlayer({ plugins: [new SimpleAssetPlugin()] });
 
     wp.start(simpleFlow);
     const ele = render(
@@ -33,7 +33,7 @@ describe('WebPlayer React', () => {
   });
 
   test('uses existing data', async () => {
-    const wp = new WebPlayer({ plugins: [new SimpleAssetPlugin()] });
+    const wp = new ReactPlayer({ plugins: [new SimpleAssetPlugin()] });
     wp.start({ ...simpleFlow, data: { foo: { bar: 'Initial Value' } } });
     const ele = render(
       <React.Suspense fallback="fallback">
@@ -46,7 +46,7 @@ describe('WebPlayer React', () => {
   });
 
   test('fails flow when UI throws error', async () => {
-    const wp = new WebPlayer({ suspend: false });
+    const wp = new ReactPlayer({ suspend: false });
     const response = wp.start(makeFlow({ type: 'err', id: 'Error' }));
     act(() => {
       render(<wp.Component />);
@@ -55,7 +55,7 @@ describe('WebPlayer React', () => {
   });
 
   test('updates the react comp when view updates', async () => {
-    const wp = new WebPlayer({
+    const wp = new ReactPlayer({
       plugins: [new SimpleAssetPlugin()],
       suspend: false,
     });
@@ -77,7 +77,7 @@ describe('WebPlayer React', () => {
   });
 
   test('shares a core player with multiple web-players', async () => {
-    const wp = new WebPlayer({ plugins: [new SimpleAssetPlugin()] });
+    const wp = new ReactPlayer({ plugins: [new SimpleAssetPlugin()] });
 
     wp.start(simpleFlow);
 
@@ -90,7 +90,7 @@ describe('WebPlayer React', () => {
     const viewNode = await wpEle.findByTestId('first_view');
     expect(getNodeText(viewNode!)).toBe('');
 
-    const wp2 = new WebPlayer({
+    const wp2 = new ReactPlayer({
       plugins: [new SimpleAssetPlugin()],
       player: wp.player,
     });
@@ -124,7 +124,7 @@ const Fallback = () => <div id="loader">Loading...</div>;
 
 describe('Suspense', () => {
   test('suspends while waiting for a flow to start', async () => {
-    const wp = new WebPlayer({
+    const wp = new ReactPlayer({
       suspend: true,
       plugins: [new SimpleAssetPlugin()],
     });
@@ -151,7 +151,7 @@ describe('Suspense', () => {
   });
 
   test('suspends while waiting for the view to render', async () => {
-    const wp = new WebPlayer({
+    const wp = new ReactPlayer({
       suspend: true,
       plugins: [new SimpleAssetPlugin()],
     });
@@ -200,7 +200,7 @@ describe('Suspense', () => {
   });
 
   test('suspends at the end of a flow until the next one starts', async () => {
-    const wp = new WebPlayer({
+    const wp = new ReactPlayer({
       suspend: true,
       plugins: [new SimpleAssetPlugin()],
     });

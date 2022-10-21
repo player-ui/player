@@ -1,4 +1,4 @@
-import type { WebPlayer, WebPlayerPlugin } from '@player-ui/react';
+import type { ReactPlayer, ReactPlayerPlugin } from '@player-ui/react';
 import type { Player } from '@player-ui/player';
 import React from 'react';
 import { AutoScrollProvider } from './hooks';
@@ -17,7 +17,7 @@ export interface AutoScrollManagerConfig {
 }
 
 /** A plugin to manage scrolling behavior */
-export class AutoScrollManagerPlugin implements WebPlayerPlugin {
+export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
   name = 'auto-scroll-manager';
 
   /** Toggles if we should auto scroll to to the first failed validation on page load */
@@ -137,8 +137,8 @@ export class AutoScrollManagerPlugin implements WebPlayerPlugin {
     });
   }
 
-  applyWeb(webPlayer: WebPlayer) {
-    webPlayer.hooks.webComponent.tap(this.name, (Comp) => {
+  applyReact(reactPlayer: ReactPlayer) {
+    reactPlayer.hooks.webComponent.tap(this.name, (Comp) => {
       return () => {
         const { scrollFn } = this;
 

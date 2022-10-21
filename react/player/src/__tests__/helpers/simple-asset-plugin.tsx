@@ -2,7 +2,7 @@ import React from 'react';
 import type { Asset as AssetType, AssetWrapper, Flow } from '@player-ui/player';
 import { usePlayer } from '@player-ui/react-utils';
 import { Asset } from '@player-ui/react-asset';
-import type { WebPlayer, WebPlayerPlugin } from '../..';
+import type { ReactPlayer, ReactPlayerPlugin } from '../..';
 
 interface SimpleAsset extends AssetType<'simple'> {
   /** text value of the asset */
@@ -99,10 +99,10 @@ export const simpleFlow: Flow<any> = {
 /**
  * Registers a simple asset as a react comp
  */
-export class SimpleAssetPlugin implements WebPlayerPlugin {
+export class SimpleAssetPlugin implements ReactPlayerPlugin {
   name = 'simple-asset-plugin';
 
-  applyWeb(wp: WebPlayer) {
+  applyReact(rp: ReactPlayer) {
     wp.assetRegistry.set({ type: 'simple' }, SimpleAsset);
     wp.assetRegistry.set({ type: 'action' }, Action);
     wp.assetRegistry.set({ type: 'collection' }, Collection);

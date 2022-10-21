@@ -1,8 +1,8 @@
 import React from 'react';
-import { Asset } from '@player-ui/react-asset';
+import { Asset } from './asset';
 import type { Asset as AssetType } from '@player-ui/player';
 
-export interface WebPlayerProps {
+export interface ReactPlayerProps {
   /**
    * The Content view object to render
    */
@@ -10,14 +10,10 @@ export interface WebPlayerProps {
 }
 
 /**
- * The entry for the WebPlayer's React tree
+ * The entry for the ReactPlayer's React tree
  */
-const WebPlayer = ({ view }: WebPlayerProps) => {
-  return (
-    <div>
-      <Asset {...view} />
-    </div>
-  );
+const ReactPlayer = ({ view }: ReactPlayerProps) => {
+  return <Asset {...view} />;
 };
 
-export default WebPlayer;
+export default ReactPlayer;

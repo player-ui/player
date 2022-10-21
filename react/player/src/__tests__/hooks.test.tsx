@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react-hooks';
-import { useWebPlayer } from '..';
+import { useReactPlayer } from '..';
 
-test('webplayer hook', () => {
-  const { result } = renderHook(() => useWebPlayer());
-  expect(result.current.webPlayer).toBeDefined();
+test('reactPlayer hook', () => {
+  const { result } = renderHook(() => useReactPlayer());
+  expect(result.current.reactPlayer).toBeDefined();
 });

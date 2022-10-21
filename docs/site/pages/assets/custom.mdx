@@ -31,9 +31,9 @@ Now that we have a React component to render our asset, let's create a plugin to
 import WebAssetProvider from '@player-ui/asset-provider-plugin-react';
 
 ```javascript
-class CustomAssetPlugin implements WebPlayerPlugin{
-  applyWeb(webplayer) {
-    new WebAssetProvider([['custom', CustomAssetComp]]).applyWeb(webplayer);
+class CustomAssetPlugin implements ReactPlayerPlugin{
+  applyReact(reactPlayer) {
+    new WebAssetProvider([['custom', CustomAssetComp]]).applyReact(reactPlayer);
   }
 }
 ```

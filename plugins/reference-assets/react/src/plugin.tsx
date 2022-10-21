@@ -1,5 +1,5 @@
 import React from 'react';
-import type { WebPlayer, WebPlayerPlugin } from '@player-ui/react';
+import type { ReactPlayer, ReactPlayerPlugin } from '@player-ui/react';
 import type { Player } from '@player-ui/player';
 import { AssetProviderPlugin } from '@player-ui/asset-provider-plugin-react';
 import { ChakraProvider, useTheme } from '@chakra-ui/react';
@@ -22,11 +22,11 @@ const OptionalChakraThemeProvider = (
 /**
  * A plugin to register the base reference assets
  */
-export class ReferenceAssetsPlugin implements WebPlayerPlugin {
+export class ReferenceAssetsPlugin implements ReactPlayerPlugin {
   name = 'reference-assets-web-plugin';
 
-  applyWeb(webplayer: WebPlayer) {
-    webplayer.registerPlugin(
+  applyReact(reactPlayer: ReactPlayer) {
+    reactPlayer.registerPlugin(
       new AssetProviderPlugin([
         ['input', Input],
         ['text', Text],
@@ -36,7 +36,7 @@ export class ReferenceAssetsPlugin implements WebPlayerPlugin {
       ])
     );
 
-    webplayer.hooks.webComponent.tap(this.name, (Comp) => {
+    reactPlayer.hooks.webComponent.tap(this.name, (Comp) => {
       return () => {
         return (
           <OptionalChakraThemeProvider>
