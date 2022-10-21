@@ -44,15 +44,15 @@ Typically you register assets by type, but the registry acts by finding the most
 
 Often times, assets contain a reference or slot to another asset. For this to function properly, the custom asset needs to defer to the React Player to render the sub-asset. Say for instance we change our custom asset to now support a `header` property that takes another asset.
 
-Use the Asset from the `@player-ui/react-asset` package with the nested asset as props to dynamically determine the rendering implementation to use:
+Use the ReactAsset Component from the `@player-ui/react` package with the nested asset as props to dynamically determine the rendering implementation to use:
 
 ```jsx
-import { Asset } from '@player-ui/react-asset';
+import { ReactAsset } from '@player-ui/react';
 
 const CustomAssetComp = (props) => {
   return (
     <div id={props.id} style={{ color: 'purple' }}>
-      {props.header && <Asset {...props.header} />}
+      {props.header && <ReactAsset {...props.header} />}
       {props.text}
     </div>
   );

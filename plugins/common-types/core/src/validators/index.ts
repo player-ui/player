@@ -1,5 +1,5 @@
 import type { Expression } from '@player-ui/types';
-import type { ValidatorFunction } from '@player-ui/validator';
+import type { ValidatorFunction } from '@player-ui/player';
 
 // Shamelessly lifted from Scott Gonzalez via the Bassistance Validation plugin http://projects.scottsplayground.com/email_address_validation/
 

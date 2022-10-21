@@ -1,4 +1,4 @@
-import { toNum } from '..';
+import { toNum } from '../toNum';
 
 describe('toNum', () => {
   test('returns the argument when provided a number', () => {

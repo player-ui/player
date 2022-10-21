@@ -1,6 +1,9 @@
 import pubsub from 'pubsub-js';
-import type { Player, PlayerPlugin } from '@player-ui/player';
-import type { ExpressionContext } from '@player-ui/expressions';
+import type {
+  Player,
+  PlayerPlugin,
+  ExpressionContext,
+} from '@player-ui/player';
 import { PubSubPluginSymbol } from './symbols';
 
 export interface PubSubConfig {

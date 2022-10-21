@@ -16,7 +16,7 @@ export class CheckPathPlugin
   name = 'check-path-web';
 
   applyReact(rp: ReactPlayer) {
-    wp.hooks.webComponent.tap(this.name, (Comp) => {
+    rp.hooks.webComponent.tap(this.name, (Comp) => {
       return () => (
         <CheckPathContext.Provider value={{ plugin: this }}>
           <Comp />

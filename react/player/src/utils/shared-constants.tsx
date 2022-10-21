@@ -1,4 +1,4 @@
-import { usePlayer } from '@player-ui/react-utils';
+import { usePlayer } from './player-context';
 
 /** Hook to get a constant under a specific namespace */
 export function useGetConstantByType(type: string, key: string): unknown {

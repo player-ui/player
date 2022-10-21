@@ -1,19 +1,19 @@
 import React from 'react';
-import { Asset } from './asset';
-import type { Asset as AssetType } from '@player-ui/player';
+import type { View } from '@player-ui/player';
+import { ReactAsset } from './asset';
 
 export interface ReactPlayerProps {
   /**
    * The Content view object to render
    */
-  view: AssetType;
+  view: View;
 }
 
 /**
  * The entry for the ReactPlayer's React tree
  */
 const ReactPlayer = ({ view }: ReactPlayerProps) => {
-  return <Asset {...view} />;
+  return <ReactAsset {...view} />;
 };
 
 export default ReactPlayer;

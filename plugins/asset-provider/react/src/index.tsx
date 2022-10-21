@@ -27,14 +27,14 @@ export class AssetProviderPlugin implements ReactPlayerPlugin {
       const normalizedMatch =
         typeof match === 'string' ? { type: match } : match;
 
-      wp.assetRegistry.set(normalizedMatch, comp);
+      rp.assetRegistry.set(normalizedMatch, comp);
     });
 
     // Because some instances may end up with a different copy of the `AssetContext` (depending on bundling and such)
-    // We add an entry to use the local version of `@web-player/asset` -- but still utilize the same wp.assetRegistry
-    wp.hooks.webComponent.tap(this.name, (Comp) => {
+    // We add an entry to use the local version of `@web-player/asset` -- but still utilize the same rp.assetRegistry
+    rp.hooks.webComponent.tap(this.name, (Comp) => {
       return () => (
-        <AssetContext.Provider value={{ registry: wp.assetRegistry }}>
+        <AssetContext.Provider value={{ registry: rp.assetRegistry }}>
           <Comp />
         </AssetContext.Provider>
       );

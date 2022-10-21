@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { Registry } from '@player-ui/partial-match-registry';
 import type { AssetRegistryType } from '..';
-import { Asset, AssetContext } from '..';
+import { ReactAsset, AssetContext } from '..';
 
 test('it prioritizes local type and id', () => {
   const assetDef = {
@@ -21,7 +21,7 @@ test('it prioritizes local type and id', () => {
 
   const asset = render(
     <AssetContext.Provider value={{ registry }}>
-      <Asset {...assetDef} />
+      <ReactAsset {...assetDef} />
     </AssetContext.Provider>
   );
 

@@ -59,7 +59,7 @@ const LocalPlayerStory = (props: LocalPlayerStory) => {
   const [playerState, setPlayerState] =
     React.useState<PlayerFlowStatus>('not-started');
 
-  const wp = React.useMemo(() => {
+  const rp = React.useMemo(() => {
     return new ReactPlayer({
       ...options,
       plugins: [
@@ -73,7 +73,7 @@ const LocalPlayerStory = (props: LocalPlayerStory) => {
   /** A callback to start the flow */
   const startFlow = () => {
     setPlayerState('in-progress');
-    wp.start(flow)
+    rp.start(flow)
       .then(() => {
         setPlayerState('completed');
       })
@@ -85,7 +85,7 @@ const LocalPlayerStory = (props: LocalPlayerStory) => {
 
   React.useEffect(() => {
     startFlow();
-  }, [wp, flow]);
+  }, [rp, flow]);
 
   React.useEffect(() => {
     // merge new data from storybook controls
@@ -105,7 +105,7 @@ const LocalPlayerStory = (props: LocalPlayerStory) => {
     return subscribe(addons.getChannel(), '@@player/flow/reset', () => {
       startFlow();
     });
-  }, [wp, flow]);
+  }, [rp, flow]);
 
   if (renderContext.platform !== 'web' && renderContext.token) {
     return (
@@ -119,7 +119,7 @@ const LocalPlayerStory = (props: LocalPlayerStory) => {
     );
   }
 
-  const currentState = wp.player.getState();
+  const currentState = rp.player.getState();
 
   if (playerState === 'completed' && currentState.status === 'completed') {
     return (
@@ -134,7 +134,7 @@ const LocalPlayerStory = (props: LocalPlayerStory) => {
     return <PlayerFlowSummary reset={startFlow} error={currentState.error} />;
   }
 
-  return <wp.Component />;
+  return <rp.Component />;
 };
 
 type Mock = Record<string, unknown>;

@@ -1,5 +1,5 @@
 import type { Player, PlayerPlugin } from '@player-ui/player';
-import { BindingInstance } from '@player-ui/binding';
+import { BindingInstance } from '@player-ui/player';
 import get from 'dlv';
 
 export interface ConstantsPluginConfig {
