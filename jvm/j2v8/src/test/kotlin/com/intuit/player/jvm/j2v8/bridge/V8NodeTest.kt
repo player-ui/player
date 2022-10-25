@@ -176,8 +176,8 @@ internal class V8NodeTest : J2V8Test() {
     @Test
     fun toJson() {
         val node = format.v8Object {
-            "beacon" to v8Object {
-                "key" to "value"
+            this["beacon"] = v8Object {
+                this["key"] = "value"
             }
         }.handleValue(format) as Node
 

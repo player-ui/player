@@ -73,4 +73,6 @@ public interface RuntimeFormatConfiguration<Value> {
     public val runtime: Runtime<Value>
 
     public val serializersModule: SerializersModule
+
+    public val discriminator: String get() = "type"
 }
