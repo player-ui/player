@@ -122,11 +122,12 @@ internal class GraalSealedClassDecoder(override val format: GraalFormat, overrid
     ): Decoder = GraalValueDecoder(format, value)
 
     override fun decodeValueElement(descriptor: SerialDescriptor, index: Int): Any? {
+
         val discriminator = (
-                descriptor.annotations.firstOrNull {
-                    it is RuntimeClassDiscriminator
-                } as? RuntimeClassDiscriminator
-                )?.discriminator ?: format.config.discriminator
+            descriptor.annotations.firstOrNull {
+                it is RuntimeClassDiscriminator
+            } as? RuntimeClassDiscriminator
+            )?.discriminator ?: format.config.discriminator
 
         return value.getMember(discriminator).handleValue(format)
     }

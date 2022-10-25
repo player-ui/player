@@ -105,10 +105,10 @@ internal class V8SealedClassDecoder(override val format: J2V8Format, override va
 
     override fun decodeValueElement(descriptor: SerialDescriptor, index: Int): Any? {
         val discriminator = (
-                descriptor.annotations.firstOrNull {
-                    it is RuntimeClassDiscriminator
-                } as? RuntimeClassDiscriminator
-                )?.discriminator ?: format.config.discriminator
+            descriptor.annotations.firstOrNull {
+                it is RuntimeClassDiscriminator
+            } as? RuntimeClassDiscriminator
+            )?.discriminator ?: format.config.discriminator
 
         return value.getV8Value(discriminator).handleValue(format)
     }
