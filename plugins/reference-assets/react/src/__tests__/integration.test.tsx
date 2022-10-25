@@ -8,7 +8,7 @@ import {
   configure,
 } from '@testing-library/react';
 import { BeaconPlugin } from '@player-ui/beacon-plugin-react';
-import { WebPlayer } from '@player-ui/react';
+import { ReactPlayer } from '@player-ui/react';
 import { makeFlow } from '@player-ui/make-flow';
 import { ReferenceAssetsPlugin } from '../plugin';
 
@@ -21,7 +21,7 @@ describe('Integration tests', () => {
     const handler = jest.fn();
     const beaconPlugin = new BeaconPlugin({ callback: handler });
 
-    const wp = new WebPlayer({
+    const rp = new ReactPlayer({
       plugins: [beaconPlugin, new ReferenceAssetsPlugin()],
     });
 
@@ -34,12 +34,12 @@ describe('Integration tests', () => {
 
     render(
       <React.Suspense fallback="fallback">
-        <wp.Component />
+        <rp.Component />
       </React.Suspense>
     );
 
     await act(async () => {
-      wp.start(flow);
+      rp.start(flow);
     });
 
     const viewNode = await screen.findByTestId('first_view');

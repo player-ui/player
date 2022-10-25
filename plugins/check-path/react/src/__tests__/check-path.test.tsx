@@ -1,13 +1,12 @@
 import React from 'react';
-import { Asset } from '@player-ui/react-asset';
-import { WebPlayer } from '@player-ui/react';
+import { ReactPlayer, ReactAsset } from '@player-ui/react';
 import { findByTestId, render } from '@testing-library/react';
 import { makeFlow } from '@player-ui/make-flow';
 import { CheckPathPlugin, useGetParentProp } from '..';
 
 describe('beacon web plugin', () => {
   test('loads in a player', async () => {
-    const wp = new WebPlayer({
+    const rp = new ReactPlayer({
       plugins: [new CheckPathPlugin()],
     });
 
@@ -23,22 +22,22 @@ describe('beacon web plugin', () => {
       },
     });
 
-    wp.assetRegistry.set({ type: 'action' }, (props: any) => {
+    rp.assetRegistry.set({ type: 'action' }, (props: any) => {
       const parentProp = useGetParentProp(props.id);
 
       return (
         <div data-testid={props.id}>
           {props.value} - {parentProp}
-          {props.label && <Asset {...props.label} />}
+          {props.label && <ReactAsset {...props.label} />}
         </div>
       );
     });
-    wp.start(flow);
+    rp.start(flow);
 
     const { container } = render(
       <div>
         <React.Suspense fallback="loading...">
-          <wp.Component />
+          <rp.Component />
         </React.Suspense>
       </div>
     );

@@ -4,13 +4,11 @@ import type {
   PlayerPlugin,
   View,
   ViewController,
-} from '@player-ui/player';
-import type {
   ExpressionType,
   ExpressionEvaluator,
-} from '@player-ui/expressions';
-import type { BindingInstance, BindingParser } from '@player-ui/binding';
-import { Interceptor } from 'tapable-ts';
+  BindingInstance,
+  BindingParser,
+} from '@player-ui/player';
 
 const LISTENER_TYPES = {
   dataChange: 'dataChange.',

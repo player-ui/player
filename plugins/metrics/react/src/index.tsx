@@ -1,5 +1,5 @@
 import React from 'react';
-import type { WebPlayer, WebPlayerPlugin } from '@player-ui/react';
+import type { ReactPlayer, ReactPlayerPlugin } from '@player-ui/react';
 import type { MetricsWebPluginOptions } from '@player-ui/metrics-plugin';
 import { MetricsCorePlugin } from '@player-ui/metrics-plugin';
 
@@ -8,7 +8,7 @@ export * from '@player-ui/metrics-plugin';
 /** A plugin to add render metrics to Player */
 export class MetricsPlugin
   extends MetricsCorePlugin
-  implements WebPlayerPlugin
+  implements ReactPlayerPlugin
 {
   constructor(options?: MetricsWebPluginOptions) {
     // Default to `true` for tracking metrics
@@ -19,7 +19,7 @@ export class MetricsPlugin
     });
   }
 
-  applyWeb(webPlayer: WebPlayer) {
+  applyReact(reactPlayer: ReactPlayer) {
     if (!this.trackRender) {
       return;
     }
@@ -29,7 +29,7 @@ export class MetricsPlugin
       this.renderEnd();
     };
 
-    webPlayer.hooks.playerComponent.tap(this.name, (Comp) => {
+    reactPlayer.hooks.playerComponent.tap(this.name, (Comp) => {
       return (props) => {
         React.useEffect(endRender);
 

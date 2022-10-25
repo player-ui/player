@@ -8,8 +8,6 @@ javascript_pipeline(
     ],
     peer_dependencies = [
         "//core/player:@player-ui/player",
-        "//core/expressions:@player-ui/expressions",
-        "//core/logger:@player-ui/logger",
         "//core/types:@player-ui/types",
     ],
     test_data = [

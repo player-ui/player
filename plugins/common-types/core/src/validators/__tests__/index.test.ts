@@ -1,10 +1,16 @@
-import { BindingParser } from '@player-ui/binding';
-import type { DataModelWithParser } from '@player-ui/data';
-import { LocalModel, withParser } from '@player-ui/data';
-import { NoopLogger } from '@player-ui/logger';
-import { ExpressionEvaluator } from '@player-ui/expressions';
-import type { ValidationObject, ValidatorContext } from '@player-ui/validator';
-import { ConstantsController } from '@player-ui/constants';
+import {
+  BindingParser,
+  ConstantsController,
+  ExpressionEvaluator,
+  LocalModel,
+  withParser,
+  NoopLogger,
+} from '@player-ui/player';
+import type {
+  DataModelWithParser,
+  ValidationObject,
+  ValidatorContext,
+} from '@player-ui/player';
 import {
   expression,
   required,

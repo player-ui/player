@@ -1,5 +1,5 @@
 import React from 'react';
-import { Asset } from '@player-ui/react-asset';
+import { ReactAsset } from '@player-ui/react';
 import { useBeacon } from '@player-ui/beacon-plugin-react';
 import type { TransformedAction } from '@player-ui/reference-assets-plugin';
 
@@ -18,6 +18,6 @@ export const useAction = (props: TransformedAction) => {
       beacon();
       props.run();
     },
-    children: label?.asset ? <Asset {...label?.asset} /> : null,
+    children: label?.asset ? <ReactAsset {...label?.asset} /> : null,
   } as const;
 };

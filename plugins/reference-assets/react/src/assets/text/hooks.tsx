@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import makeClass from 'clsx';
-import { useAssetProps } from '@player-ui/react-utils';
+import { useAssetProps } from '@player-ui/react';
 import type { TextAsset } from '@player-ui/reference-assets-plugin';
 
 export interface TextModifierContextType {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Asset } from '@player-ui/react-asset';
+import { ReactAsset } from '@player-ui/react';
 import type { TransformedInput } from '@player-ui/reference-assets-plugin';
 import {
   Input as ChakraInput,
@@ -19,14 +19,14 @@ export const Input = (props: TransformedInput) => {
     <FormControl isInvalid={Boolean(validation)}>
       {label && (
         <FormLabel htmlFor={id}>
-          <Asset {...label} />
+          <ReactAsset {...label} />
         </FormLabel>
       )}
       <ChakraInput id={id} size="md" {...inputProps} />
       {validation && <FormErrorMessage>{validation.message}</FormErrorMessage>}
       {note && (
         <FormHelperText>
-          <Asset {...note} />
+          <ReactAsset {...note} />
         </FormHelperText>
       )}
     </FormControl>

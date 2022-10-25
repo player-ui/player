@@ -1,5 +1,5 @@
-import type { Resolve } from '@player-ui/view';
 import type {
+  Resolve,
   Store,
   BeforeTransformFunction,
   TransformFunction,

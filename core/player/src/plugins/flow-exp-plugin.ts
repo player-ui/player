@@ -3,10 +3,9 @@ import type {
   ExpressionObject,
   NavigationFlowState,
 } from '@player-ui/types';
-import type { ExpressionEvaluator } from '@player-ui/expressions';
-import type { FlowInstance } from '@player-ui/flow';
+import type { ExpressionEvaluator } from '../expressions';
+import type { FlowInstance } from '../controllers';
 import type { Player, PlayerPlugin } from '../player';
-import type { InProgressState } from '../types';
 
 /**
  * A plugin that taps into the flow controller to evaluate available expressions

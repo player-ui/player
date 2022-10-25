@@ -1,5 +1,5 @@
 import React from 'react';
-import { Asset } from '@player-ui/react-asset';
+import { ReactAsset } from '@player-ui/react';
 import { Button, Text } from '@chakra-ui/react';
 import { ChevronLeftIcon } from '@chakra-ui/icons';
 import type { TransformedAction } from '@player-ui/reference-assets-plugin';
@@ -22,7 +22,7 @@ export const Action = (props: TransformedAction) => {
         {isBackAction(props) && <ChevronLeftIcon />}
         {label && (
           <Text>
-            <Asset {...label} />
+            <ReactAsset {...label} />
           </Text>
         )}
       </Button>

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { WebPlayer, WebPlayerPlugin } from '@player-ui/react';
+import type { ReactPlayer, ReactPlayerPlugin } from '@player-ui/react';
 import type { BeaconArgs } from '@player-ui/beacon-plugin';
 import { BeaconPlugin as BeaconCorePlugin } from '@player-ui/beacon-plugin';
 
@@ -39,13 +39,16 @@ export function useBeacon<T extends Partial<BeaconCallbackArgs>>(
 /**
  * A plugin for adding beacon support to a web-player
  */
-export class BeaconPlugin extends BeaconCorePlugin implements WebPlayerPlugin {
+export class BeaconPlugin
+  extends BeaconCorePlugin
+  implements ReactPlayerPlugin
+{
   name = 'beacon-web-plugin';
 
-  applyWeb(webPlayer: WebPlayer) {
+  applyReact(reactPlayer: ReactPlayer) {
     const handler = this.beacon.bind(this);
 
-    webPlayer.hooks.webComponent.tap(this.name, (Comp) => () => (
+    reactPlayer.hooks.webComponent.tap(this.name, (Comp) => () => (
       <BeaconContext.Provider value={{ handler }}>
         <Comp />
       </BeaconContext.Provider>

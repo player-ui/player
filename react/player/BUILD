@@ -7,9 +7,7 @@ javascript_pipeline(
         "//core/player:@player-ui/player",
         "//core/partial-match-registry:@player-ui/partial-match-registry",
         "//plugins/metrics/core:@player-ui/metrics-plugin",
-        "//react/asset:@player-ui/react-asset",
         "//react/subscribe:@player-ui/react-subscribe",
-        "//react/utils:@player-ui/react-utils",
         "@npm//react-error-boundary",
         "@npm//tapable-ts"
     ],

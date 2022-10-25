@@ -7,8 +7,8 @@ import type {
   ManagedPlayerContext,
 } from './types';
 import { useRequestTime } from './request-time';
-import type { WebPlayerOptions } from '../player';
-import { WebPlayer } from '../player';
+import type { ReactPlayerOptions } from '../player';
+import { ReactPlayer } from '../player';
 
 /** noop middleware */
 function identityMiddleware<T>(next: Promise<T>) {
@@ -58,9 +58,9 @@ class ManagedState {
     manager: FlowManager;
 
     /** the config to use when creating a player */
-    playerConfig: WebPlayerOptions;
+    playerConfig: ReactPlayerOptions;
   }) {
-    const playerConfig: WebPlayerOptions = {
+    const playerConfig: ReactPlayerOptions = {
       ...options.playerConfig,
       suspend: true,
     };
@@ -69,7 +69,7 @@ class ManagedState {
       value: 'not_started',
       context: {
         playerConfig,
-        webPlayer: new WebPlayer(playerConfig),
+        reactPlayer: new ReactPlayer(playerConfig),
         manager: options.manager,
       },
     };
@@ -92,7 +92,7 @@ class ManagedState {
   /** restart starts from the last result */
   public restart() {
     if (this.state?.value === 'error') {
-      const { playerConfig, manager, prevResult, webPlayer } =
+      const { playerConfig, manager, prevResult, reactPlayer } =
         this.state.context;
       this.setState({
         value: 'completed',
@@ -100,7 +100,7 @@ class ManagedState {
           playerConfig,
           manager,
           result: prevResult,
-          webPlayer,
+          reactPlayer,
         },
       });
     } else {
@@ -114,12 +114,12 @@ class ManagedState {
       c.onState(state);
     });
 
-    const { manager, webPlayer, playerConfig } = state.context;
+    const { manager, reactPlayer, playerConfig } = state.context;
 
     try {
       const nextState = await this.processState(state, {
         manager,
-        webPlayer,
+        reactPlayer,
         playerConfig,
       });
 
@@ -131,7 +131,7 @@ class ManagedState {
         value: 'error',
         context: {
           manager,
-          webPlayer,
+          reactPlayer,
           playerConfig,
           error: e as Error,
         },
@@ -189,7 +189,7 @@ class ManagedState {
           ...context,
           flow: state.context.flow,
           prevResult: state.context.prevResult,
-          result: state.context.webPlayer.start(state.context.flow),
+          result: state.context.reactPlayer.start(state.context.flow),
         },
       };
     }
@@ -219,7 +219,7 @@ export const usePersistentStateMachine = (options: {
   manager: FlowManager;
 
   /** Player config  */
-  playerConfig: WebPlayerOptions;
+  playerConfig: ReactPlayerOptions;
 
   /** Any middleware for the manager */
   middleware?: ManagerMiddleware;
@@ -281,13 +281,13 @@ export const ManagedPlayer = (props: ManagedPlayerProps) => {
 
   React.useEffect(() => {
     return () => {
-      const playerState = state?.context.webPlayer.player.getState();
+      const playerState = state?.context.reactPlayer.player.getState();
 
       if (state?.value === 'running' && playerState?.status === 'in-progress') {
         props.manager.terminate?.(playerState.controllers.data.serialize());
       }
     };
-  }, [props.manager, state?.context.webPlayer.player, state?.value]);
+  }, [props.manager, state?.context.reactPlayer.player, state?.value]);
 
   if (state?.value === 'error') {
     if (props.fallbackComponent) {
@@ -309,8 +309,8 @@ export const ManagedPlayer = (props: ManagedPlayerProps) => {
     }
   }
 
-  if (state?.context.webPlayer) {
-    const { Component } = state.context.webPlayer;
+  if (state?.context.reactPlayer) {
+    const { Component } = state.context.reactPlayer;
 
     return <Component />;
   }

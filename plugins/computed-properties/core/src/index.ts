@@ -1,9 +1,14 @@
-import type { Player, PlayerPlugin } from '@player-ui/player';
-import type { ExpressionEvaluator } from '@player-ui/expressions';
-import type { Schema, Expression } from '@player-ui/types';
-import type { DataModelMiddleware, Updates } from '@player-ui/data';
-import type { SchemaController } from '@player-ui/schema';
-import type { BindingInstance } from '@player-ui/binding';
+import type {
+  Player,
+  PlayerPlugin,
+  ExpressionEvaluator,
+  Schema,
+  Expression,
+  DataModelMiddleware,
+  Updates,
+  SchemaController,
+  BindingInstance,
+} from '@player-ui/player';
 
 export interface ExpressionDataType extends Schema.DataType<'Expression'> {
   /** The expression to evaluate to compute the value of this node */

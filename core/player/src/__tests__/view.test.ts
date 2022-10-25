@@ -1,6 +1,6 @@
-import type { FlowController } from '@player-ui/flow';
 import { waitFor } from '@testing-library/react';
 import type { Flow, NavigationFlowViewState } from '@player-ui/types';
+import type { FlowController } from '../controllers';
 import TrackBindingPlugin from './helpers/binding.plugin';
 import type { InProgressState } from '../types';
 import { Player } from '..';

@@ -17,19 +17,19 @@ import {
 
 This shows the most basic way of rendering Player in a React app.
 
-Create a React Player using the `useWebPlayer` hook, pass it a flow to render, and use the `webPlayer.Component` to render the component in your app:
+Create a React Player using the `useReactPlayer` hook, pass it a flow to render, and use the `ReactPlayer.Component` to render the component in your app:
 
 ```tsx
 const App = () => {
-  const { webPlayer } = useWebPlayer({
+  const { reactPlayer } = useReactPlayer({
     plugins: [new ReferenceAssetsPlugin()],
   });
 
   React.useEffect(() => {
-    webPlayer.start(/** Add content here */);
+    reactPlayer.start(/** Add content here */);
   }, []);
 
-  return <webPlayer.Component />;
+  return <reactPlayer.Component />;
 };
 ```
 

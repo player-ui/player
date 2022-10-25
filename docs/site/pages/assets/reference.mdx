@@ -11,10 +11,10 @@ To help users get started with Player, we have created a minimal set of useable 
 For the React Player, we ship a package (`@player-ui/reference-assets-plugin-react`) that provides the reference set of assets. Each asset package exposes a `Component`, type, and optional transform. They also export hooks for easily consuming the transformed component and supplying your own UI for a custom look and feel. These components are all then exposed via a plugin that can be added to Player like so:
 
 ```javascript
-import { WebPlayer } from '@player-ui/react';
+import { ReactPlayer } from '@player-ui/react';
 import { ReferenceAssetsPlugin } from '@player-ui/reference-assets-plugin-react';
 
-const webPlayer = new WebPlayer({
+const reactPlayer = new ReactPlayer({
   plugins: [new ReferenceAssetsPlugin()],
 });
 ```

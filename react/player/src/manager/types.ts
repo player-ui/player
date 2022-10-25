@@ -1,6 +1,6 @@
 import type React from 'react';
 import type { CompletedState, Flow, FlowResult } from '@player-ui/player';
-import type { WebPlayer, WebPlayerOptions } from '../player';
+import type { ReactPlayer, ReactPlayerOptions } from '../player';
 
 export interface FinalState {
   /** Mark the iteration as complete */
@@ -45,7 +45,7 @@ export interface FallbackProps {
   error?: Error;
 }
 
-export interface ManagedPlayerProps extends WebPlayerOptions {
+export interface ManagedPlayerProps extends ReactPlayerOptions {
   /** The manager for populating the next flows */
   manager: FlowManager;
 
@@ -67,10 +67,10 @@ export type ManagedPlayerContext = {
   manager: FlowManager;
 
   /** The web-player */
-  webPlayer: WebPlayer;
+  reactPlayer: ReactPlayer;
 
   /** The config for Player */
-  playerConfig: WebPlayerOptions;
+  playerConfig: ReactPlayerOptions;
 };
 
 export type ManagedPlayerState =

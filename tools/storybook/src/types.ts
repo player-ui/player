@@ -1,9 +1,9 @@
-import type { WebPlayerPlugin } from '@player-ui/react';
+import type { ReactPlayerPlugin } from '@player-ui/react';
 import type { AppetizeVersions } from './player/Appetize';
 
 export interface PlayerParametersType {
   /** plugins to use for any loaded player */
-  webplayerPlugins?: Array<WebPlayerPlugin>;
+  reactPlayerPlugins?: Array<ReactPlayerPlugin>;
 
   /** Appetize tokens to use */
   appetizeTokens?: {

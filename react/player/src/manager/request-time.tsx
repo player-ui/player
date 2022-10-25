@@ -5,7 +5,7 @@ import {
   MetricsCorePluginSymbol,
   RequestTimeWebPlugin,
 } from '@player-ui/metrics-plugin';
-import type { WebPlayerPlugin } from '../player';
+import type { ReactPlayerPlugin } from '../player';
 
 type RequestTime = {
   /** request start time */
@@ -45,7 +45,7 @@ export const useRequestTime = () => {
     });
   }
 
-  const RequestTimeMetricsPlugin: WebPlayerPlugin = useMemo(() => {
+  const RequestTimeMetricsPlugin: ReactPlayerPlugin = useMemo(() => {
     return {
       name: 'RequestTimeMetricsPlugin',
       apply(player: Player): void {

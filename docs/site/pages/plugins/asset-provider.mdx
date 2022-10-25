@@ -22,10 +22,10 @@ Create an instance, and add it to your Player instance.
 The API is similar to the JavaScript `Map`, and takes a list of `[match, Component]` tuples.
 
 ```tsx
-import { WebPlayer } from '@player-ui/react';
+import { ReactPlayer } from '@player-ui/react';
 import { AssetProviderPlugin } from '@player-ui/asset-provider-plugin-react';
 
-const player = new WebPlayer({
+const player = new ReactPlayer({
   plugins: [
     new AssetProviderPlugin({
       ['custom-asset', () => <div>Hello World!</div>],

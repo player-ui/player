@@ -1,6 +1,5 @@
-import type { Player, PlayerPlugin } from '@player-ui/player';
-import type { Node, Resolver } from '@player-ui/view';
-import { NodeType } from '@player-ui/view';
+import { NodeType } from '@player-ui/player';
+import type { Player, PlayerPlugin, Node, Resolver } from '@player-ui/player';
 import type { Asset } from '@player-ui/types';
 import { createObjectMatcher } from '@player-ui/partial-match-registry';
 import dlv from 'dlv';
