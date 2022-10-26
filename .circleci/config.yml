@@ -337,7 +337,7 @@ workflows:
 
       - applitools_init:
           context:
-            - applitools
+            - applitoolsFork
           requires:
             - setup
 
@@ -349,7 +349,7 @@ workflows:
 
       - build_ios:
           context:
-            - applitools
+            - applitoolsFork
             - BuildFork
           requires:
             - applitools_init
@@ -363,7 +363,7 @@ workflows:
 
       - android_test:
           context:
-            - applitools
+            - applitoolsFork
             - BuildFork
           requires:
             - applitools_init
@@ -377,7 +377,7 @@ workflows:
 
       - applitools_cleanup:
           context:
-            - applitools
+            - applitoolsFork
           requires:
             - android_test
             - build_ios
