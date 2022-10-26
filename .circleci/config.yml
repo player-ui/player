@@ -275,6 +275,7 @@ workflows:
               ignore:
                 - main
                 - /version-.*/
+                - /pull\/*/
             tags:
               ignore: /.*/
 
@@ -285,28 +286,92 @@ workflows:
             - setup
 
       - build:
+          context:
+            - Build
           requires:
             - setup
 
       - build_ios:
           context:
             - applitools
+            - Build
           requires:
             - applitools_init
             - setup
 
       - test:
+          context:
+            - Build
           requires:
             - build
 
       - android_test:
           context:
             - applitools
+            - Build
           requires:
             - applitools_init
             - build
 
       - coverage:
+          context:
+            - Build
+          requires:
+            - build
+
+      - applitools_cleanup:
+          context:
+            - applitools
+          requires:
+            - android_test
+            - build_ios
+  build_and_test_pr_fork:
+    jobs:
+      - setup:
+          filters:
+            branches:
+              only:
+                - /pull\/*/
+            tags:
+              ignore: /.*/
+
+      - applitools_init:
+          context:
+            - applitools
+          requires:
+            - setup
+
+      - build:
+          context:
+            - BuildFork
+          requires:
+            - setup
+
+      - build_ios:
+          context:
+            - applitools
+            - BuildFork
+          requires:
+            - applitools_init
+            - setup
+
+      - test:
+          context:
+            - BuildFork
+          requires:
+            - build
+
+      - android_test:
+          context:
+            - applitools
+            - BuildFork
+          requires:
+            - applitools_init
+            - build
+
+      - coverage:
+          context:
+            - BuildFork  
           requires:
             - build
 
