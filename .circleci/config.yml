@@ -275,7 +275,7 @@ workflows:
               ignore:
                 - main
                 - /version-.*/
-                - /pull\/*/
+                - /pull\/.*/
             tags:
               ignore: /.*/
 
@@ -331,7 +331,7 @@ workflows:
           filters:
             branches:
               only:
-                - /pull\/*/
+                - /pull\/.*/
             tags:
               ignore: /.*/
 
