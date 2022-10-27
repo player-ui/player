@@ -75,7 +75,7 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci --config=skip-ios -- //...
+      - run: bazel build --config=ci --config=skip-ios -- //...
 
       - save_cache:
           paths:
@@ -143,13 +143,13 @@ jobs:
 
       - run: |
           BUNDLE_TARGETS=$(bazel query "attr(name, '_Bundles', //...)" --output label 2>/dev/null | tr '\n' ' ')
-          bazel build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci $BUNDLE_TARGETS
+          bazel build --config=ci $BUNDLE_TARGETS
 
       - run: bazel shutdown
       - run: cd xcode && bundle exec pod install
-      - run: bazel build --config=ci --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} -- //:PlayerUI //:PlayerUI-Demo //:PlayerUI_Pod
+      - run: bazel build --config=ci -- //:PlayerUI //:PlayerUI-Demo //:PlayerUI_Pod
       # TODO: the timeout should be added to the test itself
-      - run: bazel test --test_env=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --test_env=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --test_env=APPLITOOLS_PR_NUMBER=${CIRCLE_PULL_REQUEST##*/} --test_timeout=600 --jobs=1 --verbose_failures --config=ci  --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
+      - run: bazel test --test_env=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --test_env=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --test_env=APPLITOOLS_PR_NUMBER=${CIRCLE_PULL_REQUEST##*/} --test_timeout=600 --jobs=1 --verbose_failures --config=ci  -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
 
       - run: 
           when: always
@@ -170,7 +170,7 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel test --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=skip-ios --config=ci -- //... -//docs/site -//android/demo:android_instrumentation_test
+      - run: bazel test --config=skip-ios --config=ci -- //... -//docs/site -//android/demo:android_instrumentation_test
 
       - run:
           when: always
@@ -219,7 +219,7 @@ jobs:
           command: |
             circle-android wait-for-boot
 
-      - run: bazel test --define=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --define=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --define=APPLITOOLS_PR_NUMBER=${CIRCLE_PULL_REQUEST##*/} --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci -- //android/demo:android_instrumentation_test
+      - run: bazel test --define=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --define=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --define=APPLITOOLS_PR_NUMBER=${CIRCLE_PULL_REQUEST##*/} --config=ci -- //android/demo:android_instrumentation_test
 
       - store_artifacts:
           path: screenshots
@@ -238,7 +238,7 @@ jobs:
 
       - run: |
           BUNDLE_TARGETS=$(bazel query "kind(nodejs_test, //...)" --output label 2>/dev/null | tr '\n' ' ')
-          bazel coverage --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci -- $BUNDLE_TARGETS
+          bazel coverage --config=ci -- $BUNDLE_TARGETS
 
       - codecov/upload:
           file: ./bazel-out/_coverage/_coverage_report.dat
