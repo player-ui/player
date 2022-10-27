@@ -61,7 +61,7 @@ jobs:
     executor: base
     steps:
       - attach_workspace:
-        at: ~/player
+          at: ~/player
       - run: |
           echo "common --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
       - persist_to_workspace:
