@@ -57,6 +57,18 @@ jobs:
           paths:
             - .
 
+  bazelrc:
+    executor: base
+    steps:
+      - attach_workspace:
+        at: ~/player
+      - run: |
+          echo "common --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
   build:
     executor: base
     steps:
@@ -278,44 +290,41 @@ workflows:
                 - /pull\/.*/
             tags:
               ignore: /.*/
+      - bazelrc:
+          context:
+            - Build
+          requires:
+            - setup
 
       - applitools_init:
           context:
             - applitools
           requires:
-            - setup
+            - bazelrc
 
       - build:
-          context:
-            - Build
           requires:
-            - setup
+            - bazelrc
 
       - build_ios:
           context:
             - applitools
-            - Build
           requires:
             - applitools_init
-            - setup
+            - bazelrc
 
       - test:
-          context:
-            - Build
           requires:
             - build
 
       - android_test:
           context:
             - applitools
-            - Build
           requires:
             - applitools_init
             - build
 
       - coverage:
-          context:
-            - Build
           requires:
             - build
 
@@ -325,6 +334,7 @@ workflows:
           requires:
             - android_test
             - build_ios
+
   build_and_test_pr_fork:
     jobs:
       - setup:
@@ -335,52 +345,25 @@ workflows:
             tags:
               ignore: /.*/
 
-      - applitools_init:
-          context:
-            - applitoolsFork
-          requires:
-            - setup
-
       - build:
-          context:
-            - BuildFork
           requires:
             - setup
 
       - build_ios:
-          context:
-            - applitoolsFork
-            - BuildFork
           requires:
-            - applitools_init
             - setup
 
       - test:
-          context:
-            - BuildFork
           requires:
             - build
 
       - android_test:
-          context:
-            - applitoolsFork
-            - BuildFork
           requires:
-            - applitools_init
             - build
 
       - coverage:
-          context:
-            - BuildFork  
           requires:
             - build
-
-      - applitools_cleanup:
-          context:
-            - applitoolsFork
-          requires:
-            - android_test
-            - build_ios
 
   build_and_test_main:
     when:
