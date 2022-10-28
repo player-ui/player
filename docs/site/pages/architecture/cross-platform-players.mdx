@@ -2,24 +2,19 @@
 title: 'Cross-Platform-Players'
 ---
 
-# Using the player across multiple platforms
+# Using Player across multiple platforms
 
-One of the major benefits of adopting the player for rendering a UI is it's ability to function across multiple platforms using the same content. In order to facilitate this, and get the most out of the player's architecture, here's a few things to keep in mind as you integrate the player into multiple platforms:
+One of the major benefits of adopting Player for rendering a UI is it's ability to function across multiple platforms using the same content. In order to facilitate this, and get the most out of Player's architecture, here's a few things to keep in mind as you integrate Player into multiple platforms:
 
 ## Use core-plugins to share implementations/functionality
 
-One of the easiest, and most beneficial thing to do when integrating the player is to organize feature sets into plugins. Keeping each plugin small and concise allows for easy sharing of features with other applications.
+One of the easiest, and most beneficial thing to do when integrating Player is to organize feature sets into plugins. Keeping each plugin small and concise allows for easy sharing of features with other applications.
 
-The core player, as well as each of the platform integration, supplies an interface for users to augment/extend the functionality of the player. This can be used to author validations, formatters, expressions, etc once, and be shared across multiple players.
+The core player, as well as each of the platform integration, supplies an interface for users to augment/extend the functionality of Player. This can be used to author validations, formatters, expressions, etc once, and be shared across multiple players.
 
 ## What this looks like in practice
 
-Plugins such as the common-types plugin is a great example of a small plugin used to add a very specific feature to the core-player. Since the validations, formats, and data-types present in this plugin are authored once, we can leverage the player's architecture to share these implementations across platforms.
-
-You can see an example of this mechanism in practice in the [CGPlayerPlugin](https://github.intuit.com/player-plugins/cg-player-plugin-web/tree/master/packages/cg-player) used in the CG configuration of the player. It houses many of the shared expressions, data-types, and asset transforms for things within CG:
-
-- For [web](https://github.intuit.com/player/cg-web-player/blob/master/packages/cg-web-player/src/index.tsx#L17) we simply register the plugin using the npm package.
-- On [iOS](https://github.intuit.com/player/ios/blob/master/iOSPlayer/Classes/Player/PluginWrappers/CoreAssetsPlugin.swift#L64) and [Android](https://github.intuit.com/player/android/blob/3ff3bb923414facfdb2cb09dc8cdc472d8f2bb36/assets/src/main/java/com/intuit/fuego/player/android/assets/CoreAssetsPlugin.kt) a webpack bundled version (you can see the config [here](https://github.intuit.com/player/cg-web-player/blob/master/packages/cg-player/webpack.config.js)) of that same core-plugin is registered with the JavaScriptCore and V8 run-times on iOS and Android respectively.
+Plugins such as the common-types plugin is a great example of a small plugin used to add a very specific feature to the core-player. Since the validations, formats, and data-types present in this plugin are authored once, we can leverage Player's architecture to share these implementations across platforms.
 
 Using this mechanism, we are guaranteed that the web, iOS, and Android player configurations are able to process the same content in the same way across the systems -- features/expressions/validations added in 1 are automatically present in the other platforms without any additional work.
 
@@ -30,5 +25,3 @@ This also applies to the asset transforms, which makes testing much simpler, but
 In the previous example, two things were mentioned that may initially seem to contradict each other:
 - Keeping each plugin small and concise allows for easy sharing of features with other applications.
 - features/expressions/validations added in 1 are automatically present in the other platforms without any additional work.
-
-### If each plugin implements a single, small feature, how are we able to add new features to each platform without requiring additional work?
