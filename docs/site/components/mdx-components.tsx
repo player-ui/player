@@ -101,10 +101,6 @@ const PlatformTabs = (props: React.PropsWithChildren<unknown>) => {
     CodeTabsNameMap.has(c.props.mdxType.toLowerCase())
   );
 
-  if (!router.isReady) {
-    return <Progress isIndeterminate size="xs" />;
-  }
-
   const langPrefIndex = children.findIndex(
     (c: any) => c.props.mdxType.toLowerCase() === router.query.lang
   );
