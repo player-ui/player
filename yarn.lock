@@ -3280,10 +3280,10 @@
   dependencies:
     "@octokit/openapi-types" "^12.7.0"
 
-"@player-tools/cli@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@player-tools/cli/-/cli-0.1.0.tgz#2b015d436d7a752ae4174b97350f49af5c5c05ef"
-  integrity sha512-kWfAqCau7wGHkK01INFlpKJkH538xXBGBAZmIiLuFKaVQZ+93GaO55U4DIorbpnMWAsgsoRVo8K8aV7gVTYPvQ==
+"@player-tools/cli@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@player-tools/cli/-/cli-0.2.0.tgz#26ae560be831892b3edea7bbb2e1cbbfe84e0acf"
+  integrity sha512-HzsDdHpnG1NM5443HLNxRBgEZ9Yfk85roLD0GjlLWDjhRP3ZPtQsGktqFsU/eyNYCtlO7c57Yb5rX1euAgUIgA==
   dependencies:
     "@babel/core" "^7.15.5"
     "@babel/plugin-transform-react-jsx-source" "^7.18.6"
@@ -3293,11 +3293,11 @@
     "@babel/register" "^7.17.7"
     "@oclif/core" "1.9.0"
     "@oclif/plugin-legacy" "^1.2.7"
-    "@player-tools/dsl" "0.1.0"
-    "@player-tools/language-service" "0.1.0"
-    "@player-tools/xlr-converters" "0.1.0"
-    "@player-tools/xlr-sdk" "0.1.0"
-    "@player-tools/xlr-utils" "0.1.0"
+    "@player-tools/dsl" "0.2.0"
+    "@player-tools/language-service" "0.2.0"
+    "@player-tools/xlr-converters" "0.2.0"
+    "@player-tools/xlr-sdk" "0.2.0"
+    "@player-tools/xlr-utils" "0.2.0"
     "@types/babel__register" "^7.17.0"
     chalk "^4.0.1"
     cosmiconfig "^7.0.1"
@@ -3311,10 +3311,10 @@
     vscode-languageserver-textdocument "^1.0.1"
     vscode-languageserver-types "^3.15.1"
 
-"@player-tools/dsl@0.1.0", "@player-tools/dsl@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@player-tools/dsl/-/dsl-0.1.0.tgz#babbc0033dde503787e7f62613c4525d5ed2e96b"
-  integrity sha512-id3+CNTRgF67mDC6eLzyX2ZEI7X38wAEBG06K6Ql6BjZbJsObukxc/qcI6aUEyQzXtKvJ5fQiqCJ8se5sm4JRA==
+"@player-tools/dsl@0.2.0", "@player-tools/dsl@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@player-tools/dsl/-/dsl-0.2.0.tgz#fb0fcc444766c28c4b95947fad4d75870e5d7acb"
+  integrity sha512-XLO0lMWamKrFomilr/H8I9CVICIj2K0BXpdzHAAuCS7IBBaC5Ofiu4PrtVRHO81T9VLmSbZ3V7THcPi8xMWURw==
   dependencies:
     "@babel/runtime" "7.15.4"
     "@player-ui/types" "^0.2.0"
@@ -3336,15 +3336,15 @@
     ts-node "^10.4.0"
     typescript "4.4.4"
 
-"@player-tools/language-service@0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@player-tools/language-service/-/language-service-0.1.0.tgz#396e4f1dd404a201833c815c3f9e617e046c01e1"
-  integrity sha512-EqTgPAKttUKUs2ogHl2eGFqC0xfLWNIZVLk6TDdLKhVPABF7nr3YFq4FGZqLalWYjH71RGkOH+uDwcCDMt4ehw==
+"@player-tools/language-service@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@player-tools/language-service/-/language-service-0.2.0.tgz#d8bde7f01d0fc7e72f3b30b35035f2f7dfe79c40"
+  integrity sha512-CY6NhxryoegBUbavk2fyfsnmQp0seL0XggjJkyAxsUhdfNtY9BGQL0AYMu3iC3TDBUeQkaZbpudyAUrR34VSVw==
   dependencies:
     "@babel/runtime" "7.15.4"
-    "@player-tools/xlr" "0.1.0"
-    "@player-tools/xlr-sdk" "0.1.0"
-    "@player-tools/xlr-utils" "0.1.0"
+    "@player-tools/xlr" "0.2.0"
+    "@player-tools/xlr-sdk" "0.2.0"
+    "@player-tools/xlr-utils" "0.2.0"
     change-case "^4.1.1"
     cross-fetch "^3.0.5"
     detect-indent "^6.0.0"
@@ -3355,41 +3355,41 @@
     vscode-languageserver-textdocument "^1.0.1"
     vscode-languageserver-types "^3.15.1"
 
-"@player-tools/xlr-converters@0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@player-tools/xlr-converters/-/xlr-converters-0.1.0.tgz#2c7679e6c6599eb71985037e7b88aedd0c4f84ff"
-  integrity sha512-KpW4FKlhYNKmqLr5oMoZzcz/ECjRU99tYeuKa7Sonz9HRQ5W7KdRfMocbzY4+adPbE/7AvJ139BblGrhNAl8wg==
+"@player-tools/xlr-converters@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@player-tools/xlr-converters/-/xlr-converters-0.2.0.tgz#46aaef19d095a221f2bbdecd4dd50eca0583699a"
+  integrity sha512-Nt0xaFSZWJYmgyOU+e1EghUiyPL1S/3+7PN8OEgZWxE2D9HZ3vUaOIVLfigOkQZJ3FlcRLpJT4E9SV3CBpZcoA==
   dependencies:
     "@babel/runtime" "7.15.4"
-    "@player-tools/xlr" "0.1.0"
-    "@player-tools/xlr-utils" "0.1.0"
+    "@player-tools/xlr" "0.2.0"
+    "@player-tools/xlr-utils" "0.2.0"
 
-"@player-tools/xlr-sdk@0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@player-tools/xlr-sdk/-/xlr-sdk-0.1.0.tgz#d968f4004f2562d4915963e54a62cc4a44f67edd"
-  integrity sha512-Ev5h6nRaW8B9XVwMfg6QwrStLHudQ6z4jUJgMfL3TJM3d5i4eY017jgnBanECfsGmbmOtf9V035CvD5YuCEafA==
+"@player-tools/xlr-sdk@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@player-tools/xlr-sdk/-/xlr-sdk-0.2.0.tgz#4c2a8ff243d95d86fe8e4266212559b6061acfd6"
+  integrity sha512-4V4FEMUZdnFO+h4FzKg7R5tiHu6Ta3j3Skm9cpVdFysL0PSNmqo6eopxNohK/2ehXaC9AH8flOEbREcMiAuBDA==
   dependencies:
     "@babel/runtime" "7.15.4"
-    "@player-tools/xlr" "0.1.0"
-    "@player-tools/xlr-converters" "0.1.0"
-    "@player-tools/xlr-utils" "0.1.0"
+    "@player-tools/xlr" "0.2.0"
+    "@player-tools/xlr-converters" "0.2.0"
+    "@player-tools/xlr-utils" "0.2.0"
     "@types/fs-extra" "^9.0.13"
     "@types/node" "^16.11.12"
     fs-extra "^10.0.0"
     jsonc-parser "^2.3.1"
 
-"@player-tools/xlr-utils@0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@player-tools/xlr-utils/-/xlr-utils-0.1.0.tgz#e52f33be6757e866ad357fe6ff5608a1edf6c85f"
-  integrity sha512-5OgV0Ie2JbbPabzRJpV9X1FPdT78pQh/AVGJeGfSry87k4KEalMF3iI9TrEOdJBRs+eTt8iO0hncTwW63hk7EQ==
+"@player-tools/xlr-utils@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@player-tools/xlr-utils/-/xlr-utils-0.2.0.tgz#90f61fb189267c59fae08f9e010f78b5c73ec1bd"
+  integrity sha512-kF/XF/5pLjT5Jae3jvqieu7AfNUU3URUnoe3NiWzjzqUth33XXIOYeUf09otWoBhDnD1N6/dACX8DHJ3kTgH/g==
   dependencies:
     "@babel/runtime" "7.15.4"
-    "@player-tools/xlr" "0.1.0"
+    "@player-tools/xlr" "0.2.0"
 
-"@player-tools/xlr@0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@player-tools/xlr/-/xlr-0.1.0.tgz#b6377e6d515efd48517992b6f33c45fd580ff102"
-  integrity sha512-Q8RjwWzjJx4Ocibj7Vbo9y21DQdGUMUgIPaWG71U6V5VZ4SJzpocpOFjF8htTQQlZ6+2sRGQQmav/DXwLwxqkw==
+"@player-tools/xlr@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@player-tools/xlr/-/xlr-0.2.0.tgz#e0476820bd32c17a893235c26db875bdce879768"
+  integrity sha512-C2yRUl3XSnlDEEP6/AVPdottdA4Grx4Ay3+/8RzPEZzOchUXuLHohjoKHoe0dKNsMB49u3+FQP+i8PCz+x1UVA==
   dependencies:
     "@babel/runtime" "7.15.4"
 
