@@ -14,7 +14,7 @@ Player Core, as well as each of the platform integration, supplies an interface 
 
 ## What this looks like in practice
 
-Plugins such as the common-types plugin is a great example of a small plugin used to add a very specific feature to the Player Core. Since the validations, formats, and data-types present in this plugin are authored once, we can leverage Player's architecture to share these implementations across platforms.
+Plugins such as the [common-types](../plugins/common-types) plugin is a great example of a small plugin used to add a very specific feature to the Player Core. Since the validations, formats, and data-types present in this plugin are authored once, we can leverage Player's architecture to share these implementations across platforms.
 
 Using this mechanism, we are guaranteed that the React, iOS, and Android player configurations are able to process the same content in the same way across the systems -- features/expressions/validations added in 1 are automatically present in the other platforms without any additional work.
 
