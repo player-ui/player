@@ -12,6 +12,7 @@ If the changes are larger (API design, architecture, etc), [opening an issue](ht
 * [npm >= 8.19.2](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 * [yarn >= 1.22.19](https://yarnpkg.com/)
 * [Swift >= 5.2](https://www.swift.org/download/)
+* [Xcode >= 14.0](https://developer.apple.com/xcode/)
 * [Android NDK >= 19.2.5345600, <= 21](https://github.com/android/ndk/wiki/Unsupported-Downloads#r19c). Any version > 21 will not work, period. You'll need to add `ANDROID_NDK_HOME` to your environment manually.
 
 ## Building and Testing Locally
