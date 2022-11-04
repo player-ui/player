@@ -31,7 +31,7 @@ executors:
     working_directory: ~/player
     resource_class: macos.x86.medium.gen2
     macos:
-      xcode: 13.4.1
+      xcode: 14.0
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   android:
