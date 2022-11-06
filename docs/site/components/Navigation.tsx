@@ -312,7 +312,7 @@ export const TopNavigation = () => {
           onClose={mobileNavDisclosure.onClose}
         >
           <DrawerContent>
-            <Box px="10">
+            <Box px="10" maxH="100vh" overflowY="auto">
               <SideNavigation />
             </Box>
           </DrawerContent>
