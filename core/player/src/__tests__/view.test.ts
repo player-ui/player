@@ -188,6 +188,73 @@ describe('state node expression tests', () => {
     });
   });
 
+  test('evaluates exp for action nodes', async () => {
+    player.start({
+      ...minimal,
+      views: [
+        {
+          id: 'view-1',
+          type: 'action',
+          label: {
+            asset: {
+              id: 'action-label',
+              type: 'text',
+              value: 'Clicked {{count}} times',
+            },
+          },
+        },
+        {
+          id: 'view-2',
+          type: 'view',
+          label: {
+            asset: {
+              id: 'action-label',
+              type: 'text',
+              value: 'yay',
+            },
+          },
+        },
+      ],
+      data: {
+        ...minimal.data,
+        viewRef: 'initial-view',
+      },
+      navigation: {
+        BEGIN: 'FLOW_1',
+        FLOW_1: {
+          startState: 'VIEW_1',
+          VIEW_1: {
+            state_type: 'ACTION',
+            exp: "{{viewref}} = 'VIEW_2'",
+            transitions: {
+              '*': '{{viewref}}',
+            },
+          },
+          VIEW_2: {
+            state_type: 'VIEW',
+            ref: 'view-2',
+            transitions: {
+              '*': 'END_Done',
+            },
+          },
+          END: {
+            state_type: 'END',
+            outcome: 'done',
+          },
+        },
+      },
+    });
+
+    // const currentFlowState = state().controllers.flow.current?.currentState
+    //   ?.value as NavigationFlowViewState;
+    // await waitFor(() => expect(currentFlowState.ref).toBe('view-2'));
+    await waitFor(() =>
+      expect(state().controllers.flow.current?.currentState?.name).toBe(
+        'VIEW_2'
+      )
+    );
+  });
+
   test('evaluates onStart/onEnd expressions for action nodes', async () => {
     player.start({
       ...minimal,

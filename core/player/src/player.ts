@@ -286,10 +286,12 @@ export class Player {
 
     flowController.hooks.flow.tap('player', (flow: FlowInstance) => {
       flow.hooks.beforeTransition.tap('player', (state, transitionVal) => {
-        if (
-          state.onEnd &&
-          (state.transitions[transitionVal] || state.transitions['*'])
-        ) {
+        /** Checks to see if there are any transitions for a specific transition state (i.e. next, back). If not, it will default to * */
+        const computedTransitionVal = state.transitions[transitionVal]
+          ? transitionVal
+          : '*';
+
+        if (state.onEnd && state.transitions[computedTransitionVal]) {
           if (typeof state.onEnd === 'object' && 'exp' in state.onEnd) {
             expressionEvaluator?.evaluate(state.onEnd.exp);
           } else {
@@ -297,14 +299,18 @@ export class Player {
           }
         }
 
-        if (!('transitions' in state) || !state.transitions[transitionVal]) {
+        /** If the transition does not exist, then do not resolve any expressions */
+        if (
+          !('transitions' in state) ||
+          !state.transitions[computedTransitionVal]
+        ) {
           return state;
         }
 
         return setIn(
           state,
-          ['transitions', transitionVal],
-          resolveStrings(state.transitions[transitionVal])
+          ['transitions', computedTransitionVal],
+          resolveStrings(state.transitions[computedTransitionVal])
         ) as any;
       });
 
