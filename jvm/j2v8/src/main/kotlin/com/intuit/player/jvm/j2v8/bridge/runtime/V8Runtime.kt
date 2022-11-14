@@ -9,6 +9,7 @@ import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.runtime.*
 import com.intuit.player.jvm.core.bridge.serialization.serializers.playerSerializersModule
+import com.intuit.player.jvm.j2v8.V8Null
 import com.intuit.player.jvm.j2v8.V8Primitive
 import com.intuit.player.jvm.j2v8.addPrimitive
 import com.intuit.player.jvm.j2v8.bridge.V8Node
@@ -39,6 +40,7 @@ internal class V8Runtime(private val config: J2V8RuntimeConfig) : Runtime<V8Valu
                 contextual(V8Object::class, V8ValueSerializer.conform())
                 contextual(V8Array::class, V8ValueSerializer.conform())
                 contextual(V8Primitive::class, V8ValueSerializer.conform())
+                contextual(V8Null::class, V8ValueSerializer.conform())
             }
         )
     )
