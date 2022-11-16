@@ -1,6 +1,9 @@
 import {Player} from "@player-ui/player";
-import { makeFlow } from '@player-ui/make-flow';
-import {CheckPathPlugin} from "./pkg/check_path_plugin_rs.js";
+import {makeFlow} from '@player-ui/make-flow';
+import {AssetTransformPlugin} from '@player-ui/asset-transform-plugin';
+import { CheckPathPlugin  } from '@player-ui/check-path-plugin';
+
+import {CheckPathPlugin as CheckPathPluginRS} from "./pkg/check_path_plugin_rs.js";
 
 const nestedAssetFlow = makeFlow({
     id: 'view-1',
@@ -43,8 +46,23 @@ const nestedAssetFlow = makeFlow({
         },
     },
 });
-const checkPathPlugin = new CheckPathPlugin();
-const player = new Player({plugins: [checkPathPlugin]});
+const ViewTransform = (
+    view
+) => ({
+    ...view,
+    run() {
+        return 'hello';
+    },
+});
+
+const checkPathPlugin = new CheckPathPluginRS();
+
+// checkPathPlugin.getPath("id");
+const player = new Player({
+    plugins: [
+        new AssetTransformPlugin([[{type: 'view'}, ViewTransform]]),
+        checkPathPlugin]
+});
 
 player.start(nestedAssetFlow)
 

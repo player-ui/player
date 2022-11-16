@@ -29,6 +29,15 @@ extern "C" {
 
 #[wasm_bindgen]
 extern "C" {
+    pub type OnUpdateHook;
+    // viewController.hooks.view.tap() return value.
+    // access view.hooks.onUpdate.tap()
+    #[wasm_bindgen(method)]
+    pub fn tap(this: &OnUpdateHook, name: &str, f: &JsValue);
+}
+
+#[wasm_bindgen]
+extern "C" {
     pub type ResolverHook;
     // viewController.hooks.view.tap() return value.
     // access view.hooks.resolver.tap()
@@ -43,6 +52,12 @@ extern "C" {
     // access view.hooks.resolver
     #[wasm_bindgen(method, getter)]
     pub fn resolver(this: &ViewHooks) -> ResolverHook;
+
+    // viewController.hooks.view.tap() return value.
+    // access view.hooks.onUpdate
+    #[wasm_bindgen(method, getter, js_name=onUpdate)]
+    pub fn on_update(this: &ViewHooks) -> OnUpdateHook;
+
 }
 
 #[wasm_bindgen]
@@ -105,7 +120,6 @@ extern "C" {
 
 #[wasm_bindgen(module = "@player-ui/player")]
 extern "C" {
-    #[wasm_bindgen(js_name = "default")]
     pub type Player;
 
     // access player.hooks
