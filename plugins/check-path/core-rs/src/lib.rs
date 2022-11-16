@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use js_sys::Reflect;
 use serde_wasm_bindgen;
+use std::cell::RefCell;
+use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 
@@ -27,7 +29,7 @@ extern "C" {
 #[wasm_bindgen(getter_with_clone)]
 pub struct CheckPathPlugin {
     pub name: String,
-    paths: HashMap<String, String>,
+    paths: Rc<RefCell<HashMap<String, Vec<String>>>>,
 }
 
 #[wasm_bindgen]
@@ -36,8 +38,40 @@ impl CheckPathPlugin {
     pub fn new() -> Self {
         Self {
             name: NAME.clone().to_string(),
-            paths: HashMap::new(),
+            paths: Rc::new(RefCell::new(HashMap::new())),
         }
+    }
+
+    #[wasm_bindgen]
+    pub fn apply(&self, player: Player) {
+        let view_controller_cb =
+            Closure::<dyn Fn(ViewController)>::new(|view_controller: ViewController| {
+                let view_cb = Closure::<dyn Fn(View)>::new(|view: View| {
+                    let on_update_callback = Closure::<dyn Fn(JsValue)>::new(|update: JsValue| {
+                        self.traverse(update);
+                    });
+
+                    view.hooks()
+                        .on_update()
+                        .tap(&NAME, on_update_callback.as_ref().unchecked_ref());
+
+                    on_update_callback.forget();
+                });
+
+                view_controller
+                    .hooks()
+                    .view()
+                    .tap(&NAME, view_cb.as_ref().unchecked_ref());
+
+                view_cb.forget();
+            });
+
+        player
+            .hooks()
+            .viewController()
+            .tap(&NAME, view_controller_cb.as_ref().unchecked_ref());
+
+        view_controller_cb.forget();
     }
 
     fn get_key_values(
@@ -71,47 +105,16 @@ impl CheckPathPlugin {
         Some(result)
     }
 
-    #[wasm_bindgen]
-    pub fn apply(&self, player: Player) {
-        let view_controller_cb =
-            Closure::<dyn Fn(ViewController)>::new(|view_controller: ViewController| {
-                let view_cb = Closure::<dyn Fn(View)>::new(|view: View| {
-                    let on_update_callback =
-                        Closure::<dyn Fn(JsValue)>::new(move |update: JsValue| {
-                            CheckPathPlugin::traverse(update);
-                        });
-
-                    view.hooks()
-                        .on_update()
-                        .tap(&NAME, on_update_callback.as_ref().unchecked_ref());
-
-                    on_update_callback.forget();
-                });
-
-                view_controller
-                    .hooks()
-                    .view()
-                    .tap(&NAME, view_cb.as_ref().unchecked_ref());
-
-                view_cb.forget();
-            });
-
-        player
-            .hooks()
-            .viewController()
-            .tap(&NAME, view_controller_cb.as_ref().unchecked_ref());
-
-        view_controller_cb.forget();
-    }
-
-    fn traverse(root: JsValue) {
-        let map: HashMap<String, Vec<&str>> = HashMap::new();
-        let mut path: Vec<String> = vec![];
+    fn traverse(&self, root: JsValue) {
+        let path: Vec<String> = vec![];
         let mut stack =
             CheckPathPlugin::get_key_values(&root, path.clone()).expect("Couldn't read root node.");
-        while let Some((key, value, mut path)) = stack.pop() {
-            if let NodeValue::StringType(value) = value {
-                log(&format!("[{}]: {} \t path: {}", key, value, path.join(".")))
+        while let Some((key, value, path)) = stack.pop() {
+            if let NodeValue::StringType(_value) = value {
+                if key == "id" || key == "type" {
+                    self.paths.borrow_mut().insert(key, path);
+                    // log(&format!("[{}]: {} \t path: {}", key, value, path.join(".")))
+                }
             } else if let NodeValue::ObjectType(value) = value {
                 let mut object_path = path.clone();
                 object_path.push(key);
