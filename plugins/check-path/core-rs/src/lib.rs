@@ -12,7 +12,7 @@ mod player;
 const NAME: &str = "check-path-plugin";
 const ID_KEY: &str = "id";
 
-enum ValuesWeCareAbout {
+enum NodeValue {
     StringType(String),
     ObjectType(JsValue),
     None,
@@ -40,7 +40,10 @@ impl CheckPathPlugin {
         }
     }
 
-    fn get_key_values(value: JsValue) -> Option<Vec<(String, ValuesWeCareAbout)>> {
+    fn get_key_values(
+        value: &JsValue,
+        path: Vec<String>,
+    ) -> Option<Vec<(String, NodeValue, Vec<String>)>> {
         if !value.is_object() {
             return None;
         }
@@ -54,15 +57,15 @@ impl CheckPathPlugin {
 
             let key: String = serde_wasm_bindgen::from_value(raw_key).unwrap();
 
-            let value: ValuesWeCareAbout = if raw_value.is_object() {
-                ValuesWeCareAbout::ObjectType(raw_value)
+            let value: NodeValue = if raw_value.is_object() {
+                NodeValue::ObjectType(raw_value)
             } else if raw_value.is_string() {
-                ValuesWeCareAbout::StringType(serde_wasm_bindgen::from_value(raw_value).unwrap())
+                NodeValue::StringType(serde_wasm_bindgen::from_value(raw_value).unwrap())
             } else {
-                ValuesWeCareAbout::None
+                NodeValue::None
             };
 
-            result.push((key, value))
+            result.push((key, value, path.clone()))
         }
 
         Some(result)
@@ -75,14 +78,7 @@ impl CheckPathPlugin {
                 let view_cb = Closure::<dyn Fn(View)>::new(|view: View| {
                     let on_update_callback =
                         Closure::<dyn Fn(JsValue)>::new(move |update: JsValue| {
-                            if let Some(key_values) = CheckPathPlugin::get_key_values(update) {
-                                for (key, value) in key_values {
-                                    if let ValuesWeCareAbout::StringType(data) = value {
-                                        log(&key);
-                                        log(&data);
-                                    }
-                                }
-                            }
+                            CheckPathPlugin::traverse(update);
                         });
 
                     view.hooks()
@@ -106,5 +102,25 @@ impl CheckPathPlugin {
             .tap(&NAME, view_controller_cb.as_ref().unchecked_ref());
 
         view_controller_cb.forget();
+    }
+
+    fn traverse(root: JsValue) {
+        let map: HashMap<String, Vec<&str>> = HashMap::new();
+        let mut path: Vec<String> = vec![];
+        let mut stack =
+            CheckPathPlugin::get_key_values(&root, path.clone()).expect("Couldn't read root node.");
+        while let Some((key, value, mut path)) = stack.pop() {
+            if let NodeValue::StringType(value) = value {
+                log(&format!("[{}]: {} \t path: {}", key, value, path.join(".")))
+            } else if let NodeValue::ObjectType(value) = value {
+                let mut object_path = path.clone();
+                object_path.push(key);
+                stack.append(
+                    CheckPathPlugin::get_key_values(&value, object_path)
+                        .unwrap()
+                        .as_mut(),
+                );
+            }
+        }
     }
 }

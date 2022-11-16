@@ -46,6 +46,8 @@ const nestedAssetFlow = makeFlow({
         },
     },
 });
+
+// console.log(JSON.stringify(nestedAssetFlow, null, 2))
 const ViewTransform = (
     view
 ) => ({
@@ -57,7 +59,6 @@ const ViewTransform = (
 
 const checkPathPlugin = new CheckPathPluginRS();
 
-// checkPathPlugin.getPath("id");
 const player = new Player({
     plugins: [
         new AssetTransformPlugin([[{type: 'view'}, ViewTransform]]),
@@ -65,4 +66,5 @@ const player = new Player({
 });
 
 player.start(nestedAssetFlow)
+// console.log("path", checkPathPlugin.getPath("coll-val-2-1"));
 
