@@ -62,4 +62,11 @@ impl CheckPathPlugin {
             .tap(&NAME, view_controller_cb.as_ref().unchecked_ref());
         view_controller_cb.forget();
     }
+
+    #[wasm_bindgen(js_name=getPath)]
+    pub fn get_path(&self, id: &str) -> js_sys::Array {
+        let value = self.paths.borrow().get(id);
+
+        value.into_iter().map(JsValue::from).collect()
+    }
 }

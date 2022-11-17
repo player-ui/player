@@ -1,7 +1,7 @@
 import {Player} from "@player-ui/player";
 import {makeFlow} from '@player-ui/make-flow';
 import {AssetTransformPlugin} from '@player-ui/asset-transform-plugin';
-import { CheckPathPlugin  } from '@player-ui/check-path-plugin';
+import {CheckPathPlugin} from '@player-ui/check-path-plugin';
 
 import {CheckPathPlugin as CheckPathPluginRS} from "./pkg/check_path_plugin_rs.js";
 
@@ -66,5 +66,6 @@ const player = new Player({
 });
 
 player.start(nestedAssetFlow)
-// console.log("path", checkPathPlugin.getPath("coll-val-2-1"));
+
+console.log("path", checkPathPlugin.getPath('coll-val-2-1'));
 

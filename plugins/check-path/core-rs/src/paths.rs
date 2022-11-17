@@ -25,14 +25,23 @@ impl Paths {
         self.traverse(data);
     }
 
+    pub fn get(&self, key: &str) -> Vec<String> {
+        self.store
+            .borrow()
+            .get(key)
+            .or(Some(&vec!["".to_string()]))
+            .unwrap()
+            .clone()
+    }
+
     fn traverse(&self, root: JsValue) {
         let path: Vec<String> = vec![];
         let mut stack =
             Paths::get_key_values(&root, path.clone()).expect("Couldn't read root node.");
         while let Some((key, value, path)) = stack.pop() {
-            if let NodeValue::StringType(_value) = value {
+            if let NodeValue::StringType(value) = value {
                 if key == "id" || key == "type" {
-                    self.store.borrow_mut().insert(key, path);
+                    self.store.borrow_mut().insert(value, path);
                 }
             } else if let NodeValue::ObjectType(value) = value {
                 let mut object_path = path.clone();

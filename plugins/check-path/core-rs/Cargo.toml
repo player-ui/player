@@ -7,6 +7,7 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+futures = "0.3.25"
 js-sys = "0.3.60"
 serde-wasm-bindgen = "0.4.5"
 wasm-bindgen = { version = "0.2.83" , features = ["serde-serialize"] }
