@@ -16,6 +16,36 @@ import SwiftUI
 // swiftlint:disable type_body_length file_length
 class SwiftUIRegistryTests: XCTestCase {
     let context: JSContext = JSContext()
+
+    func testDuplicateRegistration() {
+        let operationSkipped = expectation(description: "Skipped duplicate registration")
+        let override = expectation(description: "Asset Overridden")
+        operationSkipped.expectedFulfillmentCount = 2
+        let logger = TapableLogger()
+        logger.logLevel = .trace
+        logger.hooks.trace.tap(name: "test", { message in
+            guard message.contains("Duplicate Registration skipped for") else { return }
+            operationSkipped.fulfill()
+        })
+
+        logger.hooks.warn.tap(name: "test", { message in
+            guard message.contains("Overriding registration for match") else { return }
+            override.fulfill()
+        })
+        let registry = SwiftUIRegistry(logger: logger)
+        registry.register(["type": "action"], for: ActionAsset.self)
+        XCTAssertEqual(1, registry.registeredAssets.count)
+        registry.register(["type": "action"], for: ActionAsset.self)
+        XCTAssertEqual(1, registry.registeredAssets.count)
+        registry.register(["type": "text", "metaData": ["role": "someRole"]], for: TextAsset.self)
+        XCTAssertEqual(2, registry.registeredAssets.count)
+        registry.register(["type": "text", "metaData": ["role": "someRole"]], for: TextAsset.self)
+        XCTAssertEqual(2, registry.registeredAssets.count)
+        registry.register(["type": "text", "metaData": ["role": "someRole"]], for: ActionAsset.self)
+        XCTAssertEqual(2, registry.registeredAssets.count)
+        wait(for: [operationSkipped, override], timeout: 5)
+    }
+
     func testDecodeWrappedAsset() {
         let val = context.evaluateScript("({asset: {id: 'someId', type: 'text', value: 'someValue'}})")
 

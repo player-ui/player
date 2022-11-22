@@ -193,9 +193,9 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
         bodyContent
             .environment(\.inProgressState, (state as? InProgressState))
             // forward results from our Context along to our result binding
-            .onReceive(context.$result, perform: { result in
-                self.result = result
-            })
+            .onReceive(context.$result.debounce(for: 0.1, scheduler: RunLoop.main)) {
+                self.result = $0
+            }
             .onReceive(inspection.notice) { self.inspection.visit(self, $0) }
             .onDisappear {
                 guard unloadOnDisappear else { return }
