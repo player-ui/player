@@ -36,9 +36,6 @@ open class BaseAssetRegistry<WrapperType>: PlayerRegistry where
     WrapperType: AssetContainer,
     WrapperType.AssetType: Decodable {
 
-    /// A key for storing information in the decoder userInfo
-//    public static let decodeFunctionKey = CodingUserInfoKey(rawValue: "decodeFunction")!
-
     /// A type representing an entry in the registry
     public typealias RegistryEntry = (assetType: AssetType.Type, match: [String: Any])
 
@@ -107,8 +104,12 @@ open class BaseAssetRegistry<WrapperType>: PlayerRegistry where
         if let index = registry.firstIndex(where: { matched in
             return NSDictionary(dictionary: match).isEqual(to: matched.match)
         }) {
-            logger?.w("Overriding registration for match: \(String(describing: match))")
-            registry[index] = (assetType: asset, match: match)
+            if asset == registry[index].assetType {
+                self.logger?.t("Duplicate Registration skipped for \(String(describing: match)) asset: \(String(describing: asset))")
+            } else {
+                self.logger?.w("Overriding registration for match: \(String(describing: match))")
+                registry[index] = (assetType: asset, match: match)
+            }
         } else {
             registry.append((assetType: asset, match: match))
         }
