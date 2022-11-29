@@ -181,3 +181,57 @@ maven_install(
 load("@vaticle_bazel_distribution//common:rules.bzl", "workspace_refs")
 
 workspace_refs(name = "plugin_workspace_refs")
+
+#################################
+# Rust WebAssembly Dependencies #
+#################################
+
+http_archive(
+    name = "rules_nodejs",
+    sha256 = "4e1a5633267a0ca1d550cced2919dd4148575c0bafd47608b88aea79c41b5ca3",
+    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/4.2.0/rules_nodejs-4.2.0.tar.gz"],
+)
+
+load("@rules_nodejs//:index.bzl", "node_repositories")
+
+http_archive(
+    name = "rules_rust",
+    sha256 = "324c2a86a8708d30475f324846b35965c432b63a35567ed2b5051b86791ce345",
+    urls = ["https://github.com/bazelbuild/rules_rust/releases/download/0.13.0/rules_rust-v0.13.0.tar.gz"],
+)
+
+# rust toolchain
+load("@rules_rust//rust:repositories.bzl", "rules_rust_dependencies", "rust_register_toolchains")
+
+rules_rust_dependencies()
+
+rust_register_toolchains()
+
+# rust wasm toolchain
+load("@rules_rust//wasm_bindgen:repositories.bzl", "rust_wasm_bindgen_dependencies", "rust_wasm_bindgen_register_toolchains")
+
+rust_wasm_bindgen_dependencies()
+
+rust_wasm_bindgen_register_toolchains()
+
+# Cargo dependencies
+load("@rules_rust//crate_universe:repositories.bzl", "crate_universe_dependencies")
+crate_universe_dependencies(bootstrap = True)
+load("@rules_rust//crate_universe:defs.bzl", "crate", "crates_repository", "splicing_config")
+
+
+crates_repository(
+    name = "crate_index",
+    cargo_lockfile = "//plugins/check-path/core-rs:Cargo.lock",
+    # `generator` is not necessary in official releases.
+    # See load statement for `cargo_bazel_bootstrap`.
+#    generator = "@cargo_bazel_bootstrap//:cargo-bazel",
+    manifests = ["//plugins/check-path/core-rs:Cargo.toml"],
+)
+
+load(
+    "@crate_index//:defs.bzl",
+     "crate_repositories",
+)
+
+crate_repositories()
