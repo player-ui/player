@@ -1,1 +1,0 @@
-export { CheckPathPlugin } from './pkg';

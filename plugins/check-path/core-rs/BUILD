@@ -9,7 +9,6 @@ load("@rules_player//javascript/package_json:package_json.bzl", "create_package_
 package(default_visibility = ["//visibility:public"])
 
 BUILD_DATA = []
-SRCS = glob(include = ["src/**/*"], exclude=["**/__tests__/**", "**/*.test.*"])
 
 rust_shared_library(
     name = "check-path-rs-lib",
@@ -22,7 +21,7 @@ rust_shared_library(
 
 
 rust_wasm_bindgen(
-    name = "check-path-rs-web-wasm",
+    name = "index",
     target = "web",
     wasm_file = ":check-path-rs-lib",
 )
@@ -30,8 +29,7 @@ rust_wasm_bindgen(
 create_package_json(
     name = "check-path-rs-package_json",
     package_name = "@player-ui/check-path-plugin-rs",
-    entry = "./index.js",
-    out_dir = "dist",
+    out_dir = ".",
     registry = "https://registry.npmjs.org",
     placeholder_version = PLACEHOLDER_VERSION,
     dependencies = BUILD_DATA,
@@ -42,8 +40,7 @@ create_package_json(
 js_library(
     visibility = ["//visibility:public"],
     name = "@player-ui/check-path-plugin-rs",
-    deps = ["check-path-rs-web-wasm", "check-path-rs-package_json"],
-    srcs = ["index.js"]
+    deps = [":index", ":check-path-rs-package_json"],
 )
 
 # TODO:
