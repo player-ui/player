@@ -29,7 +29,7 @@ rust_wasm_bindgen(
 
 create_package_json(
     name = "check-path-rs-package_json",
-    package_name = "@player-ui/check-path-plugin-rs",
+    package_name = "@player-ui/check-path-plugin-wasm",
     base_package_json = "package.json",
     dependencies = BUILD_DATA,
     out_dir = ".",
@@ -41,7 +41,7 @@ create_package_json(
 
 js_library(
     name = "@player-ui/check-path-plugin-rs",
-    package_name = "@player-ui/check-path-plugin-rs",
+    package_name = "@player-ui/check-path-plugin-wasm",
     visibility = ["//visibility:public"],
     deps = [
         ":check-path-rs-package_json",

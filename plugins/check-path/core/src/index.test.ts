@@ -4,7 +4,7 @@ import { Player } from '@player-ui/player';
 import type { TransformFunction } from '@player-ui/player';
 import { makeFlow } from '@player-ui/make-flow';
 import { AssetTransformPlugin } from '@player-ui/asset-transform-plugin';
-import { CheckPathPlugin as CheckPathPluginRS } from '@player-ui/check-path-plugin-rs';
+import { CheckPathPlugin as CheckPathPluginWASM } from '@player-ui/check-path-plugin-wasm';
 import type { Asset, AssetWrapper } from '@player-ui/types';
 import { CheckPathPlugin } from '.';
 
@@ -125,9 +125,11 @@ const ViewTransform: TransformFunction<ViewAsset, TransformedView> = (
 describe('check path plugin', () => {
   let player: Player;
   let checkPathPlugin: CheckPathPlugin;
+  let checkPathPluginWASM: CheckPathPlugin;
 
   beforeEach(() => {
-    checkPathPlugin = new CheckPathPluginRS();
+    checkPathPlugin = new CheckPathPlugin();
+    checkPathPluginWASM = new CheckPathPluginWASM();
     player = new Player({
       plugins: [
         new AssetTransformPlugin([[{ type: 'view' }, ViewTransform]]),
