@@ -1,0 +1,5 @@
+{
+  "name": "@player-ui/check-path-plugin-rs",
+  "main": "index.js",
+  "module": "index.js"
+}

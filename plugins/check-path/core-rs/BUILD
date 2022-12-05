@@ -1,5 +1,5 @@
 load("@rules_player//javascript:js_library_pipeline.bzl", "PLACEHOLDER_VERSION")
-load("@build_bazel_rules_nodejs//:index.bzl", "nodejs_test", "js_library")
+load("@build_bazel_rules_nodejs//:index.bzl", "pkg_npm", "js_library")
 load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_shared_library")
 load("@rules_rust//wasm_bindgen:wasm_bindgen.bzl", "rust_wasm_bindgen")
 load("@crate_index//:defs.bzl", "all_crate_deps", "aliases")
@@ -35,6 +35,7 @@ create_package_json(
     dependencies = BUILD_DATA,
     peer_dependencies = None,
     root_package_json = "//:package.json",
+    base_package_json = "package.json",
 )
 
 js_library(
@@ -43,5 +44,13 @@ js_library(
     deps = [":index", ":check-path-rs-package_json"],
 )
 
-# TODO:
-#publish_npm_package
+pkg_npm(
+    name = "check-path-rs-publish",
+    deps = [":index", ":check-path-rs-package_json", ":@player-ui/check-path-plugin-rs"],
+    substitutions = {
+        "__VERSION__": "{STABLE_VERSION}",
+        "0.0.0-PLACEHOLDER": "{STABLE_VERSION}",
+        "__GIT_COMMIT__": "{STABLE_GIT_COMMIT}",
+    },
+    validate = False,
+)
