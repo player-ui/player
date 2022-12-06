@@ -22,7 +22,7 @@ impl CheckPathPlugin {
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
         Self {
-            name: NAME.clone().to_string(),
+            name: NAME.to_string(),
             paths: Rc::new(RefCell::new(Paths::new())),
         }
     }
