@@ -40,7 +40,7 @@ create_package_json(
 )
 
 js_library(
-    name = "@player-ui/check-path-plugin-rs",
+    name = "@player-ui/check-path-plugin-wasm",
     package_name = "@player-ui/check-path-plugin-wasm",
     visibility = ["//visibility:public"],
     deps = [

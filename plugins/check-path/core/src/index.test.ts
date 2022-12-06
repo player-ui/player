@@ -124,12 +124,10 @@ const ViewTransform: TransformFunction<ViewAsset, TransformedView> = (
 
 describe('check path plugin', () => {
   let player: Player;
-  let checkPathPlugin: CheckPathPlugin;
-  let checkPathPluginWASM: CheckPathPlugin;
+  const checkPathPlugin = new CheckPathPlugin();
+  const checkPathPluginWASM = new CheckPathPluginWASM();
 
   beforeEach(() => {
-    checkPathPlugin = new CheckPathPlugin();
-    checkPathPluginWASM = new CheckPathPluginWASM();
     player = new Player({
       plugins: [
         new AssetTransformPlugin([[{ type: 'view' }, ViewTransform]]),
@@ -139,26 +137,32 @@ describe('check path plugin', () => {
     player.start(nestedAssetFlow);
   });
 
-  test('getAsset', () => {
-    const view = checkPathPlugin.getAsset('view-1') as TransformedView;
+  test.each([
+    ['JS', checkPathPlugin],
+    ['WASM', checkPathPluginWASM],
+  ])('getAsset - %s', (type, instance) => {
+    const view = instance.getAsset('view-1') as TransformedView;
     expect(view).toBeDefined();
     expect(view.run()).toStrictEqual('hello');
   });
 
-  test('getAsset after setting data', () => {
+  test.each([
+    ['JS', checkPathPlugin],
+    ['WASM', checkPathPluginWASM],
+  ])('getAsset after setting data - %s', (_, instance) => {
     (player.getState() as InProgressState).controllers.data.set({ count: 5 });
-    const view = checkPathPlugin.getAsset('view-1') as TransformedView;
+    const view = instance.getAsset('view-1') as TransformedView;
     expect(view).toBeDefined();
     expect(view.run()).toStrictEqual('hello');
   });
 
-  test('path', () => {
-    expect(checkPathPlugin.getPath('view-1')).toStrictEqual([]);
-    expect(checkPathPlugin.getPath('fields')).toStrictEqual([
-      'fields',
-      'asset',
-    ]);
-    expect(checkPathPlugin.getPath('coll-val-2-1')).toStrictEqual([
+  test.each([
+    ['JS', checkPathPlugin],
+    ['WASM', checkPathPluginWASM],
+  ])('path - %s', (_, instance) => {
+    expect(instance.getPath('view-1')).toStrictEqual([]);
+    expect(instance.getPath('fields')).toStrictEqual(['fields', 'asset']);
+    expect(instance.getPath('coll-val-2-1')).toStrictEqual([
       'fields',
       'asset',
       'values',
@@ -169,10 +173,10 @@ describe('check path plugin', () => {
       'asset',
     ]);
     expect(
-      checkPathPlugin.getPath('coll-val-2-1', { type: 'collection' })
+      instance.getPath('coll-val-2-1', { type: 'collection' })
     ).toStrictEqual(['values', 0, 'asset']);
     expect(
-      checkPathPlugin.getPath('coll-val-2-1', [
+      instance.getPath('coll-val-2-1', [
         { type: 'collection' },
         { type: 'view' },
       ])
@@ -187,28 +191,27 @@ describe('check path plugin', () => {
       'asset',
     ]);
     expect(
-      checkPathPlugin.getPath('coll-val-2-1', [
+      instance.getPath('coll-val-2-1', [
         { type: 'collection' },
         { type: 'collection' },
       ])
     ).toStrictEqual(['values', 1, 'asset', 'values', 0, 'asset']);
     expect(
-      checkPathPlugin.getPath('coll-val-1-label', { type: 'input' })
+      instance.getPath('coll-val-1-label', { type: 'input' })
     ).toStrictEqual(['label', 'asset']);
   });
 
   describe('hasParentContext', () => {
-    it('works for types', () => {
-      expect(checkPathPlugin.hasParentContext('coll-val-1', 'collection')).toBe(
-        true
-      );
+    it.each([
+      ['JS', checkPathPlugin],
+      ['WASM', checkPathPluginWASM],
+    ])('works for types - %s', (_, instance) => {
+      expect(instance.hasParentContext('coll-val-1', 'collection')).toBe(true);
 
-      expect(checkPathPlugin.hasParentContext('coll-val-1-label', 'view')).toBe(
-        true
-      );
+      expect(instance.hasParentContext('coll-val-1-label', 'view')).toBe(true);
 
       expect(
-        checkPathPlugin.hasParentContext('coll-val-2-1', [
+        instance.hasParentContext('coll-val-2-1', [
           'collection',
           'collection',
           'view',
@@ -216,7 +219,7 @@ describe('check path plugin', () => {
       ).toBe(true);
 
       expect(
-        checkPathPlugin.hasParentContext('coll-val-2-1', [
+        instance.hasParentContext('coll-val-2-1', [
           'collection',
           'collection',
           'nah-view',
@@ -224,15 +227,18 @@ describe('check path plugin', () => {
       ).toBe(false);
     });
 
-    it('works for objects', () => {
+    it.each([
+      ['JS', checkPathPlugin],
+      ['WASM', checkPathPluginWASM],
+    ])('works for objects - %s', (_, instance) => {
       expect(
-        checkPathPlugin.hasParentContext('coll-val-1', {
+        instance.hasParentContext('coll-val-1', {
           metaData: { role: 'awesome' },
         })
       ).toBe(true);
 
       expect(
-        checkPathPlugin.hasParentContext('coll-val-1', {
+        instance.hasParentContext('coll-val-1', {
           metaData: { role: 'not-awesome' },
         })
       ).toBe(false);
@@ -240,24 +246,34 @@ describe('check path plugin', () => {
   });
 
   describe('hasChildContext', () => {
-    it('works for types', () => {
-      expect(checkPathPlugin.hasChildContext('coll-val-1', 'text')).toBe(true);
-      expect(checkPathPlugin.hasChildContext('coll-val-1', 'input')).toBe(
-        false
-      );
+    it.each([
+      ['JS', checkPathPlugin],
+      ['WASM', checkPathPluginWASM],
+    ])('works for types - %s', (_, instance) => {
+      expect(instance.hasChildContext('coll-val-1', 'text')).toBe(true);
+      expect(instance.hasChildContext('coll-val-1', 'input')).toBe(false);
     });
 
-    it('returns false for non-existent assets', () => {
-      expect(checkPathPlugin.hasChildContext('not-there', 'text')).toBe(false);
+    it.each([
+      ['JS', checkPathPlugin],
+      ['WASM', checkPathPluginWASM],
+    ])('returns false for non-existent assets - %s', (_, instance) => {
+      expect(instance.hasChildContext('not-there', 'text')).toBe(false);
     });
 
-    it('works for empty arrays', () => {
-      expect(checkPathPlugin.hasChildContext('coll-val-1', [])).toBe(true);
+    it.each([
+      ['JS', checkPathPlugin],
+      ['WASM', checkPathPluginWASM],
+    ])('works for empty arrays - %s', (_, instance) => {
+      expect(instance.hasChildContext('coll-val-1', [])).toBe(true);
     });
 
-    it('works for functions', () => {
+    it.each([
+      ['JS', checkPathPlugin],
+      ['WASM', checkPathPluginWASM],
+    ])('works for functions - %s', (_, instance) => {
       expect(
-        checkPathPlugin.hasChildContext('view-1', [
+        instance.hasChildContext('view-1', [
           (val: any) => val.values?.length === 1,
           { id: 'coll-val-2-1' },
         ])
@@ -266,36 +282,48 @@ describe('check path plugin', () => {
   });
 
   describe('getParentProp', () => {
-    it('works for simple things', () => {
-      expect(checkPathPlugin.getParentProp('coll-val-1')).toBe('values');
-      expect(checkPathPlugin.getParentProp('coll-val-1-label')).toBe('label');
-      expect(checkPathPlugin.getParentProp('not-there')).toBeUndefined();
-      expect(checkPathPlugin.getParentProp('view-1')).toBeUndefined();
+    it.each([
+      ['JS', checkPathPlugin],
+      ['WASM', checkPathPluginWASM],
+    ])('works for simple things - %s', (_, instance) => {
+      expect(instance.getParentProp('coll-val-1')).toBe('values');
+      expect(instance.getParentProp('coll-val-1-label')).toBe('label');
+      expect(instance.getParentProp('not-there')).toBeUndefined();
+      expect(instance.getParentProp('view-1')).toBeUndefined();
     });
   });
 
   describe('parent', () => {
-    it('works without a second arg', () => {
-      expect(checkPathPlugin.getParent('coll-val-2')?.id).toBe('fields');
+    it.each([
+      ['JS', checkPathPlugin],
+      ['WASM', checkPathPluginWASM],
+    ])('works without a second arg - %s', (_, instance) => {
+      expect(instance.getParent('coll-val-2')?.id).toBe('fields');
     });
 
-    it('handles non-existent node id', () => {
-      expect(checkPathPlugin.getParent('not-there')).toBeUndefined();
+    it.each([
+      ['JS', checkPathPlugin],
+      ['WASM', checkPathPluginWASM],
+    ])('handles non-existent node id - %s', (_, instance) => {
+      expect(instance.getParent('not-there')).toBeUndefined();
     });
 
-    it('handles the root node not having a parent', () => {
-      expect(checkPathPlugin.getParent('view-1')).toBeUndefined();
+    it.each([
+      ['JS', checkPathPlugin],
+      ['WASM', checkPathPluginWASM],
+    ])('handles the root node not having a parent - %s', (_, instance) => {
+      expect(instance.getParent('view-1')).toBeUndefined();
     });
   });
 });
 
 describe('works with applicability', () => {
   let player: Player;
-  let checkPathPlugin: CheckPathPlugin;
+  const checkPathPlugin = new CheckPathPlugin();
+  const checkPathPluginWASM = new CheckPathPluginWASM();
   let dataController: DataController;
 
   beforeEach(() => {
-    checkPathPlugin = new CheckPathPlugin();
     player = new Player({
       plugins: [checkPathPlugin],
     });
@@ -303,9 +331,12 @@ describe('works with applicability', () => {
     dataController = (player.getState() as InProgressState).controllers.data;
   });
 
-  test('path', async () => {
-    expect(checkPathPlugin.getPath('asset-2')).toBeUndefined();
-    expect(checkPathPlugin.getPath('asset-3')).toStrictEqual([
+  test.each([
+    ['JS', checkPathPlugin],
+    ['WASM', checkPathPluginWASM],
+  ])('path - %s', async (_, instance) => {
+    expect(instance.getPath('asset-2')).toBeUndefined();
+    expect(instance.getPath('asset-3')).toStrictEqual([
       'fields',
       'asset',
       'values',
@@ -318,7 +349,7 @@ describe('works with applicability', () => {
       ['foo.baz', true],
     ]);
     await waitFor(() =>
-      expect(checkPathPlugin.getPath('asset-2')).toStrictEqual([
+      expect(instance.getPath('asset-2')).toStrictEqual([
         'fields',
         'asset',
         'values',
@@ -327,14 +358,14 @@ describe('works with applicability', () => {
       ])
     );
 
-    expect(checkPathPlugin.getPath('asset-3')).toStrictEqual([
+    expect(instance.getPath('asset-3')).toStrictEqual([
       'fields',
       'asset',
       'values',
       2,
       'asset',
     ]);
-    expect(checkPathPlugin.getPath('asset-4a')).toStrictEqual([
+    expect(instance.getPath('asset-4a')).toStrictEqual([
       'fields',
       'asset',
       'values',
@@ -346,36 +377,45 @@ describe('works with applicability', () => {
     ]);
   });
 
-  test('getAsset', async () => {
-    expect(checkPathPlugin.getAsset('asset-4')).toBeUndefined();
+  test.each([
+    ['JS', checkPathPlugin],
+    ['WASM', checkPathPluginWASM],
+  ])('getAsset - %s', async (_, instance) => {
+    expect(instance.getAsset('asset-4')).toBeUndefined();
 
     dataController.set([['foo.baz', true]]);
     await waitFor(() => {
-      expect(checkPathPlugin.getAsset('asset-4')).toBeDefined();
+      expect(instance.getAsset('asset-4')).toBeDefined();
     });
   });
 });
 
 describe('handles non-initialized player', () => {
-  let checkPathPlugin: CheckPathPlugin;
-
-  beforeEach(() => {
-    checkPathPlugin = new CheckPathPlugin();
+  test.each([
+    ['JS', new CheckPathPlugin()],
+    ['WASM', new CheckPathPluginWASM()],
+  ])('hasParentContext - %s', (_, instance) => {
+    expect(instance.hasParentContext('foo', 'bar')).toBe(false);
   });
 
-  test('hasParentContext', () => {
-    expect(checkPathPlugin.hasParentContext('foo', 'bar')).toBe(false);
+  test.each([
+    ['JS', new CheckPathPlugin()],
+    ['WASM', new CheckPathPluginWASM()],
+  ])('hasChildContext - %s', (_, instance) => {
+    expect(instance.hasChildContext('foo', 'bar')).toBe(false);
   });
 
-  test('hasChildContext', () => {
-    expect(checkPathPlugin.hasChildContext('foo', 'bar')).toBe(false);
+  test.each([
+    ['JS', new CheckPathPlugin()],
+    ['WASM', new CheckPathPluginWASM()],
+  ])('getParentProp - %s', (_, instance) => {
+    expect(instance.getParentProp('foo')).toBeUndefined();
   });
 
-  test('getParentProp', () => {
-    expect(checkPathPlugin.getParentProp('foo')).toBeUndefined();
-  });
-
-  test('parent', () => {
-    expect(checkPathPlugin.getParent('foo', 'bar')).toBeUndefined();
+  test.each([
+    ['JS', new CheckPathPlugin()],
+    ['WASM', new CheckPathPluginWASM()],
+  ])('parent - %s', (_, instance) => {
+    expect(instance.getParent('foo', 'bar')).toBeUndefined();
   });
 });
