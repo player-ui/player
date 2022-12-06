@@ -10,10 +10,10 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 http_archive(
-  name = "rules_player",
-  strip_prefix = "rules_player-0.8.0",
-  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.8.0.tar.gz"],
-  sha256 = "2c1e049d33ccab89fdbaf513cb7a537e95a28fe05508d370b8f3063dcd54920f"
+    name = "rules_player",
+    sha256 = "2c1e049d33ccab89fdbaf513cb7a537e95a28fe05508d370b8f3063dcd54920f",
+    strip_prefix = "rules_player-0.8.0",
+    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.8.0.tar.gz"],
 )
 
 load("@rules_player//:workspace.bzl", "deps")
@@ -185,15 +185,6 @@ workspace_refs(name = "plugin_workspace_refs")
 #################################
 # Rust WebAssembly Dependencies #
 #################################
-
-http_archive(
-    name = "rules_nodejs",
-    sha256 = "4e1a5633267a0ca1d550cced2919dd4148575c0bafd47608b88aea79c41b5ca3",
-    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/4.2.0/rules_nodejs-4.2.0.tar.gz"],
-)
-
-load("@rules_nodejs//:index.bzl", "node_repositories")
-
 http_archive(
     name = "rules_rust",
     sha256 = "324c2a86a8708d30475f324846b35965c432b63a35567ed2b5051b86791ce345",
@@ -216,22 +207,20 @@ rust_wasm_bindgen_register_toolchains()
 
 # Cargo dependencies
 load("@rules_rust//crate_universe:repositories.bzl", "crate_universe_dependencies")
-crate_universe_dependencies(bootstrap = True)
-load("@rules_rust//crate_universe:defs.bzl", "crate", "crates_repository", "splicing_config")
 
+crate_universe_dependencies(bootstrap = True)
+
+load("@rules_rust//crate_universe:defs.bzl", "crate", "crates_repository", "splicing_config")
 
 crates_repository(
     name = "crate_index",
     cargo_lockfile = "//plugins/check-path/core-rs:Cargo.lock",
     # `generator` is not necessary in official releases.
     # See load statement for `cargo_bazel_bootstrap`.
-#    generator = "@cargo_bazel_bootstrap//:cargo-bazel",
+    #    generator = "@cargo_bazel_bootstrap//:cargo-bazel",
     manifests = ["//plugins/check-path/core-rs:Cargo.toml"],
 )
 
-load(
-    "@crate_index//:defs.bzl",
-     "crate_repositories",
-)
+load("@crate_index//:defs.bzl", "crate_repositories")
 
 crate_repositories()
