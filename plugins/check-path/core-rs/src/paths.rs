@@ -23,10 +23,6 @@ impl Paths {
         }
     }
 
-    pub fn parse(&self, data: JsValue) {
-        self.traverse(data);
-    }
-
     pub fn get(&self, key: &str) -> Vec<String> {
         self.key_paths
             .borrow()
@@ -36,7 +32,7 @@ impl Paths {
             .clone()
     }
 
-    fn traverse(&self, root: JsValue) {
+    pub fn parse(&self, root: JsValue) {
         let mut stack: Vec<(JsValue, Vec<String>)> = vec![(root, vec![])];
 
         while let Some((obj, key_path)) = stack.pop() {
