@@ -1,23 +1,25 @@
-use js_sys::Reflect;
+use js_sys::{Array, Reflect};
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 
-enum NodeValue {
-    StringType(String),
-    ObjectType(JsValue),
-    None,
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
 }
 
 pub struct Paths {
-    store: Rc<RefCell<HashMap<String, Vec<String>>>>,
+    key_paths: Rc<RefCell<HashMap<String, Vec<String>>>>,
+    // type_paths: Rc<RefCell<HashMap<String, Vec<String>>>>,
 }
 
 impl Paths {
     pub fn new() -> Self {
         Self {
-            store: Rc::new(RefCell::new(HashMap::new())),
+            key_paths: Rc::new(RefCell::new(HashMap::new())),
+            // type_paths: Rc::new(RefCell::new(HashMap::new())),
         }
     }
 
@@ -26,58 +28,41 @@ impl Paths {
     }
 
     pub fn get(&self, key: &str) -> Vec<String> {
-        self.store
+        self.key_paths
             .borrow()
             .get(key)
-            .or(Some(&vec!["".to_string()]))
+            .or(Some(&vec![]))
             .unwrap()
             .clone()
     }
 
     fn traverse(&self, root: JsValue) {
-        let path: Vec<String> = vec![];
-        let mut stack =
-            Paths::get_key_values(&root, path.clone()).expect("Couldn't read root node.");
+        let mut stack: Vec<(JsValue, Vec<String>)> = vec![(root, vec![])];
 
-        while let Some((key, value, path)) = stack.pop() {
-            if let NodeValue::StringType(value) = value {
-                if key == "id" || key == "type" {
-                    self.store.borrow_mut().insert(value, path);
+        while let Some((obj, key_path)) = stack.pop() {
+            let keys = Reflect::own_keys(&obj).unwrap_or(Array::new());
+            keys.iter().for_each(|js_key| {
+                let key = js_key
+                    .as_string()
+                    .expect("Could not read object key as String.");
+                let js_value = Reflect::get(&obj, &JsValue::from_str(&key))
+                    .expect(&format!("Couldn't read value for key {}", &key));
+
+                if key == "id" {
+                    self.key_paths
+                        .borrow_mut()
+                        .insert(js_value.as_string().unwrap(), key_path.clone());
                 }
-            } else if let NodeValue::ObjectType(value) = value {
-                let mut object_path = path.clone();
-                object_path.push(key);
-                stack.append(Paths::get_key_values(&value, object_path).unwrap().as_mut());
-            }
+
+                if js_value.is_object() {
+                    let mut key_path = key_path.clone();
+
+                    key_path.push(key.to_string());
+                    stack.push((js_value, key_path))
+                }
+
+                // log(&format!("{:?}", key_path))
+            });
         }
-    }
-
-    fn get_key_values(
-        value: &JsValue,
-        path: Vec<String>,
-    ) -> Option<Vec<(String, NodeValue, Vec<String>)>> {
-        if !value.is_object() {
-            return None;
-        }
-        let keys = Reflect::own_keys(&value).unwrap();
-        let len = keys.length();
-
-        let mut result = Vec::with_capacity(len as usize);
-
-        keys.iter().for_each(|raw_key| {
-            let key: String = serde_wasm_bindgen::from_value(raw_key).unwrap();
-            let raw_value = Reflect::get(&value, &raw_key).unwrap();
-
-            let value: NodeValue = if raw_value.is_object() {
-                NodeValue::ObjectType(raw_value)
-            } else if raw_value.is_string() {
-                NodeValue::StringType(serde_wasm_bindgen::from_value(raw_value).unwrap())
-            } else {
-                NodeValue::None
-            };
-
-            result.push((key, value, path.clone()))
-        });
-        Some(result)
     }
 }
