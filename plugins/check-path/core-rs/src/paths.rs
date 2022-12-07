@@ -24,12 +24,7 @@ impl Paths {
     }
 
     pub fn get(&self, key: &str) -> Vec<String> {
-        self.key_paths
-            .borrow()
-            .get(key)
-            .or(Some(&vec![]))
-            .unwrap()
-            .clone()
+        self.key_paths.borrow().get(key).unwrap_or(&vec![]).clone()
     }
 
     pub fn parse(&self, root: JsValue) {
