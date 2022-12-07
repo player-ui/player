@@ -36,29 +36,32 @@ impl Paths {
         let mut stack: Vec<(JsValue, Vec<String>)> = vec![(root, vec![])];
 
         while let Some((obj, key_path)) = stack.pop() {
-            let keys = Reflect::own_keys(&obj).unwrap_or(Array::new());
-            keys.iter().for_each(|js_key| {
-                let key = js_key
-                    .as_string()
-                    .expect("Could not read object key as String.");
-                let js_value = Reflect::get(&obj, &JsValue::from_str(&key))
-                    .expect(&format!("Couldn't read value for key {}", &key));
+            Reflect::own_keys(&obj)
+                .unwrap_or(Array::new())
+                .iter()
+                .for_each(|js_key| {
+                    let key = js_key
+                        .as_string()
+                        .expect("Could not read object key as String.");
 
-                if key == "id" {
-                    self.key_paths
-                        .borrow_mut()
-                        .insert(js_value.as_string().unwrap(), key_path.clone());
-                }
+                    let js_value = Reflect::get(&obj, &JsValue::from_str(&key))
+                        .expect(&format!("Couldn't read value for key {}", &key));
 
-                if js_value.is_object() {
-                    let mut key_path = key_path.clone();
+                    if key == "id" {
+                        self.key_paths
+                            .borrow_mut()
+                            .insert(js_value.as_string().unwrap(), key_path.clone());
+                    }
 
-                    key_path.push(key.to_string());
-                    stack.push((js_value, key_path))
-                }
+                    if js_value.is_object() {
+                        let mut key_path = key_path.clone();
 
-                // log(&format!("{:?}", key_path))
-            });
+                        key_path.push(key.to_string());
+                        stack.push((js_value, key_path))
+                    }
+
+                    // log(&format!("{:?}", key_path))
+                });
         }
     }
 }
