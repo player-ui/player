@@ -44,6 +44,7 @@ js_library(
     package_name = "@player-ui/check-path-plugin-wasm",
     visibility = ["//visibility:public"],
     deps = [
+        ":check-path-rs-lib",
         ":check-path-rs-package_json",
         ":index",
     ],
