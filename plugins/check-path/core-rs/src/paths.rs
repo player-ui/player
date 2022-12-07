@@ -38,6 +38,7 @@ impl Paths {
         let path: Vec<String> = vec![];
         let mut stack =
             Paths::get_key_values(&root, path.clone()).expect("Couldn't read root node.");
+
         while let Some((key, value, path)) = stack.pop() {
             if let NodeValue::StringType(value) = value {
                 if key == "id" || key == "type" {
@@ -62,11 +63,10 @@ impl Paths {
         let len = keys.length();
 
         let mut result = Vec::with_capacity(len as usize);
-        for i in 0..len {
-            let raw_key = keys.get(i);
-            let raw_value = Reflect::get(&value, &raw_key).unwrap();
 
+        keys.iter().for_each(|raw_key| {
             let key: String = serde_wasm_bindgen::from_value(raw_key).unwrap();
+            let raw_value = Reflect::get(&value, &raw_key).unwrap();
 
             let value: NodeValue = if raw_value.is_object() {
                 NodeValue::ObjectType(raw_value)
@@ -77,8 +77,7 @@ impl Paths {
             };
 
             result.push((key, value, path.clone()))
-        }
-
+        });
         Some(result)
     }
 }
