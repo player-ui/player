@@ -3,8 +3,6 @@ import type {
   Player,
   PlayerPlugin,
   PlayerFlowState,
-  DataController,
-  ExpressionEvaluator,
   Logger,
 } from '@player-ui/player';
 import { resolveDataRefs } from '@player-ui/player';
@@ -81,8 +79,7 @@ export class BeaconPlugin implements PlayerPlugin {
     view: undefined,
   };
 
-  private dataController?: DataController;
-  private expressionEvaluator?: ExpressionEvaluator;
+  private resolveDataRefs?: <T>(data: T) => T;
 
   public hooks = {
     buildBeacon: new AsyncSeriesWaterfallHook<[unknown, HookArgs]>(),
@@ -110,12 +107,14 @@ export class BeaconPlugin implements PlayerPlugin {
     this.player = player;
     this.logger = player.logger;
 
-    player.hooks.dataController.tap(this.name, (dataController) => {
-      this.dataController = dataController;
-    });
-
-    player.hooks.expressionEvaluator.tap(this.name, (expressionEvaluator) => {
-      this.expressionEvaluator = expressionEvaluator;
+    player.hooks.state.tap(this.name, (playerState) => {
+      if (playerState.status === 'in-progress') {
+        this.resolveDataRefs = (data) =>
+          resolveDataRefs(data, {
+            model: playerState.controllers.data,
+            evaluate: playerState.controllers.expression.evaluate,
+          });
+      }
     });
 
     player.hooks.viewController.tap(this.name, (vc) => {
@@ -185,7 +184,9 @@ export class BeaconPlugin implements PlayerPlugin {
     const { action, element, asset, view } = event;
     const { view: currentView } = this.beaconContext;
     setTimeout(async () => {
-      const data = event?.data || event.asset?.metaData?.beacon;
+      const unresolvedData = event?.data || event.asset?.metaData?.beacon;
+
+      const data = this.resolveDataRefs?.(unresolvedData) ?? unresolvedData;
 
       const defaultBeacon = {
         action,
@@ -199,25 +200,23 @@ export class BeaconPlugin implements PlayerPlugin {
         ...event,
         data,
         state,
-        view: view || currentView,
+        view: view ?? currentView,
         logger: this.logger as Logger,
       };
-      const beacon =
+      let beacon =
         (await this.hooks.buildBeacon.call(defaultBeacon, hookArgs)) ||
         defaultBeacon;
+
+      // Re-resolve data refs in case the hook modified the beacon and introduced more
+      if (beacon !== defaultBeacon && this.resolveDataRefs) {
+        beacon = this.resolveDataRefs(beacon);
+      }
+
       const shouldCancel = this.hooks.cancelBeacon.call(hookArgs) || false;
 
       if (!shouldCancel) {
-        const resolvedBeacon =
-          this.dataController && this.expressionEvaluator
-            ? resolveDataRefs(beacon, {
-                model: this.dataController,
-                evaluate: this.expressionEvaluator.evaluate,
-              })
-            : beacon;
-
-        this.logger?.debug('Sending beacon event', resolvedBeacon);
-        this.hooks.publishBeacon.call(resolvedBeacon);
+        this.logger?.debug('Sending beacon event', beacon);
+        this.hooks.publishBeacon.call(beacon);
       }
     }, 0);
   }

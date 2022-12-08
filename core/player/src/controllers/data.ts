@@ -27,7 +27,7 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
     onDelete: new SyncHook<[any]>(),
     onSet: new SyncHook<[BatchSetTransaction]>(),
     onGet: new SyncHook<[any, any]>(),
-    onUpdate: new SyncHook<[Updates]>(),
+    onUpdate: new SyncHook<[Updates, DataModelOptions | undefined]>(),
 
     format: new SyncWaterfallHook<[any, BindingInstance]>(),
     deformat: new SyncWaterfallHook<[any, BindingInstance]>(),
@@ -157,8 +157,10 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
 
     this.hooks.onSet.call(normalizedTransaction);
 
+    this.hooks.onSet.call(normalizedTransaction);
+
     if (setUpdates.length > 0) {
-      this.hooks.onUpdate.call(setUpdates);
+      this.hooks.onUpdate.call(setUpdates, options);
     }
 
     return result;

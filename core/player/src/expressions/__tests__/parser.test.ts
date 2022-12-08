@@ -1,4 +1,5 @@
 import parse from '../parser';
+import { ExpNodeOpaqueIdentifier } from '../types';
 
 test('the happy stuff', () => {
   expect(parse('foo')).toMatchSnapshot();
@@ -10,6 +11,54 @@ test('the happy stuff', () => {
   expect(parse('foo[bar]')).toMatchSnapshot();
   expect(parse('{{foo}} == "string\nwith\tbreaks"')).toMatchSnapshot();
   expect(parse('foo = [1, 2, 3]')).toMatchSnapshot();
+});
+
+test('nested binary op location', () => {
+  expect(parse('foo === bar === baz')).toStrictEqual({
+    __id: ExpNodeOpaqueIdentifier,
+    type: 'BinaryExpression',
+    operator: '===',
+    left: {
+      __id: ExpNodeOpaqueIdentifier,
+      type: 'BinaryExpression',
+      operator: '===',
+      left: {
+        __id: ExpNodeOpaqueIdentifier,
+        type: 'Identifier',
+        name: 'foo',
+        location: {
+          start: { character: 0 },
+          end: { character: 3 },
+        },
+      },
+      right: {
+        __id: ExpNodeOpaqueIdentifier,
+        type: 'Identifier',
+        name: 'bar',
+        location: {
+          start: { character: 8 },
+          end: { character: 11 },
+        },
+      },
+      location: {
+        start: { character: 0 },
+        end: { character: 11 },
+      },
+    },
+    right: {
+      __id: ExpNodeOpaqueIdentifier,
+      type: 'Identifier',
+      name: 'baz',
+      location: {
+        start: { character: 16 },
+        end: { character: 19 },
+      },
+    },
+    location: {
+      start: { character: 0 },
+      end: { character: 19 },
+    },
+  });
 });
 
 test('the bad stuff', () => {

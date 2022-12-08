@@ -69,8 +69,12 @@ function getParent(
     parent &&
     (parent.type === NodeType.Asset || parent.type === NodeType.View)
   ) {
-    return (viewInfo.resolver.getSourceNode(parent) ??
-      parent) as Node.ViewOrAsset;
+    const sourceNode = viewInfo.resolver.getSourceNode(parent);
+    const viewOrAsset =
+      sourceNode?.type === NodeType.Applicability
+        ? sourceNode.value
+        : viewInfo.resolver.getSourceNode(parent);
+    return (viewOrAsset ?? parent) as Node.ViewOrAsset;
   }
 }
 
@@ -254,8 +258,15 @@ export class CheckPathPlugin implements PlayerPlugin {
     const [first, ...rest] = query;
     const matcher = createMatcher(first);
 
-    if (node.type === NodeType.Asset || node.type === NodeType.View) {
-      const resolved = this.viewInfo?.resolvedMap.get(node);
+    if (
+      node.type === NodeType.Asset ||
+      node.type === NodeType.View ||
+      node.type === NodeType.Applicability
+    ) {
+      const resolved =
+        node.type === NodeType.Applicability
+          ? this.viewInfo?.resolvedMap.get(node.value)
+          : this.viewInfo?.resolvedMap.get(node);
       const includesSelf =
         (includeSelfMatch && resolved && matcher(resolved.value)) ?? false;
       const childQuery = includesSelf ? rest : query;
@@ -264,12 +275,16 @@ export class CheckPathPlugin implements PlayerPlugin {
         return true;
       }
 
-      if (childQuery.length && (!node.children || node.children.length === 0)) {
+      const children =
+        node.type === NodeType.Applicability
+          ? (node.value as Node.ViewOrAsset).children
+          : node.children;
+      if (childQuery.length && (!children || children.length === 0)) {
         return false;
       }
 
       if (
-        node.children?.some((childNode) =>
+        children?.some((childNode) =>
           this.findChildPath(childNode.value, childQuery)
         )
       ) {

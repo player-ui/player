@@ -13,12 +13,22 @@ import type { Logger } from '../logger';
 import type { ValidationResponse } from './types';
 
 /**
+ * A BindingInstance with an indicator of whether or not it's a strong binding
+ */
+export type StrongOrWeakBinding = {
+  /** BindingInstance in question */
+  binding: BindingInstance;
+  /** Boolean indicating whether the relevant BindingInstance is a strong binding */
+  isStrong: boolean;
+};
+
+/**
  * Returns a validation object if the data is invalid or an set of BindingsInstances if the binding itself is a weak ref of another invalid validation
  */
 export type MiddlewareChecker = (
   binding: BindingInstance,
   model: DataModelImpl
-) => ValidationResponse | Set<BindingInstance> | undefined;
+) => ValidationResponse | Set<StrongOrWeakBinding> | undefined;
 
 /**
  * Middleware for the data-model that caches the results of invalid data
@@ -60,7 +70,12 @@ export class ValidationMiddleware implements DataModelMiddleware {
       if (validations === undefined) {
         nextTransaction.push([binding, value]);
       } else if (validations instanceof Set) {
-        invalidBindings.push(...validations);
+        validations.forEach((validation) => {
+          invalidBindings.push(validation.binding);
+          if (!validation.isStrong) {
+            nextTransaction.push([validation.binding, value]);
+          }
+        });
       } else {
         this.logger?.debug(
           `Invalid value for path: ${binding.asString()} - ${
@@ -75,7 +90,10 @@ export class ValidationMiddleware implements DataModelMiddleware {
       nextTransaction.forEach(([binding]) =>
         this.shadowModelPaths.delete(binding)
       );
-      return next.set(nextTransaction, options);
+      const result = next.set(nextTransaction, options);
+      if (invalidBindings.length === 0) {
+        return result;
+      }
     }
 
     return invalidBindings.map((binding) => {

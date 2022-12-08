@@ -12,6 +12,7 @@ import type {
   ValidationProvider,
   ValidationResponse,
   WarningValidationResponse,
+  StrongOrWeakBinding,
 } from '../../validator';
 import { ValidationMiddleware, ValidatorRegistry } from '../../validator';
 import type { Logger } from '../../logger';
@@ -326,24 +327,33 @@ export class ValidationController implements BindingTracker {
           const strongValidation = this.getValidationForBinding(binding);
 
           // return validation issues directly on bindings first
-          if (strongValidation?.get()) return strongValidation.get();
+          if (strongValidation?.get()?.severity === 'error') {
+            return strongValidation.get();
+          }
 
           // if none, check to see any validations this binding may be a weak ref of and return
-          const newInvalidBindings: Set<BindingInstance> = new Set();
-          for (const [, weakValidation] of Array.from(this.validations)) {
+          const newInvalidBindings: Set<StrongOrWeakBinding> = new Set();
+          this.validations.forEach((weakValidation, strongBinding) => {
             if (
               caresAboutDataChanges(
                 new Set([binding]),
                 weakValidation.weakBindings
               ) &&
-              weakValidation?.get()
+              weakValidation?.get()?.severity === 'error'
             ) {
-              weakValidation?.weakBindings.forEach(
-                newInvalidBindings.add,
-                newInvalidBindings
-              );
+              weakValidation?.weakBindings.forEach((weakBinding) => {
+                weakBinding === strongBinding
+                  ? newInvalidBindings.add({
+                      binding: weakBinding,
+                      isStrong: true,
+                    })
+                  : newInvalidBindings.add({
+                      binding: weakBinding,
+                      isStrong: false,
+                    });
+              });
             }
-          }
+          });
 
           if (newInvalidBindings.size > 0) {
             return newInvalidBindings;
@@ -376,7 +386,10 @@ export class ValidationController implements BindingTracker {
           });
 
           if (originalValue !== withoutDefault) {
-            this.options.model.set([[binding, originalValue]]);
+            // Don't trigger updates when setting the default value
+            this.options.model.set([[binding, originalValue]], {
+              silent: true,
+            });
           }
 
           this.updateValidationsForBinding(
@@ -452,7 +465,7 @@ export class ValidationController implements BindingTracker {
             const response = this.validationRunner(
               validationObj,
               context,
-              binding
+              vBinding
             );
             return response ? { message: response.message } : undefined;
           });
@@ -582,7 +595,7 @@ export class ValidationController implements BindingTracker {
 
     const validations = new Map<BindingInstance, ValidationResponse>();
 
-    for (const b of this.getBindings()) {
+    this.getBindings().forEach((b) => {
       const invalid = this.getValidationForBinding(b)?.get();
 
       if (invalid) {
@@ -594,7 +607,7 @@ export class ValidationController implements BindingTracker {
 
         validations.set(b, invalid);
       }
-    }
+    });
 
     return {
       canTransition: validations.size === 0,
