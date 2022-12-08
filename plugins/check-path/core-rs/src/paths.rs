@@ -15,6 +15,8 @@ pub struct Paths {
     // type_paths: Rc<RefCell<HashMap<String, Vec<String>>>>,
 }
 
+type View = Rc<RefCell<JsValue>>;
+
 impl Paths {
     pub fn new() -> Self {
         Self {
@@ -27,10 +29,11 @@ impl Paths {
         self.key_paths.borrow().get(key).unwrap_or(&vec![]).clone()
     }
 
-    pub fn parse(&self, root: JsValue) {
-        let mut stack: Vec<(JsValue, Vec<String>)> = vec![(root, vec![])];
+    pub fn parse(&self, root: View) {
+        let mut stack: Vec<(View, Vec<String>)> = vec![(root, vec![])];
 
         while let Some((obj, key_path)) = stack.pop() {
+            let obj = obj.borrow();
             Reflect::own_keys(&obj)
                 .unwrap_or(Array::new())
                 .iter()
@@ -52,7 +55,7 @@ impl Paths {
                         let mut key_path = key_path.clone();
 
                         key_path.push(key.to_string());
-                        stack.push((js_value, key_path))
+                        stack.push((Rc::new(RefCell::new(js_value)), key_path))
                     }
 
                     // log(&format!("{:?}", key_path))

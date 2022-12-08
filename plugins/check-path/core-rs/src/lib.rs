@@ -1,4 +1,3 @@
-use js_sys::Array;
 use player::*;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -16,6 +15,7 @@ const NAME: &str = "check-path-plugin";
 pub struct CheckPathPlugin {
     pub name: String,
     paths: Rc<RefCell<Paths>>,
+    current_view: Rc<RefCell<JsValue>>,
 }
 
 #[wasm_bindgen]
@@ -25,6 +25,7 @@ impl CheckPathPlugin {
         Self {
             name: NAME.to_string(),
             paths: Rc::new(RefCell::new(Paths::new())),
+            current_view: Rc::new(RefCell::new(JsValue::undefined())),
         }
     }
 
@@ -32,14 +33,22 @@ impl CheckPathPlugin {
     pub fn apply(&self, player: Player) {
         let view_controller_cb = Closure::<dyn Fn(ViewController)>::new({
             let paths = Rc::clone(&self.paths);
+            let current_view = Rc::clone(&self.current_view);
+
             move |view_controller: ViewController| {
                 let view_cb = Closure::<dyn Fn(View)>::new({
                     let paths = Rc::clone(&paths);
+                    let current_view = Rc::clone(&current_view);
+
                     move |view: View| {
                         let on_update_callback = Closure::<dyn Fn(JsValue)>::new({
                             let paths = Rc::clone(&paths);
+                            let current_view = Rc::clone(&current_view);
+
                             move |update: JsValue| {
-                                paths.borrow().parse(update);
+                                let current_view = Rc::clone(&current_view);
+                                current_view.replace(update);
+                                paths.borrow().parse(current_view);
                             }
                         });
                         view.hooks()
@@ -73,7 +82,7 @@ impl CheckPathPlugin {
 
     #[wasm_bindgen(js_name=getParent)]
     pub fn get_parent(&self) -> JsValue {
-        return JsValue::undefined();
+        return self.current_view.borrow().clone();
     }
 
     #[wasm_bindgen(js_name=getParentProp)]
