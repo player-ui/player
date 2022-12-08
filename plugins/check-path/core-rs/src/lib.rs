@@ -8,8 +8,15 @@ use crate::paths::{Path, Paths};
 
 mod paths;
 mod player;
+mod query;
 
 const NAME: &str = "check-path-plugin";
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+}
 
 #[wasm_bindgen(getter_with_clone)]
 pub struct CheckPathPlugin {
@@ -74,9 +81,9 @@ impl CheckPathPlugin {
     }
 
     #[wasm_bindgen(js_name=getPath)]
-    pub fn get_path(&self, id: &str) -> js_sys::Array {
+    pub fn get_path(&self, id: &str, query: JsValue) -> js_sys::Array {
+        let _query = query::parse_query(query);
         let value = self.paths.borrow().get(id);
-
         value
             .into_iter()
             .map(|path| match path {
