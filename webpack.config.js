@@ -4,7 +4,6 @@ const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 
 module.exports = (env, argv) => ({
-  entry: '.',
   mode: argv.mode,
   devtool: 'none',
   output: {

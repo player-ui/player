@@ -48,7 +48,10 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
   }
 
   getFirstScrollableElement(idList: Set<string>, type: ScrollType) {
-    const highestElement = { id: '', ypos: 0 };
+    const highestElement = {
+      id: '',
+      ypos: 0,
+    };
     const ypos = window.scrollY;
     idList.forEach((id) => {
       const element = document.getElementById(id);
@@ -126,12 +129,10 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
           this.failedNavigation = false;
           this.alreadyScrolledTo = [];
         });
-        flow.hooks.beforeTransition.tap(this.name, (state) => {
-          // will get reset to false if view successfully transitions
-          // otherwise stays as true when view get rerendered with errors
-          this.failedNavigation = true;
-
-          return state;
+        flow.hooks.skipTransition.intercept({
+          call: () => {
+            this.failedNavigation = true;
+          },
         });
       });
     });

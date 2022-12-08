@@ -1,6 +1,7 @@
 import { SyncWaterfallHook, SyncBailHook } from 'tapable-ts';
 import parse from './parser';
 import * as DEFAULT_EXPRESSION_HANDLERS from './evaluator-functions';
+import { isExpressionNode } from './types';
 import type {
   ExpressionNode,
   BinaryOperator,
@@ -9,7 +10,6 @@ import type {
   ExpressionContext,
   ExpressionHandler,
 } from './types';
-import { isExpressionNode } from '.';
 
 /** a && b -- but handles short cutting if the first value is false */
 const andandOperator: BinaryOperator = (ctx, a, b) => {

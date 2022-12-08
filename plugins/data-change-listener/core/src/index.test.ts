@@ -129,4 +129,9 @@ describe('Data-Change-Listener', () => {
     dataController.set([['nested.2.name.3.other', 'Frodo']]);
     expect(testExpression).toHaveBeenCalledWith(2, 3);
   });
+
+  it('should not trigger when a silent update is sent', () => {
+    dataController.set(['name.first', 'New Value'], { silent: true });
+    expect(testExpression).not.toHaveBeenCalled();
+  });
 });
