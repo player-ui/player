@@ -4,7 +4,7 @@ use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 
-use crate::paths::Paths;
+use crate::paths::{Path, Paths};
 
 mod paths;
 mod player;
@@ -77,7 +77,13 @@ impl CheckPathPlugin {
     pub fn get_path(&self, id: &str) -> js_sys::Array {
         let value = self.paths.borrow().get(id);
 
-        value.into_iter().map(JsValue::from).collect()
+        value
+            .into_iter()
+            .map(|path| match path {
+                Path::Text(value) => JsValue::from(value),
+                Path::Numeric(value) => JsValue::from(value),
+            })
+            .collect()
     }
 
     #[wasm_bindgen(js_name=getParent)]

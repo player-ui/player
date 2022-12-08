@@ -1,4 +1,4 @@
-use js_sys::{Array, Reflect};
+use js_sys::{Array, Number, Reflect};
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -10,8 +10,14 @@ extern "C" {
     fn log(s: &str);
 }
 
+#[derive(Clone)]
+pub enum Path {
+    Text(String),
+    Numeric(f64),
+}
+
 pub struct Paths {
-    key_paths: Rc<RefCell<HashMap<String, Vec<String>>>>,
+    key_paths: Rc<RefCell<HashMap<String, Vec<Path>>>>,
     // type_paths: Rc<RefCell<HashMap<String, Vec<String>>>>,
 }
 
@@ -25,12 +31,12 @@ impl Paths {
         }
     }
 
-    pub fn get(&self, key: &str) -> Vec<String> {
+    pub fn get(&self, key: &str) -> Vec<Path> {
         self.key_paths.borrow().get(key).unwrap_or(&vec![]).clone()
     }
 
     pub fn parse(&self, root: View) {
-        let mut stack: Vec<(View, Vec<String>)> = vec![(root, vec![])];
+        let mut stack: Vec<(View, Vec<Path>)> = vec![(root, vec![])];
 
         while let Some((obj, key_path)) = stack.pop() {
             let obj = obj.borrow();
@@ -38,23 +44,25 @@ impl Paths {
                 .unwrap_or(Array::new())
                 .iter()
                 .for_each(|js_key| {
-                    let key = js_key
-                        .as_string()
-                        .expect("Could not read object key as String.");
+                    let key_as_string = js_key.as_string().expect("Could not read key");
+                    let key_as_f64 = Number::parse_int(&key_as_string, 10);
+                    let js_value = Reflect::get(&obj, &JsValue::from_str(&key_as_string))
+                        .expect(&format!("Couldn't read value for key {}", &key_as_string));
 
-                    let js_value = Reflect::get(&obj, &JsValue::from_str(&key))
-                        .expect(&format!("Couldn't read value for key {}", &key));
-
-                    if key == "id" {
+                    if key_as_string == "id" {
                         self.key_paths
                             .borrow_mut()
                             .insert(js_value.as_string().unwrap(), key_path.clone());
                     }
 
                     if js_value.is_object() {
+                        let key = if key_as_f64.is_nan() {
+                            Path::Text(key_as_string)
+                        } else {
+                            Path::Numeric(key_as_f64)
+                        };
                         let mut key_path = key_path.clone();
-
-                        key_path.push(key.to_string());
+                        key_path.push(key);
                         stack.push((Rc::new(RefCell::new(js_value)), key_path))
                     }
 
