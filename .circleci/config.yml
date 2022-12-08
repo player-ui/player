@@ -1,18 +1,12 @@
 version: 2.1
 
 parameters:
-  GHA_Actor:
-    type: string
-    default: ""
   GHA_Action:
     type: string
     default: ""
-  GHA_Event:
-    type: string
-    default: ""
-  GHA_Meta:
-    type: string
-    default: ""
+  should_release:
+    type: boolean
+    default: false
 
 orbs:
   macos: circleci/macos@2
@@ -41,6 +35,28 @@ executors:
     resource_class: large
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
+
+commands:
+  auto_shipit:
+    description: Perform Auto shipit
+    steps:
+      - attach_workspace:
+          at: ~/player
+
+      - restore_cache:
+          keys: 
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+            - v1-bazel-cache-core-{{ .Branch }}
+            - v1-bazel-cache-core-main
+            - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+            - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
+
+      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      - run: echo -e $GPG_KEY | gpg --import --batch
+      - run: |
+            source ~/.bashrc
+            bundle install
+            npx auto shipit --only-graduate-with-release-label -vv
 
 jobs:
   setup:
@@ -245,26 +261,19 @@ jobs:
       - codecov/upload:
           file: ./bazel-out/_coverage/_coverage_report.dat
 
+  maybe_release:
+    executor: base
+    steps:
+      - run: echo "Should I release? (<< pipeline.parameters.should_release >>)"
+      - when:
+          condition: << pipeline.parameters.should_release >>
+          steps:
+            - auto_shipit
+
   release:
     executor: base
     steps:
-      - attach_workspace:
-          at: ~/player
-
-      - restore_cache:
-          keys: 
-            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }} 
-            - v1-bazel-cache-core-{{ .Branch }} 
-            - v1-bazel-cache-core-main 
-            - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
-            - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
-
-      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      - run: echo -e $GPG_KEY | gpg --import --batch
-      - run: |
-            source ~/.bashrc
-            bundle install
-            npx auto shipit --only-graduate-with-release-label -vv
+      - auto_shipit
 
   applitools_init:
     executor: base
@@ -314,6 +323,13 @@ workflows:
           requires:
             - applitools_init
             - bazelrc
+
+      - maybe_release:
+          context:
+            - Publish
+          requires:
+            - build
+            - build_ios
 
       - test:
           requires:
