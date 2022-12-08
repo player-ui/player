@@ -1,3 +1,4 @@
+use js_sys::Array;
 use player::*;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -68,5 +69,30 @@ impl CheckPathPlugin {
         let value = self.paths.borrow().get(id);
 
         value.into_iter().map(JsValue::from).collect()
+    }
+
+    #[wasm_bindgen(js_name=getParent)]
+    pub fn get_parent(&self) -> JsValue {
+        return JsValue::undefined();
+    }
+
+    #[wasm_bindgen(js_name=getParentProp)]
+    pub fn get_parent_prop(&self) -> JsValue {
+        return JsValue::undefined();
+    }
+
+    #[wasm_bindgen(js_name=hasChildContext)]
+    pub fn has_child_context(&self) -> bool {
+        return false;
+    }
+
+    #[wasm_bindgen(js_name=hasParentContext)]
+    pub fn has_parent_context(&self) -> bool {
+        return false;
+    }
+
+    #[wasm_bindgen(js_name=getAsset)]
+    pub fn get_asset(&self) -> JsValue {
+        return JsValue::undefined();
     }
 }
