@@ -18303,10 +18303,10 @@ taketalk@^1.0.0:
     get-stdin "^4.0.1"
     minimist "^1.1.0"
 
-tapable-ts@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/tapable-ts/-/tapable-ts-0.2.1.tgz#50351ee780b3df36e27ce9fcbf9b188bdeb081b6"
-  integrity sha512-QtMGNt70mQNRbRjHREgvT4YJQyRF+BBgNW4WFA4SMIpoxzpOPv3R8FTpfX7XLb9lKlEWwOwqWRBqsNlLc/Vbdw==
+tapable-ts@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/tapable-ts/-/tapable-ts-0.2.2.tgz#d056df3015854f2959e14c564da8f428f84a106a"
+  integrity sha512-Srf4G7SjDnpheua0laq9/78nM+uifAuzAkqTe1aLcxHcZJ4lDBD2EGZo4WtNBslB5vZ7pEC8uqp0sosF5JCCoQ==
 
 tapable@^1.0.0, tapable@^1.1.3:
   version "1.1.3"

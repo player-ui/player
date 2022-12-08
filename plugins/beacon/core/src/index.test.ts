@@ -425,3 +425,52 @@ test('provides resolved values in hooks', async () => {
     });
   });
 });
+
+test('re-resolves new values before sending beacon event', async () => {
+  const handler = jest.fn();
+  const beaconPluginPlugin: BeaconPluginPlugin = {
+    apply(beaconPlugin: BeaconPlugin): void {
+      beaconPlugin.hooks.buildBeacon.tap('test', (beacon: any) => {
+        return {
+          ...beacon,
+          customData: '{{foo.bar}}',
+        };
+      });
+    },
+  };
+
+  const beaconPlugin = new BeaconPlugin({
+    callback: handler,
+    plugins: [beaconPluginPlugin],
+  });
+  const player = new Player({ plugins: [beaconPlugin] });
+  const flow = makeFlow({
+    id: 'view',
+    type: 'view',
+    metaData: {
+      beacon: {
+        count: '@[1 + 2 + 3]@',
+      },
+    },
+  });
+
+  player.start({
+    ...flow,
+    data: {
+      foo: {
+        bar: 'customTestValue',
+      },
+    },
+  });
+
+  await waitFor(() => {
+    expect(handler).toBeCalledTimes(1);
+  });
+
+  await waitFor(() => {
+    expect(handler.mock.calls[0][0]).toMatchObject({
+      data: { count: 6 },
+      customData: 'customTestValue',
+    });
+  });
+});
