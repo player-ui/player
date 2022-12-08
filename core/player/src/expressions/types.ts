@@ -56,12 +56,31 @@ export function isExpressionNode(x: any): x is ExpressionNode {
   return typeof x === 'object' && x.__id === ExpNodeOpaqueIdentifier;
 }
 
+export interface NodePosition {
+  /** The character location */
+  character: number;
+}
+
+export interface NodeLocation {
+  // We only care about the character offset, not the line/column for now
+  // But making these objects allows us to add more (like line number) later
+
+  /** The start of the node */
+  start: NodePosition;
+
+  /** The end of the node */
+  end: NodePosition;
+}
+
 export interface BaseNode<T> {
   /** The thing to discriminate the AST type on */
   type: T;
 
   /** How to tell this apart from other objects */
   __id: typeof ExpNodeOpaqueIdentifier;
+
+  /** The location of the node in the source expression string */
+  location?: NodeLocation;
 }
 
 /** A helper interface for nodes that container left and right children */
@@ -88,13 +107,9 @@ export interface BinaryNode
   operator: string;
 }
 
-export interface LogicalNode extends BaseNode<'LogicalExpression'> {
-  /** The left hand side of the equation */
-  left: any;
-
-  /** The right hand side of the equation */
-  right: any;
-
+export interface LogicalNode
+  extends BaseNode<'LogicalExpression'>,
+    DirectionalNode {
   /** The logical operation to perform on the nodes */
   operator: string;
 }
@@ -104,7 +119,7 @@ export interface UnaryNode extends BaseNode<'UnaryExpression'> {
   operator: string;
 
   /** The single argument that the operation should be performed on */
-  argument: any;
+  argument: ExpressionNode;
 }
 
 export type ThisNode = BaseNode<'ThisExpression'>;
@@ -118,10 +133,10 @@ export interface ObjectNode extends BaseNode<'Object'> {
   /**  */
   attributes: Array<{
     /** The property name of the object */
-    key: any;
+    key: ExpressionNode;
 
     /** the associated value */
-    value: any;
+    value: ExpressionNode;
   }>;
 }
 
@@ -155,7 +170,7 @@ export interface CompoundNode extends BaseNode<'Compound'> {
 
 export interface CallExpressionNode extends BaseNode<'CallExpression'> {
   /** The arguments to the function */
-  args: any[];
+  args: ExpressionNode[];
 
   /** The function name */
   callTarget: IdentifierNode;
@@ -163,7 +178,7 @@ export interface CallExpressionNode extends BaseNode<'CallExpression'> {
 
 export interface ArrayExpressionNode extends BaseNode<'ArrayExpression'> {
   /** The items in an array */
-  elements: any[];
+  elements: ExpressionNode[];
 }
 
 export interface IdentifierNode extends BaseNode<'Identifier'> {

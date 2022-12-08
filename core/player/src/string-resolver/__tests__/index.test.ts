@@ -125,6 +125,43 @@ test('works on objects and arrays', () => {
   ).toStrictEqual(['I have a cat named frodo', 'I have a dog named ginger']);
 });
 
+test('handles undefined object', () => {
+  const localModel = new LocalModel({
+    adam: {
+      age: 26,
+    },
+    person: {
+      first: 'adam',
+      last: 'dierkens',
+    },
+    pets: [
+      {
+        name: 'frodo',
+        type: 'cat',
+      },
+      {
+        name: 'ginger',
+        type: 'dog',
+      },
+    ],
+  });
+
+  const bindingParser = new BindingParser({
+    get: localModel.get,
+    set: localModel.set,
+    evaluate: () => undefined,
+  });
+
+  const model = withParser(localModel, bindingParser.parse.bind(bindingParser));
+
+  expect(
+    resolveDataRefs(null, {
+      model,
+      evaluate: (exp) => exp,
+    })
+  ).toBeNull();
+});
+
 test('resolves expressions', () => {
   const localModel = new LocalModel({
     adam: {

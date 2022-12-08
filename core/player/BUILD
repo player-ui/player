@@ -16,9 +16,11 @@ javascript_pipeline(
         "@npm//arr-flatten",
         "@npm//ebnf",
         "@npm//timm",
+        "@npm//error-polyfill"
     ],
     test_data = [
         "//core/make-flow:@player-ui/make-flow",
     ],
-    library_name = "Player"
+    library_name = "Player",
+    bundle_entry = 'bundle.entry.js'
 )

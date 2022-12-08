@@ -1,7 +1,6 @@
-import type { InProgressState } from '@player-ui/player';
+import type { InProgressState, FlowController } from '@player-ui/player';
 import { waitFor } from '@testing-library/react';
 import { Player } from '@player-ui/player';
-import type { FlowController } from '@player-ui/flow';
 import type { Asset } from '@player-ui/types';
 import { makeFlow } from '@player-ui/make-flow';
 import type { BeaconPluginPlugin } from '.';
@@ -227,7 +226,7 @@ test('gives you access to the asset, view, and state', async () => {
     apply(beaconPlugin: BeaconPlugin) {
       beaconPlugin.hooks.buildBeacon.tap(
         'ModifyPlugin',
-        (beacon, beaconOptions) => {
+        async (beacon, beaconOptions) => {
           expect(beaconOptions.asset.id).toBe('view-1');
           expect(beaconOptions.state?.status).toBe('in-progress');
           expect(beaconOptions.view?.id).toBe('view-1');
@@ -273,9 +272,8 @@ test('gives you access to the logger', async () => {
     apply(beaconPlugin: BeaconPlugin) {
       beaconPlugin.hooks.buildBeacon.tap(
         'ModifyPlugin',
-        (beacon, beaconOptions) => {
+        async (beacon, beaconOptions) => {
           expect(beaconOptions.logger?.trace).toBeDefined();
-
           return beacon;
         }
       );
@@ -383,5 +381,47 @@ test('skips resolving beacon expressions', async () => {
         beacon: '{{foo}}',
       },
     },
+  });
+});
+
+test('provides resolved values in hooks', async () => {
+  const handler = jest.fn();
+  const beaconPluginPlugin: BeaconPluginPlugin = {
+    apply(beaconPlugin: BeaconPlugin): void {
+      beaconPlugin.hooks.buildBeacon.tap('test', async (beacon) => {
+        await handler(beacon);
+        return beacon;
+      });
+    },
+  };
+
+  const beaconPlugin = new BeaconPlugin({
+    callback: handler,
+    plugins: [beaconPluginPlugin],
+  });
+  const player = new Player({ plugins: [beaconPlugin] });
+
+  player.start(
+    makeFlow({
+      id: 'view',
+      type: 'view',
+      metaData: {
+        beacon: {
+          count: '@[1 + 2 + 3]@',
+        },
+      },
+    })
+  );
+
+  const state = player.getState() as InProgressState;
+
+  const view = state.controllers.view.currentView?.lastUpdate as Asset;
+
+  beaconPlugin.beacon({ asset: view, action: 'viewed', element: 'test' });
+
+  await waitFor(() => {
+    expect(handler.mock.calls[0][0]).toMatchObject({
+      data: { count: 6 },
+    });
   });
 });

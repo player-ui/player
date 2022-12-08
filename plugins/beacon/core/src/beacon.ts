@@ -185,7 +185,15 @@ export class BeaconPlugin implements PlayerPlugin {
     const { action, element, asset, view } = event;
     const { view: currentView } = this.beaconContext;
     setTimeout(async () => {
-      const data = event?.data || event.asset?.metaData?.beacon;
+      const unresolvedData = event?.data || event.asset?.metaData?.beacon;
+
+      const data =
+        this.dataController && this.expressionEvaluator
+          ? resolveDataRefs(unresolvedData, {
+              model: this.dataController,
+              evaluate: this.expressionEvaluator.evaluate,
+            })
+          : unresolvedData;
 
       const defaultBeacon = {
         action,
@@ -208,16 +216,8 @@ export class BeaconPlugin implements PlayerPlugin {
       const shouldCancel = this.hooks.cancelBeacon.call(hookArgs) || false;
 
       if (!shouldCancel) {
-        const resolvedBeacon =
-          this.dataController && this.expressionEvaluator
-            ? resolveDataRefs(beacon, {
-                model: this.dataController,
-                evaluate: this.expressionEvaluator.evaluate,
-              })
-            : beacon;
-
-        this.logger?.debug('Sending beacon event', resolvedBeacon);
-        this.hooks.publishBeacon.call(resolvedBeacon);
+        this.logger?.debug('Sending beacon event', beacon);
+        this.hooks.publishBeacon.call(beacon);
       }
     }, 0);
   }

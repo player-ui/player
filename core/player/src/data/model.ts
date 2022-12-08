@@ -41,6 +41,11 @@ export interface DataModelOptions {
    */
   ignoreDefaultValue?: boolean;
 
+  /**
+   * A flag to indicate that this update should happen silently
+   */
+  silent?: boolean;
+
   /** Other context associated with this request */
   context?: {
     /** The data model to use when getting other data from the context of this request */

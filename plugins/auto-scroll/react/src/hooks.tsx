@@ -69,8 +69,8 @@ export const AutoScrollProvider = ({
 
     if (node) {
       scrollIntoView(node, {
-        block: 'nearest',
-        inline: 'nearest',
+        block: 'center',
+        inline: 'center',
       });
     }
   });

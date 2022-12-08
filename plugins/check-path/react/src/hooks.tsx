@@ -12,12 +12,12 @@ function getId(asset: AssetOrID): string {
 
 /** hook to check if the asset has the given parents */
 export function useHasParentContext(
-  asset: AssetOrID,
+  asset: AssetOrID | undefined,
   query: Query | Query[]
 ): boolean {
   const { plugin } = React.useContext(CheckPathContext);
 
-  if (!plugin) {
+  if (!plugin || !asset) {
     return false;
   }
 
@@ -26,12 +26,12 @@ export function useHasParentContext(
 
 /** hook to check if the asset has the given children */
 export function useHasChildContext(
-  asset: AssetOrID,
+  asset: AssetOrID | undefined,
   query: Query | Query[]
 ): boolean {
   const { plugin } = React.useContext(CheckPathContext);
 
-  if (!plugin) {
+  if (!plugin || !asset) {
     return false;
   }
 
@@ -40,11 +40,11 @@ export function useHasChildContext(
 
 /** hook to get the prop of the given asset on the parent */
 export function useGetParentProp(
-  asset: AssetOrID
+  asset: AssetOrID | undefined
 ): string | number | undefined {
   const { plugin } = React.useContext(CheckPathContext);
 
-  if (!plugin) {
+  if (!plugin || !asset) {
     return undefined;
   }
 
@@ -53,12 +53,12 @@ export function useGetParentProp(
 
 /** hook to get the path of the asset in the view */
 export function useGetPath(
-  asset: AssetOrID,
+  asset: AssetOrID | undefined,
   query?: Query | Query[]
 ): Array<string | number> | undefined {
   const { plugin } = React.useContext(CheckPathContext);
 
-  if (!plugin) {
+  if (!plugin || !asset) {
     return undefined;
   }
 
@@ -67,12 +67,12 @@ export function useGetPath(
 
 /** get the parent of the given asset */
 export function useGetParent<T extends Asset>(
-  asset: AssetOrID,
+  asset: AssetOrID | undefined,
   query?: Query | Query[]
 ): T | undefined {
   const { plugin } = React.useContext(CheckPathContext);
 
-  if (!plugin) {
+  if (!plugin || !asset) {
     return undefined;
   }
 

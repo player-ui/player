@@ -227,7 +227,9 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
     };
 
     player.hooks.dataController.tap(this.name, (dc: DataController) =>
-      dc.hooks.onUpdate.tap(this.name, (updates) => {
+      dc.hooks.onUpdate.tap(this.name, (updates, options) => {
+        const { silent = false } = options || {};
+        if (silent) return;
         onFieldUpdateHandler(updates.map((t) => t.binding));
       })
     );

@@ -160,6 +160,7 @@ function traverseObject<T>(val: T, options: Options): T {
     }
 
     case 'object': {
+      if (!val) return val;
       // TODO: Do we care refs in keys?
       const keys = Object.keys(val);
       let newVal = val;
