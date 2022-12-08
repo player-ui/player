@@ -132,6 +132,7 @@ describe('check path plugin', () => {
       plugins: [
         new AssetTransformPlugin([[{ type: 'view' }, ViewTransform]]),
         checkPathPlugin,
+        checkPathPluginWASM,
       ],
     });
     player.start(nestedAssetFlow);
