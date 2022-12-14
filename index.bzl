@@ -123,7 +123,7 @@ def javascript_pipeline(
     )
 
     if (library_name):
-        bundle_entry_path = "$(RULEDIR)"
+        bundle_entry_path = None
         bundle_deps = dependencies + peer_dependencies + build_data + BUNDLE_DATA + [
             ":%s-js_build" % name,
             "//:webpack.config.js"
