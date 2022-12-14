@@ -24,6 +24,7 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
 
         private var contextBuilder: () -> JSContext
         private let partialMatchPlugin = PartialMatchFingerprintPlugin()
+        public let logger = TapableLogger()
         private var flow: String?
         private var registryWatch: AnyCancellable?
         private var state: BaseFlowState?
@@ -50,16 +51,16 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
         /// Load the supplied flow into this context. If the currently loaded flow is supplied this will do nothing.
         /// If a new flow is supplied then the javascript environment is created or rebuilt around the new flow.
         fileprivate func load(flow: String, plugins: [NativePlugin], player: SwiftUIPlayer) {
-            registry.logger = player.logger
+            registry.logger = logger
             guard self.player == nil || flow != self.flow else {
-                player.logger.d("Reusing already loaded flow")
+                logger.d("Reusing already loaded flow")
                 return
             }
 
             let context: JSContext = contextBuilder()
             let allPlugins = plugins + [partialMatchPlugin]
             guard let playerValue = player.setupPlayer(context: context, plugins: allPlugins) else {
-                return player.logger.e("Failed to load player")
+                return logger.e("Failed to load player")
             }
 
             let hooks = SwiftUIPlayerHooks(from: playerValue)
@@ -82,7 +83,7 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             }
 
             guard !flow.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-                player.logger.d("Empty flow, not loading")
+                logger.d("Empty flow, not loading")
                 return
             }
 
@@ -154,7 +155,7 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
     @Binding private var result: Result<CompletedState, PlayerError>?
     private let unloadOnDisappear: Bool
     /// A reference to the shared logger
-    public let logger = TapableLogger()
+    public var logger: TapableLogger { context.logger }
 
     /// A read only reference to the platform shared core player value in the `JSContext`
     public var jsPlayerReference: JSValue? { context.player }
