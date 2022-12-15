@@ -1,3 +1,4 @@
+use crate::node::Node;
 use js_sys::{Array, Number, Reflect};
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -17,8 +18,7 @@ pub enum Path {
 }
 
 pub struct Paths {
-    key_paths: Rc<RefCell<HashMap<String, Vec<Path>>>>,
-    // type_paths: Rc<RefCell<HashMap<String, Vec<String>>>>,
+    nodes_by_id: Rc<RefCell<HashMap<String, Rc<RefCell<Node>>>>>, // type_paths: Rc<RefCell<HashMap<String, Vec<String>>>>,
 }
 
 type View = Rc<RefCell<JsValue>>;
@@ -26,13 +26,17 @@ type View = Rc<RefCell<JsValue>>;
 impl Paths {
     pub fn new() -> Self {
         Self {
-            key_paths: Rc::new(RefCell::new(HashMap::new())),
-            // type_paths: Rc::new(RefCell::new(HashMap::new())),
+            nodes_by_id: Rc::new(RefCell::new(HashMap::new())),
         }
     }
 
-    pub fn get(&self, key: &str) -> Vec<Path> {
-        self.key_paths.borrow().get(key).unwrap_or(&vec![]).clone()
+    pub fn get_node(&self, id: &str) -> Option<Rc<RefCell<Node>>> {
+        let nodes_by_id = self.nodes_by_id.borrow();
+        let node = nodes_by_id.get(id);
+        if node.is_some() {
+            return Some(Rc::clone(node.unwrap()));
+        }
+        None
     }
 
     pub fn parse(&self, root: View) {
@@ -50,9 +54,23 @@ impl Paths {
                         .expect(&format!("Couldn't read value for key {}", &key_as_string));
 
                     if key_as_string == "id" {
-                        self.key_paths
+                        let node_type = Reflect::get(&obj, &JsValue::from_str("type"))
+                            .expect("")
+                            .as_string()
+                            .expect("Could not parse node type value to string.");
+                        let id = js_value
+                            .as_string()
+                            .expect("Could not parse id value to string.");
+
+                        let node = Node::new(
+                            id,
+                            node_type,
+                            None,
+                            Some(Rc::new(RefCell::new(key_path.clone()))),
+                        );
+                        self.nodes_by_id
                             .borrow_mut()
-                            .insert(js_value.as_string().unwrap(), key_path.clone());
+                            .insert(js_value.as_string().unwrap(), Rc::new(RefCell::new(node)));
                     }
 
                     if js_value.is_object() {

@@ -1,11 +1,12 @@
+use crate::paths::{Path, Paths};
+use js_sys::Array;
 use player::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 
-use crate::paths::{Path, Paths};
-
+mod node;
 mod paths;
 mod player;
 mod query;
@@ -81,16 +82,29 @@ impl CheckPathPlugin {
     }
 
     #[wasm_bindgen(js_name=getPath)]
-    pub fn get_path(&self, id: &str, query: JsValue) -> js_sys::Array {
+    pub fn get_path(&self, id: &str, query: JsValue) -> JsValue {
         let _query = query::parse_query(query);
-        let value = self.paths.borrow().get(id);
-        value
-            .into_iter()
-            .map(|path| match path {
-                Path::Text(value) => JsValue::from(value),
-                Path::Numeric(value) => JsValue::from(value),
+        let node = self.paths.borrow().get_node(id);
+        if !node.is_some() {
+            return JsValue::undefined();
+        }
+
+        let path = node
+            .unwrap()
+            .borrow()
+            .get_path()
+            .borrow()
+            .iter()
+            .map(|path| {
+                return match path {
+                    // TODO: impl From<Path> for JsValue
+                    Path::Text(value) => JsValue::from(value.clone()),
+                    Path::Numeric(value) => JsValue::from(value.clone()),
+                };
             })
-            .collect()
+            .collect::<Array>();
+
+        JsValue::from(path)
     }
 
     #[wasm_bindgen(js_name=getParent)]
