@@ -1,7 +1,7 @@
 import type {
   ExpressionHandler,
   ExpressionContext,
-} from '@player-ui/expressions';
+} from '@player-ui/player';
 import { withoutContext } from '@player-ui/player';
 import type { Binding } from '@player-ui/types';
 import { toNum } from './toNum';
