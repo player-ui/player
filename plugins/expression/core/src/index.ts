@@ -1,5 +1,8 @@
-import type { Player, PlayerPlugin } from '@player-ui/player';
-import type { ExpressionHandler } from '@player-ui/expressions';
+import type {
+  Player,
+  PlayerPlugin,
+  ExpressionHandler,
+} from '@player-ui/player';
 
 export type ExpressionMap = Map<string, ExpressionHandler<any[], any>>;
 

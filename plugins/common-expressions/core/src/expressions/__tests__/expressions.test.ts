@@ -1,7 +1,5 @@
-import type { ExpressionContext } from '@player-ui/expressions';
-import type { DataModelWithParser } from '@player-ui/data';
-import { LocalModel, withParser } from '@player-ui/data';
-import { BindingParser } from '@player-ui/binding';
+import type { ExpressionContext, DataModelWithParser } from '@player-ui/player';
+import { BindingParser, LocalModel, withParser } from '@player-ui/player';
 import {
   size,
   concat,

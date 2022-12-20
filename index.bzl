@@ -2,6 +2,8 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_player//:index.bzl", "js_library_pipeline")
 load("@rules_player//player/bundle:bundle.bzl", "bundle")
 load("@rules_player//player/cli:xlr.bzl", "xlr_compile")
+load("@rules_player//javascript:utils.bzl", "filter_empty")
+load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin")
 
 lint_exts = [".ts", ".js", ".jsx", ".tsx", ".json", ".snap"]
 
@@ -87,6 +89,7 @@ def javascript_pipeline(
         root_dir = "src",
         out_dir = "dist",
         entry = None,
+        bundle_entry = None,
         dependencies = [],
         peer_dependencies = [],
         data = [],
@@ -119,23 +122,36 @@ def javascript_pipeline(
             "base_package_json": "//tools:pkg_json_template",
         },
         js_library_data = [] if not xlr_mode else [":%s_XLR" % name],
-        **kwargs
     )
 
     if (library_name):
+        bundle_entry_path = "$(RULEDIR)"
+        bundle_deps = dependencies + peer_dependencies + build_data + BUNDLE_DATA + [
+            ":%s-js_build" % name,
+            "//:webpack.config.js"
+        ]
+
+        if(bundle_entry):
+            copy_to_bin(
+                name = "copy_entrypoint",
+                srcs = [bundle_entry],
+            )
+
+            bundle_entry_path = "$(execpath :copy_entrypoint)"
+            bundle_deps += [":copy_entrypoint"]
+
         bundle(
             name = "%s_Bundles" % library_name,
             dist = [":%s-package_json" % name],
-            deps = dependencies + peer_dependencies + build_data + BUNDLE_DATA + [
-                ":%s-js_build" % name,
-                "//:webpack.config.js"
-            ],
+            deps = bundle_deps,
             env = {
                 "ROOT_FILE_NAME": resolved_entry,
-                "LIBRARY_NAME": library_name
+                "LIBRARY_NAME": library_name,
             },
             visibility = ["//visibility:public"],
-            bundle_name = name.split('/')[1]
+            bundle_name = name.split('/')[1],
+            bundle_entry = bundle_entry_path,
+            **kwargs
         )
     
     if(xlr_mode):

@@ -1,10 +1,14 @@
 import React from 'react';
-import type { Asset as AssetType, AssetWrapper, Flow } from '@player-ui/player';
-import { usePlayer } from '@player-ui/react-utils';
-import { Asset } from '@player-ui/react-asset';
-import type { WebPlayer, WebPlayerPlugin } from '../..';
+import { ReactAsset, usePlayer } from '../..';
+import type {
+  ReactPlayer,
+  ReactPlayerPlugin,
+  Asset,
+  AssetWrapper,
+  Flow,
+} from '../..';
 
-interface SimpleAsset extends AssetType<'simple'> {
+interface SimpleAsset extends Asset<'simple'> {
   /** text value of the asset */
   value?: string;
 }
@@ -14,7 +18,7 @@ const SimpleAsset = (props: SimpleAsset) => (
   <div id={props.id}>{props.value}</div>
 );
 
-interface ActionAsset extends AssetType<'action'> {
+interface ActionAsset extends Asset<'action'> {
   /** label of the action */
   label: string;
 
@@ -52,7 +56,7 @@ const Action = (props: ActionAsset) => {
   );
 };
 
-interface CollectionAsset extends AssetType<'collection'> {
+interface CollectionAsset extends Asset<'collection'> {
   /** values in a collection */
   values: Array<AssetWrapper<any>>;
 }
@@ -62,7 +66,7 @@ const Collection = (props: CollectionAsset) => {
   return (
     <div id={props.id}>
       {props.values.map((a) => (
-        <Asset key={a.asset.id} {...a.asset} />
+        <ReactAsset key={a.asset.id} {...a.asset} />
       ))}
     </div>
   );
@@ -99,12 +103,12 @@ export const simpleFlow: Flow<any> = {
 /**
  * Registers a simple asset as a react comp
  */
-export class SimpleAssetPlugin implements WebPlayerPlugin {
+export class SimpleAssetPlugin implements ReactPlayerPlugin {
   name = 'simple-asset-plugin';
 
-  applyWeb(wp: WebPlayer) {
-    wp.assetRegistry.set({ type: 'simple' }, SimpleAsset);
-    wp.assetRegistry.set({ type: 'action' }, Action);
-    wp.assetRegistry.set({ type: 'collection' }, Collection);
+  applyReact(rp: ReactPlayer) {
+    rp.assetRegistry.set({ type: 'simple' }, SimpleAsset);
+    rp.assetRegistry.set({ type: 'action' }, Action);
+    rp.assetRegistry.set({ type: 'collection' }, Collection);
   }
 }

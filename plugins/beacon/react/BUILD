@@ -4,7 +4,6 @@ javascript_pipeline(
     name = "@player-ui/beacon-plugin-react",
     dependencies = [
         "//plugins/beacon/core:@player-ui/beacon-plugin",
-        "//react/utils:@player-ui/react-utils",
     ],
     test_data = [
         "//core/make-flow:@player-ui/make-flow"

@@ -46,6 +46,32 @@ class BeaconPluginTests: XCTestCase {
         wait(for: [exp, expect], timeout: 10)
     }
 
+    func testBeaconContextWithMetaData() throws {
+        let expect = expectation(description: "Beacon Called")
+        let beacon: (AssetBeacon) -> Void = { (beaconObj: AssetBeacon) in
+            guard
+                beaconObj.action == "clicked",
+                beaconObj.element == "button",
+                beaconObj.asset.id == "test",
+                case .dictionary(let data) = beaconObj.asset.metaData?.beacon,
+                data["field"] == "value"
+            else { return XCTFail("incorrect beacon information") }
+            expect.fulfill()
+        }
+
+        let context = BeaconContext(beacon)
+        let data = MetaData(beacon: .dictionary(data: ["field": "value"]))
+        var tree = TestButton(metaData: data)
+
+        let exp = tree.on(\.didAppear) { view in
+            try view.button().tap()
+        }
+
+        ViewHosting.host(view: tree.environment(\.beaconContext, context))
+
+        wait(for: [exp, expect], timeout: 10)
+    }
+
     func testSendsViewBeacon() {
         let beaconed = expectation(description: "View beacon called")
         let plugin = BeaconPlugin<DefaultBeacon>(plugins: []) { (beacon) in
@@ -65,10 +91,15 @@ class BeaconPluginTests: XCTestCase {
 extension TestButton: Inspectable {}
 struct TestButton: View {
     @Environment(\.beaconContext) var beaconContext
+    var metaData: MetaData?
     internal var didAppear: ((Self) -> Void)?
     var body: some View {
         Button(action: {
-            beaconContext?.beacon(action: "clicked", element: "button", id: "test")
+            if let data = metaData {
+                beaconContext?.beacon(action: "clicked", element: "button", id: "test", metaData: data)
+            } else {
+                beaconContext?.beacon(action: "clicked", element: "button", id: "test")
+            }
         }, label: {Text("Beacon")})
         .onAppear { self.didAppear?(self) }
     }

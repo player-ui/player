@@ -1,4 +1,4 @@
-import type { FormatType } from '@player-ui/schema';
+import type { FormatType } from '@player-ui/player';
 import { createMaskedNumericFormatter } from './utils';
 
 const LENGTH_OF_MAX_INT = String(Number.MAX_SAFE_INTEGER).split('').length;

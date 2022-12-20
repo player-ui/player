@@ -1,7 +1,8 @@
-import type { ViewInstance } from '@player-ui/view';
 import { waitFor } from '@testing-library/react';
-import { NodeType } from '@player-ui/view';
 import { makeFlow } from '@player-ui/make-flow';
+
+import type { ViewInstance } from '../view';
+import { NodeType } from '../view';
 import { Player } from '..';
 import type { ViewController } from '..';
 import actionsFlow from './helpers/actions.flow';
@@ -535,6 +536,44 @@ describe('failure cases', () => {
 
     await expect(player.start(flow)).rejects.toThrowError(
       `No view with id view-1`
+    );
+  });
+
+  it('fails gracefully when states after an ACTION state have failures', async () => {
+    const player = new Player();
+
+    const payload = {
+      id: 'test',
+      views: [
+        {
+          id: 'view',
+          type: 'text',
+          value: 'Some text',
+        },
+      ],
+      data: {},
+      navigation: {
+        BEGIN: 'Flow',
+        Flow: {
+          startState: 'ActionState',
+          ActionState: {
+            state_type: 'ACTION',
+            transitions: {
+              '*': 'ViewState',
+            },
+          },
+          ViewState: {
+            state_type: 'VIEW',
+            ref: 'non-existing-view',
+          },
+        },
+      },
+    };
+
+    const response = player.start(makeFlow(payload));
+
+    await expect(response).rejects.toThrowError(
+      'No view with id non-existing-view'
     );
   });
 

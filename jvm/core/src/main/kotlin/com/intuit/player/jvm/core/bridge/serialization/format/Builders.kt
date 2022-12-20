@@ -26,10 +26,6 @@ public class RuntimeObjectBuilder<T>(override val format: RuntimeFormat<T>) : Bu
 
     private val content: MutableMap<String, Any?> = linkedMapOf()
 
-    public infix fun String.to(value: Any?) {
-        content[this] = format.encodeToRuntimeValue(value)
-    }
-
     public operator fun set(key: String, value: Any?) {
         content[key] = format.encodeToRuntimeValue(value)
     }
@@ -41,10 +37,10 @@ public class RuntimeObjectBuilder<T>(override val format: RuntimeFormat<T>) : Bu
 @RuntimeBuilderDsl
 public class RuntimeArrayBuilder<T>(override val format: RuntimeFormat<T>) : Builder<T> {
 
-    private val content: MutableList<T> = arrayListOf()
+    private val content: MutableList<Any?> = arrayListOf()
 
-    public operator fun Any?.unaryPlus() {
-        content.add(format.encodeToRuntimeValue(this))
+    public fun append(value: Any?) {
+        content.add(format.encodeToRuntimeValue(value))
     }
 
     public fun build(): T = format.encodeToRuntimeValue(content)

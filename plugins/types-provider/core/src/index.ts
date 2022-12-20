@@ -1,6 +1,9 @@
-import type { Player, PlayerPlugin } from '@player-ui/player';
-import type { ValidatorFunction } from '@player-ui/validator';
-import type { FormatType } from '@player-ui/schema';
+import type {
+  Player,
+  PlayerPlugin,
+  ValidatorFunction,
+  FormatType,
+} from '@player-ui/player';
 import type { Schema } from '@player-ui/types';
 
 export interface TypesConfig {

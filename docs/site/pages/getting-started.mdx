@@ -27,12 +27,12 @@ npm install @player-ui/react
 Next, in your code you'll need to initialize Player. This is where you would also initialize any plugins you want to use with Player and create the configuration for Player itself. Below is a minimal example of this. 
 
 ```javascript
-import { WebPlayer } from '@player-ui/react';
+import { ReactPlayer } from '@player-ui/react';
 import { ReferenceAssetsPlugin } from '@player-ui/reference-assets-plugin-react';
 
 // create a new web-player instance
 
-const webPlayer = new WebPlayer({
+const reactPlayer = new ReactPlayer({
   plugins: [new ReferenceAssetsPlugin()],
 });
 ```
@@ -43,14 +43,14 @@ Now that you have a Player instance created. You'll need to start it with some c
 
 ```javascript
 const content = {/* your content here */}
-webPlayer.start(content);
+reactPlayer.start(content);
 ```
 
 With Player running your content, you'll need to actually render out what is processes. To do this, you can use the React Player's component API to inster it into your React tree. 
 
 ```javascript
 const MyApp = () => {
-  return <webPlayer.Component />;
+  return <reactPlayer.Component />;
 };
 ```
 

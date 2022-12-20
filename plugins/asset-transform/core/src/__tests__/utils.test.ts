@@ -2,9 +2,9 @@ import type {
   TransformFunction,
   TransformFunctions,
   BeforeTransformFunction,
+  Node,
 } from '@player-ui/player';
 import type { Asset } from '@player-ui/types';
-import type { Node } from '@player-ui/view';
 import { compose, composeBefore } from '../utils';
 
 interface TextAsset extends Asset<'text'> {

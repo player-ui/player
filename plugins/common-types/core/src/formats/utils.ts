@@ -1,4 +1,4 @@
-import type { FormatType } from '@player-ui/schema';
+import type { FormatType } from '@player-ui/player';
 
 export const PLACEHOLDER = '#';
 

@@ -4,7 +4,7 @@ import type {
   InfoAsset,
 } from '@player-ui/reference-assets-plugin';
 import { isBackAction } from '@player-ui/reference-assets-plugin';
-import { Asset } from '@player-ui/react-asset';
+import { ReactAsset } from '@player-ui/react';
 import {
   ButtonGroup,
   Box,
@@ -41,26 +41,26 @@ export const Info = (props: InfoAsset) => {
       <Stack gap="10">
         {props.title && (
           <Heading size="lg" as="h1">
-            <Asset {...props.title} />
+            <ReactAsset {...props.title} />
           </Heading>
         )}
         {props.subTitle && (
           <Heading size="md" as="h3">
-            <Asset {...props.subTitle} />
+            <ReactAsset {...props.subTitle} />
           </Heading>
         )}
-        <Box>{props.primaryInfo && <Asset {...props.primaryInfo} />}</Box>
+        <Box>{props.primaryInfo && <ReactAsset {...props.primaryInfo} />}</Box>
         <Stack gap="4">
           {segmentedActions && <Divider />}
           <HStack justifyContent="space-between">
             <ButtonGroup spacing="6">
               {segmentedActions?.prev?.map((a) => (
-                <Asset key={a.asset.id} {...a} />
+                <ReactAsset key={a.asset.id} {...a} />
               ))}
             </ButtonGroup>
             <ButtonGroup spacing="6">
               {segmentedActions?.next?.map((a) => (
-                <Asset key={a.asset.id} {...a} />
+                <ReactAsset key={a.asset.id} {...a} />
               ))}
             </ButtonGroup>
           </HStack>

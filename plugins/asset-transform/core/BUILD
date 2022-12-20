@@ -8,6 +8,5 @@ javascript_pipeline(
     peer_dependencies = [
         "//core/player:@player-ui/player",
         "//core/types:@player-ui/types",
-        "//core/view:@player-ui/view",
     ],
 )

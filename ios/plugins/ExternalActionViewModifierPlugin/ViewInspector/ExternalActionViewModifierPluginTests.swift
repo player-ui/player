@@ -57,29 +57,36 @@ class ExternalActionViewModifierPluginTests: ViewInspectorTestCase {
             let extra: String? = state.extraProperty
             XCTAssertEqual(extra, "extraValue")
             handlerExpectation.fulfill()
-            return AnyView(Text("External State").onDisappear {
-                transition("Next")
+            return AnyView(Text("External State").onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    transition("Next")
+                }
             })
         }
 
-        let player = SwiftUIPlayer(flow: json, plugins: [ReferenceAssetsPlugin(), plugin], result: Binding(get: {nil}, set: { (result) in
+        let context = SwiftUIPlayer.Context()
+
+        let player = SwiftUIPlayer(flow: json, plugins: [PrintLoggerPlugin(level: .debug), ReferenceAssetsPlugin(), plugin], result: Binding(get: {nil}, set: { (result) in
+            print("RESULT \(String(describing: result))")
             switch result {
             case .success:
                 completionExpectation.fulfill()
             default:
                 break
             }
-        }))
+        }), context: context, unloadOnDisappear: false)
 
         ViewHosting.host(view: player)
 
         let exp = player.inspection.inspect(after: 0.5) { view in
             XCTAssertNotNil(plugin.state)
             let content = try view.vStack().first?.anyView().anyView().modifier(ExternalStateSheetModifier.self).viewModifierContent()
-            try content?.sheet().anyView().text().callOnDisappear()
+            try content?.sheet().anyView().text().callOnAppear()
         }
 
-        wait(for: [exp, handlerExpectation, completionExpectation], timeout: 10)
+        wait(for: [handlerExpectation], timeout: 5)
+        wait(for: [exp], timeout: 5)
+        wait(for: [completionExpectation], timeout: 5)
         XCTAssertNil(plugin.state)
 
         ViewHosting.expel()
@@ -130,8 +137,9 @@ class ExternalActionViewModifierPluginTests: ViewInspectorTestCase {
             switch result {
             case .success:
                 XCTFail("Should have failed")
-            default:
+            case .failure:
                 completionExpectation.fulfill()
+            default: break
             }
         }))
 

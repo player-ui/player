@@ -1,3 +1,42 @@
+# 0.3.0 (Thu Nov 03 2022)
+
+#### 🚀 Enhancement
+
+- Core package organization, and renaming to `ReactPlayer` [#93](https://github.com/player-ui/player/pull/93) ([@adierkens](https://github.com/adierkens))
+- Enhancement/Parser Rewrite for plugins [#80](https://github.com/player-ui/player/pull/80) (marlon_ercillo@intuit.com [@mercillo](https://github.com/mercillo))
+
+#### 🐛 Bug Fix
+
+- Release main [#101](https://github.com/player-ui/player/pull/101) ([@intuit-svc](https://github.com/intuit-svc))
+- Update documentation [#96](https://github.com/player-ui/player/pull/96) ([@KVSRoyal](https://github.com/KVSRoyal))
+- run a separate workflow for forked PRs without write capable cache keys [#97](https://github.com/player-ui/player/pull/97) ([@hborawski](https://github.com/hborawski))
+- [iOS] relax requirements for sending beacon metadata [#88](https://github.com/player-ui/player/pull/88) ([@hborawski](https://github.com/hborawski))
+- [iOS] fix TestPlayer test helper dependency [#83](https://github.com/player-ui/player/pull/83) ([@hborawski](https://github.com/hborawski))
+- [iOS] fix runtime warnings for published variables in Xcode14 [#84](https://github.com/player-ui/player/pull/84) ([@hborawski](https://github.com/hborawski))
+- [iOS] make some additional properties public [#82](https://github.com/player-ui/player/pull/82) ([@hborawski](https://github.com/hborawski))
+- change platform groupid [#81](https://github.com/player-ui/player/pull/81) (sentony03@gmail.com [@brocollie08](https://github.com/brocollie08))
+- [iOS] add registerPlugin(_:) to HeadlessPlayer API [#79](https://github.com/player-ui/player/pull/79) ([@hborawski](https://github.com/hborawski))
+- Cleanup Android dependencies [#77](https://github.com/player-ui/player/pull/77) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### 📝 Documentation
+
+- Docs: fix sidenav scrolling on mobile [#100](https://github.com/player-ui/player/pull/100) ([@adierkens](https://github.com/adierkens))
+- Add algolia search to /latest/ site [#76](https://github.com/player-ui/player/pull/76) ([@adierkens](https://github.com/adierkens))
+
+#### Authors: 9
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- brocollie08 (sentony03@gmail.com)
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Kori South ([@KVSRoyal](https://github.com/KVSRoyal))
+- Marlon Ercillo ([@mercillo](https://github.com/mercillo))
+- mercillo (marlon_ercillo@intuit.com)
+
+---
+
 # 0.2.0 (Tue Aug 30 2022)
 
 #### 🚀 Enhancement

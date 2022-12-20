@@ -51,10 +51,10 @@ For extensions of this plugin that wish to track the render (and update) times o
 The `react` version of the Metrics Plugin adds support for `render` and `update` times to events. The API mirrors that of the core version:
 
 ```js
-import { WebPlayer } from '@player-ui/react';
+import { ReactPlayer } from '@player-ui/react';
 import { MetricsPlugin } from '@player-ui/metrics-plugin-react';
 
-const player = new WebPlayer({
+const player = new ReactPlayer({
   plugins: [
     new MetricsPlugin({
       onUpdate: (metrics) => {

@@ -1,5 +1,5 @@
-import type { FormatType } from '@player-ui/schema';
-import type { ValidationController } from '../../validation';
+import type { FormatType } from '../../schema';
+import type { ValidationController } from '../../controllers/validation';
 import type { Player, PlayerPlugin } from '../../player';
 
 /**

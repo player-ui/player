@@ -2,9 +2,9 @@ import type {
   ExpressionHandler,
   ExpressionContext,
 } from '@player-ui/expressions';
-import { withoutContext } from '@player-ui/expressions';
-import { toNum } from '@player-ui/utils';
+import { withoutContext } from '@player-ui/player';
 import type { Binding } from '@player-ui/types';
+import { toNum } from './toNum';
 
 /** Returns a function that executes the given function only if the first argument is a string */
 function ifString(fn: (arg: string) => unknown) {

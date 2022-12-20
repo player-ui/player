@@ -1,5 +1,5 @@
 import React from 'react';
-import { WebPlayer } from '@player-ui/react';
+import { ReactPlayer } from '@player-ui/react';
 import { findByTestId, render } from '@testing-library/react';
 import { makeFlow } from '@player-ui/make-flow';
 import { BeaconPlugin, useBeacon } from '..';
@@ -8,7 +8,7 @@ describe('beacon web plugin', () => {
   test('loads in a player', async () => {
     const beaconCallback = jest.fn();
 
-    const wp = new WebPlayer({
+    const rp = new ReactPlayer({
       plugins: [
         new BeaconPlugin({
           callback: beaconCallback,
@@ -22,26 +22,26 @@ describe('beacon web plugin', () => {
       value: 'Next',
     });
 
-    wp.assetRegistry.set({ type: 'action' }, (props: any) => {
+    rp.assetRegistry.set({ type: 'action' }, (props: any) => {
       const beacon = useBeacon({ element: 'button' });
 
       beacon();
 
       return <div data-testid={props.id}>{props.value}</div>;
     });
-    wp.start(flow);
+    rp.start(flow);
 
     const { container } = render(
       <div>
         <React.Suspense fallback="loading...">
-          <wp.Component />
+          <rp.Component />
         </React.Suspense>
       </div>
     );
 
     await findByTestId(container, 'action');
 
-    expect(wp.player.getState().status).toBe('in-progress');
+    expect(rp.player.getState().status).toBe('in-progress');
 
     expect(beaconCallback).toHaveBeenCalledTimes(1);
   });

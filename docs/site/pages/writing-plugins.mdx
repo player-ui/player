@@ -41,13 +41,13 @@ _Note: For the React Player you can import and load the plugin the same way you 
   </core>
   <react>
 
-React Player Plugins are very similar to core plugins in both their composition and use. The `@player-ui/react` package exposes an interface `WebPlayerPlugin` that, much like the `PlayerPlugin` interface provides the necessary attributes that are required for a React Player plugin. Again a `name` attribute is required and a function `applyWeb` is required that takes a `WebPlayer` instance. Similarly to core plugins in the `applyWeb` function you have access to the React Player object and access to the three exposed hooks:
+React Player Plugins are very similar to core plugins in both their composition and use. The `@player-ui/react` package exposes an interface `ReactPlayerPlugin` that, much like the `PlayerPlugin` interface provides the necessary attributes that are required for a React Player plugin. Again a `name` attribute is required and a function `applyReact` is required that takes a `ReactPlayer` instance. Similarly to core plugins in the `applyReact` function you have access to the React Player object and access to the three exposed hooks:
 
 - The `webComponent` hook allows you to modify a React component that is stored in the React Player for use when it renders content. This happens during the initialization phase and ise useful if you want to wrap components in various content providers. 
 - The `playerComponent` hook allows you to modify a component or execute functionality when the React Player is rendering a component after the view has been reconciled in Player. This is useful if you want to inject additional props to components or collect data on which component was rendered. 
 - The `onBeforeViewReset` hook is fired when the view is resetting to undefined and you want to execute some asynchronous tasks. 
 
-Below is an example of a basic `WebPlayerPlugin` that would expose a function to every component that gets loaded in the React Player:
+Below is an example of a basic `ReactPlayerPlugin` that would expose a function to every component that gets loaded in the React Player:
 
 ```tsx
 export const FunctionContext = React.createContext<{
@@ -59,7 +59,7 @@ export const useFunction = (): () => {
   return function;
 };
 
-export class FunctionPlugin implements WebPlayerPlugin {
+export class FunctionPlugin implements ReactPlayerPlugin {
   name = 'function-plugin';
   private function: ();
 
@@ -67,8 +67,8 @@ export class FunctionPlugin implements WebPlayerPlugin {
     this.function = fn;
   }
 
-  applyWeb(wp: WebPlayer) {
-    wp.hooks.webComponent.tap(this.name, (Comp) => {
+  applyReact(rp: ReactPlayer) {
+    rp.hooks.webComponent.tap(this.name, (Comp) => {
       const { function } = this;
 
       return () => (
@@ -80,7 +80,7 @@ export class FunctionPlugin implements WebPlayerPlugin {
   }
 ```
 
-Lastly React plugins can also act as a core plugin in cases where core functionality needs to be extended for the React plugin to work. Since both the `PlayerPlugin` and `WebPlayerPlugin` are typescript interfaces a plugin can implement both and be considered a valid plugin. 
+Lastly React plugins can also act as a core plugin in cases where core functionality needs to be extended for the React plugin to work. Since both the `PlayerPlugin` and `ReactPlayerPlugin` are typescript interfaces a plugin can implement both and be considered a valid plugin. 
 
   </react>
   <ios>

@@ -55,6 +55,7 @@ const applicableFlow = makeFlow({
   fields: {
     asset: {
       id: 'fields',
+      type: 'any',
       values: [
         {
           asset: {
@@ -79,12 +80,12 @@ const applicableFlow = makeFlow({
           asset: {
             id: 'asset-4',
             applicability: '{{foo.baz}}',
-            type: 'asset',
+            type: 'foo',
             values: [
               {
                 asset: {
                   id: 'asset-4a',
-                  type: 'asset',
+                  type: 'bar',
                 },
               },
             ],
@@ -298,6 +299,40 @@ describe('works with applicability', () => {
     });
     player.start(applicableFlow);
     dataController = (player.getState() as InProgressState).controllers.data;
+  });
+
+  test('hasParentContext', async () => {
+    dataController.set([['foo.baz', true]]);
+    await waitFor(() => {
+      expect(
+        checkPathPlugin.hasParentContext('asset-4a', {
+          type: 'any',
+        })
+      ).toBe(true);
+
+      expect(
+        checkPathPlugin.hasParentContext('asset-4a', {
+          type: 'foo',
+        })
+      ).toBe(true);
+    });
+  });
+
+  test('hasChildContext', async () => {
+    dataController.set([['foo.baz', true]]);
+    await waitFor(() => {
+      expect(
+        checkPathPlugin.hasChildContext('fields', {
+          type: 'foo',
+        })
+      ).toBe(true);
+
+      expect(
+        checkPathPlugin.hasChildContext('fields', {
+          type: 'bar',
+        })
+      ).toBe(true);
+    });
   });
 
   test('path', async () => {

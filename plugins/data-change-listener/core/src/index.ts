@@ -4,13 +4,11 @@ import type {
   PlayerPlugin,
   View,
   ViewController,
-} from '@player-ui/player';
-import type {
   ExpressionType,
   ExpressionEvaluator,
-} from '@player-ui/expressions';
-import type { BindingInstance, BindingParser } from '@player-ui/binding';
-import { Interceptor } from 'tapable-ts';
+  BindingInstance,
+  BindingParser,
+} from '@player-ui/player';
 
 const LISTENER_TYPES = {
   dataChange: 'dataChange.',
@@ -229,7 +227,9 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
     };
 
     player.hooks.dataController.tap(this.name, (dc: DataController) =>
-      dc.hooks.onUpdate.tap(this.name, (updates) => {
+      dc.hooks.onUpdate.tap(this.name, (updates, options) => {
+        const { silent = false } = options || {};
+        if (silent) return;
         onFieldUpdateHandler(updates.map((t) => t.binding));
       })
     );

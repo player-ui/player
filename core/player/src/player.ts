@@ -1,22 +1,25 @@
-import { SyncHook, SyncWaterfallHook } from 'tapable-ts';
-import type { FlowInstance } from '@player-ui/flow';
-import { FlowController } from '@player-ui/flow';
-import type { Logger } from '@player-ui/logger';
-import { TapableLogger } from '@player-ui/logger';
-import type { ExpressionHandler } from '@player-ui/expressions';
-import { ExpressionEvaluator } from '@player-ui/expressions';
-import { SchemaController } from '@player-ui/schema';
-import { BindingParser } from '@player-ui/binding';
-import type { ViewInstance } from '@player-ui/view';
 import { setIn } from 'timm';
 import deferred from 'p-defer';
-import type { Flow as FlowType, FlowResult } from '@player-ui/types';
-import { resolveDataRefs } from '@player-ui/string-resolver';
-import { ConstantsController } from '@player-ui/constants';
 import queueMicrotask from 'queue-microtask';
-import { ViewController } from './view';
-import { DataController } from './data';
-import { ValidationController } from './validation';
+import type { Flow as FlowType, FlowResult } from '@player-ui/types';
+
+import { SyncHook, SyncWaterfallHook } from 'tapable-ts';
+import type { Logger } from './logger';
+import { TapableLogger } from './logger';
+import type { ExpressionHandler } from './expressions';
+import { ExpressionEvaluator } from './expressions';
+import { SchemaController } from './schema';
+import { BindingParser } from './binding';
+import type { ViewInstance } from './view';
+import { resolveDataRefs } from './string-resolver';
+import type { FlowInstance } from './controllers';
+import {
+  ConstantsController,
+  ViewController,
+  DataController,
+  ValidationController,
+  FlowController,
+} from './controllers';
 import { FlowExpPlugin } from './plugins/flow-exp-plugin';
 import type {
   PlayerFlowState,
@@ -295,10 +298,11 @@ export class Player {
 
     flowController.hooks.flow.tap('player', (flow: FlowInstance) => {
       flow.hooks.beforeTransition.tap('player', (state, transitionVal) => {
-        if (
-          state.onEnd &&
-          (state.transitions[transitionVal] || state.transitions['*'])
-        ) {
+        /** Checks to see if there are any transitions for a specific transition state (i.e. next, back). If not, it will default to * */
+        const computedTransitionVal = state.transitions[transitionVal]
+          ? transitionVal
+          : '*';
+        if (state.onEnd && state.transitions[computedTransitionVal]) {
           if (typeof state.onEnd === 'object' && 'exp' in state.onEnd) {
             expressionEvaluator?.evaluate(state.onEnd.exp);
           } else {
@@ -306,14 +310,19 @@ export class Player {
           }
         }
 
-        if (!('transitions' in state) || !state.transitions[transitionVal]) {
+        /** If the transition does not exist, then do not resolve any expressions */
+        if (
+          !('transitions' in state) ||
+          !state.transitions[computedTransitionVal]
+        ) {
           return state;
         }
 
+        /** resolves and sets the transition to the computed exp */
         return setIn(
           state,
-          ['transitions', transitionVal],
-          resolveStrings(state.transitions[transitionVal])
+          ['transitions', computedTransitionVal],
+          resolveStrings(state.transitions[computedTransitionVal])
         ) as any;
       });
 
@@ -357,11 +366,20 @@ export class Player {
 
           // The nested transition call would trigger another round of the flow transition hooks to be called.
           // This created a weird timing where this nested transition would happen before the view had a chance to respond to the first one
-          // Use a queueMicrotask to make sure the expression transition is outside the scope of the flow hook
+
+          // Additionally, because we are using queueMicrotask, errors could get swallowed in the detached queue
+          // Use a try catch and fail player explicitly if any errors are caught in the nested transition/state
           queueMicrotask(() => {
-            flowController?.transition(
-              String(expressionEvaluator?.evaluate(exp))
-            );
+            try {
+              flowController?.transition(
+                String(expressionEvaluator?.evaluate(exp))
+              );
+            } catch (error) {
+              const state = this.getState();
+              if (error instanceof Error && state.status === 'in-progress') {
+                state.fail(error);
+              }
+            }
           });
         }
 

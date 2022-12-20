@@ -1,4 +1,4 @@
-import type { WebPlayer, WebPlayerPlugin } from '@player-ui/react';
+import type { ReactPlayer, ReactPlayerPlugin } from '@player-ui/react';
 import type { Player } from '@player-ui/player';
 import React from 'react';
 import { AutoScrollProvider } from './hooks';
@@ -17,7 +17,7 @@ export interface AutoScrollManagerConfig {
 }
 
 /** A plugin to manage scrolling behavior */
-export class AutoScrollManagerPlugin implements WebPlayerPlugin {
+export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
   name = 'auto-scroll-manager';
 
   /** Toggles if we should auto scroll to to the first failed validation on page load */
@@ -48,7 +48,10 @@ export class AutoScrollManagerPlugin implements WebPlayerPlugin {
   }
 
   getFirstScrollableElement(idList: Set<string>, type: ScrollType) {
-    const highestElement = { id: '', ypos: 0 };
+    const highestElement = {
+      id: '',
+      ypos: 0,
+    };
     const ypos = window.scrollY;
     idList.forEach((id) => {
       const element = document.getElementById(id);
@@ -126,19 +129,17 @@ export class AutoScrollManagerPlugin implements WebPlayerPlugin {
           this.failedNavigation = false;
           this.alreadyScrolledTo = [];
         });
-        flow.hooks.beforeTransition.tap(this.name, (state) => {
-          // will get reset to false if view successfully transitions
-          // otherwise stays as true when view get rerendered with errors
-          this.failedNavigation = true;
-
-          return state;
+        flow.hooks.skipTransition.intercept({
+          call: () => {
+            this.failedNavigation = true;
+          },
         });
       });
     });
   }
 
-  applyWeb(webPlayer: WebPlayer) {
-    webPlayer.hooks.webComponent.tap(this.name, (Comp) => {
+  applyReact(reactPlayer: ReactPlayer) {
+    reactPlayer.hooks.webComponent.tap(this.name, (Comp) => {
       return () => {
         const { scrollFn } = this;
 
