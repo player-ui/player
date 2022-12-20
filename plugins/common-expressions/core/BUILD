@@ -11,5 +11,6 @@ javascript_pipeline(
     test_data = [
         "//core/make-flow:@player-ui/make-flow"
     ],
-    library_name = 'CommonExpressionsPlugin'
+    library_name = 'CommonExpressionsPlugin',
+    xlr_mode = 'plugin'
 )

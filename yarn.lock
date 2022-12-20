@@ -3104,10 +3104,10 @@
   dependencies:
     "@octokit/openapi-types" "^12.7.0"
 
-"@player-tools/cli@0.2.1--canary.16.274":
-  version "0.2.1--canary.16.274"
-  resolved "https://registry.yarnpkg.com/@player-tools/cli/-/cli-0.2.1--canary.16.274.tgz#fc607c2faff38da3482a2bdc0229fa8cb61db6b3"
-  integrity sha512-et+Tr5N6aJ/XcQZilx7GJtFNIZIDrAtxq8tvW2dB/7j3QlPup+vexZgbNtKmmkuqibbqDaUn4YoJwFZ4rAq1iw==
+"@player-tools/cli@0.3.0-next.1":
+  version "0.3.0-next.1"
+  resolved "https://registry.yarnpkg.com/@player-tools/cli/-/cli-0.3.0-next.1.tgz#d0a728978ce5d17718c0a04864d8a13624f79a44"
+  integrity sha512-SJle1LmdPYfK0Dzrheuubu3Vz9k9FyzzkR/Y1CuixiCmOQIG60C8VtB/PXTrYq1ylXrqGwL5X4PFP4NFFTCQ2Q==
   dependencies:
     "@babel/core" "^7.15.5"
     "@babel/plugin-transform-react-jsx-source" "^7.18.6"
@@ -3117,11 +3117,11 @@
     "@babel/register" "^7.17.7"
     "@oclif/core" "1.9.0"
     "@oclif/plugin-legacy" "^1.2.7"
-    "@player-tools/dsl" "0.2.1--canary.16.274"
-    "@player-tools/language-service" "0.2.1--canary.16.274"
-    "@player-tools/xlr-converters" "0.2.1--canary.16.274"
-    "@player-tools/xlr-sdk" "0.2.1--canary.16.274"
-    "@player-tools/xlr-utils" "0.2.1--canary.16.274"
+    "@player-tools/dsl" "0.3.0-next.1"
+    "@player-tools/language-service" "0.3.0-next.1"
+    "@player-tools/xlr-converters" "0.3.0-next.1"
+    "@player-tools/xlr-sdk" "0.3.0-next.1"
+    "@player-tools/xlr-utils" "0.3.0-next.1"
     "@types/babel__register" "^7.17.0"
     chalk "^4.0.1"
     cosmiconfig "^7.0.1"
@@ -3132,13 +3132,14 @@
     log-symbols "^4.0.0"
     log-update "^4.0.0"
     mkdirp "^1.0.4"
+    typescript "4.8.4"
     vscode-languageserver-textdocument "^1.0.1"
     vscode-languageserver-types "^3.15.1"
 
-"@player-tools/dsl@0.2.1--canary.16.274":
-  version "0.2.1--canary.16.274"
-  resolved "https://registry.yarnpkg.com/@player-tools/dsl/-/dsl-0.2.1--canary.16.274.tgz#e2714bc3a8a758e4c3a74f851ac7d20c61f300e9"
-  integrity sha512-hdfEsjfQtnbKiJ4PKl7tFHzp1DuxNzb15+8H9OlO/2ZPjxhi8PO48870otIHnXFbss68QdsnBWRWahHaH9kv5g==
+"@player-tools/dsl@0.3.0-next.1":
+  version "0.3.0-next.1"
+  resolved "https://registry.yarnpkg.com/@player-tools/dsl/-/dsl-0.3.0-next.1.tgz#dfa684123215937102b4950c286d75464ca882a3"
+  integrity sha512-8pZ5fmDc7wKIzODlBw9Tm7cJvi/A5yLXwKn9uDE0MIC6ihZuVtDULt7SzK8M+DDmZxruBUJhZkUzsJk5sM2gdw==
   dependencies:
     "@babel/runtime" "7.15.4"
     "@player-ui/types" "^0.2.0"
@@ -3160,15 +3161,15 @@
     ts-node "^10.4.0"
     typescript "4.8.4"
 
-"@player-tools/language-service@0.2.1--canary.16.274":
-  version "0.2.1--canary.16.274"
-  resolved "https://registry.yarnpkg.com/@player-tools/language-service/-/language-service-0.2.1--canary.16.274.tgz#40029eef68bf4b55fc1a8227d1ad434452c7129a"
-  integrity sha512-PfoYjQ2c9uvwTIM6MvbEF4XPnULmLTpKvMkQOgubKLaBARMz5q+gRTbiDtMgKSM3ILMS/wLn6DCOQFCxqP4fgw==
+"@player-tools/language-service@0.3.0-next.1":
+  version "0.3.0-next.1"
+  resolved "https://registry.yarnpkg.com/@player-tools/language-service/-/language-service-0.3.0-next.1.tgz#6140c5bef40816f857776cec7f0dc9c775728629"
+  integrity sha512-dPoZ9/27F3/u9j91yS0KHKoSJEi7qyzNEFFnqXRCiEPJKcIAAzqQCOVOCAFzufNYzsyMly1LNTCsctOZheGaeg==
   dependencies:
     "@babel/runtime" "7.15.4"
-    "@player-tools/xlr" "0.2.1--canary.16.274"
-    "@player-tools/xlr-sdk" "0.2.1--canary.16.274"
-    "@player-tools/xlr-utils" "0.2.1--canary.16.274"
+    "@player-tools/xlr" "0.3.0-next.1"
+    "@player-tools/xlr-sdk" "0.3.0-next.1"
+    "@player-tools/xlr-utils" "0.3.0-next.1"
     change-case "^4.1.1"
     cross-fetch "^3.0.5"
     detect-indent "^6.0.0"
@@ -3179,42 +3180,42 @@
     vscode-languageserver-textdocument "^1.0.1"
     vscode-languageserver-types "^3.15.1"
 
-"@player-tools/xlr-converters@0.2.1--canary.16.274":
-  version "0.2.1--canary.16.274"
-  resolved "https://registry.yarnpkg.com/@player-tools/xlr-converters/-/xlr-converters-0.2.1--canary.16.274.tgz#d1a46fab04bda2f35ee6b7751f673e8ab04d6096"
-  integrity sha512-RdXhb8nDvO2zOm51YbntATZzMhRhVC1lGWzNqP3ySzpUXS7tWcrYpQkXETGnrOiPQQZPVFNImfpm0goHu5vwMA==
+"@player-tools/xlr-converters@0.3.0-next.1":
+  version "0.3.0-next.1"
+  resolved "https://registry.yarnpkg.com/@player-tools/xlr-converters/-/xlr-converters-0.3.0-next.1.tgz#7a6e6e8bd746c6aa079934db2517a645ead96786"
+  integrity sha512-hxNKpm4Oy40K4gt5n0xkCP3w9fFwFZyL6Tr7lVDBowOdpiApTkHNZTsAzFN7I/hlEWuAs7TZ2+5ZE+poU10YBQ==
   dependencies:
     "@babel/runtime" "7.15.4"
-    "@player-tools/xlr" "0.2.1--canary.16.274"
-    "@player-tools/xlr-utils" "0.2.1--canary.16.274"
+    "@player-tools/xlr" "0.3.0-next.1"
+    "@player-tools/xlr-utils" "0.3.0-next.1"
 
-"@player-tools/xlr-sdk@0.2.1--canary.16.274":
-  version "0.2.1--canary.16.274"
-  resolved "https://registry.yarnpkg.com/@player-tools/xlr-sdk/-/xlr-sdk-0.2.1--canary.16.274.tgz#56bfdf36115279eddb2bed805f58b6fd3d1ac236"
-  integrity sha512-12ZEoU/FShqTQLIpHz77z8N7KX6YfubzDxNptRlkD9lZLWCAHu6feqEnCyr9RLO6RrNPGBosrrvMcAy3ykfbpQ==
+"@player-tools/xlr-sdk@0.3.0-next.1":
+  version "0.3.0-next.1"
+  resolved "https://registry.yarnpkg.com/@player-tools/xlr-sdk/-/xlr-sdk-0.3.0-next.1.tgz#bb94567885e3d61963d396c61a058d267ad75681"
+  integrity sha512-Z1bTVJDvIV+4LzzDT7FWWB44Z+jNo49uE4Ger3JW4t41M6PXo86zDUCpv8mmV6l6DeiTiY2z4A4zW+ZS60jHwg==
   dependencies:
     "@babel/runtime" "7.15.4"
-    "@player-tools/xlr" "0.2.1--canary.16.274"
-    "@player-tools/xlr-converters" "0.2.1--canary.16.274"
-    "@player-tools/xlr-utils" "0.2.1--canary.16.274"
+    "@player-tools/xlr" "0.3.0-next.1"
+    "@player-tools/xlr-converters" "0.3.0-next.1"
+    "@player-tools/xlr-utils" "0.3.0-next.1"
     "@types/fs-extra" "^9.0.13"
     "@types/node" "^16.11.12"
     fs-extra "^10.0.0"
     jsonc-parser "^2.3.1"
 
-"@player-tools/xlr-utils@0.2.1--canary.16.274":
-  version "0.2.1--canary.16.274"
-  resolved "https://registry.yarnpkg.com/@player-tools/xlr-utils/-/xlr-utils-0.2.1--canary.16.274.tgz#e22bfaac5811b11e3617daa7257c581e80d94dea"
-  integrity sha512-G/xJd1J3aLe6i/+TyBHEfbhpay14WTSRZSaG9Jes+sAHq4l7lhO3DMcqUuSBy0Qsm16ZutNttsM9DMixC6UBEQ==
+"@player-tools/xlr-utils@0.3.0-next.1":
+  version "0.3.0-next.1"
+  resolved "https://registry.yarnpkg.com/@player-tools/xlr-utils/-/xlr-utils-0.3.0-next.1.tgz#b33a563047af914561e8590b3223751fc8a3f84b"
+  integrity sha512-FAZQaiZNey/Apvmdv4VA9UC5KK0HHnYr3zI/Ms9uwNIA6DDiSpZPVim+ZURffg2FaN/9hxgCr1y9A/RQX6UKUg==
   dependencies:
     "@babel/runtime" "7.15.4"
-    "@player-tools/xlr" "0.2.1--canary.16.274"
+    "@player-tools/xlr" "0.3.0-next.1"
     "@typescript/vfs" "^1.4.0"
 
-"@player-tools/xlr@0.2.1--canary.16.274":
-  version "0.2.1--canary.16.274"
-  resolved "https://registry.yarnpkg.com/@player-tools/xlr/-/xlr-0.2.1--canary.16.274.tgz#30100b56d0e701bfe9a4df3e37eb659fd571d3a3"
-  integrity sha512-Wu95BXCz+cF0gN3KK3vAyTKC9SGTrms/6ZvsNdo5bUtRI/I4rQiaFJJek9pCKp/hXHVteilydAJVdVDNfvOTgQ==
+"@player-tools/xlr@0.3.0-next.1":
+  version "0.3.0-next.1"
+  resolved "https://registry.yarnpkg.com/@player-tools/xlr/-/xlr-0.3.0-next.1.tgz#c6c4d1e876085d181402961164a11879664aa544"
+  integrity sha512-GLVoCYqcactVdnELAuxPa3bqf99sh2lOxib8yZrODRmrgPuK0nreX5djKd0pffmNd0l6qe34n7bRtuKujo54Xw==
   dependencies:
     "@babel/runtime" "7.15.4"
 
