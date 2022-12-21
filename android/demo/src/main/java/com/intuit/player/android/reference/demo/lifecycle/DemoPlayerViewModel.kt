@@ -5,6 +5,7 @@ import com.intuit.player.android.lifecycle.PlayerViewModel
 import com.intuit.player.android.reference.assets.ReferenceAssetsPlugin
 import com.intuit.player.jvm.core.managed.AsyncFlowIterator
 import com.intuit.player.jvm.core.player.state.PlayerFlowState
+import com.intuit.player.plugins.devtools.AndroidDevtoolsPlugin
 import com.intuit.player.plugins.transactions.PendingTransactionPlugin
 import com.intuit.player.plugins.types.CommonTypesPlugin
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,7 @@ class DemoPlayerViewModel(iterator: AsyncFlowIterator) : PlayerViewModel(iterato
         CommonTypesPlugin(),
         ReferenceAssetsPlugin(),
         PendingTransactionPlugin(),
+        AndroidDevtoolsPlugin(),
     )
 
     private val _playerFlowState = MutableStateFlow<PlayerFlowState?>(null)

@@ -5,9 +5,9 @@ maven = [
     "com.facebook.flipper:flipper:%s" % versions.flipper,
 ]
 
-main_exports = [
+main_exports = parse_coordinates(maven) + [
     "//plugins/devtools/jvm:devtools",
     "//android/player",
 ]
 
-main_deps = main_exports + parse_coordinates(maven)
+main_deps = main_exports
