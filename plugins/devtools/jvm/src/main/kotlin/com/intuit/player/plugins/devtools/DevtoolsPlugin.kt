@@ -43,7 +43,7 @@ public class DevtoolsPlugin(public val playerID: String, public var onEvent: Dev
     public fun onMethod(method: Method): JsonObject = (callbacks[method.type] ?: throw PlayerPluginException("method handler for ${method.type} not found"))
         .invoke(method.params)
 
-    public val supportedMethods: Set<String> by callbacks::keys
+    public val supportedMethods: Set<String> get() = callbacks.keys
 
     override fun apply(player: Player) {
         logger = player.logger

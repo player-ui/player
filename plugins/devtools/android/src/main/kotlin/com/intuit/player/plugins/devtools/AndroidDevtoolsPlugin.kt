@@ -22,8 +22,6 @@ public class AndroidDevtoolsPlugin private constructor(public var playerID: Stri
         // TODO: Evaluate if this would work? Does this work for multiple Players? I think so
 //        AndroidFlipperClient.getInstanceIfInitialized()?.addPlugin(this)
 
-        flipperPlugin.supportedMethods = devtoolsPlugin.supportedMethods
-
         devtoolsPlugin.onEvent = DevtoolsEventPublisher {
             flipperPlugin.publishAndroidMessage(it)
         }
