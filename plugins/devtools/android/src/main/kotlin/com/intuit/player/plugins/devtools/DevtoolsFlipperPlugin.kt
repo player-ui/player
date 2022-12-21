@@ -48,7 +48,7 @@ public class DevtoolsFlipperPlugin : FlipperPlugin {
                 supportedMethods.forEach { type ->
                     connection.receive(type) { params, response ->
                         activePlayers[params.getString("playerID")]
-                            ?.onMethod(Method(type, params.asJsonObject))
+                            ?.onMethod(type, params.asJsonObject)
                             ?.asFlipperObject
                             ?.let(response::success) ?: response.success() // TODO: Should we error back?
                     }

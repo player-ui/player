@@ -6,11 +6,10 @@ import com.intuit.player.android.AndroidPlayerPlugin
 import com.intuit.player.jvm.core.player.state.CompletedState
 import com.intuit.player.jvm.core.plugins.JSPluginWrapper
 import com.intuit.player.jvm.core.plugins.PlayerPluginException
-import kotlinx.serialization.json.JsonObject
 
 private var count = 0
 
-public class AndroidDevtoolsPlugin private constructor(public var playerID: String, private val devtoolsPlugin: DevtoolsPlugin) : AndroidPlayerPlugin, JSPluginWrapper by devtoolsPlugin {
+public class AndroidDevtoolsPlugin private constructor(public var playerID: String, private val devtoolsPlugin: DevtoolsPlugin) : AndroidPlayerPlugin, JSPluginWrapper by devtoolsPlugin, DevtoolsMethodHandler by devtoolsPlugin {
 
     private val flipperPlugin = (AndroidFlipperClient
         .getInstanceIfInitialized() ?: throw PlayerPluginException(this::class.java.simpleName, "AndroidFlipperClient not initialized. Ensure your app is initializing the AndroidFlipperClient before this plugin is instantiated.\nhttps://fbflipper.com/docs/getting-started/android-native/"))
@@ -25,13 +24,6 @@ public class AndroidDevtoolsPlugin private constructor(public var playerID: Stri
         devtoolsPlugin.onEvent = DevtoolsEventPublisher {
             flipperPlugin.publishAndroidMessage(it)
         }
-    }
-
-    public val supportedMethods: Set<String> by devtoolsPlugin::supportedMethods
-
-    public fun onMethod(method: Method): JsonObject {
-        // TODO: Listen for JVM/Android specific events
-        return devtoolsPlugin.onMethod(method)
     }
 
     override fun apply(androidPlayer: AndroidPlayer) {

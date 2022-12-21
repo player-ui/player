@@ -10,40 +10,36 @@ import com.intuit.player.jvm.core.plugins.JSScriptPluginWrapper
 import com.intuit.player.jvm.core.plugins.LoggerPlugin
 import com.intuit.player.jvm.core.plugins.PlayerPlugin
 import com.intuit.player.jvm.core.plugins.PlayerPluginException
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
 import java.util.*
 
 public fun interface DevtoolsEventPublisher {
     public fun publish(message: JsonObject)
 }
 
-@Serializable public data class Method(public val type: String, public val params: JsonObject)
+public interface DevtoolsMethodHandler {
+    public val supportedMethods: Set<String>
+    public fun onMethod(type: String, params: JsonObject): JsonObject
+}
 
-public val Method.playerID: String? get() = params["playerID"]?.jsonPrimitive?.content
+public class DevtoolsPlugin(public val playerID: String, public var onEvent: DevtoolsEventPublisher? = null) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath), PlayerPlugin, DevtoolsMethodHandler {
 
-public class DevtoolsPlugin(public val playerID: String, public var onEvent: DevtoolsEventPublisher? = null) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath), PlayerPlugin {
-
-    public val isReleased: Boolean get() = instance.isReleased()
 
     private lateinit var logger: LoggerPlugin
-
-    // TODO: Build out interop delegates
-    private fun callback(method: String, params: JsonObject) = instance
-        .getObject("callbacks")!!
-        .getFunction<Node>(method)!!
-        .invoke(params)
-        .toJson()
-        .jsonObject
 
     private val callbacks: Map<String, (JsonObject) -> Node> by lazy {
         instance.getSerializable("callbacks") ?: throw PlayerPluginException("callbacks not defined on instance")
     }
 
-    public fun onMethod(method: Method): JsonObject = (callbacks[method.type] ?: throw PlayerPluginException("method handler for ${method.type} not found"))
-        .invoke(method.params).toJson().jsonObject
+    // TODO: Listen for JVM/Android specific events
+    override fun onMethod(type: String, params: JsonObject): JsonObject = (callbacks[type]
+        ?: throw PlayerPluginException("method handler for ${type} not found"))
+        .invoke(params)
+        .toJson()
+        .jsonObject
 
-    public val supportedMethods: Set<String> get() = callbacks.keys
+    override val supportedMethods: Set<String> get() = callbacks.keys
 
     override fun apply(player: Player) {
         logger = player.logger
@@ -64,13 +60,8 @@ public class DevtoolsPlugin(public val playerID: String, public var onEvent: Dev
         runtime.execute(script)
         val publisher = "devtoolsPublisher_${UUID.randomUUID().toString().replace("-", "")}"
         runtime.add(publisher) { event: Node ->
-            try {
-                // TODO: Update format decoders to handle this
-                onEvent?.publish(Json.decodeFromJsonElement(event.toJson()))
-            } catch (exception: Exception) {
-                // TODO: Verify which order to log things here
-                logger.error(exception, "Couldn't deserialize event: $event")
-            }
+            // TODO: Update format decoders to handle this
+            onEvent?.publish(event.toJson().jsonObject)
         }
         instance = runtime.buildInstance("""(new $name.$name("$playerID", $publisher))""")
     }
