@@ -8,6 +8,7 @@ maven_main = [
     "com.afollestad.material-dialogs:core:%s" % versions.material_dialogs,
     "com.google.android.material:material:%s" % versions.material,
     #"com.squareup.leakcanary:leakcanary-android:2.2",
+    "com.facebook.flipper:flipper:%s" % versions.flipper,
 ]
 
 maven_test = [
