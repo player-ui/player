@@ -43,4 +43,5 @@ versions = struct(
     ),
     material_dialogs = "3.3.0",
     material = "1.4.0",
+    flipper = "0.159.0",
 )
