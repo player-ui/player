@@ -3280,6 +3280,55 @@
   dependencies:
     "@octokit/openapi-types" "^12.7.0"
 
+"@player-tools/devtools-common@0.2.2--canary.17.423":
+  version "0.2.2--canary.17.423"
+  resolved "https://registry.yarnpkg.com/@player-tools/devtools-common/-/devtools-common-0.2.2--canary.17.423.tgz#347ef414714d37cd0217b03184462661eb47b89a"
+  integrity sha512-Ie4qn3ItHQPcj+zemrAZD0W3so800Jjrz4YJBlDXtkiIP7aQbA5oeyihj9p+101dLExvnZ4jCYIiRo6uAeS2kA==
+  dependencies:
+    "@babel/runtime" "7.15.4"
+    "@player-ui/player" "^0.3.0"
+    "@player-ui/types" "^0.3.0"
+    "@reduxjs/toolkit" "^1.6.1"
+    "@types/uuid" "^8.3.4"
+    uuid "^8.3.2"
+
+"@player-ui/partial-match-registry@0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@player-ui/partial-match-registry/-/partial-match-registry-0.3.0.tgz#cd102b947ccba754e390a1a022d8ccd8698053c4"
+  integrity sha512-jssryLQrPMz/A7KmtDH4M3/i2aWSVF4K6WCLZWFCxWhXKF0DXV/kdCH+8TIWMZ2mBjPwh3DZ3H6yFEhfU7DGCg==
+  dependencies:
+    "@babel/runtime" "7.15.4"
+    "@types/dlv" "^1.1.2"
+    dlv "^1.1.3"
+    sorted-array "^2.0.4"
+
+"@player-ui/player@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@player-ui/player/-/player-0.3.0.tgz#6cfbed27577e86c94ff0281be2c908081fe760a2"
+  integrity sha512-Tdd/g0yTLlCC/egXXt/DRypH/STtQYb4ZQGVvMPmonWCGo/f86DzygHUwsDEVeJCceme0nxw8gTaTlBYpAw/vQ==
+  dependencies:
+    "@babel/runtime" "7.15.4"
+    "@player-ui/partial-match-registry" "0.3.0"
+    "@player-ui/types" "0.3.0"
+    "@types/nested-error-stacks" "^2.1.0"
+    "@types/parsimmon" "^1.10.0"
+    arr-flatten "^1.1.0"
+    dequal "^2.0.2"
+    ebnf "^1.9.0"
+    nested-error-stacks "^2.1.1"
+    p-defer "^3.0.0"
+    parsimmon "^1.12.0"
+    queue-microtask "^1.2.3"
+    tapable-ts "^0.1.0"
+    timm "^1.6.2"
+
+"@player-ui/types@0.3.0", "@player-ui/types@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@player-ui/types/-/types-0.3.0.tgz#821a78b59363bcd81f283f7d2882d5446937f000"
+  integrity sha512-feq7R8Pdm5yhSJmR7LHK+69IZQ1s0XAEN1HEiSyqqKP4x4IjROH9iRZ2x9lXjC6vh1Qi8uK5JSOht8ZxRYcm2Q==
+  dependencies:
+    "@babel/runtime" "7.15.4"
+
 "@pmmmwh/react-refresh-webpack-plugin@^0.5.1":
   version "0.5.4"
   resolved "https://registry.yarnpkg.com/@pmmmwh/react-refresh-webpack-plugin/-/react-refresh-webpack-plugin-0.5.4.tgz#df0d0d855fc527db48aac93c218a0bf4ada41f99"
@@ -3379,6 +3428,16 @@
   dependencies:
     prop-types "^15.7.2"
     tslib "^2.1.0"
+
+"@reduxjs/toolkit@^1.6.1":
+  version "1.9.1"
+  resolved "https://registry.yarnpkg.com/@reduxjs/toolkit/-/toolkit-1.9.1.tgz#4c34dc4ddcec161535288c60da5c19c3ef15180e"
+  integrity sha512-HikrdY+IDgRfRYlCTGUQaiCxxDDgM1mQrRbZ6S1HFZX5ZYuJ4o8EstNmhTwHdPl2rTmLxzwSu0b3AyeyTlR+RA==
+  dependencies:
+    immer "^9.0.16"
+    redux "^4.2.0"
+    redux-thunk "^2.4.2"
+    reselect "^4.1.7"
 
 "@rollup/plugin-image@^2.1.1":
   version "2.1.1"
@@ -11063,6 +11122,11 @@ image-size@1.0.0:
   dependencies:
     queue "6.0.2"
 
+immer@^9.0.16:
+  version "9.0.16"
+  resolved "https://registry.yarnpkg.com/immer/-/immer-9.0.16.tgz#8e7caab80118c2b54b37ad43e05758cdefad0198"
+  integrity sha512-qenGE7CstVm1NrHQbMh8YaSzTZTFNP3zPqr3YU0S0UY441j4bJTg4A2Hh5KAhwgaiU6ZZ1Ar6y/2f4TblnMReQ==
+
 import-cwd@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/import-cwd/-/import-cwd-3.0.0.tgz#20845547718015126ea9b3676b7592fb8bd4cf92"
@@ -16417,10 +16481,22 @@ reduce-flatten@^2.0.0:
   resolved "https://registry.yarnpkg.com/reduce-flatten/-/reduce-flatten-2.0.0.tgz#734fd84e65f375d7ca4465c69798c25c9d10ae27"
   integrity sha512-EJ4UNY/U1t2P/2k6oqotuX2Cc3T6nxJwsM0N0asT7dhrtH1ltUxDn4NalSYmPE2rCkVpcf/X6R0wDwcFpzhd4w==
 
+redux-thunk@^2.4.2:
+  version "2.4.2"
+  resolved "https://registry.yarnpkg.com/redux-thunk/-/redux-thunk-2.4.2.tgz#b9d05d11994b99f7a91ea223e8b04cf0afa5ef3b"
+  integrity sha512-+P3TjtnP0k/FEjcBL5FZpoovtvrTNT/UXd4/sluaSyrURlSlhLSzEdfsTBW7WsKB6yPvgd7q/iZPICFjW4o57Q==
+
 redux@^4.0.0, redux@^4.1.2:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/redux/-/redux-4.1.2.tgz#140f35426d99bb4729af760afcf79eaaac407104"
   integrity sha512-SH8PglcebESbd/shgf6mii6EIoRM0zrQyjcuQ+ojmfxjTtE0z9Y8pa62iA/OJ58qjP6j27uyW4kUF4jl/jd6sw==
+  dependencies:
+    "@babel/runtime" "^7.9.2"
+
+redux@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/redux/-/redux-4.2.0.tgz#46f10d6e29b6666df758780437651eeb2b969f13"
+  integrity sha512-oSBmcKKIuIR4ME29/AeNUnl5L+hvBq7OaJWzaptTQJAntaPvxIJqfnjbaEiCzzaIz+XmVILfqAM3Ob0aXLPfjA==
   dependencies:
     "@babel/runtime" "^7.9.2"
 
@@ -16808,6 +16884,11 @@ requireindex@^1.2.0, requireindex@~1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/requireindex/-/requireindex-1.2.0.tgz#3463cdb22ee151902635aa6c9535d4de9c2ef1ef"
   integrity sha512-L9jEkOi3ASd9PYit2cwRfyppc9NoABujTP8/5gFcbERmo5jUoAKovIC3fsF17pkTnGsrByysqX+Kxd2OTNI1ww==
+
+reselect@^4.1.7:
+  version "4.1.7"
+  resolved "https://registry.yarnpkg.com/reselect/-/reselect-4.1.7.tgz#56480d9ff3d3188970ee2b76527bd94a95567a42"
+  integrity sha512-Zu1xbUt3/OPwsXL46hvOOoQrap2azE7ZQbokq61BQfiXvhewsKDwhMeZjTX9sX0nvw1t/U5Audyn1I9P/m9z0A==
 
 resize-observer-polyfill@^1.5.1:
   version "1.5.1"
@@ -18302,6 +18383,11 @@ taketalk@^1.0.0:
   dependencies:
     get-stdin "^4.0.1"
     minimist "^1.1.0"
+
+tapable-ts@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/tapable-ts/-/tapable-ts-0.1.0.tgz#9ea393d3f5ed9c998ac1d5cff81a2293569ac47e"
+  integrity sha512-pLNOGWrzcm+cc4UnyqEFK+k+thwJtJiuugKnsTrj7WPah4oZTnwDxKVNx9jhP6+RVfDOghaDIc14B5aXfV8wfQ==
 
 tapable-ts@^0.2.3:
   version "0.2.3"
