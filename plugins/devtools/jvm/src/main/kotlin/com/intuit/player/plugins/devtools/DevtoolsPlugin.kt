@@ -36,12 +36,12 @@ public class DevtoolsPlugin(public val playerID: String, public var onEvent: Dev
         .toJson()
         .jsonObject
 
-    private val callbacks: Map<String, (JsonObject) -> JsonObject> by lazy {
+    private val callbacks: Map<String, (JsonObject) -> Node> by lazy {
         instance.getSerializable("callbacks") ?: throw PlayerPluginException("callbacks not defined on instance")
     }
 
     public fun onMethod(method: Method): JsonObject = (callbacks[method.type] ?: throw PlayerPluginException("method handler for ${method.type} not found"))
-        .invoke(method.params)
+        .invoke(method.params).toJson().jsonObject
 
     public val supportedMethods: Set<String> get() = callbacks.keys
 

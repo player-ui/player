@@ -37,13 +37,6 @@ public class AndroidDevtoolsPlugin private constructor(public var playerID: Stri
     override fun apply(androidPlayer: AndroidPlayer) {
         flipperPlugin.addPlayer(this)
 
-//        flipperPlugin.publishAndroidMessage(
-//            PlayerInitEvent(
-//                playerID,
-//                BuildConfig.VERSION,
-//            )
-//        )
-
         androidPlayer.hooks.state.tap { state ->
             // TODO: Should probably be on ReleasedState?
             if (state is CompletedState) {

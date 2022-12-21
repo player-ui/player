@@ -6,8 +6,7 @@ import com.facebook.flipper.core.FlipperPlugin
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.decodeFromJsonElement
-import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonObject
 
 // TODO: Currently, this works as a "singleton" proxy for connecting flipper events to specific player plugins.
 //  In the future, it'd be nice to have _each_ player plugin register it's own flipper plugin, such that the
@@ -46,11 +45,12 @@ public class DevtoolsFlipperPlugin : FlipperPlugin {
         set(value) {
             value?.let { connection ->
                 // on each connection, we have to reconfigure listener events
-                supportedMethods.forEach {
-                    connection.receive(it) { event, response ->
-                        val method: Method = event.toJsonString().let(Json::encodeToJsonElement).let(Json::decodeFromJsonElement)
-                        activePlayers[method.playerID]?.onMethod(method)?.asFlipperObject?.let(response::success)
-                            ?: response.success() // TODO: Do we error back?
+                supportedMethods.forEach { type ->
+                    connection.receive(type) { params, response ->
+                        activePlayers[params.getString("playerID")]
+                            ?.onMethod(Method(type, params.asJsonObject))
+                            ?.asFlipperObject
+                            ?.let(response::success) ?: response.success() // TODO: Should we error back?
                     }
                 }
             }
@@ -66,4 +66,8 @@ public class DevtoolsFlipperPlugin : FlipperPlugin {
 
     private val JsonObject.asFlipperObject: FlipperObject get() = let(Json::encodeToString)
         .let(::FlipperObject)
+
+    private val FlipperObject.asJsonObject: JsonObject get() = toJsonString()
+        .let(json::parseToJsonElement)
+        .jsonObject
 }
