@@ -40,9 +40,10 @@ impl Paths {
     }
 
     pub fn parse(&self, root: View) {
-        let mut stack: Vec<(View, Vec<Path>)> = vec![(root, vec![])];
+        let mut stack: Vec<(View, Vec<Path>, Option<Rc<RefCell<Node>>>)> =
+            vec![(root, vec![], None)];
 
-        while let Some((obj, key_path)) = stack.pop() {
+        while let Some((obj, key_path, parent)) = stack.pop() {
             let obj = obj.borrow();
             Reflect::own_keys(&obj)
                 .unwrap_or(Array::new())
@@ -62,29 +63,30 @@ impl Paths {
                             .as_string()
                             .expect("Could not parse id value to string.");
 
-                        let node = Node::new(
+                        log(&format!("found id: {}, type: {}", &id, &node_type));
+
+                        let node = Rc::new(RefCell::new(Node::new(
                             id,
                             node_type,
                             None,
                             Some(Rc::new(RefCell::new(key_path.clone()))),
-                        );
+                        )));
+
                         self.nodes_by_id
                             .borrow_mut()
-                            .insert(js_value.as_string().unwrap(), Rc::new(RefCell::new(node)));
-                    }
+                            .insert(js_value.as_string().unwrap(), node);
 
-                    if js_value.is_object() {
-                        let key = if key_as_f64.is_nan() {
-                            Path::Text(key_as_string)
-                        } else {
-                            Path::Numeric(key_as_f64)
-                        };
-                        let mut key_path = key_path.clone();
-                        key_path.push(key);
-                        stack.push((Rc::new(RefCell::new(js_value)), key_path))
+                        if js_value.is_object() {
+                            let key = if key_as_f64.is_nan() {
+                                Path::Text(key_as_string)
+                            } else {
+                                Path::Numeric(key_as_f64)
+                            };
+                            let mut key_path = key_path.clone();
+                            key_path.push(key);
+                            stack.push((Rc::new(RefCell::new(js_value)), key_path, None))
+                        }
                     }
-
-                    // log(&format!("{:?}", key_path))
                 });
         }
     }

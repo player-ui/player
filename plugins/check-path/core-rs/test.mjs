@@ -67,5 +67,5 @@ const player = new Player({
 
 player.start(nestedAssetFlow)
 
-console.log("path", checkPathPlugin.getPath('coll-val-2-1'));
+console.log("path", checkPathPlugin.getPath('coll-val-2'));
 
