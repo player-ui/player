@@ -66,7 +66,7 @@ impl Paths {
 
             if node.as_ref().is_some() {
                 self.nodes_by_id.borrow_mut().insert(
-                    node.as_ref().unwrap().borrow().get_id(),
+                    node.as_ref().unwrap().borrow().get_id().to_owned(),
                     node.as_ref().map(Rc::clone).unwrap(),
                 );
             }
