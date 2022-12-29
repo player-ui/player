@@ -47,7 +47,7 @@ impl Paths {
         let nodes_by_id = self.nodes_by_id.borrow();
         let node = nodes_by_id.get(id);
 
-        node.as_ref().map(|node| Rc::clone(node))
+        node.map(Rc::clone)
     }
 
     pub fn parse(&self, root: ViewRef) {
@@ -59,14 +59,15 @@ impl Paths {
             // make a node if current object is eligible.
             let node = Paths::make_node(
                 obj.as_ref(),
+                // to prevent cloning the array, maybe we can use a ref to the same array with slices.
                 key_path.clone(),
-                parent.as_ref().map(|parent| Rc::clone(parent)),
+                parent.as_ref().map(Rc::clone),
             );
 
             if node.as_ref().is_some() {
                 self.nodes_by_id.borrow_mut().insert(
                     node.as_ref().unwrap().borrow().get_id(),
-                    node.as_ref().map(|node| Rc::clone(&node)).unwrap(),
+                    node.as_ref().map(Rc::clone).unwrap(),
                 );
             }
 
@@ -90,9 +91,9 @@ impl Paths {
                         key_path.push(key);
 
                         let parent = if node.is_some() {
-                            node.as_ref().map(|node| Rc::clone(node))
+                            node.as_ref().map(Rc::clone)
                         } else if parent.is_some() {
-                            parent.as_ref().map(|parent| Rc::clone(parent))
+                            parent.as_ref().map(Rc::clone)
                         } else {
                             None
                         };
