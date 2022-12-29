@@ -54,11 +54,9 @@ impl Paths {
         let mut stack: Vec<(ViewRef, Vec<Path>, Option<NodeRef>)> = vec![(root, vec![], None)];
 
         while let Some((obj, key_path, parent)) = stack.pop() {
-            let obj = obj.borrow();
-
             // make a node if current object is eligible.
             let node = Paths::make_node(
-                obj.as_ref(),
+                &obj,
                 // to prevent cloning the array, maybe we can use a ref to the same array with slices.
                 key_path.clone(),
                 parent.as_ref().map(Rc::clone),
@@ -72,6 +70,7 @@ impl Paths {
             }
 
             // Keep looking for nodes by finding more objects.
+            let obj = obj.borrow();
             Reflect::own_keys(&obj)
                 .unwrap_or(Array::new())
                 .iter()
@@ -104,15 +103,16 @@ impl Paths {
     }
 
     fn make_node(
-        obj: &JsValue,
+        obj: &SomeRef<JsValue>,
         key_path: Vec<Path>,
         parent: Option<NodeRef>,
     ) -> Option<Rc<RefCell<Node>>> {
-        let id = Reflect::get(obj, &JsValue::from_str("id")).unwrap();
-        let node_type = Reflect::get(obj, &JsValue::from_str("type")).unwrap();
+        let raw_node = obj.borrow();
+        let id = Reflect::get(&raw_node, &JsValue::from_str("id")).unwrap();
+        let node_type = Reflect::get(&raw_node, &JsValue::from_str("type")).unwrap();
 
         return if let (Some(id), Some(node_type)) = (id.as_string(), node_type.as_string()) {
-            let node = Node::new(id, node_type, parent, key_path);
+            let node = Node::new(id, node_type, Rc::clone(obj), parent, key_path);
             Some(Rc::new(RefCell::new(node)))
         } else {
             None
