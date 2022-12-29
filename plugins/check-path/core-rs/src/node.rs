@@ -10,8 +10,9 @@ extern "C" {
 }
 
 pub struct Node {
-    node_type: String,
     id: String,
+    node_type: String,
+    raw_node: Rc<RefCell<JsValue>>,
     parent: Option<Rc<RefCell<Node>>>,
     path: Vec<Path>,
 }
@@ -20,12 +21,14 @@ impl Node {
     pub fn new(
         id: String,
         node_type: String,
+        raw_node: Rc<RefCell<JsValue>>,
         parent: Option<Rc<RefCell<Node>>>,
         path: Vec<Path>,
     ) -> Self {
         Self {
             id,
             node_type,
+            raw_node,
             parent,
             path,
         }
@@ -43,6 +46,9 @@ impl Node {
         &self.node_type
     }
 
+    pub fn get_raw_node(&self) -> &JsValue {
+        &self.raw_node.borrow()
+    }
     pub fn has_parent(&self) -> bool {
         self.parent.is_some()
     }
