@@ -107,8 +107,18 @@ impl CheckPathPlugin {
     }
 
     #[wasm_bindgen(js_name=getParent)]
-    pub fn get_parent(&self) -> JsValue {
-        return self.current_view.borrow().clone();
+    pub fn get_parent(&self, id: &str) -> JsValue {
+        let parent = self
+            .paths
+            .borrow()
+            .get_node(id)
+            .map(|node| node.borrow().get_parent())
+            .flatten();
+
+        match parent {
+            Some(parent) => parent.borrow().get_raw_node().clone(),
+            None => JsValue::UNDEFINED,
+        }
     }
 
     #[wasm_bindgen(js_name=getParentProp)]

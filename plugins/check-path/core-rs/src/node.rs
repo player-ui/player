@@ -1,5 +1,5 @@
 use crate::paths::Path;
-use std::cell::RefCell;
+use std::cell::{Ref, RefCell};
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 
@@ -46,8 +46,8 @@ impl Node {
         &self.node_type
     }
 
-    pub fn get_raw_node(&self) -> &JsValue {
-        &self.raw_node.borrow()
+    pub fn get_raw_node(&self) -> Ref<JsValue> {
+        self.raw_node.borrow()
     }
     pub fn has_parent(&self) -> bool {
         self.parent.is_some()
