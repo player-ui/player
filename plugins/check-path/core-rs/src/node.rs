@@ -35,8 +35,12 @@ impl Node {
         &self.path
     }
 
-    pub fn get_id(&self) -> String {
-        self.id.clone()
+    pub fn get_id(&self) -> &str {
+        &self.id
+    }
+
+    pub fn get_type(&self) -> &str {
+        &self.node_type
     }
 
     pub fn has_parent(&self) -> bool {
