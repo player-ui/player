@@ -2,6 +2,8 @@ use crate::node::Node;
 use js_sys::{Array, Number, Reflect};
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::fmt;
+use std::fmt::{Debug, Formatter};
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 
@@ -11,17 +13,28 @@ extern "C" {
     fn log(s: &str);
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Path {
     Text(String),
     Numeric(f64),
+}
+
+impl fmt::Display for Path {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match self {
+            Path::Text(value) => std::fmt::Display::fmt(&value, f),
+            Path::Numeric(value) => std::fmt::Display::fmt(&value, f),
+        }
+    }
 }
 
 pub struct Paths {
     nodes_by_id: Rc<RefCell<HashMap<String, Rc<RefCell<Node>>>>>, // type_paths: Rc<RefCell<HashMap<String, Vec<String>>>>,
 }
 
-type View = Rc<RefCell<JsValue>>;
+type SomeRef<T> = Rc<RefCell<T>>;
+type ViewRef = SomeRef<JsValue>;
+type NodeRef = SomeRef<Node>;
 
 impl Paths {
     pub fn new() -> Self {
@@ -33,18 +46,31 @@ impl Paths {
     pub fn get_node(&self, id: &str) -> Option<Rc<RefCell<Node>>> {
         let nodes_by_id = self.nodes_by_id.borrow();
         let node = nodes_by_id.get(id);
-        if node.is_some() {
-            return Some(Rc::clone(node.unwrap()));
-        }
-        None
+
+        node.as_ref().map(|node| Rc::clone(node))
     }
 
-    pub fn parse(&self, root: View) {
-        let mut stack: Vec<(View, Vec<Path>, Option<Rc<RefCell<Node>>>)> =
-            vec![(root, vec![], None)];
+    pub fn parse(&self, root: ViewRef) {
+        let mut stack: Vec<(ViewRef, Vec<Path>, Option<NodeRef>)> = vec![(root, vec![], None)];
 
         while let Some((obj, key_path, parent)) = stack.pop() {
             let obj = obj.borrow();
+
+            // make a node if current object is eligible.
+            let node = Paths::make_node(
+                obj.as_ref(),
+                key_path.clone(),
+                parent.as_ref().map(|parent| Rc::clone(parent)),
+            );
+
+            if node.as_ref().is_some() {
+                self.nodes_by_id.borrow_mut().insert(
+                    node.as_ref().unwrap().borrow().get_id(),
+                    node.as_ref().map(|node| Rc::clone(&node)).unwrap(),
+                );
+            }
+
+            // Keep looking for nodes by finding more objects.
             Reflect::own_keys(&obj)
                 .unwrap_or(Array::new())
                 .iter()
@@ -54,40 +80,41 @@ impl Paths {
                     let js_value = Reflect::get(&obj, &JsValue::from_str(&key_as_string))
                         .expect(&format!("Couldn't read value for key {}", &key_as_string));
 
-                    if key_as_string == "id" {
-                        let node_type = Reflect::get(&obj, &JsValue::from_str("type"))
-                            .expect("")
-                            .as_string()
-                            .expect("Could not parse node type value to string.");
-                        let id = js_value
-                            .as_string()
-                            .expect("Could not parse id value to string.");
+                    if js_value.is_object() {
+                        let key = if key_as_f64.is_nan() {
+                            Path::Text(key_as_string)
+                        } else {
+                            Path::Numeric(key_as_f64)
+                        };
+                        let mut key_path = key_path.clone();
+                        key_path.push(key);
 
-                        log(&format!("found id: {}, type: {}", &id, &node_type));
-
-                        let node = Rc::new(RefCell::new(Node::new(
-                            id,
-                            node_type,
-                            None,
-                            Some(Rc::new(RefCell::new(key_path.clone()))),
-                        )));
-
-                        self.nodes_by_id
-                            .borrow_mut()
-                            .insert(js_value.as_string().unwrap(), node);
-
-                        if js_value.is_object() {
-                            let key = if key_as_f64.is_nan() {
-                                Path::Text(key_as_string)
-                            } else {
-                                Path::Numeric(key_as_f64)
-                            };
-                            let mut key_path = key_path.clone();
-                            key_path.push(key);
-                            stack.push((Rc::new(RefCell::new(js_value)), key_path, None))
-                        }
+                        let parent = if node.is_some() {
+                            node.as_ref().map(|node| Rc::clone(node))
+                        } else if parent.is_some() {
+                            parent.as_ref().map(|parent| Rc::clone(parent))
+                        } else {
+                            None
+                        };
+                        stack.push((Rc::new(RefCell::new(js_value)), key_path, parent));
                     }
                 });
         }
+    }
+
+    fn make_node(
+        obj: &JsValue,
+        key_path: Vec<Path>,
+        parent: Option<NodeRef>,
+    ) -> Option<Rc<RefCell<Node>>> {
+        let id = Reflect::get(obj, &JsValue::from_str("id")).unwrap();
+        let node_type = Reflect::get(obj, &JsValue::from_str("type")).unwrap();
+
+        return if let (Some(id), Some(node_type)) = (id.as_string(), node_type.as_string()) {
+            let node = Node::new(id, node_type, parent, key_path);
+            Some(Rc::new(RefCell::new(node)))
+        } else {
+            None
+        };
     }
 }

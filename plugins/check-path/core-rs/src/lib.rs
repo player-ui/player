@@ -93,7 +93,6 @@ impl CheckPathPlugin {
             .unwrap()
             .borrow()
             .get_path()
-            .borrow()
             .iter()
             .map(|path| {
                 return match path {

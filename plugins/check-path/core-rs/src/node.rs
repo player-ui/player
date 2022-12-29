@@ -1,12 +1,19 @@
 use crate::paths::Path;
 use std::cell::RefCell;
 use std::rc::Rc;
+use wasm_bindgen::prelude::*;
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+}
 
 pub struct Node {
     node_type: String,
     id: String,
     parent: Option<Rc<RefCell<Node>>>,
-    path: Rc<RefCell<Vec<Path>>>,
+    path: Vec<Path>,
 }
 
 impl Node {
@@ -14,17 +21,29 @@ impl Node {
         id: String,
         node_type: String,
         parent: Option<Rc<RefCell<Node>>>,
-        path: Option<Rc<RefCell<Vec<Path>>>>,
+        path: Vec<Path>,
     ) -> Self {
         Self {
             id,
             node_type,
             parent,
-            path: path.unwrap_or(Rc::new(RefCell::new(vec![]))),
+            path,
         }
     }
 
-    pub fn get_path(&self) -> Rc<RefCell<Vec<Path>>> {
-        self.path.clone()
+    pub fn get_path(&self) -> &Vec<Path> {
+        &self.path
+    }
+
+    pub fn get_id(&self) -> String {
+        self.id.clone()
+    }
+
+    pub fn has_parent(&self) -> bool {
+        self.parent.is_some()
+    }
+
+    pub fn get_parent(&self) -> Option<Rc<RefCell<Node>>> {
+        self.parent.as_ref().map(|parent| Rc::clone(parent))
     }
 }
