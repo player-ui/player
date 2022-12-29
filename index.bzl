@@ -103,6 +103,10 @@ def javascript_pipeline(
 
     resolved_entry = entry if entry else _find_entry(root_dir, srcs)
 
+    # If library_name is defined, the package is being bundled and we should
+    # generate an entry in the package.json to point to the bundle file
+    additional_properties = ("{\"bundle\": \"./dist/%s.prod.js\"}" % name.split('/')[1]) if library_name else None
+
     js_library_pipeline(
         name = name,
         srcs = srcs,
@@ -119,11 +123,12 @@ def javascript_pipeline(
         out_dir = out_dir,
         create_package_json_opts = {
             "base_package_json": "//tools:pkg_json_template",
+            "additional_properties": additional_properties
         }
     )
 
     if (library_name):
-        bundle_entry_path = "$(RULEDIR)"
+        bundle_entry_path = None
         bundle_deps = dependencies + peer_dependencies + build_data + BUNDLE_DATA + [
             ":%s-js_build" % name,
             "//:webpack.config.js"
