@@ -49,6 +49,7 @@ impl Node {
     pub fn get_raw_node(&self) -> Ref<JsValue> {
         self.raw_node.borrow()
     }
+
     pub fn has_parent(&self) -> bool {
         self.parent.is_some()
     }

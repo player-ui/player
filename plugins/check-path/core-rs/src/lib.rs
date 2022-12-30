@@ -1,4 +1,5 @@
 use crate::paths::{Path, Paths};
+use crate::query::Query;
 use js_sys::Array;
 use player::*;
 use std::cell::RefCell;
@@ -83,7 +84,7 @@ impl CheckPathPlugin {
 
     #[wasm_bindgen(js_name=getPath)]
     pub fn get_path(&self, id: &str, query: JsValue) -> JsValue {
-        let _query = query::parse_query(query);
+        let _query = Query::new(query);
         let node = self.paths.borrow().get_node(id);
         if !node.is_some() {
             return JsValue::undefined();
