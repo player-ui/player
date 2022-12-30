@@ -51,6 +51,7 @@ impl Paths {
     }
 
     pub fn parse(&self, root: ViewRef) {
+        self.clear_nodes();
         let mut stack: Vec<(ViewRef, Vec<Path>, Option<NodeRef>)> = vec![(root, vec![], None)];
 
         while let Some((obj, key_path, parent)) = stack.pop() {
@@ -117,5 +118,10 @@ impl Paths {
         } else {
             None
         };
+    }
+
+    fn clear_nodes(&self) {
+        let mut nodes = self.nodes_by_id.borrow_mut();
+        nodes.clear();
     }
 }
