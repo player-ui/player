@@ -137,7 +137,10 @@ impl CheckPathPlugin {
     }
 
     #[wasm_bindgen(js_name=getAsset)]
-    pub fn get_asset(&self) -> JsValue {
-        return JsValue::undefined();
+    pub fn get_asset(&self, id: &str) -> JsValue {
+        match self.paths.borrow().get_node(id) {
+            Some(node) => node.borrow().get_raw_node().clone(),
+            None => JsValue::UNDEFINED,
+        }
     }
 }
