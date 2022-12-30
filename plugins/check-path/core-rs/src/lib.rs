@@ -123,8 +123,29 @@ impl CheckPathPlugin {
     }
 
     #[wasm_bindgen(js_name=getParentProp)]
-    pub fn get_parent_prop(&self) -> JsValue {
-        return JsValue::undefined();
+    pub fn get_parent_prop(&self, id: &str) -> JsValue {
+        let node = self.paths.borrow().get_node(id);
+        let parent = node
+            .as_ref()
+            .map(|node| node.borrow().get_parent())
+            .flatten();
+
+        if node.is_none() | parent.is_none() {
+            return JsValue::UNDEFINED;
+        }
+
+        let parent_path_len = parent.unwrap().borrow().get_path().len();
+        let parent_prop = node
+            .unwrap()
+            .borrow()
+            .get_path()
+            .get(parent_path_len)
+            .map(|prop| prop.to_string());
+
+        match parent_prop {
+            Some(prop) => JsValue::from(prop),
+            None => JsValue::UNDEFINED,
+        }
     }
 
     #[wasm_bindgen(js_name=hasChildContext)]
