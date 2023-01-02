@@ -47,7 +47,6 @@ const nestedAssetFlow = makeFlow({
     },
 });
 
-// console.log(JSON.stringify(nestedAssetFlow, null, 2))
 const ViewTransform = (
     view
 ) => ({
@@ -66,6 +65,13 @@ const player = new Player({
 });
 
 player.start(nestedAssetFlow)
+let dataController = player.getState().controllers.data;
+dataController.set([['foo.baz', true]]);
 
-console.log("path", checkPathPlugin.getPath('coll-val-2'));
+// setTimeout(()=>,0);
+// console.log(checkPathPlugin.getPath('coll-val-2-1', { type: 'collection' }))
 
+console.log(checkPathPlugin.getPath('coll-val-2-1', [
+    { type: 'collection' },
+    { type: 'view' },
+]))

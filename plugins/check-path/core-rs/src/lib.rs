@@ -84,27 +84,51 @@ impl CheckPathPlugin {
 
     #[wasm_bindgen(js_name=getPath)]
     pub fn get_path(&self, id: &str, query: JsValue) -> JsValue {
-        let _query = Query::new(query);
+        let query = Query::new(query);
         let node = self.paths.borrow().get_node(id);
         if !node.is_some() {
             return JsValue::undefined();
         }
 
-        let path = node
-            .unwrap()
-            .borrow()
-            .get_path()
-            .iter()
-            .map(|path| {
-                return match path {
-                    // TODO: impl From<Path> for JsValue
-                    Path::Text(value) => JsValue::from(value.clone()),
-                    Path::Numeric(value) => JsValue::from(value.clone()),
-                };
-            })
-            .collect::<Array>();
-
-        JsValue::from(path)
+        let node = node.as_ref().unwrap().borrow();
+        let to_value = |path: &Path| {
+            return match path {
+                Path::Text(value) => JsValue::from(value.clone()),
+                Path::Numeric(value) => JsValue::from(value.clone()),
+            };
+        };
+        match query {
+            Query::None => JsValue::from(node.get_path().iter().map(to_value).collect::<Array>()),
+            _ => {
+                let base_path = node.get_path();
+                if let Some(parent) = node.get_parent() {
+                    let mut nodes = vec![parent];
+                    let mut results = vec![];
+                    while let Some(node) = nodes.pop() {
+                        let node = node.borrow();
+                        let raw_node = node.get_raw_node();
+                        if query.equals(raw_node) {
+                            let found_node_path = node.get_path();
+                            results.push(JsValue::from(
+                                base_path
+                                    .iter()
+                                    .skip(found_node_path.len())
+                                    .map(to_value)
+                                    .collect::<Array>(),
+                            ));
+                        }
+                        let next_node = node.get_parent();
+                        if next_node.is_some() {
+                            nodes.push(next_node.unwrap());
+                        }
+                    }
+                    if !results.is_empty() {
+                        return results.first().unwrap().to_owned();
+                    }
+                }
+                JsValue::UNDEFINED
+            }
+        }
     }
 
     #[wasm_bindgen(js_name=getParent)]
