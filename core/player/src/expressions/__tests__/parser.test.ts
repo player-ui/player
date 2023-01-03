@@ -97,3 +97,17 @@ describe('expression parser', () => {
     ).toThrowError();
   });
 });
+
+describe('graceful parsing', () => {
+  it('returns and sets the error for invalid expression', () => {
+    const parsed = parseExpression('{{foo}} = {{bar}', {
+      strict: false,
+    });
+
+    expect(parsed).toBeTruthy();
+    expect(parsed.error).toBeTruthy();
+    expect(parsed.error?.message).toBe(
+      'Unclosed brace after "bar}" at character 16'
+    );
+  });
+});

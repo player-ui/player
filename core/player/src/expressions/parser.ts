@@ -195,7 +195,15 @@ function isModelRefStart(ch0: number, ch1: number) {
 }
 
 /** Parse out an expression from the string */
-export function parseExpression(expr: string): ExpressionNode {
+export function parseExpression(
+  expr: string,
+  options?: {
+    /** If true (the default), will throw on invalid expressions */
+    strict?: boolean;
+  }
+): ExpressionNode {
+  const strictMode = options?.strict ?? true;
+
   // `index` stores the character number we are currently at while `length` is a constant
   // All of the gobbles below will modify `index` as we move along
   const charAtFunc = expr.charAt;
@@ -899,37 +907,51 @@ export function parseExpression(expr: string): ExpressionNode {
 
   const nodes = [];
 
-  while (index < length) {
-    const chIndex = exprICode(index);
+  try {
+    while (index < length) {
+      const chIndex = exprICode(index);
 
-    // Expressions can be separated by semicolons, commas, or just inferred without any
-    // separators
-    if (chIndex === SEMCOL_CODE || chIndex === COMMA_CODE) {
-      index++; // ignore separators
-      continue;
+      // Expressions can be separated by semicolons, commas, or just inferred without any
+      // separators
+      if (chIndex === SEMCOL_CODE || chIndex === COMMA_CODE) {
+        index++; // ignore separators
+        continue;
+      }
+
+      const node = gobbleExpression();
+
+      // Try to gobble each expression individually
+      if (node) {
+        nodes.push(node);
+        // If we weren't able to find a binary expression and are out of room, then
+        // the expression passed in probably has too much
+      } else if (index < length) {
+        throwError(`Unexpected "${exprI(index)}"`, index);
+      }
     }
 
-    const node = gobbleExpression();
-
-    // Try to gobble each expression individually
-    if (node) {
-      nodes.push(node);
-      // If we weren't able to find a binary expression and are out of room, then
-      // the expression passed in probably has too much
-    } else if (index < length) {
-      throwError(`Unexpected "${exprI(index)}"`, index);
+    // If there's only one expression just try returning the expression
+    if (nodes.length === 1) {
+      return nodes[0];
     }
-  }
 
-  // If there's only one expression just try returning the expression
-  if (nodes.length === 1) {
-    return nodes[0];
-  }
+    return {
+      __id: ExpNodeOpaqueIdentifier,
+      type: 'Compound',
+      body: nodes,
+      location: getLocation(0),
+    };
+  } catch (e) {
+    if (strictMode || !(e instanceof Error)) {
+      throw e;
+    }
 
-  return {
-    __id: ExpNodeOpaqueIdentifier,
-    type: 'Compound',
-    body: nodes,
-    location: getLocation(0),
-  };
+    return {
+      __id: ExpNodeOpaqueIdentifier,
+      type: 'Compound',
+      body: nodes,
+      location: getLocation(0),
+      error: e,
+    };
+  }
 }
