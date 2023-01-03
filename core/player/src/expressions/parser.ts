@@ -195,7 +195,7 @@ function isModelRefStart(ch0: number, ch1: number) {
 }
 
 /** Parse out an expression from the string */
-export default function parseExpression(expr: string): ExpressionNode {
+export function parseExpression(expr: string): ExpressionNode {
   // `index` stores the character number we are currently at while `length` is a constant
   // All of the gobbles below will modify `index` as we move along
   const charAtFunc = expr.charAt;
