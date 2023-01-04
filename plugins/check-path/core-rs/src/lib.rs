@@ -138,7 +138,9 @@ impl CheckPathPlugin {
     }
 
     #[wasm_bindgen(js_name=getParent)]
-    pub fn get_parent(&self, id: &str) -> JsValue {
+    pub fn get_parent(&self, id: &str, query: JsValue) -> JsValue {
+        let query = Query::new(query);
+
         let parent = self
             .paths
             .borrow()
@@ -147,7 +149,13 @@ impl CheckPathPlugin {
             .flatten();
 
         match parent {
-            Some(parent) => parent.borrow().get_raw_node().clone(),
+            Some(parent) => {
+                return if query.equals(parent.borrow().get_raw_node()) {
+                    parent.borrow().get_raw_node().clone()
+                } else {
+                    JsValue::UNDEFINED
+                }
+            }
             None => JsValue::UNDEFINED,
         }
     }
@@ -184,8 +192,8 @@ impl CheckPathPlugin {
     }
 
     #[wasm_bindgen(js_name=hasParentContext)]
-    pub fn has_parent_context(&self) -> bool {
-        return false;
+    pub fn has_parent_context(&self, id: &str, query: JsValue) -> bool {
+        return !self.get_parent(id, query).is_undefined();
     }
 
     #[wasm_bindgen(js_name=getAsset)]
