@@ -1,4 +1,4 @@
-use js_sys::{Array, Function, Reflect};
+use js_sys::{Array, Function, Reflect, JSON};
 use std::cell::Ref;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
@@ -40,7 +40,7 @@ impl Query {
     }
 
     pub fn equals(&self, obj: Ref<JsValue>) -> bool {
-        let compare = |value: JsValue| {
+        let compare_obj_query = |value: JsValue| {
             let keys = Reflect::own_keys(&value).unwrap_or(Array::new());
             for key in keys.iter() {
                 if Reflect::has(&obj, &key).is_err() {
@@ -57,14 +57,25 @@ impl Query {
         match self {
             // When no query, every JsValue matches.
             Query::None => true,
-            Query::Text(_str) => todo!(),
+            Query::Text(str) => {
+                let keys = Reflect::own_keys(&obj).unwrap();
+                for key in keys.iter() {
+                    let found_value = Reflect::get(&obj, &key).unwrap();
+                    if found_value.is_string() && str.to_owned() == found_value.as_string().unwrap()
+                    {
+                        return true;
+                    }
+                }
+                false
+            }
             Query::Function(_fun) => todo!(),
             Query::List(list) => list
                 .iter()
-                .map(compare)
+                .map(compare_obj_query)
                 .collect::<Vec<bool>>()
                 .contains(&true),
-            Query::Object(value) => compare(value.to_owned()),
+            /* TODO: this cloning can be prevented by Rc<RefCell> */
+            Query::Object(value) => compare_obj_query(value.to_owned()),
             _ => false,
         }
     }
