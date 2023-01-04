@@ -109,6 +109,7 @@ impl CheckPathPlugin {
                         let raw_node = node.get_raw_node();
                         if query.equals(raw_node) {
                             let found_node_path = node.get_path();
+                            /* we need a list of items matching the query due to reasons. */
                             results.push(JsValue::from(
                                 base_path
                                     .iter()
@@ -123,7 +124,12 @@ impl CheckPathPlugin {
                         }
                     }
                     if !results.is_empty() {
-                        return results.first().unwrap().to_owned();
+                        return match query {
+                            /* when Query is an array, the last match is the one we want */
+                            Query::List(_) => results.last().unwrap().to_owned(),
+                            /* when Query is NOT an array, the first match is the one we want */
+                            _ => results.first().unwrap().to_owned(),
+                        };
                     }
                 }
                 JsValue::UNDEFINED
