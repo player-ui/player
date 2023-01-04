@@ -120,6 +120,7 @@ def javascript_pipeline(
         test_data = include_if_unique(TEST_DATA + test_data, DATA + data),
         build_data = include_if_unique(BUILD_DATA + build_data, DATA + data),
         lint_data = include_if_unique(LINT_DATA + lint_data, DATA + data + TEST_DATA + test_data),
+        js_library_data = ["%s_Bundles" % library_name] if library_name else [],
         out_dir = out_dir,
         create_package_json_opts = {
             "base_package_json": "//tools:pkg_json_template",
