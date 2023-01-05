@@ -43,20 +43,4 @@ if [ "$RELEASE_TYPE" == "release" ]; then
   STABLE_DOCS_BASE_PATH=$SEMVER_MAJOR bazel run --config=release //docs:deploy_docs -- --dest_dir "v$SEMVER_MAJOR"
 fi
 
-if [ "$RELEASE_TYPE" == "snapshot" ]; then
-  # Need to add snapshot identifier for snapshot releases
-  cp VERSION VERSION.bak
-  echo -n -SNAPSHOT >> VERSION
-fi
-
-readonly DEPLOY_LABELS=`bazel query --output=label "kind('deploy_maven rule', //...)"`
-# publish one package at a time to make it easier to spot any errors or warnings
-for pkg in $DEPLOY_LABELS ; do
-  bazel run $pkg -- "$RELEASE_TYPE"
-done
-
-# Cleanup
-if [ -f VERSION.bak ]; then
-  rm VERSION
-  mv VERSION.bak VERSION
-fi
+bazel run @rules_player//distribution:staged-maven-deploy -- "$RELEASE_TYPE" --package-group=com.intuit.player --legacy
