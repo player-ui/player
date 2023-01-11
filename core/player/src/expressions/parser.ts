@@ -797,6 +797,10 @@ export function parseExpression(
       args.push(node);
     }
 
+    if (charIndex !== termination) {
+      throwError(`Expected ${String.fromCharCode(termination)}`, index);
+    }
+
     return args;
   }
 

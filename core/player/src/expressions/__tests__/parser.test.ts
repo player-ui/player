@@ -70,6 +70,7 @@ test('the bad stuff', () => {
   expect(() => parseExpression('foo["bar')).toThrowError();
   expect(() => parseExpression('foo]')).toThrowError();
   expect(() => parseExpression('foo = (bar')).toThrowError();
+  expect(() => parseExpression('foo(')).toThrowError();
 });
 describe('expression parser', () => {
   test('objects- in parser', () => {
