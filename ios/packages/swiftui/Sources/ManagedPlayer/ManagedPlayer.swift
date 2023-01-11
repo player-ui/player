@@ -128,11 +128,6 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
 
     private var handleScroll: Bool
 
-    // Whether or not its a the start of a new flow
-    // once the animation has been shown we need to remove it
-    // otherwise you get flickering double transitions between views in a flow
-    @State private var newFlow = true
-
     /**
      Creates a `ManagedPlayer`
      - parameters:
@@ -192,8 +187,7 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
             flow: flow,
             plugins: plugins + [viewModel] + (handleScroll ? [ScrollPlugin()] : []),
             result: $viewModel.result,
-            context: context,
-            unloadOnDisappear: false
+            context: context
         )
     }
 }
@@ -211,7 +205,11 @@ public extension SwiftUIPlayer.Context {
 }
 
 private extension JSContext {
-    static let sharedManaged: JSContext! = JSContext()
+    static var sharedManaged: JSContext! { JSContext(virtualMachine: .playerShared) }
+}
+
+private extension JSVirtualMachine {
+    static let playerShared: JSVirtualMachine = .init()
 }
 
 internal struct ManagedPlayer13<Loading: View, Fallback: View>: View {
@@ -224,11 +222,6 @@ internal struct ManagedPlayer13<Loading: View, Fallback: View>: View {
     private var fallback: (ManagedPlayerErrorContext) -> Fallback
 
     private var handleScroll: Bool
-
-    // Whether or not its a the start of a new flow
-    // once the animation has been shown we need to remove it
-    // otherwise you get flickering double transitions between views in a flow
-    @State private var newFlow = true
 
     // For ViewInspector testing
     internal let inspection = Inspection<Self>()
@@ -293,8 +286,7 @@ internal struct ManagedPlayer13<Loading: View, Fallback: View>: View {
             flow: flow,
             plugins: plugins + [viewModel] + (handleScroll ? [ScrollPlugin()] : []),
             result: $viewModel.result,
-            context: context,
-            unloadOnDisappear: false
+            context: context
         )
     }
 }
