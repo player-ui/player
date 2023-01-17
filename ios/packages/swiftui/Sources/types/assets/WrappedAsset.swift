@@ -18,9 +18,9 @@
 
  This wrapper decodes either to provide a consistent access mechanism
  */
-public typealias WrappedAsset = GenericWrappedAsset<MetaData>
+public typealias WrappedAsset = GenericWrappedAsset<DefaultAdditionalData>
 
-public struct GenericWrappedAsset<MetaData>: Decodable, AssetContainer where MetaData: Decodable&Equatable {
+public struct GenericWrappedAsset<AdditionalData>: Decodable, AssetContainer where AdditionalData: Decodable&Equatable {
     /// The keys used to decode the wrapper
     public enum CodingKeys: String, CodingKey {
         /// Key to decode asset in a wrapper
@@ -33,7 +33,7 @@ public struct GenericWrappedAsset<MetaData>: Decodable, AssetContainer where Met
     public var asset: SwiftUIAsset?
 
     /// MetaData that is associated with the adjacent asset
-    public var metaData: MetaData?
+    public var additionalData: AdditionalData?
 
     /**
      Constructs an AssetWrapper, this is used as a fallback when decoding fails
@@ -54,16 +54,21 @@ public struct GenericWrappedAsset<MetaData>: Decodable, AssetContainer where Met
      */
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.asset = try container.decode(RegistryDecodeShim<SwiftUIAsset>.self, forKey: .asset).asset
-        self.metaData = try container.decodeIfPresent(MetaData.self, forKey: .metaData)
+        self.asset = try container.decodeIfPresent(RegistryDecodeShim<SwiftUIAsset>.self, forKey: .asset)?.asset
+        self.additionalData = try decoder.singleValueContainer().decode(AdditionalData.self)
     }
+}
+
+extension GenericWrappedAsset where AdditionalData == DefaultAdditionalData {
+    /// MetaData associated with the sibling key `asset`
+    public var metaData: MetaData? { additionalData?.metaData }
 }
 
 // MARK: - Equatable conformance
 
 extension GenericWrappedAsset: Equatable where MetaData: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        let isMetaDataSame   = lhs.metaData == rhs.metaData
+        let isMetaDataSame   = lhs.additionalData == rhs.additionalData
         let areBothAssetsNil = lhs.asset == nil && rhs.asset == nil
         var areAssetsEqual: Bool { (lhs.asset?.valueData).flatMap { rhs.asset?.valueData.isEqual($0) } ?? false }
         return isMetaDataSame && (areBothAssetsNil || areAssetsEqual)

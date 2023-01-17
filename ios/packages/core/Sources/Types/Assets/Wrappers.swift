@@ -84,6 +84,11 @@ extension AssetData where Self: Equatable {
     }
 }
 
+public struct DefaultAdditionalData: Decodable, Equatable {
+    /// MetaData associated with the asset in this wrapper
+    public var metaData: MetaData?
+}
+
 /**
  MetaData associated with an asset
  */
