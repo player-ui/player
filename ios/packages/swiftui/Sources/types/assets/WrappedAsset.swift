@@ -25,14 +25,12 @@ public struct GenericWrappedAsset<AdditionalData>: Decodable, AssetContainer whe
     public enum CodingKeys: String, CodingKey {
         /// Key to decode asset in a wrapper
         case asset
-        /// Key to decode metadata in a wrapper
-        case metaData
     }
 
     /// The underlying asset if it decoded
     public var asset: SwiftUIAsset?
 
-    /// MetaData that is associated with the adjacent asset
+    /// Additional data that is associated with the adjacent asset
     public var additionalData: AdditionalData?
 
     /**
@@ -66,7 +64,7 @@ extension GenericWrappedAsset where AdditionalData == DefaultAdditionalData {
 
 // MARK: - Equatable conformance
 
-extension GenericWrappedAsset: Equatable where MetaData: Equatable {
+extension GenericWrappedAsset: Equatable where AdditionalData: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
         let isMetaDataSame   = lhs.additionalData == rhs.additionalData
         let areBothAssetsNil = lhs.asset == nil && rhs.asset == nil
