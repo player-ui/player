@@ -3,6 +3,7 @@ import { Container } from '@chakra-ui/react';
 import { useReactPlayer } from '@player-ui/react';
 import { ReferenceAssetsPlugin } from '@player-ui/reference-assets-plugin-react';
 import { CommonTypesPlugin } from '@player-ui/common-types-plugin';
+import { DevtoolsWebPlugin } from '@player-ui/devtools-plugin-react';
 
 export const Player = (props: { mock: any; plugins: any[] }) => {
   const { mock, plugins } = props;
@@ -11,6 +12,7 @@ export const Player = (props: { mock: any; plugins: any[] }) => {
       ...(plugins ?? []),
       new ReferenceAssetsPlugin(),
       new CommonTypesPlugin(),
+      new DevtoolsWebPlugin(props.mock.id),
     ],
   });
 

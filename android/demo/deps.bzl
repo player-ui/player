@@ -5,10 +5,10 @@ maven_main = [
     "androidx.navigation:navigation-runtime:%s" % versions.androidx.navigation,
     "androidx.navigation:navigation-ui-ktx:%s" % versions.androidx.navigation,
     "androidx.navigation:navigation-fragment-ktx:%s" % versions.androidx.navigation,
-
     "com.afollestad.material-dialogs:core:%s" % versions.material_dialogs,
     "com.google.android.material:material:%s" % versions.material,
     #"com.squareup.leakcanary:leakcanary-android:2.2",
+    "com.facebook.flipper:flipper:%s" % versions.flipper,
 ]
 
 maven_test = [
@@ -25,6 +25,7 @@ main_deps = parse_coordinates(maven_main) + [
     "//plugins/common-types/jvm:common-types",
     "//plugins/pending-transaction/jvm:pending-transaction",
     "//plugins/reference-assets/mocks:jar",
+    "//plugins/devtools/android:devtools-android",
 ]
 
 test_deps = parse_coordinates(maven_test) + [

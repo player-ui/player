@@ -71,6 +71,13 @@ android_binary(
     deps = ["demo_ui_test"],
 )
 
+sh_binary(
+    name = "install",
+    srcs = ["scripts/androidinstall.sh"],
+    data = [":demo"],
+    deps = [],
+)
+
 sh_test(
     name = "android_instrumentation_test",
     size = "large",

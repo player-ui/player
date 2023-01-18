@@ -12,6 +12,8 @@ import androidx.lifecycle.observe
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.*
+import com.facebook.flipper.android.AndroidFlipperClient
+import com.facebook.soloader.SoLoader
 import com.google.android.material.navigation.NavigationView
 import com.intuit.player.android.reference.demo.R
 import com.intuit.player.android.reference.demo.model.AssetMock
@@ -20,6 +22,7 @@ import com.intuit.player.android.ui.PlayerFragment
 import com.intuit.player.jvm.utils.mocks.ClassLoaderMock
 import com.intuit.player.jvm.utils.mocks.Mock
 import com.intuit.player.jvm.utils.mocks.getFlow
+import com.intuit.player.plugins.devtools.DevtoolsFlipperPlugin
 
 class MainActivity : AppCompatActivity() {
 
@@ -38,6 +41,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        SoLoader.init(application, false)
+        val flipperClient = AndroidFlipperClient.getInstance(application)
+        flipperClient.addPlugin(DevtoolsFlipperPlugin())
+        flipperClient.start()
 
         setContentView(R.layout.activity_main)
 
