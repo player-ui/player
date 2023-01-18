@@ -59,6 +59,7 @@ assemble_pod(
         # Plugins
         "//plugins/beacon/core:BeaconPlugin_Bundles_bundle_prod": "ios/plugins/BaseBeaconPlugin/Resources/",
         "//plugins/check-path/core:CheckPathPlugin_Bundles_bundle_prod": "ios/plugins/CheckPathPlugin/Resources/",
+        "//plugins/devtools/core:DevtoolsPlugin_Bundles_bundle_prod": "ios/plugins/DevtoolsPlugin/Resources",
         "//plugins/common-types/core:CommonTypesPlugin_Bundles_bundle_prod": "ios/plugins/CommonTypesPlugin/Resources/",
         "//plugins/common-expressions/core:CommonExpressionsPlugin_Bundles_bundle_prod": "ios/plugins/CommonExpressionsPlugin/Resources/",
         "//plugins/expression/core:ExpressionPlugin_Bundles_bundle_prod": "ios/plugins/ExpressionPlugin/Resources/",

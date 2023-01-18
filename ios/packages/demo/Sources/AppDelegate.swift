@@ -10,6 +10,7 @@ import UIKit
 import PlayerUI
 import SwiftUI
 import Combine
+import FlipperKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -34,7 +35,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         PubSubPlugin([]),
         TypesProviderPlugin(types: [], validators: [], formats: []),
         TransitionPlugin(popTransition: .pop),
-        BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) }
+        BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) },
+        DevtoolsPlugin("Storybook Flow")
     ]
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -63,6 +65,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         self.window?.rootViewController = root
         self.window?.makeKeyAndVisible()
+        
+        let client = FlipperClient.shared()
+        client!.add(DevtoolsFlipperPlugin.sharedInstance)
+        client!.start()
+        
         return true
     }
 
@@ -115,7 +122,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             UIHostingController(
                 rootView: AssetFlowView(
                     flow: flow,
-                    plugins: plugins,
+                    plugins: plugins + [DevtoolsPlugin("Storybook Flow")],
                     completion: self.completion(result:)
                 ).navigationBarTitle(Text("Storybook Flow"))
             ),

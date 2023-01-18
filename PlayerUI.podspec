@@ -40,6 +40,7 @@ and display it as a SwiftUI view comprised of registered assets.
 
     demo.dependency 'PlayerUI/SwiftUI'
     demo.dependency 'PlayerUI/BeaconPlugin'
+    demo.dependency 'PlayerUI/DevtoolsPlugin'
     demo.dependency 'PlayerUI/ReferenceAssets'
     demo.dependency 'PlayerUI/MetricsPlugin'
     demo.dependency 'PlayerUI/TransitionPlugin'
@@ -275,6 +276,15 @@ and display it as a SwiftUI view comprised of registered assets.
     plugin.source_files = 'ios/plugins/CommonExpressionsPlugin/Sources/**/*'
     plugin.resource_bundles = {
       'CommonExpressionsPlugin' => ['ios/plugins/CommonExpressionsPlugin/Resources/**/*.js']
+    }
+  end
+
+  s.subspec 'DevtoolsPlugin' do |plugin|
+    plugin.dependency 'PlayerUI/Core'
+    plugin.dependency 'FlipperKit'
+    plugin.source_files = 'ios/plugins/DevtoolsPlugin/Sources/**/*'
+    plugin.resource_bundles = {
+      'DevtoolsPlugin' => ['ios/plugins/DevtoolsPlugin/Resources/**/*.js']
     }
   end
 

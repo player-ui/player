@@ -25,7 +25,7 @@ export class DevtoolsWebPlugin implements ReactPlayerPlugin {
     window.addEventListener('message', (event: MessageEvent<any>) => {
       const { data } = event;
       if (Methods.isMethod(data) && !data.result) {
-        const result = this.coreDevtoolsPlugin.callbacks[data.type](data.params)
+        const result = this.coreDevtoolsPlugin.callbacks[data.type](data.params as any)
         event.source?.postMessage({
           ...data,
           result,

@@ -21,6 +21,7 @@ target 'PlayerUI_Example' do
   pod 'PlayerUI/CheckPathPlugin', :path => '../'
   pod 'PlayerUI/CommonTypesPlugin', :path => '../'
   pod 'PlayerUI/CommonExpressionsPlugin', :path => '../'
+  pod 'PlayerUI/DevtoolsPlugin', :path => '../'
   pod 'PlayerUI/ExpressionPlugin', :path => '../'
   pod 'PlayerUI/ExternalActionPlugin', :path => '../'
   pod 'PlayerUI/ExternalActionViewModifierPlugin', :path => '../'
@@ -29,6 +30,22 @@ target 'PlayerUI_Example' do
   pod 'PlayerUI/PubSubPlugin', :path => '../'
   pod 'PlayerUI/TransitionPlugin', :path => '../'
   pod 'PlayerUI/TypesProviderPlugin', :path => '../'
+
+  $static_framework = ['FlipperKit', 'Flipper', 'Flipper-Folly',
+    'CocoaAsyncSocket', 'ComponentKit', 'Flipper-DoubleConversion',
+    'Flipper-Glog', 'Flipper-PeerTalk', 'Flipper-RSocket', 'Yoga', 'YogaKit',
+    'CocoaLibEvent', 'OpenSSL-Universal', 'boost-for-react-native', 'Flipper-Fmt']
+
+  pre_install do |installer|
+    Pod::Installer::Xcode::TargetValidator.send(:define_method, :verify_no_static_framework_transitive_dependencies) {}
+    installer.pod_targets.each do |pod|
+      if $static_framework.include?(pod.name)
+        def pod.build_type;
+          Pod::BuildType.static_library
+        end
+      end
+    end
+  end
   
   target 'PlayerUI_Tests' do
     inherit! :search_paths

@@ -67,6 +67,14 @@ def PlayerUI(
             "ios/packages/core/Sources/**/*.c",
             "ios/packages/core/Sources/**/*.cc",
             "ios/packages/core/Sources/**/*.cpp",
+            "ios/plugins/DevtoolsPlugin/Sources/**/*.h",
+            "ios/plugins/DevtoolsPlugin/Sources/**/*.hh",
+            "ios/plugins/DevtoolsPlugin/Sources/**/*.m",
+            "ios/plugins/DevtoolsPlugin/Sources/**/*.mm",
+            "ios/plugins/DevtoolsPlugin/Sources/**/*.swift",
+            "ios/plugins/DevtoolsPlugin/Sources/**/*.c",
+            "ios/plugins/DevtoolsPlugin/Sources/**/*.cc",
+            "ios/plugins/DevtoolsPlugin/Sources/**/*.cpp",
             "ios/plugins/ExpressionPlugin/Sources/**/*.h",
             "ios/plugins/ExpressionPlugin/Sources/**/*.hh",
             "ios/plugins/ExpressionPlugin/Sources/**/*.m",
@@ -203,6 +211,10 @@ def PlayerUI(
                 ["ios/packages/core/Resources/**/*.js"],
                 exclude_directories = 0,
             ),
+            "DevtoolsPlugin": glob(
+                ["ios/plugins/DevtoolsPlugin/Resources/**/*.js"],
+                exclude_directories = 0,
+            ),
             "ExpressionPlugin": glob(
                 ["ios/plugins/ExpressionPlugin/Resources/**/*.js"],
                 exclude_directories = 0,
@@ -237,7 +249,10 @@ def PlayerUI(
             ),
         },
         weak_sdk_frameworks = ["XCTest"],
-        deps = ["@Pods//SwiftHooks"] + deps,
+        deps = [
+            "@Pods//FlipperKit",
+            "@Pods//SwiftHooks",
+        ] + deps,
         visibility = ["//visibility:public"],
         platforms = {"ios": "13.0"},
     )
