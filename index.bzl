@@ -108,6 +108,13 @@ def javascript_pipeline(
     # generate an entry in the package.json to point to the bundle file
     additional_properties = ("{\"bundle\": \"./dist/%s.prod.js\"}" % name.split('/')[1]) if library_name else None
 
+    js_library_data = []
+
+    if(library_name):
+        js_library_data.append("%s_Bundles" % library_name)
+    if(xlr_mode):
+        js_library_data.append(":%s_XLR" % name)
+
     js_library_pipeline(
         name = name,
         srcs = srcs,
@@ -121,13 +128,12 @@ def javascript_pipeline(
         test_data = include_if_unique(TEST_DATA + test_data, DATA + data),
         build_data = include_if_unique(BUILD_DATA + build_data, DATA + data),
         lint_data = include_if_unique(LINT_DATA + lint_data, DATA + data + TEST_DATA + test_data),
-        js_library_data = ["%s_Bundles" % library_name] if library_name else [],
+        js_library_data = js_library_data,
         out_dir = out_dir,
         create_package_json_opts = {
             "base_package_json": "//tools:pkg_json_template",
             "additional_properties": additional_properties
         },
-        js_library_data = [] if not xlr_mode else [":%s_XLR" % name],
     )
 
     if (library_name):
