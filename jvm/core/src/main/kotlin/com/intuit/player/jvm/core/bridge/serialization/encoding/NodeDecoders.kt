@@ -20,6 +20,12 @@ public interface NodeDecoder : Decoder, FunctionDecoder {
 
     /** Fallback method to allow the decoder to decode the current value into whatever type of structure it can */
     public fun decodeValue(): Any?
+
+    public val context: Map<Key<*>, Value<*>> get() = emptyMap()
+
+    class Key<Type>
+
+    class Value<Type>(val value: Type)
 }
 
 public fun Decoder.requireNodeDecoder(): NodeDecoder = this as? NodeDecoder

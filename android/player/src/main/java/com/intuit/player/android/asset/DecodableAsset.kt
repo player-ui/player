@@ -12,7 +12,7 @@ public abstract class DecodableAsset<Data>(assetContext: AssetContext, private v
     /** Instance of [Data] is passed to [hydrate] */
     public val data: Data by lazy {
         try {
-            asset.deserialize(serializer)
+            asset.deserialize(serializer, mapOf(Player.Current to player, RenderableAsset.ParentContext to requireContext()))
         } catch (exception: SerializationException) {
             assetContext.player.logger.error("Could not deserialize data for $asset", exception)
             throw PlayerException("Could not deserialize data for $asset", exception)

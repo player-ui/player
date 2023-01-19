@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.View
 import androidx.annotation.StyleRes
 import com.intuit.player.android.*
-import com.intuit.player.android.DEPRECATED_WITH_DECODABLEASSET
 import com.intuit.player.android.extensions.Style
 import com.intuit.player.android.extensions.Styles
 import com.intuit.player.android.extensions.removeSelf
@@ -12,6 +11,7 @@ import com.intuit.player.jvm.core.asset.Asset
 import com.intuit.player.jvm.core.asset.AssetWrapper
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
+import com.intuit.player.jvm.core.bridge.serialization.encoding.NodeDecoder
 import com.intuit.player.jvm.core.bridge.serialization.encoding.requireNodeDecoder
 import com.intuit.player.jvm.core.player.Player
 import com.intuit.player.jvm.core.player.PlayerException
@@ -29,6 +29,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlin.coroutines.CoroutineContext
 import kotlin.reflect.KClass
 
 /**
@@ -54,7 +55,7 @@ public abstract class RenderableAsset
     ReplaceWith("DecodableAsset(assetContext, serializer)"),
     DeprecationLevel.ERROR,
 )
-public constructor(public val assetContext: AssetContext) : NodeWrapper {
+public constructor(public val assetContext: AssetContext) : NodeWrapper, CoroutineContext.Element {
 
     /**
      * Helper to get the current cached [AssetContext] and [View].
@@ -252,9 +253,14 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
 
     private companion object {
         private val cachedAssetViewNotFound: Pair<AssetContext?, View?> = null to null
+        private val ANDROID_CONTEXT = NodeDecoder.Key<Context>()
     }
 
-    public class Serializer(private val player: AndroidPlayer) : KSerializer<RenderableAsset?> {
+    public class Serializer(private val player: AndroidPlayer, private val parent: RenderableAsset? = null) : KSerializer<RenderableAsset?> {
+
+        private val parentContext: Context? by lazy {
+            parent?.context
+        }
 
         override val descriptor: SerialDescriptor = buildClassSerialDescriptor("com.intuit.player.android.asset.RenderableAsset")
 
@@ -264,6 +270,13 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
             .let(::AssetWrapper)
             .asset
             .let(player::expandAsset)
+            ?.let { child ->
+                decoder.requireNodeDecoder().context[Parent]?.value
+                    // TODO: This should be automatically guaranteed
+                    ?.let { it as? Context }
+                    ?.let(child.assetContext::withContext)?.build() ?: child
+            }
+            ?.let { child -> parentContext?.let(child.assetContext::withContext)?.build() ?: child }
 
         /** Serialization of [RenderableAsset]s are not supported */
         override fun serialize(encoder: Encoder, value: RenderableAsset?): Nothing =
@@ -281,4 +294,6 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
 
     // Seemingly needed to prevent stack overflow: https://github.com/Kotlin/kotlinx.serialization/issues/1776
     internal object ContextualSerializer : KSerializer<RenderableAsset> by ContextualSerializer(RenderableAsset::class)
+
+    internal object Parent : CoroutineContext.Key<RenderableAsset>
 }
