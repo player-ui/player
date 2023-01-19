@@ -6,10 +6,17 @@ const { execSync } = require('child_process');
 class AfterShipItPodPush {
   name = 'after-shipit-pod-push';
 
+  wasCanary = false;
+
   apply(auto) {
+    auto.hooks.canary.tap(this.name, () => {
+      this.wasCanary = true
+    })
     auto.hooks.afterShipIt.tapPromise(this.name, async ({ dryRun, newVersion }) => {
       if (dryRun) {
-        auto.logger.log.info(`Dry run: would have pushed pod to trunk`);
+        auto.logger.log.info('Dry run: would have pushed pod to trunk');
+      } else if (this.wasCanary) {
+        auto.logger.log.info('[AfterShipItPodPush]: Canary not yet supported, skipping pod push.')
       } else {
         let found = false
         let attempt = 0
