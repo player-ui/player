@@ -9,8 +9,8 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 
 // TODO: Currently, this works as a "singleton" proxy for connecting flipper events to specific player plugins.
-//  In the future, it'd be nice to have _each_ player plugin register it's own flipper plugin, such that the
-//  flipper client automatically organizes _each_ player instance as it's own connection
+//  In the future, it'd be nice to have _each_ player plugin register its own flipper plugin, such that the
+//  flipper client automatically organizes _each_ player instance as its own connection
 public class DevtoolsFlipperPlugin : FlipperPlugin {
 
     // TODO: Generate this or pull it from TS?
@@ -26,42 +26,47 @@ public class DevtoolsFlipperPlugin : FlipperPlugin {
 
     override fun runInBackground(): Boolean = false
 
-    private val json = Json { ignoreUnknownKeys = true }
-
-    public var supportedMethods: Set<String> = setOf()
-
     private var activePlayers: MutableMap<String, AndroidDevtoolsPlugin> = mutableMapOf()
 
-    public fun addPlayer(plugin: AndroidDevtoolsPlugin) {
-        supportedMethods += plugin.supportedMethods
-        activePlayers[plugin.playerID] = plugin
+    private var connection: FlipperConnection? = null; set(value) {
+        field = value?.apply {
+            // on new connection, we have to reconfigure listener events
+            configureMethodListeners()
+        }
     }
 
-    public fun removePlayer(plugin: AndroidDevtoolsPlugin) {
+    /** Register method handlers for incoming Flipper method requests corresponding to a specific [AndroidDevtoolsPlugin.playerID] */
+    public fun register(plugin: AndroidDevtoolsPlugin) {
+        activePlayers[plugin.playerID] = plugin
+
+        // on new player, we have to reconfigure listener events
+        // to ensure we're listening for all the supported methods
+        connection?.configureMethodListeners()
+    }
+
+    /** Remove method handlers for specific [AndroidDevtoolsPlugin.playerID] */
+    public fun remove(plugin: AndroidDevtoolsPlugin) {
         activePlayers.remove(plugin.playerID)
     }
 
-    private var connection: FlipperConnection? = null
-        set(value) {
-            value?.let { connection ->
-                // on each connection, we have to reconfigure listener events
-                supportedMethods.forEach { type ->
-                    connection.receive(type) { params, response ->
-                        activePlayers[params.getString("playerID")]
-                            ?.onMethod(type, params.asJsonObject)
-                            ?.asFlipperObject
-                            ?.let(response::success) ?: response.success() // TODO: Should we error back?
-                    }
-                }
-            }
-
-            field = value
-        }
-
+    /** Publish [message] to the current Flipper [connection] */
     internal fun publishAndroidMessage(message: JsonObject) {
         message.asFlipperObject.let {
             connection?.send(it.getString("type"), it)
         }
+    }
+
+    private fun FlipperConnection.configureMethodListeners() {
+        activePlayers.values.flatMap(AndroidDevtoolsPlugin::supportedMethods)
+            .toSet()
+            .forEach { type ->
+                receive(type) { params, response ->
+                    activePlayers[params.getString("playerID")]
+                        ?.onMethod(type, params.asJsonObject)
+                        ?.asFlipperObject
+                        ?.let(response::success) ?: response.success() // TODO: Should we error back?
+                }
+            }
     }
 
     private val JsonObject.asFlipperObject: FlipperObject get() = let(Json::encodeToString)
@@ -70,4 +75,8 @@ public class DevtoolsFlipperPlugin : FlipperPlugin {
     private val FlipperObject.asJsonObject: JsonObject get() = toJsonString()
         .let(json::parseToJsonElement)
         .jsonObject
+
+    private companion object {
+        private val json = Json { ignoreUnknownKeys = true }
+    }
 }

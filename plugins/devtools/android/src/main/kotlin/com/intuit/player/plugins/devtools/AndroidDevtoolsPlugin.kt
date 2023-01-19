@@ -9,6 +9,10 @@ import com.intuit.player.jvm.core.plugins.PlayerPluginException
 
 private var count = 0
 
+/**
+ * [AndroidPlayerPlugin] responsible for proxying Player events and registering to receive Flipper method requests.
+ * Configuration with this plugin requires the [AndroidFlipperClient] to be initialized by the containing app.
+ */
 public class AndroidDevtoolsPlugin private constructor(public var playerID: String, private val devtoolsPlugin: DevtoolsPlugin) : AndroidPlayerPlugin, JSPluginWrapper by devtoolsPlugin, DevtoolsMethodHandler by devtoolsPlugin {
 
     private val flipperPlugin = (AndroidFlipperClient
@@ -18,21 +22,16 @@ public class AndroidDevtoolsPlugin private constructor(public var playerID: Stri
     public constructor(playerID: String = "player-${count++}") : this(playerID, DevtoolsPlugin(playerID))
 
     init {
-        // TODO: Evaluate if this would work? Does this work for multiple Players? I think so
-//        AndroidFlipperClient.getInstanceIfInitialized()?.addPlugin(this)
-
-        devtoolsPlugin.onEvent = DevtoolsEventPublisher {
-            flipperPlugin.publishAndroidMessage(it)
-        }
+        devtoolsPlugin.onEvent = DevtoolsEventPublisher(flipperPlugin::publishAndroidMessage)
     }
 
     override fun apply(androidPlayer: AndroidPlayer) {
-        flipperPlugin.addPlayer(this)
+        flipperPlugin.register(this)
 
         androidPlayer.hooks.state.tap { state ->
             // TODO: Should probably be on ReleasedState?
             if (state is CompletedState) {
-                flipperPlugin.removePlayer(this)
+                flipperPlugin.remove(this)
             }
         }
     }

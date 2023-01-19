@@ -19,6 +19,7 @@ public fun interface DevtoolsEventPublisher {
 }
 
 public interface DevtoolsMethodHandler {
+    /** Methods types that the handler can explicitly handle */
     public val supportedMethods: Set<String>
     public fun onMethod(type: String, params: JsonObject): JsonObject
 }
@@ -32,9 +33,7 @@ public class DevtoolsPlugin(public val playerID: String, public var onEvent: Dev
         instance.getSerializable("callbacks") ?: throw PlayerPluginException("callbacks not defined on instance")
     }
 
-    // TODO: Listen for JVM/Android specific events
-    override fun onMethod(type: String, params: JsonObject): JsonObject = (callbacks[type]
-        ?: throw PlayerPluginException("method handler for ${type} not found"))
+    override fun onMethod(type: String, params: JsonObject): JsonObject = (callbacks[type] ?: throw PlayerPluginException("method handler for $type not found"))
         .invoke(params)
         .toJson()
         .jsonObject
@@ -50,11 +49,7 @@ public class DevtoolsPlugin(public val playerID: String, public var onEvent: Dev
         runtime.execute("class WeakRef { value = null; constructor(value) { this.value = value }; deref() { return this.value } }")
         runtime.add(
             "performance",
-            mapOf(
-                "now" to {
-                    System.currentTimeMillis()
-                }
-            )
+            mapOf("now" to System::currentTimeMillis)
         )
 
         runtime.execute(script)
