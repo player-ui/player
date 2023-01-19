@@ -160,7 +160,7 @@ jobs:
       - run: bazel sync
 
       - run: |
-          BUNDLE_TARGETS=$(bazel query "attr(name, '_Bundles', //...)" --output label 2>/dev/null | tr '\n' ' ')
+          BUNDLE_TARGETS=$(bazel query "attr(name, '^.*_Bundles$', //...)" --output label 2>/dev/null | tr '\n' ' ')
           bazel build --config=ci $BUNDLE_TARGETS
 
       - run: bazel shutdown
