@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import com.intuit.hooks.HookContext
 import com.intuit.hooks.SyncWaterfallHook
+import com.intuit.player.android.AndroidPlayer.Companion.injectDefaultPlugins
 import com.intuit.player.android.asset.RenderableAsset
 import com.intuit.player.android.extensions.Styles
 import com.intuit.player.android.extensions.overlayStyles
@@ -13,6 +14,7 @@ import com.intuit.player.android.registry.RegistryPlugin
 import com.intuit.player.jvm.core.asset.Asset
 import com.intuit.player.jvm.core.bridge.Completable
 import com.intuit.player.jvm.core.bridge.format
+import com.intuit.player.jvm.core.bridge.serialization.encoding.DecoderContext
 import com.intuit.player.jvm.core.bridge.serialization.format.registerContextualSerializer
 import com.intuit.player.jvm.core.logger.TapableLogger
 import com.intuit.player.jvm.core.player.*
@@ -26,7 +28,7 @@ import com.intuit.player.plugins.coroutines.FlowScopePlugin
 import com.intuit.player.plugins.pubsub.PubSubPlugin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
-import kotlinx.serialization.modules.plus
+import kotlin.coroutines.CoroutineContext
 import kotlin.reflect.KClass
 
 /**
@@ -96,8 +98,6 @@ public class AndroidPlayer private constructor(
 
     override fun start(flow: String): Completable<CompletedState> = player.start(flow)
 
-    private val assetSerializer = RenderableAsset.Serializer(this)
-
     /** [Registry] of [RenderableAsset] builders */
     private val assetRegistry: RegistryPlugin<(AssetContext) -> RenderableAsset> = findPlugin()!!
 
@@ -116,12 +116,12 @@ public class AndroidPlayer private constructor(
     public fun <T : RenderableAsset> registerAsset(klass: KClass<T>, props: Map<String, Any>, factory: (AssetContext) -> RenderableAsset) {
         assetRegistry.register(props, factory)
         if (player.format.serializersModule.getContextual(klass) == null)
-            player.format.registerContextualSerializer(klass, assetSerializer.conform(klass))
+            player.format.registerContextualSerializer(klass, RenderableAsset.Serializer().conform(klass))
     }
 
     /** Apply [AndroidPlayerPlugin]s last */
     init {
-        player.format.registerContextualSerializer(assetSerializer.conform())
+//        player.format.registerContextualSerializer(assetSerializer.conform())
 
         plugins
             .filterIsInstance<AndroidPlayerPlugin>()
@@ -238,7 +238,10 @@ public class AndroidPlayer private constructor(
             get() = try { field } finally { field = default }
     }
 
-    private companion object {
+    public companion object : DecoderContext.Key<Current> {
+        /** Utility method for automatically creating a [Current] [DecoderContext] to combine with another [context] */
+        public operator fun <Context : CoroutineContext> AndroidPlayer.plus(context: Context): DecoderContext = Current(this) + context
+
         private val defaultLogger = AndroidLogger("AndroidPlayer")
 
         private fun buildDefaultPlugins() = listOf(
@@ -255,5 +258,9 @@ public class AndroidPlayer private constructor(
                 if (plugins.filterIsInstance(defaultPluginClass).isEmpty()) plugins + defaultPlugin
                 else plugins
             }
+    }
+
+    public class Current(public val player: AndroidPlayer) : DecoderContext.Element {
+        override val key: DecoderContext.Key<Current> = AndroidPlayer
     }
 }

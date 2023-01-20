@@ -1,6 +1,8 @@
 package com.intuit.player.jvm.core.bridge.serialization.format
 
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
+import com.intuit.player.jvm.core.bridge.serialization.encoding.DecoderContext
+import com.intuit.player.jvm.core.bridge.serialization.encoding.EmptyDecoderContext
 import com.intuit.player.jvm.core.bridge.serialization.json.PrettyJson
 import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.player.jvm.core.bridge.serialization.serializers.KCallableSerializer
@@ -20,7 +22,11 @@ public interface RuntimeFormat<Value> : SerialFormat {
 
     public fun <T> encodeToRuntimeValue(serializer: SerializationStrategy<T>, value: T): Value
 
-    public fun <T> decodeFromRuntimeValue(deserializer: DeserializationStrategy<T>, element: Value): T
+    public fun <T> decodeFromRuntimeValue(
+        deserializer: DeserializationStrategy<T>,
+        element: Value,
+        context: DecoderContext,
+    ): T
 
     public fun parseToRuntimeValue(string: String): Value
 }
@@ -35,7 +41,7 @@ public abstract class AbstractRuntimeFormat<Value>(public val config: RuntimeFor
     }
 
     override fun <T> decodeFromString(deserializer: DeserializationStrategy<T>, string: String): T =
-        this.decodeFromRuntimeValue(deserializer, parseToRuntimeValue(string))
+        this.decodeFromRuntimeValue(deserializer, parseToRuntimeValue(string), EmptyDecoderContext)
 
     override fun <T> encodeToString(serializer: SerializationStrategy<T>, value: T): String =
         PrettyJson.encodeToString(serializer, value)
@@ -65,8 +71,8 @@ public inline fun <reified T> RuntimeFormat<*>.serializer(): KSerializer<T> = wh
 public inline fun <reified T, Value> RuntimeFormat<Value>.encodeToRuntimeValue(value: T): Value =
     encodeToRuntimeValue(serializer(), value)
 
-public inline fun <reified T, Value> RuntimeFormat<Value>.decodeFromRuntimeValue(value: Value): T =
-    decodeFromRuntimeValue(serializer(), value)
+public inline fun <reified T, Value> RuntimeFormat<Value>.decodeFromRuntimeValue(value: Value, context: DecoderContext = EmptyDecoderContext): T =
+    decodeFromRuntimeValue(serializer(), value, context)
 
 public interface RuntimeFormatConfiguration<Value> {
 

@@ -3,6 +3,8 @@ package com.intuit.player.jvm.j2v8.bridge.serialization.format
 import com.eclipsesource.v8.V8
 import com.eclipsesource.v8.V8Value
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
+import com.intuit.player.jvm.core.bridge.serialization.encoding.DecoderContext
+import com.intuit.player.jvm.core.bridge.serialization.encoding.EmptyDecoderContext
 import com.intuit.player.jvm.core.bridge.serialization.format.AbstractRuntimeFormat
 import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeFormatConfiguration
 import com.intuit.player.jvm.core.bridge.serialization.format.serializer
@@ -11,7 +13,8 @@ import com.intuit.player.jvm.j2v8.bridge.runtime.V8Runtime
 import com.intuit.player.jvm.j2v8.bridge.serialization.encoding.readV8
 import com.intuit.player.jvm.j2v8.bridge.serialization.encoding.writeV8
 import com.intuit.player.jvm.j2v8.extensions.blockingLock
-import kotlinx.serialization.*
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.modules.SerializersModule
 
 public class J2V8Format(
@@ -23,8 +26,11 @@ public class J2V8Format(
     override fun <T> encodeToRuntimeValue(serializer: SerializationStrategy<T>, value: T): V8Value =
         writeV8(value, serializer)
 
-    override fun <T> decodeFromRuntimeValue(deserializer: DeserializationStrategy<T>, element: V8Value): T =
-        readV8(element, deserializer)
+    override fun <T> decodeFromRuntimeValue(
+        deserializer: DeserializationStrategy<T>,
+        element: V8Value,
+        context: DecoderContext
+    ): T = readV8(element, deserializer, context)
 
     public fun parseToV8Value(string: String): V8Value =
         parseToRuntimeValue(string)
@@ -42,5 +48,5 @@ public data class J2V8FormatConfiguration internal constructor(
 internal inline fun <reified T> J2V8Format.encodeToV8Value(value: T): V8Value =
     encodeToRuntimeValue(serializer(), value)
 
-internal inline fun <reified T> J2V8Format.decodeFromV8Value(value: V8Value): T =
-    decodeFromRuntimeValue(serializer(), value)
+internal inline fun <reified T> J2V8Format.decodeFromV8Value(value: V8Value, context: DecoderContext = EmptyDecoderContext): T =
+    decodeFromRuntimeValue(serializer(), value, context)

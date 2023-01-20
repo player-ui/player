@@ -20,7 +20,9 @@ import kotlin.reflect.full.isSubclassOf
 
 /** Common decoder base implementation to support decoding [T] runtime objects */
 @InternalPlayerApi
-public abstract class AbstractRuntimeValueDecoder<T> : RuntimeValueDecoder<T> {
+public abstract class AbstractRuntimeValueDecoder<T>(
+    override val context: DecoderContext
+) : RuntimeValueDecoder<T> {
 
     override val serializersModule: SerializersModule get() = format.serializersModule
 

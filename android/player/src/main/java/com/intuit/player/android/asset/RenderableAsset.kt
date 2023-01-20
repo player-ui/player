@@ -11,7 +11,7 @@ import com.intuit.player.jvm.core.asset.Asset
 import com.intuit.player.jvm.core.asset.AssetWrapper
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
-import com.intuit.player.jvm.core.bridge.serialization.encoding.NodeDecoder
+import com.intuit.player.jvm.core.bridge.serialization.encoding.DecoderContext
 import com.intuit.player.jvm.core.bridge.serialization.encoding.requireNodeDecoder
 import com.intuit.player.jvm.core.player.Player
 import com.intuit.player.jvm.core.player.PlayerException
@@ -21,7 +21,6 @@ import com.intuit.player.plugins.beacon.beacon
 import com.intuit.player.plugins.coroutines.subScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
-import kotlinx.serialization.ContextualSerializer
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
@@ -29,7 +28,6 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlin.coroutines.CoroutineContext
 import kotlin.reflect.KClass
 
 /**
@@ -48,14 +46,14 @@ import kotlin.reflect.KClass
  * to a new instance. However, it is recommended just propagate the
  * [AssetContext] in the constructor as to keep asset registration simple.
  */
-@Serializable(RenderableAsset.ContextualSerializer::class)
+@Serializable(RenderableAsset.Serializer::class)
 public abstract class RenderableAsset
 @Deprecated(
     "RenderableAssets should be migrated to DecodableAsset",
     ReplaceWith("DecodableAsset(assetContext, serializer)"),
     DeprecationLevel.ERROR,
 )
-public constructor(public val assetContext: AssetContext) : NodeWrapper, CoroutineContext.Element {
+public constructor(public val assetContext: AssetContext) : NodeWrapper {
 
     /**
      * Helper to get the current cached [AssetContext] and [View].
@@ -97,7 +95,7 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper, Corouti
      * also automatically caches the instance of the [View] and detects
      * when it needs to reconstruct or rehydrate.
      */
-    private fun render(): View = cachedAssetView.let { (cachedAssetContext, cachedView) ->
+    public fun render(): View = cachedAssetView.let { (cachedAssetContext, cachedView) ->
         requireContext()
         when {
             // View not found. Create and hydrate.
@@ -155,43 +153,43 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper, Corouti
         .render()
 
     /** Render child asset from the context of a parent asset, ensuring that the [context] is passed down */
-    public fun RenderableAsset.render(): View = assetContext
-        .withContext(this@RenderableAsset.requireContext())
-        .build()
-        .render()
+//    public fun RenderableAsset.render(): View = assetContext
+////        .withContext(this@RenderableAsset.requireContext())
+//        .build()
+//        .render()
 
     /** Render a [View] with specific [styles] */
-    public fun RenderableAsset.render(@StyleRes vararg styles: Style?): View = assetContext
-        .withContext(this@RenderableAsset.requireContext())
+    public fun render(@StyleRes vararg styles: Style?): View = assetContext
+//        .withContext(this@RenderableAsset.requireContext())
         .withStyles(*styles)
         .build()
         .render()
 
     /** Render a [View] with specific [styles] */
-    public fun RenderableAsset.render(@StyleRes styles: Styles): View = assetContext
-        .withContext(this@RenderableAsset.requireContext())
+    public fun render(@StyleRes styles: Styles): View = assetContext
+//        .withContext(this@RenderableAsset.requireContext())
         .withStyles(styles)
         .build()
         .render()
 
     /** Render a [View] with a specific [tag] through a new [RenderableAsset] created with a new [AssetContext] */
-    public fun RenderableAsset.render(tag: String): View = assetContext
-        .withContext(this@RenderableAsset.requireContext())
+    public fun render(tag: String): View = assetContext
+//        .withContext(this@RenderableAsset.requireContext())
         .withTag(tag)
         .build()
         .render()
 
     /** Render a [View] with specific [styles] */
-    public fun RenderableAsset.render(@StyleRes vararg styles: Style?, tag: String): View = assetContext
-        .withContext(this@RenderableAsset.requireContext())
+    public fun render(@StyleRes vararg styles: Style?, tag: String): View = assetContext
+//        .withContext(this@RenderableAsset.requireContext())
         .withTag(tag)
         .withStyles(*styles)
         .build()
         .render()
 
     /** Render a [View] with specific [styles] */
-    public fun RenderableAsset.render(@StyleRes styles: Styles, tag: String): View = assetContext
-        .withContext(this@RenderableAsset.requireContext())
+    public fun render(@StyleRes styles: Styles, tag: String): View = assetContext
+//        .withContext(this@RenderableAsset.requireContext())
         .withTag(tag)
         .withStyles(styles)
         .build()
@@ -253,30 +251,24 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper, Corouti
 
     private companion object {
         private val cachedAssetViewNotFound: Pair<AssetContext?, View?> = null to null
-        private val ANDROID_CONTEXT = NodeDecoder.Key<Context>()
     }
 
-    public class Serializer(private val player: AndroidPlayer, private val parent: RenderableAsset? = null) : KSerializer<RenderableAsset?> {
-
-        private val parentContext: Context? by lazy {
-            parent?.context
-        }
+    public class Serializer : KSerializer<RenderableAsset?> {
 
         override val descriptor: SerialDescriptor = buildClassSerialDescriptor("com.intuit.player.android.asset.RenderableAsset")
 
         /** Deserialize using the expansion process */
-        override fun deserialize(decoder: Decoder): RenderableAsset? = decoder.requireNodeDecoder()
-            .decodeNode()
-            .let(::AssetWrapper)
-            .asset
-            .let(player::expandAsset)
-            ?.let { child ->
-                decoder.requireNodeDecoder().context[Parent]?.value
-                    // TODO: This should be automatically guaranteed
-                    ?.let { it as? Context }
-                    ?.let(child.assetContext::withContext)?.build() ?: child
-            }
-            ?.let { child -> parentContext?.let(child.assetContext::withContext)?.build() ?: child }
+        override fun deserialize(decoder: Decoder): RenderableAsset? = decoder.requireNodeDecoder().run {
+            val player = context[AndroidPlayer]?.player ?: throw SerializationException("Cannot decode RenderableAssets without an AndroidPlayer")
+            decodeNode()
+                .let(::AssetWrapper)
+                .asset
+                .let(player::expandAsset)
+                ?.let { child ->
+                    context[ParentContext]?.parent?.context
+                        ?.let(child.assetContext::withContext)?.build() ?: child
+                }
+        }
 
         /** Serialization of [RenderableAsset]s are not supported */
         override fun serialize(encoder: Encoder, value: RenderableAsset?): Nothing =
@@ -292,8 +284,11 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper, Corouti
         }
     }
 
-    // Seemingly needed to prevent stack overflow: https://github.com/Kotlin/kotlinx.serialization/issues/1776
-    internal object ContextualSerializer : KSerializer<RenderableAsset> by ContextualSerializer(RenderableAsset::class)
+    /** [DecoderContext] providing access to the parent [RenderableAsset] */
+    public class ParentContext(public val parent: RenderableAsset) : DecoderContext.Element {
 
-    internal object Parent : CoroutineContext.Key<RenderableAsset>
+        override val key: DecoderContext.Key<ParentContext> = Key
+
+        public companion object Key : DecoderContext.Key<ParentContext>
+    }
 }

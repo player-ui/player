@@ -1,5 +1,6 @@
 package com.intuit.player.android.asset
 
+import com.intuit.player.android.AndroidPlayer.Companion.plus
 import com.intuit.player.android.AssetContext
 import com.intuit.player.jvm.core.player.PlayerException
 import kotlinx.serialization.KSerializer
@@ -12,7 +13,7 @@ public abstract class DecodableAsset<Data>(assetContext: AssetContext, private v
     /** Instance of [Data] is passed to [hydrate] */
     public val data: Data by lazy {
         try {
-            asset.deserialize(serializer, mapOf(Player.Current to player, RenderableAsset.ParentContext to requireContext()))
+            asset.deserialize(serializer, player + ParentContext(this))
         } catch (exception: SerializationException) {
             assetContext.player.logger.error("Could not deserialize data for $asset", exception)
             throw PlayerException("Could not deserialize data for $asset", exception)
