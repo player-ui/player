@@ -1,10 +1,11 @@
-use crate::RefType;
-use js_sys::{Array, Function, Iter, Reflect, JSON};
-use std::cell::{Ref, RefCell};
-use std::ops::Index;
+use std::cell::RefCell;
 use std::rc::Rc;
+
+use js_sys::{Array, Function, Reflect};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
+
+use crate::RefType;
 
 #[wasm_bindgen]
 extern "C" {
@@ -42,35 +43,6 @@ impl Query {
         };
     }
 
-    fn compare_obj(obj: &JsValue, query_value: &JsValue) -> bool {
-        let keys = Reflect::own_keys(&query_value).unwrap_or(Array::new());
-        for key in keys.iter() {
-            log(&format!("Looking for key: {}", key.as_string().unwrap()));
-            if Reflect::has(&obj, &key).is_err() {
-                log(&format!("key not found in search object..."));
-                return false;
-            } else {
-                let search_value = Reflect::get(&query_value, &key).unwrap();
-                log(&format!("Key found in current node... comparing values",));
-
-                if search_value != Reflect::get(&obj, &key).unwrap() {
-                    log(&format!(
-                        "in object: {}\nNOT FOUND\n",
-                        &JSON::stringify(&obj).unwrap(),
-                    ));
-                    return false;
-                } else {
-                    log(&format!(
-                        "in object: {}\nEUREKA!!\n",
-                        &JSON::stringify(&obj).unwrap(),
-                    ));
-                }
-            }
-        }
-        log("COMPARING DONE");
-        true
-    }
-
     /**
      * Compares a query instance to a JsValue object.
      * In Array queries only:
@@ -89,7 +61,6 @@ impl Query {
                     let found_value = Reflect::get(&obj, &key).unwrap();
                     if found_value.is_string() && str.to_owned() == found_value.as_string().unwrap()
                     {
-                        log("string query matched");
                         return true;
                     }
                 }
@@ -99,8 +70,31 @@ impl Query {
             /* This is not needed - lists are handled by Queries Struct */
             Query::List(_list) => todo!(),
             /* TODO: this cloning can be prevented by Rc<RefCell> */
-            Query::Object(value) => Query::compare_obj(&obj, &value),
+            Query::Object(value) => Query::compare(&obj, &value),
         }
+    }
+
+    /**
+     * Compare a query object to given object
+     */
+    fn compare(obj: &JsValue, query_value: &JsValue) -> bool {
+        let query_keys = Reflect::own_keys(&query_value).unwrap_or(Array::new());
+        !query_keys
+            .iter()
+            .map(|key| {
+                if Reflect::has(&obj, &key).is_err() {
+                    false
+                } else {
+                    let search_value = Reflect::get(&query_value, &key).unwrap();
+                    if search_value != Reflect::get(&obj, &key).unwrap() {
+                        false
+                    } else {
+                        true
+                    }
+                }
+            })
+            .collect::<Vec<bool>>()
+            .contains(&false)
     }
 }
 
