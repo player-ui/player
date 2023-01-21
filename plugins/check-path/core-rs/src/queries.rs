@@ -45,11 +45,6 @@ impl Query {
 
     /**
      * Compares a query instance to a JsValue object.
-     * In Array queries only:
-     * If the query is satisfied with the JsValue, the function returns a new Query to be used in
-     * future JsValue matching, this is due to the fact that all queries in a list queries must be
-     * satisfied in some search cases, for that purpose, successful results create a new query with
-     * found elements removed.
      */
     pub fn equals(&self, obj: JsValue) -> bool {
         match self {
