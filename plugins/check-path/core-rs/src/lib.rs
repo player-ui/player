@@ -1,12 +1,14 @@
-use crate::node::Node;
-use crate::paths::{Path, Paths};
-use crate::queries::{Queries, Query};
-use js_sys::{Array, JSON};
-use player::*;
 use std::cell::RefCell;
 use std::rc::Rc;
+
+use js_sys::Array;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
+
+use player::*;
+
+use crate::paths::Paths;
+use crate::queries::Queries;
 
 mod node;
 mod paths;
@@ -86,67 +88,24 @@ impl CheckPathPlugin {
 
     #[wasm_bindgen(js_name=getPath)]
     pub fn get_path(&self, id: &str, query: JsValue) -> JsValue {
-        let queries = Queries::from(query);
+        let _queries = Queries::from(query);
 
         let node = self.paths.borrow().get_node(id);
-        if !node.is_some() {
-            return JsValue::undefined();
+        match node {
+            Some(node) => JsValue::from(
+                node.borrow()
+                    .get_path()
+                    .iter()
+                    .map(Paths::to_js_value)
+                    .collect::<Array>(),
+            ),
+            None => JsValue::UNDEFINED,
         }
-
-        let node = node.as_ref().unwrap();
-        let results: Vec<Option<String>> = vec![];
-
-        for q in queries {}
-
-        // match query {
-        //     Queries::None => JsValue::from(
-        //         node.borrow()
-        //             .get_path()
-        //             .iter()
-        //             .map(Paths::to_js_value)
-        //             .collect::<Array>(),
-        //     ),
-        //     _ => {
-        //         let results = self.search_for_node(&query, Rc::clone(node), false);
-        //         let node = node.borrow();
-        //         let base_path = node.get_path();
-        //         if !results.is_empty() {
-        //             let found_node = match query {
-        //                 //     /* when Query is an array, the last match is the one we want */
-        //                 Queries::List(_) => {
-        //                     log(&format!(
-        //                         "result count: {}, first id: {}, last id: {}",
-        //                         results.len(),
-        //                         results.first().unwrap().borrow().get_id(),
-        //                         results.last().unwrap().borrow().get_id(),
-        //                     ));
-        //
-        //                     results.last().unwrap().borrow()
-        //                 }
-        //                 //     /* when Query is NOT an array, the first match is the one we want */
-        //                 _ => results.first().unwrap().borrow(),
-        //             };
-        //             let found_node_path = found_node.get_path();
-        //             return JsValue::from(
-        //                 base_path
-        //                     .iter()
-        //                     .skip(found_node_path.len())
-        //                     .map(Paths::to_js_value)
-        //                     .collect::<Array>(),
-        //             );
-        //         }
-        //
-        //         JsValue::UNDEFINED
-        //     }
-        // }
-
-        // TODO: Remove
-        return JsValue::undefined();
     }
 
     #[wasm_bindgen(js_name=getParent)]
     pub fn get_parent(&self, id: &str, query: JsValue) -> JsValue {
-        let query = Queries::from(query);
+        let _query = Queries::from(query);
 
         let parent = self
             .paths
@@ -156,19 +115,7 @@ impl CheckPathPlugin {
             .flatten();
 
         match parent {
-            Some(parent) => {
-                // let results = self.search_for_node(&query, Rc::clone(&parent), false);
-                // let result = results
-                //     .first()
-                //     .map(|node| node.borrow().get_raw_node().clone());
-                //
-                // match result {
-                //     Some(result) => result,
-                //     None => JsValue::UNDEFINED,
-                // }
-                JsValue::UNDEFINED
-            }
-
+            Some(parent) => parent.borrow().get_raw_node().clone(),
             None => JsValue::UNDEFINED,
         }
     }
@@ -215,30 +162,5 @@ impl CheckPathPlugin {
             Some(node) => node.borrow().get_raw_node().clone(),
             None => JsValue::UNDEFINED,
         }
-    }
-
-    fn search_for_node(
-        &self,
-        query: &Query,
-        start_at: Rc<RefCell<Node>>,
-        // TODO: implement searching down tree.
-        _descendants: bool,
-    ) -> Vec<Rc<RefCell<Node>>> {
-        let mut nodes = vec![Rc::clone(&start_at)];
-        let mut results = vec![];
-        while let Some(node) = nodes.pop() {
-            let current_node = node.borrow();
-            let raw_node = current_node.get_raw_node();
-            let matched = query.equals(raw_node);
-
-            if matched {
-                results.push(Rc::clone(&node));
-            }
-            let next_node = current_node.get_parent();
-            if next_node.is_some() {
-                nodes.push(next_node.unwrap());
-            }
-        }
-        return results;
     }
 }
