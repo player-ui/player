@@ -128,7 +128,7 @@ impl CheckPathPlugin {
             .map(|node| node.borrow().get_parent())
             .flatten();
 
-        if node.is_none() | parent.is_none() {
+        if node.is_none() || parent.is_none() {
             return JsValue::UNDEFINED;
         }
 
