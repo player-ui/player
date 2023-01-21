@@ -46,8 +46,8 @@ impl Node {
         &self.node_type
     }
 
-    pub fn get_raw_node(&self) -> Ref<JsValue> {
-        self.raw_node.borrow()
+    pub fn get_raw_node(&self) -> JsValue {
+        self.raw_node.borrow().clone()
     }
 
     pub fn has_parent(&self) -> bool {

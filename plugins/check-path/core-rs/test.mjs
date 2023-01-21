@@ -73,5 +73,5 @@ dataController.set([['foo.baz', true]]);
 
 console.log(checkPathPlugin.getPath('coll-val-2-1', [
     { type: 'collection' },
-    { type: 'view' },
+    { type: 'collection' },
 ]))

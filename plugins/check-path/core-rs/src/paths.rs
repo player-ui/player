@@ -18,7 +18,6 @@ pub enum Path {
     Text(String),
     Numeric(f64),
 }
-
 impl fmt::Display for Path {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
@@ -29,7 +28,7 @@ impl fmt::Display for Path {
 }
 
 pub struct Paths {
-    nodes_by_id: Rc<RefCell<HashMap<String, Rc<RefCell<Node>>>>>, // type_paths: Rc<RefCell<HashMap<String, Vec<String>>>>,
+    nodes_by_id: Rc<RefCell<HashMap<String, Rc<RefCell<Node>>>>>,
 }
 
 type SomeRef<T> = Rc<RefCell<T>>;
@@ -123,5 +122,12 @@ impl Paths {
     fn clear_nodes(&self) {
         let mut nodes = self.nodes_by_id.borrow_mut();
         nodes.clear();
+    }
+
+    pub fn to_js_value(path: &Path) -> JsValue {
+        return match path {
+            Path::Text(value) => JsValue::from(value.clone()),
+            Path::Numeric(value) => JsValue::from(value.clone()),
+        };
     }
 }
