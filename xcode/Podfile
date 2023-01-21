@@ -39,7 +39,7 @@ target 'PlayerUI_Example' do
 end
 
 plugin 'cocoapods-resource-bundle-copier', {
-  'bazelCommand' => 'bazel',
+  'bazelCommand' => 'bazel shutdown && bazel',
   'resource_map' => {
     # Core
     "PlayerUI/PlayerUI" => {

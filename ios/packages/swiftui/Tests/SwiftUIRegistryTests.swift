@@ -66,6 +66,45 @@ class SwiftUIRegistryTests: XCTestCase {
         }
     }
 
+    func testDecodeWrappedAssetWithAdditionalData() {
+        struct TestAddedData: Decodable, Equatable {
+            var extra: String
+        }
+
+        struct TestData: AssetData {
+            var id: String
+            var type: String
+
+            var nested: GenericWrappedAsset<TestAddedData>?
+        }
+
+        class TestNestedAsset: UncontrolledAsset<TestData> {
+            override var view: AnyView { AnyView(EmptyView()) }
+        }
+        let val = context
+            .evaluateScript("({asset: {id: 'someId', type: 'nested', nested: {asset: {id: 'someOtherId', type: 'text', value: ''}, extra: 'value'}}})")
+
+        let partialMatch = PartialMatchFingerprintPlugin()
+        partialMatch.context = context
+        partialMatch.setMapping(assetId: "someId", index: 1)
+        partialMatch.setMapping(assetId: "someOtherId", index: 0)
+        let registry = SwiftUIRegistry(logger: TapableLogger())
+        registry.register("text", asset: TextAsset.self)
+        registry.register("nested", asset: TestNestedAsset.self)
+        registry.partialMatchRegistry = partialMatch
+
+        guard let object = val else { return XCTFail("object should not be nil") }
+
+        do {
+            let decoded = try registry.decodeWrapper(object)
+            XCTAssertEqual(decoded.asset?.id, "someId")
+            guard let asset = decoded.asset as? TestNestedAsset else { return XCTFail("Decoded asset was not TestNestedAsset") }
+            XCTAssertEqual(asset.model.data.nested?.additionalData?.extra, "value")
+        } catch {
+            XCTFail("unable to decode wrapper")
+        }
+    }
+
     func testWrappedAssetEquivalence() {
         let asset1 = context.evaluateScript("({asset: {id: 'someId', type: 'text', value: 'someValue'}})")
         let asset2 = context.evaluateScript("({asset: {id: 'someId', type: 'text', value: 'someOtherValue'}})")
