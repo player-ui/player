@@ -81,6 +81,12 @@ export interface BaseNode<T> {
 
   /** The location of the node in the source expression string */
   location?: NodeLocation;
+
+  /**
+   * The error that occurred while parsing this node
+   * This is only set if the parsing mode is set to non-strict
+   */
+  error?: Error;
 }
 
 /** A helper interface for nodes that container left and right children */

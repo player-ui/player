@@ -1,5 +1,5 @@
 import { SyncWaterfallHook, SyncBailHook } from 'tapable-ts';
-import parse from './parser';
+import { parseExpression } from './parser';
 import * as DEFAULT_EXPRESSION_HANDLERS from './evaluator-functions';
 import { isExpressionNode } from './types';
 import type {
@@ -212,7 +212,7 @@ export class ExpressionEvaluator {
         return this._execAST(storedAST, options);
       }
 
-      const expAST = parse(matchedExp);
+      const expAST = parseExpression(matchedExp);
       this.expressionsCache.set(matchedExp, expAST);
 
       return this._execAST(expAST, options);

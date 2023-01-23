@@ -1,20 +1,22 @@
-import parse from '../parser';
+import { parseExpression } from '../parser';
 import { ExpNodeOpaqueIdentifier } from '../types';
 
 test('the happy stuff', () => {
-  expect(parse('foo')).toMatchSnapshot();
-  expect(parse('foo === bar')).toMatchSnapshot();
-  expect(parse('foo || bar')).toMatchSnapshot();
-  expect(parse('foo(bar)')).toMatchSnapshot();
-  expect(parse('{{foo}} = "bar"')).toMatchSnapshot();
-  expect(parse('{{foo}} ? "bar" : "baz"')).toMatchSnapshot();
-  expect(parse('foo[bar]')).toMatchSnapshot();
-  expect(parse('{{foo}} == "string\nwith\tbreaks"')).toMatchSnapshot();
-  expect(parse('foo = [1, 2, 3]')).toMatchSnapshot();
+  expect(parseExpression('foo')).toMatchSnapshot();
+  expect(parseExpression('foo === bar')).toMatchSnapshot();
+  expect(parseExpression('foo || bar')).toMatchSnapshot();
+  expect(parseExpression('foo(bar)')).toMatchSnapshot();
+  expect(parseExpression('{{foo}} = "bar"')).toMatchSnapshot();
+  expect(parseExpression('{{foo}} ? "bar" : "baz"')).toMatchSnapshot();
+  expect(parseExpression('foo[bar]')).toMatchSnapshot();
+  expect(
+    parseExpression('{{foo}} == "string\nwith\tbreaks"')
+  ).toMatchSnapshot();
+  expect(parseExpression('foo = [1, 2, 3]')).toMatchSnapshot();
 });
 
 test('nested binary op location', () => {
-  expect(parse('foo === bar === baz')).toStrictEqual({
+  expect(parseExpression('foo === bar === baz')).toStrictEqual({
     __id: ExpNodeOpaqueIdentifier,
     type: 'BinaryExpression',
     operator: '===',
@@ -62,32 +64,51 @@ test('nested binary op location', () => {
 });
 
 test('the bad stuff', () => {
-  expect(() => parse('{{foo')).toThrowError();
-  expect(() => parse('{{foo}')).toThrowError();
-  expect(() => parse('foo["bar"')).toThrowError();
-  expect(() => parse('foo["bar')).toThrowError();
-  expect(() => parse('foo]')).toThrowError();
-  expect(() => parse('foo = (bar')).toThrowError();
+  expect(() => parseExpression('{{foo')).toThrowError();
+  expect(() => parseExpression('{{foo}')).toThrowError();
+  expect(() => parseExpression('foo["bar"')).toThrowError();
+  expect(() => parseExpression('foo["bar')).toThrowError();
+  expect(() => parseExpression('foo]')).toThrowError();
+  expect(() => parseExpression('foo = (bar')).toThrowError();
+  expect(() => parseExpression('foo(')).toThrowError();
 });
 describe('expression parser', () => {
   test('objects- in parser', () => {
-    expect(parse('{"foo": "value"}')).toMatchSnapshot();
-    expect(parse('{"foo": {{some.binding}}}')).toMatchSnapshot();
-    expect(parse('{"foo": 1 + 2}')).toMatchSnapshot();
-    expect(parse('{"foo": "value", "bar": "baz"}')).toMatchSnapshot();
+    expect(parseExpression('{"foo": "value"}')).toMatchSnapshot();
+    expect(parseExpression('{"foo": {{some.binding}}}')).toMatchSnapshot();
+    expect(parseExpression('{"foo": 1 + 2}')).toMatchSnapshot();
+    expect(parseExpression('{"foo": "value", "bar": "baz"}')).toMatchSnapshot();
     expect(
-      parse('{"foo": "value", "bar": { "baz":  "foo" }}')
+      parseExpression('{"foo": "value", "bar": { "baz":  "foo" }}')
     ).toMatchSnapshot();
-    expect(parse('publish("test", {"key": "value"})')).toMatchSnapshot();
+    expect(
+      parseExpression('publish("test", {"key": "value"})')
+    ).toMatchSnapshot();
     // no closing brace
-    expect(() => parse('{"foo": "value"')).toThrowError();
+    expect(() => parseExpression('{"foo": "value"')).toThrowError();
     // no key
-    expect(() => parse('{: "value"}')).toThrowError();
+    expect(() => parseExpression('{: "value"}')).toThrowError();
     // no value
-    expect(() => parse('{"key": }')).toThrowError();
+    expect(() => parseExpression('{"key": }')).toThrowError();
     // no colon
-    expect(() => parse('{"key" "value" }')).toThrowError();
+    expect(() => parseExpression('{"key" "value" }')).toThrowError();
     // no comma
-    expect(() => parse('{"key": "value" "key2": "value" }')).toThrowError();
+    expect(() =>
+      parseExpression('{"key": "value" "key2": "value" }')
+    ).toThrowError();
+  });
+});
+
+describe('graceful parsing', () => {
+  it('returns and sets the error for invalid expression', () => {
+    const parsed = parseExpression('{{foo}} = {{bar}', {
+      strict: false,
+    });
+
+    expect(parsed).toBeTruthy();
+    expect(parsed.error).toBeTruthy();
+    expect(parsed.error?.message).toBe(
+      'Unclosed brace after "bar}" at character 16'
+    );
   });
 });
