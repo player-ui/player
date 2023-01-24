@@ -43,6 +43,16 @@ describe('generates the correct AST', () => {
     });
   });
 
+  test('works with objects that have symbols', () => {
+    const testSymbol = Symbol('foo');
+    expect(parser.parseObject({ [testSymbol]: 'bar' })).toStrictEqual({
+      type: NodeType.Value,
+      value: {
+        [testSymbol]: 'bar',
+      },
+    });
+  });
+
   test('works with applicability things', () => {
     expect(
       parser.parseObject({ foo: 'bar', applicability: '{{baz}}' })
