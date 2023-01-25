@@ -6,11 +6,17 @@ const DOUBLE_OPEN_CURLY = '{{';
 const DOUBLE_CLOSE_CURLY = '}}';
 
 export interface Options {
-  /** The model to use when resolving refs */
-  model: DataModelWithParser;
+  /**
+   * The model to use when resolving refs
+   * Passing `false` will skip trying to resolve any direct model refs ({{foo}})
+   */
+  model: false | DataModelWithParser;
 
-  /** A function to evaluate an expression */
-  evaluate: (exp: Expression) => any;
+  /**
+   * A function to evaluate an expression
+   * Passing `false` will skip trying to evaluate any expressions (@[ foo() ]@)
+   */
+  evaluate: false | ((exp: Expression) => any);
 }
 
 /** Search the given string for the coordinates of the next expression to resolve */
@@ -70,6 +76,10 @@ export function resolveExpressionsInString(
   val: string,
   { evaluate }: Options
 ): string {
+  if (!evaluate) {
+    return val;
+  }
+
   const expMatch = /@\[.*?\]@/;
   let newVal = val;
   let match = newVal.match(expMatch);
@@ -110,6 +120,7 @@ export function resolveDataRefsInString(val: string, options: Options): string {
   let workingString = resolveExpressionsInString(val, options);
 
   if (
+    !model ||
     typeof workingString !== 'string' ||
     workingString.indexOf(DOUBLE_OPEN_CURLY) === -1
   ) {
@@ -166,13 +177,13 @@ function traverseObject<T>(val: T, options: Options): T {
       let newVal = val;
 
       if (keys.length > 0) {
-        for (const key of keys) {
+        keys.forEach((key) => {
           newVal = setIn(
             newVal as any,
             [key],
             traverseObject((val as any)[key], options)
           ) as any;
-        }
+        });
       }
 
       return newVal;

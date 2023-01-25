@@ -2269,3 +2269,156 @@ describe('weak binding edge cases', () => {
     });
   });
 });
+
+test('updating a binding only updates its data and not other bindings due to weak binding connections', async () => {
+  const flow = makeFlow({
+    id: 'view-1',
+    type: 'view',
+    thing1: {
+      asset: {
+        id: 'thing-1',
+        binding: 'input.text',
+      },
+    },
+    thing2: {
+      asset: {
+        id: 'thing-2',
+        binding: 'input.check',
+      },
+    },
+    validation: [
+      {
+        type: 'requiredIf',
+        ref: 'input.text',
+        param: 'input.check',
+      },
+    ],
+  });
+
+  flow.data = {
+    someOtherParam: 'notFoo',
+  };
+
+  flow.schema = {
+    ROOT: {
+      input: {
+        type: 'InputType',
+      },
+    },
+    InputType: {
+      text: {
+        type: 'DateType',
+        validation: [
+          {
+            type: 'paramIsFoo',
+            param: 'someOtherParam',
+          },
+        ],
+      },
+      check: {
+        type: 'BooleanType',
+        validation: [
+          {
+            type: 'required',
+          },
+        ],
+      },
+    },
+  };
+
+  const basicValidationPlugin = {
+    name: 'basic-validation',
+    apply: (player: Player) => {
+      player.hooks.schema.tap('basic-validation', (schema) => {
+        schema.addDataTypes([
+          {
+            type: 'DateType',
+            validation: [{ type: 'date' }],
+          },
+          {
+            type: 'BooleanType',
+            validation: [{ type: 'boolean' }],
+          },
+        ]);
+      });
+
+      player.hooks.validationController.tap('basic-validation', (vc) => {
+        vc.hooks.createValidatorRegistry.tap('basic-validation', (registry) => {
+          registry.register('date', (ctx, value) => {
+            if (value === undefined) {
+              return;
+            }
+
+            return value.match(/^\d{4}-\d{2}-\d{2}$/)
+              ? undefined
+              : { message: 'Not a date' };
+          });
+          registry.register('boolean', (ctx, value) => {
+            if (value === undefined || value === true || value === false) {
+              return;
+            }
+
+            return {
+              message: 'Not a boolean',
+            };
+          });
+
+          registry.register('required', (ctx, value) => {
+            if (value === undefined) {
+              return {
+                message: 'Required',
+              };
+            }
+          });
+
+          registry.register<any>('requiredIf', (ctx, value, { param }) => {
+            const paramValue = ctx.model.get(param);
+            if (paramValue === undefined) {
+              return;
+            }
+
+            if (value === undefined) {
+              return {
+                message: 'Required',
+              };
+            }
+          });
+
+          registry.register<any>('paramIsFoo', (ctx, value, { param }) => {
+            const paramValue = ctx.model.get(param);
+            if (paramValue === 'foo') {
+              return;
+            }
+
+            if (value === undefined) {
+              return {
+                message: 'Must be foo',
+              };
+            }
+          });
+        });
+      });
+    },
+  };
+
+  const player = new Player({
+    plugins: [new TrackBindingPlugin(), basicValidationPlugin],
+  });
+  player.start(flow);
+  const state = player.getState() as InProgressState;
+
+  state.controllers.flow.transition('next');
+  waitFor(() => {
+    state.controllers.data.set([['input.text', '']]);
+  });
+
+  waitFor(() => {
+    state.controllers.data.set([['input.check', true]]);
+  });
+
+  waitFor(() => {
+    const finalState = player.getState() as InProgressState;
+    const otherParam = finalState.controllers.data.get('someOtherParam');
+    expect(otherParam).toBe('notFoo');
+  });
+});

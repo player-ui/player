@@ -75,22 +75,19 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
       }
 
       const epos = element?.getBoundingClientRect().top;
-
       if (
-        epos &&
-        (epos + ypos > highestElement.ypos || highestElement.ypos === 0)
+        epos !== undefined &&
+        (epos + ypos < highestElement.ypos || highestElement.id === '')
       ) {
         highestElement.id = id;
-        highestElement.ypos = ypos - epos;
+        highestElement.ypos = ypos + epos;
       }
     });
-
     return highestElement.id;
   }
 
   calculateScroll(scrollableElements: Map<ScrollType, Set<string>>) {
     let currentScroll = ScrollType.FirstAppearance;
-
     if (this.initialRender) {
       if (this.autoScrollOnLoad) {
         currentScroll = ScrollType.ValidationError;
@@ -106,13 +103,11 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
     }
 
     const elementList = scrollableElements.get(currentScroll);
-
     if (elementList) {
       const element = this.getFirstScrollableElement(
         elementList,
         currentScroll
       );
-
       return element ?? '';
     }
 
@@ -142,7 +137,6 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
     reactPlayer.hooks.webComponent.tap(this.name, (Comp) => {
       return () => {
         const { scrollFn } = this;
-
         return (
           <AutoScrollProvider getElementToScrollTo={scrollFn}>
             <Comp />

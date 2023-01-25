@@ -157,8 +157,6 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
 
     this.hooks.onSet.call(normalizedTransaction);
 
-    this.hooks.onSet.call(normalizedTransaction);
-
     if (setUpdates.length > 0) {
       this.hooks.onUpdate.call(setUpdates, options);
     }
