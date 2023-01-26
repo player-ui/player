@@ -120,7 +120,13 @@ export class Parser {
 
       const objEntries = Array.isArray(localObj)
         ? localObj.map((v, i) => [i, v])
-        : Object.entries(localObj);
+        : [
+            ...Object.entries(localObj),
+            ...Object.getOwnPropertySymbols(localObj).map((s) => [
+              s,
+              (localObj as any)[s],
+            ]),
+          ];
 
       const defaultValue: NestedObj = {
         children: [],

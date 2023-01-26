@@ -51,6 +51,7 @@ commands:
             - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
             - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
 
+      - run: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
       - run: echo -e $GPG_KEY | gpg --import --batch
       - run: |
