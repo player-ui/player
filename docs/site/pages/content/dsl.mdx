@@ -21,7 +21,7 @@ Both `binding` and `expression` in the JSX authoring leverages a tagged template
 To create a binding, or expression:
 
 ```tsx
-import { binding as b, expression as e } from '@player-ui/dsl';
+import { binding as b, expression as e } from '@player-tools/dsl';
 
 const myBinding = b`foo.bar`;
 const myExpression = e`foo()`;
@@ -94,7 +94,7 @@ Similarly, if a single asset is expected but a list of them is found instead, Pl
 
 ### Templates
 
-Templates are included via the `@player-ui/dsl` package. This can be used in any asset slot:
+Templates are included via the `@player-tools/dsl` package. This can be used in any asset slot:
 
 ```tsx
 <Collection>
@@ -111,7 +111,7 @@ Templates can be nested within one another, and the auto-id generation will hand
 
 ### Switches
 
-The `@player-ui/dsl` module also includes support for _static_ and _dynamic_ switches.
+The `@player-tools/dsl` module also includes support for _static_ and _dynamic_ switches.
 
 Use the `isDynamic` flag to denote this should be a `dynamicSwitch` instead of a `staticSwitch`:
 
@@ -238,7 +238,7 @@ will generate the schema:
 
 #### Changing the Name of a Generated Type
 
-To change the name of the generated type at any point in the tree, import the `SchemaTypeName` symbol from the `@player-ui/dsl` and use it as a key to change the name like so:
+To change the name of the generated type at any point in the tree, import the `SchemaTypeName` symbol from the `@player-tools/dsl` and use it as a key to change the name like so:
 
 ```typescript
 const mySchema = {
@@ -398,7 +398,7 @@ Pass asset in as child
 ```
 OR
 
-You can create an Asset using the `<Asset>` component from `@player-ui/dsl`. 
+You can create an Asset using the `<Asset>` component from `@player-tools/dsl`. 
 ```jsx
 <Asset id={"foo"} type={'foo'} foo={"bar"} ... />
 ```

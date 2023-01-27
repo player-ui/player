@@ -78,7 +78,7 @@ Both binding and expression in the TSX authoring leverages a tagged template, ty
 To create a binding or expression:
 
 ```tsx
-import { binding as b, expression as e } from '@player-ui/dsl';
+import { binding as b, expression as e } from '@player-tools/dsl';
 
 const myBinding = b`foo.bar`;
 const myExpression = e`foo()`;
@@ -93,7 +93,7 @@ const stringWithExp = `Some expr: ${myExpression}`; // 'Some expr: @[foo()]@'
 
 ## Templates
 
-Template support is included via the `@player-ui/dsl` package. This can be used in place of an asset slot:
+Template support is included via the `@player-tools/dsl` package. This can be used in place of an asset slot:
 
 ```tsx
 <Collection>
@@ -166,7 +166,7 @@ In order to take advantage of the auto-completion and validation of TypeScript t
 
 ## Creating a basic component
 
-The `Asset` component from the `@player-ui/dsl` package is the quickest way to create a new component.
+The `Asset` component from the `@player-tools/dsl` package is the quickest way to create a new component.
 
 In the examples below, we'll be creating a TSX component for the `action` asset in our reference set. 
 
@@ -191,7 +191,7 @@ export interface ActionAsset<AnyTextAsset extends Asset = Asset> extends Asset<'
 To turn this interface into a usable component, create a new React component that _renders_ an Asset:
 
 ```tsx
-import { Asset, AssetPropsWithChildren } from '@player-ui/dsl';
+import { Asset, AssetPropsWithChildren } from '@player-tools/dsl';
 
 export const Action = (props: AssetPropsWithChildren<ActionAsset>) => {
   return <Asset type="action" {...props} />;
@@ -211,7 +211,7 @@ The `AssetPropsWithChildren` type is a utility type to help convert the `Asset` 
 Continuing the example fo the `ActionAsset`, we need a way for users to users to specify the nested `label` property, which itself is another asset. This can be accomplished using the `createSlot` utility function.
 
 ```tsx
-import { Asset, AssetPropsWithChildren } from '@player-ui/dsl';
+import { Asset, AssetPropsWithChildren } from '@player-tools/dsl';
 
 export const Action = (props: AssetPropsWithChildren<ActionAsset>) => {
   return <Asset type="action" {...props} />;

@@ -2,8 +2,8 @@ import React from 'react';
 import type {
   AssetPropsWithChildren,
   BindingTemplateInstance,
-} from '@player-ui/dsl';
-import { createSlot, Asset } from '@player-ui/dsl';
+} from '@player-tools/dsl';
+import { createSlot, Asset } from '@player-tools/dsl';
 import type { Asset as AssetType } from '@player-ui/player';
 import type {
   ActionAsset,

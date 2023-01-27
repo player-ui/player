@@ -1,7 +1,0 @@
-#!/usr/bin/env node
-
-const oclif = require('@oclif/core')
-// Setting this to prod break source-map generation for react dsl stuff
-process.env.NODE_ENV = 'dev'
-
-oclif.run().then(require('@oclif/core/flush')).catch(require('@oclif/core/handle'))

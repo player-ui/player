@@ -6,20 +6,16 @@
 
 # Android/JVM
 
-jvm/ @sugarmanz @Brocollie08
-android/ @sugarmanz @Brocollie08
-language/ @KetanReddy
+/jvm/ @sugarmanz @Brocollie08
+/android/ @sugarmanz @Brocollie08
 
 # iOS
-xcode/ @hborawski
-ios/ @hborawski
+/xcode/ @hborawski
+/ios/ @hborawski
 
 # Web
-react/ @spentacular @adierkens
-tools/storybook/ @adierkens
+/react/ @spentacular @adierkens
+/tools/storybook/ @adierkens
 
 # Core
-core/ @KetanReddy @adierkens
-
-# Language
-language/ @KetanReddy @adierkens
+/core/ @KetanReddy @adierkens
