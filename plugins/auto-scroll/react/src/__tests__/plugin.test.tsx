@@ -174,3 +174,133 @@ describe('auto-scroll plugin', () => {
     expect(scrollIntoView).not.toBeCalled();
   });
 });
+
+describe('getFirstScrollableElement unit tests', () => {
+  const defineGetElementId = (bcrValues: any[]) => {
+    return (idIn: string): HTMLElement | null => {
+      switch (idIn) {
+        case 'Element1':
+          return {
+            getAttribute: (attrIn) =>
+              attrIn === 'aria-invalid' ? 'true' : 'false',
+            getBoundingClientRect: () => bcrValues[0],
+          } as HTMLElement;
+        case 'Element2':
+          return {
+            getAttribute: (attrIn) =>
+              attrIn === 'aria-invalid' ? 'true' : 'false',
+            getBoundingClientRect: () => bcrValues[1],
+          } as HTMLElement;
+        case 'Element3':
+          return {
+            getAttribute: (attrIn) =>
+              attrIn === 'aria-invalid' ? 'true' : 'false',
+            getBoundingClientRect: () => bcrValues[2],
+          } as HTMLElement;
+        default:
+          return null;
+      }
+    };
+  };
+
+  let autoScroll: AutoScrollManagerPlugin;
+  let idList: Set<string>;
+
+  beforeEach(() => {
+    autoScroll = new AutoScrollManagerPlugin({});
+    idList = new Set<string>();
+    idList.add('Element1');
+    idList.add('Element2');
+    idList.add('Element3');
+  });
+
+  test('scrolled past all elements', () => {
+    document.getElementById = defineGetElementId([
+      {
+        top: -30,
+      },
+      {
+        top: -20,
+      },
+      {
+        top: -10,
+      },
+    ]);
+
+    expect(
+      autoScroll.getFirstScrollableElement(idList, ScrollType.ValidationError)
+    ).toBe('Element1');
+  });
+
+  test('scrolled past some of elements', () => {
+    document.getElementById = defineGetElementId([
+      {
+        top: -20,
+      },
+      {
+        top: -10,
+      },
+      {
+        top: 0,
+      },
+    ]);
+
+    expect(
+      autoScroll.getFirstScrollableElement(idList, ScrollType.ValidationError)
+    ).toBe('Element1');
+  });
+
+  test('all elements in view', () => {
+    document.getElementById = defineGetElementId([
+      {
+        top: 10,
+      },
+      {
+        top: 20,
+      },
+      {
+        top: 30,
+      },
+    ]);
+
+    expect(
+      autoScroll.getFirstScrollableElement(idList, ScrollType.ValidationError)
+    ).toBe('Element1');
+  });
+
+  test('all elements in view and target is 0', () => {
+    document.getElementById = defineGetElementId([
+      {
+        top: 0,
+      },
+      {
+        top: 10,
+      },
+      {
+        top: 20,
+      },
+    ]);
+
+    expect(
+      autoScroll.getFirstScrollableElement(idList, ScrollType.ValidationError)
+    ).toBe('Element1');
+  });
+
+  test('all elements in view but there is a tie', () => {
+    document.getElementById = defineGetElementId([
+      {
+        top: 10,
+      },
+      {
+        top: 10,
+      },
+      {
+        top: 20,
+      },
+    ]);
+
+    expect(
+      autoScroll.getFirstScrollableElement(idList, ScrollType.ValidationError)
+    ).toBe('Element1');
+  });
+});

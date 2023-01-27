@@ -11,8 +11,8 @@ const identify = (val: any) => val;
 /** Expand the authored schema into a set of paths -> DataTypes */
 export function parse(
   schema: SchemaType.Schema
-): Map<string, SchemaType.DataType> {
-  const expandedPaths = new Map<string, SchemaType.DataType>();
+): Map<string, SchemaType.DataTypes> {
+  const expandedPaths = new Map<string, SchemaType.DataTypes>();
 
   if (!schema.ROOT) {
     return expandedPaths;
@@ -62,6 +62,10 @@ export function parse(
         nestedPath.push('[]');
       }
 
+      if (type.isRecord) {
+        nestedPath.push('{}');
+      }
+
       if (type.type && schema[type.type]) {
         parseQueue.push({
           path: nestedPath,
@@ -85,14 +89,14 @@ export class SchemaController implements ValidationProvider {
     new Map();
 
   private types: Map<string, SchemaType.DataType<any>> = new Map();
-  public readonly schema: Map<string, SchemaType.DataType> = new Map();
+  public readonly schema: Map<string, SchemaType.DataTypes> = new Map();
 
   private bindingSchemaNormalizedCache: Map<BindingInstance, string> =
     new Map();
 
   public readonly hooks = {
     resolveTypeForBinding: new SyncWaterfallHook<
-      [SchemaType.DataType | undefined, BindingInstance]
+      [SchemaType.DataTypes | undefined, BindingInstance]
     >(),
   };
 
@@ -135,17 +139,32 @@ export class SchemaController implements ValidationProvider {
       return cached;
     }
 
-    const normalized = binding
-      .asArray()
+    let bindingArray = binding.asArray();
+    let normalized = bindingArray
       .map((p) => (typeof p === 'number' ? '[]' : p))
       .join('.');
 
-    this.bindingSchemaNormalizedCache.set(binding, normalized);
+    if (normalized) {
+      this.bindingSchemaNormalizedCache.set(binding, normalized);
+      bindingArray = normalized.split('.');
+    }
+
+    bindingArray.forEach((item) => {
+      const recordBinding = bindingArray
+        .map((p) => (p === item ? '{}' : p))
+        .join('.');
+
+      if (this.schema.get(recordBinding)) {
+        this.bindingSchemaNormalizedCache.set(binding, recordBinding);
+        bindingArray = recordBinding.split('.');
+        normalized = recordBinding;
+      }
+    });
 
     return normalized;
   }
 
-  public getType(binding: BindingInstance): SchemaType.DataType | undefined {
+  public getType(binding: BindingInstance): SchemaType.DataTypes | undefined {
     return this.hooks.resolveTypeForBinding.call(
       this.schema.get(this.normalizeBinding(binding)),
       binding
@@ -154,7 +173,7 @@ export class SchemaController implements ValidationProvider {
 
   public getApparentType(
     binding: BindingInstance
-  ): SchemaType.DataType | undefined {
+  ): SchemaType.DataTypes | undefined {
     const schemaType = this.getType(binding);
 
     if (schemaType === undefined) {

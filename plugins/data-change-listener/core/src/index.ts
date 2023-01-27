@@ -230,7 +230,11 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
       dc.hooks.onUpdate.tap(this.name, (updates, options) => {
         const { silent = false } = options || {};
         if (silent) return;
-        onFieldUpdateHandler(updates.map((t) => t.binding));
+        const validUpdates = updates.filter((update) => {
+          const committedVal = options?.context?.model.get(update.binding);
+          return committedVal === update.newValue;
+        });
+        onFieldUpdateHandler(validUpdates.map((t) => t.binding));
       })
     );
 
