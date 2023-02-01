@@ -1,7 +1,7 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use js_sys::{Array, Function, Reflect, JSON};
+use js_sys::{Array, Function, JSON};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 
@@ -50,16 +50,9 @@ impl Query {
         match self {
             // When no query, every JsValue matches.
             Query::None => true,
-            Query::Text(str) => {
-                let keys = Reflect::own_keys(&obj).unwrap();
-                for key in keys.iter() {
-                    let found_value = Reflect::get(&obj, &key).unwrap();
-                    if found_value.is_string() && str.to_owned() == found_value.as_string().unwrap()
-                    {
-                        return true;
-                    }
-                }
-                false
+            Query::Text(query_value) => {
+                let obj_as_str = JSON::stringify(&obj).unwrap().as_string().unwrap();
+                obj_as_str.contains(query_value)
             }
             Query::Function(_fun) => todo!(),
             /* This is not needed - lists are handled by Queries Struct */
