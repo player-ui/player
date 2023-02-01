@@ -94,7 +94,7 @@ impl CheckPathPlugin {
 
         match node {
             Some(node) => {
-                let found_node = self.search(Rc::clone(&node), queries, false);
+                let found_node = self.search(Rc::clone(&node), queries, true, false);
                 let relative_path_len = found_node
                     .as_ref()
                     .map(|node| node.borrow().get_path().len());
@@ -171,7 +171,7 @@ impl CheckPathPlugin {
 
         match node {
             Some(node) => {
-                let found_node = self.search(Rc::clone(&node), queries, false);
+                let found_node = self.search(Rc::clone(&node), queries, false, false);
                 found_node.is_some()
             }
             None => false,
@@ -188,23 +188,27 @@ impl CheckPathPlugin {
 
     fn search(
         &self,
-        start_at: RefType<Node>,
+        node: RefType<Node>,
         queries: Queries,
-        _in_descendants: bool,
+        include_start_node: bool,
+        search_descendants: bool,
     ) -> Option<RefType<Node>> {
-        let mut stack = vec![Rc::clone(&start_at)];
+        let mut stack = if include_start_node {
+            vec![Rc::clone(&node)]
+        } else {
+            self.get_next_nodes(node, search_descendants)
+        };
         let mut found_node = None;
         'queries: for query in queries {
             while let Some(current) = stack.pop() {
                 let is_match = query.equals(current.borrow().get_raw_node());
+                let mut next_nodes = self.get_next_nodes(Rc::clone(&current), search_descendants);
                 if is_match {
                     found_node = Some(Rc::clone(&current));
-                    if let Some(parent) = current.borrow().get_parent() {
-                        stack.push(Rc::clone(&parent))
-                    }
+                    stack.append(&mut next_nodes);
                     continue 'queries;
-                } else if let Some(parent) = current.borrow().get_parent() {
-                    stack.push(Rc::clone(&parent))
+                } else if next_nodes.len() > 0 {
+                    stack.append(&mut next_nodes);
                 } else {
                     return None;
                 }
@@ -212,5 +216,29 @@ impl CheckPathPlugin {
         }
 
         return found_node;
+    }
+
+    fn get_next_nodes(
+        &self,
+        start_node: RefType<Node>,
+        search_descendants: bool,
+    ) -> Vec<RefType<Node>> {
+        if search_descendants {
+            log(&format!("{:#?}", start_node.borrow().get_children_ids()));
+            start_node
+                .borrow()
+                .get_children_ids()
+                .borrow()
+                .iter()
+                .map(|child_id| Rc::clone(&self.paths.borrow().get_node(child_id).unwrap()))
+                .collect::<Vec<RefType<Node>>>()
+        } else {
+            let parent = start_node.borrow().get_parent();
+            if let Some(parent) = parent {
+                vec![parent]
+            } else {
+                vec![]
+            }
+        }
     }
 }
