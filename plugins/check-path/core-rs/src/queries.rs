@@ -13,7 +13,7 @@ extern "C" {
     fn log(s: &str);
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Query {
     Function(Function),
     Text(String),
@@ -103,25 +103,21 @@ pub struct Queries {
 impl From<JsValue> for Queries {
     fn from(js_value: JsValue) -> Self {
         let query = Query::parse(js_value);
-        let result = if let Query::List(query_list) = query {
-            let queries = query_list
+        let values = if let Query::List(query_list) = query {
+            query_list
                 .iter()
                 .map(|query| Query::parse(query))
-                .collect::<Vec<Query>>();
-            Self {
-                curr: 0,
-                length: Rc::new(RefCell::new(queries.len())),
-                values: Rc::new(RefCell::new(queries)),
-            }
+                .collect::<Vec<Query>>()
+        } else if Query::None != query {
+            vec![query]
         } else {
-            Self {
-                curr: 0,
-                length: Rc::new(RefCell::new(0)),
-                values: Rc::new(RefCell::new(vec![])),
-            }
+            vec![]
         };
-
-        return result;
+        Self {
+            curr: 0,
+            length: Rc::new(RefCell::new(values.len())),
+            values: Rc::new(RefCell::new(values)),
+        }
     }
 }
 
