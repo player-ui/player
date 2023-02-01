@@ -160,8 +160,17 @@ impl CheckPathPlugin {
     }
 
     #[wasm_bindgen(js_name=hasChildContext)]
-    pub fn has_child_context(&self) -> bool {
-        return false;
+    pub fn has_child_context(&self, id: &str, query: JsValue) -> bool {
+        let queries = Queries::from(query);
+        let node = self.paths.borrow().get_node(id);
+        match node {
+            Some(node) => {
+                let found_node = self.search(Rc::clone(&node), queries, false, true);
+
+                found_node.is_some()
+            }
+            None => false,
+        }
     }
 
     #[wasm_bindgen(js_name=hasParentContext)]
