@@ -7,6 +7,7 @@ use wasm_bindgen::JsCast;
 
 use player::*;
 
+use crate::node::Node;
 use crate::paths::Paths;
 use crate::queries::Queries;
 
@@ -88,17 +89,29 @@ impl CheckPathPlugin {
 
     #[wasm_bindgen(js_name=getPath)]
     pub fn get_path(&self, id: &str, query: JsValue) -> JsValue {
-        let _queries = Queries::from(query);
-
+        let queries = Queries::from(query);
         let node = self.paths.borrow().get_node(id);
+
         match node {
-            Some(node) => JsValue::from(
-                node.borrow()
-                    .get_path()
-                    .iter()
-                    .map(Paths::js_value)
-                    .collect::<Array>(),
-            ),
+            Some(node) => {
+                let found_node = self.search(Rc::clone(&node), queries, false);
+                let relative_path_len = found_node
+                    .as_ref()
+                    .map(|node| node.borrow().get_path().len());
+
+                JsValue::from(
+                    node.borrow()
+                        .get_path()
+                        .iter()
+                        .skip(if let Some(relative_path_len) = relative_path_len {
+                            relative_path_len
+                        } else {
+                            0
+                        })
+                        .map(Paths::js_value)
+                        .collect::<Array>(),
+                )
+            }
             None => JsValue::UNDEFINED,
         }
     }
@@ -153,7 +166,16 @@ impl CheckPathPlugin {
 
     #[wasm_bindgen(js_name=hasParentContext)]
     pub fn has_parent_context(&self, id: &str, query: JsValue) -> bool {
-        return !self.get_parent(id, query).is_undefined();
+        let queries = Queries::from(query);
+        let node = self.paths.borrow().get_node(id);
+
+        match node {
+            Some(node) => {
+                let found_node = self.search(Rc::clone(&node), queries, false);
+                found_node.is_some()
+            }
+            None => false,
+        }
     }
 
     #[wasm_bindgen(js_name=getAsset)]
@@ -162,5 +184,33 @@ impl CheckPathPlugin {
             Some(node) => node.borrow().get_raw_node().clone(),
             None => JsValue::UNDEFINED,
         }
+    }
+
+    fn search(
+        &self,
+        start_at: RefType<Node>,
+        queries: Queries,
+        _in_descendants: bool,
+    ) -> Option<RefType<Node>> {
+        let mut stack = vec![Rc::clone(&start_at)];
+        let mut found_node = None;
+        'queries: for query in queries {
+            while let Some(current) = stack.pop() {
+                let is_match = query.equals(current.borrow().get_raw_node());
+                if is_match {
+                    found_node = Some(Rc::clone(&current));
+                    if let Some(parent) = current.borrow().get_parent() {
+                        stack.push(Rc::clone(&parent))
+                    }
+                    continue 'queries;
+                } else if let Some(parent) = current.borrow().get_parent() {
+                    stack.push(Rc::clone(&parent))
+                } else {
+                    return None;
+                }
+            }
+        }
+
+        return found_node;
     }
 }
