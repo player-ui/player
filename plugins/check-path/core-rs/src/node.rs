@@ -1,7 +1,11 @@
-use crate::paths::Path;
-use std::cell::{Ref, RefCell};
+use std::cell::RefCell;
+use std::collections::HashSet;
 use std::rc::Rc;
+
 use wasm_bindgen::prelude::*;
+
+use crate::paths::Path;
+use crate::RefType;
 
 #[wasm_bindgen]
 extern "C" {
@@ -12,8 +16,9 @@ extern "C" {
 pub struct Node {
     id: String,
     node_type: String,
-    raw_node: Rc<RefCell<JsValue>>,
-    parent: Option<Rc<RefCell<Node>>>,
+    raw_node: RefType<JsValue>,
+    parent: Option<RefType<Node>>,
+    children: RefType<HashSet<String>>,
     path: Vec<Path>,
 }
 
@@ -21,15 +26,17 @@ impl Node {
     pub fn new(
         id: String,
         node_type: String,
-        raw_node: Rc<RefCell<JsValue>>,
-        parent: Option<Rc<RefCell<Node>>>,
+        raw_node: RefType<JsValue>,
+        parent: Option<RefType<Node>>,
         path: Vec<Path>,
     ) -> Self {
+        let children: RefType<HashSet<String>> = Rc::new(RefCell::new(HashSet::new()));
         Self {
             id,
             node_type,
             raw_node,
             parent,
+            children,
             path,
         }
     }
@@ -50,11 +57,15 @@ impl Node {
         self.raw_node.borrow().clone()
     }
 
-    pub fn has_parent(&self) -> bool {
-        self.parent.is_some()
+    pub fn get_parent(&self) -> Option<RefType<Node>> {
+        self.parent.as_ref().map(|parent| Rc::clone(parent))
     }
 
-    pub fn get_parent(&self) -> Option<Rc<RefCell<Node>>> {
-        self.parent.as_ref().map(|parent| Rc::clone(parent))
+    pub fn get_children_ids(&self) -> RefType<HashSet<String>> {
+        Rc::clone(&self.children)
+    }
+
+    pub fn add_child(&self, node_id: String) {
+        self.children.borrow_mut().insert(node_id);
     }
 }
