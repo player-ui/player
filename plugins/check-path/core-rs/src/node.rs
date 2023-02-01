@@ -13,6 +13,7 @@ extern "C" {
     fn log(s: &str);
 }
 
+#[derive(Debug)]
 pub struct Node {
     id: String,
     node_type: String,
