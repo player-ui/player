@@ -1,7 +1,7 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use js_sys::{Array, Function, Reflect};
+use js_sys::{Array, Function, Reflect, JSON};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 
@@ -65,31 +65,13 @@ impl Query {
             /* This is not needed - lists are handled by Queries Struct */
             Query::List(_list) => todo!(),
             /* TODO: this cloning can be prevented by Rc<RefCell> */
-            Query::Object(value) => Query::compare(&obj, &value),
+            Query::Object(query_value) => {
+                let obj_as_str = JSON::stringify(&obj).unwrap().as_string().unwrap();
+                let query_as_str = JSON::stringify(query_value).unwrap().as_string().unwrap();
+                let query_len = query_as_str.len();
+                obj_as_str.contains(&query_as_str[1..query_len - 2])
+            }
         }
-    }
-
-    /**
-     * Compare a query object to given object
-     */
-    fn compare(obj: &JsValue, query_value: &JsValue) -> bool {
-        let query_keys = Reflect::own_keys(&query_value).unwrap_or(Array::new());
-        !query_keys
-            .iter()
-            .map(|key| {
-                if Reflect::has(&obj, &key).is_err() {
-                    false
-                } else {
-                    let search_value = Reflect::get(&query_value, &key).unwrap();
-                    if search_value != Reflect::get(&obj, &key).unwrap() {
-                        false
-                    } else {
-                        true
-                    }
-                }
-            })
-            .collect::<Vec<bool>>()
-            .contains(&false)
     }
 }
 
