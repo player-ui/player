@@ -233,7 +233,6 @@ impl CheckPathPlugin {
         search_descendants: bool,
     ) -> Vec<RefType<Node>> {
         if search_descendants {
-            log(&format!("{:#?}", start_node.borrow().get_children_ids()));
             start_node
                 .borrow()
                 .get_children_ids()
