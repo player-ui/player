@@ -96,7 +96,7 @@ impl CheckPathPlugin {
                 node.borrow()
                     .get_path()
                     .iter()
-                    .map(Paths::to_js_value)
+                    .map(Paths::js_value)
                     .collect::<Array>(),
             ),
             None => JsValue::UNDEFINED,

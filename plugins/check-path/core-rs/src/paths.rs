@@ -89,14 +89,14 @@ impl Paths {
                         let mut key_path = key_path.clone();
                         key_path.push(key);
 
-                        let parent = if node.is_some() {
+                        let next_parent = if node.is_some() {
                             node.as_ref().map(Rc::clone)
                         } else if parent.is_some() {
                             parent.as_ref().map(Rc::clone)
                         } else {
                             None
                         };
-                        stack.push((Rc::new(RefCell::new(js_value)), key_path, parent));
+                        stack.push((Rc::new(RefCell::new(js_value)), key_path, next_parent));
                     }
                 });
         }
@@ -124,7 +124,7 @@ impl Paths {
         nodes.clear();
     }
 
-    pub fn to_js_value(path: &Path) -> JsValue {
+    pub fn js_value(path: &Path) -> JsValue {
         return match path {
             Path::Text(value) => JsValue::from(value.clone()),
             Path::Numeric(value) => JsValue::from(value.clone()),
