@@ -67,6 +67,14 @@ impl Paths {
                     node.as_ref().unwrap().borrow().get_id().to_owned(),
                     node.as_ref().map(Rc::clone).unwrap(),
                 );
+
+                if parent.is_some() {
+                    parent
+                        .as_ref()
+                        .unwrap()
+                        .borrow()
+                        .add_child(node.as_ref().unwrap().borrow().get_id().to_owned())
+                }
             }
 
             // Keep looking for nodes by finding more objects.
@@ -86,22 +94,17 @@ impl Paths {
                         } else {
                             Path::Numeric(key_as_f64)
                         };
+
                         let mut key_path = key_path.clone();
                         key_path.push(key);
 
-                        let next_parent =
-                            if node.is_some() {
-                                if parent.is_some() {
-                                    parent.as_ref().unwrap().borrow().add_child(
-                                        node.as_ref().unwrap().borrow().get_id().to_owned(),
-                                    )
-                                }
-                                node.as_ref().map(Rc::clone)
-                            } else if parent.is_some() {
-                                parent.as_ref().map(Rc::clone)
-                            } else {
-                                None
-                            };
+                        let next_parent = if node.is_some() {
+                            node.as_ref().map(Rc::clone)
+                        } else if parent.is_some() {
+                            parent.as_ref().map(Rc::clone)
+                        } else {
+                            None
+                        };
                         stack.push((Rc::new(RefCell::new(js_value)), key_path, next_parent));
                     }
                 });
