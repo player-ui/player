@@ -121,8 +121,8 @@ impl Paths {
         let id = Reflect::get(&raw_node, &JsValue::from_str("id")).unwrap();
         let node_type = Reflect::get(&raw_node, &JsValue::from_str("type")).unwrap();
 
-        return if let (Some(id), Some(node_type)) = (id.as_string(), node_type.as_string()) {
-            let node = Node::new(id, node_type, Rc::clone(obj), parent, key_path);
+        return if let (Some(id), Some(_)) = (id.as_string(), node_type.as_string()) {
+            let node = Node::new(id, Rc::clone(obj), parent, key_path);
             Some(Rc::new(RefCell::new(node)))
         } else {
             None

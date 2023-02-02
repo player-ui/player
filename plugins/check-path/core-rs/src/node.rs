@@ -16,7 +16,6 @@ extern "C" {
 #[derive(Debug)]
 pub struct Node {
     id: String,
-    node_type: String,
     raw_node: RefType<JsValue>,
     parent: Option<RefType<Node>>,
     children: RefType<HashSet<String>>,
@@ -26,7 +25,6 @@ pub struct Node {
 impl Node {
     pub fn new(
         id: String,
-        node_type: String,
         raw_node: RefType<JsValue>,
         parent: Option<RefType<Node>>,
         path: Vec<Path>,
@@ -34,7 +32,6 @@ impl Node {
         let children: RefType<HashSet<String>> = Rc::new(RefCell::new(HashSet::new()));
         Self {
             id,
-            node_type,
             raw_node,
             parent,
             children,
@@ -48,10 +45,6 @@ impl Node {
 
     pub fn get_id(&self) -> &str {
         &self.id
-    }
-
-    pub fn get_type(&self) -> &str {
-        &self.node_type
     }
 
     pub fn get_raw_node(&self) -> JsValue {
