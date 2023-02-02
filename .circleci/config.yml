@@ -44,7 +44,7 @@ commands:
           at: ~/player
 
       - restore_cache:
-          keys: 
+          keys:
             - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
             - v1-bazel-cache-core-{{ .Branch }}
             - v1-bazel-cache-core-main
@@ -170,7 +170,7 @@ jobs:
       # TODO: the timeout should be added to the test itself
       - run: bazel test --test_env=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --test_env=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --test_env=APPLITOOLS_PR_NUMBER=${CIRCLE_PULL_REQUEST##*/} --test_timeout=600 --jobs=1 --verbose_failures --config=ci  -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
 
-      - run: 
+      - run:
           when: always
           command: |
             RESULTS_DIR=_test_results
@@ -257,7 +257,7 @@ jobs:
 
       - run: |
           BUNDLE_TARGETS=$(bazel query "kind(nodejs_test, //...)" --output label 2>/dev/null | tr '\n' ' ')
-          bazel coverage --config=ci -- $BUNDLE_TARGETS
+          bazel coverage --config=ci -- $BUNDLE_TARGETS -//plugins/check-path/core-rs/...
 
       - codecov/upload:
           file: ./bazel-out/_coverage/_coverage_report.dat
