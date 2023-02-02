@@ -54,10 +54,12 @@ impl Query {
                 let obj_as_str = JSON::stringify(&obj).unwrap().as_string().unwrap();
                 obj_as_str.contains(query_value)
             }
-            Query::Function(_fun) => todo!(),
+            Query::Function(callback) => match callback.call1(&JsValue::null(), &obj) {
+                Ok(val) => val.is_truthy(),
+                _ => false,
+            },
             /* This is not needed - lists are handled by Queries Struct */
             Query::List(_list) => todo!(),
-            /* TODO: this cloning can be prevented by Rc<RefCell> */
             Query::Object(query_value) => {
                 let obj_as_str = JSON::stringify(&obj).unwrap().as_string().unwrap();
                 let query_as_str = JSON::stringify(query_value).unwrap().as_string().unwrap();
