@@ -10,10 +10,10 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 http_archive(
-  name = "rules_player",
-  strip_prefix = "rules_player-0.10.2",
-  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.10.2.tar.gz"],
-  sha256 = "5cffcc80eafc2dc0522a4e397bba5b6261ccbad3e399fa843bc452fc113357ab"
+    name = "rules_player",
+    sha256 = "5cffcc80eafc2dc0522a4e397bba5b6261ccbad3e399fa843bc452fc113357ab",
+    strip_prefix = "rules_player-0.10.2",
+    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.10.2.tar.gz"],
 )
 
 load("@rules_player//:workspace.bzl", "deps")
@@ -187,8 +187,8 @@ workspace_refs(name = "plugin_workspace_refs")
 #################################
 http_archive(
     name = "rules_rust",
-    sha256 = "324c2a86a8708d30475f324846b35965c432b63a35567ed2b5051b86791ce345",
-    urls = ["https://github.com/bazelbuild/rules_rust/releases/download/0.13.0/rules_rust-v0.13.0.tar.gz"],
+    sha256 = "d125fb75432dc3b20e9b5a19347b45ec607fabe75f98c6c4ba9badaab9c193ce",
+    urls = ["https://github.com/bazelbuild/rules_rust/releases/download/0.17.0/rules_rust-v0.17.0.tar.gz"],
 )
 
 # rust toolchain
@@ -196,7 +196,7 @@ load("@rules_rust//rust:repositories.bzl", "rules_rust_dependencies", "rust_regi
 
 rules_rust_dependencies()
 
-rust_register_toolchains()
+rust_register_toolchains(edition = "2021")
 
 # rust wasm toolchain
 load("@rules_rust//wasm_bindgen:repositories.bzl", "rust_wasm_bindgen_dependencies", "rust_wasm_bindgen_register_toolchains")
