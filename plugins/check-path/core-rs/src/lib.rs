@@ -223,6 +223,8 @@ impl CheckPathPlugin {
                     continue 'queries;
                 } else if next_nodes.len() > 0 {
                     stack.append(&mut next_nodes);
+                } else if stack.len() == 0 {
+                    return None;
                 }
             }
         }
