@@ -62,6 +62,7 @@ impl Paths {
                 parent.as_ref().map(Rc::clone),
             );
 
+            // add new node to paths, track as a child if there is parent.
             if node.as_ref().is_some() {
                 self.nodes_by_id.borrow_mut().insert(
                     node.as_ref().unwrap().borrow().get_id().to_owned(),
