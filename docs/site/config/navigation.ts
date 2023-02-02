@@ -79,8 +79,8 @@ const navigation: Navigation = {
             },
             {
               title: 'Templates',
-              path: '/content/templates'
-            }
+              path: '/content/templates',
+            },
           ],
         },
         {
@@ -118,6 +118,23 @@ const navigation: Navigation = {
             {
               title: 'CLI',
               path: '/tools/cli',
+            },
+          ],
+        },
+        {
+          title: 'XLR',
+          routes: [
+            {
+              title: 'Intro',
+              path: '/xlr/intro',
+            },
+            {
+              title: 'Concepts',
+              path: '/xlr/concepts',
+            },
+            {
+              title: 'Usage',
+              path: '/xlr/usage',
             },
           ],
         },

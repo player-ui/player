@@ -9,6 +9,6 @@ javascript_pipeline(
     peer_dependencies = [
         "@npm//react",
         "@npm//@types/react",
-        "//language/dsl:@player-ui/dsl"
+        "@npm//@player-tools/dsl"
     ]
 )

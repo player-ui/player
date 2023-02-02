@@ -21,6 +21,7 @@ import {
   FlowController,
 } from './controllers';
 import { FlowExpPlugin } from './plugins/flow-exp-plugin';
+import { DefaultExpPlugin } from './plugins/default-exp-plugin';
 import type {
   PlayerFlowState,
   InProgressState,
@@ -48,6 +49,18 @@ export interface PlayerPlugin {
    */
   apply: (player: Player) => void;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface ExtendedPlayerPlugin<
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  Assets = void,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  Views = void,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  Expressions = void,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  DataTypes = void
+> {}
 
 export interface PlayerConfigOptions {
   /** A set of plugins to load  */
@@ -117,17 +130,16 @@ export class Player {
   };
 
   constructor(config?: PlayerConfigOptions) {
-    const initialPlugins: PlayerPlugin[] = [];
-    const flowExpPlugin = new FlowExpPlugin();
-
-    initialPlugins.push(flowExpPlugin);
-
     if (config?.logger) {
       this.logger.addHandler(config.logger);
     }
 
     this.config = config || {};
-    this.config.plugins = [...(this.config.plugins || []), ...initialPlugins];
+    this.config.plugins = [
+      new DefaultExpPlugin(),
+      ...(this.config.plugins || []),
+      new FlowExpPlugin(),
+    ];
     this.config.plugins?.forEach((plugin) => {
       plugin.apply(this);
     });
@@ -413,19 +425,6 @@ export class Player {
       this.hooks.view.call(view);
     });
     this.hooks.viewController.call(viewController);
-
-    /** Gets formatter for given formatName and formats value if found, returns value otherwise */
-    const formatFunction: ExpressionHandler<[unknown, string], any> = (
-      ctx,
-      value,
-      formatName
-    ) => {
-      return (
-        schema.getFormatterForType({ type: formatName })?.format(value) ?? value
-      );
-    };
-
-    expressionEvaluator.addExpressionFunction('format', formatFunction);
 
     return {
       start: () => {

@@ -72,7 +72,10 @@ export class ValidationMiddleware implements DataModelMiddleware {
       } else if (validations instanceof Set) {
         validations.forEach((validation) => {
           invalidBindings.push(validation.binding);
-          if (!validation.isStrong) {
+          if (
+            !validation.isStrong &&
+            validation.binding.asString() === binding.asString()
+          ) {
             nextTransaction.push([validation.binding, value]);
           }
         });

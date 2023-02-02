@@ -12,5 +12,6 @@ javascript_pipeline(
     peer_dependencies = [
         "//core/player:@player-ui/player",
     ],
-    library_name = 'CommonTypesPlugin'
+    library_name = 'CommonTypesPlugin',
+    xlr_mode = 'plugin'
 )

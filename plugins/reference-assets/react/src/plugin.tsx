@@ -1,11 +1,21 @@
 import React from 'react';
 import type { ReactPlayer, ReactPlayerPlugin } from '@player-ui/react';
-import type { Player } from '@player-ui/player';
+import type { Player, ExtendedPlayerPlugin } from '@player-ui/player';
 import { AssetProviderPlugin } from '@player-ui/asset-provider-plugin-react';
 import { ChakraProvider, useTheme } from '@chakra-ui/react';
+import type {
+  InputAsset,
+  TextAsset,
+  CollectionAsset,
+  ActionAsset,
+  InfoAsset,
+} from '@player-ui/reference-assets-plugin';
 import { ReferenceAssetsPlugin as ReferenceAssetsCorePlugin } from '@player-ui/reference-assets-plugin';
 import { Input, Text, Collection, Action, Info } from './assets';
 
+/**
+ *
+ */
 const OptionalChakraThemeProvider = (
   props: React.PropsWithChildren<unknown>
 ) => {
@@ -22,7 +32,13 @@ const OptionalChakraThemeProvider = (
 /**
  * A plugin to register the base reference assets
  */
-export class ReferenceAssetsPlugin implements ReactPlayerPlugin {
+export class ReferenceAssetsPlugin
+  implements
+    ReactPlayerPlugin,
+    ExtendedPlayerPlugin<
+      [InputAsset, TextAsset, ActionAsset, InfoAsset, CollectionAsset]
+    >
+{
   name = 'reference-assets-web-plugin';
 
   applyReact(reactPlayer: ReactPlayer) {
