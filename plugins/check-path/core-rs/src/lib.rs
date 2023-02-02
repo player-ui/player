@@ -165,8 +165,10 @@ impl CheckPathPlugin {
         let node = self.paths.borrow().get_node(id);
         match node {
             Some(node) => {
+                if *queries.length.borrow() == 0 {
+                    return true;
+                }
                 let found_node = self.search(Rc::clone(&node), queries, false, true);
-
                 found_node.is_some()
             }
             None => false,
@@ -180,6 +182,9 @@ impl CheckPathPlugin {
 
         match node {
             Some(node) => {
+                if *queries.length.borrow() == 0 {
+                    return true;
+                }
                 let found_node = self.search(Rc::clone(&node), queries, false, false);
                 found_node.is_some()
             }
