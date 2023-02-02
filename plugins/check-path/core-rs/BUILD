@@ -1,6 +1,6 @@
 load("@rules_player//javascript:js_library_pipeline.bzl", "PLACEHOLDER_VERSION")
 load("@build_bazel_rules_nodejs//:index.bzl", "js_library", "pkg_npm")
-load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_shared_library")
+load("@rules_rust//rust:defs.bzl", "rust_shared_library", "rust_test")
 load("@rules_rust//wasm_bindgen:wasm_bindgen.bzl", "rust_wasm_bindgen")
 load("@crate_index//:defs.bzl", "aliases", "all_crate_deps")
 load("@rules_player//javascript/package_json:package_json.bzl", "create_package_json")
@@ -25,6 +25,16 @@ rust_wasm_bindgen(
     name = "index",
     target = "nodejs",
     wasm_file = ":check-path-rs-lib",
+)
+
+rust_test(
+    name = "check-path-rs-tests",
+    srcs = ["tests/wasm.rs"],
+    edition = "2021",
+    rustc_flags = [],
+    deps = all_crate_deps(
+        normal_dev = True,
+    ),
 )
 
 create_package_json(
