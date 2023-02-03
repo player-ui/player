@@ -31,7 +31,6 @@ rust_test(
     name = "check-path-rs-tests",
     srcs = ["tests/wasm.rs"],
     edition = "2021",
-    rustc_flags = [],
     deps = all_crate_deps(
         normal_dev = True,
     ),
