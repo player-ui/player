@@ -163,16 +163,18 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
                 switch viewModel.loadingState {
                 case .idle:
                     Color.clear.onAppear {
+                        context.unload()
                         Task { await viewModel.next() }
                     }
                 case .retry(let prevResult):
                     Color.clear.onAppear {
+                        context.unload()
                         Task { await viewModel.next(prevResult) }
                     }
                 case .loading:
-                    loading()
+                    loading().onAppear { context.unload() }
                 case .failed(let error):
-                    fallback(ManagedPlayerErrorContext(error: error, retry: viewModel.retry, reset: viewModel.reset))
+                    fallback(ManagedPlayerErrorContext(error: error, retry: viewModel.retry, reset: viewModel.reset)).onAppear { context.unload() }
                 case .loaded(let flow):
                     makePlayerView(flow: flow)
                         .transition(transitionInfo.transition)
@@ -187,7 +189,8 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
             flow: flow,
             plugins: plugins + [viewModel] + (handleScroll ? [ScrollPlugin()] : []),
             result: $viewModel.result,
-            context: context
+            context: context,
+            unloadOnDisappear: false
         )
     }
 }
@@ -261,16 +264,18 @@ internal struct ManagedPlayer13<Loading: View, Fallback: View>: View {
                 switch viewModel.loadingState {
                 case .idle:
                     Color.clear.onAppear {
+                        context.unload()
                         Task { await viewModel.next() }
                     }
                 case .retry(let prevResult):
                     Color.clear.onAppear {
+                        context.unload()
                         Task { await viewModel.next(prevResult) }
                     }
                 case .loading:
-                    loading()
+                    loading().onAppear { context.unload() }
                 case .failed(let error):
-                    fallback(ManagedPlayerErrorContext(error: error, retry: viewModel.retry, reset: viewModel.reset))
+                    fallback(ManagedPlayerErrorContext(error: error, retry: viewModel.retry, reset: viewModel.reset)).onAppear { context.unload() }
                 case .loaded(let flow):
                     makePlayerView(flow: flow)
                         .transition(transitionInfo.transition)
@@ -286,7 +291,8 @@ internal struct ManagedPlayer13<Loading: View, Fallback: View>: View {
             flow: flow,
             plugins: plugins + [viewModel] + (handleScroll ? [ScrollPlugin()] : []),
             result: $viewModel.result,
-            context: context
+            context: context,
+            unloadOnDisappear: false
         )
     }
 }
