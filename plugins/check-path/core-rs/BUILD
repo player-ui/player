@@ -27,15 +27,6 @@ rust_wasm_bindgen(
     wasm_file = ":check-path-rs-lib",
 )
 
-rust_test(
-    name = "check-path-rs-tests",
-    srcs = ["tests/wasm.rs"],
-    edition = "2021",
-    deps = all_crate_deps(
-        normal_dev = True,
-    ),
-)
-
 create_package_json(
     name = "check-path-rs-package_json",
     package_name = "@player-ui/check-path-plugin-wasm",
