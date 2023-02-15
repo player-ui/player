@@ -1,11 +1,5 @@
 {
-  "name": "@player-ui/check-path-plugin-rs",
+  "name": "@player-ui/check-path-plugin-wasm",
   "main": "index.js",
-  "module": "index.js",
-  "dependencies": {
-    "@player-ui/asset-transform-plugin": "^0.3.0",
-    "@player-ui/check-path-plugin": "^0.3.0",
-    "@player-ui/make-flow": "^0.3.0",
-    "@player-ui/player": "^0.3.0"
-  }
+  "module": "index.js"
 }
