@@ -78,6 +78,43 @@ class ManagedPlayer14Tests: ViewInspectorTestCase {
                 .vStack()
                 .first?
                 .anyView()
+                .scrollViewReader()
+                .scrollView()
+            XCTAssertNotNil(view)
+        }
+
+        wait(for: [exp2], timeout: 10)
+
+        ViewHosting.expel()
+    }
+
+    func testFlowLoadsWithSuppliedScrollPlugin() throws {
+        let player = ManagedPlayer(
+            plugins: [ReferenceAssetsPlugin(), ScrollPlugin()],
+            flowManager: AlwaysLoaded(),
+            context: .init(),
+            handleScroll: false, // Passed in ScrollPlugin should ignore this
+            onComplete: {_ in},
+            fallback: {(_) in},
+            loading: {
+                Text("Loading")
+            }
+        )
+
+        try player.inspect().anyView().view(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).color(0).callOnAppear()
+
+        ViewHosting.host(view: player)
+
+        let exp2 = player.inspection.inspect(after: 3) { view in
+            let view = try view.anyView()
+                .view(ManagedPlayer14<Text, EmptyView>.self)
+                .vStack()
+                .group(0)
+                .view(SwiftUIPlayer.self, 0)
+                .vStack()
+                .first?
+                .anyView()
+                .scrollViewReader()
                 .scrollView()
             XCTAssertNotNil(view)
         }
@@ -125,6 +162,7 @@ class ManagedPlayer14Tests: ViewInspectorTestCase {
 
 extension ManagedPlayer13: Inspectable {}
 
+@available(iOS 14, *)
 class ManagedPlayer13Tests: XCTestCase {
     func testLoadingView() throws {
         let viewModel = ManagedPlayerViewModel(
@@ -207,6 +245,43 @@ class ManagedPlayer13Tests: XCTestCase {
                 .vStack()
                 .first?
                 .anyView()
+                .scrollViewReader()
+                .scrollView()
+            XCTAssertNotNil(view)
+        }
+
+        wait(for: [exp2], timeout: 10)
+
+        ViewHosting.expel()
+    }
+
+    func testFlowLoadsWithSuppliedScrollPlugin() throws {
+        let player = ManagedPlayer13(
+            viewModel: ManagedPlayerViewModel(
+                manager: AlwaysLoaded(),
+                onComplete: {_ in}
+            ),
+            plugins: [ReferenceAssetsPlugin(), ScrollPlugin()],
+            context: .init(),
+            handleScroll: false, // ScrollPlugin passed in should ignore this
+            fallback: {(_) in},
+            loading: {
+                Text("Loading")
+            }
+        )
+
+        try player.inspect().vStack().group(0).color(0).callOnAppear()
+
+        ViewHosting.host(view: player)
+
+        let exp2 = player.inspection.inspect(after: 3) { view in
+            let view = try view.vStack()
+                .group(0)
+                .view(SwiftUIPlayer.self, 0)
+                .vStack()
+                .first?
+                .anyView()
+                .scrollViewReader()
                 .scrollView()
             XCTAssertNotNil(view)
         }
@@ -262,6 +337,7 @@ class NeverLoad: FlowManager {
 class ErrorLoaded: FlowManager {
     init() {}
     func next(_ result: CompletedState?) async throws -> NextState {
+        try await Task.sleep(nanoseconds: 500_000_000)
         throw PlayerError.jsConversionFailure
     }
 }
