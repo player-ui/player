@@ -187,11 +187,19 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
     func makePlayerView(flow: String) -> some View {
         SwiftUIPlayer(
             flow: flow,
-            plugins: plugins + [viewModel] + (handleScroll ? [ScrollPlugin()] : []),
+            plugins: plugins + [viewModel] + scrollPlugin,
             result: $viewModel.result,
             context: context,
             unloadOnDisappear: false
         )
+    }
+
+    var scrollPlugin: [NativePlugin] {
+        guard
+            plugins.filter({ $0 as? ScrollPlugin != nil }).count == 0,
+            handleScroll
+        else { return [] }
+        return [ScrollPlugin()]
     }
 }
 
@@ -289,11 +297,19 @@ internal struct ManagedPlayer13<Loading: View, Fallback: View>: View {
     func makePlayerView(flow: String) -> some View {
         SwiftUIPlayer(
             flow: flow,
-            plugins: plugins + [viewModel] + (handleScroll ? [ScrollPlugin()] : []),
+            plugins: plugins + [viewModel] + scrollPlugin,
             result: $viewModel.result,
             context: context,
             unloadOnDisappear: false
         )
+    }
+
+    var scrollPlugin: [NativePlugin] {
+        guard
+            plugins.filter({ $0 as? ScrollPlugin != nil }).count == 0,
+            handleScroll
+        else { return [] }
+        return [ScrollPlugin()]
     }
 }
 
@@ -331,21 +347,3 @@ internal final class Inspection<V> where V: View {
     }
 }
 
-class ScrollPlugin: NativePlugin {
-    var pluginName: String = "ScrollPlugin"
-
-    func apply<P>(player: P) where P: HeadlessPlayer {
-        guard let player = player as? SwiftUIPlayer else { return }
-        player.hooks?.view.tap(name: pluginName) { view in
-            if #available(iOS 14, *) {
-                return AnyView(ScrollView {
-                    ScrollViewReader { proxy in
-                        view.scrollToProxy(proxy)
-                    }
-                })
-            } else {
-                return AnyView(ScrollView { view })
-            }
-        }
-    }
-}
