@@ -175,7 +175,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         // remove evaluated nodes
         val currentViewJson = Json.decodeFromJsonElement(
             GenericSerializer(),
-            simpleFlow.views[0].jsonObject
+            simpleFlow.views!![0].jsonObject
                 .filterKeys("applicability")
         )
 
