@@ -42,6 +42,7 @@ internal class InProgressStateTest : NodeBaseTest() {
         every { mockNode.getObject("value") } returns mockNode
         every { mockNode.toJson() } returns JsonPrimitive("")
         every { node.getObject(any()) } returns node
+        every { node["flow"] } returns node
         every { node.getString("ref") } returns "someRef"
         every { node.format } returns format
         every { format.serializersModule } returns EmptySerializersModule
