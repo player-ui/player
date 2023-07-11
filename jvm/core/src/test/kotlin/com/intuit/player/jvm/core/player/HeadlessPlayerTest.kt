@@ -19,6 +19,7 @@ import com.intuit.player.jvm.utils.filterKeys
 import com.intuit.player.jvm.utils.test.*
 import com.intuit.player.plugins.assets.ReferenceAssetsPlugin
 import com.intuit.player.plugins.types.CommonTypesPlugin
+import kotlinx.coroutines.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -27,6 +28,7 @@ import kotlinx.serialization.json.jsonObject
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.TestTemplate
 import kotlin.concurrent.thread
+import kotlin.coroutines.resume
 
 internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
 
@@ -339,9 +341,18 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
 
     @TestTemplate
     fun `test player released state`() = runBlockingTest {
+        val releasedStateTap: Deferred<ReleasedState> = async {
+            suspendCancellableCoroutine {
+                player.hooks.state.tap { state ->
+                    if (state is ReleasedState) it.resume(state)
+                }
+            }
+        }
+
         assertTrue(player.state is NotStartedState)
         player.release()
         assertTrue(player.state is ReleasedState)
+        assertEquals(ReleasedState, releasedStateTap.await())
         val exception = assertThrows(PlayerException::class.java) {
             player.start(simpleFlowString)
         }
