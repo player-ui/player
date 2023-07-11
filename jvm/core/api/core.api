@@ -73,14 +73,9 @@ public static final fun getValue (Lcom/intuit/player/jvm/core/asset/Asset;)Ljava
 }
 
 public final class com/intuit/player/jvm/core/asset/AssetWrapper : com/intuit/player/jvm/core/bridge/NodeWrapper {
-public static final field Companion Lcom/intuit/player/jvm/core/asset/AssetWrapper$Companion;
 public fun <init> (Lcom/intuit/player/jvm/core/bridge/Node;)V
 public final fun getAsset ()Lcom/intuit/player/jvm/core/asset/Asset;
 public fun getNode ()Lcom/intuit/player/jvm/core/bridge/Node;
-}
-
-public final class com/intuit/player/jvm/core/asset/AssetWrapper$Companion {
-public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public class com/intuit/player/jvm/core/asset/MetaData : com/intuit/player/jvm/core/bridge/NodeWrapper {
@@ -466,13 +461,8 @@ public abstract fun registerSerializersModule (Lkotlinx/serialization/modules/Se
 }
 
 public abstract interface class com/intuit/player/jvm/core/bridge/serialization/format/RuntimeFormatConfiguration {
-public abstract fun getDiscriminator ()Ljava/lang/String;
 public abstract fun getRuntime ()Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
 public abstract fun getSerializersModule ()Lkotlinx/serialization/modules/SerializersModule;
-}
-
-public final class com/intuit/player/jvm/core/bridge/serialization/format/RuntimeFormatConfiguration$DefaultImpls {
-public static fun getDiscriminator (Lcom/intuit/player/jvm/core/bridge/serialization/format/RuntimeFormatConfiguration;)Ljava/lang/String;
 }
 
 public final class com/intuit/player/jvm/core/bridge/serialization/format/RuntimeFormatKt {
@@ -754,7 +744,6 @@ public static final field Companion Lcom/intuit/player/jvm/core/flow/FlowInstanc
 public fun <init> (Lcom/intuit/player/jvm/core/bridge/Node;)V
 public final fun getCurrentState ()Lcom/intuit/player/jvm/core/player/state/NamedState;
 public final fun getHooks ()Lcom/intuit/player/jvm/core/flow/FlowInstance$Hooks;
-public final fun getId ()Ljava/lang/String;
 public fun getNode ()Lcom/intuit/player/jvm/core/bridge/Node;
 public fun transition (Ljava/lang/String;Lcom/intuit/player/jvm/core/flow/TransitionOptions;)V
 }
@@ -1109,6 +1098,9 @@ public static final fun AsyncFlowIterator ([Ljava/lang/String;)Lcom/intuit/playe
 }
 
 public final class com/intuit/player/jvm/core/player/HeadlessPlayer : com/intuit/player/jvm/core/player/Player, com/intuit/player/jvm/core/bridge/NodeWrapper {
+public fun <init> (Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;[Lcom/intuit/player/jvm/core/plugins/Plugin;)V
+public fun <init> (Ljava/util/List;)V
+public fun <init> (Ljava/util/List;Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;)V
 public fun <init> (Ljava/util/List;Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;Ljava/net/URL;)V
 public synthetic fun <init> (Ljava/util/List;Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;Ljava/net/URL;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 public fun <init> ([Lcom/intuit/player/jvm/core/plugins/Plugin;)V
@@ -1118,7 +1110,6 @@ public synthetic fun <init> ([Lcom/intuit/player/jvm/core/plugins/Plugin;Lcom/in
 public fun getHooks ()Lcom/intuit/player/jvm/core/player/Player$Hooks;
 public fun getLogger ()Lcom/intuit/player/jvm/core/logger/TapableLogger;
 public fun getNode ()Lcom/intuit/player/jvm/core/bridge/Node;
-public static fun getNode$delegate (Lcom/intuit/player/jvm/core/player/HeadlessPlayer;)Ljava/lang/Object;
 public fun getPlugins ()Ljava/util/List;
 public final fun getRuntime ()Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
 public fun getState ()Lcom/intuit/player/jvm/core/player/state/PlayerFlowState;
