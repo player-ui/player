@@ -13,7 +13,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /** [RuntimePlugin] that adds a `setTimeout` implementation into a the [Runtime] if it doesn't exist */
-public class SetTimeoutPlugin(private val exceptionHandler: CoroutineExceptionHandler? = null) : RuntimePlugin, PlayerPlugin {
+public class SetTimeoutPlugin(private val exceptionHandler: CoroutineExceptionHandler? = null) :
+    RuntimePlugin, PlayerPlugin {
 
     private var player: Player? = null
 
@@ -21,7 +22,11 @@ public class SetTimeoutPlugin(private val exceptionHandler: CoroutineExceptionHa
         if (!runtime.contains("setTimeout")) runtime.add("setTimeout") { callback: Invokable<Any?>, timeout: Double ->
             runtime.scope.launch(
                 exceptionHandler ?: CoroutineExceptionHandler { _, exception ->
-                    PlayerPluginException("SetTimeoutPlugin", "Exception throw during setTimeout invocation", exception).let {
+                    PlayerPluginException(
+                        "SetTimeoutPlugin",
+                        "Exception throw during setTimeout invocation",
+                        exception
+                    ).let {
                         player?.inProgressState?.fail(it) ?: throw it
                     }
                 }
