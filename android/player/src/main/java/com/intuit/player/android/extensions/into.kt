@@ -98,6 +98,6 @@ public infix fun List<View?>.into(root: ViewGroup) {
         }
 
         // Remove any leftover views
-        while (root.childCount > size) { root.removeViewAt(root.childCount - 1) }
+        while (root.childCount > filtered.size) { root.removeViewAt(root.childCount - 1) }
     }
 }
