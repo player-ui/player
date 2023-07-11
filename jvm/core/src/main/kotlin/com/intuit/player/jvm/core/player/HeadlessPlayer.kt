@@ -93,8 +93,8 @@ public class HeadlessPlayer public constructor(
         }
 
     override fun release() {
-        // TODO: Call state hook!
         if (!runtime.isReleased()) {
+            hooks.state.call(HashMap(), arrayOf(ReleasedState))
             runtime.release()
         }
     }
