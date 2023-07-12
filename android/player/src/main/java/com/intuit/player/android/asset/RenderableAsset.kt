@@ -270,13 +270,17 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
             throw SerializationException("DecodableAsset.Serializer.serialize is not supported")
 
         /** Conform this [Serializer] to cast the expanded asset to [T] */
-        public inline fun <reified T : RenderableAsset> conform(): KSerializer<T> = object : KSerializer<T> by this as KSerializer<T> {
-            override fun deserialize(decoder: Decoder): T = this@Serializer.deserialize(decoder) as T
-        }
+        public inline fun <reified T : RenderableAsset?> conform(): KSerializer<T> = object : KSerializer<T?> by this as KSerializer<T?> {
+            override fun deserialize(decoder: Decoder) = this@Serializer.deserialize(decoder) as? T
+        } as KSerializer<T>
 
-        public fun <T : RenderableAsset> conform(klass: KClass<T>): KSerializer<T> = object : KSerializer<T> by this as KSerializer<T> {
-            override fun deserialize(decoder: Decoder): T = klass.javaObjectType.cast(this@Serializer.deserialize(decoder))!!
-        }
+        public fun <T : RenderableAsset> conform(klass: KClass<T>): KSerializer<T> = object : KSerializer<T?> by this as KSerializer<T?> {
+            override fun deserialize(decoder: Decoder) = try {
+                klass.javaObjectType.cast(this@Serializer.deserialize(decoder))
+            } catch (e: ClassCastException) {
+                null
+            }
+        } as KSerializer<T>
     }
 
     // Seemingly needed to prevent stack overflow: https://github.com/Kotlin/kotlinx.serialization/issues/1776
