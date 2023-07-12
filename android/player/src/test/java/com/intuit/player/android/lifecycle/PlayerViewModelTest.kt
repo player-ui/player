@@ -18,7 +18,6 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
@@ -27,7 +26,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(MockKExtension::class)
 internal class PlayerViewModelTest {
 
@@ -43,7 +41,7 @@ internal class PlayerViewModelTest {
     @BeforeEach
     fun setup() {
         viewModel = PlayerViewModel(flowIterator)
-        every { runtime.scope } returns TestCoroutineScope()
+        every { runtime.scope } returns runtime.scope
     }
 
     @AfterEach
