@@ -2,37 +2,44 @@
 
 package android.util
 
-internal var e: String? = null
+internal var e: MutableList<String> = mutableListOf()
 internal fun e(tag: String, msg: String): Int {
-    e = "ERROR: $tag: $msg"
-    println(e)
+    val message = "ERROR: $tag: $msg"
+    e.add(message)
+    println(message)
     return 0
 }
 
-internal var w: String? = null
+internal var w: MutableList<String> = mutableListOf()
 internal fun w(tag: String, msg: String): Int {
-    w = "WARN: $tag: $msg"
-    println(w)
+    val message = "WARN: $tag: $msg"
+    w.add(message)
+    println(message)
     return 0
 }
 
-internal var i: String? = null
+internal var i: MutableList<String> = mutableListOf()
 internal fun i(tag: String, msg: String): Int {
-    i = "INFO: $tag: $msg"
-    println(i)
+    val message = "INFO: $tag: $msg"
+    i.add(message)
+    println(message)
     return 0
 }
 
-internal var d: String? = null
+internal var d: MutableList<String> = mutableListOf()
 internal fun d(tag: String, msg: String): Int {
-    d = "DEBUG: $tag: $msg"
-    println(d)
+    val message = "DEBUG: $tag: $msg"
+    d.add(message)
+    println(message)
     return 0
 }
 
-internal var t: String? = null
-internal fun t(tag: String, msg: String): Int {
-    d = "DEBUG: $tag: $msg"
-    println(d)
+internal var v: MutableList<String> = mutableListOf()
+internal fun v(tag: String, msg: String): Int {
+    val message = "TRACE: $tag: $msg"
+    v.add(message)
+    println(message)
     return 0
 }
+
+internal fun clearLogs() = listOf(e, w, i, d, v).forEach { it.clear() }
