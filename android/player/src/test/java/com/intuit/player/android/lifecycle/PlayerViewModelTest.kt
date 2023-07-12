@@ -37,13 +37,15 @@ internal class PlayerViewModelTest {
 
     @MockK lateinit var flowIterator: AsyncFlowIterator
     @MockK lateinit var runtime: Runtime<*>
+    @MockK lateinit var scope: CoroutineScope
 
     lateinit var viewModel: PlayerViewModel
 
     @BeforeEach
     fun setup() {
         viewModel = PlayerViewModel(flowIterator)
-        every { runtime.scope } returns CoroutineScope(EmptyCoroutineContext)
+        every { runtime.scope } returns scope
+        every { scope.coroutineContext } returns EmptyCoroutineContext
     }
 
     @AfterEach
