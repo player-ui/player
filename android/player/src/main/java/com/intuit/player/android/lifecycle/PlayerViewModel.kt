@@ -1,6 +1,7 @@
 package com.intuit.player.android.lifecycle
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -83,6 +84,7 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
     }
 
     private fun start(flow: String) = player.start(flow) {
+        Log.d("test123123", it.isFailure.toString())
         when {
             it.isSuccess -> player.logger.info(
                 "Flow completed successfully!",
@@ -90,7 +92,7 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
             )
             it.isFailure -> player.logger.error(
                 "Error in Flow!",
-                it.exceptionOrNull()?.stackTraceToString()
+                it.exceptionOrNull()
             )
         }
     }
@@ -130,12 +132,10 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
     }
 
     public fun recycle() {
-        player.logger.debug("PlayerViewModel: recycling player")
         player.recycle()
     }
 
     public fun release() {
-        player.logger.debug("PlayerViewModel: releasing player")
         player.release()
     }
 
