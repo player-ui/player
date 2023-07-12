@@ -147,6 +147,10 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
     /**
      * Render the asset using the resulting [Context] of the [AndroidPlayer.Hooks.ContextHook]
      * called with the provided [context].
+     *
+     * This should only be called from the Activity/Fragment to provide a [context] for [RenderableAsset]s to render with.
+     * Rendering of nested children assets should instead invoke the contextual [RenderableAsset.render] methods
+     * to automatically pull [context] from their parents.
      */
     public fun render(context: Context): View = assetContext
         .withContext(player.hooks.context.call(context))
