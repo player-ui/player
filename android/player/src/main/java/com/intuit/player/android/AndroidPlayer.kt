@@ -19,6 +19,7 @@ import com.intuit.player.jvm.core.logger.TapableLogger
 import com.intuit.player.jvm.core.player.*
 import com.intuit.player.jvm.core.player.state.CompletedState
 import com.intuit.player.jvm.core.player.state.PlayerFlowState
+import com.intuit.player.jvm.core.player.state.inProgressState
 import com.intuit.player.jvm.core.plugins.LoggerPlugin
 import com.intuit.player.jvm.core.plugins.Plugin
 import com.intuit.player.jvm.core.plugins.findPlugin
@@ -154,7 +155,12 @@ public class AndroidPlayer private constructor(
                 transition.value = true
                 clearCaches()
                 view?.hooks?.onUpdate?.tap { asset ->
-                    assetHandler(expandAsset(asset), transition.value)
+                    try {
+                        assetHandler(expandAsset(asset), transition.value)
+                    } catch (exception: Exception) {
+                        logger.error("Error while expanding ${asset?.id}", exception)
+                        inProgressState?.fail(PlayerException("Error while expanding ${asset?.id}", exception))
+                    }
                 }
             }
         }
