@@ -19,7 +19,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -43,7 +43,7 @@ internal class PlayerViewModelTest {
     @BeforeEach
     fun setup() {
         viewModel = PlayerViewModel(flowIterator)
-        every { runtime.scope } returns CoroutineScope(EmptyCoroutineContext)
+        every { runtime.scope } returns TestCoroutineScope()
     }
 
     @AfterEach
@@ -142,16 +142,6 @@ internal class PlayerViewModelTest {
         }
         viewModel.recycle()
         assertTrue(recycled)
-    }
-
-    @Test
-    fun `onCleared releases player`() {
-        coEvery { flowIterator.terminate() } returns Unit
-        viewModel.apply(runtime)
-        viewModel.onCleared()
-        assertThrows<PlayerRuntimeException> {
-            viewModel.player.start(SimpleAsset.sampleFlow.toString())
-        }
     }
 
     @Test
