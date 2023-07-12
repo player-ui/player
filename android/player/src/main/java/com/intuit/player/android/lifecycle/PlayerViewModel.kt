@@ -53,7 +53,7 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
     //  example, where the app needs to actually load a different native experience outside the
     //  player scope. Not sure how to solve this. Maybe a player factory instead that requires
     //  the [PlayerViewModel] to be finished initialization?
-    protected val player: AndroidPlayer by lazy {
+    public val player: AndroidPlayer by lazy {
         AndroidPlayer(plugins + this)
     }
 
@@ -122,7 +122,7 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
         this.runtime = runtime
     }
 
-    override fun onCleared() {
+    public override fun onCleared() {
         runtime.scope.launch {
             if (manager.state.value != AsyncIterationManager.State.Done) manager.iterator.terminate()
             release()
@@ -153,10 +153,9 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
         when (state.value) {
             ManagedPlayerState.NotStarted -> manager.next()
             is ManagedPlayerState.Error,
-            is ManagedPlayerState.Running -> when (val currentFlow = manager.state.value) {
+            is ManagedPlayerState.Running -> when (manager.state.value) {
                 AsyncIterationManager.State.NotStarted -> manager.next()
-                is AsyncIterationManager.State.Item<*> -> start(currentFlow.value as String)
-                // try to re-retrieve the next flow from the previous state
+                is AsyncIterationManager.State.Item<*>,
                 is AsyncIterationManager.State.Error -> manager.next(player.completedState)
             }
         }

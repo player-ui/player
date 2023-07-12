@@ -233,10 +233,10 @@ public class com/intuit/player/android/lifecycle/PlayerViewModel : androidx/life
 	public final fun fail (Ljava/lang/Throwable;)V
 	public final fun getBeacons ()Lkotlinx/coroutines/flow/SharedFlow;
 	protected final fun getManager ()Lcom/intuit/player/jvm/core/managed/AsyncIterationManager;
-	protected final fun getPlayer ()Lcom/intuit/player/android/AndroidPlayer;
+	public final fun getPlayer ()Lcom/intuit/player/android/AndroidPlayer;
 	protected fun getPlugins ()Ljava/util/List;
 	public final fun getState ()Lkotlinx/coroutines/flow/StateFlow;
-	protected fun onCleared ()V
+	public fun onCleared ()V
 	public final fun recycle ()V
 	public final fun release ()V
 	public final fun retry ()V
