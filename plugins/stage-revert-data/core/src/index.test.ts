@@ -2,7 +2,7 @@ import type { DataController, InProgressState } from '@player-ui/player';
 import { Player } from '@player-ui/player';
 import type { Flow } from '@player-ui/types';
 import { waitFor } from '@testing-library/dom';
-import StageReverDataPlugin from './index';
+import { StageRevertDataPlugin } from './index';
 
 const dataChangeFlow: Flow = {
   id: 'test-flow',
@@ -63,7 +63,7 @@ describe('Stage-Revert-Data plugin', () => {
 
   beforeEach(() => {
     player = new Player({
-      plugins: [new StageReverDataPlugin()],
+      plugins: [new StageRevertDataPlugin()],
     });
 
     player.hooks.dataController.tap('test', (dc) => {
@@ -187,7 +187,7 @@ describe('Stage-Revert-Data plugin', () => {
 
     beforeAll(() => {
       playerNoPluginActive = new Player({
-        plugins: [new StageReverDataPlugin()],
+        plugins: [new StageRevertDataPlugin()],
       });
 
       playerNoPluginActive.hooks.dataController.tap('test', (dc) => {

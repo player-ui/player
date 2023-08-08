@@ -5,7 +5,7 @@ import { ValidationMiddleware } from '@player-ui/player';
  * this plugin is supposed to stage/store changes in a local object/cache, until a transition happens,
  *  then changes are committed to the Data Model
  */
-export default class StageRevertDataPlugin implements PlayerPlugin {
+export class StageRevertDataPlugin implements PlayerPlugin {
   name = 'stage-revert-data-plugin';
 
   apply(player: Player) {
