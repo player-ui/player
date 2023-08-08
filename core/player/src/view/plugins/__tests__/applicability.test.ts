@@ -34,6 +34,11 @@ describe('applicability', () => {
   });
 
   it('undefined does not remove asset', () => {
+    const aP = new ApplicabilityPlugin();
+    const sP = new StringResolverPlugin();
+
+    aP.applyParser(parser);
+
     const root = parser.parseObject({
       asset: {
         values: [
@@ -50,8 +55,8 @@ describe('applicability', () => {
 
     const resolver = new Resolver(root as Node.Node, resolverOptions);
 
-    new ApplicabilityPlugin().applyResolver(resolver);
-    new StringResolverPlugin().applyResolver(resolver);
+    aP.applyResolver(resolver);
+    sP.applyResolver(resolver);
 
     expect(resolver.update()).toStrictEqual({
       asset: { values: [{ value: 'foo' }, { value: 'bar' }] },
