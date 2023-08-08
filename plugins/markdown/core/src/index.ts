@@ -8,7 +8,7 @@ export * from './types';
 /**
  * A plugin that parses markdown written into text assets using the given converters for markdown features into existing assets.
  */
-export default class MarkdownPlugin implements PlayerPlugin {
+export class MarkdownPlugin implements PlayerPlugin {
   name = 'MarkdownPlugin';
 
   private mappers: Mappers;

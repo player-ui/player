@@ -4,7 +4,7 @@ import { Registry } from '@player-ui/partial-match-registry';
 import { PartialMatchFingerprintPlugin } from '@player-ui/partial-match-fingerprint-plugin';
 import type { Flow } from '@player-ui/types';
 import { mockMappers } from './helpers';
-import MarkdownPlugin from '..';
+import { MarkdownPlugin } from '..';
 
 const unparsedFlow: Flow = {
   id: 'markdown-flow',

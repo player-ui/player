@@ -10,6 +10,10 @@ javascript_pipeline(
         "//core/player:@player-ui/player",
         "//core/types:@player-ui/types",
     ],
+    build_data = [
+        "@npm//babel-loader",
+        "@npm//@babel/plugin-transform-numeric-separator",
+    ],
     test_data = [
         "//core/partial-match-registry:@player-ui/partial-match-registry",
         "//plugins/partial-match-fingerprint/core:@player-ui/partial-match-fingerprint-plugin",
