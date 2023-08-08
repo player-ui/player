@@ -143,7 +143,6 @@ describe('delete', () => {
 
     controller.delete('foo.baz');
 
-    expect(controller.getTrash()).toStrictEqual(new Set());
     expect(controller.get('')).toStrictEqual({
       foo: { bar: 'Some Data' },
     });
@@ -166,9 +165,6 @@ describe('delete', () => {
 
     controller.delete('foo.bar');
 
-    expect(controller.getTrash()).toStrictEqual(
-      new Set([parser.parse('foo.bar')])
-    );
     expect(controller.get('')).toStrictEqual({ foo: {} });
   });
 
@@ -187,9 +183,6 @@ describe('delete', () => {
 
     controller.delete('foo.0');
 
-    expect(controller.getTrash()).toStrictEqual(
-      new Set([parser.parse('foo.0')])
-    );
     expect(controller.get('')).toStrictEqual({ foo: [] });
   });
 
@@ -208,7 +201,6 @@ describe('delete', () => {
 
     controller.delete('foo.1');
 
-    expect(controller.getTrash()).toStrictEqual(new Set());
     expect(controller.get('')).toStrictEqual({ foo: ['Some Data'] });
   });
 
@@ -230,7 +222,6 @@ describe('delete', () => {
 
     controller.delete('foo');
 
-    expect(controller.getTrash()).toStrictEqual(new Set([parser.parse('foo')]));
     expect(controller.get('')).toStrictEqual({ baz: 'Other data' });
   });
 
@@ -251,7 +242,6 @@ describe('delete', () => {
 
     controller.delete('');
 
-    expect(controller.getTrash()).toStrictEqual(new Set());
     expect(controller.get('')).toStrictEqual({
       foo: {
         bar: 'Some Data',
@@ -295,6 +285,9 @@ describe('formatting', () => {
 
     controller.set([['foo.baz', 'should-deformat']], { formatted: true });
     expect(controller.get('foo.baz')).toBe('deformatted!');
+    expect(controller.get('foo.baz', { formatted: false })).toBe(
+      'deformatted!'
+    );
   });
 });
 
@@ -429,4 +422,31 @@ it('should not send update for deeply equal data', () => {
   controller.set([['user', { name: 'frodo', age: 3 }]]);
 
   expect(onUpdateCallback).not.toBeCalled();
+});
+
+it('should handle deleting non-existent value + parent value', () => {
+  const model = {
+    user: {
+      name: 'frodo',
+      age: 3,
+    },
+  };
+
+  const localData = new LocalModel(model);
+
+  const parser = new BindingParser({
+    get: localData.get,
+    set: localData.set,
+  });
+  const controller = new DataController({}, { pathResolver: parser });
+  controller.hooks.resolveDataStages.tap('basic', () => [localData]);
+
+  controller.delete('user.email');
+
+  expect(controller.get('user')).toStrictEqual({
+    name: 'frodo',
+    age: 3,
+  });
+
+  controller.delete('foo.bar');
 });

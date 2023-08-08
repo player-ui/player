@@ -78,6 +78,9 @@ export const EditorPanel = (props: EditorPanelProps) => {
         theme={darkMode ? 'vs-dark' : 'light'}
         value={editorValue}
         language="json"
+        options={{
+          formatOnPaste: true,
+        }}
         onChange={onChange}
       />
     </div>

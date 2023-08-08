@@ -5,6 +5,7 @@ import type {
   Flow,
   ReactPlayerOptions,
 } from '@player-ui/react';
+import { BeaconPlugin } from '@player-ui/beacon-plugin-react';
 import { ReactPlayer } from '@player-ui/react';
 import { ChakraProvider, Spinner } from '@chakra-ui/react';
 import { makeFlow } from '@player-ui/make-flow';
@@ -59,20 +60,30 @@ const LocalPlayerStory = (props: LocalPlayerStory) => {
   const [playerState, setPlayerState] =
     React.useState<PlayerFlowStatus>('not-started');
 
+  const [trackedBeacons, setTrackedBeacons] = React.useState<any[]>([]);
+
   const rp = React.useMemo(() => {
+    const beaconPlugin = new BeaconPlugin({
+      callback: (beacon) => {
+        setTrackedBeacons((t) => [...t, beacon]);
+      },
+    });
+
     return new ReactPlayer({
       ...options,
       plugins: [
         new StorybookPlayerPlugin(stateActions),
+        beaconPlugin,
         ...plugins,
         ...(options?.plugins ?? []),
       ],
     });
-  }, [plugins]);
+  }, [plugins, flow]);
 
   /** A callback to start the flow */
   const startFlow = () => {
     setPlayerState('in-progress');
+    setTrackedBeacons([]);
     rp.start(flow)
       .then(() => {
         setPlayerState('completed');
@@ -85,7 +96,7 @@ const LocalPlayerStory = (props: LocalPlayerStory) => {
 
   React.useEffect(() => {
     startFlow();
-  }, [rp, flow]);
+  }, [rp]);
 
   React.useEffect(() => {
     // merge new data from storybook controls
@@ -105,7 +116,7 @@ const LocalPlayerStory = (props: LocalPlayerStory) => {
     return subscribe(addons.getChannel(), '@@player/flow/reset', () => {
       startFlow();
     });
-  }, [rp, flow]);
+  }, [rp]);
 
   if (renderContext.platform !== 'web' && renderContext.token) {
     return (
@@ -125,7 +136,8 @@ const LocalPlayerStory = (props: LocalPlayerStory) => {
     return (
       <PlayerFlowSummary
         reset={startFlow}
-        outcome={currentState.endState.outcome}
+        completedState={currentState}
+        beacons={trackedBeacons}
       />
     );
   }

@@ -1,5 +1,69 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`dynamic templates Works with template items plus value items Should show template item first when coming before values on lexical order 1`] = `
+Object {
+  "asset": Object {
+    "id": "overviewItem3",
+    "label": Object {
+      "asset": Object {
+        "id": "overviewItem3-label",
+        "type": "text",
+        "value": "1099-A",
+      },
+    },
+    "type": "overviewItem",
+    "values": Array [
+      Object {
+        "asset": Object {
+          "id": "overviewItem3-year",
+          "type": "text",
+          "value": "Desciption of concept 1099 1",
+        },
+      },
+      Object {
+        "asset": Object {
+          "id": "loverviewItem3-cy",
+          "type": "text",
+          "value": "4000",
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`dynamic templates Works with template items plus value items Should show template item last when coming after values on lexical order 1`] = `
+Object {
+  "asset": Object {
+    "id": "overviewItem1",
+    "label": Object {
+      "asset": Object {
+        "id": "overviewItem1-label",
+        "type": "text",
+        "value": "First Summary",
+      },
+    },
+    "type": "overviewItem",
+    "values": Array [
+      Object {
+        "asset": Object {
+          "id": "overviewItem1-year",
+          "type": "text",
+          "value": "Desciption of year summary 1",
+        },
+      },
+      Object {
+        "asset": Object {
+          "id": "loverviewItem1-cy",
+          "type": "text",
+          "value": "14000",
+        },
+      },
+    ],
+  },
+}
+`;
+
 exports[`templates works with nested templates 1`] = `
 Object {
   "children": Array [
@@ -8,6 +72,7 @@ Object {
         "values",
       ],
       "value": Object {
+        "override": false,
         "parent": [Circular],
         "type": "multi-node",
         "values": Array [
@@ -24,6 +89,7 @@ Object {
                         "values",
                       ],
                       "value": Object {
+                        "override": false,
                         "parent": [Circular],
                         "type": "multi-node",
                         "values": Array [
@@ -71,6 +137,7 @@ Object {
                         "values",
                       ],
                       "value": Object {
+                        "override": false,
                         "parent": [Circular],
                         "type": "multi-node",
                         "values": Array [
@@ -118,6 +185,7 @@ Object {
                         "values",
                       ],
                       "value": Object {
+                        "override": false,
                         "parent": [Circular],
                         "type": "multi-node",
                         "values": Array [
@@ -172,6 +240,7 @@ Object {
         "values",
       ],
       "value": Object {
+        "override": false,
         "parent": [Circular],
         "type": "multi-node",
         "values": Array [

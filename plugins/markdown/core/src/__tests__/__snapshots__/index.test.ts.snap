@@ -1,0 +1,241 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MarkdownPlugin parses the flow containing markdown into valid FRF, based on the given mappers 1`] = `
+Object {
+  "id": "markdown-view",
+  "primaryInfo": Object {
+    "asset": Object {
+      "id": "markdown-primaryInfo-collection",
+      "type": "collection",
+      "values": Array [
+        Object {
+          "asset": Object {
+            "id": "markdown-primaryInfo-collection-bold-composite-7",
+            "type": "composite",
+            "values": Array [
+              Object {
+                "asset": Object {
+                  "id": "markdown-primaryInfo-collection-bold-text-4",
+                  "type": "text",
+                  "value": "some ",
+                },
+              },
+              Object {
+                "asset": Object {
+                  "id": "markdown-primaryInfo-collection-bold-text-5",
+                  "modifiers": Array [
+                    Object {
+                      "type": "tag",
+                      "value": "important",
+                    },
+                  ],
+                  "type": "text",
+                  "value": "bold text",
+                },
+              },
+            ],
+          },
+        },
+        Object {
+          "asset": Object {
+            "id": "markdown-primaryInfo-collection-italic-text-8",
+            "modifiers": Array [
+              Object {
+                "type": "tag",
+                "value": "emphasis",
+              },
+            ],
+            "type": "text",
+            "value": "italicized text",
+          },
+        },
+        Object {
+          "asset": Object {
+            "id": "markdown-primaryInfo-collection-orderd-list-list-20",
+            "metaData": Object {
+              "listType": "ordered",
+            },
+            "type": "list",
+            "values": Array [
+              Object {
+                "asset": Object {
+                  "id": "markdown-primaryInfo-collection-orderd-list-text-11",
+                  "type": "text",
+                  "value": "First",
+                },
+              },
+              Object {
+                "asset": Object {
+                  "id": "markdown-primaryInfo-collection-orderd-list-text-14",
+                  "type": "text",
+                  "value": "Second",
+                },
+              },
+              Object {
+                "asset": Object {
+                  "id": "markdown-primaryInfo-collection-orderd-list-text-17",
+                  "type": "text",
+                  "value": "Third",
+                },
+              },
+            ],
+          },
+        },
+        Object {
+          "asset": Object {
+            "id": "markdown-primaryInfo-collection-unorderd-list-list-31",
+            "type": "list",
+            "values": Array [
+              Object {
+                "asset": Object {
+                  "id": "markdown-primaryInfo-collection-unorderd-list-text-21",
+                  "modifiers": Array [
+                    Object {
+                      "metaData": Object {
+                        "ref": "https://turbotax.intuit.ca",
+                      },
+                      "type": "link",
+                    },
+                  ],
+                  "type": "text",
+                  "value": "First",
+                },
+              },
+              Object {
+                "asset": Object {
+                  "id": "markdown-primaryInfo-collection-unorderd-list-text-25",
+                  "type": "text",
+                  "value": "Second",
+                },
+              },
+              Object {
+                "asset": Object {
+                  "id": "markdown-primaryInfo-collection-unorderd-list-text-28",
+                  "type": "text",
+                  "value": "Third",
+                },
+              },
+            ],
+          },
+        },
+        Object {
+          "asset": Object {
+            "accessibility": "alt text",
+            "id": "markdown-primaryInfo-collection-image-image-32",
+            "metaData": Object {
+              "ref": "image.png",
+            },
+            "type": "image",
+          },
+        },
+        Object {
+          "asset": Object {
+            "id": "markdown-primaryInfo-collection-unsupported-text-34",
+            "type": "text",
+            "value": "Highlights are ==not supported==",
+          },
+        },
+      ],
+    },
+  },
+  "title": Object {
+    "asset": Object {
+      "id": "markdown-view-title-composite-3",
+      "type": "composite",
+      "values": Array [
+        Object {
+          "asset": Object {
+            "id": "markdown-view-title-text-0",
+            "type": "text",
+            "value": "Learn more at ",
+          },
+        },
+        Object {
+          "asset": Object {
+            "id": "markdown-view-title-text-1",
+            "modifiers": Array [
+              Object {
+                "metaData": Object {
+                  "ref": "https://turbotax.intuit.ca",
+                },
+                "type": "link",
+              },
+            ],
+            "type": "text",
+            "value": "TurboTax Canada",
+          },
+        },
+      ],
+    },
+  },
+  "type": "questionAnswer",
+}
+`;
+
+exports[`MarkdownPlugin parses the flow, with only the required mappers 1`] = `
+Object {
+  "id": "markdown-view",
+  "primaryInfo": Object {
+    "asset": Object {
+      "id": "markdown-primaryInfo-collection",
+      "type": "collection",
+      "values": Array [
+        Object {
+          "asset": Object {
+            "id": "markdown-primaryInfo-collection-bold",
+            "type": "text",
+            "value": "some **bold text**",
+          },
+        },
+        Object {
+          "asset": Object {
+            "id": "markdown-primaryInfo-collection-italic",
+            "type": "text",
+            "value": "*italicized text*",
+          },
+        },
+        Object {
+          "asset": Object {
+            "id": "markdown-primaryInfo-collection-orderd-list",
+            "type": "text",
+            "value": "1. First
+2. Second
+3. Third",
+          },
+        },
+        Object {
+          "asset": Object {
+            "id": "markdown-primaryInfo-collection-unorderd-list",
+            "type": "text",
+            "value": "- [First](https://turbotax.intuit.ca)
+- Second
+- Third",
+          },
+        },
+        Object {
+          "asset": Object {
+            "id": "markdown-primaryInfo-collection-image",
+            "type": "text",
+            "value": "![alt text](image.png)",
+          },
+        },
+        Object {
+          "asset": Object {
+            "id": "markdown-primaryInfo-collection-unsupported-text-36",
+            "type": "text",
+            "value": "Highlights are ==not supported==",
+          },
+        },
+      ],
+    },
+  },
+  "title": Object {
+    "asset": Object {
+      "id": "markdown-view-title",
+      "type": "text",
+      "value": "Learn more at [TurboTax Canada](https://turbotax.intuit.ca)",
+    },
+  },
+  "type": "questionAnswer",
+}
+`;

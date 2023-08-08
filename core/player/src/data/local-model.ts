@@ -1,5 +1,5 @@
 import get from 'dlv';
-import { setIn } from 'timm';
+import { setIn, omit, removeAt } from 'timm';
 import type { BindingInstance } from '../binding';
 import type { BatchSetTransaction, DataModelImpl, Updates } from './model';
 
@@ -37,5 +37,29 @@ export class LocalModel implements DataModelImpl {
       effectiveOperations.push({ binding, oldValue, newValue: value });
     });
     return effectiveOperations;
+  }
+
+  public delete(binding: BindingInstance) {
+    const parentBinding = binding.parent();
+
+    if (parentBinding) {
+      const parentValue = this.get(parentBinding);
+
+      if (parentValue !== undefined) {
+        if (Array.isArray(parentValue)) {
+          this.model = setIn(
+            this.model,
+            parentBinding.asArray(),
+            removeAt(parentValue, binding.key() as number)
+          ) as any;
+        } else {
+          this.model = setIn(
+            this.model,
+            parentBinding.asArray(),
+            omit(parentValue, binding.key() as string)
+          ) as any;
+        }
+      }
+    }
   }
 }

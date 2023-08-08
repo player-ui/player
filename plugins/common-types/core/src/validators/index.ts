@@ -1,4 +1,5 @@
 import type { Expression } from '@player-ui/types';
+import { resolveDataRefs } from '@player-ui/player';
 import type { ValidatorFunction } from '@player-ui/player';
 
 // Shamelessly lifted from Scott Gonzalez via the Bassistance Validation plugin http://projects.scottsplayground.com/email_address_validation/
@@ -177,12 +178,13 @@ export const regex: ValidatorFunction<{
     return;
   }
 
+  const resolvedRegex = resolveDataRefs(options.regex, context);
   // Split up /pattern/flags into [pattern, flags]
-  const patternMatch = options.regex.match(/^\/(.*)\/(\w)*$/);
+  const patternMatch = resolvedRegex.match(/^\/(.*)\/(\w)*$/);
 
   const regexp = patternMatch
     ? new RegExp(patternMatch[1], patternMatch[2])
-    : new RegExp(options.regex);
+    : new RegExp(resolvedRegex);
 
   if (!regexp.test(value)) {
     const message = context.constants.getConstants(

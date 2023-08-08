@@ -95,15 +95,10 @@ export default class TemplatePlugin implements ViewPlugin {
     });
 
     const result: Node.MultiNode = {
-      parent: node.parent,
       type: NodeType.MultiNode,
+      override: false,
       values,
     };
-
-    result.values.forEach((innerNode) => {
-      // eslint-disable-next-line no-param-reassign
-      innerNode.parent = result;
-    });
 
     return result;
   }

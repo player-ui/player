@@ -138,7 +138,7 @@ export class ReactPlayer {
 
     onUpdatePlugin.apply(this.player);
 
-    this.Component = this.hooks.webComponent.call(this.createReactComp());
+    this.Component = this.createReactPlayerComponent();
     this.reactPlayerInfo = {
       playerVersion: this.player.getVersion(),
       playerCommit: this.player.getCommit(),
@@ -182,17 +182,11 @@ export class ReactPlayer {
     return this.reactPlayerInfo.reactPlayerCommit;
   }
 
-  private createReactComp(): React.ComponentType<ReactPlayerComponentProps> {
-    const ActualPlayerComp = this.hooks.playerComponent.call(PlayerComp);
+  private createReactPlayerComponent(): React.ComponentType<ReactPlayerComponentProps> {
+    const BaseComp = this.hooks.webComponent.call(this.createReactComp());
 
-    /** the component to use to render Player */
-    const ReactPlayerComponent = () => {
-      const view = useSubscribedState<View>(this.viewUpdateSubscription);
-
-      if (this.options.suspend) {
-        this.viewUpdateSubscription.suspend();
-      }
-
+    /** Wrap the Error boundary and context provider after the hook call to catch anything wrapped by the hook */
+    const ReactPlayerComponent = (props: ReactPlayerComponentProps) => {
       return (
         <ErrorBoundary
           fallbackRender={() => null}
@@ -205,19 +199,38 @@ export class ReactPlayer {
           }}
         >
           <PlayerContext.Provider value={{ player: this.player }}>
-            <AssetContext.Provider
-              value={{
-                registry: this.assetRegistry,
-              }}
-            >
-              {view && <ActualPlayerComp view={view} />}
-            </AssetContext.Provider>
+            <BaseComp {...props} />
           </PlayerContext.Provider>
         </ErrorBoundary>
       );
     };
 
     return ReactPlayerComponent;
+  }
+
+  private createReactComp(): React.ComponentType<ReactPlayerComponentProps> {
+    const ActualPlayerComp = this.hooks.playerComponent.call(PlayerComp);
+
+    /** the component to use to render the player */
+    const WebPlayerComponent = () => {
+      const view = useSubscribedState<View>(this.viewUpdateSubscription);
+
+      if (this.options.suspend) {
+        this.viewUpdateSubscription.suspend();
+      }
+
+      return (
+        <AssetContext.Provider
+          value={{
+            registry: this.assetRegistry,
+          }}
+        >
+          {view && <ActualPlayerComp view={view} />}
+        </AssetContext.Provider>
+      );
+    };
+
+    return WebPlayerComponent;
   }
 
   /**

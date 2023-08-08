@@ -29,6 +29,7 @@ export class FlowController {
     this.start = this.start.bind(this);
     this.run = this.run.bind(this);
     this.transition = this.transition.bind(this);
+    this.addNewFlow = this.addNewFlow.bind(this);
   }
 
   /** Navigate to another state in the state-machine */
@@ -40,20 +41,9 @@ export class FlowController {
     this.current.transition(stateTransition, options);
   }
 
-  private async addNewFlow(flow: FlowInstance) {
+  private addNewFlow(flow: FlowInstance) {
     this.navStack.push(flow);
     this.current = flow;
-    flow.hooks.transition.tap(
-      'flow-controller',
-      async (_oldState, newState: NamedState) => {
-        if (newState.value.state_type === 'FLOW') {
-          this.log?.debug(`Got FLOW state. Loading flow ${newState.value.ref}`);
-          const endState = await this.run(newState.value.ref);
-          this.log?.debug(`Flow ended. Using outcome: ${endState.outcome}`);
-          flow.transition(endState.outcome);
-        }
-      }
-    );
     this.hooks.flow.call(flow);
   }
 
@@ -74,6 +64,20 @@ export class FlowController {
 
     const flow = new FlowInstance(startState, startFlow, { logger: this.log });
     this.addNewFlow(flow);
+
+    flow.hooks.afterTransition.tap('flow-controller', (flowInstance) => {
+      if (flowInstance.currentState?.value.state_type === 'FLOW') {
+        const subflowId = flowInstance.currentState?.value.ref;
+        this.log?.debug(`Loading subflow ${subflowId}`);
+        this.run(subflowId).then((subFlowEndState) => {
+          this.log?.debug(
+            `Subflow ended. Using outcome: ${subFlowEndState.outcome}`
+          );
+          flowInstance.transition(subFlowEndState?.outcome);
+        });
+      }
+    });
+
     const end = await flow.start();
     this.navStack.pop();
 

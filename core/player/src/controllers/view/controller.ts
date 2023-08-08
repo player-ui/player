@@ -75,13 +75,30 @@ export class ViewController {
       }
     );
 
-    options.model.hooks.onUpdate.tap('viewController', (updates) => {
+    /** Trigger a view update */
+    const update = (updates: Set<BindingInstance>) => {
       if (this.currentView) {
         if (this.optimizeUpdates) {
-          this.queueUpdate(new Set(updates.map((t) => t.binding)));
+          this.queueUpdate(updates);
         } else {
           this.currentView.update();
         }
+      }
+    };
+
+    options.model.hooks.onUpdate.tap('viewController', (updates) => {
+      update(new Set(updates.map((t) => t.binding)));
+    });
+
+    options.model.hooks.onDelete.tap('viewController', (binding) => {
+      const parentBinding = binding.parent();
+      const property = binding.key();
+
+      // Deleting an array item will trigger an update for the entire array
+      if (typeof property === 'number' && parentBinding) {
+        update(new Set([parentBinding]));
+      } else {
+        update(new Set([binding]));
       }
     });
   }

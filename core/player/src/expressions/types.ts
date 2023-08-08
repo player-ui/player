@@ -1,17 +1,24 @@
 import type { DataModelWithParser } from '../data';
 import type { Logger } from '../logger';
 
+export type ExpressionObjectType = {
+  /** The expression to eval */
+  value: BasicExpressionTypes;
+};
+
 export type ExpressionLiteralType =
   | string
   | number
   | boolean
   | undefined
   | null;
-export type ExpressionType =
-  | object
+
+export type BasicExpressionTypes =
   | ExpressionLiteralType
-  | Array<ExpressionLiteralType>
-  | ExpressionNode;
+  | ExpressionObjectType
+  | Array<ExpressionLiteralType | ExpressionObjectType>;
+
+export type ExpressionType = BasicExpressionTypes | ExpressionNode;
 
 export interface OperatorProcessingOptions {
   /**
@@ -53,7 +60,12 @@ export const ExpNodeOpaqueIdentifier = Symbol('Expression Node ID');
 
 /** Checks if the input is an already processed Expression node */
 export function isExpressionNode(x: any): x is ExpressionNode {
-  return typeof x === 'object' && x.__id === ExpNodeOpaqueIdentifier;
+  return (
+    typeof x === 'object' &&
+    x !== null &&
+    !Array.isArray(x) &&
+    x.__id === ExpNodeOpaqueIdentifier
+  );
 }
 
 export interface NodePosition {

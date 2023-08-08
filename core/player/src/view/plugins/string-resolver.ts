@@ -87,15 +87,19 @@ export function resolveAllRefs(
 }
 
 /** Traverse up the node tree finding the first available 'path' */
-const findBasePath = (node: Node.Node): Node.PathSegment[] => {
+const findBasePath = (
+  node: Node.Node,
+  resolver: Resolver
+): Node.PathSegment[] => {
   const parentNode = node.parent;
   if (!parentNode) {
     return [];
   }
 
   if ('children' in parentNode) {
+    const original = resolver.getSourceNode(node);
     return (
-      parentNode.children?.find((child) => child.value === node)?.path ?? []
+      parentNode.children?.find((child) => child.value === original)?.path ?? []
     );
   }
 
@@ -103,7 +107,7 @@ const findBasePath = (node: Node.Node): Node.PathSegment[] => {
     return [];
   }
 
-  return findBasePath(parentNode);
+  return findBasePath(parentNode, resolver);
 };
 
 /** A plugin that resolves all string references for each node */
@@ -148,7 +152,7 @@ export default class StringResolverPlugin implements ViewPlugin {
           propsToSkip = new Set(['exp']);
         }
 
-        const nodePath = findBasePath(node);
+        const nodePath = findBasePath(node, resolver);
 
         /** If the path includes something that is supposed to be skipped, this node should be skipped too. */
         if (

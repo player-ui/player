@@ -1,6 +1,9 @@
+import { isExpressionNode } from './types';
 import type {
   ExpressionHandler,
   ExpressionNode,
+  ExpressionObjectType,
+  ExpressionType,
   NodeLocation,
   NodePosition,
 } from './types';
@@ -128,4 +131,20 @@ export function findClosestNodeAtPosition(
   if (node.location && isInRange(position, node.location)) {
     return node;
   }
+}
+
+/** Checks if the expression is a simple type */
+export function isObjectExpression(
+  expr: ExpressionType
+): expr is ExpressionObjectType {
+  if (isExpressionNode(expr)) {
+    return false;
+  }
+
+  return (
+    typeof expr === 'object' &&
+    expr !== null &&
+    !Array.isArray(expr) &&
+    'value' in expr
+  );
 }

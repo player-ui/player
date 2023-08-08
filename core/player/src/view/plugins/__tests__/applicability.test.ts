@@ -5,6 +5,7 @@ import { ExpressionEvaluator } from '../../../expressions';
 import { SchemaController } from '../../../schema';
 import type { Resolve } from '../../resolver';
 import { Resolver } from '../../resolver';
+import type { Node } from '../../parser';
 import { Parser } from '../../parser';
 import { ApplicabilityPlugin, StringResolverPlugin } from '..';
 
@@ -32,6 +33,35 @@ describe('applicability', () => {
     };
   });
 
+  it('undefined does not remove asset', () => {
+    const root = parser.parseObject({
+      asset: {
+        values: [
+          {
+            applicability: '{{foo}}',
+            value: 'foo',
+          },
+          {
+            value: 'bar',
+          },
+        ],
+      },
+    });
+
+    const resolver = new Resolver(root as Node.Node, resolverOptions);
+
+    new ApplicabilityPlugin().applyResolver(resolver);
+    new StringResolverPlugin().applyResolver(resolver);
+
+    expect(resolver.update()).toStrictEqual({
+      asset: { values: [{ value: 'foo' }, { value: 'bar' }] },
+    });
+    model.set([['foo', false]]);
+    expect(resolver.update()).toStrictEqual({
+      asset: { values: [{ value: 'bar' }] },
+    });
+  });
+
   it('removes empty objects', () => {
     new ApplicabilityPlugin().applyParser(parser);
     const root = parser.parseObject({
@@ -48,7 +78,7 @@ describe('applicability', () => {
       },
     });
     model.set([['foo', true]]);
-    const resolver = new Resolver(root!, resolverOptions);
+    const resolver = new Resolver(root as Node.Node, resolverOptions);
 
     new ApplicabilityPlugin().applyResolver(resolver);
     new StringResolverPlugin().applyResolver(resolver);
@@ -77,7 +107,7 @@ describe('applicability', () => {
       },
     });
     model.set([['foo', true]]);
-    const resolver = new Resolver(root!, resolverOptions);
+    const resolver = new Resolver(root as Node.Node, resolverOptions);
 
     new ApplicabilityPlugin().applyResolver(resolver);
     new StringResolverPlugin().applyResolver(resolver);
@@ -126,7 +156,7 @@ describe('applicability', () => {
       [fooBinding, true],
       [barBinding, true],
     ]);
-    const resolver = new Resolver(root!, resolverOptions);
+    const resolver = new Resolver(root as Node.Node, resolverOptions);
 
     new ApplicabilityPlugin().applyResolver(resolver);
     new StringResolverPlugin().applyResolver(resolver);

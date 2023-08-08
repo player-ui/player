@@ -20,6 +20,7 @@ javascript_pipeline(
     ],
     test_data = [
         "//core/make-flow:@player-ui/make-flow",
+        "//plugins/common-types/core:@player-ui/common-types-plugin",
     ],
     library_name = "Player",
     bundle_entry = 'bundle.entry.js'

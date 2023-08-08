@@ -10,7 +10,7 @@ export interface ConstantsProvider {
   addConstants(data: Record<string, any>, namespace: string): void;
 
   /**
-   * Function to retreive constants from the providers store
+   * Function to retrieve constants from the providers store
    *  - @param key Key used for the store access
    *  - @param namespace namespace values were loaded under (defined in the plugin)
    *  - @param fallback Optional - if key doesn't exist in namespace what to return (will return unknown if not provided)
@@ -77,9 +77,13 @@ export class ConstantsController implements ConstantsProvider {
     }
   }
 
-  clearTemporaryValues(): void {
-    this.tempStore.forEach((value: LocalModel) => {
-      value.reset();
-    });
+  clearTemporaryValues(namespace?: string): void {
+    if (namespace) {
+      this.tempStore.get(namespace)?.reset();
+    } else {
+      this.tempStore.forEach((value: LocalModel) => {
+        value.reset();
+      });
+    }
   }
 }

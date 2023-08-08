@@ -8,13 +8,18 @@ import type { SchemaController } from '../../schema';
 import type {
   ErrorValidationResponse,
   ValidationObject,
+  ValidationObjectWithHandler,
   ValidatorContext,
   ValidationProvider,
   ValidationResponse,
   WarningValidationResponse,
   StrongOrWeakBinding,
 } from '../../validator';
-import { ValidationMiddleware, ValidatorRegistry } from '../../validator';
+import {
+  ValidationMiddleware,
+  ValidatorRegistry,
+  removeBindingAndChildrenFromMap,
+} from '../../validator';
 import type { Logger } from '../../logger';
 import { ProxyLogger } from '../../logger';
 import type { Resolve, ViewInstance } from '../../view';
@@ -28,7 +33,22 @@ import type {
 import type { BindingTracker } from './binding-tracker';
 import { ValidationBindingTrackerViewPlugin } from './binding-tracker';
 
-type SimpleValidatorContext = Omit<ValidatorContext, 'validation'>;
+export const SCHEMA_VALIDATION_PROVIDER_NAME = 'schema';
+export const VIEW_VALIDATION_PROVIDER_NAME = 'view';
+
+export const VALIDATION_PROVIDER_NAME_SYMBOL: unique symbol = Symbol.for(
+  'validation-provider-name'
+);
+
+export type ValidationObjectWithSource = ValidationObjectWithHandler & {
+  /** The name of the validation */
+  [VALIDATION_PROVIDER_NAME_SYMBOL]: string;
+};
+
+type SimpleValidatorContext = Omit<
+  ValidatorContext,
+  'validation' | 'schemaType'
+>;
 
 interface BaseActiveValidation<T> {
   /** The validation is being actively shown */
@@ -52,7 +72,10 @@ type StatefulWarning = {
   type: 'warning';
 
   /** The underlying validation this tracks */
-  value: ValidationObject;
+  value: ValidationObjectWithSource;
+
+  /** If this is currently preventing navigation from continuing */
+  isBlockingNavigation: boolean;
 } & (
   | {
       /** warnings start with no state, but can active or dismissed */
@@ -67,7 +90,10 @@ type StatefulError = {
   type: 'error';
 
   /** The underlying validation this tracks */
-  value: ValidationObject;
+  value: ValidationObjectWithSource;
+
+  /** If this is currently preventing navigation from continuing */
+  isBlockingNavigation: boolean;
 } & (
   | {
       /** Errors start with no state an can be activated */
@@ -80,16 +106,17 @@ export type StatefulValidationObject = StatefulWarning | StatefulError;
 
 /** Helper for initializing a validation object that tracks state */
 function createStatefulValidationObject(
-  obj: ValidationObject
+  obj: ValidationObjectWithSource
 ): StatefulValidationObject {
   return {
     value: obj,
     type: obj.severity,
     state: 'none',
+    isBlockingNavigation: false,
   };
 }
 
-type ValidationRunner = (obj: ValidationObject) =>
+type ValidationRunner = (obj: ValidationObjectWithHandler) =>
   | {
       /** A validation message */
       message: string;
@@ -98,7 +125,7 @@ type ValidationRunner = (obj: ValidationObject) =>
 
 /** A class that manages validating bindings across phases */
 class ValidatedBinding {
-  private currentPhase?: Validation.Trigger;
+  public currentPhase?: Validation.Trigger;
   private applicableValidations: Array<StatefulValidationObject> = [];
   private validationsByState: Record<
     Validation.Trigger,
@@ -109,11 +136,16 @@ class ValidatedBinding {
     navigation: [],
   };
 
+  public get allValidations(): Array<StatefulValidationObject> {
+    return Object.values(this.validationsByState).flat();
+  }
+
   public weakBindings: Set<BindingInstance>;
+
   private onDismiss?: () => void;
 
   constructor(
-    possibleValidations: Array<ValidationObject>,
+    possibleValidations: Array<ValidationObjectWithSource>,
     onDismiss?: () => void,
     log?: Logger,
     weakBindings?: Set<BindingInstance>
@@ -123,9 +155,8 @@ class ValidatedBinding {
       const { trigger } = vObj;
 
       if (this.validationsByState[trigger]) {
-        this.validationsByState[trigger].push(
-          createStatefulValidationObject(vObj)
-        );
+        const statefulValidationObject = createStatefulValidationObject(vObj);
+        this.validationsByState[trigger].push(statefulValidationObject);
       } else {
         log?.warn(`Unknown validation trigger: ${trigger}`);
       }
@@ -133,15 +164,41 @@ class ValidatedBinding {
     this.weakBindings = weakBindings ?? new Set();
   }
 
+  private checkIfBlocking(statefulObj: StatefulValidationObject) {
+    if (statefulObj.state === 'active') {
+      const { isBlockingNavigation } = statefulObj;
+      return isBlockingNavigation;
+    }
+
+    return false;
+  }
+
+  public getAll(): Array<ValidationResponse> {
+    return this.applicableValidations.reduce((all, statefulObj) => {
+      if (statefulObj.state === 'active' && statefulObj.response) {
+        return [
+          ...all,
+          {
+            ...statefulObj.response,
+            blocking: this.checkIfBlocking(statefulObj),
+          },
+        ];
+      }
+
+      return all;
+    }, [] as Array<ValidationResponse>);
+  }
+
   public get(): ValidationResponse | undefined {
-    const firstError = this.applicableValidations.find((statefulObj) => {
-      const blocking =
-        this.currentPhase === 'navigation' ? statefulObj.value.blocking : true;
-      return statefulObj.state === 'active' && blocking !== false;
+    const firstInvalid = this.applicableValidations.find((statefulObj) => {
+      return statefulObj.state === 'active' && statefulObj.response;
     });
 
-    if (firstError?.state === 'active') {
-      return firstError.response;
+    if (firstInvalid?.state === 'active') {
+      return {
+        ...firstInvalid.response,
+        blocking: this.checkIfBlocking(firstInvalid),
+      };
     }
   }
 
@@ -158,8 +215,10 @@ class ValidatedBinding {
 
       const blocking =
         obj.value.blocking ??
-        ((obj.value.severity === 'warning' && 'once') ||
-          (obj.value.severity === 'error' && true));
+        ((obj.value.severity === 'warning' && 'once') || true);
+
+      const isBlockingNavigation =
+        blocking === true || (blocking === 'once' && !canDismiss);
 
       const dismissable = canDismiss && blocking === 'once';
 
@@ -178,12 +237,6 @@ class ValidatedBinding {
 
           return obj;
         }
-
-        if (obj.value.severity === 'error') {
-          const err = obj as StatefulError;
-          err.state = 'none';
-          return obj;
-        }
       }
 
       const response = runner(obj.value);
@@ -192,6 +245,7 @@ class ValidatedBinding {
         type: obj.type,
         value: obj.value,
         state: response ? 'active' : 'none',
+        isBlockingNavigation,
         dismissable:
           obj.value.severity === 'warning' &&
           this.currentPhase === 'navigation',
@@ -292,21 +346,48 @@ export class ValidationController implements BindingTracker {
     onRemoveValidation: new SyncWaterfallHook<
       [ValidationResponse, BindingInstance]
     >(),
+
+    resolveValidationProviders: new SyncWaterfallHook<
+      [
+        Array<{
+          /** The name of the provider */
+          source: string;
+          /** The provider itself */
+          provider: ValidationProvider;
+        }>
+      ],
+      {
+        /** The view this is triggered for  */
+        view?: ViewInstance;
+      }
+    >(),
+
+    /** A hook called when a binding is added to the tracker */
+    onTrackBinding: new SyncHook<[BindingInstance]>(),
   };
 
   private tracker: BindingTracker | undefined;
   private validations = new Map<BindingInstance, ValidatedBinding>();
   private validatorRegistry?: ValidatorRegistry;
   private schema: SchemaController;
-  private providers: Array<ValidationProvider>;
+
+  private providers:
+    | Array<{
+        /** The name of the provider */
+        source: string;
+        /** The provider itself */
+        provider: ValidationProvider;
+      }>
+    | undefined;
+
+  private viewValidationProvider?: ValidationProvider;
   private options?: SimpleValidatorContext;
   private weakBindingTracker = new Set<BindingInstance>();
-  private lastActiveBindings = new Set<BindingInstance>();
 
   constructor(schema: SchemaController, options?: SimpleValidatorContext) {
     this.schema = schema;
     this.options = options;
-    this.providers = [schema];
+    this.reset();
   }
 
   setOptions(options: SimpleValidatorContext) {
@@ -316,6 +397,22 @@ export class ValidationController implements BindingTracker {
   /** Return the middleware for the data-model to stop propagation of invalid data */
   public getDataMiddleware(): Array<DataModelMiddleware> {
     return [
+      {
+        set: (transaction, options, next) => {
+          return next?.set(transaction, options) ?? [];
+        },
+        get: (binding, options, next) => {
+          return next?.get(binding, options);
+        },
+        delete: (binding, options, next) => {
+          this.validations = removeBindingAndChildrenFromMap(
+            this.validations,
+            binding
+          );
+
+          return next?.delete(binding, options);
+        },
+      },
       new ValidationMiddleware(
         (binding) => {
           if (!this.options) {
@@ -323,7 +420,6 @@ export class ValidationController implements BindingTracker {
           }
 
           this.updateValidationsForBinding(binding, 'change', this.options);
-
           const strongValidation = this.getValidationForBinding(binding);
 
           // return validation issues directly on bindings first
@@ -342,15 +438,17 @@ export class ValidationController implements BindingTracker {
               weakValidation?.get()?.severity === 'error'
             ) {
               weakValidation?.weakBindings.forEach((weakBinding) => {
-                weakBinding === strongBinding
-                  ? newInvalidBindings.add({
-                      binding: weakBinding,
-                      isStrong: true,
-                    })
-                  : newInvalidBindings.add({
-                      binding: weakBinding,
-                      isStrong: false,
-                    });
+                if (weakBinding === strongBinding) {
+                  newInvalidBindings.add({
+                    binding: weakBinding,
+                    isStrong: true,
+                  });
+                } else {
+                  newInvalidBindings.add({
+                    binding: weakBinding,
+                    isStrong: false,
+                  });
+                }
               });
             }
           });
@@ -364,9 +462,44 @@ export class ValidationController implements BindingTracker {
     ];
   }
 
+  private getValidationProviders() {
+    if (this.providers) {
+      return this.providers;
+    }
+
+    this.providers = this.hooks.resolveValidationProviders.call([
+      {
+        source: SCHEMA_VALIDATION_PROVIDER_NAME,
+        provider: this.schema,
+      },
+      {
+        source: VIEW_VALIDATION_PROVIDER_NAME,
+        provider: {
+          getValidationsForBinding: (
+            binding: BindingInstance
+          ): Array<ValidationObject> | undefined => {
+            return this.viewValidationProvider?.getValidationsForBinding?.(
+              binding
+            );
+          },
+
+          getValidationsForView: (): Array<ValidationObject> | undefined => {
+            return this.viewValidationProvider?.getValidationsForView?.();
+          },
+        },
+      },
+    ]);
+
+    return this.providers;
+  }
+
+  public reset() {
+    this.validations.clear();
+    this.tracker = undefined;
+  }
+
   public onView(view: ViewInstance): void {
     this.validations.clear();
-
     if (!this.options) {
       return;
     }
@@ -375,7 +508,10 @@ export class ValidationController implements BindingTracker {
       ...this.options,
       callbacks: {
         onAdd: (binding) => {
-          if (!this.options) {
+          if (
+            !this.options ||
+            this.getValidationForBinding(binding) !== undefined
+          ) {
             return;
           }
 
@@ -400,30 +536,43 @@ export class ValidationController implements BindingTracker {
               view.update(new Set([binding]));
             }
           );
+
+          this.hooks.onTrackBinding.call(binding);
         },
       },
     });
 
     this.tracker = bindingTrackerPlugin;
-    this.providers = [this.schema, view];
+    this.viewValidationProvider = view;
 
     bindingTrackerPlugin.apply(view);
   }
 
-  private updateValidationsForBinding(
+  updateValidationsForBinding(
     binding: BindingInstance,
     trigger: Validation.Trigger,
-    context: SimpleValidatorContext,
+    validationContext?: SimpleValidatorContext,
     onDismiss?: () => void
   ): void {
+    const context = validationContext ?? this.options;
+
+    if (!context) {
+      throw new Error(`Context is required for executing validations`);
+    }
+
     if (trigger === 'load') {
       // Get all of the validations from each provider
-      const possibleValidations = this.providers.reduce<
-        Array<ValidationObject>
+      const possibleValidations = this.getValidationProviders().reduce<
+        Array<ValidationObjectWithSource>
       >(
         (vals, provider) => [
           ...vals,
-          ...(provider.getValidationsForBinding?.(binding) ?? []),
+          ...(provider.provider
+            .getValidationsForBinding?.(binding)
+            ?.map((valObj) => ({
+              ...valObj,
+              [VALIDATION_PROVIDER_NAME_SYMBOL]: provider.source,
+            })) ?? []),
         ],
         []
       );
@@ -444,7 +593,7 @@ export class ValidationController implements BindingTracker {
 
     const trackedValidations = this.validations.get(binding);
     trackedValidations?.update(trigger, true, (validationObj) => {
-      const response = this.validationRunner(validationObj, context, binding);
+      const response = this.validationRunner(validationObj, binding, context);
 
       if (this.weakBindingTracker.size > 0) {
         const t = this.validations.get(binding) as ValidatedBinding;
@@ -464,8 +613,8 @@ export class ValidationController implements BindingTracker {
           validation.update(trigger, true, (validationObj) => {
             const response = this.validationRunner(
               validationObj,
-              context,
-              vBinding
+              vBinding,
+              context
             );
             return response ? { message: response.message } : undefined;
           });
@@ -474,21 +623,28 @@ export class ValidationController implements BindingTracker {
     }
   }
 
-  private validationRunner(
-    validationObj: ValidationObject,
-    context: SimpleValidatorContext,
-    binding: BindingInstance
+  validationRunner(
+    validationObj: ValidationObjectWithHandler,
+    binding: BindingInstance,
+    context: SimpleValidatorContext | undefined = this.options
   ) {
-    const handler = this.getValidator(validationObj.type);
+    if (!context) {
+      throw new Error('No context provided to validation runner');
+    }
+
+    const handler =
+      validationObj.handler ?? this.getValidator(validationObj.type);
+
     const weakBindings = new Set<BindingInstance>();
 
     // For any data-gets in the validation runner, default to using the _invalid_ value (since that's what we're testing against)
     const model: DataModelWithParser = {
-      get(b, options = { includeInvalid: true }) {
+      get(b, options) {
         weakBindings.add(isBinding(b) ? binding : context.parseBinding(b));
-        return context.model.get(b, options);
+        return context.model.get(b, { ...options, includeInvalid: true });
       },
       set: context.model.set,
+      delete: context.model.delete,
     };
 
     const result = handler?.(
@@ -500,6 +656,7 @@ export class ValidationController implements BindingTracker {
         ) => context.evaluate(exp, options),
         model,
         validation: validationObj,
+        schemaType: this.schema.getType(binding),
       },
       context.model.get(binding, {
         includeInvalid: true,
@@ -519,7 +676,6 @@ export class ValidationController implements BindingTracker {
           model,
           evaluate: context.evaluate,
         });
-
         if (parameters) {
           message = replaceParams(message, parameters);
         }
@@ -532,24 +688,33 @@ export class ValidationController implements BindingTracker {
   }
 
   private updateValidationsForView(trigger: Validation.Trigger): void {
-    const { activeBindings } = this;
+    const isNavigationTrigger = trigger === 'navigation';
+    const lastActiveBindings = this.activeBindings;
 
-    const canDismiss =
-      trigger !== 'navigation' ||
-      this.setCompare(this.lastActiveBindings, activeBindings);
+    /** Run validations for all bindings in view */
+    const updateValidations = (dismissValidations: boolean) => {
+      this.getBindings().forEach((binding) => {
+        this.validations
+          .get(binding)
+          ?.update(trigger, dismissValidations, (obj) => {
+            if (!this.options) {
+              return;
+            }
 
-    this.getBindings().forEach((binding) => {
-      this.validations.get(binding)?.update(trigger, canDismiss, (obj) => {
-        if (!this.options) {
-          return;
-        }
-
-        return this.validationRunner(obj, this.options, binding);
+            return this.validationRunner(obj, binding, this.options);
+          });
       });
-    });
+    };
 
-    if (trigger === 'navigation') {
-      this.lastActiveBindings = activeBindings;
+    // Should dismiss for non-navigation triggers.
+    updateValidations(!isNavigationTrigger);
+
+    if (isNavigationTrigger) {
+      // If validations didn't change since last update, dismiss all dismissible validations.
+      const { activeBindings } = this;
+      if (this.setCompare(lastActiveBindings, activeBindings)) {
+        updateValidations(true);
+      }
     }
   }
 
@@ -583,6 +748,10 @@ export class ValidationController implements BindingTracker {
     return this.tracker?.getBindings() ?? new Set();
   }
 
+  trackBinding(binding: BindingInstance): void {
+    this.tracker?.trackBinding(binding);
+  }
+
   /** Executes all known validations for the tracked bindings using the given model */
   validateView(trigger: Validation.Trigger = 'navigation'): {
     /** Indicating if the view can proceed without error */
@@ -595,26 +764,35 @@ export class ValidationController implements BindingTracker {
 
     const validations = new Map<BindingInstance, ValidationResponse>();
 
+    let canTransition = true;
+
     this.getBindings().forEach((b) => {
-      const invalid = this.getValidationForBinding(b)?.get();
+      const allValidations = this.getValidationForBinding(b)?.getAll();
 
-      if (invalid) {
-        this.options?.logger.debug(
-          `Validation on binding: ${b.asString()} is preventing navigation. ${JSON.stringify(
-            invalid
-          )}`
-        );
+      allValidations?.forEach((v) => {
+        if (trigger === 'navigation' && v.blocking) {
+          this.options?.logger.debug(
+            `Validation on binding: ${b.asString()} is preventing navigation. ${JSON.stringify(
+              v
+            )}`
+          );
 
-        validations.set(b, invalid);
-      }
+          canTransition = false;
+        }
+
+        if (!validations.has(b)) {
+          validations.set(b, v);
+        }
+      });
     });
 
     return {
-      canTransition: validations.size === 0,
+      canTransition,
       validations: validations.size ? validations : undefined,
     };
   }
 
+  /** Get the current tracked validation for the given binding */
   public getValidationForBinding(
     binding: BindingInstance
   ): ValidatedBinding | undefined {
@@ -626,11 +804,10 @@ export class ValidationController implements BindingTracker {
       _getValidationForBinding: (binding) => {
         return this.getValidationForBinding(
           isBinding(binding) ? binding : parser(binding)
-        )?.get();
+        );
       },
       getAll: () => {
         const bindings = this.getBindings();
-
         if (bindings.size === 0) {
           return undefined;
         }
@@ -653,6 +830,9 @@ export class ValidationController implements BindingTracker {
       get() {
         throw new Error('Error Access be provided by the view plugin');
       },
+      getValidationsForBinding() {
+        throw new Error('Error rollup should be provided by the view plugin');
+      },
       getChildren() {
         throw new Error('Error rollup should be provided by the view plugin');
       },
@@ -664,7 +844,7 @@ export class ValidationController implements BindingTracker {
       },
       register: () => {
         throw new Error(
-          'Section funcationality hould be provided by the view plugin'
+          'Section functionality should be provided by the view plugin'
         );
       },
       type: (binding) =>

@@ -16,7 +16,7 @@ export default class ApplicabilityPlugin implements ViewPlugin {
         if (node?.type === NodeType.Applicability) {
           const isApplicable = options.evaluate(node.expression);
 
-          if (!isApplicable) {
+          if (isApplicable === false) {
             return null;
           }
 
