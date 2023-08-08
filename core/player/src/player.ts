@@ -1,12 +1,12 @@
 import { setIn } from 'timm';
 import deferred from 'p-defer';
-import queueMicrotask from 'queue-microtask';
 import type { Flow as FlowType, FlowResult } from '@player-ui/types';
 
 import { SyncHook, SyncWaterfallHook } from 'tapable-ts';
 import type { Logger } from './logger';
 import { TapableLogger } from './logger';
-import { ExpressionEvaluator, ExpressionType } from './expressions';
+import type { ExpressionType } from './expressions';
+import { ExpressionEvaluator } from './expressions';
 import { SchemaController } from './schema';
 import { BindingParser } from './binding';
 import type { ViewInstance } from './view';
@@ -367,8 +367,9 @@ export class Player {
       });
 
       flow.hooks.afterTransition.tap('player', (flowInstance) => {
-        if (flowInstance.currentState?.value.state_type === 'ACTION') {
-          const { exp } = flowInstance.currentState?.value;
+        const value = flowInstance.currentState?.value;
+        if (value && value.state_type === 'ACTION') {
+          const { exp } = value;
           flowController?.transition(
             String(expressionEvaluator?.evaluate(exp))
           );
@@ -395,7 +396,7 @@ export class Player {
       model: dataController,
       utils: {
         findPlugin: <Plugin = unknown>(pluginSymbol: symbol) => {
-          return (this.findPlugin(pluginSymbol) as unknown) as Plugin;
+          return this.findPlugin(pluginSymbol) as unknown as Plugin;
         },
       },
       logger: this.logger,
