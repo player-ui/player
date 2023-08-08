@@ -310,7 +310,7 @@ const headingTransformer: Transformer<Heading> = ({
   return swapMarkdownType(asset);
 };
 
-export const transformers = {
+export const transformers: Record<string, Transformer> = {
   horizontalRule: horizontalRuleTransformer,
   text: textTransformer,
   emphasis: emphasisTransformer,
