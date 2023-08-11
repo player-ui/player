@@ -501,7 +501,7 @@ export class Player {
         ref,
         status: 'completed',
         flow: state.flow,
-        dataModel: state.controllers.data.getModel(),
+        dataModel: state.controllers.data,
       } as const;
 
       return maybeUpdateState({
