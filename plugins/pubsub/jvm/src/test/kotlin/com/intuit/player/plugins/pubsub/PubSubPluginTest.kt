@@ -23,7 +23,7 @@ internal class PubSubPluginTest : PlayerTest() {
 
     private val plugin get() = player.pubSubPlugin!!
 
-    /*
+    
     @TestTemplate
     fun `subscribe shouldbe Unit`() {
         plugin.subscribe("eventName") { _, _ -> } `should be instance of` String::class
@@ -33,8 +33,8 @@ internal class PubSubPluginTest : PlayerTest() {
     fun `publish shouldbe Unit`() {
         plugin.publish("eventName", "eventData") shouldBe Unit
     } 
-    */
-    /*
+    
+    
     @TestTemplate
     fun `unsubscribe should remove handler`() {
         val (expectedName, expectedData) = "eventName" to "eventData"
@@ -48,7 +48,7 @@ internal class PubSubPluginTest : PlayerTest() {
         name.`should be null`()
         data.`should be null`()
     }
-    */
+    
 
     @TestTemplate
     fun pubsubWithString() {

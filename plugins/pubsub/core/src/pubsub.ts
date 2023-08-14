@@ -8,6 +8,8 @@ export type SubscribeHandler<T extends string, A extends unknown[]> = (
   ...args: A
 ) => void;
 
+export type PubSubUUID = `uuid_${number}`;
+
 /**
  * Split a string into an array of event layers
  */
@@ -21,12 +23,14 @@ function splitEvent(event: string) {
   }, []);
 }
 
+let count = 1;
+
 /**
  * Tiny pubsub maker
  */
 class TinyPubSub {
-  private events: Map<string, Map<symbol, SubscribeHandler<any, any>>>;
-  private tokens: Map<symbol, string>;
+  private events: Map<string, Map<PubSubUUID, SubscribeHandler<any, any>>>;
+  private tokens: Map<PubSubUUID, string>;
 
   constructor() {
     this.events = new Map();
@@ -68,7 +72,7 @@ class TinyPubSub {
    * subscribe('a', (event, ...args) => console.log(event, ...args))
    */
   subscribe(event: string, handler: SubscribeHandler<any, any>) {
-    const sym = Symbol('PubSubToken');
+    const uuid = `uuid_${++count}`;
 
     if (typeof event === 'string') {
       if (!this.events.has(event)) {
@@ -76,11 +80,11 @@ class TinyPubSub {
       }
 
       const handlers = this.events.get(event);
-      handlers?.set(sym, handler);
-      this.tokens.set(sym, event);
+      handlers!.set(uuid as PubSubUUID, handler);
+      this.tokens.set(uuid as PubSubUUID, event);
     }
 
-    return sym;
+    return uuid;
   }
 
   /**
@@ -92,16 +96,16 @@ class TinyPubSub {
    * & 'a.b.c' will be unsubscribed as well.
    */
   unsubscribe(value: string | symbol) {
-    if (typeof value === 'symbol') {
-      const path = this.tokens.get(value);
+    if (typeof value === 'string' && value.startsWith('uuid')) {
+      const path = this.tokens.get(value as PubSubUUID);
 
       if (typeof path === 'undefined') {
         return;
       }
 
       const innerPath = this.events.get(path);
-      innerPath?.delete(value);
-      this.tokens.delete(value);
+      innerPath?.delete(value as PubSubUUID);
+      this.tokens.delete(value as PubSubUUID);
       return;
     }
 

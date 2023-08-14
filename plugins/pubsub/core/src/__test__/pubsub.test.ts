@@ -17,6 +17,21 @@ describe('pubsub', () => {
     expect(spy).toHaveBeenCalledWith(type, message);
   });
 
+  it('should increment uuid with each subscribe', () => {
+    const type = 'test';
+    const message = 'this is a test message';
+    const spy = jest.fn();
+
+    const sub1 = pubsub.subscribe(type, spy);
+    const sub2 = pubsub.subscribe(type, spy);
+    const sub3 = pubsub.subscribe(type, spy);
+    pubsub.publish(type, message);
+
+    expect(sub1).not.toStrictEqual(sub2);
+    expect(sub1).not.toStrictEqual(sub3);
+    expect(sub2).not.toStrictEqual(sub3);
+  });
+
   it('should call subscriber with multiple argument', () => {
     const type = 'test';
     const spy = jest.fn();
