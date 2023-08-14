@@ -12,9 +12,9 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.amshove.kluent.`should be equal to`
-// import org.amshove.kluent.`should be instance of`
-// import org.amshove.kluent.`should be null`
-// import org.amshove.kluent.shouldBe
+import org.amshove.kluent.`should be instance of`
+import org.amshove.kluent.`should be null`
+import org.amshove.kluent.shouldBe
 import org.junit.jupiter.api.TestTemplate
 
 internal class PubSubPluginTest : PlayerTest() {
