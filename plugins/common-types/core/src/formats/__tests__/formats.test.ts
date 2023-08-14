@@ -252,5 +252,9 @@ describe('phone', () => {
     it(`doesn't remove characters when deformatting a deformatted value`, () => {
       expect(phone.deformat?.('1231231231')).toBe('1231231231');
     });
+
+    it('ignores improper formatting of the input string', () => {
+      expect(phone.deformat?.('123-123-1231')).toBe('1231231231');
+    });
   });
 });

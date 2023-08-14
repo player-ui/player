@@ -210,7 +210,7 @@ export const createMaskedNumericFormatter = (
         }
       }
 
-      return removeFormatCharactersFromMaskedString(value, mask);
+      return formatAsMasked(value, /\d/g, mask.replace(/[^#]/g, ''));
     },
   };
 };

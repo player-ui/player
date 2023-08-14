@@ -89,7 +89,7 @@ export class PubSubPlugin implements PlayerPlugin {
    *
    * @param token - A token from a `subscribe` call
    */
-  unsubscribe(token: string | symbol) {
+  unsubscribe(token: string) {
     pubsub.unsubscribe(token);
   }
 
