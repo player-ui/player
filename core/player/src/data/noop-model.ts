@@ -12,6 +12,8 @@ export class NOOPDataModel implements DataModelImpl {
   set() {
     return [];
   }
+
+  delete() {}
 }
 
 /** You only really need 1 instance of the NOOP model */

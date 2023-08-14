@@ -11,6 +11,7 @@ import { toModel } from '../data';
 import type { Logger } from '../logger';
 
 import type { ValidationResponse } from './types';
+import { removeBindingAndChildrenFromMap } from './binding-map-splice';
 
 /**
  * A BindingInstance with an indicator of whether or not it's a strong binding
@@ -37,17 +38,21 @@ export class ValidationMiddleware implements DataModelMiddleware {
   public validator: MiddlewareChecker;
   public shadowModelPaths: Map<BindingInstance, any>;
   private logger?: Logger;
+  private shouldIncludeInvalid?: (options?: DataModelOptions) => boolean;
 
   constructor(
     validator: MiddlewareChecker,
     options?: {
       /** A logger instance */
       logger?: Logger;
+      /** Optional function to include data staged in shadowModel */
+      shouldIncludeInvalid?: (options?: DataModelOptions) => boolean;
     }
   ) {
     this.validator = validator;
     this.shadowModelPaths = new Map();
     this.logger = options?.logger;
+    this.shouldIncludeInvalid = options?.shouldIncludeInvalid;
   }
 
   public set(
@@ -58,8 +63,11 @@ export class ValidationMiddleware implements DataModelMiddleware {
     const asModel = toModel(this, { ...options, includeInvalid: true }, next);
     const nextTransaction: BatchSetTransaction = [];
 
+    const includedBindings = new Set<BindingInstance>();
+
     transaction.forEach(([binding, value]) => {
       this.shadowModelPaths.set(binding, value);
+      includedBindings.add(binding);
     });
 
     const invalidBindings: Array<BindingInstance> = [];
@@ -79,7 +87,8 @@ export class ValidationMiddleware implements DataModelMiddleware {
             nextTransaction.push([validation.binding, value]);
           }
         });
-      } else {
+      } else if (includedBindings.has(binding)) {
+        invalidBindings.push(binding);
         this.logger?.debug(
           `Invalid value for path: ${binding.asString()} - ${
             validations.severity
@@ -87,6 +96,8 @@ export class ValidationMiddleware implements DataModelMiddleware {
         );
       }
     });
+
+    let validResults: Updates = [];
 
     if (next && nextTransaction.length > 0) {
       // defer clearing the shadow model to prevent validations that are run twice due to weak binding refs still needing the data
@@ -97,9 +108,11 @@ export class ValidationMiddleware implements DataModelMiddleware {
       if (invalidBindings.length === 0) {
         return result;
       }
+
+      validResults = result;
     }
 
-    return invalidBindings.map((binding) => {
+    const invalidResults = invalidBindings.map((binding) => {
       return {
         binding,
         oldValue: asModel.get(binding),
@@ -107,6 +120,8 @@ export class ValidationMiddleware implements DataModelMiddleware {
         force: true,
       };
     });
+
+    return [...validResults, ...invalidResults];
   }
 
   public get(
@@ -116,7 +131,10 @@ export class ValidationMiddleware implements DataModelMiddleware {
   ) {
     let val = next?.get(binding, options);
 
-    if (options?.includeInvalid === true) {
+    if (
+      this.shouldIncludeInvalid?.(options) ??
+      options?.includeInvalid === true
+    ) {
       this.shadowModelPaths.forEach((shadowValue, shadowBinding) => {
         if (shadowBinding === binding) {
           val = shadowValue;
@@ -131,5 +149,18 @@ export class ValidationMiddleware implements DataModelMiddleware {
     }
 
     return val;
+  }
+
+  public delete(
+    binding: BindingInstance,
+    options?: DataModelOptions,
+    next?: DataModelImpl
+  ) {
+    this.shadowModelPaths = removeBindingAndChildrenFromMap(
+      this.shadowModelPaths,
+      binding
+    );
+
+    return next?.delete(binding, options);
   }
 }

@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from 'react';
 import React, { useEffect, useState } from 'react';
-import scrollIntoView from 'smooth-scroll-into-view-if-needed';
+import scrollIntoViewWithOffset from './scrollIntoViewWithOffset';
 import type { ScrollType } from './index';
 
 export interface AutoScrollProviderProps {
@@ -8,6 +8,10 @@ export interface AutoScrollProviderProps {
   getElementToScrollTo: (
     scrollableElements: Map<ScrollType, Set<string>>
   ) => string;
+  /** Optional function to get container element, which is used for calculating offset (default: document.body) */
+  getBaseElement: () => HTMLElement | undefined | null;
+  /** Additional offset to be used (default: 0) */
+  offset: number;
 }
 
 export interface RegisterData {
@@ -35,6 +39,8 @@ export const useRegisterAsScrollable = (): ScrollFunction => {
 /** Component to handle scrolling */
 export const AutoScrollProvider = ({
   getElementToScrollTo,
+  getBaseElement,
+  offset,
   children,
 }: PropsWithChildren<AutoScrollProviderProps>) => {
   // Tracker for what elements are registered to be scroll targets
@@ -68,10 +74,7 @@ export const AutoScrollProvider = ({
     const node = document.getElementById(getElementToScrollTo(scrollableMap));
 
     if (node) {
-      scrollIntoView(node, {
-        block: 'center',
-        inline: 'center',
-      });
+      scrollIntoViewWithOffset(node, getBaseElement() || document.body, offset);
     }
   });
 

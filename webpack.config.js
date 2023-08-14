@@ -6,6 +6,22 @@ const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 module.exports = (env, argv) => ({
   mode: argv.mode,
   devtool: 'none',
+  module: {
+    rules: [
+      {
+        test: /node_modules\/(micromark-util-sanitize-uri|micromark-util-decode-numeric-character-reference)/,
+        include: /node_modules/,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              plugins: ['@babel/plugin-transform-numeric-separator'],
+            },
+          },
+        ],
+      },
+    ],
+  },
   output: {
     path: path.resolve(process.cwd(), 'dist'),
     filename: process.env.ROOT_FILE_NAME,

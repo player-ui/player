@@ -1,4 +1,4 @@
-import { replaceAt, set } from 'timm';
+import { replaceAt, set, omit } from 'timm';
 
 import { BindingParser } from '../../../binding';
 import { ExpressionEvaluator } from '../../../expressions';
@@ -7,6 +7,7 @@ import { SchemaController } from '../../../schema';
 import type { Logger } from '../../../logger';
 import { TapableLogger } from '../../../logger';
 import { Resolver } from '..';
+import type { Node } from '../../parser';
 import { NodeType, Parser } from '../../parser';
 import { StringResolverPlugin } from '../../plugins';
 
@@ -143,6 +144,174 @@ describe('Dynamic AST Transforms', () => {
       },
     });
   });
+
+  it('Nodes are properly cached on rerender', () => {
+    const model = new LocalModel({
+      year: '2021',
+    });
+    const parser = new Parser();
+    const bindingParser = new BindingParser();
+    const inputBinding = bindingParser.parse('year');
+    const rootNode = parser.parseObject(content);
+
+    const resolver = new Resolver(rootNode!, {
+      model,
+      parseBinding: bindingParser.parse.bind(bindingParser),
+      parseNode: parser.parseObject.bind(parser),
+      evaluator: new ExpressionEvaluator({
+        model: withParser(model, bindingParser.parse),
+      }),
+      schema: new SchemaController(),
+    });
+
+    resolver.update();
+
+    const resolveCache = resolver.getResolveCache();
+
+    resolver.update(new Set([inputBinding]));
+
+    const newResolveCache = resolver.getResolveCache();
+
+    expect(resolveCache.size).toBe(newResolveCache.size);
+
+    // The cached items between each re-render should stay the same
+    for (const [k, v] of resolveCache) {
+      const excludingUpdated = omit(v, 'updated');
+
+      expect(newResolveCache.has(k)).toBe(true);
+      expect(newResolveCache.get(k)).toMatchObject(excludingUpdated);
+    }
+  });
+
+  it('Cached node points to the correct parent node', () => {
+    const view = {
+      id: 'main-view',
+      type: 'questionAnswer',
+      title: [
+        {
+          asset: {
+            id: 'title',
+            type: 'text',
+            value: 'Cool Page',
+          },
+        },
+      ],
+      primaryInfo: [
+        {
+          asset: {
+            id: 'input',
+            type: 'input',
+            value: '{{year}}',
+            label: {
+              asset: {
+                id: 'label',
+                type: 'text',
+                value: 'label',
+              },
+            },
+          },
+        },
+      ],
+    };
+
+    const model = new LocalModel({
+      year: '2021',
+    });
+    const parser = new Parser();
+    const bindingParser = new BindingParser();
+    const inputBinding = bindingParser.parse('year');
+    const rootNode = parser.parseObject(view);
+
+    const resolver = new Resolver(rootNode!, {
+      model,
+      parseBinding: bindingParser.parse.bind(bindingParser),
+      parseNode: parser.parseObject.bind(parser),
+      evaluator: new ExpressionEvaluator({
+        model: withParser(model, bindingParser.parse),
+      }),
+      schema: new SchemaController(),
+    });
+
+    let inputNode: Node.Node | undefined;
+    let labelNode: Node.Node | undefined;
+
+    resolver.hooks.beforeResolve.tap('test', (node, options) => {
+      if (node?.type === 'asset' && node.value.id === 'input') {
+        // Add to dependencies
+        options.data.model.get(inputBinding);
+      }
+
+      return node;
+    });
+
+    resolver.hooks.afterResolve.tap('test', (value, node) => {
+      if (node.type === 'asset') {
+        const { id } = node.value;
+
+        if (id === 'input') inputNode = node;
+
+        if (id === 'label') labelNode = node;
+      }
+
+      return value;
+    });
+
+    resolver.update();
+
+    model.set([[inputBinding, '2022']]);
+
+    resolver.update(new Set([inputBinding]));
+
+    // Check that label (which is cached) still points to the correct parent node.
+    expect(labelNode?.parent).toBe(inputNode ?? {});
+  });
+
+  it('Fixes parent references when beforeResolve taps make changes', () => {
+    const model = new LocalModel({
+      year: '2021',
+    });
+    const parser = new Parser();
+    const bindingParser = new BindingParser();
+    const rootNode = parser.parseObject(content);
+
+    const resolver = new Resolver(rootNode!, {
+      model,
+      parseBinding: bindingParser.parse.bind(bindingParser),
+      parseNode: parser.parseObject.bind(parser),
+      evaluator: new ExpressionEvaluator({
+        model: withParser(model, bindingParser.parse),
+      }),
+      schema: new SchemaController(),
+    });
+
+    let parent;
+    resolver.hooks.beforeResolve.tap('test', (node) => {
+      if (node?.type !== NodeType.Asset || node.value.id !== 'subtitle') {
+        return node;
+      }
+
+      parent = node.parent;
+      return {
+        ...node,
+        parent: undefined,
+      };
+    });
+
+    let resolvedNode: Node.Node | undefined;
+    resolver.hooks.afterResolve.tap('test', (resolvedValue, node) => {
+      if (node?.type === NodeType.Asset && node.value.id === 'subtitle') {
+        resolvedNode = node;
+      }
+
+      return resolvedValue;
+    });
+
+    resolver.update();
+
+    expect(parent).not.toBeUndefined();
+    expect(resolvedNode).not.toBeUndefined();
+    expect(resolvedNode?.parent).toBe(parent);
+  });
 });
 
 describe('Duplicate IDs', () => {
@@ -219,7 +388,7 @@ describe('Duplicate IDs', () => {
     expect(testLogger.error).toBeCalledWith(
       'Cache conflict: Found Asset/View nodes that have conflicting ids: action-1, may cause cache issues.'
     );
-    testLogger.error.mockClear();
+    (testLogger.error as jest.Mock).mockClear();
 
     expect(firstUpdate).toStrictEqual({
       id: 'action',
@@ -314,7 +483,7 @@ describe('Duplicate IDs', () => {
     expect(testLogger.info).toBeCalledWith(
       'Cache conflict: Found Value nodes that have conflicting ids: value-1, may cause cache issues. To improve performance make value node IDs globally unique.'
     );
-    testLogger.info.mockClear();
+    (testLogger.info as jest.Mock).mockClear();
     expect(firstUpdate).toStrictEqual(content);
 
     resolver.update();
@@ -387,6 +556,71 @@ describe('AST caching', () => {
       const sourceNode = resolver.getSourceNode(node);
       expect(sourceNode).toBeDefined();
       expect(sourceNode).toStrictEqual(sourceNodes[index]!);
+    });
+  });
+});
+
+describe('Root AST Immutability', () => {
+  it('modifying nodes in beforeResolve should not impact the original tree', () => {
+    const content = {
+      id: 'action',
+      type: 'collection',
+      values: [
+        {
+          id: 'value-1',
+          binding: 'count1',
+        },
+        {
+          id: 'value-1',
+          binding: 'count2',
+        },
+      ],
+    };
+
+    const model = new LocalModel();
+    const parser = new Parser();
+    const bindingParser = new BindingParser();
+    const rootNode = parser.parseObject(content, NodeType.View);
+    const resolver = new Resolver(rootNode!, {
+      model,
+      parseBinding: bindingParser.parse.bind(bindingParser),
+      parseNode: parser.parseObject.bind(parser),
+      evaluator: new ExpressionEvaluator({
+        model: withParser(model, bindingParser.parse),
+      }),
+      schema: new SchemaController(),
+    });
+    let finalNode;
+
+    resolver.hooks.beforeResolve.tap('beforeResolve', (node) => {
+      if (node?.type !== NodeType.View) return node;
+
+      // eslint-disable-next-line no-param-reassign
+      node.value.type = 'not-collection';
+      return node;
+    });
+
+    resolver.hooks.afterResolve.tap('afterResolve', (value, node) => {
+      if (node?.type === NodeType.View) {
+        finalNode = node;
+      }
+
+      return value;
+    });
+
+    resolver.update();
+
+    expect(rootNode).toBe(resolver.root);
+    expect(rootNode).not.toBe(finalNode);
+    expect(finalNode).toMatchObject({
+      value: {
+        type: 'not-collection',
+      },
+    });
+    expect(rootNode).toMatchObject({
+      value: {
+        type: 'collection',
+      },
     });
   });
 });

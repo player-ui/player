@@ -1,4 +1,4 @@
-import type { Validation } from '@player-ui/types';
+import type { Schema, Validation } from '@player-ui/types';
 
 import type { BindingInstance, BindingFactory } from '../binding';
 import type { DataModelWithParser } from '../data';
@@ -40,12 +40,17 @@ type RequiredValidationKeys = 'severity' | 'trigger';
 export type ValidationObject = Validation.Reference &
   Required<Pick<Validation.Reference, RequiredValidationKeys>>;
 
+export type ValidationObjectWithHandler = ValidationObject & {
+  /** A predefined handler for this validation object */
+  handler?: ValidatorFunction;
+};
+
 export interface ValidationProvider {
   getValidationsForBinding?(
     binding: BindingInstance
-  ): Array<ValidationObject> | undefined;
+  ): Array<ValidationObjectWithHandler> | undefined;
 
-  getValidationsForView?(): Array<ValidationObject> | undefined;
+  getValidationsForView?(): Array<ValidationObjectWithHandler> | undefined;
 }
 
 export interface ValidatorContext {
@@ -66,6 +71,9 @@ export interface ValidatorContext {
 
   /** The constants for messages */
   constants: ConstantsProvider;
+
+  /** The type in the schema that triggered the validation if there is one */
+  schemaType: Schema.DataType | undefined;
 }
 
 export type ValidatorFunction<Options = unknown> = (

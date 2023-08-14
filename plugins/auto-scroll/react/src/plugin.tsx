@@ -14,6 +14,10 @@ export interface AutoScrollManagerConfig {
   autoScrollOnLoad?: boolean;
   /** Config to auto-focus on an error */
   autoFocusOnErrorField?: boolean;
+  /** Optional function to get container element, which is used for calculating offset (default: document.body) */
+  getBaseElement?: () => HTMLElement | undefined | null;
+  /** Additional offset to be used (default: 0) */
+  offset?: number;
 }
 
 /** A plugin to manage scrolling behavior */
@@ -32,6 +36,12 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
   /** tracks if the navigation failed */
   private failedNavigation: boolean;
 
+  /** function to return the base of the scrollable area */
+  private getBaseElement: () => HTMLElement | undefined | null;
+
+  /** static offset */
+  private offset: number;
+
   /** map of scroll type to set of ids that are registered under that type */
   private alreadyScrolledTo: Array<string>;
   private scrollFn: (
@@ -41,6 +51,8 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
   constructor(config: AutoScrollManagerConfig) {
     this.autoScrollOnLoad = config.autoScrollOnLoad ?? false;
     this.autoFocusOnErrorField = config.autoFocusOnErrorField ?? false;
+    this.getBaseElement = config.getBaseElement ?? (() => null);
+    this.offset = config.offset ?? 0;
     this.initialRender = false;
     this.failedNavigation = false;
     this.alreadyScrolledTo = [];
@@ -123,6 +135,8 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
           this.initialRender = true;
           this.failedNavigation = false;
           this.alreadyScrolledTo = [];
+          // Reset scroll position for new view
+          window.scroll(0, 0);
         });
         flow.hooks.skipTransition.intercept({
           call: () => {
@@ -136,9 +150,13 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
   applyReact(reactPlayer: ReactPlayer) {
     reactPlayer.hooks.webComponent.tap(this.name, (Comp) => {
       return () => {
-        const { scrollFn } = this;
+        const { scrollFn, getBaseElement, offset } = this;
         return (
-          <AutoScrollProvider getElementToScrollTo={scrollFn}>
+          <AutoScrollProvider
+            getElementToScrollTo={scrollFn}
+            getBaseElement={getBaseElement}
+            offset={offset}
+          >
             <Comp />
           </AutoScrollProvider>
         );

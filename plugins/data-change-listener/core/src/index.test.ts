@@ -293,6 +293,10 @@ describe('Data-Change-Listener with Validations', () => {
     return getState().controllers.view.currentView?.lastUpdate?.fields.asset;
   }
 
+  const getCurrentView = () => {
+    return getState().controllers.view.currentView;
+  };
+
   beforeEach(() => {
     player = new Player({
       plugins: [
@@ -311,11 +315,11 @@ describe('Data-Change-Listener with Validations', () => {
         testExpression(...args);
       });
     });
+
+    player.start(flow);
   });
 
   it('bindings with a value that failed validation do not trigger listeners', async () => {
-    player.start(flow);
-
     expect(getInputAsset().validation).toBe(undefined);
 
     getInputAsset().set('AdamAdam');
@@ -326,8 +330,6 @@ describe('Data-Change-Listener with Validations', () => {
   });
 
   it('bindings with a successful validation trigger listeners', async () => {
-    player.start(flow);
-
     expect(getInputAsset().validation).toBe(undefined);
 
     getInputAsset().set('Adam');
@@ -335,5 +337,9 @@ describe('Data-Change-Listener with Validations', () => {
       expect(getInputAsset().validation).not.toBeDefined();
       expect(testExpression).toHaveBeenCalled();
     });
+  });
+
+  it('removes listeners section after resolving', () => {
+    expect(getCurrentView()?.initialView?.listeners).toBeUndefined();
   });
 });

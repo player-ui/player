@@ -3,7 +3,7 @@ import React, { useLayoutEffect } from 'react';
 import type { InProgressState } from '@player-ui/react';
 import { ReactPlayer } from '@player-ui/react';
 
-import { findByRole, render, waitFor } from '@testing-library/react';
+import { findByRole, render, waitFor, act } from '@testing-library/react';
 import { makeFlow } from '@player-ui/make-flow';
 
 import {
@@ -14,7 +14,7 @@ import { Info, Action, Input } from '@player-ui/reference-assets-plugin-react';
 import { CommonTypesPlugin } from '@player-ui/common-types-plugin';
 import { AssetTransformPlugin } from '@player-ui/asset-transform-plugin';
 
-import scrollIntoView from 'smooth-scroll-into-view-if-needed';
+import scrollIntoViewWithOffset from '../scrollIntoViewWithOffset';
 
 import {
   AutoScrollManagerPlugin,
@@ -22,7 +22,7 @@ import {
   useRegisterAsScrollable,
 } from '..';
 
-jest.mock('smooth-scroll-into-view-if-needed');
+jest.mock('../scrollIntoViewWithOffset');
 
 /**
  * HOC to enable scrollable behavior for a given component
@@ -134,7 +134,107 @@ describe('auto-scroll plugin', () => {
       action.click();
     });
 
-    expect(scrollIntoView).toBeCalledTimes(1);
+    expect(scrollIntoViewWithOffset).toBeCalledTimes(1);
+  });
+
+  test('works with custom base element and offset', async () => {
+    const getBaseElementMock = jest.fn();
+
+    const wp = new ReactPlayer({
+      plugins: [
+        new AssetTransformPlugin([
+          [{ type: 'action' }, actionTransform],
+          [{ type: 'input' }, inputTransform],
+        ]),
+        new CommonTypesPlugin(),
+        new AutoScrollManagerPlugin({
+          autoFocusOnErrorField: true,
+          getBaseElement: getBaseElementMock,
+          offset: 40,
+        }),
+      ],
+    });
+    wp.assetRegistry.set({ type: 'info' }, Info);
+    wp.assetRegistry.set({ type: 'action' }, Action);
+    wp.assetRegistry.set({ type: 'input' }, withScrollable(Input));
+
+    wp.start(flow as any);
+
+    const { container } = render(
+      <div>
+        <React.Suspense fallback="loading...">
+          <wp.Component />
+        </React.Suspense>
+      </div>
+    );
+    await act(() => waitFor(() => {}));
+
+    getBaseElementMock.mockReturnValue({ id: 'view' });
+
+    const action = await findByRole(container, 'button');
+    act(() => action.click());
+    await act(() => waitFor(() => {}));
+
+    expect(scrollIntoViewWithOffset).toBeCalledWith(
+      expect.anything(),
+      expect.objectContaining({ id: 'view' }),
+      40
+    );
+
+    // Mock the case where the base element can't be found, so document.body is used as a fallback
+    getBaseElementMock.mockReturnValue(null);
+
+    act(() => action.click());
+    await act(() => waitFor(() => {}));
+
+    expect(scrollIntoViewWithOffset).toHaveBeenLastCalledWith(
+      expect.anything(),
+      document.body,
+      40
+    );
+  });
+
+  test('works without custom base element and offset provided', async () => {
+    const getBaseElementMock = jest.fn();
+
+    const wp = new ReactPlayer({
+      plugins: [
+        new AssetTransformPlugin([
+          [{ type: 'action' }, actionTransform],
+          [{ type: 'input' }, inputTransform],
+        ]),
+        new CommonTypesPlugin(),
+        new AutoScrollManagerPlugin({
+          autoFocusOnErrorField: true,
+        }),
+      ],
+    });
+    wp.assetRegistry.set({ type: 'info' }, Info);
+    wp.assetRegistry.set({ type: 'action' }, Action);
+    wp.assetRegistry.set({ type: 'input' }, withScrollable(Input));
+
+    wp.start(flow as any);
+
+    const { container } = render(
+      <div>
+        <React.Suspense fallback="loading...">
+          <wp.Component />
+        </React.Suspense>
+      </div>
+    );
+    await act(() => waitFor(() => {}));
+
+    getBaseElementMock.mockReturnValue({ id: 'view' });
+
+    const action = await findByRole(container, 'button');
+    act(() => action.click());
+    await act(() => waitFor(() => {}));
+
+    expect(scrollIntoViewWithOffset).toBeCalledWith(
+      expect.anything(),
+      document.body,
+      0
+    );
   });
 
   test('no error no scroll test', async () => {
@@ -171,7 +271,7 @@ describe('auto-scroll plugin', () => {
       action.click();
     });
 
-    expect(scrollIntoView).not.toBeCalled();
+    expect(scrollIntoViewWithOffset).not.toBeCalled();
   });
 });
 

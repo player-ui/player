@@ -13,6 +13,9 @@ const CONTEXT = 'validation-binding-tracker';
 export interface BindingTracker {
   /** Get the bindings currently being tracked for validation */
   getBindings(): Set<BindingInstance>;
+
+  /** Add a binding to the tracked set */
+  trackBinding(binding: BindingInstance): void;
 }
 interface Options {
   /** Parse a binding from a view */
@@ -42,6 +45,16 @@ export class ValidationBindingTrackerViewPlugin
     return this.trackedBindings;
   }
 
+  /** Add a binding to the tracked set */
+  trackBinding(binding: BindingInstance) {
+    if (this.trackedBindings.has(binding)) {
+      return;
+    }
+
+    this.trackedBindings.add(binding);
+    this.options.callbacks?.onAdd?.(binding);
+  }
+
   /** Attach hooks to the given resolver */
   applyResolver(resolver: Resolver) {
     this.trackedBindings.clear();
@@ -51,9 +64,6 @@ export class ValidationBindingTrackerViewPlugin
 
     /** Each Node is a registered section or page that maps to a set of nodes in its section */
     const sections = new Map<Node.Node, Set<Node.Node>>();
-
-    /** Keep track of all seen bindings so we can notify people when we hit one for the first time */
-    const seenBindings = new Set<BindingInstance>();
 
     let lastViewUpdateChangeSet: Set<BindingInstance> | undefined;
 
@@ -129,10 +139,8 @@ export class ValidationBindingTrackerViewPlugin
           }
         }
 
-        if (!seenBindings.has(parsed)) {
-          seenBindings.add(parsed);
-          this.options.callbacks?.onAdd?.(parsed);
-        }
+        this.trackedBindings.add(parsed);
+        this.options.callbacks?.onAdd?.(parsed);
       };
 
       return {
@@ -144,23 +152,36 @@ export class ValidationBindingTrackerViewPlugin
               track(binding);
             }
 
-            const eow = options.validation?._getValidationForBinding(binding);
+            const eows = options.validation
+              ?._getValidationForBinding(binding)
+              ?.getAll(getOptions);
 
-            if (
-              eow?.displayTarget === undefined ||
-              eow?.displayTarget === 'field'
-            ) {
-              return eow;
+            const firstFieldEOW = eows?.find(
+              (eow) =>
+                eow.displayTarget === 'field' || eow.displayTarget === undefined
+            );
+
+            return firstFieldEOW;
+          },
+          getValidationsForBinding(binding, getOptions) {
+            if (getOptions?.track) {
+              track(binding);
             }
 
-            return undefined;
+            return (
+              options.validation
+                ?._getValidationForBinding(binding)
+                ?.getAll(getOptions) ?? []
+            );
           },
-          getChildren: (type: Validation.DisplayTarget) => {
+          getChildren: (type?: Validation.DisplayTarget) => {
             const validations = new Array<ValidationResponse>();
             lastComputedBindingTree.get(node)?.forEach((binding) => {
-              const eow = options.validation?._getValidationForBinding(binding);
+              const eow = options.validation
+                ?._getValidationForBinding(binding)
+                ?.get();
 
-              if (eow && type === eow.displayTarget) {
+              if (eow && (type === undefined || type === eow.displayTarget)) {
                 validations.push(eow);
               }
             });
@@ -170,7 +191,9 @@ export class ValidationBindingTrackerViewPlugin
           getValidationsForSection: () => {
             const validations = new Array<ValidationResponse>();
             lastSectionBindingTree.get(node)?.forEach((binding) => {
-              const eow = options.validation?._getValidationForBinding(binding);
+              const eow = options.validation
+                ?._getValidationForBinding(binding)
+                ?.get();
 
               if (eow && eow.displayTarget === 'section') {
                 validations.push(eow);
@@ -213,7 +236,7 @@ export class ValidationBindingTrackerViewPlugin
       }
 
       if (node === resolver.root) {
-        this.trackedBindings = currentBindingTree.get(node) ?? new Set();
+        this.trackedBindings = new Set(currentBindingTree.get(node));
         lastComputedBindingTree = currentBindingTree;
 
         lastSectionBindingTree.clear();
