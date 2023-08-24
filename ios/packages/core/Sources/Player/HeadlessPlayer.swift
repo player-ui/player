@@ -261,16 +261,7 @@ public extension HeadlessPlayer {
         - context: The context to load the headless player into
      */
     private func loadCore(into context: JSContext) {
-        guard
-            let url = ResourceUtilities.urlForFile(
-                name: "player.prod",
-                ext: "js",
-                bundle: Bundle(for: ResourceBundleShim.self),
-                pathComponent: "PlayerUI.bundle"
-            ),
-            let jsString = try? String(contentsOf: url, encoding: String.Encoding.utf8)
-        else { return }
-        context.evaluateScript(jsString)
+        context.loadCore()
     }
 
     /**
@@ -307,6 +298,15 @@ public protocol WithSymbol {
 internal class ResourceBundleShim {}
 
 internal extension JSContext {
+    /// Loads the core player bundle into the give JSContext
+    func loadCore() {
+        guard
+            let url = ResourceUtilities.urlForFile(name: "player.prod", ext: "js", bundle: Bundle(for: ResourceBundleShim.self), pathComponent: "PlayerUI.bundle"),
+            let jsString = try? String(contentsOf: url, encoding: String.Encoding.utf8)
+        else { return }
+        evaluateScript(jsString)
+    }
+
     func getSymbol(_ symbolName: String) -> JSValue? {
         guard
             let ref = getClassReference(symbolName, load: {_ in}),
