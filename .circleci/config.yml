@@ -115,12 +115,12 @@ jobs:
       - run: HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@8 rbenv ruby-build
 
       - run:
-        name: Setup Ruby
-        command: |
-          eval "$(rbenv init - bash)"
-          rbenv install 2.6
-          rbenv global 2.6
-          echo 'eval "$(rbenv init - bash)"' >> $BASH_ENV
+          name: Setup Ruby
+          command: |
+            eval "$(rbenv init - bash)"
+            rbenv install 2.6
+            rbenv global 2.6
+            echo 'eval "$(rbenv init - bash)"' >> $BASH_ENV
 
 
       - restore_cache:
