@@ -40,6 +40,21 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
         player.hooks?.view.tap(name: pluginName, { (view) -> AnyView in
             return AnyView(view.modifier(ModifierType.init(plugin: self)))
         })
+
+        // If the state changes without our intervention
+        // we should update our state
+        player.hooks?.flowController.tap({ flowController in
+            flowController.hooks.flow.tap { flow in
+                flow.hooks.transition.tap {[weak self] old, newState in
+                    guard
+                        old?.value?.stateType == "EXTERNAL",
+                        newState.value?.stateType != "EXTERNAL"
+                    else { return }
+                    self?.isExternalState = false
+                    self?.state = nil
+                }
+            }
+        })
     }
 
     /**

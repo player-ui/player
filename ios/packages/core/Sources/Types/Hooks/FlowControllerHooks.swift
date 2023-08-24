@@ -14,5 +14,5 @@ import JavaScriptCore
  */
 public struct FlowControllerHooks {
     /// Fired for new Flows
-    var flow: Hook<Flow>
+    public var flow: Hook<Flow>
 }
