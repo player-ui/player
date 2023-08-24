@@ -40,3 +40,10 @@ extension JSValue: CreatedFromJSValue {
      */
     public static func createInstance(value: JSValue) -> JSValue { value }
 }
+
+extension Optional: CreatedFromJSValue where Wrapped: CreatedFromJSValue {
+    public static func createInstance(value: JSValue) -> Wrapped.T? {
+        guard !value.isUndefined else { return nil }
+        return Wrapped.createInstance(value: value)
+    }
+}

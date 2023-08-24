@@ -13,6 +13,6 @@ import JavaScriptCore
  This lets users tap into events in the JS environment
  */
 public struct FlowControllerHooks {
-    /// Fired when the FlowController does a transition
-    var transition: Hook<Flow>
+    /// Fired for new Flows
+    var flow: Hook<Flow>
 }

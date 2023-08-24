@@ -54,7 +54,7 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
                 let controllers = PlayerControllers(from: options),
                 let promise = JSUtilities.createPromise(context: context, handler: { (resolve, reject) in
                     self.isExternalState = true
-                    let state = NavigationFlowExternalState(from: state)
+                    let state = NavigationFlowExternalState(state)
                     self.state = state
                     do {
                         self.content = try self.handler?(state, controllers) { transition in

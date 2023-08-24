@@ -48,7 +48,7 @@ public class ExternalActionPlugin: JSBasePlugin, NativePlugin {
                     let controllers = PlayerControllers(from: options),
                     let promise = JSUtilities.createPromise(context: context, handler: { (resolve, reject) in
                         do {
-                            try self.handler?(NavigationFlowExternalState(from: state), controllers) { transition in
+                            try self.handler?(NavigationFlowExternalState(state), controllers) { transition in
                                 resolve(transition)
                             }
                         } catch {
