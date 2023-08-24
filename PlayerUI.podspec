@@ -320,6 +320,14 @@ and display it as a SwiftUI view comprised of registered assets.
     }
   end
 
+  s.subspec 'SwiftUICheckPathPlugin' do |plugin|
+    plugin.ios.deployment_target = '13.0'
+    plugin.dependency 'PlayerUI/Core'
+    plugin.dependency 'PlayerUI/SwiftUI'
+    plugin.dependency 'PlayerUI/CheckPathPlugin'
+    plugin.source_files = 'ios/plugins/SwiftUICheckPathPlugin/Sources/**/*'
+  end
+
   s.subspec 'TypesProviderPlugin' do |plugin|
     plugin.dependency 'PlayerUI/Core'
     plugin.source_files = 'ios/plugins/TypesProviderPlugin/Sources/**/*'
