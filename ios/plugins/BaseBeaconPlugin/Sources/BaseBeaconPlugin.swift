@@ -73,7 +73,9 @@ open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
             guard
                 let object = rawBeacon?.toObject(),
                 let data = try? JSONSerialization.data(withJSONObject: object),
-                let beacon = try? JSONDecoder().decode(BeaconStruct.self, from: data)
+                let beacon = try? AnyTypeDecodingContext(rawData: data)
+                    .inject(to: JSONDecoder())
+                    .decode(BeaconStruct.self, from: data)
             else { return }
             self.callback?(beacon)
         }
