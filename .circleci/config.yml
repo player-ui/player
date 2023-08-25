@@ -112,15 +112,18 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@8 rbenv ruby-build
+      - run: 
+          name: Homebrew Dependencies
+          command: |
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@8 rbenv ruby-build
+            echo 'eval "$(rbenv init - bash)"' >> $BASH_ENV
+            source $BASH_ENV
 
       - run:
           name: Setup Ruby
           command: |
-            eval "$(rbenv init - bash)"
             rbenv install 2.6.10
             rbenv global 2.6.10
-            echo 'eval "$(rbenv init - bash)"' >> $BASH_ENV
 
 
       - restore_cache:
