@@ -118,8 +118,8 @@ jobs:
           name: Setup Ruby
           command: |
             eval "$(rbenv init - bash)"
-            rbenv install 2.6
-            rbenv global 2.6
+            rbenv install 2.6.10
+            rbenv global 2.6.10
             echo 'eval "$(rbenv init - bash)"' >> $BASH_ENV
 
 
