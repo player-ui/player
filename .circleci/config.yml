@@ -115,15 +115,10 @@ jobs:
       - run: 
           name: Homebrew Dependencies
           command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@8 ruby-install chruby
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@8
 
-      - run:
-          name: Setup Ruby
-          command: |
-            ruby-install ruby 2.6.10
-            source /usr/local/opt/chruby/share/chruby/chruby.sh
-            chruby ruby-2.6.10
-
+      - macos/switch-ruby:
+          version: "2.7"
 
       - restore_cache:
           keys:
