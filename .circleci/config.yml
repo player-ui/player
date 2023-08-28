@@ -115,15 +115,14 @@ jobs:
       - run: 
           name: Homebrew Dependencies
           command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@8 rbenv ruby-build
-            echo 'eval "$(rbenv init - bash)"' >> $BASH_ENV
-            source $BASH_ENV
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@8 ruby-install chruby
 
       - run:
           name: Setup Ruby
           command: |
-            rbenv install 2.6.10
-            rbenv global 2.6.10
+            ruby-install ruby 2.6.10
+            source /usr/local/opt/chruby/share/chruby/chruby.sh
+            chruby ruby-2.6.10
 
 
       - restore_cache:
