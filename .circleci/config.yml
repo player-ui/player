@@ -119,7 +119,10 @@ jobs:
 
       - run:
           name: Set Ruby Version
-          command: rbenv install 2.6.10 && rbenv global 2.6.10 && rbenv rehash
+          command: |
+            rbenv install 2.6.10
+            rbenv global 2.6.10
+            rbenv rehash
 
       - restore_cache:
           keys:
