@@ -1,5 +1,7 @@
 import type { Expression } from '@player-ui/types';
-
+import { CommonTypesPlugin } from '@player-ui/common-types-plugin';
+import { Player } from '../../player';
+import type { InProgressState } from '../../types';
 import { BindingParser } from '../../binding';
 import { LocalModel, withParser } from '../../data';
 import { resolveDataRefs, resolveExpressionsInString } from '..';
@@ -213,4 +215,119 @@ test('resolves expressions', () => {
   ).toBe('Hello adam dierkens');
 
   expect(resolveDataRefs('@[{{adam.age}} + 10]@', options)).toBe(36);
+});
+
+describe('Returns unformatted values for requests', () => {
+  const player = new Player({ plugins: [new CommonTypesPlugin()] });
+
+  const endStateFlow = {
+    id: 'minimal-player-response-format',
+    topic: 'MOCK',
+    schema: {
+      ROOT: {
+        phoneNumber: {
+          type: 'PhoneType',
+          default: 'false',
+        },
+      },
+    },
+    data: {
+      phoneNumber: '1234567890',
+    },
+    views: [
+      {
+        actions: [
+          {
+            asset: {
+              id: 'action-1',
+              type: 'action',
+              value: 'Next',
+              label: {
+                asset: {
+                  id: 'Action-Label-Next',
+                  type: 'text',
+                  value: 'Continue',
+                },
+              },
+            },
+          },
+        ],
+        id: 'KitchenSink-View1',
+        title: {
+          asset: {
+            id: 'KitchenSink-View1-Title',
+            type: 'text',
+            value: '{{phoneNumber}}',
+          },
+        },
+        type: 'questionAnswer',
+      },
+    ],
+    navigation: {
+      BEGIN: 'KitchenSinkFlow',
+      KitchenSinkFlow: {
+        END_Done: {
+          outcome: '{{phoneNumber}}',
+          state_type: 'END',
+        },
+        VIEW_KitchenSink_1: {
+          ref: 'KitchenSink-View1',
+          state_type: 'VIEW',
+          transitions: {
+            param: 'END_invokeWithParam',
+            '*': 'END_Done',
+          },
+        },
+        END_invokeWithParam: {
+          state_type: 'END',
+          outcome: '{{phoneNumber}}',
+          param: {
+            type: 'someTopic',
+            topicId: 'someTopicId',
+            navData: {
+              topic: 'someTopic',
+              op: 'EDIT',
+              param: {
+                phone: '{{phoneNumber}}',
+              },
+            },
+          },
+        },
+        startState: 'VIEW_KitchenSink_1',
+      },
+    },
+  };
+
+  test('unformatted endState', async () => {
+    player.start(endStateFlow as any);
+
+    const state = player.getState() as InProgressState;
+
+    state.controllers.flow.transition('foo');
+
+    const { flowResult } = state;
+
+    const result = await flowResult;
+
+    expect(result.endState).toStrictEqual({
+      outcome: '1234567890',
+      state_type: 'END',
+    });
+  });
+
+  test('unformatted "param"', async () => {
+    player.start(endStateFlow as any);
+
+    const state = player.getState() as InProgressState;
+
+    state.controllers.flow.transition('param');
+
+    const { flowResult } = state;
+
+    const result = await flowResult;
+
+    const param = result.endState.param as any;
+
+    expect(param.navData.param.phone).toBe('1234567890');
+  });
 });

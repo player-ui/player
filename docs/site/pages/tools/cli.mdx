@@ -44,13 +44,7 @@ Plugins are the way to change runtime behavior of the CLI actions. This includes
 
 # Commands
 
-<!-- commands -->
-
 - [`player dsl compile`](#player-dsl-compile)
-<!-- - [`player json validate`](#player-json-validate) -->
-
-## `player dsl compile`
-
 Compile Player DSL files into JSON
 
 ```
@@ -69,8 +63,7 @@ DESCRIPTION
   Compile Player DSL files into JSON
 ```
 
-<!-- ## `player json validate`
-
+- [`player json validate`](#player-json-validate)
 Validate Player JSON content
 
 ```
@@ -84,6 +77,27 @@ FLAGS
 
 DESCRIPTION
   Validate Player JSON content
-``` -->
+```
 
-<!-- commandsstop -->
+- [`player dependency-versions check`](#player-dependency-versions-check)
+Checks for `@player-ui/@player-tools` dependency version mismatches and issues warnings/solutions accordingly
+
+```
+USAGE
+  $ player dependency-versions check [-c <value>] [-v] [-p] [-i <value>]
+FLAGS
+  -c, --config=<value>     Path to a specific config file to load.
+                           By default, will automatically search for an rc or config file to load
+  -i, --ignore=<value>...  Ignore the specified pattern(s) when outputting results. Note multiple patterns can be passed
+  -p, --path               Outputs full path to dependency
+  -v, --verbose            Give verbose description
+DESCRIPTION
+  Checks for `@player-ui/@player-tools` dependency version mismatches and issues warnings/solutions accordingly
+  Consider the following:
+  - The interpretation of TOP-LEVEL and NESTED dependencies is as follows:
+  a. TOP-LEVEL dependencies only have one 'node_modules' in their path
+  b. NESTED dependencies have more than one 'node_modules' in their path
+  - `@player-ui/@player-tools` dependencies are fetched not only from inside the 'node_modules' at the top of the repository in which it is run but also from 'node_modules' in sub-directories.
+  For example, if you have some 'node_modules' inside of a 'packages' folder that contains `@player-ui/@player-tools` dependencies, then these will also be fetched.
+  The display of such dependencies also depends on the first bullet point.
+```

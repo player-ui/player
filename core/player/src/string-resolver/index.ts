@@ -17,6 +17,11 @@ export interface Options {
    * Passing `false` will skip trying to evaluate any expressions (@[ foo() ]@)
    */
   evaluate: false | ((exp: Expression) => any);
+
+  /**
+   * Optionaly resolve binding without formatting in case Type format applies
+   */
+  formatted?: boolean;
 }
 
 /** Search the given string for the coordinates of the next expression to resolve */
@@ -116,7 +121,7 @@ export function resolveExpressionsInString(
 
 /** Return a string with all data model references resolved */
 export function resolveDataRefsInString(val: string, options: Options): string {
-  const { model } = options;
+  const { model, formatted = true } = options;
   let workingString = resolveExpressionsInString(val, options);
 
   if (
@@ -144,7 +149,7 @@ export function resolveDataRefsInString(val: string, options: Options): string {
       )
       .trim();
 
-    const evaledVal = model.get(binding, { formatted: true });
+    const evaledVal = model.get(binding, { formatted });
 
     // Exit early if the string is _just_ a model lookup
     // If the result is a string, we may need further processing for nested bindings

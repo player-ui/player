@@ -157,6 +157,15 @@ export class DependencyMiddleware
 
     return next?.get(binding, options);
   }
+
+  public delete(
+    binding: BindingInstance,
+    options?: DataModelOptions,
+    next?: DataModelImpl | undefined
+  ) {
+    this.addWriteDep(binding);
+    return next?.delete(binding, options);
+  }
 }
 
 /** A data-model that tracks dependencies of read/written data */
@@ -183,5 +192,10 @@ export class DependencyModel<Options = DataModelOptions>
     this.addReadDep(binding);
 
     return this.rootModel.get(binding, options);
+  }
+
+  public delete(binding: BindingInstance, options?: Options) {
+    this.addWriteDep(binding);
+    return this.rootModel.delete(binding, options);
   }
 }

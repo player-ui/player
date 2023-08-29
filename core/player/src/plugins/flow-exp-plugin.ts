@@ -3,7 +3,7 @@ import type {
   ExpressionObject,
   NavigationFlowState,
 } from '@player-ui/types';
-import type { ExpressionEvaluator } from '../expressions';
+import type { ExpressionEvaluator, ExpressionType } from '../expressions';
 import type { FlowInstance } from '../controllers';
 import type { Player, PlayerPlugin } from '../player';
 
@@ -28,7 +28,7 @@ export class FlowExpPlugin implements PlayerPlugin {
         if (typeof exp === 'object' && 'exp' in exp) {
           expressionEvaluator?.evaluate(exp.exp);
         } else {
-          expressionEvaluator?.evaluate(exp);
+          expressionEvaluator?.evaluate(exp as ExpressionType);
         }
       }
     };

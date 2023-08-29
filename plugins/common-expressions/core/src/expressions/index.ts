@@ -115,14 +115,18 @@ export const sum = withoutContext<Array<number | string>, number>((...args) => {
 
 /** Finds the property in an array of objects */
 export const findPropertyIndex: ExpressionHandler<
-  [Array<any> | Binding, string | undefined, any],
+  [Array<any> | Binding | undefined, string | undefined, any],
   number
 > = <T = unknown>(
   context: ExpressionContext,
-  bindingOrModel: Binding | Array<Record<string, T>>,
+  bindingOrModel: Binding | Array<Record<string, T>> | undefined,
   propToCheck: string | undefined,
   valueToCheck: T
 ) => {
+  if (bindingOrModel === undefined) {
+    return -1;
+  }
+
   const searchArray: Array<Record<string, T>> = Array.isArray(bindingOrModel)
     ? bindingOrModel
     : context.model.get(bindingOrModel);

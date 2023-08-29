@@ -398,6 +398,15 @@ export declare namespace Validation {
     /** Where the error should be displayed */
     displayTarget?: DisplayTarget;
 
+    /**
+     * If the validation blocks navigation
+     * true/false - always/never block navigation
+     * once - only block navigation if the validation has not been triggered before
+     *
+     * @default - true for errors, 'once' for warnings
+     */
+    blocking?: boolean | 'once';
+
     /** Additional props to send down to a Validator */
     [key: string]: unknown;
   }

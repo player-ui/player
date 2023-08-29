@@ -9,6 +9,372 @@ import { ViewInstance } from '../../view';
 import type { Options } from '../options';
 import TemplatePlugin from '../template-plugin';
 
+const templateJoinValues = {
+  id: 'snippet-of-json',
+  topic: 'Snippet',
+  schema: {},
+  data: {
+    forms: {
+      '1099-A': [
+        {
+          description: 'Desciption of concept 1099 1',
+          amount: 'Help',
+        },
+      ],
+      '1099-B': [
+        {
+          description: 'Desciption of concept 1099 2',
+          amount: 'Help',
+        },
+      ],
+    },
+  },
+  views: [
+    {
+      id: 'overviewGroup',
+      type: 'overviewGroup',
+      metaData: {
+        role: 'stateful',
+      },
+      modifiers: [
+        {
+          type: 'tag',
+          value: 'fancy-header',
+        },
+      ],
+      headers: {
+        label: {
+          asset: {
+            id: 'line-of-work-summary-gh-header-label',
+            type: 'text',
+            value: 'Header',
+          },
+        },
+        values: [
+          {
+            asset: {
+              id: 'line-of-work-summary-gh-expenses-simple-header-previous-year',
+              type: 'text',
+              value: 'Type',
+            },
+          },
+          {
+            asset: {
+              id: 'line-of-work-summary-gh-expenses-simple-header-cy',
+              type: 'text',
+              value: '2022',
+            },
+          },
+        ],
+      },
+      template: [
+        {
+          data: 'forms.1099-A',
+          output: 'values',
+          value: {
+            asset: {
+              id: 'overviewItem3',
+              type: 'overviewItem',
+              label: {
+                asset: {
+                  id: 'overviewItem3-label',
+                  type: 'text',
+                  value: '1099-A',
+                },
+              },
+              values: [
+                {
+                  asset: {
+                    id: 'overviewItem3-year',
+                    type: 'text',
+                    value: 'Desciption of concept 1099 1',
+                  },
+                },
+                {
+                  asset: {
+                    id: 'loverviewItem3-cy',
+                    type: 'text',
+                    value: '4000',
+                  },
+                },
+              ],
+            },
+          },
+        },
+        {
+          data: 'forms.1099-B',
+          output: 'values',
+          value: {
+            asset: {
+              id: 'overviewItem4',
+              type: 'overviewItem',
+              label: {
+                asset: {
+                  id: 'overviewItem4-label',
+                  type: 'text',
+                  value: '1099-B',
+                },
+              },
+              values: [
+                {
+                  asset: {
+                    id: 'overviewItem4-year',
+                    type: 'text',
+                    value: 'Desciption of concept 1099 2',
+                  },
+                },
+                {
+                  asset: {
+                    id: 'loverviewItem3-cy',
+                    type: 'text',
+                    value: '6000',
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+      values: [
+        {
+          asset: {
+            id: 'overviewItem1',
+            type: 'overviewItem',
+            label: {
+              asset: {
+                id: 'overviewItem1-label',
+                type: 'text',
+                value: 'First Summary',
+              },
+            },
+            values: [
+              {
+                asset: {
+                  id: 'overviewItem1-year',
+                  type: 'text',
+                  value: 'Desciption of year summary 1',
+                },
+              },
+              {
+                asset: {
+                  id: 'loverviewItem1-cy',
+                  type: 'text',
+                  value: '14000',
+                },
+              },
+            ],
+          },
+        },
+        {
+          asset: {
+            id: 'overviewItem2',
+            type: 'overviewItem',
+            label: {
+              asset: {
+                id: 'overviewItem2-label',
+                type: 'text',
+                value: 'Second year Summary',
+              },
+            },
+            values: [
+              {
+                asset: {
+                  id: 'overviewItem2-year',
+                  type: 'text',
+                  value: 'Desciption of year summary item 2',
+                },
+              },
+              {
+                asset: {
+                  id: 'loverviewItem1-cy',
+                  type: 'text',
+                  value: '19000',
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+    {
+      id: 'overviewGroup',
+      type: 'overviewGroup',
+      metaData: {
+        role: 'stateful',
+      },
+      modifiers: [
+        {
+          type: 'tag',
+          value: 'fancy-header',
+        },
+      ],
+      headers: {
+        label: {
+          asset: {
+            id: 'line-of-work-summary-gh-header-label',
+            type: 'text',
+            value: 'Header',
+          },
+        },
+        values: [
+          {
+            asset: {
+              id: 'line-of-work-summary-gh-expenses-simple-header-previous-year',
+              type: 'text',
+              value: 'Type',
+            },
+          },
+          {
+            asset: {
+              id: 'line-of-work-summary-gh-expenses-simple-header-cy',
+              type: 'text',
+              value: '2022',
+            },
+          },
+        ],
+      },
+      values: [
+        {
+          asset: {
+            id: 'overviewItem1',
+            type: 'overviewItem',
+            label: {
+              asset: {
+                id: 'overviewItem1-label',
+                type: 'text',
+                value: 'First Summary',
+              },
+            },
+            values: [
+              {
+                asset: {
+                  id: 'overviewItem1-year',
+                  type: 'text',
+                  value: 'Desciption of year summary 1',
+                },
+              },
+              {
+                asset: {
+                  id: 'loverviewItem1-cy',
+                  type: 'text',
+                  value: '14000',
+                },
+              },
+            ],
+          },
+        },
+        {
+          asset: {
+            id: 'overviewItem2',
+            type: 'overviewItem',
+            label: {
+              asset: {
+                id: 'overviewItem2-label',
+                type: 'text',
+                value: 'Second year Summary',
+              },
+            },
+            values: [
+              {
+                asset: {
+                  id: 'overviewItem2-year',
+                  type: 'text',
+                  value: 'Desciption of year summary item 2',
+                },
+              },
+              {
+                asset: {
+                  id: 'loverviewItem1-cy',
+                  type: 'text',
+                  value: '19000',
+                },
+              },
+            ],
+          },
+        },
+      ],
+      template: [
+        {
+          data: 'forms.1099-A',
+          output: 'values',
+          value: {
+            asset: {
+              id: 'overviewItem3',
+              type: 'overviewItem',
+              label: {
+                asset: {
+                  id: 'overviewItem3-label',
+                  type: 'text',
+                  value: '1099-A',
+                },
+              },
+              values: [
+                {
+                  asset: {
+                    id: 'overviewItem3-year',
+                    type: 'text',
+                    value: 'Desciption of concept 1099 1',
+                  },
+                },
+                {
+                  asset: {
+                    id: 'loverviewItem3-cy',
+                    type: 'text',
+                    value: '4000',
+                  },
+                },
+              ],
+            },
+          },
+        },
+        {
+          data: 'forms.1099-B',
+          output: 'values',
+          value: {
+            asset: {
+              id: 'overviewItem4',
+              type: 'overviewItem',
+              label: {
+                asset: {
+                  id: 'overviewItem4-label',
+                  type: 'text',
+                  value: '1099-B',
+                },
+              },
+              values: [
+                {
+                  asset: {
+                    id: 'overviewItem4-year',
+                    type: 'text',
+                    value: 'Desciption of concept 1099 2',
+                  },
+                },
+                {
+                  asset: {
+                    id: 'loverviewItem3-cy',
+                    type: 'text',
+                    value: '6000',
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  ],
+  navigation: {
+    BEGIN: 'SnippetFlow',
+    SnippetFlow: {
+      startState: 'VIEW_Snippet-View1',
+      'VIEW_Snippet-View1': {
+        ref: 'overviewGroup',
+        state_type: 'VIEW',
+      },
+    },
+  },
+};
+
 const parseBinding = new BindingParser().parse;
 
 describe('templates', () => {
@@ -300,6 +666,41 @@ describe('dynamic templates', () => {
         type: 'collection',
         values: ['Nuri'].map((value) => ({ value })),
       },
+    });
+  });
+
+  describe('Works with template items plus value items', () => {
+    const model = withParser(
+      new LocalModel(templateJoinValues.data),
+      parseBinding
+    );
+    const evaluator = new ExpressionEvaluator({ model });
+
+    it('Should show template item first when coming before values on lexical order', () => {
+      const view = new ViewInstance(templateJoinValues.views[0], {
+        model,
+        parseBinding,
+        evaluator,
+        schema: new SchemaController(),
+      });
+
+      const resolved = view.update();
+
+      expect(resolved.values).toHaveLength(4);
+      expect(resolved.values[0]).toMatchSnapshot();
+    });
+    it('Should show template item last when coming after values on lexical order', () => {
+      const view = new ViewInstance(templateJoinValues.views[1], {
+        model,
+        parseBinding,
+        evaluator,
+        schema: new SchemaController(),
+      });
+
+      const resolved = view.update();
+
+      expect(resolved.values).toHaveLength(4);
+      expect(resolved.values[0]).toMatchSnapshot();
     });
   });
 });

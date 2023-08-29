@@ -25,11 +25,15 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
     resolveDefaultValue: new SyncBailHook<[BindingInstance], any>(),
 
     onDelete: new SyncHook<[any]>(),
+
     onSet: new SyncHook<[BatchSetTransaction]>(),
+
     onGet: new SyncHook<[any, any]>(),
+
     onUpdate: new SyncHook<[Updates, DataModelOptions | undefined]>(),
 
     format: new SyncWaterfallHook<[any, BindingInstance]>(),
+
     deformat: new SyncWaterfallHook<[any, BindingInstance]>(),
 
     serialize: new SyncWaterfallHook<[any]>(),
@@ -119,17 +123,23 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
       (updates, [binding, newVal]) => {
         const oldVal = this.get(binding, { includeInvalid: true });
 
-        if (!dequal(oldVal, newVal)) {
-          updates.push({
-            binding,
-            newValue: newVal,
-            oldValue: oldVal,
-          });
-        }
+        const update = {
+          binding,
+          newValue: newVal,
+          oldValue: oldVal,
+        };
 
-        this.logger?.debug(
-          `Setting path: ${binding.asString()} from: ${oldVal} to: ${newVal}`
-        );
+        if (dequal(oldVal, newVal)) {
+          this.logger?.debug(
+            `Skipping update for path: ${binding.asString()}. Value was unchanged: ${oldVal}`
+          );
+        } else {
+          updates.push(update);
+
+          this.logger?.debug(
+            `Setting path: ${binding.asString()} from: ${oldVal} to: ${newVal}`
+          );
+        }
 
         return updates;
       },
@@ -164,15 +174,17 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
     return result;
   }
 
-  private resolve(binding: BindingLike): BindingInstance {
+  private resolve(binding: BindingLike, readOnly: boolean): BindingInstance {
     return Array.isArray(binding) || typeof binding === 'string'
-      ? this.pathResolver.parse(binding)
+      ? this.pathResolver.parse(binding, { readOnly })
       : binding;
   }
 
   public get(binding: BindingLike, options?: DataModelOptions) {
     const resolved =
-      binding instanceof BindingInstance ? binding : this.resolve(binding);
+      binding instanceof BindingInstance
+        ? binding
+        : this.resolve(binding, true);
     let result = this.getModel().get(resolved, options);
 
     if (result === undefined && !options?.ignoreDefaultValue) {
@@ -185,6 +197,8 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
 
     if (options?.formatted) {
       result = this.hooks.format.call(result, resolved);
+    } else if (options?.formatted === false) {
+      result = this.hooks.deformat.call(result, resolved);
     }
 
     this.hooks.onGet.call(binding, result);
@@ -192,53 +206,36 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
     return result;
   }
 
-  public delete(binding: BindingLike) {
-    if (binding === undefined || binding === null) {
-      throw new Error(`Invalid arguments: delete expects a data path (string)`);
+  public delete(binding: BindingLike, options?: DataModelOptions) {
+    if (
+      typeof binding !== 'string' &&
+      !Array.isArray(binding) &&
+      !(binding instanceof BindingInstance)
+    ) {
+      throw new Error('Invalid arguments: delete expects a data path (string)');
     }
 
-    const resolved = this.resolve(binding);
+    const resolved =
+      binding instanceof BindingInstance
+        ? binding
+        : this.resolve(binding, false);
+
+    const parentBinding = resolved.parent();
+    const property = resolved.key();
+    const parentValue = this.get(parentBinding);
+
+    const existedBeforeDelete =
+      typeof parentValue === 'object' &&
+      parentValue !== null &&
+      Object.prototype.hasOwnProperty.call(parentValue, property);
+
+    this.getModel().delete(resolved, options);
+
+    if (existedBeforeDelete && !this.get(resolved)) {
+      this.trash.add(resolved);
+    }
+
     this.hooks.onDelete.call(resolved);
-    this.deleteData(resolved);
-  }
-
-  public getTrash(): Set<BindingInstance> {
-    return this.trash;
-  }
-
-  private addToTrash(binding: BindingInstance) {
-    this.trash.add(binding);
-  }
-
-  private deleteData(binding: BindingInstance) {
-    const parentBinding = binding.parent();
-    const parentPath = parentBinding.asString();
-    const property = binding.key();
-
-    const existedBeforeDelete = Object.prototype.hasOwnProperty.call(
-      this.get(parentBinding),
-      property
-    );
-
-    if (property !== undefined) {
-      const parent = parentBinding ? this.get(parentBinding) : undefined;
-
-      // If we're deleting an item in an array, we just splice it out
-      // Don't add it to the trash
-      if (parentPath && Array.isArray(parent)) {
-        if (parent.length > property) {
-          this.set([[parentBinding, removeAt(parent, property as number)]]);
-        }
-      } else if (parentPath && parent[property]) {
-        this.set([[parentBinding, omit(parent, property as string)]]);
-      } else if (!parentPath) {
-        this.getModel().reset(omit(this.get(''), property as string));
-      }
-    }
-
-    if (existedBeforeDelete && !this.get(binding)) {
-      this.addToTrash(binding);
-    }
   }
 
   public serialize(): object {

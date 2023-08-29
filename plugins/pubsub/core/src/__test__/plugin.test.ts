@@ -1,6 +1,6 @@
 import { Player } from '@player-ui/player';
-import { PubSubPlugin } from './pubsub';
-import { PubSubPluginSymbol } from './symbols';
+import { PubSubPlugin } from '../plugin';
+import { PubSubPluginSymbol } from '../symbols';
 
 const minimal = {
   id: 'minimal',
@@ -27,8 +27,8 @@ const minimal = {
   },
 };
 
-const customName = {
-  id: 'custom',
+const multistart = {
+  id: 'minimal',
   views: [
     {
       id: 'view-1',
@@ -38,7 +38,10 @@ const customName = {
   navigation: {
     BEGIN: 'FLOW_1',
     FLOW_1: {
-      onStart: 'customPublish("pet.names", ["ginger", "daisy"])',
+      onStart: [
+        'publish("pet", ["ginger", "daisy"])',
+        'customPublish("pet", ["ginger", "daisy"])',
+      ],
       startState: 'VIEW_1',
       VIEW_1: {
         ref: 'view-1',
@@ -52,32 +55,30 @@ const customName = {
   },
 };
 
-test('handles subscriptions', () => {
-  const pubsubPlugin = new PubSubPlugin();
-
-  const handler1 = jest.fn();
-  pubsubPlugin.subscribe('foo', handler1);
-
-  const handler2 = jest.fn();
-  const token2 = pubsubPlugin.subscribe('foo.bar', handler2);
-
-  pubsubPlugin.publish('foo.bar', 'baz');
-  expect(handler1).toBeCalledTimes(1);
-  expect(handler2).toBeCalledTimes(1);
-  expect(handler1).toBeCalledWith('foo.bar', 'baz');
-  expect(handler2).toBeCalledWith('foo.bar', 'baz');
-
-  pubsubPlugin.publish('foo', 'baz times 2');
-  expect(handler1).toBeCalledTimes(2);
-  expect(handler2).toBeCalledTimes(1);
-
-  pubsubPlugin.unsubscribe(token2);
-
-  pubsubPlugin.publish('foo.bar', 'go again!');
-  expect(handler1).toBeCalledTimes(3);
-  expect(handler2).toBeCalledTimes(1);
-  expect(handler1).toBeCalledWith('foo.bar', 'go again!');
-});
+const customName = {
+  id: 'custom',
+  views: [
+    {
+      id: 'view-1',
+      type: 'info',
+    },
+  ],
+  navigation: {
+    BEGIN: 'FLOW_1',
+    FLOW_1: {
+      onStart: 'customPublish("pet.names", "ginger", "daisy")',
+      startState: 'VIEW_1',
+      VIEW_1: {
+        ref: 'view-1',
+        state_type: 'VIEW',
+        transitions: {
+          Next: 'VIEW_2',
+          '*': 'END_Done',
+        },
+      },
+    },
+  },
+};
 
 test('loads an expression', () => {
   const pubsub = new PubSubPlugin();
@@ -115,10 +116,10 @@ test('handles custom expression names', () => {
   player.start(customName as any);
 
   expect(topLevel).toBeCalledTimes(1);
-  expect(topLevel).toBeCalledWith('pet.names', ['ginger', 'daisy']);
+  expect(topLevel).toBeCalledWith('pet.names', 'ginger', 'daisy');
 
   expect(nested).toBeCalledTimes(1);
-  expect(nested).toBeCalledWith('pet.names', ['ginger', 'daisy']);
+  expect(nested).toBeCalledWith('pet.names', 'ginger', 'daisy');
 });
 
 test('finds plugin', () => {
@@ -127,4 +128,35 @@ test('finds plugin', () => {
   const player = new Player({ plugins: [pubsub] });
 
   expect(player.findPlugin<PubSubPlugin>(PubSubPluginSymbol)).toBe(pubsub);
+});
+
+test('only calls subscription once if multiple pubsub plugins are registered', () => {
+  const pubsub = new PubSubPlugin();
+  const pubsub2 = new PubSubPlugin();
+
+  const player = new Player({ plugins: [pubsub, pubsub2] });
+
+  const topLevel = jest.fn();
+  pubsub.subscribe('pet', topLevel);
+
+  player.start(minimal as any);
+
+  expect(topLevel).toBeCalledTimes(1);
+  expect(topLevel).toBeCalledWith('pet.names', ['ginger', 'daisy']);
+});
+
+test('calls subscription for each pubsub registered through pubsubplugin', () => {
+  const pubsub = new PubSubPlugin();
+  const pubsub2 = new PubSubPlugin({ expressionName: 'customPublish' });
+
+  const player = new Player({ plugins: [pubsub, pubsub2] });
+
+  const spy = jest.fn();
+  pubsub.subscribe('pet', spy);
+
+  player.start(multistart as any);
+
+  expect(spy).toBeCalledTimes(2);
+  expect(spy).toHaveBeenNthCalledWith(1, 'pet', ['ginger', 'daisy']);
+  expect(spy).toHaveBeenNthCalledWith(2, 'pet', ['ginger', 'daisy']);
 });

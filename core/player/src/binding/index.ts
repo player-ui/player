@@ -172,7 +172,7 @@ export class BindingParser {
 
     const updateKeys = Object.keys(updates);
 
-    if (updateKeys.length > 0) {
+    if (!options.readOnly && updateKeys.length > 0) {
       const updateTransaction = updateKeys.map<[BindingInstance, any]>(
         (updatedBinding) => [
           this.parse(updatedBinding),

@@ -248,6 +248,17 @@ describe('expr functions', () => {
       expect(propertyIndex).toBe(-1);
     });
 
+    test('undefined binding', () => {
+      const propertyIndex = findPropertyIndex(
+        context,
+        undefined as any,
+        'name',
+        'Tyler'
+      );
+
+      expect(propertyIndex).toBe(-1);
+    });
+
     test('non-existant model ref', () => {
       expect(findPropertyIndex(context, 'not-there', 'name', 'Adam')).toBe(-1);
       expect(

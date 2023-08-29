@@ -1,12 +1,11 @@
 import { setIn } from 'timm';
 import deferred from 'p-defer';
-import queueMicrotask from 'queue-microtask';
 import type { Flow as FlowType, FlowResult } from '@player-ui/types';
 
 import { SyncHook, SyncWaterfallHook } from 'tapable-ts';
 import type { Logger } from './logger';
 import { TapableLogger } from './logger';
-import type { ExpressionHandler } from './expressions';
+import type { ExpressionType } from './expressions';
 import { ExpressionEvaluator } from './expressions';
 import { SchemaController } from './schema';
 import { BindingParser } from './binding';
@@ -289,10 +288,11 @@ export class Player {
     });
 
     /** Resolve any data references in a string */
-    function resolveStrings<T>(val: T) {
+    function resolveStrings<T>(val: T, formatted?: boolean) {
       return resolveDataRefs(val, {
         model: dataController,
         evaluate: expressionEvaluator.evaluate,
+        formatted,
       });
     }
 
@@ -306,7 +306,7 @@ export class Player {
           if (typeof state.onEnd === 'object' && 'exp' in state.onEnd) {
             expressionEvaluator?.evaluate(state.onEnd.exp);
           } else {
-            expressionEvaluator?.evaluate(state.onEnd);
+            expressionEvaluator?.evaluate(state.onEnd as ExpressionType);
           }
         }
 
@@ -353,7 +353,7 @@ export class Player {
           newState = setIn(
             state,
             ['param'],
-            resolveStrings(state.param)
+            resolveStrings(state.param, false)
           ) as any;
         }
 
@@ -361,26 +361,18 @@ export class Player {
       });
 
       flow.hooks.transition.tap('player', (_oldState, newState) => {
-        if (newState.value.state_type === 'ACTION') {
-          const { exp } = newState.value;
+        if (newState.value.state_type !== 'VIEW') {
+          validationController.reset();
+        }
+      });
 
-          // The nested transition call would trigger another round of the flow transition hooks to be called.
-          // This created a weird timing where this nested transition would happen before the view had a chance to respond to the first one
-
-          // Additionally, because we are using queueMicrotask, errors could get swallowed in the detached queue
-          // Use a try catch and fail player explicitly if any errors are caught in the nested transition/state
-          queueMicrotask(() => {
-            try {
-              flowController?.transition(
-                String(expressionEvaluator?.evaluate(exp))
-              );
-            } catch (error) {
-              const state = this.getState();
-              if (error instanceof Error && state.status === 'in-progress') {
-                state.fail(error);
-              }
-            }
-          });
+      flow.hooks.afterTransition.tap('player', (flowInstance) => {
+        const value = flowInstance.currentState?.value;
+        if (value && value.state_type === 'ACTION') {
+          const { exp } = value;
+          flowController?.transition(
+            String(expressionEvaluator?.evaluate(exp))
+          );
         }
 
         expressionEvaluator.reset();
@@ -402,6 +394,11 @@ export class Player {
       parseBinding,
       transition: flowController.transition,
       model: dataController,
+      utils: {
+        findPlugin: <Plugin = unknown>(pluginSymbol: symbol) => {
+          return this.findPlugin(pluginSymbol) as unknown as Plugin;
+        },
+      },
       logger: this.logger,
       flowController,
       schema,
@@ -419,6 +416,7 @@ export class Player {
         ...validationController.forView(parseBinding),
         type: (b) => schema.getType(parseBinding(b)),
       },
+      constants: this.constantsController,
     });
     viewController.hooks.view.tap('player', (view) => {
       validationController.onView(view);
@@ -432,7 +430,7 @@ export class Player {
           .start()
           .then((endState) => {
             const flowResult: FlowResult = {
-              endState: resolveStrings(endState),
+              endState: resolveStrings(endState, false),
               data: dataController.serialize(),
             };
 
@@ -503,7 +501,6 @@ export class Player {
         ref,
         status: 'completed',
         flow: state.flow,
-        dataModel: state.controllers.data.getModel(),
       } as const;
 
       return maybeUpdateState({

@@ -92,7 +92,10 @@ export class AssetTransformCorePlugin {
             const transform = this.registry.get(node.value);
 
             if (transform?.beforeResolve) {
-              const store = getStore(node, this.beforeResolveSymbol);
+              const store = getStore(
+                options.node ?? node,
+                this.beforeResolveSymbol
+              );
 
               return transform.beforeResolve(node, options, store);
             }

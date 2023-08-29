@@ -17,6 +17,7 @@ javascript_pipeline(
       "@npm//ts-debounce",
       "@npm//uuid",
       "//plugins/metrics/react:@player-ui/metrics-plugin-react",
+      "//plugins/beacon/react:@player-ui/beacon-plugin-react"
     ],
 
     other_srcs = ["register.js"],    

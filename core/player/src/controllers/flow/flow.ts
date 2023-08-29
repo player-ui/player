@@ -58,6 +58,9 @@ export class FlowInstance {
 
     /** A callback when a transition from 1 state to another was made */
     transition: new SyncHook<[NamedState | undefined, NamedState]>(),
+
+    /** A callback to run actions after a transition occurs */
+    afterTransition: new SyncHook<[FlowInstance]>(),
   };
 
   constructor(
@@ -131,7 +134,7 @@ export class FlowInstance {
 
       if (skipTransition) {
         this.log?.debug(
-          `Skipping transition from ${this.currentState} b/c hook told us to`
+          `Skipping transition from ${this.currentState.name} b/c hook told us to`
         );
         return;
       }
@@ -201,5 +204,7 @@ export class FlowInstance {
     this.hooks.transition.call(prevState, {
       ...newCurrentState,
     });
+
+    this.hooks.afterTransition.call(this);
   }
 }

@@ -85,10 +85,7 @@ export type InProgressState = BaseFlowState<'in-progress'> &
 /** The flow completed properly */
 export type CompletedState = BaseFlowState<'completed'> &
   PlayerFlowExecutionData &
-  FlowResult & {
-    /** The top-level data-model for the flow */
-    dataModel: DataModelWithParser;
-  };
+  FlowResult;
 
 /** The flow finished but not successfully */
 export type ErrorState = BaseFlowState<'error'> & {

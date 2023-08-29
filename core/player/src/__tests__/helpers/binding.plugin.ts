@@ -102,12 +102,14 @@ export default class TrackBindingPlugin implements PlayerPlugin {
         view.hooks.resolver.tap('test', (resolver) => {
           resolver.hooks.resolve.tap('test', (val, node, options) => {
             if (val?.binding) {
+              const currentValue = options?.data.model.get(val.binding);
               options.validation?.track(val.binding);
               const valObj = options.validation?.get(val.binding);
 
               if (valObj) {
                 return {
                   ...val,
+                  value: currentValue,
                   validation: valObj,
                   allValidations: options.validation?.getAll(),
                 };
