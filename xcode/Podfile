@@ -27,6 +27,7 @@ target 'PlayerUI_Example' do
   pod 'PlayerUI/MetricsPlugin', :path => '../'
   pod 'PlayerUI/PrintLoggerPlugin', :path => '../'
   pod 'PlayerUI/PubSubPlugin', :path => '../'
+  pod 'PlayerUI/SwiftUICheckPathPlugin', :path => '../'
   pod 'PlayerUI/TransitionPlugin', :path => '../'
   pod 'PlayerUI/TypesProviderPlugin', :path => '../'
   

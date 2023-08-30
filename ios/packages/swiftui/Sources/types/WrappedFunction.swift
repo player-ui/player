@@ -36,6 +36,15 @@ public struct WrappedFunction<T>: JSValueBacked, Decodable, Hashable {
         let val = jsValue.call(withArguments: args)
         return val?.toObject() as? T
     }
+
+    /**
+     Executes the function and returns the customType specified
+     */
+    public func callAsFunction<T>(customType: T.Type, args: Any...) throws -> T? where T: Decodable {
+        guard let jsValue = rawValue else { throw DecodingError.malformedData }
+        let decodedState = try JSONDecoder().decode(customType, from: jsValue.call(withArguments: args))
+        return decodedState
+    }
 }
 
 /**

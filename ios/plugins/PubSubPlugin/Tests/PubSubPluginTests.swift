@@ -173,4 +173,29 @@ class PubSubPluginTests: XCTestCase {
         plugin.publish(eventName: "test", eventData: .dictionary(data: ["example": "data"]))
         wait(for: [expectation], timeout: 2)
     }
+
+    func testPubSubPluginAnyDictionaryData() {
+        let context = JSContext()!
+        JSUtilities.polyfill(context)
+
+        let expectation = XCTestExpectation(description: "beacon callback called")
+        let subscription: PubSubSubscription = ("test", { (_, data) in
+            guard let eventData = data else { return XCTFail("data did not exist") }
+            switch eventData {
+            case .anyDictionary(let dict):
+                XCTAssertEqual(2, dict.keys.count)
+                XCTAssertEqual("example", dict["data"] as? String)
+                XCTAssertEqual(3, dict["value"] as? Double)
+            default:
+                XCTFail("data was not anyDictionary")
+            }
+            expectation.fulfill()
+        })
+
+        let plugin = PubSubPlugin([subscription])
+        plugin.context = context
+
+        plugin.publish(eventName: "test", eventData: .anyDictionary(data: ["data": "example", "value": 3]))
+        wait(for: [expectation], timeout: 2)
+    }
 }

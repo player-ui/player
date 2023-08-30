@@ -25,7 +25,7 @@ executors:
     working_directory: ~/player
     resource_class: macos.x86.medium.gen2
     macos:
-      xcode: 13.4.1
+      xcode: 14.3
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   android:
@@ -112,7 +112,17 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@8
+      - run: 
+          name: Homebrew Dependencies
+          command: |
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@8
+
+      - run:
+          name: Set Ruby Version
+          command: |
+            rbenv install 2.6.10
+            rbenv global 2.6.10
+            rbenv rehash
 
       - restore_cache:
           keys:

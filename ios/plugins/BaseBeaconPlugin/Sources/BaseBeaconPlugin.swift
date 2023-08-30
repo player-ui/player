@@ -11,7 +11,7 @@ import JavaScriptCore
 /**
  Represenation of a Beacon coming from Player
  */
-public struct DefaultBeacon: Decodable {
+public struct DefaultBeacon: Codable, Hashable {
     /// The action the user performed
     public let action: String
 
@@ -26,6 +26,22 @@ public struct DefaultBeacon: Decodable {
 
     /// Additional data added from the asset or metaData
     public let data: AnyType?
+
+
+    /// Construct a ``DefaultBeacon``
+    /// - Parameters:
+    ///   - action: The action the user performed
+    ///   - element: The element that performed the action
+    ///   - assetId: The ID of the asset triggering the beacon
+    ///   - viewId: The ID of the view triggering the beacon
+    ///   - data: Additional data added from the asset or metaData
+    public init(action: String, element: String, assetId: String?, viewId: String?, data: AnyType?) {
+        self.action = action
+        self.element = element
+        self.assetId = assetId
+        self.viewId = viewId
+        self.data = data
+    }
 }
 
 /**
@@ -73,7 +89,9 @@ open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
             guard
                 let object = rawBeacon?.toObject(),
                 let data = try? JSONSerialization.data(withJSONObject: object),
-                let beacon = try? JSONDecoder().decode(BeaconStruct.self, from: data)
+                let beacon = try? AnyTypeDecodingContext(rawData: data)
+                    .inject(to: JSONDecoder())
+                    .decode(BeaconStruct.self, from: data)
             else { return }
             self.callback?(beacon)
         }

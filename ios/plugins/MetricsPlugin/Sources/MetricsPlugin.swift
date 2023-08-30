@@ -134,9 +134,9 @@ public struct NodeRenderMetrics: Decodable {
     /// the name of the flow-state
     public let stateName: String
     /// Timing representing the initial render
-    public let render: MetricsTiming
+    public let render: MetricsTiming?
     /// An array of timings representing updates to the view
-    public let updates: [MetricsTiming]
+    public let updates: [MetricsTiming]?
 }
 
 public struct MetricsFlow: Decodable {
