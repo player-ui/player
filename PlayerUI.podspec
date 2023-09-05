@@ -320,6 +320,15 @@ and display it as a SwiftUI view comprised of registered assets.
     }
   end
 
+  s.subspec 'StageRevertDataPlugin' do |plugin|
+    plugin.ios.deployment_target = '13.0'
+    plugin.dependency 'PlayerUI/Core'
+    plugin.source_files = 'ios/plugins/StageRevertDataPlugin/Sources/**/*'
+    plugin.resource_bundles = {
+      'StageRevertDataPlugin' => ['ios/plugins/StageRevertDataPlugin/Resources/**/*.js']
+    }
+  end
+
   s.subspec 'SwiftUICheckPathPlugin' do |plugin|
     plugin.ios.deployment_target = '13.0'
     plugin.dependency 'PlayerUI/Core'

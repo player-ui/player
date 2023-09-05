@@ -27,7 +27,6 @@ public struct DefaultBeacon: Codable, Hashable {
     /// Additional data added from the asset or metaData
     public let data: AnyType?
 
-
     /// Construct a ``DefaultBeacon``
     /// - Parameters:
     ///   - action: The action the user performed
