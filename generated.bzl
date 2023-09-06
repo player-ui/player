@@ -318,7 +318,7 @@ def PlayerUI_Demo(
                     "UISceneConfigurations": {"UIWindowSceneSessionRoleApplication": [
                         {
                             "UISceneConfigurationName": "Default Configuration",
-                            "UISceneDelegateClassName": "$(PRODUCT_MODULE_NAME).SceneDelegate",
+                            "UISceneDelegateClassName": "PlayerUI_Demo.SceneDelegate",
                         },
                     ]},
                 },

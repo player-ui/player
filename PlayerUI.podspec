@@ -53,7 +53,7 @@ and display it as a SwiftUI view comprised of registered assets.
           'UIWindowSceneSessionRoleApplication' => [
             {
               'UISceneConfigurationName' => 'Default Configuration',
-              'UISceneDelegateClassName' => '$(PRODUCT_MODULE_NAME).SceneDelegate'
+              'UISceneDelegateClassName' => 'PlayerUI_Demo.SceneDelegate'
             }
           ]
         }
