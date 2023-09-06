@@ -28,48 +28,8 @@ public struct AssetFlowView: View {
     }
 
     public var body: some View {
-        if #available(iOS 14, *) {
-            body14
-        } else {
-            body13
-        }
-    }
-
-    internal var body14: some View {
-        // on iOS 14 wrapping the scroll view in a geometry reader causes
-        // body to be called when the keyboard appears/disappears, which
-        // causes our model to be recreated, effectively clearing all inputs
-        // the scroll view layout issues on 13 don't exist here anyway...
         ScrollView {
             player.frame(maxWidth: .infinity, alignment: .topLeading)
-        }
-    }
-
-    internal var body13: some View {
-        Body13(player: player)
-    }
-
-    // on iOS 13 changing the size of content in the scroll view
-    // causes layout issues, the geometry reader is used to pull the current
-    // height of Player content and latch it onto the `minHeight` state
-    // which in turn is applied as a minimum frame height
-    internal struct Body13<Player>: View where Player: View {
-        @State private var minHeight: CGFloat = 0
-        let player: Player
-
-        var body: some View {
-            GeometryReader { proxy in
-                ScrollView {
-                    player
-                        .anchorHeight(proxy)
-                        .frame(maxWidth: .infinity, minHeight: minHeight, alignment: .topLeading)
-                }
-                .onHeightChange { (height) in
-                    withAnimation {
-                        minHeight = height
-                    }
-                }
-            }
         }
     }
 

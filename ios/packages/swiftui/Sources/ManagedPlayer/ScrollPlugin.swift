@@ -19,27 +19,19 @@ public class ScrollPlugin: NativePlugin {
         guard let player = player as? SwiftUIPlayer else { return }
         let ignoredEdges = self.ignoredEdges
         player.hooks?.view.tap(name: pluginName) { view in
-            if #available(iOS 14, *) {
-                return AnyView(
-                    ScrollViewReader { proxy in
-                        ScrollView {
-                            view.scrollToProxy(proxy)
-                        }
+            return AnyView(
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        view.scrollToProxy(proxy)
                     }
-                    .edgesIgnoringSafeArea(ignoredEdges)
-                    .modifier(MeasureToEnvironment(path: \.playerScrollPluginSize))
-                )
-            } else {
-                return AnyView(
-                    ScrollView { view }
-                        .edgesIgnoringSafeArea(ignoredEdges)
-                )
-            }
+                }
+                .edgesIgnoringSafeArea(ignoredEdges)
+                .modifier(MeasureToEnvironment(path: \.playerScrollPluginSize))
+            )
         }
     }
 }
 
-@available(iOS 14, *)
 struct MeasureToEnvironment: ViewModifier {
     let path: WritableKeyPath<EnvironmentValues, CGSize>
     @State var size: CGSize = .zero

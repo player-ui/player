@@ -16,7 +16,7 @@ public protocol ScrollToProxy {
     func scrollTo<Item>(_ item: Item, anchor: UnitPoint?) where Item: Hashable
 }
 
-@available(iOS 14, *) // ScrollViewProxy is only available on 14+
+// ScrollViewProxy is only available on 14+
 extension ScrollViewProxy: ScrollToProxy {}
 
 public extension View {

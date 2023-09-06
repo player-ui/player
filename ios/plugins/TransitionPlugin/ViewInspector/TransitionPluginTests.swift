@@ -15,13 +15,6 @@ import Combine
 @testable import PlayerUI
 
 class TransitionPluginTests: ViewInspectorTestCase {
-    func testTransitionPluginLegacyStateTransitions() {
-        let flow = TestFlowManager()
-        let model = ManagedPlayerViewModel(manager: flow) { _ in }
-        let plugin = TransitionPlugin(initialLoadTransition: .test1, betweenViewTransition: .test2)
-        plugin.apply(model)
-        XCTAssertEqual(model.stateTransition.call(), .test1)
-    }
     func testTransitionPluginStateTransitions() {
         let flow = TestFlowManager()
         let model = ManagedPlayerViewModel(manager: flow) { _ in }

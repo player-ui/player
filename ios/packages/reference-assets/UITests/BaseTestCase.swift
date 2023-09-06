@@ -88,11 +88,7 @@ class BaseTestCase: AssetUITestCase {
 
 extension Eyes {
     func checkApp(withTag tag: String) {
-        if #available(iOS 13, *) {
-            self.check(withTag: "[iOS] \(tag)", andSettings: Target.window().statusBarExists(true))
-        } else {
-            self.checkWindow(withTag: tag)
-        }
+        self.check(withTag: "[iOS] \(tag)", andSettings: Target.window().statusBarExists(true))
     }
 }
 
