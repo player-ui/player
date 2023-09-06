@@ -15,24 +15,6 @@ public class TransitionPlugin: NativePlugin, ManagedPlayerPlugin {
     private let popTransition: PlayerViewTransition
 
     /**
-     Initializes a `TransitionPlugin` with transition information
-     - parameters:
-        - initialLoadTransition: The transition to use during the first load of Player
-        - betweenViewTransition: The transition to use between views in the same flow
-     */
-    @available(*, deprecated, message: "Use init(stateTransition:pushTransition:popTransition) instead")
-    convenience public init(
-        initialLoadTransition: PlayerViewTransition = .fadeInSlideOut,
-        betweenViewTransition: PlayerViewTransition = .slideInSlideOut
-    ) {
-        self.init(
-            stateTransition: initialLoadTransition,
-            pushTransition: betweenViewTransition,
-            popTransition: betweenViewTransition
-        )
-    }
-
-    /**
      Initializes a `TransitionPlugin` with transition information.
     
      - parameters:

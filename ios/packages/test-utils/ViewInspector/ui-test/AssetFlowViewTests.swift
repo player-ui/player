@@ -30,8 +30,7 @@ class AssetFlowViewTests: ViewInspectorTestCase {
         }
         ViewHosting.host(view: view)
 
-        _ = try view.body13.inspect().view(AssetFlowView.Body13<SwiftUIPlayer>.self).geometryReader().scrollView().view(SwiftUIPlayer.self)
-        _ = try view.body14.inspect().scrollView().view(SwiftUIPlayer.self)
+        _ = try view.inspect().scrollView().view(SwiftUIPlayer.self)
 
         ViewHosting.expel()
     }
@@ -133,5 +132,3 @@ class ForceTransitionPlugin: NativePlugin {
         }
     }
 }
-
-extension AssetFlowView.Body13: Inspectable {}
