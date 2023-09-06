@@ -20,6 +20,9 @@ open class AssetUITestCase: XCTestCase {
      */
     open override func setUp() {
         app = XCUIApplication()
+        app.launchEnvironment = [
+            "UI_TESTING": "true"
+        ]
         app.launch()
     }
 

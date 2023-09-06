@@ -261,7 +261,7 @@ def PlayerUI(
         weak_sdk_frameworks = ["XCTest"],
         deps = ["@Pods//SwiftHooks"] + deps,
         visibility = ["//visibility:public"],
-        platforms = {"ios": "13.0"},
+        platforms = {"ios": "14.0"},
     )
 
 def PlayerUI_Demo(
@@ -311,12 +311,20 @@ def PlayerUI_Demo(
         ],
         infoplists = [
             {
-                "UIMainStoryboardFile": "Primary",
                 "UILaunchStoryboardName": "Launch",
                 "CFBundleIdentifier": "com.intuit.ios.player",
+                "UIApplicationSceneManifest": {
+                    "UIApplicationSupportsMultipleScenes": True,
+                    "UISceneConfigurations": {"UIWindowSceneSessionRoleApplication": [
+                        {
+                            "UISceneConfigurationName": "Default Configuration",
+                            "UISceneDelegateClassName": "$(PRODUCT_MODULE_NAME).SceneDelegate",
+                        },
+                    ]},
+                },
             },
         ],
-        minimum_os_version = "13.0",
+        minimum_os_version = "14.0",
     )
 
 def unit_tests(
@@ -334,7 +342,7 @@ def unit_tests(
             "ios/plugins/*/Tests/**/*.swift",
         ]),
         deps = [":PlayerUI"],
-        minimum_os_version = "13.0",
+        minimum_os_version = "14.0",
         test_host = ":PlayerUI-Demo",
     )
 
@@ -377,7 +385,7 @@ def ui_tests(
             "@Pods//ViewInspector",
         ],
         bundle_id = "com.intuit.ios.PlayerUI-ExampleUITests",
-        minimum_os_version = "13.0",
+        minimum_os_version = "14.0",
         test_host = ":PlayerUI-Demo",
     )
     ios_ui_test(
@@ -416,6 +424,6 @@ def ui_tests(
             "@Pods//EyesXCUI",
         ],
         bundle_id = "com.intuit.ios.PlayerUI-ExampleUITests",
-        minimum_os_version = "13.0",
+        minimum_os_version = "14.0",
         test_host = ":PlayerUI-Demo",
     )

@@ -20,7 +20,7 @@ and display it as a SwiftUI view comprised of registered assets.
   s.author           = { 'hborawski' => 'harris_borawski@intuit.com' }
   s.source         = { :http => "https://github.com/player-ui/player/releases/download/#{s.version.to_s}/PlayerUI_Pod.zip" }
 
-  s.ios.deployment_target = '13.0'
+  s.ios.deployment_target = '14.0'
 
   s.default_subspec = 'Main'
 
@@ -45,9 +45,19 @@ and display it as a SwiftUI view comprised of registered assets.
     demo.dependency 'PlayerUI/TransitionPlugin'
 
     demo.info_plist = {
-      'UIMainStoryboardFile' => 'Primary',
       'UILaunchStoryboardName' => 'Launch',
-      'CFBundleIdentifier' => 'com.intuit.ios.player'
+      'CFBundleIdentifier' => 'com.intuit.ios.player',
+      'UIApplicationSceneManifest' => {
+        'UIApplicationSupportsMultipleScenes' => true,
+        'UISceneConfigurations' => {
+          'UIWindowSceneSessionRoleApplication' => [
+            {
+              'UISceneConfigurationName' => 'Default Configuration',
+              'UISceneDelegateClassName' => '$(PRODUCT_MODULE_NAME).SceneDelegate'
+            }
+          ]
+        }
+      }
     }
 
     demo.pod_target_xcconfig = {
@@ -169,8 +179,6 @@ and display it as a SwiftUI view comprised of registered assets.
     utils.dependency 'PlayerUI/Core'
     utils.dependency 'PlayerUI/SwiftUI'
 
-    utils.ios.deployment_target = '13.0'
-
     utils.source_files = 'ios/packages/test-utils-core/Sources/**/*'
     utils.resource_bundles = {
       'TestUtilities' => ['ios/packages/test-utils/Resources/**/*.js']
@@ -181,8 +189,6 @@ and display it as a SwiftUI view comprised of registered assets.
     utils.dependency 'PlayerUI/Core'
     utils.dependency 'PlayerUI/SwiftUI'
     utils.dependency 'PlayerUI/TestUtilitiesCore'
-
-    utils.ios.deployment_target = '13.0'
 
     utils.source_files = 'ios/packages/test-utils/Sources/**/*'
 
@@ -198,8 +204,6 @@ and display it as a SwiftUI view comprised of registered assets.
     assets.dependency 'PlayerUI/SwiftUI'
     assets.dependency 'PlayerUI/BeaconPlugin'
 
-    assets.ios.deployment_target = '13.0'
-
     assets.source_files = 'ios/packages/reference-assets/Sources/**/*'
     assets.resource_bundles = {
       'ReferenceAssets' => [
@@ -214,7 +218,6 @@ and display it as a SwiftUI view comprised of registered assets.
 
   s.subspec 'SwiftUI' do |swiftui|
     swiftui.dependency 'PlayerUI/Core'
-    swiftui.ios.deployment_target = '13.0'
 
     swiftui.source_files = 'ios/packages/swiftui/Sources/**/*'
   end
@@ -232,7 +235,6 @@ and display it as a SwiftUI view comprised of registered assets.
   end
 
   s.subspec 'TransitionPlugin' do |plugin|
-    plugin.ios.deployment_target = '13.0'
     plugin.dependency 'PlayerUI/Core'
     plugin.dependency 'PlayerUI/SwiftUI'
     plugin.source_files = 'ios/plugins/TransitionPlugin/Sources/**/*'
@@ -247,7 +249,6 @@ and display it as a SwiftUI view comprised of registered assets.
   end
 
   s.subspec 'BeaconPlugin' do |plugin|
-    plugin.ios.deployment_target = '13.0'
     plugin.dependency 'PlayerUI/Core'
     plugin.dependency 'PlayerUI/SwiftUI'
     plugin.dependency 'PlayerUI/BaseBeaconPlugin'
@@ -295,7 +296,6 @@ and display it as a SwiftUI view comprised of registered assets.
   end
 
   s.subspec 'ExternalActionViewModifierPlugin' do |plugin|
-    plugin.ios.deployment_target = '13.0'
     plugin.dependency 'PlayerUI/Core'
     plugin.dependency 'PlayerUI/SwiftUI'
     plugin.dependency 'PlayerUI/ExternalActionPlugin'
@@ -303,7 +303,6 @@ and display it as a SwiftUI view comprised of registered assets.
   end
 
   s.subspec 'MetricsPlugin' do |plugin|
-    plugin.ios.deployment_target = '13.0'
     plugin.dependency 'PlayerUI/Core'
     plugin.dependency 'PlayerUI/SwiftUI'
     plugin.source_files = 'ios/plugins/MetricsPlugin/Sources/**/*'
@@ -321,7 +320,6 @@ and display it as a SwiftUI view comprised of registered assets.
   end
 
   s.subspec 'StageRevertDataPlugin' do |plugin|
-    plugin.ios.deployment_target = '13.0'
     plugin.dependency 'PlayerUI/Core'
     plugin.source_files = 'ios/plugins/StageRevertDataPlugin/Sources/**/*'
     plugin.resource_bundles = {
@@ -330,7 +328,6 @@ and display it as a SwiftUI view comprised of registered assets.
   end
 
   s.subspec 'SwiftUICheckPathPlugin' do |plugin|
-    plugin.ios.deployment_target = '13.0'
     plugin.dependency 'PlayerUI/Core'
     plugin.dependency 'PlayerUI/SwiftUI'
     plugin.dependency 'PlayerUI/CheckPathPlugin'

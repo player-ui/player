@@ -1,5 +1,5 @@
 use_frameworks!
-platform :ios, '13.0'
+platform :ios, '14.0'
 source 'https://cdn.cocoapods.org'
 
 target 'PlayerUI_Example' do
