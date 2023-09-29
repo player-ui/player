@@ -36,7 +36,7 @@ Ready to get started? Check out the [docs](https://player-ui.github.io) for more
 
 ## Contributing
 
-We actively welcome pull requests. Learn how to [contribute](./CONTRIBUTING.md). Be sure to read our [code of conduct](./CODE_OF_CONDUCT.md).
+We actively welcome pull requests. Learn how to [contribute](./CONTRIBUTING.md). Be sure to read our [code of conduct](./.github/CODE_OF_CONDUCT.md).
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
