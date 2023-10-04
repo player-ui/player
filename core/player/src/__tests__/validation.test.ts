@@ -6,9 +6,12 @@ import type { SchemaController } from '../schema';
 import type { BindingParser } from '../binding';
 import TrackBindingPlugin, { addValidator } from './helpers/binding.plugin';
 import { Player } from '..';
+import { VALIDATION_PROVIDER_NAME_SYMBOL } from '../controllers/validation';
 import type { ValidationController } from '../controllers/validation';
 import type { InProgressState } from '../types';
-import TestExpressionPlugin from './helpers/expression.plugin';
+import TestExpressionPlugin, {
+  RequiredIfValidationProviderPlugin,
+} from './helpers/expression.plugin';
 
 const simpleFlow: Flow = {
   id: 'test-flow',
@@ -46,6 +49,7 @@ const simpleFlow: Flow = {
           {
             type: 'names',
             names: ['frodo', 'sam'],
+            trigger: 'navigation',
             severity: 'warning',
           },
         ],
@@ -55,6 +59,7 @@ const simpleFlow: Flow = {
         validation: [
           {
             type: 'names',
+            trigger: 'navigation',
             names: ['frodo', 'sam'],
             severity: 'warning',
           },
@@ -80,6 +85,7 @@ const simpleFlow: Flow = {
     },
   },
 };
+
 const simpleExpressionFlow: Flow = {
   id: 'test-flow',
   views: [
@@ -327,6 +333,135 @@ const flowWithThings: Flow = {
   },
 };
 
+const flowWithApplicability: Flow = {
+  id: 'test-flow',
+  views: [
+    {
+      id: 'view-1',
+      type: 'view',
+      thing1: {
+        asset: {
+          type: 'whatevs',
+          id: 'thing1',
+          binding: 'dependentBinding',
+        },
+      },
+      thing2: {
+        asset: {
+          type: 'whatevs',
+          id: 'thing2',
+          binding: 'independentBinding',
+        },
+      },
+      thing3: {
+        asset: {
+          type: 'whatevs',
+          id: 'thing3',
+          applicability: '{{independentBinding}} == true',
+        },
+      },
+      validation: [
+        {
+          type: 'requiredIf',
+          ref: 'dependentBinding',
+          trigger: 'load',
+          param: '{{independentBinding}}',
+          message: 'required based on independent value',
+        },
+      ],
+    },
+  ],
+  data: {},
+  navigation: {
+    BEGIN: 'FLOW_1',
+    FLOW_1: {
+      startState: 'VIEW_1',
+      VIEW_1: {
+        state_type: 'VIEW',
+        ref: 'view-1',
+        transitions: {
+          '*': 'END_1',
+        },
+      },
+      END_1: {
+        state_type: 'END',
+        outcome: 'test',
+      },
+    },
+  },
+};
+
+const flowWithItemsInArray: Flow = {
+  id: 'test-flow',
+  views: [
+    {
+      id: 'view-1',
+      type: 'view',
+      pets: [
+        {
+          asset: {
+            type: 'whatevs',
+            id: 'thing1',
+            binding: 'pets.0.name',
+          },
+        },
+        {
+          asset: {
+            type: 'whatevs',
+            id: 'thing2',
+            binding: 'pets.1.name',
+          },
+        },
+        {
+          asset: {
+            type: 'whatevs',
+            id: 'thing2',
+            binding: 'pets.2.name',
+          },
+        },
+      ],
+    },
+  ],
+  data: {
+    pets: [],
+  },
+  schema: {
+    ROOT: {
+      pets: {
+        type: 'PetType',
+        isArray: true,
+      },
+    },
+    PetType: {
+      name: {
+        type: 'string',
+        validation: [
+          {
+            type: 'required',
+          },
+        ],
+      },
+    },
+  },
+  navigation: {
+    BEGIN: 'FLOW_1',
+    FLOW_1: {
+      startState: 'VIEW_1',
+      VIEW_1: {
+        state_type: 'VIEW',
+        ref: 'view-1',
+        transitions: {
+          '*': 'END_1',
+        },
+      },
+      END_1: {
+        state_type: 'END',
+        outcome: 'test',
+      },
+    },
+  },
+};
+
 test('alt APIs', async () => {
   const player = new Player();
 
@@ -524,6 +659,83 @@ describe('validation', () => {
     });
   });
 
+  describe('data model delete', () => {
+    it('deletes the validation when the data is deleted', async () => {
+      const state = player.getState() as InProgressState;
+
+      const { validation, data, binding, view } = state.controllers;
+      const thing2Binding = binding.parse('data.thing2');
+
+      expect(validation.getBindings().has(thing2Binding)).toBe(true);
+
+      await waitFor(() => {
+        expect(
+          view.currentView?.lastUpdate?.thing2.asset.validation
+        ).toBeUndefined();
+      });
+
+      data.set([['data.thing2', 'gandalf']]);
+
+      await waitFor(() => {
+        expect(
+          view.currentView?.lastUpdate?.thing2.asset.validation?.message
+        ).toBe('Names just be in: frodo,sam');
+      });
+
+      data.delete('data.thing2');
+      expect(data.get('data.thing2', { includeInvalid: true })).toBe(undefined);
+
+      await waitFor(() => {
+        expect(
+          view.currentView?.lastUpdate?.thing2.asset.validation
+        ).toBeUndefined();
+      });
+
+      data.set([['data.thing2', 'gandalf']]);
+      await waitFor(() => {
+        expect(
+          view.currentView?.lastUpdate?.thing2.asset.validation?.message
+        ).toBe('Names just be in: frodo,sam');
+      });
+    });
+
+    it('handles arrays', async () => {
+      player.start(flowWithItemsInArray);
+      const state = player.getState() as InProgressState;
+      const { data, binding, view } = state.controllers;
+
+      await waitFor(() => {
+        expect(
+          view.currentView?.lastUpdate?.pets[1].asset.validation
+        ).toBeUndefined();
+      });
+
+      // Trigger validation for the second item
+      data.set([['pets.1.name', '']]);
+      expect(
+        schema.getType(binding.parse('pets.1.name'))?.validation
+      ).toHaveLength(1);
+
+      await waitFor(() => {
+        expect(
+          view.currentView?.lastUpdate?.pets[1].asset.validation?.message
+        ).toBe('A value is required');
+      });
+
+      // Delete the first item, the items should shift up and validation moves to the first item
+      data.delete('pets.0');
+
+      await waitFor(() => {
+        expect(
+          view.currentView?.lastUpdate?.pets[1].asset.validation
+        ).toBeUndefined();
+        expect(
+          view.currentView?.lastUpdate?.pets[0].asset.validation?.message
+        ).toBe('A value is required');
+      });
+    });
+  });
+
   describe('state', () => {
     it('updates when setting data', async () => {
       const state = player.getState() as InProgressState;
@@ -579,6 +791,8 @@ describe('validation', () => {
           displayTarget: 'field',
           trigger: 'change',
           type: 'names',
+          blocking: true,
+          [VALIDATION_PROVIDER_NAME_SYMBOL]: 'schema',
         })
       );
 
@@ -625,7 +839,7 @@ describe('validation', () => {
       expect(result.endState.outcome).toBe('test');
     });
 
-    it('doesnt remove existing warnings if a new warning is triggered', async () => {
+    it('block navigation after data changes on first input, show warning on second input, then navigation succeeds', async () => {
       player.start(simpleFlow);
       const state = player.getState() as InProgressState;
       const { flowResult } = state;
@@ -661,26 +875,10 @@ describe('validation', () => {
       // Try to transition
       state.controllers.flow.transition('foo');
 
-      // Stays on the same view
+      // Should transition to end since data changes already occured on first input
       expect(
         state.controllers.flow.current?.currentState?.value.state_type
-      ).toBe('VIEW');
-
-      // New validation warning
-      expect(
-        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
-      ).not.toBe(undefined);
-
-      // Existing warning stays
-      expect(
-        state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation
-      ).not.toBe(undefined);
-
-      state.controllers.data.set([['data.thing1', 'frodo']]);
-      state.controllers.data.set([['data.thing2', 'sam']]);
-
-      // Try to transition again
-      state.controllers.flow.transition('foo');
+      ).toBe('END');
 
       // Should work now that there's no error
       const result = await flowResult;
@@ -778,7 +976,7 @@ describe('validation', () => {
       expect(result.endState.outcome).toBe('test');
     });
 
-    it('doesnt remove existing warnings if a new warning is triggered - manual dismiss', async () => {
+    it('autodismiss if data change already took place on input with warning, manually dismiss second warning', async () => {
       player.start(simpleFlow);
       const state = player.getState() as InProgressState;
       const { flowResult } = state;
@@ -815,30 +1013,83 @@ describe('validation', () => {
       // Try to transition
       state.controllers.flow.transition('foo');
 
-      // Stays on the same view
+      // Since data change (setting "sam") already triggered validation next step is auto dismiss
       expect(
         state.controllers.flow.current?.currentState?.value.state_type
-      ).toBe('VIEW');
-
-      // New validation warning
-      expect(
-        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
-      ).not.toBe(undefined);
-
-      // Existing warning stays
-      expect(
-        state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation
-      ).toBe(undefined);
-
-      state.controllers.data.set([['data.thing1', 'frodo']]);
-      // state.controllers.data.set([['data.thing2', 'sam']]);
-
-      // Try to transition again
-      state.controllers.flow.transition('foo');
+      ).toBe('END');
 
       // Should work now that there's no error
       const result = await flowResult;
       expect(result.endState.outcome).toBe('test');
+    });
+  });
+
+  describe('introspection and filtering', () => {
+    /**
+     *
+     */
+    const getAllKnownValidations = () => {
+      const allBindings = validationController.getBindings();
+      const allValidations = Array.from(allBindings).flatMap((b) => {
+        const validatedBinding =
+          validationController.getValidationForBinding(b);
+
+        if (!validatedBinding) {
+          return [];
+        }
+
+        return validatedBinding.allValidations.map((v) => {
+          return {
+            binding: b,
+            validation: v,
+            response: validationController.validationRunner(v.value, b),
+          };
+        });
+      });
+
+      return allValidations;
+    };
+
+    it('can query all triggered validations', async () => {
+      const state = player.getState() as InProgressState;
+      state.controllers.data.set([['data.thing4', 'not-sam']]);
+
+      await waitFor(() => {
+        expect(
+          state.controllers.view.currentView?.lastUpdate?.alreadyInvalidData
+            .asset.validation.message
+        ).toBe('Names just be in: sam');
+      });
+
+      const currentValidations = getAllKnownValidations();
+
+      expect(currentValidations).toHaveLength(5);
+      expect(
+        currentValidations[0].validation.value[VALIDATION_PROVIDER_NAME_SYMBOL]
+      ).toBe('schema');
+    });
+
+    it('can compute new validations without dismissing existing ones', async () => {
+      const updatedFlow = {
+        ...flowWithThings,
+        views: [
+          {
+            ...flowWithThings.views?.[0],
+            validation: [
+              {
+                type: 'expression',
+                ref: 'data.thing2',
+                message: 'Both need to equal 100',
+                exp: '{{data.thing1}} + {{data.thing2}} == 100',
+              },
+            ],
+          },
+        ],
+      };
+
+      player.start(updatedFlow as any);
+      const currentValidations = getAllKnownValidations();
+      expect(currentValidations).toHaveLength(6);
     });
   });
 });
@@ -957,6 +1208,7 @@ test('shows errors on load', () => {
     displayTarget: 'field',
   });
 });
+
 describe('errors', () => {
   const errorFlow = makeFlow({
     id: 'view-1',
@@ -1011,7 +1263,7 @@ describe('errors', () => {
       {
         type: 'required',
         ref: 'foo.data.thing1',
-        trigger: 'load',
+        trigger: 'navigation',
         severity: 'error',
         blocking: 'once',
       },
@@ -1099,8 +1351,141 @@ describe('errors', () => {
     );
   });
 });
+
+test('validations return non-blocking errors', async () => {
+  const flow = makeFlow({
+    id: 'view-1',
+    type: 'view',
+    blocking: {
+      asset: {
+        id: 'thing-1',
+        binding: 'foo.blocking',
+        type: 'input',
+      },
+    },
+    nonblocking: {
+      asset: {
+        id: 'thing-2',
+        binding: 'foo.nonblocking',
+        type: 'input',
+      },
+    },
+  });
+
+  flow.schema = {
+    ROOT: {
+      foo: {
+        type: 'FooType',
+      },
+    },
+    FooType: {
+      blocking: {
+        type: 'TestType',
+        validation: [
+          {
+            type: 'required',
+          },
+        ],
+      },
+      nonblocking: {
+        type: 'TestType',
+        validation: [
+          {
+            type: 'required',
+            blocking: false,
+          },
+        ],
+      },
+    },
+  };
+
+  const player = new Player({ plugins: [new TrackBindingPlugin()] });
+  player.start(flow);
+
+  /**
+   *
+   */
+  const getState = () => player.getState() as InProgressState;
+
+  /**
+   *
+   */
+  const getCurrentView = () =>
+    getState().controllers.view.currentView?.lastUpdate;
+
+  // No errors show up initially
+
+  await waitFor(() => {
+    expect(getState().controllers.view.currentView?.lastUpdate?.id).toBe(
+      'view-1'
+    );
+  });
+
+  expect(getCurrentView()?.blocking.asset.validation).toBeUndefined();
+  expect(getCurrentView()?.nonblocking.asset.validation).toBeUndefined();
+
+  getState().controllers.flow.transition('next');
+  expect(
+    getState().controllers.flow.current?.currentState?.value.state_type
+  ).toBe('VIEW');
+
+  expect(player.getState().status).toBe('in-progress');
+
+  await waitFor(() => {
+    expect(getCurrentView()?.blocking.asset.validation).toMatchObject({
+      message: 'A value is required',
+      severity: 'error',
+      displayTarget: 'field',
+    });
+
+    expect(getCurrentView()?.nonblocking.asset.validation).toMatchObject({
+      message: 'A value is required',
+      severity: 'error',
+      displayTarget: 'field',
+    });
+  });
+
+  getState().controllers.data.set([['foo.blocking', 'foo']]);
+
+  await waitFor(() => {
+    expect(getCurrentView()?.blocking.asset.validation).toBeUndefined();
+
+    expect(getCurrentView()?.nonblocking.asset.validation).toMatchObject({
+      message: 'A value is required',
+      severity: 'error',
+      displayTarget: 'field',
+    });
+  });
+
+  getState().controllers.flow.transition('next');
+
+  await waitFor(() => {
+    expect(player.getState().status).toBe('completed');
+  });
+});
+
 describe('warnings', () => {
-  const warningFlow = makeFlow({
+  const warningFlowOnNavigation = makeFlow({
+    id: 'view-1',
+    type: 'view',
+    thing1: {
+      asset: {
+        id: 'thing-1',
+        binding: 'foo.data.thing1',
+        type: 'input',
+      },
+    },
+    validation: [
+      {
+        type: 'required',
+        ref: 'foo.data.thing1',
+        trigger: 'navigation',
+        severity: 'warning',
+      },
+    ],
+  });
+
+  const warningFlowOnLoad = makeFlow({
     id: 'view-1',
     type: 'view',
     thing1: {
@@ -1155,7 +1540,28 @@ describe('warnings', () => {
       {
         type: 'required',
         ref: 'foo.data.thing1',
-        trigger: 'load',
+        trigger: 'navigation',
+        blocking: 'once',
+        severity: 'warning',
+      },
+    ],
+  });
+
+  const onceBlockingWarningFlowWithChangeTrigger = makeFlow({
+    id: 'view-1',
+    type: 'view',
+    thing1: {
+      asset: {
+        id: 'thing-1',
+        binding: 'foo.data.thing1',
+        type: 'input',
+      },
+    },
+    validation: [
+      {
+        type: 'required',
+        ref: 'foo.data.thing1',
+        trigger: 'change',
         blocking: 'once',
         severity: 'warning',
       },
@@ -1164,7 +1570,7 @@ describe('warnings', () => {
 
   it('shows warnings on load', () => {
     const player = new Player({ plugins: [new TrackBindingPlugin()] });
-    player.start(warningFlow);
+    player.start(warningFlowOnLoad);
     const state = player.getState() as InProgressState;
 
     // Validation starts with a warning on load
@@ -1182,20 +1588,8 @@ describe('warnings', () => {
 
   it('auto-dismiss on double-navigation', async () => {
     const player = new Player({ plugins: [new TrackBindingPlugin()] });
-    player.start(warningFlow);
+    player.start(warningFlowOnNavigation);
     const state = player.getState() as InProgressState;
-
-    // Validation starts with a warning on load
-    expect(
-      omit(
-        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
-        'dismiss'
-      )
-    ).toMatchObject({
-      message: 'A value is required',
-      severity: 'warning',
-      displayTarget: 'field',
-    });
 
     // Try to navigate, should prevent the navigation and keep the warning
     state.controllers.flow.transition('next');
@@ -1226,18 +1620,6 @@ describe('warnings', () => {
     player.start(blockingWarningFlow);
     const state = player.getState() as InProgressState;
 
-    // Validation starts with a warning on load
-    expect(
-      omit(
-        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
-        'dismiss'
-      )
-    ).toMatchObject({
-      message: 'A value is required',
-      severity: 'warning',
-      displayTarget: 'field',
-    });
-
     // Try to navigate, should prevent the navigation and keep the warning
     state.controllers.flow.transition('next');
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
@@ -1260,6 +1642,107 @@ describe('warnings', () => {
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
       'VIEW'
     );
+  });
+
+  it('warnings do not stop data saving', () => {
+    const flow = makeFlow({
+      asset: {
+        id: 'input-2',
+        type: 'input',
+        binding: 'person.name',
+        label: {
+          asset: {
+            id: 'input-2-label',
+            type: 'text',
+            value: 'Name',
+          },
+        },
+      },
+    });
+
+    flow.schema = {
+      ROOT: {
+        person: {
+          type: 'PersonType',
+        },
+      },
+      PersonType: {
+        name: {
+          type: 'StringType',
+          validation: [
+            {
+              type: 'names',
+              names: ['frodo', 'sam'],
+              severity: 'warning',
+            },
+          ],
+        },
+      },
+    };
+
+    const player = new Player({
+      plugins: [new TrackBindingPlugin()],
+    });
+    player.start(flow);
+    const state = player.getState() as InProgressState;
+
+    state.controllers.data.set([['person.name', 'peter']], {
+      formatted: true,
+    });
+
+    expect(
+      state.controllers.data.get('person.name', { includeInvalid: false })
+    ).toBe('peter');
+  });
+
+  it('errors still do stop data saving', () => {
+    const flow = makeFlow({
+      asset: {
+        id: 'input-2',
+        type: 'input',
+        binding: 'person.name',
+        label: {
+          asset: {
+            id: 'input-2-label',
+            type: 'text',
+            value: 'Name',
+          },
+        },
+      },
+    });
+
+    flow.schema = {
+      ROOT: {
+        person: {
+          type: 'PersonType',
+        },
+      },
+      PersonType: {
+        name: {
+          type: 'StringType',
+          validation: [
+            {
+              type: 'names',
+              names: ['frodo', 'sam'],
+            },
+          ],
+        },
+      },
+    };
+
+    const player = new Player({
+      plugins: [new TrackBindingPlugin()],
+    });
+    player.start(flow);
+    const state = player.getState() as InProgressState;
+
+    state.controllers.data.set([['person.name', 'peter']], {
+      formatted: true,
+    });
+
+    expect(
+      state.controllers.data.get('person.name', { includeInvalid: false })
+    ).toBe(undefined);
   });
 
   it('once blocking warnings auto-dismiss on double-navigation', async () => {
@@ -1267,18 +1750,6 @@ describe('warnings', () => {
     player.start(onceBlockingWarningFlow);
     const state = player.getState() as InProgressState;
 
-    // Validation starts with a warning on load
-    expect(
-      omit(
-        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
-        'dismiss'
-      )
-    ).toMatchObject({
-      message: 'A value is required',
-      severity: 'warning',
-      displayTarget: 'field',
-    });
-
     // Try to navigate, should prevent the navigation and keep the warning
     state.controllers.flow.transition('next');
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
@@ -1298,14 +1769,52 @@ describe('warnings', () => {
     // Navigate _again_ this should dismiss it
     state.controllers.flow.transition('next');
     // We make it to the next state
+
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
       'END'
     );
   });
 
+  it('once blocking warnings with change trigger auto-dismiss on double-navigation', async () => {
+    const player = new Player({ plugins: [new TrackBindingPlugin()] });
+    player.start(onceBlockingWarningFlowWithChangeTrigger);
+    const state = player.getState() as InProgressState;
+
+    // Validation starts with no warnings on load
+    expect(
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+    ).toBeUndefined();
+
+    // Try to navigate, should prevent the navigation and show the warning
+    state.controllers.flow.transition('next');
+    expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
+      'VIEW'
+    );
+    expect(
+      omit(
+        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
+        'dismiss'
+      )
+    ).toMatchObject({
+      message: 'A value is required',
+      severity: 'warning',
+      displayTarget: 'field',
+    });
+
+    // Navigate _again_ this should dismiss it
+    state.controllers.flow.transition('next');
+    // We make it to the next state
+
+    await waitFor(() => {
+      expect(
+        state.controllers.flow.current?.currentState?.value.state_type
+      ).toBe('END');
+    });
+  });
+
   it('triggers re-render on dismiss call', () => {
     const player = new Player({ plugins: [new TrackBindingPlugin()] });
-    player.start(warningFlow);
+    player.start(warningFlowOnLoad);
     const state = player.getState() as InProgressState;
 
     // Validation starts with a warning on load
@@ -1394,33 +1903,33 @@ describe('validation within arrays', () => {
 
     // Error if set to an falsy value
     state.controllers.data.set([['thing.1.data.3.name', '']]);
-    await waitFor(() =>
+    await waitFor(() => {
       expect(
         state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
       ).toMatchObject({
         severity: 'error',
         message: 'A value is required',
         displayTarget: 'field',
-      })
-    );
-    expect(
-      state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation
-    ).toBe(undefined);
+      });
+      expect(
+        state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation
+      ).toBe(undefined);
+    });
 
     // Other one gets error if i try to navigate
     state.controllers.data.set([['thing.1.data.3.name', 'adam']]);
     state.controllers.flow.transition('anything');
-    await waitFor(() =>
+    await waitFor(() => {
       expect(
         state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
-      ).toBe(undefined)
-    );
-    expect(
-      state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation
-    ).toMatchObject({
-      severity: 'error',
-      message: 'A value is required',
-      displayTarget: 'field',
+      ).toBe(undefined);
+      expect(
+        state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation
+      ).toMatchObject({
+        severity: 'error',
+        message: 'A value is required',
+        displayTarget: 'field',
+      });
     });
   });
 });
@@ -1532,18 +2041,18 @@ test('validations can run against formatted or deformatted values', async () => 
   ).toBeUndefined();
 
   state.controllers.data.set([['person.name', 'adam']], { formatted: true });
-  await waitFor(() =>
+  await waitFor(() => {
     expect(
       state.controllers.view.currentView?.lastUpdate?.validation.message
-    ).toBe('Names just be in: frodo,sam')
-  );
+    ).toBe('Names just be in: frodo,sam');
+  });
 
   state.controllers.data.set([['person.name', 'sam']], { formatted: true });
-  await waitFor(() =>
+  await waitFor(() => {
     expect(
       state.controllers.view.currentView?.lastUpdate?.validation
-    ).toBeUndefined()
-  );
+    ).toBeUndefined();
+  });
 });
 
 test('tracking a binding commits the default value', () => {
@@ -1593,7 +2102,7 @@ test('tracking a binding commits the default value', () => {
   });
 });
 
-test('validates on expressions outside of view', async () => {
+test('does not validate on expressions outside of view', async () => {
   const flowWithExp: Flow = {
     id: 'flow-with-exp',
     views: [
@@ -1662,8 +2171,233 @@ test('validates on expressions outside of view', async () => {
   state.controllers.flow.transition('Next');
 
   const response = await outcome;
-  expect(response.data).toStrictEqual({ person: { name: 'frodo' } });
+  expect(response.data).toStrictEqual({ person: { name: 'invalid' } });
 });
+
+describe('Validation applicability', () => {
+  let player: Player;
+
+  beforeEach(() => {
+    player = new Player({
+      plugins: [
+        new TrackBindingPlugin(),
+        new RequiredIfValidationProviderPlugin(),
+      ],
+    });
+
+    player.start(flowWithApplicability);
+  });
+
+  describe('weak validation', () => {
+    it('weak binding updates should be allowed despite strong validation errors', async () => {
+      const state = player.getState() as InProgressState;
+
+      state.controllers.data.set([['independentBinding', true]]);
+      await waitFor(() => {
+        expect(state.controllers.data.get('independentBinding')).toStrictEqual(
+          true
+        );
+        expect(
+          state.controllers.view.currentView?.lastUpdate?.thing1.asset
+            .validation
+        ).toMatchObject({
+          severity: 'error',
+          message: `required based on independent value`,
+        });
+      });
+
+      state.controllers.data.set([['dependentBinding', 'foo']]);
+      await waitFor(() => {
+        expect(state.controllers.data.get('dependentBinding')).toStrictEqual(
+          'foo'
+        );
+        expect(
+          state.controllers.view.currentView?.lastUpdate?.thing1.asset
+            .validation
+        ).toBeUndefined();
+      });
+
+      state.controllers.data.set([['dependentBinding', undefined]]);
+      await waitFor(() => {
+        expect(
+          state.controllers.view.currentView?.lastUpdate?.thing1.asset
+            .validation
+        ).toMatchObject({
+          severity: 'error',
+          message: `required based on independent value`,
+        });
+      });
+
+      state.controllers.data.set([['independentBinding', false]]);
+      await waitFor(() => {
+        expect(state.controllers.data.get('independentBinding')).toStrictEqual(
+          false
+        );
+        expect(
+          state.controllers.view.currentView?.lastUpdate?.thing1.asset
+            .validation
+        ).toMatchObject({
+          severity: 'error',
+          message: `required based on independent value`,
+        });
+      });
+    });
+  });
+});
+
+test('updating a binding only updates its data and not other bindings due to weak binding connections', async () => {
+  const flow = makeFlow({
+    id: 'view-1',
+    type: 'view',
+    thing1: {
+      asset: {
+        id: 'thing-1',
+        binding: 'input.text',
+      },
+    },
+    thing2: {
+      asset: {
+        id: 'thing-2',
+        binding: 'input.check',
+      },
+    },
+    validation: [
+      {
+        type: 'requiredIf',
+        ref: 'input.text',
+        param: 'input.check',
+      },
+    ],
+  });
+
+  flow.data = {
+    someOtherParam: 'notFoo',
+  };
+
+  flow.schema = {
+    ROOT: {
+      input: {
+        type: 'InputType',
+      },
+    },
+    InputType: {
+      text: {
+        type: 'DateType',
+        validation: [
+          {
+            type: 'paramIsFoo',
+            param: 'someOtherParam',
+          },
+        ],
+      },
+      check: {
+        type: 'BooleanType',
+        validation: [
+          {
+            type: 'required',
+          },
+        ],
+      },
+    },
+  };
+
+  const basicValidationPlugin = {
+    name: 'basic-validation',
+    apply: (player: Player) => {
+      player.hooks.schema.tap('basic-validation', (schema) => {
+        schema.addDataTypes([
+          {
+            type: 'DateType',
+            validation: [{ type: 'date' }],
+          },
+          {
+            type: 'BooleanType',
+            validation: [{ type: 'boolean' }],
+          },
+        ]);
+      });
+
+      player.hooks.validationController.tap('basic-validation', (vc) => {
+        vc.hooks.createValidatorRegistry.tap('basic-validation', (registry) => {
+          registry.register('date', (ctx, value) => {
+            if (value === undefined) {
+              return;
+            }
+
+            return value.match(/^\d{4}-\d{2}-\d{2}$/)
+              ? undefined
+              : { message: 'Not a date' };
+          });
+          registry.register('boolean', (ctx, value) => {
+            if (value === undefined || value === true || value === false) {
+              return;
+            }
+
+            return {
+              message: 'Not a boolean',
+            };
+          });
+
+          registry.register('required', (ctx, value) => {
+            if (value === undefined) {
+              return {
+                message: 'Required',
+              };
+            }
+          });
+
+          registry.register<any>('requiredIf', (ctx, value, { param }) => {
+            const paramValue = ctx.model.get(param);
+            if (paramValue === undefined) {
+              return;
+            }
+
+            if (value === undefined) {
+              return {
+                message: 'Required',
+              };
+            }
+          });
+
+          registry.register<any>('paramIsFoo', (ctx, value, { param }) => {
+            const paramValue = ctx.model.get(param);
+            if (paramValue === 'foo') {
+              return;
+            }
+
+            if (value === undefined) {
+              return {
+                message: 'Must be foo',
+              };
+            }
+          });
+        });
+      });
+    },
+  };
+
+  const player = new Player({
+    plugins: [new TrackBindingPlugin(), basicValidationPlugin],
+  });
+  player.start(flow);
+  const state = player.getState() as InProgressState;
+
+  state.controllers.flow.transition('next');
+  await waitFor(() => {
+    state.controllers.data.set([['input.text', '']]);
+  });
+
+  await waitFor(() => {
+    state.controllers.data.set([['input.check', true]]);
+  });
+
+  await waitFor(() => {
+    const finalState = player.getState() as InProgressState;
+    const otherParam = finalState.controllers.data.get('someOtherParam');
+    expect(otherParam).toBe('notFoo');
+  });
+});
+
 describe('Validations with custom field messages', () => {
   it('can evaluate expressions in message', async () => {
     const flow = makeFlow({
@@ -1731,7 +2465,7 @@ describe('Validations with custom field messages', () => {
 
     state.controllers.data.set([['foo.data.thing1', 200.567]]);
 
-    await waitFor(() =>
+    await waitFor(() => {
       expect(
         state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
       ).toMatchObject({
@@ -1739,8 +2473,8 @@ describe('Validations with custom field messages', () => {
           'foo.data.thing1 is a number. You have provided a value of number, which is correct. But floored value, 200 is not equal to entered value, 200.567',
         severity: 'error',
         displayTarget: 'field',
-      })
-    );
+      });
+    });
   });
 });
 
@@ -1812,31 +2546,20 @@ describe('Validations with multiple inputs', () => {
     ).toBeUndefined();
 
     state.controllers.data.set([['foo.b', 70]]);
-    await waitFor(() =>
+    await waitFor(() => {
       expect(
         state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
       ).toMatchObject({
         severity: 'error',
         message: 'Both need to equal 100',
-      })
-    );
+      });
 
-    expect(
-      state.controllers.data.get('', { includeInvalid: false })
-    ).toMatchObject({
-      foo: {
-        a: 90,
-        b: 10,
-      },
-    });
-
-    expect(
-      state.controllers.data.get('', { includeInvalid: true })
-    ).toMatchObject({
-      foo: {
-        a: 90,
-        b: 70,
-      },
+      expect(state.controllers.data.get('')).toMatchObject({
+        foo: {
+          a: 90,
+          b: 70,
+        },
+      });
     });
   });
 
@@ -1856,57 +2579,471 @@ describe('Validations with multiple inputs', () => {
     ).toBeUndefined();
 
     state.controllers.data.set([['foo.a', 15]]);
-    await waitFor(() =>
+    await waitFor(() => {
       expect(
         state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
       ).toMatchObject({
         severity: 'error',
         message: 'Both need to equal 100',
-      })
-    );
+      });
 
-    expect(
-      state.controllers.data.get('', { includeInvalid: false })
-    ).toMatchObject({
-      foo: {
-        a: 90,
-        b: 10,
-      },
-    });
+      expect(
+        state.controllers.data.get('', { includeInvalid: false })
+      ).toMatchObject({
+        foo: {
+          a: 90,
+          b: 10,
+        },
+      });
 
-    expect(
-      state.controllers.data.get('', { includeInvalid: true })
-    ).toMatchObject({
-      foo: {
-        a: 15,
-        b: 10,
-      },
+      expect(
+        state.controllers.data.get('', { includeInvalid: true })
+      ).toMatchObject({
+        foo: {
+          a: 15,
+          b: 10,
+        },
+      });
     });
 
     state.controllers.data.set([['foo.b', 85]]);
-
-    await waitFor(() =>
+    await waitFor(() => {
       expect(
         state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
-      ).toBeUndefined()
-    );
+      ).toBeUndefined();
 
-    expect(
-      state.controllers.data.get('', { includeInvalid: false })
-    ).toMatchObject({
-      foo: {
-        a: 15,
-        b: 85,
+      expect(
+        state.controllers.data.get('', { includeInvalid: false })
+      ).toMatchObject({
+        foo: {
+          a: 15,
+          b: 85,
+        },
+      });
+
+      expect(
+        state.controllers.data.get('', { includeInvalid: true })
+      ).toMatchObject({
+        foo: {
+          a: 15,
+          b: 85,
+        },
+      });
+    });
+  });
+});
+
+describe('weak binding edge cases', () => {
+  test('requiredIf', async () => {
+    const flow = makeFlow({
+      id: 'view-1',
+      type: 'view',
+      thing1: {
+        asset: {
+          id: 'thing-1',
+          binding: 'input.text',
+        },
       },
+      thing2: {
+        asset: {
+          id: 'thing-2',
+          binding: 'input.check',
+        },
+      },
+      validation: [
+        {
+          type: 'requiredIf',
+          ref: 'input.text',
+          param: 'input.check',
+        },
+      ],
     });
 
-    expect(
-      state.controllers.data.get('', { includeInvalid: true })
-    ).toMatchObject({
-      foo: {
-        a: 15,
-        b: 85,
+    flow.schema = {
+      ROOT: {
+        input: {
+          type: 'InputType',
+        },
       },
+      InputType: {
+        text: {
+          type: 'DateType',
+        },
+        check: {
+          type: 'BooleanType',
+          validation: [
+            {
+              type: 'required',
+            },
+          ],
+        },
+      },
+    };
+
+    const basicValidationPlugin = {
+      name: 'basic-validation',
+      apply: (player: Player) => {
+        player.hooks.schema.tap('basic-validation', (schema) => {
+          schema.addDataTypes([
+            {
+              type: 'DateType',
+              validation: [{ type: 'date' }],
+            },
+            {
+              type: 'BooleanType',
+              validation: [{ type: 'boolean' }],
+            },
+          ]);
+        });
+
+        player.hooks.validationController.tap('basic-validation', (vc) => {
+          vc.hooks.createValidatorRegistry.tap(
+            'basic-validation',
+            (registry) => {
+              registry.register('date', (ctx, value) => {
+                if (value === undefined) {
+                  return;
+                }
+
+                return value.match(/^\d{4}-\d{2}-\d{2}$/)
+                  ? undefined
+                  : { message: 'Not a date' };
+              });
+              registry.register('boolean', (ctx, value) => {
+                if (value === undefined || value === true || value === false) {
+                  return;
+                }
+
+                return {
+                  message: 'Not a boolean',
+                };
+              });
+
+              registry.register('required', (ctx, value) => {
+                if (value === undefined) {
+                  return {
+                    message: 'Required',
+                  };
+                }
+              });
+
+              registry.register<any>('requiredIf', (ctx, value, { param }) => {
+                const paramValue = ctx.model.get(param);
+                if (paramValue === undefined) {
+                  return;
+                }
+
+                if (value === undefined) {
+                  return {
+                    message: 'Required',
+                  };
+                }
+              });
+            }
+          );
+        });
+      },
+    };
+
+    const player = new Player({
+      plugins: [new TrackBindingPlugin(), basicValidationPlugin],
+    });
+    player.start(flow);
+    const state = player.getState() as InProgressState;
+
+    state.controllers.flow.transition('next');
+    await waitFor(() => {
+      state.controllers.data.set([['input.text', '1999-12-31']]);
+    });
+    await waitFor(() => {
+      state.controllers.data.set([['input.check', true]]);
+    });
+    await waitFor(() => {
+      state.controllers.flow.transition('next');
+    });
+    await waitFor(() => {
+      expect(player.getState().status).toBe('completed');
+    });
+  });
+});
+
+describe('Validation Providers', () => {
+  it('uses a locally defined handler', async () => {
+    let shouldError = true;
+
+    const player = new Player({
+      plugins: [
+        new TrackBindingPlugin(),
+
+        {
+          name: 'basic-validation',
+          apply: (p: Player) => {
+            p.hooks.validationController.tap('basic-validation', (vc) => {
+              vc.hooks.resolveValidationProviders.tap(
+                'basic-validation',
+                (providers) => {
+                  return [
+                    ...providers,
+                    {
+                      source: 'local-test',
+                      provider: {
+                        getValidationsForBinding(binding) {
+                          if (binding.asString() === 'data.thing1') {
+                            return [
+                              {
+                                type: 'custom',
+                                trigger: 'load',
+                                severity: 'error',
+                                handler: (ctx, value) => {
+                                  if (shouldError) {
+                                    return {
+                                      message: 'Local Error',
+                                    };
+                                  }
+                                },
+                              },
+                            ];
+                          }
+                        },
+                      },
+                    },
+                  ];
+                }
+              );
+            });
+          },
+        },
+      ],
+    });
+
+    player.start(simpleFlow);
+
+    /**
+     *
+     */
+    const getControllers = () => {
+      const state = player.getState() as InProgressState;
+      return state.controllers;
+    };
+
+    /**
+     *
+     */
+    const getFirstInput = () => {
+      return getControllers().view.currentView?.lastUpdate?.thing1.asset;
+    };
+
+    expect(getFirstInput()?.validation?.message).toBe('Local Error');
+    getControllers().data.set([['data.thing1', 'foo']]);
+    expect(getFirstInput()?.validation?.message).toBe('Local Error');
+
+    shouldError = false;
+
+    getControllers().data.set([['data.thing1', 'sam']]);
+
+    await waitFor(() => {
+      expect(getFirstInput()?.validation?.message).toBe(undefined);
+    });
+  });
+});
+
+describe('Validation + Default Data', () => {
+  it('triggers validation default data is invalid', async () => {
+    const flow = makeFlow({
+      id: 'view-1',
+      type: 'view',
+      requiredField: {
+        asset: {
+          id: 'required-field',
+          type: 'input',
+          binding: 'input.text',
+        },
+      },
+      thing2: {
+        asset: {
+          id: 'thing-2',
+          binding: 'input.check',
+        },
+      },
+      validation: [
+        {
+          type: 'requiredIf',
+          ref: 'input.text',
+          param: 'input.check',
+        },
+      ],
+    });
+
+    flow.schema = {
+      ROOT: {
+        input: {
+          type: 'InputType',
+        },
+      },
+      InputType: {
+        text: {
+          type: 'StringType',
+          // The default value is an empty string, which is invalid b/c of the required check
+          default: '',
+          validation: [
+            {
+              type: 'required',
+            },
+          ],
+        },
+      },
+    };
+
+    const player = new Player({
+      plugins: [new TrackBindingPlugin()],
+    });
+
+    player.start(flow);
+
+    /**
+     *
+     */
+    const getControllers = () => {
+      const state = player.getState() as InProgressState;
+      return state.controllers;
+    };
+
+    /**
+     *
+     */
+    const getFirstInput = () => {
+      return getControllers().view.currentView?.lastUpdate?.requiredField.asset;
+    };
+
+    await waitFor(() => {
+      expect(getFirstInput()?.validation).toBeUndefined();
+    });
+
+    // Set the value to the same as the default
+    getControllers().data.set([['input.text', '']]);
+
+    await waitFor(() => {
+      expect(getFirstInput()?.validation.message).toBe('A value is required');
+    });
+
+    // Set the value to something else
+    getControllers().data.set([['input.text', 'foo']]);
+    await waitFor(() => {
+      expect(getFirstInput()?.validation).toBeUndefined();
+    });
+  });
+});
+
+describe('Validation in subflow', () => {
+  it('validations are evaluated when in a subflow', async () => {
+    const flow = {
+      id: 'input-validation-flow',
+      views: [
+        {
+          id: 'view-1',
+          type: 'input',
+          binding: 'foo.requiredInput',
+          label: {
+            asset: {
+              id: 'input-required-label',
+              type: 'text',
+              value: 'This input is required',
+            },
+          },
+        },
+      ],
+      schema: {
+        ROOT: {
+          foo: {
+            type: 'FooType',
+          },
+        },
+        FooType: {
+          requiredInput: {
+            type: 'StringType',
+            validation: [
+              {
+                type: 'required',
+              },
+            ],
+          },
+        },
+      },
+      data: {},
+      navigation: {
+        BEGIN: 'FLOW_1',
+        FLOW_1: {
+          startState: 'SUBFLOW',
+          SUBFLOW: {
+            state_type: 'FLOW',
+            ref: 'FLOW_2',
+            transitions: {
+              '*': 'END_Done',
+            },
+          },
+          END_Done: {
+            state_type: 'END',
+            outcome: 'done',
+          },
+        },
+        FLOW_2: {
+          startState: 'VIEW_1',
+          VIEW_1: {
+            state_type: 'VIEW',
+            ref: 'view-1',
+            transitions: {
+              '*': 'END_Done',
+            },
+          },
+          END_Done: {
+            state_type: 'END',
+            outcome: 'done',
+          },
+        },
+      },
+    } as Flow;
+
+    const player = new Player({
+      plugins: [new TrackBindingPlugin()],
+    });
+
+    player.start(flow);
+
+    const getControllers = () => {
+      const state = player.getState() as InProgressState;
+      return state.controllers;
+    };
+
+    const getValidationMessage = () => {
+      return getControllers().view.currentView?.lastUpdate?.validation;
+    };
+
+    const attemptTransition = () => {
+      getControllers().flow.transition('next');
+    };
+
+    await waitFor(() => {
+      expect(getControllers().view.currentView?.lastUpdate?.id).toStrictEqual(
+        'view-1'
+      );
+    });
+
+    attemptTransition();
+    expect(getControllers().view.currentView?.lastUpdate?.id).toStrictEqual(
+      'view-1'
+    );
+    const firstRequiredValidation = getValidationMessage();
+    expect(firstRequiredValidation.message).toStrictEqual(
+      'A value is required'
+    );
+    getControllers().data.set([['foo.requiredInput', 1]]);
+
+    await waitFor(() => {
+      attemptTransition();
+    });
+
+    await waitFor(() => {
+      expect(player.getState().status).toStrictEqual('completed');
     });
   });
 });

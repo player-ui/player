@@ -24,9 +24,6 @@ open class SwiftUIAsset: Decodable, PlayerAsset, Identifiable {
     /// Used for model cache testing
     var modelObject: AnyObject { self }
 
-    @available(*, deprecated, message: "No longer used, will be removed.")
-    public var rawValue: JSValue?
-
     /// Default data that an asset will contain
     public struct Data: AssetData, Codable {
         /// The ID of the asset

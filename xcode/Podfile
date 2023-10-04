@@ -1,5 +1,5 @@
 use_frameworks!
-platform :ios, '13.0'
+platform :ios, '14.0'
 source 'https://cdn.cocoapods.org'
 
 target 'PlayerUI_Example' do
@@ -27,6 +27,8 @@ target 'PlayerUI_Example' do
   pod 'PlayerUI/MetricsPlugin', :path => '../'
   pod 'PlayerUI/PrintLoggerPlugin', :path => '../'
   pod 'PlayerUI/PubSubPlugin', :path => '../'
+  pod 'PlayerUI/StageRevertDataPlugin', :path => '../'
+  pod 'PlayerUI/SwiftUICheckPathPlugin', :path => '../'
   pod 'PlayerUI/TransitionPlugin', :path => '../'
   pod 'PlayerUI/TypesProviderPlugin', :path => '../'
   
@@ -39,7 +41,7 @@ target 'PlayerUI_Example' do
 end
 
 plugin 'cocoapods-resource-bundle-copier', {
-  'bazelCommand' => 'bazel',
+  'bazelCommand' => 'bazel shutdown && bazel',
   'resource_map' => {
     # Core
     "PlayerUI/PlayerUI" => {
@@ -71,6 +73,7 @@ plugin 'cocoapods-resource-bundle-copier', {
     "PlayerUI/MetricsPlugin" => {'target' => "//plugins/metrics/core:MetricsPlugin_Bundles_bundle_prod", 'files' => ['metrics-plugin.prod.js']},
     "PlayerUI/PubSubPlugin" => {'target' => "//plugins/pubsub/core:PubSubPlugin_Bundles_bundle_prod", 'files' => ['pubsub-plugin.prod.js']},
     "PlayerUI/TypesProviderPlugin" => {'target' => "//plugins/types-provider/core:TypesProviderPlugin_Bundles_bundle_prod", 'files' => ['types-provider-plugin.prod.js']},
+    "PlayerUI/StageRevertDataPlugin" => {'target' => "//plugins/stage-revert-data/core:StageRevertDataPlugin_Bundles_bundle_prod", 'files' => ['stage-revert-data-plugin.prod.js']},
   }
 }
 

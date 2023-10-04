@@ -61,12 +61,12 @@ export class ConstantsPlugin implements PlayerPlugin {
       updatePlayerConstants();
 
       const tempData = get(flowObj, this.dataPath.asString()) ?? {};
-      player.constantsController.clearTemporaryValues();
+      player.constantsController.clearTemporaryValues(this.namespace);
       player.constantsController.setTemporaryValues(tempData, this.namespace);
     });
     // Clear flow specific overrides at the end of the flow and remove strong ref to player
     player.hooks.onEnd.tap(this.name, () => {
-      player.constantsController.clearTemporaryValues();
+      player.constantsController.clearTemporaryValues(this.namespace);
 
       this.updatePlayerConstants.delete(updatePlayerConstants);
     });

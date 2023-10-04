@@ -1,11 +1,14 @@
 package com.intuit.player.jvm.graaljs.bridge.serialization.encoding
 
 import com.intuit.player.jvm.core.bridge.serialization.encoding.*
+import com.intuit.player.jvm.core.experimental.RuntimeClassDiscriminator
 import com.intuit.player.jvm.graaljs.bridge.runtime.GraalRuntime.Companion.undefined
+import com.intuit.player.jvm.graaljs.bridge.serialization.format.GraalDecodingException
 import com.intuit.player.jvm.graaljs.bridge.serialization.format.GraalFormat
 import com.intuit.player.jvm.graaljs.extensions.blockingLock
 import com.intuit.player.jvm.graaljs.extensions.handleValue
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.CompositeDecoder
@@ -28,6 +31,7 @@ internal sealed class AbstractGraalDecoder(
         StructureKind.LIST -> GraalArrayListDecoder(format, currentValue)
         StructureKind.MAP -> GraalObjectMapDecoder(format, currentValue)
         StructureKind.CLASS -> GraalObjectClassDecoder(format, currentValue)
+        PolymorphicKind.SEALED -> GraalSealedClassDecoder(format, currentValue)
         else -> error("Runtime format decoders can't decode kinds of (${descriptor.kind}) into structures for $descriptor")
     }
 }
@@ -102,4 +106,29 @@ internal class GraalObjectClassDecoder(override val format: GraalFormat, overrid
         index: Int,
         deserializer: DeserializationStrategy<T>
     ): Decoder = GraalValueDecoder(format, decodeElement(descriptor, index))
+}
+
+internal class GraalSealedClassDecoder(override val format: GraalFormat, override val value: Value) : AbstractRuntimeObjectClassDecoder<Value>(), NodeDecoder by GraalValueDecoder(format, value) {
+    override fun getElementAtIndex(index: Int): Value = throw GraalDecodingException("GraalSealedClassDecoder should not be used to decode any elements")
+
+    override val keys: List<String> = listOf("type", "value")
+
+    override fun decodeElement(descriptor: SerialDescriptor, index: Int): Value = throw GraalDecodingException("GraalSealedClassDecoder should not be used to decode any elements")
+
+    override fun <T> buildDecoderForSerializableElement(
+        descriptor: SerialDescriptor,
+        index: Int,
+        deserializer: DeserializationStrategy<T>
+    ): Decoder = GraalValueDecoder(format, value)
+
+    override fun decodeValueElement(descriptor: SerialDescriptor, index: Int): Any? {
+
+        val discriminator = (
+            descriptor.annotations.firstOrNull {
+                it is RuntimeClassDiscriminator
+            } as? RuntimeClassDiscriminator
+            )?.discriminator ?: format.config.discriminator
+
+        return value.getMember(discriminator).handleValue(format)
+    }
 }

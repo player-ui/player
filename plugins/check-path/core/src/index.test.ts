@@ -6,6 +6,7 @@ import { makeFlow } from '@player-ui/make-flow';
 import { AssetTransformPlugin } from '@player-ui/asset-transform-plugin';
 import type { Asset, AssetWrapper } from '@player-ui/types';
 import { CheckPathPlugin } from '.';
+import { CheckPathPluginSymbol } from './symbols';
 
 const nestedAssetFlow = makeFlow({
   id: 'view-1',
@@ -55,6 +56,7 @@ const applicableFlow = makeFlow({
   fields: {
     asset: {
       id: 'fields',
+      type: 'any',
       values: [
         {
           asset: {
@@ -79,11 +81,50 @@ const applicableFlow = makeFlow({
           asset: {
             id: 'asset-4',
             applicability: '{{foo.baz}}',
-            type: 'asset',
+            type: 'foo',
             values: [
               {
                 asset: {
                   id: 'asset-4a',
+                  type: 'bar',
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  },
+});
+
+const bindingIdFlow = makeFlow({
+  id: '{{mysterious}}',
+  type: 'view',
+  fields: {
+    asset: {
+      id: 'fields',
+      type: 'any',
+      values: [
+        {
+          asset: {
+            id: 'asset-1',
+            type: 'asset',
+          },
+        },
+        {
+          asset: {
+            id: 'asset-2',
+            type: 'asset',
+          },
+        },
+        {
+          asset: {
+            id: '{{resolveToUndefined}}',
+            type: 'any',
+            values: [
+              {
+                asset: {
+                  id: 'asset-3',
                   type: 'asset',
                 },
               },
@@ -94,6 +135,10 @@ const applicableFlow = makeFlow({
     },
   },
 });
+
+bindingIdFlow.data = {
+  mysterious: 'the-resolved-id',
+};
 
 interface ViewAsset extends Asset<'view'> {
   /**
@@ -107,15 +152,20 @@ interface TransformedView extends ViewAsset {
    *
    */
   run: () => string;
+
+  /** */
+  checkPath?: CheckPathPlugin;
 }
 
 /**
  *
  */
 const ViewTransform: TransformFunction<ViewAsset, TransformedView> = (
-  view
+  view,
+  options
 ) => ({
   ...view,
+  checkPath: options.utils?.findPlugin<CheckPathPlugin>(CheckPathPluginSymbol),
   run() {
     return 'hello';
   },
@@ -140,6 +190,11 @@ describe('check path plugin', () => {
     const view = checkPathPlugin.getAsset('view-1') as TransformedView;
     expect(view).toBeDefined();
     expect(view.run()).toStrictEqual('hello');
+  });
+
+  test('checkPath in resolveOptions', () => {
+    const view = checkPathPlugin.getAsset('view-1') as TransformedView;
+    expect(view.checkPath).toBeDefined();
   });
 
   test('getAsset after setting data', () => {
@@ -192,6 +247,10 @@ describe('check path plugin', () => {
     expect(
       checkPathPlugin.getPath('coll-val-1-label', { type: 'input' })
     ).toStrictEqual(['label', 'asset']);
+
+    expect(
+      checkPathPlugin.getPath('coll-val-1-label', { type: 'not-found' })
+    ).toBeUndefined();
   });
 
   describe('hasParentContext', () => {
@@ -283,6 +342,11 @@ describe('check path plugin', () => {
     it('handles the root node not having a parent', () => {
       expect(checkPathPlugin.getParent('view-1')).toBeUndefined();
     });
+
+    it('handles parent ids that are unresolved bindings', () => {
+      player.start(bindingIdFlow);
+      expect(checkPathPlugin.getParent('fields')?.id).toBe('the-resolved-id');
+    });
   });
 });
 
@@ -296,8 +360,45 @@ describe('works with applicability', () => {
     player = new Player({
       plugins: [checkPathPlugin],
     });
-    player.start(applicableFlow);
+    player.start({
+      ...applicableFlow,
+      data: { foo: { bar: false, baz: false } },
+    });
     dataController = (player.getState() as InProgressState).controllers.data;
+  });
+
+  test('hasParentContext', async () => {
+    dataController.set([['foo.baz', true]]);
+    await waitFor(() => {
+      expect(
+        checkPathPlugin.hasParentContext('asset-4a', {
+          type: 'any',
+        })
+      ).toBe(true);
+
+      expect(
+        checkPathPlugin.hasParentContext('asset-4a', {
+          type: 'foo',
+        })
+      ).toBe(true);
+    });
+  });
+
+  test('hasChildContext', async () => {
+    dataController.set([['foo.baz', true]]);
+    await waitFor(() => {
+      expect(
+        checkPathPlugin.hasChildContext('fields', {
+          type: 'foo',
+        })
+      ).toBe(true);
+
+      expect(
+        checkPathPlugin.hasChildContext('fields', {
+          type: 'bar',
+        })
+      ).toBe(true);
+    });
   });
 
   test('path', async () => {

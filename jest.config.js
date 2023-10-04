@@ -48,4 +48,6 @@ module.exports = {
     '!**/perf-core/**',
     '!**/_backup/**',
   ],
+  automock: false,
+  transformIgnorePatterns: ['node-modules', '!mdast-util-from-markdown'],
 };

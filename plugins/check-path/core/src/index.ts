@@ -3,6 +3,7 @@ import type { Player, PlayerPlugin, Node, Resolver } from '@player-ui/player';
 import type { Asset } from '@player-ui/types';
 import { createObjectMatcher } from '@player-ui/partial-match-registry';
 import dlv from 'dlv';
+import { CheckPathPluginSymbol } from './symbols';
 
 export type QueryFunction = (asset: Asset) => boolean;
 export type Query = QueryFunction | string | object;
@@ -51,7 +52,7 @@ interface ViewInfo {
  */
 function getParent(
   node: Node.Node,
-  viewInfo: ViewInfo
+  viewInfo?: ViewInfo
 ): Node.ViewOrAsset | undefined {
   let working = node;
 
@@ -69,8 +70,7 @@ function getParent(
     parent &&
     (parent.type === NodeType.Asset || parent.type === NodeType.View)
   ) {
-    return (viewInfo.resolver.getSourceNode(parent) ??
-      parent) as Node.ViewOrAsset;
+    return parent;
   }
 }
 
@@ -81,6 +81,7 @@ function getParent(
 export class CheckPathPlugin implements PlayerPlugin {
   name = 'check-path';
   private viewInfo?: ViewInfo;
+  public readonly symbol = CheckPathPluginSymbol;
 
   apply(player: Player) {
     player.hooks.viewController.tap(this.name, (viewController) => {
@@ -135,14 +136,12 @@ export class CheckPathPlugin implements PlayerPlugin {
       return undefined;
     }
 
-    let potentialMatch = getParent(assetNode, this.viewInfo);
+    let potentialMatch = getParent(assetNode);
 
     // Handle the case of an empty query (just get the immediate parent)
     if (query === undefined) {
       if (potentialMatch) {
-        const resolved = this.viewInfo.resolvedMap.get(potentialMatch);
-
-        return resolved?.value;
+        return this.getAssetFromAssetNode(potentialMatch);
       }
 
       return;
@@ -162,18 +161,18 @@ export class CheckPathPlugin implements PlayerPlugin {
       }
 
       const matcher = createMatcher(parentQuery);
-      const resolved = this.viewInfo.resolvedMap.get(potentialMatch);
+      const resolved = this.getAssetFromAssetNode(potentialMatch);
 
-      if (resolved && matcher(resolved.value)) {
+      if (resolved && matcher(resolved)) {
         // This is the last match.
         if (queryArray.length === 0) {
-          return resolved.value;
+          return resolved;
         }
 
         parentQuery = queryArray.shift();
       }
 
-      potentialMatch = getParent(potentialMatch, this.viewInfo);
+      potentialMatch = getParent(potentialMatch);
     }
 
     return undefined;
@@ -196,9 +195,7 @@ export class CheckPathPlugin implements PlayerPlugin {
     let parent;
 
     while (working) {
-      parent =
-        working?.parent &&
-        this.viewInfo.resolvedMap.get(working.parent)?.resolved;
+      parent = working?.parent;
 
       if (
         parent &&
@@ -254,22 +251,30 @@ export class CheckPathPlugin implements PlayerPlugin {
     const [first, ...rest] = query;
     const matcher = createMatcher(first);
 
-    if (node.type === NodeType.Asset || node.type === NodeType.View) {
-      const resolved = this.viewInfo?.resolvedMap.get(node);
+    if (
+      node.type === NodeType.Asset ||
+      node.type === NodeType.View ||
+      node.type === NodeType.Applicability
+    ) {
+      const resolvedValue = this.getResolvedValue(node);
       const includesSelf =
-        (includeSelfMatch && resolved && matcher(resolved.value)) ?? false;
+        (includeSelfMatch && matcher(resolvedValue)) ?? false;
       const childQuery = includesSelf ? rest : query;
 
       if (childQuery.length === 0 && includesSelf) {
         return true;
       }
 
-      if (childQuery.length && (!node.children || node.children.length === 0)) {
+      const children =
+        node.type === NodeType.Applicability
+          ? (node.value as Node.ViewOrAsset).children
+          : node.children;
+      if (childQuery.length && (!children || children.length === 0)) {
         return false;
       }
 
       if (
-        node.children?.some((childNode) =>
+        children?.some((childNode) =>
           this.findChildPath(childNode.value, childQuery)
         )
       ) {
@@ -314,6 +319,15 @@ export class CheckPathPlugin implements PlayerPlugin {
     const assetNode = this.viewInfo?.assetIdMap.get(id);
     if (!assetNode) return;
 
+    return this.getAssetFromAssetNode(assetNode);
+  }
+
+  /**
+   * Gets the value for an asset from an asset node
+   */
+  public getAssetFromAssetNode(
+    assetNode: Node.Asset | Node.View
+  ): Asset | undefined {
     const sourceNode = this.getSourceAssetNode(assetNode);
     if (!sourceNode) return;
 
@@ -352,23 +366,20 @@ export class CheckPathPlugin implements PlayerPlugin {
     };
 
     while (working !== undefined) {
-      const parent =
-        working?.parent && this.viewInfo.resolvedMap.get(working.parent);
+      const { parent } = working;
 
-      const parentNode = parent?.resolved;
-
-      if (parentNode) {
-        if (parentNode.type === NodeType.MultiNode) {
-          const index = parentNode.values.indexOf(working);
+      if (parent) {
+        if (parent.type === NodeType.MultiNode) {
+          const index = parent.values.indexOf(working);
 
           if (index !== -1) {
             const actualIndex =
               index -
-              parentNode.values
+              parent.values
                 .slice(0, index)
                 .reduce(
                   (undefCount, next) =>
-                    this.viewInfo?.resolvedMap.get(next)?.value === undefined
+                    this.getResolvedValue(next) === undefined
                       ? undefCount + 1
                       : undefCount,
                   0
@@ -376,18 +387,17 @@ export class CheckPathPlugin implements PlayerPlugin {
 
             path = [actualIndex, ...path];
           }
-        } else if ('children' in parentNode) {
-          const childProp = findWorkingChild(parentNode);
+        } else if ('children' in parent) {
+          const childProp = findWorkingChild(parent);
           path = [...(childProp?.path ?? []), ...path];
         }
-      }
 
-      if (parentQuery) {
-        const matcher = createMatcher(parentQuery);
-
-        if (matcher(parent?.value)) {
-          parentQuery = queryArray.shift();
-          if (!parentQuery) return path;
+        if (parentQuery) {
+          const matcher = createMatcher(parentQuery);
+          if (matcher(this.getResolvedValue(parent))) {
+            parentQuery = queryArray.shift();
+            if (!parentQuery) return path;
+          }
         }
       }
 
@@ -396,6 +406,11 @@ export class CheckPathPlugin implements PlayerPlugin {
 
     /* if at the end all queries haven't been consumed, 
        it means we couldn't find a path till the matching query */
-    return queryArray.length === 0 ? path : undefined;
+    return parentQuery ? undefined : path;
+  }
+
+  private getResolvedValue(node: Node.Node) {
+    const sourceNode = this.getSourceAssetNode(node);
+    return this.viewInfo?.resolvedMap.get(sourceNode ?? node)?.value;
   }
 }

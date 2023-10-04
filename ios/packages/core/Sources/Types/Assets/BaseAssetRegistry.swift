@@ -26,6 +26,9 @@ public enum DecodingError: Error {
 
     /// More than one asset is using the attached identifier
     case duplicateIdentifier(String)
+
+    /// Update from core player was not convertible
+    case malformedData
 }
 
 /**
@@ -35,9 +38,6 @@ open class BaseAssetRegistry<WrapperType>: PlayerRegistry where
     WrapperType: Decodable,
     WrapperType: AssetContainer,
     WrapperType.AssetType: Decodable {
-
-    /// A key for storing information in the decoder userInfo
-//    public static let decodeFunctionKey = CodingUserInfoKey(rawValue: "decodeFunction")!
 
     /// A type representing an entry in the registry
     public typealias RegistryEntry = (assetType: AssetType.Type, match: [String: Any])
@@ -107,8 +107,12 @@ open class BaseAssetRegistry<WrapperType>: PlayerRegistry where
         if let index = registry.firstIndex(where: { matched in
             return NSDictionary(dictionary: match).isEqual(to: matched.match)
         }) {
-            logger?.w("Overriding registration for match: \(String(describing: match))")
-            registry[index] = (assetType: asset, match: match)
+            if asset == registry[index].assetType {
+                self.logger?.t("Duplicate Registration skipped for \(String(describing: match)) asset: \(String(describing: asset))")
+            } else {
+                self.logger?.w("Overriding registration for match: \(String(describing: match))")
+                registry[index] = (assetType: asset, match: match)
+            }
         } else {
             registry.append((assetType: asset, match: match))
         }
@@ -186,19 +190,39 @@ public struct RegistryDecodeShim<Asset>: Decodable {
 extension JSValue {
     var jsonDisplayString: String {
         do {
-            return try String(data: jsonData(options: [.prettyPrinted]), encoding: .utf8) ?? "notuf8"
+            return try String(data: jsonData(pretty: true), encoding: .utf8) ?? "notuf8"
         } catch {
             return error.localizedDescription
         }
     }
 
-    /// Returns the contents of this value encoded into UTF-8 string data. Throws DecodingError.jsonDataNotFound
+    /// Returns the contents of this value encoded into UTF-8 string data. Throws DecodingError.malformedData
     /// if this value can't be transformed.
-    func jsonData(options: JSONSerialization.WritingOptions = []) throws -> Data {
-        guard let object = toObject(), object is NSArray || object is NSDictionary else {
-            return try JSONSerialization.data(withJSONObject: NSDictionary(), options: options)
+    func jsonData(pretty: Bool = false) throws -> Data {
+        guard
+            let json = context?.objectForKeyedSubscript("JSON"),
+            !json.isUndefined,
+            !json.isNull,
+            // replace functions with placeholders, since we retrieve the value in WrappedFunction
+            // with the coding path
+            let replacer = context?.evaluateScript("(key, value) => (typeof value === 'function' ? {} : value)"),
+            let output = json.invokeMethod(
+                "stringify",
+                withArguments: [
+                    self,
+                    replacer as Any,
+                    (
+                        pretty ? 2 : nil
+                    ) as Any
+                ]
+            ),
+            !output.isUndefined,
+            !output.isNull,
+            let data = output.toString().data(using: .utf8)
+        else {
+            throw DecodingError.malformedData
         }
-        return try JSONSerialization.data(withJSONObject: object, options: options)
+        return data
     }
 }
 

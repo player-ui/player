@@ -70,19 +70,31 @@ class JSUtilitiesTests: XCTestCase {
     func testJsonStringPretty() {
         let context = JSContext()!
 
-//        let undef = context.evaluateScript("(undefined)")
-
         let obj = context.evaluateScript("({a: 1})")
+
+        let objWithNaN = context.evaluateScript("({a: NaN})")
+
+        let objWithFunction = context.evaluateScript("({a: () => {}})")
 
         let array = context.evaluateScript("(['a', 'b'])")
 
-//        let str = context.evaluateScript("('a')")
-
-//        XCTAssertEqual(undef?.jsonDisplayString, "undefined")
+        let str = context.evaluateScript("('a')")
 
         XCTAssertEqual(obj?.jsonDisplayString, """
         {
-          "a" : 1
+          "a": 1
+        }
+        """)
+
+        XCTAssertEqual(objWithNaN?.jsonDisplayString, """
+        {
+          "a": null
+        }
+        """)
+
+        XCTAssertEqual(objWithFunction?.jsonDisplayString, """
+        {
+          "a": {}
         }
         """)
 
@@ -93,6 +105,38 @@ class JSUtilitiesTests: XCTestCase {
         ]
         """)
 
-//        XCTAssertEqual(str?.jsonDisplayString, "a")
+        XCTAssertEqual(str?.jsonDisplayString, "\"a\"")
+    }
+
+    func testJsonData() throws {
+        let context = JSContext()!
+
+        let obj = context.evaluateScript("({a: 1})")
+
+        let objWithNaN = context.evaluateScript("({a: NaN})")
+
+        let objWithFunction = context.evaluateScript("({a: () => {}})")
+
+        let array = context.evaluateScript("(['a', 'b'])")
+
+        let str = context.evaluateScript("('a')")
+
+        XCTAssertEqual(try obj?.jsonData(), """
+        {"a":1}
+        """.data(using: .utf8))
+
+        XCTAssertEqual(try objWithNaN?.jsonData(), """
+        {"a":null}
+        """.data(using: .utf8))
+
+        XCTAssertEqual(try objWithFunction?.jsonData(), """
+        {"a":{}}
+        """.data(using: .utf8))
+
+        XCTAssertEqual(try array?.jsonData(), """
+        ["a","b"]
+        """.data(using: .utf8))
+
+        XCTAssertEqual(try str?.jsonData(), "\"a\"".data(using: .utf8))
     }
 }

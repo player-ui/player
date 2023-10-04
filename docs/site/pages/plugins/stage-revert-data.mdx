@@ -1,0 +1,47 @@
+---
+title: Stage Revert Data
+platform: core
+---
+
+# Stage Rvert Data
+
+This plugin enables users to temporarily stage data changes before committing to the actual data model
+
+A `stageData` property flag inside of the `view properties` must be added on the desired view configs.
+
+```json
+{
+  "VIEW_1": {
+    "state_type": "VIEW",
+    "ref": "view-1",
+    "attributes": {
+      "stageData": true,
+      "commitTransitions": ["VIEW_2"]
+    },
+    "transitions": {
+      "next": "VIEW_2",
+      "*": "ACTION_1"
+    }
+  }
+}
+```
+
+It also should include a list of acceptable `commitTransitions` valid `VIEW` name for the data to be committed when the transition occurs, A not included commit transition would trigger the staged data to be cleared. An acceptable transition will commit the data into the `data model`. e.g. as per the previous example transitioning to `VIEW_2` will trigger the staged data to get committed in the model, since the `next` transition property is pointing to it and is listed on the `commitTransitions` array parameter, otherwise it would get thrown away.
+
+## Example
+
+<PlatformTabs>
+  <core>
+
+Simply add the plugin to the config when constructing a player instance.
+
+```javascript
+import StageRevertPlugin from '@player/stage-revert-data';
+
+const player = new Player({
+  plugins: [new StageRevertPlugin()],
+});
+```
+
+  </core>
+</PlatformTabs>

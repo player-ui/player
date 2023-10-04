@@ -6,11 +6,22 @@ const DOUBLE_OPEN_CURLY = '{{';
 const DOUBLE_CLOSE_CURLY = '}}';
 
 export interface Options {
-  /** The model to use when resolving refs */
-  model: DataModelWithParser;
+  /**
+   * The model to use when resolving refs
+   * Passing `false` will skip trying to resolve any direct model refs ({{foo}})
+   */
+  model: false | DataModelWithParser;
 
-  /** A function to evaluate an expression */
-  evaluate: (exp: Expression) => any;
+  /**
+   * A function to evaluate an expression
+   * Passing `false` will skip trying to evaluate any expressions (@[ foo() ]@)
+   */
+  evaluate: false | ((exp: Expression) => any);
+
+  /**
+   * Optionaly resolve binding without formatting in case Type format applies
+   */
+  formatted?: boolean;
 }
 
 /** Search the given string for the coordinates of the next expression to resolve */
@@ -70,6 +81,10 @@ export function resolveExpressionsInString(
   val: string,
   { evaluate }: Options
 ): string {
+  if (!evaluate) {
+    return val;
+  }
+
   const expMatch = /@\[.*?\]@/;
   let newVal = val;
   let match = newVal.match(expMatch);
@@ -106,10 +121,11 @@ export function resolveExpressionsInString(
 
 /** Return a string with all data model references resolved */
 export function resolveDataRefsInString(val: string, options: Options): string {
-  const { model } = options;
+  const { model, formatted = true } = options;
   let workingString = resolveExpressionsInString(val, options);
 
   if (
+    !model ||
     typeof workingString !== 'string' ||
     workingString.indexOf(DOUBLE_OPEN_CURLY) === -1
   ) {
@@ -133,7 +149,7 @@ export function resolveDataRefsInString(val: string, options: Options): string {
       )
       .trim();
 
-    const evaledVal = model.get(binding, { formatted: true });
+    const evaledVal = model.get(binding, { formatted });
 
     // Exit early if the string is _just_ a model lookup
     // If the result is a string, we may need further processing for nested bindings
@@ -160,18 +176,19 @@ function traverseObject<T>(val: T, options: Options): T {
     }
 
     case 'object': {
+      if (!val) return val;
       // TODO: Do we care refs in keys?
       const keys = Object.keys(val);
       let newVal = val;
 
       if (keys.length > 0) {
-        for (const key of keys) {
+        keys.forEach((key) => {
           newVal = setIn(
             newVal as any,
             [key],
             traverseObject((val as any)[key], options)
           ) as any;
-        }
+        });
       }
 
       return newVal;

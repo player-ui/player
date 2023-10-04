@@ -1,4 +1,10 @@
-import type { Flow, Asset, AssetWrapper } from '@player-ui/types';
+import type {
+  Flow,
+  Asset,
+  AssetWrapper,
+  NavigationFlow,
+  NavigationFlowEndState,
+} from '@player-ui/types';
 import identify, { ObjType } from './identify';
 
 export * from './identify';
@@ -27,10 +33,71 @@ function unwrapJSend(obj: object) {
   return obj;
 }
 
+interface NavOptions {
+  /** An optional expression to run when this Flow starts */
+  onStart?: NavigationFlow['onStart'];
+  /** An optional expression to run when this Flow ends */
+  onEnd?: NavigationFlow['onEnd'];
+  /**
+   * A description of _how_ the flow ended.
+   * If this is a flow started from another flow, the outcome determines the flow transition
+   */
+  outcome?: NavigationFlowEndState['outcome'];
+}
+
+/**
+ * create a default navigation if the flow was exactly one view and there is no navigation already
+ */
+const createDefaultNav = (flow: Flow, options?: NavOptions): Flow => {
+  if (
+    (flow.navigation === undefined || flow.navigation === null) &&
+    Array.isArray(flow.views) &&
+    flow.views.length === 1
+  ) {
+    const navFlow: NavigationFlow = {
+      startState: 'VIEW_0',
+      VIEW_0: {
+        state_type: 'VIEW',
+        ref: flow.views[0].id ?? `${flow.id}-views-0`,
+        transitions: {
+          '*': 'END_done',
+          Prev: 'END_back',
+        },
+      },
+      END_done: {
+        state_type: 'END',
+        outcome: options?.outcome ?? 'doneWithFlow',
+      },
+      END_back: {
+        state_type: 'END',
+        outcome: 'BACK',
+      },
+    };
+
+    if (options?.onStart !== undefined) {
+      navFlow.onStart = options.onStart;
+    }
+
+    if (options?.onEnd !== undefined) {
+      navFlow.onEnd = options.onEnd;
+    }
+
+    return {
+      ...flow,
+      navigation: {
+        BEGIN: 'Flow',
+        Flow: navFlow,
+      },
+    };
+  }
+
+  return flow;
+};
+
 /**
  * Take any given object and try to convert it to a flow
  */
-export function makeFlow(obj: any): Flow {
+export function makeFlow(obj: any, args?: NavOptions): Flow {
   const objified = unwrapJSend(typeof obj === 'string' ? JSON.parse(obj) : obj);
 
   if (Array.isArray(objified)) {
@@ -60,7 +127,7 @@ export function makeFlow(obj: any): Flow {
   }
 
   if (type === ObjType.FLOW) {
-    return obj;
+    return createDefaultNav(obj, args);
   }
 
   if (type === ObjType.ASSET_WRAPPER) {

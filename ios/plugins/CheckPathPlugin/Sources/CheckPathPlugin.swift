@@ -7,17 +7,8 @@
 
 import Foundation
 
-/**
- A plugin that can query the asset tree for contextual information about the hierarchy
- */
-public class CheckPathPlugin: JSBasePlugin, NativePlugin {
-    /**
-     Constructs the CheckPathPlugin
-     */
-    public convenience init() {
-        self.init(fileName: "check-path-plugin.prod", pluginName: "CheckPathPlugin.CheckPathPlugin")
-    }
-
+/// Base functionality for CheckPath
+open class BaseCheckPathPlugin: JSBasePlugin {
     /**
      The getParent method allows you to query up the tree and return the first parent that matches the given query if such exists.
      In case when query is not provided, the closest parent returned.
@@ -66,6 +57,18 @@ public class CheckPathPlugin: JSBasePlugin, NativePlugin {
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: CheckPathPlugin.self), pathComponent: "CheckPathPlugin.bundle")
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: BaseCheckPathPlugin.self), pathComponent: "CheckPathPlugin.bundle")
+    }
+}
+
+/**
+ A plugin that can query the asset tree for contextual information about the hierarchy
+ */
+open class CheckPathPlugin: BaseCheckPathPlugin, NativePlugin {
+    /**
+     Constructs the CheckPathPlugin
+     */
+    public convenience init() {
+        self.init(fileName: "check-path-plugin.prod", pluginName: "CheckPathPlugin.CheckPathPlugin")
     }
 }

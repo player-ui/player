@@ -272,16 +272,15 @@ export declare namespace Schema {
   /** A Node describes a specific object in the tree */
   export interface Node {
     /** Each property describes a property of the object */
-    [key: string]: DataType;
+    [key: string]: DataTypes;
   }
+
+  export type DataTypes = DataType | RecordType | ArrayType;
 
   /** Each prop in the object can have a specific DataType */
   export interface DataType<T = unknown> {
     /** The reference of the base type to use */
     type: string;
-
-    /** The referenced object represents an array rather than an object */
-    isArray?: boolean;
 
     /**
      * Any additional validations that are associated with this property
@@ -303,6 +302,23 @@ export declare namespace Schema {
 
     /** Any additional options */
     [key: string]: unknown;
+  }
+  /** Determines if the Datatype is a record object */
+  export interface RecordType extends DataType {
+    /** boolean to define if its a record */
+    isRecord: boolean;
+
+    /** This property is mutually exclusive with RecordType and can not be used with ArrayType */
+    isArray?: never;
+  }
+
+  /** Determines if the DataType is an Array Object */
+  export interface ArrayType extends DataType {
+    /** boolean to define if its an array */
+    isArray: boolean;
+
+    /** This property is mutually exclusive with ArrayType and can not be used with RecordType */
+    isRecord?: never;
   }
 }
 
@@ -381,6 +397,15 @@ export declare namespace Validation {
 
     /** Where the error should be displayed */
     displayTarget?: DisplayTarget;
+
+    /**
+     * If the validation blocks navigation
+     * true/false - always/never block navigation
+     * once - only block navigation if the validation has not been triggered before
+     *
+     * @default - true for errors, 'once' for warnings
+     */
+    blocking?: boolean | 'once';
 
     /** Additional props to send down to a Validator */
     [key: string]: unknown;

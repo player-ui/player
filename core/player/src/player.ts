@@ -1,12 +1,11 @@
 import { setIn } from 'timm';
 import deferred from 'p-defer';
-import queueMicrotask from 'queue-microtask';
 import type { Flow as FlowType, FlowResult } from '@player-ui/types';
 
 import { SyncHook, SyncWaterfallHook } from 'tapable-ts';
 import type { Logger } from './logger';
 import { TapableLogger } from './logger';
-import type { ExpressionHandler } from './expressions';
+import type { ExpressionType } from './expressions';
 import { ExpressionEvaluator } from './expressions';
 import { SchemaController } from './schema';
 import { BindingParser } from './binding';
@@ -21,6 +20,7 @@ import {
   FlowController,
 } from './controllers';
 import { FlowExpPlugin } from './plugins/flow-exp-plugin';
+import { DefaultExpPlugin } from './plugins/default-exp-plugin';
 import type {
   PlayerFlowState,
   InProgressState,
@@ -48,6 +48,18 @@ export interface PlayerPlugin {
    */
   apply: (player: Player) => void;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface ExtendedPlayerPlugin<
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  Assets = void,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  Views = void,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  Expressions = void,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  DataTypes = void
+> {}
 
 export interface PlayerConfigOptions {
   /** A set of plugins to load  */
@@ -117,17 +129,16 @@ export class Player {
   };
 
   constructor(config?: PlayerConfigOptions) {
-    const initialPlugins: PlayerPlugin[] = [];
-    const flowExpPlugin = new FlowExpPlugin();
-
-    initialPlugins.push(flowExpPlugin);
-
     if (config?.logger) {
       this.logger.addHandler(config.logger);
     }
 
     this.config = config || {};
-    this.config.plugins = [...(this.config.plugins || []), ...initialPlugins];
+    this.config.plugins = [
+      new DefaultExpPlugin(),
+      ...(this.config.plugins || []),
+      new FlowExpPlugin(),
+    ];
     this.config.plugins?.forEach((plugin) => {
       plugin.apply(this);
     });
@@ -277,34 +288,41 @@ export class Player {
     });
 
     /** Resolve any data references in a string */
-    function resolveStrings<T>(val: T) {
+    function resolveStrings<T>(val: T, formatted?: boolean) {
       return resolveDataRefs(val, {
         model: dataController,
         evaluate: expressionEvaluator.evaluate,
+        formatted,
       });
     }
 
     flowController.hooks.flow.tap('player', (flow: FlowInstance) => {
       flow.hooks.beforeTransition.tap('player', (state, transitionVal) => {
-        if (
-          state.onEnd &&
-          (state.transitions[transitionVal] || state.transitions['*'])
-        ) {
+        /** Checks to see if there are any transitions for a specific transition state (i.e. next, back). If not, it will default to * */
+        const computedTransitionVal = state.transitions[transitionVal]
+          ? transitionVal
+          : '*';
+        if (state.onEnd && state.transitions[computedTransitionVal]) {
           if (typeof state.onEnd === 'object' && 'exp' in state.onEnd) {
             expressionEvaluator?.evaluate(state.onEnd.exp);
           } else {
-            expressionEvaluator?.evaluate(state.onEnd);
+            expressionEvaluator?.evaluate(state.onEnd as ExpressionType);
           }
         }
 
-        if (!('transitions' in state) || !state.transitions[transitionVal]) {
+        /** If the transition does not exist, then do not resolve any expressions */
+        if (
+          !('transitions' in state) ||
+          !state.transitions[computedTransitionVal]
+        ) {
           return state;
         }
 
+        /** resolves and sets the transition to the computed exp */
         return setIn(
           state,
-          ['transitions', transitionVal],
-          resolveStrings(state.transitions[transitionVal])
+          ['transitions', computedTransitionVal],
+          resolveStrings(state.transitions[computedTransitionVal])
         ) as any;
       });
 
@@ -335,7 +353,7 @@ export class Player {
           newState = setIn(
             state,
             ['param'],
-            resolveStrings(state.param)
+            resolveStrings(state.param, false)
           ) as any;
         }
 
@@ -343,17 +361,18 @@ export class Player {
       });
 
       flow.hooks.transition.tap('player', (_oldState, newState) => {
-        if (newState.value.state_type === 'ACTION') {
-          const { exp } = newState.value;
+        if (newState.value.state_type !== 'VIEW') {
+          validationController.reset();
+        }
+      });
 
-          // The nested transition call would trigger another round of the flow transition hooks to be called.
-          // This created a weird timing where this nested transition would happen before the view had a chance to respond to the first one
-          // Use a queueMicrotask to make sure the expression transition is outside the scope of the flow hook
-          queueMicrotask(() => {
-            flowController?.transition(
-              String(expressionEvaluator?.evaluate(exp))
-            );
-          });
+      flow.hooks.afterTransition.tap('player', (flowInstance) => {
+        const value = flowInstance.currentState?.value;
+        if (value && value.state_type === 'ACTION') {
+          const { exp } = value;
+          flowController?.transition(
+            String(expressionEvaluator?.evaluate(exp))
+          );
         }
 
         expressionEvaluator.reset();
@@ -375,6 +394,11 @@ export class Player {
       parseBinding,
       transition: flowController.transition,
       model: dataController,
+      utils: {
+        findPlugin: <Plugin = unknown>(pluginSymbol: symbol) => {
+          return this.findPlugin(pluginSymbol) as unknown as Plugin;
+        },
+      },
       logger: this.logger,
       flowController,
       schema,
@@ -392,6 +416,7 @@ export class Player {
         ...validationController.forView(parseBinding),
         type: (b) => schema.getType(parseBinding(b)),
       },
+      constants: this.constantsController,
     });
     viewController.hooks.view.tap('player', (view) => {
       validationController.onView(view);
@@ -399,26 +424,13 @@ export class Player {
     });
     this.hooks.viewController.call(viewController);
 
-    /** Gets formatter for given formatName and formats value if found, returns value otherwise */
-    const formatFunction: ExpressionHandler<[unknown, string], any> = (
-      ctx,
-      value,
-      formatName
-    ) => {
-      return (
-        schema.getFormatterForType({ type: formatName })?.format(value) ?? value
-      );
-    };
-
-    expressionEvaluator.addExpressionFunction('format', formatFunction);
-
     return {
       start: () => {
         flowController
           .start()
           .then((endState) => {
             const flowResult: FlowResult = {
-              endState: resolveStrings(endState),
+              endState: resolveStrings(endState, false),
               data: dataController.serialize(),
             };
 
@@ -489,7 +501,6 @@ export class Player {
         ref,
         status: 'completed',
         flow: state.flow,
-        dataModel: state.controllers.data.getModel(),
       } as const;
 
       return maybeUpdateState({

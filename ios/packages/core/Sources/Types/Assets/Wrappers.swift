@@ -30,9 +30,6 @@ public protocol AssetContainer {
  Protocol for Asset Implementations, in order to work with `BaseAssetRegistry`
  */
 public protocol PlayerAsset {
-    /// The `JSValue` that represents this asset in the `JSContext` of Player
-    var rawValue: JSValue? { get set }
-
     /// The ID of this asset in the Flow
     var id: String { get }
 
@@ -82,6 +79,11 @@ extension AssetData where Self: Equatable {
         guard let other = other as? Self else { return false }
         return self == other
     }
+}
+
+public struct DefaultAdditionalData: Decodable, Equatable {
+    /// MetaData associated with the asset in this wrapper
+    public var metaData: MetaData?
 }
 
 /**

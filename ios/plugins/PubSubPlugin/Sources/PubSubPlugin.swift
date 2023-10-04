@@ -86,7 +86,9 @@ public class PubSubPlugin: JSBasePlugin, NativePlugin {
             } else if
                 let object = data?.toObject(),
                 let objectData = try? JSONSerialization.data(withJSONObject: object),
-                let eventData = try? JSONDecoder().decode(AnyType.self, from: objectData)
+                let eventData = try? AnyTypeDecodingContext(rawData: objectData)
+                    .inject(to: JSONDecoder())
+                    .decode(AnyType.self, from: objectData)
             {
                 callback(name, eventData)
             } else {

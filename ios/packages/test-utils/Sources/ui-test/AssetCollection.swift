@@ -43,7 +43,9 @@ public struct AssetCollection: View {
                 Section {
                     ForEach(section.flows, id: \.name) { flow in
                         NavigationLink(flow.name) {
-                            AssetFlowView(flow: flow.flow, plugins: plugins, completion: completion).padding(padding)
+                            AssetFlowView(flow: flow.flow, plugins: plugins, completion: completion)
+                                .padding(padding)
+                                .navigationBarTitle(Text(flow.name))
                         }
                         .accessibility(identifier: "\(section.title) \(flow.name)")
                     }

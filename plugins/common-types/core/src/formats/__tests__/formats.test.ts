@@ -238,11 +238,23 @@ describe('phone', () => {
     it('preserves formatting when value is well formatted', () => {
       expect(phone.format?.('(123) 123-1231')).toBe('(123) 123-1231');
     });
+
+    it(`doesn't add extra characters beyond mask value`, () => {
+      expect(phone.format?.('(123) 123-123145')).toBe('(123) 123-1231');
+    });
   });
 
   describe('deformatting', () => {
     it('removes masking chars', () => {
       expect(phone.deformat?.('(123) 123-1231')).toBe('1231231231');
+    });
+
+    it(`doesn't remove characters when deformatting a deformatted value`, () => {
+      expect(phone.deformat?.('1231231231')).toBe('1231231231');
+    });
+
+    it('ignores improper formatting of the input string', () => {
+      expect(phone.deformat?.('123-123-1231')).toBe('1231231231');
     });
   });
 });

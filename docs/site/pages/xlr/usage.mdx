@@ -1,0 +1,136 @@
+---
+title: Using XLR
+---
+
+# Part 1 - Creating XLRs
+
+XLR creation is done through the Player CLI which can be added to your project like so:
+
+```bash
+yarn install @player-tools/cli
+```
+
+## Exporting Base Type Definitions
+
+If you want to compile all exported interfaces/types to XLRs run the following command as part of your build
+
+```bash
+player xlr compile -m types <other options>
+```
+
+## Exporting Plugin Capabilities
+
+If you are writing a Player Plugin, you'll first need to have your plugin extend the `ExtendedPlayerPlugin` interface and fill in the generics with an array of the interfaces/types for each Capability. For example, you can see how its done below in the [core reference assets plugin](https://github.com/player-ui/player/blob/main/plugins/reference-assets/core/src/plugin.ts)
+
+```typescript
+export class ReferenceAssetsPlugin
+  implements
+    PlayerPlugin,
+    ExtendedPlayerPlugin<
+      [InputAsset, TextAsset, ActionAsset, InfoAsset, CollectionAsset]
+    >
+```
+
+Then run the following command as part of your build
+
+```shell
+player xlr compile -m plugin <other options>
+```
+
+# Part 2 - Using XLRs 
+
+## SDK: Initialization
+
+To start using the XLR SDK you'll need to install the SDK package
+
+```bash
+yarn install @player-tools/xlr-sdk
+```
+
+Next, import the SDK 
+
+```typescript
+import { XLRSDK } from "@player-tools/xlr-sdk"
+```
+
+_If you want to implement a custom object store, also import the `XLRRegistry` interface and have your custom registry implement it._
+
+Lastly, just initialize an instance of it. 
+
+```typescript
+import { XLRSDK } from "@player-tools/xlr-sdk"
+
+const sdk = new XLRSDK();
+```
+
+or if you want to use your custom registry, just pass it in to the initializer. 
+
+```typescript
+import { XLRSDK } from "@player-tools/xlr-sdk"
+import { customRegistry } from "./customRegistry"
+
+const sdk = new XLRSDK(customRegistry);
+```
+
+## SDK: Loading Types
+
+If you want to load XLR types from disk, you can use the `loadDefinitionsFromDisk` function and pass it the path to parent folder of the `xlr` directory.
+
+```typescript
+const sdk = new XLRSDK();
+sdk.loadDefinitionsFromDisk('./common/static_xlrs/core');
+```
+
+If you want to load XLR types from a module, you can use the `loadDefinitionsFromModule` function and pass it the module to load from.
+
+```typescript
+const sdk = new XLRSDK();
+sdk.loadDefinitionsFromModule(require("@player-ui/reference-assets-plugin").path);
+```
+
+- If you want to filter any of the types that are being loaded, you can supply a `Filters` object as the *second* arguments
+- If you want to apply any transform functions to the modules that you load, you can supply a list of `TransformFunction` as the *third* argument
+
+## SDK: Usage
+
+After the types are loaded into the SDK there are a couple ways to interact with them.
+
+### Type Recall
+
+To get a type back you can use the `getType` function and pass the name of the type you want to retrieve. You can also use the `hasType` function to check to see if the type exists before you try and access it. 
+
+```typescript
+const sdk = new XLRSDK();
+if(sdk.hasType("InputAsset")){
+  return sdk.getType("InputAsset")
+} else {
+  throw new Error("Oh no!")
+}
+```
+
+### Type Validation
+
+To validate if some JSON content matches the expected type, you can use the `validateType` function. You will need to supply a `Node` from the `jsonc-parser` library. 
+
+```typescript
+import { parseTree } from 'jsonc-parser';
+import { XLRSDK } from '@player-tools/xlr-sdk'
+
+const sdk = new XLRSDK();
+
+///... Loading XLRs
+
+const mockAsset = parseTree(`
+    {
+      "id": 1,
+      "type": "input",
+      "binding": "some.data",
+      "label": {
+        "asset": {
+          "value": "{{input.label}}"
+        }
+      }
+    `);
+
+return sdk.validate('InputAsset', mockAsset)
+```

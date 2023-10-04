@@ -139,6 +139,14 @@ def PlayerUI(
             "ios/packages/reference-assets/Sources/**/*.c",
             "ios/packages/reference-assets/Sources/**/*.cc",
             "ios/packages/reference-assets/Sources/**/*.cpp",
+            "ios/plugins/StageRevertDataPlugin/Sources/**/*.h",
+            "ios/plugins/StageRevertDataPlugin/Sources/**/*.hh",
+            "ios/plugins/StageRevertDataPlugin/Sources/**/*.m",
+            "ios/plugins/StageRevertDataPlugin/Sources/**/*.mm",
+            "ios/plugins/StageRevertDataPlugin/Sources/**/*.swift",
+            "ios/plugins/StageRevertDataPlugin/Sources/**/*.c",
+            "ios/plugins/StageRevertDataPlugin/Sources/**/*.cc",
+            "ios/plugins/StageRevertDataPlugin/Sources/**/*.cpp",
             "ios/packages/swiftui/Sources/**/*.h",
             "ios/packages/swiftui/Sources/**/*.hh",
             "ios/packages/swiftui/Sources/**/*.m",
@@ -147,6 +155,14 @@ def PlayerUI(
             "ios/packages/swiftui/Sources/**/*.c",
             "ios/packages/swiftui/Sources/**/*.cc",
             "ios/packages/swiftui/Sources/**/*.cpp",
+            "ios/plugins/SwiftUICheckPathPlugin/Sources/**/*.h",
+            "ios/plugins/SwiftUICheckPathPlugin/Sources/**/*.hh",
+            "ios/plugins/SwiftUICheckPathPlugin/Sources/**/*.m",
+            "ios/plugins/SwiftUICheckPathPlugin/Sources/**/*.mm",
+            "ios/plugins/SwiftUICheckPathPlugin/Sources/**/*.swift",
+            "ios/plugins/SwiftUICheckPathPlugin/Sources/**/*.c",
+            "ios/plugins/SwiftUICheckPathPlugin/Sources/**/*.cc",
+            "ios/plugins/SwiftUICheckPathPlugin/Sources/**/*.cpp",
             "ios/packages/test-utils/Sources/**/*.h",
             "ios/packages/test-utils/Sources/**/*.hh",
             "ios/packages/test-utils/Sources/**/*.m",
@@ -227,6 +243,12 @@ def PlayerUI(
                 ],
                 exclude_directories = 0,
             ),
+            "StageRevertDataPlugin": glob(
+                [
+                    "ios/plugins/StageRevertDataPlugin/Resources/**/*.js",
+                ],
+                exclude_directories = 0,
+            ),
             "TestUtilities": glob(
                 ["ios/packages/test-utils/Resources/**/*.js"],
                 exclude_directories = 0,
@@ -239,7 +261,7 @@ def PlayerUI(
         weak_sdk_frameworks = ["XCTest"],
         deps = ["@Pods//SwiftHooks"] + deps,
         visibility = ["//visibility:public"],
-        platforms = {"ios": "13.0"},
+        platforms = {"ios": "14.0"},
     )
 
 def PlayerUI_Demo(
@@ -289,12 +311,20 @@ def PlayerUI_Demo(
         ],
         infoplists = [
             {
-                "UIMainStoryboardFile": "Primary",
                 "UILaunchStoryboardName": "Launch",
                 "CFBundleIdentifier": "com.intuit.ios.player",
+                "UIApplicationSceneManifest": {
+                    "UIApplicationSupportsMultipleScenes": True,
+                    "UISceneConfigurations": {"UIWindowSceneSessionRoleApplication": [
+                        {
+                            "UISceneConfigurationName": "Default Configuration",
+                            "UISceneDelegateClassName": "PlayerUI_Demo.SceneDelegate",
+                        },
+                    ]},
+                },
             },
         ],
-        minimum_os_version = "13.0",
+        minimum_os_version = "14.0",
     )
 
 def unit_tests(
@@ -312,7 +342,7 @@ def unit_tests(
             "ios/plugins/*/Tests/**/*.swift",
         ]),
         deps = [":PlayerUI"],
-        minimum_os_version = "13.0",
+        minimum_os_version = "14.0",
         test_host = ":PlayerUI-Demo",
     )
 
@@ -355,7 +385,7 @@ def ui_tests(
             "@Pods//ViewInspector",
         ],
         bundle_id = "com.intuit.ios.PlayerUI-ExampleUITests",
-        minimum_os_version = "13.0",
+        minimum_os_version = "14.0",
         test_host = ":PlayerUI-Demo",
     )
     ios_ui_test(
@@ -394,6 +424,6 @@ def ui_tests(
             "@Pods//EyesXCUI",
         ],
         bundle_id = "com.intuit.ios.PlayerUI-ExampleUITests",
-        minimum_os_version = "13.0",
+        minimum_os_version = "14.0",
         test_host = ":PlayerUI-Demo",
     )

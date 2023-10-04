@@ -67,6 +67,15 @@ export class ComputedPropertiesPlugin implements PlayerPlugin {
 
         return next?.set(transaction, options) ?? [];
       },
+      delete(binding, options, next) {
+        if (getExpressionType(binding)) {
+          throw new Error(
+            `Invalid 'delete' operation on computed property: ${binding.asString()}`
+          );
+        }
+
+        return next?.delete(binding, options);
+      },
     };
 
     player.hooks.dataController.tap(this.name, (dataController) => {

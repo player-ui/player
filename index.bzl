@@ -1,6 +1,9 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_player//:index.bzl", "js_library_pipeline")
 load("@rules_player//player/bundle:bundle.bzl", "bundle")
+load("@rules_player//player/cli:xlr.bzl", "xlr_compile")
+load("@rules_player//javascript:utils.bzl", "filter_empty")
+load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin")
 
 lint_exts = [".ts", ".js", ".jsx", ".tsx", ".json", ".snap"]
 
@@ -86,6 +89,7 @@ def javascript_pipeline(
         root_dir = "src",
         out_dir = "dist",
         entry = None,
+        bundle_entry = None,
         dependencies = [],
         peer_dependencies = [],
         data = [],
@@ -93,12 +97,23 @@ def javascript_pipeline(
         test_data = [],
         lint_data = [],
         other_srcs = [],
+        xlr_mode = "",
         **kwargs
         ):
     #Derive target specific sources
     srcs = native.glob([paths.join(root_dir, "**/*"), "README.md"]) + other_srcs
-
     resolved_entry = entry if entry else _find_entry(root_dir, srcs)
+
+    # If library_name is defined, the package is being bundled and we should
+    # generate an entry in the package.json to point to the bundle file
+    additional_properties = ("{\"bundle\": \"./dist/%s.prod.js\"}" % name.split('/')[1]) if library_name else None
+
+    js_library_data = []
+
+    if(library_name):
+        js_library_data.append("%s_Bundles" % library_name)
+    if(xlr_mode):
+        js_library_data.append(":%s_XLR" % name)
 
     js_library_pipeline(
         name = name,
@@ -113,25 +128,50 @@ def javascript_pipeline(
         test_data = include_if_unique(TEST_DATA + test_data, DATA + data),
         build_data = include_if_unique(BUILD_DATA + build_data, DATA + data),
         lint_data = include_if_unique(LINT_DATA + lint_data, DATA + data + TEST_DATA + test_data),
+        js_library_data = js_library_data,
         out_dir = out_dir,
         create_package_json_opts = {
             "base_package_json": "//tools:pkg_json_template",
+            "additional_properties": additional_properties
         },
-        **kwargs
     )
 
     if (library_name):
+        bundle_entry_path = None
+        bundle_deps = dependencies + peer_dependencies + build_data + BUNDLE_DATA + [
+            ":%s-js_build" % name,
+            "//:webpack.config.js"
+        ]
+
+        if(bundle_entry):
+            copy_to_bin(
+                name = "copy_entrypoint",
+                srcs = [bundle_entry],
+            )
+
+            bundle_entry_path = "$(execpath :copy_entrypoint)"
+            bundle_deps += [":copy_entrypoint"]
+
         bundle(
             name = "%s_Bundles" % library_name,
             dist = [":%s-package_json" % name],
-            deps = dependencies + peer_dependencies + build_data + BUNDLE_DATA + [
-                ":%s-js_build" % name,
-                "//:webpack.config.js"
-            ],
+            deps = bundle_deps,
             env = {
                 "ROOT_FILE_NAME": resolved_entry,
-                "LIBRARY_NAME": library_name
+                "LIBRARY_NAME": library_name,
             },
             visibility = ["//visibility:public"],
-            bundle_name = name.split('/')[1]
+            bundle_name = name.split('/')[1],
+            bundle_entry = bundle_entry_path,
+            **kwargs
+        )
+    
+    if(xlr_mode):
+        data = BUILD_DATA + build_data + dependencies + peer_dependencies
+        xlr_compile(
+            name = "%s_XLR" % name,
+            data = data,
+            input_root = root_dir,
+            srcs = srcs,
+            mode = xlr_mode
         )

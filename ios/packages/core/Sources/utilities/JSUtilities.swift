@@ -61,19 +61,6 @@ public class JSUtilities {
     }
 }
 
-internal extension JSValue {
-    /// A JSON representation of this value
-    var jsonString: String {
-        guard !isUndefined, let obj = toObject() else { return "undefined" }
-        // only consider arrays and dictionaries, other objects are invalid top level JSON
-        guard obj is NSArray || obj is NSDictionary else { return toString() ?? "bad top level \(obj)" }
-        do {
-            let data = try JSONSerialization.data(withJSONObject: obj, options: .prettyPrinted)
-            return String(data: data, encoding: .utf8) ?? "not utf8?"
-        } catch { return error.localizedDescription }
-    }
-}
-
 internal extension JSContext {
     func error<E>(for error: E) -> JSValue? where E: Error, E: JSConvertibleError {
         objectForKeyedSubscript("Error").construct(withArguments: [error.jsDescription])

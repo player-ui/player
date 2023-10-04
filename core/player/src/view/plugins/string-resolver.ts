@@ -87,15 +87,19 @@ export function resolveAllRefs(
 }
 
 /** Traverse up the node tree finding the first available 'path' */
-const findBasePath = (node: Node.Node): Node.PathSegment[] => {
+const findBasePath = (
+  node: Node.Node,
+  resolver: Resolver
+): Node.PathSegment[] => {
   const parentNode = node.parent;
   if (!parentNode) {
     return [];
   }
 
   if ('children' in parentNode) {
+    const original = resolver.getSourceNode(node);
     return (
-      parentNode.children?.find((child) => child.value === node)?.path ?? []
+      parentNode.children?.find((child) => child.value === original)?.path ?? []
     );
   }
 
@@ -103,11 +107,17 @@ const findBasePath = (node: Node.Node): Node.PathSegment[] => {
     return [];
   }
 
-  return findBasePath(parentNode);
+  return findBasePath(parentNode, resolver);
 };
 
 /** A plugin that resolves all string references for each node */
 export default class StringResolverPlugin implements ViewPlugin {
+  private propertiesToSkipCache: Map<string, Set<string>>;
+
+  constructor() {
+    this.propertiesToSkipCache = new Map();
+  }
+
   applyResolver(resolver: Resolver) {
     resolver.hooks.resolve.tap('string-resolver', (value, node, options) => {
       if (node.type === NodeType.Empty || node.type === NodeType.Unknown) {
@@ -120,13 +130,29 @@ export default class StringResolverPlugin implements ViewPlugin {
         node.type === NodeType.View
       ) {
         /** Use specified properties to skip during string resolution, or default */
-        const propsToSkip = new Set<string>(
-          node.plugins?.stringResolver?.propertiesToSkip
-            ? node.plugins?.stringResolver?.propertiesToSkip
-            : []
-        );
+        let propsToSkip: Set<string>;
+        if (node.type === NodeType.Asset || node.type === NodeType.View) {
+          propsToSkip = new Set(
+            node.plugins?.stringResolver?.propertiesToSkip ?? ['exp']
+          );
+          if (node.value?.id) {
+            this.propertiesToSkipCache.set(node.value.id, propsToSkip);
+          }
+        } else if (
+          node.parent?.type === NodeType.MultiNode &&
+          (node.parent?.parent?.type === NodeType.Asset ||
+            node.parent?.parent?.type === NodeType.View) &&
+          node.parent.parent.value?.id &&
+          this.propertiesToSkipCache.has(node.parent.parent.value.id)
+        ) {
+          propsToSkip = this.propertiesToSkipCache.get(
+            node.parent.parent.value.id
+          ) as Set<string>;
+        } else {
+          propsToSkip = new Set(['exp']);
+        }
 
-        const nodePath = findBasePath(node);
+        const nodePath = findBasePath(node, resolver);
 
         /** If the path includes something that is supposed to be skipped, this node should be skipped too. */
         if (

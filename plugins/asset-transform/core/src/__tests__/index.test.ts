@@ -3,7 +3,12 @@ import { waitFor } from '@testing-library/react';
 import { Player } from '@player-ui/player';
 import type { Flow } from '@player-ui/types';
 import { Registry } from '@player-ui/partial-match-registry';
-import { AssetTransformPlugin } from '..';
+import {
+  AssetTransformPlugin,
+  compose,
+  composeBefore,
+  propertiesToSkipTransform,
+} from '..';
 
 const basicContentWithActions: Flow<any> = {
   id: 'test-flow',
@@ -33,6 +38,41 @@ const basicContentWithActions: Flow<any> = {
     },
   },
 };
+
+const basicFRFWithActionsAndExpressions = (asset = 'action'): Flow<any> => ({
+  id: 'test-flow',
+  views: [
+    {
+      id: 'my-view',
+      actions: [
+        {
+          asset: {
+            id: 'next-label-action',
+            type: asset,
+            value: '{{foo.bar}}',
+            example: ['{{foo.bar}} = "test"'],
+          },
+        },
+      ],
+    },
+  ],
+  data: {
+    foo: {
+      bar: '1',
+    },
+  },
+  navigation: {
+    BEGIN: 'FLOW_1',
+    FLOW_1: {
+      startState: 'VIEW_1',
+      VIEW_1: {
+        state_type: 'VIEW',
+        ref: 'my-view',
+        transitions: {},
+      },
+    },
+  },
+});
 
 const otherAction: Flow<any> = {
   ...basicContentWithActions,
@@ -96,6 +136,17 @@ registry.set({ type: 'action' }, (asset, options) => {
     },
   };
 });
+registry.set(
+  { type: 'action-2' },
+  compose((asset, options) => {
+    return {
+      ...asset,
+      run: () => {
+        options.data.model.set([['foo.bar', 'it worked!']]);
+      },
+    };
+  }, composeBefore(propertiesToSkipTransform(['example'])))
+);
 
 registry.set({ type: 'stateful-action' }, (asset, options, store) => {
   const [count, setCount] = store.useLocalState(1);
@@ -148,6 +199,32 @@ test('transforms matching assets', () => {
   const view = (player.getState() as InProgressState).controllers.view
     .currentView?.lastUpdate;
   expect(typeof view?.actions[0].asset.run).toBe('function');
+});
+
+test('transforms matching assets and does not skip string resolution', () => {
+  const player = new Player({ plugins: [new AssetTransformPlugin(registry)] });
+  player.start(basicFRFWithActionsAndExpressions());
+
+  // Should now add a run function
+  const view = (player.getState() as InProgressState).controllers.view
+    .currentView?.lastUpdate;
+
+  expect(typeof view?.actions[0].asset.run).toBe('function');
+  expect(view?.actions[0].asset.example).toStrictEqual(['1 = "test"']);
+});
+
+test('transforms matching assets and skips string resolution', () => {
+  const player = new Player({ plugins: [new AssetTransformPlugin(registry)] });
+  player.start(basicFRFWithActionsAndExpressions('action-2'));
+
+  // Should now add a run function
+  const view = (player.getState() as InProgressState).controllers.view
+    .currentView?.lastUpdate;
+
+  expect(typeof view?.actions[0].asset.run).toBe('function');
+  expect(view?.actions[0].asset.example).toStrictEqual([
+    '{{foo.bar}} = "test"',
+  ]);
 });
 
 test('uses shorthand version', () => {

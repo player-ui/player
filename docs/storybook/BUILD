@@ -6,6 +6,8 @@ data = [
     "//core/make-flow:@player-ui/make-flow",
     "//plugins/reference-assets/react:@player-ui/reference-assets-plugin-react",
     "//plugins/reference-assets/mocks:@player-ui/reference-assets-plugin-mocks",
+    "//plugins/data-change-listener/core:@player-ui/data-change-listener-plugin",
+    "//plugins/computed-properties/core:@player-ui/computed-properties-plugin",
     "//tools/storybook:@player-ui/storybook",
     "//react/player:@player-ui/react",
     "//:tsconfig.json",

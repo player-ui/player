@@ -40,6 +40,21 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
         player.hooks?.view.tap(name: pluginName, { (view) -> AnyView in
             return AnyView(view.modifier(ModifierType.init(plugin: self)))
         })
+
+        // If the state changes without our intervention
+        // we should update our state
+        player.hooks?.flowController.tap({ flowController in
+            flowController.hooks.flow.tap { flow in
+                flow.hooks.transition.tap {[weak self] old, newState in
+                    guard
+                        old?.value?.stateType == "EXTERNAL",
+                        newState.value?.stateType != "EXTERNAL"
+                    else { return }
+                    self?.isExternalState = false
+                    self?.state = nil
+                }
+            }
+        })
     }
 
     /**
@@ -54,7 +69,7 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
                 let controllers = PlayerControllers(from: options),
                 let promise = JSUtilities.createPromise(context: context, handler: { (resolve, reject) in
                     self.isExternalState = true
-                    let state = NavigationFlowExternalState(from: state)
+                    let state = NavigationFlowExternalState(state)
                     self.state = state
                     do {
                         self.content = try self.handler?(state, controllers) { transition in
