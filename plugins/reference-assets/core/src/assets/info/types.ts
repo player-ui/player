@@ -12,4 +12,7 @@ export interface InfoAsset extends Asset<'info'> {
 
   /** List of actions to show at the bottom of the page */
   actions?: Array<AssetWrapper>;
+
+  /** Primary place for info  */
+  footer?: AssetWrapper;
 }

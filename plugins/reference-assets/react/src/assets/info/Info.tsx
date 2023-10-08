@@ -65,6 +65,9 @@ export const Info = (props: InfoAsset) => {
             </ButtonGroup>
           </HStack>
         </Stack>
+        {props.footer && (
+          <ReactAsset {...props.footer} />
+        )}
       </Stack>
     </Box>
   );
