@@ -13,6 +13,8 @@ If the changes are larger (API design, architecture, etc), [opening an issue](ht
 * [yarn >= 1.22.19](https://yarnpkg.com/)
 
 * [Swift >= 5.2](https://www.swift.org/download/)
+
+#### Do not upgrade macOS to Sonoma (14.0), the minimum xcode version for Sonoma is 14. Stay on Ventura to keep xcode 14.3
 * [Xcode 14.3](https://developer.apple.com/download/all/) 
 * [Ruby >= 2.6 && <= 3.0](https://github.com/rbenv/rbenv)
 
