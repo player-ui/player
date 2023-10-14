@@ -2,6 +2,8 @@ package com.intuit.player.jvm.core.bridge
 
 import com.intuit.player.jvm.core.asset.Asset
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
+import com.intuit.player.jvm.core.bridge.serialization.encoding.DecoderContext
+import com.intuit.player.jvm.core.bridge.serialization.encoding.EmptyDecoderContext
 import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeFormat
 import com.intuit.player.jvm.core.bridge.serialization.format.serializer
 import kotlinx.serialization.DeserializationStrategy
@@ -70,10 +72,14 @@ public interface Node : Map<String, Any?> {
      * Deserializes the value corresponding to the given [key] into [T] using the the [deserializer]
      * or `null` if such a key is not present in the node or if the value is not a [Node]
      */
-    public fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>): T?
+    public fun <T> getSerializable(
+        key: String,
+        deserializer: DeserializationStrategy<T>,
+        context: DecoderContext = EmptyDecoderContext
+    ): T?
 
     /** Deserializes the backing value corresponding to the current [Node] into [T] using the [deserializer] */
-    public fun <T> deserialize(deserializer: DeserializationStrategy<T>): T
+    public fun <T> deserialize(deserializer: DeserializationStrategy<T>, context: DecoderContext = EmptyDecoderContext): T
 
     /**
      * Returns whether the backing object has been released in the context of the runtime
@@ -118,8 +124,8 @@ public inline fun <reified T> Node.getSerializable(key: String, serializer: Dese
 private inline fun <reified T> Any?.safeCast(): T? = this as? T
 
 internal object EmptyNode : Node {
-    override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>): T? = null
-    override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T = throw UnsupportedOperationException()
+    override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>, context: DecoderContext): T? = null
+    override fun <T> deserialize(deserializer: DeserializationStrategy<T>, context: DecoderContext): T = throw UnsupportedOperationException()
     override val entries: Set<Map.Entry<String, Any?>> = emptySet()
     override val keys: Set<String> = emptySet()
     override val size: Int = 0

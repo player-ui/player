@@ -1,8 +1,11 @@
 package com.intuit.player.jvm.j2v8.bridge
 
 import com.eclipsesource.v8.*
-import com.intuit.player.jvm.core.bridge.*
+import com.intuit.player.jvm.core.bridge.Invokable
+import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.NodeWrapper
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
+import com.intuit.player.jvm.core.bridge.serialization.encoding.DecoderContext
 import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeFormat
 import com.intuit.player.jvm.j2v8.extensions.*
 import com.intuit.player.jvm.j2v8.getV8Value
@@ -56,13 +59,17 @@ internal class V8Node(override val v8Object: V8Object, override val runtime: Run
         get(key) as? V8Object
     }?.toNode(format)
 
-    override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>): T? = v8Object.blockingLock {
+    override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>, context: DecoderContext): T? = v8Object.blockingLock {
         if (keys.contains(key))
-            format.decodeFromRuntimeValue(deserializer, getV8Value(key))
+            format.decodeFromRuntimeValue(deserializer, getV8Value(key), context)
         else null
     }
 
-    override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T = format.decodeFromRuntimeValue(deserializer, v8Object)
+    override fun <T> deserialize(deserializer: DeserializationStrategy<T>, context: DecoderContext): T = format.decodeFromRuntimeValue(
+        deserializer,
+        v8Object,
+        context,
+    )
 
     override fun isReleased(): Boolean = v8Object.isReleased
 

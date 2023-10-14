@@ -15,7 +15,7 @@ open class Collection(assetContext: AssetContext) : DecodableAsset<Collection.Da
     @Serializable
     data class Data(
         /** Required [values] is the collection of asset */
-        val values: List<RenderableAsset>
+        val values: List<RenderableAsset?>
     )
 
     override fun initView(): View = LinearLayout(context).apply {
@@ -25,7 +25,7 @@ open class Collection(assetContext: AssetContext) : DecodableAsset<Collection.Da
     override fun View.hydrate() {
         require(this is LinearLayout)
 
-        data.values.map {
+        data.values.filterNotNull().map {
             it.render()
         } into this
     }

@@ -1,6 +1,7 @@
 package com.intuit.player.jvm.graaljs.bridge.serialization.format
 
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
+import com.intuit.player.jvm.core.bridge.serialization.encoding.DecoderContext
 import com.intuit.player.jvm.core.bridge.serialization.format.AbstractRuntimeFormat
 import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeFormatConfiguration
 import com.intuit.player.jvm.core.bridge.serialization.format.serializer
@@ -22,7 +23,11 @@ public class GraalFormat(
     override fun <T> encodeToRuntimeValue(serializer: SerializationStrategy<T>, value: T): Value =
         writeValue(value, serializer)
 
-    override fun <T> decodeFromRuntimeValue(deserializer: DeserializationStrategy<T>, element: Value): T =
+    override fun <T> decodeFromRuntimeValue(
+        deserializer: DeserializationStrategy<T>,
+        element: Value,
+        context: DecoderContext
+    ): T =
         readValue(element, deserializer)
 
     override fun parseToRuntimeValue(string: String): Value =
@@ -38,4 +43,4 @@ internal inline fun <reified T> GraalFormat.encodeToGraalValue(value: T): Value 
     encodeToRuntimeValue(serializer(), value)
 
 internal inline fun <reified T> GraalFormat.decodeFromGraalValue(value: Value): T =
-    decodeFromRuntimeValue(serializer(), value)
+    decodeFromRuntimeValue(serializer(), value,)

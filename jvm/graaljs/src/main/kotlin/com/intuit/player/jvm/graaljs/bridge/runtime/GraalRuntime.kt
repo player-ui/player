@@ -6,6 +6,7 @@ import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeContainer
 import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeFactory
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
+import com.intuit.player.jvm.core.bridge.serialization.encoding.DecoderContext
 import com.intuit.player.jvm.core.bridge.serialization.serializers.playerSerializersModule
 import com.intuit.player.jvm.core.player.PlayerException
 import com.intuit.player.jvm.graaljs.bridge.GraalNode
@@ -99,9 +100,12 @@ internal class GraalRuntime(
     override fun containsValue(value: Any?): Boolean = backingNode.containsValue(value)
     override fun get(key: String): Any? = backingNode[key]
     override fun isEmpty(): Boolean = backingNode.isEmpty()
-    override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>): T? =
-        backingNode.getSerializable(key, deserializer)
-    override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T = backingNode.deserialize(deserializer)
+    override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>, context: DecoderContext): T? =
+        backingNode.getSerializable(key, deserializer, context)
+    override fun <T> deserialize(deserializer: DeserializationStrategy<T>, context: DecoderContext): T = backingNode.deserialize(
+        deserializer,
+        context,
+    )
     override fun isReleased(): Boolean = backingNode.isReleased()
     override fun isUndefined(): Boolean = backingNode.isUndefined()
     override fun nativeReferenceEquals(other: Any?): Boolean = backingNode.nativeReferenceEquals(other)
