@@ -30,6 +30,12 @@ CocoaPods does not directly integrate with `bazel`, when core targets are update
 ./tools/build_ios_bundles.sh
 ```
 This will query `bazel` for dependent targets, copy their output and regenerate the `.xcworkspace`.
+
+`bazel` does not process resources the same way CocoaPods does, so in order to share the same [mocks](https://github.com/player-ui/player/tree/main/plugins/reference-assets/mocks) as the other platforms, there is a [precompile script](https://github.com/player-ui/player/blob/main/PlayerUI.podspec#L84-L91) that generates a `.swift` file with the mocks. In order for this to work, `node` must be accessible in your environment. To verify this, run:
+```sh
+env node
+```
+
 ### Player
 For speed and consistency, this repo leverages `bazel` as it's main build tool. Check out the [bazel](https://bazel.build/) docs for more info.
 
