@@ -31,3 +31,33 @@ bazel mobile-install //android/demo
 If those command do not run, you can find the apk in `bazelbin/android/demo/install.runfiles/player/android/demo/demo.apk` and drag this apk onto the emulated device. This will install it. ( you may need to swipe on the device to see the application)
 
 
+
+## Troubleshooting Guide
+
+
+
+### 1. If you are seeing issues around Toolchain and sdk
+Check your SDK and NDK versions in SDK Manager in Android Studio. As well as your `ANDROID_HOME` and `ANDROID_NDK_HOME` in your bash or zsh profiles to make sure they are properly set.
+
+
+### 2. If you are seeing Errors around babel
+Make sure you have done a `bundle install`
+
+
+
+### 3. Error Message :
+```
+ ResourceProcessorBusyBox failed: error executing command bazel-out/darwin-opt-exec-2B5CBBC6/bin/external/bazel_tools/src/tools/android/java/com/google/devtools/build/android/ResourceProcessorBusyBox --tool LINK_STATIC_LIBRARY -- --aapt2 ... (remaining 17 arguments skipped)
+```
+**Possible Solution:** Check your SDK and NDK versions in SDK Manager in Android Studio. As well as your `ANDROID_HOME` and `ANDROID_NDK_HOME` in your bash or zsh profiles to make sure they are properly set.
+
+You can also do `ls $ANDROID_HOME/platforms` and make sure that there are no versions higher than 30.
+
+
+
+### 4. Mvn Error Message: 
+```
+ //jvm/j2v8:j2v8-android depends on @android_j2v8//aar:aar in repository @android_j2v8 which failed to fetch. no such package '@android_j2v8//aar': android_j2v8 requires mvn as a dependency. Please check your PATH.
+```
+Check to make sure `mvn` is installed.
+`brew install maven`
