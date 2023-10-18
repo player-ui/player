@@ -2,16 +2,16 @@ import React from 'react';
 import { Table, Head, HeadCell, Cell, Body, Row } from '@devtools-ds/table';
 import makeClass from 'clsx';
 import { useDarkMode } from 'storybook-dark-mode';
-import type { API } from '@storybook/api';
-import { useEventState } from '../../state/hooks';
+import { useSelector } from 'react-redux';
+import { Placeholder } from '@storybook/components';
 import type { EventType } from '../../state';
+import { StateType, useContentKind } from '../../redux';
+
 import styles from './events.css';
 
 interface EventsPanelProps {
   /** if the panel is shown */
   active: boolean;
-  /** storybook api */
-  api: API;
 }
 
 /** Pad the cells to give room */
@@ -63,11 +63,20 @@ const ExtraCells = (event: EventType) => {
 
 /** The panel to show events */
 export const EventsPanel = (props: EventsPanelProps) => {
-  const events = useEventState(props.api.getChannel());
+  const events = useSelector<StateType, EventType[]>((state) => state.events);
   const darkMode = useDarkMode();
+  const contentType = useContentKind();
 
   if (!props.active) {
     return null;
+  }
+
+  if (contentType === undefined) {
+    return (
+      <Placeholder>
+        This story is not configured to receive Player events.
+      </Placeholder>
+    );
   }
 
   return (

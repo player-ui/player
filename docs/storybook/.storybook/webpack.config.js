@@ -12,9 +12,12 @@ const webpackConfig = async (initialConfig) => {
       symlinks: false,
       cache: false,
       fallback: {
+        fs: false,
         util: require.resolve('util/'),
         assert: require.resolve('assert/'),
         path: require.resolve('path-browserify'),
+        stream: require.resolve("stream-browserify"),
+        constants: require.resolve("constants-browserify")
       },
     },
     plugins: [...config.plugins, new TimeFixPlugin()],

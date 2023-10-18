@@ -1,5 +1,77 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Interactions with Asset Registry parses regular flow and maps assets 1`] = `
+Object {
+  "exp": "{{count}} = {{count}} + 1",
+  "id": "action",
+  "label": Object {
+    "asset": Object {
+      "id": "action-label-composite-41",
+      "type": "composite",
+      "values": Array [
+        Object {
+          "asset": Object {
+            "id": "action-label-text-38",
+            "type": "text",
+            "value": "Clicked 0 ",
+          },
+        },
+        Object {
+          "asset": Object {
+            "id": "action-label-text-39",
+            "modifiers": Array [
+              Object {
+                "type": "tag",
+                "value": "emphasis",
+              },
+            ],
+            "type": "text",
+            "value": "times",
+          },
+        },
+      ],
+    },
+  },
+  "type": "action",
+}
+`;
+
+exports[`MarkdownPlugin parses regular flow and maps assets 1`] = `
+Object {
+  "exp": "{{count}} = {{count}} + 1",
+  "id": "action",
+  "label": Object {
+    "asset": Object {
+      "id": "action-label-composite-41",
+      "type": "composite",
+      "values": Array [
+        Object {
+          "asset": Object {
+            "id": "action-label-text-38",
+            "type": "text",
+            "value": "Clicked 0 ",
+          },
+        },
+        Object {
+          "asset": Object {
+            "id": "action-label-text-39",
+            "modifiers": Array [
+              Object {
+                "type": "tag",
+                "value": "emphasis",
+              },
+            ],
+            "type": "text",
+            "value": "times",
+          },
+        },
+      ],
+    },
+  },
+  "type": "action",
+}
+`;
+
 exports[`MarkdownPlugin parses the flow containing markdown into valid FRF, based on the given mappers 1`] = `
 Object {
   "id": "markdown-view",
