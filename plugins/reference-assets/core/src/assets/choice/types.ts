@@ -1,5 +1,6 @@
 import type { Asset, AssetWrapper, Binding, ValidationResponse } from '@player-ui/player';
 import type { BeaconDataType } from '@player-ui/beacon-plugin';
+import type { TransformedChoicesEntry } from './choices-entry'
 
 /**
  * A choice asset represents a single selection choice, often displayed as radio buttons in a web context. 
@@ -17,7 +18,7 @@ export interface ChoiceAsset<AnyTextAsset extends Asset = Asset>
   binding: Binding;
 
   /** An array of choices */
-  choices: Array<ChoicesEntry>
+  choices: Array<TransformedChoicesEntry>
 
   /** Optional additional data */
   metaData?: {
@@ -26,23 +27,12 @@ export interface ChoiceAsset<AnyTextAsset extends Asset = Asset>
   };
 }
 
-type ChoicesEntry<AnyTextAsset extends Asset = Asset> = {
-  /** Entry value to be set to binding on select */
-  value: string;
-
-  /** Description on what value is being selected */
-  label: AssetWrapper<AnyTextAsset>
-}
-
 type ValueType = string | undefined;
 
 /** A stateful instance of an action */
 export interface TransformedChoice extends ChoiceAsset {
   /** A function to commit the new value to the data-model */
   set: (choiceValue: ValueType) => void;
-
-  /** The current value of the input from the data-model */
-  value: ValueType;
 
   /** Any validation associated with the current input's value */
   validation?: ValidationResponse;
