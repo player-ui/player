@@ -16,7 +16,7 @@ const webpackConfig = async (initialConfig) => {
         util: require.resolve('util/'),
         assert: require.resolve('assert/'),
         path: require.resolve('path-browserify'),
-        stream: require.resolve("stream-browserify"),
+        stream: false,
         constants: require.resolve("constants-browserify")
       },
     },
