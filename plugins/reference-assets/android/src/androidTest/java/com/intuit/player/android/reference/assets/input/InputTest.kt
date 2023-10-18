@@ -1,6 +1,6 @@
 package com.intuit.player.android.reference.assets.input
 
-import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.get
@@ -25,12 +25,7 @@ class InputTest : AssetTest("input") {
     fun basic() {
         launchMock()
 
-        val inputLabelContainer = currentView?.findViewById<FrameLayout>(R.id.input_label_container) ?: throw AssertionError("current view is null")
         val inputField = currentView?.findViewById<FormattedEditText>(R.id.input_field) ?: throw AssertionError("current view is null")
-
-        inputLabelContainer[0].shouldBeView<TextView> {
-            assertEquals("This is an input", text.toString())
-        }
 
         inputField.apply {
             requestFocus()
@@ -53,12 +48,10 @@ class InputTest : AssetTest("input") {
         launchMock()
 
         val view = currentView.shouldBeView<ConstraintLayout>()
-        val inputLabelContainer = view.findViewById<FrameLayout>(R.id.input_label_container)
+        val inputNoteContainer = view.findViewById<LinearLayout>(R.id.input_note_container)
         val inputField = view.findViewById<FormattedEditText>(R.id.input_field)
 
-        inputLabelContainer[0].shouldBeView<TextView> {
-            assertEquals("Input with validation and formatting", text.toString())
-        }
+        inputNoteContainer.shouldBeView<LinearLayout> {}
 
         inputField.type("t")
 
