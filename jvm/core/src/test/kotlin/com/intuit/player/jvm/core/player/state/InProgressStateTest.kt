@@ -41,8 +41,6 @@ internal class InProgressStateTest : NodeBaseTest() {
         every { mockNode.getString("name") } returns ""
         every { mockNode.getObject("value") } returns mockNode
         every { mockNode.toJson() } returns JsonPrimitive("")
-        every { node.getObject(any()) } returns node
-        every { node["flow"] } returns node
         every { node.getString("ref") } returns "someRef"
         every { node.format } returns format
         every { format.serializersModule } returns EmptySerializersModule
@@ -62,7 +60,6 @@ internal class InProgressStateTest : NodeBaseTest() {
         }
         every { node.getSerializable("flow", Flow.serializer()) } returns Flow("flowId")
         every { node.getObject("dataModel") } returns mockNode
-        every { node.nativeReferenceEquals(any()) } returns true
     }
 
     @Test

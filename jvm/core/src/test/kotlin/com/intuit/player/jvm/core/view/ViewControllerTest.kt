@@ -21,10 +21,8 @@ internal class ViewControllerTest : NodeBaseTest() {
 
     @BeforeEach
     fun setUpMock() {
-        every { node.getObject(any()) } returns node
         every { node.getSerializable<Any>("hooks", any()) } returns ViewController.Hooks(hookNode)
         every { node.getSerializable<Any>("currentView", any()) } returns View(viewNode)
-        every { node.nativeReferenceEquals(any()) } returns true
     }
 
     @Test

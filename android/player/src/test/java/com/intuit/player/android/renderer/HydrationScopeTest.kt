@@ -105,16 +105,6 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
         assertFalse(completed)
     }
 
-    @Test
-    fun `test hydration scope is cancelled on player release`() {
-        val test = TestAsset(assetContext)
-        test.render(mockContext)
-        player.release()
-        assertFalse(player.flowScope!!.isActive)
-        assertFalse(test.currentHydrationScope.isActive)
-        assertFalse(completed)
-    }
-
     private fun waitForCompleted(count: Int = 5, delay: Long = 500) {
         waitForCondition(count, delay) { completed }
     }

@@ -29,15 +29,8 @@ public final class com/intuit/player/jvm/j2v8/bridge/runtime/J2V8RuntimeContaine
 }
 
 public final class com/intuit/player/jvm/j2v8/bridge/runtime/V8RuntimeKt {
-	public static final fun Runtime ()Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
-	public static final fun Runtime (Lcom/eclipsesource/v8/V8;)Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
 	public static final fun Runtime (Lcom/eclipsesource/v8/V8;Lcom/intuit/player/jvm/j2v8/bridge/runtime/J2V8RuntimeConfig;)Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
-	public static final fun Runtime (Ljava/lang/String;)Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
-	public static final fun Runtime (Ljava/lang/String;Ljava/lang/String;)Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
-	public static final fun Runtime (Ljava/lang/String;Ljava/nio/file/Path;)Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
 	public static synthetic fun Runtime$default (Lcom/eclipsesource/v8/V8;Lcom/intuit/player/jvm/j2v8/bridge/runtime/J2V8RuntimeConfig;ILjava/lang/Object;)Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
-	public static synthetic fun Runtime$default (Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
-	public static synthetic fun Runtime$default (Ljava/lang/String;Ljava/nio/file/Path;ILjava/lang/Object;)Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;
 }
 
 public final class com/intuit/player/jvm/j2v8/bridge/serialization/format/BuildersKt {

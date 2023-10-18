@@ -31,7 +31,7 @@ import java.net.URL
  *  - [JSPluginWrapper]
  *  - [PlayerPlugin]
  */
-public class HeadlessPlayer @JvmOverloads public constructor(
+public class HeadlessPlayer public constructor(
     override val plugins: List<Plugin>,
     public val runtime: Runtime<*> = runtimeFactory.create(),
     private val source: URL = bundledSource,
@@ -43,11 +43,6 @@ public class HeadlessPlayer @JvmOverloads public constructor(
         runtime: Runtime<*> = runtimeFactory.create(),
         source: URL = bundledSource
     ) : this(plugins.toList(), runtime, source)
-
-    public constructor(
-        runtime: Runtime<*>,
-        vararg plugins: Plugin,
-    ) : this(plugins.toList(), runtime)
 
     private val player: Node
 
@@ -98,8 +93,8 @@ public class HeadlessPlayer @JvmOverloads public constructor(
         }
 
     override fun release() {
+        // TODO: Call state hook!
         if (!runtime.isReleased()) {
-            hooks.state.call(HashMap(), arrayOf(ReleasedState))
             runtime.release()
         }
     }

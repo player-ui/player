@@ -5,7 +5,6 @@ import com.intuit.player.jvm.core.player.Player
 import com.intuit.player.jvm.core.player.state.CompletedState
 import com.intuit.player.jvm.core.player.state.InProgressState
 import com.intuit.player.jvm.core.player.state.PlayerFlowState
-import com.intuit.player.jvm.core.player.state.ReleasedState
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.invoke
@@ -40,7 +39,6 @@ internal class FlowScopePluginTest {
 
     private fun transitionToInProgress() = stateTap.invoke(inProgressState)
     private fun transitionToEnd() = stateTap.invoke(completedState)
-    private fun transitionToReleased() = stateTap.invoke(ReleasedState)
 
     @Test fun testNewScope() {
         assertNull(flowScopePlugin.flowScope)
@@ -49,21 +47,12 @@ internal class FlowScopePluginTest {
         assertTrue(flowScopePlugin.flowScope!!.isActive)
     }
 
-    @Test fun testScopeCancelledOnEnd() {
+    @Test fun testScopeCancelled() {
         assertNull(flowScopePlugin.flowScope)
         transitionToInProgress()
         assertNotNull(flowScopePlugin.flowScope)
         assertTrue(flowScopePlugin.flowScope!!.isActive)
         transitionToEnd()
-        assertFalse(flowScopePlugin.flowScope!!.isActive)
-    }
-
-    @Test fun testScopeCancelledOnReleased() {
-        assertNull(flowScopePlugin.flowScope)
-        transitionToInProgress()
-        assertNotNull(flowScopePlugin.flowScope)
-        assertTrue(flowScopePlugin.flowScope!!.isActive)
-        transitionToReleased()
         assertFalse(flowScopePlugin.flowScope!!.isActive)
     }
 

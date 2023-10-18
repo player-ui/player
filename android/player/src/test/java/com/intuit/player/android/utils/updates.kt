@@ -29,12 +29,12 @@ internal fun AndroidPlayer.updates(flow: JsonElement, take: Int = 1) = updates(f
 internal fun AndroidPlayer.updates(flow: String, take: Int = 1): Flow<Update> = callbackFlow {
     var count = 0
     onUpdate { asset, _ ->
-        trySend(Update.Asset(asset, count)).isSuccess
+        offer(Update.Asset(asset, count))
         if (++count >= take) close()
     }
 
     hooks.state.tap { state ->
-        trySend(Update.State(state ?: ErrorState.from("state was null"))).isSuccess
+        offer(Update.State(state ?: ErrorState.from("state was null")))
     }
 
     start(flow).onComplete {

@@ -3,7 +3,6 @@ package com.intuit.player.android
 import android.content.Context
 import android.view.View
 import com.intuit.hooks.HookContext
-import com.intuit.hooks.SyncHook
 import com.intuit.hooks.SyncWaterfallHook
 import com.intuit.player.android.asset.RenderableAsset
 import com.intuit.player.android.extensions.Styles
@@ -19,7 +18,6 @@ import com.intuit.player.jvm.core.logger.TapableLogger
 import com.intuit.player.jvm.core.player.*
 import com.intuit.player.jvm.core.player.state.CompletedState
 import com.intuit.player.jvm.core.player.state.PlayerFlowState
-import com.intuit.player.jvm.core.player.state.inProgressState
 import com.intuit.player.jvm.core.plugins.LoggerPlugin
 import com.intuit.player.jvm.core.plugins.Plugin
 import com.intuit.player.jvm.core.plugins.findPlugin
@@ -28,6 +26,7 @@ import com.intuit.player.plugins.coroutines.FlowScopePlugin
 import com.intuit.player.plugins.pubsub.PubSubPlugin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
+import kotlinx.serialization.modules.plus
 import kotlin.reflect.KClass
 
 /**
@@ -88,22 +87,7 @@ public class AndroidPlayer private constructor(
                 { f, hookCtx -> f(hookCtx, context) }
             )
         }
-
-        internal class RecycleHook : SyncHook<(HookContext) -> Unit>() {
-            public fun call(): Unit = super.call { f, context ->
-                f(context)
-            }
-        }
-
-        internal class ReleaseHook : SyncHook<(HookContext) -> Unit>() {
-            public fun call(): Unit = super.call { f, context ->
-                f(context)
-            }
-        }
-
         public val context: ContextHook = ContextHook()
-        internal val recycle: RecycleHook = RecycleHook()
-        internal val release: ReleaseHook = ReleaseHook()
     }
 
     override val hooks: Hooks = Hooks(player.hooks)
@@ -155,12 +139,7 @@ public class AndroidPlayer private constructor(
                 transition.value = true
                 clearCaches()
                 view?.hooks?.onUpdate?.tap { asset ->
-                    try {
-                        assetHandler(expandAsset(asset), transition.value)
-                    } catch (exception: Exception) {
-                        logger.error("Error while expanding ${asset?.id}", exception)
-                        inProgressState?.fail(PlayerException("Error while expanding ${asset?.id}", exception))
-                    }
+                    assetHandler(expandAsset(asset), transition.value)
                 }
             }
         }
@@ -228,18 +207,13 @@ public class AndroidPlayer private constructor(
      * prevent a leak.
      */
     public fun recycle() {
-        // TODO: Remove this check by enhancing TapableLogger to out-last Player lifecycle to use default
-        if (!player.runtime.isReleased()) logger.debug("AndroidPlayer: recycling player")
         clearCaches()
-        hooks.recycle.call()
+        // TODO: Allow [AndroidPlayerPlugins] the chance to "recycle" too
     }
 
     override fun release() {
-        // TODO: Remove this check by enhancing TapableLogger to out-last Player lifecycle to use default
-        if (!player.runtime.isReleased()) player.logger.debug("AndroidPlayer: releasing player")
         clearCaches()
         player.release()
-        hooks.release.call()
     }
 
     /**

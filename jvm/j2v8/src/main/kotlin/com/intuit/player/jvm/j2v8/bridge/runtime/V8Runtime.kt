@@ -24,21 +24,9 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.plus
-import java.nio.file.Path
-import kotlin.io.path.createTempDirectory
-import kotlin.io.path.pathString
 
-@JvmOverloads
 public fun Runtime(runtime: V8, config: J2V8RuntimeConfig = J2V8RuntimeConfig(runtime)): Runtime<V8Value> =
     V8Runtime(config)
-
-public fun Runtime(globalAlias: String? = null, tempDir: Path? = null): Runtime<V8Value> =
-    Runtime(V8.createV8Runtime(globalAlias, tempDir?.pathString).unlock())
-
-// TODO: Do a better job of exposing runtime args as Config params to limit the need for these
-@JvmOverloads
-public fun Runtime(globalAlias: String? = null, tempDirPrefix: String? = null): Runtime<V8Value> =
-    Runtime(globalAlias, tempDirPrefix?.let(::createTempDirectory))
 
 internal class V8Runtime(private val config: J2V8RuntimeConfig) : Runtime<V8Value> {
 

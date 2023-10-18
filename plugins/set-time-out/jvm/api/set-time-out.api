@@ -1,7 +1,5 @@
-public final class com/intuit/player/plugins/settimeout/SetTimeoutPlugin : com/intuit/player/jvm/core/plugins/PlayerPlugin, com/intuit/player/jvm/core/plugins/RuntimePlugin {
-public fun <init> ()V
-public fun <init> (Lkotlinx/coroutines/CoroutineExceptionHandler;)V
-public synthetic fun <init> (Lkotlinx/coroutines/CoroutineExceptionHandler;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-public fun apply (Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;)V
-public fun apply (Lcom/intuit/player/jvm/core/player/Player;)V
+public final class com/intuit/player/plugins/settimeout/SetTimeoutPlugin : com/intuit/player/jvm/core/plugins/RuntimePlugin {
+	public fun <init> ()V
+	public fun apply (Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;)V
 }
+
