@@ -12,7 +12,6 @@ import {
 
 /** The info view type is used to show information to the user */
 export const Info = (props: InfoAssetTransform) => {
-
   return (
     <Box minW={{ base: undefined, md: 'md' }}>
       <Stack gap="10">
