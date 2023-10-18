@@ -11,12 +11,11 @@ export const choiceTransform: TransformFunction<ChoiceAsset, TransformedChoice> 
 ) => {
   return {
     ...asset,
-    choices: asset.choices.map(choicesEntryTransform),
     set(val) {
       if (asset.binding === undefined) {
         return;
       }
-      this.choices.forEach(entry => {
+      this.transformedChoices.forEach(entry => {
         if (entry.value === val) {
           entry.set(true);
         } else if (entry.selected) {
@@ -28,6 +27,7 @@ export const choiceTransform: TransformFunction<ChoiceAsset, TransformedChoice> 
     validation:
       asset.binding === undefined
         ? undefined
-        : options.validation?.get(asset.binding, { track: true })
+        : options.validation?.get(asset.binding, { track: true }),
+    transformedChoices: asset.choices.map(choicesEntryTransform)
   };
 };
