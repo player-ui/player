@@ -9,19 +9,11 @@ workspace(
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
-# http_archive(
-#   name = "rules_player",
-#   strip_prefix = "rules_player-0.10.2",
-#   urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.10.2.tar.gz"],
-#   sha256 = "5cffcc80eafc2dc0522a4e397bba5b6261ccbad3e399fa843bc452fc113357ab"
-# )
-
-git_repository(
-    name = "rules_player",
-    # branch = "rules_ios_update",
-    commit = "fa077a3d79841ceeb276969a849f4c38cd8ebf9f", 
-    shallow_since = "1697658728 -0700",
-    remote = "https://github.com/player-ui/rules_player.git"
+http_archive(
+  name = "rules_player",
+  strip_prefix = "rules_player-0.10.3",
+  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.10.3.tar.gz"],
+  sha256 = "a21d0fc7428e124bdc5a068ae68e0625a13f8238e685965268b5ed46f4de23fe"
 )
 
 load("@rules_player//:workspace.bzl", "deps")
