@@ -14,6 +14,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <LinearLayout
+            android:id="@+id/input_note_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp" />
+
     <com.intuit.player.android.reference.assets.input.FormattedEditText
         android:id="@+id/input_field"
         android:layout_width="match_parent"
