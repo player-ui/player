@@ -777,7 +777,7 @@ static let inputBasic: String = """
       },
       "note": {
         "asset": {
-          "id": "input-1-note",
+          "id": "input-note",
           "type": "text",
           "value": "This is a note"
         }
