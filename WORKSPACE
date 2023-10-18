@@ -18,7 +18,9 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(
     name = "rules_player",
-    branch = "rules_ios_update",
+    # branch = "rules_ios_update",
+    commit = "fa077a3d79841ceeb276969a849f4c38cd8ebf9f", 
+    shallow_since = "1697658728 -0700",
     remote = "https://github.com/player-ui/rules_player.git"
 )
 
