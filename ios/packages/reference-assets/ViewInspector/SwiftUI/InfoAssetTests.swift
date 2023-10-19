@@ -79,7 +79,7 @@ class InfoAssetTests: SwiftUIAssetUnitTestCase {
 
         let stack = try view.inspect().vStack()
 
-        XCTAssertEqual(stack.count, 4)
+        XCTAssertEqual(stack.count, 5)
 
         let forEach = try stack.forEach(3)
 
