@@ -5,7 +5,8 @@ import { useDarkMode } from 'storybook-dark-mode';
 import { useSelector } from 'react-redux';
 import { Placeholder } from '@storybook/components';
 import type { EventType } from '../../state';
-import { StateType, useContentKind } from '../../redux';
+import type { StateType } from '../../redux';
+import { useContentKind } from '../../redux';
 
 import styles from './events.css';
 
