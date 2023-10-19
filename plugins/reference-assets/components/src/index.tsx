@@ -11,6 +11,7 @@ import type {
   CollectionAsset,
   InfoAsset,
   InputAsset,
+  ChoiceAsset
 } from '@player-ui/reference-assets-plugin';
 
 export const Text = (
@@ -51,8 +52,10 @@ export const LabelSlot = slotFactory('label');
 export const ValueSlot = slotFactory('value');
 export const TitleSlot = slotFactory('title');
 export const SubtitleSlot = slotFactory('subtitle');
+export const NoteSlot = slotFactory('note');
 export const ActionsSlot = slotFactory('actions', true);
 export const PrimaryInfoSlot = slotFactory('primaryInfo');
+export const ChoicesSlot = slotFactory('choices', true);
 
 Collection.Values = createSlot({
   name: 'values',
@@ -94,3 +97,22 @@ Info.Title = TitleSlot;
 Info.Subtitle = SubtitleSlot;
 Info.PrimaryInfo = PrimaryInfoSlot;
 Info.Actions = ActionsSlot;
+
+export const Choice = (
+  props: Omit<AssetPropsWithChildren<ChoiceAsset>, 'binding'> & {
+    /** The binding */
+    binding: BindingTemplateInstance;
+  }
+) => {
+  const { binding, children, ...rest } = props;
+  return (
+    <Asset type="choice" {...rest}>
+      <property name="binding">{binding.toValue()}</property>
+      {children}
+    </Asset>
+  );
+};
+
+Choice.Title = TitleSlot;
+Choice.Note = NoteSlot;
+Choice.Choices = ChoicesSlot;

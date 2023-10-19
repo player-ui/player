@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, binding as b } from '@player-tools/dsl';
-import { Text, Action, Info, Collection, Input } from '.';
+import { Text, Action, Info, Collection, Input, Choice, ChoicesEntry } from '.';
 
 describe('JSON serialization', () => {
   describe('text', () => {
@@ -157,6 +157,132 @@ describe('JSON serialization', () => {
             },
           },
         ],
+      });
+    });
+  });
+
+  describe('choice', () => {
+    it('works for title and choices', async () => {
+      expect(
+        (await render
+          (
+            <Choice id="choice-root" binding={b`foo.bar`}>
+              <Choice.Title>title</Choice.Title>
+              <Choice.Choices>
+                <ChoicesEntry id="choice-option-1">
+                  <ChoicesEntry.Label id="choice-option-1-label" value="choice 1">
+                    choice 1
+                  </ChoicesEntry.Label>
+                </ChoicesEntry>
+                <ChoicesEntry id="choice-option-2">
+                  <ChoicesEntry.Label id="choice-option-2-label" value="choice 2">
+                    choice 2
+                  </ChoicesEntry.Label>
+                </ChoicesEntry>
+              </Choice.Choices>
+            </Choice>
+          )
+        ).jsonValue
+      ).toStrictEqual({
+        id: 'choice-root',
+        type: 'choice',
+        title: {
+          asset: {
+            id: 'choice-view-title',
+            type: 'text',
+            value: 'title',
+          },
+        },
+        choices: [
+          {
+            "id": "choice-option-1",
+            "label": {
+              "asset": {
+                "id": "choice-option-1-label",
+                "type": "text",
+                "value": "choice 1"
+              }
+            },
+            "value": "choice 1"
+          },
+          {
+            "id": "choice-option-2",
+            "label": {
+              "asset": {
+                "id": "choice-option-2-label",
+                "type": "text",
+                "value": "choice 2"
+              }
+            },
+            "value": "choice 2"
+          }
+        ]
+      });
+    });
+
+    it('works with a note', async () => {
+      expect(
+        (await render
+          (
+            <Choice id="choice-root" binding={b`foo.bar`}>
+              <Choice.Title>title</Choice.Title>
+              <Choice.Note>note</Choice.Note>
+              <Choice.Choices>
+                <ChoicesEntry id="choice-option-1">
+                  <ChoicesEntry.Label id="choice-option-1-label" value="choice 1">
+                    choice 1
+                  </ChoicesEntry.Label>
+                </ChoicesEntry>
+                <ChoicesEntry id="choice-option-2">
+                  <ChoicesEntry.Label id="choice-option-2-label" value="choice 2">
+                    choice 2
+                  </ChoicesEntry.Label>
+                </ChoicesEntry>
+              </Choice.Choices>
+            </Choice>
+          )
+        ).jsonValue
+      ).toStrictEqual({
+        id: 'choice-root',
+        type: 'choice',
+        title: {
+          asset: {
+            id: 'choice-view-title',
+            type: 'text',
+            value: 'title',
+          },
+        },
+        note: {
+          asset: {
+            id: 'choice-view-note',
+            type: 'text',
+            value: 'note',
+          },
+        },
+        choices: [
+          {
+            "id": "choice-option-1",
+            "label": {
+              "asset": {
+                "id": "choice-option-1-label",
+                "type": "text",
+                "value": "choice 1"
+              }
+            },
+            "value": "choice 1"
+          },
+          {
+            "id": "choice-option-2",
+            "label": {
+              "asset": {
+                "id": "choice-option-2-label",
+                "type": "text",
+                "value": "choice 2"
+              }
+            },
+            "value": "choice 2"
+          }
+        ]
       });
     });
   });
