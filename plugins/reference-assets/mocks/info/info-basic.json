@@ -8,6 +8,13 @@
       "value": "View Title"
     }
   },
+  "footer": {
+    "asset": {
+      "id": "info-footer",
+      "type": "text",
+      "value": "View Footer"
+    }
+  },
   "actions": [
     {
       "asset": {

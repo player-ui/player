@@ -11,6 +11,13 @@
           "value": "View 1"
         }
       },
+      "footer": {
+        "asset": {
+          "id": "view-footer",
+          "type": "text",
+          "value": "View Footer"
+        }
+      },
       "actions": [
         {
           "asset": {
@@ -36,6 +43,13 @@
           "id": "view-title",
           "type": "text",
           "value": "View 2"
+        }
+      },
+      "footer": {
+        "asset": {
+          "id": "view-2-footer",
+          "type": "text",
+          "value": "View Footer 2"
         }
       },
       "actions": [
@@ -77,6 +91,13 @@
           "id": "view-3-title",
           "type": "text",
           "value": "View 3"
+        }
+      },
+      "footer": {
+        "asset": {
+          "id": "view-3-footer",
+          "type": "text",
+          "value": "View Footer 3"
         }
       },
       "actions": [
