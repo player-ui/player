@@ -1,0 +1,19 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs';
+import { Image } from '@player-ui/reference-assets-plugin-react';
+import { PlayerStory } from '@player-ui/storybook';
+import { StoryWrapper } from '../components';
+import imageFlow from '@player-ui/reference-assets-plugin-mocks/image/image-basic.json';
+
+<Meta title="Reference Assets/Image" component={Info} />
+
+# Info View
+
+The Info view is an example of a top level asset that encomposes a form that a user might see
+
+<Canvas>
+  <Story name="Image">
+    <StoryWrapper>
+      <PlayerStory flow={imageFlow} />
+    </StoryWrapper>
+  </Story>
+</Canvas>

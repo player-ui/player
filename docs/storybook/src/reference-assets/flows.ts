@@ -311,3 +311,11 @@ export const infoFlow = makeFlow({
     },
   ],
 });
+
+export const imageFlow = makeFlow({
+  id: 'image-1',
+  type: 'image',
+  metaData: {
+    ref: 'https://player-ui.github.io/latest/logo/logo-dark-large.png',
+  },
+});
