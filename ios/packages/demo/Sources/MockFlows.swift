@@ -774,6 +774,13 @@ static let inputBasic: String = """
           "type": "text",
           "value": "This is an input"
         }
+      },
+      "note": {
+        "asset": {
+          "id": "input-note",
+          "type": "text",
+          "value": "This is a note"
+        }
       }
     }
   ],
