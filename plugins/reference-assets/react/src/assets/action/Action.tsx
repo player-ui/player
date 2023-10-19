@@ -19,7 +19,7 @@ export const Action = (props: TransformedAction) => {
         variant={isBackAction(props) ? 'ghost' : 'solid'}
         {...buttonProps}
       >
-        {isBackAction(props) && <ChevronLeftIcon />}
+        {props?.metaData?.role && <ChevronLeftIcon />}
         {label && (
           <Text>
             <ReactAsset {...label} />
