@@ -17,15 +17,15 @@ export interface InfoAsset extends Asset<'info'> {
 
 export interface InfoAssetTransform extends InfoAsset {
   /**
-   *
+   * This is an array of next and prev actions
    */
   segmentedActions?: {
     /**
-     *
+     * Array of next actions
      */
     next: Array<AssetWrapper<ActionAsset>>;
     /**
-     *
+     * Array of prev actions
      */
     prev: Array<AssetWrapper<ActionAsset>>;
   };
