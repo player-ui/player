@@ -38,8 +38,8 @@ struct InfoAssetView: View {
     @ViewBuilder
     var body: some View {
         VStack {
-            model.data.title?.asset?.view.font(.title)
-            model.data.subTitle?.asset?.view.font(.subheadline)
+            model.data.title?.asset?.view.font(.title).padding(.bottom, 40)
+            model.data.subTitle?.asset?.view.font(.subheadline).padding(.bottom, 40)
             model.data.primaryInfo?.asset?.view
             if let actions = model.data.actions?.compactMap { $0.asset } {
                 ForEach(actions) { action in
