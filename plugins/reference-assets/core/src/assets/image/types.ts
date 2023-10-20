@@ -8,7 +8,7 @@ export interface ImageAsset extends Asset<'image'> {
   placeholder?: string;
 
   /** Optional caption */
-  caption?: Asset;
+  caption?: Asset<'text'>;
 }
 
 /** A modifier to turn the text into a link */
@@ -18,4 +18,9 @@ export interface ImageMetaData {
 
   /** Used for accessibility support */
   accessibility?: string;
+}
+
+export interface TransformedImage extends ImageAsset {
+  /** Alt text */
+  altText: string;
 }

@@ -1,0 +1,14 @@
+{
+  "id": "image-1",
+  "type": "image",
+  "metaData": {
+    "ref": "https://player-ui.github.io/latest/logo/logo-dark-large.png"
+  },
+  "caption": {
+    "asset": {
+      "id": "image-caption",
+      "type": "text",
+      "value": "Image caption"
+    }
+  }
+}
