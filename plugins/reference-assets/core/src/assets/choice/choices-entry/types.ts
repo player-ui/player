@@ -14,7 +14,7 @@ export type ChoicesEntry = {
 /** A stateful instance of an action */
 export interface TransformedChoicesEntry extends ChoicesEntry {
   /** A function to commit the new value to the data-model */
-  set: (selected: boolean) => void;
+  select: () => void;
 
   /** Set to true when current choice is selected */
   selected: boolean;

@@ -31,12 +31,6 @@ type ValueType = string | undefined;
 
 /** A stateful instance of an action */
 export interface TransformedChoice extends ChoiceAsset {
-  /** A function to commit the new value to the data-model */
-  set: (choiceValue: ValueType) => void;
-
   /** Any validation associated with the current input's value */
   validation?: ValidationResponse;
-
-  /** Transformed choices entries */
-  transformedChoices: Array<TransformedChoicesEntry>;
 }

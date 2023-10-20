@@ -116,3 +116,9 @@ export const Choice = (
 Choice.Title = TitleSlot;
 Choice.Note = NoteSlot;
 Choice.Choices = ChoicesSlot;
+
+export const ChoicesEntry = (
+
+) => {
+  
+}
