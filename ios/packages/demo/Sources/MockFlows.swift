@@ -960,9 +960,6 @@ static let textWithLink: String = """
         (title: "collection", flows: [
             (name: "basic", flow: MockFlows.collectionBasic)
         ]),
-        (title: "image", flows: [
-            (name: "basic", flow: MockFlows.imageBasic)
-        ]),
         (title: "info", flows: [
             (name: "dynamic flow", flow: MockFlows.infoDynamicFlow),
             (name: "basic", flow: MockFlows.infoBasic),
