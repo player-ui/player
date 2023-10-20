@@ -23,7 +23,7 @@ export const imageTransform: TransformFunction<ImageAsset, TransformedImage> = (
 ) => {
   const altText = getImageAlt(props);
 
-  let newImage = {
+  const newImage = {
     ...props,
     altText,
   };
