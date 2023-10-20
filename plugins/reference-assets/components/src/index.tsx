@@ -4,14 +4,15 @@ import type {
   BindingTemplateInstance,
 } from '@player-tools/dsl';
 import { createSlot, Asset } from '@player-tools/dsl';
-import type { Asset as AssetType } from '@player-ui/player';
+import type { Asset as AssetType, AssetWrapper } from '@player-ui/player';
 import type {
   ActionAsset,
   TextAsset,
   CollectionAsset,
   InfoAsset,
   InputAsset,
-  ChoiceAsset
+  ChoiceAsset,
+  ChoicesEntry as ChoicesEntryNotAsset
 } from '@player-ui/reference-assets-plugin';
 
 export const Text = (
@@ -39,13 +40,13 @@ const CollectionComp = (props: AssetPropsWithChildren<AssetType>) => {
 };
 
 /** A utility for quickly creating named slots using the text and collection factories */
-const slotFactory = (name: string, isArray = false) =>
+const slotFactory = (name: string, isArray = false, wrapInAsset = true) =>
   createSlot({
     name,
     TextComp: Text,
     CollectionComp,
     isArray,
-    wrapInAsset: true,
+    wrapInAsset: wrapInAsset,
   });
 
 export const LabelSlot = slotFactory('label');
@@ -55,7 +56,7 @@ export const SubtitleSlot = slotFactory('subtitle');
 export const NoteSlot = slotFactory('note');
 export const ActionsSlot = slotFactory('actions', true);
 export const PrimaryInfoSlot = slotFactory('primaryInfo');
-export const ChoicesSlot = slotFactory('choices', true);
+export const ChoicesSlot = slotFactory('', true, false);
 
 Collection.Values = createSlot({
   name: 'values',
@@ -117,8 +118,19 @@ Choice.Title = TitleSlot;
 Choice.Note = NoteSlot;
 Choice.Choices = ChoicesSlot;
 
-export const ChoicesEntry = (
 
+export const ChoicesEntry = (
+  props: Omit<ChoicesEntryNotAsset, 'value'> & {
+    value: string;
+  }
 ) => {
-  
-}
+  const { value, children, ...rest } = props;
+  return (
+    <Asset type="choicesEntry" {...rest}>
+      <property name="value">{value}</property>
+      {children}
+    </Asset>
+  );
+};
+
+ChoicesEntry.Label = LabelSlot;
