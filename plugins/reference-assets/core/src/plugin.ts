@@ -1,6 +1,6 @@
 import type { Player, PlayerPlugin } from '@player-ui/player';
 import { AssetTransformPlugin } from '@player-ui/asset-transform-plugin';
-import { inputTransform, actionTransform, imageTransform } from './assets';
+import { inputTransform, actionTransform, imageTransform, infoTransform } from './assets';
 
 /**
  * A plugin to add transforms for the reference assets
@@ -14,6 +14,7 @@ export class ReferenceAssetsPlugin implements PlayerPlugin {
         [{ type: 'action' }, actionTransform],
         [{ type: 'input' }, inputTransform],
         [{ type: 'image' }, imageTransform],
+        [{ type: 'info' }, infoTransform],
       ])
     );
   }
