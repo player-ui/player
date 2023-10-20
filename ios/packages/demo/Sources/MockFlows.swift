@@ -307,38 +307,6 @@ static let collectionBasic: String = """
   }
 }
 """
-static let imageBasic: String = """
-{
-  "id": "generated-flow",
-  "views": [
-    {
-      "id": "image-1",
-      "type": "image",
-      "metaData": {
-        "ref": "https://player-ui.github.io/latest/logo/logo-light-large.png"
-      }
-    }
-  ],
-  "data": {},
-  "navigation": {
-    "BEGIN": "FLOW_1",
-    "FLOW_1": {
-      "startState": "VIEW_1",
-      "VIEW_1": {
-        "state_type": "VIEW",
-        "ref": "image-1",
-        "transitions": {
-          "*": "END_Done"
-        }
-      },
-      "END_Done": {
-        "state_type": "END",
-        "outcome": "done"
-      }
-    }
-  }
-}
-"""
 static let infoDynamicFlow: String = """
 {
   "id": "modal-flow",
