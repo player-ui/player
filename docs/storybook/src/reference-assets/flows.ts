@@ -340,8 +340,9 @@ export const imageAccessibilityFlow = makeFlow({
   type: 'image',
   metaData: {
     ref: 'https://player-ui.github.io/latest/logo/logo-light-large.png',
-    accessibility: 'This is an image',
+    accessibility: 'This is accessibility text for an image',
   },
+  placeholder: 'This is placeholder text for an image',
 });
 
 export const imagePlaceholderFlow = makeFlow({
@@ -350,5 +351,5 @@ export const imagePlaceholderFlow = makeFlow({
   metaData: {
     ref: 'https://player-ui.github.io/latest/logo/logo-light-large.png',
   },
-  placeholder: 'This is an image',
+  placeholder: 'This is placeholder text for an image',
 });

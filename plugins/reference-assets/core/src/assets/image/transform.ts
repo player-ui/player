@@ -7,25 +7,20 @@ import type { ImageAsset, TransformedImage } from './types';
  * @returns The alt text for the image asset
  */
 const getImageAlt = (props: ImageAsset): string => {
-  const { metaData, placeholder, caption } = props;
+  const { metaData, placeholder } = props;
   if (metaData.accessibility) return metaData.accessibility;
 
   if (placeholder) return placeholder;
 
-  if (caption) {
-    if (typeof caption === 'string') return caption;
-
-    return caption.value;
-  }
-
-  return '';
+  return 'Image';
 };
 
 /**
  * Sets the Image's placeholder and accessibilty
  */
-const transform: TransformFunction<ImageAsset, TransformedImage> = (props) => {
-  const { metaData, placeholder, caption } = props;
+export const imageTransform: TransformFunction<ImageAsset, TransformedImage> = (
+  props
+) => {
   const altText = getImageAlt(props);
 
   let newImage = {
@@ -35,5 +30,3 @@ const transform: TransformFunction<ImageAsset, TransformedImage> = (props) => {
 
   return newImage;
 };
-
-export default transform;

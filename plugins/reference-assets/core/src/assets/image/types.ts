@@ -8,7 +8,7 @@ export interface ImageAsset extends Asset<'image'> {
   placeholder?: string;
 
   /** Optional caption */
-  caption?: Asset<'text'>;
+  caption?: Asset;
 }
 
 /** A modifier to turn the text into a link */
