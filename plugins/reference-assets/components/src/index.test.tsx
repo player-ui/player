@@ -169,12 +169,12 @@ describe('JSON serialization', () => {
             <Choice id="choice-root" binding={b`foo.bar`}>
               <Choice.Title>title</Choice.Title>
               <Choice.Choices>
-                <ChoicesEntry id="choice-option-1" value="choice 1">
+                <ChoicesEntry value="choice 1">
                   <ChoicesEntry.Label>
                     choice 1
                   </ChoicesEntry.Label>
                 </ChoicesEntry>
-                <ChoicesEntry id="choice-option-2" value="choice 2">
+                <ChoicesEntry value="choice 2">
                   <ChoicesEntry.Label>
                     choice 2
                   </ChoicesEntry.Label>

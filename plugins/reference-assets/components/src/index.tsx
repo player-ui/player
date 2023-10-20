@@ -120,15 +120,16 @@ Choice.Choices = ChoicesSlot;
 
 
 export const ChoicesEntry = (
-  props: Omit<ChoicesEntryNotAsset, 'value'> & {
+  props: Omit<ChoicesEntryNotAsset, 'value'|'label'> & {
     value: string;
+    label: AssetWrapper<AssetType>;
   }
 ) => {
-  const { value, children, ...rest } = props;
+  const { value, label } = props;
   return (
-    <Asset type="choicesEntry" {...rest}>
+    <Asset type="choicesEntry">
       <property name="value">{value}</property>
-      {children}
+      {label}
     </Asset>
   );
 };
