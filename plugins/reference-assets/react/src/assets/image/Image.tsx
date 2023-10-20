@@ -5,10 +5,10 @@ import type { TransformedImage } from '@player-ui/reference-assets-plugin';
 export const Image = (props: TransformedImage) => {
   const { metaData, caption, altText } = props;
   return (
-    <figure>
-      <img src={metaData.ref} alt={altText} />
+    <figure className="figure">
+      <img className="figure-img img-fluid" src={metaData.ref} alt={altText} />
       {caption && (
-        <figcaption>
+        <figcaption className="figure-caption" style={{ marginTop: 15 }}>
           <ReactAsset {...caption} />
         </figcaption>
       )}

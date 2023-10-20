@@ -315,7 +315,7 @@ static let imageBasic: String = """
       "id": "image-1",
       "type": "image",
       "metaData": {
-        "ref": "https://player-ui.github.io/latest/logo/logo-dark-large.png"
+        "ref": "https://player-ui.github.io/latest/logo/logo-light-large.png"
       }
     }
   ],
