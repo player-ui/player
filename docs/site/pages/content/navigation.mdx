@@ -8,11 +8,15 @@ The `navigation` section of the content describes the path the user goes through
 
 The navigation object contains a `BEGIN` property that contains a reference to a flow to start Player with. Once an end state is reached for that flow, Player will end its processing and return that outcome.
 
+![Flow state machine](/public/flow-state-machine.png)
+
 ## Flows
 
 Flows are a state machine with 1 start state and at least 1 end state. The nodes are processed in order until an end state is reached. The flow that initiated Player (the `BEGIN` reference) will be executed until its `END` state is reached.
 
 Flows can also contain an `onStart` or `onEnd` property which is an expression that will be evaluated before processing of the first start state takes place, or just prior to ending the flow.
+
+
 
 ## Navigation State Types
 
