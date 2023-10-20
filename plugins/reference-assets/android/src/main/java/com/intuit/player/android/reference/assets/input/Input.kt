@@ -98,7 +98,7 @@ class Input(assetContext: AssetContext) : DecodableAsset<Input.Data>(assetContex
             if (hasFocus()) onFocusChangeListener.onFocusChange(this, true)
         }
 
-        data.note?.render(Text.Styles.Note) into findViewById(R.id.input_label_container)
+        data.note?.render(Text.Styles.Note) into findViewById(R.id.input_note_container)
     }
 
     /** Helper to conditionally mask sensitive data under the right conditions */
