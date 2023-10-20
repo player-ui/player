@@ -307,6 +307,65 @@ static let collectionBasic: String = """
   }
 }
 """
+static let infoFooter: String = """
+{
+  "id": "generated-flow",
+  "views": [
+    {
+      "id": "info-view",
+      "type": "info",
+      "title": {
+        "asset": {
+          "id": "info-title",
+          "type": "text",
+          "value": "View Title"
+        }
+      },
+      "actions": [
+        {
+          "asset": {
+            "id": "next-action",
+            "value": "Next",
+            "type": "action",
+            "label": {
+              "asset": {
+                "id": "next-action-label",
+                "type": "text",
+                "value": "Continue"
+              }
+            }
+          }
+        }
+      ],
+      "footer": {
+        "asset": {
+          "id": "info-footer",
+          "type": "text",
+          "value": "Footer text"
+        }
+      }
+    }
+  ],
+  "data": {},
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "info-view",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+"""
 static let infoDynamicFlow: String = """
 {
   "id": "modal-flow",
@@ -968,6 +1027,7 @@ static let textWithLink: String = """
             (name: "basic", flow: MockFlows.collectionBasic)
         ]),
         (title: "info", flows: [
+            (name: "footer", flow: MockFlows.infoFooter),
             (name: "dynamic flow", flow: MockFlows.infoDynamicFlow),
             (name: "basic", flow: MockFlows.infoBasic),
             (name: "modal flow", flow: MockFlows.infoModalFlow)

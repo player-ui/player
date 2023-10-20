@@ -16,6 +16,8 @@ struct InfoData: AssetData {
     var primaryInfo: WrappedAsset?
     /// Assets to use as actions in this asset
     var actions: [WrappedAsset]?
+    /// An asset to use as a footer for this asset
+    var footer: WrappedAsset?
 }
 
 /**
@@ -44,6 +46,7 @@ struct InfoAssetView: View {
                     action.view
                 }
             }
+            model.data.footer?.asset?.view.font(.subheadline).padding(.top, 12)
         }
         .accessibilityElement(children: .contain)
         .accessibility(identifier: model.data.id)
