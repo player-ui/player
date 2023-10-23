@@ -28,6 +28,8 @@ class Input(assetContext: AssetContext) : DecodableAsset<Input.Data>(assetContex
         /** Optional [label] that gives some semantic meaning to the field asset */
         val label: RenderableAsset? = null,
 
+        val note: RenderableAsset? = null,
+
         /** The current value of the input from the data-model */
         val value: String? = null,
 
@@ -95,6 +97,8 @@ class Input(assetContext: AssetContext) : DecodableAsset<Input.Data>(assetContex
             // need to refresh registered pending transaction if we have focus
             if (hasFocus()) onFocusChangeListener.onFocusChange(this, true)
         }
+
+        data.note?.render(Text.Styles.Note) into findViewById(R.id.input_note_container)
     }
 
     /** Helper to conditionally mask sensitive data under the right conditions */
