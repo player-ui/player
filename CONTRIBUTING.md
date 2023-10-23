@@ -18,6 +18,8 @@ If the changes are larger (API design, architecture, etc), [opening an issue](ht
 
 * [Android NDK >= 19.2.5345600, <= 21](https://github.com/android/ndk/wiki/Unsupported-Downloads#r19c). Any version > 21 will not work, period. You'll need to add `ANDROID_NDK_HOME` to your environment manually.
 
+* [Bazelisk](https://github.com/bazelbuild/bazelisk). Need to add bazelisk to the `PATH` as both `bazelisk` and `bazel`.
+
 ## Building and Testing Locally
 #### Presetup
 For iOS builds, some pre-setup is required for `bazel` to generate BUILD files for dependent CocoaPods.
@@ -51,6 +53,9 @@ The `.bazelrc` contains a convenience to build everything but the iOS targets, a
 ```bash
 bazel build --config=skip-ios
 ```
+
+### Troubleshooting
+See the [Troubleshooting Guide](https://github.com/player-ui/player/blob/main/TROUBLESHOOTING.md) for issues with the running the above commands which may be prevalent in M1 Macs.
 
 ### Docs Sites
 These require the [Android NDK](https://developer.android.com/ndk).
