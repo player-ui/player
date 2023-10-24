@@ -9,6 +9,7 @@ import { makeFlow } from '@player-ui/make-flow';
 import {
   actionTransform,
   inputTransform,
+  infoTransform,
 } from '@player-ui/reference-assets-plugin';
 import { Info, Action, Input } from '@player-ui/reference-assets-plugin-react';
 import { CommonTypesPlugin } from '@player-ui/common-types-plugin';
@@ -108,6 +109,7 @@ describe('auto-scroll plugin', () => {
         new AssetTransformPlugin([
           [{ type: 'action' }, actionTransform],
           [{ type: 'input' }, inputTransform],
+          [{ type: 'info' }, infoTransform],
         ]),
         new CommonTypesPlugin(),
         new AutoScrollManagerPlugin({
@@ -145,6 +147,7 @@ describe('auto-scroll plugin', () => {
         new AssetTransformPlugin([
           [{ type: 'action' }, actionTransform],
           [{ type: 'input' }, inputTransform],
+          [{ type: 'info' }, infoTransform],
         ]),
         new CommonTypesPlugin(),
         new AutoScrollManagerPlugin({
@@ -202,6 +205,7 @@ describe('auto-scroll plugin', () => {
         new AssetTransformPlugin([
           [{ type: 'action' }, actionTransform],
           [{ type: 'input' }, inputTransform],
+          [{ type: 'info' }, infoTransform],
         ]),
         new CommonTypesPlugin(),
         new AutoScrollManagerPlugin({

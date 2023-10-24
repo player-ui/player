@@ -21,6 +21,7 @@ class Text(assetContext: AssetContext) : DecodableAsset<Text.Data>(assetContext,
         @StyleRes val Default = R.style.Text
         @StyleRes val Title = R.style.Text_Title
         @StyleRes val Label = R.style.Text_Label
+        @StyleRes val Note = R.style.Text_Note
     }
 
     @Serializable
