@@ -27,4 +27,15 @@
         android:maxLines="1"
         android:singleLine="true" />
 
+    <FrameLayout
+        android:id="@+id/input_note_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/input_field"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
