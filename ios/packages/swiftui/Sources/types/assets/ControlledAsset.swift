@@ -15,6 +15,9 @@ open class AssetViewModel<T: AssetData>: ObservableObject {
     /// The decoded data
     @Published public var data: T
 
+    /// Any contextual information set by the user
+    public var userInfo: [CodingUserInfoKey: Any]?
+
     /// Set to store subscriptions in for cancellation
     public var bag = Set<AnyCancellable>()
 
@@ -22,9 +25,11 @@ open class AssetViewModel<T: AssetData>: ObservableObject {
      Constructs an instance of this ViewModel with the given data
      - parameters:
         - data: The data to publish from this ViewModel
+        - userInfo:  Any contextual information set by the user 
      */
-    public required init(_ data: T) {
+    public required init(_ data: T, userInfo: [CodingUserInfoKey: Any]? = nil) {
         self._data = Published(initialValue: data)
+        self.userInfo = userInfo
     }
 }
 
@@ -75,7 +80,7 @@ open class ControlledAsset<DataType: AssetData, ModelType>: SwiftUIAsset where M
             decoder.logger?.t("Updating model for \(data.id)")
             model.data = data
         } else {
-            self.model = ModelType(data)
+            self.model = ModelType(data, userInfo: decoder.userInfo)
             decoder.logger?.t("Creating model for \(data.id)")
             modelCache?.set(model, forKey: data.id, codingPath: decoder.codingPath)
         }
