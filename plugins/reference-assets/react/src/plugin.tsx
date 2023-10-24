@@ -36,7 +36,8 @@ export class ReferenceAssetsPlugin
   implements
     ReactPlayerPlugin,
     ExtendedPlayerPlugin<
-      [InputAsset, TextAsset, ActionAsset, InfoAsset, CollectionAsset]
+      [InputAsset, TextAsset, ActionAsset, CollectionAsset],
+      [InfoAsset]
     >
 {
   name = 'reference-assets-web-plugin';
