@@ -31,6 +31,7 @@ struct CollectionAssetView: View {
     @ViewBuilder
     var body: some View {
         VStack {
+            model.data.label?.asset?.view.font(.label)
             ForEach(model.data.values.compactMap({ $0?.asset })) { asset in
                 asset.view
             }
