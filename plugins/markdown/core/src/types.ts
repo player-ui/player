@@ -46,6 +46,10 @@ export interface Mappers {
    */
   paragraph: CompositeMapper;
   /**
+   * required collection Asset to wrap arrays of assets
+   */
+  collection: CompositeMapper;
+  /**
    * strong markdown (e.g. **bold**)
    */
   strong?: CompositeMapper;

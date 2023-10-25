@@ -1,9 +1,10 @@
 import { Meta, Story, Canvas } from '@storybook/addon-docs';
 import { Action } from '@player-ui/reference-assets-plugin-react'
 import { StoryWrapper } from '../components'
-import { PlayerStory } from '@player-ui/storybook';
+import { PlayerStory, DSLPlayerStory, createDSLStory } from '@player-ui/storybook';
 import actionCountFlow from '@player-ui/reference-assets-plugin-mocks/action/action-counter.json';
 import actionNavigationFlow from '@player-ui/reference-assets-plugin-mocks/action/action-navigation.json'
+
 
 <Meta title="Reference Assets/Action" component={Action} />
 
@@ -12,6 +13,20 @@ import actionNavigationFlow from '@player-ui/reference-assets-plugin-mocks/actio
 The `action` asset is used when you want a user to perform some _action_. It typically manifests as a `button` or `link` depending on the context, and intention.
 
 Actions can advance Player's state machine using the `value` prop, and/or evaluate an expression using the `exp` prop.
+
+## Basic Usecase
+
+The example below uses the `exp` property to evaluate an expression when the action is clicked.
+This will increment the count, and update the label
+
+<Canvas>
+  <Story name="Action Basic">
+    <StoryWrapper>
+      <DSLPlayerStory dslContent={(() => import('!!raw-loader!@player-ui/reference-assets-plugin-mocks/action/action-basic.tsx'))}/>
+    </StoryWrapper>
+  </Story>
+</Canvas>
+
 
 ## Expression Evaluation
 
@@ -32,6 +47,16 @@ This will increment the count, and update the label
   <Story name="Navigation">
     <StoryWrapper>
       <PlayerStory flow={actionNavigationFlow} />
+    </StoryWrapper>
+  </Story>
+</Canvas>
+
+## Navigation Transition To End
+
+<Canvas>
+  <Story name="Transition To End">
+    <StoryWrapper>
+      <DSLPlayerStory dslContent={(() => import('!!raw-loader!@player-ui/reference-assets-plugin-mocks/action/action-transition-to-end.tsx'))}/>
     </StoryWrapper>
   </Story>
 </Canvas>
