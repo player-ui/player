@@ -16,7 +16,7 @@ open class AssetViewModel<T: AssetData>: ObservableObject {
     @Published public var data: T
 
     /// Any contextual information set by the user
-    public var userInfo: [CodingUserInfoKey: Any]?
+    public var userInfo: [CodingUserInfoKey: Any]
 
     /// Set to store subscriptions in for cancellation
     public var bag = Set<AnyCancellable>()
@@ -25,9 +25,9 @@ open class AssetViewModel<T: AssetData>: ObservableObject {
      Constructs an instance of this ViewModel with the given data
      - parameters:
         - data: The data to publish from this ViewModel
-        - userInfo:  Any contextual information set by the user 
+        - userInfo:  Any contextual information set by the user
      */
-    public required init(_ data: T, userInfo: [CodingUserInfoKey: Any]? = nil) {
+    public required init(_ data: T, userInfo: [CodingUserInfoKey: Any] = [:]) {
         self._data = Published(initialValue: data)
         self.userInfo = userInfo
     }
