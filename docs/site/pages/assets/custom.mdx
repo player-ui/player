@@ -170,12 +170,12 @@ class ActionAsset: UncontrolledAsset<ActionData> {
 
 #### ControlledAsset
 
-The `ControlledAsset` lets you define the viewModel type, as long as it subclasses `AssetViewModel<T: AssetData>`, this way you still receive updated data whenever Player changes state, but you can add other functionality to the `viewModel`.
+The `ControlledAsset` lets you define the viewModel type, as long as it subclasses `AssetViewModel<T: AssetData>`, this way you still receive updated data and user info whenever Player changes state, but you can add other functionality to the `viewModel`.
 
 ```swift
 class ActionViewModel: AssetViewModel<ActionData> {
-    public required init(_ data: ActionData) {
-      super.init(data)
+    public required init(_ data: ActionData, userInfo: [CodingUserInfoKey: Any]) {
+      super.init(data, userInfo: userInfo)
     }
 }
 class ActionAsset: ControlledAsset<ActionData, ActionViewModel> {
