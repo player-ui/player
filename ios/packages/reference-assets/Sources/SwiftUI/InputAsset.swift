@@ -49,7 +49,7 @@ open class InputAssetViewModel: AssetViewModel<InputData> {
         - data: The `InputData` decoded from the core player
         - userInfo: The `userInfo` from the decoder
      */
-    public required init(_ data: InputData, userInfo: [CodingUserInfoKey: Any]? = nil) {
+    public required init(_ data: InputData, userInfo: [CodingUserInfoKey: Any]) {
         super.init(data, userInfo: userInfo)
         $data.sink { [weak self] (newData) in
             (newData.value?.stringValue).map { self?.text = $0 }
