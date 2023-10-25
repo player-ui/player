@@ -8,6 +8,7 @@ data = [
     "//plugins/reference-assets/mocks:@player-ui/reference-assets-plugin-mocks",
     "//plugins/data-change-listener/core:@player-ui/data-change-listener-plugin",
     "//plugins/computed-properties/core:@player-ui/computed-properties-plugin",
+    "//plugins/reference-assets/components:@player-ui/reference-assets-components",
     "//tools/storybook:@player-ui/storybook",
     "//react/player:@player-ui/react",
     "//:tsconfig.json",

@@ -1,4 +1,4 @@
-import NestedError from 'nested-error-stacks';
+import { NestedError } from 'ts-nested-error';
 import type { SyncWaterfallHook } from 'tapable-ts';
 import type { PathNode, AnyNode } from '../binding-grammar';
 import { findInArray, maybeConvertToNum } from './utils';

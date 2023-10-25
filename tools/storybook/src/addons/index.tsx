@@ -11,6 +11,7 @@ import { EditorPanel } from './editor';
 import { EventsPanel } from './events';
 import { FlowRefresh } from './refresh';
 import { RenderSelection } from './appetize';
+import { StateProvider } from '../redux';
 
 /** register all the storybook addons */
 export function register() {
@@ -18,14 +19,18 @@ export function register() {
     addons.addPanel(EVENT_PANEL_ID, {
       title: 'Events',
       render: ({ active, key }) => (
-        <EventsPanel key={key} api={api} active={Boolean(active)} />
+        <StateProvider key={key}>
+          <EventsPanel active={Boolean(active)} />
+        </StateProvider>
       ),
     });
 
     addons.addPanel(FLOW_PANEL_ID, {
       title: 'Flow',
       render: ({ active, key }) => (
-        <EditorPanel key={key} api={api} active={Boolean(active)} />
+        <StateProvider key={key}>
+          <EditorPanel active={Boolean(active)} />
+        </StateProvider>
       ),
     });
 
@@ -34,13 +39,21 @@ export function register() {
     addons.add(FLOW_REFRESH_TOOL_ID, {
       title: 'Refresh Flow',
       type: types.TOOL,
-      render: () => <FlowRefresh api={api} />,
+      render: () => (
+        <StateProvider>
+          <FlowRefresh />
+        </StateProvider>
+      ),
     });
 
     addons.add(RENDER_SELECT_TOOL_ID, {
       title: 'Render Selection',
       type: types.TOOL,
-      render: () => <RenderSelection api={api} />,
+      render: () => (
+        <StateProvider>
+          <RenderSelection api={api} />
+        </StateProvider>
+      ),
     });
   });
 }

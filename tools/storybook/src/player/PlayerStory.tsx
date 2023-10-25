@@ -1,34 +1,45 @@
 import React from 'react';
-import type {
-  ReactPlayerPlugin,
-  PlayerFlowStatus,
-  Flow,
-  ReactPlayerOptions,
-} from '@player-ui/react';
-import { BeaconPlugin } from '@player-ui/beacon-plugin-react';
+import type { ReactPlayerOptions, ReactPlayerPlugin } from '@player-ui/react';
 import { ReactPlayer } from '@player-ui/react';
-import { ChakraProvider, Spinner } from '@chakra-ui/react';
+import { BeaconPlugin } from '@player-ui/beacon-plugin-react';
 import { makeFlow } from '@player-ui/make-flow';
+import { Placeholder } from '@storybook/components';
+import { useDispatch, useSelector } from 'react-redux';
+import type { PlayerFlowStatus, Flow } from '@player-ui/player';
 import addons from '@storybook/addons';
-import type { AsyncImportFactory, RenderTarget } from '../types';
-import { useEditorFlow } from './hooks';
+import type {
+  AsyncImportFactory,
+  PlayerParametersType,
+  RenderTarget,
+} from '../types';
 import { Appetize } from './Appetize';
 import { StorybookPlayerPlugin } from './storybookReactPlayerPlugin';
-import { useStateActions, subscribe } from '../state/hooks';
 import { PlayerFlowSummary } from './PlayerFlowSummary';
+import type { StateType } from '../redux';
+import {
+  useContentKind,
+  useCompiledEditorValue,
+  useInitialJsonEditorValue,
+  useJSONEditorValue,
+} from '../redux';
+import { useFlowSetListener } from './useFlowSet';
 
 interface LocalPlayerStory {
   /** the mock to load */
-  flow: Flow;
+  mock: Flow;
 
-  /** Web plugins to load into Player */
+  /** plugins to the player */
   webPlugins?: Array<ReactPlayerPlugin>;
 }
 
 export const ReactPlayerPluginContext = React.createContext<{
-  /** Web plugins to load into Player */
-  plugins?: Array<ReactPlayerPlugin>;
+  /** Plugins to use for the player */
+  plugins: Array<ReactPlayerPlugin>;
 }>({ plugins: [] });
+
+export const DSLPluginContext = React.createContext<
+  PlayerParametersType['dslEditor']
+>({});
 
 export const PlayerRenderContext = React.createContext<RenderTarget>({
   platform: 'web',
@@ -46,45 +57,41 @@ export const PlayerOptionsContext = React.createContext<{
   options?: ReactPlayerOptions;
 }>({ options: {} });
 
-/** A component to render a player + flow */
-const LocalPlayerStory = (props: LocalPlayerStory) => {
-  let flow = useEditorFlow(props.flow);
+/** A Component to render the current JSON editor value inside of Player */
+const PlayerJsonEditorStory = () => {
+  const jsonEditorValue = useJSONEditorValue();
+  useFlowSetListener(addons.getChannel());
 
-  const renderContext = React.useContext(PlayerRenderContext);
-  const pluginContext = React.useContext(ReactPlayerPluginContext);
-  const controlsContext = React.useContext(StorybookControlsContext);
-  const optionsContext = React.useContext(PlayerOptionsContext);
-  const options = { ...optionsContext?.options };
-  const stateActions = useStateActions(addons.getChannel());
-  const plugins = props.webPlugins ?? pluginContext?.plugins ?? [];
+  const { plugins } = React.useContext(ReactPlayerPluginContext);
+
+  const dispatch = useDispatch();
+
   const [playerState, setPlayerState] =
     React.useState<PlayerFlowStatus>('not-started');
 
   const [trackedBeacons, setTrackedBeacons] = React.useState<any[]>([]);
 
-  const rp = React.useMemo(() => {
+  const wp = React.useMemo(() => {
     const beaconPlugin = new BeaconPlugin({
       callback: (beacon) => {
         setTrackedBeacons((t) => [...t, beacon]);
       },
     });
-
     return new ReactPlayer({
-      ...options,
-      plugins: [
-        new StorybookPlayerPlugin(stateActions),
-        beaconPlugin,
-        ...plugins,
-        ...(options?.plugins ?? []),
-      ],
+      plugins: [new StorybookPlayerPlugin(dispatch), beaconPlugin, ...plugins],
     });
-  }, [plugins, flow]);
+  }, [dispatch, plugins]);
 
   /** A callback to start the flow */
   const startFlow = () => {
+    if (jsonEditorValue?.state !== 'loaded') {
+      return;
+    }
+
     setPlayerState('in-progress');
     setTrackedBeacons([]);
-    rp.start(flow)
+
+    wp.start(jsonEditorValue.value)
       .then(() => {
         setPlayerState('completed');
       })
@@ -96,41 +103,9 @@ const LocalPlayerStory = (props: LocalPlayerStory) => {
 
   React.useEffect(() => {
     startFlow();
-  }, [rp]);
+  }, [wp, jsonEditorValue]);
 
-  React.useEffect(() => {
-    // merge new data from storybook controls
-    if (controlsContext) {
-      flow = {
-        ...flow,
-        data: {
-          ...(flow.data ?? {}),
-          ...controlsContext,
-        },
-      };
-      stateActions.setFlow(flow);
-    }
-  }, [controlsContext]);
-
-  React.useEffect(() => {
-    return subscribe(addons.getChannel(), '@@player/flow/reset', () => {
-      startFlow();
-    });
-  }, [rp]);
-
-  if (renderContext.platform !== 'web' && renderContext.token) {
-    return (
-      <Appetize
-        flow={flow}
-        platform={renderContext.platform}
-        token={renderContext.token}
-        baseUrl={renderContext.baseUrl}
-        osVersions={renderContext.appetizeVersions}
-      />
-    );
-  }
-
-  const currentState = rp.player.getState();
+  const currentState = wp.player.getState();
 
   if (playerState === 'completed' && currentState.status === 'completed') {
     return (
@@ -146,7 +121,55 @@ const LocalPlayerStory = (props: LocalPlayerStory) => {
     return <PlayerFlowSummary reset={startFlow} error={currentState.error} />;
   }
 
-  return <rp.Component />;
+  return <wp.Component />;
+};
+
+/** A component to render a player + flow */
+const LocalPlayerStory = (props: LocalPlayerStory) => {
+  const flow = useInitialJsonEditorValue(props.mock);
+  const platform = useSelector<StateType>((state) => state.platform.platform);
+  const renderContext = React.useContext(PlayerRenderContext);
+  const webPlayerContext = React.useContext(ReactPlayerPluginContext);
+  const { options } = React.useContext(PlayerOptionsContext);
+
+  if (platform === 'web') {
+    return (
+      <ReactPlayerPluginContext.Provider
+        value={
+          props.webPlugins || options?.plugins
+            ? {
+                ...webPlayerContext,
+                plugins: [
+                  ...webPlayerContext.plugins,
+                  ...(props.webPlugins ?? []),
+                  ...(options?.plugins ?? []),
+                ],
+              }
+            : webPlayerContext
+        }
+      >
+        <PlayerJsonEditorStory />
+      </ReactPlayerPluginContext.Provider>
+    );
+  }
+
+  if (
+    renderContext.platform !== 'web' &&
+    renderContext.token &&
+    flow?.state === 'loaded'
+  ) {
+    return (
+      <Appetize
+        flow={flow.value}
+        platform={renderContext.platform}
+        token={renderContext.token}
+        baseUrl={renderContext.baseUrl}
+        osVersions={renderContext.appetizeVersions}
+      />
+    );
+  }
+
+  return <Placeholder>Unable to render flow</Placeholder>;
 };
 
 type Mock = Record<string, unknown>;
@@ -158,11 +181,11 @@ function wrapInLazy(
   /** The component to load */
   Component: React.ComponentType<{
     /** the flow */
-    flow: Flow;
+    mock: Flow;
   }>,
 
   /** A mock or a promise that resolve to a mock */
-  flowFactory: AsyncImportFactory<MockFactoryOrPromise> | MockFactoryOrPromise,
+  mockFactory: AsyncImportFactory<MockFactoryOrPromise> | MockFactoryOrPromise,
 
   /** Any other props to pass */
   other?: any
@@ -170,7 +193,7 @@ function wrapInLazy(
   /** an async loader to wrap the mock as a player component */
   const asPlayer = async () => {
     const mock =
-      typeof flowFactory === 'function' ? await flowFactory() : flowFactory;
+      typeof mockFactory === 'function' ? await mockFactory() : mockFactory;
 
     /** The component to load */
     const Comp = () => {
@@ -178,7 +201,8 @@ function wrapInLazy(
         ...makeFlow('default' in mock ? mock.default : mock),
         ...(other ?? {}),
       };
-      return <Component flow={flow} />;
+
+      return <Component mock={flow} />;
     };
 
     return {
@@ -206,6 +230,7 @@ export interface PlayerStoryProps {
  */
 export const PlayerStory = (props: PlayerStoryProps) => {
   const { flow, storybookControls, options, ...other } = props;
+  useContentKind('json');
 
   const MockComp = React.useMemo(
     () => wrapInLazy(LocalPlayerStory, flow, other),
@@ -214,23 +239,79 @@ export const PlayerStory = (props: PlayerStoryProps) => {
 
   return (
     <div>
-      <ChakraProvider>
-        <React.Suspense fallback={<Spinner />}>
-          <StorybookControlsContext.Provider
+      <React.Suspense fallback="Loading...">
+        <StorybookControlsContext.Provider
+          value={{
+            ...storybookControls,
+          }}
+        >
+          <PlayerOptionsContext.Provider
             value={{
-              ...storybookControls,
+              options,
             }}
           >
-            <PlayerOptionsContext.Provider
-              value={{
-                options,
-              }}
-            >
-              <MockComp />
-            </PlayerOptionsContext.Provider>{' '}
-          </StorybookControlsContext.Provider>
-        </React.Suspense>
-      </ChakraProvider>
+            <MockComp />
+          </PlayerOptionsContext.Provider>
+        </StorybookControlsContext.Provider>
+      </React.Suspense>
     </div>
+  );
+};
+
+/** A DSL story that compiles code */
+export const DSLLocalPlayerStory = (
+  props: Omit<PlayerStoryProps, 'flow'> & {
+    /** Initial state of the dsl content */
+    dslContent: string;
+  }
+) => {
+  const dslContext = React.useContext(DSLPluginContext);
+  useContentKind('dsl');
+  useCompiledEditorValue(props.dslContent, {
+    additionalModules: dslContext?.additionalModules,
+  });
+
+  return <PlayerJsonEditorStory />;
+};
+
+/** A DSL story that handles lazy-loaded content */
+export const DSLPlayerStory = (
+  props: Omit<PlayerStoryProps, 'flow'> & {
+    /** Initial state of the dsl content */
+    dslContent: () => Promise<
+      | string
+      | {
+          /** The default export of the module */
+          default: string;
+        }
+    >;
+  }
+) => {
+  const { dslContent, ...other } = props;
+  const AsLazyComp = React.useMemo(() => {
+    /** A function to load the flow for use in a lazy component */
+    const loadFlow = async () => {
+      let content = await dslContent();
+
+      if (typeof content === 'object') {
+        content = content.default;
+      }
+
+      return {
+        default: () => {
+          return (
+            <DSLLocalPlayerStory dslContent={content as string} {...other} />
+          );
+        },
+      };
+    };
+
+    return React.lazy(loadFlow);
+  }, [dslContent]);
+
+  return (
+    <React.Suspense fallback="Loading...">
+      <AsLazyComp />
+    </React.Suspense>
   );
 };

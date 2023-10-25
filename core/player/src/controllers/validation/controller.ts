@@ -1,5 +1,6 @@
 import type { Validation } from '@player-ui/types';
 import { SyncHook, SyncWaterfallHook } from 'tapable-ts';
+import { setIn } from 'timm';
 
 import type { BindingInstance, BindingFactory } from '../../binding';
 import { isBinding } from '../../binding';
@@ -104,6 +105,13 @@ type StatefulError = {
 
 export type StatefulValidationObject = StatefulWarning | StatefulError;
 
+/** Helper function to determin if the subset is within the containingSet */
+function isSubset<T>(subset: Set<T>, containingSet: Set<T>): boolean {
+  if (subset.size > containingSet.size) return false;
+  for (const entry of subset) if (!containingSet.has(entry)) return false;
+  return true;
+}
+
 /** Helper for initializing a validation object that tracks state */
 function createStatefulValidationObject(
   obj: ValidationObjectWithSource
@@ -207,67 +215,82 @@ class ValidatedBinding {
     canDismiss: boolean
   ) {
     // If the currentState is not load, skip those
-    this.applicableValidations = this.applicableValidations.map((obj) => {
-      if (obj.state === 'dismissed') {
-        // Don't rerun any dismissed warnings
-        return obj;
-      }
-
-      const blocking =
-        obj.value.blocking ??
-        ((obj.value.severity === 'warning' && 'once') || true);
-
-      const isBlockingNavigation =
-        blocking === true || (blocking === 'once' && !canDismiss);
-
-      const dismissable = canDismiss && blocking === 'once';
-
-      if (
-        this.currentPhase === 'navigation' &&
-        obj.state === 'active' &&
-        dismissable
-      ) {
-        if (obj.value.severity === 'warning') {
-          const warn = obj as ActiveWarning;
-          if (warn.dismissable && warn.response.dismiss) {
-            warn.response.dismiss();
-          } else {
-            warn.dismissable = true;
-          }
-
-          return obj;
+    this.applicableValidations = this.applicableValidations.map(
+      (originalValue) => {
+        if (originalValue.state === 'dismissed') {
+          // Don't rerun any dismissed warnings
+          return originalValue;
         }
-      }
 
-      const response = runner(obj.value);
+        // treat all warnings the same and block it once (unless blocking is true)
+        const blocking =
+          originalValue.value.blocking ??
+          ((originalValue.value.severity === 'warning' && 'once') || true);
 
-      const newState = {
-        type: obj.type,
-        value: obj.value,
-        state: response ? 'active' : 'none',
-        isBlockingNavigation,
-        dismissable:
-          obj.value.severity === 'warning' &&
-          this.currentPhase === 'navigation',
-        response: response
-          ? {
-              ...obj.value,
-              message: response.message ?? 'Something is broken',
-              severity: obj.value.severity,
-              displayTarget: obj.value.displayTarget ?? 'field',
+        const obj = setIn(
+          originalValue,
+          ['value', 'blocking'],
+          blocking
+        ) as StatefulValidationObject;
+
+        const isBlockingNavigation =
+          blocking === true || (blocking === 'once' && !canDismiss);
+
+        if (
+          this.currentPhase === 'navigation' &&
+          obj.state === 'active' &&
+          obj.value.blocking !== true
+        ) {
+          if (obj.value.severity === 'warning') {
+            const warn = obj as ActiveWarning;
+            if (
+              warn.dismissable &&
+              warn.response.dismiss &&
+              (warn.response.blocking !== 'once' || !warn.response.blocking)
+            ) {
+              warn.response.dismiss();
+            } else {
+              if (warn?.response.blocking === 'once') {
+                warn.response.blocking = false;
+              }
+
+              warn.dismissable = true;
             }
-          : undefined,
-      } as StatefulValidationObject;
 
-      if (newState.state === 'active' && obj.value.severity === 'warning') {
-        (newState.response as WarningValidationResponse).dismiss = () => {
-          (newState as StatefulWarning).state = 'dismissed';
-          this.onDismiss?.();
-        };
+            return warn as StatefulValidationObject;
+          }
+        }
+
+        const response = runner(obj.value);
+
+        const newState = {
+          type: obj.type,
+          value: obj.value,
+          state: response ? 'active' : 'none',
+          isBlockingNavigation,
+          dismissable:
+            obj.value.severity === 'warning' &&
+            this.currentPhase === 'navigation',
+          response: response
+            ? {
+                ...obj.value,
+                message: response.message ?? 'Something is broken',
+                severity: obj.value.severity,
+                displayTarget: obj.value.displayTarget ?? 'field',
+              }
+            : undefined,
+        } as StatefulValidationObject;
+
+        if (newState.state === 'active' && obj.value.severity === 'warning') {
+          (newState.response as WarningValidationResponse).dismiss = () => {
+            (newState as StatefulWarning).state = 'dismissed';
+            this.onDismiss?.();
+          };
+        }
+
+        return newState;
       }
-
-      return newState;
-    });
+    );
   }
 
   public update(
@@ -275,6 +298,8 @@ class ValidatedBinding {
     canDismiss: boolean,
     runner: ValidationRunner
   ) {
+    const newApplicableValidations: StatefulValidationObject[] = [];
+
     if (phase === 'load' && this.currentPhase !== undefined) {
       // Tried to run the 'load' phase twice. Aborting
       return;
@@ -301,8 +326,23 @@ class ValidatedBinding {
       (this.currentPhase === 'load' || this.currentPhase === 'change')
     ) {
       // Can transition to a nav state from a change or load
+
+      // if there is an non-blocking error that is active then remove the error from applicable validations so it can no longer be shown
+      // which is needed if there are additional warnings to become active for that binding after the error is shown
+      this.applicableValidations.forEach((element) => {
+        if (
+          !(
+            element.type === 'error' &&
+            element.state === 'active' &&
+            element.isBlockingNavigation === false
+          )
+        ) {
+          newApplicableValidations.push(element);
+        }
+      });
+
       this.applicableValidations = [
-        ...this.applicableValidations,
+        ...newApplicableValidations,
         ...(this.currentPhase === 'load' ? this.validationsByState.change : []),
         ...this.validationsByState.navigation,
       ];
@@ -712,16 +752,10 @@ export class ValidationController implements BindingTracker {
     if (isNavigationTrigger) {
       // If validations didn't change since last update, dismiss all dismissible validations.
       const { activeBindings } = this;
-      if (this.setCompare(lastActiveBindings, activeBindings)) {
+      if (isSubset(activeBindings, lastActiveBindings)) {
         updateValidations(true);
       }
     }
-  }
-
-  private setCompare<T>(set1: Set<T>, set2: Set<T>): boolean {
-    if (set1.size !== set2.size) return false;
-    for (const entry of set1) if (!set2.has(entry)) return false;
-    return true;
   }
 
   private get activeBindings(): Set<BindingInstance> {
