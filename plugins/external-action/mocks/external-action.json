@@ -1,0 +1,28 @@
+{
+  "id": "test-flow",
+  "data": {
+    "transitionValue": "Next"
+  },
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "EXT_1",
+      "EXT_1": {
+        "state_type": "EXTERNAL",
+        "ref": "test-1",
+        "transitions": {
+          "Next": "END_FWD",
+          "Prev": "END_BCK"
+        }
+      },
+      "END_FWD": {
+        "state_type": "END",
+        "outcome": "FWD"
+      },
+      "END_BCK": {
+        "state_type": "END",
+        "outcome": "BCK"
+      }
+    }
+  }
+}

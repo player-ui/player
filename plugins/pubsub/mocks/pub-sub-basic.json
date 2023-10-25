@@ -1,0 +1,25 @@
+
+{
+  "id": "minimal",
+  "views": [
+    {
+      "id": "view-1",
+      "type": "info"
+    }
+  ],
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "onStart": "publish('pet.names', ['ginger', 'daisy'])",
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "ref": "view-1",
+        "state_type": "VIEW",
+        "transitions": {
+          "Next": "VIEW_2",
+          "'*'": "END_Done"
+        }
+      }
+    }
+  }
+}
