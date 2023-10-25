@@ -3,7 +3,7 @@ load("//:index.bzl", "javascript_pipeline")
 
 generate_manifest(
     name = "mocks",
-    mocks = glob(["**/*.json"]),
+    mocks = glob(["*/*.json"]),
     visibility = ["//visibility:public"],
 )
 
