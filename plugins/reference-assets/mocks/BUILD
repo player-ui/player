@@ -10,10 +10,14 @@ generate_manifest(
 javascript_pipeline(
     name = "@player-ui/reference-assets-plugin-mocks",
     entry = "index.ts",
+     dependencies = [
+        "@npm//@player-tools/dsl",
+        "//plugins/reference-assets/components:@player-ui/reference-assets-components"
+    ],
     other_srcs = [
         "index.ts",
         ":mocks",
-    ],
+    ] + glob(["**/*.tsx"]),
     out_dir = "",
 )
 
