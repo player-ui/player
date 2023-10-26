@@ -1,46 +1,62 @@
 import React from 'react';
 import type { DecoratorFn } from '@storybook/react';
-import addons from '@storybook/addons';
-import type { PlatformSetType } from '../state/hooks';
-import { subscribe } from '../state/hooks';
-import { ReactPlayerPluginContext, PlayerRenderContext } from '../player';
+import { useSelector } from 'react-redux';
+import type { StateType } from '../redux';
+import { StateProvider } from '../redux';
+import {
+  ReactPlayerPluginContext,
+  PlayerRenderContext,
+  DSLPluginContext,
+} from '../player';
 import type { PlayerParametersType, RenderTarget } from '../types';
+
+/** Wrap the component in a PlayerContext provider w/ proper platform attribution */
+const PlayerRenderContextWrapper = (
+  props: React.PropsWithChildren<{
+    /** Params for the story */
+    playerParams: PlayerParametersType;
+  }>
+) => {
+  const { playerParams } = props;
+
+  const platform = useSelector<StateType, RenderTarget['platform']>(
+    (s) => s.platform.platform ?? 'web'
+  );
+
+  return (
+    <PlayerRenderContext.Provider
+      value={{
+        platform,
+        token:
+          platform === 'web'
+            ? undefined
+            : playerParams?.appetizeTokens?.[platform],
+        baseUrl: playerParams.appetizeBaseUrl,
+        appetizeVersions: playerParams.appetizeVersions,
+      }}
+    >
+      {props.children}
+    </PlayerRenderContext.Provider>
+  );
+};
 
 /**
  * A story decorator for rendering player content
  */
 export const PlayerDecorator: DecoratorFn = (story, ctx) => {
   const playerParams = ctx.parameters as PlayerParametersType;
-  const [selectedPlatform, setPlatform] =
-    React.useState<RenderTarget['platform']>('web');
-
-  React.useEffect(() => {
-    return subscribe<PlatformSetType>(
-      addons.getChannel(),
-      '@@player/platform/set',
-      (evt) => {
-        setPlatform(evt.platform);
-      }
-    );
-  }, []);
 
   return (
-    <PlayerRenderContext.Provider
-      value={{
-        platform: selectedPlatform,
-        token:
-          selectedPlatform === 'web'
-            ? undefined
-            : playerParams?.appetizeTokens?.[selectedPlatform],
-        baseUrl: playerParams.appetizeBaseUrl,
-        appetizeVersions: playerParams.appetizeVersions,
-      }}
-    >
-      <ReactPlayerPluginContext.Provider
-        value={{ plugins: playerParams.reactPlayerPlugins }}
-      >
-        {story()}
-      </ReactPlayerPluginContext.Provider>
-    </PlayerRenderContext.Provider>
+    <StateProvider>
+      <PlayerRenderContextWrapper playerParams={playerParams}>
+        <ReactPlayerPluginContext.Provider
+          value={{ plugins: playerParams.reactPlayerPlugins ?? [] }}
+        >
+          <DSLPluginContext.Provider value={playerParams.dslEditor ?? {}}>
+            {story()}
+          </DSLPluginContext.Provider>
+        </ReactPlayerPluginContext.Provider>
+      </PlayerRenderContextWrapper>
+    </StateProvider>
   );
 };

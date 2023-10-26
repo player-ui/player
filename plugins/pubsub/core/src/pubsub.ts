@@ -28,7 +28,7 @@ let count = 1;
 /**
  * Tiny pubsub maker
  */
-class TinyPubSub {
+export class TinyPubSub {
   private events: Map<string, Map<PubSubUUID, SubscribeHandler<any, any>>>;
   private tokens: Map<PubSubUUID, string>;
 

@@ -67,7 +67,7 @@ class InputAssetTests: SwiftUIAssetUnitTestCase {
             validation: nil
         )
 
-        let model = InputAssetViewModel(data)
+        let model = InputAssetViewModel(data, userInfo: [:])
         let update1expect = expectation(description: "Initial value")
         model.$data.sink { (data) in
             guard data.value?.stringValue == "a" else { return }
@@ -110,7 +110,7 @@ class InputAssetTests: SwiftUIAssetUnitTestCase {
         let modelRef = ModelReference(rawValue: val)
         let data = InputData(id: "input", type: "input", placeholder: nil, value: modelRef, label: nil, set: nil, dataType: nil, validation: nil)
 
-        let model = InputAssetViewModel(data)
+        let model = InputAssetViewModel(data, userInfo: [:])
 
         let view = InputAssetView(model: model)
 
@@ -140,7 +140,7 @@ class InputAssetTests: SwiftUIAssetUnitTestCase {
             validation: nil
         )
 
-        let model = InputAssetViewModel(data)
+        let model = InputAssetViewModel(data, userInfo: [:])
 
         let view = await InputAssetView(model: model)
 
@@ -176,7 +176,7 @@ class InputAssetTests: SwiftUIAssetUnitTestCase {
             validation: validation
         )
 
-        let model = InputAssetViewModel(data)
+        let model = InputAssetViewModel(data, userInfo: [:])
 
         let view = InputAssetView(model: model)
 
@@ -204,7 +204,7 @@ class InputAssetTests: SwiftUIAssetUnitTestCase {
 
         let data = InputData(id: "input", type: "input", placeholder: nil, value: nil, label: nil, set: wrapper, dataType: nil, validation: nil)
 
-        let model = InputAssetViewModel(data)
+        let model = InputAssetViewModel(data, userInfo: [:])
 
         let view = InputAssetView(model: model)
 
@@ -226,7 +226,7 @@ class InputAssetTests: SwiftUIAssetUnitTestCase {
 
         let data = InputData(id: "input", type: "input", placeholder: nil, value: nil, label: nil, set: wrapper, dataType: nil, validation: nil)
 
-        let model = InputAssetViewModel(data)
+        let model = InputAssetViewModel(data, userInfo: [:])
 
         let view = InputAssetView(model: model)
 
