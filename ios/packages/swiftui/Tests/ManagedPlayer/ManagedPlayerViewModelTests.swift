@@ -45,7 +45,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
         viewModel.result = .success(state)
         try await Task.sleep(nanoseconds: 1_000_000_000)
-        wait(for: [completed], timeout: 2)
+        await fulfillment(of: [completed], timeout: 2)
     }
 
     func testViewModelSuccessMultiFlow() async throws {
@@ -223,7 +223,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
         viewModel.result = .failure(.jsConversionFailure)
 
-        wait(for: [completed], timeout: 2)
+        await fulfillment(of: [completed], timeout: 2)
 
         cancellable.cancel()
     }
