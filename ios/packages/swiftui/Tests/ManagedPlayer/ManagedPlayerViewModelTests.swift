@@ -44,6 +44,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
         let state = CompletedState.createInstance(from: stateObj)!
 
         viewModel.result = .success(state)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
         await fulfillment(of: [completed], timeout: 2)
     }
 
