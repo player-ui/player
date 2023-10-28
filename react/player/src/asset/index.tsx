@@ -29,12 +29,24 @@ export const ReactAsset = (
     unwrapped = (props as unknown as AssetWrapper).asset;
   }
 
-  if (
-    !unwrapped ||
-    typeof unwrapped !== 'object' ||
-    unwrapped?.type === undefined
-  ) {
-    throw Error(`Cannot determine asset type.`);
+  if (!unwrapped) {
+    throw Error(
+      `Cannot determine asset type for props: ${JSON.stringify(props)}`
+    );
+  }
+
+  if (typeof unwrapped !== 'object') {
+    throw Error(
+      `Asset was not an object got (${typeof unwrapped}) instead: ${unwrapped}`
+    );
+  }
+
+  if (unwrapped.type === undefined) {
+    const info =
+      unwrapped.id === undefined
+        ? JSON.stringify(props)
+        : `id: ${unwrapped.id}`;
+    throw Error(`Asset is missing type for ${info}`);
   }
 
   const Impl = registry?.get(unwrapped);
@@ -45,5 +57,5 @@ export const ReactAsset = (
     );
   }
 
-  return <Impl {...unwrapped} />;
+  return <Impl key={unwrapped.id} {...unwrapped} />;
 };

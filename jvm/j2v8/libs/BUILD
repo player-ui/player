@@ -8,7 +8,10 @@ java_import(
 
 java_import(
     name = "j2v8_macos",
-    jars = [":j2v8_macos_x86_64-6.1.0.jar"],
+    jars = [
+        ":j2v8_macos_x86_64-6.1.0.jar",
+        ":j2v8_macos_aarch_64-6.1.0.jar"
+    ],
 )
 
 java_import(

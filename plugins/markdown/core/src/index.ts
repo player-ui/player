@@ -39,11 +39,7 @@ export class MarkdownPlugin implements PlayerPlugin {
               parser: options.parseNode,
             });
 
-            if (parsed.length === 1) {
-              return parsed[0];
-            }
-
-            return { ...node, nodeType: NodeType.MultiNode, values: parsed };
+            return parsed;
           }
 
           return node;

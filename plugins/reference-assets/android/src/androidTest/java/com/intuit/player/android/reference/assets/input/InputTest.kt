@@ -54,10 +54,15 @@ class InputTest : AssetTest("input") {
 
         val view = currentView.shouldBeView<ConstraintLayout>()
         val inputLabelContainer = view.findViewById<FrameLayout>(R.id.input_label_container)
+        val inputNoteContainer = view.findViewById<FrameLayout>(R.id.input_note_container)
         val inputField = view.findViewById<FormattedEditText>(R.id.input_field)
 
         inputLabelContainer[0].shouldBeView<TextView> {
             assertEquals("Input with validation and formatting", text.toString())
+        }
+
+        inputNoteContainer[0].shouldBeView<TextView> {
+            assertEquals("It expects a positive integer", text.toString())
         }
 
         inputField.type("t")

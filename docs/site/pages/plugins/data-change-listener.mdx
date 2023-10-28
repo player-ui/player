@@ -12,7 +12,8 @@ This plugin enables users to subscribe to data-change events within a view, and 
   "id": "example-view",
   "type": "info",
   "listeners": {
-    "dataChange.foo.bar": "helloWorld()"
+    "dataChange.foo.bar": "helloWorld()",
+    "dataChange.foo.baz": ["helloWorld()", "doSomethingElseToo()"]
   }
 }
 ```
@@ -38,7 +39,7 @@ const player = new Player({
 
 ## Usage
 
-The format of `dataChange.<binding>` will execute the value (any valid expression), anytime a value within the target binding's tree is updated (`foo.bar` in the example above).
+The format of `dataChange.<binding>` will execute the _value_ (any valid expression or collection of expressions), anytime a value within the target binding's tree is updated (`foo.bar` and `foo.baz` in the example above).
 
 Registrations can be made for any partial binding path, and will be evaluated anytime that path, or any child path, is mutated. The above example registration of `dataChange.foo.bar` will be triggered by a change to `foo.bar`, `foo.bar.baz`, or any other child path. (it will not be triggered by a change to `foo.baz`).
 
