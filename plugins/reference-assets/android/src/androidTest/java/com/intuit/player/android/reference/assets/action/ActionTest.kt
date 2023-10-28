@@ -2,6 +2,7 @@ package com.intuit.player.android.reference.assets.action
 
 import android.widget.Button
 import android.widget.LinearLayout
+import com.intuit.player.android.reference.assets.R
 import androidx.core.view.get
 import com.intuit.player.android.reference.assets.test.AssetTest
 import com.intuit.player.android.reference.assets.test.shouldBeAsset
@@ -43,12 +44,12 @@ class ActionTest : AssetTest("action") {
     fun transitionToEndSuccess() {
         launchMock("transition-to-end")
 
-        currentView.shouldBeView<LinearLayout> {
-            assertEquals(2, childCount)
-            get(0).shouldBeView<Button> {
-                assertEquals("End the flow (success)", text.toString())
-                performClick()
-            }
+        val collectionValues = currentView?.findViewById<LinearLayout>(R.id.collection_values) ?: throw AssertionError("current view is null")
+        assertEquals(2, collectionValues.childCount)
+
+        collectionValues[0].shouldBeView<Button> {
+            assertEquals("End the flow (success)", text.toString())
+            performClick()
         }
 
         currentState.shouldBePlayerState<CompletedState> {
@@ -60,12 +61,12 @@ class ActionTest : AssetTest("action") {
     fun transitionToEndError() {
         launchMock("transition-to-end")
 
-        currentView.shouldBeView<LinearLayout> {
-            assertEquals(2, childCount)
-            get(1).shouldBeView<Button> {
-                assertEquals("End the flow (error)", text.toString())
-                performClick()
-            }
+        val collectionValues = currentView?.findViewById<LinearLayout>(R.id.collection_values) ?: throw AssertionError("current view is null")
+        assertEquals(2, collectionValues.childCount)
+
+        collectionValues[1].shouldBeView<Button> {
+            assertEquals("End the flow (error)", text.toString())
+            performClick()
         }
 
         currentState.shouldBePlayerState<ErrorState> {
