@@ -28,6 +28,23 @@
         },
         {
           "asset": {
+            "id": "action-prev-without-icon",
+            "type": "action",
+            "value": "Prev",
+            "label": {
+              "asset": {
+                "id": "action-prev-id-without-icon",
+                "type": "text",
+                "value": "Go Back Without Icon"
+              }
+            },
+              "metaData": {
+                "role": false
+            }
+          }
+        },
+        {
+          "asset": {
             "id": "action-next",
             "type": "action",
             "value": "Next",
