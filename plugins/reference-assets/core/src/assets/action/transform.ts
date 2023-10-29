@@ -7,7 +7,7 @@ import { compose, composeBefore } from '@player-ui/asset-transform-plugin';
 import type { ActionAsset, TransformedAction } from './types';
 
 /**
- *
+ * Function to find prev button
  */
 export function isBackAction(action: ActionAsset): boolean {
   return action.value === 'Prev';
