@@ -7,8 +7,8 @@ import com.intuit.player.android.asset.DecodableAsset
 import com.intuit.player.android.asset.RenderableAsset
 import com.intuit.player.android.extensions.into
 import com.intuit.player.android.reference.assets.R
-import kotlinx.serialization.Serializable
 import com.intuit.player.android.reference.assets.text.Text
+import kotlinx.serialization.Serializable
 
 /** Asset that renders a group of assets as children with little semantic meaning */
 open class Collection(assetContext: AssetContext) : DecodableAsset<Collection.Data>(assetContext, Data.serializer()) {

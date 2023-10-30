@@ -1,9 +1,9 @@
 package com.intuit.player.android.reference.assets.text
 
 import android.widget.LinearLayout
-import com.intuit.player.android.reference.assets.R
 import android.widget.TextView
 import androidx.core.view.get
+import com.intuit.player.android.reference.assets.R
 import com.intuit.player.android.reference.assets.test.AssetTest
 import com.intuit.player.android.reference.assets.test.shouldBeView
 import org.junit.Assert.assertEquals

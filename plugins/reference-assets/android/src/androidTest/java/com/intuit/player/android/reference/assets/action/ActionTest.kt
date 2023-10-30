@@ -2,8 +2,8 @@ package com.intuit.player.android.reference.assets.action
 
 import android.widget.Button
 import android.widget.LinearLayout
-import com.intuit.player.android.reference.assets.R
 import androidx.core.view.get
+import com.intuit.player.android.reference.assets.R
 import com.intuit.player.android.reference.assets.test.AssetTest
 import com.intuit.player.android.reference.assets.test.shouldBeAsset
 import com.intuit.player.android.reference.assets.test.shouldBePlayerState
