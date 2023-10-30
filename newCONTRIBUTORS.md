@@ -30,10 +30,10 @@ This command creates the fork for us from the repo we've cloned, sets up a new r
 
 
 $ git remote -v
-origin  https://github.intuit.com/shamm/onboarding.git (fetch)
-origin  https://github.intuit.com/shamm/onboarding.git (push)
-upstream    https://github.intuit.com/player-team/onboarding.git (fetch)
-upstream    https://github.intuit.com/player-team/onboarding.git (push)
+origin	https://github.com/mercillo/player-ui.git (fetch)
+origin	https://github.com/mercillo/player-ui.git (push)
+upstream	https://github.com/player-ui/player.git (fetch)
+upstream	https://github.com/player-ui/player.git (push)
 ```
 
 From here, you can create a new branch
