@@ -1,24 +1,36 @@
-
 {
-  "id": "minimal",
+  "id": "generated-flow",
   "views": [
     {
-      "id": "view-1",
-      "type": "info"
+      "id": "action",
+      "type": "action",
+      "exp": "@[ publish('some-event', 'event published message') ]@",
+      "label": {
+        "asset": {
+          "id": "action-label",
+          "type": "text",
+          "value": "Clicked to publish event"
+        }
+      }
     }
   ],
+  "data": {
+    "count": 0
+  },
   "navigation": {
     "BEGIN": "FLOW_1",
     "FLOW_1": {
-      "onStart": "publish('pet.names', ['ginger', 'daisy'])",
       "startState": "VIEW_1",
       "VIEW_1": {
-        "ref": "view-1",
         "state_type": "VIEW",
+        "ref": "action",
         "transitions": {
-          "Next": "VIEW_2",
-          "'*'": "END_Done"
+          "*": "END_Done"
         }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
       }
     }
   }
