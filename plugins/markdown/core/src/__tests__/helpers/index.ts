@@ -72,6 +72,11 @@ export const mockMappers: Mappers = {
     type: 'text',
     value,
   }),
+  collection: ({ originalAsset, value }) => ({
+    id: `${originalAsset.id}-collection-${depth++}`,
+    type: 'collection',
+    values: value.map(wrapAsset),
+  }),
   strong: ({ originalAsset, value }) =>
     flatSingleElementCompositeAsset({
       id: `${originalAsset.id}-text-${depth++}`,

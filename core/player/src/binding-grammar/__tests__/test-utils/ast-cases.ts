@@ -186,3 +186,12 @@ export const INVALID_AST_PARSER_TESTS: Array<string> = [
   'foo.bar.{{nested.}',
   'foo.bar`not done()',
 ];
+
+export const VALID_AST_PARSER_CUSTOM_TESTS: Array<[string, PathNode]> = [
+  ['foo‑<>~¡¢£', toPath([toValue('foo‑<>~¡¢£')])],
+  ['foo.bar<>~¡¢£', toPath([toValue('foo'), toValue('bar<>~¡¢£')])],
+  [
+    'foo[{{b‑ar}}].baz',
+    toPath([toValue('foo'), toPath([toValue('b‑ar')]), toValue('baz')]),
+  ],
+];

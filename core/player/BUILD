@@ -16,7 +16,8 @@ javascript_pipeline(
         "@npm//arr-flatten",
         "@npm//ebnf",
         "@npm//timm",
-        "@npm//error-polyfill"
+        "@npm//error-polyfill",
+        "@npm//ts-nested-error"
     ],
     test_data = [
         "//core/make-flow:@player-ui/make-flow",
