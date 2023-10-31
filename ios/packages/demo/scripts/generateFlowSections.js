@@ -33,7 +33,7 @@ const mergedSections = {
 
 const toFlowTuple = (flowPath, section) => {
   const { name } = path.parse(flowPath)
-  return `(name: "${name.replace(section, '').replace(/-/g, ' ').trim()}", flow: MockFlows.${camelCase(name)})`
+  return `(name: "${name != section ? name.replace(section, '').replace(/-/g, ' ').trim() : name}", flow: MockFlows.${camelCase(name)})`
 }
 
 const toFlowSection = (section, indent) => {

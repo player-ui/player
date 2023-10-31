@@ -1125,7 +1125,7 @@ static let pubSubBasic: String = """
             (name: "with link", flow: MockFlows.textWithLink)
         ]),
         (title: "external-action", flows: [
-            (name: "", flow: MockFlows.externalAction)
+            (name: "external-action", flow: MockFlows.externalAction)
         ]),
         (title: "pubsub", flows: [
             (name: "pub sub basic", flow: MockFlows.pubSubBasic)
