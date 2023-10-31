@@ -17,6 +17,13 @@ class ManagedPlayerViewModelTests: XCTestCase {
     let flow1 = FlowData.COUNTER
     let flow2 = FlowData.COUNTER.replacingOccurrences(of: "counter-flow", with: "counter-flow-2")
 
+    var bag = Set<AnyCancellable>()
+
+    override func tearDown() {
+        bag.forEach { $0.cancel() }
+        bag.removeAll()
+    }
+
     func testViewModelSuccessFlow() async throws {
         let flowManager = ConstantFlowManager([flow1], delay: 0)
 
@@ -27,7 +34,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
         Task { await viewModel.next() }
 
-        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 }
+        waitOnChange(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 }.store(in: &bag)
 
         let result = """
         {
@@ -55,7 +62,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
         Task { await viewModel.next() }
 
-        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 }
+        waitOnChange(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 }.store(in: &bag)
 
         let result = """
         {
@@ -73,7 +80,8 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
         viewModel.result = .success(state)
 
-        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow2 }
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        waitOnChange(AnyPublisher(viewModel.$flow)) { $0 == self.flow2 }.store(in: &bag)
     }
 
     func testViewModelManagerError() async {
@@ -108,7 +116,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
                 return true
             }
             return false
-        }
+        }.store(in: &bag)
 
         let result = """
         {
@@ -126,7 +134,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
         viewModel.result = .success(state)
 
-        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow2 }
+        waitOnChange(AnyPublisher(viewModel.$flow)) { $0 == self.flow2 }.store(in: &bag)
 
         viewModel.result = .failure(PlayerError.jsConversionFailure)
 
@@ -135,7 +143,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
                 return true
             }
             return false
-        }
+        }.store(in: &bag)
 
         viewModel.retry()
 
@@ -144,11 +152,11 @@ class ManagedPlayerViewModelTests: XCTestCase {
                 return true
             }
             return false
-        }
+        }.store(in: &bag)
 
         await viewModel.next(state)
 
-        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow2 }
+        waitOnChange(AnyPublisher(viewModel.$flow)) { $0 == self.flow2 }.store(in: &bag)
     }
 
     func testViewModelReset() async throws {
@@ -158,7 +166,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
         await viewModel.next()
 
-        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 }
+        waitOnChange(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 }.store(in: &bag)
 
         let result = """
         {
@@ -176,7 +184,8 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
         viewModel.result = .success(state)
 
-        await assertPublished(AnyPublisher(viewModel.$flow), timeout: 10) { $0 == self.flow2 }
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        waitOnChange(AnyPublisher(viewModel.$flow), timeout: 10) { $0 == self.flow2 }.store(in: &bag)
 
         viewModel.result = .failure(PlayerError.jsConversionFailure)
 
@@ -185,7 +194,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
                 return true
             }
             return false
-        }
+        }.store(in: &bag)
 
         viewModel.reset()
 
@@ -194,11 +203,11 @@ class ManagedPlayerViewModelTests: XCTestCase {
                 return true
             }
             return false
-        }
+        }.store(in: &bag)
 
         await viewModel.next()
 
-        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 }
+        waitOnChange(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 }.store(in: &bag)
     }
 
     func testViewModelErrorFlow() async {
@@ -214,7 +223,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
             completed.fulfill()
         }
 
-        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 != nil }
+        waitOnChange(AnyPublisher(viewModel.$flow)) { $0 != nil }.store(in: &bag)
 
         viewModel.result = .failure(.jsConversionFailure)
 
