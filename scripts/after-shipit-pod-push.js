@@ -43,7 +43,7 @@ class AfterShipItPodPush {
           auto.logger.log.info('Pushing Pod to trunk')
           let process
           try {
-            process = execSync('bundle exec pod trunk push --skip-tests ./bazel-bin/PlayerUI.podspec')
+            process = execSync('bundle exec pod trunk push --verbose --skip-tests ./bazel-bin/PlayerUI.podspec')
           } catch(e) {
             auto.logger.log.error('Pod push failed: ', process && process.stderr.toString(), e)
             throw e
