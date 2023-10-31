@@ -40,7 +40,11 @@ If those command do not run, you can find the apk in `bazelbin/android/demo/inst
 Check your SDK and NDK versions in SDK Manager in Android Studio. As well as your `ANDROID_HOME` and `ANDROID_NDK_HOME` in your bash or zsh profiles to make sure they are properly set.
 
 
-### 2. If you are seeing Errors around babel
+### 2. If you are seeing Errors around babel:
+```
+could not find dependency @babel/helper-string-parser of @babel.plugin-transform-react-jsx/noode_modules/@babel/types
+Error: Analysis of target '//android/demo:demo' failed; build aborted.
+```
 Make sure you have done a `bundle install`
 
 
