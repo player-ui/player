@@ -26,7 +26,7 @@ const DOUBLE_QUOTE = '"';
 const BACK_TICK = '`';
 // const IDENTIFIER_REGEX = /[\w\-@]+/;
 
-/** A _faster_ way to match chars instead of a regex (/[\w\-@]+/) */
+/** A _faster_ way to match chars instead of a regex. */
 const isIdentifierChar = (char?: string): boolean => {
   if (!char) {
     return false;
@@ -34,14 +34,22 @@ const isIdentifierChar = (char?: string): boolean => {
 
   const charCode = char.charCodeAt(0);
 
-  return (
-    (charCode >= 48 && charCode <= 57) || // 0 - 9
-    (charCode >= 65 && charCode <= 90) || // A-Z
-    (charCode >= 97 && charCode <= 122) || // a-z
-    charCode === 95 || // _
-    charCode === 45 || // -
-    charCode === 64 // @
-  );
+  const matches =
+    charCode === 32 || // ' '
+    charCode === 34 || // "
+    charCode === 39 || // '
+    charCode === 40 || // (
+    charCode === 41 || // )
+    charCode === 42 || // *
+    charCode === 46 || // .
+    charCode === 61 || // =
+    charCode === 91 || // [
+    charCode === 93 || // ]
+    charCode === 96 || // `
+    charCode === 123 || // {
+    charCode === 125; // }
+
+  return !matches;
 };
 
 /** Parse out a binding AST from a path */

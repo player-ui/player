@@ -1,6 +1,7 @@
 import {
   VALID_AST_PARSER_TESTS,
   INVALID_AST_PARSER_TESTS,
+  VALID_AST_PARSER_CUSTOM_TESTS,
 } from './test-utils/ast-cases';
 import type { ParserSuccessResult, ParserFailureResult } from '../ast';
 import { parse as parseParsimmon } from '../parsimmon';
@@ -49,4 +50,13 @@ describe('custom', () => {
     expect(result.status).toBe(false);
     expect((result as ParserFailureResult).error.length > 0).toBe(true);
   });
+
+  test.each(VALID_AST_PARSER_CUSTOM_TESTS)(
+    'Custom Unicode Valid: %s',
+    (binding, AST) => {
+      const result = parseCustom(binding);
+      expect(result.status).toBe(true);
+      expect((result as ParserSuccessResult).path).toStrictEqual(AST);
+    }
+  );
 });

@@ -1,88 +1,209 @@
 import React from 'react';
-import type { API } from '@storybook/api';
 import { useDarkMode } from 'storybook-dark-mode';
-import { dequal } from 'dequal';
-import Editor from '@monaco-editor/react';
-import { useFlowState, useStateActions } from '../../state';
+import deepEqual from 'deep-equal';
+import Editor, { loader as monaco } from '@monaco-editor/react';
+import { Tabs, Placeholder } from '@storybook/components';
+import { useDispatch } from 'react-redux';
+import type { CompilationErrorType } from '../../redux';
+import {
+  setDSLEditorValue,
+  setJSONEditorValue,
+  useContentKind,
+  useDSLEditorValue,
+  useJSONEditorValue,
+} from '../../redux';
+
+monaco.init().then((m) => {
+  m.languages.typescript.typescriptDefaults.setCompilerOptions({
+    jsx: m.languages.typescript.JsxEmit.React,
+  });
+});
 
 interface EditorPanelProps {
   /** if the panel is shown */
   active: boolean;
-  /** storybook api */
-  api: API;
 }
 
 /** the panel for the flow editor */
-export const EditorPanel = (props: EditorPanelProps) => {
-  const { active } = props;
+export const JSONEditorPanel = () => {
   const darkMode = useDarkMode();
-  const flow = useFlowState(props.api.getChannel());
-  const actions = useStateActions(props.api.getChannel());
-  const [editorValue, setEditorValue] = React.useState(
-    flow ? JSON.stringify(flow, null, 2) : '{}'
-  );
 
-  const updateTimerRef = React.useRef<NodeJS.Timeout | undefined>(undefined);
+  const jsonEditorValue = useJSONEditorValue();
 
-  /** remove any pending saves */
-  function clearPending() {
-    if (updateTimerRef.current) {
-      clearTimeout(updateTimerRef.current);
-      updateTimerRef.current = undefined;
-    }
-  }
+  const jsonValueAsString =
+    jsonEditorValue?.state === 'loaded'
+      ? JSON.stringify(jsonEditorValue.value, null, 2)
+      : '';
 
-  React.useEffect(() => {
-    if (!active) {
+  const dispatch = useDispatch();
+
+  /** Handle change events */
+  const onChange = (val: string | undefined) => {
+    if (!val || jsonEditorValue?.state !== 'loaded') {
       return;
     }
 
     try {
-      if (editorValue) {
-        const parsed = JSON.parse(editorValue);
-        if (dequal(flow, parsed)) {
-          return;
-        }
+      const parsed = JSON.parse(val);
+      if (!deepEqual(parsed, jsonEditorValue.value)) {
+        dispatch(
+          setJSONEditorValue({
+            value: parsed,
+          })
+        );
       }
-    } catch (e) {}
+    } catch (e) {
+      // Parsing errors for JSON are handled by the editor
+    }
+  };
 
-    setEditorValue(JSON.stringify(flow, null, 2));
-  }, [flow, active]);
+  return (
+    <Editor
+      theme={darkMode ? 'dark' : 'light'}
+      value={jsonValueAsString}
+      language="json"
+      options={{
+        formatOnPaste: true,
+      }}
+      onChange={(val) => {
+        onChange(val);
+      }}
+    />
+  );
+};
 
-  if (!active) {
+/** simple comp to showcase dsl errors */
+const CompileErrors = ({
+  errors,
+}: {
+  /** The errors to display */
+  errors: CompilationErrorType;
+}) => {
+  if (
+    (errors.compileErrors === undefined || errors.compileErrors.length === 0) &&
+    (errors.transpileErrors === undefined ||
+      errors.transpileErrors.length === 0)
+  ) {
     return null;
   }
 
-  /** handler for changes to the content */
-  const onChange = (val: string | undefined) => {
-    clearPending();
-    setEditorValue(val ?? '');
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        bottom: 0,
+        zIndex: 100,
+        background: 'white',
+        padding: '8px',
+        border: '1px solid red',
+        color: 'red',
+        width: '100%',
+      }}
+    >
+      <h3>Errors</h3>
+      {errors.compileErrors?.map((e) => (
+        <pre key={e.message}>{e.message}</pre>
+      ))}
+      {errors.transpileErrors?.map((e) => (
+        <pre key={e.message}>{e.message}</pre>
+      ))}
+    </div>
+  );
+};
 
-    try {
-      if (val) {
-        const parsed = JSON.parse(val);
-        if (!dequal(parsed, flow)) {
-          updateTimerRef.current = setTimeout(() => {
-            if (active) {
-              actions.setFlow(parsed);
-            }
-          }, 1000);
-        }
-      }
-    } catch (e) {}
+/** A panel with the TSX editor built-in */
+const DSLEditorPanel = () => {
+  const darkMode = useDarkMode();
+
+  const jsonEditorValue = useJSONEditorValue();
+  const dslEditorValue = useDSLEditorValue();
+  const dispatch = useDispatch();
+
+  const editorValue =
+    dslEditorValue?.state === 'loaded' ? dslEditorValue.value : '';
+  const flow = jsonEditorValue?.state === 'loaded' ? jsonEditorValue.value : '';
+
+  const compilationErrors =
+    dslEditorValue?.state === 'loaded'
+      ? dslEditorValue.compilationErrors
+      : undefined;
+
+  const [selected, setSelected] = React.useState('tsx');
+
+  /** Handle editor updates */
+  const onChange = (val: string | undefined) => {
+    if (val) {
+      dispatch(
+        setDSLEditorValue({
+          value: val,
+        })
+      );
+    }
   };
 
   return (
     <div>
-      <Editor
-        theme={darkMode ? 'vs-dark' : 'light'}
-        value={editorValue}
-        language="json"
-        options={{
-          formatOnPaste: true,
+      <Tabs
+        selected={selected}
+        actions={{
+          onSelect: (id) => {
+            setSelected(id);
+          },
         }}
-        onChange={onChange}
-      />
+      >
+        <div id="tsx" title="TSX" />
+        <div id="json" title="JSON (read-only)" />
+      </Tabs>
+      <div
+        style={{
+          height: 'calc(100% - 60px)',
+        }}
+      >
+        {selected === 'tsx' && (
+          <>
+            {compilationErrors && <CompileErrors errors={compilationErrors} />}
+            <Editor
+              theme={darkMode ? 'dark' : 'light'}
+              value={editorValue}
+              language="typescript"
+              onChange={(val) => {
+                onChange(val);
+              }}
+            />
+          </>
+        )}
+        {selected === 'json' && (
+          <Editor
+            options={{
+              readOnly: true,
+            }}
+            theme={darkMode ? 'dark' : 'light'}
+            value={flow ? JSON.stringify(flow, null, 2) : '{}'}
+            language="json"
+          />
+        )}
+      </div>
     </div>
+  );
+};
+
+/** The editor panel */
+export const EditorPanel = (props: EditorPanelProps) => {
+  const contentType = useContentKind();
+
+  if (!props.active) {
+    return null;
+  }
+
+  if (contentType === 'dsl') {
+    return <DSLEditorPanel />;
+  }
+
+  if (contentType === 'json') {
+    return <JSONEditorPanel />;
+  }
+
+  return (
+    <Placeholder>This story is not configured to allow flow edits.</Placeholder>
   );
 };
