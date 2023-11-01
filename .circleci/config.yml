@@ -390,7 +390,7 @@ workflows:
           context:
             - applitools
           requires:
-            - android_test
+            - android_test-trunk
             - build_ios
 
   build_and_test_main:
