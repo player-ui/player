@@ -564,6 +564,20 @@ static let infoBasic: String = """
               }
             }
           }
+        },
+        {
+          "asset": {
+            "id": "prev-action",
+            "value": "Prev",
+            "type": "action",
+            "label": {
+              "asset": {
+                "id": "next-action-label",
+                "type": "text",
+                "value": "Back"
+              }
+            }
+          }
         }
       ]
     }
