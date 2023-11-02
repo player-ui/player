@@ -365,6 +365,7 @@ workflows:
             - build-ios-trunk
 
       - test:
+          name: test-trunk
           filters:
             branches:
               ignore:
@@ -373,6 +374,7 @@ workflows:
             - build-trunk
 
       - test:
+          name: test-fork
           filters:
             branches:
               only:
@@ -402,6 +404,7 @@ workflows:
             - build-fork
 
       - coverage:
+          name: coverage-trunk
           filters:
             branches:
               ignore:
@@ -410,6 +413,7 @@ workflows:
             - build-trunk
 
       - coverage:
+          name: coverage-fork
           filters:
             branches:
               only:
