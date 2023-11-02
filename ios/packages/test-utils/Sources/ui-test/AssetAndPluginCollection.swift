@@ -12,7 +12,7 @@ import Combine
 /**
  A SwiftUI View to load flows for ease of UI testing
  */
-public struct AssetCollection: View {
+public struct AssetAndPluginCollection: View {
     let plugins: [NativePlugin]
     let sections: [FlowLoader.FlowSection]
     let padding: CGFloat
@@ -37,26 +37,91 @@ public struct AssetCollection: View {
         self.sections = sections
     }
 
+    enum HeaderSelection: String, CaseIterable {
+        case flows = "Flows"
+        case player = "Player"
+    }
+
+    @State var segmentationSelection: HeaderSelection = .flows
+
+    @State var pubsubEventPublished = false
+    @State var pubsubEventName = ""
+    @State var pubsubEventMessage = ""
+
     public var body: some View {
-        List {
+        VStack {
+            Picker("", selection: $segmentationSelection) {
+                ForEach(HeaderSelection.allCases, id: \.self) { option in
+                    Text(option.rawValue)
+                }
+            }.pickerStyle(SegmentedPickerStyle())
+
+            Spacer()
+
+            if segmentationSelection == .flows {
+                flowsListSection
+            } else {
+                playerListSection
+            }
+        }
+    }
+
+    var flowsListSection: some View {
+        let pubsubPlugin = PubSubPlugin([("some-event", { (eventName, eventData) in
+            $pubsubEventPublished.wrappedValue = true
+            switch eventData {
+            case .string(data: let string):
+                $pubsubEventName.wrappedValue = eventName
+                $pubsubEventMessage.wrappedValue = string
+            default:
+                break
+            }
+        })])
+
+        return List {
             ForEach(sections, id: \.title) { section in
                 Section {
                     ForEach(section.flows, id: \.name) { flow in
                         NavigationLink(flow.name) {
-                            AssetFlowView(flow: flow.flow, plugins: plugins, completion: completion)
+                            AssetFlowView(flow: flow.flow, plugins: plugins + [pubsubPlugin], completion: completion)
                                 .padding(padding)
                                 .navigationBarTitle(Text(flow.name))
+                                .alert(isPresented: $pubsubEventPublished, content: {
+                                    Alert(title: Text("'\($pubsubEventName.wrappedValue)' Published"),
+                                          message: Text("Data from published event: \($pubsubEventMessage.wrappedValue)"),
+                                      dismissButton: .default(Text("OK")))
+                            })
                         }
                         .accessibility(identifier: "\(section.title) \(flow.name)")
                     }
                 } header: {
                     Text(section.title)
                 }
-
             }
         }
-        .accessibility(identifier: "AssetCollection")
+        .accessibility(identifier: "AssetAndPluginCollection")
         .navigationBarTitle(Text("Flows"))
+    }
+
+    var playerListSection: some View {
+        List {
+            Section {
+                NavigationLink("Simple Flows") {
+                    FlowManagerView(flowSequence: [.firstFlow, .secondFlow], navTitle: "Simple Flows")
+                }.accessibility(identifier: "Simple Flows")
+
+                NavigationLink("Error Content Flow") {
+                    FlowManagerView(flowSequence: [.firstFlow, .errorFlow], navTitle: "Error Content Flow")
+                }.accessibility(identifier: "Error Content Flow")
+
+                NavigationLink("Error Asset Flow") {
+                    FlowManagerView(flowSequence: [.firstFlow, .assetErrorFlow], navTitle: "Error Asset Flow")
+                }.accessibility(identifier: "Error Asset Flow")
+            }  header: {
+                Text("Managed Player")
+            }
+        } .accessibility(identifier: "Player")
+            .navigationBarTitle(Text("Player"))
     }
 }
 

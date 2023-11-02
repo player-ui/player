@@ -71,8 +71,11 @@ class SceneDelegate: UIResponder, UISceneDelegate {
         CommonTypesPlugin(),
         ExpressionPlugin(),
         CommonExpressionsPlugin(),
-        ExternalActionPlugin(handler: { _, _, _ in
-            print("external state")
+        ExternalActionPlugin(handler: { state, options, transition in
+            guard state.ref == "test-1" else { return transition("Prev") }
+            let transitionValue = options.data.get(binding: "transitionValue") as? String
+            options.expression.evaluate("{{foo}} = 'bar'")
+            transition(transitionValue ?? "Next")
         }),
         MetricsPlugin { timing, render, flow in
             print(timing as Any)
@@ -110,7 +113,7 @@ class SceneDelegate: UIResponder, UISceneDelegate {
 
         window.loadView(
             view: NavigationView {
-                AssetCollection(
+                AssetAndPluginCollection(
                     plugins: plugins,
                     sections: MockFlows.sections,
                     completion: self.completion(result:)

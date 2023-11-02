@@ -564,6 +564,20 @@ static let infoBasic: String = """
               }
             }
           }
+        },
+        {
+          "asset": {
+            "id": "prev-action",
+            "value": "Prev",
+            "type": "action",
+            "label": {
+              "asset": {
+                "id": "next-action-label",
+                "type": "text",
+                "value": "Back"
+              }
+            }
+          }
         }
       ]
     }
@@ -1016,7 +1030,78 @@ static let textWithLink: String = """
   }
 }
 """
+static let externalAction: String = """
+{
+  "id": "test-flow",
+  "data": {
+    "transitionValue": "Next"
+  },
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "EXT_1",
+      "EXT_1": {
+        "state_type": "EXTERNAL",
+        "ref": "test-1",
+        "transitions": {
+          "Next": "END_FWD",
+          "Prev": "END_BCK"
+        }
+      },
+      "END_FWD": {
+        "state_type": "END",
+        "outcome": "FWD"
+      },
+      "END_BCK": {
+        "state_type": "END",
+        "outcome": "BCK"
+      }
+    }
+  }
+}
+"""
+
+static let pubSubBasic: String = """
+{
+  "id": "generated-flow",
+  "views": [
+    {
+      "id": "action",
+      "type": "action",
+      "exp": "@[ publish('some-event', 'event published message') ]@",
+      "label": {
+        "asset": {
+          "id": "action-label",
+          "type": "text",
+          "value": "Clicked to publish event"
+        }
+      }
+    }
+  ],
+  "data": {
+    "count": 0
+  },
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "action",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+"""
     public static let sections: [FlowLoader.FlowSection] = [
+
         (title: "action", flows: [
             (name: "counter", flow: MockFlows.actionCounter),
             (name: "transition to end", flow: MockFlows.actionTransitionToEnd),
@@ -1040,6 +1125,12 @@ static let textWithLink: String = """
         (title: "text", flows: [
             (name: "basic", flow: MockFlows.textBasic),
             (name: "with link", flow: MockFlows.textWithLink)
+        ]),
+        (title: "external-action", flows: [
+            (name: "external-action", flow: MockFlows.externalAction)
+        ]),
+        (title: "pubsub", flows: [
+            (name: "pub sub basic", flow: MockFlows.pubSubBasic)
         ])
     ]
 }

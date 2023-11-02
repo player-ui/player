@@ -51,7 +51,16 @@ open class AssetUITestCase: XCTestCase {
      */
     open func openFlow(_ mockName: String) {
         navigateToAssetCollection()
-        app.otherElements.buttons[mockName].firstMatch.tap()
+
+        let button = app.otherElements.buttons[mockName].firstMatch
+        app.scrollToElement(element: button)
+
+        waitFor(button)
+        button.tap()
+    }
+
+    open func switchToPlayerTab() {
+        app.otherElements.buttons["Player"].firstMatch.tap()
     }
 
     /**
@@ -86,5 +95,21 @@ open class AssetUITestCase: XCTestCase {
         }
         let expectation = self.expectation(for: predicate, evaluatedWith: nil, handler: nil)
         wait(for: [expectation], timeout: timeout)
+    }
+}
+
+extension XCUIElement {
+    func scrollToElement(element: XCUIElement, maxTries: Int = 5) {
+        if element.visible() { return }
+        for _ in 0..<maxTries { // Do not scroll endlessly
+            swipeUp()
+            if element.visible() { return }
+        }
+        XCTFail("Scrolled \(maxTries) times but could not find element=\(element)")
+    }
+
+    func visible() -> Bool {
+        guard self.exists && !self.frame.isEmpty else { return false }
+        return XCUIApplication().windows.element(boundBy: 0).frame.contains(self.frame)
     }
 }
