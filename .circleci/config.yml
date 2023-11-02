@@ -362,11 +362,11 @@ workflows:
             - bazelrc
 
       - build_ios:
+          name: build-ios-fork
           filters:
             branches:
               only:
                 - /pull\/.*/
-          name: build-ios-fork
           requires: setup
 
       - maybe_release:
