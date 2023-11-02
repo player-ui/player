@@ -333,16 +333,28 @@ workflows:
 
       - build:
           name: build-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
           requires:
             - bazelrc
 
       - build:
           name: build-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
           requires:
             - setup
 
       - build_ios:
           name: build-ios-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
           context:
             - applitools
           requires:
@@ -350,6 +362,10 @@ workflows:
             - bazelrc
 
       - build_ios:
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
           name: build-ios-fork
           requires: setup
 
