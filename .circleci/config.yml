@@ -332,15 +332,43 @@ workflows:
             - bazelrc
 
       - build:
+          name: build-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
           requires:
             - bazelrc
 
+      - build:
+          name: build-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - setup
+
       - build_ios:
+          name: build-ios-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
           context:
             - applitools
           requires:
             - applitools_init
             - bazelrc
+
+      - build_ios:
+          name: build-ios-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - setup
 
       - maybe_release:
           filters:
@@ -350,12 +378,26 @@ workflows:
           context:
             - Publish
           requires:
-            - build
-            - build_ios
+            - build-trunk
+            - build-ios-trunk
 
       - test:
+          name: test-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
           requires:
-            - build
+            - build-trunk
+
+      - test:
+          name: test-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - build-fork
 
       - android_test:
           name: android-test-trunk
@@ -367,7 +409,7 @@ workflows:
             - applitools
           requires:
             - applitools_init
-            - build
+            - build-trunk
 
       - android_test:
           name: android-test-fork
@@ -376,11 +418,25 @@ workflows:
               only:
                 - /pull\/.*/
           requires:
-            - build
+            - build-fork
 
       - coverage:
+          name: coverage-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
           requires:
-            - build
+            - build-trunk
+
+      - coverage:
+          name: coverage-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - build-fork
 
       - applitools_cleanup:
           filters:
@@ -391,7 +447,7 @@ workflows:
             - applitools
           requires:
             - android-test-trunk
-            - build_ios
+            - build-ios-trunk
 
   build_and_test_main:
     when:
