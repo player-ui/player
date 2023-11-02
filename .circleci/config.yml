@@ -367,7 +367,8 @@ workflows:
             branches:
               only:
                 - /pull\/.*/
-          requires: setup
+          requires:
+            - setup
 
       - maybe_release:
           filters:
