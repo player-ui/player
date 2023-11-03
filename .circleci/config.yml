@@ -44,7 +44,7 @@ commands:
           at: ~/player
 
       - restore_cache:
-          keys: 
+          keys:
             - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
             - v1-bazel-cache-core-{{ .Branch }}
             - v1-bazel-cache-core-main
@@ -112,7 +112,7 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: 
+      - run:
           name: Homebrew Dependencies
           command: |
             HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@8
@@ -180,7 +180,7 @@ jobs:
       # TODO: the timeout should be added to the test itself
       - run: bazel test --test_env=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --test_env=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --test_env=APPLITOOLS_PR_NUMBER=${CIRCLE_PULL_REQUEST##*/} --test_timeout=1200 --jobs=1 --verbose_failures --config=ci  -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
 
-      - run: 
+      - run:
           when: always
           command: |
             RESULTS_DIR=_test_results
@@ -309,90 +309,145 @@ workflows:
               ignore:
                 - main
                 - /version-.*/
-                - /pull\/.*/
             tags:
               ignore: /.*/
       - bazelrc:
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
           context:
             - Build
           requires:
             - setup
 
       - applitools_init:
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
           context:
             - applitools
           requires:
             - bazelrc
 
       - build:
+          name: build-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
           requires:
             - bazelrc
 
-      - build_ios:
-          context:
-            - applitools
-          requires:
-            - applitools_init
-            - bazelrc
-
-      - maybe_release:
-          context:
-            - Publish
-          requires:
-            - build
-            - build_ios
-
-      - test:
-          requires:
-            - build
-
-      - android_test:
-          context:
-            - applitools
-          requires:
-            - applitools_init
-            - build
-
-      - coverage:
-          requires:
-            - build
-
-      - applitools_cleanup:
-          context:
-            - applitools
-          requires:
-            - android_test
-            - build_ios
-
-  build_and_test_pr_fork:
-    jobs:
-      - setup:
+      - build:
+          name: build-fork
           filters:
             branches:
               only:
                 - /pull\/.*/
-            tags:
-              ignore: /.*/
-
-      - build:
           requires:
             - setup
 
       - build_ios:
+          name: build-ios-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          context:
+            - applitools
+          requires:
+            - applitools_init
+            - bazelrc
+
+      - build_ios:
+          name: build-ios-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
           requires:
             - setup
 
-      - test:
+      - maybe_release:
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          context:
+            - Publish
           requires:
-            - build
+            - build-trunk
+            - build-ios-trunk
+
+      - test:
+          name: test-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          requires:
+            - build-trunk
+
+      - test:
+          name: test-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - build-fork
 
       - android_test:
+          name: android-test-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          context:
+            - applitools
           requires:
-            - build
+            - applitools_init
+            - build-trunk
+
+      - android_test:
+          name: android-test-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - build-fork
 
       - coverage:
+          name: coverage-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
           requires:
-            - build
+            - build-trunk
+
+      - coverage:
+          name: coverage-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - build-fork
+
+      - applitools_cleanup:
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          context:
+            - applitools
+          requires:
+            - android-test-trunk
+            - build-ios-trunk
 
   build_and_test_main:
     when:
