@@ -501,6 +501,9 @@ export class Player {
         ref,
         status: 'completed',
         flow: state.flow,
+        controllers: {
+          data: state.controllers.data.makeReadOnly(),
+        },
       } as const;
 
       return maybeUpdateState({

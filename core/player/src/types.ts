@@ -1,5 +1,4 @@
 import type { Flow, FlowResult } from '@player-ui/types';
-import type { DataModelWithParser } from './data';
 import type { BindingParser, BindingLike } from './binding';
 import type { SchemaController } from './schema';
 import type { ExpressionEvaluator } from './expressions';
@@ -10,6 +9,7 @@ import type {
   ValidationController,
   FlowController,
 } from './controllers';
+import type { ReadOnlyDataController } from './controllers/data/utils';
 
 /** The status for a flow's execution state */
 export type PlayerFlowStatus =
@@ -85,7 +85,13 @@ export type InProgressState = BaseFlowState<'in-progress'> &
 /** The flow completed properly */
 export type CompletedState = BaseFlowState<'completed'> &
   PlayerFlowExecutionData &
-  FlowResult;
+  FlowResult & {
+    /** Readonly Player controllers to provide Player functionality after the flow has ended */
+    controllers: {
+      /** A read only instance of the Data Controller */
+      data: ReadOnlyDataController;
+    };
+  };
 
 /** The flow finished but not successfully */
 export type ErrorState = BaseFlowState<'error'> & {

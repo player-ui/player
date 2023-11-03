@@ -1,9 +1,8 @@
 import { SyncHook, SyncWaterfallHook, SyncBailHook } from 'tapable-ts';
-import { omit, removeAt } from 'timm';
 import { dequal } from 'dequal';
-import type { Logger } from '../logger';
-import type { BindingParser, BindingLike } from '../binding';
-import { BindingInstance } from '../binding';
+import type { Logger } from '../../logger';
+import type { BindingParser, BindingLike } from '../../binding';
+import { BindingInstance } from '../../binding';
 import type {
   BatchSetTransaction,
   Updates,
@@ -11,9 +10,10 @@ import type {
   DataModelWithParser,
   DataPipeline,
   DataModelMiddleware,
-} from '../data';
-import { PipelinedDataModel, LocalModel } from '../data';
-import type { RawSetTransaction } from '../types';
+} from '../../data';
+import { PipelinedDataModel, LocalModel } from '../../data';
+import type { RawSetTransaction } from '../../types';
+import { ReadOnlyDataController } from './utils';
 
 /** The orchestrator for player data */
 export class DataController implements DataModelWithParser<DataModelOptions> {
@@ -240,5 +240,9 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
 
   public serialize(): object {
     return this.hooks.serialize.call(this.get(''));
+  }
+
+  public makeReadOnly(): ReadOnlyDataController {
+    return new ReadOnlyDataController(this, this.logger);
   }
 }
