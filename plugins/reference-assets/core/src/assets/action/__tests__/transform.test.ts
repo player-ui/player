@@ -105,7 +105,7 @@ describe('action transform', () => {
         },
       },
     });
-    expect(ref?.current?.metaData?.role).toBe(true);
+    expect(ref?.current?.metaData?.role).toBe('back');
     expect(ref.current?.id).toBe('view-1');
     ref.current?.run();
     expect(ref.current?.id).toBe('view-2');

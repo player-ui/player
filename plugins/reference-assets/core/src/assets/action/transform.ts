@@ -49,7 +49,7 @@ const backIconTransform: TransformFunction<ActionAsset, ActionAsset> = (
       ...action,
       metaData: {
         ...action?.metaData,
-        role: true,
+        role: 'back',
       },
     };
   }

@@ -29,7 +29,7 @@ export interface ActionAsset<AnyTextAsset extends Asset = Asset>
     skipValidation?: boolean;
 
     /** boolean value to decide for the left anchor sign */
-    role?: boolean;
+    role?: string;
   };
 }
 
