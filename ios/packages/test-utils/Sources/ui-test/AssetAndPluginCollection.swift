@@ -72,6 +72,7 @@ public struct AssetAndPluginCollection: View {
                     ForEach(section.flows, id: \.name) { flow in
                         NavigationLink(flow.name) {
                             PlayerLoader(flow: flow.flow)
+                                .navigationBarTitle(Text(flow.name))
                         }
                         .accessibility(identifier: "\(section.title) \(flow.name)")
                     }
@@ -101,8 +102,9 @@ public struct AssetAndPluginCollection: View {
             }  header: {
                 Text("Managed Player")
             }
-        } .accessibility(identifier: "Player")
-            .navigationBarTitle(Text("Player"))
+        }
+        .accessibility(identifier: "Player")
+        .navigationBarTitle(Text("Player"))
     }
 }
 
