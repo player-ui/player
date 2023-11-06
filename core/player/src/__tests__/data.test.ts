@@ -3,7 +3,7 @@ import { LocalModel } from '../data';
 import { ValidationMiddleware } from '../validator';
 import type { Logger } from '..';
 import { DataController } from '..';
-import { ReadOnlyDataController } from '../controllers/data/utils';
+import type { ReadOnlyDataController } from '../controllers/data/utils';
 
 test('works with basic data', () => {
   const model = {
