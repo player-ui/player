@@ -1061,21 +1061,44 @@ static let externalAction: String = """
 }
 """
 
+    
 static let pubSubBasic: String = """
 {
   "id": "generated-flow",
   "views": [
     {
-      "id": "action",
-      "type": "action",
-      "exp": "@[ publish('some-event', 'event published message') ]@",
-      "label": {
-        "asset": {
-          "id": "action-label",
-          "type": "text",
-          "value": "Clicked to publish event"
+      "id": "collection",
+      "type": "collection",
+      "values": [
+        {
+          "asset": {
+            "id": "action",
+            "type": "action",
+            "exp": "@[ publish('some-event', 'event published message') ]@",
+            "label": {
+              "asset": {
+                "id": "action-label",
+                "type": "text",
+                "value": "Clicked to publish event"
+              }
+            }
+          }
+        },
+        {
+          "asset": {
+            "id": "action-end",
+            "type": "action",
+            "value": "Next",
+            "label": {
+              "asset": {
+                "id": "action-end-label",
+                "type": "text",
+                "value": "End the flow (View pubsub events)"
+              }
+            }
+          }
         }
-      }
+      ]
     }
   ],
   "data": {
@@ -1087,7 +1110,7 @@ static let pubSubBasic: String = """
       "startState": "VIEW_1",
       "VIEW_1": {
         "state_type": "VIEW",
-        "ref": "action",
+        "ref": "collection",
         "transitions": {
           "*": "END_Done"
         }
@@ -1100,6 +1123,72 @@ static let pubSubBasic: String = """
   }
 }
 """
+    static let beaconAction: String = """
+    {
+      "id": "generated-flow",
+      "views": [
+        {
+          "id": "collection",
+          "type": "collection",
+          "values": [
+                  {
+              "asset": {
+              "id": "action",
+              "type": "action",
+               "exp": ["{{count}} = {{count}} + 1" , "beacon('action', 'some-data')"],
+               "metaData": {
+                "beacon": "Click count: {{count}}"
+              },
+              "label": {
+                "asset": {
+                  "id": "action-label-text",
+                  "type": "text",
+                  "value": "Clicked {{count}} times"
+                }
+              }
+            }
+            },
+            {
+              "asset": {
+                "id": "action-end",
+                "type": "action",
+                "value": "Next",
+                "label": {
+                  "asset": {
+                    "id": "action-end-label",
+                    "type": "text",
+                    "value": "End the flow (View Beacons)"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "data": {
+            "count": 0
+      },
+      "navigation": {
+        "BEGIN": "FLOW_1",
+        "FLOW_1": {
+          "startState": "VIEW_1",
+          "VIEW_1": {
+            "state_type": "VIEW",
+            "ref": "collection",
+            "transitions": {
+              "*": "END_Done"
+            }
+          },
+          "END_Done": {
+            "state_type": "END",
+            "outcome": "done"
+          }
+        }
+      }
+    }
+    """
+
+
     public static let sections: [FlowLoader.FlowSection] = [
 
         (title: "action", flows: [
@@ -1131,6 +1220,9 @@ static let pubSubBasic: String = """
         ]),
         (title: "pubsub", flows: [
             (name: "pub sub basic", flow: MockFlows.pubSubBasic)
+        ]),
+        (title: "beacon", flows: [
+            (name: "beacon action", flow: MockFlows.beaconAction)
         ])
     ]
 }

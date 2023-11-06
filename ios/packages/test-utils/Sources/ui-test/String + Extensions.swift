@@ -17,7 +17,7 @@ extension String {
             {
               "id": "first_view",
               "type": "action",
-              "value": "end",
+              "value": "flow_1",
               "label": {
                 "asset": {
                   "id": "next-view-label",
@@ -55,7 +55,7 @@ extension String {
                 {
                   "id": "second_view",
                   "type": "action",
-                  "value": "end",
+                  "value": "flow_2",
                   "label": {
                     "asset": {
                       "id": "next-view-label",

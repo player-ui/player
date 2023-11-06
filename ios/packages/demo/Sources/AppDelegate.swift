@@ -114,9 +114,7 @@ class SceneDelegate: UIResponder, UISceneDelegate {
         window.loadView(
             view: NavigationView {
                 AssetAndPluginCollection(
-                    plugins: plugins,
-                    sections: MockFlows.sections,
-                    completion: self.completion(result:)
+                    sections: MockFlows.sections
                 )
                 .navigationBarTitleDisplayMode(.inline)
             },
