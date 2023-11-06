@@ -1,7 +1,9 @@
 import { BindingParser } from '../binding';
 import { LocalModel } from '../data';
 import { ValidationMiddleware } from '../validator';
+import type { Logger } from '..';
 import { DataController } from '..';
+import { ReadOnlyDataController } from '../controllers/data/utils';
 
 test('works with basic data', () => {
   const model = {
@@ -449,4 +451,48 @@ it('should handle deleting non-existent value + parent value', () => {
   });
 
   controller.delete('foo.bar');
+});
+
+describe('Read Only Data Controller', () => {
+  let readOnlyController: ReadOnlyDataController;
+  let logger: Logger;
+
+  beforeEach(() => {
+    const localData = new LocalModel();
+    const parser = new BindingParser({
+      get: localData.get,
+      set: localData.set,
+    });
+    logger = {
+      trace: jest.fn(),
+      debug: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+    };
+
+    const controller = new DataController(
+      { some: { data: true } },
+      { pathResolver: parser, logger }
+    );
+
+    readOnlyController = controller.makeReadOnly();
+  });
+
+  it('Reads data', () => {
+    expect(readOnlyController.get('some.data')).toStrictEqual(true);
+  });
+
+  it('Logs error on set', () => {
+    expect(readOnlyController.set([['some.data', false]])).toStrictEqual([]);
+    expect(logger.error).toBeCalledWith(
+      'Error: Tried to set in a read only instance of the DataController'
+    );
+  });
+  it('Logs error on delete', () => {
+    readOnlyController.delete('some.data');
+    expect(logger.error).toBeCalledWith(
+      'Error: Tried to delete in a read only instance of the DataController'
+    );
+  });
 });
