@@ -184,7 +184,7 @@ def _generate_manifest(context):
             {
                 "group": group,
                 "name": file.replace(".json", ""),
-                "path": "../%s/%s/%s/%s" % (group, name,action,file),
+                "path": "./%s/%s/%s/%s" % (group, name,action,file),
             }
             for group, name, action, file in [
                 mock.path.split("/")[-4:]

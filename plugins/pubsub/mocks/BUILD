@@ -1,17 +1,15 @@
 load("//:index.bzl", "generate_manifest")
 load("//:index.bzl", "javascript_pipeline")
 
-# filegroup is used to create a larger manifest
 filegroup(
-    name = "mock",
+    name = "mocks",
     srcs = glob(["**/*.json"]),
     visibility = ["//visibility:public"],
 )
 
-# change load to :build.bzl to use generate manifest for non filegorup
 generate_manifest(
     name = "manifest",
-    mocks = [":mock"],
+    mocks = [":mocks"],
     visibility = ["//visibility:public"],
 )
 
@@ -28,11 +26,9 @@ javascript_pipeline(
     out_dir = "",
 )
 
-#need to figure out how to consolidate jars remove resource strip
-#  resource_strip_prefix = "plugins/reference-assets/mocks", adding this works with filegroups
 java_library(
     name = "jar",
-    resources = [":mock"],
+    resources = [":mocks"],
     resource_strip_prefix = "plugins/pubsub/mocks/",
     visibility = ["//visibility:public"],
 )
