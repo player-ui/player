@@ -8,7 +8,7 @@ filegroup(
 )
 
 generate_manifest(
-    name = "manifst",
+    name = "manifest",
     mocks = [":mocks"],
     visibility = ["//visibility:public"],
 )
