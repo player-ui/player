@@ -1,9 +1,15 @@
 load(":build.bzl", "generate_manifest")
 load("//:index.bzl", "javascript_pipeline")
 
+filegroup(
+    name = "mock",
+    srcs = glob(["**/*.json"]),
+    visibility = ["//visibility:public"],
+)
+
 generate_manifest(
-    name = "mocks",
-    mocks = glob(["**/*.json"]),
+    name = "manifest",
+    mocks = [":mock"],
     visibility = ["//visibility:public"],
 )
 
@@ -16,14 +22,14 @@ javascript_pipeline(
     ],
     other_srcs = [
         "index.ts",
-        ":mocks",
+        ":manifest",
     ] + glob(["**/*.tsx"]),
     out_dir = "",
 )
 
 java_library(
     name = "jar",
-    resources = [":mocks"],
+    resources = [":mock"],
     resource_strip_prefix = "plugins/reference-assets/mocks",
     visibility = ["//visibility:public"],
 )
