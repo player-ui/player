@@ -3,6 +3,8 @@ export * from './player';
 export * from './hooks';
 export * from './manager/managed-player';
 export * from './manager/request-time';
+export * from './subscriber/subscriber-player';
+export * from './subscriber/types';
 export * from './manager/types';
 export * from './asset';
 export * from './utils';
