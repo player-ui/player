@@ -11,7 +11,7 @@ import type {
   InfoAsset,
 } from '@player-ui/reference-assets-plugin';
 import { ReferenceAssetsPlugin as ReferenceAssetsCorePlugin } from '@player-ui/reference-assets-plugin';
-import { Input, Text, Collection, Action, Info } from './assets';
+import { Input, Text, Collection, Action, Info, Image } from './assets';
 
 /**
  *
@@ -50,6 +50,7 @@ export class ReferenceAssetsPlugin
         ['action', Action],
         ['info', Info],
         ['collection', Collection],
+        ['image', Image],
       ])
     );
 
