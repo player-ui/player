@@ -15,5 +15,4 @@ main_deps = parse_coordinates(maven) + [
     "//plugins/common-types/jvm:common-types",
     "//plugins/pending-transaction/jvm:pending-transaction",
     "//plugins/reference-assets/android:assets",
-
 ]
