@@ -1,0 +1,45 @@
+{
+  "asset": {
+    "id": "choice",
+    "title": {
+      "asset": {
+        "id": "choice-title",
+        "type": "text",
+        "value": "choice title"
+      }
+    },
+    "note": {
+      "asset": {
+        "id": "choice-note",
+        "type": "text",
+        "value": "optional choice note"
+      }
+    },
+    "type": "choice",
+    "binding": "foo.bar",
+    "choices": [
+      {
+        "id": "choice-option-1",
+        "label": {
+          "asset": {
+            "id": "choice-option-1-label",
+            "type": "text",
+            "value": "choice 1"
+          }
+        },
+        "value": "choice 1"
+      },
+      {
+        "id": "choice-option-2",
+        "label": {
+          "asset": {
+            "id": "choice-option-2-label",
+            "type": "text",
+            "value": "choice 2"
+          }
+        },
+        "value": "choice 2"
+      }
+    ]
+  }
+}

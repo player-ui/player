@@ -1,0 +1,131 @@
+{
+  "views": [
+    {
+      "id": "view-1",
+      "type": "collection",
+      "label": {
+        "asset": {
+          "id": "collection-label",
+          "type": "text",
+          "value": "Choice with Validation"
+        }
+      },
+      "values": [
+        {
+          "asset": {
+            "id": "choice",
+            "title": {
+              "asset": {
+                "id": "Choice-Title",
+                "type": "text",
+                "value": "Sample Choice"
+              }
+            },
+            "type": "choice",
+            "binding": "foo.bar",
+            "choices": [
+              {
+                "id": "Choice-1",
+                "label": {
+                  "asset": {
+                    "id": "Choice-1-Label",
+                    "type": "text",
+                    "value": "Choice 1"
+                  }
+                },
+                "value": "false"
+              },
+              {
+                "id": "Choice-2",
+                "label": {
+                  "asset": {
+                    "id": "Choice-2-Label",
+                    "type": "text",
+                    "value": "Choice 2"
+                  }
+                },
+                "value": "true"
+              }
+            ]
+          }
+        },
+        {
+          "asset": {
+            "id": "action",
+            "type": "action",
+            "value": "next",
+            "label": {
+              "asset": {
+                "id": "view-1-label",
+                "type": "text",
+                "value": "Continue"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "view-2",
+      "type": "action",
+      "value": "prev",
+      "label": {
+        "asset": {
+          "id": "view-2-label",
+          "type": "text",
+          "value": "Back"
+        }
+      }
+    }
+  ],
+  "schema": {
+    "ROOT": {
+      "application": {
+        "type": null
+      },
+      "foo": {
+        "type": "fooType"
+      }
+    },
+    "fooType": {
+      "bar": {
+        "type": "barType",
+        "validation": [
+          {
+            "type": "required",
+            "severity": "error"
+          }
+        ]
+      },
+      "baz": {
+        "type": "bazType",
+        "validation": [
+          {
+            "type": "required",
+            "message": "this is my own message"
+          }
+        ]
+      }
+    }
+  },
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "ref": "view-1",
+        "state_type": "VIEW",
+        "transitions": {
+          "next": "VIEW_2"
+        }
+      },
+      "VIEW_2": {
+        "ref": "view-2",
+        "state_type": "VIEW",
+        "transitions": {
+          "prev": "VIEW_1"
+        }
+      }
+    }
+  }
+}
