@@ -1,8 +1,8 @@
 //
-//  AssetCollectionViewController.swift
+//  SegmentControlView.swift
 //  PlayerUI
 //
-//  Created by Harris Borawski on 2/18/21.
+//  Created by Zhao Xia Wu on 2023-11-08.
 //
 
 import Foundation
@@ -12,28 +12,34 @@ import Combine
 /**
  A SwiftUI View to load flows for ease of UI testing
  */
-public struct AssetAndPluginCollection: View {
-    let sections: [FlowLoader.FlowSection]
+public struct SegmentControlView: View {
+    let plugins: [NativePlugin]
+    let assetSections: [FlowLoader.FlowSection]
+    let pluginSections: [FlowLoader.FlowSection]
     let padding: CGFloat
-
     /**
      Initializes and loads flows
      - parameters:
         - plugins: Plugins to add to Player instance that is created
-        - sections: The `[FlowSection]` to display
-        - completion: A handler for when a flow reaches an end state
+        - assetSections: The `[FlowSection]` to display asset flows
+        - pluginSections: The `[FlowSection]` to display plugin flows
+        - padding: Padding around the AssetFlowView ``
      */
     public init(
-        sections: [FlowLoader.FlowSection],
+        plugins: [NativePlugin],
+        assetSections: [FlowLoader.FlowSection],
+        pluginSections: [FlowLoader.FlowSection],
         padding: CGFloat = 16
     ) {
+        self.plugins = plugins
+        self.assetSections = assetSections
+        self.pluginSections = pluginSections
         self.padding = padding
-        self.sections = sections
     }
 
     enum HeaderSelection: String, CaseIterable {
-        case flows = "Flows"
-        case player = "Player"
+        case flows = "Asset Flows"
+        case player = "Plugins + Managed Player"
     }
 
     @State var segmentationSelection: HeaderSelection = .flows
@@ -46,6 +52,7 @@ public struct AssetAndPluginCollection: View {
     @State var beaconsInfo = ""
 
     @State var doneFlow = false
+    @State var outcome = ""
 
     public var body: some View {
         VStack {
@@ -65,9 +72,40 @@ public struct AssetAndPluginCollection: View {
         }
     }
 
+    func assetFlowCompletion(result: Result<CompletedState, PlayerError>) {
+        doneFlow = true
+        switch result {
+        case .success(let result):
+            outcome = result.endState?.outcome ?? "No Outcome"
+        case .failure(let error):
+            guard case let .promiseRejected(errorState) = error else {
+                outcome = error.playerDescription
+                return
+            }
+
+            outcome = errorState.error
+        }
+    }
+
     var flowsListSection: some View {
-        return List {
-            ForEach(sections, id: \.title) { section in
+        return AssetCollection(
+            plugins: plugins,
+            sections: assetSections,
+            completion: self.assetFlowCompletion(result:)
+        )
+        .accessibility(identifier: "AssetCollection")
+        .navigationBarTitle(Text("Flows"))
+        .alert(isPresented: $doneFlow, content: {
+            Alert(title: Text("FlowFinished"),
+                    message: Text("Outcome: \(outcome)"),
+                    dismissButton: .default(Text("OK")))
+        })
+    }
+
+    var playerListSection: some View {
+        List {
+            // Plugin flows
+            ForEach(pluginSections, id: \.title) { section in
                 Section {
                     ForEach(section.flows, id: \.name) { flow in
                         NavigationLink(flow.name) {
@@ -80,13 +118,8 @@ public struct AssetAndPluginCollection: View {
                     Text(section.title)
                 }
             }
-        }
-        .accessibility(identifier: "AssetAndPluginCollection")
-        .navigationBarTitle(Text("Flows"))
-    }
 
-    var playerListSection: some View {
-        List {
+            // Managed Player flows
             Section {
                 NavigationLink("Simple Flows") {
                     FlowManagerView(flowSequence: [.firstFlow, .secondFlow], navTitle: "Simple Flows")
@@ -105,70 +138,6 @@ public struct AssetAndPluginCollection: View {
         }
         .accessibility(identifier: "Player")
         .navigationBarTitle(Text("Player"))
-    }
-}
-
-/**
- Helper for loading player flows
- */
-public struct FlowLoader {
-    /// A single flow to render as a `UITableViewCell`
-    public typealias Flow = (name: String, flow: String)
-    /// A section of flows, the title being the asset type
-    public typealias FlowSection = (title: String, flows: [Flow])
-
-    /**
-     Loads a tree of Player Flows from the root of a given directory
-     The provided path should be to a folder containing folders listed by asset type,
-     Example:
-     ```
-     root
-        - action
-            - action-with-expression.json
-        - text
-            - text-basic.json
-            - modifiers
-                - text-with-modifiers.json
-     ```
-     - parameters:
-        - path: The path in the bundle to the root directory
-     - returns: An array of FlowSections for display
-     */
-    public static func loadTree(at path: String) -> [FlowSection] {
-        let fileManager = FileManager.default
-        let folders = (try? fileManager.contentsOfDirectory(atPath: path).sorted()) ?? []
-        func loadFlows(_ folder: String) -> [Flow] {
-            let subdirectory = "\(path)/\(folder)"
-            let files = (try? fileManager.contentsOfDirectory(atPath: subdirectory)) ?? []
-            return files
-            .map { (name) -> [Flow] in
-                var isDir: ObjCBool = false
-                _ = fileManager.fileExists(atPath: "\(subdirectory)/\(name)", isDirectory: &isDir)
-                if !isDir.boolValue {
-                    let data = fileManager.contents(atPath: "\(subdirectory)/\(name)")
-                    let json = String(data: data!, encoding: .utf8)!
-                    return [(
-                        name: name.lowercased().replacingOccurrences(of: ".json", with: ""),
-                        flow: json
-                    )]
-                }
-                return loadFlows("\(folder)/\(name)")
-            }
-            .reduce([]) { (accumulated, current) -> [Flow] in
-                return accumulated + current
-            }
-        }
-        return folders.map { folder in
-            (title: folder, flows: loadFlows(folder).map { flow in
-                (
-                    // Remove the section name from the beginning of the name, and remove dashes
-                    name: flow.name
-                        .replacingOccurrences(of: "\(folder.lowercased())-", with: "")
-                        .replacingOccurrences(of: "-", with: " "),
-                    flow: flow.flow
-                )
-            })
-        }
     }
 }
 
@@ -243,28 +212,16 @@ public extension Array where Element == NativePlugin {
 
     fileprivate static func defaults(loader: PlayerLoader.LoaderState?) -> [NativePlugin] {
         [
-            PrintLoggerPlugin(level: .trace),
             ReferenceAssetsPlugin(),
-            CommonTypesPlugin(),
-            ExpressionPlugin(),
-            CommonExpressionsPlugin(),
             ExternalActionPlugin(handler: { state, options, transition in
                 guard state.ref == "test-1" else { return transition("Prev") }
                 let transitionValue = options.data.get(binding: "transitionValue") as? String
                 options.expression.evaluate("{{foo}} = 'bar'")
                 transition(transitionValue ?? "Next")
             }),
-            MetricsPlugin { timing, render, flow in
-                print(timing as Any)
-                print(render as Any)
-                print(flow as Any)
-            },
-            RequestTimePlugin { 5 },
             PubSubPlugin([("some-event", { [weak loader] (eventName, eventData) in
-                loader?.pubsubInfo.append("Event Name: \(eventName), Event Data: \(String(describing: eventData)) \n")
+                loader?.pubsubInfo.append("Event Name: \(eventName), Event Data: \(String(describing: eventData))")
             })]),
-            TypesProviderPlugin(types: [], validators: [], formats: []),
-            TransitionPlugin(popTransition: .pop),
             BeaconPlugin<DefaultBeacon> { [weak loader] beaconStruct in
                 loader?.beaconStructList.append(beaconStruct)
 

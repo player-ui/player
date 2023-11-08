@@ -1189,7 +1189,7 @@ static let pubSubBasic: String = """
     """
 
 
-    public static let sections: [FlowLoader.FlowSection] = [
+    public static let assetSections: [FlowLoader.FlowSection] = [
 
         (title: "action", flows: [
             (name: "counter", flow: MockFlows.actionCounter),
@@ -1214,7 +1214,10 @@ static let pubSubBasic: String = """
         (title: "text", flows: [
             (name: "basic", flow: MockFlows.textBasic),
             (name: "with link", flow: MockFlows.textWithLink)
-        ]),
+        ])
+    ]
+
+    public static let pluginSections: [FlowLoader.FlowSection] = [
         (title: "external-action", flows: [
             (name: "external-action", flow: MockFlows.externalAction)
         ]),
