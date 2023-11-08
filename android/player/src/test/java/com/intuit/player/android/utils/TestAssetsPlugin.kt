@@ -15,5 +15,6 @@ internal object TestAssetsPlugin : AndroidPlayerPlugin {
             ),
             ::OtherSimpleAsset
         )
+        androidPlayer.registerAsset("broken", ::BrokenAsset)
     }
 }

@@ -4,6 +4,7 @@ import com.intuit.player.jvm.core.bridge.Completable
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
 import com.intuit.player.jvm.core.bridge.hooks.NodeSyncHook1
+import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField.Companion.NodeSerializableField
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.player.jvm.core.data.DataController
 import com.intuit.player.jvm.core.experimental.ExperimentalPlayerApi
@@ -34,7 +35,7 @@ public abstract class Player : Pluggable {
     /** [Player] hooks that expose underlying controllers for supplementing functionality */
     @Serializable(Hooks.Companion.Serializer::class)
     public interface Hooks {
-        /** The hook that fires every time we create a new flowController (a new flow is started) */
+        /** The hook that fires every time we create a new flowController (a new FRF) */
         public val flowController: NodeSyncHook1<FlowController>
 
         /** The hook that updates/handles view things */
@@ -57,22 +58,15 @@ public abstract class Player : Pluggable {
         public companion object {
             internal interface HooksByNode : Hooks, NodeWrapper
             public fun serializer(): KSerializer<Hooks> = Serializer
-            internal operator fun invoke(node: Node): HooksByNode = object : HooksByNode {
+            internal operator fun invoke(node: Node): HooksByNode = object : HooksByNode, NodeWrapper {
                 override val node: Node = node
-                override val flowController: NodeSyncHook1<FlowController>
-                    get() = NodeSyncHook1(node.getObject("flowController")!!, FlowController.serializer())
-                override val viewController: NodeSyncHook1<ViewController>
-                    get() = NodeSyncHook1(node.getObject("viewController")!!, ViewController.serializer())
-                override val view: NodeSyncHook1<View>
-                    get() = NodeSyncHook1(node.getObject("view")!!, View.serializer())
-                override val expressionEvaluator: NodeSyncHook1<ExpressionController>
-                    get() = NodeSyncHook1(node.getObject("expressionEvaluator")!!, ExpressionController.serializer())
-                override val dataController: NodeSyncHook1<DataController>
-                    get() = NodeSyncHook1(node.getObject("dataController")!!, DataController.serializer())
-                override val validationController: NodeSyncHook1<ValidationController>
-                    get() = NodeSyncHook1(node.getObject("validationController")!!, ValidationController.serializer())
-                override val state: NodeSyncHook1<out PlayerFlowState>
-                    get() = NodeSyncHook1(node.getObject("state")!!, PlayerFlowState.serializer())
+                override val flowController: NodeSyncHook1<FlowController> by NodeSerializableField(NodeSyncHook1.serializer(FlowController.serializer()))
+                override val viewController: NodeSyncHook1<ViewController> by NodeSerializableField(NodeSyncHook1.serializer(ViewController.serializer()))
+                override val view: NodeSyncHook1<View> by NodeSerializableField(NodeSyncHook1.serializer(View.serializer()))
+                override val expressionEvaluator: NodeSyncHook1<ExpressionController> by NodeSerializableField(NodeSyncHook1.serializer(ExpressionController.serializer()))
+                override val dataController: NodeSyncHook1<DataController> by NodeSerializableField(NodeSyncHook1.serializer(DataController.serializer()))
+                override val validationController: NodeSyncHook1<ValidationController> by NodeSerializableField(NodeSyncHook1.serializer(ValidationController.serializer()))
+                override val state: NodeSyncHook1<out PlayerFlowState> by NodeSerializableField(NodeSyncHook1.serializer(PlayerFlowState.serializer()))
             }
 
             internal object Serializer : KSerializer<Hooks> by NodeWrapperSerializer(Hooks::invoke) as KSerializer<Hooks>
