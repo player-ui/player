@@ -6,6 +6,9 @@ import type {
 import { compose, composeBefore } from '@player-ui/asset-transform-plugin';
 import type { ActionAsset, TransformedAction } from './types';
 
+/**
+ * Function to find prev button
+ */
 export function isBackAction(action: ActionAsset): boolean {
   return action.value === 'Prev';
 }
@@ -30,6 +33,28 @@ const transform: TransformFunction<ActionAsset, TransformedAction> = (
       }
     },
   };
+};
+
+/**
+ * De couples back button from the back icon
+ */
+const backIconTransform: TransformFunction<ActionAsset, ActionAsset> = (
+  action
+) => {
+  /** For previous versions of player, the back button would already have the back icon.
+   *  This ensures that the old functionality does not break and back button is still visible when they update the player.
+   */
+  if (isBackAction(action) && action?.metaData?.role === undefined) {
+    return {
+      ...action,
+      metaData: {
+        ...action?.metaData,
+        role: 'back',
+      },
+    };
+  }
+
+  return action;
 };
 
 /**
@@ -61,5 +86,6 @@ export const expPropTransform: BeforeTransformFunction<Asset> = (asset) => {
 
 export const actionTransform = compose(
   transform,
+  backIconTransform,
   composeBefore(expPropTransform)
 );
