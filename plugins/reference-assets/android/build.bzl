@@ -17,6 +17,7 @@ def kt_asset_test(
             "//jvm/j2v8:j2v8-all",
         ],
         resources = [
+            "//plugins/mocks:jar",
             "//plugins/reference-assets/mocks",
         ],
         manifest_values = {
