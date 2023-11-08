@@ -19,7 +19,7 @@ class ActionTest : AssetTest("action") {
 
     @Test
     fun actionExpression() {
-        launchMock("basic")
+        launchMock("action-basic")
 
         currentAssetTree.shouldBeAsset<Action> {
             data.label.shouldBeAsset<Text> {
@@ -41,7 +41,7 @@ class ActionTest : AssetTest("action") {
 
     @Test
     fun transitionToEndSuccess() {
-        launchMock("transition-to-end")
+        launchMock("action-transition-to-end")
 
         currentView.shouldBeView<LinearLayout> {
             assertEquals(2, childCount)
@@ -58,7 +58,7 @@ class ActionTest : AssetTest("action") {
 
     @Test
     fun transitionToEndError() {
-        launchMock("transition-to-end")
+        launchMock("action-transition-to-end")
 
         currentView.shouldBeView<LinearLayout> {
             assertEquals(2, childCount)
