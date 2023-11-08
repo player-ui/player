@@ -8,7 +8,7 @@ import type { Resolve } from '../../view';
 import { ViewInstance } from '../../view';
 import type { Logger } from '../../logger';
 import type { FlowInstance, FlowController } from '../flow';
-import type { DataController } from '../data';
+import type { DataController } from '../data/controller';
 import { AssetTransformCorePlugin } from './asset-transform';
 import type { TransformRegistry } from './types';
 import type { BindingInstance } from '../../binding';

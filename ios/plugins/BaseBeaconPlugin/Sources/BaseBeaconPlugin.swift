@@ -84,7 +84,7 @@ open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
         for plugin in plugins {
             plugin.context = self.context
         }
-        let callback: @convention(block) (JSValue?) -> Void = { rawBeacon in
+        let callback: @convention(block) (JSValue?) -> Void = { [weak self] rawBeacon in
             guard
                 let object = rawBeacon?.toObject(),
                 let data = try? JSONSerialization.data(withJSONObject: object),
@@ -92,7 +92,7 @@ open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
                     .inject(to: JSONDecoder())
                     .decode(BeaconStruct.self, from: data)
             else { return }
-            self.callback?(beacon)
+            self?.callback?(beacon)
         }
         let jsCallback = JSValue(object: callback, in: context) as Any
         return [["callback": jsCallback, "plugins": plugins.map { $0.pluginRef }]]
