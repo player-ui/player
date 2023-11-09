@@ -535,6 +535,67 @@ const multipleWarningsFlow: Flow = {
   },
 };
 
+const simpleFlowWithViewValidation: Flow = {
+  id: 'test-flow',
+  views: [
+    {
+      id: 'view-1',
+      type: 'view',
+      thing1: {
+        asset: {
+          type: 'whatevs',
+          id: 'thing1',
+          binding: 'data.thing1',
+        },
+      },
+      validation: [
+        {
+          ref: 'data.thing1',
+          type: 'expression',
+          exp: '{{data.thing1}} > 50',
+          trigger: 'navigation',
+          message: 'Must be greater than 50',
+        },
+      ],
+    },
+  ],
+  data: {},
+  schema: {
+    ROOT: {
+      data: {
+        type: 'DataType',
+      },
+    },
+    DataType: {
+      thing1: {
+        type: 'IntegerType',
+        validation: [
+          {
+            type: 'required',
+          },
+        ],
+      },
+    },
+  },
+  navigation: {
+    BEGIN: 'FLOW_1',
+    FLOW_1: {
+      startState: 'VIEW_1',
+      VIEW_1: {
+        state_type: 'VIEW',
+        ref: 'view-1',
+        transitions: {
+          '*': 'END_1',
+        },
+      },
+      END_1: {
+        state_type: 'END',
+        outcome: 'test',
+      },
+    },
+  },
+};
+
 test('alt APIs', async () => {
   const player = new Player();
 
@@ -1291,6 +1352,49 @@ describe('cross-field validation', () => {
       'END'
     );
   });
+
+  it('takes precedence over schema validation for the same binding', async () => {
+    const player = new Player({
+      plugins: [new TrackBindingPlugin()],
+    });
+    player.start(simpleFlowWithViewValidation);
+    const state = player.getState() as InProgressState;
+
+    // Validation starts as nothing
+    expect(
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+    ).toBe(undefined);
+
+    // Try to navigate, should show the validation now
+    state.controllers.flow.transition('next');
+    expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
+      'VIEW'
+    );
+    expect(
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+    ).toMatchObject({
+      severity: 'error',
+      message: 'Must be greater than 50',
+      displayTarget: 'field',
+    });
+
+    // Updating a thing is still nothing (haven't navigated yet)
+    state.controllers.data.set([['data.thing1', 51]]);
+    expect(
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+    ).toMatchObject({
+      severity: 'error',
+      message: 'Must be greater than 50',
+      displayTarget: 'field',
+    });
+
+    // Set it equal to 100 and continue on
+    state.controllers.flow.transition('next');
+
+    expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
+      'END'
+    );
+  });
 });
 
 test('shows errors on load', () => {
@@ -1907,6 +2011,35 @@ describe('warnings', () => {
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
       'END'
     );
+  });
+
+  it('should dismiss triggered navigation warnings on change', async () => {
+    const player = new Player({ plugins: [new TrackBindingPlugin()] });
+    player.start(warningFlowOnNavigation);
+    const state = player.getState() as InProgressState;
+
+    // Try to navigate, should prevent the navigation and keep the warning
+    state.controllers.flow.transition('next');
+    expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
+      'VIEW'
+    );
+    expect(
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+    ).toMatchObject(
+      expect.objectContaining({
+        message: 'A value is required',
+        severity: 'warning',
+        displayTarget: 'field',
+      })
+    );
+
+    state.controllers.data.set([['foo.data.thing1', 'value']]);
+
+    await waitFor(() => {
+      expect(
+        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      ).toBeUndefined();
+    });
   });
 
   it('blocking warnings dont auto-dismiss on double-navigation', async () => {
