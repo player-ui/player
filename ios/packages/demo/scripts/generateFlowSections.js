@@ -22,7 +22,7 @@ let pluginTypes = fs.readdirSync(pluginsDir).filter(function (plugin) {
 }).map(type => type)
 
 const pluginSections = pluginTypes.reduce((acc, currentType) => {
-  const filePaths = child_process.execSync(`find ../../../../plugins/${currentType}/mocks -name '*.json'`).toString().trim().split('\n').filter(p => p !== '')
+  const filePaths = child_process.execSync(`find ../../../../plugins/${currentType}/mocks/${currentType} -name '*.json'`).toString().trim().split('\n').filter(p => p !== '')
   return {...acc, [currentType]: filePaths}
 }, {})
 
@@ -64,9 +64,14 @@ ${JSON.stringify(json, null, 2).replace(/\\/g, '\\\\')}
 """`)
       .join('\n')
     }
-    public static let sections: [FlowLoader.FlowSection] = [
-${Object.keys(mergedSections).map(section => toFlowSection(section, "        ")).join(',\n')}
+
+    public static let assetSections: [FlowLoader.FlowSection] = [
+${Object.keys(assetSections).map(section => toFlowSection(section, "        ")).join(',\n')}
     ]
+
+    public static let pluginSections: [FlowLoader.FlowSection] = [
+      ${Object.keys(pluginSections).map(section => toFlowSection(section, "        ")).join(',\n')}
+          ]
 }
 `
 
