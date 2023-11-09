@@ -13,7 +13,7 @@ import com.intuit.player.jvm.core.player.state.dataModel
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class InputTest : AssetTest("input-basic") {
+class InputTest : AssetTest("reference-assets") {
 
     private fun FormattedEditText.type(text: String) {
         requestFocus()
@@ -23,7 +23,7 @@ class InputTest : AssetTest("input-basic") {
 
     @Test
     fun basic() {
-        launchMock()
+        launchMock("input-basic")
 
         val inputLabelContainer = currentView?.findViewById<FrameLayout>(R.id.input_label_container) ?: throw AssertionError("current view is null")
         val inputField = currentView?.findViewById<FormattedEditText>(R.id.input_field) ?: throw AssertionError("current view is null")
@@ -50,7 +50,7 @@ class InputTest : AssetTest("input-basic") {
 
     @Test
     fun validation() {
-        launchMock()
+        launchMock("input-validation")
 
         val view = currentView.shouldBeView<ConstraintLayout>()
         val inputLabelContainer = view.findViewById<FrameLayout>(R.id.input_label_container)

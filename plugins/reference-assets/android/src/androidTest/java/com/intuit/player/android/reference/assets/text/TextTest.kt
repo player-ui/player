@@ -9,11 +9,11 @@ import com.intuit.player.android.reference.assets.test.shouldBeView
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class TextTest : AssetTest("text-basic") {
+class TextTest : AssetTest("reference-assets") {
 
     @Test
     fun basic() {
-        launchMock()
+        launchMock("text-basic")
 
         val collectionValues = currentView?.findViewById<LinearLayout>(R.id.collection_values) ?: throw AssertionError("current view is null")
         collectionValues[0].shouldBeView<TextView> {
@@ -27,7 +27,7 @@ class TextTest : AssetTest("text-basic") {
 
     @Test
     fun link() {
-        launchMock("with-link")
+        launchMock("text-with-link")
 
         currentView.shouldBeView<TextView> {
             assertEquals("A Link", text.toString())

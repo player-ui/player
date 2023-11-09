@@ -12,11 +12,11 @@ import com.intuit.player.jvm.core.player.state.InProgressState
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class CollectionTest : AssetTest("collection") {
+class CollectionTest : AssetTest("reference-assets") {
 
     @Test
     fun basic() {
-        launchMock()
+        launchMock("collection-basic")
 
         val collectionLabel = currentView?.findViewById<FrameLayout>(R.id.collection_label) ?: throw AssertionError("current view is null")
         val collectionValues = currentView?.findViewById<LinearLayout>(R.id.collection_values) ?: throw AssertionError("current view is null")
