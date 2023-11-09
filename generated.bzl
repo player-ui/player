@@ -59,6 +59,14 @@ def PlayerUI(
             "ios/plugins/CommonTypesPlugin/Sources/**/*.c",
             "ios/plugins/CommonTypesPlugin/Sources/**/*.cc",
             "ios/plugins/CommonTypesPlugin/Sources/**/*.cpp",
+            "ios/plugins/ComputedPropertiesPlugin/Sources/**/*.h",
+            "ios/plugins/ComputedPropertiesPlugin/Sources/**/*.hh",
+            "ios/plugins/ComputedPropertiesPlugin/Sources/**/*.m",
+            "ios/plugins/ComputedPropertiesPlugin/Sources/**/*.mm",
+            "ios/plugins/ComputedPropertiesPlugin/Sources/**/*.swift",
+            "ios/plugins/ComputedPropertiesPlugin/Sources/**/*.c",
+            "ios/plugins/ComputedPropertiesPlugin/Sources/**/*.cc",
+            "ios/plugins/ComputedPropertiesPlugin/Sources/**/*.cpp",
             "ios/packages/core/Sources/**/*.h",
             "ios/packages/core/Sources/**/*.hh",
             "ios/packages/core/Sources/**/*.m",
@@ -213,6 +221,12 @@ def PlayerUI(
             ),
             "CommonTypesPlugin": glob(
                 ["ios/plugins/CommonTypesPlugin/Resources/**/*.js"],
+                exclude_directories = 0,
+            ),
+            "ComputedPropertiesPlugin": glob(
+                [
+                    "ios/plugins/ComputedPropertiesPlugin/Resources/**/*.js",
+                ],
                 exclude_directories = 0,
             ),
             "PlayerUI": glob(
