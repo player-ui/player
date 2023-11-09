@@ -275,6 +275,14 @@ and display it as a SwiftUI view comprised of registered assets.
     }
   end
 
+  s.subspec 'ComputedPropertiesPlugin' do |plugin|
+    plugin.dependency 'PlayerUI/Core'
+    plugin.source_files = 'ios/plugins/ComputedPropertiesPlugin/Sources/**/*'
+    plugin.resource_bundles = {
+      'ComputedPropertiesPlugin' => ['ios/plugins/ComputedPropertiesPlugin/Resources/**/*.js']
+    }
+  end
+
   s.subspec 'CommonExpressionsPlugin' do |plugin|
     plugin.dependency 'PlayerUI/Core'
     plugin.source_files = 'ios/plugins/CommonExpressionsPlugin/Sources/**/*'
