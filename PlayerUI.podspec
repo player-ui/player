@@ -84,8 +84,12 @@ and display it as a SwiftUI view comprised of registered assets.
         {
         :name => 'Mock Generation',
         :execution_position => :before_compile,
+        :shell_path => '/bin/zsh',
         :script => <<-SCRIPT
           cd ${SRCROOT}/../../ios/packages/demo/scripts
+          if test -f ~/.zshrc; then
+            source ~/.zshrc
+          fi
           ./generateFlowSections.js
         SCRIPT
       }
