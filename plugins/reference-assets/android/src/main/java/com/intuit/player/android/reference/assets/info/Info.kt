@@ -17,6 +17,7 @@ class Info(assetContext: AssetContext) : DecodableAsset<Info.Data>(assetContext,
         val title: RenderableAsset? = null,
         val primaryInfo: RenderableAsset? = null,
         val actions: List<RenderableAsset?> = emptyList(),
+        val footer: RenderableAsset? = null,
     )
 
     override fun initView() = LayoutInflater.from(context).inflate(R.layout.info, null).rootView
@@ -27,5 +28,6 @@ class Info(assetContext: AssetContext) : DecodableAsset<Info.Data>(assetContext,
         data.actions.filterNotNull().map {
             it.render()
         } into findViewById(R.id.info_actions)
+        data.footer?.render() into findViewById(R.id.info_footer)
     }
 }
