@@ -43,5 +43,5 @@ fi
 # Also deploy to the versioned folder for main releases
 if [ "$RELEASE_TYPE" == "release" ]; then
   SEMVER_MAJOR=$(cat VERSION | cut -d. -f1)
-  STABLE_DOCS_BASE_PATH=$SEMVER_MAJOR bazel run --verbose_failures --config=release //docs:deploy_docs -- --dest_dir "v$SEMVER_MAJOR"
+  STABLE_DOCS_BASE_PATH=$SEMVER_MAJOR bazel run --verbose_failures --config=release //docs:deploy_docs -- --dest_dir "$SEMVER_MAJOR"
 fi
