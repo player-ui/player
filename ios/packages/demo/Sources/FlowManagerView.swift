@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PlayerUI
 
 /**
  SwiftUI View to wrap the `ManagedPlayer` and handle the result
@@ -32,13 +33,21 @@ public struct FlowManagerView: View {
                                 print("Render: \(render?.duration ?? 0 )ms | Request \(flow?.flow.requestTime ?? 0)ms")
                             }
                         ],
-                        flowManager: MockFlowManager(flowSequence: flowSequence),
+                        flowManager: ConstantFlowManager(flowSequence),
                         onComplete: { _ in
                             complete = true
                         },
                         fallback: { (context) in
                             VStack {
                                 Text(context.error.localizedDescription)
+
+                                switch context.error as? PlayerError {
+                                case .promiseRejected(error: let errorState) :
+                                    Text(errorState.error)
+                                default:
+                                    EmptyView()
+                                }
+
                                 Button(action: context.retry, label: {
                                     Text("Retry")
                                 })

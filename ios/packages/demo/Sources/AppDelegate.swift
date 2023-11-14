@@ -71,11 +71,8 @@ class SceneDelegate: UIResponder, UISceneDelegate {
         CommonTypesPlugin(),
         ExpressionPlugin(),
         CommonExpressionsPlugin(),
-        ExternalActionPlugin(handler: { state, options, transition in
-            guard state.ref == "test-1" else { return transition("Prev") }
-            let transitionValue = options.data.get(binding: "transitionValue") as? String
-            options.expression.evaluate("{{foo}} = 'bar'")
-            transition(transitionValue ?? "Next")
+        ExternalActionPlugin(handler: { _, _, _ in
+            print("external state")
         }),
         MetricsPlugin { timing, render, flow in
             print(timing as Any)
@@ -113,9 +110,10 @@ class SceneDelegate: UIResponder, UISceneDelegate {
 
         window.loadView(
             view: NavigationView {
-                SegmentControlView(plugins: plugins,
-                                   assetSections: MockFlows.assetSections,
-                                   pluginSections: MockFlows.pluginSections
+                SegmentControlView(
+                    plugins: plugins,
+                    assetSections: MockFlows.assetSections,
+                    pluginSections: MockFlows.pluginSections
                 )
                 .navigationBarTitleDisplayMode(.inline)
             },
