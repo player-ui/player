@@ -301,3 +301,16 @@ class TerminatingManager: FlowManager {
         self.terminateFn(state)
     }
 }
+
+internal extension XCTestCase {
+    @discardableResult
+    func assertPublished<T>(_ publisher: AnyPublisher<T, Never>, timeout: Double = 2, condition: @escaping(T) -> Bool) async -> Cancellable {
+        let expectation = XCTestExpectation(description: "Waiting for publisher to emit value")
+        let cancel = publisher.sink { (value) in
+            guard condition(value) else { return }
+            expectation.fulfill()
+        }
+        await fulfillment(of: [expectation], timeout: timeout)
+        return cancel
+    }
+}
