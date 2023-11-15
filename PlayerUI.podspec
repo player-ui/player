@@ -346,6 +346,12 @@ and display it as a SwiftUI view comprised of registered assets.
     plugin.source_files = 'ios/plugins/SwiftUICheckPathPlugin/Sources/**/*'
   end
 
+  s.subspec 'SwiftUIPendingTransactionPlugin' do |plugin|
+    plugin.dependency 'PlayerUI/Core'
+    plugin.dependency 'PlayerUI/SwiftUI'
+    plugin.source_files = 'ios/plugins/SwiftUIPendingTransactionPlugin/Sources/**/*'
+  end
+
   s.subspec 'TypesProviderPlugin' do |plugin|
     plugin.dependency 'PlayerUI/Core'
     plugin.source_files = 'ios/plugins/TypesProviderPlugin/Sources/**/*'

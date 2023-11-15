@@ -34,7 +34,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         PubSubPlugin([]),
         TypesProviderPlugin(types: [], validators: [], formats: []),
         TransitionPlugin(popTransition: .pop),
-        BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) }
+        BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) },
+        SwiftUIPendingTransactionPlugin<PendingTransactionPhases>()
     ]
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -83,7 +84,9 @@ class SceneDelegate: UIResponder, UISceneDelegate {
         PubSubPlugin([]),
         TypesProviderPlugin(types: [], validators: [], formats: []),
         TransitionPlugin(popTransition: .pop),
-        BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) }
+        BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) },
+        SwiftUIPendingTransactionPlugin<PendingTransactionPhases>(),
+        SwiftUICheckPathPlugin()
     ]
 
     var window: UIWindow?

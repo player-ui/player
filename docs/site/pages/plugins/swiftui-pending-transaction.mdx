@@ -1,0 +1,128 @@
+
+---
+title: SwiftUIPendingTransactionPlugin
+platform: ios
+---
+
+# SwiftUIPendingTransactionPlugin
+
+The `SwiftUIPendingTransactionPlugin` allows you to register pending transactions (callbacks) in the userInfo on the decoder. Users can decide when to register, commit and clear transactions based on the use case. Anytime there is a scenario where we want a native transaction to happen while a view update is taking place, we can make use of this plugin. Below is an example used in the sample app where we can see this take place:
+
+
+## **The Issue:**
+
+When you enter text on input and then click on an action to try to navigate (which triggers a view update), the text gets wiped out and only saves you hit enter or click on another input field.
+
+## **The Solution:**
+
+**Step 1:**
+
+`SwiftUIPendingTransactionPlugin` takes a generic T that represents the namespace of the `TransactionContext`
+
+Declare a new object for keeping track of the namespaces or use the default struct `PendingTransactionPhases` for adding Phases
+
+If you use the default `PendingTransactionPhases` the plugin can be defined like `SwiftUIPendingTransactionPlugin<PendingTransactionPhases>()` or using the typealias `PendingTransactionPhasesPlugin()`
+Otherwise pass the new object in the generics on plugin initialization
+
+
+**Step 2:**
+
+If you use the default `PendingTransactionPhases`:
+
+Give a name to represent the phase of the transaction which you are keeping track of, for the example we will call the phase "input".
+Add the new phase via the `PendingTransactionPhases` extension
+
+```swift
+extension PendingTransactionPhases {
+    public static let input = PendingTransactionPhases(rawValue: "input")
+}
+```
+
+```swift
+If you don't want to use the default, one option is an enum which can show all your groups of transactions under one place
+enum AlternativePhases: String, Identifiable {
+    var id: Self { self }
+    case action
+    case input
+    case ...
+}
+```
+
+If you use the default `PendingTransactionPhases`: the transactionContext environment variable is already provided:
+
+```swift
+@Environment(\.transactionContext) private var transactionContext
+```
+
+Otherwise create a new environment variable with a different keypath:
+
+```swift
+/// EnvironmentKey for setting a `TransactionContextAlternativeKey`
+internal struct TransactionContextAlternativeKey: EnvironmentKey {
+    /// Default value for this key
+    public static let defaultValue: TransactionContext<AlternativePhases> = .init()
+}
+
+/// EnvironmentValue for `TransactionContextAlternative` for the `SwiftUIPendingTransactionPlugin`
+public extension EnvironmentValues {
+    /// The `TransactionContext` if it exists in the environment
+    var transactionContextAlternative: TransactionContext<AlternativePhases> {
+        get { self[TransactionContextAlternativeKey.self] }
+        set { self[TransactionContextAlternativeKey.self] = newValue }
+    }
+}
+```
+
+**Step 3:**
+
+To start registering transactions with the assets, access the transactionContext through the default environment variable above or the new one you created
+
+Register the transaction with the "input" phase (the view update) when a user starts editing the input,  (code snippet taken from [SwiftUIInputAsset](https://github.intuit.com/player/ios/blob/master/iOSPlayer/src/packages/reference-assets/src/SwiftUI/SwiftUIInputAsset.swift)
+
+```swift
+onEditingChanged: {editing in
+    guard !editing else {
+        // register the transaction once editing begins
+        transactionContext?.register(.input) {
+            self.model.set()
+        }
+        return** context.editBegin()
+    }
+
+    self.model.set()
+    context.editEnd()
+    // remove the transaction once editing ends
+    transactionContext?.clear(.input)
+}
+
+```
+Note: we can register multiple transactions under a single phase and we commit based on phase, when commiting a phase if multiple transactions exist they commit in no particular order
+
+
+**Step 4:**
+
+Commit the transaction (view update) before the action to navigate takes place. The WrappedFunction provides access to the userInfo where the TransactionContext is stored and users can use this how they see fit.
+
+Now in the [SwiftUIActionAsset](https://github.intuit.com/player/ios/blob/master/iOSPlayer/src/packages/reference-assets/src/SwiftUI/SwiftUIActionAsset.swift) instead of calling WrappedFunction `run` directly, we can extend the WrappedFunction and create another function called commitCallbacksThenCall which does the same thing as the normal call function except it will check for any input callbacks and commit then if they exist.
+
+```swift
+extension WrappedFunction {
+    ///  commits the pendingTransactionContext callbacks before running the wrapped function
+    public func commitCallbacksThenCall(_ args: Any...) {
+        let pendingTransactions = userInfo?[.pendingTransactionContext] as? TransactionContext
+        pendingTransactions?.commit(.input)
+
+        guard let jsValue = rawValue else { return }
+        jsValue.call(withArguments: args)
+    }
+}
+```
+
+Calling the new function inside of the action handler:
+```swift
+model.data.run?.commitCallbacksThenCall()
+```
+
+**Step 5:**
+
+Remove the registered transaction with the "input" phase once editing ended (as seen in the code snippet from step 1) because at this point callback has already been committed.
