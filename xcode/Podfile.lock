@@ -59,7 +59,6 @@ PODS:
     - PlayerUI/Core
     - PlayerUI/SwiftUI
   - PlayerUI/SwiftUIPendingTransactionPlugin (0.0.1-placeholder):
-    - PlayerUI/CheckPathPlugin
     - PlayerUI/Core
     - PlayerUI/SwiftUI
   - PlayerUI/TestUtilities (0.0.1-placeholder):
@@ -134,7 +133,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   EyesXCUI: bbb10a48b8bd1a15d541f2bc1f4d18f4db654ef1
-  PlayerUI: 265ed67933b9521b95e08e110e5033831222e1eb
+  PlayerUI: 7b9bdbf01b4da672a0b6be1281f7b70e134d4e3c
   SwiftHooks: 3ecc67c23da335d44914a8a74bd1dd23c7c149e6
   SwiftLint: 4fa9579c63416865179bc416f0a92d55f009600d
   ViewInspector: 53313c757eddc5c4842bc7943a66821a68d02d3e

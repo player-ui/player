@@ -85,8 +85,7 @@ class SceneDelegate: UIResponder, UISceneDelegate {
         TypesProviderPlugin(types: [], validators: [], formats: []),
         TransitionPlugin(popTransition: .pop),
         BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) },
-        SwiftUIPendingTransactionPlugin<PendingTransactionPhases>(),
-        SwiftUICheckPathPlugin()
+        SwiftUIPendingTransactionPlugin<PendingTransactionPhases>()
     ]
 
     var window: UIWindow?
