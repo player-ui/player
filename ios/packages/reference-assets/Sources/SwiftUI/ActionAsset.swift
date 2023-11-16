@@ -36,6 +36,9 @@ struct ActionAssetView: View {
     /// The `BeaconContext` if the `SwiftUIBeaconPlugin` is used in this player instance
     @Environment(\.beaconContext) var beaconContext
 
+    /// The `TransactionContext` if the `SwiftUIPendingTransactionPlugin` is used in this player instance
+    @Environment(\.transactionContext) private var transactionContext
+
     // For Testing Purposes
     internal var didAppear: ((Self) -> Void)?
 
@@ -44,6 +47,11 @@ struct ActionAssetView: View {
         Button(
             action: {
                 beaconContext?.beacon(action: "clicked", element: "button", id: model.data.id, metaData: model.data.metaData)
+
+                // commit the pendingTransactionContext input callbacks before running the wrapped function
+                // TODO: commit as a part of extension on wrapped function once user info is available on WrappedFunction
+                transactionContext.commit(.input)
+
                 self.model.data.run?()
             },
             label: {
