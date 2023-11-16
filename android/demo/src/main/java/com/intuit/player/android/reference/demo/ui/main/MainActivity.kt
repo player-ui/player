@@ -7,8 +7,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.observe
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.*
@@ -20,6 +22,8 @@ import com.intuit.player.android.ui.PlayerFragment
 import com.intuit.player.jvm.utils.mocks.ClassLoaderMock
 import com.intuit.player.jvm.utils.mocks.Mock
 import com.intuit.player.jvm.utils.mocks.getFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,6 +40,16 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp(navConfig) || super.onSupportNavigateUp()
     }
 
+    init {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.currentMock.collect {
+                    startFlow(it)
+                }
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -48,9 +62,6 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, navConfig)
         storybookNav.setupWithNavController(navController)
         storybookNav.menu.let(viewModel::groupMocks)
-        viewModel.currentMock.observe(this) {
-            startFlow(it)
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

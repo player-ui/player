@@ -5,7 +5,8 @@ maven_main = [
     "androidx.navigation:navigation-runtime:%s" % versions.androidx.navigation,
     "androidx.navigation:navigation-ui-ktx:%s" % versions.androidx.navigation,
     "androidx.navigation:navigation-fragment-ktx:%s" % versions.androidx.navigation,
-
+    "androidx.lifecycle:lifecycle-viewmodel-ktx:%s" % versions.androidx.lifecycle,
+    "androidx.lifecycle:lifecycle-runtime-ktx:%s" % versions.androidx.lifecycle,
     "com.afollestad.material-dialogs:core:%s" % versions.material_dialogs,
     "com.google.android.material:material:%s" % versions.material,
     #"com.squareup.leakcanary:leakcanary-android:2.2",
