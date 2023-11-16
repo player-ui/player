@@ -1,5 +1,4 @@
-load("//:index.bzl", "generate_manifest")
-load("//:index.bzl", "javascript_pipeline")
+load("//:index.bzl", "generate_manifest", "javascript_pipeline")
 
 filegroup(
     name = "mocks",
@@ -16,7 +15,7 @@ generate_manifest(
 javascript_pipeline(
     name = "@player-ui/reference-assets-plugin-mocks",
     entry = "index.ts",
-     dependencies = [
+    dependencies = [
         "@npm//@player-tools/dsl",
         "//plugins/reference-assets/components:@player-ui/reference-assets-components"
     ],

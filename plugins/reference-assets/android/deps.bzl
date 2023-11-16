@@ -10,7 +10,6 @@ main_exports = [
 
 main_deps = main_exports + parse_coordinates(maven_main) + [
     "//jvm:kotlin_serialization",
-    "//plugins/mocks:jar",
     "//plugins/reference-assets/jvm:reference-assets",
     "//plugins/pending-transaction/jvm:pending-transaction",
 ]

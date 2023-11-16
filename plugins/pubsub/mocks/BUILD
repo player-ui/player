@@ -16,7 +16,7 @@ generate_manifest(
 javascript_pipeline(
     name = "@player-ui/pubsub-plugin-mocks",
     entry = "index.ts",
-     dependencies = [
+    dependencies = [
         "@npm//@player-tools/dsl",
     ],
     other_srcs = [

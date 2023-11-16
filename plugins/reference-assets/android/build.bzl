@@ -19,7 +19,6 @@ def kt_asset_test(
 
         ],
         resources = [
-            "//plugins/mocks:jar",
         ],
         manifest_values = {
             "minSdkVersion": "14",

@@ -17,5 +17,4 @@ main_exports = [
 main_deps = main_exports
 
 main_resources = [
-    "//plugins/mocks:jar",
 ]

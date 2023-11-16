@@ -16,7 +16,6 @@ main_runtime_deps = []
 
 # Test dependencies
 test_deps = [
-     "//plugins/mocks:jar",
      "//plugins/reference-assets/jvm:reference-assets",
 ]
 test_runtime_deps = []
