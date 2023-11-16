@@ -115,7 +115,7 @@ jobs:
       - run:
           name: Homebrew Dependencies
           command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@8
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@11
 
       - run:
           name: Set Ruby Version
