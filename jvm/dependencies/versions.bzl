@@ -11,7 +11,7 @@ versions = struct(
         slf4j = "1.7.36",
         logback = "1.2.10",
     ),
-    hooks = "0.11.1",
+    hooks = "0.15.0",
     testing = struct(
         applitools = "4.7.6",
         junit = "4.12",
