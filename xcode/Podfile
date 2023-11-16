@@ -30,6 +30,7 @@ target 'PlayerUI_Example' do
   pod 'PlayerUI/PubSubPlugin', :path => '../'
   pod 'PlayerUI/StageRevertDataPlugin', :path => '../'
   pod 'PlayerUI/SwiftUICheckPathPlugin', :path => '../'
+  pod 'PlayerUI/SwiftUIPendingTransactionPlugin', :path => '../'
   pod 'PlayerUI/TransitionPlugin', :path => '../'
   pod 'PlayerUI/TypesProviderPlugin', :path => '../'
   

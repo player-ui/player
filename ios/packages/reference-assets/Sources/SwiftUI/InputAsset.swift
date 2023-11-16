@@ -79,6 +79,8 @@ struct InputAssetView: View {
     /// The viewModel with decoded data, supplied by `InputAsset`
     @ObservedObject var model: InputAssetViewModel
 
+    @Environment(\.transactionContext) private var transactionContext
+
     /// The color to use for the stroke around the field
     var strokeColor: Color {
         if let validation = model.data.validation {
@@ -94,9 +96,16 @@ struct InputAssetView: View {
             TextField(
                 model.data.placeholder ?? "",
                 text: $model.text,
-                onEditingChanged: {editing in
-                    guard !editing else { return }
+                onEditingChanged: { editing in
+                    guard !editing else {
+                        transactionContext.register(.input) {
+                            self.model.set()
+                        }
+                        return
+                    }
                     self.model.set()
+                    // remove the transaction once editing ends
+                    transactionContext.clear(.input)
                 }
             )
             .padding(4)
@@ -115,4 +124,11 @@ struct InputAssetView: View {
             model.data.note?.asset?.view.foregroundColor(Color(red: 0.729, green: 0.745, blue: 0.773)).padding(.top, 8).font(.subheadline)
         }
     }
+}
+
+/**
+ Extensions for PendingTransactionPhases of TransactionContext to create a new Phase for Input callbacks
+ */
+extension PendingTransactionPhases {
+    public static let input = PendingTransactionPhases(rawValue: "input")
 }
