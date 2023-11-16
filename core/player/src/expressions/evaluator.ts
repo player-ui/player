@@ -1,4 +1,5 @@
 import { SyncWaterfallHook, SyncBailHook } from 'tapable-ts';
+import { NestedError } from 'ts-nested-error';
 import { parseExpression } from './parser';
 import * as DEFAULT_EXPRESSION_HANDLERS from './evaluator-functions';
 import { isExpressionNode } from './types';
@@ -221,21 +222,27 @@ export class ExpressionEvaluator {
       [, matchedExp] = Array.from(matches); // In case the expression was surrounded by @[ ]@
     }
 
+    let storedAST: ExpressionNode;
+
     try {
-      const storedAST = this.expressionsCache.get(matchedExp);
-
-      if (storedAST) {
-        return this._execAST(storedAST, options);
-      }
-
-      const expAST = parseExpression(matchedExp);
-      this.expressionsCache.set(matchedExp, expAST);
-
-      return this._execAST(expAST, options);
+      storedAST =
+        this.expressionsCache.get(matchedExp) ?? parseExpression(matchedExp);
+      this.expressionsCache.set(matchedExp, storedAST);
     } catch (e: any) {
       if (options.throwErrors || !this.hooks.onError.call(e)) {
         // Only throw the error if it's not handled by the hook, or throwErrors is true
-        throw e;
+        throw new NestedError(`Error parsing expression: ${exp}`, e);
+      }
+
+      return;
+    }
+
+    try {
+      return this._execAST(storedAST, options);
+    } catch (e: any) {
+      if (options.throwErrors || !this.hooks.onError.call(e)) {
+        // Only throw the error if it's not handled by the hook, or throwErrors is true
+        throw new NestedError(`Error evaluating expression: ${exp}`, e);
       }
     }
   }
