@@ -60,7 +60,7 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
 
     protected val manager: FlowManager = FlowManager(flows)
 
-    private lateinit var runtime: Runtime<*>
+    private var runtime: Runtime<*>? = null
 
     private var _state = MutableStateFlow<ManagedPlayerState>(ManagedPlayerState.NotStarted)
     private val _beacons = MutableSharedFlow<String>()
@@ -125,7 +125,7 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
     }
 
     public override fun onCleared() {
-        runtime.scope.launch {
+        runtime?.scope?.launch {
             if (manager.state.value != AsyncIterationManager.State.Done) manager.iterator.terminate()
             release()
         }

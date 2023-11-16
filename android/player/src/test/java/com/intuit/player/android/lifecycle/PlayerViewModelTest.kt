@@ -1,6 +1,5 @@
 package com.intuit.player.android.lifecycle
 
-import android.util.*
 import android.util.clearLogs
 import android.util.e
 import android.util.i
@@ -197,5 +196,17 @@ internal class PlayerViewModelTest {
 
         viewModel.retry()
         coVerify(exactly = 2) { flowIterator.next(null) }
+    }
+    
+    @Test
+    fun `view model can be cleared successfully if player is never used`() {
+        val exception = Exception("oh no")
+        coEvery { flowIterator.next(any()) } throws exception
+        viewModel.start()
+
+        assertTrue(viewModel.state.value is ManagedPlayerState.Error)
+
+        // ensures safe handling during cleanup when player is never instantiated
+        viewModel.onCleared()
     }
 }
