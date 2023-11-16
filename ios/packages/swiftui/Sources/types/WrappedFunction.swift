@@ -12,10 +12,21 @@ import JavaScriptCore
  Represents a JS Function that was part of the asset in the JS runtime
  */
 public struct WrappedFunction<T>: JSValueBacked, Decodable, Hashable {
+    public static func == (lhs: WrappedFunction<T>, rhs: WrappedFunction<T>) -> Bool {
+        lhs.rawValue == rhs.rawValue
+    }
+
     public let rawValue: JSValue?
 
-    public init(rawValue: JSValue?) {
+    public let userInfo: [CodingUserInfoKey: Any]?
+
+    public init(rawValue: JSValue?, userInfo: [CodingUserInfoKey: Any]? = nil) {
         self.rawValue = rawValue
+        self.userInfo = userInfo
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        return hasher.combine(rawValue)
     }
 
     /**
@@ -24,7 +35,7 @@ public struct WrappedFunction<T>: JSValueBacked, Decodable, Hashable {
      and the JSValue is populated later with reflection
      */
     public init(from decoder: Decoder) throws {
-        self.init(rawValue: try decoder.getJSValue())
+        self.init(rawValue: try decoder.getJSValue(), userInfo: decoder.userInfo)
     }
 
     // In Swift 5.2 we can just call the entire object

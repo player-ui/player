@@ -49,10 +49,7 @@ struct ActionAssetView: View {
                 beaconContext?.beacon(action: "clicked", element: "button", id: model.data.id, metaData: model.data.metaData)
 
                 // commit the pendingTransactionContext input callbacks before running the wrapped function
-                // TODO: commit as a part of extension on wrapped function once user info is available on WrappedFunction
-                transactionContext.commit(.input)
-
-                self.model.data.run?()
+                model.data.run?.commitCallbacksThenCall()
             },
             label: {
                 if let label = model.data.label?.asset {
@@ -72,3 +69,15 @@ struct ActionAssetView: View {
         .onAppear { self.didAppear?(self) }
     }
 }
+
+extension WrappedFunction {
+    ///  commits the pendingTransactionContext callbacks before running the wrapped function
+    public func commitCallbacksThenCall(_ args: Any...) {
+        let pendingTransactions = userInfo?[.pendingTransactionContext] as? TransactionContext<PendingTransactionPhases>
+        pendingTransactions?.commit(.input)
+
+        guard let jsValue = rawValue else { return }
+        jsValue.call(withArguments: args)
+    }
+}
+
