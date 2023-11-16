@@ -2,7 +2,9 @@ package com.intuit.player.android
 
 import android.content.Context
 import android.view.View
+import com.intuit.hooks.BailResult
 import com.intuit.hooks.HookContext
+import com.intuit.hooks.SyncBailHook
 import com.intuit.hooks.SyncHook
 import com.intuit.hooks.SyncWaterfallHook
 import com.intuit.player.android.asset.RenderableAsset
@@ -101,7 +103,17 @@ public class AndroidPlayer private constructor(
             }
         }
 
+        public class UpdateHook : SyncBailHook<(RenderableAsset?) -> BailResult<Unit>, Unit>() {
+            public fun call(asset: RenderableAsset?, default: (HookContext) -> Unit): Unit? = super.call(
+                { f, _ ->
+                    f(asset)
+                },
+                default
+            )
+        }
+
         public val context: ContextHook = ContextHook()
+        public val update: UpdateHook = UpdateHook()
         internal val recycle: RecycleHook = RecycleHook()
         internal val release: ReleaseHook = ReleaseHook()
     }
@@ -156,7 +168,11 @@ public class AndroidPlayer private constructor(
                 clearCaches()
                 view?.hooks?.onUpdate?.tap { asset ->
                     try {
-                        assetHandler(expandAsset(asset), transition.value)
+                        expandAsset(asset).let { expandedAsset ->
+                            hooks.update.call(expandedAsset) {
+                                assetHandler(expandedAsset, transition.value)
+                            }
+                        }
                     } catch (exception: Exception) {
                         logger.error("Error while expanding ${asset?.id}", exception)
                         inProgressState?.fail(PlayerException("Error while expanding ${asset?.id}", exception))
