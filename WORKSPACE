@@ -173,6 +173,7 @@ maven_install(
     artifacts = [
         "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:jar:1.5.2",
     ],
+    fetch_sources = True,
     repositories = [
         "https://repo1.maven.org/maven2",
     ],
