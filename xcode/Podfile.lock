@@ -58,6 +58,9 @@ PODS:
     - PlayerUI/CheckPathPlugin
     - PlayerUI/Core
     - PlayerUI/SwiftUI
+  - PlayerUI/SwiftUIPendingTransactionPlugin (0.0.1-placeholder):
+    - PlayerUI/Core
+    - PlayerUI/SwiftUI
   - PlayerUI/TestUtilities (0.0.1-placeholder):
     - PlayerUI/Core
     - PlayerUI/SwiftUI
@@ -107,6 +110,7 @@ DEPENDENCIES:
   - PlayerUI/StageRevertDataPlugin (from `../`)
   - PlayerUI/SwiftUI (from `../`)
   - PlayerUI/SwiftUICheckPathPlugin (from `../`)
+  - PlayerUI/SwiftUIPendingTransactionPlugin (from `../`)
   - PlayerUI/TestUtilities (from `../`)
   - PlayerUI/TestUtilitiesCore (from `../`)
   - PlayerUI/TransitionPlugin (from `../`)
@@ -129,11 +133,11 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   EyesXCUI: bbb10a48b8bd1a15d541f2bc1f4d18f4db654ef1
-  PlayerUI: 49f4b664b10f3488c7d3caab950b7b1ec8bf3923
+  PlayerUI: 7b9bdbf01b4da672a0b6be1281f7b70e134d4e3c
   SwiftHooks: 3ecc67c23da335d44914a8a74bd1dd23c7c149e6
   SwiftLint: 4fa9579c63416865179bc416f0a92d55f009600d
   ViewInspector: 53313c757eddc5c4842bc7943a66821a68d02d3e
 
-PODFILE CHECKSUM: c49c2abae4f08be69e1ede1d83a369338a9b401f
+PODFILE CHECKSUM: 686834ace47c0cba292c80557dcd114a09d0f180
 
 COCOAPODS: 1.11.3

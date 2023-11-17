@@ -84,6 +84,21 @@ class BaseTestCase: AssetUITestCase {
     }
 
     public typealias ApplitoolsCheck = (String) -> Void
+
+    // AssetCollectionView uses a List which wont register elements if they aren't on screen
+    override func openFlow(_ mockName: String) {
+        guard !app.buttons[mockName].exists else { return super.openFlow(mockName) }
+        var attempts = 0
+        while attempts < 5 {
+            app.swipeUp()
+            XCTWaiter.delay(ms: 1)
+            if app.buttons[mockName].exists {
+                break
+            }
+            attempts += 1
+        }
+        super.openFlow(mockName)
+    }
 }
 
 extension Eyes {

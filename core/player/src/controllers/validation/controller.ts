@@ -212,7 +212,8 @@ class ValidatedBinding {
 
   private runApplicableValidations(
     runner: ValidationRunner,
-    canDismiss: boolean
+    canDismiss: boolean,
+    phase: Validation.Trigger
   ) {
     // If the currentState is not load, skip those
     this.applicableValidations = this.applicableValidations.map(
@@ -237,7 +238,7 @@ class ValidatedBinding {
           blocking === true || (blocking === 'once' && !canDismiss);
 
         if (
-          this.currentPhase === 'navigation' &&
+          phase === 'navigation' &&
           obj.state === 'active' &&
           obj.value.blocking !== true
         ) {
@@ -269,8 +270,7 @@ class ValidatedBinding {
           state: response ? 'active' : 'none',
           isBlockingNavigation,
           dismissable:
-            obj.value.severity === 'warning' &&
-            this.currentPhase === 'navigation',
+            obj.value.severity === 'warning' && phase === 'navigation',
           response: response
             ? {
                 ...obj.value,
@@ -307,7 +307,7 @@ class ValidatedBinding {
 
     if (this.currentPhase === 'navigation' || phase === this.currentPhase) {
       // Already added all the types. No need to continue adding new validations
-      this.runApplicableValidations(runner, canDismiss);
+      this.runApplicableValidations(runner, canDismiss, phase);
       return;
     }
 
@@ -343,13 +343,13 @@ class ValidatedBinding {
 
       this.applicableValidations = [
         ...newApplicableValidations,
-        ...(this.currentPhase === 'load' ? this.validationsByState.change : []),
         ...this.validationsByState.navigation,
+        ...(this.currentPhase === 'load' ? this.validationsByState.change : []),
       ];
       this.currentPhase = 'navigation';
     }
 
-    this.runApplicableValidations(runner, canDismiss);
+    this.runApplicableValidations(runner, canDismiss, phase);
   }
 }
 

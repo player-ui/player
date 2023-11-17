@@ -1,3 +1,91 @@
+# 0.4.3 (Fri Nov 17 2023)
+
+### Release Notes
+
+#### Add Automation ID to Error Element in Storybook ([#245](https://github.com/player-ui/player/pull/245))
+
+Storybook error element has a `data-automation-id` property which allows it to be programmably found in tests
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#247](https://github.com/player-ui/player/pull/247) ([@intuit-svc](https://github.com/intuit-svc))
+- Add Automation ID to Error Element in Storybook [#245](https://github.com/player-ui/player/pull/245) ([@KetanReddy](https://github.com/KetanReddy))
+- iOS: port async WrappedFunction update [#244](https://github.com/player-ui/player/pull/244) ([@hborawski](https://github.com/hborawski))
+- iOS: rewrite publisher assertions to be async [#234](https://github.com/player-ui/player/pull/234) ([@hborawski](https://github.com/hborawski))
+- Fix PR Titles Created During Release [#242](https://github.com/player-ui/player/pull/242) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 🏠 Internal
+
+- Update auto version. Filter release trigger from changelogs [#243](https://github.com/player-ui/player/pull/243) ([@adierkens](https://github.com/adierkens))
+
+#### 📝 Documentation
+
+- Update broken link in contributing docs [#238](https://github.com/player-ui/player/pull/238) ([@adierkens](https://github.com/adierkens))
+
+#### Authors: 4
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.4.2 (Thu Nov 16 2023)
+
+### Release Notes
+
+#### Add better error messaging for failed expression eval and parsing ([#239](https://github.com/player-ui/player/pull/239))
+
+Improved error messages for parse and eval failures for expressions
+
+---
+
+#### 🐛 Bug Fix
+
+- Release ${GITHUB_REF##*/} [#241](https://github.com/player-ui/player/pull/241) ([@intuit-svc](https://github.com/intuit-svc))
+- adding swiftuipendingtransactionplugin [#237](https://github.com/player-ui/player/pull/237) ([@zwu011](https://github.com/zwu011) [@nancywu1](https://github.com/nancywu1))
+- Add better error messaging for failed expression eval and parsing [#239](https://github.com/player-ui/player/pull/239) ([@adierkens](https://github.com/adierkens))
+
+#### Authors: 4
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- [@zwu011](https://github.com/zwu011)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+
+---
+
+# 0.4.1 (Wed Nov 15 2023)
+
+### Release Notes
+
+#### Pin @moncao-editor/react to non `.mjs` Only Version ([#230](https://github.com/player-ui/player/pull/230))
+
+Pin `@moncao-editor/react` to `4.3.1`
+
+---
+
+#### 🐛 Bug Fix
+
+- Release ${GITHUB_REF##*/} [#236](https://github.com/player-ui/player/pull/236) ([@intuit-svc](https://github.com/intuit-svc))
+- build: comment out major doc deploy for now [#235](https://github.com/player-ui/player/pull/235) ([@hborawski](https://github.com/hborawski))
+- Release ${GITHUB_REF##*/} [#233](https://github.com/player-ui/player/pull/233) ([@intuit-svc](https://github.com/intuit-svc))
+- remove version prefix from doc release path [#232](https://github.com/player-ui/player/pull/232) ([@hborawski](https://github.com/hborawski))
+- iOS: Update precompile script to source zshrc [#226](https://github.com/player-ui/player/pull/226) ([@hborawski](https://github.com/hborawski))
+- Release ${GITHUB_REF##*/} [#231](https://github.com/player-ui/player/pull/231) ([@intuit-svc](https://github.com/intuit-svc))
+- Pin @moncao-editor/react to non `.mjs` Only Version [#230](https://github.com/player-ui/player/pull/230) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 3
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.3.0 (Thu Nov 03 2022)
 
 #### 🚀 Enhancement
