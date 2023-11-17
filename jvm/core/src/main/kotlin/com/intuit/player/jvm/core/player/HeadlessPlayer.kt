@@ -65,27 +65,29 @@ public class HeadlessPlayer @JvmOverloads public constructor(
         /** 1. load source into the [runtime] and release lock */
         runtime.execute(source.readText())
 
-        /** 2. apply JS plugins and build [JSPlayerConfig] */
+        /** 2. merge explicit [LoggerPlugin]s with ones created by service loader */
+        val loggerPlugins = plugins.filterIsInstance<LoggerPlugin>().let { explicitLoggers ->
+            val explicitLoggerPlugins = explicitLoggers.map { it::class }
+            explicitLoggers + loggers { name = this@HeadlessPlayer::class.java.name }
+                .filterNot { explicitLoggerPlugins.contains(it::class) }
+        }
+
+        /** 3. apply runtime plugins and build [JSPlayerConfig] */
         val config = plugins
             .filterIsInstance<RuntimePlugin>()
             .onEach { it.apply(runtime) }
             .filterIsInstance<JSPluginWrapper>()
-            .let(::JSPlayerConfig)
+            .let { JSPlayerConfig(it, loggerPlugins) }
 
-        /** 3. Build JS headless player */
+        /** 4. build JS headless player */
         runtime.add("config", config)
         player = runtime.execute("new Player.Player(config)") as? Node
             ?: throw PlayerException("Couldn't create backing JS Player w/ config: $config")
 
-        /** 4. apply to player plugins */
+        /** 5. apply to player plugins */
         plugins
             .filterIsInstance<PlayerPlugin>()
             .onEach { it.apply(this) }
-
-        /** 5. apply logger plugins */
-        loggers
-            .filterNot { plugins.map { it::class }.contains(it::class) }
-            .forEach(logger::addHandler)
     }
 
     override fun start(flow: String): Completable<CompletedState> = start(runtime.execute("($flow)") as Node)
