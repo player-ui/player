@@ -162,6 +162,16 @@ public fun Node.getSymbol(key: String): String? {
     return getSymbol(this, key)
 }
 
+/** Decode a [Node] entirely as a snapshot of its current data. Will allow for additional data access after a [Node]s runtime has been released */
+@ExperimentalPlayerApi
+internal fun Node.snapshot(): Map<String, Any?> = entries.associate { (key, value) ->
+    key to when (value) {
+        is Node -> value.snapshot()
+        is Function<*> -> null
+        else -> value
+    }
+}
+
 private inline fun <reified T> Any?.safeCast(): T? = this as? T
 
 internal object EmptyNode : Node {

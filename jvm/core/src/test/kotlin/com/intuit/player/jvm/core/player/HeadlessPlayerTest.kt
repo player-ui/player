@@ -106,11 +106,13 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         player.inProgressState?.transition("Next")
 
         val result = flow.await()
-        assertEquals("done", result.endState.outcome)
-        assertEquals(mapOf("someKey" to "someValue"), result.endState["param"])
-        assertEquals("extraValue", result.endState["extraKey"])
-        assertEquals(mapOf("someInt" to 1), result.endState["extraObject"])
         assertEquals("counter-flow", result.flow.id)
+        val endState = result.endState
+        assertEquals("done", endState.outcome)
+        player.release()
+        assertEquals(mapOf("someKey" to "someValue"), endState.param)
+        assertEquals("extraValue", endState["extraKey"])
+        assertEquals(mapOf("someInt" to 1), endState["extraObject"])
     }
 
     @TestTemplate

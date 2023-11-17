@@ -4,6 +4,8 @@ import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
+import com.intuit.player.jvm.core.bridge.snapshot
+import com.intuit.player.jvm.core.experimental.ExperimentalPlayerApi
 import com.intuit.player.jvm.core.experimental.RuntimeClassDiscriminator
 import com.intuit.player.jvm.core.expressions.Expression
 import com.intuit.player.jvm.core.flow.state.NavigationFlowStateType.*
@@ -51,7 +53,7 @@ public class NavigationFlowActionState internal constructor(override val node: N
 public class NavigationFlowEndState internal constructor(override val node: Node) :
     NavigationFlowState(),
     NodeWrapper,
-    Map<String, Any?> by node {
+    Map<String, Any?> by node.snapshot() {
 
     override val stateType: NavigationFlowStateType = END
 
@@ -63,6 +65,9 @@ public class NavigationFlowEndState internal constructor(override val node: Node
 
     internal object Serializer : NodeWrapperSerializer<NavigationFlowEndState>(::NavigationFlowEndState, END.name)
 }
+
+@ExperimentalPlayerApi
+public val NavigationFlowEndState.param: Any? get() = get("param")
 
 /**
  * External Flow states represent states in the FSM that can't be resolved internally in the player.
