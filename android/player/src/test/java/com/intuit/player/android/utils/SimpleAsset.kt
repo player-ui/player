@@ -24,7 +24,7 @@ internal class SimpleAsset(assetContext: AssetContext) : DecodableAsset<Node>(as
             "id" to "simple-asset",
             "data" to "{{someBinding}}",
             "type" to "simple",
-            "metaData" to mapOf<String, Any>("a" to "b")
+            "metaData" to mapOf<String, Any>("a" to "b"),
         )
         val runtime = J2V8.create()
         val sampleAsset = runtime.serialize(sampleMap) as Asset

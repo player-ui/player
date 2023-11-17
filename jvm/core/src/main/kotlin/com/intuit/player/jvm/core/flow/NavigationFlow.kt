@@ -11,5 +11,5 @@ public data class NavigationFlow(
     val startState: String,
     val onStart: Expression?,
     @Transient
-    val states: Map<String, NavigationFlowState>? = null
+    val states: Map<String, NavigationFlowState>? = null,
 )

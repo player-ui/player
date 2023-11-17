@@ -20,7 +20,7 @@ public class NodeSyncBailHook1<T, R>(
         require(serializedArgs.size == 1)
         val p1 = serializedArgs[0] as T
         return call(
-            { f, t -> f(context, p1) }
+            { f, t -> f(context, p1) },
         ) { Unit as R }
     }
 

@@ -4,7 +4,7 @@ import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.deserialize
 import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.utils.test.RuntimeTest
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestTemplate
 
 @kotlinx.serialization.Serializable
@@ -29,7 +29,7 @@ internal class JSMapTest : RuntimeTest() {
                 
                 return { generateMap: () => map };
             })()
-            """.trimIndent()
+            """.trimIndent(),
         ) as Node
 
         val map: JSMap<Key, Value> = node.getInvokable<Node>("generateMap")!!().deserialize()
@@ -51,7 +51,7 @@ internal class JSMapTest : RuntimeTest() {
                 
                 return { generateMap: () => map };
             })()
-            """.trimIndent()
+            """.trimIndent(),
         ) as Node
 
         val map: JSMap<String, Int> = node.getInvokable<Node>("generateMap")!!().deserialize()

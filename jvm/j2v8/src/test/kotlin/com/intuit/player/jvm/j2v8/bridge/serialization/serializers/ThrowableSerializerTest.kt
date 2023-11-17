@@ -30,7 +30,7 @@ internal class ThrowableSerializerTest : J2V8Test() {
             """com.intuit.player.jvm.core.bridge.JSErrorException: Error: hello
 	at .(<anonymous>:1)
 """,
-            exception.stackTraceToString()
+            exception.stackTraceToString(),
         )
     }
 
@@ -45,7 +45,7 @@ internal class ThrowableSerializerTest : J2V8Test() {
             className,
             methodName,
             fileName,
-            lineNumber
+            lineNumber,
         )
 
         val exception = PlayerException("world")
@@ -64,7 +64,7 @@ internal class ThrowableSerializerTest : J2V8Test() {
                 format.encodeToRuntimeValue(
                     SerializableStackTraceElement.serializer(),
                     serializableStackTraceElement,
-                ).jsEquals(error.getArray("stackTrace").getObject(0))
+                ).jsEquals(error.getArray("stackTrace").getObject(0)),
             )
         }
     }
@@ -99,14 +99,14 @@ internal class ThrowableSerializerTest : J2V8Test() {
             className,
             methodName,
             fileName,
-            lineNumber
+            lineNumber,
         )
 
         val exception = PlayerException(
             "hello",
             PlayerException("world").apply {
                 stackTrace = arrayOf(stackTraceElement)
-            }
+            },
         ).apply {
             stackTrace = arrayOf(stackTraceElement)
         }
@@ -125,7 +125,7 @@ internal class ThrowableSerializerTest : J2V8Test() {
                 format.encodeToRuntimeValue(
                     SerializableStackTraceElement.serializer(),
                     serializableStackTraceElement,
-                ).jsEquals(error.getArray("stackTrace").getObject(0))
+                ).jsEquals(error.getArray("stackTrace").getObject(0)),
             )
 
             val cause = format.decodeFromV8Value<Throwable>(error.getObject("cause"))

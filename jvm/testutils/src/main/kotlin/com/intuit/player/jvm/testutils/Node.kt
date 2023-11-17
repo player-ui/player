@@ -36,7 +36,7 @@ public class Node(private val map: Map<String, Any?>) : com.intuit.player.jvm.co
     override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T =
         Json.decodeFromJsonElement(
             deserializer,
-            Json.encodeToJsonElement(MapSerializer(String.serializer(), GenericSerializer()), map)
+            Json.encodeToJsonElement(MapSerializer(String.serializer(), GenericSerializer()), map),
         )
 
     override fun isReleased(): Boolean = false

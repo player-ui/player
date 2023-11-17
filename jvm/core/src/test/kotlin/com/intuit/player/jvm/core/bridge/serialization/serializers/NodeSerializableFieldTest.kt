@@ -9,8 +9,15 @@ import com.intuit.player.jvm.core.player.PlayerException
 import com.intuit.player.jvm.utils.test.RuntimeTest
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.*
-import org.junit.jupiter.api.Assertions.*
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotSame
+import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestTemplate
 import org.junit.jupiter.api.assertThrows
@@ -37,7 +44,7 @@ internal class NodeSerializableFieldTest : RuntimeTest() {
             "nested",
             buildJsonObject {
                 put("primitive", 20)
-            }
+            },
         )
     }
 
@@ -134,7 +141,7 @@ internal class NodeSerializableFieldTest : RuntimeTest() {
             "Could not deserialize \"undefined\" as \"com.intuit.player.jvm.core.bridge.serialization.serializers.Structured(primitive: kotlin.Int, nested: com.intuit.player.jvm.core.bridge.serialization.serializers.Structured?)\"",
             assertThrows<PlayerException> {
                 nested
-            }.message
+            }.message,
         )
     }
 

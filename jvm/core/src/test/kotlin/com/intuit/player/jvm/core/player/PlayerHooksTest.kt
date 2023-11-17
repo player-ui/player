@@ -15,10 +15,13 @@ import org.junit.jupiter.api.Test
 internal class PlayerHooksTest : NodeBaseTest() {
     @MockK
     private lateinit var fc: NodeSyncHook1<FlowController>
+
     @MockK
     private lateinit var vc: NodeSyncHook1<ViewController>
+
     @MockK
     private lateinit var dc: NodeSyncHook1<DataController>
+
     @MockK
     private lateinit var state: NodeSyncHook1<PlayerFlowState>
 

@@ -1,6 +1,8 @@
 package com.intuit.player.jvm.core.serialization
 
-import com.intuit.player.jvm.core.bridge.serialization.format.*
+import com.intuit.player.jvm.core.bridge.serialization.format.encodeToRuntimeValue
+import com.intuit.player.jvm.core.bridge.serialization.format.runtimeArray
+import com.intuit.player.jvm.core.bridge.serialization.format.runtimeObject
 import com.intuit.player.jvm.utils.test.RuntimeTest
 import com.intuit.player.jvm.utils.test.equals
 import kotlinx.serialization.Serializable
@@ -89,7 +91,7 @@ internal class StructureEncoding : RuntimeTest() {
                 "five" to 5,
                 "six" to "six",
             ),
-            "seven" to 7.7
+            "seven" to 7.7,
         )
 
         assertTrue(format.equals(runtimeObject, format.encodeToRuntimeValue(map)))
@@ -136,13 +138,13 @@ internal class StructureEncoding : RuntimeTest() {
                 format.runtimeArray {
                     append(1)
                     append(2)
-                }
+                },
             )
             append(
                 format.runtimeArray {
                     append(3)
                     append(4)
-                }
+                },
             )
         }
 
@@ -161,13 +163,13 @@ internal class StructureEncoding : RuntimeTest() {
                 format.runtimeArray {
                     append(1)
                     append("two")
-                }
+                },
             )
             append(
                 format.runtimeArray {
                     append(3)
                     append(false)
-                }
+                },
             )
             append(7.7)
         }

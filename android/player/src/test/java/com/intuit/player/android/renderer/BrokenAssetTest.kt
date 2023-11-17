@@ -70,7 +70,7 @@ internal class BrokenAssetTest {
             "Android context not found! Ensure the asset is rendered with a valid Android context.",
             assertThrows<PlayerException> {
                 BrokenAsset(baseContext).requireContext()
-            }.message
+            }.message,
         )
         assertTrue(player.state is ErrorState)
     }

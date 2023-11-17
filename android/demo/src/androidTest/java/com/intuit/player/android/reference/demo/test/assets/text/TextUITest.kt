@@ -32,7 +32,7 @@ class TextUITest : AssetUITest("text") {
 
         val openLink = allOf(
             hasAction(ACTION_VIEW),
-            hasData("http://www.intuit.com")
+            hasData("http://www.intuit.com"),
         )
 
         intending(openLink).respondWith(ActivityResult(RESULT_CANCELED, null))

@@ -19,7 +19,9 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.modules.EmptySerializersModule
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 

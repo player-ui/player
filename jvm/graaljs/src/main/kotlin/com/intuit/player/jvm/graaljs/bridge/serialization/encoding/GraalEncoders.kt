@@ -56,14 +56,15 @@ internal open class GraalValueEncoder(private val format: GraalFormat, private v
         MAP,
         LIST,
         PRIMITIVE,
-        UNDECIDED
+        UNDECIDED,
     }
 
     private val currentContent get() = when (mode) {
         Mode.MAP -> contentMap
         Mode.LIST -> contentList
         Mode.PRIMITIVE,
-        Mode.UNDECIDED -> content
+        Mode.UNDECIDED,
+        -> content
     }
 
     private var tag: String? = null
@@ -73,7 +74,8 @@ internal open class GraalValueEncoder(private val format: GraalFormat, private v
     }
         get() = when (mode) {
             Mode.UNDECIDED,
-            Mode.PRIMITIVE -> field
+            Mode.PRIMITIVE,
+            -> field
             else -> error("cannot get content unless in PRIMITIVE mode")
         }
 
@@ -94,22 +96,26 @@ internal open class GraalValueEncoder(private val format: GraalFormat, private v
         }
 
     override fun beginStructure(
-        descriptor: SerialDescriptor
+        descriptor: SerialDescriptor,
     ): CompositeEncoder {
         val consumer = when (mode) {
             Mode.LIST,
-            Mode.MAP -> { node -> putContent(node) }
+            Mode.MAP,
+            -> { node -> putContent(node) }
             Mode.PRIMITIVE,
-            Mode.UNDECIDED -> consumer
+            Mode.UNDECIDED,
+            -> consumer
         }
 
-        return if (descriptor == ThrowableSerializer().descriptor)
+        return if (descriptor == ThrowableSerializer().descriptor) {
             GraalExceptionEncoder(format, ::putContent)
-        else when (descriptor.kind) {
-            StructureKind.CLASS -> GraalValueEncoder(format, Mode.MAP, consumer)
-            StructureKind.LIST, is PolymorphicKind -> GraalValueEncoder(format, Mode.LIST, consumer)
-            StructureKind.MAP -> GraalValueEncoder(format, Mode.MAP, consumer)
-            else -> GraalValueEncoder(format, consumer)
+        } else {
+            when (descriptor.kind) {
+                StructureKind.CLASS -> GraalValueEncoder(format, Mode.MAP, consumer)
+                StructureKind.LIST, is PolymorphicKind -> GraalValueEncoder(format, Mode.LIST, consumer)
+                StructureKind.MAP -> GraalValueEncoder(format, Mode.MAP, consumer)
+                else -> GraalValueEncoder(format, consumer)
+            }
         }
     }
 
@@ -121,7 +127,7 @@ internal open class GraalValueEncoder(private val format: GraalFormat, private v
             is GraalNode -> value.graalObject
             is Value -> value
             else -> value
-        }
+        },
     )
 
     override fun encodeNull() = putContent(null)
@@ -144,7 +150,7 @@ internal open class GraalValueEncoder(private val format: GraalFormat, private v
                 .toTypedArray()
 
             format.encodeToGraalValue(invokable(*encodedArgs))
-        }
+        },
     )
 
     override fun encodeFunction(kCallable: KCallable<*>) = putContent(
@@ -160,15 +166,17 @@ internal open class GraalValueEncoder(private val format: GraalFormat, private v
 
                         // check if type is nullable and value is null
                         if ((
-                            currValue == null &&
-                                // base type or type argument could be marked nullable
-                                (kParam.type.isMarkedNullable || kParam.type.arguments[0].type?.isMarkedNullable == true)
-                            ) ||
+                                currValue == null &&
+                                    // base type or type argument could be marked nullable
+                                    (kParam.type.isMarkedNullable || kParam.type.arguments[0].type?.isMarkedNullable == true)
+                                ) ||
                             // otherwise check if arg matches type if not null
                             (currValue != null && currValue::class.isSubclassOf(kParam.type.arguments[0].type?.classifier as KClass<*>))
-                        )
+                        ) {
                             index++
-                        else break
+                        } else {
+                            break
+                        }
                     }
                     // only take matching args
                     encodedArgs.slice(start until index).toTypedArray()
@@ -178,7 +186,7 @@ internal open class GraalValueEncoder(private val format: GraalFormat, private v
                 }
             }.toTypedArray()
             format.encodeToGraalValue(kCallable.call(*matchedArgs))
-        }
+        },
     )
 
     override fun encodeFunction(function: Function<*>) {
@@ -215,7 +223,7 @@ internal open class GraalValueEncoder(private val format: GraalFormat, private v
                     is JsonArray -> value.toList()
                     is JsonPrimitive -> value.value
                     else -> value
-                } as T
+                } as T,
             )
 
             else -> super<AbstractEncoder>.encodeSerializableValue(serializer, value)
@@ -230,7 +238,8 @@ internal open class GraalValueEncoder(private val format: GraalFormat, private v
                 else -> putContent(tag, content)
             }
             Mode.PRIMITIVE,
-            Mode.UNDECIDED -> {
+            Mode.UNDECIDED,
+            -> {
                 this.content = format.context.asValue(content)
                 endEncode()
             }
@@ -242,7 +251,8 @@ internal open class GraalValueEncoder(private val format: GraalFormat, private v
             Mode.LIST -> contentList.add(content)
             Mode.MAP -> contentMap[tag] = content
             Mode.UNDECIDED,
-            Mode.PRIMITIVE -> {
+            Mode.PRIMITIVE,
+            -> {
                 this.content = format.context.asValue(content)
                 endEncode()
             }
@@ -251,8 +261,10 @@ internal open class GraalValueEncoder(private val format: GraalFormat, private v
     }
 
     private fun Value.add(content: Any?) {
-        if (this.hasArrayElements()) blockingLock {
-            this.setArrayElement(this.arraySize, content)
+        if (this.hasArrayElements()) {
+            blockingLock {
+                this.setArrayElement(this.arraySize, content)
+            }
         }
         val item = ""
     }
@@ -267,7 +279,8 @@ internal open class GraalValueEncoder(private val format: GraalFormat, private v
             is Boolean,
             is Double,
             is Int,
-            is Long -> putMember(key, content)
+            is Long,
+            -> putMember(key, content)
             else -> error("can't set property on Graal Value of type: ${content::class}")
         }
     }
@@ -275,7 +288,8 @@ internal open class GraalValueEncoder(private val format: GraalFormat, private v
 
 internal class GraalExceptionEncoder(format: GraalFormat, consumer: (Value) -> Unit) : GraalValueEncoder(
     format,
-    Mode.MAP, consumer
+    Mode.MAP,
+    consumer,
 ) {
 
     override val contentMap by lazy {

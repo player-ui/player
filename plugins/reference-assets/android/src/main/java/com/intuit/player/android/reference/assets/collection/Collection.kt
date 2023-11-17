@@ -3,7 +3,6 @@ package com.intuit.player.android.reference.assets.collection
 import android.view.LayoutInflater
 import android.view.View
 import com.intuit.player.android.AssetContext
-import com.intuit.player.android.asset.DecodableAsset
 import com.intuit.player.android.asset.RenderableAsset
 import com.intuit.player.android.asset.SuspendableAsset
 import com.intuit.player.android.extensions.into
@@ -19,7 +18,7 @@ open class Collection(assetContext: AssetContext) : SuspendableAsset<Collection.
         /** Required [values] is the collection of asset */
         val values: List<RenderableAsset>,
         /** An optional label to title the collection */
-        val label: RenderableAsset? = null
+        val label: RenderableAsset? = null,
     )
 
     override suspend fun initView(data: Data) = LayoutInflater.from(context).inflate(R.layout.collection, null).rootView

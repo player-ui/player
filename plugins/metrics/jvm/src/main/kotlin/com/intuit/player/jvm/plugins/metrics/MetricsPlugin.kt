@@ -13,7 +13,7 @@ import com.intuit.player.jvm.core.plugins.findPlugin
 public typealias RenderEndHandler = (Timing?, RenderMetrics?, PlayerFlowMetrics?) -> Unit
 
 public class MetricsPlugin(
-    private val handler: RenderEndHandler
+    private val handler: RenderEndHandler,
 ) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
 
     override fun apply(runtime: Runtime<*>) {
@@ -25,11 +25,11 @@ public class MetricsPlugin(
                     handler.invoke(
                         timing.deserialize(Timing.serializer()),
                         renderMetrics.deserialize(RenderMetrics.serializer()),
-                        flowMetrics.deserialize(PlayerFlowMetrics.serializer())
+                        flowMetrics.deserialize(PlayerFlowMetrics.serializer()),
                     )
                 },
-                "trackRenderTime" to true
-            )
+                "trackRenderTime" to true,
+            ),
         )
         instance = runtime.buildInstance("(new $name(handlers))")
     }
@@ -49,7 +49,7 @@ public typealias RequestTimeClosure = () -> Int
 
 /** Wrapper around RequestTimeWebPlugin, which needs to apply to MetricsPlugin */
 internal class RequestTimeWebPlugin(
-    private val getRequestTime: RequestTimeClosure
+    private val getRequestTime: RequestTimeClosure,
 ) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
 
     override fun apply(runtime: Runtime<*>) {
@@ -57,7 +57,7 @@ internal class RequestTimeWebPlugin(
             runtime.execute(script)
         }
         runtime.add(
-            "callback"
+            "callback",
         ) getRequestTime@{ getRequestTime.invoke() }
         instance = runtime.buildInstance("(new $name(callback))")
     }
@@ -75,7 +75,7 @@ internal class RequestTimeWebPlugin(
 
 /** A plugin to supply request time to MetricsPlugin */
 public class RequestTimePlugin(
-    private val getRequestTime: RequestTimeClosure
+    private val getRequestTime: RequestTimeClosure,
 ) : PlayerPlugin {
     private val requestTimeWebPlugin = RequestTimeWebPlugin(getRequestTime)
     override fun apply(player: Player) {

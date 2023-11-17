@@ -22,7 +22,7 @@ private fun Style?.toStyles() = this?.let {
 
 public fun Context.overlayStyles(
     @StyleRes vararg additionalStyles: Style,
-    @StyleRes baseStyle: Style?
+    @StyleRes baseStyle: Style?,
 ): Context = overlayStyles(baseStyle.toStyles(), additionalStyles.toList())
 
 public fun Context.overlayStyles(@StyleRes vararg additionalStyles: Style): Context =
@@ -37,6 +37,6 @@ public fun Context.overlayStyles(@StyleRes vararg additionalStyles: Style): Cont
  */
 public fun Context.overlayStyles(
     @StyleRes baseStyles: Styles = emptyList(),
-    @StyleRes additionalStyles: Styles = emptyList()
+    @StyleRes additionalStyles: Styles = emptyList(),
 ): Context = (baseStyles + additionalStyles)
     .fold(this, ::ContextThemeWrapper)

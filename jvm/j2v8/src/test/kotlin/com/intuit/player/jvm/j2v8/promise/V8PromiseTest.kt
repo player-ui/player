@@ -21,7 +21,7 @@ internal class V8PromiseTest : J2V8Test(), PromiseUtils {
                const promise = new Promise(function(resolve, reject) { asdf.asdf.asdf.asdf });
                return [promise, resolver];
            })();
-            """.trimIndent()
+            """.trimIndent(),
         ) as List<*>
 
         Promise(promise as Node).thenRecord.catchRecord
@@ -39,7 +39,7 @@ internal class V8PromiseTest : J2V8Test(), PromiseUtils {
 	at .(<anonymous>:3)
 	at .(<anonymous>:5)
 """,
-            exception.stackTraceToString()
+            exception.stackTraceToString(),
         )
     }
 }

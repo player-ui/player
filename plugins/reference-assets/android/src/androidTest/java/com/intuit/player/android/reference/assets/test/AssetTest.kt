@@ -116,14 +116,14 @@ abstract class AssetTest(val group: String? = null) {
 
     fun launchMock(name: String) = launchMock(
         mocks.find { it.name == name || it.name == "$group-$name" }
-            ?: throw IllegalArgumentException("$name not found in mocks: ${mocks.map { "${it.group}/${it.name}" }}")
+            ?: throw IllegalArgumentException("$name not found in mocks: ${mocks.map { "${it.group}/${it.name}" }}"),
     )
 
     fun launchMock(mock: Mock<*>) = launchJson(
         when (mock) {
             is ClassLoaderMock -> mock.getFlow(context.classLoader)
             else -> throw IllegalArgumentException("mock of type ${mock::class.java.simpleName} not supported")
-        }
+        },
     )
 
     fun launchJson(json: JsonElement) = launchJson(Json.encodeToString(json))

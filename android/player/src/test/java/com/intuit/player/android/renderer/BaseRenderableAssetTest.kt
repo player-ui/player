@@ -28,7 +28,7 @@ internal abstract class BaseRenderableAssetTest {
         val action: String,
         val element: String,
         val asset: Asset,
-        val data: Any? = null
+        val data: Any? = null,
     )
 
     var beaconPlugin: BeaconPlugin = spyk(BeaconPlugin())

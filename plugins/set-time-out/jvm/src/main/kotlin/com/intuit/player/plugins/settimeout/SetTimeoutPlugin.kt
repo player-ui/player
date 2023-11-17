@@ -19,22 +19,24 @@ public class SetTimeoutPlugin(private val exceptionHandler: CoroutineExceptionHa
     private var player: Player? = null
 
     override fun apply(runtime: Runtime<*>) {
-        if (!runtime.contains("setTimeout")) runtime.add("setTimeout") { callback: Invokable<Any?>, timeout: Double ->
-            runtime.scope.launch(
-                exceptionHandler ?: CoroutineExceptionHandler { _, exception ->
-                    PlayerPluginException(
-                        "SetTimeoutPlugin",
-                        "Exception throw during setTimeout invocation",
-                        exception
-                    ).let {
-                        player?.inProgressState?.fail(it) ?: throw it
-                    }
+        if (!runtime.contains("setTimeout")) {
+            runtime.add("setTimeout") { callback: Invokable<Any?>, timeout: Double ->
+                runtime.scope.launch(
+                    exceptionHandler ?: CoroutineExceptionHandler { _, exception ->
+                        PlayerPluginException(
+                            "SetTimeoutPlugin",
+                            "Exception throw during setTimeout invocation",
+                            exception,
+                        ).let {
+                            player?.inProgressState?.fail(it) ?: throw it
+                        }
+                    },
+                ) {
+                    delay(timeout.toLong())
+                    callback()
                 }
-            ) {
-                delay(timeout.toLong())
-                callback()
+                return@add
             }
-            return@add
         }
     }
 

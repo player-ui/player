@@ -11,7 +11,10 @@ import com.intuit.player.jvm.utils.test.PlayerTest
 import com.intuit.player.jvm.utils.test.RuntimeTest
 import com.intuit.player.jvm.utils.test.runBlockingTest
 import com.intuit.player.jvm.utils.test.simpleFlowString
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.TestTemplate
 
@@ -24,7 +27,7 @@ internal class SetTimeoutPluginTest : RuntimeTest() {
             CoroutineExceptionHandler { _, exception ->
                 exception.printStackTrace()
                 exceptions.add(exception)
-            }
+            },
         ).apply(runtime)
         Assertions.assertNotNull(runtime["setTimeout"])
         val promise = (
@@ -39,7 +42,7 @@ internal class SetTimeoutPluginTest : RuntimeTest() {
                     }, 500);
                 });
             }());
-                """.trimIndent()
+                """.trimIndent(),
             ) as Node
             ).deserialize<Promise>()
         Assertions.assertFalse(runtime.getBoolean("flag")!!)
@@ -56,7 +59,7 @@ internal class SetTimeoutPluginTest : RuntimeTest() {
             CoroutineExceptionHandler { _, exception ->
                 exception.printStackTrace()
                 exceptions.add(exception)
-            }
+            },
         ).apply(runtime)
         Assertions.assertNotNull(runtime["setTimeout"])
         runtime.execute(
@@ -66,7 +69,7 @@ internal class SetTimeoutPluginTest : RuntimeTest() {
                     throw "err";
                 }, 500);
             }());
-            """.trimIndent()
+            """.trimIndent(),
         )
         delay(1000)
         Assertions.assertEquals("err", exceptions.single().message?.takeLast(3))
@@ -80,7 +83,7 @@ internal class SetTimeoutPluginTest : RuntimeTest() {
             CoroutineExceptionHandler { _, exception ->
                 exception.printStackTrace()
                 exceptions.add(exception)
-            }
+            },
         ).apply(runtime)
         Assertions.assertNotNull(runtime["setTimeout"])
         runtime.execute(
@@ -94,7 +97,7 @@ internal class SetTimeoutPluginTest : RuntimeTest() {
                     }, 500);
                 });
             }());
-            """.trimIndent()
+            """.trimIndent(),
         )
         Assertions.assertFalse(runtime.getBoolean("flag")!!)
         runtime.release()

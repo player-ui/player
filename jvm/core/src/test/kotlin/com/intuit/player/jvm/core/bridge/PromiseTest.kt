@@ -81,13 +81,13 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
                 "flowResult",
                 buildJsonObject {
                     put("outcome", "doneWithTopic")
-                }
+                },
             )
             put(
                 "flow",
                 buildJsonObject {
                     put("id", "some-id")
-                }
+                },
             )
         }
         val flow = CompletedState(
@@ -95,13 +95,13 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
                 mapOf(
                     "status" to PlayerFlowStatus.COMPLETED.value,
                     "flowResult" to mapOf(
-                        "outcome" to "doneWithTopic"
+                        "outcome" to "doneWithTopic",
                     ),
                     "flow" to mapOf(
-                        "id" to "some-id"
-                    )
-                )
-            ) as Node
+                        "id" to "some-id",
+                    ),
+                ),
+            ) as Node,
         )
 
         runtime.Promise.resolve(42)
@@ -127,7 +127,7 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
                const promise = new Promise(function(resolve, reject) { resolver = resolve });
                return [promise, resolver];
            })();
-            """.trimIndent()
+            """.trimIndent(),
         ) as List<*>
 
         Promise(promise as Node)

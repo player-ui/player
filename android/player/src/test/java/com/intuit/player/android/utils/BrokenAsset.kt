@@ -25,7 +25,7 @@ internal class BrokenAsset(assetContext: AssetContext) : DecodableAsset<BrokenAs
 
     @Serializable
     enum class Layout {
-        Frame, Linear;
+        Frame, Linear
     }
 
     override fun initView() = when (data.layout) {
@@ -35,11 +35,13 @@ internal class BrokenAsset(assetContext: AssetContext) : DecodableAsset<BrokenAs
 
     override fun View.hydrate() {
         if (data.shouldFail || (
-            data.layout == Layout.Frame && this is LinearLayout
-            ) || (
+                data.layout == Layout.Frame && this is LinearLayout
+                ) || (
                 data.layout == Layout.Linear && this is FrameLayout
                 )
-        ) invalidateView()
+        ) {
+            invalidateView()
+        }
     }
 
     companion object {

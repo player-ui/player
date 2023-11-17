@@ -18,7 +18,7 @@ internal class JavaLoggerPluginTest : RuntimeTest() {
             "MyLogger",
             JavaLoggerFactory.create {
                 name = "MyLogger"
-            }.logger.name
+            }.logger.name,
         )
     }
 

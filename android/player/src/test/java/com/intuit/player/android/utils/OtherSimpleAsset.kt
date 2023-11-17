@@ -24,7 +24,7 @@ internal class OtherSimpleAsset(assetContext: AssetContext) : SuspendableAsset<N
         val sampleMap = mapOf(
             "id" to "some-id",
             "type" to "simple",
-            "metaData" to mapOf("role" to "other")
+            "metaData" to mapOf("role" to "other"),
         )
         val sampleAsset: Asset = J2V8.create().serialize(sampleMap) as Asset
         val sampleJson = Json.encodeToJsonElement(GenericSerializer(), sampleMap)

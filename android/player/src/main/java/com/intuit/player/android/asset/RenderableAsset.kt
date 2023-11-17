@@ -3,10 +3,16 @@ package com.intuit.player.android.asset
 import android.content.Context
 import android.view.View
 import androidx.annotation.StyleRes
-import com.intuit.player.android.*
+import com.intuit.player.android.AndroidPlayer
+import com.intuit.player.android.AssetContext
+import com.intuit.player.android.DEPRECATED_WITH_DECODABLEASSET
+import com.intuit.player.android.build
 import com.intuit.player.android.extensions.Style
 import com.intuit.player.android.extensions.Styles
 import com.intuit.player.android.extensions.removeSelf
+import com.intuit.player.android.withContext
+import com.intuit.player.android.withStyles
+import com.intuit.player.android.withTag
 import com.intuit.player.jvm.core.asset.Asset
 import com.intuit.player.jvm.core.asset.AssetWrapper
 import com.intuit.player.jvm.core.bridge.Node
@@ -110,7 +116,7 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
             cachedView == null -> {
                 renewHydrationScope("recreating view")
                 initView().also { it.hydrate() }
-            }            // View found, but contexts are out of sync. Remove cached view and create and hydrate.
+            } // View found, but contexts are out of sync. Remove cached view and create and hydrate.
             cachedAssetContext?.context != context || cachedAssetContext?.asset?.type != asset.type -> {
                 renewHydrationScope("recreating view")
                 cachedView.removeSelf()
@@ -248,7 +254,7 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
         action: String,
         element: String,
         asset: Asset = this.asset,
-        data: Any? = null
+        data: Any? = null,
     ): Unit = player.beacon(action, element, asset, data)
 
     public fun requireContext(): Context = context ?: run {

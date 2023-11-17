@@ -1,17 +1,15 @@
-package com.intuit.player.android.reference.assets.test
+package com.intuit.player.android.reference.demo.test.base
 
 import android.view.View
 import com.intuit.player.android.asset.RenderableAsset
-import com.intuit.player.android.asset.SuspendableAsset
 import com.intuit.player.jvm.core.player.state.PlayerFlowState
-import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertTrue
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 @OptIn(ExperimentalContracts::class)
 inline fun <reified T : RenderableAsset> Any?.shouldBeAsset(
-    block: T.() -> Unit = {}
+    block: T.() -> Unit = {},
 ): T {
     shouldBeInstanceOf<T>(this)
     block()
@@ -20,12 +18,9 @@ inline fun <reified T : RenderableAsset> Any?.shouldBeAsset(
 
 @OptIn(ExperimentalContracts::class)
 inline fun <reified T : View> Any?.shouldBeView(assertions: T.() -> Unit = {}): T {
-    val view = if (T::class != SuspendableAsset.AsyncViewStub::class && this is SuspendableAsset.AsyncViewStub) runBlocking {
-        awaitView()
-    } else this
-    shouldBeInstanceOf<T>(view)
-    view.assertions()
-    return view
+    shouldBeInstanceOf<T>(this)
+    assertions()
+    return this
 }
 
 @OptIn(ExperimentalContracts::class)

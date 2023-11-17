@@ -39,6 +39,7 @@ internal class AndroidLoggerTest {
         logger.error(error)
         assertError()
     }
+
     @Test
     fun `test name configurability`() {
         val tag = "Logger"

@@ -39,8 +39,11 @@ internal fun AndroidPlayer.updates(flow: String, take: Int = 1): Flow<Update> = 
 
     start(flow).onComplete {
         close(
-            it.exceptionOrNull() ?: if (count != take)
-                PlayerException("did not meet expected asset updates ($count != $take)") else null
+            it.exceptionOrNull() ?: if (count != take) {
+                PlayerException("did not meet expected asset updates ($count != $take)")
+            } else {
+                null
+            },
         )
     }
 

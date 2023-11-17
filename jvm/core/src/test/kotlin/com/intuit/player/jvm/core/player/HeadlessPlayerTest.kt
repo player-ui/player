@@ -12,19 +12,44 @@ import com.intuit.player.jvm.core.flow.forceTransition
 import com.intuit.player.jvm.core.flow.state.NavigationFlowStateType
 import com.intuit.player.jvm.core.flow.state.NavigationFlowViewState
 import com.intuit.player.jvm.core.flow.state.param
-import com.intuit.player.jvm.core.player.state.*
+import com.intuit.player.jvm.core.player.state.CompletedState
+import com.intuit.player.jvm.core.player.state.ErrorState
+import com.intuit.player.jvm.core.player.state.InProgressState
+import com.intuit.player.jvm.core.player.state.NotStartedState
+import com.intuit.player.jvm.core.player.state.ReleasedState
+import com.intuit.player.jvm.core.player.state.completedState
+import com.intuit.player.jvm.core.player.state.currentFlowState
+import com.intuit.player.jvm.core.player.state.currentView
+import com.intuit.player.jvm.core.player.state.dataModel
+import com.intuit.player.jvm.core.player.state.errorState
+import com.intuit.player.jvm.core.player.state.inProgressState
+import com.intuit.player.jvm.core.player.state.lastViewUpdate
 import com.intuit.player.jvm.core.plugins.Plugin
 import com.intuit.player.jvm.core.validation.BindingInstance
 import com.intuit.player.jvm.core.validation.ValidationResponse
 import com.intuit.player.jvm.core.validation.getWarningsAndErrors
 import com.intuit.player.jvm.utils.filterKeys
-import com.intuit.player.jvm.utils.test.*
+import com.intuit.player.jvm.utils.test.PlayerTest
+import com.intuit.player.jvm.utils.test.ThreadUtils
+import com.intuit.player.jvm.utils.test.mocks
+import com.intuit.player.jvm.utils.test.runBlockingTest
+import com.intuit.player.jvm.utils.test.simpleFlow
+import com.intuit.player.jvm.utils.test.simpleFlowString
 import com.intuit.player.plugins.assets.ReferenceAssetsPlugin
 import com.intuit.player.plugins.types.CommonTypesPlugin
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.TestTemplate
 import kotlin.concurrent.thread
 import kotlin.coroutines.resume
@@ -102,7 +127,8 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
       }
     }
   }
-}""".trimMargin()
+}
+            """.trimMargin(),
         )
 
         player.inProgressState?.transition("Next")
@@ -179,7 +205,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         val currentViewJson = Json.decodeFromJsonElement(
             GenericSerializer(),
             simpleFlow.views!![0].jsonObject
-                .filterKeys("applicability")
+                .filterKeys("applicability"),
         )
 
         // remove transforms
@@ -412,7 +438,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
                 }
               }
             }
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         assertTrue(player.state is ErrorState)

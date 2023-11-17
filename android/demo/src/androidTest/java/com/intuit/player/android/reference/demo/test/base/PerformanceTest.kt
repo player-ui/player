@@ -36,20 +36,20 @@ interface PerformanceTest<T : Activity> {
         val averageTime = calculateAverage(histogram, totalFrames)
         assertTrue(
             "Over a total of $totalFrames frames, the slowest, median and average time it took for frames to render was  ${maxTime}ms, ${medianTime}ms, and ${averageTime}ms respectively",
-            (maxTime < 250 && medianTime < 32 && averageTime < 24) || true
+            (maxTime < 250 && medianTime < 32 && averageTime < 24) || true,
         )
         activityRule.scenario.close()
     }
 
     enum class FrameStats constructor(
-        val pattern: Pattern
+        val pattern: Pattern,
     ) {
         TOTAL_FRAMES(Pattern.compile("\\s*$totalFrames: (\\d+)")),
         FIFTY_PERCENTILE(Pattern.compile("\\s*$fiftiethPercentile: (\\d+)ms")),
         NINETY_PERCENTILE(Pattern.compile("\\s*$ninetiethPercentile: (\\d+)ms")),
         NINETY_FIVE_PERCENTILE(Pattern.compile("\\s*$ninetyFifthPercentile: (\\d+)ms")),
         NINETY_NINE_PERCENTILE(Pattern.compile("\\s*$ninetyNinethPercentile: (\\d+)ms")),
-        HISTOGRAM(Pattern.compile("\\s*HISTOGRAM: (.*)"))
+        HISTOGRAM(Pattern.compile("\\s*HISTOGRAM: (.*)")),
     }
 
     fun startPerformanceTest() {

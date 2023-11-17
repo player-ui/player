@@ -33,7 +33,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 public fun Runtime(runtime: Context, config: GraalRuntimeConfig = GraalRuntimeConfig()): Runtime<Value> = GraalRuntime(config)
 
 internal class GraalRuntime(
-    override val config: GraalRuntimeConfig
+    override val config: GraalRuntimeConfig,
 ) : Runtime<Value> {
 
     override val dispatcher: Nothing
@@ -46,8 +46,8 @@ internal class GraalRuntime(
             this,
             playerSerializersModule + SerializersModule {
                 contextual(Value::class, GraalValueSerializer)
-            }
-        )
+            },
+        ),
     )
 
     companion object {
@@ -69,7 +69,7 @@ internal class GraalRuntime(
     }
 
     override val scope: CoroutineScope by lazy {
-        CoroutineScope(Dispatchers.Default + SupervisorJob()+ (config.coroutineExceptionHandler ?: EmptyCoroutineContext))
+        CoroutineScope(Dispatchers.Default + SupervisorJob() + (config.coroutineExceptionHandler ?: EmptyCoroutineContext))
     }
 
     override fun execute(script: String): Any? = context.blockingLock {
@@ -139,7 +139,7 @@ public object GraalJS : PlayerRuntimeFactory<GraalRuntimeConfig> {
 }
 
 public data class GraalRuntimeConfig(
-    var graalContext: Context = PlayerContextFactory.context
+    var graalContext: Context = PlayerContextFactory.context,
 ) : PlayerRuntimeConfig()
 
 public class GraalRuntimeContainer : PlayerRuntimeContainer {

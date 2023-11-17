@@ -22,7 +22,7 @@ class StartFragment : BasePlayerFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ) = super.onCreateView(inflater, container, savedInstanceState).apply {
         when (val state = playerViewModel.state.value) {
             is ManagedPlayerState.Running -> lifecycleScope.launch(Dispatchers.Default) {
@@ -30,10 +30,12 @@ class StartFragment : BasePlayerFragment() {
             }
 
             is ManagedPlayerState.Done,
-            is ManagedPlayerState.Error -> reset()
+            is ManagedPlayerState.Error,
+            -> reset()
 
             ManagedPlayerState.NotStarted,
-            ManagedPlayerState.Pending -> Unit
+            ManagedPlayerState.Pending,
+            -> Unit
         }
     }
 

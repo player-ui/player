@@ -30,7 +30,7 @@ public class NodeSyncWaterfallHook1<T1>(override val node: Node, private val ser
         return call(
             null,
             { f, _, _ -> f(context, p1) },
-            { f, _ -> f(context, p1) }
+            { f, _ -> f(context, p1) },
         )
     }
 
@@ -49,7 +49,7 @@ public class NodeSyncWaterfallHook1<T1>(override val node: Node, private val ser
 public class NodeSyncWaterfallHook2<T1, T2>(
     override val node: Node,
     private val serializer1: KSerializer<T1>,
-    private val serializer2: KSerializer<T2>
+    private val serializer2: KSerializer<T2>,
 ) : SyncWaterfallHook<(HookContext, T1?, T2?) -> T1?, T1?>(), NodeHook<T1?> {
 
     init { init(serializer1, serializer2) }
@@ -61,7 +61,7 @@ public class NodeSyncWaterfallHook2<T1, T2>(
         return call(
             null,
             { f, _, _ -> f(context, p1, p2) },
-            { f, _ -> f(context, p1, p2) }
+            { f, _ -> f(context, p1, p2) },
         )
     }
 

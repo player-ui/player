@@ -18,7 +18,7 @@ public typealias ExpressionHandler = (List<Any?>) -> Any?
  * Any subsequent expressions registered with the same name will override previous handlers.
  */
 public class ExpressionPlugin(
-    public val map: Map<String, ExpressionHandler>
+    public val map: Map<String, ExpressionHandler>,
 ) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
 
     public constructor(vararg expressions: Pair<String, ExpressionHandler>) : this(expressions.toMap())
@@ -34,10 +34,10 @@ public class ExpressionPlugin(
                         name,
                         Invokable { args ->
                             handler.invoke(args.drop(1))
-                        }
+                        },
                     )
                 }
-            }
+            },
         )
         instance = runtime.buildInstance("(new $name(expressionHandlers))")
     }

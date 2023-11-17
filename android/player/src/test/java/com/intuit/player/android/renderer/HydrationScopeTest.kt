@@ -50,7 +50,7 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
         mapOf(
             "id" to "some-id",
             "type" to "test",
-        )
+        ),
     ) as Asset
 
     override val player by lazy {

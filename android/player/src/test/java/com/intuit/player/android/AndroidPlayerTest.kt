@@ -132,7 +132,7 @@ internal class AndroidPlayerTest {
             "DecodableAsset.Serializer.serialize is not supported",
             assertThrows<SerializationException> {
                 Json.encodeToString(serializer, asset)
-            }.message
+            }.message,
         )
     }
 }

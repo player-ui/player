@@ -8,7 +8,7 @@ import kotlinx.serialization.builtins.serializer
 
 public class JSErrorException(
     override val node: Node,
-    cause: Throwable? = node.getSerializable("innerErrors", ListSerializer(ThrowableSerializer()))?.first()
+    cause: Throwable? = node.getSerializable("innerErrors", ListSerializer(ThrowableSerializer()))?.first(),
 ) : PlayerException(node.getString("message") ?: "", cause), NodeWrapper {
 
     public val name: String by NodeSerializableField(String.serializer()) {

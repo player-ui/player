@@ -38,9 +38,13 @@ abstract class BasePlayerFragment : PlayerFragment() {
     }
 
     private suspend fun toggleScreenShare(active: Boolean) = withContext(Dispatchers.Main) {
-        binding.playerCanvas.background = if (active) GradientDrawable().apply {
-            setStroke(30, resources.getColor(android.R.color.holo_green_light))
-        } else null
+        binding.playerCanvas.background = if (active) {
+            GradientDrawable().apply {
+                setStroke(30, resources.getColor(android.R.color.holo_green_light))
+            }
+        } else {
+            null
+        }
     }
 
     override fun buildFallbackView(exception: Exception): View? = currentPlayerCanvas

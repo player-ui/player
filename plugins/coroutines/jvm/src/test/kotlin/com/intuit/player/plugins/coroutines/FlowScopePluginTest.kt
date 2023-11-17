@@ -15,7 +15,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -26,8 +30,11 @@ internal class FlowScopePluginTest {
     private val scope = CoroutineScope(Dispatchers.Default)
 
     @MockK lateinit var player: Player
+
     @MockK lateinit var inProgressState: InProgressState
+
     @MockK lateinit var completedState: CompletedState
+
     @MockK lateinit var flow: Flow
 
     var stateTap = slot<(PlayerFlowState?) -> Unit>()

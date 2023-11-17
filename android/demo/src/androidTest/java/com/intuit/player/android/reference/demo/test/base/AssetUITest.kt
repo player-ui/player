@@ -53,7 +53,7 @@ abstract class AssetUITest(val group: String? = null) : ApplitoolsTest() {
     fun launchMock(name: String) {
         launchMock(
             mocks.find { it.name == name || it.name == "$group-$name" }
-                ?: throw IllegalArgumentException("$name not found in mocks: ${mocks.map { "${it.group}/${it.name}" }}")
+                ?: throw IllegalArgumentException("$name not found in mocks: ${mocks.map { "${it.group}/${it.name}" }}"),
         )
     }
 

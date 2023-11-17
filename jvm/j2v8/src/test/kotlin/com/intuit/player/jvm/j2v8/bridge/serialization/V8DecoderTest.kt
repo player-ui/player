@@ -18,7 +18,9 @@ import com.intuit.player.jvm.j2v8.extensions.invoke
 import com.intuit.player.jvm.j2v8.v8Function
 import com.intuit.player.jvm.j2v8.v8Object
 import kotlinx.serialization.Serializable
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 /** Legacy tests for encoding values into J2V8 */
@@ -233,7 +235,7 @@ internal class V8DecoderTest : J2V8Test() {
                 "string" to "thisisastring",
                 "int" to 1,
                 "object" to mapOf(
-                    "string" to "anotherstring"
+                    "string" to "anotherstring",
                 ),
                 "list" to listOf(
                     1,
@@ -241,14 +243,14 @@ internal class V8DecoderTest : J2V8Test() {
                     listOf(
                         "a",
                         "b",
-                        "c"
+                        "c",
                     ),
                     mapOf(
-                        "string" to "onemorestring"
+                        "string" to "onemorestring",
                     ),
-                    null
+                    null,
                 ),
-                "null" to null
+                "null" to null,
             )
             val v8Object = executeObjectScript("""(${complex.prettify()})""")
             val result = format.encodeToV8Value(complex)
@@ -274,7 +276,7 @@ internal class V8DecoderTest : J2V8Test() {
 
             val mapTestClass = mapOf(
                 "one" to 1,
-                "string" to "string"
+                "string" to "string",
             )
 
             val encodedMapTestClass = format.decodeFromV8Value<Any>(obj)
@@ -311,7 +313,7 @@ internal class V8DecoderTest : J2V8Test() {
                 V8Function(format) {
                     println("$it called me!")
                     true
-                }
+                },
             )
             val obj = executeObjectScript("""({one: 1, string: "string", method: f})""")
             val decodedObj = format.encodeToV8Value(testClass).v8Object
@@ -353,11 +355,12 @@ internal class V8DecoderTest : J2V8Test() {
     fun testV8ValueDecodingWithInvokableType() {
         v8.evaluateInJSThreadBlocking(runtime) {
             val testClass = TestClass3(
-                1, "string",
+                1,
+                "string",
                 Invokable {
                     println("${it.firstOrNull()} called me!")
                     return@Invokable true
-                }
+                },
             )
 
             add(
@@ -365,7 +368,7 @@ internal class V8DecoderTest : J2V8Test() {
                 V8Function(format) {
                     println("$it called me!")
                     true
-                }
+                },
             )
             val obj = executeObjectScript("""({one: 1, string: "string", method: f})""")
             val decodedObj = format.encodeToV8Value(testClass) as V8Object
@@ -401,7 +404,7 @@ internal class V8DecoderTest : J2V8Test() {
     data class TestClass4(
         val one: Int,
         val string: String,
-        val nested: TestClass4? = null
+        val nested: TestClass4? = null,
     )
 
     @Test
@@ -421,8 +424,8 @@ internal class V8DecoderTest : J2V8Test() {
                 "string" to "string",
                 "nested" to mapOf(
                     "one" to 2,
-                    "string" to "another"
-                )
+                    "string" to "another",
+                ),
             )
 
             val encodedMapTestClass = format.decodeFromV8Value<Map<String, Any?>>(obj)
@@ -443,13 +446,13 @@ internal class V8DecoderTest : J2V8Test() {
     data class TestClass5(
         val one: Int,
         val string: String,
-        val nested: TestClass6
+        val nested: TestClass6,
     )
 
     @Serializable
     data class TestClass6(
         val two: String,
-        val string: Int
+        val string: Int,
     )
 
     @Test
@@ -469,8 +472,8 @@ internal class V8DecoderTest : J2V8Test() {
                 "string" to "string",
                 "nested" to mapOf(
                     "two" to "another",
-                    "string" to 2
-                )
+                    "string" to 2,
+                ),
             )
 
             val encodedMapTestClass = format.decodeFromV8Value<Map<String, Any?>>(obj)
@@ -489,7 +492,7 @@ internal class V8DecoderTest : J2V8Test() {
 
     @Serializable
     class LoggerAsValue(
-        var TAG: String = "Logger As Value"
+        var TAG: String = "Logger As Value",
     ) {
         private val retVal = "this is my return"
         val log: ((String?) -> String)? = { println(TAG); println(it); retVal }

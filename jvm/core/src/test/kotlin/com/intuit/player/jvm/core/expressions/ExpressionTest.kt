@@ -1,6 +1,12 @@
 package com.intuit.player.jvm.core.expressions
 
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonPrimitive
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -48,6 +54,7 @@ internal class ExpressionTest {
         assertEquals(collectionJson, Json.encodeToJsonElement(Expression.Collection.serializer(), collection))
         assertEquals(genericCollectionJson, Json.encodeToJsonElement(Expression.serializer(), genericCollection))
     }
+
     @Test
     fun `test ExpressionType from JSON using implicit serializer`() {
         /** Uses [Expression.Single.Serializer] */

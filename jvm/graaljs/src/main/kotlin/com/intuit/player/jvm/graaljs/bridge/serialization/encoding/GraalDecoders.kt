@@ -69,7 +69,7 @@ internal class GraalObjectMapDecoder(override val format: GraalFormat, override 
     override fun <T> buildDecoderForSerializableElement(
         descriptor: SerialDescriptor,
         index: Int,
-        deserializer: DeserializationStrategy<T>
+        deserializer: DeserializationStrategy<T>,
     ): Decoder = when (index % 2 == 0) {
         true -> GraalValueDecoder(format, format.context.asValue(getKeyAtIndex(index)))
         false -> GraalValueDecoder(format, getElementAtIndex(index))
@@ -91,7 +91,7 @@ internal class GraalArrayListDecoder(override val format: GraalFormat, override 
     override fun <T> buildDecoderForSerializableElement(
         descriptor: SerialDescriptor,
         index: Int,
-        deserializer: DeserializationStrategy<T>
+        deserializer: DeserializationStrategy<T>,
     ): Decoder =
         GraalValueDecoder(format, decodeElement(descriptor, index))
 }
@@ -115,7 +115,7 @@ internal class GraalObjectClassDecoder(override val format: GraalFormat, overrid
     override fun <T> buildDecoderForSerializableElement(
         descriptor: SerialDescriptor,
         index: Int,
-        deserializer: DeserializationStrategy<T>
+        deserializer: DeserializationStrategy<T>,
     ): Decoder = GraalValueDecoder(format, decodeElement(descriptor, index))
 }
 
@@ -129,11 +129,10 @@ internal class GraalSealedClassDecoder(override val format: GraalFormat, overrid
     override fun <T> buildDecoderForSerializableElement(
         descriptor: SerialDescriptor,
         index: Int,
-        deserializer: DeserializationStrategy<T>
+        deserializer: DeserializationStrategy<T>,
     ): Decoder = GraalValueDecoder(format, value)
 
     override fun decodeValueElement(descriptor: SerialDescriptor, index: Int): Any? {
-
         val discriminator = (
             descriptor.annotations.firstOrNull {
                 it is RuntimeClassDiscriminator

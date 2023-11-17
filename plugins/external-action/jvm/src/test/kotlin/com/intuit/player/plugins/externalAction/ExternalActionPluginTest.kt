@@ -76,7 +76,7 @@ internal class ExternalActionPluginTest : PlayerTest() {
                 runBlocking {
                     player.start(jsonFlow).await()
                 }
-            }.message
+            }.message,
         )
     }
 

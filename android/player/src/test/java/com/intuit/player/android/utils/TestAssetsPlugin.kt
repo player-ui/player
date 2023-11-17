@@ -11,9 +11,9 @@ internal object TestAssetsPlugin : AndroidPlayerPlugin {
         androidPlayer.registerAsset(
             mapOf(
                 TYPE to "simple",
-                METADATA to mapOf("role" to "other")
+                METADATA to mapOf("role" to "other"),
             ),
-            ::OtherSimpleAsset
+            ::OtherSimpleAsset,
         )
         androidPlayer.registerAsset("broken", ::BrokenAsset)
     }

@@ -22,7 +22,7 @@ internal class JsonEncodingTests : J2V8Test() {
             buildJsonObject {
                 put("state_type", "END")
                 put("outcome", "doneWithTopic")
-            }
+            },
         )
     }
     private val expectedJsonString = expectedJson.toString()

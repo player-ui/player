@@ -76,7 +76,7 @@ internal class PubSubPluginTest : PlayerTest() {
     @TestTemplate
     fun pubsubWithMap() {
         val (expectedName, expectedData) = "eventName" to mapOf(
-            "some" to "data"
+            "some" to "data",
         )
         var name: String? = null
         var data: Any? = null
@@ -90,14 +90,14 @@ internal class PubSubPluginTest : PlayerTest() {
     @TestTemplate
     fun pubsubWithV8Object() {
         val (expectedName, expectedData) = "eventName" to mapOf(
-            "some" to "data"
+            "some" to "data",
         )
         var name: String? = null
         var data: Any? = null
         plugin.subscribe(expectedName) { n, d -> name = n; data = d; println("EVENT: $n: ${Json.encodeToString(GenericSerializer(), d)}") }
         plugin.publish(
             expectedName,
-            expectedData
+            expectedData,
         )
 
         name `should be equal to` expectedName
@@ -107,7 +107,7 @@ internal class PubSubPluginTest : PlayerTest() {
     @TestTemplate
     fun pubsubWithDefaultName() {
         val (expectedName, expectedData) = "eventName" to mapOf(
-            "some" to "data"
+            "some" to "data",
         )
         var name: String? = null
         var data: Any? = null
@@ -123,7 +123,7 @@ internal class PubSubPluginTest : PlayerTest() {
     fun pubsubWithCustomName() {
         setupPlayer(PubSubPlugin(PubSubPlugin.Config("publishEvent")))
         val (expectedName, expectedData) = "eventName" to mapOf(
-            "some" to "data"
+            "some" to "data",
         )
         var name: String? = null
         var data: Any? = null

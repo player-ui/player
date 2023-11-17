@@ -24,8 +24,8 @@ class MainActivityTest : PerformanceTest<MainActivity> {
 
         onView(
             allOf(
-                withText("Random Mock")
-            )
+                withText("Random Mock"),
+            ),
         ).perform(click())
     }
 }

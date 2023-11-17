@@ -12,7 +12,7 @@ public interface PromiseUtils {
 
     public fun assertThen(vararg expected: Any?): Unit = assertChain(
         thenChain,
-        *expected
+        *expected,
     )
     public fun assertCatch(vararg expected: Any?): Unit = assertChain(
         catchChain.map {
@@ -21,7 +21,7 @@ public interface PromiseUtils {
                 else -> it
             }
         },
-        *expected
+        *expected,
     )
     public fun assertChain(chain: List<Any?>, vararg expected: Any?): Unit =
         Assertions.assertEquals(expected.asList(), chain)

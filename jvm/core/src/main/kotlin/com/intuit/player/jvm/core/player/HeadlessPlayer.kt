@@ -17,7 +17,11 @@ import com.intuit.player.jvm.core.player.state.CompletedState
 import com.intuit.player.jvm.core.player.state.PlayerFlowState
 import com.intuit.player.jvm.core.player.state.ReleasedState
 import com.intuit.player.jvm.core.player.state.inProgressState
-import com.intuit.player.jvm.core.plugins.*
+import com.intuit.player.jvm.core.plugins.JSPluginWrapper
+import com.intuit.player.jvm.core.plugins.LoggerPlugin
+import com.intuit.player.jvm.core.plugins.PlayerPlugin
+import com.intuit.player.jvm.core.plugins.Plugin
+import com.intuit.player.jvm.core.plugins.RuntimePlugin
 import com.intuit.player.jvm.core.plugins.logging.loggers
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -39,19 +43,23 @@ import java.net.URL
  *  - [JSPluginWrapper]
  *  - [PlayerPlugin]
  */
-public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public constructor(
+public class HeadlessPlayer
+@ExperimentalPlayerApi
+@JvmOverloads
+public constructor(
     override val plugins: List<Plugin>,
     explicitRuntime: Runtime<*>? = null,
     private val source: URL = bundledSource,
-    config: PlayerRuntimeConfig = PlayerRuntimeConfig()
+    config: PlayerRuntimeConfig = PlayerRuntimeConfig(),
 ) : Player(), NodeWrapper {
 
     /** Convenience constructor to allow [plugins] to be passed as varargs */
-    @ExperimentalPlayerApi @JvmOverloads public constructor(
+    @ExperimentalPlayerApi @JvmOverloads
+    public constructor(
         vararg plugins: Plugin,
         config: PlayerRuntimeConfig = PlayerRuntimeConfig(),
         explicitRuntime: Runtime<*>? = null,
-        source: URL = bundledSource
+        source: URL = bundledSource,
     ) : this(plugins.toList(), explicitRuntime, source, config)
 
     public constructor(
@@ -67,8 +75,11 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
 
     override val hooks: Hooks by NodeSerializableField(Hooks.serializer(), NodeSerializableField.CacheStrategy.Full)
 
-    override val state: PlayerFlowState get() = if (player.isReleased()) ReleasedState else
+    override val state: PlayerFlowState get() = if (player.isReleased()) {
+        ReleasedState
+    } else {
         player.getInvokable<Node>("getState")!!().deserialize(PlayerFlowState.serializer())
+    }
 
     public val runtime: Runtime<*> = explicitRuntime ?: runtimeFactory.create {
         debuggable = config.debuggable
@@ -77,7 +88,7 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
                 "Exception caught in Player scope: ${throwable.message}",
                 throwable.stackTrace.joinToString("\n") {
                     "\tat $it"
-                }.replaceFirst("\tat ", "\n")
+                }.replaceFirst("\tat ", "\n"),
             )
         }
     }
@@ -111,13 +122,15 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
 
         // we only have access to the logger after we have the player instance
         runtime.checkBlockingThread = {
-            if (name == "main") scope.launch {
-                logger.warn(
-                    "Main thread is blocking on JS runtime access: $this",
-                    stackTrace.joinToString("\n") {
-                        "\tat $it"
-                    }.replaceFirst("\tat ", "\n")
-                )
+            if (name == "main") {
+                scope.launch {
+                    logger.warn(
+                        "Main thread is blocking on JS runtime access: $this",
+                        stackTrace.joinToString("\n") {
+                            "\tat $it"
+                        }.replaceFirst("\tat ", "\n"),
+                    )
+                }
             }
         }
 

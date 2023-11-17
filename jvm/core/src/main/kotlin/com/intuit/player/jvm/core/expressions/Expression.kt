@@ -1,10 +1,15 @@
 package com.intuit.player.jvm.core.expressions
 
+import com.intuit.player.jvm.core.expressions.Expression.Collection
+import com.intuit.player.jvm.core.expressions.Expression.Serializer
+import com.intuit.player.jvm.core.expressions.Expression.Single
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.descriptors.*
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.listSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
@@ -26,7 +31,7 @@ public sealed class Expression {
 
             override val descriptor = PrimitiveSerialDescriptor(
                 Single::class.toString(),
-                PrimitiveKind.STRING
+                PrimitiveKind.STRING,
             )
 
             override fun serialize(encoder: Encoder, value: Single) =
@@ -74,7 +79,7 @@ public sealed class Expression {
          */
         override val descriptor = PrimitiveSerialDescriptor(
             Single::class.toString(),
-            PrimitiveKind.STRING
+            PrimitiveKind.STRING,
         )
 
         override fun serialize(encoder: Encoder, value: Expression) = when (value) {

@@ -39,7 +39,7 @@ public interface Invokable<R> : Function<R>, Function0<R>, Function1<Any?, R>, F
 /** Extension to convert an [Invokable] to some [functionTypeName] */
 @Deprecated(
     "Invokable extend Functions automatically",
-    level = DeprecationLevel.ERROR
+    level = DeprecationLevel.ERROR,
 )
 public fun <R> Invokable<R>.toFunction(functionTypeName: String): Function<R> = when (functionTypeName) {
     "Function0" -> object : Function0<R> {

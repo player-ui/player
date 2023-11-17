@@ -3,8 +3,12 @@ package com.intuit.player.jvm.core.managed
 import com.intuit.player.jvm.core.player.PlayerException
 import com.intuit.player.jvm.core.player.state.CompletedState
 import io.mockk.mockk
-import kotlinx.coroutines.*
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.yield
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import kotlin.coroutines.resume
@@ -31,7 +35,7 @@ internal class AsyncIterationManagerTest {
                 override suspend fun next(result: Boolean?): String? {
                     throw PlayerException("expected")
                 }
-            }
+            },
         )
         assertEquals(AsyncIterationManager.State.NotStarted, manager.state.value)
         manager.next()

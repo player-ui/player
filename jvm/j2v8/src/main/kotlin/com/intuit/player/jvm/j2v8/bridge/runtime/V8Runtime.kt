@@ -17,6 +17,7 @@ import com.intuit.player.jvm.core.bridge.runtime.ScriptContext
 import com.intuit.player.jvm.core.bridge.serialization.serializers.playerSerializersModule
 import com.intuit.player.jvm.core.player.PlayerException
 import com.intuit.player.jvm.core.utils.InternalPlayerApi
+import com.intuit.player.jvm.core.utils.await
 import com.intuit.player.jvm.j2v8.V8Null
 import com.intuit.player.jvm.j2v8.V8Primitive
 import com.intuit.player.jvm.j2v8.addPrimitive
@@ -27,7 +28,15 @@ import com.intuit.player.jvm.j2v8.bridge.serialization.serializers.V8ValueSerial
 import com.intuit.player.jvm.j2v8.extensions.evaluateInJSThreadBlocking
 import com.intuit.player.jvm.j2v8.extensions.handleValue
 import com.intuit.player.jvm.j2v8.extensions.unlock
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExecutorCoroutineDispatcher
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.modules.SerializersModule
@@ -66,8 +75,8 @@ internal class V8Runtime(override val config: J2V8RuntimeConfig) : Runtime<V8Val
                 contextual(V8Array::class, V8ValueSerializer.conform())
                 contextual(V8Primitive::class, V8ValueSerializer.conform())
                 contextual(V8Null::class, V8ValueSerializer.conform())
-            }
-        )
+            },
+        ),
     )
 
     private lateinit var memoryScope: MemoryManager; private set
@@ -190,7 +199,7 @@ public data class J2V8RuntimeConfig(
     var runtime: V8? = null,
     private val explicitExecutorService: ExecutorService? = null,
     override var debuggable: Boolean = false,
-    override var coroutineExceptionHandler: CoroutineExceptionHandler? = null
+    override var coroutineExceptionHandler: CoroutineExceptionHandler? = null,
 ) : PlayerRuntimeConfig() {
     public val executorService: ExecutorService by lazy {
         explicitExecutorService ?: Executors.newSingleThreadExecutor {

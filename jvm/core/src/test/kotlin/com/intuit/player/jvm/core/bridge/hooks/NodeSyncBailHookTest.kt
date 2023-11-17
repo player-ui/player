@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test
 internal class NodeSyncBailHookTest : NodeBaseTest() {
     @MockK
     private lateinit var dummyNode: Node
+
     @MockK
     private lateinit var invokable: Invokable<Unit>
 

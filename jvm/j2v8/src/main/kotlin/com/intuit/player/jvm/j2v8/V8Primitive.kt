@@ -1,6 +1,10 @@
 package com.intuit.player.jvm.j2v8
 
-import com.eclipsesource.v8.*
+import com.eclipsesource.v8.V8
+import com.eclipsesource.v8.V8Array
+import com.eclipsesource.v8.V8Function
+import com.eclipsesource.v8.V8Object
+import com.eclipsesource.v8.V8Value
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.J2V8Format
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.encodeToV8Value

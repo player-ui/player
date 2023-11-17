@@ -55,7 +55,7 @@ internal class FunctionDecoding : GraalTest() {
         Assertions.assertEquals("PLAYER: 1", function.execute(eval("js", "'PLAYER'"), eval("js", "1")))
         Assertions.assertEquals(
             "PLAYER: 2",
-            format.decodeFromGraalValue<Function2<String, Int, String>>(graalObject.getMember("method"))("PLAYER", 2)
+            format.decodeFromGraalValue<Function2<String, Int, String>>(graalObject.getMember("method"))("PLAYER", 2),
         )
     }
 
@@ -70,14 +70,14 @@ internal class FunctionDecoding : GraalTest() {
         Assertions.assertEquals("PLAYER: 1", function.execute(eval("js", "'PLAYER'"), eval("js", "1")))
         Assertions.assertEquals(
             "PLAYER: 2",
-            format.decodeFromGraalValue<Invokable<String>>(graalObject.getMember("method"))("PLAYER", 2)
+            format.decodeFromGraalValue<Invokable<String>>(graalObject.getMember("method"))("PLAYER", 2),
         )
     }
 
     @Test fun `decode kcallable`() = format.context.blockingLock {
         @Serializable
         data class Container(
-            val method: (String, Int) -> String
+            val method: (String, Int) -> String,
         )
 
         val function = ProxyExecutable {
@@ -90,8 +90,8 @@ internal class FunctionDecoding : GraalTest() {
             format.decodeFromGraalValue<Container>(
                 eval("js", "new Object()").also {
                     it.putMember("method", function)
-                }
-            ).method("PLAYER", 2)
+                },
+            ).method("PLAYER", 2),
         )
     }
 }

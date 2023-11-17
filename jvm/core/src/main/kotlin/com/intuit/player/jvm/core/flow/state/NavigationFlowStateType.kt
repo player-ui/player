@@ -6,5 +6,5 @@ public enum class NavigationFlowStateType {
     END,
     FLOW,
     ACTION,
-    EXTERNAL
+    EXTERNAL,
 }

@@ -28,7 +28,7 @@ data class SomeData(
 
 @Serializable
 data class SomeDataWithDefaults(
-    val name: String = "default"
+    val name: String = "default",
 )
 
 internal class NodeSerializationTest : RuntimeTest() {
@@ -83,7 +83,7 @@ internal class NodeSerializationTest : RuntimeTest() {
                 "specificInvokableWithNode" to specificInvokableWithNode,
                 "specificNonPrimitiveInvokable" to specificNonPrimitiveInvokable,
                 "specificInvokable" to specificInvokable,
-            )
+            ),
         ) as Node
         val someData = someDataObj.deserialize(SomeData.serializer()) as SomeData
         assertEquals(name, someData.name)
@@ -119,7 +119,7 @@ internal class NodeSerializationTest : RuntimeTest() {
                 "specificInvokable" to specificInvokable,
                 "specificNonPrimitiveInvokable" to specificNonPrimitiveInvokable,
                 "maybeNode" to Unit,
-            )
+            ),
         ) as Node
 
         val someData = someDataObj.deserialize(SomeData.serializer()) as SomeData
@@ -130,7 +130,7 @@ internal class NodeSerializationTest : RuntimeTest() {
         val someDataObj = runtime.serialize(
             mapOf(
                 "name" to Unit,
-            )
+            ),
         ) as Node
 
         val someData = someDataObj.deserialize(SomeDataWithDefaults.serializer())

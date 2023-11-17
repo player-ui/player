@@ -29,7 +29,7 @@ class SplashActivityTest : ApplitoolsTest() {
                 "type": "text",
                 "value": "Deep link test!"
             }
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 

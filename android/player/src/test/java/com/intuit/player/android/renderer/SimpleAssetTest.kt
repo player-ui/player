@@ -7,7 +7,9 @@ import com.intuit.player.android.utils.SimpleAsset
 import com.intuit.player.android.utils.SimpleAsset.Companion.sampleFlow
 import com.intuit.player.android.utils.stringify
 import com.intuit.player.android.withContext
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 internal class SimpleAssetTest : BaseRenderableAssetTest() {

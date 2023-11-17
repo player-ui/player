@@ -45,33 +45,47 @@ private fun Value.transform(format: RuntimeFormat<Value>): Any? = when {
     }
 }
 
-internal fun Value.toList(format: RuntimeFormat<Value>): List<Any?>? = if (isNull || !hasArrayElements()) null else lockIfDefined {
-    (0 until this.arraySize).map(::getArrayElement).map { it.handleValue(format) }
+internal fun Value.toList(format: RuntimeFormat<Value>): List<Any?>? = if (isNull || !hasArrayElements()) {
+    null
+} else {
+    lockIfDefined {
+        (0 until this.arraySize).map(::getArrayElement).map { it.handleValue(format) }
+    }
 }
 
-internal fun Value.toNode(format: RuntimeFormat<Value>): Node? = if (isNull || !hasMembers()) null else lockIfDefined {
-    if (this.hasMember("id") && this.hasMember("type"))
-        Asset(GraalNode(this, format.runtime))
-    else GraalNode(this, format.runtime)
+internal fun Value.toNode(format: RuntimeFormat<Value>): Node? = if (isNull || !hasMembers()) {
+    null
+} else {
+    lockIfDefined {
+        if (this.hasMember("id") && this.hasMember("type")) {
+            Asset(GraalNode(this, format.runtime))
+        } else {
+            GraalNode(this, format.runtime)
+        }
+    }
 }
 
-internal fun <R> Value.toInvokable(format: RuntimeFormat<Value>, deserializationStrategy: DeserializationStrategy<R>?): Invokable<R>? = if (isNull || !canExecute()) null else lockIfDefined {
-    Invokable { args ->
-        blockingLock {
-            when (
-                val result =
-                    this.execute(
-                        *format.encodeToRuntimeValue(
-                            args as Array<Any?>
-                        ).`as`(List::class.java).toTypedArray()
-                    ).handleValue(format)
-            ) {
-                is Node -> deserializationStrategy?.let {
-                    result.deserialize(deserializationStrategy)
-                } ?: run {
-                    result as R
+internal fun <R> Value.toInvokable(format: RuntimeFormat<Value>, deserializationStrategy: DeserializationStrategy<R>?): Invokable<R>? = if (isNull || !canExecute()) {
+    null
+} else {
+    lockIfDefined {
+        Invokable { args ->
+            blockingLock {
+                when (
+                    val result =
+                        this.execute(
+                            *format.encodeToRuntimeValue(
+                                args as Array<Any?>,
+                            ).`as`(List::class.java).toTypedArray(),
+                        ).handleValue(format)
+                ) {
+                    is Node -> deserializationStrategy?.let {
+                        result.deserialize(deserializationStrategy)
+                    } ?: run {
+                        result as R
+                    }
+                    else -> result as R
                 }
-                else -> result as R
             }
         }
     }

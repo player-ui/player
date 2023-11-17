@@ -124,7 +124,7 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View = FragmentPlayerBinding.inflate(inflater, container, false).run {
         _binding = this
         root

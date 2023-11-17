@@ -1,6 +1,10 @@
 package com.intuit.player.jvm.j2v8.bridge.serialization.encoding
 
-import com.eclipsesource.v8.*
+import com.eclipsesource.v8.V8
+import com.eclipsesource.v8.V8Array
+import com.eclipsesource.v8.V8Function
+import com.eclipsesource.v8.V8Object
+import com.eclipsesource.v8.V8Value
 import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
@@ -12,13 +16,18 @@ import com.intuit.player.jvm.core.bridge.serialization.json.value
 import com.intuit.player.jvm.core.bridge.serialization.serializers.FunctionLikeSerializer
 import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.player.jvm.core.bridge.serialization.serializers.ThrowableSerializer
-import com.intuit.player.jvm.j2v8.*
+import com.intuit.player.jvm.j2v8.V8Function
+import com.intuit.player.jvm.j2v8.V8Null
+import com.intuit.player.jvm.j2v8.V8Primitive
+import com.intuit.player.jvm.j2v8.V8Value
+import com.intuit.player.jvm.j2v8.addPrimitive
 import com.intuit.player.jvm.j2v8.bridge.V8Node
 import com.intuit.player.jvm.j2v8.bridge.V8ObjectWrapper
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.J2V8EncodingException
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.J2V8Format
 import com.intuit.player.jvm.j2v8.extensions.evaluateInJSThreadBlocking
 import com.intuit.player.jvm.j2v8.extensions.handleValue
+import com.intuit.player.jvm.j2v8.pushPrimitive
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -55,20 +64,22 @@ internal open class V8ValueEncoder(private val format: J2V8Format, private val m
         MAP,
         LIST,
         PRIMITIVE,
-        UNDECIDED
+        UNDECIDED,
     }
 
     private val currentContent get() = when (mode) {
         Mode.MAP -> contentMap
         Mode.LIST -> contentList
         Mode.PRIMITIVE,
-        Mode.UNDECIDED -> content
+        Mode.UNDECIDED,
+        -> content
     }
 
     private var content: V8Value = V8.getUndefined()
         get() = when (mode) {
             Mode.UNDECIDED,
-            Mode.PRIMITIVE -> field
+            Mode.PRIMITIVE,
+            -> field
             else -> error("cannot get content unless in PRIMITIVE mode")
         }
 
@@ -94,7 +105,8 @@ internal open class V8ValueEncoder(private val format: J2V8Format, private val m
                 else -> putContent(tag, content)
             }
             Mode.PRIMITIVE,
-            Mode.UNDECIDED -> {
+            Mode.UNDECIDED,
+            -> {
                 this.content = content as? V8Value ?: error("cannot set content (${content?.let { it::class }}) unless wrapped as V8Value")
                 endEncode()
             }
@@ -136,7 +148,8 @@ internal open class V8ValueEncoder(private val format: J2V8Format, private val m
             Mode.LIST -> contentList.add(content)
             Mode.MAP -> contentMap[tag] = content
             Mode.UNDECIDED,
-            Mode.PRIMITIVE -> {
+            Mode.PRIMITIVE,
+            -> {
                 this.content = content as? V8Value ?: error("cannot set content (${content?.let { it::class }}) unless wrapped as V8Value")
                 endEncode()
             }
@@ -145,22 +158,26 @@ internal open class V8ValueEncoder(private val format: J2V8Format, private val m
     }
 
     override fun beginStructure(
-        descriptor: SerialDescriptor
+        descriptor: SerialDescriptor,
     ): CompositeEncoder {
         val consumer = when (mode) {
             Mode.LIST,
-            Mode.MAP -> { node -> putContent(node) }
+            Mode.MAP,
+            -> { node -> putContent(node) }
             Mode.PRIMITIVE,
-            Mode.UNDECIDED -> consumer
+            Mode.UNDECIDED,
+            -> consumer
         }
 
-        return if (descriptor == ThrowableSerializer().descriptor)
+        return if (descriptor == ThrowableSerializer().descriptor) {
             V8ExceptionEncoder(format, ::putContent)
-        else when (descriptor.kind) {
-            StructureKind.CLASS -> V8ValueEncoder(format, Mode.MAP, consumer)
-            StructureKind.LIST, is PolymorphicKind -> V8ValueEncoder(format, Mode.LIST, consumer)
-            StructureKind.MAP -> V8ValueEncoder(format, Mode.MAP, consumer)
-            else -> V8ValueEncoder(format, consumer)
+        } else {
+            when (descriptor.kind) {
+                StructureKind.CLASS -> V8ValueEncoder(format, Mode.MAP, consumer)
+                StructureKind.LIST, is PolymorphicKind -> V8ValueEncoder(format, Mode.LIST, consumer)
+                StructureKind.MAP -> V8ValueEncoder(format, Mode.MAP, consumer)
+                else -> V8ValueEncoder(format, consumer)
+            }
         }
     }
 
@@ -172,7 +189,7 @@ internal open class V8ValueEncoder(private val format: J2V8Format, private val m
             is V8Node -> value.v8Object
             is V8Value -> value
             else -> V8Value(value)
-        }
+        },
     )
 
     override fun encodeNull(): Unit = putContent(V8Null)
@@ -208,7 +225,7 @@ internal open class V8ValueEncoder(private val format: J2V8Format, private val m
                     is JsonArray -> value.toList()
                     is JsonPrimitive -> value.value
                     else -> value
-                } as T
+                } as T,
             )
 
             else -> super<AbstractEncoder>.encodeSerializableValue(serializer, value)
@@ -222,7 +239,7 @@ internal open class V8ValueEncoder(private val format: J2V8Format, private val m
                 .toTypedArray()
 
             invokable(*encodedArgs)
-        }
+        },
     )
 
     /**
@@ -251,15 +268,17 @@ internal open class V8ValueEncoder(private val format: J2V8Format, private val m
 
                         // check if type is nullable and value is null
                         if ((
-                            currValue == null &&
-                                // base type or type argument could be marked nullable
-                                (kParam.type.isMarkedNullable || kParam.type.arguments[0].type?.isMarkedNullable == true)
-                            ) ||
+                                currValue == null &&
+                                    // base type or type argument could be marked nullable
+                                    (kParam.type.isMarkedNullable || kParam.type.arguments[0].type?.isMarkedNullable == true)
+                                ) ||
                             // otherwise check if arg matches type if not null
                             (currValue != null && currValue::class.isSubclassOf(kParam.type.arguments[0].type?.classifier as KClass<*>))
-                        )
+                        ) {
                             index++
-                        else break
+                        } else {
+                            break
+                        }
                     }
                     // only take matching args
                     encodedArgs.slice(start until index).toTypedArray()
@@ -272,7 +291,7 @@ internal open class V8ValueEncoder(private val format: J2V8Format, private val m
             handleInvocation(kCallable::class, matchedArgs) {
                 kCallable.call(*it)
             }
-        }
+        },
     )
 
     /**
@@ -292,25 +311,29 @@ internal open class V8ValueEncoder(private val format: J2V8Format, private val m
      *  implementation of [KCallable.call] so that we
      *  don't even need to use Java reflection. Until then...
      */
-    override fun encodeFunction(function: Function<*>) = if (function is Invokable<*>) encodeFunction(function) else putContent(
-        V8Function(format) { args ->
-            val encodedArgs = (0 until args.length())
-                .map { args[it].handleValue(format) }
+    override fun encodeFunction(function: Function<*>) = if (function is Invokable<*>) {
+        encodeFunction(function)
+    } else {
+        putContent(
+            V8Function(format) { args ->
+                val encodedArgs = (0 until args.length())
+                    .map { args[it].handleValue(format) }
 
-            // Hate that we need to look at an internal class for arity
-            val arity = (function as kotlin.jvm.internal.FunctionBase<*>).arity
+                // Hate that we need to look at an internal class for arity
+                val arity = (function as kotlin.jvm.internal.FunctionBase<*>).arity
 
-            // trim and pad args to fit arity constraints,
-            // note that padding will fail if arg types are non-nullable
-            val matchedArgs = (0 until arity)
-                .map { encodedArgs.getOrNull(it) }
-                .toTypedArray()
+                // trim and pad args to fit arity constraints,
+                // note that padding will fail if arg types are non-nullable
+                val matchedArgs = (0 until arity)
+                    .map { encodedArgs.getOrNull(it) }
+                    .toTypedArray()
 
-            handleInvocation(function::class, matchedArgs) {
-                function.invokeVararg(*it)
-            }
-        }
-    )
+                handleInvocation(function::class, matchedArgs) {
+                    function.invokeVararg(*it)
+                }
+            },
+        )
+    }
 
     private fun handleInvocation(reference: KClass<*>, args: Array<Any?>, block: (Array<Any?>) -> Any?) = try {
         block(args)

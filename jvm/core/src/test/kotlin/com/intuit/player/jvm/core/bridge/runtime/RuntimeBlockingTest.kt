@@ -6,12 +6,19 @@ import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializa
 import com.intuit.player.jvm.core.bridge.toCompletable
 import com.intuit.player.jvm.utils.test.RuntimeTest
 import com.intuit.player.jvm.utils.test.runBlockingTest
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestTemplate
 import org.junit.jupiter.api.assertThrows
-import java.util.UUID
+import java.util.*
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 
@@ -51,7 +58,7 @@ internal class RuntimeBlockingTest : RuntimeTest() {
         jobs = hashMapOf()
         runtime.add("blockOnJvm") { key: String -> runBlocking { suspendOnHandler(key) } }
         runtime.add("promiseOnJvm") { key: String ->
-            runtime.Promise { resolve, _ ->
+            runtime.Promise<Unit> { resolve, _ ->
                 suspendOnHandler(key)
                 resolve(Unit)
             }

@@ -59,7 +59,7 @@ public interface Node : Map<String, Any?> {
         "Replaced with getInvokable, which requires a deserializer for the return type. Either provide a deserializer explicitly, " +
             "or use the extension to automatically determine the correct serializer.",
         ReplaceWith("getInvokable<R>(key)", "com.intuit.player.jvm.core.bridge.getInvokable"),
-        DeprecationLevel.WARNING
+        DeprecationLevel.WARNING,
     )
     public fun <R> getFunction(key: String): Invokable<R>? = get(key).safeCast()
 
@@ -145,7 +145,7 @@ public inline fun <reified R> Node.getInvokable(key: String, deserializer: Deser
 */
 @ExperimentalPlayerApi
 public fun Node.getSymbol(key: String): String? {
-    if (!runtime.containsKey("getSymbol"))
+    if (!runtime.containsKey("getSymbol")) {
         runtime.execute(
             """
             function getSymbol(parent, key) {
@@ -153,8 +153,9 @@ public fun Node.getSymbol(key: String): String? {
                 if (typeof value === 'symbol') return value.toString();
                 else return null;
             }
-        """
+        """,
         )
+    }
 
     val getSymbol = runtime.getInvokable<String?>("getSymbol")
         ?: throw runtime.PlayerRuntimeException("getSymbol doesn't exist in runtime")

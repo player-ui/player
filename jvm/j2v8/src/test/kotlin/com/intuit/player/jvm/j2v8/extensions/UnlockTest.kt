@@ -3,7 +3,9 @@ package com.intuit.player.jvm.j2v8.extensions
 import com.intuit.player.jvm.j2v8.base.J2V8Test
 import com.intuit.player.jvm.utils.test.runBlockingTest
 import kotlinx.coroutines.withContext
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import kotlin.concurrent.thread
 
@@ -24,7 +26,7 @@ internal class UnlockTest : J2V8Test() {
     }
 
     @Test
-        fun `unlock when current thread has the lock`() = runBlockingTest {
+    fun `unlock when current thread has the lock`() = runBlockingTest {
         withContext(runtime.dispatcher) {
             v8.unlock()
         }

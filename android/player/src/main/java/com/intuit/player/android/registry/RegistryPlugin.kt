@@ -16,7 +16,7 @@ internal class RegistryPlugin<T> : JSPluginWrapper {
         runtime.execute(readSource("plugins/partial-match-fingerprint/core/dist/partial-match-fingerprint-plugin.prod.js"))
         runtime.execute(readSource("core/partial-match-registry/dist/partial-match-registry.prod.js"))
         instance = runtime.execute(
-            """(new PartialMatchFingerprintPlugin.PartialMatchFingerprintPlugin(new Registry.Registry()))"""
+            """(new PartialMatchFingerprintPlugin.PartialMatchFingerprintPlugin(new Registry.Registry()))""",
         ) as Node
     }
 

@@ -48,7 +48,7 @@ public class PubSubPlugin(public val config: Config? = null) : JSScriptPluginWra
 
     @Serializable
     public data class Config(
-        public val expressionName: String
+        public val expressionName: String,
     )
 
     private companion object {

@@ -8,5 +8,5 @@ public typealias ValidationMapping = JSMap<BindingInstance, ValidationResponse>
 @Serializable
 public data class ValidationInfo(
     val canTransition: Boolean,
-    val validations: ValidationMapping? = null
+    val validations: ValidationMapping? = null,
 )

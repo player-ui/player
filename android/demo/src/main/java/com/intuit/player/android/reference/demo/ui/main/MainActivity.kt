@@ -13,7 +13,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.*
+import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.onNavDestinationSelected
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.intuit.player.android.reference.demo.R
 import com.intuit.player.android.reference.demo.model.AssetMock
@@ -95,7 +100,7 @@ class MainActivity : AppCompatActivity() {
             is StringMock -> mock.getFlow("")
             else -> throw IllegalArgumentException("mock of type ${mock::class}[$mock] not supported")
         },
-        mock.name
+        mock.name,
     )
 
     private fun launchFlow(flow: String, name: String?) {
@@ -104,7 +109,7 @@ class MainActivity : AppCompatActivity() {
             R.id.action_launch_player,
             name?.let {
                 bundleOf("name" to name, "flow" to flow)
-            } ?: bundleOf("flow" to flow)
+            } ?: bundleOf("flow" to flow),
         )
     }
 }

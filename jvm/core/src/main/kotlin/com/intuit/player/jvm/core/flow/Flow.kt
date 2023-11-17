@@ -11,7 +11,7 @@ public data class Flow(
     val views: List<JsonElement>? = emptyList(),
     val schema: JsonElement = JsonNull,
     val data: JsonElement = JsonNull,
-    val navigation: Navigation? = null
+    val navigation: Navigation? = null,
 ) {
 
     public companion object {

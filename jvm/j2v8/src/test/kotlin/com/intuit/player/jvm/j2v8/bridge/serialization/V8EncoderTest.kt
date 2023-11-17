@@ -86,7 +86,7 @@ internal class V8EncoderTest : J2V8Test() {
                 "func",
                 V8Function(format) { args ->
                     println(args.get(0)); retVal
-                }
+                },
             )
             val functionContainer = executeObjectScript("""({ log: func })""")
             val v8Function = functionContainer.getObject("log") as? V8Function
@@ -106,7 +106,7 @@ internal class V8EncoderTest : J2V8Test() {
                 "string" to "thisisastring",
                 "int" to 1,
                 "object" to mapOf(
-                    "string" to "anotherstring"
+                    "string" to "anotherstring",
                 ),
                 "list" to listOf(
                     1,
@@ -114,14 +114,14 @@ internal class V8EncoderTest : J2V8Test() {
                     listOf(
                         "a",
                         "b",
-                        "c"
+                        "c",
                     ),
                     mapOf(
-                        "string" to "onemorestring"
+                        "string" to "onemorestring",
                     ),
-                    null
+                    null,
                 ),
-                "null" to null
+                "null" to null,
             )
             val v8Object = executeObjectScript("""(${complex.prettify()})""")
             val result: Any? = format.decodeFromV8Value(v8Object)

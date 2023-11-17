@@ -42,18 +42,18 @@ internal class NestedAsset(assetContext: AssetContext) : SuspendableAsset<Node>(
                 "asset" to mapOf(
                     "id" to "some-nested-id",
                     "type" to "simple",
-                    "metaData" to mapOf<String, Any>("a" to "b")
-                )
+                    "metaData" to mapOf<String, Any>("a" to "b"),
+                ),
             ),
             "nestedAssets" to listOf(
                 mapOf(
                     "asset" to mapOf(
                         "id" to "some-nested-id",
                         "type" to "simple",
-                        "metaData" to mapOf<String, Any>("a" to "b")
-                    )
-                )
-            )
+                        "metaData" to mapOf<String, Any>("a" to "b"),
+                    ),
+                ),
+            ),
         )
         val sampleAsset: Asset = J2V8.create().serialize(sampleMap) as Asset
         val sampleJson = Json.encodeToJsonElement(GenericSerializer(), sampleMap)

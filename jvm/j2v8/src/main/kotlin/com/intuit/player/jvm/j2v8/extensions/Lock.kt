@@ -11,7 +11,7 @@ import kotlinx.coroutines.withTimeout
 internal suspend fun <Context : V8Value, T> Context.evaluateInJSThread(
     runtime: Runtime<V8Value>,
     timeout: Long = 5000,
-    block: suspend Context.() -> T
+    block: suspend Context.() -> T,
 ): T = withTimeout(timeout) {
     if (runtime.isReleased()) throw PlayerRuntimeException(runtime, "Runtime object has been released!")
     withContext(runtime.dispatcher) {
@@ -23,11 +23,13 @@ internal suspend fun <Context : V8Value, T> Context.evaluateInJSThread(
 internal fun <Context : V8Value, T> Context.evaluateInJSThreadBlocking(
     runtime: Runtime<V8Value>,
     timeout: Long = 5000,
-    block: Context.() -> T
+    block: Context.() -> T,
 ): T {
     if (runtime.isReleased()) throw PlayerRuntimeException(runtime, "Runtime object has been released!")
     // if we're already on the dispatcher thread, DON'T BLOCK
-    return if (this@evaluateInJSThreadBlocking.runtime.locker.hasLock()) block() else {
+    return if (this@evaluateInJSThreadBlocking.runtime.locker.hasLock()) {
+        block()
+    } else {
         runtime.checkBlockingThread(Thread.currentThread())
         runBlocking {
             evaluateInJSThread(runtime, timeout, block)

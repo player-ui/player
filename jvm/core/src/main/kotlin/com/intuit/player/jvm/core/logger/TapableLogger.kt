@@ -28,7 +28,7 @@ public class TapableLogger(override val node: Node) : LoggerPlugin, NodeWrapper 
 
         private fun loggerHook(key: String) = NodeSyncHook1(
             node.getObject(key)!!,
-            ListSerializer(GenericSerializer())
+            ListSerializer(GenericSerializer()),
         ).toTypedArrayHook()
 
         internal object Serializer : NodeWrapperSerializer<Hooks>(::Hooks)

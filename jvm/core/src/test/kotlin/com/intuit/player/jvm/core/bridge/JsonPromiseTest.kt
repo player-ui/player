@@ -2,7 +2,15 @@ package com.intuit.player.jvm.core.bridge
 
 import com.intuit.player.jvm.utils.test.RuntimeTest
 import com.intuit.player.jvm.utils.test.runBlockingTest
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.addJsonArray
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.TestTemplate
@@ -55,7 +63,7 @@ internal class JsonPromiseTest : RuntimeTest() {
             buildJsonObject {
                 put("a", "b")
             },
-            result
+            result,
         )
     }
 
@@ -72,10 +80,10 @@ internal class JsonPromiseTest : RuntimeTest() {
                     "c",
                     buildJsonObject {
                         put("d", "e")
-                    }
+                    },
                 )
             },
-            result
+            result,
         )
     }
 
@@ -91,7 +99,7 @@ internal class JsonPromiseTest : RuntimeTest() {
                 add((2 as Number))
                 add((3 as Number))
             },
-            result
+            result,
         )
     }
 
@@ -111,7 +119,7 @@ internal class JsonPromiseTest : RuntimeTest() {
                     add((5 as Number))
                 }
             },
-            result
+            result,
         )
     }
 }

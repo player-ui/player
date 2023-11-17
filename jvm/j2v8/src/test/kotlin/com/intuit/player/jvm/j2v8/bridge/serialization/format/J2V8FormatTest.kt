@@ -83,7 +83,7 @@ internal class J2V8FormatTest : J2V8Test() {
             V8Object(this).apply {
                 add("one", 3)
                 add("two", 4)
-            }
+            },
         )
 
         assertEquals(3, simple.one)
@@ -102,9 +102,9 @@ internal class J2V8FormatTest : J2V8Test() {
                     "increment",
                     V8Function(format) { args ->
                         args.getInteger(0) + 1
-                    }
+                    },
                 )
-            }
+            },
         )
 
         assertEquals(1, simple.increment(0))
@@ -125,9 +125,9 @@ internal class J2V8FormatTest : J2V8Test() {
                     "increment",
                     V8Function(format) { args ->
                         args.getInteger(0) + 1
-                    }
+                    },
                 )
-            }
+            },
         )
 
         assertEquals(3, simple.one)

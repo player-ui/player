@@ -53,17 +53,21 @@ public class Promise(override val node: Node) : NodeWrapper {
                                 //  the value, since that _would_ be wrapped in a holder able to be generically
                                 //  deserialized
                                 is Node -> arg.deserialize(deserializer)
-                                else -> if (deserializer.isJsonElementSerializer) Json.encodeToJsonElement(
-                                    GenericSerializer(),
-                                    arg,
-                                ) else arg
-                            } as? Expected
+                                else -> if (deserializer.isJsonElementSerializer) {
+                                    Json.encodeToJsonElement(
+                                        GenericSerializer(),
+                                        arg,
+                                    )
+                                } else {
+                                    arg
+                                }
+                            } as? Expected,
                         )
                     } catch (e: Throwable) {
                         Promise.reject(e)
                     }
-                }
-            ) ?: throw PromiseException("then did not return valid Promise")
+                },
+            ) ?: throw PromiseException("then did not return valid Promise"),
         )
 
     /**
@@ -80,8 +84,11 @@ public class Promise(override val node: Node) : NodeWrapper {
                 { arg: Any? ->
                     try {
                         // Attempt to dynamically build exception from JS error
-                        if (arg is Exception) block(arg) else
+                        if (arg is Exception) {
+                            block(arg)
+                        } else {
                             block((arg as Node).deserialize())
+                        }
                     } catch (e: Exception) {
                         // fallback to simple String representation of error
                         // if you are debugging and the stacktrace leads you
@@ -89,8 +96,8 @@ public class Promise(override val node: Node) : NodeWrapper {
                         // be very helpful
                         block(PromiseException(arg.toString()))
                     }
-                }
-            ) ?: throw PromiseException("then did not return valid Promise")
+                },
+            ) ?: throw PromiseException("then did not return valid Promise"),
         )
 
     /** Converts the [Promise] into a [Completable] to enable awaiting it to resolve or reject  */
@@ -178,6 +185,6 @@ public fun <T : Any> Runtime<*>.Promise(block: suspend ((T) -> Unit, (Throwable)
 
     return Promise(
         execute("(new Promise($key))") as? Node
-            ?: throw PromiseException("Error creating promise")
+            ?: throw PromiseException("Error creating promise"),
     )
 }

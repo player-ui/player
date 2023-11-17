@@ -66,7 +66,7 @@ public class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JSScrip
                     "element" to element,
                     "asset" to asset,
                     "data" to data,
-                )
+                ),
             )
         }
     }
@@ -79,7 +79,7 @@ public class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JSScrip
     @Serializable
     internal data class JSBeaconPluginConfig(
         val plugins: List<JSPluginWrapper>,
-        val callback: (@Contextual Any?) -> Unit
+        val callback: (@Contextual Any?) -> Unit,
     )
 }
 

@@ -20,13 +20,18 @@ internal interface NodeHook<R> : NodeWrapper {
             Invokable { args ->
                 val context = args[0] as Map<String, Any>
                 val rest = args.drop(1).zip(serializers).map { (value, serializer) ->
-                    if (serializer.descriptor.isNullable && value == null) value
-                    else if (value!!::class == serializer.descriptor.capturedKClass) value
-                    else if (value is Node) value.deserialize(serializer)
-                    else value
+                    if (serializer.descriptor.isNullable && value == null) {
+                        value
+                    } else if (value!!::class == serializer.descriptor.capturedKClass) {
+                        value
+                    } else if (value is Node) {
+                        value.deserialize(serializer)
+                    } else {
+                        value
+                    }
                 }
                 call(HashMap(context), rest.toTypedArray())
-            }
+            },
         )
     }
 

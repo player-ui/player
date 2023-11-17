@@ -2,7 +2,11 @@ package com.intuit.player.jvm.j2v8.bridge.serialization.encoding
 
 import com.eclipsesource.v8.V8
 import com.intuit.player.jvm.core.bridge.Invokable
-import com.intuit.player.jvm.j2v8.*
+import com.intuit.player.jvm.j2v8.V8Array
+import com.intuit.player.jvm.j2v8.V8Function
+import com.intuit.player.jvm.j2v8.V8Null
+import com.intuit.player.jvm.j2v8.V8Object
+import com.intuit.player.jvm.j2v8.V8Primitive
 import com.intuit.player.jvm.j2v8.base.J2V8Test
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.decodeFromV8Value
 import com.intuit.player.jvm.j2v8.extensions.evaluateInJSThreadBlocking
@@ -60,7 +64,7 @@ internal class FunctionDecoding : J2V8Test() {
         assertEquals("PLAYER: 1", function.call(this, args))
         assertEquals(
             "PLAYER: 2",
-            format.decodeFromV8Value<Function2<String, Int, String>>(function)("PLAYER", 2)
+            format.decodeFromV8Value<Function2<String, Int, String>>(function)("PLAYER", 2),
         )
     }
 
@@ -79,14 +83,14 @@ internal class FunctionDecoding : J2V8Test() {
         assertEquals("PLAYER: 1", function.call(this, args))
         assertEquals(
             "PLAYER: 2",
-            format.decodeFromV8Value<Invokable<String>>(function)("PLAYER", 2)
+            format.decodeFromV8Value<Invokable<String>>(function)("PLAYER", 2),
         )
     }
 
     @Test fun `decode kcallable`() = v8.evaluateInJSThreadBlocking(runtime) {
         @Serializable
         data class Container(
-            val method: (String, Int) -> String
+            val method: (String, Int) -> String,
         )
 
         val args = V8Array {
@@ -106,8 +110,8 @@ internal class FunctionDecoding : J2V8Test() {
             format.decodeFromV8Value<Container>(
                 V8Object {
                     add("method", function)
-                }
-            ).method("PLAYER", 2)
+                },
+            ).method("PLAYER", 2),
         )
     }
 }

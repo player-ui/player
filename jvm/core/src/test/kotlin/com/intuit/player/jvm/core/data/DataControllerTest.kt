@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 internal class DataControllerTest : NodeBaseTest() {
 
     var data: Map<String, Any?> = mapOf(
-        "key" to "initial value"
+        "key" to "initial value",
     )
     private val dataController by lazy {
         DataController(node)
@@ -30,14 +30,14 @@ internal class DataControllerTest : NodeBaseTest() {
         assertEquals("initial value", data["key"])
         dataController.set(
             mapOf(
-                "key2" to 2
-            )
+                "key2" to 2,
+            ),
         )
         assertEquals(2, data["key2"])
         dataController.set(
             mapOf(
-                "key" to "1"
-            )
+                "key" to "1",
+            ),
         )
         assertEquals("1", data["key"])
         assertEquals(2, data["key2"])

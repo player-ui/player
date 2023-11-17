@@ -14,7 +14,7 @@ public interface PlayerLoggingFactory<out T : PlayerLoggingConfig> {
  * with further configurations from the [nested] block.
  */
 public fun <T : PlayerLoggingConfig> PlayerLoggingFactory<T>.config(
-    nested: T.() -> Unit
+    nested: T.() -> Unit,
 ): PlayerLoggingFactory<T> {
     val parent = this
 

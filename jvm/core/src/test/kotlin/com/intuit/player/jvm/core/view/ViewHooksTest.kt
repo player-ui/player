@@ -30,8 +30,8 @@ internal class ViewHooksTest : NodeBaseTest() {
         every { node.getObject("onUpdate") } returns node
         every { node.getObject("resolver") } returns node
         every { node.getInvokable<Unit>("tap") } returns Invokable {}
-        every { node.getSerializable< NodeSyncHook1<Asset>>("onUpdate", any()) } returns onUpdate
-        every { node.getSerializable< NodeSyncHook1<Resolver>>("resolver", any()) } returns resolver
+        every { node.getSerializable<NodeSyncHook1<Asset>>("onUpdate", any()) } returns onUpdate
+        every { node.getSerializable<NodeSyncHook1<Resolver>>("resolver", any()) } returns resolver
         every { node.nativeReferenceEquals(any()) } returns false
     }
 

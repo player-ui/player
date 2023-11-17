@@ -1,7 +1,15 @@
 package com.intuit.player.jvm.core.player.state
 
 import com.intuit.player.jvm.core.asset.Asset
-import com.intuit.player.jvm.core.bridge.*
+import com.intuit.player.jvm.core.bridge.Completable
+import com.intuit.player.jvm.core.bridge.EmptyNode
+import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.NodeWrapper
+import com.intuit.player.jvm.core.bridge.Promise
+import com.intuit.player.jvm.core.bridge.deserialize
+import com.intuit.player.jvm.core.bridge.getInvokable
+import com.intuit.player.jvm.core.bridge.getSerializable
+import com.intuit.player.jvm.core.bridge.getSymbol
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.player.jvm.core.data.DataController
@@ -17,7 +25,11 @@ import com.intuit.player.jvm.core.flow.state.NavigationFlowEndState
 import com.intuit.player.jvm.core.player.Player
 import com.intuit.player.jvm.core.player.PlayerException
 import com.intuit.player.jvm.core.player.PlayerFlowStatus
-import com.intuit.player.jvm.core.player.PlayerFlowStatus.*
+import com.intuit.player.jvm.core.player.PlayerFlowStatus.COMPLETED
+import com.intuit.player.jvm.core.player.PlayerFlowStatus.ERROR
+import com.intuit.player.jvm.core.player.PlayerFlowStatus.IN_PROGRESS
+import com.intuit.player.jvm.core.player.PlayerFlowStatus.NOT_STARTED
+import com.intuit.player.jvm.core.player.PlayerFlowStatus.RELEASED
 import com.intuit.player.jvm.core.validation.ValidationController
 import com.intuit.player.jvm.core.view.View
 import com.intuit.player.jvm.core.view.ViewController
@@ -112,7 +124,7 @@ public class InProgressState internal constructor(override val node: Node) :
     /** [FlowResult] value that will be available once the flow completes */
     // TODO: Make non-nullable if possible - requires Promise change
     public val flowResult: Completable<FlowResult?> get() = Promise(
-        node.getObject("flowResult")!!
+        node.getObject("flowResult")!!,
     ).toCompletable(FlowResult.serializer())
 
     public val controllers: ControllerState by NodeSerializableField(ControllerState.serializer())

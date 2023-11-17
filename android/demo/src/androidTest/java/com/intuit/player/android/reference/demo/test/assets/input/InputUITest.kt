@@ -53,12 +53,12 @@ class InputUITest : AssetUITest("input") {
 
         val ageContainer = allOf(
             withId(R.id.input_container),
-            withChild(withChild(withText("Age")))
+            withChild(withChild(withText("Age"))),
         ).also(::verifyIsDisplayed)
 
         val ageInput = allOf(
             withId(R.id.input_field),
-            withParent(ageContainer)
+            withParent(ageContainer),
         ).also(::verifyIsDisplayed)
 
         onView(ageInput)
@@ -86,12 +86,12 @@ class InputUITest : AssetUITest("input") {
 
         val nameContainer = allOf(
             withId(R.id.input_container),
-            withChild(withChild(withText("Name")))
+            withChild(withChild(withText("Name"))),
         ).also(::verifyIsDisplayed)
 
         val nameInput = allOf(
             withId(R.id.input_field),
-            withParent(nameContainer)
+            withParent(nameContainer),
         ).also(::verifyIsDisplayed)
 
         onView(nameInput)

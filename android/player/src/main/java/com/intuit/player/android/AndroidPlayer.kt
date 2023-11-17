@@ -3,7 +3,11 @@ package com.intuit.player.android
 import android.content.Context
 import android.view.View
 import com.alexii.j2v8debugger.ScriptSourceProvider
-import com.intuit.hooks.*
+import com.intuit.hooks.BailResult
+import com.intuit.hooks.HookContext
+import com.intuit.hooks.SyncBailHook
+import com.intuit.hooks.SyncHook
+import com.intuit.hooks.SyncWaterfallHook
 import com.intuit.player.android.AndroidPlayer.Companion.injectDefaultPlugins
 import com.intuit.player.android.asset.RenderableAsset
 import com.intuit.player.android.debug.UnsupportedScriptProvider
@@ -18,7 +22,9 @@ import com.intuit.player.jvm.core.bridge.format
 import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.player.jvm.core.bridge.serialization.format.registerContextualSerializer
 import com.intuit.player.jvm.core.logger.TapableLogger
-import com.intuit.player.jvm.core.player.*
+import com.intuit.player.jvm.core.player.HeadlessPlayer
+import com.intuit.player.jvm.core.player.Player
+import com.intuit.player.jvm.core.player.PlayerException
 import com.intuit.player.jvm.core.player.state.CompletedState
 import com.intuit.player.jvm.core.player.state.PlayerFlowState
 import com.intuit.player.jvm.core.player.state.inProgressState
@@ -30,7 +36,6 @@ import com.intuit.player.plugins.coroutines.FlowScopePlugin
 import com.intuit.player.plugins.pubsub.PubSubPlugin
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.*
 import kotlin.reflect.KClass
 
 public typealias AndroidPlayerConfig = AndroidPlayer.Config
@@ -48,7 +53,7 @@ public class AndroidPlayer private constructor(
     /** Convenience constructor to provide vararg style [plugins] parameter */
     public constructor(
         vararg plugins: Plugin,
-        config: Config = Config()
+        config: Config = Config(),
     ) : this(plugins.toList(), config)
 
     /**
@@ -59,7 +64,7 @@ public class AndroidPlayer private constructor(
      */
     public constructor(
         plugins: List<Plugin>,
-        config: Config = Config()
+        config: Config = Config(),
     ) : this(HeadlessPlayer(plugins.injectDefaultPlugins(), config = config))
 
     /**
@@ -92,7 +97,7 @@ public class AndroidPlayer private constructor(
             public fun call(context: Context): Context = super.call(
                 context,
                 { f, acc, hookCtx -> f(hookCtx, acc) },
-                { f, hookCtx -> f(hookCtx, context) }
+                { f, hookCtx -> f(hookCtx, context) },
             )
         }
 
@@ -113,7 +118,7 @@ public class AndroidPlayer private constructor(
                 { f, _ ->
                     f(asset)
                 },
-                default
+                default,
             )
         }
 
@@ -150,8 +155,9 @@ public class AndroidPlayer private constructor(
     /** Helper provided to reduce overhead for asset registrations with metaData */
     public fun <T : RenderableAsset> registerAsset(klass: KClass<T>, props: Map<String, Any>, factory: (AssetContext) -> RenderableAsset) {
         assetRegistry.register(props, factory)
-        if (player.format.serializersModule.getContextual(klass) == null)
+        if (player.format.serializersModule.getContextual(klass) == null) {
             player.format.registerContextualSerializer(klass, assetSerializer.conform(klass))
+        }
     }
 
     /** Apply [AndroidPlayerPlugin]s last */
@@ -301,13 +307,16 @@ public class AndroidPlayer private constructor(
         /** Helper to add default plugins if there isn't already an instance of that plugin */
         private fun List<Plugin>.injectDefaultPlugins() = buildDefaultPlugins()
             .fold(this) { plugins, (defaultPluginClass, defaultPlugin) ->
-                if (plugins.filterIsInstance(defaultPluginClass).isEmpty()) plugins + defaultPlugin
-                else plugins
+                if (plugins.filterIsInstance(defaultPluginClass).isEmpty()) {
+                    plugins + defaultPlugin
+                } else {
+                    plugins
+                }
             }
     }
 
     public data class Config(
         override var debuggable: Boolean = false,
-        override var coroutineExceptionHandler: CoroutineExceptionHandler? = null
+        override var coroutineExceptionHandler: CoroutineExceptionHandler? = null,
     ) : PlayerRuntimeConfig()
 }

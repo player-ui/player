@@ -87,7 +87,7 @@ internal class GraalFormatTest : GraalTest() {
 
         val simple = format.decodeFromRuntimeValue(
             Simple.serializer(),
-            graalObject
+            graalObject,
         )
 
         Assertions.assertEquals(3, simple.one)
@@ -105,12 +105,12 @@ internal class GraalFormatTest : GraalTest() {
             "increment",
             ProxyExecutable { args ->
                 args[0].asInt() + 1
-            }
+            },
         )
 
         val simple = format.decodeFromRuntimeValue(
             NodeWrapperSerializer(::Simple),
-            graalObject
+            graalObject,
         )
 
         Assertions.assertEquals(1, simple.increment(0))
@@ -130,12 +130,12 @@ internal class GraalFormatTest : GraalTest() {
             "increment",
             ProxyExecutable { args ->
                 args[0].asInt() + 1
-            }
+            },
         )
 
         val simple = format.decodeFromRuntimeValue(
             Data.serializer(),
-            graalObject
+            graalObject,
         )
 
         Assertions.assertEquals(3, simple.one)

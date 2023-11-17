@@ -72,8 +72,12 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
 
     @OptIn(ExperimentalCoroutinesApi::class, ExperimentalPlayerApi::class)
     public val player: AndroidPlayer by lazy {
-        if (deferredPlayer.isCompleted) deferredPlayer.getCompleted() else runBlocking {
-            deferredPlayer.await()
+        if (deferredPlayer.isCompleted) {
+            deferredPlayer.getCompleted()
+        } else {
+            runBlocking {
+                deferredPlayer.await()
+            }
         }
     }
 
@@ -106,11 +110,11 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
         when {
             it.isSuccess -> player.logger.info(
                 "Flow completed successfully!",
-                it.getOrNull()?.endState
+                it.getOrNull()?.endState,
             )
             it.isFailure -> player.logger.error(
                 "Error in Flow!",
-                it.exceptionOrNull()
+                it.exceptionOrNull(),
             )
         }
     }
@@ -143,8 +147,10 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
     }
 
     public override fun onCleared() {
-        if (manager.state.value != AsyncIterationManager.State.Done) runBlocking {
-            manager.iterator.terminate()
+        if (manager.state.value != AsyncIterationManager.State.Done) {
+            runBlocking {
+                manager.iterator.terminate()
+            }
         }
 
         release()
@@ -172,15 +178,19 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
         when (state.value) {
             ManagedPlayerState.NotStarted -> manager.next()
             is ManagedPlayerState.Error,
-            is ManagedPlayerState.Running -> when (manager.state.value) {
+            is ManagedPlayerState.Running,
+            -> when (manager.state.value) {
                 AsyncIterationManager.State.NotStarted -> manager.next()
                 is AsyncIterationManager.State.Item<*>,
-                is AsyncIterationManager.State.Error -> manager.next(player.completedState)
+                is AsyncIterationManager.State.Error,
+                -> manager.next(player.completedState)
                 AsyncIterationManager.State.Done,
-                AsyncIterationManager.State.Pending -> Unit
+                AsyncIterationManager.State.Pending,
+                -> Unit
             }
             is ManagedPlayerState.Done,
-            ManagedPlayerState.Pending -> Unit
+            ManagedPlayerState.Pending,
+            -> Unit
         }
     }
 
@@ -196,7 +206,7 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
     /** Generic [ViewModelProvider.AndroidViewModelFactory] to conveniently construct some [T] with an [Application] and [AsyncFlowIterator] */
     public class Factory<T : PlayerViewModel>(
         private val iterator: AsyncFlowIterator,
-        private val factory: (AsyncFlowIterator) -> T = { i -> PlayerViewModel(i) as T }
+        private val factory: (AsyncFlowIterator) -> T = { i -> PlayerViewModel(i) as T },
     ) : ViewModelProvider.Factory {
 
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

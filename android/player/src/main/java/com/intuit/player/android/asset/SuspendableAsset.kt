@@ -12,8 +12,15 @@ import com.intuit.player.android.R
 import com.intuit.player.jvm.core.player.PlayerException
 import com.intuit.player.jvm.core.player.state.inProgressState
 import com.intuit.player.jvm.core.utils.InternalPlayerApi
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.coroutineContext
 
 /** Extension of [DecodableAsset] that provides suspendable [initView] and [hydrate] APIs that will provide an instance of [Data] to use during [View] updates */

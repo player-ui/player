@@ -40,6 +40,7 @@ internal class PlayerViewModelTest {
     private val invalidFlow = "{\"id\": \"id\",\"navigation\": {\"BEGIN\": \"FLOW\",\"FLOW_1\": {\"startState\": \"END_Done\",\"END_Done\": {\"state_type\": \"END\",\"outcome\": \"done\"}}}}"
 
     @MockK lateinit var flowIterator: AsyncFlowIterator
+
     @MockK lateinit var runtime: Runtime<*>
 
     lateinit var viewModel: PlayerViewModel
@@ -72,14 +73,14 @@ internal class PlayerViewModelTest {
         timeout,
         viewModel.player::state,
         { it is T },
-        { "Expected Player state to eventually be ${T::class}, but is ${viewModel.player.state}" }
+        { "Expected Player state to eventually be ${T::class}, but is ${viewModel.player.state}" },
     ) as T
 
     private suspend inline fun <reified T : ManagedPlayerState> assertManagedPlayerState(timeout: Long = 5000): T = suspendUntilCondition(
         timeout,
         viewModel.state::value,
         { it is T },
-        { "Expected Managed Player state to eventually be ${T::class}, but is ${viewModel.state.value}" }
+        { "Expected Managed Player state to eventually be ${T::class}, but is ${viewModel.state.value}" },
     ) as T
 
     @BeforeEach
@@ -99,7 +100,7 @@ internal class PlayerViewModelTest {
         assertNotNull(
             PlayerViewModel.Factory(flowIterator) {
                 PlayerViewModel(it)
-            }.create(PlayerViewModel::class.java)
+            }.create(PlayerViewModel::class.java),
         )
     }
 
@@ -187,7 +188,7 @@ internal class PlayerViewModelTest {
             "[J2V8] Runtime object has been released!",
             assertThrows<PlayerRuntimeException> {
                 viewModel.player.start(SimpleAsset.sampleFlow.toString())
-            }.message
+            }.message,
         )
     }
 

@@ -12,6 +12,7 @@ internal class ViewControllerTest : NodeBaseTest() {
 
     @MockK
     private lateinit var hookNode: Node
+
     @MockK
     private lateinit var viewNode: Node
 

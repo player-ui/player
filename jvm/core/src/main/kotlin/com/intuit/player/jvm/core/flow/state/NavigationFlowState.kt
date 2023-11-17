@@ -8,7 +8,11 @@ import com.intuit.player.jvm.core.bridge.snapshot
 import com.intuit.player.jvm.core.experimental.ExperimentalPlayerApi
 import com.intuit.player.jvm.core.experimental.RuntimeClassDiscriminator
 import com.intuit.player.jvm.core.expressions.Expression
-import com.intuit.player.jvm.core.flow.state.NavigationFlowStateType.*
+import com.intuit.player.jvm.core.flow.state.NavigationFlowStateType.ACTION
+import com.intuit.player.jvm.core.flow.state.NavigationFlowStateType.END
+import com.intuit.player.jvm.core.flow.state.NavigationFlowStateType.EXTERNAL
+import com.intuit.player.jvm.core.flow.state.NavigationFlowStateType.FLOW
+import com.intuit.player.jvm.core.flow.state.NavigationFlowStateType.VIEW
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer

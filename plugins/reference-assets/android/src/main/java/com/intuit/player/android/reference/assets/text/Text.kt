@@ -18,8 +18,11 @@ class Text(assetContext: AssetContext) : SuspendableAsset<Text.Data>(assetContex
 
     object Styles {
         @StyleRes val Default = R.style.Text
+
         @StyleRes val Title = R.style.Text_Title
+
         @StyleRes val Label = R.style.Text_Label
+
         @StyleRes val Note = R.style.Text_Note
     }
 
@@ -38,7 +41,7 @@ class Text(assetContext: AssetContext) : SuspendableAsset<Text.Data>(assetContex
             val metaData: LinkMetaData? = null,
         ) {
             @Serializable data class LinkMetaData(
-                val ref: String
+                val ref: String,
             )
         }
 

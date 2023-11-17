@@ -35,8 +35,8 @@ internal abstract class J2V8Test(val v8: V8 = V8.createV8Runtime().unlock()) : P
     fun buildV8Object(jsonElement: JsonElement = buildJsonObject {}) = buildV8ObjectFromMap(
         Json.decodeFromJsonElement(
             MapSerializer(String.serializer(), GenericSerializer()),
-            jsonElement
-        )
+            jsonElement,
+        ),
     )
 
     fun buildV8ObjectFromMap(map: Map<String, Any?>): V8Object = format.encodeToV8Value(map).v8Object
@@ -91,12 +91,14 @@ internal abstract class J2V8Test(val v8: V8 = V8.createV8Runtime().unlock()) : P
 
             if (isUndefined) {
                 assertEquals(this, another)
-            } else keys.forEach { key ->
-                val (expected, actual) = get(key) to another.get(key)
-                if (expected is V8Object && !expected.isUndefined) {
-                    expected.assertEquivalent(actual)
-                } else {
-                    assertEquals(expected, actual, "comparing key: $key")
+            } else {
+                keys.forEach { key ->
+                    val (expected, actual) = get(key) to another.get(key)
+                    if (expected is V8Object && !expected.isUndefined) {
+                        expected.assertEquivalent(actual)
+                    } else {
+                        assertEquals(expected, actual, "comparing key: $key")
+                    }
                 }
             }
         }

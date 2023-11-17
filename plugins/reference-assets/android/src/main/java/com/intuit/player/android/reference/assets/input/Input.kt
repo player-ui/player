@@ -21,7 +21,7 @@ class Input(assetContext: AssetContext) : SuspendableAsset<Input.Data>(assetCont
 
     @Serializable
     data class Validation(
-        val message: String
+        val message: String,
     )
 
     @Serializable
@@ -77,9 +77,11 @@ class Input(assetContext: AssetContext) : SuspendableAsset<Input.Data>(assetCont
                 val formatted = runBlocking { data.format(value) } ?: value
                 val shouldFormat = (selectionStart == selectionEnd) and (selectionEnd == it.length)
 
-                if (value != formatted && shouldFormat) pauseFormatter {
-                    it.clear()
-                    it.replace(0, it.length, formatted)
+                if (value != formatted && shouldFormat) {
+                    pauseFormatter {
+                        it.clear()
+                        it.replace(0, it.length, formatted)
+                    }
                 }
             }
 
