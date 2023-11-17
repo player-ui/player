@@ -2,6 +2,7 @@ package com.intuit.player.jvm.core.bridge.global
 
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -18,7 +19,7 @@ public class JSIterator<T>(override val node: Node, public val itemSerializer: K
     )
 
     private fun getNext(): NextResult<T> = node
-        .getFunction<Node>("next")!!()
+        .getInvokable<Node>("next")!!()
         .deserialize(NextResult.serializer(itemSerializer))
 
     /** Always keeps track of value to be read */

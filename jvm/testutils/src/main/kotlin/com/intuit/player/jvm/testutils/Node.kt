@@ -8,7 +8,7 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.Json
 import kotlin.reflect.jvm.reflect
 
 /**
@@ -19,7 +19,7 @@ import kotlin.reflect.jvm.reflect
  */
 public class Node(private val map: Map<String, Any?>) : com.intuit.player.jvm.core.bridge.Node, Map<String, Any?> by map {
 
-    override fun <R> getFunction(key: String): Invokable<R>? = get(key)?.let {
+    override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = get(key)?.let {
         when (it) {
             is Function<*> -> it
             else -> null

@@ -1,6 +1,7 @@
 package com.intuit.player.plugins.beacon
 
 import com.intuit.player.jvm.core.asset.Asset
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
 import com.intuit.player.jvm.core.bridge.runtime.add
 import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
@@ -55,7 +56,7 @@ public class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JSScrip
 
     /** Fire a beacon event */
     public fun beacon(action: String, element: String, asset: Asset, data: Any? = null) {
-        instance.getFunction<Any?>("beacon")!!.invoke(
+        instance.getInvokable<Any?>("beacon")!!.invoke(
             mapOf(
                 "action" to action,
                 "element" to element,

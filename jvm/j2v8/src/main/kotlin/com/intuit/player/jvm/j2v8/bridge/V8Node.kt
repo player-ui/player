@@ -1,10 +1,21 @@
 package com.intuit.player.jvm.j2v8.bridge
 
-import com.eclipsesource.v8.*
-import com.intuit.player.jvm.core.bridge.*
+import com.eclipsesource.v8.V8
+import com.eclipsesource.v8.V8Array
+import com.eclipsesource.v8.V8Function
+import com.eclipsesource.v8.V8Object
+import com.eclipsesource.v8.V8Value
+import com.intuit.player.jvm.core.bridge.Invokable
+import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.NodeWrapper
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
 import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeFormat
-import com.intuit.player.jvm.j2v8.extensions.*
+import com.intuit.player.jvm.j2v8.extensions.blockingLock
+import com.intuit.player.jvm.j2v8.extensions.handleValue
+import com.intuit.player.jvm.j2v8.extensions.lockIfDefined
+import com.intuit.player.jvm.j2v8.extensions.toInvokable
+import com.intuit.player.jvm.j2v8.extensions.toList
+import com.intuit.player.jvm.j2v8.extensions.toNode
 import com.intuit.player.jvm.j2v8.getV8Value
 import kotlinx.serialization.DeserializationStrategy
 
@@ -44,9 +55,13 @@ internal class V8Node(override val v8Object: V8Object, override val runtime: Run
         get(key).handleValue(format)
     }
 
+    override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = v8Object.lockIfDefined {
+        get(key) as? V8Function
+    }?.toInvokable(format, v8Object, deserializationStrategy)
+
     override fun <R> getFunction(key: String): Invokable<R>? = v8Object.lockIfDefined {
         get(key) as? V8Function
-    }?.toInvokable(format, v8Object)
+    }?.toInvokable(format, v8Object, null)
 
     override fun getList(key: String): List<*>? = v8Object.lockIfDefined {
         get(key) as? V8Array

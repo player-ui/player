@@ -5,8 +5,10 @@ import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeFormat
 import com.intuit.player.jvm.core.bridge.serialization.format.encodeToRuntimeValue
+import com.intuit.player.jvm.core.bridge.serialization.format.serializer
 import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.player.jvm.graaljs.bridge.GraalNode
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import org.graalvm.polyglot.Value
@@ -24,7 +26,7 @@ private fun Value.transform(format: RuntimeFormat<Value>): Any? = when {
         else -> hostObject
     }
     hasArrayElements() -> toList(format)
-    canExecute() -> toInvokable<Any>(format)
+    canExecute() -> toInvokable<Any>(format, format.serializer())
     else -> when (this.`as`(Any::class.java)) {
         is Int -> asInt()
         is Double, is Long -> try { asInt() } catch (e: Exception) { asDouble() }
@@ -51,14 +53,24 @@ internal fun Value.toNode(format: RuntimeFormat<Value>): Node? = if (isNull || !
     else GraalNode(this, format.runtime)
 }
 
-internal fun <R> Value.toInvokable(format: RuntimeFormat<Value>): Invokable<R>? = if (isNull || !canExecute()) null else lockIfDefined {
+internal fun <R> Value.toInvokable(format: RuntimeFormat<Value>, deserializationStrategy: DeserializationStrategy<R>?): Invokable<R>? = if (isNull || !canExecute()) null else lockIfDefined {
     Invokable { args ->
         blockingLock {
-            this.execute(
-                *format.encodeToRuntimeValue(
-                    args as Array<Any?>
-                ).`as`(List::class.java).toTypedArray()
-            ).handleValue(format) as R
+            when (
+                val result =
+                    this.execute(
+                        *format.encodeToRuntimeValue(
+                            args as Array<Any?>
+                        ).`as`(List::class.java).toTypedArray()
+                    ).handleValue(format)
+            ) {
+                is Node -> deserializationStrategy?.let {
+                    result.deserialize(deserializationStrategy)
+                } ?: run {
+                    result as R
+                }
+                else -> result as R
+            }
         }
     }
 }

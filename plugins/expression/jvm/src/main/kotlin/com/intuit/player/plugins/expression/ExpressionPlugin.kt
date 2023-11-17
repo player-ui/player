@@ -2,6 +2,7 @@ package com.intuit.player.plugins.expression
 
 import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
 import com.intuit.player.jvm.core.bridge.runtime.add
 import com.intuit.player.jvm.core.plugins.JSScriptPluginWrapper
@@ -28,7 +29,7 @@ public class ExpressionPlugin(
             map.entries.fold(runtime.execute("new Map()") as Node) { acc, entry ->
                 acc.apply {
                     val (name, handler) = entry
-                    getFunction<Any?>("set")!!.invoke(
+                    getInvokable<Any?>("set")!!.invoke(
                         name,
                         Invokable { args ->
                             handler.invoke(args.drop(1))

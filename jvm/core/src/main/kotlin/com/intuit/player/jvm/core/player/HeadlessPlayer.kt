@@ -3,6 +3,7 @@ package com.intuit.player.jvm.core.player
 import com.intuit.player.jvm.core.bridge.Completable
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
 import com.intuit.player.jvm.core.bridge.runtime.add
 import com.intuit.player.jvm.core.bridge.runtime.runtimeFactory
@@ -58,7 +59,7 @@ public class HeadlessPlayer @JvmOverloads public constructor(
     override val hooks: Hooks by NodeSerializableField(Hooks.serializer())
 
     override val state: PlayerFlowState get() = if (player.isReleased()) ReleasedState else
-        player.getFunction<Node>("getState")!!().deserialize(PlayerFlowState.serializer())
+        player.getInvokable<Node>("getState")!!().deserialize(PlayerFlowState.serializer())
 
     init {
         /** 1. load source into the [runtime] and release lock */
@@ -89,7 +90,7 @@ public class HeadlessPlayer @JvmOverloads public constructor(
 
     override fun start(flow: String): Completable<CompletedState> = start(runtime.execute("($flow)") as Node)
 
-    public fun start(flow: Node): Completable<CompletedState> = PlayerCompletable(player.getFunction<Node>("start")!!.invoke(flow))
+    public fun start(flow: Node): Completable<CompletedState> = PlayerCompletable(player.getInvokable<Node>("start")!!.invoke(flow))
 
     /** Start a [flow] and subscribe to the result */
     public fun start(flow: Node, onComplete: (Result<CompletedState>) -> Unit): Completable<CompletedState> =

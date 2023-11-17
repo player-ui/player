@@ -2,6 +2,7 @@ package com.intuit.player.jvm.core.data
 
 import com.intuit.player.jvm.core.NodeBaseTest
 import com.intuit.player.jvm.core.bridge.Invokable
+import com.intuit.player.jvm.core.bridge.getInvokable
 import io.mockk.every
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -18,7 +19,7 @@ internal class DataControllerTest : NodeBaseTest() {
 
     @BeforeEach
     fun setUpMocks() {
-        every { node.getFunction<Unit>("set") } returns Invokable { args ->
+        every { node.getInvokable<Unit>("set") } returns Invokable { args ->
             val arg = args[0] as Map<String, Any?>
             data = data + arg.keys.map { it to arg[it] }
         }

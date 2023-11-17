@@ -50,6 +50,14 @@ public interface Node : Map<String, Any?> {
      * Returns the value corresponding to the given [key] as a [Invokable],
      * or `null` if such a key is not present in the node or if the value is not invokable
      */
+    public fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = get(key).safeCast()
+
+    @Deprecated(
+        "Replaced with getInvokable, which requires a deserializer for the return type. Either provide a deserializer explicitly, " +
+            "or use the extension to automatically determine the correct serializer.",
+        ReplaceWith("getInvokable<R>(key)", "com.intuit.player.jvm.core.bridge.getInvokable"),
+        DeprecationLevel.WARNING
+    )
     public fun <R> getFunction(key: String): Invokable<R>? = get(key).safeCast()
 
     /**
@@ -114,6 +122,12 @@ public inline fun <reified T> Node.getSerializable(key: String): T? = getSeriali
 public inline fun <reified T> Node.getSerializable(key: String, serializer: DeserializationStrategy<T>?): T? = serializer?.let {
     getSerializable(key, it)
 } ?: getSerializable(key)
+
+public inline fun <reified R> Node.getInvokable(key: String): Invokable<R>? = getInvokable(key, format.serializer())
+
+public inline fun <reified R> Node.getInvokable(key: String, deserializer: DeserializationStrategy<R>?): Invokable<R>? = deserializer?.let {
+    getInvokable(key, it)
+} ?: getInvokable(key)
 
 private inline fun <reified T> Any?.safeCast(): T? = this as? T
 

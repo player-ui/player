@@ -2,6 +2,7 @@ package com.intuit.player.jvm.graaljs.bridge.runtime
 
 import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeContainer
 import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeFactory
@@ -46,7 +47,8 @@ internal class GraalRuntime(
 
     companion object {
         val Context.isReleased: Boolean
-            get() = contextRuntimeMap[this]?.released ?: throw PlayerException("Graal Context is not associated with a runtime")
+            get() = contextRuntimeMap[this]?.released
+                ?: throw PlayerException("Graal Context is not associated with a runtime")
         val Context.undefined: Value
             get() = eval("js", "undefined")
         private val contextRuntimeMap: MutableMap<Context, GraalRuntime> = hashMapOf()
@@ -101,6 +103,7 @@ internal class GraalRuntime(
     override fun isEmpty(): Boolean = backingNode.isEmpty()
     override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>): T? =
         backingNode.getSerializable(key, deserializer)
+
     override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T = backingNode.deserialize(deserializer)
     override fun isReleased(): Boolean = backingNode.isReleased()
     override fun isUndefined(): Boolean = backingNode.isUndefined()
@@ -110,7 +113,8 @@ internal class GraalRuntime(
     override fun getDouble(key: String): Double? = backingNode.getDouble(key)
     override fun getLong(key: String): Long? = backingNode.getLong(key)
     override fun getBoolean(key: String): Boolean? = backingNode.getBoolean(key)
-    override fun <R> getFunction(key: String): Invokable<R>? = backingNode.getFunction(key)
+    override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = backingNode.getInvokable(key, deserializationStrategy)
+    override fun <R> getFunction(key: String): Invokable<R>? = backingNode.getInvokable<R>(key)
     override fun getList(key: String): List<*>? = backingNode.getList(key)
     override fun getObject(key: String): Node? = backingNode.getObject(key)
 }

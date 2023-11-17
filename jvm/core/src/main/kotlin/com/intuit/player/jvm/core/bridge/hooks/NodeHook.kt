@@ -4,6 +4,7 @@ import com.intuit.hooks.HookContext
 import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.utils.InternalPlayerApi
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
@@ -14,7 +15,7 @@ internal interface NodeHook<R> : NodeWrapper {
 
     @OptIn(ExperimentalSerializationApi::class)
     fun init(vararg serializers: KSerializer<*>) {
-        node.getFunction<Unit>("tap")?.invoke(
+        node.getInvokable<Unit>("tap")?.invoke(
             mapOf("name" to "name", "context" to true),
             Invokable { args ->
                 val context = args[0] as Map<String, Any>

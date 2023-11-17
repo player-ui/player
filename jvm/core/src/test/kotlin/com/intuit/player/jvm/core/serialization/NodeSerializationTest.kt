@@ -2,6 +2,7 @@ package com.intuit.player.jvm.core.serialization
 
 import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.runtime.serialize
 import com.intuit.player.jvm.utils.test.RuntimeTest
 import kotlinx.serialization.Polymorphic
@@ -50,14 +51,14 @@ internal class NodeSerializationTest : RuntimeTest() {
         assertEquals(node, someDataObj["node"])
 
         assertNotEquals(genericInvokable, someDataObj["genericInvokable"])
-        assertEquals(2, someDataObj.getFunction<Int>("genericInvokable")?.invoke())
+        assertEquals(2, someDataObj.getInvokable<Int>("genericInvokable")?.invoke())
 
         assertNotEquals(specificInvokable, someDataObj["specificInvokable"])
-        assertEquals(3, someDataObj.getFunction<Int>("specificInvokable")?.invoke(2, "three"))
+        assertEquals(3, someDataObj.getInvokable<Int>("specificInvokable")?.invoke(2, "three"))
 
         val param = mapOf("wut" to "where")
         assertNotEquals(specificInvokableWithNode, someDataObj["specificInvokableWithNode"])
-        assertEquals(param, someDataObj.getFunction<Node>("specificInvokableWithNode")?.invoke(param))
+        assertEquals(param, someDataObj.getInvokable<Node>("specificInvokableWithNode")?.invoke(param))
 
         assertNull(someDataObj["maybeGenericInvokable"])
         assertNull(someDataObj["maybeNode"])

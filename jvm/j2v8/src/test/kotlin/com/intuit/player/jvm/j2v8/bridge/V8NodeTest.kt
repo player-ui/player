@@ -3,6 +3,7 @@ package com.intuit.player.jvm.j2v8.bridge
 import com.intuit.player.jvm.core.asset.Asset
 import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.getJson
 import com.intuit.player.jvm.core.bridge.toJson
 import com.intuit.player.jvm.core.flow.Flow
@@ -74,10 +75,10 @@ internal class V8NodeTest : J2V8Test() {
             "notafunction" to 1
         )
 
-        assertEquals("classicstring", node.getFunction<String>("function")?.invoke())
-        assertEquals(listOf("1", 2), node.getFunction<Any?>("tuple")?.invoke("1", 2))
-        assertEquals(null, node.getFunction<Any>("notafunction"))
-        assertEquals(null, node.getFunction<Any>("notthere"))
+        assertEquals("classicstring", node.getInvokable<String>("function")?.invoke())
+        assertEquals(listOf("1", 2), node.getInvokable<Any?>("tuple")?.invoke("1", 2))
+        assertEquals(null, node.getInvokable<Any>("notafunction"))
+        assertEquals(null, node.getInvokable<Any>("notthere"))
     }
 
     @Test

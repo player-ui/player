@@ -3,6 +3,7 @@ package com.intuit.player.jvm.core.player.state
 import com.intuit.player.jvm.core.NodeBaseTest
 import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeFormat
 import com.intuit.player.jvm.core.bridge.serialization.format.serializer
 import com.intuit.player.jvm.core.bridge.toJson
@@ -53,11 +54,11 @@ internal class InProgressStateTest : NodeBaseTest() {
         every { node.getSerializable<Any>("current", any()) } returns null
         every { node.getSerializable<Any>("currentView", any()) } returns null
         every { node.getSerializable<Any>("data", any()) } returns DataController(node)
-        every { node.getFunction<Node>("getCurrentView") } returns null
-        every { node.getFunction<Node>("getLastViewUpdate") } returns Invokable { mockNode }
-        every { node.getFunction<Node>("getCurrentFlowState") } returns null
+        every { node.getInvokable<Node>("getCurrentView") } returns null
+        every { node.getInvokable<Node>("getLastViewUpdate") } returns Invokable { mockNode }
+        every { node.getInvokable<Node>("getCurrentFlowState") } returns null
         every { node.getObject("flowResult") } returns mockNode
-        every { node.getFunction<Unit>("transition") } returns Invokable {
+        every { node.getInvokable<Unit>("transition") } returns Invokable {
             lastTransition = it[0] as String
         }
         every { node.getSerializable("flow", Flow.serializer()) } returns Flow("flowId")

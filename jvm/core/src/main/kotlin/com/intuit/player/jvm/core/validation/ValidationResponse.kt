@@ -3,6 +3,7 @@ package com.intuit.player.jvm.core.validation
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
 import com.intuit.player.jvm.core.bridge.deserialize
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.player.jvm.core.bridge.serialization.serializers.PolymorphicNodeWrapperSerializer
 import com.intuit.player.jvm.core.player.PlayerException
@@ -23,7 +24,7 @@ public class WarningValidationResponse(override val node: Node) : ValidationResp
 
     /** Warning validations can be dismissed without correcting the error */
     public fun dismiss() {
-        node.getFunction<Unit>("dismiss")?.invoke()
+        node.getInvokable<Unit>("dismiss")?.invoke()
     }
 
     internal object Serializer : NodeWrapperSerializer<WarningValidationResponse>(::WarningValidationResponse)

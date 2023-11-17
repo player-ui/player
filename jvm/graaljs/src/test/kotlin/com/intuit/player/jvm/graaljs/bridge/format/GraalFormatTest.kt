@@ -2,6 +2,7 @@ package com.intuit.player.jvm.graaljs.bridge.format
 
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.player.jvm.graaljs.base.GraalTest
 import com.intuit.player.jvm.graaljs.bridge.serialization.format.encodeToGraalValue
@@ -96,7 +97,7 @@ internal class GraalFormatTest : GraalTest() {
     @Test
     fun `decode into Node backed serializable`() = format.context.blockingLock {
         data class Simple(override val node: Node) : NodeWrapper {
-            fun increment(value: Int) = node.getFunction<Int>("increment")!!(value)
+            fun increment(value: Int) = node.getInvokable<Int>("increment")!!(value)
         }
 
         val graalObject = format.context.eval("js", "new Object()")

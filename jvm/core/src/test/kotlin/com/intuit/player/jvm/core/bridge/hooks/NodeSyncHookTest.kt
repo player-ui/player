@@ -3,6 +3,7 @@ package com.intuit.player.jvm.core.bridge.hooks
 import com.intuit.player.jvm.core.NodeBaseTest
 import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.view.View
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -23,7 +24,7 @@ internal class NodeSyncHookTest : NodeBaseTest() {
     @Suppress("UNCHECKED_CAST")
     @BeforeEach
     fun setUpMock() {
-        every { node.getFunction<Unit>("tap") } returns Invokable {
+        every { node.getInvokable<Unit>("tap") } returns Invokable {
             map = it[0] as HashMap<String, Any>
             callback = it[1] as Invokable<Unit>
         }
@@ -34,7 +35,7 @@ internal class NodeSyncHookTest : NodeBaseTest() {
     @Test
     fun `JS Hook Tap On Init`() {
         NodeSyncHook1(node, View.serializer())
-        verify { node.getFunction<Unit>("tap") }
+        verify { node.getInvokable<Unit>("tap") }
     }
 
     @Test
@@ -46,7 +47,7 @@ internal class NodeSyncHookTest : NodeBaseTest() {
 
         callback.invoke(hashMapOf<Any, Any>(), dummyNode)
 
-        verify { node.getFunction<Unit>("tap") }
+        verify { node.getInvokable<Unit>("tap") }
         assertEquals(dummyNode, output?.node)
     }
 

@@ -39,7 +39,7 @@ public class Promise(override val node: Node) : NodeWrapper {
      */
     public fun <Expected : Any, Next : Any> then(deserializer: DeserializationStrategy<Expected>, block: (Expected?) -> Next?): Promise =
         Promise(
-            node.getFunction<Node>("then")?.invoke(
+            node.getInvokable<Node>("then")?.invoke(
                 { arg: Any? ->
                     try {
                         block(
@@ -74,7 +74,7 @@ public class Promise(override val node: Node) : NodeWrapper {
      */
     public fun <Next : Any> catch(block: (Throwable) -> Next?): Promise =
         Promise(
-            node.getFunction<Node>("catch")?.invoke(
+            node.getInvokable<Node>("catch")?.invoke(
                 { arg: Any? ->
                     try {
                         // Attempt to dynamically build exception from JS error
@@ -149,11 +149,11 @@ public val Node.Promise: Promise.Api get() = runtime.Promise
 public val Runtime<*>.Promise: Promise.Api get() = getObject("Promise")?.let { promise ->
     object : Promise.Api {
         override fun <T : Any> resolve(vararg values: T): Promise = promise
-            .getFunction<Node>("resolve")?.invoke(*values)?.let(::Promise)
+            .getInvokable<Node>("resolve")?.invoke(*values)?.let(::Promise)
             ?: throw PromiseException("Could not resolve with values: $values")
 
         override fun <T : Any> reject(vararg values: T): Promise = promise
-            .getFunction<Node>("reject")?.invoke(*values)?.let(::Promise)
+            .getInvokable<Node>("reject")?.invoke(*values)?.let(::Promise)
             ?: throw PromiseException("Could not reject with values: $values")
     }
 } ?: throw PlayerRuntimeException("'Promise' not defined in runtime")

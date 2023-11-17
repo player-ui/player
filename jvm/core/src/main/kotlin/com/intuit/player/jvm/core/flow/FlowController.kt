@@ -2,6 +2,7 @@ package com.intuit.player.jvm.core.flow
 
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.hooks.NodeSyncHook1
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField.Companion.NodeSerializableField
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
@@ -11,7 +12,7 @@ import kotlinx.serialization.Serializable
 @Serializable(with = FlowController.Serializer::class)
 public class FlowController internal constructor(override val node: Node) : NodeWrapper, Transition {
     override fun transition(state: String, options: TransitionOptions?) {
-        node.getFunction<Unit>("transition")?.invoke(state, options)
+        node.getInvokable<Unit>("transition")?.invoke(state, options)
     }
 
     public val hooks: Hooks by NodeSerializableField(Hooks.serializer())

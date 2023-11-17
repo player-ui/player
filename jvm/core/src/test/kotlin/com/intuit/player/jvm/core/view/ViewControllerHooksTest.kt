@@ -3,6 +3,7 @@ package com.intuit.player.jvm.core.view
 import com.intuit.player.jvm.core.NodeBaseTest
 import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.getInvokable
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -17,7 +18,7 @@ internal class ViewControllerHooksTest : NodeBaseTest() {
     @BeforeEach
     fun setUpMock() {
         every { node.getObject("view") } returns view
-        every { view.getFunction<Unit>("tap") } returns Invokable {}
+        every { view.getInvokable<Unit>("tap") } returns Invokable {}
     }
 
     @Test

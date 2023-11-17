@@ -197,7 +197,7 @@ internal class PlayerViewModelTest {
         viewModel.retry()
         coVerify(exactly = 2) { flowIterator.next(null) }
     }
-    
+
     @Test
     fun `view model can be cleared successfully if player is never used`() {
         val exception = Exception("oh no")

@@ -3,6 +3,7 @@ package com.intuit.player.jvm.core.logger
 import com.intuit.hooks.HookContext
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.hooks.NodeSyncHook1
 import com.intuit.player.jvm.core.bridge.hooks.SyncHook1
 import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
@@ -34,23 +35,23 @@ public class TapableLogger(override val node: Node) : LoggerPlugin, NodeWrapper 
     public val hooks: Hooks by NodeSerializableField(Hooks.serializer())
 
     public override fun trace(vararg args: Any?) {
-        node.getFunction<Unit>("trace")!!(*args)
+        node.getInvokable<Unit>("trace")!!(*args)
     }
 
     public override fun debug(vararg args: Any?) {
-        node.getFunction<Unit>("debug")!!(*args)
+        node.getInvokable<Unit>("debug")!!(*args)
     }
 
     public override fun info(vararg args: Any?) {
-        node.getFunction<Unit>("info")!!(*args)
+        node.getInvokable<Unit>("info")!!(*args)
     }
 
     public override fun warn(vararg args: Any?) {
-        node.getFunction<Unit>("warn")!!(*args)
+        node.getInvokable<Unit>("warn")!!(*args)
     }
 
     public override fun error(vararg args: Any?) {
-        node.getFunction<Unit>("error")!!(*args)
+        node.getInvokable<Unit>("error")!!(*args)
     }
 
     public fun addHandler(logger: LoggerPlugin) {

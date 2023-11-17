@@ -1,6 +1,7 @@
 package com.intuit.player.jvm.plugins.metrics
 
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
 import com.intuit.player.jvm.core.bridge.runtime.add
 import com.intuit.player.jvm.core.player.Player
@@ -32,7 +33,7 @@ public class MetricsPlugin(
         instance = runtime.buildInstance("(new $name(handlers))")
     }
 
-    public fun renderEnd(): Unit = instance.getFunction<Unit>("renderEnd")!!()
+    public fun renderEnd(): Unit = instance.getInvokable<Unit>("renderEnd")!!()
 
     private companion object {
         private const val bundledSourcePath = "plugins/metrics/core/dist/metrics-plugin.prod.js"
@@ -62,7 +63,7 @@ internal class RequestTimeWebPlugin(
 
     public fun apply(metricsPlugin: MetricsPlugin) {
         apply(metricsPlugin.instance.runtime)
-        instance.getFunction<Any>("apply")?.invoke(metricsPlugin.instance)
+        instance.getInvokable<Any>("apply")?.invoke(metricsPlugin.instance)
     }
 
     private companion object {

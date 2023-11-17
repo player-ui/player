@@ -3,6 +3,7 @@ package com.intuit.player.jvm.core.bridge.hooks
 import com.intuit.player.jvm.core.NodeBaseTest
 import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.player.jvm.core.view.View
 import io.mockk.every
@@ -28,7 +29,7 @@ internal class NodeSyncWaterfallHookTest : NodeBaseTest() {
     @Suppress("UNCHECKED_CAST")
     @BeforeEach
     fun setUpMock() {
-        every { node.getFunction<Unit>("tap") } returns Invokable {
+        every { node.getInvokable<Unit>("tap") } returns Invokable {
             map = it[0] as HashMap<String, Any>
             callback = it[1] as Invokable<Any?>
         }
@@ -40,7 +41,7 @@ internal class NodeSyncWaterfallHookTest : NodeBaseTest() {
     @Test
     fun `JS Hook Tap On Init`() {
         NodeSyncWaterfallHook1(node, View.serializer())
-        verify { node.getFunction<Unit>("tap") }
+        verify { node.getInvokable<Unit>("tap") }
     }
 
     @Test
@@ -55,7 +56,7 @@ internal class NodeSyncWaterfallHookTest : NodeBaseTest() {
 
         callback.invoke(hashMapOf<Any, Any>(), dummyNode)
 
-        verify { node.getFunction<Unit>("tap") }
+        verify { node.getInvokable<Unit>("tap") }
         assertEquals(dummyNode, output?.node)
     }
 
@@ -68,7 +69,7 @@ internal class NodeSyncWaterfallHookTest : NodeBaseTest() {
 
         val result = callback.invoke(hashMapOf<Any, Any>(), dummyNode)
 
-        verify { node.getFunction<Unit>("tap") }
+        verify { node.getInvokable<Unit>("tap") }
         assertEquals(mapOf("key" to "value", "anotherKey" to "anotherValue"), result)
     }
 

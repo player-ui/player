@@ -129,7 +129,7 @@ public class InProgressState internal constructor(override val node: Node) :
     public val controllers: ControllerState by NodeSerializableField(ControllerState.serializer())
 
     public fun fail(error: Throwable) {
-        node.getFunction<Any>("fail")!!.invoke(error)
+        node.getInvokable<Any>("fail")!!.invoke(error)
     }
 
     internal object Serializer : NodeWrapperSerializer<InProgressState>(::InProgressState)

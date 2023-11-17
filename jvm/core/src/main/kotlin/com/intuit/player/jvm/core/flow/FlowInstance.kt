@@ -2,6 +2,7 @@ package com.intuit.player.jvm.core.flow
 
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.hooks.NodeSyncHook1
 import com.intuit.player.jvm.core.bridge.hooks.NodeSyncHook2
 import com.intuit.player.jvm.core.bridge.hooks.NodeSyncWaterfallHook1
@@ -25,7 +26,7 @@ public class FlowInstance(override val node: Node) : NodeWrapper, Transition {
     public val currentState: NamedState? get() = node.getSerializable("currentState", NamedState.serializer())
 
     override fun transition(state: String, options: TransitionOptions?) {
-        node.getFunction<Unit>("transition")?.invoke(state, options)
+        node.getInvokable<Unit>("transition")?.invoke(state, options)
     }
 
     @Serializable(Hooks.Serializer::class)

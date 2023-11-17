@@ -3,6 +3,7 @@ package com.intuit.player.jvm.graaljs.bridge
 import com.intuit.player.jvm.core.asset.Asset
 import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.getJson
 import com.intuit.player.jvm.core.bridge.toJson
 import com.intuit.player.jvm.core.flow.Flow
@@ -71,10 +72,10 @@ internal class GraalNodeTest : GraalTest() {
             "notafunction" to 1
         )
 
-        Assertions.assertEquals("classicstring", node.getFunction<String>("function")?.invoke())
-        Assertions.assertEquals(listOf("1", 2), node.getFunction<Any?>("tuple")?.invoke("1", 2))
-        Assertions.assertEquals(null, node.getFunction<Any>("notafunction"))
-        Assertions.assertEquals(null, node.getFunction<Any>("notthere"))
+        Assertions.assertEquals("classicstring", node.getInvokable<String>("function")?.invoke())
+        Assertions.assertEquals(listOf("1", 2), node.getInvokable<Any?>("tuple")?.invoke("1", 2))
+        Assertions.assertEquals(null, node.getInvokable<Any>("notafunction"))
+        Assertions.assertEquals(null, node.getInvokable<Any>("notthere"))
     }
 
     @Test

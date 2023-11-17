@@ -2,6 +2,7 @@ package com.intuit.player.jvm.core.flow
 
 import com.intuit.player.jvm.core.NodeBaseTest
 import com.intuit.player.jvm.core.bridge.Invokable
+import com.intuit.player.jvm.core.bridge.getInvokable
 import io.mockk.every
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -16,7 +17,7 @@ internal class FlowControllerTest : NodeBaseTest() {
 
     @Test
     fun transition() {
-        every { node.getFunction<Unit>("transition") } returns Invokable {
+        every { node.getInvokable<Unit>("transition") } returns Invokable {
             lastTransition = it[0] as String
         }
         flowController.transition("Next")
