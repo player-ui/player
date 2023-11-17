@@ -120,8 +120,7 @@ jobs:
       - run:
           name: Set Ruby Version
           command: |
-            rbenv install 2.6.10
-            rbenv global 2.6.10
+            rbenv global 2.7.8
             rbenv rehash
 
       - restore_cache:
@@ -161,7 +160,7 @@ jobs:
       - save_cache:
           key: gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
           paths:
-            - ~/.gem/ruby/2.7.5
+            - ~/.gem/ruby/2.7.8
 
       - macos/preboot-simulator:
           version: "15.5"
