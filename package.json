@@ -15,8 +15,9 @@
     "test": "bazel test -- $(bazel query \"kind(nodejs_test, //...)\" --output label 2>/dev/null | tr '\\n' ' ')"
   },
   "dependencies": {
-    "@auto-it/upload-assets": "^10.37.2",
-    "@auto-it/version-file": "^10.37.2",
+    "@auto-it/upload-assets": "^11.0.4",
+    "@auto-it/version-file": "^11.0.4",
+    "@auto-it/omit-release-notes": "^11.0.4",
     "@babel/cli": "^7.15.7",
     "@babel/core": "^7.15.5",
     "@babel/eslint-parser": "^7.15.8",
@@ -84,7 +85,7 @@
     "all-contributors-cli": "^6.20.0",
     "arr-flatten": "^1.1.0",
     "assert": "^2.0.0",
-    "auto": "^10.37.2",
+    "auto": "^11.0.4",
     "babel-plugin-preval": "^5.0.0",
     "bowser": "^2.11.0",
     "c8": "^7.10.0",
