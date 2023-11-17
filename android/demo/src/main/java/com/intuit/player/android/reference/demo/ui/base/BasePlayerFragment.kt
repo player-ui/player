@@ -1,11 +1,15 @@
 package com.intuit.player.android.reference.demo.ui.base
 
 import android.graphics.drawable.GradientDrawable
+import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
+import com.alexii.j2v8debugger.StethoHelper
 import com.intuit.player.android.lifecycle.ManagedPlayerState
 import com.intuit.player.android.lifecycle.PlayerViewModel
 import com.intuit.player.android.reference.demo.lifecycle.DemoPlayerViewModel
@@ -27,6 +31,11 @@ abstract class BasePlayerFragment : PlayerFragment() {
     }
 
     private val currentPlayerCanvas get() = binding.playerCanvas.getChildAt(0)
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        StethoHelper.initializeDebugger(requireContext(), playerViewModel.player)
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
 
     private suspend fun toggleScreenShare(active: Boolean) = withContext(Dispatchers.Main) {
         binding.playerCanvas.background = if (active) GradientDrawable().apply {

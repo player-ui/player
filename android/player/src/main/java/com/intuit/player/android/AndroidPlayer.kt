@@ -2,9 +2,11 @@ package com.intuit.player.android
 
 import android.content.Context
 import android.view.View
+import com.alexii.j2v8debugger.ScriptSourceProvider
 import com.intuit.hooks.*
 import com.intuit.player.android.AndroidPlayer.Companion.injectDefaultPlugins
 import com.intuit.player.android.asset.RenderableAsset
+import com.intuit.player.android.debug.UnsupportedScriptProvider
 import com.intuit.player.android.extensions.Styles
 import com.intuit.player.android.extensions.overlayStyles
 import com.intuit.player.android.extensions.removeSelf
@@ -13,6 +15,7 @@ import com.intuit.player.android.registry.RegistryPlugin
 import com.intuit.player.jvm.core.asset.Asset
 import com.intuit.player.jvm.core.bridge.Completable
 import com.intuit.player.jvm.core.bridge.format
+import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.player.jvm.core.bridge.serialization.format.registerContextualSerializer
 import com.intuit.player.jvm.core.logger.TapableLogger
 import com.intuit.player.jvm.core.player.*
@@ -25,9 +28,12 @@ import com.intuit.player.jvm.core.plugins.findPlugin
 import com.intuit.player.plugins.beacon.BeaconPlugin
 import com.intuit.player.plugins.coroutines.FlowScopePlugin
 import com.intuit.player.plugins.pubsub.PubSubPlugin
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlin.reflect.KClass
+
+public typealias AndroidPlayerConfig = AndroidPlayer.Config
 
 /**
  * [android.view.View] [Player] that is backed by another [Player].
@@ -37,12 +43,13 @@ import kotlin.reflect.KClass
 public class AndroidPlayer private constructor(
     private val player: HeadlessPlayer,
     override val plugins: List<Plugin> = player.plugins,
-) : Player() {
+) : Player(), ScriptSourceProvider by player.runtime as? ScriptSourceProvider ?: UnsupportedScriptProvider(player.runtime) {
 
     /** Convenience constructor to provide vararg style [plugins] parameter */
     public constructor(
         vararg plugins: Plugin,
-    ) : this(plugins.toList())
+        config: Config = Config()
+    ) : this(plugins.toList(), config)
 
     /**
      * Constructor that takes a [context] and collection of [Plugin]s.
@@ -52,7 +59,8 @@ public class AndroidPlayer private constructor(
      */
     public constructor(
         plugins: List<Plugin>,
-    ) : this(HeadlessPlayer(*plugins.injectDefaultPlugins().toTypedArray()))
+        config: Config = Config()
+    ) : this(HeadlessPlayer(plugins.injectDefaultPlugins(), config = config))
 
     /**
      * Allow the [AndroidPlayer] to be built on top of a pre-existing
@@ -297,4 +305,9 @@ public class AndroidPlayer private constructor(
                 else plugins
             }
     }
+
+    public data class Config(
+        override var debuggable: Boolean = false,
+        override var coroutineExceptionHandler: CoroutineExceptionHandler? = null
+    ) : PlayerRuntimeConfig()
 }

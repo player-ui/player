@@ -43,4 +43,7 @@ versions = struct(
     ),
     material_dialogs = "3.3.0",
     material = "1.4.0",
+    facebook = struct(
+        stetho = "1.5.1",
+    ),
 )

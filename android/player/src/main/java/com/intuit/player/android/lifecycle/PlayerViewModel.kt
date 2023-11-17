@@ -13,12 +13,28 @@ import com.intuit.player.jvm.core.managed.AsyncFlowIterator
 import com.intuit.player.jvm.core.managed.AsyncIterationManager
 import com.intuit.player.jvm.core.managed.FlowManager
 import com.intuit.player.jvm.core.player.PlayerException
-import com.intuit.player.jvm.core.player.state.*
+import com.intuit.player.jvm.core.player.state.CompletedState
+import com.intuit.player.jvm.core.player.state.ErrorState
+import com.intuit.player.jvm.core.player.state.NotStartedState
+import com.intuit.player.jvm.core.player.state.completedState
+import com.intuit.player.jvm.core.player.state.inProgressState
 import com.intuit.player.jvm.core.plugins.Plugin
 import com.intuit.player.jvm.core.plugins.RuntimePlugin
 import com.intuit.player.plugins.beacon.onBeacon
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 /**
  * Android lifecycle-aware player manager that integrates and manages
@@ -45,11 +61,13 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
      */
     protected open val plugins: List<Plugin> = emptyList()
 
+    protected open val config: AndroidPlayer.Config = AndroidPlayer.Config()
+
     @ExperimentalPlayerApi
     public val deferredPlayer: Deferred<AndroidPlayer> = viewModelScope.async(Dispatchers.Default) {
         // this is unfortunate, but is essentially for ensuring view model has completely initialized
         while (plugins == null) { delay(5) }
-        AndroidPlayer(plugins + this@PlayerViewModel)
+        AndroidPlayer(plugins + this@PlayerViewModel, config)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class, ExperimentalPlayerApi::class)

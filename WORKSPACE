@@ -165,6 +165,7 @@ maven_install(
         "https://maven.google.com/",
         "https://plugins.gradle.org/m2/",
         "https://jcenter.bintray.com/",
+        "https://jitpack.io/",
     ],
 )
 
