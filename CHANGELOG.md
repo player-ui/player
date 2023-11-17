@@ -1,3 +1,28 @@
+# 0.4.2 (Thu Nov 16 2023)
+
+### Release Notes
+
+#### Add better error messaging for failed expression eval and parsing ([#239](https://github.com/player-ui/player/pull/239))
+
+Improved error messages for parse and eval failures for expressions
+
+---
+
+#### 🐛 Bug Fix
+
+- Release ${GITHUB_REF##*/} [#241](https://github.com/player-ui/player/pull/241) ([@intuit-svc](https://github.com/intuit-svc))
+- adding swiftuipendingtransactionplugin [#237](https://github.com/player-ui/player/pull/237) ([@zwu011](https://github.com/zwu011) [@nancywu1](https://github.com/nancywu1))
+- Add better error messaging for failed expression eval and parsing [#239](https://github.com/player-ui/player/pull/239) ([@adierkens](https://github.com/adierkens))
+
+#### Authors: 4
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- [@zwu011](https://github.com/zwu011)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+
+---
+
 # 0.4.1 (Wed Nov 15 2023)
 
 ### Release Notes
