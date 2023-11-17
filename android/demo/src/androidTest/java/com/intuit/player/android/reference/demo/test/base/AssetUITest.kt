@@ -42,8 +42,8 @@ abstract class AssetUITest(val group: String? = null) : ApplitoolsTest() {
     fun after() {
         Intents.assertNoUnverifiedIntents()
         Intents.release()
-        eyes.checkWindow("done")
-        eyes.close()
+        eyes?.checkWindow("done")
+        eyes?.close()
     }
 
     fun launchMock() {
@@ -65,7 +65,7 @@ abstract class AssetUITest(val group: String? = null) : ApplitoolsTest() {
                 ?: throw IllegalStateException("player not found")
         }
 
-        eyes.open("Android Reference Assets Demo", "${mock.group}/${name.methodName}")
-        eyes.checkPlayer("init")
+        eyes?.open("Android Reference Assets Demo", "${mock.group}/${name.methodName}")
+        eyes?.checkPlayer("init")
     }
 }

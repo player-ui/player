@@ -2,11 +2,8 @@ package com.intuit.player.android
 
 import android.content.Context
 import android.view.View
-import com.intuit.hooks.BailResult
-import com.intuit.hooks.HookContext
-import com.intuit.hooks.SyncBailHook
-import com.intuit.hooks.SyncHook
-import com.intuit.hooks.SyncWaterfallHook
+import com.intuit.hooks.*
+import com.intuit.player.android.AndroidPlayer.Companion.injectDefaultPlugins
 import com.intuit.player.android.asset.RenderableAsset
 import com.intuit.player.android.extensions.Styles
 import com.intuit.player.android.extensions.overlayStyles
@@ -121,6 +118,8 @@ public class AndroidPlayer private constructor(
     override val hooks: Hooks = Hooks(player.hooks)
 
     override val state: PlayerFlowState by player::state
+
+    override val scope: CoroutineScope by player::scope
 
     override fun start(flow: String): Completable<CompletedState> = player.start(flow)
 

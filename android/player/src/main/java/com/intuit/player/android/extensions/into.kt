@@ -6,6 +6,12 @@ import android.widget.FrameLayout
 import androidx.core.view.children
 import androidx.transition.Transition
 import androidx.transition.TransitionManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+internal suspend infix fun View?.intoOnMain(root: FrameLayout) = withContext(Dispatchers.Main) {
+    into(root)
+}
 
 /**
  * Helper method to replace the existing [FrameLayout] child
@@ -36,7 +42,10 @@ public infix fun View?.into(root: FrameLayout) {
 public fun View?.transitionInto(root: FrameLayout, transition: Transition?) {
     root.removeAllViews()
     if (this == null) {
-        root.visibility = View.GONE
+        if (root.visibility != View.GONE) {
+            root.visibility = View.GONE
+            root.removeAllViews()
+        }
     } else {
         root.visibility = View.VISIBLE
         if (!root.children.contains(this)) {
@@ -78,8 +87,10 @@ public infix fun View?.into(root: ViewGroup) {
 public infix fun List<View?>.into(root: ViewGroup) {
     val filtered = filterNotNull()
     if (filtered.isEmpty()) {
-        root.visibility = View.GONE
-        root.removeAllViews()
+        if (root.visibility != View.GONE) {
+            root.visibility = View.GONE
+            root.removeAllViews()
+        }
     } else {
         root.visibility = View.VISIBLE
 

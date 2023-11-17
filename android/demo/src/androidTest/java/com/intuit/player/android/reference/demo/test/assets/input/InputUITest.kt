@@ -16,6 +16,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.intuit.player.android.reference.demo.R
 import com.intuit.player.android.reference.demo.test.base.AssetUITest
 import com.intuit.player.android.reference.demo.test.base.shouldBePlayerState
+import com.intuit.player.android.reference.demo.test.base.waitForViewInRoot
 import com.intuit.player.jvm.core.player.state.InProgressState
 import com.intuit.player.jvm.core.player.state.dataModel
 import org.hamcrest.Matcher
@@ -25,14 +26,14 @@ import org.junit.Test
 
 class InputUITest : AssetUITest("input") {
 
-    fun verifyIsDisplayed(matcher: Matcher<View>) = onView(matcher)
+    fun verifyIsDisplayed(matcher: Matcher<View>) = waitForViewInRoot(matcher)
         .check(matches(isDisplayed()))
 
     @Test
     fun basic() {
         launchMock()
 
-        onView(withText("This is an input"))
+        waitForViewInRoot(withText("This is an input"))
             .check(matches(isDisplayed()))
 
         onView(withId(R.id.input_field))
@@ -68,7 +69,7 @@ class InputUITest : AssetUITest("input") {
             assertEquals("", dataModel.get("person.age"))
         }
 
-        eyes.checkPlayer("invalid-age")
+        eyes?.checkPlayer("invalid-age")
 
         onView(ageInput)
             .perform(typeText("30"))
@@ -96,25 +97,33 @@ class InputUITest : AssetUITest("input") {
         onView(nameInput)
             .perform(typeText("more than 10 characters"))
             .perform(pressImeActionButton())
-            .check(matches(hasErrorText("Up to 10 characters allowed")))
+
+        allOf(
+            nameInput,
+            hasErrorText("Up to 10 characters allowed"),
+        ).let(::verifyIsDisplayed)
 
         currentState.shouldBePlayerState<InProgressState> {
             assertEquals("", dataModel.get("person.name"))
         }
 
-        eyes.checkPlayer("upper-limit-validation")
+        eyes?.checkPlayer("upper-limit-validation")
 
         onView(nameInput)
             .perform(click())
             .perform(clearText())
             .perform(pressImeActionButton())
-            .check(matches(hasErrorText("At least 1 characters needed")))
+
+        allOf(
+            nameInput,
+            hasErrorText("At least 1 characters needed"),
+        ).let(::verifyIsDisplayed)
 
         currentState.shouldBePlayerState<InProgressState> {
             assertEquals("", dataModel.get("person.name"))
         }
 
-        eyes.checkPlayer("lower-limit-validation")
+        eyes?.checkPlayer("lower-limit-validation")
 
         onView(nameInput)
             .perform(typeText("Jeremiah"))

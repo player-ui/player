@@ -5,8 +5,8 @@ import com.intuit.player.android.asset.RenderableAsset
 import com.intuit.player.android.utils.SimpleAsset
 import com.intuit.player.android.utils.TestAssetsPlugin
 import com.intuit.player.android.utils.awaitFirstView
+import com.intuit.player.jvm.core.bridge.PlayerRuntimeException
 import com.intuit.player.jvm.core.player.HeadlessPlayer
-import com.intuit.player.jvm.core.player.PlayerException
 import com.intuit.player.jvm.utils.start
 import com.intuit.player.jvm.utils.test.runBlockingTest
 import com.intuit.player.plugins.beacon.BeaconPlugin
@@ -17,7 +17,10 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
@@ -101,7 +104,7 @@ internal class AndroidPlayerTest {
     fun `release puts player in unusable state`() {
         val player = AndroidPlayer()
         player.release()
-        assertThrows<PlayerException> {
+        assertThrows<PlayerRuntimeException> {
             player.start(SimpleAsset.sampleFlow)
         }
     }

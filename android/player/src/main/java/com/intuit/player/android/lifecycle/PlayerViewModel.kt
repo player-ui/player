@@ -1,7 +1,6 @@
 package com.intuit.player.android.lifecycle
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -18,12 +17,12 @@ import com.intuit.player.jvm.core.player.state.*
 import com.intuit.player.jvm.core.plugins.Plugin
 import com.intuit.player.jvm.core.plugins.RuntimePlugin
 import com.intuit.player.plugins.beacon.onBeacon
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
 /**
  * Android lifecycle-aware player manager that integrates and manages
- * state between a [FlowManager] and an [AndroidPlayer]. This sta
+ * state between a [FlowManager] and an [AndroidPlayer].
  *
  * As-is, this bare-bones implementation does not include any additional
  * plugins, meaning that any flows will not actually expand into
@@ -46,16 +45,18 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
      */
     protected open val plugins: List<Plugin> = emptyList()
 
-    // TODO: accessing non-final fields in constructor -- must not use player before init is done
-    //  This could be fixed by requiring [plugins] be in the constructor, but this is kinda
-    //  backwards since subclasses are required to configure plugin behavior manually. Maybe
-    //  apps just supply a meta plugin to configure things? Although, the reason for configuring
-    //  plugins here is to potentially hook into the fragment. External actions is a great
-    //  example, where the app needs to actually load a different native experience outside the
-    //  player scope. Not sure how to solve this. Maybe a player factory instead that requires
-    //  the [PlayerViewModel] to be finished initialization?
+    @ExperimentalPlayerApi
+    public val deferredPlayer: Deferred<AndroidPlayer> = viewModelScope.async(Dispatchers.Default) {
+        // this is unfortunate, but is essentially for ensuring view model has completely initialized
+        while (plugins == null) { delay(5) }
+        AndroidPlayer(plugins + this@PlayerViewModel)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalPlayerApi::class)
     public val player: AndroidPlayer by lazy {
-        AndroidPlayer(plugins + this)
+        if (deferredPlayer.isCompleted) deferredPlayer.getCompleted() else runBlocking {
+            deferredPlayer.await()
+        }
     }
 
     protected val manager: FlowManager = FlowManager(flows)
@@ -70,7 +71,7 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
 
     init {
         // next() TODO: If we fix the non-final field error, we can prefetch here
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             manager.state.collect {
                 when (it) {
                     AsyncIterationManager.State.NotStarted -> _state.emit(ManagedPlayerState.NotStarted)
@@ -84,7 +85,6 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
     }
 
     private fun start(flow: String) = player.start(flow) {
-        Log.d("test123123", it.isFailure.toString())
         when {
             it.isSuccess -> player.logger.info(
                 "Flow completed successfully!",
@@ -125,10 +125,11 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
     }
 
     public override fun onCleared() {
-        runtime?.scope?.launch {
-            if (manager.state.value != AsyncIterationManager.State.Done) manager.iterator.terminate()
-            release()
+        if (manager.state.value != AsyncIterationManager.State.Done) runBlocking {
+            manager.iterator.terminate()
         }
+
+        release()
     }
 
     public fun recycle() {
@@ -157,7 +158,11 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
                 AsyncIterationManager.State.NotStarted -> manager.next()
                 is AsyncIterationManager.State.Item<*>,
                 is AsyncIterationManager.State.Error -> manager.next(player.completedState)
+                AsyncIterationManager.State.Done,
+                AsyncIterationManager.State.Pending -> Unit
             }
+            is ManagedPlayerState.Done,
+            ManagedPlayerState.Pending -> Unit
         }
     }
 

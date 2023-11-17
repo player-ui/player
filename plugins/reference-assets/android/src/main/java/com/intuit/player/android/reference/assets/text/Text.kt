@@ -8,14 +8,13 @@ import androidx.annotation.StyleRes
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
 import com.intuit.player.android.AssetContext
-import com.intuit.player.android.asset.DecodableAsset
+import com.intuit.player.android.asset.SuspendableAsset
 import com.intuit.player.android.reference.assets.R
 import com.intuit.player.android.reference.assets.ReferenceAssetsPlugin.Companion.referenceAssetsPlugin
-import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.player.Player
 import kotlinx.serialization.Serializable
 
-class Text(assetContext: AssetContext) : DecodableAsset<Text.Data>(assetContext, Data.serializer()) {
+class Text(assetContext: AssetContext) : SuspendableAsset<Text.Data>(assetContext, Data.serializer()) {
 
     object Styles {
         @StyleRes val Default = R.style.Text
@@ -27,28 +26,40 @@ class Text(assetContext: AssetContext) : DecodableAsset<Text.Data>(assetContext,
     @Serializable
     data class Data(
         val value: String?,
-        val modifiers: List<Node> = emptyList()
+        private val modifiers: List<Modifier> = emptyList(),
     ) {
-        val ref: String? = modifiers.firstOrNull {
-            it["type"] == "link"
-        }?.getObject("metaData")?.getString("ref")
+        @Serializable data class Modifier(
+            val type: String,
+            // TODO: LinkMetaData isn't relevant to all modifiers
+            //       but we don't care about other modifiers, it'd
+            //       be nice to have a way to _only_ decode a LinkModifier
+            //       if it _is_ a LinkModifier, and not error out
+            //       on unknown modifiers that we don't care about
+            val metaData: LinkMetaData? = null,
+        ) {
+            @Serializable data class LinkMetaData(
+                val ref: String
+            )
+        }
+
+        val ref: String? get() = modifiers.firstOrNull {
+            it.type == "link"
+        }?.metaData?.ref
     }
 
-    val text get() = buildSpannedString {
-        data.ref?.let {
-            inSpans(refSpan(it)) { append(data.value) }
-        } ?: append(data.value)
-    }
-
-    override fun initView() = TextView(context).apply {
+    override suspend fun initView(data: Data) = TextView(context).apply {
         data.ref?.let {
             movementMethod = LinkMovementMethod.getInstance()
         }
     }
 
-    override fun View.hydrate() {
+    override suspend fun View.hydrate(data: Data) {
         when (this) {
-            is TextView -> text = this@Text.text
+            is TextView -> text = buildSpannedString {
+                data.ref?.let {
+                    inSpans(refSpan(it)) { append(data.value) }
+                } ?: append(data.value)
+            }
             else -> invalidateView()
         }
     }

@@ -4,10 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.intuit.player.android.lifecycle.ManagedPlayerState
 import com.intuit.player.android.reference.demo.ui.base.BasePlayerFragment
 import com.intuit.player.android.reference.demo.ui.main.MainViewModel
 import com.intuit.player.jvm.utils.mocks.getFlow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class StartFragment : BasePlayerFragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
@@ -21,7 +24,17 @@ class StartFragment : BasePlayerFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ) = super.onCreateView(inflater, container, savedInstanceState).apply {
-        reset()
+        when (val state = playerViewModel.state.value) {
+            is ManagedPlayerState.Running -> lifecycleScope.launch(Dispatchers.Default) {
+                handleAssetUpdate(state.asset, state.animateViewTransition)
+            }
+
+            is ManagedPlayerState.Done,
+            is ManagedPlayerState.Error -> reset()
+
+            ManagedPlayerState.NotStarted,
+            ManagedPlayerState.Pending -> Unit
+        }
     }
 
     override fun onDone(doneState: ManagedPlayerState.Done) {

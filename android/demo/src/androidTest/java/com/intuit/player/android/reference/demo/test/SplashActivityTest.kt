@@ -3,12 +3,12 @@ package com.intuit.player.android.reference.demo.test
 import android.content.Intent
 import android.net.Uri
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.activityScenarioRule
 import com.intuit.player.android.reference.demo.test.base.ApplitoolsTest
+import com.intuit.player.android.reference.demo.test.base.waitForViewInRoot
 import com.intuit.player.android.reference.demo.ui.splash.SplashActivity
 import com.intuit.player.jvm.utils.makeFlow
 import org.junit.Rule
@@ -45,6 +45,6 @@ class SplashActivityTest : ApplitoolsTest() {
 
     @Test
     fun deepLinkTest() {
-        onView(withText("Deep link test!")).check(matches(isDisplayed()))
+        waitForViewInRoot(withText("Deep link test!")).check(matches(isDisplayed()))
     }
 }

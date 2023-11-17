@@ -43,3 +43,15 @@ internal fun v(tag: String, msg: String): Int {
 }
 
 internal fun clearLogs() = listOf(e, w, i, d, v).forEach { it.clear() }
+
+internal enum class Level {
+    Error, Warn, Info, Debug, Verbose;
+
+    fun getLogs(): List<String> = when (this) {
+        Error -> e
+        Warn -> w
+        Info -> i
+        Debug -> d
+        Verbose -> v
+    }
+}

@@ -8,19 +8,27 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.transition.Transition
 import com.intuit.player.android.AndroidPlayer
 import com.intuit.player.android.asset.RenderableAsset
+import com.intuit.player.android.asset.SuspendableAsset
 import com.intuit.player.android.databinding.DefaultFallbackBinding
 import com.intuit.player.android.databinding.FragmentPlayerBinding
 import com.intuit.player.android.extensions.into
+import com.intuit.player.android.extensions.intoOnMain
 import com.intuit.player.android.extensions.transitionInto
 import com.intuit.player.android.lifecycle.ManagedPlayerState
 import com.intuit.player.android.lifecycle.PlayerViewModel
 import com.intuit.player.android.lifecycle.fail
+import com.intuit.player.jvm.core.experimental.ExperimentalPlayerApi
 import com.intuit.player.jvm.core.managed.AsyncFlowIterator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * [Fragment] wrapper integration with the [AndroidPlayer]. Delegates
@@ -48,6 +56,14 @@ import kotlinx.coroutines.flow.collect
  */
 public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
 
+    /** [LifecycleCoroutineScope.launchWhenStarted] extension for waiting on [AndroidPlayer] instance */
+    @ExperimentalPlayerApi
+    protected fun LifecycleCoroutineScope.launchWhenReady(block: suspend CoroutineScope.(player: AndroidPlayer) -> Unit) {
+        launchWhenStarted {
+            block(playerViewModel.deferredPlayer.await())
+        }
+    }
+
     private var _binding: FragmentPlayerBinding? = null
 
     /**
@@ -65,36 +81,40 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
 
     init {
         lifecycleScope.launchWhenStarted {
-            playerViewModel.state.collect {
-                when (it) {
-                    ManagedPlayerState.NotStarted -> {
-                        buildLoadingView() into binding.playerCanvas
-                        onNotStarted()
-                    }
-
-                    ManagedPlayerState.Pending -> {
-                        buildLoadingView() into binding.playerCanvas
-                        onPending()
-                    }
-
-                    is ManagedPlayerState.Running -> {
-                        try {
-                            handleAssetUpdate(it.asset, it.animateViewTransition)
-                            onRunning(it)
-                        } catch (exception: Exception) {
-                            exception.printStackTrace()
-                            playerViewModel.fail("Error rendering asset", exception)
+            // get the player view model on the main thread
+            val playerViewModel = playerViewModel
+            withContext(Dispatchers.Default) {
+                playerViewModel.state.collect {
+                    when (it) {
+                        ManagedPlayerState.NotStarted -> {
+                            buildLoadingView() intoOnMain binding.playerCanvas
+                            onNotStarted()
                         }
-                    }
 
-                    is ManagedPlayerState.Error -> {
-                        buildFallbackView(it.exception) into binding.playerCanvas
-                        onError(it)
-                    }
+                        ManagedPlayerState.Pending -> {
+                            buildLoadingView() intoOnMain binding.playerCanvas
+                            onPending()
+                        }
 
-                    is ManagedPlayerState.Done -> {
-                        buildDoneView() into binding.playerCanvas
-                        onDone(it)
+                        is ManagedPlayerState.Running -> {
+                            try {
+                                handleAssetUpdate(it.asset, it.animateViewTransition)
+                                onRunning(it)
+                            } catch (exception: Exception) {
+                                exception.printStackTrace()
+                                playerViewModel.fail("Error rendering asset", exception)
+                            }
+                        }
+
+                        is ManagedPlayerState.Error -> {
+                            buildFallbackView(it.exception) intoOnMain binding.playerCanvas
+                            onError(it)
+                        }
+
+                        is ManagedPlayerState.Done -> {
+                            buildDoneView() intoOnMain binding.playerCanvas
+                            onDone(it)
+                        }
                     }
                 }
             }
@@ -122,25 +142,46 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
         playerViewModel.start()
     }
 
+    /** Default suspendable implementation of [handleAssetUpdate] */
+    @ExperimentalPlayerApi
+    protected open suspend fun renderIntoPlayerCanvas(asset: RenderableAsset?, animateTransition: Boolean) {
+        val startTime = System.currentTimeMillis()
+        val view = asset?.render(requireContext())?.let {
+            // unwrap if we know we have an async view stub, and just wait on the actual view
+            if (it is SuspendableAsset.AsyncViewStub) it.awaitView() else it
+        }
+
+        view?.doOnLayout {
+            playerViewModel.logRenderTime(asset, System.currentTimeMillis() - startTime)
+        }
+
+        // swap to main
+        withContext(Dispatchers.Main) {
+            if (asset is RenderableAsset.ViewportAsset) binding.scrollContainer.isFillViewport = true
+
+            animateTransition
+                .takeIf { it }
+                ?.let { binding.scrollContainer.scrollTo(0, 0) }
+                ?.let { buildTransitionAnimation() }
+                ?.let { view.transitionInto(binding.playerCanvas, it) }
+                ?: (view into binding.playerCanvas)
+        }
+    }
+
     /**
      * Handle [asset] updates from the [PlayerViewModel]. By default,
      * this will invoke [RenderableAsset.render] with no additional
      * styles and inject that into the view tree.
      */
     protected open fun handleAssetUpdate(asset: RenderableAsset?, animateTransition: Boolean) {
-        val startTime = System.currentTimeMillis()
-        if (asset is RenderableAsset.ViewportAsset) binding.scrollContainer.isFillViewport = true
-        val view = asset?.render(requireContext())?.also {
-            it.doOnLayout { playerViewModel.logRenderTime(asset, System.currentTimeMillis() - startTime) }
-        }
-        if (animateTransition) {
-            binding.root.scrollTo(0, 0)
-            buildTransitionAnimation()?.let {
-                view.transitionInto(binding.playerCanvas, it)
-                return
+        lifecycleScope.launch(Dispatchers.Default) {
+            try {
+                renderIntoPlayerCanvas(asset, animateTransition)
+            } catch (exception: Exception) {
+                exception.printStackTrace()
+                playerViewModel.fail("Error rendering asset", exception)
             }
         }
-        view into binding.playerCanvas
     }
 
     public open fun buildTransitionAnimation(): Transition? = null

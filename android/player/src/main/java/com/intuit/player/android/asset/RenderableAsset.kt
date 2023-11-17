@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.View
 import androidx.annotation.StyleRes
 import com.intuit.player.android.*
-import com.intuit.player.android.DEPRECATED_WITH_DECODABLEASSET
 import com.intuit.player.android.extensions.Style
 import com.intuit.player.android.extensions.Styles
 import com.intuit.player.android.extensions.removeSelf
@@ -30,6 +29,8 @@ import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlin.reflect.KClass
+
+internal typealias CachedAssetView = Pair<AssetContext?, View?>
 
 /**
  * [RenderableAsset] is the base class for each asset in an asset tree.
@@ -60,7 +61,7 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
      * Helper to get the current cached [AssetContext] and [View].
      * Will return empty pair if not found.
      */
-    private val cachedAssetView get() =
+    internal val cachedAssetView: CachedAssetView get() =
         player.getCachedAssetView(assetContext) ?: cachedAssetViewNotFound
 
     /** Main API */
@@ -88,6 +89,12 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
         get() = player.getCachedHydrationScope(assetContext)
         set(value) = player.cacheHydrationScope(assetContext, value)
 
+    internal fun renewHydrationScope(message: String): CoroutineScope {
+        _hydrationScope?.cancel(message)
+        _hydrationScope = player.subScope()
+        return hydrationScope
+    }
+
     /**
      * Construct a [View] that represents the asset.
      *
@@ -100,11 +107,14 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
         requireContext()
         when {
             // View not found. Create and hydrate.
-            cachedView == null -> initView().also(::rehydrate)
-            // View found, but contexts are out of sync. Remove cached view and create and hydrate.
+            cachedView == null -> {
+                renewHydrationScope("recreating view")
+                initView().also { it.hydrate() }
+            }            // View found, but contexts are out of sync. Remove cached view and create and hydrate.
             cachedAssetContext?.context != context || cachedAssetContext?.asset?.type != asset.type -> {
+                renewHydrationScope("recreating view")
                 cachedView.removeSelf()
-                initView().also(::rehydrate)
+                initView().also { it.hydrate() }
             }
             // View found, but assets are out of sync. Rehydrate. It is possible for the hydrate
             // implementation to throw [StaleViewException] to signify that the view is out of sync.
@@ -120,12 +130,18 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
             // View found, everything is in sync. Do nothing.
             else -> cachedView
         }
-    }.also { player.cacheAssetView(assetContext, it) }
+    }.also { if (it !is SuspendableAsset.AsyncViewStub) player.cacheAssetView(assetContext, it) }
 
     /** Invalidate view, causing a complete re-render of the current asset */
     public fun invalidateView() {
         player.removeCachedAssetView(assetContext)
         throw StaleViewException(assetContext)
+    }
+
+    /** Private helper for managing scope for hydration */
+    private fun rehydrate(view: View) {
+        renewHydrationScope("rehydrating ${asset.id}")
+        view.hydrate()
     }
 
     /** Instruct a [RenderableAsset] to [rehydrate] */
@@ -135,13 +151,6 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
         } catch (exception: StaleViewException) {
             player.inProgressState?.fail("stale child while trying to rehydrate: ${exception.assetContext.id}")
         }
-    }
-
-    /** Private helper for managing scope for hydration */
-    private fun rehydrate(view: View) {
-        _hydrationScope?.cancel("rehydrating ${asset.id}")
-        _hydrationScope = player.subScope()
-        view.hydrate()
     }
 
     /**
