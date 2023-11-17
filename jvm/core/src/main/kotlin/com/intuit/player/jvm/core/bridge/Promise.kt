@@ -7,10 +7,14 @@ import com.intuit.player.jvm.core.bridge.serialization.json.isJsonElementSeriali
 import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.player.jvm.core.utils.InternalPlayerApi
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -104,7 +108,7 @@ public class Promise(override val node: Node) : NodeWrapper {
             try {
                 onComplete {
                     when {
-                        it.isSuccess -> offer(it.getOrNull())
+                        it.isSuccess -> trySend(it.getOrNull())
                         it.isFailure -> close(it.exceptionOrNull())
                     }
                 }

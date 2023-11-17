@@ -4,10 +4,13 @@ import com.intuit.player.jvm.core.bridge.Completable
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
 import com.intuit.player.jvm.core.bridge.getInvokable
+import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
+import com.intuit.player.jvm.core.bridge.runtime.ScriptContext
 import com.intuit.player.jvm.core.bridge.runtime.add
 import com.intuit.player.jvm.core.bridge.runtime.runtimeFactory
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField
+import com.intuit.player.jvm.core.experimental.ExperimentalPlayerApi
 import com.intuit.player.jvm.core.logger.TapableLogger
 import com.intuit.player.jvm.core.player.HeadlessPlayer.Companion.bundledSource
 import com.intuit.player.jvm.core.player.state.CompletedState
@@ -36,23 +39,25 @@ import java.net.URL
  *  - [JSPluginWrapper]
  *  - [PlayerPlugin]
  */
-public class HeadlessPlayer @JvmOverloads public constructor(
+public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public constructor(
     override val plugins: List<Plugin>,
     explicitRuntime: Runtime<*>? = null,
     private val source: URL = bundledSource,
+    config: PlayerRuntimeConfig = PlayerRuntimeConfig()
 ) : Player(), NodeWrapper {
 
     /** Convenience constructor to allow [plugins] to be passed as varargs */
-    @JvmOverloads public constructor(
+    @ExperimentalPlayerApi @JvmOverloads public constructor(
         vararg plugins: Plugin,
+        config: PlayerRuntimeConfig = PlayerRuntimeConfig(),
         explicitRuntime: Runtime<*>? = null,
         source: URL = bundledSource
-    ) : this(plugins.toList(), explicitRuntime, source)
+    ) : this(plugins.toList(), explicitRuntime, source, config)
 
     public constructor(
         explicitRuntime: Runtime<*>,
         vararg plugins: Plugin,
-    ) : this(plugins.toList(), explicitRuntime)
+    ) : this(plugins.toList(), explicitRuntime, config = explicitRuntime.config)
 
     private val player: Node
 
@@ -66,7 +71,8 @@ public class HeadlessPlayer @JvmOverloads public constructor(
         player.getInvokable<Node>("getState")!!().deserialize(PlayerFlowState.serializer())
 
     public val runtime: Runtime<*> = explicitRuntime ?: runtimeFactory.create {
-        coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        debuggable = config.debuggable
+        coroutineExceptionHandler = config.coroutineExceptionHandler ?: CoroutineExceptionHandler { _, throwable ->
             inProgressState?.fail(throwable) ?: logger.error(
                 "Exception caught in Player scope: ${throwable.message}",
                 throwable.stackTrace.joinToString("\n") {
@@ -80,7 +86,7 @@ public class HeadlessPlayer @JvmOverloads public constructor(
 
     init {
         /** 1. load source into the [runtime] and release lock */
-        runtime.execute(source.readText())
+        runtime.load(ScriptContext(if (runtime.config.debuggable) debugSource.readText() else source.readText(), bundledSourcePath))
 
         /** 2. merge explicit [LoggerPlugin]s with ones created by service loader */
         val loggerPlugins = plugins.filterIsInstance<LoggerPlugin>().let { explicitLoggers ->
@@ -100,6 +106,8 @@ public class HeadlessPlayer @JvmOverloads public constructor(
         runtime.add("config", config)
         player = runtime.execute("new Player.Player(config)") as? Node
             ?: throw PlayerException("Couldn't create backing JS Player w/ config: $config")
+
+        runtime.add("player", player)
 
         // we only have access to the logger after we have the player instance
         runtime.checkBlockingThread = {
@@ -139,9 +147,13 @@ public class HeadlessPlayer @JvmOverloads public constructor(
     internal companion object {
 
         private const val bundledSourcePath = "core/player/dist/player.prod.js"
+        private const val debugSourcePath = "core/player/dist/player.debug.js"
 
         /** Gets [URL] of the bundled source */
         private val bundledSource get() = this::class.java
             .classLoader.getResource(bundledSourcePath)!!
+
+        private val debugSource get() = this::class.java
+            .classLoader.getResource(debugSourcePath)!!
     }
 }

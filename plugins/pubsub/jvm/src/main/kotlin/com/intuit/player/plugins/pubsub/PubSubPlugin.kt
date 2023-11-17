@@ -2,6 +2,7 @@ package com.intuit.player.plugins.pubsub
 
 import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
+import com.intuit.player.jvm.core.bridge.runtime.ScriptContext
 import com.intuit.player.jvm.core.bridge.runtime.add
 import com.intuit.player.jvm.core.player.Player
 import com.intuit.player.jvm.core.plugins.JSScriptPluginWrapper
@@ -13,7 +14,7 @@ public class PubSubPlugin(public val config: Config? = null) : JSScriptPluginWra
 
     override fun apply(runtime: Runtime<*>) {
         config?.let {
-            runtime.execute(script)
+            runtime.load(ScriptContext(if (runtime.config.debuggable) debugScript else script, bundledSourcePath))
             runtime.add("pubsubConfig", config)
             instance = runtime.buildInstance("(new $name(pubsubConfig))")
         } ?: super.apply(runtime)

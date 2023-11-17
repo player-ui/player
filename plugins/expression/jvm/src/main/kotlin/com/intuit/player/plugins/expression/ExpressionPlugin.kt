@@ -4,6 +4,7 @@ import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
+import com.intuit.player.jvm.core.bridge.runtime.ScriptContext
 import com.intuit.player.jvm.core.bridge.runtime.add
 import com.intuit.player.jvm.core.plugins.JSScriptPluginWrapper
 
@@ -23,7 +24,7 @@ public class ExpressionPlugin(
     public constructor(vararg expressions: Pair<String, ExpressionHandler>) : this(expressions.toMap())
 
     override fun apply(runtime: Runtime<*>) {
-        runtime.execute(script)
+        runtime.load(ScriptContext(if (runtime.config.debuggable) debugScript else script, bundledSourcePath))
         runtime.add(
             "expressionHandlers",
             map.entries.fold(runtime.execute("new Map()") as Node) { acc, entry ->

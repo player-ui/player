@@ -4,6 +4,7 @@ import com.intuit.player.jvm.core.asset.Asset
 import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.runtime
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
+import com.intuit.player.jvm.core.bridge.runtime.ScriptContext
 import com.intuit.player.jvm.core.bridge.runtime.add
 import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.player.jvm.core.player.Player
@@ -44,7 +45,7 @@ public class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JSScrip
                 }
             }
 
-        runtime.execute(script)
+        runtime.load(ScriptContext(if (runtime.config.debuggable) debugScript else script, bundledSourcePath))
         runtime.add("beaconOptions", config)
         instance = runtime.buildInstance("(new $name.$name(beaconOptions))")
     }

@@ -3,6 +3,7 @@ package com.intuit.player.jvm.plugins.metrics
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
+import com.intuit.player.jvm.core.bridge.runtime.ScriptContext
 import com.intuit.player.jvm.core.bridge.runtime.add
 import com.intuit.player.jvm.core.player.Player
 import com.intuit.player.jvm.core.plugins.JSScriptPluginWrapper
@@ -16,7 +17,7 @@ public class MetricsPlugin(
 ) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
 
     override fun apply(runtime: Runtime<*>) {
-        runtime.execute(script)
+        runtime.load(ScriptContext(if (runtime.config.debuggable) debugScript else script, bundledSourcePath))
         runtime.add(
             "handlers",
             mapOf(

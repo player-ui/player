@@ -1,5 +1,7 @@
 package com.intuit.player.jvm.j2v8.bridge.runtime
 
+import com.alexii.j2v8debugger.ScriptSourceProvider
+import com.alexii.j2v8debugger.V8Debugger
 import com.eclipsesource.v8.V8
 import com.eclipsesource.v8.V8Array
 import com.eclipsesource.v8.V8Object
@@ -11,7 +13,9 @@ import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeContainer
 import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeFactory
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
+import com.intuit.player.jvm.core.bridge.runtime.ScriptContext
 import com.intuit.player.jvm.core.bridge.serialization.serializers.playerSerializersModule
+import com.intuit.player.jvm.core.player.PlayerException
 import com.intuit.player.jvm.core.utils.InternalPlayerApi
 import com.intuit.player.jvm.j2v8.V8Null
 import com.intuit.player.jvm.j2v8.V8Primitive
@@ -29,6 +33,7 @@ import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.plus
 import java.nio.file.Path
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.io.path.createTempDirectory
@@ -46,16 +51,11 @@ public fun Runtime(globalAlias: String? = null, tempDir: Path? = null): Runtime<
 public fun Runtime(globalAlias: String? = null, tempDirPrefix: String? = null): Runtime<V8Value> =
     Runtime(globalAlias, tempDirPrefix?.let(::createTempDirectory))
 
-internal class V8Runtime(private val config: J2V8RuntimeConfig) : Runtime<V8Value> {
+internal class V8Runtime(override val config: J2V8RuntimeConfig) : Runtime<V8Value>, ScriptSourceProvider {
 
     lateinit var v8: V8; private set
 
-    override val dispatcher: ExecutorCoroutineDispatcher = config.dispatcher
-        ?: Executors.newSingleThreadExecutor {
-            Executors.defaultThreadFactory().newThread(it).apply {
-                name = "js-runtime"
-            }
-        }.asCoroutineDispatcher()
+    override val dispatcher: ExecutorCoroutineDispatcher = config.executorService.asCoroutineDispatcher()
 
     override val format: J2V8Format = J2V8Format(
         J2V8FormatConfiguration(
@@ -90,7 +90,11 @@ internal class V8Runtime(private val config: J2V8RuntimeConfig) : Runtime<V8Valu
         withContext(dispatcher) {
             v8 = config.runtime?.apply {
                 locker.acquire()
-            } ?: V8.createV8Runtime()
+            } ?: if (config.debuggable) {
+                V8Debugger.createDebuggableV8Runtime(config.executorService, "debuggableJ2v8", true)!!.await()
+            } else {
+                V8.createV8Runtime()
+            }
             memoryScope = MemoryManager(v8)
         }
     }
@@ -98,6 +102,15 @@ internal class V8Runtime(private val config: J2V8RuntimeConfig) : Runtime<V8Valu
     override fun execute(script: String): Any? = v8.evaluateInJSThreadBlocking(runtime) {
         executeScript(script).handleValue(format)
     }
+
+    override fun load(scriptContext: ScriptContext): Unit = v8.evaluateInJSThreadBlocking(runtime) {
+        if (config.debuggable) {
+            scriptIds.add(scriptContext.id)
+            scriptMapping[scriptContext.id] = scriptContext.script
+        }
+        executeScript(scriptContext.script, scriptContext.id.takeIf { config.debuggable }, 0)
+    }
+
     override fun add(name: String, value: V8Value) {
         v8.evaluateInJSThreadBlocking(runtime) {
             when (value) {
@@ -125,6 +138,14 @@ internal class V8Runtime(private val config: J2V8RuntimeConfig) : Runtime<V8Valu
 
     @InternalPlayerApi
     override var checkBlockingThread: Thread.() -> Unit = {}
+
+    private val scriptMapping = mutableMapOf<String, String>()
+
+    private val scriptIds: MutableSet<String> = mutableSetOf()
+    override val allScriptIds: Collection<String>
+        get() = scriptIds.toSet()
+
+    override fun getSource(scriptId: String): String = scriptMapping[scriptId] ?: throw PlayerException("Script with name $scriptId not available for debugging, was it loaded?")
 
     override fun toString(): String = "J2V8"
 
@@ -167,9 +188,18 @@ public object J2V8 : PlayerRuntimeFactory<J2V8RuntimeConfig> {
 
 public data class J2V8RuntimeConfig(
     var runtime: V8? = null,
-    var dispatcher: ExecutorCoroutineDispatcher? = null,
+    private val explicitExecutorService: ExecutorService? = null,
+    override var debuggable: Boolean = false,
     override var coroutineExceptionHandler: CoroutineExceptionHandler? = null
-) : PlayerRuntimeConfig()
+) : PlayerRuntimeConfig() {
+    public val executorService: ExecutorService by lazy {
+        explicitExecutorService ?: Executors.newSingleThreadExecutor {
+            Executors.defaultThreadFactory().newThread(it).apply {
+                name = "js-runtime"
+            }
+        }
+    }
+}
 
 public class J2V8RuntimeContainer : PlayerRuntimeContainer {
     override val factory: PlayerRuntimeFactory<*> = J2V8

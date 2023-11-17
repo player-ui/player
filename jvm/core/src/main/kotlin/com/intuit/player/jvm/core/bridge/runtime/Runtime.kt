@@ -15,6 +15,8 @@ public interface Runtime<Value> : Node {
 
     public val dispatcher: CoroutineDispatcher
 
+    public val config: PlayerRuntimeConfig
+
     /** [CoroutineScope] that represents when the [Runtime] is released and relevant coroutines should cancel */
     public val scope: CoroutineScope
 
@@ -22,6 +24,8 @@ public interface Runtime<Value> : Node {
 
     /** Execute some arbitrary [script] and return the deserialized result */
     public fun execute(script: String): Any?
+
+    public fun load(scriptContext: ScriptContext): Any?
 
     /** Serialize and assign some [value] to [name] within the [Runtime] */
     public fun add(name: String, value: Value)
@@ -51,3 +55,8 @@ public inline fun <reified T> Runtime<*>.serialize(value: T): Any? =
 public inline fun <reified T> Runtime<*>.serialize(serializer: SerializationStrategy<T>?, value: T): Any? = serializer?.let {
     serialize(it, value)
 } ?: serialize(value)
+
+public data class ScriptContext(
+    val script: String,
+    val id: String
+)

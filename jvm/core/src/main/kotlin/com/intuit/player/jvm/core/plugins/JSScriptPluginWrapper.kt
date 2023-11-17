@@ -2,6 +2,7 @@ package com.intuit.player.jvm.core.plugins
 
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
+import com.intuit.player.jvm.core.bridge.runtime.ScriptContext
 
 /**
  * Convenience construct to instantiate a JS player plugin. By default, this will
@@ -10,17 +11,22 @@ import com.intuit.player.jvm.core.bridge.runtime.Runtime
  * can be passed in directly as a [String], or can be passed as a classpath location
  * and be read from the provided [ClassLoader].
  */
-public abstract class JSScriptPluginWrapper(public val name: String, protected val script: String) : JSPluginWrapper {
+public abstract class JSScriptPluginWrapper(public val name: String, protected val script: String, private val sourcePath: String? = null) : JSPluginWrapper {
 
     public constructor(name: String, sourcePath: String, classLoader: ClassLoader = JSScriptPluginWrapper::class.java.classLoader) :
-        this(name, classLoader.getResource(sourcePath)!!.readText())
+        this(name, classLoader.getResource(sourcePath)!!.readText(), sourcePath)
 
     final override lateinit var instance: Node protected set
+
+    protected val debugScript: String
+        get() = loadDebugScript() ?: script
+
+    private fun loadDebugScript(): String? = JSScriptPluginWrapper::class.java.classLoader.getResource(sourcePath?.substringBeforeLast(".") + ".debug." + sourcePath?.substringAfterLast("."))?.readText()
 
     public val isInstantiated: Boolean get() = ::instance.isInitialized
 
     override fun apply(runtime: Runtime<*>) {
-        runtime.execute(script)
+        runtime.load(ScriptContext(if (runtime.config.debuggable) debugScript else script, sourcePath ?: "$name.js"))
         instance = runtime.buildInstance()
     }
 
@@ -32,7 +38,7 @@ public abstract class JSScriptPluginWrapper(public val name: String, protected v
         public fun from(name: String, sourcePath: String, classLoader: ClassLoader = JSScriptPluginWrapper::class.java.classLoader): JSScriptPluginWrapper = object : JSScriptPluginWrapper(name, sourcePath, classLoader) {}
 
         /** Convenience helper to expose constructor as an anonymous builder */
-        public fun from(name: String, script: String): JSScriptPluginWrapper = object : JSScriptPluginWrapper(name, script) {}
+        public fun from(name: String, script: String): JSScriptPluginWrapper = object : JSScriptPluginWrapper(name, script = script) {}
     }
 }
 

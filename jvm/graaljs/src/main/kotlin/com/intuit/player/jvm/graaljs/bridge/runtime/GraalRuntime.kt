@@ -6,6 +6,7 @@ import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeContainer
 import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeFactory
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
+import com.intuit.player.jvm.core.bridge.runtime.ScriptContext
 import com.intuit.player.jvm.core.bridge.serialization.serializers.playerSerializersModule
 import com.intuit.player.jvm.core.player.PlayerException
 import com.intuit.player.jvm.core.utils.InternalPlayerApi
@@ -32,7 +33,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 public fun Runtime(runtime: Context, config: GraalRuntimeConfig = GraalRuntimeConfig()): Runtime<Value> = GraalRuntime(config)
 
 internal class GraalRuntime(
-    private val config: GraalRuntimeConfig
+    override val config: GraalRuntimeConfig
 ) : Runtime<Value> {
 
     override val dispatcher: Nothing
@@ -73,6 +74,10 @@ internal class GraalRuntime(
 
     override fun execute(script: String): Any? = context.blockingLock {
         context.eval("js", script).handleValue(format)
+    }
+
+    override fun load(scriptContext: ScriptContext) = context.blockingLock {
+        context.eval("js", scriptContext.script).handleValue(format)
     }
 
     override fun add(name: String, value: Value) {
