@@ -115,7 +115,7 @@ jobs:
       - run:
           name: Homebrew Dependencies
           command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@11
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@17
 
       - run:
           name: Set Ruby Version
@@ -141,7 +141,7 @@ jobs:
             echo 'export PATH=$ANDROID_SDK_HOME/emulator:$PATH'  >> $BASH_ENV
             source $BASH_ENV
           environment:
-            JAVA_HOME: /opt/homebrew/opt/openjdk@11
+            JAVA_HOME: /opt/homebrew/opt/openjdk@17
 
       - save_cache:
           key: android-tools-{{ arch }}-{{ checksum "scripts/install-android-tools.sh" }}
