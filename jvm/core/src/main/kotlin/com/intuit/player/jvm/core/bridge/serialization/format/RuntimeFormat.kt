@@ -58,7 +58,7 @@ public fun <T : Any> RuntimeFormat<*>.registerContextualSerializer(klass: KClass
 /** [RuntimeFormat] specific [KSerializer] lookup for [T] type that handles special cases before delegating to the [serializersModule] */
 public inline fun <reified T> RuntimeFormat<*>.serializer(): KSerializer<T> = when {
     T::class == Any::class -> GenericSerializer().conform()
-    T::class.isSubclassOf(KCallable::class) -> KCallableSerializer<Any?>() as KSerializer<T>
+    T::class.isSubclassOf(KCallable::class) -> KCallableSerializer<Any?>(GenericSerializer().conform()) as KSerializer<T>
     else -> serializersModule.serializer()
 }
 

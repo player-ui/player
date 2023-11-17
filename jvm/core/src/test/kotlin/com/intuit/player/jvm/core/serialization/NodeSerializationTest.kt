@@ -4,10 +4,13 @@ import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.runtime.serialize
+import com.intuit.player.jvm.core.bridge.serialization.serializers.Function1Serializer
 import com.intuit.player.jvm.utils.test.RuntimeTest
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.TestTemplate
 
 @Serializable
@@ -17,6 +20,8 @@ data class SomeData(
     val genericInvokable: Invokable<@Polymorphic Any?>,
     val specificInvokable: (Int, String) -> Int,
     val specificInvokableWithNode: (Node) -> Map<String, @Polymorphic Any?>,
+    @Serializable(with = Function1Serializer::class)
+    val specificNonPrimitiveInvokable: (String) -> SomeDataWithDefaults?,
     val maybeGenericInvokable: Invokable<@Polymorphic Any?>? = null,
     val maybeNode: Node? = null,
 )
@@ -33,6 +38,9 @@ internal class NodeSerializationTest : RuntimeTest() {
     private val genericInvokable: Invokable<Any?> get() = Invokable { p1 -> println(p1); 2 }
     private val specificInvokable: (Int, String) -> Int get() = { p1, p2 -> println("p1: $p1; p2: $p2"); 3 }
     private val specificInvokableWithNode: (Node) -> Map<String, *> get() = { p1 -> println(p1); p1 }
+    private val specificNonPrimitiveInvokable: (String) -> SomeDataWithDefaults? get() = {
+        SomeDataWithDefaults(it)
+    }
 
     @TestTemplate
     fun `serializes node wrappers`() {
@@ -42,6 +50,7 @@ internal class NodeSerializationTest : RuntimeTest() {
             genericInvokable,
             specificInvokable,
             specificInvokableWithNode,
+            { null },
             null,
             null,
         )
@@ -72,6 +81,7 @@ internal class NodeSerializationTest : RuntimeTest() {
                 "node" to node,
                 "genericInvokable" to genericInvokable,
                 "specificInvokableWithNode" to specificInvokableWithNode,
+                "specificNonPrimitiveInvokable" to specificNonPrimitiveInvokable,
                 "specificInvokable" to specificInvokable,
             )
         ) as Node
@@ -91,6 +101,11 @@ internal class NodeSerializationTest : RuntimeTest() {
 
         assertNull(someData.maybeGenericInvokable)
         assertNull(someData.maybeNode)
+
+        val function = someData.specificNonPrimitiveInvokable
+        val data = function.invoke("Foo")
+
+        assertEquals(SomeDataWithDefaults("Foo"), data)
     }
 
     @TestTemplate
@@ -102,6 +117,7 @@ internal class NodeSerializationTest : RuntimeTest() {
                 "genericInvokable" to genericInvokable,
                 "specificInvokableWithNode" to specificInvokableWithNode,
                 "specificInvokable" to specificInvokable,
+                "specificNonPrimitiveInvokable" to specificNonPrimitiveInvokable,
                 "maybeNode" to Unit,
             )
         ) as Node

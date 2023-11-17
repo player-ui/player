@@ -1,6 +1,8 @@
 package com.intuit.player.jvm.j2v8.bridge.serialization
 
-import com.eclipsesource.v8.*
+import com.eclipsesource.v8.V8
+import com.eclipsesource.v8.V8Object
+import com.eclipsesource.v8.V8ScriptExecutionException
 import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.serialization.json.prettify
 import com.intuit.player.jvm.core.bridge.serialization.json.prettyPrint
@@ -352,10 +354,13 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
     @Test
     fun testV8ValueDecodingWithInvokableType() {
         v8.blockingLock {
-            val testClass = TestClass3(1, "string") {
-                println("${it.firstOrNull()} called me!")
-                return@TestClass3 true
-            }
+            val testClass = TestClass3(
+                1, "string",
+                Invokable {
+                    println("${it.firstOrNull()} called me!")
+                    return@Invokable true
+                }
+            )
 
             add(
                 "f",

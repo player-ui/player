@@ -3,14 +3,26 @@ package com.intuit.player.jvm.j2v8.bridge.serialization.encoding
 import com.eclipsesource.v8.V8Array
 import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.V8Value
-import com.intuit.player.jvm.core.bridge.serialization.encoding.*
+import com.intuit.player.jvm.core.bridge.Invokable
+import com.intuit.player.jvm.core.bridge.serialization.encoding.AbstractRuntimeArrayListDecoder
+import com.intuit.player.jvm.core.bridge.serialization.encoding.AbstractRuntimeObjectClassDecoder
+import com.intuit.player.jvm.core.bridge.serialization.encoding.AbstractRuntimeObjectMapDecoder
+import com.intuit.player.jvm.core.bridge.serialization.encoding.AbstractRuntimeValueDecoder
+import com.intuit.player.jvm.core.bridge.serialization.encoding.NodeDecoder
 import com.intuit.player.jvm.core.experimental.RuntimeClassDiscriminator
-import com.intuit.player.jvm.j2v8.*
+import com.intuit.player.jvm.j2v8.V8Null
+import com.intuit.player.jvm.j2v8.V8Primitive
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.J2V8DecodingException
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.J2V8Format
 import com.intuit.player.jvm.j2v8.extensions.blockingLock
 import com.intuit.player.jvm.j2v8.extensions.handleValue
-import kotlinx.serialization.*
+import com.intuit.player.jvm.j2v8.extensions.toInvokable
+import com.intuit.player.jvm.j2v8.getV8Value
+import com.intuit.player.jvm.j2v8.v8Array
+import com.intuit.player.jvm.j2v8.v8Function
+import com.intuit.player.jvm.j2v8.v8Object
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
@@ -34,6 +46,10 @@ internal sealed class AbstractV8Decoder(
         StructureKind.CLASS -> V8ObjectClassDecoder(format, currentValue.v8Object)
         PolymorphicKind.SEALED -> V8SealedClassDecoder(format, currentValue.v8Object)
         else -> error("Runtime format decoders can't decode kinds of (${descriptor.kind}) into structures for $descriptor")
+    }
+
+    override fun <R> decodeFunction(returnTypeSerializer: KSerializer<R>): Invokable<R> {
+        return currentValue.v8Function.toInvokable(format, currentValue.v8Function, returnTypeSerializer) ?: error("Unable to decode V8 function using return type serializer ${returnTypeSerializer.descriptor}")
     }
 }
 

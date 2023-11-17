@@ -7,6 +7,7 @@ import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeEncodingExc
 import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeFormat
 import com.intuit.player.jvm.core.bridge.serialization.json.value
 import com.intuit.player.jvm.core.utils.InternalPlayerApi
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -57,7 +58,7 @@ public interface FunctionEncoder : Encoder {
 }
 
 public interface FunctionDecoder : Decoder {
-    public fun decodeFunction(): Invokable<*>
+    public fun <R> decodeFunction(returnTypeSerializer: KSerializer<R>): Invokable<R>
 }
 
 @InternalPlayerApi
