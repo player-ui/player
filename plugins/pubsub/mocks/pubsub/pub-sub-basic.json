@@ -2,38 +2,16 @@
   "id": "generated-flow",
   "views": [
     {
-      "id": "collection",
-      "type": "collection",
-      "values": [
-        {
-          "asset": {
-            "id": "action",
-            "type": "action",
-            "exp": "@[ publish('some-event', 'event published message') ]@",
-            "label": {
-              "asset": {
-                "id": "action-label",
-                "type": "text",
-                "value": "Clicked to publish event"
-              }
-            }
-          }
-        },
-        {
-          "asset": {
-            "id": "action-end",
-            "type": "action",
-            "value": "Next",
-            "label": {
-              "asset": {
-                "id": "action-end-label",
-                "type": "text",
-                "value": "End the flow (View pubsub events)"
-              }
-            }
-          }
+      "id": "action",
+      "type": "action",
+      "exp": "@[ publish('some-event', 'event published message') ]@",
+      "label": {
+        "asset": {
+          "id": "action-label",
+          "type": "text",
+          "value": "Clicked to publish event"
         }
-      ]
+      }
     }
   ],
   "data": {
@@ -45,7 +23,7 @@
       "startState": "VIEW_1",
       "VIEW_1": {
         "state_type": "VIEW",
-        "ref": "collection",
+        "ref": "action",
         "transitions": {
           "*": "END_Done"
         }

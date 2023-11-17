@@ -1,5 +1,4 @@
-load("//:index.bzl", "generate_manifest")
-load("//:index.bzl", "javascript_pipeline")
+load("//:index.bzl", "generate_manifest","javascript_pipeline")
 
 filegroup(
     name = "mocks",
@@ -12,7 +11,6 @@ generate_manifest(
     mocks = [":mocks"],
     visibility = ["//visibility:public"],
 )
-
 javascript_pipeline(
     name = "@player-ui/external-action-plugin-mocks",
     entry = "index.ts",
