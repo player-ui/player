@@ -108,10 +108,13 @@ jobs:
 
   build_ios:
     executor: ios
+
     steps:
       - attach_workspace:
           at: ~/player
 
+      - macos/install-rosetta
+      
       - run:
           name: Homebrew Dependencies
           command: |
@@ -148,14 +151,18 @@ jobs:
           paths:
             - ~/android-tools
 
-      - run: gem install bundler
+      - run:
+          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
+          command: gem install bundler
 
       - restore_cache:
           keys:
             - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
             - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
 
-      - run: bundle install
+      - run:
+          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
+          command: bundle install
 
       - save_cache:
           key: gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
@@ -167,17 +174,27 @@ jobs:
           platform: 'iOS'
           device: 'iPhone 13'
 
-      - run: bazel sync
+      - run:
+          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
+          command: bazel sync
 
       - run: |
           BUNDLE_TARGETS=$(bazel query "attr(name, '^.*_Bundles$', //...)" --output label 2>/dev/null | tr '\n' ' ')
           bazel build --config=ci $BUNDLE_TARGETS
 
       - run: bazel shutdown
-      - run: cd xcode && bundle exec pod install
-      - run: bazel build --config=ci -- //:PlayerUI //:PlayerUI-Demo //:PlayerUI_Pod
+      - run: 
+          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
+          command: cd xcode && bundle exec pod install
+
+      - run: 
+          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
+          command: bazel build --config=ci -- //:PlayerUI //:PlayerUI-Demo //:PlayerUI_Pod
+
       # TODO: the timeout should be added to the test itself
-      - run: bazel test --test_env=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --test_env=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --test_env=APPLITOOLS_PR_NUMBER=${CIRCLE_PULL_REQUEST##*/} --test_timeout=1200 --jobs=1 --verbose_failures --config=ci  -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
+      - run: 
+          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
+          command: bazel test --test_env=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --test_env=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --test_env=APPLITOOLS_PR_NUMBER=${CIRCLE_PULL_REQUEST##*/} --test_timeout=1200 --jobs=1 --verbose_failures --config=ci  -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
 
       - run:
           when: always
