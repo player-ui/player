@@ -3,10 +3,7 @@ package com.intuit.player.jvm.core.flow
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
 import com.intuit.player.jvm.core.bridge.getInvokable
-import com.intuit.player.jvm.core.bridge.hooks.NodeSyncHook1
-import com.intuit.player.jvm.core.bridge.hooks.NodeSyncHook2
-import com.intuit.player.jvm.core.bridge.hooks.NodeSyncWaterfallHook1
-import com.intuit.player.jvm.core.bridge.hooks.NodeSyncWaterfallHook2
+import com.intuit.player.jvm.core.bridge.hooks.*
 import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
@@ -40,6 +37,10 @@ public class FlowInstance(override val node: Node) : NodeWrapper, Transition {
         /** A chance to manipulate the flow-node used to calculate the given transition used  */
         public val beforeTransition: NodeSyncWaterfallHook2<NavigationFlowState, String>
             by NodeSerializableField(NodeSyncWaterfallHook2.serializer(NavigationFlowState.serializer(), String.serializer()))
+
+        /** A hook to intercept and block a transition */
+        public val skipTransition: NodeSyncBailHook1<NamedState, Boolean>
+            by NodeSerializableField(NodeSyncBailHook1.serializer(NamedState.serializer(), Boolean.serializer()))
 
         /** A chance to manipulate the flow-node calculated after a transition */
         public val resolveTransitionNode: NodeSyncWaterfallHook1<NavigationFlowState>

@@ -22,7 +22,7 @@ public val playerSerializersModule: SerializersModule = SerializersModule {
     polymorphic(Node::class, NodeSerializer()) {
         default { NodeSerializer() }
     }
-    
+
     polymorphic(PlayerFlowState::class, ErroneousState::class, ErroneousState.serializer())
 
     polymorphic(Any::class) {
