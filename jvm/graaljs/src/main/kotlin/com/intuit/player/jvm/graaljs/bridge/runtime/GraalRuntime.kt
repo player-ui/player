@@ -114,7 +114,7 @@ internal class GraalRuntime(
     override fun getLong(key: String): Long? = backingNode.getLong(key)
     override fun getBoolean(key: String): Boolean? = backingNode.getBoolean(key)
     override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = backingNode.getInvokable(key, deserializationStrategy)
-    override fun <R> getFunction(key: String): Invokable<R>? = backingNode.getInvokable<R>(key)
+    override fun <R> getFunction(key: String): Invokable<R>? = backingNode.getFunction(key)
     override fun getList(key: String): List<*>? = backingNode.getList(key)
     override fun getObject(key: String): Node? = backingNode.getObject(key)
 }

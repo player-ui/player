@@ -31,7 +31,7 @@ internal class RuntimePerfTest : JSEngineTest() {
         val person = runtime.getObject("person")
         var resultString = ""
         captureTime {
-            resultString = runtime.getInvokable<R>("getAge")?.invoke(person) ?: ""
+            resultString = runtime.getInvokable<String>("getAge")?.invoke(person) ?: ""
         }
         assert(resultString.isNotEmpty())
         assertEquals("Joe is 25 years old", resultString)
