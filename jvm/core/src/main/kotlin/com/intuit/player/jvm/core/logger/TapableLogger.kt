@@ -6,10 +6,12 @@ import com.intuit.player.jvm.core.bridge.NodeWrapper
 import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.hooks.NodeSyncHook1
 import com.intuit.player.jvm.core.bridge.hooks.SyncHook1
+import com.intuit.player.jvm.core.bridge.runtime
 import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.player.jvm.core.plugins.LoggerPlugin
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 
@@ -35,23 +37,33 @@ public class TapableLogger(override val node: Node) : LoggerPlugin, NodeWrapper 
     public val hooks: Hooks by NodeSerializableField(Hooks.serializer())
 
     public override fun trace(vararg args: Any?) {
-        node.getInvokable<Unit>("trace")!!(*args)
+        runtime.scope.launch {
+            node.getInvokable<Unit>("trace")!!(*args)
+        }
     }
 
     public override fun debug(vararg args: Any?) {
-        node.getInvokable<Unit>("debug")!!(*args)
+        runtime.scope.launch {
+            node.getInvokable<Unit>("debug")!!(*args)
+        }
     }
 
     public override fun info(vararg args: Any?) {
-        node.getInvokable<Unit>("info")!!(*args)
+        runtime.scope.launch {
+            node.getInvokable<Unit>("info")!!(*args)
+        }
     }
 
     public override fun warn(vararg args: Any?) {
-        node.getInvokable<Unit>("warn")!!(*args)
+        runtime.scope.launch {
+            node.getInvokable<Unit>("warn")!!(*args)
+        }
     }
 
     public override fun error(vararg args: Any?) {
-        node.getInvokable<Unit>("error")!!(*args)
+        runtime.scope.launch {
+            node.getInvokable<Unit>("error")!!(*args)
+        }
     }
 
     public fun addHandler(logger: LoggerPlugin) {

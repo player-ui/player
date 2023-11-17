@@ -7,12 +7,10 @@ import com.intuit.player.jvm.core.bridge.serialization.json.isJsonElementSeriali
 import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.player.jvm.core.utils.InternalPlayerApi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -159,14 +157,19 @@ public val Runtime<*>.Promise: Promise.Api get() = getObject("Promise")?.let { p
 } ?: throw PlayerRuntimeException("'Promise' not defined in runtime")
 
 /** Helper to bridge complex [Promise] logic with the JS promise constructor */
-public fun <T : Any> Runtime<*>.Promise(block: ((T) -> Unit, (Throwable) -> Unit) -> Unit): Promise {
+public fun <T : Any> Runtime<*>.Promise(block: suspend ((T) -> Unit, (Throwable) -> Unit) -> Unit): Promise {
     val key = "promiseHandler_${UUID.randomUUID().toString().replace("-", "")}"
     add(key) { resolve: Invokable<Any?>, reject: Invokable<Any?> ->
-        try {
-            block({ resolve(it) }, { reject(it) })
-        } catch (e: Throwable) {
-            reject(e)
+        runtime.scope.launch {
+            try {
+                block({ runtime.scope.ensureActive(); resolve(it) }, { runtime.scope.ensureActive(); reject(it) })
+            } catch (e: Throwable) {
+                runtime.scope.ensureActive()
+                reject(e)
+            }
         }
+
+        Unit
     }
 
     return Promise(

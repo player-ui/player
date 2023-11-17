@@ -2,12 +2,12 @@ package com.intuit.player.jvm.j2v8.promise
 
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.Promise
-import com.intuit.player.jvm.j2v8.base.AutoAcquireJ2V8Test
+import com.intuit.player.jvm.j2v8.base.J2V8Test
 import com.intuit.player.jvm.utils.test.PromiseUtils
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-internal class V8PromiseTest : AutoAcquireJ2V8Test(), PromiseUtils {
+internal class V8PromiseTest : J2V8Test(), PromiseUtils {
 
     override val thenChain = mutableListOf<Any?>()
     override val catchChain = mutableListOf<Any?>()

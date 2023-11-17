@@ -8,29 +8,27 @@ import com.intuit.player.jvm.core.bridge.serialization.json.prettify
 import com.intuit.player.jvm.core.bridge.serialization.json.prettyPrint
 import com.intuit.player.jvm.j2v8.V8Function
 import com.intuit.player.jvm.j2v8.V8Value
-import com.intuit.player.jvm.j2v8.base.AutoAcquireJ2V8Test
+import com.intuit.player.jvm.j2v8.base.J2V8Test
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.decodeFromV8Value
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.encodeToV8Value
 import com.intuit.player.jvm.j2v8.extensions.args
-import com.intuit.player.jvm.j2v8.extensions.blockingLock
 import com.intuit.player.jvm.j2v8.extensions.emptyArgs
+import com.intuit.player.jvm.j2v8.extensions.evaluateInJSThreadBlocking
 import com.intuit.player.jvm.j2v8.extensions.invoke
 import com.intuit.player.jvm.j2v8.v8Function
 import com.intuit.player.jvm.j2v8.v8Object
 import kotlinx.serialization.Serializable
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertThrows
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 /** Legacy tests for encoding values into J2V8 */
-internal class V8DecoderTest : AutoAcquireJ2V8Test() {
+internal class V8DecoderTest : J2V8Test() {
 
     private val retVal = "this is my return"
 
     @Test
     fun testPrimitives() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             listOf(42, 1234L, "string", null, Unit to V8.getUndefined())
                 .map { if (it is Pair<*, *>) it else it to V8Value(it) }
                 .forEach { (actual, expected) -> assertEquals(expected, format.encodeToV8Value(actual)) }
@@ -39,7 +37,7 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
 
     @Test
     fun testArray() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val list = listOf(1, 2, 3)
             val v8Array = executeArrayScript("""(${list.prettify()})""")
             val result = format.encodeToV8Value(list)
@@ -49,7 +47,7 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
 
     @Test
     fun testNestedArray() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val list = listOf("a", 2, 3, listOf(4, 5, 6))
             val nestedV8Array = executeArrayScript("""(${list.prettify()})""")
             val result = format.encodeToV8Value(list)
@@ -59,7 +57,7 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
 
     @Test
     fun testObject() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val map = mapOf("a" to "b", "c" to "d")
             val v8Object = executeObjectScript("""(${map.prettify()})""")
             val result = format.encodeToV8Value(map)
@@ -69,7 +67,7 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
 
     @Test
     fun testObjectDynamicKeys() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val map = mapOf(1 to "b", "c" to "d")
             val v8Object = executeObjectScript("""(${map.prettify()})""")
             val result = format.encodeToV8Value(map)
@@ -79,7 +77,7 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
 
     @Test
     fun testNestedObject() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val map = mapOf("a" to "b", "c" to "d")
             val v8Object = executeObjectScript("""(${map.prettify()})""")
             val result = format.encodeToV8Value(map)
@@ -89,7 +87,7 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
 
     @Test
     fun testFunction() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val function = { arg: String -> println(arg); retVal }
             assertEquals(retVal, function("this is my arg"))
 
@@ -100,7 +98,7 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
 
     @Test
     fun testFunctionReturn() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val function = { arg: String -> arg }
             assertEquals("this is my arg", function("this is my arg"))
 
@@ -111,7 +109,7 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
 
     @Test
     fun testTooManyParamsOnFunction() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val function = { arg: String -> println(arg); retVal }
             assertEquals(retVal, function("this is my arg"))
 
@@ -122,7 +120,7 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
 
     @Test
     fun notEnoughParamsOnFunction() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val function = { arg: String? -> println(arg); retVal }
             assertEquals(retVal, function("this is my arg"))
 
@@ -133,7 +131,7 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
 
     @Test
     fun wrongParamsOnFunction() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val function = { arg: String -> println(arg); retVal }
             assertEquals(retVal, function("this is my arg"))
 
@@ -146,7 +144,7 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
 
     @Test
     fun testMemberFunction() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val logger = LoggerAsMethod()
             val function = logger::log
             assertEquals(retVal, function("this is my arg"))
@@ -158,7 +156,7 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
 
     @Test
     fun testMemberFunctionReturn() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val logger = LoggerAsMethod()
             val function = logger::logAndReturn
             assertEquals("this is my arg", function("this is my arg"))
@@ -170,7 +168,7 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
 
     @Test
     fun testTooManyParamsOnMemberFunction() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val logger = LoggerAsMethod()
             val function = logger::log
             assertEquals(retVal, function("this is my arg"))
@@ -182,19 +180,19 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
 
     @Test
     fun notEnoughParamsOnMemberFunction() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val logger = LoggerAsMethod()
             val function = logger::log
             assertEquals(retVal, function("this is my arg"))
 
             val result = format.encodeToV8Value(function).v8Function
-            assertEquals(retVal, result())
+            assertEquals(retVal, result(format))
         }
     }
 
     @Test
     fun wrongParamsOnMemberFunction() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val logger = LoggerAsMethod()
             val function = logger::log
             assertEquals(retVal, function("this is my arg"))
@@ -217,7 +215,7 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
             }
         }
 
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val logger = ComplicatedVarargMethod()
             val function = logger::log
             // assertEquals(retVal, function("someArg", argsAsList.toTypedArray(), 42))
@@ -230,7 +228,7 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
 
     @Test
     fun testComplexStructure() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val complex = mapOf(
                 "string" to "thisisastring",
                 "int" to 1,
@@ -266,7 +264,7 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
 
     @Test
     fun testV8ValueDecoding() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val testClass = TestClass1(1, "string")
 
             val obj = executeObjectScript("""(${testClass.prettify(TestClass1.serializer())})""")
@@ -302,7 +300,7 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
 
     @Test
     fun testV8ValueDecodingWithFunctionType() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val testClass = TestClass2(1, "string") {
                 println("$it called me!")
                 return@TestClass2 true
@@ -353,7 +351,7 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
 
     @Test
     fun testV8ValueDecodingWithInvokableType() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val testClass = TestClass3(
                 1, "string",
                 Invokable {
@@ -408,7 +406,7 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
 
     @Test
     fun testV8ValueDecodingWithNestedDataClass() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val testClass = TestClass4(1, "string", TestClass4(2, "another"))
 
             testClass.prettyPrint(TestClass4.serializer())
@@ -456,7 +454,7 @@ internal class V8DecoderTest : AutoAcquireJ2V8Test() {
 
     @Test
     fun testV8ValueDecodingWithComplexDataClass() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val testClass = TestClass5(1, "string", TestClass6("another", 2))
 
             testClass.prettyPrint(TestClass5.serializer())

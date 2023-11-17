@@ -1,6 +1,7 @@
 package com.intuit.player.jvm.core.player
 
 import com.intuit.player.jvm.core.bridge.JSErrorException
+import com.intuit.player.jvm.core.bridge.PlayerRuntimeException
 import com.intuit.player.jvm.core.bridge.global.JSMap
 import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.player.jvm.core.data.get
@@ -10,6 +11,7 @@ import com.intuit.player.jvm.core.flow.Flow.Companion.UNKNOWN_ID
 import com.intuit.player.jvm.core.flow.forceTransition
 import com.intuit.player.jvm.core.flow.state.NavigationFlowStateType
 import com.intuit.player.jvm.core.flow.state.NavigationFlowViewState
+import com.intuit.player.jvm.core.flow.state.param
 import com.intuit.player.jvm.core.player.state.*
 import com.intuit.player.jvm.core.plugins.Plugin
 import com.intuit.player.jvm.core.validation.BindingInstance
@@ -352,7 +354,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         player.release()
         assertTrue(player.state is ReleasedState)
         assertEquals(ReleasedState, releasedStateTap.await())
-        val exception = assertThrows(PlayerException::class.java) {
+        val exception = assertThrows(PlayerRuntimeException::class.java) {
             player.start(simpleFlowString)
         }
         assertEquals("Runtime object has been released!", exception.message?.split("] ")?.get(1))

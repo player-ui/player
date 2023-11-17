@@ -43,7 +43,7 @@ public class NodeSerializableField<T> private constructor(
 
     public operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
         // early exit if we have a value and explicitly using the cache
-        value?.takeIf { strategy == CacheStrategy.Full && !provider().isReleased() }?.let { (_, value) ->
+        value?.takeIf { strategy == CacheStrategy.Full }?.let { (_, value) ->
             return value
         }
 

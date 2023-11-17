@@ -1,10 +1,10 @@
 package com.intuit.player.jvm.j2v8.bridge.serialization.encoding
 
 import com.intuit.player.jvm.core.flow.FlowResult
-import com.intuit.player.jvm.j2v8.base.AutoAcquireJ2V8Test
+import com.intuit.player.jvm.j2v8.base.J2V8Test
 import com.intuit.player.jvm.j2v8.bridge.V8Node
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.encodeToV8Value
-import com.intuit.player.jvm.j2v8.extensions.blockingLock
+import com.intuit.player.jvm.j2v8.extensions.evaluateInJSThreadBlocking
 import com.intuit.player.jvm.j2v8.v8Object
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -14,7 +14,7 @@ import kotlinx.serialization.json.put
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-internal class JsonEncodingTests : AutoAcquireJ2V8Test() {
+internal class JsonEncodingTests : J2V8Test() {
     private val expectedJson = buildJsonObject {
         put("data", buildJsonObject { put("a", "b") })
         put(
@@ -26,7 +26,7 @@ internal class JsonEncodingTests : AutoAcquireJ2V8Test() {
         )
     }
     private val expectedJsonString = expectedJson.toString()
-    private val expectedV8Object = v8.blockingLock {
+    private val expectedV8Object = v8.evaluateInJSThreadBlocking(runtime) {
         executeObjectScript("""($expectedJsonString)""")
     }
     private val expectedFlowResult = FlowResult(V8Node(expectedV8Object, runtime))
@@ -45,7 +45,9 @@ internal class JsonEncodingTests : AutoAcquireJ2V8Test() {
 
     @Test
     fun testToV8() {
-        expectedV8Object.assertEquivalent(format.encodeToV8Value(expectedFlowResult))
+        expectedV8Object.evaluateInJSThreadBlocking(runtime) {
+            expectedV8Object.assertEquivalent(format.encodeToV8Value(expectedFlowResult))
+        }
     }
 
     @Test
@@ -56,10 +58,12 @@ internal class JsonEncodingTests : AutoAcquireJ2V8Test() {
 
     @Test
     fun testToAndFromV8() {
-        val v8Object = format.encodeToV8Value(expectedFlowResult).v8Object
-        expectedV8Object.assertEquivalent(v8Object)
+        expectedV8Object.evaluateInJSThreadBlocking(runtime) {
+            val v8Object = format.encodeToV8Value(expectedFlowResult).v8Object
+            expectedV8Object.assertEquivalent(v8Object)
 
-        val flow = format.decodeFromRuntimeValue(FlowResult.serializer(), v8Object)
-        Assertions.assertEquals(expectedFlowResult, flow)
+            val flow = format.decodeFromRuntimeValue(FlowResult.serializer(), v8Object)
+            Assertions.assertEquals(expectedFlowResult, flow)
+        }
     }
 }

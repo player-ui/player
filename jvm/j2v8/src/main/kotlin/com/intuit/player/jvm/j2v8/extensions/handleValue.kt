@@ -1,10 +1,6 @@
 package com.intuit.player.jvm.j2v8.extensions
 
-import com.eclipsesource.v8.V8
-import com.eclipsesource.v8.V8Array
-import com.eclipsesource.v8.V8Function
-import com.eclipsesource.v8.V8Object
-import com.eclipsesource.v8.V8Value
+import com.eclipsesource.v8.*
 import com.intuit.player.jvm.core.asset.Asset
 import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
@@ -23,7 +19,7 @@ internal fun Any?.handleValue(format: RuntimeFormat<V8Value>): Any? = when (this
     else -> this
 }
 
-private fun V8Value.transform(format: RuntimeFormat<V8Value>): Any? = lockIfDefined {
+private fun V8Value.transform(format: RuntimeFormat<V8Value>): Any? = evaluateInJSThreadBlocking(format.runtime) {
     when (this) {
         V8.getUndefined() -> null
         is V8Primitive -> value
@@ -34,19 +30,19 @@ private fun V8Value.transform(format: RuntimeFormat<V8Value>): Any? = lockIfDefi
     }
 }
 
-internal fun V8Array.toList(format: RuntimeFormat<V8Value>): List<Any?>? = if (isUndefined) null else lockIfDefined {
+internal fun V8Array.toList(format: RuntimeFormat<V8Value>): List<Any?>? = if (isUndefined) null else evaluateInJSThreadIfDefinedBlocking(format.runtime) {
     keys.map(::get).map { it.handleValue(format) }
 }
 
-internal fun V8Object.toNode(format: RuntimeFormat<V8Value>): Node? = if (isUndefined) null else lockIfDefined {
+internal fun V8Object.toNode(format: RuntimeFormat<V8Value>): Node? = if (isUndefined) null else evaluateInJSThreadIfDefinedBlocking(format.runtime) {
     if (contains("id") && contains("type"))
         Asset(V8Node(this, format.runtime))
     else V8Node(this, format.runtime)
 }
 
-internal fun <R> V8Function.toInvokable(format: RuntimeFormat<V8Value>, receiver: V8Object, deserializationStrategy: DeserializationStrategy<R>?): Invokable<R>? = if (isUndefined) null else lockIfDefined {
+internal fun <R> V8Function.toInvokable(format: RuntimeFormat<V8Value>, receiver: V8Object, deserializationStrategy: DeserializationStrategy<R>?): Invokable<R>? = if (isUndefined) null else evaluateInJSThreadIfDefinedBlocking(format.runtime) {
     Invokable { args ->
-        blockingLock {
+        evaluateInJSThreadBlocking(format.runtime) {
             try {
                 when (
                     val result =

@@ -103,8 +103,8 @@ internal class NodeSerializableFieldTest : RuntimeTest() {
 
         // access check after runtime is released
         runtime.release()
-        assertEquals("[$runtime] Runtime object has been released!", assertThrows<PlayerRuntimeException> { primitive }.message)
-        assertEquals("[$runtime] Runtime object has been released!", assertThrows<PlayerRuntimeException> { nested }.message)
+        assertEquals(10, primitive)
+        assertEquals(Structured(20), nested)
     }
 
     @TestTemplate fun `no caching always re-deserializes`() {

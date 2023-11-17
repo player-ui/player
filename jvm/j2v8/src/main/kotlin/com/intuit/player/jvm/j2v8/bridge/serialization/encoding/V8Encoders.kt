@@ -17,7 +17,7 @@ import com.intuit.player.jvm.j2v8.bridge.V8Node
 import com.intuit.player.jvm.j2v8.bridge.V8ObjectWrapper
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.J2V8EncodingException
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.J2V8Format
-import com.intuit.player.jvm.j2v8.extensions.blockingLock
+import com.intuit.player.jvm.j2v8.extensions.evaluateInJSThreadBlocking
 import com.intuit.player.jvm.j2v8.extensions.handleValue
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.descriptors.PolymorphicKind
@@ -72,13 +72,13 @@ internal open class V8ValueEncoder(private val format: J2V8Format, private val m
             else -> error("cannot get content unless in PRIMITIVE mode")
         }
 
-    protected open val contentList = format.v8.blockingLock(::V8Array)
+    protected open val contentList = format.v8.evaluateInJSThreadBlocking(format.runtime) { V8Array(this) }
         get() = when (mode) {
             Mode.LIST -> field
             else -> error("cannot get list unless in LIST mode")
         }
 
-    protected open val contentMap = format.v8.blockingLock(::V8Object)
+    protected open val contentMap = format.v8.evaluateInJSThreadBlocking(format.runtime) { V8Object(this) }
         get() = when (mode) {
             Mode.MAP -> field
             else -> error("cannot get map unless in MAP mode")
@@ -101,7 +101,7 @@ internal open class V8ValueEncoder(private val format: J2V8Format, private val m
         }
     }
 
-    private operator fun V8Object.set(key: String, content: Any?): Unit = blockingLock {
+    private operator fun V8Object.set(key: String, content: Any?): Unit = evaluateInJSThreadBlocking(format.runtime) {
         when (content) {
             null -> addNull(key)
             Unit -> addUndefined(key)
@@ -116,7 +116,7 @@ internal open class V8ValueEncoder(private val format: J2V8Format, private val m
         }
     }
 
-    private fun V8Array.add(content: Any?): Unit = blockingLock {
+    private fun V8Array.add(content: Any?): Unit = evaluateInJSThreadBlocking(format.runtime) {
         when (content) {
             null -> pushNull()
             Unit -> pushUndefined()
@@ -326,7 +326,7 @@ internal open class V8ValueEncoder(private val format: J2V8Format, private val m
 internal class V8ExceptionEncoder(format: J2V8Format, consumer: (V8Value) -> Unit) : V8ValueEncoder(format, Mode.MAP, consumer) {
 
     override val contentMap by lazy {
-        format.v8.blockingLock {
+        format.v8.evaluateInJSThreadBlocking(format.runtime) {
             executeObjectScript("""(new Error())""")
         }
     }

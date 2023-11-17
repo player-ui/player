@@ -2,6 +2,7 @@ package com.intuit.player.plugins.beacon
 
 import com.intuit.player.jvm.core.asset.Asset
 import com.intuit.player.jvm.core.bridge.getInvokable
+import com.intuit.player.jvm.core.bridge.runtime
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
 import com.intuit.player.jvm.core.bridge.runtime.add
 import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
@@ -11,6 +12,7 @@ import com.intuit.player.jvm.core.plugins.JSScriptPluginWrapper
 import com.intuit.player.jvm.core.plugins.Pluggable
 import com.intuit.player.jvm.core.plugins.findPlugin
 import com.intuit.player.plugins.settimeout.SetTimeoutPlugin
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -56,14 +58,16 @@ public class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JSScrip
 
     /** Fire a beacon event */
     public fun beacon(action: String, element: String, asset: Asset, data: Any? = null) {
-        instance.getInvokable<Any?>("beacon")!!.invoke(
-            mapOf(
-                "action" to action,
-                "element" to element,
-                "asset" to asset,
-                "data" to data,
+        runtime.scope.launch {
+            instance.getInvokable<Any?>("beacon")!!.invoke(
+                mapOf(
+                    "action" to action,
+                    "element" to element,
+                    "asset" to asset,
+                    "data" to data,
+                )
             )
-        )
+        }
     }
 
     private companion object {

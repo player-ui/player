@@ -7,6 +7,8 @@ import com.intuit.player.jvm.core.player.state.CompletedState
 import com.intuit.player.jvm.core.player.state.PlayerFlowState
 import com.intuit.player.jvm.utils.test.PromiseUtils
 import com.intuit.player.jvm.utils.test.RuntimeTest
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -18,8 +20,17 @@ private inline fun currentStackTrace() = Exception().stackTrace
 
 internal class PromiseTest : RuntimeTest(), PromiseUtils {
 
-    override val thenChain = mutableListOf<Any?>()
-    override val catchChain = mutableListOf<Any?>()
+    override val thenChain = mutableListOf<Any?>(); get() = runBlocking {
+        // TODO: Rework delay into a proper suspension mechanism
+        delay(100)
+        field
+    }
+
+    override val catchChain = mutableListOf<Any?>(); get() = runBlocking {
+        // TODO: Rework delay into a proper suspension mechanism
+        delay(100)
+        field
+    }
 
     /**
      * Anti-test case since old test existed to prove the Json conversions forced Ints as Longs.

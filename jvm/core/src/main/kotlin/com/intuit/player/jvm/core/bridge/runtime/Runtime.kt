@@ -4,12 +4,16 @@ import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeFormat
 import com.intuit.player.jvm.core.bridge.serialization.format.encodeToRuntimeValue
 import com.intuit.player.jvm.core.bridge.serialization.format.serializer
+import com.intuit.player.jvm.core.utils.InternalPlayerApi
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
 
 /** Special [Node] that represents the JS runtime */
 public interface Runtime<Value> : Node {
+
+    public val dispatcher: CoroutineDispatcher
 
     /** [CoroutineScope] that represents when the [Runtime] is released and relevant coroutines should cancel */
     public val scope: CoroutineScope
@@ -31,6 +35,10 @@ public interface Runtime<Value> : Node {
 
     /** Close the [Runtime] and release any resources */
     public fun release()
+
+    /** Opportunity to verify the thread to perfom blocking operations on */
+    @InternalPlayerApi
+    public var checkBlockingThread: Thread.() -> Unit
 }
 
 public inline fun <reified T, Value> Runtime<Value>.add(name: String, value: T): Unit =

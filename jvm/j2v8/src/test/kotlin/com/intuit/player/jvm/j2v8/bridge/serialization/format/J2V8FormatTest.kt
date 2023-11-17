@@ -8,7 +8,7 @@ import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.player.jvm.j2v8.V8Function
 import com.intuit.player.jvm.j2v8.base.J2V8Test
-import com.intuit.player.jvm.j2v8.extensions.blockingLock
+import com.intuit.player.jvm.j2v8.extensions.evaluateInJSThreadBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test
 
 internal class J2V8FormatTest : J2V8Test() {
 
-    @Test fun `encode simple map into V8Object with explicit serializers`() = format.v8.blockingLock {
+    @Test fun `encode simple map into V8Object with explicit serializers`() = format.v8.evaluateInJSThreadBlocking(runtime) {
         val map = mapOf(
             "one" to 1,
             "two" to 2,
@@ -30,7 +30,7 @@ internal class J2V8FormatTest : J2V8Test() {
         assertEquals(V8.getUndefined(), v8Object.get("three"))
     }
 
-    @Test fun `encode simple map into V8Object with implicit serializers`() = format.v8.blockingLock {
+    @Test fun `encode simple map into V8Object with implicit serializers`() = format.v8.evaluateInJSThreadBlocking(runtime) {
         val map = mapOf(
             "one" to 1,
             "two" to 2,
@@ -43,7 +43,7 @@ internal class J2V8FormatTest : J2V8Test() {
         assertEquals(V8.getUndefined(), v8Object.get("three"))
     }
 
-    @Test fun `encode nested map into V8Object with implicit serializers`() = format.v8.blockingLock {
+    @Test fun `encode nested map into V8Object with implicit serializers`() = format.v8.evaluateInJSThreadBlocking(runtime) {
         val map = mapOf(
             "one" to mapOf("three" to 3),
             "two" to mapOf("four" to 4),
@@ -56,7 +56,7 @@ internal class J2V8FormatTest : J2V8Test() {
         assertEquals(V8.getUndefined(), v8Object.get("five"))
     }
 
-    @Test fun `encode serializable into V8Object with implicit serializers`() = format.v8.blockingLock {
+    @Test fun `encode serializable into V8Object with implicit serializers`() = format.v8.evaluateInJSThreadBlocking(runtime) {
         @Serializable
         data class Simple(
             val one: Int = 1,
@@ -71,7 +71,7 @@ internal class J2V8FormatTest : J2V8Test() {
         assertEquals(V8.getUndefined(), v8Object.get("three"))
     }
 
-    @Test fun `decode V8Object into serializable with implicit serializers`() = format.v8.blockingLock {
+    @Test fun `decode V8Object into serializable with implicit serializers`() = format.v8.evaluateInJSThreadBlocking(runtime) {
         @Serializable
         data class Simple(
             val one: Int = 1,
@@ -90,7 +90,7 @@ internal class J2V8FormatTest : J2V8Test() {
         assertEquals(4, simple.two)
     }
 
-    @Test fun `decode into Node backed serializable`() = format.v8.blockingLock {
+    @Test fun `decode into Node backed serializable`() = format.v8.evaluateInJSThreadBlocking(runtime) {
         data class Simple(override val node: Node) : NodeWrapper {
             fun increment(value: Int) = node.getInvokable<Int>("increment")!!(value)
         }
@@ -110,7 +110,7 @@ internal class J2V8FormatTest : J2V8Test() {
         assertEquals(1, simple.increment(0))
     }
 
-    @Test fun `decode function into data class`() = format.v8.blockingLock {
+    @Test fun `decode function into data class`() = format.v8.evaluateInJSThreadBlocking(runtime) {
         @Serializable
         data class Data(
             val one: Int = 1,

@@ -6,7 +6,7 @@ import com.intuit.player.jvm.core.bridge.serialization.serializers.ThrowableSeri
 import com.intuit.player.jvm.core.player.PlayerException
 import com.intuit.player.jvm.j2v8.base.J2V8Test
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.decodeFromV8Value
-import com.intuit.player.jvm.j2v8.extensions.blockingLock
+import com.intuit.player.jvm.j2v8.extensions.evaluateInJSThreadBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -18,7 +18,7 @@ internal class ThrowableSerializerTest : J2V8Test() {
 
     @Test
     fun `JS Error is deserialized as PlayerException (using regex)`() {
-        val error = format.v8.blockingLock {
+        val error = format.v8.evaluateInJSThreadBlocking(runtime) {
             executeObjectScript("""(new Error("hello"))""")
         }
         val exception = format.decodeFromRuntimeValue(ThrowableSerializer(), error)
@@ -55,7 +55,7 @@ internal class ThrowableSerializerTest : J2V8Test() {
         assertTrue(error is V8Object)
         error as V8Object
 
-        error.blockingLock {
+        error.evaluateInJSThreadBlocking(runtime) {
             assertEquals("world", error.get("message"))
             assertEquals(exception.stackTraceToString(), error.getString("stack"))
 
@@ -116,7 +116,7 @@ internal class ThrowableSerializerTest : J2V8Test() {
         assertTrue(error is V8Object)
         error as V8Object
 
-        error.blockingLock {
+        error.evaluateInJSThreadBlocking(runtime) {
             assertEquals("hello", error.get("message"))
             assertEquals(exception.stackTraceToString(), error.getString("stack"))
 

@@ -12,14 +12,21 @@ import com.intuit.player.jvm.core.expressions.ExpressionController
 import com.intuit.player.jvm.core.flow.FlowController
 import com.intuit.player.jvm.core.flow.FlowResult
 import com.intuit.player.jvm.core.logger.TapableLogger
-import com.intuit.player.jvm.core.player.state.*
+import com.intuit.player.jvm.core.player.state.CompletedState
+import com.intuit.player.jvm.core.player.state.PlayerFlowState
+import com.intuit.player.jvm.core.player.state.ReleasedState
 import com.intuit.player.jvm.core.plugins.Pluggable
 import com.intuit.player.jvm.core.validation.ValidationController
 import com.intuit.player.jvm.core.view.View
 import com.intuit.player.jvm.core.view.ViewController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.job
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import java.net.URL
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /** Agnostic [Pluggable] [Player] to provide the core API */
 public abstract class Player : Pluggable {
@@ -76,6 +83,9 @@ public abstract class Player : Pluggable {
     /** The current [PlayerFlowState] of the player. */
     public abstract val state: PlayerFlowState
 
+    /** [CoroutineScope] to be used for launching coroutines that should be cancelled once the Player is released */
+    public abstract val scope: CoroutineScope
+
     /**
      * Asynchronously [start] the [flow] represented as a [String]. The
      * [FlowResult] can be obtained by subscribing the the [Completable.onComplete]
@@ -115,3 +125,13 @@ public abstract class Player : Pluggable {
         onComplete(onComplete)
     }
 }
+
+/**
+ * Create a child [CoroutineScope] of the [Player.scope], such that it'll inherit the [CoroutineContext],
+ * but with its own [SupervisorJob]. Unless overridden by the provided [context], this ensures that the
+ * sub-scope can be cancelled independently, but still contains other top-level elements, such as the
+ * dispatcher or coroutine exception handler.
+ */
+@ExperimentalPlayerApi
+public fun Player.subScope(context: CoroutineContext = EmptyCoroutineContext): CoroutineScope =
+    CoroutineScope(scope.coroutineContext + SupervisorJob(scope.coroutineContext.job) + context)

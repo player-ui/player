@@ -18,7 +18,7 @@ internal class V8Node(override val v8Object: V8Object, override val runtime: Run
     override val format: RuntimeFormat<V8Value> get() = runtime.format
 
     override val keys: Set<String> by lazy {
-        v8Object.lockIfDefined {
+        v8Object.evaluateInJSThreadIfDefinedBlocking(runtime) {
             keys.filter { v8Object.get(it) != V8.getUndefined() }.toSet()
         } ?: emptySet()
     }
@@ -42,28 +42,28 @@ internal class V8Node(override val v8Object: V8Object, override val runtime: Run
     override fun isEmpty(): Boolean = size == 0
 
     // Getter APIs
-    override operator fun get(key: String): Any? = v8Object.lockIfDefined {
+    override operator fun get(key: String): Any? = v8Object.evaluateInJSThreadIfDefinedBlocking(runtime) {
         get(key).handleValue(format)
     }
 
-    override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = v8Object.lockIfDefined {
+    override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = v8Object.evaluateInJSThreadIfDefinedBlocking(runtime) {
         get(key) as? V8Function
     }?.toInvokable(format, v8Object, deserializationStrategy)
 
-    override fun <R> getFunction(key: String): Invokable<R>? = v8Object.lockIfDefined {
+    override fun <R> getFunction(key: String): Invokable<R>? = v8Object.evaluateInJSThreadIfDefinedBlocking(runtime) {
         get(key) as? V8Function
     }?.toInvokable(format, v8Object, null)
 
-    override fun getList(key: String): List<*>? = v8Object.lockIfDefined {
+    override fun getList(key: String): List<*>? = v8Object.evaluateInJSThreadIfDefinedBlocking(runtime) {
         get(key) as? V8Array
     }?.toList(format)
 
-    override fun getObject(key: String): Node? = v8Object.lockIfDefined {
+    override fun getObject(key: String): Node? = v8Object.evaluateInJSThreadIfDefinedBlocking(runtime) {
         get(key) as? V8Object
     }?.toNode(format)
 
-    override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>): T? = v8Object.blockingLock {
-        getV8Value(key).mapUndefinedToNull()?.let {
+    override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>): T? = v8Object.evaluateInJSThreadBlocking(runtime) {
+        getV8Value(this@V8Node.runtime, key).mapUndefinedToNull()?.let {
             format.decodeFromRuntimeValue(deserializer, it)
         }
     }
@@ -77,7 +77,7 @@ internal class V8Node(override val v8Object: V8Object, override val runtime: Run
     override fun nativeReferenceEquals(other: Any?): Boolean = when (other) {
         is NodeWrapper -> nativeReferenceEquals(other.node)
         is V8ObjectWrapper -> nativeReferenceEquals(other.v8Object)
-        is V8Object -> v8Object.blockingLock {
+        is V8Object -> v8Object.evaluateInJSThreadBlocking(runtime) {
             v8Object.strictEquals(other)
         }
         else -> false
@@ -93,9 +93,9 @@ internal class V8Node(override val v8Object: V8Object, override val runtime: Run
         else -> false
     }
 
-    override fun hashCode(): Int = v8Object.blockingLock { hashCode() }
+    override fun hashCode(): Int = v8Object.evaluateInJSThreadBlocking(runtime) { hashCode() }
 
-    override fun toString(): String = v8Object.lockIfDefined {
+    override fun toString(): String = v8Object.evaluateInJSThreadIfDefinedBlocking(runtime) {
         keys.associate { it to get(it) }.toString()
     } ?: emptyMap<String, Any?>().toString()
 }

@@ -11,6 +11,9 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.invoke
 import io.mockk.junit5.MockKExtension
 import io.mockk.slot
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -19,6 +22,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
 internal class FlowScopePluginTest {
+
+    private val scope = CoroutineScope(Dispatchers.Default)
 
     @MockK lateinit var player: Player
     @MockK lateinit var inProgressState: InProgressState
@@ -90,6 +95,15 @@ internal class FlowScopePluginTest {
         assertEquals(flow, flowScopePlugin.flowScope!!.flow)
         val subScope = flowScopePlugin.subScope()
         assertNotNull(subScope)
-        assertNull(subScope!!.flow)
+        assertEquals(flow, subScope!!.flow)
+    }
+
+    @Test fun testRuntimeScopeCancelsFlowScope() {
+        assertNull(flowScopePlugin.flowScope)
+        transitionToInProgress()
+        assertNotNull(flowScopePlugin.flowScope)
+        assertTrue(flowScopePlugin.flowScope!!.isActive)
+        scope.cancel()
+        assertFalse(flowScopePlugin.flowScope!!.isActive)
     }
 }

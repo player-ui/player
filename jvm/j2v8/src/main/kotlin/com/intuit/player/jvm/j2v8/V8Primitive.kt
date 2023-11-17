@@ -1,9 +1,10 @@
 package com.intuit.player.jvm.j2v8
 
 import com.eclipsesource.v8.*
+import com.intuit.player.jvm.core.bridge.runtime.Runtime
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.J2V8Format
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.encodeToV8Value
-import com.intuit.player.jvm.j2v8.extensions.blockingLock
+import com.intuit.player.jvm.j2v8.extensions.evaluateInJSThreadBlocking
 
 /**
  * Primitive wrapper for [V8Value]s. The intent behind this construct is to enable the
@@ -53,8 +54,12 @@ internal val <Context : V8Value> Context.v8Function: V8Function get() = this as?
     ?: throw IllegalArgumentException("Element ${this::class} is not a V8Function")
 
 // [get] helpers for wrapping primitive values
-internal fun V8Object.getV8Value(key: String): V8Value = blockingLock { get(key) }.let(::V8Value)
-internal fun V8Array.getV8Value(index: Int): V8Value = blockingLock { get(index) }.let(::V8Value)
+internal fun V8Object.getV8Value(runtime: Runtime<V8Value>, key: String): V8Value = evaluateInJSThreadBlocking(runtime) {
+    get(key).let(::V8Value)
+}
+internal fun V8Array.getV8Value(runtime: Runtime<V8Value>, index: Int): V8Value = evaluateInJSThreadBlocking(runtime) {
+    get(index).let(::V8Value)
+}
 
 internal fun V8Value(content: Any?): V8Value = when (content) {
     is V8Value -> content
@@ -87,9 +92,9 @@ internal fun <Context : V8Value> Context.V8Array(block: V8Array.() -> Unit = {})
  * This _should_ be the main entry point for creating [V8Function]s within this module b/c it takes into account
  * runtime locking and ensuring that the return value can be appropriately handled by J2V8
  */
-internal inline fun <reified T> V8Function(format: J2V8Format, crossinline block: V8Object.(args: V8Array) -> T): V8Function = format.v8.blockingLock {
+internal inline fun <reified T> V8Function(format: J2V8Format, crossinline block: V8Object.(args: V8Array) -> T): V8Function = format.v8.evaluateInJSThreadBlocking(format.runtime) {
     V8Function(this) { receiver, args ->
-        receiver.blockingLock {
+        receiver.evaluateInJSThreadBlocking(format.runtime) {
             when (val retVal = format.encodeToV8Value(block(args))) {
                 is V8Primitive -> retVal.value
                 else -> retVal

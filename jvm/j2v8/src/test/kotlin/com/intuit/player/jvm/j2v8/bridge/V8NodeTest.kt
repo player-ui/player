@@ -1,15 +1,11 @@
 package com.intuit.player.jvm.j2v8.bridge
 
 import com.intuit.player.jvm.core.asset.Asset
-import com.intuit.player.jvm.core.bridge.Invokable
-import com.intuit.player.jvm.core.bridge.Node
-import com.intuit.player.jvm.core.bridge.getInvokable
-import com.intuit.player.jvm.core.bridge.getJson
-import com.intuit.player.jvm.core.bridge.toJson
+import com.intuit.player.jvm.core.bridge.*
 import com.intuit.player.jvm.core.flow.Flow
 import com.intuit.player.jvm.j2v8.base.J2V8Test
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.v8Object
-import com.intuit.player.jvm.j2v8.extensions.blockingLock
+import com.intuit.player.jvm.j2v8.extensions.evaluateInJSThreadBlocking
 import com.intuit.player.jvm.j2v8.extensions.handleValue
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -25,7 +21,7 @@ import kotlin.concurrent.thread
 internal class V8NodeTest : J2V8Test() {
 
     @Test
-    fun get() = v8.blockingLock {
+    fun get() = v8.evaluateInJSThreadBlocking(runtime) {
         val node = buildNodeFromMap(
             "string" to "thisisastring",
             "int" to 1,
@@ -68,7 +64,7 @@ internal class V8NodeTest : J2V8Test() {
     }
 
     @Test
-    fun getFunction() = v8.blockingLock {
+    fun getFunction() = v8.evaluateInJSThreadBlocking(runtime) {
         val node = buildNodeFromMap(
             "function" to Invokable { "classicstring" },
             "tuple" to Invokable { (p0, p1) -> listOf(p0, p1) },
@@ -226,31 +222,31 @@ internal class V8NodeTest : J2V8Test() {
 
         addThreads(
             thread {
-                v8.blockingLock {
+                v8.evaluateInJSThreadBlocking(runtime) {
                     runBlocking { delay(1000) }
                     assertEquals(1, node.getInt("int"))
                 }
             },
             thread(false) {
-                v8.blockingLock {
+                v8.evaluateInJSThreadBlocking(runtime) {
                     assertEquals("thisisastring", node["string"])
                 }
-                v8.blockingLock {
+                v8.evaluateInJSThreadBlocking(runtime) {
                     assertEquals("thisisastring", node.getString("string"))
                 }
-                v8.blockingLock {
+                v8.evaluateInJSThreadBlocking(runtime) {
                     assertEquals(1, node.getInt("int"))
                 }
                 assertEquals("thisisastring", node.get("string"))
             },
             thread(false) {
-                v8.blockingLock {
+                v8.evaluateInJSThreadBlocking(runtime) {
                     assertEquals("thisisastring", node["string"])
                 }
-                v8.blockingLock {
+                v8.evaluateInJSThreadBlocking(runtime) {
                     assertEquals("thisisastring", node.getString("string"))
                 }
-                v8.blockingLock {
+                v8.evaluateInJSThreadBlocking(runtime) {
                     assertEquals(1, node.getInt("int"))
                 }
                 assertEquals("thisisastring", node.get("string"))

@@ -2,13 +2,13 @@ package com.intuit.player.jvm.graaljs.bridge.runtime
 
 import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
-import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeContainer
 import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeFactory
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
 import com.intuit.player.jvm.core.bridge.serialization.serializers.playerSerializersModule
 import com.intuit.player.jvm.core.player.PlayerException
+import com.intuit.player.jvm.core.utils.InternalPlayerApi
 import com.intuit.player.jvm.graaljs.bridge.GraalNode
 import com.intuit.player.jvm.graaljs.bridge.serialization.format.GraalFormat
 import com.intuit.player.jvm.graaljs.bridge.serialization.format.GraalFormatConfiguration
@@ -27,12 +27,16 @@ import kotlinx.serialization.modules.plus
 import org.graalvm.polyglot.Context
 import org.graalvm.polyglot.Value
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.coroutines.EmptyCoroutineContext
 
 public fun Runtime(runtime: Context, config: GraalRuntimeConfig = GraalRuntimeConfig()): Runtime<Value> = GraalRuntime(config)
 
 internal class GraalRuntime(
     private val config: GraalRuntimeConfig
 ) : Runtime<Value> {
+
+    override val dispatcher: Nothing
+        get() = throw UnsupportedOperationException("dispatcher not defined for GraalRuntime")
 
     val context: Context by config::graalContext
 
@@ -64,7 +68,7 @@ internal class GraalRuntime(
     }
 
     override val scope: CoroutineScope by lazy {
-        CoroutineScope(Dispatchers.Default + SupervisorJob())
+        CoroutineScope(Dispatchers.Default + SupervisorJob()+ (config.coroutineExceptionHandler ?: EmptyCoroutineContext))
     }
 
     override fun execute(script: String): Any? = context.blockingLock {
@@ -88,6 +92,9 @@ internal class GraalRuntime(
             scope.cancel()
         }
     }
+
+    @InternalPlayerApi
+    override var checkBlockingThread: Thread.() -> Unit = {}
 
     override fun toString(): String = "Graal"
 

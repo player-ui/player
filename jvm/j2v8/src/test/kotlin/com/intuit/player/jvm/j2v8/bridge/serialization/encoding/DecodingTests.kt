@@ -5,7 +5,7 @@ import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.j2v8.*
 import com.intuit.player.jvm.j2v8.base.J2V8Test
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.decodeFromV8Value
-import com.intuit.player.jvm.j2v8.extensions.blockingLock
+import com.intuit.player.jvm.j2v8.extensions.evaluateInJSThreadBlocking
 import kotlinx.serialization.Serializable
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -13,39 +13,39 @@ import org.junit.jupiter.api.Test
 internal class PrimitiveDecoding : J2V8Test() {
 
     @Test
-    fun `decode string primitive`() = v8.blockingLock {
+    fun `decode string primitive`() = v8.evaluateInJSThreadBlocking(runtime) {
         assertEquals("hello", format.decodeFromV8Value<String>(V8Primitive("hello")))
     }
 
     @Test
-    fun `decode boolean primitive`() = v8.blockingLock {
+    fun `decode boolean primitive`() = v8.evaluateInJSThreadBlocking(runtime) {
         assertEquals(true, format.decodeFromV8Value<Boolean>(V8Primitive(true)))
     }
 
     @Test
-    fun `decode int primitive`() = v8.blockingLock {
+    fun `decode int primitive`() = v8.evaluateInJSThreadBlocking(runtime) {
         assertEquals(20, format.decodeFromV8Value(V8Primitive(20)))
     }
 
     @Test
-    fun `decode double primitive`() = v8.blockingLock {
+    fun `decode double primitive`() = v8.evaluateInJSThreadBlocking(runtime) {
         assertEquals(2.2, format.decodeFromV8Value(V8Primitive(2.2)))
     }
 
     @Test
-    fun `decode unit`() = v8.blockingLock {
+    fun `decode unit`() = v8.evaluateInJSThreadBlocking(runtime) {
         assertEquals(null, format.decodeFromV8Value<Boolean?>(V8.getUndefined()))
     }
 
     @Test
-    fun `decode null`() = v8.blockingLock {
+    fun `decode null`() = v8.evaluateInJSThreadBlocking(runtime) {
         assertEquals(null, format.decodeFromV8Value<Boolean?>(V8Null))
     }
 }
 
 internal class FunctionDecoding : J2V8Test() {
 
-    @Test fun `decode typed lambda`() = v8.blockingLock {
+    @Test fun `decode typed lambda`() = v8.evaluateInJSThreadBlocking(runtime) {
         val args = V8Array {
             push("PLAYER")
             push(1)
@@ -64,7 +64,7 @@ internal class FunctionDecoding : J2V8Test() {
         )
     }
 
-    @Test fun `decode invokable`() = v8.blockingLock {
+    @Test fun `decode invokable`() = v8.evaluateInJSThreadBlocking(runtime) {
         val args = V8Array {
             push("PLAYER")
             push(1)
@@ -83,7 +83,7 @@ internal class FunctionDecoding : J2V8Test() {
         )
     }
 
-    @Test fun `decode kcallable`() = v8.blockingLock {
+    @Test fun `decode kcallable`() = v8.evaluateInJSThreadBlocking(runtime) {
         @Serializable
         data class Container(
             val method: (String, Int) -> String

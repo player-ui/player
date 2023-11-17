@@ -16,12 +16,12 @@ public val Asset.value: String? get() = get("value") as? String
 /** Special [Node] type that also describes a player asset */
 @Serializable(with = Asset.Serializer::class)
 public open class Asset(override val node: Node) : Node by node, NodeWrapper {
-    public val id: String by NodeSerializableField(String.serializer()) {
+    public val id: String by NodeSerializableField(String.serializer(), NodeSerializableField.CacheStrategy.Full) {
         throw PlayerException("Asset's must be described with an ID")
     }
     public operator fun component1(): String = id
 
-    public val type: String by NodeSerializableField(String.serializer()) {
+    public val type: String by NodeSerializableField(String.serializer(), NodeSerializableField.CacheStrategy.Full) {
         throw PlayerException("Asset's must be described with a type")
     }
     public operator fun component2(): String = type

@@ -12,6 +12,7 @@ import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeContainer
 import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeFactory
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
 import com.intuit.player.jvm.core.bridge.serialization.serializers.playerSerializersModule
+import com.intuit.player.jvm.core.utils.InternalPlayerApi
 import com.intuit.player.jvm.j2v8.V8Null
 import com.intuit.player.jvm.j2v8.V8Primitive
 import com.intuit.player.jvm.j2v8.addPrimitive
@@ -19,18 +20,17 @@ import com.intuit.player.jvm.j2v8.bridge.V8Node
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.J2V8Format
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.J2V8FormatConfiguration
 import com.intuit.player.jvm.j2v8.bridge.serialization.serializers.V8ValueSerializer
-import com.intuit.player.jvm.j2v8.extensions.blockingLock
+import com.intuit.player.jvm.j2v8.extensions.evaluateInJSThreadBlocking
 import com.intuit.player.jvm.j2v8.extensions.handleValue
 import com.intuit.player.jvm.j2v8.extensions.unlock
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.plus
 import java.nio.file.Path
+import java.util.concurrent.Executors
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.pathString
 
@@ -48,7 +48,14 @@ public fun Runtime(globalAlias: String? = null, tempDirPrefix: String? = null): 
 
 internal class V8Runtime(private val config: J2V8RuntimeConfig) : Runtime<V8Value> {
 
-    val v8: V8 by config::runtime
+    lateinit var v8: V8; private set
+
+    override val dispatcher: ExecutorCoroutineDispatcher = config.dispatcher
+        ?: Executors.newSingleThreadExecutor {
+            Executors.defaultThreadFactory().newThread(it).apply {
+                name = "js-runtime"
+            }
+        }.asCoroutineDispatcher()
 
     override val format: J2V8Format = J2V8Format(
         J2V8FormatConfiguration(
@@ -63,18 +70,36 @@ internal class V8Runtime(private val config: J2V8RuntimeConfig) : Runtime<V8Valu
         )
     )
 
-    private val memoryScope: MemoryManager = MemoryManager(config.runtime)
+    private lateinit var memoryScope: MemoryManager; private set
 
     override val scope: CoroutineScope by lazy {
-        CoroutineScope(Dispatchers.Default + SupervisorJob())
+        // explicitly not using the JS specific dispatcher to avoid clogging up that thread
+        CoroutineScope(Dispatchers.Default + SupervisorJob() + (config.coroutineExceptionHandler ?: EmptyCoroutineContext))
     }
 
-    override fun execute(script: String): Any? = v8.blockingLock {
+    init {
+        // TODO: Uplevel suspension init towards creation point instead of runBlocking
+        runBlocking {
+            init()
+        }
+    }
+
+    // Call to initialize V8 -- needs to be invoked for V8 to be set, will acquire the lock for pre-created V8s on the
+    // single threaded executor (will fail if another thread has the lock). Otherwise, create a new V8 runtime
+    suspend fun init() {
+        withContext(dispatcher) {
+            v8 = config.runtime?.apply {
+                locker.acquire()
+            } ?: V8.createV8Runtime()
+            memoryScope = MemoryManager(v8)
+        }
+    }
+
+    override fun execute(script: String): Any? = v8.evaluateInJSThreadBlocking(runtime) {
         executeScript(script).handleValue(format)
     }
-
     override fun add(name: String, value: V8Value) {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             when (value) {
                 is V8Primitive -> addPrimitive(name, value)
                 else -> add(name, value)
@@ -82,19 +107,26 @@ internal class V8Runtime(private val config: J2V8RuntimeConfig) : Runtime<V8Valu
         }
     }
 
-    override fun <T> serialize(serializer: SerializationStrategy<T>, value: T): Any? = v8.blockingLock {
+    override fun <T> serialize(serializer: SerializationStrategy<T>, value: T): Any? = v8.evaluateInJSThreadBlocking(runtime) {
         format.encodeToRuntimeValue(serializer, value).handleValue(format)
     }
 
     override fun release() {
-        v8.blockingLock {
-            scope.cancel()
+        // cancel work in runtime scope
+        scope.cancel("releasing runtime")
+        // swap to dispatcher to release everything
+        runBlocking(dispatcher) {
             memoryScope.release()
-            runtime.release(true)
+            v8.release(true)
         }
+        // close dispatcher
+        dispatcher.close()
     }
 
-    override fun toString() = "J2V8"
+    @InternalPlayerApi
+    override var checkBlockingThread: Thread.() -> Unit = {}
+
+    override fun toString(): String = "J2V8"
 
     // Delegated Node members
     private val backingNode: Node = V8Node(v8, this)
@@ -134,7 +166,9 @@ public object J2V8 : PlayerRuntimeFactory<J2V8RuntimeConfig> {
 }
 
 public data class J2V8RuntimeConfig(
-    var runtime: V8 = V8.createV8Runtime().unlock(),
+    var runtime: V8? = null,
+    var dispatcher: ExecutorCoroutineDispatcher? = null,
+    override var coroutineExceptionHandler: CoroutineExceptionHandler? = null
 ) : PlayerRuntimeConfig()
 
 public class J2V8RuntimeContainer : PlayerRuntimeContainer {

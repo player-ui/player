@@ -13,8 +13,12 @@ import com.intuit.player.jvm.core.player.HeadlessPlayer.Companion.bundledSource
 import com.intuit.player.jvm.core.player.state.CompletedState
 import com.intuit.player.jvm.core.player.state.PlayerFlowState
 import com.intuit.player.jvm.core.player.state.ReleasedState
+import com.intuit.player.jvm.core.player.state.inProgressState
 import com.intuit.player.jvm.core.plugins.*
 import com.intuit.player.jvm.core.plugins.logging.loggers
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.net.URL
 
 /**
@@ -34,32 +38,45 @@ import java.net.URL
  */
 public class HeadlessPlayer @JvmOverloads public constructor(
     override val plugins: List<Plugin>,
-    public val runtime: Runtime<*> = runtimeFactory.create(),
+    explicitRuntime: Runtime<*>? = null,
     private val source: URL = bundledSource,
 ) : Player(), NodeWrapper {
 
     /** Convenience constructor to allow [plugins] to be passed as varargs */
     @JvmOverloads public constructor(
         vararg plugins: Plugin,
-        runtime: Runtime<*> = runtimeFactory.create(),
+        explicitRuntime: Runtime<*>? = null,
         source: URL = bundledSource
-    ) : this(plugins.toList(), runtime, source)
+    ) : this(plugins.toList(), explicitRuntime, source)
 
     public constructor(
-        runtime: Runtime<*>,
+        explicitRuntime: Runtime<*>,
         vararg plugins: Plugin,
-    ) : this(plugins.toList(), runtime)
+    ) : this(plugins.toList(), explicitRuntime)
 
     private val player: Node
 
     override val node: Node by ::player
 
-    override val logger: TapableLogger by NodeSerializableField(TapableLogger.serializer())
+    override val logger: TapableLogger by NodeSerializableField(TapableLogger.serializer(), NodeSerializableField.CacheStrategy.Full)
 
-    override val hooks: Hooks by NodeSerializableField(Hooks.serializer())
+    override val hooks: Hooks by NodeSerializableField(Hooks.serializer(), NodeSerializableField.CacheStrategy.Full)
 
     override val state: PlayerFlowState get() = if (player.isReleased()) ReleasedState else
         player.getInvokable<Node>("getState")!!().deserialize(PlayerFlowState.serializer())
+
+    public val runtime: Runtime<*> = explicitRuntime ?: runtimeFactory.create {
+        coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+            inProgressState?.fail(throwable) ?: logger.error(
+                "Exception caught in Player scope: ${throwable.message}",
+                throwable.stackTrace.joinToString("\n") {
+                    "\tat $it"
+                }.replaceFirst("\tat ", "\n")
+            )
+        }
+    }
+
+    override val scope: CoroutineScope by runtime::scope
 
     init {
         /** 1. load source into the [runtime] and release lock */
@@ -83,6 +100,18 @@ public class HeadlessPlayer @JvmOverloads public constructor(
         runtime.add("config", config)
         player = runtime.execute("new Player.Player(config)") as? Node
             ?: throw PlayerException("Couldn't create backing JS Player w/ config: $config")
+
+        // we only have access to the logger after we have the player instance
+        runtime.checkBlockingThread = {
+            if (name == "main") scope.launch {
+                logger.warn(
+                    "Main thread is blocking on JS runtime access: $this",
+                    stackTrace.joinToString("\n") {
+                        "\tat $it"
+                    }.replaceFirst("\tat ", "\n")
+                )
+            }
+        }
 
         /** 5. apply to player plugins */
         plugins
