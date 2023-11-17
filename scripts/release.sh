@@ -40,8 +40,10 @@ elif [ "$RELEASE_TYPE" == "release" ] && [ "$CURRENT_BRANCH" == "main" ]; then
   STABLE_DOCS_BASE_PATH=latest bazel run --verbose_failures --config=release //docs:deploy_docs -- --dest_dir latest
 fi
 
+# Commented out for now due to failures to deploy
+# causes lots of "java.io.IOException: io.grpc.StatusRuntimeException: CANCELLED: Failed to read message." messages in the build
 # Also deploy to the versioned folder for main releases
-if [ "$RELEASE_TYPE" == "release" ]; then
-  SEMVER_MAJOR=$(cat VERSION | cut -d. -f1)
-  STABLE_DOCS_BASE_PATH=$SEMVER_MAJOR bazel run --verbose_failures --config=release //docs:deploy_docs -- --dest_dir "$SEMVER_MAJOR"
-fi
+# if [ "$RELEASE_TYPE" == "release" ]; then
+#   SEMVER_MAJOR=$(cat VERSION | cut -d. -f1)
+#   STABLE_DOCS_BASE_PATH=$SEMVER_MAJOR bazel run --verbose_failures --config=release //docs:deploy_docs -- --dest_dir "$SEMVER_MAJOR"
+# fi

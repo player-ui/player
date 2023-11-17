@@ -2,7 +2,7 @@
 
 If you find something interesting you want contribute to the repo, feel free to raise a PR, or open an issue for features you'd like to see added.
 
-[For first time contributors](https://github.com/player-ui/player/newCONTRIBUTORS.md)
+[For first time contributors](./newCONTRIBUTORS.md)
 
 ## Proposing a Change
 
