@@ -134,6 +134,7 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
             it.doOnLayout { playerViewModel.logRenderTime(asset, System.currentTimeMillis() - startTime) }
         }
         if (animateTransition) {
+            binding.root.scrollTo(0, 0)
             buildTransitionAnimation()?.let {
                 view.transitionInto(binding.playerCanvas, it)
                 return
