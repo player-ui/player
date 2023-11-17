@@ -1,6 +1,8 @@
 package com.intuit.player.jvm.core.bridge.serialization.serializers
 
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.player.state.ErroneousState
+import com.intuit.player.jvm.core.player.state.PlayerFlowState
 import kotlinx.serialization.modules.PolymorphicModuleBuilder
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.plus
@@ -20,6 +22,8 @@ public val playerSerializersModule: SerializersModule = SerializersModule {
     polymorphic(Node::class, NodeSerializer()) {
         default { NodeSerializer() }
     }
+    
+    polymorphic(PlayerFlowState::class, ErroneousState::class, ErroneousState.serializer())
 
     polymorphic(Any::class) {
         registerThrowableSerializers()

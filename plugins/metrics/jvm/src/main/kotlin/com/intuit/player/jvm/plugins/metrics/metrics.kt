@@ -13,7 +13,6 @@ import kotlinx.serialization.builtins.serializer
 
 internal class TimingSerializer : PolymorphicNodeWrapperSerializer<Timing>() {
     override fun selectDeserializer(node: Node): KSerializer<out Timing> {
-        // TODO: Use local class discriminator
         return when (node.getBoolean("completed")) {
             true -> CompletedTiming.serializer()
             false -> IncompleteTiming.serializer()

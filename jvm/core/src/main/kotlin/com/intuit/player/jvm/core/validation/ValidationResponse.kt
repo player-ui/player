@@ -6,15 +6,14 @@ import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
-import com.intuit.player.jvm.core.bridge.serialization.serializers.PolymorphicNodeWrapperSerializer
-import com.intuit.player.jvm.core.player.PlayerException
-import kotlinx.serialization.KSerializer
+import com.intuit.player.jvm.core.experimental.RuntimeClassDiscriminator
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 
-@Serializable(with = ValidationResponseSerializer::class)
+@Serializable
+@RuntimeClassDiscriminator("severity")
 public sealed class ValidationResponse : NodeWrapper {
     /** The validation message to show to the user */
     public val message: String by NodeSerializableField(String.serializer())
@@ -31,21 +30,10 @@ public class WarningValidationResponse(override val node: Node) : ValidationResp
         node.getInvokable<Unit>("dismiss")?.invoke()
     }
 
-    internal object Serializer : NodeWrapperSerializer<WarningValidationResponse>(::WarningValidationResponse)
+    internal object Serializer : NodeWrapperSerializer<WarningValidationResponse>(::WarningValidationResponse, "warning")
 }
 
 @Serializable(with = ErrorValidationResponse.Serializer::class)
 public class ErrorValidationResponse(override val node: Node) : ValidationResponse() {
-    internal object Serializer : NodeWrapperSerializer<ErrorValidationResponse>(::ErrorValidationResponse)
-}
-
-// TODO: Replace with local class discriminator
-internal class ValidationResponseSerializer : PolymorphicNodeWrapperSerializer<ValidationResponse>() {
-    override fun selectDeserializer(node: Node): KSerializer<out ValidationResponse> {
-        return when (node.getString("severity")) {
-            "warning" -> WarningValidationResponse.serializer()
-            "error" -> ErrorValidationResponse.serializer()
-            else -> throw PlayerException("ValidationResponse must be Error or Warning")
-        }
-    }
+    internal object Serializer : NodeWrapperSerializer<ErrorValidationResponse>(::ErrorValidationResponse, "error")
 }

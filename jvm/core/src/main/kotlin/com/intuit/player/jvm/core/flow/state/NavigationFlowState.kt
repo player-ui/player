@@ -4,35 +4,23 @@ import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
-import com.intuit.player.jvm.core.bridge.serialization.serializers.PolymorphicNodeWrapperSerializer
+import com.intuit.player.jvm.core.experimental.RuntimeClassDiscriminator
 import com.intuit.player.jvm.core.expressions.Expression
 import com.intuit.player.jvm.core.flow.state.NavigationFlowStateType.*
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 
 /** The base representation of a state within a Flow */
-@Serializable(with = NavigationFlowState.NavigationFlowStateSerializer::class)
+@Serializable
+@RuntimeClassDiscriminator("state_type")
 public sealed class NavigationFlowState : NodeWrapper {
     /** A property to determine the type of state this is */
     public abstract val stateType: NavigationFlowStateType
-
-    // TODO: Replace with local class discriminator
-    internal class NavigationFlowStateSerializer : PolymorphicNodeWrapperSerializer<NavigationFlowState>() {
-        override fun selectDeserializer(node: Node): KSerializer<out NavigationFlowState> {
-            return when (NavigationFlowStateType.valueOf(node.getString("state_type") ?: "")) {
-                VIEW -> NavigationFlowViewState.serializer()
-                END -> NavigationFlowEndState.serializer()
-                FLOW -> NavigationFlowFlowState.serializer()
-                ACTION -> NavigationFlowActionState.serializer()
-                EXTERNAL -> NavigationFlowExternalState.serializer()
-            }
-        }
-    }
 }
 
 /** A generic state that can transition to another state */
+@Serializable
 public sealed class NavigationFlowTransitionableState(override val node: Node) : NavigationFlowState() {
     /** A mapping of transition-name to FlowState name */
     public val transitions: Map<String, String> by NodeSerializableField(MapSerializer(String.serializer(), String.serializer()))
@@ -55,7 +43,7 @@ public class NavigationFlowActionState internal constructor(override val node: N
      */
     public val exp: Expression by NodeSerializableField(Expression.serializer())
 
-    internal object Serializer : NodeWrapperSerializer<NavigationFlowActionState>(::NavigationFlowActionState)
+    internal object Serializer : NodeWrapperSerializer<NavigationFlowActionState>(::NavigationFlowActionState, ACTION.name)
 }
 
 /** An END state of the flow */
@@ -73,7 +61,7 @@ public class NavigationFlowEndState internal constructor(override val node: Node
      */
     public val outcome: String by NodeSerializableField(String.serializer()) { "" }
 
-    internal object Serializer : NodeWrapperSerializer<NavigationFlowEndState>(::NavigationFlowEndState)
+    internal object Serializer : NodeWrapperSerializer<NavigationFlowEndState>(::NavigationFlowEndState, END.name)
 }
 
 /**
@@ -90,7 +78,7 @@ public class NavigationFlowExternalState internal constructor(override val node:
     /** Getter for any additional properties */
     public operator fun get(name: String): Any? = node[name]
 
-    internal object Serializer : NodeWrapperSerializer<NavigationFlowExternalState>(::NavigationFlowExternalState)
+    internal object Serializer : NodeWrapperSerializer<NavigationFlowExternalState>(::NavigationFlowExternalState, EXTERNAL.name)
 }
 
 @Serializable(with = NavigationFlowFlowState.Serializer::class)
@@ -100,7 +88,7 @@ public class NavigationFlowFlowState internal constructor(override val node: Nod
 
     override val stateType: NavigationFlowStateType = FLOW
 
-    internal object Serializer : NodeWrapperSerializer<NavigationFlowFlowState>(::NavigationFlowFlowState)
+    internal object Serializer : NodeWrapperSerializer<NavigationFlowFlowState>(::NavigationFlowFlowState, FLOW.name)
 }
 
 /** A state representing a view */
@@ -111,5 +99,5 @@ public class NavigationFlowViewState internal constructor(override val node: Nod
 
     override val stateType: NavigationFlowStateType = VIEW
 
-    internal object Serializer : NodeWrapperSerializer<NavigationFlowViewState>(::NavigationFlowViewState)
+    internal object Serializer : NodeWrapperSerializer<NavigationFlowViewState>(::NavigationFlowViewState, VIEW.name)
 }
