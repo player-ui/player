@@ -120,7 +120,6 @@ jobs:
       - run:
           name: Set Ruby Version
           command: |
-            rbenv install 2.7.8
             rbenv global 2.7.8
             rbenv rehash
 
