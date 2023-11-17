@@ -51,10 +51,13 @@ cd $ANDROID_HOME
 curl https://dl.google.com/android/repository/commandlinetools-mac-$ANDROID_CMDLINE_TOOLS_VERSION.zip -o cmdline-tools.zip
 
 unzip cmdline-tools.zip
+mv cmdline-tools latest
+mkdir cmdline-tools
+mv latest cmdline-tools
 
 accept_all_android_licenses
 
-SDK_MANAGER=$ANDROID_HOME/cmdline-tools/bin/sdkmanager
+SDK_MANAGER=$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
 
 yes | $SDK_MANAGER --licenses
 yes | $SDK_MANAGER --update
