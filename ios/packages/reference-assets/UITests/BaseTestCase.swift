@@ -91,12 +91,12 @@ class BaseTestCase: AssetUITestCase {
         var attempts = 0
         while attempts < 5 {
             app.swipeUp()
+            XCTWaiter.delay(ms: 1)
             if app.buttons[mockName].exists {
                 break
             }
             attempts += 1
         }
-        XCTWaiter.delay(ms: 1)
         super.openFlow(mockName)
     }
 }
