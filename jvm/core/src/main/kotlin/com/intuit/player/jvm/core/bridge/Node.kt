@@ -4,7 +4,10 @@ import com.intuit.player.jvm.core.asset.Asset
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
 import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeFormat
 import com.intuit.player.jvm.core.bridge.serialization.format.serializer
+import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializer
+import com.intuit.player.jvm.core.experimental.ExperimentalPlayerApi
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 
@@ -99,6 +102,10 @@ public interface Node : Map<String, Any?> {
     public val runtime: Runtime<*>
 
     public val format: RuntimeFormat<*> get() = runtime.format
+
+    public companion object {
+        public fun serializer(): KSerializer<Node> = NodeSerializer()
+    }
 }
 
 public val NodeWrapper.runtime: Runtime<*> get() = node.runtime
@@ -128,6 +135,32 @@ public inline fun <reified R> Node.getInvokable(key: String): Invokable<R>? = ge
 public inline fun <reified R> Node.getInvokable(key: String, deserializer: DeserializationStrategy<R>?): Invokable<R>? = deserializer?.let {
     getInvokable(key, it)
 } ?: getInvokable(key)
+
+/**
+* Get the toString value of a symbol. Due to the current limitations of the
+* various supported JS runtimes, we can only reliably get a [String]
+* representation of symbols that are contained within a parent [Node].
+* This inherently breaks the uniqueness of symbol representation on the JVM,
+* and thus shouldn't be used to verify referential equality between symbols.
+*/
+@ExperimentalPlayerApi
+public fun Node.getSymbol(key: String): String? {
+    if (!runtime.containsKey("getSymbol"))
+        runtime.execute(
+            """
+            function getSymbol(parent, key) {
+                const value = parent[key];
+                if (typeof value === 'symbol') return value.toString();
+                else return null;
+            }
+        """
+        )
+
+    val getSymbol = runtime.getInvokable<String?>("getSymbol")
+        ?: throw runtime.PlayerRuntimeException("getSymbol doesn't exist in runtime")
+
+    return getSymbol(this, key)
+}
 
 private inline fun <reified T> Any?.safeCast(): T? = this as? T
 

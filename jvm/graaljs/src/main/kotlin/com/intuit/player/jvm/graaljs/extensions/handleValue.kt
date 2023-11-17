@@ -9,6 +9,7 @@ import com.intuit.player.jvm.core.bridge.serialization.format.serializer
 import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.player.jvm.graaljs.bridge.GraalNode
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import org.graalvm.polyglot.Value
@@ -27,6 +28,7 @@ private fun Value.transform(format: RuntimeFormat<Value>): Any? = when {
     }
     hasArrayElements() -> toList(format)
     canExecute() -> toInvokable<Any>(format, format.serializer())
+    metaObject.toString() == "symbol" -> null // this is also awful, but consistent w/ j2v8
     else -> when (this.`as`(Any::class.java)) {
         is Int -> asInt()
         is Double, is Long -> try { asInt() } catch (e: Exception) { asDouble() }
@@ -39,7 +41,7 @@ private fun Value.transform(format: RuntimeFormat<Value>): Any? = when {
         * Refer to the tests in NodeSerializationTest
         * */
         is Map<*, *> -> if (canInvokeMember("getGraalObject")) invokeMember("getGraalObject").toNode(format) else toNode(format)
-        else -> null
+        else -> throw SerializationException("Value ($this) of type (${this::class.java}) is unknown")
     }
 }
 

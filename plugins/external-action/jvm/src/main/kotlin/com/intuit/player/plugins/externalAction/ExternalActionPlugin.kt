@@ -35,7 +35,7 @@ public class ExternalActionPlugin(
         runtime.add("externalActionHandler") externalActionHandler@{ state: Node, options: Node ->
             val state = state.deserialize(NavigationFlowState.serializer())
                 as? NavigationFlowExternalState ?: return@externalActionHandler null
-            val options = options.deserialize(ControllerState.serializer())!!
+            val options = options.deserialize(ControllerState.serializer())
 
             return@externalActionHandler runtime.Promise<Any> { resolve, _ ->
                 handler?.onExternalState(state, options, resolve)

@@ -4,7 +4,7 @@ import com.intuit.player.jvm.core.bridge.Completable
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
 import com.intuit.player.jvm.core.bridge.hooks.NodeSyncHook1
-import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField.Companion.NodeSerializableField
+import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.player.jvm.core.data.DataController
 import com.intuit.player.jvm.core.experimental.ExperimentalPlayerApi

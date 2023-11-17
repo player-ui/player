@@ -7,7 +7,7 @@ import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
 import com.intuit.player.jvm.core.bridge.runtime.add
 import com.intuit.player.jvm.core.bridge.runtime.runtimeFactory
-import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField.Companion.NodeSerializableField
+import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.player.jvm.core.logger.TapableLogger
 import com.intuit.player.jvm.core.player.HeadlessPlayer.Companion.bundledSource
 import com.intuit.player.jvm.core.player.state.CompletedState

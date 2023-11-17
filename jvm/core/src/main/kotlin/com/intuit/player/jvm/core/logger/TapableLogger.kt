@@ -7,7 +7,7 @@ import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.hooks.NodeSyncHook1
 import com.intuit.player.jvm.core.bridge.hooks.SyncHook1
 import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
-import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField.Companion.NodeSerializableField
+import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.player.jvm.core.plugins.LoggerPlugin
 import kotlinx.serialization.Serializable

@@ -40,7 +40,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         val state = player.state
         assertTrue(state is NotStartedState)
         assertEquals(PlayerFlowStatus.NOT_STARTED, state.status)
-        assertNull(state.ref)
+        assertEquals("Symbol(not-started)", state.ref)
     }
 
     @TestTemplate
@@ -165,7 +165,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         val state = player.state
         assertTrue(state is InProgressState)
         assertEquals(PlayerFlowStatus.IN_PROGRESS, state.status)
-        assertNull(state.ref)
+        assertEquals("Symbol(generated-flow)", state.ref)
 
         state as InProgressState
         val flowResultCompletable = state.flowResult

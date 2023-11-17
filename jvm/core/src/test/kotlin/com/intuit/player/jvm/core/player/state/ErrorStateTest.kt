@@ -1,14 +1,15 @@
 package com.intuit.player.jvm.core.player.state
 
 import com.intuit.player.jvm.core.NodeBaseTest
-import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeFormat
+import com.intuit.player.jvm.core.bridge.Invokable
+import com.intuit.player.jvm.core.bridge.getInvokable
+import com.intuit.player.jvm.core.bridge.runtime.Runtime
 import com.intuit.player.jvm.core.flow.Flow
 import com.intuit.player.jvm.core.player.PlayerException
 import com.intuit.player.jvm.core.player.PlayerFlowStatus
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.modules.EmptySerializersModule
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -21,12 +22,16 @@ internal class ErrorStateTest : NodeBaseTest() {
 
     @BeforeEach
     fun setUpMocks() {
-        every { node.getString("ref") } returns "someRef"
+        val runtime: Runtime<*> = mockk()
+        every { node.runtime } returns runtime
+        every { runtime.containsKey("getSymbol") } returns true
+        every { runtime.getInvokable<String?>("getSymbol") } returns Invokable { "Symbol(hello)" }
         every { node.getSerializable("flow", Flow.serializer()) } returns Flow("flowId")
-
-        val mockFormat: RuntimeFormat<*> = mockk()
-        every { node.format } returns mockFormat
-        every { mockFormat.serializersModule } returns EmptySerializersModule
+        every { node.getSerializable("error", any<KSerializer<Throwable>>()) } returns null
+        every { node.getString("error") } returns "hello"
+        every { node.getObject("error") } returns null
+        every { node.getObject("flow") } returns null
+        every { node.nativeReferenceEquals(any()) } returns false
     }
 
     @Test
@@ -48,7 +53,7 @@ internal class ErrorStateTest : NodeBaseTest() {
 
     @Test
     fun ref() {
-        assertEquals("someRef", errorState.ref)
+        assertEquals("Symbol(hello)", errorState.ref)
     }
 
     @Test

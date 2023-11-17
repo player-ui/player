@@ -1,4 +1,5 @@
 package com.intuit.player.jvm.core.bridge.hooks
+
 import com.intuit.hooks.HookContext
 import com.intuit.hooks.SyncHook
 import com.intuit.player.jvm.core.bridge.Node

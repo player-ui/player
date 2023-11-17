@@ -3,7 +3,9 @@ package com.intuit.player.jvm.core.bridge.hooks
 import com.intuit.hooks.HookContext
 import com.intuit.hooks.SyncWaterfallHook
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
 
 /**
  * A note of caution when using these hooks. Waterfall hooks act as accumulators, applying the tapped functions
@@ -17,6 +19,7 @@ import kotlinx.serialization.KSerializer
  * outside of the tapped function, this can be done by reading the information and storing it in a non-Node backed
  * object from within the tapped function.
  */
+@Serializable(NodeSyncWaterfallHook1.Serializer::class)
 public class NodeSyncWaterfallHook1<T1>(override val node: Node, private val serializer1: KSerializer<T1>) : SyncWaterfallHook<(HookContext, T1?) -> T1?, T1?>(), NodeHook<T1?> {
 
     init { init(serializer1) }
@@ -36,8 +39,13 @@ public class NodeSyncWaterfallHook1<T1>(override val node: Node, private val ser
     public inline fun tap(noinline callback: (T1?) -> T1?): String? = tap(callingStackTraceElement.toString(), callback)
 
     public inline fun tap(noinline callback: (HookContext, T1?) -> T1?): String? = tap(callingStackTraceElement.toString(), callback)
+
+    internal class Serializer<T1>(private val serializer1: KSerializer<T1>) : NodeWrapperSerializer<NodeSyncWaterfallHook1<T1>>({
+        NodeSyncWaterfallHook1(it, serializer1)
+    })
 }
 
+@Serializable(NodeSyncWaterfallHook2.Serializer::class)
 public class NodeSyncWaterfallHook2<T1, T2>(
     override val node: Node,
     private val serializer1: KSerializer<T1>,
@@ -62,4 +70,8 @@ public class NodeSyncWaterfallHook2<T1, T2>(
     public inline fun tap(noinline callback: (T1?, T2?) -> T1?): String? = tap(callingStackTraceElement.toString(), callback)
 
     public inline fun tap(noinline callback: (HookContext, T1?, T2?) -> T1?): String? = tap(callingStackTraceElement.toString(), callback)
+
+    internal class Serializer<T1, T2>(private val serializer1: KSerializer<T1>, private val serializer2: KSerializer<T2>) : NodeWrapperSerializer<NodeSyncWaterfallHook2<T1, T2>>({
+        NodeSyncWaterfallHook2(it, serializer1, serializer2)
+    })
 }

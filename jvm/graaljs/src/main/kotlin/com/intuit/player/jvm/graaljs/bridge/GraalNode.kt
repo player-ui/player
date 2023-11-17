@@ -70,9 +70,9 @@ internal open class GraalNode(override val graalObject: Value, override val runt
 
     override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>): T? {
         return graalObject.blockingLock {
-            if (memberKeys.contains(key))
-                format.decodeFromRuntimeValue(deserializer, graalObject.getMember(key))
-            else null
+            key.takeIf(graalObject::hasMember)
+                ?.let(graalObject::getMember)
+                ?.let { format.decodeFromRuntimeValue(deserializer, it) }
         }
     }
 

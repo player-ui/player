@@ -2,12 +2,15 @@ package com.intuit.player.jvm.core.flow.state
 
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
+import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.player.jvm.core.bridge.serialization.serializers.PolymorphicNodeWrapperSerializer
 import com.intuit.player.jvm.core.expressions.Expression
 import com.intuit.player.jvm.core.flow.state.NavigationFlowStateType.*
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
 
 /** The base representation of a state within a Flow */
 @Serializable(with = NavigationFlowState.NavigationFlowStateSerializer::class)
@@ -15,6 +18,7 @@ public sealed class NavigationFlowState : NodeWrapper {
     /** A property to determine the type of state this is */
     public abstract val stateType: NavigationFlowStateType
 
+    // TODO: Replace with local class discriminator
     internal class NavigationFlowStateSerializer : PolymorphicNodeWrapperSerializer<NavigationFlowState>() {
         override fun selectDeserializer(node: Node): KSerializer<out NavigationFlowState> {
             return when (NavigationFlowStateType.valueOf(node.getString("state_type") ?: "")) {
@@ -31,13 +35,10 @@ public sealed class NavigationFlowState : NodeWrapper {
 /** A generic state that can transition to another state */
 public sealed class NavigationFlowTransitionableState(override val node: Node) : NavigationFlowState() {
     /** A mapping of transition-name to FlowState name */
-    public val transitions: Map<String, String>
-        get() = node.getObject("transitions")?.run {
-            keys.map { it to (this.getString(it) ?: "") }.toMap()
-        } ?: emptyMap()
+    public val transitions: Map<String, String> by NodeSerializableField(MapSerializer(String.serializer(), String.serializer()))
 
     /** An id corresponding to a view from the 'views' array */
-    public val ref: String get() = node.getString("ref") ?: ""
+    public val ref: String by NodeSerializableField(String.serializer())
 }
 
 /** Action states execute an expression to determine the next state to transition to */
@@ -52,7 +53,7 @@ public class NavigationFlowActionState internal constructor(override val node: N
      * An expression to execute.
      * The return value determines the transition to take
      */
-    public val exp: Expression get() = node.getSerializable("exp", Expression.serializer())!!
+    public val exp: Expression by NodeSerializableField(Expression.serializer())
 
     internal object Serializer : NodeWrapperSerializer<NavigationFlowActionState>(::NavigationFlowActionState)
 }
@@ -70,7 +71,7 @@ public class NavigationFlowEndState internal constructor(override val node: Node
      * A description of _how_ the flow ended.
      * If this is a flow started from another flow, the outcome determines the flow transition
      */
-    public val outcome: String get() = node.getString("outcome") ?: ""
+    public val outcome: String by NodeSerializableField(String.serializer()) { "" }
 
     internal object Serializer : NodeWrapperSerializer<NavigationFlowEndState>(::NavigationFlowEndState)
 }

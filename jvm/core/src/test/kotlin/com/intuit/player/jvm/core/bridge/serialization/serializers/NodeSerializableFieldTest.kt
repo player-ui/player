@@ -146,4 +146,23 @@ internal class NodeSerializableFieldTest : RuntimeTest() {
         assertEquals(10, wrapper.primitive)
         assertEquals(20, wrapper.nested.primitive)
     }
+
+    @TestTemplate fun `default value when non nullable returns null`() {
+        val delegate = NodeSerializableField({ node }, defaultValue = { 100 })
+        val noKeyEntry by delegate
+        assertEquals(100, noKeyEntry)
+    }
+
+    @TestTemplate fun `JsonNull is unfortunately not handled automatically`() {
+        var callCount = 0
+        val json: JsonElement by NodeSerializableField({ runtime }) { callCount++; JsonNull }
+        assertEquals(JsonNull, json)
+
+        runtime.execute("var json = 20;")
+        assertEquals(JsonPrimitive(20), json)
+
+        runtime.execute("json = { hello: 'world' };")
+        assertEquals(JsonObject(mapOf("hello" to JsonPrimitive("world"))), json)
+        assertEquals(1, callCount)
+    }
 }

@@ -5,7 +5,6 @@ import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeDecodingExc
 import com.intuit.player.jvm.core.bridge.serialization.json.isJsonElementSerializer
 import com.intuit.player.jvm.core.bridge.serialization.json.value
 import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
-import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializer
 import com.intuit.player.jvm.core.utils.InternalPlayerApi
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.PolymorphicSerializer
@@ -17,6 +16,7 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.modules.SerializersModule
 import kotlin.reflect.full.isSubclassOf
 
+// TODO: Better support for nullish values
 /** Common decoder base implementation to support decoding [T] runtime objects */
 @InternalPlayerApi
 public abstract class AbstractRuntimeValueDecoder<T> : RuntimeValueDecoder<T> {
@@ -33,7 +33,7 @@ public abstract class AbstractRuntimeValueDecoder<T> : RuntimeValueDecoder<T> {
 
         // handle json serializers separately because they don't support custom decoders
         deserializer.isJsonElementSerializer -> when {
-            decodeNotNullMark() -> Json.encodeToJsonElement(NodeSerializer(), decodeValue() as Node)
+            decodeNotNullMark() -> Json.encodeToJsonElement(GenericSerializer(), decodeValue())
             else -> JsonNull
         } as T
 

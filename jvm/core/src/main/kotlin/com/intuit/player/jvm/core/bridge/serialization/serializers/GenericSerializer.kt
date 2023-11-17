@@ -52,7 +52,7 @@ public open class GenericSerializer(private val typeSerializers: List<KSerialize
     }
 
     /** Will attempt to find a registered serializer on the companion for whatever class the [value] */
-    @OptIn(ExperimentalStdlibApi::class, InternalSerializationApi::class)
+    @OptIn(InternalSerializationApi::class)
     override fun serialize(encoder: Encoder, value: Any?): Unit = when (value) {
         null -> encoder.encodeNull()
         else -> encoder.encodeSerializableValue(
