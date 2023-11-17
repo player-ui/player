@@ -51,10 +51,48 @@ public struct WrappedFunction<T>: JSValueBacked, Decodable, Hashable {
     /**
      Executes the function and returns the customType specified
      */
-    public func callAsFunction<T>(customType: T.Type, args: Any...) throws -> T? where T: Decodable {
+    public func callAsFunction<U>(customType: U.Type, args: Any...) throws -> U? where U: Decodable {
         guard let jsValue = rawValue else { throw DecodingError.malformedData }
         let decodedState = try JSONDecoder().decode(customType, from: jsValue.call(withArguments: args))
         return decodedState
+    }
+}
+
+extension WrappedFunction where T: Decodable {
+    public enum Error: Swift.Error, Equatable {
+        /// There was a failure in the promise from calling a JS function
+        case promiseFailed(error: String)
+    }
+
+    public func callAsFunctionAsync(args: Any...) async throws -> T {
+        try await withCheckedThrowingContinuation { continuation in
+            guard let jsValue = rawValue else { return continuation.resume(throwing: DecodingError.malformedData) }
+
+            let promiseHandler: @convention(block) (JSValue) -> Void = {
+                do {
+                    let value = try JSONDecoder().decode(T.self, from: $0)
+                    continuation.resume(returning: value)
+                } catch {
+                    continuation.resume(throwing: error)
+                }
+            }
+
+            let errorHandler: @convention(block) (JSValue) -> Void = { error in
+                return continuation.resume(throwing: WrappedFunction.Error.promiseFailed(error: error.toString()))
+            }
+
+            guard
+                let context = jsValue.context,
+                let callback = JSValue(object: promiseHandler, in: context),
+                let catchCallback = JSValue(object: errorHandler, in: context)
+            else {
+                return continuation.resume(throwing: PlayerError.jsConversionFailure)
+            }
+
+            jsValue.call(withArguments: args)
+                .invokeMethod("then", withArguments: [callback])
+                .invokeMethod("catch", withArguments: [catchCallback])
+        }
     }
 }
 
