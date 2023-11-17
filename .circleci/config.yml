@@ -3,7 +3,7 @@ version: 2.1
 parameters:
   GHA_Action:
     type: string
-    default: ""
+    default: ''
   should_release:
     type: boolean
     default: false
@@ -20,21 +20,21 @@ executors:
     working_directory: ~/player
     resource_class: xlarge
     environment:
-      TZ: "/usr/share/zoneinfo/America/Los_Angeles"
+      TZ: '/usr/share/zoneinfo/America/Los_Angeles'
   ios:
     working_directory: ~/player
     resource_class: macos.m1.medium.gen1
     macos:
       xcode: 14.3
     environment:
-      TZ: "/usr/share/zoneinfo/America/Los_Angeles"
+      TZ: '/usr/share/zoneinfo/America/Los_Angeles'
   android:
     machine:
       image: android:202102-01
     working_directory: ~/player
     resource_class: large
     environment:
-      TZ: "/usr/share/zoneinfo/America/Los_Angeles"
+      TZ: '/usr/share/zoneinfo/America/Los_Angeles'
 
 commands:
   auto_shipit:
@@ -55,9 +55,9 @@ commands:
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
       - run: echo -e $GPG_KEY | gpg --import --batch
       - run: |
-            source ~/.bashrc
-            bundle install
-            npx auto shipit --only-graduate-with-release-label -vv
+          source ~/.bashrc
+          bundle install
+          npx auto shipit --only-graduate-with-release-label -vv
 
 jobs:
   setup:
@@ -120,8 +120,8 @@ jobs:
       - run:
           name: Set Ruby Version
           command: |
-            rbenv install 2.6.10
-            rbenv global 2.6.10
+            rbenv install 2.7.8
+            rbenv global 2.7.8
             rbenv rehash
 
       - restore_cache:
@@ -164,9 +164,9 @@ jobs:
             - ~/.gem/ruby/2.7.5
 
       - macos/preboot-simulator:
-          version: "15.5"
-          platform: "iOS"
-          device: "iPhone 13"
+          version: '15.5'
+          platform: 'iOS'
+          device: 'iPhone 13'
 
       - run: bazel sync
 
@@ -298,7 +298,7 @@ jobs:
     steps:
       - run:
           name: Cleanup Applitools
-          command: "curl -X POST \"$APPLITOOLS_SERVER_URL/api/externals/github/servers/github.com/commit/$CIRCLE_SHA1/complete?apiKey=$APPLITOOLS_API_KEY\" -H Content-Type:application/json --data '{\"serverId\": \"github.com\", \"commitSha\": \"$CIRCLE_SHA1\"}' -v -L"
+          command: 'curl -X POST "$APPLITOOLS_SERVER_URL/api/externals/github/servers/github.com/commit/$CIRCLE_SHA1/complete?apiKey=$APPLITOOLS_API_KEY" -H Content-Type:application/json --data ''{"serverId": "github.com", "commitSha": "$CIRCLE_SHA1"}'' -v -L'
 
 workflows:
   build_and_test_pr:
@@ -451,7 +451,7 @@ workflows:
 
   build_and_test_main:
     when:
-      equal: [ "", << pipeline.parameters.GHA_Action >> ]
+      equal: ['', << pipeline.parameters.GHA_Action >>]
     jobs:
       - setup:
           filters:
@@ -495,7 +495,7 @@ workflows:
 
   release:
     when:
-      equal: [ release, << pipeline.parameters.GHA_Action >> ]
+      equal: [release, << pipeline.parameters.GHA_Action >>]
     jobs:
       - setup
 
