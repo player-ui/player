@@ -90,4 +90,9 @@ public struct MetaData: Codable, Hashable {
 
     /// The role of this asset
     public var role: String?
+
+    public init(beacon: AnyType?, role: String? = nil) {
+        self.beacon = beacon
+        self.role = role
+    }
 }
