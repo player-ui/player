@@ -64,7 +64,7 @@ export const PlayerFlowSummary = (props: PlayerFlowSummaryProps) => {
 
       {props.error && (
         <Code colorScheme="red">
-          <pre>{props.error?.message}</pre>
+          <pre data-automation-id="Error-Content">{props.error?.message}</pre>
         </Code>
       )}
 

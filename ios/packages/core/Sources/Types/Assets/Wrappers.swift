@@ -81,11 +81,6 @@ extension AssetData where Self: Equatable {
     }
 }
 
-public struct DefaultAdditionalData: Decodable, Equatable {
-    /// MetaData associated with the asset in this wrapper
-    public var metaData: MetaData?
-}
-
 /**
  MetaData associated with an asset
  */
@@ -95,4 +90,9 @@ public struct MetaData: Codable, Hashable {
 
     /// The role of this asset
     public var role: String?
+
+    public init(beacon: AnyType?, role: String? = nil) {
+        self.beacon = beacon
+        self.role = role
+    }
 }

@@ -1,3 +1,38 @@
+# 0.4.3 (Fri Nov 17 2023)
+
+### Release Notes
+
+#### Add Automation ID to Error Element in Storybook ([#245](https://github.com/player-ui/player/pull/245))
+
+Storybook error element has a `data-automation-id` property which allows it to be programmably found in tests
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#247](https://github.com/player-ui/player/pull/247) ([@intuit-svc](https://github.com/intuit-svc))
+- Add Automation ID to Error Element in Storybook [#245](https://github.com/player-ui/player/pull/245) ([@KetanReddy](https://github.com/KetanReddy))
+- iOS: port async WrappedFunction update [#244](https://github.com/player-ui/player/pull/244) ([@hborawski](https://github.com/hborawski))
+- iOS: rewrite publisher assertions to be async [#234](https://github.com/player-ui/player/pull/234) ([@hborawski](https://github.com/hborawski))
+- Fix PR Titles Created During Release [#242](https://github.com/player-ui/player/pull/242) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 🏠 Internal
+
+- Update auto version. Filter release trigger from changelogs [#243](https://github.com/player-ui/player/pull/243) ([@adierkens](https://github.com/adierkens))
+
+#### 📝 Documentation
+
+- Update broken link in contributing docs [#238](https://github.com/player-ui/player/pull/238) ([@adierkens](https://github.com/adierkens))
+
+#### Authors: 4
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.4.2 (Thu Nov 16 2023)
 
 ### Release Notes
