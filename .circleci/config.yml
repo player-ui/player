@@ -119,6 +119,7 @@ jobs:
           name: Homebrew Dependencies
           shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
           command: |
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
             HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@17
 
       - run:
