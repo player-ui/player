@@ -117,14 +117,11 @@ jobs:
       
       - run:
           name: Homebrew Dependencies
-          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
           command: |
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
             HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@17
 
       - run:
           name: Set Ruby Version
-          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
           command: |
             rbenv global 2.7.8
             rbenv rehash
@@ -137,7 +134,6 @@ jobs:
 
       - run:
           name: Install Android tools
-          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
           command: |
             sh scripts/install-android-tools.sh
             echo 'export ANDROID_SDK_HOME=$ANDROID_HOME'  >> $BASH_ENV
@@ -156,7 +152,6 @@ jobs:
             - ~/android-tools
 
       - run:
-          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
           command: gem install bundler
 
       - restore_cache:
@@ -179,18 +174,15 @@ jobs:
           device: 'iPhone 13'
 
       - run:
-          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
           command: bazel sync
 
       - run: 
-          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
           command: |
             BUNDLE_TARGETS=$(bazel query "attr(name, '^.*_Bundles$', //...)" --output label 2>/dev/null | tr '\n' ' ')
             bazel build --config=ci $BUNDLE_TARGETS
 
       - run: bazel shutdown
       - run: 
-          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
           command: cd xcode && bundle exec pod install
 
       - run: 
@@ -199,7 +191,6 @@ jobs:
 
       # TODO: the timeout should be added to the test itself
       - run: 
-          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
           command: bazel test --test_env=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --test_env=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --test_env=APPLITOOLS_PR_NUMBER=${CIRCLE_PULL_REQUEST##*/} --test_timeout=1200 --jobs=1 --verbose_failures --config=ci  -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
 
       - run:
