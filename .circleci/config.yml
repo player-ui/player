@@ -152,7 +152,6 @@ jobs:
             - ~/android-tools
 
       - run:
-          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
           command: gem install bundler
 
       - restore_cache:
