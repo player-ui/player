@@ -1,3 +1,22 @@
+# 0.4.4 (Mon Nov 20 2023)
+
+#### 🐛 Bug Fix
+
+- Release main [#249](https://github.com/player-ui/player/pull/249) ([@intuit-svc](https://github.com/intuit-svc))
+- iOS: make AssetBeacon equatable and add public init for metadata [#248](https://github.com/player-ui/player/pull/248) ([@hborawski](https://github.com/hborawski))
+
+#### 🏠 Internal
+
+- Update ruby version in build [#246](https://github.com/player-ui/player/pull/246) ([@adierkens](https://github.com/adierkens))
+
+#### Authors: 3
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+
+---
+
 # 0.4.3 (Fri Nov 17 2023)
 
 ### Release Notes
