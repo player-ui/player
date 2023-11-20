@@ -161,7 +161,9 @@ jobs:
 
       - run:
           shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
-          command: bundle install
+          command: |
+            bundle update --bundler
+            bundle install
 
       - save_cache:
           key: gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
