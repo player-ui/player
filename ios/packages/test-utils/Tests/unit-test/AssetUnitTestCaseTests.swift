@@ -133,7 +133,7 @@ class AssetUnitTestCaseTests: SwiftUIAssetUnitTestCase {
         asset.model.data.function = function
 
         asset.model.data.function?.callAsFunction()
-        wait(for: [functionExpecation], timeout: 1)
+        await fulfillment(of: [functionExpecation], timeout: 1)
     }
 
     func testNotEquatableAssetDatasAreNotEqual() {

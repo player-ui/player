@@ -64,4 +64,54 @@ describe('action transform', () => {
     await (ref.player.getState() as InProgressState).flowResult;
     expect(ref.player.getState().status).toBe('completed');
   });
+
+  it('prev button transitions', async () => {
+    const ref = runTransform('action', actionTransform, {
+      id: 'test-flow',
+      views: [
+        {
+          type: 'action',
+          id: 'view-1',
+          value: 'Prev',
+        },
+        {
+          type: 'action',
+          id: 'view-2',
+          value: 'Prev',
+        },
+      ],
+      navigation: {
+        BEGIN: 'FLOW_1',
+        FLOW_1: {
+          startState: 'view_1',
+          view_1: {
+            state_type: 'VIEW',
+            ref: 'view-1',
+            transitions: {
+              '*': 'view_2',
+            },
+          },
+          view_2: {
+            state_type: 'VIEW',
+            ref: 'view-2',
+            transitions: {
+              '*': 'end',
+            },
+          },
+          end: {
+            state_type: 'END',
+            outcome: 'done',
+          },
+        },
+      },
+    });
+    expect(ref?.current?.metaData?.role).toBe('back');
+    expect(ref.current?.id).toBe('view-1');
+    ref.current?.run();
+    expect(ref.current?.id).toBe('view-2');
+    ref.current?.run();
+
+    await (ref.player.getState() as InProgressState).flowResult;
+    expect(ref.player.getState().status).toBe('completed');
+  });
 });

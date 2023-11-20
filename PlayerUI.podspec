@@ -84,8 +84,12 @@ and display it as a SwiftUI view comprised of registered assets.
         {
         :name => 'Mock Generation',
         :execution_position => :before_compile,
+        :shell_path => '/bin/zsh',
         :script => <<-SCRIPT
           cd ${SRCROOT}/../../ios/packages/demo/scripts
+          if test -f ~/.zshrc; then
+            source ~/.zshrc
+          fi
           ./generateFlowSections.js
         SCRIPT
       }
@@ -271,6 +275,14 @@ and display it as a SwiftUI view comprised of registered assets.
     }
   end
 
+  s.subspec 'ComputedPropertiesPlugin' do |plugin|
+    plugin.dependency 'PlayerUI/Core'
+    plugin.source_files = 'ios/plugins/ComputedPropertiesPlugin/Sources/**/*'
+    plugin.resource_bundles = {
+      'ComputedPropertiesPlugin' => ['ios/plugins/ComputedPropertiesPlugin/Resources/**/*.js']
+    }
+  end
+
   s.subspec 'CommonExpressionsPlugin' do |plugin|
     plugin.dependency 'PlayerUI/Core'
     plugin.source_files = 'ios/plugins/CommonExpressionsPlugin/Sources/**/*'
@@ -332,6 +344,12 @@ and display it as a SwiftUI view comprised of registered assets.
     plugin.dependency 'PlayerUI/SwiftUI'
     plugin.dependency 'PlayerUI/CheckPathPlugin'
     plugin.source_files = 'ios/plugins/SwiftUICheckPathPlugin/Sources/**/*'
+  end
+
+  s.subspec 'SwiftUIPendingTransactionPlugin' do |plugin|
+    plugin.dependency 'PlayerUI/Core'
+    plugin.dependency 'PlayerUI/SwiftUI'
+    plugin.source_files = 'ios/plugins/SwiftUIPendingTransactionPlugin/Sources/**/*'
   end
 
   s.subspec 'TypesProviderPlugin' do |plugin|

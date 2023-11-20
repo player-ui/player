@@ -63,22 +63,22 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
      - returns: An array of arguments to construct the plugin
      */
     override open func getArguments() -> [Any] {
-        let callback: @convention(block) (JSValue, JSValue) -> JSValue? = { (state, options) in
+        let callback: @convention(block) (JSValue, JSValue) -> JSValue? = { [weak self] (state, options) in
             guard
-                let context = self.context,
+                let context = self?.context,
                 let controllers = PlayerControllers(from: options),
                 let promise = JSUtilities.createPromise(context: context, handler: { (resolve, reject) in
-                    self.isExternalState = true
+                    self?.isExternalState = true
                     let state = NavigationFlowExternalState(state)
-                    self.state = state
+                    self?.state = state
                     do {
-                        self.content = try self.handler?(state, controllers) { transition in
+                        self?.content = try self?.handler?(state, controllers) { transition in
                             resolve(transition)
                             withAnimation {
-                                self.isExternalState = false
-                                self.state = nil
+                                self?.isExternalState = false
+                                self?.state = nil
                             }
-                            self.content = nil
+                            self?.content = nil
                         }
                     } catch {
                         reject(JSValue(newErrorFromMessage: error.playerDescription, in: context) as Any)

@@ -163,8 +163,28 @@ static let actionNavigation: String = """
               "asset": {
                 "id": "action-prev-id",
                 "type": "text",
-                "value": "Go Back"
+                "value": "Go Back Without Icon"
               }
+            },
+            "metaData": {
+              "role": ""
+            }
+          }
+        },
+        {
+          "asset": {
+            "id": "action-prev-without-icon",
+            "type": "action",
+            "value": "Prev",
+            "label": {
+              "asset": {
+                "id": "action-prev-id-without-icon",
+                "type": "text",
+                "value": "Go Back With Role"
+              }
+            },
+            "metaData": {
+              "role": "back"
             }
           }
         },
@@ -295,6 +315,144 @@ static let collectionBasic: String = """
       "VIEW_1": {
         "state_type": "VIEW",
         "ref": "view-1",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+"""
+static let imageBasic: String = """
+{
+  "id": "generated-flow",
+  "views": [
+    {
+      "id": "image-1",
+      "type": "image",
+      "metaData": {
+        "ref": "https://player-ui.github.io/latest/logo/logo-light-large.png"
+      }
+    }
+  ],
+  "data": {},
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "image-1",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+"""
+static let imageWithAccessibility: String = """
+{
+  "id": "generated-flow",
+  "views": [
+    {
+      "id": "image-1",
+      "type": "image",
+      "metaData": {
+        "ref": "https://player-ui.github.io/latest/logo/logo-light-large.png",
+        "accessibility": "This is accessibility text for an image"
+      },
+      "placeholder": "This is placeholder text for an image"
+    }
+  ],
+  "data": {},
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "image-1",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+"""
+static let imageWithCaption: String = """
+{
+  "id": "generated-flow",
+  "views": [
+    {
+      "id": "image-1",
+      "type": "image",
+      "metaData": {
+        "ref": "https://player-ui.github.io/latest/logo/logo-light-large.png"
+      },
+      "caption": {
+        "asset": {
+          "id": "image-caption",
+          "type": "text",
+          "value": "Image caption"
+        }
+      }
+    }
+  ],
+  "data": {},
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "image-1",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+"""
+static let imageWithPlaceholder: String = """
+{
+  "id": "generated-flow",
+  "views": [
+    {
+      "id": "image-1",
+      "type": "image",
+      "metaData": {
+        "ref": "https://player-ui.github.io/latest/logo/logo-light-large.png"
+      },
+      "placeholder": "This is placeholder text for an image"
+    }
+  ],
+  "data": {},
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "image-1",
         "transitions": {
           "*": "END_Done"
         }
@@ -1199,6 +1357,12 @@ static let pubSubBasic: String = """
         ]),
         (title: "collection", flows: [
             (name: "basic", flow: MockFlows.collectionBasic)
+        ]),
+        (title: "image", flows: [
+            (name: "basic", flow: MockFlows.imageBasic),
+            (name: "with accessibility", flow: MockFlows.imageWithAccessibility),
+            (name: "with caption", flow: MockFlows.imageWithCaption),
+            (name: "with placeholder", flow: MockFlows.imageWithPlaceholder)
         ]),
         (title: "info", flows: [
             (name: "footer", flow: MockFlows.infoFooter),

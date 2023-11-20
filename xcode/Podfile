@@ -21,6 +21,7 @@ target 'PlayerUI_Example' do
   pod 'PlayerUI/CheckPathPlugin', :path => '../'
   pod 'PlayerUI/CommonTypesPlugin', :path => '../'
   pod 'PlayerUI/CommonExpressionsPlugin', :path => '../'
+  pod 'PlayerUI/ComputedPropertiesPlugin', :path => '../'
   pod 'PlayerUI/ExpressionPlugin', :path => '../'
   pod 'PlayerUI/ExternalActionPlugin', :path => '../'
   pod 'PlayerUI/ExternalActionViewModifierPlugin', :path => '../'
@@ -29,6 +30,7 @@ target 'PlayerUI_Example' do
   pod 'PlayerUI/PubSubPlugin', :path => '../'
   pod 'PlayerUI/StageRevertDataPlugin', :path => '../'
   pod 'PlayerUI/SwiftUICheckPathPlugin', :path => '../'
+  pod 'PlayerUI/SwiftUIPendingTransactionPlugin', :path => '../'
   pod 'PlayerUI/TransitionPlugin', :path => '../'
   pod 'PlayerUI/TypesProviderPlugin', :path => '../'
   
@@ -68,6 +70,7 @@ plugin 'cocoapods-resource-bundle-copier', {
     "PlayerUI/CommonTypesPlugin" => {'target' => "//plugins/common-types/core:CommonTypesPlugin_Bundles_bundle_prod", 'files' => ['common-types-plugin.prod.js']},
     "PlayerUI/CheckPathPlugin" => {'target' => "//plugins/check-path/core:CheckPathPlugin_Bundles_bundle_prod", 'files' => ['check-path-plugin.prod.js']},
     "PlayerUI/CommonExpressionsPlugin" => {'target' => "//plugins/common-expressions/core:CommonExpressionsPlugin_Bundles_bundle_prod", 'files' => ['common-expressions-plugin.prod.js']},
+    "PlayerUI/ComputedPropertiesPlugin" => {'target' => "//plugins/computed-properties/core:ComputedPropertiesPlugin_Bundles_bundle_prod", 'files' => ['computed-properties-plugin.prod.js']},
     "PlayerUI/ExpressionPlugin" => {'target' => "//plugins/expression/core:ExpressionPlugin_Bundles_bundle_prod", 'files' => ['expression-plugin.prod.js']},
     "PlayerUI/ExternalActionPlugin" => {'target' => "//plugins/external-action/core:ExternalActionPlugin_Bundles_bundle_prod", 'files' => ['external-action-plugin.prod.js']},
     "PlayerUI/MetricsPlugin" => {'target' => "//plugins/metrics/core:MetricsPlugin_Bundles_bundle_prod", 'files' => ['metrics-plugin.prod.js']},

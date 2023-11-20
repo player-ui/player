@@ -15,5 +15,6 @@ javascript_pipeline(
         "//plugins/asset-transform/core:@player-ui/asset-transform-plugin",
         "//core/make-flow:@player-ui/make-flow",
         "//core/partial-match-registry:@player-ui/partial-match-registry"
-    ]
+    ],
+    library_name = 'ComputedPropertiesPlugin',
 )
