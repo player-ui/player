@@ -17,7 +17,6 @@ public struct PluginsAndPlayerCollection: View {
     let plugins: [NativePlugin]
     let sections: [FlowLoader.FlowSection]
     let padding: CGFloat
-    let completion: ((Result<CompletedState, PlayerError>) -> Void)?
 
     /**
      Initializes and loads flows
@@ -29,16 +28,15 @@ public struct PluginsAndPlayerCollection: View {
     public init(
         plugins: [NativePlugin],
         sections: [FlowLoader.FlowSection],
-        padding: CGFloat = 16,
-        completion: ((Result<CompletedState, PlayerError>) -> Void)? = nil
+        padding: CGFloat = 16
     ) {
         self.plugins = plugins
         self.padding = padding
         self.sections = sections
-        self.completion = completion
     }
 
     @State var beaconAndPubsubInfo = ""
+    @State var completionMessage = ""
     @State var alertPresented = false
 
     public var body: some View {
@@ -48,24 +46,7 @@ public struct PluginsAndPlayerCollection: View {
             pluginFlows
 
             // Managed Player flows
-            Section {
-                NavigationLink("Simple Flows") {
-                    FlowManagerView(flowSequence: [.firstFlow, .secondFlow], navTitle: "Simple Flows")
-                        .padding(padding)
-                }.accessibility(identifier: "Simple Flows")
 
-                NavigationLink("Error Content Flow") {
-                    FlowManagerView(flowSequence: [.firstFlow, .errorFlow], navTitle: "Error Content Flow")
-                        .padding(padding)
-                }.accessibility(identifier: "Error Content Flow")
-
-                NavigationLink("Error Asset Flow") {
-                    FlowManagerView(flowSequence: [.firstFlow, .assetErrorFlow], navTitle: "Error Asset Flow")
-                        .padding(padding)
-                }.accessibility(identifier: "Error Asset Flow")
-            }  header: {
-                Text("Managed Player")
-            }
         }
         .accessibility(identifier: "Player")
         .navigationBarTitle(Text("Player"))
@@ -74,7 +55,7 @@ public struct PluginsAndPlayerCollection: View {
     var pluginFlows: some View {
         let pubsubPlugin = PubSubPlugin([("some-event", { (eventName, eventData) in
             $alertPresented.wrappedValue = true
-            // $pubsubInfo.wrappedValue =
+
             switch eventData {
             case .string(data: let string):
                 $beaconAndPubsubInfo.wrappedValue = $beaconAndPubsubInfo.wrappedValue + "Published: `\(eventName)` with message: `\(string)` \n"
@@ -90,46 +71,71 @@ public struct PluginsAndPlayerCollection: View {
             }
         }
 
-        let external =  ExternalActionPlugin(handler: { state, options, transition in
+        let externalActionPlugin =  ExternalActionPlugin(handler: { state, options, transition in
             guard state.ref == "test-1" else { return transition("Prev") }
             let transitionValue = options.data.get(binding: "transitionValue") as? String
             options.expression.evaluate("{{foo}} = 'bar'")
             transition(transitionValue ?? "Next")
         })
 
-          return  ForEach(sections, id: \.title) { section in
-                Section {
-                    ForEach(section.flows, id: \.name) { flow in
-                        NavigationLink(flow.name) {
-                            AssetFlowView(flow: flow.flow, plugins: [external] + plugins + [beaconPlugin, pubsubPlugin], completion: completion)
-                                .padding(padding)
-                                .navigationBarTitle(Text(flow.name))
-                                .modifier(AlertViewModifier(alertPresented: $alertPresented, pubsubEventName: $beaconAndPubsubInfo))
-                                .onDisappear {
-                                    // clear tracked beacons and pub sub info
-                                    $beaconAndPubsubInfo.wrappedValue = ""
-                                }
-                        }
-                        .accessibility(identifier: "\(section.title) \(flow.name)")
+        return ForEach(sections, id: \.title) { section in
+            Section {
+                ForEach(section.flows, id: \.name) { flow in
+                    NavigationLink(flow.name) {
+                        AssetFlowView(flow: flow.flow, plugins: plugins + [externalActionPlugin, beaconPlugin, pubsubPlugin], completion: completion(result:))
+                            .padding(padding)
+                            .navigationBarTitle(Text(flow.name))
+                            .modifier(
+                                AlertViewModifier(
+                                    alertPresented: $alertPresented,
+                                    pubsubEventName: $beaconAndPubsubInfo,
+                                    completionMessage: $completionMessage)
+                            )
+                            .onDisappear {
+                                // clear tracked beacons and pub sub info
+                                $beaconAndPubsubInfo.wrappedValue = ""
+                            }
                     }
-                } header: {
-                    Text(section.title)
+                    .accessibility(identifier: "\(section.title) \(flow.name)")
                 }
+            } header: {
+                Text(section.title)
             }
+        }
     }
 
     struct AlertViewModifier: ViewModifier {
         @Binding var alertPresented: Bool
         @Binding var pubsubEventName: String
+        @Binding var completionMessage: String
 
         func body(content: Content) -> some View {
             content
                 .alert(
                     isPresented: $alertPresented,
-                    content: { Alert(title: Text("Info"), message: Text("Data: \n \($pubsubEventName.wrappedValue)"),
-                        dismissButton: .default(Text("OK")))
-                            }
+                    content: {
+                        Alert(
+                            title: Text("Info"),
+                            message: Text("Data: \n \($pubsubEventName.wrappedValue) \n Completion: \($completionMessage.wrappedValue)"),
+                            dismissButton: .default(Text("OK"))
+                        )
+                    }
                 )
+        }
+    }
+
+    func completion(result: Result<CompletedState, PlayerError>) {
+        $alertPresented.wrappedValue = true
+        switch result {
+        case .success(let result):
+            completionMessage = result.endState?.outcome ?? "No Outcome"
+        case .failure(let error):
+            guard case let .promiseRejected(errorState) = error else {
+                completionMessage = "\(error)"
+                return
+            }
+
+            completionMessage = "\(errorState.error)"
         }
     }
 }
