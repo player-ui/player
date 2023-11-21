@@ -115,7 +115,8 @@ class SceneDelegate: UIResponder, UISceneDelegate {
                 SegmentControlView(
                     plugins: plugins,
                     assetSections: MockFlows.assetSections,
-                    pluginSections: MockFlows.pluginSections
+                    pluginSections: MockFlows.pluginSections,
+                    completion: completion(result:)
                 )
                 .navigationBarTitleDisplayMode(.inline)
             },

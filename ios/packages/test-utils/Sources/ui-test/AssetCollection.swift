@@ -23,8 +23,8 @@ public struct AssetCollection: View {
      - parameters:
         - plugins: Plugins to add to Player instance that is created
         - sections: The `[FlowSection]` to display
+        - padding: Padding around the AssetFlowView
         - completion: A handler for when a flow reaches an end state
-        - padding: Padding around the AssetFlowView 
      */
     public init(
         plugins: [NativePlugin],

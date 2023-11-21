@@ -18,6 +18,7 @@ public struct SegmentControlView: View {
     let assetSections: [FlowLoader.FlowSection]
     let pluginSections: [FlowLoader.FlowSection]
     let padding: CGFloat
+    let completion: ((Result<CompletedState, PlayerError>) -> Void)?
     /**
      Initializes and loads flows
      - parameters:
@@ -25,17 +26,20 @@ public struct SegmentControlView: View {
         - assetSections: The `[FlowSection]` to display asset flows
         - pluginSections: The `[FlowSection]` to display plugin flows
         - padding: Padding around the AssetFlowView ``
+        - completion: A handler for when a flow reaches an end state
      */
     public init(
         plugins: [NativePlugin],
         assetSections: [FlowLoader.FlowSection],
         pluginSections: [FlowLoader.FlowSection],
-        padding: CGFloat = 16
+        padding: CGFloat = 16,
+        completion: ((Result<CompletedState, PlayerError>) -> Void)? = nil
     ) {
         self.plugins = plugins
         self.assetSections = assetSections
         self.pluginSections = pluginSections
         self.padding = padding
+        self.completion = completion
     }
 
     enum HeaderSelection: String, CaseIterable {
@@ -73,27 +77,12 @@ public struct SegmentControlView: View {
         }
     }
 
-    func assetFlowCompletion(result: Result<CompletedState, PlayerError>) {
-        doneFlow = true
-        switch result {
-        case .success(let result):
-            outcome = result.endState?.outcome ?? "No Outcome"
-        case .failure(let error):
-            guard case let .promiseRejected(errorState) = error else {
-                outcome = error.localizedDescription
-                return
-            }
-
-            outcome = errorState.error
-        }
-    }
-
     var flowsListSection: some View {
         return AssetCollection(
             plugins: plugins,
             sections: assetSections,
             padding: padding,
-            completion: self.assetFlowCompletion(result:)
+            completion: completion
         )
         .accessibility(identifier: "AssetCollection")
         .navigationBarTitle(Text("Flows"))
