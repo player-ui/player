@@ -16,7 +16,7 @@ maven = [
 ]
 
 main_exports = [
-    "//jvm/j2v8:j2v8-android"
+    "//jvm/j2v8:j2v8-android",
 ]
 
 main_deps = main_exports + parse_coordinates(maven) + [

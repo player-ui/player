@@ -15,7 +15,9 @@ import com.intuit.player.jvm.core.managed.FlowManager
 import com.intuit.player.jvm.core.player.PlayerException
 import com.intuit.player.jvm.core.player.state.CompletedState
 import com.intuit.player.jvm.core.player.state.ErrorState
+import com.intuit.player.jvm.core.player.state.InProgressState
 import com.intuit.player.jvm.core.player.state.NotStartedState
+import com.intuit.player.jvm.core.player.state.ReleasedState
 import com.intuit.player.jvm.core.player.state.completedState
 import com.intuit.player.jvm.core.player.state.inProgressState
 import com.intuit.player.jvm.core.plugins.Plugin
@@ -138,6 +140,7 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
                 // which will either start a new flow or transition to done
                 is CompletedState -> manager.next(state)
                 is ErrorState -> _state.tryEmit(ManagedPlayerState.Error(state.error))
+                is InProgressState, ReleasedState, null -> Unit
             }
         }
     }

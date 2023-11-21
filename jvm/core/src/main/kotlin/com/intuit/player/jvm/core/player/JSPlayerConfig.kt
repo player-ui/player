@@ -4,6 +4,7 @@ import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.plugins.JSPluginWrapper
 import com.intuit.player.jvm.core.plugins.LoggerPlugin
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 /** [JSPluginWrapper]s and [LoggerPlugin]s to configure a JS Player with */
 @Serializable

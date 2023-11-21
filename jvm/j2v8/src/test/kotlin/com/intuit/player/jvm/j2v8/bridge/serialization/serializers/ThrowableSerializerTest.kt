@@ -84,7 +84,7 @@ internal class ThrowableSerializerTest : J2V8Test() {
         assertTrue(exception is PlayerException)
         exception as PlayerException
         assertEquals("hello world", exception.message)
-        assertEquals(listOf(stackTraceElement), exception.stackTrace.toList())
+        assertEquals(arrayOf(stackTraceElement).normalize(), exception.stackTrace.normalize())
         exception.printStackTrace()
     }
 
@@ -130,7 +130,17 @@ internal class ThrowableSerializerTest : J2V8Test() {
 
             val cause = format.decodeFromV8Value<Throwable>(error.getObject("cause"))
             assertEquals("world", cause.message)
-            assertEquals(exception.cause!!.stackTrace.toList(), cause.stackTrace.toList())
+            assertEquals(exception.cause!!.stackTrace.normalize(), cause.stackTrace.normalize())
         }
+    }
+
+    /** Make a collection of [StackTraceElement]s subject to element equality */
+    private fun Array<StackTraceElement>.normalize(): List<SerializableStackTraceElement> = map { stackTraceElement ->
+        SerializableStackTraceElement(
+            stackTraceElement.className,
+            stackTraceElement.methodName,
+            stackTraceElement.fileName,
+            stackTraceElement.lineNumber,
+        )
     }
 }

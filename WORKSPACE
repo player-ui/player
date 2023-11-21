@@ -74,7 +74,9 @@ kotlin()
 
 load("@io_bazel_rules_kotlin//kotlin:core.bzl", "kt_register_toolchains")
 
-kt_register_toolchains()
+#kt_register_toolchains()
+
+register_toolchains("//jvm:kotlin_toolchain")
 
 load("@rules_player//junit5:conf.bzl", "junit5")
 
@@ -87,45 +89,58 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 grab_remote = "https://github.com/sugarmanz/grab-bazel-common.git"
 
-grab_commit = "a3fe2daf2965b439c8c2a4c2cce1f13beba446b1"
+grab_commit = "5326c6ba7a4e39e150c33e123134525473baffb6"
 
 git_repository(
     name = "grab_bazel_common",
     commit = grab_commit,
     remote = grab_remote,
-    shallow_since = "1654123549 -0400",
 )
+
+load("@grab_bazel_common//android:repositories.bzl", "bazel_common_dependencies")
+
+bazel_common_dependencies()
+
+load("@grab_bazel_common//android:initialize.bzl", "bazel_common_initialize")
+
+bazel_common_initialize(
+    pinned_maven_install = False,
+)
+#
+#load("@grab_bazel_common//android:maven.bzl", "pin_bazel_common_artifacts")
+#
+#pin_bazel_common_artifacts()
 
 # Optional patched Android Tools
-load("@grab_bazel_common//:workspace_defs.bzl", "android_tools")
+#load("@grab_bazel_common//:workspace_defs.bzl", "android_tools")
+#
+#android_tools(
+#    commit = grab_commit,
+#    remote = grab_remote,
+#    shallow_since = "1654123549 -0400",
+#)
 
-android_tools(
-    commit = grab_commit,
-    remote = grab_remote,
-    shallow_since = "1654123549 -0400",
-)
+#DAGGER_TAG = "2.43.2"
+#
+#DAGGER_SHA = "f7fbc3e417b3cdc10e76e818a6854ada777ad6d408408b65c23a096f3ff6daf7"
+#
+#http_archive(
+#    name = "dagger",
+#    sha256 = DAGGER_SHA,
+#    strip_prefix = "dagger-dagger-%s" % DAGGER_TAG,
+#    url = "https://github.com/google/dagger/archive/dagger-%s.zip" % DAGGER_TAG,
+#)
 
-DAGGER_TAG = "2.28.1"
-
-DAGGER_SHA = "9e69ab2f9a47e0f74e71fe49098bea908c528aa02fa0c5995334447b310d0cdd"
-
-http_archive(
-    name = "dagger",
-    sha256 = DAGGER_SHA,
-    strip_prefix = "dagger-dagger-%s" % DAGGER_TAG,
-    url = "https://github.com/google/dagger/archive/dagger-%s.zip" % DAGGER_TAG,
-)
-
-http_archive(
-    name = "robolectric",
-    sha256 = "4e002cbe712c8abd9c3b565eb165787a2a7a92dfafb117e0d84b6767c2053189",
-    strip_prefix = "robolectric-bazel-4.8",
-    urls = ["https://github.com/robolectric/robolectric-bazel/archive/4.8.tar.gz"],
-)
-
-load("@robolectric//bazel:robolectric.bzl", "robolectric_repositories")
-
-robolectric_repositories()
+#http_archive(
+#    name = "robolectric",
+#    sha256 = "4e002cbe712c8abd9c3b565eb165787a2a7a92dfafb117e0d84b6767c2053189",
+#    strip_prefix = "robolectric-bazel-4.8",
+#    urls = ["https://github.com/robolectric/robolectric-bazel/archive/4.8.tar.gz"],
+#)
+#
+#load("@robolectric//bazel:robolectric.bzl", "robolectric_repositories")
+#
+#robolectric_repositories()
 
 http_archive(
     name = "build_bazel_rules_android",
@@ -173,6 +188,7 @@ maven_install(
         "https://maven.google.com/",
         "https://plugins.gradle.org/m2/",
         "https://jcenter.bintray.com/",
+        "https://jitpack.io/",
     ],
 )
 

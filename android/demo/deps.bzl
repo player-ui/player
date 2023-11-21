@@ -11,6 +11,7 @@ maven_main = [
     "com.google.android.material:material:%s" % versions.material,
     #"com.squareup.leakcanary:leakcanary-android:2.2",
     "com.facebook.stetho:stetho:%s" % versions.facebook.stetho,
+    "com.github.AlexTrotsenko:j2v8-debugger:%s" % versions.j2v8.debugger,
 ]
 
 maven_test = [

@@ -7,6 +7,9 @@ versions = struct(
         graaljs = "21.2.0",
         j2v8 = "6.1.0",
     ),
+    j2v8 = struct(
+        debugger = "0.2.3",
+    ),
     logging = struct(
         slf4j = "1.7.36",
         logback = "1.2.10",

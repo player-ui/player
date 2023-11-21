@@ -21,7 +21,7 @@ public abstract class JSScriptPluginWrapper(public val name: String, protected v
     protected val debugScript: String
         get() = loadDebugScript() ?: script
 
-    private fun loadDebugScript(): String? = JSScriptPluginWrapper::class.java.classLoader.getResource(sourcePath?.substringBeforeLast(".") + ".debug." + sourcePath?.substringAfterLast("."))?.readText()
+    private fun loadDebugScript(): String? = JSScriptPluginWrapper::class.java.classLoader.getResource(sourcePath?.substringBeforeLast(".") + ".dev." + sourcePath?.substringAfterLast("."))?.readText()
 
     public val isInstantiated: Boolean get() = ::instance.isInitialized
 

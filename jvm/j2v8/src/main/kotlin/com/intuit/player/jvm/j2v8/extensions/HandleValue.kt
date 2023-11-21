@@ -23,7 +23,7 @@ internal fun Any?.handleValue(format: RuntimeFormat<V8Value>): Any? = when (this
     else -> this
 }
 
-private fun V8Value.transform(format: RuntimeFormat<V8Value>): Any? = evaluateInJSThreadBlocking(format.runtime) {
+private fun V8Value.transform(format: RuntimeFormat<V8Value>): Any? = evaluateInJSThreadIfDefinedBlocking(format.runtime) {
     when (this) {
         V8.getUndefined() -> null
         is V8Primitive -> value
@@ -34,54 +34,43 @@ private fun V8Value.transform(format: RuntimeFormat<V8Value>): Any? = evaluateIn
     }
 }
 
-internal fun V8Array.toList(format: RuntimeFormat<V8Value>): List<Any?>? = if (isUndefined) {
-    null
-} else {
-    evaluateInJSThreadIfDefinedBlocking(format.runtime) {
-        keys.map(::get).map { it.handleValue(format) }
+internal fun V8Array.toList(format: RuntimeFormat<V8Value>): List<Any?>? = evaluateInJSThreadIfDefinedBlocking(format.runtime) {
+    keys.map(::get).map { it.handleValue(format) }
+}
+
+internal fun V8Object.toNode(format: RuntimeFormat<V8Value>): Node? = evaluateInJSThreadIfDefinedBlocking(format.runtime) {
+    if (contains("id") && contains("type")) {
+        Asset(V8Node(this, format.runtime))
+    } else {
+        V8Node(this, format.runtime)
     }
 }
 
-internal fun V8Object.toNode(format: RuntimeFormat<V8Value>): Node? = if (isUndefined) {
-    null
-} else {
-    evaluateInJSThreadIfDefinedBlocking(format.runtime) {
-        if (contains("id") && contains("type")) {
-            Asset(V8Node(this, format.runtime))
-        } else {
-            V8Node(this, format.runtime)
-        }
-    }
-}
-
-internal fun <R> V8Function.toInvokable(format: RuntimeFormat<V8Value>, receiver: V8Object, deserializationStrategy: DeserializationStrategy<R>?): Invokable<R>? = if (isUndefined) {
-    null
-} else {
-    evaluateInJSThreadIfDefinedBlocking(format.runtime) {
-        Invokable { args ->
-            evaluateInJSThreadBlocking(format.runtime) {
-                try {
-                    when (
-                        val result =
-                            call(
-                                receiver,
-                                format.encodeToRuntimeValue(
-                                    ArraySerializer(GenericSerializer()),
-                                    args as Array<Any?>,
-                                ).v8Array,
-                            ).handleValue(format)
-                    ) {
-                        is Node -> deserializationStrategy?.let {
-                            result.deserialize(deserializationStrategy)
-                        } ?: run {
-                            result as R
-                        }
-                        else -> result as R
+internal fun <R> V8Function.toInvokable(format: RuntimeFormat<V8Value>, receiver: V8Object, deserializationStrategy: DeserializationStrategy<R>?): Invokable<R>? = evaluateInJSThreadIfDefinedBlocking(format.runtime) {
+    Invokable { args ->
+        evaluateInJSThreadBlocking(format.runtime) {
+            try {
+                when (
+                    val result =
+                        call(
+                            receiver,
+                            format.encodeToRuntimeValue(
+                                ArraySerializer(GenericSerializer()),
+                                args as Array<Any?>,
+                            ).v8Array,
+                        ).handleValue(format)
+                ) {
+                    is Node -> deserializationStrategy?.let {
+                        result.deserialize(deserializationStrategy)
+                    } ?: run {
+                        result as R
                     }
-                } catch (e: Throwable) {
-                    e.printStackTrace()
-                    throw e
+
+                    else -> result as R
                 }
+            } catch (e: Throwable) {
+                e.printStackTrace()
+                throw e
             }
         }
     }

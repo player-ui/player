@@ -160,7 +160,7 @@ public constructor(
     internal companion object {
 
         private const val bundledSourcePath = "core/player/dist/player.prod.js"
-        private const val debugSourcePath = "core/player/dist/player.debug.js"
+        private const val debugSourcePath = "core/player/dist/player.dev.js"
 
         /** Gets [URL] of the bundled source */
         private val bundledSource get() = this::class.java
