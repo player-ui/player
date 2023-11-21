@@ -24,7 +24,7 @@ main_deps = parse_coordinates(maven_main) + [
     "//plugins/reference-assets/android:assets",
     "//plugins/common-types/jvm:common-types",
     "//plugins/pending-transaction/jvm:pending-transaction",
-    "//plugins/reference-assets/mocks:jar",
+    "//plugins/mocks:jar",
 ]
 
 test_deps = parse_coordinates(maven_test) + [

@@ -13,7 +13,7 @@ import com.intuit.player.jvm.core.player.state.InProgressState
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class InfoTest : AssetTest("info") {
+class InfoTest : AssetTest("reference-assets") {
 
     enum class PlayerAction {
         Next, Dismiss
@@ -37,7 +37,7 @@ class InfoTest : AssetTest("info") {
 
     @Test
     fun infoBasic() {
-        launchMock("modal-flow")
+        launchMock("info-modal-flow")
 
         verifyAndProceed(1, PlayerAction.Next)
         verifyAndProceed(2, PlayerAction.Dismiss)
