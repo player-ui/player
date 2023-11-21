@@ -7,9 +7,9 @@ class BeaconPluginUITests: BaseTestCase {
     }
 
     func testBeaconPluginAction() {
-        withEyes("beacon beacon action") { check in
+        withEyes("beacon action") { check in
             check("beacons on loaded")
-            XCTAssertTrue(app.alerts["Info"].staticTexts.element(boundBy: 1).label.contains("collection"))
+            XCTAssertTrue(app.alerts["Info"].staticTexts.element(boundBy: 1).label.contains("action"))
 
             app.buttons["OK"].firstMatch.tap()
             let button = app.buttons["action"].firstMatch

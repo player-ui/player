@@ -10,7 +10,7 @@ class PubSubUITests: BaseTestCase {
         withEyes("pub sub basic") { check in
             check("pub sub basic loaded")
 
-            XCTAssertTrue(app.alerts["Info"].staticTexts.element(boundBy: 1).label.contains("collection"))
+            XCTAssertTrue(app.alerts["Info"].staticTexts.element(boundBy: 1).label.contains("action"))
 
             app.buttons["OK"].firstMatch.tap()
 
