@@ -3,6 +3,7 @@ const fs = require('fs')
 const path = require('path')
 const child_process = require('child_process')
 const { camelCase } = require('change-case')
+const { makeFlow } = require('@player-ui/make-flow')
 
 const assetsMocksDir = '../../../../plugins/reference-assets/mocks'
 const assetTypes = fs.readdirSync(assetsMocksDir, { withFileTypes: true })

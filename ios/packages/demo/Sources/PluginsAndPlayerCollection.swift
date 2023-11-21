@@ -46,7 +46,22 @@ public struct PluginsAndPlayerCollection: View {
             pluginFlows
 
             // Managed Player flows
-
+            Section {
+                NavigationLink("Simple Flows") {
+                    FlowManagerView(flowSequence: [.firstFlow, .secondFlow], navTitle: "Simple Flows")
+                        .padding(padding)
+                }.accessibility(identifier: "Simple Flows")
+                NavigationLink("Error Content Flow") {
+                    FlowManagerView(flowSequence: [.firstFlow, .errorFlow], navTitle: "Error Content Flow")
+                        .padding(padding)
+                }.accessibility(identifier: "Error Content Flow")
+                NavigationLink("Error Asset Flow") {
+                    FlowManagerView(flowSequence: [.firstFlow, .assetErrorFlow], navTitle: "Error Asset Flow")
+                        .padding(padding)
+                }.accessibility(identifier: "Error Asset Flow")
+            }  header: {
+                Text("Managed Player")
+            }
         }
         .accessibility(identifier: "Player")
         .navigationBarTitle(Text("Player"))
