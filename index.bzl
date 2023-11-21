@@ -197,8 +197,7 @@ def _generate_manifest(context):
 
 generate_manifest = rule(
     attrs = {
-        "mocks": attr.label_list(
-            mandatory = True,
+        "mocks": attr.label_list(            
             allow_files = [".json"],
         ),
     },
