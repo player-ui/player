@@ -1219,7 +1219,7 @@ static let externalAction: String = """
 }
 """
 
-    
+
 static let pubSubBasic: String = """
 {
   "id": "generated-flow",
@@ -1347,8 +1347,102 @@ static let pubSubBasic: String = """
     """
 
 
-    public static let assetSections: [FlowLoader.FlowSection] = [
+    static let inputAssetPendingTransaction: String = """
+    {
+      "id": "input-validation-flow",
+      "views": [
+        {
+          "id": "view-1",
+          "type": "collection",
+          "values": [
+            {
+              "asset": {
+                "id": "input-required",
+                "type": "input",
+                "binding": "foo.requiredInput",
+                "label": {
+                  "asset": {
+                    "id": "input-required-label",
+                    "type": "text",
+                    "value": "This input is required and must be greater than 0"
+                  }
+                }
+              }
+            },
+            {
+              "asset": {
+                "id": "action-1",
+                "type": "action",
+                "value": "Next",
+                "label": {
+                  "asset": {
+                    "id": "action-1-label",
+                    "type": "text",
+                    "value": "Continue"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "view-2",
+          "type": "info",
+          "title": {
+            "asset": {
+              "id": "view-2-title",
+              "type": "text",
+              "value": "You made it!"
+            }
+          }
+        }
+      ],
+      "schema": {
+        "ROOT": {
+          "foo": {
+            "type": "FooType"
+          }
+        },
+        "FooType": {
+          "requiredInput": {
+            "type": "IntegerPosType",
+            "validation": [
+              {
+                "type": "required"
+              }
+            ]
+          }
+        }
+      },
+      "data": {},
+      "navigation": {
+        "BEGIN": "FLOW_1",
+        "FLOW_1": {
+          "startState": "VIEW_1",
+          "VIEW_1": {
+            "state_type": "VIEW",
+            "ref": "view-1",
+            "transitions": {
+              "*": "VIEW_2"
+            }
+          },
+          "VIEW_2": {
+            "state_type": "VIEW",
+            "ref": "view-2",
+            "transitions": {
+              "*": "END_Done"
+            }
+          },
+          "END_Done": {
+            "state_type": "END",
+            "outcome": "done"
+          }
+        }
+      }
+    }
+    """
 
+    public static let assetSections: [FlowLoader.FlowSection] = [
         (title: "action", flows: [
             (name: "counter", flow: MockFlows.actionCounter),
             (name: "transition to end", flow: MockFlows.actionTransitionToEnd),
@@ -1391,5 +1485,10 @@ static let pubSubBasic: String = """
         (title: "beacon", flows: [
             (name: "beacon action", flow: MockFlows.beaconAction)
         ])
-    ]
+      ,
+        (title: "pending-transaction", flows: [
+          (name: "input asset pending transaction", flow: MockFlows.inputAssetPendingTransaction)
+          ])
+        ]
+
 }
