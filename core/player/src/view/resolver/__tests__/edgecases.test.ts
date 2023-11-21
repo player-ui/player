@@ -1,5 +1,5 @@
+import { describe, it, expect, vitest } from 'vitest';
 import { replaceAt, set, omit } from 'timm';
-
 import { BindingParser } from '../../../binding';
 import { ExpressionEvaluator } from '../../../expressions';
 import { LocalModel, withParser } from '../../../data';
@@ -360,11 +360,11 @@ describe('Duplicate IDs', () => {
     const logger = new TapableLogger();
 
     const testLogger: Logger = {
-      trace: jest.fn(),
-      debug: jest.fn(),
-      info: jest.fn(),
-      warn: jest.fn(),
-      error: jest.fn(),
+      trace: vitest.fn(),
+      debug: vitest.fn(),
+      info: vitest.fn(),
+      warn: vitest.fn(),
+      error: vitest.fn(),
     };
 
     logger.addHandler(testLogger);
@@ -455,11 +455,11 @@ describe('Duplicate IDs', () => {
     const logger = new TapableLogger();
 
     const testLogger: Logger = {
-      trace: jest.fn(),
-      debug: jest.fn(),
-      info: jest.fn(),
-      warn: jest.fn(),
-      error: jest.fn(),
+      trace: vitest.fn(),
+      debug: vitest.fn(),
+      info: vitest.fn(),
+      warn: vitest.fn(),
+      error: vitest.fn(),
     };
 
     logger.addHandler(testLogger);

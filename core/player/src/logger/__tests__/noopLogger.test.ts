@@ -1,3 +1,4 @@
+import { test, expect } from 'vitest';
 import { NoopLogger, severities } from '..';
 import type { LogFn } from '../types';
 

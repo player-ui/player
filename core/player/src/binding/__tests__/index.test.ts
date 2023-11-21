@@ -1,3 +1,4 @@
+import { describe, test, expect, vitest } from 'vitest';
 import { BindingParser } from '..';
 
 test('caches bindings', () => {
@@ -11,8 +12,8 @@ test('caches bindings', () => {
 });
 
 test('does not call the update hook when readOnly is true', () => {
-  const onSetHook = jest.fn();
-  const onGetHook = jest.fn();
+  const onSetHook = vitest.fn();
+  const onGetHook = vitest.fn();
 
   const parser = new BindingParser({
     get: (b) => {
@@ -29,8 +30,8 @@ test('does not call the update hook when readOnly is true', () => {
 });
 
 test('calls the update hook when data needs to be changed', () => {
-  const onSetHook = jest.fn();
-  const onGetHook = jest.fn();
+  const onSetHook = vitest.fn();
+  const onGetHook = vitest.fn();
 
   const parser = new BindingParser({
     get: (b) => {
@@ -47,8 +48,8 @@ test('calls the update hook when data needs to be changed', () => {
 });
 
 test('skips the update hook when data does not need to be changed', () => {
-  const onSetHook = jest.fn();
-  const onGetHook = jest.fn();
+  const onSetHook = vitest.fn();
+  const onGetHook = vitest.fn();
 
   const parser = new BindingParser({
     get: (b) => {

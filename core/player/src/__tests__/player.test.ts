@@ -80,7 +80,7 @@ test('it loads a flow', async () => {
 test('multiple data change only update view once', async () => {
   const player = new Player();
 
-  const onUpdateCall = jest.fn();
+  const onUpdateCall = vitest.fn();
   player.hooks.viewController.tap('test', (vc: ViewController) => {
     vc.hooks.view.tap('test', (view: ViewInstance) => {
       view.hooks.onUpdate.tap('test', onUpdateCall);

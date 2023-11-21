@@ -1,3 +1,5 @@
+import { describe, test, expect } from 'vitest';
+
 import {
   VALID_AST_PARSER_TESTS,
   INVALID_AST_PARSER_TESTS,

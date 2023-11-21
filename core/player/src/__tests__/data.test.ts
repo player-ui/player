@@ -418,7 +418,7 @@ it('should not send update for deeply equal data', () => {
   const controller = new DataController({}, { pathResolver: parser });
   controller.hooks.resolveDataStages.tap('basic', () => [localData]);
 
-  const onUpdateCallback = jest.fn();
+  const onUpdateCallback = vitest.fn();
   controller.hooks.onUpdate.tap('test', onUpdateCallback);
 
   controller.set([['user', { name: 'frodo', age: 3 }]]);
@@ -464,11 +464,11 @@ describe('Read Only Data Controller', () => {
       set: localData.set,
     });
     logger = {
-      trace: jest.fn(),
-      debug: jest.fn(),
-      info: jest.fn(),
-      warn: jest.fn(),
-      error: jest.fn(),
+      trace: vitest.fn(),
+      debug: vitest.fn(),
+      info: vitest.fn(),
+      warn: vitest.fn(),
+      error: vitest.fn(),
     };
 
     const controller = new DataController(

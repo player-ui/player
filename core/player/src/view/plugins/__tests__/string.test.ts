@@ -1,3 +1,4 @@
+import { describe, expect, beforeEach, test } from 'vitest';
 import { BindingParser } from '../../../binding';
 import type { DataModelImpl } from '../../../data';
 import { LocalModel, withParser } from '../../../data';

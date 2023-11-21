@@ -1,3 +1,4 @@
+import { it, expect } from 'vitest';
 import { BindingParser } from '../../binding';
 import { LocalModel } from '..';
 

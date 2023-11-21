@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, vitest } from 'vitest';
 import { BindingInstance, BindingParser } from '../../binding';
 import type { DataModelMiddleware } from '..';
 import { LocalModel, PipelinedDataModel } from '..';
@@ -49,7 +50,7 @@ describe('model', () => {
   });
 
   it('works with withParser', () => {
-    const mockParse = jest.fn(() => new BindingInstance(['some', 'binding']));
+    const mockParse = vitest.fn(() => new BindingInstance(['some', 'binding']));
 
     const modelWithParser = withParser(model, mockParse);
 

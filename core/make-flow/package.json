@@ -1,0 +1,7 @@
+{
+  "name": "@player-ui/make-flow",
+  "version": "0.0.0-PLACEHOLDER",
+  "dependencies": {
+    "@player-ui/types": "workspace:*"
+  }
+}

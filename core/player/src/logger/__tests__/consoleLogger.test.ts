@@ -1,3 +1,4 @@
+import { describe, it, expect, vitest, beforeEach } from 'vitest';
 import { ConsoleLogger } from '..';
 import type { ConsoleHandler } from '../consoleLogger';
 
@@ -6,9 +7,9 @@ describe('console logger', () => {
 
   beforeEach(() => {
     consoleFns = {
-      log: jest.fn(),
-      warn: jest.fn(),
-      error: jest.fn(),
+      log: vitest.fn(),
+      warn: vitest.fn(),
+      error: vitest.fn(),
     };
   });
 

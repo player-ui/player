@@ -1,8 +1,15 @@
-load("@rules_player//cocoapods:cocoapod.bzl", "assemble_pod", "pod_push")
-load("@rules_player//internal:stamp.bzl", "stamp")
-load("//:generated.bzl", "PlayerUI", "PlayerUI_Demo", "ui_tests", "unit_tests")
+# load("@rules_player//cocoapods:cocoapod.bzl", "assemble_pod", "pod_push")
+# load("@rules_player//internal:stamp.bzl", "stamp")
+# load("//:generated.bzl", "PlayerUI", "PlayerUI_Demo", "ui_tests", "unit_tests")
 
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@aspect_rules_js//js:defs.bzl", "js_library")
 package(default_visibility = ["//visibility:public"])
+
+npm_link_all_packages(
+    name = "node_modules",
+)
+
 
 exports_files([
     "VERSION",
@@ -18,70 +25,82 @@ exports_files([
     "README.md",
 ])
 
+js_library(
+    name = "vitest_config",
+    testonly = True,
+    srcs = [
+        "vitest.shared.ts",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:node_modules/vitest"
+    ],
+)
+
 filegroup(
     name = "typings",
     srcs = glob(["typings/*"]),
 )
 
-PlayerUI(deps = [])
+# PlayerUI(deps = [])
 
-PlayerUI_Demo(deps = [])
+# PlayerUI_Demo(deps = [])
 
-unit_tests()
+# unit_tests()
 
-ui_tests()
+# ui_tests()
 
-# Update the version in the podspec
-stamp(
-    name = "PlayerUI_Podspec",
-    files = ["//:PlayerUI.podspec"],
-    stable = True,
-    substitutions = {
-        "0.0.1-placeholder": "{STABLE_VERSION}",
-    },
-)
+# # Update the version in the podspec
+# stamp(
+#     name = "PlayerUI_Podspec",
+#     files = ["//:PlayerUI.podspec"],
+#     stable = True,
+#     substitutions = {
+#         "0.0.1-placeholder": "{STABLE_VERSION}",
+#     },
+# )
 
-assemble_pod(
-    name = "PlayerUI_Pod",
-    srcs = glob([
-        "ios/**/*.swift",
-        "LICENSE",
-    ]),
-    data = {
-        # Core
-        "//core/player:Player_Bundles_bundle_prod": "ios/packages/core/Resources/",
-        "//plugins/partial-match-fingerprint/core:PartialMatchFingerprintPlugin_Bundles_bundle_prod": "ios/packages/core/Resources/",
-        "//core/partial-match-registry:Registry_Bundles_bundle_prod": "ios/packages/core/Resources/",
+# assemble_pod(
+#     name = "PlayerUI_Pod",
+#     srcs = glob([
+#         "ios/**/*.swift",
+#         "LICENSE",
+#     ]),
+#     data = {
+#         # Core
+#         "//core/player:Player_Bundles_bundle_prod": "ios/packages/core/Resources/",
+#         "//plugins/partial-match-fingerprint/core:PartialMatchFingerprintPlugin_Bundles_bundle_prod": "ios/packages/core/Resources/",
+#         "//core/partial-match-registry:Registry_Bundles_bundle_prod": "ios/packages/core/Resources/",
 
-        # Packages
-        "//core/make-flow:MakeFlow_Bundles_bundle_prod": "ios/packages/test-utils/Resources/",
-        "//plugins/reference-assets/core:ReferenceAssetsPlugin_Bundles_bundle_prod": "ios/packages/reference-assets/Resources/js/",
-        # Plugins
-        "//plugins/beacon/core:BeaconPlugin_Bundles_bundle_prod": "ios/plugins/BaseBeaconPlugin/Resources/",
-        "//plugins/check-path/core:CheckPathPlugin_Bundles_bundle_prod": "ios/plugins/CheckPathPlugin/Resources/",
-        "//plugins/common-types/core:CommonTypesPlugin_Bundles_bundle_prod": "ios/plugins/CommonTypesPlugin/Resources/",
-        "//plugins/common-expressions/core:CommonExpressionsPlugin_Bundles_bundle_prod": "ios/plugins/CommonExpressionsPlugin/Resources/",
-        "//plugins/computed-properties/core:ComputedPropertiesPlugin_Bundles_bundle_prod": "ios/plugins/ComputedPropertiesPlugin/Resources/",
-        "//plugins/expression/core:ExpressionPlugin_Bundles_bundle_prod": "ios/plugins/ExpressionPlugin/Resources/",
-        "//plugins/external-action/core:ExternalActionPlugin_Bundles_bundle_prod": "ios/plugins/ExternalActionPlugin/Resources/",
-        "//plugins/metrics/core:MetricsPlugin_Bundles_bundle_prod": "ios/plugins/MetricsPlugin/Resources/",
-        "//plugins/pubsub/core:PubSubPlugin_Bundles_bundle_prod": "ios/plugins/PubSubPlugin/Resources/",
-        "//plugins/stage-revert-data/core:StageRevertDataPlugin_Bundles_bundle_prod": "ios/plugins/StageRevertDataPlugin/Resources/",
-        "//plugins/types-provider/core:TypesProviderPlugin_Bundles_bundle_prod": "ios/plugins/TypesProviderPlugin/Resources/",
-    },
-    podspec = ":PlayerUI_Podspec",
-)
+#         # Packages
+#         "//core/make-flow:MakeFlow_Bundles_bundle_prod": "ios/packages/test-utils/Resources/",
+#         "//plugins/reference-assets/core:ReferenceAssetsPlugin_Bundles_bundle_prod": "ios/packages/reference-assets/Resources/js/",
+#         # Plugins
+#         "//plugins/beacon/core:BeaconPlugin_Bundles_bundle_prod": "ios/plugins/BaseBeaconPlugin/Resources/",
+#         "//plugins/check-path/core:CheckPathPlugin_Bundles_bundle_prod": "ios/plugins/CheckPathPlugin/Resources/",
+#         "//plugins/common-types/core:CommonTypesPlugin_Bundles_bundle_prod": "ios/plugins/CommonTypesPlugin/Resources/",
+#         "//plugins/common-expressions/core:CommonExpressionsPlugin_Bundles_bundle_prod": "ios/plugins/CommonExpressionsPlugin/Resources/",
+#         "//plugins/computed-properties/core:ComputedPropertiesPlugin_Bundles_bundle_prod": "ios/plugins/ComputedPropertiesPlugin/Resources/",
+#         "//plugins/expression/core:ExpressionPlugin_Bundles_bundle_prod": "ios/plugins/ExpressionPlugin/Resources/",
+#         "//plugins/external-action/core:ExternalActionPlugin_Bundles_bundle_prod": "ios/plugins/ExternalActionPlugin/Resources/",
+#         "//plugins/metrics/core:MetricsPlugin_Bundles_bundle_prod": "ios/plugins/MetricsPlugin/Resources/",
+#         "//plugins/pubsub/core:PubSubPlugin_Bundles_bundle_prod": "ios/plugins/PubSubPlugin/Resources/",
+#         "//plugins/stage-revert-data/core:StageRevertDataPlugin_Bundles_bundle_prod": "ios/plugins/StageRevertDataPlugin/Resources/",
+#         "//plugins/types-provider/core:TypesProviderPlugin_Bundles_bundle_prod": "ios/plugins/TypesProviderPlugin/Resources/",
+#     },
+#     podspec = ":PlayerUI_Podspec",
+# )
 
-# Push podspec to specs repo
-# tag must exist in github first
-pod_push(
-    name = "PlayerUI_Pod_Push",
-    executable = "bundle exec pod",
-    globalFlags = [],
-    podspec = ":PlayerUI_Podspec",
-    pushFlags = [
-        # skip tests because it never runs them right
-        # and they're run as part of the build pipeline anyway
-        "--skip-tests",
-    ],
-)
+# # Push podspec to specs repo
+# # tag must exist in github first
+# pod_push(
+#     name = "PlayerUI_Pod_Push",
+#     executable = "bundle exec pod",
+#     globalFlags = [],
+#     podspec = ":PlayerUI_Podspec",
+#     pushFlags = [
+#         # skip tests because it never runs them right
+#         # and they're run as part of the build pipeline anyway
+#         "--skip-tests",
+#     ],
+# )

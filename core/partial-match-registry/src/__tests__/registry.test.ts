@@ -1,3 +1,5 @@
+import { test, expect, beforeEach } from 'vitest';
+
 import { Registry } from '..';
 
 let registry: Registry<any>;

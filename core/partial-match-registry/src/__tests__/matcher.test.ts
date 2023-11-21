@@ -1,3 +1,4 @@
+import { test, expect } from 'vitest';
 import createObjectMatch from '../deep-partial-matcher';
 
 test('works on basic objects', () => {

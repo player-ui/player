@@ -1,3 +1,4 @@
+import { describe, it, expect, test } from 'vitest';
 import { LocalModel, withParser } from '../../data';
 import { ExpressionEvaluator } from '../../expressions';
 import { BindingParser } from '../../binding';

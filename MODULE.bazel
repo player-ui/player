@@ -1,0 +1,32 @@
+module(name = "player", version = "1.0")
+
+bazel_dep(name = "rules_player")
+
+# git_override("rules_player", "https://github.com/player-ui/rules_player.git", commit = "bazel-6")
+local_path_override(module_name = "rules_player", path = "../rules_player")
+
+bazel_dep(name = "aspect_bazel_lib", version = "1.32.0")
+bazel_dep(name = "aspect_rules_js", version = "1.33.1")
+bazel_dep(name = "aspect_rules_rollup", version = "1.0.0")
+bazel_dep(name = "bazel_skylib", version = "1.4.1")
+bazel_dep(name = "rules_pkg", version = "0.9.1")
+
+####### Node.js version #########
+bazel_dep(name = "rules_nodejs", version = "5.8.2")
+node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
+node.toolchain(node_version = "16.14.2")
+#################################
+
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+
+npm.npm_translate_lock(
+    name = "npm",
+    pnpm_lock = "//:pnpm-lock.yaml",
+    data = [
+      "//:package.json",
+    ],
+    npmrc = "//:.npmrc",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+
+use_repo(npm, "npm")

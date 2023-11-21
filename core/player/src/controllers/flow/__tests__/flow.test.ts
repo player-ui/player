@@ -1,3 +1,4 @@
+import { describe, it, test, expect, vitest } from 'vitest';
 import { FlowInstance } from '..';
 
 test('starts the right state', () => {
@@ -195,7 +196,7 @@ test('calls onStart hook', async () => {
   const flow = new FlowInstance('flow', {
     onStart: 'foo bar',
   } as any);
-  const hook = jest.fn();
+  const hook = vitest.fn();
   flow.hooks.onStart.tap('test', hook);
   const result = flow.start();
   expect(hook).toBeCalledWith('foo bar');
@@ -212,7 +213,7 @@ test('calls the onEnd hook', async () => {
       outcome: 'done',
     },
   });
-  const hook = jest.fn();
+  const hook = vitest.fn();
 
   flow.hooks.onEnd.tap('test', hook);
   const result = flow.start();

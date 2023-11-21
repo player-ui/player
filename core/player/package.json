@@ -1,0 +1,9 @@
+{
+  "name": "@player-ui/player",
+  "version": "0.0.0-PLACEHOLDER",
+  "dependencies": {
+    "@player-ui/partial-match-registry": "workspace:*",
+    "@player-ui/make-flow": "workspace:*",
+    "@player-ui/types": "workspace:*"
+  }
+}

@@ -1,9 +1,11 @@
-load("//:index.bzl", "javascript_pipeline")
+load("@rules_player//javascript:defs.bzl", "js_pipeline")
+load("@npm//:defs.bzl", "npm_link_all_packages")
 
-javascript_pipeline(
-    name = "@player-ui/make-flow",
-    dependencies = [
-        "//core/types:@player-ui/types",
-    ],
-    library_name = "MakeFlow"
+npm_link_all_packages(name = "node_modules")
+
+js_pipeline(
+    package_name = "@player-ui/make-flow",
+    deps = [
+        ":node_modules/@player-ui/types",
+    ]
 )

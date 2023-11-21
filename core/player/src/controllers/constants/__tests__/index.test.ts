@@ -1,3 +1,4 @@
+import { test, expect } from 'vitest';
 import { ConstantsController } from '..';
 
 test('basic get/set functionality', () => {

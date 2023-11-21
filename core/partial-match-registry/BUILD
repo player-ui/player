@@ -1,11 +1,10 @@
-load("//:index.bzl", "javascript_pipeline")
+load("@rules_player//javascript:defs.bzl", "js_pipeline")
 
-javascript_pipeline(
-    name = "@player-ui/partial-match-registry",
-    dependencies = [
-        "@npm//dlv",
-        "@npm//@types/dlv",
-        "@npm//sorted-array",
-    ],
-    library_name = 'Registry'
+js_pipeline(
+    package_name = "@player-ui/partial-match-registry",
+    deps = [
+        "//:node_modules/dlv",
+        "//:node_modules/@types/dlv",
+        "//:node_modules/sorted-array",
+    ]
 )

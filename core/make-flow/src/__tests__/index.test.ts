@@ -1,3 +1,4 @@
+import { test, expect } from 'vitest';
 import { makeFlow } from '..';
 
 test('makes a flow from an asset', () => {

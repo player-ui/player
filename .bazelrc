@@ -1,3 +1,5 @@
+common --enable_bzlmod
+
 test --test_output=errors
 coverage --combined_report=lcov
 

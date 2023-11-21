@@ -1,7 +1,3 @@
-load("//:index.bzl", "javascript_pipeline")
+load("@rules_player//javascript:defs.bzl", "js_pipeline")
 
-javascript_pipeline(
-    name = "@player-ui/types",
-    dependencies = [],
-    xlr_mode = "types"
-)
+js_pipeline(package_name = "@player-ui/types")

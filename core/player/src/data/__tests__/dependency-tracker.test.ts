@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import { BindingParser } from '../../binding';
 import { LocalModel, DependencyModel, DependencyMiddleware } from '..';
 

@@ -1,3 +1,4 @@
+import { test, expect, vitest } from 'vitest';
 import { LocalModel, withParser, PipelinedDataModel } from '../../data';
 import { ExpressionEvaluator } from '../../expressions';
 import { BindingParser } from '../../binding';
@@ -245,7 +246,7 @@ test('should only update if data is used in view', () => {
     }
   );
 
-  const hook = jest.fn();
+  const hook = vitest.fn();
   view.hooks.onUpdate.tap('update', hook);
 
   model.set([['foo.bar.baz', 20]]);

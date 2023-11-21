@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest';
 import { BindingParser } from '../../binding';
 import { SchemaController } from '..';
 

@@ -1,3 +1,4 @@
+import { describe, it, expect, vitest, test, beforeEach } from 'vitest';
 import type { DataModelWithParser } from '../../data';
 import { LocalModel, withParser } from '../../data';
 import type { BindingLike } from '../../binding';
@@ -29,7 +30,7 @@ describe('evaluator', () => {
     model = withParser(new LocalModel({ foo: 2 }), parseBinding);
     evaluator = new ExpressionEvaluator({ model });
 
-    const testFn = jest.fn();
+    const testFn = vitest.fn();
 
     evaluator.hooks.resolveOptions.tap('test', (hookOptions) => {
       testFn.mockImplementation((value: any) => hookOptions.model.set(value));
@@ -307,7 +308,7 @@ describe('evaluator', () => {
 
   describe('error handling', () => {
     test('skips throwing error when handler is provided, but not when throwErrors is true', () => {
-      const errorHandler = jest.fn();
+      const errorHandler = vitest.fn();
 
       evaluator.hooks.onError.tap('test', (e) => {
         errorHandler(e);
@@ -340,8 +341,8 @@ describe('evaluator', () => {
   });
 
   describe('shortcuts binary ops', () => {
-    const aFunc = jest.fn();
-    const bFunc = jest.fn();
+    const aFunc = vitest.fn();
+    const bFunc = vitest.fn();
 
     beforeEach(() => {
       aFunc.mockReset();

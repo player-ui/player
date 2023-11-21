@@ -1,3 +1,4 @@
+import { test, expect, vitest } from 'vitest';
 import type { Logger } from '../types';
 import ProxyLogger from '../proxyLogger';
 
@@ -8,11 +9,11 @@ test('proxyLogger works with no logger', () => {
 
 test('calls real logger when set', () => {
   const testLogger: Logger = {
-    trace: jest.fn(),
-    debug: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
+    trace: vitest.fn(),
+    debug: vitest.fn(),
+    info: vitest.fn(),
+    warn: vitest.fn(),
+    error: vitest.fn(),
   };
 
   let useTestLogger = false;

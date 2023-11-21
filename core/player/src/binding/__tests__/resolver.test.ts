@@ -1,5 +1,5 @@
+import { describe, test, expect, vitest } from 'vitest';
 import get from 'dlv';
-
 import type { ParserSuccessResult } from '../../binding-grammar';
 import { parseParsimmon } from '../../binding-grammar';
 import { resolveBindingAST } from '../resolver';
@@ -67,7 +67,7 @@ describe('expressions', () => {
   test('evaluates expressions as paths', () => {
     const parsedBinding = parseParsimmon('foo.bar.`exp()`');
 
-    const evaluate = jest.fn().mockReturnValue(100);
+    const evaluate = vitest.fn().mockReturnValue(100);
     const resolved = resolveBindingAST(
       (parsedBinding as ParserSuccessResult).path,
       {
