@@ -16,11 +16,11 @@ import com.intuit.player.jvm.core.player.state.dataModel
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class ActionTest : AssetTest("action") {
+class ActionTest : AssetTest("reference-assets") {
 
     @Test
     fun actionExpression() {
-        launchMock("basic")
+        launchMock("action-basic")
 
         currentAssetTree.shouldBeAsset<Action> {
             data.label.shouldBeAsset<Text> {
@@ -42,7 +42,7 @@ class ActionTest : AssetTest("action") {
 
     @Test
     fun transitionToEndSuccess() {
-        launchMock("transition-to-end")
+        launchMock("action-transition-to-end")
 
         val collectionValues = currentView?.findViewById<LinearLayout>(R.id.collection_values) ?: throw AssertionError("current view is null")
         assertEquals(2, collectionValues.childCount)
@@ -59,7 +59,7 @@ class ActionTest : AssetTest("action") {
 
     @Test
     fun transitionToEndError() {
-        launchMock("transition-to-end")
+        launchMock("action-transition-to-end")
 
         val collectionValues = currentView?.findViewById<LinearLayout>(R.id.collection_values) ?: throw AssertionError("current view is null")
         assertEquals(2, collectionValues.childCount)

@@ -15,5 +15,7 @@ main_deps = main_exports + [
 main_runtime_deps = []
 
 # Test dependencies
-test_deps = []
+test_deps = [
+     "//plugins/reference-assets/jvm:reference-assets",
+]
 test_runtime_deps = []

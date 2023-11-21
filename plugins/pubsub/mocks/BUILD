@@ -1,4 +1,7 @@
-load("//:index.bzl", "generate_manifest", "javascript_pipeline")
+load("//:index.bzl", "generate_manifest","javascript_pipeline")
+
+
+
 
 filegroup(
     name = "mocks",
@@ -13,11 +16,10 @@ generate_manifest(
 )
 
 javascript_pipeline(
-    name = "@player-ui/reference-assets-plugin-mocks",
+    name = "@player-ui/pubsub-plugin-mocks",
     entry = "index.ts",
     dependencies = [
         "@npm//@player-tools/dsl",
-        "//plugins/reference-assets/components:@player-ui/reference-assets-components"
     ],
     other_srcs = [
         "index.ts",
@@ -28,7 +30,7 @@ javascript_pipeline(
 
 java_library(
     name = "jar",
-    resources = [":manifest"],
-    resource_strip_prefix = "plugins/reference-assets/mocks",
+    resources = [":mocks"],
+    resource_strip_prefix = "plugins/pubsub/mocks/",
     visibility = ["//visibility:public"],
 )

@@ -12,7 +12,7 @@ public class ClassLoaderMocksReader(private val classLoader: ClassLoader = Class
      * will read the manifest on demand and default to an empty list if not found.
      */
     public val manifest: String by lazy {
-        classLoader.getResource("manifest.json")?.readText() ?: "[]"
+        classLoader.getResource("mocks/manifest.json")?.readText() ?: "[]"
     }
 
     /**
