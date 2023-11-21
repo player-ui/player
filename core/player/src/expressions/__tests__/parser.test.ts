@@ -11,7 +11,7 @@ test('the happy stuff', () => {
   expect(parseExpression('{{foo}} ? "bar" : "baz"')).toMatchSnapshot();
   expect(parseExpression('foo[bar]')).toMatchSnapshot();
   expect(
-    parseExpression('{{foo}} == "string\nwith\tbreaks"')
+    parseExpression('{{foo}} == "string\nwith\tbreaks"'),
   ).toMatchSnapshot();
   expect(parseExpression('foo = [1, 2, 3]')).toMatchSnapshot();
 });
@@ -80,10 +80,10 @@ describe('expression parser', () => {
     expect(parseExpression('{"foo": 1 + 2}')).toMatchSnapshot();
     expect(parseExpression('{"foo": "value", "bar": "baz"}')).toMatchSnapshot();
     expect(
-      parseExpression('{"foo": "value", "bar": { "baz":  "foo" }}')
+      parseExpression('{"foo": "value", "bar": { "baz":  "foo" }}'),
     ).toMatchSnapshot();
     expect(
-      parseExpression('publish("test", {"key": "value"})')
+      parseExpression('publish("test", {"key": "value"})'),
     ).toMatchSnapshot();
     // no closing brace
     expect(() => parseExpression('{"foo": "value"')).toThrowError();
@@ -95,7 +95,7 @@ describe('expression parser', () => {
     expect(() => parseExpression('{"key" "value" }')).toThrowError();
     // no comma
     expect(() =>
-      parseExpression('{"key": "value" "key2": "value" }')
+      parseExpression('{"key": "value" "key2": "value" }'),
     ).toThrowError();
   });
 });
@@ -109,7 +109,7 @@ describe('graceful parsing', () => {
     expect(parsed).toBeTruthy();
     expect(parsed.error).toBeTruthy();
     expect(parsed.error?.message).toBe(
-      'Unclosed brace after "bar}" at character 16'
+      'Unclosed brace after "bar}" at character 16',
     );
   });
 });

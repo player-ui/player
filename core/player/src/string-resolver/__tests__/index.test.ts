@@ -43,25 +43,25 @@ test('works on basic data', () => {
   };
 
   expect(
-    resolveDataRefs('Adam is {{adam.age}} years old', options)
+    resolveDataRefs('Adam is {{adam.age}} years old', options),
   ).toStrictEqual('Adam is 26 years old');
 
   expect(
-    resolveDataRefs('My name is {{person.first}} {{person.last}}', options)
+    resolveDataRefs('My name is {{person.first}} {{person.last}}', options),
   ).toStrictEqual('My name is adam dierkens');
 
   expect(resolveDataRefs('My name is {{name}}', options)).toStrictEqual(
-    'My name is adam dierkens'
+    'My name is adam dierkens',
   );
 
   expect(resolveDataRefs('{{name}}', options)).toStrictEqual('adam dierkens');
 
   expect(
-    resolveDataRefs('My cat is named {{pets[type="cat"].name}}', options)
+    resolveDataRefs('My cat is named {{pets[type="cat"].name}}', options),
   ).toStrictEqual('My cat is named frodo');
 
   expect(
-    resolveDataRefs('Name: {{pets.{{index}}.name}}', options)
+    resolveDataRefs('Name: {{pets.{{index}}.name}}', options),
   ).toStrictEqual('Name: ginger');
 });
 
@@ -80,7 +80,7 @@ test('replaces data w/ raw value if only data ref', () => {
     resolveDataRefs('{{foo}}', {
       model,
       evaluate: (exp) => exp,
-    })
+    }),
   ).toStrictEqual(100);
 });
 
@@ -122,8 +122,8 @@ test('works on objects and arrays', () => {
       {
         model,
         evaluate: (exp) => exp,
-      }
-    )
+      },
+    ),
   ).toStrictEqual(['I have a cat named frodo', 'I have a dog named ginger']);
 });
 
@@ -160,7 +160,7 @@ test('handles undefined object', () => {
     resolveDataRefs(null, {
       model,
       evaluate: (exp) => exp,
-    })
+    }),
   ).toBeNull();
 });
 
@@ -210,8 +210,8 @@ test('resolves expressions', () => {
   expect(
     resolveExpressionsInString(
       'Hello @[{{person.first}} + " " + {{person.last}}]@',
-      options
-    )
+      options,
+    ),
   ).toBe('Hello adam dierkens');
 
   expect(resolveDataRefs('@[{{adam.age}} + 10]@', options)).toBe(36);

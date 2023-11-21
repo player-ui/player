@@ -52,7 +52,7 @@ export interface ExpressionContext {
 
 export type ExpressionHandler<
   T extends readonly unknown[] = unknown[],
-  R = void
+  R = void,
 > = ((context: ExpressionContext, ...args: T) => R) &
   Partial<OperatorProcessingOptions>;
 

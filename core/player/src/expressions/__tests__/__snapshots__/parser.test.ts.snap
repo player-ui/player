@@ -1,17 +1,17 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`expression parser objects- in parser 1`] = `
-Object {
+exports[`expression parser > objects- in parser 1`] = `
+{
   "__id": Symbol(Expression Node ID),
-  "attributes": Array [
-    Object {
-      "key": Object {
+  "attributes": [
+    {
+      "key": {
         "__id": Symbol(Expression Node ID),
-        "location": Object {
-          "end": Object {
+        "location": {
+          "end": {
             "character": 6,
           },
-          "start": Object {
+          "start": {
             "character": 2,
           },
         },
@@ -19,13 +19,13 @@ Object {
         "type": "Literal",
         "value": "foo",
       },
-      "value": Object {
+      "value": {
         "__id": Symbol(Expression Node ID),
-        "location": Object {
-          "end": Object {
+        "location": {
+          "end": {
             "character": 15,
           },
-          "start": Object {
+          "start": {
             "character": 9,
           },
         },
@@ -35,11 +35,11 @@ Object {
       },
     },
   ],
-  "location": Object {
-    "end": Object {
+  "location": {
+    "end": {
       "character": 16,
     },
-    "start": Object {
+    "start": {
       "character": 0,
     },
   },
@@ -47,18 +47,18 @@ Object {
 }
 `;
 
-exports[`expression parser objects- in parser 2`] = `
-Object {
+exports[`expression parser > objects- in parser 2`] = `
+{
   "__id": Symbol(Expression Node ID),
-  "attributes": Array [
-    Object {
-      "key": Object {
+  "attributes": [
+    {
+      "key": {
         "__id": Symbol(Expression Node ID),
-        "location": Object {
-          "end": Object {
+        "location": {
+          "end": {
             "character": 6,
           },
-          "start": Object {
+          "start": {
             "character": 2,
           },
         },
@@ -66,13 +66,13 @@ Object {
         "type": "Literal",
         "value": "foo",
       },
-      "value": Object {
+      "value": {
         "__id": Symbol(Expression Node ID),
-        "location": Object {
-          "end": Object {
+        "location": {
+          "end": {
             "character": 24,
           },
-          "start": Object {
+          "start": {
             "character": 8,
           },
         },
@@ -81,11 +81,11 @@ Object {
       },
     },
   ],
-  "location": Object {
-    "end": Object {
+  "location": {
+    "end": {
       "character": 25,
     },
-    "start": Object {
+    "start": {
       "character": 0,
     },
   },
@@ -93,18 +93,18 @@ Object {
 }
 `;
 
-exports[`expression parser objects- in parser 3`] = `
-Object {
+exports[`expression parser > objects- in parser 3`] = `
+{
   "__id": Symbol(Expression Node ID),
-  "attributes": Array [
-    Object {
-      "key": Object {
+  "attributes": [
+    {
+      "key": {
         "__id": Symbol(Expression Node ID),
-        "location": Object {
-          "end": Object {
+        "location": {
+          "end": {
             "character": 6,
           },
-          "start": Object {
+          "start": {
             "character": 2,
           },
         },
@@ -112,15 +112,15 @@ Object {
         "type": "Literal",
         "value": "foo",
       },
-      "value": Object {
+      "value": {
         "__id": Symbol(Expression Node ID),
-        "left": Object {
+        "left": {
           "__id": Symbol(Expression Node ID),
-          "location": Object {
-            "end": Object {
+          "location": {
+            "end": {
               "character": 9,
             },
-            "start": Object {
+            "start": {
               "character": 8,
             },
           },
@@ -128,22 +128,22 @@ Object {
           "type": "Literal",
           "value": 1,
         },
-        "location": Object {
-          "end": Object {
+        "location": {
+          "end": {
             "character": 13,
           },
-          "start": Object {
+          "start": {
             "character": 8,
           },
         },
         "operator": "+",
-        "right": Object {
+        "right": {
           "__id": Symbol(Expression Node ID),
-          "location": Object {
-            "end": Object {
+          "location": {
+            "end": {
               "character": 13,
             },
-            "start": Object {
+            "start": {
               "character": 12,
             },
           },
@@ -155,11 +155,11 @@ Object {
       },
     },
   ],
-  "location": Object {
-    "end": Object {
+  "location": {
+    "end": {
       "character": 14,
     },
-    "start": Object {
+    "start": {
       "character": 0,
     },
   },
@@ -167,18 +167,18 @@ Object {
 }
 `;
 
-exports[`expression parser objects- in parser 4`] = `
-Object {
+exports[`expression parser > objects- in parser 4`] = `
+{
   "__id": Symbol(Expression Node ID),
-  "attributes": Array [
-    Object {
-      "key": Object {
+  "attributes": [
+    {
+      "key": {
         "__id": Symbol(Expression Node ID),
-        "location": Object {
-          "end": Object {
+        "location": {
+          "end": {
             "character": 6,
           },
-          "start": Object {
+          "start": {
             "character": 2,
           },
         },
@@ -186,13 +186,13 @@ Object {
         "type": "Literal",
         "value": "foo",
       },
-      "value": Object {
+      "value": {
         "__id": Symbol(Expression Node ID),
-        "location": Object {
-          "end": Object {
+        "location": {
+          "end": {
             "character": 15,
           },
-          "start": Object {
+          "start": {
             "character": 9,
           },
         },
@@ -201,14 +201,14 @@ Object {
         "value": "value",
       },
     },
-    Object {
-      "key": Object {
+    {
+      "key": {
         "__id": Symbol(Expression Node ID),
-        "location": Object {
-          "end": Object {
+        "location": {
+          "end": {
             "character": 22,
           },
-          "start": Object {
+          "start": {
             "character": 18,
           },
         },
@@ -216,13 +216,13 @@ Object {
         "type": "Literal",
         "value": "bar",
       },
-      "value": Object {
+      "value": {
         "__id": Symbol(Expression Node ID),
-        "location": Object {
-          "end": Object {
+        "location": {
+          "end": {
             "character": 29,
           },
-          "start": Object {
+          "start": {
             "character": 25,
           },
         },
@@ -232,11 +232,11 @@ Object {
       },
     },
   ],
-  "location": Object {
-    "end": Object {
+  "location": {
+    "end": {
       "character": 30,
     },
-    "start": Object {
+    "start": {
       "character": 0,
     },
   },
@@ -244,18 +244,18 @@ Object {
 }
 `;
 
-exports[`expression parser objects- in parser 5`] = `
-Object {
+exports[`expression parser > objects- in parser 5`] = `
+{
   "__id": Symbol(Expression Node ID),
-  "attributes": Array [
-    Object {
-      "key": Object {
+  "attributes": [
+    {
+      "key": {
         "__id": Symbol(Expression Node ID),
-        "location": Object {
-          "end": Object {
+        "location": {
+          "end": {
             "character": 6,
           },
-          "start": Object {
+          "start": {
             "character": 2,
           },
         },
@@ -263,13 +263,13 @@ Object {
         "type": "Literal",
         "value": "foo",
       },
-      "value": Object {
+      "value": {
         "__id": Symbol(Expression Node ID),
-        "location": Object {
-          "end": Object {
+        "location": {
+          "end": {
             "character": 15,
           },
-          "start": Object {
+          "start": {
             "character": 9,
           },
         },
@@ -278,14 +278,14 @@ Object {
         "value": "value",
       },
     },
-    Object {
-      "key": Object {
+    {
+      "key": {
         "__id": Symbol(Expression Node ID),
-        "location": Object {
-          "end": Object {
+        "location": {
+          "end": {
             "character": 22,
           },
-          "start": Object {
+          "start": {
             "character": 18,
           },
         },
@@ -293,17 +293,17 @@ Object {
         "type": "Literal",
         "value": "bar",
       },
-      "value": Object {
+      "value": {
         "__id": Symbol(Expression Node ID),
-        "attributes": Array [
-          Object {
-            "key": Object {
+        "attributes": [
+          {
+            "key": {
               "__id": Symbol(Expression Node ID),
-              "location": Object {
-                "end": Object {
+              "location": {
+                "end": {
                   "character": 31,
                 },
-                "start": Object {
+                "start": {
                   "character": 27,
                 },
               },
@@ -311,13 +311,13 @@ Object {
               "type": "Literal",
               "value": "baz",
             },
-            "value": Object {
+            "value": {
               "__id": Symbol(Expression Node ID),
-              "location": Object {
-                "end": Object {
+              "location": {
+                "end": {
                   "character": 39,
                 },
-                "start": Object {
+                "start": {
                   "character": 35,
                 },
               },
@@ -327,11 +327,11 @@ Object {
             },
           },
         ],
-        "location": Object {
-          "end": Object {
+        "location": {
+          "end": {
             "character": 41,
           },
-          "start": Object {
+          "start": {
             "character": 24,
           },
         },
@@ -339,11 +339,11 @@ Object {
       },
     },
   ],
-  "location": Object {
-    "end": Object {
+  "location": {
+    "end": {
       "character": 42,
     },
-    "start": Object {
+    "start": {
       "character": 0,
     },
   },
@@ -351,17 +351,17 @@ Object {
 }
 `;
 
-exports[`expression parser objects- in parser 6`] = `
-Object {
+exports[`expression parser > objects- in parser 6`] = `
+{
   "__id": Symbol(Expression Node ID),
-  "args": Array [
-    Object {
+  "args": [
+    {
       "__id": Symbol(Expression Node ID),
-      "location": Object {
-        "end": Object {
+      "location": {
+        "end": {
           "character": 14,
         },
-        "start": Object {
+        "start": {
           "character": 9,
         },
       },
@@ -369,17 +369,17 @@ Object {
       "type": "Literal",
       "value": "test",
     },
-    Object {
+    {
       "__id": Symbol(Expression Node ID),
-      "attributes": Array [
-        Object {
-          "key": Object {
+      "attributes": [
+        {
+          "key": {
             "__id": Symbol(Expression Node ID),
-            "location": Object {
-              "end": Object {
+            "location": {
+              "end": {
                 "character": 22,
               },
-              "start": Object {
+              "start": {
                 "character": 18,
               },
             },
@@ -387,13 +387,13 @@ Object {
             "type": "Literal",
             "value": "key",
           },
-          "value": Object {
+          "value": {
             "__id": Symbol(Expression Node ID),
-            "location": Object {
-              "end": Object {
+            "location": {
+              "end": {
                 "character": 31,
               },
-              "start": Object {
+              "start": {
                 "character": 25,
               },
             },
@@ -403,35 +403,35 @@ Object {
           },
         },
       ],
-      "location": Object {
-        "end": Object {
+      "location": {
+        "end": {
           "character": 32,
         },
-        "start": Object {
+        "start": {
           "character": 16,
         },
       },
       "type": "Object",
     },
   ],
-  "callTarget": Object {
+  "callTarget": {
     "__id": Symbol(Expression Node ID),
-    "location": Object {
-      "end": Object {
+    "location": {
+      "end": {
         "character": 7,
       },
-      "start": Object {
+      "start": {
         "character": 0,
       },
     },
     "name": "publish",
     "type": "Identifier",
   },
-  "location": Object {
-    "end": Object {
+  "location": {
+    "end": {
       "character": 33,
     },
-    "start": Object {
+    "start": {
       "character": 7,
     },
   },
@@ -440,13 +440,13 @@ Object {
 `;
 
 exports[`the happy stuff 1`] = `
-Object {
+{
   "__id": Symbol(Expression Node ID),
-  "location": Object {
-    "end": Object {
+  "location": {
+    "end": {
       "character": 3,
     },
-    "start": Object {
+    "start": {
       "character": 0,
     },
   },
@@ -456,37 +456,37 @@ Object {
 `;
 
 exports[`the happy stuff 2`] = `
-Object {
+{
   "__id": Symbol(Expression Node ID),
-  "left": Object {
+  "left": {
     "__id": Symbol(Expression Node ID),
-    "location": Object {
-      "end": Object {
+    "location": {
+      "end": {
         "character": 3,
       },
-      "start": Object {
+      "start": {
         "character": 0,
       },
     },
     "name": "foo",
     "type": "Identifier",
   },
-  "location": Object {
-    "end": Object {
+  "location": {
+    "end": {
       "character": 11,
     },
-    "start": Object {
+    "start": {
       "character": 0,
     },
   },
   "operator": "===",
-  "right": Object {
+  "right": {
     "__id": Symbol(Expression Node ID),
-    "location": Object {
-      "end": Object {
+    "location": {
+      "end": {
         "character": 11,
       },
-      "start": Object {
+      "start": {
         "character": 8,
       },
     },
@@ -498,37 +498,37 @@ Object {
 `;
 
 exports[`the happy stuff 3`] = `
-Object {
+{
   "__id": Symbol(Expression Node ID),
-  "left": Object {
+  "left": {
     "__id": Symbol(Expression Node ID),
-    "location": Object {
-      "end": Object {
+    "location": {
+      "end": {
         "character": 3,
       },
-      "start": Object {
+      "start": {
         "character": 0,
       },
     },
     "name": "foo",
     "type": "Identifier",
   },
-  "location": Object {
-    "end": Object {
+  "location": {
+    "end": {
       "character": 10,
     },
-    "start": Object {
+    "start": {
       "character": 0,
     },
   },
   "operator": "||",
-  "right": Object {
+  "right": {
     "__id": Symbol(Expression Node ID),
-    "location": Object {
-      "end": Object {
+    "location": {
+      "end": {
         "character": 10,
       },
-      "start": Object {
+      "start": {
         "character": 7,
       },
     },
@@ -540,16 +540,16 @@ Object {
 `;
 
 exports[`the happy stuff 4`] = `
-Object {
+{
   "__id": Symbol(Expression Node ID),
-  "args": Array [
-    Object {
+  "args": [
+    {
       "__id": Symbol(Expression Node ID),
-      "location": Object {
-        "end": Object {
+      "location": {
+        "end": {
           "character": 7,
         },
-        "start": Object {
+        "start": {
           "character": 4,
         },
       },
@@ -557,24 +557,24 @@ Object {
       "type": "Identifier",
     },
   ],
-  "callTarget": Object {
+  "callTarget": {
     "__id": Symbol(Expression Node ID),
-    "location": Object {
-      "end": Object {
+    "location": {
+      "end": {
         "character": 3,
       },
-      "start": Object {
+      "start": {
         "character": 0,
       },
     },
     "name": "foo",
     "type": "Identifier",
   },
-  "location": Object {
-    "end": Object {
+  "location": {
+    "end": {
       "character": 8,
     },
-    "start": Object {
+    "start": {
       "character": 3,
     },
   },
@@ -583,37 +583,37 @@ Object {
 `;
 
 exports[`the happy stuff 5`] = `
-Object {
+{
   "__id": Symbol(Expression Node ID),
-  "left": Object {
+  "left": {
     "__id": Symbol(Expression Node ID),
-    "location": Object {
-      "end": Object {
+    "location": {
+      "end": {
         "character": 7,
       },
-      "start": Object {
+      "start": {
         "character": 0,
       },
     },
     "ref": "foo",
     "type": "ModelRef",
   },
-  "location": Object {
-    "end": Object {
+  "location": {
+    "end": {
       "character": 15,
     },
-    "start": Object {
+    "start": {
       "character": 0,
     },
   },
   "operator": "=",
-  "right": Object {
+  "right": {
     "__id": Symbol(Expression Node ID),
-    "location": Object {
-      "end": Object {
+    "location": {
+      "end": {
         "character": 15,
       },
-      "start": Object {
+      "start": {
         "character": 11,
       },
     },
@@ -626,15 +626,15 @@ Object {
 `;
 
 exports[`the happy stuff 6`] = `
-Object {
+{
   "__id": Symbol(Expression Node ID),
-  "alternate": Object {
+  "alternate": {
     "__id": Symbol(Expression Node ID),
-    "location": Object {
-      "end": Object {
+    "location": {
+      "end": {
         "character": 23,
       },
-      "start": Object {
+      "start": {
         "character": 19,
       },
     },
@@ -642,13 +642,13 @@ Object {
     "type": "Literal",
     "value": "baz",
   },
-  "consequent": Object {
+  "consequent": {
     "__id": Symbol(Expression Node ID),
-    "location": Object {
-      "end": Object {
+    "location": {
+      "end": {
         "character": 15,
       },
-      "start": Object {
+      "start": {
         "character": 11,
       },
     },
@@ -656,21 +656,21 @@ Object {
     "type": "Literal",
     "value": "bar",
   },
-  "location": Object {
-    "end": Object {
+  "location": {
+    "end": {
       "character": 23,
     },
-    "start": Object {
+    "start": {
       "character": 8,
     },
   },
-  "test": Object {
+  "test": {
     "__id": Symbol(Expression Node ID),
-    "location": Object {
-      "end": Object {
+    "location": {
+      "end": {
         "character": 7,
       },
-      "start": Object {
+      "start": {
         "character": 0,
       },
     },
@@ -682,37 +682,37 @@ Object {
 `;
 
 exports[`the happy stuff 7`] = `
-Object {
+{
   "__id": Symbol(Expression Node ID),
   "computed": true,
-  "location": Object {
-    "end": Object {
+  "location": {
+    "end": {
       "character": 7,
     },
-    "start": Object {
+    "start": {
       "character": 3,
     },
   },
-  "object": Object {
+  "object": {
     "__id": Symbol(Expression Node ID),
-    "location": Object {
-      "end": Object {
+    "location": {
+      "end": {
         "character": 3,
       },
-      "start": Object {
+      "start": {
         "character": 0,
       },
     },
     "name": "foo",
     "type": "Identifier",
   },
-  "property": Object {
+  "property": {
     "__id": Symbol(Expression Node ID),
-    "location": Object {
-      "end": Object {
+    "location": {
+      "end": {
         "character": 7,
       },
-      "start": Object {
+      "start": {
         "character": 4,
       },
     },
@@ -724,37 +724,37 @@ Object {
 `;
 
 exports[`the happy stuff 8`] = `
-Object {
+{
   "__id": Symbol(Expression Node ID),
-  "left": Object {
+  "left": {
     "__id": Symbol(Expression Node ID),
-    "location": Object {
-      "end": Object {
+    "location": {
+      "end": {
         "character": 7,
       },
-      "start": Object {
+      "start": {
         "character": 0,
       },
     },
     "ref": "foo",
     "type": "ModelRef",
   },
-  "location": Object {
-    "end": Object {
+  "location": {
+    "end": {
       "character": 31,
     },
-    "start": Object {
+    "start": {
       "character": 0,
     },
   },
   "operator": "==",
-  "right": Object {
+  "right": {
     "__id": Symbol(Expression Node ID),
-    "location": Object {
-      "end": Object {
+    "location": {
+      "end": {
         "character": 31,
       },
-      "start": Object {
+      "start": {
         "character": 12,
       },
     },
@@ -769,40 +769,40 @@ with	breaks",
 `;
 
 exports[`the happy stuff 9`] = `
-Object {
+{
   "__id": Symbol(Expression Node ID),
-  "left": Object {
+  "left": {
     "__id": Symbol(Expression Node ID),
-    "location": Object {
-      "end": Object {
+    "location": {
+      "end": {
         "character": 3,
       },
-      "start": Object {
+      "start": {
         "character": 0,
       },
     },
     "name": "foo",
     "type": "Identifier",
   },
-  "location": Object {
-    "end": Object {
+  "location": {
+    "end": {
       "character": 15,
     },
-    "start": Object {
+    "start": {
       "character": 0,
     },
   },
   "operator": "=",
-  "right": Object {
+  "right": {
     "__id": Symbol(Expression Node ID),
-    "elements": Array [
-      Object {
+    "elements": [
+      {
         "__id": Symbol(Expression Node ID),
-        "location": Object {
-          "end": Object {
+        "location": {
+          "end": {
             "character": 8,
           },
-          "start": Object {
+          "start": {
             "character": 7,
           },
         },
@@ -810,13 +810,13 @@ Object {
         "type": "Literal",
         "value": 1,
       },
-      Object {
+      {
         "__id": Symbol(Expression Node ID),
-        "location": Object {
-          "end": Object {
+        "location": {
+          "end": {
             "character": 11,
           },
-          "start": Object {
+          "start": {
             "character": 10,
           },
         },
@@ -824,13 +824,13 @@ Object {
         "type": "Literal",
         "value": 2,
       },
-      Object {
+      {
         "__id": Symbol(Expression Node ID),
-        "location": Object {
-          "end": Object {
+        "location": {
+          "end": {
             "character": 14,
           },
-          "start": Object {
+          "start": {
             "character": 13,
           },
         },
@@ -839,11 +839,11 @@ Object {
         "value": 3,
       },
     ],
-    "location": Object {
-      "end": Object {
+    "location": {
+      "end": {
         "character": 15,
       },
-      "start": Object {
+      "start": {
         "character": 6,
       },
     },

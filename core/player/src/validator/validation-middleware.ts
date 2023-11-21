@@ -28,7 +28,7 @@ export type StrongOrWeakBinding = {
  */
 export type MiddlewareChecker = (
   binding: BindingInstance,
-  model: DataModelImpl
+  model: DataModelImpl,
 ) => ValidationResponse | Set<StrongOrWeakBinding> | undefined;
 
 /**
@@ -47,7 +47,7 @@ export class ValidationMiddleware implements DataModelMiddleware {
       logger?: Logger;
       /** Optional function to include data staged in shadowModel */
       shouldIncludeInvalid?: (options?: DataModelOptions) => boolean;
-    }
+    },
   ) {
     this.validator = validator;
     this.shadowModelPaths = new Map();
@@ -58,7 +58,7 @@ export class ValidationMiddleware implements DataModelMiddleware {
   public set(
     transaction: BatchSetTransaction,
     options?: DataModelOptions,
-    next?: DataModelImpl
+    next?: DataModelImpl,
   ): Updates {
     const asModel = toModel(this, { ...options, includeInvalid: true }, next);
     const nextTransaction: BatchSetTransaction = [];
@@ -92,7 +92,7 @@ export class ValidationMiddleware implements DataModelMiddleware {
         this.logger?.debug(
           `Invalid value for path: ${binding.asString()} - ${
             validations.severity
-          } - ${validations.message}`
+          } - ${validations.message}`,
         );
       }
     });
@@ -102,7 +102,7 @@ export class ValidationMiddleware implements DataModelMiddleware {
     if (next && nextTransaction.length > 0) {
       // defer clearing the shadow model to prevent validations that are run twice due to weak binding refs still needing the data
       nextTransaction.forEach(([binding]) =>
-        this.shadowModelPaths.delete(binding)
+        this.shadowModelPaths.delete(binding),
       );
       const result = next.set(nextTransaction, options);
       if (invalidBindings.length === 0) {
@@ -127,7 +127,7 @@ export class ValidationMiddleware implements DataModelMiddleware {
   public get(
     binding: BindingInstance,
     options?: DataModelOptions,
-    next?: DataModelImpl
+    next?: DataModelImpl,
   ) {
     let val = next?.get(binding, options);
 
@@ -154,11 +154,11 @@ export class ValidationMiddleware implements DataModelMiddleware {
   public delete(
     binding: BindingInstance,
     options?: DataModelOptions,
-    next?: DataModelImpl
+    next?: DataModelImpl,
   ) {
     this.shadowModelPaths = removeBindingAndChildrenFromMap(
       this.shadowModelPaths,
-      binding
+      binding,
     );
 
     return next?.delete(binding, options);

@@ -56,7 +56,7 @@ describe('generates the correct AST', () => {
 
   test('works with applicability things', () => {
     expect(
-      parser.parseObject({ foo: 'bar', applicability: '{{baz}}' })
+      parser.parseObject({ foo: 'bar', applicability: '{{baz}}' }),
     ).toMatchSnapshot();
 
     expect(
@@ -72,7 +72,7 @@ describe('generates the correct AST', () => {
             },
           ],
         },
-      })
+      }),
     ).toMatchSnapshot();
 
     expect(
@@ -88,7 +88,7 @@ describe('generates the correct AST', () => {
             },
           },
         },
-      })
+      }),
     ).toMatchSnapshot();
 
     expect(
@@ -101,7 +101,7 @@ describe('generates the correct AST', () => {
             },
           },
         },
-      })
+      }),
     ).toMatchSnapshot();
   });
 
@@ -117,8 +117,8 @@ describe('generates the correct AST', () => {
           type: 'action',
           exp: ['{{please}} = "work"'],
         },
-        NodeType.Asset
-      )
+        NodeType.Asset,
+      ),
     ).toMatchSnapshot();
   });
 
@@ -187,7 +187,7 @@ describe('parseView', () => {
             ],
           },
         },
-      } as any)
+      } as any),
     ).toMatchSnapshot();
   });
 });
@@ -258,7 +258,7 @@ describe('generates the correct AST when using switch plugin', () => {
 
   test('works with objects in a multiNode', () => {
     expect(
-      parser.parseObject(toughStaticSwitchMultiNodeView)
+      parser.parseObject(toughStaticSwitchMultiNodeView),
     ).toMatchSnapshot();
   });
 });

@@ -80,7 +80,7 @@ describe('Dynamic AST Transforms', () => {
                     value: {
                       ...firstChild,
                     },
-                  })
+                  }),
                 );
               }
             }
@@ -386,7 +386,7 @@ describe('Duplicate IDs', () => {
 
     expect(testLogger.error).toBeCalledTimes(1);
     expect(testLogger.error).toBeCalledWith(
-      'Cache conflict: Found Asset/View nodes that have conflicting ids: action-1, may cause cache issues.'
+      'Cache conflict: Found Asset/View nodes that have conflicting ids: action-1, may cause cache issues.',
     );
     (testLogger.error as jest.Mock).mockClear();
 
@@ -481,7 +481,7 @@ describe('Duplicate IDs', () => {
 
     expect(testLogger.info).toBeCalledTimes(1);
     expect(testLogger.info).toBeCalledWith(
-      'Cache conflict: Found Value nodes that have conflicting ids: value-1, may cause cache issues. To improve performance make value node IDs globally unique.'
+      'Cache conflict: Found Value nodes that have conflicting ids: value-1, may cause cache issues. To improve performance make value node IDs globally unique.',
     );
     (testLogger.info as jest.Mock).mockClear();
     expect(firstUpdate).toStrictEqual(content);
@@ -532,7 +532,7 @@ describe('AST caching', () => {
 
     resolver.hooks.skipResolve.tap(
       'skipResolve',
-      () => resolvedNodes.length >= 5
+      () => resolvedNodes.length >= 5,
     );
 
     new StringResolverPlugin().applyResolver(resolver);

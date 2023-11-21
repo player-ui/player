@@ -19,7 +19,7 @@ export function flatten(obj: any, roots: [string][] = [], sep = '.'): any {
             : // include current prop and value and prefix prop with the roots
               { [roots.concat([prop]).join(sep)]: obj[prop] }),
         }),
-        {}
+        {},
       )
   );
 }

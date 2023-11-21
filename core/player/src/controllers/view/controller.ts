@@ -49,7 +49,7 @@ export class ViewController {
 
   constructor(
     initialViews: View[],
-    options: Resolve.ResolverOptions & ViewControllerOptions
+    options: Resolve.ResolverOptions & ViewControllerOptions,
   ) {
     this.viewOptions = options;
     this.viewMap = initialViews.reduce<Record<string, View>>(
@@ -57,7 +57,7 @@ export class ViewController {
         ...viewMap,
         [view.id]: view,
       }),
-      {}
+      {},
     );
 
     new AssetTransformCorePlugin(this.transformRegistry).apply(this);
@@ -72,7 +72,7 @@ export class ViewController {
             this.currentView = undefined;
           }
         });
-      }
+      },
     );
 
     /** Trigger a view update */
@@ -132,7 +132,7 @@ export class ViewController {
         resolveDataRefsInString(possibleViewIdMatch, {
           model: this.viewOptions.model,
           evaluate: this.viewOptions.evaluator.evaluate,
-        })
+        }),
     );
 
     if (matchingViewId && this.viewMap[matchingViewId]) {
@@ -146,7 +146,7 @@ export class ViewController {
     const source = this.hooks.resolveView.call(
       this.getViewForRef(viewId),
       viewId,
-      state
+      state,
     );
 
     if (!source) {

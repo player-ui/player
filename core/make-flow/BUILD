@@ -7,5 +7,5 @@ js_pipeline(
     package_name = "@player-ui/make-flow",
     deps = [
         ":node_modules/@player-ui/types",
-    ]
+    ],
 )

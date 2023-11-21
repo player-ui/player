@@ -1,11 +1,11 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`dependency model tracks dependency sets correctly 1`] = `
+exports[`dependency model > tracks dependency sets correctly 1`] = `
 Set {
   BindingInstance {
     "factory": [Function],
     "joined": "foo.bar",
-    "split": Array [
+    "split": [
       "foo",
       "bar",
     ],
@@ -13,12 +13,12 @@ Set {
 }
 `;
 
-exports[`dependency model tracks dependency sets correctly 2`] = `
+exports[`dependency model > tracks dependency sets correctly 2`] = `
 Set {
   BindingInstance {
     "factory": [Function],
     "joined": "foo.baz",
-    "split": Array [
+    "split": [
       "foo",
       "baz",
     ],
@@ -26,7 +26,7 @@ Set {
   BindingInstance {
     "factory": [Function],
     "joined": "foo.bad",
-    "split": Array [
+    "split": [
       "foo",
       "bad",
     ],
@@ -34,12 +34,12 @@ Set {
 }
 `;
 
-exports[`dependency model tracks dependency sets correctly 3`] = `
+exports[`dependency model > tracks dependency sets correctly 3`] = `
 Set {
   BindingInstance {
     "factory": [Function],
     "joined": "foo.bar",
-    "split": Array [
+    "split": [
       "foo",
       "bar",
     ],
@@ -47,7 +47,7 @@ Set {
   BindingInstance {
     "factory": [Function],
     "joined": "foo.baz",
-    "split": Array [
+    "split": [
       "foo",
       "baz",
     ],
@@ -55,7 +55,7 @@ Set {
   BindingInstance {
     "factory": [Function],
     "joined": "foo.bad",
-    "split": Array [
+    "split": [
       "foo",
       "bad",
     ],

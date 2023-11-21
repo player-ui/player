@@ -419,7 +419,7 @@ describe('templates', () => {
             },
           },
         ],
-      })
+      }),
     ).toMatchSnapshot();
   });
 
@@ -455,7 +455,7 @@ describe('templates', () => {
             },
           },
         ],
-      })
+      }),
     ).toMatchSnapshot();
   });
 
@@ -489,7 +489,7 @@ describe('templates', () => {
       obj,
       NodeType.Value,
       nodeOptions,
-      NodeType.Template
+      NodeType.Template,
     );
     expect(parsedNode).toStrictEqual({
       data: 'foo.bar',
@@ -516,7 +516,7 @@ describe('templates', () => {
       obj,
       NodeType.Value,
       nodeOptions,
-      NodeType.Template
+      NodeType.Template,
     );
     expect(parsedNode).toStrictEqual({
       data: 'foo.bar2',
@@ -560,7 +560,7 @@ describe('dynamic templates', () => {
         parseBinding,
         evaluator,
         schema,
-      }
+      },
     );
 
     model.set([['foo.bar', petNames]]);
@@ -629,7 +629,7 @@ describe('dynamic templates', () => {
         parseBinding,
         evaluator,
         schema,
-      }
+      },
     );
 
     model.set([['foo.bar', petNames]]);
@@ -673,7 +673,7 @@ describe('dynamic templates', () => {
   describe('Works with template items plus value items', () => {
     const model = withParser(
       new LocalModel(templateJoinValues.data),
-      parseBinding
+      parseBinding,
     );
     const evaluator = new ExpressionEvaluator({ model });
 

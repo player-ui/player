@@ -56,7 +56,7 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
 
       /** A logger to use  */
       logger?: Logger;
-    }
+    },
   ) {
     this.logger = options.logger;
     const middleware = options.middleware || [];
@@ -80,7 +80,7 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
   private resolveDataValue(
     binding: BindingInstance,
     value: any,
-    deformat: boolean
+    deformat: boolean,
   ) {
     if (deformat) {
       return this.hooks.deformat.call(value, binding);
@@ -91,7 +91,7 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
 
   public set(
     transaction: RawSetTransaction,
-    options?: DataModelOptions
+    options?: DataModelOptions,
   ): Updates {
     let normalizedTransaction: BatchSetTransaction = [];
 
@@ -114,7 +114,7 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
             parsed,
             this.resolveDataValue(parsed, val, Boolean(options?.formatted)),
           ];
-        }
+        },
       ) as BatchSetTransaction;
     }
 
@@ -131,19 +131,19 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
 
         if (dequal(oldVal, newVal)) {
           this.logger?.debug(
-            `Skipping update for path: ${binding.asString()}. Value was unchanged: ${oldVal}`
+            `Skipping update for path: ${binding.asString()}. Value was unchanged: ${oldVal}`,
           );
         } else {
           updates.push(update);
 
           this.logger?.debug(
-            `Setting path: ${binding.asString()} from: ${oldVal} to: ${newVal}`
+            `Setting path: ${binding.asString()} from: ${oldVal} to: ${newVal}`,
           );
         }
 
         return updates;
       },
-      []
+      [],
     );
 
     // Get the applied update
@@ -159,7 +159,7 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
         this.logger?.debug(
           `Path: ${tr.binding.asString()} was changed from: ${
             tr.oldValue
-          } to: ${tr.newValue}`
+          } to: ${tr.newValue}`,
         );
         setUpdates.push(tr);
       }

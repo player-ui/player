@@ -58,7 +58,7 @@ export interface ExtendedPlayerPlugin<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Expressions = void,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  DataTypes = void
+  DataTypes = void,
 > {}
 
 export interface PlayerConfigOptions {
@@ -151,7 +151,7 @@ export class Player {
 
   /** Find instance of [Plugin] that has been registered to Player */
   public findPlugin<Plugin extends PlayerPlugin>(
-    symbol: symbol
+    symbol: symbol,
   ): Plugin | undefined {
     return this.config.plugins?.find((el) => el.symbol === symbol) as Plugin;
   }
@@ -159,7 +159,7 @@ export class Player {
   /** Retrieve an instance of [Plugin] and conditionally invoke [apply] if it exists */
   public applyTo<Plugin extends PlayerPlugin>(
     symbol: symbol,
-    apply: (plugin: Plugin) => void
+    apply: (plugin: Plugin) => void,
   ): void {
     const plugin = this.findPlugin<Plugin>(symbol);
 
@@ -268,7 +268,7 @@ export class Player {
 
     dataController.hooks.resolveDefaultValue.tap(
       'player',
-      (binding) => schema.getApparentType(binding)?.default
+      (binding) => schema.getApparentType(binding)?.default,
     );
 
     // eslint-disable-next-line prefer-const
@@ -322,7 +322,7 @@ export class Player {
         return setIn(
           state,
           ['transitions', computedTransitionVal],
-          resolveStrings(state.transitions[computedTransitionVal])
+          resolveStrings(state.transitions[computedTransitionVal]),
         ) as any;
       });
 
@@ -353,7 +353,7 @@ export class Player {
           newState = setIn(
             state,
             ['param'],
-            resolveStrings(state.param, false)
+            resolveStrings(state.param, false),
           ) as any;
         }
 
@@ -371,7 +371,7 @@ export class Player {
         if (value && value.state_type === 'ACTION') {
           const { exp } = value;
           flowController?.transition(
-            String(expressionEvaluator?.evaluate(exp))
+            String(expressionEvaluator?.evaluate(exp)),
           );
         }
 
@@ -470,7 +470,7 @@ export class Player {
     const maybeUpdateState = <T extends PlayerFlowState>(newState: T) => {
       if (this.state.ref !== ref) {
         this.logger.warn(
-          `Received update for a flow that's not the current one`
+          `Received update for a flow that's not the current one`,
         );
 
         return newState;

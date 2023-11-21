@@ -100,8 +100,8 @@ export class ValidationBindingTrackerViewPlugin
 
       const intersection = new Set(
         [...lastViewUpdateChangeSet].filter((b) =>
-          trackedBindingsForNode.has(b)
-        )
+          trackedBindingsForNode.has(b),
+        ),
       );
 
       return intersection.size === 0;
@@ -158,7 +158,8 @@ export class ValidationBindingTrackerViewPlugin
 
             const firstFieldEOW = eows?.find(
               (eow) =>
-                eow.displayTarget === 'field' || eow.displayTarget === undefined
+                eow.displayTarget === 'field' ||
+                eow.displayTarget === undefined,
             );
 
             return firstFieldEOW;
@@ -231,7 +232,7 @@ export class ValidationBindingTrackerViewPlugin
       } else {
         currentBindingTree.set(
           node,
-          lastComputedBindingTree.get(node) ?? new Set()
+          lastComputedBindingTree.get(node) ?? new Set(),
         );
       }
 

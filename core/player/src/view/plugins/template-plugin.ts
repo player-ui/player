@@ -24,7 +24,7 @@ export interface TemplateSubstitution {
 
 export type TemplateSubstitutionsFunc = (
   baseSubstitutions: TemplateSubstitution[],
-  templateItemInfo: TemplateItemInfo
+  templateItemInfo: TemplateItemInfo,
 ) => TemplateSubstitution[];
 
 /** A view plugin to resolve/manage templates */
@@ -44,7 +44,7 @@ export default class TemplatePlugin implements ViewPlugin {
   private parseTemplate(
     parseObject: any,
     node: Node.Template,
-    options: Options
+    options: Options,
   ): Node.Node | null {
     const { template, depth } = node;
     const data = options.data.model.get(node.data);
@@ -72,7 +72,7 @@ export default class TemplatePlugin implements ViewPlugin {
             depth,
             data: dataItem,
             index,
-          }
+          },
         );
       let templateStr = JSON.stringify(template);
 
@@ -109,7 +109,7 @@ export default class TemplatePlugin implements ViewPlugin {
         return this.parseTemplate(
           parser.parseObject.bind(parser),
           node,
-          this.options
+          this.options,
         );
       }
 
@@ -128,7 +128,7 @@ export default class TemplatePlugin implements ViewPlugin {
         obj: any,
         nodeType: Node.ChildrenTypes,
         options: ParseObjectOptions,
-        determinedNodeType: null | NodeType
+        determinedNodeType: null | NodeType,
       ) => {
         if (determinedNodeType === NodeType.Template) {
           const templateNode = parser.createASTNode(
@@ -139,14 +139,14 @@ export default class TemplatePlugin implements ViewPlugin {
               template: obj.value,
               dynamic: obj.dynamic ?? false,
             },
-            obj
+            obj,
           );
 
           if (templateNode) {
             return templateNode;
           }
         }
-      }
+      },
     );
   }
 

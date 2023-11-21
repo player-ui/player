@@ -10,7 +10,7 @@ export type Matcher = ((searchObj: object) => boolean) & {
 function traverseObj(
   object: Record<any, any>,
   path: string[] = [],
-  pairs: Map<string[], any> = new Map()
+  pairs: Map<string[], any> = new Map(),
 ): Map<string[], any> {
   for (const key of Object.keys(object)) {
     const val: any = object[key];

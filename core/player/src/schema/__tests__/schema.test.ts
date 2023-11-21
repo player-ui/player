@@ -144,7 +144,7 @@ describe('schema', () => {
   test('gets the type for objects in an array', () => {
     expect(schema.getType(parse('pets.4.name'))?.type).toBe('StringType');
     expect(
-      schema.getValidationsForBinding(parse('pets.999.name'))
+      schema.getValidationsForBinding(parse('pets.999.name')),
     ).toStrictEqual([
       {
         type: 'required',
@@ -171,7 +171,7 @@ describe('schema', () => {
   test('gets the type for objects in a record', () => {
     expect(schema.getType(parse('animals.cat.age'))?.type).toBe('IntegerType');
     expect(
-      schema.getValidationsForBinding(parse('animals.cat.age'))
+      schema.getValidationsForBinding(parse('animals.cat.age')),
     ).toStrictEqual([
       {
         type: 'required',
@@ -183,16 +183,16 @@ describe('schema', () => {
 
   test('gets the type for objects in a record in an array', () => {
     expect(schema.getType(parse('animals.cat.colors.0.color'))?.type).toBe(
-      'StringType'
+      'StringType',
     );
   });
 
   test('gets the type for objects in a record with validation', () => {
     expect(schema.getType(parse('animals.ginger.name'))?.type).toBe(
-      'StringType'
+      'StringType',
     );
     expect(
-      schema.getValidationsForBinding(parse('animals.ginger.name'))
+      schema.getValidationsForBinding(parse('animals.ginger.name')),
     ).toStrictEqual([
       {
         type: 'length',
@@ -206,15 +206,15 @@ describe('schema', () => {
 
   test('gets the schema type for an array of objects in an object. and an array in an object of arrays', () => {
     expect(schema.getType(parse('automobile.0.year'))?.type).toBe(
-      'IntegerType'
+      'IntegerType',
     );
     expect(
-      schema.getType(parse('automobile.0.car.honda.makeInteger'))?.type
+      schema.getType(parse('automobile.0.car.honda.makeInteger'))?.type,
     ).toBe('IntegerType');
     expect(
       schema.getValidationsForBinding(
-        parse('automobile.0.car.honda.makeInteger')
-      )
+        parse('automobile.0.car.honda.makeInteger'),
+      ),
     ).toStrictEqual([
       {
         type: 'required',
@@ -223,15 +223,15 @@ describe('schema', () => {
       },
     ]);
     expect(
-      schema.getType(parse('automobile.0.car.honda.model.0.color'))?.type
+      schema.getType(parse('automobile.0.car.honda.model.0.color'))?.type,
     ).toBe('StringType');
     expect(
-      schema.getType(parse('automobile.0.car.honda.model.0.body'))?.type
+      schema.getType(parse('automobile.0.car.honda.model.0.body'))?.type,
     ).toBe('StringType');
     expect(
       schema.getValidationsForBinding(
-        parse('automobile.0.car.honda.model.0.body')
-      )
+        parse('automobile.0.car.honda.model.0.body'),
+      ),
     ).toStrictEqual([
       {
         type: 'required',

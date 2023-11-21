@@ -87,7 +87,7 @@ export type ExpressionEvaluatorOptions = Omit<
 
 export type ExpressionEvaluatorFunction = (
   exp: ExpressionType,
-  options?: ExpressionEvaluatorOptions
+  options?: ExpressionEvaluatorOptions,
 ) => any;
 
 /**
@@ -120,7 +120,7 @@ export class ExpressionEvaluator {
     binary: new Map(Object.entries(DEFAULT_BINARY_OPERATORS)),
     unary: new Map(Object.entries(DEFAULT_UNARY_OPERATORS)),
     expressions: new Map<string, ExpressionHandler<any, any>>(
-      Object.entries(DEFAULT_EXPRESSION_HANDLERS)
+      Object.entries(DEFAULT_EXPRESSION_HANDLERS),
     ),
   };
 
@@ -142,7 +142,7 @@ export class ExpressionEvaluator {
 
   public evaluate(
     expr: ExpressionType,
-    options?: ExpressionEvaluatorOptions
+    options?: ExpressionEvaluatorOptions,
   ): any {
     const resolvedOpts = this.hooks.resolveOptions.call({
       ...this.defaultHookOptions,
@@ -176,7 +176,7 @@ export class ExpressionEvaluator {
     if (Array.isArray(expression)) {
       return expression.reduce(
         (_nothing, exp) => this.evaluate(exp, options),
-        null
+        null,
       );
     }
 
@@ -185,7 +185,7 @@ export class ExpressionEvaluator {
 
   public addExpressionFunction<T extends readonly unknown[], R>(
     name: string,
-    handler: ExpressionHandler<T, R>
+    handler: ExpressionHandler<T, R>,
   ): void {
     this.operators.expressions.set(name, handler);
   }
@@ -250,7 +250,7 @@ export class ExpressionEvaluator {
   private _resolveNode(
     _currentValue: any,
     node: ExpressionNode,
-    options: HookOptions
+    options: HookOptions,
   ) {
     const { resolveNode, model } = options;
 
@@ -283,7 +283,7 @@ export class ExpressionEvaluator {
           return operator(
             expressionContext,
             resolveNode(node.left),
-            resolveNode(node.right)
+            resolveNode(node.right),
           );
         }
 
@@ -302,7 +302,7 @@ export class ExpressionEvaluator {
             expressionContext,
             operator.resolveParams === false
               ? node.argument
-              : resolveNode(node.argument)
+              : resolveNode(node.argument),
           );
         }
 
@@ -394,7 +394,7 @@ export class ExpressionEvaluator {
             newValue = operation(
               expressionContext,
               resolveNode(node.left),
-              resolveNode(node.right)
+              resolveNode(node.right),
             );
           }
         } else {

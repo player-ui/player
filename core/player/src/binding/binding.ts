@@ -31,7 +31,7 @@ export type RawBinding = string | RawBindingSegment[];
 export type BindingLike = RawBinding | BindingInstance;
 export type BindingFactory = (
   raw: RawBinding,
-  options?: Partial<BindingParserOptions>
+  options?: Partial<BindingParserOptions>,
 ) => BindingInstance;
 
 /**
@@ -44,7 +44,7 @@ export class BindingInstance {
 
   constructor(
     raw: RawBinding,
-    factory = (rawBinding: RawBinding) => new BindingInstance(rawBinding)
+    factory = (rawBinding: RawBinding) => new BindingInstance(rawBinding),
   ) {
     const split = Array.isArray(raw) ? raw : raw.split('.');
     this.split = split.map((segment) => {

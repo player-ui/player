@@ -1,3 +1,4 @@
+import { describe, it } from 'vitest';
 import type { Flow } from '@player-ui/types';
 import type { InProgressState } from '..';
 import { Player } from '..';
@@ -71,7 +72,7 @@ describe('AssetTransformPlugin allows custom skipped properties', () => {
     },
   };
 
-  test('skips string resolution per asset type', () => {
+  it('skips string resolution per asset type', () => {
     const player = new Player({
       plugins: [
         new AssetTransformPlugin([
@@ -140,7 +141,7 @@ describe('AssetTransformPlugin allows custom skipped properties', () => {
     });
   });
 
-  test("shouldn't skip child with a different asset type", () => {
+  it("shouldn't skip child with a different asset type", () => {
     const player = new Player({
       plugins: [
         new AssetTransformPlugin([

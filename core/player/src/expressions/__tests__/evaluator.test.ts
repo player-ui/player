@@ -72,7 +72,7 @@ describe('evaluator', () => {
 
   test('Objects', () => {
     expect(
-      evaluator.evaluate('[{"foo": "value"}, {"bar": "value"}]')
+      evaluator.evaluate('[{"foo": "value"}, {"bar": "value"}]'),
     ).toStrictEqual([
       {
         foo: 'value',
@@ -93,7 +93,7 @@ describe('evaluator', () => {
       bar: 4,
     });
     expect(
-      evaluator.evaluate('{"foo": 2, "bar": { "baz":  "foo" }}')
+      evaluator.evaluate('{"foo": 2, "bar": { "baz":  "foo" }}'),
     ).toStrictEqual({
       foo: 2,
       bar: {
@@ -186,19 +186,19 @@ describe('evaluator', () => {
     expect(
       evaluator.evaluate('{{foo.bar}}', {
         model,
-      })
+      }),
     ).toStrictEqual('baz');
   });
 
   test('model ref and Object', () => {
     model = withParser(
       new LocalModel({ bar: { hello: 'world' } }),
-      parseBinding
+      parseBinding,
     );
     expect(
       evaluator.evaluate('{ "foo": {{bar}} }', {
         model,
-      })
+      }),
     ).toStrictEqual({ foo: { hello: 'world' } });
   });
 
@@ -277,7 +277,7 @@ describe('evaluator', () => {
       expect(
         evaluator.evaluate('getDataVal("foo")', {
           model,
-        })
+        }),
       ).toStrictEqual(1);
     });
     test('set model', () => {
@@ -288,11 +288,11 @@ describe('evaluator', () => {
     });
     test('conditional', () => {
       expect(
-        evaluator.evaluate('conditional(true, true, false)')
+        evaluator.evaluate('conditional(true, true, false)'),
       ).toStrictEqual(true);
 
       expect(
-        evaluator.evaluate('conditional(false, true, false)')
+        evaluator.evaluate('conditional(false, true, false)'),
       ).toStrictEqual(false);
     });
   });
@@ -321,7 +321,7 @@ describe('evaluator', () => {
       expect(errorHandler).toBeCalledTimes(1);
 
       expect(() =>
-        evaluator.evaluate('foo()', { throwErrors: true, model })
+        evaluator.evaluate('foo()', { throwErrors: true, model }),
       ).toThrowError();
     });
   });
@@ -330,7 +330,7 @@ describe('evaluator', () => {
     beforeEach(() => {
       model = withParser(
         new LocalModel({ foo: { bar: true }, baz: { other: false } }),
-        parseBinding
+        parseBinding,
       );
     });
 
@@ -387,7 +387,7 @@ describe('evaluator', () => {
 
   test('throws errors for unknown expressions', () => {
     expect(() => evaluator.evaluate('foo()')).toThrowError(
-      'Error evaluating expression: foo()'
+      'Error evaluating expression: foo()',
     );
   });
 
@@ -404,7 +404,7 @@ describe('evaluator', () => {
       evaluator.evaluate({
         _comment: 'hello world',
         value: true,
-      } as any)
+      } as any),
     ).toStrictEqual(true);
   });
 });

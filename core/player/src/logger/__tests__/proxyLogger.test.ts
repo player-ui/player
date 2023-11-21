@@ -19,7 +19,7 @@ test('calls real logger when set', () => {
   let useTestLogger = false;
 
   const proxyLogger = new ProxyLogger(() =>
-    useTestLogger ? testLogger : undefined
+    useTestLogger ? testLogger : undefined,
   );
 
   proxyLogger.error('err');

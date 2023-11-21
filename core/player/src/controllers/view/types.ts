@@ -8,17 +8,17 @@ import type { Store } from './store';
 export type BeforeTransformFunction<AuthoredAsset extends Asset = Asset> = (
   asset: Node.Asset<AuthoredAsset> | Node.View<AuthoredAsset>,
   options: Resolve.NodeResolveOptions,
-  store: Store
+  store: Store,
 ) => Node.Node;
 
 /** Transform function that is ran on the Asset after it's resolved */
 export type TransformFunction<
   AuthoredAsset extends Asset = Asset,
-  TransformedAsset extends Asset = AuthoredAsset
+  TransformedAsset extends Asset = AuthoredAsset,
 > = (
   asset: AuthoredAsset,
   options: Resolve.NodeResolveOptions,
-  store: Store
+  store: Store,
 ) => TransformedAsset;
 
 export interface TransformFunctions {

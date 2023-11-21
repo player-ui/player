@@ -30,7 +30,7 @@ test('uses the exact same object if nothing changes', () => {
       evaluator,
       transition: () => undefined,
       schema,
-    }
+    },
   );
 
   view.hooks.resolver.tap('input', (resolver) => {
@@ -66,7 +66,7 @@ test('applicability is immutable', () => {
         bar: true,
       },
     }),
-    parseBinding
+    parseBinding,
   );
   const evaluator = new ExpressionEvaluator({ model });
   const schema = new SchemaController();
@@ -87,7 +87,7 @@ test('applicability is immutable', () => {
       evaluator,
       parseBinding,
       schema,
-    }
+    },
   );
 
   const resolved = view.update();
@@ -147,7 +147,7 @@ test('binding normalization', () => {
       evaluator,
       parseBinding,
       schema,
-    }
+    },
   );
 
   const resolved = view.update();
@@ -160,7 +160,7 @@ test('binding normalization', () => {
 
   expect(barUpdate.fields.asset.binding).not.toBe('foo[bar={{baz}}].enabled');
   expect(barUpdate.fields.asset.binding).not.toBe(
-    resolved.fields.asset.binding
+    resolved.fields.asset.binding,
   );
 });
 
@@ -173,7 +173,7 @@ test('hardcore immutability', () => {
         },
       },
     }),
-    parseBinding
+    parseBinding,
   );
   const evaluator = new ExpressionEvaluator({ model });
   const schema = new SchemaController();
@@ -194,7 +194,7 @@ test('hardcore immutability', () => {
       evaluator,
       parseBinding,
       schema,
-    }
+    },
   );
 
   const resolved = view.update();
@@ -222,7 +222,7 @@ test('should only update if data is used in view', () => {
         },
       },
     }),
-    parseBinding
+    parseBinding,
   );
   const evaluator = new ExpressionEvaluator({ model });
   const schema = new SchemaController();
@@ -243,7 +243,7 @@ test('should only update if data is used in view', () => {
       evaluator,
       parseBinding,
       schema,
-    }
+    },
   );
 
   const hook = vitest.fn();

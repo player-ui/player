@@ -88,7 +88,7 @@ test('fails when theres no startState', async () => {
   } as any);
 
   await expect(flow.start()).rejects.toThrowError(
-    "No 'startState' defined for flow"
+    "No 'startState' defined for flow",
   );
 });
 
@@ -274,7 +274,7 @@ test('fails if no startState points to unknown state', async () => {
   } as any);
 
   await expect(flow.start()).rejects.toThrowError(
-    'No flow definition for: View2 was found.'
+    'No flow definition for: View2 was found.',
   );
 });
 

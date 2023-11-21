@@ -33,7 +33,7 @@ export interface ResolveBindingASTHooks {
 export function resolveBindingAST(
   bindingPathNode: PathNode,
   options: ResolveBindingASTOptions,
-  hooks?: ResolveBindingASTHooks
+  hooks?: ResolveBindingASTHooks,
 ): NormalizedResult {
   const context: Required<NormalizedResult> = {
     updates: {},
@@ -61,12 +61,12 @@ export function resolveBindingAST(
 
       try {
         return options.convertToPath(
-          options.getValue(nestedResolvedValue.path)
+          options.getValue(nestedResolvedValue.path),
         );
       } catch (e: any) {
         throw new NestedError(
           `Unable to resolve path segment: ${nestedResolvedValue.path}`,
-          e
+          e,
         );
       }
     }

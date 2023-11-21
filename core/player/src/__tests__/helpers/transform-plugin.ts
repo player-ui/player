@@ -12,7 +12,7 @@ export class AssetTransformPlugin implements PlayerPlugin {
   apply(player: Player) {
     player.hooks.viewController.tap(this.name, (vc) => {
       this.registry.forEach(([key, value]) =>
-        vc.transformRegistry.set(key, value)
+        vc.transformRegistry.set(key, value),
       );
     });
   }

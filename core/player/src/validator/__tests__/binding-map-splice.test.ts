@@ -18,7 +18,7 @@ describe('removeBindingAndChildrenFromMap', () => {
 
     const result = removeBindingAndChildrenFromMap(
       sourceMap,
-      parser.parse('foo.bar')
+      parser.parse('foo.bar'),
     );
 
     expect(result).toStrictEqual(new Map([[parser.parse('foo.baz'), 3]]));
@@ -37,7 +37,7 @@ describe('removeBindingAndChildrenFromMap', () => {
 
     const result = removeBindingAndChildrenFromMap(
       sourceMap,
-      parser.parse('foo.bar.1')
+      parser.parse('foo.bar.1'),
     );
 
     expect(result).toStrictEqual(
@@ -47,7 +47,7 @@ describe('removeBindingAndChildrenFromMap', () => {
         [parser.parse('foo.bar.1.cca'), 5],
         [parser.parse('foo.bar.1.ccb'), 6],
         [parser.parse('foo.baz'), 3],
-      ])
+      ]),
     );
   });
 });

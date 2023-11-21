@@ -74,14 +74,14 @@ export class AssetTransformCorePlugin {
 
           return {
             useSharedState: (
-              key: string | symbol
+              key: string | symbol,
             ): (<T>(initialState: T) => readonly [T, (value: T) => void]) => {
               return store.useSharedState(key);
             },
             useLocalState: <T>(initialState: T) => {
               return store.getLocalStateFunction<T>(
                 stepKey,
-                countKey
+                countKey,
               )(initialState);
             },
           };
@@ -94,7 +94,7 @@ export class AssetTransformCorePlugin {
             if (transform?.beforeResolve) {
               const store = getStore(
                 options.node ?? node,
-                this.beforeResolveSymbol
+                this.beforeResolveSymbol,
               );
 
               return transform.beforeResolve(node, options, store);
@@ -141,7 +141,7 @@ export class AssetTransformCorePlugin {
             }
 
             return value;
-          }
+          },
         );
       });
     });

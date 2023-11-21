@@ -1,5 +1,6 @@
 {
   "name": "@player-ui/partial-match-registry",
   "version": "0.0.0-PLACEHOLDER",
+  "type": "module",
   "dependencies": {}
 }

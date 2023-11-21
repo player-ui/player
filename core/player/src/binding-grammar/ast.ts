@@ -63,7 +63,7 @@ export const toQuery = (key: AnyNode, value?: AnyNode): QueryNode => ({
 
 /** Create a concat node */
 export const toConcatenatedNode = (
-  values: Array<PathNode | ValueNode | ExpressionNode>
+  values: Array<PathNode | ValueNode | ExpressionNode>,
 ): PathNode | ValueNode | ConcatenatedNode | ExpressionNode => {
   if (values.length === 1) {
     return values[0];

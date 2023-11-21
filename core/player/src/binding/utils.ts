@@ -20,7 +20,7 @@ export function maybeConvertToNum(i: string): string | number {
  * utility to convert binding into binding segments.
  */
 export function getBindingSegments(
-  binding: BindingLike
+  binding: BindingLike,
 ): Array<string | number> {
   if (Array.isArray(binding)) {
     return binding;
@@ -37,7 +37,7 @@ export function getBindingSegments(
 export function findInArray<T extends Record<string | number, object>>(
   array: Array<T>,
   key: string | number,
-  value: T
+  value: T,
 ): number | undefined {
   return array.findIndex((obj) => {
     if (obj && typeof obj === 'object') {

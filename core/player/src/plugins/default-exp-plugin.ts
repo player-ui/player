@@ -10,7 +10,7 @@ const createFormatFunction = (schema: SchemaController) => {
   const handler: ExpressionHandler<[unknown, string], any> = (
     ctx,
     value,
-    formatName
+    formatName,
   ) => {
     return (
       schema.getFormatterForType({ type: formatName })?.format(value) ?? value
@@ -50,7 +50,7 @@ export class DefaultExpPlugin implements PlayerPlugin {
         'eval',
         (ctx, ...args: [ExpressionType]) => {
           return ctx.evaluate(...args);
-        }
+        },
       );
     });
   }

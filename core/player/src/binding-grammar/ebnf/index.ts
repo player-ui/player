@@ -66,7 +66,7 @@ function convertExpressionToken(token: ExpressionToken): ExpressionNode {
 
 /** map a concatenated token to a node */
 function convertConcatenatedToken(
-  token: ConcatenatedToken
+  token: ConcatenatedToken,
 ): ConcatenatedNode | ValueNode | PathNode | ExpressionNode {
   return toConcatenatedNode(
     token.children.map((child) => {
@@ -79,7 +79,7 @@ function convertConcatenatedToken(
       }
 
       return convertModelRefToken(child);
-    })
+    }),
   );
 }
 
@@ -90,7 +90,7 @@ function convertQuotedValueToken(token: QuotedValueToken): ValueNode {
 
 /** map a quoted value token to a value node */
 function convertOptionallyQuotedToken(
-  token: OptionallyQuotedSegment
+  token: OptionallyQuotedSegment,
 ): ValueNode | ConcatenatedNode | PathNode | ExpressionNode {
   const child = token.children[0];
   if (child.type === 'quoted_value') {
@@ -109,7 +109,7 @@ function convertOptionallyQuotedToken(
 function convertQueryToken(token: QueryToken): QueryNode {
   return toQuery(
     convertOptionallyQuotedToken(token.children[0]),
-    convertOptionallyQuotedToken(token.children[1])
+    convertOptionallyQuotedToken(token.children[1]),
   );
 }
 

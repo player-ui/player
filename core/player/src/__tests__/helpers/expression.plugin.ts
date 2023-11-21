@@ -50,7 +50,7 @@ export const required: ValidatorFunction<{
     const message = context.constants.getConstants(
       'validation.required',
       'constants',
-      'A value is required'
+      'A value is required',
     ) as string;
     return { message, severity: 'error' };
   }
@@ -81,7 +81,7 @@ export class RequiredIfValidationProviderPlugin implements PlayerPlugin {
         this.name,
         (validationRegistry) => {
           validationRegistry.register('requiredIf', requiredIf);
-        }
+        },
       );
     });
   }

@@ -1,3 +1,4 @@
+import { describe, it, beforeEach, vitest, test, expect } from 'vitest';
 import { BindingParser } from '../binding';
 import { LocalModel } from '../data';
 import { ValidationMiddleware } from '../validator';
@@ -44,7 +45,7 @@ test('works with path segments starting with numbers', () => {
   controller.hooks.resolveDataStages.tap('basic', () => [localData]);
 
   expect(controller.get('foo.5f4704fd-adab-49df-bcbc-5aedb04194f9.bar')).toBe(
-    'baz'
+    'baz',
   );
 });
 
@@ -124,7 +125,7 @@ describe('delete', () => {
     controller.hooks.resolveDataStages.tap('Local', () => [localData]);
 
     expect(() => controller.delete(undefined as any)).toThrow(
-      'Invalid arguments: delete expects a data path (string)'
+      'Invalid arguments: delete expects a data path (string)',
     );
   });
 
@@ -288,7 +289,7 @@ describe('formatting', () => {
     controller.set([['foo.baz', 'should-deformat']], { formatted: true });
     expect(controller.get('foo.baz')).toBe('deformatted!');
     expect(controller.get('foo.baz', { formatted: false })).toBe(
-      'deformatted!'
+      'deformatted!',
     );
   });
 });
@@ -302,7 +303,7 @@ describe('serialization', () => {
     });
     const controller = new DataController(
       { testData: 0 },
-      { pathResolver: parser }
+      { pathResolver: parser },
     );
 
     controller.hooks.serialize.tap('test', (dataModel) => {
@@ -342,7 +343,7 @@ describe('serialization', () => {
             }
           }),
         ],
-      }
+      },
     );
 
     expect(dc?.serialize()).toStrictEqual({
@@ -383,7 +384,6 @@ describe('default value', () => {
         return 'FOO';
       }
 
-      // eslint-disable-next-line jest/no-if
       if (b.asString() === 'bar') {
         return 'BAR';
       }
@@ -473,7 +473,7 @@ describe('Read Only Data Controller', () => {
 
     const controller = new DataController(
       { some: { data: true } },
-      { pathResolver: parser, logger }
+      { pathResolver: parser, logger },
     );
 
     readOnlyController = controller.makeReadOnly();
@@ -486,13 +486,13 @@ describe('Read Only Data Controller', () => {
   it('Logs error on set', () => {
     expect(readOnlyController.set([['some.data', false]])).toStrictEqual([]);
     expect(logger.error).toBeCalledWith(
-      'Error: Tried to set in a read only instance of the DataController'
+      'Error: Tried to set in a read only instance of the DataController',
     );
   });
   it('Logs error on delete', () => {
     readOnlyController.delete('some.data');
     expect(logger.error).toBeCalledWith(
-      'Error: Tried to delete in a read only instance of the DataController'
+      'Error: Tried to delete in a read only instance of the DataController',
     );
   });
 });

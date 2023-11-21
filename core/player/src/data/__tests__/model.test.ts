@@ -58,21 +58,21 @@ describe('model', () => {
 
     expect(mockParse).toHaveBeenCalledWith(
       'some.binding',
-      expect.objectContaining({ readOnly: true })
+      expect.objectContaining({ readOnly: true }),
     );
 
     modelWithParser.set([['some.binding', 'test']]);
 
     expect(mockParse).toHaveBeenCalledWith(
       'some.binding',
-      expect.objectContaining({ readOnly: false })
+      expect.objectContaining({ readOnly: false }),
     );
 
     modelWithParser.delete(['some.binding']);
 
     expect(mockParse).toHaveBeenCalledWith(
       'some.binding',
-      expect.objectContaining({ readOnly: false })
+      expect.objectContaining({ readOnly: false }),
     );
   });
 });

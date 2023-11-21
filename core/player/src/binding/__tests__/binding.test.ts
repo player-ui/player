@@ -17,10 +17,10 @@ describe('contains', () => {
 
   it('can handle bindings starting with numbers', () => {
     const instance = new BindingInstance(
-      'foo.5f4704fd-adab-49df-bcbc-5aedb04194f9.baz'
+      'foo.5f4704fd-adab-49df-bcbc-5aedb04194f9.baz',
     );
     expect(instance.asString()).toBe(
-      'foo.5f4704fd-adab-49df-bcbc-5aedb04194f9.baz'
+      'foo.5f4704fd-adab-49df-bcbc-5aedb04194f9.baz',
     );
     expect(instance.asArray()[1]).toBe('5f4704fd-adab-49df-bcbc-5aedb04194f9');
     expect(instance.key()).toBe('baz');
@@ -33,8 +33,8 @@ describe('contains', () => {
 
     expect(
       new BindingInstance('foo.bar.baz').contains(
-        new BindingInstance('foo.bar.bazzzz')
-      )
+        new BindingInstance('foo.bar.bazzzz'),
+      ),
     ).toBe(false);
   });
 });

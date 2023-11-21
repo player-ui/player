@@ -22,7 +22,7 @@ export interface TransitionOptions {
 }
 export type TransitionFunction = (
   name: string,
-  options?: TransitionOptions
+  options?: TransitionOptions,
 ) => void;
 
 /** The Content navigation state machine */
@@ -69,7 +69,7 @@ export class FlowInstance {
     options?: {
       /** Logger instance to use */
       logger?: Logger;
-    }
+    },
   ) {
     this.id = id;
     this.flow = flow;
@@ -84,7 +84,7 @@ export class FlowInstance {
         if (this.flowPromise && newState.state_type === 'END') {
           this.flowPromise.resolve(newState);
         }
-      }
+      },
     );
   }
 
@@ -117,7 +117,7 @@ export class FlowInstance {
   public transition(transitionValue: string, options?: TransitionOptions) {
     if (this.currentState?.value.state_type === 'END') {
       this.log?.warn(
-        `Skipping transition using ${transitionValue}. Already at and END state`
+        `Skipping transition using ${transitionValue}. Already at and END state`,
       );
 
       return;
@@ -134,7 +134,7 @@ export class FlowInstance {
 
       if (skipTransition) {
         this.log?.debug(
-          `Skipping transition from ${this.currentState.name} b/c hook told us to`
+          `Skipping transition from ${this.currentState.name} b/c hook told us to`,
         );
         return;
       }
@@ -142,7 +142,7 @@ export class FlowInstance {
 
     const state = this.hooks.beforeTransition.call(
       this.currentState.value,
-      transitionValue
+      transitionValue,
     );
 
     if (!('transitions' in state)) {
@@ -154,14 +154,14 @@ export class FlowInstance {
 
     if (nextState === undefined) {
       this.log?.warn(
-        `No transition from ${this.currentState.name} using ${transitionValue} or *`
+        `No transition from ${this.currentState.name} using ${transitionValue} or *`,
       );
 
       return;
     }
 
     this.log?.debug(
-      `Transitioning from ${this.currentState.name} to ${nextState} using ${transitionValue} `
+      `Transitioning from ${this.currentState.name} to ${nextState} using ${transitionValue} `,
     );
 
     return this.pushHistory(nextState, options);

@@ -10,7 +10,7 @@ const identify = (val: any) => val;
 
 /** Expand the authored schema into a set of paths -> DataTypes */
 export function parse(
-  schema: SchemaType.Schema
+  schema: SchemaType.Schema,
 ): Map<string, SchemaType.DataTypes> {
   const expandedPaths = new Map<string, SchemaType.DataTypes>();
 
@@ -46,13 +46,13 @@ export function parse(
       if (expandedPaths.has(nestedPathStr)) {
         // We've gone in a loop. Panic
         throw new Error(
-          "Path has already been processed. There's either a loop somewhere or a bug"
+          "Path has already been processed. There's either a loop somewhere or a bug",
         );
       }
 
       if (visited.has(type.type)) {
         throw new Error(
-          `Path already contained type: ${type.type}. This likely indicates a loop in the schema`
+          `Path already contained type: ${type.type}. This likely indicates a loop in the schema`,
         );
       }
 
@@ -117,7 +117,7 @@ export class SchemaController implements ValidationProvider {
   }
 
   getValidationsForBinding(
-    binding: BindingInstance
+    binding: BindingInstance,
   ): Array<ValidationObject> | undefined {
     const typeDef = this.getApparentType(binding);
 
@@ -167,12 +167,12 @@ export class SchemaController implements ValidationProvider {
   public getType(binding: BindingInstance): SchemaType.DataTypes | undefined {
     return this.hooks.resolveTypeForBinding.call(
       this.schema.get(this.normalizeBinding(binding)),
-      binding
+      binding,
     );
   }
 
   public getApparentType(
-    binding: BindingInstance
+    binding: BindingInstance,
   ): SchemaType.DataTypes | undefined {
     const schemaType = this.getType(binding);
 
@@ -201,7 +201,7 @@ export class SchemaController implements ValidationProvider {
   }
 
   public getFormatterForType(
-    formatReference: Formatting.Reference
+    formatReference: Formatting.Reference,
   ): FormatDefinition<unknown, unknown> | undefined {
     const { type: formatType, ...options } = formatReference;
 
@@ -226,7 +226,7 @@ export class SchemaController implements ValidationProvider {
    * If no formatter is registered, it will return undefined
    */
   public getFormatter(
-    binding: BindingInstance
+    binding: BindingInstance,
   ): FormatDefinition<unknown, unknown> | undefined {
     const type = this.getApparentType(binding);
 

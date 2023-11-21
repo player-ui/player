@@ -26,17 +26,17 @@ export class ReadOnlyDataController
 
   set(
     transaction: [BindingLike, any][],
-    options?: DataModelOptions | undefined
+    options?: DataModelOptions | undefined,
   ): Updates {
     this.logger?.error(
-      'Error: Tried to set in a read only instance of the DataController'
+      'Error: Tried to set in a read only instance of the DataController',
     );
     return [];
   }
 
   delete(binding: BindingLike, options?: DataModelOptions | undefined): void {
     this.logger?.error(
-      'Error: Tried to delete in a read only instance of the DataController'
+      'Error: Tried to delete in a read only instance of the DataController',
     );
   }
 }

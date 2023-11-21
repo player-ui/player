@@ -1,4 +1,4 @@
-import { waitFor } from '@testing-library/react';
+import { test, vitest } from 'vitest';
 import type { Flow, NavigationFlowViewState } from '@player-ui/types';
 import type { FlowController } from '../controllers';
 import TrackBindingPlugin from './helpers/binding.plugin';
@@ -112,7 +112,7 @@ describe('state node expression tests', () => {
 
     state().controllers.expression.evaluate(getView()?.exp);
 
-    await waitFor(() =>
+    await vitest.waitFor(() =>
       expect(getView()).toStrictEqual({
         id: 'action',
         type: 'action',
@@ -124,7 +124,7 @@ describe('state node expression tests', () => {
             value: 'Clicked 2 times',
           },
         },
-      })
+      }),
     );
   });
 
@@ -185,7 +185,7 @@ describe('state node expression tests', () => {
       },
     });
 
-    await waitFor(() => {
+    await vitest.waitFor(() => {
       const currentFlowState = state().controllers.flow.current?.currentState
         ?.value as NavigationFlowViewState;
       expect(currentFlowState.ref).toBe('view-2');
@@ -284,10 +284,10 @@ describe('state node expression tests', () => {
       },
     });
 
-    await waitFor(() =>
+    await vitest.waitFor(() =>
       expect(state().controllers.flow.current?.currentState?.name).toBe(
-        'VIEW_1'
-      )
+        'VIEW_1',
+      ),
     );
 
     /**
@@ -296,7 +296,7 @@ describe('state node expression tests', () => {
      * 2. exp
      * 3. onEnd
      */
-    await waitFor(() =>
+    await vitest.waitFor(() =>
       expect(getView()).toStrictEqual({
         id: 'view-1',
         type: 'view',
@@ -307,7 +307,7 @@ describe('state node expression tests', () => {
             value: 'Clicked 100 times',
           },
         },
-      })
+      }),
     );
   });
 
@@ -347,10 +347,10 @@ describe('state node expression tests', () => {
       },
     });
 
-    await waitFor(() =>
+    await vitest.waitFor(() =>
       expect(state().controllers.flow.current?.currentState?.name).toBe(
-        'VIEW_1'
-      )
+        'VIEW_1',
+      ),
     );
 
     /**

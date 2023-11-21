@@ -20,7 +20,7 @@ export class FlowController {
     options?: {
       /** A logger instance to use */
       logger?: Logger;
-    }
+    },
   ) {
     this.navigation = navigation;
     this.navStack = [];
@@ -56,7 +56,7 @@ export class FlowController {
 
     if (startFlow === null || typeof startFlow !== 'object') {
       return Promise.reject(
-        new Error(`Flow: ${startState} needs to be an object`)
+        new Error(`Flow: ${startState} needs to be an object`),
       );
     }
 
@@ -71,7 +71,7 @@ export class FlowController {
         this.log?.debug(`Loading subflow ${subflowId}`);
         this.run(subflowId).then((subFlowEndState) => {
           this.log?.debug(
-            `Subflow ended. Using outcome: ${subFlowEndState.outcome}`
+            `Subflow ended. Using outcome: ${subFlowEndState.outcome}`,
           );
           flowInstance.transition(subFlowEndState?.outcome);
         });

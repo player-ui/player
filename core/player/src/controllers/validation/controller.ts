@@ -38,7 +38,7 @@ export const SCHEMA_VALIDATION_PROVIDER_NAME = 'schema';
 export const VIEW_VALIDATION_PROVIDER_NAME = 'view';
 
 export const VALIDATION_PROVIDER_NAME_SYMBOL: unique symbol = Symbol.for(
-  'validation-provider-name'
+  'validation-provider-name',
 );
 
 export type ValidationObjectWithSource = ValidationObjectWithHandler & {
@@ -114,7 +114,7 @@ function isSubset<T>(subset: Set<T>, containingSet: Set<T>): boolean {
 
 /** Helper for initializing a validation object that tracks state */
 function createStatefulValidationObject(
-  obj: ValidationObjectWithSource
+  obj: ValidationObjectWithSource,
 ): StatefulValidationObject {
   return {
     value: obj,
@@ -156,7 +156,7 @@ class ValidatedBinding {
     possibleValidations: Array<ValidationObjectWithSource>,
     onDismiss?: () => void,
     log?: Logger,
-    weakBindings?: Set<BindingInstance>
+    weakBindings?: Set<BindingInstance>,
   ) {
     this.onDismiss = onDismiss;
     possibleValidations.forEach((vObj) => {
@@ -213,7 +213,7 @@ class ValidatedBinding {
   private runApplicableValidations(
     runner: ValidationRunner,
     canDismiss: boolean,
-    phase: Validation.Trigger
+    phase: Validation.Trigger,
   ) {
     // If the currentState is not load, skip those
     this.applicableValidations = this.applicableValidations.map(
@@ -231,7 +231,7 @@ class ValidatedBinding {
         const obj = setIn(
           originalValue,
           ['value', 'blocking'],
-          blocking
+          blocking,
         ) as StatefulValidationObject;
 
         const isBlockingNavigation =
@@ -289,14 +289,14 @@ class ValidatedBinding {
         }
 
         return newState;
-      }
+      },
     );
   }
 
   public update(
     phase: Validation.Trigger,
     canDismiss: boolean,
-    runner: ValidationRunner
+    runner: ValidationRunner,
   ) {
     const newApplicableValidations: StatefulValidationObject[] = [];
 
@@ -394,7 +394,7 @@ export class ValidationController implements BindingTracker {
           source: string;
           /** The provider itself */
           provider: ValidationProvider;
-        }>
+        }>,
       ],
       {
         /** The view this is triggered for  */
@@ -447,7 +447,7 @@ export class ValidationController implements BindingTracker {
         delete: (binding, options, next) => {
           this.validations = removeBindingAndChildrenFromMap(
             this.validations,
-            binding
+            binding,
           );
 
           return next?.delete(binding, options);
@@ -473,7 +473,7 @@ export class ValidationController implements BindingTracker {
             if (
               caresAboutDataChanges(
                 new Set([binding]),
-                weakValidation.weakBindings
+                weakValidation.weakBindings,
               ) &&
               weakValidation?.get()?.severity === 'error'
             ) {
@@ -497,7 +497,7 @@ export class ValidationController implements BindingTracker {
             return newInvalidBindings;
           }
         },
-        { logger: new ProxyLogger(() => this.options?.logger) }
+        { logger: new ProxyLogger(() => this.options?.logger) },
       ),
     ];
   }
@@ -516,10 +516,10 @@ export class ValidationController implements BindingTracker {
         source: VIEW_VALIDATION_PROVIDER_NAME,
         provider: {
           getValidationsForBinding: (
-            binding: BindingInstance
+            binding: BindingInstance,
           ): Array<ValidationObject> | undefined => {
             return this.viewValidationProvider?.getValidationsForBinding?.(
-              binding
+              binding,
             );
           },
 
@@ -574,7 +574,7 @@ export class ValidationController implements BindingTracker {
             this.options,
             () => {
               view.update(new Set([binding]));
-            }
+            },
           );
 
           this.hooks.onTrackBinding.call(binding);
@@ -592,7 +592,7 @@ export class ValidationController implements BindingTracker {
     binding: BindingInstance,
     trigger: Validation.Trigger,
     validationContext?: SimpleValidatorContext,
-    onDismiss?: () => void
+    onDismiss?: () => void,
   ): void {
     const context = validationContext ?? this.options;
 
@@ -614,7 +614,7 @@ export class ValidationController implements BindingTracker {
               [VALIDATION_PROVIDER_NAME_SYMBOL]: provider.source,
             })) ?? []),
         ],
-        []
+        [],
       );
 
       if (possibleValidations.length === 0) {
@@ -626,8 +626,8 @@ export class ValidationController implements BindingTracker {
         new ValidatedBinding(
           possibleValidations,
           onDismiss,
-          this.options?.logger
-        )
+          this.options?.logger,
+        ),
       );
     }
 
@@ -654,7 +654,7 @@ export class ValidationController implements BindingTracker {
             const response = this.validationRunner(
               validationObj,
               vBinding,
-              context
+              context,
             );
             return response ? { message: response.message } : undefined;
           });
@@ -666,7 +666,7 @@ export class ValidationController implements BindingTracker {
   validationRunner(
     validationObj: ValidationObjectWithHandler,
     binding: BindingInstance,
-    context: SimpleValidatorContext | undefined = this.options
+    context: SimpleValidatorContext | undefined = this.options,
   ) {
     if (!context) {
       throw new Error('No context provided to validation runner');
@@ -692,7 +692,7 @@ export class ValidationController implements BindingTracker {
         ...context,
         evaluate: (
           exp: ExpressionType,
-          options: ExpressionEvaluatorOptions = { model }
+          options: ExpressionEvaluatorOptions = { model },
         ) => context.evaluate(exp, options),
         model,
         validation: validationObj,
@@ -702,7 +702,7 @@ export class ValidationController implements BindingTracker {
         includeInvalid: true,
         formatted: validationObj.dataTarget === 'formatted',
       }),
-      validationObj
+      validationObj,
     );
 
     this.weakBindingTracker = weakBindings;
@@ -761,8 +761,8 @@ export class ValidationController implements BindingTracker {
   private get activeBindings(): Set<BindingInstance> {
     return new Set(
       Array.from(this.getBindings()).filter(
-        (b) => this.validations.get(b)?.get() !== undefined
-      )
+        (b) => this.validations.get(b)?.get() !== undefined,
+      ),
     );
   }
 
@@ -807,8 +807,8 @@ export class ValidationController implements BindingTracker {
         if (trigger === 'navigation' && v.blocking) {
           this.options?.logger.debug(
             `Validation on binding: ${b.asString()} is preventing navigation. ${JSON.stringify(
-              v
-            )}`
+              v,
+            )}`,
           );
 
           canTransition = false;
@@ -828,7 +828,7 @@ export class ValidationController implements BindingTracker {
 
   /** Get the current tracked validation for the given binding */
   public getValidationForBinding(
-    binding: BindingInstance
+    binding: BindingInstance,
   ): ValidatedBinding | undefined {
     return this.validations.get(binding);
   }
@@ -837,7 +837,7 @@ export class ValidationController implements BindingTracker {
     return {
       _getValidationForBinding: (binding) => {
         return this.getValidationForBinding(
-          isBinding(binding) ? binding : parser(binding)
+          isBinding(binding) ? binding : parser(binding),
         );
       },
       getAll: () => {
@@ -878,7 +878,7 @@ export class ValidationController implements BindingTracker {
       },
       register: () => {
         throw new Error(
-          'Section functionality should be provided by the view plugin'
+          'Section functionality should be provided by the view plugin',
         );
       },
       type: (binding) =>

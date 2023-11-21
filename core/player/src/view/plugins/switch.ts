@@ -49,7 +49,7 @@ export default class SwitchPlugin implements ViewPlugin {
         obj: any,
         nodeType: Node.ChildrenTypes,
         options: ParseObjectOptions,
-        determinedNodeType: null | NodeType
+        determinedNodeType: null | NodeType,
       ) => {
         if (determinedNodeType === NodeType.Switch) {
           const dynamic = 'dynamicSwitch' in obj;
@@ -64,7 +64,7 @@ export default class SwitchPlugin implements ViewPlugin {
               const value = parser.parseObject(
                 switchBody,
                 NodeType.Value,
-                options
+                options,
               );
 
               if (value) {
@@ -73,7 +73,7 @@ export default class SwitchPlugin implements ViewPlugin {
                   value: value as Node.Value,
                 });
               }
-            }
+            },
           );
 
           const switchAST = parser.hooks.onCreateASTNode.call(
@@ -82,7 +82,7 @@ export default class SwitchPlugin implements ViewPlugin {
               dynamic,
               cases,
             },
-            obj
+            obj,
           );
 
           if (switchAST?.type === NodeType.Switch) {
@@ -98,7 +98,7 @@ export default class SwitchPlugin implements ViewPlugin {
 
           return switchAST ?? null;
         }
-      }
+      },
     );
   }
 

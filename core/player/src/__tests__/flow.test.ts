@@ -1,5 +1,4 @@
-import { waitFor } from '@testing-library/react';
-
+import { test, vitest } from 'vitest';
 import type { FlowController } from '../controllers';
 import type { DataController } from '..';
 import { Player } from '..';
@@ -38,7 +37,9 @@ test('transitions on action nodes', async () => {
     },
   });
 
-  await waitFor(() => expect(player.getState().status).toBe('in-progress'));
+  await vitest.waitFor(() =>
+    expect(player.getState().status).toBe('in-progress'),
+  );
 
   const state = player.getState();
   const currentState = (state as InProgressState).controllers.flow.current
@@ -157,7 +158,7 @@ test('resolves dynamic view ids', () => {
 
   expect(state.status).toBe('in-progress');
   expect(
-    (state as InProgressState).controllers.view.currentView?.lastUpdate?.id
+    (state as InProgressState).controllers.view.currentView?.lastUpdate?.id,
   ).toBe('view-1-adam');
 });
 

@@ -1,6 +1,6 @@
 import { omit } from 'timm';
 import { makeFlow } from '@player-ui/make-flow';
-import { waitFor } from '@testing-library/react';
+import { vitest } from 'vitest';
 import type { Flow } from '@player-ui/types';
 import type { SchemaController } from '../schema';
 import type { BindingParser } from '../binding';
@@ -637,25 +637,25 @@ test('alt APIs', async () => {
 
   // Starts out with nothing
   expect(
-    state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation
+    state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation,
   ).toBe(undefined);
 
   // Updates when data is updated to throw an error
   state.controllers.data.set([['data.thing2', 'ginger']]);
-  await waitFor(() =>
+  await vitest.waitFor(() =>
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation,
     ).toMatchObject({
       severity: 'error',
       message: `Names just be in: frodo,sam`,
       displayTarget: 'field',
-    })
+    }),
   );
 
   expect(
     Array.from(
-      state.controllers.view.currentView?.lastUpdate?.thing2.asset.allValidations.values()
-    )
+      state.controllers.view.currentView?.lastUpdate?.thing2.asset.allValidations.values(),
+    ),
   ).toMatchObject([
     {
       severity: 'error',
@@ -670,20 +670,20 @@ test('alt APIs', async () => {
   state.controllers.data.set([['data.thing7', 'golumn']]);
 
   // Gets all page errors for all children
-  await waitFor(() =>
+  await vitest.waitFor(() =>
     expect(
       Array.from(
         state.controllers.view.currentView?.lastUpdate
           ?.childValidations('page')
-          .values()
-      )
+          .values(),
+      ),
     ).toMatchObject([
       {
         severity: 'error',
         message: `Names just be in: frodo`,
         displayTarget: 'page',
       },
-    ])
+    ]),
   );
 
   // Gets all section errors for all children
@@ -691,8 +691,8 @@ test('alt APIs', async () => {
     Array.from(
       state.controllers.view.currentView?.lastUpdate
         ?.childValidations('section')
-        .values()
-    )
+        .values(),
+    ),
   ).toMatchObject([
     {
       severity: 'error',
@@ -711,8 +711,8 @@ test('alt APIs', async () => {
     Array.from(
       state.controllers.view.currentView?.lastUpdate?.thing5.asset
         ?.sectionValidations()
-        .values()
-    )
+        .values(),
+    ),
   ).toMatchObject([
     {
       severity: 'error',
@@ -726,8 +726,8 @@ test('alt APIs', async () => {
     Array.from(
       state.controllers.view.currentView?.lastUpdate?.thing5.asset.thing6.asset
         ?.sectionValidations()
-        .values()
-    )
+        .values(),
+    ),
   ).toMatchObject([
     {
       severity: 'error',
@@ -781,8 +781,8 @@ describe('validation', () => {
         ['applicability.thing3', false],
       ]);
 
-      await waitFor(() =>
-        expect(validationController?.getBindings().size).toStrictEqual(6)
+      await vitest.waitFor(() =>
+        expect(validationController?.getBindings().size).toStrictEqual(6),
       );
     });
   });
@@ -802,33 +802,33 @@ describe('validation', () => {
 
       expect(validation.getBindings().has(thing2Binding)).toBe(true);
 
-      await waitFor(() => {
+      await vitest.waitFor(() => {
         expect(
-          view.currentView?.lastUpdate?.thing2.asset.validation
+          view.currentView?.lastUpdate?.thing2.asset.validation,
         ).toBeUndefined();
       });
 
       data.set([['data.thing2', 'gandalf']]);
 
-      await waitFor(() => {
+      await vitest.waitFor(() => {
         expect(
-          view.currentView?.lastUpdate?.thing2.asset.validation?.message
+          view.currentView?.lastUpdate?.thing2.asset.validation?.message,
         ).toBe('Names just be in: frodo,sam');
       });
 
       data.delete('data.thing2');
       expect(data.get('data.thing2', { includeInvalid: true })).toBe(undefined);
 
-      await waitFor(() => {
+      await vitest.waitFor(() => {
         expect(
-          view.currentView?.lastUpdate?.thing2.asset.validation
+          view.currentView?.lastUpdate?.thing2.asset.validation,
         ).toBeUndefined();
       });
 
       data.set([['data.thing2', 'gandalf']]);
-      await waitFor(() => {
+      await vitest.waitFor(() => {
         expect(
-          view.currentView?.lastUpdate?.thing2.asset.validation?.message
+          view.currentView?.lastUpdate?.thing2.asset.validation?.message,
         ).toBe('Names just be in: frodo,sam');
       });
     });
@@ -838,33 +838,33 @@ describe('validation', () => {
       const state = player.getState() as InProgressState;
       const { data, binding, view } = state.controllers;
 
-      await waitFor(() => {
+      await vitest.waitFor(() => {
         expect(
-          view.currentView?.lastUpdate?.pets[1].asset.validation
+          view.currentView?.lastUpdate?.pets[1].asset.validation,
         ).toBeUndefined();
       });
 
       // Trigger validation for the second item
       data.set([['pets.1.name', '']]);
       expect(
-        schema.getType(binding.parse('pets.1.name'))?.validation
+        schema.getType(binding.parse('pets.1.name'))?.validation,
       ).toHaveLength(1);
 
-      await waitFor(() => {
+      await vitest.waitFor(() => {
         expect(
-          view.currentView?.lastUpdate?.pets[1].asset.validation?.message
+          view.currentView?.lastUpdate?.pets[1].asset.validation?.message,
         ).toBe('A value is required');
       });
 
       // Delete the first item, the items should shift up and validation moves to the first item
       data.delete('pets.0');
 
-      await waitFor(() => {
+      await vitest.waitFor(() => {
         expect(
-          view.currentView?.lastUpdate?.pets[1].asset.validation
+          view.currentView?.lastUpdate?.pets[1].asset.validation,
         ).toBeUndefined();
         expect(
-          view.currentView?.lastUpdate?.pets[0].asset.validation?.message
+          view.currentView?.lastUpdate?.pets[0].asset.validation?.message,
         ).toBe('A value is required');
       });
     });
@@ -876,29 +876,29 @@ describe('validation', () => {
 
       // Starts out with nothing
       expect(
-        state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation,
       ).toBe(undefined);
 
       // Updates when data is updated to throw an error
       state.controllers.data.set([['data.thing2', 'ginger']]);
-      await waitFor(() =>
+      await vitest.waitFor(() =>
         expect(
           state.controllers.view.currentView?.lastUpdate?.thing2.asset
-            .validation
+            .validation,
         ).toMatchObject({
           severity: 'error',
           message: `Names just be in: frodo,sam`,
           displayTarget: 'field',
-        })
+        }),
       );
 
       // Back to nothing when the error is fixed
       state.controllers.data.set([['data.thing2', 'frodo']]);
-      await waitFor(() =>
+      await vitest.waitFor(() =>
         expect(
           state.controllers.view.currentView?.lastUpdate?.thing2.asset
-            .validation
-        ).toBe(undefined)
+            .validation,
+        ).toBe(undefined),
       );
     });
   });
@@ -909,15 +909,15 @@ describe('validation', () => {
 
       // Starts out with nothing
       expect(
-        state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation,
       ).toBe(undefined);
 
       // Updates when data is updated to throw an error
       state.controllers.data.set([['data.thing2', 'ginger']]);
-      await waitFor(() =>
+      await vitest.waitFor(() =>
         expect(
           state.controllers.view.currentView?.lastUpdate?.thing2.asset
-            .validation
+            .validation,
         ).toStrictEqual({
           severity: 'error',
           message: `Names just be in: frodo,sam`,
@@ -927,16 +927,16 @@ describe('validation', () => {
           type: 'names',
           blocking: true,
           [VALIDATION_PROVIDER_NAME_SYMBOL]: 'schema',
-        })
+        }),
       );
 
       // Back to nothing when the error is fixed
       state.controllers.data.set([['data.thing2', 'frodo']]);
-      await waitFor(() =>
+      await vitest.waitFor(() =>
         expect(
           state.controllers.view.currentView?.lastUpdate?.thing2.asset
-            .validation
-        ).toBe(undefined)
+            .validation,
+        ).toBe(undefined),
       );
     });
   });
@@ -948,7 +948,7 @@ describe('validation', () => {
       // Starts out with nothing
       expect(
         state.controllers.view.currentView?.lastUpdate?.alreadyInvalidData.asset
-          .validation
+          .validation,
       ).toBe(undefined);
 
       // Try to transition
@@ -956,7 +956,7 @@ describe('validation', () => {
 
       // Stays on the same view
       expect(
-        state.controllers.flow.current?.currentState?.value.state_type
+        state.controllers.flow.current?.currentState?.value.state_type,
       ).toBe('VIEW');
 
       // Fix the error.
@@ -979,11 +979,11 @@ describe('validation', () => {
       const { flowResult } = state;
       // Starts out with nothing
       expect(
-        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
       ).toBe(undefined);
 
       expect(
-        state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation,
       ).toBe(undefined);
 
       state.controllers.data.set([['data.thing1', 'sam']]);
@@ -993,15 +993,15 @@ describe('validation', () => {
 
       // Stays on the same view
       expect(
-        state.controllers.flow.current?.currentState?.value.state_type
+        state.controllers.flow.current?.currentState?.value.state_type,
       ).toBe('VIEW');
 
       expect(
-        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
       ).toBe(undefined);
 
       expect(
-        state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation,
       ).not.toBe(undefined);
 
       state.controllers.data.set([['data.thing1', 'bilbo']]);
@@ -1011,7 +1011,7 @@ describe('validation', () => {
 
       // Should transition to end since data changes already occured on first input
       expect(
-        state.controllers.flow.current?.currentState?.value.state_type
+        state.controllers.flow.current?.currentState?.value.state_type,
       ).toBe('END');
 
       // Should work now that there's no error
@@ -1037,11 +1037,11 @@ describe('validation', () => {
       const { flowResult } = state;
       // Starts out with nothing
       expect(
-        state.controllers.view.currentView?.lastUpdate?.foo.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.foo.asset.validation,
       ).toBe(undefined);
 
       expect(
-        state.controllers.view.currentView?.lastUpdate?.bar.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.bar.asset.validation,
       ).toBe(undefined);
 
       state.controllers.data.set([['data.foo2', 'someData']]);
@@ -1051,23 +1051,23 @@ describe('validation', () => {
 
       // Stays on the same view
       expect(
-        state.controllers.flow.current?.currentState?.value.state_type
+        state.controllers.flow.current?.currentState?.value.state_type,
       ).toBe('VIEW');
 
       expect(
-        state.controllers.view.currentView?.lastUpdate?.foo.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.foo.asset.validation,
       ).not.toBe(undefined);
 
       expect(
-        state.controllers.view.currentView?.lastUpdate?.foo2.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.foo2.asset.validation,
       ).toBe(undefined);
 
       expect(
-        state.controllers.view.currentView?.lastUpdate?.bar.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.bar.asset.validation,
       ).toBe(undefined);
 
       expect(
-        state.controllers.view.currentView?.lastUpdate?.bar2.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.bar2.asset.validation,
       ).toBe(undefined);
 
       state.controllers.data.set([['data.bar2', 'someData']]);
@@ -1077,26 +1077,26 @@ describe('validation', () => {
 
       // Stays on the same view
       expect(
-        state.controllers.flow.current?.currentState?.value.state_type
+        state.controllers.flow.current?.currentState?.value.state_type,
       ).toBe('VIEW');
 
       // existing validation
       // FAILS HERE
       expect(
-        state.controllers.view.currentView?.lastUpdate?.foo.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.foo.asset.validation,
       ).not.toBe(undefined);
 
       expect(
-        state.controllers.view.currentView?.lastUpdate?.foo2.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.foo2.asset.validation,
       ).toBe(undefined);
 
       // new validation
       expect(
-        state.controllers.view.currentView?.lastUpdate?.bar.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.bar.asset.validation,
       ).not.toBe(undefined);
 
       expect(
-        state.controllers.view.currentView?.lastUpdate?.bar2.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.bar2.asset.validation,
       ).toBe(undefined);
 
       state.controllers.data.set([['data.foo', 'frodo']]);
@@ -1116,11 +1116,11 @@ describe('validation', () => {
       const { flowResult } = state;
       // Starts out with nothing
       expect(
-        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
       ).toBe(undefined);
 
       expect(
-        state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation,
       ).toBe(undefined);
 
       state.controllers.data.set([['data.thing1', 'sam']]);
@@ -1130,15 +1130,15 @@ describe('validation', () => {
 
       // Stays on the same view
       expect(
-        state.controllers.flow.current?.currentState?.value.state_type
+        state.controllers.flow.current?.currentState?.value.state_type,
       ).toBe('VIEW');
 
       expect(
-        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
       ).toBe(undefined);
 
       expect(
-        state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation,
       ).not.toBe(undefined);
 
       state.controllers.data.set([['data.thing1', 'bilbo']]);
@@ -1149,7 +1149,7 @@ describe('validation', () => {
 
       // Since data change (setting "sam") already triggered validation next step is auto dismiss
       expect(
-        state.controllers.flow.current?.currentState?.value.state_type
+        state.controllers.flow.current?.currentState?.value.state_type,
       ).toBe('END');
 
       // Should work now that there's no error
@@ -1164,12 +1164,12 @@ describe('validation', () => {
       // Starts with one warning
       expect(
         state.controllers.view.currentView?.lastUpdate?.loadWarning.asset
-          .validation
+          .validation,
       ).toBeDefined();
 
       expect(
         state.controllers.view.currentView?.lastUpdate?.navigationWarning.asset
-          .validation
+          .validation,
       ).toBeUndefined();
 
       // Try to transition
@@ -1177,18 +1177,18 @@ describe('validation', () => {
 
       // Stays on the same view
       expect(
-        state.controllers.flow.current?.currentState?.value.state_type
+        state.controllers.flow.current?.currentState?.value.state_type,
       ).toBe('VIEW');
 
       // new warning appears
       expect(
         state.controllers.view.currentView?.lastUpdate?.loadWarning.asset
-          .validation
+          .validation,
       ).toBeDefined();
 
       expect(
         state.controllers.view.currentView?.lastUpdate?.navigationWarning.asset
-          .validation
+          .validation,
       ).toBeDefined();
 
       // Try to transition
@@ -1196,7 +1196,7 @@ describe('validation', () => {
 
       // Since data change (setting "sam") already triggered validation next step is auto dismiss
       expect(
-        state.controllers.flow.current?.currentState?.value.state_type
+        state.controllers.flow.current?.currentState?.value.state_type,
       ).toBe('END');
 
       // Should work now that there's no error
@@ -1235,10 +1235,10 @@ describe('validation', () => {
       const state = player.getState() as InProgressState;
       state.controllers.data.set([['data.thing4', 'not-sam']]);
 
-      await waitFor(() => {
+      await vitest.waitFor(() => {
         expect(
           state.controllers.view.currentView?.lastUpdate?.alreadyInvalidData
-            .asset.validation.message
+            .asset.validation.message,
         ).toBe('Names just be in: sam');
       });
 
@@ -1246,7 +1246,7 @@ describe('validation', () => {
 
       expect(currentValidations).toHaveLength(5);
       expect(
-        currentValidations[0].validation.value[VALIDATION_PROVIDER_NAME_SYMBOL]
+        currentValidations[0].validation.value[VALIDATION_PROVIDER_NAME_SYMBOL],
       ).toBe('schema');
     });
 
@@ -1312,22 +1312,22 @@ describe('cross-field validation', () => {
 
     // Validation starts as nothing
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toBe(undefined);
 
     // Updating a thing is still nothing (haven't navigated yet)
     state.controllers.data.set([['foo.data.thing1', 20]]);
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toBe(undefined);
 
     // Try to navigate, should show the validation now
     state.controllers.flow.transition('next');
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'VIEW'
+      'VIEW',
     );
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toMatchObject({
       severity: 'error',
       message: 'Both need to equal 100',
@@ -1337,7 +1337,7 @@ describe('cross-field validation', () => {
     // Updating a thing is still nothing (haven't navigated yet)
     state.controllers.data.set([['foo.data.thing2', 85]]);
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toMatchObject({
       severity: 'error',
       message: 'Both need to equal 100',
@@ -1349,7 +1349,7 @@ describe('cross-field validation', () => {
     state.controllers.flow.transition('next');
 
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'END'
+      'END',
     );
   });
 
@@ -1362,16 +1362,16 @@ describe('cross-field validation', () => {
 
     // Validation starts as nothing
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toBe(undefined);
 
     // Try to navigate, should show the validation now
     state.controllers.flow.transition('next');
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'VIEW'
+      'VIEW',
     );
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toMatchObject({
       severity: 'error',
       message: 'Must be greater than 50',
@@ -1381,7 +1381,7 @@ describe('cross-field validation', () => {
     // Updating a thing is still nothing (haven't navigated yet)
     state.controllers.data.set([['data.thing1', 51]]);
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toMatchObject({
       severity: 'error',
       message: 'Must be greater than 50',
@@ -1392,7 +1392,7 @@ describe('cross-field validation', () => {
     state.controllers.flow.transition('next');
 
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'END'
+      'END',
     );
   });
 });
@@ -1425,7 +1425,7 @@ test('shows errors on load', () => {
 
   // Validation starts with a warning on load
   expect(
-    state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+    state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
   ).toMatchObject({
     message: 'Stuffs broken',
     severity: 'error',
@@ -1558,10 +1558,10 @@ describe('errors', () => {
     // Try to navigate, should prevent the navigation and display the error
     state.controllers.flow.transition('next');
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'VIEW'
+      'VIEW',
     );
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toMatchObject({
       message: 'A value is required',
       severity: 'error',
@@ -1572,7 +1572,7 @@ describe('errors', () => {
     state.controllers.flow.transition('next');
     // We make it to the next state
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'VIEW'
+      'VIEW',
     );
   });
   it('blocking once allows navigation on second attempt', async () => {
@@ -1583,10 +1583,10 @@ describe('errors', () => {
     // Try to navigate, should prevent the navigation and display the error
     state.controllers.flow.transition('next');
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'VIEW'
+      'VIEW',
     );
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toMatchObject({
       message: 'A value is required',
       severity: 'error',
@@ -1597,19 +1597,19 @@ describe('errors', () => {
     state.controllers.flow.transition('next');
     // We make it to the next state
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'END'
+      'END',
     );
   });
 
   it('error on load blocking false then warning with change trigger on navigation attempt', async () => {
     const player = new Player({ plugins: [new TrackBindingPlugin()] });
     player.start(
-      oneInputWithErrorOnLoadBlockingFalseAndWarningChangeTriggerFlow
+      oneInputWithErrorOnLoadBlockingFalseAndWarningChangeTriggerFlow,
     );
     const state = player.getState() as InProgressState;
 
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toMatchObject({
       message: 'A value is required',
       severity: 'error',
@@ -1619,11 +1619,11 @@ describe('errors', () => {
     // Try to navigate, should prevent the navigation and display the warning
     state.controllers.flow.transition('next');
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'VIEW'
+      'VIEW',
     );
 
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toMatchObject({
       message: 'A value is required',
       severity: 'warning',
@@ -1635,19 +1635,19 @@ describe('errors', () => {
     // We make it to the next state
 
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'END'
+      'END',
     );
   });
 
   it('error on load blocking false then warning on navigation attempt', async () => {
     const player = new Player({ plugins: [new TrackBindingPlugin()] });
     player.start(
-      oneInputWithErrorOnLoadBlockingFalseAndWarningNavigationTriggerFlow
+      oneInputWithErrorOnLoadBlockingFalseAndWarningNavigationTriggerFlow,
     );
     const state = player.getState() as InProgressState;
 
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toMatchObject({
       message: 'A value is required',
       severity: 'error',
@@ -1657,11 +1657,11 @@ describe('errors', () => {
     // Try to navigate, should prevent the navigation and display the warning
     state.controllers.flow.transition('next');
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'VIEW'
+      'VIEW',
     );
 
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toMatchObject({
       message: 'A value is required',
       severity: 'warning',
@@ -1673,19 +1673,19 @@ describe('errors', () => {
     // We make it to the next state
 
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'END'
+      'END',
     );
   });
 
   it('error on load blocking false then input active then warning on navigation attempt', async () => {
     const player = new Player({ plugins: [new TrackBindingPlugin()] });
     player.start(
-      oneInputWithErrorOnLoadBlockingFalseAndWarningNavigationTriggerFlow
+      oneInputWithErrorOnLoadBlockingFalseAndWarningNavigationTriggerFlow,
     );
     const state = player.getState() as InProgressState;
 
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toMatchObject({
       message: 'A value is required',
       severity: 'error',
@@ -1698,11 +1698,11 @@ describe('errors', () => {
     // Try to navigate, should prevent the navigation and display the warning
     state.controllers.flow.transition('next');
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'VIEW'
+      'VIEW',
     );
 
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toMatchObject({
       message: 'A value is required',
       severity: 'warning',
@@ -1714,7 +1714,7 @@ describe('errors', () => {
     // We make it to the next state
 
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'END'
+      'END',
     );
   });
 
@@ -1726,7 +1726,7 @@ describe('errors', () => {
     // Try to navigate, should allow navigation because blocking is false
     state.controllers.flow.transition('next');
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'END'
+      'END',
     );
   });
   it('blocking false still shows validation', async () => {
@@ -1735,7 +1735,7 @@ describe('errors', () => {
     const state = player.getState() as InProgressState;
 
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toMatchObject({
       message: 'A value is required',
       severity: 'error',
@@ -1745,7 +1745,7 @@ describe('errors', () => {
     // Try to navigate, should allow navigation because blocking is false
     state.controllers.flow.transition('next');
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'END'
+      'END',
     );
   });
 });
@@ -1813,9 +1813,9 @@ test('validations return non-blocking errors', async () => {
 
   // No errors show up initially
 
-  await waitFor(() => {
+  await vitest.waitFor(() => {
     expect(getState().controllers.view.currentView?.lastUpdate?.id).toBe(
-      'view-1'
+      'view-1',
     );
   });
 
@@ -1824,12 +1824,12 @@ test('validations return non-blocking errors', async () => {
 
   getState().controllers.flow.transition('next');
   expect(
-    getState().controllers.flow.current?.currentState?.value.state_type
+    getState().controllers.flow.current?.currentState?.value.state_type,
   ).toBe('VIEW');
 
   expect(player.getState().status).toBe('in-progress');
 
-  await waitFor(() => {
+  await vitest.waitFor(() => {
     expect(getCurrentView()?.blocking.asset.validation).toMatchObject({
       message: 'A value is required',
       severity: 'error',
@@ -1845,7 +1845,7 @@ test('validations return non-blocking errors', async () => {
 
   getState().controllers.data.set([['foo.blocking', 'foo']]);
 
-  await waitFor(() => {
+  await vitest.waitFor(() => {
     expect(getCurrentView()?.blocking.asset.validation).toBeUndefined();
 
     expect(getCurrentView()?.nonblocking.asset.validation).toMatchObject({
@@ -1857,7 +1857,7 @@ test('validations return non-blocking errors', async () => {
 
   getState().controllers.flow.transition('next');
 
-  await waitFor(() => {
+  await vitest.waitFor(() => {
     expect(player.getState().status).toBe('completed');
   });
 });
@@ -1975,8 +1975,8 @@ describe('warnings', () => {
     expect(
       omit(
         state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
-        'dismiss'
-      )
+        'dismiss',
+      ),
     ).toMatchObject({
       message: 'A value is required',
       severity: 'warning',
@@ -1992,13 +1992,13 @@ describe('warnings', () => {
     // Try to navigate, should prevent the navigation and keep the warning
     state.controllers.flow.transition('next');
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'VIEW'
+      'VIEW',
     );
     expect(
       omit(
         state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
-        'dismiss'
-      )
+        'dismiss',
+      ),
     ).toMatchObject({
       message: 'A value is required',
       severity: 'warning',
@@ -2009,7 +2009,7 @@ describe('warnings', () => {
     state.controllers.flow.transition('next');
     // We make it to the next state
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'END'
+      'END',
     );
   });
 
@@ -2021,23 +2021,23 @@ describe('warnings', () => {
     // Try to navigate, should prevent the navigation and keep the warning
     state.controllers.flow.transition('next');
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'VIEW'
+      'VIEW',
     );
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toMatchObject(
       expect.objectContaining({
         message: 'A value is required',
         severity: 'warning',
         displayTarget: 'field',
-      })
+      }),
     );
 
     state.controllers.data.set([['foo.data.thing1', 'value']]);
 
-    await waitFor(() => {
+    await vitest.waitFor(() => {
       expect(
-        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
       ).toBeUndefined();
     });
   });
@@ -2050,13 +2050,13 @@ describe('warnings', () => {
     // Try to navigate, should prevent the navigation and keep the warning
     state.controllers.flow.transition('next');
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'VIEW'
+      'VIEW',
     );
     expect(
       omit(
         state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
-        'dismiss'
-      )
+        'dismiss',
+      ),
     ).toMatchObject({
       message: 'A value is required',
       severity: 'warning',
@@ -2067,7 +2067,7 @@ describe('warnings', () => {
     state.controllers.flow.transition('next');
     // We make it to the next state
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'VIEW'
+      'VIEW',
     );
   });
 
@@ -2118,7 +2118,7 @@ describe('warnings', () => {
     });
 
     expect(
-      state.controllers.data.get('person.name', { includeInvalid: false })
+      state.controllers.data.get('person.name', { includeInvalid: false }),
     ).toBe('peter');
   });
 
@@ -2168,7 +2168,7 @@ describe('warnings', () => {
     });
 
     expect(
-      state.controllers.data.get('person.name', { includeInvalid: false })
+      state.controllers.data.get('person.name', { includeInvalid: false }),
     ).toBe(undefined);
   });
 
@@ -2180,13 +2180,13 @@ describe('warnings', () => {
     // Try to navigate, should prevent the navigation and keep the warning
     state.controllers.flow.transition('next');
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'VIEW'
+      'VIEW',
     );
     expect(
       omit(
         state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
-        'dismiss'
-      )
+        'dismiss',
+      ),
     ).toMatchObject({
       message: 'A value is required',
       severity: 'warning',
@@ -2198,7 +2198,7 @@ describe('warnings', () => {
     // We make it to the next state
 
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'END'
+      'END',
     );
   });
 
@@ -2209,19 +2209,19 @@ describe('warnings', () => {
 
     // Validation starts with no warnings on load
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toBeUndefined();
 
     // Try to navigate, should prevent the navigation and show the warning
     state.controllers.flow.transition('next');
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'VIEW'
+      'VIEW',
     );
     expect(
       omit(
         state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
-        'dismiss'
-      )
+        'dismiss',
+      ),
     ).toMatchObject({
       message: 'A value is required',
       severity: 'warning',
@@ -2232,9 +2232,9 @@ describe('warnings', () => {
     state.controllers.flow.transition('next');
     // We make it to the next state
 
-    await waitFor(() => {
+    await vitest.waitFor(() => {
       expect(
-        state.controllers.flow.current?.currentState?.value.state_type
+        state.controllers.flow.current?.currentState?.value.state_type,
       ).toBe('END');
     });
   });
@@ -2248,8 +2248,8 @@ describe('warnings', () => {
     expect(
       omit(
         state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
-        'dismiss'
-      )
+        'dismiss',
+      ),
     ).toMatchObject({
       message: 'A value is required',
       severity: 'warning',
@@ -2258,14 +2258,14 @@ describe('warnings', () => {
 
     state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation.dismiss();
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toBe(undefined);
 
     // Should be able to navigate w/o issues
     state.controllers.flow.transition('next');
     // We make it to the next state
     expect(state.controllers.flow.current?.currentState?.value.state_type).toBe(
-      'END'
+      'END',
     );
   });
 });
@@ -2322,36 +2322,36 @@ describe('validation within arrays', () => {
 
     // Nothing initially
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toBe(undefined);
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation,
     ).toBe(undefined);
 
     // Error if set to an falsy value
     state.controllers.data.set([['thing.1.data.3.name', '']]);
-    await waitFor(() => {
+    await vitest.waitFor(() => {
       expect(
-        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
       ).toMatchObject({
         severity: 'error',
         message: 'A value is required',
         displayTarget: 'field',
       });
       expect(
-        state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation,
       ).toBe(undefined);
     });
 
     // Other one gets error if i try to navigate
     state.controllers.data.set([['thing.1.data.3.name', 'adam']]);
     state.controllers.flow.transition('anything');
-    await waitFor(() => {
+    await vitest.waitFor(() => {
       expect(
-        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
       ).toBe(undefined);
       expect(
-        state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.thing2.asset.validation,
       ).toMatchObject({
         severity: 'error',
         message: 'A value is required',
@@ -2405,13 +2405,13 @@ describe('models can get valid or invalid data', () => {
 
     expect(state.controllers.data.get('person.name')).toBe(undefined);
     expect(
-      state.controllers.data.get('person.name', { includeInvalid: true })
+      state.controllers.data.get('person.name', { includeInvalid: true }),
     ).toBe('adam');
 
     state.controllers.data.set([['person.name', 'sam']]);
     expect(state.controllers.data.get('person.name')).toBe('sam');
     expect(
-      state.controllers.data.get('person.name', { includeInvalid: true })
+      state.controllers.data.get('person.name', { includeInvalid: true }),
     ).toBe('sam');
   });
 });
@@ -2464,20 +2464,20 @@ test('validations can run against formatted or deformatted values', async () => 
   state.controllers.data.set([['person.name', 0]]);
   expect(state.controllers.data.get('person.name')).toBe(0);
   expect(
-    state.controllers.view.currentView?.lastUpdate?.validation
+    state.controllers.view.currentView?.lastUpdate?.validation,
   ).toBeUndefined();
 
   state.controllers.data.set([['person.name', 'adam']], { formatted: true });
-  await waitFor(() => {
+  await vitest.waitFor(() => {
     expect(
-      state.controllers.view.currentView?.lastUpdate?.validation.message
+      state.controllers.view.currentView?.lastUpdate?.validation.message,
     ).toBe('Names just be in: frodo,sam');
   });
 
   state.controllers.data.set([['person.name', 'sam']], { formatted: true });
-  await waitFor(() => {
+  await vitest.waitFor(() => {
     expect(
-      state.controllers.view.currentView?.lastUpdate?.validation
+      state.controllers.view.currentView?.lastUpdate?.validation,
     ).toBeUndefined();
   });
 });
@@ -2522,7 +2522,7 @@ test('tracking a binding commits the default value', () => {
   expect(state.controllers.data.get('person.name')).toBe('Adam');
   expect(state.controllers.data.get('other.name')).toBe('Adam');
   expect(
-    state.controllers.view.currentView?.lastUpdate?.label.asset.value
+    state.controllers.view.currentView?.lastUpdate?.label.asset.value,
   ).toBe('Adam');
   expect(state.controllers.data.get('')).toStrictEqual({
     person: { name: 'Adam' },
@@ -2620,13 +2620,13 @@ describe('Validation applicability', () => {
       const state = player.getState() as InProgressState;
 
       state.controllers.data.set([['independentBinding', true]]);
-      await waitFor(() => {
+      await vitest.waitFor(() => {
         expect(state.controllers.data.get('independentBinding')).toStrictEqual(
-          true
+          true,
         );
         expect(
           state.controllers.view.currentView?.lastUpdate?.thing1.asset
-            .validation
+            .validation,
         ).toMatchObject({
           severity: 'error',
           message: `required based on independent value`,
@@ -2634,21 +2634,21 @@ describe('Validation applicability', () => {
       });
 
       state.controllers.data.set([['dependentBinding', 'foo']]);
-      await waitFor(() => {
+      await vitest.waitFor(() => {
         expect(state.controllers.data.get('dependentBinding')).toStrictEqual(
-          'foo'
+          'foo',
         );
         expect(
           state.controllers.view.currentView?.lastUpdate?.thing1.asset
-            .validation
+            .validation,
         ).toBeUndefined();
       });
 
       state.controllers.data.set([['dependentBinding', undefined]]);
-      await waitFor(() => {
+      await vitest.waitFor(() => {
         expect(
           state.controllers.view.currentView?.lastUpdate?.thing1.asset
-            .validation
+            .validation,
         ).toMatchObject({
           severity: 'error',
           message: `required based on independent value`,
@@ -2656,13 +2656,13 @@ describe('Validation applicability', () => {
       });
 
       state.controllers.data.set([['independentBinding', false]]);
-      await waitFor(() => {
+      await vitest.waitFor(() => {
         expect(state.controllers.data.get('independentBinding')).toStrictEqual(
-          false
+          false,
         );
         expect(
           state.controllers.view.currentView?.lastUpdate?.thing1.asset
-            .validation
+            .validation,
         ).toMatchObject({
           severity: 'error',
           message: `required based on independent value`,
@@ -2810,15 +2810,15 @@ test('updating a binding only updates its data and not other bindings due to wea
   const state = player.getState() as InProgressState;
 
   state.controllers.flow.transition('next');
-  await waitFor(() => {
+  await vitest.waitFor(() => {
     state.controllers.data.set([['input.text', '']]);
   });
 
-  await waitFor(() => {
+  await vitest.waitFor(() => {
     state.controllers.data.set([['input.check', true]]);
   });
 
-  await waitFor(() => {
+  await vitest.waitFor(() => {
     const finalState = player.getState() as InProgressState;
     const otherParam = finalState.controllers.data.get('someOtherParam');
     expect(otherParam).toBe('notFoo');
@@ -2855,7 +2855,7 @@ describe('Validations with custom field messages', () => {
     state.controllers.data.set([['foo.data.thing1', 200]]);
     state.controllers.flow.transition('next');
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toMatchObject({
       severity: 'error',
       message: 'The entered value 200 is greater than 100',
@@ -2892,9 +2892,9 @@ describe('Validations with custom field messages', () => {
 
     state.controllers.data.set([['foo.data.thing1', 200.567]]);
 
-    await waitFor(() => {
+    await vitest.waitFor(() => {
       expect(
-        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
       ).toMatchObject({
         message:
           'foo.data.thing1 is a number. You have provided a value of number, which is correct. But floored value, 200 is not equal to entered value, 200.567',
@@ -2969,13 +2969,13 @@ describe('Validations with multiple inputs', () => {
     const state = player.getState() as InProgressState;
 
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toBeUndefined();
 
     state.controllers.data.set([['foo.b', 70]]);
-    await waitFor(() => {
+    await vitest.waitFor(() => {
       expect(
-        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
       ).toMatchObject({
         severity: 'error',
         message: 'Both need to equal 100',
@@ -3002,20 +3002,20 @@ describe('Validations with multiple inputs', () => {
     const state = player.getState() as InProgressState;
 
     expect(
-      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+      state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toBeUndefined();
 
     state.controllers.data.set([['foo.a', 15]]);
-    await waitFor(() => {
+    await vitest.waitFor(() => {
       expect(
-        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
       ).toMatchObject({
         severity: 'error',
         message: 'Both need to equal 100',
       });
 
       expect(
-        state.controllers.data.get('', { includeInvalid: false })
+        state.controllers.data.get('', { includeInvalid: false }),
       ).toMatchObject({
         foo: {
           a: 90,
@@ -3024,7 +3024,7 @@ describe('Validations with multiple inputs', () => {
       });
 
       expect(
-        state.controllers.data.get('', { includeInvalid: true })
+        state.controllers.data.get('', { includeInvalid: true }),
       ).toMatchObject({
         foo: {
           a: 15,
@@ -3034,13 +3034,13 @@ describe('Validations with multiple inputs', () => {
     });
 
     state.controllers.data.set([['foo.b', 85]]);
-    await waitFor(() => {
+    await vitest.waitFor(() => {
       expect(
-        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation
+        state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
       ).toBeUndefined();
 
       expect(
-        state.controllers.data.get('', { includeInvalid: false })
+        state.controllers.data.get('', { includeInvalid: false }),
       ).toMatchObject({
         foo: {
           a: 15,
@@ -3049,7 +3049,7 @@ describe('Validations with multiple inputs', () => {
       });
 
       expect(
-        state.controllers.data.get('', { includeInvalid: true })
+        state.controllers.data.get('', { includeInvalid: true }),
       ).toMatchObject({
         foo: {
           a: 15,
@@ -3166,7 +3166,7 @@ describe('weak binding edge cases', () => {
                   };
                 }
               });
-            }
+            },
           );
         });
       },
@@ -3179,16 +3179,16 @@ describe('weak binding edge cases', () => {
     const state = player.getState() as InProgressState;
 
     state.controllers.flow.transition('next');
-    await waitFor(() => {
+    await vitest.waitFor(() => {
       state.controllers.data.set([['input.text', '1999-12-31']]);
     });
-    await waitFor(() => {
+    await vitest.waitFor(() => {
       state.controllers.data.set([['input.check', true]]);
     });
-    await waitFor(() => {
+    await vitest.waitFor(() => {
       state.controllers.flow.transition('next');
     });
-    await waitFor(() => {
+    await vitest.waitFor(() => {
       expect(player.getState().status).toBe('completed');
     });
   });
@@ -3235,7 +3235,7 @@ describe('Validation Providers', () => {
                       },
                     },
                   ];
-                }
+                },
               );
             });
           },
@@ -3268,7 +3268,7 @@ describe('Validation Providers', () => {
 
     getControllers().data.set([['data.thing1', 'sam']]);
 
-    await waitFor(() => {
+    await vitest.waitFor(() => {
       expect(getFirstInput()?.validation?.message).toBe(undefined);
     });
   });
@@ -3342,20 +3342,20 @@ describe('Validation + Default Data', () => {
       return getControllers().view.currentView?.lastUpdate?.requiredField.asset;
     };
 
-    await waitFor(() => {
+    await vitest.waitFor(() => {
       expect(getFirstInput()?.validation).toBeUndefined();
     });
 
     // Set the value to the same as the default
     getControllers().data.set([['input.text', '']]);
 
-    await waitFor(() => {
+    await vitest.waitFor(() => {
       expect(getFirstInput()?.validation.message).toBe('A value is required');
     });
 
     // Set the value to something else
     getControllers().data.set([['input.text', 'foo']]);
-    await waitFor(() => {
+    await vitest.waitFor(() => {
       expect(getFirstInput()?.validation).toBeUndefined();
     });
   });
@@ -3458,27 +3458,27 @@ describe('Validation in subflow', () => {
       getControllers().flow.transition('next');
     };
 
-    await waitFor(() => {
+    await vitest.waitFor(() => {
       expect(getControllers().view.currentView?.lastUpdate?.id).toStrictEqual(
-        'view-1'
+        'view-1',
       );
     });
 
     attemptTransition();
     expect(getControllers().view.currentView?.lastUpdate?.id).toStrictEqual(
-      'view-1'
+      'view-1',
     );
     const firstRequiredValidation = getValidationMessage();
     expect(firstRequiredValidation.message).toStrictEqual(
-      'A value is required'
+      'A value is required',
     );
     getControllers().data.set([['foo.requiredInput', 1]]);
 
-    await waitFor(() => {
+    await vitest.waitFor(() => {
       attemptTransition();
     });
 
-    await waitFor(() => {
+    await vitest.waitFor(() => {
       expect(player.getState().status).toStrictEqual('completed');
     });
   });

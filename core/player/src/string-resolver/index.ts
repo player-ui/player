@@ -52,7 +52,7 @@ export function findNextExp(str: string) {
       // Move everything over and bump our close count by 1
       count++;
       workingString = workingString.substring(
-        nextOpenCurly + DOUBLE_OPEN_CURLY.length
+        nextOpenCurly + DOUBLE_OPEN_CURLY.length,
       );
       offset += nextOpenCurly + DOUBLE_OPEN_CURLY.length;
     } else {
@@ -60,7 +60,7 @@ export function findNextExp(str: string) {
       // Decrement our count and updates offsets
       count--;
       workingString = workingString.substring(
-        nextCloseCurly + DOUBLE_CLOSE_CURLY.length
+        nextCloseCurly + DOUBLE_CLOSE_CURLY.length,
       );
       offset += nextCloseCurly + DOUBLE_CLOSE_CURLY.length;
     }
@@ -79,7 +79,7 @@ export function findNextExp(str: string) {
 /** Finds any subset of the string wrapped in @[]@ and evaluates it as an expression */
 export function resolveExpressionsInString(
   val: string,
-  { evaluate }: Options
+  { evaluate }: Options,
 ): string {
   if (!evaluate) {
     return val;
@@ -95,7 +95,7 @@ export function resolveExpressionsInString(
 
     const expString = expStrWithBrackets.substr(
       '@['.length,
-      expStrWithBrackets.length - '@['.length - ']@'.length
+      expStrWithBrackets.length - '@['.length - ']@'.length,
     );
     const expValue = evaluate(expString);
 
@@ -145,7 +145,7 @@ export function resolveDataRefsInString(val: string, options: Options): string {
     const binding = workingString
       .substring(
         start + DOUBLE_OPEN_CURLY.length,
-        end - DOUBLE_OPEN_CURLY.length
+        end - DOUBLE_OPEN_CURLY.length,
       )
       .trim();
 
@@ -186,7 +186,7 @@ function traverseObject<T>(val: T, options: Options): T {
           newVal = setIn(
             newVal as any,
             [key],
-            traverseObject((val as any)[key], options)
+            traverseObject((val as any)[key], options),
           ) as any;
         });
       }

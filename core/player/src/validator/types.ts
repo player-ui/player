@@ -47,7 +47,7 @@ export type ValidationObjectWithHandler = ValidationObject & {
 
 export interface ValidationProvider {
   getValidationsForBinding?(
-    binding: BindingInstance
+    binding: BindingInstance,
   ): Array<ValidationObjectWithHandler> | undefined;
 
   getValidationsForView?(): Array<ValidationObjectWithHandler> | undefined;
@@ -79,5 +79,5 @@ export interface ValidatorContext {
 export type ValidatorFunction<Options = unknown> = (
   context: ValidatorContext,
   value: any,
-  options?: Options
+  options?: Options,
 ) => Omit<BaseValidationResponse, 'severity'> | undefined;

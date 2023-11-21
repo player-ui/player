@@ -33,6 +33,7 @@ export interface PlayerUtils {
   findPlugin<Plugin = unknown>(symbol: symbol): Plugin | undefined;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export declare namespace Resolve {
   export interface Validation {
     /** Fetch the data-type for the given binding */
@@ -40,7 +41,7 @@ export declare namespace Resolve {
 
     /** Get all currently applicable validation errors */
     getAll(
-      options?: ValidationGetResolveOptions
+      options?: ValidationGetResolveOptions,
     ): Map<BindingInstance, ValidationResponse> | undefined;
 
     /** Internal Method to lookup if there is a validation for the given binding */
@@ -48,12 +49,12 @@ export declare namespace Resolve {
       | {
           /** Get the validation for the given binding */
           get: (
-            options?: ValidationGetResolveOptions
+            options?: ValidationGetResolveOptions,
           ) => ValidationResponse | undefined;
 
           /** Get all validations for the given binding */
           getAll: (
-            options?: ValidationGetResolveOptions
+            options?: ValidationGetResolveOptions,
           ) => Array<ValidationResponse>;
         }
       | undefined;
@@ -64,7 +65,7 @@ export declare namespace Resolve {
       options?: {
         /** If this binding should also be tracked for validations */
         track?: boolean;
-      } & ValidationGetResolveOptions
+      } & ValidationGetResolveOptions,
     ): ValidationResponse | undefined;
 
     getValidationsForBinding(
@@ -72,12 +73,12 @@ export declare namespace Resolve {
       options?: {
         /** If this binding should also be tracked for validations */
         track?: boolean;
-      } & ValidationGetResolveOptions
+      } & ValidationGetResolveOptions,
     ): Array<ValidationResponse>;
 
     /** Get errors for all children regardless of section */
     getChildren(
-      type?: ValidationTypes.DisplayTarget
+      type?: ValidationTypes.DisplayTarget,
     ): Array<ValidationResponse>;
 
     /** Get errors for all children solely in this section */
@@ -180,13 +181,13 @@ export declare namespace Resolve {
 
   export type NodeTransformFunction = (
     node: Node.Node,
-    options: NodeResolveOptions
+    options: NodeResolveOptions,
   ) => Node.Node | null;
 
   export type NodeResolveFunction = (
     value: any,
     node: Node.Node,
-    options: NodeResolveOptions
+    options: NodeResolveOptions,
   ) => any;
 
   export interface Plugin {

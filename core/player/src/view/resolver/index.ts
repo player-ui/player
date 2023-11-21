@@ -35,7 +35,7 @@ const withContext = (model: DataModelWithParser): DataModelWithParser => {
 
     set: (
       transaction: [BindingLike, any][],
-      options?: DataModelOptions
+      options?: DataModelOptions,
     ): Updates => {
       return model.set(transaction, {
         context: { model },
@@ -157,7 +157,7 @@ export class Resolver {
       resolveCache,
       toNodeResolveOptions(this.options),
       undefined,
-      prevASTMap
+      prevASTMap,
     );
     this.resolveCache = resolveCache;
     this.hooks.afterUpdate.call(updated.value);
@@ -200,11 +200,11 @@ export class Resolver {
         if (isFirstUpdate) {
           if (node.type === NodeType.Asset || node.type === NodeType.View) {
             this.logger?.error(
-              `Cache conflict: Found Asset/View nodes that have conflicting ids: ${id}, may cause cache issues.`
+              `Cache conflict: Found Asset/View nodes that have conflicting ids: ${id}, may cause cache issues.`,
             );
           } else if (node.type === NodeType.Value) {
             this.logger?.info(
-              `Cache conflict: Found Value nodes that have conflicting ids: ${id}, may cause cache issues. To improve performance make value node IDs globally unique.`
+              `Cache conflict: Found Value nodes that have conflicting ids: ${id}, may cause cache issues. To improve performance make value node IDs globally unique.`,
             );
           }
         }
@@ -241,13 +241,13 @@ export class Resolver {
     cacheUpdate: Map<Node.Node, Resolve.ResolvedNode>,
     options: Resolve.NodeResolveOptions,
     parentNode: Node.Node | undefined,
-    prevASTMap: Map<Node.Node, Node.Node>
+    prevASTMap: Map<Node.Node, Node.Node>,
   ): NodeUpdate {
     const dependencyModel = new DependencyModel(options.data.model);
 
     dependencyModel.trackSubset('core');
     const depModelWithParser = withContext(
-      withParser(dependencyModel, this.options.parseBinding)
+      withParser(dependencyModel, this.options.parseBinding),
     );
 
     const resolveOptions = this.hooks.resolveOptions.call(
@@ -261,7 +261,7 @@ export class Resolver {
           this.options.evaluator.evaluate(exp, { model: depModelWithParser }),
         node,
       },
-      node
+      node,
     );
 
     const previousResult = this.getPreviousResult(node);
@@ -271,7 +271,7 @@ export class Resolver {
     const shouldUseLastValue = this.hooks.skipResolve.call(
       !dataChanged,
       node,
-      resolveOptions
+      resolveOptions,
     );
 
     if (shouldUseLastValue && previousResult) {
@@ -286,7 +286,7 @@ export class Resolver {
       const repopulateASTMapFromCache = (
         resolvedNode: Resolve.ResolvedNode,
         AST: Node.Node,
-        ASTParent: Node.Node | undefined
+        ASTParent: Node.Node | undefined,
       ) => {
         const { node: resolvedAST } = resolvedNode;
         this.ASTMap.set(resolvedAST, AST);
@@ -306,13 +306,13 @@ export class Resolver {
           repopulateASTMapFromCache(
             previousChildResult,
             originalChildNode,
-            AST
+            AST,
           );
         };
 
         if ('children' in resolvedAST) {
           resolvedAST.children?.forEach(({ value: childAST }) =>
-            handleChildNode(childAST)
+            handleChildNode(childAST),
           );
         } else if (resolvedAST.type === NodeType.MultiNode) {
           resolvedAST.values.forEach(handleChildNode);
@@ -337,7 +337,7 @@ export class Resolver {
     };
     const resolvedAST = this.hooks.beforeResolve.call(
       clonedNode,
-      resolveOptions
+      resolveOptions,
     ) ?? {
       type: NodeType.Empty,
     };
@@ -350,7 +350,7 @@ export class Resolver {
     let resolved = this.hooks.resolve.call(
       undefined,
       resolvedAST,
-      resolveOptions
+      resolveOptions,
     );
 
     let updated = !dequal(previousResult?.value, resolved);
@@ -371,7 +371,7 @@ export class Resolver {
           cacheUpdate,
           resolveOptions,
           resolvedAST,
-          prevASTMap
+          prevASTMap,
         );
         const {
           dependencies: childTreeDeps,
@@ -386,7 +386,7 @@ export class Resolver {
           if (childNode.type === NodeType.MultiNode && !childNode.override) {
             const arr = addLast(
               dlv(resolved, child.path as any[], []),
-              childValue
+              childValue,
             );
             resolved = setIn(resolved, child.path, arr);
           } else {
@@ -410,14 +410,14 @@ export class Resolver {
           cacheUpdate,
           resolveOptions,
           resolvedAST,
-          prevASTMap
+          prevASTMap,
         );
         if (mTree.value !== undefined && mTree.value !== null) {
           childValue.push(mTree.value);
         }
 
         mTree.dependencies.forEach((bindingDep) =>
-          childDependencies.add(bindingDep)
+          childDependencies.add(bindingDep),
         );
 
         updated = updated || mTree.updated;
@@ -430,7 +430,7 @@ export class Resolver {
     }
 
     childDependencies.forEach((bindingDep) =>
-      dependencyModel.addChildReadDep(bindingDep)
+      dependencyModel.addChildReadDep(bindingDep),
     );
 
     dependencyModel.trackSubset('core');

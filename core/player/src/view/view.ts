@@ -36,7 +36,7 @@ class CrossfieldProvider implements ValidationProvider {
 
     if (!Array.isArray(xfieldRefs)) {
       this.logger?.warn(
-        `Unable to register view validations for id: ${contentView.id}. 'validation' property must be an Array.`
+        `Unable to register view validations for id: ${contentView.id}. 'validation' property must be an Array.`,
       );
 
       return;
@@ -115,7 +115,7 @@ export class ViewInstance implements ValidationProvider {
       this.validationProvider = new CrossfieldProvider(
         this.initialView,
         this.resolverOptions.parseBinding,
-        this.resolverOptions.logger
+        this.resolverOptions.logger,
       );
 
       this.hooks.templatePlugin.call(this.templatePlugin);

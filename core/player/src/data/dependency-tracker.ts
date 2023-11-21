@@ -102,7 +102,7 @@ export class DependencyTracker {
 
   protected addReadDep(
     binding: BindingInstance,
-    namedSet = this.namedSet
+    namedSet = this.namedSet,
   ): void {
     if (namedSet) {
       this.namedDependencySets?.[namedSet]?.readDeps.add(binding);
@@ -113,7 +113,7 @@ export class DependencyTracker {
 
   protected addWriteDep(
     binding: BindingInstance,
-    namedSet = this.namedSet
+    namedSet = this.namedSet,
   ): void {
     if (namedSet) {
       this.namedDependencySets?.[namedSet]?.writeDeps.add(binding);
@@ -141,7 +141,7 @@ export class DependencyMiddleware
   public set(
     transaction: BatchSetTransaction,
     options?: DataModelOptions,
-    next?: DataModelImpl | undefined
+    next?: DataModelImpl | undefined,
   ): Updates {
     transaction.forEach(([binding]) => this.addWriteDep(binding));
 
@@ -151,7 +151,7 @@ export class DependencyMiddleware
   public get(
     binding: BindingInstance,
     options?: DataModelOptions,
-    next?: DataModelImpl | undefined
+    next?: DataModelImpl | undefined,
   ) {
     this.addReadDep(binding);
 
@@ -161,7 +161,7 @@ export class DependencyMiddleware
   public delete(
     binding: BindingInstance,
     options?: DataModelOptions,
-    next?: DataModelImpl | undefined
+    next?: DataModelImpl | undefined,
   ) {
     this.addWriteDep(binding);
     return next?.delete(binding, options);

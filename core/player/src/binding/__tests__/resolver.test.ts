@@ -41,7 +41,7 @@ test.each(testCases)('Resolving binding: %s', (binding, expectedResolved) => {
       getValue: (path) => get(testModel, getBindingSegments(path) as any),
       convertToPath: (p) => p,
       evaluate: () => undefined,
-    }
+    },
   );
 
   expect(actual.path.join('.')).toBe(expectedResolved);
@@ -57,7 +57,7 @@ test('works for nested keys', () => {
       getValue: () => 'path.nested[1]',
       convertToPath: () => 'path.nested.1',
       evaluate: () => undefined,
-    }
+    },
   );
   expect(resolved.path.join('.')).toBe('foo.path.nested.1.bar');
   expect(resolved.path).toStrictEqual(['foo', 'path', 'nested', 1, 'bar']);
@@ -74,7 +74,7 @@ describe('expressions', () => {
         getValue: () => undefined,
         convertToPath: (p) => p,
         evaluate,
-      }
+      },
     );
 
     expect(evaluate).toBeCalledWith('exp()');

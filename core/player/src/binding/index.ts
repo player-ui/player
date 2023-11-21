@@ -59,7 +59,7 @@ export class BindingParser {
    */
   private normalizePath(
     path: string,
-    resolveOptions: ResolveBindingASTOptions
+    resolveOptions: ResolveBindingASTOptions,
   ) {
     /**
      * Ensure no binding characters exist in path and the characters remaining
@@ -78,7 +78,7 @@ export class BindingParser {
 
     if (typeof ast !== 'object' || !ast?.status) {
       throw new TypeError(
-        `Cannot normalize path "${path}": ${ast?.error ?? 'Unknown Error.'}`
+        `Cannot normalize path "${path}": ${ast?.error ?? 'Unknown Error.'}`,
       );
     }
 
@@ -90,7 +90,7 @@ export class BindingParser {
   }
 
   private getBindingForNormalizedResult(
-    normalized: NormalizedResult
+    normalized: NormalizedResult,
   ): BindingInstance {
     const normalizedStr = normalized.path.join('.');
 
@@ -100,7 +100,7 @@ export class BindingParser {
 
     const created = new BindingInstance(
       normalizedStr === '' ? [] : normalized.path,
-      this.parse
+      this.parse,
     );
     this.cache[normalizedStr] = created;
 
@@ -109,7 +109,7 @@ export class BindingParser {
 
   public parse(
     rawBinding: BindingLike,
-    overrides: Partial<BindingParserOptions> = {}
+    overrides: Partial<BindingParserOptions> = {},
   ): BindingInstance {
     if (isBinding(rawBinding)) {
       return rawBinding;
@@ -138,7 +138,7 @@ export class BindingParser {
       convertToPath: (path: any) => {
         if (path === undefined) {
           throw new Error(
-            'Attempted to convert undefined value to binding path'
+            'Attempted to convert undefined value to binding path',
           );
         }
 
@@ -148,7 +148,7 @@ export class BindingParser {
           typeof path !== 'boolean'
         ) {
           throw new Error(
-            `Attempting to convert ${typeof path} to a binding path.`
+            `Attempting to convert ${typeof path} to a binding path.`,
           );
         }
 
@@ -187,7 +187,7 @@ export class BindingParser {
         (updatedBinding) => [
           this.parse(updatedBinding),
           updates[updatedBinding],
-        ]
+        ],
       );
 
       options.set(updateTransaction);

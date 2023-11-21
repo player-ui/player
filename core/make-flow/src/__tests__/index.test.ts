@@ -7,7 +7,7 @@ test('makes a flow from an asset', () => {
       id: 'some-id',
       type: 'text',
       value: 'I am a text asset',
-    })
+    }),
   ).toStrictEqual({
     id: 'generated-flow',
     views: [
@@ -53,7 +53,7 @@ test('makes a flow using an array of assets', () => {
           value: 'I am a text asset',
         },
       },
-    ])
+    ]),
   ).toStrictEqual({
     id: 'generated-flow',
     views: [

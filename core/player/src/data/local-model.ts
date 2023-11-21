@@ -50,13 +50,13 @@ export class LocalModel implements DataModelImpl {
           this.model = setIn(
             this.model,
             parentBinding.asArray(),
-            removeAt(parentValue, binding.key() as number)
+            removeAt(parentValue, binding.key() as number),
           ) as any;
         } else {
           this.model = setIn(
             this.model,
             parentBinding.asArray(),
-            omit(parentValue, binding.key() as string)
+            omit(parentValue, binding.key() as string),
           ) as any;
         }
       }

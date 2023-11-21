@@ -57,7 +57,7 @@ export class Parser {
         obj: object,
         nodeType: Node.ChildrenTypes,
         parseOptions: ParseObjectOptions,
-        determinedNodeType: NodeType | null
+        determinedNodeType: NodeType | null,
       ],
       Node.Node
     >(),
@@ -101,7 +101,7 @@ export class Parser {
   public parseObject(
     obj: object,
     type: Node.ChildrenTypes = NodeType.Value,
-    options: ParseObjectOptions = { templateDepth: 0 }
+    options: ParseObjectOptions = { templateDepth: 0 },
   ): Node.Node | null {
     const nodeType = this.hooks.determineNodeType.call(obj);
 
@@ -110,7 +110,7 @@ export class Parser {
         obj,
         type,
         options,
-        nodeType
+        nodeType,
       );
       if (parsedNode) {
         return parsedNode;
@@ -120,7 +120,7 @@ export class Parser {
     const parseLocalObject = (
       currentValue: any,
       objToParse: unknown,
-      path: string[] = []
+      path: string[] = [],
     ): NestedObj => {
       if (typeof objToParse !== 'object' || objToParse === null) {
         // value = objToParse;
@@ -155,7 +155,7 @@ export class Parser {
           const assetAST = this.parseObject(
             localValue,
             NodeType.Asset,
-            options
+            options,
           );
 
           if (assetAST) {
@@ -184,7 +184,7 @@ export class Parser {
                   template: template.value,
                   dynamic: template.dynamic ?? false,
                 },
-                template
+                template,
               );
 
               if (templateAST?.type === NodeType.MultiNode) {
@@ -218,7 +218,7 @@ export class Parser {
             localValue,
             NodeType.Value,
             options,
-            NodeType.Switch
+            NodeType.Switch,
           );
 
           if (
@@ -256,7 +256,7 @@ export class Parser {
         } else if (localValue && Array.isArray(localValue)) {
           const childValues = localValue
             .map((childVal) =>
-              this.parseObject(childVal, NodeType.Value, options)
+              this.parseObject(childVal, NodeType.Value, options),
             )
             .filter((child): child is Node.Node => !!child);
 
@@ -267,7 +267,7 @@ export class Parser {
                 override: !this.hasTemplateValues(localObj, localKey),
                 values: childValues,
               },
-              localValue
+              localValue,
             );
 
             if (multiNode?.type === NodeType.MultiNode) {
@@ -299,7 +299,7 @@ export class Parser {
               localValue,
               NodeType.Value,
               options,
-              determineNodeType
+              determineNodeType,
             );
             if (parsedNode) {
               return {
@@ -327,7 +327,7 @@ export class Parser {
           const value = setIn(
             accumulation.value,
             [...path, localKey],
-            localValue
+            localValue,
           );
 
           return {

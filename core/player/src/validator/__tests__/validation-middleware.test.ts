@@ -38,7 +38,7 @@ describe('middleware', () => {
     // Any valid value should fall through
     dataModelWithMiddleware.set([[foo, 'bar']], undefined, baseDataModel);
     expect(
-      dataModelWithMiddleware.get(foo, undefined, baseDataModel)
+      dataModelWithMiddleware.get(foo, undefined, baseDataModel),
     ).toStrictEqual('bar');
     expect(baseDataModel.get(foo)).toStrictEqual('bar');
   });
@@ -48,7 +48,7 @@ describe('middleware', () => {
     dataModelWithMiddleware.set([[foo, 'bar']], undefined, baseDataModel);
     dataModelWithMiddleware.set([[foo, 'baz']], undefined, baseDataModel);
     expect(
-      dataModelWithMiddleware.get(foo, { includeInvalid: true }, baseDataModel)
+      dataModelWithMiddleware.get(foo, { includeInvalid: true }, baseDataModel),
     ).toStrictEqual('baz');
     expect(baseDataModel.get(foo)).toStrictEqual('bar');
   });
@@ -58,16 +58,16 @@ describe('middleware', () => {
     const invalidUpdates = dataModelWithMiddleware.set(
       [[foo, 'baz']],
       undefined,
-      baseDataModel
+      baseDataModel,
     );
 
     expect(invalidUpdates).toMatchInlineSnapshot(`
-      Array [
-        Object {
+      [
+        {
           "binding": BindingInstance {
             "factory": [Function],
             "joined": "foo",
-            "split": Array [
+            "split": [
               "foo",
             ],
           },
@@ -82,7 +82,7 @@ describe('middleware', () => {
     const validUpdates = dataModelWithMiddleware.set(
       [[bar, 'baz']],
       undefined,
-      baseDataModel
+      baseDataModel,
     );
 
     expect(validUpdates).toHaveLength(1);

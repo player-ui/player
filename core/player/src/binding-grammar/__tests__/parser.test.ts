@@ -59,6 +59,6 @@ describe('custom', () => {
       const result = parseCustom(binding);
       expect(result.status).toBe(true);
       expect((result as ParserSuccessResult).path).toStrictEqual(AST);
-    }
+    },
   );
 });

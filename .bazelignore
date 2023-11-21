@@ -33,8 +33,3 @@ core/make-flow/node_modules
 core/types/node_modules
 core/partial-match-registry/node_modules
 core/player/node_modules
-
-ios
-docs
-xcode
-jvm

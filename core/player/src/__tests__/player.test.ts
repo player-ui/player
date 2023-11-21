@@ -1,4 +1,4 @@
-import { waitFor } from '@testing-library/react';
+import { vitest } from 'vitest';
 import { makeFlow } from '@player-ui/make-flow';
 
 import type { ViewInstance } from '../view';
@@ -125,7 +125,7 @@ test('multiple data change only update view once', async () => {
   state.controllers.data.set([['count', 1]]);
   state.controllers.data.set([['count', 2]]);
 
-  await waitFor(() => expect(onUpdateCall).toBeCalledTimes(2));
+  await vitest.waitFor(() => expect(onUpdateCall).toBeCalledTimes(2));
 });
 
 test('it handles multiple resolutions', async () => {
@@ -162,14 +162,14 @@ test('it handles multiple resolutions', async () => {
   const state = player.getState() as InProgressState;
   let lastUpdate = state.controllers.view.currentView?.lastUpdate;
   lastUpdate?.values?.[1].asset.run();
-  await waitFor(() => {
+  await vitest.waitFor(() => {
     lastUpdate = getView();
 
     expect(lastUpdate?.values[1].asset.label.asset.value).toBe(
-      'Clicked 1 times'
+      'Clicked 1 times',
     );
     expect(lastUpdate?.values[2].asset.label.asset.value).toBe(
-      'Clicked 0 times'
+      'Clicked 0 times',
     );
   });
 
@@ -177,14 +177,14 @@ test('it handles multiple resolutions', async () => {
 
   lastUpdate?.values[2].asset.run();
 
-  await waitFor(() => {
+  await vitest.waitFor(() => {
     lastUpdate = getView();
 
     expect(lastUpdate?.values[1].asset.label.asset.value).toBe(
-      'Clicked 1 times'
+      'Clicked 1 times',
     );
     expect(lastUpdate?.values[2].asset.label.asset.value).toBe(
-      'Clicked 1 times'
+      'Clicked 1 times',
     );
   });
 });
@@ -247,10 +247,10 @@ test('it inserts data into the view', async () => {
   });
 
   started.controllers.expression.evaluate(
-    started.controllers.view.currentView?.lastUpdate?.exp
+    started.controllers.view.currentView?.lastUpdate?.exp,
   );
 
-  await waitFor(() =>
+  await vitest.waitFor(() =>
     expect(started.controllers.view.currentView?.lastUpdate).toStrictEqual({
       id: 'action',
       type: 'action',
@@ -262,7 +262,7 @@ test('it inserts data into the view', async () => {
           value: 'Clicked 1 times',
         },
       },
-    })
+    }),
   );
 });
 
@@ -278,7 +278,7 @@ test('handles non-present data', async () => {
 
   expect(
     (player.getState() as InProgressState).controllers.view.currentView
-      ?.lastUpdate
+      ?.lastUpdate,
   ).toStrictEqual({
     id: 'text',
     type: 'text',
@@ -291,7 +291,7 @@ test('handles non-present data', async () => {
 
   expect(
     (player.getState() as InProgressState).controllers.view.currentView
-      ?.lastUpdate
+      ?.lastUpdate,
   ).toStrictEqual({
     id: 'text',
     type: 'text',
@@ -302,15 +302,15 @@ test('handles non-present data', async () => {
     ['some.data', 'Updated!'],
   ]);
 
-  await waitFor(() =>
+  await vitest.waitFor(() =>
     expect(
       (player.getState() as InProgressState).controllers.view.currentView
-        ?.lastUpdate
+        ?.lastUpdate,
     ).toStrictEqual({
       id: 'text',
       type: 'text',
       value: 'Updated!',
-    })
+    }),
   );
 });
 
@@ -355,10 +355,10 @@ describe('expressions', () => {
       '{{data.count1}} = 5',
       '{{data.count2}} = 10',
     ]);
-    await waitFor(() =>
+    await vitest.waitFor(() =>
       expect(state.controllers.view.currentView?.lastUpdate?.value).toBe(
-        '5 - 10'
-      )
+        '5 - 10',
+      ),
     );
   });
 
@@ -374,13 +374,17 @@ describe('expressions', () => {
     const state = player.getState() as InProgressState;
 
     state.controllers.expression.evaluate(['label2 = 5', '{{label1}} = 10']);
-    await waitFor(() =>
-      expect(state.controllers.view.currentView?.lastUpdate?.value).toBe('10 5')
+    await vitest.waitFor(() =>
+      expect(state.controllers.view.currentView?.lastUpdate?.value).toBe(
+        '10 5',
+      ),
     );
 
     state.controllers.expression.evaluate(['{{label1}} = 20']);
-    await waitFor(() =>
-      expect(state.controllers.view.currentView?.lastUpdate?.value).toBe('20 5')
+    await vitest.waitFor(() =>
+      expect(state.controllers.view.currentView?.lastUpdate?.value).toBe(
+        '20 5',
+      ),
     );
   });
 
@@ -425,10 +429,10 @@ describe('expressions', () => {
     ]);
     state.controllers.view.currentView?.lastUpdate?.run();
 
-    await waitFor(() =>
+    await vitest.waitFor(() =>
       expect(state.controllers.view.currentView?.lastUpdate?.value).toBe(
-        '5 - 10'
-      )
+        '5 - 10',
+      ),
     );
   });
 
@@ -491,7 +495,7 @@ describe('formatting', () => {
     const state = player.getState() as InProgressState;
 
     expect(
-      state.controllers.view.currentView?.lastUpdate?.title.asset.value
+      state.controllers.view.currentView?.lastUpdate?.title.asset.value,
     ).toBe('MINIMAL JSON EXAMPLE');
   });
 });
@@ -504,7 +508,7 @@ describe('failure cases', () => {
     flow.views![0].id = 'not-view-1';
 
     await expect(player.start(flow)).rejects.toThrowError(
-      'No view with id view-1'
+      'No view with id view-1',
     );
   });
 
@@ -525,7 +529,7 @@ describe('failure cases', () => {
     const flow = makeFlow({ id: 'view-1', type: 'text', value: 'Title' });
 
     await expect(player.start(flow)).rejects.toThrowError(
-      'b.notThere is not a function'
+      'b.notThere is not a function',
     );
   });
 
@@ -535,7 +539,7 @@ describe('failure cases', () => {
     flow.views![0].id = 'other-id';
 
     await expect(player.start(flow)).rejects.toThrowError(
-      `No view with id view-1`
+      `No view with id view-1`,
     );
   });
 
@@ -573,7 +577,7 @@ describe('failure cases', () => {
     const response = player.start(makeFlow(payload));
 
     await expect(response).rejects.toThrowError(
-      'No view with id non-existing-view'
+      'No view with id non-existing-view',
     );
   });
 
@@ -581,7 +585,7 @@ describe('failure cases', () => {
     const player = new Player();
 
     const response = player.start(
-      makeFlow({ type: 'text', id: 'text', value: 'View' })
+      makeFlow({ type: 'text', id: 'text', value: 'View' }),
     );
 
     const state = player.getState() as InProgressState;

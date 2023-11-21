@@ -47,7 +47,7 @@ function resolveString(str: string, resolveOptions: Options) {
 export function resolveAllRefs(
   node: any,
   resolveOptions: Options,
-  propertiesToSkip: Set<string | number>
+  propertiesToSkip: Set<string | number>,
 ): any {
   if (
     node === null ||
@@ -89,7 +89,7 @@ export function resolveAllRefs(
 /** Traverse up the node tree finding the first available 'path' */
 const findBasePath = (
   node: Node.Node,
-  resolver: Resolver
+  resolver: Resolver,
 ): Node.PathSegment[] => {
   const parentNode = node.parent;
   if (!parentNode) {
@@ -133,7 +133,7 @@ export default class StringResolverPlugin implements ViewPlugin {
         let propsToSkip: Set<string>;
         if (node.type === NodeType.Asset || node.type === NodeType.View) {
           propsToSkip = new Set(
-            node.plugins?.stringResolver?.propertiesToSkip ?? ['exp']
+            node.plugins?.stringResolver?.propertiesToSkip ?? ['exp'],
           );
           if (node.value?.id) {
             this.propertiesToSkipCache.set(node.value.id, propsToSkip);
@@ -146,7 +146,7 @@ export default class StringResolverPlugin implements ViewPlugin {
           this.propertiesToSkipCache.has(node.parent.parent.value.id)
         ) {
           propsToSkip = this.propertiesToSkipCache.get(
-            node.parent.parent.value.id
+            node.parent.parent.value.id,
           ) as Set<string>;
         } else {
           propsToSkip = new Set(['exp']);

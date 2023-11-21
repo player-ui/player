@@ -1,5 +1,4 @@
-import { it, expect } from 'vitest';
-import { waitFor } from '@testing-library/react';
+import { it, expect, vitest } from 'vitest';
 import { FlowController } from '..';
 
 it('ends when the flow does', async () => {
@@ -127,7 +126,7 @@ it('can switch between parent and sub flow', async () => {
   controller.transition('Back');
 
   // Wait for all pending promises (in this case, the sub-flow promise) to complete.
-  await waitFor(() => expect(controller.current?.id).toBe('Flow-1'));
+  await vitest.waitFor(() => expect(controller.current?.id).toBe('Flow-1'));
 
   controller.transition('Next');
   expect(controller.current?.id).toBe('Flow-2');
@@ -140,7 +139,7 @@ it('fails if BEGIN doesnt point to a flow', async () => {
   } as any);
 
   await expect(controller.start()).rejects.toThrowError(
-    'No flow defined for: foo'
+    'No flow defined for: foo',
   );
 });
 
@@ -150,21 +149,21 @@ it('fails if state isnt an object', async () => {
     foo: 'bar',
   } as any);
   await expect(controller.start()).rejects.toThrowError(
-    'Flow: foo needs to be an object'
+    'Flow: foo needs to be an object',
   );
 });
 
 it('fails if no BEGIN state', async () => {
   const controller = new FlowController({} as any);
   await expect(controller.start()).rejects.toThrowError(
-    'Must supply a BEGIN state'
+    'Must supply a BEGIN state',
   );
 });
 
 it('fails if flow not started', async () => {
   const controller = new FlowController({} as any);
   expect(controller.transition).toThrowError(
-    'Not currently in a flow. Cannot transition.'
+    'Not currently in a flow. Cannot transition.',
   );
 });
 

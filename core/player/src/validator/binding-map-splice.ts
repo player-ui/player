@@ -9,7 +9,7 @@ import type { BindingInstance } from '../binding';
  */
 export function removeBindingAndChildrenFromMap<T>(
   sourceMap: Map<BindingInstance, T>,
-  binding: BindingInstance
+  binding: BindingInstance,
 ): Map<BindingInstance, T> {
   const targetMap = new Map(sourceMap);
 

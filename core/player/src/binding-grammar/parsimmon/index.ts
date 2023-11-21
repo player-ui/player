@@ -39,13 +39,13 @@ const segment = P.alt(identifier, nestedPath, nestedExpression)
 const optionallyQuotedSegment = P.alt(
   P.regex(/[^"]*/).wrap(doubleQuote, doubleQuote).map(toValue),
   P.regex(/[^']*/).wrap(singleQuote, singleQuote).map(toValue),
-  segment
+  segment,
 );
 
 const query = P.seq(
   optionallyQuotedSegment,
   P.string('=').times(1, 3).trim(P.optWhitespace),
-  optionallyQuotedSegment
+  optionallyQuotedSegment,
 ).map(([key, , value]) => toQuery(key as any, value as any));
 
 const brackets = P.alt(query, optionallyQuotedSegment)

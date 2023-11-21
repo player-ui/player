@@ -1,7 +1,6 @@
 common --enable_bzlmod
 
 test --test_output=errors
-coverage --combined_report=lcov
 
 build:ci --experimental_remote_cache_compression --experimental_remote_cache_async
 test:ci --experimental_remote_cache_compression --experimental_remote_cache_async

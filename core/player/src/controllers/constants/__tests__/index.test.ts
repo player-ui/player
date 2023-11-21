@@ -19,14 +19,14 @@ test('basic get/set functionality', () => {
   const middleNameSafe = controller.getConstants(
     'middlename',
     'constants',
-    'A'
+    'A',
   );
   const favoriteColor = controller.getConstants('favorite.color', 'constants');
   const nonExistantNamespace = controller.getConstants('test', 'foo');
   const nonExistantNamespaceWithFallback = controller.getConstants(
     'test',
     'foo',
-    'bar'
+    'bar',
   );
 
   expect(firstname).toStrictEqual(data.firstname);
@@ -47,7 +47,7 @@ test('basic get/set functionality', () => {
   controller.addConstants(newData, 'constants');
   const newFavoriteColor = controller.getConstants(
     'favorite.color',
-    'constants'
+    'constants',
   );
   expect(newFavoriteColor).toStrictEqual(newData.favorite.color);
 });
@@ -76,7 +76,7 @@ test('temp override functionality', () => {
   const tempMiddleName = controller.getConstants('middlename', 'constants');
   const tempFavoriteColor = controller.getConstants(
     'favorite.color',
-    'constants'
+    'constants',
   );
 
   expect(tempMiddleName).toStrictEqual(temp.middlename);
@@ -91,7 +91,7 @@ test('temp override functionality', () => {
   controller.setTemporaryValues(newTemp, 'constants');
   const newtempFavoriteColor = controller.getConstants(
     'favorite.color',
-    'constants'
+    'constants',
   );
   expect(newtempFavoriteColor).toStrictEqual(newTemp.favorite.color);
 

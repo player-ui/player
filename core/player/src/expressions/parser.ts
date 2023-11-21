@@ -134,7 +134,7 @@ function createBinaryExpression(
   operator: string | boolean,
   left: string,
   right: string,
-  location?: NodeLocation
+  location?: NodeLocation,
 ) {
   let type: ExpressionNodeType;
 
@@ -200,7 +200,7 @@ export function parseExpression(
   options?: {
     /** If true (the default), will throw on invalid expressions */
     strict?: boolean;
-  }
+  },
 ): ExpressionNode {
   const strictMode = options?.strict ?? true;
 
@@ -447,7 +447,7 @@ export function parseExpression(
           biop,
           left,
           right,
-          createSpanningLocation(left.location, right.location)
+          createSpanningLocation(left.location, right.location),
         );
         stack.push(node);
       }
@@ -470,7 +470,7 @@ export function parseExpression(
         stack[i - 1].value,
         stack[i - 2],
         node,
-        createSpanningLocation(stack[i - 2].location, node.location)
+        createSpanningLocation(stack[i - 2].location, node.location),
       );
       i -= 2;
     }
@@ -585,7 +585,7 @@ export function parseExpression(
     if (isIdentifierStart(chCode)) {
       throwError(
         `Variable names cannot start with a number (${num}${exprI(index)})`,
-        index
+        index,
       );
     } else if (chCode === PERIOD_CODE) {
       throwError('Unexpected period', index);

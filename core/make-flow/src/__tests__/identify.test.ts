@@ -7,7 +7,7 @@ test('finds an asset', () => {
       id: 'some-id',
       type: 'text',
       value: 'I am a text asset',
-    })
+    }),
   ).toBe(ObjType.ASSET);
 });
 
@@ -19,7 +19,7 @@ test('finds an asset wrapper', () => {
         type: 'text',
         value: 'I am a text asset',
       },
-    })
+    }),
   ).toBe(ObjType.ASSET_WRAPPER);
 });
 

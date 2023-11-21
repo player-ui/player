@@ -10,7 +10,7 @@ import type {
 
 /** Generates a function by removing the first context argument */
 export function withoutContext<T extends unknown[], Return>(
-  fn: (...args: T) => Return
+  fn: (...args: T) => Return,
 ): ExpressionHandler<T, Return> {
   return (_context, ...args) => fn(...args);
 }
@@ -26,7 +26,7 @@ function isInRange(position: NodePosition, location: NodeLocation) {
 /** Get the node in the expression that's closest to the desired position */
 export function findClosestNodeAtPosition(
   node: ExpressionNode,
-  position: NodePosition
+  position: NodePosition,
 ): ExpressionNode | undefined {
   // This is just mapping recursively over nodes in the tree
 
@@ -84,7 +84,7 @@ export function findClosestNodeAtPosition(
         node.type === 'ArrayExpression' ? node.elements : node.body;
 
       const anyElements = elements.find((e) =>
-        findClosestNodeAtPosition(e, position)
+        findClosestNodeAtPosition(e, position),
       );
 
       if (anyElements) {
@@ -103,7 +103,7 @@ export function findClosestNodeAtPosition(
             findClosestNodeAtPosition(next.value, position)
           );
         },
-        undefined
+        undefined,
       );
 
       if (checkObject) {
@@ -135,7 +135,7 @@ export function findClosestNodeAtPosition(
 
 /** Checks if the expression is a simple type */
 export function isObjectExpression(
-  expr: ExpressionType
+  expr: ExpressionType,
 ): expr is ExpressionObjectType {
   if (isExpressionNode(expr)) {
     return false;

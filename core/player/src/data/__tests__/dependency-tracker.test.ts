@@ -12,7 +12,7 @@ const binding = parser.parse('foo.bar');
 describe('dependency model', () => {
   it('tracks reads', () => {
     const trackedModel = new DependencyModel(
-      new LocalModel({ foo: { bar: 'baz' } })
+      new LocalModel({ foo: { bar: 'baz' } }),
     );
 
     trackedModel.get(binding);
@@ -23,7 +23,7 @@ describe('dependency model', () => {
 
   it('tracks writes', () => {
     const trackedModel = new DependencyModel(
-      new LocalModel({ foo: { bar: 'baz' } })
+      new LocalModel({ foo: { bar: 'baz' } }),
     );
 
     trackedModel.set([[binding, 'not baz']]);
@@ -34,7 +34,7 @@ describe('dependency model', () => {
 
   it(`uses the existing set instead of recreating a new one`, () => {
     const trackedModel = new DependencyModel(
-      new LocalModel({ foo: { bar: 'baz' } })
+      new LocalModel({ foo: { bar: 'baz' } }),
     );
     const binding2 = parser.parse('foo.baz');
 
@@ -48,7 +48,7 @@ describe('dependency model', () => {
 
   it('tracks dependency sets correctly', () => {
     const trackedModel = new DependencyModel(
-      new LocalModel({ foo: { bar: 'baz' } })
+      new LocalModel({ foo: { bar: 'baz' } }),
     );
     const binding2 = parser.parse('foo.baz');
     const binding3 = parser.parse('foo.bad');
@@ -72,7 +72,7 @@ describe('dependency model', () => {
 
   it('adds a tracked dependency to children set', () => {
     const trackedModel = new DependencyModel(
-      new LocalModel({ foo: { bar: 'baz' } })
+      new LocalModel({ foo: { bar: 'baz' } }),
     );
 
     trackedModel.addChildReadDep(binding);

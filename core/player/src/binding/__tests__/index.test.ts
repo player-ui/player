@@ -68,7 +68,7 @@ test('skips the update hook when data does not need to be changed', () => {
 test('throws error on bad binding syntax', () => {
   const parser = new BindingParser();
   expect(() => parser.parse('foo.bar[')).toThrowError(
-    /Cannot normalize path "foo.bar\[/
+    /Cannot normalize path "foo.bar\[/,
   );
 });
 
@@ -107,10 +107,10 @@ test('works for binding with partial-nested refs', () => {
   });
 
   expect(parser.parse('foo.{{hello}}_world.baz').asString()).toBe(
-    'foo.bar_world.baz'
+    'foo.bar_world.baz',
   );
   expect(parser.parse('foo.{{hello}}_other_{{world}}.baz').asString()).toBe(
-    'foo.bar_other_not-bar.baz'
+    'foo.bar_other_not-bar.baz',
   );
 });
 
@@ -124,7 +124,7 @@ test('works for expanded nested refs', () => {
   });
 
   expect(parser.parse('foo.{{nested}}.baz').asString()).toBe(
-    'foo.nested.ref.1.baz'
+    'foo.nested.ref.1.baz',
   );
 });
 
@@ -156,9 +156,9 @@ describe('errors', () => {
     });
 
     expect(() =>
-      parser.parse('foo.{{nested}}.bar')
+      parser.parse('foo.{{nested}}.bar'),
     ).toThrowErrorMatchingInlineSnapshot(
-      `"Cannot resolve binding: foo.{{nested}}.bar"`
+      `"Cannot resolve binding: foo.{{nested}}.bar"`,
     );
   });
 

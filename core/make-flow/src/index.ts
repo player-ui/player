@@ -122,7 +122,7 @@ export function makeFlow(obj: any, args?: NavOptions): Flow {
 
   if (type === ObjType.UNKNOWN) {
     throw new Error(
-      'No clue how to convert this into a flow. Just do it yourself'
+      'No clue how to convert this into a flow. Just do it yourself',
     );
   }
 

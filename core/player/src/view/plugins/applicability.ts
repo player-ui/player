@@ -24,7 +24,7 @@ export default class ApplicabilityPlugin implements ViewPlugin {
         }
 
         return newNode;
-      }
+      },
     );
   }
 
@@ -42,13 +42,13 @@ export default class ApplicabilityPlugin implements ViewPlugin {
         obj: any,
         nodeType: Node.ChildrenTypes,
         options: ParseObjectOptions,
-        determinedNodeType: null | NodeType
+        determinedNodeType: null | NodeType,
       ) => {
         if (determinedNodeType === NodeType.Applicability) {
           const parsedApplicability = parser.parseObject(
             omit(obj, 'applicability'),
             nodeType,
-            options
+            options,
           );
           if (parsedApplicability !== null) {
             const applicabilityNode = parser.createASTNode(
@@ -57,7 +57,7 @@ export default class ApplicabilityPlugin implements ViewPlugin {
                 expression: (obj as any).applicability,
                 value: parsedApplicability,
               },
-              obj
+              obj,
             );
 
             if (applicabilityNode?.type === NodeType.Applicability) {
@@ -67,7 +67,7 @@ export default class ApplicabilityPlugin implements ViewPlugin {
             return applicabilityNode;
           }
         }
-      }
+      },
     );
   }
 
