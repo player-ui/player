@@ -207,6 +207,7 @@ and display it as a SwiftUI view comprised of registered assets.
     assets.dependency 'PlayerUI/Core'
     assets.dependency 'PlayerUI/SwiftUI'
     assets.dependency 'PlayerUI/BeaconPlugin'
+    assets.dependency 'PlayerUI/SwiftUIPendingTransactionPlugin'
 
     assets.source_files = 'ios/packages/reference-assets/Sources/**/*'
     assets.resource_bundles = {
