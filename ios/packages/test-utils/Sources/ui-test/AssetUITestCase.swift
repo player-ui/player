@@ -50,7 +50,8 @@ open class AssetUITestCase: XCTestCase {
         - mockName: The name of the mock to open
      */
     open func openFlow(_ mockName: String) {
-    
+        navigateToAssetCollection()
+
         app.otherElements.buttons[mockName].firstMatch.tap()
     }
 
