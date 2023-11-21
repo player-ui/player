@@ -48,7 +48,7 @@ const getFlowContents = (flowPath) => {
 
   return {
     name: camelCase(name),
-    json: JSON.parse(fs.readFileSync(path.resolve(process.cwd(), flowPath)))
+    json: makeFlow(JSON.parse(fs.readFileSync(path.resolve(process.cwd(), flowPath))))
   }
 }
 const pendingTransactionPluginFlow = `

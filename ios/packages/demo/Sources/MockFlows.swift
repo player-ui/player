@@ -1188,6 +1188,51 @@ static let textWithLink: String = """
   }
 }
 """
+static let beaconAction: String = """
+{
+  "id": "generated-flow",
+  "views": [
+    {
+      "id": "action",
+      "type": "action",
+      "exp": [
+        "{{count}} = {{count}} + 1",
+        "beacon('action', 'some-data')"
+      ],
+      "metaData": {
+        "beacon": "Click count: {{count}}"
+      },
+      "label": {
+        "asset": {
+          "id": "action-label-text",
+          "type": "text",
+          "value": "Clicked {{count}} times"
+        }
+      }
+    }
+  ],
+  "data": {
+    "count": 0
+  },
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "action",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+"""
 static let externalAction: String = """
 {
   "id": "test-flow",
@@ -1218,45 +1263,21 @@ static let externalAction: String = """
   }
 }
 """
-
-
 static let pubSubBasic: String = """
 {
   "id": "generated-flow",
   "views": [
     {
-      "id": "collection",
-      "type": "collection",
-      "values": [
-        {
-          "asset": {
-            "id": "action",
-            "type": "action",
-            "exp": "@[ publish('some-event', 'event published message') ]@",
-            "label": {
-              "asset": {
-                "id": "action-label",
-                "type": "text",
-                "value": "Clicked to publish event"
-              }
-            }
-          }
-        },
-        {
-          "asset": {
-            "id": "action-end",
-            "type": "action",
-            "value": "Next",
-            "label": {
-              "asset": {
-                "id": "action-end-label",
-                "type": "text",
-                "value": "End the flow (View pubsub events)"
-              }
-            }
-          }
+      "id": "action",
+      "type": "action",
+      "exp": "@[ publish('some-event', 'event published message') ]@",
+      "label": {
+        "asset": {
+          "id": "action-label",
+          "type": "text",
+          "value": "Clicked to publish event"
         }
-      ]
+      }
     }
   ],
   "data": {
@@ -1268,7 +1289,7 @@ static let pubSubBasic: String = """
       "startState": "VIEW_1",
       "VIEW_1": {
         "state_type": "VIEW",
-        "ref": "collection",
+        "ref": "action",
         "transitions": {
           "*": "END_Done"
         }
@@ -1281,166 +1302,102 @@ static let pubSubBasic: String = """
   }
 }
 """
-    static let beaconAction: String = """
+
+    
+static let inputAssetPendingTransaction: String = """
+{
+  "id": "input-validation-flow",
+  "views": [
     {
-      "id": "generated-flow",
-      "views": [
+      "id": "view-1",
+      "type": "collection",
+      "values": [
         {
-          "id": "collection",
-          "type": "collection",
-          "values": [
-                  {
+          "asset": {
+            "id": "input-required",
+            "type": "input",
+            "binding": "foo.requiredInput",
+            "label": {
               "asset": {
-              "id": "action",
-              "type": "action",
-               "exp": ["{{count}} = {{count}} + 1" , "beacon('action', 'some-data')"],
-               "metaData": {
-                "beacon": "Click count: {{count}}"
-              },
-              "label": {
-                "asset": {
-                  "id": "action-label-text",
-                  "type": "text",
-                  "value": "Clicked {{count}} times"
-                }
+                "id": "input-required-label",
+                "type": "text",
+                "value": "This input is required and must be greater than 0"
               }
             }
-            },
-            {
-              "asset": {
-                "id": "action-end",
-                "type": "action",
-                "value": "Next",
-                "label": {
-                  "asset": {
-                    "id": "action-end-label",
-                    "type": "text",
-                    "value": "End the flow (View Beacons)"
-                  }
-                }
-              }
-            }
-          ]
-        }
-      ],
-      "data": {
-            "count": 0
-      },
-      "navigation": {
-        "BEGIN": "FLOW_1",
-        "FLOW_1": {
-          "startState": "VIEW_1",
-          "VIEW_1": {
-            "state_type": "VIEW",
-            "ref": "collection",
-            "transitions": {
-              "*": "END_Done"
-            }
-          },
-          "END_Done": {
-            "state_type": "END",
-            "outcome": "done"
           }
+        },
+        {
+          "asset": {
+            "id": "action-1",
+            "type": "action",
+            "value": "Next",
+            "label": {
+              "asset": {
+                "id": "action-1-label",
+                "type": "text",
+                "value": "Continue"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "view-2",
+      "type": "info",
+      "title": {
+        "asset": {
+          "id": "view-2-title",
+          "type": "text",
+          "value": "You made it!"
         }
       }
     }
-    """
-
-
-    static let inputAssetPendingTransaction: String = """
-    {
-      "id": "input-validation-flow",
-      "views": [
-        {
-          "id": "view-1",
-          "type": "collection",
-          "values": [
-            {
-              "asset": {
-                "id": "input-required",
-                "type": "input",
-                "binding": "foo.requiredInput",
-                "label": {
-                  "asset": {
-                    "id": "input-required-label",
-                    "type": "text",
-                    "value": "This input is required and must be greater than 0"
-                  }
-                }
-              }
-            },
-            {
-              "asset": {
-                "id": "action-1",
-                "type": "action",
-                "value": "Next",
-                "label": {
-                  "asset": {
-                    "id": "action-1-label",
-                    "type": "text",
-                    "value": "Continue"
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "id": "view-2",
-          "type": "info",
-          "title": {
-            "asset": {
-              "id": "view-2-title",
-              "type": "text",
-              "value": "You made it!"
-            }
+  ],
+  "schema": {
+    "ROOT": {
+      "foo": {
+        "type": "FooType"
+      }
+    },
+    "FooType": {
+      "requiredInput": {
+        "type": "IntegerPosType",
+        "validation": [
+          {
+            "type": "required"
           }
-        }
-      ],
-      "schema": {
-        "ROOT": {
-          "foo": {
-            "type": "FooType"
-          }
-        },
-        "FooType": {
-          "requiredInput": {
-            "type": "IntegerPosType",
-            "validation": [
-              {
-                "type": "required"
-              }
-            ]
-          }
-        }
-      },
-      "data": {},
-      "navigation": {
-        "BEGIN": "FLOW_1",
-        "FLOW_1": {
-          "startState": "VIEW_1",
-          "VIEW_1": {
-            "state_type": "VIEW",
-            "ref": "view-1",
-            "transitions": {
-              "*": "VIEW_2"
-            }
-          },
-          "VIEW_2": {
-            "state_type": "VIEW",
-            "ref": "view-2",
-            "transitions": {
-              "*": "END_Done"
-            }
-          },
-          "END_Done": {
-            "state_type": "END",
-            "outcome": "done"
-          }
-        }
+        ]
       }
     }
-    """
+  },
+  "data": {},
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "view-1",
+        "transitions": {
+          "*": "VIEW_2"
+        }
+      },
+      "VIEW_2": {
+        "state_type": "VIEW",
+        "ref": "view-2",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+"""
 
     public static let assetSections: [FlowLoader.FlowSection] = [
         (title: "action", flows: [
@@ -1476,19 +1433,18 @@ static let pubSubBasic: String = """
     ]
 
     public static let pluginSections: [FlowLoader.FlowSection] = [
+              (title: "beacon", flows: [
+            (name: "action", flow: MockFlows.beaconAction)
+        ]),
         (title: "external-action", flows: [
             (name: "external-action", flow: MockFlows.externalAction)
         ]),
         (title: "pubsub", flows: [
             (name: "pub sub basic", flow: MockFlows.pubSubBasic)
-        ]),
-        (title: "beacon", flows: [
-            (name: "beacon action", flow: MockFlows.beaconAction)
         ])
       ,
-        (title: "pending-transaction", flows: [
-          (name: "input asset pending transaction", flow: MockFlows.inputAssetPendingTransaction)
-          ])
-        ]
-
+      (title: "pending-transaction", flows: [
+        (name: "input asset pending transaction", flow: MockFlows.inputAssetPendingTransaction)
+        ])
+      ]
 }
