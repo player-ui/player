@@ -130,7 +130,7 @@ public struct PluginsAndPlayerCollection: View {
                     isPresented: $alertPresented,
                     content: {
                         Alert(
-                            title: Text("Info"),
+                            title: (completionMessage != "" ? Text("FlowCompleted") : Text("Info")),
                             message: Text("Data: \n \($pubsubEventName.wrappedValue) \n Completion: \($completionMessage.wrappedValue)"),
                             dismissButton: .default(Text("OK"))
                         )

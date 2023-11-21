@@ -6,7 +6,7 @@ class PubSubUITests: BaseTestCase {
         app.otherElements.buttons["Plugins + Managed Player"].firstMatch.tap()
     }
 
-    func testBeaconPluginAction() {
+    func testPubsubPluginAction() {
         withEyes("pub sub basic") { check in
             check("pub sub basic loaded")
 
