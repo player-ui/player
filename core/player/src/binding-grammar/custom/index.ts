@@ -254,7 +254,7 @@ export const parse: Parser = (path) => {
   const parseSegmentAndBrackets = (): Array<AnyNode> => {
     // try to parse a segment first
 
-    const parsed = [];
+    const parsed: Array<AnyNode> = [];
 
     const firstSegment = segment();
 

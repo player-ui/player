@@ -47,7 +47,7 @@ export default class SwitchPlugin implements ViewPlugin {
       'switch',
       (
         obj: any,
-        nodeType: Node.ChildrenTypes,
+        _nodeType: Node.ChildrenTypes,
         options: ParseObjectOptions,
         determinedNodeType: null | NodeType,
       ) => {

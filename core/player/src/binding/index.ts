@@ -1,6 +1,6 @@
 import { SyncBailHook, SyncWaterfallHook } from 'tapable-ts';
 import { NestedError } from 'ts-nested-error';
-import type { ParserResult, AnyNode } from '../binding-grammar';
+import type { ParserResult, AnyNode } from '../binding-grammar/index';
 import {
   // We can swap this with whichever parser we want to use
   parseCustom as parseBinding,

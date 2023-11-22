@@ -1,19 +1,15 @@
 {
-  "exclude": ["node_modules", "_backup", "bazel-*"],
   "compilerOptions": {
-    "target": "ES6",
-    "module": "commonjs",
-    "jsx": "react",
-    "resolveJsonModule": true,
-    "allowJs": true,
-    "declaration": true,
-    "declarationMap": true,
-    "emitDeclarationOnly": true,
-    "outDir": "./dist",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
     "strict": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
     "skipLibCheck": true,
-    "downlevelIteration": true
+    "jsx": "react",
+    "declaration": true,
+    "declarationDir": "./types",
+    "sourceMap": true,
+    "removeComments": false,
   }
 }

@@ -1,4 +1,4 @@
-import { describe, it } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import type { Flow } from '@player-ui/types';
 import type { InProgressState } from '..';
 import { Player } from '..';

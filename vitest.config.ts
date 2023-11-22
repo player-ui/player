@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config';
+import { configDefaults, defineConfig } from 'vitest/config';
 import path from 'node:path';
 
 const COVERAGE_OUTPUT_FILE = path.relative(
@@ -8,6 +8,7 @@ const COVERAGE_OUTPUT_FILE = path.relative(
 
 export default defineConfig({
   test: {
+    exclude: [...configDefaults.exclude, 'helpers'],
     reporters: ['default', 'junit'],
     outputFile: {
       junit: process.env.XML_OUTPUT_FILE ?? 'test-results.xml',

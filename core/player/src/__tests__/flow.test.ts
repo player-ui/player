@@ -1,4 +1,4 @@
-import { test, vitest } from 'vitest';
+import { test, vitest, expect } from 'vitest';
 import type { FlowController } from '../controllers';
 import type { DataController } from '..';
 import { Player } from '..';

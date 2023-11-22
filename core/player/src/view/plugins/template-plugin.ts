@@ -126,7 +126,7 @@ export default class TemplatePlugin implements ViewPlugin {
       'template',
       (
         obj: any,
-        nodeType: Node.ChildrenTypes,
+        _nodeType: Node.ChildrenTypes,
         options: ParseObjectOptions,
         determinedNodeType: null | NodeType,
       ) => {

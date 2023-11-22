@@ -1,10 +1,10 @@
-import { test, vitest } from 'vitest';
+import { test, vitest, describe, beforeEach, expect } from 'vitest';
 import type { Flow, NavigationFlowViewState } from '@player-ui/types';
 import type { FlowController } from '../controllers';
 import TrackBindingPlugin from './helpers/binding.plugin';
 import type { InProgressState } from '../types';
 import { Player } from '..';
-import { ActionExpPlugin } from './helpers/action-exp.test';
+import { ActionExpPlugin } from './helpers/action-exp.plugin';
 
 const minimal: Flow = {
   id: 'minimal-flow',
@@ -400,7 +400,7 @@ describe('state node expression tests', () => {
         },
       },
     });
-    jest.runOnlyPendingTimers();
+
     flowController?.transition('Next');
 
     /**

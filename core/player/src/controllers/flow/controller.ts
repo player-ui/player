@@ -1,7 +1,7 @@
 import { SyncHook } from 'tapable-ts';
 import type { Navigation, NavigationFlowEndState } from '@player-ui/types';
 import type { Logger } from '../../logger';
-import type { NamedState, TransitionOptions } from './flow';
+import type { TransitionOptions } from './flow';
 import { FlowInstance } from './flow';
 
 /** A manager for the navigation section of a Content blob */

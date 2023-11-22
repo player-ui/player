@@ -1,4 +1,4 @@
-import { vitest } from 'vitest';
+import { vitest, test, expect, describe, it } from 'vitest';
 import { makeFlow } from '@player-ui/make-flow';
 
 import type { ViewInstance } from '../view';
@@ -7,7 +7,7 @@ import { Player } from '..';
 import type { ViewController } from '..';
 import actionsFlow from './helpers/actions.flow';
 import type { InProgressState } from '../types';
-import { ActionExpPlugin } from './helpers/action-exp.test';
+import { ActionExpPlugin } from './helpers/action-exp.plugin';
 
 const minimal = {
   id: 'minimal-player-content-response-format',
