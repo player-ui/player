@@ -87,8 +87,8 @@ test('loads an expression', () => {
     plugins: [pubsub],
   });
 
-  const topLevel = jest.fn();
-  const nested = jest.fn();
+  const topLevel = vitest.fn();
+  const nested = vitest.fn();
   pubsub.subscribe('pet', topLevel);
   pubsub.subscribe('pet.names', nested);
 
@@ -108,8 +108,8 @@ test('handles custom expression names', () => {
     plugins: [pubsub],
   });
 
-  const topLevel = jest.fn();
-  const nested = jest.fn();
+  const topLevel = vitest.fn();
+  const nested = vitest.fn();
   pubsub.subscribe('pet', topLevel);
   pubsub.subscribe('pet.names', nested);
 
@@ -136,7 +136,7 @@ test('only calls subscription once if multiple pubsub plugins are registered', (
 
   const player = new Player({ plugins: [pubsub, pubsub2] });
 
-  const topLevel = jest.fn();
+  const topLevel = vitest.fn();
   pubsub.subscribe('pet', topLevel);
 
   player.start(minimal as any);
@@ -151,7 +151,7 @@ test('calls subscription for each pubsub registered through pubsubplugin', () =>
 
   const player = new Player({ plugins: [pubsub, pubsub2] });
 
-  const spy = jest.fn();
+  const spy = vitest.fn();
   pubsub.subscribe('pet', spy);
 
   player.start(multistart as any);

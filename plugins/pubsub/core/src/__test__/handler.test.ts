@@ -43,7 +43,7 @@ describe('PubSubHandlerPlugin', () => {
 
   it('registers a new subscription handler', () => {
     const pubsub = new PubSubPlugin();
-    const spy = jest.fn();
+    const spy = vitest.fn();
 
     const player = new Player({
       plugins: [

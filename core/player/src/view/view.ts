@@ -1,18 +1,18 @@
-import { SyncHook } from 'tapable-ts';
-import type { View as ViewType } from '@player-ui/types';
-import type { BindingInstance, BindingFactory } from '../binding';
-import type { ValidationProvider, ValidationObject } from '../validator';
-import type { Logger } from '../logger';
-import type { Resolve } from './resolver';
-import { Resolver, toNodeResolveOptions } from './resolver';
-import type { Node } from './parser';
-import { Parser } from './parser';
+import { SyncHook } from "tapable-ts";
+import type { View as ViewType } from "@player-ui/types";
+import type { BindingInstance, BindingFactory } from "../binding";
+import type { ValidationProvider, ValidationObject } from "../validator";
+import type { Logger } from "../logger";
+import type { Resolve } from "./resolver";
+import { Resolver, toNodeResolveOptions } from "./resolver";
+import type { Node } from "./parser";
+import { Parser } from "./parser";
 import {
   TemplatePlugin,
   StringResolverPlugin,
   ApplicabilityPlugin,
   SwitchPlugin,
-} from './plugins';
+} from "./plugins";
 
 /**
  * Manages the view level validations
@@ -49,8 +49,8 @@ class CrossfieldProvider implements ValidationProvider {
       // x-field validations by default are triggered by navigating away from the page
       // the reference can also override that _or_ the severity
       const withDefaults: ValidationObject = {
-        trigger: 'navigation',
-        severity: 'error',
+        trigger: "navigation",
+        severity: "error",
         ...vRef,
       };
 

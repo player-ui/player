@@ -5,14 +5,15 @@ load("//tools:defs.bzl", "tsup_config", "vitest_config")
 npm_link_all_packages(name = "node_modules")
 
 tsup_config(name = "tsup_config")
+
 vitest_config(name = "vitest_config")
 
 js_pipeline(
     package_name = "@player-ui/player",
     test_deps = [
-        "//:vitest_config",
+        ":node_modules/@player-ui/common-types-plugin",
         ":node_modules/@player-ui/make-flow",
-        # ":node_modules/@player-ui/common-types-plugin",
+        "//:vitest_config",
     ],
     deps = [
         ":node_modules/@player-ui/partial-match-registry",

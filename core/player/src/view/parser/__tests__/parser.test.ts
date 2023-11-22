@@ -1,15 +1,15 @@
-import { describe, expect, beforeEach, test } from 'vitest';
-import { BindingParser } from '../../../binding';
-import { LocalModel, withParser } from '../../../data';
-import { SchemaController } from '../../../schema';
-import { NodeType, Parser } from '../index';
-import { SwitchPlugin, ApplicabilityPlugin, TemplatePlugin } from '../..';
-import type { Options } from '../../plugins/options';
-import { ExpressionEvaluator } from '../../../expressions';
-import type { DataModelWithParser } from '../../../data';
+import { describe, expect, beforeEach, test } from "vitest";
+import { BindingParser } from "../../../binding";
+import { LocalModel, withParser } from "../../../data";
+import { SchemaController } from "../../../schema";
+import { NodeType, Parser } from "../index";
+import { SwitchPlugin, ApplicabilityPlugin, TemplatePlugin } from "../..";
+import type { Options } from "../../plugins/options";
+import { ExpressionEvaluator } from "../../../expressions";
+import type { DataModelWithParser } from "../../../data";
 
 const parseBinding = new BindingParser().parse;
-describe('generates the correct AST', () => {
+describe("generates the correct AST", () => {
   let model: DataModelWithParser;
   let expressionEvaluator: ExpressionEvaluator;
   let options: Options;
@@ -35,28 +35,28 @@ describe('generates the correct AST', () => {
     new SwitchPlugin(options).applyParser(parser);
   });
 
-  test('works with basic objects', () => {
-    expect(parser.parseObject({ foo: 'bar' })).toStrictEqual({
+  test("works with basic objects", () => {
+    expect(parser.parseObject({ foo: "bar" })).toStrictEqual({
       type: NodeType.Value,
       value: {
-        foo: 'bar',
+        foo: "bar",
       },
     });
   });
 
-  test('works with objects that have symbols', () => {
-    const testSymbol = Symbol('foo');
-    expect(parser.parseObject({ [testSymbol]: 'bar' })).toStrictEqual({
+  test("works with objects that have symbols", () => {
+    const testSymbol = Symbol("foo");
+    expect(parser.parseObject({ [testSymbol]: "bar" })).toStrictEqual({
       type: NodeType.Value,
       value: {
-        [testSymbol]: 'bar',
+        [testSymbol]: "bar",
       },
     });
   });
 
-  test('works with applicability things', () => {
+  test("works with applicability things", () => {
     expect(
-      parser.parseObject({ foo: 'bar', applicability: '{{baz}}' }),
+      parser.parseObject({ foo: "bar", applicability: "{{baz}}" }),
     ).toMatchSnapshot();
 
     expect(
@@ -64,11 +64,11 @@ describe('generates the correct AST', () => {
         asset: {
           values: [
             {
-              applicability: '{{foo}}',
-              value: 'foo',
+              applicability: "{{foo}}",
+              value: "foo",
             },
             {
-              value: 'bar',
+              value: "bar",
             },
           ],
         },
@@ -79,12 +79,12 @@ describe('generates the correct AST', () => {
       parser.parseObject({
         asset: {
           someProp: {
-            applicability: '{{foo}}',
+            applicability: "{{foo}}",
             label: {
-              value: 'label',
+              value: "label",
             },
             description: {
-              value: 'description',
+              value: "description",
             },
           },
         },
@@ -96,8 +96,8 @@ describe('generates the correct AST', () => {
         asset: {
           someProp: {
             asset: {
-              applicability: '{{foo}}',
-              type: 'someAsset',
+              applicability: "{{foo}}",
+              type: "someAsset",
             },
           },
         },
@@ -105,16 +105,16 @@ describe('generates the correct AST', () => {
     ).toMatchSnapshot();
   });
 
-  test('parses an object', () => {
-    expect(parser.parseObject({ asset: { type: 'bar' } })).toMatchSnapshot();
+  test("parses an object", () => {
+    expect(parser.parseObject({ asset: { type: "bar" } })).toMatchSnapshot();
   });
 
-  test('parses an exp array', () => {
+  test("parses an exp array", () => {
     expect(
       parser.parseObject(
         {
-          id: 'foo',
-          type: 'action',
+          id: "foo",
+          type: "action",
           exp: ['{{please}} = "work"'],
         },
         NodeType.Asset,
@@ -122,18 +122,18 @@ describe('generates the correct AST', () => {
     ).toMatchSnapshot();
   });
 
-  test('keeps null values when parsing object', () => {
-    expect(parser.parseObject({ foo: 'bar', baz: null })).toStrictEqual({
+  test("keeps null values when parsing object", () => {
+    expect(parser.parseObject({ foo: "bar", baz: null })).toStrictEqual({
       type: NodeType.Value,
       value: {
-        foo: 'bar',
+        foo: "bar",
         baz: null,
       },
     });
   });
 });
 
-describe('parseView', () => {
+describe("parseView", () => {
   let model: DataModelWithParser;
   let expressionEvaluator: ExpressionEvaluator;
   let options: Options;
@@ -159,28 +159,28 @@ describe('parseView', () => {
     new SwitchPlugin(options).applyParser(parser);
   });
 
-  test('parses a simple view', () => {
+  test("parses a simple view", () => {
     expect(
       parser.parseView({
-        id: 'foo-view',
-        type: 'viewtype',
+        id: "foo-view",
+        type: "viewtype",
         fields: {
           asset: {
-            id: 'foo-asset',
-            type: 'collection',
+            id: "foo-asset",
+            type: "collection",
             values: [
               {
                 asset: {
-                  id: 'text-asset',
-                  type: 'text',
-                  value: 'bar',
+                  id: "text-asset",
+                  type: "text",
+                  value: "bar",
                 },
               },
               {
                 asset: {
-                  applicability: 'foo.bar',
-                  id: 'input-asset',
-                  type: 'input',
+                  applicability: "foo.bar",
+                  id: "input-asset",
+                  type: "input",
                 },
               },
               {},
@@ -192,17 +192,17 @@ describe('parseView', () => {
   });
 });
 
-describe('generates the correct AST when using switch plugin', () => {
+describe("generates the correct AST when using switch plugin", () => {
   const toughStaticSwitchView = {
-    id: 'toughView',
-    type: 'view',
+    id: "toughView",
+    type: "view",
     title: {
       staticSwitch: [
         {
           case: "'true'",
           asset: {
-            id: 'businessprofile-tile-screen-yoy-subtitle',
-            type: 'text',
+            id: "businessprofile-tile-screen-yoy-subtitle",
+            type: "text",
             value:
               "If it's changed since last year, let us know. Feel free to pick more than one.",
           },
@@ -212,20 +212,20 @@ describe('generates the correct AST when using switch plugin', () => {
   };
 
   const toughStaticSwitchMultiNodeView = {
-    id: 'toughView',
-    type: 'view',
+    id: "toughView",
+    type: "view",
     title: {
       asset: {
-        id: 'someMultiNode',
-        type: 'type',
+        id: "someMultiNode",
+        type: "type",
         values: [
           {
             staticSwitch: [
               {
                 case: "'true'",
                 asset: {
-                  id: 'businessprofile-tile-screen-yoy-subtitle-1',
-                  type: 'text',
+                  id: "businessprofile-tile-screen-yoy-subtitle-1",
+                  type: "text",
                   value:
                     "If it's changed since last year, let us know. Feel free to pick more than one.",
                 },
@@ -234,9 +234,9 @@ describe('generates the correct AST when using switch plugin', () => {
           },
           {
             asset: {
-              id: 'businessprofile-tile-screen-yoy-subtitle-2',
-              type: 'text',
-              value: 'More text',
+              id: "businessprofile-tile-screen-yoy-subtitle-2",
+              type: "text",
+              value: "More text",
             },
           },
         ],
@@ -252,11 +252,11 @@ describe('generates the correct AST when using switch plugin', () => {
   const parser = new Parser();
   switchPlugin.applyParser(parser);
 
-  test('works with asset wrapped objects', () => {
+  test("works with asset wrapped objects", () => {
     expect(parser.parseObject(toughStaticSwitchView)).toMatchSnapshot();
   });
 
-  test('works with objects in a multiNode', () => {
+  test("works with objects in a multiNode", () => {
     expect(
       parser.parseObject(toughStaticSwitchMultiNodeView),
     ).toMatchSnapshot();

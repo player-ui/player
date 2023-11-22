@@ -1,15 +1,15 @@
-import { omit } from 'timm';
-import type { ViewPlugin, View } from './plugin';
-import type { Options } from './options';
-import type { Resolver } from '../resolver';
-import type { Node, ParseObjectOptions, Parser } from '../parser';
-import { NodeType } from '../parser';
+import { omit } from "timm";
+import type { ViewPlugin, View } from "./plugin";
+import type { Options } from "./options";
+import type { Resolver } from "../resolver";
+import type { Node, ParseObjectOptions, Parser } from "../parser";
+import { NodeType } from "../parser";
 
 /** A view plugin to remove inapplicable assets from the tree */
 export default class ApplicabilityPlugin implements ViewPlugin {
   applyResolver(resolver: Resolver) {
     resolver.hooks.beforeResolve.tap(
-      'applicability',
+      "applicability",
       (node: Node.Node | null, options: Options) => {
         let newNode = node;
 
@@ -30,14 +30,14 @@ export default class ApplicabilityPlugin implements ViewPlugin {
 
   applyParser(parser: Parser) {
     /** Switches resolved during the parsing phase are static */
-    parser.hooks.determineNodeType.tap('applicability', (obj: any) => {
-      if (Object.prototype.hasOwnProperty.call(obj, 'applicability')) {
+    parser.hooks.determineNodeType.tap("applicability", (obj: any) => {
+      if (Object.prototype.hasOwnProperty.call(obj, "applicability")) {
         return NodeType.Applicability;
       }
     });
 
     parser.hooks.parseNode.tap(
-      'applicability',
+      "applicability",
       (
         obj: any,
         nodeType: Node.ChildrenTypes,
@@ -46,7 +46,7 @@ export default class ApplicabilityPlugin implements ViewPlugin {
       ) => {
         if (determinedNodeType === NodeType.Applicability) {
           const parsedApplicability = parser.parseObject(
-            omit(obj, 'applicability'),
+            omit(obj, "applicability"),
             nodeType,
             options,
           );
@@ -72,7 +72,7 @@ export default class ApplicabilityPlugin implements ViewPlugin {
   }
 
   apply(view: View) {
-    view.hooks.resolver.tap('applicability', this.applyResolver.bind(this));
-    view.hooks.parser.tap('applicability', this.applyParser.bind(this));
+    view.hooks.resolver.tap("applicability", this.applyResolver.bind(this));
+    view.hooks.parser.tap("applicability", this.applyParser.bind(this));
   }
 }

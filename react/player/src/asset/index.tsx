@@ -1,6 +1,6 @@
-import React from 'react';
-import type { Asset as AssetType, AssetWrapper } from '@player-ui/player';
-import type { Registry } from '@player-ui/partial-match-registry';
+import React from "react";
+import type { Asset as AssetType, AssetWrapper } from "@player-ui/player";
+import type { Registry } from "@player-ui/partial-match-registry";
 
 export type AssetRegistryType = Registry<React.ComponentType<any>>;
 
@@ -17,27 +17,27 @@ export const AssetContext = React.createContext<ContextType>({});
  * A React Component that looks up an implementation from a registry
  */
 export const ReactAsset = (
-  props: AssetType<string> | AssetWrapper<AssetType<string>>
+  props: AssetType<string> | AssetWrapper<AssetType<string>>,
 ) => {
   const { registry } = React.useContext(AssetContext);
 
   let unwrapped;
 
-  if ('type' in props && 'id' in props) {
+  if ("type" in props && "id" in props) {
     unwrapped = props;
-  } else if ('asset' in props) {
+  } else if ("asset" in props) {
     unwrapped = (props as unknown as AssetWrapper).asset;
   }
 
   if (!unwrapped) {
     throw Error(
-      `Cannot determine asset type for props: ${JSON.stringify(props)}`
+      `Cannot determine asset type for props: ${JSON.stringify(props)}`,
     );
   }
 
-  if (typeof unwrapped !== 'object') {
+  if (typeof unwrapped !== "object") {
     throw Error(
-      `Asset was not an object got (${typeof unwrapped}) instead: ${unwrapped}`
+      `Asset was not an object got (${typeof unwrapped}) instead: ${unwrapped}`,
     );
   }
 
@@ -53,7 +53,7 @@ export const ReactAsset = (
 
   if (!Impl) {
     throw Error(
-      `No implementation found for id: ${unwrapped.id} type: ${unwrapped.type}`
+      `No implementation found for id: ${unwrapped.id} type: ${unwrapped.type}`,
     );
   }
 

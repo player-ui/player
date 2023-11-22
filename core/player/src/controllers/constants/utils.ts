@@ -1,7 +1,7 @@
-import { BindingInstance } from '../../binding';
+import { BindingInstance } from "../../binding";
 
 /** Recursively flattens a nested object to be an object of depth 1 with keys being the full path in the orginal object */
-export function flatten(obj: any, roots: [string][] = [], sep = '.'): any {
+export function flatten(obj: any, roots: [string][] = [], sep = "."): any {
   return (
     Object
       // find props of given object
@@ -13,7 +13,7 @@ export function flatten(obj: any, roots: [string][] = [], sep = '.'): any {
 
           // include previously returned object
           ...memo,
-          ...(Object.prototype.toString.call(obj[prop]) === '[object Object]'
+          ...(Object.prototype.toString.call(obj[prop]) === "[object Object]"
             ? // keep working if value is an object
               flatten(obj[prop], roots.concat([prop]))
             : // include current prop and value and prefix prop with the roots

@@ -8,7 +8,7 @@ describe('pubsub', () => {
   it('should call subscriber with single argument', () => {
     const type = 'test';
     const message = 'this is a test message';
-    const spy = jest.fn();
+    const spy = vitest.fn();
 
     pubsub.subscribe(type, spy);
     pubsub.publish(type, message);
@@ -20,7 +20,7 @@ describe('pubsub', () => {
   it('should increment uuid with each subscribe', () => {
     const type = 'test';
     const message = 'this is a test message';
-    const spy = jest.fn();
+    const spy = vitest.fn();
 
     const sub1 = pubsub.subscribe(type, spy);
     const sub2 = pubsub.subscribe(type, spy);
@@ -34,7 +34,7 @@ describe('pubsub', () => {
 
   it('should call subscriber with multiple argument', () => {
     const type = 'test';
-    const spy = jest.fn();
+    const spy = vitest.fn();
 
     pubsub.subscribe(type, spy);
     pubsub.publish(type, 1, 'two', 'three');
@@ -45,7 +45,7 @@ describe('pubsub', () => {
 
   it('should handle different argument types', () => {
     const type = 'test';
-    const spy = jest.fn();
+    const spy = vitest.fn();
 
     pubsub.subscribe(type, spy);
     pubsub.publish(type, 'one', 2, undefined, null, true, false);
@@ -65,8 +65,8 @@ describe('pubsub', () => {
   it('should call all subscribers only once', () => {
     const type = 'test';
     const message = 'this is a test message';
-    const first = jest.fn();
-    const second = jest.fn();
+    const first = vitest.fn();
+    const second = vitest.fn();
 
     pubsub.subscribe(type, first);
     pubsub.subscribe(type, second);
@@ -81,8 +81,8 @@ describe('pubsub', () => {
 
   it('should call only subscribers of event', () => {
     const message = 'this is a test message';
-    const first = jest.fn();
-    const second = jest.fn();
+    const first = vitest.fn();
+    const second = vitest.fn();
 
     pubsub.subscribe('first', first);
     pubsub.subscribe('second', second);
@@ -95,7 +95,7 @@ describe('pubsub', () => {
   });
 
   it('should call subscriber for all publish types', () => {
-    const spy = jest.fn();
+    const spy = vitest.fn();
 
     pubsub.subscribe('*', spy);
 
@@ -110,9 +110,9 @@ describe('pubsub', () => {
   });
 
   it('should call all levels of subscribers only once', () => {
-    const level1 = jest.fn();
-    const level2 = jest.fn();
-    const level3 = jest.fn();
+    const level1 = vitest.fn();
+    const level2 = vitest.fn();
+    const level3 = vitest.fn();
 
     pubsub.subscribe('foo', level1);
     pubsub.subscribe('foo.bar', level2);
@@ -129,8 +129,8 @@ describe('pubsub', () => {
   });
 
   it('should return unique symbols for each subscribe', () => {
-    const spy = jest.fn();
-    const spy2 = jest.fn();
+    const spy = vitest.fn();
+    const spy2 = vitest.fn();
 
     const token1 = pubsub.subscribe('test', spy);
     const token2 = pubsub.subscribe('test', spy);
@@ -141,7 +141,7 @@ describe('pubsub', () => {
   });
 
   it(`shouldn't error if subscribing to non string value`, () => {
-    const spy = jest.fn();
+    const spy = vitest.fn();
     pubsub.subscribe(true as any, spy);
     pubsub.publish(true as any, 'test');
 
@@ -150,7 +150,7 @@ describe('pubsub', () => {
 
   it('should remove handler with token', () => {
     const type = 'test';
-    const spy = jest.fn();
+    const spy = vitest.fn();
     const token = pubsub.subscribe(type, spy);
 
     expect(pubsub.count()).toBe(1);
@@ -164,8 +164,8 @@ describe('pubsub', () => {
 
   it('should only remove handler with passed token', () => {
     const type = 'test';
-    const spy1 = jest.fn();
-    const spy2 = jest.fn();
+    const spy1 = vitest.fn();
+    const spy2 = vitest.fn();
     const token1 = pubsub.subscribe(type, spy1);
     const token2 = pubsub.subscribe(type, spy2);
 
@@ -185,8 +185,8 @@ describe('pubsub', () => {
 
   it('should remove all handlers for type', () => {
     const type = 'test';
-    const spy1 = jest.fn();
-    const spy2 = jest.fn();
+    const spy1 = vitest.fn();
+    const spy2 = vitest.fn();
     pubsub.subscribe(type, spy1);
     pubsub.subscribe(type, spy2);
 
@@ -204,9 +204,9 @@ describe('pubsub', () => {
   });
 
   it('should remove all nested handlers for type', () => {
-    const spy1 = jest.fn();
-    const spy2 = jest.fn();
-    const spy3 = jest.fn();
+    const spy1 = vitest.fn();
+    const spy2 = vitest.fn();
+    const spy3 = vitest.fn();
     pubsub.subscribe('foo', spy1);
     pubsub.subscribe('foo.bar', spy2);
     pubsub.subscribe('foo.bar.baz', spy3);
@@ -229,9 +229,9 @@ describe('pubsub', () => {
   });
 
   it('should keep top layer for type', () => {
-    const spy1 = jest.fn();
-    const spy2 = jest.fn();
-    const spy3 = jest.fn();
+    const spy1 = vitest.fn();
+    const spy2 = vitest.fn();
+    const spy3 = vitest.fn();
     pubsub.subscribe('foo', spy1);
     pubsub.subscribe('foo.bar', spy2);
     pubsub.subscribe('foo.bar.baz', spy3);
@@ -254,9 +254,9 @@ describe('pubsub', () => {
   });
 
   it('should only delete deeply nested type', () => {
-    const spy1 = jest.fn();
-    const spy2 = jest.fn();
-    const spy3 = jest.fn();
+    const spy1 = vitest.fn();
+    const spy2 = vitest.fn();
+    const spy3 = vitest.fn();
     pubsub.subscribe('foo', spy1);
     pubsub.subscribe('foo.bar', spy2);
     pubsub.subscribe('foo.bar.baz', spy3);
@@ -279,7 +279,7 @@ describe('pubsub', () => {
   });
 
   it(`should gracefully handle when token doesn't exist anymore`, () => {
-    const spy = jest.fn();
+    const spy = vitest.fn();
 
     const token = pubsub.subscribe('foo', spy);
     expect(pubsub.count()).toBe(1);
@@ -293,7 +293,7 @@ describe('pubsub', () => {
   });
 
   it(`should gracefully handle when unsubscribe isn't string or symbol`, () => {
-    const spy = jest.fn();
+    const spy = vitest.fn();
 
     pubsub.subscribe('foo', spy);
     expect(pubsub.count()).toBe(1);

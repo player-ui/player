@@ -7,7 +7,7 @@ export interface Node<T extends string> {
  * An AST node that represents a nested path in the model
  * foo.{{bar}}.baz (this is {{bar}})
  */
-export interface PathNode extends Node<'PathNode'> {
+export interface PathNode extends Node<"PathNode"> {
   /** The path in the model that this node represents */
   path: Array<AnyNode>;
 }
@@ -16,7 +16,7 @@ export interface PathNode extends Node<'PathNode'> {
  * A segment representing a query
  * [foo=bar]
  */
-export interface QueryNode extends Node<'Query'> {
+export interface QueryNode extends Node<"Query"> {
   /** The key to query */
   key: AnyNode;
 
@@ -25,38 +25,38 @@ export interface QueryNode extends Node<'Query'> {
 }
 
 /** A simple segment */
-export interface ValueNode extends Node<'Value'> {
+export interface ValueNode extends Node<"Value"> {
   /** The segment value */
   value: string | number;
 }
 
 /** A nested expression */
-export interface ExpressionNode extends Node<'Expression'> {
+export interface ExpressionNode extends Node<"Expression"> {
   /** The expression */
   value: string;
 }
 
 /** Helper to create a value node */
 export const toValue = (value: string | number): ValueNode => ({
-  name: 'Value',
+  name: "Value",
   value,
 });
 
 /** Helper to create an expression node */
 export const toExpression = (value: string): ExpressionNode => ({
-  name: 'Expression',
+  name: "Expression",
   value,
 });
 
 /** Helper to create a nested path node */
 export const toPath = (path: Array<AnyNode>): PathNode => ({
-  name: 'PathNode',
+  name: "PathNode",
   path,
 });
 
 /** Helper to create a query node */
 export const toQuery = (key: AnyNode, value?: AnyNode): QueryNode => ({
-  name: 'Query',
+  name: "Query",
   key,
   value,
 });
@@ -70,7 +70,7 @@ export const toConcatenatedNode = (
   }
 
   return {
-    name: 'Concatenated',
+    name: "Concatenated",
     value: values,
   };
 };
@@ -79,7 +79,7 @@ export const toConcatenatedNode = (
  * A binding segment that's multiple smaller ones
  * {{foo}}_bar_{{baz}}
  */
-export interface ConcatenatedNode extends Node<'Concatenated'> {
+export interface ConcatenatedNode extends Node<"Concatenated"> {
   /** A list of nested paths, or value nodes to concat together to form a segment */
   value: Array<PathNode | ValueNode | ExpressionNode>;
 }

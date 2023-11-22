@@ -33,3 +33,12 @@ core/make-flow/node_modules
 core/types/node_modules
 core/partial-match-registry/node_modules
 core/player/node_modules
+plugins/beacon/core/node_modules
+plugins/metrics/core/node_modules
+plugins/metrics/react/node_modules
+react/player/node_modules
+react/subscribe/node_modules
+plugins/asset-provider/react/node_modules
+plugins/asset-transform/core/node_modules
+plugins/common-types/core/node_modules
+plugins/types-provider/core/node_modules

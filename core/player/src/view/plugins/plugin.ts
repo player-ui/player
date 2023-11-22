@@ -1,6 +1,6 @@
-import type { SyncHook } from 'tapable-ts';
-import type { Resolver } from '../resolver';
-import type { Parser } from '../parser';
+import type { SyncHook } from "tapable-ts";
+import type { Resolver } from "../resolver";
+import type { Parser } from "../parser";
 
 /** The basic view api */
 export interface View {

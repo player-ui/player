@@ -1,21 +1,21 @@
-import flatten from 'arr-flatten';
-import type { Parser } from 'parsimmon';
-import P from 'parsimmon';
-import type { Parser as BindingParser } from '../ast';
+import flatten from "arr-flatten";
+import type { Parser } from "parsimmon";
+import P from "parsimmon";
+import type { Parser as BindingParser } from "../ast";
 import {
   toValue,
   toConcatenatedNode,
   toQuery,
   toPath,
   toExpression,
-} from '../ast';
+} from "../ast";
 
 const doubleQuote = P.string('"');
 const singleQuote = P.string("'");
-const backTick = P.string('`');
+const backTick = P.string("`");
 
 const identifier = P.regex(/[\w\-@]+/)
-  .desc('identifier')
+  .desc("identifier")
   .map(toValue);
 
 // eslint-disable-next-line prefer-const
@@ -24,7 +24,7 @@ let path: Parser<any>;
 const futurePath = P.lazy(() => path);
 const nestedPath = futurePath
   .trim(P.optWhitespace)
-  .wrap(P.string('{{'), P.string('}}'))
+  .wrap(P.string("{{"), P.string("}}"))
   .map(toPath);
 
 const nestedExpression = P.regex(/[^`]*/)
@@ -44,18 +44,18 @@ const optionallyQuotedSegment = P.alt(
 
 const query = P.seq(
   optionallyQuotedSegment,
-  P.string('=').times(1, 3).trim(P.optWhitespace),
+  P.string("=").times(1, 3).trim(P.optWhitespace),
   optionallyQuotedSegment,
 ).map(([key, , value]) => toQuery(key as any, value as any));
 
 const brackets = P.alt(query, optionallyQuotedSegment)
   .trim(P.optWhitespace)
-  .wrap(P.string('['), P.string(']'))
+  .wrap(P.string("["), P.string("]"))
   .many();
 
 const segmentAndBrackets = P.seqMap(segment, brackets, (s, bs) => [s, ...bs]);
 
-path = P.sepBy(segmentAndBrackets, P.string('.')).map(flatten);
+path = P.sepBy(segmentAndBrackets, P.string(".")).map(flatten);
 
 /** Parse a binding using parsimmon */
 export const parse: BindingParser = (binding) => {
@@ -65,7 +65,7 @@ export const parse: BindingParser = (binding) => {
     return {
       status: true,
       path: {
-        name: 'PathNode',
+        name: "PathNode",
         path: result.value,
       },
     };

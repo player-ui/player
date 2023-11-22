@@ -1,12 +1,12 @@
-import { SyncBailHook, SyncHook, SyncWaterfallHook } from 'tapable-ts';
-import type { DeferredPromise } from 'p-defer';
-import defer from 'p-defer';
+import { SyncBailHook, SyncHook, SyncWaterfallHook } from "tapable-ts";
+import type { DeferredPromise } from "p-defer";
+import defer from "p-defer";
 import type {
   NavigationFlow,
   NavigationFlowState,
   NavigationFlowEndState,
-} from '@player-ui/types';
-import type { Logger } from '../../logger';
+} from "@player-ui/types";
+import type { Logger } from "../../logger";
 
 export interface NamedState {
   /** The name of the navigation node */
@@ -77,11 +77,11 @@ export class FlowInstance {
     this.history = [];
 
     this.hooks.transition.tap(
-      'startPromise',
+      "startPromise",
       async (_oldState, nextState: NamedState) => {
         const newState = nextState.value;
 
-        if (this.flowPromise && newState.state_type === 'END') {
+        if (this.flowPromise && newState.state_type === "END") {
           this.flowPromise.resolve(newState);
         }
       },
@@ -91,7 +91,7 @@ export class FlowInstance {
   /** Start the state machine */
   public async start(): Promise<NavigationFlowEndState> {
     if (this.flowPromise) {
-      this.log?.warn('Already called start for flow');
+      this.log?.warn("Already called start for flow");
 
       return this.flowPromise.promise;
     }
@@ -115,7 +115,7 @@ export class FlowInstance {
   }
 
   public transition(transitionValue: string, options?: TransitionOptions) {
-    if (this.currentState?.value.state_type === 'END') {
+    if (this.currentState?.value.state_type === "END") {
       this.log?.warn(
         `Skipping transition using ${transitionValue}. Already at and END state`,
       );
@@ -145,12 +145,12 @@ export class FlowInstance {
       transitionValue,
     );
 
-    if (!('transitions' in state)) {
+    if (!("transitions" in state)) {
       throw new Error(`No transitions defined for ${this.currentState.value}`);
     }
 
     const { transitions } = state;
-    const nextState = transitions[transitionValue] || transitions['*'];
+    const nextState = transitions[transitionValue] || transitions["*"];
 
     if (nextState === undefined) {
       this.log?.warn(
@@ -176,8 +176,8 @@ export class FlowInstance {
 
     if (
       !this.flow[stateName] ||
-      typeof nextState !== 'object' ||
-      !('state_type' in nextState)
+      typeof nextState !== "object" ||
+      !("state_type" in nextState)
     ) {
       this.log?.error(`Flow doesn't contain any states named: ${stateName}`);
 
@@ -197,7 +197,7 @@ export class FlowInstance {
 
     // If the new state is an END state call the `onEnd` if it exists
 
-    if (newCurrentState.value.state_type === 'END' && this.flow.onEnd) {
+    if (newCurrentState.value.state_type === "END" && this.flow.onEnd) {
       this.hooks.onEnd.call(this.flow.onEnd);
     }
 

@@ -1,11 +1,11 @@
-import { describe, test, expect, beforeEach } from 'vitest';
-import type { DataModelWithParser } from '../../data';
-import { LocalModel, withParser } from '../../data';
-import { BindingParser } from '../../binding';
-import { deleteDataVal, setDataVal, getDataVal } from '../evaluator-functions';
-import type { ExpressionContext } from '../types';
+import { describe, test, expect, beforeEach } from "vitest";
+import type { DataModelWithParser } from "../../data";
+import { LocalModel, withParser } from "../../data";
+import { BindingParser } from "../../binding";
+import { deleteDataVal, setDataVal, getDataVal } from "../evaluator-functions";
+import type { ExpressionContext } from "../types";
 
-describe('eval functions', () => {
+describe("eval functions", () => {
   let model: DataModelWithParser;
   let context: ExpressionContext;
 
@@ -23,25 +23,25 @@ describe('eval functions', () => {
     };
   });
 
-  test('deleteDataVal', () => {
-    model.set([['foo.bar', 2]]);
-    expect(model.get('foo.bar')).toBe(2);
+  test("deleteDataVal", () => {
+    model.set([["foo.bar", 2]]);
+    expect(model.get("foo.bar")).toBe(2);
 
-    deleteDataVal(context, 'foo.bar');
-    expect(model.get('foo.bar')).toBeUndefined();
+    deleteDataVal(context, "foo.bar");
+    expect(model.get("foo.bar")).toBeUndefined();
   });
 
-  test('setDataVal', () => {
-    model.set([['foo.bar', 2]]);
-    expect(model.get('foo.bar')).toBe(2);
+  test("setDataVal", () => {
+    model.set([["foo.bar", 2]]);
+    expect(model.get("foo.bar")).toBe(2);
 
-    setDataVal(context, 'foo.bar', 10);
-    expect(model.get('foo.bar')).toBe(10);
+    setDataVal(context, "foo.bar", 10);
+    expect(model.get("foo.bar")).toBe(10);
   });
 
-  test('getDataVal', () => {
-    model.set([['foo.bar', 2]]);
-    expect(model.get('foo.bar')).toBe(2);
-    expect(getDataVal(context, 'foo.bar')).toBe(2);
+  test("getDataVal", () => {
+    model.set([["foo.bar", 2]]);
+    expect(model.get("foo.bar")).toBe(2);
+    expect(getDataVal(context, "foo.bar")).toBe(2);
   });
 });

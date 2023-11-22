@@ -1,4 +1,4 @@
-import type { BindingInstance } from '../binding';
+import type { BindingInstance } from "../binding";
 
 /**
  * Remove a binding, and any children from from the map
@@ -24,7 +24,7 @@ export function removeBindingAndChildrenFromMap<T>(
     }
   });
 
-  if (typeof property === 'number') {
+  if (typeof property === "number") {
     // Splice out this index from the rest
 
     // Order matters here b/c we are shifting items in the array
@@ -33,7 +33,7 @@ export function removeBindingAndChildrenFromMap<T>(
       .filter((b) => {
         if (parentBinding.contains(b)) {
           const [childIndex] = b.relative(parentBinding);
-          return typeof childIndex === 'number' && childIndex > property;
+          return typeof childIndex === "number" && childIndex > property;
         }
 
         return false;
@@ -46,7 +46,7 @@ export function removeBindingAndChildrenFromMap<T>(
 
       const [childIndex, ...childPath] = trackedBinding.relative(parentBinding);
 
-      if (typeof childIndex === 'number') {
+      if (typeof childIndex === "number") {
         const newSegments = [childIndex - 1, ...childPath];
         const newChildBinding = parentBinding.descendent(newSegments);
         targetMap.set(newChildBinding, targetMap.get(trackedBinding) as T);

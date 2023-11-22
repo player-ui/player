@@ -1,14 +1,14 @@
-import React from 'react';
-import { ReactAsset, usePlayer } from '../..';
+import React from "react";
+import { ReactAsset, usePlayer } from "../..";
 import type {
   ReactPlayer,
   ReactPlayerPlugin,
   Asset,
   AssetWrapper,
   Flow,
-} from '../..';
+} from "../..";
 
-interface SimpleAsset extends Asset<'simple'> {
+interface SimpleAsset extends Asset<"simple"> {
   /** text value of the asset */
   value?: string;
 }
@@ -18,7 +18,7 @@ const SimpleAsset = (props: SimpleAsset) => (
   <div id={props.id}>{props.value}</div>
 );
 
-interface ActionAsset extends Asset<'action'> {
+interface ActionAsset extends Asset<"action"> {
   /** label of the action */
   label: string;
 
@@ -40,7 +40,7 @@ const Action = (props: ActionAsset) => {
       onClick={() => {
         const state = player?.getState();
 
-        if (state?.status === 'in-progress') {
+        if (state?.status === "in-progress") {
           if (props.exp) {
             state.controllers.expression.evaluate(props.exp);
           }
@@ -56,7 +56,7 @@ const Action = (props: ActionAsset) => {
   );
 };
 
-interface CollectionAsset extends Asset<'collection'> {
+interface CollectionAsset extends Asset<"collection"> {
   /** values in a collection */
   values: Array<AssetWrapper<any>>;
 }
@@ -73,28 +73,28 @@ const Collection = (props: CollectionAsset) => {
 };
 
 export const simpleFlow: Flow<any> = {
-  id: 'flow_1',
+  id: "flow_1",
   views: [
     {
-      id: 'first_view',
-      type: 'simple',
-      value: '{{foo.bar}}',
+      id: "first_view",
+      type: "simple",
+      value: "{{foo.bar}}",
     },
   ],
   navigation: {
-    BEGIN: 'flow_1',
+    BEGIN: "flow_1",
     flow_1: {
-      startState: 'view_1',
+      startState: "view_1",
       view_1: {
-        state_type: 'VIEW',
-        ref: 'first_view',
+        state_type: "VIEW",
+        ref: "first_view",
         transitions: {
-          '*': 'end_1',
+          "*": "end_1",
         },
       },
       end_1: {
-        state_type: 'END',
-        outcome: 'end',
+        state_type: "END",
+        outcome: "end",
       },
     },
   },
@@ -104,11 +104,11 @@ export const simpleFlow: Flow<any> = {
  * Registers a simple asset as a react comp
  */
 export class SimpleAssetPlugin implements ReactPlayerPlugin {
-  name = 'simple-asset-plugin';
+  name = "simple-asset-plugin";
 
   applyReact(rp: ReactPlayer) {
-    rp.assetRegistry.set({ type: 'simple' }, SimpleAsset);
-    rp.assetRegistry.set({ type: 'action' }, Action);
-    rp.assetRegistry.set({ type: 'collection' }, Collection);
+    rp.assetRegistry.set({ type: "simple" }, SimpleAsset);
+    rp.assetRegistry.set({ type: "action" }, Action);
+    rp.assetRegistry.set({ type: "collection" }, Collection);
   }
 }

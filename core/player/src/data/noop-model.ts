@@ -1,4 +1,4 @@
-import type { DataModelImpl } from './model';
+import type { DataModelImpl } from "./model";
 
 /**
  * A model that does nothing

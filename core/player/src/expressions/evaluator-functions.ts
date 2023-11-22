@@ -1,11 +1,11 @@
-import type { Binding } from '@player-ui/types';
+import type { Binding } from "@player-ui/types";
 
-import type { BindingLike } from '../binding';
+import type { BindingLike } from "../binding";
 import type {
   ExpressionHandler,
   ExpressionContext,
   ExpressionNode,
-} from './types';
+} from "./types";
 
 /** Sets a value to the data-model */
 export const setDataVal: ExpressionHandler<[Binding, any], any> = (

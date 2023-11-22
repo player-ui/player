@@ -1,8 +1,8 @@
-import type { View, ViewPlugin } from './plugin';
-import type { Options } from './options';
-import type { Parser, Node, ParseObjectOptions } from '../parser';
-import { EMPTY_NODE, NodeType } from '../parser';
-import type { Resolver } from '../resolver';
+import type { View, ViewPlugin } from "./plugin";
+import type { Options } from "./options";
+import type { Parser, Node, ParseObjectOptions } from "../parser";
+import { EMPTY_NODE, NodeType } from "../parser";
+import type { Resolver } from "../resolver";
 
 /** A view plugin to resolve switches */
 export default class SwitchPlugin implements ViewPlugin {
@@ -26,7 +26,7 @@ export default class SwitchPlugin implements ViewPlugin {
 
   applyParser(parser: Parser) {
     /** Switches resolved during the parsing phase are static */
-    parser.hooks.onCreateASTNode.tap('switch', (node) => {
+    parser.hooks.onCreateASTNode.tap("switch", (node) => {
       if (node && node.type === NodeType.Switch && !node.dynamic) {
         return this.resolveSwitch(node, this.options);
       }
@@ -34,17 +34,17 @@ export default class SwitchPlugin implements ViewPlugin {
       return node;
     });
 
-    parser.hooks.determineNodeType.tap('switch', (obj) => {
+    parser.hooks.determineNodeType.tap("switch", (obj) => {
       if (
-        Object.prototype.hasOwnProperty.call(obj, 'dynamicSwitch') ||
-        Object.prototype.hasOwnProperty.call(obj, 'staticSwitch')
+        Object.prototype.hasOwnProperty.call(obj, "dynamicSwitch") ||
+        Object.prototype.hasOwnProperty.call(obj, "staticSwitch")
       ) {
         return NodeType.Switch;
       }
     });
 
     parser.hooks.parseNode.tap(
-      'switch',
+      "switch",
       (
         obj: any,
         _nodeType: Node.ChildrenTypes,
@@ -52,9 +52,9 @@ export default class SwitchPlugin implements ViewPlugin {
         determinedNodeType: null | NodeType,
       ) => {
         if (determinedNodeType === NodeType.Switch) {
-          const dynamic = 'dynamicSwitch' in obj;
+          const dynamic = "dynamicSwitch" in obj;
           const switchContent =
-            'dynamicSwitch' in obj ? obj.dynamicSwitch : obj.staticSwitch;
+            "dynamicSwitch" in obj ? obj.dynamicSwitch : obj.staticSwitch;
 
           const cases: Node.SwitchCase[] = [];
 
@@ -104,7 +104,7 @@ export default class SwitchPlugin implements ViewPlugin {
 
   applyResolver(resolver: Resolver) {
     /** Switches resolved during the parsing phase are dynamic */
-    resolver.hooks.beforeResolve.tap('switch', (node, options) => {
+    resolver.hooks.beforeResolve.tap("switch", (node, options) => {
       if (node && node.type === NodeType.Switch && node.dynamic) {
         return this.resolveSwitch(node, options);
       }
@@ -114,7 +114,7 @@ export default class SwitchPlugin implements ViewPlugin {
   }
 
   apply(view: View) {
-    view.hooks.parser.tap('switch', this.applyParser.bind(this));
-    view.hooks.resolver.tap('switch', this.applyResolver.bind(this));
+    view.hooks.parser.tap("switch", this.applyParser.bind(this));
+    view.hooks.resolver.tap("switch", this.applyResolver.bind(this));
   }
 }

@@ -1,6 +1,6 @@
-import type { Formatting } from '@player-ui/types';
+import type { Formatting } from "@player-ui/types";
 
-export type FormatOptions = Omit<Formatting.Reference, 'type'>;
+export type FormatOptions = Omit<Formatting.Reference, "type">;
 
 /**
  * The return types for the schema don't include options.

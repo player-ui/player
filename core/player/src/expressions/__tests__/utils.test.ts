@@ -1,42 +1,42 @@
-import { describe, it, expect } from 'vitest';
-import { parseExpression } from '../parser';
-import { findClosestNodeAtPosition } from '../utils';
+import { describe, it, expect } from "vitest";
+import { parseExpression } from "../parser";
+import { findClosestNodeAtPosition } from "../utils";
 
-describe('findClosestNodeAtPosition', () => {
-  it('finds the right nodes', () => {
+describe("findClosestNodeAtPosition", () => {
+  it("finds the right nodes", () => {
     const expression = '{{foo}} = test("bar", 12, ["baz", "qux"]) + !true';
     const parsed = parseExpression(expression);
 
     expect(findClosestNodeAtPosition(parsed, { character: 1 })).toStrictEqual(
       expect.objectContaining({
-        type: 'ModelRef',
-        ref: 'foo',
+        type: "ModelRef",
+        ref: "foo",
       }),
     );
 
     expect(findClosestNodeAtPosition(parsed, { character: 8 })).toStrictEqual(
       expect.objectContaining({
-        type: 'Assignment',
+        type: "Assignment",
       }),
     );
 
     expect(findClosestNodeAtPosition(parsed, { character: 12 })).toStrictEqual(
       expect.objectContaining({
-        type: 'Identifier',
-        name: 'test',
+        type: "Identifier",
+        name: "test",
       }),
     );
 
     expect(findClosestNodeAtPosition(parsed, { character: 16 })).toStrictEqual(
       expect.objectContaining({
-        type: 'Literal',
-        value: 'bar',
+        type: "Literal",
+        value: "bar",
       }),
     );
 
     expect(findClosestNodeAtPosition(parsed, { character: 23 })).toStrictEqual(
       expect.objectContaining({
-        type: 'Literal',
+        type: "Literal",
         value: 12,
       }),
     );

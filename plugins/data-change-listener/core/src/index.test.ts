@@ -125,7 +125,7 @@ describe('Data-Change-Listener', () => {
       plugins: [new DataChangeListenerPlugin()],
     });
 
-    testExpression = jest.fn();
+    testExpression = vitest.fn();
 
     player.hooks.expressionEvaluator.tap('test', (ev) => {
       ev.addExpressionFunction('test', (context, ...args) => {
@@ -308,7 +308,7 @@ describe('Data-Change-Listener with Validations', () => {
       ],
     });
 
-    testExpression = jest.fn();
+    testExpression = vitest.fn();
 
     player.hooks.expressionEvaluator.tap('test', (ev) => {
       ev.addExpressionFunction('test', (context, ...args) => {

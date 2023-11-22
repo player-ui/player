@@ -1,13 +1,13 @@
-import type { BindingInstance } from '../binding';
+import type { BindingInstance } from "../binding";
 import type {
   BatchSetTransaction,
   DataModelImpl,
   DataModelMiddleware,
   DataModelOptions,
   Updates,
-} from './model';
+} from "./model";
 
-export type DependencySets = 'core' | 'children';
+export type DependencySets = "core" | "children";
 
 /** A class to track usage of read/writes to/from a data model */
 export class DependencyTracker {
@@ -31,10 +31,10 @@ export class DependencyTracker {
     this.readDeps = new Set();
     this.writeDeps = new Set();
     this.namedDependencySets = {};
-    this.namedSet = 'core';
+    this.namedSet = "core";
 
-    this.createSubset('core');
-    this.createSubset('children');
+    this.createSubset("core");
+    this.createSubset("children");
   }
 
   protected createSubset(name: DependencySets, force = false): void {
@@ -61,7 +61,7 @@ export class DependencyTracker {
   }
 
   public trackDefault() {
-    this.namedSet = 'core';
+    this.namedSet = "core";
   }
 
   /** Grab all of the bindings this wrote to */
@@ -94,10 +94,10 @@ export class DependencyTracker {
     this.readDeps = new Set();
     this.writeDeps = new Set();
     this.namedDependencySets = {};
-    this.namedSet = 'core';
+    this.namedSet = "core";
 
-    this.createSubset('core', true);
-    this.createSubset('children', true);
+    this.createSubset("core", true);
+    this.createSubset("children", true);
   }
 
   protected addReadDep(
@@ -123,7 +123,7 @@ export class DependencyTracker {
   }
 
   public addChildReadDep(binding: BindingInstance): void {
-    this.addReadDep(binding, 'children');
+    this.addReadDep(binding, "children");
   }
 }
 

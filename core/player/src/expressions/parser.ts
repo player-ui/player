@@ -2,8 +2,8 @@
 /**
  * An expression to AST parser based on JSEP: http://jsep.from.so/
  */
-import type { ExpressionNode, ExpressionNodeType, NodeLocation } from './types';
-import { ExpNodeOpaqueIdentifier } from './types';
+import type { ExpressionNode, ExpressionNodeType, NodeLocation } from "./types";
+import { ExpNodeOpaqueIdentifier } from "./types";
 
 const PERIOD_CODE = 46; // '.'
 const COMMA_CODE = 44; // ','
@@ -27,39 +27,39 @@ const t = true;
 
 // Use a quickly-accessible map to store all of the unary operators
 // Values are set to `true` (it really doesn't matter)
-const unaryOps = { '-': t, '!': t, '~': t, '+': t };
+const unaryOps = { "-": t, "!": t, "~": t, "+": t };
 
 // Also use a map for the binary operations but set their values to their
 // binary precedence for quick reference:
 // see [Operator precedence](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence)
 const binaryOps: Record<string, number> = {
-  '=': 3,
-  '+=': 3,
-  '-=': 3,
-  '&=': 3,
-  '|=': 3,
+  "=": 3,
+  "+=": 3,
+  "-=": 3,
+  "&=": 3,
+  "|=": 3,
   // Conditional: 4,
-  '||': 5,
-  '&&': 6,
-  '|': 7,
-  '^': 8,
-  '&': 9,
-  '==': 10,
-  '!=': 10,
-  '===': 10,
-  '!==': 10,
-  '<': 11,
-  '>': 11,
-  '<=': 11,
-  '>=': 11,
-  '<<': 12,
-  '>>': 12,
-  '>>>': 12,
-  '+': 13,
-  '-': 13,
-  '*': 14,
-  '/': 14,
-  '%': 14,
+  "||": 5,
+  "&&": 6,
+  "|": 7,
+  "^": 8,
+  "&": 9,
+  "==": 10,
+  "!=": 10,
+  "===": 10,
+  "!==": 10,
+  "<": 11,
+  ">": 11,
+  "<=": 11,
+  ">=": 11,
+  "<<": 12,
+  ">>": 12,
+  ">>>": 12,
+  "+": 13,
+  "-": 13,
+  "*": 14,
+  "/": 14,
+  "%": 14,
 };
 
 interface ErrorWithLocation extends Error {
@@ -119,7 +119,7 @@ const literals = {
 } as const;
 
 // Except for `this`, which is special. This could be changed to something like `'self'` as well
-const thisStr = 'this';
+const thisStr = "this";
 
 /** Returns the precedence of a binary operator or `0` if it isn't a binary operator */
 function binaryPrecedence(opVal: string): number {
@@ -138,19 +138,19 @@ function createBinaryExpression(
 ) {
   let type: ExpressionNodeType;
 
-  if (operator === '||' || operator === '&&') {
-    type = 'LogicalExpression';
-  } else if (operator === '=') {
-    type = 'Assignment';
+  if (operator === "||" || operator === "&&") {
+    type = "LogicalExpression";
+  } else if (operator === "=") {
+    type = "Assignment";
   } else if (
-    operator === '+=' ||
-    operator === '-=' ||
-    operator === '&=' ||
-    operator === '|='
+    operator === "+=" ||
+    operator === "-=" ||
+    operator === "&=" ||
+    operator === "|="
   ) {
-    type = 'Modification';
+    type = "Modification";
   } else {
-    type = 'BinaryExpression';
+    type = "BinaryExpression";
   }
 
   return {
@@ -263,7 +263,7 @@ export function parseExpression(
       if (chCode === CCURL_CODE) {
         // if we are at the end but a key was defined
         if (key) {
-          throwError('A key was defined but a value was not', index);
+          throwError("A key was defined but a value was not", index);
         }
 
         index++;
@@ -272,7 +272,7 @@ export function parseExpression(
       } else if (shouldDefineKey) {
         // check for key
         if (chCode !== SQUOTE_CODE && chCode !== DQUOTE_CODE) {
-          throwError('An object must start wtih a key', index);
+          throwError("An object must start wtih a key", index);
         }
 
         // get key
@@ -284,7 +284,7 @@ export function parseExpression(
           index++;
           shouldDefineKey = false;
         } else {
-          throwError('A colon must follow an object key', index);
+          throwError("A colon must follow an object key", index);
         }
       } else {
         value = gobbleExpression();
@@ -295,7 +295,7 @@ export function parseExpression(
         if (chCode === COMMA_CODE) {
           index++;
         } else if (chCode !== CCURL_CODE) {
-          throwError('Please add a comma to add another key', index);
+          throwError("Please add a comma to add another key", index);
         }
 
         shouldDefineKey = true;
@@ -313,7 +313,7 @@ export function parseExpression(
 
     return {
       __id: ExpNodeOpaqueIdentifier,
-      type: 'Object',
+      type: "Object",
       attributes,
       location: getLocation(startCharIndex),
     };
@@ -344,7 +344,7 @@ export function parseExpression(
       const consequent = gobbleExpression();
 
       if (!consequent) {
-        throwError('Expected expression', index);
+        throwError("Expected expression", index);
       }
 
       gobbleSpaces();
@@ -354,12 +354,12 @@ export function parseExpression(
         const alternate = gobbleExpression();
 
         if (!alternate) {
-          throwError('Expected expression', index);
+          throwError("Expected expression", index);
         }
 
         return {
           __id: ExpNodeOpaqueIdentifier,
-          type: 'ConditionalExpression',
+          type: "ConditionalExpression",
           test,
           consequent,
           alternate,
@@ -367,7 +367,7 @@ export function parseExpression(
         };
       }
 
-      throwError('Expected :', index);
+      throwError("Expected :", index);
     }
 
     return test;
@@ -524,7 +524,7 @@ export function parseExpression(
         index += tcLen;
         return {
           __id: ExpNodeOpaqueIdentifier,
-          type: 'UnaryExpression',
+          type: "UnaryExpression",
           operator: toCheck,
           argument: gobbleToken(),
           prefix: true,
@@ -543,7 +543,7 @@ export function parseExpression(
    * keep track of everything in the numeric literal and then calling `parseFloat` on that string
    */
   function gobbleNumericLiteral() {
-    let num = '';
+    let num = "";
     const startCharIndex = index;
 
     while (isDecimalDigit(exprICode(index))) {
@@ -560,12 +560,12 @@ export function parseExpression(
     }
 
     let ch = exprI(index);
-    if (ch === 'e' || ch === 'E') {
+    if (ch === "e" || ch === "E") {
       // Exponent marker
       num += exprI(index++);
       ch = exprI(index);
 
-      if (ch === '+' || ch === '-') {
+      if (ch === "+" || ch === "-") {
         // Exponent sign
         num += exprI(index++);
       }
@@ -588,12 +588,12 @@ export function parseExpression(
         index,
       );
     } else if (chCode === PERIOD_CODE) {
-      throwError('Unexpected period', index);
+      throwError("Unexpected period", index);
     }
 
     return {
       __id: ExpNodeOpaqueIdentifier,
-      type: 'Literal',
+      type: "Literal",
       value: parseFloat(num),
       raw: num,
       location: getLocation(startCharIndex),
@@ -606,7 +606,7 @@ export function parseExpression(
    */
   function gobbleStringLiteral() {
     const quote = exprI(index++);
-    let str = '';
+    let str = "";
     let closed = false;
     const startCharIndex = index;
 
@@ -618,7 +618,7 @@ export function parseExpression(
         break;
       }
 
-      if (ch !== '\\') {
+      if (ch !== "\\") {
         str += ch;
         continue;
       }
@@ -627,23 +627,23 @@ export function parseExpression(
       ch = exprI(index++);
 
       switch (ch) {
-        case 'n':
-          str += '\n';
+        case "n":
+          str += "\n";
           break;
-        case 'r':
-          str += '\r';
+        case "r":
+          str += "\r";
           break;
-        case 't':
-          str += '\t';
+        case "t":
+          str += "\t";
           break;
-        case 'b':
-          str += '\b';
+        case "b":
+          str += "\b";
           break;
-        case 'f':
-          str += '\f';
+        case "f":
+          str += "\f";
           break;
-        case 'v':
-          str += '\u000B';
+        case "v":
+          str += "\u000B";
           break;
         default:
       }
@@ -655,7 +655,7 @@ export function parseExpression(
 
     return {
       __id: ExpNodeOpaqueIdentifier,
-      type: 'Literal',
+      type: "Literal",
       value: str,
       raw: `${quote}${str}${quote}`,
       location: getLocation(startCharIndex),
@@ -667,7 +667,7 @@ export function parseExpression(
    * e.g. {{foo.bar.ref}}
    */
   function gobbleModelRef() {
-    let str = '';
+    let str = "";
     let closed = false;
     let openBraceCount = 1;
     const startCharIndex = index;
@@ -676,7 +676,7 @@ export function parseExpression(
     while (index < length) {
       const ch = exprI(index++);
 
-      if (ch === '}' && exprICode(index) === CCURL_CODE) {
+      if (ch === "}" && exprICode(index) === CCURL_CODE) {
         index++;
         openBraceCount--;
 
@@ -685,10 +685,10 @@ export function parseExpression(
           break;
         }
 
-        str += '}}';
-      } else if (ch === '{' && exprICode(index) === OCURL_CODE) {
+        str += "}}";
+      } else if (ch === "{" && exprICode(index) === OCURL_CODE) {
         openBraceCount++;
-        str += '{{';
+        str += "{{";
         index++;
       } else {
         str += ch;
@@ -701,7 +701,7 @@ export function parseExpression(
 
     return {
       __id: ExpNodeOpaqueIdentifier,
-      type: 'ModelRef',
+      type: "ModelRef",
       ref: str,
       location: getLocation(startCharIndex),
     };
@@ -737,7 +737,7 @@ export function parseExpression(
     if (Object.prototype.hasOwnProperty.call(literals, identifier)) {
       return {
         __id: ExpNodeOpaqueIdentifier,
-        type: 'Literal',
+        type: "Literal",
         value: (literals as any)[identifier],
         raw: identifier,
         location: getLocation(start),
@@ -747,14 +747,14 @@ export function parseExpression(
     if (identifier === thisStr) {
       return {
         __id: ExpNodeOpaqueIdentifier,
-        type: 'ThisExpression',
+        type: "ThisExpression",
         location: getLocation(start),
       };
     }
 
     return {
       __id: ExpNodeOpaqueIdentifier,
-      type: 'Identifier',
+      type: "Identifier",
       name: identifier,
       location: getLocation(start),
     };
@@ -790,8 +790,8 @@ export function parseExpression(
 
       node = gobbleExpression();
 
-      if (!node || node.type === 'Compound') {
-        throwError('Expected comma', index);
+      if (!node || node.type === "Compound") {
+        throwError("Expected comma", index);
       }
 
       args.push(node);
@@ -830,7 +830,7 @@ export function parseExpression(
 
         node = {
           __id: ExpNodeOpaqueIdentifier,
-          type: 'MemberExpression',
+          type: "MemberExpression",
           computed: false,
           object: node,
           property: gobbleIdentifier(),
@@ -839,7 +839,7 @@ export function parseExpression(
       } else if (charIndex === OBRACK_CODE) {
         node = {
           __id: ExpNodeOpaqueIdentifier,
-          type: 'MemberExpression',
+          type: "MemberExpression",
           computed: true,
           object: node,
           property: gobbleExpression(),
@@ -850,7 +850,7 @@ export function parseExpression(
         charIndex = exprICode(index);
 
         if (charIndex !== CBRACK_CODE) {
-          throwError('Unclosed [', index);
+          throwError("Unclosed [", index);
         }
 
         index++;
@@ -858,7 +858,7 @@ export function parseExpression(
         // A function call is being made; gobble all the arguments
         node = {
           __id: ExpNodeOpaqueIdentifier,
-          type: 'CallExpression',
+          type: "CallExpression",
           args: gobbleArguments(CPAREN_CODE),
           callTarget: node,
           location: getLocation(startCharIndex),
@@ -889,7 +889,7 @@ export function parseExpression(
       return node;
     }
 
-    throwError('Unclosed (', index);
+    throwError("Unclosed (", index);
   }
 
   /**
@@ -903,7 +903,7 @@ export function parseExpression(
 
     return {
       __id: ExpNodeOpaqueIdentifier,
-      type: 'ArrayExpression',
+      type: "ArrayExpression",
       elements: gobbleArguments(CBRACK_CODE),
       location: getLocation(startCharIndex),
     };
@@ -941,7 +941,7 @@ export function parseExpression(
 
     return {
       __id: ExpNodeOpaqueIdentifier,
-      type: 'Compound',
+      type: "Compound",
       body: nodes,
       location: getLocation(0),
     };
@@ -952,7 +952,7 @@ export function parseExpression(
 
     return {
       __id: ExpNodeOpaqueIdentifier,
-      type: 'Compound',
+      type: "Compound",
       body: nodes,
       location: getLocation(0),
       error: e,

@@ -1,10 +1,10 @@
-import type { Schema, Validation } from '@player-ui/types';
+import type { Schema, Validation } from "@player-ui/types";
 
-import type { BindingInstance, BindingFactory } from '../binding';
-import type { DataModelWithParser } from '../data';
-import type { ExpressionEvaluatorFunction } from '../expressions';
-import type { Logger } from '../logger';
-import type { ConstantsProvider } from '../controllers';
+import type { BindingInstance, BindingFactory } from "../binding";
+import type { DataModelWithParser } from "../data";
+import type { ExpressionEvaluatorFunction } from "../expressions";
+import type { Logger } from "../logger";
+import type { ConstantsProvider } from "../controllers";
 
 interface BaseValidationResponse<T = Validation.Severity> {
   /** The validation message to show to the user */
@@ -20,22 +20,22 @@ interface BaseValidationResponse<T = Validation.Severity> {
   displayTarget?: Validation.DisplayTarget;
 
   /** The blocking state of this validation */
-  blocking?: boolean | 'once';
+  blocking?: boolean | "once";
 }
 
 export interface WarningValidationResponse
-  extends BaseValidationResponse<'warning'> {
+  extends BaseValidationResponse<"warning"> {
   /** Warning validations can be dismissed without correcting the error */
   dismiss?: () => void;
 }
 
-export type ErrorValidationResponse = BaseValidationResponse<'error'>;
+export type ErrorValidationResponse = BaseValidationResponse<"error">;
 
 export type ValidationResponse =
   | ErrorValidationResponse
   | WarningValidationResponse;
 
-type RequiredValidationKeys = 'severity' | 'trigger';
+type RequiredValidationKeys = "severity" | "trigger";
 
 export type ValidationObject = Validation.Reference &
   Required<Pick<Validation.Reference, RequiredValidationKeys>>;
@@ -80,4 +80,4 @@ export type ValidatorFunction<Options = unknown> = (
   context: ValidatorContext,
   value: any,
   options?: Options,
-) => Omit<BaseValidationResponse, 'severity'> | undefined;
+) => Omit<BaseValidationResponse, "severity"> | undefined;

@@ -1,10 +1,10 @@
-import { setIn } from 'timm';
-import { SyncBailHook, SyncWaterfallHook } from 'tapable-ts';
-import type { Template } from '@player-ui/types';
-import type { Node, AnyAssetType } from './types';
-import { NodeType } from './types';
+import { setIn } from "timm";
+import { SyncBailHook, SyncWaterfallHook } from "tapable-ts";
+import type { Template } from "@player-ui/types";
+import type { Node, AnyAssetType } from "./types";
+import { NodeType } from "./types";
 
-export * from './types';
+export * from "./types";
 
 export const EMPTY_NODE: Node.Empty = {
   type: NodeType.Empty,
@@ -67,7 +67,7 @@ export class Parser {
     const viewNode = this.parseObject(value, NodeType.View);
 
     if (!viewNode) {
-      throw new Error('Unable to parse object into a view');
+      throw new Error("Unable to parse object into a view");
     }
 
     return viewNode as Node.View;
@@ -91,7 +91,7 @@ export class Parser {
    */
   private hasTemplateValues(obj: any, localKey: string) {
     return (
-      Object.hasOwnProperty.call(obj, 'template') &&
+      Object.hasOwnProperty.call(obj, "template") &&
       Array.isArray(obj?.template) &&
       obj.template.length &&
       obj.template.find((tmpl: any) => tmpl.output === localKey)
@@ -122,7 +122,7 @@ export class Parser {
       objToParse: unknown,
       path: string[] = [],
     ): NestedObj => {
-      if (typeof objToParse !== 'object' || objToParse === null) {
+      if (typeof objToParse !== "object" || objToParse === null) {
         // value = objToParse;
         return { value: objToParse, children: [] };
       }
@@ -151,7 +151,7 @@ export class Parser {
       const newValue = objEntries.reduce((accumulation, current): NestedObj => {
         const { children, ...rest } = accumulation;
         const [localKey, localValue] = current;
-        if (localKey === 'asset' && typeof localValue === 'object') {
+        if (localKey === "asset" && typeof localValue === "object") {
           const assetAST = this.parseObject(
             localValue,
             NodeType.Asset,
@@ -164,7 +164,7 @@ export class Parser {
               children: [
                 ...children,
                 {
-                  path: [...path, 'asset'],
+                  path: [...path, "asset"],
                   value: assetAST,
                 },
               ],
@@ -290,7 +290,7 @@ export class Parser {
               };
             }
           }
-        } else if (localValue && typeof localValue === 'object') {
+        } else if (localValue && typeof localValue === "object") {
           const determineNodeType =
             this.hooks.determineNodeType.call(localValue);
 

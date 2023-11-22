@@ -1,14 +1,14 @@
-import React from 'react';
+import React from "react";
 import type {
   FlowManager,
   ManagedPlayerProps,
   ManagedPlayerState,
   ManagerMiddleware,
   ManagedPlayerContext,
-} from './types';
-import { useRequestTime } from './request-time';
-import type { ReactPlayerOptions } from '../player';
-import { ReactPlayer } from '../player';
+} from "./types";
+import { useRequestTime } from "./request-time";
+import type { ReactPlayerOptions } from "../player";
+import { ReactPlayer } from "../player";
 
 /** noop middleware */
 function identityMiddleware<T>(next: Promise<T>) {
@@ -66,7 +66,7 @@ class ManagedState {
     };
 
     const initialState: ManagedPlayerState = {
-      value: 'not_started',
+      value: "not_started",
       context: {
         playerConfig,
         reactPlayer: new ReactPlayer(playerConfig),
@@ -81,21 +81,21 @@ class ManagedState {
 
   /** reset starts from nothing */
   public reset() {
-    if (this.state?.value === 'error') {
+    if (this.state?.value === "error") {
       const { playerConfig, manager } = this.state.context;
       this.start({ playerConfig, manager });
     } else {
-      throw new Error('Flow must be in error state to reset');
+      throw new Error("Flow must be in error state to reset");
     }
   }
 
   /** restart starts from the last result */
   public restart() {
-    if (this.state?.value === 'error') {
+    if (this.state?.value === "error") {
       const { playerConfig, manager, prevResult, reactPlayer } =
         this.state.context;
       this.setState({
-        value: 'completed',
+        value: "completed",
         context: {
           playerConfig,
           manager,
@@ -104,7 +104,7 @@ class ManagedState {
         },
       });
     } else {
-      throw new Error('Flow must be in error state to restart');
+      throw new Error("Flow must be in error state to restart");
     }
   }
 
@@ -128,7 +128,7 @@ class ManagedState {
       }
     } catch (e) {
       this.setState({
-        value: 'error',
+        value: "error",
         context: {
           manager,
           reactPlayer,
@@ -141,16 +141,16 @@ class ManagedState {
 
   private async processState(
     state: ManagedPlayerState,
-    context: ManagedPlayerContext
+    context: ManagedPlayerContext,
   ): Promise<ManagedPlayerState | undefined> {
-    if (state.value === 'not_started' || state.value === 'completed') {
+    if (state.value === "not_started" || state.value === "completed") {
       const prevResult =
-        state.value === 'completed' ? state.context.result : undefined;
+        state.value === "completed" ? state.context.result : undefined;
 
       const middleware = this.middleware?.next ?? identityMiddleware;
 
       return {
-        value: 'pending',
+        value: "pending",
         context: {
           ...context,
           prevResult,
@@ -159,12 +159,12 @@ class ManagedState {
       };
     }
 
-    if (state.value === 'pending') {
+    if (state.value === "pending") {
       const nextResult = await state.context.next;
 
       if (nextResult.done) {
         return {
-          value: 'ended',
+          value: "ended",
           context: {
             ...context,
             result: state.context.prevResult,
@@ -173,7 +173,7 @@ class ManagedState {
       }
 
       return {
-        value: 'loaded',
+        value: "loaded",
         context: {
           ...context,
           prevResult: state.context.prevResult,
@@ -182,9 +182,9 @@ class ManagedState {
       };
     }
 
-    if (state.value === 'loaded') {
+    if (state.value === "loaded") {
       return {
-        value: 'running',
+        value: "running",
         context: {
           ...context,
           flow: state.context.flow,
@@ -194,11 +194,11 @@ class ManagedState {
       };
     }
 
-    if (state.value === 'running') {
+    if (state.value === "running") {
       const result = await state.context.result;
 
       return {
-        value: 'completed',
+        value: "completed",
         context: {
           ...context,
           result,
@@ -225,7 +225,7 @@ export const usePersistentStateMachine = (options: {
   middleware?: ManagerMiddleware;
 }) => {
   const keyRef = React.useRef<ManagedPlayerStateKey>({
-    _key: Symbol('managed-player'),
+    _key: Symbol("managed-player"),
   });
 
   const managedState =
@@ -270,11 +270,11 @@ export const ManagedPlayer = (props: ManagedPlayerProps) => {
   });
 
   React.useEffect(() => {
-    if (state?.value === 'ended') {
+    if (state?.value === "ended") {
       props.onComplete?.(state?.context.result);
-    } else if (state?.value === 'error') {
+    } else if (state?.value === "error") {
       props.onError?.(state?.context.error);
-    } else if (state?.value === 'running') {
+    } else if (state?.value === "running") {
       props.onStartedFlow?.();
     }
   }, [state]);
@@ -283,13 +283,13 @@ export const ManagedPlayer = (props: ManagedPlayerProps) => {
     return () => {
       const playerState = state?.context.reactPlayer.player.getState();
 
-      if (state?.value === 'running' && playerState?.status === 'in-progress') {
+      if (state?.value === "running" && playerState?.status === "in-progress") {
         props.manager.terminate?.(playerState.controllers.data.serialize());
       }
     };
   }, [props.manager, state?.context.reactPlayer.player, state?.value]);
 
-  if (state?.value === 'error') {
+  if (state?.value === "error") {
     if (props.fallbackComponent) {
       return (
         <props.fallbackComponent

@@ -1,7 +1,7 @@
-import { SyncHook } from 'tapable-ts';
-import type { BindingLike, BindingFactory } from '../binding';
-import { BindingInstance, isBinding } from '../binding';
-import { NOOP_MODEL } from './noop-model';
+import { SyncHook } from "tapable-ts";
+import type { BindingLike, BindingFactory } from "../binding";
+import { BindingInstance, isBinding } from "../binding";
+import { NOOP_MODEL } from "./noop-model";
 
 export const ROOT_BINDING = new BindingInstance([]);
 export type BatchSetTransaction = [BindingInstance, any][];
@@ -109,7 +109,7 @@ export function withParser<Options = unknown>(
         });
 
     if (!parsed) {
-      throw new Error('Unable to parse binding');
+      throw new Error("Unable to parse binding");
     }
 
     return parsed;
@@ -238,7 +238,7 @@ export class PipelinedDataModel implements DataModelImpl {
 
   public reset(model = {}) {
     this.pipeline.forEach((middleware) => {
-      if ('reset' in middleware) {
+      if ("reset" in middleware) {
         middleware.reset?.();
       }
     });

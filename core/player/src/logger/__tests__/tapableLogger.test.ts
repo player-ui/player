@@ -1,9 +1,9 @@
-import { test, expect, vitest } from 'vitest';
-import { TapableLogger } from '..';
-import type { Logger } from '../types';
-import { severities } from '../types';
+import { test, expect, vitest } from "vitest";
+import { TapableLogger } from "..";
+import type { Logger } from "../types";
+import { severities } from "../types";
 
-test('works via logger api', () => {
+test("works via logger api", () => {
   const logger = new TapableLogger();
 
   const testLogger: Logger = {

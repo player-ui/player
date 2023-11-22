@@ -1,27 +1,27 @@
-import { describe, it, expect, test, beforeEach } from 'vitest';
-import { BindingParser } from '../../binding';
-import type { DataModelImpl } from '../../data';
-import { PipelinedDataModel, LocalModel } from '../../data';
-import type { MiddlewareChecker } from '..';
-import { ValidationMiddleware } from '..';
+import { describe, it, expect, test, beforeEach } from "vitest";
+import { BindingParser } from "../../binding";
+import type { DataModelImpl } from "../../data";
+import { PipelinedDataModel, LocalModel } from "../../data";
+import type { MiddlewareChecker } from "..";
+import { ValidationMiddleware } from "..";
 
 const parser = new BindingParser({
   get: () => undefined,
   set: () => undefined,
   evaluate: () => undefined,
 });
-const foo = parser.parse('foo');
-const bar = parser.parse('bar');
+const foo = parser.parse("foo");
+const bar = parser.parse("bar");
 
-describe('middleware', () => {
+describe("middleware", () => {
   /**
    * a sample validator that checks for non-vaz values.
    */
   const validator: MiddlewareChecker = (binding, model) => {
-    if (model.get(binding) === 'baz') {
+    if (model.get(binding) === "baz") {
       return {
-        severity: 'error',
-        message: 'Wrong Value',
+        severity: "error",
+        message: "Wrong Value",
       };
     }
   };
@@ -34,29 +34,29 @@ describe('middleware', () => {
     dataModelWithMiddleware = new ValidationMiddleware(validator);
   });
 
-  it('allows valid data to fall through', () => {
+  it("allows valid data to fall through", () => {
     // Any valid value should fall through
-    dataModelWithMiddleware.set([[foo, 'bar']], undefined, baseDataModel);
+    dataModelWithMiddleware.set([[foo, "bar"]], undefined, baseDataModel);
     expect(
       dataModelWithMiddleware.get(foo, undefined, baseDataModel),
-    ).toStrictEqual('bar');
-    expect(baseDataModel.get(foo)).toStrictEqual('bar');
+    ).toStrictEqual("bar");
+    expect(baseDataModel.get(foo)).toStrictEqual("bar");
   });
 
-  it('catches invalid data', () => {
+  it("catches invalid data", () => {
     // Any invalid data should stay in the middleware's cache
-    dataModelWithMiddleware.set([[foo, 'bar']], undefined, baseDataModel);
-    dataModelWithMiddleware.set([[foo, 'baz']], undefined, baseDataModel);
+    dataModelWithMiddleware.set([[foo, "bar"]], undefined, baseDataModel);
+    dataModelWithMiddleware.set([[foo, "baz"]], undefined, baseDataModel);
     expect(
       dataModelWithMiddleware.get(foo, { includeInvalid: true }, baseDataModel),
-    ).toStrictEqual('baz');
-    expect(baseDataModel.get(foo)).toStrictEqual('bar');
+    ).toStrictEqual("baz");
+    expect(baseDataModel.get(foo)).toStrictEqual("bar");
   });
 
-  it('only returns updates for bindings set in the same transaction', () => {
+  it("only returns updates for bindings set in the same transaction", () => {
     // Setup the invalid data
     const invalidUpdates = dataModelWithMiddleware.set(
-      [[foo, 'baz']],
+      [[foo, "baz"]],
       undefined,
       baseDataModel,
     );
@@ -80,7 +80,7 @@ describe('middleware', () => {
 
     // Set some unrelated data
     const validUpdates = dataModelWithMiddleware.set(
-      [[bar, 'baz']],
+      [[bar, "baz"]],
       undefined,
       baseDataModel,
     );
@@ -89,7 +89,7 @@ describe('middleware', () => {
   });
 });
 
-test('merges invalid', () => {
+test("merges invalid", () => {
   const model = new PipelinedDataModel([
     new LocalModel({
       valid: true,
@@ -97,30 +97,30 @@ test('merges invalid', () => {
     }),
     new ValidationMiddleware((binding, validationModel) => {
       if (
-        binding.asString() === 'invalid' &&
+        binding.asString() === "invalid" &&
         validationModel.get(binding) !== false
       ) {
         return {
-          severity: 'error',
-          message: 'Nope',
+          severity: "error",
+          message: "Nope",
         };
       }
     }),
   ]);
 
-  expect(model.get(parser.parse(''))).toStrictEqual({
+  expect(model.get(parser.parse(""))).toStrictEqual({
     valid: true,
     invalid: false,
   });
 
-  model.set([[parser.parse('invalid'), true]]);
+  model.set([[parser.parse("invalid"), true]]);
 
-  expect(model.get(parser.parse(''), { includeInvalid: false })).toStrictEqual({
+  expect(model.get(parser.parse(""), { includeInvalid: false })).toStrictEqual({
     valid: true,
     invalid: false,
   });
 
-  expect(model.get(parser.parse(''), { includeInvalid: true })).toStrictEqual({
+  expect(model.get(parser.parse(""), { includeInvalid: true })).toStrictEqual({
     valid: true,
     invalid: true,
   });

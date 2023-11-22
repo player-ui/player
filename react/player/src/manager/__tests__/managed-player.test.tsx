@@ -1,222 +1,215 @@
-import React, { Suspense } from 'react';
-import { makeFlow } from '@player-ui/make-flow';
-import {
-  render,
-  screen,
-  act,
-  configure,
-  waitFor,
-} from '@testing-library/react';
+import { test, expect, vitest } from "vitest";
+import React, { Suspense } from "react";
+import { makeFlow } from "@player-ui/make-flow";
+import { render, act, configure, waitFor } from "@testing-library/react";
 import {
   MetricsCorePlugin,
   RequestTimeWebPlugin,
-} from '@player-ui/metrics-plugin';
-import { ManagedPlayer } from '../managed-player';
-import type { FlowManager, FallbackProps } from '../types';
-import { SimpleAssetPlugin } from '../../__tests__/helpers/simple-asset-plugin';
+} from "@player-ui/metrics-plugin";
+import { ManagedPlayer } from "../managed-player";
+import type { FlowManager, FallbackProps } from "../types";
+import { SimpleAssetPlugin } from "../../__tests__/helpers/simple-asset-plugin";
 
-jest.mock('@player-ui/metrics-plugin', () => ({
-  ...(jest.requireActual('@player-ui/metrics-plugin') as []),
-  RequestTimeWebPlugin: jest.fn().mockImplementation(() => {
-    return { apply: jest.fn() };
-  }),
-}));
+vitest.mock("@player-ui/metrics-plugin", async () => {
+  const actual: object = await vitest.importActual("@player-ui/metrics-plugin");
 
-configure({ testIdAttribute: 'id' });
+  return {
+    ...actual,
+    RequestTimeWebPlugin: vitest.fn().mockImplementation(() => {
+      return { apply: vitest.fn() };
+    }),
+  };
+});
 
-test('requestTime should be available', async () => {
+configure({ testIdAttribute: "id" });
+
+test("requestTime should be available", async () => {
   const manager: FlowManager = {
-    next: jest
+    next: vitest
       .fn()
       .mockReturnValueOnce(
         Promise.resolve({
           value: makeFlow({
-            id: 'flow-1',
-            type: 'collection',
+            id: "flow-1",
+            type: "collection",
             values: [
               {
                 asset: {
-                  id: 'action',
-                  type: 'action',
-                  value: 'Next',
-                  label: 'Continue',
+                  id: "action",
+                  type: "action",
+                  value: "Next",
+                  label: "Continue",
                 },
               },
             ],
           }),
-        })
+        }),
       )
       .mockReturnValueOnce(
         Promise.resolve({
           value: makeFlow({
-            id: 'flow-2',
-            type: 'collection',
+            id: "flow-2",
+            type: "collection",
             values: [
               {
                 asset: {
-                  id: 'action',
-                  type: 'action',
-                  value: 'Next',
-                  label: 'Continue',
+                  id: "action",
+                  type: "action",
+                  value: "Next",
+                  label: "Continue",
                 },
               },
             ],
           }),
-        })
+        }),
       )
       .mockReturnValue(Promise.resolve({ done: true })),
   };
 
-  const onComplete = jest.fn();
-  const onError = jest.fn();
+  const onComplete = vitest.fn();
+  const onError = vitest.fn();
 
-  act(() => {
-    render(
-      <Suspense fallback="loading">
-        <ManagedPlayer
-          manager={manager}
-          plugins={[new SimpleAssetPlugin(), new MetricsCorePlugin()]}
-          onComplete={onComplete}
-          onError={onError}
-        />
-      </Suspense>
-    );
-  });
+  const container = render(
+    <Suspense fallback="loading">
+      <ManagedPlayer
+        manager={manager}
+        plugins={[new SimpleAssetPlugin(), new MetricsCorePlugin()]}
+        onComplete={onComplete}
+        onError={onError}
+      />
+    </Suspense>,
+  );
 
   expect(manager.next).toBeCalledWith(undefined);
-  const view = await screen.findByTestId('flow-1');
+  const view = await container.findByTestId("flow-1");
   expect(view).toBeInTheDocument();
 
   await act(async () => {
-    const nextButton = await screen.findByText('Continue');
+    const nextButton = await container.findByText("Continue");
     nextButton.click();
   });
 
   expect(manager.next).toBeCalledTimes(2);
 
-  const view2 = await screen.findByTestId('flow-2');
+  const view2 = await container.findByTestId("flow-2");
   expect(view2).toBeInTheDocument();
 
   await act(async () => {
-    const nextButton = await screen.findByText('Continue');
+    const nextButton = await container.findByText("Continue");
     nextButton.click();
   });
-  const getRequestTime = (
-    RequestTimeWebPlugin as jest.Mock<RequestTimeWebPlugin>
-  ).mock.calls[0][0];
+  const getRequestTime = (RequestTimeWebPlugin as any).mock.calls[0][0];
   expect(getRequestTime()).toBeDefined();
   expect(onComplete).toBeCalled();
 });
 
-test('handles dummy flows', async () => {
+test("handles dummy flows", async () => {
   const manager: FlowManager = {
-    next: jest
+    next: vitest
       .fn()
       .mockReturnValueOnce(
         Promise.resolve({
           value: makeFlow({
-            id: 'flow-1',
-            type: 'collection',
+            id: "flow-1",
+            type: "collection",
             values: [
               {
                 asset: {
-                  id: 'action',
-                  type: 'action',
-                  value: 'Next',
-                  label: 'Continue',
+                  id: "action",
+                  type: "action",
+                  value: "Next",
+                  label: "Continue",
                 },
               },
             ],
           }),
-        })
+        }),
       )
       .mockReturnValueOnce(
         Promise.resolve({
           value: {
             ...makeFlow({
-              id: 'flow-2',
-              type: 'collection',
+              id: "flow-2",
+              type: "collection",
               values: [
                 {
                   asset: {
-                    id: 'action',
-                    type: 'action',
-                    value: 'Next',
-                    label: 'Continue',
+                    id: "action",
+                    type: "action",
+                    value: "Next",
+                    label: "Continue",
                   },
                 },
               ],
             }),
-            data: { foo: 'bar' },
+            data: { foo: "bar" },
           },
-        })
+        }),
       )
       .mockReturnValue(Promise.resolve({ done: true })),
   };
 
-  const onComplete = jest.fn();
-  const onError = jest.fn();
+  const onComplete = vitest.fn();
+  const onError = vitest.fn();
 
-  act(() => {
-    render(
-      <Suspense fallback="loading">
-        <ManagedPlayer
-          manager={manager}
-          plugins={[new SimpleAssetPlugin()]}
-          onComplete={onComplete}
-          onError={onError}
-        />
-      </Suspense>
-    );
-  });
+  const screen = render(
+    <Suspense fallback="loading">
+      <ManagedPlayer
+        manager={manager}
+        plugins={[new SimpleAssetPlugin()]}
+        onComplete={onComplete}
+        onError={onError}
+      />
+    </Suspense>,
+  );
 
   expect(manager.next).toBeCalledWith(undefined);
-  const view = await screen.findByTestId('flow-1');
+  const view = await screen.findByTestId("flow-1");
   expect(view).toBeInTheDocument();
 
   await act(async () => {
-    const nextButton = await screen.findByText('Continue');
+    const nextButton = await screen.findByText("Continue");
     nextButton.click();
   });
 
   expect(manager.next).toBeCalledTimes(2);
 
-  const view2 = await screen.findByTestId('flow-2');
+  const view2 = await screen.findByTestId("flow-2");
   expect(view2).toBeInTheDocument();
 
   await act(async () => {
-    const nextButton = await screen.findByText('Continue');
+    const nextButton = await screen.findByText("Continue");
     nextButton.click();
   });
   expect(onComplete).toBeCalledWith(
     expect.objectContaining({
-      status: 'completed',
-      data: { foo: 'bar' },
-    })
+      status: "completed",
+      data: { foo: "bar" },
+    }),
   );
 });
 
-test('handles FlowManager error', async () => {
+test("handles FlowManager error", async () => {
   const manager: FlowManager = {
-    next: jest
+    next: vitest
       .fn()
       .mockReturnValueOnce(
         Promise.resolve({
           value: makeFlow({
-            id: 'flow-1',
-            type: 'collection',
+            id: "flow-1",
+            type: "collection",
             values: [
               {
                 asset: {
-                  id: 'action',
-                  type: 'action',
-                  value: 'Next',
-                  label: 'Continue',
+                  id: "action",
+                  type: "action",
+                  value: "Next",
+                  label: "Continue",
                 },
               },
             ],
           }),
-        })
+        }),
       )
       .mockImplementationOnce(() => {
         throw new Error();
@@ -227,8 +220,8 @@ test('handles FlowManager error', async () => {
       .mockReturnValue(Promise.resolve({ done: true })),
   };
 
-  const onComplete = jest.fn();
-  const onError = jest.fn();
+  const onComplete = vitest.fn();
+  const onError = vitest.fn();
   /**
    *
    */
@@ -243,40 +236,38 @@ test('handles FlowManager error', async () => {
     </div>
   );
 
-  act(() => {
-    render(
-      <Suspense fallback="loading">
-        <ManagedPlayer
-          manager={manager}
-          plugins={[new SimpleAssetPlugin()]}
-          fallbackComponent={MyFallback}
-          onComplete={onComplete}
-          onError={onError}
-        />
-      </Suspense>
-    );
-  });
+  const screen = render(
+    <Suspense fallback="loading">
+      <ManagedPlayer
+        manager={manager}
+        plugins={[new SimpleAssetPlugin()]}
+        fallbackComponent={MyFallback}
+        onComplete={onComplete}
+        onError={onError}
+      />
+    </Suspense>,
+  );
 
   expect(manager.next).toBeCalledWith(undefined);
-  const view = await screen.findByTestId('flow-1');
+  const view = await screen.findByTestId("flow-1");
   expect(view).toBeInTheDocument();
 
   await act(async () => {
-    const nextButton = await screen.findByText('Continue');
+    const nextButton = await screen.findByText("Continue");
     nextButton.click();
   });
 
   expect(manager.next).toBeCalledTimes(2);
 
   await act(async () => {
-    const nextButton = await screen.findByText('Retry');
+    const nextButton = await screen.findByText("Retry");
     nextButton.click();
   });
 
   expect(manager.next).toBeCalledTimes(3);
 
   await act(async () => {
-    const nextButton = await screen.findByText('Reset');
+    const nextButton = await screen.findByText("Reset");
     nextButton.click();
   });
 
@@ -285,52 +276,52 @@ test('handles FlowManager error', async () => {
   expect(onComplete).toBeCalled();
 });
 
-test('handles flow error', async () => {
+test("handles flow error", async () => {
   const manager: FlowManager = {
-    next: jest
+    next: vitest
       .fn()
       .mockReturnValueOnce(
         Promise.resolve({
           value: makeFlow({
-            id: 'flow-1',
-            type: 'collection',
+            id: "flow-1",
+            type: "collection",
             values: [
               {
                 asset: {
-                  id: 'action',
-                  type: 'action',
-                  value: 'Next',
-                  label: 'Continue',
+                  id: "action",
+                  type: "action",
+                  value: "Next",
+                  label: "Continue",
                 },
               },
             ],
           }),
-        })
+        }),
       )
       .mockReturnValueOnce(
         Promise.resolve({
           value: makeFlow({
-            id: 'flow-2',
-            type: 'action',
-            exp: 'err(',
-            label: 'Error',
+            id: "flow-2",
+            type: "action",
+            exp: "err(",
+            label: "Error",
           }),
-        })
+        }),
       )
       .mockReturnValueOnce(
         Promise.resolve({
           value: makeFlow({
-            id: 'flow-2',
-            type: 'action',
-            exp: 'err(',
-            label: 'Error',
+            id: "flow-2",
+            type: "action",
+            exp: "err(",
+            label: "Error",
           }),
-        })
+        }),
       )
       .mockReturnValue(Promise.resolve({ done: true })),
   };
-  const onComplete = jest.fn();
-  const onError = jest.fn();
+  const onComplete = vitest.fn();
+  const onError = vitest.fn();
 
   /**
    *
@@ -346,39 +337,37 @@ test('handles flow error', async () => {
     </div>
   );
 
-  await act(async () => {
-    render(
-      <Suspense fallback="loading">
-        <ManagedPlayer
-          manager={manager}
-          plugins={[new SimpleAssetPlugin()]}
-          fallbackComponent={MyFallback}
-          onComplete={onComplete}
-          onError={onError}
-        />
-      </Suspense>
-    );
-  });
+  const screen = render(
+    <Suspense fallback="loading">
+      <ManagedPlayer
+        manager={manager}
+        plugins={[new SimpleAssetPlugin()]}
+        fallbackComponent={MyFallback}
+        onComplete={onComplete}
+        onError={onError}
+      />
+    </Suspense>,
+  );
 
   expect(manager.next).toBeCalledWith(undefined);
-  const view = await screen.findByTestId('flow-1');
+  const view = await screen.findByTestId("flow-1");
   expect(view).toBeInTheDocument();
 
   await act(async () => {
-    const nextButton = await screen.findByText('Continue');
+    const nextButton = await screen.findByText("Continue");
     nextButton.click();
   });
 
   await waitFor(() => expect(manager.next).toBeCalledTimes(2));
 
-  const view2 = await screen.findByTestId('flow-2');
+  const view2 = await screen.findByTestId("flow-2");
   expect(view2).toBeInTheDocument();
 
   await act(async () => {
     view2.click();
   });
 
-  const retryButton = await screen.findByText('Retry');
+  const retryButton = await screen.findByText("Retry");
   expect(retryButton).toBeInTheDocument();
 
   await act(async () => {
@@ -387,14 +376,14 @@ test('handles flow error', async () => {
 
   expect(manager.next).toBeCalledTimes(3);
 
-  const view3 = await screen.findByTestId('flow-2');
+  const view3 = await screen.findByTestId("flow-2");
   expect(view3).toBeInTheDocument();
 
   await act(async () => {
     view3.click();
   });
 
-  const resetButton = await screen.findByText('Retry');
+  const resetButton = await screen.findByText("Retry");
   expect(resetButton).toBeInTheDocument();
 
   await act(async () => {
@@ -407,37 +396,37 @@ test('handles flow error', async () => {
   expect(onComplete).toBeCalled();
 });
 
-test('handles terminating with data', async () => {
-  jest.useRealTimers();
+test("handles terminating with data", async () => {
+  vitest.useRealTimers();
   const manager: FlowManager = {
-    next: jest.fn().mockReturnValueOnce(
+    next: vitest.fn().mockReturnValueOnce(
       Promise.resolve({
         value: {
           ...makeFlow({
-            id: 'flow-1',
-            type: 'collection',
+            id: "flow-1",
+            type: "collection",
             values: [
               {
                 asset: {
-                  id: 'action',
-                  type: 'action',
-                  value: 'Next',
-                  label: 'Continue',
+                  id: "action",
+                  type: "action",
+                  value: "Next",
+                  label: "Continue",
                 },
               },
             ],
           }),
           data: {
-            returns: { id: '123' },
+            returns: { id: "123" },
           },
         },
-      })
+      }),
     ),
-    terminate: jest.fn(),
+    terminate: vitest.fn(),
   };
 
-  const onComplete = jest.fn();
-  const onError = jest.fn();
+  const onComplete = vitest.fn();
+  const onError = vitest.fn();
 
   let renderResult;
   act(() => {
@@ -449,11 +438,11 @@ test('handles terminating with data', async () => {
           onComplete={onComplete}
           onError={onError}
         />
-      </Suspense>
+      </Suspense>,
     );
   });
 
-  await screen.findByTestId('flow-1');
+  await renderResult.findByTestId("flow-1");
   (renderResult as any).unmount();
-  expect(manager.terminate).toBeCalledWith({ returns: { id: '123' } });
+  expect(manager.terminate).toBeCalledWith({ returns: { id: "123" } });
 });

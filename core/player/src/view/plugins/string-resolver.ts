@@ -1,10 +1,10 @@
-import { set } from 'timm';
-import { resolveDataRefs } from '../../string-resolver';
-import type { Options } from './options';
-import type { View, ViewPlugin } from './plugin';
-import type { Node } from '../parser';
-import { NodeType } from '../parser';
-import type { Resolver } from '../resolver';
+import { set } from "timm";
+import { resolveDataRefs } from "../../string-resolver";
+import type { Options } from "./options";
+import type { View, ViewPlugin } from "./plugin";
+import type { Node } from "../parser";
+import { NodeType } from "../parser";
+import type { Resolver } from "../resolver";
 
 /** Create a function that checks for a start/end sequence in a string */
 const createPatternMatcher = (start: string, end: string) => {
@@ -25,8 +25,8 @@ const createPatternMatcher = (start: string, end: string) => {
   };
 };
 
-const bindingResolveLookup = createPatternMatcher('{{', '}}');
-const expressionResolveLookup = createPatternMatcher('@[', ']@');
+const bindingResolveLookup = createPatternMatcher("{{", "}}");
+const expressionResolveLookup = createPatternMatcher("@[", "]@");
 
 /** Check to see if a string contains a reference to dynamic content */
 function hasSomethingToResolve(str: string) {
@@ -52,12 +52,12 @@ export function resolveAllRefs(
   if (
     node === null ||
     node === undefined ||
-    (typeof node !== 'object' && typeof node !== 'string')
+    (typeof node !== "object" && typeof node !== "string")
   ) {
     return node;
   }
 
-  if (typeof node === 'string') {
+  if (typeof node === "string") {
     return resolveString(node, resolveOptions);
   }
 
@@ -72,9 +72,9 @@ export function resolveAllRefs(
 
     let newVal = val;
 
-    if (typeof val === 'object') {
+    if (typeof val === "object") {
       newVal = resolveAllRefs(val, resolveOptions, propertiesToSkip);
-    } else if (typeof val === 'string') {
+    } else if (typeof val === "string") {
       newVal = resolveString(val, resolveOptions);
     }
 
@@ -96,7 +96,7 @@ const findBasePath = (
     return [];
   }
 
-  if ('children' in parentNode) {
+  if ("children" in parentNode) {
     const original = resolver.getSourceNode(node);
     return (
       parentNode.children?.find((child) => child.value === original)?.path ?? []
@@ -119,7 +119,7 @@ export default class StringResolverPlugin implements ViewPlugin {
   }
 
   applyResolver(resolver: Resolver) {
-    resolver.hooks.resolve.tap('string-resolver', (value, node, options) => {
+    resolver.hooks.resolve.tap("string-resolver", (value, node, options) => {
       if (node.type === NodeType.Empty || node.type === NodeType.Unknown) {
         return null;
       }
@@ -133,7 +133,7 @@ export default class StringResolverPlugin implements ViewPlugin {
         let propsToSkip: Set<string>;
         if (node.type === NodeType.Asset || node.type === NodeType.View) {
           propsToSkip = new Set(
-            node.plugins?.stringResolver?.propertiesToSkip ?? ['exp'],
+            node.plugins?.stringResolver?.propertiesToSkip ?? ["exp"],
           );
           if (node.value?.id) {
             this.propertiesToSkipCache.set(node.value.id, propsToSkip);
@@ -149,7 +149,7 @@ export default class StringResolverPlugin implements ViewPlugin {
             node.parent.parent.value.id,
           ) as Set<string>;
         } else {
-          propsToSkip = new Set(['exp']);
+          propsToSkip = new Set(["exp"]);
         }
 
         const nodePath = findBasePath(node, resolver);
@@ -170,6 +170,6 @@ export default class StringResolverPlugin implements ViewPlugin {
   }
 
   apply(view: View) {
-    view.hooks.resolver.tap('string-resolver', this.applyResolver.bind(this));
+    view.hooks.resolver.tap("string-resolver", this.applyResolver.bind(this));
   }
 }

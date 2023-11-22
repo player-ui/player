@@ -1,15 +1,15 @@
-import { describe, expect, beforeEach, test } from 'vitest';
-import { BindingParser } from '../../../binding';
-import type { DataModelImpl } from '../../../data';
-import { LocalModel, withParser } from '../../../data';
-import { ExpressionEvaluator } from '../../../expressions';
-import { SchemaController } from '../../../schema';
-import type { Resolve } from '../../resolver';
-import { Resolver } from '../../resolver';
-import { NodeType, Parser } from '../../parser';
-import { StringResolverPlugin } from '..';
+import { describe, expect, beforeEach, test } from "vitest";
+import { BindingParser } from "../../../binding";
+import type { DataModelImpl } from "../../../data";
+import { LocalModel, withParser } from "../../../data";
+import { ExpressionEvaluator } from "../../../expressions";
+import { SchemaController } from "../../../schema";
+import type { Resolve } from "../../resolver";
+import { Resolver } from "../../resolver";
+import { NodeType, Parser } from "../../parser";
+import { StringResolverPlugin } from "..";
 
-describe('string-resolver', () => {
+describe("string-resolver", () => {
   let model: DataModelImpl;
   let expressionEvaluator: ExpressionEvaluator;
   let resolverOptions: Resolve.ResolverOptions;
@@ -17,10 +17,10 @@ describe('string-resolver', () => {
 
   beforeEach(() => {
     const localModel = new LocalModel({
-      name: 'Adam',
+      name: "Adam",
       age: 27,
-      city: 'San Diego',
-      nested: 'Name: {{name}} age: {{age}}',
+      city: "San Diego",
+      nested: "Name: {{name}} age: {{age}}",
     });
 
     const bindingParser = new BindingParser({
@@ -43,41 +43,41 @@ describe('string-resolver', () => {
     };
   });
 
-  test('resolves basic objects', () => {
+  test("resolves basic objects", () => {
     const root = parser.parseObject({
       asset: {
-        type: 'bar',
-        name: 'My name is {{name}}',
-        age: '{{age}}',
-        alt: '{{nested}}',
+        type: "bar",
+        name: "My name is {{name}}",
+        age: "{{age}}",
+        alt: "{{nested}}",
       },
     });
     const resolver = new Resolver(root!, resolverOptions);
     new StringResolverPlugin().applyResolver(resolver);
     expect(resolver.update()).toStrictEqual({
       asset: {
-        type: 'bar',
-        name: 'My name is Adam',
+        type: "bar",
+        name: "My name is Adam",
         age: 27,
-        alt: 'Name: Adam age: 27',
+        alt: "Name: Adam age: 27",
       },
     });
   });
 
-  test('skips exp prop when configured', () => {
+  test("skips exp prop when configured", () => {
     const root = parser.parseObject({
       asset: {
-        type: 'bar',
-        name: 'My name is {{name}}',
-        age: '{{age}}',
-        alt: '{{nested}}',
+        type: "bar",
+        name: "My name is {{name}}",
+        age: "{{age}}",
+        alt: "{{nested}}",
         exp: {
           onStart: '{{name}} = "test"',
         },
         label: {
           asset: {
-            id: 'foo',
-            type: 'bar',
+            id: "foo",
+            type: "bar",
             exp: '{{name}} = "other"',
           },
         },
@@ -86,13 +86,13 @@ describe('string-resolver', () => {
 
     const resolver = new Resolver(root!, resolverOptions);
 
-    resolver.hooks.beforeResolve.tap('test', (n) => {
+    resolver.hooks.beforeResolve.tap("test", (n) => {
       if (n?.type === NodeType.Asset || n?.type === NodeType.View) {
         return {
           ...n,
           plugins: {
             stringResolver: {
-              propertiesToSkip: ['exp'],
+              propertiesToSkip: ["exp"],
             },
           },
         };
@@ -102,17 +102,17 @@ describe('string-resolver', () => {
     new StringResolverPlugin().applyResolver(resolver);
     expect(resolver.update()).toStrictEqual({
       asset: {
-        type: 'bar',
-        name: 'My name is Adam',
+        type: "bar",
+        name: "My name is Adam",
         age: 27,
-        alt: 'Name: Adam age: 27',
+        alt: "Name: Adam age: 27",
         exp: {
           onStart: '{{name}} = "test"',
         },
         label: {
           asset: {
-            id: 'foo',
-            type: 'bar',
+            id: "foo",
+            type: "bar",
             exp: '{{name}} = "other"',
           },
         },

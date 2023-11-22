@@ -4,10 +4,10 @@ import type {
   AssetWrapper,
   NavigationFlow,
   NavigationFlowEndState,
-} from '@player-ui/types';
-import identify, { ObjType } from './identify';
+} from "@player-ui/types";
+import identify, { ObjType } from "./identify";
 
-export * from './identify';
+export * from "./identify";
 export { identify };
 
 interface JSend<T> {
@@ -17,14 +17,14 @@ interface JSend<T> {
   data: T;
 }
 
-interface CollectionAsset extends Asset<'collection'> {
+interface CollectionAsset extends Asset<"collection"> {
   /** The values of the collection. Used when there are an array of assets passed to the makeFlow fn */
   values: Array<AssetWrapper>;
 }
 
 /** Check an object for the JSEND wrapper and remove it if needed */
 function unwrapJSend(obj: object) {
-  const isJSend = 'status' in obj && 'data' in obj;
+  const isJSend = "status" in obj && "data" in obj;
 
   if (isJSend) {
     return (obj as JSend<object>).data;
@@ -35,14 +35,14 @@ function unwrapJSend(obj: object) {
 
 interface NavOptions {
   /** An optional expression to run when this Flow starts */
-  onStart?: NavigationFlow['onStart'];
+  onStart?: NavigationFlow["onStart"];
   /** An optional expression to run when this Flow ends */
-  onEnd?: NavigationFlow['onEnd'];
+  onEnd?: NavigationFlow["onEnd"];
   /**
    * A description of _how_ the flow ended.
    * If this is a flow started from another flow, the outcome determines the flow transition
    */
-  outcome?: NavigationFlowEndState['outcome'];
+  outcome?: NavigationFlowEndState["outcome"];
 }
 
 /**
@@ -55,22 +55,22 @@ const createDefaultNav = (flow: Flow, options?: NavOptions): Flow => {
     flow.views.length === 1
   ) {
     const navFlow: NavigationFlow = {
-      startState: 'VIEW_0',
+      startState: "VIEW_0",
       VIEW_0: {
-        state_type: 'VIEW',
+        state_type: "VIEW",
         ref: flow.views[0].id ?? `${flow.id}-views-0`,
         transitions: {
-          '*': 'END_done',
-          Prev: 'END_back',
+          "*": "END_done",
+          Prev: "END_back",
         },
       },
       END_done: {
-        state_type: 'END',
-        outcome: options?.outcome ?? 'doneWithFlow',
+        state_type: "END",
+        outcome: options?.outcome ?? "doneWithFlow",
       },
       END_back: {
-        state_type: 'END',
-        outcome: 'BACK',
+        state_type: "END",
+        outcome: "BACK",
       },
     };
 
@@ -85,7 +85,7 @@ const createDefaultNav = (flow: Flow, options?: NavOptions): Flow => {
     return {
       ...flow,
       navigation: {
-        BEGIN: 'Flow',
+        BEGIN: "Flow",
         Flow: navFlow,
       },
     };
@@ -98,12 +98,12 @@ const createDefaultNav = (flow: Flow, options?: NavOptions): Flow => {
  * Take any given object and try to convert it to a flow
  */
 export function makeFlow(obj: any, args?: NavOptions): Flow {
-  const objified = unwrapJSend(typeof obj === 'string' ? JSON.parse(obj) : obj);
+  const objified = unwrapJSend(typeof obj === "string" ? JSON.parse(obj) : obj);
 
   if (Array.isArray(objified)) {
     const collection: CollectionAsset = {
-      id: 'collection',
-      type: 'collection',
+      id: "collection",
+      type: "collection",
       values: objified.map((v) => {
         const type = identify(v);
 
@@ -122,7 +122,7 @@ export function makeFlow(obj: any, args?: NavOptions): Flow {
 
   if (type === ObjType.UNKNOWN) {
     throw new Error(
-      'No clue how to convert this into a flow. Just do it yourself',
+      "No clue how to convert this into a flow. Just do it yourself",
     );
   }
 
@@ -135,23 +135,23 @@ export function makeFlow(obj: any, args?: NavOptions): Flow {
   }
 
   return {
-    id: 'generated-flow',
+    id: "generated-flow",
     views: [obj],
     data: {},
     navigation: {
-      BEGIN: 'FLOW_1',
+      BEGIN: "FLOW_1",
       FLOW_1: {
-        startState: 'VIEW_1',
+        startState: "VIEW_1",
         VIEW_1: {
-          state_type: 'VIEW',
+          state_type: "VIEW",
           ref: obj.id,
           transitions: {
-            '*': 'END_Done',
+            "*": "END_Done",
           },
         },
         END_Done: {
-          state_type: 'END',
-          outcome: 'done',
+          state_type: "END",
+          outcome: "done",
         },
       },
     },

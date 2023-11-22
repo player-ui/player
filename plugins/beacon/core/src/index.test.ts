@@ -47,7 +47,7 @@ const asset: Asset = {
 };
 
 test('tracks view changes', async () => {
-  const handler = jest.fn();
+  const handler = vitest.fn();
   const beaconPlugin = new BeaconPlugin({ callback: handler });
 
   let flowController: FlowController | undefined;
@@ -74,7 +74,7 @@ test('tracks view changes', async () => {
 });
 
 test('adds an expression', async () => {
-  const handler = jest.fn();
+  const handler = vitest.fn();
   const beaconPlugin = new BeaconPlugin({ callback: handler });
   const player = new Player({ plugins: [beaconPlugin] });
 
@@ -97,7 +97,7 @@ test('adds an expression', async () => {
 });
 
 test('automatically beacons view changes', async () => {
-  const handler = jest.fn();
+  const handler = vitest.fn();
   const beaconPlugin = new BeaconPlugin({ callback: handler });
 
   let flowController: FlowController | undefined;
@@ -126,7 +126,7 @@ test('automatically beacons view changes', async () => {
 });
 
 test('allows you to modify the beacon format', async () => {
-  const handler = jest.fn();
+  const handler = vitest.fn();
   const beaconPlugin = new BeaconPlugin({ callback: handler });
 
   beaconPlugin.hooks.buildBeacon.tap(
@@ -151,7 +151,7 @@ test('allows you to modify the beacon format', async () => {
 });
 
 test('cancels specific beacons using hooks', async () => {
-  const handler = jest.fn();
+  const handler = vitest.fn();
   const beaconPlugin = new BeaconPlugin({ callback: handler });
 
   beaconPlugin.hooks.cancelBeacon.tap('TestPlugin', (options) => {
@@ -187,7 +187,7 @@ test('cancels specific beacons using hooks', async () => {
 });
 
 test('allows you to add plugins via arguments', async () => {
-  const handler = jest.fn();
+  const handler = vitest.fn();
 
   class BeaconModifyPlugin implements BeaconPluginPlugin {
     apply(beaconPlugin: BeaconPlugin) {
@@ -220,7 +220,7 @@ test('allows you to add plugins via arguments', async () => {
 });
 
 test('gives you access to the asset, view, and state', async () => {
-  const handler = jest.fn();
+  const handler = vitest.fn();
 
   class BeaconModifyPlugin implements BeaconPluginPlugin {
     apply(beaconPlugin: BeaconPlugin) {
@@ -266,7 +266,7 @@ test('gives you access to the asset, view, and state', async () => {
 });
 
 test('gives you access to the logger', async () => {
-  const handler = jest.fn();
+  const handler = vitest.fn();
 
   class BeaconModifyPlugin implements BeaconPluginPlugin {
     apply(beaconPlugin: BeaconPlugin) {
@@ -297,7 +297,7 @@ test('gives you access to the logger', async () => {
 });
 
 test('Allows you to access beacons via a plugin', async () => {
-  const handler = jest.fn();
+  const handler = vitest.fn();
 
   const beaconPlugin = new BeaconPlugin();
 
@@ -316,7 +316,7 @@ test('Allows you to access beacons via a plugin', async () => {
 });
 
 test('waits for expressions to resolve on view', async () => {
-  const handler = jest.fn();
+  const handler = vitest.fn();
   const beaconPlugin = new BeaconPlugin({ callback: handler });
   const player = new Player({ plugins: [beaconPlugin] });
 
@@ -341,7 +341,7 @@ test('waits for expressions to resolve on view', async () => {
 });
 
 test('skips resolving beacon expressions', async () => {
-  const handler = jest.fn();
+  const handler = vitest.fn();
   const beaconPlugin = new BeaconPlugin({ callback: handler });
   const player = new Player({ plugins: [beaconPlugin] });
 
@@ -385,7 +385,7 @@ test('skips resolving beacon expressions', async () => {
 });
 
 test('provides resolved values in hooks', async () => {
-  const handler = jest.fn();
+  const handler = vitest.fn();
   const beaconPluginPlugin: BeaconPluginPlugin = {
     apply(beaconPlugin: BeaconPlugin): void {
       beaconPlugin.hooks.buildBeacon.tap('test', async (beacon) => {
@@ -427,7 +427,7 @@ test('provides resolved values in hooks', async () => {
 });
 
 test('re-resolves new values before sending beacon event', async () => {
-  const handler = jest.fn();
+  const handler = vitest.fn();
   const beaconPluginPlugin: BeaconPluginPlugin = {
     apply(beaconPlugin: BeaconPlugin): void {
       beaconPlugin.hooks.buildBeacon.tap('test', (beacon: any) => {

@@ -1,9 +1,9 @@
-import { SyncWaterfallHook } from 'tapable-ts';
-import type { Schema as SchemaType, Formatting } from '@player-ui/types';
+import { SyncWaterfallHook } from "tapable-ts";
+import type { Schema as SchemaType, Formatting } from "@player-ui/types";
 
-import type { BindingInstance } from '../binding';
-import type { ValidationProvider, ValidationObject } from '../validator';
-import type { FormatDefinition, FormatOptions, FormatType } from './types';
+import type { BindingInstance } from "../binding";
+import type { ValidationProvider, ValidationObject } from "../validator";
+import type { FormatDefinition, FormatOptions, FormatType } from "./types";
 
 /** A function that returns itself */
 const identify = (val: any) => val;
@@ -41,7 +41,7 @@ export function parse(
     Object.entries(node).forEach(([prop, type]) => {
       const nestedPath = [...path, prop];
 
-      const nestedPathStr = nestedPath.join('.');
+      const nestedPathStr = nestedPath.join(".");
 
       if (expandedPaths.has(nestedPathStr)) {
         // We've gone in a loop. Panic
@@ -59,11 +59,11 @@ export function parse(
       expandedPaths.set(nestedPathStr, type);
 
       if (type.isArray) {
-        nestedPath.push('[]');
+        nestedPath.push("[]");
       }
 
       if (type.isRecord) {
-        nestedPath.push('{}');
+        nestedPath.push("{}");
       }
 
       if (type.type && schema[type.type]) {
@@ -127,8 +127,8 @@ export class SchemaController implements ValidationProvider {
 
     // Set the defaults for schema-level validations
     return typeDef.validation.map((vRef) => ({
-      severity: 'error',
-      trigger: 'change',
+      severity: "error",
+      trigger: "change",
       ...vRef,
     }));
   }
@@ -141,22 +141,22 @@ export class SchemaController implements ValidationProvider {
 
     let bindingArray = binding.asArray();
     let normalized = bindingArray
-      .map((p) => (typeof p === 'number' ? '[]' : p))
-      .join('.');
+      .map((p) => (typeof p === "number" ? "[]" : p))
+      .join(".");
 
     if (normalized) {
       this.bindingSchemaNormalizedCache.set(binding, normalized);
-      bindingArray = normalized.split('.');
+      bindingArray = normalized.split(".");
     }
 
     bindingArray.forEach((item) => {
       const recordBinding = bindingArray
-        .map((p) => (p === item ? '{}' : p))
-        .join('.');
+        .map((p) => (p === item ? "{}" : p))
+        .join(".");
 
       if (this.schema.get(recordBinding)) {
         this.bindingSchemaNormalizedCache.set(binding, recordBinding);
-        bindingArray = recordBinding.split('.');
+        bindingArray = recordBinding.split(".");
         normalized = recordBinding;
       }
     });

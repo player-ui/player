@@ -18,7 +18,7 @@ configure({
 
 describe('Integration tests', () => {
   test('input beacons the correct custom data value', async () => {
-    const handler = jest.fn();
+    const handler = vitest.fn();
     const beaconPlugin = new BeaconPlugin({ callback: handler });
 
     const rp = new ReactPlayer({

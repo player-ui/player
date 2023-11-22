@@ -6,7 +6,7 @@ import { BeaconPlugin, useBeacon } from '..';
 
 describe('beacon web plugin', () => {
   test('loads in a player', async () => {
-    const beaconCallback = jest.fn();
+    const beaconCallback = vitest.fn();
 
     const rp = new ReactPlayer({
       plugins: [

@@ -1,9 +1,9 @@
-import { SyncWaterfallHook, SyncBailHook } from 'tapable-ts';
-import { NestedError } from 'ts-nested-error';
-import { parseExpression } from './parser';
-import * as DEFAULT_EXPRESSION_HANDLERS from './evaluator-functions';
-import { isExpressionNode } from './types';
-import { isObjectExpression } from './utils';
+import { SyncWaterfallHook, SyncBailHook } from "tapable-ts";
+import { NestedError } from "ts-nested-error";
+import { parseExpression } from "./parser";
+import * as DEFAULT_EXPRESSION_HANDLERS from "./evaluator-functions";
+import { isExpressionNode } from "./types";
+import { isObjectExpression } from "./utils";
 import type {
   ExpressionNode,
   BinaryOperator,
@@ -11,7 +11,7 @@ import type {
   ExpressionType,
   ExpressionContext,
   ExpressionHandler,
-} from './types';
+} from "./types";
 
 /** a && b -- but handles short cutting if the first value is false */
 const andandOperator: BinaryOperator = (ctx, a, b) => {
@@ -29,45 +29,45 @@ ororOperator.resolveParams = false;
 
 const DEFAULT_BINARY_OPERATORS: Record<string, BinaryOperator> = {
   // TODO: A lot of these functions used to do type coercion. Not sure if we want to keep that behavior or not.
-  '+': (a: any, b: any) => a + b,
-  '-': (a: any, b: any) => a - b,
-  '*': (a: any, b: any) => a * b,
-  '/': (a: any, b: any) => a / b,
-  '%': (a: any, b: any) => a % b,
+  "+": (a: any, b: any) => a + b,
+  "-": (a: any, b: any) => a - b,
+  "*": (a: any, b: any) => a * b,
+  "/": (a: any, b: any) => a / b,
+  "%": (a: any, b: any) => a % b,
 
   // eslint-disable-next-line
-  '==': (a: any, b: any) => a == b,
+  "==": (a: any, b: any) => a == b,
 
   // eslint-disable-next-line
-  '!=': (a: any, b: any) => a != b,
-  '>': (a: any, b: any) => a > b,
-  '>=': (a: any, b: any) => a >= b,
-  '<': (a: any, b: any) => a < b,
-  '<=': (a: any, b: any) => a <= b,
-  '&&': andandOperator,
-  '||': ororOperator,
-  '!==': (a: any, b: any) => a !== b,
-  '===': (a: any, b: any) => a === b,
+  "!=": (a: any, b: any) => a != b,
+  ">": (a: any, b: any) => a > b,
+  ">=": (a: any, b: any) => a >= b,
+  "<": (a: any, b: any) => a < b,
+  "<=": (a: any, b: any) => a <= b,
+  "&&": andandOperator,
+  "||": ororOperator,
+  "!==": (a: any, b: any) => a !== b,
+  "===": (a: any, b: any) => a === b,
 
   // eslint-disable-next-line
-  '|': (a: any, b: any) => a | b,
+  "|": (a: any, b: any) => a | b,
 
   // eslint-disable-next-line
-  '&': (a: any, b: any) => a & b,
-  '+=': (a: any, b: any) => a + b,
-  '-=': (a: any, b: any) => a - b,
+  "&": (a: any, b: any) => a & b,
+  "+=": (a: any, b: any) => a + b,
+  "-=": (a: any, b: any) => a - b,
 
   // eslint-disable-next-line
-  '&=': (a: any, b: any) => a & b,
+  "&=": (a: any, b: any) => a & b,
 
   // eslint-disable-next-line
-  '|=': (a: any, b: any) => a | b,
+  "|=": (a: any, b: any) => a | b,
 };
 
 const DEFAULT_UNARY_OPERATORS: Record<string, UnaryOperator> = {
-  '-': (a: any) => -a,
-  '+': (a: any) => Number(a),
-  '!': (a: any) => !a,
+  "-": (a: any) => -a,
+  "+": (a: any) => Number(a),
+  "!": (a: any) => !a,
 };
 
 export interface HookOptions extends ExpressionContext {
@@ -82,7 +82,7 @@ export interface HookOptions extends ExpressionContext {
 
 export type ExpressionEvaluatorOptions = Omit<
   HookOptions,
-  'resolveNode' | 'evaluate'
+  "resolveNode" | "evaluate"
 >;
 
 export type ExpressionEvaluatorFunction = (
@@ -136,7 +136,7 @@ export class ExpressionEvaluator {
         this._execAST(node, this.defaultHookOptions),
     };
 
-    this.hooks.resolve.tap('ExpressionEvaluator', this._resolveNode.bind(this));
+    this.hooks.resolve.tap("ExpressionEvaluator", this._resolveNode.bind(this));
     this.evaluate = this.evaluate.bind(this);
   }
 
@@ -160,8 +160,8 @@ export class ExpressionEvaluator {
 
     // Check for literals
     if (
-      typeof expression === 'number' ||
-      typeof expression === 'boolean' ||
+      typeof expression === "number" ||
+      typeof expression === "boolean" ||
       expression === undefined ||
       expression === null
     ) {
@@ -211,7 +211,7 @@ export class ExpressionEvaluator {
   }
 
   private _execString(exp: string, options: HookOptions) {
-    if (exp === '') {
+    if (exp === "") {
       return exp;
     }
 
@@ -259,23 +259,23 @@ export class ExpressionEvaluator {
       evaluate: (expr) => this.evaluate(expr, options),
     };
 
-    if (node.type === 'Literal') {
+    if (node.type === "Literal") {
       return node.value;
     }
 
-    if (node.type === 'Identifier') {
+    if (node.type === "Identifier") {
       return this.vars[node.name];
     }
 
-    if (node.type === 'Compound' || node.type === 'ThisExpression') {
+    if (node.type === "Compound" || node.type === "ThisExpression") {
       throw new Error(`Expression type: ${node.type} is not supported`);
     }
 
-    if (node.type === 'BinaryExpression' || node.type === 'LogicalExpression') {
+    if (node.type === "BinaryExpression" || node.type === "LogicalExpression") {
       const operator = this.operators.binary.get(node.operator);
 
       if (operator) {
-        if ('resolveParams' in operator) {
+        if ("resolveParams" in operator) {
           if (operator.resolveParams === false) {
             return operator(expressionContext, node.left, node.right);
           }
@@ -293,11 +293,11 @@ export class ExpressionEvaluator {
       return;
     }
 
-    if (node.type === 'UnaryExpression') {
+    if (node.type === "UnaryExpression") {
       const operator = this.operators.unary.get(node.operator);
 
       if (operator) {
-        if ('resolveParams' in operator) {
+        if ("resolveParams" in operator) {
           return operator(
             expressionContext,
             operator.resolveParams === false
@@ -312,7 +312,7 @@ export class ExpressionEvaluator {
       return;
     }
 
-    if (node.type === 'Object') {
+    if (node.type === "Object") {
       const { attributes } = node;
       const resolvedAttributes: any = {};
 
@@ -325,7 +325,7 @@ export class ExpressionEvaluator {
       return resolvedAttributes;
     }
 
-    if (node.type === 'CallExpression') {
+    if (node.type === "CallExpression") {
       const expressionName = node.callTarget.name;
 
       const operator = this.operators.expressions.get(expressionName);
@@ -334,7 +334,7 @@ export class ExpressionEvaluator {
         throw new Error(`Unknown expression function: ${expressionName}`);
       }
 
-      if ('resolveParams' in operator && operator.resolveParams === false) {
+      if ("resolveParams" in operator && operator.resolveParams === false) {
         return operator(expressionContext, ...node.args);
       }
 
@@ -343,26 +343,26 @@ export class ExpressionEvaluator {
       return operator(expressionContext, ...args);
     }
 
-    if (node.type === 'ModelRef') {
+    if (node.type === "ModelRef") {
       return model.get(node.ref, { context: { model: options.model } });
     }
 
-    if (node.type === 'MemberExpression') {
+    if (node.type === "MemberExpression") {
       const obj = resolveNode(node.object);
       const prop = resolveNode(node.property);
 
       return obj[prop];
     }
 
-    if (node.type === 'Assignment') {
-      if (node.left.type === 'ModelRef') {
+    if (node.type === "Assignment") {
+      if (node.left.type === "ModelRef") {
         const value = resolveNode(node.right);
         model.set([[node.left.ref, value]]);
 
         return value;
       }
 
-      if (node.left.type === 'Identifier') {
+      if (node.left.type === "Identifier") {
         const value = resolveNode(node.right);
         this.vars[node.left.name] = value;
         return value;
@@ -371,23 +371,23 @@ export class ExpressionEvaluator {
       return;
     }
 
-    if (node.type === 'ConditionalExpression') {
+    if (node.type === "ConditionalExpression") {
       const result = resolveNode(node.test) ? node.consequent : node.alternate;
 
       return resolveNode(result);
     }
 
-    if (node.type === 'ArrayExpression') {
+    if (node.type === "ArrayExpression") {
       return node.elements.map((ele) => resolveNode(ele));
     }
 
-    if (node.type === 'Modification') {
+    if (node.type === "Modification") {
       const operation = this.operators.binary.get(node.operator);
 
       if (operation) {
         let newValue;
 
-        if ('resolveParams' in operation) {
+        if ("resolveParams" in operation) {
           if (operation.resolveParams === false) {
             newValue = operation(expressionContext, node.left, node.right);
           } else {
@@ -401,9 +401,9 @@ export class ExpressionEvaluator {
           newValue = operation(resolveNode(node.left), resolveNode(node.right));
         }
 
-        if (node.left.type === 'ModelRef') {
+        if (node.left.type === "ModelRef") {
           model.set([[node.left.ref, newValue]]);
-        } else if (node.left.type === 'Identifier') {
+        } else if (node.left.type === "Identifier") {
           this.vars[node.left.name] = newValue;
         }
 

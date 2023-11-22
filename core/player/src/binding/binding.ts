@@ -1,4 +1,4 @@
-import { getBindingSegments } from './utils';
+import { getBindingSegments } from "./utils";
 
 export interface BindingParserOptions {
   /** Get the value for a specific binding */
@@ -46,9 +46,9 @@ export class BindingInstance {
     raw: RawBinding,
     factory = (rawBinding: RawBinding) => new BindingInstance(rawBinding),
   ) {
-    const split = Array.isArray(raw) ? raw : raw.split('.');
+    const split = Array.isArray(raw) ? raw : raw.split(".");
     this.split = split.map((segment) => {
-      if (typeof segment === 'number') {
+      if (typeof segment === "number") {
         return segment;
       }
 
@@ -56,7 +56,7 @@ export class BindingInstance {
       return isNaN(tryNum) ? segment : tryNum;
     });
     Object.freeze(this.split);
-    this.joined = this.split.join('.');
+    this.joined = this.split.join(".");
     this.factory = factory;
   }
 

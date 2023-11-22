@@ -70,11 +70,11 @@ describe('beacon web plugin', () => {
 
 describe('check-path tests', () => {
   const spy = jest.spyOn(React, 'useContext');
-  const hasParentContextMock = jest.fn();
-  const hasChildContextMock = jest.fn();
-  const getParentPropMock = jest.fn();
-  const getPathMock = jest.fn();
-  const getParentMock = jest.fn();
+  const hasParentContextMock = vitest.fn();
+  const hasChildContextMock = vitest.fn();
+  const getParentPropMock = vitest.fn();
+  const getPathMock = vitest.fn();
+  const getParentMock = vitest.fn();
 
   beforeEach(() => {
     spy.mockReturnValue({

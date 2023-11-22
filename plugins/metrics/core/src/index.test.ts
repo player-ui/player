@@ -54,7 +54,7 @@ const basicContentWithActions: Flow<any> = {
 };
 
 test('tracks metrics', () => {
-  const onUpdate = jest.fn();
+  const onUpdate = vitest.fn();
   const metrics = new MetricsCorePlugin({ onUpdate });
   const player = new Player({ plugins: [metrics] });
   player.start(basicContentWithActions);
@@ -86,7 +86,7 @@ test('tracks metrics', () => {
 });
 
 test('tracks metrics w/ render time', () => {
-  const onRenderEnd = jest.fn();
+  const onRenderEnd = vitest.fn();
   const metrics = new MetricsCorePlugin({
     trackRenderTime: true,
     trackUpdateTime: true,
@@ -134,7 +134,7 @@ test('tracks metrics w/ render time', () => {
 });
 
 test('handles double updates', async () => {
-  const onRenderEnd = jest.fn();
+  const onRenderEnd = vitest.fn();
   const metrics = new MetricsCorePlugin({
     trackRenderTime: true,
     trackUpdateTime: true,
@@ -189,7 +189,7 @@ class MyBeaconPluginPlugin implements BeaconPluginPlugin {
 }
 
 test('viewed beacon builder can use request time', async () => {
-  const getRequestTime = jest.fn().mockImplementation(() => 123);
+  const getRequestTime = vitest.fn().mockImplementation(() => 123);
   const metricsPlugin = new MetricsCorePlugin({
     trackRenderTime: true,
     trackUpdateTime: true,
@@ -208,7 +208,7 @@ test('viewed beacon builder can use request time', async () => {
 });
 
 test('viewed beacon builder can use render time', async () => {
-  const handler = jest.fn();
+  const handler = vitest.fn();
 
   const metricsPlugin = new MetricsCorePlugin({
     trackRenderTime: true,
@@ -238,7 +238,7 @@ test('viewed beacon builder can use render time', async () => {
 });
 
 test('viewed beacon builder can use render time when it resolves', async () => {
-  const handler = jest.fn();
+  const handler = vitest.fn();
 
   const metricsPlugin = new MetricsCorePlugin({
     trackRenderTime: true,

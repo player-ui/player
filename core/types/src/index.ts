@@ -146,7 +146,7 @@ export interface NavigationBaseState<T extends string> extends CommentBase {
    * TS gets really confused with both the ActionState and the onStart state both declaring the `exp` property
    * So this explicity says there should never be an exp prop on a state node that's not of type 'ACTION'
    */
-  exp?: T extends 'ACTION' ? Expression : never;
+  exp?: T extends "ACTION" ? Expression : never;
 }
 
 /** A generic state that can transition to another state */
@@ -158,7 +158,7 @@ export interface NavigationFlowTransitionableState<T extends string>
 
 /** A state representing a view  */
 export interface NavigationFlowViewState
-  extends NavigationFlowTransitionableState<'VIEW'> {
+  extends NavigationFlowTransitionableState<"VIEW"> {
   /** An id corresponding to a view from the 'views' array */
   ref: string;
 
@@ -174,7 +174,7 @@ export interface NavigationFlowViewState
 /**
  * An END state of the flow.
  */
-export interface NavigationFlowEndState extends NavigationBaseState<'END'> {
+export interface NavigationFlowEndState extends NavigationBaseState<"END"> {
   /**
    * A description of _how_ the flow ended.
    * If this is a flow started from another flow, the outcome determines the flow transition
@@ -187,7 +187,7 @@ export interface NavigationFlowEndState extends NavigationBaseState<'END'> {
 
 /** Action states execute an expression to determine the next state to transition to */
 export interface NavigationFlowActionState
-  extends NavigationFlowTransitionableState<'ACTION'> {
+  extends NavigationFlowTransitionableState<"ACTION"> {
   /**
    * An expression to execute.
    * The return value determines the transition to take
@@ -200,7 +200,7 @@ export interface NavigationFlowActionState
  * The flow will wait for the embedded application to manage moving to the next state via a transition
  */
 export interface NavigationFlowExternalState
-  extends NavigationFlowTransitionableState<'EXTERNAL'> {
+  extends NavigationFlowTransitionableState<"EXTERNAL"> {
   /** A reference for this external state */
   ref: string;
   /** Any additional properties are forwarded as options */
@@ -208,7 +208,7 @@ export interface NavigationFlowExternalState
 }
 
 export interface NavigationFlowFlowState
-  extends NavigationFlowTransitionableState<'FLOW'> {
+  extends NavigationFlowTransitionableState<"FLOW"> {
   /** A reference to a FLOW id state to run */
   ref: string;
 }
@@ -356,7 +356,7 @@ export declare namespace Validation {
    * Warning validations are reserved for errors that could be ignored by the user without consequence
    * Errors must be fixed before proceeding
    */
-  export type Severity = 'error' | 'warning';
+  export type Severity = "error" | "warning";
 
   /**
    * When to _first_ start caring about a validation of a data-val.
@@ -365,7 +365,7 @@ export declare namespace Validation {
    * change - check anytime the data changes
    * navigation - check once the user attempts to navigate away from a view
    */
-  export type Trigger = 'navigation' | 'change' | 'load';
+  export type Trigger = "navigation" | "change" | "load";
 
   /**
    * Where the error/warning should be displayed.
@@ -373,7 +373,7 @@ export declare namespace Validation {
    * - `section` is used to display a message at a parent node that is designated as a "section"
    * - `page` a special section used to display a message at the top of the page.
    */
-  export type DisplayTarget = 'page' | 'section' | 'field';
+  export type DisplayTarget = "page" | "section" | "field";
 
   /** A reference to a validation object */
   export interface Reference {
@@ -397,7 +397,7 @@ export declare namespace Validation {
      * By default, this is the value stored in the data-model (deformatted).
      * In the off chance you'd like this validator to run against the formatted value (the one the user sees), set this option
      */
-    dataTarget?: 'formatted' | 'deformatted';
+    dataTarget?: "formatted" | "deformatted";
 
     /** Where the error should be displayed */
     displayTarget?: DisplayTarget;
@@ -409,7 +409,7 @@ export declare namespace Validation {
      *
      * @default - true for errors, 'once' for warnings
      */
-    blocking?: boolean | 'once';
+    blocking?: boolean | "once";
 
     /** Additional props to send down to a Validator */
     [key: string]: unknown;
@@ -424,7 +424,7 @@ export declare namespace Validation {
   }
 }
 
-export type View<T extends Asset = Asset> = unknown extends T['validation']
+export type View<T extends Asset = Asset> = unknown extends T["validation"]
   ? T & {
       /** Each view can optionally supply a list of validations to run against a particular view */
       validation?: Array<Validation.CrossfieldReference>;

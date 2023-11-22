@@ -1,7 +1,7 @@
-import get from 'dlv';
-import { setIn, omit, removeAt } from 'timm';
-import type { BindingInstance } from '../binding';
-import type { BatchSetTransaction, DataModelImpl, Updates } from './model';
+import get from "dlv";
+import { setIn, omit, removeAt } from "timm";
+import type { BindingInstance } from "../binding";
+import type { BatchSetTransaction, DataModelImpl, Updates } from "./model";
 
 /**
  * A data model that stores data in an in-memory JS object

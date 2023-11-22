@@ -1,4 +1,4 @@
-import dlv from 'dlv';
+import dlv from "dlv";
 
 /** A function that checks overlapping properties against a reference value */
 export type Matcher = ((searchObj: object) => boolean) & {
@@ -15,9 +15,9 @@ function traverseObj(
   for (const key of Object.keys(object)) {
     const val: any = object[key];
     const nestedPath = [...path, key];
-    ('');
+    ("");
 
-    if (typeof val === 'object') {
+    if (typeof val === "object") {
       traverseObj(val, nestedPath, pairs);
     } else {
       pairs.set(nestedPath, val);

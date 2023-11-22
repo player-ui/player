@@ -1,8 +1,8 @@
-import type { Player, PlayerPlugin } from '../..';
+import type { Player, PlayerPlugin } from "../..";
 
 /** Just need something quick to use in tests */
 export class AssetTransformPlugin implements PlayerPlugin {
-  name = 'asset-transform-test';
+  name = "asset-transform-test";
   public readonly registry: Array<[string, any]>;
 
   constructor(transforms: Array<[string, any]>) {

@@ -2,24 +2,24 @@ import type {
   Schema,
   Formatting,
   Validation as ValidationTypes,
-} from '@player-ui/types';
+} from "@player-ui/types";
 import type {
   BindingInstance,
   BindingLike,
   BindingFactory,
-} from '../../binding';
+} from "../../binding";
 import type {
   DataModelWithParser,
   DataModelImpl,
   DataModelOptions,
-} from '../../data';
-import type { ConstantsProvider } from '../../controllers/constants';
-import type { TransitionFunction } from '../../controllers';
-import type { ExpressionEvaluator, ExpressionType } from '../../expressions';
-import type { ValidationResponse } from '../../validator';
-import type { Logger } from '../../logger';
-import type { SchemaController } from '../../schema';
-import type { Node } from '../parser';
+} from "../../data";
+import type { ConstantsProvider } from "../../controllers/constants";
+import type { TransitionFunction } from "../../controllers";
+import type { ExpressionEvaluator, ExpressionType } from "../../expressions";
+import type { ValidationResponse } from "../../validator";
+import type { Logger } from "../../logger";
+import type { SchemaController } from "../../schema";
+import type { Node } from "../parser";
 
 export interface ValidationGetResolveOptions {
   /**
@@ -90,7 +90,7 @@ export declare namespace Resolve {
     /** Register node as a section */
     register: (options?: {
       /** While type of Display Target group it should register as */
-      type: Exclude<ValidationTypes.DisplayTarget, 'field'>;
+      type: Exclude<ValidationTypes.DisplayTarget, "field">;
     }) => void;
   }
 
@@ -142,7 +142,7 @@ export declare namespace Resolve {
     data: NodeDataOptions;
 
     /** The data dependencies that were requested during the resolution */
-    getDependencies?(scope?: 'core' | 'children'): Set<BindingInstance>;
+    getDependencies?(scope?: "core" | "children"): Set<BindingInstance>;
 
     /** original node */
     node?: Node.Node;

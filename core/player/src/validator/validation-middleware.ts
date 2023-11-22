@@ -1,17 +1,17 @@
-import { setIn } from 'timm';
-import type { BindingInstance } from '../binding';
+import { setIn } from "timm";
+import type { BindingInstance } from "../binding";
 import type {
   BatchSetTransaction,
   DataModelImpl,
   DataModelOptions,
   DataModelMiddleware,
   Updates,
-} from '../data';
-import { toModel } from '../data';
-import type { Logger } from '../logger';
+} from "../data";
+import { toModel } from "../data";
+import type { Logger } from "../logger";
 
-import type { ValidationResponse } from './types';
-import { removeBindingAndChildrenFromMap } from './binding-map-splice';
+import type { ValidationResponse } from "./types";
+import { removeBindingAndChildrenFromMap } from "./binding-map-splice";
 
 /**
  * A BindingInstance with an indicator of whether or not it's a strong binding

@@ -1,18 +1,18 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { BindingParser } from '../../../binding';
-import type { DataModelWithParser } from '../../../data';
-import { LocalModel, withParser } from '../../../data';
-import { ExpressionEvaluator } from '../../../expressions';
-import { SchemaController } from '../../../schema';
-import type { Resolve } from '../../resolver';
-import { Resolver } from '../../resolver';
-import type { Node } from '../../parser';
-import { Parser } from '../../parser';
-import { ApplicabilityPlugin, StringResolverPlugin } from '..';
+import { describe, it, expect, beforeEach } from "vitest";
+import { BindingParser } from "../../../binding";
+import type { DataModelWithParser } from "../../../data";
+import { LocalModel, withParser } from "../../../data";
+import { ExpressionEvaluator } from "../../../expressions";
+import { SchemaController } from "../../../schema";
+import type { Resolve } from "../../resolver";
+import { Resolver } from "../../resolver";
+import type { Node } from "../../parser";
+import { Parser } from "../../parser";
+import { ApplicabilityPlugin, StringResolverPlugin } from "..";
 
 const parseBinding = new BindingParser().parse;
 
-describe('applicability', () => {
+describe("applicability", () => {
   let model: DataModelWithParser;
   let expressionEvaluator: ExpressionEvaluator;
   let resolverOptions: Resolve.ResolverOptions;
@@ -34,7 +34,7 @@ describe('applicability', () => {
     };
   });
 
-  it('undefined does not remove asset', () => {
+  it("undefined does not remove asset", () => {
     const aP = new ApplicabilityPlugin();
     const sP = new StringResolverPlugin();
 
@@ -44,11 +44,11 @@ describe('applicability', () => {
       asset: {
         values: [
           {
-            applicability: '{{foo}}',
-            value: 'foo',
+            applicability: "{{foo}}",
+            value: "foo",
           },
           {
-            value: 'bar',
+            value: "bar",
           },
         ],
       },
@@ -60,94 +60,94 @@ describe('applicability', () => {
     sP.applyResolver(resolver);
 
     expect(resolver.update()).toStrictEqual({
-      asset: { values: [{ value: 'foo' }, { value: 'bar' }] },
+      asset: { values: [{ value: "foo" }, { value: "bar" }] },
     });
-    model.set([['foo', false]]);
+    model.set([["foo", false]]);
     expect(resolver.update()).toStrictEqual({
-      asset: { values: [{ value: 'bar' }] },
+      asset: { values: [{ value: "bar" }] },
     });
   });
 
-  it('removes empty objects', () => {
+  it("removes empty objects", () => {
     new ApplicabilityPlugin().applyParser(parser);
     const root = parser.parseObject({
       asset: {
         values: [
           {
-            applicability: '{{foo}}',
-            value: 'foo',
+            applicability: "{{foo}}",
+            value: "foo",
           },
           {
-            value: 'bar',
+            value: "bar",
           },
         ],
       },
     });
-    model.set([['foo', true]]);
+    model.set([["foo", true]]);
     const resolver = new Resolver(root as Node.Node, resolverOptions);
 
     new ApplicabilityPlugin().applyResolver(resolver);
     new StringResolverPlugin().applyResolver(resolver);
 
     expect(resolver.update()).toStrictEqual({
-      asset: { values: [{ value: 'foo' }, { value: 'bar' }] },
+      asset: { values: [{ value: "foo" }, { value: "bar" }] },
     });
 
-    model.set([['foo', false]]);
+    model.set([["foo", false]]);
     expect(resolver.update()).toStrictEqual({
-      asset: { values: [{ value: 'bar' }] },
+      asset: { values: [{ value: "bar" }] },
     });
   });
 
-  it('removes asset wrappers', () => {
+  it("removes asset wrappers", () => {
     new ApplicabilityPlugin().applyParser(parser);
     const root = parser.parseObject({
       asset: {
         title: {
-          applicability: '{{foo}}',
+          applicability: "{{foo}}",
           asset: {
-            value: 'foo',
+            value: "foo",
           },
         },
-        value: 'Hello World',
+        value: "Hello World",
       },
     });
-    model.set([['foo', true]]);
+    model.set([["foo", true]]);
     const resolver = new Resolver(root as Node.Node, resolverOptions);
 
     new ApplicabilityPlugin().applyResolver(resolver);
     new StringResolverPlugin().applyResolver(resolver);
 
     expect(resolver.update()).toStrictEqual({
-      asset: { title: { asset: { value: 'foo' } }, value: 'Hello World' },
+      asset: { title: { asset: { value: "foo" } }, value: "Hello World" },
     });
-    model.set([['foo', false]]);
+    model.set([["foo", false]]);
     expect(resolver.update()).toStrictEqual({
-      asset: { value: 'Hello World' },
+      asset: { value: "Hello World" },
     });
   });
 
-  it('handles empty models', () => {
+  it("handles empty models", () => {
     new ApplicabilityPlugin().applyParser(parser);
     const root = parser.parseObject({
       asset: {
         values: [
           {
             asset: {
-              id: 'some-asset-1',
-              type: 'text',
+              id: "some-asset-1",
+              type: "text",
             },
           },
           {
             asset: {
-              id: 'some-asset-2',
-              type: 'text',
-              applicability: '{{foo}} == true',
-              value: 'foo',
+              id: "some-asset-2",
+              type: "text",
+              applicability: "{{foo}} == true",
+              value: "foo",
               label: {
                 asset: {
-                  applicability: '{{bar}} == true',
-                  value: 'bar',
+                  applicability: "{{bar}} == true",
+                  value: "bar",
                 },
               },
             },
@@ -155,8 +155,8 @@ describe('applicability', () => {
         ],
       },
     });
-    const fooBinding = parseBinding('foo');
-    const barBinding = parseBinding('bar');
+    const fooBinding = parseBinding("foo");
+    const barBinding = parseBinding("bar");
 
     model.set([
       [fooBinding, true],
@@ -172,16 +172,16 @@ describe('applicability', () => {
         values: [
           {
             asset: {
-              id: 'some-asset-1',
-              type: 'text',
+              id: "some-asset-1",
+              type: "text",
             },
           },
           {
             asset: {
-              id: 'some-asset-2',
-              type: 'text',
-              value: 'foo',
-              label: { asset: { value: 'bar' } },
+              id: "some-asset-2",
+              type: "text",
+              value: "foo",
+              label: { asset: { value: "bar" } },
             },
           },
         ],
@@ -193,8 +193,8 @@ describe('applicability', () => {
         values: [
           {
             asset: {
-              id: 'some-asset-1',
-              type: 'text',
+              id: "some-asset-1",
+              type: "text",
             },
           },
         ],
@@ -207,16 +207,16 @@ describe('applicability', () => {
         values: [
           {
             asset: {
-              id: 'some-asset-1',
-              type: 'text',
+              id: "some-asset-1",
+              type: "text",
             },
           },
           {
             asset: {
-              id: 'some-asset-2',
-              type: 'text',
-              value: 'foo',
-              label: { asset: { value: 'bar' } },
+              id: "some-asset-2",
+              type: "text",
+              value: "foo",
+              label: { asset: { value: "bar" } },
             },
           },
         ],
@@ -229,15 +229,15 @@ describe('applicability', () => {
         values: [
           {
             asset: {
-              id: 'some-asset-1',
-              type: 'text',
+              id: "some-asset-1",
+              type: "text",
             },
           },
           {
             asset: {
-              id: 'some-asset-2',
-              type: 'text',
-              value: 'foo',
+              id: "some-asset-2",
+              type: "text",
+              value: "foo",
             },
           },
         ],
@@ -245,19 +245,19 @@ describe('applicability', () => {
     });
   });
 
-  it('determines if nodeType is applicability', () => {
+  it("determines if nodeType is applicability", () => {
     new ApplicabilityPlugin().applyParser(parser);
     const nodeTest = {
-      applicability: '{{bar}} == true',
+      applicability: "{{bar}} == true",
     };
     const nodeType = parser.hooks.determineNodeType.call(nodeTest);
-    expect(nodeType).toStrictEqual('applicability');
+    expect(nodeType).toStrictEqual("applicability");
   });
 
-  it('Does not return a nodeType', () => {
+  it("Does not return a nodeType", () => {
     new ApplicabilityPlugin().applyParser(parser);
     const nodeTest = {
-      value: 'foo',
+      value: "foo",
     };
     const nodeType = parser.hooks.determineNodeType.call(nodeTest);
     expect(nodeType).toBe(undefined);

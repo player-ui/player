@@ -1,8 +1,8 @@
-import type { Asset } from '@player-ui/types';
-import type { Registry } from '@player-ui/partial-match-registry';
+import type { Asset } from "@player-ui/types";
+import type { Registry } from "@player-ui/partial-match-registry";
 
-import type { Resolve, Node } from '../../view';
-import type { Store } from './store';
+import type { Resolve, Node } from "../../view";
+import type { Store } from "./store";
 
 /** Transform function that is ran on the Asset before it's resolved */
 export type BeforeTransformFunction<AuthoredAsset extends Asset = Asset> = (

@@ -27,11 +27,16 @@ js_library(
     name = "vitest_config",
     testonly = True,
     srcs = [
+        "scripts/vitest.setup.ts",
         "vitest.config.ts",
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//:node_modules/@testing-library/jest-dom",
+        "//:node_modules/@testing-library/react",
+        "//:node_modules/@testing-library/react-hooks",
         "//:node_modules/@vitest/coverage-v8",
+        "//:node_modules/happy-dom",
         "//:node_modules/vitest",
     ],
 )
@@ -41,7 +46,6 @@ js_library(
     testonly = True,
     srcs = [
         ".eslintrc.js",
-        ".prettierrc",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -49,6 +53,7 @@ js_library(
         ":node_modules/@typescript-eslint/parser",
         ":node_modules/eslint",
         ":node_modules/eslint-plugin-prettier",
+        ":node_modules/eslint-plugin-react",
     ],
 )
 
@@ -67,7 +72,7 @@ js_library(
 
 js_library(
     name = "typings",
-    data = ["tsconfig.json"] + glob(['typings/*']),
+    data = ["tsconfig.json"] + glob(["typings/*"]),
     visibility = ["//visibility:public"],
 )
 # PlayerUI(deps = [])

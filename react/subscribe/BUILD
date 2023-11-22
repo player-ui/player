@@ -1,13 +1,21 @@
-load("//:index.bzl", "javascript_pipeline")
+load("@rules_player//javascript:defs.bzl", "js_pipeline")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//tools:defs.bzl", "tsup_config", "vitest_config")
 
-javascript_pipeline(
-    name = "@player-ui/react-subscribe",
-    entry = "src/index.tsx",
-    dependencies = [
-        "@npm//p-defer",
+npm_link_all_packages(name = "node_modules")
+
+tsup_config(name = "tsup_config")
+
+vitest_config(name = "vitest_config")
+
+js_pipeline(
+    name = "subscribe",
+    package_name = "@player-ui/react-subscribe",
+    peer_deps = [
+        "//:node_modules/@types/react",
+        "//:node_modules/react",
     ],
-    peer_dependencies = [
-        "@npm//@types/react",
-        "@npm//react",
+    deps = [
+        "//:node_modules/p-defer",
     ],
 )

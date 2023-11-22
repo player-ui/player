@@ -1,17 +1,17 @@
-import { SyncHook, SyncWaterfallHook } from 'tapable-ts';
-import queueMicrotask from 'queue-microtask';
-import { Registry } from '@player-ui/partial-match-registry';
-import type { View, NavigationFlowViewState } from '@player-ui/types';
+import { SyncHook, SyncWaterfallHook } from "tapable-ts";
+import queueMicrotask from "queue-microtask";
+import { Registry } from "@player-ui/partial-match-registry";
+import type { View, NavigationFlowViewState } from "@player-ui/types";
 
-import { resolveDataRefsInString } from '../../string-resolver';
-import type { Resolve } from '../../view';
-import { ViewInstance } from '../../view';
-import type { Logger } from '../../logger';
-import type { FlowInstance, FlowController } from '../flow';
-import type { DataController } from '../data/controller';
-import { AssetTransformCorePlugin } from './asset-transform';
-import type { TransformRegistry } from './types';
-import type { BindingInstance } from '../../binding';
+import { resolveDataRefsInString } from "../../string-resolver";
+import type { Resolve } from "../../view";
+import { ViewInstance } from "../../view";
+import type { Logger } from "../../logger";
+import type { FlowInstance, FlowController } from "../flow";
+import type { DataController } from "../data/controller";
+import { AssetTransformCorePlugin } from "./asset-transform";
+import type { TransformRegistry } from "./types";
+import type { BindingInstance } from "../../binding";
 
 export interface ViewControllerOptions {
   /** Where to get data from */
@@ -63,10 +63,10 @@ export class ViewController {
     new AssetTransformCorePlugin(this.transformRegistry).apply(this);
 
     options.flowController.hooks.flow.tap(
-      'viewController',
+      "viewController",
       (flow: FlowInstance) => {
-        flow.hooks.transition.tap('viewController', (_oldState, newState) => {
-          if (newState.value.state_type === 'VIEW') {
+        flow.hooks.transition.tap("viewController", (_oldState, newState) => {
+          if (newState.value.state_type === "VIEW") {
             this.onView(newState.value);
           } else {
             this.currentView = undefined;
@@ -86,16 +86,16 @@ export class ViewController {
       }
     };
 
-    options.model.hooks.onUpdate.tap('viewController', (updates) => {
+    options.model.hooks.onUpdate.tap("viewController", (updates) => {
       update(new Set(updates.map((t) => t.binding)));
     });
 
-    options.model.hooks.onDelete.tap('viewController', (binding) => {
+    options.model.hooks.onDelete.tap("viewController", (binding) => {
       const parentBinding = binding.parent();
       const property = binding.key();
 
       // Deleting an array item will trigger an update for the entire array
-      if (typeof property === 'number' && parentBinding) {
+      if (typeof property === "number" && parentBinding) {
         update(new Set([parentBinding]));
       } else {
         update(new Set([binding]));

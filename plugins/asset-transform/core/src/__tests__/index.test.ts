@@ -333,8 +333,8 @@ test('uses the same store', () => {
 });
 
 test('merges registries', () => {
-  const actionFn1 = jest.fn();
-  const actionFn2 = jest.fn();
+  const actionFn1 = vitest.fn();
+  const actionFn2 = vitest.fn();
 
   const player = new Player({
     plugins: [

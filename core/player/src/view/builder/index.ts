@@ -1,5 +1,5 @@
-import type { Node, AnyAssetType } from '../parser';
-import { NodeType } from '../parser';
+import type { Node, AnyAssetType } from "../parser";
+import { NodeType } from "../parser";
 
 /**
  * Functions for building AST nodes (relatively) easily

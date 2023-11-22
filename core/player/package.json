@@ -6,5 +6,8 @@
     "@player-ui/partial-match-registry": "workspace:*",
     "@player-ui/make-flow": "workspace:*",
     "@player-ui/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@player-ui/common-types-plugin": "workspace:*"
   }
 }

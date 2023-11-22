@@ -1,8 +1,8 @@
-import type { IToken } from 'ebnf';
+import type { IToken } from "ebnf";
 
 export interface ValueToken extends IToken {
   /** A value type  */
-  type: 'value';
+  type: "value";
 
   /** Any children of the value */
   children: Array<SegmentAndBracketToken>;
@@ -10,7 +10,7 @@ export interface ValueToken extends IToken {
 
 export interface SegmentAndBracketToken extends IToken {
   /** A token for a segment + brackets */
-  type: 'segment_and_bracket';
+  type: "segment_and_bracket";
 
   /** The segment + brackets */
   children: [SegmentToken, ...Array<BracketToken>];
@@ -18,7 +18,7 @@ export interface SegmentAndBracketToken extends IToken {
 
 export interface SegmentToken extends IToken {
   /** A segment token */
-  type: 'segment';
+  type: "segment";
 
   /** Any children of the token */
   children: [ConcatenatedToken | IdentifierToken];
@@ -26,14 +26,14 @@ export interface SegmentToken extends IToken {
 
 export interface BracketToken extends IToken {
   /** A bracket token */
-  type: 'bracket';
+  type: "bracket";
   /** Any children of the token */
   children: [OptionallyQuotedSegment | QueryToken];
 }
 
 export interface ExpressionValueToken extends IToken {
   /** Expression value token */
-  type: 'expression_value';
+  type: "expression_value";
 
   /** No children here */
   children: [];
@@ -41,7 +41,7 @@ export interface ExpressionValueToken extends IToken {
 
 export interface ExpressionToken extends IToken {
   /** Expression token */
-  type: 'expression';
+  type: "expression";
 
   /** Children is the expression value */
   children: [ExpressionValueToken];
@@ -49,42 +49,42 @@ export interface ExpressionToken extends IToken {
 
 export interface QuotedValueToken extends IToken {
   /** A quoted value */
-  type: 'quoted_value';
+  type: "quoted_value";
   /** Any children of the token */
   children: [];
 }
 
 export interface IdentifierToken extends IToken {
   /** Any identifier */
-  type: 'identifier';
+  type: "identifier";
   /** Any children of the token */
   children: [];
 }
 
 export interface ConcatenatedToken extends IToken {
   /** A node of more than 1 identifier */
-  type: 'concatenated';
+  type: "concatenated";
   /** Any children of the token */
   children: Array<IdentifierToken | ModelRefToken | ExpressionToken>;
 }
 
 export interface ModelRefToken extends IToken {
   /** A nested model reference */
-  type: 'modelRef';
+  type: "modelRef";
   /** Any children of the token */
   children: [ValueToken];
 }
 
 export interface OptionallyQuotedSegment extends IToken {
   /** Any optionally quoted segment */
-  type: 'optionally_quoted_segment';
+  type: "optionally_quoted_segment";
   /** Any children of the token */
   children: [QuotedValueToken | SegmentToken];
 }
 
 export interface QueryToken extends IToken {
   /** A query */
-  type: 'query';
+  type: "query";
   /** Any children of the token */
   children: [OptionallyQuotedSegment, OptionallyQuotedSegment];
 }

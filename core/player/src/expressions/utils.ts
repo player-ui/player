@@ -1,4 +1,4 @@
-import { isExpressionNode } from './types';
+import { isExpressionNode } from "./types";
 import type {
   ExpressionHandler,
   ExpressionNode,
@@ -6,7 +6,7 @@ import type {
   ExpressionType,
   NodeLocation,
   NodePosition,
-} from './types';
+} from "./types";
 
 /** Generates a function by removing the first context argument */
 export function withoutContext<T extends unknown[], Return>(
@@ -32,10 +32,10 @@ export function findClosestNodeAtPosition(
 
   // eslint-disable-next-line default-case
   switch (node.type) {
-    case 'Modification':
-    case 'Assignment':
-    case 'LogicalExpression':
-    case 'BinaryExpression': {
+    case "Modification":
+    case "Assignment":
+    case "LogicalExpression":
+    case "BinaryExpression": {
       const check =
         findClosestNodeAtPosition(node.left, position) ??
         findClosestNodeAtPosition(node.right, position);
@@ -46,7 +46,7 @@ export function findClosestNodeAtPosition(
       break;
     }
 
-    case 'UnaryExpression': {
+    case "UnaryExpression": {
       const checkArg = findClosestNodeAtPosition(node.argument, position);
       if (checkArg) {
         return checkArg;
@@ -55,7 +55,7 @@ export function findClosestNodeAtPosition(
       break;
     }
 
-    case 'MemberExpression': {
+    case "MemberExpression": {
       const checkObject =
         findClosestNodeAtPosition(node.object, position) ??
         findClosestNodeAtPosition(node.property, position);
@@ -66,7 +66,7 @@ export function findClosestNodeAtPosition(
       break;
     }
 
-    case 'ConditionalExpression': {
+    case "ConditionalExpression": {
       const checkObject =
         findClosestNodeAtPosition(node.test, position) ??
         findClosestNodeAtPosition(node.consequent, position) ??
@@ -78,10 +78,10 @@ export function findClosestNodeAtPosition(
       break;
     }
 
-    case 'ArrayExpression':
-    case 'Compound': {
+    case "ArrayExpression":
+    case "Compound": {
       const elements =
-        node.type === 'ArrayExpression' ? node.elements : node.body;
+        node.type === "ArrayExpression" ? node.elements : node.body;
 
       const anyElements = elements.find((e) =>
         findClosestNodeAtPosition(e, position),
@@ -94,7 +94,7 @@ export function findClosestNodeAtPosition(
       break;
     }
 
-    case 'Object': {
+    case "Object": {
       const checkObject = node.attributes.reduce<ExpressionNode | undefined>(
         (found, next) => {
           return (
@@ -113,7 +113,7 @@ export function findClosestNodeAtPosition(
       break;
     }
 
-    case 'CallExpression': {
+    case "CallExpression": {
       const anyArgs =
         node.args.find((arg) => {
           return findClosestNodeAtPosition(arg, position);
@@ -142,9 +142,9 @@ export function isObjectExpression(
   }
 
   return (
-    typeof expr === 'object' &&
+    typeof expr === "object" &&
     expr !== null &&
     !Array.isArray(expr) &&
-    'value' in expr
+    "value" in expr
   );
 }

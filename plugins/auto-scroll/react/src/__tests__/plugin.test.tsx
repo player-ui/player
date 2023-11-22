@@ -140,7 +140,7 @@ describe('auto-scroll plugin', () => {
   });
 
   test('works with custom base element and offset', async () => {
-    const getBaseElementMock = jest.fn();
+    const getBaseElementMock = vitest.fn();
 
     const wp = new ReactPlayer({
       plugins: [
@@ -198,7 +198,7 @@ describe('auto-scroll plugin', () => {
   });
 
   test('works without custom base element and offset provided', async () => {
-    const getBaseElementMock = jest.fn();
+    const getBaseElementMock = vitest.fn();
 
     const wp = new ReactPlayer({
       plugins: [

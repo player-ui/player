@@ -1,9 +1,9 @@
-import type { Player, PlayerFlowState } from '@player-ui/player';
-import { NOT_STARTED_STATE } from '@player-ui/player';
-import React from 'react';
-import type { ReactPlayerOptions } from './player';
-import { ReactPlayer } from './player';
-import { StateTapPlugin } from './plugins/tapstate-plugin';
+import type { Player, PlayerFlowState } from "@player-ui/player";
+import { NOT_STARTED_STATE } from "@player-ui/player";
+import React from "react";
+import type { ReactPlayerOptions } from "./player";
+import { ReactPlayer } from "./player";
+import { StateTapPlugin } from "./plugins/tapstate-plugin";
 
 export interface UseReactPlayerReturn {
   /** The web-player instance */
@@ -19,7 +19,7 @@ export interface UseReactPlayerReturn {
  * Simply supply your config, plugins, and an optional flow, which will be automatically started for you when changed.
  */
 export const useReactPlayer = (
-  options?: ReactPlayerOptions
+  options?: ReactPlayerOptions,
 ): UseReactPlayerReturn => {
   const [playerState, setPlayerState] =
     React.useState<PlayerFlowState>(NOT_STARTED_STATE);

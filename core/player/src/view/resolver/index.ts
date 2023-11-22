@@ -1,22 +1,22 @@
-import { SyncWaterfallHook, SyncHook } from 'tapable-ts';
-import { setIn, addLast, clone } from 'timm';
-import dlv from 'dlv';
-import { dequal } from 'dequal';
-import type { BindingInstance, BindingLike } from '../../binding';
+import { SyncWaterfallHook, SyncHook } from "tapable-ts";
+import { setIn, addLast, clone } from "timm";
+import dlv from "dlv";
+import { dequal } from "dequal";
+import type { BindingInstance, BindingLike } from "../../binding";
 import type {
   DataModelOptions,
   DataModelWithParser,
   Updates,
-} from '../../data';
-import { DependencyModel, withParser } from '../../data';
-import type { Logger } from '../../logger';
-import type { Node } from '../parser';
-import { NodeType } from '../parser';
-import { caresAboutDataChanges, toNodeResolveOptions } from './utils';
-import type { Resolve } from './types';
+} from "../../data";
+import { DependencyModel, withParser } from "../../data";
+import type { Logger } from "../../logger";
+import type { Node } from "../parser";
+import { NodeType } from "../parser";
+import { caresAboutDataChanges, toNodeResolveOptions } from "./utils";
+import type { Resolve } from "./types";
 
-export * from './types';
-export * from './utils';
+export * from "./types";
+export * from "./utils";
 
 interface NodeUpdate extends Resolve.ResolvedNode {
   /** A flag to track if a node has changed since the last resolution */
@@ -178,8 +178,8 @@ export class Resolver {
       (node.type === NodeType.Asset ||
         node.type === NodeType.View ||
         node.type === NodeType.Value) &&
-      typeof node.value === 'object' &&
-      typeof node.value?.id === 'string'
+      typeof node.value === "object" &&
+      typeof node.value?.id === "string"
     ) {
       return node.value.id;
     }
@@ -223,10 +223,10 @@ export class Resolver {
     const clonedNode = clone(node);
 
     Object.keys(clonedNode).forEach((key) => {
-      if (key === 'parent') return;
+      if (key === "parent") return;
 
       const value = clonedNode[key];
-      if (typeof value === 'object' && value !== null) {
+      if (typeof value === "object" && value !== null) {
         clonedNode[key] = Array.isArray(value) ? [...value] : { ...value };
       }
     });
@@ -245,7 +245,7 @@ export class Resolver {
   ): NodeUpdate {
     const dependencyModel = new DependencyModel(options.data.model);
 
-    dependencyModel.trackSubset('core');
+    dependencyModel.trackSubset("core");
     const depModelWithParser = withContext(
       withParser(dependencyModel, this.options.parseBinding),
     );
@@ -310,7 +310,7 @@ export class Resolver {
           );
         };
 
-        if ('children' in resolvedAST) {
+        if ("children" in resolvedAST) {
           resolvedAST.children?.forEach(({ value: childAST }) =>
             handleChildNode(childAST),
           );
@@ -360,9 +360,9 @@ export class Resolver {
     }
 
     const childDependencies = new Set<BindingInstance>();
-    dependencyModel.trackSubset('children');
+    dependencyModel.trackSubset("children");
 
-    if ('children' in resolvedAST) {
+    if ("children" in resolvedAST) {
       const newChildren = resolvedAST.children?.map((child) => {
         const computedChildTree = this.computeTree(
           child.value,
@@ -433,14 +433,14 @@ export class Resolver {
       dependencyModel.addChildReadDep(bindingDep),
     );
 
-    dependencyModel.trackSubset('core');
+    dependencyModel.trackSubset("core");
     if (previousResult && !updated) {
       resolved = previousResult?.value;
     }
 
     resolved = this.hooks.afterResolve.call(resolved, resolvedAST, {
       ...resolveOptions,
-      getDependencies: (scope?: 'core' | 'children') =>
+      getDependencies: (scope?: "core" | "children") =>
         dependencyModel.getDependencies(scope),
     });
 

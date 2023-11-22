@@ -1,35 +1,35 @@
-import { test, vitest, expect } from 'vitest';
-import type { FlowController } from '../controllers';
-import type { DataController } from '..';
-import { Player } from '..';
-import type { InProgressState } from '../types';
+import { test, vitest, expect } from "vitest";
+import type { FlowController } from "../controllers";
+import type { DataController } from "..";
+import { Player } from "..";
+import type { InProgressState } from "../types";
 
-test('transitions on action nodes', async () => {
+test("transitions on action nodes", async () => {
   const player = new Player();
 
   player.start({
-    id: 'test-flow',
+    id: "test-flow",
     data: {
       my: {
-        puppy: 'Ginger',
+        puppy: "Ginger",
       },
     },
     navigation: {
-      BEGIN: 'FLOW_1',
+      BEGIN: "FLOW_1",
       FLOW_1: {
-        startState: 'ACTION_1',
+        startState: "ACTION_1",
         ACTION_1: {
-          state_type: 'ACTION',
-          exp: '{{my.puppy}}',
+          state_type: "ACTION",
+          exp: "{{my.puppy}}",
           transitions: {
-            Ginger: 'EXTERNAL_1',
+            Ginger: "EXTERNAL_1",
           },
         },
         EXTERNAL_1: {
-          state_type: 'EXTERNAL',
-          ref: 'view_1',
+          state_type: "EXTERNAL",
+          ref: "view_1",
           param: {
-            best: '{{my.puppy}}',
+            best: "{{my.puppy}}",
           },
           transitions: {},
         },
@@ -38,63 +38,63 @@ test('transitions on action nodes', async () => {
   });
 
   await vitest.waitFor(() =>
-    expect(player.getState().status).toBe('in-progress'),
+    expect(player.getState().status).toBe("in-progress"),
   );
 
   const state = player.getState();
   const currentState = (state as InProgressState).controllers.flow.current
     ?.currentState;
-  expect(currentState?.name).toBe('EXTERNAL_1');
+  expect(currentState?.name).toBe("EXTERNAL_1");
   expect(currentState?.value).toStrictEqual({
-    state_type: 'EXTERNAL',
-    ref: 'view_1',
+    state_type: "EXTERNAL",
+    ref: "view_1",
     param: {
-      best: 'Ginger',
+      best: "Ginger",
     },
     transitions: {},
   });
 });
 
-test('resolves data when transitioning', async () => {
+test("resolves data when transitioning", async () => {
   const player = new Player();
 
   let flowController: FlowController | undefined;
 
-  player.hooks.flowController.tap('test', (fc) => {
+  player.hooks.flowController.tap("test", (fc) => {
     flowController = fc;
   });
 
   const flowResponse = player.start({
-    id: 'test-flow',
+    id: "test-flow",
     views: [
-      { id: 'view-1', type: 'view' },
-      { id: 'view-2', type: 'view' },
+      { id: "view-1", type: "view" },
+      { id: "view-2", type: "view" },
     ],
     data: {
       viewNum: 2,
-      outcomeData: 'not good',
+      outcomeData: "not good",
     },
     navigation: {
-      BEGIN: 'FLOW_1',
+      BEGIN: "FLOW_1",
       FLOW_1: {
-        startState: 'VIEW_1',
+        startState: "VIEW_1",
         VIEW_1: {
-          state_type: 'VIEW',
-          ref: 'view-1',
+          state_type: "VIEW",
+          ref: "view-1",
           transitions: {
-            Next: 'VIEW_{{viewNum}}',
+            Next: "VIEW_{{viewNum}}",
           },
         },
         VIEW_2: {
-          state_type: 'VIEW',
-          ref: 'view-{{viewNum}}',
+          state_type: "VIEW",
+          ref: "view-{{viewNum}}",
           transitions: {
-            '*': 'END',
+            "*": "END",
           },
         },
         END: {
-          state_type: 'END',
-          outcome: '{{outcomeData}}',
+          state_type: "END",
+          outcome: "{{outcomeData}}",
         },
       },
     },
@@ -106,49 +106,49 @@ test('resolves data when transitioning', async () => {
       ?.lastUpdate;
 
   expect(getView()).toStrictEqual({
-    id: 'view-1',
-    type: 'view',
+    id: "view-1",
+    type: "view",
   });
 
-  flowController?.transition('Next');
+  flowController?.transition("Next");
 
   expect(getView()).toStrictEqual({
-    id: 'view-2',
-    type: 'view',
+    id: "view-2",
+    type: "view",
   });
 
-  flowController?.transition('Next');
+  flowController?.transition("Next");
   expect((await flowResponse).endState).toStrictEqual({
-    state_type: 'END',
-    outcome: 'not good',
+    state_type: "END",
+    outcome: "not good",
   });
 });
 
-test('resolves dynamic view ids', () => {
+test("resolves dynamic view ids", () => {
   const player = new Player();
 
   player.start({
-    id: 'test-flow',
-    views: [{ id: 'view-1-{{name}}', type: 'view' }],
+    id: "test-flow",
+    views: [{ id: "view-1-{{name}}", type: "view" }],
     data: {
       viewNum: 1,
-      name: 'adam',
-      outcomeData: 'not good',
+      name: "adam",
+      outcomeData: "not good",
     },
     navigation: {
-      BEGIN: 'FLOW_1',
+      BEGIN: "FLOW_1",
       FLOW_1: {
-        startState: 'VIEW_1',
+        startState: "VIEW_1",
         VIEW_1: {
-          state_type: 'VIEW',
-          ref: 'view-1-adam',
+          state_type: "VIEW",
+          ref: "view-1-adam",
           transitions: {
-            Next: 'END',
+            Next: "END",
           },
         },
         END: {
-          state_type: 'END',
-          outcome: '{{outcomeData}}',
+          state_type: "END",
+          outcome: "{{outcomeData}}",
         },
       },
     },
@@ -156,57 +156,57 @@ test('resolves dynamic view ids', () => {
 
   const state = player.getState();
 
-  expect(state.status).toBe('in-progress');
+  expect(state.status).toBe("in-progress");
   expect(
     (state as InProgressState).controllers.view.currentView?.lastUpdate?.id,
-  ).toBe('view-1-adam');
+  ).toBe("view-1-adam");
 });
 
-test('resolves data when completing', async () => {
+test("resolves data when completing", async () => {
   const player = new Player();
 
   let flowController: FlowController | undefined;
   let dataController: DataController | undefined;
 
-  player.hooks.flowController.tap('test', (fc) => {
+  player.hooks.flowController.tap("test", (fc) => {
     flowController = fc;
   });
 
-  player.hooks.dataController.tap('test', (dc) => {
+  player.hooks.dataController.tap("test", (dc) => {
     dataController = dc;
   });
 
   const flowResponse = player.start({
-    id: 'test-flow',
+    id: "test-flow",
     views: [
-      { id: 'view-1', type: 'view' },
-      { id: 'view-2', type: 'view' },
+      { id: "view-1", type: "view" },
+      { id: "view-2", type: "view" },
     ],
     data: {
       viewNum: 2,
-      outcomeData: 'not good',
+      outcomeData: "not good",
     },
     navigation: {
-      BEGIN: 'FLOW_1',
+      BEGIN: "FLOW_1",
       FLOW_1: {
-        startState: 'VIEW_1',
+        startState: "VIEW_1",
         VIEW_1: {
-          state_type: 'VIEW',
-          ref: 'view-1',
+          state_type: "VIEW",
+          ref: "view-1",
           transitions: {
-            Next: 'VIEW_{{viewNum}}',
+            Next: "VIEW_{{viewNum}}",
           },
         },
         VIEW_2: {
-          state_type: 'VIEW',
-          ref: 'view-{{viewNum}}',
+          state_type: "VIEW",
+          ref: "view-{{viewNum}}",
           transitions: {
-            '*': 'END',
+            "*": "END",
           },
         },
         END: {
-          state_type: 'END',
-          outcome: '{{outcomeData}}',
+          state_type: "END",
+          outcome: "{{outcomeData}}",
         },
       },
     },
@@ -218,95 +218,95 @@ test('resolves data when completing', async () => {
       ?.lastUpdate;
 
   expect(getView()).toStrictEqual({
-    id: 'view-1',
-    type: 'view',
+    id: "view-1",
+    type: "view",
   });
 
-  flowController?.transition('Next');
+  flowController?.transition("Next");
 
-  dataController?.set({ testData: 'testValue' });
+  dataController?.set({ testData: "testValue" });
 
   expect(getView()).toStrictEqual({
-    id: 'view-2',
-    type: 'view',
+    id: "view-2",
+    type: "view",
   });
 
-  flowController?.transition('Next');
+  flowController?.transition("Next");
   const result = await flowResponse;
 
   expect(result.data).toStrictEqual({
     viewNum: 2,
-    outcomeData: 'not good',
-    testData: 'testValue',
+    outcomeData: "not good",
+    testData: "testValue",
   });
 });
 
-test('resolves param on end nodes', async () => {
+test("resolves param on end nodes", async () => {
   const player = new Player();
 
   const flowResponse = player.start({
-    id: 'test-flow',
+    id: "test-flow",
     views: [
-      { id: 'view-1', type: 'view' },
-      { id: 'view-2', type: 'view' },
+      { id: "view-1", type: "view" },
+      { id: "view-2", type: "view" },
     ],
     data: {
       cat: {
-        name: 'Sam',
+        name: "Sam",
       },
     },
     navigation: {
-      BEGIN: 'FLOW_1',
+      BEGIN: "FLOW_1",
       FLOW_1: {
-        startState: 'VIEW_1',
+        startState: "VIEW_1",
         VIEW_1: {
-          state_type: 'VIEW',
-          ref: 'view-1',
+          state_type: "VIEW",
+          ref: "view-1",
           transitions: {
-            Next: 'ACTION_1',
+            Next: "ACTION_1",
           },
         },
         ACTION_1: {
-          state_type: 'ACTION',
+          state_type: "ACTION",
           exp: '{{cat.name}} = "FRODO"',
           transitions: {
-            '*': 'END',
+            "*": "END",
           },
         },
         END: {
-          state_type: 'END',
-          outcome: 'favoritePet',
-          param: '{{cat.name}}',
+          state_type: "END",
+          outcome: "favoritePet",
+          param: "{{cat.name}}",
         },
       },
     },
   });
 
-  (player.getState() as InProgressState).controllers.flow.transition('Next');
+  (player.getState() as InProgressState).controllers.flow.transition("Next");
 
   expect((await flowResponse).endState).toStrictEqual({
-    state_type: 'END',
-    outcome: 'favoritePet',
-    param: 'FRODO',
+    state_type: "END",
+    outcome: "favoritePet",
+    param: "FRODO",
   });
 });
 
-test('works with iffe flows', async () => {
+test("works with iffe flows", async () => {
   const player = new Player();
   const flowResponse = player.start({
-    id: 'first-end-flow',
+    id: "first-end-flow",
     navigation: {
-      BEGIN: 'DoneWithTopicFlow',
+      BEGIN: "DoneWithTopicFlow",
       DoneWithTopicFlow: {
-        startState: 'END_done',
-        END_before_topic: { state_type: 'END', outcome: 'BACK' },
-        END_done: { state_type: 'END', outcome: 'doneWithTopic' },
+        startState: "END_done",
+        END_before_topic: { state_type: "END", outcome: "BACK" },
+        END_done: { state_type: "END", outcome: "doneWithTopic" },
       },
     },
   });
 
   expect((await flowResponse).endState).toStrictEqual({
-    state_type: 'END',
-    outcome: 'doneWithTopic',
+    state_type: "END",
+    outcome: "doneWithTopic",
   });
 });

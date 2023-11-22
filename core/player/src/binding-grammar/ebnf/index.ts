@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { Grammars } from 'ebnf';
+import { Grammars } from "ebnf";
 import type {
   Parser,
   AnyNode,
@@ -8,14 +8,14 @@ import type {
   ConcatenatedNode,
   QueryNode,
   ExpressionNode,
-} from '../ast';
+} from "../ast";
 import {
   toValue,
   toQuery,
   toPath,
   toConcatenatedNode,
   toExpression,
-} from '../ast';
+} from "../ast";
 import type {
   ValueToken,
   ModelRefToken,
@@ -26,7 +26,7 @@ import type {
   QueryToken,
   QuotedValueToken,
   ExpressionToken,
-} from './types';
+} from "./types";
 
 const parser = new Grammars.W3C.Parser(`
 value                      ::= segment_and_bracket (SEGMENT_SEPARATOR segment_and_bracket)*
@@ -70,11 +70,11 @@ function convertConcatenatedToken(
 ): ConcatenatedNode | ValueNode | PathNode | ExpressionNode {
   return toConcatenatedNode(
     token.children.map((child) => {
-      if (child.type === 'identifier') {
+      if (child.type === "identifier") {
         return convertIdentifierToken(child);
       }
 
-      if (child.type === 'expression') {
+      if (child.type === "expression") {
         return convertExpressionToken(child);
       }
 
@@ -93,12 +93,12 @@ function convertOptionallyQuotedToken(
   token: OptionallyQuotedSegment,
 ): ValueNode | ConcatenatedNode | PathNode | ExpressionNode {
   const child = token.children[0];
-  if (child.type === 'quoted_value') {
+  if (child.type === "quoted_value") {
     return convertQuotedValueToken(child);
   }
 
   const grandChild = child.children[0];
-  if (grandChild.type === 'identifier') {
+  if (grandChild.type === "identifier") {
     return convertIdentifierToken(grandChild);
   }
 
@@ -120,22 +120,22 @@ function convertValueToken(binding: ValueToken): PathNode {
   /** Expand a token into it's path refs */
   function expandPath(token: Token) {
     switch (token.type) {
-      case 'modelRef':
+      case "modelRef":
         path.push(convertModelRefToken(token));
         break;
-      case 'identifier':
+      case "identifier":
         path.push(convertIdentifierToken(token));
         break;
-      case 'quoted_value':
+      case "quoted_value":
         path.push(convertQuotedValueToken(token));
         break;
-      case 'expression':
+      case "expression":
         path.push(convertExpressionToken(token));
         break;
-      case 'query':
+      case "query":
         path.push(convertQueryToken(token));
         break;
-      case 'concatenated':
+      case "concatenated":
         path.push(convertConcatenatedToken(token));
         break;
       default:
@@ -155,7 +155,7 @@ function convertModelRefToken(token: ModelRefToken): PathNode {
 
 /** Parse a binding using ebnf */
 export const parse: Parser = (path) => {
-  if (path === '') {
+  if (path === "") {
     return {
       status: true,
       path: toPath([]),
@@ -167,7 +167,7 @@ export const parse: Parser = (path) => {
   if (!ast) {
     return {
       status: false,
-      error: 'Unable to parse binding',
+      error: "Unable to parse binding",
     };
   }
 

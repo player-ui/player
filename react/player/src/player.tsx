@@ -1,26 +1,26 @@
 /* eslint-disable react/no-this-in-sfc */
-import React from 'react';
-import { SyncWaterfallHook, AsyncParallelHook } from 'tapable-ts';
-import { Subscribe, useSubscribedState } from '@player-ui/react-subscribe';
-import { Registry } from '@player-ui/partial-match-registry';
+import React from "react";
+import { SyncWaterfallHook, AsyncParallelHook } from "tapable-ts";
+import { Subscribe, useSubscribedState } from "@player-ui/react-subscribe";
+import { Registry } from "@player-ui/partial-match-registry";
 import type {
   CompletedState,
   PlayerPlugin,
   Flow,
   View,
-} from '@player-ui/player';
-import { Player } from '@player-ui/player';
-import { ErrorBoundary } from 'react-error-boundary';
-import type { AssetRegistryType } from './asset';
-import { AssetContext } from './asset';
-import { PlayerContext } from './utils';
+} from "@player-ui/player";
+import { Player } from "@player-ui/player";
+import { ErrorBoundary } from "react-error-boundary";
+import type { AssetRegistryType } from "./asset";
+import { AssetContext } from "./asset";
+import { PlayerContext } from "./utils";
 
-import type { ReactPlayerProps } from './app';
-import PlayerComp from './app';
-import OnUpdatePlugin from './plugins/onupdate-plugin';
+import type { ReactPlayerProps } from "./app";
+import PlayerComp from "./app";
+import OnUpdatePlugin from "./plugins/onupdate-plugin";
 
-const WEB_PLAYER_VERSION = '__VERSION__';
-const COMMIT = '__GIT_COMMIT__';
+const WEB_PLAYER_VERSION = "__VERSION__";
+const COMMIT = "__GIT_COMMIT__";
 
 export interface DevtoolsGlobals {
   /** A global for a plugin to load to Player for devtools */
@@ -32,7 +32,7 @@ export interface DevtoolsGlobals {
 export type DevtoolsWindow = typeof window & DevtoolsGlobals;
 
 const _window: DevtoolsWindow | undefined =
-  typeof window === 'undefined' ? undefined : window;
+  typeof window === "undefined" ? undefined : window;
 
 export interface ReactPlayerInfo {
   /** Version of the running player */
@@ -109,13 +109,13 @@ export class ReactPlayer {
 
     // Default the suspend option to `true` unless explicitly unset
     // Remove the suspend option in the next major
-    if (!('suspend' in this.options)) {
+    if (!("suspend" in this.options)) {
       this.options.suspend = true;
     }
 
     const Devtools = _window?.__PLAYER_DEVTOOLS_PLUGIN;
     const onUpdatePlugin = new OnUpdatePlugin(
-      this.viewUpdateSubscription.publish
+      this.viewUpdateSubscription.publish,
     );
 
     const plugins = options?.plugins ?? [];
@@ -125,7 +125,7 @@ export class ReactPlayer {
     }
 
     const playerPlugins = plugins.filter((p) =>
-      Boolean(p.apply)
+      Boolean(p.apply),
     ) as PlayerPlugin[];
 
     this.player = options?.player ?? new Player({ plugins: playerPlugins });
@@ -159,7 +159,7 @@ export class ReactPlayer {
 
   /** Find instance of [Plugin] that has been registered to the web player */
   public findPlugin<Plugin extends ReactPlayerPlugin>(
-    symbol: symbol
+    symbol: symbol,
   ): Plugin | undefined {
     return this.options.plugins?.find((el) => el.symbol === symbol) as Plugin;
   }
@@ -193,7 +193,7 @@ export class ReactPlayer {
           onError={(err) => {
             const playerState = this.player.getState();
 
-            if (playerState.status === 'in-progress') {
+            if (playerState.status === "in-progress") {
               playerState.fail(err);
             }
           }}
@@ -243,7 +243,7 @@ export class ReactPlayer {
       this.options.suspend && this.hooks.onBeforeViewReset.isUsed();
 
     return this.viewUpdateSubscription.reset(
-      shouldCallResetHook ? this.hooks.onBeforeViewReset.call() : undefined
+      shouldCallResetHook ? this.hooks.onBeforeViewReset.call() : undefined,
     );
   }
 

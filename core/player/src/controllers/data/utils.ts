@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { DataController } from '.';
-import type { Logger } from '../../logger';
-import type { BindingLike } from '../../binding';
+import type { DataController } from ".";
+import type { Logger } from "../../logger";
+import type { BindingLike } from "../../binding";
 import type {
   DataModelWithParser,
   DataModelOptions,
   Updates,
-} from '../../data';
+} from "../../data";
 
 /** Wrapper for the Data Controller Class that prevents writes */
 export class ReadOnlyDataController
@@ -29,14 +29,14 @@ export class ReadOnlyDataController
     options?: DataModelOptions | undefined,
   ): Updates {
     this.logger?.error(
-      'Error: Tried to set in a read only instance of the DataController',
+      "Error: Tried to set in a read only instance of the DataController",
     );
     return [];
   }
 
   delete(binding: BindingLike, options?: DataModelOptions | undefined): void {
     this.logger?.error(
-      'Error: Tried to delete in a read only instance of the DataController',
+      "Error: Tried to delete in a read only instance of the DataController",
     );
   }
 }
