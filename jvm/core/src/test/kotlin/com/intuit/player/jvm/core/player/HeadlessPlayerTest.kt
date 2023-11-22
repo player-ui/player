@@ -29,6 +29,7 @@ import com.intuit.player.jvm.core.validation.BindingInstance
 import com.intuit.player.jvm.core.validation.ValidationResponse
 import com.intuit.player.jvm.core.validation.getWarningsAndErrors
 import com.intuit.player.jvm.utils.filterKeys
+import com.intuit.player.jvm.utils.normalizeStackTraceElements
 import com.intuit.player.jvm.utils.test.PlayerTest
 import com.intuit.player.jvm.utils.test.ThreadUtils
 import com.intuit.player.jvm.utils.test.mocks
@@ -262,7 +263,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
 
         exception.printStackTrace()
         player.errorState?.error?.printStackTrace()
-        assertEquals(exception.stackTrace.toList(), player.errorState?.error?.stackTrace?.toList())
+        assertEquals(exception.stackTrace.normalizeStackTraceElements(), player.errorState?.error?.stackTrace?.normalizeStackTraceElements())
     }
 
     @TestTemplate
@@ -299,7 +300,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         }
 
         assertEquals(message, exception.message)
-        assertEquals(message, player.errorState?.error?.message)
+        assertEquals("uncaught exception: $message", player.errorState?.error?.message)
     }
 
     @TestTemplate

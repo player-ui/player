@@ -18,7 +18,8 @@ internal class ViewControllerHooksTest : NodeBaseTest() {
     @BeforeEach
     fun setUpMock() {
         every { node.getObject("view") } returns node
-        every { node.getInvokable<Unit>("tap") } returns Invokable {}
+        every { node.getInvokable<Any?>("tap") } returns Invokable {}
+        every { node.getInvokable<Any?>("tap", any()) } returns Invokable {}
         every { node.getSerializable<NodeSyncHook1<View>>("view", any()) } returns view
         every { node.nativeReferenceEquals(any()) } returns false
     }

@@ -26,10 +26,12 @@ internal class NodeSyncBailHookTest : NodeBaseTest() {
     @Suppress("UNCHECKED_CAST")
     @BeforeEach
     fun setUpMock() {
-        every { node.getInvokable<Unit>("tap") } returns Invokable {
+        val callback = Invokable<Any?> {
             map = it[0] as HashMap<String, Any>
             callback = it[1] as Invokable<Any>
         }
+        every { node.getInvokable<Any?>("tap") } returns callback
+        every { node.getInvokable<Any?>("tap", any()) } returns callback
         every { invokable.invoke(*anyVararg()) }
         every { dummyNode.deserialize(View.Serializer) } returns View(dummyNode)
     }
@@ -37,7 +39,7 @@ internal class NodeSyncBailHookTest : NodeBaseTest() {
     @Test
     fun `JS Hook Tap On Init`() {
         NodeSyncBailHook1<View, Int>(node, View.serializer())
-        verify { node.getInvokable<Unit>("tap") }
+        verify { node.getInvokable<Any?>("tap", any()) }
     }
 
     @Test

@@ -7,6 +7,7 @@ import com.intuit.player.jvm.core.player.PlayerException
 import com.intuit.player.jvm.j2v8.base.J2V8Test
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.decodeFromV8Value
 import com.intuit.player.jvm.j2v8.extensions.evaluateInJSThreadBlocking
+import com.intuit.player.jvm.utils.normalizeStackTraceElements
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -84,7 +85,7 @@ internal class ThrowableSerializerTest : J2V8Test() {
         assertTrue(exception is PlayerException)
         exception as PlayerException
         assertEquals("hello world", exception.message)
-        assertEquals(arrayOf(stackTraceElement).normalize(), exception.stackTrace.normalize())
+        assertEquals(arrayOf(stackTraceElement).normalizeStackTraceElements(), exception.stackTrace.normalizeStackTraceElements())
         exception.printStackTrace()
     }
 
@@ -130,17 +131,7 @@ internal class ThrowableSerializerTest : J2V8Test() {
 
             val cause = format.decodeFromV8Value<Throwable>(error.getObject("cause"))
             assertEquals("world", cause.message)
-            assertEquals(exception.cause!!.stackTrace.normalize(), cause.stackTrace.normalize())
+            assertEquals(exception.cause!!.stackTrace.normalizeStackTraceElements(), cause.stackTrace.normalizeStackTraceElements())
         }
-    }
-
-    /** Make a collection of [StackTraceElement]s subject to element equality */
-    private fun Array<StackTraceElement>.normalize(): List<SerializableStackTraceElement> = map { stackTraceElement ->
-        SerializableStackTraceElement(
-            stackTraceElement.className,
-            stackTraceElement.methodName,
-            stackTraceElement.fileName,
-            stackTraceElement.lineNumber,
-        )
     }
 }

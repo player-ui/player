@@ -19,14 +19,8 @@ java_import(
     jars = [":j2v8_linux_x86_64-6.1.0.jar"],
 )
 
+# TODO: Iterate on debugger strategy
 java_import(
     name = "j2v8_debugger_no_op",
     jars = [":j2v8_debugger_no_op.jar"],
-    neverlink = True,
-)
-
-java_import(
-    name = "stetho",
-    jars = [":stetho.jar"],
-    neverlink = True,
 )

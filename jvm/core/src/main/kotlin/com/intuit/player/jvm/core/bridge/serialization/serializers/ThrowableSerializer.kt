@@ -1,6 +1,7 @@
 package com.intuit.player.jvm.core.bridge.serialization.serializers
 
 import com.intuit.player.jvm.core.bridge.JSErrorException
+import com.intuit.player.jvm.core.bridge.serialization.encoding.NodeDecoder
 import com.intuit.player.jvm.core.bridge.serialization.encoding.requireNodeDecoder
 import com.intuit.player.jvm.core.bridge.serialization.encoding.requireNodeEncoder
 import com.intuit.player.jvm.core.player.PlayerException
@@ -33,56 +34,67 @@ public class ThrowableSerializer : KSerializer<Throwable> {
         element("cause", defer { ThrowableSerializer().descriptor.nullable }, isOptional = true)
     }
 
-    override fun deserialize(decoder: Decoder): PlayerException = decoder.decodeStructure(descriptor) {
-        var serialized = false
-        var message = ""
-        var stackTrace: Array<StackTraceElement> = emptyArray()
-        var cause: Throwable? = null
-
-        fun decodeStackTraceFromStack(stack: String? = decodeNullableSerializableElement(descriptor, 2, String.serializer().nullable)): Array<StackTraceElement> = stack
-            ?.split("\n")
-            ?.mapNotNull(errorStackReg::find)
-            ?.map(MatchResult::destructured)
-            ?.map { (className, methodName, fileName, lineNumber) ->
-                StackTraceElement(className, methodName, fileName, lineNumber.toIntOrNull() ?: -2)
-            }?.toTypedArray() ?: emptyArray()
-
-        fun decodeSerializedStackTrace(): Array<StackTraceElement> = decodeNullableSerializableElement(descriptor, 3, serializedStackTraceSerializer.nullable)
-            ?.map { (className, methodName, fileName, lineNumber) ->
-                StackTraceElement(className, methodName, fileName, lineNumber)
-            }?.toTypedArray() ?: emptyArray()
-
-        if (decodeSequentially()) {
-            serialized = decodeNullableSerializableElement(descriptor, 0, Boolean.serializer().nullable) ?: false
-
-            if (serialized) {
-                message = decodeNullableSerializableElement(descriptor, 1, String.serializer().nullable) ?: ""
-                stackTrace = decodeSerializedStackTrace()
-                cause = decodeNullableSerializableElement(descriptor, 4, nullable)
-            } else {
-                stackTrace = decodeStackTraceFromStack()
-            }
-        } else {
-            while (true) {
-                when (val index = decodeElementIndex(descriptor)) {
-                    0 -> serialized = decodeNullableSerializableElement(descriptor, 0, Boolean.serializer().nullable) ?: false
-                    1 -> message = decodeNullableSerializableElement(descriptor, 1, String.serializer().nullable) ?: ""
-                    2 -> stackTrace = decodeStackTraceFromStack()
-                    3 -> stackTrace = decodeSerializedStackTrace()
-                    4 -> cause = decodeNullableSerializableElement(descriptor, 4, nullable)
-                    CompositeDecoder.DECODE_DONE -> break
-                    else -> error("Unexpected index: $index")
-                }
+    override fun deserialize(decoder: Decoder): PlayerException {
+        // uncaught JVM exceptions can come across as strings or actual exceptions
+        if (decoder is NodeDecoder) {
+            when (val value = decoder.decodeValue()) {
+                is String -> return PlayerException("uncaught exception: $value")
+                is PlayerException -> return value
+                is Exception -> return PlayerException("uncaught exception: ${value.message}", value)
             }
         }
 
-        if (serialized) {
-            PlayerException(message, cause)
-        } else {
-            val error = decoder.requireNodeDecoder().decodeNode()
-            stackTrace = decodeStackTraceFromStack(error.getString("stack"))
-            JSErrorException(error)
-        }.apply { setStackTrace(stackTrace) }
+        return decoder.decodeStructure(descriptor) {
+            var serialized = false
+            var message = ""
+            var stackTrace: Array<StackTraceElement> = emptyArray()
+            var cause: Throwable? = null
+
+            fun decodeStackTraceFromStack(stack: String? = decodeNullableSerializableElement(descriptor, 2, String.serializer().nullable)): Array<StackTraceElement> = stack
+                ?.split("\n")
+                ?.mapNotNull(errorStackReg::find)
+                ?.map(MatchResult::destructured)
+                ?.map { (className, methodName, fileName, lineNumber) ->
+                    StackTraceElement(className, methodName, fileName, lineNumber.toIntOrNull() ?: -2)
+                }?.toTypedArray() ?: emptyArray()
+
+            fun decodeSerializedStackTrace(): Array<StackTraceElement> = decodeNullableSerializableElement(descriptor, 3, serializedStackTraceSerializer.nullable)
+                ?.map { (className, methodName, fileName, lineNumber) ->
+                    StackTraceElement(className, methodName, fileName, lineNumber)
+                }?.toTypedArray() ?: emptyArray()
+
+            if (decodeSequentially()) {
+                serialized = decodeNullableSerializableElement(descriptor, 0, Boolean.serializer().nullable) ?: false
+
+                if (serialized) {
+                    message = decodeNullableSerializableElement(descriptor, 1, String.serializer().nullable) ?: ""
+                    stackTrace = decodeSerializedStackTrace()
+                    cause = decodeNullableSerializableElement(descriptor, 4, nullable)
+                } else {
+                    stackTrace = decodeStackTraceFromStack()
+                }
+            } else {
+                while (true) {
+                    when (val index = decodeElementIndex(descriptor)) {
+                        0 -> serialized = decodeNullableSerializableElement(descriptor, 0, Boolean.serializer().nullable) ?: false
+                        1 -> message = decodeNullableSerializableElement(descriptor, 1, String.serializer().nullable) ?: ""
+                        2 -> stackTrace = decodeStackTraceFromStack()
+                        3 -> stackTrace = decodeSerializedStackTrace()
+                        4 -> cause = decodeNullableSerializableElement(descriptor, 4, nullable)
+                        CompositeDecoder.DECODE_DONE -> break
+                        else -> error("Unexpected index: $index")
+                    }
+                }
+            }
+
+            if (serialized) {
+                PlayerException(message, cause)
+            } else {
+                val error = decoder.requireNodeDecoder().decodeNode()
+                stackTrace = decodeStackTraceFromStack(error.getString("stack"))
+                JSErrorException(error)
+            }.apply { setStackTrace(stackTrace) }
+        }
     }
 
     override fun serialize(encoder: Encoder, value: Throwable) {

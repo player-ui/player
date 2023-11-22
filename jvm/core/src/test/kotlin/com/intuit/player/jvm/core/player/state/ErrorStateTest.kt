@@ -38,8 +38,7 @@ internal class ErrorStateTest : NodeBaseTest() {
     fun errorFromObject() {
         val someException = PlayerException("hello")
 
-        every { node["error"] } returns node
-        every { node.deserialize(any<KSerializer<Throwable>>()) } returns someException
+        every { node.getSerializable("error", any<KSerializer<Throwable>>()) } returns someException
 
         assertEquals(someException, errorState.error)
     }

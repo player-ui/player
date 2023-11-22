@@ -30,10 +30,12 @@ internal class NodeSyncWaterfallHookTest : NodeBaseTest() {
     @Suppress("UNCHECKED_CAST")
     @BeforeEach
     fun setUpMock() {
-        every { node.getInvokable<Unit>("tap") } returns Invokable {
+        val callback = Invokable<Any?> {
             map = it[0] as HashMap<String, Any>
             callback = it[1] as Invokable<Any?>
         }
+        every { node.getInvokable<Any?>("tap") } returns callback
+        every { node.getInvokable<Any?>("tap", any()) } returns callback
         every { invokable.invoke(*anyVararg()) }
         every { dummyNode.deserialize(View.Serializer) } returns View(dummyNode)
         every { dummyNode.deserialize(mapSerializer) } returns mapOf("key" to "value")
@@ -42,7 +44,7 @@ internal class NodeSyncWaterfallHookTest : NodeBaseTest() {
     @Test
     fun `JS Hook Tap On Init`() {
         NodeSyncWaterfallHook1(node, View.serializer())
-        verify { node.getInvokable<Unit>("tap") }
+        verify { node.getInvokable<Any?>("tap", any()) }
     }
 
     @Test
@@ -57,7 +59,7 @@ internal class NodeSyncWaterfallHookTest : NodeBaseTest() {
 
         callback.invoke(hashMapOf<Any, Any>(), dummyNode)
 
-        verify { node.getInvokable<Unit>("tap") }
+        verify { node.getInvokable<Any?>("tap", any()) }
         assertEquals(dummyNode, output?.node)
     }
 
@@ -70,7 +72,7 @@ internal class NodeSyncWaterfallHookTest : NodeBaseTest() {
 
         val result = callback.invoke(hashMapOf<Any, Any>(), dummyNode)
 
-        verify { node.getInvokable<Unit>("tap") }
+        verify { node.getInvokable<Any?>("tap", any()) }
         assertEquals(mapOf("key" to "value", "anotherKey" to "anotherValue"), result)
     }
 

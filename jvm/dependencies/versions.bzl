@@ -1,7 +1,7 @@
 versions = struct(
     kotlin = struct(
-        coroutines = "1.5.2",
-        serialization = "1.3.0",
+        coroutines = "1.6.0",
+        serialization = "1.3.0",  # 1.4.1
     ),
     runtimes = struct(
         graaljs = "21.2.0",

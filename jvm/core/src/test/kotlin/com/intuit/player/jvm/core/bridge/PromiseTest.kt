@@ -5,6 +5,7 @@ import com.intuit.player.jvm.core.player.PlayerException
 import com.intuit.player.jvm.core.player.PlayerFlowStatus
 import com.intuit.player.jvm.core.player.state.CompletedState
 import com.intuit.player.jvm.core.player.state.PlayerFlowState
+import com.intuit.player.jvm.utils.normalizeStackTraceElements
 import com.intuit.player.jvm.utils.test.PromiseUtils
 import com.intuit.player.jvm.utils.test.RuntimeTest
 import kotlinx.coroutines.delay
@@ -181,7 +182,7 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
         assertTrue(caught is Throwable)
         caught as Throwable
         assertEquals(exception.message, caught.message)
-        assertEquals(exception.stackTrace.toList(), caught.stackTrace.toList())
+        assertEquals(exception.stackTrace.normalizeStackTraceElements(), caught.stackTrace.normalizeStackTraceElements())
     }
 
     @TestTemplate
@@ -199,7 +200,7 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
         caught as Throwable
         caught.printStackTrace()
         assertEquals(exception.message, caught.message)
-        assertEquals(exception.stackTrace.toList(), caught.stackTrace.toList())
+        assertEquals(exception.stackTrace.normalizeStackTraceElements(), caught.stackTrace.normalizeStackTraceElements())
     }
 
     @TestTemplate
@@ -216,6 +217,6 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
         assertTrue(caught is Throwable)
         caught as Throwable
         assertEquals(exception.message, caught.message)
-        assertEquals(exception.stackTrace.toList(), caught.stackTrace.toList())
+        assertEquals(exception.stackTrace.normalizeStackTraceElements(), caught.stackTrace.normalizeStackTraceElements())
     }
 }
