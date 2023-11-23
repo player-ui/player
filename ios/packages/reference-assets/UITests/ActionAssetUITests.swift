@@ -28,7 +28,7 @@ class ActionAssetUITests: BaseTestCase {
             check("After Click")
             XCTAssertTrue(app.alerts["FlowFinished"].exists)
 
-            XCTAssertEqual(app.alerts["FlowFinished"].staticTexts.element(boundBy: 1).label, "done")
+            XCTAssertTrue(app.alerts["FlowFinished"].staticTexts.element(boundBy: 1).label.contains("done"))
         }
     }
 

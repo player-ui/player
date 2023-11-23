@@ -87,6 +87,8 @@ class BaseTestCase: AssetUITestCase {
 
     // AssetCollectionView uses a List which wont register elements if they aren't on screen
     override func openFlow(_ mockName: String) {
+        navigateToAssetCollection()
+
         guard !app.buttons[mockName].exists else { return super.openFlow(mockName) }
         var attempts = 0
         while attempts < 5 {
