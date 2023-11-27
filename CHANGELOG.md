@@ -1,3 +1,35 @@
+# 0.4.5 (Mon Nov 27 2023)
+
+#### 🐛 Bug Fix
+
+- Release main [#251](https://github.com/player-ui/player/pull/251) ([@intuit-svc](https://github.com/intuit-svc))
+- 177/ add plugin examples and managed player to demo app [#215](https://github.com/player-ui/player/pull/215) ([@zwu011](https://github.com/zwu011) [@nancywu1](https://github.com/nancywu1))
+- iOS: add SwiftUIPendingTransactionPlugin to reference asset dependencies [#250](https://github.com/player-ui/player/pull/250) ([@hborawski](https://github.com/hborawski))
+- Mocks for plugins [#206](https://github.com/player-ui/player/pull/206) (marlon_ercillo@intuit.com [@mercillo](https://github.com/mercillo) [@zwu011](https://github.com/zwu011) [@hborawski](https://github.com/hborawski) [@brocollie08](https://github.com/brocollie08) [@adierkens](https://github.com/adierkens) [@intuit-svc](https://github.com/intuit-svc))
+- store cancellables in ManagedPlayerViewModelTests [#210](https://github.com/player-ui/player/pull/210) ([@hborawski](https://github.com/hborawski))
+- apply swift 6 warning fix to flaky iOS tests [#207](https://github.com/player-ui/player/pull/207) ([@hborawski](https://github.com/hborawski))
+- iOS: make AssetBeacon equatable and add public init for metadata [#248](https://github.com/player-ui/player/pull/248) ([@hborawski](https://github.com/hborawski))
+- Singular workflow for CI [#214](https://github.com/player-ui/player/pull/214) (sentony03@gmail.com [@brocollie08](https://github.com/brocollie08))
+- update Gemfile.lock [#208](https://github.com/player-ui/player/pull/208) ([@hborawski](https://github.com/hborawski))
+
+#### 🏠 Internal
+
+- Update ruby version in build [#246](https://github.com/player-ui/player/pull/246) ([@adierkens](https://github.com/adierkens))
+
+#### Authors: 9
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- [@zwu011](https://github.com/zwu011)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- brocollie08 (sentony03@gmail.com)
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Marlon "Marky" Ercillo ([@mercillo](https://github.com/mercillo))
+- mercillo (marlon_ercillo@intuit.com)
+
+---
+
 # 0.4.4 (Mon Nov 20 2023)
 
 #### 🐛 Bug Fix
