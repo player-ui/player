@@ -5,15 +5,15 @@
 -* @param offset Additional offset
  */
 
-import { scrollTo } from 'seamless-scroll-polyfill';
+import { scrollTo } from "seamless-scroll-polyfill";
 
 export default (
   node: HTMLElement,
   baseElement: HTMLElement,
-  offset: number
+  offset: number,
 ) => {
   scrollTo(window, {
-    behavior: 'smooth',
+    behavior: "smooth",
     top:
       node.getBoundingClientRect().top -
       baseElement.getBoundingClientRect().top -

@@ -1,19 +1,19 @@
-import React from 'react';
-import type { Query } from '@player-ui/check-path-plugin';
-import type { Asset } from '@player-ui/player';
-import { CheckPathContext } from './context';
+import React from "react";
+import type { Query } from "@player-ui/check-path-plugin";
+import type { Asset } from "@player-ui/react";
+import { CheckPathContext } from "./context";
 
 export type AssetOrID = Asset | string;
 
 /** get the id for an asset */
 function getId(asset: AssetOrID): string {
-  return typeof asset === 'string' ? asset : asset.id;
+  return typeof asset === "string" ? asset : asset.id;
 }
 
 /** hook to check if the asset has the given parents */
 export function useHasParentContext(
   asset: AssetOrID | undefined,
-  query: Query | Query[]
+  query: Query | Query[],
 ): boolean {
   const { plugin } = React.useContext(CheckPathContext);
 
@@ -27,7 +27,7 @@ export function useHasParentContext(
 /** hook to check if the asset has the given children */
 export function useHasChildContext(
   asset: AssetOrID | undefined,
-  query: Query | Query[]
+  query: Query | Query[],
 ): boolean {
   const { plugin } = React.useContext(CheckPathContext);
 
@@ -40,7 +40,7 @@ export function useHasChildContext(
 
 /** hook to get the prop of the given asset on the parent */
 export function useGetParentProp(
-  asset: AssetOrID | undefined
+  asset: AssetOrID | undefined,
 ): string | number | undefined {
   const { plugin } = React.useContext(CheckPathContext);
 
@@ -54,7 +54,7 @@ export function useGetParentProp(
 /** hook to get the path of the asset in the view */
 export function useGetPath(
   asset: AssetOrID | undefined,
-  query?: Query | Query[]
+  query?: Query | Query[],
 ): Array<string | number> | undefined {
   const { plugin } = React.useContext(CheckPathContext);
 
@@ -68,7 +68,7 @@ export function useGetPath(
 /** get the parent of the given asset */
 export function useGetParent<T extends Asset>(
   asset: AssetOrID | undefined,
-  query?: Query | Query[]
+  query?: Query | Query[],
 ): T | undefined {
   const { plugin } = React.useContext(CheckPathContext);
 

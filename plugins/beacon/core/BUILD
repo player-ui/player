@@ -10,15 +10,15 @@ vitest_config(name = "vitest_config")
 
 js_pipeline(
     package_name = "@player-ui/beacon-plugin",
+    peer_deps = [
+        ":node_modules/@player-ui/player",
+    ],
+    test_deps = [
+        ":node_modules/@player-ui/make-flow",
+        "//:vitest_config",
+    ],
     deps = [
         "//:node_modules/tapable-ts",
         "//:node_modules/timm",
-    ],
-    peer_deps = [
-        ":node_modules/@player-ui/player",
-        ":node_modules/@player-ui/types",
-    ],
-    test_deps = [
-        ":node_modules/@player-ui/make-flow"
     ],
 )

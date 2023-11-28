@@ -1,5 +1,5 @@
-import type { Asset, AssetWrapper } from '@player-ui/types';
-import type { Mappers } from '../../types';
+import type { Asset, AssetWrapper } from "@player-ui/types";
+import type { Mappers } from "../../types";
 
 // Mock Asset Plugin implementation of the markdown plugin:
 
@@ -18,7 +18,7 @@ function wrapAsset(asset: Asset): AssetWrapper {
  * Flatten a composite Asset with a single element
  */
 function flatSingleElementCompositeAsset(asset: Asset): Asset {
-  if (asset.type === 'composite' && (asset.values as Asset[]).length === 1) {
+  if (asset.type === "composite" && (asset.values as Asset[]).length === 1) {
     return (asset.values as AssetWrapper[])[0].asset;
   }
 
@@ -58,7 +58,7 @@ function applyModifierToAssets({
     modifiedAsset = {
       ...modifiedAsset,
       values: (asset.values as Asset[]).map((a) =>
-        applyModifierToAssets({ types, asset: a, modifiers })
+        applyModifierToAssets({ types, asset: a, modifiers }),
       ),
     };
   }
@@ -69,67 +69,67 @@ function applyModifierToAssets({
 export const mockMappers: Mappers = {
   text: ({ originalAsset, value }) => ({
     id: `${originalAsset.id}-text-${depth++}`,
-    type: 'text',
+    type: "text",
     value,
   }),
   collection: ({ originalAsset, value }) => ({
     id: `${originalAsset.id}-collection-${depth++}`,
-    type: 'collection',
+    type: "collection",
     values: value.map(wrapAsset),
   }),
   strong: ({ originalAsset, value }) =>
     flatSingleElementCompositeAsset({
       id: `${originalAsset.id}-text-${depth++}`,
-      type: 'composite',
+      type: "composite",
       values: value.map((v) =>
         wrapAsset(
           applyModifierToAssets({
             asset: v,
-            types: ['text'],
+            types: ["text"],
             modifiers: [
               {
-                type: 'tag',
-                value: 'important',
+                type: "tag",
+                value: "important",
               },
             ],
-          })
-        )
+          }),
+        ),
       ),
     }),
   emphasis: ({ originalAsset, value }) =>
     flatSingleElementCompositeAsset({
       id: `${originalAsset.id}-text-${depth++}`,
-      type: 'composite',
+      type: "composite",
       values: value.map((v) =>
         wrapAsset(
           applyModifierToAssets({
             asset: v,
-            types: ['text'],
+            types: ["text"],
             modifiers: [
               {
-                type: 'tag',
-                value: 'emphasis',
+                type: "tag",
+                value: "emphasis",
               },
             ],
-          })
-        )
+          }),
+        ),
       ),
     }),
   paragraph: ({ originalAsset, value }) =>
     flatSingleElementCompositeAsset({
       id: `${originalAsset.id}-composite-${depth++}`,
-      type: 'composite',
+      type: "composite",
       values: value.map(wrapAsset),
     }),
   list: ({ originalAsset, value, ordered }) => ({
     id: `${originalAsset.id}-list-${depth++}`,
-    type: 'list',
+    type: "list",
     values: value.map(wrapAsset),
-    ...(ordered && { metaData: { listType: 'ordered' } }),
+    ...(ordered && { metaData: { listType: "ordered" } }),
   }),
   image: ({ originalAsset, value, src }) => ({
     id: `${originalAsset.id}-image-${depth++}`,
-    type: 'image',
+    type: "image",
     accessibility: value,
     metaData: {
       ref: src,
@@ -138,22 +138,22 @@ export const mockMappers: Mappers = {
   link: ({ originalAsset, value, href }) =>
     flatSingleElementCompositeAsset({
       id: `${originalAsset.id}-link-${depth++}`,
-      type: 'composite',
+      type: "composite",
       values: value.map((v) =>
         wrapAsset(
           applyModifierToAssets({
             asset: v,
-            types: ['text', 'image'],
+            types: ["text", "image"],
             modifiers: [
               {
-                type: 'link',
+                type: "link",
                 metaData: {
                   ref: href,
                 },
               },
             ],
-          })
-        )
+          }),
+        ),
       ),
     }),
 };

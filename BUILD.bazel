@@ -65,14 +65,17 @@ js_library(
     data = [":typings"],
     visibility = ["//visibility:public"],
     deps = [
+        ":node_modules/@microsoft/api-extractor",
+        ":node_modules/@types/node",
         ":node_modules/tsup",
         ":node_modules/typescript",
+        ":node_modules/vitest",
     ],
 )
 
 js_library(
     name = "typings",
-    data = ["tsconfig.json"] + glob(["typings/*"]),
+    srcs = ["tsconfig.build.json"] + glob(["typings/*"]),
     visibility = ["//visibility:public"],
 )
 # PlayerUI(deps = [])

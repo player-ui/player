@@ -1,4 +1,4 @@
-import type { Asset } from '@player-ui/types';
+import type { Asset } from "@player-ui/types";
 import type {
   Blockquote,
   Code,
@@ -13,14 +13,14 @@ import type {
   Strong,
   Text,
   ThematicBreak,
-} from 'mdast-util-from-markdown/lib';
-import type { Transformer } from '../types';
+} from "mdast-util-from-markdown/lib";
+import type { Transformer } from "../types";
 
 /**
  * Swap markdown type to text
  */
 function swapMarkdownType(asset: Asset): Asset {
-  return { ...asset, type: 'text' };
+  return { ...asset, type: "text" };
 }
 
 /**
@@ -48,7 +48,7 @@ const emphasisTransformer: Transformer<Emphasis> = ({
     const { children } = astNode;
 
     const value = children.map((node) =>
-      transformers[node.type]({ astNode: node, asset, mappers, transformers })
+      transformers[node.type]({ astNode: node, asset, mappers, transformers }),
     );
 
     return mappers.emphasis({
@@ -73,7 +73,7 @@ const strongTransformer: Transformer<Strong> = ({
     const { children } = astNode;
 
     const value = children.map((node) =>
-      transformers[node.type]({ astNode: node, asset, mappers, transformers })
+      transformers[node.type]({ astNode: node, asset, mappers, transformers }),
     );
 
     return mappers.strong({
@@ -100,7 +100,7 @@ const paragraphTransformer: Transformer<Paragraph> = ({
     children.every(({ type }) => Boolean(mappers[type as keyof typeof mappers]))
   ) {
     const value = children.map((node) =>
-      transformers[node.type]({ astNode: node, asset, mappers, transformers })
+      transformers[node.type]({ astNode: node, asset, mappers, transformers }),
     );
 
     return mappers.paragraph({
@@ -125,7 +125,7 @@ const listTransformer: Transformer<List> = ({
     const { children, ordered, start } = astNode;
 
     const value = children.map((node) =>
-      transformers[node.type]({ astNode: node, asset, mappers, transformers })
+      transformers[node.type]({ astNode: node, asset, mappers, transformers }),
     );
 
     return mappers.list({
@@ -151,7 +151,7 @@ const listItemTransformer: Transformer<ListItem> = ({
   const { children } = astNode;
 
   const value = children.map((node) =>
-    transformers[node.type]({ astNode: node, asset, mappers, transformers })
+    transformers[node.type]({ astNode: node, asset, mappers, transformers }),
   );
 
   const mapper = mappers.listItem || mappers.paragraph;
@@ -175,7 +175,7 @@ const linkTransformer: Transformer<Link> = ({
     const { children, url } = astNode;
 
     const value = children.map((node) =>
-      transformers[node.type]({ astNode: node, asset, mappers, transformers })
+      transformers[node.type]({ astNode: node, asset, mappers, transformers }),
     );
 
     return mappers.link({
@@ -198,7 +198,7 @@ const imageTransformer: Transformer<Image> = ({ astNode, asset, mappers }) => {
     return mappers.image({
       originalAsset: asset,
       src: url,
-      value: title || alt || '',
+      value: title || alt || "",
     });
   }
 
@@ -218,7 +218,7 @@ const blockquoteTransformer: Transformer<Blockquote> = ({
     const { children } = astNode;
 
     const value = children.map((node) =>
-      transformers[node.type]({ astNode: node, asset, mappers, transformers })
+      transformers[node.type]({ astNode: node, asset, mappers, transformers }),
     );
 
     return mappers.blockquote({
@@ -277,7 +277,7 @@ const horizontalRuleTransformer: Transformer<ThematicBreak> = ({
   if (mappers.horizontalRule) {
     return mappers.horizontalRule({
       originalAsset: asset,
-      value: '---',
+      value: "---",
     });
   }
 
@@ -297,7 +297,7 @@ const headingTransformer: Transformer<Heading> = ({
     const { children, depth } = astNode;
 
     const value = children.map((node) =>
-      transformers[node.type]({ astNode: node, asset, mappers, transformers })
+      transformers[node.type]({ astNode: node, asset, mappers, transformers }),
     );
 
     return mappers.heading({

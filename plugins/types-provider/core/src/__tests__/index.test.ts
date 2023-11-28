@@ -1,17 +1,15 @@
-import { waitFor } from '@testing-library/react';
-import type { InProgressState } from '@player-ui/player';
-import { Player } from '@player-ui/player';
-import { makeFlow } from '@player-ui/make-flow';
-import { Registry } from '@player-ui/partial-match-registry';
-import { AssetTransformPlugin } from '@player-ui/asset-transform-plugin';
-import type { FormatType } from '@player-ui/schema';
-import type { Flow } from '@player-ui/types';
-import { TypesProviderPlugin } from '.';
+import { expect, test, describe, vitest } from "vitest";
+import type { InProgressState, Flow, FormatType } from "@player-ui/player";
+import { Player } from "@player-ui/player";
+import { makeFlow } from "@player-ui/make-flow";
+import { Registry } from "@player-ui/partial-match-registry";
+import { AssetTransformPlugin } from "@player-ui/asset-transform-plugin";
+import { TypesProviderPlugin } from "..";
 
 const inputTransformPlugin = new AssetTransformPlugin(
   new Registry([
     [
-      { type: 'input' },
+      { type: "input" },
       (value, options) => {
         return {
           ...value,
@@ -23,25 +21,25 @@ const inputTransformPlugin = new AssetTransformPlugin(
         };
       },
     ],
-  ])
+  ]),
 );
 
-test('adds custom types', async () => {
+test("adds custom types", async () => {
   const flowWithCustomTypes = makeFlow({
-    id: 'view-1',
-    type: 'input',
-    binding: 'foo.bar',
+    id: "view-1",
+    type: "input",
+    binding: "foo.bar",
   });
 
   flowWithCustomTypes.schema = {
     ROOT: {
       foo: {
-        type: 'FooType',
+        type: "FooType",
       },
     },
     FooType: {
       bar: {
-        type: 'CustomType',
+        type: "CustomType",
       },
     },
   };
@@ -52,22 +50,22 @@ test('adds custom types', async () => {
       new TypesProviderPlugin({
         types: [
           {
-            type: 'CustomType',
+            type: "CustomType",
             validation: [
               {
-                type: 'customValidation',
-                props: 'stuff',
+                type: "customValidation",
+                props: "stuff",
               },
             ],
           },
         ],
         validators: [
           [
-            'customValidation',
+            "customValidation",
             (context, value, options) => {
               if (value !== options.props) {
                 return {
-                  message: 'thats not good',
+                  message: "thats not good",
                 };
               }
             },
@@ -83,38 +81,38 @@ test('adds custom types', async () => {
       ?.lastUpdate;
 
   let input = getLastUpdate();
-  expect(input?.dataType).toBe('CustomType');
+  expect(input?.dataType).toBe("CustomType");
 
-  input?.set('not right');
+  input?.set("not right");
 
-  await waitFor(() => {
+  await vitest.waitFor(() => {
     input = getLastUpdate();
-    expect(input?.validation.message).toBe('thats not good');
+    expect(input?.validation.message).toBe("thats not good");
   });
 
-  input?.set('stuff');
+  input?.set("stuff");
 
-  await waitFor(() => {
+  await vitest.waitFor(() => {
     input = getLastUpdate();
     expect(input?.validation).toBe(undefined);
   });
 });
 
-describe('formatting', () => {
+describe("formatting", () => {
   const flowWithDataTypes: Flow = {
-    id: 'tst',
+    id: "tst",
     views: [],
     schema: {
       ROOT: {
         foo: {
-          type: 'NumberType',
+          type: "NumberType",
         },
       },
       NumberType: {
         num: {
-          type: 'BaseType',
+          type: "BaseType",
           format: {
-            type: 'number',
+            type: "number",
             decimalPlaces: 2,
           },
           default: 500,
@@ -122,12 +120,12 @@ describe('formatting', () => {
       },
     },
     navigation: {
-      BEGIN: 'FLOW_1',
+      BEGIN: "FLOW_1",
       FLOW_1: {
-        startState: 'EXT_1',
+        startState: "EXT_1",
         EXT_1: {
-          state_type: 'EXTERNAL',
-          ref: 'wait',
+          state_type: "EXTERNAL",
+          ref: "wait",
           transitions: {},
         },
       },
@@ -143,18 +141,18 @@ describe('formatting', () => {
       decimalPlaces: number;
     }
   > = {
-    name: 'number',
+    name: "number",
     format(val, options) {
-      return typeof val === 'string'
+      return typeof val === "string"
         ? val
         : val.toFixed(options?.decimalPlaces);
     },
     deformat(val) {
-      return typeof val === 'string' ? parseFloat(val) : val;
+      return typeof val === "string" ? parseFloat(val) : val;
     },
   };
 
-  test('it formats things', () => {
+  test("it formats things", () => {
     const player = new Player({
       plugins: [
         new TypesProviderPlugin({
@@ -170,11 +168,11 @@ describe('formatting', () => {
     const state = player.getState() as InProgressState;
 
     expect(
-      state.controllers.data.get('foo.num', { formatted: true })
-    ).toStrictEqual('500.00');
+      state.controllers.data.get("foo.num", { formatted: true }),
+    ).toStrictEqual("500.00");
   });
 
-  test('it formats things with default types', () => {
+  test("it formats things with default types", () => {
     const player = new Player({
       plugins: [
         new TypesProviderPlugin({
@@ -187,7 +185,7 @@ describe('formatting', () => {
     const state = player.getState() as InProgressState;
 
     expect(
-      state.controllers.data.get('foo.num', { formatted: true })
-    ).toStrictEqual('500.00');
+      state.controllers.data.get("foo.num", { formatted: true }),
+    ).toStrictEqual("500.00");
   });
 });

@@ -1,6 +1,6 @@
-import type { ExtendedPlayerPlugin, Player } from '@player-ui/player';
-import { ExpressionPlugin } from '@player-ui/expression-plugin';
-import * as Expressions from './expressions';
+import type { ExtendedPlayerPlugin, Player } from "@player-ui/player";
+import { ExpressionPlugin } from "@player-ui/expression-plugin";
+import * as Expressions from "./expressions";
 import type {
   size,
   length,
@@ -21,7 +21,7 @@ import type {
   findPropertyIndex,
   findProperty,
   containsAny,
-} from './expressions';
+} from "./expressions";
 /**
  * Exposes a lot of expressions to Player.
  */
@@ -49,15 +49,15 @@ export class CommonExpressionsPlugin
         typeof sum,
         typeof findPropertyIndex,
         typeof findProperty,
-        typeof containsAny
+        typeof containsAny,
       ]
     >
 {
-  name = 'CommonExpressions';
+  name = "CommonExpressions";
 
   apply(player: Player) {
     player.registerPlugin(
-      new ExpressionPlugin(new Map(Object.entries(Expressions)))
+      new ExpressionPlugin(new Map(Object.entries(Expressions))),
     );
   }
 }

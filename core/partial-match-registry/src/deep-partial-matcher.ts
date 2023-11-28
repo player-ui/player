@@ -34,7 +34,7 @@ export default function createMatcher(partialObj: object): Matcher {
 
   /** Generate a function to match against all of the properties we care about */
   const matchFunction = (searchObj: object) => {
-    for (const entry of pairs) {
+    for (const entry of Array.from(pairs)) {
       const [path, value] = entry;
 
       if (dlv(searchObj, path) !== value) {

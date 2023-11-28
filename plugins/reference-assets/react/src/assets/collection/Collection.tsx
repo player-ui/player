@@ -1,7 +1,7 @@
-import React from 'react';
-import { Flex } from '@chakra-ui/react';
-import { ReactAsset } from '@player-ui/react';
-import type { CollectionAsset } from '@player-ui/reference-assets-plugin';
+import React from "react";
+import { Flex } from "@chakra-ui/react";
+import { ReactAsset } from "@player-ui/react";
+import type { CollectionAsset } from "@player-ui/reference-assets-plugin";
 
 export const Collection = (props: CollectionAsset) => {
   return (
@@ -11,9 +11,7 @@ export const Collection = (props: CollectionAsset) => {
           <ReactAsset {...props.label} />
         </h3>
       )}
-      {props.values?.map((a) => (
-        <ReactAsset key={a.asset.id} {...a} />
-      ))}
+      {props.values?.map((a) => <ReactAsset key={a.asset.id} {...a} />)}
     </Flex>
   );
 };

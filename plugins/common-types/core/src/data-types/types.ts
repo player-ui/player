@@ -1,4 +1,4 @@
-import type { Schema } from '@player-ui/types';
+import type { Schema } from "@player-ui/player";
 import {
   BooleanTypeRef,
   CollectionTypeRef,
@@ -8,15 +8,15 @@ import {
   PhoneTypeRef,
   StringTypeRef,
   IntegerNNTypeRef,
-} from './refs';
+} from "./refs";
 
 export const BooleanType: Schema.DataType<boolean> = {
   ...BooleanTypeRef,
   default: false,
   validation: [
     {
-      type: 'oneOf',
-      message: 'Value must be true or false',
+      type: "oneOf",
+      message: "Value must be true or false",
       options: [true, false],
     },
   ],
@@ -26,11 +26,11 @@ export const IntegerType: Schema.DataType<number> = {
   ...IntegerTypeRef,
   validation: [
     {
-      type: 'integer',
+      type: "integer",
     },
   ],
   format: {
-    type: 'integer',
+    type: "integer",
   },
 };
 
@@ -38,15 +38,15 @@ export const IntegerPosType: Schema.DataType<number> = {
   ...IntegerPosTypeRef,
   validation: [
     {
-      type: 'integer',
+      type: "integer",
     },
     {
-      type: 'min',
+      type: "min",
       value: 1,
     },
   ],
   format: {
-    type: 'integer',
+    type: "integer",
   },
 };
 
@@ -54,28 +54,28 @@ export const IntegerNNType: Schema.DataType<number> = {
   ...IntegerNNTypeRef,
   validation: [
     {
-      type: 'integer',
+      type: "integer",
     },
     {
-      type: 'min',
+      type: "min",
       value: 0,
     },
   ],
   format: {
-    type: 'integer',
+    type: "integer",
   },
 };
 
 export const StringType: Schema.DataType<string> = {
   ...StringTypeRef,
-  default: '',
+  default: "",
   validation: [
     {
-      type: 'string',
+      type: "string",
     },
   ],
   format: {
-    type: 'string',
+    type: "string",
   },
 };
 
@@ -83,7 +83,7 @@ export const CollectionType: Schema.DataType<Array<unknown>> = {
   ...CollectionTypeRef,
   validation: [
     {
-      type: 'collection',
+      type: "collection",
     },
   ],
 };
@@ -92,11 +92,11 @@ export const DateType: Schema.DataType<string> = {
   ...DateTypeRef,
   validation: [
     {
-      type: 'string',
+      type: "string",
     },
   ],
   format: {
-    type: 'date',
+    type: "date",
   },
 };
 
@@ -104,10 +104,10 @@ export const PhoneType: Schema.DataType<string> = {
   ...PhoneTypeRef,
   validation: [
     {
-      type: 'phone',
+      type: "phone",
     },
   ],
   format: {
-    type: 'phone',
+    type: "phone",
   },
 };

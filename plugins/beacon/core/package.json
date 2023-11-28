@@ -5,5 +5,8 @@
   "peerDependencies": {
     "@player-ui/player": "workspace:*",
     "@player-ui/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@player-ui/make-flow": "workspace:*"
   }
 }

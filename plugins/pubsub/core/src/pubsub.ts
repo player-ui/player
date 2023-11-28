@@ -14,7 +14,7 @@ export type PubSubUUID = `uuid_${number}`;
  * Split a string into an array of event layers
  */
 function splitEvent(event: string) {
-  return event.split('.').reduce<string[]>((prev, curr, index) => {
+  return event.split(".").reduce<string[]>((prev, curr, index) => {
     if (index === 0) {
       return [curr];
     }
@@ -41,11 +41,11 @@ export class TinyPubSub {
    * Publish an event with any number of additional arguments
    */
   publish(event: string, ...args: unknown[]) {
-    if (typeof event !== 'string') {
+    if (typeof event !== "string") {
       return;
     }
 
-    if (event.includes('.')) {
+    if (event.includes(".")) {
       const eventKeys = splitEvent(event);
 
       eventKeys.forEach((key) => {
@@ -55,7 +55,7 @@ export class TinyPubSub {
       this.deliver(event, event, ...args);
     }
 
-    this.deliver('*', event, ...args);
+    this.deliver("*", event, ...args);
   }
 
   /**
@@ -74,7 +74,7 @@ export class TinyPubSub {
   subscribe(event: string, handler: SubscribeHandler<any, any>) {
     const uuid = `uuid_${++count}`;
 
-    if (typeof event === 'string') {
+    if (typeof event === "string") {
       if (!this.events.has(event)) {
         this.events.set(event, new Map());
       }
@@ -96,10 +96,10 @@ export class TinyPubSub {
    * & 'a.b.c' will be unsubscribed as well.
    */
   unsubscribe(value: string | symbol) {
-    if (typeof value === 'string' && value.startsWith('uuid')) {
+    if (typeof value === "string" && value.startsWith("uuid")) {
       const path = this.tokens.get(value as PubSubUUID);
 
-      if (typeof path === 'undefined') {
+      if (typeof path === "undefined") {
         return;
       }
 
@@ -109,7 +109,7 @@ export class TinyPubSub {
       return;
     }
 
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       for (const key of this.events.keys()) {
         if (key.indexOf(value) === 0) {
           const tokens = this.events.get(key);
@@ -134,7 +134,7 @@ export class TinyPubSub {
   count(event?: string) {
     let counter = 0;
 
-    if (typeof event === 'undefined') {
+    if (typeof event === "undefined") {
       for (const handlers of this.events.values()) {
         counter += handlers.size;
       }

@@ -1,12 +1,15 @@
-import type { ExpressionHandler, ExpressionContext } from '@player-ui/player';
-import { withoutContext } from '@player-ui/player';
-import type { Binding } from '@player-ui/types';
-import { toNum } from './toNum';
+import type {
+  ExpressionHandler,
+  ExpressionContext,
+  Binding,
+} from "@player-ui/player";
+import { withoutContext } from "@player-ui/player";
+import { toNum } from "./toNum";
 
 /** Returns a function that executes the given function only if the first argument is a string */
 function ifString(fn: (arg: string) => unknown) {
   return (arg: unknown) => {
-    if (typeof arg === 'string') {
+    if (typeof arg === "string") {
       return fn(arg);
     }
 
@@ -17,11 +20,11 @@ function ifString(fn: (arg: string) => unknown) {
 /** Generic Types */
 
 export const size = withoutContext((val: unknown): number => {
-  if (typeof val === 'string') {
+  if (typeof val === "string") {
     return val.length;
   }
 
-  if (typeof val === 'object' && val !== null) {
+  if (typeof val === "object" && val !== null) {
     return Object.keys(val).length;
   }
 
@@ -36,7 +39,7 @@ export const isEmpty: ExpressionHandler<[unknown], boolean> = (ctx, val) => {
     return true;
   }
 
-  if (typeof val === 'object' || typeof val === 'string') {
+  if (typeof val === "object" || typeof val === "string") {
     return size(ctx, val) === 0;
   }
 
@@ -55,7 +58,7 @@ export const concat = withoutContext((...args: Array<unknown>) => {
     return arrayArgs.reduce((merged, next) => [...merged, ...next]);
   }
 
-  return args.reduce((merged: any, next) => merged + (next ?? ''), '');
+  return args.reduce((merged: any, next) => merged + (next ?? ""), "");
 });
 
 /** String Types */
@@ -64,31 +67,31 @@ export const trim = withoutContext(ifString((str) => str.trim()));
 export const upperCase = withoutContext(ifString((str) => str.toUpperCase()));
 export const lowerCase = withoutContext(ifString((str) => str.toLowerCase()));
 export const replace = withoutContext(
-  (str: unknown, pattern: unknown, replacement: unknown = '') => {
+  (str: unknown, pattern: unknown, replacement: unknown = "") => {
     if (
-      typeof str === 'string' &&
-      typeof pattern === 'string' &&
-      typeof replacement === 'string'
+      typeof str === "string" &&
+      typeof pattern === "string" &&
+      typeof replacement === "string"
     ) {
-      const replacementRegex = new RegExp(pattern, 'g');
+      const replacementRegex = new RegExp(pattern, "g");
 
       return str.replace(replacementRegex, replacement);
     }
 
     return str;
-  }
+  },
 );
 export const titleCase = withoutContext(
   ifString((str) =>
     str
-      .split(' ')
+      .split(" ")
       .map((word) => word[0].toUpperCase() + word.slice(1))
-      .join(' ')
-  )
+      .join(" "),
+  ),
 );
 
 export const sentenceCase = withoutContext(
-  ifString((str) => str.replace(/\b[a-zA-Z]/, (word) => word.toUpperCase()))
+  ifString((str) => str.replace(/\b[a-zA-Z]/, (word) => word.toUpperCase())),
 );
 
 /** Math Types */
@@ -96,15 +99,15 @@ export const sentenceCase = withoutContext(
 export const number = withoutContext(toNum);
 
 export const round = withoutContext<[number | string], number>((num) =>
-  Math.round(toNum(num, true) ?? 0)
+  Math.round(toNum(num, true) ?? 0),
 );
 
 export const floor = withoutContext<[number | string], number>((num) =>
-  Math.floor(toNum(num, true) ?? 0)
+  Math.floor(toNum(num, true) ?? 0),
 );
 
 export const ceil = withoutContext<[number | string], number>((num) =>
-  Math.ceil(toNum(num, true) ?? 0)
+  Math.ceil(toNum(num, true) ?? 0),
 );
 
 export const sum = withoutContext<Array<number | string>, number>((...args) => {
@@ -121,7 +124,7 @@ export const findPropertyIndex: ExpressionHandler<
   context: ExpressionContext,
   bindingOrModel: Binding | Array<Record<string, T>> | undefined,
   propToCheck: string | undefined,
-  valueToCheck: T
+  valueToCheck: T,
 ) => {
   if (bindingOrModel === undefined) {
     return -1;
@@ -137,7 +140,7 @@ export const findPropertyIndex: ExpressionHandler<
 
   return searchArray.findIndex((value) => {
     const propVal =
-      typeof value === 'object' && propToCheck !== undefined
+      typeof value === "object" && propToCheck !== undefined
         ? value[propToCheck]
         : value;
 
@@ -155,7 +158,7 @@ export const findProperty: ExpressionHandler<
   propToCheck: string | undefined,
   valueToCheck: T,
   propToReturn?: string,
-  defaultValue?: T
+  defaultValue?: T,
 ) => {
   const searchArray: Array<Record<string, T>> = Array.isArray(bindingOrModel)
     ? bindingOrModel
@@ -167,7 +170,7 @@ export const findProperty: ExpressionHandler<
 
   const foundValue = searchArray.find((value) => {
     const propVal =
-      typeof value === 'object' && propToCheck !== undefined
+      typeof value === "object" && propToCheck !== undefined
         ? value[propToCheck]
         : value;
 
@@ -178,7 +181,7 @@ export const findProperty: ExpressionHandler<
     return defaultValue;
   }
 
-  if (typeof foundValue === 'object' && propToReturn) {
+  if (typeof foundValue === "object" && propToReturn) {
     return foundValue[propToReturn] ?? defaultValue;
   }
 
@@ -194,8 +197,8 @@ export const findProperty: ExpressionHandler<
 export const containsAny = withoutContext<[string, string[] | string], boolean>(
   (str, keywords) => {
     if (
-      !(typeof str === 'string') ||
-      !(typeof keywords === 'string' || Array.isArray(keywords))
+      !(typeof str === "string") ||
+      !(typeof keywords === "string" || Array.isArray(keywords))
     ) {
       return false;
     }
@@ -205,5 +208,5 @@ export const containsAny = withoutContext<[string, string[] | string], boolean>(
     }
 
     return str.indexOf(keywords) > -1;
-  }
+  },
 );

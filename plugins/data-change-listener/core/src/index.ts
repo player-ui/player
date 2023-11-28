@@ -8,11 +8,11 @@ import type {
   ExpressionEvaluator,
   BindingInstance,
   BindingParser,
-} from '@player-ui/player';
-import { isExpressionNode } from '@player-ui/player';
+} from "@player-ui/player";
+import { isExpressionNode } from "@player-ui/player";
 
 const LISTENER_TYPES = {
-  dataChange: 'dataChange.',
+  dataChange: "dataChange.",
 };
 
 const WILDCARD_REGEX = /\._\.|\._$/;
@@ -31,13 +31,13 @@ export type ViewListenerHandler = (
     /** a means of evaluating an expression */
     expressionEvaluator: ExpressionEvaluator;
   },
-  binding: BindingInstance
+  binding: BindingInstance,
 ) => void;
 
 /** Sub out any _index_ refs with the ones from the supplied list */
 function replaceExpressionIndexes(
   expression: ExpressionType,
-  indexes: Array<string | number>
+  indexes: Array<string | number>,
 ): ExpressionType {
   if (indexes.length === 0) {
     return expression;
@@ -49,7 +49,7 @@ function replaceExpressionIndexes(
 
   if (Array.isArray(expression)) {
     return expression.map((subExp) =>
-      replaceExpressionIndexes(subExp, indexes)
+      replaceExpressionIndexes(subExp, indexes),
     ) as any;
   }
 
@@ -61,13 +61,13 @@ function replaceExpressionIndexes(
     replacementIndex += 1
   ) {
     const regex = new RegExp(
-      `_index${replacementIndex === 0 ? '' : replacementIndex.toString()}_`,
-      'g'
+      `_index${replacementIndex === 0 ? "" : replacementIndex.toString()}_`,
+      "g",
     );
 
     workingExp = workingExp.replace(
       regex,
-      indexes[replacementIndex].toString()
+      indexes[replacementIndex].toString(),
     );
   }
 
@@ -80,7 +80,7 @@ function replaceExpressionIndexes(
 function createWildcardHandler(
   listenerBinding: string,
   listenerExp: ExpressionType,
-  bindingParser: BindingParser
+  bindingParser: BindingParser,
 ): ViewListenerHandler {
   // The index of the start of the wildcard placeholder (foo._.bar)
   const wildCardIndex = listenerBinding.search(WILDCARD_REGEX);
@@ -88,12 +88,12 @@ function createWildcardHandler(
 
   // The top binding that we care about
   const topLevelBinding = bindingParser.parse(
-    listenerBinding.substr(0, wildCardIndex)
+    listenerBinding.substr(0, wildCardIndex),
   );
 
   /** Compute an updated expression (resolving _index_'s), or nothing if the binding update doesn't match */
   const getUpdatedExpressionToRun = (
-    updatedBinding: BindingInstance
+    updatedBinding: BindingInstance,
   ): ExpressionType | undefined => {
     // what to replace _index_, _index1_, etc.
     const indexes: Array<number | string> = [];
@@ -111,7 +111,7 @@ function createWildcardHandler(
         parsedListenerBinding.asArray()[bindingPartIndex];
       const updatedBindingPart = updatedBinding.asArray()[bindingPartIndex];
 
-      if (listenerBindingPart === '_') {
+      if (listenerBindingPart === "_") {
         indexes.push(updatedBindingPart);
       } else if (updatedBindingPart !== listenerBindingPart) {
         // We are listening for a binding that isn't this one
@@ -144,7 +144,7 @@ function createWildcardHandler(
  */
 function extractDataChangeListeners(
   view: ViewWithListener,
-  bindingParser: BindingParser
+  bindingParser: BindingParser,
 ): Array<ViewListenerHandler> {
   if (!view?.listeners) {
     return [];
@@ -155,14 +155,14 @@ function extractDataChangeListeners(
   return Object.entries(listeners).reduce<Array<ViewListenerHandler>>(
     (allListeners, [listenerKey, listenerExp]) => {
       if (
-        typeof listenerKey !== 'string' ||
+        typeof listenerKey !== "string" ||
         !listenerKey.startsWith(LISTENER_TYPES.dataChange)
       ) {
         return allListeners;
       }
 
       const listenerRawBinding = listenerKey.slice(
-        LISTENER_TYPES.dataChange.length
+        LISTENER_TYPES.dataChange.length,
       );
 
       if (listenerKey.match(WILDCARD_REGEX)) {
@@ -183,7 +183,7 @@ function extractDataChangeListeners(
         },
       ];
     },
-    []
+    [],
   );
 }
 
@@ -191,7 +191,7 @@ function extractDataChangeListeners(
  * this plugin processes the view level dataChange and evaluates custom expressions.
  */
 export class DataChangeListenerPlugin implements PlayerPlugin {
-  name = 'data-change-listener-plugin';
+  name = "data-change-listener-plugin";
 
   apply(player: Player) {
     let expressionEvaluator: ExpressionEvaluator;
@@ -201,7 +201,7 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
       this.name,
       (expEvaluator: ExpressionEvaluator) => {
         expressionEvaluator = expEvaluator;
-      }
+      },
     );
 
     /**
@@ -225,7 +225,7 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
             {
               expressionEvaluator,
             },
-            binding
+            binding,
           );
         });
       });
@@ -240,7 +240,7 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
           return committedVal === update.newValue;
         });
         onFieldUpdateHandler(validUpdates.map((t) => t.binding));
-      })
+      }),
     );
 
     /**
@@ -255,13 +255,13 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
       call: (view: View | undefined) => {
         const playerState = player.getState();
 
-        if (playerState.status !== 'in-progress' || !view) {
+        if (playerState.status !== "in-progress" || !view) {
           return;
         }
 
         dataChangeListeners = extractDataChangeListeners(
           view,
-          playerState.controllers.binding
+          playerState.controllers.binding,
         );
       },
     };
@@ -276,13 +276,13 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
           const { listeners, ...withoutListeners } = view as any;
           return withoutListeners;
         });
-      }
+      },
     );
 
     player.hooks.flowController.tap(this.name, (flowController) => {
       flowController.hooks.flow.tap(this.name, (flow) => {
         flow.hooks.transition.tap(this.name, (from, to) => {
-          if (to.value.state_type !== 'VIEW') {
+          if (to.value.state_type !== "VIEW") {
             dataChangeListeners = [];
           }
         });

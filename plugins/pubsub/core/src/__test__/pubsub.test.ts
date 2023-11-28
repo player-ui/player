@@ -1,13 +1,14 @@
-import { pubsub } from '../pubsub';
+import { describe, test, it, beforeEach, expect, vitest } from "vitest";
+import { pubsub } from "../pubsub";
 
-describe('pubsub', () => {
+describe("pubsub", () => {
   beforeEach(() => {
     pubsub.clear();
   });
 
-  it('should call subscriber with single argument', () => {
-    const type = 'test';
-    const message = 'this is a test message';
+  it("should call subscriber with single argument", () => {
+    const type = "test";
+    const message = "this is a test message";
     const spy = vitest.fn();
 
     pubsub.subscribe(type, spy);
@@ -17,9 +18,9 @@ describe('pubsub', () => {
     expect(spy).toHaveBeenCalledWith(type, message);
   });
 
-  it('should increment uuid with each subscribe', () => {
-    const type = 'test';
-    const message = 'this is a test message';
+  it("should increment uuid with each subscribe", () => {
+    const type = "test";
+    const message = "this is a test message";
     const spy = vitest.fn();
 
     const sub1 = pubsub.subscribe(type, spy);
@@ -32,39 +33,39 @@ describe('pubsub', () => {
     expect(sub2).not.toStrictEqual(sub3);
   });
 
-  it('should call subscriber with multiple argument', () => {
-    const type = 'test';
+  it("should call subscriber with multiple argument", () => {
+    const type = "test";
     const spy = vitest.fn();
 
     pubsub.subscribe(type, spy);
-    pubsub.publish(type, 1, 'two', 'three');
+    pubsub.publish(type, 1, "two", "three");
 
     expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenCalledWith(type, 1, 'two', 'three');
+    expect(spy).toHaveBeenCalledWith(type, 1, "two", "three");
   });
 
-  it('should handle different argument types', () => {
-    const type = 'test';
+  it("should handle different argument types", () => {
+    const type = "test";
     const spy = vitest.fn();
 
     pubsub.subscribe(type, spy);
-    pubsub.publish(type, 'one', 2, undefined, null, true, false);
+    pubsub.publish(type, "one", 2, undefined, null, true, false);
 
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy).toHaveBeenCalledWith(
       type,
-      'one',
+      "one",
       2,
       undefined,
       null,
       true,
-      false
+      false,
     );
   });
 
-  it('should call all subscribers only once', () => {
-    const type = 'test';
-    const message = 'this is a test message';
+  it("should call all subscribers only once", () => {
+    const type = "test";
+    const message = "this is a test message";
     const first = vitest.fn();
     const second = vitest.fn();
 
@@ -79,62 +80,62 @@ describe('pubsub', () => {
     expect(second).toHaveBeenCalledWith(type, message);
   });
 
-  it('should call only subscribers of event', () => {
-    const message = 'this is a test message';
+  it("should call only subscribers of event", () => {
+    const message = "this is a test message";
     const first = vitest.fn();
     const second = vitest.fn();
 
-    pubsub.subscribe('first', first);
-    pubsub.subscribe('second', second);
+    pubsub.subscribe("first", first);
+    pubsub.subscribe("second", second);
 
-    pubsub.publish('first', message);
+    pubsub.publish("first", message);
 
     expect(first).toHaveBeenCalledTimes(1);
-    expect(first).toHaveBeenCalledWith('first', message);
+    expect(first).toHaveBeenCalledWith("first", message);
     expect(second).not.toHaveBeenCalled();
   });
 
-  it('should call subscriber for all publish types', () => {
+  it("should call subscriber for all publish types", () => {
     const spy = vitest.fn();
 
-    pubsub.subscribe('*', spy);
+    pubsub.subscribe("*", spy);
 
-    pubsub.publish('one', 'one');
-    pubsub.publish('two', 'two');
-    pubsub.publish('three', 'three');
+    pubsub.publish("one", "one");
+    pubsub.publish("two", "two");
+    pubsub.publish("three", "three");
 
     expect(spy).toHaveBeenCalledTimes(3);
-    expect(spy).toHaveBeenNthCalledWith(1, 'one', 'one');
-    expect(spy).toHaveBeenNthCalledWith(2, 'two', 'two');
-    expect(spy).toHaveBeenNthCalledWith(3, 'three', 'three');
+    expect(spy).toHaveBeenNthCalledWith(1, "one", "one");
+    expect(spy).toHaveBeenNthCalledWith(2, "two", "two");
+    expect(spy).toHaveBeenNthCalledWith(3, "three", "three");
   });
 
-  it('should call all levels of subscribers only once', () => {
+  it("should call all levels of subscribers only once", () => {
     const level1 = vitest.fn();
     const level2 = vitest.fn();
     const level3 = vitest.fn();
 
-    pubsub.subscribe('foo', level1);
-    pubsub.subscribe('foo.bar', level2);
-    pubsub.subscribe('foo.bar.baz', level3);
+    pubsub.subscribe("foo", level1);
+    pubsub.subscribe("foo.bar", level2);
+    pubsub.subscribe("foo.bar.baz", level3);
 
-    pubsub.publish('foo.bar.baz', 'one', 'two', 'three');
+    pubsub.publish("foo.bar.baz", "one", "two", "three");
 
     expect(level1).toHaveBeenCalledTimes(1);
     expect(level2).toHaveBeenCalledTimes(1);
     expect(level3).toHaveBeenCalledTimes(1);
-    expect(level1).toHaveBeenCalledWith('foo.bar.baz', 'one', 'two', 'three');
-    expect(level2).toHaveBeenCalledWith('foo.bar.baz', 'one', 'two', 'three');
-    expect(level3).toHaveBeenCalledWith('foo.bar.baz', 'one', 'two', 'three');
+    expect(level1).toHaveBeenCalledWith("foo.bar.baz", "one", "two", "three");
+    expect(level2).toHaveBeenCalledWith("foo.bar.baz", "one", "two", "three");
+    expect(level3).toHaveBeenCalledWith("foo.bar.baz", "one", "two", "three");
   });
 
-  it('should return unique symbols for each subscribe', () => {
+  it("should return unique symbols for each subscribe", () => {
     const spy = vitest.fn();
     const spy2 = vitest.fn();
 
-    const token1 = pubsub.subscribe('test', spy);
-    const token2 = pubsub.subscribe('test', spy);
-    const token3 = pubsub.subscribe('test', spy2);
+    const token1 = pubsub.subscribe("test", spy);
+    const token2 = pubsub.subscribe("test", spy);
+    const token3 = pubsub.subscribe("test", spy2);
 
     const symbols = new Set([token1, token2, token3]);
     expect(symbols.size).toBe(3);
@@ -143,13 +144,13 @@ describe('pubsub', () => {
   it(`shouldn't error if subscribing to non string value`, () => {
     const spy = vitest.fn();
     pubsub.subscribe(true as any, spy);
-    pubsub.publish(true as any, 'test');
+    pubsub.publish(true as any, "test");
 
     expect(spy).not.toHaveBeenCalled();
   });
 
-  it('should remove handler with token', () => {
-    const type = 'test';
+  it("should remove handler with token", () => {
+    const type = "test";
     const spy = vitest.fn();
     const token = pubsub.subscribe(type, spy);
 
@@ -162,8 +163,8 @@ describe('pubsub', () => {
     expect(pubsub.count(type)).toBe(0);
   });
 
-  it('should only remove handler with passed token', () => {
-    const type = 'test';
+  it("should only remove handler with passed token", () => {
+    const type = "test";
     const spy1 = vitest.fn();
     const spy2 = vitest.fn();
     const token1 = pubsub.subscribe(type, spy1);
@@ -183,8 +184,8 @@ describe('pubsub', () => {
     expect(pubsub.count(type)).toBe(0);
   });
 
-  it('should remove all handlers for type', () => {
-    const type = 'test';
+  it("should remove all handlers for type", () => {
+    const type = "test";
     const spy1 = vitest.fn();
     const spy2 = vitest.fn();
     pubsub.subscribe(type, spy1);
@@ -192,117 +193,117 @@ describe('pubsub', () => {
 
     expect(pubsub.count()).toBe(2);
     expect(pubsub.count(type)).toBe(2);
-    // @ts-ignore
+
     expect(pubsub.tokens.size).toBe(2);
 
     pubsub.unsubscribe(type);
 
     expect(pubsub.count()).toBe(0);
     expect(pubsub.count(type)).toBe(0);
-    // @ts-ignore
+
     expect(pubsub.tokens.size).toBe(0);
   });
 
-  it('should remove all nested handlers for type', () => {
+  it("should remove all nested handlers for type", () => {
     const spy1 = vitest.fn();
     const spy2 = vitest.fn();
     const spy3 = vitest.fn();
-    pubsub.subscribe('foo', spy1);
-    pubsub.subscribe('foo.bar', spy2);
-    pubsub.subscribe('foo.bar.baz', spy3);
+    pubsub.subscribe("foo", spy1);
+    pubsub.subscribe("foo.bar", spy2);
+    pubsub.subscribe("foo.bar.baz", spy3);
 
     expect(pubsub.count()).toBe(3);
-    expect(pubsub.count('foo')).toBe(1);
-    expect(pubsub.count('foo.bar')).toBe(1);
-    expect(pubsub.count('foo.bar.baz')).toBe(1);
-    // @ts-ignore
+    expect(pubsub.count("foo")).toBe(1);
+    expect(pubsub.count("foo.bar")).toBe(1);
+    expect(pubsub.count("foo.bar.baz")).toBe(1);
+
     expect(pubsub.tokens.size).toBe(3);
 
-    pubsub.unsubscribe('foo');
+    pubsub.unsubscribe("foo");
 
     expect(pubsub.count()).toBe(0);
-    expect(pubsub.count('foo')).toBe(0);
-    expect(pubsub.count('foo.bar')).toBe(0);
-    expect(pubsub.count('foo.bar.baz')).toBe(0);
-    // @ts-ignore
+    expect(pubsub.count("foo")).toBe(0);
+    expect(pubsub.count("foo.bar")).toBe(0);
+    expect(pubsub.count("foo.bar.baz")).toBe(0);
+
     expect(pubsub.tokens.size).toBe(0);
   });
 
-  it('should keep top layer for type', () => {
+  it("should keep top layer for type", () => {
     const spy1 = vitest.fn();
     const spy2 = vitest.fn();
     const spy3 = vitest.fn();
-    pubsub.subscribe('foo', spy1);
-    pubsub.subscribe('foo.bar', spy2);
-    pubsub.subscribe('foo.bar.baz', spy3);
+    pubsub.subscribe("foo", spy1);
+    pubsub.subscribe("foo.bar", spy2);
+    pubsub.subscribe("foo.bar.baz", spy3);
 
     expect(pubsub.count()).toBe(3);
-    expect(pubsub.count('foo')).toBe(1);
-    expect(pubsub.count('foo.bar')).toBe(1);
-    expect(pubsub.count('foo.bar.baz')).toBe(1);
-    // @ts-ignore
+    expect(pubsub.count("foo")).toBe(1);
+    expect(pubsub.count("foo.bar")).toBe(1);
+    expect(pubsub.count("foo.bar.baz")).toBe(1);
+
     expect(pubsub.tokens.size).toBe(3);
 
-    pubsub.unsubscribe('foo.bar');
+    pubsub.unsubscribe("foo.bar");
 
     expect(pubsub.count()).toBe(1);
-    expect(pubsub.count('foo')).toBe(1);
-    expect(pubsub.count('foo.bar')).toBe(0);
-    expect(pubsub.count('foo.bar.baz')).toBe(0);
-    // @ts-ignore
+    expect(pubsub.count("foo")).toBe(1);
+    expect(pubsub.count("foo.bar")).toBe(0);
+    expect(pubsub.count("foo.bar.baz")).toBe(0);
+
     expect(pubsub.tokens.size).toBe(1);
   });
 
-  it('should only delete deeply nested type', () => {
+  it("should only delete deeply nested type", () => {
     const spy1 = vitest.fn();
     const spy2 = vitest.fn();
     const spy3 = vitest.fn();
-    pubsub.subscribe('foo', spy1);
-    pubsub.subscribe('foo.bar', spy2);
-    pubsub.subscribe('foo.bar.baz', spy3);
+    pubsub.subscribe("foo", spy1);
+    pubsub.subscribe("foo.bar", spy2);
+    pubsub.subscribe("foo.bar.baz", spy3);
 
     expect(pubsub.count()).toBe(3);
-    expect(pubsub.count('foo')).toBe(1);
-    expect(pubsub.count('foo.bar')).toBe(1);
-    expect(pubsub.count('foo.bar.baz')).toBe(1);
-    // @ts-ignore
+    expect(pubsub.count("foo")).toBe(1);
+    expect(pubsub.count("foo.bar")).toBe(1);
+    expect(pubsub.count("foo.bar.baz")).toBe(1);
+
     expect(pubsub.tokens.size).toBe(3);
 
-    pubsub.unsubscribe('foo.bar.baz');
+    pubsub.unsubscribe("foo.bar.baz");
 
     expect(pubsub.count()).toBe(2);
-    expect(pubsub.count('foo')).toBe(1);
-    expect(pubsub.count('foo.bar')).toBe(1);
-    expect(pubsub.count('foo.bar.baz')).toBe(0);
-    // @ts-ignore
+    expect(pubsub.count("foo")).toBe(1);
+    expect(pubsub.count("foo.bar")).toBe(1);
+    expect(pubsub.count("foo.bar.baz")).toBe(0);
+
     expect(pubsub.tokens.size).toBe(2);
   });
 
   it(`should gracefully handle when token doesn't exist anymore`, () => {
     const spy = vitest.fn();
 
-    const token = pubsub.subscribe('foo', spy);
+    const token = pubsub.subscribe("foo", spy);
     expect(pubsub.count()).toBe(1);
 
     pubsub.clear();
     expect(pubsub.count()).toBe(0);
 
     pubsub.unsubscribe(token);
-    // @ts-ignore
+
     expect(pubsub.tokens.size).toBe(0);
   });
 
   it(`should gracefully handle when unsubscribe isn't string or symbol`, () => {
     const spy = vitest.fn();
 
-    pubsub.subscribe('foo', spy);
+    pubsub.subscribe("foo", spy);
     expect(pubsub.count()).toBe(1);
 
     pubsub.clear();
     expect(pubsub.count()).toBe(0);
 
     pubsub.unsubscribe(false as any);
-    // @ts-ignore
+
     expect(pubsub.tokens.size).toBe(0);
   });
 });

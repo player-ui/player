@@ -1,9 +1,9 @@
-import React from 'react';
-import type { ReactPlayer, ReactPlayerPlugin } from '@player-ui/react';
-import type { MetricsWebPluginOptions } from '@player-ui/metrics-plugin';
-import { MetricsCorePlugin } from '@player-ui/metrics-plugin';
+import React from "react";
+import type { ReactPlayer, ReactPlayerPlugin } from "@player-ui/react";
+import type { MetricsWebPluginOptions } from "@player-ui/metrics-plugin";
+import { MetricsCorePlugin } from "@player-ui/metrics-plugin";
 
-export * from '@player-ui/metrics-plugin';
+export * from "@player-ui/metrics-plugin";
 
 /** A plugin to add render metrics to Player */
 export class MetricsPlugin
@@ -30,7 +30,7 @@ export class MetricsPlugin
     };
 
     reactPlayer.hooks.playerComponent.tap(this.name, (Comp) => {
-      return (props) => {
+      return function MetricsWrapper(props) {
         React.useEffect(endRender);
 
         return <Comp {...props} />;

@@ -1,12 +1,11 @@
-const path = require('path');
-const fm = require('gray-matter');
-const slugger = require('github-slugger');
-const removeMarkdown = require('remove-markdown');
+const path = require("path");
+const fm = require("gray-matter");
+const slugger = require("github-slugger");
+const removeMarkdown = require("remove-markdown");
 
 // https://github.com/chakra-ui/chakra-ui-docs/blob/main/src/utils/mdx-utils.ts
 function getTableOfContents(mdxContent) {
-  const regexp = new RegExp(/^(#+\s)(.*)\n/, 'gm');
-  // @ts-ignore
+  const regexp = new RegExp(/^(#+\s)(.*)\n/, "gm");
   const headings = [...mdxContent.matchAll(regexp)];
   let tableOfContents = [];
 
@@ -33,7 +32,7 @@ module.exports = async function (src) {
 
   const compDir = path.relative(
     this.context,
-    path.join(__dirname, '..', 'components', 'Layout', `MDXPageLayout`)
+    path.join(__dirname, "..", "components", "Layout", `MDXPageLayout`),
   );
 
   const code = `import withLayout from '${compDir}';

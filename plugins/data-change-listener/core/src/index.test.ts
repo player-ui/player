@@ -1,15 +1,15 @@
-import { waitFor } from '@testing-library/react';
+import { vitest, describe, expect, it, beforeEach, Mock } from "vitest";
 import type {
   DataController,
   InProgressState,
   TransformFunction,
-} from '@player-ui/player';
-import { Player } from '@player-ui/player';
-import type { Flow } from '@player-ui/types';
-import { CommonTypesPlugin } from '@player-ui/common-types-plugin';
-import { AssetTransformPlugin } from '@player-ui/asset-transform-plugin';
-import { Registry } from '@player-ui/partial-match-registry';
-import { DataChangeListenerPlugin } from './index';
+  Flow,
+} from "@player-ui/player";
+import { Player } from "@player-ui/player";
+import { CommonTypesPlugin } from "@player-ui/common-types-plugin";
+import { AssetTransformPlugin } from "@player-ui/asset-transform-plugin";
+import { Registry } from "@player-ui/partial-match-registry";
+import { DataChangeListenerPlugin } from "./index";
 
 /** Test transform function to add validation to asset */
 const transform: TransformFunction = (asset: any, options: any) => {
@@ -32,93 +32,93 @@ const transform: TransformFunction = (asset: any, options: any) => {
 };
 
 const dataChangeFlow: Flow = {
-  id: 'test-flow',
+  id: "test-flow",
   data: {
     name: {
-      first: 'Adam',
-      last: 'Dierkens',
+      first: "Adam",
+      last: "Dierkens",
     },
   },
   views: [
     {
-      id: 'view-1',
-      type: 'view',
+      id: "view-1",
+      type: "view",
       fields: {
         asset: {
-          id: 'input-1',
-          type: 'input',
-          binding: 'name.first',
+          id: "input-1",
+          type: "input",
+          binding: "name.first",
         },
       },
       listeners: {
-        'dataChange.name.first': ["test('hello ' + {{name.first}})"],
-        'dataChange.name.last': ["test('goodbye ' + {{name.last}}"],
-        'dataChange.person._.name': ['test(_index_)'],
-        'dataChange.nested._.name._.other': ['test(_index_, _index1_)'],
+        "dataChange.name.first": ["test('hello ' + {{name.first}})"],
+        "dataChange.name.last": ["test('goodbye ' + {{name.last}}"],
+        "dataChange.person._.name": ["test(_index_)"],
+        "dataChange.nested._.name._.other": ["test(_index_, _index1_)"],
       },
     },
     {
-      id: 'view-2',
-      type: 'view',
+      id: "view-2",
+      type: "view",
       listeners: {
-        'dataChange.name.last': ["test('hello ' + {{name.last}})"],
+        "dataChange.name.last": ["test('hello ' + {{name.last}})"],
       },
     },
   ],
   schema: {
     ROOT: {
       name: {
-        type: 'nameType',
+        type: "nameType",
       },
     },
     nameType: {
       first: {
-        type: 'StringType',
+        type: "StringType",
         validation: [
           {
-            param: '^[a-zA-Z]*$',
-            type: 'regex',
+            param: "^[a-zA-Z]*$",
+            type: "regex",
           },
         ],
       },
       last: {
-        type: 'StringType',
+        type: "StringType",
       },
     },
   },
   navigation: {
-    BEGIN: 'FLOW_1',
+    BEGIN: "FLOW_1",
     FLOW_1: {
-      startState: 'VIEW_1',
+      startState: "VIEW_1",
       VIEW_1: {
-        state_type: 'VIEW',
-        ref: 'view-1',
+        state_type: "VIEW",
+        ref: "view-1",
         transitions: {
-          '*': 'ACTION_1',
+          "*": "ACTION_1",
         },
       },
       ACTION_1: {
-        state_type: 'ACTION',
+        state_type: "ACTION",
         exp: ['{{name.first}} = "Frodo"', '{{name.last}} = "Baggins"'],
         transitions: {
-          '*': 'VIEW_2',
+          "*": "VIEW_2",
         },
       },
       VIEW_2: {
-        state_type: 'VIEW',
-        ref: 'view-2',
+        state_type: "VIEW",
+        ref: "view-2",
         transitions: {
-          '*': 'ACTION_1',
+          "*": "ACTION_1",
         },
       },
     },
   },
 };
 
-describe('Data-Change-Listener', () => {
+describe("Data-Change-Listener", () => {
   let player: Player;
   let dataController: DataController;
-  let testExpression: jest.Mock<any, any>;
+  let testExpression: Mock<any, any>;
 
   beforeEach(() => {
     player = new Player({
@@ -127,59 +127,59 @@ describe('Data-Change-Listener', () => {
 
     testExpression = vitest.fn();
 
-    player.hooks.expressionEvaluator.tap('test', (ev) => {
-      ev.addExpressionFunction('test', (context, ...args) => {
+    player.hooks.expressionEvaluator.tap("test", (ev) => {
+      ev.addExpressionFunction("test", (context, ...args) => {
         testExpression(...args);
       });
     });
 
-    player.hooks.dataController.tap('test', (dc) => {
+    player.hooks.dataController.tap("test", (dc) => {
       dataController = dc;
     });
 
     player.start(dataChangeFlow);
   });
 
-  it('should ignore fields that are not tracked', () => {
-    dataController.set([['name.middle', 'Christopher']]);
+  it("should ignore fields that are not tracked", () => {
+    dataController.set([["name.middle", "Christopher"]]);
     expect(testExpression).not.toHaveBeenCalled();
   });
 
-  it('should not call evaluate if field does not change', () => {
-    dataController.set([['name.first', 'Adam']]);
+  it("should not call evaluate if field does not change", () => {
+    dataController.set([["name.first", "Adam"]]);
     expect(testExpression).not.toHaveBeenCalled();
   });
 
-  it('should call expression evaluator when a field that is tracked changes', () => {
-    dataController.set([['name.first', 'Frodo']], {
+  it("should call expression evaluator when a field that is tracked changes", () => {
+    dataController.set([["name.first", "Frodo"]], {
       context: {
         model: dataController.getModel(),
       },
     });
-    expect(testExpression).toHaveBeenCalledWith('hello Frodo');
+    expect(testExpression).toHaveBeenCalledWith("hello Frodo");
   });
 
-  it('should forget about listeners when transitioning', () => {
+  it("should forget about listeners when transitioning", () => {
     const state = player.getState() as InProgressState;
-    state.controllers.flow.transition('next');
+    state.controllers.flow.transition("next");
     expect(testExpression).not.toHaveBeenCalled();
   });
 
-  it('should forget about listeners on a new view', async () => {
+  it("should forget about listeners on a new view", async () => {
     const state = player.getState() as InProgressState;
-    state.controllers.flow.transition('next');
+    state.controllers.flow.transition("next");
 
-    await waitFor(() => expect(testExpression).not.toHaveBeenCalled());
-    dataController.set([['name.last', 'Dierkens']], {
+    await vitest.waitFor(() => expect(testExpression).not.toHaveBeenCalled());
+    dataController.set([["name.last", "Dierkens"]], {
       context: {
         model: dataController.getModel(),
       },
     });
-    expect(testExpression).toHaveBeenCalledWith('hello Dierkens');
+    expect(testExpression).toHaveBeenCalledWith("hello Dierkens");
   });
 
-  it('should call the listener for each item when a sub-item changes', () => {
-    dataController.set([['person.1.name', 'Frodo']], {
+  it("should call the listener for each item when a sub-item changes", () => {
+    dataController.set([["person.1.name", "Frodo"]], {
       context: {
         model: dataController.getModel(),
       },
@@ -187,13 +187,13 @@ describe('Data-Change-Listener', () => {
     expect(testExpression).toHaveBeenCalledWith(1);
   });
 
-  it('should skip nested, incorrect bindings', () => {
-    dataController.set([['person.1.fruit', 'Frodo']]);
+  it("should skip nested, incorrect bindings", () => {
+    dataController.set([["person.1.fruit", "Frodo"]]);
     expect(testExpression).not.toHaveBeenCalled();
   });
 
-  it('should sub out nested bindings', () => {
-    dataController.set([['nested.2.name.3.other', 'Frodo']], {
+  it("should sub out nested bindings", () => {
+    dataController.set([["nested.2.name.3.other", "Frodo"]], {
       context: {
         model: dataController.getModel(),
       },
@@ -201,82 +201,82 @@ describe('Data-Change-Listener', () => {
     expect(testExpression).toHaveBeenCalledWith(2, 3);
   });
 
-  it('should not trigger when a silent update is sent', () => {
-    dataController.set(['name.first', 'New Value'], { silent: true });
+  it("should not trigger when a silent update is sent", () => {
+    dataController.set(["name.first", "New Value"], { silent: true });
     expect(testExpression).not.toHaveBeenCalled();
   });
 });
 
-describe('Data-Change-Listener with Validations', () => {
+describe("Data-Change-Listener with Validations", () => {
   let player: Player;
-  let testExpression: jest.Mock<any, any>;
+  let testExpression: Mock<any, any>;
 
   const flow: Flow = {
-    id: 'test-flow',
+    id: "test-flow",
     data: {
       name: {
-        first: 'Madam',
-        last: 'Dierkens',
+        first: "Madam",
+        last: "Dierkens",
       },
     },
     views: [
       {
-        id: 'view-1',
-        type: 'info',
+        id: "view-1",
+        type: "info",
         fields: {
           asset: {
-            id: 'input',
-            type: 'input',
-            binding: 'name.first',
+            id: "input",
+            type: "input",
+            binding: "name.first",
           },
         },
         listeners: {
-          'dataChange.name.first': ["test('hello ' + {{name.first}})"],
-          'dataChange.name.last': ["test('goodbye ' + {{name.last}}"],
-          'dataChange.person._.name': ['test(_index_)'],
-          'dataChange.nested._.name._.other': ['test(_index_, _index1_)'],
+          "dataChange.name.first": ["test('hello ' + {{name.first}})"],
+          "dataChange.name.last": ["test('goodbye ' + {{name.last}}"],
+          "dataChange.person._.name": ["test(_index_)"],
+          "dataChange.nested._.name._.other": ["test(_index_, _index1_)"],
         },
         validation: [
           {
-            ref: 'name.first',
-            type: 'expression',
+            ref: "name.first",
+            type: "expression",
             exp: '{{name.first}} == "Adam"',
-            message: 'Adam is always the right option',
-            trigger: 'change',
+            message: "Adam is always the right option",
+            trigger: "change",
           },
         ],
       },
       {
-        id: 'view-2',
-        type: 'view',
+        id: "view-2",
+        type: "view",
         listeners: {
-          'dataChange.name.last': ["test('hello ' + {{name.last}})"],
+          "dataChange.name.last": ["test('hello ' + {{name.last}})"],
         },
       },
     ],
     navigation: {
-      BEGIN: 'FLOW_1',
+      BEGIN: "FLOW_1",
       FLOW_1: {
-        startState: 'VIEW_1',
+        startState: "VIEW_1",
         VIEW_1: {
-          state_type: 'VIEW',
-          ref: 'view-1',
+          state_type: "VIEW",
+          ref: "view-1",
           transitions: {
-            '*': 'ACTION_1',
+            "*": "ACTION_1",
           },
         },
         ACTION_1: {
-          state_type: 'ACTION',
+          state_type: "ACTION",
           exp: ['{{name.first}} = "Frodo"', '{{name.last}} = "Baggins"'],
           transitions: {
-            '*': 'VIEW_2',
+            "*": "VIEW_2",
           },
         },
         VIEW_2: {
-          state_type: 'VIEW',
-          ref: 'view-2',
+          state_type: "VIEW",
+          ref: "view-2",
           transitions: {
-            '*': 'ACTION_1',
+            "*": "ACTION_1",
           },
         },
       },
@@ -303,15 +303,15 @@ describe('Data-Change-Listener with Validations', () => {
         new CommonTypesPlugin(),
         new DataChangeListenerPlugin(),
         new AssetTransformPlugin(
-          new Registry([[{ type: 'input' }, transform]])
+          new Registry([[{ type: "input" }, transform]]),
         ),
       ],
     });
 
     testExpression = vitest.fn();
 
-    player.hooks.expressionEvaluator.tap('test', (ev) => {
-      ev.addExpressionFunction('test', (context, ...args) => {
+    player.hooks.expressionEvaluator.tap("test", (ev) => {
+      ev.addExpressionFunction("test", (context, ...args) => {
         testExpression(...args);
       });
     });
@@ -319,27 +319,27 @@ describe('Data-Change-Listener with Validations', () => {
     player.start(flow);
   });
 
-  it('bindings with a value that failed validation do not trigger listeners', async () => {
+  it("bindings with a value that failed validation do not trigger listeners", async () => {
     expect(getInputAsset().validation).toBe(undefined);
 
-    getInputAsset().set('AdamAdam');
-    waitFor(() => {
+    getInputAsset().set("AdamAdam");
+    await vitest.waitFor(() => {
       expect(getInputAsset().validation).toBeDefined();
       expect(testExpression).not.toHaveBeenCalled();
     });
   });
 
-  it('bindings with a successful validation trigger listeners', async () => {
+  it("bindings with a successful validation trigger listeners", async () => {
     expect(getInputAsset().validation).toBe(undefined);
 
-    getInputAsset().set('Adam');
-    waitFor(() => {
+    getInputAsset().set("Adam");
+    await vitest.waitFor(() => {
       expect(getInputAsset().validation).not.toBeDefined();
       expect(testExpression).toHaveBeenCalled();
     });
   });
 
-  it('removes listeners section after resolving', () => {
+  it("removes listeners section after resolving", () => {
     expect(getCurrentView()?.initialView?.listeners).toBeUndefined();
   });
 });

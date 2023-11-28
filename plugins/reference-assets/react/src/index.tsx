@@ -1,2 +1,2 @@
-export * from './plugin';
-export * from './assets';
+export * from "./plugin";
+export * from "./assets";

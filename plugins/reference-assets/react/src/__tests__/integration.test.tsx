@@ -1,4 +1,5 @@
-import React from 'react';
+import { describe, test, vitest, expect } from "vitest";
+import React from "react";
 import {
   screen,
   render,
@@ -6,18 +7,18 @@ import {
   fireEvent,
   waitFor,
   configure,
-} from '@testing-library/react';
-import { BeaconPlugin } from '@player-ui/beacon-plugin-react';
-import { ReactPlayer } from '@player-ui/react';
-import { makeFlow } from '@player-ui/make-flow';
-import { ReferenceAssetsPlugin } from '../plugin';
+} from "@testing-library/react";
+import { BeaconPlugin } from "@player-ui/beacon-plugin-react";
+import { ReactPlayer } from "@player-ui/react";
+import { makeFlow } from "@player-ui/make-flow";
+import { ReferenceAssetsPlugin } from "../plugin";
 
 configure({
-  testIdAttribute: 'id',
+  testIdAttribute: "id",
 });
 
-describe('Integration tests', () => {
-  test('input beacons the correct custom data value', async () => {
+describe("Integration tests", () => {
+  test("input beacons the correct custom data value", async () => {
     const handler = vitest.fn();
     const beaconPlugin = new BeaconPlugin({ callback: handler });
 
@@ -26,30 +27,30 @@ describe('Integration tests', () => {
     });
 
     const flow = makeFlow({
-      id: 'first_view',
-      type: 'input',
-      binding: 'foo.bar',
-      metaData: { beacon: { custom_data: '{{foo.bar}}' } },
+      id: "first_view",
+      type: "input",
+      binding: "foo.bar",
+      metaData: { beacon: { custom_data: "{{foo.bar}}" } },
     });
 
     render(
       <React.Suspense fallback="fallback">
         <rp.Component />
-      </React.Suspense>
+      </React.Suspense>,
     );
 
     await act(async () => {
       rp.start(flow);
     });
 
-    const viewNode = await screen.findByTestId('first_view');
+    const viewNode = await screen.findByTestId("first_view");
 
     act(() => {
-      fireEvent.change(viewNode, { target: { value: 'new value' } });
+      fireEvent.change(viewNode, { target: { value: "new value" } });
     });
 
     act(() => {
-      fireEvent.blur(viewNode, { target: { value: 'new value' } });
+      fireEvent.blur(viewNode, { target: { value: "new value" } });
     });
 
     await waitFor(() => {
@@ -57,8 +58,8 @@ describe('Integration tests', () => {
     });
 
     expect(handler.mock.calls[1][0]).toMatchObject({
-      assetId: 'first_view',
-      data: { custom_data: 'new value' },
+      assetId: "first_view",
+      data: { custom_data: "new value" },
     });
   });
 });

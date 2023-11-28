@@ -10,10 +10,12 @@ vitest_config(name = "vitest_config")
 
 js_pipeline(
     package_name = "@player-ui/asset-provider-plugin-react",
-    dependencies = [
-        ":node_modules/@player-ui/react-subscribe",
-    ],
-    peer_dependencies = [
+    peer_deps = [
+        "//:node_modules/react",
+        "//:node_modules/@types/react",
         ":node_modules/@player-ui/react",
+    ],
+    deps = [
+        ":node_modules/@player-ui/react-subscribe",
     ],
 )

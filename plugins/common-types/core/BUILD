@@ -16,6 +16,8 @@ js_pipeline(
     test_deps = [
         ":node_modules/@player-ui/asset-transform-plugin",
         ":node_modules/@player-ui/make-flow",
+        ":node_modules/@player-ui/partial-match-registry",
+        "//:vitest_config",
     ],
     deps = [
         ":node_modules/@player-ui/types-provider-plugin",

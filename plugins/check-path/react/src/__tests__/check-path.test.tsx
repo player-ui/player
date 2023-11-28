@@ -1,7 +1,8 @@
-import React from 'react';
-import { ReactPlayer, ReactAsset } from '@player-ui/react';
-import { findByTestId, render } from '@testing-library/react';
-import { makeFlow } from '@player-ui/make-flow';
+import { describe, test, expect, vitest, afterEach, beforeEach } from "vitest";
+import React from "react";
+import { ReactPlayer, ReactAsset } from "@player-ui/react";
+import { findByTestId, render } from "@testing-library/react";
+import { makeFlow } from "@player-ui/make-flow";
 import {
   CheckPathPlugin,
   useGetParent,
@@ -9,27 +10,27 @@ import {
   useGetPath,
   useHasChildContext,
   useHasParentContext,
-} from '..';
+} from "..";
 
-describe('beacon web plugin', () => {
-  test('loads in a player', async () => {
+describe("beacon web plugin", () => {
+  test("loads in a player", async () => {
     const rp = new ReactPlayer({
       plugins: [new CheckPathPlugin()],
     });
 
     const flow = makeFlow({
-      id: 'action',
-      type: 'action',
-      value: 'Next',
+      id: "action",
+      type: "action",
+      value: "Next",
       label: {
         asset: {
-          type: 'action',
-          id: 'label',
+          type: "action",
+          id: "label",
         },
       },
     });
 
-    rp.assetRegistry.set({ type: 'action' }, (props: any) => {
+    rp.assetRegistry.set({ type: "action" }, (props: any) => {
       const parentProp = useGetParentProp(props.id);
 
       return (
@@ -46,10 +47,10 @@ describe('beacon web plugin', () => {
         <React.Suspense fallback="loading...">
           <rp.Component />
         </React.Suspense>
-      </div>
+      </div>,
     );
 
-    const action = await findByTestId(container, 'action');
+    const action = await findByTestId(container, "action");
 
     expect(action).toMatchInlineSnapshot(`
       <div
@@ -68,8 +69,8 @@ describe('beacon web plugin', () => {
   });
 });
 
-describe('check-path tests', () => {
-  const spy = jest.spyOn(React, 'useContext');
+describe("check-path tests", () => {
+  const spy = vitest.spyOn(React, "useContext");
   const hasParentContextMock = vitest.fn();
   const hasChildContextMock = vitest.fn();
   const getParentPropMock = vitest.fn();
@@ -89,25 +90,25 @@ describe('check-path tests', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vitest.clearAllMocks();
   });
 
   /**
    * useHasParent tests
    */
 
-  test('useHasParentContext undefined asset', () => {
-    expect(useHasParentContext(undefined, 'query')).toBe(false);
+  test("useHasParentContext undefined asset", () => {
+    expect(useHasParentContext(undefined, "query")).toBe(false);
     expect(hasParentContextMock).not.toBeCalled();
   });
 
-  test('useHasParentContext string asset', () => {
-    useHasParentContext('testId', 'query');
+  test("useHasParentContext string asset", () => {
+    useHasParentContext("testId", "query");
     expect(hasParentContextMock).toBeCalled();
   });
 
-  test('useHasParentContext object asset', () => {
-    useHasParentContext({ id: 'testId', type: 'testType' }, 'query');
+  test("useHasParentContext object asset", () => {
+    useHasParentContext({ id: "testId", type: "testType" }, "query");
     expect(hasParentContextMock).toBeCalled();
   });
 
@@ -115,18 +116,18 @@ describe('check-path tests', () => {
    * useHasChildContext tests
    */
 
-  test('useHasChildContext undefined asset', () => {
-    expect(useHasChildContext(undefined, 'query')).toBe(false);
+  test("useHasChildContext undefined asset", () => {
+    expect(useHasChildContext(undefined, "query")).toBe(false);
     expect(hasChildContextMock).not.toBeCalled();
   });
 
-  test('useHasChildContext string asset', () => {
-    useHasChildContext('testId', 'query');
+  test("useHasChildContext string asset", () => {
+    useHasChildContext("testId", "query");
     expect(hasChildContextMock).toBeCalled();
   });
 
-  test('useHasChildContext object asset', () => {
-    useHasChildContext({ id: 'testId', type: 'testType' }, 'query');
+  test("useHasChildContext object asset", () => {
+    useHasChildContext({ id: "testId", type: "testType" }, "query");
     expect(hasChildContextMock).toBeCalled();
   });
 
@@ -134,18 +135,18 @@ describe('check-path tests', () => {
    * useGetParentProp tests
    */
 
-  test('useGetParentProp undefined asset', () => {
+  test("useGetParentProp undefined asset", () => {
     expect(useGetParentProp(undefined)).toBe(undefined);
     expect(getParentPropMock).not.toBeCalled();
   });
 
-  test('useGetParentProp string asset', () => {
-    useGetParentProp('testId');
+  test("useGetParentProp string asset", () => {
+    useGetParentProp("testId");
     expect(getParentPropMock).toBeCalled();
   });
 
-  test('useGetParentProp object asset', () => {
-    useGetParentProp({ id: 'testId', type: 'testType' });
+  test("useGetParentProp object asset", () => {
+    useGetParentProp({ id: "testId", type: "testType" });
     expect(getParentPropMock).toBeCalled();
   });
 
@@ -153,18 +154,18 @@ describe('check-path tests', () => {
    * useGetPath tests
    */
 
-  test('useGetPath undefined asset', () => {
-    expect(useGetPath(undefined, 'query')).toBe(undefined);
+  test("useGetPath undefined asset", () => {
+    expect(useGetPath(undefined, "query")).toBe(undefined);
     expect(getPathMock).not.toBeCalled();
   });
 
-  test('useGetPath string asset', () => {
-    useGetPath('testId', 'query');
+  test("useGetPath string asset", () => {
+    useGetPath("testId", "query");
     expect(getPathMock).toBeCalled();
   });
 
-  test('useGetPath object asset', () => {
-    useGetPath({ id: 'testId', type: 'testType' }, 'query');
+  test("useGetPath object asset", () => {
+    useGetPath({ id: "testId", type: "testType" }, "query");
     expect(getPathMock).toBeCalled();
   });
 
@@ -172,18 +173,18 @@ describe('check-path tests', () => {
    * useGetParent tests
    */
 
-  test('useGetParent undefined asset', () => {
-    expect(useGetParent(undefined, 'query')).toBe(undefined);
+  test("useGetParent undefined asset", () => {
+    expect(useGetParent(undefined, "query")).toBe(undefined);
     expect(getParentMock).not.toBeCalled();
   });
 
-  test('useGetParent string asset', () => {
-    useGetParent('testId', 'query');
+  test("useGetParent string asset", () => {
+    useGetParent("testId", "query");
     expect(getParentMock).toBeCalled();
   });
 
-  test('useGetParent object asset', () => {
-    useGetParent({ id: 'testId', type: 'testType' }, 'query');
+  test("useGetParent object asset", () => {
+    useGetParent({ id: "testId", type: "testType" }, "query");
     expect(getParentMock).toBeCalled();
   });
 });

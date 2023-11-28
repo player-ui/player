@@ -1,52 +1,52 @@
-import React from 'react';
-import { render, binding as b } from '@player-tools/dsl';
-import { Text, Action, Info, Collection, Input } from '.';
+import React from "react";
+import { render, binding as b } from "@player-tools/dsl";
+import { Text, Action, Info, Collection, Input } from ".";
 
-describe('JSON serialization', () => {
-  describe('text', () => {
-    it('works for basic text', async () => {
+describe("JSON serialization", () => {
+  describe("text", () => {
+    it("works for basic text", async () => {
       expect((await render(<Text>Hello World</Text>)).jsonValue).toStrictEqual({
-        id: 'root',
-        type: 'text',
-        value: 'Hello World',
+        id: "root",
+        type: "text",
+        value: "Hello World",
       });
     });
 
-    it('works for value prop', async () => {
+    it("works for value prop", async () => {
       expect(
-        (await render(<Text value="Hello World" />)).jsonValue
+        (await render(<Text value="Hello World" />)).jsonValue,
       ).toStrictEqual({
-        id: 'root',
-        type: 'text',
-        value: 'Hello World',
+        id: "root",
+        type: "text",
+        value: "Hello World",
       });
     });
   });
 
-  describe('collection', () => {
-    it('adds a label', async () => {
+  describe("collection", () => {
+    it("adds a label", async () => {
       expect(
         (
           await render(
             <Collection id="test-id">
               <Collection.Label>Test</Collection.Label>
-            </Collection>
+            </Collection>,
           )
-        ).jsonValue
+        ).jsonValue,
       ).toStrictEqual({
-        id: 'test-id',
-        type: 'collection',
+        id: "test-id",
+        type: "collection",
         label: {
           asset: {
-            id: 'test-id-label',
-            type: 'text',
-            value: 'Test',
+            id: "test-id-label",
+            type: "text",
+            value: "Test",
           },
         },
       });
     });
 
-    it('adds values', async () => {
+    it("adds values", async () => {
       expect(
         (
           await render(
@@ -55,25 +55,25 @@ describe('JSON serialization', () => {
                 <Text>First</Text>
                 <Text>Second</Text>
               </Collection.Values>
-            </Collection>
+            </Collection>,
           )
-        ).jsonValue
+        ).jsonValue,
       ).toStrictEqual({
-        id: 'root',
-        type: 'collection',
+        id: "root",
+        type: "collection",
         values: [
           {
             asset: {
-              id: 'values-0',
-              type: 'text',
-              value: 'First',
+              id: "values-0",
+              type: "text",
+              value: "First",
             },
           },
           {
             asset: {
-              id: 'values-1',
-              type: 'text',
-              value: 'Second',
+              id: "values-1",
+              type: "text",
+              value: "Second",
             },
           },
         ],
@@ -81,8 +81,8 @@ describe('JSON serialization', () => {
     });
   });
 
-  describe('info', () => {
-    it('works for a large view', async () => {
+  describe("info", () => {
+    it("works for a large view", async () => {
       expect(
         (
           await render(
@@ -99,43 +99,43 @@ describe('JSON serialization', () => {
                   <Action.Label>Continue</Action.Label>
                 </Action>
               </Info.Actions>
-            </Info>
+            </Info>,
           )
-        ).jsonValue
+        ).jsonValue,
       ).toStrictEqual({
-        id: 'info-view',
-        type: 'info',
+        id: "info-view",
+        type: "info",
         title: {
           asset: {
-            id: 'info-view-title',
-            type: 'text',
-            value: 'Info Title',
+            id: "info-view-title",
+            type: "text",
+            value: "Info Title",
           },
         },
         primaryInfo: {
           asset: {
-            id: 'info-view-primaryInfo',
-            type: 'collection',
+            id: "info-view-primaryInfo",
+            type: "collection",
             values: [
               {
                 asset: {
-                  id: 'info-view-primaryInfo-values-0',
-                  type: 'input',
-                  binding: 'foo.bar',
+                  id: "info-view-primaryInfo-values-0",
+                  type: "input",
+                  binding: "foo.bar",
                   label: {
                     asset: {
-                      id: 'info-view-primaryInfo-values-0-label',
-                      type: 'text',
-                      value: 'Input Label',
+                      id: "info-view-primaryInfo-values-0-label",
+                      type: "text",
+                      value: "Input Label",
                     },
                   },
                 },
               },
               {
                 asset: {
-                  id: 'input-result',
-                  type: 'text',
-                  value: '{{foo.bar}}',
+                  id: "input-result",
+                  type: "text",
+                  value: "{{foo.bar}}",
                 },
               },
             ],
@@ -144,14 +144,14 @@ describe('JSON serialization', () => {
         actions: [
           {
             asset: {
-              id: 'info-view-actions-0',
-              type: 'action',
-              value: 'next',
+              id: "info-view-actions-0",
+              type: "action",
+              value: "next",
               label: {
                 asset: {
-                  id: 'info-view-actions-0-label',
-                  type: 'text',
-                  value: 'Continue',
+                  id: "info-view-actions-0-label",
+                  type: "text",
+                  value: "Continue",
                 },
               },
             },

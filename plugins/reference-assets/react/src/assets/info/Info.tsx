@@ -1,6 +1,6 @@
-import React from 'react';
-import type { InfoAssetTransform } from '@player-ui/reference-assets-plugin';
-import { ReactAsset } from '@player-ui/react';
+import React from "react";
+import type { InfoAssetTransform } from "@player-ui/reference-assets-plugin";
+import { ReactAsset } from "@player-ui/react";
 import {
   ButtonGroup,
   Box,
@@ -8,12 +8,12 @@ import {
   Divider,
   Stack,
   HStack,
-} from '@chakra-ui/react';
+} from "@chakra-ui/react";
 
 /** The info view type is used to show information to the user */
 export const Info = (props: InfoAssetTransform) => {
   return (
-    <Box minW={{ base: undefined, md: 'md' }}>
+    <Box minW={{ base: undefined, md: "md" }}>
       <Stack gap="10">
         {props.title && (
           <Heading size="lg" as="h1">

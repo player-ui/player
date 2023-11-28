@@ -1,5 +1,5 @@
-import type { TransformFunction } from '@player-ui/player';
-import type { ImageAsset, TransformedImage } from './types';
+import type { TransformFunction } from "@player-ui/player";
+import type { ImageAsset, TransformedImage } from "./types";
 
 /**
  * Function to retrieve the desired alt text based on passed in props.
@@ -12,14 +12,14 @@ const getImageAlt = (props: ImageAsset): string => {
 
   if (placeholder) return placeholder;
 
-  return 'Image';
+  return "Image";
 };
 
 /**
  * Sets the Image's placeholder and accessibilty
  */
 export const imageTransform: TransformFunction<ImageAsset, TransformedImage> = (
-  props
+  props,
 ) => {
   const altText = getImageAlt(props);
 

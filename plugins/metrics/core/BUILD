@@ -10,11 +10,11 @@ vitest_config(name = "vitest_config")
 
 js_pipeline(
     package_name = "@player-ui/metrics-plugin",
+    peer_deps = [
+        ":node_modules/@player-ui/player",
+    ],
     deps = [
         ":node_modules/@player-ui/beacon-plugin",
         "//:node_modules/tapable-ts",
     ],
-    peer_deps = [
-        ":node_modules/@player-ui/player",
-    ]
 )

@@ -6,6 +6,7 @@
     "@player-ui/player": "workspace:*"
   },
   "devDependencies": {
+    "@player-ui/partial-match-registry": "workspace:*",
     "@player-ui/asset-transform-plugin": "workspace:*",
     "@player-ui/make-flow": "workspace:*"
   }

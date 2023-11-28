@@ -1,17 +1,17 @@
-import React from 'react';
-import { Link } from '@chakra-ui/react';
+import React from "react";
+import { Link } from "@chakra-ui/react";
 import type {
   TextAsset,
   LinkModifier,
-} from '@player-ui/reference-assets-plugin';
-import { useText } from './hooks';
+} from "@player-ui/reference-assets-plugin";
+import { useText } from "./hooks";
 
 /** Find any link modifiers on the text */
 export const getLinkModifier = (asset: TextAsset): LinkModifier | undefined => {
   return asset.modifiers?.find(
     (mod) =>
-      mod.type === 'link' &&
-      (mod.metaData as LinkModifier['metaData'])?.ref !== undefined
+      mod.type === "link" &&
+      (mod.metaData as LinkModifier["metaData"])?.ref !== undefined,
   ) as LinkModifier;
 };
 

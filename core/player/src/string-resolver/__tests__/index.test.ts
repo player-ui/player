@@ -1,11 +1,38 @@
 import { test, expect, describe } from "vitest";
 import type { Expression } from "@player-ui/types";
-import { CommonTypesPlugin } from "@player-ui/common-types-plugin";
-import { Player } from "../../player";
+import { Player, PlayerPlugin } from "../../player";
 import type { InProgressState } from "../../types";
 import { BindingParser } from "../../binding";
 import { LocalModel, withParser } from "../../data";
 import { resolveDataRefs, resolveExpressionsInString } from "..";
+
+class PhoneFormatterPlugin implements PlayerPlugin {
+  name = "phone-formatter";
+  apply(player: Player) {
+    player.hooks.schema.tap(this.name, (schema) => {
+      schema.addDataTypes([
+        {
+          type: "PhoneType",
+          format: {
+            type: "phone",
+          },
+        },
+      ]);
+
+      schema.addFormatters([
+        {
+          name: "phone",
+          format: (value) => {
+            return value.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
+          },
+          deformat: (value) => {
+            return value.replace(/-/g, "");
+          },
+        },
+      ]);
+    });
+  }
+}
 
 test("works on basic data", () => {
   const localModel = new LocalModel({
@@ -219,7 +246,7 @@ test("resolves expressions", () => {
 });
 
 describe("Returns unformatted values for requests", () => {
-  const player = new Player({ plugins: [new CommonTypesPlugin()] });
+  const player = new Player({ plugins: [new PhoneFormatterPlugin()] });
 
   const endStateFlow = {
     id: "minimal-player-response-format",

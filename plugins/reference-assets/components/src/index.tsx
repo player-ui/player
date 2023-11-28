@@ -1,22 +1,22 @@
-import React from 'react';
+import React from "react";
 import type {
   AssetPropsWithChildren,
   BindingTemplateInstance,
-} from '@player-tools/dsl';
-import { createSlot, Asset } from '@player-tools/dsl';
-import type { Asset as AssetType } from '@player-ui/player';
+} from "@player-tools/dsl";
+import { createSlot, Asset } from "@player-tools/dsl";
+import type { Asset as AssetType } from "@player-ui/player";
 import type {
   ActionAsset,
   TextAsset,
   CollectionAsset,
   InfoAsset,
   InputAsset,
-} from '@player-ui/reference-assets-plugin';
+} from "@player-ui/reference-assets-plugin";
 
 export const Text = (
-  props: Omit<AssetPropsWithChildren<TextAsset>, 'value'> & {
+  props: Omit<AssetPropsWithChildren<TextAsset>, "value"> & {
     value?: string;
-  }
+  },
 ) => {
   return (
     <Asset type="text" {...props}>
@@ -47,15 +47,15 @@ const slotFactory = (name: string, isArray = false) =>
     wrapInAsset: true,
   });
 
-export const LabelSlot = slotFactory('label');
-export const ValueSlot = slotFactory('value');
-export const TitleSlot = slotFactory('title');
-export const SubtitleSlot = slotFactory('subtitle');
-export const ActionsSlot = slotFactory('actions', true);
-export const PrimaryInfoSlot = slotFactory('primaryInfo');
+export const LabelSlot = slotFactory("label");
+export const ValueSlot = slotFactory("value");
+export const TitleSlot = slotFactory("title");
+export const SubtitleSlot = slotFactory("subtitle");
+export const ActionsSlot = slotFactory("actions", true);
+export const PrimaryInfoSlot = slotFactory("primaryInfo");
 
 Collection.Values = createSlot({
-  name: 'values',
+  name: "values",
   isArray: true,
   TextComp: Text,
   wrapInAsset: true,
@@ -70,10 +70,10 @@ export const Action = (props: AssetPropsWithChildren<ActionAsset>) => {
 Action.Label = LabelSlot;
 
 export const Input = (
-  props: Omit<AssetPropsWithChildren<InputAsset>, 'binding'> & {
+  props: Omit<AssetPropsWithChildren<InputAsset>, "binding"> & {
     /** The binding */
     binding: BindingTemplateInstance;
-  }
+  },
 ) => {
   const { binding, children, ...rest } = props;
   return (

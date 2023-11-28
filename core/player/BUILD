@@ -11,13 +11,13 @@ vitest_config(name = "vitest_config")
 js_pipeline(
     package_name = "@player-ui/player",
     test_deps = [
-        ":node_modules/@player-ui/common-types-plugin",
         ":node_modules/@player-ui/make-flow",
         "//:vitest_config",
     ],
     deps = [
         ":node_modules/@player-ui/partial-match-registry",
         ":node_modules/@player-ui/types",
+        "//:node_modules/@types/dlv",
         "//:node_modules/@types/parsimmon",
         "//:node_modules/arr-flatten",
         "//:node_modules/dequal",

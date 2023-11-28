@@ -1,14 +1,14 @@
-import React from 'react';
-import { ReactAsset } from '@player-ui/react';
-import type { TransformedInput } from '@player-ui/reference-assets-plugin';
+import React from "react";
+import { ReactAsset } from "@player-ui/react";
+import type { TransformedInput } from "@player-ui/reference-assets-plugin";
 import {
   Input as ChakraInput,
   FormControl,
   FormLabel,
   FormErrorMessage,
   FormHelperText,
-} from '@chakra-ui/react';
-import { useInputAsset } from './hooks';
+} from "@chakra-ui/react";
+import { useInputAsset } from "./hooks";
 
 /** An Input */
 export const Input = (props: TransformedInput) => {

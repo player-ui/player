@@ -1,11 +1,9 @@
 import { defineConfig, Options } from "tsup";
-import fs from 'fs';
+import fs from "fs";
 
 // Using the work from mark
 // https://github.com/reduxjs/redux/blob/c9e06506f88926e252daf5275495eba0c04bf8e3/tsup.config.ts#L2
 // https://blog.isquaredsoftware.com/2023/08/esm-modernization-lessons/
-
-console.log("tsup.config.ts", process.cwd());
 
 export function createConfig() {
   return defineConfig((options: Options) => {
@@ -13,7 +11,6 @@ export function createConfig() {
 
     const defaultOptions: Options = {
       entry: [pkgJson.main],
-      dts: true,
       sourcemap: true,
       ...options,
     };
@@ -22,10 +19,9 @@ export function createConfig() {
       {
         ...defaultOptions,
         format: ["esm"],
-        outExtension: () => ({ js: ".mjs" }),
-        dts: true,
+        outExtension: () => ({ js: ".mjs", dts: ".d.mts" }),
         clean: true,
-        onSuccess() {
+        async onSuccess() {
           // Support Webpack 4 by pointing `"module"` to a file with a `.js` extension
           fs.copyFileSync("dist/index.mjs", "dist/index.legacy-esm.js");
         },

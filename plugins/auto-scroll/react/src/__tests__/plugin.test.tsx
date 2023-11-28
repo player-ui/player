@@ -1,29 +1,30 @@
-import type { ComponentType } from 'react';
-import React, { useLayoutEffect } from 'react';
-import type { InProgressState } from '@player-ui/react';
-import { ReactPlayer } from '@player-ui/react';
+import { test, expect, vitest, describe, beforeEach } from "vitest";
+import type { ComponentType } from "react";
+import React, { useLayoutEffect } from "react";
+import type { InProgressState } from "@player-ui/react";
+import { ReactPlayer } from "@player-ui/react";
 
-import { findByRole, render, waitFor, act } from '@testing-library/react';
-import { makeFlow } from '@player-ui/make-flow';
+import { findByRole, render, waitFor, act } from "@testing-library/react";
+import { makeFlow } from "@player-ui/make-flow";
 
 import {
   actionTransform,
   inputTransform,
   infoTransform,
-} from '@player-ui/reference-assets-plugin';
-import { Info, Action, Input } from '@player-ui/reference-assets-plugin-react';
-import { CommonTypesPlugin } from '@player-ui/common-types-plugin';
-import { AssetTransformPlugin } from '@player-ui/asset-transform-plugin';
+} from "@player-ui/reference-assets-plugin";
+import { Info, Action, Input } from "@player-ui/reference-assets-plugin-react";
+import { CommonTypesPlugin } from "@player-ui/common-types-plugin";
+import { AssetTransformPlugin } from "@player-ui/asset-transform-plugin";
 
-import scrollIntoViewWithOffset from '../scrollIntoViewWithOffset';
+import scrollIntoViewWithOffset from "../scrollIntoViewWithOffset";
 
 import {
   AutoScrollManagerPlugin,
   ScrollType,
   useRegisterAsScrollable,
-} from '..';
+} from "..";
 
-jest.mock('../scrollIntoViewWithOffset');
+vitest.mock("../scrollIntoViewWithOffset");
 
 /**
  * HOC to enable scrollable behavior for a given component
@@ -47,27 +48,27 @@ const withScrollable = (Component: ComponentType<any>) => {
   return ScrollableComponent;
 };
 
-describe('auto-scroll plugin', () => {
+describe("auto-scroll plugin", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vitest.clearAllMocks();
   });
 
   const flow = makeFlow({
-    id: 'view-1',
-    type: 'info',
+    id: "view-1",
+    type: "info",
     primaryInfo: {
       asset: {
-        id: 'asset',
-        type: 'input',
-        binding: 'person.name',
+        id: "asset",
+        type: "input",
+        binding: "person.name",
       },
     },
     actions: [
       {
         asset: {
-          id: 'action-auto-scroll',
-          type: 'action',
-          value: 'Next',
+          id: "action-auto-scroll",
+          type: "action",
+          value: "Next",
         },
       },
     ],
@@ -76,16 +77,16 @@ describe('auto-scroll plugin', () => {
   flow.schema = {
     ROOT: {
       person: {
-        type: 'PersonType',
+        type: "PersonType",
       },
     },
     PersonType: {
       name: {
-        type: 'StringType',
+        type: "StringType",
         validation: [
           {
-            type: 'required',
-            message: 'Required',
+            type: "required",
+            message: "Required",
           },
         ],
       },
@@ -93,9 +94,9 @@ describe('auto-scroll plugin', () => {
   };
 
   document.getElementById = (id: any) => {
-    if (id === 'asset') {
+    if (id === "asset") {
       return {
-        getAttribute: () => 'true',
+        getAttribute: () => "true",
         getBoundingClientRect: () => ({ top: 50 }),
       } as any;
     }
@@ -103,13 +104,13 @@ describe('auto-scroll plugin', () => {
     return undefined;
   };
 
-  test('scrolls successfully test', async () => {
+  test("scrolls successfully test", async () => {
     const wp = new ReactPlayer({
       plugins: [
         new AssetTransformPlugin([
-          [{ type: 'action' }, actionTransform],
-          [{ type: 'input' }, inputTransform],
-          [{ type: 'info' }, infoTransform],
+          [{ type: "action" }, actionTransform],
+          [{ type: "input" }, inputTransform],
+          [{ type: "info" }, infoTransform],
         ]),
         new CommonTypesPlugin(),
         new AutoScrollManagerPlugin({
@@ -117,9 +118,9 @@ describe('auto-scroll plugin', () => {
         }),
       ],
     });
-    wp.assetRegistry.set({ type: 'info' }, Info);
-    wp.assetRegistry.set({ type: 'action' }, Action);
-    wp.assetRegistry.set({ type: 'input' }, withScrollable(Input));
+    wp.assetRegistry.set({ type: "info" }, Info);
+    wp.assetRegistry.set({ type: "action" }, Action);
+    wp.assetRegistry.set({ type: "input" }, withScrollable(Input));
 
     wp.start(flow as any);
 
@@ -128,26 +129,26 @@ describe('auto-scroll plugin', () => {
         <React.Suspense fallback="loading...">
           <wp.Component />
         </React.Suspense>
-      </div>
+      </div>,
     );
 
     await waitFor(async () => {
-      const action = await findByRole(container, 'button');
+      const action = await findByRole(container, "button");
       action.click();
     });
 
     expect(scrollIntoViewWithOffset).toBeCalledTimes(1);
   });
 
-  test('works with custom base element and offset', async () => {
+  test("works with custom base element and offset", async () => {
     const getBaseElementMock = vitest.fn();
 
     const wp = new ReactPlayer({
       plugins: [
         new AssetTransformPlugin([
-          [{ type: 'action' }, actionTransform],
-          [{ type: 'input' }, inputTransform],
-          [{ type: 'info' }, infoTransform],
+          [{ type: "action" }, actionTransform],
+          [{ type: "input" }, inputTransform],
+          [{ type: "info" }, infoTransform],
         ]),
         new CommonTypesPlugin(),
         new AutoScrollManagerPlugin({
@@ -157,9 +158,9 @@ describe('auto-scroll plugin', () => {
         }),
       ],
     });
-    wp.assetRegistry.set({ type: 'info' }, Info);
-    wp.assetRegistry.set({ type: 'action' }, Action);
-    wp.assetRegistry.set({ type: 'input' }, withScrollable(Input));
+    wp.assetRegistry.set({ type: "info" }, Info);
+    wp.assetRegistry.set({ type: "action" }, Action);
+    wp.assetRegistry.set({ type: "input" }, withScrollable(Input));
 
     wp.start(flow as any);
 
@@ -168,20 +169,20 @@ describe('auto-scroll plugin', () => {
         <React.Suspense fallback="loading...">
           <wp.Component />
         </React.Suspense>
-      </div>
+      </div>,
     );
     await act(() => waitFor(() => {}));
 
-    getBaseElementMock.mockReturnValue({ id: 'view' });
+    getBaseElementMock.mockReturnValue({ id: "view" });
 
-    const action = await findByRole(container, 'button');
+    const action = await findByRole(container, "button");
     act(() => action.click());
     await act(() => waitFor(() => {}));
 
     expect(scrollIntoViewWithOffset).toBeCalledWith(
       expect.anything(),
-      expect.objectContaining({ id: 'view' }),
-      40
+      expect.objectContaining({ id: "view" }),
+      40,
     );
 
     // Mock the case where the base element can't be found, so document.body is used as a fallback
@@ -193,19 +194,19 @@ describe('auto-scroll plugin', () => {
     expect(scrollIntoViewWithOffset).toHaveBeenLastCalledWith(
       expect.anything(),
       document.body,
-      40
+      40,
     );
   });
 
-  test('works without custom base element and offset provided', async () => {
+  test("works without custom base element and offset provided", async () => {
     const getBaseElementMock = vitest.fn();
 
     const wp = new ReactPlayer({
       plugins: [
         new AssetTransformPlugin([
-          [{ type: 'action' }, actionTransform],
-          [{ type: 'input' }, inputTransform],
-          [{ type: 'info' }, infoTransform],
+          [{ type: "action" }, actionTransform],
+          [{ type: "input" }, inputTransform],
+          [{ type: "info" }, infoTransform],
         ]),
         new CommonTypesPlugin(),
         new AutoScrollManagerPlugin({
@@ -213,9 +214,9 @@ describe('auto-scroll plugin', () => {
         }),
       ],
     });
-    wp.assetRegistry.set({ type: 'info' }, Info);
-    wp.assetRegistry.set({ type: 'action' }, Action);
-    wp.assetRegistry.set({ type: 'input' }, withScrollable(Input));
+    wp.assetRegistry.set({ type: "info" }, Info);
+    wp.assetRegistry.set({ type: "action" }, Action);
+    wp.assetRegistry.set({ type: "input" }, withScrollable(Input));
 
     wp.start(flow as any);
 
@@ -224,29 +225,29 @@ describe('auto-scroll plugin', () => {
         <React.Suspense fallback="loading...">
           <wp.Component />
         </React.Suspense>
-      </div>
+      </div>,
     );
     await act(() => waitFor(() => {}));
 
-    getBaseElementMock.mockReturnValue({ id: 'view' });
+    getBaseElementMock.mockReturnValue({ id: "view" });
 
-    const action = await findByRole(container, 'button');
+    const action = await findByRole(container, "button");
     act(() => action.click());
     await act(() => waitFor(() => {}));
 
     expect(scrollIntoViewWithOffset).toBeCalledWith(
       expect.anything(),
       document.body,
-      0
+      0,
     );
   });
 
-  test('no error no scroll test', async () => {
+  test("no error no scroll test", async () => {
     const wp = new ReactPlayer({
       plugins: [
         new AssetTransformPlugin([
-          [{ type: 'action' }, actionTransform],
-          [{ type: 'input' }, inputTransform],
+          [{ type: "action" }, actionTransform],
+          [{ type: "input" }, inputTransform],
         ]),
         new CommonTypesPlugin(),
         new AutoScrollManagerPlugin({
@@ -254,9 +255,9 @@ describe('auto-scroll plugin', () => {
         }),
       ],
     });
-    wp.assetRegistry.set({ type: 'info' }, Info);
-    wp.assetRegistry.set({ type: 'action' }, Action);
-    wp.assetRegistry.set({ type: 'input' }, withScrollable(Input));
+    wp.assetRegistry.set({ type: "info" }, Info);
+    wp.assetRegistry.set({ type: "action" }, Action);
+    wp.assetRegistry.set({ type: "input" }, withScrollable(Input));
 
     wp.start(flow as any);
 
@@ -265,13 +266,13 @@ describe('auto-scroll plugin', () => {
         <React.Suspense fallback="loading...">
           <wp.Component />
         </React.Suspense>
-      </div>
+      </div>,
     );
 
     waitFor(async () => {
       const state = wp.player.getState() as InProgressState;
-      state.controllers.data.set([['person.name', 'sam']]);
-      const action = await findByRole(container, 'button');
+      state.controllers.data.set([["person.name", "sam"]]);
+      const action = await findByRole(container, "button");
       action.click();
     });
 
@@ -279,26 +280,26 @@ describe('auto-scroll plugin', () => {
   });
 });
 
-describe('getFirstScrollableElement unit tests', () => {
+describe("getFirstScrollableElement unit tests", () => {
   const defineGetElementId = (bcrValues: any[]) => {
     return (idIn: string): HTMLElement | null => {
       switch (idIn) {
-        case 'Element1':
+        case "Element1":
           return {
             getAttribute: (attrIn) =>
-              attrIn === 'aria-invalid' ? 'true' : 'false',
+              attrIn === "aria-invalid" ? "true" : "false",
             getBoundingClientRect: () => bcrValues[0],
           } as HTMLElement;
-        case 'Element2':
+        case "Element2":
           return {
             getAttribute: (attrIn) =>
-              attrIn === 'aria-invalid' ? 'true' : 'false',
+              attrIn === "aria-invalid" ? "true" : "false",
             getBoundingClientRect: () => bcrValues[1],
           } as HTMLElement;
-        case 'Element3':
+        case "Element3":
           return {
             getAttribute: (attrIn) =>
-              attrIn === 'aria-invalid' ? 'true' : 'false',
+              attrIn === "aria-invalid" ? "true" : "false",
             getBoundingClientRect: () => bcrValues[2],
           } as HTMLElement;
         default:
@@ -313,12 +314,12 @@ describe('getFirstScrollableElement unit tests', () => {
   beforeEach(() => {
     autoScroll = new AutoScrollManagerPlugin({});
     idList = new Set<string>();
-    idList.add('Element1');
-    idList.add('Element2');
-    idList.add('Element3');
+    idList.add("Element1");
+    idList.add("Element2");
+    idList.add("Element3");
   });
 
-  test('scrolled past all elements', () => {
+  test("scrolled past all elements", () => {
     document.getElementById = defineGetElementId([
       {
         top: -30,
@@ -332,11 +333,11 @@ describe('getFirstScrollableElement unit tests', () => {
     ]);
 
     expect(
-      autoScroll.getFirstScrollableElement(idList, ScrollType.ValidationError)
-    ).toBe('Element1');
+      autoScroll.getFirstScrollableElement(idList, ScrollType.ValidationError),
+    ).toBe("Element1");
   });
 
-  test('scrolled past some of elements', () => {
+  test("scrolled past some of elements", () => {
     document.getElementById = defineGetElementId([
       {
         top: -20,
@@ -350,11 +351,11 @@ describe('getFirstScrollableElement unit tests', () => {
     ]);
 
     expect(
-      autoScroll.getFirstScrollableElement(idList, ScrollType.ValidationError)
-    ).toBe('Element1');
+      autoScroll.getFirstScrollableElement(idList, ScrollType.ValidationError),
+    ).toBe("Element1");
   });
 
-  test('all elements in view', () => {
+  test("all elements in view", () => {
     document.getElementById = defineGetElementId([
       {
         top: 10,
@@ -368,11 +369,11 @@ describe('getFirstScrollableElement unit tests', () => {
     ]);
 
     expect(
-      autoScroll.getFirstScrollableElement(idList, ScrollType.ValidationError)
-    ).toBe('Element1');
+      autoScroll.getFirstScrollableElement(idList, ScrollType.ValidationError),
+    ).toBe("Element1");
   });
 
-  test('all elements in view and target is 0', () => {
+  test("all elements in view and target is 0", () => {
     document.getElementById = defineGetElementId([
       {
         top: 0,
@@ -386,11 +387,11 @@ describe('getFirstScrollableElement unit tests', () => {
     ]);
 
     expect(
-      autoScroll.getFirstScrollableElement(idList, ScrollType.ValidationError)
-    ).toBe('Element1');
+      autoScroll.getFirstScrollableElement(idList, ScrollType.ValidationError),
+    ).toBe("Element1");
   });
 
-  test('all elements in view but there is a tie', () => {
+  test("all elements in view but there is a tie", () => {
     document.getElementById = defineGetElementId([
       {
         top: 10,
@@ -404,7 +405,7 @@ describe('getFirstScrollableElement unit tests', () => {
     ]);
 
     expect(
-      autoScroll.getFirstScrollableElement(idList, ScrollType.ValidationError)
-    ).toBe('Element1');
+      autoScroll.getFirstScrollableElement(idList, ScrollType.ValidationError),
+    ).toBe("Element1");
   });
 });

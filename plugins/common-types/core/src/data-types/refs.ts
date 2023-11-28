@@ -1,33 +1,33 @@
-import type { Language } from '@player-ui/types';
+import type { Language } from "@player-ui/player";
 
 export const BooleanTypeRef: Language.DataTypeRef = {
-  type: 'BooleanType',
+  type: "BooleanType",
 };
 
 export const IntegerTypeRef: Language.DataTypeRef = {
-  type: 'IntegerType',
+  type: "IntegerType",
 };
 
 export const IntegerPosTypeRef: Language.DataTypeRef = {
-  type: 'IntegerPosType',
+  type: "IntegerPosType",
 };
 
 export const IntegerNNTypeRef: Language.DataTypeRef = {
-  type: 'IntegerNNType',
+  type: "IntegerNNType",
 };
 
 export const StringTypeRef: Language.DataTypeRef = {
-  type: 'StringType',
+  type: "StringType",
 };
 
 export const CollectionTypeRef: Language.DataTypeRef = {
-  type: 'CollectionType',
+  type: "CollectionType",
 };
 
 export const DateTypeRef: Language.DataTypeRef = {
-  type: 'DateType',
+  type: "DateType",
 };
 
 export const PhoneTypeRef: Language.DataTypeRef = {
-  type: 'PhoneType',
+  type: "PhoneType",
 };
