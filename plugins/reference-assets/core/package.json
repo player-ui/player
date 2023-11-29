@@ -2,6 +2,7 @@
   "name": "@player-ui/reference-assets-plugin",
   "version": "0.0.0-PLACEHOLDER",
   "main": "src/index.ts",
+  "bundle": "dist/ReferenceAssetsPlugin.native.js",
   "dependencies": {
     "@player-ui/asset-transform-plugin": "workspace:*",
     "@player-ui/beacon-plugin": "workspace:*"

@@ -2,6 +2,7 @@
   "name": "@player-ui/make-flow",
   "version": "0.0.0-PLACEHOLDER",
   "main": "src/index.ts",
+  "bundle": "dist/MakeFlow.native.js",
   "dependencies": {
     "@player-ui/types": "workspace:*"
   }

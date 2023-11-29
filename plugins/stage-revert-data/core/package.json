@@ -2,6 +2,7 @@
   "name": "@player-ui/stage-revert-data-plugin",
   "version": "0.0.0-PLACEHOLDER",
   "main": "src/index.ts",
+  "bundle": "dist/StageRevertDataPlugin.native.js",
   "devDependencies": {
     "@player-ui/make-flow": "workspace:*",
     "@player-ui/types": "workspace:*"

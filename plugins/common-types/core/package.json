@@ -2,6 +2,7 @@
   "name": "@player-ui/common-types-plugin",
   "version": "0.0.0-PLACEHOLDER",
   "main": "src/index.ts",
+  "bundle": "dist/CommonTypesPlugin.native.js",
   "dependencies": {
     "@player-ui/types-provider-plugin": "workspace:*"
   },
