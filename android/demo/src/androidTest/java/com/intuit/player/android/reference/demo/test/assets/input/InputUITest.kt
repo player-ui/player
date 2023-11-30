@@ -48,15 +48,19 @@ class InputUITest : AssetUITest("reference-assets") {
     fun validation() {
         launchMock("input-validation")
 
-        verifyIsDisplayed(allOf(
-            withId(R.id.input_label_container),
-            withChild(withText("Input with validation and formatting")),
-        ))
+        verifyIsDisplayed(
+            allOf(
+                withId(R.id.input_label_container),
+                withChild(withText("Input with validation and formatting")),
+            ),
+        )
 
-        verifyIsDisplayed(allOf(
-            withId(R.id.input_note_container),
-            withChild(withText("It expects a positive integer")),
-        ))
+        verifyIsDisplayed(
+            allOf(
+                withId(R.id.input_note_container),
+                withChild(withText("It expects a positive integer")),
+            ),
+        )
 
         onView(withId(R.id.input_field))
             .perform(typeText("t"))
