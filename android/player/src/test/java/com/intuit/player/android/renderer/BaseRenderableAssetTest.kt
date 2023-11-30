@@ -5,6 +5,7 @@ import android.widget.TextView
 import com.intuit.player.android.AndroidPlayer
 import com.intuit.player.android.AssetContext
 import com.intuit.player.android.asset.RenderableAsset
+import com.intuit.player.android.extensions.CoroutineTestDispatcherExtension
 import com.intuit.player.android.utils.TestAssetsPlugin
 import com.intuit.player.jvm.core.asset.Asset
 import com.intuit.player.jvm.core.flow.Flow

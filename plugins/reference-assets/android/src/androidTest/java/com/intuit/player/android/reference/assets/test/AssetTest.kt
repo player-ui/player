@@ -24,15 +24,20 @@ import com.intuit.player.jvm.utils.start
 import com.intuit.player.plugins.transactions.PendingTransactionPlugin
 import com.intuit.player.plugins.types.CommonTypesPlugin
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TestName
@@ -103,6 +108,7 @@ abstract class AssetTest(val group: String? = null) {
 
     @Before
     fun beforeEach() {
+        Dispatchers.setMain(TestCoroutineDispatcher())
         player.onUpdate { asset, _ -> currentAssetTree = asset }
         player.hooks.state.tap { state ->
             if (state !is InProgressState) {
@@ -110,6 +116,11 @@ abstract class AssetTest(val group: String? = null) {
                 viewChannel.tryEmit(emptyView)
             }
         }
+    }
+
+    @After
+    fun afterEach() {
+        Dispatchers.resetMain()
     }
 
     fun launchMock() = launchMock(name.methodName)

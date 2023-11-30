@@ -44,6 +44,7 @@ internal class FlowScopePluginTest {
     @BeforeEach fun setup() {
         every { player.hooks.state.tap(any(), capture(stateTap)) } returns "some-id"
         every { inProgressState.flow } returns flow
+        every { player.scope } returns scope
 
         flowScopePlugin = FlowScopePlugin().apply {
             apply(player)

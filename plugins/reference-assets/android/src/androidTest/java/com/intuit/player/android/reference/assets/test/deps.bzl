@@ -6,6 +6,7 @@ maven = [
     "androidx.test:runner:%s" % versions.androidx.test.core,
     "junit:junit:%s" % versions.testing.junit,
     "org.robolectric:robolectric:%s" % versions.testing.robolectric,
+    "org.jetbrains.kotlinx:kotlinx-coroutines-test:%s" % versions.kotlin.coroutines,
 ]
 
 main_deps = parse_coordinates(maven) + [

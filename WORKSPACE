@@ -131,16 +131,16 @@ bazel_common_initialize(
 #    url = "https://github.com/google/dagger/archive/dagger-%s.zip" % DAGGER_TAG,
 #)
 
-#http_archive(
-#    name = "robolectric",
-#    sha256 = "4e002cbe712c8abd9c3b565eb165787a2a7a92dfafb117e0d84b6767c2053189",
-#    strip_prefix = "robolectric-bazel-4.8",
-#    urls = ["https://github.com/robolectric/robolectric-bazel/archive/4.8.tar.gz"],
-#)
-#
-#load("@robolectric//bazel:robolectric.bzl", "robolectric_repositories")
-#
-#robolectric_repositories()
+http_archive(
+    name = "robolectric",
+    sha256 = "4e002cbe712c8abd9c3b565eb165787a2a7a92dfafb117e0d84b6767c2053189",
+    strip_prefix = "robolectric-bazel-4.8",
+    urls = ["https://github.com/robolectric/robolectric-bazel/archive/4.8.tar.gz"],
+)
+
+load("@robolectric//bazel:robolectric.bzl", "robolectric_repositories")
+
+robolectric_repositories()
 
 http_archive(
     name = "build_bazel_rules_android",
