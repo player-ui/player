@@ -32,7 +32,6 @@ abstract class AssetUITest(val group: String? = null) : ApplitoolsTest() {
 
     @Before
     fun before() {
-        Intents.init()
         rule.scenario.onActivity {
             viewModel = it.viewModel
         }
@@ -40,10 +39,12 @@ abstract class AssetUITest(val group: String? = null) : ApplitoolsTest() {
 
     @After
     fun after() {
+        eyes?.takeIf { it.isOpen }?.run {
+            checkWindow("done")
+            close()
+        }
         Intents.assertNoUnverifiedIntents()
         Intents.release()
-        eyes?.checkWindow("done")
-        eyes?.close()
     }
 
     fun launchMock() {
@@ -65,7 +66,11 @@ abstract class AssetUITest(val group: String? = null) : ApplitoolsTest() {
                 ?: throw IllegalStateException("player not found")
         }
 
-        eyes?.open("Android Reference Assets Demo", "${mock.group}/${name.methodName}")
+        Intents.init()
+        Intents.release()
+        Intents.init()
+
+        eyes?.open("Android Reference Assets Demo", "${mock.group}/${mock.name}/${name.methodName}")
         eyes?.checkPlayer("init")
     }
 }

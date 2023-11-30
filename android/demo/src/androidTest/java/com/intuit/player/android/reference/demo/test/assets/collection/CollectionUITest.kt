@@ -10,16 +10,19 @@ import com.intuit.player.android.reference.demo.test.base.waitForViewInRoot
 import com.intuit.player.jvm.core.player.state.InProgressState
 import org.junit.Test
 
-class CollectionUITest : AssetUITest("collection") {
+class CollectionUITest : AssetUITest("reference-assets") {
 
     @Test
     fun basic() {
-        launchMock()
+        launchMock("collection-basic")
 
-        waitForViewInRoot(withText("Item 1"))
+        waitForViewInRoot(withText("Collections are used to group assets."))
             .check(matches(isDisplayed()))
 
-        onView(withText("Item 2"))
+        onView(withText("This is the first item in the collection"))
+            .check(matches(isDisplayed()))
+
+        onView(withText("This is the second item in the collection"))
             .check(matches(isDisplayed()))
 
         currentState.shouldBePlayerState<InProgressState>()

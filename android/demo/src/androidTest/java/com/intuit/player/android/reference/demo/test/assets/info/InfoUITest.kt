@@ -11,7 +11,7 @@ import com.intuit.player.android.reference.demo.test.base.waitForViewInRoot
 import com.intuit.player.jvm.core.player.state.InProgressState
 import org.junit.Test
 
-class InfoUITest : AssetUITest("info") {
+class InfoUITest : AssetUITest("reference-assets") {
 
     enum class Action {
         Next, Dismiss
@@ -36,7 +36,7 @@ class InfoUITest : AssetUITest("info") {
 
     @Test
     fun basic() {
-        launchMock("modal-flow")
+        launchMock("info-modal-flow")
 
         verifyAndProceed(1, Action.Next)
         verifyAndProceed(2, Action.Dismiss)

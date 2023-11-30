@@ -2,16 +2,13 @@ package com.intuit.player.android.reference.demo.test.assets.input
 
 import android.view.View
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.clearText
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.pressImeActionButton
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.hasErrorText
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withChild
 import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withParent
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.intuit.player.android.reference.demo.R
 import com.intuit.player.android.reference.demo.test.base.AssetUITest
@@ -24,14 +21,14 @@ import org.hamcrest.Matchers.allOf
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class InputUITest : AssetUITest("input") {
+class InputUITest : AssetUITest("reference-assets") {
 
     fun verifyIsDisplayed(matcher: Matcher<View>) = waitForViewInRoot(matcher)
         .check(matches(isDisplayed()))
 
     @Test
     fun basic() {
-        launchMock()
+        launchMock("input-basic")
 
         waitForViewInRoot(withText("This is an input"))
             .check(matches(isDisplayed()))
@@ -48,89 +45,35 @@ class InputUITest : AssetUITest("input") {
     }
 
     @Test
-    fun validationAgeFormatter() {
-        launchMock("validation")
+    fun validation() {
+        launchMock("input-validation")
 
-        val ageContainer = allOf(
-            withId(R.id.input_container),
-            withChild(withChild(withText("Age"))),
-        ).also(::verifyIsDisplayed)
+        verifyIsDisplayed(allOf(
+            withId(R.id.input_label_container),
+            withChild(withText("Input with validation and formatting")),
+        ))
 
-        val ageInput = allOf(
-            withId(R.id.input_field),
-            withParent(ageContainer),
-        ).also(::verifyIsDisplayed)
+        verifyIsDisplayed(allOf(
+            withId(R.id.input_note_container),
+            withChild(withText("It expects a positive integer")),
+        ))
 
-        onView(ageInput)
-            .perform(typeText("text"))
+        onView(withId(R.id.input_field))
+            .perform(typeText("t"))
             .perform(pressImeActionButton())
 
         currentState.shouldBePlayerState<InProgressState> {
-            assertEquals("", dataModel.get("person.age"))
+            assertEquals(null, dataModel.get("foo.bar"))
         }
 
-        eyes?.checkPlayer("invalid-age")
+        eyes?.checkPlayer("invalid-input")
 
-        onView(ageInput)
+        onView(withId(R.id.input_field))
             .perform(typeText("30"))
             .perform(pressImeActionButton())
 
         currentState.shouldBePlayerState<InProgressState> {
-            assertEquals(30, dataModel.get("person.age"))
-        }
-    }
-
-    @Test
-    fun validationName() {
-        launchMock("validation")
-
-        val nameContainer = allOf(
-            withId(R.id.input_container),
-            withChild(withChild(withText("Name"))),
-        ).also(::verifyIsDisplayed)
-
-        val nameInput = allOf(
-            withId(R.id.input_field),
-            withParent(nameContainer),
-        ).also(::verifyIsDisplayed)
-
-        onView(nameInput)
-            .perform(typeText("more than 10 characters"))
-            .perform(pressImeActionButton())
-
-        allOf(
-            nameInput,
-            hasErrorText("Up to 10 characters allowed"),
-        ).let(::verifyIsDisplayed)
-
-        currentState.shouldBePlayerState<InProgressState> {
-            assertEquals("", dataModel.get("person.name"))
-        }
-
-        eyes?.checkPlayer("upper-limit-validation")
-
-        onView(nameInput)
-            .perform(click())
-            .perform(clearText())
-            .perform(pressImeActionButton())
-
-        allOf(
-            nameInput,
-            hasErrorText("At least 1 characters needed"),
-        ).let(::verifyIsDisplayed)
-
-        currentState.shouldBePlayerState<InProgressState> {
-            assertEquals("", dataModel.get("person.name"))
-        }
-
-        eyes?.checkPlayer("lower-limit-validation")
-
-        onView(nameInput)
-            .perform(typeText("Jeremiah"))
-            .perform(pressImeActionButton())
-
-        currentState.shouldBePlayerState<InProgressState> {
-            assertEquals("Jeremiah", dataModel.get("person.name"))
+            assertEquals(30, dataModel.get("foo.bar"))
         }
     }
 }

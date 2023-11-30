@@ -14,11 +14,11 @@ import com.intuit.player.jvm.core.player.state.dataModel
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class ActionUITest : AssetUITest("action") {
+class ActionUITest : AssetUITest("reference-assets") {
 
     @Test
     fun basic() {
-        launchMock()
+        launchMock("action-basic")
 
         repeat(10) {
             waitForViewInRoot(withText("Count: $it"))
@@ -36,7 +36,7 @@ class ActionUITest : AssetUITest("action") {
 
     @Test
     fun transitionToEndSuccess() {
-        launchMock("transition-to-end")
+        launchMock("action-transition-to-end")
 
         waitForViewInRoot(withText("End the flow (success)"))
             .check(matches(isDisplayed()))
@@ -49,7 +49,7 @@ class ActionUITest : AssetUITest("action") {
 
     @Test
     fun transitionToEndError() {
-        launchMock("transition-to-end")
+        launchMock("action-transition-to-end")
 
         waitForViewInRoot(withText("End the flow (error)"))
             .check(matches(isDisplayed()))

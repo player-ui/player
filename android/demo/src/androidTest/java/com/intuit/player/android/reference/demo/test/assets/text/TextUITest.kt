@@ -16,19 +16,19 @@ import com.intuit.player.android.reference.demo.test.base.waitForViewInRoot
 import org.hamcrest.Matchers.allOf
 import org.junit.Test
 
-class TextUITest : AssetUITest("text") {
+class TextUITest : AssetUITest("reference-assets") {
 
     @Test
     fun basic() {
-        launchMock()
+        launchMock("text-basic")
 
-        waitForViewInRoot(withText("Some text content"))
+        waitForViewInRoot(withText("This is some text."))
             .check(matches(isDisplayed()))
     }
 
     @Test
     fun link() {
-        launchMock("with-link")
+        launchMock("text-with-link")
 
         val openLink = allOf(
             hasAction(ACTION_VIEW),
