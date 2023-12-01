@@ -87,6 +87,8 @@ sh_test(
     data = [
         ":demo",
         ":demo_test_app",
+        "@android_test_orchestrator_apk//file",
+        "@android_test_services_apk//file",
     ],
 )
 

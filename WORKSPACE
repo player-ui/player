@@ -6,7 +6,7 @@ workspace(
     },
 )
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 http_archive(
@@ -106,30 +106,6 @@ load("@grab_bazel_common//android:initialize.bzl", "bazel_common_initialize")
 bazel_common_initialize(
     pinned_maven_install = False,
 )
-#
-#load("@grab_bazel_common//android:maven.bzl", "pin_bazel_common_artifacts")
-#
-#pin_bazel_common_artifacts()
-
-# Optional patched Android Tools
-#load("@grab_bazel_common//:workspace_defs.bzl", "android_tools")
-#
-#android_tools(
-#    commit = grab_commit,
-#    remote = grab_remote,
-#    shallow_since = "1654123549 -0400",
-#)
-
-#DAGGER_TAG = "2.43.2"
-#
-#DAGGER_SHA = "f7fbc3e417b3cdc10e76e818a6854ada777ad6d408408b65c23a096f3ff6daf7"
-#
-#http_archive(
-#    name = "dagger",
-#    sha256 = DAGGER_SHA,
-#    strip_prefix = "dagger-dagger-%s" % DAGGER_TAG,
-#    url = "https://github.com/google/dagger/archive/dagger-%s.zip" % DAGGER_TAG,
-#)
 
 http_archive(
     name = "robolectric",
@@ -141,6 +117,18 @@ http_archive(
 load("@robolectric//bazel:robolectric.bzl", "robolectric_repositories")
 
 robolectric_repositories()
+
+ANDROIDX_TEST_VERSION = "1.4.2"
+
+http_file(
+    name = "android_test_orchestrator_apk",
+    url = "https://dl.google.com/android/maven2/androidx/test/orchestrator/1.4.2/orchestrator-1.4.2.apk",
+)
+
+http_file(
+    name = "android_test_services_apk",
+    url = "https://dl.google.com/android/maven2/androidx/test/services/test-services/1.4.2/test-services-1.4.2.apk",
+)
 
 http_archive(
     name = "build_bazel_rules_android",
