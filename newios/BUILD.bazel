@@ -1,0 +1,70 @@
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+load("@build_bazel_rules_ios//rules:test.bzl", "ios_unit_test")
+load("@build_bazel_rules_apple//apple:ios.bzl", "ios_framework")
+load(
+    "@rules_xcodeproj//xcodeproj:defs.bzl",
+    "top_level_target",
+    "xcodeproj",
+)
+
+swift_library(
+    name = "PlayerUILogger",
+    module_name = "PlayerUILogger",
+    srcs = glob(["Sources/logger/**/*.swift"]),
+    tags = ["manual"],
+    visibility = ["//visibility:public"],
+    deps = ["@swiftpkg_swift_hooks//:Sources_SwiftHooks"]
+)
+
+# ios_framework(
+#     name = "DynTest",
+#     deps = [":PlayerUILogger"],
+#     families = [
+#         "iphone",
+#         "ipad",
+#     ]
+# )
+
+swift_library(
+    name = "PlayerUI",
+    module_name = "PlayerUI",
+    srcs = glob(["Sources/core/**/*.swift"]),
+    tags = ["manual"],
+    visibility = ["//visibility:public"],
+    deps = ["@swiftpkg_swift_hooks//:Sources_SwiftHooks", ":PlayerUILogger"],
+    data = glob(["Sources/core/Resources/**/*"])
+)
+
+swift_library(
+    name = "PlayerUIInternalTestUtilities",
+    module_name = "PlayerUIInternalTestUtilities",
+    srcs = glob(["Sources/internal-test-utils/**/*.swift"]),
+    tags = ["manual"],
+    visibility = ["//visibility:public"],
+    deps = [":PlayerUI"]
+)
+
+ios_unit_test(
+    name = "PlayerUILoggerTests",
+    srcs = glob(["Tests/logger/**/*.swift"]),
+    minimum_os_version = "14.0",
+    deps = [":PlayerUILogger"],
+    visibility = ["//visibility:public"],
+)
+ios_unit_test(
+    name = "PlayerUITests",
+    srcs = glob(["Tests/core/**/*.swift"]),
+    minimum_os_version = "14.0",
+    deps = [":PlayerUI", ":PlayerUIInternalTestUtilities"],
+    visibility = ["//visibility:public"],
+)
+
+xcodeproj(
+    name = "xcodeproj",
+    project_name = "Player",
+    tags = ["manual"],
+    top_level_targets = [
+        ":PlayerUILoggerTests",
+        ":PlayerUITests"
+    ],
+)

@@ -1,0 +1,505 @@
+{
+  "direct_dep_identities": [
+    "eyes-xcui-swift-package",
+    "swift-hooks",
+    "viewinspector",
+    "xcodegen"
+  ],
+  "modules": [
+    {
+      "name": "AEXML",
+      "c99name": "AEXML",
+      "src_type": "swift",
+      "label": "@swiftpkg_aexml//:Sources_AEXML",
+      "package_identity": "aexml",
+      "product_memberships": [
+        "AEXML"
+      ]
+    },
+    {
+      "name": "EyesXCUI",
+      "c99name": "EyesXCUI",
+      "src_type": "binary",
+      "label": "@swiftpkg_eyes_xcui_swift_package//:remote_archive_EyesXCUI.xcframework.zip_EyesXCUI",
+      "package_identity": "eyes-xcui-swift-package",
+      "product_memberships": [
+        "EyesXCUI"
+      ]
+    },
+    {
+      "name": "DOT",
+      "c99name": "DOT",
+      "src_type": "swift",
+      "label": "@swiftpkg_graphviz//:Sources_DOT",
+      "package_identity": "graphviz",
+      "product_memberships": [
+        "GraphViz"
+      ]
+    },
+    {
+      "name": "GraphViz",
+      "c99name": "GraphViz",
+      "src_type": "swift",
+      "label": "@swiftpkg_graphviz//:Sources_GraphViz",
+      "package_identity": "graphviz",
+      "product_memberships": [
+        "GraphViz",
+        "GraphVizBuilder"
+      ]
+    },
+    {
+      "name": "GraphVizBuilder",
+      "c99name": "GraphVizBuilder",
+      "src_type": "swift",
+      "label": "@swiftpkg_graphviz//:Sources_GraphVizBuilder",
+      "package_identity": "graphviz",
+      "product_memberships": [
+        "GraphVizBuilder"
+      ]
+    },
+    {
+      "name": "Tools",
+      "c99name": "Tools",
+      "src_type": "swift",
+      "label": "@swiftpkg_graphviz//:Sources_Tools",
+      "package_identity": "graphviz",
+      "product_memberships": [
+        "GraphViz"
+      ]
+    },
+    {
+      "name": "JSONUtilities",
+      "c99name": "JSONUtilities",
+      "src_type": "swift",
+      "label": "@swiftpkg_jsonutilities//:Sources_JSONUtilities",
+      "package_identity": "jsonutilities",
+      "product_memberships": [
+        "JSONUtilities"
+      ]
+    },
+    {
+      "name": "PathKit",
+      "c99name": "PathKit",
+      "src_type": "swift",
+      "label": "@swiftpkg_pathkit//:Sources_PathKit",
+      "package_identity": "pathkit",
+      "product_memberships": [
+        "PathKit"
+      ]
+    },
+    {
+      "name": "Rainbow",
+      "c99name": "Rainbow",
+      "src_type": "swift",
+      "label": "@swiftpkg_rainbow//:Sources_Rainbow",
+      "package_identity": "rainbow",
+      "product_memberships": [
+        "Rainbow"
+      ]
+    },
+    {
+      "name": "Spectre",
+      "c99name": "Spectre",
+      "src_type": "swift",
+      "label": "@swiftpkg_spectre//:Sources_Spectre",
+      "package_identity": "spectre",
+      "product_memberships": [
+        "Spectre"
+      ]
+    },
+    {
+      "name": "SwiftHooks",
+      "c99name": "SwiftHooks",
+      "src_type": "swift",
+      "label": "@swiftpkg_swift_hooks//:Sources_SwiftHooks",
+      "package_identity": "swift-hooks",
+      "product_memberships": [
+        "SwiftHooks"
+      ]
+    },
+    {
+      "name": "SwiftCLI",
+      "c99name": "SwiftCLI",
+      "src_type": "swift",
+      "label": "@swiftpkg_swiftcli//:Sources_SwiftCLI",
+      "package_identity": "swiftcli",
+      "product_memberships": [
+        "SwiftCLI"
+      ]
+    },
+    {
+      "name": "Version",
+      "c99name": "Version",
+      "src_type": "swift",
+      "label": "@swiftpkg_version//:Sources_Version",
+      "package_identity": "version",
+      "product_memberships": [
+        "Version"
+      ]
+    },
+    {
+      "name": "ViewInspector",
+      "c99name": "ViewInspector",
+      "src_type": "swift",
+      "label": "@swiftpkg_viewinspector//:Sources_ViewInspector",
+      "modulemap_label": "@swiftpkg_viewinspector//:Sources_ViewInspector_modulemap",
+      "package_identity": "viewinspector",
+      "product_memberships": [
+        "ViewInspector"
+      ]
+    },
+    {
+      "name": "ProjectSpec",
+      "c99name": "ProjectSpec",
+      "src_type": "swift",
+      "label": "@swiftpkg_xcodegen//:Sources_ProjectSpec",
+      "package_identity": "xcodegen",
+      "product_memberships": [
+        "xcodegen",
+        "XcodeGenKit",
+        "ProjectSpec"
+      ]
+    },
+    {
+      "name": "XcodeGen",
+      "c99name": "XcodeGen",
+      "src_type": "swift",
+      "label": "@swiftpkg_xcodegen//:Sources_XcodeGen",
+      "package_identity": "xcodegen",
+      "product_memberships": [
+        "xcodegen"
+      ]
+    },
+    {
+      "name": "XcodeGenCLI",
+      "c99name": "XcodeGenCLI",
+      "src_type": "swift",
+      "label": "@swiftpkg_xcodegen//:Sources_XcodeGenCLI",
+      "package_identity": "xcodegen",
+      "product_memberships": [
+        "xcodegen"
+      ]
+    },
+    {
+      "name": "XcodeGenCore",
+      "c99name": "XcodeGenCore",
+      "src_type": "swift",
+      "label": "@swiftpkg_xcodegen//:Sources_XcodeGenCore",
+      "package_identity": "xcodegen",
+      "product_memberships": [
+        "xcodegen",
+        "XcodeGenKit",
+        "ProjectSpec"
+      ]
+    },
+    {
+      "name": "XcodeGenKit",
+      "c99name": "XcodeGenKit",
+      "src_type": "swift",
+      "label": "@swiftpkg_xcodegen//:Sources_XcodeGenKit",
+      "package_identity": "xcodegen",
+      "product_memberships": [
+        "xcodegen",
+        "XcodeGenKit"
+      ]
+    },
+    {
+      "name": "XcodeProj",
+      "c99name": "XcodeProj",
+      "src_type": "swift",
+      "label": "@swiftpkg_xcodeproj//:Sources_XcodeProj",
+      "package_identity": "xcodeproj",
+      "product_memberships": [
+        "XcodeProj"
+      ]
+    },
+    {
+      "name": "CYaml",
+      "c99name": "CYaml",
+      "src_type": "clang",
+      "label": "@swiftpkg_yams//:Sources_CYaml",
+      "package_identity": "yams",
+      "product_memberships": [
+        "Yams"
+      ]
+    },
+    {
+      "name": "Yams",
+      "c99name": "Yams",
+      "src_type": "swift",
+      "label": "@swiftpkg_yams//:Sources_Yams",
+      "package_identity": "yams",
+      "product_memberships": [
+        "Yams"
+      ]
+    }
+  ],
+  "products": [
+    {
+      "identity": "aexml",
+      "name": "AEXML",
+      "type": "library",
+      "target_labels": [
+        "@swiftpkg_aexml//:Sources_AEXML"
+      ]
+    },
+    {
+      "identity": "eyes-xcui-swift-package",
+      "name": "EyesXCUI",
+      "type": "library",
+      "target_labels": [
+        "@swiftpkg_eyes_xcui_swift_package//:remote_archive_EyesXCUI.xcframework.zip_EyesXCUI"
+      ]
+    },
+    {
+      "identity": "graphviz",
+      "name": "GraphViz",
+      "type": "library",
+      "target_labels": [
+        "@swiftpkg_graphviz//:Sources_GraphViz",
+        "@swiftpkg_graphviz//:Sources_DOT",
+        "@swiftpkg_graphviz//:Sources_Tools"
+      ]
+    },
+    {
+      "identity": "graphviz",
+      "name": "GraphVizBuilder",
+      "type": "library",
+      "target_labels": [
+        "@swiftpkg_graphviz//:Sources_GraphVizBuilder"
+      ]
+    },
+    {
+      "identity": "jsonutilities",
+      "name": "JSONUtilities",
+      "type": "library",
+      "target_labels": [
+        "@swiftpkg_jsonutilities//:Sources_JSONUtilities"
+      ]
+    },
+    {
+      "identity": "pathkit",
+      "name": "PathKit",
+      "type": "library",
+      "target_labels": [
+        "@swiftpkg_pathkit//:Sources_PathKit"
+      ]
+    },
+    {
+      "identity": "rainbow",
+      "name": "Rainbow",
+      "type": "library",
+      "target_labels": [
+        "@swiftpkg_rainbow//:Sources_Rainbow"
+      ]
+    },
+    {
+      "identity": "spectre",
+      "name": "Spectre",
+      "type": "library",
+      "target_labels": [
+        "@swiftpkg_spectre//:Sources_Spectre"
+      ]
+    },
+    {
+      "identity": "swift-hooks",
+      "name": "SwiftHooks",
+      "type": "library",
+      "target_labels": [
+        "@swiftpkg_swift_hooks//:Sources_SwiftHooks"
+      ]
+    },
+    {
+      "identity": "swiftcli",
+      "name": "SwiftCLI",
+      "type": "library",
+      "target_labels": [
+        "@swiftpkg_swiftcli//:Sources_SwiftCLI"
+      ]
+    },
+    {
+      "identity": "version",
+      "name": "Version",
+      "type": "library",
+      "target_labels": [
+        "@swiftpkg_version//:Sources_Version"
+      ]
+    },
+    {
+      "identity": "viewinspector",
+      "name": "ViewInspector",
+      "type": "library",
+      "target_labels": [
+        "@swiftpkg_viewinspector//:Sources_ViewInspector"
+      ]
+    },
+    {
+      "identity": "xcodegen",
+      "name": "ProjectSpec",
+      "type": "library",
+      "target_labels": [
+        "@swiftpkg_xcodegen//:Sources_ProjectSpec"
+      ]
+    },
+    {
+      "identity": "xcodegen",
+      "name": "XcodeGenKit",
+      "type": "library",
+      "target_labels": [
+        "@swiftpkg_xcodegen//:Sources_XcodeGenKit"
+      ]
+    },
+    {
+      "identity": "xcodegen",
+      "name": "xcodegen",
+      "type": "executable",
+      "target_labels": [
+        "@swiftpkg_xcodegen//:Sources_XcodeGen"
+      ]
+    },
+    {
+      "identity": "xcodeproj",
+      "name": "XcodeProj",
+      "type": "library",
+      "target_labels": [
+        "@swiftpkg_xcodeproj//:Sources_XcodeProj"
+      ]
+    },
+    {
+      "identity": "yams",
+      "name": "Yams",
+      "type": "library",
+      "target_labels": [
+        "@swiftpkg_yams//:Sources_Yams"
+      ]
+    }
+  ],
+  "packages": [
+    {
+      "name": "swiftpkg_aexml",
+      "identity": "aexml",
+      "remote": {
+        "commit": "38f7d00b23ecd891e1ee656fa6aeebd6ba04ecc3",
+        "remote": "https://github.com/tadija/AEXML.git",
+        "version": "4.6.1"
+      }
+    },
+    {
+      "name": "swiftpkg_eyes_xcui_swift_package",
+      "identity": "eyes-xcui-swift-package",
+      "remote": {
+        "commit": "ba8bc9221d1f5ca733d794d9c85ad017df9e0423",
+        "remote": "https://github.com/applitools/eyes-xcui-swift-package.git",
+        "version": "8.9.1"
+      }
+    },
+    {
+      "name": "swiftpkg_graphviz",
+      "identity": "graphviz",
+      "remote": {
+        "commit": "70bebcf4597b9ce33e19816d6bbd4ba9b7bdf038",
+        "remote": "https://github.com/SwiftDocOrg/GraphViz.git",
+        "version": "0.2.0"
+      }
+    },
+    {
+      "name": "swiftpkg_jsonutilities",
+      "identity": "jsonutilities",
+      "remote": {
+        "commit": "128d2ffc22467f69569ef8ff971683e2393191a0",
+        "remote": "https://github.com/yonaskolb/JSONUtilities.git",
+        "version": "4.2.0"
+      }
+    },
+    {
+      "name": "swiftpkg_pathkit",
+      "identity": "pathkit",
+      "remote": {
+        "commit": "3bfd2737b700b9a36565a8c94f4ad2b050a5e574",
+        "remote": "https://github.com/kylef/PathKit.git",
+        "version": "1.0.1"
+      }
+    },
+    {
+      "name": "swiftpkg_rainbow",
+      "identity": "rainbow",
+      "remote": {
+        "commit": "626c3d4b6b55354b4af3aa309f998fae9b31a3d9",
+        "remote": "https://github.com/onevcat/Rainbow.git",
+        "version": "3.2.0"
+      }
+    },
+    {
+      "name": "swiftpkg_spectre",
+      "identity": "spectre",
+      "remote": {
+        "commit": "26cc5e9ae0947092c7139ef7ba612e34646086c7",
+        "remote": "https://github.com/kylef/Spectre.git",
+        "version": "0.10.1"
+      }
+    },
+    {
+      "name": "swiftpkg_swift_hooks",
+      "identity": "swift-hooks",
+      "remote": {
+        "commit": "5f3136ac2a3c27aa469e3f9a1222b15080d431d3",
+        "remote": "https://github.com/intuit/swift-hooks.git",
+        "version": "0.1.0"
+      }
+    },
+    {
+      "name": "swiftpkg_swiftcli",
+      "identity": "swiftcli",
+      "remote": {
+        "commit": "2e949055d9797c1a6bddcda0e58dada16cc8e970",
+        "remote": "https://github.com/jakeheis/SwiftCLI.git",
+        "version": "6.0.3"
+      }
+    },
+    {
+      "name": "swiftpkg_version",
+      "identity": "version",
+      "remote": {
+        "commit": "1fe824b80d89201652e7eca7c9252269a1d85e25",
+        "remote": "https://github.com/mxcl/Version",
+        "version": "2.0.1"
+      }
+    },
+    {
+      "name": "swiftpkg_viewinspector",
+      "identity": "viewinspector",
+      "remote": {
+        "commit": "07c090d73e0169c342a4ed46e9010be2781eca1e",
+        "remote": "https://github.com/nalexn/ViewInspector",
+        "version": "0.9.8"
+      }
+    },
+    {
+      "name": "swiftpkg_xcodegen",
+      "identity": "xcodegen",
+      "remote": {
+        "commit": "87a275fb0852bb231550e66473804de57063c957",
+        "remote": "https://github.com/yonaskolb/XcodeGen.git",
+        "version": "2.38.0"
+      }
+    },
+    {
+      "name": "swiftpkg_xcodeproj",
+      "identity": "xcodeproj",
+      "remote": {
+        "commit": "447c159b0c5fb047a024fd8d942d4a76cf47dde0",
+        "remote": "https://github.com/tuist/XcodeProj.git",
+        "version": "8.16.0"
+      }
+    },
+    {
+      "name": "swiftpkg_yams",
+      "identity": "yams",
+      "remote": {
+        "commit": "0d9ee7ea8c4ebd4a489ad7a73d5c6cad55d6fed3",
+        "remote": "https://github.com/jpsim/Yams.git",
+        "version": "5.0.6"
+      }
+    }
+  ]
+}

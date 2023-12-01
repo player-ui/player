@@ -1,0 +1,14 @@
+$(BAZEL_EXTERNAL)/rules_ios~3.1.4/rules/library/common.pch
+$(BAZEL_EXTERNAL)/rules_ios~3.1.4/rules/test_host_app/Info.plist
+$(BAZEL_EXTERNAL)/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks/Sources/SwiftHooks/AsyncParallelBailHook.swift
+$(BAZEL_EXTERNAL)/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks/Sources/SwiftHooks/AsyncParallelHook.swift
+$(BAZEL_EXTERNAL)/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks/Sources/SwiftHooks/AsyncSeriesBailHook.swift
+$(BAZEL_EXTERNAL)/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks/Sources/SwiftHooks/AsyncSeriesHook.swift
+$(BAZEL_EXTERNAL)/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks/Sources/SwiftHooks/AsyncSeriesLoopHook.swift
+$(BAZEL_EXTERNAL)/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks/Sources/SwiftHooks/AsyncSeriesWaterfallHook.swift
+$(BAZEL_EXTERNAL)/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks/Sources/SwiftHooks/BaseHook.swift
+$(BAZEL_EXTERNAL)/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks/Sources/SwiftHooks/Interceptors.swift
+$(BAZEL_EXTERNAL)/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks/Sources/SwiftHooks/SyncBailHook.swift
+$(BAZEL_EXTERNAL)/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks/Sources/SwiftHooks/SyncHook.swift
+$(BAZEL_EXTERNAL)/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks/Sources/SwiftHooks/SyncLoopHook.swift
+$(BAZEL_EXTERNAL)/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks/Sources/SwiftHooks/SyncWaterfallHook.swift
