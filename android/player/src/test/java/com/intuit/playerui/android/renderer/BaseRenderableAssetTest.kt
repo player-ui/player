@@ -11,7 +11,7 @@ import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.flow.Flow
 import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.plugins.Plugin
-import com.intuit.player.plugins.beacon.BeaconPlugin
+import com.intuit.playerui.plugins.beacon.BeaconPlugin
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK

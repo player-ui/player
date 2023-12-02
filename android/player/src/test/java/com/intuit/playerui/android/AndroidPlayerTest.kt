@@ -1,16 +1,16 @@
 package com.intuit.playerui.android
 
 import android.content.Context
-import com.intuit.player.plugins.beacon.BeaconPlugin
-import com.intuit.player.plugins.beacon.beaconPlugin
-import com.intuit.player.plugins.pubsub.PubSubPlugin
-import com.intuit.player.plugins.pubsub.pubSubPlugin
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.utils.SimpleAsset
 import com.intuit.playerui.android.utils.TestAssetsPlugin
 import com.intuit.playerui.android.utils.awaitFirstView
 import com.intuit.playerui.core.bridge.PlayerRuntimeException
 import com.intuit.playerui.core.player.HeadlessPlayer
+import com.intuit.playerui.plugins.beacon.BeaconPlugin
+import com.intuit.playerui.plugins.beacon.beaconPlugin
+import com.intuit.playerui.plugins.pubsub.PubSubPlugin
+import com.intuit.playerui.plugins.pubsub.pubSubPlugin
 import com.intuit.playerui.utils.start
 import com.intuit.playerui.utils.test.runBlockingTest
 import io.mockk.impl.annotations.MockK
