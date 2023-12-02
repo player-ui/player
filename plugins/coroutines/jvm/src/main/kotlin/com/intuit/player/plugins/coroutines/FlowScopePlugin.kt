@@ -1,11 +1,11 @@
 package com.intuit.player.plugins.coroutines
 
-import com.intuit.player.jvm.core.flow.Flow
-import com.intuit.player.jvm.core.player.Player
-import com.intuit.player.jvm.core.player.state.InProgressState
-import com.intuit.player.jvm.core.player.subScope
-import com.intuit.player.jvm.core.plugins.PlayerPlugin
-import com.intuit.player.jvm.core.plugins.findPlugin
+import com.intuit.playerui.core.flow.Flow
+import com.intuit.playerui.core.player.Player
+import com.intuit.playerui.core.player.state.InProgressState
+import com.intuit.playerui.core.player.subScope
+import com.intuit.playerui.core.plugins.PlayerPlugin
+import com.intuit.playerui.core.plugins.findPlugin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel

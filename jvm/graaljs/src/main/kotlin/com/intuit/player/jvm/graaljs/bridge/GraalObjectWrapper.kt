@@ -1,4 +1,4 @@
-package com.intuit.player.jvm.graaljs.bridge
+package com.intuit.playerui.graaljs.bridge
 
 import org.graalvm.polyglot.Value
 

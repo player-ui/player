@@ -1,11 +1,11 @@
 package com.intuit.player.plugins.coroutines
 
-import com.intuit.player.jvm.core.flow.Flow
-import com.intuit.player.jvm.core.player.Player
-import com.intuit.player.jvm.core.player.state.CompletedState
-import com.intuit.player.jvm.core.player.state.InProgressState
-import com.intuit.player.jvm.core.player.state.PlayerFlowState
-import com.intuit.player.jvm.core.player.state.ReleasedState
+import com.intuit.playerui.core.flow.Flow
+import com.intuit.playerui.core.player.Player
+import com.intuit.playerui.core.player.state.CompletedState
+import com.intuit.playerui.core.player.state.InProgressState
+import com.intuit.playerui.core.player.state.PlayerFlowState
+import com.intuit.playerui.core.player.state.ReleasedState
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.invoke

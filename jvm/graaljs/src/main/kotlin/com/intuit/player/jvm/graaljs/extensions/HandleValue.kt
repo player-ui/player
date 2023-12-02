@@ -1,13 +1,13 @@
-package com.intuit.player.jvm.graaljs.extensions
+package com.intuit.playerui.graaljs.extensions
 
-import com.intuit.player.jvm.core.asset.Asset
-import com.intuit.player.jvm.core.bridge.Invokable
-import com.intuit.player.jvm.core.bridge.Node
-import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeFormat
-import com.intuit.player.jvm.core.bridge.serialization.format.encodeToRuntimeValue
-import com.intuit.player.jvm.core.bridge.serialization.format.serializer
-import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
-import com.intuit.player.jvm.graaljs.bridge.GraalNode
+import com.intuit.playerui.core.asset.Asset
+import com.intuit.playerui.core.bridge.Invokable
+import com.intuit.playerui.core.bridge.Node
+import com.intuit.playerui.core.bridge.serialization.format.RuntimeFormat
+import com.intuit.playerui.core.bridge.serialization.format.encodeToRuntimeValue
+import com.intuit.playerui.core.bridge.serialization.format.serializer
+import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
+import com.intuit.playerui.graaljs.bridge.GraalNode
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json

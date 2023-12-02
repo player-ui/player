@@ -1,4 +1,4 @@
-package com.intuit.player.jvm.graaljs.player
+package com.intuit.playerui.graaljs.player
 
 import org.graalvm.polyglot.Context
 

@@ -1,12 +1,12 @@
 package com.intuit.player.plugins.expression
 
-import com.intuit.player.jvm.core.expressions.ExpressionEvaluator
-import com.intuit.player.jvm.core.expressions.evaluate
-import com.intuit.player.jvm.core.plugins.Plugin
-import com.intuit.player.jvm.core.plugins.findPlugin
-import com.intuit.player.jvm.utils.test.PlayerTest
-import com.intuit.player.jvm.utils.test.setupPlayer
-import com.intuit.player.jvm.utils.test.simpleFlowString
+import com.intuit.playerui.core.expressions.ExpressionEvaluator
+import com.intuit.playerui.core.expressions.evaluate
+import com.intuit.playerui.core.plugins.Plugin
+import com.intuit.playerui.core.plugins.findPlugin
+import com.intuit.playerui.utils.test.PlayerTest
+import com.intuit.playerui.utils.test.setupPlayer
+import com.intuit.playerui.utils.test.simpleFlowString
 import org.amshove.kluent.`should be empty`
 import org.amshove.kluent.`should be equal to`
 import org.amshove.kluent.`should be instance of`

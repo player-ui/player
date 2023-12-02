@@ -10,5 +10,5 @@ kt_player_module(
     main_deps = main_deps,
     main_exports = main_exports,
     test_deps = test_deps,
-    test_package = "com.intuit.player.jvm.core",
+    test_package = "com.intuit.playerui.core",
 )

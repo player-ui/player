@@ -1,7 +1,7 @@
-package com.intuit.player.jvm.plugins.logging.jul
+package com.intuit.playerui.plugins.logging.jul
 
-import com.intuit.player.jvm.core.plugins.logging.loggers
-import com.intuit.player.jvm.utils.test.RuntimeTest
+import com.intuit.playerui.core.plugins.logging.loggers
+import com.intuit.playerui.utils.test.RuntimeTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 

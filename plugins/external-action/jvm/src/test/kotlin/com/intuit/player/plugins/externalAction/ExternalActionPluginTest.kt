@@ -1,8 +1,8 @@
 package com.intuit.player.plugins.externalAction
 
-import com.intuit.player.jvm.core.expressions.evaluate
-import com.intuit.player.jvm.utils.test.PlayerTest
-import com.intuit.player.jvm.utils.test.runBlockingTest
+import com.intuit.playerui.core.expressions.evaluate
+import com.intuit.playerui.utils.test.PlayerTest
+import com.intuit.playerui.utils.test.runBlockingTest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking

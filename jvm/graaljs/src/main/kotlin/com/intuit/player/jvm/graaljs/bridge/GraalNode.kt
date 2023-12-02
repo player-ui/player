@@ -1,18 +1,18 @@
-package com.intuit.player.jvm.graaljs.bridge
+package com.intuit.playerui.graaljs.bridge
 
-import com.intuit.player.jvm.core.bridge.Invokable
-import com.intuit.player.jvm.core.bridge.Node
-import com.intuit.player.jvm.core.bridge.NodeWrapper
-import com.intuit.player.jvm.core.bridge.runtime.Runtime
-import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeFormat
-import com.intuit.player.jvm.graaljs.bridge.runtime.GraalRuntime.Companion.isReleased
-import com.intuit.player.jvm.graaljs.bridge.runtime.GraalRuntime.Companion.undefined
-import com.intuit.player.jvm.graaljs.extensions.blockingLock
-import com.intuit.player.jvm.graaljs.extensions.handleValue
-import com.intuit.player.jvm.graaljs.extensions.lockIfDefined
-import com.intuit.player.jvm.graaljs.extensions.toInvokable
-import com.intuit.player.jvm.graaljs.extensions.toList
-import com.intuit.player.jvm.graaljs.extensions.toNode
+import com.intuit.playerui.core.bridge.Invokable
+import com.intuit.playerui.core.bridge.Node
+import com.intuit.playerui.core.bridge.NodeWrapper
+import com.intuit.playerui.core.bridge.runtime.Runtime
+import com.intuit.playerui.core.bridge.serialization.format.RuntimeFormat
+import com.intuit.playerui.graaljs.bridge.runtime.GraalRuntime.Companion.isReleased
+import com.intuit.playerui.graaljs.bridge.runtime.GraalRuntime.Companion.undefined
+import com.intuit.playerui.graaljs.extensions.blockingLock
+import com.intuit.playerui.graaljs.extensions.handleValue
+import com.intuit.playerui.graaljs.extensions.lockIfDefined
+import com.intuit.playerui.graaljs.extensions.toInvokable
+import com.intuit.playerui.graaljs.extensions.toList
+import com.intuit.playerui.graaljs.extensions.toNode
 import kotlinx.serialization.DeserializationStrategy
 import org.graalvm.polyglot.Value
 

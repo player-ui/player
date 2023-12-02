@@ -2,9 +2,9 @@ package com.intuit.player.plugins.transactions
 
 import com.intuit.hooks.HookContext
 import com.intuit.hooks.SyncHook
-import com.intuit.player.jvm.core.player.Player
-import com.intuit.player.jvm.core.plugins.Plugin
-import com.intuit.player.jvm.core.plugins.findPlugin
+import com.intuit.playerui.core.player.Player
+import com.intuit.playerui.core.plugins.Plugin
+import com.intuit.playerui.core.plugins.findPlugin
 
 public fun interface PendingTransaction {
     public fun commit()

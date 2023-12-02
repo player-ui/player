@@ -1,7 +1,7 @@
 package com.intuit.player.plugins.checkpath
 
-import com.intuit.player.jvm.utils.test.PlayerTest
-import com.intuit.player.jvm.utils.test.simpleFlowString
+import com.intuit.playerui.utils.test.PlayerTest
+import com.intuit.playerui.utils.test.simpleFlowString
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestTemplate

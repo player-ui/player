@@ -1,9 +1,9 @@
-package com.intuit.player.jvm.graaljs.bridge.serialization
+package com.intuit.playerui.graaljs.bridge.serialization
 
-import com.intuit.player.jvm.core.bridge.Invokable
-import com.intuit.player.jvm.graaljs.base.GraalTest
-import com.intuit.player.jvm.graaljs.bridge.serialization.format.encodeToGraalValue
-import com.intuit.player.jvm.graaljs.extensions.blockingLock
+import com.intuit.playerui.core.bridge.Invokable
+import com.intuit.playerui.graaljs.base.GraalTest
+import com.intuit.playerui.graaljs.bridge.serialization.format.encodeToGraalValue
+import com.intuit.playerui.graaljs.extensions.blockingLock
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 

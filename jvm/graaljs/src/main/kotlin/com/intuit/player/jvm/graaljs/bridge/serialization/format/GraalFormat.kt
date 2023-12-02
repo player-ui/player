@@ -1,12 +1,12 @@
-package com.intuit.player.jvm.graaljs.bridge.serialization.format
+package com.intuit.playerui.graaljs.bridge.serialization.format
 
-import com.intuit.player.jvm.core.bridge.runtime.Runtime
-import com.intuit.player.jvm.core.bridge.serialization.format.AbstractRuntimeFormat
-import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeFormatConfiguration
-import com.intuit.player.jvm.core.bridge.serialization.format.serializer
-import com.intuit.player.jvm.graaljs.bridge.runtime.GraalRuntime
-import com.intuit.player.jvm.graaljs.bridge.serialization.encoding.readValue
-import com.intuit.player.jvm.graaljs.bridge.serialization.encoding.writeValue
+import com.intuit.playerui.core.bridge.runtime.Runtime
+import com.intuit.playerui.core.bridge.serialization.format.AbstractRuntimeFormat
+import com.intuit.playerui.core.bridge.serialization.format.RuntimeFormatConfiguration
+import com.intuit.playerui.core.bridge.serialization.format.serializer
+import com.intuit.playerui.graaljs.bridge.runtime.GraalRuntime
+import com.intuit.playerui.graaljs.bridge.serialization.encoding.readValue
+import com.intuit.playerui.graaljs.bridge.serialization.encoding.writeValue
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.modules.SerializersModule

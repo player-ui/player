@@ -1,9 +1,9 @@
 package com.intuit.player.plugins.coroutines
 
-import com.intuit.player.jvm.core.asset.Asset
-import com.intuit.player.jvm.core.player.Player
-import com.intuit.player.jvm.core.plugins.PlayerPlugin
-import com.intuit.player.jvm.core.plugins.findPlugin
+import com.intuit.playerui.core.asset.Asset
+import com.intuit.playerui.core.player.Player
+import com.intuit.playerui.core.plugins.PlayerPlugin
+import com.intuit.playerui.core.plugins.findPlugin
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel

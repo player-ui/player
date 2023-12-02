@@ -1,10 +1,10 @@
-package com.intuit.player.jvm.plugins.metrics
+package com.intuit.playerui.plugins.metrics
 
-import com.intuit.player.jvm.core.player.state.inProgressState
-import com.intuit.player.jvm.core.plugins.Plugin
-import com.intuit.player.jvm.utils.test.PlayerTest
-import com.intuit.player.jvm.utils.test.runBlockingTest
-import com.intuit.player.jvm.utils.test.simpleFlowString
+import com.intuit.playerui.core.player.state.inProgressState
+import com.intuit.playerui.core.plugins.Plugin
+import com.intuit.playerui.utils.test.PlayerTest
+import com.intuit.playerui.utils.test.runBlockingTest
+import com.intuit.playerui.utils.test.simpleFlowString
 import io.mockk.Called
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockkObject

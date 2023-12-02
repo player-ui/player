@@ -1,13 +1,13 @@
 package com.intuit.player.plugins.settimeout
 
-import com.intuit.player.jvm.core.bridge.Invokable
-import com.intuit.player.jvm.core.bridge.runtime.Runtime
-import com.intuit.player.jvm.core.bridge.runtime.add
-import com.intuit.player.jvm.core.player.Player
-import com.intuit.player.jvm.core.player.state.inProgressState
-import com.intuit.player.jvm.core.plugins.PlayerPlugin
-import com.intuit.player.jvm.core.plugins.PlayerPluginException
-import com.intuit.player.jvm.core.plugins.RuntimePlugin
+import com.intuit.playerui.core.bridge.Invokable
+import com.intuit.playerui.core.bridge.runtime.Runtime
+import com.intuit.playerui.core.bridge.runtime.add
+import com.intuit.playerui.core.player.Player
+import com.intuit.playerui.core.player.state.inProgressState
+import com.intuit.playerui.core.plugins.PlayerPlugin
+import com.intuit.playerui.core.plugins.PlayerPluginException
+import com.intuit.playerui.core.plugins.RuntimePlugin
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

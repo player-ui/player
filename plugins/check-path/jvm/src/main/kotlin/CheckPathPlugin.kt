@@ -1,10 +1,10 @@
 package com.intuit.player.plugins.checkpath
 
-import com.intuit.player.jvm.core.asset.Asset
-import com.intuit.player.jvm.core.bridge.getInvokable
-import com.intuit.player.jvm.core.player.Player
-import com.intuit.player.jvm.core.plugins.JSScriptPluginWrapper
-import com.intuit.player.jvm.core.plugins.findPlugin
+import com.intuit.playerui.core.asset.Asset
+import com.intuit.playerui.core.bridge.getInvokable
+import com.intuit.playerui.core.player.Player
+import com.intuit.playerui.core.plugins.JSScriptPluginWrapper
+import com.intuit.playerui.core.plugins.findPlugin
 
 /** Reduced wrapper of the core check-path plugin for relative asset querying */
 public class CheckPathPlugin : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {

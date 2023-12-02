@@ -1,9 +1,9 @@
-package com.intuit.player.jvm.plugins.logging.jul
+package com.intuit.playerui.plugins.logging.jul
 
-import com.intuit.player.jvm.core.plugins.LoggerPlugin
-import com.intuit.player.jvm.core.plugins.logging.PlayerLoggingConfig
-import com.intuit.player.jvm.core.plugins.logging.PlayerLoggingContainer
-import com.intuit.player.jvm.core.plugins.logging.PlayerLoggingFactory
+import com.intuit.playerui.core.plugins.LoggerPlugin
+import com.intuit.playerui.core.plugins.logging.PlayerLoggingConfig
+import com.intuit.playerui.core.plugins.logging.PlayerLoggingContainer
+import com.intuit.playerui.core.plugins.logging.PlayerLoggingFactory
 import java.util.logging.Logger
 
 /** Basic Java Logger player plugin */

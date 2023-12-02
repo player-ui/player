@@ -10,7 +10,7 @@ kt_player_module(
     main_exports = main_exports,
     main_resources = main_resources + glob(["src/main/resources/**"]),
     test_deps = test_deps,
-    test_package = "com.intuit.player.jvm.j2v8",
+    test_package = "com.intuit.playerui.j2v8",
 )
 
 j2v8_platform("macos")

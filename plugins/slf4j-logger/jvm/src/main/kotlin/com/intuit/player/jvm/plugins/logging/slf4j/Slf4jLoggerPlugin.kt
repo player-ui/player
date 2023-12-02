@@ -1,9 +1,9 @@
-package com.intuit.player.jvm.plugins.logging.slf4j
+package com.intuit.playerui.plugins.logging.slf4j
 
-import com.intuit.player.jvm.core.plugins.LoggerPlugin
-import com.intuit.player.jvm.core.plugins.logging.PlayerLoggingConfig
-import com.intuit.player.jvm.core.plugins.logging.PlayerLoggingContainer
-import com.intuit.player.jvm.core.plugins.logging.PlayerLoggingFactory
+import com.intuit.playerui.core.plugins.LoggerPlugin
+import com.intuit.playerui.core.plugins.logging.PlayerLoggingConfig
+import com.intuit.playerui.core.plugins.logging.PlayerLoggingContainer
+import com.intuit.playerui.core.plugins.logging.PlayerLoggingFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

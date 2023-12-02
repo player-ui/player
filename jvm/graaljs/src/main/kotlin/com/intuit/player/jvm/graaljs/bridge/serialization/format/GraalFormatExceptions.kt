@@ -1,7 +1,7 @@
-package com.intuit.player.jvm.graaljs.bridge.serialization.format
+package com.intuit.playerui.graaljs.bridge.serialization.format
 
-import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeSerializationException
-import com.intuit.player.jvm.core.utils.InternalPlayerApi
+import com.intuit.playerui.core.bridge.serialization.format.RuntimeSerializationException
+import com.intuit.playerui.core.utils.InternalPlayerApi
 
 /** Generic exception indicating a problem with [GraalFormat] serialization and deserialization */
 internal open class GraalSerializationException @InternalPlayerApi constructor(message: String?, cause: Throwable? = null) : RuntimeSerializationException(message, cause)

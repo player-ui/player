@@ -1,17 +1,17 @@
 package com.intuit.player.plugins.externalAction
 
-import com.intuit.player.jvm.core.bridge.Node
-import com.intuit.player.jvm.core.bridge.Promise
-import com.intuit.player.jvm.core.bridge.runtime.Runtime
-import com.intuit.player.jvm.core.bridge.runtime.ScriptContext
-import com.intuit.player.jvm.core.bridge.runtime.add
-import com.intuit.player.jvm.core.flow.state.NavigationFlowExternalState
-import com.intuit.player.jvm.core.flow.state.NavigationFlowState
-import com.intuit.player.jvm.core.player.Player
-import com.intuit.player.jvm.core.player.state.ControllerState
-import com.intuit.player.jvm.core.plugins.JSScriptPluginWrapper
-import com.intuit.player.jvm.core.plugins.PlayerPlugin
-import com.intuit.player.jvm.core.plugins.findPlugin
+import com.intuit.playerui.core.bridge.Node
+import com.intuit.playerui.core.bridge.Promise
+import com.intuit.playerui.core.bridge.runtime.Runtime
+import com.intuit.playerui.core.bridge.runtime.ScriptContext
+import com.intuit.playerui.core.bridge.runtime.add
+import com.intuit.playerui.core.flow.state.NavigationFlowExternalState
+import com.intuit.playerui.core.flow.state.NavigationFlowState
+import com.intuit.playerui.core.player.Player
+import com.intuit.playerui.core.player.state.ControllerState
+import com.intuit.playerui.core.plugins.JSScriptPluginWrapper
+import com.intuit.playerui.core.plugins.PlayerPlugin
+import com.intuit.playerui.core.plugins.findPlugin
 import com.intuit.player.plugins.settimeout.SetTimeoutPlugin
 
 /** Function definition of an external action handler */

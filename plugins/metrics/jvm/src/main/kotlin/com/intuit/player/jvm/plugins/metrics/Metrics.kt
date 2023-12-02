@@ -1,11 +1,11 @@
-package com.intuit.player.jvm.plugins.metrics
+package com.intuit.playerui.plugins.metrics
 
-import com.intuit.player.jvm.core.bridge.Node
-import com.intuit.player.jvm.core.bridge.NodeWrapper
-import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField
-import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
-import com.intuit.player.jvm.core.bridge.serialization.serializers.PolymorphicNodeWrapperSerializer
-import com.intuit.player.jvm.core.player.PlayerException
+import com.intuit.playerui.core.bridge.Node
+import com.intuit.playerui.core.bridge.NodeWrapper
+import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
+import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
+import com.intuit.playerui.core.bridge.serialization.serializers.PolymorphicNodeWrapperSerializer
+import com.intuit.playerui.core.player.PlayerException
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.nullable

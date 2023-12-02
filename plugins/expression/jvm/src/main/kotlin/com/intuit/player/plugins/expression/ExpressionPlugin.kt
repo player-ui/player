@@ -1,12 +1,12 @@
 package com.intuit.player.plugins.expression
 
-import com.intuit.player.jvm.core.bridge.Invokable
-import com.intuit.player.jvm.core.bridge.Node
-import com.intuit.player.jvm.core.bridge.getInvokable
-import com.intuit.player.jvm.core.bridge.runtime.Runtime
-import com.intuit.player.jvm.core.bridge.runtime.ScriptContext
-import com.intuit.player.jvm.core.bridge.runtime.add
-import com.intuit.player.jvm.core.plugins.JSScriptPluginWrapper
+import com.intuit.playerui.core.bridge.Invokable
+import com.intuit.playerui.core.bridge.Node
+import com.intuit.playerui.core.bridge.getInvokable
+import com.intuit.playerui.core.bridge.runtime.Runtime
+import com.intuit.playerui.core.bridge.runtime.ScriptContext
+import com.intuit.playerui.core.bridge.runtime.add
+import com.intuit.playerui.core.plugins.JSScriptPluginWrapper
 
 // TODO: Turn into functional interface
 public typealias ExpressionHandler = (List<Any?>) -> Any?

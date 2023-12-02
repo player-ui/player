@@ -1,11 +1,11 @@
 package com.intuit.player.plugins.beacon
 
-import com.intuit.player.jvm.core.asset.Asset
-import com.intuit.player.jvm.core.bridge.Invokable
-import com.intuit.player.jvm.core.bridge.runtime.serialize
-import com.intuit.player.jvm.core.plugins.JSScriptPluginWrapper
-import com.intuit.player.jvm.utils.test.RuntimePluginTest
-import com.intuit.player.jvm.utils.test.runBlockingTest
+import com.intuit.playerui.core.asset.Asset
+import com.intuit.playerui.core.bridge.Invokable
+import com.intuit.playerui.core.bridge.runtime.serialize
+import com.intuit.playerui.core.plugins.JSScriptPluginWrapper
+import com.intuit.playerui.utils.test.RuntimePluginTest
+import com.intuit.playerui.utils.test.runBlockingTest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json

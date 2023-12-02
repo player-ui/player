@@ -1,11 +1,11 @@
 package com.intuit.player.plugins.pubsub
 
-import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
-import com.intuit.player.jvm.core.expressions.evaluate
-import com.intuit.player.jvm.core.player.state.inProgressState
-import com.intuit.player.jvm.utils.test.PlayerTest
-import com.intuit.player.jvm.utils.test.setupPlayer
-import com.intuit.player.jvm.utils.test.simpleFlowString
+import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
+import com.intuit.playerui.core.expressions.evaluate
+import com.intuit.playerui.core.player.state.inProgressState
+import com.intuit.playerui.utils.test.PlayerTest
+import com.intuit.playerui.utils.test.setupPlayer
+import com.intuit.playerui.utils.test.simpleFlowString
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

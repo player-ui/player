@@ -1,8 +1,8 @@
-package com.intuit.player.jvm.graaljs.extensions
+package com.intuit.playerui.graaljs.extensions
 
-import com.intuit.player.jvm.core.bridge.PlayerRuntimeException
-import com.intuit.player.jvm.graaljs.bridge.runtime.GraalRuntime.Companion.isReleased
-import com.intuit.player.jvm.graaljs.bridge.runtime.GraalRuntime.Companion.runtime
+import com.intuit.playerui.core.bridge.PlayerRuntimeException
+import com.intuit.playerui.graaljs.bridge.runtime.GraalRuntime.Companion.isReleased
+import com.intuit.playerui.graaljs.bridge.runtime.GraalRuntime.Companion.runtime
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout

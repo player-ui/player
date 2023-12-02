@@ -1,12 +1,12 @@
-package com.intuit.player.jvm.graaljs.bridge.format
+package com.intuit.playerui.graaljs.bridge.format
 
-import com.intuit.player.jvm.core.bridge.Node
-import com.intuit.player.jvm.core.bridge.NodeWrapper
-import com.intuit.player.jvm.core.bridge.getInvokable
-import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
-import com.intuit.player.jvm.graaljs.base.GraalTest
-import com.intuit.player.jvm.graaljs.bridge.serialization.format.encodeToGraalValue
-import com.intuit.player.jvm.graaljs.extensions.blockingLock
+import com.intuit.playerui.core.bridge.Node
+import com.intuit.playerui.core.bridge.NodeWrapper
+import com.intuit.playerui.core.bridge.getInvokable
+import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
+import com.intuit.playerui.graaljs.base.GraalTest
+import com.intuit.playerui.graaljs.bridge.serialization.format.encodeToGraalValue
+import com.intuit.playerui.graaljs.extensions.blockingLock
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer

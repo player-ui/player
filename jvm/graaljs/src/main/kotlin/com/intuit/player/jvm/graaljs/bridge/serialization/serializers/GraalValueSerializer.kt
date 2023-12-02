@@ -1,7 +1,7 @@
-package com.intuit.player.jvm.graaljs.bridge.serialization.serializers
+package com.intuit.playerui.graaljs.bridge.serialization.serializers
 
-import com.intuit.player.jvm.core.bridge.serialization.encoding.requireNodeEncoder
-import com.intuit.player.jvm.graaljs.bridge.serialization.encoding.AbstractGraalDecoder
+import com.intuit.playerui.core.bridge.serialization.encoding.requireNodeEncoder
+import com.intuit.playerui.graaljs.bridge.serialization.encoding.AbstractGraalDecoder
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.descriptors.SerialDescriptor

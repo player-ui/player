@@ -1,10 +1,10 @@
-package com.intuit.player.jvm.graaljs.bridge.serialization
+package com.intuit.playerui.graaljs.bridge.serialization
 
-import com.intuit.player.jvm.core.flow.FlowResult
-import com.intuit.player.jvm.graaljs.base.GraalTest
-import com.intuit.player.jvm.graaljs.bridge.GraalNode
-import com.intuit.player.jvm.graaljs.bridge.serialization.format.encodeToGraalValue
-import com.intuit.player.jvm.graaljs.extensions.blockingLock
+import com.intuit.playerui.core.flow.FlowResult
+import com.intuit.playerui.graaljs.base.GraalTest
+import com.intuit.playerui.graaljs.bridge.GraalNode
+import com.intuit.playerui.graaljs.bridge.serialization.format.encodeToGraalValue
+import com.intuit.playerui.graaljs.extensions.blockingLock
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement

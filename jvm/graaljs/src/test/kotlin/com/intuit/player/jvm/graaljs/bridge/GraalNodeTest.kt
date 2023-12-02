@@ -1,15 +1,15 @@
-package com.intuit.player.jvm.graaljs.bridge
+package com.intuit.playerui.graaljs.bridge
 
-import com.intuit.player.jvm.core.asset.Asset
-import com.intuit.player.jvm.core.bridge.Invokable
-import com.intuit.player.jvm.core.bridge.Node
-import com.intuit.player.jvm.core.bridge.getInvokable
-import com.intuit.player.jvm.core.bridge.getJson
-import com.intuit.player.jvm.core.bridge.toJson
-import com.intuit.player.jvm.core.flow.Flow
-import com.intuit.player.jvm.graaljs.base.GraalTest
-import com.intuit.player.jvm.graaljs.extensions.blockingLock
-import com.intuit.player.jvm.graaljs.extensions.handleValue
+import com.intuit.playerui.core.asset.Asset
+import com.intuit.playerui.core.bridge.Invokable
+import com.intuit.playerui.core.bridge.Node
+import com.intuit.playerui.core.bridge.getInvokable
+import com.intuit.playerui.core.bridge.getJson
+import com.intuit.playerui.core.bridge.toJson
+import com.intuit.playerui.core.flow.Flow
+import com.intuit.playerui.graaljs.base.GraalTest
+import com.intuit.playerui.graaljs.extensions.blockingLock
+import com.intuit.playerui.graaljs.extensions.handleValue
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.builtins.serializer

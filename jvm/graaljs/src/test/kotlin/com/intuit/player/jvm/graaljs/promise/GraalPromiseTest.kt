@@ -1,9 +1,9 @@
-package com.intuit.player.jvm.graaljs.promise
+package com.intuit.playerui.graaljs.promise
 
-import com.intuit.player.jvm.core.bridge.Node
-import com.intuit.player.jvm.core.bridge.Promise
-import com.intuit.player.jvm.graaljs.base.GraalTest
-import com.intuit.player.jvm.utils.test.PromiseUtils
+import com.intuit.playerui.core.bridge.Node
+import com.intuit.playerui.core.bridge.Promise
+import com.intuit.playerui.graaljs.base.GraalTest
+import com.intuit.playerui.utils.test.PromiseUtils
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -33,7 +33,7 @@ internal class GraalPromiseTest : GraalTest(), PromiseUtils {
 
         val exception = catchChain[0] as Throwable
         assertEquals(
-            """com.intuit.player.jvm.core.bridge.JSErrorException: ReferenceError: asdf is not defined
+            """com.intuit.playerui.core.bridge.JSErrorException: ReferenceError: asdf is not defined
 	at .promise(Unnamed:3)
 	at .new Promise(Native Method)
 	at .(Unnamed:3)

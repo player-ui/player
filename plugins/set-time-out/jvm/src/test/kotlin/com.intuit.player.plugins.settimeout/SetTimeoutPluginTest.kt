@@ -1,16 +1,16 @@
 package com.intuit.player.plugins.settimeout
 
-import com.intuit.player.jvm.core.bridge.Node
-import com.intuit.player.jvm.core.bridge.Promise
-import com.intuit.player.jvm.core.bridge.deserialize
-import com.intuit.player.jvm.core.bridge.toCompletable
-import com.intuit.player.jvm.core.player.state.errorState
-import com.intuit.player.jvm.core.player.state.inProgressState
-import com.intuit.player.jvm.core.plugins.Plugin
-import com.intuit.player.jvm.utils.test.PlayerTest
-import com.intuit.player.jvm.utils.test.RuntimeTest
-import com.intuit.player.jvm.utils.test.runBlockingTest
-import com.intuit.player.jvm.utils.test.simpleFlowString
+import com.intuit.playerui.core.bridge.Node
+import com.intuit.playerui.core.bridge.Promise
+import com.intuit.playerui.core.bridge.deserialize
+import com.intuit.playerui.core.bridge.toCompletable
+import com.intuit.playerui.core.player.state.errorState
+import com.intuit.playerui.core.player.state.inProgressState
+import com.intuit.playerui.core.plugins.Plugin
+import com.intuit.playerui.utils.test.PlayerTest
+import com.intuit.playerui.utils.test.RuntimeTest
+import com.intuit.playerui.utils.test.runBlockingTest
+import com.intuit.playerui.utils.test.simpleFlowString
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

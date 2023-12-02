@@ -30,7 +30,7 @@ kt_jvm_library(
 
 optins = [
     "kotlin.RequiresOptIn",
-    "com.intuit.player.jvm.core.utils.InternalPlayerApi",
+    "com.intuit.playerui.core.utils.InternalPlayerApi",
     "kotlinx.serialization.ExperimentalSerializationApi",
     "kotlinx.coroutines.ExperimentalCoroutinesApi",
     "kotlin.contracts.ExperimentalContracts",

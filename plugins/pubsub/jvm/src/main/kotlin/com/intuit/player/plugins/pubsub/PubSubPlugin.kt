@@ -1,12 +1,12 @@
 package com.intuit.player.plugins.pubsub
 
-import com.intuit.player.jvm.core.bridge.getInvokable
-import com.intuit.player.jvm.core.bridge.runtime.Runtime
-import com.intuit.player.jvm.core.bridge.runtime.ScriptContext
-import com.intuit.player.jvm.core.bridge.runtime.add
-import com.intuit.player.jvm.core.player.Player
-import com.intuit.player.jvm.core.plugins.JSScriptPluginWrapper
-import com.intuit.player.jvm.core.plugins.findPlugin
+import com.intuit.playerui.core.bridge.getInvokable
+import com.intuit.playerui.core.bridge.runtime.Runtime
+import com.intuit.playerui.core.bridge.runtime.ScriptContext
+import com.intuit.playerui.core.bridge.runtime.add
+import com.intuit.playerui.core.player.Player
+import com.intuit.playerui.core.plugins.JSScriptPluginWrapper
+import com.intuit.playerui.core.plugins.findPlugin
 import kotlinx.serialization.Serializable
 
 /** Core plugin wrapper providing pub-sub support to the JVM player */

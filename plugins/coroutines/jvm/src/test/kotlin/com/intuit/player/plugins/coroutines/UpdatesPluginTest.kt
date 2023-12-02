@@ -1,8 +1,8 @@
 package com.intuit.player.plugins.coroutines
 
-import com.intuit.player.jvm.core.plugins.Plugin
-import com.intuit.player.jvm.utils.test.PlayerTest
-import com.intuit.player.jvm.utils.test.simpleFlowString
+import com.intuit.playerui.core.plugins.Plugin
+import com.intuit.playerui.utils.test.PlayerTest
+import com.intuit.playerui.utils.test.simpleFlowString
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestTemplate
 import kotlin.concurrent.thread
