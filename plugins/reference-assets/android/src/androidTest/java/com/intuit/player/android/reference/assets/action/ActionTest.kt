@@ -3,16 +3,17 @@ package com.intuit.player.android.reference.assets.action
 import android.widget.Button
 import android.widget.LinearLayout
 import androidx.core.view.get
-import com.intuit.player.android.reference.assets.R
-import com.intuit.player.android.reference.assets.test.AssetTest
-import com.intuit.player.android.reference.assets.test.shouldBeAsset
-import com.intuit.player.android.reference.assets.test.shouldBePlayerState
-import com.intuit.player.android.reference.assets.test.shouldBeView
-import com.intuit.player.android.reference.assets.text.Text
-import com.intuit.player.jvm.core.player.state.CompletedState
-import com.intuit.player.jvm.core.player.state.ErrorState
-import com.intuit.player.jvm.core.player.state.InProgressState
-import com.intuit.player.jvm.core.player.state.dataModel
+import com.intuit.playerui.android.reference.assets.R
+import com.intuit.playerui.android.reference.assets.action.Action
+import com.intuit.playerui.android.reference.assets.test.AssetTest
+import com.intuit.playerui.android.reference.assets.test.shouldBeAsset
+import com.intuit.playerui.android.reference.assets.test.shouldBePlayerState
+import com.intuit.playerui.android.reference.assets.test.shouldBeView
+import com.intuit.playerui.android.reference.assets.text.Text
+import com.intuit.playerui.core.player.state.CompletedState
+import com.intuit.playerui.core.player.state.ErrorState
+import com.intuit.playerui.core.player.state.InProgressState
+import com.intuit.playerui.core.player.state.dataModel
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

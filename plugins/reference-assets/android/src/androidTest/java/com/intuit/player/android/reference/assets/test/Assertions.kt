@@ -1,9 +1,9 @@
 package com.intuit.player.android.reference.assets.test
 
 import android.view.View
-import com.intuit.player.android.asset.RenderableAsset
-import com.intuit.player.android.asset.SuspendableAsset
-import com.intuit.player.jvm.core.player.state.PlayerFlowState
+import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.asset.SuspendableAsset
+import com.intuit.playerui.core.player.state.PlayerFlowState
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertTrue
 import kotlin.contracts.ExperimentalContracts

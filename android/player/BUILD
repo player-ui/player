@@ -10,7 +10,7 @@ load("@grab_bazel_common//tools/databinding:databinding.bzl", "kt_db_android_lib
 kt_db_android_library(
     name = "player",
     srcs = glob(["src/main/java/**/*.kt"]),
-    custom_package = "com.intuit.player.android",
+    custom_package = "com.intuit.playerui.android",
     manifest = ":src/main/AndroidManifest.xml",
     resource_files = glob(["src/main/res/**"]),
     resources = main_resources,
@@ -31,7 +31,7 @@ kt_jvm_junit5_test(
     srcs = glob(["src/test/java/**"]),
     associates = [":player-kotlin"],
     kotlinc_opts = "//jvm:test_options",
-    test_package = "com.intuit.player.android",
+    test_package = "com.intuit.playerui.android",
     deps = [":player"] + test_deps,
 )
 
