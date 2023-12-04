@@ -17,7 +17,7 @@
                      BlueprintIdentifier = "6D1DBA425CE56881D5F0F94C"
                      BuildableName = "PlayerUIInternalTestUtilities"
                      BlueprintName = "PlayerUIInternalTestUtilities"
-                     ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
+                     ReferencedContainer = "container:/Users/hborawski/dev/open/player/ios/Player.xcodeproj">
                   </BuildableReference>
                </EnvironmentBuildable>
             </ActionContent>
@@ -35,7 +35,7 @@
                BlueprintIdentifier = "6D1DBA425CE56881D5F0F94C"
                BuildableName = "PlayerUIInternalTestUtilities"
                BlueprintName = "PlayerUIInternalTestUtilities"
-               ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
+               ReferencedContainer = "container:/Users/hborawski/dev/open/player/ios/Player.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>

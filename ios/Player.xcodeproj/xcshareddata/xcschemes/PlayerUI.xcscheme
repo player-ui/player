@@ -14,10 +14,10 @@
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
-                     BlueprintIdentifier = "79887500B3245F4EAF131F67"
-                     BuildableName = "PlayerUILoggerTests (Library)"
-                     BlueprintName = "PlayerUILoggerTests (Library)"
-                     ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
+                     BlueprintIdentifier = "E156BCF8DE2E9A88F82AB7C7"
+                     BuildableName = "PlayerUI"
+                     BlueprintName = "PlayerUI"
+                     ReferencedContainer = "container:/Users/hborawski/dev/open/player/ios/Player.xcodeproj">
                   </BuildableReference>
                </EnvironmentBuildable>
             </ActionContent>
@@ -32,10 +32,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "79887500B3245F4EAF131F67"
-               BuildableName = "PlayerUILoggerTests (Library)"
-               BlueprintName = "PlayerUILoggerTests (Library)"
-               ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
+               BlueprintIdentifier = "E156BCF8DE2E9A88F82AB7C7"
+               BuildableName = "PlayerUI"
+               BlueprintName = "PlayerUI"
+               ReferencedContainer = "container:/Users/hborawski/dev/open/player/ios/Player.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>

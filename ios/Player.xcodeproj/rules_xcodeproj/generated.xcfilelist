@@ -1,0 +1,15 @@
+$(BAZEL_OUT)/darwin_arm64-dbg/bin/external/rules_xcodeproj~1.13.0~internal~rules_xcodeproj_generated/generator/ios/xcodeproj/xcodeproj-params/PlayerUIDemo.3.link.params
+$(BAZEL_OUT)/darwin_arm64-dbg/bin/external/rules_xcodeproj~1.13.0~internal~rules_xcodeproj_generated/generator/ios/xcodeproj/xcodeproj-params/PlayerUILoggerTests.8.link.params
+$(BAZEL_OUT)/darwin_arm64-dbg/bin/external/rules_xcodeproj~1.13.0~internal~rules_xcodeproj_generated/generator/ios/xcodeproj/xcodeproj-params/PlayerUITests.6.link.params
+$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/external/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks/Sources_SwiftHooks.rules_xcodeproj.swift.compile.params
+$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/core/PlayerUI.rules_xcodeproj.swift.compile.params
+$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/core/PlayerUITests-Swift.h
+$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/core/PlayerUITests_swift.rules_xcodeproj.swift.compile.params
+$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/core/rules_xcodeproj/PlayerUITests.__internal__.__test_bundle/Info.plist
+$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/demo/PlayerUIDemoSources.rules_xcodeproj.swift.compile.params
+$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/demo/rules_xcodeproj/PlayerUIDemo/Info.plist
+$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/internal-test-utils/PlayerUIInternalTestUtilities.rules_xcodeproj.swift.compile.params
+$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/logger/PlayerUILogger.rules_xcodeproj.swift.compile.params
+$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/logger/PlayerUILoggerTests-Swift.h
+$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/logger/PlayerUILoggerTests_swift.rules_xcodeproj.swift.compile.params
+$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/logger/rules_xcodeproj/PlayerUILoggerTests.__internal__.__test_bundle/Info.plist

@@ -1,5 +1,0 @@
-filegroup(
-    name = "PlayerUICoreResources",
-    srcs = glob(["*.js"]),
-    visibility = ["//visibility:public"],
-)

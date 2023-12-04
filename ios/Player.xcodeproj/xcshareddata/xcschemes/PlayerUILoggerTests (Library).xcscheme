@@ -14,10 +14,10 @@
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
-                     BlueprintIdentifier = "0701C727DBF60E2FC7999710"
-                     BuildableName = "SwiftHooks"
-                     BlueprintName = "SwiftHooks"
-                     ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
+                     BlueprintIdentifier = "79887500B3245F4EAF131F67"
+                     BuildableName = "PlayerUILoggerTests (Library)"
+                     BlueprintName = "PlayerUILoggerTests (Library)"
+                     ReferencedContainer = "container:/Users/hborawski/dev/open/player/ios/Player.xcodeproj">
                   </BuildableReference>
                </EnvironmentBuildable>
             </ActionContent>
@@ -32,10 +32,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0701C727DBF60E2FC7999710"
-               BuildableName = "SwiftHooks"
-               BlueprintName = "SwiftHooks"
-               ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
+               BlueprintIdentifier = "79887500B3245F4EAF131F67"
+               BuildableName = "PlayerUILoggerTests (Library)"
+               BlueprintName = "PlayerUILoggerTests (Library)"
+               ReferencedContainer = "container:/Users/hborawski/dev/open/player/ios/Player.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>

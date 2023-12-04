@@ -125,15 +125,15 @@ fi
   --color=yes \
   ${toolchain:+--define=SWIFT_CUSTOM_TOOLCHAIN="$toolchain"} \
   "$output_groups_flag" \
-  "@@rules_xcodeproj~1.13.0~internal~rules_xcodeproj_generated//generator/newios/xcodeproj:xcodeproj" \
+  "@@rules_xcodeproj~1.13.0~internal~rules_xcodeproj_generated//generator/ios/xcodeproj:xcodeproj" \
   ${labels:+"--build_metadata=PATTERN=${labels[*]}"} \
   2>&1
 
 # Verify that we actually built what we requested
 
 if [[ -n "${target_ids:-}" ]]; then
-  if [[ ! -s "$PROJECT_DIR/bazel-out/darwin_arm64-dbg/bin/external/rules_xcodeproj~1.13.0~internal~rules_xcodeproj_generated/generator/newios/xcodeproj/xcodeproj_target_ids" ]]; then
-      echo "error: \"$PROJECT_DIR/bazel-out/darwin_arm64-dbg/bin/external/rules_xcodeproj~1.13.0~internal~rules_xcodeproj_generated/generator/newios/xcodeproj/xcodeproj_target_ids\" was not created. This can happen if" \
+  if [[ ! -s "$PROJECT_DIR/bazel-out/darwin_arm64-dbg/bin/external/rules_xcodeproj~1.13.0~internal~rules_xcodeproj_generated/generator/ios/xcodeproj/xcodeproj_target_ids" ]]; then
+      echo "error: \"$PROJECT_DIR/bazel-out/darwin_arm64-dbg/bin/external/rules_xcodeproj~1.13.0~internal~rules_xcodeproj_generated/generator/ios/xcodeproj/xcodeproj_target_ids\" was not created. This can happen if" \
 "you apply build-affecting flags to \"rules_xcodeproj_generator\" config, or" \
 "with the \"--@rules_xcodeproj//xcodeproj:extra_generator_flags\" flag." \
 "Please ensure that all build-affecting flags are moved to the" \
@@ -146,7 +146,7 @@ if [[ -n "${target_ids:-}" ]]; then
       exit 1
   fi
 
-  diff_output=$(comm -23 <(printf '%s\n' "${target_ids[@]}") "$PROJECT_DIR/bazel-out/darwin_arm64-dbg/bin/external/rules_xcodeproj~1.13.0~internal~rules_xcodeproj_generated/generator/newios/xcodeproj/xcodeproj_target_ids")
+  diff_output=$(comm -23 <(printf '%s\n' "${target_ids[@]}") "$PROJECT_DIR/bazel-out/darwin_arm64-dbg/bin/external/rules_xcodeproj~1.13.0~internal~rules_xcodeproj_generated/generator/ios/xcodeproj/xcodeproj_target_ids")
 
   if [ -n "$diff_output" ]; then
       missing_target_ids=("${diff_output[@]}")

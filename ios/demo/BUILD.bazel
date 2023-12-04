@@ -1,0 +1,24 @@
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+load("@build_bazel_rules_apple//apple:ios.bzl", "ios_application")
+
+swift_library(
+    name = "PlayerUIDemoSources",
+    srcs = glob(["Sources/**/*.swift"]),
+    deps = [
+        "//ios/core:PlayerUI",
+        "//ios/logger:PlayerUILogger"
+    ]
+)
+
+ios_application(
+    name = "PlayerUIDemo",
+    bundle_id = "com.intuit.ios.player",
+    families = [
+        "iphone",
+        "ipad",
+    ],
+    infoplists = ["Resources/Info.plist"],
+    minimum_os_version = "14.0",
+    visibility = ["//visibility:public"],
+    deps = [":PlayerUIDemoSources"],
+)

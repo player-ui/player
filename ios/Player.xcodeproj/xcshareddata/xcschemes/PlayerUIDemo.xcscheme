@@ -17,7 +17,7 @@
                      BlueprintIdentifier = "18C56DE95BA1FC3F2EBEBCE2"
                      BuildableName = "PlayerUIDemo.app"
                      BlueprintName = "PlayerUIDemo"
-                     ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
+                     ReferencedContainer = "container:/Users/hborawski/dev/open/player/ios/Player.xcodeproj">
                   </BuildableReference>
                </EnvironmentBuildable>
             </ActionContent>
@@ -33,7 +33,7 @@
                      BlueprintIdentifier = "18C56DE95BA1FC3F2EBEBCE2"
                      BuildableName = "PlayerUIDemo.app"
                      BlueprintName = "PlayerUIDemo"
-                     ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
+                     ReferencedContainer = "container:/Users/hborawski/dev/open/player/ios/Player.xcodeproj">
                   </BuildableReference>
                </EnvironmentBuildable>
             </ActionContent>
@@ -51,7 +51,7 @@
                BlueprintIdentifier = "18C56DE95BA1FC3F2EBEBCE2"
                BuildableName = "PlayerUIDemo.app"
                BlueprintName = "PlayerUIDemo"
-               ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
+               ReferencedContainer = "container:/Users/hborawski/dev/open/player/ios/Player.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -86,7 +86,7 @@
                      BlueprintIdentifier = "18C56DE95BA1FC3F2EBEBCE2"
                      BuildableName = "PlayerUIDemo.app"
                      BlueprintName = "PlayerUIDemo"
-                     ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
+                     ReferencedContainer = "container:/Users/hborawski/dev/open/player/ios/Player.xcodeproj">
                   </BuildableReference>
                </EnvironmentBuildable>
             </ActionContent>
@@ -99,7 +99,7 @@
             BlueprintIdentifier = "18C56DE95BA1FC3F2EBEBCE2"
             BuildableName = "PlayerUIDemo.app"
             BlueprintName = "PlayerUIDemo"
-            ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
+            ReferencedContainer = "container:/Users/hborawski/dev/open/player/ios/Player.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <EnvironmentVariables>
@@ -133,7 +133,7 @@
                      BlueprintIdentifier = "18C56DE95BA1FC3F2EBEBCE2"
                      BuildableName = "PlayerUIDemo.app"
                      BlueprintName = "PlayerUIDemo"
-                     ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
+                     ReferencedContainer = "container:/Users/hborawski/dev/open/player/ios/Player.xcodeproj">
                   </BuildableReference>
                </EnvironmentBuildable>
             </ActionContent>
@@ -146,7 +146,7 @@
             BlueprintIdentifier = "18C56DE95BA1FC3F2EBEBCE2"
             BuildableName = "PlayerUIDemo.app"
             BlueprintName = "PlayerUIDemo"
-            ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
+            ReferencedContainer = "container:/Users/hborawski/dev/open/player/ios/Player.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

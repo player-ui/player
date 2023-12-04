@@ -1,0 +1,19 @@
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+
+load("@build_bazel_rules_ios//rules:test.bzl", "ios_unit_test")
+
+swift_library(
+    name = "PlayerUILogger",
+    module_name = "PlayerUILogger",
+    srcs = glob(["Sources/**/*.swift"]),
+    visibility = ["//visibility:public"],
+    deps = ["@swiftpkg_swift_hooks//:Sources_SwiftHooks"]
+)
+
+ios_unit_test(
+    name = "PlayerUILoggerTests",
+    srcs = glob(["Tests/**/*.swift"]),
+    minimum_os_version = "14.0",
+    deps = [":PlayerUILogger"],
+    visibility = ["//visibility:public"],
+)
