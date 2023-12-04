@@ -14,6 +14,8 @@ import Combine
 import JavaScriptCore
 
 @testable import PlayerUI
+@testable import PlayerUISwiftUI
+@testable import PlayerUIInternalTestUtilities
 
 extension SwiftUIPlayer: Inspectable {}
 
@@ -21,7 +23,7 @@ class SwiftUIPlayerTests: XCTestCase {
     func testFlowLoads() throws {
         var bag = Set<AnyCancellable>()
         let context = SwiftUIPlayer.Context { JSContext() }
-        let player = SwiftUIPlayer(flow: FlowData.COUNTER, plugins: [ReferenceAssetsPlugin()], context: context)
+        let player = SwiftUIPlayer(flow: FlowData.COUNTER, plugins: [], context: context)
 
         let initialLoad = expectation(description: "Root loaded")
         player.assetRegistry.$root.sink { (asset) in
@@ -62,7 +64,7 @@ class SwiftUIPlayerTests: XCTestCase {
 
     func testViewHook() throws {
         var bag = Set<AnyCancellable>()
-        let player = SwiftUIPlayer(flow: FlowData.COUNTER, plugins: [ReferenceAssetsPlugin(), ViewHookPlugin()])
+        let player = SwiftUIPlayer(flow: FlowData.COUNTER, plugins: [ViewHookPlugin()])
 
         let initialLoad = expectation(description: "Root loaded")
         player.assetRegistry.$root.sink { (asset) in

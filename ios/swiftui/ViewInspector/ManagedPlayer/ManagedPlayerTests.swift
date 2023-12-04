@@ -12,13 +12,15 @@ import Combine
 import ViewInspector
 
 @testable import PlayerUI
+@testable import PlayerUISwiftUI
+@testable import PlayerUIInternalTestUtilities
 
 extension ManagedPlayer: Inspectable {}
 extension Inspection: InspectionEmissary where V: Inspectable { }
 
 extension ManagedPlayer14: Inspectable {}
 
-class ManagedPlayer14Tests: ViewInspectorTestCase {
+class ManagedPlayer14Tests: XCTestCase {
     func testLoadingView() throws {
         let viewModel = ManagedPlayerViewModel(manager: NeverLoad(), onComplete: {_ in })
         let player = ManagedPlayer(plugins: [], context: .init(), viewModel: viewModel, fallback: { _ in Text("Error")}, loading: { Text("Loading")})
@@ -177,5 +179,18 @@ class AlwaysLoaded: FlowManager {
     init() {}
     func next(_ result: CompletedState?) async throws -> NextState {
         return .flow(FlowData.COUNTER)
+    }
+}
+
+extension XCTestCase {
+    @discardableResult
+    func waitOnChange<T>(_ publisher: AnyPublisher<T, Never>, timeout: Double = 5, condition: @escaping (T) -> Bool) -> Cancellable {
+        let expectation = XCTestExpectation(description: "Waiting for publisher to emit value")
+        let cancel = publisher.sink { (value) in
+            guard condition(value) else { return }
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: timeout)
+        return cancel
     }
 }

@@ -1,6 +1,6 @@
 load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
 
-load("@build_bazel_rules_ios//rules:test.bzl", "ios_unit_test")
+load("@build_bazel_rules_ios//rules:test.bzl", "ios_unit_test", "ios_ui_test")
 
 
 swift_library(
@@ -19,4 +19,18 @@ ios_unit_test(
     minimum_os_version = "14.0",
     deps = [":PlayerUISwiftUI", "//ios/core:PlayerUI", "//ios/internal-test-utils:PlayerUIInternalTestUtilities"],
     visibility = ["//visibility:public"]
+)
+
+ios_ui_test(
+    name = "PlayerUISwiftUIViewInspectorTests",
+    srcs = glob(["ViewInspector/**/*.swift"]),
+    minimum_os_version = "14.0",
+    deps = [
+        "@swiftpkg_viewinspector//:Sources_ViewInspector",
+        ":PlayerUISwiftUI", 
+        "//ios/core:PlayerUI", 
+        "//ios/internal-test-utils:PlayerUIInternalTestUtilities"
+    ],
+    visibility = ["//visibility:public"],
+    test_host = "//ios/demo:PlayerUIDemo"
 )
