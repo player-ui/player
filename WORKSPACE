@@ -11,17 +11,9 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 http_archive(
     name = "rules_player",
-    sha256 = "a21d0fc7428e124bdc5a068ae68e0625a13f8238e685965268b5ed46f4de23fe",
-    strip_prefix = "rules_player-0.10.3",
-    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.10.3.tar.gz"],
-)
-
-load("@rules_player//kotlin:workspace.bzl", kotlin_rules = "kotlin")
-
-kotlin_rules(
-    baseUrl = "https://github.com/bazelbuild/rules_kotlin/releases/download",
-    sha256 = "fd92a98bd8a8f0e1cdcb490b93f5acef1f1727ed992571232d33de42395ca9b3",
-    tag = "v1.7.1",
+    sha256 = "c015a09ce2a5f999a89473cb9f71346c6831e27830a228ebe8f1ba25e83b77b2",
+    strip_prefix = "rules_player-0.10.4",
+    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.10.4.tar.gz"],
 )
 
 load("@rules_player//:workspace.bzl", "deps")
@@ -74,8 +66,6 @@ kotlin()
 
 load("@io_bazel_rules_kotlin//kotlin:core.bzl", "kt_register_toolchains")
 
-#kt_register_toolchains()
-
 register_toolchains("//jvm:kotlin_toolchain")
 
 load("@rules_player//junit5:conf.bzl", "junit5")
@@ -95,6 +85,7 @@ git_repository(
     name = "grab_bazel_common",
     commit = grab_commit,
     remote = grab_remote,
+    shallow_since = "1700536974 -0500",
 )
 
 load("@grab_bazel_common//android:repositories.bzl", "bazel_common_dependencies")
@@ -118,15 +109,15 @@ load("@robolectric//bazel:robolectric.bzl", "robolectric_repositories")
 
 robolectric_repositories()
 
-ANDROIDX_TEST_VERSION = "1.4.2"
-
 http_file(
     name = "android_test_orchestrator_apk",
+    sha256 = "b7a2e7d0184b03e12c7357f3914d539da40b52a11e90815edff1022c655f459b",
     url = "https://dl.google.com/android/maven2/androidx/test/orchestrator/1.4.2/orchestrator-1.4.2.apk",
 )
 
 http_file(
     name = "android_test_services_apk",
+    sha256 = "c6bc74268b29bdabad8da962e00e2f6fd613c24b42c69e81b258397b4819f156",
     url = "https://dl.google.com/android/maven2/androidx/test/services/test-services/1.4.2/test-services-1.4.2.apk",
 )
 
