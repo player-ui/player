@@ -14,7 +14,7 @@ import kotlinx.serialization.Serializable
  * However, with the immutable principles implemented by the core player runtime, this means that any mutated value
  * is meant to be a completely new object. Persisting an early value would result in an object that is potentially
  * _not_ the final accumulated value, meaning it might not even be relevant anymore. In some circumstances, this
- * value might be garbage collected and result in a [PlayerRuntimeException][com.intuit.player.jvm.core.bridge.PlayerRuntimeException]
+ * value might be garbage collected and result in a [PlayerRuntimeException][com.intuit.playerui.core.bridge.PlayerRuntimeException]
  * representing that the underlying JS instance has been released. If there is a use case to persist this value
  * outside of the tapped function, this can be done by reading the information and storing it in a non-Node backed
  * object from within the tapped function.

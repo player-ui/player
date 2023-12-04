@@ -32,7 +32,7 @@ public class NodeSerializer : KSerializer<Node> {
 public open class NodeWrapperSerializer<T : NodeWrapper>(
     private val factory: (Node) -> T,
     // TODO: Can we pull this from the @SerialName annotation?
-    private val serialName: String = "com.intuit.player.jvm.core.bridge.NodeWrapper",
+    private val serialName: String = "com.intuit.playerui.core.bridge.NodeWrapper",
 ) : KSerializer<T> {
     final override val descriptor: SerialDescriptor = buildClassSerialDescriptor(serialName)
 

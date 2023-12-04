@@ -35,7 +35,7 @@ public data class AssetContext(
         factory: (AssetContext) -> RenderableAsset,
     ) : this(context, asset, player, factory, asset.id)
 
-    @Deprecated("Replacing with `with`-style builder calls", ReplaceWith("withTag(tag)", "com.intuit.player.android.AssetContext.withTag"))
+    @Deprecated("Replacing with `with`-style builder calls", ReplaceWith("withTag(tag)", "com.intuit.playerui.android.AssetContext.withTag"))
     public fun postFixId(tag: String): AssetContext = withTag(tag)
 
     val type: String by lazy {

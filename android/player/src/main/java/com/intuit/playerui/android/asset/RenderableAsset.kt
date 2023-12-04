@@ -275,7 +275,7 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
 
     public class Serializer(private val player: AndroidPlayer) : KSerializer<RenderableAsset?> {
 
-        override val descriptor: SerialDescriptor = buildClassSerialDescriptor("com.intuit.player.android.asset.RenderableAsset")
+        override val descriptor: SerialDescriptor = buildClassSerialDescriptor("com.intuit.playerui.android.asset.RenderableAsset")
 
         /** Deserialize using the expansion process */
         override fun deserialize(decoder: Decoder): RenderableAsset? = decoder.requireNodeDecoder()

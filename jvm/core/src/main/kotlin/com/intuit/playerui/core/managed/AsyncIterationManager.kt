@@ -41,7 +41,7 @@ public class AsyncIterationManager<Item : Any, Result : Any>(public val iterator
 }
 
 /**
- * An [AsyncIterationManager] specifically for a [Player][com.intuit.player.jvm.core.player.Player]
+ * An [AsyncIterationManager] specifically for a [Player][com.intuit.playerui.core.player.Player]
  * that consumes [String] flows and a results in a [CompletedState].
  */
 public typealias FlowManager = AsyncIterationManager<String, CompletedState>

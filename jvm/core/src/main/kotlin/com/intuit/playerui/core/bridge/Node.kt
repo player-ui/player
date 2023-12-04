@@ -58,7 +58,7 @@ public interface Node : Map<String, Any?> {
     @Deprecated(
         "Replaced with getInvokable, which requires a deserializer for the return type. Either provide a deserializer explicitly, " +
             "or use the extension to automatically determine the correct serializer.",
-        ReplaceWith("getInvokable<R>(key)", "com.intuit.player.jvm.core.bridge.getInvokable"),
+        ReplaceWith("getInvokable<R>(key)", "com.intuit.playerui.core.bridge.getInvokable"),
         DeprecationLevel.WARNING,
     )
     public fun <R> getFunction(key: String): Invokable<R>? = get(key).safeCast()

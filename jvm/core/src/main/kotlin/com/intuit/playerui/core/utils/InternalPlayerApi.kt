@@ -2,7 +2,7 @@ package com.intuit.playerui.core.utils
 
 /**
  * Public API marked with this annotation is effectively **internal**, which means
- * it should not be used outside of `player.jvm`.
+ * it should not be used outside of `playerui.core`.
  * Signature, semantics, source and binary compatibilities are not guaranteed for this API
  * and will be changed without any warnings or migration aids.
  */

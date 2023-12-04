@@ -75,7 +75,7 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
 
     /**
      * [ViewModel][androidx.lifecycle.ViewModel] responsible for managing an [AndroidPlayer]
-     * with respect to a specific [FlowManager][com.intuit.player.jvm.core.managed.FlowManager].
+     * with respect to a specific [FlowManager][com.intuit.playerui.core.managed.FlowManager].
      */
     public abstract val playerViewModel: PlayerViewModel
 
