@@ -17,7 +17,11 @@ swift_library(
     srcs = glob(["Sources/**/*.swift"]),
     # tags = ["manual"],
     visibility = ["//visibility:public"],
-    deps = ["//ios/core:PlayerUI", "//ios/swiftui:PlayerUISwiftUI"],
+    deps = [
+        "//ios/core:PlayerUI",
+         "//ios/swiftui:PlayerUISwiftUI", 
+         "//plugins/pending-transaction/ios:PlayerUISwiftUIPendingTransactionPlugin"
+    ],
     data = [":PlayerUIReferenceAssetsResourceBundle"],
     defines = ["BAZEL_TARGET"]
 )

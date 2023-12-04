@@ -4,6 +4,7 @@ import Combine
 #if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUISwiftUI
+import PlayerUISwiftUIPendingTransactionPlugin
 #endif
 
 /**
@@ -84,7 +85,7 @@ struct InputAssetView: View {
     /// The viewModel with decoded data, supplied by `InputAsset`
     @ObservedObject var model: InputAssetViewModel
 
-    // @Environment(\.transactionContext) private var transactionContext
+    @Environment(\.transactionContext) private var transactionContext
 
     /// The color to use for the stroke around the field
     var strokeColor: Color {
@@ -103,14 +104,14 @@ struct InputAssetView: View {
                 text: $model.text,
                 onEditingChanged: { editing in
                     guard !editing else {
-                        // transactionContext.register(.input) {
-                        //     self.model.set()
-                        // }
+                        transactionContext.register(.input) {
+                            self.model.set()
+                        }
                         return
                     }
                     self.model.set()
                     // remove the transaction once editing ends
-                    // transactionContext.clear(.input)
+                    transactionContext.clear(.input)
                 }
             )
             .padding(4)
@@ -134,6 +135,6 @@ struct InputAssetView: View {
 /**
  Extensions for PendingTransactionPhases of TransactionContext to create a new Phase for Input callbacks
  */
-// extension PendingTransactionPhases {
-//     public static let input = PendingTransactionPhases(rawValue: "input")
-// }
+extension PendingTransactionPhases {
+    public static let input = PendingTransactionPhases(rawValue: "input")
+}

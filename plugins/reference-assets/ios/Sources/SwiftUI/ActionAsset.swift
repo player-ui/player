@@ -4,6 +4,7 @@ import Combine
 #if SWIFT_PACKAGE
 import PlayerUI
 import PlayerUISwiftUI
+import PlayerUISwiftUIPendingTransactionPlugin
 #endif
 
 /**
@@ -42,7 +43,7 @@ public struct ActionAssetView: View {
     // @Environment(\.beaconContext) var beaconContext
 
     /// The `TransactionContext` if the `SwiftUIPendingTransactionPlugin` is used in this player instance
-    // @Environment(\.transactionContext) private var transactionContext
+    @Environment(\.transactionContext) private var transactionContext
 
     // For Testing Purposes
     internal var didAppear: ((Self) -> Void)?
@@ -54,7 +55,7 @@ public struct ActionAssetView: View {
                 // beaconContext?.beacon(action: "clicked", element: "button", id: model.data.id, metaData: model.data.metaData)
 
                 // commit the pendingTransactionContext input callbacks before running the wrapped function
-                model.data.run?()
+                model.data.run?.commitCallbacksThenCall()
             },
             label: {
                 if let label = model.data.label?.asset {
@@ -75,14 +76,14 @@ public struct ActionAssetView: View {
     }
 }
 
-// extension WrappedFunction {
-//     ///  commits the pendingTransactionContext callbacks before running the wrapped function
-//     public func commitCallbacksThenCall(_ args: Any...) {
-//         let pendingTransactions = userInfo?[.pendingTransactionContext] as? TransactionContext<PendingTransactionPhases>
-//         pendingTransactions?.commit(.input)
+extension WrappedFunction {
+    ///  commits the pendingTransactionContext callbacks before running the wrapped function
+    public func commitCallbacksThenCall(_ args: Any...) {
+        let pendingTransactions = userInfo?[.pendingTransactionContext] as? TransactionContext<PendingTransactionPhases>
+        pendingTransactions?.commit(.input)
 
-//         guard let jsValue = rawValue else { return }
-//         jsValue.call(withArguments: args)
-//     }
-// }
+        guard let jsValue = rawValue else { return }
+        jsValue.call(withArguments: args)
+    }
+}
 

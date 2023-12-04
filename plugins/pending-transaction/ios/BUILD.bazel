@@ -1,0 +1,27 @@
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+
+load("@build_bazel_rules_ios//rules:test.bzl", "ios_unit_test", "ios_ui_test")
+
+
+swift_library(
+    name = "PlayerUISwiftUIPendingTransactionPlugin",
+    module_name = "PlayerUISwiftUIPendingTransactionPlugin",
+    srcs = glob(["Sources/**/*.swift"]),
+    # tags = ["manual"],
+    visibility = ["//visibility:public"],
+    deps = ["//ios/core:PlayerUI", "//ios/swiftui:PlayerUISwiftUI"],
+    defines = ["BAZEL_TARGET"]
+)
+
+ios_ui_test(
+    name = "PlayerUISwiftUIPendingTransactionPluginViewInspectorTests",
+    srcs = glob(["ViewInspector/**/*.swift"]),
+    minimum_os_version = "14.0",
+    deps = [
+        "@swiftpkg_viewinspector//:Sources_ViewInspector",
+        ":PlayerUISwiftUIPendingTransactionPlugin", 
+        "//ios/core:PlayerUI"
+    ],
+    visibility = ["//visibility:public"],
+    test_host = "//ios/demo:PlayerUIDemo"
+)
