@@ -105,7 +105,7 @@ extension Foundation.Bundle {
     #if BAZEL_TARGET
     /// Returns the resource bundle associated with the current Swift module.
     static let module: Bundle = {
-        let bundleName = "PlayerUIResourceBundle"
+        let bundleName = "PlayerUI"
 
         let candidates: [URL?] = [
             // Bundle should be present here when the package is linked into an App.

@@ -32,6 +32,7 @@ ios_framework(
 
 apple_resource_bundle(
     name = "PlayerUIResourceBundle",
+    bundle_name = "PlayerUI",
     bundle_id = "com.intuit.ios.player.resources.core",
     resources = [
         "//newios/Sources/core/Resources:PlayerUICoreResources"
