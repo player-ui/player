@@ -29,7 +29,8 @@ ios_ui_test(
         "@swiftpkg_viewinspector//:Sources_ViewInspector",
         ":PlayerUISwiftUI", 
         "//ios/core:PlayerUI", 
-        "//ios/internal-test-utils:PlayerUIInternalTestUtilities"
+        "//ios/internal-test-utils:PlayerUIInternalTestUtilities",
+        "//plugins/reference-assets/ios:PlayerUIReferenceAssets"
     ],
     visibility = ["//visibility:public"],
     test_host = "//ios/demo:PlayerUIDemo"

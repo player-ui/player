@@ -6,7 +6,9 @@ swift_library(
     srcs = glob(["Sources/**/*.swift"]),
     deps = [
         "//ios/core:PlayerUI",
-        "//ios/logger:PlayerUILogger"
+        "//ios/logger:PlayerUILogger",
+        "//ios/swiftui:PlayerUISwiftUI",
+        "//plugins/reference-assets/ios:PlayerUIReferenceAssets"
     ]
 )
 
@@ -17,8 +19,14 @@ ios_application(
         "iphone",
         "ipad",
     ],
-    infoplists = ["Resources/Info.plist"],
+    infoplists = [":InfoPlist"],
     minimum_os_version = "14.0",
     visibility = ["//visibility:public"],
     deps = [":PlayerUIDemoSources"],
+)
+
+filegroup(
+    name = "InfoPlist",
+    srcs = ["Resources/Info.plist"],
+    visibility = ["//visibility:public"],
 )

@@ -16,6 +16,7 @@ import JavaScriptCore
 @testable import PlayerUI
 @testable import PlayerUISwiftUI
 @testable import PlayerUIInternalTestUtilities
+@testable import PlayerUIReferenceAssets
 
 extension SwiftUIPlayer: Inspectable {}
 

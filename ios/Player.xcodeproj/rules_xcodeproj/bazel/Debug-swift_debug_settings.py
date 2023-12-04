@@ -18,11 +18,13 @@ _TRIPLE_MATCH = re.compile(r"([^-]+-[^-]+)(-\D+)[^-]*(-.*)?")
 
 _SETTINGS = {
 	"arm64-apple-ios-simulator PlayerUIDemo.app/PlayerUIDemo": {
-		"c": "-iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -DBAZEL_TARGET -DSWIFT_PACKAGE -O0 -DDEBUG=1 -fstack-protector -fstack-protector-all -iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -O0 -fstack-protector -fstack-protector-all -iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -O0 -fstack-protector -fstack-protector-all -iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -O0 -fstack-protector -fstack-protector-all",
+		"c": "-iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -DBAZEL_TARGET -DSWIFT_PACKAGE -O0 -DDEBUG=1 -fstack-protector -fstack-protector-all -iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -O0 -fstack-protector -fstack-protector-all -iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -O0 -fstack-protector -fstack-protector-all -iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -O0 -fstack-protector -fstack-protector-all -iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -O0 -fstack-protector -fstack-protector-all -iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -O0 -fstack-protector -fstack-protector-all",
 		"s": [
 			"$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/external/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks",
 			"$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/logger",
-			"$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/core"
+			"$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/core",
+			"$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/swiftui",
+			"$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/plugins/reference-assets/ios"
 		]
 	},
 	"arm64-apple-ios-simulator PlayerUILoggerTests.xctest/PlayerUILoggerTests": {
@@ -35,6 +37,38 @@ _SETTINGS = {
 			"$(DEVELOPER_DIR)/Platforms/iPhoneSimulator.platform/Developer/usr/lib",
 			"$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/external/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks",
 			"$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/logger"
+		]
+	},
+	"arm64-apple-ios-simulator PlayerUISwiftUITests.xctest/PlayerUISwiftUITests": {
+		"c": "-iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -DBAZEL_TARGET -DSWIFT_PACKAGE -D__SWIFTC__ -I$(PROJECT_DIR) -O0 -DDEBUG=1 -fstack-protector -fstack-protector-all -iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -O0 -fstack-protector -fstack-protector-all -iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -O0 -fstack-protector -fstack-protector-all -iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -O0 -fstack-protector -fstack-protector-all -iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -O0 -fstack-protector -fstack-protector-all -iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -O0 -fstack-protector -fstack-protector-all",
+		"f": [
+			"$(DEVELOPER_DIR)/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks",
+			"$(SDKROOT)/Developer/Library/Frameworks"
+		],
+		"s": [
+			"$(DEVELOPER_DIR)/Platforms/iPhoneSimulator.platform/Developer/usr/lib",
+			"$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/external/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks",
+			"$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/logger",
+			"$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/core",
+			"$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/swiftui",
+			"$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/internal-test-utils"
+		]
+	},
+	"arm64-apple-ios-simulator PlayerUISwiftUIViewInspectorTests.xctest/PlayerUISwiftUIViewInspectorTests": {
+		"c": "-iquote$(PROJECT_DIR)/external/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_viewinspector -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/external/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_viewinspector -iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -DSWIFT_PACKAGE -DBAZEL_TARGET -fmodule-map-file=$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/external/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_viewinspector/Sources_ViewInspector.swift.modulemap -D__SWIFTC__ -I$(PROJECT_DIR) -O0 -DDEBUG=1 -fstack-protector -fstack-protector-all -iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -O0 -fstack-protector -fstack-protector-all -iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -O0 -fstack-protector -fstack-protector-all -iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -O0 -fstack-protector -fstack-protector-all -iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -O0 -fstack-protector -fstack-protector-all -iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -O0 -fstack-protector -fstack-protector-all -iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -O0 -fstack-protector -fstack-protector-all -iquote$(PROJECT_DIR) -iquote$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -O0 -fstack-protector -fstack-protector-all",
+		"f": [
+			"$(DEVELOPER_DIR)/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks",
+			"$(SDKROOT)/Developer/Library/Frameworks"
+		],
+		"s": [
+			"$(DEVELOPER_DIR)/Platforms/iPhoneSimulator.platform/Developer/usr/lib",
+			"$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/external/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_viewinspector",
+			"$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/external/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks",
+			"$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/logger",
+			"$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/core",
+			"$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/swiftui",
+			"$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/ios/internal-test-utils",
+			"$(PROJECT_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/plugins/reference-assets/ios"
 		]
 	},
 	"arm64-apple-ios-simulator PlayerUITests.xctest/PlayerUITests": {

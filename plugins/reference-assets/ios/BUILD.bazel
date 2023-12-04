@@ -1,0 +1,31 @@
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+load("@build_bazel_rules_apple//apple:resources.bzl", "apple_resource_bundle")
+
+load("@build_bazel_rules_ios//rules:test.bzl", "ios_unit_test")
+load("@build_bazel_rules_apple//apple:ios.bzl", "ios_framework", "ios_build_test")
+
+apple_resource_bundle(
+    name = "PlayerUIReferenceAssetsResourceBundle",
+    bundle_name = "ReferenceAssets",
+    bundle_id = "com.intuit.ios.player.resources.core",
+    resources = glob(["Resources/**/*"])
+)
+
+swift_library(
+    name = "PlayerUIReferenceAssets",
+    module_name = "PlayerUIReferenceAssets",
+    srcs = glob(["Sources/**/*.swift"]),
+    # tags = ["manual"],
+    visibility = ["//visibility:public"],
+    deps = ["//ios/core:PlayerUI", "//ios/swiftui:PlayerUISwiftUI"],
+    data = [":PlayerUIReferenceAssetsResourceBundle"],
+    defines = ["BAZEL_TARGET"]
+)
+
+ios_build_test(
+    name = "PlayerUIReferenceAssetsBuild",
+    minimum_os_version = "14.0",
+    targets = [
+        ":PlayerUIReferenceAssets",
+    ],
+)

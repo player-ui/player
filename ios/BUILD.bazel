@@ -11,6 +11,8 @@ xcodeproj(
     top_level_targets = [
         top_level_target("//ios/demo:PlayerUIDemo", target_environments = ["simulator"]),
         "//ios/core:PlayerUITests",
-        "//ios/logger:PlayerUILoggerTests"
+        "//ios/logger:PlayerUILoggerTests",
+        "//ios/swiftui:PlayerUISwiftUITests",
+        "//ios/swiftui:PlayerUISwiftUIViewInspectorTests"
     ],
 )
