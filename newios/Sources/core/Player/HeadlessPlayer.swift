@@ -303,7 +303,7 @@ internal class ResourceBundleShim {}
 internal extension JSContext {
     var coreBundle: URL? {
         #if SWIFT_PACKAGE
-        return ResourceUtilities.urlForFile(name: "player.prod", ext: "js", bundle: Bundle(for: ResourceBundleShim.self))
+        return ResourceUtilities.urlForFile(name: "player.prod", ext: "js", bundle: Bundle.module)
         #else
         return ResourceUtilities.urlForFile(name: "player.prod", ext: "js", bundle: Bundle(for: ResourceBundleShim.self), pathComponent: "PlayerUI.bundle")
         #endif

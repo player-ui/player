@@ -64,9 +64,6 @@ open class JSBasePlugin {
      - returns: A URL to the file in the bundle if found
      */
     open func getUrlForFile(fileName: String) -> URL? {
-        #if BAZEL_TARGET
-        print((Bundle.module.resourceURL?.absoluteString ?? "fail") + " > \(fileName)")
-        #endif
         #if SWIFT_PACKAGE
         return ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
         #else

@@ -70,11 +70,10 @@ ios_unit_test(
 ios_unit_test(
     name = "PlayerUITests",
     # srcs = glob(["Tests/core/**/*.swift"]),
-    srcs = glob(["Tests/core/CorePlugins/*.swift"]),
+    srcs = glob(["Tests/core/**/*.swift"]),
     minimum_os_version = "14.0",
     deps = [":PlayerUI", ":PlayerUIInternalTestUtilities"],
-    visibility = ["//visibility:public"],
-    test_host = ":PlayerUIDemo"
+    visibility = ["//visibility:public"]
 )
 
 swift_library(
