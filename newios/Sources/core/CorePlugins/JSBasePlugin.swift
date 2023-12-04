@@ -64,10 +64,13 @@ open class JSBasePlugin {
      - returns: A URL to the file in the bundle if found
      */
     open func getUrlForFile(fileName: String) -> URL? {
+        #if BAZEL_TARGET
+        print((Bundle.module.resourceURL?.absoluteString ?? "fail") + " > \(fileName)")
+        #endif
         #if SWIFT_PACKAGE
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: JSBasePlugin.self))
+        return ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
         #else
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: JSBasePlugin.self), pathComponent: "PlayerUI.bundle")
+        return ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: JSBasePlugin.self), pathComponent: "PlayerUI.bundle")
         #endif
     }
 
@@ -97,4 +100,35 @@ open class JSBasePlugin {
         }
         context.evaluateScript(jsString)
     }
+}
+
+private class BundleFinder {}
+
+extension Foundation.Bundle {
+    #if BAZEL_TARGET
+    /// Returns the resource bundle associated with the current Swift module.
+    static let module: Bundle = {
+        let bundleName = "PlayerUIResourceBundle"
+
+        let candidates: [URL?] = [
+            // Bundle should be present here when the package is linked into an App.
+            Bundle.main.resourceURL,
+
+            // Bundle should be present here when the package is linked into a framework.
+            Bundle(for: BundleFinder.self).resourceURL,
+
+            // For command-line tools.
+            Bundle.main.bundleURL,
+        ]
+
+        for candidate in candidates {
+            let bundlePath = candidate?.appendingPathComponent(bundleName + ".bundle")
+            if let bundle = bundlePath.flatMap(Bundle.init(url:)) {
+                return bundle
+            }
+        }
+
+        fatalError("unable to find bundle named \(bundleName)")
+    }()
+    #endif
 }

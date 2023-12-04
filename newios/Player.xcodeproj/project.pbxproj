@@ -28,42 +28,33 @@
 		06A7A8910675BDF0AF825AA0 /* AsyncSeriesWaterfallHook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EA132BCC7D3B0D46E5EB367 /* AsyncSeriesWaterfallHook.swift */; };
 		0ADB96944C6A3C214C49CBB5 /* NativePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72210BFB02638542D61B1D13 /* NativePlugin.swift */; };
 		136F0B0BF2886624D452160B /* SyncBailHook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49B0F0BB40F5199DB6FAE3DA /* SyncBailHook.swift */; };
-		1409E60FE9E1A7B44BB1C6DC /* JSLoggerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51CF3E7C015811C364302E3 /* JSLoggerTests.swift */; };
 		1B895089412C340F1146113E /* BaseAssetRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD65E695444C4A7385436CA4 /* BaseAssetRegistry.swift */; };
 		1C215EC42DA1ED12A619351E /* AsyncParallelHook.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF8662BE0EBB7218DB0B40A1 /* AsyncParallelHook.swift */; };
 		25B288F9BC7FDF613464AC12 /* ViewHooks.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A8467F5836783825EF3D3F /* ViewHooks.swift */; };
-		25E1F804783D6F4FD211E27A /* ErrorUtilitiesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4688DD6F8C46978A36CB8A1A /* ErrorUtilitiesTests.swift */; };
 		35A669BC3C0EF6A4991C25F0 /* JSLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F5D63D8FDC4918D1894C361 /* JSLogger.swift */; };
 		3851AE5136B37145305C27F4 /* JSUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0F3EC819CD2BBB24E74C140 /* JSUtilities.swift */; };
 		3BC3B59C25A792E118960D5C /* AnyType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D98605A0018325BCBA5BFF6 /* AnyType.swift */; };
 		40179632EEFCDBF88FA3E932 /* Beacon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C637351EF0AEBFE58B8167C /* Beacon.swift */; };
 		480E6F51F1092BF0D6537FA5 /* Modifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C37FE24082DFDA25E31B2B9 /* Modifiers.swift */; };
 		4A3DAFB677840C989EEC15D0 /* _CompileStub_.m in Sources */ = {isa = PBXBuildFile; fileRef = 952A2FB09B66D9141E86BEB8 /* _CompileStub_.m */; };
-		4AE1A24C40432001961930AD /* BindingParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FB96CBC08885836E6B397C1 /* BindingParserTests.swift */; };
 		4B141B39A39CE8CD1975BB2B /* TapableLoggerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AC1998418ABD678EB190015 /* TapableLoggerTests.swift */; };
-		4C8AEA7AEE4DF0CFFCC1BE73 /* FlowStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EA46A99828F058C80F882EF /* FlowStateTests.swift */; };
 		4CCE6F92FAA30B5D0C712E2B /* SyncLoopHook.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16B2E58B2F7A7244F8B870B /* SyncLoopHook.swift */; };
 		4E22985663EE7CB038DB7A8E /* FlowData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A39EBDEA38C141D07FC4F6 /* FlowData.swift */; };
 		5120E0E4C1A9D282478A2C10 /* AsyncSeriesHook.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E14AD19D25BB4C0A9A86FC /* AsyncSeriesHook.swift */; };
 		53395B23F5948404F3DC92D2 /* ErrorUtilites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476DCCA08CCC8479D4D5A9DE /* ErrorUtilites.swift */; };
-		53B86A62454C9D401E2F8088 /* ExpressionEvaluatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85389D8A1127DC4C0D6FF7B /* ExpressionEvaluatorTests.swift */; };
-		559C96A582E0555568469B99 /* HeadlessPlayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BDEC652DC98870853563BBA /* HeadlessPlayerTests.swift */; };
 		55F66BD66659760723489DDF /* PartialMatchFingerprintPluginTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56F9F819868676EFC1750F4D /* PartialMatchFingerprintPluginTests.swift */; };
 		56D6576D2B3F7C4FB85EC304 /* BindingParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E311437A3B484E3F1F53CD57 /* BindingParser.swift */; };
 		56FE6ADDBA51D53361120637 /* Hook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606068978F6662BA644AD5DF /* Hook.swift */; };
+		57DA10ADB516453F8C6FFAB8 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39175D570A16FC49D5C85CDF /* App.swift */; };
 		5F609D5228444F6F018F128C /* SyncWaterfallHook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DFD3FFCB04736BA429EF1F4 /* SyncWaterfallHook.swift */; };
 		62DB07B20C0F408E6EE7E6D0 /* AsyncParallelBailHook.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD524C9E2D5EF91032B7153 /* AsyncParallelBailHook.swift */; };
 		630D3E55E9B2BB607DD2772E /* HeadlessPlayerImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = A96329144FDC56F0EF08C401 /* HeadlessPlayerImpl.swift */; };
 		658214F59FCB254384766FA8 /* DebugValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C182934EC4072C9684AF645 /* DebugValue.swift */; };
 		65AF986856172D0737FFD9A0 /* TestDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DF33E828C279006FC62E7A4 /* TestDecoder.swift */; };
 		6B82A1057BF77E7396676A53 /* NavigationStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5335D87BAA0F465A73DC291 /* NavigationStates.swift */; };
-		700842667C565DBAFE965990 /* DebugValueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE66B446DC4EB15042F98EC /* DebugValueTests.swift */; };
 		71D5F35700056FD175E58EF4 /* Wrappers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0C7F7FC3CD130CEDE726BE /* Wrappers.swift */; };
 		7495CDBBA4D4055EC2F4C5A7 /* LogLevelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A84ADEF76C188B529F81873 /* LogLevelTests.swift */; };
 		75727EBBD58728F13ADC86F7 /* ViewControllerHooks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93FB0765E12F0AB903B055A9 /* ViewControllerHooks.swift */; };
-		7D04B20FB47B37A1DAE96BE5 /* JSUtilitiesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F1294B204B0F1A913C8E50 /* JSUtilitiesTests.swift */; };
-		80359D9185E01E7FD7B53A11 /* ModifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FDC68C8B70AD3E262811111 /* ModifierTests.swift */; };
-		8149BBD30AC21D09E356A4C9 /* AnyTypeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39F3891A3F9B8340D4B6862F /* AnyTypeTests.swift */; };
 		8D256008C8121897BFD77E1E /* AsyncSeriesLoopHook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E2B06E6E36677295858872 /* AsyncSeriesLoopHook.swift */; };
 		948226D890FC6682979F6752 /* CompletedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC98E3C8F7CA5751601528A5 /* CompletedState.swift */; };
 		99A9C8CE1DA45B84D7CE1F5F /* AsyncSeriesBailHook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB87B90488DD9FF63AF9702 /* AsyncSeriesBailHook.swift */; };
@@ -78,7 +69,6 @@
 		E2778B7572900AB13E238C15 /* ExpressionEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FEDDE1E1016D1D3FA164B38 /* ExpressionEvaluator.swift */; };
 		E6A9ADE6140C8B8D73666223 /* ResourceUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF25ADED04B3638C37C4C4A3 /* ResourceUtilities.swift */; };
 		EB28F6A57AD3F8800FD2A4D0 /* SyncHook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C6F90DCABD695D76956779B /* SyncHook.swift */; };
-		EDE5B9E8BC6703BE9640A07F /* StateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75306FC0CCD73D752A2CE671 /* StateTests.swift */; };
 		F90351535BBFF9E7A96144AF /* Flow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D3881C236E7CB886F89F60 /* Flow.swift */; };
 		FA775F87FC1A6165017592D2 /* PartialMatchFingerprintPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30E5ADE036B646DCDA9A41B /* PartialMatchFingerprintPlugin.swift */; };
 		FEB0571B68A238EBB95A2969 /* TapableLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ABCDB9AA104C453CDFE4369 /* TapableLogger.swift */; };
@@ -86,6 +76,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		0C34E26AF0FABB7B06E7D3AD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F45B4C872F70AD371A0CAA31 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 83CCF1C056B66ADE44C2B385;
+			remoteInfo = BazelDependencies;
+		};
 		1A61959AF89005A9B3E8BD55 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F45B4C872F70AD371A0CAA31 /* Project object */;
@@ -113,6 +110,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 83CCF1C056B66ADE44C2B385;
 			remoteInfo = BazelDependencies;
+		};
+		4E0D0D93EC30F10BB331D280 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F45B4C872F70AD371A0CAA31 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 18C56DE95BA1FC3F2EBEBCE2;
+			remoteInfo = PlayerUIDemo;
 		};
 		50FDD398650ADCA8165478E3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -147,19 +151,19 @@
 /* Begin PBXFileReference section */
 		07D4E5740E2CBA6A5DC4E784 /* GenericInterfaces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericInterfaces.swift; sourceTree = "<group>"; };
 		0AC1998418ABD678EB190015 /* TapableLoggerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapableLoggerTests.swift; sourceTree = "<group>"; };
+		0B27B908CD0E9EA872D108DB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		0FEDDE1E1016D1D3FA164B38 /* ExpressionEvaluator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpressionEvaluator.swift; sourceTree = "<group>"; };
-		11F1294B204B0F1A913C8E50 /* JSUtilitiesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSUtilitiesTests.swift; sourceTree = "<group>"; };
 		173A9BE78D77E1EEC71D49C1 /* libPlayerUILogger.a */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; name = libPlayerUILogger.a; path = "bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/newios/libPlayerUILogger.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		175ED9E3AAEB9E2443EF3A2C /* BUILD.bazel */ = {isa = PBXFileReference; explicitFileType = text.script.python; path = BUILD.bazel; sourceTree = "<group>"; };
 		1C032F07FF8A463B6E1ADB8F /* JSBasePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSBasePlugin.swift; sourceTree = "<group>"; };
+		1CE8D4E26BAD9973A66B98D2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		1CF27C103FD20F79BF46F985 /* PlayerUILoggerTests.5.link.params */ = {isa = PBXFileReference; lastKnownFileType = file; path = PlayerUILoggerTests.5.link.params; sourceTree = "<group>"; };
 		1D0C7F7FC3CD130CEDE726BE /* Wrappers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wrappers.swift; sourceTree = "<group>"; };
 		1F5D63D8FDC4918D1894C361 /* JSLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSLogger.swift; sourceTree = "<group>"; };
 		2ABCDB9AA104C453CDFE4369 /* TapableLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapableLogger.swift; sourceTree = "<group>"; };
-		2EA46A99828F058C80F882EF /* FlowStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowStateTests.swift; sourceTree = "<group>"; };
 		36715771CCB7A29FFE2914FC /* libPlayerUITests_swift.a */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; name = libPlayerUITests_swift.a; path = "bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/newios/libPlayerUITests_swift.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		39F3891A3F9B8340D4B6862F /* AnyTypeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyTypeTests.swift; sourceTree = "<group>"; };
+		39175D570A16FC49D5C85CDF /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		3C6F90DCABD695D76956779B /* SyncHook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncHook.swift; sourceTree = "<group>"; };
-		4688DD6F8C46978A36CB8A1A /* ErrorUtilitiesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorUtilitiesTests.swift; sourceTree = "<group>"; };
 		476DCCA08CCC8479D4D5A9DE /* ErrorUtilites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorUtilites.swift; sourceTree = "<group>"; };
 		49B0F0BB40F5199DB6FAE3DA /* SyncBailHook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncBailHook.swift; sourceTree = "<group>"; };
 		4C637351EF0AEBFE58B8167C /* Beacon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Beacon.swift; sourceTree = "<group>"; };
@@ -172,6 +176,8 @@
 		5DF33E828C279006FC62E7A4 /* TestDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestDecoder.swift; sourceTree = "<group>"; };
 		606068978F6662BA644AD5DF /* Hook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hook.swift; sourceTree = "<group>"; };
 		613EE8CF9575AF5F660F02F3 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
+		62A5CAFD267F860ED131F36C /* PlayerUIDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlayerUIDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		63519A12C4797C56BC8F4C32 /* PlayerUIDemo.3.link.params */ = {isa = PBXFileReference; lastKnownFileType = file; path = PlayerUIDemo.3.link.params; sourceTree = "<group>"; };
 		64CBD6BD1A2C8EDDD48C9044 /* partial-match-registry.prod.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "partial-match-registry.prod.js"; sourceTree = "<group>"; };
 		64D3881C236E7CB886F89F60 /* Flow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Flow.swift; sourceTree = "<group>"; };
 		66A39EBDEA38C141D07FC4F6 /* FlowData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowData.swift; sourceTree = "<group>"; };
@@ -179,19 +185,14 @@
 		6A922A10835E6F74011CA0C3 /* FlowControllerHooks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowControllerHooks.swift; sourceTree = "<group>"; };
 		6D98605A0018325BCBA5BFF6 /* AnyType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyType.swift; sourceTree = "<group>"; };
 		72210BFB02638542D61B1D13 /* NativePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativePlugin.swift; sourceTree = "<group>"; };
-		75306FC0CCD73D752A2CE671 /* StateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateTests.swift; sourceTree = "<group>"; };
 		7C37FE24082DFDA25E31B2B9 /* Modifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modifiers.swift; sourceTree = "<group>"; };
 		7DFD3FFCB04736BA429EF1F4 /* SyncWaterfallHook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncWaterfallHook.swift; sourceTree = "<group>"; };
 		7E064A9CA28A580F7141110F /* PlayerUILoggerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PlayerUILoggerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F3D2506FB0D092A435AEFE4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		824848F479B3D0774F6F4BA3 /* PlayerUIInternalTestUtilities.rules_xcodeproj.swift.compile.params */ = {isa = PBXFileReference; lastKnownFileType = file; path = PlayerUIInternalTestUtilities.rules_xcodeproj.swift.compile.params; sourceTree = "<group>"; };
 		86C0AB9F0DA80F2262230E0F /* PlayerUILogger.rules_xcodeproj.swift.compile.params */ = {isa = PBXFileReference; lastKnownFileType = file; path = PlayerUILogger.rules_xcodeproj.swift.compile.params; sourceTree = "<group>"; };
-		8BDEC652DC98870853563BBA /* HeadlessPlayerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlessPlayerTests.swift; sourceTree = "<group>"; };
-		8C899B99062384F719457E3E /* PlayerUILoggerTests.3.link.params */ = {isa = PBXFileReference; lastKnownFileType = file; path = PlayerUILoggerTests.3.link.params; sourceTree = "<group>"; };
 		8CB87B90488DD9FF63AF9702 /* AsyncSeriesBailHook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncSeriesBailHook.swift; sourceTree = "<group>"; };
 		8F29F93816E0A978DDEB15A6 /* partial-match-fingerprint-plugin.prod.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "partial-match-fingerprint-plugin.prod.js"; sourceTree = "<group>"; };
-		8FB96CBC08885836E6B397C1 /* BindingParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BindingParserTests.swift; sourceTree = "<group>"; };
-		8FDC68C8B70AD3E262811111 /* ModifierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModifierTests.swift; sourceTree = "<group>"; };
 		93BECF4A078B92B1465BE190 /* PlayerUILoggerTests_swift.rules_xcodeproj.swift.compile.params */ = {isa = PBXFileReference; lastKnownFileType = file; path = PlayerUILoggerTests_swift.rules_xcodeproj.swift.compile.params; sourceTree = "<group>"; };
 		93FB0765E12F0AB903B055A9 /* ViewControllerHooks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerHooks.swift; sourceTree = "<group>"; };
 		952A2FB09B66D9141E86BEB8 /* _CompileStub_.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = _CompileStub_.m; sourceTree = DERIVED_FILE_DIR; };
@@ -202,26 +203,24 @@
 		A1E14AD19D25BB4C0A9A86FC /* AsyncSeriesHook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncSeriesHook.swift; sourceTree = "<group>"; };
 		A5335D87BAA0F465A73DC291 /* NavigationStates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationStates.swift; sourceTree = "<group>"; };
 		A96329144FDC56F0EF08C401 /* HeadlessPlayerImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlessPlayerImpl.swift; sourceTree = "<group>"; };
-		ADE66B446DC4EB15042F98EC /* DebugValueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugValueTests.swift; sourceTree = "<group>"; };
 		AE698E47CF6A5675F12A27EC /* libPlayerUIInternalTestUtilities.a */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; name = libPlayerUIInternalTestUtilities.a; path = "bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/newios/libPlayerUIInternalTestUtilities.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B20E19C2B3FE255958880375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B3A8467F5836783825EF3D3F /* ViewHooks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewHooks.swift; sourceTree = "<group>"; };
-		B51CF3E7C015811C364302E3 /* JSLoggerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSLoggerTests.swift; sourceTree = "<group>"; };
 		B91AFE051CBB5F5C3BCB0489 /* PlayerUILoggerTests-Swift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PlayerUILoggerTests-Swift.h"; sourceTree = "<group>"; };
 		BA88EC08C1B352AA42EABF02 /* libSources_SwiftHooks.a */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; name = libSources_SwiftHooks.a; path = "bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/external/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks/libSources_SwiftHooks.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BED397DF90D03902DDA0E1BE /* PlayerUITests_swift.rules_xcodeproj.swift.compile.params */ = {isa = PBXFileReference; lastKnownFileType = file; path = PlayerUITests_swift.rules_xcodeproj.swift.compile.params; sourceTree = "<group>"; };
 		CD65E695444C4A7385436CA4 /* BaseAssetRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseAssetRegistry.swift; sourceTree = "<group>"; };
 		CDBBB301AA054ECE2B0C3FAF /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
 		CDD524C9E2D5EF91032B7153 /* AsyncParallelBailHook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncParallelBailHook.swift; sourceTree = "<group>"; };
-		D85389D8A1127DC4C0D6FF7B /* ExpressionEvaluatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpressionEvaluatorTests.swift; sourceTree = "<group>"; };
+		D55C4DF26D4BAAC43BE5C98D /* PlayerUITests.8.link.params */ = {isa = PBXFileReference; lastKnownFileType = file; path = PlayerUITests.8.link.params; sourceTree = "<group>"; };
 		DA36D3FBDA15E7A93E3B7991 /* libPlayerUI.a */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; name = libPlayerUI.a; path = "bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/newios/libPlayerUI.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC05C53AAA8464C5AFEF005A /* player.prod.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = player.prod.js; sourceTree = "<group>"; };
-		DE4FFEEE1E1AC3A5DAF64118 /* PlayerUITests.7.link.params */ = {isa = PBXFileReference; lastKnownFileType = file; path = PlayerUITests.7.link.params; sourceTree = "<group>"; };
 		DF25ADED04B3638C37C4C4A3 /* ResourceUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceUtilities.swift; sourceTree = "<group>"; };
 		E2F8B14629919245C81D74E9 /* LogLevel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogLevel.swift; sourceTree = "<group>"; };
 		E30E5ADE036B646DCDA9A41B /* PartialMatchFingerprintPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartialMatchFingerprintPlugin.swift; sourceTree = "<group>"; };
 		E311437A3B484E3F1F53CD57 /* BindingParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BindingParser.swift; sourceTree = "<group>"; };
 		E321E01D4EBB8F0BB062E2BD /* PlayerUITests-Swift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PlayerUITests-Swift.h"; sourceTree = "<group>"; };
+		E48A1277683F330DD0BCDFD9 /* PlayerUIDemoSources.rules_xcodeproj.swift.compile.params */ = {isa = PBXFileReference; lastKnownFileType = file; path = PlayerUIDemoSources.rules_xcodeproj.swift.compile.params; sourceTree = "<group>"; };
 		E52F649CDCFB08175B60A49B /* FlowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowController.swift; sourceTree = "<group>"; };
 		E76C018CFEF4A9A81179049C /* Interceptors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interceptors.swift; sourceTree = "<group>"; };
 		EAF7289353D4F20EC009A491 /* PlayerUI.rules_xcodeproj.swift.compile.params */ = {isa = PBXFileReference; lastKnownFileType = file; path = PlayerUI.rules_xcodeproj.swift.compile.params; sourceTree = "<group>"; };
@@ -259,6 +258,14 @@
 				2621182261C437A94F900A07 /* bin */,
 			);
 			path = "ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20";
+			sourceTree = "<group>";
+		};
+		14398377854B55A8342652B5 /* demo */ = {
+			isa = PBXGroup;
+			children = (
+				39175D570A16FC49D5C85CDF /* App.swift */,
+			);
+			path = demo;
 			sourceTree = "<group>";
 		};
 		1454EB4C55076C637ACE586F /* logger */ = {
@@ -299,6 +306,7 @@
 		1F61D0FA115C350A14680C68 /* newios */ = {
 			isa = PBXGroup;
 			children = (
+				F6E44440EB21597DF5D16DDC /* Resources */,
 				64205D8744875E8C0702F383 /* Sources */,
 				4474678DCEDD425440B038D1 /* Tests */,
 				175ED9E3AAEB9E2443EF3A2C /* BUILD.bazel */,
@@ -331,15 +339,6 @@
 			path = Sources;
 			sourceTree = "<group>";
 		};
-		287ACB0E5C2685B9310FD174 /* Generic */ = {
-			isa = PBXGroup;
-			children = (
-				39F3891A3F9B8340D4B6862F /* AnyTypeTests.swift */,
-				ADE66B446DC4EB15042F98EC /* DebugValueTests.swift */,
-			);
-			path = Generic;
-			sourceTree = "<group>";
-		};
 		330D9181D2F4ACAB40149373 /* Bazel Generated Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -359,6 +358,7 @@
 				EBDBFD9BF071147A03005762 /* libPlayerUILoggerTests_swift.a */,
 				36715771CCB7A29FFE2914FC /* libPlayerUITests_swift.a */,
 				BA88EC08C1B352AA42EABF02 /* libSources_SwiftHooks.a */,
+				62A5CAFD267F860ED131F36C /* PlayerUIDemo.app */,
 				7E064A9CA28A580F7141110F /* PlayerUILoggerTests.xctest */,
 				F28EE9002D86113B85D75DD5 /* PlayerUITests.xctest */,
 			);
@@ -393,8 +393,9 @@
 		48E356D59CB525D2AEF78996 /* xcodeproj-params */ = {
 			isa = PBXGroup;
 			children = (
-				8C899B99062384F719457E3E /* PlayerUILoggerTests.3.link.params */,
-				DE4FFEEE1E1AC3A5DAF64118 /* PlayerUITests.7.link.params */,
+				63519A12C4797C56BC8F4C32 /* PlayerUIDemo.3.link.params */,
+				1CF27C103FD20F79BF46F985 /* PlayerUILoggerTests.5.link.params */,
+				D55C4DF26D4BAAC43BE5C98D /* PlayerUITests.8.link.params */,
 			);
 			path = "xcodeproj-params";
 			sourceTree = "<group>";
@@ -434,6 +435,7 @@
 			isa = PBXGroup;
 			children = (
 				E77883B144093FFCD55A6AF6 /* core */,
+				14398377854B55A8342652B5 /* demo */,
 				AE3611728766A874A605EAC5 /* internal-test-utils */,
 				FE2E4510C33A1A0D3E20767C /* logger */,
 			);
@@ -451,6 +453,7 @@
 		75B6992A36192F4C6BC1DB59 /* rules_xcodeproj */ = {
 			isa = PBXGroup;
 			children = (
+				FA09DC0FF526F88597BBB13A /* PlayerUIDemo */,
 				1B926AD36425B2591035CB05 /* PlayerUILoggerTests.__internal__.__test_bundle */,
 				7F13739857FD3E17A1DED2B1 /* PlayerUITests.__internal__.__test_bundle */,
 			);
@@ -481,16 +484,6 @@
 				963E30ED0C610DB7FD08441F /* Sources_SwiftHooks.rules_xcodeproj.swift.compile.params */,
 			);
 			path = "rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks";
-			sourceTree = "<group>";
-		};
-		8F7B2ED272EC64B770A08279 /* utilities */ = {
-			isa = PBXGroup;
-			children = (
-				4688DD6F8C46978A36CB8A1A /* ErrorUtilitiesTests.swift */,
-				B51CF3E7C015811C364302E3 /* JSLoggerTests.swift */,
-				11F1294B204B0F1A913C8E50 /* JSUtilitiesTests.swift */,
-			);
-			path = utilities;
 			sourceTree = "<group>";
 		};
 		97FAF3B7250A065238CD421D /* Core */ = {
@@ -543,10 +536,6 @@
 			isa = PBXGroup;
 			children = (
 				6A4E72DA2C7D6DD60EE3C7CE /* CorePlugins */,
-				D203CC6A00CE2C0D7B0A1830 /* Types */,
-				8F7B2ED272EC64B770A08279 /* utilities */,
-				2EA46A99828F058C80F882EF /* FlowStateTests.swift */,
-				8BDEC652DC98870853563BBA /* HeadlessPlayerTests.swift */,
 			);
 			path = core;
 			sourceTree = "<group>";
@@ -582,6 +571,7 @@
 			children = (
 				75B6992A36192F4C6BC1DB59 /* rules_xcodeproj */,
 				EAF7289353D4F20EC009A491 /* PlayerUI.rules_xcodeproj.swift.compile.params */,
+				E48A1277683F330DD0BCDFD9 /* PlayerUIDemoSources.rules_xcodeproj.swift.compile.params */,
 				824848F479B3D0774F6F4BA3 /* PlayerUIInternalTestUtilities.rules_xcodeproj.swift.compile.params */,
 				86C0AB9F0DA80F2262230E0F /* PlayerUILogger.rules_xcodeproj.swift.compile.params */,
 				93BECF4A078B92B1465BE190 /* PlayerUILoggerTests_swift.rules_xcodeproj.swift.compile.params */,
@@ -598,15 +588,6 @@
 				3C1E2175BF0591F4C2317AF8 /* generator */,
 			);
 			path = "rules_xcodeproj~1.13.0~internal~rules_xcodeproj_generated";
-			sourceTree = "<group>";
-		};
-		D203CC6A00CE2C0D7B0A1830 /* Types */ = {
-			isa = PBXGroup;
-			children = (
-				FD12492A4EB951301AB360A3 /* Core */,
-				287ACB0E5C2685B9310FD174 /* Generic */,
-			);
-			path = Types;
 			sourceTree = "<group>";
 		};
 		D87BF09F2A24902586F0AA37 /* rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks */ = {
@@ -710,15 +691,20 @@
 			path = external;
 			sourceTree = "<group>";
 		};
-		FD12492A4EB951301AB360A3 /* Core */ = {
+		F6E44440EB21597DF5D16DDC /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				8FB96CBC08885836E6B397C1 /* BindingParserTests.swift */,
-				D85389D8A1127DC4C0D6FF7B /* ExpressionEvaluatorTests.swift */,
-				8FDC68C8B70AD3E262811111 /* ModifierTests.swift */,
-				75306FC0CCD73D752A2CE671 /* StateTests.swift */,
+				1CE8D4E26BAD9973A66B98D2 /* Info.plist */,
 			);
-			path = Core;
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		FA09DC0FF526F88597BBB13A /* PlayerUIDemo */ = {
+			isa = PBXGroup;
+			children = (
+				0B27B908CD0E9EA872D108DB /* Info.plist */,
+			);
+			path = PlayerUIDemo;
 			sourceTree = "<group>";
 		};
 		FE2E4510C33A1A0D3E20767C /* logger */ = {
@@ -750,6 +736,25 @@
 			productName = Sources_SwiftHooks;
 			productType = "com.apple.product-type.library.static";
 		};
+		18C56DE95BA1FC3F2EBEBCE2 /* PlayerUIDemo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 404A7116D18BAF226E50B04D /* Build configuration list for PBXNativeTarget "PlayerUIDemo" */;
+			buildPhases = (
+				794FB3353F6063D307F15674 /* Copy Bazel Outputs / Generate Bazel Dependencies (Index Build) */,
+				0FDAA7929F565EC343BF21F0 /* Create Compile Dependencies */,
+				873A285D72C08F5FC7674D16 /* Create Link Dependencies */,
+				AFD21AF472ADC080B379DAAD /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				82A4A366C9719B99A899EB52 /* PBXTargetDependency */,
+			);
+			name = PlayerUIDemo;
+			productName = PlayerUIDemo;
+			productReference = 62A5CAFD267F860ED131F36C /* PlayerUIDemo.app */;
+			productType = "com.apple.product-type.application";
+		};
 		4175939388041D9BE70B7B0E /* PlayerUILogger */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5D640E69E18407973BA578BD /* Build configuration list for PBXNativeTarget "PlayerUILogger" */;
@@ -779,6 +784,7 @@
 			);
 			dependencies = (
 				CA8649314E238D2E4AFCCF9B /* PBXTargetDependency */,
+				B66E9D9879D131025BCBB5D0 /* PBXTargetDependency */,
 			);
 			name = "PlayerUITests (Unit Tests)";
 			productName = PlayerUITests;
@@ -885,6 +891,10 @@
 						CreatedOnToolsVersion = 15.0.1;
 						LastSwiftMigration = 9999;
 					};
+					18C56DE95BA1FC3F2EBEBCE2 = {
+						CreatedOnToolsVersion = 15.0.1;
+						LastSwiftMigration = 9999;
+					};
 					4175939388041D9BE70B7B0E = {
 						CreatedOnToolsVersion = 15.0.1;
 						LastSwiftMigration = 9999;
@@ -892,6 +902,7 @@
 					55244311E4A457602217042F = {
 						CreatedOnToolsVersion = 15.0.1;
 						LastSwiftMigration = 9999;
+						TestTargetID = 18C56DE95BA1FC3F2EBEBCE2;
 					};
 					6D1DBA425CE56881D5F0F94C = {
 						CreatedOnToolsVersion = 15.0.1;
@@ -933,6 +944,7 @@
 			targets = (
 				83CCF1C056B66ADE44C2B385 /* BazelDependencies */,
 				E156BCF8DE2E9A88F82AB7C7 /* PlayerUI */,
+				18C56DE95BA1FC3F2EBEBCE2 /* PlayerUIDemo */,
 				6D1DBA425CE56881D5F0F94C /* PlayerUIInternalTestUtilities */,
 				4175939388041D9BE70B7B0E /* PlayerUILogger */,
 				79887500B3245F4EAF131F67 /* PlayerUILoggerTests (Library) */,
@@ -959,6 +971,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "set -euo pipefail\n\nif [[ \"$ACTION\" == \"indexbuild\" ]]; then\n  cd \"$SRCROOT\"\n\n  \"$BAZEL_INTEGRATION_DIR/generate_index_build_bazel_dependencies.sh\"\nelse\n  \"$BAZEL_INTEGRATION_DIR/copy_outputs.sh\" \\\n    \"_BazelForcedCompile_.swift\" \\\n    \"\"\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		0FDAA7929F565EC343BF21F0 /* Create Compile Dependencies */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SWIFT_PARAMS_FILE)",
+			);
+			name = "Create Compile Dependencies";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/swift.compile.params",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -euo pipefail\n\nperl -pe '\n  s/__BAZEL_XCODE_DEVELOPER_DIR__/\\$(DEVELOPER_DIR)/g;\n  s/__BAZEL_XCODE_SDKROOT__/\\$(SDKROOT)/g;\n  s/\\$(\\()?([a-zA-Z_]\\w*)(?(1)\\))/$ENV{$2}/gx;\n' \"$SCRIPT_INPUT_FILE_0\" > \"$SCRIPT_OUTPUT_FILE_0\"\n";
 			showEnvVarsInLog = 0;
 		};
 		10594D95DBCA3A5B4FCF4283 /* Copy Bazel Outputs / Generate Bazel Dependencies (Index Build) */ = {
@@ -1130,6 +1159,40 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "set -euo pipefail\n\nif [[ \"$ACTION\" == \"indexbuild\" ]]; then\n  cd \"$SRCROOT\"\n\n  \"$BAZEL_INTEGRATION_DIR/generate_index_build_bazel_dependencies.sh\"\nelse\n  \"$BAZEL_INTEGRATION_DIR/copy_outputs.sh\" \\\n    \"_BazelForcedCompile_.swift\" \\\n    \"$BAZEL_INTEGRATION_DIR/xctest.exclude.rsynclist\"\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		794FB3353F6063D307F15674 /* Copy Bazel Outputs / Generate Bazel Dependencies (Index Build) */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = "Copy Bazel Outputs / Generate Bazel Dependencies (Index Build)";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -euo pipefail\n\nif [[ \"$ACTION\" == \"indexbuild\" ]]; then\n  cd \"$SRCROOT\"\n\n  \"$BAZEL_INTEGRATION_DIR/generate_index_build_bazel_dependencies.sh\"\nelse\n  \"$BAZEL_INTEGRATION_DIR/copy_outputs.sh\" \\\n    \"_BazelForcedCompile_.swift\" \\\n    \"$BAZEL_INTEGRATION_DIR/app.exclude.rsynclist\"\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		873A285D72C08F5FC7674D16 /* Create Link Dependencies */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(LINK_PARAMS_FILE)",
+			);
+			name = "Create Link Dependencies";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/link.params",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -euo pipefail\n\nif [[ \"${ENABLE_PREVIEWS:-}\" == \"YES\" ]]; then\nperl -pe 's/\\$(\\()?([a-zA-Z_]\\w*)(?(1)\\))/$ENV{$2}/g' \\\n  \"$SCRIPT_INPUT_FILE_0\" > \"$SCRIPT_OUTPUT_FILE_0\"\nelse\n  touch \"$SCRIPT_OUTPUT_FILE_0\"\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 		8A40B1850D2D50E42A880819 /* Create Compile Dependencies */ = {
@@ -1321,17 +1384,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				55F66BD66659760723489DDF /* PartialMatchFingerprintPluginTests.swift in Sources */,
-				4C8AEA7AEE4DF0CFFCC1BE73 /* FlowStateTests.swift in Sources */,
-				559C96A582E0555568469B99 /* HeadlessPlayerTests.swift in Sources */,
-				4AE1A24C40432001961930AD /* BindingParserTests.swift in Sources */,
-				53B86A62454C9D401E2F8088 /* ExpressionEvaluatorTests.swift in Sources */,
-				80359D9185E01E7FD7B53A11 /* ModifierTests.swift in Sources */,
-				EDE5B9E8BC6703BE9640A07F /* StateTests.swift in Sources */,
-				8149BBD30AC21D09E356A4C9 /* AnyTypeTests.swift in Sources */,
-				700842667C565DBAFE965990 /* DebugValueTests.swift in Sources */,
-				25E1F804783D6F4FD211E27A /* ErrorUtilitiesTests.swift in Sources */,
-				1409E60FE9E1A7B44BB1C6DC /* JSLoggerTests.swift in Sources */,
-				7D04B20FB47B37A1DAE96BE5 /* JSUtilitiesTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1349,6 +1401,14 @@
 			files = (
 				7495CDBBA4D4055EC2F4C5A7 /* LogLevelTests.swift in Sources */,
 				4B141B39A39CE8CD1975BB2B /* TapableLoggerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AFD21AF472ADC080B379DAAD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				57DA10ADB516453F8C6FFAB8 /* App.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1385,6 +1445,12 @@
 			target = 83CCF1C056B66ADE44C2B385 /* BazelDependencies */;
 			targetProxy = 3A1B9259739982A607B06A1C /* PBXContainerItemProxy */;
 		};
+		82A4A366C9719B99A899EB52 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = BazelDependencies;
+			target = 83CCF1C056B66ADE44C2B385 /* BazelDependencies */;
+			targetProxy = 0C34E26AF0FABB7B06E7D3AD /* PBXContainerItemProxy */;
+		};
 		8DFD2B26C790A96211E394ED /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = BazelDependencies;
@@ -1402,6 +1468,12 @@
 			name = BazelDependencies;
 			target = 83CCF1C056B66ADE44C2B385 /* BazelDependencies */;
 			targetProxy = 7A4EA68328E2EC6AA5B0D0BE /* PBXContainerItemProxy */;
+		};
+		B66E9D9879D131025BCBB5D0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = PlayerUIDemo;
+			target = 18C56DE95BA1FC3F2EBEBCE2 /* PlayerUIDemo */;
+			targetProxy = 4E0D0D93EC30F10BB331D280 /* PBXContainerItemProxy */;
 		};
 		CA8649314E238D2E4AFCCF9B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1440,15 +1512,17 @@
 				DEPLOYMENT_LOCATION = NO;
 				INFOPLIST_FILE = "$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/newios/rules_xcodeproj/PlayerUITests.__internal__.__test_bundle/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LINK_PARAMS_FILE = "$(BAZEL_OUT)/darwin_arm64-dbg/bin/external/rules_xcodeproj~1.13.0~internal~rules_xcodeproj_generated/generator/newios/xcodeproj/xcodeproj-params/PlayerUITests.7.link.params";
+				LINK_PARAMS_FILE = "$(BAZEL_OUT)/darwin_arm64-dbg/bin/external/rules_xcodeproj~1.13.0~internal~rules_xcodeproj_generated/generator/newios/xcodeproj/xcodeproj-params/PlayerUITests.8.link.params";
 				OTHER_LDFLAGS = "@$(DERIVED_FILE_DIR)/link.params";
-				PRODUCT_BUNDLE_IDENTIFIER = com.bazelbuild.rulesapple.Tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.intuit.ios.playerTests;
 				PRODUCT_NAME = PlayerUITests;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = iphonesimulator;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGET_BUILD_DIR = "$(BUILD_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/newios$(TARGET_BUILD_SUBPATH)";
 				TARGET_NAME = PlayerUITests;
+				TEST_HOST = "$(BUILD_DIR)/bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/newios/PlayerUIDemo.app/PlayerUIDemo";
 			};
 			name = Debug;
 		};
@@ -1526,7 +1600,7 @@
 				"BAZEL_TARGET_ID[sdk=iphonesimulator*]" = "$(BAZEL_TARGET_ID)";
 				COMPILE_TARGET_NAME = PlayerUIInternalTestUtilities;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				OTHER_SWIFT_FLAGS = "-Xcc -working-directory -Xcc $(PROJECT_DIR) -working-directory $(PROJECT_DIR) -vfsoverlay $(OBJROOT)/bazel-out-overlay.yaml @$(DERIVED_FILE_DIR)/swift.compile.params -I$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/external/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks -I$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/newios -Xcc -iquote -Xcc $(PROJECT_DIR) -Xcc -iquote -Xcc $(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -Xcc -DSWIFT_PACKAGE -Xcc -O0 -Xcc -DDEBUG=1 -Xcc -fstack-protector -Xcc -fstack-protector-all";
+				OTHER_SWIFT_FLAGS = "-Xcc -working-directory -Xcc $(PROJECT_DIR) -working-directory $(PROJECT_DIR) -vfsoverlay $(OBJROOT)/bazel-out-overlay.yaml @$(DERIVED_FILE_DIR)/swift.compile.params -I$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/external/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks -I$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/newios -Xcc -iquote -Xcc $(PROJECT_DIR) -Xcc -iquote -Xcc $(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -Xcc -DBAZEL_TARGET -Xcc -DSWIFT_PACKAGE -Xcc -O0 -Xcc -DDEBUG=1 -Xcc -fstack-protector -Xcc -fstack-protector-all";
 				PRODUCT_MODULE_NAME = PlayerUIInternalTestUtilities;
 				PRODUCT_NAME = PlayerUIInternalTestUtilities;
 				SDKROOT = iphoneos;
@@ -1558,6 +1632,42 @@
 			};
 			name = Debug;
 		};
+		8379D2D5DAA275D9DCA08540 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				BAZEL_COMPILE_TARGET_IDS = "@@//newios:PlayerUIDemoSources ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20";
+				"BAZEL_COMPILE_TARGET_IDS[sdk=iphonesimulator*]" = "$(BAZEL_COMPILE_TARGET_IDS)";
+				BAZEL_LABEL = "@@//newios:PlayerUIDemo";
+				BAZEL_OUTPUTS_PRODUCT = "bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/newios/PlayerUIDemo.app";
+				BAZEL_OUTPUTS_PRODUCT_BASENAME = PlayerUIDemo.app;
+				BAZEL_PACKAGE_BIN_DIR = "bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/newios";
+				BAZEL_TARGET_ID = "@@//newios:PlayerUIDemo ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20";
+				"BAZEL_TARGET_ID[sdk=iphonesimulator*]" = "$(BAZEL_TARGET_ID)";
+				BUILT_PRODUCTS_DIR = "$(CONFIGURATION_BUILD_DIR)";
+				CODE_SIGN_STYLE = Manual;
+				COMPILE_TARGET_NAME = PlayerUIDemoSources;
+				DEPLOYMENT_LOCATION = NO;
+				INFOPLIST_FILE = "$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/newios/rules_xcodeproj/PlayerUIDemo/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LINK_PARAMS_FILE = "$(BAZEL_OUT)/darwin_arm64-dbg/bin/external/rules_xcodeproj~1.13.0~internal~rules_xcodeproj_generated/generator/newios/xcodeproj/xcodeproj-params/PlayerUIDemo.3.link.params";
+				OTHER_LDFLAGS = "@$(DERIVED_FILE_DIR)/link.params";
+				OTHER_SWIFT_FLAGS = "-Xcc -working-directory -Xcc $(PROJECT_DIR) -working-directory $(PROJECT_DIR) -vfsoverlay $(OBJROOT)/bazel-out-overlay.yaml $(PREVIEWS_SWIFT_INCLUDE__$(ENABLE_PREVIEWS)) @$(DERIVED_FILE_DIR)/swift.compile.params -I$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/external/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks -I$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/newios -Xcc -iquote -Xcc $(PROJECT_DIR) -Xcc -iquote -Xcc $(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -Xcc -DBAZEL_TARGET -Xcc -DSWIFT_PACKAGE -Xcc -O0 -Xcc -DDEBUG=1 -Xcc -fstack-protector -Xcc -fstack-protector-all";
+				PREVIEWS_SWIFT_INCLUDE__ = "";
+				PREVIEWS_SWIFT_INCLUDE__NO = "";
+				PREVIEWS_SWIFT_INCLUDE__YES = "-I bazel-out/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/newios";
+				PRODUCT_BUNDLE_IDENTIFIER = com.intuit.ios.player;
+				PRODUCT_MODULE_NAME = newios_PlayerUIDemoSources;
+				PRODUCT_NAME = PlayerUIDemo;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = iphonesimulator;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_PARAMS_FILE = "$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/newios/PlayerUIDemoSources.rules_xcodeproj.swift.compile.params";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGET_NAME = PlayerUIDemo;
+			};
+			name = Debug;
+		};
 		A0FB602DDE726229F3B6F8B8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1574,7 +1684,7 @@
 				DEPLOYMENT_LOCATION = NO;
 				INFOPLIST_FILE = "$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/newios/rules_xcodeproj/PlayerUILoggerTests.__internal__.__test_bundle/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LINK_PARAMS_FILE = "$(BAZEL_OUT)/darwin_arm64-dbg/bin/external/rules_xcodeproj~1.13.0~internal~rules_xcodeproj_generated/generator/newios/xcodeproj/xcodeproj-params/PlayerUILoggerTests.3.link.params";
+				LINK_PARAMS_FILE = "$(BAZEL_OUT)/darwin_arm64-dbg/bin/external/rules_xcodeproj~1.13.0~internal~rules_xcodeproj_generated/generator/newios/xcodeproj/xcodeproj-params/PlayerUILoggerTests.5.link.params";
 				OTHER_LDFLAGS = "@$(DERIVED_FILE_DIR)/link.params";
 				PRODUCT_BUNDLE_IDENTIFIER = com.bazelbuild.rulesapple.Tests;
 				PRODUCT_NAME = PlayerUILoggerTests;
@@ -1618,7 +1728,7 @@
 				"BAZEL_TARGET_ID[sdk=iphonesimulator*]" = "$(BAZEL_TARGET_ID)";
 				COMPILE_TARGET_NAME = PlayerUITests_swift;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				OTHER_SWIFT_FLAGS = "-Xcc -working-directory -Xcc $(PROJECT_DIR) -working-directory $(PROJECT_DIR) -vfsoverlay $(OBJROOT)/bazel-out-overlay.yaml @$(DERIVED_FILE_DIR)/swift.compile.params -F$(DEVELOPER_DIR)/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F$(SDKROOT)/Developer/Library/Frameworks -I$(DEVELOPER_DIR)/Platforms/iPhoneSimulator.platform/Developer/usr/lib -I$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/external/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks -I$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/newios -Xcc -iquote -Xcc $(PROJECT_DIR) -Xcc -iquote -Xcc $(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -Xcc -DSWIFT_PACKAGE -Xcc -D__SWIFTC__ -Xcc -I -Xcc $(PROJECT_DIR) -Xcc -O0 -Xcc -DDEBUG=1 -Xcc -fstack-protector -Xcc -fstack-protector-all";
+				OTHER_SWIFT_FLAGS = "-Xcc -working-directory -Xcc $(PROJECT_DIR) -working-directory $(PROJECT_DIR) -vfsoverlay $(OBJROOT)/bazel-out-overlay.yaml @$(DERIVED_FILE_DIR)/swift.compile.params -F$(DEVELOPER_DIR)/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F$(SDKROOT)/Developer/Library/Frameworks -I$(DEVELOPER_DIR)/Platforms/iPhoneSimulator.platform/Developer/usr/lib -I$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/external/rules_swift_package_manager~0.22.0~swift_deps~swiftpkg_swift_hooks -I$(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin/newios -Xcc -iquote -Xcc $(PROJECT_DIR) -Xcc -iquote -Xcc $(BAZEL_OUT)/ios-sim_arm64-min14.0-applebin_ios-ios_sim_arm64-dbg-ST-09abb88b3e20/bin -Xcc -DBAZEL_TARGET -Xcc -DSWIFT_PACKAGE -Xcc -D__SWIFTC__ -Xcc -I -Xcc $(PROJECT_DIR) -Xcc -O0 -Xcc -DDEBUG=1 -Xcc -fstack-protector -Xcc -fstack-protector-all";
 				PRODUCT_MODULE_NAME = PlayerUITests;
 				PRODUCT_NAME = PlayerUITests_swift;
 				SDKROOT = iphoneos;
@@ -1721,6 +1831,14 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6402474CCA5546CD1995682E /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		404A7116D18BAF226E50B04D /* Build configuration list for PBXNativeTarget "PlayerUIDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8379D2D5DAA275D9DCA08540 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

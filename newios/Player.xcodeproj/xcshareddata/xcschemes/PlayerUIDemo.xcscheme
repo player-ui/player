@@ -14,9 +14,9 @@
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
-                     BlueprintIdentifier = "98AE13DE3E2F748E2D404F26"
-                     BuildableName = "PlayerUILoggerTests.xctest"
-                     BlueprintName = "PlayerUILoggerTests (Unit Tests)"
+                     BlueprintIdentifier = "18C56DE95BA1FC3F2EBEBCE2"
+                     BuildableName = "PlayerUIDemo.app"
+                     BlueprintName = "PlayerUIDemo"
                      ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
                   </BuildableReference>
                </EnvironmentBuildable>
@@ -30,9 +30,9 @@
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
-                     BlueprintIdentifier = "98AE13DE3E2F748E2D404F26"
-                     BuildableName = "PlayerUILoggerTests.xctest"
-                     BlueprintName = "PlayerUILoggerTests (Unit Tests)"
+                     BlueprintIdentifier = "18C56DE95BA1FC3F2EBEBCE2"
+                     BuildableName = "PlayerUIDemo.app"
+                     BlueprintName = "PlayerUIDemo"
                      ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
                   </BuildableReference>
                </EnvironmentBuildable>
@@ -48,9 +48,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "98AE13DE3E2F748E2D404F26"
-               BuildableName = "PlayerUILoggerTests.xctest"
-               BlueprintName = "PlayerUILoggerTests (Unit Tests)"
+               BlueprintIdentifier = "18C56DE95BA1FC3F2EBEBCE2"
+               BuildableName = "PlayerUIDemo.app"
+               BlueprintName = "PlayerUIDemo"
                ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -60,58 +60,9 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "NO">
-      <PreActions>
-         <ExecutionAction
-            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
-            <ActionContent
-               title = "Update .lldbinit"
-               scriptText = "&quot;$BAZEL_INTEGRATION_DIR/create_lldbinit.sh&quot;&#10;">
-               <EnvironmentBuildable>
-                  <BuildableReference
-                     BuildableIdentifier = "primary"
-                     BlueprintIdentifier = "98AE13DE3E2F748E2D404F26"
-                     BuildableName = "PlayerUILoggerTests.xctest"
-                     BlueprintName = "PlayerUILoggerTests (Unit Tests)"
-                     ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
-                  </BuildableReference>
-               </EnvironmentBuildable>
-            </ActionContent>
-         </ExecutionAction>
-      </PreActions>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "98AE13DE3E2F748E2D404F26"
-            BuildableName = "PlayerUILoggerTests.xctest"
-            BlueprintName = "PlayerUILoggerTests (Unit Tests)"
-            ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
+      shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "98AE13DE3E2F748E2D404F26"
-               BuildableName = "PlayerUILoggerTests.xctest"
-               BlueprintName = "PlayerUILoggerTests (Unit Tests)"
-               ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
-      <EnvironmentVariables>
-         <EnvironmentVariable
-            key = "BUILD_WORKING_DIRECTORY"
-            value = "$(BUILT_PRODUCTS_DIR)"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-         <EnvironmentVariable
-            key = "BUILD_WORKSPACE_DIRECTORY"
-            value = "$(BUILD_WORKSPACE_DIRECTORY)"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-      </EnvironmentVariables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -132,24 +83,25 @@
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
-                     BlueprintIdentifier = "98AE13DE3E2F748E2D404F26"
-                     BuildableName = "PlayerUILoggerTests.xctest"
-                     BlueprintName = "PlayerUILoggerTests (Unit Tests)"
+                     BlueprintIdentifier = "18C56DE95BA1FC3F2EBEBCE2"
+                     BuildableName = "PlayerUIDemo.app"
+                     BlueprintName = "PlayerUIDemo"
                      ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
                   </BuildableReference>
                </EnvironmentBuildable>
             </ActionContent>
          </ExecutionAction>
       </PreActions>
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "98AE13DE3E2F748E2D404F26"
-            BuildableName = "PlayerUILoggerTests.xctest"
-            BlueprintName = "PlayerUILoggerTests (Unit Tests)"
+            BlueprintIdentifier = "18C56DE95BA1FC3F2EBEBCE2"
+            BuildableName = "PlayerUIDemo.app"
+            BlueprintName = "PlayerUIDemo"
             ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
       <EnvironmentVariables>
          <EnvironmentVariable
             key = "BUILD_WORKING_DIRECTORY"
@@ -178,24 +130,25 @@
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
-                     BlueprintIdentifier = "98AE13DE3E2F748E2D404F26"
-                     BuildableName = "PlayerUILoggerTests.xctest"
-                     BlueprintName = "PlayerUILoggerTests (Unit Tests)"
+                     BlueprintIdentifier = "18C56DE95BA1FC3F2EBEBCE2"
+                     BuildableName = "PlayerUIDemo.app"
+                     BlueprintName = "PlayerUIDemo"
                      ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
                   </BuildableReference>
                </EnvironmentBuildable>
             </ActionContent>
          </ExecutionAction>
       </PreActions>
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "98AE13DE3E2F748E2D404F26"
-            BuildableName = "PlayerUILoggerTests.xctest"
-            BlueprintName = "PlayerUILoggerTests (Unit Tests)"
+            BlueprintIdentifier = "18C56DE95BA1FC3F2EBEBCE2"
+            BuildableName = "PlayerUIDemo.app"
+            BlueprintName = "PlayerUIDemo"
             ReferencedContainer = "container:/Users/hborawski/dev/open/player/newios/Player.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
