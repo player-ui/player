@@ -29,6 +29,8 @@ adb shell settings put global window_animation_scale 0
 adb shell settings put global transition_animation_scale 0
 adb shell settings put global animator_duration_scale 0
 
+# Inspiration: https://gist.github.com/swenson/f797ffea7e243d889406#file-runtests-sh
+
 # adb shell throws away the return value, so we have to hack do some magic
 # see https://code.google.com/p/android/issues/detail?id=3254
 
@@ -40,15 +42,20 @@ import subprocess as sp
 import sys
 import threading
 import time
+
 done = False
+
 def update():
-  # prevent CI from killing the process for inactivity
   while not done:
     time.sleep(5)
     print "Running..."
+
+# Start idling thread to prevent CI from killing the process for inactivity
 t = threading.Thread(target=update)
 t.dameon = True
 t.start()
+
+# Wait for device and launch tests with Androidx test orchestrator
 def run():
   os.system('adb wait-for-device')
   p = sp.Popen("""adb shell 'CLASSPATH=\$(pm path androidx.test.services) app_process / \
@@ -58,11 +65,15 @@ def run():
                shell=True, stdout=sp.PIPE, stderr=sp.PIPE, stdin=sp.PIPE)
 
   return p.communicate()
+
+# Search for JUnit success log
 success = re.compile(r'OK \(\d+ test(s)?\)')
+
 stdout, stderr = run()
 done = True
 print stderr
 print stdout
+
 if success.search(stderr + stdout):
   sys.exit(0)
 else:
