@@ -12,7 +12,7 @@ import com.intuit.playerui.core.player.state.ControllerState
 import com.intuit.playerui.core.plugins.JSScriptPluginWrapper
 import com.intuit.playerui.core.plugins.PlayerPlugin
 import com.intuit.playerui.core.plugins.findPlugin
-import com.intuit.player.plugins.settimeout.SetTimeoutPlugin
+import com.intuit.playerui.plugins.settimeout.SetTimeoutPlugin
 
 /** Function definition of an external action handler */
 public fun interface ExternalActionHandler {

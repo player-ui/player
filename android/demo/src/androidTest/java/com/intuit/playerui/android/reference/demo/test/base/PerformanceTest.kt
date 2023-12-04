@@ -105,7 +105,7 @@ interface PerformanceTest<T : Activity> {
     }
 
     companion object {
-        const val pkg = "com.intuit.player.android.reference.demo"
+        const val pkg = "com.intuit.playerui.android.reference.demo"
         const val totalFrames = "Total frames rendered"
         const val fiftiethPercentile = "50th percentile"
         const val ninetiethPercentile = "90th percentile"

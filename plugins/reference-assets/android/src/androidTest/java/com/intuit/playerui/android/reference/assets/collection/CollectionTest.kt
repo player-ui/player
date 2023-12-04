@@ -1,4 +1,4 @@
-package com.intuit.player.android.reference.assets.collection
+package com.intuit.playerui.android.reference.assets.collection
 
 import android.widget.FrameLayout
 import android.widget.LinearLayout

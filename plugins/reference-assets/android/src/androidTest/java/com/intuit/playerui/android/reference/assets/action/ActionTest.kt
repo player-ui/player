@@ -1,10 +1,9 @@
-package com.intuit.player.android.reference.assets.action
+package com.intuit.playerui.android.reference.assets.action
 
 import android.widget.Button
 import android.widget.LinearLayout
 import androidx.core.view.get
 import com.intuit.playerui.android.reference.assets.R
-import com.intuit.playerui.android.reference.assets.action.Action
 import com.intuit.playerui.android.reference.assets.test.AssetTest
 import com.intuit.playerui.android.reference.assets.test.shouldBeAsset
 import com.intuit.playerui.android.reference.assets.test.shouldBePlayerState

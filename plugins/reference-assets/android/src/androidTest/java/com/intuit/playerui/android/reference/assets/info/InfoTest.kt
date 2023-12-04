@@ -1,4 +1,4 @@
-package com.intuit.player.android.reference.assets.info
+package com.intuit.playerui.android.reference.assets.info
 
 import android.widget.Button
 import android.widget.FrameLayout

@@ -1,4 +1,4 @@
-package com.intuit.player.android.reference.assets.test
+package com.intuit.playerui.android.reference.assets.test
 
 import android.content.Context
 import android.os.Build.VERSION_CODES.P
@@ -15,14 +15,14 @@ import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.player.state.PlayerFlowState
 import com.intuit.playerui.core.plugins.Plugin
+import com.intuit.playerui.plugins.transactions.PendingTransactionPlugin
+import com.intuit.playerui.plugins.types.CommonTypesPlugin
 import com.intuit.playerui.utils.makeFlow
 import com.intuit.playerui.utils.mocks.ClassLoaderMock
 import com.intuit.playerui.utils.mocks.ClassLoaderMocksReader
 import com.intuit.playerui.utils.mocks.Mock
 import com.intuit.playerui.utils.mocks.getFlow
 import com.intuit.playerui.utils.start
-import com.intuit.player.plugins.transactions.PendingTransactionPlugin
-import com.intuit.player.plugins.types.CommonTypesPlugin
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

@@ -1,4 +1,4 @@
-package com.intuit.player.android.reference.assets.text
+package com.intuit.playerui.android.reference.assets.text
 
 import android.widget.LinearLayout
 import android.widget.TextView

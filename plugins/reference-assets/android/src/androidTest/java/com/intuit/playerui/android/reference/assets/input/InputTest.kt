@@ -1,11 +1,10 @@
-package com.intuit.player.android.reference.assets.input
+package com.intuit.playerui.android.reference.assets.input
 
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.get
 import com.intuit.playerui.android.reference.assets.R
-import com.intuit.playerui.android.reference.assets.input.FormattedEditText
 import com.intuit.playerui.android.reference.assets.test.AssetTest
 import com.intuit.playerui.android.reference.assets.test.shouldBePlayerState
 import com.intuit.playerui.android.reference.assets.test.shouldBeView

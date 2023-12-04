@@ -1,4 +1,4 @@
-package com.intuit.player.android.reference.assets.test
+package com.intuit.playerui.android.reference.assets.test
 
 import android.view.View
 import com.intuit.playerui.android.asset.RenderableAsset
