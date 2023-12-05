@@ -18,8 +18,31 @@ xcodeproj(
         # plugins
         "//plugins/beacon/ios:PlayerUIBaseBeaconPluginTests",
         "//plugins/beacon/swiftui:PlayerUIBeaconPluginViewInspectorTests",
+
+        "//plugins/check-path/ios:PlayerUICheckPathPluginTests",
+        "//plugins/check-path/swiftui:PlayerUISwiftUICheckPathPluginViewInspectorTests",
+
+        "//plugins/common-expressions/ios:PlayerUICommonExpressionsPluginTests",
+
+        "//plugins/common-types/ios:PlayerUICommonTypesPluginTests",
+        
+        "//plugins/computed-properties/ios:PlayerUIComputedPropertiesPluginTests",
+
+        "//plugins/console-logger/ios:PlayerUIPrintLoggerPluginTests",
+
+        "//plugins/expression/ios:PlayerUIExpressionPluginTests",
+
+        "//plugins/external-action/ios:PlayerUIExternalActionPluginTests",
+        "//plugins/external-action/swiftui:PlayerUIExternalActionViewModifierPluginViewInspectorTests",
+
+        "//plugins/metrics/swiftui:PlayerUIMetricsPluginViewInspectorTests",
+
         "//plugins/pending-transaction/swiftui:PlayerUISwiftUIPendingTransactionPluginViewInspectorTests",
 
-        "//plugins/reference-assets/swiftui:PlayerUIReferenceAssetsBuild"
+        "//plugins/pubsub/ios:PlayerUIPubSubPluginTests",
+
+        "//plugins/reference-assets/swiftui:PlayerUIReferenceAssetsViewInspectorTests",
+
+        "//plugins/types-provider/ios:PlayerUITypesProviderPluginTests"
     ],
 )
