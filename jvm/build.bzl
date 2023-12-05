@@ -9,7 +9,7 @@ DEFAULT_PROJECT_NAME = "Player"
 DEFAUTL_PROJECT_DESCRIPTION = "A cross-platform semantic rendering engine"
 DEFAULT_DEVELOPERS = {
     "sugarmanz": ["name=Jeremiah Zucker", "email=zucker.jeremiah@gmail.com"],
-    "brocollie08": ["name=Tony Lin"],
+    "brocollie08": ["name=Tony Lin", "email=sentony93@gmail.com"],
 }
 DEFAULT_RELEASE_REPO = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
 DEFAULT_SNAPSHOT_REPO = "https://oss.sonatype.org/content/repositories/snapshots/"
