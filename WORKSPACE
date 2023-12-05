@@ -109,16 +109,18 @@ load("@robolectric//bazel:robolectric.bzl", "robolectric_repositories")
 
 robolectric_repositories()
 
+ANDROIDX_TEST_VERSION = "1.4.2"
+
 http_file(
     name = "android_test_orchestrator_apk",
     sha256 = "b7a2e7d0184b03e12c7357f3914d539da40b52a11e90815edff1022c655f459b",
-    url = "https://dl.google.com/android/maven2/androidx/test/orchestrator/1.4.2/orchestrator-1.4.2.apk",
+    url = "https://dl.google.com/android/maven2/androidx/test/orchestrator/%s/orchestrator-%s.apk" % (ANDROIDX_TEST_VERSION, ANDROIDX_TEST_VERSION),
 )
 
 http_file(
     name = "android_test_services_apk",
     sha256 = "c6bc74268b29bdabad8da962e00e2f6fd613c24b42c69e81b258397b4819f156",
-    url = "https://dl.google.com/android/maven2/androidx/test/services/test-services/1.4.2/test-services-1.4.2.apk",
+    url = "https://dl.google.com/android/maven2/androidx/test/services/test-services/%s/test-services-%s.apk" % (ANDROIDX_TEST_VERSION, ANDROIDX_TEST_VERSION),
 )
 
 http_archive(
