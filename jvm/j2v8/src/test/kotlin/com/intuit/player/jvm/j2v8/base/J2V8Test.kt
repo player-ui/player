@@ -10,14 +10,17 @@ import com.intuit.player.jvm.j2v8.bridge.runtime.Runtime
 import com.intuit.player.jvm.j2v8.bridge.runtime.V8Runtime
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.decodeFromV8Value
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.encodeToV8Value
-import com.intuit.player.jvm.j2v8.extensions.blockingLock
+import com.intuit.player.jvm.j2v8.extensions.evaluateInJSThreadBlocking
+import com.intuit.player.jvm.j2v8.extensions.evaluateInJSThreadIfDefinedBlocking
 import com.intuit.player.jvm.j2v8.extensions.unlock
 import com.intuit.player.jvm.j2v8.v8Object
 import com.intuit.player.jvm.utils.test.PromiseUtils
 import com.intuit.player.jvm.utils.test.ThreadUtils
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.buildJsonObject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -32,8 +35,8 @@ internal abstract class J2V8Test(val v8: V8 = V8.createV8Runtime().unlock()) : P
     fun buildV8Object(jsonElement: JsonElement = buildJsonObject {}) = buildV8ObjectFromMap(
         Json.decodeFromJsonElement(
             MapSerializer(String.serializer(), GenericSerializer()),
-            jsonElement
-        )
+            jsonElement,
+        ),
     )
 
     fun buildV8ObjectFromMap(map: Map<String, Any?>): V8Object = format.encodeToV8Value(map).v8Object
@@ -49,7 +52,7 @@ internal abstract class J2V8Test(val v8: V8 = V8.createV8Runtime().unlock()) : P
 
     @BeforeEach
     fun resetGlobalLog() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadIfDefinedBlocking(runtime) {
             val globalLog = V8Array(this)
             add("globalLog", globalLog)
             globalLog.close()
@@ -57,7 +60,7 @@ internal abstract class J2V8Test(val v8: V8 = V8.createV8Runtime().unlock()) : P
     }
 
     fun flushRuntimeLogs() {
-        v8.blockingLock {
+        v8.evaluateInJSThreadBlocking(runtime) {
             val globalLog = getArray("globalLog")
             globalLog.keys.map { globalLog.get(it) }.forEach { it.prettyPrint() }
             globalLog.close()
@@ -71,8 +74,8 @@ internal abstract class J2V8Test(val v8: V8 = V8.createV8Runtime().unlock()) : P
     fun V8Object.assertEquivalent(another: Any?) {
         assertTrue(
             another is V8Object,
-            "value to compare is not a V8Object: $another"
-        )
+        ) { "value to compare is not a V8Object: $another" }
+
         (another as V8Object).let {
             // verify that all missing keys from another are null or undefined
             (keys.toSet() - another.keys.toSet()).forEach { missingKey ->
@@ -88,12 +91,14 @@ internal abstract class J2V8Test(val v8: V8 = V8.createV8Runtime().unlock()) : P
 
             if (isUndefined) {
                 assertEquals(this, another)
-            } else keys.forEach { key ->
-                val (expected, actual) = get(key) to another.get(key)
-                if (expected is V8Object && !expected.isUndefined) {
-                    expected.assertEquivalent(actual)
-                } else {
-                    assertEquals(expected, actual, "comparing key: $key")
+            } else {
+                keys.forEach { key ->
+                    val (expected, actual) = get(key) to another.get(key)
+                    if (expected is V8Object && !expected.isUndefined) {
+                        expected.assertEquivalent(actual)
+                    } else {
+                        assertEquals(expected, actual, "comparing key: $key")
+                    }
                 }
             }
         }

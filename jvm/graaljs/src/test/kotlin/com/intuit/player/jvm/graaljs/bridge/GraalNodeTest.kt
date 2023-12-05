@@ -3,6 +3,7 @@ package com.intuit.player.jvm.graaljs.bridge
 import com.intuit.player.jvm.core.asset.Asset
 import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.getJson
 import com.intuit.player.jvm.core.bridge.toJson
 import com.intuit.player.jvm.core.flow.Flow
@@ -26,18 +27,18 @@ internal class GraalNodeTest : GraalTest() {
             "string" to "thisisastring",
             "int" to 1,
             "object" to mapOf(
-                "string" to "anotherstring"
+                "string" to "anotherstring",
             ),
             "list" to listOf(
                 1,
                 "two",
                 mapOf(
-                    "string" to "onemorestring"
+                    "string" to "onemorestring",
                 ),
-                null
+                null,
             ),
             "function" to Invokable { "classicstring" },
-            "null" to null
+            "null" to null,
         )
 
         Assertions.assertEquals("thisisastring", node["string"])
@@ -55,7 +56,7 @@ internal class GraalNodeTest : GraalTest() {
     fun getString() {
         val node = buildNodeFromMap(
             "string" to "string",
-            "notastring" to 1
+            "notastring" to 1,
         )
 
         Assertions.assertEquals("string", node.getString("string"))
@@ -68,20 +69,20 @@ internal class GraalNodeTest : GraalTest() {
         val node = buildNodeFromMap(
             "function" to Invokable { "classicstring" },
             "tuple" to Invokable { (p0, p1) -> listOf(p0, p1) },
-            "notafunction" to 1
+            "notafunction" to 1,
         )
 
-        Assertions.assertEquals("classicstring", node.getFunction<String>("function")?.invoke())
-        Assertions.assertEquals(listOf("1", 2), node.getFunction<Any?>("tuple")?.invoke("1", 2))
-        Assertions.assertEquals(null, node.getFunction<Any>("notafunction"))
-        Assertions.assertEquals(null, node.getFunction<Any>("notthere"))
+        Assertions.assertEquals("classicstring", node.getInvokable<String>("function")?.invoke())
+        Assertions.assertEquals(listOf("1", 2), node.getInvokable<Any?>("tuple")?.invoke("1", 2))
+        Assertions.assertEquals(null, node.getInvokable<Any>("notafunction"))
+        Assertions.assertEquals(null, node.getInvokable<Any>("notthere"))
     }
 
     @Test
     fun getList() {
         val node = buildNodeFromMap(
             "list" to listOf(1, 2, 3),
-            "notalist" to 1
+            "notalist" to 1,
         )
 
         Assertions.assertEquals(listOf(1, 2, 3), node.getList("list"))
@@ -93,9 +94,9 @@ internal class GraalNodeTest : GraalTest() {
     fun getObject() {
         val node = buildNodeFromMap(
             "object" to mapOf(
-                "string" to "thisisastring"
+                "string" to "thisisastring",
             ),
-            "notaobject" to 1234
+            "notaobject" to 1234,
         )
 
         Assertions.assertEquals("thisisastring", node.getObject("object")?.getString("string"))
@@ -109,8 +110,8 @@ internal class GraalNodeTest : GraalTest() {
         val node = buildNodeFromMap(
             "asset" to mapOf(
                 "id" to "testId",
-                "type" to "testType"
-            )
+                "type" to "testType",
+            ),
         )
 
         val (id, type) = node.getObject("asset") as Asset
@@ -124,14 +125,14 @@ internal class GraalNodeTest : GraalTest() {
             "assets" to listOf(
                 mapOf(
                     "id" to "testId1",
-                    "type" to "testType"
+                    "type" to "testType",
                 ),
                 mapOf(
-                    "id" to "notAnAsset"
+                    "id" to "notAnAsset",
                 ),
-                1
+                1,
             ),
-            "notassets" to "justastring"
+            "notassets" to "justastring",
         )
 
         val assets = node.getList("assets") as List<*>
@@ -153,7 +154,7 @@ internal class GraalNodeTest : GraalTest() {
     fun getInt() {
         val node = buildNodeFromMap(
             "int" to 1,
-            "notanint" to "asdf"
+            "notanint" to "asdf",
         )
 
         Assertions.assertEquals(1, node.getInt("int"))
@@ -164,7 +165,7 @@ internal class GraalNodeTest : GraalTest() {
     @Test
     fun getJson() {
         val node = buildNodeFromMap(
-            "beacon" to mapOf("key" to "value")
+            "beacon" to mapOf("key" to "value"),
         )
         Assertions.assertEquals(JsonNull, node.getJson("notthere"))
         Assertions.assertEquals(buildJsonObject { put("key", "value") }, node.getJson("beacon"))
@@ -185,17 +186,17 @@ internal class GraalNodeTest : GraalTest() {
                     "beacon",
                     buildJsonObject {
                         put("key", "value")
-                    }
+                    },
                 )
             },
-            node.toJson()
+            node.toJson(),
         )
     }
 
     @Test
     fun getBoolean() {
         val node = buildNodeFromMap(
-            "isSelected" to true
+            "isSelected" to true,
         )
         Assertions.assertEquals(true, node.getBoolean("isSelected"))
         Assertions.assertNull(node.getBoolean("notthere"))
@@ -207,18 +208,18 @@ internal class GraalNodeTest : GraalTest() {
             "string" to "thisisastring",
             "int" to 1,
             "object" to mapOf(
-                "string" to "anotherstring"
+                "string" to "anotherstring",
             ),
             "list" to listOf(
                 1,
                 "two",
                 mapOf(
-                    "string" to "onemorestring"
+                    "string" to "onemorestring",
                 ),
-                null
+                null,
             ),
             "function" to Invokable { "classicstring" },
-            "null" to null
+            "null" to null,
         )
 
         addThreads(
@@ -251,7 +252,7 @@ internal class GraalNodeTest : GraalTest() {
                     Assertions.assertEquals(1, node.getInt("int"))
                 }
                 Assertions.assertEquals("thisisastring", node.get("string"))
-            }
+            },
         )
         startThreads()
         verifyThreads()
@@ -260,7 +261,7 @@ internal class GraalNodeTest : GraalTest() {
     @Test
     fun getSerializablePrimitive() {
         val node = buildNodeFromMap(
-            "number" to 9
+            "number" to 9,
         )
         Assertions.assertEquals(9, node.getSerializable("number", Int.serializer()))
     }
@@ -269,8 +270,8 @@ internal class GraalNodeTest : GraalTest() {
     fun getSerializable() {
         val node = buildNodeFromMap(
             "flow" to mapOf(
-                "id" to "testId"
-            )
+                "id" to "testId",
+            ),
         )
         Assertions.assertEquals("testId", node.getSerializable("flow", Flow.serializer())?.id)
     }

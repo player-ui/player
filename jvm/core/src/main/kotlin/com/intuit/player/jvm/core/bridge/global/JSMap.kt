@@ -2,6 +2,7 @@ package com.intuit.player.jvm.core.bridge.global
 
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -10,11 +11,11 @@ import kotlinx.serialization.Serializable
 public class JSMap<K, V> (override val node: Node, keySerializer: KSerializer<K>, valueSerializer: KSerializer<V>) : Map<K, V>, NodeWrapper {
 
     override val keys: Set<K> by lazy {
-        JSIterator(node.getFunction<Node>("keys")!!(), keySerializer).asSequence().toSet()
+        JSIterator(node.getInvokable<Node>("keys")!!(), keySerializer).asSequence().toSet()
     }
 
     override val values: List<V> by lazy {
-        JSIterator(node.getFunction<Node>("values")!!(), valueSerializer).asSequence().toList()
+        JSIterator(node.getInvokable<Node>("values")!!(), valueSerializer).asSequence().toList()
     }
 
     override val entries: Set<Map.Entry<K, V>> by lazy {

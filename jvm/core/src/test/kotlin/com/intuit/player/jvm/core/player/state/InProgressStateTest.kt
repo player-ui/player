@@ -3,10 +3,12 @@ package com.intuit.player.jvm.core.player.state
 import com.intuit.player.jvm.core.NodeBaseTest
 import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.getInvokable
+import com.intuit.player.jvm.core.bridge.runtime.Runtime
 import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeFormat
-import com.intuit.player.jvm.core.bridge.serialization.format.serializer
 import com.intuit.player.jvm.core.bridge.toJson
 import com.intuit.player.jvm.core.data.DataController
+import com.intuit.player.jvm.core.data.DataModelWithParser
 import com.intuit.player.jvm.core.expressions.ExpressionController
 import com.intuit.player.jvm.core.flow.Flow
 import com.intuit.player.jvm.core.flow.FlowController
@@ -14,9 +16,12 @@ import com.intuit.player.jvm.core.player.PlayerFlowStatus
 import com.intuit.player.jvm.core.view.ViewController
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.modules.EmptySerializersModule
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -41,7 +46,12 @@ internal class InProgressStateTest : NodeBaseTest() {
         every { mockNode.getString("name") } returns ""
         every { mockNode.getObject("value") } returns mockNode
         every { mockNode.toJson() } returns JsonPrimitive("")
-        every { node.getString("ref") } returns "someRef"
+        every { node.getObject(any()) } returns node
+        every { node["flow"] } returns node
+        val runtime: Runtime<*> = mockk()
+        every { node.runtime } returns runtime
+        every { runtime.containsKey("getSymbol") } returns true
+        every { runtime.getInvokable<String?>("getSymbol") } returns Invokable { "Symbol(hello)" }
         every { node.format } returns format
         every { format.serializersModule } returns EmptySerializersModule
         every { node.getSerializable<Any>("controllers", any()) } returns controllerState
@@ -51,15 +61,16 @@ internal class InProgressStateTest : NodeBaseTest() {
         every { node.getSerializable<Any>("current", any()) } returns null
         every { node.getSerializable<Any>("currentView", any()) } returns null
         every { node.getSerializable<Any>("data", any()) } returns DataController(node)
-        every { node.getFunction<Node>("getCurrentView") } returns null
-        every { node.getFunction<Node>("getLastViewUpdate") } returns Invokable { mockNode }
-        every { node.getFunction<Node>("getCurrentFlowState") } returns null
+        every { node.getInvokable<Node>("getCurrentView") } returns null
+        every { node.getInvokable<Node>("getLastViewUpdate") } returns Invokable { mockNode }
+        every { node.getInvokable<Node>("getCurrentFlowState") } returns null
         every { node.getObject("flowResult") } returns mockNode
-        every { node.getFunction<Unit>("transition") } returns Invokable {
+        every { node.getInvokable<Unit>("transition") } returns Invokable {
             lastTransition = it[0] as String
         }
         every { node.getSerializable("flow", Flow.serializer()) } returns Flow("flowId")
-        every { node.getObject("dataModel") } returns mockNode
+        every { node.getSerializable("dataModel", DataModelWithParser.serializer()) } returns DataModelWithParser(node)
+        every { node.nativeReferenceEquals(any()) } returns false
     }
 
     @Test
@@ -95,7 +106,7 @@ internal class InProgressStateTest : NodeBaseTest() {
 
     @Test
     fun ref() {
-        assertEquals("someRef", inProgressState.ref)
+        assertEquals("Symbol(hello)", inProgressState.ref)
     }
 
     @Test

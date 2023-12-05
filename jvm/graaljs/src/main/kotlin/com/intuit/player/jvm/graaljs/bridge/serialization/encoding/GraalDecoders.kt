@@ -1,13 +1,20 @@
 package com.intuit.player.jvm.graaljs.bridge.serialization.encoding
 
-import com.intuit.player.jvm.core.bridge.serialization.encoding.*
+import com.intuit.player.jvm.core.bridge.Invokable
+import com.intuit.player.jvm.core.bridge.serialization.encoding.AbstractRuntimeArrayListDecoder
+import com.intuit.player.jvm.core.bridge.serialization.encoding.AbstractRuntimeObjectClassDecoder
+import com.intuit.player.jvm.core.bridge.serialization.encoding.AbstractRuntimeObjectMapDecoder
+import com.intuit.player.jvm.core.bridge.serialization.encoding.AbstractRuntimeValueDecoder
+import com.intuit.player.jvm.core.bridge.serialization.encoding.NodeDecoder
 import com.intuit.player.jvm.core.experimental.RuntimeClassDiscriminator
 import com.intuit.player.jvm.graaljs.bridge.runtime.GraalRuntime.Companion.undefined
 import com.intuit.player.jvm.graaljs.bridge.serialization.format.GraalDecodingException
 import com.intuit.player.jvm.graaljs.bridge.serialization.format.GraalFormat
 import com.intuit.player.jvm.graaljs.extensions.blockingLock
 import com.intuit.player.jvm.graaljs.extensions.handleValue
+import com.intuit.player.jvm.graaljs.extensions.toInvokable
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
@@ -34,6 +41,10 @@ internal sealed class AbstractGraalDecoder(
         PolymorphicKind.SEALED -> GraalSealedClassDecoder(format, currentValue)
         else -> error("Runtime format decoders can't decode kinds of (${descriptor.kind}) into structures for $descriptor")
     }
+
+    override fun <R> decodeFunction(returnTypeSerializer: KSerializer<R>): Invokable<R> {
+        return currentValue.toInvokable(format, returnTypeSerializer) ?: error("Unable to decode Graal function using return type serializer ${returnTypeSerializer.descriptor}")
+    }
 }
 
 internal class GraalValueDecoder(format: GraalFormat, value: Value) : AbstractGraalDecoder(format, value)
@@ -58,7 +69,7 @@ internal class GraalObjectMapDecoder(override val format: GraalFormat, override 
     override fun <T> buildDecoderForSerializableElement(
         descriptor: SerialDescriptor,
         index: Int,
-        deserializer: DeserializationStrategy<T>
+        deserializer: DeserializationStrategy<T>,
     ): Decoder = when (index % 2 == 0) {
         true -> GraalValueDecoder(format, format.context.asValue(getKeyAtIndex(index)))
         false -> GraalValueDecoder(format, getElementAtIndex(index))
@@ -80,7 +91,7 @@ internal class GraalArrayListDecoder(override val format: GraalFormat, override 
     override fun <T> buildDecoderForSerializableElement(
         descriptor: SerialDescriptor,
         index: Int,
-        deserializer: DeserializationStrategy<T>
+        deserializer: DeserializationStrategy<T>,
     ): Decoder =
         GraalValueDecoder(format, decodeElement(descriptor, index))
 }
@@ -104,7 +115,7 @@ internal class GraalObjectClassDecoder(override val format: GraalFormat, overrid
     override fun <T> buildDecoderForSerializableElement(
         descriptor: SerialDescriptor,
         index: Int,
-        deserializer: DeserializationStrategy<T>
+        deserializer: DeserializationStrategy<T>,
     ): Decoder = GraalValueDecoder(format, decodeElement(descriptor, index))
 }
 
@@ -118,11 +129,10 @@ internal class GraalSealedClassDecoder(override val format: GraalFormat, overrid
     override fun <T> buildDecoderForSerializableElement(
         descriptor: SerialDescriptor,
         index: Int,
-        deserializer: DeserializationStrategy<T>
+        deserializer: DeserializationStrategy<T>,
     ): Decoder = GraalValueDecoder(format, value)
 
     override fun decodeValueElement(descriptor: SerialDescriptor, index: Int): Any? {
-
         val discriminator = (
             descriptor.annotations.firstOrNull {
                 it is RuntimeClassDiscriminator

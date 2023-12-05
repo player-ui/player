@@ -3,17 +3,29 @@ package com.intuit.player.jvm.core.player
 import com.intuit.player.jvm.core.bridge.Completable
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
+import com.intuit.player.jvm.core.bridge.getInvokable
+import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
+import com.intuit.player.jvm.core.bridge.runtime.ScriptContext
 import com.intuit.player.jvm.core.bridge.runtime.add
 import com.intuit.player.jvm.core.bridge.runtime.runtimeFactory
-import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField.Companion.NodeSerializableField
+import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField
+import com.intuit.player.jvm.core.experimental.ExperimentalPlayerApi
 import com.intuit.player.jvm.core.logger.TapableLogger
 import com.intuit.player.jvm.core.player.HeadlessPlayer.Companion.bundledSource
 import com.intuit.player.jvm.core.player.state.CompletedState
 import com.intuit.player.jvm.core.player.state.PlayerFlowState
 import com.intuit.player.jvm.core.player.state.ReleasedState
-import com.intuit.player.jvm.core.plugins.*
+import com.intuit.player.jvm.core.player.state.inProgressState
+import com.intuit.player.jvm.core.plugins.JSPluginWrapper
+import com.intuit.player.jvm.core.plugins.LoggerPlugin
+import com.intuit.player.jvm.core.plugins.PlayerPlugin
+import com.intuit.player.jvm.core.plugins.Plugin
+import com.intuit.player.jvm.core.plugins.RuntimePlugin
 import com.intuit.player.jvm.core.plugins.logging.loggers
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.net.URL
 
 /**
@@ -31,60 +43,106 @@ import java.net.URL
  *  - [JSPluginWrapper]
  *  - [PlayerPlugin]
  */
-public class HeadlessPlayer public constructor(
+public class HeadlessPlayer
+@ExperimentalPlayerApi
+@JvmOverloads
+public constructor(
     override val plugins: List<Plugin>,
-    public val runtime: Runtime<*> = runtimeFactory.create(),
+    explicitRuntime: Runtime<*>? = null,
     private val source: URL = bundledSource,
+    config: PlayerRuntimeConfig = PlayerRuntimeConfig(),
 ) : Player(), NodeWrapper {
 
     /** Convenience constructor to allow [plugins] to be passed as varargs */
-    @JvmOverloads public constructor(
+    @ExperimentalPlayerApi @JvmOverloads
+    public constructor(
         vararg plugins: Plugin,
-        runtime: Runtime<*> = runtimeFactory.create(),
-        source: URL = bundledSource
-    ) : this(plugins.toList(), runtime, source)
+        config: PlayerRuntimeConfig = PlayerRuntimeConfig(),
+        explicitRuntime: Runtime<*>? = null,
+        source: URL = bundledSource,
+    ) : this(plugins.toList(), explicitRuntime, source, config)
+
+    public constructor(
+        explicitRuntime: Runtime<*>,
+        vararg plugins: Plugin,
+    ) : this(plugins.toList(), explicitRuntime, config = explicitRuntime.config)
 
     private val player: Node
 
     override val node: Node by ::player
 
-    override val logger: TapableLogger by NodeSerializableField(TapableLogger.serializer())
+    override val logger: TapableLogger by NodeSerializableField(TapableLogger.serializer(), NodeSerializableField.CacheStrategy.Full)
 
-    override val hooks: Hooks by NodeSerializableField(Hooks.serializer())
+    override val hooks: Hooks by NodeSerializableField(Hooks.serializer(), NodeSerializableField.CacheStrategy.Full)
 
-    override val state: PlayerFlowState get() = if (player.isReleased()) ReleasedState else
-        player.getFunction<Node>("getState")!!().deserialize(PlayerFlowState.serializer())
+    override val state: PlayerFlowState get() = if (player.isReleased()) {
+        ReleasedState
+    } else {
+        player.getInvokable<Node>("getState")!!().deserialize(PlayerFlowState.serializer())
+    }
+
+    public val runtime: Runtime<*> = explicitRuntime ?: runtimeFactory.create {
+        debuggable = config.debuggable
+        coroutineExceptionHandler = config.coroutineExceptionHandler ?: CoroutineExceptionHandler { _, throwable ->
+            inProgressState?.fail(throwable) ?: logger.error(
+                "Exception caught in Player scope: ${throwable.message}",
+                throwable.stackTrace.joinToString("\n") {
+                    "\tat $it"
+                }.replaceFirst("\tat ", "\n"),
+            )
+        }
+    }
+
+    override val scope: CoroutineScope by runtime::scope
 
     init {
         /** 1. load source into the [runtime] and release lock */
-        runtime.execute(source.readText())
+        runtime.load(ScriptContext(if (runtime.config.debuggable) debugSource.readText() else source.readText(), bundledSourcePath))
 
-        /** 2. apply JS plugins and build [JSPlayerConfig] */
+        /** 2. merge explicit [LoggerPlugin]s with ones created by service loader */
+        val loggerPlugins = plugins.filterIsInstance<LoggerPlugin>().let { explicitLoggers ->
+            val explicitLoggerPlugins = explicitLoggers.map { it::class }
+            explicitLoggers + loggers { name = this@HeadlessPlayer::class.java.name }
+                .filterNot { explicitLoggerPlugins.contains(it::class) }
+        }
+
+        /** 3. apply runtime plugins and build [JSPlayerConfig] */
         val config = plugins
             .filterIsInstance<RuntimePlugin>()
             .onEach { it.apply(runtime) }
             .filterIsInstance<JSPluginWrapper>()
-            .let(::JSPlayerConfig)
+            .let { JSPlayerConfig(it, loggerPlugins) }
 
-        /** 3. Build JS headless player */
+        /** 4. build JS headless player */
         runtime.add("config", config)
         player = runtime.execute("new Player.Player(config)") as? Node
             ?: throw PlayerException("Couldn't create backing JS Player w/ config: $config")
 
-        /** 4. apply to player plugins */
+        runtime.add("player", player)
+
+        // we only have access to the logger after we have the player instance
+        runtime.checkBlockingThread = {
+            if (name == "main") {
+                scope.launch {
+                    logger.warn(
+                        "Main thread is blocking on JS runtime access: $this",
+                        stackTrace.joinToString("\n") {
+                            "\tat $it"
+                        }.replaceFirst("\tat ", "\n"),
+                    )
+                }
+            }
+        }
+
+        /** 5. apply to player plugins */
         plugins
             .filterIsInstance<PlayerPlugin>()
             .onEach { it.apply(this) }
-
-        /** 5. apply logger plugins */
-        loggers
-            .filterNot { plugins.map { it::class }.contains(it::class) }
-            .forEach(logger::addHandler)
     }
 
     override fun start(flow: String): Completable<CompletedState> = start(runtime.execute("($flow)") as Node)
 
-    public fun start(flow: Node): Completable<CompletedState> = PlayerCompletable(player.getFunction<Node>("start")!!.invoke(flow))
+    public fun start(flow: Node): Completable<CompletedState> = PlayerCompletable(player.getInvokable<Node>("start")!!.invoke(flow))
 
     /** Start a [flow] and subscribe to the result */
     public fun start(flow: Node, onComplete: (Result<CompletedState>) -> Unit): Completable<CompletedState> =
@@ -93,8 +151,8 @@ public class HeadlessPlayer public constructor(
         }
 
     override fun release() {
-        // TODO: Call state hook!
         if (!runtime.isReleased()) {
+            hooks.state.call(HashMap(), arrayOf(ReleasedState))
             runtime.release()
         }
     }
@@ -102,9 +160,13 @@ public class HeadlessPlayer public constructor(
     internal companion object {
 
         private const val bundledSourcePath = "core/player/dist/player.prod.js"
+        private const val debugSourcePath = "core/player/dist/player.dev.js"
 
         /** Gets [URL] of the bundled source */
         private val bundledSource get() = this::class.java
             .classLoader.getResource(bundledSourcePath)!!
+
+        private val debugSource get() = this::class.java
+            .classLoader.getResource(debugSourcePath)!!
     }
 }

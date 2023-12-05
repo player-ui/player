@@ -11,7 +11,7 @@ package com.intuit.player.jvm.core.experimental
     AnnotationTarget.FUNCTION,
     AnnotationTarget.PROPERTY_GETTER,
     AnnotationTarget.PROPERTY_SETTER,
-    AnnotationTarget.TYPEALIAS
+    AnnotationTarget.TYPEALIAS,
 )
 @RequiresOptIn("These Player APIs are in active development and may change. Use with caution", RequiresOptIn.Level.WARNING)
 public annotation class ExperimentalPlayerApi

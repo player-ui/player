@@ -1,6 +1,7 @@
 package com.intuit.player.jvm.utils
 
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
 import com.intuit.player.jvm.core.bridge.runtime.runtimeFactory
 import com.intuit.player.jvm.core.bridge.toJson
@@ -18,7 +19,7 @@ public open class MakeFlowModule internal constructor() : JSScriptPluginWrapper(
 
     public fun makeFlow(flow: Node): JsonElement {
         ensureInitialized()
-        return instance.getFunction<Node>("makeFlow").let(::requireNotNull)(flow).toJson()
+        return instance.getInvokable<Node>("makeFlow").let(::requireNotNull)(flow).toJson()
     }
 
     public fun makeFlow(flow: String): JsonElement {

@@ -22,6 +22,7 @@ internal class AssetContextAndroidTest {
     private fun Map<String, Any?>.toAsset(): Asset = Node(this).let(::Asset)
 
     private val assetMap = mapOf("id" to "first", "type" to "rando")
+
     @Suppress("DEPRECATION_ERROR")
     private fun renderableAsset(assetContext: AssetContext) = object : RenderableAsset(assetContext) {
         override fun initView() = TextView(context)

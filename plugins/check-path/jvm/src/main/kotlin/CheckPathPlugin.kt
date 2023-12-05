@@ -1,6 +1,7 @@
 package com.intuit.player.plugins.checkpath
 
 import com.intuit.player.jvm.core.asset.Asset
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.player.Player
 import com.intuit.player.jvm.core.plugins.JSScriptPluginWrapper
 import com.intuit.player.jvm.core.plugins.findPlugin
@@ -9,7 +10,7 @@ import com.intuit.player.jvm.core.plugins.findPlugin
 public class CheckPathPlugin : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
 
     /** Get the [Asset] represented by the [id] */
-    public fun getAsset(id: String): Asset? = instance.getFunction<Any?>("getAsset")?.invoke(id) as? Asset
+    public fun getAsset(id: String): Asset? = instance.getInvokable<Any?>("getAsset")?.invoke(id) as? Asset
 
     private companion object {
         private const val bundledSourcePath = "plugins/check-path/core/dist/check-path-plugin.prod.js"

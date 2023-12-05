@@ -106,7 +106,7 @@ internal class FlowControllerIntegrationTest : PlayerTest() {
     }
   }
 }
-"""
+""",
         )
 
         val controller = player.inProgressState!!.controllers.flow

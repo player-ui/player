@@ -2,6 +2,7 @@ package com.intuit.player.jvm.core.expressions
 
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
 import kotlinx.serialization.Serializable
 
@@ -30,7 +31,7 @@ public fun ExpressionEvaluator.evaluate(expression: Expression): Any? = when (ex
 @Serializable(ExpressionController.Serializer::class)
 public class ExpressionController(override val node: Node) : NodeWrapper, ExpressionEvaluator {
     override fun evaluate(expressions: List<String>): Any? = node
-        .getFunction<Any>("evaluate")?.invoke(expressions)
+        .getInvokable<Any>("evaluate")?.invoke(expressions)
 
     internal object Serializer : NodeWrapperSerializer<ExpressionController>(::ExpressionController)
 }

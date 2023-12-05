@@ -15,7 +15,7 @@ class MakeFlowTests {
             buildJsonObject {
                 put("id", "some-id")
                 put("type", "some-type")
-            }
+            },
         )
 
         assertTrue(flow is JsonObject)
@@ -27,7 +27,7 @@ class MakeFlowTests {
                 "data",
                 "navigation",
             ),
-            keys
+            keys,
         )
     }
 }

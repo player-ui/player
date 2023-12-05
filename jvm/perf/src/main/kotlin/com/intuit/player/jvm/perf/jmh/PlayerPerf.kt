@@ -13,7 +13,15 @@ import com.intuit.player.jvm.core.player.HeadlessPlayer
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
-import org.openjdk.jmh.annotations.*
+import org.openjdk.jmh.annotations.Benchmark
+import org.openjdk.jmh.annotations.BenchmarkMode
+import org.openjdk.jmh.annotations.CompilerControl
+import org.openjdk.jmh.annotations.Mode
+import org.openjdk.jmh.annotations.OutputTimeUnit
+import org.openjdk.jmh.annotations.Param
+import org.openjdk.jmh.annotations.Scope
+import org.openjdk.jmh.annotations.Setup
+import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
@@ -105,7 +113,7 @@ open class RuntimePlayerCreation : RuntimePerformance() {
 
     @CompilerControl(CompilerControl.Mode.DONT_INLINE)
     @Benchmark fun createHeadlessPlayer(consumer: Blackhole) {
-        consumer.consume(HeadlessPlayer(runtime = jsRuntime))
+        consumer.consume(HeadlessPlayer(explicitRuntime = jsRuntime))
     }
 
     @CompilerControl(CompilerControl.Mode.DONT_INLINE)
@@ -149,7 +157,7 @@ open class HeadlessPlayerFlowPerformance : ContentPerformance() {
 
     @CompilerControl(CompilerControl.Mode.DONT_INLINE)
     @Benchmark fun startFlow(consumer: Blackhole) {
-        val player = HeadlessPlayer(runtime = jsRuntime)
+        val player = HeadlessPlayer(explicitRuntime = jsRuntime)
         consumer.consume(runBlocking {
             suspendCoroutine<Asset?> {
                 player.hooks.viewController.tap("perf") { vc ->
@@ -167,7 +175,7 @@ open class HeadlessPlayerFlowPerformance : ContentPerformance() {
 
     @CompilerControl(CompilerControl.Mode.DONT_INLINE)
     @Benchmark fun startAndUpdateFlow(consumer: Blackhole) {
-        val player = HeadlessPlayer(runtime = jsRuntime)
+        val player = HeadlessPlayer(explicitRuntime = jsRuntime)
         consumer.consume(runBlocking {
             suspendCoroutine<Asset?> {
                 var dataController: DataController? = null

@@ -4,7 +4,10 @@ import com.intuit.player.jvm.core.asset.Asset
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
 import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeFormat
 import com.intuit.player.jvm.core.bridge.serialization.format.serializer
+import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializer
+import com.intuit.player.jvm.core.experimental.ExperimentalPlayerApi
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 
@@ -50,6 +53,14 @@ public interface Node : Map<String, Any?> {
      * Returns the value corresponding to the given [key] as a [Invokable],
      * or `null` if such a key is not present in the node or if the value is not invokable
      */
+    public fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = get(key).safeCast()
+
+    @Deprecated(
+        "Replaced with getInvokable, which requires a deserializer for the return type. Either provide a deserializer explicitly, " +
+            "or use the extension to automatically determine the correct serializer.",
+        ReplaceWith("getInvokable<R>(key)", "com.intuit.player.jvm.core.bridge.getInvokable"),
+        DeprecationLevel.WARNING,
+    )
     public fun <R> getFunction(key: String): Invokable<R>? = get(key).safeCast()
 
     /**
@@ -91,6 +102,10 @@ public interface Node : Map<String, Any?> {
     public val runtime: Runtime<*>
 
     public val format: RuntimeFormat<*> get() = runtime.format
+
+    public companion object {
+        public fun serializer(): KSerializer<Node> = NodeSerializer()
+    }
 }
 
 public val NodeWrapper.runtime: Runtime<*> get() = node.runtime
@@ -114,6 +129,49 @@ public inline fun <reified T> Node.getSerializable(key: String): T? = getSeriali
 public inline fun <reified T> Node.getSerializable(key: String, serializer: DeserializationStrategy<T>?): T? = serializer?.let {
     getSerializable(key, it)
 } ?: getSerializable(key)
+
+public inline fun <reified R> Node.getInvokable(key: String): Invokable<R>? = getInvokable(key, format.serializer())
+
+public inline fun <reified R> Node.getInvokable(key: String, deserializer: DeserializationStrategy<R>?): Invokable<R>? = deserializer?.let {
+    getInvokable(key, it)
+} ?: getInvokable(key)
+
+/**
+* Get the toString value of a symbol. Due to the current limitations of the
+* various supported JS runtimes, we can only reliably get a [String]
+* representation of symbols that are contained within a parent [Node].
+* This inherently breaks the uniqueness of symbol representation on the JVM,
+* and thus shouldn't be used to verify referential equality between symbols.
+*/
+@ExperimentalPlayerApi
+public fun Node.getSymbol(key: String): String? {
+    if (!runtime.containsKey("getSymbol")) {
+        runtime.execute(
+            """
+            function getSymbol(parent, key) {
+                const value = parent[key];
+                if (typeof value === 'symbol') return value.toString();
+                else return null;
+            }
+        """,
+        )
+    }
+
+    val getSymbol = runtime.getInvokable<String?>("getSymbol")
+        ?: throw runtime.PlayerRuntimeException("getSymbol doesn't exist in runtime")
+
+    return getSymbol(this, key)
+}
+
+/** Decode a [Node] entirely as a snapshot of its current data. Will allow for additional data access after a [Node]s runtime has been released */
+@ExperimentalPlayerApi
+internal fun Node.snapshot(): Map<String, Any?> = entries.associate { (key, value) ->
+    key to when (value) {
+        is Node -> value.snapshot()
+        is Function<*> -> null
+        else -> value
+    }
+}
 
 private inline fun <reified T> Any?.safeCast(): T? = this as? T
 

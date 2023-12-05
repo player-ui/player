@@ -2,7 +2,9 @@ package com.intuit.player.plugins.expression
 
 import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
+import com.intuit.player.jvm.core.bridge.runtime.ScriptContext
 import com.intuit.player.jvm.core.bridge.runtime.add
 import com.intuit.player.jvm.core.plugins.JSScriptPluginWrapper
 
@@ -16,26 +18,26 @@ public typealias ExpressionHandler = (List<Any?>) -> Any?
  * Any subsequent expressions registered with the same name will override previous handlers.
  */
 public class ExpressionPlugin(
-    public val map: Map<String, ExpressionHandler>
+    public val map: Map<String, ExpressionHandler>,
 ) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
 
     public constructor(vararg expressions: Pair<String, ExpressionHandler>) : this(expressions.toMap())
 
     override fun apply(runtime: Runtime<*>) {
-        runtime.execute(script)
+        runtime.load(ScriptContext(if (runtime.config.debuggable) debugScript else script, bundledSourcePath))
         runtime.add(
             "expressionHandlers",
             map.entries.fold(runtime.execute("new Map()") as Node) { acc, entry ->
                 acc.apply {
                     val (name, handler) = entry
-                    getFunction<Any?>("set")!!.invoke(
+                    getInvokable<Any?>("set")!!.invoke(
                         name,
                         Invokable { args ->
                             handler.invoke(args.drop(1))
-                        }
+                        },
                     )
                 }
-            }
+            },
         )
         instance = runtime.buildInstance("(new $name(expressionHandlers))")
     }

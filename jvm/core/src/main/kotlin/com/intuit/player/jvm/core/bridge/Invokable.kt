@@ -2,12 +2,45 @@ package com.intuit.player.jvm.core.bridge
 
 import kotlin.jvm.functions.FunctionN
 
+public fun <R> Invokable(block: (args: Array<out Any?>) -> R): Invokable<R> = object : Invokable<R> {
+    override fun invoke(vararg args: Any?): R {
+        return block(args)
+    }
+}
+
 /** [Function] extension that provides loosely-typed vararg [invoke] signature */
-public fun interface Invokable<R> : Function<R> {
+public interface Invokable<R> : Function<R>, Function0<R>, Function1<Any?, R>, Function2<Any?, Any?, R>, Function3<Any?, Any?, Any?, R>, Function4<Any?, Any?, Any?, Any?, R>, Function5<Any?, Any?, Any?, Any?, Any?, R>, Function6<Any?, Any?, Any?, Any?, Any?, Any?, R>, Function7<Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function8<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function9<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function10<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function11<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function12<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function13<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function14<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function15<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function16<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function17<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function18<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function19<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function20<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function21<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function22<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R> {
     public operator fun invoke(vararg args: Any?): R
+    override fun invoke(): R = invoke(*arrayOf())
+    override fun invoke(p1: Any?): R = invoke(*arrayOf(p1))
+    override fun invoke(p1: Any?, p2: Any?): R = invoke(*arrayOf(p1, p2))
+    override fun invoke(p1: Any?, p2: Any?, p3: Any?): R = invoke(*arrayOf(p1, p2, p3))
+    override fun invoke(p1: Any?, p2: Any?, p3: Any?, p4: Any?): R = invoke(*arrayOf(p1, p2, p3, p4))
+    override fun invoke(p1: Any?, p2: Any?, p3: Any?, p4: Any?, p5: Any?): R = invoke(*arrayOf(p1, p2, p3, p4, p5))
+    override fun invoke(p1: Any?, p2: Any?, p3: Any?, p4: Any?, p5: Any?, p6: Any?): R = invoke(*arrayOf(p1, p2, p3, p4, p5, p6))
+    override fun invoke(p1: Any?, p2: Any?, p3: Any?, p4: Any?, p5: Any?, p6: Any?, p7: Any?): R = invoke(*arrayOf(p1, p2, p3, p4, p5, p6, p7))
+    override fun invoke(p1: Any?, p2: Any?, p3: Any?, p4: Any?, p5: Any?, p6: Any?, p7: Any?, p8: Any?): R = invoke(*arrayOf(p1, p2, p3, p4, p5, p6, p7, p8))
+    override fun invoke(p1: Any?, p2: Any?, p3: Any?, p4: Any?, p5: Any?, p6: Any?, p7: Any?, p8: Any?, p9: Any?): R = invoke(*arrayOf(p1, p2, p3, p4, p5, p6, p7, p8, p9))
+    override fun invoke(p1: Any?, p2: Any?, p3: Any?, p4: Any?, p5: Any?, p6: Any?, p7: Any?, p8: Any?, p9: Any?, p10: Any?): R = invoke(*arrayOf(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10))
+    override fun invoke(p1: Any?, p2: Any?, p3: Any?, p4: Any?, p5: Any?, p6: Any?, p7: Any?, p8: Any?, p9: Any?, p10: Any?, p11: Any?): R = invoke(*arrayOf(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11))
+    override fun invoke(p1: Any?, p2: Any?, p3: Any?, p4: Any?, p5: Any?, p6: Any?, p7: Any?, p8: Any?, p9: Any?, p10: Any?, p11: Any?, p12: Any?): R = invoke(*arrayOf(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12))
+    override fun invoke(p1: Any?, p2: Any?, p3: Any?, p4: Any?, p5: Any?, p6: Any?, p7: Any?, p8: Any?, p9: Any?, p10: Any?, p11: Any?, p12: Any?, p13: Any?): R = invoke(*arrayOf(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13))
+    override fun invoke(p1: Any?, p2: Any?, p3: Any?, p4: Any?, p5: Any?, p6: Any?, p7: Any?, p8: Any?, p9: Any?, p10: Any?, p11: Any?, p12: Any?, p13: Any?, p14: Any?): R = invoke(*arrayOf(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14))
+    override fun invoke(p1: Any?, p2: Any?, p3: Any?, p4: Any?, p5: Any?, p6: Any?, p7: Any?, p8: Any?, p9: Any?, p10: Any?, p11: Any?, p12: Any?, p13: Any?, p14: Any?, p15: Any?): R = invoke(*arrayOf(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15))
+    override fun invoke(p1: Any?, p2: Any?, p3: Any?, p4: Any?, p5: Any?, p6: Any?, p7: Any?, p8: Any?, p9: Any?, p10: Any?, p11: Any?, p12: Any?, p13: Any?, p14: Any?, p15: Any?, p16: Any?): R = invoke(*arrayOf(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16))
+    override fun invoke(p1: Any?, p2: Any?, p3: Any?, p4: Any?, p5: Any?, p6: Any?, p7: Any?, p8: Any?, p9: Any?, p10: Any?, p11: Any?, p12: Any?, p13: Any?, p14: Any?, p15: Any?, p16: Any?, p17: Any?): R = invoke(*arrayOf(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17))
+    override fun invoke(p1: Any?, p2: Any?, p3: Any?, p4: Any?, p5: Any?, p6: Any?, p7: Any?, p8: Any?, p9: Any?, p10: Any?, p11: Any?, p12: Any?, p13: Any?, p14: Any?, p15: Any?, p16: Any?, p17: Any?, p18: Any?): R = invoke(*arrayOf(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18))
+    override fun invoke(p1: Any?, p2: Any?, p3: Any?, p4: Any?, p5: Any?, p6: Any?, p7: Any?, p8: Any?, p9: Any?, p10: Any?, p11: Any?, p12: Any?, p13: Any?, p14: Any?, p15: Any?, p16: Any?, p17: Any?, p18: Any?, p19: Any?): R = invoke(*arrayOf(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19))
+    override fun invoke(p1: Any?, p2: Any?, p3: Any?, p4: Any?, p5: Any?, p6: Any?, p7: Any?, p8: Any?, p9: Any?, p10: Any?, p11: Any?, p12: Any?, p13: Any?, p14: Any?, p15: Any?, p16: Any?, p17: Any?, p18: Any?, p19: Any?, p20: Any?): R = invoke(*arrayOf(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20))
+    override fun invoke(p1: Any?, p2: Any?, p3: Any?, p4: Any?, p5: Any?, p6: Any?, p7: Any?, p8: Any?, p9: Any?, p10: Any?, p11: Any?, p12: Any?, p13: Any?, p14: Any?, p15: Any?, p16: Any?, p17: Any?, p18: Any?, p19: Any?, p20: Any?, p21: Any?): R = invoke(*arrayOf(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21))
+    override fun invoke(p1: Any?, p2: Any?, p3: Any?, p4: Any?, p5: Any?, p6: Any?, p7: Any?, p8: Any?, p9: Any?, p10: Any?, p11: Any?, p12: Any?, p13: Any?, p14: Any?, p15: Any?, p16: Any?, p17: Any?, p18: Any?, p19: Any?, p20: Any?, p21: Any?, p22: Any?): R = invoke(*arrayOf(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22))
 }
 
 /** Extension to convert an [Invokable] to some [functionTypeName] */
+@Deprecated(
+    "Invokable extend Functions automatically",
+    level = DeprecationLevel.ERROR,
+)
 public fun <R> Invokable<R>.toFunction(functionTypeName: String): Function<R> = when (functionTypeName) {
     "Function0" -> object : Function0<R> {
         override fun invoke() = this@toFunction()

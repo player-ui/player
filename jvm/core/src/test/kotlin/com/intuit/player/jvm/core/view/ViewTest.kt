@@ -1,20 +1,21 @@
 package com.intuit.player.jvm.core.view
 
 import com.intuit.player.jvm.core.NodeBaseTest
-import com.intuit.player.jvm.core.bridge.Node
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
-import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 internal class ViewTest : NodeBaseTest() {
-    @MockK
-    private lateinit var hooksNode: Node
+    private val hooks by lazy {
+        ViewHooks(node)
+    }
 
     @BeforeEach
     fun setUpMocks() {
-        every { node.getObject("hooks") } returns hooksNode
+        every { node.getObject("hooks") } returns node
+        every { node.getSerializable<ViewHooks>("hooks", any()) } returns hooks
+        every { node.nativeReferenceEquals(any()) } returns false
     }
 
     val view by lazy {
@@ -23,6 +24,6 @@ internal class ViewTest : NodeBaseTest() {
 
     @Test
     fun hooks() {
-        assertNotNull(view.hooks)
+        assertEquals(view.hooks, hooks)
     }
 }

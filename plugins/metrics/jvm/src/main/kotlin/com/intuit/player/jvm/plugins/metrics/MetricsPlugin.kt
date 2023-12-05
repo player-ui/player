@@ -1,7 +1,9 @@
 package com.intuit.player.jvm.plugins.metrics
 
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
+import com.intuit.player.jvm.core.bridge.runtime.ScriptContext
 import com.intuit.player.jvm.core.bridge.runtime.add
 import com.intuit.player.jvm.core.player.Player
 import com.intuit.player.jvm.core.plugins.JSScriptPluginWrapper
@@ -11,11 +13,11 @@ import com.intuit.player.jvm.core.plugins.findPlugin
 public typealias RenderEndHandler = (Timing?, RenderMetrics?, PlayerFlowMetrics?) -> Unit
 
 public class MetricsPlugin(
-    private val handler: RenderEndHandler
+    private val handler: RenderEndHandler,
 ) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
 
     override fun apply(runtime: Runtime<*>) {
-        runtime.execute(script)
+        runtime.load(ScriptContext(if (runtime.config.debuggable) debugScript else script, bundledSourcePath))
         runtime.add(
             "handlers",
             mapOf(
@@ -23,16 +25,16 @@ public class MetricsPlugin(
                     handler.invoke(
                         timing.deserialize(Timing.serializer()),
                         renderMetrics.deserialize(RenderMetrics.serializer()),
-                        flowMetrics.deserialize(PlayerFlowMetrics.serializer())
+                        flowMetrics.deserialize(PlayerFlowMetrics.serializer()),
                     )
                 },
-                "trackRenderTime" to true
-            )
+                "trackRenderTime" to true,
+            ),
         )
         instance = runtime.buildInstance("(new $name(handlers))")
     }
 
-    public fun renderEnd(): Unit = instance.getFunction<Unit>("renderEnd")!!()
+    public fun renderEnd(): Unit = instance.getInvokable<Unit>("renderEnd")!!()
 
     private companion object {
         private const val bundledSourcePath = "plugins/metrics/core/dist/metrics-plugin.prod.js"
@@ -47,7 +49,7 @@ public typealias RequestTimeClosure = () -> Int
 
 /** Wrapper around RequestTimeWebPlugin, which needs to apply to MetricsPlugin */
 internal class RequestTimeWebPlugin(
-    private val getRequestTime: RequestTimeClosure
+    private val getRequestTime: RequestTimeClosure,
 ) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
 
     override fun apply(runtime: Runtime<*>) {
@@ -55,14 +57,14 @@ internal class RequestTimeWebPlugin(
             runtime.execute(script)
         }
         runtime.add(
-            "callback"
+            "callback",
         ) getRequestTime@{ getRequestTime.invoke() }
         instance = runtime.buildInstance("(new $name(callback))")
     }
 
     public fun apply(metricsPlugin: MetricsPlugin) {
         apply(metricsPlugin.instance.runtime)
-        instance.getFunction<Any>("apply")?.invoke(metricsPlugin.instance)
+        instance.getInvokable<Any>("apply")?.invoke(metricsPlugin.instance)
     }
 
     private companion object {
@@ -73,7 +75,7 @@ internal class RequestTimeWebPlugin(
 
 /** A plugin to supply request time to MetricsPlugin */
 public class RequestTimePlugin(
-    private val getRequestTime: RequestTimeClosure
+    private val getRequestTime: RequestTimeClosure,
 ) : PlayerPlugin {
     private val requestTimeWebPlugin = RequestTimeWebPlugin(getRequestTime)
     override fun apply(player: Player) {

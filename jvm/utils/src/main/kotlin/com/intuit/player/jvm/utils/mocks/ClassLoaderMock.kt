@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 public data class ClassLoaderMock(
     override val group: String,
     override val name: String,
-    override val path: String
+    override val path: String,
 ) : Mock<ClassLoader> {
 
     /** Helper to provide default [ClassLoader] overload of [read] */

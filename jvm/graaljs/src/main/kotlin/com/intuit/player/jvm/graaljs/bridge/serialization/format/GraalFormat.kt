@@ -14,7 +14,7 @@ import org.graalvm.polyglot.Context
 import org.graalvm.polyglot.Value
 
 public class GraalFormat(
-    config: GraalFormatConfiguration
+    config: GraalFormatConfiguration,
 ) : AbstractRuntimeFormat<Value>(config) {
 
     public val context: Context = (config.runtime as GraalRuntime).context
@@ -31,7 +31,7 @@ public class GraalFormat(
 
 public data class GraalFormatConfiguration internal constructor(
     override val runtime: Runtime<Value>,
-    override val serializersModule: SerializersModule
+    override val serializersModule: SerializersModule,
 ) : RuntimeFormatConfiguration<Value>
 
 internal inline fun <reified T> GraalFormat.encodeToGraalValue(value: T): Value =

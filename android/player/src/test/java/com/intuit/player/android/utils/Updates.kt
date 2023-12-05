@@ -29,18 +29,21 @@ internal fun AndroidPlayer.updates(flow: JsonElement, take: Int = 1) = updates(f
 internal fun AndroidPlayer.updates(flow: String, take: Int = 1): Flow<Update> = callbackFlow {
     var count = 0
     onUpdate { asset, _ ->
-        offer(Update.Asset(asset, count))
+        trySend(Update.Asset(asset, count)).isSuccess
         if (++count >= take) close()
     }
 
     hooks.state.tap { state ->
-        offer(Update.State(state ?: ErrorState.from("state was null")))
+        trySend(Update.State(state ?: ErrorState.from("state was null"))).isSuccess
     }
 
     start(flow).onComplete {
         close(
-            it.exceptionOrNull() ?: if (count != take)
-                PlayerException("did not meet expected asset updates ($count != $take)") else null
+            it.exceptionOrNull() ?: if (count != take) {
+                PlayerException("did not meet expected asset updates ($count != $take)")
+            } else {
+                null
+            },
         )
     }
 

@@ -32,6 +32,7 @@ class ActionTest : AssetTest("reference-assets") {
             repeat(10) {
                 assertEquals("Count: $it", text.toString())
                 performClick()
+                blockUntilRendered()
             }
         }
 
@@ -50,6 +51,7 @@ class ActionTest : AssetTest("reference-assets") {
         collectionValues[0].shouldBeView<Button> {
             assertEquals("End the flow (success)", text.toString())
             performClick()
+            blockUntilRendered()
         }
 
         currentState.shouldBePlayerState<CompletedState> {
@@ -67,6 +69,7 @@ class ActionTest : AssetTest("reference-assets") {
         collectionValues[1].shouldBeView<Button> {
             assertEquals("End the flow (error)", text.toString())
             performClick()
+            blockUntilRendered()
         }
 
         currentState.shouldBePlayerState<ErrorState> {

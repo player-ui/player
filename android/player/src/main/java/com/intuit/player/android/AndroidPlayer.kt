@@ -2,9 +2,15 @@ package com.intuit.player.android
 
 import android.content.Context
 import android.view.View
+import com.alexii.j2v8debugger.ScriptSourceProvider
+import com.intuit.hooks.BailResult
 import com.intuit.hooks.HookContext
+import com.intuit.hooks.SyncBailHook
+import com.intuit.hooks.SyncHook
 import com.intuit.hooks.SyncWaterfallHook
+import com.intuit.player.android.AndroidPlayer.Companion.injectDefaultPlugins
 import com.intuit.player.android.asset.RenderableAsset
+import com.intuit.player.android.debug.UnsupportedScriptProvider
 import com.intuit.player.android.extensions.Styles
 import com.intuit.player.android.extensions.overlayStyles
 import com.intuit.player.android.extensions.removeSelf
@@ -13,21 +19,26 @@ import com.intuit.player.android.registry.RegistryPlugin
 import com.intuit.player.jvm.core.asset.Asset
 import com.intuit.player.jvm.core.bridge.Completable
 import com.intuit.player.jvm.core.bridge.format
+import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.player.jvm.core.bridge.serialization.format.registerContextualSerializer
 import com.intuit.player.jvm.core.logger.TapableLogger
-import com.intuit.player.jvm.core.player.*
+import com.intuit.player.jvm.core.player.HeadlessPlayer
+import com.intuit.player.jvm.core.player.Player
+import com.intuit.player.jvm.core.player.PlayerException
 import com.intuit.player.jvm.core.player.state.CompletedState
 import com.intuit.player.jvm.core.player.state.PlayerFlowState
+import com.intuit.player.jvm.core.player.state.inProgressState
 import com.intuit.player.jvm.core.plugins.LoggerPlugin
 import com.intuit.player.jvm.core.plugins.Plugin
 import com.intuit.player.jvm.core.plugins.findPlugin
 import com.intuit.player.plugins.beacon.BeaconPlugin
 import com.intuit.player.plugins.coroutines.FlowScopePlugin
 import com.intuit.player.plugins.pubsub.PubSubPlugin
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.*
-import kotlinx.serialization.modules.plus
 import kotlin.reflect.KClass
+
+public typealias AndroidPlayerConfig = AndroidPlayer.Config
 
 /**
  * [android.view.View] [Player] that is backed by another [Player].
@@ -37,12 +48,13 @@ import kotlin.reflect.KClass
 public class AndroidPlayer private constructor(
     private val player: HeadlessPlayer,
     override val plugins: List<Plugin> = player.plugins,
-) : Player() {
+) : Player(), ScriptSourceProvider by player.runtime as? ScriptSourceProvider ?: UnsupportedScriptProvider(player.runtime) {
 
     /** Convenience constructor to provide vararg style [plugins] parameter */
     public constructor(
         vararg plugins: Plugin,
-    ) : this(plugins.toList())
+        config: Config = Config(),
+    ) : this(plugins.toList(), config)
 
     /**
      * Constructor that takes a [context] and collection of [Plugin]s.
@@ -52,7 +64,8 @@ public class AndroidPlayer private constructor(
      */
     public constructor(
         plugins: List<Plugin>,
-    ) : this(HeadlessPlayer(*plugins.injectDefaultPlugins().toTypedArray()))
+        config: Config = Config(),
+    ) : this(HeadlessPlayer(plugins.injectDefaultPlugins(), config = config))
 
     /**
      * Allow the [AndroidPlayer] to be built on top of a pre-existing
@@ -84,15 +97,42 @@ public class AndroidPlayer private constructor(
             public fun call(context: Context): Context = super.call(
                 context,
                 { f, acc, hookCtx -> f(hookCtx, acc) },
-                { f, hookCtx -> f(hookCtx, context) }
+                { f, hookCtx -> f(hookCtx, context) },
             )
         }
+
+        internal class RecycleHook : SyncHook<(HookContext) -> Unit>() {
+            public fun call(): Unit = super.call { f, context ->
+                f(context)
+            }
+        }
+
+        internal class ReleaseHook : SyncHook<(HookContext) -> Unit>() {
+            public fun call(): Unit = super.call { f, context ->
+                f(context)
+            }
+        }
+
+        public class UpdateHook : SyncBailHook<(RenderableAsset?) -> BailResult<Unit>, Unit>() {
+            public fun call(asset: RenderableAsset?, default: (HookContext) -> Unit): Unit? = super.call(
+                { f, _ ->
+                    f(asset)
+                },
+                default,
+            )
+        }
+
         public val context: ContextHook = ContextHook()
+        public val update: UpdateHook = UpdateHook()
+        internal val recycle: RecycleHook = RecycleHook()
+        internal val release: ReleaseHook = ReleaseHook()
     }
 
     override val hooks: Hooks = Hooks(player.hooks)
 
     override val state: PlayerFlowState by player::state
+
+    override val scope: CoroutineScope by player::scope
 
     override fun start(flow: String): Completable<CompletedState> = player.start(flow)
 
@@ -115,8 +155,9 @@ public class AndroidPlayer private constructor(
     /** Helper provided to reduce overhead for asset registrations with metaData */
     public fun <T : RenderableAsset> registerAsset(klass: KClass<T>, props: Map<String, Any>, factory: (AssetContext) -> RenderableAsset) {
         assetRegistry.register(props, factory)
-        if (player.format.serializersModule.getContextual(klass) == null)
+        if (player.format.serializersModule.getContextual(klass) == null) {
             player.format.registerContextualSerializer(klass, assetSerializer.conform(klass))
+        }
     }
 
     /** Apply [AndroidPlayerPlugin]s last */
@@ -139,7 +180,16 @@ public class AndroidPlayer private constructor(
                 transition.value = true
                 clearCaches()
                 view?.hooks?.onUpdate?.tap { asset ->
-                    assetHandler(expandAsset(asset), transition.value)
+                    try {
+                        expandAsset(asset).let { expandedAsset ->
+                            hooks.update.call(expandedAsset) {
+                                assetHandler(expandedAsset, transition.value)
+                            }
+                        }
+                    } catch (exception: Exception) {
+                        logger.error("Error while expanding ${asset?.id}", exception)
+                        inProgressState?.fail(PlayerException("Error while expanding ${asset?.id}", exception))
+                    }
                 }
             }
         }
@@ -207,13 +257,18 @@ public class AndroidPlayer private constructor(
      * prevent a leak.
      */
     public fun recycle() {
+        // TODO: Remove this check by enhancing TapableLogger to out-last Player lifecycle to use default
+        if (!player.runtime.isReleased()) logger.debug("AndroidPlayer: recycling player")
         clearCaches()
-        // TODO: Allow [AndroidPlayerPlugins] the chance to "recycle" too
+        hooks.recycle.call()
     }
 
     override fun release() {
+        // TODO: Remove this check by enhancing TapableLogger to out-last Player lifecycle to use default
+        if (!player.runtime.isReleased()) player.logger.debug("AndroidPlayer: releasing player")
         clearCaches()
         player.release()
+        hooks.release.call()
     }
 
     /**
@@ -252,8 +307,16 @@ public class AndroidPlayer private constructor(
         /** Helper to add default plugins if there isn't already an instance of that plugin */
         private fun List<Plugin>.injectDefaultPlugins() = buildDefaultPlugins()
             .fold(this) { plugins, (defaultPluginClass, defaultPlugin) ->
-                if (plugins.filterIsInstance(defaultPluginClass).isEmpty()) plugins + defaultPlugin
-                else plugins
+                if (plugins.filterIsInstance(defaultPluginClass).isEmpty()) {
+                    plugins + defaultPlugin
+                } else {
+                    plugins
+                }
             }
     }
+
+    public data class Config(
+        override var debuggable: Boolean = false,
+        override var coroutineExceptionHandler: CoroutineExceptionHandler? = null,
+    ) : PlayerRuntimeConfig()
 }

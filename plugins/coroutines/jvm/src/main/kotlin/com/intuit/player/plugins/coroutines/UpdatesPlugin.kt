@@ -2,17 +2,17 @@ package com.intuit.player.plugins.coroutines
 
 import com.intuit.player.jvm.core.asset.Asset
 import com.intuit.player.jvm.core.player.Player
-import com.intuit.player.jvm.core.player.state.ReleasedState
 import com.intuit.player.jvm.core.plugins.PlayerPlugin
 import com.intuit.player.jvm.core.plugins.findPlugin
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 
 /** [PlayerPlugin] that converts view updates to a [ReceiveChannel] and provides functionality for waiting for an update */
 public class UpdatesPlugin : PlayerPlugin {
-
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
 
     private val _updates: Channel<Asset?> = Channel()
 
@@ -40,15 +40,11 @@ public class UpdatesPlugin : PlayerPlugin {
         player.hooks.viewController.tap { vc ->
             vc?.hooks?.view?.tap { v ->
                 v?.hooks?.onUpdate?.tap { asset ->
-                    scope.launch {
+                    player.scope.launch {
                         _updates.send(asset)
                     }
                 }
             }
-        }
-
-        player.hooks.state.tap { state ->
-            if (state is ReleasedState) scope.cancel()
         }
     }
 }

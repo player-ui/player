@@ -10,8 +10,10 @@ import com.intuit.player.jvm.core.utils.InternalPlayerApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
@@ -39,7 +41,7 @@ public class Promise(override val node: Node) : NodeWrapper {
      */
     public fun <Expected : Any, Next : Any> then(deserializer: DeserializationStrategy<Expected>, block: (Expected?) -> Next?): Promise =
         Promise(
-            node.getFunction<Node>("then")?.invoke(
+            node.getInvokable<Node>("then")?.invoke(
                 { arg: Any? ->
                     try {
                         block(
@@ -51,17 +53,21 @@ public class Promise(override val node: Node) : NodeWrapper {
                                 //  the value, since that _would_ be wrapped in a holder able to be generically
                                 //  deserialized
                                 is Node -> arg.deserialize(deserializer)
-                                else -> if (deserializer.isJsonElementSerializer) Json.encodeToJsonElement(
-                                    GenericSerializer(),
-                                    arg,
-                                ) else arg
-                            } as? Expected
+                                else -> if (deserializer.isJsonElementSerializer) {
+                                    Json.encodeToJsonElement(
+                                        GenericSerializer(),
+                                        arg,
+                                    )
+                                } else {
+                                    arg
+                                }
+                            } as? Expected,
                         )
                     } catch (e: Throwable) {
                         Promise.reject(e)
                     }
-                }
-            ) ?: throw PromiseException("then did not return valid Promise")
+                },
+            ) ?: throw PromiseException("then did not return valid Promise"),
         )
 
     /**
@@ -74,12 +80,15 @@ public class Promise(override val node: Node) : NodeWrapper {
      */
     public fun <Next : Any> catch(block: (Throwable) -> Next?): Promise =
         Promise(
-            node.getFunction<Node>("catch")?.invoke(
+            node.getInvokable<Node>("catch")?.invoke(
                 { arg: Any? ->
                     try {
                         // Attempt to dynamically build exception from JS error
-                        if (arg is Exception) block(arg) else
+                        if (arg is Exception) {
+                            block(arg)
+                        } else {
                             block((arg as Node).deserialize())
+                        }
                     } catch (e: Exception) {
                         // fallback to simple String representation of error
                         // if you are debugging and the stacktrace leads you
@@ -87,8 +96,8 @@ public class Promise(override val node: Node) : NodeWrapper {
                         // be very helpful
                         block(PromiseException(arg.toString()))
                     }
-                }
-            ) ?: throw PromiseException("then did not return valid Promise")
+                },
+            ) ?: throw PromiseException("then did not return valid Promise"),
         )
 
     /** Converts the [Promise] into a [Completable] to enable awaiting it to resolve or reject  */
@@ -106,7 +115,7 @@ public class Promise(override val node: Node) : NodeWrapper {
             try {
                 onComplete {
                     when {
-                        it.isSuccess -> offer(it.getOrNull())
+                        it.isSuccess -> trySend(it.getOrNull())
                         it.isFailure -> close(it.exceptionOrNull())
                     }
                 }
@@ -149,28 +158,33 @@ public val Node.Promise: Promise.Api get() = runtime.Promise
 public val Runtime<*>.Promise: Promise.Api get() = getObject("Promise")?.let { promise ->
     object : Promise.Api {
         override fun <T : Any> resolve(vararg values: T): Promise = promise
-            .getFunction<Node>("resolve")?.invoke(*values)?.let(::Promise)
+            .getInvokable<Node>("resolve")?.invoke(*values)?.let(::Promise)
             ?: throw PromiseException("Could not resolve with values: $values")
 
         override fun <T : Any> reject(vararg values: T): Promise = promise
-            .getFunction<Node>("reject")?.invoke(*values)?.let(::Promise)
+            .getInvokable<Node>("reject")?.invoke(*values)?.let(::Promise)
             ?: throw PromiseException("Could not reject with values: $values")
     }
 } ?: throw PlayerRuntimeException("'Promise' not defined in runtime")
 
 /** Helper to bridge complex [Promise] logic with the JS promise constructor */
-public fun <T : Any> Runtime<*>.Promise(block: ((T) -> Unit, (Throwable) -> Unit) -> Unit): Promise {
+public fun <T : Any> Runtime<*>.Promise(block: suspend ((T) -> Unit, (Throwable) -> Unit) -> Unit): Promise {
     val key = "promiseHandler_${UUID.randomUUID().toString().replace("-", "")}"
     add(key) { resolve: Invokable<Any?>, reject: Invokable<Any?> ->
-        try {
-            block({ resolve(it) }, { reject(it) })
-        } catch (e: Throwable) {
-            reject(e)
+        runtime.scope.launch {
+            try {
+                block({ runtime.scope.ensureActive(); resolve(it) }, { runtime.scope.ensureActive(); reject(it) })
+            } catch (e: Throwable) {
+                runtime.scope.ensureActive()
+                reject(e)
+            }
         }
+
+        Unit
     }
 
     return Promise(
         execute("(new Promise($key))") as? Node
-            ?: throw PromiseException("Error creating promise")
+            ?: throw PromiseException("Error creating promise"),
     )
 }

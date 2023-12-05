@@ -6,8 +6,10 @@ import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeContainer
 import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeFactory
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
+import com.intuit.player.jvm.core.bridge.runtime.ScriptContext
 import com.intuit.player.jvm.core.bridge.serialization.serializers.playerSerializersModule
 import com.intuit.player.jvm.core.player.PlayerException
+import com.intuit.player.jvm.core.utils.InternalPlayerApi
 import com.intuit.player.jvm.graaljs.bridge.GraalNode
 import com.intuit.player.jvm.graaljs.bridge.serialization.format.GraalFormat
 import com.intuit.player.jvm.graaljs.bridge.serialization.format.GraalFormatConfiguration
@@ -26,12 +28,16 @@ import kotlinx.serialization.modules.plus
 import org.graalvm.polyglot.Context
 import org.graalvm.polyglot.Value
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.coroutines.EmptyCoroutineContext
 
 public fun Runtime(runtime: Context, config: GraalRuntimeConfig = GraalRuntimeConfig()): Runtime<Value> = GraalRuntime(config)
 
 internal class GraalRuntime(
-    private val config: GraalRuntimeConfig
+    override val config: GraalRuntimeConfig,
 ) : Runtime<Value> {
+
+    override val dispatcher: Nothing
+        get() = throw UnsupportedOperationException("dispatcher not defined for GraalRuntime")
 
     val context: Context by config::graalContext
 
@@ -40,13 +46,14 @@ internal class GraalRuntime(
             this,
             playerSerializersModule + SerializersModule {
                 contextual(Value::class, GraalValueSerializer)
-            }
-        )
+            },
+        ),
     )
 
     companion object {
         val Context.isReleased: Boolean
-            get() = contextRuntimeMap[this]?.released ?: throw PlayerException("Graal Context is not associated with a runtime")
+            get() = contextRuntimeMap[this]?.released
+                ?: throw PlayerException("Graal Context is not associated with a runtime")
         val Context.undefined: Value
             get() = eval("js", "undefined")
         private val contextRuntimeMap: MutableMap<Context, GraalRuntime> = hashMapOf()
@@ -62,11 +69,15 @@ internal class GraalRuntime(
     }
 
     override val scope: CoroutineScope by lazy {
-        CoroutineScope(Dispatchers.Default + SupervisorJob())
+        CoroutineScope(Dispatchers.Default + SupervisorJob() + (config.coroutineExceptionHandler ?: EmptyCoroutineContext))
     }
 
     override fun execute(script: String): Any? = context.blockingLock {
         context.eval("js", script).handleValue(format)
+    }
+
+    override fun load(scriptContext: ScriptContext) = context.blockingLock {
+        context.eval("js", scriptContext.script).handleValue(format)
     }
 
     override fun add(name: String, value: Value) {
@@ -87,6 +98,9 @@ internal class GraalRuntime(
         }
     }
 
+    @InternalPlayerApi
+    override var checkBlockingThread: Thread.() -> Unit = {}
+
     override fun toString(): String = "Graal"
 
     private val backingNode: Node = GraalNode(context.getBindings("js"), this)
@@ -101,6 +115,7 @@ internal class GraalRuntime(
     override fun isEmpty(): Boolean = backingNode.isEmpty()
     override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>): T? =
         backingNode.getSerializable(key, deserializer)
+
     override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T = backingNode.deserialize(deserializer)
     override fun isReleased(): Boolean = backingNode.isReleased()
     override fun isUndefined(): Boolean = backingNode.isUndefined()
@@ -110,6 +125,7 @@ internal class GraalRuntime(
     override fun getDouble(key: String): Double? = backingNode.getDouble(key)
     override fun getLong(key: String): Long? = backingNode.getLong(key)
     override fun getBoolean(key: String): Boolean? = backingNode.getBoolean(key)
+    override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = backingNode.getInvokable(key, deserializationStrategy)
     override fun <R> getFunction(key: String): Invokable<R>? = backingNode.getFunction(key)
     override fun getList(key: String): List<*>? = backingNode.getList(key)
     override fun getObject(key: String): Node? = backingNode.getObject(key)
@@ -123,7 +139,7 @@ public object GraalJS : PlayerRuntimeFactory<GraalRuntimeConfig> {
 }
 
 public data class GraalRuntimeConfig(
-    var graalContext: Context = PlayerContextFactory.context
+    var graalContext: Context = PlayerContextFactory.context,
 ) : PlayerRuntimeConfig()
 
 public class GraalRuntimeContainer : PlayerRuntimeContainer {

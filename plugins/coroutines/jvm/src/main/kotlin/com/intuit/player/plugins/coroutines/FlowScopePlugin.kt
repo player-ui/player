@@ -3,10 +3,15 @@ package com.intuit.player.plugins.coroutines
 import com.intuit.player.jvm.core.flow.Flow
 import com.intuit.player.jvm.core.player.Player
 import com.intuit.player.jvm.core.player.state.InProgressState
+import com.intuit.player.jvm.core.player.subScope
 import com.intuit.player.jvm.core.plugins.PlayerPlugin
 import com.intuit.player.jvm.core.plugins.findPlugin
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.job
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /** Simple [PlayerPlugin] that provides a [CoroutineScope] reflective of the current [Flow] */
 public class FlowScopePlugin : PlayerPlugin {
@@ -20,14 +25,14 @@ public class FlowScopePlugin : PlayerPlugin {
             flowScope?.cancel("player changed state: $state")
             if (state is InProgressState) {
                 // only create a new scope for new flows, determined on InProgressState updates
-                flowScope = CoroutineScope(Dispatchers.Default + FlowContext(state.flow) + SupervisorJob())
+                flowScope = player.subScope(FlowContext(state.flow))
             }
         }
     }
 
     /** Build a child scope of the current [flowScope] to ensure that these scopes will be structured according to the current [Flow] */
-    public fun subScope(coroutineContext: CoroutineContext = Dispatchers.Default): CoroutineScope? = flowScope?.let {
-        CoroutineScope(it.coroutineContext[Job].let(::SupervisorJob) + coroutineContext)
+    public fun subScope(coroutineContext: CoroutineContext = EmptyCoroutineContext): CoroutineScope? = flowScope?.let {
+        CoroutineScope(it.coroutineContext + SupervisorJob(it.coroutineContext.job) + coroutineContext)
     }
 
     /** [CoroutineContext.Element] that contains the [Flow] bound to the current [CoroutineContext] */
@@ -52,5 +57,5 @@ public val Player.flowScopePlugin: FlowScopePlugin? get() = findPlugin()
 public val Player.flowScope: CoroutineScope? get() = flowScopePlugin?.flowScope
 
 /** Convenience method for building a subscope of the [flowScope] */
-public fun Player.subScope(coroutineContext: CoroutineContext = Dispatchers.Default): CoroutineScope? =
+public fun Player.subScope(coroutineContext: CoroutineContext = EmptyCoroutineContext): CoroutineScope? =
     flowScopePlugin?.subScope(coroutineContext)

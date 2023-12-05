@@ -2,6 +2,7 @@ package com.intuit.player.jvm.graaljs.bridge.format
 
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.player.jvm.graaljs.base.GraalTest
 import com.intuit.player.jvm.graaljs.bridge.serialization.format.encodeToGraalValue
@@ -86,7 +87,7 @@ internal class GraalFormatTest : GraalTest() {
 
         val simple = format.decodeFromRuntimeValue(
             Simple.serializer(),
-            graalObject
+            graalObject,
         )
 
         Assertions.assertEquals(3, simple.one)
@@ -96,7 +97,7 @@ internal class GraalFormatTest : GraalTest() {
     @Test
     fun `decode into Node backed serializable`() = format.context.blockingLock {
         data class Simple(override val node: Node) : NodeWrapper {
-            fun increment(value: Int) = node.getFunction<Int>("increment")!!(value)
+            fun increment(value: Int) = node.getInvokable<Int>("increment")!!(value)
         }
 
         val graalObject = format.context.eval("js", "new Object()")
@@ -104,12 +105,12 @@ internal class GraalFormatTest : GraalTest() {
             "increment",
             ProxyExecutable { args ->
                 args[0].asInt() + 1
-            }
+            },
         )
 
         val simple = format.decodeFromRuntimeValue(
             NodeWrapperSerializer(::Simple),
-            graalObject
+            graalObject,
         )
 
         Assertions.assertEquals(1, simple.increment(0))
@@ -129,12 +130,12 @@ internal class GraalFormatTest : GraalTest() {
             "increment",
             ProxyExecutable { args ->
                 args[0].asInt() + 1
-            }
+            },
         )
 
         val simple = format.decodeFromRuntimeValue(
             Data.serializer(),
-            graalObject
+            graalObject,
         )
 
         Assertions.assertEquals(3, simple.one)

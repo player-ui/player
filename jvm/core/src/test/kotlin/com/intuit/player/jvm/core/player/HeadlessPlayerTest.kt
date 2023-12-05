@@ -1,6 +1,7 @@
 package com.intuit.player.jvm.core.player
 
 import com.intuit.player.jvm.core.bridge.JSErrorException
+import com.intuit.player.jvm.core.bridge.PlayerRuntimeException
 import com.intuit.player.jvm.core.bridge.global.JSMap
 import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.player.jvm.core.data.get
@@ -10,23 +11,49 @@ import com.intuit.player.jvm.core.flow.Flow.Companion.UNKNOWN_ID
 import com.intuit.player.jvm.core.flow.forceTransition
 import com.intuit.player.jvm.core.flow.state.NavigationFlowStateType
 import com.intuit.player.jvm.core.flow.state.NavigationFlowViewState
-import com.intuit.player.jvm.core.player.state.*
+import com.intuit.player.jvm.core.flow.state.param
+import com.intuit.player.jvm.core.player.state.CompletedState
+import com.intuit.player.jvm.core.player.state.ErrorState
+import com.intuit.player.jvm.core.player.state.InProgressState
+import com.intuit.player.jvm.core.player.state.NotStartedState
+import com.intuit.player.jvm.core.player.state.ReleasedState
+import com.intuit.player.jvm.core.player.state.completedState
+import com.intuit.player.jvm.core.player.state.currentFlowState
+import com.intuit.player.jvm.core.player.state.currentView
+import com.intuit.player.jvm.core.player.state.dataModel
+import com.intuit.player.jvm.core.player.state.errorState
+import com.intuit.player.jvm.core.player.state.inProgressState
+import com.intuit.player.jvm.core.player.state.lastViewUpdate
 import com.intuit.player.jvm.core.plugins.Plugin
 import com.intuit.player.jvm.core.validation.BindingInstance
 import com.intuit.player.jvm.core.validation.ValidationResponse
 import com.intuit.player.jvm.core.validation.getWarningsAndErrors
 import com.intuit.player.jvm.utils.filterKeys
-import com.intuit.player.jvm.utils.test.*
+import com.intuit.player.jvm.utils.normalizeStackTraceElements
+import com.intuit.player.jvm.utils.test.PlayerTest
+import com.intuit.player.jvm.utils.test.ThreadUtils
+import com.intuit.player.jvm.utils.test.mocks
+import com.intuit.player.jvm.utils.test.runBlockingTest
+import com.intuit.player.jvm.utils.test.simpleFlow
+import com.intuit.player.jvm.utils.test.simpleFlowString
 import com.intuit.player.plugins.assets.ReferenceAssetsPlugin
 import com.intuit.player.plugins.types.CommonTypesPlugin
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.TestTemplate
 import kotlin.concurrent.thread
+import kotlin.coroutines.resume
 
 internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
 
@@ -41,7 +68,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         val state = player.state
         assertTrue(state is NotStartedState)
         assertEquals(PlayerFlowStatus.NOT_STARTED, state.status)
-        assertNull(state.ref)
+        assertEquals("Symbol(not-started)", state.ref)
     }
 
     @TestTemplate
@@ -101,17 +128,20 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
       }
     }
   }
-}""".trimMargin()
+}
+            """.trimMargin(),
         )
 
         player.inProgressState?.transition("Next")
 
         val result = flow.await()
-        assertEquals("done", result.endState.outcome)
-        assertEquals(mapOf("someKey" to "someValue"), result.endState["param"])
-        assertEquals("extraValue", result.endState["extraKey"])
-        assertEquals(mapOf("someInt" to 1), result.endState["extraObject"])
         assertEquals("counter-flow", result.flow.id)
+        val endState = result.endState
+        assertEquals("done", endState.outcome)
+        player.release()
+        assertEquals(mapOf("someKey" to "someValue"), endState.param)
+        assertEquals("extraValue", endState["extraKey"])
+        assertEquals(mapOf("someInt" to 1), endState["extraObject"])
     }
 
     @TestTemplate
@@ -166,7 +196,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         val state = player.state
         assertTrue(state is InProgressState)
         assertEquals(PlayerFlowStatus.IN_PROGRESS, state.status)
-        assertNull(state.ref)
+        assertEquals("Symbol(generated-flow)", state.ref)
 
         state as InProgressState
         val flowResultCompletable = state.flowResult
@@ -175,8 +205,8 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         // remove evaluated nodes
         val currentViewJson = Json.decodeFromJsonElement(
             GenericSerializer(),
-            simpleFlow.views[0].jsonObject
-                .filterKeys("applicability")
+            simpleFlow.views!![0].jsonObject
+                .filterKeys("applicability"),
         )
 
         // remove transforms
@@ -233,7 +263,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
 
         exception.printStackTrace()
         player.errorState?.error?.printStackTrace()
-        assertEquals(exception.stackTrace.toList(), player.errorState?.error?.stackTrace?.toList())
+        assertEquals(exception.stackTrace.normalizeStackTraceElements(), player.errorState?.error?.stackTrace?.normalizeStackTraceElements())
     }
 
     @TestTemplate
@@ -270,7 +300,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         }
 
         assertEquals(message, exception.message)
-        assertEquals(message, player.errorState?.error?.message)
+        assertEquals("uncaught exception: $message", player.errorState?.error?.message)
     }
 
     @TestTemplate
@@ -339,10 +369,19 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
 
     @TestTemplate
     fun `test player released state`() = runBlockingTest {
+        val releasedStateTap: Deferred<ReleasedState> = async {
+            suspendCancellableCoroutine {
+                player.hooks.state.tap { state ->
+                    if (state is ReleasedState) it.resume(state)
+                }
+            }
+        }
+
         assertTrue(player.state is NotStartedState)
         player.release()
         assertTrue(player.state is ReleasedState)
-        val exception = assertThrows(PlayerException::class.java) {
+        assertEquals(ReleasedState, releasedStateTap.await())
+        val exception = assertThrows(PlayerRuntimeException::class.java) {
             player.start(simpleFlowString)
         }
         assertEquals("Runtime object has been released!", exception.message?.split("] ")?.get(1))
@@ -400,7 +439,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
                 }
               }
             }
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         assertTrue(player.state is ErrorState)

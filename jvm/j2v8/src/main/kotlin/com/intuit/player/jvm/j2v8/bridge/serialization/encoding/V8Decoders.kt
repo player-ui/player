@@ -3,14 +3,26 @@ package com.intuit.player.jvm.j2v8.bridge.serialization.encoding
 import com.eclipsesource.v8.V8Array
 import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.V8Value
-import com.intuit.player.jvm.core.bridge.serialization.encoding.*
+import com.intuit.player.jvm.core.bridge.Invokable
+import com.intuit.player.jvm.core.bridge.serialization.encoding.AbstractRuntimeArrayListDecoder
+import com.intuit.player.jvm.core.bridge.serialization.encoding.AbstractRuntimeObjectClassDecoder
+import com.intuit.player.jvm.core.bridge.serialization.encoding.AbstractRuntimeObjectMapDecoder
+import com.intuit.player.jvm.core.bridge.serialization.encoding.AbstractRuntimeValueDecoder
+import com.intuit.player.jvm.core.bridge.serialization.encoding.NodeDecoder
 import com.intuit.player.jvm.core.experimental.RuntimeClassDiscriminator
-import com.intuit.player.jvm.j2v8.*
+import com.intuit.player.jvm.j2v8.V8Null
+import com.intuit.player.jvm.j2v8.V8Primitive
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.J2V8DecodingException
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.J2V8Format
-import com.intuit.player.jvm.j2v8.extensions.blockingLock
+import com.intuit.player.jvm.j2v8.extensions.evaluateInJSThreadBlocking
 import com.intuit.player.jvm.j2v8.extensions.handleValue
-import kotlinx.serialization.*
+import com.intuit.player.jvm.j2v8.extensions.toInvokable
+import com.intuit.player.jvm.j2v8.getV8Value
+import com.intuit.player.jvm.j2v8.v8Array
+import com.intuit.player.jvm.j2v8.v8Function
+import com.intuit.player.jvm.j2v8.v8Object
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PolymorphicKind
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
@@ -35,6 +47,10 @@ internal sealed class AbstractV8Decoder(
         PolymorphicKind.SEALED -> V8SealedClassDecoder(format, currentValue.v8Object)
         else -> error("Runtime format decoders can't decode kinds of (${descriptor.kind}) into structures for $descriptor")
     }
+
+    override fun <R> decodeFunction(returnTypeSerializer: KSerializer<R>): Invokable<R> {
+        return currentValue.v8Function.toInvokable(format, currentValue.v8Function, returnTypeSerializer) ?: error("Unable to decode V8 function using return type serializer ${returnTypeSerializer.descriptor}")
+    }
 }
 
 /** Simple implementation of [AbstractV8Decoder] can be treated as the entry point for [value] decoding */
@@ -42,14 +58,14 @@ internal class V8ValueDecoder(format: J2V8Format, value: V8Value) : AbstractV8De
 
 internal class V8ObjectMapDecoder(override val format: J2V8Format, override val value: V8Object) : AbstractRuntimeObjectMapDecoder<V8Value>(), NodeDecoder by V8ValueDecoder(format, value) {
 
-    override val keys: List<String> = value.blockingLock {
+    override val keys: List<String> = value.evaluateInJSThreadBlocking(format.runtime) {
         keys.toList()
     }
 
-    override fun getElementAtIndex(index: Int): V8Value = value.getV8Value(getKeyAtIndex(index))
+    override fun getElementAtIndex(index: Int): V8Value = value.getV8Value(format.runtime, getKeyAtIndex(index))
 
     override fun decodeElement(descriptor: SerialDescriptor, index: Int): V8Value =
-        value.getV8Value(descriptor.getElementName(index))
+        value.getV8Value(format.runtime, descriptor.getElementName(index))
 
     override fun <T> buildDecoderForSerializableElement(descriptor: SerialDescriptor, index: Int, deserializer: DeserializationStrategy<T>): V8ValueDecoder = when (index % 2 == 0) {
         true -> V8ValueDecoder(format, getKeyAtIndex(index).let(::V8Primitive))
@@ -62,11 +78,11 @@ internal class V8ObjectMapDecoder(override val format: J2V8Format, override val 
 
 internal class V8ArrayListDecoder(override val format: J2V8Format, override val value: V8Array) : AbstractRuntimeArrayListDecoder<V8Value>(), NodeDecoder by V8ValueDecoder(format, value) {
 
-    override val keys: List<Int> = value.blockingLock {
+    override val keys: List<Int> = value.evaluateInJSThreadBlocking(format.runtime) {
         keys.map(String::toInt)
     }
 
-    override fun getElementAtIndex(index: Int): V8Value = value.getV8Value(getKeyAtIndex(index))
+    override fun getElementAtIndex(index: Int): V8Value = value.getV8Value(format.runtime, getKeyAtIndex(index))
 
     override fun <T> buildDecoderForSerializableElement(descriptor: SerialDescriptor, index: Int, deserializer: DeserializationStrategy<T>): V8ValueDecoder =
         V8ValueDecoder(format, decodeElement(descriptor, index))
@@ -77,14 +93,14 @@ internal class V8ArrayListDecoder(override val format: J2V8Format, override val 
 
 internal class V8ObjectClassDecoder(override val format: J2V8Format, override val value: V8Object) : AbstractRuntimeObjectClassDecoder<V8Value>(), NodeDecoder by V8ValueDecoder(format, value) {
 
-    override val keys: List<String> = value.blockingLock {
-        keys.toList().filter { !value.getV8Value(it).isUndefined }
+    override val keys: List<String> = value.evaluateInJSThreadBlocking(format.runtime) {
+        keys.toList().filter { !value.getV8Value(format.runtime, it).isUndefined }
     }
 
-    override fun getElementAtIndex(index: Int): V8Value = value.getV8Value(getKeyAtIndex(index))
+    override fun getElementAtIndex(index: Int): V8Value = value.getV8Value(format.runtime, getKeyAtIndex(index))
 
     override fun decodeElement(descriptor: SerialDescriptor, index: Int): V8Value =
-        value.getV8Value(descriptor.getElementName(index))
+        value.getV8Value(format.runtime, descriptor.getElementName(index))
 
     override fun <T> buildDecoderForSerializableElement(descriptor: SerialDescriptor, index: Int, deserializer: DeserializationStrategy<T>): V8ValueDecoder =
         V8ValueDecoder(format, decodeElement(descriptor, index))
@@ -110,6 +126,6 @@ internal class V8SealedClassDecoder(override val format: J2V8Format, override va
             } as? RuntimeClassDiscriminator
             )?.discriminator ?: format.config.discriminator
 
-        return value.getV8Value(discriminator).handleValue(format)
+        return value.getV8Value(format.runtime, discriminator).handleValue(format)
     }
 }

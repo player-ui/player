@@ -1,6 +1,8 @@
 package com.intuit.player.plugins.pubsub
 
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
+import com.intuit.player.jvm.core.bridge.runtime.ScriptContext
 import com.intuit.player.jvm.core.bridge.runtime.add
 import com.intuit.player.jvm.core.player.Player
 import com.intuit.player.jvm.core.plugins.JSScriptPluginWrapper
@@ -12,7 +14,7 @@ public class PubSubPlugin(public val config: Config? = null) : JSScriptPluginWra
 
     override fun apply(runtime: Runtime<*>) {
         config?.let {
-            runtime.execute(script)
+            runtime.load(ScriptContext(if (runtime.config.debuggable) debugScript else script, bundledSourcePath))
             runtime.add("pubsubConfig", config)
             instance = runtime.buildInstance("(new $name(pubsubConfig))")
         } ?: super.apply(runtime)
@@ -25,14 +27,14 @@ public class PubSubPlugin(public val config: Config? = null) : JSScriptPluginWra
      * @return subscription token used to [unsubscribe]
      */
     public fun subscribe(eventName: String, block: (String, Any?) -> Unit): String = instance
-        .getFunction<String>("subscribe")!!(eventName, block)
+        .getInvokable<String>("subscribe")!!(eventName, block)
 
     /**
      * Cancel subscription registered with [token]
      * @param token subscription token obtained from [subscribe] call
      */
     public fun unsubscribe(token: String) {
-        instance.getFunction<Any?>("unsubscribe")!!(token)
+        instance.getInvokable<Any?>("unsubscribe")!!(token)
     }
 
     /**
@@ -41,12 +43,12 @@ public class PubSubPlugin(public val config: Config? = null) : JSScriptPluginWra
      * @param eventData Arbitrary data associated with the event
      */
     public fun publish(eventName: String, eventData: Any) {
-        instance.getFunction<Any?>("publish")!!(eventName, eventData)
+        instance.getInvokable<Any?>("publish")!!(eventName, eventData)
     }
 
     @Serializable
     public data class Config(
-        public val expressionName: String
+        public val expressionName: String,
     )
 
     private companion object {

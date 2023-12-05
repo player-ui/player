@@ -3,6 +3,7 @@ package com.intuit.player.jvm.core.bridge.hooks
 import com.intuit.player.jvm.core.NodeBaseTest
 import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.view.View
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test
 internal class NodeSyncHookTest : NodeBaseTest() {
     @MockK
     private lateinit var dummyNode: Node
+
     @MockK
     private lateinit var invokable: Invokable<Unit>
 
@@ -23,10 +25,12 @@ internal class NodeSyncHookTest : NodeBaseTest() {
     @Suppress("UNCHECKED_CAST")
     @BeforeEach
     fun setUpMock() {
-        every { node.getFunction<Unit>("tap") } returns Invokable {
+        val callback = Invokable<Any?> {
             map = it[0] as HashMap<String, Any>
             callback = it[1] as Invokable<Unit>
         }
+        every { node.getInvokable<Any?>("tap") } returns callback
+        every { node.getInvokable<Any?>("tap", any()) } returns callback
         every { invokable.invoke(*anyVararg()) }
         every { dummyNode.deserialize(View.Serializer) } returns View(dummyNode)
     }
@@ -34,7 +38,7 @@ internal class NodeSyncHookTest : NodeBaseTest() {
     @Test
     fun `JS Hook Tap On Init`() {
         NodeSyncHook1(node, View.serializer())
-        verify { node.getFunction<Unit>("tap") }
+        verify { node.getInvokable<Any?>("tap", any()) }
     }
 
     @Test
@@ -46,7 +50,7 @@ internal class NodeSyncHookTest : NodeBaseTest() {
 
         callback.invoke(hashMapOf<Any, Any>(), dummyNode)
 
-        verify { node.getFunction<Unit>("tap") }
+        verify { node.getInvokable<Any?>("tap", any()) }
         assertEquals(dummyNode, output?.node)
     }
 

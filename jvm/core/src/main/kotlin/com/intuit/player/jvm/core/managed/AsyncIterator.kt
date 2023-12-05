@@ -1,10 +1,8 @@
 package com.intuit.player.jvm.core.managed
 
 import com.intuit.player.jvm.core.player.state.CompletedState
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /** Generic async iterator that uses some [Result] to determine the next [Item] in the iteration */
-@OptIn(ExperimentalCoroutinesApi::class)
 public interface AsyncIterator<Item : Any, Result : Any> {
 
     /**

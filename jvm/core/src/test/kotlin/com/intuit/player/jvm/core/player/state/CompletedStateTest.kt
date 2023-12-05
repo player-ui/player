@@ -1,18 +1,17 @@
 package com.intuit.player.jvm.core.player.state
 
 import com.intuit.player.jvm.core.NodeBaseTest
+import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
-import com.intuit.player.jvm.core.bridge.getSerializable
+import com.intuit.player.jvm.core.bridge.getInvokable
+import com.intuit.player.jvm.core.bridge.runtime.Runtime
 import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeFormat
 import com.intuit.player.jvm.core.data.DataModelWithParser
-import com.intuit.player.jvm.core.expressions.ExpressionController
 import com.intuit.player.jvm.core.flow.Flow
-import com.intuit.player.jvm.core.flow.FlowController
 import com.intuit.player.jvm.core.player.PlayerFlowStatus
-import com.intuit.player.jvm.core.view.ViewController
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import kotlinx.serialization.modules.EmptySerializersModule
+import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
@@ -32,21 +31,20 @@ internal class CompletedStateTest : NodeBaseTest() {
 
     @BeforeEach
     fun setUpMocks() {
-        every { node.getString("ref") } returns "someRef"
-        every { node.format } returns format
-        every { format.serializersModule } returns EmptySerializersModule
-        every { node.getSerializable<Any>("controllers", any()) } returns ControllerState(node)
-        every { node.getSerializable<Any>("view", any()) } returns ViewController(node)
-        every { node.getSerializable<Any>("flow", any()) } returns FlowController(node)
-        every { node.getSerializable<Any>("flow", any()) } returns FlowController(node)
-        every { node.getSerializable<Any>("expression", any()) } returns ExpressionController(node)
+        val runtime: Runtime<*> = mockk()
+        every { node.runtime } returns runtime
+        every { runtime.containsKey("getSymbol") } returns true
+        every { runtime.getInvokable<String?>("getSymbol") } returns Invokable { "Symbol(hello)" }
         every { node.getSerializable("flow", Flow.serializer()) } returns Flow("flowId")
-        every { node.getSerializable<Any>("dataModel", any()) } returns DataModelWithParser(node)
+        every { node.getSerializable("dataModel", DataModelWithParser.serializer()) } returns DataModelWithParser(node)
+        every { node.getObject("dataModel") } returns mockDataModel
+        every { node.getObject("flow") } returns null
+        every { node.nativeReferenceEquals(any()) } returns false
     }
 
     @Test
     fun ref() {
-        assertEquals("someRef", completedState.ref)
+        assertEquals("Symbol(hello)", completedState.ref)
     }
 
     @Test

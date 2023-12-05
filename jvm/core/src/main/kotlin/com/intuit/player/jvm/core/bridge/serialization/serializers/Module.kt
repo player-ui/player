@@ -1,8 +1,12 @@
 package com.intuit.player.jvm.core.bridge.serialization.serializers
 
-import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
-import kotlinx.serialization.modules.*
+import com.intuit.player.jvm.core.player.state.ErroneousState
+import com.intuit.player.jvm.core.player.state.PlayerFlowState
+import kotlinx.serialization.modules.PolymorphicModuleBuilder
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.plus
+import kotlinx.serialization.modules.polymorphic
 
 public val playerSerializersModule: SerializersModule = SerializersModule {
     fun PolymorphicModuleBuilder<Throwable>.registerThrowableSerializers() {
@@ -19,6 +23,8 @@ public val playerSerializersModule: SerializersModule = SerializersModule {
         default { NodeSerializer() }
     }
 
+    polymorphic(PlayerFlowState::class, ErroneousState::class, ErroneousState.serializer())
+
     polymorphic(Any::class) {
         registerThrowableSerializers()
 
@@ -27,7 +33,4 @@ public val playerSerializersModule: SerializersModule = SerializersModule {
 
     contextual(Any::class, ::GenericSerializer)
     contextual(Throwable::class, ThrowableSerializer())
-    contextual(Invokable::class) {
-        InvokableSerializer<Any?>()
-    }
-}
+} + FunctionLikeSerializer.functionSerializerModule

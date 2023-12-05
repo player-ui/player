@@ -29,8 +29,12 @@ public class NodeSerializer : KSerializer<Node> {
     }
 }
 
-public open class NodeWrapperSerializer<T : NodeWrapper>(private val factory: (Node) -> T) : KSerializer<T> {
-    final override val descriptor: SerialDescriptor = buildClassSerialDescriptor("com.intuit.player.jvm.core.bridge.NodeWrapper")
+public open class NodeWrapperSerializer<T : NodeWrapper>(
+    private val factory: (Node) -> T,
+    // TODO: Can we pull this from the @SerialName annotation?
+    private val serialName: String = "com.intuit.player.jvm.core.bridge.NodeWrapper",
+) : KSerializer<T> {
+    final override val descriptor: SerialDescriptor = buildClassSerialDescriptor(serialName)
 
     override fun deserialize(decoder: Decoder): T = NodeSerializer().deserialize(decoder).let(factory)
 

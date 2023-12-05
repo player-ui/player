@@ -3,12 +3,15 @@ package com.intuit.player.android.reference.demo.ui.main
 import android.app.Application
 import android.view.Menu
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.intuit.player.android.reference.demo.model.AssetMock
 import com.intuit.player.android.reference.demo.model.StringMock
 import com.intuit.player.jvm.utils.mocks.ClassLoaderMocksReader
 import com.intuit.player.jvm.utils.mocks.Mock
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import java.io.FileNotFoundException
 
 class MainViewModel(private val context: Application) : AndroidViewModel(context) {
@@ -21,14 +24,16 @@ class MainViewModel(private val context: Application) : AndroidViewModel(context
         AssetMock("", "default", "mocks/default.json")
     }
 
-    private val _currentMock = MutableLiveData<Mock<*>>()
+    private val _currentMock = MutableSharedFlow<Mock<*>>()
 
     /** [currentMock] LiveData that represents the mock that is currently displayed */
-    val currentMock: LiveData<Mock<*>> get() = _currentMock
+    val currentMock: SharedFlow<Mock<*>> = _currentMock.asSharedFlow()
 
     fun launch(json: String) = launch(StringMock(json))
 
-    fun launch(mock: Mock<*>) = _currentMock.postValue(mock)
+    fun launch(mock: Mock<*>) = viewModelScope.launch {
+        _currentMock.emit(mock)
+    }
 
     private fun readMocksFromClasspath() = ClassLoaderMocksReader(MainViewModel::class.java.classLoader!!).mocks
 

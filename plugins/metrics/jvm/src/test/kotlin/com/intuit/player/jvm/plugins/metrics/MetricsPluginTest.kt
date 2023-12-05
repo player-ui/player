@@ -60,7 +60,7 @@ internal class RequestTimePluginTest : PlayerTest() {
         mockkObject(renderEndHandler)
         return listOf(
             MetricsPlugin(renderEndHandler),
-            RequestTimePlugin(getRequestTime)
+            RequestTimePlugin(getRequestTime),
         )
     }
 

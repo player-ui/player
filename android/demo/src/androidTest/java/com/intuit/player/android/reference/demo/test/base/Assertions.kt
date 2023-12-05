@@ -1,4 +1,4 @@
-package com.intuit.player.android.reference.assets.test
+package com.intuit.player.android.reference.demo.test.base
 
 import android.view.View
 import com.intuit.player.android.asset.RenderableAsset
@@ -9,7 +9,7 @@ import kotlin.contracts.contract
 
 @OptIn(ExperimentalContracts::class)
 inline fun <reified T : RenderableAsset> Any?.shouldBeAsset(
-    block: T.() -> Unit = {}
+    block: T.() -> Unit = {},
 ): T {
     shouldBeInstanceOf<T>(this)
     block()

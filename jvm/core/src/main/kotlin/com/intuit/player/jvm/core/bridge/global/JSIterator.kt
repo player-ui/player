@@ -18,8 +18,7 @@ public class JSIterator<T>(override val node: Node, public val itemSerializer: K
     )
 
     private fun getNext(): NextResult<T> = node
-        .getFunction<Node>("next")!!()
-        .deserialize(NextResult.serializer(itemSerializer))
+        .getInvokable("next", NextResult.serializer(itemSerializer))!!()
 
     /** Always keeps track of value to be read */
     private var current: NextResult<T> = getNext()

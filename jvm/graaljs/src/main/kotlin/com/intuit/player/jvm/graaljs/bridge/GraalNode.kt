@@ -7,8 +7,10 @@ import com.intuit.player.jvm.core.bridge.runtime.Runtime
 import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeFormat
 import com.intuit.player.jvm.graaljs.bridge.runtime.GraalRuntime.Companion.isReleased
 import com.intuit.player.jvm.graaljs.bridge.runtime.GraalRuntime.Companion.undefined
-import com.intuit.player.jvm.graaljs.extensions.*
+import com.intuit.player.jvm.graaljs.extensions.blockingLock
 import com.intuit.player.jvm.graaljs.extensions.handleValue
+import com.intuit.player.jvm.graaljs.extensions.lockIfDefined
+import com.intuit.player.jvm.graaljs.extensions.toInvokable
 import com.intuit.player.jvm.graaljs.extensions.toList
 import com.intuit.player.jvm.graaljs.extensions.toNode
 import kotlinx.serialization.DeserializationStrategy
@@ -54,9 +56,13 @@ internal open class GraalNode(override val graalObject: Value, override val runt
         getMember(key)
     }?.handleValue(format)
 
+    override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = graalObject.lockIfDefined {
+        graalObject.getMember(key)
+    }?.toInvokable(format, deserializationStrategy)
+
     override fun <R> getFunction(key: String): Invokable<R>? = graalObject.lockIfDefined {
         graalObject.getMember(key)
-    }?.toInvokable(format)
+    }?.toInvokable(format, null)
 
     override fun getList(key: String): List<*>? = graalObject.lockIfDefined {
         graalObject.getMember(key)
@@ -64,9 +70,9 @@ internal open class GraalNode(override val graalObject: Value, override val runt
 
     override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>): T? {
         return graalObject.blockingLock {
-            if (memberKeys.contains(key))
-                format.decodeFromRuntimeValue(deserializer, graalObject.getMember(key))
-            else null
+            key.takeIf(graalObject::hasMember)
+                ?.let(graalObject::getMember)
+                ?.let { format.decodeFromRuntimeValue(deserializer, it) }
         }
     }
 

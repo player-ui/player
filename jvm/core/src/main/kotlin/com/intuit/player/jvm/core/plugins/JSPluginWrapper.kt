@@ -23,6 +23,6 @@ public interface JSPluginWrapper : RuntimePlugin, NodeWrapper {
 @Deprecated(
     "Replaced with more generic JSPluginWrapper",
     ReplaceWith("JSPluginWrapper"),
-    DeprecationLevel.HIDDEN
+    DeprecationLevel.HIDDEN,
 )
 public typealias JSPlayerPluginWrapper = JSPluginWrapper

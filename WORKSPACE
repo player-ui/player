@@ -6,14 +6,14 @@ workspace(
     },
 )
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 http_archive(
-  name = "rules_player",
-  strip_prefix = "rules_player-0.10.3",
-  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.10.3.tar.gz"],
-  sha256 = "a21d0fc7428e124bdc5a068ae68e0625a13f8238e685965268b5ed46f4de23fe"
+    name = "rules_player",
+    sha256 = "c015a09ce2a5f999a89473cb9f71346c6831e27830a228ebe8f1ba25e83b77b2",
+    strip_prefix = "rules_player-0.10.4",
+    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.10.4.tar.gz"],
 )
 
 load("@rules_player//:workspace.bzl", "deps")
@@ -66,7 +66,7 @@ kotlin()
 
 load("@io_bazel_rules_kotlin//kotlin:core.bzl", "kt_register_toolchains")
 
-kt_register_toolchains()
+register_toolchains("//jvm:kotlin_toolchain")
 
 load("@rules_player//junit5:conf.bzl", "junit5")
 
@@ -79,33 +79,23 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 grab_remote = "https://github.com/sugarmanz/grab-bazel-common.git"
 
-grab_commit = "a3fe2daf2965b439c8c2a4c2cce1f13beba446b1"
+grab_commit = "5326c6ba7a4e39e150c33e123134525473baffb6"
 
 git_repository(
     name = "grab_bazel_common",
     commit = grab_commit,
     remote = grab_remote,
-    shallow_since = "1654123549 -0400",
+    shallow_since = "1700536974 -0500",
 )
 
-# Optional patched Android Tools
-load("@grab_bazel_common//:workspace_defs.bzl", "android_tools")
+load("@grab_bazel_common//android:repositories.bzl", "bazel_common_dependencies")
 
-android_tools(
-    commit = grab_commit,
-    remote = grab_remote,
-    shallow_since = "1654123549 -0400",
-)
+bazel_common_dependencies()
 
-DAGGER_TAG = "2.28.1"
+load("@grab_bazel_common//android:initialize.bzl", "bazel_common_initialize")
 
-DAGGER_SHA = "9e69ab2f9a47e0f74e71fe49098bea908c528aa02fa0c5995334447b310d0cdd"
-
-http_archive(
-    name = "dagger",
-    sha256 = DAGGER_SHA,
-    strip_prefix = "dagger-dagger-%s" % DAGGER_TAG,
-    url = "https://github.com/google/dagger/archive/dagger-%s.zip" % DAGGER_TAG,
+bazel_common_initialize(
+    pinned_maven_install = False,
 )
 
 http_archive(
@@ -118,6 +108,20 @@ http_archive(
 load("@robolectric//bazel:robolectric.bzl", "robolectric_repositories")
 
 robolectric_repositories()
+
+ANDROIDX_TEST_VERSION = "1.4.2"
+
+http_file(
+    name = "android_test_orchestrator_apk",
+    sha256 = "b7a2e7d0184b03e12c7357f3914d539da40b52a11e90815edff1022c655f459b",
+    url = "https://dl.google.com/android/maven2/androidx/test/orchestrator/%s/orchestrator-%s.apk" % (ANDROIDX_TEST_VERSION, ANDROIDX_TEST_VERSION),
+)
+
+http_file(
+    name = "android_test_services_apk",
+    sha256 = "c6bc74268b29bdabad8da962e00e2f6fd613c24b42c69e81b258397b4819f156",
+    url = "https://dl.google.com/android/maven2/androidx/test/services/test-services/%s/test-services-%s.apk" % (ANDROIDX_TEST_VERSION, ANDROIDX_TEST_VERSION),
+)
 
 http_archive(
     name = "build_bazel_rules_android",
@@ -165,6 +169,7 @@ maven_install(
         "https://maven.google.com/",
         "https://plugins.gradle.org/m2/",
         "https://jcenter.bintray.com/",
+        "https://jitpack.io/",
     ],
 )
 
@@ -173,6 +178,7 @@ maven_install(
     artifacts = [
         "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:jar:1.5.2",
     ],
+    fetch_sources = True,
     repositories = [
         "https://repo1.maven.org/maven2",
     ],

@@ -5,8 +5,11 @@ import com.intuit.player.jvm.core.player.PlayerException
 import com.intuit.player.jvm.core.player.PlayerFlowStatus
 import com.intuit.player.jvm.core.player.state.CompletedState
 import com.intuit.player.jvm.core.player.state.PlayerFlowState
+import com.intuit.player.jvm.utils.normalizeStackTraceElements
 import com.intuit.player.jvm.utils.test.PromiseUtils
 import com.intuit.player.jvm.utils.test.RuntimeTest
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -18,8 +21,17 @@ private inline fun currentStackTrace() = Exception().stackTrace
 
 internal class PromiseTest : RuntimeTest(), PromiseUtils {
 
-    override val thenChain = mutableListOf<Any?>()
-    override val catchChain = mutableListOf<Any?>()
+    override val thenChain = mutableListOf<Any?>(); get() = runBlocking {
+        // TODO: Rework delay into a proper suspension mechanism
+        delay(100)
+        field
+    }
+
+    override val catchChain = mutableListOf<Any?>(); get() = runBlocking {
+        // TODO: Rework delay into a proper suspension mechanism
+        delay(100)
+        field
+    }
 
     /**
      * Anti-test case since old test existed to prove the Json conversions forced Ints as Longs.
@@ -70,13 +82,13 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
                 "flowResult",
                 buildJsonObject {
                     put("outcome", "doneWithTopic")
-                }
+                },
             )
             put(
                 "flow",
                 buildJsonObject {
                     put("id", "some-id")
-                }
+                },
             )
         }
         val flow = CompletedState(
@@ -84,13 +96,13 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
                 mapOf(
                     "status" to PlayerFlowStatus.COMPLETED.value,
                     "flowResult" to mapOf(
-                        "outcome" to "doneWithTopic"
+                        "outcome" to "doneWithTopic",
                     ),
                     "flow" to mapOf(
-                        "id" to "some-id"
-                    )
-                )
-            ) as Node
+                        "id" to "some-id",
+                    ),
+                ),
+            ) as Node,
         )
 
         runtime.Promise.resolve(42)
@@ -116,7 +128,7 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
                const promise = new Promise(function(resolve, reject) { resolver = resolve });
                return [promise, resolver];
            })();
-            """.trimIndent()
+            """.trimIndent(),
         ) as List<*>
 
         Promise(promise as Node)
@@ -170,7 +182,7 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
         assertTrue(caught is Throwable)
         caught as Throwable
         assertEquals(exception.message, caught.message)
-        assertEquals(exception.stackTrace.toList(), caught.stackTrace.toList())
+        assertEquals(exception.stackTrace.normalizeStackTraceElements(), caught.stackTrace.normalizeStackTraceElements())
     }
 
     @TestTemplate
@@ -188,7 +200,7 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
         caught as Throwable
         caught.printStackTrace()
         assertEquals(exception.message, caught.message)
-        assertEquals(exception.stackTrace.toList(), caught.stackTrace.toList())
+        assertEquals(exception.stackTrace.normalizeStackTraceElements(), caught.stackTrace.normalizeStackTraceElements())
     }
 
     @TestTemplate
@@ -205,6 +217,6 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
         assertTrue(caught is Throwable)
         caught as Throwable
         assertEquals(exception.message, caught.message)
-        assertEquals(exception.stackTrace.toList(), caught.stackTrace.toList())
+        assertEquals(exception.stackTrace.normalizeStackTraceElements(), caught.stackTrace.normalizeStackTraceElements())
     }
 }

@@ -3,13 +3,16 @@ package com.intuit.player.android.reference.assets.action
 import android.view.View
 import android.widget.Button
 import com.intuit.player.android.AssetContext
-import com.intuit.player.android.asset.DecodableAsset
+import com.intuit.player.android.asset.SuspendableAsset
 import com.intuit.player.android.reference.assets.text.Text
 import com.intuit.player.plugins.transactions.commitPendingTransaction
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 
-class Action(assetContext: AssetContext) : DecodableAsset<Action.Data>(assetContext, Data.serializer()) {
+class Action(assetContext: AssetContext) : SuspendableAsset<Action.Data>(assetContext, Data.serializer()) {
 
     @Serializable
     data class Data(
@@ -31,22 +34,28 @@ class Action(assetContext: AssetContext) : DecodableAsset<Action.Data>(assetCont
          * serializer.
          */
         val label: @Contextual Text? = null,
-        val run: () -> Unit,
-    )
+        private val run: () -> Unit,
+    ) {
+        suspend fun run() = withContext(Dispatchers.Default) {
+            run.invoke()
+        }
+    }
 
-    override fun initView() = Button(context)
+    override suspend fun initView(data: Data) = Button(context)
 
-    override fun View.hydrate() {
+    override suspend fun View.hydrate(data: Data) {
         require(this is Button)
 
         data.label?.let {
-            text = it.data.value
+            text = it.getData().value
         }
 
         setOnClickListener {
             beacon("clicked", "button")
             player.commitPendingTransaction()
-            data.run()
+            hydrationScope.launch {
+                data.run()
+            }
         }
     }
 }

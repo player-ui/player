@@ -3,12 +3,15 @@ package com.intuit.player.jvm.core.logger
 import com.intuit.hooks.HookContext
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.hooks.NodeSyncHook1
 import com.intuit.player.jvm.core.bridge.hooks.SyncHook1
+import com.intuit.player.jvm.core.bridge.runtime
 import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
-import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField.Companion.NodeSerializableField
+import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.player.jvm.core.plugins.LoggerPlugin
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 
@@ -25,7 +28,7 @@ public class TapableLogger(override val node: Node) : LoggerPlugin, NodeWrapper 
 
         private fun loggerHook(key: String) = NodeSyncHook1(
             node.getObject(key)!!,
-            ListSerializer(GenericSerializer())
+            ListSerializer(GenericSerializer()),
         ).toTypedArrayHook()
 
         internal object Serializer : NodeWrapperSerializer<Hooks>(::Hooks)
@@ -34,23 +37,33 @@ public class TapableLogger(override val node: Node) : LoggerPlugin, NodeWrapper 
     public val hooks: Hooks by NodeSerializableField(Hooks.serializer())
 
     public override fun trace(vararg args: Any?) {
-        node.getFunction<Unit>("trace")!!(*args)
+        runtime.scope.launch {
+            node.getInvokable<Unit>("trace")!!(*args)
+        }
     }
 
     public override fun debug(vararg args: Any?) {
-        node.getFunction<Unit>("debug")!!(*args)
+        runtime.scope.launch {
+            node.getInvokable<Unit>("debug")!!(*args)
+        }
     }
 
     public override fun info(vararg args: Any?) {
-        node.getFunction<Unit>("info")!!(*args)
+        runtime.scope.launch {
+            node.getInvokable<Unit>("info")!!(*args)
+        }
     }
 
     public override fun warn(vararg args: Any?) {
-        node.getFunction<Unit>("warn")!!(*args)
+        runtime.scope.launch {
+            node.getInvokable<Unit>("warn")!!(*args)
+        }
     }
 
     public override fun error(vararg args: Any?) {
-        node.getFunction<Unit>("error")!!(*args)
+        runtime.scope.launch {
+            node.getInvokable<Unit>("error")!!(*args)
+        }
     }
 
     public fun addHandler(logger: LoggerPlugin) {

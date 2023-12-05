@@ -6,7 +6,8 @@ import com.intuit.player.jvm.core.bridge.serialization.serializers.ThrowableSeri
 import com.intuit.player.jvm.core.player.PlayerException
 import com.intuit.player.jvm.j2v8.base.J2V8Test
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.decodeFromV8Value
-import com.intuit.player.jvm.j2v8.extensions.blockingLock
+import com.intuit.player.jvm.j2v8.extensions.evaluateInJSThreadBlocking
+import com.intuit.player.jvm.utils.normalizeStackTraceElements
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -18,7 +19,7 @@ internal class ThrowableSerializerTest : J2V8Test() {
 
     @Test
     fun `JS Error is deserialized as PlayerException (using regex)`() {
-        val error = format.v8.blockingLock {
+        val error = format.v8.evaluateInJSThreadBlocking(runtime) {
             executeObjectScript("""(new Error("hello"))""")
         }
         val exception = format.decodeFromRuntimeValue(ThrowableSerializer(), error)
@@ -30,7 +31,7 @@ internal class ThrowableSerializerTest : J2V8Test() {
             """com.intuit.player.jvm.core.bridge.JSErrorException: Error: hello
 	at .(<anonymous>:1)
 """,
-            exception.stackTraceToString()
+            exception.stackTraceToString(),
         )
     }
 
@@ -45,7 +46,7 @@ internal class ThrowableSerializerTest : J2V8Test() {
             className,
             methodName,
             fileName,
-            lineNumber
+            lineNumber,
         )
 
         val exception = PlayerException("world")
@@ -55,7 +56,7 @@ internal class ThrowableSerializerTest : J2V8Test() {
         assertTrue(error is V8Object)
         error as V8Object
 
-        error.blockingLock {
+        error.evaluateInJSThreadBlocking(runtime) {
             assertEquals("world", error.get("message"))
             assertEquals(exception.stackTraceToString(), error.getString("stack"))
 
@@ -64,7 +65,7 @@ internal class ThrowableSerializerTest : J2V8Test() {
                 format.encodeToRuntimeValue(
                     SerializableStackTraceElement.serializer(),
                     serializableStackTraceElement,
-                ).jsEquals(error.getArray("stackTrace").getObject(0))
+                ).jsEquals(error.getArray("stackTrace").getObject(0)),
             )
         }
     }
@@ -84,7 +85,7 @@ internal class ThrowableSerializerTest : J2V8Test() {
         assertTrue(exception is PlayerException)
         exception as PlayerException
         assertEquals("hello world", exception.message)
-        assertEquals(listOf(stackTraceElement), exception.stackTrace.toList())
+        assertEquals(arrayOf(stackTraceElement).normalizeStackTraceElements(), exception.stackTrace.normalizeStackTraceElements())
         exception.printStackTrace()
     }
 
@@ -99,14 +100,14 @@ internal class ThrowableSerializerTest : J2V8Test() {
             className,
             methodName,
             fileName,
-            lineNumber
+            lineNumber,
         )
 
         val exception = PlayerException(
             "hello",
             PlayerException("world").apply {
                 stackTrace = arrayOf(stackTraceElement)
-            }
+            },
         ).apply {
             stackTrace = arrayOf(stackTraceElement)
         }
@@ -116,7 +117,7 @@ internal class ThrowableSerializerTest : J2V8Test() {
         assertTrue(error is V8Object)
         error as V8Object
 
-        error.blockingLock {
+        error.evaluateInJSThreadBlocking(runtime) {
             assertEquals("hello", error.get("message"))
             assertEquals(exception.stackTraceToString(), error.getString("stack"))
 
@@ -125,12 +126,12 @@ internal class ThrowableSerializerTest : J2V8Test() {
                 format.encodeToRuntimeValue(
                     SerializableStackTraceElement.serializer(),
                     serializableStackTraceElement,
-                ).jsEquals(error.getArray("stackTrace").getObject(0))
+                ).jsEquals(error.getArray("stackTrace").getObject(0)),
             )
 
             val cause = format.decodeFromV8Value<Throwable>(error.getObject("cause"))
             assertEquals("world", cause.message)
-            assertEquals(exception.cause!!.stackTrace.toList(), cause.stackTrace.toList())
+            assertEquals(exception.cause!!.stackTrace.normalizeStackTraceElements(), cause.stackTrace.normalizeStackTraceElements())
         }
     }
 }

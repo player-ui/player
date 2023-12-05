@@ -48,14 +48,14 @@ internal class ExpressionSerializationTest : RuntimeTest() {
         val expression: Expression.Single,
         val genericExpression: Expression,
         val expressions: Expression.Collection,
-        val genericExpressions: Expression
+        val genericExpressions: Expression,
     )
 
     private val wrapper = ExprWrapper(
         single,
         genericSingle,
         collection,
-        genericCollection
+        genericCollection,
     )
 
     @TestTemplate
@@ -66,7 +66,7 @@ internal class ExpressionSerializationTest : RuntimeTest() {
                 "genericExpression" to (genericSingle as Expression.Single).expression,
                 "expressions" to collection.expressions,
                 "genericExpressions" to (genericCollection as Expression.Collection).expressions,
-            )
+            ),
         )
 
         val wrapper = format.decodeFromRuntimeValue(ExprWrapper.serializer(), node)
@@ -85,9 +85,9 @@ internal class ExpressionSerializationTest : RuntimeTest() {
                     "genericExpression" to (genericSingle as Expression.Single).expression,
                     "expressions" to collection.expressions,
                     "genericExpressions" to (genericCollection as Expression.Collection).expressions,
-                )
+                ),
             ),
-            runtime.serialize(ExprWrapper.serializer(), wrapper)
+            runtime.serialize(ExprWrapper.serializer(), wrapper),
         )
     }
 }

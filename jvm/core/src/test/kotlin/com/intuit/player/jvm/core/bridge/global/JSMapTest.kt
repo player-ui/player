@@ -2,8 +2,9 @@ package com.intuit.player.jvm.core.bridge.global
 
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.deserialize
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.utils.test.RuntimeTest
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestTemplate
 
 @kotlinx.serialization.Serializable
@@ -28,10 +29,10 @@ internal class JSMapTest : RuntimeTest() {
                 
                 return { generateMap: () => map };
             })()
-            """.trimIndent()
+            """.trimIndent(),
         ) as Node
 
-        val map: JSMap<Key, Value> = node.getFunction<Node>("generateMap")!!().deserialize()
+        val map: JSMap<Key, Value> = node.getInvokable<Node>("generateMap")!!().deserialize()
         assertEquals(1, map.size)
         assertEquals(setOf(Key(1)), map.keys)
         assertEquals(listOf(Value(2)), map.values)
@@ -50,10 +51,10 @@ internal class JSMapTest : RuntimeTest() {
                 
                 return { generateMap: () => map };
             })()
-            """.trimIndent()
+            """.trimIndent(),
         ) as Node
 
-        val map: JSMap<String, Int> = node.getFunction<Node>("generateMap")!!().deserialize()
+        val map: JSMap<String, Int> = node.getInvokable<Node>("generateMap")!!().deserialize()
         assertEquals(1, map.size)
         assertEquals(setOf("hello"), map.keys)
         assertEquals(listOf(1), map.values)

@@ -21,16 +21,18 @@ abstract class ApplitoolsTest {
     }
 
     // Initialize the eyes SDK and set your private API key.
-    val eyes by lazy {
-        Eyes().apply {
-            componentsProvider = AndroidXComponentsProvider()
-            configuration = Configuration().apply {
-                appName = "Android Reference Assets"
-                addProperty("platform", "android")
-                batch = batchInfo
-                apiKey = API_KEY
-                setFeatures(Feature.PIXEL_COPY_SCREENSHOT)
-                setServerUrl("https://intuiteyesapi.applitools.com")
+    val eyes: Eyes? by lazy {
+        API_KEY?.let {
+            Eyes().apply {
+                componentsProvider = AndroidXComponentsProvider()
+                configuration = Configuration().apply {
+                    appName = "Android Reference Assets"
+                    addProperty("platform", "android")
+                    batch = batchInfo
+                    apiKey = API_KEY
+                    setFeatures(Feature.PIXEL_COPY_SCREENSHOT)
+                    setServerUrl("https://intuiteyesapi.applitools.com")
+                }
             }
         }
     }

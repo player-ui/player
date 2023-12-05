@@ -6,7 +6,7 @@ class StringMock(
     private val json: String,
     override val group: String = "",
     override val name: String = "Player",
-    override val path: String = ""
+    override val path: String = "",
 ) : Mock<Any> {
     override fun read(source: Any) = json
 }

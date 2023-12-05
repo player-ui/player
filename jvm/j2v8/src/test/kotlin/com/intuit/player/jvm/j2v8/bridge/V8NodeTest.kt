@@ -3,12 +3,13 @@ package com.intuit.player.jvm.j2v8.bridge
 import com.intuit.player.jvm.core.asset.Asset
 import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.getJson
 import com.intuit.player.jvm.core.bridge.toJson
 import com.intuit.player.jvm.core.flow.Flow
 import com.intuit.player.jvm.j2v8.base.J2V8Test
 import com.intuit.player.jvm.j2v8.bridge.serialization.format.v8Object
-import com.intuit.player.jvm.j2v8.extensions.blockingLock
+import com.intuit.player.jvm.j2v8.extensions.evaluateInJSThreadBlocking
 import com.intuit.player.jvm.j2v8.extensions.handleValue
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -16,7 +17,9 @@ import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import kotlin.concurrent.thread
 
@@ -24,23 +27,23 @@ import kotlin.concurrent.thread
 internal class V8NodeTest : J2V8Test() {
 
     @Test
-    fun get() = v8.blockingLock {
+    fun get() = v8.evaluateInJSThreadBlocking(runtime) {
         val node = buildNodeFromMap(
             "string" to "thisisastring",
             "int" to 1,
             "object" to mapOf(
-                "string" to "anotherstring"
+                "string" to "anotherstring",
             ),
             "list" to listOf(
                 1,
                 "two",
                 mapOf(
-                    "string" to "onemorestring"
+                    "string" to "onemorestring",
                 ),
-                null
+                null,
             ),
             "function" to Invokable { "classicstring" },
-            "null" to null
+            "null" to null,
         )
 
         assertEquals("thisisastring", node["string"])
@@ -58,7 +61,7 @@ internal class V8NodeTest : J2V8Test() {
     fun getString() {
         val node = buildNodeFromMap(
             "string" to "string",
-            "notastring" to 1
+            "notastring" to 1,
         )
 
         assertEquals("string", node.getString("string"))
@@ -67,24 +70,24 @@ internal class V8NodeTest : J2V8Test() {
     }
 
     @Test
-    fun getFunction() = v8.blockingLock {
+    fun getFunction() = v8.evaluateInJSThreadBlocking(runtime) {
         val node = buildNodeFromMap(
             "function" to Invokable { "classicstring" },
             "tuple" to Invokable { (p0, p1) -> listOf(p0, p1) },
-            "notafunction" to 1
+            "notafunction" to 1,
         )
 
-        assertEquals("classicstring", node.getFunction<String>("function")?.invoke())
-        assertEquals(listOf("1", 2), node.getFunction<Any?>("tuple")?.invoke("1", 2))
-        assertEquals(null, node.getFunction<Any>("notafunction"))
-        assertEquals(null, node.getFunction<Any>("notthere"))
+        assertEquals("classicstring", node.getInvokable<String>("function")?.invoke())
+        assertEquals(listOf("1", 2), node.getInvokable<Any?>("tuple")?.invoke("1", 2))
+        assertEquals(null, node.getInvokable<Any>("notafunction"))
+        assertEquals(null, node.getInvokable<Any>("notthere"))
     }
 
     @Test
     fun getList() {
         val node = buildNodeFromMap(
             "list" to listOf(1, 2, 3),
-            "notalist" to 1
+            "notalist" to 1,
         )
 
         assertEquals(listOf(1, 2, 3), node.getList("list"))
@@ -96,9 +99,9 @@ internal class V8NodeTest : J2V8Test() {
     fun getObject() {
         val node = buildNodeFromMap(
             "object" to mapOf(
-                "string" to "thisisastring"
+                "string" to "thisisastring",
             ),
-            "notaobject" to 1234
+            "notaobject" to 1234,
         )
 
         assertEquals("thisisastring", node.getObject("object")?.getString("string"))
@@ -112,8 +115,8 @@ internal class V8NodeTest : J2V8Test() {
         val node = buildNodeFromMap(
             "asset" to mapOf(
                 "id" to "testId",
-                "type" to "testType"
-            )
+                "type" to "testType",
+            ),
         )
 
         val (id, type) = node.getObject("asset") as Asset
@@ -127,14 +130,14 @@ internal class V8NodeTest : J2V8Test() {
             "assets" to listOf(
                 mapOf(
                     "id" to "testId1",
-                    "type" to "testType"
+                    "type" to "testType",
                 ),
                 mapOf(
-                    "id" to "notAnAsset"
+                    "id" to "notAnAsset",
                 ),
-                1
+                1,
             ),
-            "notassets" to "justastring"
+            "notassets" to "justastring",
         )
 
         val assets = node.getList("assets") as List<*>
@@ -156,7 +159,7 @@ internal class V8NodeTest : J2V8Test() {
     fun getInt() {
         val node = buildNodeFromMap(
             "int" to 1,
-            "notanint" to "asdf"
+            "notanint" to "asdf",
         )
 
         assertEquals(1, node.getInt("int"))
@@ -167,7 +170,7 @@ internal class V8NodeTest : J2V8Test() {
     @Test
     fun getJson() {
         val node = buildNodeFromMap(
-            "beacon" to mapOf("key" to "value")
+            "beacon" to mapOf("key" to "value"),
         )
         assertEquals(JsonNull, node.getJson("notthere"))
         assertEquals(buildJsonObject { put("key", "value") }, node.getJson("beacon"))
@@ -187,17 +190,17 @@ internal class V8NodeTest : J2V8Test() {
                     "beacon",
                     buildJsonObject {
                         put("key", "value")
-                    }
+                    },
                 )
             },
-            node.toJson()
+            node.toJson(),
         )
     }
 
     @Test
     fun getBoolean() {
         val node = buildNodeFromMap(
-            "isSelected" to true
+            "isSelected" to true,
         )
         assertEquals(true, node.getBoolean("isSelected"))
         assertNull(node.getBoolean("notthere"))
@@ -209,51 +212,51 @@ internal class V8NodeTest : J2V8Test() {
             "string" to "thisisastring",
             "int" to 1,
             "object" to mapOf(
-                "string" to "anotherstring"
+                "string" to "anotherstring",
             ),
             "list" to listOf(
                 1,
                 "two",
                 mapOf(
-                    "string" to "onemorestring"
+                    "string" to "onemorestring",
                 ),
-                null
+                null,
             ),
             "function" to Invokable { "classicstring" },
-            "null" to null
+            "null" to null,
         )
 
         addThreads(
             thread {
-                v8.blockingLock {
+                v8.evaluateInJSThreadBlocking(runtime) {
                     runBlocking { delay(1000) }
                     assertEquals(1, node.getInt("int"))
                 }
             },
             thread(false) {
-                v8.blockingLock {
+                v8.evaluateInJSThreadBlocking(runtime) {
                     assertEquals("thisisastring", node["string"])
                 }
-                v8.blockingLock {
+                v8.evaluateInJSThreadBlocking(runtime) {
                     assertEquals("thisisastring", node.getString("string"))
                 }
-                v8.blockingLock {
+                v8.evaluateInJSThreadBlocking(runtime) {
                     assertEquals(1, node.getInt("int"))
                 }
                 assertEquals("thisisastring", node.get("string"))
             },
             thread(false) {
-                v8.blockingLock {
+                v8.evaluateInJSThreadBlocking(runtime) {
                     assertEquals("thisisastring", node["string"])
                 }
-                v8.blockingLock {
+                v8.evaluateInJSThreadBlocking(runtime) {
                     assertEquals("thisisastring", node.getString("string"))
                 }
-                v8.blockingLock {
+                v8.evaluateInJSThreadBlocking(runtime) {
                     assertEquals(1, node.getInt("int"))
                 }
                 assertEquals("thisisastring", node.get("string"))
-            }
+            },
         )
         startThreads()
         verifyThreads()
@@ -262,7 +265,7 @@ internal class V8NodeTest : J2V8Test() {
     @Test
     fun getSerializablePrimitive() {
         val node = buildNodeFromMap(
-            "number" to 9
+            "number" to 9,
         )
         assertEquals(9, node.getSerializable("number", Int.serializer()))
     }
@@ -271,8 +274,8 @@ internal class V8NodeTest : J2V8Test() {
     fun getSerializable() {
         val node = buildNodeFromMap(
             "flow" to mapOf(
-                "id" to "testId"
-            )
+                "id" to "testId",
+            ),
         )
         assertEquals("testId", node.getSerializable("flow", Flow.serializer())?.id)
     }

@@ -34,7 +34,7 @@ public class Slf4jLoggerPlugin(public val config: Slf4jLoggerConfig) : LoggerPlu
 }
 
 public class Slf4jLoggerConfig(
-    public var name: String = "Slf4jLogger",
+    override var name: String = "Slf4jLogger",
     public var logger: (Logger) -> Unit = {},
 ) : PlayerLoggingConfig()
 

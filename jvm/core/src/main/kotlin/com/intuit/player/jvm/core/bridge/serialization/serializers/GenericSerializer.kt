@@ -6,7 +6,9 @@ import com.intuit.player.jvm.core.bridge.serialization.encoding.NodeDecoder
 import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeSerializationException
 import com.intuit.player.jvm.core.bridge.serialization.json.value
 import com.intuit.player.jvm.core.utils.InternalPlayerApi
-import kotlinx.serialization.*
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.ArraySerializer
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.MapSerializer
@@ -15,7 +17,12 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonDecoder
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.serializerOrNull
 
 /**
  * Generic serializer for [Any]? that uses the actual value type to determine the [KSerializer]
@@ -47,12 +54,12 @@ public open class GenericSerializer(private val typeSerializers: List<KSerialize
             """
             |GenericFallbackSerializer provides limited deserialization support only for NodeDecoder and JsonDecoder:
             |   ${decoder::class} type not supported
-        """.trimMargin()
+            """.trimMargin(),
         )
     }
 
     /** Will attempt to find a registered serializer on the companion for whatever class the [value] */
-    @OptIn(ExperimentalStdlibApi::class, InternalSerializationApi::class)
+    @OptIn(InternalSerializationApi::class)
     override fun serialize(encoder: Encoder, value: Any?): Unit = when (value) {
         null -> encoder.encodeNull()
         else -> encoder.encodeSerializableValue(

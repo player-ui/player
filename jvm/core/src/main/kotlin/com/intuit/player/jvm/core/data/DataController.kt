@@ -2,6 +2,7 @@ package com.intuit.player.jvm.core.data
 
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
 import kotlinx.serialization.Serializable
 
@@ -10,15 +11,15 @@ import kotlinx.serialization.Serializable
 public class DataController internal constructor(override val node: Node) : NodeWrapper {
     /** Apply [data] to the underlying data model */
     public fun set(data: Map<String, Any?>) {
-        node.getFunction<Unit>("set")?.invoke(data)
+        node.getInvokable<Unit>("set")?.invoke(data)
     }
 
     /** [set] each of the [Binding]s contained in the [transaction] */
     public fun set(transaction: List<List<Any?>>) {
-        node.getFunction<Unit>("set")?.invoke(transaction)
+        node.getInvokable<Unit>("set")?.invoke(transaction)
     }
 
-    public fun get(binding: Binding): Any? = node.getFunction<Any?>("get")?.invoke(binding)
+    public fun get(binding: Binding): Any? = node.getInvokable<Any?>("get")?.invoke(binding)
 
     internal object Serializer : NodeWrapperSerializer<DataController>(::DataController)
 }

@@ -1,7 +1,7 @@
 package com.intuit.player.jvm.core.plugins.logging
 
 import com.intuit.player.jvm.core.plugins.LoggerPlugin
-import java.util.ServiceLoader
+import java.util.*
 
 /** Factory of [Logging] with a specific [T] of [PlayerLoggingConfig] */
 public interface PlayerLoggingFactory<out T : PlayerLoggingConfig> {
@@ -14,7 +14,7 @@ public interface PlayerLoggingFactory<out T : PlayerLoggingConfig> {
  * with further configurations from the [nested] block.
  */
 public fun <T : PlayerLoggingConfig> PlayerLoggingFactory<T>.config(
-    nested: T.() -> Unit
+    nested: T.() -> Unit,
 ): PlayerLoggingFactory<T> {
     val parent = this
 
@@ -33,3 +33,6 @@ public val loggerContainers: List<PlayerLoggingContainer> = PlayerLoggingContain
 
 /** Default [PlayerLoggingFactory] to use if none are specified */
 public val loggers: List<LoggerPlugin> = loggerContainers.map { it.factory.create() }
+
+/** Instantiate and configure all [LoggerPlugin]s */
+public fun loggers(block: PlayerLoggingConfig.() -> Unit): List<LoggerPlugin> = loggerContainers.map { it.factory.create(block) }

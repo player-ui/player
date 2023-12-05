@@ -4,6 +4,7 @@ import com.intuit.player.jvm.core.bridge.Completable
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
 import com.intuit.player.jvm.core.bridge.hooks.NodeSyncHook1
+import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.player.jvm.core.data.DataController
 import com.intuit.player.jvm.core.experimental.ExperimentalPlayerApi
@@ -11,14 +12,21 @@ import com.intuit.player.jvm.core.expressions.ExpressionController
 import com.intuit.player.jvm.core.flow.FlowController
 import com.intuit.player.jvm.core.flow.FlowResult
 import com.intuit.player.jvm.core.logger.TapableLogger
-import com.intuit.player.jvm.core.player.state.*
+import com.intuit.player.jvm.core.player.state.CompletedState
+import com.intuit.player.jvm.core.player.state.PlayerFlowState
+import com.intuit.player.jvm.core.player.state.ReleasedState
 import com.intuit.player.jvm.core.plugins.Pluggable
 import com.intuit.player.jvm.core.validation.ValidationController
 import com.intuit.player.jvm.core.view.View
 import com.intuit.player.jvm.core.view.ViewController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.job
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import java.net.URL
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /** Agnostic [Pluggable] [Player] to provide the core API */
 public abstract class Player : Pluggable {
@@ -34,7 +42,7 @@ public abstract class Player : Pluggable {
     /** [Player] hooks that expose underlying controllers for supplementing functionality */
     @Serializable(Hooks.Companion.Serializer::class)
     public interface Hooks {
-        /** The hook that fires every time we create a new flowController (a new flow is started) */
+        /** The hook that fires every time we create a new flowController (a new FRF) */
         public val flowController: NodeSyncHook1<FlowController>
 
         /** The hook that updates/handles view things */
@@ -57,22 +65,15 @@ public abstract class Player : Pluggable {
         public companion object {
             internal interface HooksByNode : Hooks, NodeWrapper
             public fun serializer(): KSerializer<Hooks> = Serializer
-            internal operator fun invoke(node: Node): HooksByNode = object : HooksByNode {
+            internal operator fun invoke(node: Node): HooksByNode = object : HooksByNode, NodeWrapper {
                 override val node: Node = node
-                override val flowController: NodeSyncHook1<FlowController>
-                    get() = NodeSyncHook1(node.getObject("flowController")!!, FlowController.serializer())
-                override val viewController: NodeSyncHook1<ViewController>
-                    get() = NodeSyncHook1(node.getObject("viewController")!!, ViewController.serializer())
-                override val view: NodeSyncHook1<View>
-                    get() = NodeSyncHook1(node.getObject("view")!!, View.serializer())
-                override val expressionEvaluator: NodeSyncHook1<ExpressionController>
-                    get() = NodeSyncHook1(node.getObject("expressionEvaluator")!!, ExpressionController.serializer())
-                override val dataController: NodeSyncHook1<DataController>
-                    get() = NodeSyncHook1(node.getObject("dataController")!!, DataController.serializer())
-                override val validationController: NodeSyncHook1<ValidationController>
-                    get() = NodeSyncHook1(node.getObject("validationController")!!, ValidationController.serializer())
-                override val state: NodeSyncHook1<out PlayerFlowState>
-                    get() = NodeSyncHook1(node.getObject("state")!!, PlayerFlowState.serializer())
+                override val flowController: NodeSyncHook1<FlowController> by NodeSerializableField(NodeSyncHook1.serializer(FlowController.serializer()))
+                override val viewController: NodeSyncHook1<ViewController> by NodeSerializableField(NodeSyncHook1.serializer(ViewController.serializer()))
+                override val view: NodeSyncHook1<View> by NodeSerializableField(NodeSyncHook1.serializer(View.serializer()))
+                override val expressionEvaluator: NodeSyncHook1<ExpressionController> by NodeSerializableField(NodeSyncHook1.serializer(ExpressionController.serializer()))
+                override val dataController: NodeSyncHook1<DataController> by NodeSerializableField(NodeSyncHook1.serializer(DataController.serializer()))
+                override val validationController: NodeSyncHook1<ValidationController> by NodeSerializableField(NodeSyncHook1.serializer(ValidationController.serializer()))
+                override val state: NodeSyncHook1<out PlayerFlowState> by NodeSerializableField(NodeSyncHook1.serializer(PlayerFlowState.serializer()))
             }
 
             internal object Serializer : KSerializer<Hooks> by NodeWrapperSerializer(Hooks::invoke) as KSerializer<Hooks>
@@ -81,6 +82,9 @@ public abstract class Player : Pluggable {
 
     /** The current [PlayerFlowState] of the player. */
     public abstract val state: PlayerFlowState
+
+    /** [CoroutineScope] to be used for launching coroutines that should be cancelled once the Player is released */
+    public abstract val scope: CoroutineScope
 
     /**
      * Asynchronously [start] the [flow] represented as a [String]. The
@@ -121,3 +125,13 @@ public abstract class Player : Pluggable {
         onComplete(onComplete)
     }
 }
+
+/**
+ * Create a child [CoroutineScope] of the [Player.scope], such that it'll inherit the [CoroutineContext],
+ * but with its own [SupervisorJob]. Unless overridden by the provided [context], this ensures that the
+ * sub-scope can be cancelled independently, but still contains other top-level elements, such as the
+ * dispatcher or coroutine exception handler.
+ */
+@ExperimentalPlayerApi
+public fun Player.subScope(context: CoroutineContext = EmptyCoroutineContext): CoroutineScope =
+    CoroutineScope(scope.coroutineContext + SupervisorJob(scope.coroutineContext.job) + context)

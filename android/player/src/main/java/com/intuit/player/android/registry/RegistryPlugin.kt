@@ -1,6 +1,7 @@
 package com.intuit.player.android.registry
 
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
 import com.intuit.player.jvm.core.plugins.JSPluginWrapper
 
@@ -15,13 +16,13 @@ internal class RegistryPlugin<T> : JSPluginWrapper {
         runtime.execute(readSource("plugins/partial-match-fingerprint/core/dist/partial-match-fingerprint-plugin.prod.js"))
         runtime.execute(readSource("core/partial-match-registry/dist/partial-match-registry.prod.js"))
         instance = runtime.execute(
-            """(new PartialMatchFingerprintPlugin.PartialMatchFingerprintPlugin(new Registry.Registry()))"""
+            """(new PartialMatchFingerprintPlugin.PartialMatchFingerprintPlugin(new Registry.Registry()))""",
         ) as Node
     }
 
     fun register(match: Map<String, Any>, value: T) {
         registry.add(value)
-        instance.getFunction<Unit>("register")!!.invoke(match, registry.size - 1)
+        instance.getInvokable<Unit>("register")!!.invoke(match, registry.size - 1)
     }
 
     /**
@@ -31,7 +32,7 @@ internal class RegistryPlugin<T> : JSPluginWrapper {
      */
     operator fun get(id: String): T? = getAssetIndex(id)?.let(registry::getOrNull)
 
-    private fun getAssetIndex(id: String): Int? = instance.getFunction<Any?>("get")!!.invoke(id) as? Int
+    private fun getAssetIndex(id: String): Int? = instance.getInvokable<Any?>("get")!!.invoke(id) as? Int
 
     private fun readSource(source: String) = RegistryPlugin::class.java.classLoader!!
         .getResource(source)

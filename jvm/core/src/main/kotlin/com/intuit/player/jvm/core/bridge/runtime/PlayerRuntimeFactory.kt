@@ -13,7 +13,7 @@ public interface PlayerRuntimeFactory<out T : PlayerRuntimeConfig> {
  * with further configurations from the [nested] block.
  */
 public fun <T : PlayerRuntimeConfig> PlayerRuntimeFactory<T>.config(
-    nested: T.() -> Unit
+    nested: T.() -> Unit,
 ): PlayerRuntimeFactory<T> {
     val parent = this
 
@@ -33,5 +33,5 @@ public val runtimeContainers: List<PlayerRuntimeContainer> = PlayerRuntimeContai
 /** Default [PlayerRuntimeFactory] to use if none are specified */
 public val runtimeFactory: PlayerRuntimeFactory<*> = runtimeContainers.firstOrNull()?.factory ?: error(
     "Failed to find JS Player runtime implementation in the classpath: consider adding player runtime dependency. " +
-        "See https://TODO"
+        "See https://TODO",
 )

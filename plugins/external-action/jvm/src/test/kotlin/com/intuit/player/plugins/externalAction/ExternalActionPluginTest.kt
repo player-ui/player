@@ -3,11 +3,9 @@ package com.intuit.player.plugins.externalAction
 import com.intuit.player.jvm.core.expressions.evaluate
 import com.intuit.player.jvm.utils.test.PlayerTest
 import com.intuit.player.jvm.utils.test.runBlockingTest
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestTemplate
 import org.junit.jupiter.api.assertThrows
@@ -78,14 +76,14 @@ internal class ExternalActionPluginTest : PlayerTest() {
                 runBlocking {
                     player.start(jsonFlow).await()
                 }
-            }.message
+            }.message,
         )
     }
 
     @TestTemplate
     fun testExternalStateHandlingWithDelay() = runBlockingTest {
         player.onExternalAction { _, _, transition ->
-            GlobalScope.launch {
+            launch {
                 delay(2000)
                 transition("Next")
             }

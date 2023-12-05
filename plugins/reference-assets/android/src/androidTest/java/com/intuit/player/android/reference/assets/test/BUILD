@@ -3,10 +3,13 @@ load("@rules_player//kotlin:lint.bzl", "lint")
 load(":deps.bzl", "main_deps")
 
 kt_android_library(
-  name = "test",
-  srcs = ["assertions.kt", "AssetTest.kt"],
-  deps = main_deps,
-  visibility = ["//plugins/reference-assets/android:__subpackages__"],
+    name = "test",
+    srcs = [
+        "Assertions.kt",
+        "AssetTest.kt",
+    ],
+    visibility = ["//plugins/reference-assets/android:__subpackages__"],
+    deps = main_deps,
 )
 
 lint(

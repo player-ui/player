@@ -10,15 +10,18 @@ import com.intuit.player.jvm.j2v8.V8Value
 import com.intuit.player.jvm.j2v8.bridge.runtime.V8Runtime
 import com.intuit.player.jvm.j2v8.bridge.serialization.encoding.readV8
 import com.intuit.player.jvm.j2v8.bridge.serialization.encoding.writeV8
-import com.intuit.player.jvm.j2v8.extensions.blockingLock
-import kotlinx.serialization.*
+import com.intuit.player.jvm.j2v8.extensions.evaluateInJSThreadBlocking
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.modules.SerializersModule
 
 public class J2V8Format(
     config: J2V8FormatConfiguration,
 ) : AbstractRuntimeFormat<V8Value>(config) {
 
-    public val v8: V8 = (config.runtime as V8Runtime).v8
+    public val v8: V8 by lazy {
+        (config.runtime as V8Runtime).v8
+    }
 
     override fun <T> encodeToRuntimeValue(serializer: SerializationStrategy<T>, value: T): V8Value =
         writeV8(value, serializer)
@@ -29,7 +32,7 @@ public class J2V8Format(
     public fun parseToV8Value(string: String): V8Value =
         parseToRuntimeValue(string)
 
-    override fun parseToRuntimeValue(string: String): V8Value = v8.blockingLock {
+    override fun parseToRuntimeValue(string: String): V8Value = v8.evaluateInJSThreadBlocking(runtime) {
         executeScript("($string)").let(::V8Value)
     }
 }

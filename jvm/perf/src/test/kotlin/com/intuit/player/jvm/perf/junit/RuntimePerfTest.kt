@@ -1,11 +1,14 @@
 package com.intuit.player.jvm.perf.junit
 
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.runtime.add
 import com.intuit.player.jvm.core.player.JSPlayerConfig
 import com.intuit.player.jvm.core.plugins.JSPluginWrapper
 import com.intuit.player.jvm.core.plugins.Plugin
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.TestTemplate
 
 internal class RuntimePerfTest : JSEngineTest() {
@@ -30,7 +33,7 @@ internal class RuntimePerfTest : JSEngineTest() {
         val person = runtime.getObject("person")
         var resultString = ""
         captureTime {
-            resultString = runtime.getFunction<String>("getAge")?.invoke(person) ?: ""
+            resultString = runtime.getInvokable<String>("getAge")?.invoke(person) ?: ""
         }
         assert(resultString.isNotEmpty())
         assertEquals("Joe is 25 years old", resultString)

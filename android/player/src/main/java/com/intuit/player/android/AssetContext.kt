@@ -51,12 +51,16 @@ public fun AssetContext.withContext(context: Context): AssetContext = copy(conte
 public fun AssetContext.withStyles(@StyleRes vararg styles: Style?): AssetContext = withStyles(styles.filterNotNull())
 
 /** Create a new, styled [AssetContext] */
-public fun AssetContext.withStyles(@StyleRes styles: Styles): AssetContext = if (styles.isEmpty()) this else copy(
-    context = context?.let { player.getCachedStyledContext(it, styles) } ?: run {
-        val error = PlayerException("Android context not found! Ensure the asset is rendered with a valid Android context.")
-        player.inProgressState?.fail(error)
-        throw error
-    }
-)
+public fun AssetContext.withStyles(@StyleRes styles: Styles): AssetContext = if (styles.isEmpty()) {
+    this
+} else {
+    copy(
+        context = context?.let { player.getCachedStyledContext(it, styles) } ?: run {
+            val error = PlayerException("Android context not found! Ensure the asset is rendered with a valid Android context.")
+            player.inProgressState?.fail(error)
+            throw error
+        },
+    )
+}
 
 public fun AssetContext.build(): RenderableAsset = factory(this)

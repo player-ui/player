@@ -10,5 +10,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 public data class Navigation(
     val BEGIN: String,
-    val flows: Map<String, NavigationFlow> = emptyMap()
+    val flows: Map<String, NavigationFlow> = emptyMap(),
 )

@@ -2,7 +2,7 @@ package com.intuit.player.jvm.core.validation
 
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.NodeWrapper
-import com.intuit.player.jvm.core.bridge.deserialize
+import com.intuit.player.jvm.core.bridge.getInvokable
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.player.jvm.core.resolver.Resolver
 import kotlinx.serialization.Serializable
@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
 @Serializable(with = Validation.Serializer::class)
 public class Validation internal constructor(override val node: Node) : NodeWrapper {
     /** get all outstanding validations on current flow */
-    public fun getAll(): ValidationMapping? = node.getFunction<Node>("getAll")?.invoke()?.deserialize()
+    public fun getAll(): ValidationMapping? = node.getInvokable<ValidationMapping?>("getAll")!!()
 
     internal object Serializer : NodeWrapperSerializer<Validation>(::Validation)
 }

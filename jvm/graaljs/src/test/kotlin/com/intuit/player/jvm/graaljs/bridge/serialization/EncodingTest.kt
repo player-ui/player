@@ -53,7 +53,7 @@ internal class FunctionEncoding : GraalTest() {
         Assertions.assertEquals("PLAYER: 1", callback("PLAYER", 1))
         Assertions.assertEquals(
             "PLAYER: 2",
-            format.encodeToGraalValue(callback).execute("PLAYER", 2).asString()
+            format.encodeToGraalValue(callback).execute("PLAYER", 2).asString(),
         )
     }
 
@@ -63,7 +63,7 @@ internal class FunctionEncoding : GraalTest() {
         Assertions.assertEquals("PLAYER: 1", callback("PLAYER", 1))
         Assertions.assertEquals(
             "PLAYER: 2",
-            format.encodeToGraalValue(callback).execute("PLAYER", 2).asString()
+            format.encodeToGraalValue(callback).execute("PLAYER", 2).asString(),
         )
     }
 
@@ -77,7 +77,7 @@ internal class FunctionEncoding : GraalTest() {
         Assertions.assertEquals("PLAYER: 1", callback("PLAYER", 1))
         Assertions.assertEquals(
             "PLAYER: 2",
-            format.encodeToGraalValue(callback).execute("PLAYER", 2).asString()
+            format.encodeToGraalValue(callback).execute("PLAYER", 2).asString(),
         )
     }
 }

@@ -18,7 +18,7 @@ internal class Slf4jLoggerPluginTest : RuntimeTest() {
             "MyLogger",
             Slf4jLoggerFactory.create {
                 name = "MyLogger"
-            }.logger.name
+            }.logger.name,
         )
     }
 

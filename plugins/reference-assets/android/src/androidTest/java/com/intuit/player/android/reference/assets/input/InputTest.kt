@@ -19,6 +19,7 @@ class InputTest : AssetTest("reference-assets") {
         requestFocus()
         setText(text)
         clearFocus()
+        blockUntilRendered()
     }
 
     @Test

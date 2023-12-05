@@ -71,7 +71,7 @@ internal fun <T> Context.blockingLock(block: Context.() -> T): T = when {
 
 /** Special [blockingLock] helper to guard against undefined values */
 internal fun <T> Value.lockIfDefined(
-    block: Value.() -> T
+    block: Value.() -> T,
 ): T? = mapUndefinedToNull()?.let { blockingLock(block) }
 
 internal fun Value.mapUndefinedToNull() = blockingLock {

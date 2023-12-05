@@ -33,7 +33,7 @@ public class JavaLoggerPlugin(public val config: JavaLoggerConfig) : LoggerPlugi
 }
 
 public class JavaLoggerConfig(
-    public var name: String = "JavaLogger",
+    override var name: String = "JavaLogger",
     public var logger: (Logger) -> Unit = {},
 ) : PlayerLoggingConfig()
 

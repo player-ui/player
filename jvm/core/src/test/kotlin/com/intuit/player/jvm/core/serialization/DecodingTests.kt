@@ -10,7 +10,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.TestTemplate
 
 @Serializable
@@ -111,7 +112,7 @@ internal class StructureDecoding : RuntimeTest() {
                 "five" to 5,
                 "six" to "six",
             ),
-            "seven" to 7.7
+            "seven" to 7.7,
         )
 
         assertEquals(map, format.decodeFromRuntimeValue(runtimeObject))
@@ -159,13 +160,13 @@ internal class StructureDecoding : RuntimeTest() {
                 format.runtimeArray {
                     append(1)
                     append(2)
-                }
+                },
             )
             append(
                 format.runtimeArray {
                     append(3)
                     append(4)
-                }
+                },
             )
         }
 
@@ -185,13 +186,13 @@ internal class StructureDecoding : RuntimeTest() {
                 format.runtimeArray {
                     append(1)
                     append("two")
-                }
+                },
             )
             append(
                 format.runtimeArray {
                     append(3)
                     append(false)
-                }
+                },
             )
             append(7.7)
         }

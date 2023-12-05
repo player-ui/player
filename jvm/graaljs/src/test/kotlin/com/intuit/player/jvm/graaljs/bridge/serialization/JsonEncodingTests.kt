@@ -21,7 +21,7 @@ internal class JsonEncodingTests : GraalTest() {
             buildJsonObject {
                 put("state_type", "END")
                 put("outcome", "doneWithTopic")
-            }
+            },
         )
     }
     private val expectedJsonString = expectedJson.toString()

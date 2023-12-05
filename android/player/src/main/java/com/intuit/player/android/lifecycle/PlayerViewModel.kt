@@ -13,16 +13,34 @@ import com.intuit.player.jvm.core.managed.AsyncFlowIterator
 import com.intuit.player.jvm.core.managed.AsyncIterationManager
 import com.intuit.player.jvm.core.managed.FlowManager
 import com.intuit.player.jvm.core.player.PlayerException
-import com.intuit.player.jvm.core.player.state.*
+import com.intuit.player.jvm.core.player.state.CompletedState
+import com.intuit.player.jvm.core.player.state.ErrorState
+import com.intuit.player.jvm.core.player.state.InProgressState
+import com.intuit.player.jvm.core.player.state.NotStartedState
+import com.intuit.player.jvm.core.player.state.ReleasedState
+import com.intuit.player.jvm.core.player.state.completedState
+import com.intuit.player.jvm.core.player.state.inProgressState
 import com.intuit.player.jvm.core.plugins.Plugin
 import com.intuit.player.jvm.core.plugins.RuntimePlugin
 import com.intuit.player.plugins.beacon.onBeacon
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 /**
  * Android lifecycle-aware player manager that integrates and manages
- * state between a [FlowManager] and an [AndroidPlayer]. This sta
+ * state between a [FlowManager] and an [AndroidPlayer].
  *
  * As-is, this bare-bones implementation does not include any additional
  * plugins, meaning that any flows will not actually expand into
@@ -45,21 +63,29 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
      */
     protected open val plugins: List<Plugin> = emptyList()
 
-    // TODO: accessing non-final fields in constructor -- must not use player before init is done
-    //  This could be fixed by requiring [plugins] be in the constructor, but this is kinda
-    //  backwards since subclasses are required to configure plugin behavior manually. Maybe
-    //  apps just supply a meta plugin to configure things? Although, the reason for configuring
-    //  plugins here is to potentially hook into the fragment. External actions is a great
-    //  example, where the app needs to actually load a different native experience outside the
-    //  player scope. Not sure how to solve this. Maybe a player factory instead that requires
-    //  the [PlayerViewModel] to be finished initialization?
-    protected val player: AndroidPlayer by lazy {
-        AndroidPlayer(plugins + this)
+    protected open val config: AndroidPlayer.Config = AndroidPlayer.Config()
+
+    @ExperimentalPlayerApi
+    public val deferredPlayer: Deferred<AndroidPlayer> = viewModelScope.async(Dispatchers.Default) {
+        // this is unfortunate, but is essentially for ensuring view model has completely initialized
+        while (plugins == null) { delay(5) }
+        AndroidPlayer(plugins + this@PlayerViewModel, config)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalPlayerApi::class)
+    public val player: AndroidPlayer by lazy {
+        if (deferredPlayer.isCompleted) {
+            deferredPlayer.getCompleted()
+        } else {
+            runBlocking {
+                deferredPlayer.await()
+            }
+        }
     }
 
     protected val manager: FlowManager = FlowManager(flows)
 
-    private lateinit var runtime: Runtime<*>
+    private var runtime: Runtime<*>? = null
 
     private var _state = MutableStateFlow<ManagedPlayerState>(ManagedPlayerState.NotStarted)
     private val _beacons = MutableSharedFlow<String>()
@@ -69,7 +95,7 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
 
     init {
         // next() TODO: If we fix the non-final field error, we can prefetch here
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             manager.state.collect {
                 when (it) {
                     AsyncIterationManager.State.NotStarted -> _state.emit(ManagedPlayerState.NotStarted)
@@ -86,11 +112,11 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
         when {
             it.isSuccess -> player.logger.info(
                 "Flow completed successfully!",
-                it.getOrNull()?.endState
+                it.getOrNull()?.endState,
             )
             it.isFailure -> player.logger.error(
                 "Error in Flow!",
-                it.exceptionOrNull()?.stackTraceToString()
+                it.exceptionOrNull(),
             )
         }
     }
@@ -114,6 +140,7 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
                 // which will either start a new flow or transition to done
                 is CompletedState -> manager.next(state)
                 is ErrorState -> _state.tryEmit(ManagedPlayerState.Error(state.error))
+                is InProgressState, ReleasedState, null -> Unit
             }
         }
     }
@@ -122,20 +149,21 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
         this.runtime = runtime
     }
 
-    override fun onCleared() {
-        runtime.scope.launch {
-            if (manager.state.value != AsyncIterationManager.State.Done) manager.iterator.terminate()
-            release()
+    public override fun onCleared() {
+        if (manager.state.value != AsyncIterationManager.State.Done) {
+            runBlocking {
+                manager.iterator.terminate()
+            }
         }
+
+        release()
     }
 
     public fun recycle() {
-        player.logger.debug("PlayerViewModel: recycling player")
         player.recycle()
     }
 
     public fun release() {
-        player.logger.debug("PlayerViewModel: releasing player")
         player.release()
     }
 
@@ -153,12 +181,19 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
         when (state.value) {
             ManagedPlayerState.NotStarted -> manager.next()
             is ManagedPlayerState.Error,
-            is ManagedPlayerState.Running -> when (val currentFlow = manager.state.value) {
+            is ManagedPlayerState.Running,
+            -> when (manager.state.value) {
                 AsyncIterationManager.State.NotStarted -> manager.next()
-                is AsyncIterationManager.State.Item<*> -> start(currentFlow.value as String)
-                // try to re-retrieve the next flow from the previous state
-                is AsyncIterationManager.State.Error -> manager.next(player.completedState)
+                is AsyncIterationManager.State.Item<*>,
+                is AsyncIterationManager.State.Error,
+                -> manager.next(player.completedState)
+                AsyncIterationManager.State.Done,
+                AsyncIterationManager.State.Pending,
+                -> Unit
             }
+            is ManagedPlayerState.Done,
+            ManagedPlayerState.Pending,
+            -> Unit
         }
     }
 
@@ -174,7 +209,7 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
     /** Generic [ViewModelProvider.AndroidViewModelFactory] to conveniently construct some [T] with an [Application] and [AsyncFlowIterator] */
     public class Factory<T : PlayerViewModel>(
         private val iterator: AsyncFlowIterator,
-        private val factory: (AsyncFlowIterator) -> T = { i -> PlayerViewModel(i) as T }
+        private val factory: (AsyncFlowIterator) -> T = { i -> PlayerViewModel(i) as T },
     ) : ViewModelProvider.Factory {
 
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

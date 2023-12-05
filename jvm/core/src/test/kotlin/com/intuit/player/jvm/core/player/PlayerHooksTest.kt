@@ -1,8 +1,11 @@
 package com.intuit.player.jvm.core.player
 
 import com.intuit.player.jvm.core.NodeBaseTest
-import com.intuit.player.jvm.core.bridge.Invokable
-import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.hooks.NodeSyncHook1
+import com.intuit.player.jvm.core.data.DataController
+import com.intuit.player.jvm.core.flow.FlowController
+import com.intuit.player.jvm.core.player.state.PlayerFlowState
+import com.intuit.player.jvm.core.view.ViewController
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -11,13 +14,16 @@ import org.junit.jupiter.api.Test
 
 internal class PlayerHooksTest : NodeBaseTest() {
     @MockK
-    private lateinit var fc: Node
+    private lateinit var fc: NodeSyncHook1<FlowController>
+
     @MockK
-    private lateinit var vc: Node
+    private lateinit var vc: NodeSyncHook1<ViewController>
+
     @MockK
-    private lateinit var dc: Node
+    private lateinit var dc: NodeSyncHook1<DataController>
+
     @MockK
-    private lateinit var state: Node
+    private lateinit var state: NodeSyncHook1<PlayerFlowState>
 
     private val hooks by lazy {
         Player.Hooks(node)
@@ -25,14 +31,12 @@ internal class PlayerHooksTest : NodeBaseTest() {
 
     @BeforeEach
     fun setUpMocks() {
-        every { node.getObject("flowController") } returns fc
-        every { node.getObject("viewController") } returns vc
-        every { node.getObject("dataController") } returns dc
-        every { node.getObject("state") } returns state
-        every { fc.getFunction<Unit>("tap") } returns Invokable {}
-        every { vc.getFunction<Unit>("tap") } returns Invokable {}
-        every { dc.getFunction<Unit>("tap") } returns Invokable {}
-        every { state.getFunction<Unit>("tap") } returns Invokable {}
+        every { node.getObject(any()) } returns node
+        every { node.getSerializable<NodeSyncHook1<FlowController>>("flowController", any()) } returns fc
+        every { node.getSerializable<NodeSyncHook1<ViewController>>("viewController", any()) } returns vc
+        every { node.getSerializable<NodeSyncHook1<DataController>>("dataController", any()) } returns dc
+        every { node.getSerializable<NodeSyncHook1<PlayerFlowState>>("state", any()) } returns state
+        every { node.nativeReferenceEquals(any()) } returns true
     }
 
     @Test

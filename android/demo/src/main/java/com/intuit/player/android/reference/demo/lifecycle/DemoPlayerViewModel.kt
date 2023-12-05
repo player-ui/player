@@ -1,6 +1,7 @@
 package com.intuit.player.android.reference.demo.lifecycle
 
 import com.intuit.player.android.AndroidPlayer
+import com.intuit.player.android.AndroidPlayer.Config
 import com.intuit.player.android.lifecycle.PlayerViewModel
 import com.intuit.player.android.reference.assets.ReferenceAssetsPlugin
 import com.intuit.player.jvm.core.managed.AsyncFlowIterator
@@ -17,6 +18,10 @@ class DemoPlayerViewModel(iterator: AsyncFlowIterator) : PlayerViewModel(iterato
         CommonTypesPlugin(),
         ReferenceAssetsPlugin(),
         PendingTransactionPlugin(),
+    )
+
+    override val config: Config = Config(
+        debuggable = true,
     )
 
     private val _playerFlowState = MutableStateFlow<PlayerFlowState?>(null)

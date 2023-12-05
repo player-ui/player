@@ -3,6 +3,7 @@ package com.intuit.player.plugins.externalAction
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.Promise
 import com.intuit.player.jvm.core.bridge.runtime.Runtime
+import com.intuit.player.jvm.core.bridge.runtime.ScriptContext
 import com.intuit.player.jvm.core.bridge.runtime.add
 import com.intuit.player.jvm.core.flow.state.NavigationFlowExternalState
 import com.intuit.player.jvm.core.flow.state.NavigationFlowState
@@ -20,7 +21,7 @@ public fun interface ExternalActionHandler {
 
 /** Core plugin wrapper providing external action support for the JVM Player */
 public class ExternalActionPlugin(
-    private var handler: ExternalActionHandler? = null
+    private var handler: ExternalActionHandler? = null,
 ) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath), PlayerPlugin {
 
     private lateinit var player: Player
@@ -31,11 +32,11 @@ public class ExternalActionPlugin(
 
     override fun apply(runtime: Runtime<*>) {
         SetTimeoutPlugin().apply(runtime)
-        runtime.execute(script)
+        runtime.load(ScriptContext(if (runtime.config.debuggable) debugScript else script, bundledSourcePath))
         runtime.add("externalActionHandler") externalActionHandler@{ state: Node, options: Node ->
             val state = state.deserialize(NavigationFlowState.serializer())
                 as? NavigationFlowExternalState ?: return@externalActionHandler null
-            val options = options.deserialize(ControllerState.serializer())!!
+            val options = options.deserialize(ControllerState.serializer())
 
             return@externalActionHandler runtime.Promise<Any> { resolve, _ ->
                 handler?.onExternalState(state, options, resolve)

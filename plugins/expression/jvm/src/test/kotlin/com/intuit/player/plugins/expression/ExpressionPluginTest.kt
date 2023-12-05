@@ -7,7 +7,10 @@ import com.intuit.player.jvm.core.plugins.findPlugin
 import com.intuit.player.jvm.utils.test.PlayerTest
 import com.intuit.player.jvm.utils.test.setupPlayer
 import com.intuit.player.jvm.utils.test.simpleFlowString
-import org.amshove.kluent.*
+import org.amshove.kluent.`should be empty`
+import org.amshove.kluent.`should be equal to`
+import org.amshove.kluent.`should be instance of`
+import org.amshove.kluent.`should not be null`
 import org.junit.jupiter.api.TestTemplate
 
 internal class ExpressionPluginTest : PlayerTest() {
@@ -21,8 +24,8 @@ internal class ExpressionPluginTest : PlayerTest() {
                     else -> "bye"
                 }
             },
-            "MyExpression2" to { null }
-        )
+            "MyExpression2" to { null },
+        ),
     )
 
     private val expressionPlugin get() = player.findPlugin<ExpressionPlugin>()!!

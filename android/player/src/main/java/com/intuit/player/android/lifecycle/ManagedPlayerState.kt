@@ -10,12 +10,16 @@ import com.intuit.player.jvm.core.player.state.PlayerFlowState
 public sealed class ManagedPlayerState {
     /** Initial state of the [PlayerViewModel] */
     public object NotStarted : ManagedPlayerState()
+
     /** State that represents any error encountered when instantiating a player, retrieving a flow, or running a flow */
     public data class Error(public val exception: Exception) : ManagedPlayerState()
+
     /** [Pending] represents the time spent retrieving a flow, either before any flow or after the [AndroidPlayer] reaches the [CompletedState] */
     public object Pending : ManagedPlayerState()
+
     /** State containing the current [asset] representation of the current in-progress flow */
     public data class Running(public val asset: RenderableAsset?, public val animateViewTransition: Boolean) : ManagedPlayerState()
+
     /** The [PlayerViewModel] reaches the [Done] state once the [PlayerViewModel.manager] has no more flows to produce */
     public data class Done(public val completedState: CompletedState?) : ManagedPlayerState()
 

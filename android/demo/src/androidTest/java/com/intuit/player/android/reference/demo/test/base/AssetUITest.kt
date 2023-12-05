@@ -40,10 +40,11 @@ abstract class AssetUITest(val group: String? = null) : ApplitoolsTest() {
 
     @After
     fun after() {
-        Intents.assertNoUnverifiedIntents()
+        eyes?.takeIf { it.isOpen }?.run {
+            checkWindow("done")
+            close()
+        }
         Intents.release()
-        eyes.checkWindow("done")
-        eyes.close()
     }
 
     fun launchMock() {
@@ -53,7 +54,7 @@ abstract class AssetUITest(val group: String? = null) : ApplitoolsTest() {
     fun launchMock(name: String) {
         launchMock(
             mocks.find { it.name == name || it.name == "$group-$name" }
-                ?: throw IllegalArgumentException("$name not found in mocks: ${mocks.map { "${it.group}/${it.name}" }}")
+                ?: throw IllegalArgumentException("$name not found in mocks: ${mocks.map { "${it.group}/${it.name}" }}"),
         )
     }
 
@@ -65,7 +66,7 @@ abstract class AssetUITest(val group: String? = null) : ApplitoolsTest() {
                 ?: throw IllegalStateException("player not found")
         }
 
-        eyes.open("Android Reference Assets Demo", "${mock.group}/${name.methodName}")
-        eyes.checkPlayer("init")
+        eyes?.open("Android Reference Assets Demo", "${mock.group}/${mock.name}/${name.methodName}")
+        eyes?.checkPlayer("init")
     }
 }

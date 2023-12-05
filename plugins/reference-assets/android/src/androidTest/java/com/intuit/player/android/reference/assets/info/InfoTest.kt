@@ -31,6 +31,7 @@ class InfoTest : AssetTest("reference-assets") {
             infoActions[action.ordinal].shouldBeView<Button> {
                 assertEquals(action.name, text.toString())
                 performClick()
+                blockUntilRendered()
             }
         }
     }
@@ -46,6 +47,6 @@ class InfoTest : AssetTest("reference-assets") {
         verifyAndProceed(3, PlayerAction.Next)
         verifyAndProceed(1)
 
-        currentState.shouldBePlayerState<InProgressState>({})
+        currentState.shouldBePlayerState<InProgressState>()
     }
 }

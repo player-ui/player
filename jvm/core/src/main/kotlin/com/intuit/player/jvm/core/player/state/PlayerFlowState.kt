@@ -1,12 +1,20 @@
 package com.intuit.player.jvm.core.player.state
 
 import com.intuit.player.jvm.core.asset.Asset
-import com.intuit.player.jvm.core.bridge.*
-import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField.Companion.NodeSerializableField
+import com.intuit.player.jvm.core.bridge.Completable
+import com.intuit.player.jvm.core.bridge.EmptyNode
+import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.NodeWrapper
+import com.intuit.player.jvm.core.bridge.Promise
+import com.intuit.player.jvm.core.bridge.deserialize
+import com.intuit.player.jvm.core.bridge.getInvokable
+import com.intuit.player.jvm.core.bridge.getSerializable
+import com.intuit.player.jvm.core.bridge.getSymbol
+import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeWrapperSerializer
-import com.intuit.player.jvm.core.bridge.serialization.serializers.PolymorphicNodeWrapperSerializer
 import com.intuit.player.jvm.core.data.DataController
 import com.intuit.player.jvm.core.data.DataModelWithParser
+import com.intuit.player.jvm.core.experimental.RuntimeClassDiscriminator
 import com.intuit.player.jvm.core.expressions.ExpressionController
 import com.intuit.player.jvm.core.expressions.ExpressionEvaluator
 import com.intuit.player.jvm.core.flow.Flow
@@ -14,39 +22,30 @@ import com.intuit.player.jvm.core.flow.FlowController
 import com.intuit.player.jvm.core.flow.FlowResult
 import com.intuit.player.jvm.core.flow.Transition
 import com.intuit.player.jvm.core.flow.state.NavigationFlowEndState
-import com.intuit.player.jvm.core.flow.state.NavigationFlowState
 import com.intuit.player.jvm.core.player.Player
 import com.intuit.player.jvm.core.player.PlayerException
 import com.intuit.player.jvm.core.player.PlayerFlowStatus
-import com.intuit.player.jvm.core.player.PlayerFlowStatus.*
+import com.intuit.player.jvm.core.player.PlayerFlowStatus.COMPLETED
+import com.intuit.player.jvm.core.player.PlayerFlowStatus.ERROR
+import com.intuit.player.jvm.core.player.PlayerFlowStatus.IN_PROGRESS
+import com.intuit.player.jvm.core.player.PlayerFlowStatus.NOT_STARTED
+import com.intuit.player.jvm.core.player.PlayerFlowStatus.RELEASED
 import com.intuit.player.jvm.core.validation.ValidationController
 import com.intuit.player.jvm.core.view.View
 import com.intuit.player.jvm.core.view.ViewController
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 
 /** The base representation of the player state */
-@Serializable(with = PlayerFlowStateSerializer::class)
+@Serializable
+@RuntimeClassDiscriminator("status")
 public sealed class PlayerFlowState : NodeWrapper {
     /** The status of the given flow */
     public abstract val status: PlayerFlowStatus
 
     /** A unique reference for the life-cycle of a flow */
-    public val ref: String? get() = node.getString("ref")
-}
-
-internal class PlayerFlowStateSerializer : PolymorphicNodeWrapperSerializer<PlayerFlowState>() {
-    override fun selectDeserializer(node: Node): KSerializer<out PlayerFlowState> {
-        return when (PlayerFlowStatus.from(node.getString("status"))) {
-            NOT_STARTED -> NotStartedState.serializer()
-            IN_PROGRESS -> InProgressState.serializer()
-            COMPLETED -> CompletedState.serializer()
-            ERROR -> ErroneousState.serializer()
-            RELEASED -> ReleasedState.ReleasedStateSerializer
-        }
-    }
+    public val ref: String? get() = node.getSymbol("ref")
 }
 
 /** Player state describing when a flow completed successfully */
@@ -56,15 +55,14 @@ public class CompletedState(override val node: Node) :
 
     override val status: PlayerFlowStatus = COMPLETED
 
-    public val endState: NavigationFlowEndState
-        get() = node.getSerializable("endState", NavigationFlowState.serializer())
-            as? NavigationFlowEndState ?: throw PlayerException("flow result not defined")
+    public val endState: NavigationFlowEndState by NodeSerializableField(NavigationFlowEndState.serializer())
 
-    public val data: JsonElement get() = node.getJson("data") ?: JsonNull
+    public val data: JsonElement by NodeSerializableField(JsonElement.serializer()) { JsonNull }
 
-    public val dataModel: DataModelWithParser get() = node.getSerializable("dataModel")!!
+    // TODO: Completed state dataModel change needs rectification here
+    public val dataModel: DataModelWithParser by NodeSerializableField(DataModelWithParser.serializer())
 
-    internal object Serializer : NodeWrapperSerializer<CompletedState>(::CompletedState)
+    internal object Serializer : NodeWrapperSerializer<CompletedState>(::CompletedState, COMPLETED.value)
 }
 
 /** Player state describing when a flow finished but not successfully */
@@ -97,17 +95,20 @@ internal class ErroneousState(override val node: Node) :
     ErrorState(),
     NodeWrapper {
 
-    override val flow: Flow get() = node.getSerializable("flow", Flow.serializer()) ?: Flow()
+    override val flow: Flow by NodeSerializableField(Flow.serializer()) { Flow() }
 
-    override val error: PlayerException get() = when (val rawError = node["error"]) {
-        is PlayerException -> rawError
-        is Exception -> PlayerException(rawError.message ?: "", rawError)
-        is Node -> rawError.deserialize()
-        is String -> PlayerException(rawError)
-        else -> PlayerException("unable to determine error")
+    override val error: PlayerException by NodeSerializableField(PlayerException.serializer()) {
+        // TODO: Need to test this error handling strategy
+        when (val rawError = get(it)) {
+            is PlayerException -> rawError
+            is Exception -> PlayerException(rawError.message ?: "", rawError)
+            is Node -> rawError.deserialize()
+            is String -> PlayerException(rawError)
+            else -> PlayerException(rawError?.toString() ?: "unable to determine error")
+        }
     }
 
-    internal object Serializer : NodeWrapperSerializer<ErroneousState>(::ErroneousState)
+    internal object Serializer : NodeWrapperSerializer<ErroneousState>(::ErroneousState, ERROR.value)
 }
 
 /** [InProgressState] is for when a flow is currently executing */
@@ -123,16 +124,16 @@ public class InProgressState internal constructor(override val node: Node) :
     /** [FlowResult] value that will be available once the flow completes */
     // TODO: Make non-nullable if possible - requires Promise change
     public val flowResult: Completable<FlowResult?> get() = Promise(
-        node.getObject("flowResult")!!
+        node.getObject("flowResult")!!,
     ).toCompletable(FlowResult.serializer())
 
     public val controllers: ControllerState by NodeSerializableField(ControllerState.serializer())
 
     public fun fail(error: Throwable) {
-        node.getFunction<Any>("fail")!!.invoke(error)
+        node.getInvokable<Any>("fail")!!.invoke(error)
     }
 
-    internal object Serializer : NodeWrapperSerializer<InProgressState>(::InProgressState)
+    internal object Serializer : NodeWrapperSerializer<InProgressState>(::InProgressState, IN_PROGRESS.value)
 }
 
 // inline on purpose to capture stack trace of calling site
@@ -177,16 +178,17 @@ public class NotStartedState internal constructor(override val node: Node) :
 
     override val status: PlayerFlowStatus = NOT_STARTED
 
-    internal object Serializer : NodeWrapperSerializer<NotStartedState>(::NotStartedState)
+    internal object Serializer : NodeWrapperSerializer<NotStartedState>(::NotStartedState, NOT_STARTED.value)
 }
 
 /** Terminal player state the signifies when the player resources have been released */
+@Serializable(with = ReleasedState.ReleasedStateSerializer::class)
 public object ReleasedState : PlayerFlowState(), NodeWrapper {
     override val node: Node = EmptyNode
 
     override val status: PlayerFlowStatus = RELEASED
 
-    internal object ReleasedStateSerializer : NodeWrapperSerializer<ReleasedState>({ ReleasedState })
+    internal object ReleasedStateSerializer : NodeWrapperSerializer<ReleasedState>({ ReleasedState }, RELEASED.value)
 }
 
 /**
@@ -198,7 +200,7 @@ public sealed class PlayerFlowExecutionState(override val node: Node) :
     NodeWrapper {
 
     /** The currently executing flow */
-    public val flow: Flow get() = node.getSerializable("flow", Flow.serializer()) ?: Flow()
+    public val flow: Flow by NodeSerializableField(Flow.serializer()) { Flow() }
 }
 
 // Set of *safe* convenience helpers for bounding state to concrete class

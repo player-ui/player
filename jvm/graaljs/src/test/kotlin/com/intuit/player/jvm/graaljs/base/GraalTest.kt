@@ -30,8 +30,8 @@ internal abstract class GraalTest(val graal: Context = PlayerContextFactory.buil
     fun buildV8Object(jsonElement: JsonElement = buildJsonObject {}) = buildV8ObjectFromMap(
         Json.decodeFromJsonElement(
             MapSerializer(String.serializer(), GenericSerializer()),
-            jsonElement
-        )
+            jsonElement,
+        ),
     )
 
     fun buildV8ObjectFromMap(map: Map<String, Any?>): Value = format.encodeToGraalValue(map)
@@ -48,10 +48,9 @@ internal abstract class GraalTest(val graal: Context = PlayerContextFactory.buil
     fun Value.assertEquivalent(another: Any?) {
         Assertions.assertTrue(
             another is Value,
-            "value to compare is not a Graal Object: $another"
+            "value to compare is not a Graal Object: $another",
         )
         (another as Value).let {
-
             // verify that all missing keys from another are null or undefined
             (memberKeys.toSet() - another.memberKeys.toSet()).forEach { missingKey ->
                 val actual = getMember(missingKey)
@@ -66,12 +65,14 @@ internal abstract class GraalTest(val graal: Context = PlayerContextFactory.buil
 
             if (isNull || !hasMembers() || hasArrayElements()) {
                 if (!canExecute()) Assertions.assertEquals(this.handleValue(format), another.handleValue(format))
-            } else memberKeys.forEach { key ->
-                val (expected, actual) = getMember(key) to another.getMember(key)
-                if (expected is Value && !expected.isNull) {
-                    expected.assertEquivalent(actual)
-                } else {
-                    Assertions.assertEquals(expected, actual, "comparing key: $key")
+            } else {
+                memberKeys.forEach { key ->
+                    val (expected, actual) = getMember(key) to another.getMember(key)
+                    if (expected is Value && !expected.isNull) {
+                        expected.assertEquivalent(actual)
+                    } else {
+                        Assertions.assertEquals(expected, actual, "comparing key: $key")
+                    }
                 }
             }
         }

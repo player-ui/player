@@ -11,9 +11,9 @@ kt_db_android_library(
     manifest = ":src/main/AndroidManifest.xml",
     resource_files = glob(["src/main/res/**"]),
     resources = main_resources,
-    deps = main_deps,
+    tags = ["maven_coordinates=com.intuit.player.android:player:{pom_version}"],
     visibility = ["//visibility:public"],
-    tags = ["maven_coordinates=com.intuit.player.android:player:{pom_version}"]
+    deps = main_deps,
 )
 
 distribution(

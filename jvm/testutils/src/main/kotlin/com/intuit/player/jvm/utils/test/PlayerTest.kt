@@ -28,7 +28,7 @@ public abstract class PlayerTest : RuntimeTest(), Pluggable, LoggerPlugin by Tes
 
     /** Helper method for setting a [player] with configurable [plugins] and [runtime] */
     public fun setupPlayer(plugins: List<Plugin> = this.plugins + this, runtime: Runtime<*> = this.runtime) {
-        player = HeadlessPlayer(plugins, runtime)
+        player = HeadlessPlayer(plugins, runtime, config = runtime.config)
     }
 }
 

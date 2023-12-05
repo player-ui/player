@@ -4,26 +4,30 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import com.intuit.player.android.AssetContext
-import com.intuit.player.android.asset.DecodableAsset
 import com.intuit.player.android.asset.RenderableAsset
+import com.intuit.player.android.asset.SuspendableAsset
 import com.intuit.player.android.extensions.into
 import com.intuit.player.android.reference.assets.R
 import com.intuit.player.android.reference.assets.text.Text
 import com.intuit.player.plugins.transactions.commitPendingTransaction
 import com.intuit.player.plugins.transactions.registerPendingTransaction
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 
-class Input(assetContext: AssetContext) : DecodableAsset<Input.Data>(assetContext, Data.serializer()) {
+class Input(assetContext: AssetContext) : SuspendableAsset<Input.Data>(assetContext, Data.serializer()) {
 
     @Serializable
     data class Validation(
-        val message: String
+        val message: String,
     )
 
     @Serializable
     data class Data(
-        val set: (String?) -> Unit,
-        val format: (String?) -> String?,
+        private val set: (String?) -> Unit,
+        private val format: (String?) -> String?,
 
         /** Optional [label] that gives some semantic meaning to the field asset */
         val label: RenderableAsset? = null,
@@ -34,9 +38,17 @@ class Input(assetContext: AssetContext) : DecodableAsset<Input.Data>(assetContex
         val value: String? = null,
 
         val validation: Validation? = null,
-    )
+    ) {
+        suspend fun set(value: String) = withContext(Dispatchers.Default) {
+            set.invoke(value)
+        }
 
-    override fun initView(): View = LayoutInflater.from(context).inflate(R.layout.input, null).apply {
+        suspend fun format(value: String): String? = withContext(Dispatchers.Default) {
+            format.invoke(value)
+        }
+    }
+
+    override suspend fun initView(data: Data): View = LayoutInflater.from(context).inflate(R.layout.input, null).apply {
         findViewById<FormattedEditText>(R.id.input_field).run {
             setOnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -47,38 +59,29 @@ class Input(assetContext: AssetContext) : DecodableAsset<Input.Data>(assetContex
         }
     }.rootView
 
-    override fun View.hydrate() {
+    override suspend fun View.hydrate(data: Data) {
         data.label?.render(Text.Styles.Label) into findViewById(R.id.input_label_container)
 
         findViewById<FormattedEditText>(R.id.input_field).run {
             error = data.validation?.message
-            val (value, isMasked) = data.value.maybePrivify()
-            if (value != text.toString()) {
-                setText(value ?: "")
-                setSelection(value?.length ?: 0)
+            if (data.value != text.toString()) {
+                setText(data.value ?: "")
+                setSelection(data.value?.length ?: 0)
             }
 
             registerFormatter {
                 it ?: return@registerFormatter
 
-                // Ignore input when masked
-                if (isMasked) {
-                    pauseFormatter {
-                        it.clear()
-                        it.replace(0, it.length, data.value.maybePrivify().first)
-                    }
-
-                    return@registerFormatter
-                }
-
                 val value = it.toString()
 
-                val formatted = data.format(value) ?: value
+                val formatted = runBlocking { data.format(value) } ?: value
                 val shouldFormat = (selectionStart == selectionEnd) and (selectionEnd == it.length)
 
-                if (value != formatted && shouldFormat) pauseFormatter {
-                    it.clear()
-                    it.replace(0, it.length, formatted.maybePrivify().first)
+                if (value != formatted && shouldFormat) {
+                    pauseFormatter {
+                        it.clear()
+                        it.replace(0, it.length, formatted)
+                    }
                 }
             }
 
@@ -87,9 +90,9 @@ class Input(assetContext: AssetContext) : DecodableAsset<Input.Data>(assetContex
                     player.commitPendingTransaction()
                 } else {
                     player.registerPendingTransaction {
-                        // only set data when we have valid data to set
-                        if (!isMasked) data.set(text.toString())
-                        else rehydrate()
+                        hydrationScope.launch {
+                            data.set(text.toString())
+                        }
                     }
                 }
             }
@@ -100,9 +103,4 @@ class Input(assetContext: AssetContext) : DecodableAsset<Input.Data>(assetContex
 
         data.note?.render(Text.Styles.Note) into findViewById(R.id.input_note_container)
     }
-
-    /** Helper to conditionally mask sensitive data under the right conditions */
-    private fun String?.maybePrivify(): Pair<String?, Boolean> =
-        /*if (shouldMaskData) this?.privify() to true
-        else */this to false
 }

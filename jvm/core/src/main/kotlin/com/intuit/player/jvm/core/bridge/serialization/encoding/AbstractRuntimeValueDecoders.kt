@@ -1,12 +1,10 @@
 package com.intuit.player.jvm.core.bridge.serialization.encoding
 
-import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeDecodingException
 import com.intuit.player.jvm.core.bridge.serialization.json.isJsonElementSerializer
 import com.intuit.player.jvm.core.bridge.serialization.json.value
-import com.intuit.player.jvm.core.bridge.serialization.serializers.NodeSerializer
-import com.intuit.player.jvm.core.bridge.toFunction
+import com.intuit.player.jvm.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.player.jvm.core.utils.InternalPlayerApi
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.PolymorphicSerializer
@@ -18,6 +16,7 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.modules.SerializersModule
 import kotlin.reflect.full.isSubclassOf
 
+// TODO: Better support for nullish values
 /** Common decoder base implementation to support decoding [T] runtime objects */
 @InternalPlayerApi
 public abstract class AbstractRuntimeValueDecoder<T> : RuntimeValueDecoder<T> {
@@ -27,16 +26,14 @@ public abstract class AbstractRuntimeValueDecoder<T> : RuntimeValueDecoder<T> {
     @Suppress("UNCHECKED_CAST")
     override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T = when {
         deserializer is PolymorphicSerializer<*> -> when {
-            deserializer.baseClass.isSubclassOf(Function::class) -> decodeFunction().let {
-                if (deserializer.baseClass == Invokable::class) it else it.toFunction(deserializer.baseClass.simpleName!!)
-            }
+            deserializer.baseClass.isSubclassOf(Function::class) -> decodeFunction(GenericSerializer())
             deserializer.baseClass.isSubclassOf(Node::class) -> decodeNode()
             else -> super.decodeSerializableValue(deserializer)
         } as T
 
         // handle json serializers separately because they don't support custom decoders
         deserializer.isJsonElementSerializer -> when {
-            decodeNotNullMark() -> Json.encodeToJsonElement(NodeSerializer(), decodeValue() as Node)
+            decodeNotNullMark() -> Json.encodeToJsonElement(GenericSerializer(), decodeValue())
             else -> JsonNull
         } as T
 
@@ -54,7 +51,6 @@ public abstract class AbstractRuntimeValueDecoder<T> : RuntimeValueDecoder<T> {
     override fun decodeShort(): Short = decode<Number>().toShort()
     override fun decodeString(): String = decode()
     override fun decodeNode(): Node = decode()
-    override fun decodeFunction(): Invokable<*> = decode()
 
     override fun decodeEnum(enumDescriptor: SerialDescriptor): Int = enumDescriptor.getElementIndex(decode())
 

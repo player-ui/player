@@ -4,12 +4,18 @@ import com.intuit.player.jvm.core.bridge.Node
 import com.intuit.player.jvm.core.bridge.serialization.format.RuntimeFormat
 import com.intuit.player.jvm.core.bridge.serialization.format.encodeToRuntimeValue
 import com.intuit.player.jvm.core.bridge.serialization.format.serializer
+import com.intuit.player.jvm.core.utils.InternalPlayerApi
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
 
 /** Special [Node] that represents the JS runtime */
 public interface Runtime<Value> : Node {
+
+    public val dispatcher: CoroutineDispatcher
+
+    public val config: PlayerRuntimeConfig
 
     /** [CoroutineScope] that represents when the [Runtime] is released and relevant coroutines should cancel */
     public val scope: CoroutineScope
@@ -18,6 +24,8 @@ public interface Runtime<Value> : Node {
 
     /** Execute some arbitrary [script] and return the deserialized result */
     public fun execute(script: String): Any?
+
+    public fun load(scriptContext: ScriptContext): Any?
 
     /** Serialize and assign some [value] to [name] within the [Runtime] */
     public fun add(name: String, value: Value)
@@ -31,6 +39,10 @@ public interface Runtime<Value> : Node {
 
     /** Close the [Runtime] and release any resources */
     public fun release()
+
+    /** Opportunity to verify the thread to perfom blocking operations on */
+    @InternalPlayerApi
+    public var checkBlockingThread: Thread.() -> Unit
 }
 
 public inline fun <reified T, Value> Runtime<Value>.add(name: String, value: T): Unit =
@@ -43,3 +55,8 @@ public inline fun <reified T> Runtime<*>.serialize(value: T): Any? =
 public inline fun <reified T> Runtime<*>.serialize(serializer: SerializationStrategy<T>?, value: T): Any? = serializer?.let {
     serialize(it, value)
 } ?: serialize(value)
+
+public data class ScriptContext(
+    val script: String,
+    val id: String,
+)

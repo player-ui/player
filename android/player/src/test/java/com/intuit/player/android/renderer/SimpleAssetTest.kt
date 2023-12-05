@@ -2,11 +2,14 @@ package com.intuit.player.android.renderer
 
 import android.widget.TextView
 import com.intuit.player.android.AssetContext
+import com.intuit.player.android.R
 import com.intuit.player.android.utils.SimpleAsset
 import com.intuit.player.android.utils.SimpleAsset.Companion.sampleFlow
 import com.intuit.player.android.utils.stringify
 import com.intuit.player.android.withContext
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 internal class SimpleAssetTest : BaseRenderableAssetTest() {
@@ -20,6 +23,38 @@ internal class SimpleAssetTest : BaseRenderableAssetTest() {
     @Test
     fun `test rendering with no styles`() {
         val simple = SimpleAsset(assetContext).render(mockContext)
+        assertTrue(simple is TextView)
+    }
+
+    @Test
+    fun `test rendering with some styles`() {
+        val simple = SimpleAsset(assetContext.withContext(mockContext)).run {
+            render(R.style.TextAppearance_AppCompat)
+        }
+        assertTrue(simple is TextView)
+    }
+
+    @Test
+    fun `test rendering with some styles using another render method`() {
+        val simple = SimpleAsset(assetContext.withContext(mockContext)).run {
+            render(listOf(R.style.TextAppearance_AppCompat))
+        }
+        assertTrue(simple is TextView)
+    }
+
+    @Test
+    fun `test rendering with some styles and a tag`() {
+        val simple = SimpleAsset(assetContext.withContext(mockContext)).run {
+            render(R.style.TextAppearance_AppCompat, tag = "tag")
+        }
+        assertTrue(simple is TextView)
+    }
+
+    @Test
+    fun `test rendering with some styles and a tag using another render method`() {
+        val simple = SimpleAsset(assetContext.withContext(mockContext)).run {
+            render(listOf(R.style.TextAppearance_AppCompat), "tag")
+        }
         assertTrue(simple is TextView)
     }
 
