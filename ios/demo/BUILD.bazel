@@ -18,9 +18,10 @@ swift_library(
         "//plugins/external-action/ios:PlayerUIExternalActionPlugin",
         "//plugins/metrics/swiftui:PlayerUIMetricsPlugin",
         "//plugins/console-logger/ios:PlayerUIPrintLoggerPlugin",
+        "//plugins/pending-transaction/swiftui:PlayerUISwiftUIPendingTransactionPlugin",
         "//plugins/pubsub/ios:PlayerUIPubSubPlugin",
+        "//plugins/transition/swiftui:PlayerUITransitionPlugin",
         "//plugins/types-provider/ios:PlayerUITypesProviderPlugin",
-        "//plugins/pending-transaction/swiftui:PlayerUISwiftUIPendingTransactionPlugin"
     ]
 )
 

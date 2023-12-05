@@ -43,6 +43,7 @@ xcodeproj(
 
         "//plugins/reference-assets/swiftui:PlayerUIReferenceAssetsViewInspectorTests",
 
+        "//plugins/transition/swiftui:PlayerUITransitionPluginViewInspectorTests",
         "//plugins/types-provider/ios:PlayerUITypesProviderPluginTests"
     ],
 )

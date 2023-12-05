@@ -4,26 +4,25 @@ load("@build_bazel_rules_ios//rules:test.bzl", "ios_unit_test", "ios_ui_test")
 
 
 swift_library(
-    name = "PlayerUIBeaconPlugin",
-    module_name = "PlayerUIBeaconPlugin",
+    name = "PlayerUITransitionPlugin",
+    module_name = "PlayerUITransitionPlugin",
     srcs = glob(["Sources/**/*.swift"]),
     # tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = [
         "//ios/core:PlayerUI", 
-        "//ios/swiftui:PlayerUISwiftUI",
-        "//plugins/beacon/ios:PlayerUIBaseBeaconPlugin"
+        "//ios/swiftui:PlayerUISwiftUI"
     ],
     defines = ["BAZEL_TARGET"]
 )
 
 ios_ui_test(
-    name = "PlayerUIBeaconPluginViewInspectorTests",
+    name = "PlayerUITransitionPluginViewInspectorTests",
     srcs = glob(["ViewInspector/**/*.swift"]),
     minimum_os_version = "14.0",
     deps = [
         "@swiftpkg_viewinspector//:Sources_ViewInspector",
-        ":PlayerUIBeaconPlugin", 
+        ":PlayerUITransitionPlugin", 
         "//ios/core:PlayerUI", 
         "//ios/swiftui:PlayerUISwiftUI",
         "//plugins/reference-assets/swiftui:PlayerUIReferenceAssets",

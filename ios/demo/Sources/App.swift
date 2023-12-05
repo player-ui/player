@@ -14,6 +14,7 @@ import PlayerUIMetricsPlugin
 import PlayerUIPrintLoggerPlugin
 import PlayerUIPubSubPlugin
 import PlayerUISwiftUIPendingTransactionPlugin
+import PlayerUITransitionPlugin
 import PlayerUITypesProviderPlugin
 
 let flow = """
@@ -85,7 +86,7 @@ struct PlayerView: View {
         RequestTimePlugin { 5 },
         PubSubPlugin([]),
         TypesProviderPlugin(types: [], validators: [], formats: []),
-//        TransitionPlugin(popTransition: .pop),
+        TransitionPlugin(popTransition: .pop),
         BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) },
         SwiftUIPendingTransactionPlugin<PendingTransactionPhases>()
     ]
