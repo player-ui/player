@@ -36,10 +36,11 @@ ios_ui_test(
     minimum_os_version = "14.0",
     deps = [
         "@swiftpkg_viewinspector//:Sources_ViewInspector",
-        ":PlayerUISwiftUI", 
+        "//ios/swiftui:PlayerUISwiftUI", 
         "//ios/core:PlayerUI", 
         "//ios/internal-test-utils:PlayerUIInternalTestUtilities",
-        "//plugins/reference-assets/swiftui:PlayerUIReferenceAssets"
+        "//plugins/reference-assets/swiftui:PlayerUIReferenceAssets",
+        ":PlayerUITestUtilities"
     ],
     visibility = ["//visibility:public"],
     test_host = "//ios/demo:PlayerUIDemo"

@@ -8,6 +8,8 @@ swift_library(
         "//ios/core:PlayerUI",
         "//ios/swiftui:PlayerUISwiftUI",
         "//ios/logger:PlayerUILogger",
+
+        "//ios/test-utils-core:PlayerUITestUtilitiesCore",
         
         "//plugins/reference-assets/swiftui:PlayerUIReferenceAssets",
 
