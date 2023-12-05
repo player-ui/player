@@ -1,5 +1,6 @@
 import { defineConfig, Options } from "tsup";
 import fs from "fs";
+import path from "path";
 
 // Using the work from mark
 // https://github.com/reduxjs/redux/blob/c9e06506f88926e252daf5275495eba0c04bf8e3/tsup.config.ts#L2
@@ -14,6 +15,29 @@ export function createConfig() {
       sourcemap: true,
       ...options,
     };
+
+    const bundleConfig: Options[] = [];
+
+    if (pkgJson.bundle) {
+      const bundleFileTarget = pkgJson.bundle;
+      const bundleEntryName = path.basename(bundleFileTarget, ".native.js");
+
+      bundleConfig.push({
+        ...defaultOptions,
+        globalName: bundleEntryName,
+        format: ["iife"],
+        async onSuccess() {
+          await fs.promises.copyFile("dist/index.global.js", bundleFileTarget);
+          await fs.promises.copyFile(
+            "dist/index.global.js.map",
+            bundleFileTarget + ".map",
+          );
+
+          await fs.promises.rm("dist/index.global.js");
+          await fs.promises.rm("dist/index.global.js.map");
+        },
+      });
+    }
 
     return [
       {
@@ -42,6 +66,7 @@ export function createConfig() {
         outDir: "./dist/cjs/",
         outExtension: () => ({ js: ".cjs" }),
       },
+      ...bundleConfig,
     ];
   });
 }
