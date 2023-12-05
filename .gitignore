@@ -76,7 +76,7 @@ xcui.json
 #SPM
 .build
 .swiftpm
-.xcodeproj
+ios/Player.xcodeproj
 
 # Bundles used by cocoapods for development
 ios/*/*/Resources/**/*.js
