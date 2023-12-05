@@ -1,0 +1,34 @@
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+
+load("@build_bazel_rules_ios//rules:test.bzl", "ios_unit_test", "ios_ui_test")
+
+
+swift_library(
+    name = "PlayerUIExternalActionViewModifierPlugin",
+    module_name = "PlayerUIExternalActionViewModifierPlugin",
+    srcs = glob(["Sources/**/*.swift"]),
+    # tags = ["manual"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//ios/core:PlayerUI", 
+        "//ios/swiftui:PlayerUISwiftUI",
+        "//plugins/external-action/ios:PlayerUIExternalActionPlugin"
+    ],
+    defines = ["BAZEL_TARGET"]
+)
+
+ios_ui_test(
+    name = "PlayerUIExternalActionViewModifierPluginViewInspectorTests",
+    srcs = glob(["ViewInspector/**/*.swift"]),
+    minimum_os_version = "14.0",
+    deps = [
+        "@swiftpkg_viewinspector//:Sources_ViewInspector",
+        ":PlayerUIExternalActionViewModifierPlugin", 
+        "//ios/core:PlayerUI", 
+        "//ios/swiftui:PlayerUISwiftUI",
+        "//plugins/reference-assets/swiftui:PlayerUIReferenceAssets",
+        "//ios/internal-test-utils:PlayerUIInternalTestUtilities"
+    ],
+    visibility = ["//visibility:public"],
+    test_host = "//ios/demo:PlayerUIDemo"
+)

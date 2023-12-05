@@ -73,4 +73,8 @@ public class ExternalActionPlugin: JSBasePlugin, NativePlugin {
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: ExternalActionPlugin.self), pathComponent: "ExternalActionPlugin.bundle")
         #endif
     }
+
+    #if SWIFT_PACKAGE
+    public static let bundle = Bundle.module
+    #endif
 }
