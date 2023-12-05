@@ -1,37 +1,37 @@
-import { FlowManager, Flow, CompletedState } from '@player-ui/react';
-import { makeFlow } from '@player-ui/make-flow';
+import { FlowManager, Flow, CompletedState } from "@player-ui/react";
+import { makeFlow } from "@player-ui/make-flow";
 
 const firstFlow = makeFlow({
-  id: 'text-1',
-  type: 'action',
-  value: 'Flow 1',
+  id: "text-1",
+  type: "action",
+  value: "Flow 1",
   label: {
-    asset: { id: 'action-label-1', type: 'text', value: 'End Flow 1' },
+    asset: { id: "action-label-1", type: "text", value: "End Flow 1" },
   },
 });
 
 const secondFlow = makeFlow({
-  id: 'text-2',
-  type: 'action',
-  value: 'Flow 2',
+  id: "text-2",
+  type: "action",
+  value: "Flow 2",
   label: {
-    asset: { id: 'action-label-2', type: 'text', value: 'End Flow 2' },
+    asset: { id: "action-label-2", type: "text", value: "End Flow 2" },
   },
 });
 
 const errorFlow = makeFlow({
-  id: 'text-2',
-  type: 'action',
-  value: 'Flow Error',
-  exp: '{{foo.bar..}',
+  id: "text-2",
+  type: "action",
+  value: "Flow Error",
+  exp: "{{foo.bar..}",
   label: {
-    asset: { id: 'action-label-2', type: 'text', value: 'End Flow 2' },
+    asset: { id: "action-label-2", type: "text", value: "End Flow 2" },
   },
 });
 
 const assetErrorFlow = makeFlow({
-  id: 'text-3',
-  type: 'error',
+  id: "text-3",
+  type: "error",
 });
 
 export const SIMPLE_FLOWS = [firstFlow, secondFlow];

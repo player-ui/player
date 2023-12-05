@@ -77,7 +77,10 @@ js_library(
 
 js_library(
     name = "typings",
-    srcs = ["tsconfig.build.json"] + glob(["typings/*"]),
+    srcs = [
+        "tsconfig.build.json",
+        "tsconfig.json",
+    ] + glob(["typings/*"]),
     visibility = ["//visibility:public"],
 )
 # PlayerUI(deps = [])

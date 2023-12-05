@@ -1,23 +1,25 @@
-import React from 'react';
-import { useDarkMode } from 'storybook-dark-mode';
-import deepEqual from 'deep-equal';
-import Editor, { loader as monaco } from '@monaco-editor/react';
-import { Tabs, Placeholder } from '@storybook/components';
-import { useDispatch } from 'react-redux';
-import type { CompilationErrorType } from '../../redux';
+import React from "react";
+// import { useDarkMode } from "storybook-dark-mode";
+import { dequal } from "dequal";
+import Editor, { loader as monaco } from "@monaco-editor/react";
+import { Tabs, Placeholder } from "@storybook/components";
+import { useDispatch } from "react-redux";
+import type { CompilationErrorType } from "../../redux";
 import {
   setDSLEditorValue,
   setJSONEditorValue,
   useContentKind,
   useDSLEditorValue,
   useJSONEditorValue,
-} from '../../redux';
+} from "../../redux";
 
-monaco.init().then((m) => {
-  m.languages.typescript.typescriptDefaults.setCompilerOptions({
-    jsx: m.languages.typescript.JsxEmit.React,
+if (typeof window !== "undefined") {
+  monaco.init().then((m) => {
+    m.languages.typescript.typescriptDefaults.setCompilerOptions({
+      jsx: m.languages.typescript.JsxEmit.React,
+    });
   });
-});
+}
 
 interface EditorPanelProps {
   /** if the panel is shown */
@@ -26,30 +28,30 @@ interface EditorPanelProps {
 
 /** the panel for the flow editor */
 export const JSONEditorPanel = () => {
-  const darkMode = useDarkMode();
+  const darkMode = false; // useDarkMode();
 
   const jsonEditorValue = useJSONEditorValue();
 
   const jsonValueAsString =
-    jsonEditorValue?.state === 'loaded'
+    jsonEditorValue?.state === "loaded"
       ? JSON.stringify(jsonEditorValue.value, null, 2)
-      : '';
+      : "";
 
   const dispatch = useDispatch();
 
   /** Handle change events */
   const onChange = (val: string | undefined) => {
-    if (!val || jsonEditorValue?.state !== 'loaded') {
+    if (!val || jsonEditorValue?.state !== "loaded") {
       return;
     }
 
     try {
       const parsed = JSON.parse(val);
-      if (!deepEqual(parsed, jsonEditorValue.value)) {
+      if (!dequal(parsed, jsonEditorValue.value)) {
         dispatch(
           setJSONEditorValue({
             value: parsed,
-          })
+          }),
         );
       }
     } catch (e) {
@@ -59,7 +61,7 @@ export const JSONEditorPanel = () => {
 
   return (
     <Editor
-      theme={darkMode ? 'dark' : 'light'}
+      theme={darkMode ? "dark" : "light"}
       value={jsonValueAsString}
       language="json"
       options={{
@@ -90,20 +92,18 @@ const CompileErrors = ({
   return (
     <div
       style={{
-        position: 'absolute',
+        position: "absolute",
         bottom: 0,
         zIndex: 100,
-        background: 'white',
-        padding: '8px',
-        border: '1px solid red',
-        color: 'red',
-        width: '100%',
+        background: "white",
+        padding: "8px",
+        border: "1px solid red",
+        color: "red",
+        width: "100%",
       }}
     >
       <h3>Errors</h3>
-      {errors.compileErrors?.map((e) => (
-        <pre key={e.message}>{e.message}</pre>
-      ))}
+      {errors.compileErrors?.map((e) => <pre key={e.message}>{e.message}</pre>)}
       {errors.transpileErrors?.map((e) => (
         <pre key={e.message}>{e.message}</pre>
       ))}
@@ -113,22 +113,22 @@ const CompileErrors = ({
 
 /** A panel with the TSX editor built-in */
 const DSLEditorPanel = () => {
-  const darkMode = useDarkMode();
+  const darkMode = false; // useDarkMode();
 
   const jsonEditorValue = useJSONEditorValue();
   const dslEditorValue = useDSLEditorValue();
   const dispatch = useDispatch();
 
   const editorValue =
-    dslEditorValue?.state === 'loaded' ? dslEditorValue.value : '';
-  const flow = jsonEditorValue?.state === 'loaded' ? jsonEditorValue.value : '';
+    dslEditorValue?.state === "loaded" ? dslEditorValue.value : "";
+  const flow = jsonEditorValue?.state === "loaded" ? jsonEditorValue.value : "";
 
   const compilationErrors =
-    dslEditorValue?.state === 'loaded'
+    dslEditorValue?.state === "loaded"
       ? dslEditorValue.compilationErrors
       : undefined;
 
-  const [selected, setSelected] = React.useState('tsx');
+  const [selected, setSelected] = React.useState("tsx");
 
   /** Handle editor updates */
   const onChange = (val: string | undefined) => {
@@ -136,7 +136,7 @@ const DSLEditorPanel = () => {
       dispatch(
         setDSLEditorValue({
           value: val,
-        })
+        }),
       );
     }
   };
@@ -156,14 +156,14 @@ const DSLEditorPanel = () => {
       </Tabs>
       <div
         style={{
-          height: 'calc(100% - 60px)',
+          height: "calc(100% - 60px)",
         }}
       >
-        {selected === 'tsx' && (
+        {selected === "tsx" && (
           <>
             {compilationErrors && <CompileErrors errors={compilationErrors} />}
             <Editor
-              theme={darkMode ? 'dark' : 'light'}
+              theme={darkMode ? "dark" : "light"}
               value={editorValue}
               language="typescript"
               onChange={(val) => {
@@ -172,13 +172,13 @@ const DSLEditorPanel = () => {
             />
           </>
         )}
-        {selected === 'json' && (
+        {selected === "json" && (
           <Editor
             options={{
               readOnly: true,
             }}
-            theme={darkMode ? 'dark' : 'light'}
-            value={flow ? JSON.stringify(flow, null, 2) : '{}'}
+            theme={darkMode ? "dark" : "light"}
+            value={flow ? JSON.stringify(flow, null, 2) : "{}"}
             language="json"
           />
         )}
@@ -195,11 +195,11 @@ export const EditorPanel = (props: EditorPanelProps) => {
     return null;
   }
 
-  if (contentType === 'dsl') {
+  if (contentType === "dsl") {
     return <DSLEditorPanel />;
   }
 
-  if (contentType === 'json') {
+  if (contentType === "json") {
     return <JSONEditorPanel />;
   }
 

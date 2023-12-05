@@ -1,32 +1,32 @@
 /* eslint-disable no-param-reassign */
-import React from 'react';
-import type { Flow } from '@player-ui/player';
-import { DSLCompiler } from '@player-tools/dsl';
+import React from "react";
+import type { Flow } from "@player-ui/react";
+import { DSLCompiler } from "@player-tools/dsl";
 import {
   configureStore,
   createAction,
   createAsyncThunk,
   createReducer,
-} from '@reduxjs/toolkit';
-import { Provider, useDispatch, useSelector } from 'react-redux';
+} from "@reduxjs/toolkit";
+import { Provider, useDispatch, useSelector } from "react-redux";
 import {
   createStateSyncMiddleware,
   initStateWithPrevTab,
-} from 'redux-state-sync';
-import { execute } from '../dsl';
-import type { RenderTarget } from '../types';
-import type { EventType } from '../state';
+} from "redux-state-sync";
+import { execute } from "../dsl";
+import type { RenderTarget } from "../types";
+import type { EventType } from "../state";
 
 const compiler = new DSLCompiler();
 
-export type LoadingState = 'loading' | 'loaded' | 'error';
+export type LoadingState = "loading" | "loaded" | "error";
 
-export const resetEditor = createAction('@@player/flow/reset');
+export const resetEditor = createAction("@@player/flow/reset");
 
 export const setDSLEditorValue = createAction<{
   /** The state of the editor */
   value: string;
-}>('setDSLEditorValue');
+}>("setDSLEditorValue");
 
 export const setCompiledEditorResult = createAction<{
   /** The state of the editor */
@@ -34,17 +34,17 @@ export const setCompiledEditorResult = createAction<{
 
   /** Any errors from the compilation */
   errors?: CompilationErrorType;
-}>('setCompiledEditorResult');
+}>("setCompiledEditorResult");
 
 export const setEditorContentType = createAction<{
   /** The state of the editor */
-  contentType: 'dsl' | 'json' | undefined;
-}>('setEditorContentType');
+  contentType: "dsl" | "json" | undefined;
+}>("setEditorContentType");
 
 export const setJSONEditorValue = createAction<{
   /** The state of the editor */
   value: Flow;
-}>('setJSONEditorValue');
+}>("setJSONEditorValue");
 
 export const updateAndCompileDSLFlow = createAsyncThunk<
   void,
@@ -52,11 +52,11 @@ export const updateAndCompileDSLFlow = createAsyncThunk<
     /** Other external modules to include */
     additionalModules?: Record<string, any>;
   }
->('editor/dsl/compile', async (context, thunkAPI) => {
+>("editor/dsl/compile", async (context, thunkAPI) => {
   const content = (thunkAPI.getState() as any).editor.dsl?.value;
 
   if (!content) {
-    throw new Error('No content to compile');
+    throw new Error("No content to compile");
   }
 
   try {
@@ -68,7 +68,7 @@ export const updateAndCompileDSLFlow = createAsyncThunk<
       const compiled = await compiler.serialize(transpiledResult.default);
 
       thunkAPI.dispatch(
-        setCompiledEditorResult({ result: compiled.value as any })
+        setCompiledEditorResult({ result: compiled?.value as any }),
       );
     }
   } catch (e: any) {
@@ -81,24 +81,24 @@ export const updateAndCompileDSLFlow = createAsyncThunk<
             },
           ],
         },
-      })
+      }),
     );
   }
 });
 
 export const setPlatform = createAction<{
   /** The platform to render on */
-  platform: RenderTarget['platform'];
-}>('@@player/platform/set');
+  platform: RenderTarget["platform"];
+}>("@@player/platform/set");
 
-export const unsetPlatform = createAction('@@player/platform/unset');
+export const unsetPlatform = createAction("@@player/platform/unset");
 
 const platformReducer = createReducer<{
   /** The platform to render on */
-  platform?: RenderTarget['platform'];
+  platform?: RenderTarget["platform"];
 }>(
   {
-    platform: 'web',
+    platform: "web",
   },
   (builder) => {
     builder.addCase(setPlatform, (state, action) => {
@@ -108,7 +108,7 @@ const platformReducer = createReducer<{
     builder.addCase(unsetPlatform, (state) => {
       state.platform = undefined;
     });
-  }
+  },
 );
 
 export type CompilationErrorType = {
@@ -126,22 +126,22 @@ export type CompilationErrorType = {
 };
 
 export const setCompilationErrors = createAction<CompilationErrorType>(
-  'setCompilationErrors'
+  "setCompilationErrors",
 );
 
 const flowEditorReducer = createReducer<{
   /** The primary content type for the editor */
-  contentType?: 'json' | 'dsl';
+  contentType?: "json" | "dsl";
 
   /** The state of the JSON portion of the editor */
   json?:
     | {
         /** The state of the editor */
-        state: 'loading' | 'error' | 'initial';
+        state: "loading" | "error" | "initial";
       }
     | {
         /** The state of the editor */
-        state: 'loaded';
+        state: "loaded";
         /** The value of the editor */
         value: Flow;
       };
@@ -150,11 +150,11 @@ const flowEditorReducer = createReducer<{
   dsl?:
     | {
         /** The state of the editor */
-        state: 'loading' | 'error' | 'initial';
+        state: "loading" | "error" | "initial";
       }
     | {
         /** The state of the editor */
-        state: 'loaded';
+        state: "loaded";
         /** The value of the editor */
         value: string;
         /** Set if this value needs to be converted into JSON */
@@ -165,22 +165,22 @@ const flowEditorReducer = createReducer<{
       };
 }>(
   {
-    json: { state: 'initial' },
-    dsl: { state: 'initial' },
+    json: { state: "initial" },
+    dsl: { state: "initial" },
     contentType: undefined,
   },
   (builder) => {
     builder.addCase(setEditorContentType, (state, action) => {
       state.contentType = action.payload.contentType;
 
-      if (action.payload.contentType === 'json') {
-        state.dsl = { state: 'initial' };
+      if (action.payload.contentType === "json") {
+        state.dsl = { state: "initial" };
       }
     });
 
     builder.addCase(setDSLEditorValue, (state, action) => {
       state.dsl = {
-        state: 'loaded',
+        state: "loaded",
         value: action.payload.value,
         needsCompile: true,
         compilationErrors: undefined,
@@ -188,43 +188,43 @@ const flowEditorReducer = createReducer<{
     });
 
     builder.addCase(setCompilationErrors, (state, action) => {
-      if (state.dsl?.state === 'loaded') {
+      if (state.dsl?.state === "loaded") {
         state.dsl.compilationErrors = action.payload;
       }
     });
 
     builder.addCase(updateAndCompileDSLFlow.pending, (state) => {
-      state.json = { state: 'loading' };
+      state.json = { state: "loading" };
     });
 
     builder.addCase(resetEditor, (state) => {
-      state.json = { state: 'initial' };
-      state.dsl = { state: 'initial' };
+      state.json = { state: "initial" };
+      state.dsl = { state: "initial" };
     });
 
     builder.addCase(updateAndCompileDSLFlow.rejected, (state) => {
-      state.dsl = { state: 'error' };
+      state.dsl = { state: "error" };
     });
 
     builder.addCase(setCompiledEditorResult, (state, action) => {
-      if (state.dsl?.state === 'loaded') {
+      if (state.dsl?.state === "loaded") {
         state.dsl.needsCompile = false;
         state.dsl.compilationErrors = action.payload.errors;
       }
 
       if (action.payload.result) {
-        state.json = { state: 'loaded', value: action.payload.result };
+        state.json = { state: "loaded", value: action.payload.result };
       }
     });
 
     builder.addCase(setJSONEditorValue, (state, action) => {
-      state.json = { state: 'loaded', value: action.payload.value };
+      state.json = { state: "loaded", value: action.payload.value };
     });
-  }
+  },
 );
 
-export const addEvents = createAction<Array<EventType>>('@@player/events/add');
-export const clearEvents = createAction('@@player/events/clear');
+export const addEvents = createAction<Array<EventType>>("@@player/events/add");
+export const clearEvents = createAction("@@player/events/clear");
 
 const eventsReducer = createReducer<Array<EventType>>([], (builder) => {
   builder.addCase(addEvents, (state, action) => {
@@ -237,14 +237,18 @@ const eventsReducer = createReducer<Array<EventType>>([], (builder) => {
 });
 
 const STATE_SYNC_CHANNEL_NAME = (() => {
-  if (sessionStorage.getItem('player:channel')) {
-    return sessionStorage.getItem('player:channel') as string;
+  if (typeof window === "undefined") {
+    return "player:channel";
+  }
+
+  if (window?.sessionStorage.getItem("player:channel")) {
+    return window?.sessionStorage.getItem("player:channel") as string;
   }
 
   const channel =
     Math.random().toString(36).substring(2, 15) +
     Math.random().toString(36).substring(2, 15);
-  sessionStorage.setItem('player:channel', channel);
+  window?.sessionStorage.setItem("player:channel", channel);
   return channel;
 })();
 
@@ -260,9 +264,9 @@ export const store = configureStore({
       createStateSyncMiddleware({
         channel: STATE_SYNC_CHANNEL_NAME,
         blacklist: [
-          'editor/dsl/compile/pending',
-          'editor/dsl/compile/fulfilled',
-          'editor/dsl/compile/rejected',
+          "editor/dsl/compile/pending",
+          "editor/dsl/compile/fulfilled",
+          "editor/dsl/compile/rejected",
         ],
       }),
     ];
@@ -294,7 +298,7 @@ export const useDSLEditorValue = () => {
 };
 
 /** Grab the current editor type */
-export const useContentKind = (contentTypeToSet?: 'json' | 'dsl') => {
+export const useContentKind = (contentTypeToSet?: "json" | "dsl") => {
   const dispatch = useDispatch();
 
   const contentType = useSelector<StateType>((state: StateType) => {
@@ -306,7 +310,7 @@ export const useContentKind = (contentTypeToSet?: 'json' | 'dsl') => {
       dispatch(
         setEditorContentType({
           contentType: contentTypeToSet,
-        })
+        }),
       );
     }
   }, [contentType, contentTypeToSet, dispatch]);
@@ -332,9 +336,9 @@ export const useCompiledEditorValue = (
   options?: {
     /** Things to add to the compilation */
     additionalModules?: Record<string, any>;
-  }
+  },
 ) => {
-  useContentKind('dsl');
+  useContentKind("dsl");
 
   const dispatch = useDispatch();
 
@@ -348,17 +352,17 @@ export const useCompiledEditorValue = (
   }, []);
 
   React.useEffect(() => {
-    if (dslEditorValue?.state === 'initial') {
+    if (dslEditorValue?.state === "initial") {
       dispatch(setDSLEditorValue({ value: initialValue }));
     }
   }, [dslEditorValue, initialValue]);
 
   React.useEffect(() => {
-    if (dslEditorValue?.state === 'loaded' && dslEditorValue.needsCompile) {
+    if (dslEditorValue?.state === "loaded" && dslEditorValue.needsCompile) {
       dispatch(
         updateAndCompileDSLFlow({
           additionalModules: options?.additionalModules,
-        })
+        }),
       );
     }
   }, [dslEditorValue, options?.additionalModules]);
@@ -369,7 +373,7 @@ export const useCompiledEditorValue = (
 /** A hook to handle initializing and updating the JSON value of the flow editor (for use when _not_ using DSL content) */
 export const useInitialJsonEditorValue = (initialValue: Flow) => {
   const dispatch = useDispatch();
-  useContentKind('json');
+  useContentKind("json");
 
   const jsonEditorValue = useSelector((s: StateType) => {
     return s.editor.json;
@@ -381,7 +385,7 @@ export const useInitialJsonEditorValue = (initialValue: Flow) => {
   }, []);
 
   React.useEffect(() => {
-    if (jsonEditorValue?.state === 'initial') {
+    if (jsonEditorValue?.state === "initial") {
       dispatch(setJSONEditorValue({ value: initialValue }));
     }
   }, [jsonEditorValue, initialValue]);

@@ -3,3 +3,5 @@ packages:
   - "react/*"
   - "plugins/*/*"
   - "tools/*/*"
+  - "tools/*"
+  - "docs/*"

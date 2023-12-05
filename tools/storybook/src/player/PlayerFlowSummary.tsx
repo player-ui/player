@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
-import type { CompletedState } from '@player-ui/player';
-import { BindingParser, LocalModel } from '@player-ui/player';
-import { VStack, Code, Heading, Button, Text } from '@chakra-ui/react';
+import React, { useEffect } from "react";
+import type { CompletedState } from "@player-ui/react";
+import { BindingParser, LocalModel } from "@player-ui/react";
+import { VStack, Code, Heading, Button, Text } from "@chakra-ui/react";
 
 export type PlayerFlowSummaryProps = {
   /** Reset the flow */
@@ -34,7 +34,9 @@ declare global {
 }
 
 /** A component to show at the end of a flow */
-export const PlayerFlowSummary = (props: PlayerFlowSummaryProps) => {
+export const PlayerFlowSummary = (
+  props: PlayerFlowSummaryProps,
+): React.ReactElement => {
   useEffect(() => {
     const model = new LocalModel(props.completedState?.data);
     // Point back to local model for data lookups when
@@ -54,10 +56,10 @@ export const PlayerFlowSummary = (props: PlayerFlowSummaryProps) => {
 
   return (
     <VStack gap="10">
-      <Heading>Flow Completed {props.error ? 'with Error' : ''}</Heading>
+      <Heading>Flow Completed {props.error ? "with Error" : ""}</Heading>
       {props.completedState?.endState.outcome && (
         <Code>
-          Outcome:{' '}
+          Outcome:{" "}
           <Text as="strong">{props.completedState?.endState.outcome}</Text>
         </Code>
       )}

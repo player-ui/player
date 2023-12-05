@@ -1,11 +1,43 @@
-# load(":build.bzl", "generate_manifest")
-# load("//:index.bzl", "javascript_pipeline")
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@rules_player//player:defs.bzl", compile_dsl = "compile", create_base_dsl_config = "create_base_config")
+
+npm_link_all_packages(name = "node_modules")
+
+create_base_dsl_config(
+    name = "dsl_config",
+    plugins = [],
+)
+
+compile_dsl(
+    name = "all_flows",
+    srcs = glob(["action/*.tsx"]),
+    config = ":dsl_config",
+    data = [
+        ":node_modules/@player-ui/reference-assets-plugin-components",
+        "//:node_modules/@player-tools/dsl",
+        "//:node_modules/dlv",
+        "//:node_modules/react",
+    ],
+)
 
 # generate_manifest(
 #     name = "mocks",
 #     mocks = glob(["**/*.json"]),
 #     visibility = ["//visibility:public"],
 # )
+
+js_library(
+    name = "mocks-js-library",
+    srcs = glob(["**/*.json"]) + [":all_flows"],
+)
+
+npm_package(
+    name = "mocks",
+    srcs = [":mocks-js-library"] + glob(["action/*.tsx"]),
+    visibility = ["//visibility:public"],
+)
 
 # javascript_pipeline(
 #     name = "@player-ui/reference-assets-plugin-mocks",

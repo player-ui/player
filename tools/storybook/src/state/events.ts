@@ -1,6 +1,5 @@
-import { v4 as uuid } from 'uuid';
-import type { PlayerFlowStatus } from '@player-ui/player';
-import type { Severity } from '@player-ui/player';
+import { v4 as uuid } from "uuid";
+import type { PlayerFlowStatus, Severity } from "@player-ui/react";
 
 interface BaseEventType<T extends string> {
   /** A timestamp for the event */
@@ -11,14 +10,14 @@ interface BaseEventType<T extends string> {
   type: T;
 }
 
-export interface LogEventType extends BaseEventType<'log'> {
+export interface LogEventType extends BaseEventType<"log"> {
   /** the message */
   message: Array<unknown>;
   /** the log severity */
   severity: Severity;
 }
 
-export interface DataChangeEventType extends BaseEventType<'dataChange'> {
+export interface DataChangeEventType extends BaseEventType<"dataChange"> {
   /** The binding */
   binding: string;
   /** the old value */
@@ -27,7 +26,7 @@ export interface DataChangeEventType extends BaseEventType<'dataChange'> {
   to: unknown;
 }
 
-export interface StateChangeEventType extends BaseEventType<'stateChange'> {
+export interface StateChangeEventType extends BaseEventType<"stateChange"> {
   /** The state type */
   state: PlayerFlowStatus;
   /** The error message */
@@ -36,7 +35,7 @@ export interface StateChangeEventType extends BaseEventType<'stateChange'> {
   outcome?: string;
 }
 
-export interface MetricChangeEventType extends BaseEventType<'metric'> {
+export interface MetricChangeEventType extends BaseEventType<"metric"> {
   /** The metric type */
   metricType: string;
 
@@ -52,7 +51,7 @@ export type EventType =
 
 /** Create an event for the timeline */
 export function createEvent<T extends EventType>(
-  base: Omit<T, 'id' | 'time'>
+  base: Omit<T, "id" | "time">,
 ): T {
   return {
     id: uuid(),

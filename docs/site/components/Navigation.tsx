@@ -1,6 +1,6 @@
-import React from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
+import React from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import {
   Flex,
   Image,
@@ -22,17 +22,17 @@ import {
   AlertTitle,
   AlertDescription,
   Select,
-} from '@chakra-ui/react';
-import { FaReact, FaApple, FaAndroid, FaPuzzlePiece } from 'react-icons/fa';
-import { HamburgerIcon } from '@chakra-ui/icons';
-import type { Route } from '../config/navigation';
-import NAV, { PATH_TO_NAV, Platform } from '../config/navigation';
-import { ColorSchemeSwitch } from './ColorSchemeSwitch';
-import { DOCS_BASE_URL, GITHUB_URL } from '../config/constants';
-import { withBasePrefix } from './Image';
-import { SearchInput } from './Search';
-import { GithubIcon } from './gh-icon';
-import { WarningBanner } from './SiteBanner';
+} from "@chakra-ui/react";
+import { FaReact, FaApple, FaAndroid, FaPuzzlePiece } from "react-icons/fa";
+import { HamburgerIcon } from "@chakra-ui/icons";
+import type { Route } from "../config/navigation";
+import NAV, { PATH_TO_NAV, Platform } from "../config/navigation";
+import { ColorSchemeSwitch } from "./ColorSchemeSwitch";
+import { DOCS_BASE_URL, GITHUB_URL } from "../config/constants";
+import { withBasePrefix } from "./Image";
+import { SearchInput } from "./Search";
+import { GithubIcon } from "./gh-icon";
+import { WarningBanner } from "./SiteBanner";
 
 const getPathFromRoute = (route: Route): string => {
   if (route.path) {
@@ -48,7 +48,7 @@ const getPathFromRoute = (route: Route): string => {
     }
   }
 
-  return '';
+  return "";
 };
 
 const PlatformIcon = (props: any) => {
@@ -72,7 +72,7 @@ const NavTitleOrLink = (props: { route: Route }) => {
   const { pathname } = useRouter();
   const router = useRouter();
   const langpref = router.query.lang;
-  const selectedButtonColor = useColorModeValue('blue.800', 'blue.600');
+  const selectedButtonColor = useColorModeValue("blue.800", "blue.600");
 
   if (route.path) {
     return (
@@ -89,7 +89,7 @@ const NavTitleOrLink = (props: { route: Route }) => {
             size="sm"
             variant="ghost"
             mx="3"
-            colorScheme={pathname === route.path ? 'blue' : 'gray'}
+            colorScheme={pathname === route.path ? "blue" : "gray"}
             color={pathname === route.path ? selectedButtonColor : undefined}
           >
             <HStack spacing="2">
@@ -181,12 +181,12 @@ const useGetReleasedVersions = () => {
   React.useEffect(() => {
     const send = async () => {
       const response = await fetch(
-        'https://api.github.com/repos/player-ui/player-ui.github.io/contents/'
+        "https://api.github.com/repos/player-ui/player-ui.github.io/contents/",
       );
 
       const data = await response.json();
       const versions = data
-        .filter((d) => d.type === 'dir' && d.name.match(/^v\d/))
+        .filter((d) => d.type === "dir" && d.name.match(/^v\d/))
         .map((d) => ({
           label: d.name,
           path: d.name,
@@ -210,11 +210,11 @@ export const VersionSelector = () => {
       aria-label="Select the version of the Player docs you with to see"
       variant="unstyled"
       rootProps={{
-        width: 'auto',
-        display: 'flex',
-        flexShrink: '0',
+        width: "auto",
+        display: "flex",
+        flexShrink: "0",
       }}
-      value={router.basePath || 'latest'}
+      value={router.basePath || "latest"}
       onChange={(e) => {
         router.push(`${DOCS_BASE_URL}/${e.target.value}`);
       }}
@@ -236,21 +236,21 @@ export const TopNavigation = () => {
   const mobileNavDisclosure = useDisclosure();
 
   const currentTopLevelRoute = NAV.routes.find(
-    (r) => r.title === subRoutes?.[0]
+    (r) => r.title === subRoutes?.[0],
   );
 
   const logoSrc = useBreakpointValue({
     base: useColorModeValue(
-      withBasePrefix('/logo/logo-light-small.png'),
-      withBasePrefix('/logo/logo-dark-small.png')
+      withBasePrefix("/logo/logo-light-small.png"),
+      withBasePrefix("/logo/logo-dark-small.png"),
     ),
     lg: useColorModeValue(
-      withBasePrefix('/logo/logo-light-large.png'),
-      withBasePrefix('/logo/logo-dark-large.png')
+      withBasePrefix("/logo/logo-light-large.png"),
+      withBasePrefix("/logo/logo-dark-large.png"),
     ),
   });
 
-  const selectedButtonColor = useColorModeValue('blue.800', 'blue.600');
+  const selectedButtonColor = useColorModeValue("blue.800", "blue.600");
 
   return (
     <Flex w="100%" h="100%" direction="column" align="center">
@@ -259,15 +259,15 @@ export const TopNavigation = () => {
           <IconButton
             variant="ghost"
             icon={<HamburgerIcon />}
-            display={{ base: 'flex', md: 'none' }}
+            display={{ base: "flex", md: "none" }}
             aria-label="Open Side Navigation Menu"
             onClick={mobileNavDisclosure.onOpen}
           />
           <Link passHref href="/">
             <CLink
               display={{
-                base: 'none',
-                md: 'block',
+                base: "none",
+                md: "block",
               }}
               py="2"
             >
@@ -278,7 +278,7 @@ export const TopNavigation = () => {
 
         <Box>
           <HStack spacing="4">
-            <Box display={{ base: 'none', lg: 'block' }}>
+            <Box display={{ base: "none", lg: "block" }}>
               <SearchInput />
             </Box>
             {NAV.routes.map((topRoute) => {
@@ -290,7 +290,7 @@ export const TopNavigation = () => {
                   <Button
                     as="a"
                     variant="ghost"
-                    colorScheme={isSelected ? 'blue' : 'gray'}
+                    colorScheme={isSelected ? "blue" : "gray"}
                     color={isSelected ? selectedButtonColor : undefined}
                     size="md"
                     ml="0"
@@ -323,9 +323,9 @@ export const TopNavigation = () => {
           Player and its documentation are still in early development.
         </AlertTitle>
         <AlertDescription>
-          If you find any issues, please report them to us on{' '}
+          If you find any issues, please report them to us on{" "}
           <CLink
-            color={useColorModeValue('blue.800', 'blue.600')}
+            color={useColorModeValue("blue.800", "blue.600")}
             href="https://github.com/player-ui/player/issues"
           >
             GitHub

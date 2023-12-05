@@ -1,16 +1,15 @@
-/* eslint-disable import/no-extraneous-dependencies */
-import React from 'react';
-import { Action } from '@player-ui/reference-assets-components';
-import type { DSLFlow } from '@player-tools/dsl';
+import React from "react";
+import { Action } from "@player-ui/reference-assets-plugin-components";
+import type { DSLFlow } from "@player-tools/dsl";
 import {
   binding as b,
   expression as e,
   makeBindingsForObject,
-} from '@player-tools/dsl';
+} from "@player-tools/dsl";
 
 const schema = {
   count: {
-    type: 'NumberType',
+    type: "NumberType",
   },
 };
 
@@ -23,26 +22,26 @@ const view1 = (
 );
 
 const flow: DSLFlow = {
-  id: 'test-flow',
+  id: "test-flow",
   views: [view1],
   data: {
     count: 0,
   },
   schema,
   navigation: {
-    BEGIN: 'FLOW_1',
+    BEGIN: "FLOW_1",
     FLOW_1: {
-      startState: 'VIEW_1',
+      startState: "VIEW_1",
       VIEW_1: {
-        state_type: 'VIEW',
+        state_type: "VIEW",
         ref: view1,
         transitions: {
-          '*': 'END_Done',
+          "*": "END_Done",
         },
       },
       END_Done: {
-        state_type: 'END',
-        outcome: 'DONE',
+        state_type: "END",
+        outcome: "DONE",
       },
     },
   },
