@@ -2,7 +2,7 @@ import SwiftUI
 import PlayerUILogger
 import PlayerUISwiftUI
 import PlayerUIReferenceAssets
-
+import PlayerUIBeaconPlugin
 
 let flow = """
 {

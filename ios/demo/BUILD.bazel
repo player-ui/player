@@ -8,7 +8,8 @@ swift_library(
         "//ios/core:PlayerUI",
         "//ios/logger:PlayerUILogger",
         "//ios/swiftui:PlayerUISwiftUI",
-        "//plugins/reference-assets/ios:PlayerUIReferenceAssets"
+        "//plugins/reference-assets/swiftui:PlayerUIReferenceAssets",
+        "//plugins/beacon/swiftui:PlayerUIBeaconPlugin"
     ]
 )
 

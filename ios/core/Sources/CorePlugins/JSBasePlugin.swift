@@ -65,9 +65,9 @@ open class JSBasePlugin {
      */
     open func getUrlForFile(fileName: String) -> URL? {
         #if SWIFT_PACKAGE
-        return ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
         #else
-        return ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: JSBasePlugin.self), pathComponent: "PlayerUI.bundle")
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: JSBasePlugin.self), pathComponent: "PlayerUI.bundle")
         #endif
     }
 

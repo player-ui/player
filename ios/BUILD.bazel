@@ -13,6 +13,13 @@ xcodeproj(
         "//ios/core:PlayerUITests",
         "//ios/logger:PlayerUILoggerTests",
         "//ios/swiftui:PlayerUISwiftUITests",
-        "//ios/swiftui:PlayerUISwiftUIViewInspectorTests"
+        "//ios/swiftui:PlayerUISwiftUIViewInspectorTests",
+
+        # plugins
+        "//plugins/beacon/ios:PlayerUIBaseBeaconPluginTests",
+        "//plugins/beacon/swiftui:PlayerUIBeaconPluginViewInspectorTests",
+        "//plugins/pending-transaction/swiftui:PlayerUISwiftUIPendingTransactionPluginViewInspectorTests",
+
+        "//plugins/reference-assets/swiftui:PlayerUIReferenceAssetsBuild"
     ],
 )

@@ -4,33 +4,38 @@ load("@build_bazel_rules_ios//rules:test.bzl", "ios_unit_test", "ios_ui_test")
 
 
 swift_library(
-    name = "PlayerUISwiftUI",
-    module_name = "PlayerUISwiftUI",
+    name = "PlayerUIBeaconPlugin",
+    module_name = "PlayerUIBeaconPlugin",
     srcs = glob(["Sources/**/*.swift"]),
     # tags = ["manual"],
     visibility = ["//visibility:public"],
-    deps = ["@swiftpkg_swift_hooks//:Sources_SwiftHooks", "//ios/core:PlayerUI"],
+    deps = [
+        "//ios/core:PlayerUI", 
+        "//ios/swiftui:PlayerUISwiftUI",
+        "//plugins/beacon/ios:PlayerUIBaseBeaconPlugin"
+    ],
     defines = ["BAZEL_TARGET"]
 )
 
 ios_unit_test(
-    name = "PlayerUISwiftUITests",
+    name = "PlayerUIBeaconPluginTests",
     srcs = glob(["Tests/**/*.swift"]),
     minimum_os_version = "14.0",
-    deps = [":PlayerUISwiftUI", "//ios/core:PlayerUI", "//ios/internal-test-utils:PlayerUIInternalTestUtilities"],
+    deps = [":PlayerUIBeaconPlugin", "//ios/core:PlayerUI", "//ios/internal-test-utils:PlayerUIInternalTestUtilities"],
     visibility = ["//visibility:public"]
 )
 
 ios_ui_test(
-    name = "PlayerUISwiftUIViewInspectorTests",
+    name = "PlayerUIBeaconPluginViewInspectorTests",
     srcs = glob(["ViewInspector/**/*.swift"]),
     minimum_os_version = "14.0",
     deps = [
         "@swiftpkg_viewinspector//:Sources_ViewInspector",
-        ":PlayerUISwiftUI", 
+        ":PlayerUIBeaconPlugin", 
         "//ios/core:PlayerUI", 
-        "//ios/internal-test-utils:PlayerUIInternalTestUtilities",
-        "//plugins/reference-assets/swiftui:PlayerUIReferenceAssets"
+        "//ios/swiftui:PlayerUISwiftUI",
+        "//plugins/reference-assets/swiftui:PlayerUIReferenceAssets",
+        "//ios/internal-test-utils:PlayerUIInternalTestUtilities"
     ],
     visibility = ["//visibility:public"],
     test_host = "//ios/demo:PlayerUIDemo"
