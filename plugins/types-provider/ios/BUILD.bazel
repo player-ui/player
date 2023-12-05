@@ -1,0 +1,34 @@
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+load("@build_bazel_rules_apple//apple:resources.bzl", "apple_resource_bundle")
+
+load("@build_bazel_rules_ios//rules:test.bzl", "ios_unit_test")
+
+load("//tools/ios:util.bzl", "ios_bundle_module_shim")
+
+apple_resource_bundle(
+    name = "PlayerUITypesProviderPluginResourceBundle",
+    bundle_name = "TypesProviderPlugin",
+    bundle_id = "com.intuit.ios.player.resources.core",
+    resources = glob(["Resources/**/*"])
+)
+
+ios_bundle_module_shim("TypesProviderPlugin")
+
+swift_library(
+    name = "PlayerUITypesProviderPlugin",
+    module_name = "PlayerUITypesProviderPlugin",
+    srcs = glob(["Sources/**/*.swift"]) + [":TypesProviderPluginResourceShim"],
+    # tags = ["manual"],
+    visibility = ["//visibility:public"],
+    deps = ["//ios/core:PlayerUI"],
+    data = [":PlayerUITypesProviderPluginResourceBundle"],
+    defines = ["BAZEL_TARGET"]
+)
+
+ios_unit_test(
+    name = "PlayerUITypesProviderPluginTests",
+    srcs = glob(["Tests/**/*.swift"]),
+    minimum_os_version = "14.0",
+    deps = [":PlayerUITypesProviderPlugin", "//ios/internal-test-utils:PlayerUIInternalTestUtilities"],
+    visibility = ["//visibility:public"]
+)
