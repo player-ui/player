@@ -1,3 +1,29 @@
+# 0.5.0 (Tue Dec 05 2023)
+
+### Release Notes
+
+#### Sync Android and JVM packages to latest ([#222](https://github.com/player-ui/player/pull/222))
+
+
+
+---
+
+#### 🚀 Enhancement
+
+- Sync Android and JVM packages to latest [#222](https://github.com/player-ui/player/pull/222) ([@Kiwiegg](https://github.com/Kiwiegg) [@sugarmanz](https://github.com/sugarmanz))
+
+#### 🐛 Bug Fix
+
+- Release main [#254](https://github.com/player-ui/player/pull/254) ([@intuit-svc](https://github.com/intuit-svc))
+
+#### Authors: 3
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Larry ([@Kiwiegg](https://github.com/Kiwiegg))
+
+---
+
 # 0.4.5 (Mon Nov 27 2023)
 
 #### 🐛 Bug Fix
