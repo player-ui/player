@@ -12,6 +12,9 @@ import ViewInspector
 import SwiftUI
 
 @testable import PlayerUI
+@testable import PlayerUITestUtilities
+@testable import PlayerUIReferenceAssets
+@testable import PlayerUISwiftUI
 
 extension CollectionAssetView: Inspectable {}
 

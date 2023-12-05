@@ -10,6 +10,9 @@ import Foundation
 import XCTest
 import JavaScriptCore
 @testable import PlayerUI
+@testable import PlayerUITestUtilities
+@testable import PlayerUIReferenceAssets
+@testable import PlayerUISwiftUI
 
 class SwiftUIReferenceAssetsPluginTests: XCTestCase {
     func testReferenceAssetsPluginConstructs() {

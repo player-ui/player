@@ -12,6 +12,9 @@ import ViewInspector
 import XCTest
 
 @testable import PlayerUI
+@testable import PlayerUITestUtilities
+@testable import PlayerUIReferenceAssets
+@testable import PlayerUISwiftUI
 
 extension InfoAssetView: Inspectable {}
 

@@ -11,9 +11,12 @@ import Combine
 import SwiftUI
 import ViewInspector
 import XCTest
+import JavaScriptCore
 
 @testable import PlayerUI
-import JavaScriptCore
+@testable import PlayerUITestUtilities
+@testable import PlayerUIReferenceAssets
+@testable import PlayerUISwiftUI
 
 extension InputAssetView: Inspectable {}
 extension ValidationView: Inspectable {}

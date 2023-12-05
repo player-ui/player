@@ -11,6 +11,9 @@ import XCTest
 import JavaScriptCore
 import SwiftUI
 @testable import PlayerUI
+@testable import PlayerUITestUtilities
+@testable import PlayerUIReferenceAssets
+@testable import PlayerUISwiftUI
 
 class ValidationTests: SwiftUIAssetUnitTestCase {
     func testErrorValidation() {

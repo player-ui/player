@@ -11,6 +11,9 @@ import XCTest
 import ViewInspector
 import SwiftUI
 @testable import PlayerUI
+@testable import PlayerUIReferenceAssets
+@testable import PlayerUISwiftUI
+@testable import PlayerUITestUtilities
 
 extension TextAssetView: Inspectable {}
 extension LinkModifier: Inspectable {}
