@@ -26,7 +26,7 @@ public class PlayerControllers {
     /// The ExpressionEvaluator for the current flow
     public let expression: ExpressionEvaluator
 
-    init?(from value: JSValue?) {
+    public init?(from value: JSValue?) {
         guard let controllers = value else { return nil }
         rawValue = controllers
         data = DataController.createInstance(value: rawValue.objectForKeyedSubscript("data"))

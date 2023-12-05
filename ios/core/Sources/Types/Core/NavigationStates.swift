@@ -22,7 +22,7 @@ open class NavigationBaseState: CreatedFromJSValue {
         }
     }
 
-    init(_ value: JSValue) {
+    public init(_ value: JSValue) {
         rawValue = value
         stateType = value.objectForKeyedSubscript("state_type").toString()
     }

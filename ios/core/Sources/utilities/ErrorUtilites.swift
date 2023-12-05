@@ -10,7 +10,7 @@ import Foundation
 extension Error {
 
     /// Creates error descriptions logged by Player.
-    var playerDescription: String {
+    public var playerDescription: String {
         if let decodingError = self as? Swift.DecodingError {
             return decodingError.prettyDescription
         }
