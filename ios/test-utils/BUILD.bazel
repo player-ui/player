@@ -1,0 +1,46 @@
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+load("@build_bazel_rules_apple//apple:resources.bzl", "apple_resource_bundle")
+
+load("@build_bazel_rules_ios//rules:test.bzl", "ios_unit_test", "ios_ui_test")
+
+swift_library(
+    name = "PlayerUITestUtilities",
+    module_name = "PlayerUITestUtilities",
+    srcs = glob(["Sources/**/*.swift"]),
+    # Because this relies on XCTest
+    testonly = True,
+    visibility = ["//visibility:public"],
+    deps = [
+        "//ios/core:PlayerUI", 
+        "//ios/swiftui:PlayerUISwiftUI", 
+        "//ios/logger:PlayerUILogger",
+        "//ios/test-utils-core:PlayerUITestUtilitiesCore"
+    ],
+    defines = ["BAZEL_TARGET"]
+)
+
+ios_unit_test(
+    name = "PlayerUITestUtilitiesTests",
+    srcs = glob(["Tests/**/*.swift"]),
+    minimum_os_version = "14.0",
+    deps = [
+        ":PlayerUITestUtilities",
+        "//ios/internal-test-utils:PlayerUIInternalTestUtilities"
+    ],
+    visibility = ["//visibility:public"]
+)
+
+ios_ui_test(
+    name = "PlayerUITestUtilitiesViewInspectorTests",
+    srcs = glob(["ViewInspector/**/*.swift"]),
+    minimum_os_version = "14.0",
+    deps = [
+        "@swiftpkg_viewinspector//:Sources_ViewInspector",
+        ":PlayerUISwiftUI", 
+        "//ios/core:PlayerUI", 
+        "//ios/internal-test-utils:PlayerUIInternalTestUtilities",
+        "//plugins/reference-assets/swiftui:PlayerUIReferenceAssets"
+    ],
+    visibility = ["//visibility:public"],
+    test_host = "//ios/demo:PlayerUIDemo"
+)
