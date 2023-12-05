@@ -44,7 +44,8 @@ swift_deps.from_file(
 use_repo(
     swift_deps,
     "swiftpkg_swift_hooks",
-    "swiftpkg_viewinspector"
+    "swiftpkg_viewinspector",
+    "swiftpkg_eyes_xcui_swift_package"
 )
 
 # end iOS

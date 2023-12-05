@@ -10,6 +10,8 @@ import Foundation
 import XCTest
 import EyesXCUI
 import PlayerUI
+import PlayerUITestUtilities
+import PlayerUITestUtilitiesCore
 import Combine
 
 class BaseTestCase: AssetUITestCase {
