@@ -1,6 +1,5 @@
 {
   "name": "@player-ui/partial-match-registry",
   "version": "0.0.0-PLACEHOLDER",
-  "main": "src/index.ts",
-  "bundle": "dist/Registry.native.js"
+  "main": "src/index.ts"
 }

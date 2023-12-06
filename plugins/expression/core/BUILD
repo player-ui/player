@@ -10,6 +10,7 @@ vitest_config(name = "vitest_config")
 
 js_pipeline(
     package_name = "@player-ui/expression-plugin",
+    native_bundle = "ExpressionPlugin",
     peer_deps = [
         ":node_modules/@player-ui/player",
     ],

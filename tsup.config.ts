@@ -16,27 +16,33 @@ export function createConfig() {
       ...options,
     };
 
-    const bundleConfig: Options[] = [];
+    if (process.env.PLAYER_NATIVE_BUNDLE) {
+      const bundleEntryName = process.env.PLAYER_NATIVE_BUNDLE;
+      const bundleFileTarget = path.join(
+        "dist",
+        bundleEntryName + ".native.js",
+      );
+      return [
+        {
+          ...defaultOptions,
+          globalName: bundleEntryName,
+          external: [],
+          format: ["iife"],
+          async onSuccess() {
+            await fs.promises.copyFile(
+              "dist/index.global.js",
+              bundleFileTarget,
+            );
+            await fs.promises.copyFile(
+              "dist/index.global.js.map",
+              bundleFileTarget + ".map",
+            );
 
-    if (pkgJson.bundle) {
-      const bundleFileTarget = pkgJson.bundle;
-      const bundleEntryName = path.basename(bundleFileTarget, ".native.js");
-
-      bundleConfig.push({
-        ...defaultOptions,
-        globalName: bundleEntryName,
-        format: ["iife"],
-        async onSuccess() {
-          await fs.promises.copyFile("dist/index.global.js", bundleFileTarget);
-          await fs.promises.copyFile(
-            "dist/index.global.js.map",
-            bundleFileTarget + ".map",
-          );
-
-          await fs.promises.rm("dist/index.global.js");
-          await fs.promises.rm("dist/index.global.js.map");
+            await fs.promises.rm("dist/index.global.js");
+            await fs.promises.rm("dist/index.global.js.map");
+          },
         },
-      });
+      ];
     }
 
     return [
@@ -58,7 +64,6 @@ export function createConfig() {
         },
         format: ["esm"],
         outExtension: () => ({ js: ".mjs" }),
-        minify: true,
       },
       {
         ...defaultOptions,
@@ -66,7 +71,6 @@ export function createConfig() {
         outDir: "./dist/cjs/",
         outExtension: () => ({ js: ".cjs" }),
       },
-      ...bundleConfig,
     ];
   });
 }

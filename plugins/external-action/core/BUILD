@@ -10,6 +10,7 @@ vitest_config(name = "vitest_config")
 
 js_pipeline(
     package_name = "@player-ui/external-action-plugin",
+    native_bundle = "ExternalActionPlugin",
     peer_deps = [
         ":node_modules/@player-ui/player",
     ],
