@@ -10,6 +10,7 @@ vitest_config(name = "vitest_config")
 
 js_pipeline(
     package_name = "@player-ui/check-path-plugin",
+    native_bundle = "PubSubPlugin",
     peer_deps = [
         ":node_modules/@player-ui/player",
     ],

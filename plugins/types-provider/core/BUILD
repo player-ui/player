@@ -10,6 +10,7 @@ vitest_config(name = "vitest_config")
 
 js_pipeline(
     package_name = "@player-ui/types-provider-plugin",
+    native_bundle = "TypesProviderPlugin",
     peer_deps = [
         ":node_modules/@player-ui/player",
     ],

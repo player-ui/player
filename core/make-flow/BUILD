@@ -10,6 +10,7 @@ vitest_config(name = "vitest_config")
 
 js_pipeline(
     package_name = "@player-ui/make-flow",
+    native_bundle = "MakeFlow",
     build_deps = [
         "//:tsup_config",
         "//:typings",

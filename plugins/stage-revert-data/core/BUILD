@@ -10,6 +10,7 @@ vitest_config(name = "vitest_config")
 
 js_pipeline(
     package_name = "@player-ui/stage-revert-data-plugin",
+    native_bundle = "StageRevertDataPlugin",
     peer_deps = [
         ":node_modules/@player-ui/player",
     ],

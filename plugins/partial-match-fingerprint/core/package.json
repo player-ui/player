@@ -2,7 +2,6 @@
   "name": "@player-ui/partial-match-fingerprint-plugin",
   "version": "0.0.0-PLACEHOLDER",
   "main": "src/index.ts",
-  "bundle": "dist/PartialMatchFingerprintPlugin.native.js",
   "dependencies": {
     "@player-ui/partial-match-registry": "workspace:*"
   },

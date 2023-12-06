@@ -10,6 +10,7 @@ vitest_config(name = "vitest_config")
 
 js_pipeline(
     package_name = "@player-ui/player",
+    native_bundle = "Player",
     test_deps = [
         ":node_modules/@player-ui/make-flow",
         "//:vitest_config",

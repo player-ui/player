@@ -6,6 +6,7 @@ vitest_config(name = "vitest_config")
 
 js_pipeline(
     package_name = "@player-ui/partial-match-registry",
+    native_bundle = "Registry",
     deps = [
         "//:node_modules/@types/dlv",
         "//:node_modules/dlv",

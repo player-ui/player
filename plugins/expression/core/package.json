@@ -2,7 +2,6 @@
   "name": "@player-ui/expression-plugin",
   "version": "0.0.0-PLACEHOLDER",
   "main": "src/index.ts",
-  "bundle": "dist/ExpressionPlugin.native.js",
   "peerDependencies": {
     "@player-ui/player": "workspace:*"
   }
