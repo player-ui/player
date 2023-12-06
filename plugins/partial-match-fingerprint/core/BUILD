@@ -10,6 +10,7 @@ vitest_config(name = "vitest_config")
 
 js_pipeline(
     package_name = "@player-ui/partial-match-fingerprint-plugin",
+    native_bundle = "PartialMatchFingerprintPlugin",
     peer_deps = [
         ":node_modules/@player-ui/player",
     ],

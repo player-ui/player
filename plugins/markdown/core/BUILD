@@ -10,6 +10,7 @@ vitest_config(name = "vitest_config")
 
 js_pipeline(
     package_name = "@player-ui/markdown-plugin",
+    native_bundle = "MarkdownPlugin",
     peer_deps = [
         ":node_modules/@player-ui/player",
         ":node_modules/@player-ui/types",
