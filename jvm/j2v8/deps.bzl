@@ -1,8 +1,6 @@
 load("//jvm/dependencies:versions.bzl", "versions")
 load("@rules_player//maven:parse_coordinates.bzl", "parse_coordinates")
 
-maven = []
-
 maven_main = []
 
 maven = maven_main + [
