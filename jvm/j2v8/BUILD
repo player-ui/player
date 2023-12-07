@@ -19,4 +19,6 @@ j2v8_platform("linux")
 
 j2v8_platform("android")
 
+j2v8_platform("android-debug")
+
 j2v8_platform("all")
