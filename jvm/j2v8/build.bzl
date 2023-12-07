@@ -4,11 +4,15 @@ deps = {
     "macos": ["//jvm/j2v8/libs:j2v8_macos"],
     "linux": ["//jvm/j2v8/libs:j2v8_linux"],
     "android": ["@android_j2v8//aar"],
+    "android-debug": [
+        "//jvm/j2v8:j2v8-android",
+        "@maven//:com_github_AlexTrotsenko_j2v8_debugger",
+    ],
     "all": [
         "//jvm/j2v8:j2v8-macos",
         "//jvm/j2v8:j2v8-linux",
         "//jvm/j2v8:j2v8-android",
-    ]
+    ],
 }
 
 def j2v8_platform(platform):
