@@ -303,9 +303,9 @@ internal class ResourceBundleShim {}
 internal extension JSContext {
     var coreBundle: URL? {
         #if SWIFT_PACKAGE
-        return ResourceUtilities.urlForFile(name: "player.prod", ext: "js", bundle: Bundle.module)
+        return ResourceUtilities.urlForFile(name: "Player.native", ext: "js", bundle: Bundle.module)
         #else
-        return ResourceUtilities.urlForFile(name: "player.prod", ext: "js", bundle: Bundle(for: ResourceBundleShim.self), pathComponent: "PlayerUI.bundle")
+        return ResourceUtilities.urlForFile(name: "Player.native", ext: "js", bundle: Bundle(for: ResourceBundleShim.self), pathComponent: "PlayerUI.bundle")
         #endif
     }
     /// Loads the core player bundle into the give JSContext

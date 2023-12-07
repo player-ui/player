@@ -9,7 +9,11 @@ apple_resource_bundle(
     name = "PlayerUIResourceBundle",
     bundle_name = "PlayerUI",
     bundle_id = "com.intuit.ios.player.resources.core",
-    resources = glob(["Resources/**/*"])
+    resources = [
+        "//core/player:player_native_bundle",
+        "//core/partial-match-registry:partial-match-registry_native_bundle",
+        "//plugins/partial-match-fingerprint/core:core_native_bundle"
+    ]
 )
 
 ios_bundle_module_shim("PlayerUI")

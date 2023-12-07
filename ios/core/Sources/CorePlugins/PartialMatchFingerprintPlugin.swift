@@ -17,7 +17,7 @@ public class PartialMatchFingerprintPlugin: JSBasePlugin, NativePlugin {
      */
     public convenience init() {
         self.init(
-            fileName: "partial-match-fingerprint-plugin.prod",
+            fileName: "PartialMatchFingerprintPlugin.native",
             pluginName: "PartialMatchFingerprintPlugin.PartialMatchFingerprintPlugin"
         )
     }
@@ -77,6 +77,6 @@ class PartialMatchRegistry: JSBasePlugin {
      Constructs a PartialMatchRegistry JS object
      */
     convenience init() {
-        self.init(fileName: "partial-match-registry.prod", pluginName: "Registry.Registry")
+        self.init(fileName: "Registry.native", pluginName: "Registry.Registry")
     }
 }
