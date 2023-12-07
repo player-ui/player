@@ -34,7 +34,7 @@ public class ExternalActionPlugin: JSBasePlugin, NativePlugin {
      */
     public convenience init(handler: @escaping ExternalStateHandler) {
         self.init(
-            fileName: "external-action-plugin.prod",
+            fileName: "ExternalActionPlugin.native",
             pluginName: "ExternalActionPlugin.ExternalActionPlugin"
         )
         self.handler = handler

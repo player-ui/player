@@ -46,7 +46,7 @@ public class PubSubPlugin: JSBasePlugin, NativePlugin {
         - eventReceived: A callback to receive events
      */
     public convenience init(_ subscriptions: [PubSubSubscription], options: PubSubPluginOptions? = nil) {
-        self.init(fileName: "pubsub-plugin.prod", pluginName: "PubSubPlugin.PubSubPlugin")
+        self.init(fileName: "PubSubPlugin.native", pluginName: "PubSubPlugin.PubSubPlugin")
         eventSubscriptions = subscriptions
         self.options = options
     }

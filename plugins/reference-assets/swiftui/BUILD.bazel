@@ -4,17 +4,21 @@ load("@build_bazel_rules_apple//apple:resources.bzl", "apple_resource_bundle")
 load("@build_bazel_rules_ios//rules:test.bzl", "ios_unit_test", "ios_ui_test")
 load("@build_bazel_rules_apple//apple:ios.bzl", "ios_framework", "ios_build_test")
 
+load("//tools/ios:util.bzl", "ios_bundle_module_shim")
+
 apple_resource_bundle(
     name = "PlayerUIReferenceAssetsResourceBundle",
     bundle_name = "ReferenceAssets",
     bundle_id = "com.intuit.ios.player.resources.core",
-    resources = glob(["Resources/**/*"])
+    resources = glob(["Resources/**/*"]) + ["//plugins/reference-assets/core:core_native_bundle"]
 )
+
+ios_bundle_module_shim("ReferenceAssets")
 
 swift_library(
     name = "PlayerUIReferenceAssets",
     module_name = "PlayerUIReferenceAssets",
-    srcs = glob(["Sources/**/*.swift"]),
+    srcs = glob(["Sources/**/*.swift"]) + [":ReferenceAssetsResourceShim"],
     # tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = [

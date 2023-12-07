@@ -34,7 +34,7 @@ public class TypesProviderPlugin: JSBasePlugin, NativePlugin {
      */
     public convenience init(types: [CustomType], validators: [ValidationDeclaration], formats: [FormatDeclaration]) {
         self.init(
-            fileName: "types-provider-plugin.prod",
+            fileName: "TypesProviderPlugin.native",
             pluginName: "TypesProviderPlugin.TypesProviderPlugin"
         )
         self.types = types

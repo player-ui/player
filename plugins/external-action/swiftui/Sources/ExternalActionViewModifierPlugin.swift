@@ -37,7 +37,7 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
         - handler: the function to call when an external state is transitioned to
      */
     public convenience init(handler: @escaping ExternalStateViewModifierHandler) {
-        self.init(fileName: "external-action-plugin.prod", pluginName: "ExternalActionPlugin.ExternalActionPlugin")
+        self.init(fileName: "ExternalActionPlugin.native", pluginName: "ExternalActionPlugin.ExternalActionPlugin")
         self.handler = handler
     }
 

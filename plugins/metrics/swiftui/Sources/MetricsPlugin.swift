@@ -36,7 +36,7 @@ public class RequestTimePlugin: NativePlugin {
 class RequestTimeWebPlugin: JSBasePlugin {
     private var getRequestTime: () -> Int = { 0 }
     public convenience init(_ getRequestTime: @escaping () -> Int) {
-        self.init(fileName: "metrics-plugin.prod", pluginName: "MetricsPlugin.RequestTimeWebPlugin")
+        self.init(fileName: "MetricsPlugin.native", pluginName: "MetricsPlugin.RequestTimeWebPlugin")
         self.getRequestTime = getRequestTime
     }
 
@@ -98,7 +98,7 @@ public class MetricsPlugin: JSBasePlugin, NativePlugin, WithSymbol {
         - handler: A handler to receive events when rendering has finished
      */
     public convenience init(trackRenderTime: Bool = true, handler: RenderEndHandler? = nil) {
-        self.init(fileName: "metrics-plugin.prod", pluginName: "MetricsPlugin.MetricsCorePlugin")
+        self.init(fileName: "MetricsPlugin.native", pluginName: "MetricsPlugin.MetricsCorePlugin")
         self.trackRenderTime = trackRenderTime
         self.onRenderEnd = handler
     }

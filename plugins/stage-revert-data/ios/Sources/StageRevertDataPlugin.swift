@@ -13,7 +13,7 @@ public class StageRevertDataPlugin: JSBasePlugin, NativePlugin {
      Constructs the StageRevertDataPlugin
      */
     public convenience init() {
-        self.init(fileName: "stage-revert-data-plugin.prod", pluginName: "StageRevertDataPlugin.StageRevertDataPlugin")
+        self.init(fileName: "StageRevertDataPlugin.native", pluginName: "StageRevertDataPlugin.StageRevertDataPlugin")
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {

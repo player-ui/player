@@ -12,7 +12,7 @@ public class ComputedPropertiesPlugin: JSBasePlugin, NativePlugin {
      Constructs a PartialMatchRegistry JS object
      */
     public convenience init() {
-        self.init(fileName: "computed-properties-plugin.prod", pluginName: "ComputedPropertiesPlugin.ComputedPropertiesPlugin")
+        self.init(fileName: "ComputedPropertiesPlugin.native", pluginName: "ComputedPropertiesPlugin.ComputedPropertiesPlugin")
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {

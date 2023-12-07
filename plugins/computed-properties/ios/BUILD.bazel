@@ -9,7 +9,7 @@ apple_resource_bundle(
     name = "PlayerUIComputedPropertiesPluginResourceBundle",
     bundle_name = "ComputedPropertiesPlugin",
     bundle_id = "com.intuit.ios.player.resources.core",
-    resources = glob(["Resources/**/*"])
+    resources = ["//plugins/computed-properties/core:core_native_bundle"]
 )
 
 ios_bundle_module_shim("ComputedPropertiesPlugin")

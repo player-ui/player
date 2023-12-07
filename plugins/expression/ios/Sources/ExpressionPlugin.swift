@@ -24,7 +24,7 @@ public class ExpressionPlugin: JSBasePlugin, NativePlugin {
         - expressions: A dictionary of expression name to handler function
      */
     public convenience init(expressions: [String: ([Any]) -> Any?] = [:]) {
-        self.init(fileName: "expression-plugin.prod", pluginName: "ExpressionPlugin.ExpressionPlugin")
+        self.init(fileName: "ExpressionPlugin.native", pluginName: "ExpressionPlugin.ExpressionPlugin")
         self.expressions = expressions
     }
 

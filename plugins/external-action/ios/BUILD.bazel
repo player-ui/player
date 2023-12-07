@@ -9,7 +9,7 @@ apple_resource_bundle(
     name = "PlayerUIExternalActionPluginResourceBundle",
     bundle_name = "ExternalActionPlugin",
     bundle_id = "com.intuit.ios.player.resources.core",
-    resources = glob(["Resources/**/*"])
+    resources = ["//plugins/external-action/core:core_native_bundle"]
 )
 
 ios_bundle_module_shim("ExternalActionPlugin")
