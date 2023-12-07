@@ -77,6 +77,6 @@ open class CheckPathPlugin: BaseCheckPathPlugin, NativePlugin {
      Constructs the CheckPathPlugin
      */
     public convenience init() {
-        self.init(fileName: "check-path-plugin.prod", pluginName: "CheckPathPlugin.CheckPathPlugin")
+        self.init(fileName: "CheckPathPlugin.native", pluginName: "CheckPathPlugin.CheckPathPlugin")
     }
 }

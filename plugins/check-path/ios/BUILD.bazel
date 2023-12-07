@@ -9,7 +9,7 @@ apple_resource_bundle(
     name = "PlayerUICheckPathResourceBundle",
     bundle_name = "CheckPathPlugin",
     bundle_id = "com.intuit.ios.player.resources.core",
-    resources = glob(["Resources/**/*"])
+    resources = ["//plugins/check-path/core:core_native_bundle"]
 )
 
 ios_bundle_module_shim("CheckPathPlugin")
