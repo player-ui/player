@@ -24,10 +24,10 @@ extension JSContext {
 
     var bundleUrl: URL? {
         #if SWIFT_PACKAGE
-        ResourceUtilities.urlForFile(name: "make-flow.prod", ext: "js", bundle: Bundle.module)
+        ResourceUtilities.urlForFile(name: "MakeFlow.native", ext: "js", bundle: Bundle.module)
         #else
         ResourceUtilities.urlForFile(
-            name: "make-flow.prod",
+            name: "MakeFlow.native",
             ext: "js",
             bundle: Bundle(for: MakeFlowResourceShim.self), 
             pathComponent: "TestUtilities.bundle"
