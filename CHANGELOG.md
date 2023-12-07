@@ -1,3 +1,18 @@
+# 0.5.1 (Thu Dec 07 2023)
+
+#### 🐛 Bug Fix
+
+- Release main [#259](https://github.com/player-ui/player/pull/259) ([@intuit-svc](https://github.com/intuit-svc))
+- iOS - allow navigationFlowViewState attributes to take Any instead of string [#258](https://github.com/player-ui/player/pull/258) ([@zwu011](https://github.com/zwu011) [@nancywu1](https://github.com/nancywu1))
+
+#### Authors: 3
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- [@zwu011](https://github.com/zwu011)
+
+---
+
 # 0.5.0 (Tue Dec 05 2023)
 
 ### Release Notes
