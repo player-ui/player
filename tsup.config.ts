@@ -27,6 +27,9 @@ export function createConfig() {
           ...defaultOptions,
           globalName: bundleEntryName,
           external: [],
+          define: {
+            "process.env.NODE_ENV": JSON.stringify("production"),
+          },
           format: ["iife"],
           async onSuccess() {
             await fs.promises.copyFile(
