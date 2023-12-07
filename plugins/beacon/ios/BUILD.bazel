@@ -10,9 +10,6 @@ apple_resource_bundle(
     bundle_name = "BaseBeaconPlugin",
     bundle_id = "com.intuit.ios.player.resources.core",
     resources = ["//plugins/beacon/core:core_native_bundle"],
-
-    # Use old rollup bundle
-    # resources = glob(["Resources/**/*"]),
 )
 
 ios_bundle_module_shim("BaseBeaconPlugin")
