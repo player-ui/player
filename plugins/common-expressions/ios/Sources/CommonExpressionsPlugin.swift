@@ -12,7 +12,7 @@ public class CommonExpressionsPlugin: JSBasePlugin, NativePlugin {
      */
     public convenience init() {
         self.init(
-            fileName: "common-expressions-plugin.prod",
+            fileName: "CommonExpressionsPlugin.native",
             pluginName: "CommonExpressionsPlugin.CommonExpressionsPlugin"
         )
     }

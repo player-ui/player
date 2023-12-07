@@ -12,7 +12,7 @@ public class CommonTypesPlugin: JSBasePlugin, NativePlugin {
      Constructs a PartialMatchRegistry JS object
      */
     public convenience init() {
-        self.init(fileName: "common-types-plugin.prod", pluginName: "CommonTypesPlugin.CommonTypesPlugin")
+        self.init(fileName: "CommonTypesPlugin.native", pluginName: "CommonTypesPlugin.CommonTypesPlugin")
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {

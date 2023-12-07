@@ -9,7 +9,7 @@ apple_resource_bundle(
     name = "PlayerUICommonTypesPluginResourceBundle",
     bundle_name = "CommonTypesPlugin",
     bundle_id = "com.intuit.ios.player.resources.core",
-    resources = glob(["Resources/**/*"])
+    resources = ["//plugins/common-types/core:core_native_bundle"]
 )
 
 ios_bundle_module_shim("CommonTypesPlugin")

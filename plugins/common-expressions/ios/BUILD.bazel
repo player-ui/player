@@ -9,7 +9,7 @@ apple_resource_bundle(
     name = "PlayerUICommonExpressionsPluginResourceBundle",
     bundle_name = "CommonExpressionsPlugin",
     bundle_id = "com.intuit.ios.player.resources.core",
-    resources = glob(["Resources/**/*"])
+    resources = ["//plugins/common-expressions/core:core_native_bundle"]
 )
 
 ios_bundle_module_shim("CommonExpressionsPlugin")
