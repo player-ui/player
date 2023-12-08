@@ -20,7 +20,7 @@ public struct AssetCollection: View {
     let plugins: [NativePlugin]
     let sections: [FlowLoader.FlowSection]
     let padding: CGFloat
-    let completion: ((Result<CompletedState, PlayerError>) -> Void)?
+    let result: Binding<Result<CompletedState, PlayerError>?>
 
     /**
      Initializes and loads flows
@@ -33,11 +33,11 @@ public struct AssetCollection: View {
         plugins: [NativePlugin],
         sections: [FlowLoader.FlowSection],
         padding: CGFloat = 16,
-        completion: ((Result<CompletedState, PlayerError>) -> Void)? = nil
+        result: Binding<Result<CompletedState, PlayerError>?>
     ) {
         self.plugins = plugins
         self.padding = padding
-        self.completion = completion
+        self.result = result
         self.sections = sections
     }
 
@@ -47,7 +47,7 @@ public struct AssetCollection: View {
                 Section {
                     ForEach(section.flows, id: \.name) { flow in
                         NavigationLink(flow.name) {
-                            AssetFlowView(flow: flow.flow, plugins: plugins, completion: completion)
+                            AssetFlowView(flow: flow.flow, plugins: plugins, result: result)
                                 .padding(padding)
                                 .navigationBarTitle(Text(flow.name))
                         }
@@ -61,6 +61,35 @@ public struct AssetCollection: View {
         }
         .accessibility(identifier: "AssetCollection")
         .navigationBarTitle(Text("Flows"))
+    }
+}
+
+public extension AssetCollection {
+    /**
+     Initializes and loads flows
+     - parameters:
+     - plugins: Plugins to add to Player instance that is created
+     - sections: The `[FlowSection]` to display
+     - completion: A handler for when a flow reaches an end state
+     */
+    init(
+        plugins: [NativePlugin],
+        sections: [FlowLoader.FlowSection],
+        padding: CGFloat = 16,
+        completion: ((Result<CompletedState, PlayerError>) -> Void)? = nil
+    ) {
+        self.init(
+            plugins: plugins,
+            sections: sections,
+            padding: padding,
+            result: Binding(
+                get: {nil},
+                set: { result in
+                    guard let res = result else { return }
+                    completion?(res)
+                }
+            )
+        )
     }
 }
 

@@ -24,11 +24,11 @@ class ActionAssetUITests: BaseTestCase {
 
             tap(app.buttons["action-good"])
 
-            waitFor(app.alerts["FlowFinished"])
+            waitFor(app.alerts["Flow Finished"])
             check("After Click")
-            XCTAssertTrue(app.alerts["FlowFinished"].exists)
+            XCTAssertTrue(app.alerts["Flow Finished"].exists)
 
-            XCTAssertEqual(app.alerts["FlowFinished"].staticTexts.element(boundBy: 1).label, "done")
+            XCTAssertEqual(app.alerts["Flow Finished"].staticTexts.element(boundBy: 1).label, "done")
         }
     }
 
@@ -39,11 +39,11 @@ class ActionAssetUITests: BaseTestCase {
 
             tap(app.buttons["action-bad"])
 
-            waitFor(app.alerts["FlowFinished"])
+            waitFor(app.alerts["Flow Finished"])
             check("After Click")
-            XCTAssertTrue(app.alerts["FlowFinished"].exists)
+            XCTAssertTrue(app.alerts["Flow Finished"].exists)
 
-            XCTAssertTrue(app.alerts["FlowFinished"].staticTexts.element(boundBy: 1).label.contains("Unclosed brace"))
+            XCTAssertTrue(app.alerts["Flow Finished"].staticTexts.element(boundBy: 1).label.contains("Unclosed brace"))
         }
     }
 }

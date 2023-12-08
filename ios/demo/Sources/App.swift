@@ -22,13 +22,22 @@ struct BazelApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationView {
-                PlayerView()
+                MainView()
             }
         }
     }
 }
 
-struct PlayerView: View {
+struct MainView: View {
+    @State var result: Result<CompletedState, PlayerError>? = nil
+
+    var showAlert: Binding<Bool> {
+        Binding(get: { result != nil }) { newValue in
+            guard !newValue else { return }
+            result = nil
+        }
+    }
+
     let plugins: [NativePlugin] = [
         PrintLoggerPlugin(level: .trace),
         ReferenceAssetsPlugin(),
@@ -51,16 +60,33 @@ struct PlayerView: View {
         SwiftUIPendingTransactionPlugin<PendingTransactionPhases>()
     ]
     var body: some View {
-        NavigationView {
-            SegmentControlView(
-                plugins: plugins,
-                assetSections: MockFlows.assetSections,
-                pluginSections: MockFlows.pluginSections,
-                completion: { _ in
-                  print("finished")
-                }
+        SegmentControlView(
+            plugins: plugins,
+            assetSections: MockFlows.assetSections,
+            pluginSections: MockFlows.pluginSections,
+            result: $result
+        )
+        .navigationBarTitleDisplayMode(.inline)
+        .alert(isPresented: showAlert, content: {
+            return Alert(
+                title: Text("Flow Finished"),
+                message: Text(result?.message ?? "No Result"),
+                dismissButton: .default(Text("Done"))
             )
-            .navigationBarTitleDisplayMode(.inline)
+        })
+    }
+}
+
+extension Result where Success == CompletedState, Failure == PlayerError {
+    var message: String {
+        switch self {
+        case .success(let success):
+            return success.endState?.outcome ?? "No Outcome"
+        case .failure(let failure):
+            guard case let .promiseRejected(error) = failure else {
+                return failure.playerDescription
+            }
+            return error.error
         }
     }
 }

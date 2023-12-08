@@ -42,6 +42,7 @@ xcodeproj(
         "//plugins/pubsub/ios:PlayerUIPubSubPluginTests",
 
         "//plugins/reference-assets/swiftui:PlayerUIReferenceAssetsViewInspectorTests",
+        "//plugins/reference-assets/swiftui:PlayerUIReferenceAssetsUITests",
 
         "//plugins/transition/swiftui:PlayerUITransitionPluginViewInspectorTests",
         "//plugins/types-provider/ios:PlayerUITypesProviderPluginTests"

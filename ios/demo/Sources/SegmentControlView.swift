@@ -19,7 +19,7 @@ public struct SegmentControlView: View {
     let assetSections: [FlowLoader.FlowSection]
     let pluginSections: [FlowLoader.FlowSection]
     let padding: CGFloat
-    let completion: ((Result<CompletedState, PlayerError>) -> Void)?
+    let result: Binding<Result<CompletedState, PlayerError>?>
     /**
      Initializes and loads flows
      - parameters:
@@ -34,13 +34,13 @@ public struct SegmentControlView: View {
         assetSections: [FlowLoader.FlowSection],
         pluginSections: [FlowLoader.FlowSection],
         padding: CGFloat = 16,
-        completion: ((Result<CompletedState, PlayerError>) -> Void)? = nil
+        result: Binding<Result<CompletedState, PlayerError>?>
     ) {
         self.plugins = plugins
         self.assetSections = assetSections
         self.pluginSections = pluginSections
         self.padding = padding
-        self.completion = completion
+        self.result = result
     }
 
     enum HeaderSelection: String, CaseIterable {
@@ -83,7 +83,7 @@ public struct SegmentControlView: View {
             plugins: plugins,
             sections: assetSections,
             padding: padding,
-            completion: completion
+            result: result
         )
         .accessibility(identifier: "AssetCollection")
         .navigationBarTitle(Text("Flows"))

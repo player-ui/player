@@ -32,20 +32,6 @@ public struct AssetFlowView: View {
         }
     }
 
-    public init(flow: String, plugins: [NativePlugin], completion: ((Result<CompletedState, PlayerError>) -> Void)? = nil) {
-        self.init(
-            flow: flow,
-            plugins: plugins,
-            result: Binding(
-                get: {nil},
-                set: { result in
-                    guard let res = result else { return }
-                    completion?(res)
-                }
-            )
-        )
-    }
-
     public var body: some View {
         ScrollView {
             player.frame(maxWidth: .infinity, alignment: .topLeading)
@@ -58,6 +44,22 @@ public struct AssetFlowView: View {
             flow: flow,
             plugins: plugins,
             result: result
+        )
+    }
+}
+
+public extension AssetFlowView {
+    init(flow: String, plugins: [NativePlugin], completion: ((Result<CompletedState, PlayerError>) -> Void)? = nil) {
+        self.init(
+            flow: flow,
+            plugins: plugins,
+            result: Binding(
+                get: {nil},
+                set: { result in
+                    guard let res = result else { return }
+                    completion?(res)
+                }
+            )
         )
     }
 }
