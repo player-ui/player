@@ -39,6 +39,7 @@ js_library(
         "//:node_modules/@vitest/coverage-v8",
         "//:node_modules/happy-dom",
         "//:node_modules/vitest",
+        "//tools:vitest_coverage_mapper",
     ],
 )
 
