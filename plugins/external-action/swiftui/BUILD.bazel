@@ -7,7 +7,6 @@ swift_library(
     name = "PlayerUIExternalActionViewModifierPlugin",
     module_name = "PlayerUIExternalActionViewModifierPlugin",
     srcs = glob(["Sources/**/*.swift"]),
-    # tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = [
         "//ios/core:PlayerUI", 

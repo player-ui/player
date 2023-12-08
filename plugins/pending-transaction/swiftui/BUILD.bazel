@@ -7,7 +7,6 @@ swift_library(
     name = "PlayerUISwiftUIPendingTransactionPlugin",
     module_name = "PlayerUISwiftUIPendingTransactionPlugin",
     srcs = glob(["Sources/**/*.swift"]),
-    # tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = ["//ios/core:PlayerUI", "//ios/swiftui:PlayerUISwiftUI"],
     defines = ["BAZEL_TARGET"]

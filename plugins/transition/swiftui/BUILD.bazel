@@ -7,7 +7,6 @@ swift_library(
     name = "PlayerUITransitionPlugin",
     module_name = "PlayerUITransitionPlugin",
     srcs = glob(["Sources/**/*.swift"]),
-    # tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = [
         "//ios/core:PlayerUI", 

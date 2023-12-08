@@ -7,7 +7,6 @@ swift_library(
     name = "PlayerUIPrintLoggerPlugin",
     module_name = "PlayerUIPrintLoggerPlugin",
     srcs = glob(["Sources/**/*.swift"]),
-    # tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = ["//ios/core:PlayerUI", "//ios/logger:PlayerUILogger"],
     defines = ["BAZEL_TARGET"]

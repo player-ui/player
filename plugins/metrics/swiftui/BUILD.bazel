@@ -18,7 +18,6 @@ swift_library(
     name = "PlayerUIMetricsPlugin",
     module_name = "PlayerUIMetricsPlugin",
     srcs = glob(["Sources/**/*.swift"]) + [":MetricsPluginResourceShim"],
-    # tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = ["//ios/core:PlayerUI", "//ios/swiftui:PlayerUISwiftUI"],
     data = [":PlayerUIMetricsPluginResourceBundle"],

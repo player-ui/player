@@ -18,7 +18,6 @@ swift_library(
     name = "PlayerUICheckPathPlugin",
     module_name = "PlayerUICheckPathPlugin",
     srcs = glob(["Sources/**/*.swift"]) + [":CheckPathPluginResourceShim"],
-    # tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = ["//ios/core:PlayerUI"],
     data = [":PlayerUICheckPathResourceBundle"],

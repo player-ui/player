@@ -19,7 +19,6 @@ swift_library(
     name = "PlayerUIReferenceAssets",
     module_name = "PlayerUIReferenceAssets",
     srcs = glob(["Sources/**/*.swift"]) + [":ReferenceAssetsResourceShim"],
-    # tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = [
         "//ios/core:PlayerUI",

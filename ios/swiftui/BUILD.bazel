@@ -7,7 +7,6 @@ swift_library(
     name = "PlayerUISwiftUI",
     module_name = "PlayerUISwiftUI",
     srcs = glob(["Sources/**/*.swift"]),
-    # tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = ["@swiftpkg_swift_hooks//:Sources_SwiftHooks", "//ios/core:PlayerUI"],
     defines = ["BAZEL_TARGET"]

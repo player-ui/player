@@ -22,7 +22,6 @@ swift_library(
     name = "PlayerUI",
     module_name = "PlayerUI",
     srcs = glob(["Sources/**/*.swift"]) + [":PlayerUIResourceShim"],
-    # tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = ["@swiftpkg_swift_hooks//:Sources_SwiftHooks", "//ios/logger:PlayerUILogger"],
     data = [":PlayerUIResourceBundle"],

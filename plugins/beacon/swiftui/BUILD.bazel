@@ -7,7 +7,6 @@ swift_library(
     name = "PlayerUIBeaconPlugin",
     module_name = "PlayerUIBeaconPlugin",
     srcs = glob(["Sources/**/*.swift"]),
-    # tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = [
         "//ios/core:PlayerUI", 
