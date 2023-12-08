@@ -15,7 +15,7 @@ exports[`generates the correct AST > parses an exp array 1`] = `
           {
             "parent": [Circular],
             "type": "value",
-            "value": "{{please}} = \\"work\\"",
+            "value": "{{please}} = "work"",
           },
         ],
       },

@@ -158,7 +158,7 @@ describe("errors", () => {
     expect(() =>
       parser.parse("foo.{{nested}}.bar"),
     ).toThrowErrorMatchingInlineSnapshot(
-      `"Cannot resolve binding: foo.{{nested}}.bar"`,
+      `[NestedError: Cannot resolve binding: foo.{{nested}}.bar]`,
     );
   });
 
