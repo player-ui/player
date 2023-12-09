@@ -10,15 +10,15 @@ git_override(
 # local_path_override(module_name = "rules_player", path = "../rules_player")
 
 bazel_dep(name = "aspect_bazel_lib", version = "1.32.0")
-bazel_dep(name = "aspect_rules_js", version = "1.33.1")
+bazel_dep(name = "aspect_rules_js", version = "1.34.0")
 bazel_dep(name = "bazel_skylib", version = "1.4.1")
 bazel_dep(name = "rules_pkg", version = "0.9.1")
 bazel_dep(name = "aspect_rules_ts", version = "2.1.0")
 
 ####### Node.js version #########
-bazel_dep(name = "rules_nodejs", version = "5.8.2")
+bazel_dep(name = "rules_nodejs", version = "6.0.2")
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
-node.toolchain(node_version = "16.14.2")
+node.toolchain(node_version = "18.18.0")
 #################################
 
 

@@ -48,7 +48,7 @@
     "@types/dlv": "^1.1.4",
     "@types/lunr": "^2.3.4",
     "@types/mdx-js__react": "^1.5.5",
-    "@types/node": "^16.18.62",
+    "@types/node": "^18.18.0",
     "@types/parsimmon": "^1.10.0",
     "@types/pubsub-js": "^1.8.3",
     "@types/react": "^17.0.25",
@@ -59,7 +59,7 @@
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.1.0",
     "@typescript-eslint/parser": "^5.1.0",
-    "@vitest/coverage-v8": "^0.34.6",
+    "@vitest/coverage-v8": "^1.0.2",
     "all-contributors-cli": "^6.20.0",
     "arr-flatten": "^1.1.0",
     "auto": "^11.0.4",
@@ -134,7 +134,7 @@
     "tsup": "^8.0.1",
     "typescript": "5.3.2",
     "uuid": "^8.3.2",
-    "vitest": "^0.34.6"
+    "vitest": "^1.0.2"
   },
   "volta": {
     "node": "16.14.0"
