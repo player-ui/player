@@ -163,22 +163,22 @@ jobs:
 
       - run: bazel build --config=ci -- //ios/demo:PlayerUIDemo
       - run:
-        name: Tests
-        command: |
-          bazel coverage \
-            --config=ci \
-            --jobs=2 \
-            --experimental_use_llvm_covmap \
-            --combined_report=lcov \
-            --test_output=all \
-            --test_env=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} \
-            --test_env=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} \
-            --test_env=APPLITOOLS_PR_NUMBER=${CIRCLE_PULL_REQUEST##*/} \
-            --test_timeout=1800 \
-            $(bazel query "kind(ios_unit_test, //ios/...)") \
-            $(bazel query "kind(ios_unit_test, //plugins/...)") \
-            $(bazel query "kind(ios_ui_test, //ios/...)") \
-            $(bazel query "kind(ios_ui_test, //plugins/...)")
+          name: Tests
+          command: |
+            bazel coverage \
+              --config=ci \
+              --jobs=2 \
+              --experimental_use_llvm_covmap \
+              --combined_report=lcov \
+              --test_output=all \
+              --test_env=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} \
+              --test_env=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} \
+              --test_env=APPLITOOLS_PR_NUMBER=${CIRCLE_PULL_REQUEST##*/} \
+              --test_timeout=1800 \
+              $(bazel query "kind(ios_unit_test, //ios/...)") \
+              $(bazel query "kind(ios_unit_test, //plugins/...)") \
+              $(bazel query "kind(ios_ui_test, //ios/...)") \
+              $(bazel query "kind(ios_ui_test, //plugins/...)")
 
       - run:
           when: always
