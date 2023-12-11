@@ -1,3 +1,4 @@
+load("@rules_pkg//:mappings.bzl", "pkg_files", "strip_prefix")
 load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
 load("@build_bazel_rules_apple//apple:resources.bzl", "apple_resource_bundle")
 
@@ -10,15 +11,22 @@ apple_resource_bundle(
     name = "PlayerUIReferenceAssetsResourceBundle",
     bundle_name = "ReferenceAssets",
     bundle_id = "com.intuit.ios.player.resources.core",
-    resources = glob(["Resources/**/*"]) + ["//plugins/reference-assets/core:core_native_bundle"]
+    resources = ["//plugins/reference-assets/swiftui/Resources:PlayerUIReferenceAssets_Resources", "//plugins/reference-assets/core:core_native_bundle"]
 )
 
 ios_bundle_module_shim("ReferenceAssets")
 
+pkg_files(
+    name = "PlayerUIReferenceAssets_Sources",
+    srcs = glob(["Sources/**/*.swift"]),
+    strip_prefix = strip_prefix.from_pkg(),
+    visibility = ["//visibility:public"],
+)
+
 swift_library(
     name = "PlayerUIReferenceAssets",
     module_name = "PlayerUIReferenceAssets",
-    srcs = glob(["Sources/**/*.swift"]) + [":ReferenceAssetsResourceShim"],
+    srcs = [":PlayerUIReferenceAssets_Sources", ":ReferenceAssetsResourceShim"],
     visibility = ["//visibility:public"],
     deps = [
         "//ios/core:PlayerUI",

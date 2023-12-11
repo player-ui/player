@@ -1,3 +1,4 @@
+load("@rules_pkg//:mappings.bzl", "pkg_files", "strip_prefix")
 load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
 load("@build_bazel_rules_apple//apple:resources.bzl", "apple_resource_bundle")
 
@@ -14,10 +15,17 @@ apple_resource_bundle(
 
 ios_bundle_module_shim("CommonTypesPlugin")
 
+pkg_files(
+    name = "PlayerUICommonTypesPlugin_Sources",
+    srcs = glob(["Sources/**/*.swift"]),
+    strip_prefix = strip_prefix.from_pkg(),
+    visibility = ["//visibility:public"],
+)
+
 swift_library(
     name = "PlayerUICommonTypesPlugin",
     module_name = "PlayerUICommonTypesPlugin",
-    srcs = glob(["Sources/**/*.swift"]) + [":CommonTypesPluginResourceShim"],
+    srcs = [":PlayerUICommonTypesPlugin_Sources", ":CommonTypesPluginResourceShim"],
     visibility = ["//visibility:public"],
     deps = ["//ios/core:PlayerUI"],
     data = [":PlayerUICommonTypesPluginResourceBundle"],

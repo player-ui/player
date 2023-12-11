@@ -1,6 +1,7 @@
 # load("@rules_player//cocoapods:cocoapod.bzl", "assemble_pod", "pod_push")
 # load("@rules_player//internal:stamp.bzl", "stamp")
 # load("//:generated.bzl", "PlayerUI", "PlayerUI_Demo", "ui_tests", "unit_tests")
+load("//tools/ios:util.bzl", "assemble_pod")
 
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@aspect_rules_js//js:defs.bzl", "js_library")
@@ -97,36 +98,99 @@ js_library(
 #     },
 # )
 
-# assemble_pod(
-#     name = "PlayerUI_Pod",
-#     srcs = glob([
-#         "ios/**/*.swift",
-#         "LICENSE",
-#     ]),
-#     data = {
-#         # Core
-#         "//core/player:Player_Bundles_bundle_prod": "ios/packages/core/Resources/",
-#         "//plugins/partial-match-fingerprint/core:PartialMatchFingerprintPlugin_Bundles_bundle_prod": "ios/packages/core/Resources/",
-#         "//core/partial-match-registry:Registry_Bundles_bundle_prod": "ios/packages/core/Resources/",
+exports_files([
+    "PlayerUI.podspec"
+])
 
-#         # Packages
-#         "//core/make-flow:MakeFlow_Bundles_bundle_prod": "ios/packages/test-utils/Resources/",
-#         "//plugins/reference-assets/core:ReferenceAssetsPlugin_Bundles_bundle_prod": "ios/packages/reference-assets/Resources/js/",
-#         # Plugins
-#         "//plugins/beacon/core:BeaconPlugin_Bundles_bundle_prod": "ios/plugins/BaseBeaconPlugin/Resources/",
-#         "//plugins/check-path/core:CheckPathPlugin_Bundles_bundle_prod": "ios/plugins/CheckPathPlugin/Resources/",
-#         "//plugins/common-types/core:CommonTypesPlugin_Bundles_bundle_prod": "ios/plugins/CommonTypesPlugin/Resources/",
-#         "//plugins/common-expressions/core:CommonExpressionsPlugin_Bundles_bundle_prod": "ios/plugins/CommonExpressionsPlugin/Resources/",
-#         "//plugins/computed-properties/core:ComputedPropertiesPlugin_Bundles_bundle_prod": "ios/plugins/ComputedPropertiesPlugin/Resources/",
-#         "//plugins/expression/core:ExpressionPlugin_Bundles_bundle_prod": "ios/plugins/ExpressionPlugin/Resources/",
-#         "//plugins/external-action/core:ExternalActionPlugin_Bundles_bundle_prod": "ios/plugins/ExternalActionPlugin/Resources/",
-#         "//plugins/metrics/core:MetricsPlugin_Bundles_bundle_prod": "ios/plugins/MetricsPlugin/Resources/",
-#         "//plugins/pubsub/core:PubSubPlugin_Bundles_bundle_prod": "ios/plugins/PubSubPlugin/Resources/",
-#         "//plugins/stage-revert-data/core:StageRevertDataPlugin_Bundles_bundle_prod": "ios/plugins/StageRevertDataPlugin/Resources/",
-#         "//plugins/types-provider/core:TypesProviderPlugin_Bundles_bundle_prod": "ios/plugins/TypesProviderPlugin/Resources/",
-#     },
-#     podspec = ":PlayerUI_Podspec",
-# )
+assemble_pod(
+    name = "PlayerUI_Pod",
+    srcs = glob([
+        "LICENSE",
+        "Package.swift",
+    ]),
+    data = {
+        # Core
+        "//ios/core:PlayerUI_Sources": "ios/core/",
+        "//core/player:player_native_bundle": "ios/core/Resources/",
+        "//plugins/partial-match-fingerprint/core:core_native_bundle": "ios/core/Resources/",
+        "//core/partial-match-registry:partial-match-registry_native_bundle": "ios/core/Resources/",
+
+        # SwiftUI
+        "//ios/swiftui:PlayerUISwiftUI_Sources": "ios/swiftui/",
+
+        # Logger
+        "//ios/logger:PlayerUILogger_Sources": "ios/logger/",
+
+        # Test Utilities
+        "//ios/test-utils-core:PlayerUITestUtilitiesCore_Sources": "ios/test-utils-core/",
+        "//ios/test-utils:PlayerUITestUtilities_Sources": "ios/test-utils/",
+        "//core/make-flow:make-flow_native_bundle": "ios/test-utils-core/Resources/",
+
+        # Plugins #
+
+        # Beacon
+        "//plugins/beacon/ios:PlayerUIBaseBeaconPlugin_Sources": "plugins/beacon/ios/",
+        "//plugins/beacon/swiftui:PlayerUIBeaconPlugin_Sources": "plugins/beacon/swiftui/",
+        "//plugins/beacon/core:core_native_bundle": "plugins/beacon/ios/Resources/",
+
+        # Check Path
+        "//plugins/check-path/ios:PlayerUICheckPathPlugin_Sources": "plugins/check-path/ios/",
+        "//plugins/check-path/swiftui:PlayerUISwiftUICheckPathPlugin_Sources": "plugins/check-path/swiftui/",
+        "//plugins/check-path/core:core_native_bundle": "plugins/check-path/ios/Resources/",
+
+        # Common Expressions
+        "//plugins/common-expressions/ios:PlayerUICommonExpressionsPlugin_Sources": "plugins/common-expressions/ios/",
+        "//plugins/common-expressions/core:core_native_bundle": "plugins/common-expressions/ios/Resources/",
+
+        # Common Types
+        "//plugins/common-types/ios:PlayerUICommonTypesPlugin_Sources": "plugins/common-types/ios/",
+        "//plugins/common-types/core:core_native_bundle": "plugins/common-types/ios/Resources/",
+
+        # Computed Properties
+        "//plugins/computed-properties/ios:PlayerUIComputedPropertiesPlugin_Sources": "plugins/computed-properties/ios/",
+        "//plugins/computed-properties/core:core_native_bundle": "plugins/computed-properties/ios/Resources/",
+
+        # Console Logger (PrintLoggerPlugin)
+        "//plugins/console-logger/ios:PlayerUIPrintLoggerPlugin_Sources": "plugins/console-logger/ios/",
+
+        # Expression
+        "//plugins/expression/ios:PlayerUIExpressionPlugin_Sources": "plugins/expression/ios/",
+        "//plugins/expression/core:core_native_bundle": "plugins/expression/ios/Resources/",
+
+        # External Action
+        "//plugins/external-action/ios:PlayerUIExternalActionPlugin_Sources": "plugins/external-action/ios/",
+        "//plugins/external-action/swiftui:PlayerUIExternalActionViewModifierPlugin_Sources": "plugins/external-action/swiftui/",
+        "//plugins/external-action/core:core_native_bundle": "plugins/external-action/ios/Resources/",
+
+        # Metrics
+        "//plugins/metrics/swiftui:PlayerUIMetricsPlugin_Sources": "plugins/metrics/swiftui/",
+        "//plugins/metrics/core:core_native_bundle": "plugins/metrics/swiftui/Resources/",
+
+        # Pending Transaction
+        "//plugins/pending-transaction/swiftui:PlayerUISwiftUIPendingTransactionPlugin_Sources": "plugins/pending-transaction/swiftui/",
+
+        # PubSub
+        "//plugins/pubsub/ios:PlayerUIPubSubPlugin_Sources": "plugins/pubsub/ios/",
+        "//plugins/pubsub/core:core_native_bundle": "plugins/pubsub/ios/Resources/",
+
+        # Reference Assets
+        "//plugins/reference-assets/swiftui:PlayerUIReferenceAssets_Sources": "plugins/reference-assets/swiftui/",
+        "//plugins/reference-assets/swiftui/Resources:PlayerUIReferenceAssets_Resources": "plugins/reference-assets/swiftui/Resources/",
+        "//plugins/reference-assets/core:core_native_bundle": "plugins/reference-assets/swiftui/Resources/js/",
+
+        # Stage Revert Data
+        "//plugins/stage-revert-data/ios:PlayerUIStageRevertDataPlugin_Sources": "plugins/stage-revert-data/ios/",
+        "//plugins/stage-revert-data/core:core_native_bundle": "plugins/stage-revert-data/ios/Resources/",
+
+        # Transition
+        "//plugins/transition/swiftui:PlayerUITransitionPlugin_Sources": "plugins/transition/swiftui",
+
+        # Types Provider
+        "//plugins/types-provider/ios:PlayerUITypesProviderPlugin_Sources": "plugins/types-provider/ios/",
+        "//plugins/types-provider/core:core_native_bundle": "plugins/types-provider/ios/Resources/",
+    },
+    podspec = ":PlayerUI.podspec",
+)
 
 # # Push podspec to specs repo
 # # tag must exist in github first

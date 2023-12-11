@@ -1,3 +1,4 @@
+load("@rules_pkg//:mappings.bzl", "pkg_files", "strip_prefix")
 load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
 load("@build_bazel_rules_apple//apple:resources.bzl", "apple_resource_bundle")
 
@@ -6,7 +7,7 @@ load("@build_bazel_rules_ios//rules:test.bzl", "ios_unit_test")
 load("//tools/ios:util.bzl", "ios_bundle_module_shim")
 
 apple_resource_bundle(
-    name = "PlayerUIBeaconResourceBundle",
+    name = "PlayerUIBaseBeaconResourceBundle",
     bundle_name = "BaseBeaconPlugin",
     bundle_id = "com.intuit.ios.player.resources.core",
     resources = ["//plugins/beacon/core:core_native_bundle"],
@@ -14,13 +15,20 @@ apple_resource_bundle(
 
 ios_bundle_module_shim("BaseBeaconPlugin")
 
+pkg_files(
+    name = "PlayerUIBaseBeaconPlugin_Sources",
+    srcs = glob(["Sources/**/*.swift"]),
+    strip_prefix = strip_prefix.from_pkg(),
+    visibility = ["//visibility:public"],
+)
+
 swift_library(
     name = "PlayerUIBaseBeaconPlugin",
     module_name = "PlayerUIBaseBeaconPlugin",
-    srcs = glob(["Sources/**/*.swift"]) + [":BaseBeaconPluginResourceShim"],
+    srcs = [":PlayerUIBaseBeaconPlugin_Sources", ":BaseBeaconPluginResourceShim"],
     visibility = ["//visibility:public"],
     deps = ["//ios/core:PlayerUI"],
-    data = [":PlayerUIBeaconResourceBundle"],
+    data = [":PlayerUIBaseBeaconResourceBundle"],
     defines = ["BAZEL_TARGET"]
 )
 
