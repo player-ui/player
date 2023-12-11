@@ -73,6 +73,11 @@ CoverageData/
 bep.json
 xcui.json
 
+#SPM
+.build
+.swiftpm
+ios/Player.xcodeproj
+
 # Bundles used by cocoapods for development
 ios/*/*/Resources/**/*.js
 

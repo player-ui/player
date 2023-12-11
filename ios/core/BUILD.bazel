@@ -1,0 +1,45 @@
+load("@rules_pkg//:mappings.bzl", "pkg_files", "strip_prefix")
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+load("@build_bazel_rules_apple//apple:resources.bzl", "apple_resource_bundle")
+
+load("@build_bazel_rules_ios//rules:test.bzl", "ios_unit_test")
+
+load("//tools/ios:util.bzl", "ios_bundle_module_shim")
+
+apple_resource_bundle(
+    name = "PlayerUIResourceBundle",
+    bundle_name = "PlayerUI",
+    bundle_id = "com.intuit.ios.player.resources.core",
+    resources = [
+        "//core/player:player_native_bundle",
+        "//core/partial-match-registry:partial-match-registry_native_bundle",
+        "//plugins/partial-match-fingerprint/core:core_native_bundle"
+    ]
+)
+
+ios_bundle_module_shim("PlayerUI")
+
+pkg_files(
+    name = "PlayerUI_Sources",
+    srcs = glob(["Sources/**/*.swift"]),
+    strip_prefix = strip_prefix.from_pkg(),
+    visibility = ["//visibility:public"],
+)
+
+swift_library(
+    name = "PlayerUI",
+    module_name = "PlayerUI",
+    srcs = [":PlayerUI_Sources", ":PlayerUIResourceShim"],
+    visibility = ["//visibility:public"],
+    deps = ["@swiftpkg_swift_hooks//:Sources_SwiftHooks", "//ios/logger:PlayerUILogger"],
+    data = [":PlayerUIResourceBundle"],
+    defines = ["BAZEL_TARGET"]
+)
+
+ios_unit_test(
+    name = "PlayerUITests",
+    srcs = glob(["Tests/**/*.swift"]),
+    minimum_os_version = "14.0",
+    deps = [":PlayerUI", "//ios/internal-test-utils:PlayerUIInternalTestUtilities"],
+    visibility = ["//visibility:public"]
+)

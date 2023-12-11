@@ -28,154 +28,13 @@ and display it as a SwiftUI view comprised of registered assets.
     all.dependency 'PlayerUI/SwiftUI'
   end
 
-  # <INTERNAL>
-  s.app_spec 'Demo' do |demo|
-    demo.source_files = 'ios/packages/demo/Sources/**/*'
-
-    demo.resources = [
-      'ios/packages/demo/Resources/Primary.storyboard',
-      'ios/packages/demo/Resources/Launch.xib',
-      'ios/packages/demo/Resources/**/*.xcassets'
-    ]
-
-    demo.dependency 'PlayerUI/SwiftUI'
-    demo.dependency 'PlayerUI/BeaconPlugin'
-    demo.dependency 'PlayerUI/ReferenceAssets'
-    demo.dependency 'PlayerUI/MetricsPlugin'
-    demo.dependency 'PlayerUI/TransitionPlugin'
-
-    demo.info_plist = {
-      'UILaunchStoryboardName' => 'Launch',
-      'CFBundleIdentifier' => 'com.intuit.ios.player',
-      'UIApplicationSceneManifest' => {
-        'UIApplicationSupportsMultipleScenes' => true,
-        'UISceneConfigurations' => {
-          'UIWindowSceneSessionRoleApplication' => [
-            {
-              'UISceneConfigurationName' => 'Default Configuration',
-              'UISceneDelegateClassName' => 'PlayerUI_Demo.SceneDelegate'
-            }
-          ]
-        }
-      }
-    }
-
-    demo.pod_target_xcconfig = {
-      'PRODUCT_BUNDLE_IDENTIFIER': 'com.intuit.ios.player',
-
-      'CODE_SIGN_STYLE': 'Manual',
-      'CODE_SIGN_IDENTITY': 'iPhone Distribution',
-      'PROVISIONING_PROFILE_SPECIFIER': 'match InHouse com.intuit.ios.player',
-      'DEVELOPMENT_TEAM': 'F6DWWXWEX6',
-
-      'SKIP_INSTALL': 'NO',
-      'SKIP_INSTALLED_PRODUCT': 'YES'
-    }
-
-    demo.script_phases = [
-        {
-          :name => 'SwiftLint',
-          :execution_position => :before_compile,
-          :script => <<-SCRIPT
-            cd ${SRCROOT}/../..
-            ${PODS_ROOT}/SwiftLint/swiftlint --config .swiftlint.yml --path ./ios/
-          SCRIPT
-        },
-        {
-        :name => 'Mock Generation',
-        :execution_position => :before_compile,
-        :shell_path => '/bin/zsh',
-        :script => <<-SCRIPT
-          cd ${SRCROOT}/../../ios/packages/demo/scripts
-          if test -f ~/.zshrc; then
-            source ~/.zshrc
-          fi
-          ./generateFlowSections.js
-        SCRIPT
-      }
-    ]
-  end
-
-  s.subspec 'InternalUnitTestUtilities' do |utils|
-    utils.dependency 'PlayerUI/Core'
-    utils.source_files = 'ios/packages/internal-test-utils/Sources/**/*'
-
-    utils.weak_framework = 'XCTest'
-    utils.pod_target_xcconfig = {
-      'ENABLE_BITCODE' => 'NO',
-      'ENABLE_TESTING_SEARCH_PATHS' => 'YES'
-    }
-  end
-
-  s.test_spec 'Unit' do |tests|
-    tests.requires_app_host = true
-    tests.app_host_name = 'PlayerUI/Demo'
-    tests.dependency 'PlayerUI/InternalUnitTestUtilities'
-    tests.dependency 'PlayerUI/Demo'
-    tests.dependency 'PlayerUI/TestUtilities'
-    tests.source_files = [
-      'ios/packages/*/Tests/**/*.swift',
-      'ios/plugins/*/Tests/**/*.swift'
-    ]
-  end
-
-  s.test_spec 'ViewInspectorTests' do |tests|
-    tests.test_type = :ui
-    tests.requires_app_host = true
-    tests.app_host_name = 'PlayerUI/Demo'
-    tests.dependency 'PlayerUI/InternalUnitTestUtilities'
-    tests.dependency 'PlayerUI/Demo'
-    tests.dependency 'ViewInspector', '0.9.0'
-    tests.source_files = [
-      'ios/packages/*/ViewInspector/**/*',
-      'ios/plugins/*/ViewInspector/**/*',
-
-      # Mocks from demo app
-      'ios/packages/demo/Sources/MockFlows.swift'
-    ]
-    # tests.resources = ['ios/packages/test-utils/viewinspector/ui-test/mocks']
-
-    tests.pod_target_xcconfig = {
-      'PRODUCT_BUNDLE_IDENTIFIER': 'com.intuit.ios.PlayerUI-ExampleUITests',
-
-      'CODE_SIGN_STYLE': 'Manual',
-      'CODE_SIGN_IDENTITY[sdk=iphoneos*]': 'iPhone Developer',
-      'PROVISIONING_PROFILE_SPECIFIER': 'match Development com.intuit.ios.PlayerUI-ExampleUITests*',
-      'DEVELOPMENT_TEAM': 'F6DWWXWEX6'
-    }
-  end
-
-  s.test_spec 'XCUITests' do |tests|
-    tests.test_type = :ui
-    tests.requires_app_host = true
-    tests.app_host_name = 'PlayerUI/Demo'
-    tests.dependency 'PlayerUI/InternalUnitTestUtilities'
-    tests.dependency 'PlayerUI/Demo'
-    tests.dependency 'EyesXCUI', '8.8.8'
-    tests.source_files = [
-      'ios/packages/*/UITests/**/*',
-      'ios/plugins/*/UITests/**/*'
-    ]
-
-    tests.pod_target_xcconfig = {
-      'PRODUCT_BUNDLE_IDENTIFIER': 'com.intuit.ios.PlayerUI-ExampleUITests',
-
-      'CODE_SIGN_STYLE': 'Manual',
-      'CODE_SIGN_IDENTITY[sdk=iphoneos*]': 'iPhone Developer',
-      'PROVISIONING_PROFILE_SPECIFIER': 'match Development com.intuit.ios.PlayerUI-ExampleUITests*',
-      'DEVELOPMENT_TEAM': 'F6DWWXWEX6'
-    }
-  end
-
-  # </INTERNAL>
-
   # <PACKAGES>
   s.subspec 'Core' do |core|
-    core.source_files = 'ios/packages/core/Sources/**/*'
+    core.source_files = 'ios/core/Sources/**/*'
     core.dependency 'SwiftHooks', '~> 0', '>= 0.1.0'
     core.dependency 'PlayerUI/Logger'
     core.resource_bundles = {
-      'PlayerUI' => ['ios/packages/core/Resources/**/*.js']
+      'PlayerUI' => ['ios/core/Resources/**/*.js']
     }
   end
 
@@ -183,9 +42,9 @@ and display it as a SwiftUI view comprised of registered assets.
     utils.dependency 'PlayerUI/Core'
     utils.dependency 'PlayerUI/SwiftUI'
 
-    utils.source_files = 'ios/packages/test-utils-core/Sources/**/*'
+    utils.source_files = 'ios/test-utils-core/Sources/**/*'
     utils.resource_bundles = {
-      'TestUtilities' => ['ios/packages/test-utils/Resources/**/*.js']
+      'TestUtilities' => ['ios/test-utils-core/Resources/**/*.js']
     }
   end
 
@@ -194,7 +53,7 @@ and display it as a SwiftUI view comprised of registered assets.
     utils.dependency 'PlayerUI/SwiftUI'
     utils.dependency 'PlayerUI/TestUtilitiesCore'
 
-    utils.source_files = 'ios/packages/test-utils/Sources/**/*'
+    utils.source_files = 'ios/test-utils/Sources/**/*'
 
     utils.weak_framework = 'XCTest'
     utils.pod_target_xcconfig = {
@@ -207,15 +66,14 @@ and display it as a SwiftUI view comprised of registered assets.
     assets.dependency 'PlayerUI/Core'
     assets.dependency 'PlayerUI/SwiftUI'
     assets.dependency 'PlayerUI/BeaconPlugin'
+    assets.dependency 'PlayerUI/SwiftUIPendingTransactionPlugin'
 
-    assets.source_files = 'ios/packages/reference-assets/Sources/**/*'
+    assets.source_files = 'plugins/reference-assets/swiftui/Sources/**/*'
     assets.resource_bundles = {
       'ReferenceAssets' => [
-        'ios/packages/reference-assets/Resources/js/**/*.js',
-        'ios/packages/reference-assets/Resources/svg/*.xcassets',
-
-        # This should be generated by cocoapods-bazel in the build file, but isn't for some reason
-        'ios/packages/reference-assets/Resources/svg/*.xcassets/**/*'
+        'plugins/reference-assets/swiftui/Resources/js/**/*.js',
+        'plugins/reference-assets/swiftui/Resources/svg/*.xcassets',
+        'plugins/reference-assets/swiftui/Resources/svg/*.xcassets/**/*'
       ]
     }
   end
@@ -223,32 +81,32 @@ and display it as a SwiftUI view comprised of registered assets.
   s.subspec 'SwiftUI' do |swiftui|
     swiftui.dependency 'PlayerUI/Core'
 
-    swiftui.source_files = 'ios/packages/swiftui/Sources/**/*'
+    swiftui.source_files = 'ios/swiftui/Sources/**/*'
   end
 
   s.subspec 'Logger' do |pkg|
     pkg.dependency 'SwiftHooks', '~> 0', '>= 0.1.0'
-    pkg.source_files = 'ios/packages/logger/Sources/**/*'
+    pkg.source_files = 'ios/logger/Sources/**/*'
   end
   # </PACKAGES>
 
   # <PLUGINS>
   s.subspec 'PrintLoggerPlugin' do |plugin|
     plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'ios/plugins/PrintLoggerPlugin/Sources/**/*'
+    plugin.source_files = 'plugins/console-logger/ios/Sources/**/*'
   end
 
   s.subspec 'TransitionPlugin' do |plugin|
     plugin.dependency 'PlayerUI/Core'
     plugin.dependency 'PlayerUI/SwiftUI'
-    plugin.source_files = 'ios/plugins/TransitionPlugin/Sources/**/*'
+    plugin.source_files = 'plugins/transition/swiftui/Sources/**/*'
   end
 
   s.subspec 'BaseBeaconPlugin' do |plugin|
     plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'ios/plugins/BaseBeaconPlugin/Sources/**/*'
+    plugin.source_files = 'plugins/beacon/ios/Sources/**/*'
     plugin.resource_bundles = {
-      'BaseBeaconPlugin' => ['ios/plugins/BaseBeaconPlugin/Resources/**/*.js']
+      'BaseBeaconPlugin' => ['plugins/beacon/ios/Resources/**/*.js']
     }
   end
 
@@ -256,54 +114,54 @@ and display it as a SwiftUI view comprised of registered assets.
     plugin.dependency 'PlayerUI/Core'
     plugin.dependency 'PlayerUI/SwiftUI'
     plugin.dependency 'PlayerUI/BaseBeaconPlugin'
-    plugin.source_files = 'ios/plugins/BeaconPlugin/Sources/**/*'
+    plugin.source_files = 'plugins/beacon/swiftui/Sources/**/*'
   end
 
   s.subspec 'CheckPathPlugin' do |plugin|
     plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'ios/plugins/CheckPathPlugin/Sources/**/*'
+    plugin.source_files = 'plugins/check-path/ios/Sources/**/*'
     plugin.resource_bundles = {
-      'CheckPathPlugin' => ['ios/plugins/CheckPathPlugin/Resources/**/*.js']
+      'CheckPathPlugin' => ['plugins/check-path/ios/Resources/**/*.js']
     }
   end
 
   s.subspec 'CommonTypesPlugin' do |plugin|
     plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'ios/plugins/CommonTypesPlugin/Sources/**/*'
+    plugin.source_files = 'plugins/common-types/ios/Sources/**/*'
     plugin.resource_bundles = {
-      'CommonTypesPlugin' => ['ios/plugins/CommonTypesPlugin/Resources/**/*.js']
+      'CommonTypesPlugin' => ['plugins/common-types/ios/Resources/**/*.js']
     }
   end
 
   s.subspec 'ComputedPropertiesPlugin' do |plugin|
     plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'ios/plugins/ComputedPropertiesPlugin/Sources/**/*'
+    plugin.source_files = 'plugins/computed-properties/ios/Sources/**/*'
     plugin.resource_bundles = {
-      'ComputedPropertiesPlugin' => ['ios/plugins/ComputedPropertiesPlugin/Resources/**/*.js']
+      'ComputedPropertiesPlugin' => ['plugins/computed-properties/ios/Resources/**/*.js']
     }
   end
 
   s.subspec 'CommonExpressionsPlugin' do |plugin|
     plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'ios/plugins/CommonExpressionsPlugin/Sources/**/*'
+    plugin.source_files = 'plugins/common-expressions/ios/Sources/**/*'
     plugin.resource_bundles = {
-      'CommonExpressionsPlugin' => ['ios/plugins/CommonExpressionsPlugin/Resources/**/*.js']
+      'CommonExpressionsPlugin' => ['plugins/common-expressions/ios/Resources/**/*.js']
     }
   end
 
   s.subspec 'ExpressionPlugin' do |plugin|
     plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'ios/plugins/ExpressionPlugin/Sources/**/*'
+    plugin.source_files = 'plugins/expression/ios/Sources/**/*'
     plugin.resource_bundles = {
-      'ExpressionPlugin' => ['ios/plugins/ExpressionPlugin/Resources/**/*.js']
+      'ExpressionPlugin' => ['plugins/expression/ios/Resources/**/*.js']
     }
   end
 
   s.subspec 'ExternalActionPlugin' do |plugin|
     plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'ios/plugins/ExternalActionPlugin/Sources/**/*'
+    plugin.source_files = 'plugins/external-action/ios/Sources/**/*'
     plugin.resource_bundles = {
-      'ExternalActionPlugin' => ['ios/plugins/ExternalActionPlugin/Resources/**/*.js']
+      'ExternalActionPlugin' => ['plugins/external-action/ios/Resources/**/*.js']
     }
   end
 
@@ -311,31 +169,31 @@ and display it as a SwiftUI view comprised of registered assets.
     plugin.dependency 'PlayerUI/Core'
     plugin.dependency 'PlayerUI/SwiftUI'
     plugin.dependency 'PlayerUI/ExternalActionPlugin'
-    plugin.source_files = 'ios/plugins/ExternalActionViewModifierPlugin/Sources/**/*'
+    plugin.source_files = 'plugins/external-action/swiftui/Sources/**/*'
   end
 
   s.subspec 'MetricsPlugin' do |plugin|
     plugin.dependency 'PlayerUI/Core'
     plugin.dependency 'PlayerUI/SwiftUI'
-    plugin.source_files = 'ios/plugins/MetricsPlugin/Sources/**/*'
+    plugin.source_files = 'plugins/metrics/swiftui/Sources/**/*'
     plugin.resource_bundles = {
-      'MetricsPlugin' => ['ios/plugins/MetricsPlugin/Resources/**/*.js']
+      'MetricsPlugin' => ['plugins/metrics/swiftui/Resources/**/*.js']
     }
   end
 
   s.subspec 'PubSubPlugin' do |plugin|
     plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'ios/plugins/PubSubPlugin/Sources/**/*'
+    plugin.source_files = 'plugins/pubsub/ios/Sources/**/*'
     plugin.resource_bundles = {
-      'PubSubPlugin' => ['ios/plugins/PubSubPlugin/Resources/**/*.js']
+      'PubSubPlugin' => ['plugins/pubsub/ios/Resources/**/*.js']
     }
   end
 
   s.subspec 'StageRevertDataPlugin' do |plugin|
     plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'ios/plugins/StageRevertDataPlugin/Sources/**/*'
+    plugin.source_files = 'plugins/stage-revert-data/ios/Sources/**/*'
     plugin.resource_bundles = {
-      'StageRevertDataPlugin' => ['ios/plugins/StageRevertDataPlugin/Resources/**/*.js']
+      'StageRevertDataPlugin' => ['plugins/stage-revert-data/ios/Resources/**/*.js']
     }
   end
 
@@ -343,20 +201,20 @@ and display it as a SwiftUI view comprised of registered assets.
     plugin.dependency 'PlayerUI/Core'
     plugin.dependency 'PlayerUI/SwiftUI'
     plugin.dependency 'PlayerUI/CheckPathPlugin'
-    plugin.source_files = 'ios/plugins/SwiftUICheckPathPlugin/Sources/**/*'
+    plugin.source_files = 'plugins/check-path/swiftui/Sources/**/*'
   end
 
   s.subspec 'SwiftUIPendingTransactionPlugin' do |plugin|
     plugin.dependency 'PlayerUI/Core'
     plugin.dependency 'PlayerUI/SwiftUI'
-    plugin.source_files = 'ios/plugins/SwiftUIPendingTransactionPlugin/Sources/**/*'
+    plugin.source_files = 'plugins/pending-transaction/swiftui/Sources/**/*'
   end
 
   s.subspec 'TypesProviderPlugin' do |plugin|
     plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'ios/plugins/TypesProviderPlugin/Sources/**/*'
+    plugin.source_files = 'plugins/types-provider/ios/Sources/**/*'
     plugin.resource_bundles = {
-      'TypesProviderPlugin' => ['ios/plugins/TypesProviderPlugin/Resources/**/*.js']
+      'TypesProviderPlugin' => ['plugins/types-provider/ios/Resources/**/*.js']
     }
   end
   # </PLUGINS>

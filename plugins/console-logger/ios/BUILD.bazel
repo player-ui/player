@@ -1,0 +1,29 @@
+load("@rules_pkg//:mappings.bzl", "pkg_files", "strip_prefix")
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+load("@build_bazel_rules_apple//apple:resources.bzl", "apple_resource_bundle")
+
+load("@build_bazel_rules_ios//rules:test.bzl", "ios_unit_test")
+
+pkg_files(
+    name = "PlayerUIPrintLoggerPlugin_Sources",
+    srcs = glob(["Sources/**/*.swift"]),
+    strip_prefix = strip_prefix.from_pkg(),
+    visibility = ["//visibility:public"],
+)
+
+swift_library(
+    name = "PlayerUIPrintLoggerPlugin",
+    module_name = "PlayerUIPrintLoggerPlugin",
+    srcs = [":PlayerUIPrintLoggerPlugin_Sources"],
+    visibility = ["//visibility:public"],
+    deps = ["//ios/core:PlayerUI", "//ios/logger:PlayerUILogger"],
+    defines = ["BAZEL_TARGET"]
+)
+
+ios_unit_test(
+    name = "PlayerUIPrintLoggerPluginTests",
+    srcs = glob(["Tests/**/*.swift"]),
+    minimum_os_version = "14.0",
+    deps = [":PlayerUIPrintLoggerPlugin", "//ios/internal-test-utils:PlayerUIInternalTestUtilities"],
+    visibility = ["//visibility:public"]
+)

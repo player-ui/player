@@ -4,7 +4,7 @@ bazel_dep(name = "rules_player")
 
 git_override(
     remote = "https://github.com/player-ui/rules_player.git",
-    commit = "d9c8d7c1802916dc6e4619b5da2ac0cab590944a",
+    commit = "a1626024afabb38b9aca9981cc0e76b704d4fd77",
     module_name = "rules_player",
 )
 # local_path_override(module_name = "rules_player", path = "../rules_player")
@@ -21,6 +21,34 @@ node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 node.toolchain(node_version = "18.18.0")
 #################################
 
+
+# iOS
+
+bazel_dep(name = "rules_swift", version = "1.13.0", repo_name = "build_bazel_rules_swift")
+bazel_dep(name = "rules_apple", version = "3.1.1", repo_name = "build_bazel_rules_apple")
+bazel_dep(name = "rules_ios", version = "3.1.4", repo_name = "build_bazel_rules_ios")
+bazel_dep(name = "rules_xcodeproj", version = "1.13.0")
+
+bazel_dep(name = "gazelle", version = "0.34.0", repo_name = "bazel_gazelle")
+bazel_dep(name = "rules_swift_package_manager", version = "0.22.0")
+
+# swift_deps START
+swift_deps = use_extension(
+    "@rules_swift_package_manager//:extensions.bzl",
+    "swift_deps",
+)
+swift_deps.from_file(
+    deps_index = "//:swift_deps_index.json",
+)
+
+use_repo(
+    swift_deps,
+    "swiftpkg_swift_hooks",
+    "swiftpkg_viewinspector",
+    "swiftpkg_eyes_xcui_swift_package"
+)
+
+# end iOS
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
 
 npm.npm_translate_lock(
