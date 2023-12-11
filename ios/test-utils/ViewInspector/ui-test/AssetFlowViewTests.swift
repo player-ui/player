@@ -12,10 +12,22 @@ import SwiftUI
 import ViewInspector
 
 @testable import PlayerUI
+@testable import PlayerUICommonTypesPlugin
+@testable import PlayerUIBaseBeaconPlugin
+@testable import PlayerUIBeaconPlugin
+@testable import PlayerUIReferenceAssets
+@testable import PlayerUITestUtilities
+@testable import PlayerUITestUtilitiesCore
+@testable import PlayerUISwiftUI
+@testable import PlayerUIInternalTestUtilities
+@testable import PlayerUIInternalTestUtilities
 
 extension AssetFlowView: Inspectable {}
 
-class AssetFlowViewTests: ViewInspectorTestCase {
+class AssetFlowViewTests: XCTestCase {
+  override func setUp() {
+        XCUIApplication().terminate()
+    }
     func testVersionBodies() throws {
         let flow = FlowData.COUNTER
 
