@@ -19,22 +19,31 @@ import PlayerUI
  ```
  { id, type }
  ```
-
  This wrapper decodes either to provide a consistent access mechanism
  */
-public typealias WrappedAsset = GenericWrappedAsset<DefaultAdditionalData>
+public typealias WrappedAsset = GenericWrappedAsset<MetaData>
 
-public struct GenericWrappedAsset<AdditionalData>: Decodable, AssetContainer where AdditionalData: Decodable&Equatable {
+public typealias GenericWrappedAsset<MetaDataType: Decodable&Equatable> = BaseGenericWrappedAsset<MetaDataType, DefaultAdditionalData>
+
+public struct DefaultAdditionalData: Decodable, Equatable {}
+
+public struct BaseGenericWrappedAsset<MetaData, AdditionalData>: Decodable, AssetContainer
+    where MetaData: Decodable&Equatable, AdditionalData: Decodable&Equatable {
     /// The keys used to decode the wrapper
     public enum CodingKeys: String, CodingKey {
         /// Key to decode asset in a wrapper
         case asset
+        /// Key to decode metadata in a wrapper
+        case metaData
     }
 
     /// The underlying asset if it decoded
     public var asset: SwiftUIAsset?
 
-    /// Additional data that is associated with the adjacent asset
+    /// MetaData that is associated with the adjacent asset
+    public var metaData: MetaData?
+
+    /// Additional data to decode as sibling keys to `asset` or `metaData`
     public var additionalData: AdditionalData?
 
     /**
@@ -57,20 +66,15 @@ public struct GenericWrappedAsset<AdditionalData>: Decodable, AssetContainer whe
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.asset = try container.decodeIfPresent(RegistryDecodeShim<SwiftUIAsset>.self, forKey: .asset)?.asset
+        self.metaData = try container.decodeIfPresent(MetaData.self, forKey: .metaData)
         self.additionalData = try decoder.singleValueContainer().decode(AdditionalData.self)
     }
 }
 
-extension GenericWrappedAsset where AdditionalData == DefaultAdditionalData {
-    /// MetaData associated with the sibling key `asset`
-    public var metaData: MetaData? { additionalData?.metaData }
-}
-
 // MARK: - Equatable conformance
-
-extension GenericWrappedAsset: Equatable where AdditionalData: Equatable {
+extension GenericWrappedAsset: Equatable where MetaData: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        let isMetaDataSame   = lhs.additionalData == rhs.additionalData
+        let isMetaDataSame   = lhs.metaData == rhs.metaData
         let areBothAssetsNil = lhs.asset == nil && rhs.asset == nil
         var areAssetsEqual: Bool { (lhs.asset?.valueData).flatMap { rhs.asset?.valueData.isEqual($0) } ?? false }
         return isMetaDataSame && (areBothAssetsNil || areAssetsEqual)

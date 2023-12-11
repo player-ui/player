@@ -13,7 +13,7 @@ pkg_files(
 swift_library(
     name = "PlayerUISwiftUIPendingTransactionPlugin",
     module_name = "PlayerUISwiftUIPendingTransactionPlugin",
-    srcs = [":PlayerUISwiftUIPendingTransctionPlugin_Sources"],
+    srcs = [":PlayerUISwiftUIPendingTransactionPlugin_Sources"],
     visibility = ["//visibility:public"],
     deps = ["//ios/core:PlayerUI", "//ios/swiftui:PlayerUISwiftUI"],
     defines = ["BAZEL_TARGET"]

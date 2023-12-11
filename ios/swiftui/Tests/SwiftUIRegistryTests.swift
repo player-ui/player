@@ -106,7 +106,7 @@ class SwiftUIRegistryTests: XCTestCase {
             var id: String
             var type: String
 
-            var nested: GenericWrappedAsset<TestAddedData>?
+            var nested: BaseGenericWrappedAsset<MetaData, TestAddedData>?
         }
 
         class TestNestedAsset: UncontrolledAsset<TestData> {
