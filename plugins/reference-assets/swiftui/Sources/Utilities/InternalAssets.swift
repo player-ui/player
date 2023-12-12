@@ -28,7 +28,6 @@ class InternalAssets {
      - returns: A resized UIImage from the SVG
      */
     static func getSVGOfSize(name: String, size: CGSize? = nil) -> UIImage? {
-        print(InternalAssets.bundleURL?.absoluteString)
         guard
             let url = InternalAssets.bundleURL,
             let bundle = Bundle(url: url) else { return nil }
