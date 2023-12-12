@@ -28,8 +28,9 @@ class InternalAssets {
      - returns: A resized UIImage from the SVG
      */
     static func getSVGOfSize(name: String, size: CGSize? = nil) -> UIImage? {
+        print(InternalAssets.bundleURL?.absoluteString)
         guard
-            let url = Bundle(for: InternalAssets.self).resourceURL?.appendingPathComponent("ReferenceAssets.bundle"),
+            let url = InternalAssets.bundleURL,
             let bundle = Bundle(url: url) else { return nil }
 
         let image = UIImage(named: name, in: bundle, with: .none)
@@ -40,6 +41,12 @@ class InternalAssets {
 
         return image?.withRenderingMode(.alwaysTemplate)
     }
+
+    #if SWIFT_PACKAGE
+    static var bundleURL: URL? { Bundle.module.resourceURL }
+    #else
+    static var bundleURL: URL? { Bundle(for: InternalAssets.self).resourceURL?.appendingPathComponent("ReferenceAssets.bundle") }
+    #endif
 }
 
 extension UIImage {

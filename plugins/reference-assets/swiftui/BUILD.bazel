@@ -11,7 +11,8 @@ apple_resource_bundle(
     name = "PlayerUIReferenceAssetsResourceBundle",
     bundle_name = "ReferenceAssets",
     bundle_id = "com.intuit.ios.player.resources.core",
-    resources = ["//plugins/reference-assets/swiftui/Resources:PlayerUIReferenceAssets_Resources", "//plugins/reference-assets/core:core_native_bundle"]
+    resources = ["//plugins/reference-assets/swiftui/Resources:PlayerUIReferenceAssets_Resources", "//plugins/reference-assets/core:core_native_bundle"],
+    infoplists = ["//tools/ios:Info.plist"]
 )
 
 ios_bundle_module_shim("ReferenceAssets")
