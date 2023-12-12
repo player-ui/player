@@ -162,6 +162,16 @@ jobs:
           device: "iPhone 15"
 
       - run: bazel build --config=ci -- //ios/demo:PlayerUIDemo
+
+      - run:
+          name: Test Prebuild
+          command: |
+            bazel build \
+              --config=ci \
+              $(bazel query "kind(ios_unit_test, //ios/...)") \
+              $(bazel query "kind(ios_unit_test, //plugins/...)") \
+              $(bazel query "kind(ios_ui_test, //ios/...)") \
+              $(bazel query "kind(ios_ui_test, //plugins/...)")
       - run:
           name: Tests
           command: |
