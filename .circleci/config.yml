@@ -135,7 +135,7 @@ jobs:
       #       echo 'export PATH=$ANDROID_SDK_HOME/emulator:$PATH'  >> $BASH_ENV
       #       source $BASH_ENV
       #     environment:
-      #       JAVA_HOME: /usr/local/opt/openjdk@8
+      #       JAVA_HOME: /opt/homebrew/opt/openjdk@17
 
       # - save_cache:
       #     key: android-tools-{{ arch }}-{{ checksum "scripts/install-android-tools.sh" }}
@@ -167,7 +167,7 @@ jobs:
           command: |
             bazel coverage \
               --config=ci \
-              --jobs=2 \
+              --jobs=1 \
               --experimental_use_llvm_covmap \
               --combined_report=lcov \
               --test_output=all \
