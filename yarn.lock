@@ -3274,41 +3274,34 @@
   dependencies:
     "@babel/runtime" "7.15.4"
 
-"@player-ui/partial-match-registry@0.4.0-next.7":
-  version "0.4.0-next.7"
-  resolved "https://registry.yarnpkg.com/@player-ui/partial-match-registry/-/partial-match-registry-0.4.0-next.7.tgz#579710d4cee77c8a75dfda02b3c2f74652e56dfa"
-  integrity sha512-JCoIZvH+VPmrDJECtHxD1p6quzYAlvKCKwpcLTb/clIYIR5xXr0H5xqqkQi+32y9nZjIkj9p8Tw0qmQ/oLplvg==
+"@player-ui/partial-match-registry@0.0.0-PLACEHOLDER", "@player-ui/partial-match-registry@file:./bazel-bin/core/partial-match-registry":
+  version "0.0.0-PLACEHOLDER"
   dependencies:
     "@babel/runtime" "7.15.4"
     "@types/dlv" "^1.1.2"
     dlv "^1.1.3"
     sorted-array "^2.0.4"
 
-"@player-ui/player@0.4.0-next.7":
-  version "0.4.0-next.7"
-  resolved "https://registry.yarnpkg.com/@player-ui/player/-/player-0.4.0-next.7.tgz#d0e6152badd077474a2c015d00396c59f90de1a2"
-  integrity sha512-0SlssdS7uYL5XO0kKg5mt9LqTQ+2Zxb82Z4I4P7AE9FdCLjGDU6bpH6Sm0Odf9UK0kmwvael/vcEDihunzFPEw==
+"@player-ui/player@0.4.0-next.7", "@player-ui/player@file:./bazel-bin/core/player":
+  version "0.0.0-PLACEHOLDER"
   dependencies:
     "@babel/runtime" "7.15.4"
-    "@player-ui/partial-match-registry" "0.4.0-next.7"
-    "@player-ui/types" "0.4.0-next.7"
-    "@types/nested-error-stacks" "^2.1.0"
+    "@player-ui/partial-match-registry" "0.0.0-PLACEHOLDER"
+    "@player-ui/types" "0.0.0-PLACEHOLDER"
     "@types/parsimmon" "^1.10.0"
     arr-flatten "^1.1.0"
     dequal "^2.0.2"
     ebnf "^1.9.0"
     error-polyfill "^0.1.3"
-    nested-error-stacks "^2.1.1"
     p-defer "^3.0.0"
     parsimmon "^1.12.0"
     queue-microtask "^1.2.3"
     tapable-ts "^0.2.3"
     timm "^1.6.2"
+    ts-nested-error "^1.2.1"
 
-"@player-ui/types@0.4.0-next.7":
-  version "0.4.0-next.7"
-  resolved "https://registry.yarnpkg.com/@player-ui/types/-/types-0.4.0-next.7.tgz#efe9daba706ca750b34680ca94a97d41bd3782c6"
-  integrity sha512-mU8+eXb9de2Fmhhp7K/lUXNqKDjiFEoPGBkGwWTO/dIaHPZBR6yyALBUELXRus7xBBJjm3++B/ErjmUFIGpLDw==
+"@player-ui/types@0.0.0-PLACEHOLDER", "@player-ui/types@0.4.0-next.7", "@player-ui/types@file:./bazel-bin/core/types":
+  version "0.0.0-PLACEHOLDER"
   dependencies:
     "@babel/runtime" "7.15.4"
 
@@ -4737,11 +4730,6 @@
   version "0.7.31"
   resolved "https://registry.yarnpkg.com/@types/ms/-/ms-0.7.31.tgz#31b7ca6407128a3d2bbc27fe2d21b345397f6197"
   integrity sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==
-
-"@types/nested-error-stacks@^2.1.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@types/nested-error-stacks/-/nested-error-stacks-2.1.0.tgz#0e4caf703b874c3c4e6ba74dbc0c6acf88b8ce05"
-  integrity sha512-7+la7jn6iA603lBgyASoaW5Nk/R5G3+hkJ4Y0gtc9VYHlcixvm/YBV2KV92dTBpeCQJYjpN2owb5jVuKCqxOaA==
 
 "@types/nlcst@^1.0.0":
   version "1.0.0"
@@ -6176,15 +6164,6 @@ babel-plugin-polyfill-regenerator@^0.3.0:
   integrity sha512-dhAPTDLGoMW5/84wkgwiLRwMnio2i1fUe53EuvtKMv0pn2p3S8OCoV1xAzfJPl0KOX7IB89s2ib85vbYiea3jg==
   dependencies:
     "@babel/helper-define-polyfill-provider" "^0.3.0"
-
-babel-plugin-preval@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/babel-plugin-preval/-/babel-plugin-preval-5.0.0.tgz#6cabb947ecc241664966e1f99eb56a3b4bb63d1e"
-  integrity sha512-8DqJq6/LPUjSZ0Qq6bVIFpsj2flCEE0Cbnbut9TvGU6jP9g3dOWEXtQ/sdvsA9d6souza8eNGh04WRXpuH9ThA==
-  dependencies:
-    "@babel/runtime" "^7.9.2"
-    babel-plugin-macros "^2.8.0"
-    require-from-string "^2.0.2"
 
 babel-plugin-react-docgen@^4.2.1:
   version "4.2.1"
@@ -13595,7 +13574,7 @@ neo-async@^2.5.0, neo-async@^2.6.0, neo-async@^2.6.1, neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-nested-error-stacks@^2.0.0, nested-error-stacks@^2.1.0, nested-error-stacks@^2.1.1:
+nested-error-stacks@^2.0.0, nested-error-stacks@^2.1.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/nested-error-stacks/-/nested-error-stacks-2.1.1.tgz#26c8a3cee6cc05fbcf1e333cd2fc3e003326c0b5"
   integrity sha512-9iN1ka/9zmX1ZvLV9ewJYEk9h7RyRRtqdK0woXcqohu8EWIerfPUjYJPg0ULy0UqP7cslmdGc8xKDJcojlKiaw==
@@ -15063,15 +15042,25 @@ pretty-ms@^7.0.0:
   dependencies:
     parse-ms "^2.1.0"
 
-prismjs@^1.21.0, prismjs@^1.25.0:
+prismjs@^1.21.0:
   version "1.26.0"
   resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.26.0.tgz#16881b594828bb6b45296083a8cbab46b0accd47"
   integrity sha512-HUoH9C5Z3jKkl3UunCyiD5jwk0+Hz0fIgQ2nbwU2Oo/ceuTAQAg+pPVnfdt2TJWRVLcxKh9iuoYDUSc8clb5UQ==
+
+prismjs@^1.27.0:
+  version "1.29.0"
+  resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.29.0.tgz#f113555a8fa9b57c35e637bba27509dcf802dd12"
+  integrity sha512-Kx/1w86q/epKcmte75LNrEoT+lX8pBpavuAbvJWRXar7Hz8jrtF+e3vY751p0R8H9HdArwaCTNDDzHg/ScJK1Q==
 
 prismjs@~1.25.0:
   version "1.25.0"
   resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.25.0.tgz#6f822df1bdad965734b310b315a23315cf999756"
   integrity sha512-WCjJHl1KEWbnkQom1+SzftbtXMKQoezOCYs5rECqMN+jP+apI7ftoflyqigqzopSO3hMhTEb0mFClA8lkolgEg==
+
+prismjs@~1.27.0:
+  version "1.27.0"
+  resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.27.0.tgz#bb6ee3138a0b438a3653dd4d6ce0cc6510a45057"
+  integrity sha512-t13BGPUlFDR7wRB5kQDG4jjl7XeuH6jbJGt11JHPL96qwsEHNX2+68tFXqc1/k+/jALsbSWJKUOT/hcYAZ5LkA==
 
 private@^0.1.8:
   version "0.1.8"
@@ -15619,16 +15608,16 @@ react-syntax-highlighter@^13.5.3:
     prismjs "^1.21.0"
     refractor "^3.1.0"
 
-react-syntax-highlighter@^15.4.5:
-  version "15.4.5"
-  resolved "https://registry.yarnpkg.com/react-syntax-highlighter/-/react-syntax-highlighter-15.4.5.tgz#db900d411d32a65c8e90c39cd64555bf463e712e"
-  integrity sha512-RC90KQTxZ/b7+9iE6s9nmiFLFjWswUcfULi4GwVzdFVKVMQySkJWBuOmJFfjwjMVCo0IUUuJrWebNKyviKpwLQ==
+react-syntax-highlighter@^15.5.0:
+  version "15.5.0"
+  resolved "https://registry.yarnpkg.com/react-syntax-highlighter/-/react-syntax-highlighter-15.5.0.tgz#4b3eccc2325fa2ec8eff1e2d6c18fa4a9e07ab20"
+  integrity sha512-+zq2myprEnQmH5yw6Gqc8lD55QHnpKaU8TOcFeC/Lg/MQSs8UknEA0JC4nTZGFAXC2J2Hyj/ijJ7NlabyPi2gg==
   dependencies:
     "@babel/runtime" "^7.3.1"
     highlight.js "^10.4.1"
     lowlight "^1.17.0"
-    prismjs "^1.25.0"
-    refractor "^3.2.0"
+    prismjs "^1.27.0"
+    refractor "^3.6.0"
 
 react-textarea-autosize@^8.3.0:
   version "8.3.3"
@@ -15818,7 +15807,7 @@ redux@^4.0.1, redux@^4.2.1:
   dependencies:
     "@babel/runtime" "^7.9.2"
 
-refractor@^3.1.0, refractor@^3.2.0:
+refractor@^3.1.0:
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/refractor/-/refractor-3.5.0.tgz#334586f352dda4beaf354099b48c2d18e0819aec"
   integrity sha512-QwPJd3ferTZ4cSPPjdP5bsYHMytwWYnAN5EEnLtGvkqp/FCCnGsBgxrm9EuIDnjUC3Uc/kETtvVi7fSIVC74Dg==
@@ -15826,6 +15815,15 @@ refractor@^3.1.0, refractor@^3.2.0:
     hastscript "^6.0.0"
     parse-entities "^2.0.0"
     prismjs "~1.25.0"
+
+refractor@^3.6.0:
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/refractor/-/refractor-3.6.0.tgz#ac318f5a0715ead790fcfb0c71f4dd83d977935a"
+  integrity sha512-MY9W41IOWxxk31o+YvFCNyNzdkc9M20NoZK5vq6jkv4I/uh2zkWcfudj0Q1fovjUQJrNewS9NMzeTtqPf+n5EA==
+  dependencies:
+    hastscript "^6.0.0"
+    parse-entities "^2.0.0"
+    prismjs "~1.27.0"
 
 regenerate-unicode-properties@^9.0.0:
   version "9.0.0"
@@ -16192,11 +16190,6 @@ require-directory@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/require-directory/-/require-directory-2.1.1.tgz#8c64ad5fd30dab1c976e2344ffe7f792a6a6df42"
   integrity sha1-jGStX9MNqxyXbiNE/+f3kqam30I=
-
-require-from-string@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/require-from-string/-/require-from-string-2.0.2.tgz#89a7fdd938261267318eafe14f9c32e598c36909"
-  integrity sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==
 
 require-main-filename@^2.0.0:
   version "2.0.0"

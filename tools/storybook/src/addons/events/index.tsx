@@ -78,22 +78,22 @@ export const EventsPanel = (props: EventsPanelProps) => {
   }
 
   return (
-      <Table>
-          <Table.HeadCell className={styles.header}>
-              <Table.Row>
-                  <Table.Cell>Time</Table.Cell>
-                  <Table.Cell>Type</Table.Cell>
-              </Table.Row>
-          </Table.HeadCell>
-          <Table.Body>
-              {events.map((evt) => (
-                  <Table.Row key={evt.id}>
-                      <Table.Cell>{evt.time}</Table.Cell>
-                      <Table.Cell>{evt.type}</Table.Cell>
-                      <ExtraCells {...evt} />
-                  </Table.Row>
-              ))}
-          </Table.Body>
-      </Table>
+    <Table>
+      <Table.HeadCell className={styles.header}>
+        <Table.Row>
+          <Table.Cell>Time</Table.Cell>
+          <Table.Cell>Type</Table.Cell>
+        </Table.Row>
+      </Table.HeadCell>
+      <Table.Body>
+        {events.map((evt) => (
+          <Table.Row key={evt.id}>
+            <Table.Cell>{evt.time}</Table.Cell>
+            <Table.Cell>{evt.type}</Table.Cell>
+            <ExtraCells {...evt} />
+          </Table.Row>
+        ))}
+      </Table.Body>
+    </Table>
   );
 };

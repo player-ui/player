@@ -204,6 +204,11 @@
     "webpack-cli": "^3.3.9",
     "zip-folder": "^1.0.0"
   },
+  "resolutions": {
+    "@player-ui/player": "file:./bazel-bin/core/player",
+    "@player-ui/partial-match-registry": "file:./bazel-bin/core/partial-match-registry",
+    "@player-ui/types": "file:./bazel-bin/core/types"
+  },
   "volta": {
     "node": "16.15.0",
     "yarn": "1.22.19"

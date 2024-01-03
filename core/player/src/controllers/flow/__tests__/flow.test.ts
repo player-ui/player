@@ -158,18 +158,18 @@ test('Fails to transition during another transition', () => {
       },
     },
     View2: {
-      state_type: "VIEW",
+      state_type: 'VIEW',
       ref: 'bar',
       transitions: {
-        Next: 'View3'
-      }
-    }
+        Next: 'View3',
+      },
+    },
   });
 
   flow.hooks.resolveTransitionNode.intercept({
     call: (nextState) => {
       if (nextState?.onStart) {
-        expect(() => flow.transition('Next')).toThrowError()
+        expect(() => flow.transition('Next')).toThrowError();
       }
     },
   });
