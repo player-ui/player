@@ -1,5 +1,10 @@
 import { NodeType, getNodeID } from '@player-ui/player';
-import type { Player, PlayerPlugin, Node, ParseObjectOptions } from '@player-ui/player';
+import type {
+  Player,
+  PlayerPlugin,
+  Node,
+  ParseObjectOptions,
+} from '@player-ui/player';
 import { AsyncParallelBailHook } from 'tapable-ts';
 import queueMicrotask from 'queue-microtask';
 import { omit } from 'timm';
@@ -23,46 +28,46 @@ export default class AsyncNodePlugin implements PlayerPlugin {
     return node?.type === NodeType.Async;
   }
 
-  doSomething() {
-    const dummy = '';
-  }
-
   apply(player: Player) {
     player.hooks.viewController.tap(this.name, (viewController) => {
       viewController.hooks.view.tap(this.name, (view) => {
-
-        
         view.hooks.parser.tap(this.name, (parser) => {
           parser.hooks.determineNodeType.tap(this.name, (obj) => {
             if (Object.prototype.hasOwnProperty.call(obj, 'async')) {
               return NodeType.Async;
             }
-          })
-          parser.hooks.parseNode.tap(this.name, (
-            obj: any,
-            nodeType: Node.ChildrenTypes,
-            options: ParseObjectOptions,
-            determinedNodeType: null | NodeType
-          ) => {
-            if (determinedNodeType === NodeType.Async) {
-              const parsedAsync = parser.parseObject(omit(obj, 'async'), nodeType, options);
-              const parsedNodeId = getNodeID(parsedAsync);
-              if (parsedAsync !== null && parsedNodeId) {
-                return parser.createASTNode(
-                  {
-                    id: parsedNodeId,
-                    type: NodeType.Async,
-                    value: parsedAsync,
-                  },
-                  obj
+          });
+          parser.hooks.parseNode.tap(
+            this.name,
+            (
+              obj: any,
+              nodeType: Node.ChildrenTypes,
+              options: ParseObjectOptions,
+              determinedNodeType: null | NodeType
+            ) => {
+              if (determinedNodeType === NodeType.Async) {
+                const parsedAsync = parser.parseObject(
+                  omit(obj, 'async'),
+                  nodeType,
+                  options
                 );
-              }
-          
-              return null;
-            }
-          })
-        })
+                const parsedNodeId = getNodeID(parsedAsync);
+                if (parsedAsync !== null && parsedNodeId) {
+                  return parser.createASTNode(
+                    {
+                      id: parsedNodeId,
+                      type: NodeType.Async,
+                      value: parsedAsync,
+                    },
+                    obj
+                  );
+                }
 
+                return null;
+              }
+            }
+          );
+        });
 
         view.hooks.resolver.tap(this.name, (resolver) => {
           resolver.hooks.beforeResolve.tap(this.name, (node, options) => {

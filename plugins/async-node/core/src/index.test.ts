@@ -54,9 +54,6 @@ test('replaces async nodes with provided node', async () => {
 
   player.hooks.viewController.tap('async-node-test', (vc) => {
     vc.hooks.view.tap('async-node-test', (view) => {
-      view.hooks.parser.tap('asdf', (parser) => {
-        //parser.parseObject({});
-      });
       view.hooks.onUpdate.tap('async-node-test', (update) => {
         updateNumber++;
       });
