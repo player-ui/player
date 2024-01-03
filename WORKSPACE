@@ -31,7 +31,7 @@ load("@build_bazel_rules_nodejs//:index.bzl", "node_repositories", "yarn_install
 
 node_repositories(
     node_version = "16.12.0",
-    yarn_version = "1.22.19",
+    yarn_version = "1.22.17",
 )
 
 yarn_install(
