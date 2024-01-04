@@ -129,7 +129,12 @@ export class Parser {
     const nodeType = this.hooks.determineNodeType.call(obj);
 
     if (nodeType !== undefined) {
-      const parsedNode = this.hooks.parseNode.call(obj, type, options, nodeType);
+      const parsedNode = this.hooks.parseNode.call(
+        obj,
+        type,
+        options,
+        nodeType
+      );
       if (parsedNode) {
         return parsedNode;
       }
@@ -144,7 +149,6 @@ export class Parser {
       path: string[] = []
     ): NestedObj => {
       if (typeof objToParse !== 'object' || objToParse === null) {
-        // value = objToParse;
         return { value: objToParse, children: [] };
       }
 
