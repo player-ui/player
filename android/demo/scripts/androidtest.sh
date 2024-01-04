@@ -35,7 +35,7 @@ adb shell settings put global animator_duration_scale 0
 # see https://code.google.com/p/android/issues/detail?id=3254
 
 adb logcat -c &&
-python - <<END
+python2 - <<END
 import os
 import re
 import subprocess as sp
