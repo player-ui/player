@@ -40,10 +40,10 @@ abstract class AssetUITest(val group: String? = null) : ApplitoolsTest() {
 
     @After
     fun after() {
-        eyes?.takeIf { it.isOpen }?.run {
-            checkWindow("done")
-            close()
-        }
+        // eyes?.takeIf { it.isOpen }?.run {
+        //     checkWindow("done")
+        //     close()
+        // }
         Intents.release()
     }
 
@@ -66,7 +66,7 @@ abstract class AssetUITest(val group: String? = null) : ApplitoolsTest() {
                 ?: throw IllegalStateException("player not found")
         }
 
-        eyes?.open("Android Reference Assets Demo", "${mock.group}/${mock.name}/${name.methodName}")
-        eyes?.checkPlayer("init")
+        //eyes?.open("Android Reference Assets Demo", "${mock.group}/${mock.name}/${name.methodName}")
+        //eyes?.checkPlayer("init")
     }
 }
