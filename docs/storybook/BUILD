@@ -19,6 +19,8 @@ deps = [
     "//:node_modules/@babel/preset-env",
     "//:node_modules/@storybook/react-webpack5",
     "//:node_modules/raw-loader",
+    "//:node_modules/react",
+    "//:node_modules/react-dom",
     "//:typings",
     "tsconfig.json",
     "package.json",
@@ -54,5 +56,8 @@ storybook_bin.storybook_binary(
         "src/**/*",
         ".storybook/*",
     ]) + deps,
+    tags = [
+        "ibazel_notify_changes",
+    ],
     visibility = ["//visibility:public"],
 )

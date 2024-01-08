@@ -278,6 +278,12 @@ export const DSLLocalPlayerStory = (
   return <PlayerJsonEditorStory />;
 };
 
+export const SuspenseWrapper = (props: { children: React.ReactNode }) => {
+  return (
+    <React.Suspense fallback="Loading...">{props.children}</React.Suspense>
+  );
+};
+
 /** A DSL story that handles lazy-loaded content */
 export const DSLPlayerStory = (
   props: Omit<PlayerStoryProps, "flow"> & {
@@ -314,8 +320,8 @@ export const DSLPlayerStory = (
   }, [dslContent]);
 
   return (
-    <React.Suspense fallback="Loading...">
+    <SuspenseWrapper>
       <AsLazyComp />
-    </React.Suspense>
+    </SuspenseWrapper>
   );
 };

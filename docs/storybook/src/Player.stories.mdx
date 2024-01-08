@@ -1,15 +1,16 @@
-import { Meta, Story, Canvas } from '@storybook/addon-docs';
-import { ErrorHandler, StoryWrapper } from './components';
-import { ManagedPlayer } from '@player-ui/react';
-import { PlayerStory } from '@player-ui/storybook';
-import basicFlow from './flows/basic-action';
-import { ReferenceAssetsPlugin } from '@player-ui/reference-assets-plugin-react';
+import { Suspense } from "react";
+import { Meta, Story, Canvas } from "@storybook/addon-docs";
+import { ErrorHandler, StoryWrapper } from "./components";
+import { ManagedPlayer } from "@player-ui/react";
+import { PlayerStory } from "@player-ui/storybook";
+import basicFlow from "./flows/basic-action";
+import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin-react";
 import {
   createFlowManager,
   SIMPLE_FLOWS,
   ERROR_CONTENT_FLOW,
   ERROR_ASSET_FLOW,
-} from './flows/managed';
+} from "./flows/managed";
 
 <Meta title="Player" />
 
@@ -51,12 +52,12 @@ Between loading each flow, the `ManagedPlayer` will trigger `React.Suspense` and
 <Canvas>
   <Story name="Managed Web Player">
     <StoryWrapper>
-      <React.Suspense fallback="Loading...">
+      <Suspense fallback="Loading...">
         <ManagedPlayer
           plugins={[new ReferenceAssetsPlugin()]}
           manager={createFlowManager(SIMPLE_FLOWS)}
         />
-      </React.Suspense>
+      </Suspense>
     </StoryWrapper>
   </Story>
 </Canvas>
@@ -73,13 +74,13 @@ This is an example of a flow that triggers an error with an issue within the con
 <Canvas>
   <Story name="Content Errors">
     <StoryWrapper>
-    <React.Suspense fallback="Loading...">
-      <ManagedPlayer
-        fallbackComponent={ErrorHandler}
-        plugins={[new ReferenceAssetsPlugin()]}
-        manager={createFlowManager(ERROR_CONTENT_FLOW)}
-      />
-    </React.Suspense>
+      <Suspense fallback="Loading...">
+        <ManagedPlayer
+          fallbackComponent={ErrorHandler}
+          plugins={[new ReferenceAssetsPlugin()]}
+          manager={createFlowManager(ERROR_CONTENT_FLOW)}
+        />
+      </Suspense>
     </StoryWrapper>
   </Story>
 </Canvas>
@@ -89,15 +90,15 @@ This is an example of a flow that triggers an error with an issue within the con
 This is an example of a flow that triggers an error from the UI -- in this case trying to render as asset type that has no registered handler.
 
 <Canvas>
-  <Story name="Asset Errors">       
+  <Story name="Asset Errors">
     <StoryWrapper>
-      <React.Suspense fallback="Loading...">
+      <Suspense fallback="Loading...">
         <ManagedPlayer
           fallbackComponent={ErrorHandler}
           plugins={[new ReferenceAssetsPlugin()]}
           manager={createFlowManager(ERROR_ASSET_FLOW)}
         />
-      </React.Suspense>
+      </Suspense>
     </StoryWrapper>
   </Story>
 </Canvas>
