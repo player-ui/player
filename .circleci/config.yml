@@ -148,7 +148,7 @@ jobs:
           paths:
             - ~/android-tools
 
-      - run: gem install bundler
+      - run: gem install bundler -v 2.4.22
 
       - restore_cache:
           keys:
