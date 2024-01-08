@@ -67,12 +67,13 @@ class StageRevertDataPluginTests: XCTestCase {
 
         player.hooks?.viewController.tap { viewController in
             viewController.hooks.view.tap { view in
-                guard view.id == "view-3" else {
-                    (player.state as? InProgressState)?.controllers?.data.set(transaction: ["name": "Test"])
-                    (player.state as? InProgressState)?.controllers?.flow.transition(with: "clear")
-                    return
-                }
                 view.hooks.onUpdate.tap { value in
+                    guard view.id == "view-3" else {
+                        (player.state as? InProgressState)?.controllers?.data.set(transaction: ["name": "Test"])
+                        (player.state as? InProgressState)?.controllers?.flow.transition(with: "clear")
+                        return
+                    }
+
                     let labelValue = value.objectForKeyedSubscript("value").toString()
 
                     XCTAssertEqual(labelValue, "default")
@@ -91,12 +92,13 @@ class StageRevertDataPluginTests: XCTestCase {
 
         player.hooks?.viewController.tap { viewController in
             viewController.hooks.view.tap { view in
-                guard view.id == "view-2" else {
-                    (player.state as? InProgressState)?.controllers?.data.set(transaction: ["name": "Test"])
-                    (player.state as? InProgressState)?.controllers?.flow.transition(with: "commit")
-                    return
-                }
                 view.hooks.onUpdate.tap { value in
+                    guard view.id == "view-2" else {
+                        (player.state as? InProgressState)?.controllers?.data.set(transaction: ["name": "Test"])
+                        (player.state as? InProgressState)?.controllers?.flow.transition(with: "commit")
+                        return
+                    }
+
                     let labelValue = value.objectForKeyedSubscript("value").toString()
 
                     XCTAssertEqual(labelValue, "Test")
