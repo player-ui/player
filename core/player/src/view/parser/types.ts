@@ -2,15 +2,16 @@ import type { Asset as AssetType, Expression, Binding } from "@player-ui/types";
 
 export type AnyAssetType = AssetType<string>;
 export enum NodeType {
-  Asset = "asset",
-  View = "view",
-  Applicability = "applicability",
-  Template = "template",
-  Value = "value",
-  MultiNode = "multi-node",
-  Switch = "switch",
-  Unknown = "unknown",
-  Empty = "empty",
+  Asset = 'asset',
+  View = 'view',
+  Applicability = 'applicability',
+  Template = 'template',
+  Value = 'value',
+  MultiNode = 'multi-node',
+  Switch = 'switch',
+  Async = 'async',
+  Unknown = 'unknown',
+  Empty = 'empty',
 }
 export declare namespace Node {
   export type ChildrenTypes = NodeType.Asset | NodeType.Value | NodeType.View;
@@ -110,6 +111,13 @@ export declare namespace Node {
     value: Value;
   }
 
+  export interface Async extends Base<NodeType.Async> {
+    /** The unique id of the node */
+    id: string;
+    /** The value representing the node */
+    value: Node;
+  }
+
   export interface PluginOptions {
     /** A list of plugins */
     plugins?: {
@@ -136,6 +144,7 @@ export declare namespace Node {
     | View
     | MultiNode
     | Switch
+    | Async
     | Unknown
     | Empty;
 }

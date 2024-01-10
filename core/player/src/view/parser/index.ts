@@ -1,10 +1,12 @@
-import { setIn } from "timm";
-import { SyncBailHook, SyncWaterfallHook } from "tapable-ts";
-import type { Template } from "@player-ui/types";
-import type { Node, AnyAssetType } from "./types";
-import { NodeType } from "./types";
+import { omit, setIn } from 'timm';
+import { SyncBailHook, SyncWaterfallHook } from 'tapable-ts';
+import type { Template } from '@player-ui/types';
+import type { AnyAssetType, Node } from './types';
+import { NodeType } from './types';
+import { getNodeID, hasAsync } from './utils';
 
-export * from "./types";
+export * from './types';
+export * from './utils';
 
 export const EMPTY_NODE: Node.Empty = {
   type: NodeType.Empty,
@@ -73,6 +75,27 @@ export class Parser {
     return viewNode as Node.View;
   }
 
+  private parseAsync(
+    obj: object,
+    type: Node.ChildrenTypes,
+    options: ParseObjectOptions
+  ): Node.Node | null {
+    const parsedAsync = this.parseObject(omit(obj, 'async'), type, options);
+    const parsedNodeId = getNodeID(parsedAsync);
+    if (parsedAsync !== null && parsedNodeId) {
+      return this.createASTNode(
+        {
+          id: parsedNodeId,
+          type: NodeType.Async,
+          value: parsedAsync,
+        },
+        obj
+      );
+    }
+
+    return null;
+  }
+
   public createASTNode(node: Node.Node | null, value: any): Node.Node | null {
     const tapped = this.hooks.onCreateASTNode.call(node, value);
 
@@ -117,6 +140,9 @@ export class Parser {
       }
     }
 
+    /**
+     *
+     */
     const parseLocalObject = (
       currentValue: any,
       objToParse: unknown,
@@ -252,6 +278,18 @@ export class Parser {
                 },
               ],
             };
+          }
+        } else if (localValue && hasAsync(localValue)) {
+          const localAsync = this.parseAsync(
+            localValue,
+            NodeType.Value,
+            options
+          );
+          if (localAsync) {
+            children.push({
+              path: [...path, localKey],
+              value: localAsync,
+            });
           }
         } else if (localValue && Array.isArray(localValue)) {
           const childValues = localValue

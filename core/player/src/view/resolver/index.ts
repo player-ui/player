@@ -7,13 +7,18 @@ import type {
   DataModelOptions,
   DataModelWithParser,
   Updates,
-} from "../../data";
-import { DependencyModel, withParser } from "../../data";
-import type { Logger } from "../../logger";
-import type { Node } from "../parser";
-import { NodeType } from "../parser";
-import { caresAboutDataChanges, toNodeResolveOptions } from "./utils";
-import type { Resolve } from "./types";
+} from '../../data';
+import { DependencyModel, withParser } from '../../data';
+import type { Logger } from '../../logger';
+import type { Node } from '../parser';
+import { NodeType } from '../parser';
+import {
+  caresAboutDataChanges,
+  toNodeResolveOptions,
+  unpackAndPush,
+} from './utils';
+import type { Resolve } from './types';
+import { getNodeID } from '../parser/utils';
 
 export * from "./types";
 export * from "./utils";
@@ -42,6 +47,7 @@ const withContext = (model: DataModelWithParser): DataModelWithParser => {
         ...options,
       });
     },
+
     delete: (binding: BindingLike, options?: DataModelOptions): void => {
       return model.delete(binding, {
         context: { model },
@@ -169,29 +175,13 @@ export class Resolver {
     return new Map(this.resolveCache);
   }
 
-  private getNodeID(node?: Node.Node): string | undefined {
-    if (!node) {
-      return;
-    }
-
-    if (
-      (node.type === NodeType.Asset ||
-        node.type === NodeType.View ||
-        node.type === NodeType.Value) &&
-      typeof node.value === "object" &&
-      typeof node.value?.id === "string"
-    ) {
-      return node.value.id;
-    }
-  }
-
   private getPreviousResult(node: Node.Node): Resolve.ResolvedNode | undefined {
     if (!node) {
       return;
     }
 
     const isFirstUpdate = this.resolveCache.size === 0;
-    const id = this.getNodeID(node);
+    const id = getNodeID(node);
 
     if (id) {
       if (this.idCache.has(id)) {
@@ -236,12 +226,12 @@ export class Resolver {
 
   private computeTree(
     node: Node.Node,
-    parent: Node.Node | undefined,
+    rawParent: Node.Node | undefined,
     dataChanges: Set<BindingInstance> | undefined,
     cacheUpdate: Map<Node.Node, Resolve.ResolvedNode>,
     options: Resolve.NodeResolveOptions,
-    parentNode: Node.Node | undefined,
-    prevASTMap: Map<Node.Node, Node.Node>,
+    partiallyResolvedParent: Node.Node | undefined,
+    prevASTMap: Map<Node.Node, Node.Node>
   ): NodeUpdate {
     const dependencyModel = new DependencyModel(options.data.model);
 
@@ -274,13 +264,29 @@ export class Resolver {
       resolveOptions,
     );
 
-    if (shouldUseLastValue && previousResult) {
+    // Shallow clone the node so that changes to it during the resolve steps don't impact the original.
+    // We are trusting that this becomes a deep clone once the whole node tree has been traversed.
+    const clonedNode = {
+      ...this.cloneNode(node),
+      parent: partiallyResolvedParent,
+    };
+    const resolvedAST = this.hooks.beforeResolve.call(
+      clonedNode,
+      resolveOptions
+    ) ?? {
+      type: NodeType.Empty,
+    };
+
+    const isNestedMultiNode =
+      resolvedAST.type === NodeType.MultiNode &&
+      partiallyResolvedParent?.parent?.type === NodeType.MultiNode &&
+      partiallyResolvedParent.type === NodeType.Value;
+
+    if (previousResult && shouldUseLastValue) {
       const update = {
         ...previousResult,
         updated: false,
       };
-
-      cacheUpdate.set(node, update);
 
       /** Recursively repopulate the AST map given some AST Node and it's resolved AST representation */
       const repopulateASTMapFromCache = (
@@ -288,8 +294,8 @@ export class Resolver {
         AST: Node.Node,
         ASTParent: Node.Node | undefined,
       ) => {
-        const { node: resolvedAST } = resolvedNode;
-        this.ASTMap.set(resolvedAST, AST);
+        const { node: resolvedASTLocal } = resolvedNode;
+        this.ASTMap.set(resolvedASTLocal, AST);
         const resolvedUpdate = {
           ...resolvedNode,
           updated: false,
@@ -310,39 +316,29 @@ export class Resolver {
           );
         };
 
-        if ("children" in resolvedAST) {
-          resolvedAST.children?.forEach(({ value: childAST }) =>
-            handleChildNode(childAST),
+
+        if ('children' in resolvedASTLocal) {
+          resolvedASTLocal.children?.forEach(({ value: childAST }) =>
+            handleChildNode(childAST)
           );
-        } else if (resolvedAST.type === NodeType.MultiNode) {
-          resolvedAST.values.forEach(handleChildNode);
+        } else if (resolvedASTLocal.type === NodeType.MultiNode) {
+          resolvedASTLocal.values.forEach(handleChildNode);
         }
 
         this.hooks.afterNodeUpdate.call(AST, ASTParent, resolvedUpdate);
       };
 
       // Point the root of the cached node to the new resolved node.
-      previousResult.node.parent = parentNode;
+      previousResult.node.parent = partiallyResolvedParent;
 
-      repopulateASTMapFromCache(previousResult, node, parent);
+      repopulateASTMapFromCache(previousResult, node, rawParent);
 
       return update;
     }
 
-    // Shallow clone the node so that changes to it during the resolve steps don't impact the original.
-    // We are trusting that this becomes a deep clone once the whole node tree has been traversed.
-    const clonedNode = {
-      ...this.cloneNode(node),
-      parent: parentNode,
-    };
-    const resolvedAST = this.hooks.beforeResolve.call(
-      clonedNode,
-      resolveOptions,
-    ) ?? {
-      type: NodeType.Empty,
-    };
 
-    resolvedAST.parent = parentNode;
+    resolvedAST.parent = partiallyResolvedParent;
+
     resolveOptions.node = resolvedAST;
 
     this.ASTMap.set(resolvedAST, node);
@@ -402,18 +398,32 @@ export class Resolver {
       resolvedAST.children = newChildren;
     } else if (resolvedAST.type === NodeType.MultiNode) {
       const childValue: any = [];
+      const rawParentToPassIn = isNestedMultiNode
+        ? partiallyResolvedParent?.parent
+        : node;
+
       const newValues = resolvedAST.values.map((mValue) => {
         const mTree = this.computeTree(
           mValue,
-          node,
+          rawParentToPassIn,
           dataChanges,
           cacheUpdate,
           resolveOptions,
           resolvedAST,
           prevASTMap,
         );
+
         if (mTree.value !== undefined && mTree.value !== null) {
-          childValue.push(mTree.value);
+          if (
+            mTree.node.parent?.type === NodeType.MultiNode &&
+            Array.isArray(mTree.value)
+          ) {
+            mTree.value.forEach((v: any) => {
+              unpackAndPush(v, childValue);
+            });
+          } else {
+            childValue.push(mTree.value);
+          }
         }
 
         mTree.dependencies.forEach((bindingDep) =>
@@ -454,7 +464,11 @@ export class Resolver {
       ]),
     };
 
-    this.hooks.afterNodeUpdate.call(node, parent, update);
+    this.hooks.afterNodeUpdate.call(
+      node,
+      isNestedMultiNode ? partiallyResolvedParent?.parent : rawParent,
+      update
+    );
     cacheUpdate.set(node, update);
 
     return update;

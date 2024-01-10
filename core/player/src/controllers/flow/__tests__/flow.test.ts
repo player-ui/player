@@ -147,10 +147,41 @@ test("Fails to transition when not started", () => {
   expect(() => flow.transition("foo")).toThrowError();
 });
 
-describe("promise api", () => {
-  it("resolves when were done", async () => {
-    const flow = new FlowInstance("flow", {
-      startState: "View1",
+test('Fails to transition during another transition', () => {
+  const flow = new FlowInstance('flow', {
+    startState: 'View1',
+    View1: {
+      state_type: 'VIEW',
+      onStart: 'foo bar',
+      ref: 'foo',
+      transitions: {
+        Next: 'View2',
+      },
+    },
+    View2: {
+      state_type: 'VIEW',
+      ref: 'bar',
+      transitions: {
+        Next: 'View3',
+      },
+    },
+  });
+
+  flow.hooks.resolveTransitionNode.intercept({
+    call: (nextState) => {
+      if (nextState?.onStart) {
+        expect(() => flow.transition('Next')).toThrowError();
+      }
+    },
+  });
+
+  flow.start();
+});
+
+describe('promise api', () => {
+  it('resolves when were done', async () => {
+    const flow = new FlowInstance('flow', {
+      startState: 'View1',
       View1: {
         state_type: "VIEW",
         ref: "foo",
