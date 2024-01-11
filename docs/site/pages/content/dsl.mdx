@@ -94,15 +94,25 @@ Similarly, if a single asset is expected but a list of them is found instead, Pl
 
 ### Templates
 
-Templates are included via the `@player-tools/dsl` package. This can be used in any asset slot:
+Templates are included via the `@player-ui/dsl` package. This can be used in any asset slot:
 
 ```tsx
+import { dataTypes } from '@player-ui/common-types-plugin';
+import { makeBindingsForObject, Template } from '@player-ui/dsl';
+
+const schema = {
+  foo: [{
+    bar: dataTypes.StringType,
+  }],
+};
+
+const bindings = makeBindingsForObject(schema);
+
 <Collection>
   <Collection.Values>
-    <Template data={b`foo.bar`}>
-      <Text>Template Value</Text>
+    <Template data={bindings.foo}>
+      <Text>currentItem._index_.bar: {bindings.foo._index_.bar}</Text>
     </Template>
-    <Text id="static">Value 1</Text>
   </Collection.Values>
 </Collection>
 ```
@@ -116,6 +126,8 @@ The `@player-tools/dsl` module also includes support for _static_ and _dynamic_ 
 Use the `isDynamic` flag to denote this should be a `dynamicSwitch` instead of a `staticSwitch`:
 
 ```tsx
+import { Switch } from '@player-ui/dsl';
+
 <Collection>
   <Collection.Label>
     <Switch isDynamic>
@@ -271,8 +283,8 @@ Sometimes you need to define specific data types that extend existing types for 
 Using our previous example we can fill in the values with some types now to look like this in the ts object:
 
 ```typescript
-
-import { Schema, BooleanTypeRef } from '@player-ui/types'
+import { dataTypes } from '@player-ui/common-types-plugin';
+import type { Schema } from '@player-ui/types';
 
 const mycustombooleantype: Schema.DataType = {
   type: "BooleanType",
@@ -338,8 +350,9 @@ There is one important function that enables us to use our schema object in cont
 Using these functions we can use the schema directly in content:
 
 ```jsx
+import { makeBindingsForObject } from '@player-ui/dsl';
 
-const schema = makeBindings(mySchema)
+const schema = makeBindingsForObject(mySchema)
 
 const baz = schema.foo.bar.baz
 
