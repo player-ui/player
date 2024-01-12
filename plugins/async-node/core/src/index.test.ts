@@ -2,7 +2,7 @@ import { expect, test } from "vitest";
 import type { Node, InProgressState } from '@player-ui/player';
 import { Player } from '@player-ui/player';
 import { waitFor } from '@testing-library/react';
-import AsyncNodePlugin from './index';
+import { AsyncNodePlugin, AsyncNodePluginPlugin } from "./index";
 
 const basicFRFWithActions = {
   id: 'test-flow',
@@ -38,11 +38,14 @@ const basicFRFWithActions = {
 };
 
 test('replaces async nodes with provided node', async () => {
-  const plugin = new AsyncNodePlugin();
+  const plugin = new AsyncNodePlugin({
+    plugins: [new AsyncNodePluginPlugin()],
+  });
 
   let deferredResolve: ((value: any) => void) | undefined;
 
   plugin.hooks.onAsyncNode.tap('test', async (node: Node.Node) => {
+    console.log('tapped')
     return new Promise((resolve) => {
       deferredResolve = resolve;
     });
@@ -53,9 +56,6 @@ test('replaces async nodes with provided node', async () => {
 
   player.hooks.viewController.tap('async-node-test', (vc) => {
     vc.hooks.view.tap('async-node-test', (view) => {
-      view.hooks.parser.tap('asdf', (parser) => {
-        parser.parseObject({})
-      })
       view.hooks.onUpdate.tap('async-node-test', (update) => {
         updateNumber++;
       });
@@ -98,7 +98,7 @@ test('replaces async nodes with provided node', async () => {
 });
 
 test('replaces async nodes with multi node', async () => {
-  const plugin = new AsyncNodePlugin();
+  const plugin = new AsyncNodePlugin({plugins: [new AsyncNodePluginPlugin()]});
 
   let deferredResolve: ((value: any) => void) | undefined;
 
@@ -165,7 +165,7 @@ test('replaces async nodes with multi node', async () => {
 });
 
 test('replaces async nodes with chained multiNodes', async () => {
-  const plugin = new AsyncNodePlugin();
+  const plugin = new AsyncNodePlugin({plugins: [new AsyncNodePluginPlugin()]});
 
   let deferredResolve: ((value: any) => void) | undefined;
 
@@ -260,7 +260,7 @@ test('replaces async nodes with chained multiNodes', async () => {
 });
 
 test('replaces async nodes with chained multiNodes singular', async () => {
-  const plugin = new AsyncNodePlugin();
+  const plugin = new AsyncNodePlugin({plugins: [new AsyncNodePluginPlugin()]});
 
   let deferredResolve: ((value: any) => void) | undefined;
 
