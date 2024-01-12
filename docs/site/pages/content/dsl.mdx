@@ -94,11 +94,11 @@ Similarly, if a single asset is expected but a list of them is found instead, Pl
 
 ### Templates
 
-Templates are included via the `@player-ui/dsl` package. This can be used in any asset slot:
+Templates are included via the `@player-tools/dsl` package. This can be used in any asset slot:
 
 ```tsx
 import { dataTypes } from '@player-ui/common-types-plugin';
-import { makeBindingsForObject, Template } from '@player-ui/dsl';
+import { makeBindingsForObject, Template } from '@player-tools/dsl';
 
 const schema = {
   foo: [{
@@ -350,7 +350,7 @@ There is one important function that enables us to use our schema object in cont
 Using these functions we can use the schema directly in content:
 
 ```jsx
-import { makeBindingsForObject } from '@player-ui/dsl';
+import { makeBindingsForObject } from '@player-tools/dsl';
 
 const schema = makeBindingsForObject(mySchema)
 
