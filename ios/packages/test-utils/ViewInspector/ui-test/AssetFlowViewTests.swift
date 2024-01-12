@@ -130,5 +130,14 @@ class ForceTransitionPlugin: NativePlugin {
                 }
             }
         }
+
+        player.hooks?.flowController.tap({ flowController in
+            flowController.hooks.flow.tap { flow in
+                flow.hooks.afterTransition.tap { _ in
+                    guard let state = player.state as? InProgressState else { return }
+                    flowController.transition(with: "NEXT")
+                }
+            }
+        })
     }
 }

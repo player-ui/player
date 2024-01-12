@@ -44,13 +44,16 @@ public class Flow: CreatedFromJSValue {
     */
     public init(_ value: JSValue) {
         self.value = value
-        hooks = FlowHooks(transition: Hook2<NamedState?, NamedState>(baseValue: value, name: "transition"))
+        hooks = FlowHooks(transition: Hook2(baseValue: value, name: "transition"), afterTransition: Hook(baseValue: value, name: "afterTransition"))
     }
 }
 
 public struct FlowHooks {
     /// A hook that fires when transitioning states and giving the old and new states as parameters
     public var transition: Hook2<NamedState?, NamedState>
+
+    /// A hook that fires after a transition occurs giving the FlowInstance as parameter
+    public var afterTransition: Hook<Flow>
 }
 
 public struct NamedState: CreatedFromJSValue {
