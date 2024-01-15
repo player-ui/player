@@ -2,9 +2,9 @@ import { SyncWaterfallHook } from "tapable-ts";
 import type { Node, ParseObjectOptions, Parser } from "../parser";
 import { NodeType } from "../parser";
 import type { ViewPlugin } from ".";
-import type { View } from "./plugin";
 import type { Options } from "./options";
 import type { Resolver } from "../resolver";
+import { ViewInstance } from "../view";
 
 export interface TemplateItemInfo {
   /** The index of the data for the current iteration of the template */
@@ -160,7 +160,7 @@ export default class TemplatePlugin implements ViewPlugin {
     });
   }
 
-  apply(view: View) {
+  apply(view: ViewInstance) {
     view.hooks.parser.tap("template", this.applyParser.bind(this));
     view.hooks.resolver.tap("template", this.applyResolverHooks.bind(this));
   }
