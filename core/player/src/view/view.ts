@@ -153,3 +153,9 @@ export class ViewInstance implements ValidationProvider {
     return this.validationProvider?.getValidationsForBinding(binding);
   }
 }
+
+/** A plugin for a view */
+export interface ViewPlugin {
+  /** Called with a view instance */
+  apply(view: ViewInstance): void;
+}

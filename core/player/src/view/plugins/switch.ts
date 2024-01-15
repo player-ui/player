@@ -1,9 +1,8 @@
-import type { ViewPlugin } from "./plugin";
 import type { Options } from "./options";
 import type { Parser, Node, ParseObjectOptions } from "../parser";
 import { EMPTY_NODE, NodeType } from "../parser";
 import type { Resolver } from "../resolver";
-import { ViewInstance } from "../view";
+import { ViewInstance, ViewPlugin } from "../view";
 
 /** A view plugin to resolve switches */
 export default class SwitchPlugin implements ViewPlugin {

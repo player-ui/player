@@ -1,11 +1,10 @@
 import { set } from "timm";
 import { resolveDataRefs } from "../../string-resolver";
 import type { Options } from "./options";
-import type { ViewPlugin } from "./plugin";
 import type { Node } from "../parser";
 import { NodeType } from "../parser";
 import type { Resolver } from "../resolver";
-import { ViewInstance } from "../view";
+import { ViewInstance, ViewPlugin } from "../view";
 
 /** Create a function that checks for a start/end sequence in a string */
 const createPatternMatcher = (start: string, end: string) => {

@@ -1,10 +1,9 @@
 import { omit } from "timm";
-import type { ViewPlugin } from "./plugin";
 import type { Options } from "./options";
 import type { Resolver } from "../resolver";
 import type { Node, ParseObjectOptions, Parser } from "../parser";
 import { NodeType } from "../parser";
-import { ViewInstance } from "../view";
+import { ViewInstance, ViewPlugin } from "../view";
 
 /** A view plugin to remove inapplicable assets from the tree */
 export default class ApplicabilityPlugin implements ViewPlugin {

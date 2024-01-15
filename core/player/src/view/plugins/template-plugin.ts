@@ -1,10 +1,9 @@
 import { SyncWaterfallHook } from "tapable-ts";
 import type { Node, ParseObjectOptions, Parser } from "../parser";
 import { NodeType } from "../parser";
-import type { ViewPlugin } from ".";
 import type { Options } from "./options";
 import type { Resolver } from "../resolver";
-import { ViewInstance } from "../view";
+import { ViewInstance, ViewPlugin } from "../view";
 
 export interface TemplateItemInfo {
   /** The index of the data for the current iteration of the template */
