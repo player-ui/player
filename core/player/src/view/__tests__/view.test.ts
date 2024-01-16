@@ -3,7 +3,12 @@ import { LocalModel, withParser } from "../../data";
 import { ExpressionEvaluator } from "../../expressions";
 import { BindingParser } from "../../binding";
 import { SchemaController } from "../../schema";
-import { StringResolverPlugin, SwitchPlugin, ViewInstance, toNodeResolveOptions } from "..";
+import {
+  StringResolverPlugin,
+  SwitchPlugin,
+  ViewInstance,
+  toNodeResolveOptions,
+} from "..";
 
 const parseBinding = new BindingParser().parse;
 
