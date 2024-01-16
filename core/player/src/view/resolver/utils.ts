@@ -55,3 +55,16 @@ export function toNodeResolveOptions(
       resolverOptions.evaluator.evaluate(exp, resolverOptions),
   };
 }
+
+/**
+ * helper function to flatten a potential nested array and combine with initial array
+ */
+export function unpackAndPush(item: any | any[], initial: any[]) {
+  if (Array.isArray(item)) {
+    item.forEach((i) => {
+      unpackAndPush(i, initial);
+    });
+  } else {
+    initial.push(item);
+  }
+}

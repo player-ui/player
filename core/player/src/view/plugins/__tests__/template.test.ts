@@ -9,6 +9,7 @@ import { Parser } from "../../parser";
 import { ViewInstance } from "../../view";
 import type { Options } from "../options";
 import TemplatePlugin from "../template-plugin";
+import { StringResolverPlugin, toNodeResolveOptions } from "../..";
 
 const templateJoinValues = {
   id: "snippet-of-json",
@@ -563,6 +564,10 @@ describe("dynamic templates", () => {
       },
     );
 
+    const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+    new TemplatePlugin(pluginOptions).apply(view);
+    new StringResolverPlugin().apply(view);
+
     model.set([["foo.bar", petNames]]);
 
     const resolved = view.update();
@@ -632,6 +637,10 @@ describe("dynamic templates", () => {
       },
     );
 
+    const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+    new TemplatePlugin(pluginOptions).apply(view);
+    new StringResolverPlugin().apply(view);
+
     model.set([["foo.bar", petNames]]);
 
     const resolved = view.update();
@@ -685,6 +694,10 @@ describe("dynamic templates", () => {
         schema: new SchemaController(),
       });
 
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new TemplatePlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
+
       const resolved = view.update();
 
       expect(resolved.values).toHaveLength(4);
@@ -697,6 +710,10 @@ describe("dynamic templates", () => {
         evaluator,
         schema: new SchemaController(),
       });
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new TemplatePlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
 
       const resolved = view.update();
 

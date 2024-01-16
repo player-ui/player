@@ -3,7 +3,12 @@ import { LocalModel, withParser } from "../../data";
 import { ExpressionEvaluator } from "../../expressions";
 import { BindingParser } from "../../binding";
 import { SchemaController } from "../../schema";
-import { ViewInstance } from "..";
+import {
+  StringResolverPlugin,
+  SwitchPlugin,
+  ViewInstance,
+  toNodeResolveOptions,
+} from "..";
 
 const parseBinding = new BindingParser().parse;
 
@@ -51,6 +56,10 @@ describe("view", () => {
           schema,
         },
       );
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new SwitchPlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
 
       const resolved = view.update();
 
@@ -110,6 +119,10 @@ describe("view", () => {
         },
       );
 
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new SwitchPlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
+
       const resolved = view.update();
 
       expect(resolved).toStrictEqual({
@@ -164,6 +177,10 @@ describe("view", () => {
           schema,
         },
       );
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new SwitchPlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
 
       const resolved = view.update();
 
@@ -221,6 +238,10 @@ describe("view", () => {
           evaluator,
         },
       );
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new SwitchPlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
 
       const resolved = view.update();
 
@@ -305,6 +326,10 @@ describe("view", () => {
           schema,
         },
       );
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new SwitchPlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
 
       const resolved = view.update();
 
@@ -400,6 +425,10 @@ describe("view", () => {
         },
       );
 
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new SwitchPlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
+
       const resolved = view.update();
 
       expect(resolved).toStrictEqual({
@@ -461,6 +490,8 @@ describe("view", () => {
           schema,
         },
       );
+
+      new StringResolverPlugin().apply(view);
 
       const resolved = view.update();
 

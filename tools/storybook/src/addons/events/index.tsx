@@ -1,7 +1,5 @@
 import React from 'react';
-import { Table, Head, HeadCell, Cell, Body, Row } from '@devtools-ds/table';
-import makeClass from 'clsx';
-import { useDarkMode } from 'storybook-dark-mode';
+import { Table, HeadCell, Cell, Body, Row } from '@devtools-ds/table';
 import { useSelector } from 'react-redux';
 import { Placeholder } from '@storybook/components';
 import type { EventType } from '../../state';
@@ -65,7 +63,6 @@ const ExtraCells = (event: EventType) => {
 /** The panel to show events */
 export const EventsPanel = (props: EventsPanelProps) => {
   const events = useSelector<StateType, EventType[]>((state) => state.events);
-  const darkMode = useDarkMode();
   const contentType = useContentKind();
 
   if (!props.active) {
@@ -81,30 +78,22 @@ export const EventsPanel = (props: EventsPanelProps) => {
   }
 
   return (
-    <div
-      className={makeClass(styles.wrapper, {
-        [styles.dark]: darkMode,
-      })}
-    >
-      <Table colorScheme={darkMode ? 'dark' : 'light'}>
-        <Head className={styles.header}>
-          <Row>
-            <HeadCell>Time</HeadCell>
-            <HeadCell>Type</HeadCell>
-            <HeadCell />
-            <HeadCell />
-          </Row>
-        </Head>
-        <Body className={styles.body}>
-          {events.map((evt) => (
-            <Row key={evt.id}>
-              <Cell>{evt.time}</Cell>
-              <Cell>{evt.type}</Cell>
-              <ExtraCells {...evt} />
-            </Row>
-          ))}
-        </Body>
-      </Table>
-    </div>
+    <Table>
+      <Table.HeadCell className={styles.header}>
+        <Table.Row>
+          <Table.Cell>Time</Table.Cell>
+          <Table.Cell>Type</Table.Cell>
+        </Table.Row>
+      </Table.HeadCell>
+      <Table.Body>
+        {events.map((evt) => (
+          <Table.Row key={evt.id}>
+            <Table.Cell>{evt.time}</Table.Cell>
+            <Table.Cell>{evt.type}</Table.Cell>
+            <ExtraCells {...evt} />
+          </Table.Row>
+        ))}
+      </Table.Body>
+    </Table>
   );
 };

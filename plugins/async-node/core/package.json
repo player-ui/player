@@ -1,0 +1,9 @@
+{
+    "name": "@player-ui/async-node-plugin",
+    "version": "0.0.0-PLACEHOLDER",
+    "main": "src/index.ts",
+    "peerDependencies": {
+      "@player-ui/player": "workspace:*"
+    }
+  }
+  

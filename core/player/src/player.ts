@@ -28,6 +28,7 @@ import type {
   ErrorState,
 } from "./types";
 import { NOT_STARTED_STATE } from "./types";
+import { DefaultViewPlugin } from "./plugins/default-view-plugin";
 
 // Variables injected at build time
 const PLAYER_VERSION = "__VERSION__";
@@ -136,6 +137,7 @@ export class Player {
     this.config = config || {};
     this.config.plugins = [
       new DefaultExpPlugin(),
+      new DefaultViewPlugin(),
       ...(this.config.plugins || []),
       new FlowExpPlugin(),
     ];

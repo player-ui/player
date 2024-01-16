@@ -40,6 +40,7 @@ react/player/node_modules
 react/subscribe/node_modules
 plugins/asset-provider/react/node_modules
 plugins/asset-transform/core/node_modules
+plugins/async-node/core/node_modules
 plugins/common-types/core/node_modules
 plugins/types-provider/core/node_modules
 plugins/auto-scroll/react/node_modules
