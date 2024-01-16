@@ -102,9 +102,9 @@ export class ViewInstance implements ValidationProvider {
   constructor(initialView: ViewType, resolverOptions: Resolve.ResolverOptions) {
     this.initialView = initialView;
     this.resolverOptions = resolverOptions;
-    this.hooks.onTemplatePluginCreated.tap('view', (templatePlugin) => {
+    this.hooks.onTemplatePluginCreated.tap("view", (templatePlugin) => {
       this.templatePlugin = templatePlugin;
-    })
+    });
   }
 
   public updateAsync() {
@@ -125,7 +125,9 @@ export class ViewInstance implements ValidationProvider {
       if (this.templatePlugin) {
         this.hooks.templatePlugin.call(this.templatePlugin);
       } else {
-        this.resolverOptions.logger?.warn('templatePlugin not set for View, legacy templates may not work')
+        this.resolverOptions.logger?.warn(
+          "templatePlugin not set for View, legacy templates may not work",
+        );
       }
 
       const parser = new Parser();

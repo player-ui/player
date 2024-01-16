@@ -116,13 +116,12 @@ export class FlowInstance {
   }
 
   public transition(transitionValue: string, options?: TransitionOptions) {
-
     if (this.isTransitioning) {
       throw new Error(
-        `Transitioning while ongoing transition from ${this.currentState?.name} is in progress is not supported`
+        `Transitioning while ongoing transition from ${this.currentState?.name} is in progress is not supported`,
       );
     }
-    
+
     if (this.currentState?.value.state_type === "END") {
       this.log?.warn(
         `Skipping transition using ${transitionValue}. Already at and END state`,

@@ -1,6 +1,11 @@
-import { SyncHook } from "tapable-ts";
 import type { Player, PlayerPlugin } from "../player";
-import { ApplicabilityPlugin, StringResolverPlugin, SwitchPlugin, TemplatePlugin, toNodeResolveOptions } from "../view";
+import {
+  ApplicabilityPlugin,
+  StringResolverPlugin,
+  SwitchPlugin,
+  TemplatePlugin,
+  toNodeResolveOptions,
+} from "../view";
 
 /**
  * A plugin that provides the out-of-the-box expressions for player

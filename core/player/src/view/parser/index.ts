@@ -1,12 +1,12 @@
-import { omit, setIn } from 'timm';
-import { SyncBailHook, SyncWaterfallHook } from 'tapable-ts';
-import type { Template } from '@player-ui/types';
-import type { AnyAssetType, Node } from './types';
-import { NodeType } from './types';
-import { getNodeID, hasAsync } from './utils';
+import { omit, setIn } from "timm";
+import { SyncBailHook, SyncWaterfallHook } from "tapable-ts";
+import type { Template } from "@player-ui/types";
+import type { AnyAssetType, Node } from "./types";
+import { NodeType } from "./types";
+import { getNodeID, hasAsync } from "./utils";
 
-export * from './types';
-export * from './utils';
+export * from "./types";
+export * from "./utils";
 
 export const EMPTY_NODE: Node.Empty = {
   type: NodeType.Empty,
@@ -78,9 +78,9 @@ export class Parser {
   private parseAsync(
     obj: object,
     type: Node.ChildrenTypes,
-    options: ParseObjectOptions
+    options: ParseObjectOptions,
   ): Node.Node | null {
-    const parsedAsync = this.parseObject(omit(obj, 'async'), type, options);
+    const parsedAsync = this.parseObject(omit(obj, "async"), type, options);
     const parsedNodeId = getNodeID(parsedAsync);
     if (parsedAsync !== null && parsedNodeId) {
       return this.createASTNode(
@@ -89,7 +89,7 @@ export class Parser {
           type: NodeType.Async,
           value: parsedAsync,
         },
-        obj
+        obj,
       );
     }
 
@@ -283,7 +283,7 @@ export class Parser {
           const localAsync = this.parseAsync(
             localValue,
             NodeType.Value,
-            options
+            options,
           );
           if (localAsync) {
             children.push({

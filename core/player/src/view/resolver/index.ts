@@ -7,18 +7,18 @@ import type {
   DataModelOptions,
   DataModelWithParser,
   Updates,
-} from '../../data';
-import { DependencyModel, withParser } from '../../data';
-import type { Logger } from '../../logger';
-import type { Node } from '../parser';
-import { NodeType } from '../parser';
+} from "../../data";
+import { DependencyModel, withParser } from "../../data";
+import type { Logger } from "../../logger";
+import type { Node } from "../parser";
+import { NodeType } from "../parser";
 import {
   caresAboutDataChanges,
   toNodeResolveOptions,
   unpackAndPush,
-} from './utils';
-import type { Resolve } from './types';
-import { getNodeID } from '../parser/utils';
+} from "./utils";
+import type { Resolve } from "./types";
+import { getNodeID } from "../parser/utils";
 
 export * from "./types";
 export * from "./utils";
@@ -231,7 +231,7 @@ export class Resolver {
     cacheUpdate: Map<Node.Node, Resolve.ResolvedNode>,
     options: Resolve.NodeResolveOptions,
     partiallyResolvedParent: Node.Node | undefined,
-    prevASTMap: Map<Node.Node, Node.Node>
+    prevASTMap: Map<Node.Node, Node.Node>,
   ): NodeUpdate {
     const dependencyModel = new DependencyModel(options.data.model);
 
@@ -272,7 +272,7 @@ export class Resolver {
     };
     const resolvedAST = this.hooks.beforeResolve.call(
       clonedNode,
-      resolveOptions
+      resolveOptions,
     ) ?? {
       type: NodeType.Empty,
     };
@@ -316,10 +316,9 @@ export class Resolver {
           );
         };
 
-
-        if ('children' in resolvedASTLocal) {
+        if ("children" in resolvedASTLocal) {
           resolvedASTLocal.children?.forEach(({ value: childAST }) =>
-            handleChildNode(childAST)
+            handleChildNode(childAST),
           );
         } else if (resolvedASTLocal.type === NodeType.MultiNode) {
           resolvedASTLocal.values.forEach(handleChildNode);
@@ -335,7 +334,6 @@ export class Resolver {
 
       return update;
     }
-
 
     resolvedAST.parent = partiallyResolvedParent;
 
@@ -467,7 +465,7 @@ export class Resolver {
     this.hooks.afterNodeUpdate.call(
       node,
       isNestedMultiNode ? partiallyResolvedParent?.parent : rawParent,
-      update
+      update,
     );
     cacheUpdate.set(node, update);
 
