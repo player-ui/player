@@ -11,6 +11,7 @@ kt_android_library(
     assets = glob(["src/main/assets/mocks/**"]),
     assets_dir = "src/main/assets",
     custom_package = "com.intuit.player.android.reference.demo",
+    enable_data_binding = False,
     manifest = ":src/main/AndroidManifest.xml",
     resource_files = glob(["src/main/res/**"]),
     deps = main_deps,
@@ -25,6 +26,7 @@ android_binary(
     multidex = "native",
     deps = [
         ":demo_lib",
+        "//android/player:player_base",
         "@android_j2v8//aar",
         "@maven//:androidx_databinding_databinding_common",
         "@maven//:androidx_databinding_databinding_runtime",

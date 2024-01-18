@@ -6,11 +6,12 @@ kt_android_library(
     name = "assets",
     srcs = glob(["src/main/java/**/*.kt"]),
     custom_package = "com.intuit.player.android.reference.assets",
+    enable_data_binding = False,
     manifest = ":src/main/AndroidManifest.xml",
     resource_files = glob(["src/main/res/**"]),
-    deps = main_deps,
-    exports = main_exports,
     visibility = ["//visibility:public"],
+    exports = main_exports,
+    deps = main_deps,
 )
 
 lint(
@@ -18,4 +19,3 @@ lint(
     srcs = glob(["src/main/**/*.kt"]),
     lint_config = "//jvm:lint_config",
 )
-
