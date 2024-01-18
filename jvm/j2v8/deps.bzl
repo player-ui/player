@@ -17,6 +17,7 @@ main_deps = main_exports + parse_coordinates(maven_main) + [
     "//jvm/j2v8/libs:j2v8_debugger_compile_only",
 ]
 
+# TODO: These should probably just be dependencies of headless
 main_resources = [
     "//core/player:Player_Bundles",
 ]

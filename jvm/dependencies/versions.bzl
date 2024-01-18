@@ -26,6 +26,7 @@ versions = struct(
     jmh = "1.21",
     androidx = struct(
         activity = "1.2.3",
+        annotation = "1.5.0",
         appcompat = "1.3.0",
         constraintlayout = "2.1.4",
         core = "1.6.0",
