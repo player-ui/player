@@ -69,8 +69,6 @@ class StageRevertDataPluginTests: XCTestCase {
             viewController.hooks.view.tap { view in
                 view.hooks.onUpdate.tap { value in
                     guard view.id == "view-3" else {
-                        (player.state as? InProgressState)?.controllers?.data.set(transaction: ["name": "Test"])
-                        (player.state as? InProgressState)?.controllers?.flow.transition(with: "clear")
                         return
                     }
 
@@ -81,6 +79,22 @@ class StageRevertDataPluginTests: XCTestCase {
                 }
             }
         }
+
+        player.hooks?.flowController.tap({ flowController in
+            flowController.hooks.flow.tap { flow in
+                flow.hooks.afterTransition.tap { flowInstance in
+                    guard flowInstance.currentState?.name == "VIEW_3" else {
+                        (player.state as? InProgressState)?.controllers?.data.set(transaction: ["name": "Test"])
+                        do {
+                            try flowController.transition(with: "clear")
+                        } catch {
+                            XCTFail("Transition with 'clear' failed")
+                        }
+                        return
+                    }
+                }
+            }
+        })
 
         player.start(flow: json, completion: {_ in})
         wait(for: [expected], timeout: 1)
@@ -94,8 +108,6 @@ class StageRevertDataPluginTests: XCTestCase {
             viewController.hooks.view.tap { view in
                 view.hooks.onUpdate.tap { value in
                     guard view.id == "view-2" else {
-                        (player.state as? InProgressState)?.controllers?.data.set(transaction: ["name": "Test"])
-                        (player.state as? InProgressState)?.controllers?.flow.transition(with: "commit")
                         return
                     }
 
@@ -106,6 +118,22 @@ class StageRevertDataPluginTests: XCTestCase {
                 }
             }
         }
+
+        player.hooks?.flowController.tap({ flowController in
+            flowController.hooks.flow.tap { flow in
+                flow.hooks.afterTransition.tap { flowInstance in
+                    guard flowInstance.currentState?.name == "VIEW_2" else {
+                        (player.state as? InProgressState)?.controllers?.data.set(transaction: ["name": "Test"])
+                        do {
+                            try flowController.transition(with: "commit")
+                        } catch {
+                            XCTFail("Transition with 'commit' failed")
+                        }
+                        return
+                    }
+                }
+            }
+        })
 
         player.start(flow: json, completion: {_ in})
         wait(for: [expected], timeout: 1)

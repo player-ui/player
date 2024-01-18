@@ -31,11 +31,19 @@ class TransitionPluginTests: ViewInspectorTestCase {
 
         let playerTransition1 = player.hooks?.transition.call()
         XCTAssertEqual(playerTransition1, .identity)
-        (player.state as? InProgressState)?.controllers?.flow.transition(with: "next")
+        do {
+            try (player.state as? InProgressState)?.controllers?.flow.transition(with: "next")
+        } catch {
+            XCTFail("Transition with 'next' failed")
+        }
 
         let playerTransitions3 = player.hooks?.transition.call()
         XCTAssertEqual(playerTransitions3, .test1)
-        (player.state as? InProgressState)?.controllers?.flow.transition(with: "prev")
+        do {
+            try (player.state as? InProgressState)?.controllers?.flow.transition(with: "prev")
+        } catch {
+            "Transition with 'next' failed"
+        }
 
         let playerTransitions4 = player.hooks?.transition.call()
         XCTAssertEqual(playerTransitions4, .test2)
