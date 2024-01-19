@@ -22,9 +22,9 @@ class JSValueExtensionsTests: XCTestCase {
                            """)
 
         do {
-            let _ = try functionReturningError?.callTryCatchWrapperWithReturnValue(args: [] as [String])
+            let _ = try functionReturningError?.tryCatch(args: [] as [String])
         } catch let error {
-            XCTAssertEqual(error as? JSValueError, JSValueError.thrownFromJS)
+            XCTAssertEqual(error as? JSValueError, JSValueError.thrownFromJS(message: "Error: Fail"))
         }
     }
 
@@ -37,7 +37,7 @@ class JSValueExtensionsTests: XCTestCase {
                            """)
 
         do {
-            let result = try functionReturningInt?.callTryCatchWrapperWithReturnValue(args: [] as [String])
+            let result = try functionReturningInt?.tryCatch(args: [] as [String])
             XCTAssertEqual(result?.toInt32(), 1)
         } catch let error {
             XCTFail("Should have returned Int but failed with \(error)")
@@ -47,6 +47,8 @@ class JSValueExtensionsTests: XCTestCase {
     func testTransitionDuringAnActiveTransitionShouldCatchErrorUsingTryCatchWrapper() {
         let player = HeadlessPlayerImpl(plugins: [])
 
+        var caughtError = false
+
         player.hooks?.viewController.tap { viewController in
             viewController.hooks.view.tap { view in
                 view.hooks.onUpdate.tap { value in
@@ -54,7 +56,12 @@ class JSValueExtensionsTests: XCTestCase {
                         do {
                             try (player.state as? InProgressState)?.controllers?.flow.transition(with: "NEXT")
                         } catch let error {
-                            XCTAssertEqual(error as? JSValueError, JSValueError.thrownFromJS)
+                            caughtError = true
+                            XCTAssertEqual(error as? JSValueError, JSValueError.thrownFromJS(message: "Error: Transitioning while ongoing transition from VIEW_1 is in progress is not supported"))
+                        }
+
+                        if !caughtError {
+                            XCTFail("Expected error, but no error was caught")
                         }
 
                         return

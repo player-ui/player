@@ -49,6 +49,6 @@ public class FlowController: CreatedFromJSValue {
         - action: The action to use for transitioning
      */
     public func transition(with action: String) throws {
-        try self.value.objectForKeyedSubscript("transition").callTryCatchWrapper(args: [action])
+        try self.value.objectForKeyedSubscript("transition").tryCatch(args: [action])
     }
 }

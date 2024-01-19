@@ -9,61 +9,42 @@ import Foundation
 import JavaScriptCore
 
 extension JSValue {
-    var tryCatchWrapper: JSValue? {
-        self.context.evaluateScript(
-        """
-           (fn, args) => {
-               try {
-                   console.log(args)
-                   return fn(...args)
-               } catch(e) {
-                   console.log(e)
-                   if (e instanceof Error) {
-
-                      return e
-                }
-             }
-           }
-        """)
-
-    }
-
-    var errorCheckWrapper: JSValue? {
-        self.context.evaluateScript(
-        """
-                (obj) => (obj instanceof Error)
-        """)
-    }
 
 
     /**
-     A way to catch errors for void functions not called inside a player process. Called on void functions.
+     A way to catch errors for functions not called inside a player process. Can be called on functions with a return value and void with discardableResult.
      - parameters:
         - args: List of arguments taken by the function
      */
-    public func callTryCatchWrapper(args: Any...) throws {
-        let result = self.tryCatchWrapper?.call(withArguments: [self, args])
-
-        let isError = self.errorCheckWrapper?.call(withArguments: [result as Any])
-
-        if isError?.toBool() == true {
-            throw JSValueError.thrownFromJS
+    @discardableResult
+    public func tryCatch(args: Any...) throws -> JSValue? {
+        var tryCatchWrapper: JSValue? {
+            self.context.evaluateScript(
+            """
+               (fn, args) => {
+                   try {
+                       return fn(...args)
+                   } catch(e) {
+                       return e
+                   }
+               }
+            """)
         }
-    }
 
+        var errorCheckWrapper: JSValue? {
+            self.context.evaluateScript(
+            """
+                    (obj) => (obj instanceof Error)
+            """)
+        }
+        let result = tryCatchWrapper?.call(withArguments: [self, args])
 
-    /**
-     A way to catch errors for functions not called inside a player process. Called on functions with a return value.
-     - parameters:
-        - args: List of arguments taken by the function
-     */
-    public func callTryCatchWrapperWithReturnValue(args: Any...) throws -> JSValue? {
-         let result = tryCatchWrapper?.call(withArguments: [self, args])
+        let isError = errorCheckWrapper?.call(withArguments: [result as Any])
 
-        let isError = self.errorCheckWrapper?.call(withArguments: [result as Any])
+        let errorMessage = result?.toString() ?? ""
 
         if isError?.toBool() == true {
-            throw JSValueError.thrownFromJS
+            throw JSValueError.thrownFromJS(message: errorMessage)
         } else {
             return result
         }
@@ -73,6 +54,6 @@ extension JSValue {
 /**
  Represents the different errors that occur when evaluating JSValue
  */
-public enum JSValueError: Error {
-    case thrownFromJS
+public enum JSValueError: Error, Equatable {
+    case thrownFromJS(message: String)
 }
