@@ -56,8 +56,6 @@ class JSValueExtensionsTests: XCTestCase {
                     guard view.id == "view-2" else {
                         do {
                             try (player.state as? InProgressState)?.controllers?.flow.transition(with: "NEXT")
-
-
                         } catch let error {
                             expectation.fulfill()
 
