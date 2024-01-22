@@ -48,7 +48,7 @@ class JSValueExtensionsTests: XCTestCase {
     func testTransitionDuringAnActiveTransitionShouldCatchErrorUsingTryCatchWrapper() {
         let player = HeadlessPlayerImpl(plugins: [])
 
-        var caughtError = false
+        let expectation = expectation(description: "Error caught")
 
         player.hooks?.viewController.tap { viewController in
             viewController.hooks.view.tap { view in
@@ -56,13 +56,12 @@ class JSValueExtensionsTests: XCTestCase {
                     guard view.id == "view-2" else {
                         do {
                             try (player.state as? InProgressState)?.controllers?.flow.transition(with: "NEXT")
-                        } catch let error {
-                            caughtError = true
-                            XCTAssertEqual(error as? JSValueError, JSValueError.thrownFromJS(message: "Error: Transitioning while ongoing transition from VIEW_1 is in progress is not supported"))
-                        }
 
-                        if !caughtError {
-                            XCTFail("Expected error, but no error was caught")
+
+                        } catch let error {
+                            expectation.fulfill()
+
+                            XCTAssertEqual(error as? JSValueError, JSValueError.thrownFromJS(message: "Error: Transitioning while ongoing transition from VIEW_1 is in progress is not supported"))
                         }
 
                         return
@@ -72,5 +71,6 @@ class JSValueExtensionsTests: XCTestCase {
         }
 
         player.start(flow: FlowData.MULTIPAGE, completion: {_ in})
+        wait(for: [expectation], timeout: 1)
     }
 }
