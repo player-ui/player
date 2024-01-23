@@ -1,13 +1,15 @@
 load("@rules_player//kotlin:kt_jvm.bzl", _kt_jvm = "kt_jvm")
 load("@rules_player//kotlin:distribution.bzl", _distribution = "distribution")
+load("@build_constants//:constants.bzl", "VERSION")
 load("//jvm/dependencies:common.bzl", common_main_deps = "main_deps", common_test_deps = "test_deps")
-load("//:index.bzl", "GIT_REPO", "DOCS_URL")
+load("//:index.bzl", "DOCS_URL", "GIT_REPO")
 
+DEFAULT_GROUP = "com.intuit.player"
 DEFAULT_PROJECT_NAME = "Player"
 DEFAUTL_PROJECT_DESCRIPTION = "A cross-platform semantic rendering engine"
 DEFAULT_DEVELOPERS = {
-   "sugarmanz": ["name=Jeremiah Zucker", "email=zucker.jeremiah@gmail.com"],
-   "brocollie08": ["name=Tony Lin"]
+    "sugarmanz": ["name=Jeremiah Zucker", "email=zucker.jeremiah@gmail.com"],
+    "brocollie08": ["name=Tony Lin"],
 }
 DEFAULT_RELEASE_REPO = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
 DEFAULT_SNAPSHOT_REPO = "https://oss.sonatype.org/content/repositories/snapshots/"
@@ -22,14 +24,7 @@ def kt_player_module(
         include_common_deps = True,
 
         # Distribution config
-        group = "com.intuit.player",
-
-        # (optional)
-        project_name = DEFAULT_PROJECT_NAME,
-        project_description = DEFAUTL_PROJECT_DESCRIPTION,
-        project_url = DOCS_URL,
-        scm_url = GIT_REPO,
-        developers = DEFAULT_DEVELOPERS,
+        group = DEFAULT_GROUP,
 
         # Package level config
         module_name = None,
@@ -53,15 +48,7 @@ def kt_player_module(
         name = name,
         lint_config = "//jvm:lint_config",
         group = group,
-        release_repo = DEFAULT_RELEASE_REPO,
-        snapshot_repo = DEFAULT_SNAPSHOT_REPO,
-        version_file = "//:VERSION",
-        project_name = project_name,
-        project_description = project_description,
-        project_url = project_url,
-        scm_url = scm_url,
-        developers = developers,
-        workspace_refs = "@plugin_workspace_refs//:refs.json",
+        version = VERSION,
         module_name = module_name,
         main_opts = "//jvm:main_options",
         main_srcs = main_srcs,
@@ -86,22 +73,10 @@ def kt_player_module(
 def distribution(
         *,
         name,
-
-        # (optional)
-        project_name = DEFAULT_PROJECT_NAME,
-        project_description = DEFAUTL_PROJECT_DESCRIPTION,
-        project_url = DOCS_URL,
-        scm_url = GIT_REPO,
-        developers = DEFAULT_DEVELOPERS,):
+        maven_coordinates,
+        lib_name = None):
     _distribution(
         name = name,
-        release_repo = DEFAULT_RELEASE_REPO,
-        snapshot_repo = DEFAULT_SNAPSHOT_REPO,
-        version_file = "//:VERSION",
-        project_name = project_name,
-        project_description = project_description,
-        project_url = project_url,
-        scm_url = scm_url,
-        developers = developers,
-        workspace_refs = "@plugin_workspace_refs//:refs.json",
+        maven_coordinates = maven_coordinates,
+        lib_name = lib_name,
     )

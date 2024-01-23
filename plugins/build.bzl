@@ -1,4 +1,4 @@
-load("//jvm:build.bzl", _kt_player_module = "kt_player_module")
+load("//jvm:build.bzl", "DEFAULT_GROUP", _kt_player_module = "kt_player_module")
 load("//jvm/dependencies:common.bzl", "test_deps")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 
@@ -10,14 +10,6 @@ def kt_player_plugin(
 
         # Project level config
         include_common_deps = True,
-
-        # Distribution config
-
-        # (optional) TODO: Maybe hardcode these
-        project_name = None,
-        project_description = None,
-        project_url = None,
-        scm_url = None,
 
         # Package level config
         module_name = None,
@@ -40,13 +32,7 @@ def kt_player_plugin(
     _kt_player_module(
         name = name,
         include_common_deps = include_common_deps,
-        group = "com.intuit.player.plugins",
-
-        # (optional) TODO: Maybe hardcode these
-        project_name = project_name,
-        project_description = project_description,
-        project_url = project_url,
-        scm_url = scm_url,
+        group = DEFAULT_GROUP + ".plugins",
 
         # Package level config
         module_name = module_name,

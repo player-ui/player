@@ -38,7 +38,8 @@ main_resources = [
 ]
 
 test_deps = [
-    "@grab_bazel_common//tools/test:mockable-android-jar",
+    #    "@grab_bazel_common//tools/test:mockable-android-jar",
+    #    "@robolectric//bazel:android-all",
     "@maven//:io_mockk_mockk",
     "//jvm/testutils",
     "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_test",
