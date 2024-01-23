@@ -26,7 +26,6 @@ android_binary(
     multidex = "native",
     deps = [
         ":demo_lib",
-        "//android/player:player_base",
         "@android_j2v8//aar",
         "@maven//:androidx_databinding_databinding_common",
         "@maven//:androidx_databinding_databinding_runtime",

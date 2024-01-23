@@ -1,32 +1,44 @@
-load(":deps.bzl", "main_deps", "main_resources", "test_deps")
+load(":deps.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
+load("@build_constants//:constants.bzl", "VERSION")
 load("//jvm:build.bzl", "distribution")
 load("@io_bazel_rules_kotlin//kotlin:android.bzl", "kt_android_library")
-
-#load("@grab_bazel_common//tools/databinding:databinding.bzl", "kt_db_android_library")
+load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@junit//junit5-jupiter-starter-bazel:junit5.bzl", "kt_jvm_junit5_test")
 load("@rules_player//kotlin:lint.bzl", "lint")
 
 kt_android_library(
-    name = "player",
+    name = "player-lib",
     srcs = glob(["src/main/java/**/*.kt"]),
     custom_package = "com.intuit.player.android",
     enable_data_binding = True,
     manifest = ":src/main/AndroidManifest.xml",
     resource_files = glob(["src/main/res/**"]),
     resources = main_resources,
-    tags = ["maven_coordinates=com.intuit.player.android:player:{pom_version}"],
-    visibility = ["//visibility:public"],
+    exports = main_exports,
     deps = main_deps,
+)
+
+# TODO: This is currently needed to ensure the AAR is created for the primary output
+#       Additionally, we need to ensure the maven_coordinates tag only sticks to outer
+#       artifact to capture the transitive closure.
+android_library(
+    name = "player",
+    custom_package = "com.intuit.player.android",
+    manifest = ":src/main/AndroidManifest.xml",
+    tags = ["maven_coordinates=com.intuit.player.android:player:aar:%s" % VERSION],
+    visibility = ["//visibility:public"],
+    exports = ["player-lib"],
 )
 
 distribution(
     name = "player",
+    maven_coordinates = "com.intuit.player.android:player:%s" % VERSION,
 )
 
 kt_jvm_junit5_test(
     name = "player-tests",
     srcs = glob(["src/test/java/**"]),
-    associates = [":player_kt"],
+    associates = [":player-lib_kt"],
     kotlinc_opts = "//jvm:test_options",
     test_package = "com.intuit.player.android",
     deps = [":player"] + test_deps,

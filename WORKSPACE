@@ -6,14 +6,35 @@ workspace(
     },
 )
 
+load("//:build_constants.bzl", "build_constants")
+
+build_constants()
+
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
-http_archive(
+git_repository(
+    name = "rules_jvm_external",
+    branch = "maven-export-aar",
+    patches = [
+        "//patches:rules_jvm_external.default_public_visibility.patch",
+    ],
+    remote = "https://github.com/sugarmanz/rules_jvm_external",
+)
+
+#
+load("@rules_jvm_external//:repositories.bzl", "rules_jvm_external_deps")
+
+rules_jvm_external_deps()
+
+load("@rules_jvm_external//:setup.bzl", "rules_jvm_external_setup")
+
+rules_jvm_external_setup()
+
+git_repository(
     name = "rules_player",
-    sha256 = "e0cf3efd5f82654b21a48d8b4a822c772d5828a826f84efa162354b7883df7c2",
-    strip_prefix = "rules_player-0.11.0",
-    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.11.0.tar.gz"],
+    branch = "maven-export-distribution",
+    remote = "https://github.com/player-ui/rules_player",
 )
 
 load("@rules_player//:workspace.bzl", "deps")
@@ -75,28 +96,46 @@ junit5()
 ######################
 # Android Setup      #
 ######################
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
-
-grab_remote = "https://github.com/sugarmanz/grab-bazel-common.git"
-
-grab_commit = "5326c6ba7a4e39e150c33e123134525473baffb6"
-
-git_repository(
-    name = "grab_bazel_common",
-    commit = grab_commit,
-    remote = grab_remote,
-    shallow_since = "1700536974 -0500",
+http_archive(
+    name = "android_tools",
+    sha256 = "ed5290594244c2eeab41f0104519bcef51e27c699ff4b379fcbd25215270513e",
+    url = "https://mirror.bazel.build/bazel_android_tools/android_tools_pkg-0.23.0.tar.gz",
 )
 
-load("@grab_bazel_common//android:repositories.bzl", "bazel_common_dependencies")
+#DAGGER_TAG = "2.42"
+#
+#DAGGER_SHA = "8121789cc443f177005f683bdbed8f36273a5ceb96fb16a9528fd76bb2c35c79"
+#
+#http_archive(
+#    name = "bazel_common_dagger",
+#    sha256 = DAGGER_SHA,
+#    strip_prefix = "dagger-dagger-%s" % DAGGER_TAG,
+#    url = "https://github.com/google/dagger/archive/dagger-%s.zip" % DAGGER_TAG,
+#)
+#
+#grab_remote = "https://github.com/sugarmanz/grab-bazel-common.git"
+#
+#grab_commit = "5326c6ba7a4e39e150c33e123134525473baffb6"
+#
+#git_repository(
+#    name = "grab_bazel_common",
+#    commit = grab_commit,
+#    remote = grab_remote,
+#    shallow_since = "1700536974 -0500",
+#)
 
-bazel_common_dependencies()
+#load("@grab_bazel_common//android:repositories.bzl", "bazel_common_dependencies")
+#
+#bazel_common_dependencies()
 
-load("@grab_bazel_common//android:initialize.bzl", "bazel_common_initialize")
-
-bazel_common_initialize(
-    pinned_maven_install = False,
-)
+#
+#load("@grab_bazel_common//android:initialize.bzl", "bazel_common_initialize")
+#
+##
+#bazel_common_initialize(
+#    patched_android_tools = False,
+#    pinned_maven_install = False,
+#)
 
 http_archive(
     name = "robolectric",
@@ -154,6 +193,11 @@ android_ndk_repository(name = "androidndk")
 
 register_toolchains("@androidndk//:all")
 
+bind(
+    name = "databinding_annotation_processor",
+    actual = "//android:compiler_annotation_processor",
+)
+
 ######################
 # Maven Dependencies #
 ######################
@@ -182,6 +226,41 @@ maven_install(
     repositories = [
         "https://repo1.maven.org/maven2",
     ],
+)
+
+maven_install(
+    name = "bazel_common_maven",
+    artifacts = [
+        "com.google.guava:guava:29.0-jre",
+        "com.google.auto:auto-common:0.10",
+        "com.google.auto.service:auto-service:1.0-rc6",
+        "com.google.protobuf:protobuf-java:3.6.0",
+        "com.google.protobuf:protobuf-java-util:3.6.0",
+        "io.reactivex.rxjava3:rxjava:3.0.12",
+        "com.squareup.moshi:moshi-kotlin:1.14.0",
+        "com.squareup.okio:okio-jvm:3.2.0",
+        "com.squareup:javapoet:1.13.0",
+        "com.github.ajalt:clikt:2.8.0",
+        "org.ow2.asm:asm:6.0",
+        "org.ow2.asm:asm-tree:6.0",
+        "xmlpull:xmlpull:1.1.3.1",
+        "net.sf.kxml:kxml2:2.3.0",
+        "com.squareup.moshi:moshi:1.11.0",
+        "org.jetbrains.kotlin:kotlin-parcelize-compiler:1.7.21",
+        "org.jetbrains.kotlin:kotlin-parcelize-runtime:1.7.21",
+        "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4",
+        "com.github.tschuchortdev:kotlin-compile-testing:1.5.0",
+        "com.google.android.material:material:1.2.1",
+        "javax.inject:javax.inject:1",
+        "junit:junit:4.13",
+        "org.json:json:20210307",
+    ],
+    repositories = [
+        "https://jcenter.bintray.com/",
+        "https://maven.google.com",
+        "https://repo1.maven.org/maven2",
+    ],
+    strict_visibility = True,
 )
 
 load("@vaticle_bazel_distribution//common:rules.bzl", "workspace_refs")

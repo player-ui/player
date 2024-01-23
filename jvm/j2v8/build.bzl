@@ -1,4 +1,5 @@
-load("//jvm:build.bzl", "distribution")
+load("//jvm:build.bzl", "DEFAULT_GROUP", "distribution")
+load("@build_constants//:constants.bzl", "VERSION")
 
 deps = {
     "macos": ["//jvm/j2v8/libs:j2v8_macos"],
@@ -15,7 +16,7 @@ deps = {
     ],
 }
 
-def j2v8_platform(platform):
+def j2v8_platform(platform, group = DEFAULT_GROUP, version = VERSION):
     if platform not in deps:
         fail("platform must be defined in " + deps.keys())
 
@@ -23,10 +24,11 @@ def j2v8_platform(platform):
     native.java_library(
         name = name,
         exports = [":j2v8"] + deps[platform],
-        tags = ["maven_coordinates=%s:%s:{pom_version}" % ("com.intuit.player", name)],
+        tags = ["maven_coordinates=%s:%s:%s" % (group, name, version)],
         visibility = ["//visibility:public"],
     )
 
     distribution(
         name = name,
+        maven_coordinates = "%s:%s:%s" % (group, name, version),
     )

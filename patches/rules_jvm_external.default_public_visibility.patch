@@ -1,0 +1,13 @@
+diff --git coursier.bzl coursier.bzl
+index a7c5f30..57977ae 100644
+--- coursier.bzl
++++ coursier.bzl
+@@ -28,7 +28,7 @@ load("//private/rules:v1_lock_file.bzl", "v1_lock_file")
+ load("//private/rules:v2_lock_file.bzl", "v2_lock_file")
+ 
+ _BUILD = """
+-# package(default_visibility = [{visibilities}])  # https://github.com/bazelbuild/bazel/issues/13681
++package(default_visibility = [{visibilities}])  # https://github.com/bazelbuild/bazel/issues/13681
+ 
+ load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+ load("@rules_jvm_external//private/rules:jvm_import.bzl", "jvm_import")
