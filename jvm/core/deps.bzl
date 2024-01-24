@@ -10,12 +10,12 @@ main_exports = [
     "//jvm:kotlin_serialization",
 ]
 main_deps = main_exports + [
-    "@maven//:org_jetbrains_kotlin_kotlin_reflect"
+    "@com_github_jetbrains_kotlin//:kotlin-reflect",
 ]
 main_runtime_deps = []
 
 # Test dependencies
 test_deps = [
-     "//plugins/reference-assets/jvm:reference-assets",
+    "//plugins/reference-assets/jvm:reference-assets",
 ]
 test_runtime_deps = []
