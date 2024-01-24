@@ -139,7 +139,7 @@ export class Parser {
         return parsedNode;
       }
     }
-    
+
     const parseLocalObject = (
       currentValue: any,
       objToParse: unknown,
