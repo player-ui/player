@@ -69,6 +69,6 @@ class JSValueExtensionsTests: XCTestCase {
         }
 
         player.start(flow: FlowData.MULTIPAGE, completion: {_ in})
-        wait(for: [expectation], timeout: 5)
+        wait(for: [expectation], timeout: 2)
     }
 }
