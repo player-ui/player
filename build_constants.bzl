@@ -11,14 +11,14 @@ filegroup(
 
     version = repository_ctx.read(repository_ctx.attr.version_file)
 
-    _MAVEN_CONSTANTS_FILE = """
+    _CONSTANTS_FILE = """
 # DO NOT EDIT: automatically generated for _build_constants rule
 VERSION = \"{version}\"
 """
 
     repository_ctx.file(
         "constants.bzl",
-        _MAVEN_CONSTANTS_FILE.format(version = version),
+        _CONSTANTS_FILE.format(version = version),
         False,
     )
 

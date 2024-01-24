@@ -11,7 +11,6 @@ kt_android_library(
     assets = glob(["src/main/assets/mocks/**"]),
     assets_dir = "src/main/assets",
     custom_package = "com.intuit.player.android.reference.demo",
-    enable_data_binding = False,
     manifest = ":src/main/AndroidManifest.xml",
     resource_files = glob(["src/main/res/**"]),
     deps = main_deps,

@@ -2,16 +2,13 @@ load("//jvm/dependencies:versions.bzl", "versions")
 load("@rules_player//maven:parse_coordinates.bzl", "parse_coordinates")
 load("//plugins/reference-assets/android/src/androidTest/java/com/intuit/player/android/reference/assets/test:deps.bzl", maven_test = "maven")
 
-maven_main = [
-    "androidx.databinding:databinding-runtime:%s" % versions.androidx.databinding,
-]
+maven_main = []
 
 main_exports = [
-    #    "//android/player",
+    "//android/player",
 ]
 
 main_deps = main_exports + parse_coordinates(maven_main) + [
-    "//android/player",
     "//jvm:kotlin_serialization",
     "//plugins/reference-assets/jvm:reference-assets",
     "//plugins/pending-transaction/jvm:pending-transaction",

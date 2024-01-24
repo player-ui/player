@@ -9,8 +9,7 @@ load("//jvm/testutils:deps.bzl", testutils = "maven")
 load("//jvm/perf:deps.bzl", perf = "maven")
 load("//plugins:deps.bzl", plugins = "maven")
 load("@rules_player//distribution:deps.bzl", distribution = "maven")
-#load("@grab_bazel_common//:workspace_defs.bzl", grab = "GRAB_BAZEL_COMMON_ARTIFACTS")
 
-tooling = distribution  #+ grab
+tooling = distribution
 
 maven = remove_duplicates(common + core + graaljs + j2v8 + utils + testutils + perf + plugins + tooling + android)
