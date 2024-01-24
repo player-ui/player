@@ -25,6 +25,8 @@ def kt_player_module(
 
         # Distribution config
         group = DEFAULT_GROUP,
+        deploy_env = None,
+        excluded_workspaces = None,
 
         # Package level config
         module_name = None,
@@ -49,6 +51,8 @@ def kt_player_module(
         lint_config = "//jvm:lint_config",
         group = group,
         version = VERSION,
+        deploy_env = deploy_env,
+        excluded_workspaces = excluded_workspaces,
         module_name = module_name,
         main_opts = "//jvm:main_options",
         main_srcs = main_srcs,
