@@ -25,6 +25,7 @@ android_library(
     name = "player",
     custom_package = "com.intuit.player.android",
     manifest = ":src/main/AndroidManifest.xml",
+    resource_files = glob(["src/main/res/**"]),
     tags = ["maven_coordinates=com.intuit.player.android:player:aar:%s" % VERSION],
     visibility = ["//visibility:public"],
     exports = ["player-lib"],
