@@ -22,15 +22,6 @@ git_repository(
     remote = "https://github.com/sugarmanz/rules_jvm_external",
 )
 
-#
-load("@rules_jvm_external//:repositories.bzl", "rules_jvm_external_deps")
-
-rules_jvm_external_deps()
-
-load("@rules_jvm_external//:setup.bzl", "rules_jvm_external_setup")
-
-rules_jvm_external_setup()
-
 git_repository(
     name = "rules_player",
     branch = "maven-export-distribution",
@@ -201,6 +192,14 @@ bind(
 ######################
 # Maven Dependencies #
 ######################
+load("@rules_jvm_external//:repositories.bzl", "rules_jvm_external_deps")
+
+rules_jvm_external_deps()
+
+load("@rules_jvm_external//:setup.bzl", "rules_jvm_external_setup")
+
+rules_jvm_external_setup()
+
 load("//jvm/dependencies:deps.bzl", artifacts = "maven")
 load("@rules_jvm_external//:defs.bzl", "maven_install")
 
