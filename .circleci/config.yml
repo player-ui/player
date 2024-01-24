@@ -54,8 +54,8 @@ commands:
       - run: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
       - run: |
-            echo 'export GPG_TTY=$(tty)' >> $BASH_ENV
-            source $BASH_ENV
+            echo 'pinentry-mode loopback' >> ~/.gnupg/gpg.conf
+            echo RELOADAGENT | gpg-connect-agent
             echo -e $GPG_KEY | gpg --import --batch
       - run: |
             source ~/.bashrc
