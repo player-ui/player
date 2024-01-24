@@ -1,0 +1,37 @@
+
+```mermaid
+sequenceDiagram
+    title Data Controller with MiddleWare
+    participant P as Player
+
+    %% the controller is responsible for orchestrating the flow of data and handling interactions between the Data model
+    participant DC as dataController
+
+
+    participant MW as Validation Middleware
+
+    Note right of MW: Keep in mind the Binding Parser is still being used to help <br>parse the bindings in the dataModel to the values
+
+
+    %% the model is reponsible for defining the structure of the data, handling the data operations(get,set,delete), and managing middleware for data processing
+    participant DM as dataModel
+   
+
+    P->>DC: Request to set a value that has validation
+
+ 
+    DC-->>DM: calls set([[binding,value]],options)
+    Note over MW: The middleware intercepts the set, <br> calling set(transaction, options, next)
+    MW-->DM: for each transaction, sets a shadowModelPath for the binding
+    MW-->DM: checks to see if validations exist using the MiddlewareCheck for current binding 
+    MW-->DM: [does check to see if binding is strong or week]
+    MW->>DM: by calling next.set(nextTransaction, options), this is calling the datamodels .set call
+    DM->>DC: this returns all invalid and valid results
+   
+  
+    
+
+
+    
+```
+
