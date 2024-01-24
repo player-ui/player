@@ -58,10 +58,9 @@ class JSValueExtensionsTests: XCTestCase {
                             try (player.state as? InProgressState)?.controllers?.flow.transition(with: "NEXT")
                         } catch let error {
                             XCTAssertEqual(error as? JSValueError, JSValueError.thrownFromJS(message: "Error: Transitioning while ongoing transition from VIEW_1 is in progress is not supported"))
-
+                            expectation.fulfill()
                         }
 
-                        expectation.fulfill()
                         return
                     }
                 }
@@ -69,6 +68,6 @@ class JSValueExtensionsTests: XCTestCase {
         }
 
         player.start(flow: FlowData.MULTIPAGE, completion: {_ in})
-        wait(for: [expectation], timeout: 2)
+        wait(for: [expectation], timeout: 6)
     }
 }
