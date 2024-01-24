@@ -93,40 +93,27 @@ http_archive(
     url = "https://mirror.bazel.build/bazel_android_tools/android_tools_pkg-0.23.0.tar.gz",
 )
 
-#DAGGER_TAG = "2.42"
-#
-#DAGGER_SHA = "8121789cc443f177005f683bdbed8f36273a5ceb96fb16a9528fd76bb2c35c79"
-#
-#http_archive(
-#    name = "bazel_common_dagger",
-#    sha256 = DAGGER_SHA,
-#    strip_prefix = "dagger-dagger-%s" % DAGGER_TAG,
-#    url = "https://github.com/google/dagger/archive/dagger-%s.zip" % DAGGER_TAG,
-#)
-#
-#grab_remote = "https://github.com/sugarmanz/grab-bazel-common.git"
-#
-#grab_commit = "5326c6ba7a4e39e150c33e123134525473baffb6"
-#
-#git_repository(
-#    name = "grab_bazel_common",
-#    commit = grab_commit,
-#    remote = grab_remote,
-#    shallow_since = "1700536974 -0500",
-#)
+grab_remote = "https://github.com/sugarmanz/grab-bazel-common.git"
 
-#load("@grab_bazel_common//android:repositories.bzl", "bazel_common_dependencies")
-#
-#bazel_common_dependencies()
+grab_commit = "5326c6ba7a4e39e150c33e123134525473baffb6"
 
-#
-#load("@grab_bazel_common//android:initialize.bzl", "bazel_common_initialize")
-#
-##
-#bazel_common_initialize(
-#    patched_android_tools = False,
-#    pinned_maven_install = False,
-#)
+git_repository(
+    name = "grab_bazel_common",
+    commit = grab_commit,
+    remote = grab_remote,
+    shallow_since = "1700536974 -0500",
+)
+
+load("@grab_bazel_common//android:repositories.bzl", "bazel_common_dependencies")
+
+bazel_common_dependencies()
+
+load("@grab_bazel_common//android:initialize.bzl", "bazel_common_initialize")
+
+bazel_common_initialize(
+    patched_android_tools = False,
+    pinned_maven_install = False,
+)
 
 http_archive(
     name = "robolectric",
