@@ -53,7 +53,10 @@ commands:
 
       - run: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      - run: echo -e $GPG_KEY | gpg --import --batch
+      - run: |
+            echo 'export GPG_TTY=$(tty)' >> $BASH_ENV
+            source $BASH_ENV
+            echo -e $GPG_KEY | gpg --import --batch
       - run: |
             source ~/.bashrc
             bundle install
