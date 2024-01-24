@@ -1,3 +1,5 @@
+# Use embedded JDK
+build --repo_env=JAVA_HOME=../bazel_tools/jdk
 test --test_output=errors
 coverage --combined_report=lcov
 
