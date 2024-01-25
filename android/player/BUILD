@@ -5,6 +5,19 @@ load("@io_bazel_rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@junit//junit5-jupiter-starter-bazel:junit5.bzl", "kt_jvm_junit5_test")
 load("@rules_player//kotlin:lint.bzl", "lint")
+load("@grab_bazel_common//tools/databinding:databinding.bzl", "kt_db_android_library")
+
+kt_db_android_library(
+    name = "player-db",
+    srcs = glob(["src/main/java/**/*.kt"]),
+    custom_package = "com.intuit.player.android",
+    manifest = ":src/main/AndroidManifest.xml",
+    resource_files = glob(["src/main/res/**"]),
+    resources = main_resources,
+    tags = ["maven_coordinates=com.intuit.player.android:player:aar:%s" % VERSION],
+    exports = main_exports,
+    deps = main_deps,
+)
 
 kt_android_library(
     name = "player-lib",
@@ -25,15 +38,19 @@ android_library(
     name = "player",
     custom_package = "com.intuit.player.android",
     manifest = ":src/main/AndroidManifest.xml",
-    resource_files = glob(["src/main/res/**"]),
+    # TODO: This is ugly garbage because the databinding processed resources aren't easily locatable
+    resource_files = glob(["src/main/processed-res/**"]),
     tags = ["maven_coordinates=com.intuit.player.android:player:aar:%s" % VERSION],
     visibility = ["//visibility:public"],
     exports = ["player-lib"],
+    deps = main_deps,
 )
 
 distribution(
     name = "player",
+    lib_name = "player-db-databinding",
     maven_coordinates = "com.intuit.player.android:player:%s" % VERSION,
+    #    tags = ["no-javadocs"],
 )
 
 kt_jvm_junit5_test(

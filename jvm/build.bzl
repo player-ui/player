@@ -78,9 +78,11 @@ def distribution(
         *,
         name,
         maven_coordinates,
-        lib_name = None):
+        lib_name = None,
+        **kwargs):
     _distribution(
         name = name,
         maven_coordinates = maven_coordinates,
         lib_name = lib_name,
+        **kwargs
     )

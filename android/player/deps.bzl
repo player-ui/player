@@ -12,9 +12,9 @@ maven = [
     "androidx.lifecycle:lifecycle-viewmodel-ktx:%s" % versions.androidx.lifecycle,
 
     # View binding
-    "androidx.annotation:annotation:%s" % versions.androidx.annotation,
-    "androidx.databinding:databinding-common:%s" % versions.androidx.databinding,
-    "androidx.databinding:databinding-runtime:%s" % versions.androidx.databinding,
+    #    "androidx.annotation:annotation:%s" % versions.androidx.annotation,
+    #    "androidx.databinding:databinding-common:%s" % versions.androidx.databinding,
+    #    "androidx.databinding:databinding-runtime:%s" % versions.androidx.databinding,
 
     # Default fallback
     "androidx.constraintlayout:constraintlayout:%s" % versions.androidx.constraintlayout,

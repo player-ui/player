@@ -4,6 +4,7 @@ java_import(
     name = "j2v8_empty_compile_only",
     jars = [":j2v8_empty-6.1.0.jar"],
     neverlink = True,
+    tags = ["maven:compile-only"],
 )
 
 java_import(
@@ -23,5 +24,6 @@ java_import(
     name = "j2v8_debugger_compile_only",
     jars = [],
     neverlink = True,
+    tags = ["maven:compile-only"],
     deps = ["@maven//:com_github_AlexTrotsenko_j2v8_debugger"],
 )

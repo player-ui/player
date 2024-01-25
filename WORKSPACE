@@ -13,20 +13,35 @@ build_constants()
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
-git_repository(
-    name = "rules_jvm_external",
-    branch = "maven-export-aar",
-    patches = [
-        "//patches:rules_jvm_external.default_public_visibility.patch",
-    ],
-    remote = "https://github.com/sugarmanz/rules_jvm_external",
+local_repository(
+    name = "grab_bazel_common",
+    path = "../../sugarmanz/grab-bazel-common",
 )
 
-git_repository(
-    name = "rules_player",
-    branch = "maven-export-distribution",
-    remote = "https://github.com/player-ui/rules_player",
+local_repository(
+    name = "rules_jvm_external",
+    path = "../../sugarmanz/rules_jvm_external",
 )
+
+local_repository(
+    name = "rules_player",
+    path = "../rules_player",
+)
+
+#git_repository(
+#    name = "rules_jvm_external",
+#    branch = "maven-export-aar",
+#    patches = [
+#        "//patches:rules_jvm_external.default_public_visibility.patch",
+#    ],
+#    remote = "https://github.com/sugarmanz/rules_jvm_external",
+#)
+
+#git_repository(
+#    name = "rules_player",
+#    branch = "maven-export-distribution",
+#    remote = "https://github.com/player-ui/rules_player",
+#)
 
 load("@rules_player//:workspace.bzl", "deps")
 
@@ -87,11 +102,11 @@ junit5()
 ######################
 # Android Setup      #
 ######################
-http_archive(
-    name = "android_tools",
-    sha256 = "ed5290594244c2eeab41f0104519bcef51e27c699ff4b379fcbd25215270513e",
-    url = "https://mirror.bazel.build/bazel_android_tools/android_tools_pkg-0.23.0.tar.gz",
-)
+#http_archive(
+#    name = "android_tools",
+#    sha256 = "ed5290594244c2eeab41f0104519bcef51e27c699ff4b379fcbd25215270513e",
+#    url = "https://mirror.bazel.build/bazel_android_tools/android_tools_pkg-0.23.0.tar.gz",
+#)
 
 grab_remote = "https://github.com/sugarmanz/grab-bazel-common.git"
 
@@ -111,7 +126,7 @@ bazel_common_dependencies()
 load("@grab_bazel_common//android:initialize.bzl", "bazel_common_initialize")
 
 bazel_common_initialize(
-    patched_android_tools = False,
+    patched_android_tools = True,
     pinned_maven_install = False,
 )
 
@@ -171,10 +186,10 @@ android_ndk_repository(name = "androidndk")
 
 register_toolchains("@androidndk//:all")
 
-bind(
-    name = "databinding_annotation_processor",
-    actual = "//android:compiler_annotation_processor",
-)
+#bind(
+#    name = "databinding_annotation_processor",
+#    actual = "//android:compiler_annotation_processor",
+#)
 
 ######################
 # Maven Dependencies #
