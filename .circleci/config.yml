@@ -53,7 +53,9 @@ commands:
 
       - run: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      - run: echo -e $GPG_KEY | gpg --import --batch
+      - run: |
+            echo -e $GPG_KEY | gpg --import --batch
+            echo -e "pinentry-mode loopback\npassphrase $DEPLOY_MAVEN_GPG_PASSPHRASE" > ~/.gnupg/gpg.conf
       - run: |
             source ~/.bashrc
             bundle install

@@ -1,7 +1,6 @@
 package com.intuit.player.jvm.j2v8.bridge.runtime
 
 import com.alexii.j2v8debugger.ScriptSourceProvider
-import com.alexii.j2v8debugger.V8Debugger
 import com.eclipsesource.v8.V8
 import com.eclipsesource.v8.V8Array
 import com.eclipsesource.v8.V8Object
@@ -9,6 +8,7 @@ import com.eclipsesource.v8.V8Value
 import com.eclipsesource.v8.utils.MemoryManager
 import com.intuit.player.jvm.core.bridge.Invokable
 import com.intuit.player.jvm.core.bridge.Node
+import com.intuit.player.jvm.core.bridge.PlayerRuntimeException
 import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeContainer
 import com.intuit.player.jvm.core.bridge.runtime.PlayerRuntimeFactory
@@ -100,7 +100,11 @@ internal class V8Runtime(override val config: J2V8RuntimeConfig) : Runtime<V8Val
             v8 = config.runtime?.apply {
                 locker.acquire()
             } ?: if (config.debuggable) {
-                V8Debugger.createDebuggableV8Runtime(config.executorService, "debuggableJ2v8", true)!!.await()
+                try {
+                    com.alexii.j2v8debugger.V8Debugger.createDebuggableV8Runtime(config.executorService, "debuggableJ2v8", true).await()
+                } catch (e: ClassNotFoundException) {
+                    throw PlayerRuntimeException("V8Debugger not found. Ensure 'com.github.AlexTrotsenko:j2v8-debugger:0.2.3' is included on your classpath.", e)
+                }
             } else {
                 V8.createV8Runtime()
             }
