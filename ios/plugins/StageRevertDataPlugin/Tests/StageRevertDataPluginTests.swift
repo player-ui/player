@@ -61,6 +61,7 @@ class StageRevertDataPluginTests: XCTestCase {
       }
     }
     """
+    
     func testStageRevertDataPluginStagesData() {
         let expected = XCTestExpectation(description: "data did not change")
         let player = HeadlessPlayerImpl(plugins: [PrintLoggerPlugin(level: .trace), StageRevertDataPlugin()])
@@ -69,8 +70,6 @@ class StageRevertDataPluginTests: XCTestCase {
             viewController.hooks.view.tap { view in
                 view.hooks.onUpdate.tap { value in
                     guard view.id == "view-3" else {
-                        (player.state as? InProgressState)?.controllers?.data.set(transaction: ["name": "Test"])
-                        (player.state as? InProgressState)?.controllers?.flow.transition(with: "clear")
                         return
                     }
 
@@ -81,6 +80,18 @@ class StageRevertDataPluginTests: XCTestCase {
                 }
             }
         }
+
+        player.hooks?.flowController.tap({ flowController in
+            flowController.hooks.flow.tap { flow in
+                flow.hooks.afterTransition.tap { flowInstance in
+                    guard flowInstance.currentState?.name == "VIEW_3" else {
+                        (player.state as? InProgressState)?.controllers?.data.set(transaction: ["name": "Test"])
+                        flowController.transition(with: "clear")
+                        return
+                    }
+                }
+            }
+        })
 
         player.start(flow: json, completion: {_ in})
         wait(for: [expected], timeout: 1)
@@ -94,8 +105,6 @@ class StageRevertDataPluginTests: XCTestCase {
             viewController.hooks.view.tap { view in
                 view.hooks.onUpdate.tap { value in
                     guard view.id == "view-2" else {
-                        (player.state as? InProgressState)?.controllers?.data.set(transaction: ["name": "Test"])
-                        (player.state as? InProgressState)?.controllers?.flow.transition(with: "commit")
                         return
                     }
 
@@ -106,6 +115,18 @@ class StageRevertDataPluginTests: XCTestCase {
                 }
             }
         }
+
+        player.hooks?.flowController.tap({ flowController in
+            flowController.hooks.flow.tap { flow in
+                flow.hooks.afterTransition.tap { flowInstance in
+                    guard flowInstance.currentState?.name == "VIEW_2" else {
+                        (player.state as? InProgressState)?.controllers?.data.set(transaction: ["name": "Test"])
+                        flowController.transition(with: "commit")
+                        return
+                    }
+                }
+            }
+        })
 
         player.start(flow: json, completion: {_ in})
         wait(for: [expected], timeout: 1)
