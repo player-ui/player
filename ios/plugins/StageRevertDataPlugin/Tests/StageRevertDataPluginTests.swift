@@ -86,7 +86,12 @@ class StageRevertDataPluginTests: XCTestCase {
                 flow.hooks.afterTransition.tap { flowInstance in
                     guard flowInstance.currentState?.name == "VIEW_3" else {
                         (player.state as? InProgressState)?.controllers?.data.set(transaction: ["name": "Test"])
-                        flowController.transition(with: "clear")
+                        do {
+                            try flowController.transition(with: "clear")
+                        } catch {
+                            XCTFail("Transition with 'clear' failed")
+                        }
+                        
                         return
                     }
                 }
@@ -121,7 +126,12 @@ class StageRevertDataPluginTests: XCTestCase {
                 flow.hooks.afterTransition.tap { flowInstance in
                     guard flowInstance.currentState?.name == "VIEW_2" else {
                         (player.state as? InProgressState)?.controllers?.data.set(transaction: ["name": "Test"])
-                        flowController.transition(with: "commit")
+                        do {
+                            try flowController.transition(with: "commit")
+                        } catch {
+                            XCTFail("Transition with 'commit' failed")
+                        }
+
                         return
                     }
                 }
