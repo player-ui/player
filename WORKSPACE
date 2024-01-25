@@ -13,35 +13,20 @@ build_constants()
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
-local_repository(
-    name = "grab_bazel_common",
-    path = "../../sugarmanz/grab-bazel-common",
-)
-
-local_repository(
+git_repository(
     name = "rules_jvm_external",
-    path = "../../sugarmanz/rules_jvm_external",
+    branch = "maven-export-aar",
+    patches = [
+        "//patches:rules_jvm_external.default_public_visibility.patch",
+    ],
+    remote = "https://github.com/sugarmanz/rules_jvm_external",
 )
 
-local_repository(
+git_repository(
     name = "rules_player",
-    path = "../rules_player",
+    branch = "maven-export-distribution",
+    remote = "https://github.com/player-ui/rules_player",
 )
-
-#git_repository(
-#    name = "rules_jvm_external",
-#    branch = "maven-export-aar",
-#    patches = [
-#        "//patches:rules_jvm_external.default_public_visibility.patch",
-#    ],
-#    remote = "https://github.com/sugarmanz/rules_jvm_external",
-#)
-
-#git_repository(
-#    name = "rules_player",
-#    branch = "maven-export-distribution",
-#    remote = "https://github.com/player-ui/rules_player",
-#)
 
 load("@rules_player//:workspace.bzl", "deps")
 
@@ -102,21 +87,15 @@ junit5()
 ######################
 # Android Setup      #
 ######################
-#http_archive(
-#    name = "android_tools",
-#    sha256 = "ed5290594244c2eeab41f0104519bcef51e27c699ff4b379fcbd25215270513e",
-#    url = "https://mirror.bazel.build/bazel_android_tools/android_tools_pkg-0.23.0.tar.gz",
-#)
-
 grab_remote = "https://github.com/sugarmanz/grab-bazel-common.git"
 
-grab_commit = "5326c6ba7a4e39e150c33e123134525473baffb6"
+grab_commit = "35317b3d1c0da07b42af6e6a2137ebdec0ffe400"
 
 git_repository(
     name = "grab_bazel_common",
     commit = grab_commit,
     remote = grab_remote,
-    shallow_since = "1700536974 -0500",
+    shallow_since = "1706157787 -0500",
 )
 
 load("@grab_bazel_common//android:repositories.bzl", "bazel_common_dependencies")
@@ -126,7 +105,6 @@ bazel_common_dependencies()
 load("@grab_bazel_common//android:initialize.bzl", "bazel_common_initialize")
 
 bazel_common_initialize(
-    patched_android_tools = True,
     pinned_maven_install = False,
 )
 
@@ -169,12 +147,6 @@ overridden_targets = {
 
 load("@bazel_tools//tools/build_defs/repo:maven_rules.bzl", "maven_aar")
 
-# Because J2V8 is published as type `aar.asc`
-maven_aar(
-    name = "android_j2v8",
-    artifact = "com.eclipsesource.j2v8:j2v8:6.1.0",
-)
-
 # Because eyes androidx components is published as type `pom`
 maven_aar(
     name = "androidx_eyes_components",
@@ -185,11 +157,6 @@ maven_aar(
 android_ndk_repository(name = "androidndk")
 
 register_toolchains("@androidndk//:all")
-
-#bind(
-#    name = "databinding_annotation_processor",
-#    actual = "//android:compiler_annotation_processor",
-#)
 
 ######################
 # Maven Dependencies #

@@ -8,55 +8,28 @@ load("@rules_player//kotlin:lint.bzl", "lint")
 load("@grab_bazel_common//tools/databinding:databinding.bzl", "kt_db_android_library")
 
 kt_db_android_library(
-    name = "player-db",
-    srcs = glob(["src/main/java/**/*.kt"]),
-    custom_package = "com.intuit.player.android",
-    manifest = ":src/main/AndroidManifest.xml",
-    resource_files = glob(["src/main/res/**"]),
-    resources = main_resources,
-    tags = ["maven_coordinates=com.intuit.player.android:player:aar:%s" % VERSION],
-    exports = main_exports,
-    deps = main_deps,
-)
-
-kt_android_library(
-    name = "player-lib",
-    srcs = glob(["src/main/java/**/*.kt"]),
-    custom_package = "com.intuit.player.android",
-    enable_data_binding = True,
-    manifest = ":src/main/AndroidManifest.xml",
-    resource_files = glob(["src/main/res/**"]),
-    resources = main_resources,
-    exports = main_exports,
-    deps = main_deps,
-)
-
-# TODO: This is currently needed to ensure the AAR is created for the primary output
-#       Additionally, we need to ensure the maven_coordinates tag only sticks to outer
-#       artifact to capture the transitive closure.
-android_library(
     name = "player",
+    srcs = glob(["src/main/java/**/*.kt"]),
     custom_package = "com.intuit.player.android",
     manifest = ":src/main/AndroidManifest.xml",
-    # TODO: This is ugly garbage because the databinding processed resources aren't easily locatable
-    resource_files = glob(["src/main/processed-res/**"]),
+    resource_files = glob(["src/main/res/**"]),
+    resources = main_resources,
     tags = ["maven_coordinates=com.intuit.player.android:player:aar:%s" % VERSION],
     visibility = ["//visibility:public"],
-    exports = ["player-lib"],
+    exports = main_exports,
     deps = main_deps,
 )
 
 distribution(
     name = "player",
-    lib_name = "player-db-databinding",
+    lib_name = "player-databinding",
     maven_coordinates = "com.intuit.player.android:player:%s" % VERSION,
-    #    tags = ["no-javadocs"],
 )
 
 kt_jvm_junit5_test(
     name = "player-tests",
     srcs = glob(["src/test/java/**"]),
-    associates = [":player-lib_kt"],
+    associates = [":player-kotlin"],
     kotlinc_opts = "//jvm:test_options",
     test_package = "com.intuit.player.android",
     deps = [":player"] + test_deps,
