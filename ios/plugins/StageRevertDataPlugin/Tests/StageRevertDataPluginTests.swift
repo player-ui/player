@@ -61,6 +61,7 @@ class StageRevertDataPluginTests: XCTestCase {
       }
     }
     """
+    
     func testStageRevertDataPluginStagesData() {
         let expected = XCTestExpectation(description: "data did not change")
         let player = HeadlessPlayerImpl(plugins: [PrintLoggerPlugin(level: .trace), StageRevertDataPlugin()])
@@ -90,6 +91,7 @@ class StageRevertDataPluginTests: XCTestCase {
                         } catch {
                             XCTFail("Transition with 'clear' failed")
                         }
+                        
                         return
                     }
                 }
@@ -129,6 +131,7 @@ class StageRevertDataPluginTests: XCTestCase {
                         } catch {
                             XCTFail("Transition with 'commit' failed")
                         }
+
                         return
                     }
                 }

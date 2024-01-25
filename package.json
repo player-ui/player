@@ -86,7 +86,6 @@
     "arr-flatten": "^1.1.0",
     "assert": "^2.0.0",
     "auto": "^11.0.4",
-    "babel-plugin-preval": "^5.0.0",
     "bowser": "^2.11.0",
     "c8": "^7.10.0",
     "case-sensitive-paths-webpack-plugin": "^2.3.0",
@@ -161,7 +160,7 @@
     "react-json-reconciler": "^2.0.0",
     "react-merge-refs": "^1.1.0",
     "react-redux": "^7.2.6",
-    "react-syntax-highlighter": "^15.4.5",
+    "react-syntax-highlighter": "^15.5.0",
     "redux": "^4.1.2",
     "redux-state-sync": "^3.1.4",
     "rehype-autolink-headings": "^6.1.1",
@@ -206,6 +205,7 @@
     "zip-folder": "^1.0.0"
   },
   "volta": {
-    "node": "16.14.0"
+    "node": "16.15.0",
+    "yarn": "1.22.19"
   }
 }

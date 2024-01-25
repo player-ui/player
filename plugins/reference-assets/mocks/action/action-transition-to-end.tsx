@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import React from 'react';
 import { Action, Collection } from '@player-ui/reference-assets-components';
 import type { DSLFlow } from '@player-tools/dsl';
