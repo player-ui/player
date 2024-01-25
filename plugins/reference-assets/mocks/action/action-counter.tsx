@@ -17,12 +17,12 @@ const data = makeBindingsForObject(schema);
 
 const view1 = (
   <Action exp={e`${data.count} = ${data.count} + 1`}>
-    <Action.Label>Count: {data.count}</Action.Label>
+    <Action.Label>Clicked {data.count} times</Action.Label>
   </Action>
 );
 
 const flow: DSLFlow = {
-  id: "action-basic",
+  id: "action-counter",
   views: [view1],
   data: {
     count: 0,

@@ -172,7 +172,6 @@ export const parse: Parser = (path) => {
   }
 
   if (ast.errors.length > 0) {
-    // console.log(ast.errors);
     return {
       status: false,
       error: ast.errors[0].message,

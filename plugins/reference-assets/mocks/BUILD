@@ -28,9 +28,14 @@ compile_dsl(
 #     visibility = ["//visibility:public"],
 # )
 
+filegroup(
+    name = "mock-files",
+    srcs = glob(["**/*.json"]) + [":all_flows"],
+)
+
 js_library(
     name = "mocks-js-library",
-    srcs = glob(["**/*.json"]) + [":all_flows"],
+    srcs = [":mock-files"],
 )
 
 npm_package(

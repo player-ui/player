@@ -64,12 +64,6 @@ export interface ReactPlayerOptions {
 
   /** A set of plugins to apply to this player */
   plugins?: Array<ReactPlayerPlugin>;
-
-  /**
-   * If the underlying reactPlayer.Component should use `React.Suspense` to trigger a loading state while waiting for content or content updates.
-   * It requires that a `React.Suspense` component handler be somewhere in the `reactPlayer.Component` hierarchy.
-   */
-  suspend?: boolean;
 }
 
 export type ReactPlayerComponentProps = Record<string, unknown>;
@@ -106,12 +100,6 @@ export class ReactPlayer {
 
   constructor(options?: ReactPlayerOptions) {
     this.options = options ?? {};
-
-    // Default the suspend option to `true` unless explicitly unset
-    // Remove the suspend option in the next major
-    if (!("suspend" in this.options)) {
-      this.options.suspend = true;
-    }
 
     const Devtools = _window?.__PLAYER_DEVTOOLS_PLUGIN;
     const onUpdatePlugin = new OnUpdatePlugin(
@@ -214,10 +202,7 @@ export class ReactPlayer {
     /** the component to use to render the player */
     const WebPlayerComponent = () => {
       const view = useSubscribedState<View>(this.viewUpdateSubscription);
-
-      if (this.options.suspend) {
-        this.viewUpdateSubscription.suspend();
-      }
+      this.viewUpdateSubscription.suspend();
 
       return (
         <AssetContext.Provider
@@ -238,9 +223,7 @@ export class ReactPlayer {
    * If the `suspense` option is set, this will suspend while an update is pending, otherwise nothing will be rendered.
    */
   public setWaitForNextViewUpdate() {
-    // If the `suspend` option isn't set, then we need to reset immediately otherwise we risk flashing the old view while the new one is processing
-    const shouldCallResetHook =
-      this.options.suspend && this.hooks.onBeforeViewReset.isUsed();
+    const shouldCallResetHook = this.hooks.onBeforeViewReset.isUsed();
 
     return this.viewUpdateSubscription.reset(
       shouldCallResetHook ? this.hooks.onBeforeViewReset.call() : undefined,
@@ -251,9 +234,7 @@ export class ReactPlayer {
     this.setWaitForNextViewUpdate();
 
     return this.player.start(flow).finally(async () => {
-      if (this.options?.suspend) {
-        await this.setWaitForNextViewUpdate();
-      }
+      await this.setWaitForNextViewUpdate();
     });
   }
 }

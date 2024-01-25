@@ -2,8 +2,8 @@ import type { StorybookConfig } from "@storybook/react-webpack5";
 import path from "path";
 
 const config: StorybookConfig = {
-  stories: ["../src/**/*.stories.@(js|mdx|tsx|ts)"],
-  addons: ["@storybook/addon-docs", "@player-ui/storybook"],
+  stories: ["../src/**/*.@(stories.@(js|tsx|ts))", "../src/**/*.mdx"],
+  addons: ["@storybook/addon-docs", "@player-ui/storybook-addon-player"],
   typescript: {
     reactDocgen: false,
   },

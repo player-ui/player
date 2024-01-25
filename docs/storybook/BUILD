@@ -13,8 +13,8 @@ deps = [
     ":node_modules/@player-ui/reference-assets-plugin-components",
     ":node_modules/@player-ui/data-change-listener-plugin",
     ":node_modules/@player-ui/computed-properties-plugin",
-    ":node_modules/@player-ui/storybook",
     ":node_modules/@player-ui/react",
+    ":node_modules/@player-ui/storybook-addon-player",
     "//:node_modules/@babel/preset-typescript",
     "//:node_modules/@babel/preset-env",
     "//:node_modules/@storybook/react-webpack5",
@@ -50,6 +50,9 @@ storybook_bin.storybook_binary(
     name = "start",
     args = [
         "dev",
+        "--no-open",
+        "--port",
+        "6006",
     ],
     chdir = "docs/storybook",
     data = glob(include = [
@@ -57,7 +60,7 @@ storybook_bin.storybook_binary(
         ".storybook/*",
     ]) + deps,
     tags = [
-        "ibazel_notify_changes",
+        # "ibazel_notify_changes",
     ],
     visibility = ["//visibility:public"],
 )

@@ -1,12 +1,9 @@
-import { PlayerDecorator } from "@player-ui/storybook";
+// import { PlayerDecorator } from "@player-ui/storybook-addon-player";
 import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin-react";
 import { CommonTypesPlugin } from "@player-ui/common-types-plugin";
 import { DataChangeListenerPlugin } from "@player-ui/data-change-listener-plugin";
 import { ComputedPropertiesPlugin } from "@player-ui/computed-properties-plugin";
-import * as dslRefComponents from "@player-ui/reference-assets-components";
-
-import React from "react";
-window.React = React;
+import * as dslRefComponents from "@player-ui/reference-assets-plugin-components";
 
 const reactPlayerPlugins = [
   new ReferenceAssetsPlugin(),
@@ -19,7 +16,7 @@ export const parameters = {
   reactPlayerPlugins,
   dslEditor: {
     additionalModules: {
-      "@player-ui/reference-assets-components": dslRefComponents,
+      "@player-ui/reference-assets-plugin-components": dslRefComponents,
     },
   },
   options: {
@@ -28,5 +25,3 @@ export const parameters = {
     },
   },
 };
-
-export const decorators = [PlayerDecorator];
