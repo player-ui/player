@@ -1,29 +1,22 @@
 import React from "react";
-import { Action } from "@player-ui/reference-assets-plugin-components";
+import { Action, Info } from "@player-ui/reference-assets-plugin-components";
 import type { DSLFlow } from "@player-tools/dsl";
-import { expression as e, makeBindingsForObject } from "@player-tools/dsl";
-
-const schema = {
-  count: {
-    type: "NumberType",
-  },
-};
-
-const data = makeBindingsForObject(schema);
 
 const view1 = (
-  <Action exp={e`${data.count} = ${data.count} + 1`}>
-    <Action.Label>Count: {data.count}</Action.Label>
-  </Action>
+  <Info id="info-view">
+    <Info.Title>View Title</Info.Title>
+    <Info.Actions>
+      <Action value="Next">
+        <Action.Label>Continue</Action.Label>
+      </Action>
+    </Info.Actions>
+    <Info.Footer>Footer text</Info.Footer>
+  </Info>
 );
 
 const flow: DSLFlow = {
-  id: "action-basic",
+  id: "info-footer",
   views: [view1],
-  data: {
-    count: 0,
-  },
-  schema,
   navigation: {
     BEGIN: "FLOW_1",
     FLOW_1: {

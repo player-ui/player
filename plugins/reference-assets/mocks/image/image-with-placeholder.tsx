@@ -1,29 +1,19 @@
 import React from "react";
-import { Action } from "@player-ui/reference-assets-plugin-components";
+import { Image } from "@player-ui/reference-assets-plugin-components";
 import type { DSLFlow } from "@player-tools/dsl";
-import { expression as e, makeBindingsForObject } from "@player-tools/dsl";
-
-const schema = {
-  count: {
-    type: "NumberType",
-  },
-};
-
-const data = makeBindingsForObject(schema);
 
 const view1 = (
-  <Action exp={e`${data.count} = ${data.count} + 1`}>
-    <Action.Label>Count: {data.count}</Action.Label>
-  </Action>
+  <Image
+    metaData={{
+      ref: "https://player-ui.github.io/latest/logo/logo-light-large.png",
+    }}
+    placeholder="This is placeholder text for an image"
+  />
 );
 
 const flow: DSLFlow = {
-  id: "action-basic",
+  id: "image-with-placeholder",
   views: [view1],
-  data: {
-    count: 0,
-  },
-  schema,
   navigation: {
     BEGIN: "FLOW_1",
     FLOW_1: {

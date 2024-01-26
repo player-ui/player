@@ -10,9 +10,18 @@ create_base_dsl_config(
     plugins = [],
 )
 
+DSL_SRCS = glob([
+    "action/*.tsx",
+    "collection/*.tsx",
+    "image/*.tsx",
+    "info/*.tsx",
+    "input/*.tsx",
+    "text/*.tsx",
+])
+
 compile_dsl(
     name = "all_flows",
-    srcs = glob(["action/*.tsx"]),
+    srcs = DSL_SRCS,
     config = ":dsl_config",
     data = [
         ":node_modules/@player-ui/reference-assets-plugin-components",
@@ -40,7 +49,7 @@ js_library(
 
 npm_package(
     name = "mocks",
-    srcs = [":mocks-js-library"] + glob(["action/*.tsx"]),
+    srcs = [":mocks-js-library"] + DSL_SRCS,
     visibility = ["//visibility:public"],
 )
 
