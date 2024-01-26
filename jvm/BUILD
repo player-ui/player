@@ -3,6 +3,10 @@ load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@io_bazel_rules_kotlin//kotlin:lint.bzl", "ktlint_config")
 load("//jvm/dependencies:versions.bzl", "versions")
 
+exports_files([
+    "pom.tpl",
+])
+
 kt_compiler_plugin(
     name = "serialization_plugin",
     compile_phase = True,
