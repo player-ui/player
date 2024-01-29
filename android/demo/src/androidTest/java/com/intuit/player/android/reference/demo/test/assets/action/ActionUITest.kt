@@ -25,8 +25,6 @@ class ActionUITest : AssetUITest("reference-assets") {
                 .perform(click())
 
             waitForViewInRoot(withText("Count: ${it + 1}"))
-
-            eyes?.checkPlayer("click $it")
         }
 
         currentState.shouldBePlayerState<InProgressState> {

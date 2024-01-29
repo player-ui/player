@@ -145,15 +145,6 @@ overridden_targets = {
     "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm": "@//android/demo:kotlinx_coroutines_core_jvm_fixed",
 }
 
-load("@bazel_tools//tools/build_defs/repo:maven_rules.bzl", "maven_aar")
-
-# Because eyes androidx components is published as type `pom`
-maven_aar(
-    name = "androidx_eyes_components",
-    artifact = "com.applitools:eyes-android-components-androidx:4.7.6",
-    settings = "//android/demo:androidsettings.xml",
-)
-
 android_ndk_repository(name = "androidndk")
 
 register_toolchains("@androidndk//:all")

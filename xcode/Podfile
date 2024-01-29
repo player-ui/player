@@ -38,7 +38,6 @@ target 'PlayerUI_Example' do
     inherit! :search_paths
   end
   target 'PlayerUI_ExampleUITests' do
-    pod 'EyesXCUI'
   end
 end
 

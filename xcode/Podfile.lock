@@ -1,5 +1,4 @@
 PODS:
-  - EyesXCUI (8.8.8)
   - PlayerUI (0.0.1-placeholder):
     - PlayerUI/Main (= 0.0.1-placeholder)
   - PlayerUI/BaseBeaconPlugin (0.0.1-placeholder):
@@ -83,7 +82,6 @@ PODS:
     - PlayerUI/InternalUnitTestUtilities
     - ViewInspector (= 0.9.0)
   - PlayerUI/XCUITests (0.0.1-placeholder):
-    - EyesXCUI (= 8.8.8)
     - PlayerUI/Demo
     - PlayerUI/InternalUnitTestUtilities
   - SwiftHooks (0.1.0)
@@ -91,7 +89,6 @@ PODS:
   - ViewInspector (0.9.0)
 
 DEPENDENCIES:
-  - EyesXCUI
   - PlayerUI (from `../`)
   - PlayerUI/BeaconPlugin (from `../`)
   - PlayerUI/CheckPathPlugin (from `../`)
@@ -123,7 +120,6 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - EyesXCUI
     - SwiftHooks
     - SwiftLint
     - ViewInspector
@@ -133,12 +129,11 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  EyesXCUI: bbb10a48b8bd1a15d541f2bc1f4d18f4db654ef1
-  PlayerUI: 904ce444be3bf2cc654a422c616d4612f5b6649d
+  PlayerUI: 743ca0b222c755099830a02a6259b614e784033a
   SwiftHooks: 3ecc67c23da335d44914a8a74bd1dd23c7c149e6
   SwiftLint: 4fa9579c63416865179bc416f0a92d55f009600d
   ViewInspector: 53313c757eddc5c4842bc7943a66821a68d02d3e
 
-PODFILE CHECKSUM: 686834ace47c0cba292c80557dcd114a09d0f180
+PODFILE CHECKSUM: cf0040a7b6788d084b630060f551e6aa7adeb659
 
 COCOAPODS: 1.11.3

@@ -7,41 +7,38 @@ class SwiftUIPendingTransactionPluginUITests: BaseTestCase {
     }
 
     func testInputAssetPendingTransaction() {
-        withEyes("input asset pending transaction") { check in
-            check("Beacons Alert")
+        openFlow("input asset pending transaction")
 
-            app.buttons["OK"].firstMatch.tap()
-            check("Page Loaded")
+        waitFor(app.alerts.buttons["OK"].firstMatch)
 
-            var enteredValue = "-1"
+        app.alerts.buttons["OK"].firstMatch.tap()
 
-            let input = app.textFields["input-required"]
-            waitFor(input)
+        var enteredValue = "-1"
 
-            check("Page Load")
+        let input = app.textFields["input-required"]
+        waitFor(input)
 
-            input.tap()
-            input.typeText(enteredValue)
+        input.tap()
+        input.typeText(enteredValue)
 
-            let button = app.buttons["action-1"].firstMatch
+        let button = app.buttons["action-1"].firstMatch
 
-            button.tap()
-            XCTAssertTrue(app.staticTexts["Must be at least 1"].firstMatch.exists)
+        button.tap()
+        XCTAssertTrue(app.staticTexts["Must be at least 1"].firstMatch.exists)
 
-            input.typeText(XCUIKeyboardKey.delete.rawValue)
-            input.typeText(XCUIKeyboardKey.delete.rawValue)
+        input.typeText(XCUIKeyboardKey.delete.rawValue)
+        input.typeText(XCUIKeyboardKey.delete.rawValue)
 
-            enteredValue = "1"
+        enteredValue = "1"
 
-            input.tap()
-            input.typeText(enteredValue)
+        input.tap()
+        input.typeText(enteredValue)
 
-            button.tap()
+        button.tap()
 
-            XCTAssertTrue(app.alerts["Info"].staticTexts.element(boundBy: 1).label.contains("view-2"))
+        XCTAssertTrue(app.alerts["Info"].staticTexts.element(boundBy: 1).label.contains("view-2"))
 
-            app.buttons["OK"].firstMatch.tap()
-            XCTAssertTrue(app.staticTexts["You made it!"].firstMatch.exists)
-        }
+        app.buttons["OK"].firstMatch.tap()
+        XCTAssertTrue(app.staticTexts["You made it!"].firstMatch.exists)
     }
 }

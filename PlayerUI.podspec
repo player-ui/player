@@ -151,7 +151,6 @@ and display it as a SwiftUI view comprised of registered assets.
     tests.app_host_name = 'PlayerUI/Demo'
     tests.dependency 'PlayerUI/InternalUnitTestUtilities'
     tests.dependency 'PlayerUI/Demo'
-    tests.dependency 'EyesXCUI', '8.8.8'
     tests.source_files = [
       'ios/packages/*/UITests/**/*',
       'ios/plugins/*/UITests/**/*'

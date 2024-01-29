@@ -7,12 +7,9 @@ class ExternalActionUITests: BaseTestCase {
     }
 
     func testExternalAction() {
-        withEyes("external-action external-action") { check in
-            let alert = app.alerts["FlowCompleted"]
-            waitFor(alert)
-            XCTAssertTrue(alert.staticTexts.element(boundBy: 1).label.contains("FWD"))
-
-            check("External action alert")
-        }
+        openFlow("external-action external-action")
+        let alert = app.alerts["FlowCompleted"]
+        waitFor(alert)
+        XCTAssertTrue(alert.staticTexts.element(boundBy: 1).label.contains("FWD"))
     }
 }
