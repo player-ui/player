@@ -7,6 +7,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.View.OnAttachStateChangeListener
 import android.view.ViewGroup
+import androidx.core.view.children
 import com.intuit.player.android.AssetContext
 import com.intuit.player.android.R
 import com.intuit.player.jvm.core.player.PlayerException
@@ -81,7 +82,18 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
 
         /** Suspend until there is a hydrated view, or returns null if the provided [scope] is cancelled */
         public suspend fun awaitView(): View? = try {
-            hydratedView.await()
+            suspend fun ViewGroup.awaitAsyncChildren() {
+                children.forEach {
+                    when (it) {
+                        is AsyncViewStub -> it.awaitView()
+                        is ViewGroup -> it.awaitAsyncChildren()
+                    }
+                }
+            }
+
+            hydratedView.await().also { parent ->
+                (parent as? ViewGroup)?.awaitAsyncChildren()
+            }
         } catch (e: CancellationException) {
             // if it was the calling scope that is cancelled, this will re-raise
             coroutineContext.ensureActive()

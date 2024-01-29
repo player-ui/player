@@ -53,6 +53,7 @@ def kt_player_module(
         version = VERSION,
         deploy_env = deploy_env,
         excluded_workspaces = excluded_workspaces,
+        pom_template = "//jvm:pom.tpl",
         module_name = module_name,
         main_opts = "//jvm:main_options",
         main_srcs = main_srcs,
@@ -79,10 +80,12 @@ def distribution(
         name,
         maven_coordinates,
         lib_name = None,
+        pom_template = "//jvm:pom.tpl",
         **kwargs):
     _distribution(
         name = name,
         maven_coordinates = maven_coordinates,
         lib_name = lib_name,
+        pom_template = pom_template,
         **kwargs
     )
