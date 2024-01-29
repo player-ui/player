@@ -59,8 +59,12 @@ public class CompletedState(override val node: Node) :
 
     public val data: JsonElement by NodeSerializableField(JsonElement.serializer()) { JsonNull }
 
+    internal val controllers: ControllerState by NodeSerializableField(ControllerState.serializer())
+
     // TODO: Completed state dataModel change needs rectification here
-    public val dataModel: DataModelWithParser by NodeSerializableField(DataModelWithParser.serializer())
+    public val dataModel: DataModelWithParser by lazy {
+        DataModelWithParser(controllers.data.node)
+    }
 
     internal object Serializer : NodeWrapperSerializer<CompletedState>(::CompletedState, COMPLETED.value)
 }

@@ -59,7 +59,13 @@ export default class SwitchPlugin implements ViewPlugin {
           const cases: Node.SwitchCase[] = [];
 
           switchContent.forEach(
-            (switchCase: { [x: string]: any; case: any }) => {
+            (switchCase: {
+              [x: string]: any;
+              /**
+               *
+               */
+              case: any;
+            }) => {
               const { case: switchCaseExpr, ...switchBody } = switchCase;
               const value = parser.parseObject(
                 switchBody,

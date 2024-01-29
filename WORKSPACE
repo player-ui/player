@@ -6,14 +6,26 @@ workspace(
     },
 )
 
+load("//:build_constants.bzl", "build_constants")
+
+build_constants()
+
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
-http_archive(
+git_repository(
+    name = "rules_jvm_external",
+    branch = "maven-export-aar",
+    patches = [
+        "//patches:rules_jvm_external.default_public_visibility.patch",
+    ],
+    remote = "https://github.com/sugarmanz/rules_jvm_external",
+)
+
+git_repository(
     name = "rules_player",
-    sha256 = "c015a09ce2a5f999a89473cb9f71346c6831e27830a228ebe8f1ba25e83b77b2",
-    strip_prefix = "rules_player-0.10.4",
-    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.10.4.tar.gz"],
+    branch = "maven-export-distribution",
+    remote = "https://github.com/player-ui/rules_player",
 )
 
 load("@rules_player//:workspace.bzl", "deps")
@@ -75,17 +87,15 @@ junit5()
 ######################
 # Android Setup      #
 ######################
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
-
 grab_remote = "https://github.com/sugarmanz/grab-bazel-common.git"
 
-grab_commit = "5326c6ba7a4e39e150c33e123134525473baffb6"
+grab_commit = "35317b3d1c0da07b42af6e6a2137ebdec0ffe400"
 
 git_repository(
     name = "grab_bazel_common",
     commit = grab_commit,
     remote = grab_remote,
-    shallow_since = "1700536974 -0500",
+    shallow_since = "1706157787 -0500",
 )
 
 load("@grab_bazel_common//android:repositories.bzl", "bazel_common_dependencies")
@@ -137,12 +147,6 @@ overridden_targets = {
 
 load("@bazel_tools//tools/build_defs/repo:maven_rules.bzl", "maven_aar")
 
-# Because J2V8 is published as type `aar.asc`
-maven_aar(
-    name = "android_j2v8",
-    artifact = "com.eclipsesource.j2v8:j2v8:6.1.0",
-)
-
 # Because eyes androidx components is published as type `pom`
 maven_aar(
     name = "androidx_eyes_components",
@@ -157,6 +161,14 @@ register_toolchains("@androidndk//:all")
 ######################
 # Maven Dependencies #
 ######################
+load("@rules_jvm_external//:repositories.bzl", "rules_jvm_external_deps")
+
+rules_jvm_external_deps()
+
+load("@rules_jvm_external//:setup.bzl", "rules_jvm_external_setup")
+
+rules_jvm_external_setup()
+
 load("//jvm/dependencies:deps.bzl", artifacts = "maven")
 load("@rules_jvm_external//:defs.bzl", "maven_install")
 
@@ -183,7 +195,3 @@ maven_install(
         "https://repo1.maven.org/maven2",
     ],
 )
-
-load("@vaticle_bazel_distribution//common:rules.bzl", "workspace_refs")
-
-workspace_refs(name = "plugin_workspace_refs")
