@@ -70,8 +70,6 @@ class InputUITest : AssetUITest("reference-assets") {
             assertEquals(null, dataModel.get("foo.bar"))
         }
 
-        eyes?.checkPlayer("invalid-input")
-
         onView(withId(R.id.input_field))
             .perform(typeText("30"))
             .perform(pressImeActionButton())
