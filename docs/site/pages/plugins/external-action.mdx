@@ -48,6 +48,15 @@ This will transition any `EXTERNAL` state in Player's navigation, with a `ref` p
   </core>
   <ios>
 
+### CocoaPods
+Add the subspec to your `Podfile`
+
+```ruby
+pod 'PlayerUI/ExternalActionPlugin'
+```
+
+### Swift Usage
+
 For an example flow with an external state such as:
 
 ```json
@@ -82,7 +91,7 @@ For an example flow with an external state such as:
 }
 ```
 
-The plugin can be declared to handle this external state:
+The plugin can be declared to handle this external state, whether that means integrating an existing platform native experience, or doing headless processing:
 
 ```swift
 let plugin = ExternalActionPlugin { state, options, transition in
@@ -96,7 +105,15 @@ let plugin = ExternalActionPlugin { state, options, transition in
 		transition(transitionValue ?? "Next")
 }
 
-let player = Player(plugins: [plugin])
+var body: some View {
+  SwiftUIPlayer(
+    flow: flow,
+    plugins: [
+      plugin
+    ],
+    result: $resultBinding
+  )
+}
 ```
 
   </ios>
