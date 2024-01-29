@@ -63,8 +63,6 @@ Congrats! You've got Player up and running. If you need additional functionality
 In your `Podfile` you'll need to add `PlayerUI` as a dependency and the `ReferenceAssets` plugin to use the base set of assets. 
 
 ```ruby
-source 'https://github.com/player-ui/player'
-
 target 'MyApp' do
   # Add the pod to your target
   pod 'PlayerUI'
@@ -74,7 +72,7 @@ end
 
 ### Configuration
 
-The `SwiftUIPlayer` is just a normal SwiftUI View and can be inserted anywhere in your hierarchy. The flow will start automatically, and the result will update the `Binding<Result<CompletedState, PlayerError>?>` that you pass to it:
+`SwiftUIPlayer` is just a normal SwiftUI View and can be inserted anywhere in your hierarchy. The flow will start automatically, and the result will update the `Binding<Result<CompletedState, PlayerError>?>` that you pass to it:
 
 ```swift
 import PlayerUI
