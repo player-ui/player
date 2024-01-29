@@ -1,5 +1,4 @@
 
-```mermaid
 sequenceDiagram
     title Data Controller with Binding Parser
     participant P as Player
@@ -49,8 +48,3 @@ sequenceDiagram
     Note right of DC: On a deeper level, we keep track of the transactions and updates <br> to help with debugging and logging. Once all the update is accounted <br> for, it then calls set on the dataModel.
     BP->>DM: set([[foo.array.0.property, "New Value"]])
     Note right of DM: { foo: bar {...}, { array:[ property: "New Value"} ] }
-
-
-    
-```
-

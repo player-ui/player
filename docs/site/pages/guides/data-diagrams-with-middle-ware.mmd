@@ -1,5 +1,4 @@
 
-```mermaid
 sequenceDiagram
     title Data Controller with MiddleWare
     participant P as Player
@@ -24,14 +23,5 @@ sequenceDiagram
     Note over MW: The middleware intercepts the set, <br> calling set(transaction, options, next)
     MW-->DM: for each transaction, sets a shadowModelPath for the binding
     MW-->DM: checks to see if validations exist using the MiddlewareCheck for current binding 
-    MW-->DM: [does check to see if binding is strong or week]
-    MW->>DM: by calling next.set(nextTransaction, options), this is calling the datamodels .set call
     DM->>DC: this returns all invalid and valid results
-   
-  
-    
-
-
-    
-```
 
