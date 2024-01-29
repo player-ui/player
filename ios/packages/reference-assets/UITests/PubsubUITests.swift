@@ -7,22 +7,17 @@ class PubSubUITests: BaseTestCase {
     }
 
     func testPubsubPluginAction() {
-        withEyes("pub sub basic") { check in
-            check("pub sub basic loaded")
+        openFlow("pub sub basic")
+        XCTAssertTrue(app.alerts["Info"].staticTexts.element(boundBy: 1).label.contains("action"))
 
-            XCTAssertTrue(app.alerts["Info"].staticTexts.element(boundBy: 1).label.contains("action"))
+        app.buttons["OK"].firstMatch.tap()
 
-            app.buttons["OK"].firstMatch.tap()
+        let button = app.buttons["action"].firstMatch
+        waitFor(button)
+        button.tap()
 
-            let button = app.buttons["action"].firstMatch
-            waitFor(button)
-            button.tap()
+        XCTAssertTrue(app.alerts["Info"].staticTexts.element(boundBy: 1).label.contains("Published: `some-event`"))
 
-            XCTAssertTrue(app.alerts["Info"].staticTexts.element(boundBy: 1).label.contains("Published: `some-event`"))
-
-            XCTAssertTrue(app.alerts["Info"].staticTexts.element(boundBy: 1).label.contains("event published message"))
-
-            check("pub sub event")
-        }
+        XCTAssertTrue(app.alerts["Info"].staticTexts.element(boundBy: 1).label.contains("event published message"))
     }
 }

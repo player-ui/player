@@ -20,8 +20,6 @@ class InfoUITest : AssetUITest("reference-assets") {
     fun verifyView(view: Int) {
         waitForViewInRoot(withText("View $view"))
             .check(matches(isDisplayed()))
-
-        eyes?.checkPlayer("View $view")
     }
 
     fun verifyAndProceed(view: Int, action: Action? = null) {

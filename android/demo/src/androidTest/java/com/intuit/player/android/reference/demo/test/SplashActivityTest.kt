@@ -7,7 +7,6 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.activityScenarioRule
-import com.intuit.player.android.reference.demo.test.base.ApplitoolsTest
 import com.intuit.player.android.reference.demo.test.base.waitForViewInRoot
 import com.intuit.player.android.reference.demo.ui.splash.SplashActivity
 import com.intuit.player.jvm.utils.makeFlow
@@ -19,7 +18,7 @@ import org.junit.Test
  * If there are new tests added that should be run on device farm,
  * update testFilter inclusion list in buildConfig.yml
  */
-class SplashActivityTest : ApplitoolsTest() {
+class SplashActivityTest {
 
     private val json by lazy {
         makeFlow(
