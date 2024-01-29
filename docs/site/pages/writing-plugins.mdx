@@ -13,6 +13,22 @@ platform: core,react
 
 Core plugins are the easiest way to extend Player functionality regardless of what platform you are using Player on. To make writing core plugins easy `@player-ui/player` exposes an interface `PlayerPlugin` that denotes everything needed. The two mandatory features are a `name` property which is lets Player know how to refer to the plugin and an implemented `apply` function that takes a `player` object. Optionally a `symbol` property can be used to provide a unique identifier that can be used to retrieve the plugin from Player. 
 
+The first step for making a plugin is creating our plugin class, making sure it inherits the `PlayerPlugin` class from `@player/core`. By convention, a class constant with the name of your plugin should be defined.
+
+```javascript
+export default class MyFirstPlayerPlugin implements PlayerPlugin {
+  name = 'my-first-player-plugin';
+
+  {/* A constructor can go here */}
+
+  apply(player: Player) {
+    {/* Your logic here */}
+  }
+
+  {/* More logic or helper functions can go here */}
+}
+```
+
 The `apply` function is where the actual logic of the plugin lives. By tapping the hooks exposed via `player.hooks` you gain access to the internal pipeline of components that comprise Player and can inject your functionality into their exposed hooks. For example if you want to do something any time Player's state changes you could do the following: 
 
 ```javascript
