@@ -1,6 +1,6 @@
 ---
 title: Asset Provider Plugin
-platform: react
+platform: json, react
 ---
 
 # Asset Provider
@@ -9,7 +9,61 @@ The Asset Provider Plugin enables users to easily register UI components to rend
 
 ### Usage
 
+Use the Asset Provider plugin the register your custom assets. In this example, we have components that are rendering a customer asset from type `custom-asset` and `custom`.
+
 <PlatformTabs>
+  <json>
+```
+{
+  "id": "test-flow",
+  "views": [
+    {
+      "id": "view-1",
+      "type": "collection",
+      "label": {
+        "asset": {
+          "id": "title",
+          "type": "text",
+          "value": "Collections are used to group assets."
+        }
+      },
+      "values": [
+        {
+          "asset": {
+            "id": "text-1",
+            "type": "custom-asset",
+          }
+        },
+        {
+          "asset": {
+            "id": "text-2",
+            "type": "custom",
+          }
+        }
+      ]
+    }
+  ],
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "view-1",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "DONE"
+      }
+    }
+  }
+}
+```
+
+  </json>
   <react>
 
 Install the plugin:
