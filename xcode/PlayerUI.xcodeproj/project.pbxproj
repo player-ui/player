@@ -346,13 +346,11 @@
 				"${PODS_ROOT}/Target Support Files/Pods-PlayerUI_Example-PlayerUI_ExampleUITests/Pods-PlayerUI_Example-PlayerUI_ExampleUITests-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/PlayerUI/PlayerUI.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftHooks/SwiftHooks.framework",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/EyesXCUI/EyesXCUI.framework/EyesXCUI",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PlayerUI.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftHooks.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/EyesXCUI.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

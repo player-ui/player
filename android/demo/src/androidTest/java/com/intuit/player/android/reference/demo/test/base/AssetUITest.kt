@@ -12,7 +12,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TestName
 
-abstract class AssetUITest(val group: String? = null) : ApplitoolsTest() {
+abstract class AssetUITest(val group: String? = null) {
 
     @get:Rule
     val name = TestName()
@@ -40,10 +40,6 @@ abstract class AssetUITest(val group: String? = null) : ApplitoolsTest() {
 
     @After
     fun after() {
-        eyes?.takeIf { it.isOpen }?.run {
-            checkWindow("done")
-            close()
-        }
         Intents.release()
     }
 
@@ -65,8 +61,5 @@ abstract class AssetUITest(val group: String? = null) : ApplitoolsTest() {
             playerViewModel = it.currentPlayer?.playerViewModel as? DemoPlayerViewModel
                 ?: throw IllegalStateException("player not found")
         }
-
-        eyes?.open("Android Reference Assets Demo", "${mock.group}/${mock.name}/${name.methodName}")
-        eyes?.checkPlayer("init")
     }
 }

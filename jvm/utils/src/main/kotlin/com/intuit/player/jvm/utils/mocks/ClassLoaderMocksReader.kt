@@ -4,7 +4,10 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 
 /** Utility class to catalogue the published mocks bundled in a player plugin mocks package */
-public class ClassLoaderMocksReader(private val classLoader: ClassLoader = ClassLoader.getSystemClassLoader()) {
+public class ClassLoaderMocksReader(
+    private val classLoader: ClassLoader = ClassLoader.getSystemClassLoader(),
+    private val manifestPath: String = "mocks/manifest.json",
+) {
 
     /**
      * Manifest is a JSON blob published by the player plugin mocks package declaring
@@ -12,7 +15,7 @@ public class ClassLoaderMocksReader(private val classLoader: ClassLoader = Class
      * will read the manifest on demand and default to an empty list if not found.
      */
     public val manifest: String by lazy {
-        classLoader.getResource("mocks/manifest.json")?.readText() ?: "[]"
+        classLoader.getResource(manifestPath)?.readText() ?: "[]"
     }
 
     /**

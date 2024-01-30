@@ -7,19 +7,14 @@ class BeaconPluginUITests: BaseTestCase {
     }
 
     func testBeaconPluginAction() {
-        withEyes("beacon action") { check in
-            check("beacons on loaded")
-            XCTAssertTrue(app.alerts["Info"].staticTexts.element(boundBy: 1).label.contains("action"))
+        openFlow("beacon action")
+        XCTAssertTrue(app.alerts["Info"].staticTexts.element(boundBy: 1).label.contains("action"))
 
-            app.buttons["OK"].firstMatch.tap()
-            let button = app.buttons["action"].firstMatch
-            waitFor(button)
-            button.tap()
+        app.buttons["OK"].firstMatch.tap()
+        let button = app.buttons["action"].firstMatch
+        waitFor(button)
+        button.tap()
 
-            XCTAssertTrue(app.alerts["Info"].staticTexts.element(boundBy: 1).label.contains("some-data"))
-
-            check("Multiple beacons alert")
-
-        }
+        XCTAssertTrue(app.alerts["Info"].staticTexts.element(boundBy: 1).label.contains("some-data"))
     }
 }

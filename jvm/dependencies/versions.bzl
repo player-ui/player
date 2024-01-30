@@ -16,7 +16,6 @@ versions = struct(
     ),
     hooks = "0.15.0",
     testing = struct(
-        applitools = "4.7.6",
         junit = "4.12",
         jupiter = "5.6.0",
         kluent = "1.68",
