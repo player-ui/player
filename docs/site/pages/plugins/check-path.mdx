@@ -65,6 +65,7 @@ This will automatically create the underlying _core_ version of the `CheckPathPl
   </react>
 
 <ios>
+
 ### CocoaPods
 
 Add the subspec to your `Podfile`
@@ -82,7 +83,7 @@ var body: some View {
     SwiftUIPlayer(
         flow: flow,
         plugins: [
-        SwiftUICheckPathPlugin()
+          SwiftUICheckPathPlugin()
         ],
         result: $resultBinding
     )

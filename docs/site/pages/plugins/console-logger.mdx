@@ -34,23 +34,28 @@ consoleLogger.setSeverity('warn');
   </core>
   <ios>
 
-Add the subspec:
+### CocoaPods
+Add the subspec to your `Podfile`
 
 ```ruby
 pod 'PlayerUI/PrintLoggerPlugin'
 ```
 
-Construct the plugin:
+### Swift Usage
 
 ```swift
-SwiftUIPlayer(
-  flow: flow,
-  plugins: [PrintLoggerPlugin()],
-  result: $result
-)
+var body: some View {
+    SwiftUIPlayer(
+        flow: flow,
+        plugins: [
+          PrintLoggerPlugin()
+        ],
+        result: $resultBinding
+    )
+}
 ```
 
-To change the severity:
+To change the severity, supply it as an argument to the constructor:
 ```swift
 PrintLoggerPlugin(level: .warn)
 ```

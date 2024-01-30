@@ -96,6 +96,15 @@ This will add additional React Context to the running player for the producers f
   </react>
   <ios>
 
+### CocoaPods
+Add the subspec to your `Podfile`
+
+```ruby
+pod 'PlayerUI/BeaconPlugin'
+```
+
+### Swift Usage
+
 To receive Beacon events from Player in iOS, add the `BeaconPlugin` to your plugin array:
 
 ```swift
@@ -104,7 +113,7 @@ var body: some View {
     flow: flow,
     plugins: [
       BeaconPlugin<DefaultBeacon> { (beacon: DefaultBeacon) in
-				// Process beacon into the format you need for Segment/Trinity and send it on
+				// Process beacon into the format you need for your analytics platform
 			}
     ]
   )
