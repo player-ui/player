@@ -9,7 +9,65 @@ This plugin exposes some basic `DataTypes`, `validations`, and `formats` into Pl
 
 It also serves as a good reference to adding your own custom types into Player.
 
----
+## Usage
+
+<PlatformTabs>
+  <core>
+
+Install the plugin:
+
+```bash
+yarn add @player-ui/common-types-plugin
+```
+
+Add it to Player:
+```js
+import CommonTypesPlugin from '@player-ui/common-types-plugin';
+
+const commonTypesPlugin = new CommonTypesPlugin();
+const player = new Player({ plugins: [commonTypesPlugin] });
+
+// Start your flow
+player.start(myFlow);
+```
+
+This will allow any `DataTypes`, `formats`, `validations` and custom data types to be used in the content
+
+  </core>
+
+<ios>
+
+### CocoaPods
+
+Add the subspec to your `Podfile`
+
+```ruby
+
+pod 'PlayerUI/CommonTypesPlugin'
+
+```
+
+### Swift Usage
+
+This plugin takes no parameters, and the configuration comes from content, it can just be added to the plugin array:
+
+```swift
+
+var body: some View {
+    SwiftUIPlayer(
+        flow: flow,
+        plugins: [
+        CommonTypesPlugin()
+        ],
+        result: $resultBinding
+    )
+}
+```
+
+</ios>
+
+</PlatformTabs>
+
 
 ## Formats
 

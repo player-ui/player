@@ -25,6 +25,33 @@ const player = new Player({
 ```
 
   </core>
+
+  <ios>
+
+### CocoaPods
+
+Add the subspec to your `Podfile`
+
+```ruby
+pod 'PlayerUI/ComputedPropertiesPlugin'
+```
+
+### Swift Usage
+
+This plugin takes no parameters, and the configuration comes from content, it can just be added to the plugin array:
+
+```swift
+var body: some View {
+    SwiftUIPlayer(
+        flow: flow,
+        plugins: [
+        ComputedPropertiesPlugin()
+        ],
+        result: $resultBinding
+    )
+}
+```
+  </ios>
 </PlatformTabs>
 
 ## Expression Data Type

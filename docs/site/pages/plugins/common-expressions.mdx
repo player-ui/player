@@ -9,6 +9,64 @@ This plugin exposes some basic expressions into Player content.
 
 It also serves as a good reference to adding your own custom expressions into Player.
 
+## Usage
+
+<PlatformTabs>
+  <core>
+
+Install the plugin:
+
+```bash
+yarn add @player-ui/common-types-plugin
+```
+
+Add it to Player:
+```js
+import CommonExpressionsPlugin from '@player-ui/common-expressions-plugin';
+
+const commonExpressionsPlugin = new CommonExpressionsPlugin();
+const player = new Player({ plugins: [commonExpressionsPlugin] });
+
+// Start your flow
+player.start(myFlow);
+```
+
+This will allow any included expressions or custom expressions to be used in the content
+
+  </core>
+
+<ios>
+
+### CocoaPods
+
+Add the subspec to your `Podfile`
+
+```ruby
+
+pod 'PlayerUI/CommonExpressionsPlugin'
+
+```
+
+### Swift Usage
+
+This plugin takes no parameters, and the configuration comes from content, it can just be added to the plugin array:
+
+```swift
+
+var body: some View {
+    SwiftUIPlayer(
+        flow: flow,
+        plugins: [
+        CommonExpressionsPlugin()
+        ],
+        result: $resultBinding
+    )
+}
+```
+</ios>
+
+</PlatformTabs>
+
 ---
 
 ## General

@@ -264,6 +264,8 @@ export const Component = (props) => {
   </react>
   <ios>
 
+The SwiftUIBeaconPlugin attaches a BeaconContext to the root of the SwiftUI view tree as an environment value, so when included any asset can use that context to send a beacon, if the context is in the environment:
+
 ```swift
 struct ActionAssetView: View {
   @ObservedObject var viewModel: AssetViewModel<ActionData>

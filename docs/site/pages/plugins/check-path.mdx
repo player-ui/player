@@ -63,6 +63,33 @@ const rp = new ReactPlayer({
 This will automatically create the underlying _core_ version of the `CheckPathPlugin` to be made available via `React` Context for the hooks.
 
   </react>
+
+<ios>
+### CocoaPods
+
+Add the subspec to your `Podfile`
+
+```ruby
+pod 'PlayerUI/SwiftUICheckPathPlugin'
+```
+
+### Swift Usage
+
+This plugin takes no parameters, and the configuration comes from content, it can just be added to the plugin array:
+
+```swift
+var body: some View {
+    SwiftUIPlayer(
+        flow: flow,
+        plugins: [
+        SwiftUICheckPathPlugin()
+        ],
+        result: $resultBinding
+    )
+}
+```
+</ios>
+
 </PlatformTabs>
 
 
@@ -149,6 +176,30 @@ export const MyAsset = ({ id }) => {
 ```
 
   </react>
+  <ios>
+
+### Swift Usage
+
+The SwiftUICheckPathPlugin attaches the `BaseCheckPathPlugin`  named `checkPath` to the root of the SwiftUI view tree as an environment value, so when included any asset can use that environment value to access the base functionality
+
+```swift
+
+struct MyAsset: View {
+    @ObservedObject var viewModel: AssetViewModel<AssetData>
+    @Environment(\.checkPath) var checkPath
+
+    var body: some View {
+       let isInForm = checkPath?.hasParentContext(id: viewModal.data.id, query: "form")
+       if isInForm {
+         SelectChoice()
+       } else {
+         RadioGroup()
+    }
+}
+
+```
+</ios>
+
 </PlatformTabs>
 
 
