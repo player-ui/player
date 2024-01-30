@@ -1,0 +1,26 @@
+{
+  "id": "flow_3",
+  "views": [
+    {
+      "id": "third_view",
+      "type": "error"
+    }
+  ],
+  "navigation": {
+    "BEGIN": "flow_3",
+    "flow_3": {
+      "startState": "view_3",
+      "view_3": {
+        "state_type": "VIEW",
+        "ref": "third_view",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
