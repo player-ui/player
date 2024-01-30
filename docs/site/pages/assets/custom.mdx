@@ -190,7 +190,7 @@ In either situation, your asset implementation needs only to override the view p
 
 ```swift
 class ActionAsset: UncontrolledAsset<ActionData> {
-		public override var view: AnyView { ActionView(model: model) }
+		public override var view: AnyView { AnyView(ActionView(model: model)) }
 }
 ```
 
