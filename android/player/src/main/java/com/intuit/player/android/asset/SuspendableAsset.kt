@@ -7,7 +7,6 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.View.OnAttachStateChangeListener
 import android.view.ViewGroup
-import androidx.core.view.children
 import com.intuit.player.android.AssetContext
 import com.intuit.player.android.R
 import com.intuit.player.jvm.core.player.PlayerException

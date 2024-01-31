@@ -26,7 +26,7 @@ class InfoUITest : AssetUITest("reference-assets") {
         verifyView(view)
 
         action?.let {
-            onView(withText(action.name))
+            waitForViewInRoot(withText(action.name))
                 .check(matches(isDisplayed()))
                 .perform(click())
         }
