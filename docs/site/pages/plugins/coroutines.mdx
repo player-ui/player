@@ -1,0 +1,97 @@
+---
+title: Coroutines
+platform: android
+---
+
+# Kotlin Coroutines
+
+Kotlin coroutines is a popular Kotlin library to handle asynchronous programming and concurrency in the JVM. More information on Coroutines can be found [here](https://kotlinlang.org/docs/coroutines-overview.html)
+This module contains several JVM exclusive plugins to aid various tooling needs.
+
+## UpdatesPlugin
+
+Plugin using a `ReceiveChannel` to provide an updated asset whenever the Player View is updated.
+
+### Usage
+
+<PlatformTabs>
+  <android>
+In build.gradle
+```kotlin
+implementation "com.intuit.player.jvm.plugins:coroutines:$JVM_PLAYER_VERSION"
+ ```
+
+In Player constructor
+```kotlin
+import com.intuit.player.plugins.coroutines.UpdatesPlugin
+
+val plugins = listOf(UpdatesPlugin())
+AndroidPlayer(plugins)
+```
+  </android>
+</PlatformTabs>
+
+
+### API
+
+<PlatformTabs>
+  <android>
+The API for this plugin revolves around the `ReceiveChannel` for asset updates.
+```kotlin
+// Plugin API
+public val updates: ReceiveChannel<Asset?> // Public property that is used by the [UpdatesPlugin] to send [Asset] updates, can be used in a CoroutineContext to receive [Asset] updates.
+public fun waitForUpdates(timeout: Long = 500): Asset? // This blocks the current thread until a new update is received or the timeout specified has passed.
+
+// Experimental
+public fun flush(): Unit // This cleans out the [updates] channel to prepare it to receive new updates
+
+// Player extensions
+public val Player.updatesPlugin: UpdatesPlugin?
+public fun Player.waitForUpdates(timeout: Long = 500): Asset?
+```
+
+  </android>
+</PlatformTabs>
+
+## FlowScopePlugin
+
+Plugin that provides a CoroutineScope that can be used to perform various async operations with the context of the current flow.
+All operations launched using the scope will be cancelled when player changes state.
+
+### Usage
+
+<PlatformTabs>
+  <android>
+In build.gradle
+```kotlin
+implementation "com.intuit.player.jvm.plugins:coroutines:$JVM_PLAYER_VERSION"
+ ```
+
+In Player constructor
+```kotlin
+import com.intuit.player.plugins.coroutines.FlowScopePlugin
+
+val plugins = listOf(FlowScopePlugin())
+AndroidPlayer(plugins)
+```
+  </android>
+</PlatformTabs>
+
+
+### API
+
+<PlatformTabs>
+  <android>
+```kotlin
+// Plugin API
+public var flowScope: CoroutineScope? // The CoroutineScope reflective of the current Player flow
+public fun subScope(coroutineContext: CoroutineContext = Dispatchers.Default): CoroutineScope? // Build a child scope of the current flowScope to ensure that these scopes will be structured according to the current Flow
+
+// Extension functions
+public val CoroutineScope.flow: Flow? // Retrieves the current Player flow bound to the scope created by this plugin
+public val Player.flowScopePlugin: FlowScopePlugin?
+public val Player.flowScope: CoroutineScope?
+public fun Player.subScope(coroutineContext: CoroutineContext = EmptyCoroutineContext): CoroutineScope?
+```
+  </android>
+</PlatformTabs>

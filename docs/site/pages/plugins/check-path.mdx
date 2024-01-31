@@ -152,6 +152,23 @@ export const MyAsset = ({ id }) => {
 
   <android>
 
+## Usage
+
+In build.gradle
+```kotlin
+implementation "com.intuit.player.jvm.plugins:check-path:$JVM_PLAYER_VERSION"
+ ```
+
+In Player constructor
+```kotlin
+import com.intuit.player.plugins.checkpath.CheckPathPlugin
+
+val plugins = listOf(CheckPathPlugin())
+AndroidPlayer(plugins)
+```
+
+## API
+
 The JVM CheckPathPlugin API is incompletely in comparison to the core plugin, ideally this should not be used, and all logic where pathing is concerned should be handled in transforms
 If the situation arises and this plugin is absolutely necessary, the following API are available at the moment. This is subject to change in future releases:
 
