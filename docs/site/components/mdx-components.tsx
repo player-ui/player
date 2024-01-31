@@ -24,9 +24,9 @@ import {
   Td,
   Link as CLink,
   Alert as ChakraAlert,
+  AlertStatus,
   AlertTitle,
   AlertDescription,
-  AlertOptions,
   AlertIcon,
   Box,
 } from '@chakra-ui/react';
@@ -233,7 +233,8 @@ export const InlineCode = (props: JSX.IntrinsicElements['code']) => {
   );
 };
 
-type ChakraAlertProps = React.PropsWithChildren<AlertOptions & {
+type ChakraAlertProps = React.PropsWithChildren<{
+  status?: AlertStatus;
   title?: string;
   description?: string;
 }>
