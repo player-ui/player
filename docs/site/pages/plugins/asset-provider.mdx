@@ -45,11 +45,23 @@ const player = new ReactPlayer({
 In this example, when your content has assets of type `custom-asset` and `custom`, they will render `<div>Hello World!</div>` and `<div>Other Custom Asset</div>`.
 
 <ContentTabs>
-  <json>
+  <tsx>
+```tsx
+import { Custom, CustomAsset, Collection } from 'my-assets';
 
+const view = (
+  <Collection>
+    <CustomAsset/>
+    <CustomAsset/>
+  </Collection>
+);
+```
+
+</tsx>
+  <json>
+Your TSX should make the following json
 ```json
 {
-  "id": "test-flow",
   "views": [
     {
       "id": "view-1",
@@ -76,28 +88,12 @@ In this example, when your content has assets of type `custom-asset` and `custom
         }
       ]
     }
-  ],
-  "navigation": {
-    "BEGIN": "FLOW_1",
-    "FLOW_1": {
-      "startState": "VIEW_1",
-      "VIEW_1": {
-        "state_type": "VIEW",
-        "ref": "view-1",
-        "transitions": {
-          "*": "END_Done"
-        }
-      },
-      "END_Done": {
-        "state_type": "END",
-        "outcome": "DONE"
-      }
-    }
-  }
+  ]
 }
 ```
 
-  This will register a match on `{ type: 'custom-asset' }` and `{ type: 'custom', key: 'asset' }` in the view to use your React components.
   </json>
+  
+
 </ContentTabs>
   
