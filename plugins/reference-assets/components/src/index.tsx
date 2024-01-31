@@ -2,8 +2,9 @@ import React from 'react';
 import type {
   AssetPropsWithChildren,
   BindingTemplateInstance,
+  ExpressionTemplateInstance,
 } from '@player-tools/dsl';
-import { createSlot, Asset } from '@player-tools/dsl';
+import { createSlot, Asset, View } from '@player-tools/dsl';
 import type { Asset as AssetType } from '@player-ui/player';
 import type {
   ActionAsset,
@@ -63,8 +64,20 @@ Collection.Values = createSlot({
 
 Collection.Label = LabelSlot;
 
-export const Action = (props: AssetPropsWithChildren<ActionAsset>) => {
-  return <Asset type="action" {...props} />;
+export const Action = (
+  props: Omit<AssetPropsWithChildren<ActionAsset>, 'exp'> & {
+    /** An optional expression to execute before transitioning */
+    exp?: ExpressionTemplateInstance;
+  }
+) => {
+  const { exp, children, ...rest } = props;
+
+  return (
+    <Asset type="action" {...rest}>
+      <property name="exp">{exp?.toValue()}</property>
+      {children}
+    </Asset>
+  );
 };
 
 Action.Label = LabelSlot;
@@ -87,7 +100,7 @@ export const Input = (
 Input.Label = LabelSlot;
 
 export const Info = (props: AssetPropsWithChildren<InfoAsset>) => {
-  return <Asset type="info" {...props} />;
+  return <View type="info" {...props} />;
 };
 
 Info.Title = TitleSlot;

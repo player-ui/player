@@ -1,0 +1,126 @@
+---
+title: Writing DSL Components
+---
+
+# Creating TSX Components
+
+In order to take advantage of the auto-completion and validation of TypeScript types, asset libraries can export a component library for content authoring. Creating components isn't much different than writing a React component for the web. The primative elements uses the [react-json-reconciler](https://github.com/intuit/react-json-reconciler) to create the JSON content tree, with utilities to make it quick and painless to create new asset-components.
+
+
+## Creating a Basic Component
+
+The `Asset` component from the `@player-tools/dsl` package is the quickest way to create a new component. The `Asset` component will take all the Asset's properties and convert them to their equivalent JSON representation when serialized.
+
+In the examples below, we'll be creating a TSX component for the `action` asset in our reference set. 
+
+The `action` asset has a `label` slot (which is typically used as a `text` asset), a `value` (for flow transitions), and an `exp` for evaluating expressions.
+It's type resembles something akin to:
+
+```ts
+import { Asset, AssetWrapper, Expression } from '@player-ui/player';
+
+export interface ActionAsset<AnyTextAsset extends Asset = Asset> extends Asset<'action'> {
+  /** The transition value of the action in the state machine */
+  value?: string;
+
+  /** A text-like asset for the action's label */
+  label?: AssetWrapper<AnyTextAsset>;
+
+  /** An optional expression to execute before transitioning */
+  exp?: Expression;
+}
+```
+
+To turn this interface into a usable component, create a new React component that _renders_ an Asset:
+
+```tsx
+import { Asset, AssetPropsWithChildren } from '@player-tools/dsl';
+
+export const Action = (props: AssetPropsWithChildren<ActionAsset>) => {
+  return <Asset type="action" {...props} />;
+}
+```
+
+This would allow users to import the `Action` component, and _render_ it to JSON:
+
+```tsx
+const myView = <Action value="next" />
+```
+
+The `AssetPropsWithChildren` type is a utility type to help convert the `Asset` type (which has a required `id` and `type` properties) to a type more suited for components. It changes the `id` to be optional, and adds a `applicability` property automatically.
+
+## Slots
+
+Continuing the example fo the `ActionAsset`, we need a way for users to users to specify the nested `label` property, which itself is another asset. This can be accomplished using the `createSlot` utility function.
+
+```tsx
+import { Asset, AssetPropsWithChildren } from '@player-tools/dsl';
+
+export const Action = (props: AssetPropsWithChildren<ActionAsset>) => {
+  return <Asset type="action" {...props} />;
+}
+
+Action.Label = createSlot({
+  name: 'label'
+})
+```
+
+This adds component (`Action.Label`) that will automatically place any nested children under the `label` property of the parent asset:
+
+```tsx
+const myView = (
+  <Action value="next">
+    <Action.Label>
+      <Text value="Continue" />
+    </Action.Label>
+  </Action>
+);
+```
+
+It also accepts components for automatically creating `text` and `collection` assets, allowing users to shortcut the `Text` component:
+
+```tsx
+const myView = (
+  <Action value="next">
+    <Action.Label>Continue</Action.Label>
+  </Action>
+);
+```
+
+## Creating a Complex Component
+
+While a majority of Assets can be described simply via the base `Action` Component, there are certain cases where DSL components need to contain a bit more logic. This section aims to describe further tools that are offered in the `@player-tools/dsl` package.
+
+### Components with Specially Handled Properties 
+
+In the previous example, we covered how to create a DSL Component for our reference `Action` Asset. Our actual Action Asset however looks a little bit different. 
+
+```tsx
+export const Action = (
+  props: Omit<AssetPropsWithChildren<ActionAsset>, 'exp'> & {
+    /** An optional expression to execute before transitioning */
+    exp?: ExpressionTemplateInstance;
+  }
+) => {
+  const { exp, children, ...rest } = props;
+
+  return (
+    <Asset type="action" {...rest}>
+      <property name="exp">{exp?.toValue()}</property>
+      {children}
+    </Asset>
+  );
+};
+```
+
+Crucially, the difference is in how the `exp` property is handled. As the `exp` property is an `Expression`, if we just allowed the `Action` component to process this property, we would end up with an `ExpressionTemplate` instance _not_ an `Expression` instance. While technically they are equivalent, there is no need to wrap the final string in the Expression Template tags (`@[]@`) since we know the string will be an `Expression` and it will just lead to additonal procssing at runtime. Therefore, we need to do a few things to properly construct this DSL component.
+
+The first is to modify the type for the commponent. In the above code snippit we are using the `Omit` type to remove the base `exp` property from the source type and replacing it with an `exp` property that expects a `ExpressionTemplateInstance` which allows an DSL expression to be passed in. 
+
+The second is to extract out the `exp` property from the props and use a `property` component to manually control how that property will get serialized. This component is exposed by the underlying `react-json-reconciler` library which also supplies an `array`, `obj` and `value` component to allow full control over more complicated data structures. The `@player-tools/dsl` package also exposes the `toJsonProperties` function to process whole non-Asset objects.
+
+### View Components
+
+For Assets that are intended to be Views, a `View` component is exported from the `@player-tools/dsl` package. Its usage is exactly the same as the `Asset` component, however it correctly handles the serialization of any Crossfield Validations that exist on the View.
+
+
