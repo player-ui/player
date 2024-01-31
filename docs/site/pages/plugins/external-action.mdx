@@ -108,6 +108,38 @@ The `ExternalActionPlugin` adds support for handling `EXTERNAL` navigation state
 2. options: `ControllerState` provides access to the current player controllers
 3. transition: `(String) -> Unit` is provided to enable the handler to "complete" the `EXTERNAL` state and transition using the provided `String` value
 
+## Usage
+In build.gradle
+```kotlin
+implementation "com.intuit.player.jvm.plugins:external-action:$JVM_PLAYER_VERSION"
+```
+
+In Player constructor
+```kotlin
+import com.intuit.player.plugins.externalAction.ExternalActionPlugin
+
+val externalActionPlugin = ExternalActionPlugin { state, options, transition ->
+    // access external state node
+    val extraProperty = state["extraProperty"]
+    // access data model
+    options.data.get("{{foo.bar}}")
+    // evaluate expression
+    options.expression.evaluate("{{foo.bar}} = 1")
+    // do other processing or show non-player experience
+
+    // transition to the next node using "Next"
+    transition("Next")
+}
+AndroidPlayer(externalActionPlugin)
+
+// handler can be configured after instantiation
+externalActionPlugin.onExternalAction { /** handle external action */ }
+
+// extension method for configuring plugin with player instance
+androidPlayer.onExernalAction { /** handle external action */ }
+```
+
+In Player content
 ```json
 {
   "navigation": {
@@ -135,26 +167,18 @@ The `ExternalActionPlugin` adds support for handling `EXTERNAL` navigation state
   }
 }
 ```
+
+## API
 ```kotlin
-val externalActionPlugin = ExternalActionPlugin { state, options, transition ->
-    // access external state node
-    val extraProperty = state["extraProperty"]
-    // access data model
-    options.data.get("{{foo.bar}}")
-    // evaluate expression
-    options.expression.evaluate("{{foo.bar}} = 1")
-    // do other processing or show non-player experience
+// Plugin API
+public fun onExternalAction(handler: ExternalActionHandler): Unit // Member function to configure external action handler
+public fun interface ExternalActionHandler {
+    public fun onExternalState(state: NavigationFlowExternalState, options: ControllerState, transition: (String) -> Unit)
+} // Functional interface for handling external state given the state, options controller and a transition function
 
-    // transition to the next node using "Next"
-    transition("Next")
-}
-
-// handler can be configured after instantiation
-externalActionPlugin.onExternalAction { /** handle external action */ }
-
-val player = AndroidPlayer(context, externalActionPlugin)
-// extension method for configuring plugin with player instance
-player.onExernalAction { /** handle external action */ }
+// Player extensions
+public val Player.externalActionPlugin: ExternalActionPlugin?
+public fun Player.onExternalAction(handler: ExternalActionHandler): Unit
 ```
 
   </android>
