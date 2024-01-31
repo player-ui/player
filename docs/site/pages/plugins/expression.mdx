@@ -52,7 +52,14 @@ Any calls to `myCustomFunction()` within the flow will utilize the newly registe
   </core>
   <ios>
 
-### Use 
+### CocoaPods
+Add the subspec to your `Podfile`
+
+```ruby
+pod 'PlayerUI/ExpressionPlugin'
+```
+
+### Swift Usage
 
 The ExpressionPlugin lets you register custom expressions to run native code:
 
@@ -71,7 +78,7 @@ let expressionPlugin = ExpressionPlugin(expressions: [
 	}
 ])
 ```
-### Arguments
+#### Arguments
 
 Arguments can be passed to custom expressions, and your handler receives the arguments as an array of Any:
 
