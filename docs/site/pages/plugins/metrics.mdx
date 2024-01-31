@@ -85,6 +85,24 @@ SwiftUIPlayer(
 ```
 
   </ios>
+  <android>
+The `JVM` Metrics plugin can track render time for views in a flow.
+
+In build.gradle
+```kotlin
+implementation "com.intuit.player.jvm.plugins:metrics:$JVM_PLAYER_VERSION"
+```
+
+In Player constructor
+```kotlin
+import com.intuit.player.plugins.expression.ExpressionPlugin
+
+val metricsPlugin = MetricsPlugin { timing, renderMetrics, flowMetrics ->
+  ...
+}
+AndroidPlayer(metricsPlugin)
+```
+  </android>
 </PlatformTabs>
 
 
