@@ -5,7 +5,7 @@ title: Plugin Implementation
 
 Plugins main capabilities are to tap into the player's lifecycle hooks and to add new functionality to the player. In this section we'll go over the steps to implement a plugin.
 
-We'll use the [stage-revert-data](./plugins/stage-revert-data.md) plugin as example. After creating our plugin class, in the `apply` method we'll add the following code:
+We'll use the [stage-revert-data](./plugins/stage-revert-data) plugin as example. After creating our plugin class, in the `apply` method we'll add the following code:
 
 ```typescript
 export default class StageRevertDataPlugin implements PlayerPlugin {
