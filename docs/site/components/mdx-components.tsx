@@ -1,5 +1,5 @@
 import React from 'react';
-import path from 'path';
+import path, { parse } from 'path';
 import Link from 'next/link';
 import {
   Heading,
@@ -137,7 +137,6 @@ const PlatformTabs = (props: React.PropsWithChildren<unknown>) => {
  * Tab section for Content Authoring. This should include tsx and/or example JSON files.
  */
 const ContentTabs = (props: React.PropsWithChildren<unknown>) => {
-  const router = useRouter();
 
   const children = React.Children.toArray(props.children).filter((c: any) => {
     return ContentTabsNameMap.has(c.props.mdxType.toLowerCase());
@@ -148,13 +147,6 @@ const ContentTabs = (props: React.PropsWithChildren<unknown>) => {
       nameMap={ContentTabsNameMap}
       callback={(tabIndex: number) => {
         const lang = (children[tabIndex] as any).props.mdxType.toLowerCase();
-        router.push({
-          pathname: router.pathname,
-          query: {
-            ...router.query,
-            lang,
-          },
-        });
       }}
     >
       {children}

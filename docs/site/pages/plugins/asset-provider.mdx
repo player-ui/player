@@ -42,29 +42,60 @@ const player = new ReactPlayer({
 
 ### Content
 
-In this example, when your content has assets of type `custom-asset` and `custom`, they will render <div>Hello World!</div> and <div>Other Custom Asset</div>.
+In this example, when your content has assets of type `custom-asset` and `custom`, they will render `<div>Hello World!</div>` and `<div>Other Custom Asset</div>`.
 
 <ContentTabs>
-
   <json>
-<Code>
 
-
-{/*[
+```json
+{
+  "id": "test-flow",
+  "views": [
+    {
+      "id": "view-1",
+      "type": "collection",
+      "label": {
+        "asset": {
+          "id": "title",
+          "type": "text",
+          "value": "Collections are used to group assets."
+        }
+      },
+      "values": [
+        {
           "asset": {
-            "id": "text-1",
+            "id": "custom-1",
             "type": "custom-asset",
           }
         },
         {
           "asset": {
-            "id": "text-2",
+            "id": "custom-2",
             "type": "custom",
           }
         }
-    ]*/}
-
-</Code>
+      ]
+    }
+  ],
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "view-1",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "DONE"
+      }
+    }
+  }
+}
+```
 
   This will register a match on `{ type: 'custom-asset' }` and `{ type: 'custom', key: 'asset' }` in the view to use your React components.
   </json>
