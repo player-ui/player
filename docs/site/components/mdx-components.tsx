@@ -53,6 +53,11 @@ const CodeTabsNameMap = new Map([
   ['android', 'Android'],
 ]);
 
+const ContentTabsNameMap = new Map([
+  ['json', 'JSON'],
+  ['tsx', 'TSX'],
+]);
+
 const CodeTabsMap = new Map([['gradle', GradleTab]]);
 
 /**
@@ -111,6 +116,35 @@ const PlatformTabs = (props: React.PropsWithChildren<unknown>) => {
     <Tabs
       defaultTab={defaultTab}
       nameMap={CodeTabsNameMap}
+      callback={(tabIndex: number) => {
+        const lang = (children[tabIndex] as any).props.mdxType.toLowerCase();
+        router.push({
+          pathname: router.pathname,
+          query: {
+            ...router.query,
+            lang,
+          },
+        });
+      }}
+    >
+      {children}
+    </Tabs>
+  );
+};
+
+/**
+ * Tab section for Content Authoring. This should include tsx and/or example JSON files.
+ */
+const ContentTabs = (props: React.PropsWithChildren<unknown>) => {
+  const router = useRouter();
+
+  const children = React.Children.toArray(props.children).filter((c: any) => {
+    return ContentTabsNameMap.has(c.props.mdxType.toLowerCase());
+  });
+
+  return (
+    <Tabs
+      nameMap={ContentTabsNameMap}
       callback={(tabIndex: number) => {
         const lang = (children[tabIndex] as any).props.mdxType.toLowerCase();
         router.push({
@@ -242,6 +276,8 @@ export const MDXComponents: MDXProviderComponents = {
   PlayerTeam,
 
   PlatformTabs: withRouter(PlatformTabs),
+
+  ContentTabs: withRouter(ContentTabs),
 
   table: Table,
   th: Th,
