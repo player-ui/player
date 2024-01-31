@@ -56,7 +56,6 @@ const CodeTabsNameMap = new Map([
 const ContentTabsNameMap = new Map([
   ['json', 'JSON'],
   ['tsx', 'TSX'],
-  ['react', 'React'],
 ]);
 
 const CodeTabsMap = new Map([['gradle', GradleTab]]);
@@ -270,7 +269,7 @@ export const MDXComponents: MDXProviderComponents = {
 
   PlatformTabs: withRouter(PlatformTabs),
 
-  ContentTabs: withRouter(ContentTabs),
+  ContentTabs,
 
   table: Table,
   th: Th,

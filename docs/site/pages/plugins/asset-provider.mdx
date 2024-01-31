@@ -46,6 +46,7 @@ In this example, when your content has assets of type `custom-asset` and `custom
 
 <ContentTabs>
   <tsx>
+
 ```tsx
 import { Custom, CustomAsset, Collection } from 'my-assets';
 
@@ -59,9 +60,10 @@ const view = (
 
 </tsx>
   <json>
-Your TSX should make the following json
+
 ```json
 {
+  "id": "test-flow",
   "views": [
     {
       "id": "view-1",
@@ -88,10 +90,28 @@ Your TSX should make the following json
         }
       ]
     }
-  ]
+  ],
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "view-1",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "DONE"
+      }
+    }
+  }
 }
 ```
 
+  This will register a match on `{ type: 'custom-asset' }` and `{ type: 'custom', key: 'asset' }` in the view to use your React components.
   </json>
   
 
