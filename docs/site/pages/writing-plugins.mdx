@@ -105,13 +105,19 @@ Lastly React plugins can also act as a core plugin in cases where core functiona
 
   </react>
   <ios>
-iOS Player Plugins are very similar to core and react plugins in both their composition and use. The `PlayerUI/Core` subspec exposes an interface `NativePlugin` that, much like the core `PlayerPlugin` interfaces, provides the necessary attributes that are required for an iOS Player plugin. A `pluginName` attributed is required, and a function `apply` is required that takes an instance of a Player implementation. Similarly to core plugins, in the `apply` function you have access to the Player object and access to the hooks. `apply` uses generics to future proof so plugins can be used for multiple Player implementations should they be created.
+iOS Player Plugins are very similar to core and react plugins in both their composition and use. 
+
+### NativePlugin
+
+The `PlayerUI/Core` subspec exposes an interface `NativePlugin` that, much like the core `PlayerPlugin` interfaces, provides the necessary attributes that are required for an iOS Player plugin. A `pluginName` attributed is required, and a function `apply` is required that takes an instance of a Player implementation. Similarly to core plugins, in the `apply` function you have access to the Player object and access to the hooks. `apply` uses generics to future proof so plugins can be used for multiple Player implementations should they be created.
 
 The `player` passed to `apply` exposes hooks from the core player, as well as hooks specific to that player implementation. For the current state of this project, the `SwiftUIPlayer` is the primary iOS Player, and exposes two hooks for the SwiftUI layer specifically:
 
 - The `view` hook allows you to modify the root view that will be displayed in the SwiftUIPlayer body. This is useful for applying changes to the environment for the SwiftUI view tree, or apply ViewModifiers and such.
 - The `transition` hook allows you to specify a `PlayerViewTransition` object to be applied when the flow transitions from one view to another, to animate the transition.
 
+
+#### Basic Example
 Below is an example of a basic `NativePlugin` that sets a value in the EnvironmentValues when the plugin is included:
 
 ```swift
@@ -128,5 +134,76 @@ class EnvironmentPlugin: NativePlugin {
     }
 }
 ```
+#### Asset Registration
+Likely the most common usecase for plugins is to register assets:
+
+```swift
+import PlayerUI
+
+class ExampleAssetPlugin: NativePlugin {
+    let pluginName = "ExampleAssetPlugin"
+
+    func apply<P>(player: P) where P: HeadlessPlayer {
+      guard let player = player as? SwiftUIPlayer else { return }
+      player.assetRegistry.register("text", asset: TextAsset.self)
+      player.assetRegistry.register("action", asset: ActionAsset.self)
+    }
+}
+```
+
+### JSBasePlugin
+Building native features on top of shared functionality is one of the primary benefits of using player. As such we expose convenience utilities to enable loading JavaScript Player Plugins as the base for your `NativePlugin`.
+
+
+#### Basic Setup
+This example will load the `SharedJSPlugin` in the JavaScript layer when included as a plugin to `SwiftUIPlayer`.
+```swift
+import PlayerUI
+
+class SharedJSPlugin: JSBasePlugin {
+    convenience init() {
+      // pluginName must match the exported class name in the JavaScript plugin
+      self.init(fileName: 'shared-js-plugin-bundle', pluginName: 'SharedJSPlugin')
+    }
+
+    // Construct the URL to load the JS bundle
+    override open func getUrlForFile(fileName: String) -> URL? {
+      ResourceUtilities.urlForFile(
+        fileName: fileName,
+        ext: "js",
+        bundle: Bundle(for: YourPlugin.self),
+        pathComponent: "YOUR_POD.bundle"
+      )
+    }
+}
+```
+#### Arguments for constructing the JavaScript plugins
+To simplify the ease of use, the `JSContext` for `JSBasePlugin` implementations is provided when the underlying resources for the core `player` are being setup. This means that we need to provide the arguments for the JavaScript constructor late. To do this, override the `getArguments` function:
+
+```swift
+import PlayerUI
+
+class SharedJSPlugin: JSBasePlugin {
+    var option: Boolean
+
+    convenience init(option: Boolean) {
+      // pluginName must match the exported class name in the JavaScript plugin
+      self.init(fileName: 'shared-js-plugin-bundle', pluginName: 'SharedJSPlugin')
+      self.option = option
+    }
+
+    override open func getArguments() -> [Any] {
+        // plugin just takes a boolean arguments
+        return [option]
+        // More common in JavaScript, constructor takes an object
+        return [["enable": option]]
+    }
+}
+```
+
+**Note**: As `JavaScriptCore` cannot resolve dependencies at runtime, using a module bundler such as [tsup](https://github.com/egoist/tsup) is required.
+
+**Note**: `JSBasePlugin` implementations do not necessarily need to be a `PlayerPlugin`, for example, the [BeaconPlugin](https://github.com/player-ui/player/blob/main/ios/plugins/BaseBeaconPlugin/Sources/BaseBeaconPlugin.swift#L63) can take plugins in it's constructor, that are not `PlayerPlugin`.
+
   </ios>
  </PlatformTabs>
