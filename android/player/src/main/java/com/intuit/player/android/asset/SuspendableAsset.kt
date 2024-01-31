@@ -82,18 +82,7 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
 
         /** Suspend until there is a hydrated view, or returns null if the provided [scope] is cancelled */
         public suspend fun awaitView(): View? = try {
-            suspend fun ViewGroup.awaitAsyncChildren() {
-                children.forEach {
-                    when (it) {
-                        is AsyncViewStub -> it.awaitView()
-                        is ViewGroup -> it.awaitAsyncChildren()
-                    }
-                }
-            }
-
-            hydratedView.await().also { parent ->
-                (parent as? ViewGroup)?.awaitAsyncChildren()
-            }
+            hydratedView.await()
         } catch (e: CancellationException) {
             // if it was the calling scope that is cancelled, this will re-raise
             coroutineContext.ensureActive()
