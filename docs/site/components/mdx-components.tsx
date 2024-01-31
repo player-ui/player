@@ -23,12 +23,19 @@ import {
   Tr,
   Td,
   Link as CLink,
+  Alert as ChakraAlert,
+  AlertTitle,
+  AlertDescription,
+  AlertOptions,
+  AlertIcon,
+  Box,
 } from '@chakra-ui/react';
 import { MDXProviderComponents } from '@mdx-js/react';
 import { withRouter, useRouter } from 'next/router';
 import { CodeHighlight } from './code-highlight';
 import { withBasePrefix } from './Image';
 import { PlayerTeam } from './PlayerTeam';
+import {AppContext} from "./Context";
 
 /**
  * Generic Tab Component that extends Chakra's Tab
@@ -62,7 +69,7 @@ const Tabs = (props: any) => {
   return (
     <ChakraTabs
       colorScheme="blue"
-      defaultIndex={props.defaultTab}
+      index={props.defaultTab}
       onChange={(index) => props.callback?.(index)}
     >
       <TabList>
@@ -210,6 +217,25 @@ export const InlineCode = (props: JSX.IntrinsicElements['code']) => {
   );
 };
 
+type ChakraAlertProps = React.PropsWithChildren<AlertOptions & {
+  title?: string;
+  description?: string;
+}>
+
+export const Alert = (props: ChakraAlertProps) => {
+  return (
+      <ChakraAlert status={props.status} variant='left-accent'>
+        <AlertIcon />
+        <Box flex={1}>
+          {props.title && <AlertTitle>{props.title}</AlertTitle>}
+          {props.description && <AlertDescription>{props.description}</AlertDescription>}
+          {props.children}
+        </Box>
+      </ChakraAlert>
+  );
+};
+
+
 /**
  * Anchor tab component wrapping Chakra's
  */
@@ -249,4 +275,8 @@ export const MDXComponents: MDXProviderComponents = {
   td: Td,
 
   inlineCode: InlineCode,
+
+  Alert,
+  AlertTitle,
+  AlertDescription,
 };
