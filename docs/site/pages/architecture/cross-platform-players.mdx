@@ -1,0 +1,27 @@
+---
+title: 'Cross-Platform-Players'
+---
+
+# Using Player across multiple platforms
+
+One of the major benefits of adopting Player for rendering a UI is it's ability to function across multiple platforms using the same content. In order to facilitate this, and get the most out of Player's architecture, here's a few things to keep in mind as you integrate Player into multiple platforms:
+
+## Use core-plugins to share implementations/functionality
+
+One of the easiest, and most beneficial thing to do when integrating Player is to organize feature sets into plugins. Keeping each plugin small and concise allows for easy sharing of features with other applications.
+
+Player Core, as well as each of the platform integration, supplies an interface for users to augment/extend the functionality of Player. This can be used to author validations, formatters, expressions, etc once, and be shared across Player implementations across platforms.
+
+## What this looks like in practice
+
+Plugins such as the [common-types](../plugins/common-types) plugin is a great example of a small plugin used to add a very specific feature to the Player Core. Since the validations, formats, and data-types present in this plugin are authored once, we can leverage Player's architecture to share these implementations across platforms.
+
+Using this mechanism, we are guaranteed that the React, iOS, and Android player configurations are able to process the same content in the same way across the systems -- features/expressions/validations added in 1 are automatically present in the other platforms without any additional work.
+
+This also applies to the asset transforms, which makes testing much simpler, but still leaves room for rendering variability for each platform.
+
+## Use the meta-plugin to simplify plugin sets
+
+In the previous example, two things were mentioned that may initially seem to contradict each other:
+- Keeping each plugin small and concise allows for easy sharing of features with other applications.
+- features/expressions/validations added in 1 are automatically present in the other platforms without any additional work.
