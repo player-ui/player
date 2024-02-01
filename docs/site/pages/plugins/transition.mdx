@@ -7,18 +7,19 @@ platform: ios
 
 The `TransitionPlugin` allows for specifying transitions for when Player loads a flow, and for transition between views in the same flow.
 
-## Usage
-
-Add the optional subspec to your Podfile or podspec:
+### CocoaPods
+Add the subspec to your `Podfile`
 
 ```ruby
 pod 'PlayerUI/TransitionPlugin'
 ```
+
+### Swift Usage
 ```swift
 SwiftUIPlayer(flow: flowString, plugins: [TransitionPlugin(popTransition: .pop)], result: $resultBinding)
 ```
 
-## Customizing Transitions
+#### Customizing Transitions
 
 To specify different transition, just supply a `PlayerViewTransition` to the plugin initializer:
 
@@ -34,7 +35,7 @@ let plugin = TransitionPlugin(
 )
 ```
 
-## Default Transitions
+#### Default Transitions
 
 By default there are 5 transitions included with the `SwiftUIPlayer`:
 
