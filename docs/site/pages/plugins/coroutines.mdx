@@ -17,9 +17,10 @@ Plugin using a `ReceiveChannel` to provide an updated asset whenever the Player 
 <PlatformTabs>
   <android>
 In build.gradle
+
 ```kotlin
-implementation "com.intuit.player.jvm.plugins:coroutines:$JVM_PLAYER_VERSION"
- ```
+implementation 'com.intuit.player.jvm.plugins:coroutines:$JVM_PLAYER_VERSION'
+```
 
 In Player constructor
 ```kotlin
@@ -37,10 +38,14 @@ AndroidPlayer(plugins)
 <PlatformTabs>
   <android>
 The API for this plugin revolves around the `ReceiveChannel` for asset updates.
+
 ```kotlin
 // Plugin API
-public val updates: ReceiveChannel<Asset?> // Public property that is used by the [UpdatesPlugin] to send [Asset] updates, can be used in a CoroutineContext to receive [Asset] updates.
-public fun waitForUpdates(timeout: Long = 500): Asset? // This blocks the current thread until a new update is received or the timeout specified has passed.
+
+/** Public property that is used by the [UpdatesPlugin] to send [Asset] updates, can be used in a CoroutineContext to receive [Asset] updates. */
+public val updates: ReceiveChannel&lt;Asset?&gt;
+/** This blocks the current thread until a new update is received or the timeout specified has passed. */
+public fun waitForUpdates(timeout: Long = 500): Asset?
 
 // Experimental
 public fun flush(): Unit // This cleans out the [updates] channel to prepare it to receive new updates
@@ -63,9 +68,10 @@ All operations launched using the scope will be cancelled when player changes st
 <PlatformTabs>
   <android>
 In build.gradle
+
 ```kotlin
 implementation "com.intuit.player.jvm.plugins:coroutines:$JVM_PLAYER_VERSION"
- ```
+```
 
 In Player constructor
 ```kotlin
@@ -82,13 +88,19 @@ AndroidPlayer(plugins)
 
 <PlatformTabs>
   <android>
+
 ```kotlin
 // Plugin API
-public var flowScope: CoroutineScope? // The CoroutineScope reflective of the current Player flow
-public fun subScope(coroutineContext: CoroutineContext = Dispatchers.Default): CoroutineScope? // Build a child scope of the current flowScope to ensure that these scopes will be structured according to the current Flow
+
+/** The CoroutineScope reflective of the current Player flow */
+public var flowScope: CoroutineScope?
+/** Build a child scope of the current flowScope to ensure that these scopes will be structured according to the current Flow */
+public fun subScope(coroutineContext: CoroutineContext = Dispatchers.Default): CoroutineScope?
 
 // Extension functions
-public val CoroutineScope.flow: Flow? // Retrieves the current Player flow bound to the scope created by this plugin
+
+/** Retrieves the current Player flow bound to the scope created by this plugin */
+public val CoroutineScope.flow: Flow?
 public val Player.flowScopePlugin: FlowScopePlugin?
 public val Player.flowScope: CoroutineScope?
 public fun Player.subScope(coroutineContext: CoroutineContext = EmptyCoroutineContext): CoroutineScope?
