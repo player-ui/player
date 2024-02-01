@@ -19,7 +19,7 @@ Plugin using a `ReceiveChannel` to provide an updated asset whenever the Player 
 In build.gradle
 
 ```kotlin
-implementation 'com.intuit.player.jvm.plugins:coroutines:$JVM_PLAYER_VERSION'
+implementation "com.intuit.player.jvm.plugins:coroutines:$JVM_PLAYER_VERSION"
 ```
 
 In Player constructor
@@ -44,11 +44,14 @@ The API for this plugin revolves around the `ReceiveChannel` for asset updates.
 
 /** Public property that is used by the [UpdatesPlugin] to send [Asset] updates, can be used in a CoroutineContext to receive [Asset] updates. */
 public val updates: ReceiveChannel&lt;Asset?&gt;
+
 /** This blocks the current thread until a new update is received or the timeout specified has passed. */
 public fun waitForUpdates(timeout: Long = 500): Asset?
 
 // Experimental
-public fun flush(): Unit // This cleans out the [updates] channel to prepare it to receive new updates
+
+/** This cleans out the [updates] channel to prepare it to receive new updates */
+public fun flush(): Unit
 
 // Player extensions
 public val Player.updatesPlugin: UpdatesPlugin?

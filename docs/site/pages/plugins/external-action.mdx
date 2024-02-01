@@ -171,10 +171,18 @@ In Player content
 ## API
 ```kotlin
 // Plugin API
-public fun onExternalAction(handler: ExternalActionHandler): Unit // Member function to configure external action handler
+
+/**  Member function to configure external action handler */
+public fun onExternalAction(handler: ExternalActionHandler): Unit
+
+/** Functional interface for handling external state given the state, options controller and a transition function */
 public fun interface ExternalActionHandler {
-    public fun onExternalState(state: NavigationFlowExternalState, options: ControllerState, transition: (String) -> Unit)
-} // Functional interface for handling external state given the state, options controller and a transition function
+    public fun onExternalState(
+      state: NavigationFlowExternalState, 
+      options: ControllerState, 
+      transition: (String) -> Unit
+    )
+}
 
 // Player extensions
 public val Player.externalActionPlugin: ExternalActionPlugin?
