@@ -25,7 +25,7 @@ bazel run //android:demo
 ```
 
 ```
-bazel mobile-install //android/demo
+bazel run //android/demo:install
 ```
 
 If those command do not run, you can find the apk in `bazelbin/android/demo/install.runfiles/player/android/demo/demo.apk` and drag this apk onto the emulated device. This will install it. ( you may need to swipe on the device to see the application)

@@ -186,12 +186,12 @@ For convenience, there are several extension methods for utilizing a pre-install
 
 ```kotlin
 // registering handler
-player.onBeacon { beacon: String ->
+androidPlayer.onBeacon { beacon: String ->
     // Process beacon and send to analytics platform
 }
 
 // fire beacon
-player.beacon(
+androidPlayer.beacon(
     "clicked",
     "button",
     assetThatIsBeaconing,
@@ -201,10 +201,7 @@ player.beacon(
 
 The base `RenderableAsset` class provides an additional helper to make beaconing less verbose from an asset perspective.
 
-```kotlin
-// within RenderableAsset implementation
-beacon(BeaconAction.clicked, BeaconElement.button)
-```
+[Helper in RenderableAsset](https://github.com/player-ui/player/blob/2a2110caf87ab752207c82ec9ab8ce72316d20f5/android/player/src/main/java/com/intuit/player/android/asset/RenderableAsset.kt#L253)
 
   </android>
 </PlatformTabs>
@@ -288,4 +285,40 @@ struct ActionAssetView: View {
 ```
 
   </ios>
+
+  <android>
+
+  Using the base `RenderableAsset`'s helper function in this example fires off a basic beacon with no adjustment to format as well as empty data upon button click
+
+**Example**
+
+```kotlin
+class MyAsset(assetContext: AssetContext) :
+    DecodableAsset<>(assetContext, Data.serializer()) {
+
+    @Serializable
+    data class Data(
+      ...
+    ) : AssetData()
+
+    override fun createView(): View {
+      ...
+    }
+
+    override fun View.hydrate() {
+        val binding = MyCustomViewBinding.bind(this)
+        binding.button.setOnClickListener {
+          this@MyAsset.beacon(
+            action = BeaconAction.clicked,
+            element = BeaconElement.button,
+            asset = this@MyAsset,
+            data = null
+          )
+        }
+        ...
+    }
+}
+```
+
+  </android>
 </PlatformTabs>
