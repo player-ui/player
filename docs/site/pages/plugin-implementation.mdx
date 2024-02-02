@@ -4,7 +4,7 @@ title: Plugin Implementation
 
 # Plugin Implementation
 
-Plugins main capabilities are to tap into the player's lifecycle hooks and to add new functionality to the player. In this section we'll go over the steps to implement a plugin.
+Plugins main capabilities are to extend or add new functionality by tapping into player's pipeline of components via hooks . In this section we'll go over the steps to implement a plugin.
 
 We'll use the [stage-revert-data](./plugins/stage-revert-data) plugin as example. After creating our plugin class, in the `apply` method we'll add the following code:
 
@@ -88,3 +88,5 @@ Finally, we tap into the `flowController` so we can intercept the `flow` hook. W
 ```
 
 And this is how we implement a plugin that manages the staging of data based on the view state attributes.
+
+Code Snippets Reference: [StageRevertDataPlugin](https://github.com/player-ui/player/blob/main/plugins/stage-revert-data/core/src/index.ts)
