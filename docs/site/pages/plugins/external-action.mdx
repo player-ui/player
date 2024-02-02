@@ -128,7 +128,7 @@ The `ExternalActionPlugin` adds support for handling `EXTERNAL` navigation state
 ## Usage
 In build.gradle
 ```kotlin
-implementation "com.intuit.player.plugins:external-action:$JVM_PLAYER_VERSION"
+implementation "com.intuit.player.plugins:external-action:$PLAYER_VERSION"
 ```
 
 In Player constructor
@@ -186,25 +186,9 @@ In Player content
 ```
 
 ## API
-```kotlin
-// Plugin API
 
-/**  Member function to configure external action handler */
-public fun onExternalAction(handler: ExternalActionHandler): Unit
+Public API available from sources here:
 
-/** Functional interface for handling external state given the state, options controller and a transition function */
-public fun interface ExternalActionHandler {
-    public fun onExternalState(
-      state: NavigationFlowExternalState, 
-      options: ControllerState, 
-      transition: (String) -> Unit
-    )
-}
-
-// Player extensions
-public val Player.externalActionPlugin: ExternalActionPlugin?
-public fun Player.onExternalAction(handler: ExternalActionHandler): Unit
-```
-
+[ExternalActionPlugin](https://github.com/player-ui/player/blob/main/plugins/external-action/jvm/src/main/kotlin/com/intuit/player/plugins/externalAction/ExternalActionPlugin.kt)
   </android>
 </PlatformTabs>

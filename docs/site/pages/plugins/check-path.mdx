@@ -95,7 +95,7 @@ var body: some View {
 In build.gradle
 
 ```kotlin
-implementation "com.intuit.player.plugins:check-path:$JVM_PLAYER_VERSION"
+implementation "com.intuit.player.plugins:check-path:$PLAYER_VERSION"
 ```
 
 In Player constructor
@@ -221,16 +221,9 @@ struct MyAsset: View {
   <android>
 
 The JVM CheckPathPlugin API contains partial functionality in comparison to the core plugin, ideally this should not be used, and all logic where pathing is concerned should be handled in transforms
-If the situation arises and this plugin is absolutely necessary, the following API are available at the moment. This is subject to change in future releases:
+If the situation arises and this plugin is absolutely necessary, the API from the following source are available at the moment. This is subject to change in future releases:
 
-```kotlin
-// Plugin API
-public fun getAsset(id: String): Asset?
-
-// Player extensions
-public val Player.checkPathPlugin: CheckPathPlugin?
-public fun Player.getAsset(id: String): Asset?
-```
+[CheckPathPlugin](https://github.com/player-ui/player/blob/main/plugins/check-path/jvm/src/main/kotlin/CheckPathPlugin.kt)
 
   </android>
 

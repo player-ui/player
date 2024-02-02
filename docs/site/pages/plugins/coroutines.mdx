@@ -19,7 +19,7 @@ Plugin using a `ReceiveChannel` to provide an updated asset whenever the Player 
 In build.gradle
 
 ```kotlin
-implementation "com.intuit.player.plugins:coroutines:$JVM_PLAYER_VERSION"
+implementation "com.intuit.player.plugins:coroutines:$PLAYER_VERSION"
 ```
 
 In Player constructor
@@ -37,26 +37,10 @@ AndroidPlayer(plugins)
 
 <PlatformTabs>
   <android>
-The API for this plugin revolves around the `ReceiveChannel` for asset updates.
+The API for this plugin revolves around the `ReceiveChannel` for asset updates.    
+Public API available from sources here:
 
-```kotlin
-// Plugin API
-
-/** Public property that is used by the [UpdatesPlugin] to send [Asset] updates, can be used in a CoroutineContext to receive [Asset] updates. */
-public val updates: ReceiveChannel&lt;Asset?&gt;
-
-/** This blocks the current thread until a new update is received or the timeout specified has passed. */
-public fun waitForUpdates(timeout: Long = 500): Asset?
-
-// Experimental
-
-/** This cleans out the [updates] channel to prepare it to receive new updates */
-public fun flush(): Unit
-
-// Player extensions
-public val Player.updatesPlugin: UpdatesPlugin?
-public fun Player.waitForUpdates(timeout: Long = 500): Asset?
-```
+[UpdatesPlugin](https://github.com/player-ui/player/blob/main/plugins/coroutines/jvm/src/main/kotlin/com/intuit/player/plugins/coroutines/UpdatesPlugin.kt)
 
   </android>
 </PlatformTabs>
@@ -73,7 +57,7 @@ All operations launched using the scope will be cancelled when player changes st
 In build.gradle
 
 ```kotlin
-implementation "com.intuit.player.plugins:coroutines:$JVM_PLAYER_VERSION"
+implementation "com.intuit.player.plugins:coroutines:$PLAYER_VERSION"
 ```
 
 In Player constructor
@@ -92,21 +76,8 @@ AndroidPlayer(plugins)
 <PlatformTabs>
   <android>
 
-```kotlin
-// Plugin API
+Public API available from sources here:
 
-/** The CoroutineScope reflective of the current Player flow */
-public var flowScope: CoroutineScope?
-/** Build a child scope of the current flowScope to ensure that these scopes will be structured according to the current Flow */
-public fun subScope(coroutineContext: CoroutineContext = Dispatchers.Default): CoroutineScope?
-
-// Extension functions
-
-/** Retrieves the current Player flow bound to the scope created by this plugin */
-public val CoroutineScope.flow: Flow?
-public val Player.flowScopePlugin: FlowScopePlugin?
-public val Player.flowScope: CoroutineScope?
-public fun Player.subScope(coroutineContext: CoroutineContext = EmptyCoroutineContext): CoroutineScope?
-```
+[FlowScopePlugin](https://github.com/player-ui/player/blob/main/plugins/coroutines/jvm/src/main/kotlin/com/intuit/player/plugins/coroutines/FlowScopePlugin.kt)
   </android>
 </PlatformTabs>

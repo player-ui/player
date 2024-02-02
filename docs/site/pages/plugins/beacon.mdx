@@ -199,25 +199,9 @@ androidPlayer.beacon(
 )
 ```
 
-The base `RenderableAsset` class provides an additional helper as well as extension to make beaconing less verbose from an asset perspective.
+The base `RenderableAsset` class provides an additional helper to make beaconing less verbose from an asset perspective.
 
-```kotlin
-// helper in RenderableAsset
-public fun beacon(
-  action: String,
-  element: String,
-  asset: Asset = this.asset,
-  data: Any? = null
-): Unit
-
-// extension on RenderableAsset
-fun RenderableAsset.beacon(
-    action: BeaconAction,
-    element: BeaconElement,
-    asset: Asset = this.asset,
-    data: Any? = null
-): Unit
-```
+[Helper in RenderableAsset](https://github.com/player-ui/player/blob/2a2110caf87ab752207c82ec9ab8ce72316d20f5/android/player/src/main/java/com/intuit/player/android/asset/RenderableAsset.kt#L253)
 
   </android>
 </PlatformTabs>
