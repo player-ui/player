@@ -55,7 +55,7 @@ bazel build --config=skip-ios
 ```
 
 ## For Android Only builds
-If you are interested in only contributing for android, follow our [android guide](https://github.com/player-ui/player/android/demo/README.md)
+If you are interested in only contributing for android, follow our [android guide](https://github.com/player-ui/player/blob/main/android/demo/README.md)
 
 ## For iOS Only builds
 If you are interested in only contributing for iOS, follow our [iOS guide](https://github.com/player-ui/player)
