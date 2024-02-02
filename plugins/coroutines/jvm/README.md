@@ -2,4 +2,4 @@
 
 ## Gradle Dependency
 
-`implementation("com.intuit.player.jvm.plugins:coroutines:$VERSION")`
+`implementation("com.intuit.player.plugins:coroutines:$VERSION")`
