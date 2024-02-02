@@ -86,6 +86,80 @@ const player = new ReactPlayer({
   </react>
   <ios>
 
+### CocoaPods
+
+Add the subspec to your `Podfile`
+
+```ruby
+pod 'PlayerUI/AsyncNodePlugin'
+```
+
+### Swift Usage
+
+In integration code
+
+```swift
+var body: some View {
+    SwiftUIPlayer(
+        flow: flow,
+        plugins: [
+          AsyncNodePlugin { node in
+              // Determine what to return either using the singleNode or multiNode case
+              // Then JSON can be provided using the concrete case, see below for using the encodable case
+              return .singleNode(.concrete(jsContext?.evaluateScript("""
+                  ({"asset": {"id": "text", "type": "text", "value":"new node from the hook"}})
+                  """) ?? JSValue()))
+
+              // OR
+              return .multiNode([
+                .concrete(jsContext?.evaluateScript("""
+                  ({"asset": {"id": "text", "type": "text", "value":"1st value in the multinode"}})
+                  """) ?? JSValue()),
+                .concrete(jsContext?.evaluateScript("""
+                  ({"asset": {"id": "async-node-2", "async": "true" }})
+                  """) ?? JSValue())
+              ])
+
+          }
+        ],
+        result: $resultBinding
+    )
+}
+```
+
+The plugin also provides a default asset placeholder struct that is encodable, instead of passing in the JSON string users can use
+`AssetPlaceholderNode` which includes an `asset` key that takes any user defined Encodable struct as the value. Assuming the following encodable struct is defined:
+
+```swift
+struct PlaceholderNode: Codable, Equatable, AssetData {
+    public var id: String
+    public var type: String
+    var value: String?
+
+    public init(id: String, type: String, value: String? = nil) {
+        self.id = id
+        self.type = type
+        self.value = value
+    }
+}
+```
+
+Instead of using the JSON string above, the following can be used:
+
+```swift
+return .singleNode(.encodable(PlaceholderNode(id: "text", type: "text", value: "new node from the hook")))
+
+// OR
+
+return .multiNode([
+    ReplacementNode.encodable(PlaceholderNode(id: "text", type: "text", value: "1st value in the multinode")),
+    ReplacementNode.encodable(AsyncNode(id: "id"))])
+```
+
+Note: the AsyncNode struct is already defined in the plugin with the `async` property defaulted to true so only `id` needs to be passed in
+
+As a convenience to the user, the AsyncNodePlugin just takes a callback which has the content to be returned, this is provided to the plugin which calls the the `onAsyncNode` hook tap method
+
   </ios>
   <android>
 
