@@ -31,12 +31,12 @@ export default class StageRevertDataPlugin implements PlayerPlugin {
 ```
 We defined variables that will be used in the plugin:
 - `dataController`: The data orchestrator of our Player instance
-- `stageData`: State attribute that enables that comes from the view attribute content to enabling the staging of data
+- `stageData`: State attribute that comes from the view attribute content to enabling the staging of data
 - `commitTransitions`: The list of view names which the shadow model should be committed if transitioned to. Comes from the view state attribute.
-- `commitShadowModel`: Flag that enables committing shadow model into data model after the transition, if `stageData` is set to true and the next view name is included in `commitTransitions`.
+- `commitShadowModel`: Flag that enables committing shadow model into data model after the transition, only if `stageData` is set to true and the next view name is included in `commitTransitions`.
 - `GatedDataMiddleware` Data Middleware that will be used to intercept the data pipeline if `stageData` is set to true.
 
-The next step is to tap into the necessary Player hooks. First we tap into the `viewController` which we can then intercept the `reolveView` hook. By defining our own property method `call` we can intercept the current view state and read the `stageData` and `commitTransitions` properties.
+The next step is to tap into the necessary Player hooks. First we tap into the `viewController` which we can then intercept the `resolveView` hook. By defining our own property method `call` we can intercept the current view state and read the `stageData` and `commitTransitions` properties.
 
 ```javascript
     player.hooks.viewController.tap(this.name, (vc) => {
@@ -63,7 +63,7 @@ Next we tap into the `dataController`, so we can scope the data controller insta
       });
     });
 ```
-Finally, we tap into the `flowController` so we can intercept the `flow` hook. We then tap into the `transition` hook, which is called every time the player transitions from one view to another. If the `commitTransitions` includes the next view name, we set the `commitShadowModel` flag to true, and add the shadow model paths to the `GatedDataMiddleware`. If not, we clear the shadow model paths and set the `commitShadowModel` flag to false.
+Finally, we tap into the `flowController` so we can intercept the `flow` hook. We then tap into the `transition` hook, which is called every time the player transitions from one view to another. If the `commitTransitions` includes the next view name, we set the `commitShadowModel` flag to true, and commit the data stored in the shadow model through `GatedDataMiddleware` into the data model. Whether the data was committed from the shadow model or not, we clear the shadow model paths in the `GatedDataMiddleware` instance and set the `commitShadowModel` flag to false as final steps.
 
 ```javascript
     player.hooks.flowController.tap(this.name, (flowController) => {
