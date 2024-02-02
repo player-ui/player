@@ -38,8 +38,16 @@ pubsub.unsubscribe(token);
   </core>
   <ios>
 
-If your content uses the `@[ publish() ]@` expression for actions, you can subscribe to these events by adding the `PubSubPlugin` to your plugin array:
+If your content uses the `@[ publish() ]@` expression for actions, you can subscribe to these events by using the `PubSubPlugin`.
 
+### CocoaPods
+Add the subspec to your `Podfile`
+
+```ruby
+pod 'PlayerUI/PubSubPlugin'
+```
+
+### Swift Usage
 ```swift
 let eventHandler: (String, AnyType?) -> Void = { (eventName, eventData) in
   // Handle event
@@ -47,10 +55,23 @@ let eventHandler: (String, AnyType?) -> Void = { (eventName, eventData) in
 let plugin = PubSubPlugin([("eventName", eventHandler)])
 ```
 
-If your content uses a different name for publishing (such as publishEvent) you can customize the expression name that the plugin uses:
+If your content uses a different name for publishing (such as `publishEvent`) you can customize the expression name that the plugin uses:
 
 ```swift
 let plugin = PubSubPlugin([("eventName", eventHandler)], options: PubSubPluginOptions(expressionName: "publishEvent"))
+```
+
+Then, just include it in your `plugins` to a Player instance:
+```swift
+var body: some View {
+  SwiftUIPlayer(
+    flow: flow,
+    plugins: [
+      plugin
+    ],
+    result: $resultBinding
+  )
+}
 ```
 
 _Note: AnyType is a custom enum type to handle the arbitrary types that can be received from these events, as the data is set in your Player Content, ensure that it matches either String, [String], or [String: String]._
