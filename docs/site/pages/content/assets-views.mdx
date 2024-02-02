@@ -107,7 +107,7 @@ Anywhere you can place an `asset` node, a `dynamicSwitch` or `staticSwitch` can 
       }
     },
     {
-      "case": "{{name.first}} == 'margie'",
+      "case": "{{name.first}} == 'notadam'",
       "asset": {
         "id": "name",
         "type": "text",
@@ -186,7 +186,7 @@ Within a template, the `_index_` string can be used to substitute the array-inde
         "asset": {
           "id": "value-1",
           "type": "text",
-          "value": "Margie"
+          "value": "Not Adam"
         }
       }
     ]
@@ -202,7 +202,7 @@ There's a few ways to leverage multiple templates within a single asset. Templat
 
 Templates can contain other templates. When referencing a nested template, append the template depth to the `_index_` string to reference the correct data-item.
 
-For example, if 1 template contains another, use `_index_` to reference the outer-loop, and `_index1_` to reference the inner loop.
+For example, if 1 template contains another, use `_index_` to reference the outer-loop, and `_index1_` to reference the inner loop. Furthermore, if templates are nested three levels deep, the first level loop will still be referenced by `_index_`, the second level will be referenced by `_index1_` and the bottom most loop will be referenced by `_index2_`.
 
 ### Multiple Templates - Single Output
 

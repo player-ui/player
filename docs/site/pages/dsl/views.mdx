@@ -6,6 +6,7 @@ title: Writing DSL Views
 Writing assets or views is as simple as creating a React element using your base DSL components:
 
 ```tsx
+import React from 'react';
 import { Input, Text, Collection } from '@player-ui/reference-assets-components';
 
 const view = (
@@ -58,6 +59,7 @@ Not only is the source DSL content a fraction of the output object's size (makin
 Templates are included via the `@player-tools/dsl` package. This can be used in any asset slot:
 
 ```tsx
+import React from 'react';
 import { dataTypes } from '@player-ui/common-types-plugin';
 import { makeBindingsForObject, Template } from '@player-tools/dsl';
 
@@ -87,6 +89,7 @@ The `@player-tools/dsl` module also includes support for _static_ and _dynamic_ 
 Use the `isDynamic` flag to denote this should be a `dynamicSwitch` instead of a `staticSwitch`:
 
 ```tsx
+import React from 'react';
 import { Switch } from '@player-ui/dsl';
 
 <Collection>
@@ -120,6 +123,8 @@ Similarly, if a single asset is expected but a list of them is found instead, Pl
 As DSL components are React component, they can be composed into reusable building blocks to simplify and abstract away common UI patterns. By centralizing these patterns, code duplication can be minimized and updates across multiple sets of content can be simplified. These composed components don't just have to be built on top of the base set of DSL components, DSL components themselves can offer common shortcuts for behavior. For example, if we wanted to offer an out of the box `Action` component that could be used as a `Next` action asset, we could export the following from the DSL components library.
 
 ```tsx
+import React from 'react';
+
 Action.Next = () => (
   <Action value="next">
     <Action.Label>Continue</Action.Label>

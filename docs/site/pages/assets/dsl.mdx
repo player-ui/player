@@ -17,7 +17,7 @@ The `action` asset has a `label` slot (which is typically used as a `text` asset
 For this example we'll use a resemblance of this type, but in practice types should be imported directly from their asset rather than duplicating them.
 
 ```ts
-import { Asset, AssetWrapper, Expression } from '@player-ui/player';
+import type { Asset, AssetWrapper, Expression } from '@player-ui/player';
 
 export interface ActionAsset<AnyTextAsset extends Asset = Asset> extends Asset<'action'> {
   /** The transition value of the action in the state machine */
@@ -30,6 +30,8 @@ export interface ActionAsset<AnyTextAsset extends Asset = Asset> extends Asset<'
   exp?: Expression;
 }
 ```
+
+_Note: The `Asset` type we're importing here from the `@player-ui/player` package is different than the `Asset` component from the `@player-tools/dsl` package. The former is the basic TypeScript definition for what an Asset in Player is while the latter is a helper function for allowing DSL components to be created. Fundamentally they share a name to reinforce the abstraction of foundational capabilities to core libraries_
 
 To turn this interface into a usable component, create a new React component that _renders_ an Asset:
 
@@ -47,21 +49,36 @@ This would allow users to import the `Action` component, and _render_ it to JSON
 const myView = <Action value="next" />
 ```
 
+which when compiled would look like 
+
+```json
+{
+    "id": "root",
+    "type": "action",
+    "value": "next"
+}
+```
+
 The `AssetPropsWithChildren` type is a utility type to help convert the `Asset` type (which has a required `id` and `type` properties) to a type more suited for components. It changes the `id` to be optional, and adds a `applicability` property automatically.
 
 ## Slots
 
-Continuing the example fo the `ActionAsset`, we need a way for users to users to specify the nested `label` property, which itself is another asset. This can be accomplished using the `createSlot` utility function.
+Continuing the example fo the `ActionAsset`, we need a way for users to users to specify the nested `label` property, which itself is another asset. This can be accomplished using the `createSlot` utility function. The `createSlot` function also accept components to enable automatically creating `text` and `collection` assets when they aren't specified where needed. If these components aren't passed into the slot when used, the resulting content may be invalid. Let's add a `Label` slot to our `Action` component to allow it to be easily authored. Lets assume we already have a `Text` and `Collection` component. 
+
 
 ```tsx
-import { Asset, AssetPropsWithChildren } from '@player-tools/dsl';
+import React from 'react';
+import { Asset, AssetPropsWithChildren, createSlot } from '@player-tools/dsl';
 
 export const Action = (props: AssetPropsWithChildren<ActionAsset>) => {
   return <Asset type="action" {...props} />;
 }
 
 Action.Label = createSlot({
-  name: 'label'
+  name: 'label',
+  wrapInAsset: true,
+  TextComp: SomeTextComponent
+  CollectionComp: SomeCollectionComponent
 })
 ```
 
@@ -77,14 +94,76 @@ const myView = (
 );
 ```
 
-It also accepts components for automatically creating `text` and `collection` assets, allowing users to shortcut the `Text` component:
 
 ```tsx
+import React from 'react';
+
 const myView = (
   <Action value="next">
     <Action.Label>Continue</Action.Label>
   </Action>
 );
+```
+
+which when compiled would look like (note the auto injection of the `Text` asset and corresponding Asset Wrapper):
+
+```json
+{
+    "id": "root",
+    "type": "action",
+    "value": "next",
+    "label": {
+        "asset": {
+            "id": "root-label-text",
+            "type": "text",
+            "value": "Continue"
+        }
+    }
+}
+```
+
+And if we wanted to have the `label` property to have to text assets we could write the following DSL
+
+```tsx
+const myView = (
+  <Action value="next">
+    <Action.Label>
+        <Text>Some</Text>
+        <Text>Text</Text>
+    </Action.Label>
+  </Action>
+);
+```
+
+which when compiled would look like the following (note the automatic insertion of the `Collection` Asset):
+
+```json
+{
+    "id": "root",
+    "type": "action",
+    "value": "next",
+    "label": {
+        "asset": {
+            "id": "root-collection",
+            "type": "text",
+            "values": [
+                {
+                    "asset": {
+                        "id": "root-collection-1-text",
+                        "type": "text",
+                        "value": "Some"
+                    }
+                },{
+                    "asset": {
+                        "id": "root-collection-2-text",
+                        "type": "text",
+                        "value": "Text"
+                    }
+                }
+            ]
+        }
+    }
+}
 ```
 
 ## Creating a Complex Component
@@ -96,6 +175,8 @@ While a majority of Assets can be described simply via the base `Action` Compone
 In the previous example, we covered how to create a DSL Component for our reference `Action` Asset. Our actual Action Asset however looks a little bit different. 
 
 ```tsx
+import React from 'react';
+
 export const Action = (
   props: Omit<AssetPropsWithChildren<ActionAsset>, 'exp'> & {
     /** An optional expression to execute before transitioning */
