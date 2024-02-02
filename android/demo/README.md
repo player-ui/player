@@ -56,12 +56,3 @@ Make sure you have done a `bundle install`
 **Possible Solution:** Check your SDK and NDK versions in SDK Manager in Android Studio. As well as your `ANDROID_HOME` and `ANDROID_NDK_HOME` in your bash or zsh profiles to make sure they are properly set.
 
 You can also do `ls $ANDROID_HOME/platforms` and make sure that there are no versions higher than 30.
-
-
-
-### 4. Mvn Error Message: 
-```
- //jvm/j2v8:j2v8-android depends on @android_j2v8//aar:aar in repository @android_j2v8 which failed to fetch. no such package '@android_j2v8//aar': android_j2v8 requires mvn as a dependency. Please check your PATH.
-```
-Check to make sure `mvn` is installed.
-`brew install maven`

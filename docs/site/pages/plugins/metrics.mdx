@@ -68,22 +68,31 @@ const player = new ReactPlayer({
   </react>
   <ios>
 
-The `ios` version of the Metrics Plugin will track initial render time for each view in a flow. Due to current SwiftUI limitations, update time can't be tracked yet. It should be used in conjunction with a core plugin that utilizes the events.
+The `ios` version of the Metrics Plugin will track initial render time for each view in a flow. Due to current SwiftUI limitations, update time can't be tracked yet. It can be used in conjunction with a core plugin that utilizes the events, through `findPlugin`, or standalone.
 
-Add the subspec:
+### CocoaPods
+Add the subspec to your `Podfile`
+
 ```ruby
 pod 'PlayerUI/MetricsPlugin'
-
-Construct the plugin:
-
-```swift
-SwiftUIPlayer(
-  flow: flow,
-  plugins: [MetricsPlugin()],
-  result: $result
-)
 ```
 
+### Swift Usage
+```swift
+var body: some View {
+  SwiftUIPlayer(
+    flow: flow,
+    plugins: [
+      // Tracking render time can be controlled with a parameter
+      MetricsPlugin(trackRenderTime: true) { timing, nodeMetrics, flowMetrics in
+        // Handle metrics payload
+        log(timing.duration ?? -1)
+      }
+    ],
+    result: $resultBinding
+  )
+}
+```
   </ios>
   <android>
 

@@ -53,7 +53,9 @@ commands:
 
       - run: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      - run: echo -e $GPG_KEY | gpg --import --batch
+      - run: |
+            echo -e $GPG_KEY | gpg --import --batch
+            echo -e "pinentry-mode loopback\npassphrase $DEPLOY_MAVEN_GPG_PASSPHRASE" > ~/.gnupg/gpg.conf
       - run: |
             source ~/.bashrc
             bundle install
@@ -177,7 +179,7 @@ jobs:
       - run: cd xcode && bundle exec pod install
       - run: bazel build --config=ci -- //:PlayerUI //:PlayerUI-Demo //:PlayerUI_Pod
       # TODO: the timeout should be added to the test itself
-      - run: bazel test --test_env=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --test_env=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --test_env=APPLITOOLS_PR_NUMBER=${CIRCLE_PULL_REQUEST##*/} --test_timeout=1200 --jobs=1 --verbose_failures --config=ci  -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
+      - run: bazel test --test_timeout=1200 --jobs=1 --verbose_failures --config=ci  -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
 
       - run:
           when: always
@@ -247,7 +249,7 @@ jobs:
           command: |
             circle-android wait-for-boot
 
-      - run: bazel test --define=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --define=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --define=APPLITOOLS_PR_NUMBER=${CIRCLE_PULL_REQUEST##*/} --config=ci -- //android/demo:android_instrumentation_test
+      - run: bazel test --config=ci -- //android/demo:android_instrumentation_test
 
       - run:
           when: always
@@ -298,20 +300,6 @@ jobs:
     steps:
       - auto_shipit
 
-  applitools_init:
-    executor: base
-    steps:
-      - run:
-          name: Initialize Applitools
-          command: curl -L -d '' -X POST "$APPLITOOLS_SERVER_URL/api/externals/github/push?apiKey=$APPLITOOLS_API_KEY&CommitSha=$CIRCLE_SHA1&BranchName=$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/$CIRCLE_BRANCH"
-
-  applitools_cleanup:
-    executor: base
-    steps:
-      - run:
-          name: Cleanup Applitools
-          command: "curl -X POST \"$APPLITOOLS_SERVER_URL/api/externals/github/servers/github.com/commit/$CIRCLE_SHA1/complete?apiKey=$APPLITOOLS_API_KEY\" -H Content-Type:application/json --data '{\"serverId\": \"github.com\", \"commitSha\": \"$CIRCLE_SHA1\"}' -v -L"
-
 workflows:
   build_and_test_pr:
     jobs:
@@ -332,16 +320,6 @@ workflows:
             - Build
           requires:
             - setup
-
-      - applitools_init:
-          filters:
-            branches:
-              ignore:
-                - /pull\/.*/
-          context:
-            - applitools
-          requires:
-            - bazelrc
 
       - build:
           name: build-trunk
@@ -367,10 +345,7 @@ workflows:
             branches:
               ignore:
                 - /pull\/.*/
-          context:
-            - applitools
           requires:
-            - applitools_init
             - bazelrc
 
       - build_ios:
@@ -417,10 +392,7 @@ workflows:
             branches:
               ignore:
                 - /pull\/.*/
-          context:
-            - applitools
           requires:
-            - applitools_init
             - build-trunk
 
       - android_test:
@@ -450,17 +422,6 @@ workflows:
           requires:
             - build-fork
 
-      - applitools_cleanup:
-          filters:
-            branches:
-              ignore:
-                - /pull\/.*/
-          context:
-            - applitools
-          requires:
-            - android-test-trunk
-            - build-ios-trunk
-
   build_and_test_main:
     when:
       equal: [ "", << pipeline.parameters.GHA_Action >> ]
@@ -477,8 +438,6 @@ workflows:
             - setup
 
       - build_ios:
-          context:
-            - applitools
           requires:
             - setup
 
@@ -487,8 +446,6 @@ workflows:
             - build
 
       - android_test:
-          context:
-            - applitools
           requires:
             - build
 
@@ -516,8 +473,6 @@ workflows:
             - setup
 
       - build_ios:
-          context:
-            - applitools
           requires:
             - setup
 
@@ -526,8 +481,6 @@ workflows:
             - build
 
       - android_test:
-          context:
-            - applitools
           requires:
             - build
 

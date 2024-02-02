@@ -1,3 +1,35 @@
+# 0.6.0 (Thu Jan 25 2024)
+
+#### 🚀 Enhancement
+
+- Latest sync including AsyncNodePlugin [#263](https://github.com/player-ui/player/pull/263) (sentony03@gmail.com [@nancywu1](https://github.com/nancywu1) [@brocollie08](https://github.com/brocollie08))
+
+#### 🐛 Bug Fix
+
+- Release main [#274](https://github.com/player-ui/player/pull/274) ([@intuit-svc](https://github.com/intuit-svc))
+- Playa 8756 - iOS add callTryCatchWrapper function on JSValue [#270](https://github.com/player-ui/player/pull/270) (nancy_wu1@intuit.com [@nancywu1](https://github.com/nancywu1))
+- Release main [#273](https://github.com/player-ui/player/pull/273) ([@intuit-svc](https://github.com/intuit-svc))
+- Fix `com.intuit.player:j2v8` transitive deps [#256](https://github.com/player-ui/player/pull/256) ([@sugarmanz](https://github.com/sugarmanz))
+- update iOS StageRevertDataPluginTests [#264](https://github.com/player-ui/player/pull/264) (nancy_wu1@intuit.com [@nancywu1](https://github.com/nancywu1))
+
+#### 📝 Documentation
+
+- DSL documentation changes [#266](https://github.com/player-ui/player/pull/266) (rafael_campos@intuit.com [@rafbcampos](https://github.com/rafbcampos))
+
+#### Authors: 9
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- brocollie08 (sentony03@gmail.com)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- nancywu1 (nancy_wu1@intuit.com)
+- Rafael Campos ([@rafbcampos](https://github.com/rafbcampos))
+- rcampos2 (rafael_campos@intuit.com)
+- zwu01 (nancy_wu1@intuit.com)
+
+---
+
 # 0.5.1 (Thu Dec 07 2023)
 
 #### 🐛 Bug Fix

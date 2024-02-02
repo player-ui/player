@@ -2,7 +2,6 @@ load("@build_bazel_rules_android//android:rules.bzl", "android_binary")
 load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_import")
 load("@io_bazel_rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load(":deps.bzl", "main_deps", "test_deps")
-load("//android:build.bzl", "applitools_config")
 load("@rules_player//kotlin:lint.bzl", "lint")
 
 kt_android_library(
@@ -25,7 +24,6 @@ android_binary(
     multidex = "native",
     deps = [
         ":demo_lib",
-        "@android_j2v8//aar",
         "@maven//:androidx_databinding_databinding_common",
         "@maven//:androidx_databinding_databinding_runtime",
         "@maven//:org_jetbrains_kotlin_kotlin_reflect",
@@ -53,14 +51,9 @@ java_library(
     neverlink = True,
 )
 
-applitools_config(
-    name = "applitools_config",
-    package = "com.intuit.player.android.reference.demo",
-)
-
 kt_android_library(
     name = "demo_ui_test",
-    srcs = glob(["src/androidTest/**/*.kt"]) + [":applitools_config"],
+    srcs = glob(["src/androidTest/**/*.kt"]),
     deps = test_deps + [":demo_lib"],
 )
 

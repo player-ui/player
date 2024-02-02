@@ -165,7 +165,11 @@ class ExternalActionViewModifierPluginTests: ViewInspectorTestCase {
             let content = try view.vStack().first?.anyView().anyView().modifier(ExternalStateSheetModifier.self).viewModifierContent()
             let value = try content?.sheet().anyView().text().string()
             XCTAssertEqual(value, "External State")
-            (try view.actualView().state as? InProgressState)?.controllers?.flow.transition(with: "Next")
+            do {
+                try (view.actualView().state as? InProgressState)?.controllers?.flow.transition(with: "Next")
+            } catch {
+                XCTFail("Transition with 'Next' failed")
+            }
         }
 
         wait(for: [exp, handlerExpectation], timeout: 10)
@@ -174,7 +178,11 @@ class ExternalActionViewModifierPluginTests: ViewInspectorTestCase {
         XCTAssertEqual(state?.controllers?.flow.current?.currentState?.value?.stateType, "VIEW")
         XCTAssertNil(plugin.state)
         XCTAssertFalse(plugin.isExternalState)
-        state?.controllers?.flow.transition(with: "Next")
+        do {
+            try state?.controllers?.flow.transition(with: "Next")
+        } catch {
+            XCTFail("Transition with 'Next' failed")
+        }
         wait(for: [completionExpectation], timeout: 10)
 
         ViewHosting.expel()

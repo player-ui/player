@@ -441,10 +441,7 @@ def ui_tests(
             "ios/plugins/*/UITests/**/*.cc",
             "ios/plugins/*/UITests/**/*.cpp",
         ]),
-        deps = [
-            ":PlayerUI",
-            "@Pods//EyesXCUI",
-        ],
+        deps = [":PlayerUI"],
         bundle_id = "com.intuit.ios.PlayerUI-ExampleUITests",
         minimum_os_version = "14.0",
         test_host = ":PlayerUI-Demo",

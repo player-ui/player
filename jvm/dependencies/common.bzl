@@ -1,6 +1,7 @@
 load("//jvm/dependencies:versions.bzl", "versions")
 
 maven = [
+    "org.jetbrains.kotlin:kotlin-reflect:%s" % "1.7.10",
     "org.jetbrains.kotlinx:kotlinx-coroutines-core:%s" % versions.kotlin.coroutines,
     "org.jetbrains.kotlinx:kotlinx-serialization-json:%s" % versions.kotlin.serialization,
     "com.intuit.hooks:hooks:%s" % versions.hooks,
