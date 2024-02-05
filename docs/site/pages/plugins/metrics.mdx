@@ -1,6 +1,6 @@
 ---
 title: Metrics
-platform: core,react,ios
+platform: core,react,ios,android
 ---
 
 # Metrics Plugin
@@ -94,6 +94,25 @@ var body: some View {
 }
 ```
   </ios>
+  <android>
+
+The `JVM` Metrics plugin can track render time for views in a flow.
+
+In build.gradle
+```kotlin
+implementation "com.intuit.player.plugins:metrics:$PLAYER_VERSION"
+```
+
+In Player constructor
+```kotlin
+import com.intuit.player.plugins.expression.ExpressionPlugin
+
+val metricsPlugin = MetricsPlugin { timing, renderMetrics, flowMetrics ->
+  ...
+}
+AndroidPlayer(metricsPlugin)
+```
+  </android>
 </PlatformTabs>
 
 
