@@ -1,0 +1,83 @@
+---
+title: Coroutines
+platform: android
+---
+
+# Kotlin Coroutines
+
+Kotlin coroutines is a popular Kotlin library to handle asynchronous programming and concurrency in the JVM. More information on Coroutines can be found [here](https://kotlinlang.org/docs/coroutines-overview.html)
+This module contains several JVM exclusive plugins to aid various tooling needs.
+
+## UpdatesPlugin
+
+Plugin using a `ReceiveChannel` to provide an updated asset whenever the Player View is updated.
+
+### Usage
+
+<PlatformTabs>
+  <android>
+In build.gradle
+
+```kotlin
+implementation "com.intuit.player.plugins:coroutines:$PLAYER_VERSION"
+```
+
+In Player constructor
+```kotlin
+import com.intuit.player.plugins.coroutines.UpdatesPlugin
+
+val plugins = listOf(UpdatesPlugin())
+AndroidPlayer(plugins)
+```
+  </android>
+</PlatformTabs>
+
+
+### API
+
+<PlatformTabs>
+  <android>
+The API for this plugin revolves around the `ReceiveChannel` for asset updates.    
+Public API available from sources here:
+
+[UpdatesPlugin](https://github.com/player-ui/player/blob/main/plugins/coroutines/jvm/src/main/kotlin/com/intuit/player/plugins/coroutines/UpdatesPlugin.kt)
+
+  </android>
+</PlatformTabs>
+
+## FlowScopePlugin
+
+Plugin that provides a CoroutineScope that can be used to perform various async operations with the context of the current flow.
+All operations launched using the scope will be cancelled when player changes state.
+
+### Usage
+
+<PlatformTabs>
+  <android>
+In build.gradle
+
+```kotlin
+implementation "com.intuit.player.plugins:coroutines:$PLAYER_VERSION"
+```
+
+In Player constructor
+```kotlin
+import com.intuit.player.plugins.coroutines.FlowScopePlugin
+
+val plugins = listOf(FlowScopePlugin())
+AndroidPlayer(plugins)
+```
+  </android>
+</PlatformTabs>
+
+
+### API
+
+<PlatformTabs>
+  <android>
+
+Public API available from sources here:
+
+[FlowScopePlugin](https://github.com/player-ui/player/blob/main/plugins/coroutines/jvm/src/main/kotlin/com/intuit/player/plugins/coroutines/FlowScopePlugin.kt)
+  </android>
+</PlatformTabs>
