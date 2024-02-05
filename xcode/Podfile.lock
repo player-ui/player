@@ -1,6 +1,9 @@
 PODS:
   - PlayerUI (0.0.1-placeholder):
     - PlayerUI/Main (= 0.0.1-placeholder)
+  - PlayerUI/AsyncNodePlugin (0.0.1-placeholder):
+    - PlayerUI/Core
+    - PlayerUI/SwiftUI
   - PlayerUI/BaseBeaconPlugin (0.0.1-placeholder):
     - PlayerUI/Core
   - PlayerUI/BeaconPlugin (0.0.1-placeholder):
@@ -90,6 +93,7 @@ PODS:
 
 DEPENDENCIES:
   - PlayerUI (from `../`)
+  - PlayerUI/AsyncNodePlugin (from `../`)
   - PlayerUI/BeaconPlugin (from `../`)
   - PlayerUI/CheckPathPlugin (from `../`)
   - PlayerUI/CommonExpressionsPlugin (from `../`)
@@ -129,11 +133,11 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  PlayerUI: 743ca0b222c755099830a02a6259b614e784033a
+  PlayerUI: cd843baf4343ebf9b4ec15516dd6690fee8615e0
   SwiftHooks: 3ecc67c23da335d44914a8a74bd1dd23c7c149e6
   SwiftLint: 4fa9579c63416865179bc416f0a92d55f009600d
   ViewInspector: 53313c757eddc5c4842bc7943a66821a68d02d3e
 
-PODFILE CHECKSUM: cf0040a7b6788d084b630060f551e6aa7adeb659
+PODFILE CHECKSUM: 3432ef77c78bbcd7c7bd59ecea3b6e00a4cbb128
 
 COCOAPODS: 1.11.3

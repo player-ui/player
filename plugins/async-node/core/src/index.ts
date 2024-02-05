@@ -29,14 +29,19 @@ export default class AsyncNodePlugin implements PlayerPlugin {
   }
 
   apply(player: Player) {
+    player.logger.info("start plugin")
     player.hooks.viewController.tap(this.name, (viewController) => {
       viewController.hooks.view.tap(this.name, (view) => {
         view.hooks.parser.tap(this.name, (parser) => {
+          player.logger.info("parser tap")
           parser.hooks.determineNodeType.tap(this.name, (obj) => {
+            player.logger.info("determindNodeTap")
             if (Object.prototype.hasOwnProperty.call(obj, 'async')) {
               return NodeType.Async;
             }
           });
+
+          
           parser.hooks.parseNode.tap(
             this.name,
             (
@@ -45,6 +50,8 @@ export default class AsyncNodePlugin implements PlayerPlugin {
               options: ParseObjectOptions,
               determinedNodeType: null | NodeType
             ) => {
+
+              player.logger.info("parseNodeTap")
               if (determinedNodeType === NodeType.Async) {
                 const parsedAsync = parser.parseObject(
                   omit(obj, 'async'),
@@ -69,10 +76,14 @@ export default class AsyncNodePlugin implements PlayerPlugin {
           );
         });
 
+
         view.hooks.resolver.tap(this.name, (resolver) => {
           resolver.hooks.beforeResolve.tap(this.name, (node, options) => {
             let resolvedNode;
+
+            player.logger.info("befpre resolve tap")
             if (this.isAsync(node)) {
+              player.logger.info("is Async")
               const mappedValue = this.resolvedMapping.get(node.id);
               if (mappedValue) {
                 resolvedNode = mappedValue;
