@@ -136,21 +136,11 @@ const PlatformTabs = (props: React.PropsWithChildren<unknown>) => {
  * Tab section for Content Authoring. This should include tsx and/or example JSON files.
  */
 const ContentTabs = (props: React.PropsWithChildren<unknown>) => {
-
   const children = React.Children.toArray(props.children).filter((c: any) => {
     return ContentTabsNameMap.has(c.props.mdxType.toLowerCase());
   });
 
-  return (
-    <Tabs
-      nameMap={ContentTabsNameMap}
-      callback={(tabIndex: number) => {
-        const lang = (children[tabIndex] as any).props.mdxType.toLowerCase();
-      }}
-    >
-      {children}
-    </Tabs>
-  );
+  return <Tabs nameMap={ContentTabsNameMap}>{children}</Tabs>;
 };
 
 const langMap: Record<string, string> = {
