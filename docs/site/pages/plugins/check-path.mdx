@@ -1,6 +1,6 @@
 ---
 title: Check Path Plugin
-platform: react,core
+platform: react,core,android
 ---
 
 # Check Path Plugin
@@ -48,7 +48,7 @@ Install the plugin:
 ```bash
 yarn add @player-ui/check-path-plugin-react
 ```
-
+6474792156
 Add it to Player:
 
 ```js
@@ -90,6 +90,23 @@ var body: some View {
 }
 ```
 </ios>
+
+  <android>
+In build.gradle
+
+```kotlin
+implementation "com.intuit.player.plugins:check-path:$PLAYER_VERSION"
+```
+
+In Player constructor
+
+```kotlin
+import com.intuit.player.plugins.checkpath.CheckPathPlugin
+
+val plugins = listOf(CheckPathPlugin())
+AndroidPlayer(plugins)
+```
+  </android>
 
 </PlatformTabs>
 
@@ -200,6 +217,15 @@ struct MyAsset: View {
 
 ```
 </ios>
+
+  <android>
+
+The JVM CheckPathPlugin API contains partial functionality in comparison to the core plugin, ideally this should not be used, and all logic where pathing is concerned should be handled in transforms
+If the situation arises and this plugin is absolutely necessary, the API from the following source are available at the moment. This is subject to change in future releases:
+
+[CheckPathPlugin](https://github.com/player-ui/player/blob/main/plugins/check-path/jvm/src/main/kotlin/CheckPathPlugin.kt)
+
+  </android>
 
 </PlatformTabs>
 

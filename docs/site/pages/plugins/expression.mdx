@@ -104,9 +104,16 @@ let expressionPlugin = ExpressionPlugin(expressions: [
 
 The `ExpressionPlugin` enables consumers to register custom expressions in native JVM code. Simply supply a map of expression name to handler on instantiation, and the expressions will be available within the content. Handlers receive arguments are as a `List<Any?>` and are permitted to return `Any?`.
 
+## Usage
+In build.gradle
 ```kotlin
-// A convenience constructor is provided that takes
-// varargs pairs of the expressions to register
+implementation "com.intuit.player.plugins:expression:$PLAYER_VERSION"
+```
+
+In Player constructor
+```kotlin
+import com.intuit.player.plugins.expression.ExpressionPlugin
+
 val expressionPlugin = ExpressionPlugin(
      "hello" to { args: List<Any?> ->
         when (val name = args.firstOfNull()) {
@@ -115,7 +122,10 @@ val expressionPlugin = ExpressionPlugin(
         }
     }
 )
+AndroidPlayer(expressionPlugin)
 ```
+
+In Player content
 ```json
 {
   "id": "hello-world-text",
