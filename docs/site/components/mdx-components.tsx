@@ -1,5 +1,5 @@
 import React from 'react';
-import path from 'path';
+import path, { parse } from 'path';
 import Link from 'next/link';
 import {
   Heading,
@@ -51,6 +51,11 @@ const CodeTabsNameMap = new Map([
   ['react', 'React'],
   ['ios', 'iOS'],
   ['android', 'Android'],
+]);
+
+const ContentTabsNameMap = new Map([
+  ['json', 'JSON'],
+  ['tsx', 'TSX'],
 ]);
 
 const CodeTabsMap = new Map([['gradle', GradleTab]]);
@@ -125,6 +130,17 @@ const PlatformTabs = (props: React.PropsWithChildren<unknown>) => {
       {children}
     </Tabs>
   );
+};
+
+/**
+ * Tab section for Content Authoring. This should include tsx and/or example JSON files.
+ */
+const ContentTabs = (props: React.PropsWithChildren<unknown>) => {
+  const children = React.Children.toArray(props.children).filter((c: any) => {
+    return ContentTabsNameMap.has(c.props.mdxType.toLowerCase());
+  });
+
+  return <Tabs nameMap={ContentTabsNameMap}>{children}</Tabs>;
 };
 
 const langMap: Record<string, string> = {
@@ -242,6 +258,8 @@ export const MDXComponents: MDXProviderComponents = {
   PlayerTeam,
 
   PlatformTabs: withRouter(PlatformTabs),
+
+  ContentTabs,
 
   table: Table,
   th: Th,
