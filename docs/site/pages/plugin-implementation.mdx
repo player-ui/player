@@ -6,7 +6,9 @@ title: Plugin Implementation
 
 The main purpose of a Plugin is to extend or add new functionality by tapping into Player's pipeline of components via hooks. In this section we'll go over the steps to implement a plugin.
 
-We'll use the [stage-revert-data](./plugins/stage-revert-data) plugin as example. After creating our plugin class, in the `apply` method we'll add the following code:
+We'll use the [stage-revert-data](./plugins/stage-revert-data) plugin as example. After creating our plugin class, we'll use the `apply` method which provides access to the Player instance, which then gives access to the necessary hooks. First we define the variables that will be used in the plugin when accessing the hooks:
+
+```typescript
 
 ```typescript
 export default class StageRevertDataPlugin implements PlayerPlugin {
@@ -31,12 +33,12 @@ export default class StageRevertDataPlugin implements PlayerPlugin {
 ```
 We defined variables that will be used in the plugin:
 - `dataController`: The data orchestrator of our Player instance
-- `stageData`: State attribute that comes from the view attribute content to enabling the staging of data
-- `commitTransitions`: The list of view names which the shadow model should be committed if transitioned to. Comes from the view state attribute.
+- `stageData`: View attribute that comes from the view state, used for enabling the staging of data
+- `commitTransitions`: The list of view names which the shadow model should be committed if transitioned to. Comes from the view state attribute as well.
 - `commitShadowModel`: Flag that enables committing shadow model into data model after the transition, only if `stageData` is set to true and the next view name is included in `commitTransitions`.
 - `GatedDataMiddleware` Data Middleware that will be used to intercept the data pipeline if `stageData` is set to true.
 
-The next step is to tap into the necessary Player hooks. First we tap into the `viewController` which we can then intercept the `resolveView` hook. By defining our own property method `call` we can intercept the current view state and read the `stageData` and `commitTransitions` properties.
+The next step is to tap into the necessary Player hooks. First we tap into the `viewController` which we can then intercept the `resolveView` hook. Player hooks are implemented with the [Tapable](https://github.com/webpack/tapable) package, so we can use the interception API's `call` method, this triggers everytime the hook is triggered, then we get access to the current view state and read the `stageData` and `commitTransitions` attributes.
 
 ```javascript
     player.hooks.viewController.tap(this.name, (vc) => {
