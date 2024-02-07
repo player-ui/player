@@ -39,11 +39,15 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
     // To be launched in Dispatchers.Default
     public abstract suspend fun initView(data: Data): View
 
-    final override fun initView(): View = AsyncViewStub(
-        hydrationScope,
-        hydrationScope.async { doInitView() },
-        requireContext(),
-    ) { doHydrate(); player.cacheAssetView(assetContext, this) }
+    final override fun initView(): View {
+        // ensure we pre-track hydration to ensure all assets are accounted for during async hydration
+        track()
+        return AsyncViewStub(
+            hydrationScope,
+            hydrationScope.async { doInitView() },
+            requireContext(),
+        ) { doHydrate(); player.cacheAssetView(assetContext, this) }
+    }
 
     private suspend fun doInitView() = withContext(Dispatchers.Default) {
         initView(getData()).apply { setTag(R.bool.view_hydrated, false) }
@@ -52,7 +56,6 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
     // To be launched in Dispatchers.Main
     public abstract suspend fun View.hydrate(data: Data)
 
-    @OptIn(ExperimentalPlayerApi::class)
     final override fun View.hydrate() {
         if (this is AsyncViewStub) return
 
@@ -61,8 +64,10 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
     }
 
     @OptIn(ExperimentalPlayerApi::class)
+    private fun track(): () -> Unit = player.asyncHydrationTrackerPlugin?.run { trackHydration() } ?: {}
+
     private suspend fun View.doHydrate() = withContext(Dispatchers.Main) {
-        val onDone = player.asyncHydrationTrackerPlugin?.run { trackHydration() }
+        val onDone = track()
         try {
             hydrate(getData())
             setTag(R.bool.view_hydrated, true)
@@ -70,14 +75,13 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
             // b/c we're launched in a scope that isn't cared about anymore, we can't appropriately handle this, so just fast fail
             player.inProgressState?.fail(PlayerException("SuspendableAssets can't appropriately handle invalidateViews currently, this should be handled in a future major", exception))
         } finally {
-            onDone?.invoke()
+            onDone()
         }
     }
 
     @ExperimentalPlayerApi
     public class AsyncHydrationTrackerPlugin : AndroidPlayerPlugin {
-
-        private var trackedHydrations = mutableListOf<String>()
+        private var trackedHydrations = mutableSetOf<String>()
 
         public val hooks: Hooks = Hooks()
 
@@ -98,7 +102,6 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
                 }
             }
         }
-
         override fun apply(androidPlayer: AndroidPlayer) {
             androidPlayer.onUpdate { _, _ -> synchronized(trackedHydrations) {
                 trackedHydrations.clear()
