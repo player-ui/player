@@ -233,6 +233,15 @@ and display it as a SwiftUI view comprised of registered assets.
   # </PACKAGES>
 
   # <PLUGINS>
+
+  s.subspec 'AsyncNodePlugin' do |plugin|
+    plugin.dependency 'PlayerUI/Core'
+    plugin.source_files = 'ios/plugins/AsyncNodePlugin/Sources/**/*'
+    plugin.resource_bundles = {
+      'AsyncNodePlugin' => ['ios/plugins/AsyncNodePlugin/Resources/**/*.js']
+    }
+  end
+
   s.subspec 'PrintLoggerPlugin' do |plugin|
     plugin.dependency 'PlayerUI/Core'
     plugin.source_files = 'ios/plugins/PrintLoggerPlugin/Sources/**/*'

@@ -131,7 +131,7 @@ import { BeaconPluginPlugin } from '@player-ui/beacon-plugin';
 
 class MyBeaconPluginPlugin implements BeaconPluginPlugin {
   apply(beaconPlugin: BeaconPlugin) {
-    beaconPlugin.hooks.buildBeacon.tapPromise(
+    beaconPlugin.hooks.buildBeacon.tap(
       { name: 'my-beacon-plugin', context: true } as Tap,
       async (context, beacon) => {
         const { renderTime } =

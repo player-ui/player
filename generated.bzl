@@ -19,6 +19,14 @@ def PlayerUI(
             "ENABLE_TESTING_SEARCH_PATHS": "YES",
         },
         srcs = glob([
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.h",
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.hh",
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.m",
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.mm",
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.swift",
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.c",
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.cc",
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.cpp",
             "ios/plugins/BaseBeaconPlugin/Sources/**/*.h",
             "ios/plugins/BaseBeaconPlugin/Sources/**/*.hh",
             "ios/plugins/BaseBeaconPlugin/Sources/**/*.m",
@@ -213,6 +221,10 @@ def PlayerUI(
             "ios/plugins/TypesProviderPlugin/Sources/**/*.cpp",
         ]),
         resource_bundles = {
+            "AsyncNodePlugin": glob(
+                ["ios/plugins/AsyncNodePlugin/Resources/**/*.js"],
+                exclude_directories = 0,
+            ),
             "BaseBeaconPlugin": glob(
                 ["ios/plugins/BaseBeaconPlugin/Resources/**/*.js"],
                 exclude_directories = 0,

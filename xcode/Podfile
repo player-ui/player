@@ -17,6 +17,7 @@ target 'PlayerUI_Example' do
   pod 'PlayerUI/Logger', :path => '../'
 
   # Plugins
+  pod 'PlayerUI/AsyncNodePlugin', :path => '../'
   pod 'PlayerUI/BeaconPlugin', :path => '../'
   pod 'PlayerUI/CheckPathPlugin', :path => '../'
   pod 'PlayerUI/CommonTypesPlugin', :path => '../'
@@ -65,6 +66,7 @@ plugin 'cocoapods-resource-bundle-copier', {
     "PlayerUI/ReferenceAssets" => {'target' => "//plugins/reference-assets/core:ReferenceAssetsPlugin_Bundles_bundle_prod", 'files' => ['reference-assets-plugin.prod.js']},
 
     # Plugins
+    "PlayerUI/AsyncNodePlugin" => {'target' => "//plugins/async-node/core:AsyncNodePlugin_Bundles_bundle_prod", 'files' => ['async-node-plugin.prod.js']},
     "PlayerUI/BaseBeaconPlugin" => {'target' => "//plugins/beacon/core:BeaconPlugin_Bundles_bundle_prod", 'files' => ['beacon-plugin.prod.js']},
     "PlayerUI/CommonTypesPlugin" => {'target' => "//plugins/common-types/core:CommonTypesPlugin_Bundles_bundle_prod", 'files' => ['common-types-plugin.prod.js']},
     "PlayerUI/CheckPathPlugin" => {'target' => "//plugins/check-path/core:CheckPathPlugin_Bundles_bundle_prod", 'files' => ['check-path-plugin.prod.js']},

@@ -15,7 +15,7 @@ export * from './types';
  * Async node plugin used to resolve async nodes in the content
  * If an async node is present, allow users to provide a replacement node to be rendered when ready
  */
-export default class AsyncNodePlugin implements PlayerPlugin {
+export class AsyncNodePlugin implements PlayerPlugin {
   public readonly hooks = {
     onAsyncNode: new AsyncParallelBailHook<[Node.Node], Node.Node>(),
   };
