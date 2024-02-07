@@ -20,11 +20,9 @@ import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.player.state.inProgressState
 import com.intuit.playerui.core.plugins.findPlugin
 import com.intuit.playerui.core.utils.InternalPlayerApi
-import com.intuit.playerui.plugins.coroutines.flowScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
@@ -103,9 +101,11 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
             }
         }
         override fun apply(androidPlayer: AndroidPlayer) {
-            androidPlayer.onUpdate { _, _ -> synchronized(trackedHydrations) {
-                trackedHydrations.clear()
-            } }
+            androidPlayer.onUpdate { _, _ ->
+                synchronized(trackedHydrations) {
+                    trackedHydrations.clear()
+                }
+            }
         }
 
         public class Hooks {
