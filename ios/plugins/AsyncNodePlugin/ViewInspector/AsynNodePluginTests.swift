@@ -300,6 +300,60 @@ class AsyncNodePluginTests: SwiftUIAssetUnitTestCase {
     }
 }
 
+extension String {
+    static let asyncNodeJson = """
+     {
+       "id": "generated-flow",
+       "views": [
+         {
+           "id": "collection",
+           "type": "collection",
+           "values": [
+             {
+               "asset": {
+                 "id": "action",
+                 "type": "action",
+                 "exp": "{{count}} = {{count}} + 1",
+                 "label": {
+                   "asset": {
+                     "id": "test",
+                     "type": "text",
+                     "value": "test"
+                   }
+                 }
+               }
+             },
+             {
+               "id": "async",
+               "async": true
+             }
+           ]
+         }
+       ],
+       "data": {
+         "count": 0
+       },
+       "navigation": {
+         "BEGIN": "FLOW_1",
+         "FLOW_1": {
+           "startState": "VIEW_1",
+           "VIEW_1": {
+             "state_type": "VIEW",
+             "ref": "collection",
+             "transitions": {
+               "*": "END_Done"
+             }
+           },
+           "END_Done": {
+             "state_type": "END",
+             "outcome": "done"
+           }
+         }
+       }
+     }
+    """
+}
+
 struct PlaceholderNode: Codable, Equatable, AssetData {
     public var id: String
     public var type: String
@@ -311,4 +365,3 @@ struct PlaceholderNode: Codable, Equatable, AssetData {
         self.value = value
     }
 }
-
