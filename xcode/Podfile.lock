@@ -3,7 +3,6 @@ PODS:
     - PlayerUI/Main (= 0.0.1-placeholder)
   - PlayerUI/AsyncNodePlugin (0.0.1-placeholder):
     - PlayerUI/Core
-    - PlayerUI/SwiftUI
   - PlayerUI/BaseBeaconPlugin (0.0.1-placeholder):
     - PlayerUI/Core
   - PlayerUI/BeaconPlugin (0.0.1-placeholder):
@@ -133,7 +132,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  PlayerUI: cd843baf4343ebf9b4ec15516dd6690fee8615e0
+  PlayerUI: ac5d77faecfd960c749d1c80452ca1ae0bbf11be
   SwiftHooks: 3ecc67c23da335d44914a8a74bd1dd23c7c149e6
   SwiftLint: 4fa9579c63416865179bc416f0a92d55f009600d
   ViewInspector: 53313c757eddc5c4842bc7943a66821a68d02d3e

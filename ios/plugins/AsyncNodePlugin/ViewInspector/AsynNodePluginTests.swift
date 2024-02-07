@@ -7,12 +7,12 @@
 
 import Foundation
 import XCTest
-import JavaScriptCore
-import Combine
 import SwiftUI
+import ViewInspector
+import JavaScriptCore
 @testable import PlayerUI
 
-class AsyncNodePluginTests: XCTestCase {
+class AsyncNodePluginTests: SwiftUIAssetUnitTestCase {
 
     func testConstruction() {
         let context = JSContext()
@@ -22,6 +22,34 @@ class AsyncNodePluginTests: XCTestCase {
         plugin.context = context
 
         XCTAssertNotNil(plugin.pluginRef)
+    }
+
+    func testAsyncNodeWithSwiftUIPlayerUsingJSValue() {
+        let handlerExpectation = XCTestExpectation(description: "handler called")
+        let jsContext = JSContext()
+
+        let plugin = AsyncNodePlugin { _ in
+            handlerExpectation.fulfill()
+
+            return .singleNode(.concrete(jsContext?.evaluateScript("""
+                ({"asset": {"id": "text", "type": "text", "value":"new node from the hook"}})
+                """) ?? JSValue()))
+        }
+
+        plugin.context = jsContext
+
+        let context = SwiftUIPlayer.Context { jsContext ?? JSContext() }
+
+        let player = SwiftUIPlayer(
+            flow: .asyncNodeJson, plugins: [ReferenceAssetsPlugin(), plugin], context: context)
+
+        ViewHosting.host(view: player)
+
+        let viewExpectation = player.inspection.inspect(after: 0.5) { view in
+            _ = try view.vStack().first?.anyView().find(text: "new node from the hook")
+        }
+
+        wait(for: [handlerExpectation, viewExpectation], timeout: 1)
     }
 
     func testAsyncNodeWithAnotherAsyncNodeDelay() {
@@ -46,7 +74,7 @@ class AsyncNodePluginTests: XCTestCase {
 
         plugin.context = context
 
-        let player = HeadlessPlayerImpl(plugins: [ReferenceAssetsPlugin(), plugin, PrintLoggerPlugin(level: .info)], context: context ?? JSContext())
+        let player = HeadlessPlayerImpl(plugins: [ReferenceAssetsPlugin(), plugin], context: context ?? JSContext())
 
         let textExpectation = XCTestExpectation(description: "newText1 found")
 
@@ -270,60 +298,6 @@ class AsyncNodePluginTests: XCTestCase {
         XCTAssert(count == 3)
         XCTAssertEqual(expectedMultiNode2Text, "new node from the hook 2")
     }
-}
-
-extension String {
-    static let asyncNodeJson = """
-     {
-       "id": "generated-flow",
-       "views": [
-         {
-           "id": "collection",
-           "type": "collection",
-           "values": [
-             {
-               "asset": {
-                 "id": "action",
-                 "type": "action",
-                 "exp": "{{count}} = {{count}} + 1",
-                 "label": {
-                   "asset": {
-                     "id": "test",
-                     "type": "text",
-                     "value": "test"
-                   }
-                 }
-               }
-             },
-             {
-               "id": "async",
-               "async": true
-             }
-           ]
-         }
-       ],
-       "data": {
-         "count": 0
-       },
-       "navigation": {
-         "BEGIN": "FLOW_1",
-         "FLOW_1": {
-           "startState": "VIEW_1",
-           "VIEW_1": {
-             "state_type": "VIEW",
-             "ref": "collection",
-             "transitions": {
-               "*": "END_Done"
-             }
-           },
-           "END_Done": {
-             "state_type": "END",
-             "outcome": "done"
-           }
-         }
-       }
-     }
-    """
 }
 
 struct PlaceholderNode: Codable, Equatable, AssetData {
