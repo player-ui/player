@@ -1,7 +1,7 @@
 import type { Node, InProgressState } from '@player-ui/player';
 import { Player } from '@player-ui/player';
 import { waitFor } from '@testing-library/react';
-import AsyncNodePlugin from './index';
+import {AsyncNodePlugin} from './index';
 
 jest.useFakeTimers();
 

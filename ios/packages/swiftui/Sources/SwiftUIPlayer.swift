@@ -58,9 +58,8 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             }
 
             let context: JSContext = contextBuilder()
-            let loggerPlugin = PrintLoggerPlugin()
 
-            let allPlugins = plugins + [partialMatchPlugin, loggerPlugin]
+            let allPlugins = plugins + [partialMatchPlugin]
             guard let playerValue = player.setupPlayer(context: context, plugins: allPlugins) else {
                 return logger.e("Failed to load player")
             }

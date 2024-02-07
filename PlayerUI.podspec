@@ -236,7 +236,6 @@ and display it as a SwiftUI view comprised of registered assets.
 
   s.subspec 'AsyncNodePlugin' do |plugin|
     plugin.dependency 'PlayerUI/Core'
-    plugin.dependency 'PlayerUI/SwiftUI'
     plugin.source_files = 'ios/plugins/AsyncNodePlugin/Sources/**/*'
     plugin.resource_bundles = {
       'AsyncNodePlugin' => ['ios/plugins/AsyncNodePlugin/Resources/**/*.js']

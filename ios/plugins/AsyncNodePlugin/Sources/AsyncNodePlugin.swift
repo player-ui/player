@@ -7,7 +7,6 @@
 
 import Foundation
 import JavaScriptCore
-import SwiftUI
 
 public typealias AsyncHookHandler = (JSValue) async throws -> AsyncNodeHandlerType
 

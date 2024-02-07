@@ -119,6 +119,6 @@ public class AsyncHook<T>: BaseJSHook where T: CreatedFromJSValue {
              return promise ?? JSValue()
          }
 
-         self.hook.invokeMethod("tapPromise", withArguments: [name, JSValue(object: tapMethod, in: context) as Any])
+         self.hook.invokeMethod("tap", withArguments: [name, JSValue(object: tapMethod, in: context) as Any])
      }
 }
