@@ -57,63 +57,52 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
         if (this is AsyncViewStub) return
 
         setTag(R.bool.view_hydrated, false)
-
-        hydrationScope.launch(Dispatchers.Main) { doHydrate() }.let {
-            player.asyncHydrationTrackerPlugin!!.apply {
-                trackHydration(it)
-            }
-        }
+        hydrationScope.launch(Dispatchers.Main) { doHydrate() }
     }
 
+    @OptIn(ExperimentalPlayerApi::class)
     private suspend fun View.doHydrate() = withContext(Dispatchers.Main) {
+        val onDone = player.asyncHydrationTrackerPlugin?.run { trackHydration() }
         try {
             hydrate(getData())
             setTag(R.bool.view_hydrated, true)
         } catch (exception: StaleViewException) {
             // b/c we're launched in a scope that isn't cared about anymore, we can't appropriately handle this, so just fast fail
             player.inProgressState?.fail(PlayerException("SuspendableAssets can't appropriately handle invalidateViews currently, this should be handled in a future major", exception))
+        } finally {
+            onDone?.invoke()
         }
     }
 
     @ExperimentalPlayerApi
     public class AsyncHydrationTrackerPlugin : AndroidPlayerPlugin {
-        private lateinit var androidPlayer: AndroidPlayer
 
-        private val scope get() = androidPlayer.flowScope ?: androidPlayer.scope
-
-
-        private var trackedHydrations = mutableMapOf<String, SuspendableAsset<*>>()
+        private var trackedHydrations = mutableListOf<String>()
 
         public val hooks: Hooks = Hooks()
 
-        public fun SuspendableAsset<*>.trackHydration(job: Job) {
+        public fun SuspendableAsset<*>.trackHydration(): () -> Unit {
             val key = assetContext.id
             synchronized(trackedHydrations) {
-                if (trackedHydrations.containsKey(key)) {
-                    // if we're getting a new hydration for the same asset id,
-                    // we're rehydrating and should clear the tracked hydrations
-                    trackedHydrations.clear()
-                }
-
-                trackedHydrations.put(key, this)
+                trackedHydrations.add(key)
             }
 
-            scope.launch {
-                job.join()
-
+            return {
                 val doneHydrating = synchronized(trackedHydrations) {
                     trackedHydrations.remove(key)
                     trackedHydrations.isEmpty()
                 }
 
                 if (doneHydrating) {
-                    ensureActive()
                     hooks.onHydrationComplete.call()
                 }
             }
         }
+
         override fun apply(androidPlayer: AndroidPlayer) {
-            this.androidPlayer = androidPlayer
+            androidPlayer.onUpdate { _, _ -> synchronized(trackedHydrations) {
+                trackedHydrations.clear()
+            } }
         }
 
         public class Hooks {
