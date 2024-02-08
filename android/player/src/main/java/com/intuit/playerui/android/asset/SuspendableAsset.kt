@@ -39,7 +39,7 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
 
     final override fun initView(): View {
         // ensure we pre-track hydration to ensure all assets are accounted for during async hydration
-        player.asyncHydrationTrackerPlugin?.hydrationDone(this@SuspendableAsset)
+        player.asyncHydrationTrackerPlugin?.trackHydration(this@SuspendableAsset)
         return AsyncViewStub(
             hydrationScope,
             hydrationScope.async { doInitView() },
