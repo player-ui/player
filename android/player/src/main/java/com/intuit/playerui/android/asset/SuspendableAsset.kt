@@ -39,7 +39,7 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
 
     final override fun initView(): View {
         // ensure we pre-track hydration to ensure all assets are accounted for during async hydration
-        track()
+        player.asyncHydrationTrackerPlugin?.hydrationDone(this@SuspendableAsset)
         return AsyncViewStub(
             hydrationScope,
             hydrationScope.async { doInitView() },
@@ -61,11 +61,8 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
         hydrationScope.launch(Dispatchers.Main) { doHydrate() }
     }
 
-    @OptIn(ExperimentalPlayerApi::class)
-    private fun track(): () -> Unit = player.asyncHydrationTrackerPlugin?.run { trackHydration() } ?: {}
-
     private suspend fun View.doHydrate() = withContext(Dispatchers.Main) {
-        val onDone = track()
+        player.asyncHydrationTrackerPlugin?.trackHydration(this@SuspendableAsset)
         try {
             hydrate(getData())
             setTag(R.bool.view_hydrated, true)
@@ -73,7 +70,7 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
             // b/c we're launched in a scope that isn't cared about anymore, we can't appropriately handle this, so just fast fail
             player.inProgressState?.fail(PlayerException("SuspendableAssets can't appropriately handle invalidateViews currently, this should be handled in a future major", exception))
         } finally {
-            onDone()
+            player.asyncHydrationTrackerPlugin?.hydrationDone(this@SuspendableAsset)
         }
     }
 
@@ -83,23 +80,23 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
 
         public val hooks: Hooks = Hooks()
 
-        public fun SuspendableAsset<*>.trackHydration(): () -> Unit {
-            val key = assetContext.id
+        public fun trackHydration(asset: SuspendableAsset<*>) {
             synchronized(trackedHydrations) {
-                trackedHydrations.add(key)
-            }
-
-            return {
-                val doneHydrating = synchronized(trackedHydrations) {
-                    trackedHydrations.remove(key)
-                    trackedHydrations.isEmpty()
-                }
-
-                if (doneHydrating) {
-                    hooks.onHydrationComplete.call()
-                }
+                trackedHydrations.add(asset.assetContext.id)
             }
         }
+
+        public fun hydrationDone(asset: SuspendableAsset<*>) {
+            val doneHydrating = synchronized(trackedHydrations) {
+                trackedHydrations.remove(asset.assetContext.id)
+                trackedHydrations.isEmpty()
+            }
+
+            if (doneHydrating) {
+                hooks.onHydrationComplete.call()
+            }
+        }
+
         override fun apply(androidPlayer: AndroidPlayer) {
             androidPlayer.onUpdate { _, _ ->
                 synchronized(trackedHydrations) {
