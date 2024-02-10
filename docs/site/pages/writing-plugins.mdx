@@ -13,6 +13,22 @@ platform: core,react
 
 Core plugins are the easiest way to extend Player functionality regardless of what platform you are using Player on. To make writing core plugins easy `@player-ui/player` exposes an interface `PlayerPlugin` that denotes everything needed. The two mandatory features are a `name` property which is lets Player know how to refer to the plugin and an implemented `apply` function that takes a `player` object. Optionally a `symbol` property can be used to provide a unique identifier that can be used to retrieve the plugin from Player. 
 
+The first step for creating a plugin is making our plugin class, making sure it implements the `PlayerPlugin` interface from `@player-ui/player`. By convention, a name attribute with the dash-cased name of your plugin should be defined.
+
+```typescript
+export default class ExamplePlayerPlugin implements PlayerPlugin {
+  name = 'example-player-plugin';
+
+  {/* A constructor can go here */}
+
+  apply(player: Player) {
+    {/* Your logic here */}
+  }
+
+  {/* Helper methods can go here */}
+}
+```
+
 The `apply` function is where the actual logic of the plugin lives. By tapping the hooks exposed via `player.hooks` you gain access to the internal pipeline of components that comprise Player and can inject your functionality into their exposed hooks. For example if you want to do something any time Player's state changes you could do the following: 
 
 ```javascript
@@ -36,12 +52,14 @@ apply(player: Player) {
 
 It is not uncommon for core plugins to have constructors for cases where the plugin needs to take some configuration. In cases where plugin configs are more complicated than basic feature flags, it is recommended to make an interface to represent the config object. As an added benefit it also makes it easier to down stream consumers to use your plugin. 
 
+For a more comprehensive guide on plugins, check out this [Plugin Implementation](./plugin-implementation) example.
+
 _Note: For the React Player you can import and load the plugin the same way you would a React Player Plugin but for the iOS and Android Players you will need to wrap the javascript bundle in a iOS/Android plugin to ensure it is available on your platform._
 
   </core>
   <react>
 
-React Player Plugins are very similar to core plugins in both their composition and use. The `@player-ui/react` package exposes an interface `ReactPlayerPlugin` that, much like the `PlayerPlugin` interface provides the necessary attributes that are required for a React Player plugin. Again a `name` attribute is required and a function `applyReact` is required that takes a `ReactPlayer` instance. Similarly to core plugins in the `applyReact` function you have access to the React Player object and access to the three exposed hooks:
+React Player Plugins are very similar to core plugins in both their composition and use. The `@player-ui/react` package exposes an interface `ReactPlayerPlugin` that, much like the `PlayerPlugin` interface provides the necessary attributes that are required for a React Player plugin. Again a dash-cased `name` attribute should be used by convention, and a function `applyReact` is required that takes a `ReactPlayer` instance. Similarly to core plugins in the `applyReact` function you have access to the React Player object and access to the three exposed hooks:
 
 - The `webComponent` hook allows you to modify a React component that is stored in the React Player for use when it renders content. This happens during the initialization phase and ise useful if you want to wrap components in various content providers. 
 - The `playerComponent` hook allows you to modify a component or execute functionality when the React Player is rendering a component after the view has been reconciled in Player. This is useful if you want to inject additional props to components or collect data on which component was rendered. 
@@ -78,6 +96,9 @@ export class FunctionPlugin implements ReactPlayerPlugin {
       );
     });
   }
+
+  {/* Helper methods can go here */}
+}
 ```
 
 Lastly React plugins can also act as a core plugin in cases where core functionality needs to be extended for the React plugin to work. Since both the `PlayerPlugin` and `ReactPlayerPlugin` are typescript interfaces a plugin can implement both and be considered a valid plugin. 

@@ -49,6 +49,10 @@ const navigation: Navigation = {
               path: '/writing-plugins',
             },
             {
+              title: 'Plugin Implementation',
+              path: '/plugin-implementation',
+            },
+            {
               title: 'Multi-Flow Experiences',
               path: '/guides/multi-flow-experiences',
             },

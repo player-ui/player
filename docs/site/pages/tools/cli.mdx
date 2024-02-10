@@ -45,7 +45,7 @@ Plugins are the way to change runtime behavior of the CLI actions. This includes
 # Commands
 
 - [`player dsl compile`](#player-dsl-compile)
-Compile Player DSL files into JSON
+Compile Player DSL files into JSON after running TSC compiler against Typescript files
 
 ```
 USAGE
@@ -60,7 +60,23 @@ FLAGS
   --skip-validation     Option to skip validating the generated JSON
 
 DESCRIPTION
-  Compile Player DSL files into JSON
+  Compile Player DSL files into JSON after running TSC compiler against Typescript files
+```
+
+- [`player dsl validate`](#player-dsl-validate)
+Runs isolated TSC compiler on authored Player DSL Typescript files.
+
+```
+USAGE
+  $ player dsl validate [-f <value>] [-c <value>] 
+
+FLAGS
+  -c, --config=<value>  Path to a specific config file to load.
+                        By default, will automatically search for an rc or config file to load
+  -f, --files=<value>...  A list of files or globs to validate
+
+DESCRIPTION
+  Runs isolated TSC compiler on authored Player DSL Typescript files.
 ```
 
 - [`player json validate`](#player-json-validate)
