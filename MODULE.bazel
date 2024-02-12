@@ -2,12 +2,12 @@ module(name = "player", version = "1.0")
 
 bazel_dep(name = "rules_player")
 
-git_override(
-    remote = "https://github.com/player-ui/rules_player.git",
-    commit = "9a166dcc3dffdc39d8528751df22d883ec2e3f20",
-    module_name = "rules_player",
-)
-# local_path_override(module_name = "rules_player", path = "../rules_player")
+# git_override(
+#     remote = "https://github.com/player-ui/rules_player.git",
+#     commit = "9a166dcc3dffdc39d8528751df22d883ec2e3f20",
+#     module_name = "rules_player",
+# )
+local_path_override(module_name = "rules_player", path = "../rules_player")
 
 bazel_dep(name = "aspect_bazel_lib", version = "1.32.0")
 bazel_dep(name = "aspect_rules_js", version = "1.34.1")

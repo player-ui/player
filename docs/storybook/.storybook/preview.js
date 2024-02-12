@@ -5,6 +5,8 @@ import { DataChangeListenerPlugin } from "@player-ui/data-change-listener-plugin
 import { ComputedPropertiesPlugin } from "@player-ui/computed-properties-plugin";
 import * as dslRefComponents from "@player-ui/reference-assets-plugin-components";
 
+import "@player-ui/reference-assets-plugin-react/dist/index.css";
+
 const reactPlayerPlugins = [
   new ReferenceAssetsPlugin(),
   new CommonTypesPlugin(),
@@ -21,7 +23,12 @@ export const parameters = {
   },
   options: {
     storySort: {
-      order: ["Welcome", "Player", "Reference Assets", ["Overview", "Intro"]],
+      order: [
+        "Welcome",
+        "React Player",
+        "Reference Assets",
+        ["Docs", "Overview", "Intro"],
+      ],
     },
   },
 };

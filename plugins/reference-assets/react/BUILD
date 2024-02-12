@@ -10,6 +10,18 @@ vitest_config(name = "vitest_config")
 
 js_pipeline(
     package_name = "@player-ui/reference-assets-plugin-react",
+    srcs = [
+        "postcss.config.js",
+        "tailwind.config.js",
+    ] + glob(["src/**/*"]),
+    build_deps = [
+        "//:tsup_config",
+        "//:typings",
+        "//:node_modules/autoprefixer",
+        "//:node_modules/postcss",
+        "//:node_modules/tailwindcss",
+        "//:node_modules/tailwindcss-animate",
+    ],
     peer_deps = [
         ":node_modules/@player-ui/react",
         "//:node_modules/react",
@@ -27,6 +39,12 @@ js_pipeline(
         ":node_modules/@player-ui/reference-assets-plugin",
         "//:node_modules/@chakra-ui/icons",
         "//:node_modules/@chakra-ui/react",
+        "//:node_modules/@radix-ui/react-label",
+        "//:node_modules/@radix-ui/react-separator",
+        "//:node_modules/@radix-ui/react-slot",
+        "//:node_modules/class-variance-authority",
         "//:node_modules/clsx",
+        "//:node_modules/lucide-react",
+        "//:node_modules/tailwind-merge",
     ],
 )
