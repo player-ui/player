@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "@chakra-ui/react";
 import type {
   TextAsset,
   LinkModifier,
@@ -22,7 +21,14 @@ export const Text = (props: TextAsset) => {
   const { value } = props;
 
   if (linkModifier) {
-    return <Link href={linkModifier.metaData.ref}>{value}</Link>;
+    return (
+      <a
+        className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+        href={linkModifier.metaData.ref}
+      >
+        {value}
+      </a>
+    );
   }
 
   return <span {...spanProps}>{value}</span>;

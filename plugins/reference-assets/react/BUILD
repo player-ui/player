@@ -37,8 +37,6 @@ js_pipeline(
         ":node_modules/@player-ui/beacon-plugin-react",
         ":node_modules/@player-ui/partial-match-registry",
         ":node_modules/@player-ui/reference-assets-plugin",
-        "//:node_modules/@chakra-ui/icons",
-        "//:node_modules/@chakra-ui/react",
         "//:node_modules/@radix-ui/react-label",
         "//:node_modules/@radix-ui/react-separator",
         "//:node_modules/@radix-ui/react-slot",

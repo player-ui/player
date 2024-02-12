@@ -1,13 +1,6 @@
 import React from "react";
 import { ReactAsset } from "@player-ui/react";
 import type { TransformedInput } from "@player-ui/reference-assets-plugin";
-// import {
-//   Input as ChakraInput,
-//   FormControl,
-//   FormLabel,
-//   FormErrorMessage,
-//   FormHelperText,
-// } from "@chakra-ui/react";
 import { Input as InputComp } from "../../components/Input";
 import { Label } from "../../components/Label";
 
