@@ -14,7 +14,7 @@ kt_db_android_library(
     manifest = ":src/main/AndroidManifest.xml",
     resource_files = glob(["src/main/res/**"]),
     resources = main_resources,
-    tags = ["maven_coordinates=com.intuit.player.android:player:aar:%s" % VERSION],
+    tags = ["maven_coordinates=com.intuit.playerui:android:aar:%s" % VERSION],
     visibility = ["//visibility:public"],
     exports = main_exports,
     deps = main_deps,
@@ -23,7 +23,7 @@ kt_db_android_library(
 distribution(
     name = "player",
     lib_name = "player-databinding",
-    maven_coordinates = "com.intuit.player.android:player:%s" % VERSION,
+    maven_coordinates = "com.intuit.playerui:android:%s" % VERSION,
 )
 
 kt_jvm_junit5_test(
