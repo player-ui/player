@@ -57,8 +57,7 @@ assemble_pod(
         "//core/make-flow:MakeFlow_Bundles_bundle_prod": "ios/packages/test-utils/Resources/",
         "//plugins/reference-assets/core:ReferenceAssetsPlugin_Bundles_bundle_prod": "ios/packages/reference-assets/Resources/js/",
         # Plugins
-        "//plugins/async-node/core:AsyncNodePlugin_Bundles_bundle_prod":
-            "ios/plugins/AsyncNodePlugin/Resources/",
+        "//plugins/async-node/core:AsyncNodePlugin_Bundles_bundle_prod": "ios/plugins/AsyncNodePlugin/Resources/",
         "//plugins/beacon/core:BeaconPlugin_Bundles_bundle_prod": "ios/plugins/BaseBeaconPlugin/Resources/",
         "//plugins/check-path/core:CheckPathPlugin_Bundles_bundle_prod": "ios/plugins/CheckPathPlugin/Resources/",
         "//plugins/common-types/core:CommonTypesPlugin_Bundles_bundle_prod": "ios/plugins/CommonTypesPlugin/Resources/",
