@@ -60,7 +60,7 @@ def run():
   os.system('adb wait-for-device')
   p = sp.Popen("""adb shell 'CLASSPATH=\$(pm path androidx.test.services) app_process / \
                androidx.test.services.shellexecutor.ShellMain am instrument -w -e clearPackageData true \
-               -e targetInstrumentation com.intuit.player.android.reference.demo.test/androidx.test.runner.AndroidJUnitRunner \
+               -e targetInstrumentation com.intuit.playerui.android.reference.demo.test/androidx.test.runner.AndroidJUnitRunner \
                androidx.test.orchestrator/.AndroidTestOrchestrator'""",
                shell=True, stdout=sp.PIPE, stderr=sp.PIPE, stdin=sp.PIPE)
 

@@ -4,8 +4,8 @@ load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 kt_player_module(
     name = "perf_tests",
     main_deps = ["//jvm/testutils"],
-    main_srcs = ["src/main/kotlin/com/intuit/player/jvm/perf/junit/JSEngineTest.kt"],
-    test_package = "com.intuit.player.jvm.perf",
+    main_srcs = ["src/main/kotlin/com/intuit/playerui/perf/junit/JSEngineTest.kt"],
+    test_package = "com.intuit.playerui.perf",
 )
 
 java_plugin(
@@ -16,7 +16,7 @@ java_plugin(
 
 kt_jvm_library(
     name = "perf_lib",
-    srcs = ["src/main/kotlin/com/intuit/player/jvm/perf/jmh/PlayerPerf.kt"],
+    srcs = ["src/main/kotlin/com/intuit/playerui/perf/jmh/PlayerPerf.kt"],
     kotlinc_opts = "//jvm:test_options",
     plugins = [":jmh_annotation_processor"],
     resources = glob(["src/main/resources/*.json"]),

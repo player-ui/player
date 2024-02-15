@@ -1,7 +1,7 @@
 package @{{package}}
 
-import com.intuit.player.jvm.utils.test.PlayerTest
-import com.intuit.player.jvm.core.plugins.findPlugin
+import com.intuit.playerui.utils.test.PlayerTest
+import com.intuit.playerui.core.plugins.findPlugin
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.TestTemplate
 

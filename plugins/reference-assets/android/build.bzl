@@ -5,18 +5,16 @@ def kt_asset_test(
         name,
         test_class,
         srcs = [],
-        deps = []
-):
+        deps = []):
     kt_android_local_test(
         name = name,
         srcs = srcs,
-        custom_package = "com.intuit.player.android.reference.assets",
+        custom_package = "com.intuit.playerui.android.reference.assets",
         test_class = test_class,
         deps = deps + [
             "//plugins/mocks:jar",
-            "//plugins/reference-assets/android/src/androidTest/java/com/intuit/player/android/reference/assets/test",
+            "//plugins/reference-assets/android/src/androidTest/java/com/intuit/playerui/android/reference/assets/test",
             "//jvm/j2v8:j2v8-all",
-
         ],
         resources = [
         ],

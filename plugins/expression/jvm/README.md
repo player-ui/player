@@ -2,4 +2,4 @@
 
 ## Gradle Dependency
 
-`implementation("com.intuit.player.plugins:expression:$VERSION")`
+`implementation("com.intuit.playerui.plugins:expression:$VERSION")`

@@ -2,4 +2,4 @@
 
 ## Gradle Dependency
 
-`implementation("com.intuit.player.plugins", "java-logger", version)`
+`implementation("com.intuit.playerui.plugins", "java-logger", version)`
