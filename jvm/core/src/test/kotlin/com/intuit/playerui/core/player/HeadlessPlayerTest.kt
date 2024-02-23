@@ -296,9 +296,9 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         assertTrue(exception is PlayerException)
         assertEquals("Could not load Player content", exception.message)
 
-        val state = player.state
-        assertEquals(PlayerFlowStatus.NOT_STARTED, state.status)
-        assertTrue(state is NotStartedState)
+        // this is not started b/c we failed out of content
+        // evaluation _before_ it's handed to the underlying Player
+        assertTrue(player.state is NotStartedState)
     }
 
     @TestTemplate
