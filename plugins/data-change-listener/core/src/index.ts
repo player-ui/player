@@ -8,6 +8,7 @@ import type {
   ExpressionEvaluator,
   BindingInstance,
   BindingParser,
+  ValidationController,
 } from '@player-ui/player';
 import { isExpressionNode } from '@player-ui/player';
 
@@ -194,6 +195,7 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
   apply(player: Player) {
     let expressionEvaluator: ExpressionEvaluator;
     let dataChangeListeners: Array<ViewListenerHandler> = [];
+    let validationController: ValidationController;
 
     player.hooks.expressionEvaluator.tap(
       this.name,
@@ -234,8 +236,9 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
         const { silent = false } = options || {};
         if (silent) return;
         const validUpdates = updates.filter((update) => {
-          const committedVal = options?.context?.model.get(update.binding);
-          return committedVal === update.newValue;
+          return !validationController
+            .getValidationForBinding(update.binding)
+            ?.getAll().length;
         });
         onFieldUpdateHandler(validUpdates.map((t) => t.binding));
       })
@@ -276,6 +279,10 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
         });
       }
     );
+
+    player.hooks.validationController.tap(this.name, (vc) => {
+      validationController = vc;
+    });
 
     player.hooks.flowController.tap(this.name, (flowController) => {
       flowController.hooks.flow.tap(this.name, (flow) => {
