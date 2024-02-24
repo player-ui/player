@@ -55,10 +55,11 @@ export class ViewController {
   ) {
     this.viewOptions = options;
     this.viewMap = initialViews.reduce<Record<string, View>>(
-      (viewMap, view) => ({
-        ...viewMap,
-        [view.id]: view,
-      }),
+      (viewMap, view) => {
+        // eslint-disable-next-line no-param-reassign
+        viewMap[view.id] = view;
+        return viewMap;
+      },
       {}
     );
 

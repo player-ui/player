@@ -166,22 +166,20 @@ function extractDataChangeListeners(
       );
 
       if (listenerKey.match(WILDCARD_REGEX)) {
-        return [
-          ...allListeners,
-          createWildcardHandler(listenerRawBinding, listenerExp, bindingParser),
-        ];
+        allListeners.push(
+          createWildcardHandler(listenerRawBinding, listenerExp, bindingParser)
+        );
+        return allListeners;
       }
 
       const parsedOriginalBinding = bindingParser.parse(listenerRawBinding);
 
-      return [
-        ...allListeners,
-        (context, binding) => {
-          if (parsedOriginalBinding.contains(binding)) {
-            context.expressionEvaluator.evaluate(listenerExp);
-          }
-        },
-      ];
+      allListeners.push((context, binding) => {
+        if (parsedOriginalBinding.contains(binding)) {
+          context.expressionEvaluator.evaluate(listenerExp);
+        }
+      });
+      return allListeners;
     },
     []
   );
