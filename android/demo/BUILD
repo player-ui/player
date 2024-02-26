@@ -9,7 +9,7 @@ kt_android_library(
     srcs = glob(["src/main/java/**"]),
     assets = glob(["src/main/assets/mocks/**"]),
     assets_dir = "src/main/assets",
-    custom_package = "com.intuit.player.android.reference.demo",
+    custom_package = "com.intuit.playerui.android.reference.demo",
     manifest = ":src/main/AndroidManifest.xml",
     resource_files = glob(["src/main/res/**"]),
     deps = main_deps,
@@ -17,7 +17,7 @@ kt_android_library(
 
 android_binary(
     name = "demo",
-    custom_package = "com.intuit.player.android.reference.demo",
+    custom_package = "com.intuit.playerui.android.reference.demo",
     dex_shards = 10,
     enable_data_binding = True,
     manifest = ":src/main/AndroidManifest.xml",
@@ -59,7 +59,7 @@ kt_android_library(
 
 android_binary(
     name = "demo_test_app",
-    custom_package = "com.intuit.player.android.reference.demo",
+    custom_package = "com.intuit.playerui.android.reference.demo",
     instruments = ":demo",
     manifest = ":src/androidTest/AndroidManifest.xml",
     deps = ["demo_ui_test"],

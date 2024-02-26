@@ -2,4 +2,4 @@
 
 ## Gradle Dependency
 
-`implementation("com.intuit.player.plugins:external-action:$VERSION")`
+`implementation("com.intuit.playerui.plugins:external-action:$VERSION")`

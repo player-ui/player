@@ -30,7 +30,7 @@ bazel build --config=release //:PlayerUI_Podspec //:PlayerUI_Pod
 bazel run --config=release //language/vscode-player-syntax:vscode-plugin.publish
 
 # Maven Central publishing
-bazel run @rules_player//distribution:staged-maven-deploy -- "$RELEASE_TYPE" --package-group=com.intuit.player --legacy --client-timeout=600 --connect-timeout=600
+bazel run @rules_player//distribution:staged-maven-deploy -- "$RELEASE_TYPE" --package-group=com.intuit.playerui --legacy --client-timeout=600 --connect-timeout=600
 
 # Running this here because it will still have the pre-release version in the VERSION file before auto cleans it up
 # Make sure to re-stamp the outputs with the BASE_PATH so nextjs knows what to do with links

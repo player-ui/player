@@ -2,4 +2,4 @@
 
 ## Gradle Dependency
 
-`implementation("com.intuit.player.jvm.plugins:set-time-out:$VERSION")`
+`implementation("com.intuit.playerui.plugins:set-time-out:$VERSION")`

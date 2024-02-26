@@ -1,3 +1,3 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.intuit.player.android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.intuit.playerui.android">
     <uses-sdk android:minSdkVersion="14" />
 </manifest>

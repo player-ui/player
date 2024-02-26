@@ -14,7 +14,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.intuit.player.android.reference.assets.input.FormattedEditText
+    <com.intuit.playerui.android.reference.assets.input.FormattedEditText
         android:id="@+id/input_field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

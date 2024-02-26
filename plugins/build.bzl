@@ -69,7 +69,7 @@ def kt_player_plugin_wrapper(
         project_description = None,
         project_url = None,
         scm_url = None):
-    package = "com.intuit.player.plugins.%s" % package_scope
+    package = "com.intuit.playerui.plugins.%s" % package_scope
     generate_plugin_wrapper(
         name = "%s-gen" % name,
         package = package,
