@@ -52,7 +52,10 @@ export const concat = withoutContext((...args: Array<unknown>) => {
   if (args.every((v) => Array.isArray(v))) {
     const arrayArgs = args as Array<Array<unknown>>;
 
-    return arrayArgs.reduce((merged, next) => [...merged, ...next]);
+    return arrayArgs.reduce((merged, next) => {
+      merged.push(...next);
+      return merged;
+    });
   }
 
   return args.reduce((merged: any, next) => merged + (next ?? ''), '');

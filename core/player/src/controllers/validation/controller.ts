@@ -184,13 +184,10 @@ class ValidatedBinding {
   public getAll(): Array<ValidationResponse> {
     return this.applicableValidations.reduce((all, statefulObj) => {
       if (statefulObj.state === 'active' && statefulObj.response) {
-        return [
-          ...all,
-          {
-            ...statefulObj.response,
-            blocking: this.checkIfBlocking(statefulObj),
-          },
-        ];
+        all.push({
+          ...statefulObj.response,
+          blocking: this.checkIfBlocking(statefulObj),
+        });
       }
 
       return all;
@@ -604,18 +601,18 @@ export class ValidationController implements BindingTracker {
       // Get all of the validations from each provider
       const possibleValidations = this.getValidationProviders().reduce<
         Array<ValidationObjectWithSource>
-      >(
-        (vals, provider) => [
-          ...vals,
+      >((vals, provider) => {
+        vals.push(
           ...(provider.provider
             .getValidationsForBinding?.(binding)
             ?.map((valObj) => ({
               ...valObj,
               [VALIDATION_PROVIDER_NAME_SYMBOL]: provider.source,
-            })) ?? []),
-        ],
-        []
-      );
+            })) ?? [])
+        );
+
+        return vals;
+      }, []);
 
       if (possibleValidations.length === 0) {
         return;
