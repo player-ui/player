@@ -11,9 +11,9 @@ import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
 import com.alexii.j2v8debugger.StethoHelper
 import com.intuit.player.android.lifecycle.ManagedPlayerState
-import com.intuit.player.android.lifecycle.PlayerViewModel
+import com.intuit.player.android.mvvm.lifecycle.PlayerViewModel
 import com.intuit.player.android.reference.demo.lifecycle.DemoPlayerViewModel
-import com.intuit.player.android.ui.PlayerFragment
+import com.intuit.player.android.mvvm.ui.PlayerFragment
 import com.intuit.player.jvm.core.bridge.serialization.json.prettify
 import com.intuit.player.jvm.core.bridge.toJson
 import com.intuit.player.jvm.core.managed.AsyncFlowIterator
