@@ -80,7 +80,7 @@ export type MyWorkspaceDSLSchema = DSLSchema<
 >;
 ```
 
-Finally this is how to use the schema: By adding the statement `satisfies` followed by your `DSLSchema` generated type, Typescript will show if there is anything not compliant with the data types and validation functions we defined in the schema:
+Finally, this is how to use the custom schema type to type check your schema. By adding the `satisfies` keyword followed by your `DSLSchema` generated type, your editor's LSP will show if there is anything not compliant with the data types and validation functions we defined in the schema:
 
 ```typescript
 import { MyWorkspaceDSLSchema, dataRefs } from './MyTypes'
