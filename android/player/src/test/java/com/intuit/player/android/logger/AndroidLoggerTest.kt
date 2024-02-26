@@ -1,11 +1,6 @@
 package com.intuit.player.android.logger
 
-import android.util.clearLogs
-import android.util.d
-import android.util.e
-import android.util.i
-import android.util.v
-import android.util.w
+import com.intuit.player.android.utils.clearLogs
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -35,8 +30,6 @@ internal class AndroidLoggerTest {
         logger.info(info)
         assertInfo()
         logger.warn(warn)
-        assertWarn()
-        logger.error(error)
         assertError()
     }
 

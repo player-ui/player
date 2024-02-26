@@ -1,4 +1,4 @@
-package com.intuit.player.android.ui
+package com.intuit.player.android.mvvm.ui
 
 import android.content.Context
 import android.os.Bundle
@@ -14,14 +14,14 @@ import androidx.transition.Transition
 import com.intuit.player.android.AndroidPlayer
 import com.intuit.player.android.asset.RenderableAsset
 import com.intuit.player.android.asset.SuspendableAsset
-import com.intuit.player.android.databinding.DefaultFallbackBinding
-import com.intuit.player.android.databinding.FragmentPlayerBinding
 import com.intuit.player.android.extensions.into
 import com.intuit.player.android.extensions.intoOnMain
 import com.intuit.player.android.extensions.transitionInto
 import com.intuit.player.android.lifecycle.ManagedPlayerState
-import com.intuit.player.android.lifecycle.PlayerViewModel
-import com.intuit.player.android.lifecycle.fail
+import com.intuit.player.android.mvvm.databinding.DefaultFallbackBinding
+import com.intuit.player.android.mvvm.databinding.FragmentPlayerBinding
+import com.intuit.player.android.mvvm.lifecycle.PlayerViewModel
+import com.intuit.player.android.mvvm.lifecycle.fail
 import com.intuit.player.jvm.core.experimental.ExperimentalPlayerApi
 import com.intuit.player.jvm.core.managed.AsyncFlowIterator
 import kotlinx.coroutines.CoroutineScope

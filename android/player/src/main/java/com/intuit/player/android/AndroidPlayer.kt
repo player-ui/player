@@ -101,13 +101,13 @@ public class AndroidPlayer private constructor(
             )
         }
 
-        internal class RecycleHook : SyncHook<(HookContext) -> Unit>() {
+        public class RecycleHook : SyncHook<(HookContext) -> Unit>() {
             public fun call(): Unit = super.call { f, context ->
                 f(context)
             }
         }
 
-        internal class ReleaseHook : SyncHook<(HookContext) -> Unit>() {
+        public class ReleaseHook : SyncHook<(HookContext) -> Unit>() {
             public fun call(): Unit = super.call { f, context ->
                 f(context)
             }
@@ -124,8 +124,8 @@ public class AndroidPlayer private constructor(
 
         public val context: ContextHook = ContextHook()
         public val update: UpdateHook = UpdateHook()
-        internal val recycle: RecycleHook = RecycleHook()
-        internal val release: ReleaseHook = ReleaseHook()
+        public val recycle: RecycleHook = RecycleHook()
+        public val release: ReleaseHook = ReleaseHook()
     }
 
     override val hooks: Hooks = Hooks(player.hooks)

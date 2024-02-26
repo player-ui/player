@@ -1,6 +1,7 @@
 load("//jvm/dependencies:versions.bzl", "versions")
 load("//android/player:deps.bzl", player = "maven")
 load("//android/demo:deps.bzl", demo = "maven")
+load("//android/player-ui:deps.bzl", ui = "maven")
 
 android = [
     # Grab Databinding
@@ -18,4 +19,4 @@ android = [
     "androidx.fragment:fragment-ktx:%s" % versions.androidx.fragment,
 ]
 
-maven = android + player + demo
+maven = android + player + demo + ui

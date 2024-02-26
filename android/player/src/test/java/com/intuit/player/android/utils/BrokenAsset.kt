@@ -15,7 +15,7 @@ import com.intuit.player.jvm.utils.makeFlow
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
-internal class BrokenAsset(assetContext: AssetContext) : DecodableAsset<BrokenAsset.Data>(assetContext, Data.serializer()) {
+public class BrokenAsset(assetContext: AssetContext) : DecodableAsset<BrokenAsset.Data>(assetContext, Data.serializer()) {
 
     @Serializable
     data class Data(
