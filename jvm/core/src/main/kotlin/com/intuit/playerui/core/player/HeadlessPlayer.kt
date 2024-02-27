@@ -3,6 +3,7 @@ package com.intuit.playerui.core.player
 import com.intuit.playerui.core.bridge.Completable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
+import com.intuit.playerui.core.bridge.Promise
 import com.intuit.playerui.core.bridge.getInvokable
 import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.playerui.core.bridge.runtime.Runtime
@@ -14,6 +15,7 @@ import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.logger.TapableLogger
 import com.intuit.playerui.core.player.HeadlessPlayer.Companion.bundledSource
 import com.intuit.playerui.core.player.state.CompletedState
+import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.core.player.state.PlayerFlowState
 import com.intuit.playerui.core.player.state.ReleasedState
 import com.intuit.playerui.core.player.state.inProgressState
@@ -140,7 +142,13 @@ public constructor(
             .onEach { it.apply(this) }
     }
 
-    override fun start(flow: String): Completable<CompletedState> = start(runtime.execute("($flow)") as Node)
+    override fun start(flow: String): Completable<CompletedState> = try {
+        start(runtime.execute("($flow)") as Node)
+    } catch (exception: Exception) {
+        val wrapped = PlayerException("Could not load Player content", exception)
+        inProgressState?.fail(wrapped) ?: hooks.state.call(hashMapOf(), arrayOf(ErrorState.from(wrapped)))
+        PlayerCompletable(Promise.reject(wrapped))
+    }
 
     public fun start(flow: Node): Completable<CompletedState> = PlayerCompletable(player.getInvokable<Node>("start")!!.invoke(flow))
 
