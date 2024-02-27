@@ -4,9 +4,9 @@ title: 'Getting Started'
 
 # Getting Started
 
-Getting started with Player is simple. Below we have guides per platform on how to integrate Player into your platform of choice. 
+Getting started with Player is simple. Below we have guides per platform on how to integrate Player into your platform of choice.
 
-## React 
+## React
 
 ### Install Dependencies
 
@@ -16,7 +16,7 @@ The first dependency you'll need to pull in in the React Player itself. You can 
 yarn add @player-ui/react
 ```
 
-or 
+or
 
 ```bash
 npm install @player-ui/react
@@ -24,7 +24,7 @@ npm install @player-ui/react
 
 ### Configuration
 
-Next, in your code you'll need to initialize Player. This is where you would also initialize any plugins you want to use with Player and create the configuration for Player itself. Below is a minimal example of this. 
+Next, in your code you'll need to initialize Player. This is where you would also initialize any plugins you want to use with Player and create the configuration for Player itself. Below is a minimal example of this.
 
 ```javascript
 import { ReactPlayer } from '@player-ui/react';
@@ -46,7 +46,7 @@ const content = {/* your content here */}
 reactPlayer.start(content);
 ```
 
-With Player running your content, you'll need to actually render out what is processes. To do this, you can use the React Player's component API to inster it into your React tree. 
+With Player running your content, you'll need to actually render out what is processes. To do this, you can use the React Player's component API to inster it into your React tree.
 
 ```javascript
 const MyApp = () => {
@@ -54,13 +54,13 @@ const MyApp = () => {
 };
 ```
 
-Congrats! You've got Player up and running. If you need additional functionality you can add more plugins to extend Player's functionality. Head over to the [Plugins](./plugins) section to take a look at the Plugins we've developed or take a look at the [Architecture](./architecture) section to see how you can write your own. 
+Congrats! You've got Player up and running. If you need additional functionality you can add more plugins to extend Player's functionality. Head over to the [Plugins](./plugins) section to take a look at the Plugins we've developed or take a look at the [Architecture](./architecture) section to see how you can write your own.
 
 ## iOS (Swift)
 
 ### Install Dependencies
 
-In your `Podfile` you'll need to add `PlayerUI` as a dependency and the `ReferenceAssets` plugin to use the base set of assets. 
+In your `Podfile` you'll need to add `PlayerUI` as a dependency and the `ReferenceAssets` plugin to use the base set of assets.
 
 ```ruby
 target 'MyApp' do
@@ -94,7 +94,7 @@ struct MyApp: View {
 
 ### Install Dependencies
 
-Configure the Android Player dependencies in your Gradle files. You'll also need to add a plugin that provides asset definitions and components. To get started, we are going to use the reference set provided by the Android Player. _Note: The reference asset set isn't intended for production use. It exists as an example of how to create an Android asset and can be used to help get started. _ 
+Configure the Android Player dependencies in your Gradle files. You'll also need to add a plugin that provides asset definitions and components. To get started, we are going to use the reference set provided by the Android Player. _Note: The reference asset set isn't intended for production use. It exists as an example of how to create an Android asset and can be used to help get started. _
 
 <Tabs>
 <Gradle language="Kotlin">
@@ -109,7 +109,7 @@ dependencies {
 }
 ```
 
-</Gradle>  
+</Gradle>
 <Gradle language="Groovy">
 
 ```groovy
@@ -145,7 +145,7 @@ All you need to create an `AndroidPlayer` instance is the Android Context and an
 val player = AndroidPlayer(context, ReferenceAssetsPlugin())
 ```
 
-Once you have a Player, you must add a handler for view updates, which are represented as RenderableAssets. 
+Once you have a Player, you must add a handler for view updates, which are represented as RenderableAssets.
 
 ```kotlin
 // handle view updates
@@ -198,3 +198,44 @@ class SimplePlayerFragment(override val flow: String) : PlayerFragment() {
     }
 }
 ```
+
+### Release Optimization
+
+The Android Player dependency automatically pulls in both the `dev` as well as the `prod` versions of the underlying JS scripts.
+
+The `dev` scripts are handy for debugging shared JS code through the JS debugger in debug builds, but they are not necessary for consumer facing release builds.1
+
+To optimize the release bundles, it is highly recommended to exclude the `dev` scripts, as well as enabling V8 to strip out unused code from the final bundle.
+
+<Tabs>
+<Gradle language="Kotlin">
+
+```kotlin
+buildTypes {
+    getByName("release") {
+        isMinifyEnabled = true
+        isShrinkResources = true
+        packagingOptions {
+            exclude("**/*.dev.js")
+        }
+    }
+}
+```
+
+</Gradle>
+<Gradle language="Groovy">
+
+```groovy
+buildTypes {
+    release {
+        shrinkResources true
+        minifyEnabled true
+        packagingOptions {
+            exclude("**/*.dev.js")
+        }
+    }
+}
+```
+
+</Gradle>
+</Tabs>
