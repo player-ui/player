@@ -203,7 +203,7 @@ class SimplePlayerFragment(override val flow: String) : PlayerFragment() {
 
 The Android Player dependency automatically pulls in both the `dev` as well as the `prod` versions of the underlying JS scripts.
 
-The `dev` scripts are handy for debugging shared JS code through the JS debugger in debug builds, but they are not necessary for consumer facing release builds.1
+The `dev` scripts are handy for debugging shared JS code through the JS debugger in debug builds, but they are not necessary for consumer facing release builds.
 
 To optimize the release bundles, it is highly recommended to exclude the `dev` scripts, as well as enabling V8 to strip out unused code from the final bundle.
 
