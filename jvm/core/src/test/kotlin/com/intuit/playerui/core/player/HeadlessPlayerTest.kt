@@ -268,9 +268,10 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
 
     @TestTemplate
     fun `test player error state`() = runBlockingTest {
+        val completable = player.start("{}")
         val exception = assertThrows(PlayerException::class.java) {
             runBlocking {
-                player.start("""{}""").await()
+                completable.await()
             }
         }
         assertTrue(exception is JSErrorException)
@@ -282,6 +283,22 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         state as ErrorState
 
         assertEquals(UNKNOWN_ID, state.flow.id)
+    }
+
+    @TestTemplate
+    fun `test invalid JSON content`() = runBlockingTest {
+        val completable = player.start("hello")
+        val exception = assertThrows(PlayerException::class.java) {
+            runBlocking {
+                completable.await()
+            }
+        }
+        assertTrue(exception is PlayerException)
+        assertEquals("Could not load Player content", exception.message)
+
+        // this is not started b/c we failed out of content
+        // evaluation _before_ it's handed to the underlying Player
+        assertTrue(player.state is NotStartedState)
     }
 
     @TestTemplate
