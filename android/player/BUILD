@@ -20,6 +20,12 @@ kt_db_android_library(
     deps = main_deps,
 )
 
+distribution(
+    name = "player",
+    lib_name = "player-databinding",
+    maven_coordinates = "com.intuit.playerui:android:%s" % VERSION,
+)
+
 kt_jvm_junit5_test(
     name = "player-tests",
     srcs = glob(["src/test/java/**"]),
