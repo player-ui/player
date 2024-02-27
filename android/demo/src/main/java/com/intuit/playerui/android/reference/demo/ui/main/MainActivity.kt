@@ -20,10 +20,10 @@ import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
+import com.intuit.playerui.android.mvvm.ui.PlayerFragment
 import com.intuit.playerui.android.reference.demo.R
 import com.intuit.playerui.android.reference.demo.model.AssetMock
 import com.intuit.playerui.android.reference.demo.model.StringMock
-import com.intuit.playerui.android.mvvm.ui.PlayerFragment
 import com.intuit.playerui.utils.mocks.ClassLoaderMock
 import com.intuit.playerui.utils.mocks.Mock
 import com.intuit.playerui.utils.mocks.getFlow

@@ -2,17 +2,10 @@ package com.intuit.playerui.android.mvvm.lifecycle
 
 import android.util.Level
 import com.intuit.playerui.android.utils.clearLogs
-import com.intuit.playerui.android.utils.SimpleAsset
-import com.intuit.playerui.core.bridge.PlayerRuntimeException
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.managed.AsyncFlowIterator
-import com.intuit.playerui.core.player.state.CompletedState
-import com.intuit.playerui.core.player.state.ErrorState
-import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.player.state.PlayerFlowState
-import com.intuit.playerui.core.player.state.ReleasedState
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -20,16 +13,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.withTimeout
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
