@@ -155,7 +155,41 @@ player.onUpdate { asset: RenderableAsset? ->
 player.start(content)
 ```
 
-Creating your own `AndroidPlayer` instance is fairly simple, but it grows in complexity when considering proper resources management and app orchestration. We provide a Fragment/ViewModel integration to make it easier to properly integrate into your app and account for these concerns. Check out the [PlayerViewModel](./player-view-model) section for more information.
+When you're done with Player, release any native runtime memory used to instantiate Player or run the flow.
+
+```kotlin
+player.release()
+```
+
+Creating your own `AndroidPlayer` instance is fairly simple, but it grows in complexity when considering proper resources management and app orchestration. We provide a Fragment/ViewModel integration to make it easier to properly integrate into your app and account for these concerns. 
+
+#### ViewModel
+
+With the `PlayerViewModel` and `PlayerFragment`, the above orchestration is done for you. All that is needed is to provide concrete implementations of each and add the fragment to your app.
+
+##### PlayerViewModel
+
+The `PlayerViewModel` requires an `AsyncFlowIterator` to be supplied in the constructor. The AsyncFlowIterator is what tells Player which flows to run. This can be hardcoded into the view model or expected as an argument, as shown below.
+
+```kotlin
+class SimplePlayerViewModel(flows: AsyncFlowIterator) : PlayerViewModel(flows) {
+    override val plugins = listOf(ReferenceAssetsPlugin())
+}
+```
+
+##### PlayerFragment
+
+The `PlayerFragment` is a simple Android `Fragment` that only requires a specific `PlayerViewModel` to be defined. If your view model requires the `AsyncFlowIterator` to be passed as part of the constructor, you can leverage the `PlayerViewModel.Factory` to produce it, as shown below.
+
+Specifically, this fragment takes a flow as an argument to the constructor and creates a single-flow `AsyncFlowIterator` instance using the pseudo-constructor helper.
+
+```kotlin
+class SimplePlayerFragment(override val flow: String) : PlayerFragment() {
+    override val playerViewModel by viewModels<SimplePlayerViewModel> {
+        PlayerViewModel.Factory(AsyncFlowIterator(flow), ::SimplePlayerViewModel)
+    }
+}
+```
   </android>
 </PlatformTabs>
 
