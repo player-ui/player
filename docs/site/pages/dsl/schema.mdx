@@ -250,31 +250,24 @@ import {
   validators as coreValidators
 } from '@player-ui/common-types-plugin';
 
-/** Abstracting the types from the given data type set */
-type myCommonDataTypes = typeof commonDataTypes
+/** Abstracting the types from commonDataTypes to be passed as generic to the DataTypeRefs type for dynamically generating the data type reference types */
+type myCommonDataTypesRefs = DataTypeRefs<typeof commonDataTypes>
 
-/** Passing myCommonDataTypes type as generic of DataTypeRefs for dynamically generating the data type reference types */
-type myCommonDataTypesRefs = DataTypeRefs<myCommonDataTypes>
-
-/** Using getObjectReferences helper to generate the actual data type references */
-export const dataRefs = getObjectReferences<commonDataTypes, myCommonDataTypesRefs>(
+/** Using getObjectReferences helper to generate the actual data type references we can use in our schema by passing inferred types from commonDataTypes and myCommonDataTypesRefs */
+export const dataRefs = getObjectReferences<typeof commonDataTypes, myCommonDataTypesRefs>(
   coreDataSet
 );
 ```
 
 We'll proceed generating the validation function types:
-
 ```typescript
-/** Abstracting the types from the given validator functions set */
-type myCommonValidators = typeof coreValidators
-
-/** Passing myCommonValidators type as generic of ValidatorFunctionRefs for dynamically generating the data type reference types */
-type commonValidatorRefs = ValidatorFunctionRefs<myCommonValidators>
+/** Abstracting types from coreValidators and using as generic of ValidatorFunctionRefs for dynamically generating the data validation function reference types */
+type commonValidatorRefs = ValidatorFunctionRefs<typeof coreValidators>
 ```
-The final step is to put our generated data type properties union, and our validator function references union as generics for the `DataTypeReference` type which is the sole type we pass into the `DSLSchema` type instance:
 
+The final step is to provide the data types set and validator function references abstracted types as generics for the `DataTypeReference` type which is the sole type we pass into the `DSLSchema` type instance:
 ```typescript
-type CommonDSLSchema = DSLSchema<DataTypeReference<myCommonDataTypes, commonValidatorRefs>>
+type CommonDSLSchema = DSLSchema<DataTypeReference<typeof commonDataTypes, commonValidatorRefs>>
 ```
 
 Finally, this is how to use the custom schema type to type check your schema. By adding the `satisfies` keyword followed by your `DSLSchema` generated type, your editor's LSP will show if there is anything not compliant with the data types and validation functions we defined in the schema:
