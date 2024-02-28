@@ -225,76 +225,12 @@ export default {
 }
 ```
 
+# DSLSchema Type
+
+A `DSLSchema` Type is provided in order be able to customize a set of the acceptable data types and validator functions to be used for authoring the DSL data schema in our workspace. Please refer to this [DSLSchema Type](../dsl/dsl-schema-type) section to see the detailed steps for creating and using a DSLSchema type definition in your project.
+
 # DSL Benefit in Schema
 
 ## Format
 
 ## Ease of Use
-
-# DSLSchema type
-
-A `DSLSchema` type is provided in order be able to customize a set of the acceptable data types and validator functions to be used for authoring the DSL data schema in our workspace. By using this schema type we can make sure every author only uses the included data types and validators, as well include the required parameters and their respective types of the latter. 
-
-We'll start out by importing the `DSLSchema` and relevant helper types and functions from `@player-tools/dsl`. For this example we are importing the `common-types-plugin` in order to use its data types and validators. Our first step would be to generate the data type object types and references:
-
-```typescript
-import { 
-  DSLSchema,
-  DataTypeReference 
-  DataTypeRefs,
-  ValidatorFunctionRefs,
-  getObjectReferences
-} from '@player-tools/dsl'
-import {
-  dataTypes as commonDataTypes,
-  validators as commonValidators
-} from '@player-ui/common-types-plugin';
-
-/** Abstracting the types from commonDataTypes to be passed as generic to the DataTypeRefs type for dynamically generating the data type reference types */
-type myCommonDataTypesRefs = DataTypeRefs<typeof commonDataTypes>
-
-/** Using getObjectReferences helper to generate the actual data type references we can use in our schema by passing inferred types from commonDataTypes and myCommonDataTypesRefs */
-export const dataRefs = getObjectReferences<typeof commonDataTypes, myCommonDataTypesRefs>(
-  coreDataSet
-);
-```
-
-We'll proceed generating the validation function types:
-
-```typescript
-/** Abstracting types from coreValidators and using as generic of ValidatorFunctionRefs for dynamically generating the data validation function reference types */
-type commonValidatorRefs = ValidatorFunctionRefs<typeof commonValidators>
-```
-
-The final step is to provide the data types set and validator function references type as generics for the `DataTypeReference` type which is the sole generic type we pass into the `DSLSchema` instance:
-```typescript
-type CommonDSLSchema = DSLSchema<
-  DataTypeReference<typeof commonDataTypes, commonValidatorRefs>
->
-```
-
-Finally, this is how to use the custom schema type to type check your schema. By adding the `satisfies` keyword followed by your `DSLSchema` generated type, your editor's LSP will show if there is anything not compliant with the data types and validation functions we defined in the schema:
-
-```typescript
-import { CommonDSLSchema, dataRefs } from './MyTypes'
-
-const { BooleanTypeRef } = dataRefs
-
-const exampleSchema = {
-  myDataSet = {
-    /** Simply using the BooleanTypeReference to define 'firstPath' type to Boolean */
-    firstPath: BooleanTypeRef
-    secondPath: {
-      /** For adding custom validation for 'secondPath', we pass an object definition with the data 'type', TextType for this example */
-      type: 'TextType',
-      /**  In the validation array open another object definition specifying the use of the 'required' validator with the 'type' property, with a custom 'message' value */
-      validation: [
-        {
-          type: 'required',
-          message: 'This field is required'
-        }
-      ]
-    }
-  }
-} satisfies CommonDSLSchema
-```
