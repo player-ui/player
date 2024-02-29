@@ -1,5 +1,4 @@
 versions = struct(
-    compose = "1.3.2",
     kotlin = struct(
         coroutines = "1.6.0",
         serialization = "1.3.0",
@@ -25,14 +24,15 @@ versions = struct(
     ),
     jmh = "1.21",
     androidx = struct(
-        activity = "1.5.1",
-        appcompat = "1.6.1",
+        activity = "1.4.0",
+        appcompat = "1.4.2",
         constraintlayout = "2.1.4",
-        core = "1.9.0",
-        databinding = "8.2.2",
-        fragment = "1.5.6",
+        compose = "1.2.0",
+        core = "1.8.0",
+        databinding = "8.0.0",
+        fragment = "1.4.1",
         lifecycle = "2.4.0",
-        navigation = "2.5.3",
+        navigation = "2.3.1",
         test = struct(
             core = "1.4.0",
             espresso = "3.3.0",
@@ -45,7 +45,7 @@ versions = struct(
         inject = "1",
     ),
     material_dialogs = "3.3.0",
-    material = "1.4.0",
+    material = "1.6.1",
     facebook = struct(
         stetho = "1.5.1",
     ),
