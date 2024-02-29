@@ -102,10 +102,6 @@ const navigation: Navigation = {
               title: 'Schema',
               path: '/dsl/schema',
             },
-            {
-              title: 'DSLSchema Type',
-              path: '/dsl/dsl-schema-type',
-            },
           ],
         },
         {
