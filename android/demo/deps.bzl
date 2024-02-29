@@ -14,7 +14,6 @@ maven_main = [
     "com.github.AlexTrotsenko:j2v8-debugger:%s" % versions.j2v8.debugger,
     "androidx.compose.ui:ui:%s" % versions.androidx.compose,
     "androidx.compose.ui:ui-tooling:%s" % versions.androidx.compose,
-    "androidx.compose.compiler:compiler:%s" % versions.androidx.compose,
     "androidx.compose.runtime:runtime:%s" % versions.androidx.compose,
 ]
 
