@@ -21,15 +21,14 @@ kt_compiler_plugin(
     ],
 )
 
-
 kt_android_library(
     name = "demo_lib",
     srcs = glob(["src/main/java/**"]),
     assets = glob(["src/main/assets/mocks/**"]),
-    plugins = [":jetpack_compose_compiler_plugin"],
     assets_dir = "src/main/assets",
-    custom_package = "com.intuit.player.android.reference.demo",
+    custom_package = "com.intuit.playerui.android.reference.demo",
     manifest = ":src/main/AndroidManifest.xml",
+    plugins = [":jetpack_compose_compiler_plugin"],
     resource_files = glob(["src/main/res/**"]),
     deps = main_deps,
 )
@@ -78,7 +77,7 @@ kt_android_library(
 
 android_binary(
     name = "demo_test_app",
-    custom_package = "com.intuit.player.android.reference.demo",
+    custom_package = "com.intuit.playerui.android.reference.demo",
     instruments = ":demo",
     manifest = ":src/androidTest/AndroidManifest.xml",
     deps = ["demo_ui_test"],

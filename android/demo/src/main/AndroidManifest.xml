@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:dist="http://schemas.android.com/apk/distribution"
-    package="com.intuit.player.android.reference.demo">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.intuit.playerui.android.reference.demo">
 
     <uses-sdk
         android:minSdkVersion="24"
@@ -18,7 +19,6 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.splash.SplashActivity"
-            android:exported="true"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,10 +38,15 @@
         </activity>
         <activity
             android:name=".ui.main.MainActivity"
-            android:exported="true"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+
+        <!-- Resolve a conflict issue while building with Bazel. -->
+        <provider
+                android:name="androidx.startup.InitializationProvider"
+                android:authorities="${applicationId}.androidx-startup"
+                tools:node="remove" />
     </application>
 
 </manifest>
