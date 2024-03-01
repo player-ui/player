@@ -34,10 +34,10 @@ Indicate the type of change your pull request is:
 -->
 
 
-### Does your PR have any Documentation Updates?
-- [ ] Updated Docs
-- [ ] No Documentation Update needed
-- [ ] Unable to update Documents. 
+### Does your PR have any documentation updates?
+- [ ] Updated docs
+- [ ] No Update needed
+- [ ] Unable to update docs
 <!--
 In an effort to standardize our process and code, please make sure you include documentation and/or update any existing documentation.
 Please refer to our site https://player-ui.github.io/latest/about, and include any neccesary information that would be helpful to coders, developers, and learners.
