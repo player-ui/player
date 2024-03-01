@@ -32,7 +32,7 @@ load("@rules_player//:workspace.bzl", "deps")
 
 deps()
 
-load("@rules_player//:conf.bzl", "apple", "javascript", "kotlin")
+load("@rules_player//:conf.bzl", "apple", "javascript")
 
 #####################
 # Yarn Dependencies #
@@ -74,7 +74,14 @@ pod_install(
 ######################
 # Kotlin Setup       #
 ######################
-kotlin()
+load("@io_bazel_rules_kotlin//kotlin:repositories.bzl", "kotlin_repositories", "kotlinc_version")
+
+kotlin_repositories(
+    compiler_release = kotlinc_version(
+        release = "1.7.0",
+        sha256 = "f5216644ad81571e5db62ec2322fe07468927bda40f51147ed626a2884b55f9a",
+    ),
+)
 
 load("@io_bazel_rules_kotlin//kotlin:core.bzl", "kt_register_toolchains")
 
