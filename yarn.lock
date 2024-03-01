@@ -3160,9 +3160,9 @@
   dependencies:
     "@octokit/openapi-types" "^12.7.0"
 
-"@player-tools/cli@0.4.0-next.3":
-  version "0.4.0-next.3"
-  resolved "https://registry.yarnpkg.com/@player-tools/cli/-/cli-0.4.0-next.3.tgz#60fea43ab70f93edb101bc9228d1ebee61f88b7d"
+"@player-tools/cli@0.5.0-next.7":
+  version "0.5.0-next.7"
+  resolved "https://registry.yarnpkg.com/@player-tools/cli/-/cli-0.5.0-next.7.tgz#60fea43ab70f93edb101bc9228d1ebee61f88b7d"
   integrity sha512-g+2pFOU8WN9eouSz8Qc4JCvvlC48axnbj7mJfF3hvsU1cUZar2BYq2HvpHVuOUh74rqNYAyhqLSC+w/HpgX55A==
   dependencies:
     "@babel/core" "^7.15.5"
@@ -3173,11 +3173,11 @@
     "@babel/register" "^7.17.7"
     "@oclif/core" "1.9.0"
     "@oclif/plugin-legacy" "^1.2.7"
-    "@player-tools/dsl" "0.4.0-next.3"
-    "@player-tools/json-language-service" "0.4.0-next.3"
-    "@player-tools/xlr-converters" "0.4.0-next.3"
-    "@player-tools/xlr-sdk" "0.4.0-next.3"
-    "@player-tools/xlr-utils" "0.4.0-next.3"
+    "@player-tools/dsl" "0.5.0-next.7"
+    "@player-tools/json-language-service" "0.5.0-next.7"
+    "@player-tools/xlr-converters" "0.5.0-next.7"
+    "@player-tools/xlr-sdk" "0.5.0-next.7"
+    "@player-tools/xlr-utils" "0.5.0-next.7"
     "@types/babel__register" "^7.17.0"
     chalk "^4.0.1"
     cosmiconfig "^7.0.1"
@@ -3192,9 +3192,9 @@
     vscode-languageserver-textdocument "^1.0.1"
     vscode-languageserver-types "^3.15.1"
 
-"@player-tools/dsl@0.4.0-next.3":
-  version "0.4.0-next.3"
-  resolved "https://registry.yarnpkg.com/@player-tools/dsl/-/dsl-0.4.0-next.3.tgz#c136ac5f10abcb33e714fae507496cea5df1fe10"
+"@player-tools/dsl@0.5.0-next.7":
+  version "0.5.0-next.7"
+  resolved "https://registry.yarnpkg.com/@player-tools/dsl/-/dsl-0.5.0-next.7.tgz#c136ac5f10abcb33e714fae507496cea5df1fe10"
   integrity sha512-qjb9q1aYfxq/e9dOF7uLoqhyuNnCSj1kKcaNYLj7EFtrWZKopuFsL1IQcPvLGa4kF0nL5hfva6cQnyecIV41ZA==
   dependencies:
     "@babel/runtime" "7.15.4"
@@ -3216,15 +3216,15 @@
     ts-node "^10.4.0"
     typescript "4.8.4"
 
-"@player-tools/json-language-service@0.4.0-next.3":
-  version "0.4.0-next.3"
-  resolved "https://registry.yarnpkg.com/@player-tools/json-language-service/-/json-language-service-0.4.0-next.3.tgz#5f1611aaad586784850f1f5501b6d52cbfe4b69c"
+"@player-tools/json-language-service@0.5.0-next.7":
+  version "0.5.0-next.7"
+  resolved "https://registry.yarnpkg.com/@player-tools/json-language-service/-/json-language-service-0.5.0-next.7.tgz#5f1611aaad586784850f1f5501b6d52cbfe4b69c"
   integrity sha512-5ogbrMzluGC7ypj+Hib7pQD/flOFClptop2j78vAUYYdAKMOKRu+dQW47+raqt71XCMawnra+5H2zUv4gAy6Eg==
   dependencies:
     "@babel/runtime" "7.15.4"
-    "@player-tools/xlr" "0.4.0-next.3"
-    "@player-tools/xlr-sdk" "0.4.0-next.3"
-    "@player-tools/xlr-utils" "0.4.0-next.3"
+    "@player-tools/xlr" "0.5.0-next.7"
+    "@player-tools/xlr-sdk" "0.5.0-next.7"
+    "@player-tools/xlr-utils" "0.5.0-next.7"
     change-case "^4.1.1"
     cross-fetch "^3.0.5"
     detect-indent "^6.0.0"
@@ -3235,41 +3235,41 @@
     vscode-languageserver-textdocument "^1.0.1"
     vscode-languageserver-types "^3.15.1"
 
-"@player-tools/xlr-converters@0.4.0-next.3":
-  version "0.4.0-next.3"
-  resolved "https://registry.yarnpkg.com/@player-tools/xlr-converters/-/xlr-converters-0.4.0-next.3.tgz#43bbe3a0e7c6bb4c87a0267b992c8dd8925cd2ff"
+"@player-tools/xlr-converters@0.5.0-next.7":
+  version "0.5.0-next.7"
+  resolved "https://registry.yarnpkg.com/@player-tools/xlr-converters/-/xlr-converters-0.5.0-next.7.tgz#43bbe3a0e7c6bb4c87a0267b992c8dd8925cd2ff"
   integrity sha512-R3CRVib48U55zWjW3OA5WdAMXx8WtaKlQCY0hjVAxf0yOm+KDTHpLlV0/I9upAyqQZMWhAz9wublzBqXEWX5Xw==
   dependencies:
     "@babel/runtime" "7.15.4"
-    "@player-tools/xlr" "0.4.0-next.3"
-    "@player-tools/xlr-utils" "0.4.0-next.3"
+    "@player-tools/xlr" "0.5.0-next.7"
+    "@player-tools/xlr-utils" "0.5.0-next.7"
 
-"@player-tools/xlr-sdk@0.4.0-next.3":
-  version "0.4.0-next.3"
-  resolved "https://registry.yarnpkg.com/@player-tools/xlr-sdk/-/xlr-sdk-0.4.0-next.3.tgz#815ad4a7210c4286b3b89be4ed78d6fc492b3ecb"
+"@player-tools/xlr-sdk@0.5.0-next.7":
+  version "0.5.0-next.7"
+  resolved "https://registry.yarnpkg.com/@player-tools/xlr-sdk/-/xlr-sdk-0.5.0-next.7.tgz#815ad4a7210c4286b3b89be4ed78d6fc492b3ecb"
   integrity sha512-fN/LSaaL+GOd8LF4VXLke5Zf0fpvhMUbBoMVmbe8Tynk4zibcoGKeFnbEwj2DU2HxUq5/9nuvCfKl01/BOx9Dg==
   dependencies:
     "@babel/runtime" "7.15.4"
-    "@player-tools/xlr" "0.4.0-next.3"
-    "@player-tools/xlr-converters" "0.4.0-next.3"
-    "@player-tools/xlr-utils" "0.4.0-next.3"
+    "@player-tools/xlr" "0.5.0-next.7"
+    "@player-tools/xlr-converters" "0.5.0-next.7"
+    "@player-tools/xlr-utils" "0.5.0-next.7"
     "@types/fs-extra" "^9.0.13"
     "@types/node" "^16.11.12"
     fs-extra "^10.0.0"
     jsonc-parser "^2.3.1"
 
-"@player-tools/xlr-utils@0.4.0-next.3":
-  version "0.4.0-next.3"
-  resolved "https://registry.yarnpkg.com/@player-tools/xlr-utils/-/xlr-utils-0.4.0-next.3.tgz#c6d33912b4ef4e306805de3f74ff016d9bedf035"
+"@player-tools/xlr-utils@0.5.0-next.7":
+  version "0.5.0-next.7"
+  resolved "https://registry.yarnpkg.com/@player-tools/xlr-utils/-/xlr-utils-0.5.0-next.7.tgz#c6d33912b4ef4e306805de3f74ff016d9bedf035"
   integrity sha512-lsLdb/gXdipjPKWjcbNXdoX34fAu0AlqnqhsXm+z2aTS+VO+TK1iuwkRbxz2avK00A1vB1M7r4qid/NehxdJUA==
   dependencies:
     "@babel/runtime" "7.15.4"
-    "@player-tools/xlr" "0.4.0-next.3"
+    "@player-tools/xlr" "0.5.0-next.7"
     "@typescript/vfs" "^1.4.0"
 
-"@player-tools/xlr@0.4.0-next.3":
-  version "0.4.0-next.3"
-  resolved "https://registry.yarnpkg.com/@player-tools/xlr/-/xlr-0.4.0-next.3.tgz#ff9cb1604c6595dc3c99ec939c873e9b46a426eb"
+"@player-tools/xlr@0.5.0-next.7":
+  version "0.5.0-next.7"
+  resolved "https://registry.yarnpkg.com/@player-tools/xlr/-/xlr-0.5.0-next.7.tgz#ff9cb1604c6595dc3c99ec939c873e9b46a426eb"
   integrity sha512-BoWOSyzEJHUzZpfnCPEHf9HXZGK0EG5OCU2n32ie4uGnO+smUyYstygXJVKeknlJfpMHPuE/2Qxk0NE35JehBw==
   dependencies:
     "@babel/runtime" "7.15.4"

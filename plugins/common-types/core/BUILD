@@ -3,6 +3,7 @@ load("//:index.bzl", "javascript_pipeline")
 javascript_pipeline(
     name = "@player-ui/common-types-plugin",
     dependencies = [
+        "@npm//@player-tools/dsl",
         "//plugins/types-provider/core:@player-ui/types-provider-plugin",
     ],
     test_data = [
