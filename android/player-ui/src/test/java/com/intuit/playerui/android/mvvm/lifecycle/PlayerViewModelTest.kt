@@ -157,7 +157,6 @@ internal class PlayerViewModelTest {
         viewModel.start()
         assertPlayerState<ErrorState>()
         Level.Error.assertLogged("ERROR: AndroidPlayer: Error in Flow!, {}")
-        assertTrue(!Level.Error.getLogs().isEmpty())
         Level.Error.assertLogged("ERROR: AndroidPlayer: Something went wrong: No flow defined for: FLOW")
     }
 
