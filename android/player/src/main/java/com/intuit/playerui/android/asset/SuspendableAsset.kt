@@ -83,6 +83,7 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
 
         public fun trackHydration(asset: SuspendableAsset<*>) {
             synchronized(trackedHydrations) {
+                if (trackedHydrations.isEmpty()) hooks.onHydrationStarted.call()
                 trackedHydrations.add(asset.assetContext.id)
             }
         }
@@ -107,12 +108,19 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
         }
 
         public class Hooks {
+            public class OnHydrationStartedHook : SyncHook<(HookContext) -> Unit>() {
+                public fun call(): Unit = super.call { f, context ->
+                    f(context)
+                }
+            }
+
             public class OnHydrationCompleteHook : SyncHook<(HookContext) -> Unit>() {
                 public fun call(): Unit = super.call { f, context ->
                     f(context)
                 }
             }
 
+            public val onHydrationStarted: OnHydrationStartedHook = OnHydrationStartedHook()
             public val onHydrationComplete: OnHydrationCompleteHook = OnHydrationCompleteHook()
         }
     }
