@@ -22,6 +22,7 @@ maven_test = [
 maven = maven_main + maven_test
 
 main_deps = parse_coordinates(maven_main) + [
+    "//android/player-ui:player-mvvm",
     "//jvm/utils",
     "//plugins/reference-assets/android:assets",
     "//plugins/common-types/jvm:common-types",

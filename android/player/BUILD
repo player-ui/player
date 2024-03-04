@@ -3,7 +3,7 @@ load("@build_constants//:constants.bzl", "VERSION")
 load("//jvm:build.bzl", "distribution")
 load("@io_bazel_rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
-load("@junit//junit5-jupiter-starter-bazel:junit5.bzl", "kt_jvm_junit5_test")
+load("//android/player:build.bzl", "kt_player_test")
 load("@rules_player//kotlin:lint.bzl", "lint")
 load("@grab_bazel_common//tools/databinding:databinding.bzl", "kt_db_android_library")
 
@@ -26,13 +26,26 @@ distribution(
     maven_coordinates = "com.intuit.playerui:android:%s" % VERSION,
 )
 
-kt_jvm_junit5_test(
+kt_player_test(
     name = "player-tests",
-    srcs = glob(["src/test/java/**"]),
-    associates = [":player-kotlin"],
-    kotlinc_opts = "//jvm:test_options",
-    test_package = "com.intuit.playerui.android",
-    deps = [":player"] + test_deps,
+    srcs = [
+        "src/test/java/com/intuit/playerui/android/AndroidPlayerTest.kt",
+        "src/test/java/com/intuit/playerui/android/AssetContextTest.kt",
+        "src/test/java/com/intuit/playerui/android/BrokenAssetTest.kt"
+    ]
+)
+
+filegroup(
+    name = "manifest",
+    srcs = ["src/main/AndroidManifest.xml"],
+    visibility = ["//visibility:public"]
+)
+
+kt_jvm_library(
+    name = "player-associates",
+    srcs = glob(["src/main/java/**/*.kt"]) + [":player-stubs_binding.srcjar"],
+    deps = main_deps + ["@grab_bazel_common//tools/android:android_sdk", ":player-r-classes"],
+    visibility = ["//visibility:public"]
 )
 
 lint(

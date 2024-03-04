@@ -1,4 +1,4 @@
-package com.intuit.playerui.android.lifecycle
+package com.intuit.playerui.android.mvvm.lifecycle
 
 import android.app.Application
 import androidx.lifecycle.ViewModel
@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AndroidPlayerPlugin
 import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.lifecycle.ManagedPlayerState
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.managed.AsyncFlowIterator

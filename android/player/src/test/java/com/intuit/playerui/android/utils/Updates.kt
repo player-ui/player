@@ -14,19 +14,19 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.json.JsonElement
 import kotlin.coroutines.resume
 
-internal sealed class Update {
+sealed class Update {
     data class Asset(val asset: RenderableAsset?, val index: Int) : Update()
     data class State(val state: PlayerFlowState) : Update()
 }
 
-internal suspend fun AndroidPlayer.awaitFirstView(flow: JsonElement): RenderableAsset? =
+suspend fun AndroidPlayer.awaitFirstView(flow: JsonElement): RenderableAsset? =
     suspendCancellableCoroutine { cont ->
         onUpdate { asset, _ -> cont.resume(asset) }
         start(flow)
     }
 
-internal fun AndroidPlayer.updates(flow: JsonElement, take: Int = 1) = updates(flow.stringify(), take)
-internal fun AndroidPlayer.updates(flow: String, take: Int = 1): Flow<Update> = callbackFlow {
+fun AndroidPlayer.updates(flow: JsonElement, take: Int = 1) = updates(flow.stringify(), take)
+fun AndroidPlayer.updates(flow: String, take: Int = 1): Flow<Update> = callbackFlow {
     var count = 0
     onUpdate { asset, _ ->
         trySend(Update.Asset(asset, count)).isSuccess

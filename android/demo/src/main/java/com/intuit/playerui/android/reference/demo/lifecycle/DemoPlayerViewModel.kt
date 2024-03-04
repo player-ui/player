@@ -2,7 +2,7 @@ package com.intuit.playerui.android.reference.demo.lifecycle
 
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AndroidPlayer.Config
-import com.intuit.playerui.android.lifecycle.PlayerViewModel
+import com.intuit.playerui.android.mvvm.lifecycle.PlayerViewModel
 import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.core.managed.AsyncFlowIterator
 import com.intuit.playerui.core.player.state.PlayerFlowState

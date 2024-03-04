@@ -9,7 +9,7 @@ import androidx.transition.TransitionManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-internal suspend infix fun View?.intoOnMain(root: FrameLayout) = withContext(Dispatchers.Main) {
+suspend infix fun View?.intoOnMain(root: FrameLayout) = withContext(Dispatchers.Main) {
     into(root)
 }
 

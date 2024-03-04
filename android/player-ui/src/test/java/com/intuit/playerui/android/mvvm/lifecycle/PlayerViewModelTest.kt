@@ -1,8 +1,9 @@
-package com.intuit.playerui.android.lifecycle
+package com.intuit.playerui.android.mvvm.lifecycle
 
 import android.util.Level
-import android.util.clearLogs
+import com.intuit.playerui.android.lifecycle.ManagedPlayerState
 import com.intuit.playerui.android.utils.SimpleAsset
+import com.intuit.playerui.android.utils.clearLogs
 import com.intuit.playerui.core.bridge.PlayerRuntimeException
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.managed.AsyncFlowIterator
