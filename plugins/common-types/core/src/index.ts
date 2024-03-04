@@ -1,5 +1,6 @@
 import type { Player, ExtendedPlayerPlugin } from '@player-ui/player';
 import { TypesProviderPlugin } from '@player-ui/types-provider-plugin';
+import {DataTypeRefs, getObjectReferences} from '@player-tools/dsl'
 
 import * as validators from './validators';
 import * as dataTypes from './data-types/types';
@@ -15,7 +16,10 @@ import type {
   PhoneType,
 } from './data-types/types';
 
-export { validators, dataTypes, formats };
+const dataRefs = getObjectReferences<typeof dataTypes, DataTypeRefs<typeof dataTypes>>(dataTypes)
+
+export { validators, dataTypes, dataRefs, formats };
+
 export * from './formats/utils';
 
 /**
