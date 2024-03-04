@@ -30,12 +30,17 @@ kt_player_test(
     name = "player-tests",
     srcs = [
         "src/test/java/com/intuit/playerui/android/AndroidPlayerTest.kt",
-        "src/test/java/com/intuit/playerui/android/AssetContextTest.kt"
+        "src/test/java/com/intuit/playerui/android/AssetContextTest.kt",
+        "src/test/java/com/intuit/playerui/android/BrokenAssetTest.kt"
     ],
     associates = [":player-kotlin"]
 )
 
-exports_files(["src/main/AndroidManifest.xml"])
+filegroup(
+    name = "manifest",
+    srcs = ["src/main/AndroidManifest.xml"],
+    visibility = ["//visibility:public"]
+)
 
 lint(
     name = "player",

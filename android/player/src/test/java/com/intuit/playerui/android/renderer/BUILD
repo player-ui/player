@@ -6,7 +6,6 @@ kt_player_test(
     name = "render-tests",
     srcs = [
         "BaseRenderableAssetTest.kt",
-        "BrokenAssetTest.kt",
         "HydrationScopeTest.kt",
         "NestedAssetTest.kt",
         "SimpleAssetTest.kt",

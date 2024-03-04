@@ -14,7 +14,7 @@ kt_android_library(
         "Updates.kt"
     ],
     custom_package = "com.intuit.playerui.android.utils",
-    manifest = "//android/player:src/main/AndroidManifest.xml",
+    manifest = "//android/player:manifest",
     deps = ["//android/player:player"] + test_deps,
     visibility = ["//visibility:public"]
 )

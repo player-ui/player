@@ -1,10 +1,8 @@
-package com.intuit.playerui.android.renderer
+package com.intuit.playerui.android
 
 import android.content.Context
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import com.intuit.playerui.android.AndroidPlayer
-import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.StaleViewException
 import com.intuit.playerui.android.utils.BrokenAsset
 import com.intuit.playerui.android.utils.BrokenAsset.Companion.asset
