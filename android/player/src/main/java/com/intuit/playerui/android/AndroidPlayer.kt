@@ -101,13 +101,13 @@ public class AndroidPlayer private constructor(
         }
 
         internal class RecycleHook : SyncHook<(HookContext) -> Unit>() {
-            internal fun call(): Unit = super.call { f, context ->
+            public fun call(): Unit = super.call { f, context ->
                 f(context)
             }
         }
 
         internal class ReleaseHook : SyncHook<(HookContext) -> Unit>() {
-            internal fun call(): Unit = super.call { f, context ->
+            public fun call(): Unit = super.call { f, context ->
                 f(context)
             }
         }
