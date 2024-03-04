@@ -132,7 +132,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  PlayerUI: ac5d77faecfd960c749d1c80452ca1ae0bbf11be
+  PlayerUI: 1a56d1e3b8fabe269beca028bf5efeedf33708f9
   SwiftHooks: 3ecc67c23da335d44914a8a74bd1dd23c7c149e6
   SwiftLint: 4fa9579c63416865179bc416f0a92d55f009600d
   ViewInspector: 53313c757eddc5c4842bc7943a66821a68d02d3e

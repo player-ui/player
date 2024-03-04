@@ -184,7 +184,7 @@ and display it as a SwiftUI view comprised of registered assets.
 
     utils.source_files = 'ios/packages/test-utils-core/Sources/**/*'
     utils.resource_bundles = {
-      'TestUtilities' => ['ios/packages/test-utils/Resources/**/*.js']
+      'PlayerUI_TestUtilities' => ['ios/packages/test-utils/Resources/**/*.js']
     }
   end
 
@@ -238,7 +238,7 @@ and display it as a SwiftUI view comprised of registered assets.
     plugin.dependency 'PlayerUI/Core'
     plugin.source_files = 'ios/plugins/AsyncNodePlugin/Sources/**/*'
     plugin.resource_bundles = {
-      'AsyncNodePlugin' => ['ios/plugins/AsyncNodePlugin/Resources/**/*.js']
+      'PlayerUI_AsyncNodePlugin' => ['ios/plugins/AsyncNodePlugin/Resources/**/*.js']
     }
   end
 
@@ -257,7 +257,7 @@ and display it as a SwiftUI view comprised of registered assets.
     plugin.dependency 'PlayerUI/Core'
     plugin.source_files = 'ios/plugins/BaseBeaconPlugin/Sources/**/*'
     plugin.resource_bundles = {
-      'BaseBeaconPlugin' => ['ios/plugins/BaseBeaconPlugin/Resources/**/*.js']
+      'PlayerUI_BaseBeaconPlugin' => ['ios/plugins/BaseBeaconPlugin/Resources/**/*.js']
     }
   end
 
@@ -272,7 +272,7 @@ and display it as a SwiftUI view comprised of registered assets.
     plugin.dependency 'PlayerUI/Core'
     plugin.source_files = 'ios/plugins/CheckPathPlugin/Sources/**/*'
     plugin.resource_bundles = {
-      'CheckPathPlugin' => ['ios/plugins/CheckPathPlugin/Resources/**/*.js']
+      'PlayerUI_CheckPathPlugin' => ['ios/plugins/CheckPathPlugin/Resources/**/*.js']
     }
   end
 
@@ -280,7 +280,7 @@ and display it as a SwiftUI view comprised of registered assets.
     plugin.dependency 'PlayerUI/Core'
     plugin.source_files = 'ios/plugins/CommonTypesPlugin/Sources/**/*'
     plugin.resource_bundles = {
-      'CommonTypesPlugin' => ['ios/plugins/CommonTypesPlugin/Resources/**/*.js']
+      'PlayerUI_CommonTypesPlugin' => ['ios/plugins/CommonTypesPlugin/Resources/**/*.js']
     }
   end
 
@@ -288,7 +288,7 @@ and display it as a SwiftUI view comprised of registered assets.
     plugin.dependency 'PlayerUI/Core'
     plugin.source_files = 'ios/plugins/ComputedPropertiesPlugin/Sources/**/*'
     plugin.resource_bundles = {
-      'ComputedPropertiesPlugin' => ['ios/plugins/ComputedPropertiesPlugin/Resources/**/*.js']
+      'PlayerUI_ComputedPropertiesPlugin' => ['ios/plugins/ComputedPropertiesPlugin/Resources/**/*.js']
     }
   end
 
@@ -296,7 +296,7 @@ and display it as a SwiftUI view comprised of registered assets.
     plugin.dependency 'PlayerUI/Core'
     plugin.source_files = 'ios/plugins/CommonExpressionsPlugin/Sources/**/*'
     plugin.resource_bundles = {
-      'CommonExpressionsPlugin' => ['ios/plugins/CommonExpressionsPlugin/Resources/**/*.js']
+      'PlayerUI_CommonExpressionsPlugin' => ['ios/plugins/CommonExpressionsPlugin/Resources/**/*.js']
     }
   end
 
@@ -304,7 +304,7 @@ and display it as a SwiftUI view comprised of registered assets.
     plugin.dependency 'PlayerUI/Core'
     plugin.source_files = 'ios/plugins/ExpressionPlugin/Sources/**/*'
     plugin.resource_bundles = {
-      'ExpressionPlugin' => ['ios/plugins/ExpressionPlugin/Resources/**/*.js']
+      'PlayerUI_ExpressionPlugin' => ['ios/plugins/ExpressionPlugin/Resources/**/*.js']
     }
   end
 
@@ -312,7 +312,7 @@ and display it as a SwiftUI view comprised of registered assets.
     plugin.dependency 'PlayerUI/Core'
     plugin.source_files = 'ios/plugins/ExternalActionPlugin/Sources/**/*'
     plugin.resource_bundles = {
-      'ExternalActionPlugin' => ['ios/plugins/ExternalActionPlugin/Resources/**/*.js']
+      'PlayerUI_ExternalActionPlugin' => ['ios/plugins/ExternalActionPlugin/Resources/**/*.js']
     }
   end
 
@@ -328,7 +328,7 @@ and display it as a SwiftUI view comprised of registered assets.
     plugin.dependency 'PlayerUI/SwiftUI'
     plugin.source_files = 'ios/plugins/MetricsPlugin/Sources/**/*'
     plugin.resource_bundles = {
-      'MetricsPlugin' => ['ios/plugins/MetricsPlugin/Resources/**/*.js']
+      'PlayerUI_MetricsPlugin' => ['ios/plugins/MetricsPlugin/Resources/**/*.js']
     }
   end
 
@@ -336,7 +336,7 @@ and display it as a SwiftUI view comprised of registered assets.
     plugin.dependency 'PlayerUI/Core'
     plugin.source_files = 'ios/plugins/PubSubPlugin/Sources/**/*'
     plugin.resource_bundles = {
-      'PubSubPlugin' => ['ios/plugins/PubSubPlugin/Resources/**/*.js']
+      'PlayerUI_PubSubPlugin' => ['ios/plugins/PubSubPlugin/Resources/**/*.js']
     }
   end
 
@@ -344,7 +344,7 @@ and display it as a SwiftUI view comprised of registered assets.
     plugin.dependency 'PlayerUI/Core'
     plugin.source_files = 'ios/plugins/StageRevertDataPlugin/Sources/**/*'
     plugin.resource_bundles = {
-      'StageRevertDataPlugin' => ['ios/plugins/StageRevertDataPlugin/Resources/**/*.js']
+      'PlayerUI_StageRevertDataPlugin' => ['ios/plugins/StageRevertDataPlugin/Resources/**/*.js']
     }
   end
 
@@ -365,7 +365,7 @@ and display it as a SwiftUI view comprised of registered assets.
     plugin.dependency 'PlayerUI/Core'
     plugin.source_files = 'ios/plugins/TypesProviderPlugin/Sources/**/*'
     plugin.resource_bundles = {
-      'TypesProviderPlugin' => ['ios/plugins/TypesProviderPlugin/Resources/**/*.js']
+      'PlayerUI_TypesProviderPlugin' => ['ios/plugins/TypesProviderPlugin/Resources/**/*.js']
     }
   end
   # </PLUGINS>
