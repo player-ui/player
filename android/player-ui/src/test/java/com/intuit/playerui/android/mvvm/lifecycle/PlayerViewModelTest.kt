@@ -1,11 +1,19 @@
 package com.intuit.playerui.android.mvvm.lifecycle
 
 import android.util.Level
+import com.intuit.playerui.android.lifecycle.ManagedPlayerState
+import com.intuit.playerui.android.utils.SimpleAsset
 import com.intuit.playerui.android.utils.clearLogs
+import com.intuit.playerui.core.bridge.PlayerRuntimeException
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.managed.AsyncFlowIterator
+import com.intuit.playerui.core.player.state.CompletedState
+import com.intuit.playerui.core.player.state.ErrorState
+import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.player.state.PlayerFlowState
+import com.intuit.playerui.core.player.state.ReleasedState
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -13,12 +21,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.withTimeout
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
@@ -93,7 +105,7 @@ internal class PlayerViewModelTest {
         )
     }
 
-/*    @Test
+    @Test
     fun `AndroidPlayer isn't null`() {
         assertNotNull(viewModel.player)
     }
@@ -104,7 +116,7 @@ internal class PlayerViewModelTest {
         viewModel.start()
         coVerify(exactly = 1) { flowIterator.next(any()) }
         assertPlayerState<InProgressState>()
-        //Level.Warn.assertLogged("WARN: AndroidPlayer: Warning in flow: simple-asset of type simple is not registered")
+        Level.Warn.assertLogged("WARN: AndroidPlayer: Warning in flow: simple-asset of type simple is not registered")
     }
 
     @Test
@@ -136,20 +148,20 @@ internal class PlayerViewModelTest {
         coEvery { flowIterator.next(any()) } returns validFlow andThen null
         viewModel.start()
         assertPlayerState<CompletedState>()
-        //Level.Info.assertLogged("INFO: AndroidPlayer: Flow completed successfully!, {state_type=END, outcome=done}")
-    }*/
+        Level.Info.assertLogged("INFO: AndroidPlayer: Flow completed successfully!, {state_type=END, outcome=done}")
+    }
 
-//    @Test
-//    fun `start error path`() = runBlocking {
-//        coEvery { flowIterator.next(any()) } returns invalidFlow
-//        viewModel.start()
-//        assertPlayerState<ErrorState>()
-//        //Level.Error.assertLogged("ERROR: AndroidPlayer: Error in Flow!, {}")
-//        assertTrue(!Level.Error.getLogs().isEmpty())
-//        //Level.Error.assertLogged("ERROR: AndroidPlayer: Something went wrong: No flow defined for: FLOW")
-//    }
+    @Test
+    fun `start error path`() = runBlocking {
+        coEvery { flowIterator.next(any()) } returns invalidFlow
+        viewModel.start()
+        assertPlayerState<ErrorState>()
+        Level.Error.assertLogged("ERROR: AndroidPlayer: Error in Flow!, {}")
+        assertTrue(!Level.Error.getLogs().isEmpty())
+        Level.Error.assertLogged("ERROR: AndroidPlayer: Something went wrong: No flow defined for: FLOW")
+    }
 
-    /*@Test
+    @Test
     fun `start will emit error state if iterator errors out`() = runBlocking {
         val exception = Exception("oh no")
         coEvery { flowIterator.next(any()) } throws exception
@@ -248,5 +260,5 @@ internal class PlayerViewModelTest {
 
         // ensures safe handling during cleanup when player is never instantiated
         viewModel.onCleared()
-    }*/
+    }
 }

@@ -24,14 +24,19 @@ distribution(
     maven_coordinates = "com.intuit.playerui.android:player-mvvm:%s" % VERSION,
 )
 
-#kt_jvm_junit5_test(
-#    name = "player-mvvm-tests",
-#    srcs = glob(["src/test/java/**"]),
-#    associates = [":player-mvvm-kotlin"],
-#    kotlinc_opts = "//jvm:test_options",
-#    test_package = "com.intuit.playerui.android.mvvm",
-#    deps = [":player-mvvm", "//android/player/src/test:android_utils"] + test_deps,
-#)
+kt_jvm_junit5_test(
+    name = "player-mvvm-tests",
+    srcs = glob(["src/test/java/**/*.kt"]),
+    kotlinc_opts = "//jvm:test_options",
+    test_package = "com.intuit.playerui.android.mvvm",
+    deps = [
+        "//android/player:player",
+        ":player-mvvm",
+        "//android/player/src/test/java/android/util:android_utils_stub",
+        "//android/player/src/test/java/com/intuit/playerui/android/utils:android_test_utils",
+        "//android/player/src/test/java/com/intuit/playerui/android/utils:android_log_util"
+    ] + test_deps,
+)
 
 lint(
     name = "player-mvvm",

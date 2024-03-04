@@ -2,8 +2,6 @@
 
 package android.util
 
-import com.intuit.playerui.android.utils.*
-
 public var e: MutableList<String> = mutableListOf()
 public fun e(tag: String, msg: String): Int {
     val message = "ERROR: $tag: $msg"
