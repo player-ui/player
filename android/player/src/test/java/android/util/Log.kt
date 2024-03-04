@@ -2,40 +2,40 @@
 
 package android.util
 
-public var e: MutableList<String> = mutableListOf()
-public fun e(tag: String, msg: String): Int {
+var e: MutableList<String> = mutableListOf()
+fun e(tag: String, msg: String): Int {
     val message = "ERROR: $tag: $msg"
     e.add(message)
     println(message)
     return 0
 }
 
-public var w: MutableList<String> = mutableListOf()
-public fun w(tag: String, msg: String): Int {
+var w: MutableList<String> = mutableListOf()
+fun w(tag: String, msg: String): Int {
     val message = "WARN: $tag: $msg"
     w.add(message)
     println(message)
     return 0
 }
 
-public var i: MutableList<String> = mutableListOf()
-public fun i(tag: String, msg: String): Int {
+var i: MutableList<String> = mutableListOf()
+fun i(tag: String, msg: String): Int {
     val message = "INFO: $tag: $msg"
     i.add(message)
     println(message)
     return 0
 }
 
-public var d: MutableList<String> = mutableListOf()
-public fun d(tag: String, msg: String): Int {
+var d: MutableList<String> = mutableListOf()
+fun d(tag: String, msg: String): Int {
     val message = "DEBUG: $tag: $msg"
     d.add(message)
     println(message)
     return 0
 }
 
-public var v: MutableList<String> = mutableListOf()
-public fun v(tag: String, msg: String): Int {
+var v: MutableList<String> = mutableListOf()
+fun v(tag: String, msg: String): Int {
     val message = "TRACE: $tag: $msg"
     v.add(message)
     println(message)

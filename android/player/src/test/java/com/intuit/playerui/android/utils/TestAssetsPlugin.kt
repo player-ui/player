@@ -5,7 +5,7 @@ import com.intuit.playerui.android.AndroidPlayerPlugin
 import com.intuit.playerui.android.METADATA
 import com.intuit.playerui.android.TYPE
 
-public object TestAssetsPlugin : AndroidPlayerPlugin {
+object TestAssetsPlugin : AndroidPlayerPlugin {
     override fun apply(androidPlayer: AndroidPlayer) {
         androidPlayer.registerAsset("simple", ::SimpleAsset)
         androidPlayer.registerAsset(
