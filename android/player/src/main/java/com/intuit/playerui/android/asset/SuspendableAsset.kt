@@ -57,6 +57,7 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
     final override fun View.hydrate() {
         if (this is AsyncViewStub) return
 
+        player.asyncHydrationTrackerPlugin?.trackHydration(this@SuspendableAsset)
         setTag(R.bool.view_hydrated, false)
         hydrationScope.launch(Dispatchers.Main) { doHydrate() }
     }
