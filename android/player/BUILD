@@ -42,6 +42,12 @@ filegroup(
     visibility = ["//visibility:public"]
 )
 
+kt_jvm_library(
+    name = "constants",
+    srcs = ["src/main/java/com/intuit/playerui/android/Constants.kt"],
+    visibility = ["//visibility:public"]
+)
+
 lint(
     name = "player",
     srcs = glob(["src/**/*.kt"]),
