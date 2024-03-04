@@ -32,8 +32,7 @@ kt_player_test(
         "src/test/java/com/intuit/playerui/android/AndroidPlayerTest.kt",
         "src/test/java/com/intuit/playerui/android/AssetContextTest.kt",
         "src/test/java/com/intuit/playerui/android/BrokenAssetTest.kt"
-    ],
-    associates = [":player-kotlin"]
+    ]
 )
 
 filegroup(
@@ -44,8 +43,8 @@ filegroup(
 
 kt_jvm_library(
     name = "player-associates",
-    srcs = ["src/main/java/com/intuit/playerui/android/Constants.kt", "src/main/java/com/intuit/playerui/android/logger/AndroidLogger.kt"],
-    deps = main_deps + ["@grab_bazel_common//tools/android:android_sdk"],
+    srcs = glob(["src/main/java/**/*.kt"]) + [":player-stubs_binding.srcjar"],
+    deps = main_deps + ["@grab_bazel_common//tools/android:android_sdk", ":player-r-classes"],
     visibility = ["//visibility:public"]
 )
 

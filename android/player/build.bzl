@@ -10,7 +10,7 @@ def kt_player_test(
     kt_jvm_junit5_test(
         name = name,
         srcs = srcs,
-        associates = associates,
+        associates = ["//android/player:player-associates"],
         kotlinc_opts = "//jvm:test_options",
         test_package = "com.intuit.playerui.android",
         deps = deps + [
