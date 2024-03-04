@@ -43,8 +43,9 @@ filegroup(
 )
 
 kt_jvm_library(
-    name = "constants",
-    srcs = ["src/main/java/com/intuit/playerui/android/Constants.kt"],
+    name = "player-associates",
+    srcs = ["src/main/java/com/intuit/playerui/android/Constants.kt", "src/main/java/com/intuit/playerui/android/logger/AndroidLogger.kt"],
+    deps = main_deps + ["@grab_bazel_common//tools/android:android_sdk"],
     visibility = ["//visibility:public"]
 )
 

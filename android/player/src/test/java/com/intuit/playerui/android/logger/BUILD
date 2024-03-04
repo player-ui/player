@@ -5,4 +5,5 @@ kt_player_test(
     srcs = [
         "AndroidLoggerTest.kt"
     ],
+    associates = ["//android/player:player-associates"]
 )
