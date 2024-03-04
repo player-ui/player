@@ -22,6 +22,6 @@ kt_android_library(
 kt_jvm_library(
     name = "android_log_util",
     srcs = ["LogUtil.kt"],
-    deps = ["//android/player:player", "//android/player/src/test/java/android/util:android_utils_stub"],
+    deps = ["//android/player/src/test/java/android/util:android_utils_stub"],
     visibility = ["//visibility:public"]
 )
