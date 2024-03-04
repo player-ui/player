@@ -28,6 +28,7 @@ kt_jvm_junit5_test(
     name = "player-mvvm-tests",
     srcs = glob(["src/test/java/**/*.kt"]),
     kotlinc_opts = "//jvm:test_options",
+    associates = ["//android/player:player-associates"],
     test_package = "com.intuit.playerui.android.mvvm",
     deps = [
         "//android/player:player",
