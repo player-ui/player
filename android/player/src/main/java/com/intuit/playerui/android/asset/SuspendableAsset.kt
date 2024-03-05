@@ -63,7 +63,6 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
     }
 
     private suspend fun View.doHydrate() = withContext(Dispatchers.Main) {
-        player.asyncHydrationTrackerPlugin?.trackHydration(this@SuspendableAsset)
         try {
             hydrate(getData())
             setTag(R.bool.view_hydrated, true)
