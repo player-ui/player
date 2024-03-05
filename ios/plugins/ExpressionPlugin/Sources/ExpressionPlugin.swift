@@ -25,7 +25,7 @@ public class ExpressionPlugin: JSBasePlugin, NativePlugin {
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: ExpressionPlugin.self), pathComponent: "ExpressionPlugin.bundle")
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: ExpressionPlugin.self), pathComponent: "PlayerUI_ExpressionPlugin.bundle")
     }
 
     override public func getArguments() -> [Any] {

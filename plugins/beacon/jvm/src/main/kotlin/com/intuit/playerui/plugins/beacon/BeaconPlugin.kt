@@ -2,7 +2,6 @@ package com.intuit.playerui.plugins.beacon
 
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.getInvokable
-import com.intuit.playerui.core.bridge.runtime
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.ScriptContext
 import com.intuit.playerui.core.bridge.runtime.add
@@ -13,7 +12,6 @@ import com.intuit.playerui.core.plugins.JSScriptPluginWrapper
 import com.intuit.playerui.core.plugins.Pluggable
 import com.intuit.playerui.core.plugins.findPlugin
 import com.intuit.playerui.plugins.settimeout.SetTimeoutPlugin
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -57,18 +55,17 @@ public class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JSScrip
         handlers.add(handler)
     }
 
+    // TODO: Convert to suspend method to ensure view scope is captured in a non-blocking way
     /** Fire a beacon event */
     public fun beacon(action: String, element: String, asset: Asset, data: Any? = null) {
-        runtime.scope.launch {
-            instance.getInvokable<Any?>("beacon")!!.invoke(
-                mapOf(
-                    "action" to action,
-                    "element" to element,
-                    "asset" to asset,
-                    "data" to data,
-                ),
-            )
-        }
+        instance.getInvokable<Any?>("beacon")!!.invoke(
+            mapOf(
+                "action" to action,
+                "element" to element,
+                "asset" to asset,
+                "data" to data,
+            ),
+        )
     }
 
     private companion object {
