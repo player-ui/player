@@ -57,7 +57,7 @@ open class BaseCheckPathPlugin: JSBasePlugin {
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: BaseCheckPathPlugin.self), pathComponent: "CheckPathPlugin.bundle")
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: BaseCheckPathPlugin.self), pathComponent: "PlayerUI_CheckPathPlugin.bundle")
     }
 }
 

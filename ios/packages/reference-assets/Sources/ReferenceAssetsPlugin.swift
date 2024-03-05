@@ -32,6 +32,6 @@ public class ReferenceAssetsPlugin: JSBasePlugin, NativePlugin {
      - returns: A URL if it exists in the bundle
      */
     override open func getUrlForFile(fileName: String) -> URL? {
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: ReferenceAssetsPlugin.self), pathComponent: "ReferenceAssets.bundle")
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: ReferenceAssetsPlugin.self), pathComponent: "PlayerUI_ReferenceAssets.bundle")
     }
 }
