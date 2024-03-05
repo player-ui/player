@@ -3,9 +3,14 @@ import type {
   AssetPropsWithChildren,
   BindingTemplateInstance,
   ExpressionTemplateInstance,
-  DataTypeRefs
+  DataTypeRefs,
 } from '@player-tools/dsl';
-import { createSlot, Asset, View, getObjectReferences } from '@player-tools/dsl';
+import {
+  createSlot,
+  Asset,
+  View,
+  getObjectReferences,
+} from '@player-tools/dsl';
 import type { Asset as AssetType } from '@player-ui/player';
 import type {
   ActionAsset,
@@ -14,9 +19,12 @@ import type {
   InfoAsset,
   InputAsset,
 } from '@player-ui/reference-assets-plugin';
-import { dataTypes } from '@player-ui/common-types-plugin'
+import { dataTypes } from '@player-ui/common-types-plugin';
 
-export const dataRefs = getObjectReferences<typeof dataTypes, DataTypeRefs<typeof dataTypes>>(dataTypes)
+export const dataRefs = getObjectReferences<
+  typeof dataTypes,
+  DataTypeRefs<typeof dataTypes>
+>(dataTypes);
 
 export const Text = (
   props: Omit<AssetPropsWithChildren<TextAsset>, 'value'> & {
