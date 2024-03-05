@@ -269,7 +269,7 @@ def PlayerUI(
                 ["ios/plugins/PubSubPlugin/Resources/**/*.js"],
                 exclude_directories = 0,
             ),
-            "ReferenceAssets": glob(
+            "PlayerUI_ReferenceAssets": glob(
                 [
                     "ios/packages/reference-assets/Resources/js/**/*.js",
                     "ios/packages/reference-assets/Resources/svg/*.xcassets",

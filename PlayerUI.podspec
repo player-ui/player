@@ -210,7 +210,7 @@ and display it as a SwiftUI view comprised of registered assets.
 
     assets.source_files = 'ios/packages/reference-assets/Sources/**/*'
     assets.resource_bundles = {
-      'ReferenceAssets' => [
+      'PlayerUI_ReferenceAssets' => [
         'ios/packages/reference-assets/Resources/js/**/*.js',
         'ios/packages/reference-assets/Resources/svg/*.xcassets',
 

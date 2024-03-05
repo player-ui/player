@@ -63,7 +63,7 @@ plugin 'cocoapods-resource-bundle-copier', {
       ]
     },
     "PlayerUI/PlayerUI_TestUtilities" => {'target' => "//core/make-flow:MakeFlow_Bundles_bundle_prod", 'files' => ['make-flow.prod.js']},
-    "PlayerUI/ReferenceAssets" => {'target' => "//plugins/reference-assets/core:ReferenceAssetsPlugin_Bundles_bundle_prod", 'files' => ['reference-assets-plugin.prod.js']},
+    "PlayerUI/PlayerUI_ReferenceAssets" => {'target' => "//plugins/reference-assets/core:ReferenceAssetsPlugin_Bundles_bundle_prod", 'files' => ['reference-assets-plugin.prod.js']},
 
     # Plugins
     "PlayerUI/PlayerUI_AsyncNodePlugin" => {'target' => "//plugins/async-node/core:AsyncNodePlugin_Bundles_bundle_prod", 'files' => ['async-node-plugin.prod.js']},
