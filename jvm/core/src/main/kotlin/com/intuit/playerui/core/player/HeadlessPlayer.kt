@@ -123,7 +123,7 @@ public constructor(
         runtime.add("player", player)
 
         // we only have access to the logger after we have the player instance
-        runtime.checkBlockingThread = {
+        if (runtime.config.debuggable) runtime.checkBlockingThread = {
             if (name == "main") {
                 scope.launch {
                     logger.warn(

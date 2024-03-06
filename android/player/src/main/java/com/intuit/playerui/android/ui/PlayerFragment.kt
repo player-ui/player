@@ -28,6 +28,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 /**
@@ -145,26 +146,31 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
     /** Default suspendable implementation of [handleAssetUpdate] */
     @ExperimentalPlayerApi
     protected open suspend fun renderIntoPlayerCanvas(asset: RenderableAsset?, animateTransition: Boolean) {
-        val startTime = System.currentTimeMillis()
-        val view = asset?.render(requireContext())?.let {
-            // unwrap if we know we have an async view stub, and just wait on the actual view
-            if (it is SuspendableAsset.AsyncViewStub) it.awaitView() else it
-        }
+        try {
+            val startTime = System.currentTimeMillis()
+            val view = asset?.render(requireContext())?.let {
+                // unwrap if we know we have an async view stub, and just wait on the actual view
+                if (it is SuspendableAsset.AsyncViewStub) it.awaitView() else it
+            }
 
-        view?.doOnLayout {
-            playerViewModel.logRenderTime(asset, System.currentTimeMillis() - startTime)
-        }
+            view?.doOnLayout {
+                playerViewModel.logRenderTime(asset, System.currentTimeMillis() - startTime)
+            }
 
-        // swap to main
-        withContext(Dispatchers.Main) {
-            if (asset is RenderableAsset.ViewportAsset) binding.scrollContainer.isFillViewport = true
+            // swap to main
+            withContext(Dispatchers.Main) {
+                if (asset is RenderableAsset.ViewportAsset) binding.scrollContainer.isFillViewport = true
 
-            animateTransition
-                .takeIf { it }
-                ?.let { binding.scrollContainer.scrollTo(0, 0) }
-                ?.let { buildTransitionAnimation() }
-                ?.let { view.transitionInto(binding.playerCanvas, it) }
-                ?: (view into binding.playerCanvas)
+                animateTransition
+                    .takeIf { it }
+                    ?.let { binding.scrollContainer.scrollTo(0, 0) }
+                    ?.let { buildTransitionAnimation() }
+                    ?.let { view.transitionInto(binding.playerCanvas, it) }
+                    ?: (view into binding.playerCanvas)
+            }
+        } catch (exception: Exception) {
+            exception.printStackTrace()
+            playerViewModel.fail("Error rendering asset", exception)
         }
     }
 
@@ -174,13 +180,10 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
      * styles and inject that into the view tree.
      */
     protected open fun handleAssetUpdate(asset: RenderableAsset?, animateTransition: Boolean) {
-        lifecycleScope.launch(Dispatchers.Default) {
-            try {
-                renderIntoPlayerCanvas(asset, animateTransition)
-            } catch (exception: Exception) {
-                exception.printStackTrace()
-                playerViewModel.fail("Error rendering asset", exception)
-            }
+        if (asset is SuspendableAsset<*>) lifecycleScope.launch(Dispatchers.Default) {
+            renderIntoPlayerCanvas(asset, animateTransition)
+        } else runBlocking(Dispatchers.Main) {
+            renderIntoPlayerCanvas(asset, animateTransition)
         }
     }
 
