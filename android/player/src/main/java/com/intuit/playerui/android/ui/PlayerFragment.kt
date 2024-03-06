@@ -180,10 +180,14 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
      * styles and inject that into the view tree.
      */
     protected open fun handleAssetUpdate(asset: RenderableAsset?, animateTransition: Boolean) {
-        if (asset is SuspendableAsset<*>) lifecycleScope.launch(Dispatchers.Default) {
-            renderIntoPlayerCanvas(asset, animateTransition)
-        } else runBlocking(Dispatchers.Main) {
-            renderIntoPlayerCanvas(asset, animateTransition)
+        if (asset is SuspendableAsset<*>) {
+            lifecycleScope.launch(Dispatchers.Default) {
+                renderIntoPlayerCanvas(asset, animateTransition)
+            }
+        } else {
+            runBlocking(Dispatchers.Main) {
+                renderIntoPlayerCanvas(asset, animateTransition)
+            }
         }
     }
 
