@@ -3,8 +3,17 @@ import type {
   AssetPropsWithChildren,
   BindingTemplateInstance,
   ExpressionTemplateInstance,
+  DSLSchema as PlayerDSLSchema,
+  DataTypeReference,
+  DataTypeRefs,
+  ValidatorFunctionRefs,
 } from '@player-tools/dsl';
-import { createSlot, Asset, View } from '@player-tools/dsl';
+import {
+  createSlot,
+  Asset,
+  View,
+  getObjectReferences,
+} from '@player-tools/dsl';
 import type { Asset as AssetType } from '@player-ui/player';
 import type {
   ActionAsset,
@@ -13,6 +22,21 @@ import type {
   InfoAsset,
   InputAsset,
 } from '@player-ui/reference-assets-plugin';
+import { dataTypes, validators } from '@player-ui/common-types-plugin';
+
+export const dataRefs = getObjectReferences<
+  typeof dataTypes,
+  DataTypeRefs<typeof dataTypes>
+>(dataTypes);
+
+export const validationRefs = getObjectReferences<
+  typeof validators,
+  ValidatorFunctionRefs<typeof validators>
+>(validators);
+
+export type DSLSchema = PlayerDSLSchema<
+  DataTypeReference<typeof dataTypes, ValidatorFunctionRefs<typeof validators>>
+>;
 
 export const Text = (
   props: Omit<AssetPropsWithChildren<TextAsset>, 'value'> & {
