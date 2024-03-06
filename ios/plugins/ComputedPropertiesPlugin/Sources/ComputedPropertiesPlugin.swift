@@ -14,7 +14,7 @@ public class ComputedPropertiesPlugin: JSBasePlugin, NativePlugin {
             name: fileName,
             ext: "js",
             bundle: Bundle(for: ComputedPropertiesPlugin.self),
-            pathComponent: "ComputedPropertiesPlugin.bundle"
+            pathComponent: "PlayerUI_ComputedPropertiesPlugin.bundle"
         )
     }
 }

@@ -1,3 +1,53 @@
+# 0.7.1 (Tue Mar 05 2024)
+
+### Release Notes
+
+#### [Android] `AsyncHydrationTrackerPlugin` ([#296](https://github.com/player-ui/player/pull/296))
+
+Introduction of `AsyncHydrationTrackerPlugin` to provide a mechanism for reacting when `SuspendableAsset` hydration is completely finished.
+
+```kotlin
+androidPlayer.asyncHydrationTrackerPlugin!!.hooks.onHydrationComplete.tap(this::class.java.name) {
+    // process effects after hydration is complete
+}
+```
+
+#### [Sync] Performance and Bugfix ([#306](https://github.com/player-ui/player/pull/306))
+
+- Skip view updates for silent data changes
+- Replace `reduce` calls for performance reasons
+- Fix data change events not cascading properly when setting data
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#313](https://github.com/player-ui/player/pull/313) ([@intuit-svc](https://github.com/intuit-svc))
+- bump @player-tools packages to 0.5.1 [#312](https://github.com/player-ui/player/pull/312) ([@hborawski](https://github.com/hborawski))
+- iOS: prefix resource bundles to prevent naming collisions [#310](https://github.com/player-ui/player/pull/310) ([@hborawski](https://github.com/hborawski))
+- [Android] `AsyncHydrationTrackerPlugin` [#296](https://github.com/player-ui/player/pull/296) ([@sugarmanz](https://github.com/sugarmanz))
+- [Docs] Platform consolidation [#287](https://github.com/player-ui/player/pull/287) ([@sugarmanz](https://github.com/sugarmanz) nancy_wu1@intuit.com)
+- [JVM] Handle invalid JSON as Player error [#303](https://github.com/player-ui/player/pull/303) ([@sugarmanz](https://github.com/sugarmanz))
+- [Sync] Performance and Bugfix [#306](https://github.com/player-ui/player/pull/306) (ketan_reddy@intuit.com)
+
+#### 📝 Documentation
+
+- Fix documentation error on custom asset [#311](https://github.com/player-ui/player/pull/311) ([@ktamilvanan](https://github.com/ktamilvanan))
+- [Docs] Update: DSLSchema [#304](https://github.com/player-ui/player/pull/304) (alejandro_fimbres@intuit.com [@lexfm](https://github.com/lexfm))
+
+#### Authors: 8
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- afimbres (alejandro_fimbres@intuit.com)
+- Alex Fimbres ([@lexfm](https://github.com/lexfm))
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- KT ([@ktamilvanan](https://github.com/ktamilvanan))
+- nancywu1 (nancy_wu1@intuit.com)
+
+---
+
 # 0.7.0 (Thu Feb 15 2024)
 
 ### Release Notes
