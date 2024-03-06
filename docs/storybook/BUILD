@@ -1,33 +1,40 @@
-load("@npm//@storybook/react:index.bzl", "build_storybook", "start_storybook")
-load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//:storybook/package_json.bzl", storybook_bin = "bin")
 
-data = [
-    "//plugins/common-types/core:@player-ui/common-types-plugin",
-    "//core/make-flow:@player-ui/make-flow",
-    "//plugins/reference-assets/react:@player-ui/reference-assets-plugin-react",
-    "//plugins/reference-assets/mocks:@player-ui/reference-assets-plugin-mocks",
-    "//plugins/data-change-listener/core:@player-ui/data-change-listener-plugin",
-    "//plugins/computed-properties/core:@player-ui/computed-properties-plugin",
-    "//plugins/reference-assets/components:@player-ui/reference-assets-components",
-    "//tools/storybook:@player-ui/storybook",
-    "//react/player:@player-ui/react",
-    "//:tsconfig.json",
-    "//:package.json",
+npm_link_all_packages(
+    name = "node_modules",
+)
+
+deps = [
+    ":node_modules/@player-ui/common-types-plugin",
+    ":node_modules/@player-ui/make-flow",
+    ":node_modules/@player-ui/reference-assets-plugin-react",
+    ":node_modules/@player-ui/reference-assets-plugin-mocks",
+    ":node_modules/@player-ui/reference-assets-plugin-components",
+    ":node_modules/@player-ui/data-change-listener-plugin",
+    ":node_modules/@player-ui/computed-properties-plugin",
+    ":node_modules/@player-ui/react",
+    ":node_modules/@player-ui/storybook-addon-player",
+    "//:node_modules/@babel/preset-typescript",
+    "//:node_modules/@babel/preset-env",
+    "//:node_modules/@storybook/react-webpack5",
+    "//:node_modules/raw-loader",
+    "//:node_modules/react",
+    "//:node_modules/react-dom",
+    "//:typings",
+    "tsconfig.json",
+    "package.json",
+    "babel.config.json",
 ]
 
-# doesn't pick up CSS without calling it out explicitly
-storybook_deps = [
-    "@npm//@storybook/addon-docs",
-    "@npm//time-fix-plugin",
-    "@npm//util",
-    "@npm//assert",
-    "@npm//path-browserify",
-    "@npm//dequal",
-]
-
-build_storybook(
+storybook_bin.storybook(
     name = "storybook",
+    srcs = glob(include = [
+        "src/**/*",
+        ".storybook/*",
+    ]) + deps,
     args = [
+        "build",
         "--config-dir",
         "./docs/storybook/.storybook",
         "--output-dir",
@@ -35,30 +42,25 @@ build_storybook(
         "--loglevel",
         "verbose",
     ],
-    data = glob(include = [
-        "src/**/*",
-        ".storybook/*",
-    ]) + data + storybook_deps,
-    output_dir = True,
+    out_dirs = ["storybook"],
     visibility = ["//visibility:public"],
 )
 
-start_storybook(
+storybook_bin.storybook_binary(
     name = "start",
     args = [
-        "--config-dir",
-        "./docs/storybook/.storybook",
-        "--loglevel",
-        "verbose",
+        "dev",
+        "--no-open",
+        "--port",
+        "6006",
     ],
+    chdir = "docs/storybook",
     data = glob(include = [
         "src/**/*",
         ".storybook/*",
-    ]) + data + storybook_deps,
-    env = {
-        "STORYBOOK_ENV": "DEVELOPMENT",
-    },
+    ]) + deps,
     tags = [
-        "ibazel_notify_changes",
+        # "ibazel_notify_changes",
     ],
+    visibility = ["//visibility:public"],
 )

@@ -1,13 +1,9 @@
 import React from "react";
 import { ReactAsset } from "@player-ui/react";
 import type { TransformedInput } from "@player-ui/reference-assets-plugin";
-import {
-  Input as ChakraInput,
-  FormControl,
-  FormLabel,
-  FormErrorMessage,
-  FormHelperText,
-} from "@chakra-ui/react";
+import { Input as InputComp } from "../../components/Input";
+import { Label } from "../../components/Label";
+
 import { useInputAsset } from "./hooks";
 
 /** An Input */
@@ -16,20 +12,32 @@ export const Input = (props: TransformedInput) => {
   const inputProps = useInputAsset(props);
 
   return (
-    <FormControl isInvalid={Boolean(validation)}>
+    <div className="grid w-full max-w-sm items-center gap-1.5">
       {label && (
-        <FormLabel htmlFor={id}>
+        <Label htmlFor={id}>
           <ReactAsset {...label} />
-        </FormLabel>
+        </Label>
       )}
-      <ChakraInput id={id} size="md" {...inputProps} />
-      {validation && <FormErrorMessage>{validation.message}</FormErrorMessage>}
+      <InputComp
+        id={id}
+        aria-invalid={Boolean(validation)}
+        aria-describedby={validation ? `${id}-validation` : undefined}
+        {...inputProps}
+      />
+      {validation && (
+        <Label
+          id={`${id}-validation`}
+          className="text-[0.8rem] font-medium text-destructive"
+        >
+          {validation.message}
+        </Label>
+      )}
       {note && (
-        <FormHelperText>
+        <Label className="text-[0.8rem] text-muted-foreground">
           <ReactAsset {...note} />
-        </FormHelperText>
+        </Label>
       )}
-    </FormControl>
+    </div>
   );
 };
 

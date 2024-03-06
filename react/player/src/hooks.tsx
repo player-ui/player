@@ -31,7 +31,6 @@ export const useReactPlayer = (
         ...(options?.plugins ?? []),
         new StateTapPlugin(setPlayerState),
       ],
-      suspend: options?.suspend,
     });
 
     return rp;

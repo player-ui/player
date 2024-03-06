@@ -60,16 +60,11 @@ class ManagedState {
     /** the config to use when creating a player */
     playerConfig: ReactPlayerOptions;
   }) {
-    const playerConfig: ReactPlayerOptions = {
-      ...options.playerConfig,
-      suspend: true,
-    };
-
     const initialState: ManagedPlayerState = {
       value: "not_started",
       context: {
-        playerConfig,
-        reactPlayer: new ReactPlayer(playerConfig),
+        playerConfig: options.playerConfig,
+        reactPlayer: new ReactPlayer(options.playerConfig),
         manager: options.manager,
       },
     };

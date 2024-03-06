@@ -1,8 +1,10 @@
-/* eslint-disable import/no-extraneous-dependencies */
-import React from 'react';
-import { Action, Collection } from '@player-ui/reference-assets-components';
-import type { DSLFlow } from '@player-tools/dsl';
-import { expression as e } from '@player-tools/dsl';
+import React from "react";
+import {
+  Action,
+  Collection,
+} from "@player-ui/reference-assets-plugin-components";
+import type { DSLFlow } from "@player-tools/dsl";
+import { expression as e } from "@player-tools/dsl";
 
 const view1 = (
   <Collection>
@@ -18,22 +20,22 @@ const view1 = (
 );
 
 const flow: DSLFlow = {
-  id: 'test-flow',
+  id: "test-flow",
   views: [view1],
   navigation: {
-    BEGIN: 'FLOW_1',
+    BEGIN: "FLOW_1",
     FLOW_1: {
-      startState: 'VIEW_1',
+      startState: "VIEW_1",
       VIEW_1: {
-        state_type: 'VIEW',
+        state_type: "VIEW",
         ref: view1,
         transitions: {
-          '*': 'END_Done',
+          "*": "END_Done",
         },
       },
       END_Done: {
-        state_type: 'END',
-        outcome: 'DONE',
+        state_type: "END",
+        outcome: "DONE",
       },
     },
   },

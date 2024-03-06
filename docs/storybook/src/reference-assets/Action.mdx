@@ -1,0 +1,33 @@
+import { Meta, Story } from "@storybook/addon-docs";
+import { Action } from "@player-ui/reference-assets-plugin-components";
+import * as ActionStories from "./Action.stories";
+
+<Meta title="Reference Assets/Action" component={Action} />
+
+# Action Asset
+
+The `action` asset is used when you want a user to perform some _action_. It typically manifests as a `button` or `link` depending on the context, and intention.
+
+Actions can advance Player's state machine using the `value` prop, and/or evaluate an expression using the `exp` prop.
+
+## Basic Use Case
+
+The example below uses the `exp` property to evaluate an expression when the action is clicked.
+This will increment the count, and update the label
+
+<Story of={ActionStories.Basic} />
+
+## Expression Evaluation
+
+The example below uses the `exp` property to evaluate an expression when the action is clicked.
+This will increment the count, and update the label
+
+<Story of={ActionStories.Expression} />
+
+## Navigation Transition
+
+<Story of={ActionStories.Navigation} />
+
+## Navigation Transition To End
+
+<Story of={ActionStories.TransitionToEnd} />

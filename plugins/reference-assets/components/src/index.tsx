@@ -11,6 +11,7 @@ import type {
   CollectionAsset,
   InfoAsset,
   InputAsset,
+  ImageAsset,
 } from "@player-ui/reference-assets-plugin";
 
 export const Text = (
@@ -69,6 +70,12 @@ export const Action = (props: AssetPropsWithChildren<ActionAsset>) => {
 
 Action.Label = LabelSlot;
 
+export const Image = (props: AssetPropsWithChildren<ImageAsset>) => {
+  return <Asset type="image" {...props} />;
+};
+
+Image.Caption = slotFactory("caption");
+
 export const Input = (
   props: Omit<AssetPropsWithChildren<InputAsset>, "binding"> & {
     /** The binding */
@@ -85,6 +92,7 @@ export const Input = (
 };
 
 Input.Label = LabelSlot;
+Input.Note = slotFactory("note");
 
 export const Info = (props: AssetPropsWithChildren<InfoAsset>) => {
   return <Asset type="info" {...props} />;
@@ -94,3 +102,4 @@ Info.Title = TitleSlot;
 Info.Subtitle = SubtitleSlot;
 Info.PrimaryInfo = PrimaryInfoSlot;
 Info.Actions = ActionsSlot;
+Info.Footer = slotFactory("footer");
