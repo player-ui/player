@@ -65,7 +65,6 @@ export const parse: Parser = (path) => {
 
     ch = path.charAt(index);
     index += 1;
-    // console.log(`Index: ${index} Char: ${ch}`);
     return ch;
   };
 

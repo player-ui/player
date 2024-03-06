@@ -1,47 +1,44 @@
 import React from "react";
 import type { InfoAssetTransform } from "@player-ui/reference-assets-plugin";
 import { ReactAsset } from "@player-ui/react";
-import {
-  ButtonGroup,
-  Box,
-  Heading,
-  Divider,
-  Stack,
-  HStack,
-} from "@chakra-ui/react";
+import { Separator } from "../../components/Separator";
 
 /** The info view type is used to show information to the user */
 export const Info = (props: InfoAssetTransform) => {
   return (
-    <Box minW={{ base: undefined, md: "md" }}>
-      <Stack gap="10">
+    <div className="max-w-full">
+      <div className="flex flex-col gap-4">
         {props.title && (
-          <Heading size="lg" as="h1">
+          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
             <ReactAsset {...props.title} />
-          </Heading>
+          </h1>
         )}
         {props.subTitle && (
-          <Heading size="md" as="h3">
+          <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
             <ReactAsset {...props.subTitle} />
-          </Heading>
+          </h3>
         )}
-        <Box>{props.primaryInfo && <ReactAsset {...props.primaryInfo} />}</Box>
-        <Stack gap="4">
-          {props?.segmentedActions && <Divider />}
-          <HStack justifyContent="space-between">
-            <ButtonGroup spacing="6">
+        {props.primaryInfo && (
+          <div>
+            <ReactAsset {...props.primaryInfo} />
+          </div>
+        )}
+        <div className="flex flex-col gap-4">
+          {props?.segmentedActions && <Separator />}
+          <div className="flex justify-between sm:flex-row flex-col-reverse gap-4">
+            <div className="flex gap-4">
               {props?.segmentedActions?.prev?.map((a) => (
                 <ReactAsset key={a.asset.id} {...a} />
               ))}
-            </ButtonGroup>
-            <ButtonGroup spacing="6">
+            </div>
+            <div className="flex gap-4">
               {props?.segmentedActions?.next?.map((a) => (
                 <ReactAsset key={a.asset.id} {...a} />
               ))}
-            </ButtonGroup>
-          </HStack>
-        </Stack>
-      </Stack>
-    </Box>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };

@@ -20,6 +20,7 @@
     "noErrorTruncation": true,
     "importHelpers": true,
     "resolveJsonModule": true,
-    "composite": true
+    "composite": true,
+    "lib": ["DOM", "ES2020"]
   }
 }
