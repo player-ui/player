@@ -12,7 +12,7 @@ def swift_dependencies():
     # version: 8.9.1
     swift_package(
         name = "swiftpkg_eyes_xcui_swift_package",
-        commit = "ba8bc9221d1f5ca733d794d9c85ad017df9e0423",
+        commit = "8e968bc753f298bdc8836dae95ef8862bb6fa4bc",
         dependencies_index = "@//:swift_deps_index.json",
         remote = "https://github.com/applitools/eyes-xcui-swift-package.git",
     )

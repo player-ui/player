@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/applitools/eyes-xcui-swift-package.git",
       "state" : {
-        "revision" : "ba8bc9221d1f5ca733d794d9c85ad017df9e0423",
-        "version" : "8.9.1"
+        "revision" : "8e968bc753f298bdc8836dae95ef8862bb6fa4bc",
+        "version" : "8.11.0"
       }
     },
     {
