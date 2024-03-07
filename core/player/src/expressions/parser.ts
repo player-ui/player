@@ -797,7 +797,7 @@ export function parseExpression(
       args.push(node);
     }
 
-    if (charIndex !== termination) {
+    if (strictMode && charIndex !== termination) {
       throwError(`Expected ${String.fromCharCode(termination)}`, index);
     }
 
@@ -929,7 +929,7 @@ export function parseExpression(
         nodes.push(node);
         // If we weren't able to find a binary expression and are out of room, then
         // the expression passed in probably has too much
-      } else if (index < length) {
+      } else if (strictMode && index < length) {
         throwError(`Unexpected "${exprI(index)}"`, index);
       }
     }
