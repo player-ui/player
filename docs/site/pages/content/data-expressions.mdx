@@ -180,3 +180,34 @@ There are a few expressions built into Player. These are pretty basic, so if you
 | `getDataval`    | Fetches a value from the model. This is equivalent to using the `{{foo.bar}}` syntax. | `binding`          |
 | `setDataVal`    | Sets a value from the model. This is equivalent to using `{{foo.bar}} = 'value'`      | `binding`, `value` |
 | `deleteDataVal` | Clears a value from the model.                                                        | `binding`          |
+| `conditional`   | Execute expressions, or return data based on an expression condition                  | `condition`, `valueIfTrue`, `valueIfFalse` |
+
+### Examples
+
+#### `getDataval` 
+```json
+{
+  "value": "Hello @[getDataval('user.name')]@"
+}
+```
+
+#### `setDataVal` 
+```json
+{
+  "exp": "setDataVal('user.name', 'Test User')"
+}
+```
+
+#### `deleteDataVal` 
+```json
+{
+  "exp": "deleteDataVal('user.name')"
+}
+```
+
+#### `conditional` 
+```json
+{
+  "value": "It is @[ conditional({{foo.bar}} == 'DAY', 'daytime', 'nighttime') ]@."
+}
+```
