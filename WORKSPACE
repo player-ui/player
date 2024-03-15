@@ -89,7 +89,7 @@ junit5()
 ######################
 grab_remote = "https://github.com/sugarmanz/grab-bazel-common.git"
 
-grab_commit = "35317b3d1c0da07b42af6e6a2137ebdec0ffe400"
+grab_commit = "d1d4b28bab4bdc2810dfdfdf38a83d71a3eb36d4"
 
 git_repository(
     name = "grab_bazel_common",
