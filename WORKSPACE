@@ -24,7 +24,7 @@ git_repository(
 
 git_repository(
     name = "rules_player",
-    branch = "maven-export-distribution",
+    branch = "main",
     remote = "https://github.com/player-ui/rules_player",
 )
 
