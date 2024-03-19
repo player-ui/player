@@ -12,9 +12,6 @@ maven_main = [
     #"com.squareup.leakcanary:leakcanary-android:2.2",
     "com.facebook.stetho:stetho:%s" % versions.facebook.stetho,
     "com.github.AlexTrotsenko:j2v8-debugger:%s" % versions.j2v8.debugger,
-    "androidx.compose.ui:ui:%s" % versions.androidx.compose,
-    "androidx.compose.ui:ui-tooling:%s" % versions.androidx.compose,
-    "androidx.compose.runtime:runtime:%s" % versions.androidx.compose,
 ]
 
 maven_test = [

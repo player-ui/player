@@ -3,23 +3,6 @@ load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_import")
 load("@io_bazel_rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load(":deps.bzl", "main_deps", "test_deps")
 load("@rules_player//kotlin:lint.bzl", "lint")
-load(
-    "@io_bazel_rules_kotlin//kotlin:core.bzl",
-    "kt_compiler_plugin",
-)
-
-# Define the compose compiler plugin
-# Used by referencing //:jetpack_compose_compiler_plugin
-
-kt_compiler_plugin(
-    name = "jetpack_compose_compiler_plugin",
-    id = "androidx.compose.compiler",
-    target_embedded_compiler = True,
-    visibility = ["//visibility:public"],
-    deps = [
-        "@maven//:androidx_compose_compiler_compiler",
-    ],
-)
 
 kt_android_library(
     name = "demo_lib",
@@ -28,7 +11,6 @@ kt_android_library(
     assets_dir = "src/main/assets",
     custom_package = "com.intuit.playerui.android.reference.demo",
     manifest = ":src/main/AndroidManifest.xml",
-    plugins = [":jetpack_compose_compiler_plugin"],
     resource_files = glob(["src/main/res/**"]),
     deps = main_deps,
 )
