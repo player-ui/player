@@ -94,11 +94,15 @@ The flow state executes the referenced flow, and its `outcome` determines the tr
 
 Reaching this state will execute the `FLOW_2` flow -- and if `FLOW_2` reaches an `END` state with an `outcome` of `next`, will transition to the `VIEW_2` state
 
+## Expressions
+
 State types can also contain `onStart` and `onEnd` properties for evaluating expressions. Order of operations:
 
 1. `onStart` - Evaluated at the start of a node's lifecycle; useful for updating data before it's resolved
 2. `exp`
-3. `onEnd` - Evaluated last, right before transition. If a transition is halted (by validation or otherwise), the expression won't be executed.
+3. `onEnd` - Evaluated last, right before transition. 
+    1. If a transition is halted (by validation or otherwise), the expression won't be executed.
+    1. Player navigation is a state machine, `onEnd` expressions will only execute when the state machine ends the flow. Terminating the flow, by unmounting player on any given platform, will not execute `onEnd` expressions, as it would not have reached an `END` state.
 
 ## Examples
 
@@ -128,7 +132,7 @@ This is the simplest of flows. The navigation begins with executing `FLOW_1`. `F
 
 ![Single Flow Example](/simple-flow.png?darkModeInvert)
 
-### Flow with `onStart` expression
+### Flow with `onStart` expression on a `VIEW` state
 
 ```json
 {
@@ -153,7 +157,7 @@ This is the simplest of flows. The navigation begins with executing `FLOW_1`. `F
 
 The `view` node in this flow utilizes an `onStart` expression to update the `ref` property dynamically. The expression is evaluated before the data is resolved, and the node references the updated `id`.
 
-### Flow with multiple expressions
+### Flow with multiple expression types on a `VIEW` state
 
 ```json
 {
