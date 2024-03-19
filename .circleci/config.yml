@@ -16,7 +16,7 @@ orbs:
 executors:
   base:
     docker:
-      - image: docker.io/playerui/bazel-docker
+      - image: docker.io/playerui/bazel-docker:7
     working_directory: ~/player
     resource_class: xlarge
     environment:
@@ -235,13 +235,13 @@ jobs:
       - run:
           name: Create avd
           command: |
-            sdkmanager "system-images;android-31;default;x86_64"
-            echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-31;default;x86_64"
+            sdkmanager "system-images;android-29;default;x86"
+            echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-29;default;x86"
 
       - run:
           name: Launch emulator
           command: |
-            emulator -avd test -delay-adb -verbose -gpu swiftshader_indirect -no-snapshot -noaudio
+            emulator -avd test -delay-adb -verbose -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           background: true
 
       - run:
