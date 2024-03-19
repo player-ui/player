@@ -31,7 +31,10 @@ http_archive(
 
 load("@rules_player//:workspace.bzl", "deps")
 
-deps()
+deps(
+    android_api_version = 31,
+    android_build_tools_version = "30.0.2"
+)
 
 load("@rules_player//:conf.bzl", "apple", "javascript", "kotlin")
 
