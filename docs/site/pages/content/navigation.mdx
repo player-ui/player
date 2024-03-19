@@ -102,7 +102,7 @@ State types can also contain `onStart` and `onEnd` properties for evaluating exp
 2. `exp`
 3. `onEnd` - Evaluated last, right before transition. 
     1. If a transition is halted (by validation or otherwise), the expression won't be executed.
-    1. Player navigation is a state machine, `onEnd` expressions will only execute when the state machine ends the flow. Terminating the flow, by unmounting player on any given platform, will not execute `onEnd` expressions, as it would not have reached an `END` state.
+    2. As Player's navigation is a state machine, `onEnd` expressions will only execute when the state machine ends the flow. Terminating the flow by unmounting Player (on any given platform) will not execute `onEnd` expressions as it would not have reached an `END` state.
 
 ## Examples
 
