@@ -22,11 +22,10 @@ git_repository(
     remote = "https://github.com/sugarmanz/rules_jvm_external",
 )
 
-http_archive(
-  name = "rules_player",
-  strip_prefix = "rules_player-0.12.0",
-  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.12.0.tar.gz"],
-  sha256 = "44dd1cd289166f7ccb7932e88f4fb71446132fe247c1caf1a2e59ffe3344ffcc"
+git_repository(
+    name = "rules_player",
+    branch = "fix-android-sdk",
+    remote = "https://github.com/player-ui/rules_player",
 )
 
 load("@rules_player//:workspace.bzl", "deps")
