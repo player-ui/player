@@ -101,8 +101,8 @@ State types can also contain `onStart` and `onEnd` properties for evaluating exp
 1. `onStart` - Evaluated at the start of a node's lifecycle; useful for updating data before it's resolved
 2. `exp`
 3. `onEnd` - Evaluated last, right before transition. 
-    1. If a transition is halted (by validation or otherwise), the expression won't be executed.
-    1. Player navigation is a state machine, `onEnd` expressions will only execute when the state machine ends the flow. Terminating the flow, by unmounting player on any given platform, will not execute `onEnd` expressions, as it would not have reached an `END` state.
+    1. For an `onEnd` expression defined on an individual state, if a transition is halted (by validation or otherwise), the `onEnd` expressions for that state won't be executed.
+    1. Player navigation is a state machine, `onEnd` expressions defined for the entire flow will only execute when the state machine ends the flow, by reaching an `END` state. Terminating the flow, by unmounting player on any given platform, will not execute flow defined `onEnd` expressions, as it would not have reached an `END` state.
 
 ## Examples
 
