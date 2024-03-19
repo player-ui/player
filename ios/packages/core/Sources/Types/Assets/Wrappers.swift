@@ -30,9 +30,6 @@ public protocol AssetContainer {
  Protocol for Asset Implementations, in order to work with `BaseAssetRegistry`
  */
 public protocol PlayerAsset {
-    /// The `JSValue` that represents this asset in the `JSContext` of Player
-    var rawValue: JSValue? { get set }
-
     /// The ID of this asset in the Flow
     var id: String { get }
 
@@ -93,4 +90,9 @@ public struct MetaData: Codable, Hashable {
 
     /// The role of this asset
     public var role: String?
+
+    public init(beacon: AnyType?, role: String? = nil) {
+        self.beacon = beacon
+        self.role = role
+    }
 }

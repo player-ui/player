@@ -25,9 +25,9 @@ class ManagedPlayerViewModelTests: XCTestCase {
             completed.fulfill()
         })
 
-        await viewModel.next()
+        Task { await viewModel.next() }
 
-        waitOnChange(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 }
+        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 }
 
         let result = """
         {
@@ -44,8 +44,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
         let state = CompletedState.createInstance(from: stateObj)!
 
         viewModel.result = .success(state)
-        try await Task.sleep(nanoseconds: 1_000_000_000)
-        wait(for: [completed], timeout: 2)
+        await fulfillment(of: [completed], timeout: 2)
     }
 
     func testViewModelSuccessMultiFlow() async throws {
@@ -53,9 +52,9 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
         let viewModel = ManagedPlayerViewModel(manager: flowManager, onComplete: {_ in})
 
-        await viewModel.next()
+        Task { await viewModel.next() }
 
-        waitOnChange(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 }
+        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 }
 
         let result = """
         {
@@ -73,8 +72,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
         viewModel.result = .success(state)
 
-        try await Task.sleep(nanoseconds: 1_000_000_000)
-        waitOnChange(AnyPublisher(viewModel.$flow)) { $0 == self.flow2 }
+        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow2 }
     }
 
     func testViewModelManagerError() async {
@@ -104,7 +102,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
         await viewModel.next()
 
-        waitOnChange(AnyPublisher(viewModel.$loadingState)) { value in
+        await assertPublished(AnyPublisher(viewModel.$loadingState)) { value in
             if case .loaded(let flow) = value, flow == self.flow1 {
                 return true
             }
@@ -126,13 +124,12 @@ class ManagedPlayerViewModelTests: XCTestCase {
         let state = CompletedState.createInstance(from: stateObj)!
 
         viewModel.result = .success(state)
-        try await Task.sleep(nanoseconds: 1_000_000_000)
 
-        waitOnChange(AnyPublisher(viewModel.$flow)) { $0 == self.flow2 }
+        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow2 }
 
         viewModel.result = .failure(PlayerError.jsConversionFailure)
 
-        waitOnChange(AnyPublisher(viewModel.$loadingState)) { value in
+        await assertPublished(AnyPublisher(viewModel.$loadingState)) { value in
             if case .failed = value {
                 return true
             }
@@ -140,9 +137,8 @@ class ManagedPlayerViewModelTests: XCTestCase {
         }
 
         viewModel.retry()
-        try await Task.sleep(nanoseconds: 1_000_000_000)
 
-        waitOnChange(AnyPublisher(viewModel.$loadingState)) {
+        await assertPublished(AnyPublisher(viewModel.$loadingState)) {
             if case .retry = $0 {
                 return true
             }
@@ -151,7 +147,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
         await viewModel.next(state)
 
-        waitOnChange(AnyPublisher(viewModel.$flow)) { $0 == self.flow2 }
+        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow2 }
     }
 
     func testViewModelReset() async throws {
@@ -161,7 +157,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
         await viewModel.next()
 
-        waitOnChange(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 }
+        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 }
 
         let result = """
         {
@@ -179,12 +175,11 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
         viewModel.result = .success(state)
 
-        try await Task.sleep(nanoseconds: 1_000_000_000)
-        waitOnChange(AnyPublisher(viewModel.$flow), timeout: 10) { $0 == self.flow2 }
+        await assertPublished(AnyPublisher(viewModel.$flow), timeout: 10) { $0 == self.flow2 }
 
         viewModel.result = .failure(PlayerError.jsConversionFailure)
 
-        waitOnChange(AnyPublisher(viewModel.$loadingState)) { value in
+        await assertPublished(AnyPublisher(viewModel.$loadingState)) { value in
             if case .failed = value {
                 return true
             }
@@ -192,9 +187,8 @@ class ManagedPlayerViewModelTests: XCTestCase {
         }
 
         viewModel.reset()
-        try await Task.sleep(nanoseconds: 1_000_000_000)
 
-        waitOnChange(AnyPublisher(viewModel.$loadingState)) {
+        await assertPublished(AnyPublisher(viewModel.$loadingState)) {
             if case .idle = $0 {
                 return true
             }
@@ -203,7 +197,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
         await viewModel.next()
 
-        waitOnChange(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 }
+        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 == self.flow1 }
     }
 
     func testViewModelErrorFlow() async {
@@ -219,11 +213,11 @@ class ManagedPlayerViewModelTests: XCTestCase {
             completed.fulfill()
         }
 
-        waitOnChange(AnyPublisher(viewModel.$flow)) { $0 != nil }
+        await assertPublished(AnyPublisher(viewModel.$flow)) { $0 != nil }
 
         viewModel.result = .failure(.jsConversionFailure)
 
-        wait(for: [completed], timeout: 2)
+        await fulfillment(of: [completed], timeout: 2)
 
         cancellable.cancel()
     }
@@ -256,7 +250,11 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
         XCTAssertNotNil(model.currentState)
 
-        (player.state as? InProgressState)?.controllers?.flow.transition(with: "next")
+        do {
+            try (player.state as? InProgressState)?.controllers?.flow.transition(with: "next")
+        } catch {
+            XCTFail("Transition with 'next' Failed")
+        }
 
         XCTAssertNil(model.currentState)
     }
@@ -305,5 +303,18 @@ class TerminatingManager: FlowManager {
     }
     public func terminate(state: InProgressState?) {
         self.terminateFn(state)
+    }
+}
+
+internal extension XCTestCase {
+    @discardableResult
+    func assertPublished<T>(_ publisher: AnyPublisher<T, Never>, timeout: Double = 2, condition: @escaping(T) -> Bool) async -> Cancellable {
+        let expectation = XCTestExpectation(description: "Waiting for publisher to emit value")
+        let cancel = publisher.sink { (value) in
+            guard condition(value) else { return }
+            expectation.fulfill()
+        }
+        await fulfillment(of: [expectation], timeout: timeout)
+        return cancel
     }
 }

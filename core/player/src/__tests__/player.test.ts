@@ -539,6 +539,44 @@ describe('failure cases', () => {
     );
   });
 
+  it('fails gracefully when states after an ACTION state have failures', async () => {
+    const player = new Player();
+
+    const payload = {
+      id: 'test',
+      views: [
+        {
+          id: 'view',
+          type: 'text',
+          value: 'Some text',
+        },
+      ],
+      data: {},
+      navigation: {
+        BEGIN: 'Flow',
+        Flow: {
+          startState: 'ActionState',
+          ActionState: {
+            state_type: 'ACTION',
+            transitions: {
+              '*': 'ViewState',
+            },
+          },
+          ViewState: {
+            state_type: 'VIEW',
+            ref: 'non-existing-view',
+          },
+        },
+      },
+    };
+
+    const response = player.start(makeFlow(payload));
+
+    await expect(response).rejects.toThrowError(
+      'No view with id non-existing-view'
+    );
+  });
+
   it('can be failed from other places', async () => {
     const player = new Player();
 

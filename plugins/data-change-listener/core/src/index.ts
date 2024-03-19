@@ -8,7 +8,9 @@ import type {
   ExpressionEvaluator,
   BindingInstance,
   BindingParser,
+  ValidationController,
 } from '@player-ui/player';
+import { isExpressionNode } from '@player-ui/player';
 
 const LISTENER_TYPES = {
   dataChange: 'dataChange.',
@@ -35,20 +37,24 @@ export type ViewListenerHandler = (
 
 /** Sub out any _index_ refs with the ones from the supplied list */
 function replaceExpressionIndexes(
-  exp: ExpressionType,
+  expression: ExpressionType,
   indexes: Array<string | number>
 ): ExpressionType {
   if (indexes.length === 0) {
-    return exp;
+    return expression;
   }
 
-  if (typeof exp === 'object' && exp !== null) {
-    return Object.values(exp).map((subExp) =>
+  if (isExpressionNode(expression)) {
+    return expression;
+  }
+
+  if (Array.isArray(expression)) {
+    return expression.map((subExp) =>
       replaceExpressionIndexes(subExp, indexes)
-    );
+    ) as any;
   }
 
-  let workingExp = String(exp);
+  let workingExp = String(expression);
 
   for (
     let replacementIndex = 0;
@@ -161,22 +167,20 @@ function extractDataChangeListeners(
       );
 
       if (listenerKey.match(WILDCARD_REGEX)) {
-        return [
-          ...allListeners,
-          createWildcardHandler(listenerRawBinding, listenerExp, bindingParser),
-        ];
+        allListeners.push(
+          createWildcardHandler(listenerRawBinding, listenerExp, bindingParser)
+        );
+        return allListeners;
       }
 
       const parsedOriginalBinding = bindingParser.parse(listenerRawBinding);
 
-      return [
-        ...allListeners,
-        (context, binding) => {
-          if (parsedOriginalBinding.contains(binding)) {
-            context.expressionEvaluator.evaluate(listenerExp);
-          }
-        },
-      ];
+      allListeners.push((context, binding) => {
+        if (parsedOriginalBinding.contains(binding)) {
+          context.expressionEvaluator.evaluate(listenerExp);
+        }
+      });
+      return allListeners;
     },
     []
   );
@@ -191,6 +195,7 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
   apply(player: Player) {
     let expressionEvaluator: ExpressionEvaluator;
     let dataChangeListeners: Array<ViewListenerHandler> = [];
+    let validationController: ValidationController;
 
     player.hooks.expressionEvaluator.tap(
       this.name,
@@ -227,8 +232,15 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
     };
 
     player.hooks.dataController.tap(this.name, (dc: DataController) =>
-      dc.hooks.onUpdate.tap(this.name, (updates) => {
-        onFieldUpdateHandler(updates.map((t) => t.binding));
+      dc.hooks.onUpdate.tap(this.name, (updates, options) => {
+        const { silent = false } = options || {};
+        if (silent) return;
+        const validUpdates = updates.filter((update) => {
+          return !validationController
+            .getValidationForBinding(update.binding)
+            ?.getAll().length;
+        });
+        onFieldUpdateHandler(validUpdates.map((t) => t.binding));
       })
     );
 
@@ -259,8 +271,18 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
       this.name,
       (viewController: ViewController) => {
         viewController.hooks.resolveView.intercept(resolveViewInterceptor);
+
+        // remove listeners after extracting so that it does not get triggered in subsequent view updates
+        viewController.hooks.resolveView.tap(this.name, (view) => {
+          const { listeners, ...withoutListeners } = view as any;
+          return withoutListeners;
+        });
       }
     );
+
+    player.hooks.validationController.tap(this.name, (vc) => {
+      validationController = vc;
+    });
 
     player.hooks.flowController.tap(this.name, (flowController) => {
       flowController.hooks.flow.tap(this.name, (flow) => {

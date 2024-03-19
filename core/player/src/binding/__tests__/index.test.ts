@@ -10,6 +10,24 @@ test('caches bindings', () => {
   expect(b1).toBe(b3);
 });
 
+test('does not call the update hook when readOnly is true', () => {
+  const onSetHook = jest.fn();
+  const onGetHook = jest.fn();
+
+  const parser = new BindingParser({
+    get: (b) => {
+      onGetHook(b);
+      return [{ bar: 'blah' }];
+    },
+    set: onSetHook,
+    readOnly: true,
+  });
+
+  parser.parse('foo[bar="baz"].blah');
+  expect(onGetHook).toBeCalledWith(parser.parse('foo'));
+  expect(onSetHook).not.toHaveBeenCalled();
+});
+
 test('calls the update hook when data needs to be changed', () => {
   const onSetHook = jest.fn();
   const onGetHook = jest.fn();

@@ -13,6 +13,7 @@ assignees: ""
 **To Reproduce**
 
 <!-- Steps to reproduce the behavior: -->
+<!-- If possible JSON content utilizing reference assets to illustrate the issue -->
 
 **Expected behavior**
 

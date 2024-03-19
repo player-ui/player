@@ -41,6 +41,11 @@ export interface DataModelOptions {
    */
   ignoreDefaultValue?: boolean;
 
+  /**
+   * A flag to indicate that this update should happen silently
+   */
+  silent?: boolean;
+
   /** Other context associated with this request */
   context?: {
     /** The data model to use when getting other data from the context of this request */
@@ -51,11 +56,13 @@ export interface DataModelOptions {
 export interface DataModelWithParser<Options = DataModelOptions> {
   get(binding: BindingLike, options?: Options): any;
   set(transaction: [BindingLike, any][], options?: Options): Updates;
+  delete(binding: BindingLike, options?: Options): void;
 }
 
 export interface DataModelImpl<Options = DataModelOptions> {
   get(binding: BindingInstance, options?: Options): any;
   set(transaction: BatchSetTransaction, options?: Options): Updates;
+  delete(binding: BindingInstance, options?: Options): void;
 }
 
 export interface DataModelMiddleware {
@@ -67,11 +74,19 @@ export interface DataModelMiddleware {
     options?: DataModelOptions,
     next?: DataModelImpl
   ): Updates;
+
   get(
     binding: BindingInstance,
     options?: DataModelOptions,
     next?: DataModelImpl
   ): any;
+
+  delete?(
+    binding: BindingInstance,
+    options?: DataModelOptions,
+    next?: DataModelImpl
+  ): void;
+
   reset?(): void;
 }
 
@@ -81,12 +96,16 @@ export function withParser<Options = unknown>(
   parseBinding: BindingFactory
 ): DataModelWithParser<Options> {
   /** Parse something into a binding if it requires it */
-  function maybeParse(binding: BindingLike): BindingInstance {
+  function maybeParse(
+    binding: BindingLike,
+    readOnly: boolean
+  ): BindingInstance {
     const parsed = isBinding(binding)
       ? binding
       : parseBinding(binding, {
           get: model.get,
           set: model.set,
+          readOnly,
         });
 
     if (!parsed) {
@@ -98,13 +117,16 @@ export function withParser<Options = unknown>(
 
   return {
     get(binding, options?: Options) {
-      return model.get(maybeParse(binding), options);
+      return model.get(maybeParse(binding, true), options);
     },
     set(transaction, options?: Options) {
       return model.set(
-        transaction.map(([key, val]) => [maybeParse(key), val]),
+        transaction.map(([key, val]) => [maybeParse(key, false), val]),
         options
       );
+    },
+    delete(binding, options?: Options) {
+      return model.delete(maybeParse(binding, false), options);
     },
   };
 }
@@ -120,10 +142,33 @@ export function toModel(
   }
 
   return {
-    get: (binding: BindingInstance, options?: DataModelOptions) =>
-      middleware.get(binding, options ?? defaultOptions, next),
-    set: (transaction: BatchSetTransaction, options?: DataModelOptions) =>
-      middleware.set(transaction, options ?? defaultOptions, next),
+    get: (binding: BindingInstance, options?: DataModelOptions) => {
+      const resolvedOptions = options ?? defaultOptions;
+
+      if (middleware.get) {
+        return middleware.get(binding, resolvedOptions, next);
+      }
+
+      return next?.get(binding, resolvedOptions);
+    },
+    set: (transaction: BatchSetTransaction, options?: DataModelOptions) => {
+      const resolvedOptions = options ?? defaultOptions;
+
+      if (middleware.set) {
+        return middleware.set(transaction, resolvedOptions, next);
+      }
+
+      return next?.set(transaction, resolvedOptions);
+    },
+    delete: (binding: BindingInstance, options?: DataModelOptions) => {
+      const resolvedOptions = options ?? defaultOptions;
+
+      if (middleware.delete) {
+        return middleware.delete(binding, resolvedOptions, next);
+      }
+
+      return next?.delete(binding, resolvedOptions);
+    },
   };
 }
 
@@ -140,7 +185,7 @@ export function constructModelForPipeline(
   }
 
   if (pipeline.length === 1) {
-    return pipeline[0];
+    return toModel(pipeline[0]);
   }
 
   /** Default and propagate the options into the nested calls */
@@ -160,6 +205,9 @@ export function constructModelForPipeline(
     },
     set: (transaction, options) => {
       return createModelWithOptions(options)?.set(transaction, options);
+    },
+    delete: (binding, options) => {
+      return createModelWithOptions(options)?.delete(binding, options);
     },
   };
 }
@@ -212,5 +260,9 @@ export class PipelinedDataModel implements DataModelImpl {
 
   public get(binding: BindingInstance, options?: DataModelOptions): any {
     return this.effectiveDataModel.get(binding, options);
+  }
+
+  public delete(binding: BindingInstance, options?: DataModelOptions): void {
+    return this.effectiveDataModel.delete(binding, options);
   }
 }

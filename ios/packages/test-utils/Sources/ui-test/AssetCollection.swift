@@ -23,6 +23,7 @@ public struct AssetCollection: View {
      - parameters:
         - plugins: Plugins to add to Player instance that is created
         - sections: The `[FlowSection]` to display
+        - padding: Padding around the AssetFlowView
         - completion: A handler for when a flow reaches an end state
      */
     public init(
@@ -43,7 +44,9 @@ public struct AssetCollection: View {
                 Section {
                     ForEach(section.flows, id: \.name) { flow in
                         NavigationLink(flow.name) {
-                            AssetFlowView(flow: flow.flow, plugins: plugins, completion: completion).padding(padding)
+                            AssetFlowView(flow: flow.flow, plugins: plugins, completion: completion)
+                                .padding(padding)
+                                .navigationBarTitle(Text(flow.name))
                         }
                         .accessibility(identifier: "\(section.title) \(flow.name)")
                     }

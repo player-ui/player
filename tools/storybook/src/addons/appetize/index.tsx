@@ -8,8 +8,10 @@ import {
   WithTooltip,
   TooltipLinkList,
 } from '@storybook/components';
+import { useDispatch, useSelector } from 'react-redux';
+import type { StateType } from '../../redux';
+import { setPlatform } from '../../redux';
 import type { RenderTarget } from '../../types';
-import { useStateActions } from '../../state';
 
 interface RenderSelectionProps {
   /** storybook api */
@@ -19,14 +21,16 @@ interface RenderSelectionProps {
 /** Component to show the appetize dropdown */
 export const RenderSelection = ({ api }: RenderSelectionProps) => {
   const params = useParameter('appetizeTokens', {});
-  const actions = useStateActions(api.getChannel());
-  const [selectedPlatform, setPlatform] =
-    React.useState<RenderTarget['platform']>('web');
+  const dispatch = useDispatch();
+
+  const selectedPlatform = useSelector<StateType, RenderTarget['platform']>(
+    (state) => state.platform.platform ?? 'web'
+  );
 
   React.useEffect(() => {
     /** callback for the subscribe listener */
     const listener = () => {
-      setPlatform('web');
+      dispatch(setPlatform({ platform: 'web' }));
     };
 
     api.getChannel().addListener(STORY_CHANGED, listener);
@@ -34,7 +38,7 @@ export const RenderSelection = ({ api }: RenderSelectionProps) => {
     return () => {
       api.getChannel().removeListener(STORY_CHANGED, listener);
     };
-  }, [api]);
+  }, [api, dispatch]);
 
   const mobilePlatforms = Object.keys(params) as Array<'ios' | 'android'>;
 
@@ -54,8 +58,8 @@ export const RenderSelection = ({ api }: RenderSelectionProps) => {
             id: platform,
             title: platform,
             onClick: () => {
-              setPlatform(platform);
-              actions.setPlatform(platform);
+              setPlatform(platform as any);
+              dispatch(setPlatform({ platform }));
               onHide();
             },
             value: platform,

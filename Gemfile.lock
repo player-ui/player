@@ -14,10 +14,10 @@ GIT
 
 GIT
   remote: https://github.com/hborawski/starlark_compiler.git
-  revision: be2f8a7422a9f26ee50d4548d50dcb0286341573
+  revision: 544f76ebb29241e36aab75d2a5b6467eebdad856
   branch: build-file-path
   specs:
-    starlark_compiler (0.4.0)
+    starlark_compiler (0.5.0)
 
 GEM
   remote: https://rubygems.org/
@@ -317,4 +317,4 @@ DEPENDENCIES
   xcov
 
 BUNDLED WITH
-   2.3.10
+   2.3.19

@@ -27,8 +27,9 @@ public class BeaconPlugin<BeaconStruct: Decodable>: BaseBeaconPlugin<BeaconStruc
 
     public func apply<P>(player: P) where P: HeadlessPlayer {
         guard let player = player as? SwiftUIPlayer else { return }
+        let beacon = self.beacon(assetBeacon:)
         player.hooks?.view.tap(name: "BeaconPlugin") { view in
-            AnyView(view.environment(\.beaconContext, BeaconContext(self.beacon(assetBeacon:))))
+            AnyView(view.environment(\.beaconContext, BeaconContext(beacon)))
         }
     }
 }

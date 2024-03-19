@@ -1,10 +1,12 @@
-import { setIn } from 'timm';
+import { omit, setIn } from 'timm';
 import { SyncBailHook, SyncWaterfallHook } from 'tapable-ts';
 import type { Template } from '@player-ui/types';
-import type { Node, AnyAssetType } from './types';
+import type { AnyAssetType, Node } from './types';
 import { NodeType } from './types';
+import { getNodeID, hasAsync } from './utils';
 
 export * from './types';
+export * from './utils';
 
 export const EMPTY_NODE: Node.Empty = {
   type: NodeType.Empty,
@@ -73,6 +75,27 @@ export class Parser {
     return viewNode as Node.View;
   }
 
+  private parseAsync(
+    obj: object,
+    type: Node.ChildrenTypes,
+    options: ParseObjectOptions
+  ): Node.Node | null {
+    const parsedAsync = this.parseObject(omit(obj, 'async'), type, options);
+    const parsedNodeId = getNodeID(parsedAsync);
+    if (parsedAsync !== null && parsedNodeId) {
+      return this.createASTNode(
+        {
+          id: parsedNodeId,
+          type: NodeType.Async,
+          value: parsedAsync,
+        },
+        obj
+      );
+    }
+
+    return null;
+  }
+
   public createASTNode(node: Node.Node | null, value: any): Node.Node | null {
     const tapped = this.hooks.onCreateASTNode.call(node, value);
 
@@ -81,6 +104,21 @@ export class Parser {
     }
 
     return tapped;
+  }
+
+  /**
+   * Checks if there are templated values in the object
+   *
+   * @param obj - The Parsed Object to check to see if we have a template array type for
+   * @param localKey - The key being checked
+   */
+  private hasTemplateValues(obj: any, localKey: string) {
+    return (
+      Object.hasOwnProperty.call(obj, 'template') &&
+      Array.isArray(obj?.template) &&
+      obj.template.length &&
+      obj.template.find((tmpl: any) => tmpl.output === localKey)
+    );
   }
 
   public parseObject(
@@ -108,7 +146,6 @@ export class Parser {
       path: string[] = []
     ): NestedObj => {
       if (typeof objToParse !== 'object' || objToParse === null) {
-        // value = objToParse;
         return { value: objToParse, children: [] };
       }
 
@@ -120,7 +157,13 @@ export class Parser {
 
       const objEntries = Array.isArray(localObj)
         ? localObj.map((v, i) => [i, v])
-        : Object.entries(localObj);
+        : [
+            ...Object.entries(localObj),
+            ...Object.getOwnPropertySymbols(localObj).map((s) => [
+              s,
+              (localObj as any)[s],
+            ]),
+          ];
 
       const defaultValue: NestedObj = {
         children: [],
@@ -166,6 +209,13 @@ export class Parser {
                 template
               );
 
+              if (templateAST?.type === NodeType.MultiNode) {
+                templateAST.values.forEach((v) => {
+                  // eslint-disable-next-line no-param-reassign
+                  v.parent = templateAST;
+                });
+              }
+
               if (templateAST) {
                 return {
                   path: [...path, template.output],
@@ -193,6 +243,26 @@ export class Parser {
             NodeType.Switch
           );
 
+          if (
+            localSwitch &&
+            localSwitch.type === NodeType.Value &&
+            localSwitch.children?.length === 1 &&
+            localSwitch.value === undefined
+          ) {
+            const firstChild = localSwitch.children[0];
+
+            return {
+              ...rest,
+              children: [
+                ...children,
+                {
+                  path: [...path, localKey, ...firstChild.path],
+                  value: firstChild.value,
+                },
+              ],
+            };
+          }
+
           if (localSwitch) {
             return {
               ...rest,
@@ -205,6 +275,18 @@ export class Parser {
               ],
             };
           }
+        } else if (localValue && hasAsync(localValue)) {
+          const localAsync = this.parseAsync(
+            localValue,
+            NodeType.Value,
+            options
+          );
+          if (localAsync) {
+            children.push({
+              path: [...path, localKey],
+              value: localAsync,
+            });
+          }
         } else if (localValue && Array.isArray(localValue)) {
           const childValues = localValue
             .map((childVal) =>
@@ -216,7 +298,7 @@ export class Parser {
             const multiNode = this.hooks.onCreateASTNode.call(
               {
                 type: NodeType.MultiNode,
-                override: true,
+                override: !this.hasTemplateValues(localObj, localKey),
                 values: childValues,
               },
               localValue
@@ -249,7 +331,7 @@ export class Parser {
           if (determineNodeType === NodeType.Applicability) {
             const parsedNode = this.hooks.parseNode.call(
               localValue,
-              type,
+              NodeType.Value,
               options,
               determineNodeType
             );

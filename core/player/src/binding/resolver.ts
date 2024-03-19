@@ -1,9 +1,7 @@
-import NestedError from 'nested-error-stacks';
+import { NestedError } from 'ts-nested-error';
 import type { SyncWaterfallHook } from 'tapable-ts';
 import type { PathNode, AnyNode } from '../binding-grammar';
-
-import { maybeConvertToNum } from '.';
-import { findInArray } from './utils';
+import { findInArray, maybeConvertToNum } from './utils';
 
 export interface NormalizedResult {
   /** The normalized path */

@@ -13,6 +13,7 @@ import type {
   DataModelImpl,
   DataModelOptions,
 } from '../../data';
+import type { ConstantsProvider } from '../../controllers/constants';
 import type { TransitionFunction } from '../../controllers';
 import type { ExpressionEvaluator, ExpressionType } from '../../expressions';
 import type { ValidationResponse } from '../../validator';
@@ -20,30 +21,64 @@ import type { Logger } from '../../logger';
 import type { SchemaController } from '../../schema';
 import type { Node } from '../parser';
 
+export interface ValidationGetResolveOptions {
+  /**
+   * If we should ignore any non-blocking validations in the return
+   * @default true
+   */
+  ignoreNonBlocking?: boolean;
+}
+
+export interface PlayerUtils {
+  findPlugin<Plugin = unknown>(symbol: symbol): Plugin | undefined;
+}
+
 export declare namespace Resolve {
   export interface Validation {
     /** Fetch the data-type for the given binding */
     type(binding: BindingLike): Schema.DataType | undefined;
 
     /** Get all currently applicable validation errors */
-    getAll(): Map<BindingInstance, ValidationResponse> | undefined;
+    getAll(
+      options?: ValidationGetResolveOptions
+    ): Map<BindingInstance, ValidationResponse> | undefined;
 
     /** Internal Method to lookup if there is a validation for the given binding */
-    _getValidationForBinding(
-      binding: BindingLike
-    ): ValidationResponse | undefined;
+    _getValidationForBinding(binding: BindingLike):
+      | {
+          /** Get the validation for the given binding */
+          get: (
+            options?: ValidationGetResolveOptions
+          ) => ValidationResponse | undefined;
+
+          /** Get all validations for the given binding */
+          getAll: (
+            options?: ValidationGetResolveOptions
+          ) => Array<ValidationResponse>;
+        }
+      | undefined;
 
     /** Get field level error for the specific binding */
     get(
       binding: BindingLike,
       options?: {
         /** If this binding should also be tracked for validations */
-        track: boolean;
-      }
+        track?: boolean;
+      } & ValidationGetResolveOptions
     ): ValidationResponse | undefined;
 
+    getValidationsForBinding(
+      binding: BindingLike,
+      options?: {
+        /** If this binding should also be tracked for validations */
+        track?: boolean;
+      } & ValidationGetResolveOptions
+    ): Array<ValidationResponse>;
+
     /** Get errors for all children regardless of section */
-    getChildren(type: ValidationTypes.DisplayTarget): Array<ValidationResponse>;
+    getChildren(
+      type?: ValidationTypes.DisplayTarget
+    ): Array<ValidationResponse>;
 
     /** Get errors for all children solely in this section */
     getValidationsForSection(): Array<ValidationResponse>;
@@ -62,6 +97,9 @@ export declare namespace Resolve {
     /** A logger to use */
     logger?: Logger;
 
+    /** Utils for various useful operations */
+    utils?: PlayerUtils;
+
     /** An optional set of validation features */
     validation?: Validation;
 
@@ -73,6 +111,9 @@ export declare namespace Resolve {
 
     /** The hub for data invariants and metaData associated with the data model */
     schema: SchemaController;
+
+    /** The constants for messages */
+    constants?: ConstantsProvider;
   }
 
   export interface NodeDataOptions {

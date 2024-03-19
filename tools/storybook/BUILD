@@ -16,7 +16,16 @@ javascript_pipeline(
       "@npm//dequal",
       "@npm//ts-debounce",
       "@npm//uuid",
+      "@npm//@reduxjs/toolkit",
+      "@npm//@swc/wasm-web",
+      "@npm//@types/redux-state-sync",
+      "@npm//esbuild-wasm",
+      "@npm//redux-state-sync",
+      "@npm//deep-equal",
+      "@npm//@types/deep-equal",
+      "@npm//@player-tools/dsl",
       "//plugins/metrics/react:@player-ui/metrics-plugin-react",
+      "//plugins/beacon/react:@player-ui/beacon-plugin-react"
     ],
 
     other_srcs = ["register.js"],    

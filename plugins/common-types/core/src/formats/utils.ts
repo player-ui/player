@@ -17,10 +17,34 @@ export const removeFormatCharactersFromMaskedString = (
   mask: string,
   reserved: string[] = [PLACEHOLDER]
 ): string => {
+  const reservedMatchesLength = mask
+    .split('')
+    .filter((val) => reserved.includes(val)).length;
+  let replacements = 0;
+
   return value.split('').reduce((newString, nextChar, nextIndex) => {
     const maskedVal = mask[nextIndex];
 
+    if (maskedVal === undefined) {
+      return newString;
+    }
+
+    if (reservedMatchesLength === replacements) {
+      return newString;
+    }
+
     if (reserved.includes(maskedVal)) {
+      replacements++;
+      return newString + nextChar;
+    }
+
+    /**
+     * Characters will match when the incoming value is formatted, but in cases
+     * where it's being pulled from the model and deformatted again, ensure we
+     * don't skip over characters.
+     */
+    if (maskedVal !== nextChar) {
+      replacements++;
       return newString + nextChar;
     }
 
@@ -79,13 +103,12 @@ export const formatAsEnum = (
         return validCompletions;
       }
 
-      return [
-        ...validCompletions,
-        {
-          count: overlap,
-          target: validValue,
-        },
-      ];
+      validCompletions.push({
+        count: overlap,
+        target: validValue,
+      });
+
+      return validCompletions;
     }, [])
     .sort((e) => e.count);
 
@@ -186,7 +209,7 @@ export const createMaskedNumericFormatter = (
         }
       }
 
-      return removeFormatCharactersFromMaskedString(value, mask);
+      return formatAsMasked(value, /\d/g, mask.replace(/[^#]/g, ''));
     },
   };
 };

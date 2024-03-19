@@ -1,6 +1,6 @@
 //
 //  Flow.swift
-//  
+//
 //
 //  Created by Borawski, Harris on 2/13/20.
 //
@@ -21,6 +21,12 @@ public class Flow: CreatedFromJSValue {
     /// The original data associated with this flow
     public var data: [String: Any]? { value.objectForKeyedSubscript("data")?.toObject() as? [String: Any] }
 
+    /// The name of this flow
+    public var currentState: NamedState? { value.objectForKeyedSubscript("currentState").map { NamedState($0) } }
+
+    /// Lifecycle hooks
+    public let hooks: FlowHooks
+
     /**
     Creates an instance from a JSValue, used for generic construction
     - parameters:
@@ -38,5 +44,31 @@ public class Flow: CreatedFromJSValue {
     */
     public init(_ value: JSValue) {
         self.value = value
+        hooks = FlowHooks(transition: Hook2(baseValue: value, name: "transition"), afterTransition: Hook(baseValue: value, name: "afterTransition"))
+    }
+}
+
+public struct FlowHooks {
+    /// A hook that fires when transitioning states and giving the old and new states as parameters
+    public var transition: Hook2<NamedState?, NamedState>
+
+    /// A hook that fires after a transition occurs giving the FlowInstance as parameter
+    public var afterTransition: Hook<Flow>
+}
+
+public struct NamedState: CreatedFromJSValue {
+    public typealias T = NamedState
+
+    public static func createInstance(value: JSValue) -> NamedState { .init(value) }
+
+    /// The name of the navigation node
+    public let name: String
+
+    /// The navigation node itself
+    public let value: NavigationBaseState?
+
+    init(_ value: JSValue) {
+        self.name = value.objectForKeyedSubscript("name").toString()
+        self.value = NavigationBaseState.createInstance(value: value.objectForKeyedSubscript("value"))
     }
 }

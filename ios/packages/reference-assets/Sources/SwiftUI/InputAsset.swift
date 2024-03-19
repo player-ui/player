@@ -32,6 +32,8 @@ public struct InputData: AssetData, Equatable {
     var dataType: DataType?
     /// A validation if present on the input
     var validation: ValidationData?
+    /// An asset to use as a note for this asset
+    var note: WrappedAsset?
 }
 
 /**
@@ -45,9 +47,10 @@ open class InputAssetViewModel: AssetViewModel<InputData> {
      Constructs the `InputAssetViewModel`
      - parameters:
         - data: The `InputData` decoded from the core player
+        - userInfo: The `userInfo` from the decoder
      */
-    public required init(_ data: InputData) {
-        super.init(data)
+    public required init(_ data: InputData, userInfo: [CodingUserInfoKey: Any]) {
+        super.init(data, userInfo: userInfo)
         $data.sink { [weak self] (newData) in
             (newData.value?.stringValue).map { self?.text = $0 }
         }.store(in: &bag)
@@ -76,6 +79,8 @@ struct InputAssetView: View {
     /// The viewModel with decoded data, supplied by `InputAsset`
     @ObservedObject var model: InputAssetViewModel
 
+    @Environment(\.transactionContext) private var transactionContext
+
     /// The color to use for the stroke around the field
     var strokeColor: Color {
         if let validation = model.data.validation {
@@ -87,13 +92,20 @@ struct InputAssetView: View {
     @ViewBuilder
     var body: some View {
         VStack(alignment: .leading) {
-            model.data.label?.asset?.view.foregroundColor(Color(red: 0.729, green: 0.745, blue: 0.773)).padding(.bottom, 0)
+            model.data.label?.asset?.view.foregroundColor(Color(red: 0.102, green: 0.125, blue: 0.173)).padding(.bottom, 8).font(.headline)
             TextField(
                 model.data.placeholder ?? "",
                 text: $model.text,
-                onEditingChanged: {editing in
-                    guard !editing else { return }
+                onEditingChanged: { editing in
+                    guard !editing else {
+                        transactionContext.register(.input) {
+                            self.model.set()
+                        }
+                        return
+                    }
                     self.model.set()
+                    // remove the transaction once editing ends
+                    transactionContext.clear(.input)
                 }
             )
             .padding(4)
@@ -109,6 +121,14 @@ struct InputAssetView: View {
                 ValidationView(message: data.message, severity: data.severity, dismiss: dismissFunction)
                     .accessibility(identifier: "\(model.data.id)-validation")
             }
+            model.data.note?.asset?.view.foregroundColor(Color(red: 0.729, green: 0.745, blue: 0.773)).padding(.top, 8).font(.subheadline)
         }
     }
+}
+
+/**
+ Extensions for PendingTransactionPhases of TransactionContext to create a new Phase for Input callbacks
+ */
+extension PendingTransactionPhases {
+    public static let input = PendingTransactionPhases(rawValue: "input")
 }

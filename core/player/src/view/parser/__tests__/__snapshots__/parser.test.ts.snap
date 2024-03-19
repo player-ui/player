@@ -50,6 +50,115 @@ Object {
 }
 `;
 
+exports[`generates the correct AST when using switch plugin works with asset wrapped objects 1`] = `
+Object {
+  "children": Array [
+    Object {
+      "path": Array [
+        "title",
+        "asset",
+      ],
+      "value": Object {
+        "parent": [Circular],
+        "type": "asset",
+        "value": Object {
+          "id": "businessprofile-tile-screen-yoy-subtitle",
+          "type": "text",
+          "value": "If it's changed since last year, let us know. Feel free to pick more than one.",
+        },
+      },
+    },
+  ],
+  "type": "value",
+  "value": Object {
+    "id": "toughView",
+    "type": "view",
+  },
+}
+`;
+
+exports[`generates the correct AST when using switch plugin works with objects in a multiNode 1`] = `
+Object {
+  "children": Array [
+    Object {
+      "path": Array [
+        "title",
+        "asset",
+      ],
+      "value": Object {
+        "children": Array [
+          Object {
+            "path": Array [
+              "values",
+            ],
+            "value": Object {
+              "override": true,
+              "parent": [Circular],
+              "type": "multi-node",
+              "values": Array [
+                Object {
+                  "children": Array [
+                    Object {
+                      "path": Array [
+                        "asset",
+                      ],
+                      "value": Object {
+                        "parent": [Circular],
+                        "type": "asset",
+                        "value": Object {
+                          "id": "businessprofile-tile-screen-yoy-subtitle-1",
+                          "type": "text",
+                          "value": "If it's changed since last year, let us know. Feel free to pick more than one.",
+                        },
+                      },
+                    },
+                  ],
+                  "parent": [Circular],
+                  "type": "value",
+                  "value": undefined,
+                },
+                Object {
+                  "children": Array [
+                    Object {
+                      "path": Array [
+                        "asset",
+                      ],
+                      "value": Object {
+                        "parent": [Circular],
+                        "type": "asset",
+                        "value": Object {
+                          "id": "businessprofile-tile-screen-yoy-subtitle-2",
+                          "type": "text",
+                          "value": "More text",
+                        },
+                      },
+                    },
+                  ],
+                  "parent": [Circular],
+                  "type": "value",
+                  "value": undefined,
+                },
+              ],
+            },
+          },
+        ],
+        "parent": [Circular],
+        "type": "asset",
+        "value": Object {
+          "id": "someMultiNode",
+          "type": "type",
+        },
+      },
+    },
+  ],
+  "type": "value",
+  "value": Object {
+    "id": "toughView",
+    "type": "view",
+  },
+}
+`;
+
 exports[`generates the correct AST works with applicability things 1`] = `
 Object {
   "expression": "{{baz}}",
@@ -102,6 +211,88 @@ Object {
                   },
                 },
               ],
+            },
+          },
+        ],
+        "parent": [Circular],
+        "type": "asset",
+        "value": undefined,
+      },
+    },
+  ],
+  "type": "value",
+  "value": undefined,
+}
+`;
+
+exports[`generates the correct AST works with applicability things 3`] = `
+Object {
+  "children": Array [
+    Object {
+      "path": Array [
+        "asset",
+      ],
+      "value": Object {
+        "children": Array [
+          Object {
+            "path": Array [
+              "someProp",
+            ],
+            "value": Object {
+              "expression": "{{foo}}",
+              "parent": [Circular],
+              "type": "applicability",
+              "value": Object {
+                "parent": [Circular],
+                "type": "value",
+                "value": Object {
+                  "description": Object {
+                    "value": "description",
+                  },
+                  "label": Object {
+                    "value": "label",
+                  },
+                },
+              },
+            },
+          },
+        ],
+        "parent": [Circular],
+        "type": "asset",
+        "value": undefined,
+      },
+    },
+  ],
+  "type": "value",
+  "value": undefined,
+}
+`;
+
+exports[`generates the correct AST works with applicability things 4`] = `
+Object {
+  "children": Array [
+    Object {
+      "path": Array [
+        "asset",
+      ],
+      "value": Object {
+        "children": Array [
+          Object {
+            "path": Array [
+              "someProp",
+              "asset",
+            ],
+            "value": Object {
+              "expression": "{{foo}}",
+              "parent": [Circular],
+              "type": "applicability",
+              "value": Object {
+                "parent": [Circular],
+                "type": "asset",
+                "value": Object {
+                  "type": "someAsset",
+                },
+              },
             },
           },
         ],

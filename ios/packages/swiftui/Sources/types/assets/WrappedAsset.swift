@@ -15,12 +15,16 @@
  ```
  { id, type }
  ```
-
  This wrapper decodes either to provide a consistent access mechanism
  */
 public typealias WrappedAsset = GenericWrappedAsset<MetaData>
 
-public struct GenericWrappedAsset<MetaData>: Decodable, AssetContainer where MetaData: Decodable&Equatable {
+public typealias GenericWrappedAsset<MetaDataType: Decodable&Equatable> = BaseGenericWrappedAsset<MetaDataType, DefaultAdditionalData>
+
+public struct DefaultAdditionalData: Decodable, Equatable {}
+
+public struct BaseGenericWrappedAsset<MetaData, AdditionalData>: Decodable, AssetContainer
+    where MetaData: Decodable&Equatable, AdditionalData: Decodable&Equatable {
     /// The keys used to decode the wrapper
     public enum CodingKeys: String, CodingKey {
         /// Key to decode asset in a wrapper
@@ -34,6 +38,9 @@ public struct GenericWrappedAsset<MetaData>: Decodable, AssetContainer where Met
 
     /// MetaData that is associated with the adjacent asset
     public var metaData: MetaData?
+
+    /// Additional data to decode as sibling keys to `asset` or `metaData`
+    public var additionalData: AdditionalData?
 
     /**
      Constructs an AssetWrapper, this is used as a fallback when decoding fails
@@ -54,13 +61,13 @@ public struct GenericWrappedAsset<MetaData>: Decodable, AssetContainer where Met
      */
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.asset = try container.decode(RegistryDecodeShim<SwiftUIAsset>.self, forKey: .asset).asset
+        self.asset = try container.decodeIfPresent(RegistryDecodeShim<SwiftUIAsset>.self, forKey: .asset)?.asset
         self.metaData = try container.decodeIfPresent(MetaData.self, forKey: .metaData)
+        self.additionalData = try decoder.singleValueContainer().decode(AdditionalData.self)
     }
 }
 
 // MARK: - Equatable conformance
-
 extension GenericWrappedAsset: Equatable where MetaData: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
         let isMetaDataSame   = lhs.metaData == rhs.metaData

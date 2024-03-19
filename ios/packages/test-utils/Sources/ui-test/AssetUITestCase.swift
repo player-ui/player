@@ -20,6 +20,9 @@ open class AssetUITestCase: XCTestCase {
      */
     open override func setUp() {
         app = XCUIApplication()
+        app.launchEnvironment = [
+            "UI_TESTING": "true"
+        ]
         app.launch()
     }
 
@@ -48,6 +51,7 @@ open class AssetUITestCase: XCTestCase {
      */
     open func openFlow(_ mockName: String) {
         navigateToAssetCollection()
+
         app.otherElements.buttons[mockName].firstMatch.tap()
     }
 

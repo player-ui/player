@@ -16,6 +16,36 @@ import SwiftUI
 // swiftlint:disable type_body_length file_length
 class SwiftUIRegistryTests: XCTestCase {
     let context: JSContext = JSContext()
+
+    func testDuplicateRegistration() {
+        let operationSkipped = expectation(description: "Skipped duplicate registration")
+        let override = expectation(description: "Asset Overridden")
+        operationSkipped.expectedFulfillmentCount = 2
+        let logger = TapableLogger()
+        logger.logLevel = .trace
+        logger.hooks.trace.tap(name: "test", { message in
+            guard message.contains("Duplicate Registration skipped for") else { return }
+            operationSkipped.fulfill()
+        })
+
+        logger.hooks.warn.tap(name: "test", { message in
+            guard message.contains("Overriding registration for match") else { return }
+            override.fulfill()
+        })
+        let registry = SwiftUIRegistry(logger: logger)
+        registry.register(["type": "action"], for: ActionAsset.self)
+        XCTAssertEqual(1, registry.registeredAssets.count)
+        registry.register(["type": "action"], for: ActionAsset.self)
+        XCTAssertEqual(1, registry.registeredAssets.count)
+        registry.register(["type": "text", "metaData": ["role": "someRole"]], for: TextAsset.self)
+        XCTAssertEqual(2, registry.registeredAssets.count)
+        registry.register(["type": "text", "metaData": ["role": "someRole"]], for: TextAsset.self)
+        XCTAssertEqual(2, registry.registeredAssets.count)
+        registry.register(["type": "text", "metaData": ["role": "someRole"]], for: ActionAsset.self)
+        XCTAssertEqual(2, registry.registeredAssets.count)
+        wait(for: [operationSkipped, override], timeout: 5)
+    }
+
     func testDecodeWrappedAsset() {
         let val = context.evaluateScript("({asset: {id: 'someId', type: 'text', value: 'someValue'}})")
 
@@ -31,6 +61,45 @@ class SwiftUIRegistryTests: XCTestCase {
         do {
             let decoded = try registry.decodeWrapper(object)
             XCTAssertEqual(decoded.asset?.id, "someId")
+        } catch {
+            XCTFail("unable to decode wrapper")
+        }
+    }
+
+    func testDecodeWrappedAssetWithAdditionalData() {
+        struct TestAddedData: Decodable, Equatable {
+            var extra: String
+        }
+
+        struct TestData: AssetData {
+            var id: String
+            var type: String
+
+            var nested: BaseGenericWrappedAsset<MetaData, TestAddedData>?
+        }
+
+        class TestNestedAsset: UncontrolledAsset<TestData> {
+            override var view: AnyView { AnyView(EmptyView()) }
+        }
+        let val = context
+            .evaluateScript("({asset: {id: 'someId', type: 'nested', nested: {asset: {id: 'someOtherId', type: 'text', value: ''}, extra: 'value'}}})")
+
+        let partialMatch = PartialMatchFingerprintPlugin()
+        partialMatch.context = context
+        partialMatch.setMapping(assetId: "someId", index: 1)
+        partialMatch.setMapping(assetId: "someOtherId", index: 0)
+        let registry = SwiftUIRegistry(logger: TapableLogger())
+        registry.register("text", asset: TextAsset.self)
+        registry.register("nested", asset: TestNestedAsset.self)
+        registry.partialMatchRegistry = partialMatch
+
+        guard let object = val else { return XCTFail("object should not be nil") }
+
+        do {
+            let decoded = try registry.decodeWrapper(object)
+            XCTAssertEqual(decoded.asset?.id, "someId")
+            guard let asset = decoded.asset as? TestNestedAsset else { return XCTFail("Decoded asset was not TestNestedAsset") }
+            XCTAssertEqual(asset.model.data.nested?.additionalData?.extra, "value")
         } catch {
             XCTFail("unable to decode wrapper")
         }

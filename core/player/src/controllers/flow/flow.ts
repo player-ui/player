@@ -30,6 +30,7 @@ export class FlowInstance {
   private flow: NavigationFlow;
   private log?: Logger;
   private history: string[];
+  private isTransitioning = false;
   private flowPromise?: DeferredPromise<NavigationFlowEndState>;
   public readonly id: string;
   public currentState?: NamedState;
@@ -58,6 +59,9 @@ export class FlowInstance {
 
     /** A callback when a transition from 1 state to another was made */
     transition: new SyncHook<[NamedState | undefined, NamedState]>(),
+
+    /** A callback to run actions after a transition occurs */
+    afterTransition: new SyncHook<[FlowInstance]>(),
   };
 
   constructor(
@@ -112,6 +116,12 @@ export class FlowInstance {
   }
 
   public transition(transitionValue: string, options?: TransitionOptions) {
+    if (this.isTransitioning) {
+      throw new Error(
+        `Transitioning while ongoing transition from ${this.currentState?.name} is in progress is not supported`
+      );
+    }
+
     if (this.currentState?.value.state_type === 'END') {
       this.log?.warn(
         `Skipping transition using ${transitionValue}. Already at and END state`
@@ -131,7 +141,7 @@ export class FlowInstance {
 
       if (skipTransition) {
         this.log?.debug(
-          `Skipping transition from ${this.currentState} b/c hook told us to`
+          `Skipping transition from ${this.currentState.name} b/c hook told us to`
         );
         return;
       }
@@ -183,6 +193,7 @@ export class FlowInstance {
 
     const prevState = this.currentState;
 
+    this.isTransitioning = true;
     nextState = this.hooks.resolveTransitionNode.call(nextState);
 
     const newCurrentState = {
@@ -201,5 +212,9 @@ export class FlowInstance {
     this.hooks.transition.call(prevState, {
       ...newCurrentState,
     });
+
+    this.isTransitioning = false;
+
+    this.hooks.afterTransition.call(this);
   }
 }

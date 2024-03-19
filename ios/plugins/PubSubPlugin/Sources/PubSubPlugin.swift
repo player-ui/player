@@ -65,7 +65,7 @@ public class PubSubPlugin: JSBasePlugin, NativePlugin {
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: PubSubPlugin.self), pathComponent: "PubSubPlugin.bundle")
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: PubSubPlugin.self), pathComponent: "PlayerUI_PubSubPlugin.bundle")
     }
 
     /**
@@ -86,7 +86,9 @@ public class PubSubPlugin: JSBasePlugin, NativePlugin {
             } else if
                 let object = data?.toObject(),
                 let objectData = try? JSONSerialization.data(withJSONObject: object),
-                let eventData = try? JSONDecoder().decode(AnyType.self, from: objectData)
+                let eventData = try? AnyTypeDecodingContext(rawData: objectData)
+                    .inject(to: JSONDecoder())
+                    .decode(AnyType.self, from: objectData)
             {
                 callback(name, eventData)
             } else {

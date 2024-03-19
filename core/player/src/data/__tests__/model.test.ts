@@ -1,6 +1,7 @@
-import { BindingParser } from '../../binding';
+import { BindingInstance, BindingParser } from '../../binding';
 import type { DataModelMiddleware } from '..';
 import { LocalModel, PipelinedDataModel } from '..';
+import { withParser } from '../model';
 import type { BatchSetTransaction } from '../model';
 
 const { parse } = new BindingParser({
@@ -27,7 +28,8 @@ describe('model', () => {
             newTransaction.push([binding, val]);
           }
         });
-        next?.set(newTransaction, options);
+
+        return next?.set(newTransaction, options) ?? [];
       },
     };
 
@@ -44,5 +46,32 @@ describe('model', () => {
 
     expect(localModel.get(parse('foo.bar'))).toBe(undefined);
     expect(localModel.get(parse('foo.baz'))).toBe('good');
+  });
+
+  it('works with withParser', () => {
+    const mockParse = jest.fn(() => new BindingInstance(['some', 'binding']));
+
+    const modelWithParser = withParser(model, mockParse);
+
+    modelWithParser.get('some.binding');
+
+    expect(mockParse).toHaveBeenCalledWith(
+      'some.binding',
+      expect.objectContaining({ readOnly: true })
+    );
+
+    modelWithParser.set([['some.binding', 'test']]);
+
+    expect(mockParse).toHaveBeenCalledWith(
+      'some.binding',
+      expect.objectContaining({ readOnly: false })
+    );
+
+    modelWithParser.delete(['some.binding']);
+
+    expect(mockParse).toHaveBeenCalledWith(
+      'some.binding',
+      expect.objectContaining({ readOnly: false })
+    );
   });
 });

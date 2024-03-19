@@ -4,27 +4,66 @@ title: 'Getting Started'
 
 # Getting Started
 
-Getting started with Player is simple. Below we have guides per platform on how to integrate Player into your platform of choice. 
-
-## React 
+Getting started with Player is simple.
 
 ### Install Dependencies
 
-The first dependency you'll need to pull in in the React Player itself. You can do this by running
+The first dependency you'll need to pull in is the Player itself. Additionally, you'll need an assets plugin to define any UI -- we'll use the reference assets as an example.
+
+<PlatformTabs>
+  <react>
+
+You can do this by running
 
 ```bash
 yarn add @player-ui/react
+yarn add @player-ui/reference-assets-plugin-react
 ```
 
-or 
+or
 
 ```bash
 npm install @player-ui/react
+npm install @player-ui/reference-assets-plugin-react
 ```
+  </react>
+  <ios>
+
+In your `Podfile` you'll need to add `PlayerUI` as a dependency and the `ReferenceAssets` plugin to use the base set of assets.
+
+```ruby
+source 'https://github.com/player-ui/player'
+
+target 'MyApp' do
+  # Add the pod to your target
+  pod 'PlayerUI'
+  pod 'PlayerUI/ReferenceAssets' # For example only
+end
+```
+  </ios>
+  <android>
+
+Configure the Android Player dependencies in your `build.gradle(.kts)` files.
+
+```kotlin
+dependencies {
+    // Android Player
+    implementation("com.intuit.player.android:player:$playerVersion")
+    // Optional - reference assets
+    implementation("com.intuit.player.android:assets:$playerVersion")
+}
+```
+  </android>
+</PlatformTabs>
+
+<Alert status="warning" description="The reference assets aren't intended for production use. They exist as an example of how to create assets and can be used to help get started." />
 
 ### Configuration
 
-Next, in your code you'll need to initialize Player. This is where you would also initialize any plugins you want to use with Player and create the configuration for Player itself. Below is a minimal example of this. 
+Next, in your code you'll need to initialize Player. This is where you would also initialize any plugins you want to use with Player and create the configuration for Player itself. Below is a minimal example of this.
+
+<PlatformTabs>
+  <react>
 
 ```javascript
 import { ReactPlayer } from '@player-ui/react';
@@ -36,45 +75,54 @@ const reactPlayer = new ReactPlayer({
   plugins: [new ReferenceAssetsPlugin()],
 });
 ```
+  </react>
+  <ios>
+
+`SwiftUIPlayer` is just a normal SwiftUI View and can be inserted anywhere in your hierarchy.
+
+```swift
+import PlayerUI
+
+var body: some View {
+  SwiftUIPlayer(
+    plugins: [ReferenceAssetsPlugin()],
+  )
+}
+```
+  </ios>
+
+  <android>
+
+```kotlin
+// create Android Player with reference assets plugin
+val player = AndroidPlayer(ReferenceAssetsPlugin())
+```
+  </android>
+</PlatformTabs>
 
 ### Render Content
+Now that you have a Player instance created. You'll need to start it with some [content](/content).
 
-Now that you have a Player instance created. You'll need to start it with some content.
+<PlatformTabs>
+
+  <react>
 
 ```javascript
 const content = {/* your content here */}
 reactPlayer.start(content);
 ```
 
-With Player running your content, you'll need to actually render out what is processes. To do this, you can use the React Player's component API to inster it into your React tree. 
+With Player running your content, you'll need to actually render out what is processes. To do this, you can use the React Player's component API to insert it into your React tree.
 
 ```javascript
 const MyApp = () => {
   return <reactPlayer.Component />;
 };
 ```
+  </react>
+  <ios>
 
-Congrats! You've got Player up and running. If you need additional functionality you can add more plugins to extend Player's functionality. Head over to the [Plugins](./plugins) section to take a look at the Plugins we've developed or take a look at the [Architecture](./architecture) section to see how you can write your own. 
-
-## iOS (Swift)
-
-### Install Dependencies
-
-In your `Podfile` you'll need to add `PlayerUI` as a dependency and the `ReferenceAssets` plugin to use the base set of assets. 
-
-```ruby
-source 'https://github.com/player-ui/player'
-
-target 'MyApp' do
-  # Add the pod to your target
-  pod 'PlayerUI'
-  pod 'PlayerUI/ReferenceAssets' # For example only
-end
-```
-
-### Configuration
-
-The `SwiftUIPlayer` is just a normal SwiftUI View and can be inserted anywhere in your hierarchy. The flow will start automatically, and the result will update the `Binding<Result<CompletedState, PlayerError>?>` that you pass to it:
+Expanding on the `SwiftUIPlayer` creation above, providing a `flow` will start the Player automatically, and the `result` will update the `Binding<Result<CompletedState, PlayerError>?>` that you pass to it:
 
 ```swift
 import PlayerUI
@@ -91,80 +139,19 @@ struct MyApp: View {
   }
 }
 ```
+  </ios>
+  <android>
 
-## JVM/Android
-
-### Install Dependencies
-
-Configure the Android Player dependencies in your Gradle files. You'll also need to add a plugin that provides asset definitions and components. To get started, we are going to use the reference set provided by the Android Player. _Note: The reference asset set isn't intended for production use. It exists as an example of how to create an Android asset and can be used to help get started. _ 
-
-<Tabs>
-<Gradle language="Kotlin">
+To receive view updates, you must add a handler to render the views which are represented as `RenderableAsset`s.
 
 ```kotlin
-// Add Android Player dependencies
-dependencies {
-    // Android Player
-    implementation("com.intuit.player.android", "player", androidPlayerVersion)
-    // Optional - reference asset set
-    implementation("com.intuit.player.android", "assets", referenceAssetsVersion)
-}
-```
-
-</Gradle>  
-<Gradle language="Groovy">
-
-```groovy
-// Add Android Player dependencies
-dependencies {
-    // Android Player
-    implementation "com.intuit.player.android:player:$androidPlayerVersion"
-    // Optional - reference asset set
-    implementation "com.intuit.player.android:assets:$referenceAssetsVersion"
-}
-```
-
-</Gradle>
-<Maven>
-
-```xml
-<dependency>
-    <groupId>com.intuit.player.jvm</groupId>
-    <artifactId>core</artifactId>
-    <version>3.2.1</version>
-</dependency>
-```
-
-</Maven>
-</Tabs>
-
-### Configuration
-
-All you need to create an `AndroidPlayer` instance is the Android Context and any plugins you want.
-
-```kotlin
-// create Android Player with reference assets plugin
-val player = AndroidPlayer(context, ReferenceAssetsPlugin())
-```
-
-Once you have a Player, you must add a handler for view updates, which are represented as RenderableAssets. 
-
-```kotlin
-// handle view updates
+// handle view updates - should be done before starting the Player
 player.onUpdate { asset: RenderableAsset? ->
-    // render asset as View
-    val view: View = asset?.render()
-    // add view to screen
+    // render asset as View `into` view tree
+    asset?.render() into binding.playerContainer
 }
-```
 
-### Usage
-
-#### Basic
-With the Android Player and handler configured, all that's left is starting a flow. This is done by calling
-start with a JSON string containing your Player content.
-
-```kotlin
+// start Player
 player.start(content)
 ```
 
@@ -174,29 +161,36 @@ When you're done with Player, release any native runtime memory used to instanti
 player.release()
 ```
 
+Creating your own `AndroidPlayer` instance is fairly simple, but it grows in complexity when considering proper resources management and app orchestration. We provide a Fragment/ViewModel integration to make it easier to properly integrate into your app and account for these concerns. 
+
 #### ViewModel
 
 With the `PlayerViewModel` and `PlayerFragment`, the above orchestration is done for you. All that is needed is to provide concrete implementations of each and add the fragment to your app.
 
 ##### PlayerViewModel
-The `PlayerViewModel` is an `AndroidViewModel` meaning it requires the actual Android `Application` as well as an `AsyncFlowIterator` to be supplied in the constructor. The AsyncFlowIterator is what tells Player which flows to run. This can be hardcoded into the view model or expected as an argument, as shown below.
+
+The `PlayerViewModel` requires an `AsyncFlowIterator` to be supplied in the constructor. The AsyncFlowIterator is what tells Player which flows to run. This can be hardcoded into the view model or expected as an argument, as shown below.
 
 ```kotlin
-class SimplePlayerViewModel(application: Application, flows: AsyncFlowIterator) : PlayerViewModel(application, flows) {
+class SimplePlayerViewModel(flows: AsyncFlowIterator) : PlayerViewModel(flows) {
     override val plugins = listOf(ReferenceAssetsPlugin())
 }
 ```
 
 ##### PlayerFragment
 
-The `PlayerFragment` is a simple Android `Fragment` that only requires a specific `PlayerViewModel` to be defined. If your view model requires the AsyncFlowIterator to be passed as part of the constructor, you can leverage the `PlayerViewModel.Factory` to produce it, as shown below.
+The `PlayerFragment` is a simple Android `Fragment` that only requires a specific `PlayerViewModel` to be defined. If your view model requires the `AsyncFlowIterator` to be passed as part of the constructor, you can leverage the `PlayerViewModel.Factory` to produce it, as shown below.
 
 Specifically, this fragment takes a flow as an argument to the constructor and creates a single-flow `AsyncFlowIterator` instance using the pseudo-constructor helper.
 
 ```kotlin
 class SimplePlayerFragment(override val flow: String) : PlayerFragment() {
     override val playerViewModel by viewModels<SimplePlayerViewModel> {
-        PlayerViewModel.Factory(requireActivity().application, AsyncFlowIterator(flow), ::SimplePlayerViewModel)
+        PlayerViewModel.Factory(AsyncFlowIterator(flow), ::SimplePlayerViewModel)
     }
 }
 ```
+  </android>
+</PlatformTabs>
+
+Congrats! You've got Player up and running. If you need additional functionality you can add more plugins to extend Player's functionality. Head over to the [Plugins](./plugins) section to take a look at the Plugins we've developed or take a look at the [Architecture](./architecture) section to see how you can write your own.

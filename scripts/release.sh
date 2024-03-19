@@ -29,18 +29,21 @@ bazel build --config=release //:PlayerUI_Podspec //:PlayerUI_Pod
 # VScode extension publishing
 bazel run --config=release //language/vscode-player-syntax:vscode-plugin.publish
 
+# Maven Central publishing
+bazel run @rules_player//distribution:staged-maven-deploy -- "$RELEASE_TYPE" --package-group=com.intuit.playerui --legacy --client-timeout=600 --connect-timeout=600
+
 # Running this here because it will still have the pre-release version in the VERSION file before auto cleans it up
 # Make sure to re-stamp the outputs with the BASE_PATH so nextjs knows what to do with links
 if [ "$RELEASE_TYPE" == "snapshot" ] && [ "$CURRENT_BRANCH" == "main" ]; then
-  STABLE_DOCS_BASE_PATH=next bazel run --config=release //docs:deploy_docs -- --dest_dir next
+  STABLE_DOCS_BASE_PATH=next bazel run --verbose_failures --config=release //docs:deploy_docs -- --dest_dir next
 elif [ "$RELEASE_TYPE" == "release" ] && [ "$CURRENT_BRANCH" == "main" ]; then
-  STABLE_DOCS_BASE_PATH=latest bazel run --config=release //docs:deploy_docs -- --dest_dir latest
+  STABLE_DOCS_BASE_PATH=latest bazel run --verbose_failures --config=release //docs:deploy_docs -- --dest_dir latest
 fi
 
+# Commented out for now due to failures to deploy
+# causes lots of "java.io.IOException: io.grpc.StatusRuntimeException: CANCELLED: Failed to read message." messages in the build
 # Also deploy to the versioned folder for main releases
-if [ "$RELEASE_TYPE" == "release" ]; then
-  SEMVER_MAJOR=$(cat VERSION | cut -d. -f1)
-  STABLE_DOCS_BASE_PATH=$SEMVER_MAJOR bazel run --config=release //docs:deploy_docs -- --dest_dir "v$SEMVER_MAJOR"
-fi
-
-bazel run @rules_player//distribution:staged-maven-deploy -- "$RELEASE_TYPE" --package-group=com.intuit.player --legacy
+# if [ "$RELEASE_TYPE" == "release" ]; then
+#   SEMVER_MAJOR=$(cat VERSION | cut -d. -f1)
+#   STABLE_DOCS_BASE_PATH=$SEMVER_MAJOR bazel run --verbose_failures --config=release //docs:deploy_docs -- --dest_dir "$SEMVER_MAJOR"
+# fi

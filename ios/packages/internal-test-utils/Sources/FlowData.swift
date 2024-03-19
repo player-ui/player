@@ -28,6 +28,92 @@ public struct FlowData {
         "ref": "action",
         "transitions": {
           "*": "END_Done"
+        },
+        "attributes": { "test": "value" }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done",
+        "param": {
+          "someKey": "someValue"
+        },
+        "extraKey": "extraValue",
+        "extraObject": {
+          "someInt": 1
+        }
+      }
+    }
+  }
+}
+"""
+
+    public static let externalFlow: String = """
+{
+  "id": "counter-flow",
+  "views": [],
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "EXTERNAL_1",
+      "EXTERNAL_1": {
+        "state_type": "EXTERNAL",
+        "ref": "action",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+"""
+
+    public static let actionFlow: String = """
+{
+  "id": "counter-flow",
+  "views": [],
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "ACTION_1",
+      "ACTION_1": {
+        "state_type": "ACTION",
+        "exp": "{{foo}}",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done",
+        "param": {
+          "someKey": "someValue"
+        },
+        "extraKey": "extraValue",
+        "extraObject": {
+          "someInt": 1
+        }
+      }
+    }
+  }
+}
+"""
+    public static let actionMultiExpFlow: String = """
+{
+  "id": "counter-flow",
+  "views": [],
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "ACTION_1",
+      "ACTION_1": {
+        "state_type": "ACTION",
+        "exp": ["{{foo}}", "{{bar}}"],
+        "transitions": {
+          "*": "END_Done"
         }
       },
       "END_Done": {

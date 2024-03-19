@@ -9,16 +9,18 @@ javascript_pipeline(
         "@npm//p-defer",
         "@npm//queue-microtask",
         "@npm//tapable-ts",
-        "@npm//nested-error-stacks",
-        "@npm//@types/nested-error-stacks",
         "@npm//parsimmon",
         "@npm//@types/parsimmon",
         "@npm//arr-flatten",
         "@npm//ebnf",
         "@npm//timm",
+        "@npm//error-polyfill",
+        "@npm//ts-nested-error"
     ],
     test_data = [
         "//core/make-flow:@player-ui/make-flow",
+        "//plugins/common-types/core:@player-ui/common-types-plugin",
     ],
-    library_name = "Player"
+    library_name = "Player",
+    bundle_entry = 'bundle.entry.js'
 )

@@ -19,6 +19,14 @@ def PlayerUI(
             "ENABLE_TESTING_SEARCH_PATHS": "YES",
         },
         srcs = glob([
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.h",
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.hh",
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.m",
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.mm",
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.swift",
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.c",
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.cc",
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.cpp",
             "ios/plugins/BaseBeaconPlugin/Sources/**/*.h",
             "ios/plugins/BaseBeaconPlugin/Sources/**/*.hh",
             "ios/plugins/BaseBeaconPlugin/Sources/**/*.m",
@@ -59,6 +67,14 @@ def PlayerUI(
             "ios/plugins/CommonTypesPlugin/Sources/**/*.c",
             "ios/plugins/CommonTypesPlugin/Sources/**/*.cc",
             "ios/plugins/CommonTypesPlugin/Sources/**/*.cpp",
+            "ios/plugins/ComputedPropertiesPlugin/Sources/**/*.h",
+            "ios/plugins/ComputedPropertiesPlugin/Sources/**/*.hh",
+            "ios/plugins/ComputedPropertiesPlugin/Sources/**/*.m",
+            "ios/plugins/ComputedPropertiesPlugin/Sources/**/*.mm",
+            "ios/plugins/ComputedPropertiesPlugin/Sources/**/*.swift",
+            "ios/plugins/ComputedPropertiesPlugin/Sources/**/*.c",
+            "ios/plugins/ComputedPropertiesPlugin/Sources/**/*.cc",
+            "ios/plugins/ComputedPropertiesPlugin/Sources/**/*.cpp",
             "ios/packages/core/Sources/**/*.h",
             "ios/packages/core/Sources/**/*.hh",
             "ios/packages/core/Sources/**/*.m",
@@ -139,6 +155,14 @@ def PlayerUI(
             "ios/packages/reference-assets/Sources/**/*.c",
             "ios/packages/reference-assets/Sources/**/*.cc",
             "ios/packages/reference-assets/Sources/**/*.cpp",
+            "ios/plugins/StageRevertDataPlugin/Sources/**/*.h",
+            "ios/plugins/StageRevertDataPlugin/Sources/**/*.hh",
+            "ios/plugins/StageRevertDataPlugin/Sources/**/*.m",
+            "ios/plugins/StageRevertDataPlugin/Sources/**/*.mm",
+            "ios/plugins/StageRevertDataPlugin/Sources/**/*.swift",
+            "ios/plugins/StageRevertDataPlugin/Sources/**/*.c",
+            "ios/plugins/StageRevertDataPlugin/Sources/**/*.cc",
+            "ios/plugins/StageRevertDataPlugin/Sources/**/*.cpp",
             "ios/packages/swiftui/Sources/**/*.h",
             "ios/packages/swiftui/Sources/**/*.hh",
             "ios/packages/swiftui/Sources/**/*.m",
@@ -147,6 +171,22 @@ def PlayerUI(
             "ios/packages/swiftui/Sources/**/*.c",
             "ios/packages/swiftui/Sources/**/*.cc",
             "ios/packages/swiftui/Sources/**/*.cpp",
+            "ios/plugins/SwiftUICheckPathPlugin/Sources/**/*.h",
+            "ios/plugins/SwiftUICheckPathPlugin/Sources/**/*.hh",
+            "ios/plugins/SwiftUICheckPathPlugin/Sources/**/*.m",
+            "ios/plugins/SwiftUICheckPathPlugin/Sources/**/*.mm",
+            "ios/plugins/SwiftUICheckPathPlugin/Sources/**/*.swift",
+            "ios/plugins/SwiftUICheckPathPlugin/Sources/**/*.c",
+            "ios/plugins/SwiftUICheckPathPlugin/Sources/**/*.cc",
+            "ios/plugins/SwiftUICheckPathPlugin/Sources/**/*.cpp",
+            "ios/plugins/SwiftUIPendingTransactionPlugin/Sources/**/*.h",
+            "ios/plugins/SwiftUIPendingTransactionPlugin/Sources/**/*.hh",
+            "ios/plugins/SwiftUIPendingTransactionPlugin/Sources/**/*.m",
+            "ios/plugins/SwiftUIPendingTransactionPlugin/Sources/**/*.mm",
+            "ios/plugins/SwiftUIPendingTransactionPlugin/Sources/**/*.swift",
+            "ios/plugins/SwiftUIPendingTransactionPlugin/Sources/**/*.c",
+            "ios/plugins/SwiftUIPendingTransactionPlugin/Sources/**/*.cc",
+            "ios/plugins/SwiftUIPendingTransactionPlugin/Sources/**/*.cpp",
             "ios/packages/test-utils/Sources/**/*.h",
             "ios/packages/test-utils/Sources/**/*.hh",
             "ios/packages/test-utils/Sources/**/*.m",
@@ -181,45 +221,55 @@ def PlayerUI(
             "ios/plugins/TypesProviderPlugin/Sources/**/*.cpp",
         ]),
         resource_bundles = {
-            "BaseBeaconPlugin": glob(
+            "PlayerUI_AsyncNodePlugin": glob(
+                ["ios/plugins/AsyncNodePlugin/Resources/**/*.js"],
+                exclude_directories = 0,
+            ),
+            "PlayerUI_BaseBeaconPlugin": glob(
                 ["ios/plugins/BaseBeaconPlugin/Resources/**/*.js"],
                 exclude_directories = 0,
             ),
-            "CheckPathPlugin": glob(
+            "PlayerUI_CheckPathPlugin": glob(
                 ["ios/plugins/CheckPathPlugin/Resources/**/*.js"],
                 exclude_directories = 0,
             ),
-            "CommonExpressionsPlugin": glob(
+            "PlayerUI_CommonExpressionsPlugin": glob(
                 [
                     "ios/plugins/CommonExpressionsPlugin/Resources/**/*.js",
                 ],
                 exclude_directories = 0,
             ),
-            "CommonTypesPlugin": glob(
+            "PlayerUI_CommonTypesPlugin": glob(
                 ["ios/plugins/CommonTypesPlugin/Resources/**/*.js"],
+                exclude_directories = 0,
+            ),
+            "PlayerUI_ComputedPropertiesPlugin": glob(
+                [
+                    "ios/plugins/ComputedPropertiesPlugin/Resources/**/*.js",
+                ],
                 exclude_directories = 0,
             ),
             "PlayerUI": glob(
                 ["ios/packages/core/Resources/**/*.js"],
                 exclude_directories = 0,
             ),
-            "ExpressionPlugin": glob(
+            "PlayerUI_ExpressionPlugin": glob(
                 ["ios/plugins/ExpressionPlugin/Resources/**/*.js"],
                 exclude_directories = 0,
             ),
-            "ExternalActionPlugin": glob(
+            "PlayerUI_ExternalActionPlugin": glob(
                 ["ios/plugins/ExternalActionPlugin/Resources/**/*.js"],
                 exclude_directories = 0,
             ),
-            "MetricsPlugin": glob(
+            "PlayerUI_MetricsPlugin": glob(
                 ["ios/plugins/MetricsPlugin/Resources/**/*.js"],
                 exclude_directories = 0,
             ),
-            "PubSubPlugin": glob(
+            "PlayerUI_PubSubPlugin": glob(
                 ["ios/plugins/PubSubPlugin/Resources/**/*.js"],
                 exclude_directories = 0,
             ),
-            "ReferenceAssets": glob(
+            "PlayerUI_ReferenceAssets": glob(
                 [
                     "ios/packages/reference-assets/Resources/js/**/*.js",
                     "ios/packages/reference-assets/Resources/svg/*.xcassets",
@@ -227,11 +277,17 @@ def PlayerUI(
                 ],
                 exclude_directories = 0,
             ),
-            "TestUtilities": glob(
+            "PlayerUI_StageRevertDataPlugin": glob(
+                [
+                    "ios/plugins/StageRevertDataPlugin/Resources/**/*.js",
+                ],
+                exclude_directories = 0,
+            ),
+            "PlayerUI_TestUtilities": glob(
                 ["ios/packages/test-utils/Resources/**/*.js"],
                 exclude_directories = 0,
             ),
-            "TypesProviderPlugin": glob(
+            "PlayerUI_TypesProviderPlugin": glob(
                 ["ios/plugins/TypesProviderPlugin/Resources/**/*.js"],
                 exclude_directories = 0,
             ),
@@ -239,7 +295,7 @@ def PlayerUI(
         weak_sdk_frameworks = ["XCTest"],
         deps = ["@Pods//SwiftHooks"] + deps,
         visibility = ["//visibility:public"],
-        platforms = {"ios": "13.0"},
+        platforms = {"ios": "14.0"},
     )
 
 def PlayerUI_Demo(
@@ -289,12 +345,20 @@ def PlayerUI_Demo(
         ],
         infoplists = [
             {
-                "UIMainStoryboardFile": "Primary",
                 "UILaunchStoryboardName": "Launch",
                 "CFBundleIdentifier": "com.intuit.ios.player",
+                "UIApplicationSceneManifest": {
+                    "UIApplicationSupportsMultipleScenes": True,
+                    "UISceneConfigurations": {"UIWindowSceneSessionRoleApplication": [
+                        {
+                            "UISceneConfigurationName": "Default Configuration",
+                            "UISceneDelegateClassName": "PlayerUI_Demo.SceneDelegate",
+                        },
+                    ]},
+                },
             },
         ],
-        minimum_os_version = "13.0",
+        minimum_os_version = "14.0",
     )
 
 def unit_tests(
@@ -312,7 +376,7 @@ def unit_tests(
             "ios/plugins/*/Tests/**/*.swift",
         ]),
         deps = [":PlayerUI"],
-        minimum_os_version = "13.0",
+        minimum_os_version = "14.0",
         test_host = ":PlayerUI-Demo",
     )
 
@@ -355,7 +419,7 @@ def ui_tests(
             "@Pods//ViewInspector",
         ],
         bundle_id = "com.intuit.ios.PlayerUI-ExampleUITests",
-        minimum_os_version = "13.0",
+        minimum_os_version = "14.0",
         test_host = ":PlayerUI-Demo",
     )
     ios_ui_test(
@@ -389,11 +453,8 @@ def ui_tests(
             "ios/plugins/*/UITests/**/*.cc",
             "ios/plugins/*/UITests/**/*.cpp",
         ]),
-        deps = [
-            ":PlayerUI",
-            "@Pods//EyesXCUI",
-        ],
+        deps = [":PlayerUI"],
         bundle_id = "com.intuit.ios.PlayerUI-ExampleUITests",
-        minimum_os_version = "13.0",
+        minimum_os_version = "14.0",
         test_host = ":PlayerUI-Demo",
     )

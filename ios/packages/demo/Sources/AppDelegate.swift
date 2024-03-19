@@ -34,35 +34,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         PubSubPlugin([]),
         TypesProviderPlugin(types: [], validators: [], formats: []),
         TransitionPlugin(popTransition: .pop),
-        BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) }
+        BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) },
+        SwiftUIPendingTransactionPlugin<PendingTransactionPhases>()
     ]
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        if
-            UserDefaults.standard.bool(forKey: "isAppetize"),
-            let flowStr = UserDefaults.standard.string(forKey: "json")
-        {
-            launch(flow: flowStr)
-            return true
-        }
-
-        let root = UINavigationController()
-
-        root.setViewControllers(
-            [
-                UIHostingController(
-                    rootView: AssetCollection(
-                        plugins: plugins,
-                        sections: MockFlows.sections,
-                        completion: self.completion(result:)
-                    )
-                )
-            ],
-            animated: false
-        )
-
-        self.window?.rootViewController = root
-        self.window?.makeKeyAndVisible()
         return true
     }
 
@@ -87,44 +63,69 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
+}
 
-    func application(
-        _ application: UIApplication,
-        continue userActivity: NSUserActivity,
-        restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
-    ) -> Bool {
-        guard
-            userActivity.activityType == NSUserActivityTypeBrowsingWeb,
-            let url = userActivity.webpageURL,
-            let components = URLComponents.init(url: url, resolvingAgainstBaseURL: true),
-            let jsonQuery = components.queryItems?.first(where: { $0.name == "json" }),
-            let flowString = jsonQuery.value
-        else {
-            return false
+class SceneDelegate: UIResponder, UISceneDelegate {
+    let plugins: [NativePlugin] = [
+        PrintLoggerPlugin(level: .trace),
+        ReferenceAssetsPlugin(),
+        CommonTypesPlugin(),
+        ExpressionPlugin(),
+        CommonExpressionsPlugin(),
+        ExternalActionPlugin(handler: { _, _, _ in
+            print("external state")
+        }),
+        MetricsPlugin { timing, render, flow in
+            print(timing as Any)
+            print(render as Any)
+            print(flow as Any)
+        },
+        RequestTimePlugin { 5 },
+        PubSubPlugin([]),
+        TypesProviderPlugin(types: [], validators: [], formats: []),
+        TransitionPlugin(popTransition: .pop),
+        BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) },
+        SwiftUIPendingTransactionPlugin<PendingTransactionPhases>()
+    ]
+
+    var window: UIWindow?
+
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+        guard let windowScene = scene as? UIWindowScene else { return }
+        window = window ?? UIWindow(windowScene: windowScene)
+
+        if
+            UserDefaults.standard.bool(forKey: "isAppetize"),
+            let flowStr = UserDefaults.standard.string(forKey: "json")
+        {
+            window.loadView(
+                view:
+                    AssetFlowView(
+                        flow: flowStr,
+                        plugins: plugins,
+                        completion: self.completion(result:)
+                    ).navigationBarTitle(Text("Storybook Flow"))
+            )
         }
 
-        launch(flow: flowString)
-        return true
-    }
+        let isUiTest = ProcessInfo.processInfo.environment["UI_TESTING"] == "true"
 
-    func launch(flow: String) {
-        guard let navController = window?.rootViewController as? UINavigationController else { return }
-
-        navController.popToRootViewController(animated: false)
-        navController.pushViewController(
-            UIHostingController(
-                rootView: AssetFlowView(
-                    flow: flow,
+        window.loadView(
+            view: NavigationView {
+                SegmentControlView(
                     plugins: plugins,
-                    completion: self.completion(result:)
-                ).navigationBarTitle(Text("Storybook Flow"))
-            ),
-            animated: true
+                    assetSections: MockFlows.assetSections,
+                    pluginSections: MockFlows.pluginSections,
+                    completion: completion(result:)
+                )
+                .navigationBarTitleDisplayMode(.inline)
+            },
+            hideStatusBar: isUiTest
         )
     }
 }
 
-extension AppDelegate {
+extension SceneDelegate {
     func completion(result: Result<CompletedState, PlayerError>) {
         switch result {
         case .success(let result):
@@ -145,5 +146,12 @@ extension AppDelegate {
             alertController.dismiss(animated: true, completion: nil)
         }))
         self.window?.rootViewController?.present(alertController, animated: true, completion: nil)
+    }
+}
+
+extension Optional where Wrapped == UIWindow {
+    func loadView<V: View>(view: V, hideStatusBar: Bool = false) {
+        self?.rootViewController = UIHostingController(rootView: view.statusBar(hidden: hideStatusBar))
+        self?.makeKeyAndVisible()
     }
 }

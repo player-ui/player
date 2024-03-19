@@ -49,6 +49,10 @@ const navigation: Navigation = {
               path: '/writing-plugins',
             },
             {
+              title: 'Plugin Implementation',
+              path: '/plugin-implementation',
+            },
+            {
               title: 'Multi-Flow Experiences',
               path: '/guides/multi-flow-experiences',
             },
@@ -66,6 +70,10 @@ const navigation: Navigation = {
               path: '/content',
             },
             {
+              title: 'Navigation',
+              path: '/content/navigation',
+            },
+            {
               title: 'Assets & Views',
               path: '/content/assets-views',
             },
@@ -74,13 +82,26 @@ const navigation: Navigation = {
               path: '/content/data-expressions',
             },
             {
-              title: 'Navigation',
-              path: '/content/navigation',
+              title: 'Schema',
+              path: '/content/schema',
+            },
+          ],
+        },
+        {
+          title: 'Authoring',
+          routes: [
+            {
+              title: 'Overview',
+              path: '/dsl',
             },
             {
-              title: 'Templates',
-              path: '/content/templates'
-            }
+              title: 'Views',
+              path: '/dsl/views',
+            },
+            {
+              title: 'Schema',
+              path: '/dsl/schema',
+            },
           ],
         },
         {
@@ -102,6 +123,10 @@ const navigation: Navigation = {
               title: 'Custom Assets',
               path: '/assets/custom',
             },
+            {
+              title: 'DSL Components',
+              path: '/assets/dsl',
+            },
           ],
         },
         {
@@ -112,12 +137,25 @@ const navigation: Navigation = {
               path: '/tools/storybook',
             },
             {
-              title: 'TSX Content Authoring',
-              path: '/tools/dsl',
-            },
-            {
               title: 'CLI',
               path: '/tools/cli',
+            },
+          ],
+        },
+        {
+          title: 'XLR',
+          routes: [
+            {
+              title: 'Intro',
+              path: '/xlr/intro',
+            },
+            {
+              title: 'Concepts',
+              path: '/xlr/concepts',
+            },
+            {
+              title: 'Usage',
+              path: '/xlr/usage',
             },
           ],
         },

@@ -1,6 +1,9 @@
 import { SyncWaterfallHook, SyncBailHook } from 'tapable-ts';
-import parse from './parser';
+import { NestedError } from 'ts-nested-error';
+import { parseExpression } from './parser';
 import * as DEFAULT_EXPRESSION_HANDLERS from './evaluator-functions';
+import { isExpressionNode } from './types';
+import { isObjectExpression } from './utils';
 import type {
   ExpressionNode,
   BinaryOperator,
@@ -9,7 +12,6 @@ import type {
   ExpressionContext,
   ExpressionHandler,
 } from './types';
-import { isExpressionNode } from '.';
 
 /** a && b -- but handles short cutting if the first value is false */
 const andandOperator: BinaryOperator = (ctx, a, b) => {
@@ -71,6 +73,14 @@ const DEFAULT_UNARY_OPERATORS: Record<string, UnaryOperator> = {
 export interface HookOptions extends ExpressionContext {
   /** Given an expression node  */
   resolveNode: (node: ExpressionNode) => any;
+
+  /** Enabling this flag skips calling the onError hook, and just throws errors back to the caller.
+   * The caller is responsible for handling the error.
+   */
+  throwErrors?: boolean;
+
+  /** Whether expressions should be parsed strictly or not */
+  strict?: boolean;
 }
 
 export type ExpressionEvaluatorOptions = Omit<
@@ -91,6 +101,12 @@ export class ExpressionEvaluator {
   public readonly hooks = {
     /** Resolve an AST node for an expression to a value */
     resolve: new SyncWaterfallHook<[any, ExpressionNode, HookOptions]>(),
+
+    /** Gets the options that will be passed in calls to the resolve hook */
+    resolveOptions: new SyncWaterfallHook<[HookOptions]>(),
+
+    /** Allows users to change the expression to be evaluated before processing */
+    beforeEvaluate: new SyncWaterfallHook<[ExpressionType, HookOptions]>(),
 
     /**
      * An optional means of handling an error in the expression execution
@@ -128,14 +144,22 @@ export class ExpressionEvaluator {
   }
 
   public evaluate(
-    expression: ExpressionType,
+    expr: ExpressionType,
     options?: ExpressionEvaluatorOptions
   ): any {
-    const opts = {
+    const resolvedOpts = this.hooks.resolveOptions.call({
       ...this.defaultHookOptions,
       ...options,
-      resolveNode: (node: ExpressionNode) => this._execAST(node, opts),
-    };
+      resolveNode: (node: ExpressionNode) => this._execAST(node, resolvedOpts),
+    });
+
+    let expression = this.hooks.beforeEvaluate.call(expr, resolvedOpts) ?? expr;
+
+    // Unwrap any returned expression type
+    // Since this could also be an object type, we need to recurse through it until we find the end
+    while (isObjectExpression(expression)) {
+      expression = expression.value;
+    }
 
     // Check for literals
     if (
@@ -149,21 +173,17 @@ export class ExpressionEvaluator {
 
     // Skip doing anything with objects that are _actually_ just parsed expression nodes
     if (isExpressionNode(expression)) {
-      return this._execAST(expression, opts);
+      return this._execAST(expression, resolvedOpts);
     }
 
-    if (typeof expression === 'object') {
-      const values = Array.isArray(expression)
-        ? expression
-        : Object.values(expression);
-
-      return values.reduce(
+    if (Array.isArray(expression)) {
+      return expression.reduce(
         (_nothing, exp) => this.evaluate(exp, options),
         null
       );
     }
 
-    return this._execString(String(expression), opts);
+    return this._execString(String(expression), resolvedOpts);
   }
 
   public addExpressionFunction<T extends readonly unknown[], R>(
@@ -205,21 +225,28 @@ export class ExpressionEvaluator {
       [, matchedExp] = Array.from(matches); // In case the expression was surrounded by @[ ]@
     }
 
-    try {
-      const storedAST = this.expressionsCache.get(matchedExp);
+    let storedAST: ExpressionNode;
 
-      if (storedAST) {
-        return this._execAST(storedAST, options);
+    try {
+      storedAST =
+        this.expressionsCache.get(matchedExp) ??
+        parseExpression(matchedExp, { strict: options.strict });
+      this.expressionsCache.set(matchedExp, storedAST);
+    } catch (e: any) {
+      if (options.throwErrors || !this.hooks.onError.call(e)) {
+        // Only throw the error if it's not handled by the hook, or throwErrors is true
+        throw new NestedError(`Error parsing expression: ${exp}`, e);
       }
 
-      const expAST = parse(matchedExp);
-      this.expressionsCache.set(matchedExp, expAST);
+      return;
+    }
 
-      return this._execAST(expAST, options);
+    try {
+      return this._execAST(storedAST, options);
     } catch (e: any) {
-      if (!this.hooks.onError.call(e)) {
-        // Only throw the error if it's not handled by the hook
-        throw e;
+      if (options.throwErrors || !this.hooks.onError.call(e)) {
+        // Only throw the error if it's not handled by the hook, or throwErrors is true
+        throw new NestedError(`Error evaluating expression: ${exp}`, e);
       }
     }
   }
@@ -305,26 +332,14 @@ export class ExpressionEvaluator {
     if (node.type === 'CallExpression') {
       const expressionName = node.callTarget.name;
 
-      // Treat the conditional operator as special.
-      // Don't exec the arguments that don't apply
-      if (expressionName === 'conditional') {
-        const condition = resolveNode(node.args[0]);
-
-        if (condition) {
-          return resolveNode(node.args[1]);
-        }
-
-        if (node.args[2]) {
-          return resolveNode(node.args[2]);
-        }
-
-        return null;
-      }
-
       const operator = this.operators.expressions.get(expressionName);
 
       if (!operator) {
         throw new Error(`Unknown expression function: ${expressionName}`);
+      }
+
+      if ('resolveParams' in operator && operator.resolveParams === false) {
+        return operator(expressionContext, ...node.args);
       }
 
       const args = node.args.map((n) => resolveNode(n));
@@ -333,7 +348,7 @@ export class ExpressionEvaluator {
     }
 
     if (node.type === 'ModelRef') {
-      return model.get(node.ref);
+      return model.get(node.ref, { context: { model: options.model } });
     }
 
     if (node.type === 'MemberExpression') {

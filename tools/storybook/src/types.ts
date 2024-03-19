@@ -2,6 +2,12 @@ import type { ReactPlayerPlugin } from '@player-ui/react';
 import type { AppetizeVersions } from './player/Appetize';
 
 export interface PlayerParametersType {
+  /** Options for the dsl editor */
+  dslEditor?: {
+    /** Enable more imports */
+    additionalModules?: Record<string, any>;
+  };
+
   /** plugins to use for any loaded player */
   reactPlayerPlugins?: Array<ReactPlayerPlugin>;
 

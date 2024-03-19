@@ -1,0 +1,9 @@
+{
+  "id": "image-1",
+  "type": "image",
+  "metaData": {
+    "ref": "https://player-ui.github.io/latest/logo/logo-light-large.png",
+    "accessibility": "This is accessibility text for an image"
+  },
+  "placeholder": "This is placeholder text for an image"
+}

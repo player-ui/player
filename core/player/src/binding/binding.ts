@@ -14,6 +14,14 @@ export interface BindingParserOptions {
    * Get the result of evaluating an expression
    */
   evaluate: (exp: string) => any;
+
+  /**
+   * Without readOnly, if a binding such as this is used: arr[key='does not exist'],
+   * then an object with that key will be created.
+   * This is done to make assignment such as arr[key='abc'].val = 'foo' work smoothly.
+   * Setting readOnly to true will prevent this behavior, avoiding unintended data changes.
+   */
+  readOnly?: boolean;
 }
 
 export type Getter = (path: BindingInstance) => any;

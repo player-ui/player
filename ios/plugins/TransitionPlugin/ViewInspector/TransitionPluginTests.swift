@@ -15,13 +15,6 @@ import Combine
 @testable import PlayerUI
 
 class TransitionPluginTests: ViewInspectorTestCase {
-    func testTransitionPluginLegacyStateTransitions() {
-        let flow = TestFlowManager()
-        let model = ManagedPlayerViewModel(manager: flow) { _ in }
-        let plugin = TransitionPlugin(initialLoadTransition: .test1, betweenViewTransition: .test2)
-        plugin.apply(model)
-        XCTAssertEqual(model.stateTransition.call(), .test1)
-    }
     func testTransitionPluginStateTransitions() {
         let flow = TestFlowManager()
         let model = ManagedPlayerViewModel(manager: flow) { _ in }
@@ -38,11 +31,19 @@ class TransitionPluginTests: ViewInspectorTestCase {
 
         let playerTransition1 = player.hooks?.transition.call()
         XCTAssertEqual(playerTransition1, .identity)
-        (player.state as? InProgressState)?.controllers?.flow.transition(with: "next")
+        do {
+            try (player.state as? InProgressState)?.controllers?.flow.transition(with: "next")
+        } catch {
+            XCTFail("Transition with 'next' failed")
+        }
 
         let playerTransitions3 = player.hooks?.transition.call()
         XCTAssertEqual(playerTransitions3, .test1)
-        (player.state as? InProgressState)?.controllers?.flow.transition(with: "prev")
+        do {
+            try (player.state as? InProgressState)?.controllers?.flow.transition(with: "prev")
+        } catch {
+            "Transition with 'next' failed"
+        }
 
         let playerTransitions4 = player.hooks?.transition.call()
         XCTAssertEqual(playerTransitions4, .test2)

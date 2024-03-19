@@ -14,6 +14,10 @@ export interface AutoScrollManagerConfig {
   autoScrollOnLoad?: boolean;
   /** Config to auto-focus on an error */
   autoFocusOnErrorField?: boolean;
+  /** Optional function to get container element, which is used for calculating offset (default: document.body) */
+  getBaseElement?: () => HTMLElement | undefined | null;
+  /** Additional offset to be used (default: 0) */
+  offset?: number;
 }
 
 /** A plugin to manage scrolling behavior */
@@ -32,6 +36,12 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
   /** tracks if the navigation failed */
   private failedNavigation: boolean;
 
+  /** function to return the base of the scrollable area */
+  private getBaseElement: () => HTMLElement | undefined | null;
+
+  /** static offset */
+  private offset: number;
+
   /** map of scroll type to set of ids that are registered under that type */
   private alreadyScrolledTo: Array<string>;
   private scrollFn: (
@@ -41,6 +51,8 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
   constructor(config: AutoScrollManagerConfig) {
     this.autoScrollOnLoad = config.autoScrollOnLoad ?? false;
     this.autoFocusOnErrorField = config.autoFocusOnErrorField ?? false;
+    this.getBaseElement = config.getBaseElement ?? (() => null);
+    this.offset = config.offset ?? 0;
     this.initialRender = false;
     this.failedNavigation = false;
     this.alreadyScrolledTo = [];
@@ -48,7 +60,10 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
   }
 
   getFirstScrollableElement(idList: Set<string>, type: ScrollType) {
-    const highestElement = { id: '', ypos: 0 };
+    const highestElement = {
+      id: '',
+      ypos: 0,
+    };
     const ypos = window.scrollY;
     idList.forEach((id) => {
       const element = document.getElementById(id);
@@ -72,22 +87,19 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
       }
 
       const epos = element?.getBoundingClientRect().top;
-
       if (
-        epos &&
-        (epos + ypos > highestElement.ypos || highestElement.ypos === 0)
+        epos !== undefined &&
+        (epos + ypos < highestElement.ypos || highestElement.id === '')
       ) {
         highestElement.id = id;
-        highestElement.ypos = ypos - epos;
+        highestElement.ypos = ypos + epos;
       }
     });
-
     return highestElement.id;
   }
 
   calculateScroll(scrollableElements: Map<ScrollType, Set<string>>) {
     let currentScroll = ScrollType.FirstAppearance;
-
     if (this.initialRender) {
       if (this.autoScrollOnLoad) {
         currentScroll = ScrollType.ValidationError;
@@ -103,13 +115,11 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
     }
 
     const elementList = scrollableElements.get(currentScroll);
-
     if (elementList) {
       const element = this.getFirstScrollableElement(
         elementList,
         currentScroll
       );
-
       return element ?? '';
     }
 
@@ -125,13 +135,13 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
           this.initialRender = true;
           this.failedNavigation = false;
           this.alreadyScrolledTo = [];
+          // Reset scroll position for new view
+          window.scroll(0, 0);
         });
-        flow.hooks.beforeTransition.tap(this.name, (state) => {
-          // will get reset to false if view successfully transitions
-          // otherwise stays as true when view get rerendered with errors
-          this.failedNavigation = true;
-
-          return state;
+        flow.hooks.skipTransition.intercept({
+          call: () => {
+            this.failedNavigation = true;
+          },
         });
       });
     });
@@ -140,10 +150,13 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
   applyReact(reactPlayer: ReactPlayer) {
     reactPlayer.hooks.webComponent.tap(this.name, (Comp) => {
       return () => {
-        const { scrollFn } = this;
-
+        const { scrollFn, getBaseElement, offset } = this;
         return (
-          <AutoScrollProvider getElementToScrollTo={scrollFn}>
+          <AutoScrollProvider
+            getElementToScrollTo={scrollFn}
+            getBaseElement={getBaseElement}
+            offset={offset}
+          >
             <Comp />
           </AutoScrollProvider>
         );

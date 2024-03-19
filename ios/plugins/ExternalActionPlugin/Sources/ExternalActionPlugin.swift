@@ -42,13 +42,13 @@ public class ExternalActionPlugin: JSBasePlugin, NativePlugin {
      - returns: An array of arguments to construct the plugin
      */
     override public func getArguments() -> [Any] {
-            let callback: @convention(block) (JSValue, JSValue) -> JSValue? = { (state, options) in
+            let callback: @convention(block) (JSValue, JSValue) -> JSValue? = { [weak self] (state, options) in
                 guard
-                    let context = self.context,
+                    let context = self?.context,
                     let controllers = PlayerControllers(from: options),
                     let promise = JSUtilities.createPromise(context: context, handler: { (resolve, reject) in
                         do {
-                            try self.handler?(NavigationFlowExternalState(from: state), controllers) { transition in
+                            try self?.handler?(NavigationFlowExternalState(state), controllers) { transition in
                                 resolve(transition)
                             }
                         } catch {
@@ -63,6 +63,6 @@ public class ExternalActionPlugin: JSBasePlugin, NativePlugin {
         }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: ExternalActionPlugin.self), pathComponent: "ExternalActionPlugin.bundle")
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: ExternalActionPlugin.self), pathComponent: "PlayerUI_ExternalActionPlugin.bundle")
     }
 }

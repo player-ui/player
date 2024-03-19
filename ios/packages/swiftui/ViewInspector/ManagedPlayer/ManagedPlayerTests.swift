@@ -16,10 +16,8 @@ import ViewInspector
 extension ManagedPlayer: Inspectable {}
 extension Inspection: InspectionEmissary where V: Inspectable { }
 
-@available(iOS 14, *)
 extension ManagedPlayer14: Inspectable {}
 
-@available(iOS 14, *)
 class ManagedPlayer14Tests: ViewInspectorTestCase {
     func testLoadingView() throws {
         let viewModel = ManagedPlayerViewModel(manager: NeverLoad(), onComplete: {_ in })
@@ -27,11 +25,11 @@ class ManagedPlayer14Tests: ViewInspectorTestCase {
 
         let playerView = try player.inspect()
 
-        try playerView.anyView().view(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).color(0).callOnAppear()
+        try playerView.view(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).color(0).callOnAppear()
 
         waitOnChange(viewModel.$loadingState.eraseToAnyPublisher()) { $0 == ManagedPlayerViewModel.LoadingState.loading }
 
-        let text = try playerView.anyView().view(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).text(0)
+        let text = try playerView.view(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).text(0)
 
         XCTAssertEqual("Loading", try text.string())
     }
@@ -42,14 +40,14 @@ class ManagedPlayer14Tests: ViewInspectorTestCase {
 
         let playerView = try player.inspect()
 
-        try playerView.anyView().view(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).color(0).callOnAppear()
+        try playerView.view(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).color(0).callOnAppear()
 
         waitOnChange(viewModel.$loadingState.eraseToAnyPublisher()) {
             guard case .failed = $0 else { return false }
             return true
         }
 
-        let text = try playerView.anyView().view(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).text(0).string()
+        let text = try playerView.view(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).text(0).string()
         XCTAssertEqual(text, "Error")
     }
 
@@ -65,12 +63,12 @@ class ManagedPlayer14Tests: ViewInspectorTestCase {
             }
         )
 
-        try player.inspect().anyView().view(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).color(0).callOnAppear()
+        try player.inspect().view(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).color(0).callOnAppear()
 
         ViewHosting.host(view: player)
 
         let exp2 = player.inspection.inspect(after: 3) { view in
-            let view = try view.anyView()
+            let view = try view
                 .view(ManagedPlayer14<Text, EmptyView>.self)
                 .vStack()
                 .group(0)
@@ -78,6 +76,43 @@ class ManagedPlayer14Tests: ViewInspectorTestCase {
                 .vStack()
                 .first?
                 .anyView()
+                .scrollViewReader()
+                .scrollView()
+            XCTAssertNotNil(view)
+        }
+
+        wait(for: [exp2], timeout: 10)
+
+        ViewHosting.expel()
+    }
+
+    func testFlowLoadsWithSuppliedScrollPlugin() throws {
+        let player = ManagedPlayer(
+            plugins: [ReferenceAssetsPlugin(), ScrollPlugin()],
+            flowManager: AlwaysLoaded(),
+            context: .init(),
+            handleScroll: false, // Passed in ScrollPlugin should ignore this
+            onComplete: {_ in},
+            fallback: {(_) in},
+            loading: {
+                Text("Loading")
+            }
+        )
+
+        try player.inspect().view(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).color(0).callOnAppear()
+
+        ViewHosting.host(view: player)
+
+        let exp2 = player.inspection.inspect(after: 3) { view in
+            let view = try view
+                .view(ManagedPlayer14<Text, EmptyView>.self)
+                .vStack()
+                .group(0)
+                .view(SwiftUIPlayer.self, 0)
+                .vStack()
+                .first?
+                .anyView()
+                .scrollViewReader()
                 .scrollView()
             XCTAssertNotNil(view)
         }
@@ -100,143 +135,14 @@ class ManagedPlayer14Tests: ViewInspectorTestCase {
             }
         )
 
-        try player.inspect().anyView().view(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).color(0).callOnAppear()
+        try player.inspect().view(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).color(0).callOnAppear()
 
         ViewHosting.host(view: player)
 
         let exp2 = player.inspection.inspect(after: 3) { view in
-            let view = try view.anyView()
+            let view = try view
                 .view(ManagedPlayer14<Text, EmptyView>.self)
                 .vStack()
-                .group(0)
-                .view(SwiftUIPlayer.self, 0)
-                .vStack()
-                .first?
-                .anyView()
-                .view(ActionAssetView.self)
-            XCTAssertNotNil(view)
-        }
-
-        wait(for: [exp2], timeout: 10)
-
-        ViewHosting.expel()
-    }
-}
-
-extension ManagedPlayer13: Inspectable {}
-
-class ManagedPlayer13Tests: XCTestCase {
-    func testLoadingView() throws {
-        let viewModel = ManagedPlayerViewModel(
-            manager: NeverLoad(),
-            onComplete: {_ in}
-        )
-        let player = ManagedPlayer13(
-            viewModel: viewModel,
-            plugins: [],
-            context: .init(),
-            fallback: {(_) in},
-            loading: {
-                Text("Loading")
-            }
-        )
-
-        let playerView = try player.inspect()
-
-        try playerView.vStack().group(0).color(0).callOnAppear()
-
-        waitOnChange(viewModel.$loadingState.eraseToAnyPublisher()) { $0 == ManagedPlayerViewModel.LoadingState.loading }
-
-        let text = try playerView.vStack().group(0).text(0)
-
-        XCTAssertEqual("Loading", try text.string())
-
-    }
-
-    func testFallbackView() throws {
-        let viewModel = ManagedPlayerViewModel(
-            manager: ErrorLoaded(),
-            onComplete: {_ in}
-        )
-        let player = ManagedPlayer13(
-            viewModel: viewModel,
-            plugins: [],
-            context: .init(),
-            fallback: {(_) in
-                Text("Error")
-            }, loading: {
-                Text("Loading")
-            }
-        )
-
-        let playerView = try player.inspect()
-
-        try playerView.vStack().group(0).color(0).callOnAppear()
-
-        waitOnChange(viewModel.$loadingState.eraseToAnyPublisher()) {
-            guard case .failed = $0 else { return false }
-            return true
-        }
-
-        let text = try playerView.vStack().group(0).text(0).string()
-        XCTAssertEqual(text, "Error")
-    }
-
-    func testFlowLoads() throws {
-        let player = ManagedPlayer13(
-            viewModel: ManagedPlayerViewModel(
-                manager: AlwaysLoaded(),
-                onComplete: {_ in}
-            ),
-            plugins: [ReferenceAssetsPlugin()],
-            context: .init(),
-            fallback: {(_) in},
-            loading: {
-                Text("Loading")
-            }
-        )
-
-        try player.inspect().vStack().group(0).color(0).callOnAppear()
-
-        ViewHosting.host(view: player)
-
-        let exp2 = player.inspection.inspect(after: 3) { view in
-            let view = try view.vStack()
-                .group(0)
-                .view(SwiftUIPlayer.self, 0)
-                .vStack()
-                .first?
-                .anyView()
-                .scrollView()
-            XCTAssertNotNil(view)
-        }
-
-        wait(for: [exp2], timeout: 10)
-
-        ViewHosting.expel()
-    }
-
-    func testFlowLoadsWithoutScrollView() throws {
-        let player = ManagedPlayer13(
-            viewModel: ManagedPlayerViewModel(
-                manager: AlwaysLoaded(),
-                onComplete: {_ in}
-            ),
-            plugins: [ReferenceAssetsPlugin()],
-            context: .init(),
-            handleScroll: false,
-            fallback: {(_) in},
-            loading: {
-                Text("Loading")
-            }
-        )
-
-        try player.inspect().vStack().group(0).color(0).callOnAppear()
-
-        ViewHosting.host(view: player)
-
-        let exp2 = player.inspection.inspect(after: 3) { view in
-            let view = try view.vStack()
                 .group(0)
                 .view(SwiftUIPlayer.self, 0)
                 .vStack()
@@ -262,6 +168,7 @@ class NeverLoad: FlowManager {
 class ErrorLoaded: FlowManager {
     init() {}
     func next(_ result: CompletedState?) async throws -> NextState {
+        try await Task.sleep(nanoseconds: 500_000_000)
         throw PlayerError.jsConversionFailure
     }
 }

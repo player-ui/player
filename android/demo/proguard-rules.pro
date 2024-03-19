@@ -22,10 +22,10 @@
 
 -keepattributes *Annotation*, InnerClasses
 -dontnote kotlinx.serialization.SerializationKt
--keep,includedescriptorclasses class com.intuit.player.android.demo.**$$serializer { *; }
--keepclassmembers class com.intuit.player.android.demo.** {
+-keep,includedescriptorclasses class com.intuit.playerui.android.demo.**$$serializer { *; }
+-keepclassmembers class com.intuit.playerui.android.demo.** {
     *** Companion;
 }
--keepclasseswithmembers class com.intuit.player.android.demo.** {
+-keepclasseswithmembers class com.intuit.playerui.android.demo.** {
     kotlinx.serialization.KSerializer serializer(...);
 }

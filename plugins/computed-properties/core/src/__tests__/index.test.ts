@@ -1,5 +1,5 @@
 import { waitFor } from '@testing-library/react';
-import type { InProgressState } from '@player-ui/player';
+import type { InProgressState, Flow } from '@player-ui/player';
 import { Player } from '@player-ui/player';
 import { makeFlow } from '@player-ui/make-flow';
 import { ComputedPropertiesPlugin } from '..';
@@ -139,4 +139,81 @@ test('updates work across computations', async () => {
   ]);
 
   await waitFor(() => expect(getView().label).toBe(undefined));
+});
+
+test('expressions update dependent expressions', async () => {
+  const flowWithDependentComputedValues: Flow = makeFlow({
+    views: [
+      {
+        id: 'view-1',
+        type: 'view',
+        computed: {
+          asset: {
+            id: 'computed',
+            type: 'text',
+            applicability: '{{foo.bar.computedValue}}',
+          },
+        },
+        dependent: {
+          asset: {
+            id: 'dependent',
+            type: 'text',
+            applicability: '{{foo.bar.dependentValue}}',
+          },
+        },
+      },
+    ],
+    data: {
+      foo: {
+        bar: {
+          sourceValue: false,
+        },
+      },
+    },
+    schema: {
+      ROOT: {
+        foo: {
+          type: 'FooType',
+        },
+      },
+      FooType: {
+        bar: {
+          type: 'BarType',
+        },
+      },
+      BarType: {
+        sourceValue: {
+          type: 'boolean',
+        },
+        computedValue: {
+          type: 'Expression',
+          exp: '{{foo.bar.sourceValue}} == true',
+        },
+        dependentValue: {
+          type: 'Expression',
+          exp: '{{foo.bar.computedValue}} == false',
+        },
+      },
+    },
+  });
+  const player = new Player({ plugins: [new ComputedPropertiesPlugin()] });
+  player.start(flowWithDependentComputedValues);
+
+  const getView = () => {
+    return (player.getState() as InProgressState).controllers.view.currentView
+      ?.lastUpdate as any;
+  };
+
+  // The label should start off as not there
+
+  expect(getView().computed).toBeUndefined();
+  expect(getView().dependent).toBeDefined();
+
+  (player.getState() as InProgressState).controllers.data.set([
+    ['foo.bar.sourceValue', true],
+  ]);
+  await waitFor(() => {
+    expect(getView().computed).toBeDefined();
+    expect(getView().dependent).toBeUndefined();
+  });
 });

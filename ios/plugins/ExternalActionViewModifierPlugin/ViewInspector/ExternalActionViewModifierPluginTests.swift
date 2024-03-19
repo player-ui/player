@@ -62,6 +62,8 @@ class ExternalActionViewModifierPluginTests: ViewInspectorTestCase {
             })
         }
 
+        let context = SwiftUIPlayer.Context()
+
         let player = SwiftUIPlayer(flow: json, plugins: [ReferenceAssetsPlugin(), plugin], result: Binding(get: {nil}, set: { (result) in
             switch result {
             case .success:
@@ -69,7 +71,7 @@ class ExternalActionViewModifierPluginTests: ViewInspectorTestCase {
             default:
                 break
             }
-        }))
+        }), context: context, unloadOnDisappear: false)
 
         ViewHosting.host(view: player)
 
@@ -81,6 +83,107 @@ class ExternalActionViewModifierPluginTests: ViewInspectorTestCase {
 
         wait(for: [exp, handlerExpectation, completionExpectation], timeout: 10)
         XCTAssertNil(plugin.state)
+
+        ViewHosting.expel()
+    }
+
+    // swiftlint:disable function_body_length
+    func testExternalStateHandlingForcedTransition() throws {
+        let json = """
+        {
+          "id": "test-flow",
+          "views": [
+            {
+              "id": "view-1",
+              "type": "text",
+              "value": "View 1"
+            }
+          ],
+          "data": {
+            "transitionValue": "Next"
+          },
+          "navigation": {
+            "BEGIN": "FLOW_1",
+            "FLOW_1": {
+              "startState": "EXT_1",
+              "VIEW_1": {
+                "state_type": "VIEW",
+                "ref": "view-1",
+                "transitions": {
+                  "*": "END_FWD"
+                }
+              },
+              "EXT_1": {
+                "state_type": "EXTERNAL",
+                "ref": "test-1",
+                "transitions": {
+                  "Next": "VIEW_1",
+                  "Prev": "END_BCK"
+                },
+                "extraProperty": "extraValue"
+              },
+              "END_FWD": {
+                "state_type": "END",
+                "outcome": "FWD"
+              },
+              "END_BCK": {
+                "state_type": "END",
+                "outcome": "BCK"
+              }
+            }
+          }
+        }
+        """
+
+        let handlerExpectation = XCTestExpectation(description: "handler called")
+        let completionExpectation = XCTestExpectation(description: "flow completed")
+        let plugin = ExternalActionViewModifierPlugin<ExternalStateSheetModifier> { (state, _, transition) in
+            XCTAssertEqual(state.transitions, ["Next": "VIEW_1", "Prev": "END_BCK"])
+            XCTAssertEqual(state.ref, "test-1")
+            // Test out subscript fetching additional properties
+            let extra: String? = state.extraProperty
+            XCTAssertEqual(extra, "extraValue")
+            handlerExpectation.fulfill()
+            return AnyView(Text("External State"))
+        }
+
+        let context = SwiftUIPlayer.Context()
+
+        let player = SwiftUIPlayer(flow: json, plugins: [ReferenceAssetsPlugin(), plugin], result: Binding(get: {nil}, set: { (result) in
+            switch result {
+            case .success:
+                completionExpectation.fulfill()
+            default:
+                break
+            }
+        }), context: context, unloadOnDisappear: false)
+
+        ViewHosting.host(view: player)
+
+        let exp = player.inspection.inspect(after: 0.5) { view in
+            XCTAssertNotNil(plugin.state)
+            let content = try view.vStack().first?.anyView().anyView().modifier(ExternalStateSheetModifier.self).viewModifierContent()
+            let value = try content?.sheet().anyView().text().string()
+            XCTAssertEqual(value, "External State")
+            do {
+                try (view.actualView().state as? InProgressState)?.controllers?.flow.transition(with: "Next")
+            } catch {
+                XCTFail("Transition with 'Next' failed")
+            }
+        }
+
+        wait(for: [exp, handlerExpectation], timeout: 10)
+        let state = player.state as? InProgressState
+        XCTAssertNotNil(state)
+        XCTAssertEqual(state?.controllers?.flow.current?.currentState?.value?.stateType, "VIEW")
+        XCTAssertNil(plugin.state)
+        XCTAssertFalse(plugin.isExternalState)
+        do {
+            try state?.controllers?.flow.transition(with: "Next")
+        } catch {
+            XCTFail("Transition with 'Next' failed")
+        }
+        wait(for: [completionExpectation], timeout: 10)
 
         ViewHosting.expel()
     }
@@ -125,6 +228,8 @@ class ExternalActionViewModifierPluginTests: ViewInspectorTestCase {
             throw PlayerError.jsConversionFailure
         }
 
+        let context = SwiftUIPlayer.Context()
+
         let player = SwiftUIPlayer(flow: json, plugins: [ReferenceAssetsPlugin(), plugin], result: Binding(get: {nil}, set: { (result) in
             guard result != nil else { return }
             switch result {
@@ -133,7 +238,7 @@ class ExternalActionViewModifierPluginTests: ViewInspectorTestCase {
             default:
                 completionExpectation.fulfill()
             }
-        }))
+        }), context: context, unloadOnDisappear: false)
 
         ViewHosting.host(view: player)
 

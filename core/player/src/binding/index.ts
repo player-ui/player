@@ -1,5 +1,5 @@
 import { SyncBailHook, SyncWaterfallHook } from 'tapable-ts';
-import NestedError from 'nested-error-stacks';
+import { NestedError } from 'ts-nested-error';
 import type { ParserResult, AnyNode } from '../binding-grammar';
 import {
   // We can swap this with whichever parser we want to use
@@ -15,6 +15,8 @@ export * from './utils';
 export * from './binding';
 
 export const SIMPLE_BINDING_REGEX = /^[\w\-@]+(\.[\w\-@]+)*$/;
+export const BINDING_BRACKETS_REGEX = /[\s()*=`{}'"[\]]/;
+const LAZY_BINDING_REGEX = /^[^.]+(\..+)*$/;
 
 const DEFAULT_OPTIONS: BindingParserOptions = {
   get: () => {
@@ -28,6 +30,9 @@ const DEFAULT_OPTIONS: BindingParserOptions = {
   },
 };
 
+type BeforeResolveNodeContext = Required<NormalizedResult> &
+  ResolveBindingASTOptions;
+
 /** A parser for creating bindings from a string */
 export class BindingParser {
   private cache: Record<string, BindingInstance>;
@@ -37,7 +42,7 @@ export class BindingParser {
   public hooks = {
     skipOptimization: new SyncBailHook<[string], boolean>(),
     beforeResolveNode: new SyncWaterfallHook<
-      [AnyNode, Required<NormalizedResult> & ResolveBindingASTOptions]
+      [AnyNode, BeforeResolveNodeContext]
     >(),
   };
 
@@ -56,8 +61,13 @@ export class BindingParser {
     path: string,
     resolveOptions: ResolveBindingASTOptions
   ) {
+    /**
+     * Ensure no binding characters exist in path and the characters remaining
+     * look like a binding format.
+     */
     if (
-      path.match(SIMPLE_BINDING_REGEX) &&
+      !BINDING_BRACKETS_REGEX.test(path) &&
+      LAZY_BINDING_REGEX.test(path) &&
       this.hooks.skipOptimization.call(path) !== true
     ) {
       return { path: path.split('.'), updates: undefined } as NormalizedResult;
@@ -172,7 +182,7 @@ export class BindingParser {
 
     const updateKeys = Object.keys(updates);
 
-    if (updateKeys.length > 0) {
+    if (!options.readOnly && updateKeys.length > 0) {
       const updateTransaction = updateKeys.map<[BindingInstance, any]>(
         (updatedBinding) => [
           this.parse(updatedBinding),

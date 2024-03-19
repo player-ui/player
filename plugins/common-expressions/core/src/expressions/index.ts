@@ -1,7 +1,4 @@
-import type {
-  ExpressionHandler,
-  ExpressionContext,
-} from '@player-ui/expressions';
+import type { ExpressionHandler, ExpressionContext } from '@player-ui/player';
 import { withoutContext } from '@player-ui/player';
 import type { Binding } from '@player-ui/types';
 import { toNum } from './toNum';
@@ -55,7 +52,10 @@ export const concat = withoutContext((...args: Array<unknown>) => {
   if (args.every((v) => Array.isArray(v))) {
     const arrayArgs = args as Array<Array<unknown>>;
 
-    return arrayArgs.reduce((merged, next) => [...merged, ...next]);
+    return arrayArgs.reduce((merged, next) => {
+      merged.push(...next);
+      return merged;
+    });
   }
 
   return args.reduce((merged: any, next) => merged + (next ?? ''), '');
@@ -118,14 +118,18 @@ export const sum = withoutContext<Array<number | string>, number>((...args) => {
 
 /** Finds the property in an array of objects */
 export const findPropertyIndex: ExpressionHandler<
-  [Array<any> | Binding, string | undefined, any],
+  [Array<any> | Binding | undefined, string | undefined, any],
   number
 > = <T = unknown>(
   context: ExpressionContext,
-  bindingOrModel: Binding | Array<Record<string, T>>,
+  bindingOrModel: Binding | Array<Record<string, T>> | undefined,
   propToCheck: string | undefined,
   valueToCheck: T
 ) => {
+  if (bindingOrModel === undefined) {
+    return -1;
+  }
+
   const searchArray: Array<Record<string, T>> = Array.isArray(bindingOrModel)
     ? bindingOrModel
     : context.model.get(bindingOrModel);

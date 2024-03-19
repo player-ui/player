@@ -2,6 +2,7 @@ import type { DataModelWithParser } from '../../data';
 import { LocalModel, withParser } from '../../data';
 import type { BindingLike } from '../../binding';
 import { BindingParser } from '../../binding';
+import type { ExpressionType } from '..';
 import { ExpressionEvaluator } from '..';
 
 describe('evaluator', () => {
@@ -14,7 +15,7 @@ describe('evaluator', () => {
     const bindingParser = new BindingParser({
       get: localModel.get,
       set: localModel.set,
-      evaluate: (exp) => {
+      evaluate: (exp: ExpressionType) => {
         return evaluator.evaluate(exp);
       },
     });
@@ -22,6 +23,23 @@ describe('evaluator', () => {
     parseBinding = bindingParser.parse;
     model = withParser(localModel, bindingParser.parse);
     evaluator = new ExpressionEvaluator({ model });
+  });
+
+  test('resolveOptions hook', () => {
+    model = withParser(new LocalModel({ foo: 2 }), parseBinding);
+    evaluator = new ExpressionEvaluator({ model });
+
+    const testFn = jest.fn();
+
+    evaluator.hooks.resolveOptions.tap('test', (hookOptions) => {
+      testFn.mockImplementation((value: any) => hookOptions.model.set(value));
+
+      return { ...hookOptions, model: { ...hookOptions.model, set: testFn } };
+    });
+
+    evaluator.evaluate('{{foo}} = 3');
+    expect(model.get('foo')).toStrictEqual(3);
+    expect(testFn).toBeCalled();
   });
 
   test('member expression', () => {
@@ -82,7 +100,7 @@ describe('evaluator', () => {
       },
     });
 
-    expect(evaluator.evaluate({ foo: '1 + 2' })).toStrictEqual(3);
+    expect(evaluator.evaluate({ value: '1 + 2' })).toStrictEqual(3);
   });
   test('functions', () => {
     model = withParser(new LocalModel({ test: 2 }), parseBinding);
@@ -267,6 +285,15 @@ describe('evaluator', () => {
       });
       expect(model.get('foo')).toStrictEqual(2);
     });
+    test('conditional', () => {
+      expect(
+        evaluator.evaluate('conditional(true, true, false)')
+      ).toStrictEqual(true);
+
+      expect(
+        evaluator.evaluate('conditional(false, true, false)')
+      ).toStrictEqual(false);
+    });
   });
   describe('not supported', () => {
     test('this ref', () => {
@@ -279,7 +306,7 @@ describe('evaluator', () => {
   });
 
   describe('error handling', () => {
-    test('skips throwing error when handler is provided', () => {
+    test('skips throwing error when handler is provided, but not when throwErrors is true', () => {
       const errorHandler = jest.fn();
 
       evaluator.hooks.onError.tap('test', (e) => {
@@ -291,6 +318,10 @@ describe('evaluator', () => {
       evaluator.evaluate('foo()');
 
       expect(errorHandler).toBeCalledTimes(1);
+
+      expect(() =>
+        evaluator.evaluate('foo()', { throwErrors: true, model })
+      ).toThrowError();
     });
   });
 
@@ -355,7 +386,24 @@ describe('evaluator', () => {
 
   test('throws errors for unknown expressions', () => {
     expect(() => evaluator.evaluate('foo()')).toThrowError(
-      'Unknown expression function: foo'
+      'Error evaluating expression: foo()'
     );
+  });
+
+  test('enables hooks to change expression', () => {
+    evaluator.hooks.beforeEvaluate.tap('test', (expression) => {
+      return `'foo' == 'bar'`;
+    });
+
+    expect(evaluator.evaluate('bar()')).toStrictEqual(false);
+  });
+
+  test('ignores props other than value on expression', () => {
+    expect(
+      evaluator.evaluate({
+        _comment: 'hello world',
+        value: true,
+      } as any)
+    ).toStrictEqual(true);
   });
 });

@@ -10,6 +10,7 @@ const parser = new BindingParser({
   evaluate: () => undefined,
 });
 const foo = parser.parse('foo');
+const bar = parser.parse('bar');
 
 describe('middleware', () => {
   /**
@@ -49,6 +50,41 @@ describe('middleware', () => {
       dataModelWithMiddleware.get(foo, { includeInvalid: true }, baseDataModel)
     ).toStrictEqual('baz');
     expect(baseDataModel.get(foo)).toStrictEqual('bar');
+  });
+
+  it('only returns updates for bindings set in the same transaction', () => {
+    // Setup the invalid data
+    const invalidUpdates = dataModelWithMiddleware.set(
+      [[foo, 'baz']],
+      undefined,
+      baseDataModel
+    );
+
+    expect(invalidUpdates).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "binding": BindingInstance {
+            "factory": [Function],
+            "joined": "foo",
+            "split": Array [
+              "foo",
+            ],
+          },
+          "force": true,
+          "newValue": "baz",
+          "oldValue": "baz",
+        },
+      ]
+    `);
+
+    // Set some unrelated data
+    const validUpdates = dataModelWithMiddleware.set(
+      [[bar, 'baz']],
+      undefined,
+      baseDataModel
+    );
+
+    expect(validUpdates).toHaveLength(1);
   });
 });
 

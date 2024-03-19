@@ -1,7 +1,9 @@
 import { BindingParser } from '../binding';
 import { LocalModel } from '../data';
 import { ValidationMiddleware } from '../validator';
+import type { Logger } from '..';
 import { DataController } from '..';
+import type { ReadOnlyDataController } from '../controllers/data/utils';
 
 test('works with basic data', () => {
   const model = {
@@ -143,7 +145,6 @@ describe('delete', () => {
 
     controller.delete('foo.baz');
 
-    expect(controller.getTrash()).toStrictEqual(new Set());
     expect(controller.get('')).toStrictEqual({
       foo: { bar: 'Some Data' },
     });
@@ -166,9 +167,6 @@ describe('delete', () => {
 
     controller.delete('foo.bar');
 
-    expect(controller.getTrash()).toStrictEqual(
-      new Set([parser.parse('foo.bar')])
-    );
     expect(controller.get('')).toStrictEqual({ foo: {} });
   });
 
@@ -187,9 +185,6 @@ describe('delete', () => {
 
     controller.delete('foo.0');
 
-    expect(controller.getTrash()).toStrictEqual(
-      new Set([parser.parse('foo.0')])
-    );
     expect(controller.get('')).toStrictEqual({ foo: [] });
   });
 
@@ -208,7 +203,6 @@ describe('delete', () => {
 
     controller.delete('foo.1');
 
-    expect(controller.getTrash()).toStrictEqual(new Set());
     expect(controller.get('')).toStrictEqual({ foo: ['Some Data'] });
   });
 
@@ -230,7 +224,6 @@ describe('delete', () => {
 
     controller.delete('foo');
 
-    expect(controller.getTrash()).toStrictEqual(new Set([parser.parse('foo')]));
     expect(controller.get('')).toStrictEqual({ baz: 'Other data' });
   });
 
@@ -251,7 +244,6 @@ describe('delete', () => {
 
     controller.delete('');
 
-    expect(controller.getTrash()).toStrictEqual(new Set());
     expect(controller.get('')).toStrictEqual({
       foo: {
         bar: 'Some Data',
@@ -295,6 +287,9 @@ describe('formatting', () => {
 
     controller.set([['foo.baz', 'should-deformat']], { formatted: true });
     expect(controller.get('foo.baz')).toBe('deformatted!');
+    expect(controller.get('foo.baz', { formatted: false })).toBe(
+      'deformatted!'
+    );
   });
 });
 
@@ -429,4 +424,75 @@ it('should not send update for deeply equal data', () => {
   controller.set([['user', { name: 'frodo', age: 3 }]]);
 
   expect(onUpdateCallback).not.toBeCalled();
+});
+
+it('should handle deleting non-existent value + parent value', () => {
+  const model = {
+    user: {
+      name: 'frodo',
+      age: 3,
+    },
+  };
+
+  const localData = new LocalModel(model);
+
+  const parser = new BindingParser({
+    get: localData.get,
+    set: localData.set,
+  });
+  const controller = new DataController({}, { pathResolver: parser });
+  controller.hooks.resolveDataStages.tap('basic', () => [localData]);
+
+  controller.delete('user.email');
+
+  expect(controller.get('user')).toStrictEqual({
+    name: 'frodo',
+    age: 3,
+  });
+
+  controller.delete('foo.bar');
+});
+
+describe('Read Only Data Controller', () => {
+  let readOnlyController: ReadOnlyDataController;
+  let logger: Logger;
+
+  beforeEach(() => {
+    const localData = new LocalModel();
+    const parser = new BindingParser({
+      get: localData.get,
+      set: localData.set,
+    });
+    logger = {
+      trace: jest.fn(),
+      debug: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+    };
+
+    const controller = new DataController(
+      { some: { data: true } },
+      { pathResolver: parser, logger }
+    );
+
+    readOnlyController = controller.makeReadOnly();
+  });
+
+  it('Reads data', () => {
+    expect(readOnlyController.get('some.data')).toStrictEqual(true);
+  });
+
+  it('Logs error on set', () => {
+    expect(readOnlyController.set([['some.data', false]])).toStrictEqual([]);
+    expect(logger.error).toBeCalledWith(
+      'Error: Tried to set in a read only instance of the DataController'
+    );
+  });
+  it('Logs error on delete', () => {
+    readOnlyController.delete('some.data');
+    expect(logger.error).toBeCalledWith(
+      'Error: Tried to delete in a read only instance of the DataController'
+    );
+  });
 });

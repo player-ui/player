@@ -5,5 +5,5 @@ kt_player_plugin(
     name = "java-logger",
     main_deps = main_deps,
     main_exports = main_exports,
-    test_package = "com.intuit.player.plugins.logging.jul",
+    test_package = "com.intuit.playerui.plugins.logging.jul",
 )

@@ -2,7 +2,7 @@
 /**
  * An expression to AST parser based on JSEP: http://jsep.from.so/
  */
-import type { ExpressionNode, ExpressionNodeType } from './types';
+import type { ExpressionNode, ExpressionNodeType, NodeLocation } from './types';
 import { ExpNodeOpaqueIdentifier } from './types';
 
 const PERIOD_CODE = 46; // '.'
@@ -80,6 +80,18 @@ function throwError(message: string, index: number) {
   throw err;
 }
 
+/** Create a new location marker that spans both nodes */
+function createSpanningLocation(start?: NodeLocation, end?: NodeLocation) {
+  if (!start || !end) {
+    return;
+  }
+
+  return {
+    start: start.start,
+    end: end.end,
+  };
+}
+
 /** Get return the longest key length of any object */
 function getMaxKeyLen(obj: object): number {
   let maxLen = 0;
@@ -121,7 +133,8 @@ function binaryPrecedence(opVal: string): number {
 function createBinaryExpression(
   operator: string | boolean,
   left: string,
-  right: string
+  right: string,
+  location?: NodeLocation
 ) {
   let type: ExpressionNodeType;
 
@@ -146,6 +159,7 @@ function createBinaryExpression(
     operator,
     left,
     right,
+    location,
   };
 }
 
@@ -181,7 +195,15 @@ function isModelRefStart(ch0: number, ch1: number) {
 }
 
 /** Parse out an expression from the string */
-export default function parseExpression(expr: string): ExpressionNode {
+export function parseExpression(
+  expr: string,
+  options?: {
+    /** If true (the default), will throw on invalid expressions */
+    strict?: boolean;
+  }
+): ExpressionNode {
+  const strictMode = options?.strict ?? true;
+
   // `index` stores the character number we are currently at while `length` is a constant
   // All of the gobbles below will modify `index` as we move along
   const charAtFunc = expr.charAt;
@@ -189,6 +211,18 @@ export default function parseExpression(expr: string): ExpressionNode {
   const { length } = expr;
 
   let index = 0;
+
+  /** Create a location object  */
+  const getLocation = (startChar: number) => {
+    return {
+      start: {
+        character: startChar,
+      },
+      end: {
+        character: index,
+      },
+    };
+  };
 
   /** Grab the char at the index from the expression */
   function exprI(i: number) {
@@ -217,13 +251,14 @@ export default function parseExpression(expr: string): ExpressionNode {
     let key;
     let value;
     let chCode;
+    const startCharIndex = index;
+
     // get rid of OCURL_CODE
     ++index;
 
     while (index < length) {
       gobbleSpaces();
       chCode = exprICode(index);
-
       // check for end
       if (chCode === CCURL_CODE) {
         // if we are at the end but a key was defined
@@ -244,7 +279,6 @@ export default function parseExpression(expr: string): ExpressionNode {
         key = gobbleStringLiteral();
         // remove spaces
         gobbleSpaces();
-
         // remove colon
         if (exprICode(index) === COLON_CODE) {
           index++;
@@ -258,7 +292,6 @@ export default function parseExpression(expr: string): ExpressionNode {
         attributes.push({ key, value });
         gobbleSpaces();
         chCode = exprICode(index);
-
         if (chCode === COMMA_CODE) {
           index++;
         } else if (chCode !== CCURL_CODE) {
@@ -282,6 +315,7 @@ export default function parseExpression(expr: string): ExpressionNode {
       __id: ExpNodeOpaqueIdentifier,
       type: 'Object',
       attributes,
+      location: getLocation(startCharIndex),
     };
   }
 
@@ -290,7 +324,6 @@ export default function parseExpression(expr: string): ExpressionNode {
    */
   function gobbleSpaces() {
     let ch = exprICode(index);
-
     // Space or tab
     while (ch === 32 || ch === 9) {
       ch = exprICode(++index);
@@ -303,6 +336,7 @@ export default function parseExpression(expr: string): ExpressionNode {
   function gobbleExpression(): ExpressionNode {
     const test = gobbleBinaryExpression();
     gobbleSpaces();
+    const startCharIndex = index;
 
     if (index < length && exprICode(index) === QUMARK_CODE) {
       // Ternary expression: test ? consequent : alternate
@@ -329,6 +363,7 @@ export default function parseExpression(expr: string): ExpressionNode {
           test,
           consequent,
           alternate,
+          location: getLocation(startCharIndex),
         };
       }
 
@@ -353,7 +388,6 @@ export default function parseExpression(expr: string): ExpressionNode {
     while (tcLen > 0) {
       if (Object.prototype.hasOwnProperty.call(binaryOps, toCheck)) {
         index += tcLen;
-
         return toCheck;
       }
 
@@ -395,7 +429,6 @@ export default function parseExpression(expr: string): ExpressionNode {
 
     // Properly deal with precedence using [recursive descent](http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm)
     biop = gobbleBinaryOp();
-
     while (biop) {
       prec = binaryPrecedence(biop);
 
@@ -410,7 +443,12 @@ export default function parseExpression(expr: string): ExpressionNode {
         right = stack.pop();
         biop = stack.pop().value;
         left = stack.pop();
-        node = createBinaryExpression(biop, left, right);
+        node = createBinaryExpression(
+          biop,
+          left,
+          right,
+          createSpanningLocation(left.location, right.location)
+        );
         stack.push(node);
       }
 
@@ -428,7 +466,12 @@ export default function parseExpression(expr: string): ExpressionNode {
     node = stack[i];
 
     while (i > 1) {
-      node = createBinaryExpression(stack[i - 1].value, stack[i - 2], node);
+      node = createBinaryExpression(
+        stack[i - 1].value,
+        stack[i - 2],
+        node,
+        createSpanningLocation(stack[i - 2].location, node.location)
+      );
       i -= 2;
     }
 
@@ -442,6 +485,7 @@ export default function parseExpression(expr: string): ExpressionNode {
   function gobbleToken(): any {
     gobbleSpaces();
     const ch = exprICode(index);
+    const startCharIndex = index;
 
     if (isDecimalDigit(ch) || ch === PERIOD_CODE) {
       // Char code 46 is a dot `.` which can start off a numeric literal
@@ -478,13 +522,13 @@ export default function parseExpression(expr: string): ExpressionNode {
     while (tcLen > 0) {
       if (Object.prototype.hasOwnProperty.call(unaryOps, toCheck)) {
         index += tcLen;
-
         return {
           __id: ExpNodeOpaqueIdentifier,
           type: 'UnaryExpression',
           operator: toCheck,
           argument: gobbleToken(),
           prefix: true,
+          location: getLocation(startCharIndex),
         };
       }
 
@@ -500,6 +544,7 @@ export default function parseExpression(expr: string): ExpressionNode {
    */
   function gobbleNumericLiteral() {
     let num = '';
+    const startCharIndex = index;
 
     while (isDecimalDigit(exprICode(index))) {
       num += exprI(index++);
@@ -515,7 +560,6 @@ export default function parseExpression(expr: string): ExpressionNode {
     }
 
     let ch = exprI(index);
-
     if (ch === 'e' || ch === 'E') {
       // Exponent marker
       num += exprI(index++);
@@ -537,7 +581,6 @@ export default function parseExpression(expr: string): ExpressionNode {
     }
 
     const chCode = exprICode(index);
-
     // Check to make sure this isn't a variable name that start with a number (123abc)
     if (isIdentifierStart(chCode)) {
       throwError(
@@ -553,6 +596,7 @@ export default function parseExpression(expr: string): ExpressionNode {
       type: 'Literal',
       value: parseFloat(num),
       raw: num,
+      location: getLocation(startCharIndex),
     };
   }
 
@@ -564,6 +608,7 @@ export default function parseExpression(expr: string): ExpressionNode {
     const quote = exprI(index++);
     let str = '';
     let closed = false;
+    const startCharIndex = index;
 
     while (index < length) {
       let ch = exprI(index++);
@@ -613,6 +658,7 @@ export default function parseExpression(expr: string): ExpressionNode {
       type: 'Literal',
       value: str,
       raw: `${quote}${str}${quote}`,
+      location: getLocation(startCharIndex),
     };
   }
 
@@ -624,9 +670,9 @@ export default function parseExpression(expr: string): ExpressionNode {
     let str = '';
     let closed = false;
     let openBraceCount = 1;
+    const startCharIndex = index;
 
     index += 2; // Skip the {{
-
     while (index < length) {
       const ch = exprI(index++);
 
@@ -657,6 +703,7 @@ export default function parseExpression(expr: string): ExpressionNode {
       __id: ExpNodeOpaqueIdentifier,
       type: 'ModelRef',
       ref: str,
+      location: getLocation(startCharIndex),
     };
   }
 
@@ -678,7 +725,6 @@ export default function parseExpression(expr: string): ExpressionNode {
 
     while (index < length) {
       ch = exprICode(index);
-
       if (isIdentifierPart(ch)) {
         index++;
       } else {
@@ -694,6 +740,7 @@ export default function parseExpression(expr: string): ExpressionNode {
         type: 'Literal',
         value: (literals as any)[identifier],
         raw: identifier,
+        location: getLocation(start),
       };
     }
 
@@ -701,6 +748,7 @@ export default function parseExpression(expr: string): ExpressionNode {
       return {
         __id: ExpNodeOpaqueIdentifier,
         type: 'ThisExpression',
+        location: getLocation(start),
       };
     }
 
@@ -708,6 +756,7 @@ export default function parseExpression(expr: string): ExpressionNode {
       __id: ExpNodeOpaqueIdentifier,
       type: 'Identifier',
       name: identifier,
+      location: getLocation(start),
     };
   }
 
@@ -748,6 +797,10 @@ export default function parseExpression(expr: string): ExpressionNode {
       args.push(node);
     }
 
+    if (strictMode && charIndex !== termination) {
+      throwError(`Expected ${String.fromCharCode(termination)}`, index);
+    }
+
     return args;
   }
 
@@ -761,7 +814,7 @@ export default function parseExpression(expr: string): ExpressionNode {
     let charIndex = exprICode(index);
     let node: any =
       charIndex === OPAREN_CODE ? gobbleGroup() : gobbleIdentifier();
-
+    const startCharIndex = index;
     gobbleSpaces();
     charIndex = exprICode(index);
 
@@ -781,6 +834,7 @@ export default function parseExpression(expr: string): ExpressionNode {
           computed: false,
           object: node,
           property: gobbleIdentifier(),
+          location: getLocation(startCharIndex),
         };
       } else if (charIndex === OBRACK_CODE) {
         node = {
@@ -789,6 +843,7 @@ export default function parseExpression(expr: string): ExpressionNode {
           computed: true,
           object: node,
           property: gobbleExpression(),
+          location: getLocation(startCharIndex),
         };
 
         gobbleSpaces();
@@ -806,6 +861,7 @@ export default function parseExpression(expr: string): ExpressionNode {
           type: 'CallExpression',
           args: gobbleArguments(CPAREN_CODE),
           callTarget: node,
+          location: getLocation(startCharIndex),
         };
       }
 
@@ -817,7 +873,7 @@ export default function parseExpression(expr: string): ExpressionNode {
   }
 
   /**
-   * Responsible for parsing a group within parentheses `()`
+   * Responsible for parsing a group of things within parentheses `()`
    * This function assumes that it needs to gobble the opening parenthesis
    * and then tries to gobble everything within that parenthesis, assuming
    * that the next thing it should see is the close parenthesis. If not,
@@ -830,7 +886,6 @@ export default function parseExpression(expr: string): ExpressionNode {
 
     if (exprICode(index) === CPAREN_CODE) {
       index++;
-
       return node;
     }
 
@@ -843,47 +898,64 @@ export default function parseExpression(expr: string): ExpressionNode {
    * and then tries to gobble the expressions as arguments.
    */
   function gobbleArray() {
+    const startCharIndex = index;
     index++;
 
     return {
       __id: ExpNodeOpaqueIdentifier,
       type: 'ArrayExpression',
       elements: gobbleArguments(CBRACK_CODE),
+      location: getLocation(startCharIndex),
     };
   }
 
   const nodes = [];
 
-  while (index < length) {
-    const chIndex = exprICode(index);
+  try {
+    while (index < length) {
+      const chIndex = exprICode(index);
 
-    // Expressions can be separated by semicolons, commas, or just inferred without any
-    // separators
-    if (chIndex === SEMCOL_CODE || chIndex === COMMA_CODE) {
-      index++; // ignore separators
-      continue;
+      // Expressions can be separated by semicolons, commas, or just inferred without any
+      // separators
+      if (chIndex === SEMCOL_CODE || chIndex === COMMA_CODE) {
+        index++; // ignore separators
+        continue;
+      }
+
+      const node = gobbleExpression();
+
+      // Try to gobble each expression individually
+      if (node) {
+        nodes.push(node);
+        // If we weren't able to find a binary expression and are out of room, then
+        // the expression passed in probably has too much
+      } else if (strictMode && index < length) {
+        throwError(`Unexpected "${exprI(index)}"`, index);
+      }
     }
 
-    const node = gobbleExpression();
-
-    // Try to gobble each expression individually
-    if (node) {
-      nodes.push(node);
-      // If we weren't able to find a binary expression and are out of room, then
-      // the expression passed in probably has too much
-    } else if (index < length) {
-      throwError(`Unexpected "${exprI(index)}"`, index);
+    // If there's only one expression just try returning the expression
+    if (nodes.length === 1) {
+      return nodes[0];
     }
-  }
 
-  // If there's only one expression just try returning the expression
-  if (nodes.length === 1) {
-    return nodes[0];
-  }
+    return {
+      __id: ExpNodeOpaqueIdentifier,
+      type: 'Compound',
+      body: nodes,
+      location: getLocation(0),
+    };
+  } catch (e) {
+    if (strictMode || !(e instanceof Error)) {
+      throw e;
+    }
 
-  return {
-    __id: ExpNodeOpaqueIdentifier,
-    type: 'Compound',
-    body: nodes,
-  };
+    return {
+      __id: ExpNodeOpaqueIdentifier,
+      type: 'Compound',
+      body: nodes,
+      location: getLocation(0),
+      error: e,
+    };
+  }
 }

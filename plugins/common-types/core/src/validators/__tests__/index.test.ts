@@ -56,6 +56,7 @@ function create(
     validation: fullValidation,
     constants: new ConstantsController(),
     evaluate: new ExpressionEvaluator({ model }).evaluate,
+    schemaType: undefined,
   };
 
   return { context, validation: fullValidation };
@@ -175,9 +176,9 @@ describe('string', () => {
   });
 
   it('parameters on non-strings', () => {
-    expect(string(context, {})?.parameters.type).toBe('object');
-    expect(string(context, [])?.parameters.type).toBe('object');
-    expect(string(context, 1234)?.parameters.type).toBe('number');
+    expect(string(context, {})?.parameters?.type).toBe('object');
+    expect(string(context, [])?.parameters?.type).toBe('object');
+    expect(string(context, 1234)?.parameters?.type).toBe('number');
   });
 });
 
@@ -202,11 +203,11 @@ describe('integer', () => {
   });
 
   it('parameters on non-integers', () => {
-    expect(integer(context, 1234.567)?.parameters.type).toBe('number');
-    expect(integer(context, 1234.567)?.parameters.flooredValue).toBe(1234);
+    expect(integer(context, 1234.567)?.parameters?.type).toBe('number');
+    expect(integer(context, 1234.567)?.parameters?.flooredValue).toBe(1234);
 
-    expect(integer(context, 'test')?.parameters.type).toBe('string');
-    expect(integer(context, 'test')?.parameters.flooredValue).toBe(NaN);
+    expect(integer(context, 'test')?.parameters?.type).toBe('string');
+    expect(integer(context, 'test')?.parameters?.flooredValue).toBe(NaN);
   });
 
   it('errors on out of bounds integers', () => {
@@ -273,7 +274,7 @@ describe('oneOf', () => {
 });
 
 describe('regex', () => {
-  const { context } = create({ type: 'regex' });
+  const { context } = create({ type: 'regex' }, { foo: 'asset' });
 
   it('does nothing with invalid entries', () => {
     expect(regex(context, undefined)).toBe(undefined);
@@ -296,6 +297,19 @@ describe('regex', () => {
     );
     // i ignores case
     expect(regex(context, 'FOO', { regex: '/foo/i' })).toBe(undefined);
+
+    // Regex uses data reference
+    expect(regex(context, 'asset_text', { regex: '{{foo}}' })).toBe(undefined);
+    expect(regex(context, 'asset_text', { regex: '@[{{foo}}]@' })).toBe(
+      undefined
+    );
+
+    expect(regex(context, 'asset_text', { regex: 'a{{foo}}' })?.message).toBe(
+      'Invalid entry'
+    );
+    expect(regex(context, 'view_info', { regex: '{{foo}}' })?.message).toBe(
+      'Invalid entry'
+    );
   });
 });
 

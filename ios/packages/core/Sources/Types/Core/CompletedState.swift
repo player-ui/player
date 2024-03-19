@@ -37,7 +37,7 @@ public class PlayerControllers {
 }
 
 /**
- Enum with the different possible states of Player
+ Enum with the different possible states of the player
  */
 public enum PlayerFlowStatus: String {
     /// The Flow has not been started
@@ -108,58 +108,17 @@ public protocol PlayerFlowExecutionData {
     var flow: Flow { get }
 }
 
-/**
- Structure holding the result of the flow, defined in the content
- */
-@dynamicMemberLookup
-public struct EndState {
-    /**
-     The full FlowResult object for dynamicMemberLookup
-     */
-    private var endState: [String: Any]
-    /// The outcome string for the end state
-    public let outcome: String
-
-    /// The param object associated with the state
-    public var param: [String: Any]?
-
-    /**
-     Create an instance of `EndState` from a JSValue
-     - parameters:
-        -  value: The JSValue representing the EndState
-     - returns: An EndState object if the JSValue was one
-     */
-    public init?(from value: JSValue?) {
-        guard
-            let value = value,
-            let outcome = value.objectForKeyedSubscript("outcome")?.toString()
-        else { return nil }
-        self.outcome = outcome
-        self.param = value.objectForKeyedSubscript("param")?.toObject() as? [String: Any]
-        self.endState = value.toObject() as? [String: Any] ?? [:]
-    }
-
-    /**
-     Subscript function to allow fetching any additional properties that the FlowResult might have
-     - parameters:
-        - member: The name of the member to access
-     - returns: The member cast to the receiving type if it exists
-     */
-    public subscript<T>(dynamicMember member: String) -> T? {
-        return endState[member] as? T
-    }
-
-}
+public typealias EndState = NavigationFlowEndState
 
 /**
- A structure that holds the data of a completed Flow
+ A structure that holds the data of a completed Fuego Flow
  */
 public class CompletedState: BaseFlowState, PlayerFlowExecutionData {
     /// The flow object for the completed state
     public var flow: Flow
 
     /// The result of the flow
-    public var endState: EndState?
+    public var endState: NavigationFlowEndState?
 
     /// The local data from the flow
     public var data: [String: Any]
@@ -176,12 +135,12 @@ public class CompletedState: BaseFlowState, PlayerFlowExecutionData {
         else { return nil }
         return CompletedState(
             flow: Flow.createInstance(value: flow),
-            endState: EndState(from: value?.objectForKeyedSubscript("endState")),
+            endState: value.map { NavigationFlowEndState($0.objectForKeyedSubscript("endState")) },
             data: value?.objectForKeyedSubscript("data")?.toObject() as? [String: Any] ?? [:]
         )
     }
 
-    private init(flow: Flow, endState: EndState?, data: [String: Any]) {
+    private init(flow: Flow, endState: NavigationFlowEndState?, data: [String: Any]) {
         self.flow = flow
         self.endState = endState
         self.data = data
@@ -190,7 +149,7 @@ public class CompletedState: BaseFlowState, PlayerFlowExecutionData {
 }
 
 /**
- A structure that holds the data of a Flow that hasnt been started
+ A structure that holds the data of a Fuego Flow that hasnt been started
  */
 public class NotStartedState: BaseFlowState {
     /**
@@ -209,14 +168,14 @@ public class NotStartedState: BaseFlowState {
 }
 
 /**
- A structure that holds the data of a Flow that is in progress
+ A structure that holds the data of a Fuego Flow that is in progress
  */
 public class InProgressState: BaseFlowState, PlayerFlowExecutionData {
     /// The flow object that is currently in progress
     public var flow: Flow
 
     /// A promise that resolves when the flow completes
-    public var flowResult: EndState?
+    public var flowResult: NavigationFlowEndState?
 
     /// Controllers for the active state
     public var controllers: PlayerControllers?
@@ -224,7 +183,7 @@ public class InProgressState: BaseFlowState, PlayerFlowExecutionData {
     /// The Logger for the current player instance
     public let logger: JSLogger?
 
-    /// A function to force Player to a failed state
+    /// A function to force the player to a failed state
     public let fail: (PlayerError) -> Void
 
     /**
@@ -239,7 +198,7 @@ public class InProgressState: BaseFlowState, PlayerFlowExecutionData {
         else { return nil }
         return InProgressState(
             flow: Flow.createInstance(value: flow),
-            flowResult: EndState(from: value?.objectForKeyedSubscript("flowResult")),
+            flowResult: value.map { NavigationFlowEndState($0.objectForKeyedSubscript("flowResult")) },
             controllers: PlayerControllers(from: value?.objectForKeyedSubscript("controllers")),
             logger: JSLogger(from: value?.objectForKeyedSubscript("logger")),
             fail: { value?.objectForKeyedSubscript("fail")?.call(withArguments: [value?.context.error(for: $0) as Any]) }
@@ -248,7 +207,7 @@ public class InProgressState: BaseFlowState, PlayerFlowExecutionData {
 
     private init(
         flow: Flow,
-        flowResult: EndState?,
+        flowResult: NavigationFlowEndState?,
         controllers: PlayerControllers?,
         logger: JSLogger?,
         fail: @escaping (PlayerError) -> Void
@@ -263,7 +222,7 @@ public class InProgressState: BaseFlowState, PlayerFlowExecutionData {
 }
 
 /**
-A structure that holds the data of a Flow that has errored
+A structure that holds the data of a Fuego Flow that has errored
 */
 public class ErrorState: BaseFlowState, PlayerFlowExecutionData {
     /// The flow object that is currently in progress

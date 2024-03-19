@@ -7,5 +7,5 @@ kt_player_plugin(
     main_exports = main_exports,
     main_resources = main_resources,
     # TODO: Reformat package
-    test_package = "com.intuit.player.plugins.externalAction",
+    test_package = "com.intuit.playerui.plugins.externalAction",
 )

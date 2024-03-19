@@ -19,6 +19,7 @@ javascript_pipeline(
         "@npm//@testing-library/react",
         "//core/make-flow:@player-ui/make-flow",
     ],
+    xlr_mode = "plugin"
 )
 
 filegroup(

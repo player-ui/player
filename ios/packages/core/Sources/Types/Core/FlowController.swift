@@ -28,6 +28,11 @@ public class FlowController: CreatedFromJSValue {
     /// The hooks that can be tapped into
     public let hooks: FlowControllerHooks
 
+    /// The current flow for this controller
+    public var current: Flow? {
+        value.objectForKeyedSubscript("current").map { Flow($0) }
+    }
+
     /**
     Construct a FlowController from a JSValue
     - parameters:
@@ -35,7 +40,7 @@ public class FlowController: CreatedFromJSValue {
     */
     public init(_ value: JSValue) {
         self.value = value
-        hooks = FlowControllerHooks(transition: Hook(baseValue: value, name: "transition"))
+        hooks = FlowControllerHooks(flow: Hook(baseValue: value, name: "flow"))
     }
 
     /**
@@ -43,7 +48,7 @@ public class FlowController: CreatedFromJSValue {
      - parameters:
         - action: The action to use for transitioning
      */
-    public func transition(with action: String) {
-        value.invokeMethod("transition", withArguments: [action])
+    public func transition(with action: String) throws {
+        try self.value.objectForKeyedSubscript("transition").tryCatch(args: [action])
     }
 }

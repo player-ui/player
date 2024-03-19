@@ -128,6 +128,70 @@ describe('state node expression tests', () => {
     );
   });
 
+  test('evaluates exp for action nodes', async () => {
+    player.start({
+      ...minimal,
+      views: [
+        {
+          id: 'view-1',
+          type: 'action',
+          label: {
+            asset: {
+              id: 'action-label',
+              type: 'text',
+              value: 'Clicked {{count}} times',
+            },
+          },
+        },
+        {
+          id: 'view-2',
+          type: 'view',
+          label: {
+            asset: {
+              id: 'action-label',
+              type: 'text',
+              value: 'yay',
+            },
+          },
+        },
+      ],
+      data: {
+        ...minimal.data,
+        viewRef: 'initial-view',
+      },
+      navigation: {
+        BEGIN: 'FLOW_1',
+        FLOW_1: {
+          startState: 'VIEW_1',
+          VIEW_1: {
+            state_type: 'ACTION',
+            exp: "{{viewref}} = 'VIEW_2'",
+            transitions: {
+              '*': '{{viewref}}',
+            },
+          },
+          VIEW_2: {
+            state_type: 'VIEW',
+            ref: 'view-2',
+            transitions: {
+              '*': 'END_Done',
+            },
+          },
+          END: {
+            state_type: 'END',
+            outcome: 'done',
+          },
+        },
+      },
+    });
+
+    await waitFor(() => {
+      const currentFlowState = state().controllers.flow.current?.currentState
+        ?.value as NavigationFlowViewState;
+      expect(currentFlowState.ref).toBe('view-2');
+    });
+  });
+
   test('evaluates onEnd expression', () => {
     const updatedContent = {
       ...minimal,
@@ -559,5 +623,93 @@ describe('state node expression tests', () => {
     player.start(flowWithObjExp);
 
     expect(state().controllers.data.get('count')).toBe(11);
+  });
+});
+
+describe('view update scheduling', () => {
+  test('schedules view updates', async () => {
+    const player = new Player();
+    player.start(minimal as any);
+
+    const view = (player.getState() as InProgressState).controllers.view
+      .currentView?.lastUpdate;
+
+    expect(view).toStrictEqual({
+      id: 'view-1',
+      type: 'view',
+      label: {
+        asset: {
+          id: 'action-label',
+          type: 'text',
+          value: 'Clicked 0 times',
+        },
+      },
+    });
+
+    (player.getState() as InProgressState).controllers.data.set([['count', 1]]);
+
+    await waitFor(() => {
+      expect(
+        (player.getState() as InProgressState).controllers.view.currentView
+          ?.lastUpdate
+      ).toStrictEqual({
+        id: 'view-1',
+        type: 'view',
+        label: {
+          asset: {
+            id: 'action-label',
+            type: 'text',
+            value: 'Clicked 1 times',
+          },
+        },
+      });
+    });
+
+    (player.getState() as InProgressState).controllers.data.set(
+      [['count', 2]],
+      { silent: true }
+    );
+
+    // Add a delay here to flush any queued updates
+    await new Promise((resolve) => {
+      setTimeout(resolve, 10);
+    });
+
+    expect(
+      (player.getState() as InProgressState).controllers.view.currentView
+        ?.lastUpdate
+    ).toStrictEqual({
+      id: 'view-1',
+      type: 'view',
+      label: {
+        asset: {
+          id: 'action-label',
+          type: 'text',
+          value: 'Clicked 1 times',
+        },
+      },
+    });
+
+    // non-silent update an unrelated field, should trigger an update to the original
+    (player.getState() as InProgressState).controllers.data.set([
+      ['not-count', 1],
+    ]);
+
+    await waitFor(() => {
+      expect(
+        (player.getState() as InProgressState).controllers.view.currentView
+          ?.lastUpdate
+      ).toStrictEqual({
+        id: 'view-1',
+        type: 'view',
+        label: {
+          asset: {
+            id: 'action-label',
+            type: 'text',
+            value: 'Clicked 2 times',
+          },
+        },
+      });
+    });
   });
 });
