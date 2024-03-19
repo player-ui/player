@@ -241,7 +241,7 @@ jobs:
       - run:
           name: Launch emulator
           command: |
-            emulator -avd test -delay-adb -verbose -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+            emulator -avd test -delay-adb -verbose -gpu swiftshader_indirect -no-snapshot -noaudio
           background: true
 
       - run:
