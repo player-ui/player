@@ -1,6 +1,7 @@
 package com.intuit.player.android.cg.assets
 
 
+import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import androidx.compose.material.LocalTextStyle
@@ -24,12 +25,11 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
 
 /**
- * A temp fix to support Jetpack Compose assets
  *
  * @param assetContext The context of the asset.
  * @param serializer The serializer for the Data type.
  */
-internal abstract class ComposableAsset<Data> internal constructor(
+public abstract class ComposableAsset<Data> (
     assetContext: AssetContext,
     serializer: KSerializer<Data>
 ) : SuspendableAsset<Data>(assetContext, serializer) {
