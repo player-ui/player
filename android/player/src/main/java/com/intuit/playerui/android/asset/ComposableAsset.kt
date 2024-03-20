@@ -1,7 +1,6 @@
-package com.intuit.player.android.cg.assets
+package com.intuit.playerui.android.asset
 
 
-import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import androidx.compose.material.LocalTextStyle
@@ -14,8 +13,6 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.viewinterop.AndroidView
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.build
 import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.into
@@ -62,7 +59,12 @@ public abstract class ComposableAsset<Data> (
             }
         }
 
-        dataState.value?.let { content(it) }
+
+        if (data != null) {
+            content(data)
+        } else {
+            dataState.value?.let { content(it) }
+        }
 
     }
     @Composable
