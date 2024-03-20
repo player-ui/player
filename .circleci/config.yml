@@ -96,7 +96,7 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel build --config=ci --config=skip-ios -- //...
+      - run: bazel build --verbose-failures --config=ci --config=skip-ios -- //...
 
       - save_cache:
           paths:
@@ -249,7 +249,7 @@ jobs:
           command: |
             circle-android wait-for-boot
 
-      - run: bazel test -s --test_output=errors --verbose-failures --config=ci -- //android/demo:android_instrumentation_test
+      - run: bazel test -s --test_output=errors --config=ci -- //android/demo:android_instrumentation_test
 
       - run:
           when: always
