@@ -13,7 +13,7 @@ extension JSContext {
             let url = ResourceUtilities.urlForFile(
                 name: "make-flow.prod",
                 ext: "js",
-                bundle: Bundle(for: MakeFlowResourceShim.self), pathComponent: "TestUtilities.bundle"),
+                bundle: Bundle(for: MakeFlowResourceShim.self), pathComponent: "PlayerUI_TestUtilities.bundle"),
             let contents = try? String(contentsOf: url)
         else { return }
         evaluateScript(contents)

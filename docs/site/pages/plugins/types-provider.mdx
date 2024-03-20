@@ -76,12 +76,21 @@ Given a data-type reference to `CustomType` in the content, your new validation 
   </core>
   <ios>
 
-A wrapper is provided for the types-provider plugin for Core Player. This allows the use of Swift code to create custom types, validators, and formatters.
+The swift `TypesProviderPlugin` enables adding custom data types, formatters and validation purely through swift code. While in general, the recommendation would be to share a single JavaScript implementation to multiple platforms, some use cases may need a native integration.
 
-## Custom Validator
+### CocoaPods
+Add the subspec to your `Podfile`
+
+```ruby
+pod 'PlayerUI/TypesProviderPlugin'
+```
+
+### Swift Usage
+
+#### Custom Validator
 
 ```swift
-let validationFunction = {context, value, options in
+let validationFunction = { context, value, options in
     if value == goodValue {
       return nil // Return nil to pass the validation
     } else {
@@ -111,7 +120,7 @@ then in the JSON schema for your type:''
   }
 ```
 
-## Custom Formatter
+#### Custom Formatter
 
 ```swift
 let formatFunction = {value, options in
@@ -144,7 +153,7 @@ then in the JSON schema for your type:
   }
 ```
 
-### Formatting Options
+##### Formatting Options
 
 The second parameter passed to the format/deformat functions is for additional options, it is of type `[String: Any]` and contains any other keys that were passed alongside the `type` of the formatter:
 
@@ -167,7 +176,7 @@ let formatFunction = {value, options in
 }
 ```
 
-## Custom Types
+#### Custom Types
 
 Just as you can define custom formats and validation, you can define a custom type that encapsulates that functionality into a type, to avoid the need to keep specifying options, this is how the [common-types](./plugins/common-types) are defined, so when you choose a type like `DateType` the formatting is already set up.
 
@@ -196,7 +205,7 @@ then in your JSON schema:
   }
 ```
 
-### Options in the CustomType
+##### Options in the CustomType
 
 You can supply options to formatters of your custom type in the `ValidationReference` or `FormatReference`:
 

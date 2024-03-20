@@ -39,7 +39,7 @@ public class TypesProviderPlugin: JSBasePlugin, NativePlugin {
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: TypesProviderPlugin.self), pathComponent: "TypesProviderPlugin.bundle")
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: TypesProviderPlugin.self), pathComponent: "PlayerUI_TypesProviderPlugin.bundle")
     }
 
     /**

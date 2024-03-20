@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
-          package="com.intuit.player.android.reference.demo.test">
+          package="com.intuit.playerui.android.reference.demo.test">
 
     <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="30" />
-    <instrumentation android:targetPackage="com.intuit.player.android.reference.demo"
+    <instrumentation android:targetPackage="com.intuit.playerui.android.reference.demo"
                      android:name="androidx.test.runner.AndroidJUnitRunner"/>
 </manifest>

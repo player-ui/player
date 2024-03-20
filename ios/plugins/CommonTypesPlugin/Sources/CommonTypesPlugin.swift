@@ -10,6 +10,6 @@ public class CommonTypesPlugin: JSBasePlugin, NativePlugin {
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: CommonTypesPlugin.self), pathComponent: "CommonTypesPlugin.bundle")
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: CommonTypesPlugin.self), pathComponent: "PlayerUI_CommonTypesPlugin.bundle")
     }
 }

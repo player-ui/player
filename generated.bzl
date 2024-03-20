@@ -19,6 +19,14 @@ def PlayerUI(
             "ENABLE_TESTING_SEARCH_PATHS": "YES",
         },
         srcs = glob([
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.h",
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.hh",
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.m",
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.mm",
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.swift",
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.c",
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.cc",
+            "ios/plugins/AsyncNodePlugin/Sources/**/*.cpp",
             "ios/plugins/BaseBeaconPlugin/Sources/**/*.h",
             "ios/plugins/BaseBeaconPlugin/Sources/**/*.hh",
             "ios/plugins/BaseBeaconPlugin/Sources/**/*.m",
@@ -213,25 +221,29 @@ def PlayerUI(
             "ios/plugins/TypesProviderPlugin/Sources/**/*.cpp",
         ]),
         resource_bundles = {
-            "BaseBeaconPlugin": glob(
+            "PlayerUI_AsyncNodePlugin": glob(
+                ["ios/plugins/AsyncNodePlugin/Resources/**/*.js"],
+                exclude_directories = 0,
+            ),
+            "PlayerUI_BaseBeaconPlugin": glob(
                 ["ios/plugins/BaseBeaconPlugin/Resources/**/*.js"],
                 exclude_directories = 0,
             ),
-            "CheckPathPlugin": glob(
+            "PlayerUI_CheckPathPlugin": glob(
                 ["ios/plugins/CheckPathPlugin/Resources/**/*.js"],
                 exclude_directories = 0,
             ),
-            "CommonExpressionsPlugin": glob(
+            "PlayerUI_CommonExpressionsPlugin": glob(
                 [
                     "ios/plugins/CommonExpressionsPlugin/Resources/**/*.js",
                 ],
                 exclude_directories = 0,
             ),
-            "CommonTypesPlugin": glob(
+            "PlayerUI_CommonTypesPlugin": glob(
                 ["ios/plugins/CommonTypesPlugin/Resources/**/*.js"],
                 exclude_directories = 0,
             ),
-            "ComputedPropertiesPlugin": glob(
+            "PlayerUI_ComputedPropertiesPlugin": glob(
                 [
                     "ios/plugins/ComputedPropertiesPlugin/Resources/**/*.js",
                 ],
@@ -241,23 +253,23 @@ def PlayerUI(
                 ["ios/packages/core/Resources/**/*.js"],
                 exclude_directories = 0,
             ),
-            "ExpressionPlugin": glob(
+            "PlayerUI_ExpressionPlugin": glob(
                 ["ios/plugins/ExpressionPlugin/Resources/**/*.js"],
                 exclude_directories = 0,
             ),
-            "ExternalActionPlugin": glob(
+            "PlayerUI_ExternalActionPlugin": glob(
                 ["ios/plugins/ExternalActionPlugin/Resources/**/*.js"],
                 exclude_directories = 0,
             ),
-            "MetricsPlugin": glob(
+            "PlayerUI_MetricsPlugin": glob(
                 ["ios/plugins/MetricsPlugin/Resources/**/*.js"],
                 exclude_directories = 0,
             ),
-            "PubSubPlugin": glob(
+            "PlayerUI_PubSubPlugin": glob(
                 ["ios/plugins/PubSubPlugin/Resources/**/*.js"],
                 exclude_directories = 0,
             ),
-            "ReferenceAssets": glob(
+            "PlayerUI_ReferenceAssets": glob(
                 [
                     "ios/packages/reference-assets/Resources/js/**/*.js",
                     "ios/packages/reference-assets/Resources/svg/*.xcassets",
@@ -265,17 +277,17 @@ def PlayerUI(
                 ],
                 exclude_directories = 0,
             ),
-            "StageRevertDataPlugin": glob(
+            "PlayerUI_StageRevertDataPlugin": glob(
                 [
                     "ios/plugins/StageRevertDataPlugin/Resources/**/*.js",
                 ],
                 exclude_directories = 0,
             ),
-            "TestUtilities": glob(
+            "PlayerUI_TestUtilities": glob(
                 ["ios/packages/test-utils/Resources/**/*.js"],
                 exclude_directories = 0,
             ),
-            "TypesProviderPlugin": glob(
+            "PlayerUI_TypesProviderPlugin": glob(
                 ["ios/plugins/TypesProviderPlugin/Resources/**/*.js"],
                 exclude_directories = 0,
             ),

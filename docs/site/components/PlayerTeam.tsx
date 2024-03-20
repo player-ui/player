@@ -21,9 +21,11 @@ const ProfileCard = (props: any) => {
 export const PlayerTeam = () => {
   return (
     <SimpleGrid columns={[2, null, 3]} spacing="40px">
-      {teamdata.map((element) => {
-        return <ProfileCard key={element.name} profile={element} />;
-      })}
+      {teamdata
+        .sort(() => 0.5 - Math.random())
+        .map((element) => {
+          return <ProfileCard key={element.name} profile={element} />;
+        })}
     </SimpleGrid>
   );
 };

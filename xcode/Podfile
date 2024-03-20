@@ -17,6 +17,7 @@ target 'PlayerUI_Example' do
   pod 'PlayerUI/Logger', :path => '../'
 
   # Plugins
+  pod 'PlayerUI/AsyncNodePlugin', :path => '../'
   pod 'PlayerUI/BeaconPlugin', :path => '../'
   pod 'PlayerUI/CheckPathPlugin', :path => '../'
   pod 'PlayerUI/CommonTypesPlugin', :path => '../'
@@ -61,21 +62,22 @@ plugin 'cocoapods-resource-bundle-copier', {
         },
       ]
     },
-    "PlayerUI/TestUtilities" => {'target' => "//core/make-flow:MakeFlow_Bundles_bundle_prod", 'files' => ['make-flow.prod.js']},
-    "PlayerUI/ReferenceAssets" => {'target' => "//plugins/reference-assets/core:ReferenceAssetsPlugin_Bundles_bundle_prod", 'files' => ['reference-assets-plugin.prod.js']},
+    "PlayerUI/PlayerUI_TestUtilities" => {'target' => "//core/make-flow:MakeFlow_Bundles_bundle_prod", 'files' => ['make-flow.prod.js']},
+    "PlayerUI/PlayerUI_ReferenceAssets" => {'target' => "//plugins/reference-assets/core:ReferenceAssetsPlugin_Bundles_bundle_prod", 'files' => ['reference-assets-plugin.prod.js']},
 
     # Plugins
-    "PlayerUI/BaseBeaconPlugin" => {'target' => "//plugins/beacon/core:BeaconPlugin_Bundles_bundle_prod", 'files' => ['beacon-plugin.prod.js']},
-    "PlayerUI/CommonTypesPlugin" => {'target' => "//plugins/common-types/core:CommonTypesPlugin_Bundles_bundle_prod", 'files' => ['common-types-plugin.prod.js']},
-    "PlayerUI/CheckPathPlugin" => {'target' => "//plugins/check-path/core:CheckPathPlugin_Bundles_bundle_prod", 'files' => ['check-path-plugin.prod.js']},
-    "PlayerUI/CommonExpressionsPlugin" => {'target' => "//plugins/common-expressions/core:CommonExpressionsPlugin_Bundles_bundle_prod", 'files' => ['common-expressions-plugin.prod.js']},
-    "PlayerUI/ComputedPropertiesPlugin" => {'target' => "//plugins/computed-properties/core:ComputedPropertiesPlugin_Bundles_bundle_prod", 'files' => ['computed-properties-plugin.prod.js']},
-    "PlayerUI/ExpressionPlugin" => {'target' => "//plugins/expression/core:ExpressionPlugin_Bundles_bundle_prod", 'files' => ['expression-plugin.prod.js']},
-    "PlayerUI/ExternalActionPlugin" => {'target' => "//plugins/external-action/core:ExternalActionPlugin_Bundles_bundle_prod", 'files' => ['external-action-plugin.prod.js']},
-    "PlayerUI/MetricsPlugin" => {'target' => "//plugins/metrics/core:MetricsPlugin_Bundles_bundle_prod", 'files' => ['metrics-plugin.prod.js']},
-    "PlayerUI/PubSubPlugin" => {'target' => "//plugins/pubsub/core:PubSubPlugin_Bundles_bundle_prod", 'files' => ['pubsub-plugin.prod.js']},
-    "PlayerUI/TypesProviderPlugin" => {'target' => "//plugins/types-provider/core:TypesProviderPlugin_Bundles_bundle_prod", 'files' => ['types-provider-plugin.prod.js']},
-    "PlayerUI/StageRevertDataPlugin" => {'target' => "//plugins/stage-revert-data/core:StageRevertDataPlugin_Bundles_bundle_prod", 'files' => ['stage-revert-data-plugin.prod.js']},
+    "PlayerUI/PlayerUI_AsyncNodePlugin" => {'target' => "//plugins/async-node/core:AsyncNodePlugin_Bundles_bundle_prod", 'files' => ['async-node-plugin.prod.js']},
+    "PlayerUI/PlayerUI_BaseBeaconPlugin" => {'target' => "//plugins/beacon/core:BeaconPlugin_Bundles_bundle_prod", 'files' => ['beacon-plugin.prod.js']},
+    "PlayerUI/PlayerUI_CommonTypesPlugin" => {'target' => "//plugins/common-types/core:CommonTypesPlugin_Bundles_bundle_prod", 'files' => ['common-types-plugin.prod.js']},
+    "PlayerUI/PlayerUI_CheckPathPlugin" => {'target' => "//plugins/check-path/core:CheckPathPlugin_Bundles_bundle_prod", 'files' => ['check-path-plugin.prod.js']},
+    "PlayerUI/PlayerUI_CommonExpressionsPlugin" => {'target' => "//plugins/common-expressions/core:CommonExpressionsPlugin_Bundles_bundle_prod", 'files' => ['common-expressions-plugin.prod.js']},
+    "PlayerUI/PlayerUI_ComputedPropertiesPlugin" => {'target' => "//plugins/computed-properties/core:ComputedPropertiesPlugin_Bundles_bundle_prod", 'files' => ['computed-properties-plugin.prod.js']},
+    "PlayerUI/PlayerUI_ExpressionPlugin" => {'target' => "//plugins/expression/core:ExpressionPlugin_Bundles_bundle_prod", 'files' => ['expression-plugin.prod.js']},
+    "PlayerUI/PlayerUI_ExternalActionPlugin" => {'target' => "//plugins/external-action/core:ExternalActionPlugin_Bundles_bundle_prod", 'files' => ['external-action-plugin.prod.js']},
+    "PlayerUI/PlayerUI_MetricsPlugin" => {'target' => "//plugins/metrics/core:MetricsPlugin_Bundles_bundle_prod", 'files' => ['metrics-plugin.prod.js']},
+    "PlayerUI/PlayerUI_PubSubPlugin" => {'target' => "//plugins/pubsub/core:PubSubPlugin_Bundles_bundle_prod", 'files' => ['pubsub-plugin.prod.js']},
+    "PlayerUI/PlayerUI_TypesProviderPlugin" => {'target' => "//plugins/types-provider/core:TypesProviderPlugin_Bundles_bundle_prod", 'files' => ['types-provider-plugin.prod.js']},
+    "PlayerUI/PlayerUI_StageRevertDataPlugin" => {'target' => "//plugins/stage-revert-data/core:StageRevertDataPlugin_Bundles_bundle_prod", 'files' => ['stage-revert-data-plugin.prod.js']},
   }
 }
 
