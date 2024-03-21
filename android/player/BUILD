@@ -6,6 +6,24 @@ load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@junit//junit5-jupiter-starter-bazel:junit5.bzl", "kt_jvm_junit5_test")
 load("@rules_player//kotlin:lint.bzl", "lint")
 load("@grab_bazel_common//tools/databinding:databinding.bzl", "kt_db_android_library")
+load(
+    "@io_bazel_rules_kotlin//kotlin:core.bzl",
+    "kt_compiler_plugin",
+)
+
+
+# Define the compose compiler plugin
+# Used by referencing //:jetpack_compose_compiler_plugin
+
+kt_compiler_plugin(
+    name = "jetpack_compose_compiler_plugin",
+    id = "androidx.compose.compiler",
+    target_embedded_compiler = True,
+    visibility = ["//visibility:public"],
+    deps = [
+        "@maven//:androidx_compose_compiler_compiler",
+    ],
+)
 
 kt_db_android_library(
     name = "player",
@@ -15,6 +33,7 @@ kt_db_android_library(
     resource_files = glob(["src/main/res/**"]),
     resources = main_resources,
     tags = ["maven_coordinates=com.intuit.playerui:android:aar:%s" % VERSION],
+    plugins = [":jetpack_compose_compiler_plugin"],
     visibility = ["//visibility:public"],
     exports = main_exports,
     deps = main_deps,
