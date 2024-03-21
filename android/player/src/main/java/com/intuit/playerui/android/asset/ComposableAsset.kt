@@ -59,12 +59,8 @@ public abstract class ComposableAsset<Data> (
             }
         }
 
+        dataState.value?.let { content(it) }
 
-        if (data != null) {
-            content(data)
-        } else {
-            dataState.value?.let { content(it) }
-        }
 
     }
     @Composable
