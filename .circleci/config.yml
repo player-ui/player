@@ -16,7 +16,7 @@ orbs:
 executors:
   base:
     docker:
-      - image: docker.io/playerui/bazel-docker
+      - image: docker.io/playerui/bazel-docker:7
     working_directory: ~/player
     resource_class: xlarge
     environment:
@@ -96,7 +96,7 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel build --config=ci --config=skip-ios -- //...
+      - run: bazel build --config=ci --config=d8 --config=skip-ios -- //...
 
       - save_cache:
           paths:
@@ -200,7 +200,7 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel test --config=skip-ios --config=ci -- //... -//docs/site -//android/demo:android_instrumentation_test
+      - run: bazel test --config=skip-ios --config=ci --config=d8 -- //... -//docs/site -//android/demo:android_instrumentation_test
 
       - run:
           when: always

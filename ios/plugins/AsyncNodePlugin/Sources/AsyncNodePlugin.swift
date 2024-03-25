@@ -89,7 +89,7 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: AsyncNodePlugin.self), pathComponent: "AsyncNodePlugin.bundle")
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: AsyncNodePlugin.self), pathComponent: "PlayerUI_AsyncNodePlugin.bundle")
     }
 }
 

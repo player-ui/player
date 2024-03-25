@@ -47,7 +47,7 @@ class RequestTimeWebPlugin: JSBasePlugin {
             name: fileName,
             ext: "js",
             bundle: Bundle(for: MetricsPlugin.self),
-            pathComponent: "MetricsPlugin.bundle"
+            pathComponent: "PlayerUI_MetricsPlugin.bundle"
         )
     }
 }
@@ -106,7 +106,7 @@ public class MetricsPlugin: JSBasePlugin, NativePlugin, WithSymbol {
             name: fileName,
             ext: "js",
             bundle: Bundle(for: MetricsPlugin.self),
-            pathComponent: "MetricsPlugin.bundle"
+            pathComponent: "PlayerUI_MetricsPlugin.bundle"
         )
     }
 

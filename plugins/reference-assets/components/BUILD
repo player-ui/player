@@ -3,6 +3,7 @@ load("//:index.bzl", "javascript_pipeline")
 javascript_pipeline(
     name = "@player-ui/reference-assets-components",
     dependencies = [
+      "//plugins/common-types/core:@player-ui/common-types-plugin",
       "//plugins/reference-assets/core:@player-ui/reference-assets-plugin"
     ],
 

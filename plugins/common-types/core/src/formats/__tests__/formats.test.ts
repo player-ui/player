@@ -68,6 +68,9 @@ describe('commaNumber', () => {
       expect(commaNumber.format?.(1000.999, { precision: 2 })).toBe('1,000.99');
       expect(commaNumber.format?.(1000, { precision: 2 })).toBe('1,000.00');
       expect(commaNumber.format?.(1000.1, { precision: 2 })).toBe('1,000.10');
+      expect(commaNumber.format?.(123456789, { precision: 0 })).toBe(
+        '123,456,789'
+      );
     });
 
     it('handles out of bounds', () => {
