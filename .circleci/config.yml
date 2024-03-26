@@ -25,7 +25,7 @@ executors:
     working_directory: ~/player
     resource_class: macos.m1.large.gen1
     macos:
-      xcode: 15.0.0
+      xcode: 15.1.0
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   android:
@@ -177,7 +177,7 @@ jobs:
           command: |
             bazel coverage \
               --config=ci \
-              --jobs=1 \
+              --jobs=2 \
               --experimental_use_llvm_covmap \
               --combined_report=lcov \
               --test_output=all \
