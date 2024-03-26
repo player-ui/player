@@ -25,7 +25,7 @@ executors:
     working_directory: ~/player
     resource_class: macos.m1.large.gen1
     macos:
-      xcode: 15.1.0
+      xcode: 15.3.0
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   android:
@@ -157,7 +157,7 @@ jobs:
       #       - ~/.gem/ruby/2.7.5
 
       - macos/preboot-simulator:
-          version: "17.0"
+          version: "17.4"
           platform: "iOS"
           device: "iPhone 15"
 
