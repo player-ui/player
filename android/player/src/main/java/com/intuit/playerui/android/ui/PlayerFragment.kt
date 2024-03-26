@@ -14,8 +14,8 @@ import androidx.transition.Transition
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.SuspendableAsset
-import com.intuit.playerui.android.databinding.DefaultFallbackBinding
-import com.intuit.playerui.android.databinding.FragmentPlayerBinding
+import com.intuit.playerui.android.databinding.FallbackViewBinding
+import com.intuit.playerui.android.databinding.PlayerFragmentBinding
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.extensions.intoOnMain
 import com.intuit.playerui.android.extensions.transitionInto
@@ -64,14 +64,14 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
         }
     }
 
-    private var _binding: FragmentPlayerBinding? = null
+    private var _binding: PlayerFragmentBinding? = null
 
     /**
-     * [FragmentPlayerBinding] instance
+     * [PlayerFragmentBinding] instance
      * This property is only valid between onCreateView and onDestroyView.
      * Will throw a NPE if called out of turn.
      */
-    protected val binding: FragmentPlayerBinding get() = _binding!!
+    protected val binding: PlayerFragmentBinding get() = _binding!!
 
     /**
      * [ViewModel][androidx.lifecycle.ViewModel] responsible for managing an [AndroidPlayer]
@@ -125,7 +125,7 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View = FragmentPlayerBinding.inflate(inflater, container, false).run {
+    ): View = PlayerFragmentBinding.inflate(inflater, container, false).run {
         _binding = this
         root
     }
@@ -174,7 +174,7 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
      * styles and inject that into the view tree.
      */
     protected open fun handleAssetUpdate(asset: RenderableAsset?, animateTransition: Boolean) {
-        lifecycleScope.launch(Dispatchers.Default) {
+        lifecycleScope.launch(if (asset is SuspendableAsset<*>) Dispatchers.Default else Dispatchers.Main) {
             try {
                 renderIntoPlayerCanvas(asset, animateTransition)
             } catch (exception: Exception) {
@@ -195,10 +195,10 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
 
     /**
      * Builder method to provide a fallback [View] to be shown when the
-     * [PlayerViewModel] encounters an [exception]. Defaults to an instance of [DefaultFallbackBinding].
+     * [PlayerViewModel] encounters an [exception]. Defaults to an instance of [FallbackViewBinding].
      */
     public open fun buildFallbackView(exception: Exception): View? =
-        DefaultFallbackBinding.inflate(layoutInflater).apply {
+        FallbackViewBinding.inflate(layoutInflater).apply {
             this.error.text = exception.localizedMessage
 
             retry.setOnClickListener {
