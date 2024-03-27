@@ -25,7 +25,7 @@ pkg_files(
 swift_library(
     name = "PlayerUICheckPathPlugin",
     module_name = "PlayerUICheckPathPlugin",
-    srcs = [":PlayerUICheckPathPlugin", ":CheckPathPluginResourceShim"],
+    srcs = [":PlayerUICheckPathPlugin_Sources", ":CheckPathPluginResourceShim"],
     visibility = ["//visibility:public"],
     deps = ["//ios/core:PlayerUI"],
     data = [":PlayerUICheckPathResourceBundle"],

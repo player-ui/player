@@ -13,6 +13,10 @@ import ViewInspector
 import XCTest
 
 @testable import PlayerUI
+@testable import PlayerUILogger
+@testable import PlayerUISwiftUI
+@testable import PlayerUITestUtilities
+@testable import PlayerUITestUtilitiesCore
 
 struct ExampleData: AssetData {
     var id: String

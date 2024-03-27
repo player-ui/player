@@ -2,9 +2,9 @@ common --enable_bzlmod
 
 test --test_output=errors
 
-build:ci --experimental_remote_cache_compression --experimental_remote_cache_async
-test:ci --experimental_remote_cache_compression --experimental_remote_cache_async
-coverage:ci --experimental_remote_cache_compression --experimental_remote_cache_async
+# build:ci --experimental_remote_cache_compression --experimental_remote_cache_async
+# test:ci --experimental_remote_cache_compression --experimental_remote_cache_async
+# coverage:ci --experimental_remote_cache_compression --experimental_remote_cache_async
 
 # TODO: Migrate away from managed directories (https://github.com/bazelbuild/bazel/issues/15463)
 # TODO: Re-upgrade to Bazel 6.+

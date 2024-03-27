@@ -1,3 +1,4 @@
 exports_files([
-    "ResourceShimTemplate.swift"
+    "ResourceShimTemplate.swift",
+    "Info.plist"
 ])
