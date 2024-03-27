@@ -159,6 +159,12 @@ jobs:
           platform: "iOS"
           device: "iPhone 15"
 
+      - run: 
+        name: Clean Bazel
+        command: |
+          bazel clean --expunge
+          rm -r $(bazel info repository_cache)
+
       - run: bazel build --config=ci -- //ios/demo:PlayerUIDemo
 
       - run:
