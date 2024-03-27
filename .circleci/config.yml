@@ -162,8 +162,10 @@ jobs:
       - run: 
           name: Clean Bazel
           command: |
+            du -sh $(bazel info repository_cache)
             bazel clean --expunge
             rm -r $(bazel info repository_cache)
+            du -sh $(bazel info repository_cache)
 
       - run: bazel build --config=ci -- //ios/demo:PlayerUIDemo
 
