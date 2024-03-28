@@ -35,7 +35,7 @@ class ErrorUtilitiesTestCase: XCTestCase {
             XCTFail("DecodingError expected")
         } catch {
             let message = error.playerDescription
-            XCTAssertEqual(message, "Expected to decode Int but found a string/data instead. (coding path bar.bbb)")
+            XCTAssertEqual(message, "Expected to decode Int but found a string instead. (coding path bar.bbb)")
         }
 
         // keyNotFound

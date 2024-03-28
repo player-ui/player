@@ -251,7 +251,7 @@ class SwiftUIRegistryTests: XCTestCase {
         partialMatch.context = context
         partialMatch.setMapping(assetId: "someId", index: 0)
         let registry = SwiftUIRegistry(logger: TapableLogger())
-        registry.register("text", asset: TextAsset.self)
+        registry.register("text", asset: SwiftUITestAsset.self)
         registry.partialMatchRegistry = partialMatch
 
         XCTAssertNil(registry.root)
