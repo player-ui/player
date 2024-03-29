@@ -84,7 +84,7 @@ def swift_dependencies():
     # version: 0.9.8
     swift_package(
         name = "swiftpkg_viewinspector",
-        commit = "07c090d73e0169c342a4ed46e9010be2781eca1e",
+        commit = "67319287749b83f39dcc2f20edd520c610c012fd",
         dependencies_index = "@//:swift_deps_index.json",
         remote = "https://github.com/nalexn/ViewInspector",
     )

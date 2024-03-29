@@ -26,7 +26,7 @@ let package = Package(
 
         // Testing
         .package(url: "https://github.com/applitools/eyes-xcui-swift-package.git", exact: "8.11.0"),
-        .package(url: "https://github.com/nalexn/viewinspector.git", .upToNextMajor(from: "0.9.7"))
+        .package(url: "https://github.com/nalexn/viewinspector.git", .upToNextMajor(from: "0.9.10"))
     ],
     targets: []
 )

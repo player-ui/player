@@ -469,9 +469,9 @@
       "name": "swiftpkg_viewinspector",
       "identity": "viewinspector",
       "remote": {
-        "commit": "07c090d73e0169c342a4ed46e9010be2781eca1e",
+        "commit": "67319287749b83f39dcc2f20edd520c610c012fd",
         "remote": "https://github.com/nalexn/ViewInspector",
-        "version": "0.9.8"
+        "version": "0.9.10"
       }
     },
     {
