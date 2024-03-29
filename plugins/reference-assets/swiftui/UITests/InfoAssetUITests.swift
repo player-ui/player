@@ -3,14 +3,14 @@ import XCTest
 
 class InfoAssetUITests: BaseTestCase {
     func testInfoBasic() {
-        withEyes("info basic") { check in
-            waitFor(app.buttons["next-action"])
+        openFlow("info basic")
+        waitFor(app.buttons["next-action"])
 
-            check("Page Load")
+        tap(app.buttons["next-action"])
 
-            tap(app.buttons["next-action"])
+        XCTAssertTrue(app.alerts["Flow Finished"].exists)
 
-            check("Flow End")
-        }
+        XCTAssertTrue(app.alerts["Flow Finished"].staticTexts.element(boundBy: 1).label.contains("done"))
+
     }
 }
