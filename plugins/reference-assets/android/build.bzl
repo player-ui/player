@@ -19,7 +19,7 @@ def kt_asset_test(
         resources = [
         ],
         manifest_values = {
-            "minSdkVersion": "14",
+            "minSdkVersion": "24",
         },
     )
 
