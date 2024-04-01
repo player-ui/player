@@ -1,9 +1,9 @@
 ---
 title: Stage Revert Data
-platform: core
+platform: core,ios
 ---
 
-# Stage Rvert Data
+# Stage Revert Data Plugin
 
 This plugin enables users to temporarily stage data changes before committing to the actual data model
 
@@ -44,4 +44,27 @@ const player = new Player({
 ```
 
   </core>
+  <ios>
+
+### CocoaPods
+Add the subspec to your `Podfile`
+
+```ruby
+pod 'PlayerUI/StageRevertDataPlugin'
+```
+
+### Swift Usage
+This plugin takes no parameters, and the configuration comes from content, it can just be added to the plugin array:
+```swift
+var body: some View {
+  SwiftUIPlayer(
+    flow: flow,
+    plugins: [
+      StageRevertDataPlugin()
+    ],
+    result: $resultBinding
+  )
+}
+```
+  </ios>
 </PlatformTabs>
