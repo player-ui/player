@@ -18,8 +18,6 @@ import JavaScriptCore
 @testable import PlayerUIInternalTestUtilities
 @testable import PlayerUIReferenceAssets
 
-extension SwiftUIPlayer: Inspectable {}
-
 class SwiftUIPlayerTests: XCTestCase {
     func testFlowLoads() throws {
         var bag = Set<AnyCancellable>()

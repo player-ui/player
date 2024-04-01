@@ -16,8 +16,6 @@ import SwiftUI
 @testable import PlayerUIReferenceAssets
 @testable import PlayerUISwiftUI
 
-extension CollectionAssetView: Inspectable {}
-
 class CollectionAssetTests: SwiftUIAssetUnitTestCase {
     override func register(registry: SwiftUIRegistry) {
         registry.register("collection", asset: CollectionAsset.self)

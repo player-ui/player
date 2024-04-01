@@ -247,7 +247,5 @@ class ExternalActionViewModifierPluginTests: XCTestCase {
     }
 }
 
-extension ExternalStateSheetModifier: Inspectable {}
 extension InspectableSheet: PopupPresenter {}
-extension SwiftUIPlayer: Inspectable {}
-extension Inspection: InspectionEmissary where V: Inspectable { }
+extension Inspection: InspectionEmissary { }

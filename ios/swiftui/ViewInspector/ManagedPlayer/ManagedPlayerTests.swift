@@ -16,10 +16,7 @@ import ViewInspector
 @testable import PlayerUIInternalTestUtilities
 @testable import PlayerUIReferenceAssets
 
-extension ManagedPlayer: Inspectable {}
-extension Inspection: InspectionEmissary where V: Inspectable { }
-
-extension ManagedPlayer14: Inspectable {}
+extension Inspection: InspectionEmissary { }
 
 class ManagedPlayer14Tests: XCTestCase {
     func testLoadingView() throws {

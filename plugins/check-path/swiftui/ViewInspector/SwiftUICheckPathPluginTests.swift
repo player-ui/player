@@ -40,5 +40,3 @@ private struct CheckPathTestAssetView: View {
         Text(checkPath == nil ? "Not Found" : "Found").onAppear { didAppear?(self) }
     }
 }
-
-extension CheckPathTestAssetView: Inspectable {}

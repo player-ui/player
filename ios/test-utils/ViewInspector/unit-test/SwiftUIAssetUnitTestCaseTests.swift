@@ -40,8 +40,6 @@ class ExampleSwiftUIAsset: UncontrolledAsset<ExampleData> {
     override var view: AnyView { AnyView(ExampleView(model: model)) }
 }
 
-extension ExampleView: Inspectable {}
-
 class SwiftUIAssetUnitTestDefaultTests: SwiftUIAssetUnitTestCase {
     func testDefaultRegister() {
         let player = TestPlayer<WrappedAsset, SwiftUIRegistry>(plugins: [self], registry: SwiftUIRegistry(logger: TapableLogger()))

@@ -22,8 +22,6 @@ import ViewInspector
 @testable import PlayerUIInternalTestUtilities
 @testable import PlayerUIInternalTestUtilities
 
-extension AssetFlowView: Inspectable {}
-
 class AssetFlowViewTests: XCTestCase {
   override func setUp() {
         XCUIApplication().terminate()

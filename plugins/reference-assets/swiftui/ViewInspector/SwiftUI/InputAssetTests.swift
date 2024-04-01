@@ -18,8 +18,6 @@ import JavaScriptCore
 @testable import PlayerUIReferenceAssets
 @testable import PlayerUISwiftUI
 
-extension InputAssetView: Inspectable {}
-extension ValidationView: Inspectable {}
 
 class InputAssetTests: SwiftUIAssetUnitTestCase {
     override func register(registry: SwiftUIRegistry) {
