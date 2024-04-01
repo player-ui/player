@@ -102,17 +102,7 @@ struct InputAssetView: View {
             TextField(
                 model.data.placeholder ?? "",
                 text: $model.text,
-                onEditingChanged: { editing in
-                    guard !editing else {
-                        transactionContext.register(.input) {
-                            self.model.set()
-                        }
-                        return
-                    }
-                    self.model.set()
-                    // remove the transaction once editing ends
-                    transactionContext.clear(.input)
-                }
+                onEditingChanged: onEditingChanged(_:)
             )
             .padding(4)
             .background(
@@ -129,6 +119,18 @@ struct InputAssetView: View {
             }
             model.data.note?.asset?.view.foregroundColor(Color(red: 0.729, green: 0.745, blue: 0.773)).padding(.top, 8).font(.subheadline)
         }
+    }
+
+    func onEditingChanged(_ editing: Bool) {
+        guard !editing else {
+            transactionContext.register(.input) {
+                self.model.set()
+            }
+            return
+        }
+        self.model.set()
+        // remove the transaction once editing ends
+        transactionContext.clear(.input)
     }
 }
 
