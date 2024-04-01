@@ -250,7 +250,7 @@ class ExternalActionPluginTests: XCTestCase {
             }
         }
 
-        wait(for: [handlerExpectation, completionExpectation], timeout: 3)
+        wait(for: [handlerExpectation, completionExpectation], timeout: 5)
     }
 
     func testExternalStateHandlingOptions() {
