@@ -94,7 +94,7 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel build --config=ci --config=skip-ios -- //...
+      - run: bazel build --config=ci -- `bazel query '//... except filter("ios|swiftui", //...)'`
 
       - save_cache:
           paths:
@@ -206,7 +206,7 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel test --config=skip-ios --config=ci -- //... -//docs/site -//android/demo:android_instrumentation_test
+      - run: bazel test --config=ci -- `bazel query '//... except filter("ios|swiftui", //...)'` -//docs/site -//android/demo:android_instrumentation_test
 
       - run:
           when: always
