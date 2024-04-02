@@ -22,9 +22,9 @@ node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 node.toolchain(node_version = "18.18.0")
 #################################
 
-# iOS
-
-bazel_dep(name = "rules_swift", version = "1.13.0", repo_name = "build_bazel_rules_swift")
+###### Start iOS ######
+## Rule Dependencies
+bazel_dep(name = "rules_swift", version = "1.14.0", repo_name = "build_bazel_rules_swift")
 bazel_dep(name = "rules_apple", version = "3.1.1", repo_name = "build_bazel_rules_apple")
 bazel_dep(name = "rules_ios", version = "3.1.4", repo_name = "build_bazel_rules_ios")
 bazel_dep(name = "rules_xcodeproj", version = "1.13.0")
@@ -32,7 +32,7 @@ bazel_dep(name = "rules_xcodeproj", version = "1.13.0")
 bazel_dep(name = "gazelle", version = "0.34.0", repo_name = "bazel_gazelle")
 bazel_dep(name = "rules_swift_package_manager", version = "0.22.0")
 
-# swift_deps START
+## This section is handled by rules_swift_package_manager
 swift_deps = use_extension(
     "@rules_swift_package_manager//:extensions.bzl",
     "swift_deps",
@@ -41,13 +41,16 @@ swift_deps.from_file(
     deps_index = "//:swift_deps_index.json",
 )
 
+## SPM Dependencies
+### need to be listed here to be available as a target in BUILD files
+### Add dependency in xcode/Package.swift and then run `bazel run //:update_swift_pkgs`
+### before adding it here
 use_repo(
     swift_deps,
     "swiftpkg_swift_hooks",
     "swiftpkg_viewinspector"
 )
-
-# end iOS
+###### End iOS ######
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
 
 npm.npm_translate_lock(
