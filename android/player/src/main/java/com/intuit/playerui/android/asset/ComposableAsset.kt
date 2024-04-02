@@ -4,7 +4,6 @@ package com.intuit.playerui.android.asset
 import android.view.View
 import android.widget.FrameLayout
 import androidx.compose.material.LocalTextStyle
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf

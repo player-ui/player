@@ -17,15 +17,15 @@ Assuming you have read the [requirements on the root contributing guide](https:/
 3. You will now need to create an android device for emulation. Click on Device Manager and do create new device.
    1. You will need to download an Sv2.
    2. You should now be able to click the play button to start up your device.
-4. You should now be able to run  `bazel build //android/demo`
+4. You should now be able to run  `bazel build --config=d8 //android/demo`
 5. The following are different ways to run the apk on your device. If the following methods do not work, we can manually drop the APK that gets generated from the build command to the emulated android device.
 
 ```
-bazel run //android:demo
+bazel run --config=d8 //android:demo
 ```
 
 ```
-bazel run //android/demo:install
+bazel run --config=d8 //android/demo:install
 ```
 
 If those command do not run, you can find the apk in `bazelbin/android/demo/install.runfiles/player/android/demo/demo.apk` and drag this apk onto the emulated device. This will install it. ( you may need to swipe on the device to see the application)
