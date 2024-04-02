@@ -2,7 +2,12 @@
 /**
  * An expression to AST parser based on JSEP: http://jsep.from.so/
  */
-import type { ExpressionNode, ExpressionNodeType, NodeLocation } from './types';
+import type {
+  ErrorWithLocation,
+  ExpressionNode,
+  ExpressionNodeType,
+  NodeLocation,
+} from './types';
 import { ExpNodeOpaqueIdentifier } from './types';
 
 const PERIOD_CODE = 46; // '.'
@@ -62,16 +67,8 @@ const binaryOps: Record<string, number> = {
   '%': 14,
 };
 
-interface ErrorWithLocation extends Error {
-  /** The place in the string where the error occurs */
-  index: number;
-
-  /** a helpful description */
-  description: string;
-}
-
 /** Wrap the message and index in an error and throw it */
-function throwError(message: string, index: number) {
+function throwError(message: string, index: number): ErrorWithLocation {
   const err = new Error(`${message} at character ${index}`);
 
   (err as ErrorWithLocation).index = index;

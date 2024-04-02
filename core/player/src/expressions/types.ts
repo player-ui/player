@@ -231,3 +231,11 @@ export type ExpressionNode =
   | ObjectNode;
 
 export type ExpressionNodeType = ExpressionNode['type'];
+
+export interface ErrorWithLocation extends Error {
+  /** The place in the string where the error occurs */
+  index: number;
+
+  /** a helpful description */
+  description: string;
+}
