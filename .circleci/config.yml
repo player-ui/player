@@ -196,6 +196,16 @@ jobs:
               mkdir -p $RESULTS_DIR/$(dirname $line)
               cp $line $RESULTS_DIR/$(dirname $line)
             done
+      - run:
+          when: always
+          command: |
+            mkdir -p _coverage/lcov
+            mkdir -p _coverage/html
+            cp -r $(bazel info output_path)/_coverage/_coverage_report.dat _coverage
+            genhtml --branch-coverage --output-directory=_coverage/html/ "$(bazel info output_path)/_coverage/_coverage_report.dat"
+
+      - store_artifacts:
+          path: _coverage
 
       - store_test_results:
           path: _test_results
