@@ -201,7 +201,7 @@ jobs:
           command: |
             mkdir -p _coverage/lcov
             mkdir -p _coverage/html
-            cp -r $(bazel info output_path)/_coverage/_coverage_report.dat _coverage
+            cp -r $(bazel info output_path)/_coverage/_coverage_report.dat _coverage/lcov/
             genhtml --branch-coverage --output-directory=_coverage/html/ "$(bazel info output_path)/_coverage/_coverage_report.dat"
 
       - store_artifacts:
