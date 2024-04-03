@@ -93,7 +93,7 @@ class BeaconPluginTests: XCTestCase {
         wait(for: [beaconed], timeout: 5)
     }
 }
-extension TestButton: Inspectable {}
+
 struct TestButton: View {
     @Environment(\.beaconContext) var beaconContext
     var metaData: MetaData?

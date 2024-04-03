@@ -86,7 +86,6 @@ class SwiftUIPendingTransactionPluginTests: XCTestCase {
     }
 }
 
-extension TestButtons: Inspectable {}
 private struct TestButtons: View {
     @Environment(\.transactionContext) var transactionContext
 
@@ -114,7 +113,6 @@ private struct TestButtons: View {
     }
 }
 
-extension TestButtons2: Inspectable {}
 private struct TestButtons2: View {
     @Environment(\.transactionContext) var transactionContext
 

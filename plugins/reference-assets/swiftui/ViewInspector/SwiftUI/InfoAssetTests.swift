@@ -16,8 +16,6 @@ import XCTest
 @testable import PlayerUIReferenceAssets
 @testable import PlayerUISwiftUI
 
-extension InfoAssetView: Inspectable {}
-
 class InfoAssetTests: SwiftUIAssetUnitTestCase {
     override func register(registry: SwiftUIRegistry) {
         registry.register("info", asset: InfoAsset.self)

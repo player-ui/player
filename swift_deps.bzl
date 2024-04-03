@@ -12,7 +12,7 @@ def swift_dependencies():
     # version: 8.9.1
     swift_package(
         name = "swiftpkg_eyes_xcui_swift_package",
-        commit = "ba8bc9221d1f5ca733d794d9c85ad017df9e0423",
+        commit = "8e968bc753f298bdc8836dae95ef8862bb6fa4bc",
         dependencies_index = "@//:swift_deps_index.json",
         remote = "https://github.com/applitools/eyes-xcui-swift-package.git",
     )
@@ -84,7 +84,7 @@ def swift_dependencies():
     # version: 0.9.8
     swift_package(
         name = "swiftpkg_viewinspector",
-        commit = "07c090d73e0169c342a4ed46e9010be2781eca1e",
+        commit = "67319287749b83f39dcc2f20edd520c610c012fd",
         dependencies_index = "@//:swift_deps_index.json",
         remote = "https://github.com/nalexn/ViewInspector",
     )

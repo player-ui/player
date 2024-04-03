@@ -17,8 +17,6 @@ import ViewInspector
 @testable import PlayerUISwiftUI
 @testable import PlayerUIBeaconPlugin
 
-extension ActionAssetView: Inspectable {}
-
 class ActionAssetTests: SwiftUIAssetUnitTestCase {
     override func register(registry: SwiftUIRegistry) {
         registry.register("action", asset: ActionAsset.self)

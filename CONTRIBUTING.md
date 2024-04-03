@@ -21,17 +21,6 @@ If the changes are larger (API design, architecture, etc), [opening an issue](ht
 * [Android NDK >= 19.2.5345600, <= 21](https://github.com/android/ndk/wiki/Unsupported-Downloads#r19c). Any version > 21 will not work, period. You'll need to add `ANDROID_NDK_HOME` to your environment manually.
 
 ## Building and Testing Locally (All platforms)
-#### Presetup
-For iOS builds, some pre-setup is required for `bazel` to generate BUILD files for dependent CocoaPods.
-
-```bash
-bundle install
-```
-CocoaPods does not directly integrate with `bazel`, when core targets are updated, the output bundles need to be copied to the location described in the `PlayerUI.podspec`, to do so run the script:
-```bash
-./tools/build_ios_bundles.sh
-```
-This will query `bazel` for dependent targets, copy their output and regenerate the `.xcworkspace`.
 ### Player
 For speed and consistency, this repo leverages `bazel` as it's main build tool. Check out the [bazel](https://bazel.build/) docs for more info.
 
@@ -47,20 +36,26 @@ Tests can also be ran using:
 bazel test //...
 ```
 
-#### Skipping iOS builds
-The `.bazelrc` contains a convenience to build everything but the iOS targets, as the toolchain for those is platform specific.
-
-```bash
-bazel build --config=skip-ios
-```
-
 ## For Android Only builds
-If you are interested in only contributing for android, follow our [android guide](https://github.com/player-ui/player/android/demo/README.md)
+If you are interested in only contributing for android, follow our [android guide](https://github.com/player-ui/player/blob/main/android/demo/README.md)
 
 ## For iOS Only builds
-If you are interested in only contributing for iOS, follow our [iOS guide](https://github.com/player-ui/player)
+### Xcode Project generation
+Generate the `.xcodeproj` to open and work in Xcode. Builds and tests will be executed through bazel, to ensure behavioral parity.
 
+```bash
+bazel run //ios:xcodeproj
+open -a Xcode ios/PlayerUI.xcodeproj/
+```
+### Demo Application
+#### Xcode
+The first time the Xcode project is generated, the default selected target is `PlayerUI`, for a runnable target select `PlayerUIDemo` to run the demo application in the simulator.
 
+#### Bazel
+The demo app can also be built and launched in a simulator from the command line with bazel:
+```bash
+bazel run //ios/demo:PlayerUIDemo
+```
 
 ## Docs Sites
 These require the [Android NDK](https://developer.android.com/ndk).

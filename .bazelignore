@@ -23,11 +23,6 @@ profile
 DerivedData
 *.hmap
 *.ipa
-xcode/Pods/
-CoverageData/
-bep.json
-xcui.json
-ios/*/*/Resources/**/*.js
 
 core/make-flow/node_modules
 core/types/node_modules

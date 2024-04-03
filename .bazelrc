@@ -52,7 +52,7 @@ mobile-install --start=warm
 
 build:ci --build_metadata=ROLE=CI --workspace_status_command=./scripts/workspace-status.sh
 
-# Circle large has 4 CPU cores/8GB mem
+# Circle xlarge has 8 CPU cores/16GB mem
 build:ci --local_cpu_resources=8
 build:ci --local_ram_resources=15000
 build:ci --config="release"
@@ -61,17 +61,6 @@ build:release --stamp --workspace_status_command=./scripts/workspace-status.sh
 
 # Cache action outputs on disk so they persist across output_base and bazel shutdown (eg. changing branches)
 # build --disk_cache=~/.cache/bazel-disk-cache
-
-build:skip-ios -- \
-  -//:PlayerUI \
-  -//:PlayerUI_Pod \
-  -//:PlayerUI-Demo \
-  -//:PlayerUI-Unit-Unit \
-  -//:PlayerUI-Unit-Unit.__internal__.__test_bundle \
-  -//:PlayerUI-UI-ViewInspectorTests \
-  -//:PlayerUI-UI-ViewInspectorTests.__internal__.__test_bundle \
-  -//:PlayerUI-UI-XCUITests \
-  -//:PlayerUI-UI-XCUITests.__internal__.__test_bundle
 
 # Support for debugging NodeJS tests
 # Add the Bazel option `--config=debug` to enable this

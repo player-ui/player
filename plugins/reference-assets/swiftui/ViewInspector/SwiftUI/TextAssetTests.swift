@@ -15,9 +15,6 @@ import SwiftUI
 @testable import PlayerUISwiftUI
 @testable import PlayerUITestUtilities
 
-extension TextAssetView: Inspectable {}
-extension LinkModifier: Inspectable {}
-
 class TextAssetTests: SwiftUIAssetUnitTestCase {
     override func register(registry: SwiftUIRegistry) {
         registry.register("text", asset: TextAsset.self)

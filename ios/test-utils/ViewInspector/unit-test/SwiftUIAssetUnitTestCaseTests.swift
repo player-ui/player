@@ -13,6 +13,10 @@ import ViewInspector
 import XCTest
 
 @testable import PlayerUI
+@testable import PlayerUILogger
+@testable import PlayerUISwiftUI
+@testable import PlayerUITestUtilities
+@testable import PlayerUITestUtilitiesCore
 
 struct ExampleData: AssetData {
     var id: String
@@ -35,8 +39,6 @@ struct ExampleView: View {
 class ExampleSwiftUIAsset: UncontrolledAsset<ExampleData> {
     override var view: AnyView { AnyView(ExampleView(model: model)) }
 }
-
-extension ExampleView: Inspectable {}
 
 class SwiftUIAssetUnitTestDefaultTests: SwiftUIAssetUnitTestCase {
     func testDefaultRegister() {
