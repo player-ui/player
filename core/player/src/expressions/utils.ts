@@ -1,5 +1,6 @@
 import { isExpressionNode } from './types';
 import type {
+  ErrorWithLocation,
   ExpressionHandler,
   ExpressionNode,
   ExpressionObjectType,
@@ -146,5 +147,15 @@ export function isObjectExpression(
     expr !== null &&
     !Array.isArray(expr) &&
     'value' in expr
+  );
+}
+
+/**
+ * Type guard for ErrorWithLocation
+ */
+export function isErrorWithLocation(error: Error): error is ErrorWithLocation {
+  return (
+    (error as ErrorWithLocation).index !== undefined &&
+    (error as ErrorWithLocation).description !== undefined
   );
 }
