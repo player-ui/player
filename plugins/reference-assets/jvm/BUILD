@@ -1,4 +1,4 @@
-# load("//plugins:build.bzl", "kt_player_plugin_wrapper")
+# load("//plugins:defs.bzl", "kt_player_plugin_wrapper")
 
 # kt_player_plugin_wrapper(
 #     name = "reference-assets",

@@ -1,4 +1,4 @@
-# load("//plugins:build.bzl", "kt_player_plugin")
+# load("//plugins:defs.bzl", "kt_player_plugin")
 # load(":deps.bzl", "main_deps", "main_exports", "main_resources")
 
 # kt_player_plugin(
