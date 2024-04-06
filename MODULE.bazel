@@ -110,6 +110,10 @@ maven.install(
         "org.graalvm.js:js-scriptengine:21.2.0",
         "org.graalvm.sdk:graal-sdk:21.2.0",
 
+        # J2V8
+        "com.github.AlexTrotsenko:j2v8-debugger:0.2.3",
+        "org.jetbrains.kotlin:kotlin-serialization-unshaded:1.9.23",
+
         # Test utils
         "org.junit.jupiter:junit-jupiter-api:5.6.0",
 
@@ -169,6 +173,5 @@ use_repo(maven, "maven", "unpinned_maven")
 
 
 # Kotlin
-bazel_dep(name = "rules_kotlin", version = "1.9.4", repo_name = "io_bazel_rules_kotlin")
-register_toolchains("//jvm:kotlin_toolchain")
+bazel_dep(name = "rules_kotlin", version = "1.9.0", repo_name = "io_bazel_rules_kotlin")
 

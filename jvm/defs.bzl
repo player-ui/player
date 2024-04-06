@@ -1,5 +1,4 @@
-load("@rules_player//kotlin:kt_jvm.bzl", _kt_jvm = "kt_jvm")
-load("@rules_player//kotlin:distribution.bzl", _distribution = "distribution")
+load("@rules_player//kotlin:defs.bzl", _kt_jvm = "kt_jvm", _distribution = "distribution")
 load("@build_constants//:constants.bzl", "VERSION")
 load("//jvm/dependencies:common.bzl", common_main_deps = "main_deps", common_test_deps = "test_deps")
 
