@@ -167,6 +167,9 @@ jobs:
             zip -r _coverage/html.zip _coverage/html/
             rm -r _coverage/html/
 
+      - codecov/upload:
+          file: _coverage/lcov/_coverage_report.dat
+
       - store_artifacts:
           path: _coverage
 
