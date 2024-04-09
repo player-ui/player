@@ -167,6 +167,11 @@ jobs:
             zip -r _coverage/html.zip _coverage/html/
             rm -r _coverage/html/
 
+      - run:
+          when: always
+          name: Quick fix for GPG error in Codecov
+          command: mkdir -p ~/.gnupg
+
       - codecov/upload:
           file: _coverage/lcov/_coverage_report.dat
 
