@@ -11,7 +11,7 @@ parameters:
 orbs:
   macos: circleci/macos@2
   android: circleci/android@2.0
-  codecov: codecov/codecov@3.2.2
+  codecov: codecov/codecov@3.3.0
 
 executors:
   base:
@@ -166,11 +166,6 @@ jobs:
             genhtml --branch-coverage --output-directory=_coverage/html/ "$(bazel info output_path)/_coverage/_coverage_report.dat"
             zip -r _coverage/html.zip _coverage/html/
             rm -r _coverage/html/
-
-      - run:
-          when: always
-          name: Quick fix for GPG error in Codecov
-          command: mkdir -p ~/.gnupg
 
       - codecov/upload:
           file: _coverage/lcov/_coverage_report.dat
