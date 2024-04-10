@@ -79,6 +79,28 @@ use_repo(rules_ts_ext, "npm_typescript")
 # Kotlin
 bazel_dep(name = "rules_kotlin", version = "1.9.1")
 
+# Android
+
+# The following uses an unreleased version of rules_android
+# The commit points to the last commit before rules_android updated to use rules_java 7.x,
+# which is only compatible with bazel 7+
+# Toolchains doesn't seem to register properly at this point, which is why android_sdk_repository is in WORKSPACE.bzlmod
+# TODO: remove that from WORKSPACE.bzlmod
+
+#bazel_dep(name = "rules_android")
+#git_override(
+#    remote = "https://github.com/bazelbuild/rules_android.git",
+#    commit = "60d9e0ae898912863ec517f0fe4eddea3b332a21",
+#    module_name = "rules_android"
+#)
+#register_toolchains(
+#    "@rules_android//toolchains/android:android_default_toolchain",
+#    "@rules_android//toolchains/android_sdk:android_sdk_tools",
+#)
+
+remote_android_extensions = use_extension("@bazel_tools//tools/android:android_extensions.bzl", "remote_android_tools_extensions")
+use_repo(remote_android_extensions, "android_gmaven_r8", "android_tools")
+
 # Maven
 bazel_dep(name = "rules_jvm_external")
 git_override(

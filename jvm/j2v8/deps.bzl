@@ -19,7 +19,7 @@ main_deps = main_exports + parse_coordinates(maven_main) + [
 
 # TODO: These should probably just be dependencies of headless
 main_resources = [
-    "//core/player:Player_Bundles",
+    "//core/player:player_native_bundle"
 ]
 
 test_deps = [

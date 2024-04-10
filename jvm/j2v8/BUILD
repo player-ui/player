@@ -1,6 +1,6 @@
 load("//jvm:defs.bzl", "kt_player_module")
 load(":deps.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
-load(":build.bzl", "j2v8_platform")
+load(":defs.bzl", "j2v8_platform")
 
 # TODO: Add core as associates and remove InternalPlayerApi?
 #       May require creating shared module_name space.
