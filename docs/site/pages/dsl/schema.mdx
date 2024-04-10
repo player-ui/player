@@ -293,8 +293,11 @@ export default {
 }
 ```
 
-# DSL Benefit in Schema
+# DSL Benefits in Schema
+Player's schema has a few issues that makes it both hard to write and very susceptible to experience breaking mistakes. The DSL Schema aims to mitigate all of these pitfalls. 
 
 ## Format
+The flattened nature of Player's schema makes it confusing to write for content authors new to Player and tedius to write for more experienced content authors. By allowing the schema to be represented in a tree format, the schema is both easier to write and more closely resembles the shape that the data will take in the data model. 
 
 ## Ease of Use
+The biggest quality of life improvement the DSL schema brings is that the schema object can be directly used in content. This almost completely eliminates the positiblity of mistyping a schema path leading to runtime errors and massively reduces how verbose content needs to be. Additionally, with plugins able to export references to the data types and validation functions they export, content can now directly reference those artifacts further reducing the possibility of producing invalid content. Lastly, given the number of features that are available in the schema, it can be overwhelming to remember what can/should be used where. By making the schema a normal TypeScript object and assigning it the proper type, content authors are given autocomplete suggestions and a cursory level of validation in their development environment while they are writing their schema. 
