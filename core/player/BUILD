@@ -9,8 +9,6 @@ javascript_pipeline(
         "@npm//p-defer",
         "@npm//queue-microtask",
         "@npm//tapable-ts",
-        "@npm//nested-error-stacks",
-        "@npm//@types/nested-error-stacks",
         "@npm//parsimmon",
         "@npm//@types/parsimmon",
         "@npm//arr-flatten",

@@ -1,5 +1,5 @@
 import React from 'react';
-import path from 'path';
+import path, { parse } from 'path';
 import Link from 'next/link';
 import {
   Heading,
@@ -23,12 +23,19 @@ import {
   Tr,
   Td,
   Link as CLink,
+  Alert as ChakraAlert,
+  AlertStatus,
+  AlertTitle,
+  AlertDescription,
+  AlertIcon,
+  Box,
 } from '@chakra-ui/react';
 import { MDXProviderComponents } from '@mdx-js/react';
 import { withRouter, useRouter } from 'next/router';
 import { CodeHighlight } from './code-highlight';
 import { withBasePrefix } from './Image';
 import { PlayerTeam } from './PlayerTeam';
+import {AppContext} from "./Context";
 
 /**
  * Generic Tab Component that extends Chakra's Tab
@@ -53,6 +60,11 @@ const CodeTabsNameMap = new Map([
   ['android', 'Android'],
 ]);
 
+const ContentTabsNameMap = new Map([
+  ['json', 'JSON'],
+  ['tsx', 'TSX'],
+]);
+
 const CodeTabsMap = new Map([['gradle', GradleTab]]);
 
 /**
@@ -62,7 +74,7 @@ const Tabs = (props: any) => {
   return (
     <ChakraTabs
       colorScheme="blue"
-      defaultIndex={props.defaultTab}
+      index={props.defaultTab}
       onChange={(index) => props.callback?.(index)}
     >
       <TabList>
@@ -125,6 +137,17 @@ const PlatformTabs = (props: React.PropsWithChildren<unknown>) => {
       {children}
     </Tabs>
   );
+};
+
+/**
+ * Tab section for Content Authoring. This should include tsx and/or example JSON files.
+ */
+const ContentTabs = (props: React.PropsWithChildren<unknown>) => {
+  const children = React.Children.toArray(props.children).filter((c: any) => {
+    return ContentTabsNameMap.has(c.props.mdxType.toLowerCase());
+  });
+
+  return <Tabs nameMap={ContentTabsNameMap}>{children}</Tabs>;
 };
 
 const langMap: Record<string, string> = {
@@ -210,6 +233,26 @@ export const InlineCode = (props: JSX.IntrinsicElements['code']) => {
   );
 };
 
+type ChakraAlertProps = React.PropsWithChildren<{
+  status?: AlertStatus;
+  title?: string;
+  description?: string;
+}>
+
+export const Alert = (props: ChakraAlertProps) => {
+  return (
+      <ChakraAlert status={props.status} variant='left-accent'>
+        <AlertIcon />
+        <Box flex={1}>
+          {props.title && <AlertTitle>{props.title}</AlertTitle>}
+          {props.description && <AlertDescription>{props.description}</AlertDescription>}
+          {props.children}
+        </Box>
+      </ChakraAlert>
+  );
+};
+
+
 /**
  * Anchor tab component wrapping Chakra's
  */
@@ -243,10 +286,16 @@ export const MDXComponents: MDXProviderComponents = {
 
   PlatformTabs: withRouter(PlatformTabs),
 
+  ContentTabs,
+
   table: Table,
   th: Th,
   tr: Tr,
   td: Td,
 
   inlineCode: InlineCode,
+
+  Alert,
+  AlertTitle,
+  AlertDescription,
 };

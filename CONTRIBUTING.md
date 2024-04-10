@@ -2,6 +2,8 @@
 
 If you find something interesting you want contribute to the repo, feel free to raise a PR, or open an issue for features you'd like to see added.
 
+[For first time contributors](./newCONTRIBUTORS.md)
+
 ## Proposing a Change
 
 For small bug-fixes, documentation updates, or other trivial changes, feel free to jump straight to submitting a pull request. 
@@ -18,7 +20,7 @@ If the changes are larger (API design, architecture, etc), [opening an issue](ht
 
 * [Android NDK >= 19.2.5345600, <= 21](https://github.com/android/ndk/wiki/Unsupported-Downloads#r19c). Any version > 21 will not work, period. You'll need to add `ANDROID_NDK_HOME` to your environment manually.
 
-## Building and Testing Locally
+## Building and Testing Locally (All platforms)
 #### Presetup
 For iOS builds, some pre-setup is required for `bazel` to generate BUILD files for dependent CocoaPods.
 
@@ -30,6 +32,12 @@ CocoaPods does not directly integrate with `bazel`, when core targets are update
 ./tools/build_ios_bundles.sh
 ```
 This will query `bazel` for dependent targets, copy their output and regenerate the `.xcworkspace`.
+
+`bazel` does not process resources the same way CocoaPods does, so in order to share the same [mocks](https://github.com/player-ui/player/tree/main/plugins/reference-assets/mocks) as the other platforms, there is a [precompile script](https://github.com/player-ui/player/blob/main/PlayerUI.podspec#L84-L91) that generates a `.swift` file with the mocks. In order for this to work, `node` must be accessible in your environment. To verify this, run:
+```sh
+env node
+```
+
 ### Player
 For speed and consistency, this repo leverages `bazel` as it's main build tool. Check out the [bazel](https://bazel.build/) docs for more info.
 
@@ -52,7 +60,15 @@ The `.bazelrc` contains a convenience to build everything but the iOS targets, a
 bazel build --config=skip-ios
 ```
 
-### Docs Sites
+## For Android Only builds
+If you are interested in only contributing for android, follow our [android guide](https://github.com/player-ui/player/blob/main/android/demo/README.md)
+
+## For iOS Only builds
+If you are interested in only contributing for iOS, follow our [iOS guide](https://github.com/player-ui/player)
+
+
+
+## Docs Sites
 These require the [Android NDK](https://developer.android.com/ndk).
 The docs site can be ran using:
 

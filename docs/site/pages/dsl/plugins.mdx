@@ -1,0 +1,46 @@
+---
+title: DSL Plugins
+---
+
+# DSl Plugins
+
+Much like the rest of Player, DSL compilation supports plugins that can influce how content gets compiled and generated. DSL Plugins are a subset of CLI Plugins that use either the hooks available on the CLI itself or on the DSL compiler instance created by the CLI. This section will cover the hooks that are available for use and why you might want to tap them. 
+
+## CLI Hooks
+ 
+The `createCompilerContext` function available to plugins that extend the `PlayerCLIPlugin` class gives access to the `CompilationContext` instance. This class manages the context around DSL compilation and exposes two related hooks.
+
+### `identifyContentType`
+
+The `identifyContentType` hooks's purpose is to allow plugins to inject custom behavior around detecting what kind of file is being compiled. By default there are three types of content the CLI is aware of (`view`, `flow`, and `schema`). Its methods for detecting which kind of content is contained within a file is very rudimentary (the logic can be found [here](https://github.com/player-ui/tools/blob/main/language/dsl/src/compiler/utils.ts#L5)). In order to allow desired convention or orchestrate the compilation of custom file types, this hook provides a mechanism for allowing that custom logic to be injected. The result of this hook is used in the next hook
+
+### `compileContent`
+
+The `compileContent` hook's purpose is to allow the custom compilation logic for any identified file type. As it is an `AsyncSeriesBailHook` it will take the first result returned from a tap who was able to return a result for the compilation for the given file of the identified type. In the case where no external logic is added, the hook will attempt to compile any of its known content types with the built in compiler instance. 
+
+## Compilation Hooks
+
+The CLI will initialize an instance of the `DSLCompiler` and provide a reference to it via the `onCreateDSLCompiler` function available to plugins that extend the `PlayerCLIPlugin` class. On the compiler itself, the following hook are available to modify the behavior of how DSL content is compiled.
+
+### `preProcessFlow` 
+_Note: Only called for `view` or `flow` content_
+
+This hook allows transformations on the content before it is compiled. This enables the injection of additonal data or resolving any integration specific convention into something that may be understood by the compiler. This hook can also be used to collate information on what is being compiled for use later. 
+
+### `postProcessFlow`
+_Note: Only called for `view` or `flow` content_
+
+This hook allows transformations on the content after it is compiled. This allows modifications to the compiled content which in some cases may be preferable as manipulating JSON may be easier than a React Tree. 
+
+### `schemaGenerator`
+
+This hook gives access to the internal `SchemaGenerator` object which is responsible for compiling the schema. On this generator there are the following hooks. 
+
+#### `createSchemaNode`
+
+This hook allows custom logic for processing schema nodes as they are generated. This enables arbitrary properties to be statically or dynamically added based on the authored schema node. One potential usecase of this is to allow integration specific semantic conventions to be defined and injected into the final schema. For example, the presence of a specific `Symbol` might mean that a property needs to be injected or even that the schema tree from this point on needs to be modified. 
+
+
+### `onEnd`
+
+This hook is called to signal that the compilation of all files has been completed. This allows any post processing on the output as a whole to take place as a part of the build process. This may include actions like moving or bundling the compilation results or writing new files based on information collected via other hooks on the files that were processed. 

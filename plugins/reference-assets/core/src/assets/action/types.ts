@@ -27,6 +27,9 @@ export interface ActionAsset<AnyTextAsset extends Asset = Asset>
 
     /** Force transition to the next view without checking for validation */
     skipValidation?: boolean;
+
+    /** string value to decide for the left anchor sign */
+    role?: string;
   };
 }
 

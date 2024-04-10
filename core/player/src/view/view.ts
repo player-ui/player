@@ -109,6 +109,12 @@ export class ViewInstance implements ValidationProvider {
     this.templatePlugin.apply(this);
   }
 
+  public updateAsync() {
+    const update = this.resolver?.update();
+    this.lastUpdate = update;
+    this.hooks.onUpdate.call(update);
+  }
+
   public update(changes?: Set<BindingInstance>) {
     if (this.rootNode === undefined) {
       /** On initialization of the view, also create a validation parser */

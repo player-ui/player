@@ -65,7 +65,7 @@ public class PubSubPlugin: JSBasePlugin, NativePlugin {
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: PubSubPlugin.self), pathComponent: "PubSubPlugin.bundle")
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: PubSubPlugin.self), pathComponent: "PlayerUI_PubSubPlugin.bundle")
     }
 
     /**

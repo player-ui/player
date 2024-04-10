@@ -34,7 +34,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         PubSubPlugin([]),
         TypesProviderPlugin(types: [], validators: [], formats: []),
         TransitionPlugin(popTransition: .pop),
-        BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) }
+        BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) },
+        SwiftUIPendingTransactionPlugin<PendingTransactionPhases>()
     ]
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -83,7 +84,8 @@ class SceneDelegate: UIResponder, UISceneDelegate {
         PubSubPlugin([]),
         TypesProviderPlugin(types: [], validators: [], formats: []),
         TransitionPlugin(popTransition: .pop),
-        BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) }
+        BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) },
+        SwiftUIPendingTransactionPlugin<PendingTransactionPhases>()
     ]
 
     var window: UIWindow?
@@ -110,10 +112,11 @@ class SceneDelegate: UIResponder, UISceneDelegate {
 
         window.loadView(
             view: NavigationView {
-                AssetCollection(
+                SegmentControlView(
                     plugins: plugins,
-                    sections: MockFlows.sections,
-                    completion: self.completion(result:)
+                    assetSections: MockFlows.assetSections,
+                    pluginSections: MockFlows.pluginSections,
+                    completion: completion(result:)
                 )
                 .navigationBarTitleDisplayMode(.inline)
             },

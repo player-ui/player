@@ -272,7 +272,7 @@ extension JSONDecoder {
     /// Attempts to decode an object of type T from the JSON data found in value.
     /// During decoding calls to `decoder.getJSValue()` will return the object subscripted in value
     /// at the current coding path. A decode function might use this to update RawValueBacked entities.
-    func decode<T>(_ type: T.Type, from value: JSValue) throws -> T where T: Decodable {
+    public func decode<T>(_ type: T.Type, from value: JSValue) throws -> T where T: Decodable {
         setRootJS(value)
         defer { setRootJS(nil) }
 

@@ -25,18 +25,19 @@ public class ExpressionPlugin: JSBasePlugin, NativePlugin {
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: ExpressionPlugin.self), pathComponent: "ExpressionPlugin.bundle")
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: ExpressionPlugin.self), pathComponent: "PlayerUI_ExpressionPlugin.bundle")
     }
 
     override public func getArguments() -> [Any] {
         guard
             let map = context?.evaluateScript("Map")?.construct(withArguments: []),
-            let restWrapper = context?.evaluateScript("(fn) => (context, ...args) => fn(context, args)")
+            let restWrapper = context?.evaluateScript("(fn) => (context, ...args) => fn(context, args)"),
+            let context = self.context
         else { return [] }
         for (key, value) in expressions {
-            let callback: @convention(block) (JSValue?, JSValue?) -> JSValue? = { (context, params) in
+            let callback: @convention(block) (JSValue?, JSValue?) -> JSValue? = { (_, params) in
                 let args = params?.toObject() as? [Any] ?? []
-                return JSValue(object: value(args), in: self.context)
+                return JSValue(object: value(args), in: context)
             }
             let jsCallback = JSValue(object: callback, in: context)
             map.invokeMethod("set", withArguments: [key, restWrapper.call(withArguments: [jsCallback as Any]) as Any])

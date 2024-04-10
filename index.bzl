@@ -175,3 +175,31 @@ def javascript_pipeline(
             srcs = srcs,
             mode = xlr_mode
         )
+
+def _generate_manifest(context):
+    manifest = context.actions.declare_file("manifest.json")
+    context.actions.write(
+        output = manifest,
+        content = json.encode([
+            {
+                "group": group,
+                "name": file.replace(".json", ""),
+                "path": "./%s/%s/%s/%s" % (group, name,action,file),
+            }
+            for group, name, action, file in [
+                mock.path.split("/")[-4:]
+                for filegroup in context.attr.mocks
+                for mock in filegroup[DefaultInfo].files.to_list()
+            ]
+        ]),
+    )
+    return [DefaultInfo(files = depset([manifest], transitive = [mock[DefaultInfo].files for mock in context.attr.mocks]))]
+
+generate_manifest = rule(
+    attrs = {
+        "mocks": attr.label_list(            
+            allow_files = [".json"],
+        ),
+    },
+    implementation = _generate_manifest,
+)

@@ -22,8 +22,8 @@ public class RequestTimePlugin: NativePlugin {
 
     public func apply<P>(player: P) where P: HeadlessPlayer {
         requestTimeWebPlugin.context = player.jsPlayerReference?.context
-        player.applyTo(MetricsPlugin.self) { plugin in
-            self.requestTimeWebPlugin.pluginRef?.invokeMethod("apply", withArguments: [plugin])
+        player.applyTo(MetricsPlugin.self) { [weak self] plugin in
+            self?.requestTimeWebPlugin.pluginRef?.invokeMethod("apply", withArguments: [plugin])
         }
     }
 }
@@ -47,7 +47,7 @@ class RequestTimeWebPlugin: JSBasePlugin {
             name: fileName,
             ext: "js",
             bundle: Bundle(for: MetricsPlugin.self),
-            pathComponent: "MetricsPlugin.bundle"
+            pathComponent: "PlayerUI_MetricsPlugin.bundle"
         )
     }
 }
@@ -74,9 +74,10 @@ public class MetricsPlugin: JSBasePlugin, NativePlugin, WithSymbol {
 
     public func apply<P>(player: P) where P: HeadlessPlayer {
         guard trackRenderTime, let player = player as? SwiftUIPlayer else { return }
+        let renderEnd = self.renderEnd
         player.hooks?.view.tap(name: pluginName, { (view) -> AnyView in
             AnyView(view.onAppear {
-                self.renderEnd()
+                renderEnd()
             })
         })
     }
@@ -105,7 +106,7 @@ public class MetricsPlugin: JSBasePlugin, NativePlugin, WithSymbol {
             name: fileName,
             ext: "js",
             bundle: Bundle(for: MetricsPlugin.self),
-            pathComponent: "MetricsPlugin.bundle"
+            pathComponent: "PlayerUI_MetricsPlugin.bundle"
         )
     }
 

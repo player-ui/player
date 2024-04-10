@@ -1,3 +1,5 @@
+# Use embedded JDK
+build --repo_env=JAVA_HOME=../bazel_tools/jdk
 test --test_output=errors
 coverage --combined_report=lcov
 
@@ -17,6 +19,7 @@ build --android_databinding_use_v3_4_args
 build --android_databinding_use_androidx
 build --experimental_google_legacy_api
 query --experimental_google_legacy_api
+sync --experimental_google_legacy_api
 
 # Android demo app flags
 build --noincremental_dexing --fat_apk_cpu=armeabi-v7a,arm64-v8a,x86,x86_64

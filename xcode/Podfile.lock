@@ -1,7 +1,8 @@
 PODS:
-  - EyesXCUI (8.8.8)
   - PlayerUI (0.0.1-placeholder):
     - PlayerUI/Main (= 0.0.1-placeholder)
+  - PlayerUI/AsyncNodePlugin (0.0.1-placeholder):
+    - PlayerUI/Core
   - PlayerUI/BaseBeaconPlugin (0.0.1-placeholder):
     - PlayerUI/Core
   - PlayerUI/BeaconPlugin (0.0.1-placeholder):
@@ -13,6 +14,8 @@ PODS:
   - PlayerUI/CommonExpressionsPlugin (0.0.1-placeholder):
     - PlayerUI/Core
   - PlayerUI/CommonTypesPlugin (0.0.1-placeholder):
+    - PlayerUI/Core
+  - PlayerUI/ComputedPropertiesPlugin (0.0.1-placeholder):
     - PlayerUI/Core
   - PlayerUI/Core (0.0.1-placeholder):
     - PlayerUI/Logger
@@ -48,12 +51,16 @@ PODS:
     - PlayerUI/BeaconPlugin
     - PlayerUI/Core
     - PlayerUI/SwiftUI
+    - PlayerUI/SwiftUIPendingTransactionPlugin
   - PlayerUI/StageRevertDataPlugin (0.0.1-placeholder):
     - PlayerUI/Core
   - PlayerUI/SwiftUI (0.0.1-placeholder):
     - PlayerUI/Core
   - PlayerUI/SwiftUICheckPathPlugin (0.0.1-placeholder):
     - PlayerUI/CheckPathPlugin
+    - PlayerUI/Core
+    - PlayerUI/SwiftUI
+  - PlayerUI/SwiftUIPendingTransactionPlugin (0.0.1-placeholder):
     - PlayerUI/Core
     - PlayerUI/SwiftUI
   - PlayerUI/TestUtilities (0.0.1-placeholder):
@@ -77,7 +84,6 @@ PODS:
     - PlayerUI/InternalUnitTestUtilities
     - ViewInspector (= 0.9.0)
   - PlayerUI/XCUITests (0.0.1-placeholder):
-    - EyesXCUI (= 8.8.8)
     - PlayerUI/Demo
     - PlayerUI/InternalUnitTestUtilities
   - SwiftHooks (0.1.0)
@@ -85,12 +91,13 @@ PODS:
   - ViewInspector (0.9.0)
 
 DEPENDENCIES:
-  - EyesXCUI
   - PlayerUI (from `../`)
+  - PlayerUI/AsyncNodePlugin (from `../`)
   - PlayerUI/BeaconPlugin (from `../`)
   - PlayerUI/CheckPathPlugin (from `../`)
   - PlayerUI/CommonExpressionsPlugin (from `../`)
   - PlayerUI/CommonTypesPlugin (from `../`)
+  - PlayerUI/ComputedPropertiesPlugin (from `../`)
   - PlayerUI/Core (from `../`)
   - PlayerUI/Demo (from `../`)
   - PlayerUI/ExpressionPlugin (from `../`)
@@ -104,6 +111,7 @@ DEPENDENCIES:
   - PlayerUI/StageRevertDataPlugin (from `../`)
   - PlayerUI/SwiftUI (from `../`)
   - PlayerUI/SwiftUICheckPathPlugin (from `../`)
+  - PlayerUI/SwiftUIPendingTransactionPlugin (from `../`)
   - PlayerUI/TestUtilities (from `../`)
   - PlayerUI/TestUtilitiesCore (from `../`)
   - PlayerUI/TransitionPlugin (from `../`)
@@ -115,7 +123,6 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - EyesXCUI
     - SwiftHooks
     - SwiftLint
     - ViewInspector
@@ -125,12 +132,11 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  EyesXCUI: bbb10a48b8bd1a15d541f2bc1f4d18f4db654ef1
-  PlayerUI: 4151c9a81d752e04d8c7ef269c3205dc3551325d
+  PlayerUI: 0ca0d5e095434d566b06df9d7b7e529099e5fa55
   SwiftHooks: 3ecc67c23da335d44914a8a74bd1dd23c7c149e6
   SwiftLint: 4fa9579c63416865179bc416f0a92d55f009600d
   ViewInspector: 53313c757eddc5c4842bc7943a66821a68d02d3e
 
-PODFILE CHECKSUM: 4dced11617263934702383efbea39a6c14419c2d
+PODFILE CHECKSUM: 1a64cbf0efe998242f10e560a7afe33ee6228ffe
 
 COCOAPODS: 1.11.3

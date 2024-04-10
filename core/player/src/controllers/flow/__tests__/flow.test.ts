@@ -1,3 +1,4 @@
+import { waitFor } from '@testing-library/react';
 import { FlowInstance } from '..';
 
 test('starts the right state', () => {
@@ -144,6 +145,54 @@ test('Fails to transition when not started', () => {
   });
 
   expect(() => flow.transition('foo')).toThrowError();
+});
+
+test('Fails to transition during another transition', async () => {
+  const flow = new FlowInstance('flow', {
+    startState: 'View1',
+    View1: {
+      state_type: 'VIEW',
+      onStart: 'foo bar',
+      ref: 'foo',
+      transitions: {
+        Next: 'View2',
+      },
+    },
+    View2: {
+      state_type: 'VIEW',
+      ref: 'bar',
+      transitions: {
+        Next: 'View3',
+      },
+    },
+  });
+
+  let deferredVar: string;
+
+  const transition = () => {
+    try {
+      flow.transition('Next');
+      return 'foo';
+    } catch (error: unknown) {
+      return 'bar';
+    }
+  };
+
+  flow.hooks.resolveTransitionNode.intercept({
+    call: (nextState) => {
+      if (nextState?.onStart) {
+        deferredVar = transition();
+      }
+    },
+  });
+
+  flow.start();
+
+  await waitFor(() => {
+    expect(deferredVar).toBeDefined();
+  });
+
+  expect(deferredVar!).toBe('bar');
 });
 
 describe('promise api', () => {

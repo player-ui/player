@@ -8,13 +8,23 @@
   "plugins": [
     [
       "upload-assets",
-      { "assets": ["./bazel-bin/PlayerUI_Pod.zip"] }
+      {
+        "assets": [
+          "./bazel-bin/PlayerUI_Pod.zip"
+        ]
+      }
     ],
     [
       "version-file",
       {
         "versionFile": "./VERSION",
         "publishScript": "./scripts/release.sh"
+      }
+    ],
+    [
+      "omit-release-notes",
+      {
+        "labels": "release"
       }
     ],
     "./scripts/after-shipit-pod-push.js",
