@@ -358,7 +358,6 @@ workflows:
           context:
             - applitools
           requires:
-            - applitools_init
             - bazelrc
 
       - build_ios:
