@@ -1,5 +1,5 @@
 load("//jvm:defs.bzl", "kt_player_module")
-load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 
 kt_player_module(
     name = "perf_tests",

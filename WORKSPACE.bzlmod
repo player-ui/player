@@ -1,0 +1,3 @@
+load("//:build_constants.bzl", "build_constants")
+
+build_constants()

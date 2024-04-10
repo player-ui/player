@@ -76,8 +76,17 @@ rules_ts_ext.deps()
 
 use_repo(rules_ts_ext, "npm_typescript")
 
+# Kotlin
+bazel_dep(name = "rules_kotlin", version = "1.9.1")
+
 # Maven
-bazel_dep(name = "rules_jvm_external", version = "5.3")
+bazel_dep(name = "rules_jvm_external")
+git_override(
+    remote = "https://github.com/brocollie08/rules_jvm_external.git",
+    # bazel-6 branch
+    commit = "e8cd402df87c0939d2a28fe5154247fc431b9f51",
+    module_name = "rules_jvm_external",
+)
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 
 maven.install(
@@ -143,6 +152,18 @@ maven.install(
         # slf4j
         "org.slf4j:slf4j-api:1.7.36",
         "ch.qos.logback:logback-classic:1.2.10",
+        
+        # Junit5
+        "org.junit.platform:junit-platform-commons:1.7.2",
+        "org.junit.platform:junit-platform-console:1.7.2",
+        "org.junit.platform:junit-platform-engine:1.7.2",
+        "org.junit.platform:junit-platform-launcher:1.7.2",
+        "org.junit.platform:junit-platform-suite-api:1.7.2",
+        "org.apiguardian:apiguardian-api:1.0.0",
+        "org.opentest4j:opentest4j:1.1.1",
+        "org.junit.jupiter:junit-jupiter-api:5.7.2",
+        "org.junit.jupiter:junit-jupiter-engine:5.7.2",
+        "org.junit.jupiter:junit-jupiter-params:5.7.2",
     ],
     fetch_sources = True,
     fail_if_repin_required = True,
@@ -162,7 +183,6 @@ maven.install(
         "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:jar:1.5.2",
     ],
     fetch_sources = True,
-    fail_if_repin_required = True,
     repositories = [
         "https://repo1.maven.org/maven2",
     ],
@@ -171,7 +191,4 @@ maven.install(
 use_repo(maven, "maven", "unpinned_maven")
 
 
-
-# Kotlin
-bazel_dep(name = "rules_kotlin", version = "1.9.0", repo_name = "io_bazel_rules_kotlin")
 

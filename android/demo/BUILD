@@ -1,6 +1,6 @@
 load("@build_bazel_rules_android//android:rules.bzl", "android_binary")
-load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_import")
-load("@io_bazel_rules_kotlin//kotlin:android.bzl", "kt_android_library")
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_import")
+load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load(":deps.bzl", "main_deps", "test_deps")
 load("@rules_player//kotlin:lint.bzl", "lint")
 
