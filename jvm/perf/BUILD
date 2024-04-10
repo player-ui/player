@@ -25,7 +25,7 @@ kt_jvm_library(
         "//jvm/core",
         "//jvm/graaljs",
         "//jvm/j2v8:j2v8-all",
-        "@com_github_jetbrains_kotlin//:kotlin-reflect",
+        "@rules_kotlin//kotlin/compiler:kotlin-reflect",
         "@maven//:org_openjdk_jmh_jmh_core",
     ],
 )
