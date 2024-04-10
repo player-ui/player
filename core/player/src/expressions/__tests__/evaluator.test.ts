@@ -386,7 +386,7 @@ describe('evaluator', () => {
 
   test('throws errors for unknown expressions', () => {
     expect(() => evaluator.evaluate('foo()')).toThrowError(
-      'Unknown expression function: foo'
+      'Error evaluating expression: foo()'
     );
   });
 

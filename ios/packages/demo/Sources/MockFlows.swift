@@ -163,8 +163,28 @@ static let actionNavigation: String = """
               "asset": {
                 "id": "action-prev-id",
                 "type": "text",
-                "value": "Go Back"
+                "value": "Go Back Without Icon"
               }
+            },
+            "metaData": {
+              "role": ""
+            }
+          }
+        },
+        {
+          "asset": {
+            "id": "action-prev-without-icon",
+            "type": "action",
+            "value": "Prev",
+            "label": {
+              "asset": {
+                "id": "action-prev-id-without-icon",
+                "type": "text",
+                "value": "Go Back With Role"
+              }
+            },
+            "metaData": {
+              "role": "back"
             }
           }
         },
@@ -295,6 +315,144 @@ static let collectionBasic: String = """
       "VIEW_1": {
         "state_type": "VIEW",
         "ref": "view-1",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+"""
+static let imageBasic: String = """
+{
+  "id": "generated-flow",
+  "views": [
+    {
+      "id": "image-1",
+      "type": "image",
+      "metaData": {
+        "ref": "https://player-ui.github.io/latest/logo/logo-light-large.png"
+      }
+    }
+  ],
+  "data": {},
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "image-1",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+"""
+static let imageWithAccessibility: String = """
+{
+  "id": "generated-flow",
+  "views": [
+    {
+      "id": "image-1",
+      "type": "image",
+      "metaData": {
+        "ref": "https://player-ui.github.io/latest/logo/logo-light-large.png",
+        "accessibility": "This is accessibility text for an image"
+      },
+      "placeholder": "This is placeholder text for an image"
+    }
+  ],
+  "data": {},
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "image-1",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+"""
+static let imageWithCaption: String = """
+{
+  "id": "generated-flow",
+  "views": [
+    {
+      "id": "image-1",
+      "type": "image",
+      "metaData": {
+        "ref": "https://player-ui.github.io/latest/logo/logo-light-large.png"
+      },
+      "caption": {
+        "asset": {
+          "id": "image-caption",
+          "type": "text",
+          "value": "Image caption"
+        }
+      }
+    }
+  ],
+  "data": {},
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "image-1",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+"""
+static let imageWithPlaceholder: String = """
+{
+  "id": "generated-flow",
+  "views": [
+    {
+      "id": "image-1",
+      "type": "image",
+      "metaData": {
+        "ref": "https://player-ui.github.io/latest/logo/logo-light-large.png"
+      },
+      "placeholder": "This is placeholder text for an image"
+    }
+  ],
+  "data": {},
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "image-1",
         "transitions": {
           "*": "END_Done"
         }
@@ -1030,7 +1188,218 @@ static let textWithLink: String = """
   }
 }
 """
-    public static let sections: [FlowLoader.FlowSection] = [
+static let beaconAction: String = """
+{
+  "id": "generated-flow",
+  "views": [
+    {
+      "id": "action",
+      "type": "action",
+      "exp": [
+        "{{count}} = {{count}} + 1",
+        "beacon('action', 'some-data')"
+      ],
+      "metaData": {
+        "beacon": "Click count: {{count}}"
+      },
+      "label": {
+        "asset": {
+          "id": "action-label-text",
+          "type": "text",
+          "value": "Clicked {{count}} times"
+        }
+      }
+    }
+  ],
+  "data": {
+    "count": 0
+  },
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "action",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+"""
+static let externalAction: String = """
+{
+  "id": "test-flow",
+  "data": {
+    "transitionValue": "Next"
+  },
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "EXT_1",
+      "EXT_1": {
+        "state_type": "EXTERNAL",
+        "ref": "test-1",
+        "transitions": {
+          "Next": "END_FWD",
+          "Prev": "END_BCK"
+        }
+      },
+      "END_FWD": {
+        "state_type": "END",
+        "outcome": "FWD"
+      },
+      "END_BCK": {
+        "state_type": "END",
+        "outcome": "BCK"
+      }
+    }
+  }
+}
+"""
+static let pubSubBasic: String = """
+{
+  "id": "generated-flow",
+  "views": [
+    {
+      "id": "action",
+      "type": "action",
+      "exp": "@[ publish('some-event', 'event published message') ]@",
+      "label": {
+        "asset": {
+          "id": "action-label",
+          "type": "text",
+          "value": "Clicked to publish event"
+        }
+      }
+    }
+  ],
+  "data": {
+    "count": 0
+  },
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "action",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+"""
+
+    
+static let inputAssetPendingTransaction: String = """
+{
+  "id": "input-validation-flow",
+  "views": [
+    {
+      "id": "view-1",
+      "type": "collection",
+      "values": [
+        {
+          "asset": {
+            "id": "input-required",
+            "type": "input",
+            "binding": "foo.requiredInput",
+            "label": {
+              "asset": {
+                "id": "input-required-label",
+                "type": "text",
+                "value": "This input is required and must be greater than 0"
+              }
+            }
+          }
+        },
+        {
+          "asset": {
+            "id": "action-1",
+            "type": "action",
+            "value": "Next",
+            "label": {
+              "asset": {
+                "id": "action-1-label",
+                "type": "text",
+                "value": "Continue"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "view-2",
+      "type": "info",
+      "title": {
+        "asset": {
+          "id": "view-2-title",
+          "type": "text",
+          "value": "You made it!"
+        }
+      }
+    }
+  ],
+  "schema": {
+    "ROOT": {
+      "foo": {
+        "type": "FooType"
+      }
+    },
+    "FooType": {
+      "requiredInput": {
+        "type": "IntegerPosType",
+        "validation": [
+          {
+            "type": "required"
+          }
+        ]
+      }
+    }
+  },
+  "data": {},
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "view-1",
+        "transitions": {
+          "*": "VIEW_2"
+        }
+      },
+      "VIEW_2": {
+        "state_type": "VIEW",
+        "ref": "view-2",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+"""
+
+    public static let assetSections: [FlowLoader.FlowSection] = [
         (title: "action", flows: [
             (name: "counter", flow: MockFlows.actionCounter),
             (name: "transition to end", flow: MockFlows.actionTransitionToEnd),
@@ -1039,6 +1408,12 @@ static let textWithLink: String = """
         ]),
         (title: "collection", flows: [
             (name: "basic", flow: MockFlows.collectionBasic)
+        ]),
+        (title: "image", flows: [
+            (name: "basic", flow: MockFlows.imageBasic),
+            (name: "with accessibility", flow: MockFlows.imageWithAccessibility),
+            (name: "with caption", flow: MockFlows.imageWithCaption),
+            (name: "with placeholder", flow: MockFlows.imageWithPlaceholder)
         ]),
         (title: "info", flows: [
             (name: "footer", flow: MockFlows.infoFooter),
@@ -1056,4 +1431,20 @@ static let textWithLink: String = """
             (name: "with link", flow: MockFlows.textWithLink)
         ])
     ]
+
+    public static let pluginSections: [FlowLoader.FlowSection] = [
+              (title: "beacon", flows: [
+            (name: "action", flow: MockFlows.beaconAction)
+        ]),
+        (title: "external-action", flows: [
+            (name: "external-action", flow: MockFlows.externalAction)
+        ]),
+        (title: "pubsub", flows: [
+            (name: "pub sub basic", flow: MockFlows.pubSubBasic)
+        ])
+      ,
+      (title: "pending-transaction", flows: [
+        (name: "input asset pending transaction", flow: MockFlows.inputAssetPendingTransaction)
+        ])
+      ]
 }

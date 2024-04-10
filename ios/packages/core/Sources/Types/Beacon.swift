@@ -10,7 +10,7 @@ import Foundation
 /**
  An object representing a beacon fired from an `Asset`
  */
-public struct AssetBeacon: Codable {
+public struct AssetBeacon: Codable, Equatable {
     /// The action that caused the beacon
     public var action: String
 
@@ -49,7 +49,7 @@ public protocol BeaconableMetaData {
 }
 
 /// Container Object for matching the data type for the JS Beacon Plugin
-public struct BeaconableAsset: Codable {
+public struct BeaconableAsset: Codable, Equatable {
     /// The ID of the asset that fired the beacon
     public var id: String
 

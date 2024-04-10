@@ -13,6 +13,6 @@ public class StageRevertDataPlugin: JSBasePlugin, NativePlugin {
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: StageRevertDataPlugin.self), pathComponent: "StageRevertDataPlugin.bundle")
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: StageRevertDataPlugin.self), pathComponent: "PlayerUI_StageRevertDataPlugin.bundle")
     }
 }

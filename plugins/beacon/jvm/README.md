@@ -2,4 +2,4 @@
 
 ## Gradle Dependency
 
-`implementation("com.intuit.player.jvm.plugins:beacon:$VERSION")`
+`implementation("com.intuit.playerui.plugins:beacon:$VERSION")`

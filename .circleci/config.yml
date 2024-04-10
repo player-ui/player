@@ -16,7 +16,7 @@ orbs:
 executors:
   base:
     docker:
-      - image: docker.io/playerui/bazel-docker
+      - image: docker.io/playerui/bazel-docker:7
     working_directory: ~/player
     resource_class: xlarge
     environment:
@@ -44,7 +44,7 @@ commands:
           at: ~/player
 
       - restore_cache:
-          keys: 
+          keys:
             - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
             - v1-bazel-cache-core-{{ .Branch }}
             - v1-bazel-cache-core-main
@@ -53,7 +53,9 @@ commands:
 
       - run: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      - run: echo -e $GPG_KEY | gpg --import --batch
+      - run: |
+            echo -e $GPG_KEY | gpg --import --batch
+            echo -e "pinentry-mode loopback\npassphrase $DEPLOY_MAVEN_GPG_PASSPHRASE" > ~/.gnupg/gpg.conf
       - run: |
             source ~/.bashrc
             bundle install
@@ -112,7 +114,7 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: 
+      - run:
           name: Homebrew Dependencies
           command: |
             HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@8
@@ -120,8 +122,7 @@ jobs:
       - run:
           name: Set Ruby Version
           command: |
-            rbenv install 2.6.10
-            rbenv global 2.6.10
+            rbenv global 2.7.8
             rbenv rehash
 
       - restore_cache:
@@ -149,7 +150,7 @@ jobs:
           paths:
             - ~/android-tools
 
-      - run: gem install bundler
+      - run: gem install bundler -v 2.4.22
 
       - restore_cache:
           keys:
@@ -161,7 +162,7 @@ jobs:
       - save_cache:
           key: gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
           paths:
-            - ~/.gem/ruby/2.7.5
+            - ~/.gem/ruby/2.7.8
 
       - macos/preboot-simulator:
           version: "15.5"
@@ -178,9 +179,9 @@ jobs:
       - run: cd xcode && bundle exec pod install
       - run: bazel build --config=ci -- //:PlayerUI //:PlayerUI-Demo //:PlayerUI_Pod
       # TODO: the timeout should be added to the test itself
-      - run: bazel test --test_env=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --test_env=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --test_env=APPLITOOLS_PR_NUMBER=${CIRCLE_PULL_REQUEST##*/} --test_timeout=1200 --jobs=1 --verbose_failures --config=ci  -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
+      - run: bazel test --test_timeout=1200 --jobs=1 --verbose_failures --config=ci  -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
 
-      - run: 
+      - run:
           when: always
           command: |
             RESULTS_DIR=_test_results
@@ -248,7 +249,20 @@ jobs:
           command: |
             circle-android wait-for-boot
 
-      - run: bazel test --define=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --define=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --define=APPLITOOLS_PR_NUMBER=${CIRCLE_PULL_REQUEST##*/} --config=ci -- //android/demo:android_instrumentation_test
+      - run: bazel test --config=ci -- //android/demo:android_instrumentation_test
+
+      - run:
+          when: always
+          command: |
+            RESULTS_DIR=_test_results
+            find -L ./bazel-testlogs -name test.xml | while read line
+            do
+              mkdir -p $RESULTS_DIR/$(dirname $line)
+              cp $line $RESULTS_DIR/$(dirname $line)
+            done
+
+      - store_test_results:
+          path: _test_results
 
       - store_artifacts:
           path: screenshots
@@ -286,20 +300,6 @@ jobs:
     steps:
       - auto_shipit
 
-  applitools_init:
-    executor: base
-    steps:
-      - run:
-          name: Initialize Applitools
-          command: curl -L -d '' -X POST "$APPLITOOLS_SERVER_URL/api/externals/github/push?apiKey=$APPLITOOLS_API_KEY&CommitSha=$CIRCLE_SHA1&BranchName=$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/$CIRCLE_BRANCH"
-
-  applitools_cleanup:
-    executor: base
-    steps:
-      - run:
-          name: Cleanup Applitools
-          command: "curl -X POST \"$APPLITOOLS_SERVER_URL/api/externals/github/servers/github.com/commit/$CIRCLE_SHA1/complete?apiKey=$APPLITOOLS_API_KEY\" -H Content-Type:application/json --data '{\"serverId\": \"github.com\", \"commitSha\": \"$CIRCLE_SHA1\"}' -v -L"
-
 workflows:
   build_and_test_pr:
     jobs:
@@ -309,90 +309,118 @@ workflows:
               ignore:
                 - main
                 - /version-.*/
-                - /pull\/.*/
             tags:
               ignore: /.*/
       - bazelrc:
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
           context:
             - Build
           requires:
             - setup
 
-      - applitools_init:
-          context:
-            - applitools
+      - build:
+          name: build-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
           requires:
             - bazelrc
 
       - build:
-          requires:
-            - bazelrc
-
-      - build_ios:
-          context:
-            - applitools
-          requires:
-            - applitools_init
-            - bazelrc
-
-      - maybe_release:
-          context:
-            - Publish
-          requires:
-            - build
-            - build_ios
-
-      - test:
-          requires:
-            - build
-
-      - android_test:
-          context:
-            - applitools
-          requires:
-            - applitools_init
-            - build
-
-      - coverage:
-          requires:
-            - build
-
-      - applitools_cleanup:
-          context:
-            - applitools
-          requires:
-            - android_test
-            - build_ios
-
-  build_and_test_pr_fork:
-    jobs:
-      - setup:
+          name: build-fork
           filters:
             branches:
               only:
                 - /pull\/.*/
-            tags:
-              ignore: /.*/
-
-      - build:
           requires:
             - setup
 
       - build_ios:
+          name: build-ios-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          requires:
+            - bazelrc
+
+      - build_ios:
+          name: build-ios-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
           requires:
             - setup
 
-      - test:
+      - maybe_release:
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          context:
+            - Publish
           requires:
-            - build
+            - build-trunk
+            - build-ios-trunk
+
+      - test:
+          name: test-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          requires:
+            - build-trunk
+
+      - test:
+          name: test-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - build-fork
 
       - android_test:
+          name: android-test-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
           requires:
-            - build
+            - build-trunk
+
+      - android_test:
+          name: android-test-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - build-fork
 
       - coverage:
+          name: coverage-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
           requires:
-            - build
+            - build-trunk
+
+      - coverage:
+          name: coverage-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - build-fork
 
   build_and_test_main:
     when:
@@ -410,8 +438,6 @@ workflows:
             - setup
 
       - build_ios:
-          context:
-            - applitools
           requires:
             - setup
 
@@ -420,8 +446,6 @@ workflows:
             - build
 
       - android_test:
-          context:
-            - applitools
           requires:
             - build
 
@@ -449,8 +473,6 @@ workflows:
             - setup
 
       - build_ios:
-          context:
-            - applitools
           requires:
             - setup
 
@@ -459,8 +481,6 @@ workflows:
             - build
 
       - android_test:
-          context:
-            - applitools
           requires:
             - build
 

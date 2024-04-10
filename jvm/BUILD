@@ -1,7 +1,11 @@
-load("@io_bazel_rules_kotlin//kotlin:core.bzl", "kt_compiler_plugin", "kt_kotlinc_options")
+load("@io_bazel_rules_kotlin//kotlin:core.bzl", "define_kt_toolchain", "kt_compiler_plugin", "kt_kotlinc_options")
 load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@io_bazel_rules_kotlin//kotlin:lint.bzl", "ktlint_config")
 load("//jvm/dependencies:versions.bzl", "versions")
+
+exports_files([
+    "pom.tpl",
+])
 
 kt_compiler_plugin(
     name = "serialization_plugin",
@@ -26,7 +30,7 @@ kt_jvm_library(
 
 optins = [
     "kotlin.RequiresOptIn",
-    "com.intuit.player.jvm.core.utils.InternalPlayerApi",
+    "com.intuit.playerui.core.utils.InternalPlayerApi",
     "kotlinx.serialization.ExperimentalSerializationApi",
     "kotlinx.coroutines.ExperimentalCoroutinesApi",
     "kotlin.contracts.ExperimentalContracts",
@@ -49,6 +53,10 @@ kt_kotlinc_options(
 
 ktlint_config(
     name = "lint_config",
-    editorconfig = "//:.editorconfig",
     visibility = ["//visibility:public"],
+)
+
+define_kt_toolchain(
+    name = "kotlin_toolchain",
+    kotlinc_options = ":test_options",
 )

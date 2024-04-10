@@ -4,9 +4,10 @@ title: 'Custom Assets'
 
 # Custom Assets
 
-One of the conscious design decisions we made when building Player was to abstract away the actual asset implementation and open it up for users to bring their own when using Player. This way you can seamlessly integrate Player into your existing experiences and reuse UI assets you may have already built. Below we've outlined the way to build custom assets on the various platforms Player supports. 
+One of the conscious design decisions we made when building Player was to abstract away the actual asset implementation and open it up for users to bring their own when using Player. This way you can seamlessly integrate Player into your existing experiences and reuse UI assets you may have already built. Below we've outlined the way to build custom assets on the various platforms Player supports.
 
-## React
+<PlatformTabs>
+  <react>
 
 ### Create Your Asset
 
@@ -61,7 +62,8 @@ const CustomAssetComp = (props) => {
 
 This would automatically find the appropriate handler for the `props.header` asset and use that to render.
 
-## iOS
+  </react>
+  <ios>
 
 SwiftUI Player assets are made of 3 parts:
 
@@ -190,7 +192,7 @@ In either situation, your asset implementation needs only to override the view p
 
 ```swift
 class ActionAsset: UncontrolledAsset<ActionData> {
-		public override var view: AnyView { ActionView(model: model) }
+        public override var view: AnyView { AnyView(ActionView(model: model)) }
 }
 ```
 
@@ -230,11 +232,15 @@ In the latter case, it is recommended to extend the original asset, so as to avo
 
 ##### Why Would I Register my Asset as a Variant?
 
+
 1. Transform backed assets have functions that are attached to them, through shared JavaScript plugins. This simplifies setting data from the asset, by giving simple functions like `run` in the reference `ActionAsset` for example. Swift only asset types will not have any convenience functions.
 
 2. Registering as a variant allows you to maintain usage of the transform backed asset as well as your new asset, so both can be used by the same `SwiftUIPlayer` instance, including in the same flow. This also maintains the semantics of Player content, an `action` asset is always an `action` type of interaction, but with `metaData`, it can be displayed differently.
 
-## Android 
+
+
+  </ios>
+  <android>
 
 In order to render an asset a renderer for that type must be registered in the Android Player. If a renderer is found, then Player will delegate rendering when that type is encountered, otherwise Player will skip that node. Creating and registering such a renderer requires the following:
 
@@ -278,12 +284,12 @@ In most cases, there is some additional data that is used to make the rendering 
 
 ```kotlin
 class TextAsset(assetContext: AssetContext) : DecodableAsset<TextAsset.Data>(Data.serializer()) {
-   
+
     @Serializable
     data class Data(
        val value: String
     )
-    
+
 }
 ```
 
@@ -335,7 +341,7 @@ A helper is provided to reduce overhead with rendering an asset into a layout. `
 
 ```kotlin
 // title_container is a view extension referencing a FrameLayout in an XML layout
-data.title.render() into title_container 
+data.title.render() into title_container
 ```
 
 #### Styling
@@ -408,3 +414,7 @@ This asset will only be used when decoding a view in the JSON tree that is type 
 In this scenario, the custom action asset implementation would still have access to the transformed values of a regular action asset, such as the `run` method.
 
 When creating a new plugin, remember to register it when building the AndroidPlayer!
+
+
+  </android>
+</PlatformTabs>

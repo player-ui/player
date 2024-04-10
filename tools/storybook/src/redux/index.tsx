@@ -67,11 +67,9 @@ export const updateAndCompileDSLFlow = createAsyncThunk<
     if (transpiledResult) {
       const compiled = await compiler.serialize(transpiledResult.default);
 
-      if (compiled.contentType === 'flow') {
-        thunkAPI.dispatch(
-          setCompiledEditorResult({ result: compiled.value as any })
-        );
-      }
+      thunkAPI.dispatch(
+        setCompiledEditorResult({ result: compiled.value as any })
+      );
     }
   } catch (e: any) {
     thunkAPI.dispatch(
