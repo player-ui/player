@@ -167,10 +167,10 @@ jobs:
             zip -r _ios_coverage/html.zip _ios_coverage/html/
             rm -r _ios_coverage/html/
       
-      - save_cache:
-          key: ios_coverage
-          paths:
-            - _ios_coverage
+      - persist_to_workspace:
+        root: .
+        paths:
+          - _ios_coverage
 
       - store_test_results:
           path: _test_results
@@ -225,7 +225,6 @@ jobs:
             - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
             - v1-bazel-cache-core-{{ .Branch }}
             - v1-bazel-cache-core-main
-            - ios_coverage
 
       # union the bundle targets until //... doesnt explode analyzing jvm/android targets
       - run: |
