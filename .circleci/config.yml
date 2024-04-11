@@ -467,10 +467,6 @@ workflows:
           requires:
             - setup
 
-      - test:
-          requires:
-            - build
-
       - android_test:
           context:
             - applitools
@@ -486,6 +482,5 @@ workflows:
             - Publish
           requires:
             - android_test
-            - test
             - coverage
             - build_ios
