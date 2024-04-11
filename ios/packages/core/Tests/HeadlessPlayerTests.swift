@@ -250,6 +250,26 @@ class HeadlessPlayerTests: XCTestCase {
             }
         }
     }
+
+    func testDataControllerOnUpdate() {
+        let player = HeadlessPlayerImpl(plugins: [])
+
+        let updateExp = expectation(description: "Data Updated")
+
+        XCTAssertNotNil(player.state as? NotStartedState)
+        player.hooks?.dataController.tap({ dataController in
+            dataController.hooks.onUpdate.tap { updates in
+                XCTAssertEqual(updates.first?.oldValue, AnyType.number(data: 0))
+                XCTAssertEqual(updates.first?.newValue, AnyType.number(data: 5))
+                updateExp.fulfill()
+            }
+
+            dataController.set(transaction: ["count": 5])
+        })
+
+        player.start(flow: FlowData.COUNTER) { _ in}
+        wait(for: [updateExp], timeout: 1)
+    }
 }
 
 class FakePlugin: JSBasePlugin, NativePlugin {

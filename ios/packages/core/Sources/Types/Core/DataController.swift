@@ -16,6 +16,9 @@ open class BaseDataController {
     /// The JSValue that backs this wrapper
     public let value: JSValue
 
+    /// The hooks that can be tapped into
+    public let hooks: DataControllerHooks
+
     /**
     Construct a DataController from a JSValue
     - parameters:
@@ -23,6 +26,9 @@ open class BaseDataController {
     */
     public init(_ value: JSValue) {
         self.value = value
+        self.hooks = DataControllerHooks(
+            onUpdate: HookDecode<[Update]>(baseValue: self.value, name: "onUpdate")
+        )
     }
 
     /**
