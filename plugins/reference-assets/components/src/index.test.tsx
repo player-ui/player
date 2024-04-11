@@ -1,10 +1,11 @@
 import React from "react";
+import { describe, test, expect } from "vitest";
 import { render, binding as b } from "@player-tools/dsl";
 import { Text, Action, Info, Collection, Input } from ".";
 
 describe("JSON serialization", () => {
   describe("text", () => {
-    it("works for basic text", async () => {
+    test("works for basic text", async () => {
       expect((await render(<Text>Hello World</Text>)).jsonValue).toStrictEqual({
         id: "root",
         type: "text",
@@ -12,7 +13,7 @@ describe("JSON serialization", () => {
       });
     });
 
-    it("works for value prop", async () => {
+    test("works for value prop", async () => {
       expect(
         (await render(<Text value="Hello World" />)).jsonValue,
       ).toStrictEqual({
@@ -24,7 +25,7 @@ describe("JSON serialization", () => {
   });
 
   describe("collection", () => {
-    it("adds a label", async () => {
+    test("adds a label", async () => {
       expect(
         (
           await render(
@@ -46,7 +47,7 @@ describe("JSON serialization", () => {
       });
     });
 
-    it("adds values", async () => {
+    test("adds values", async () => {
       expect(
         (
           await render(
@@ -82,7 +83,7 @@ describe("JSON serialization", () => {
   });
 
   describe("info", () => {
-    it("works for a large view", async () => {
+    test("works for a large view", async () => {
       expect(
         (
           await render(
