@@ -94,7 +94,7 @@ jobs:
       - attach_workspace:
           at: ~/player
       # need to filter because //android/demo rules dont resolve
-      - run: bazel build --config=ci -- $(bazel query '//plugins/... except filter("ios|swiftui|jvm|android", //plugins/...)') $(bazel query '//core/... except filter("ios|swiftui|jvm|android", //core/...)') $(bazel query '//react/... except filter("ios|swiftui|jvm|android", //react/...)') -//react/player:player_vitest -//plugins/reference-assets/react:react_eslint
+      - run: bazel build --config=ci -- $(bazel query '//plugins/... except filter("ios|swiftui|jvm|android", //plugins/...)') $(bazel query '//core/... except filter("ios|swiftui|jvm|android", //core/...)') $(bazel query '//react/... except filter("ios|swiftui|jvm|android", //react/...)')
 
       - save_cache:
           paths:
@@ -230,7 +230,7 @@ jobs:
       # union the bundle targets until //... doesnt explode analyzing jvm/android targets
       - run: |
           BUNDLE_TARGETS=$(bazel query "kind(js_test, //plugins/...) union kind(js_test, //react/...) union kind(js_test, //core/...)" --output label 2>/dev/null | tr '\n' ' ')
-          bazel coverage --config=ci -- $BUNDLE_TARGETS
+          bazel coverage --config=ci -- $BUNDLE_TARGETS -//react/player:player_vitest -//plugins/reference-assets/react:react_eslint
 
       - run:
           when: always
