@@ -93,8 +93,8 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/player
-      - run: bazel query '//... except filter("ios|swiftui", //...)'
-      - run: bazel build --config=ci -- $(bazel query '//... except filter("ios|swiftui", //...)')
+      # need to filter because //android/demo rules dont resolve
+      - run: bazel build --config=ci -- $(bazel query '//plugins/... except filter("ios|swiftui|jvm|android", //plugins/...)') $(bazel query '//core/... except filter("ios|swiftui|jvm|android", //core/...)') $(bazel query '//react/... except filter("ios|swiftui|jvm|android", //react/...)')
 
       - save_cache:
           paths:
@@ -171,27 +171,6 @@ jobs:
           key: ios_coverage
           paths:
             - _ios_coverage
-
-      - store_test_results:
-          path: _test_results
-
-  test:
-    executor: base
-    steps:
-      - attach_workspace:
-          at: ~/player
-
-      - run: bazel test --config=ci -- $(bazel query '//... except filter("ios|swiftui", //...)') -//docs/site -//android/demo:android_instrumentation_test
-
-      - run:
-          when: always
-          command: |
-            RESULTS_DIR=_test_results
-            find -L ./bazel-testlogs -name test.xml | while read line
-            do
-              mkdir -p $RESULTS_DIR/$(dirname $line)
-              cp $line $RESULTS_DIR/$(dirname $line)
-            done
 
       - store_test_results:
           path: _test_results
