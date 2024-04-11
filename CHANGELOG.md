@@ -1,3 +1,86 @@
+# 0.7.2 (Wed Apr 10 2024)
+
+### Release Notes
+
+#### Update Player Tools Version ([#334](https://github.com/player-ui/player/pull/334))
+
+- Update Player Tools to latest
+
+
+### Does your PR have any documentation updates?
+- [ ] Updated docs
+- [x] No Update needed
+- [ ] Unable to update docs
+
+#### Version Selector Fixes ([#330](https://github.com/player-ui/player/pull/330))
+
+Docs - Fix version selector not working and preserve route when changing versions
+
+#### [Docs] Update the DSL Benefits in Schema Section ([#326](https://github.com/player-ui/player/pull/326))
+
+Docs - Update DSL Schema benefits section 
+
+### Does your PR have any documentation updates?
+- [x] Updated docs
+- [ ] No Update needed
+- [ ] Unable to update docs
+
+#### Expose More Information About Expression Parsing Errors ([#328](https://github.com/player-ui/player/pull/328))
+
+Types - Expose types/utilities around expression parsing errors
+
+### Does your PR have any documentation updates?
+- [ ] Updated docs
+- [x] No Update needed
+- [ ] Unable to update docs
+
+#### Fix `commaNumber` Formatting when Using a Precision of 0 ([#319](https://github.com/player-ui/player/pull/319))
+
+Common Types Plugin - Fix `commaNumber` Formatting when Using a Precision of 0
+
+#### Expression Parser Strictness ([#315](https://github.com/player-ui/player/pull/315))
+
+Expose Expression Parser's strictness option via the `resolveOptions` hook
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#335](https://github.com/player-ui/player/pull/335) ([@intuit-svc](https://github.com/intuit-svc))
+- Update Player Tools Version [#334](https://github.com/player-ui/player/pull/334) ([@KetanReddy](https://github.com/KetanReddy))
+- Version Selector Fixes [#330](https://github.com/player-ui/player/pull/330) ([@KetanReddy](https://github.com/KetanReddy))
+- Move managed player mock flows to shared reference asset mocks [#217](https://github.com/player-ui/player/pull/217) (nancy_wu1@intuit.com [@nancywu1](https://github.com/nancywu1))
+- Android: Preserve old rendering path for non-suspendable assets [#314](https://github.com/player-ui/player/pull/314) ([@sugarmanz](https://github.com/sugarmanz) [@brocollie08](https://github.com/brocollie08))
+- Expose More Information About Expression Parsing Errors [#328](https://github.com/player-ui/player/pull/328) ([@KetanReddy](https://github.com/KetanReddy))
+- update iOS contributing guide [#323](https://github.com/player-ui/player/pull/323) ([@hborawski](https://github.com/hborawski))
+- update rules_player to latest 0.12.0 [#322](https://github.com/player-ui/player/pull/322) ([@hborawski](https://github.com/hborawski) [@brocollie08](https://github.com/brocollie08))
+- Fix `commaNumber` Formatting when Using a Precision of 0 [#319](https://github.com/player-ui/player/pull/319) ([@KetanReddy](https://github.com/KetanReddy))
+- Expression Parser Strictness [#315](https://github.com/player-ui/player/pull/315) ([@KetanReddy](https://github.com/KetanReddy))
+- Common Types Plugin restoring old dataRefs [#302](https://github.com/player-ui/player/pull/302) (alejandro_fimbres@intuit.com [@lexfm](https://github.com/lexfm) [@KetanReddy](https://github.com/KetanReddy))
+
+#### 📝 Documentation
+
+- [Docs] Update the DSL Benefits in Schema Section [#326](https://github.com/player-ui/player/pull/326) ([@KetanReddy](https://github.com/KetanReddy))
+- refactor nav docs slightly to better call out onEnd expressions [#321](https://github.com/player-ui/player/pull/321) ([@hborawski](https://github.com/hborawski))
+- PR Checklist update [#309](https://github.com/player-ui/player/pull/309) (marlon_ercillo@intuit.com [@mercillo](https://github.com/mercillo))
+- add syntax examples for default expressions [#317](https://github.com/player-ui/player/pull/317) ([@hborawski](https://github.com/hborawski))
+
+#### Authors: 11
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- afimbres (alejandro_fimbres@intuit.com)
+- Alex Fimbres ([@lexfm](https://github.com/lexfm))
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Marlon "Marky" Ercillo ([@mercillo](https://github.com/mercillo))
+- mercillo (marlon_ercillo@intuit.com)
+- zwu01 (nancy_wu1@intuit.com)
+
+---
+
 # 0.7.1 (Tue Mar 05 2024)
 
 ### Release Notes
