@@ -96,10 +96,9 @@ public class HookDecode<T>: BaseJSHook where T: Decodable {
         - hook: A function to run when the JS hook is fired
      */
     public func tap(_ hook: @escaping (T) -> Void) {
-        let tapMethod: @convention(block) (JSValue?, JSValue?) -> Void = { value, value2 in
+        let tapMethod: @convention(block) (JSValue?) -> Void = { value in
             guard
                 let val = value,
-                let val2 = value2,
                 let hookValue = try? JSONDecoder().decode(T.self, from: val)
             else { return }
             hook(hookValue)
@@ -123,11 +122,13 @@ public class Hook2Decode<T, U>: BaseJSHook where T: Decodable, U: Decodable {
      */
     public func tap(_ hook: @escaping (T, U) -> Void) {
         let tapMethod: @convention(block) (JSValue?, JSValue?) -> Void = { value, value2 in
+
+            let decoder = JSONDecoder()
             guard
                 let val = value,
                 let val2 = value2,
-                let hookValue = try? JSONDecoder().decode(T.self, from: val),
-                let hookValue2 = try? JSONDecoder().decode(U.self, from: val2)
+                let hookValue = try? decoder.decode(T.self, from: val),
+                let hookValue2 = try? decoder.decode(U.self, from: val2)
             else { return }
             hook(hookValue, hookValue2)
         }

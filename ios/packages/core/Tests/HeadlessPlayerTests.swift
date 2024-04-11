@@ -259,6 +259,7 @@ class HeadlessPlayerTests: XCTestCase {
         XCTAssertNotNil(player.state as? NotStartedState)
         player.hooks?.dataController.tap({ dataController in
             dataController.hooks.onUpdate.tap { updates in
+                XCTAssertEqual(updates.first?.binding.asString(), "count")
                 XCTAssertEqual(updates.first?.oldValue, AnyType.number(data: 0))
                 XCTAssertEqual(updates.first?.newValue, AnyType.number(data: 5))
                 updateExp.fulfill()
