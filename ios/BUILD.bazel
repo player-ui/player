@@ -14,6 +14,9 @@ xcodeproj(
         "//ios/logger:PlayerUILoggerTests",
         "//ios/swiftui:PlayerUISwiftUITests",
         "//ios/swiftui:PlayerUISwiftUIViewInspectorTests",
+        "//ios/test-utils-core:PlayerUITestUtilitiesCoreTests",
+        "//ios/test-utils:PlayerUITestUtilitiesTests",
+        "//ios/test-utils:PlayerUITestUtilitiesViewInspectorTests",
 
         # plugins
         "//plugins/beacon/ios:PlayerUIBaseBeaconPluginTests",
@@ -43,6 +46,8 @@ xcodeproj(
 
         "//plugins/reference-assets/swiftui:PlayerUIReferenceAssetsViewInspectorTests",
         "//plugins/reference-assets/swiftui:PlayerUIReferenceAssetsUITests",
+
+        "//plugins/stage-revert-data/ios:PlayerUIStageRevertDataPluginTests",
 
         "//plugins/transition/swiftui:PlayerUITransitionPluginViewInspectorTests",
         "//plugins/types-provider/ios:PlayerUITypesProviderPluginTests"

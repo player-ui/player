@@ -72,7 +72,11 @@ class HeadlessPlayerTests: XCTestCase {
         })
 
         player.start(flow: FlowData.COUNTER, completion: {_ in})
-        (player.state as? InProgressState)?.controllers?.flow.transition(with: "NEXT")
+        do {
+            try (player.state as? InProgressState)?.controllers?.flow.transition(with: "NEXT")
+        } catch {
+            XCTFail("Transition with 'NEXT' failed")
+        }
 
         wait(for: [inProgress, completed], timeout: 5)
     }
@@ -144,7 +148,11 @@ class HeadlessPlayerTests: XCTestCase {
         }
         XCTAssertNotNil(player.state as? InProgressState)
         XCTAssertEqual(player.state?.status, .inProgress)
-        (player.state as? InProgressState)?.controllers?.flow.transition(with: "NEXT")
+        do {
+            try (player.state as? InProgressState)?.controllers?.flow.transition(with: "NEXT")
+        } catch {
+            XCTFail("Transition with 'NEXT' failed")
+        }
     }
 
     func testPlayerControllers() {
