@@ -10,6 +10,7 @@ import Foundation
 import XCTest
 import JavaScriptCore
 @testable import PlayerUI
+@testable import PlayerUIInternalTestUtilities
 
 class JSValueExtensionsTests: XCTestCase {
     let context: JSContext = JSContext()
