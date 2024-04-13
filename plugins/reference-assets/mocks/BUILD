@@ -33,7 +33,7 @@ filegroup(
 
 filegroup(
     name = "mock-files",
-    srcs = glob(["**/*.json"]) + [":all_flows"],
+    srcs = glob(["**/*.json"], exclude = ["package.json"]) + [":all_flows"],
 )
 
 js_library(
@@ -47,23 +47,15 @@ npm_package(
     visibility = ["//visibility:public"],
 )
 
-# javascript_pipeline(
-#     name = "@player-ui/reference-assets-plugin-mocks",
-#     entry = "index.ts",
-#      dependencies = [
-#         "@npm//@player-tools/dsl",
-#         "//plugins/reference-assets/components:@player-ui/reference-assets-components"
-#     ],
-#     other_srcs = [
-#         "index.ts",
-#         ":mocks",
-#     ] + glob(["**/*.tsx"]),
-#     out_dir = "",
-# )
+generate_manifest(
+    name = "manifest",
+    mocks = [":mock-files"],
+    visibility = ["//visibility:public"],
+)
 
-# java_library(
-#     name = "jar",
-#     resources = [":mocks"],
-#     resource_strip_prefix = "plugins/reference-assets/mocks",
-#     visibility = ["//visibility:public"],
-# )
+java_library(
+    name = "jar",
+    resources = [":manifest"],
+    resource_strip_prefix = "plugins/reference-assets/mocks",
+    visibility = ["//visibility:public"],
+)

@@ -13,8 +13,8 @@ internal class RegistryPlugin<T> : JSPluginWrapper {
 
     /** apply core transforms */
     override fun apply(runtime: Runtime<*>) {
-        runtime.execute(readSource("plugins/partial-match-fingerprint/core/dist/partial-match-fingerprint-plugin.prod.js"))
-        runtime.execute(readSource("core/partial-match-registry/dist/partial-match-registry.prod.js"))
+        runtime.execute(readSource("plugins/partial-match-fingerprint/core/dist/PartialMatchFingerprintPlugin.native.js"))
+        runtime.execute(readSource("core/partial-match-registry/dist/PartialMatchRegistry.native.js"))
         instance = runtime.execute(
             """(new PartialMatchFingerprintPlugin.PartialMatchFingerprintPlugin(new Registry.Registry()))""",
         ) as Node

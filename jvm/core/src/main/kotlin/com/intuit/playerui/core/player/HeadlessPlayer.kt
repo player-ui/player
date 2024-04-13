@@ -169,8 +169,9 @@ public constructor(
 
     internal companion object {
 
-        private const val bundledSourcePath = "core/player/dist/player.prod.js"
-        private const val debugSourcePath = "core/player/dist/player.dev.js"
+        private const val bundledSourcePath = "core/player/dist/Player.native.js"
+        // TODO: Actually bundle debug source
+        private const val debugSourcePath = "core/player/dist/Player.native.js"
 
         /** Gets [URL] of the bundled source */
         private val bundledSource get() = this::class.java

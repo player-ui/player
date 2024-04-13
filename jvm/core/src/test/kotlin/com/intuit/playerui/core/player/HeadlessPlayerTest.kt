@@ -78,8 +78,8 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         player.inProgressState?.transition("Next")
 
         val result = flow.await()
-        assertEquals("done", result.endState.outcome)
-        assertEquals("generated-flow", result.flow.id)
+        assertEquals("DONE", result.endState.outcome)
+        assertEquals("collection-basic", result.flow.id)
     }
 
     @TestTemplate
@@ -146,7 +146,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
 
     @TestTemplate
     fun `test player can transition and skip validation`() = runBlockingTest {
-        player.start(mocks.findMockByName("input-validation")!!.getFlow())
+        player.start(mocks.findMockByName("input-transition")!!.getFlow())
 
         assertEquals("VIEW_1", player.inProgressState!!.currentFlowState?.name)
 
@@ -158,7 +158,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         player.inProgressState!!.forceTransition("Next")
 
         assertTrue(player.state is CompletedState)
-        assertEquals("done", player.completedState!!.endState.outcome)
+        assertEquals("DONE", player.completedState!!.endState.outcome)
     }
 
     @TestTemplate
@@ -174,7 +174,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
                 }
             }
         }
-        player.start(mocks.findMockByName("input-validation")!!.getFlow())
+        player.start(mocks.findMockByName("input-transition")!!.getFlow())
 
         val validationController = player.inProgressState!!.controllers.validation
 
@@ -242,7 +242,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
 
         state.transition("Next")
 
-        assertEquals("done", flowResultCompletable.await()!!.endState.outcome)
+        assertEquals("DONE", flowResultCompletable.await()!!.endState.outcome)
     }
 
     @TestTemplate
@@ -332,8 +332,8 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
 
         assertTrue(result.isSuccess)
 
-        assertEquals("done", result.getOrThrow().endState.outcome)
-        assertEquals("generated-flow", result.getOrThrow().flow.id)
+        assertEquals("DONE", result.getOrThrow().endState.outcome)
+        assertEquals("collection-basic", result.getOrThrow().flow.id)
     }
 
     @TestTemplate
@@ -364,8 +364,8 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
             runBlocking {
                 delay(1000)
                 val result = flow.await()
-                assertEquals("done", result.endState.outcome)
-                assertEquals("generated-flow", result.flow.id)
+                assertEquals("DONE", result.endState.outcome)
+                assertEquals("collection-basic", result.flow.id)
             }
         }
 
@@ -380,8 +380,8 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         player.inProgressState?.transition("Next")
 
         val result = flow.await()
-        assertEquals("done", result.endState.outcome)
-        assertEquals("generated-flow", result.flow.id)
+        assertEquals("DONE", result.endState.outcome)
+        assertEquals("collection-basic", result.flow.id)
     }
 
     @TestTemplate
@@ -451,7 +451,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
                   },
                   "END_Done": {
                     "state_type": "END",
-                    "outcome": "done"
+                    "outcome": "DONE"
                   }
                 }
               }
