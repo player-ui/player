@@ -239,7 +239,11 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
         XCTAssertNotNil(model.currentState)
 
-        (player.state as? InProgressState)?.controllers?.flow.transition(with: "next")
+        do {
+            try (player.state as? InProgressState)?.controllers?.flow.transition(with: "next")
+        } catch {
+            XCTFail("Transition with 'next' Failed")
+        }
 
         XCTAssertNil(model.currentState)
     }

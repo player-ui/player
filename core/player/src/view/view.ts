@@ -83,6 +83,7 @@ export class ViewInstance implements ValidationProvider {
     onUpdate: new SyncHook<[ViewType]>(),
     parser: new SyncHook<[Parser]>(),
     resolver: new SyncHook<[Resolver]>(),
+    onTemplatePluginCreated: new SyncHook<[TemplatePlugin]>(),
     templatePlugin: new SyncHook<[TemplatePlugin]>(),
   };
 
@@ -93,7 +94,7 @@ export class ViewInstance implements ValidationProvider {
 
   private validationProvider?: CrossfieldProvider;
 
-  private templatePlugin: TemplatePlugin;
+  private templatePlugin: TemplatePlugin | undefined;
 
   // TODO might want to add a version/timestamp to this to compare updates
   public lastUpdate: Record<string, any> | undefined;
@@ -101,12 +102,15 @@ export class ViewInstance implements ValidationProvider {
   constructor(initialView: ViewType, resolverOptions: Resolve.ResolverOptions) {
     this.initialView = initialView;
     this.resolverOptions = resolverOptions;
-    const pluginOptions = toNodeResolveOptions(resolverOptions);
-    new SwitchPlugin(pluginOptions).apply(this);
-    new ApplicabilityPlugin().apply(this);
-    new StringResolverPlugin().apply(this);
-    this.templatePlugin = new TemplatePlugin(pluginOptions);
-    this.templatePlugin.apply(this);
+    this.hooks.onTemplatePluginCreated.tap("view", (templatePlugin) => {
+      this.templatePlugin = templatePlugin;
+    });
+  }
+
+  public updateAsync() {
+    const update = this.resolver?.update();
+    this.lastUpdate = update;
+    this.hooks.onUpdate.call(update);
   }
 
   public update(changes?: Set<BindingInstance>) {
@@ -118,7 +122,13 @@ export class ViewInstance implements ValidationProvider {
         this.resolverOptions.logger,
       );
 
-      this.hooks.templatePlugin.call(this.templatePlugin);
+      if (this.templatePlugin) {
+        this.hooks.templatePlugin.call(this.templatePlugin);
+      } else {
+        this.resolverOptions.logger?.warn(
+          "templatePlugin not set for View, legacy templates may not work",
+        );
+      }
 
       const parser = new Parser();
       this.hooks.parser.call(parser);
@@ -146,4 +156,10 @@ export class ViewInstance implements ValidationProvider {
   getValidationsForBinding(binding: BindingInstance) {
     return this.validationProvider?.getValidationsForBinding(binding);
   }
+}
+
+/** A plugin for a view */
+export interface ViewPlugin {
+  /** Called with a view instance */
+  apply(view: ViewInstance): void;
 }
