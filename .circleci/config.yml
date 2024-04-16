@@ -229,7 +229,7 @@ jobs:
       # union the bundle targets until //... doesnt explode analyzing jvm/android targets
       - run: |
           BUNDLE_TARGETS=$(bazel query "kind(js_test, //plugins/...) union kind(js_test, //react/...) union kind(js_test, //core/...)" --output label 2>/dev/null | tr '\n' ' ')
-          bazel coverage --combined_report=lcov --config=ci -- $BUNDLE_TARGETS -//react/player:player_vitest -//plugins/reference-assets/react:react_eslint
+          bazel coverage --combined_report=lcov --config=ci -- $BUNDLE_TARGETS -//react/player:player_vitest
 
       - run:
           when: always
