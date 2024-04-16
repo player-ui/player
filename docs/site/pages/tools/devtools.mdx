@@ -1,0 +1,20 @@
+# Devtools
+
+Our Devtools player extension has been redesigned to work with manifest v3. It leverages plugins to handle communicated between the inspected Player-UI instance and the devtools extension panel. 
+
+## Devtools architecture
+The devtools extension is running an instance of Player. By running an instance of Player in the devtools extension; we are able to leverage the Player plugin system. The plugin author can select which hooks to tap in, what information to gather, and how to interact with it.
+
+The two instances of Player-UI [The extension and the inspected instance] are communicating through a Messenger class. This messenger class acts as a communication layer this is agnostic, self-sufficient, and a loss-less messenger designed for seamless communication between instances.
+It operates indepdently without a bookkeeper ensuring no data loss during communication.
+
+
+## Devtools basic plugin
+We provide a basic dev tools plugin that displays information about the inspected Player-ui Instance. It provides plugin information, flow, logs, and exposes a console for expression evaluation.
+
+## Devtools assets
+https://github.com/player-ui/devtools-assets, devtools UI is our collection of asset packages and assets that's designed to be leveraged with our devtools basic plugin.
+
+## How to write your own devtools plugins
+
+
