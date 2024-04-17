@@ -49,9 +49,6 @@ ios_ui_test(
         "//ios/logger:PlayerUILogger", 
         "//ios/internal-test-utils:PlayerUIInternalTestUtilities",
         "//plugins/reference-assets/swiftui:PlayerUIReferenceAssets",
-        "//plugins/beacon/ios:PlayerUIBaseBeaconPlugin",
-        "//plugins/beacon/swiftui:PlayerUIBeaconPlugin",
-        "//plugins/common-types/ios:PlayerUICommonTypesPlugin",
         ":PlayerUITestUtilities"
     ],
     visibility = ["//visibility:public"],
