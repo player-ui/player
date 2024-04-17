@@ -47,7 +47,7 @@ def assemble_pod(
       srcs = ["podspec", "srcs"] + data_pkgs
   )
 
-def ios_pipeline(name, resources, deps, test_deps, hasUnitTests, hasViewInspectorTests):
+def ios_pipeline(name, resources, deps, test_deps, hasUnitTests, hasViewInspectorTests, needsXCTest = False):
   """Packages source files, creates swift library and tests for a swift PlayerUI plugin
 
   Args:
@@ -59,6 +59,7 @@ def ios_pipeline(name, resources, deps, test_deps, hasUnitTests, hasViewInspecto
     test_deps: Dependencies for the tests of this plugin
     hasUnitTests: Whether or not to generate ios_unit_test tests
     hasUITests: Whether or not to generate ios_ui_test tests
+    needsXCTest: set the 'testonly' attribute on swift_library
   """
 
   # if we are backed by a JS package, these attributes
@@ -93,6 +94,7 @@ def ios_pipeline(name, resources, deps, test_deps, hasUnitTests, hasViewInspecto
       module_name = name,
       srcs = [":" + name + "_Sources"] + resourceSources,
       visibility = ["//visibility:public"],
+      testonly = needsXCTest,
       deps = deps,
       data = data,
       # this define makes Bundle.module extension work from ios_bundle_module_shim
