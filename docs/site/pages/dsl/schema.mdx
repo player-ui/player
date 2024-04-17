@@ -262,6 +262,9 @@ const exampleSchema = {
 } satisfies CommonDSLSchema
 ```
 
+_Note: The `satisfies` Typescript operator is used instead of type assignment (`exampleSchema:DSLSChema`), because `satisfies` doesn't lose the inferred type of your value by changing and broadening the type unlike using assignment, it simply type-checks, creating localised feedback if anything is incorrect._
+
+
 # Using the Schema Object in JSX/TSX Content
 
 As the schema is now a TypeScript obejct, you can now directly reference the schema anywhere in content. The `makeBindingsForObject()` function takes your schema object and constructs the bindings opaquely within the object. This allows the use of the native path in your authored content and for the actual underlying binding to be used when the content is compiled. Additionally, as the underlying bindings are exposed, can you can use the native object path with functions like `.toString()`, `.toValue()`, and `toRefString()` like you could with regular string template bindings.
