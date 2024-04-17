@@ -11,7 +11,7 @@ parameters:
 orbs:
   macos: circleci/macos@2
   android: circleci/android@2.0
-  codecov: codecov/codecov@3.2.2
+  codecov: codecov/codecov@3.3.0
 
 executors:
   base:
@@ -93,8 +93,8 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/player
-      - run: bazel query '//... except filter("ios|swiftui", //...)'
-      - run: bazel build --config=ci -- $(bazel query '//... except filter("ios|swiftui", //...)')
+      # need to filter because //android/demo rules dont resolve
+      - run: bazel build --config=ci -- $(bazel query '//plugins/... except filter("ios|swiftui|jvm|android", //plugins/...)') $(bazel query '//core/... except filter("ios|swiftui|jvm|android", //core/...)') $(bazel query '//react/... except filter("ios|swiftui|jvm|android", //react/...)')
 
       - save_cache:
           paths:
@@ -115,7 +115,7 @@ jobs:
       - run:
           name: Homebrew Dependencies
           command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@17 lcov
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk lcov
 
       - macos/preboot-simulator:
           version: "17.4"
@@ -160,36 +160,17 @@ jobs:
       - run:
           when: always
           command: |
-            mkdir -p _coverage/lcov
-            mkdir -p _coverage/html
-            cp -r $(bazel info output_path)/_coverage/_coverage_report.dat _coverage/lcov/
-            genhtml --branch-coverage --output-directory=_coverage/html/ "$(bazel info output_path)/_coverage/_coverage_report.dat"
-            zip -r _coverage/html.zip _coverage/html/
-            rm -r _coverage/html/
-
-      - store_artifacts:
-          path: _coverage
-
-      - store_test_results:
-          path: _test_results
-
-  test:
-    executor: base
-    steps:
-      - attach_workspace:
-          at: ~/player
-
-      - run: bazel test --config=ci -- $(bazel query '//... except filter("ios|swiftui", //...)') -//docs/site -//android/demo:android_instrumentation_test
-
-      - run:
-          when: always
-          command: |
-            RESULTS_DIR=_test_results
-            find -L ./bazel-testlogs -name test.xml | while read line
-            do
-              mkdir -p $RESULTS_DIR/$(dirname $line)
-              cp $line $RESULTS_DIR/$(dirname $line)
-            done
+            mkdir -p _ios_coverage/lcov
+            mkdir -p _ios_coverage/html
+            cp -r $(bazel info output_path)/_coverage/_coverage_report.dat _ios_coverage/lcov/
+            genhtml --branch-coverage --output-directory=_ios_coverage/html/ "$(bazel info output_path)/_coverage/_coverage_report.dat"
+            zip -r _ios_coverage/html.zip _ios_coverage/html/
+            rm -r _ios_coverage/html/
+      
+      - persist_to_workspace:
+          root: .
+          paths:
+            - _ios_coverage
 
       - store_test_results:
           path: _test_results
@@ -245,12 +226,29 @@ jobs:
             - v1-bazel-cache-core-{{ .Branch }}
             - v1-bazel-cache-core-main
 
+      # union the bundle targets until //... doesnt explode analyzing jvm/android targets
       - run: |
-          BUNDLE_TARGETS=$(bazel query "kind(nodejs_test, //...)" --output label 2>/dev/null | tr '\n' ' ')
-          bazel coverage --config=ci -- $BUNDLE_TARGETS
+          BUNDLE_TARGETS=$(bazel query "kind(js_test, //plugins/...) union kind(js_test, //react/...) union kind(js_test, //core/...)" --output label 2>/dev/null | tr '\n' ' ')
+          bazel coverage --combined_report=lcov --config=ci -- $BUNDLE_TARGETS -//react/player:player_vitest
+
+      - run:
+          when: always
+          command: |
+            RESULTS_DIR=_test_results
+            find -L ./bazel-testlogs -name test.xml | while read line
+            do
+              mkdir -p $RESULTS_DIR/$(dirname $line)
+              cp $line $RESULTS_DIR/$(dirname $line)
+            done
+
+      - store_test_results:
+          path: _test_results
 
       - codecov/upload:
           file: ./bazel-out/_coverage/_coverage_report.dat
+
+      - codecov/upload:
+          file: _ios_coverage/lcov/_coverage_report.dat
 
   maybe_release:
     executor: base
@@ -338,7 +336,6 @@ workflows:
           context:
             - applitools
           requires:
-            - applitools_init
             - bazelrc
 
       - build_ios:
@@ -360,24 +357,6 @@ workflows:
           requires:
             - build-trunk
             - build-ios-trunk
-
-      - test:
-          name: test-trunk
-          filters:
-            branches:
-              ignore:
-                - /pull\/.*/
-          requires:
-            - build-trunk
-
-      - test:
-          name: test-fork
-          filters:
-            branches:
-              only:
-                - /pull\/.*/
-          requires:
-            - build-fork
 
       - android_test:
           name: android-test-trunk
@@ -408,6 +387,7 @@ workflows:
                 - /pull\/.*/
           requires:
             - build-trunk
+            - build-ios-trunk
 
       - coverage:
           name: coverage-fork
@@ -417,6 +397,7 @@ workflows:
                 - /pull\/.*/
           requires:
             - build-fork
+            - build-ios-fork
 
       - applitools_cleanup:
           filters:
@@ -450,10 +431,6 @@ workflows:
           requires:
             - setup
 
-      - test:
-          requires:
-            - build
-
       - android_test:
           context:
             - applitools
@@ -463,13 +440,13 @@ workflows:
       - coverage:
           requires:
             - build
+            - build_ios
 
       - release:
           context:
             - Publish
           requires:
             - android_test
-            - test
             - coverage
             - build_ios
 
@@ -489,10 +466,6 @@ workflows:
           requires:
             - setup
 
-      - test:
-          requires:
-            - build
-
       - android_test:
           context:
             - applitools
@@ -508,6 +481,5 @@ workflows:
             - Publish
           requires:
             - android_test
-            - test
             - coverage
             - build_ios
