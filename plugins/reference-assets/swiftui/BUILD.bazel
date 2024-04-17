@@ -1,70 +1,21 @@
-load("@rules_pkg//:mappings.bzl", "pkg_files", "strip_prefix")
-load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
-load("@build_bazel_rules_apple//apple:resources.bzl", "apple_resource_bundle")
+load("//tools/ios:util.bzl", "swiftui_plugin")
+load("@build_bazel_rules_ios//rules:test.bzl", "ios_ui_test")
 
-load("@build_bazel_rules_ios//rules:test.bzl", "ios_unit_test", "ios_ui_test")
-load("@build_bazel_rules_apple//apple:ios.bzl", "ios_framework", "ios_build_test")
-
-load("//tools/ios:util.bzl", "ios_bundle_module_shim")
-
-apple_resource_bundle(
-    name = "PlayerUIReferenceAssetsResourceBundle",
-    bundle_name = "ReferenceAssets",
-    bundle_id = "com.intuit.ios.player.resources.core",
+swiftui_plugin(
+    name = "ReferenceAssets",
     resources = ["//plugins/reference-assets/swiftui/Resources:PlayerUIReferenceAssets_Resources", "//plugins/reference-assets/core:core_native_bundle"],
-    infoplists = ["//tools/ios:Info.plist"]
-)
-
-ios_bundle_module_shim("ReferenceAssets")
-
-pkg_files(
-    name = "PlayerUIReferenceAssets_Sources",
-    srcs = glob(["Sources/**/*.swift"]),
-    strip_prefix = strip_prefix.from_pkg(),
-    visibility = ["//visibility:public"],
-)
-
-swift_library(
-    name = "PlayerUIReferenceAssets",
-    module_name = "PlayerUIReferenceAssets",
-    srcs = [":PlayerUIReferenceAssets_Sources", ":ReferenceAssetsResourceShim"],
-    visibility = ["//visibility:public"],
     deps = [
-        "//ios/core:PlayerUI",
         "//ios/swiftui:PlayerUISwiftUI",
         "//plugins/beacon/swiftui:PlayerUIBeaconPlugin",
         "//plugins/pending-transaction/swiftui:PlayerUISwiftUIPendingTransactionPlugin"
     ],
-    data = [":PlayerUIReferenceAssetsResourceBundle"],
-    defines = ["BAZEL_TARGET"]
+    test_deps = [
+        "//ios/test-utils:PlayerUITestUtilities",
+    ]
 )
 
-ios_build_test(
-    name = "PlayerUIReferenceAssetsBuild",
-    minimum_os_version = "14.0",
-    targets = [
-        ":PlayerUIReferenceAssets",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-ios_ui_test(
-    name = "PlayerUIReferenceAssetsViewInspectorTests",
-    srcs = glob(["ViewInspector/**/*.swift"]),
-    minimum_os_version = "14.0",
-    deps = [
-        "@swiftpkg_viewinspector//:Sources_ViewInspector",
-        "//ios/swiftui:PlayerUISwiftUI", 
-        "//ios/core:PlayerUI", 
-        "//ios/test-utils:PlayerUITestUtilities", 
-        "//ios/internal-test-utils:PlayerUIInternalTestUtilities",
-        ":PlayerUIReferenceAssets",
-        "//plugins/beacon/swiftui:PlayerUIBeaconPlugin"
-    ],
-    visibility = ["//visibility:public"],
-    test_host = "//ios/demo:PlayerUIDemo"
-)
-
+# This is the only plugin with XCUITests
+# so it's not in the macro currently
 ios_ui_test(
     name = "PlayerUIReferenceAssetsUITests",
     srcs = glob(["UITests/**/*.swift"]),

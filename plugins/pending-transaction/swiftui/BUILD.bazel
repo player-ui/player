@@ -1,33 +1,10 @@
-load("@rules_pkg//:mappings.bzl", "pkg_files", "strip_prefix")
-load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+load("//tools/ios:util.bzl", "swiftui_plugin")
 
-load("@build_bazel_rules_ios//rules:test.bzl", "ios_unit_test", "ios_ui_test")
-
-pkg_files(
-    name = "PlayerUISwiftUIPendingTransactionPlugin_Sources",
-    srcs = glob(["Sources/**/*.swift"]),
-    strip_prefix = strip_prefix.from_pkg(),
-    visibility = ["//visibility:public"],
-)
-
-swift_library(
-    name = "PlayerUISwiftUIPendingTransactionPlugin",
-    module_name = "PlayerUISwiftUIPendingTransactionPlugin",
-    srcs = [":PlayerUISwiftUIPendingTransactionPlugin_Sources"],
-    visibility = ["//visibility:public"],
-    deps = ["//ios/core:PlayerUI", "//ios/swiftui:PlayerUISwiftUI"],
-    defines = ["BAZEL_TARGET"]
-)
-
-ios_ui_test(
-    name = "PlayerUISwiftUIPendingTransactionPluginViewInspectorTests",
-    srcs = glob(["ViewInspector/**/*.swift"]),
-    minimum_os_version = "14.0",
+swiftui_plugin(
+    name = "SwiftUIPendingTransactionPlugin",
+    resources = [],
     deps = [
-        "@swiftpkg_viewinspector//:Sources_ViewInspector",
-        ":PlayerUISwiftUIPendingTransactionPlugin", 
-        "//ios/core:PlayerUI"
+        "//ios/swiftui:PlayerUISwiftUI",
     ],
-    visibility = ["//visibility:public"],
-    test_host = "//ios/demo:PlayerUIDemo"
+    test_deps = []
 )
