@@ -1,0 +1,15 @@
+---
+title: Platforms
+---
+
+# Platforms
+
+The Player platform is built to be platform-agnostic, enabling us to power each platform integration with the same code. The shared code layer is written in TypeScript, requiring JS execution capabilities for non-JS platforms (Android, iOS).
+
+The core Player platform is technically headless, meaning it doesn't contain any UI framework mechanisms. Each platform integration consumes the core Player, but adds a UI framework integration.
+
+The documentation [`Guides`](/getting-started) were written to be followed regardless of what platform you're targeting, but more advanced integrations may require some explicit platform documentation. Take a look at the specific platform docs for answers to platform specific questions:
+- [Android](/platforms/android)
+- [iOS](/platforms/ios)
+- [JVM](/platforms/jvm)
+- [Web - React](/platforms/web-react)
