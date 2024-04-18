@@ -90,132 +90,52 @@ and display it as a SwiftUI view comprised of registered assets.
   end
   # </PACKAGES>
 
+  ios_plugin = lambda { |name, path, resources|
+    s.subspec name do |subspec|
+      subspec.dependency 'PlayerUI/Core'
+      subspec.source_files = "plugins/#{path}/ios/Sources/**/*"
+      if resources == TRUE
+        subspec.resource_bundles = {
+          name => ["plugins/#{path}/ios/Resources/**/*.js"]
+        }
+      end
+    end
+  }
+
+  swiftui_plugin = lambda { |name, path, deps, resources|
+    s.subspec name do |subspec|
+      subspec.dependency 'PlayerUI/Core'
+      subspec.dependency 'PlayerUI/SwiftUI'
+      deps.each { |dep|
+        subspec.dependency "PlayerUI/#{dep}"
+      }
+      subspec.source_files = "plugins/#{path}/swiftui/Sources/**/*"
+      if resources == TRUE
+        subspec.resource_bundles = {
+          name => ["plugins/#{path}/swiftui/Resources/**/*.js"]
+        }
+      end
+    end
+  }
+
   # <PLUGINS>
-  s.subspec 'PrintLoggerPlugin' do |plugin|
-    plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'plugins/console-logger/ios/Sources/**/*'
-  end
+  ios_plugin.call("BaseBeaconPlugin", "beacon", TRUE)
+  ios_plugin.call("CheckPathPlugin", "check-path", TRUE)
+  ios_plugin.call("CommonExpressionsPlugin", "common-expressions", TRUE)
+  ios_plugin.call("CommonTypesPlugin", "common-types", TRUE)
+  ios_plugin.call("ComputedPropertiesPlugin", "computed-properties", TRUE)
+  ios_plugin.call("ExpressionPlugin", "expression", TRUE)
+  ios_plugin.call("ExternalActionPlugin", "external-action", TRUE)
+  ios_plugin.call("PubSubPlugin", "pubsub", TRUE)
+  ios_plugin.call("StageRevertDataPlugin", "stage-revert-data", TRUE)
+  ios_plugin.call("TypesProviderPlugin", "types-provider", TRUE)
+  ios_plugin.call("PrintLoggerPlugin", "console-logger", FALSE)
 
-  s.subspec 'TransitionPlugin' do |plugin|
-    plugin.dependency 'PlayerUI/Core'
-    plugin.dependency 'PlayerUI/SwiftUI'
-    plugin.source_files = 'plugins/transition/swiftui/Sources/**/*'
-  end
-
-  s.subspec 'BaseBeaconPlugin' do |plugin|
-    plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'plugins/beacon/ios/Sources/**/*'
-    plugin.resource_bundles = {
-      'BaseBeaconPlugin' => ['plugins/beacon/ios/Resources/**/*.js']
-    }
-  end
-
-  s.subspec 'BeaconPlugin' do |plugin|
-    plugin.dependency 'PlayerUI/Core'
-    plugin.dependency 'PlayerUI/SwiftUI'
-    plugin.dependency 'PlayerUI/BaseBeaconPlugin'
-    plugin.source_files = 'plugins/beacon/swiftui/Sources/**/*'
-  end
-
-  s.subspec 'CheckPathPlugin' do |plugin|
-    plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'plugins/check-path/ios/Sources/**/*'
-    plugin.resource_bundles = {
-      'CheckPathPlugin' => ['plugins/check-path/ios/Resources/**/*.js']
-    }
-  end
-
-  s.subspec 'CommonTypesPlugin' do |plugin|
-    plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'plugins/common-types/ios/Sources/**/*'
-    plugin.resource_bundles = {
-      'CommonTypesPlugin' => ['plugins/common-types/ios/Resources/**/*.js']
-    }
-  end
-
-  s.subspec 'ComputedPropertiesPlugin' do |plugin|
-    plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'plugins/computed-properties/ios/Sources/**/*'
-    plugin.resource_bundles = {
-      'ComputedPropertiesPlugin' => ['plugins/computed-properties/ios/Resources/**/*.js']
-    }
-  end
-
-  s.subspec 'CommonExpressionsPlugin' do |plugin|
-    plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'plugins/common-expressions/ios/Sources/**/*'
-    plugin.resource_bundles = {
-      'CommonExpressionsPlugin' => ['plugins/common-expressions/ios/Resources/**/*.js']
-    }
-  end
-
-  s.subspec 'ExpressionPlugin' do |plugin|
-    plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'plugins/expression/ios/Sources/**/*'
-    plugin.resource_bundles = {
-      'ExpressionPlugin' => ['plugins/expression/ios/Resources/**/*.js']
-    }
-  end
-
-  s.subspec 'ExternalActionPlugin' do |plugin|
-    plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'plugins/external-action/ios/Sources/**/*'
-    plugin.resource_bundles = {
-      'ExternalActionPlugin' => ['plugins/external-action/ios/Resources/**/*.js']
-    }
-  end
-
-  s.subspec 'ExternalActionViewModifierPlugin' do |plugin|
-    plugin.dependency 'PlayerUI/Core'
-    plugin.dependency 'PlayerUI/SwiftUI'
-    plugin.dependency 'PlayerUI/ExternalActionPlugin'
-    plugin.source_files = 'plugins/external-action/swiftui/Sources/**/*'
-  end
-
-  s.subspec 'MetricsPlugin' do |plugin|
-    plugin.dependency 'PlayerUI/Core'
-    plugin.dependency 'PlayerUI/SwiftUI'
-    plugin.source_files = 'plugins/metrics/swiftui/Sources/**/*'
-    plugin.resource_bundles = {
-      'MetricsPlugin' => ['plugins/metrics/swiftui/Resources/**/*.js']
-    }
-  end
-
-  s.subspec 'PubSubPlugin' do |plugin|
-    plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'plugins/pubsub/ios/Sources/**/*'
-    plugin.resource_bundles = {
-      'PubSubPlugin' => ['plugins/pubsub/ios/Resources/**/*.js']
-    }
-  end
-
-  s.subspec 'StageRevertDataPlugin' do |plugin|
-    plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'plugins/stage-revert-data/ios/Sources/**/*'
-    plugin.resource_bundles = {
-      'StageRevertDataPlugin' => ['plugins/stage-revert-data/ios/Resources/**/*.js']
-    }
-  end
-
-  s.subspec 'SwiftUICheckPathPlugin' do |plugin|
-    plugin.dependency 'PlayerUI/Core'
-    plugin.dependency 'PlayerUI/SwiftUI'
-    plugin.dependency 'PlayerUI/CheckPathPlugin'
-    plugin.source_files = 'plugins/check-path/swiftui/Sources/**/*'
-  end
-
-  s.subspec 'SwiftUIPendingTransactionPlugin' do |plugin|
-    plugin.dependency 'PlayerUI/Core'
-    plugin.dependency 'PlayerUI/SwiftUI'
-    plugin.source_files = 'plugins/pending-transaction/swiftui/Sources/**/*'
-  end
-
-  s.subspec 'TypesProviderPlugin' do |plugin|
-    plugin.dependency 'PlayerUI/Core'
-    plugin.source_files = 'plugins/types-provider/ios/Sources/**/*'
-    plugin.resource_bundles = {
-      'TypesProviderPlugin' => ['plugins/types-provider/ios/Resources/**/*.js']
-    }
-  end
+  swiftui_plugin.call("BeaconPlugin", "beacon", ["BaseBeaconPlugin"], FALSE)
+  swiftui_plugin.call("MetricsPlugin", "metrics", [], TRUE)
+  swiftui_plugin.call("SwiftUICheckPathPlugin", "check-path", ["CheckPathPlugin"], FALSE)
+  swiftui_plugin.call("ExternalActionViewModifierPlugin", "external-action", ["ExternalActionPlugin"], FALSE)
+  swiftui_plugin.call("SwiftUIPendingTransactionPlugin", "pending-transaction", [], FALSE)
+  swiftui_plugin.call("TransitionPlugin", "transition", [], FALSE)
   # </PLUGINS>
 end

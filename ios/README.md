@@ -180,7 +180,17 @@ products: [
 
 #### PlayerUI.podspec
 
-WIP
+In `PlayerUI.podspec` subspecs are listed in a single location, and there are `ios_plugin` and `swiftui_plugin` functions to generate the subspec entries.
+
+```ruby
+# Plugin Name, Path, Resources
+ios_plugin("ExamplePlugin", "example", FALSE)
+# Plugin Name, Path, Dependencies, Resources
+swiftui_plugin("ExamplePlugin", "example", ["OtherPlugin"] FALSE)
+```
+
+##### Adding Utility Packages
+For packages that do not fit the plugin pattern, subspecs must be manually specified to set the appropriate file paths for Sources and Resources.
 
 ### Artifacts
 
