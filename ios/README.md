@@ -184,9 +184,9 @@ In `PlayerUI.podspec` subspecs are listed in a single location, and there are `i
 
 ```ruby
 # Plugin Name, Path, Resources
-ios_plugin("ExamplePlugin", "example", FALSE)
+ios_plugin.call("ExamplePlugin", "example", FALSE)
 # Plugin Name, Path, Dependencies, Resources
-swiftui_plugin("ExamplePlugin", "example", ["OtherPlugin"] FALSE)
+swiftui_plugin.call("ExamplePlugin", "example", ["OtherPlugin"] FALSE)
 ```
 
 ##### Adding Utility Packages

@@ -38,6 +38,33 @@ and display it as a SwiftUI view comprised of registered assets.
     }
   end
 
+  s.subspec 'SwiftUI' do |swiftui|
+    swiftui.dependency 'PlayerUI/Core'
+
+    swiftui.source_files = 'ios/swiftui/Sources/**/*'
+  end
+
+  s.subspec 'Logger' do |pkg|
+    pkg.dependency 'SwiftHooks', '~> 0', '>= 0.1.0'
+    pkg.source_files = 'ios/logger/Sources/**/*'
+  end
+
+  s.subspec 'ReferenceAssets' do |assets|
+    assets.dependency 'PlayerUI/Core'
+    assets.dependency 'PlayerUI/SwiftUI'
+    assets.dependency 'PlayerUI/BeaconPlugin'
+    assets.dependency 'PlayerUI/SwiftUIPendingTransactionPlugin'
+
+    assets.source_files = 'plugins/reference-assets/swiftui/Sources/**/*'
+    assets.resource_bundles = {
+      'ReferenceAssets' => [
+        'plugins/reference-assets/swiftui/Resources/js/**/*.js',
+        'plugins/reference-assets/swiftui/Resources/svg/*.xcassets',
+        'plugins/reference-assets/swiftui/Resources/svg/*.xcassets/**/*'
+      ]
+    }
+  end
+
   s.subspec 'TestUtilitiesCore' do |utils|
     utils.dependency 'PlayerUI/Core'
     utils.dependency 'PlayerUI/SwiftUI'
@@ -60,33 +87,6 @@ and display it as a SwiftUI view comprised of registered assets.
       'ENABLE_BITCODE' => 'NO',
       'ENABLE_TESTING_SEARCH_PATHS' => 'YES'
     }
-  end
-
-  s.subspec 'ReferenceAssets' do |assets|
-    assets.dependency 'PlayerUI/Core'
-    assets.dependency 'PlayerUI/SwiftUI'
-    assets.dependency 'PlayerUI/BeaconPlugin'
-    assets.dependency 'PlayerUI/SwiftUIPendingTransactionPlugin'
-
-    assets.source_files = 'plugins/reference-assets/swiftui/Sources/**/*'
-    assets.resource_bundles = {
-      'ReferenceAssets' => [
-        'plugins/reference-assets/swiftui/Resources/js/**/*.js',
-        'plugins/reference-assets/swiftui/Resources/svg/*.xcassets',
-        'plugins/reference-assets/swiftui/Resources/svg/*.xcassets/**/*'
-      ]
-    }
-  end
-
-  s.subspec 'SwiftUI' do |swiftui|
-    swiftui.dependency 'PlayerUI/Core'
-
-    swiftui.source_files = 'ios/swiftui/Sources/**/*'
-  end
-
-  s.subspec 'Logger' do |pkg|
-    pkg.dependency 'SwiftHooks', '~> 0', '>= 0.1.0'
-    pkg.source_files = 'ios/logger/Sources/**/*'
   end
   # </PACKAGES>
 
