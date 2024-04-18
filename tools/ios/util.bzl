@@ -47,7 +47,16 @@ def assemble_pod(
       srcs = ["podspec", "srcs"] + data_pkgs
   )
 
-def ios_pipeline(name, resources, deps, test_deps, hasUnitTests, hasViewInspectorTests, needsXCTest = False):
+def ios_pipeline(
+  name,
+  resources,
+  deps,
+  test_deps,
+  hasUnitTests,
+  hasViewInspectorTests,
+  needsXCTest = False,
+  bundle_name = None
+):
   """Packages source files, creates swift library and tests for a swift PlayerUI plugin
 
   Args:
@@ -60,6 +69,7 @@ def ios_pipeline(name, resources, deps, test_deps, hasUnitTests, hasViewInspecto
     hasUnitTests: Whether or not to generate ios_unit_test tests
     hasUITests: Whether or not to generate ios_ui_test tests
     needsXCTest: set the 'testonly' attribute on swift_library
+    bundle_name: optionally override the name used for the resource bundle
   """
 
   # if we are backed by a JS package, these attributes
@@ -68,17 +78,19 @@ def ios_pipeline(name, resources, deps, test_deps, hasUnitTests, hasViewInspecto
   data = []
   resourceSources = []
 
+  bundleName = bundle_name if bundle_name != None else name
+
   if len(resources) > 0:
     apple_resource_bundle(
       name = name + "ResourceBundle",
-      bundle_name = name,
+      bundle_name = bundleName,
       bundle_id = "com.intuit.ios.player.resources."+name,
       resources = resources,
     )
 
-    ios_bundle_module_shim(name)
+    ios_bundle_module_shim(bundleName)
     data.append(":" + name + "ResourceBundle")
-    resourceSources.append(":" + name + "ResourceShim")
+    resourceSources.append(":" + bundleName + "ResourceShim")
 
   # Group up files to be used in swift_library
   # and in //:PlayerUI_Pod which builds the zip of sources
@@ -148,7 +160,9 @@ def ios_plugin(name, resources = [], deps = [], test_deps = []):
       deps = deps + default_dependencies,
       test_deps = test_deps + default_test_dependencies,
       hasUnitTests = True, 
-      hasViewInspectorTests = False
+      hasViewInspectorTests = False,
+      needsXCTest = False,
+      bundle_name = name
   )
 
 def swiftui_plugin(name, resources = [], deps = [], test_deps = []):
@@ -168,5 +182,7 @@ def swiftui_plugin(name, resources = [], deps = [], test_deps = []):
       deps = deps + default_dependencies,
       test_deps = test_deps + default_test_dependencies,
       hasUnitTests = False, 
-      hasViewInspectorTests = True
+      hasViewInspectorTests = True,
+      needsXCTest = False,
+      bundle_name = name
   )
