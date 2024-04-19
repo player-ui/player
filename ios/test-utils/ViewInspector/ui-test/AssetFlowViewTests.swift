@@ -12,14 +12,10 @@ import SwiftUI
 import ViewInspector
 
 @testable import PlayerUI
-@testable import PlayerUICommonTypesPlugin
-@testable import PlayerUIBaseBeaconPlugin
-@testable import PlayerUIBeaconPlugin
 @testable import PlayerUIReferenceAssets
 @testable import PlayerUITestUtilities
 @testable import PlayerUITestUtilitiesCore
 @testable import PlayerUISwiftUI
-@testable import PlayerUIInternalTestUtilities
 @testable import PlayerUIInternalTestUtilities
 
 class AssetFlowViewTests: XCTestCase {
@@ -32,9 +28,7 @@ class AssetFlowViewTests: XCTestCase {
         let view = AssetFlowView(
             flow: flow,
             plugins: [
-                ReferenceAssetsPlugin(),
-                BeaconPlugin<DefaultBeacon> {_ in},
-                CommonTypesPlugin()
+                ReferenceAssetsPlugin()
             ]
         ) { _ in
         }
@@ -113,8 +107,6 @@ class AssetFlowViewTests: XCTestCase {
             flow: flow,
             plugins: [
                 ReferenceAssetsPlugin(),
-                BeaconPlugin<DefaultBeacon> {_ in},
-                CommonTypesPlugin(),
                 ForceTransitionPlugin()
             ]
         ) { _ in

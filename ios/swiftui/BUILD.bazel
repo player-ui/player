@@ -1,43 +1,16 @@
-load("@rules_pkg//:mappings.bzl", "pkg_files", "strip_prefix")
-load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+load("//tools/ios:util.bzl", "ios_pipeline")
 
-load("@build_bazel_rules_ios//rules:test.bzl", "ios_unit_test", "ios_ui_test")
-
-pkg_files(
-    name = "PlayerUISwiftUI_Sources",
-    srcs = glob(["Sources/**/*.swift"]),
-    strip_prefix = strip_prefix.from_pkg(),
-    visibility = ["//visibility:public"],
-)
-
-swift_library(
+ios_pipeline(
     name = "PlayerUISwiftUI",
-    module_name = "PlayerUISwiftUI",
-    srcs = [":PlayerUISwiftUI_Sources"],
-    visibility = ["//visibility:public"],
-    deps = ["@swiftpkg_swift_hooks//:Sources_SwiftHooks", "//ios/core:PlayerUI"],
-    defines = ["BAZEL_TARGET"]
-)
-
-ios_unit_test(
-    name = "PlayerUISwiftUITests",
-    srcs = glob(["Tests/**/*.swift"]),
-    minimum_os_version = "14.0",
-    deps = [":PlayerUISwiftUI", "//ios/core:PlayerUI", "//ios/internal-test-utils:PlayerUIInternalTestUtilities"],
-    visibility = ["//visibility:public"]
-)
-
-ios_ui_test(
-    name = "PlayerUISwiftUIViewInspectorTests",
-    srcs = glob(["ViewInspector/**/*.swift"]),
-    minimum_os_version = "14.0",
+    resources = [],
     deps = [
-        "@swiftpkg_viewinspector//:Sources_ViewInspector",
-        ":PlayerUISwiftUI", 
-        "//ios/core:PlayerUI", 
-        "//ios/internal-test-utils:PlayerUIInternalTestUtilities",
-        "//plugins/reference-assets/swiftui:PlayerUIReferenceAssets"
+        "@swiftpkg_swift_hooks//:Sources_SwiftHooks",
+        "//ios/core:PlayerUI"
     ],
-    visibility = ["//visibility:public"],
-    test_host = "//ios/demo:PlayerUIDemo"
+    test_deps = [
+        "//plugins/reference-assets/swiftui:PlayerUIReferenceAssets",
+        "//ios/internal-test-utils:PlayerUIInternalTestUtilities"
+    ],
+    hasUnitTests = True,
+    hasViewInspectorTests = True
 )

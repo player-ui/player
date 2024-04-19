@@ -1,49 +1,12 @@
-load("@rules_pkg//:mappings.bzl", "pkg_files", "strip_prefix")
-load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
-load("@build_bazel_rules_apple//apple:resources.bzl", "apple_resource_bundle")
+load("//tools/ios:util.bzl", "swiftui_plugin")
 
-load("@build_bazel_rules_ios//rules:test.bzl", "ios_ui_test")
-
-load("//tools/ios:util.bzl", "ios_bundle_module_shim")
-
-apple_resource_bundle(
-    name = "PlayerUIMetricsPluginResourceBundle",
-    bundle_name = "MetricsPlugin",
-    bundle_id = "com.intuit.ios.player.resources.core",
-    resources = ["//plugins/metrics/core:core_native_bundle"]
-)
-
-ios_bundle_module_shim("MetricsPlugin")
-
-pkg_files(
-    name = "PlayerUIMetricsPlugin_Sources",
-    srcs = glob(["Sources/**/*.swift"]),
-    strip_prefix = strip_prefix.from_pkg(),
-    visibility = ["//visibility:public"],
-)
-
-swift_library(
-    name = "PlayerUIMetricsPlugin",
-    module_name = "PlayerUIMetricsPlugin",
-    srcs = [":PlayerUIMetricsPlugin_Sources", ":MetricsPluginResourceShim"],
-    visibility = ["//visibility:public"],
-    deps = ["//ios/core:PlayerUI", "//ios/swiftui:PlayerUISwiftUI"],
-    data = [":PlayerUIMetricsPluginResourceBundle"],
-    defines = ["BAZEL_TARGET"]
-)
-
-ios_ui_test(
-    name = "PlayerUIMetricsPluginViewInspectorTests",
-    srcs = glob(["ViewInspector/**/*.swift"]),
-    minimum_os_version = "14.0",
+swiftui_plugin(
+    name = "MetricsPlugin",
+    resources = ["//plugins/metrics/core:core_native_bundle"],
     deps = [
-        "@swiftpkg_viewinspector//:Sources_ViewInspector",
-        ":PlayerUIMetricsPlugin", 
-        "//ios/core:PlayerUI", 
-        "//ios/swiftui:PlayerUISwiftUI",
-        "//plugins/reference-assets/swiftui:PlayerUIReferenceAssets",
-        "//ios/internal-test-utils:PlayerUIInternalTestUtilities"
+        "//ios/swiftui:PlayerUISwiftUI"
     ],
-    visibility = ["//visibility:public"],
-    test_host = "//ios/demo:PlayerUIDemo"
+    test_deps = [
+        "//plugins/reference-assets/swiftui:PlayerUIReferenceAssets",
+    ]
 )
