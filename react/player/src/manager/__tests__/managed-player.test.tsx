@@ -23,6 +23,8 @@ vitest.mock("@player-ui/metrics-plugin", async () => {
 
 configure({ testIdAttribute: "id" });
 
+const testOptions = { legacyRoot: true };
+
 test("requestTime should be available", async () => {
   const manager: FlowManager = {
     next: vitest
@@ -78,6 +80,7 @@ test("requestTime should be available", async () => {
         onError={onError}
       />
     </Suspense>,
+    testOptions,
   );
 
   expect(manager.next).toBeCalledWith(undefined);
@@ -161,6 +164,7 @@ test("handles dummy flows", async () => {
         onError={onError}
       />
     </Suspense>,
+    testOptions,
   );
 
   expect(manager.next).toBeCalledWith(undefined);
@@ -246,6 +250,7 @@ test("handles FlowManager error", async () => {
         onError={onError}
       />
     </Suspense>,
+    testOptions,
   );
 
   expect(manager.next).toBeCalledWith(undefined);
@@ -347,6 +352,7 @@ test("handles flow error", async () => {
         onError={onError}
       />
     </Suspense>,
+    testOptions,
   );
 
   expect(manager.next).toBeCalledWith(undefined);
