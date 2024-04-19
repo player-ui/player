@@ -99,6 +99,8 @@ swiftui_plugin(
 )
 ```
 
+For external dependencies, see [External Dependencies](#external-dependencies).
+
 #### JavaScript Resources
 As PlayerUI is a cross platform project, that aims for code reuse, many plugins for iOS are built on top of core plugin functionality. These JS resources can be easily included in either the `ios_plugin` or `swiftui_plugin` macros:
 
@@ -212,7 +214,48 @@ assemble_pod(
 )
 ```
 
-### Advanced Usage
+## Advanced Usage
+
+### External Dependencies
+
+Adding external dependencies for packages is simple, but requires some manual changes to bazel files.
+
+>**Note** As `PlayerUI` is published as a Swift Package and a CocoaPod, external dependencies must be available on both package managers.
+
+#### Bazel
+Bazel resolution of external swift dependencies is done with [rules_swift_package_manager](https://github.com/cgrindel/rules_swift_package_manager). 
+
+Add new dependencies for plugins to both the main `Package.swift` for final consumer user, and to `xcode/Package.swift` for workspace use.
+
+>With `Package.swift` manifest files, dependencies for consuming users are resolved regardless of whether or not the consuming user relies the product with that dependency. Due to this, test packages, and developer tooling can conflict with consuming users. To avoid this potential conflict, project level dependencies are redeclared in `xcode/Package.swift`. This allows the main `Package.swift` to contain dependencies only for the library targets, and no testing or tooling dependencies.
+
+After adding the dependency, a bazel command is used to regenerate the dependency index:
+```bash
+bazel run //:swift_update_pkgs
+```
+
+After updating the index, `MODULE.bazel` needs to be updated to expose that package in the `use_repo` call:
+```python
+use_repo(
+    swift_deps,
+    "swiftpkg_swift_hooks",
+    ...,
+    "swiftpkg_<package_name>"
+)
+```
+
+Package names are converted to snake case, if you are unsure what name to use, open `swift_deps.bzl` and search for the git repository for that dependency to find its entry and name.
+
+Once the `MODULE.bazel` entry is updated, the dependency is available to bazel targets:
+```
+@swiftpkg_<package_name>//:Sources_<PackageName>
+```
+
+#### SPM / CocoaPods
+
+Adding external dependencies to package manifests follows the normal convention for those package managers. If you are deviating from the plugin pattern to add an external dependency, you will need to specify the targets manually.
+
+### Bazel Macros
 Both `ios_plugin` and `swiftui_plugin` call the same `ios_pipeline` macro, and hardcode some of the parameters to that pipeline. For more complex usecases, `ios_pipeline` can be used directly, to generate tests for packages that have both regular unit tests, as well as SwiftUI ViewInspector based tests.
 
 Example:
