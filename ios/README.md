@@ -220,14 +220,16 @@ assemble_pod(
 
 Adding external dependencies for packages is simple, but requires some manual changes to bazel files.
 
->**Note** As `PlayerUI` is published as a Swift Package and a CocoaPod, external dependencies must be available on both package managers.
+> [!NOTE]
+> As `PlayerUI` is published as a Swift Package and a CocoaPod, external dependencies must be available on both package managers.
 
 #### Bazel
 Bazel resolution of external swift dependencies is done with [rules_swift_package_manager](https://github.com/cgrindel/rules_swift_package_manager). 
 
 Add new dependencies for plugins to both the main `Package.swift` for final consumer user, and to `xcode/Package.swift` for workspace use.
 
->With `Package.swift` manifest files, dependencies for consuming users are resolved regardless of whether or not the consuming user relies the product with that dependency. Due to this, test packages, and developer tooling can conflict with consuming users. To avoid this potential conflict, project level dependencies are redeclared in `xcode/Package.swift`. This allows the main `Package.swift` to contain dependencies only for the library targets, and no testing or tooling dependencies.
+> [!TIP]
+> With `Package.swift` manifest files, dependencies for consuming users are resolved regardless of whether or not the consuming user relies the product with that dependency. Due to this, test packages, and developer tooling can conflict with consuming users. To avoid this potential conflict, project level dependencies are redeclared in `xcode/Package.swift`. This allows the main `Package.swift` to contain dependencies only for the library targets, and no testing or tooling dependencies.
 
 After adding the dependency, a bazel command is used to regenerate the dependency index:
 ```bash
