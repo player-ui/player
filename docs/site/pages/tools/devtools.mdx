@@ -12,25 +12,12 @@ It operates indepdently without a bookkeeper ensuring no data loss during commun
 
 Read more about the Devtools Messenger here https://github.com/player-ui/tools/blob/3ca98bdc70c76e290084b75c5b8f26ebb35b0dd0/devtools/messenger/README.md
 
-The `devtools-client` is used in our browser-extension https://github.com/player-ui/browser-devtools. This is where you can create custom devtool panels that can be used to debug and inspect your Player-UI Experiences.
-
-
-## Devtools basic plugin
-We provide a basic dev tools plugin that displays information about the inspected Player-ui Instance. [devtools/plugins/desktop/basic]. This is essentially a player plugin that provides plugin information, flow, logs, and exposes a console for expression evaluation. It uses our devtools-assets 
-to render the UI.
-
-As of the current state; the basic plugin will help debug flows, data, and views within player. In the future; we hope to release plugins that will also help with content authoring.
-
-## Devtools assets
-https://github.com/player-ui/devtools-assets, devtools UI is our collection of asset packages and assets that's designed to be leveraged with our devtools basic plugin.
-
+The `@player-tools/devtools-client` exposes the Panel containing the ReactPlayer responsible for running the content sent by the Player devtool plugins on the inspected Player UI instance and the navigation bar.
 
 ## Usage
-To use the extension, you need to have the Player UI Devtools running in the inspected page leveraging one or more devtools plugins and have the extension installed. For more information on how to install and use the Player UI Devtools, check out the Player UI Devtools documentation.
+Install the devtool extension from the chrome store and firefox store. [Link TBA]
 
-
-## How to write your own devtools plugins
-You may create your own plugins and test them by adding them into the ReactPlayerOptions as plugins. Check out our Player UI Devtools Plugin template thats coming soon.
+In order for the devtools extension communicating with the player in your content; you must have a plugin that is using devtools-client. You may use our `BasicWevDevtoolsPlugin` as one the plugins in your Player UI and that will connect to the browser extension if it is installed.
 
 ```
 const testingPlugins: ReactPlayerOptions["plugins"] = [
@@ -45,5 +32,36 @@ const config: ReactPlayerOptions = {
 };
 ```
 
-## Chromestore && Firefox Downloads
-Coming soon.
+
+## Devtools basic plugin
+We provide a basic dev tools plugin that displays information about the inspected Player-ui Instance. [devtools/plugins/desktop/basic]. This is essentially a player plugin that provides plugin information, flow, logs, and exposes a console for expression evaluation. It uses our devtools-assets to render the UI.
+
+As of the current state; the basic plugin will help debug flows, data, and views within player. In the future; we hope to release plugins that will also help with content authoring.
+
+## Devtools assets
+https://github.com/player-ui/devtools-assets, devtools UI is our collection of asset packages and assets that's designed to be leveraged with our devtools basic plugin.
+
+
+## How to write your own devtools plugins
+You may create your own plugins and test them by adding them into the ReactPlayerOptions as plugins. In our BasicWebDevtoolsPlugin, we are leveraging the `@player-tools/devtools-messenger` to communicate with the extension.
+
+const messenger = useMemo(() => {
+    const options: MessengerOptions<ExtensionSupportedEvents> = {
+      id: playerID,
+      context: "player",
+      messageCallback: (message) =>
+        dispatch(message as Parameters<typeof dispatch>[0]),
+      sendMessage,
+      addListener,
+      removeListener,
+      logger: console,
+    };
+
+    return new Messenger(options);
+  }, [addListener, removeListener, sendMessage]);
+
+You may write other plugins that talk to our extension; or even extend our BasicWebDevtoolsPlugin to add additional views.
+
+Check out our Player UI Devtools Plugin template thats coming soon.
+
+
