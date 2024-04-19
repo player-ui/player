@@ -11,7 +11,7 @@ git_override(
 # local_path_override(module_name = "rules_player", path = "../rules_player")
 
 bazel_dep(name = "aspect_bazel_lib", version = "1.32.0")
-bazel_dep(name = "aspect_rules_js", version = "1.34.1")
+bazel_dep(name = "aspect_rules_js", version = "1.41.1")
 bazel_dep(name = "bazel_skylib", version = "1.4.1")
 bazel_dep(name = "rules_pkg", version = "0.9.1")
 bazel_dep(name = "aspect_rules_ts", version = "2.1.0")
@@ -26,7 +26,7 @@ node.toolchain(node_version = "18.18.0")
 ## Rule Dependencies
 bazel_dep(name = "rules_swift", version = "1.18.0", repo_name = "build_bazel_rules_swift")
 bazel_dep(name = "rules_apple", version = "3.5.1", repo_name = "build_bazel_rules_apple")
-bazel_dep(name = "rules_ios", version = "4.3.1", repo_name = "build_bazel_rules_ios")
+bazel_dep(name = "rules_ios", version = "4.4.0", repo_name = "build_bazel_rules_ios")
 bazel_dep(name = "rules_xcodeproj", version = "2.2.0")
 
 bazel_dep(name = "gazelle", version = "0.34.0", repo_name = "bazel_gazelle")
