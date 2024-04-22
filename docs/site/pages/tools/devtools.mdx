@@ -2,12 +2,12 @@
 
 ## Introduction
 https://github.com/player-ui/browser-devtools 
-Our Devtools player extension has been redesigned to work with manifest v3. It leverages plugins to handle communicated between the inspected Player-UI instance and the devtools extension panel. 
+Our Devtools player extension has been redesigned to work with manifest v3. It leverages plugins to handle communication between the inspected Player-UI instance and the devtools extension panel.
 
 ## Devtools architecture
 The devtools extension is running an instance of Player. By running an instance of Player in the devtools extension; we are able to leverage the Player plugin system. The plugin author can select which hooks to tap in, what information to gather, and how to interact with it.
 
-The two instances of Player-UI [The extension and the inspected instance] are communicating through a Messenger class injected into the content script. This messenger class acts as a communication layer this is agnostic, self-sufficient, and a loss-less messenger designed for seamless communication between instances.
+The two instances of Player [The extension and the inspected instance] are communicating through a Messenger class injected into the content script. This messenger class acts as a communication layer this is agnostic, self-sufficient, and a loss-less messenger designed for seamless communication between instances.
 It operates indepdently without a bookkeeper ensuring no data loss during communication.
 
 Read more about the Devtools Messenger here https://github.com/player-ui/tools/blob/3ca98bdc70c76e290084b75c5b8f26ebb35b0dd0/devtools/messenger/README.md
@@ -17,9 +17,9 @@ The `@player-tools/devtools-client` exposes the Panel containing the ReactPlayer
 ## Usage
 Install the devtool extension from the chrome store and firefox store. [Link TBA]
 
-In order for the devtools extension communicating with the player in your content; you must have a plugin that is using devtools-client. You may use our `BasicWevDevtoolsPlugin` as one the plugins in your Player UI and that will connect to the browser extension if it is installed.
+In order for the devtools extension communicating with the Player in your content; you must have a plugin that is using devtools-client. You may use our `BasicWevDevtoolsPlugin` as one the plugins in your Player integration and that will connect to the browser extension if it is installed.
 
-```
+```javascript
 const testingPlugins: ReactPlayerOptions["plugins"] = [
   new BasicWevDevtoolsPlugin() as unknown as ReactPlayerPlugin,
 ];
@@ -34,7 +34,7 @@ const config: ReactPlayerOptions = {
 
 
 ## Devtools basic plugin
-We provide a basic dev tools plugin that displays information about the inspected Player-ui Instance. [devtools/plugins/desktop/basic]. This is essentially a player plugin that provides plugin information, flow, logs, and exposes a console for expression evaluation. It uses our devtools-assets to render the UI.
+We provide a basic dev tools plugin that displays information about the inspected Player Instance. [devtools/plugins/desktop/basic]. This is essentially a Player plugin that provides plugin information, flow, logs, and exposes a console for expression evaluation. It uses our devtools-assets to render the UI.
 
 As of the current state; the basic plugin will help debug flows, data, and views within player. In the future; we hope to release plugins that will also help with content authoring.
 
@@ -44,6 +44,9 @@ https://github.com/player-ui/devtools-assets, devtools UI is our collection of a
 
 ## How to write your own devtools plugins
 You may create your own plugins and test them by adding them into the ReactPlayerOptions as plugins. In our BasicWebDevtoolsPlugin, we are leveraging the `@player-tools/devtools-messenger` to communicate with the extension.
+
+```javascript
+import { Messenger } from "@player-tools/devtools-messenger";
 
 const messenger = useMemo(() => {
     const options: MessengerOptions<ExtensionSupportedEvents> = {
@@ -59,6 +62,7 @@ const messenger = useMemo(() => {
 
     return new Messenger(options);
   }, [addListener, removeListener, sendMessage]);
+  ```
 
 You may write other plugins that talk to our extension; or even extend our BasicWebDevtoolsPlugin to add additional views.
 
