@@ -237,7 +237,115 @@ In the latter case, it is recommended to extend the original asset, so as to avo
 
 2. Registering as a variant allows you to maintain usage of the transform backed asset as well as your new asset, so both can be used by the same `SwiftUIPlayer` instance, including in the same flow. This also maintains the semantics of Player content, an `action` asset is always an `action` type of interaction, but with `metaData`, it can be displayed differently.
 
+For more info on transform registration see [Asset Transform Plugin](https://player-ui.github.io/latest/plugins/asset-transform#asset-transform-plugin)
 
+Below are 3 different use cases for different ways to mix and match the asset and transform registry to simplify the asset implementation
+
+Use Case 1: Same type with different variants and asset implementations that can share the same transform
+
+```swift
+player.assetRegistry.register("input", asset: InputAsset.self)
+
+player.assetRegistry.register(["type": "input", "dataType": ["type": "DateType"]], for: DateInputAsset.self)
+```
+
+If the common InputData fields for the decoded data looks like:
+```swift
+struct InputData: AssetData {
+  var id: String
+  var type: String
+  var value: String?
+  ///  A function to set the value into the data model
+  var set: WrappedFunction<Void>?
+  ///  The `DataType` associated with this asset, for formatting the keyboard
+  var dataType: DataType?
+}
+```
+And we would like to render two different assets based on whether or not "dataType" is present then both InputAsset and DateInputAsset can share the same InputData which can contain a transform (such as the function to perform after input data is set) but show different content for the views such as input accessories like a calender based on the DataType
+
+Use Case 2: Same type with different variants and asset implementations that don't share the same transform
+```swift
+player.assetRegistry.register("input", asset: InputAsset.self)
+
+player.assetRegistry.register(["type": "input", "dataType": ["type": "DateType"]], for: DateInputAsset.self)
+```
+
+If the common InputData fields for the decoded data looks like:
+```swift
+struct InputData: AssetData {
+  var id: String
+  var type: String
+  var value: String?
+  ///  A function to set the value into the data model
+  var set: WrappedFunction<Void>?
+  ///  The `DataType` associated with this asset, for formatting the keyboard
+  var dataType: DataType?
+}
+```
+In the case where the regular InputAsset and the DateInputAsset should not share the same transform, its possible to target the variant in the transform registration (since transform also use the partial match registry) to specify a different transform when the "dataType" is present for example:
+
+```jsx
+import { Player } from '@player-ui/player';
+import { AssetTransformPlugin } from '@player-ui/asset-transform-plugin';
+
+// Add it to Player
+
+const player = new Player({
+  plugins: [
+    new AssetTransformPlugin(
+      new Registry([
+        // Register a match for any input type with a custom transform.
+        [{ type: 'input' }, inputTransform],
+        // Register a match for any input type that has dataType DateType with a custom transform.
+        [{ type: 'input', "dataType": {type: "DateType"} }, dateInputtransform]
+      ])
+    )
+  ]
+});      
+```
+
+Use Case 3: Different type, same asset implementation, different transforms
+```swift
+player.assetRegistry.register("choiceA", asset: ChoiceAsset.self)
+
+player.assetRegistry.register("choiceB", asset: ChoiceAsset.self)
+```
+Its possible to register the same asset implementation to different type names with the same variant, this may be needed if the two types visually look the same but behaviourally is different such as when the choice is clicked "choiceA" does one action but "choiceB" does something else which is defined in the transform 
+
+```swift
+struct ChoiceData: AssetData {
+  var id: String
+  var type: String
+  var value: String?
+  ///  Function to mark this choice as selected
+  var select: WrappedFunction<Void>?
+}
+```
+Since the transform is called on "select" of the wrapped function in the data this doesnt change the ChoiceData which means they can both be registered to ChoiceAsset
+
+For example in the web transform registration choiceA and choiceB are registered to different transforms
+
+```jsx
+import { Player } from '@player-ui/player';
+import { AssetTransformPlugin } from '@player-ui/asset-transform-plugin';
+
+// Add it to Player
+
+const player = new Player({
+  plugins: [
+    new AssetTransformPlugin(
+      new Registry([
+        // Register a match for any choiceA type with a custom transform.
+        [{ type: 'choiceA' }, choiceATransform],
+        // Register a match for any choiceB type with a custom transform.
+        [{ type: 'choiceB' }, choiceBTransform]
+      ])
+    )
+  ]
+});      
+```
+
+Overall the asset and transform registry gives developers a lot of flexibility for extending and simplifying assets based on given constraints
 
   </ios>
   <android>
