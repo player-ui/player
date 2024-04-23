@@ -38,6 +38,10 @@ const navigation: Navigation = {
           path: '/faqs',
         },
         {
+          title: 'Privacy Policy',
+          path: '/privacy-policy',
+        },
+        {
           title: 'Guides',
           routes: [
             {
