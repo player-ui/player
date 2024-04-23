@@ -6,6 +6,10 @@ load(
     "kt_compiler_plugin",
 )
 
+exports_files([
+    "src/main/AndroidManifest.xml"
+])
+
 
 # Define the compose compiler plugin
 # Used by referencing //:jetpack_compose_compiler_plugin

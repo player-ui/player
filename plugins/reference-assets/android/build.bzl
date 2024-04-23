@@ -18,9 +18,7 @@ def kt_asset_test(
         ],
         resources = [
         ],
-        manifest_values = {
-            "minSdkVersion": "24",
-        },
+        manifest = "//plugins/reference-assets/android:src/main/AndroidManifest.xml"
     )
 
     lint(
