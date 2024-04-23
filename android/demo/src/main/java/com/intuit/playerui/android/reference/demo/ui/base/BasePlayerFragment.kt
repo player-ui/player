@@ -1,6 +1,5 @@
 package com.intuit.playerui.android.reference.demo.ui.base
 
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,7 +18,6 @@ import com.intuit.playerui.core.bridge.toJson
 import com.intuit.playerui.core.managed.AsyncFlowIterator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /** Simple [PlayerFragment] example that builds a [DemoPlayerViewModel] w/ a single flow iterator */
 abstract class BasePlayerFragment : PlayerFragment() {
@@ -35,16 +33,6 @@ abstract class BasePlayerFragment : PlayerFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         StethoHelper.initializeDebugger(requireContext(), playerViewModel.player)
         return super.onCreateView(inflater, container, savedInstanceState)
-    }
-
-    private suspend fun toggleScreenShare(active: Boolean) = withContext(Dispatchers.Main) {
-        binding.playerCanvas.background = if (active) {
-            GradientDrawable().apply {
-                setStroke(30, resources.getColor(android.R.color.holo_green_light))
-            }
-        } else {
-            null
-        }
     }
 
     override fun buildFallbackView(exception: Exception): View? = currentPlayerCanvas

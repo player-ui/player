@@ -8,8 +8,11 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.whenStarted
 import androidx.transition.Transition
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.asset.RenderableAsset
@@ -17,17 +20,25 @@ import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.databinding.FallbackViewBinding
 import com.intuit.playerui.android.databinding.PlayerFragmentBinding
 import com.intuit.playerui.android.extensions.into
-import com.intuit.playerui.android.extensions.intoOnMain
 import com.intuit.playerui.android.extensions.transitionInto
 import com.intuit.playerui.android.lifecycle.ManagedPlayerState
+import com.intuit.playerui.android.lifecycle.ManagedPlayerState.Done
+import com.intuit.playerui.android.lifecycle.ManagedPlayerState.Error
+import com.intuit.playerui.android.lifecycle.ManagedPlayerState.NotStarted
+import com.intuit.playerui.android.lifecycle.ManagedPlayerState.Pending
+import com.intuit.playerui.android.lifecycle.ManagedPlayerState.Running
 import com.intuit.playerui.android.lifecycle.PlayerViewModel
 import com.intuit.playerui.android.lifecycle.fail
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.managed.AsyncFlowIterator
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import kotlinx.coroutines.withContext
 
 /**
@@ -80,41 +91,33 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
     public abstract val playerViewModel: PlayerViewModel
 
     init {
-        lifecycleScope.launchWhenStarted {
-            // get the player view model on the main thread
-            val playerViewModel = playerViewModel
-            withContext(Dispatchers.Default) {
-                playerViewModel.state.collect {
+        lifecycleScope.launch {
+            repeatOnLifecycle(State.STARTED) {
+                // forward state events to callbacks
+                playerViewModel.state.onEach {
                     when (it) {
-                        ManagedPlayerState.NotStarted -> {
-                            buildLoadingView() intoOnMain binding.playerCanvas
-                            onNotStarted()
+                        NotStarted -> onNotStarted()
+                        Pending -> onPending()
+                        is Running -> onRunning(it)
+                        is Error -> onError(it)
+                        is Done -> onDone(it)
+                    }
+                }.launchIn(this + Dispatchers.Default)
+
+                // update UI for latest state
+                playerViewModel.state.collectLatest {
+                    when (it) {
+                        NotStarted, Pending -> buildLoadingView() into binding.playerCanvas
+                        is Running -> try {
+                            handleAssetUpdate(it.asset, it.animateViewTransition)
+                        } catch (exception: Exception) {
+                            if (exception is CancellationException) throw exception
+                            exception.printStackTrace()
+                            playerViewModel.fail("Error rendering asset", exception)
                         }
 
-                        ManagedPlayerState.Pending -> {
-                            buildLoadingView() intoOnMain binding.playerCanvas
-                            onPending()
-                        }
-
-                        is ManagedPlayerState.Running -> {
-                            try {
-                                handleAssetUpdate(it.asset, it.animateViewTransition)
-                                onRunning(it)
-                            } catch (exception: Exception) {
-                                exception.printStackTrace()
-                                playerViewModel.fail("Error rendering asset", exception)
-                            }
-                        }
-
-                        is ManagedPlayerState.Error -> {
-                            buildFallbackView(it.exception) intoOnMain binding.playerCanvas
-                            onError(it)
-                        }
-
-                        is ManagedPlayerState.Done -> {
-                            buildDoneView() intoOnMain binding.playerCanvas
-                            onDone(it)
-                        }
+                        is Error -> buildFallbackView(it.exception) into binding.playerCanvas
+                        is Done -> buildDoneView() into binding.playerCanvas
                     }
                 }
             }
@@ -175,11 +178,14 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
      */
     protected open fun handleAssetUpdate(asset: RenderableAsset?, animateTransition: Boolean) {
         lifecycleScope.launch(if (asset is SuspendableAsset<*>) Dispatchers.Default else Dispatchers.Main) {
-            try {
-                renderIntoPlayerCanvas(asset, animateTransition)
-            } catch (exception: Exception) {
-                exception.printStackTrace()
-                playerViewModel.fail("Error rendering asset", exception)
+            whenStarted { // TODO: This'll go away when we can call a suspend version of this
+                try {
+                    renderIntoPlayerCanvas(asset, animateTransition)
+                } catch (exception: Exception) {
+                    if (exception is CancellationException) throw exception
+                    exception.printStackTrace()
+                    playerViewModel.fail("Error rendering asset", exception)
+                }
             }
         }
     }
