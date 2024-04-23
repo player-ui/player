@@ -17,17 +17,24 @@ import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.databinding.FallbackViewBinding
 import com.intuit.playerui.android.databinding.PlayerFragmentBinding
 import com.intuit.playerui.android.extensions.into
-import com.intuit.playerui.android.extensions.intoOnMain
 import com.intuit.playerui.android.extensions.transitionInto
 import com.intuit.playerui.android.lifecycle.ManagedPlayerState
+import com.intuit.playerui.android.lifecycle.ManagedPlayerState.Done
+import com.intuit.playerui.android.lifecycle.ManagedPlayerState.Error
+import com.intuit.playerui.android.lifecycle.ManagedPlayerState.NotStarted
+import com.intuit.playerui.android.lifecycle.ManagedPlayerState.Pending
+import com.intuit.playerui.android.lifecycle.ManagedPlayerState.Running
 import com.intuit.playerui.android.lifecycle.PlayerViewModel
 import com.intuit.playerui.android.lifecycle.fail
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.managed.AsyncFlowIterator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import kotlinx.coroutines.withContext
 
 /**
@@ -81,41 +88,30 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
 
     init {
         lifecycleScope.launchWhenStarted {
-            // get the player view model on the main thread
-            val playerViewModel = playerViewModel
-            withContext(Dispatchers.Default) {
-                playerViewModel.state.collect {
-                    when (it) {
-                        ManagedPlayerState.NotStarted -> {
-                            buildLoadingView() intoOnMain binding.playerCanvas
-                            onNotStarted()
-                        }
+            // forward state events to callbacks
+            playerViewModel.state.onEach {
+                when (it) {
+                    NotStarted -> onNotStarted()
+                    Pending -> onPending()
+                    is Running -> onRunning(it)
+                    is Error -> onError(it)
+                    is Done -> onDone(it)
+                }
+            }.launchIn(this + Dispatchers.Default)
 
-                        ManagedPlayerState.Pending -> {
-                            buildLoadingView() intoOnMain binding.playerCanvas
-                            onPending()
-                        }
-
-                        is ManagedPlayerState.Running -> {
-                            try {
-                                handleAssetUpdate(it.asset, it.animateViewTransition)
-                                onRunning(it)
-                            } catch (exception: Exception) {
-                                exception.printStackTrace()
-                                playerViewModel.fail("Error rendering asset", exception)
-                            }
-                        }
-
-                        is ManagedPlayerState.Error -> {
-                            buildFallbackView(it.exception) intoOnMain binding.playerCanvas
-                            onError(it)
-                        }
-
-                        is ManagedPlayerState.Done -> {
-                            buildDoneView() intoOnMain binding.playerCanvas
-                            onDone(it)
-                        }
+            // update UI for latest state
+            playerViewModel.state.collectLatest {
+                when (it) {
+                    NotStarted, Pending -> buildLoadingView() into binding.playerCanvas
+                    is Running -> try {
+                        handleAssetUpdate(it.asset, it.animateViewTransition)
+                        onRunning(it)
+                    } catch (exception: Exception) {
+                        exception.printStackTrace()
+                        playerViewModel.fail("Error rendering asset", exception)
                     }
+                    is Error -> buildFallbackView(it.exception) into binding.playerCanvas
+                    is Done -> buildDoneView() into binding.playerCanvas
                 }
             }
         }
