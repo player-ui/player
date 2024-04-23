@@ -11,7 +11,7 @@ Assuming you have read the [requirements on the root contributing guide](https:/
 1. Once you have Android Studio installed, you will need to go to tools->SDK Manager->SDK Platforms.
    1.  Make sure you have **only** the following SDK installed: Android API 32.
    *If you are using Android Giraffe, you may need to click on show package details and it will be under Android12L. (Android SDK Platrform 32)*
-2. The next step will be to make sure you have the right SDK Build tools and NDK. Click on the SDK Tools tab and make sure you have the following clicked:
+2. The next step will be to make sure you have the right (and _only_ the right) SDK Build tools and NDK. Click on the SDK Tools tab and make sure you have only the following clicked:
    1. 30.0.3
    2. 21.4.7075529
 3. You will now need to create an android device for emulation. Click on Device Manager and do create new device.
