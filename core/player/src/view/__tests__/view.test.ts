@@ -70,39 +70,38 @@ describe('view', () => {
       expect(updated).toBe(resolved);
     });
 
-
     test('works with no valid switch cases in an array', () => {
       const model = withParser(new LocalModel({}), parseBinding);
       const evaluator = new ExpressionEvaluator({ model });
       const schema = new SchemaController();
 
       const view = new ViewInstance(
-          {
-            id: 'test',
-            type: 'view',
-            title: [
-              {
-                staticSwitch: [
-                  {
-                    case: false,
-                    asset: {
-                      id: 'false-case',
-                      type: 'text',
-                      value: 'some text',
-                    },
+        {
+          id: 'test',
+          type: 'view',
+          title: [
+            {
+              staticSwitch: [
+                {
+                  case: false,
+                  asset: {
+                    id: 'false-case',
+                    type: 'text',
+                    value: 'some text',
                   },
-                  {
-                    case: false,
-                    asset: {
-                      id: 'false-case-2',
-                      type: 'text',
-                      value: 'some text',
-                    },
+                },
+                {
+                  case: false,
+                  asset: {
+                    id: 'false-case-2',
+                    type: 'text',
+                    value: 'some text',
                   },
-                ],
-              },
-            ],
-          },
+                },
+              ],
+            },
+          ],
+        },
         {
           model,
           parseBinding,

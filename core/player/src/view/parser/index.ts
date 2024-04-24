@@ -121,8 +121,8 @@ export class Parser {
     );
   }
 
-  private hasSwitchKey(localKey: string){
-    return localKey.toLocaleLowerCase() === ('staticswitch' || 'dynamicswitch')
+  private hasSwitchKey(localKey: string) {
+    return localKey === ('staticSwitch' || 'dynamicSwitch');
   }
 
   public parseObject(
@@ -132,7 +132,6 @@ export class Parser {
   ): Node.Node | null {
     const nodeType = this.hooks.determineNodeType.call(obj);
 
-    //nodeType is what it should be checking on
     if (nodeType !== undefined) {
       const parsedNode = this.hooks.parseNode.call(
         obj,
@@ -239,11 +238,15 @@ export class Parser {
             children: [...children, ...templateChildren],
           } as NestedObj;
         } else if (
-          (localValue && 
-          this.hooks.determineNodeType.call(localValue) === NodeType.Switch) || this.hasSwitchKey(localKey)
+          (localValue &&
+            this.hooks.determineNodeType.call(localValue) ===
+              NodeType.Switch) ||
+          this.hasSwitchKey(localKey)
         ) {
           const localSwitch = this.hooks.parseNode.call(
-            this.hasSwitchKey(localKey) ? {[localKey]:localValue}:localValue,
+            this.hasSwitchKey(localKey)
+              ? { [localKey]: localValue }
+              : localValue,
             NodeType.Value,
             options,
             NodeType.Switch
@@ -299,7 +302,6 @@ export class Parser {
               this.parseObject(childVal, NodeType.Value, options)
             )
             .filter((child): child is Node.Node => !!child);
-          
 
           if (childValues.length > 0) {
             const multiNode = this.hooks.onCreateASTNode.call(
