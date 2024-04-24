@@ -1,13 +1,16 @@
 load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("@rules_player//player:defs.bzl", compile_dsl = "compile", create_base_dsl_config = "create_base_config")
+load("@rules_player//player:defs.bzl", create_base_dsl_config = "create_base_config")
+load("generate_dsl_targets.bzl", "generate_all_dsl_mocks")
 
 npm_link_all_packages(name = "node_modules")
 
 create_base_dsl_config(
     name = "dsl_config",
-    plugins = [":node_modules/@player-ui/reference-assets-cli-plugin"],
+    plugins = [
+        ":node_modules/@player-ui/reference-assets-cli-plugin",
+    ],
 )
 
 DSL_SRCS = glob([
@@ -19,19 +22,36 @@ DSL_SRCS = glob([
     "text/*.tsx",
 ])
 
-compile_dsl(
+MOCK_DIRS = [
+    "action",
+    "collection",
+    "image",
+    "info",
+    "input",
+    "text",
+]
+
+generate_all_dsl_mocks(MOCK_DIRS)
+
+filegroup(
     name = "all_flows",
-    srcs = DSL_SRCS,
-    config = ":dsl_config",
-    data = [
-        ":node_modules/@player-ui/reference-assets-cli-plugin",
-        ":node_modules/@player-ui/reference-assets-plugin-components",
-        "//:node_modules/@player-tools/dsl",
-        "//:node_modules/@types/react",
-        "//:node_modules/dlv",
-        "//:node_modules/react",
-    ],
+    srcs = [":dsl_mocks_" + mock_dir for mock_dir in MOCK_DIRS],
 )
+
+# compile_dsl(
+#     name = "all_flows",
+#     srcs = DSL_SRCS,
+#     config = ":dsl_config",
+#     data = [
+#         ":node_modules/@player-ui/reference-assets-cli-plugin",
+#         ":node_modules/@player-ui/reference-assets-plugin-components",
+#         "//:node_modules/@player-tools/dsl",
+#         "//:node_modules/@types/react",
+#         "//:node_modules/dlv",
+#         "//:node_modules/react",
+#     ],
+#     skip_test = True,
+# )
 
 # generate_manifest(
 #     name = "mocks",

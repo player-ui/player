@@ -5,7 +5,7 @@ bazel_dep(name = "rules_player")
 git_override(
     remote = "https://github.com/player-ui/rules_player.git",
     # bazel-6 branch
-    commit = "e71339c96deeec1f4976fbc04815143ee23d8541",
+    commit = "444af3cdd15f4d4f5a3c92573b0afab0ab26a4dc",
     module_name = "rules_player",
 )
 # local_path_override(module_name = "rules_player", path = "../rules_player")
@@ -48,8 +48,9 @@ swift_deps.from_file(
 use_repo(
     swift_deps,
     "swiftpkg_swift_hooks",
-    "swiftpkg_viewinspector"
+    "swiftpkg_viewinspector",
 )
+
 ###### End iOS ######
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
 
