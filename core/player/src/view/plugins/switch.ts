@@ -15,12 +15,13 @@ export default class SwitchPlugin implements ViewPlugin {
   private resolveSwitch(node: Node.Switch, options: Options): Node.Node {
     for (const switchCase of node.cases) {
       const isApplicable = options.evaluate(switchCase.case);
-
+      console.log('@@ resolveSwitch[isApplicable]',isApplicable)
       if (isApplicable) {
         return switchCase.value;
       }
     }
 
+    console.log('@@ resolveSwitch[node.cases] are false. should return empty node')
     return EMPTY_NODE;
   }
 
@@ -31,14 +32,18 @@ export default class SwitchPlugin implements ViewPlugin {
         return this.resolveSwitch(node, this.options);
       }
 
+      console.log('@@ ApplyParse onCreateASTNODE[ Returning node: ',node )
+      console.log('@@ ApplyParse onCreateASTNODE[ Returning nodeType: ['+node?.type+']')
       return node;
     });
 
     parser.hooks.determineNodeType.tap('switch', (obj) => {
+      console.log('** determining switch nodetype:',obj)
       if (
         Object.prototype.hasOwnProperty.call(obj, 'dynamicSwitch') ||
         Object.prototype.hasOwnProperty.call(obj, 'staticSwitch')
       ) {
+        console.log('** DETERMINED switch nodetype:',obj)
         return NodeType.Switch;
       }
     });
@@ -52,6 +57,7 @@ export default class SwitchPlugin implements ViewPlugin {
         determinedNodeType: null | NodeType
       ) => {
         if (determinedNodeType === NodeType.Switch) {
+          console.log('@@ PARSENODE SWITCH:', obj)
           const dynamic = 'dynamicSwitch' in obj;
           const switchContent =
             'dynamicSwitch' in obj ? obj.dynamicSwitch : obj.staticSwitch;
@@ -112,9 +118,11 @@ export default class SwitchPlugin implements ViewPlugin {
     /** Switches resolved during the parsing phase are dynamic */
     resolver.hooks.beforeResolve.tap('switch', (node, options) => {
       if (node && node.type === NodeType.Switch && node.dynamic) {
+        console.log('@@ applyResolver | beforeResolve calling resolveSwitch', node)
         return this.resolveSwitch(node, options);
       }
 
+      console.log('@@ applyResolver not a switch', node)
       return node;
     });
   }

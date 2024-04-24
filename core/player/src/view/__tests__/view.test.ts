@@ -70,6 +70,55 @@ describe('view', () => {
       expect(updated).toBe(resolved);
     });
 
+
+    test('works with no valid switch cases in an array', () => {
+      const model = withParser(new LocalModel({}), parseBinding);
+      const evaluator = new ExpressionEvaluator({ model });
+      const schema = new SchemaController();
+
+      const view = new ViewInstance(
+          {
+            id: 'test',
+            type: 'view',
+            title: [
+              {
+                staticSwitch: [
+                  {
+                    case: false,
+                    asset: {
+                      id: 'false-case',
+                      type: 'text',
+                      value: 'some text',
+                    },
+                  },
+                  {
+                    case: false,
+                    asset: {
+                      id: 'false-case-2',
+                      type: 'text',
+                      value: 'some text',
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        {
+          model,
+          parseBinding,
+          evaluator,
+          schema,
+        }
+      );
+
+      const resolved = view.update();
+
+      expect(resolved).toStrictEqual({
+        id: 'test',
+        type: 'view',
+      });
+    });
+
     it('does not return a field object if the case does not resolve an asset', () => {
       const model = withParser(
         new LocalModel({

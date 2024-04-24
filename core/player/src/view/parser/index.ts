@@ -128,6 +128,10 @@ export class Parser {
   ): Node.Node | null {
     const nodeType = this.hooks.determineNodeType.call(obj);
 
+    console.log('@@ PARSEOBJECT[obj]: ',obj)
+    console.log('@@ PARSEOBJECT[type]: ',type)
+    
+    //nodeType is what it should be checking on
     if (nodeType !== undefined) {
       const parsedNode = this.hooks.parseNode.call(
         obj,
@@ -173,6 +177,8 @@ export class Parser {
       const newValue = objEntries.reduce((accumulation, current): NestedObj => {
         const { children, ...rest } = accumulation;
         const [localKey, localValue] = current;
+        console.log('@@ PARSER LOCALKEY: ', localKey)
+        console.log('@@ PARSER LOCALVALUE: ', localValue)
         if (localKey === 'asset' && typeof localValue === 'object') {
           const assetAST = this.parseObject(
             localValue,
@@ -233,16 +239,21 @@ export class Parser {
             children: [...children, ...templateChildren],
           } as NestedObj;
         } else if (
-          localValue &&
-          this.hooks.determineNodeType.call(localValue) === NodeType.Switch
+          (localValue && 
+          this.hooks.determineNodeType.call(localValue) === NodeType.Switch) || localKey === 'staticSwitch'
         ) {
+          console.log('@@ PARSER[parseLocalObject] localValue: ',localValue)
+          console.log('@@ PARSER[parseLocalObject] DetermineNodeType: ',this.hooks.determineNodeType.call(localValue))
+
           const localSwitch = this.hooks.parseNode.call(
-            localValue,
+            localKey === 'staticSwitch' ? {"staticSwitch":localValue}:localValue,
             NodeType.Value,
             options,
             NodeType.Switch
           );
 
+
+          console.log('@@ PARSER[parseLocalObject] localSwitch: ',localSwitch)
           if (
             localSwitch &&
             localSwitch.type === NodeType.Value &&
@@ -288,13 +299,17 @@ export class Parser {
             });
           }
         } else if (localValue && Array.isArray(localValue)) {
+          console.log('@@ IN PARSER[multinode] [localValue]: ', localValue)
+          localValue.map((childValues)=>console.log("@@CHILDVALUES FOR LOCALVALUE^: ", childValues))
           const childValues = localValue
             .map((childVal) =>
               this.parseObject(childVal, NodeType.Value, options)
             )
             .filter((child): child is Node.Node => !!child);
+          
 
           if (childValues.length > 0) {
+            console.log('@@ PARSER in childValues: ',childValues)
             const multiNode = this.hooks.onCreateASTNode.call(
               {
                 type: NodeType.MultiNode,
@@ -310,7 +325,7 @@ export class Parser {
                 v.parent = multiNode;
               });
             }
-
+            console.log('@@ Parser: in multinode: ',multiNode)
             if (multiNode) {
               return {
                 ...rest,
