@@ -78,6 +78,9 @@ export interface HookOptions extends ExpressionContext {
    * The caller is responsible for handling the error.
    */
   throwErrors?: boolean;
+
+  /** Whether expressions should be parsed strictly or not */
+  strict?: boolean;
 }
 
 export type ExpressionEvaluatorOptions = Omit<
@@ -226,7 +229,8 @@ export class ExpressionEvaluator {
 
     try {
       storedAST =
-        this.expressionsCache.get(matchedExp) ?? parseExpression(matchedExp);
+        this.expressionsCache.get(matchedExp) ??
+        parseExpression(matchedExp, { strict: options.strict });
       this.expressionsCache.set(matchedExp, storedAST);
     } catch (e: any) {
       if (options.throwErrors || !this.hooks.onError.call(e)) {

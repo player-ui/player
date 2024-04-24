@@ -1,6 +1,6 @@
 ---
 title: Partial Match
-platform: core
+platform: core, ios
 ---
 
 # Partial Match Plugin
@@ -43,4 +43,27 @@ Query the plugin for matches:
 const value = matchPlugin.get('asset-id') // 'ABC'
 ```
   </core>
+  <ios>
+
+This plugin is used by `BaseAssetRegistry` to handle matching resolved asset nodes with their native implementation, to decode for rendering. It is unlikely to be needed to be used directly in iOS use cases.
+
+### CocoaPods
+Add the subspec to your `Podfile`
+
+```ruby
+pod 'PlayerUI'
+```
+
+### Swift Usage
+```swift
+let plugin = PartialMatchFingerprintPlugin()
+
+// iOS usage links the array position of a registered asset to its requested match object
+// The JavaScript part of this plugin will populate matches when the view is resolving
+plugin.register(match: ["type": "text"], index: 1)
+
+// get the index for the asset with matching ID if it was resolved in the core plugin
+plugin.get(assetId: "test")
+```
+  </ios>
 </PlatformTabs>

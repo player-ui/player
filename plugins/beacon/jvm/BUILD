@@ -6,5 +6,5 @@
 #     main_deps = main_deps,
 #     main_exports = main_exports,
 #     main_resources = main_resources,
-#     test_package = "com.intuit.player.plugins.beacon",
+#     test_package = "com.intuit.playerui.plugins.beacon",
 # )

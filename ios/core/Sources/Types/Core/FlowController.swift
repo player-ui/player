@@ -52,4 +52,3 @@ public class FlowController: CreatedFromJSValue {
         try self.value.objectForKeyedSubscript("transition").tryCatch(args: [action])
     }
 }
-

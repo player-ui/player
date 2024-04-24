@@ -10,13 +10,16 @@ kt_player_module(
     main_exports = main_exports,
     main_resources = main_resources + glob(["src/main/resources/**"]),
     test_deps = test_deps,
-    test_package = "com.intuit.player.jvm.j2v8",
+    test_package = "com.intuit.playerui.j2v8",
 )
 
 j2v8_platform("macos")
 
 j2v8_platform("linux")
 
+# TODO: These should probably be AARs?
 j2v8_platform("android")
+
+j2v8_platform("android-debug")
 
 j2v8_platform("all")

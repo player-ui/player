@@ -78,7 +78,7 @@ open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
             name: fileName,
             ext: "js",
             bundle: Bundle(for: BaseBeaconPlugin<DefaultBeacon>.self),
-            pathComponent: "BaseBeaconPlugin.bundle"
+            pathComponent: "PlayerUI_BaseBeaconPlugin.bundle"
         )
         #endif
     }

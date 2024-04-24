@@ -55,11 +55,11 @@ importers:
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.47.0)(react-dom@18.2.0)(react@18.2.0)
       '@player-tools/cli':
-        specifier: 0.5.0--canary.62.1176
-        version: 0.5.0--canary.62.1176(@oclif/config@1.18.17)(@swc/core@1.4.13)(@types/node@18.19.31)(@types/react@18.2.77)(jsonc-parser@2.3.1)
+        specifier: 0.5.2
+        version: 0.5.2(@babel/core@7.24.4)(@oclif/config@1.18.17)(@swc/core@1.4.13)(@types/node@18.19.31)(@types/react@18.2.77)(jsonc-parser@2.3.1)
       '@player-tools/dsl':
-        specifier: 0.5.0--canary.62.1176
-        version: 0.5.0--canary.62.1176(@swc/core@1.4.13)(@types/node@18.19.31)(@types/react@18.2.77)(react@18.2.0)
+        specifier: 0.5.2
+        version: 0.5.2(@swc/core@1.4.13)(@types/node@18.19.31)(@types/react@18.2.77)(react@18.2.0)
       '@radix-ui/react-label':
         specifier: ^2.0.2
         version: 2.0.2(@types/react@18.2.77)(react-dom@18.2.0)(react@18.2.0)
@@ -742,6 +742,9 @@ importers:
 
   plugins/reference-assets/components:
     dependencies:
+      '@player-ui/common-types-plugin':
+        specifier: workspace:*
+        version: link:../../common-types/core
       '@player-ui/player':
         specifier: workspace:*
         version: link:../../../core/player
@@ -4694,7 +4697,7 @@ packages:
       tslib: 1.14.1
     dev: false
 
-  /@oclif/command@1.8.36(@oclif/config@1.18.17):
+  /@oclif/command@1.8.36(@oclif/config@1.18.17)(supports-color@8.1.1):
     resolution: {integrity: sha512-/zACSgaYGtAQRzc7HjzrlIs14FuEYAZrMOEwicRoUnZVyRunG4+t5iSEeQu0Xy2bgbCD0U1SP/EdeNZSTXRwjQ==, tarball: https://registry.npmjs.org/@oclif/command/-/command-1.8.36.tgz}
     engines: {node: '>=12.0.0'}
     deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
@@ -4703,7 +4706,7 @@ packages:
     dependencies:
       '@oclif/config': 1.18.17
       '@oclif/errors': 1.3.6
-      '@oclif/help': 1.0.15
+      '@oclif/help': 1.0.15(supports-color@8.1.1)
       '@oclif/parser': 3.8.17
       debug: 4.3.4(supports-color@8.1.1)
       semver: 7.6.0
@@ -4711,7 +4714,7 @@ packages:
       - supports-color
     dev: false
 
-  /@oclif/config@1.18.16:
+  /@oclif/config@1.18.16(supports-color@8.1.1):
     resolution: {integrity: sha512-VskIxVcN22qJzxRUq+raalq6Q3HUde7sokB7/xk5TqRZGEKRVbFeqdQBxDWwQeudiJEgcNiMvIFbMQ43dY37FA==, tarball: https://registry.npmjs.org/@oclif/config/-/config-1.18.16.tgz}
     engines: {node: '>=8.0.0'}
     deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
@@ -4787,12 +4790,12 @@ packages:
       wrap-ansi: 7.0.0
     dev: false
 
-  /@oclif/help@1.0.15:
+  /@oclif/help@1.0.15(supports-color@8.1.1):
     resolution: {integrity: sha512-Yt8UHoetk/XqohYX76DfdrUYLsPKMc5pgkzsZVHDyBSkLiGRzujVaGZdjr32ckVZU9q3a47IjhWxhip7Dz5W/g==, tarball: https://registry.npmjs.org/@oclif/help/-/help-1.0.15.tgz}
     engines: {node: '>=8.0.0'}
     deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
     dependencies:
-      '@oclif/config': 1.18.16
+      '@oclif/config': 1.18.16(supports-color@8.1.1)
       '@oclif/errors': 1.3.6
       chalk: 4.1.2
       indent-string: 4.0.0
@@ -4826,11 +4829,33 @@ packages:
     dependencies:
       '@heroku-cli/command': 8.5.0
       '@oclif/color': 0.1.2
-      '@oclif/command': 1.8.36(@oclif/config@1.18.17)
+      '@oclif/command': 1.8.36(@oclif/config@1.18.17)(supports-color@8.1.1)
       ansi-escapes: 4.3.2
       debug: 4.3.4(supports-color@8.1.1)
       semver: 7.6.0
       tslib: 2.6.2
+    transitivePeerDependencies:
+      - '@oclif/config'
+      - supports-color
+    dev: false
+
+  /@oclif/plugin-plugins@1.10.11(@oclif/config@1.18.17):
+    resolution: {integrity: sha512-C9eHF10UkxwoAqRYrPW51YDuDOpDXASX4BEA++kTVcqhMQTKBQalmEJKw+gVnLl1YNmapse1ZSAcU1TrXjqykg==, tarball: https://registry.npmjs.org/@oclif/plugin-plugins/-/plugin-plugins-1.10.11.tgz}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      '@oclif/color': 0.1.2
+      '@oclif/command': 1.8.36(@oclif/config@1.18.17)(supports-color@8.1.1)
+      '@oclif/errors': 1.3.6
+      chalk: 4.1.2
+      cli-ux: 5.6.7(@oclif/config@1.18.17)
+      debug: 4.3.4(supports-color@8.1.1)
+      fs-extra: 9.1.0
+      http-call: 5.3.0
+      load-json-file: 5.3.0
+      npm-run-path: 4.0.1
+      semver: 7.6.0
+      tslib: 2.6.2
+      yarn: 1.22.22
     transitivePeerDependencies:
       - '@oclif/config'
       - supports-color
@@ -4991,11 +5016,10 @@ packages:
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
     dev: false
 
-  /@player-tools/cli@0.5.0--canary.62.1176(@oclif/config@1.18.17)(@swc/core@1.4.13)(@types/node@18.19.31)(@types/react@18.2.77)(jsonc-parser@2.3.1):
-    resolution: {integrity: sha512-CuL54TB7n1Eo1ukovRG1U1YeB1k4aBfnaQkE8ES3CX02fayb6+Nep5zG3TXX0gNzwE6Wxgc/dfQHn6KwXjJrmg==, tarball: https://registry.npmjs.org/@player-tools/cli/-/cli-0.5.0--canary.62.1176.tgz}
+  /@player-tools/cli@0.5.2(@babel/core@7.24.4)(@oclif/config@1.18.17)(@swc/core@1.4.13)(@types/node@18.19.31)(@types/react@18.2.77)(jsonc-parser@2.3.1):
+    resolution: {integrity: sha512-uaXxUsy4DXd1qPmhP/bm8eJ6PI5Z5p736aCqf97wTlMJXOGacTMjXXuRlCIuETGtxo6g7Wc4a1iNO5Y9B3mJNQ==, tarball: https://registry.npmjs.org/@player-tools/cli/-/cli-0.5.2.tgz}
     hasBin: true
     dependencies:
-      '@babel/core': 7.24.4
       '@babel/plugin-transform-react-jsx-source': 7.24.1(@babel/core@7.24.4)
       '@babel/preset-env': 7.24.4(@babel/core@7.24.4)
       '@babel/preset-react': 7.24.1(@babel/core@7.24.4)
@@ -5003,27 +5027,33 @@ packages:
       '@babel/register': 7.23.7(@babel/core@7.24.4)
       '@oclif/core': 1.9.0
       '@oclif/plugin-legacy': 1.3.6(@oclif/config@1.18.17)
-      '@player-tools/dsl': 0.5.0--canary.62.1176(@swc/core@1.4.13)(@types/node@18.19.31)(@types/react@18.2.77)(react@18.2.0)
-      '@player-tools/json-language-service': 0.5.0--canary.62.1176
-      '@player-tools/xlr-converters': 0.5.0--canary.62.1176(jsonc-parser@2.3.1)(typescript@4.8.4)
-      '@player-tools/xlr-sdk': 0.5.0--canary.62.1176(typescript@4.8.4)
-      '@player-tools/xlr-utils': 0.5.0--canary.62.1176(jsonc-parser@2.3.1)(typescript@4.8.4)
-      '@types/babel__register': 7.17.3
+      '@oclif/plugin-plugins': 1.10.11(@oclif/config@1.18.17)
+      '@player-tools/dsl': 0.5.2(@swc/core@1.4.13)(@types/node@18.19.31)(@types/react@18.2.77)(react@18.2.0)
+      '@player-tools/json-language-service': 0.5.2
+      '@player-tools/xlr': 0.5.2
+      '@player-tools/xlr-converters': 0.5.2(jsonc-parser@2.3.1)(typescript@5.4.5)
+      '@player-tools/xlr-sdk': 0.5.2(typescript@5.4.5)
+      '@player-tools/xlr-utils': 0.5.2(jsonc-parser@2.3.1)(typescript@5.4.5)
       chalk: 4.1.2
       cosmiconfig: 7.1.0
       cross-fetch: 3.1.8
+      dlv: 1.1.3
+      easy-table: 1.2.0
       elegant-spinner: 2.0.0
       figures: 3.2.0
+      fs-extra: 10.1.0
       globby: 11.1.0
       log-symbols: 4.1.0
       log-update: 4.0.0
       mkdirp: 1.0.4
       react: 18.2.0
       tapable-ts: 0.2.4
-      typescript: 4.8.4
+      tslib: 2.6.2
+      typescript: 5.4.5
       vscode-languageserver-textdocument: 1.0.11
       vscode-languageserver-types: 3.17.5
     transitivePeerDependencies:
+      - '@babel/core'
       - '@oclif/config'
       - '@swc/core'
       - '@swc/wasm'
@@ -5034,15 +5064,14 @@ packages:
       - supports-color
     dev: false
 
-  /@player-tools/dsl@0.5.0--canary.62.1176(@swc/core@1.4.13)(@types/node@18.19.31)(@types/react@18.2.77)(react@18.2.0):
-    resolution: {integrity: sha512-IefGyJ1Bb5x4X1CfEjHTLIn/6T67tuN5os6d4NA3zbCxLS6RSTXOoMW8gR25raiS6lrw+xU+ffk8FhwzZ42geQ==, tarball: https://registry.npmjs.org/@player-tools/dsl/-/dsl-0.5.0--canary.62.1176.tgz}
+  /@player-tools/dsl@0.5.2(@swc/core@1.4.13)(@types/node@18.19.31)(@types/react@18.2.77)(react@18.2.0):
+    resolution: {integrity: sha512-Jqp1Eu1UDX5yRI7e5kPaKM0avY/uDExWNAM7wu+RCQte0C+4A5CwC3DCohoQW++XsSHyD5yB2gE93e4eTTHQhA==, tarball: https://registry.npmjs.org/@player-tools/dsl/-/dsl-0.5.2.tgz}
     peerDependencies:
-      '@types/react': ^18.2.45
+      '@types/react': ^18.2.51
       react: ^18.2.0
     dependencies:
-      '@babel/runtime': 7.15.4
-      '@player-ui/player': 0.4.3
-      '@player-ui/types': 0.4.3
+      '@player-ui/player': 0.7.2-next.4
+      '@player-ui/types': 0.7.2-next.4
       '@types/mkdirp': 1.0.2
       '@types/react': 18.2.77
       chalk: 4.1.2
@@ -5053,33 +5082,32 @@ packages:
       jsonc-parser: 2.3.1
       mkdirp: 1.0.4
       react: 18.2.0
-      react-flatten-children: 1.1.2
-      react-json-reconciler: 3.0.1(react@18.2.0)
-      react-merge-refs: 1.1.0
+      react-json-reconciler: 2.0.0(react@18.2.0)
       source-map-js: 1.2.0
       tapable-ts: 0.2.4
-      ts-node: 10.9.2(@swc/core@1.4.13)(@types/node@18.19.31)(typescript@4.8.4)
-      typescript: 4.8.4
+      ts-node: 10.9.2(@swc/core@1.4.13)(@types/node@18.19.31)(typescript@5.4.5)
+      tslib: 2.6.2
+      typescript: 5.4.5
     transitivePeerDependencies:
       - '@swc/core'
       - '@swc/wasm'
       - '@types/node'
     dev: false
 
-  /@player-tools/json-language-service@0.5.0--canary.62.1176:
-    resolution: {integrity: sha512-QQl9o0DWwDPgeMZaPnakfkFDLYqS1EKlzcTIIR2I9HmCg+gx6htCjVZBOub7qvBHJ6a8tJIYCNgVxWY8k2dbsQ==, tarball: https://registry.npmjs.org/@player-tools/json-language-service/-/json-language-service-0.5.0--canary.62.1176.tgz}
+  /@player-tools/json-language-service@0.5.2:
+    resolution: {integrity: sha512-vpXjJ3irqQMwdwQWzzB4vNl7Reskq9XSXXj+M61G0ZLTScXRZa83hLeRgTYHfsuW39IWu0AYufHNgbR6uDZi9A==, tarball: https://registry.npmjs.org/@player-tools/json-language-service/-/json-language-service-0.5.2.tgz}
     dependencies:
-      '@babel/runtime': 7.15.4
-      '@player-tools/xlr': 0.5.0--canary.62.1176
-      '@player-tools/xlr-sdk': 0.5.0--canary.62.1176(typescript@4.8.4)
-      '@player-tools/xlr-utils': 0.5.0--canary.62.1176(jsonc-parser@2.3.1)(typescript@4.8.4)
+      '@player-tools/xlr': 0.5.2
+      '@player-tools/xlr-sdk': 0.5.2(typescript@5.4.5)
+      '@player-tools/xlr-utils': 0.5.2(jsonc-parser@2.3.1)(typescript@5.4.5)
       change-case: 4.1.2
       cross-fetch: 3.1.8
       detect-indent: 6.1.0
       jsonc-parser: 2.3.1
       tapable-ts: 0.2.4
       timm: 1.7.1
-      typescript: 4.8.4
+      tslib: 2.6.2
+      typescript: 5.4.5
       vscode-languageserver-textdocument: 1.0.11
       vscode-languageserver-types: 3.17.5
     transitivePeerDependencies:
@@ -5087,61 +5115,61 @@ packages:
       - supports-color
     dev: false
 
-  /@player-tools/xlr-converters@0.5.0--canary.62.1176(jsonc-parser@2.3.1)(typescript@4.8.4):
-    resolution: {integrity: sha512-hPb+hRyt2jQCAFjX9eh/UQF2nFzI4GUd+1T87D8LGiYBd1okEckEDSn63twZNNZo0SpsQiyEADpEvwak2+pmvA==, tarball: https://registry.npmjs.org/@player-tools/xlr-converters/-/xlr-converters-0.5.0--canary.62.1176.tgz}
+  /@player-tools/xlr-converters@0.5.2(jsonc-parser@2.3.1)(typescript@5.4.5):
+    resolution: {integrity: sha512-5M644wJwyGz5gVV0+yHxwIFGkB7aL25Bll08TnqTFhLjYAIuy/Q12tE4DWklaNemvySkRUvRakh4EqFM1J3zDw==, tarball: https://registry.npmjs.org/@player-tools/xlr-converters/-/xlr-converters-0.5.2.tgz}
     peerDependencies:
-      typescript: 4.8.4
+      typescript: ^5.4.4
     dependencies:
-      '@babel/runtime': 7.15.4
-      '@player-tools/xlr': 0.5.0--canary.62.1176
-      '@player-tools/xlr-utils': 0.5.0--canary.62.1176(jsonc-parser@2.3.1)(typescript@4.8.4)
-      typescript: 4.8.4
+      '@player-tools/xlr': 0.5.2
+      '@player-tools/xlr-utils': 0.5.2(jsonc-parser@2.3.1)(typescript@5.4.5)
+      tslib: 2.6.2
+      typescript: 5.4.5
     transitivePeerDependencies:
       - jsonc-parser
       - supports-color
     dev: false
 
-  /@player-tools/xlr-sdk@0.5.0--canary.62.1176(typescript@4.8.4):
-    resolution: {integrity: sha512-PChAzlE9nhA04mUZNvv2T4L4tP8QhYT8l/Dttv4OFY7Vt/2HuLHvQzlhxRw45XVtBEtj55Q+hBJgMKvY0IILiA==, tarball: https://registry.npmjs.org/@player-tools/xlr-sdk/-/xlr-sdk-0.5.0--canary.62.1176.tgz}
+  /@player-tools/xlr-sdk@0.5.2(typescript@5.4.5):
+    resolution: {integrity: sha512-ZguEmjpgUARPo+8Bu8NJz4ojAYYOOj3AXjWScG7vCvGJdHJ70azPM9og/gYkSIxt12xAr1lAHeM1FSSf2kRmEg==, tarball: https://registry.npmjs.org/@player-tools/xlr-sdk/-/xlr-sdk-0.5.2.tgz}
     peerDependencies:
-      typescript: 4.8.4
+      typescript: ^5.4.4
     dependencies:
-      '@babel/runtime': 7.15.4
-      '@player-tools/xlr': 0.5.0--canary.62.1176
-      '@player-tools/xlr-converters': 0.5.0--canary.62.1176(jsonc-parser@2.3.1)(typescript@4.8.4)
-      '@player-tools/xlr-utils': 0.5.0--canary.62.1176(jsonc-parser@2.3.1)(typescript@4.8.4)
+      '@player-tools/xlr': 0.5.2
+      '@player-tools/xlr-converters': 0.5.2(jsonc-parser@2.3.1)(typescript@5.4.5)
+      '@player-tools/xlr-utils': 0.5.2(jsonc-parser@2.3.1)(typescript@5.4.5)
       '@types/fs-extra': 9.0.13
-      '@types/node': 16.18.96
+      '@types/node': 18.19.31
       fs-extra: 10.1.0
       jsonc-parser: 2.3.1
-      typescript: 4.8.4
+      tslib: 2.6.2
+      typescript: 5.4.5
     transitivePeerDependencies:
       - supports-color
     dev: false
 
-  /@player-tools/xlr-utils@0.5.0--canary.62.1176(jsonc-parser@2.3.1)(typescript@4.8.4):
-    resolution: {integrity: sha512-n6a9npihBd7jIBgsS9r/EfhELvomMVuMtUItLSHF5pGB8XpjQH7Omj98jaNQQO4FLbL0BEE6hghc9rQZP3VoFw==, tarball: https://registry.npmjs.org/@player-tools/xlr-utils/-/xlr-utils-0.5.0--canary.62.1176.tgz}
+  /@player-tools/xlr-utils@0.5.2(jsonc-parser@2.3.1)(typescript@5.4.5):
+    resolution: {integrity: sha512-kCLMySi8TGaB3Zij8UWPOgRW/4bmfkqA00khiI9IKEnEr2sFAqTM9abGDGhO9d9Pxd3OFJjVGKO+7qBTM8Lklg==, tarball: https://registry.npmjs.org/@player-tools/xlr-utils/-/xlr-utils-0.5.2.tgz}
     peerDependencies:
       jsonc-parser: ^2.3.1
-      typescript: 4.8.4
+      typescript: ^5.4.4
     dependencies:
-      '@babel/runtime': 7.15.4
-      '@player-tools/xlr': 0.5.0--canary.62.1176
+      '@player-tools/xlr': 0.5.2
       '@typescript/vfs': 1.5.0
       jsonc-parser: 2.3.1
-      typescript: 4.8.4
+      tslib: 2.6.2
+      typescript: 5.4.5
     transitivePeerDependencies:
       - supports-color
     dev: false
 
-  /@player-tools/xlr@0.5.0--canary.62.1176:
-    resolution: {integrity: sha512-uWeUwDNvABAZhcJbYpKaQjc3sz2oFWYbIA4OCbdF0UTdaOriW9t7gU/FDi/sVtfB3DKs8BsG5Zh9lTkcPvfFjg==, tarball: https://registry.npmjs.org/@player-tools/xlr/-/xlr-0.5.0--canary.62.1176.tgz}
+  /@player-tools/xlr@0.5.2:
+    resolution: {integrity: sha512-3rMN/W/9QKNeUPmeLwciFyAYXYH6pInQpXyqd4GaR+x3FrkZI5XYcFYP4dCKrx1xFfiug/IZdBsbBXnThyOLkA==, tarball: https://registry.npmjs.org/@player-tools/xlr/-/xlr-0.5.2.tgz}
     dependencies:
-      '@babel/runtime': 7.15.4
+      tslib: 2.6.2
     dev: false
 
-  /@player-ui/partial-match-registry@0.4.3:
-    resolution: {integrity: sha512-je6q8SVlNcHHSO0DmtLJSOP0yhfTDa6Sz1Fb5pGFBVieZkb+7bTpE8Yq2n3rMm/oIDSymTesTNYlvCxC0MBANw==, tarball: https://registry.npmjs.org/@player-ui/partial-match-registry/-/partial-match-registry-0.4.3.tgz}
+  /@player-ui/partial-match-registry@0.7.2-next.4:
+    resolution: {integrity: sha512-7I2YorvboXBbv4l6f9Bh95/CrRDkDsPw0Angh6B+UVntR2F6UJBMEhCNMG/rnv2Xv1nQpTzDCGK6SYuA+k1DxQ==, tarball: https://registry.npmjs.org/@player-ui/partial-match-registry/-/partial-match-registry-0.7.2-next.4.tgz}
     dependencies:
       '@babel/runtime': 7.15.4
       '@types/dlv': 1.1.4
@@ -5149,12 +5177,12 @@ packages:
       sorted-array: 2.0.4
     dev: false
 
-  /@player-ui/player@0.4.3:
-    resolution: {integrity: sha512-2buPknL35gBlQCa+bSqrDeAUkfFwrmKULYcQtRNI+o/itLl0xGckLk8twyN3K20Xw+XrdJfSdwXO8wWUyrqsrA==, tarball: https://registry.npmjs.org/@player-ui/player/-/player-0.4.3.tgz}
+  /@player-ui/player@0.7.2-next.4:
+    resolution: {integrity: sha512-TqdoMz/GDYPBeAEIIoK7GM3+oRJTN4g71HG8lOV2BxzTb2cwvyddRlUz6A0E/JSnkG9D0lR8ommv3w7bcKYpqA==, tarball: https://registry.npmjs.org/@player-ui/player/-/player-0.7.2-next.4.tgz}
     dependencies:
       '@babel/runtime': 7.15.4
-      '@player-ui/partial-match-registry': 0.4.3
-      '@player-ui/types': 0.4.3
+      '@player-ui/partial-match-registry': 0.7.2-next.4
+      '@player-ui/types': 0.7.2-next.4
       '@types/parsimmon': 1.10.9
       arr-flatten: 1.1.0
       dequal: 2.0.3
@@ -5168,8 +5196,8 @@ packages:
       ts-nested-error: 1.2.1
     dev: false
 
-  /@player-ui/types@0.4.3:
-    resolution: {integrity: sha512-oGiup9OvJLIgSFAEelhPKY1gst7a2UFX96x3OJechFI0YfkFm1zzt3DHVMgD0KTR+si6xdMhO2uce5J1Vnz/ew==, tarball: https://registry.npmjs.org/@player-ui/types/-/types-0.4.3.tgz}
+  /@player-ui/types@0.7.2-next.4:
+    resolution: {integrity: sha512-wvKlmu+ZJSVT5fs/vHHwpv4KhgZmqinJBvHhttU4LHzqrEauaRcS/DVCItABXt6ABxhIakPInnxQtH1xCwdDyQ==, tarball: https://registry.npmjs.org/@player-ui/types/-/types-0.7.2-next.4.tgz}
     dependencies:
       '@babel/runtime': 7.15.4
     dev: false
@@ -6924,12 +6952,6 @@ packages:
       '@babel/types': 7.24.0
     dev: false
 
-  /@types/babel__register@7.17.3:
-    resolution: {integrity: sha512-hy9H39BUIGO0C88bLxQD5rqBvqMgjPjDnA8Mx+fjAqtOi4OG7qYaZUMlDHfLOx5G9WtBzhfchzxKl37LTsVRbA==, tarball: https://registry.npmjs.org/@types/babel__register/-/babel__register-7.17.3.tgz}
-    dependencies:
-      '@types/babel__core': 7.20.5
-    dev: false
-
   /@types/babel__template@7.4.4:
     resolution: {integrity: sha512-h/NUaSyG5EyxBIp8YRxo4RMe2/qQgvyowRwVMzhYhBCONbW8PUsg4lkFMrhgZhUe5z3L3MiLDuvyJ/CaPa2A8A==, tarball: https://registry.npmjs.org/@types/babel__template/-/babel__template-7.4.4.tgz}
     dependencies:
@@ -7172,10 +7194,6 @@ packages:
       form-data: 4.0.0
     dev: false
 
-  /@types/node@16.18.96:
-    resolution: {integrity: sha512-84iSqGXoO+Ha16j8pRZ/L90vDMKX04QTYMTfYeE1WrjWaZXuchBehGUZEpNgx7JnmlrIHdnABmpjrQjhCnNldQ==, tarball: https://registry.npmjs.org/@types/node/-/node-16.18.96.tgz}
-    dev: false
-
   /@types/node@18.19.31:
     resolution: {integrity: sha512-ArgCD39YpyyrtFKIqMDvjz79jto5fcI/SVUs2HwB+f0dAzq68yqOdyaSivLiLugSziTpNXLQrVb7RZFmdZzbhA==, tarball: https://registry.npmjs.org/@types/node/-/node-18.19.31.tgz}
     dependencies:
@@ -7224,8 +7242,8 @@ packages:
       '@types/react': 18.2.77
     dev: false
 
-  /@types/react-reconciler@0.28.8:
-    resolution: {integrity: sha512-SN9c4kxXZonFhbX4hJrZy37yw9e7EIxcpHCxQv5JUS18wDE5ovkQKlqQEkufdJCCMfuI9BnjUJvhYeJ9x5Ra7g==, tarball: https://registry.npmjs.org/@types/react-reconciler/-/react-reconciler-0.28.8.tgz}
+  /@types/react-reconciler@0.26.7:
+    resolution: {integrity: sha512-mBDYl8x+oyPX/VBb3E638N0B7xG+SPk/EAMcVPeexqus/5aTpTphQi0curhhshOqRrc9t6OPoJfEUkbymse/lQ==, tarball: https://registry.npmjs.org/@types/react-reconciler/-/react-reconciler-0.26.7.tgz}
     dependencies:
       '@types/react': 18.2.77
     dev: false
@@ -8798,6 +8816,41 @@ packages:
       tslib: 1.14.1
     dev: false
 
+  /cli-ux@5.6.7(@oclif/config@1.18.17):
+    resolution: {integrity: sha512-dsKAurMNyFDnO6X1TiiRNiVbL90XReLKcvIq4H777NMqXGBxBws23ag8ubCJE97vVZEgWG2eSUhsyLf63Jv8+g==, tarball: https://registry.npmjs.org/cli-ux/-/cli-ux-5.6.7.tgz}
+    engines: {node: '>=8.0.0'}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+    dependencies:
+      '@oclif/command': 1.8.36(@oclif/config@1.18.17)(supports-color@8.1.1)
+      '@oclif/errors': 1.3.6
+      '@oclif/linewrap': 1.0.0
+      '@oclif/screen': 1.0.4
+      ansi-escapes: 4.3.2
+      ansi-styles: 4.3.0
+      cardinal: 2.1.1
+      chalk: 4.1.2
+      clean-stack: 3.0.1
+      cli-progress: 3.12.0
+      extract-stack: 2.0.0
+      fs-extra: 8.1.0
+      hyperlinker: 1.0.0
+      indent-string: 4.0.0
+      is-wsl: 2.2.0
+      js-yaml: 3.14.1
+      lodash: 4.17.21
+      natural-orderby: 2.0.3
+      object-treeify: 1.1.33
+      password-prompt: 1.1.3
+      semver: 7.6.0
+      string-width: 4.2.3
+      strip-ansi: 6.0.1
+      supports-color: 8.1.1
+      supports-hyperlinks: 2.3.0
+      tslib: 2.6.2
+    transitivePeerDependencies:
+      - '@oclif/config'
+    dev: false
+
   /cli-width@3.0.0:
     resolution: {integrity: sha512-FxqpkPPwu1HjuN93Omfm4h8uIanXofW0RxVEW3k5RKx+mJJYSthzNhp32Kzxxy3YAEZ/Dc/EWN1vZRY0+kOhbw==, tarball: https://registry.npmjs.org/cli-width/-/cli-width-3.0.0.tgz}
     engines: {node: '>= 10'}
@@ -9572,6 +9625,14 @@ packages:
       stream-shift: 1.0.3
     dev: false
 
+  /easy-table@1.2.0:
+    resolution: {integrity: sha512-OFzVOv03YpvtcWGe5AayU5G2hgybsg3iqA6drU8UaoZyB9jLGMTrz9+asnLp/E+6qPh88yEI1gvyZFZ41dmgww==, tarball: https://registry.npmjs.org/easy-table/-/easy-table-1.2.0.tgz}
+    dependencies:
+      ansi-regex: 5.0.1
+    optionalDependencies:
+      wcwidth: 1.0.1
+    dev: false
+
   /ebnf@1.9.1:
     resolution: {integrity: sha512-uW2UKSsuty9ANJ3YByIQE4ANkD8nqUPO7r6Fwcc1ADKPe9FRdcPpMl3VEput4JSvKBJ4J86npIC2MLP0pYkCuw==, tarball: https://registry.npmjs.org/ebnf/-/ebnf-1.9.1.tgz}
     hasBin: true
@@ -10200,6 +10261,11 @@ packages:
   /extract-stack@1.0.0:
     resolution: {integrity: sha512-M5Ge0JIrn12EtIVpje2G+hI5X78hmX4UDzynZ7Vnp1MiPSqleEonmgr2Rh59eygEEgq3YJ1GDP96rnM8tnVg/Q==, tarball: https://registry.npmjs.org/extract-stack/-/extract-stack-1.0.0.tgz}
     engines: {node: '>=4'}
+    dev: false
+
+  /extract-stack@2.0.0:
+    resolution: {integrity: sha512-AEo4zm+TenK7zQorGK1f9mJ8L14hnTDi2ZQPR+Mub1NX8zimka1mXpV5LpH8x9HoUmFSHZCfLHqWvp0Y4FxxzQ==, tarball: https://registry.npmjs.org/extract-stack/-/extract-stack-2.0.0.tgz}
+    engines: {node: '>=8'}
     dev: false
 
   /extract-zip@1.7.0:
@@ -12327,6 +12393,17 @@ packages:
       parse-json: 4.0.0
       pify: 3.0.0
       strip-bom: 3.0.0
+    dev: false
+
+  /load-json-file@5.3.0:
+    resolution: {integrity: sha512-cJGP40Jc/VXUsp8/OrnyKyTZ1y6v/dphm3bioS+RrKXjK2BB6wHUd6JptZEFDGgGahMT+InnZO5i1Ei9mpC8Bw==, tarball: https://registry.npmjs.org/load-json-file/-/load-json-file-5.3.0.tgz}
+    engines: {node: '>=6'}
+    dependencies:
+      graceful-fs: 4.2.11
+      parse-json: 4.0.0
+      pify: 4.0.1
+      strip-bom: 3.0.0
+      type-fest: 0.3.1
     dev: false
 
   /load-tsconfig@0.2.5:
@@ -14505,16 +14582,16 @@ packages:
     resolution: {integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==, tarball: https://registry.npmjs.org/react-is/-/react-is-18.2.0.tgz}
     dev: false
 
-  /react-json-reconciler@3.0.1(react@18.2.0):
-    resolution: {integrity: sha512-PDqlphgT5BkqDiFbExungyAyNRWextBjAr1cgh2J4YtvX3dzN02qpIA06zYCmIjM4FuRhCmhofBIXAkiD64LgA==, tarball: https://registry.npmjs.org/react-json-reconciler/-/react-json-reconciler-3.0.1.tgz}
+  /react-json-reconciler@2.0.0(react@18.2.0):
+    resolution: {integrity: sha512-3JYu/uQ3hwbFW18LePpEm0m5LaFpCxTt+3gf/N84wFUv7EBhbR2SBGhTmXiJ92u6tLIXy7H+tB8t7LqfdYhPNA==, tarball: https://registry.npmjs.org/react-json-reconciler/-/react-json-reconciler-2.0.0.tgz}
     peerDependencies:
       react: '*'
     dependencies:
-      '@types/react-reconciler': 0.28.8
+      '@types/react-reconciler': 0.26.7
       json-source-map: 0.6.1
       react: 18.2.0
       react-flatten-children: 1.1.2
-      react-reconciler: 0.29.0(react@18.2.0)
+      react-reconciler: 0.26.2(react@18.2.0)
       source-map-js: 1.2.0
     dev: false
 
@@ -14522,15 +14599,16 @@ packages:
     resolution: {integrity: sha512-alTKsjEL0dKH/ru1Iyn7vliS2QRcBp9zZPGoWxUOvRGWPUYgjo+V01is7p04It6KhgrzhJGnIj9GgX8W4bZoCQ==, tarball: https://registry.npmjs.org/react-merge-refs/-/react-merge-refs-1.1.0.tgz}
     dev: false
 
-  /react-reconciler@0.29.0(react@18.2.0):
-    resolution: {integrity: sha512-wa0fGj7Zht1EYMRhKWwoo1H9GApxYLBuhoAuXN0TlltESAjDssB+Apf0T/DngVqaMyPypDmabL37vw/2aRM98Q==, tarball: https://registry.npmjs.org/react-reconciler/-/react-reconciler-0.29.0.tgz}
+  /react-reconciler@0.26.2(react@18.2.0):
+    resolution: {integrity: sha512-nK6kgY28HwrMNwDnMui3dvm3rCFjZrcGiuwLc5COUipBK5hWHLOxMJhSnSomirqWwjPBJKV1QcbkI0VJr7Gl1Q==, tarball: https://registry.npmjs.org/react-reconciler/-/react-reconciler-0.26.2.tgz}
     engines: {node: '>=0.10.0'}
     peerDependencies:
-      react: ^18.2.0
+      react: ^17.0.2
     dependencies:
       loose-envify: 1.4.0
+      object-assign: 4.1.1
       react: 18.2.0
-      scheduler: 0.23.0
+      scheduler: 0.20.2
     dev: false
 
   /react-redux@7.2.9(react-dom@18.2.0)(react@18.2.0):
@@ -15297,6 +15375,13 @@ packages:
 
   /safer-buffer@2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==, tarball: https://registry.npmjs.org/safer-buffer/-/safer-buffer-2.1.2.tgz}
+    dev: false
+
+  /scheduler@0.20.2:
+    resolution: {integrity: sha512-2eWfGgAqqWFGqtdMmcL5zCMK1U8KlXv8SQFGglL3CEtd0aDVDWgeF/YoCmvln55m5zSk3J/20hTaSBeSObsQDQ==, tarball: https://registry.npmjs.org/scheduler/-/scheduler-0.20.2.tgz}
+    dependencies:
+      loose-envify: 1.4.0
+      object-assign: 4.1.1
     dev: false
 
   /scheduler@0.23.0:
@@ -16345,38 +16430,6 @@ packages:
     resolution: {integrity: sha512-hd5aYe8XfpWSCoh8vkV+JJmFY22Q2WtUIQIWEM3dYVKnEwMwyiRbxir/kRlTbZdGhoOeKqZ1ammPR/eiS7Tdgg==, tarball: https://registry.npmjs.org/ts-nested-error/-/ts-nested-error-1.2.1.tgz}
     dev: false
 
-  /ts-node@10.9.2(@swc/core@1.4.13)(@types/node@18.19.31)(typescript@4.8.4):
-    resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==, tarball: https://registry.npmjs.org/ts-node/-/ts-node-10.9.2.tgz}
-    hasBin: true
-    peerDependencies:
-      '@swc/core': '>=1.2.50'
-      '@swc/wasm': '>=1.2.50'
-      '@types/node': '*'
-      typescript: '>=2.7'
-    peerDependenciesMeta:
-      '@swc/core':
-        optional: true
-      '@swc/wasm':
-        optional: true
-    dependencies:
-      '@cspotcode/source-map-support': 0.8.1
-      '@swc/core': 1.4.13
-      '@tsconfig/node10': 1.0.11
-      '@tsconfig/node12': 1.0.11
-      '@tsconfig/node14': 1.0.3
-      '@tsconfig/node16': 1.0.4
-      '@types/node': 18.19.31
-      acorn: 8.11.3
-      acorn-walk: 8.3.2
-      arg: 4.1.3
-      create-require: 1.1.1
-      diff: 4.0.2
-      make-error: 1.3.6
-      typescript: 4.8.4
-      v8-compile-cache-lib: 3.0.1
-      yn: 3.1.1
-    dev: false
-
   /ts-node@10.9.2(@swc/core@1.4.13)(@types/node@18.19.31)(typescript@5.3.2):
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==, tarball: https://registry.npmjs.org/ts-node/-/ts-node-10.9.2.tgz}
     hasBin: true
@@ -16405,6 +16458,38 @@ packages:
       diff: 4.0.2
       make-error: 1.3.6
       typescript: 5.3.2
+      v8-compile-cache-lib: 3.0.1
+      yn: 3.1.1
+    dev: false
+
+  /ts-node@10.9.2(@swc/core@1.4.13)(@types/node@18.19.31)(typescript@5.4.5):
+    resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==, tarball: https://registry.npmjs.org/ts-node/-/ts-node-10.9.2.tgz}
+    hasBin: true
+    peerDependencies:
+      '@swc/core': '>=1.2.50'
+      '@swc/wasm': '>=1.2.50'
+      '@types/node': '*'
+      typescript: '>=2.7'
+    peerDependenciesMeta:
+      '@swc/core':
+        optional: true
+      '@swc/wasm':
+        optional: true
+    dependencies:
+      '@cspotcode/source-map-support': 0.8.1
+      '@swc/core': 1.4.13
+      '@tsconfig/node10': 1.0.11
+      '@tsconfig/node12': 1.0.11
+      '@tsconfig/node14': 1.0.3
+      '@tsconfig/node16': 1.0.4
+      '@types/node': 18.19.31
+      acorn: 8.11.3
+      acorn-walk: 8.3.2
+      arg: 4.1.3
+      create-require: 1.1.1
+      diff: 4.0.2
+      make-error: 1.3.6
+      typescript: 5.4.5
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
     dev: false
@@ -16547,6 +16632,11 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
+  /type-fest@0.3.1:
+    resolution: {integrity: sha512-cUGJnCdr4STbePCgqNFbpVNCepa+kAVohJs1sLhxzdH+gnEoOd8VhbYa7pD3zZYGiURWM2xzEII3fQcRizDkYQ==, tarball: https://registry.npmjs.org/type-fest/-/type-fest-0.3.1.tgz}
+    engines: {node: '>=6'}
+    dev: false
+
   /type-fest@0.6.0:
     resolution: {integrity: sha512-q+MB8nYR1KDLrgr4G5yemftpMC7/QLqVndBmEEdqzmNj5dcFOO4Oo8qlwZE3ULT3+Zim1F8Kq4cBnikNhlCMlg==, tarball: https://registry.npmjs.org/type-fest/-/type-fest-0.6.0.tgz}
     engines: {node: '>=8'}
@@ -16622,14 +16712,14 @@ packages:
     resolution: {integrity: sha512-GQ90TcKpIH4XxYTI2F98yEQYZgjNMOGPpOgdjIBhaLaWji5HPWlRnZ4AeA1hfBxtY7bCGDJsqDDHk/KaHOl5bA==, tarball: https://registry.npmjs.org/typescript-memoize/-/typescript-memoize-1.1.1.tgz}
     dev: false
 
-  /typescript@4.8.4:
-    resolution: {integrity: sha512-QCh+85mCy+h0IGff8r5XWzOVSbBO+KfeYrMQh7NJ58QujwcE22u+NUSmUxqF+un70P9GXKxa2HCNiTTMJknyjQ==, tarball: https://registry.npmjs.org/typescript/-/typescript-4.8.4.tgz}
-    engines: {node: '>=4.2.0'}
+  /typescript@5.3.2:
+    resolution: {integrity: sha512-6l+RyNy7oAHDfxC4FzSJcz9vnjTKxrLpDG5M2Vu4SHRVNg6xzqZp6LYSR9zjqQTu8DU/f5xwxUdADOkbrIX2gQ==, tarball: https://registry.npmjs.org/typescript/-/typescript-5.3.2.tgz}
+    engines: {node: '>=14.17'}
     hasBin: true
     dev: false
 
-  /typescript@5.3.2:
-    resolution: {integrity: sha512-6l+RyNy7oAHDfxC4FzSJcz9vnjTKxrLpDG5M2Vu4SHRVNg6xzqZp6LYSR9zjqQTu8DU/f5xwxUdADOkbrIX2gQ==, tarball: https://registry.npmjs.org/typescript/-/typescript-5.3.2.tgz}
+  /typescript@5.4.5:
+    resolution: {integrity: sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ==, tarball: https://registry.npmjs.org/typescript/-/typescript-5.4.5.tgz}
     engines: {node: '>=14.17'}
     hasBin: true
     dev: false
@@ -17704,6 +17794,13 @@ packages:
       string-width: 4.2.3
       y18n: 5.0.8
       yargs-parser: 20.2.9
+    dev: false
+
+  /yarn@1.22.22:
+    resolution: {integrity: sha512-prL3kGtyG7o9Z9Sv8IPfBNrWTDmXB4Qbes8A9rEzt6wkJV8mUvoirjU0Mp3GGAU06Y0XQyA3/2/RQFVuK7MTfg==, tarball: https://registry.npmjs.org/yarn/-/yarn-1.22.22.tgz}
+    engines: {node: '>=4.0.0'}
+    hasBin: true
+    requiresBuild: true
     dev: false
 
   /yauzl@2.10.0:

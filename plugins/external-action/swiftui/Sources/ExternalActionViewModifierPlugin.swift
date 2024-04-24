@@ -107,7 +107,7 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
         ResourceUtilities.urlForFile(
             name: fileName, ext: "js",
             bundle: Bundle(for: ExternalActionPlugin.self),
-            pathComponent: "ExternalActionPlugin.bundle"
+            pathComponent: "PlayerUI_ExternalActionPlugin.bundle"
         )
         #endif
     }

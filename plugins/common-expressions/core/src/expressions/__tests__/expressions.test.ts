@@ -181,12 +181,12 @@ describe("expr functions", () => {
               pet: "dog",
             },
             {
-              name: "Margie",
+              name: "Frodo",
               pet: "cat",
             },
           ],
         ],
-        ["names", ["Adam", "Tyler", "Andrew", "Kendall"]],
+        ["names", ["Adam", "Spencer", "Ketan", "Harris"]],
       ]);
     });
 
@@ -195,7 +195,7 @@ describe("expr functions", () => {
         context,
         "people",
         "name",
-        "Margie",
+        "Frodo",
         "pet",
         undefined,
       );
@@ -204,7 +204,7 @@ describe("expr functions", () => {
         context,
         "people",
         "name",
-        "Margie",
+        "Frodo",
       );
 
       expect(property).toBe("cat");
@@ -218,7 +218,7 @@ describe("expr functions", () => {
           pet: "dog",
         },
         {
-          name: "Margie",
+          name: "Frodo",
           pet: "cat",
         },
       ];
@@ -227,12 +227,12 @@ describe("expr functions", () => {
         context,
         arr,
         "name",
-        "Margie",
+        "Frodo",
         "pet",
         undefined,
       );
 
-      const propertyIndex = findPropertyIndex(context, arr, "name", "Margie");
+      const propertyIndex = findPropertyIndex(context, arr, "name", "Frodo");
 
       expect(property).toBe("cat");
       expect(propertyIndex).toBe(1);
@@ -243,7 +243,7 @@ describe("expr functions", () => {
         context,
         "people",
         "name",
-        "Tyler",
+        "Spencer",
       );
 
       expect(propertyIndex).toBe(-1);
@@ -254,7 +254,7 @@ describe("expr functions", () => {
         context,
         undefined as any,
         "name",
-        "Tyler",
+        "Spencer",
       );
 
       expect(propertyIndex).toBe(-1);
@@ -279,7 +279,7 @@ describe("expr functions", () => {
         context,
         "people",
         "name",
-        "Tyler",
+        "Spencer",
         "pet",
         "rabbit",
       );
@@ -305,12 +305,12 @@ describe("expr functions", () => {
               pet: "dog",
             },
             {
-              name: "Margie",
+              name: "Frodo",
               pet: "cat",
             },
           ],
         ],
-        ["names", ["Adam", "Tyler", "Andrew", "Kendall"]],
+        ["names", ["Adam", "Spencer", "Ketan", "Harris"]],
       ]);
     });
 

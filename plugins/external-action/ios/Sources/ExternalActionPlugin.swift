@@ -70,7 +70,7 @@ public class ExternalActionPlugin: JSBasePlugin, NativePlugin {
         #if SWIFT_PACKAGE
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
         #else
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: ExternalActionPlugin.self), pathComponent: "ExternalActionPlugin.bundle")
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: ExternalActionPlugin.self), pathComponent: "PlayerUI_ExternalActionPlugin.bundle")
         #endif
     }
 

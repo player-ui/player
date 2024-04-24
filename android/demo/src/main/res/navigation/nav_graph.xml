@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/StartFragment"
-        android:name="com.intuit.player.android.reference.demo.ui.start.StartFragment"
+        android:name="com.intuit.playerui.android.reference.demo.ui.start.StartFragment"
         android:label="@string/player_fragment_label"
         tools:layout="@layout/fragment_player">
 
@@ -18,7 +18,7 @@
 
     <fragment
         android:id="@+id/PlayerFragment"
-        android:name="com.intuit.player.android.reference.demo.ui.player.DemoPlayerFragment"
+        android:name="com.intuit.playerui.android.reference.demo.ui.player.DemoPlayerFragment"
         android:label="{name}"
         tools:layout="@layout/fragment_player">
 

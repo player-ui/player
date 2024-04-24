@@ -149,7 +149,6 @@ export class Parser {
       path: string[] = [],
     ): NestedObj => {
       if (typeof objToParse !== "object" || objToParse === null) {
-        // value = objToParse;
         return { value: objToParse, children: [] };
       }
 

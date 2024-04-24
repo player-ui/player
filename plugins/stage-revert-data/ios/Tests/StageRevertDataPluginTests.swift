@@ -63,16 +63,18 @@ class StageRevertDataPluginTests: XCTestCase {
       }
     }
     """
+    
     func testStageRevertDataPluginStagesData() {
         let expected = XCTestExpectation(description: "data did not change")
         let player = HeadlessPlayerImpl(plugins: [StageRevertDataPlugin()])
 
         player.hooks?.viewController.tap { viewController in
             viewController.hooks.view.tap { view in
-                guard view.id == "view-3" else {
-                    return
-                }
                 view.hooks.onUpdate.tap { value in
+                    guard view.id == "view-3" else {
+                        return
+                    }
+
                     let labelValue = value.objectForKeyedSubscript("value").toString()
 
                     XCTAssertEqual(labelValue, "default")
@@ -107,10 +109,11 @@ class StageRevertDataPluginTests: XCTestCase {
 
         player.hooks?.viewController.tap { viewController in
             viewController.hooks.view.tap { view in
-                guard view.id == "view-2" else {
-                    return
-                }
                 view.hooks.onUpdate.tap { value in
+                    guard view.id == "view-2" else {
+                        return
+                    }
+
                     let labelValue = value.objectForKeyedSubscript("value").toString()
 
                     XCTAssertEqual(labelValue, "Test")

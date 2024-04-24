@@ -207,7 +207,11 @@ class ExternalActionViewModifierPluginTests: XCTestCase {
         let content = try player.inspect().vStack().first?.anyView().anyView().modifier(ExternalStateSheetModifier.self).viewModifierContent()
         let value = try content?.sheet().anyView().text().string()
         XCTAssertEqual(value, "External State")
-        try (player.state as? InProgressState)?.controllers?.flow.transition(with: "Next")
+        do {
+            try (view.actionView().state as? InProgressState)?.controllers?.flow.transition(with: "Next")
+        } catch {
+            XCTFail("Transition with 'Next' failed")
+        }
 
         wait(for: [viewTransition], timeout: 10)
         let state = player.state as? InProgressState

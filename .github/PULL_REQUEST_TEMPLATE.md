@@ -32,3 +32,16 @@ Indicate the type of change your pull request is:
   const plugin = new Plugin(...)
   ```
 -->
+
+
+### Does your PR have any documentation updates?
+- [ ] Updated docs
+- [ ] No Update needed
+- [ ] Unable to update docs
+<!--
+In an effort to standardize our process and code, please make sure you include documentation and/or update any existing documentation.
+Please refer to our site https://player-ui.github.io/latest/about, and include any neccesary information that would be helpful to coders, developers, and learners.
+
+If you are unable to update the current documents, please create an issue for us to get back to it.
+
+-->

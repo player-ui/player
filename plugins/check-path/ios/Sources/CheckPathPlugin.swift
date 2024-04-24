@@ -64,7 +64,7 @@ open class BaseCheckPathPlugin: JSBasePlugin {
         #if SWIFT_PACKAGE
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
         #else
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: BaseCheckPathPlugin.self), pathComponent: "CheckPathPlugin.bundle")
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: BaseCheckPathPlugin.self), pathComponent: "PlayerUI_CheckPathPlugin.bundle")
         #endif
     }
 }

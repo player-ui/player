@@ -6,6 +6,7 @@
     "@player-ui/player": "workspace:*"
   },
   "dependencies": {
+    "@player-ui/common-types-plugin": "workspace:*",
     "@player-ui/reference-assets-plugin": "workspace:*"
   }
 }

@@ -216,7 +216,21 @@ export const VersionSelector = () => {
       }}
       value={router.basePath || "latest"}
       onChange={(e) => {
-        router.push(`${DOCS_BASE_URL}/${e.target.value}`);
+        const currentRoute = router.pathname
+        .split('/')
+        .filter((s) => {
+          // filter out empty string and url elements that include the version
+          if (
+            s &&
+            !['latest', 'next', ...released.map((r) => r.path)].includes(s)
+          ) {
+            return true;
+          }
+    
+          return false;
+        })
+        .join('/');
+        router.push(`${DOCS_BASE_URL}${e.target.value}/${currentRoute}`);
       }}
     >
       <option value="latest">Latest</option>

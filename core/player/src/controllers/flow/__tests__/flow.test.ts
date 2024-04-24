@@ -147,7 +147,7 @@ test("Fails to transition when not started", () => {
   expect(() => flow.transition("foo")).toThrowError();
 });
 
-test("Fails to transition during another transition", () => {
+test("Fails to transition during another transition", async () => {
   const flow = new FlowInstance("flow", {
     startState: "View1",
     View1: {
@@ -167,15 +167,32 @@ test("Fails to transition during another transition", () => {
     },
   });
 
+  let deferredVar: string;
+
+  const transition = () => {
+    try {
+      flow.transition("Next");
+      return "foo";
+    } catch (error: unknown) {
+      return "bar";
+    }
+  };
+
   flow.hooks.resolveTransitionNode.intercept({
     call: (nextState) => {
       if (nextState?.onStart) {
-        expect(() => flow.transition("Next")).toThrowError();
+        deferredVar = transition();
       }
     },
   });
 
   flow.start();
+
+  await vitest.waitFor(() => {
+    expect(deferredVar).toBeDefined();
+  });
+
+  expect(deferredVar!).toBe("bar");
 });
 
 describe("promise api", () => {

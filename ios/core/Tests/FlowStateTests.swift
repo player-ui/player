@@ -22,7 +22,7 @@ class FlowStateTests: XCTestCase {
         XCTAssertNotNil(inProgress.controllers?.flow.current?.currentState?.value as? NavigationFlowViewState)
         let view = inProgress.controllers?.flow.current?.currentState?.value as? NavigationFlowViewState
 
-        XCTAssertEqual(view?.attributes?["test"], "value")
+        XCTAssertEqual(view?.attributes?["test"] as? String, "value")
     }
 
     func testExternalFlowState() {

@@ -22,7 +22,7 @@ DSL_SRCS = glob([
 compile_dsl(
     name = "all_flows",
     srcs = DSL_SRCS,
-    config = ":dsl_config",
+    config = ":player.config.json",
     data = [
         ":node_modules/@player-ui/reference-assets-plugin-components",
         "//:node_modules/@player-tools/dsl",

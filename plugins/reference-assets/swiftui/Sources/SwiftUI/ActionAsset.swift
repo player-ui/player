@@ -87,4 +87,3 @@ extension WrappedFunction {
         jsValue.call(withArguments: args)
     }
 }
-

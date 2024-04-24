@@ -82,3 +82,97 @@ public class Hook2<T, U>: BaseJSHook where T: CreatedFromJSValue, U: CreatedFrom
         self.hook.invokeMethod("tap", withArguments: [name, JSValue(object: tapMethod, in: context) as Any])
     }
 }
+
+/**
+ This class represents an object in the JS runtime that can be tapped into
+ to receive JS events
+ */
+public class HookDecode<T>: BaseJSHook where T: Decodable {
+    /**
+     Attach a closure to the hook, so when the hook is fired in the JS runtime
+     we receive the event in the native runtime
+
+     - parameters:
+        - hook: A function to run when the JS hook is fired
+     */
+    public func tap(_ hook: @escaping (T) -> Void) {
+        let tapMethod: @convention(block) (JSValue?) -> Void = { value in
+            guard
+                let val = value,
+                let hookValue = try? JSONDecoder().decode(T.self, from: val)
+            else { return }
+            hook(hookValue)
+        }
+
+        self.hook.invokeMethod("tap", withArguments: [name, JSValue(object: tapMethod, in: context) as Any])
+    }
+}
+
+/**
+ This class represents an object in the JS runtime that can be tapped into
+ to receive JS events that has 2 parameters
+ */
+public class Hook2Decode<T, U>: BaseJSHook where T: Decodable, U: Decodable {
+    /**
+     Attach a closure to the hook, so when the hook is fired in the JS runtime
+     we receive the event in the native runtime
+
+     - parameters:
+        - hook: A function to run when the JS hook is fired
+     */
+    public func tap(_ hook: @escaping (T, U) -> Void) {
+        let tapMethod: @convention(block) (JSValue?, JSValue?) -> Void = { value, value2 in
+
+            let decoder = JSONDecoder()
+            guard
+                let val = value,
+                let val2 = value2,
+                let hookValue = try? decoder.decode(T.self, from: val),
+                let hookValue2 = try? decoder.decode(U.self, from: val2)
+            else { return }
+            hook(hookValue, hookValue2)
+        }
+
+        self.hook.invokeMethod("tap", withArguments: [name, JSValue(object: tapMethod, in: context) as Any])
+    }
+}
+
+/**
+ This class represents an object in the JS runtime that can be tapped into
+ and returns a promise that resolves when the asynchronous task is completed
+ */
+public class AsyncHook<T>: BaseJSHook where T: CreatedFromJSValue {
+    private var handler: AsyncHookHandler?
+
+    public typealias AsyncHookHandler = (T) async throws -> JSValue?
+
+    /**
+     Attach a closure to the hook, so when the hook is fired in the JS runtime
+     we receive the event in the native runtime
+
+     - parameters:
+        - hook: A function to run when the JS hook is fired
+     */
+    public func tap(_ hook: @escaping AsyncHookHandler) {
+        let tapMethod: @convention(block) (JSValue?) -> JSValue = { value in
+             guard
+                 let val = value,
+                 let hookValue = T.createInstance(value: val) as? T
+             else { return JSValue() }
+
+             let promise =
+             JSUtilities.createPromise(context: self.context, handler: { (resolve, _) in
+                 Task {
+                     let result = try await hook(hookValue)
+                     DispatchQueue.main.async {
+                         resolve(result as Any)
+                     }
+                 }
+             })
+
+             return promise ?? JSValue()
+         }
+
+         self.hook.invokeMethod("tap", withArguments: [name, JSValue(object: tapMethod, in: context) as Any])
+     }
+}
