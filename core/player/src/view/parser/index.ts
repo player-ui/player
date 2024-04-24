@@ -290,7 +290,6 @@ export class Parser {
             });
           }
         } else if (localValue && Array.isArray(localValue)) {
-          localValue.map((childValues)=>console.log("@@CHILDVALUES FOR LOCALVALUE^: ", childValues))
           const childValues = localValue
             .map((childVal) =>
               this.parseObject(childVal, NodeType.Value, options)
