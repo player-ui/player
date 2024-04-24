@@ -7,6 +7,7 @@ def generate_all_dsl_mocks(MOCK_DIRS):
             srcs = native.glob([
                 mock_dir + "/*.tsx",
             ]),
+            # skip_test = True,
             config = ":dsl_config",
             data = [
                 ":node_modules/@player-ui/reference-assets-cli-plugin",
