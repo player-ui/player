@@ -1,47 +1,47 @@
-import { replaceAt, set, omit } from 'timm';
+import { describe, it, expect, vitest } from "vitest";
+import { replaceAt, set, omit } from "timm";
+import { BindingParser } from "../../../binding";
+import { ExpressionEvaluator } from "../../../expressions";
+import { LocalModel, withParser } from "../../../data";
+import { SchemaController } from "../../../schema";
+import type { Logger } from "../../../logger";
+import { TapableLogger } from "../../../logger";
+import { Resolver } from "..";
+import type { Node } from "../../parser";
+import { NodeType, Parser } from "../../parser";
+import { StringResolverPlugin } from "../../plugins";
 
-import { BindingParser } from '../../../binding';
-import { ExpressionEvaluator } from '../../../expressions';
-import { LocalModel, withParser } from '../../../data';
-import { SchemaController } from '../../../schema';
-import type { Logger } from '../../../logger';
-import { TapableLogger } from '../../../logger';
-import { Resolver } from '..';
-import type { Node } from '../../parser';
-import { NodeType, Parser } from '../../parser';
-import { StringResolverPlugin } from '../../plugins';
-
-describe('Dynamic AST Transforms', () => {
+describe("Dynamic AST Transforms", () => {
   const content = {
-    id: 'main-view',
-    type: 'questionAnswer',
+    id: "main-view",
+    type: "questionAnswer",
     title: [
       {
         asset: {
-          id: 'title',
-          type: 'text',
-          value: 'Cool Page',
+          id: "title",
+          type: "text",
+          value: "Cool Page",
         },
       },
     ],
     primaryInfo: [
       {
         asset: {
-          id: 'subtitle',
-          type: 'text',
-          value: '{{year}}',
+          id: "subtitle",
+          type: "text",
+          value: "{{year}}",
         },
       },
     ],
   };
 
-  it('Dynamically added Nodes are properly resolved/cached on rerender', () => {
+  it("Dynamically added Nodes are properly resolved/cached on rerender", () => {
     const model = new LocalModel({
-      year: '2021',
+      year: "2021",
     });
     const parser = new Parser();
     const bindingParser = new BindingParser();
-    const inputBinding = bindingParser.parse('year');
+    const inputBinding = bindingParser.parse("year");
     const rootNode = parser.parseObject(content);
 
     const resolver = new Resolver(rootNode!, {
@@ -55,7 +55,7 @@ describe('Dynamic AST Transforms', () => {
     });
 
     // basic transform to change the asset
-    resolver.hooks.beforeResolve.tap('test-plugin', (node) => {
+    resolver.hooks.beforeResolve.tap("test-plugin", (node) => {
       if (
         node?.type === NodeType.Asset ||
         node?.type === NodeType.View ||
@@ -68,19 +68,19 @@ describe('Dynamic AST Transforms', () => {
             // We have a child for this key
             // Check if it's an array and shouldn't be
             const { value: childNode } = child;
-            if (childNode.type === 'multi-node') {
+            if (childNode.type === "multi-node") {
               if (childNode.values.length === 1) {
                 // If there's only 1 node, no need for a collection, just up-level the asset that's there
                 const firstChild = childNode.values[0];
                 newNode = set(
                   newNode,
-                  'children',
+                  "children",
                   replaceAt(newNode.children ?? [], i, {
                     path: child.path,
                     value: {
                       ...firstChild,
                     },
-                  })
+                  }),
                 );
               }
             }
@@ -105,53 +105,53 @@ describe('Dynamic AST Transforms', () => {
 
     const firstUpdate = resolver.update();
     expect(firstUpdate).toStrictEqual({
-      id: 'main-view',
-      type: 'questionAnswer',
+      id: "main-view",
+      type: "questionAnswer",
       title: {
         asset: {
-          id: 'title',
-          type: 'text',
-          value: 'Cool Page',
+          id: "title",
+          type: "text",
+          value: "Cool Page",
         },
       },
       primaryInfo: {
         asset: {
-          id: 'subtitle',
-          type: 'text',
-          value: '2021',
+          id: "subtitle",
+          type: "text",
+          value: "2021",
         },
       },
     });
 
-    model.set([[inputBinding, '2022']]);
+    model.set([[inputBinding, "2022"]]);
     const secondUpdate = resolver.update(new Set([inputBinding]));
     expect(secondUpdate).toStrictEqual({
-      id: 'main-view',
-      type: 'questionAnswer',
+      id: "main-view",
+      type: "questionAnswer",
       title: {
         asset: {
-          id: 'title',
-          type: 'text',
-          value: 'Cool Page',
+          id: "title",
+          type: "text",
+          value: "Cool Page",
         },
       },
       primaryInfo: {
         asset: {
-          id: 'subtitle',
-          type: 'text',
-          value: '2022',
+          id: "subtitle",
+          type: "text",
+          value: "2022",
         },
       },
     });
   });
 
-  it('Nodes are properly cached on rerender', () => {
+  it("Nodes are properly cached on rerender", () => {
     const model = new LocalModel({
-      year: '2021',
+      year: "2021",
     });
     const parser = new Parser();
     const bindingParser = new BindingParser();
-    const inputBinding = bindingParser.parse('year');
+    const inputBinding = bindingParser.parse("year");
     const rootNode = parser.parseObject(content);
 
     const resolver = new Resolver(rootNode!, {
@@ -176,37 +176,37 @@ describe('Dynamic AST Transforms', () => {
 
     // The cached items between each re-render should stay the same
     for (const [k, v] of resolveCache) {
-      const excludingUpdated = omit(v, 'updated');
+      const excludingUpdated = omit(v, "updated");
 
       expect(newResolveCache.has(k)).toBe(true);
       expect(newResolveCache.get(k)).toMatchObject(excludingUpdated);
     }
   });
 
-  it('Cached node points to the correct parent node', () => {
+  it("Cached node points to the correct parent node", () => {
     const view = {
-      id: 'main-view',
-      type: 'questionAnswer',
+      id: "main-view",
+      type: "questionAnswer",
       title: [
         {
           asset: {
-            id: 'title',
-            type: 'text',
-            value: 'Cool Page',
+            id: "title",
+            type: "text",
+            value: "Cool Page",
           },
         },
       ],
       primaryInfo: [
         {
           asset: {
-            id: 'input',
-            type: 'input',
-            value: '{{year}}',
+            id: "input",
+            type: "input",
+            value: "{{year}}",
             label: {
               asset: {
-                id: 'label',
-                type: 'text',
-                value: 'label',
+                id: "label",
+                type: "text",
+                value: "label",
               },
             },
           },
@@ -215,11 +215,11 @@ describe('Dynamic AST Transforms', () => {
     };
 
     const model = new LocalModel({
-      year: '2021',
+      year: "2021",
     });
     const parser = new Parser();
     const bindingParser = new BindingParser();
-    const inputBinding = bindingParser.parse('year');
+    const inputBinding = bindingParser.parse("year");
     const rootNode = parser.parseObject(view);
 
     const resolver = new Resolver(rootNode!, {
@@ -235,8 +235,8 @@ describe('Dynamic AST Transforms', () => {
     let inputNode: Node.Node | undefined;
     let labelNode: Node.Node | undefined;
 
-    resolver.hooks.beforeResolve.tap('test', (node, options) => {
-      if (node?.type === 'asset' && node.value.id === 'input') {
+    resolver.hooks.beforeResolve.tap("test", (node, options) => {
+      if (node?.type === "asset" && node.value.id === "input") {
         // Add to dependencies
         options.data.model.get(inputBinding);
       }
@@ -244,13 +244,13 @@ describe('Dynamic AST Transforms', () => {
       return node;
     });
 
-    resolver.hooks.afterResolve.tap('test', (value, node) => {
-      if (node.type === 'asset') {
+    resolver.hooks.afterResolve.tap("test", (value, node) => {
+      if (node.type === "asset") {
         const { id } = node.value;
 
-        if (id === 'input') inputNode = node;
+        if (id === "input") inputNode = node;
 
-        if (id === 'label') labelNode = node;
+        if (id === "label") labelNode = node;
       }
 
       return value;
@@ -258,7 +258,7 @@ describe('Dynamic AST Transforms', () => {
 
     resolver.update();
 
-    model.set([[inputBinding, '2022']]);
+    model.set([[inputBinding, "2022"]]);
 
     resolver.update(new Set([inputBinding]));
 
@@ -266,9 +266,9 @@ describe('Dynamic AST Transforms', () => {
     expect(labelNode?.parent).toBe(inputNode ?? {});
   });
 
-  it('Fixes parent references when beforeResolve taps make changes', () => {
+  it("Fixes parent references when beforeResolve taps make changes", () => {
     const model = new LocalModel({
-      year: '2021',
+      year: "2021",
     });
     const parser = new Parser();
     const bindingParser = new BindingParser();
@@ -285,8 +285,8 @@ describe('Dynamic AST Transforms', () => {
     });
 
     let parent;
-    resolver.hooks.beforeResolve.tap('test', (node) => {
-      if (node?.type !== NodeType.Asset || node.value.id !== 'subtitle') {
+    resolver.hooks.beforeResolve.tap("test", (node) => {
+      if (node?.type !== NodeType.Asset || node.value.id !== "subtitle") {
         return node;
       }
 
@@ -298,8 +298,8 @@ describe('Dynamic AST Transforms', () => {
     });
 
     let resolvedNode: Node.Node | undefined;
-    resolver.hooks.afterResolve.tap('test', (resolvedValue, node) => {
-      if (node?.type === NodeType.Asset && node.value.id === 'subtitle') {
+    resolver.hooks.afterResolve.tap("test", (resolvedValue, node) => {
+      if (node?.type === NodeType.Asset && node.value.id === "subtitle") {
         resolvedNode = node;
       }
 
@@ -314,34 +314,34 @@ describe('Dynamic AST Transforms', () => {
   });
 });
 
-describe('Duplicate IDs', () => {
-  it('Throws an error if two assets have the same id', () => {
+describe("Duplicate IDs", () => {
+  it("Throws an error if two assets have the same id", () => {
     const content = {
-      id: 'action',
-      type: 'collection',
+      id: "action",
+      type: "collection",
       values: [
         {
           asset: {
-            id: 'action-1',
-            type: 'action',
+            id: "action-1",
+            type: "action",
             label: {
               asset: {
-                id: 'action-label-1',
-                type: 'text',
-                value: 'Clicked {{count1}} times',
+                id: "action-label-1",
+                type: "text",
+                value: "Clicked {{count1}} times",
               },
             },
           },
         },
         {
           asset: {
-            id: 'action-1',
-            type: 'action',
+            id: "action-1",
+            type: "action",
             label: {
               asset: {
-                id: 'action-label-2',
-                type: 'text',
-                value: 'Clicked {{count2}} times',
+                id: "action-label-2",
+                type: "text",
+                value: "Clicked {{count2}} times",
               },
             },
           },
@@ -360,11 +360,11 @@ describe('Duplicate IDs', () => {
     const logger = new TapableLogger();
 
     const testLogger: Logger = {
-      trace: jest.fn(),
-      debug: jest.fn(),
-      info: jest.fn(),
-      warn: jest.fn(),
-      error: jest.fn(),
+      trace: vitest.fn(),
+      debug: vitest.fn(),
+      info: vitest.fn(),
+      warn: vitest.fn(),
+      error: vitest.fn(),
     };
 
     logger.addHandler(testLogger);
@@ -386,36 +386,36 @@ describe('Duplicate IDs', () => {
 
     expect(testLogger.error).toBeCalledTimes(1);
     expect(testLogger.error).toBeCalledWith(
-      'Cache conflict: Found Asset/View nodes that have conflicting ids: action-1, may cause cache issues.'
+      "Cache conflict: Found Asset/View nodes that have conflicting ids: action-1, may cause cache issues.",
     );
     (testLogger.error as jest.Mock).mockClear();
 
     expect(firstUpdate).toStrictEqual({
-      id: 'action',
-      type: 'collection',
+      id: "action",
+      type: "collection",
       values: [
         {
           asset: {
-            id: 'action-1',
-            type: 'action',
+            id: "action-1",
+            type: "action",
             label: {
               asset: {
-                id: 'action-label-1',
-                type: 'text',
-                value: 'Clicked 0 times',
+                id: "action-label-1",
+                type: "text",
+                value: "Clicked 0 times",
               },
             },
           },
         },
         {
           asset: {
-            id: 'action-1',
-            type: 'action',
+            id: "action-1",
+            type: "action",
             label: {
               asset: {
-                id: 'action-label-2',
-                type: 'text',
-                value: 'Clicked 0 times',
+                id: "action-label-2",
+                type: "text",
+                value: "Clicked 0 times",
               },
             },
           },
@@ -428,18 +428,18 @@ describe('Duplicate IDs', () => {
     expect(testLogger.error).not.toBeCalled();
   });
 
-  it('Throws a warning if two views have the same id', () => {
+  it("Throws a warning if two views have the same id", () => {
     const content = {
-      id: 'action',
-      type: 'collection',
+      id: "action",
+      type: "collection",
       values: [
         {
-          id: 'value-1',
-          binding: 'count1',
+          id: "value-1",
+          binding: "count1",
         },
         {
-          id: 'value-1',
-          binding: 'count2',
+          id: "value-1",
+          binding: "count2",
         },
       ],
     };
@@ -455,11 +455,11 @@ describe('Duplicate IDs', () => {
     const logger = new TapableLogger();
 
     const testLogger: Logger = {
-      trace: jest.fn(),
-      debug: jest.fn(),
-      info: jest.fn(),
-      warn: jest.fn(),
-      error: jest.fn(),
+      trace: vitest.fn(),
+      debug: vitest.fn(),
+      info: vitest.fn(),
+      warn: vitest.fn(),
+      error: vitest.fn(),
     };
 
     logger.addHandler(testLogger);
@@ -481,7 +481,7 @@ describe('Duplicate IDs', () => {
 
     expect(testLogger.info).toBeCalledTimes(1);
     expect(testLogger.info).toBeCalledWith(
-      'Cache conflict: Found Value nodes that have conflicting ids: value-1, may cause cache issues. To improve performance make value node IDs globally unique.'
+      "Cache conflict: Found Value nodes that have conflicting ids: value-1, may cause cache issues. To improve performance make value node IDs globally unique.",
     );
     (testLogger.info as jest.Mock).mockClear();
     expect(firstUpdate).toStrictEqual(content);
@@ -492,18 +492,18 @@ describe('Duplicate IDs', () => {
   });
 });
 
-describe('AST caching', () => {
-  it('skipping resolution of nodes should still repopulate AST map for itself and children', () => {
+describe("AST caching", () => {
+  it("skipping resolution of nodes should still repopulate AST map for itself and children", () => {
     const content = {
-      id: 'collection',
-      type: 'collection',
+      id: "collection",
+      type: "collection",
       values: [
         {
-          id: 'value-1',
-          type: 'collection',
+          id: "value-1",
+          type: "collection",
           values: [
             {
-              id: 'value-1-1',
+              id: "value-1-1",
             },
           ],
         },
@@ -525,14 +525,14 @@ describe('AST caching', () => {
     });
 
     const resolvedNodes: any[] = [];
-    resolver.hooks.afterResolve.tap('afterResolve', (value, node) => {
+    resolver.hooks.afterResolve.tap("afterResolve", (value, node) => {
       resolvedNodes.push(node);
       return value;
     });
 
     resolver.hooks.skipResolve.tap(
-      'skipResolve',
-      () => resolvedNodes.length >= 5
+      "skipResolve",
+      () => resolvedNodes.length >= 5,
     );
 
     new StringResolverPlugin().applyResolver(resolver);
@@ -560,19 +560,19 @@ describe('AST caching', () => {
   });
 });
 
-describe('Root AST Immutability', () => {
-  it('modifying nodes in beforeResolve should not impact the original tree', () => {
+describe("Root AST Immutability", () => {
+  it("modifying nodes in beforeResolve should not impact the original tree", () => {
     const content = {
-      id: 'action',
-      type: 'collection',
+      id: "action",
+      type: "collection",
       values: [
         {
-          id: 'value-1',
-          binding: 'count1',
+          id: "value-1",
+          binding: "count1",
         },
         {
-          id: 'value-1',
-          binding: 'count2',
+          id: "value-1",
+          binding: "count2",
         },
       ],
     };
@@ -592,15 +592,15 @@ describe('Root AST Immutability', () => {
     });
     let finalNode;
 
-    resolver.hooks.beforeResolve.tap('beforeResolve', (node) => {
+    resolver.hooks.beforeResolve.tap("beforeResolve", (node) => {
       if (node?.type !== NodeType.View) return node;
 
       // eslint-disable-next-line no-param-reassign
-      node.value.type = 'not-collection';
+      node.value.type = "not-collection";
       return node;
     });
 
-    resolver.hooks.afterResolve.tap('afterResolve', (value, node) => {
+    resolver.hooks.afterResolve.tap("afterResolve", (value, node) => {
       if (node?.type === NodeType.View) {
         finalNode = node;
       }
@@ -614,12 +614,12 @@ describe('Root AST Immutability', () => {
     expect(rootNode).not.toBe(finalNode);
     expect(finalNode).toMatchObject({
       value: {
-        type: 'not-collection',
+        type: "not-collection",
       },
     });
     expect(rootNode).toMatchObject({
       value: {
-        type: 'collection',
+        type: "collection",
       },
     });
   });

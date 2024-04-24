@@ -1,14 +1,15 @@
-import { SyncBailHook, AsyncSeriesWaterfallHook, SyncHook } from 'tapable-ts';
+import { SyncBailHook, AsyncSeriesWaterfallHook, SyncHook } from "tapable-ts";
 import type {
   Player,
   PlayerPlugin,
   PlayerFlowState,
   Logger,
-} from '@player-ui/player';
-import { resolveDataRefs } from '@player-ui/player';
-import type { Asset, View } from '@player-ui/types';
-import { setIn } from 'timm';
-import { BeaconPluginSymbol } from './symbols';
+  Asset,
+  View,
+} from "@player-ui/player";
+import { resolveDataRefs } from "@player-ui/player";
+import { setIn } from "timm";
+import { BeaconPluginSymbol } from "./symbols";
 
 export type BeaconDataType = string | Record<string, any>;
 
@@ -67,7 +68,7 @@ export interface HookArgs extends BeaconArgs {
  * It automatically keeps track of the current user's view, and adds additional metaData to each beacon event.
  */
 export class BeaconPlugin implements PlayerPlugin {
-  name = 'Beacon';
+  name = "Beacon";
 
   static Symbol = BeaconPluginSymbol;
   public readonly symbol = BeaconPlugin.Symbol;
@@ -95,7 +96,7 @@ export class BeaconPlugin implements PlayerPlugin {
     }
 
     if (options?.callback) {
-      this.hooks.publishBeacon.tap('BeaconCallback', (beacon: any) => {
+      this.hooks.publishBeacon.tap("BeaconCallback", (beacon: any) => {
         if (options.callback) {
           options.callback(beacon);
         }
@@ -108,7 +109,7 @@ export class BeaconPlugin implements PlayerPlugin {
     this.logger = player.logger;
 
     player.hooks.state.tap(this.name, (playerState) => {
-      if (playerState.status === 'in-progress') {
+      if (playerState.status === "in-progress") {
         this.resolveDataRefs = (data) =>
           resolveDataRefs(data, {
             model: playerState.controllers.data,
@@ -129,18 +130,18 @@ export class BeaconPlugin implements PlayerPlugin {
           /* If there is a 'beacon' property in an asset or view, skip resolving as we
              are doing this manually when beacon is fired. */
           parser.hooks.onCreateASTNode.tap(this.name, (obj) => {
-            if (obj?.type !== 'asset' && obj?.type !== 'view') return undefined;
+            if (obj?.type !== "asset" && obj?.type !== "view") return undefined;
 
             const propertiesToSkip =
               obj.plugins?.stringResolver?.propertiesToSkip ?? [];
 
-            if (propertiesToSkip.includes('beacon')) return undefined;
+            if (propertiesToSkip.includes("beacon")) return undefined;
 
             // eslint-disable-next-line no-param-reassign
             obj.plugins = setIn(
               obj.plugins ?? {},
-              ['stringResolver', 'propertiesToSkip'],
-              ['beacon', ...propertiesToSkip]
+              ["stringResolver", "propertiesToSkip"],
+              ["beacon", ...propertiesToSkip],
             ) as any;
 
             return obj;
@@ -154,8 +155,8 @@ export class BeaconPlugin implements PlayerPlugin {
 
           if (!beaconedView) {
             this.beacon({
-              action: 'viewed',
-              element: 'view',
+              action: "viewed",
+              element: "view",
               asset: viewUpdate,
               view: viewUpdate,
             });
@@ -167,12 +168,12 @@ export class BeaconPlugin implements PlayerPlugin {
     });
 
     player.hooks.expressionEvaluator.tap(this.name, (evaluator) => {
-      evaluator.addExpressionFunction('beacon', (_ctx, action, data) => {
+      evaluator.addExpressionFunction("beacon", (_ctx, action, data) => {
         const view = this.beaconContext.view || ({} as ViewBeacon);
         this.beacon({
           action: action as string,
           data: data as any,
-          element: 'view',
+          element: "view",
           asset: view,
           view,
         });
@@ -215,7 +216,7 @@ export class BeaconPlugin implements PlayerPlugin {
       const shouldCancel = this.hooks.cancelBeacon.call(hookArgs) || false;
 
       if (!shouldCancel) {
-        this.logger?.debug('Sending beacon event', beacon);
+        this.logger?.debug("Sending beacon event", beacon);
         this.hooks.publishBeacon.call(beacon);
       }
     }, 0);

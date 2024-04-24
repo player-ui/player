@@ -1,5 +1,5 @@
-import { SyncHook } from 'tapable-ts';
-import type { Logger, Severity } from './types';
+import { SyncHook } from "tapable-ts";
+import type { Logger, Severity } from "./types";
 
 /** A logger that has a tapable subscriptions to callbacks */
 export default class TapableLogger implements Logger {
@@ -30,9 +30,9 @@ export default class TapableLogger implements Logger {
     this.logHandlers.delete(logHandler);
   }
 
-  public readonly trace = this.createHandler('trace');
-  public readonly debug = this.createHandler('debug');
-  public readonly info = this.createHandler('info');
-  public readonly warn = this.createHandler('warn');
-  public readonly error = this.createHandler('error');
+  public readonly trace = this.createHandler("trace");
+  public readonly debug = this.createHandler("debug");
+  public readonly info = this.createHandler("info");
+  public readonly warn = this.createHandler("warn");
+  public readonly error = this.createHandler("error");
 }

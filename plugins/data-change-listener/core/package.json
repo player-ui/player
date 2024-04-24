@@ -1,0 +1,13 @@
+{
+  "name": "@player-ui/data-change-listener-plugin",
+  "version": "0.0.0-PLACEHOLDER",
+  "main": "src/index.ts",
+  "peerDependencies": {
+    "@player-ui/player": "workspace:*"
+  },
+  "devDependencies": {
+    "@player-ui/partial-match-registry": "workspace:*",
+    "@player-ui/asset-transform-plugin": "workspace:*",
+    "@player-ui/common-types-plugin": "workspace:*"
+  }
+}

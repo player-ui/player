@@ -1,5 +1,5 @@
-import type { Player, PlayerPlugin, InProgressState } from '@player-ui/player';
-import { getPubSubPlugin } from './utils';
+import type { Player, PlayerPlugin, InProgressState } from "@player-ui/player";
+import { getPubSubPlugin } from "./utils";
 
 export type PubSubHandler<T extends unknown[]> = (
   context: InProgressState,
@@ -12,7 +12,7 @@ export type SubscriptionMap = Map<string, PubSubHandler<any>>;
  * Plugin to easily add subscribers to the PubSubPlugin
  */
 export class PubSubHandlerPlugin implements PlayerPlugin {
-  name = 'pubsub-handler';
+  name = "pubsub-handler";
   private subscriptions: SubscriptionMap;
 
   constructor(subscriptions: SubscriptionMap) {
@@ -27,12 +27,12 @@ export class PubSubHandlerPlugin implements PlayerPlugin {
         pubsub.subscribe(key, (_, ...args) => {
           const state = player.getState();
 
-          if (state.status === 'in-progress') {
+          if (state.status === "in-progress") {
             return handler(state, ...args);
           }
 
           player.logger.info(
-            `[PubSubHandlerPlugin] subscriber for ${key} was called when player was not in-progress`
+            `[PubSubHandlerPlugin] subscriber for ${key} was called when player was not in-progress`,
           );
         });
       });

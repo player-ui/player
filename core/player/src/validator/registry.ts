@@ -1,4 +1,4 @@
-import type { ValidatorFunction } from './types';
+import type { ValidatorFunction } from "./types";
 
 /** A registry that tracks validators  */
 export class ValidatorRegistry {

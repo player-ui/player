@@ -1,0 +1,15 @@
+{
+  "name": "@player-ui/check-path-plugin",
+  "version": "0.0.0-PLACEHOLDER",
+  "main": "src/index.ts",
+  "peerDependencies": {
+    "@player-ui/player": "workspace:*"
+  },
+  "devDependencies": {
+    "@player-ui/make-flow": "workspace:*",
+    "@player-ui/asset-transform-plugin": "workspace:*"
+  },
+  "dependencies": {
+    "@player-ui/partial-match-registry": "workspace:*"
+  }
+}

@@ -1,46 +1,47 @@
-import { runTransform } from '@player-ui/asset-testing-library';
-import { infoTransform } from '..';
+import { describe, it, expect } from "vitest";
+import { runTransform } from "@player-ui/asset-testing-library";
+import { infoTransform } from "..";
 
-describe('info transform', () => {
-  it('populates segmentedActions', () => {
-    const ref = runTransform('info', infoTransform, {
-      id: 'generated-flow',
+describe("info transform", () => {
+  it("populates segmentedActions", () => {
+    const ref = runTransform("info", infoTransform, {
+      id: "generated-flow",
       views: [
         {
-          id: 'info-view',
-          type: 'info',
+          id: "info-view",
+          type: "info",
           title: {
             asset: {
-              id: 'info-title',
-              type: 'text',
-              value: 'Info Title',
+              id: "info-title",
+              type: "text",
+              value: "Info Title",
             },
           },
           actions: [
             {
               asset: {
-                id: 'next-action',
-                value: 'Next',
-                type: 'action',
+                id: "next-action",
+                value: "Next",
+                type: "action",
                 label: {
                   asset: {
-                    id: 'next-action-label',
-                    type: 'text',
-                    value: 'Continue',
+                    id: "next-action-label",
+                    type: "text",
+                    value: "Continue",
                   },
                 },
               },
             },
             {
               asset: {
-                id: 'prev-action',
-                value: 'Prev',
-                type: 'action',
+                id: "prev-action",
+                value: "Prev",
+                type: "action",
                 label: {
                   asset: {
-                    id: 'next-action-label',
-                    type: 'text',
-                    value: 'Back',
+                    id: "next-action-label",
+                    type: "text",
+                    value: "Back",
                   },
                 },
               },
@@ -50,19 +51,19 @@ describe('info transform', () => {
       ],
       data: {},
       navigation: {
-        BEGIN: 'FLOW_1',
+        BEGIN: "FLOW_1",
         FLOW_1: {
-          startState: 'VIEW_1',
+          startState: "VIEW_1",
           VIEW_1: {
-            state_type: 'VIEW',
-            ref: 'info-view',
+            state_type: "VIEW",
+            ref: "info-view",
             transitions: {
-              '*': 'END_Done',
+              "*": "END_Done",
             },
           },
           END_Done: {
-            state_type: 'END',
-            outcome: 'done',
+            state_type: "END",
+            outcome: "done",
           },
         },
       },
@@ -71,68 +72,68 @@ describe('info transform', () => {
       next: [
         {
           asset: {
-            id: 'next-action',
+            id: "next-action",
             label: {
               asset: {
-                id: 'next-action-label',
-                type: 'text',
-                value: 'Continue',
+                id: "next-action-label",
+                type: "text",
+                value: "Continue",
               },
             },
-            type: 'action',
-            value: 'Next',
+            type: "action",
+            value: "Next",
           },
         },
       ],
       prev: [
         {
           asset: {
-            id: 'prev-action',
+            id: "prev-action",
             label: {
               asset: {
-                id: 'next-action-label',
-                type: 'text',
-                value: 'Back',
+                id: "next-action-label",
+                type: "text",
+                value: "Back",
               },
             },
-            type: 'action',
-            value: 'Prev',
+            type: "action",
+            value: "Prev",
           },
         },
       ],
     });
   });
-  it('does not populate segmentedActions', () => {
-    const ref = runTransform('info', infoTransform, {
-      id: 'generated-flow',
+  it("does not populate segmentedActions", () => {
+    const ref = runTransform("info", infoTransform, {
+      id: "generated-flow",
       views: [
         {
-          id: 'info-view',
-          type: 'info',
+          id: "info-view",
+          type: "info",
           title: {
             asset: {
-              id: 'info-title',
-              type: 'text',
-              value: 'Info Title',
+              id: "info-title",
+              type: "text",
+              value: "Info Title",
             },
           },
         },
       ],
       data: {},
       navigation: {
-        BEGIN: 'FLOW_1',
+        BEGIN: "FLOW_1",
         FLOW_1: {
-          startState: 'VIEW_1',
+          startState: "VIEW_1",
           VIEW_1: {
-            state_type: 'VIEW',
-            ref: 'info-view',
+            state_type: "VIEW",
+            ref: "info-view",
             transitions: {
-              '*': 'END_Done',
+              "*": "END_Done",
             },
           },
           END_Done: {
-            state_type: 'END',
-            outcome: 'done',
+            state_type: "END",
+            outcome: "done",
           },
         },
       },

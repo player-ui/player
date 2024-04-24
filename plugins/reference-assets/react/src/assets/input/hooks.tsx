@@ -1,7 +1,7 @@
-import React from 'react';
-import { useBeacon } from '@player-ui/beacon-plugin-react';
-import type { TransformedInput } from '@player-ui/reference-assets-plugin';
-import type { KeyDownHandler } from './types';
+import React from "react";
+import { useBeacon } from "@player-ui/beacon-plugin-react";
+import type { TransformedInput } from "@player-ui/reference-assets-plugin";
+import type { KeyDownHandler } from "./types";
 
 export interface InputHookConfig {
   /** Format the input as the user keys down */
@@ -30,21 +30,21 @@ export interface InputHookConfig {
 }
 
 const defaultKeyStrings = [
-  'Delete',
-  'Backspace',
-  'Tab',
-  'Home',
-  'End',
-  'ArrowLeft',
-  'ArrowRight',
-  'ArrowUp',
-  'ArrowDown',
-  'Escape',
+  "Delete",
+  "Backspace",
+  "Tab",
+  "Home",
+  "End",
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowUp",
+  "ArrowDown",
+  "Escape",
 ];
 
 /** Create a valid config mixing in defaults and user overrides */
 export const getConfig = (
-  userConfig: InputHookConfig = {}
+  userConfig: InputHookConfig = {},
 ): Required<InputHookConfig> => {
   return {
     liveFormat: true,
@@ -52,28 +52,28 @@ export const getConfig = (
     quickFormatDelay: 200,
     slowFormatDelay: 1000,
     slowFormatKeys: defaultKeyStrings,
-    decimalSymbol: '.',
-    prefix: '',
-    suffix: '',
+    decimalSymbol: ".",
+    prefix: "",
+    suffix: "",
     ...userConfig,
   };
 };
 
 /** A hook to manage beacon changes for input assets */
 export const useInputBeacon = (props: TransformedInput) => {
-  const beaconHandler = useBeacon({ element: 'text_input', asset: props });
+  const beaconHandler = useBeacon({ element: "text_input", asset: props });
 
   return (newValue: string) => {
-    let action = 'modified';
+    let action = "modified";
 
     if (newValue === props.value) {
       return;
     }
 
     if (newValue && !props.value) {
-      action = 'added';
+      action = "added";
     } else if (!newValue && props.value) {
-      action = 'deleted';
+      action = "deleted";
     }
 
     beaconHandler({ action });
@@ -90,9 +90,9 @@ export const useInputBeacon = (props: TransformedInput) => {
  */
 export const useInputAsset = (
   props: TransformedInput,
-  config?: InputHookConfig
+  config?: InputHookConfig,
 ) => {
-  const [localValue, setLocalValue] = React.useState(props.value ?? '');
+  const [localValue, setLocalValue] = React.useState(props.value ?? "");
   const formatTimerRef = React.useRef<NodeJS.Timeout | undefined>(undefined);
   const inputBeacon = useInputBeacon(props);
 
@@ -117,7 +117,7 @@ export const useInputAsset = (
 
   /** Determines whether pressed key should trigger slow format or quick format delay */
   function getFormatDelaySpeed(e: React.KeyboardEvent<HTMLInputElement>) {
-    const key = slowFormatKeys.every((k) => typeof k === 'number')
+    const key = slowFormatKeys.every((k) => typeof k === "number")
       ? e.which
       : e.key;
 
@@ -150,9 +150,9 @@ export const useInputAsset = (
       e.preventDefault();
       target.setSelectionRange(pl, end - start + pl);
     } else if (
-      (e.key === 'ArrowLeft' && atStart) ||
-      (e.key === 'Backspace' && atStart && atEnd) ||
-      e.key === 'Home'
+      (e.key === "ArrowLeft" && atStart) ||
+      (e.key === "Backspace" && atStart && atEnd) ||
+      e.key === "Home"
     ) {
       e.preventDefault();
       target.setSelectionRange(prefix.length, prefix.length);
@@ -161,7 +161,7 @@ export const useInputAsset = (
 
   /** Helper to add affixes to value where appropriate  */
   function formatValueWithAffix(value: string | undefined) {
-    if (!value) return '';
+    if (!value) return "";
 
     return `${prefix}${value}${suffix}`;
   }
@@ -169,7 +169,7 @@ export const useInputAsset = (
   /** Value handling logic on key down */
   const onKeyDownHandler: KeyDownHandler = (currentValue: string) => {
     const symbolPosition = currentValue.indexOf(decimalSymbol);
-    const newValue = props.format(currentValue) ?? '';
+    const newValue = props.format(currentValue) ?? "";
     const newSymbolPosition = newValue.indexOf(decimalSymbol);
 
     if (
@@ -200,15 +200,15 @@ export const useInputAsset = (
 
     const formatted =
       (prefix
-        ? e.target.value.replace(prefix, '')
-        : props.format(e.target.value)) ?? '';
+        ? e.target.value.replace(prefix, "")
+        : props.format(e.target.value)) ?? "";
 
     if (formatted) {
       props.set(formatted);
       setLocalValue(formatValueWithAffix(formatted));
     } else {
-      props.set('');
-      setLocalValue('');
+      props.set("");
+      setLocalValue("");
     }
 
     if (!suppressBeacons) {
@@ -251,7 +251,7 @@ export const useInputAsset = (
   /** Format value onFocus if affixes exist */
   const onFocus: React.FocusEventHandler<HTMLInputElement> = (e) => {
     const target = e.target as HTMLInputElement;
-    const inputEmpty = target.value === '';
+    const inputEmpty = target.value === "";
 
     if ((!inputEmpty && suffix) || (inputEmpty && prefix)) {
       setLocalValue(handleAffixOnFocus(target));

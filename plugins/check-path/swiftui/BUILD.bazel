@@ -1,0 +1,11 @@
+load("//tools/ios:util.bzl", "swiftui_plugin")
+
+swiftui_plugin(
+    name = "SwiftUICheckPathPlugin",
+    resources = [],
+    deps = [
+        "//ios/swiftui:PlayerUISwiftUI",
+        "//plugins/check-path/ios:PlayerUICheckPathPlugin"
+    ],
+    test_deps = []
+)

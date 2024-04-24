@@ -2,7 +2,6 @@ load("@rules_player//kotlin:kt_jvm.bzl", _kt_jvm = "kt_jvm")
 load("@rules_player//kotlin:distribution.bzl", _distribution = "distribution")
 load("@build_constants//:constants.bzl", "VERSION")
 load("//jvm/dependencies:common.bzl", common_main_deps = "main_deps", common_test_deps = "test_deps")
-load("//:index.bzl", "DOCS_URL", "GIT_REPO")
 
 DEFAULT_GROUP = "com.intuit.playerui"
 DEFAULT_PROJECT_NAME = "Player"

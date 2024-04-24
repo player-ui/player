@@ -1,25 +1,26 @@
-import { LocalModel, withParser, PipelinedDataModel } from '../../data';
-import { ExpressionEvaluator } from '../../expressions';
-import { BindingParser } from '../../binding';
-import { SchemaController } from '../../schema';
-import { ViewInstance } from '..';
-import { NodeType } from '../parser';
+import { test, expect, vitest } from "vitest";
+import { LocalModel, withParser, PipelinedDataModel } from "../../data";
+import { ExpressionEvaluator } from "../../expressions";
+import { BindingParser } from "../../binding";
+import { SchemaController } from "../../schema";
+import { ApplicabilityPlugin, StringResolverPlugin, ViewInstance } from "..";
+import { NodeType } from "../parser";
 
 const parseBinding = new BindingParser().parse;
-const fooBarBinding = parseBinding('foo.bar');
+const fooBarBinding = parseBinding("foo.bar");
 
-test('uses the exact same object if nothing changes', () => {
+test("uses the exact same object if nothing changes", () => {
   const model = withParser(new LocalModel(), parseBinding);
   const evaluator = new ExpressionEvaluator({ model });
   const schema = new SchemaController();
   const view = new ViewInstance(
     {
-      id: 'foo',
+      id: "foo",
       fields: {
         asset: {
-          id: 'input',
-          type: 'input',
-          binding: 'foo.bar',
+          id: "input",
+          type: "input",
+          binding: "foo.bar",
         },
       },
     } as any,
@@ -29,12 +30,14 @@ test('uses the exact same object if nothing changes', () => {
       evaluator,
       transition: () => undefined,
       schema,
-    }
+    },
   );
 
-  view.hooks.resolver.tap('input', (resolver) => {
-    resolver.hooks.resolve.tap('input', (value, astNode, options) => {
-      if (astNode.type === NodeType.Asset && astNode.value.type === 'input') {
+  new StringResolverPlugin().apply(view);
+
+  view.hooks.resolver.tap("input", (resolver) => {
+    resolver.hooks.resolve.tap("input", (value, astNode, options) => {
+      if (astNode.type === NodeType.Asset && astNode.value.type === "input") {
         return {
           ...value,
           set(newValue: any) {
@@ -48,36 +51,36 @@ test('uses the exact same object if nothing changes', () => {
 
   const resolved = view.update();
   model.set([[fooBarBinding, true]]);
-  const bazUpdate = view.update(new Set([parseBinding('foo.baz')]));
+  const bazUpdate = view.update(new Set([parseBinding("foo.baz")]));
 
   expect(bazUpdate).toBe(resolved);
 
   model.set([[fooBarBinding, false]]);
-  const barUpdate = view.update(new Set([parseBinding('foo.bar')]));
+  const barUpdate = view.update(new Set([parseBinding("foo.bar")]));
   expect(barUpdate).not.toBe(bazUpdate);
   expect(barUpdate.fields.asset.value).toBe(false);
 });
 
-test('applicability is immutable', () => {
+test("applicability is immutable", () => {
   const model = withParser(
     new LocalModel({
       foo: {
         bar: true,
       },
     }),
-    parseBinding
+    parseBinding,
   );
   const evaluator = new ExpressionEvaluator({ model });
   const schema = new SchemaController();
 
   const view = new ViewInstance(
     {
-      id: 'foo',
+      id: "foo",
       fields: {
         asset: {
-          id: 'input',
-          type: 'input',
-          applicability: '{{foo.bar}}',
+          id: "input",
+          type: "input",
+          applicability: "{{foo.bar}}",
         },
       },
     } as any,
@@ -86,24 +89,27 @@ test('applicability is immutable', () => {
       evaluator,
       parseBinding,
       schema,
-    }
+    },
   );
 
+  new StringResolverPlugin().apply(view);
+  new ApplicabilityPlugin().apply(view);
+
   const resolved = view.update();
-  const batUpdate = view.update(new Set([parseBinding('foo.bat')]));
+  const batUpdate = view.update(new Set([parseBinding("foo.bat")]));
 
   expect(batUpdate.fields).toStrictEqual({
-    asset: { id: 'input', type: 'input' },
+    asset: { id: "input", type: "input" },
   });
   expect(batUpdate).toBe(resolved);
 
-  const firstUpdate = view.update(new Set([parseBinding('foo.bar')]));
+  const firstUpdate = view.update(new Set([parseBinding("foo.bar")]));
 
   expect(firstUpdate).not.toBe(resolved);
 
-  model.set([['foo', { bar: false }]]);
+  model.set([["foo", { bar: false }]]);
 
-  const secondUpdate = view.update(new Set([parseBinding('foo.bar')]));
+  const secondUpdate = view.update(new Set([parseBinding("foo.bar")]));
 
   expect(secondUpdate.fields).not.toBeDefined();
   expect(secondUpdate).not.toBe(firstUpdate);
@@ -111,7 +117,7 @@ test('applicability is immutable', () => {
   expect(secondUpdate).not.toBe(batUpdate);
 });
 
-test('binding normalization', () => {
+test("binding normalization", () => {
   const model = new PipelinedDataModel([
     new LocalModel({
       baz: 10,
@@ -132,12 +138,12 @@ test('binding normalization', () => {
 
   const view = new ViewInstance(
     {
-      id: 'foo',
+      id: "foo",
       fields: {
         asset: {
-          id: 'input',
-          type: 'input',
-          binding: 'foo[bar={{baz}}].enabled',
+          id: "input",
+          type: "input",
+          binding: "foo[bar={{baz}}].enabled",
         },
       },
     } as any,
@@ -146,45 +152,47 @@ test('binding normalization', () => {
       evaluator,
       parseBinding,
       schema,
-    }
+    },
   );
 
+  new StringResolverPlugin().apply(view);
+
   const resolved = view.update();
-  let barUpdate = view.update(new Set([parseBinding('boo')]));
+  let barUpdate = view.update(new Set([parseBinding("boo")]));
 
   expect(barUpdate).toBe(resolved);
 
-  model.set([[parseBinding('baz'), 20]]);
-  barUpdate = view.update(new Set([parseBinding('baz')]));
+  model.set([[parseBinding("baz"), 20]]);
+  barUpdate = view.update(new Set([parseBinding("baz")]));
 
-  expect(barUpdate.fields.asset.binding).not.toBe('foo[bar={{baz}}].enabled');
+  expect(barUpdate.fields.asset.binding).not.toBe("foo[bar={{baz}}].enabled");
   expect(barUpdate.fields.asset.binding).not.toBe(
-    resolved.fields.asset.binding
+    resolved.fields.asset.binding,
   );
 });
 
-test('hardcore immutability', () => {
+test("hardcore immutability", () => {
   const model = withParser(
     new LocalModel({
       foo: {
         bar: {
-          baz: '100!',
+          baz: "100!",
         },
       },
     }),
-    parseBinding
+    parseBinding,
   );
   const evaluator = new ExpressionEvaluator({ model });
   const schema = new SchemaController();
 
   const view = new ViewInstance(
     {
-      id: 'foo',
+      id: "foo",
       fields: {
         asset: {
-          id: 'input',
-          type: 'text',
-          value: '{{foo.bar.baz}}',
+          id: "input",
+          type: "text",
+          value: "{{foo.bar.baz}}",
         },
       },
     } as any,
@@ -193,47 +201,49 @@ test('hardcore immutability', () => {
       evaluator,
       parseBinding,
       schema,
-    }
+    },
   );
+
+  new StringResolverPlugin().apply(view);
 
   const resolved = view.update();
 
-  let barUpdate = view.update(new Set([parseBinding('boo')]));
+  let barUpdate = view.update(new Set([parseBinding("boo")]));
 
   expect(barUpdate).toBe(resolved);
 
-  barUpdate = view.update(new Set([parseBinding('foo')]));
+  barUpdate = view.update(new Set([parseBinding("foo")]));
 
   expect(barUpdate).not.toBe(resolved);
 
-  model.set([['foo.bar.baz', 20]]);
-  barUpdate = view.update(new Set([parseBinding('foo')]));
+  model.set([["foo.bar.baz", 20]]);
+  barUpdate = view.update(new Set([parseBinding("foo")]));
 
   expect(barUpdate.fields.asset.value).toBe(20);
 });
 
-test('should only update if data is used in view', () => {
+test("should only update if data is used in view", () => {
   const model = withParser(
     new LocalModel({
       foo: {
         bar: {
-          baz: '100!',
+          baz: "100!",
         },
       },
     }),
-    parseBinding
+    parseBinding,
   );
   const evaluator = new ExpressionEvaluator({ model });
   const schema = new SchemaController();
 
   const view = new ViewInstance(
     {
-      id: 'foo',
+      id: "foo",
       fields: {
         asset: {
-          id: 'input',
-          type: 'text',
-          value: 'A',
+          id: "input",
+          type: "text",
+          value: "A",
         },
       },
     } as any,
@@ -242,16 +252,18 @@ test('should only update if data is used in view', () => {
       evaluator,
       parseBinding,
       schema,
-    }
+    },
   );
 
-  const hook = jest.fn();
-  view.hooks.onUpdate.tap('update', hook);
+  new StringResolverPlugin().apply(view);
 
-  model.set([['foo.bar.baz', 20]]);
-  view.update(new Set([parseBinding('foo.bar.baz')]));
-  model.set([['foo.bar.baz', 30]]);
-  view.update(new Set([parseBinding('foo.bar.baz')]));
+  const hook = vitest.fn();
+  view.hooks.onUpdate.tap("update", hook);
+
+  model.set([["foo.bar.baz", 20]]);
+  view.update(new Set([parseBinding("foo.bar.baz")]));
+  model.set([["foo.bar.baz", 30]]);
+  view.update(new Set([parseBinding("foo.bar.baz")]));
 
   expect(hook.mock.calls).toHaveLength(1);
 });

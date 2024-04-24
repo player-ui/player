@@ -1,8 +1,8 @@
-import type { Node } from '../../view';
-import { NodeType } from '../../view';
-import { LocalStateStore } from './store';
-import type { TransformRegistry } from './types';
-import type { ViewController } from './controller';
+import type { Node } from "../../view";
+import { NodeType } from "../../view";
+import { LocalStateStore } from "./store";
+import type { TransformRegistry } from "./types";
+import type { ViewController } from "./controller";
 
 /** Traverse up the nodes until the target is found */
 function findUp(node: Node.Node, target: Node.Node): boolean {
@@ -32,18 +32,18 @@ export class AssetTransformCorePlugin {
   constructor(registry: TransformRegistry) {
     this.registry = registry;
     this.stateStore = new Map();
-    this.beforeResolveSymbol = Symbol('before resolve');
-    this.resolveSymbol = Symbol('resolve');
-    this.beforeResolveCountSymbol = Symbol('before resolve count');
-    this.resolveCountSymbol = Symbol('resolve count');
+    this.beforeResolveSymbol = Symbol("before resolve");
+    this.resolveSymbol = Symbol("resolve");
+    this.beforeResolveCountSymbol = Symbol("before resolve count");
+    this.resolveCountSymbol = Symbol("resolve count");
   }
 
   apply(viewController: ViewController) {
-    viewController.hooks.view.tap('asset-transform', (view) => {
+    viewController.hooks.view.tap("asset-transform", (view) => {
       // Clear out everything when we create a new view
       this.stateStore.clear();
 
-      view.hooks.resolver.tap('asset-transform', (resolver) => {
+      view.hooks.resolver.tap("asset-transform", (resolver) => {
         let lastUpdatedNode: Node.Node | undefined;
 
         /** A function to update the state and trigger a view re-compute */
@@ -74,27 +74,27 @@ export class AssetTransformCorePlugin {
 
           return {
             useSharedState: (
-              key: string | symbol
+              key: string | symbol,
             ): (<T>(initialState: T) => readonly [T, (value: T) => void]) => {
               return store.useSharedState(key);
             },
             useLocalState: <T>(initialState: T) => {
               return store.getLocalStateFunction<T>(
                 stepKey,
-                countKey
+                countKey,
               )(initialState);
             },
           };
         };
 
-        resolver.hooks.beforeResolve.tap('asset-transform', (node, options) => {
-          if (node && (node.type === 'asset' || node.type === 'view')) {
+        resolver.hooks.beforeResolve.tap("asset-transform", (node, options) => {
+          if (node && (node.type === "asset" || node.type === "view")) {
             const transform = this.registry.get(node.value);
 
             if (transform?.beforeResolve) {
               const store = getStore(
                 options.node ?? node,
-                this.beforeResolveSymbol
+                this.beforeResolveSymbol,
               );
 
               return transform.beforeResolve(node, options, store);
@@ -104,11 +104,11 @@ export class AssetTransformCorePlugin {
           return node;
         });
 
-        resolver.hooks.afterUpdate.tap('asset-transform', () => {
+        resolver.hooks.afterUpdate.tap("asset-transform", () => {
           lastUpdatedNode = undefined;
         });
 
-        resolver.hooks.skipResolve.tap('asset-transform', (skip, node) => {
+        resolver.hooks.skipResolve.tap("asset-transform", (skip, node) => {
           if (!skip || !lastUpdatedNode) {
             return skip;
           }
@@ -120,7 +120,7 @@ export class AssetTransformCorePlugin {
         });
 
         resolver.hooks.afterResolve.tap(
-          'asset-transform',
+          "asset-transform",
           (value, node, options) => {
             if (node.type !== NodeType.Asset && node.type !== NodeType.View) {
               return value;
@@ -141,7 +141,7 @@ export class AssetTransformCorePlugin {
             }
 
             return value;
-          }
+          },
         );
       });
     });

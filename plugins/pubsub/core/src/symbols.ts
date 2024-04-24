@@ -1,1 +1,1 @@
-export const PubSubPluginSymbol = Symbol.for('PubSubPlugin');
+export const PubSubPluginSymbol = Symbol.for("PubSubPlugin");

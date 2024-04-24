@@ -1,0 +1,13 @@
+load("//tools/ios:util.bzl", "swiftui_plugin")
+
+swiftui_plugin(
+    name = "ExternalActionViewModifierPlugin",
+    resources = [],
+    deps = [
+        "//ios/swiftui:PlayerUISwiftUI",
+        "//plugins/external-action/ios:PlayerUIExternalActionPlugin"
+    ],
+    test_deps = [
+        "//plugins/reference-assets/swiftui:PlayerUIReferenceAssets",
+    ]
+)

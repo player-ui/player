@@ -1,8 +1,9 @@
-import { BindingInstance, BindingParser } from '../../binding';
-import type { DataModelMiddleware } from '..';
-import { LocalModel, PipelinedDataModel } from '..';
-import { withParser } from '../model';
-import type { BatchSetTransaction } from '../model';
+import { describe, it, expect, beforeEach, vitest } from "vitest";
+import { BindingInstance, BindingParser } from "../../binding";
+import type { DataModelMiddleware } from "..";
+import { LocalModel, PipelinedDataModel } from "..";
+import { withParser } from "../model";
+import type { BatchSetTransaction } from "../model";
 
 const { parse } = new BindingParser({
   get: () => undefined,
@@ -10,7 +11,7 @@ const { parse } = new BindingParser({
   evaluate: () => undefined,
 });
 
-describe('model', () => {
+describe("model", () => {
   let localModel: LocalModel;
   let model: PipelinedDataModel;
 
@@ -24,7 +25,7 @@ describe('model', () => {
       set(transaction, options, next) {
         const newTransaction: BatchSetTransaction = [];
         transaction.forEach(([binding, val]) => {
-          if (val !== 'bad') {
+          if (val !== "bad") {
             newTransaction.push([binding, val]);
           }
         });
@@ -38,40 +39,40 @@ describe('model', () => {
     model.addMiddleware(middleware);
   });
 
-  it('works with basic middleware', () => {
+  it("works with basic middleware", () => {
     model.set([
-      [parse('foo.bar'), 'bad'],
-      [parse('foo.baz'), 'good'],
+      [parse("foo.bar"), "bad"],
+      [parse("foo.baz"), "good"],
     ]);
 
-    expect(localModel.get(parse('foo.bar'))).toBe(undefined);
-    expect(localModel.get(parse('foo.baz'))).toBe('good');
+    expect(localModel.get(parse("foo.bar"))).toBe(undefined);
+    expect(localModel.get(parse("foo.baz"))).toBe("good");
   });
 
-  it('works with withParser', () => {
-    const mockParse = jest.fn(() => new BindingInstance(['some', 'binding']));
+  it("works with withParser", () => {
+    const mockParse = vitest.fn(() => new BindingInstance(["some", "binding"]));
 
     const modelWithParser = withParser(model, mockParse);
 
-    modelWithParser.get('some.binding');
+    modelWithParser.get("some.binding");
 
     expect(mockParse).toHaveBeenCalledWith(
-      'some.binding',
-      expect.objectContaining({ readOnly: true })
+      "some.binding",
+      expect.objectContaining({ readOnly: true }),
     );
 
-    modelWithParser.set([['some.binding', 'test']]);
+    modelWithParser.set([["some.binding", "test"]]);
 
     expect(mockParse).toHaveBeenCalledWith(
-      'some.binding',
-      expect.objectContaining({ readOnly: false })
+      "some.binding",
+      expect.objectContaining({ readOnly: false }),
     );
 
-    modelWithParser.delete(['some.binding']);
+    modelWithParser.delete(["some.binding"]);
 
     expect(mockParse).toHaveBeenCalledWith(
-      'some.binding',
-      expect.objectContaining({ readOnly: false })
+      "some.binding",
+      expect.objectContaining({ readOnly: false }),
     );
   });
 });

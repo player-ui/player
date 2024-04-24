@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useRef, useMemo } from 'react';
-import type { Player } from '@player-ui/player';
-import type { MetricsCorePlugin } from '@player-ui/metrics-plugin';
+import { useCallback, useEffect, useRef, useMemo } from "react";
+import type { Player } from "@player-ui/player";
+import type { MetricsCorePlugin } from "@player-ui/metrics-plugin";
 import {
   MetricsCorePluginSymbol,
   RequestTimeWebPlugin,
-} from '@player-ui/metrics-plugin';
-import type { ReactPlayerPlugin } from '../player';
+} from "@player-ui/metrics-plugin";
+import type { ReactPlayerPlugin } from "../player";
 
 type RequestTime = {
   /** request start time */
@@ -34,7 +34,7 @@ export const useRequestTime = () => {
 
   /** wrap a promise with tracking it's time in flight */
   function withRequestTime<Type>(nextPromise: Promise<Type>): Promise<Type> {
-    const getTime = typeof performance === 'undefined' ? Date : performance;
+    const getTime = typeof performance === "undefined" ? Date : performance;
     requestTimeRef.current = { start: getTime.now() };
 
     return nextPromise.finally(() => {
@@ -47,13 +47,13 @@ export const useRequestTime = () => {
 
   const RequestTimeMetricsPlugin: ReactPlayerPlugin = useMemo(() => {
     return {
-      name: 'RequestTimeMetricsPlugin',
+      name: "RequestTimeMetricsPlugin",
       apply(player: Player): void {
         player.applyTo<MetricsCorePlugin>(
           MetricsCorePluginSymbol,
           (metricsCorePlugin) => {
             new RequestTimeWebPlugin(getRequestTime).apply(metricsCorePlugin);
-          }
+          },
         );
       },
     };

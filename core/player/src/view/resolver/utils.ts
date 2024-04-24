@@ -1,12 +1,12 @@
-import type { BindingInstance, BindingLike } from '../../binding';
-import { isBinding } from '../../binding';
-import type { ExpressionType } from '../../expressions';
-import type { Resolve } from './types';
+import type { BindingInstance, BindingLike } from "../../binding";
+import { isBinding } from "../../binding";
+import type { ExpressionType } from "../../expressions";
+import type { Resolve } from "./types";
 
 /** Check to see if and of the data-changes affect the given dependencies  */
 export function caresAboutDataChanges(
   dataChanges?: Set<BindingInstance>,
-  dependencies?: Set<BindingInstance>
+  dependencies?: Set<BindingInstance>,
 ) {
   if (!dataChanges || !dependencies) {
     return true;
@@ -20,15 +20,15 @@ export function caresAboutDataChanges(
       (dep) =>
         !!dataChangeArray.find(
           (change) =>
-            change === dep || change.contains(dep) || dep.contains(change)
-        )
+            change === dep || change.contains(dep) || dep.contains(change),
+        ),
     ) !== undefined
   );
 }
 
 /** Convert the options object for a resolver to one for a node */
 export function toNodeResolveOptions(
-  resolverOptions: Resolve.ResolverOptions
+  resolverOptions: Resolve.ResolverOptions,
 ): Resolve.NodeResolveOptions {
   return {
     ...resolverOptions,
@@ -47,7 +47,7 @@ export function toNodeResolveOptions(
               isBinding(bindingLike)
                 ? bindingLike
                 : resolverOptions.parseBinding(bindingLike),
-              value
+              value,
             )
           : value,
     },

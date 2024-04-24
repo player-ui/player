@@ -1,6 +1,6 @@
-import type { Asset, Expression } from '@player-ui/player';
+import type { Asset, Expression } from "@player-ui/player";
 
-export interface TextAsset extends Asset<'text'> {
+export interface TextAsset extends Asset<"text"> {
   /** The text to display */
   value: string;
 
@@ -24,7 +24,7 @@ export interface BasicTextModifier {
 /** A modifier to turn the text into a link */
 export interface LinkModifier {
   /** The link type denotes this as a link */
-  type: 'link';
+  type: "link";
 
   /** An optional expression to run before the link is opened */
   exp?: Expression;
@@ -35,6 +35,6 @@ export interface LinkModifier {
     ref: string;
 
     /** Used to indicate an application specific resolver to use */
-    'mime-type'?: string;
+    "mime-type"?: string;
   };
 }

@@ -1,5 +1,5 @@
-import type { Asset, AssetWrapper, Expression } from '@player-ui/player';
-import type { BeaconDataType } from '@player-ui/beacon-plugin';
+import type { Asset, AssetWrapper, Expression } from "@player-ui/player";
+import type { BeaconDataType } from "@player-ui/beacon-plugin";
 
 /**
  * User actions can be represented in several places.
@@ -7,7 +7,7 @@ import type { BeaconDataType } from '@player-ui/beacon-plugin';
  * In addition, several asset types can have actions that apply to that asset only.
  */
 export interface ActionAsset<AnyTextAsset extends Asset = Asset>
-  extends Asset<'action'> {
+  extends Asset<"action"> {
   /** The transition value of the action in the state machine */
   value?: string;
 

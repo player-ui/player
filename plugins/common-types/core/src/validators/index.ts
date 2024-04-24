@@ -1,6 +1,5 @@
-import type { Expression } from '@player-ui/types';
-import { resolveDataRefs } from '@player-ui/player';
-import type { ValidatorFunction } from '@player-ui/player';
+import { resolveDataRefs } from "@player-ui/player";
+import type { ValidatorFunction, Expression } from "@player-ui/player";
 
 // Shamelessly lifted from Scott Gonzalez via the Bassistance Validation plugin http://projects.scottsplayground.com/email_address_validation/
 
@@ -11,7 +10,7 @@ const ZIP_REGEX = /^\d{5}(-\d{4})?$/;
 
 /** Skip any null or undefined value when running the validator */
 function skipNullish<T>(
-  validationFn: ValidatorFunction<T>
+  validationFn: ValidatorFunction<T>,
 ): ValidatorFunction<T> {
   return (context, value, options) => {
     if (value === null || value === undefined) {
@@ -24,11 +23,11 @@ function skipNullish<T>(
 
 /** Checks to see if the data-type is a string */
 export const string: ValidatorFunction = skipNullish((context, value) => {
-  if (typeof value !== 'string') {
+  if (typeof value !== "string") {
     const message = context.constants.getConstants(
-      'validation.string',
-      'constants',
-      'Value must be a string'
+      "validation.string",
+      "constants",
+      "Value must be a string",
     ) as string;
 
     return {
@@ -43,9 +42,9 @@ export const string: ValidatorFunction = skipNullish((context, value) => {
 /** Validation for a non-mutable property */
 export const readonly: ValidatorFunction = (context) => {
   const message = context.constants.getConstants(
-    'validation.readonly',
-    'constants',
-    'Value cannot be modified'
+    "validation.readonly",
+    "constants",
+    "Value cannot be modified",
   ) as string;
 
   return { message };
@@ -55,9 +54,9 @@ export const readonly: ValidatorFunction = (context) => {
 export const collection: ValidatorFunction = skipNullish((context, value) => {
   if (!Array.isArray(value)) {
     const message = context.constants.getConstants(
-      'validation.collection',
-      'constants',
-      'Cannot set collection to non-array'
+      "validation.collection",
+      "constants",
+      "Cannot set collection to non-array",
     ) as string;
 
     return { message };
@@ -68,15 +67,15 @@ export const collection: ValidatorFunction = skipNullish((context, value) => {
 export const integer: ValidatorFunction = skipNullish((context, value) => {
   if (
     value &&
-    (typeof value !== 'number' ||
+    (typeof value !== "number" ||
       Math.floor(value) !== value ||
       Number(value) > Number.MAX_SAFE_INTEGER ||
       Number(value) < Number.MIN_SAFE_INTEGER)
   ) {
     const message = context.constants.getConstants(
-      'validation.integer',
-      'constants',
-      'Value must be an integer'
+      "validation.integer",
+      "constants",
+      "Value must be an integer",
     ) as string;
 
     return {
@@ -99,9 +98,9 @@ export const oneOf: ValidatorFunction<{
   }
 
   const message = context.constants.getConstants(
-    'validation.oneOf',
-    'constants',
-    'Invalid entry'
+    "validation.oneOf",
+    "constants",
+    "Invalid entry",
   ) as string;
 
   return { message };
@@ -116,7 +115,7 @@ export const expression: ValidatorFunction<{
   exp: Expression;
 }> = (context, value, options?) => {
   if (options?.exp === undefined) {
-    context.logger.warn('No expression defined for validation');
+    context.logger.warn("No expression defined for validation");
 
     return;
   }
@@ -125,9 +124,9 @@ export const expression: ValidatorFunction<{
 
   if (!result) {
     const message = context.constants.getConstants(
-      'validation.expression',
-      'constants',
-      'Expression evaluation failed'
+      "validation.expression",
+      "constants",
+      "Expression evaluation failed",
     ) as string;
 
     return { message };
@@ -150,14 +149,14 @@ export const required: ValidatorFunction<{
     return;
   }
 
-  if (value === undefined || value === null || value === '') {
+  if (value === undefined || value === null || value === "") {
     const message = context.constants.getConstants(
-      'validation.required',
-      'constants',
-      'A value is required'
+      "validation.required",
+      "constants",
+      "A value is required",
     ) as string;
 
-    return { message, severity: 'error' };
+    return { message, severity: "error" };
   }
 };
 
@@ -172,8 +171,8 @@ export const regex: ValidatorFunction<{
   if (
     value === undefined ||
     value === null ||
-    value === '' ||
-    typeof options?.regex !== 'string'
+    value === "" ||
+    typeof options?.regex !== "string"
   ) {
     return;
   }
@@ -188,9 +187,9 @@ export const regex: ValidatorFunction<{
 
   if (!regexp.test(value)) {
     const message = context.constants.getConstants(
-      'validation.regex',
-      'constants',
-      'Invalid entry'
+      "validation.regex",
+      "constants",
+      "Invalid entry",
     ) as string;
 
     return { message };
@@ -211,31 +210,31 @@ export const length: ValidatorFunction<
       exact: number;
     }
 > = skipNullish((context, value, options) => {
-  if (typeof options !== 'object') {
-    context.logger.warn('Missing comparison in length validation');
+  if (typeof options !== "object") {
+    context.logger.warn("Missing comparison in length validation");
 
     return;
   }
 
   let valLength: number | undefined;
-  let itemName = 'items';
+  let itemName = "items";
 
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     valLength = value.length;
-    itemName = 'characters';
-  } else if (typeof value === 'object' && value !== null) {
+    itemName = "characters";
+  } else if (typeof value === "object" && value !== null) {
     valLength = Object.keys(value).length;
   }
 
   if (valLength === undefined) {
     context.logger.warn(
-      `Unable to determine a length for value of type: ${value}`
+      `Unable to determine a length for value of type: ${value}`,
     );
 
     return;
   }
 
-  if ('exact' in options) {
+  if ("exact" in options) {
     if (valLength !== options.exact) {
       return {
         message: `Must be exactly ${options.exact} ${itemName} long`,
@@ -250,9 +249,9 @@ export const length: ValidatorFunction<
 
   if (options.min !== undefined && valLength < options.min) {
     const message = context.constants.getConstants(
-      'validation.length.minimum',
-      'constants',
-      `At least ${options.min} ${itemName} needed`
+      "validation.length.minimum",
+      "constants",
+      `At least ${options.min} ${itemName} needed`,
     ) as string;
 
     return {
@@ -265,9 +264,9 @@ export const length: ValidatorFunction<
 
   if (options.max !== undefined && valLength > options.max) {
     const message = context.constants.getConstants(
-      'validation.length.maximum',
-      'constants',
-      `Up to ${options.max} ${itemName} allowed`
+      "validation.length.maximum",
+      "constants",
+      `Up to ${options.max} ${itemName} allowed`,
     ) as string;
 
     return {
@@ -286,15 +285,15 @@ export const min: ValidatorFunction<{
   /** The minimum value */
   value: number;
 }> = skipNullish((context, value, options) => {
-  if (typeof value !== 'number' || options?.value === undefined) {
+  if (typeof value !== "number" || options?.value === undefined) {
     return;
   }
 
   if (value < options.value) {
     const message = context.constants.getConstants(
-      'validation.min',
-      'constants',
-      `Must be at least ${options.value}`
+      "validation.min",
+      "constants",
+      `Must be at least ${options.value}`,
     ) as string;
 
     return { message };
@@ -308,15 +307,15 @@ export const max: ValidatorFunction<{
   /** The minimum value */
   value: number;
 }> = skipNullish((context, value, options) => {
-  if (typeof value !== 'number' || options?.value === undefined) {
+  if (typeof value !== "number" || options?.value === undefined) {
     return;
   }
 
   if (value > options.value) {
     const message = context.constants.getConstants(
-      'validation.max',
-      'constants',
-      `Cannot exceed ${options.value}`
+      "validation.max",
+      "constants",
+      `Cannot exceed ${options.value}`,
     ) as string;
 
     return { message };
@@ -327,18 +326,18 @@ export const max: ValidatorFunction<{
 const stringRegexValidator = (
   test: RegExp,
   messagePath: string,
-  invalidMessage: string
+  invalidMessage: string,
 ): ValidatorFunction => {
   return skipNullish((context, value) => {
-    if (typeof value === 'string' && value === '') {
+    if (typeof value === "string" && value === "") {
       return;
     }
 
-    if (typeof value !== 'string' || !test.test(value)) {
+    if (typeof value !== "string" || !test.test(value)) {
       const message = context.constants.getConstants(
         messagePath,
-        'constants',
-        invalidMessage
+        "constants",
+        invalidMessage,
       ) as string;
 
       return { message };
@@ -349,20 +348,20 @@ const stringRegexValidator = (
 /** Checks that the given value represents an email */
 export const email = stringRegexValidator(
   EMAIL_REGEX,
-  'validation.email',
-  'Improper email format'
+  "validation.email",
+  "Improper email format",
 );
 
 /** Checks that the given value represents a phone number */
 export const phone = stringRegexValidator(
   PHONE_REGEX,
-  'validation.phone',
-  'Invalid phone number'
+  "validation.phone",
+  "Invalid phone number",
 );
 
 /** Checks that the given value represents a phone number */
 export const zip = stringRegexValidator(
   ZIP_REGEX,
-  'validation.regex',
-  'Invalid zip code'
+  "validation.regex",
+  "Invalid zip code",
 );

@@ -1,7 +1,7 @@
-import { NestedError } from 'ts-nested-error';
-import type { SyncWaterfallHook } from 'tapable-ts';
-import type { PathNode, AnyNode } from '../binding-grammar';
-import { findInArray, maybeConvertToNum } from './utils';
+import { NestedError } from "ts-nested-error";
+import type { SyncWaterfallHook } from "tapable-ts";
+import type { PathNode, AnyNode } from "../binding-grammar";
+import { findInArray, maybeConvertToNum } from "./utils";
 
 export interface NormalizedResult {
   /** The normalized path */
@@ -33,7 +33,7 @@ export interface ResolveBindingASTHooks {
 export function resolveBindingAST(
   bindingPathNode: PathNode,
   options: ResolveBindingASTOptions,
-  hooks?: ResolveBindingASTHooks
+  hooks?: ResolveBindingASTHooks,
 ): NormalizedResult {
   const context: Required<NormalizedResult> = {
     updates: {},
@@ -45,11 +45,11 @@ export function resolveBindingAST(
 
   /** Get the value for any child node */
   function getValueForNode(node: AnyNode): any {
-    if (node.name === 'Value') {
+    if (node.name === "Value") {
       return node.value;
     }
 
-    if (node.name === 'PathNode') {
+    if (node.name === "PathNode") {
       const nestedResolvedValue = resolveBindingAST(node, options);
 
       if (nestedResolvedValue.updates) {
@@ -61,17 +61,17 @@ export function resolveBindingAST(
 
       try {
         return options.convertToPath(
-          options.getValue(nestedResolvedValue.path)
+          options.getValue(nestedResolvedValue.path),
         );
       } catch (e: any) {
         throw new NestedError(
           `Unable to resolve path segment: ${nestedResolvedValue.path}`,
-          e
+          e,
         );
       }
     }
 
-    if (node.name === 'Expression') {
+    if (node.name === "Expression") {
       try {
         const actualValue = options.evaluate(node.value);
 
@@ -86,8 +86,8 @@ export function resolveBindingAST(
 
   /** Handle when path segments are binding paths (foo.bar) or single segments (foo) */
   function appendPathSegments(segment: string | number) {
-    if (typeof segment === 'string' && segment.indexOf('.') > -1) {
-      segment.split('.').forEach((i) => {
+    if (typeof segment === "string" && segment.indexOf(".") > -1) {
+      segment.split(".").forEach((i) => {
         context.path.push(maybeConvertToNum(i));
       });
     } else {
@@ -101,16 +101,16 @@ export function resolveBindingAST(
       hooks?.beforeResolveNode.call(_node, { ...context, ...options }) ?? _node;
 
     switch (resolvedNode.name) {
-      case 'Expression':
-      case 'PathNode':
+      case "Expression":
+      case "PathNode":
         appendPathSegments(getValueForNode(resolvedNode));
         break;
 
-      case 'Value':
+      case "Value":
         appendPathSegments(resolvedNode.value);
         break;
 
-      case 'Query': {
+      case "Query": {
         // Look for an object at the path with the given key/val criteria
         const objToQuery: Record<string, any>[] =
           options.getValue(context.path) ?? [];
@@ -124,7 +124,7 @@ export function resolveBindingAST(
 
         if (index === undefined || index === -1) {
           context.updates[
-            [...context.path, objToQuery.length, resolvedKey].join('.')
+            [...context.path, objToQuery.length, resolvedKey].join(".")
           ] = resolvedValue;
           context.path.push(objToQuery.length);
         } else {
@@ -134,8 +134,8 @@ export function resolveBindingAST(
         break;
       }
 
-      case 'Concatenated':
-        context.path.push(resolvedNode.value.map(getValueForNode).join(''));
+      case "Concatenated":
+        context.path.push(resolvedNode.value.map(getValueForNode).join(""));
         break;
 
       default:

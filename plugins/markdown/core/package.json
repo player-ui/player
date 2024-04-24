@@ -1,0 +1,13 @@
+{
+  "name": "@player-ui/markdown-plugin",
+  "version": "0.0.0-PLACEHOLDER",
+  "main": "src/index.ts",
+  "peerDependencies": {
+    "@player-ui/player": "workspace:*",
+    "@player-ui/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@player-ui/partial-match-fingerprint-plugin": "workspace:*",
+    "@player-ui/partial-match-registry": "workspace:*"
+  }
+}

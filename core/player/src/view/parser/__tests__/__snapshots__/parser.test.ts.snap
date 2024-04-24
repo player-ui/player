@@ -1,45 +1,45 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`generates the correct AST parses an exp array 1`] = `
-Object {
-  "children": Array [
-    Object {
-      "path": Array [
+exports[`generates the correct AST > parses an exp array 1`] = `
+{
+  "children": [
+    {
+      "path": [
         "exp",
       ],
-      "value": Object {
+      "value": {
         "override": true,
         "parent": [Circular],
         "type": "multi-node",
-        "values": Array [
-          Object {
+        "values": [
+          {
             "parent": [Circular],
             "type": "value",
-            "value": "{{please}} = \\"work\\"",
+            "value": "{{please}} = "work"",
           },
         ],
       },
     },
   ],
   "type": "asset",
-  "value": Object {
+  "value": {
     "id": "foo",
     "type": "action",
   },
 }
 `;
 
-exports[`generates the correct AST parses an object 1`] = `
-Object {
-  "children": Array [
-    Object {
-      "path": Array [
+exports[`generates the correct AST > parses an object 1`] = `
+{
+  "children": [
+    {
+      "path": [
         "asset",
       ],
-      "value": Object {
+      "value": {
         "parent": [Circular],
         "type": "asset",
-        "value": Object {
+        "value": {
           "type": "bar",
         },
       },
@@ -50,163 +50,54 @@ Object {
 }
 `;
 
-exports[`generates the correct AST when using switch plugin works with asset wrapped objects 1`] = `
-Object {
-  "children": Array [
-    Object {
-      "path": Array [
-        "title",
-        "asset",
-      ],
-      "value": Object {
-        "parent": [Circular],
-        "type": "asset",
-        "value": Object {
-          "id": "businessprofile-tile-screen-yoy-subtitle",
-          "type": "text",
-          "value": "If it's changed since last year, let us know. Feel free to pick more than one.",
-        },
-      },
-    },
-  ],
-  "type": "value",
-  "value": Object {
-    "id": "toughView",
-    "type": "view",
-  },
-}
-`;
-
-exports[`generates the correct AST when using switch plugin works with objects in a multiNode 1`] = `
-Object {
-  "children": Array [
-    Object {
-      "path": Array [
-        "title",
-        "asset",
-      ],
-      "value": Object {
-        "children": Array [
-          Object {
-            "path": Array [
-              "values",
-            ],
-            "value": Object {
-              "override": true,
-              "parent": [Circular],
-              "type": "multi-node",
-              "values": Array [
-                Object {
-                  "children": Array [
-                    Object {
-                      "path": Array [
-                        "asset",
-                      ],
-                      "value": Object {
-                        "parent": [Circular],
-                        "type": "asset",
-                        "value": Object {
-                          "id": "businessprofile-tile-screen-yoy-subtitle-1",
-                          "type": "text",
-                          "value": "If it's changed since last year, let us know. Feel free to pick more than one.",
-                        },
-                      },
-                    },
-                  ],
-                  "parent": [Circular],
-                  "type": "value",
-                  "value": undefined,
-                },
-                Object {
-                  "children": Array [
-                    Object {
-                      "path": Array [
-                        "asset",
-                      ],
-                      "value": Object {
-                        "parent": [Circular],
-                        "type": "asset",
-                        "value": Object {
-                          "id": "businessprofile-tile-screen-yoy-subtitle-2",
-                          "type": "text",
-                          "value": "More text",
-                        },
-                      },
-                    },
-                  ],
-                  "parent": [Circular],
-                  "type": "value",
-                  "value": undefined,
-                },
-              ],
-            },
-          },
-        ],
-        "parent": [Circular],
-        "type": "asset",
-        "value": Object {
-          "id": "someMultiNode",
-          "type": "type",
-        },
-      },
-    },
-  ],
-  "type": "value",
-  "value": Object {
-    "id": "toughView",
-    "type": "view",
-  },
-}
-`;
-
-exports[`generates the correct AST works with applicability things 1`] = `
-Object {
+exports[`generates the correct AST > works with applicability things 1`] = `
+{
   "expression": "{{baz}}",
   "type": "applicability",
-  "value": Object {
+  "value": {
     "parent": [Circular],
     "type": "value",
-    "value": Object {
+    "value": {
       "foo": "bar",
     },
   },
 }
 `;
 
-exports[`generates the correct AST works with applicability things 2`] = `
-Object {
-  "children": Array [
-    Object {
-      "path": Array [
+exports[`generates the correct AST > works with applicability things 2`] = `
+{
+  "children": [
+    {
+      "path": [
         "asset",
       ],
-      "value": Object {
-        "children": Array [
-          Object {
-            "path": Array [
+      "value": {
+        "children": [
+          {
+            "path": [
               "values",
             ],
-            "value": Object {
+            "value": {
               "override": true,
               "parent": [Circular],
               "type": "multi-node",
-              "values": Array [
-                Object {
+              "values": [
+                {
                   "expression": "{{foo}}",
                   "parent": [Circular],
                   "type": "applicability",
-                  "value": Object {
+                  "value": {
                     "parent": [Circular],
                     "type": "value",
-                    "value": Object {
+                    "value": {
                       "value": "foo",
                     },
                   },
                 },
-                Object {
+                {
                   "parent": [Circular],
                   "type": "value",
-                  "value": Object {
+                  "value": {
                     "value": "bar",
                   },
                 },
@@ -225,31 +116,31 @@ Object {
 }
 `;
 
-exports[`generates the correct AST works with applicability things 3`] = `
-Object {
-  "children": Array [
-    Object {
-      "path": Array [
+exports[`generates the correct AST > works with applicability things 3`] = `
+{
+  "children": [
+    {
+      "path": [
         "asset",
       ],
-      "value": Object {
-        "children": Array [
-          Object {
-            "path": Array [
+      "value": {
+        "children": [
+          {
+            "path": [
               "someProp",
             ],
-            "value": Object {
+            "value": {
               "expression": "{{foo}}",
               "parent": [Circular],
               "type": "applicability",
-              "value": Object {
+              "value": {
                 "parent": [Circular],
                 "type": "value",
-                "value": Object {
-                  "description": Object {
+                "value": {
+                  "description": {
                     "value": "description",
                   },
-                  "label": Object {
+                  "label": {
                     "value": "label",
                   },
                 },
@@ -268,28 +159,28 @@ Object {
 }
 `;
 
-exports[`generates the correct AST works with applicability things 4`] = `
-Object {
-  "children": Array [
-    Object {
-      "path": Array [
+exports[`generates the correct AST > works with applicability things 4`] = `
+{
+  "children": [
+    {
+      "path": [
         "asset",
       ],
-      "value": Object {
-        "children": Array [
-          Object {
-            "path": Array [
+      "value": {
+        "children": [
+          {
+            "path": [
               "someProp",
               "asset",
             ],
-            "value": Object {
+            "value": {
               "expression": "{{foo}}",
               "parent": [Circular],
               "type": "applicability",
-              "value": Object {
+              "value": {
                 "parent": [Circular],
                 "type": "asset",
-                "value": Object {
+                "value": {
                   "type": "someAsset",
                 },
               },
@@ -307,35 +198,144 @@ Object {
 }
 `;
 
-exports[`parseView parses a simple view 1`] = `
-Object {
-  "children": Array [
-    Object {
-      "path": Array [
-        "fields",
+exports[`generates the correct AST when using switch plugin > works with asset wrapped objects 1`] = `
+{
+  "children": [
+    {
+      "path": [
+        "title",
         "asset",
       ],
-      "value": Object {
-        "children": Array [
-          Object {
-            "path": Array [
+      "value": {
+        "parent": [Circular],
+        "type": "asset",
+        "value": {
+          "id": "businessprofile-tile-screen-yoy-subtitle",
+          "type": "text",
+          "value": "If it's changed since last year, let us know. Feel free to pick more than one.",
+        },
+      },
+    },
+  ],
+  "type": "value",
+  "value": {
+    "id": "toughView",
+    "type": "view",
+  },
+}
+`;
+
+exports[`generates the correct AST when using switch plugin > works with objects in a multiNode 1`] = `
+{
+  "children": [
+    {
+      "path": [
+        "title",
+        "asset",
+      ],
+      "value": {
+        "children": [
+          {
+            "path": [
               "values",
             ],
-            "value": Object {
+            "value": {
               "override": true,
               "parent": [Circular],
               "type": "multi-node",
-              "values": Array [
-                Object {
-                  "children": Array [
-                    Object {
-                      "path": Array [
+              "values": [
+                {
+                  "children": [
+                    {
+                      "path": [
                         "asset",
                       ],
-                      "value": Object {
+                      "value": {
                         "parent": [Circular],
                         "type": "asset",
-                        "value": Object {
+                        "value": {
+                          "id": "businessprofile-tile-screen-yoy-subtitle-1",
+                          "type": "text",
+                          "value": "If it's changed since last year, let us know. Feel free to pick more than one.",
+                        },
+                      },
+                    },
+                  ],
+                  "parent": [Circular],
+                  "type": "value",
+                  "value": undefined,
+                },
+                {
+                  "children": [
+                    {
+                      "path": [
+                        "asset",
+                      ],
+                      "value": {
+                        "parent": [Circular],
+                        "type": "asset",
+                        "value": {
+                          "id": "businessprofile-tile-screen-yoy-subtitle-2",
+                          "type": "text",
+                          "value": "More text",
+                        },
+                      },
+                    },
+                  ],
+                  "parent": [Circular],
+                  "type": "value",
+                  "value": undefined,
+                },
+              ],
+            },
+          },
+        ],
+        "parent": [Circular],
+        "type": "asset",
+        "value": {
+          "id": "someMultiNode",
+          "type": "type",
+        },
+      },
+    },
+  ],
+  "type": "value",
+  "value": {
+    "id": "toughView",
+    "type": "view",
+  },
+}
+`;
+
+exports[`parseView > parses a simple view 1`] = `
+{
+  "children": [
+    {
+      "path": [
+        "fields",
+        "asset",
+      ],
+      "value": {
+        "children": [
+          {
+            "path": [
+              "values",
+            ],
+            "value": {
+              "override": true,
+              "parent": [Circular],
+              "type": "multi-node",
+              "values": [
+                {
+                  "children": [
+                    {
+                      "path": [
+                        "asset",
+                      ],
+                      "value": {
+                        "parent": [Circular],
+                        "type": "asset",
+                        "value": {
                           "id": "text-asset",
                           "type": "text",
                           "value": "bar",
@@ -347,20 +347,20 @@ Object {
                   "type": "value",
                   "value": undefined,
                 },
-                Object {
-                  "children": Array [
-                    Object {
-                      "path": Array [
+                {
+                  "children": [
+                    {
+                      "path": [
                         "asset",
                       ],
-                      "value": Object {
+                      "value": {
                         "expression": "foo.bar",
                         "parent": [Circular],
                         "type": "applicability",
-                        "value": Object {
+                        "value": {
                           "parent": [Circular],
                           "type": "asset",
-                          "value": Object {
+                          "value": {
                             "id": "input-asset",
                             "type": "input",
                           },
@@ -378,7 +378,7 @@ Object {
         ],
         "parent": [Circular],
         "type": "asset",
-        "value": Object {
+        "value": {
           "id": "foo-asset",
           "type": "collection",
         },
@@ -386,7 +386,7 @@ Object {
     },
   ],
   "type": "view",
-  "value": Object {
+  "value": {
     "id": "foo-view",
     "type": "viewtype",
   },

@@ -1,0 +1,7 @@
+{
+  "name": "@player-ui/reference-assets-plugin-mocks",
+  "version": "0.0.0-PLACEHOLDER",
+  "dependencies": {
+    "@player-ui/reference-assets-plugin-components": "workspace:*"
+  }
+}

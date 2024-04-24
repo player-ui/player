@@ -1,0 +1,14 @@
+{
+  "name": "@player-ui/partial-match-fingerprint-plugin",
+  "version": "0.0.0-PLACEHOLDER",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@player-ui/partial-match-registry": "workspace:*"
+  },
+  "devDependencies": {
+    "@player-ui/make-flow": "workspace:*"
+  },
+  "peerDependencies": {
+    "@player-ui/player": "workspace:*"
+  }
+}

@@ -1,15 +1,15 @@
-import type { Player, PlayerPlugin } from '@player-ui/player';
-import { resolveDataRefsInString, NodeType } from '@player-ui/player';
-import type { Mappers } from './types';
-import { parseAssetMarkdownContent } from './utils';
+import type { Player, PlayerPlugin } from "@player-ui/player";
+import { resolveDataRefsInString, NodeType } from "@player-ui/player";
+import type { Mappers } from "./types";
+import { parseAssetMarkdownContent } from "./utils";
 
-export * from './types';
+export * from "./types";
 
 /**
  * A plugin that parses markdown written into text assets using the given converters for markdown features into existing assets.
  */
 export class MarkdownPlugin implements PlayerPlugin {
-  name = 'MarkdownPlugin';
+  name = "MarkdownPlugin";
 
   private mappers: Mappers;
 
@@ -21,13 +21,13 @@ export class MarkdownPlugin implements PlayerPlugin {
     player.hooks.view.tap(this.name, (view) => {
       view.hooks.resolver.tap(this.name, (resolver) => {
         resolver.hooks.beforeResolve.tap(this.name, (node, options) => {
-          if (node?.type === NodeType.Asset && node.value.type === 'markdown') {
+          if (node?.type === NodeType.Asset && node.value.type === "markdown") {
             const resolvedContent = resolveDataRefsInString(
               node.value.value as string,
               {
                 evaluate: options.evaluate,
                 model: options.data.model,
-              }
+              },
             );
 
             const parsed = parseAssetMarkdownContent({

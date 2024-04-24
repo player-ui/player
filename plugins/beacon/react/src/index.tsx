@@ -1,9 +1,9 @@
-import React from 'react';
-import type { ReactPlayer, ReactPlayerPlugin } from '@player-ui/react';
-import type { BeaconArgs } from '@player-ui/beacon-plugin';
-import { BeaconPlugin as BeaconCorePlugin } from '@player-ui/beacon-plugin';
+import React from "react";
+import type { ReactPlayer, ReactPlayerPlugin } from "@player-ui/react";
+import type { BeaconArgs } from "@player-ui/beacon-plugin";
+import { BeaconPlugin as BeaconCorePlugin } from "@player-ui/beacon-plugin";
 
-export * from '@player-ui/beacon-plugin';
+export * from "@player-ui/beacon-plugin";
 
 export type BeaconHandler = (options: BeaconArgs) => void;
 
@@ -16,15 +16,15 @@ export const BeaconContext = React.createContext<BeaconContextType>({
   handler: () => undefined,
 });
 
-export type BeaconCallbackArgs = Omit<BeaconArgs, 'view'>;
+export type BeaconCallbackArgs = Omit<BeaconArgs, "view">;
 
 export type BeaconCallbackFn<T extends Partial<BeaconCallbackArgs>> = (
-  options?: T
+  options?: T,
 ) => void;
 
 /** A hook for creating a beacon handler */
 export function useBeacon<T extends Partial<BeaconCallbackArgs>>(
-  initialArgs: T
+  initialArgs: T,
 ): BeaconCallbackFn<Omit<BeaconCallbackArgs, keyof T>> {
   const { handler } = React.useContext(BeaconContext);
 
@@ -43,15 +43,21 @@ export class BeaconPlugin
   extends BeaconCorePlugin
   implements ReactPlayerPlugin
 {
-  name = 'beacon-web-plugin';
+  name = "beacon-web-plugin";
 
   applyReact(reactPlayer: ReactPlayer) {
     const handler = this.beacon.bind(this);
 
-    reactPlayer.hooks.webComponent.tap(this.name, (Comp) => () => (
-      <BeaconContext.Provider value={{ handler }}>
-        <Comp />
-      </BeaconContext.Provider>
-    ));
+    reactPlayer.hooks.webComponent.tap(this.name, (Comp) => {
+      function BeaconContextComponent() {
+        return (
+          <BeaconContext.Provider value={{ handler }}>
+            <Comp />
+          </BeaconContext.Provider>
+        );
+      }
+
+      return BeaconContextComponent;
+    });
   }
 }

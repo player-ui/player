@@ -1,0 +1,6 @@
+load("//tools/ios:util.bzl", "ios_plugin")
+
+ios_plugin(
+    name = "StageRevertDataPlugin",
+    resources = ["//plugins/stage-revert-data/core:core_native_bundle"]
+)

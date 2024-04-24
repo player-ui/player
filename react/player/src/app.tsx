@@ -1,6 +1,6 @@
-import React from 'react';
-import type { View } from '@player-ui/player';
-import { ReactAsset } from './asset';
+import React from "react";
+import type { View } from "@player-ui/player";
+import { ReactAsset } from "./asset";
 
 export interface ReactPlayerProps {
   /**

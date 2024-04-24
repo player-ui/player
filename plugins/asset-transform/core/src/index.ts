@@ -4,12 +4,12 @@ import type {
   TransformRegistry,
   TransformFunction,
   TransformFunctions,
-} from '@player-ui/player';
-import { Registry } from '@player-ui/partial-match-registry';
-import { compose } from './utils';
+} from "@player-ui/player";
+import { Registry } from "@player-ui/partial-match-registry";
+import { compose } from "./utils";
 
-export * from './utils';
-export * from './propertiesToSkip';
+export * from "./utils";
+export * from "./propertiesToSkip";
 
 export type TransformType = TransformFunction<any> | TransformFunctions;
 export type TransformRegistryEntries = Array<[any, TransformType]>;
@@ -22,7 +22,7 @@ export type AssetTransformInit =
  * the resolve & beforeResolve functions.
  */
 function maybeCompose(maybeFn: any): TransformFunctions {
-  if (typeof maybeFn === 'object') {
+  if (typeof maybeFn === "object") {
     return maybeFn;
   }
 
@@ -34,7 +34,7 @@ function maybeCompose(maybeFn: any): TransformFunctions {
  * registry shape.
  */
 function cleanupTransformRegistry(
-  maybeRegistry: AssetTransformInit
+  maybeRegistry: AssetTransformInit,
 ): TransformRegistry {
   if (Array.isArray(maybeRegistry)) {
     const wrappedTransforms = maybeRegistry.map(([key, value]) => {
@@ -58,7 +58,7 @@ function cleanupTransformRegistry(
  * This allows users to embed stateful data into transforms.
  */
 export class AssetTransformPlugin implements PlayerPlugin {
-  name = 'asset-transform';
+  name = "asset-transform";
   public readonly registry: TransformRegistry;
 
   constructor(transforms: AssetTransformInit) {
@@ -68,7 +68,7 @@ export class AssetTransformPlugin implements PlayerPlugin {
   apply(player: Player) {
     player.hooks.viewController.tap(this.name, (vc) => {
       this.registry.forEach(({ key, value }) =>
-        vc.transformRegistry.set(key, maybeCompose(value))
+        vc.transformRegistry.set(key, maybeCompose(value)),
       );
     });
   }

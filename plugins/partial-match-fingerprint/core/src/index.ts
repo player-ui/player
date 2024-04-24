@@ -1,6 +1,5 @@
-import type { Player, PlayerPlugin } from '@player-ui/player';
-import type { Registry } from '@player-ui/partial-match-registry';
-import type { Asset } from '@player-ui/types';
+import type { Player, PlayerPlugin, Asset } from "@player-ui/player";
+import type { Registry } from "@player-ui/partial-match-registry";
 
 /**
  * A player plugin to manage partial-match-mappings by asset id
@@ -8,7 +7,7 @@ import type { Asset } from '@player-ui/types';
  * the partial match registry
  */
 export class PartialMatchFingerprintPlugin implements PlayerPlugin {
-  name = 'partial-match-fingerprint';
+  name = "partial-match-fingerprint";
   private registry: Registry<any>;
   private mapping: Map<string, any>;
 
@@ -23,12 +22,12 @@ export class PartialMatchFingerprintPlugin implements PlayerPlugin {
         view.hooks.resolver.tap(this.name, (resolver) => {
           resolver.hooks.afterResolve.tap(this.name, (resolved, node) => {
             if (
-              (resolved && node && node.type === 'asset') ||
-              node.type === 'view'
+              (resolved && node && node.type === "asset") ||
+              node.type === "view"
             ) {
               this.mapping.set(
                 (resolved as Asset).id,
-                this.registry.get(resolved as Asset)
+                this.registry.get(resolved as Asset),
               );
             }
           });

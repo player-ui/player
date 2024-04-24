@@ -2,10 +2,10 @@ import type {
   Player,
   PlayerPlugin,
   ExpressionContext,
-} from '@player-ui/player';
-import type { SubscribeHandler, TinyPubSub } from './pubsub';
-import { pubsub } from './pubsub';
-import { PubSubPluginSymbol } from './symbols';
+} from "@player-ui/player";
+import type { SubscribeHandler, TinyPubSub } from "./pubsub";
+import { pubsub } from "./pubsub";
+import { PubSubPluginSymbol } from "./symbols";
 
 export interface PubSubConfig {
   /** A custom expression name to register  */
@@ -22,7 +22,7 @@ export interface PubSubConfig {
  *
  */
 export class PubSubPlugin implements PlayerPlugin {
-  name = 'pub-sub';
+  name = "pub-sub";
 
   static Symbol = PubSubPluginSymbol;
   public readonly symbol = PubSubPlugin.Symbol;
@@ -32,7 +32,7 @@ export class PubSubPlugin implements PlayerPlugin {
   private expressionName: string;
 
   constructor(config?: PubSubConfig) {
-    this.expressionName = config?.expressionName ?? 'publish';
+    this.expressionName = config?.expressionName ?? "publish";
     this.pubsub = pubsub;
   }
 
@@ -46,21 +46,21 @@ export class PubSubPlugin implements PlayerPlugin {
 
     player.hooks.expressionEvaluator.tap(this.name, (expEvaluator) => {
       const existingExpression = expEvaluator.operators.expressions.get(
-        this.expressionName
+        this.expressionName,
       );
 
       if (existingExpression) {
         player.logger.warn(
-          `[PubSubPlugin] expression ${this.expressionName} is already registered.`
+          `[PubSubPlugin] expression ${this.expressionName} is already registered.`,
         );
       } else {
         expEvaluator.addExpressionFunction(
           this.expressionName,
           (_ctx: ExpressionContext, event: unknown, ...args: unknown[]) => {
-            if (typeof event === 'string') {
+            if (typeof event === "string") {
               this.publish(event, ...args);
             }
-          }
+          },
         );
       }
     });
@@ -89,7 +89,7 @@ export class PubSubPlugin implements PlayerPlugin {
    */
   subscribe<T extends string, A extends unknown[]>(
     event: T,
-    handler: SubscribeHandler<T, A>
+    handler: SubscribeHandler<T, A>,
   ) {
     return this.pubsub.subscribe(event, handler);
   }

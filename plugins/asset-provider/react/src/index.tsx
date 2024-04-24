@@ -1,6 +1,6 @@
-import React from 'react';
-import type { ReactPlayer, ReactPlayerPlugin } from '@player-ui/react';
-import { AssetContext } from '@player-ui/react';
+import React from "react";
+import type { ReactPlayer, ReactPlayerPlugin } from "@player-ui/react";
+import { AssetContext } from "@player-ui/react";
 
 export type AssetRegistryEntries = Array<[any, React.ComponentType<any>]>;
 
@@ -8,7 +8,7 @@ export type AssetRegistryEntries = Array<[any, React.ComponentType<any>]>;
  * A streamlined way of registering custom assets with the web-player
  */
 export class AssetProviderPlugin implements ReactPlayerPlugin {
-  name = 'web-asset-provider-plugin';
+  name = "web-asset-provider-plugin";
 
   private readonly entries: AssetRegistryEntries;
 
@@ -25,7 +25,7 @@ export class AssetProviderPlugin implements ReactPlayerPlugin {
   applyReact(rp: ReactPlayer) {
     this.entries.forEach(([match, comp]) => {
       const normalizedMatch =
-        typeof match === 'string' ? { type: match } : match;
+        typeof match === "string" ? { type: match } : match;
 
       rp.assetRegistry.set(normalizedMatch, comp);
     });
@@ -33,11 +33,15 @@ export class AssetProviderPlugin implements ReactPlayerPlugin {
     // Because some instances may end up with a different copy of the `AssetContext` (depending on bundling and such)
     // We add an entry to use the local version of `@web-player/asset` -- but still utilize the same rp.assetRegistry
     rp.hooks.webComponent.tap(this.name, (Comp) => {
-      return () => (
-        <AssetContext.Provider value={{ registry: rp.assetRegistry }}>
-          <Comp />
-        </AssetContext.Provider>
-      );
+      function AssetRegistryComponent() {
+        return (
+          <AssetContext.Provider value={{ registry: rp.assetRegistry }}>
+            <Comp />
+          </AssetContext.Provider>
+        );
+      }
+
+      return AssetRegistryComponent;
     });
   }
 }

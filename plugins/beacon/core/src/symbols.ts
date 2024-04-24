@@ -1,1 +1,1 @@
-export const BeaconPluginSymbol = Symbol.for('BeaconPlugin');
+export const BeaconPluginSymbol = Symbol.for("BeaconPlugin");

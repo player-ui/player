@@ -1,8 +1,8 @@
-import type { BindingLike, BindingInstance } from './binding';
+import type { BindingLike, BindingInstance } from "./binding";
 
 /** Check if the parameter representing a binding is already of the Binding class */
 export function isBinding(binding: BindingLike): binding is BindingInstance {
-  return !(typeof binding === 'string' || Array.isArray(binding));
+  return !(typeof binding === "string" || Array.isArray(binding));
 }
 
 /** Convert the string to an int if you can, otherwise just return the original string */
@@ -20,14 +20,14 @@ export function maybeConvertToNum(i: string): string | number {
  * utility to convert binding into binding segments.
  */
 export function getBindingSegments(
-  binding: BindingLike
+  binding: BindingLike,
 ): Array<string | number> {
   if (Array.isArray(binding)) {
     return binding;
   }
 
-  if (typeof binding === 'string') {
-    return binding.split('.');
+  if (typeof binding === "string") {
+    return binding.split(".");
   }
 
   return binding.asArray();
@@ -37,10 +37,10 @@ export function getBindingSegments(
 export function findInArray<T extends Record<string | number, object>>(
   array: Array<T>,
   key: string | number,
-  value: T
+  value: T,
 ): number | undefined {
   return array.findIndex((obj) => {
-    if (obj && typeof obj === 'object') {
+    if (obj && typeof obj === "object") {
       // Intentional double-equals because we want '4' to be coerced to 4
       // eslint-disable-next-line eqeqeq
       return obj[key] == value;

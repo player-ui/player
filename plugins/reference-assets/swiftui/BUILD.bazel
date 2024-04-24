@@ -1,0 +1,33 @@
+load("//tools/ios:util.bzl", "swiftui_plugin")
+load("@build_bazel_rules_ios//rules:test.bzl", "ios_ui_test")
+
+swiftui_plugin(
+    name = "ReferenceAssets",
+    resources = ["//plugins/reference-assets/swiftui/Resources:PlayerUIReferenceAssets_Resources", "//plugins/reference-assets/core:core_native_bundle"],
+    deps = [
+        "//ios/swiftui:PlayerUISwiftUI",
+        "//plugins/beacon/swiftui:PlayerUIBeaconPlugin",
+        "//plugins/pending-transaction/swiftui:PlayerUISwiftUIPendingTransactionPlugin"
+    ],
+    test_deps = [
+        "//ios/test-utils:PlayerUITestUtilities",
+    ]
+)
+
+# This is the only plugin with XCUITests
+# so it's not in the macro currently
+ios_ui_test(
+    name = "PlayerUIReferenceAssetsUITests",
+    srcs = glob(["UITests/**/*.swift"]),
+    minimum_os_version = "14.0",
+    deps = [
+        "//ios/swiftui:PlayerUISwiftUI", 
+        "//ios/core:PlayerUI", 
+        "//ios/test-utils:PlayerUITestUtilities", 
+        "//ios/test-utils-core:PlayerUITestUtilitiesCore", 
+        "//ios/internal-test-utils:PlayerUIInternalTestUtilities",
+        ":PlayerUIReferenceAssets"
+    ],
+    visibility = ["//visibility:public"],
+    test_host = "//ios/demo:PlayerUIDemo"
+)

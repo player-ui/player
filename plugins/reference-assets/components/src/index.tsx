@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import type {
   AssetPropsWithChildren,
   BindingTemplateInstance,
@@ -7,22 +7,23 @@ import type {
   DataTypeReference,
   DataTypeRefs,
   ValidatorFunctionRefs,
-} from '@player-tools/dsl';
+} from "@player-tools/dsl";
 import {
   createSlot,
   Asset,
   View,
   getObjectReferences,
-} from '@player-tools/dsl';
-import type { Asset as AssetType } from '@player-ui/player';
+} from "@player-tools/dsl";
+import type { Asset as AssetType } from "@player-ui/player";
 import type {
   ActionAsset,
   TextAsset,
   CollectionAsset,
   InfoAsset,
   InputAsset,
-} from '@player-ui/reference-assets-plugin';
-import { dataTypes, validators } from '@player-ui/common-types-plugin';
+  ImageAsset,
+} from "@player-ui/reference-assets-plugin";
+import { dataTypes, validators } from "@player-ui/common-types-plugin";
 
 export const dataRefs = getObjectReferences<
   typeof dataTypes,
@@ -39,9 +40,9 @@ export type DSLSchema = PlayerDSLSchema<
 >;
 
 export const Text = (
-  props: Omit<AssetPropsWithChildren<TextAsset>, 'value'> & {
+  props: Omit<AssetPropsWithChildren<TextAsset>, "value"> & {
     value?: string;
-  }
+  },
 ) => {
   return (
     <Asset type="text" {...props}>
@@ -72,15 +73,15 @@ const slotFactory = (name: string, isArray = false) =>
     wrapInAsset: true,
   });
 
-export const LabelSlot = slotFactory('label');
-export const ValueSlot = slotFactory('value');
-export const TitleSlot = slotFactory('title');
-export const SubtitleSlot = slotFactory('subtitle');
-export const ActionsSlot = slotFactory('actions', true);
-export const PrimaryInfoSlot = slotFactory('primaryInfo');
+export const LabelSlot = slotFactory("label");
+export const ValueSlot = slotFactory("value");
+export const TitleSlot = slotFactory("title");
+export const SubtitleSlot = slotFactory("subtitle");
+export const ActionsSlot = slotFactory("actions", true);
+export const PrimaryInfoSlot = slotFactory("primaryInfo");
 
 Collection.Values = createSlot({
-  name: 'values',
+  name: "values",
   isArray: true,
   TextComp: Text,
   wrapInAsset: true,
@@ -89,10 +90,10 @@ Collection.Values = createSlot({
 Collection.Label = LabelSlot;
 
 export const Action = (
-  props: Omit<AssetPropsWithChildren<ActionAsset>, 'exp'> & {
+  props: Omit<AssetPropsWithChildren<ActionAsset>, "exp"> & {
     /** An optional expression to execute before transitioning */
     exp?: ExpressionTemplateInstance;
-  }
+  },
 ) => {
   const { exp, children, ...rest } = props;
 
@@ -106,11 +107,17 @@ export const Action = (
 
 Action.Label = LabelSlot;
 
+export const Image = (props: AssetPropsWithChildren<ImageAsset>) => {
+  return <Asset type="image" {...props} />;
+};
+
+Image.Caption = slotFactory("caption");
+
 export const Input = (
-  props: Omit<AssetPropsWithChildren<InputAsset>, 'binding'> & {
+  props: Omit<AssetPropsWithChildren<InputAsset>, "binding"> & {
     /** The binding */
     binding: BindingTemplateInstance;
-  }
+  },
 ) => {
   const { binding, children, ...rest } = props;
   return (
@@ -122,6 +129,7 @@ export const Input = (
 };
 
 Input.Label = LabelSlot;
+Input.Note = slotFactory("note");
 
 export const Info = (props: AssetPropsWithChildren<InfoAsset>) => {
   return <View type="info" {...props} />;
@@ -131,3 +139,4 @@ Info.Title = TitleSlot;
 Info.Subtitle = SubtitleSlot;
 Info.PrimaryInfo = PrimaryInfoSlot;
 Info.Actions = ActionsSlot;
+Info.Footer = slotFactory("footer");

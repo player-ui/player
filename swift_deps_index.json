@@ -1,0 +1,67 @@
+{
+  "direct_dep_identities": [
+    "swift-hooks",
+    "viewinspector"
+  ],
+  "modules": [
+    {
+      "name": "SwiftHooks",
+      "c99name": "SwiftHooks",
+      "src_type": "swift",
+      "label": "@swiftpkg_swift_hooks//:Sources_SwiftHooks",
+      "package_identity": "swift-hooks",
+      "product_memberships": [
+        "SwiftHooks"
+      ]
+    },
+    {
+      "name": "ViewInspector",
+      "c99name": "ViewInspector",
+      "src_type": "swift",
+      "label": "@swiftpkg_viewinspector//:Sources_ViewInspector",
+      "modulemap_label": "@swiftpkg_viewinspector//:Sources_ViewInspector_modulemap",
+      "package_identity": "viewinspector",
+      "product_memberships": [
+        "ViewInspector"
+      ]
+    }
+  ],
+  "products": [
+    {
+      "identity": "swift-hooks",
+      "name": "SwiftHooks",
+      "type": "library",
+      "target_labels": [
+        "@swiftpkg_swift_hooks//:Sources_SwiftHooks"
+      ]
+    },
+    {
+      "identity": "viewinspector",
+      "name": "ViewInspector",
+      "type": "library",
+      "target_labels": [
+        "@swiftpkg_viewinspector//:Sources_ViewInspector"
+      ]
+    }
+  ],
+  "packages": [
+    {
+      "name": "swiftpkg_swift_hooks",
+      "identity": "swift-hooks",
+      "remote": {
+        "commit": "5f3136ac2a3c27aa469e3f9a1222b15080d431d3",
+        "remote": "https://github.com/intuit/swift-hooks.git",
+        "version": "0.1.0"
+      }
+    },
+    {
+      "name": "swiftpkg_viewinspector",
+      "identity": "viewinspector",
+      "remote": {
+        "commit": "67319287749b83f39dcc2f20edd520c610c012fd",
+        "remote": "https://github.com/nalexn/ViewInspector",
+        "version": "0.9.10"
+      }
+    }
+  ]
+}

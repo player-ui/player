@@ -1,37 +1,38 @@
-import { setIn } from 'timm';
-import deferred from 'p-defer';
-import type { Flow as FlowType, FlowResult } from '@player-ui/types';
+import { setIn } from "timm";
+import deferred from "p-defer";
+import type { Flow as FlowType, FlowResult } from "@player-ui/types";
 
-import { SyncHook, SyncWaterfallHook } from 'tapable-ts';
-import type { Logger } from './logger';
-import { TapableLogger } from './logger';
-import type { ExpressionType } from './expressions';
-import { ExpressionEvaluator } from './expressions';
-import { SchemaController } from './schema';
-import { BindingParser } from './binding';
-import type { ViewInstance } from './view';
-import { resolveDataRefs } from './string-resolver';
-import type { FlowInstance } from './controllers';
+import { SyncHook, SyncWaterfallHook } from "tapable-ts";
+import type { Logger } from "./logger";
+import { TapableLogger } from "./logger";
+import type { ExpressionType } from "./expressions";
+import { ExpressionEvaluator } from "./expressions";
+import { SchemaController } from "./schema";
+import { BindingParser } from "./binding";
+import type { ViewInstance } from "./view";
+import { resolveDataRefs } from "./string-resolver";
+import type { FlowInstance } from "./controllers";
 import {
   ConstantsController,
   ViewController,
   DataController,
   ValidationController,
   FlowController,
-} from './controllers';
-import { FlowExpPlugin } from './plugins/flow-exp-plugin';
-import { DefaultExpPlugin } from './plugins/default-exp-plugin';
+} from "./controllers";
+import { FlowExpPlugin } from "./plugins/flow-exp-plugin";
+import { DefaultExpPlugin } from "./plugins/default-exp-plugin";
 import type {
   PlayerFlowState,
   InProgressState,
   CompletedState,
   ErrorState,
-} from './types';
-import { NOT_STARTED_STATE } from './types';
+} from "./types";
+import { NOT_STARTED_STATE } from "./types";
+import { DefaultViewPlugin } from "./plugins/default-view-plugin";
 
 // Variables injected at build time
-const PLAYER_VERSION = '__VERSION__';
-const COMMIT = '__GIT_COMMIT__';
+const PLAYER_VERSION = "__VERSION__";
+const COMMIT = "__GIT_COMMIT__";
 
 export interface PlayerPlugin {
   /**
@@ -58,7 +59,7 @@ export interface ExtendedPlayerPlugin<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Expressions = void,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  DataTypes = void
+  DataTypes = void,
 > {}
 
 export interface PlayerConfigOptions {
@@ -136,6 +137,7 @@ export class Player {
     this.config = config || {};
     this.config.plugins = [
       new DefaultExpPlugin(),
+      new DefaultViewPlugin(),
       ...(this.config.plugins || []),
       new FlowExpPlugin(),
     ];
@@ -151,7 +153,7 @@ export class Player {
 
   /** Find instance of [Plugin] that has been registered to Player */
   public findPlugin<Plugin extends PlayerPlugin>(
-    symbol: symbol
+    symbol: symbol,
   ): Plugin | undefined {
     return this.config.plugins?.find((el) => el.symbol === symbol) as Plugin;
   }
@@ -159,7 +161,7 @@ export class Player {
   /** Retrieve an instance of [Plugin] and conditionally invoke [apply] if it exists */
   public applyTo<Plugin extends PlayerPlugin>(
     symbol: symbol,
-    apply: (plugin: Plugin) => void
+    apply: (plugin: Plugin) => void,
   ): void {
     const plugin = this.findPlugin<Plugin>(symbol);
 
@@ -208,7 +210,7 @@ export class Player {
     start: () => void;
 
     /** the state object to kick if off */
-    state: Omit<InProgressState, 'ref'>;
+    state: Omit<InProgressState, "ref">;
   } {
     const userFlow = this.hooks.resolveFlowContent.call(userContent);
 
@@ -254,21 +256,21 @@ export class Player {
       logger: this.logger,
     });
 
-    dataController.hooks.format.tap('player', (value, binding) => {
+    dataController.hooks.format.tap("player", (value, binding) => {
       const formatter = schema.getFormatter(binding);
 
       return formatter ? formatter.format(value) : value;
     });
 
-    dataController.hooks.deformat.tap('player', (value, binding) => {
+    dataController.hooks.deformat.tap("player", (value, binding) => {
       const formatter = schema.getFormatter(binding);
 
       return formatter ? formatter.deformat(value) : value;
     });
 
     dataController.hooks.resolveDefaultValue.tap(
-      'player',
-      (binding) => schema.getApparentType(binding)?.default
+      "player",
+      (binding) => schema.getApparentType(binding)?.default,
     );
 
     // eslint-disable-next-line prefer-const
@@ -281,7 +283,7 @@ export class Player {
 
     this.hooks.expressionEvaluator.call(expressionEvaluator);
 
-    expressionEvaluator.hooks.onError.tap('player', (e) => {
+    expressionEvaluator.hooks.onError.tap("player", (e) => {
       flowResultDeferred.reject(e);
 
       return true;
@@ -296,14 +298,14 @@ export class Player {
       });
     }
 
-    flowController.hooks.flow.tap('player', (flow: FlowInstance) => {
-      flow.hooks.beforeTransition.tap('player', (state, transitionVal) => {
+    flowController.hooks.flow.tap("player", (flow: FlowInstance) => {
+      flow.hooks.beforeTransition.tap("player", (state, transitionVal) => {
         /** Checks to see if there are any transitions for a specific transition state (i.e. next, back). If not, it will default to * */
         const computedTransitionVal = state.transitions[transitionVal]
           ? transitionVal
-          : '*';
+          : "*";
         if (state.onEnd && state.transitions[computedTransitionVal]) {
-          if (typeof state.onEnd === 'object' && 'exp' in state.onEnd) {
+          if (typeof state.onEnd === "object" && "exp" in state.onEnd) {
             expressionEvaluator?.evaluate(state.onEnd.exp);
           } else {
             expressionEvaluator?.evaluate(state.onEnd as ExpressionType);
@@ -312,7 +314,7 @@ export class Player {
 
         /** If the transition does not exist, then do not resolve any expressions */
         if (
-          !('transitions' in state) ||
+          !("transitions" in state) ||
           !state.transitions[computedTransitionVal]
         ) {
           return state;
@@ -321,15 +323,15 @@ export class Player {
         /** resolves and sets the transition to the computed exp */
         return setIn(
           state,
-          ['transitions', computedTransitionVal],
-          resolveStrings(state.transitions[computedTransitionVal])
+          ["transitions", computedTransitionVal],
+          resolveStrings(state.transitions[computedTransitionVal]),
         ) as any;
       });
 
-      flow.hooks.skipTransition.tap('validation', (currentState) => {
-        if (currentState?.value.state_type === 'VIEW') {
+      flow.hooks.skipTransition.tap("validation", (currentState) => {
+        if (currentState?.value.state_type === "VIEW") {
           const { canTransition, validations } =
-            validationController.validateView('navigation');
+            validationController.validateView("navigation");
 
           if (!canTransition && validations) {
             const bindings = new Set(validations.keys());
@@ -342,36 +344,36 @@ export class Player {
         return undefined;
       });
 
-      flow.hooks.resolveTransitionNode.tap('player', (state) => {
+      flow.hooks.resolveTransitionNode.tap("player", (state) => {
         let newState = state;
 
-        if ('ref' in state) {
-          newState = setIn(state, ['ref'], resolveStrings(state.ref)) as any;
+        if ("ref" in state) {
+          newState = setIn(state, ["ref"], resolveStrings(state.ref)) as any;
         }
 
-        if ('param' in state) {
+        if ("param" in state) {
           newState = setIn(
             state,
-            ['param'],
-            resolveStrings(state.param, false)
+            ["param"],
+            resolveStrings(state.param, false),
           ) as any;
         }
 
         return newState;
       });
 
-      flow.hooks.transition.tap('player', (_oldState, newState) => {
-        if (newState.value.state_type !== 'VIEW') {
+      flow.hooks.transition.tap("player", (_oldState, newState) => {
+        if (newState.value.state_type !== "VIEW") {
           validationController.reset();
         }
       });
 
-      flow.hooks.afterTransition.tap('player', (flowInstance) => {
+      flow.hooks.afterTransition.tap("player", (flowInstance) => {
         const value = flowInstance.currentState?.value;
-        if (value && value.state_type === 'ACTION') {
+        if (value && value.state_type === "ACTION") {
           const { exp } = value;
           flowController?.transition(
-            String(expressionEvaluator?.evaluate(exp))
+            String(expressionEvaluator?.evaluate(exp)),
           );
         }
 
@@ -418,7 +420,7 @@ export class Player {
       },
       constants: this.constantsController,
     });
-    viewController.hooks.view.tap('player', (view) => {
+    viewController.hooks.view.tap("player", (view) => {
       validationController.onView(view);
       this.hooks.view.call(view);
     });
@@ -445,7 +447,7 @@ export class Player {
           .finally(() => this.hooks.onEnd.call());
       },
       state: {
-        status: 'in-progress',
+        status: "in-progress",
         flowResult: flowResultDeferred.promise,
         controllers: {
           data: dataController,
@@ -464,13 +466,13 @@ export class Player {
   }
 
   public async start(payload: FlowType): Promise<CompletedState> {
-    const ref = Symbol(payload?.id ?? 'payload');
+    const ref = Symbol(payload?.id ?? "payload");
 
     /** A check to avoid updating the state for a flow that's not the current one */
     const maybeUpdateState = <T extends PlayerFlowState>(newState: T) => {
       if (this.state.ref !== ref) {
         this.logger.warn(
-          `Received update for a flow that's not the current one`
+          `Received update for a flow that's not the current one`,
         );
 
         return newState;
@@ -482,7 +484,7 @@ export class Player {
     };
 
     this.setState({
-      status: 'not-started',
+      status: "not-started",
       ref,
     });
 
@@ -499,7 +501,7 @@ export class Player {
       // make sure to use the same ref as the starting one
       const endProps = {
         ref,
-        status: 'completed',
+        status: "completed",
         flow: state.flow,
         controllers: {
           data: state.controllers.data.makeReadOnly(),
@@ -512,7 +514,7 @@ export class Player {
       });
     } catch (error: any) {
       const errorState: ErrorState = {
-        status: 'error',
+        status: "error",
         ref,
         flow: payload,
         error,

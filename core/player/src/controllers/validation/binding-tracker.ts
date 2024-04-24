@@ -1,14 +1,14 @@
-import type { Validation } from '@player-ui/types';
-import type { ViewPlugin, Resolver, Node, ViewInstance } from '../../view';
+import type { Validation } from "@player-ui/types";
+import type { ViewPlugin, Resolver, Node, ViewInstance } from "../../view";
 import type {
   BindingInstance,
   BindingLike,
   BindingFactory,
-} from '../../binding';
-import { isBinding } from '../../binding';
-import type { ValidationResponse } from '../../validator';
+} from "../../binding";
+import { isBinding } from "../../binding";
+import type { ValidationResponse } from "../../validator";
 
-const CONTEXT = 'validation-binding-tracker';
+const CONTEXT = "validation-binding-tracker";
 
 export interface BindingTracker {
   /** Get the bindings currently being tracked for validation */
@@ -100,8 +100,8 @@ export class ValidationBindingTrackerViewPlugin
 
       const intersection = new Set(
         [...lastViewUpdateChangeSet].filter((b) =>
-          trackedBindingsForNode.has(b)
-        )
+          trackedBindingsForNode.has(b),
+        ),
       );
 
       return intersection.size === 0;
@@ -158,7 +158,8 @@ export class ValidationBindingTrackerViewPlugin
 
             const firstFieldEOW = eows?.find(
               (eow) =>
-                eow.displayTarget === 'field' || eow.displayTarget === undefined
+                eow.displayTarget === "field" ||
+                eow.displayTarget === undefined,
             );
 
             return firstFieldEOW;
@@ -195,7 +196,7 @@ export class ValidationBindingTrackerViewPlugin
                 ?._getValidationForBinding(binding)
                 ?.get();
 
-              if (eow && eow.displayTarget === 'section') {
+              if (eow && eow.displayTarget === "section") {
                 validations.push(eow);
               }
             });
@@ -203,7 +204,7 @@ export class ValidationBindingTrackerViewPlugin
             return validations;
           },
           register: (registerOptions) => {
-            if (registerOptions?.type === 'section') {
+            if (registerOptions?.type === "section") {
               if (!sections.has(node)) {
                 sections.set(node, new Set());
               }
@@ -231,7 +232,7 @@ export class ValidationBindingTrackerViewPlugin
       } else {
         currentBindingTree.set(
           node,
-          lastComputedBindingTree.get(node) ?? new Set()
+          lastComputedBindingTree.get(node) ?? new Set(),
         );
       }
 

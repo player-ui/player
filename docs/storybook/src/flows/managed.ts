@@ -1,5 +1,4 @@
 import { FlowManager, Flow, CompletedState } from '@player-ui/react';
-import { makeFlow } from '@player-ui/make-flow';
 import firstFlow from '@player-ui/reference-assets-plugin-mocks/flow-manager/first-flow.json';
 import secondFlow from '@player-ui/reference-assets-plugin-mocks/flow-manager/second-flow.json';
 import errorFlow from '@player-ui/reference-assets-plugin-mocks/flow-manager/error-flow.json';

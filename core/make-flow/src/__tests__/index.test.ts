@@ -1,77 +1,78 @@
-import { makeFlow } from '..';
+import { test, expect } from "vitest";
+import { makeFlow } from "..";
 
-test('makes a flow from an asset', () => {
+test("makes a flow from an asset", () => {
   expect(
     makeFlow({
-      id: 'some-id',
-      type: 'text',
-      value: 'I am a text asset',
-    })
+      id: "some-id",
+      type: "text",
+      value: "I am a text asset",
+    }),
   ).toStrictEqual({
-    id: 'generated-flow',
+    id: "generated-flow",
     views: [
       {
-        id: 'some-id',
-        type: 'text',
-        value: 'I am a text asset',
+        id: "some-id",
+        type: "text",
+        value: "I am a text asset",
       },
     ],
     data: {},
     navigation: {
-      BEGIN: 'FLOW_1',
+      BEGIN: "FLOW_1",
       FLOW_1: {
-        startState: 'VIEW_1',
+        startState: "VIEW_1",
         VIEW_1: {
-          state_type: 'VIEW',
-          ref: 'some-id',
+          state_type: "VIEW",
+          ref: "some-id",
           transitions: {
-            '*': 'END_Done',
+            "*": "END_Done",
           },
         },
         END_Done: {
-          state_type: 'END',
-          outcome: 'done',
+          state_type: "END",
+          outcome: "done",
         },
       },
     },
   });
 });
 
-test('makes a flow using an array of assets', () => {
+test("makes a flow using an array of assets", () => {
   expect(
     makeFlow([
       {
-        id: 'some-id',
-        type: 'text',
-        value: 'I am a text asset',
+        id: "some-id",
+        type: "text",
+        value: "I am a text asset",
       },
       {
         asset: {
-          id: 'some-id-2',
-          type: 'text',
-          value: 'I am a text asset',
+          id: "some-id-2",
+          type: "text",
+          value: "I am a text asset",
         },
       },
-    ])
+    ]),
   ).toStrictEqual({
-    id: 'generated-flow',
+    id: "generated-flow",
     views: [
       {
-        id: 'collection',
-        type: 'collection',
+        id: "collection",
+        type: "collection",
         values: [
           {
             asset: {
-              id: 'some-id',
-              type: 'text',
-              value: 'I am a text asset',
+              id: "some-id",
+              type: "text",
+              value: "I am a text asset",
             },
           },
           {
             asset: {
-              id: 'some-id-2',
-              type: 'text',
-              value: 'I am a text asset',
+              id: "some-id-2",
+              type: "text",
+              value: "I am a text asset",
             },
           },
         ],
@@ -79,19 +80,19 @@ test('makes a flow using an array of assets', () => {
     ],
     data: {},
     navigation: {
-      BEGIN: 'FLOW_1',
+      BEGIN: "FLOW_1",
       FLOW_1: {
-        startState: 'VIEW_1',
+        startState: "VIEW_1",
         VIEW_1: {
-          state_type: 'VIEW',
-          ref: 'collection',
+          state_type: "VIEW",
+          ref: "collection",
           transitions: {
-            '*': 'END_Done',
+            "*": "END_Done",
           },
         },
         END_Done: {
-          state_type: 'END',
-          outcome: 'done',
+          state_type: "END",
+          outcome: "done",
         },
       },
     },

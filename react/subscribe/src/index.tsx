@@ -1,10 +1,10 @@
-import React from 'react';
+import React from "react";
 
 export type SubscribeID = number;
 
 type ResolveType<T> = (arg?: T) => void;
 type RejectType = (error?: Error) => void;
-type StatusType = 'success' | 'failure' | 'pending';
+type StatusType = "success" | "failure" | "pending";
 type DefferedReturnType<T> = {
   /** a function to resolve the promise */
   resolve: ResolveType<T>;
@@ -27,17 +27,17 @@ function deferred<T>(): DefferedReturnType<T> {
   /** the default reject handler is a noop */
   let reject: RejectType = () => undefined;
 
-  let status: StatusType = 'pending';
+  let status: StatusType = "pending";
 
   const promise = new Promise<T>((res, rej) => {
     resolve = (a?: T) => {
-      status = 'success';
+      status = "success";
       const resolveFunc = res as ResolveType<T>;
       resolveFunc(a);
     };
 
     reject = (error?: Error) => {
-      status = 'failure';
+      status = "failure";
       rej(error);
     };
   });
@@ -50,7 +50,7 @@ function deferred<T>(): DefferedReturnType<T> {
   };
 }
 
-const NOT_CALLED = Symbol('Subscribe -- Empty Value');
+const NOT_CALLED = Symbol("Subscribe -- Empty Value");
 /**
  * A pub-sub module that works across the React bridge
  */
@@ -84,7 +84,7 @@ export class Subscribe<T> {
     options?: {
       /** Use the last updated value for this subscription to immediately trigger the onSet callback */
       initializeWithPreviousValue?: boolean;
-    }
+    },
   ): SubscribeID {
     const id = this.callbacks.size;
     this.callbacks.set(id, callback);
@@ -165,7 +165,7 @@ export function useSubscribedState<T>(subscriber: Subscribe<T>): T | undefined {
       },
       {
         initializeWithPreviousValue: true,
-      }
+      },
     );
 
     return () => {

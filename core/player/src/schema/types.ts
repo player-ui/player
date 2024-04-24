@@ -1,6 +1,6 @@
-import type { Formatting } from '@player-ui/types';
+import type { Formatting } from "@player-ui/types";
 
-export type FormatOptions = Omit<Formatting.Reference, 'type'>;
+export type FormatOptions = Omit<Formatting.Reference, "type">;
 
 /**
  * The return types for the schema don't include options.
@@ -8,7 +8,7 @@ export type FormatOptions = Omit<Formatting.Reference, 'type'>;
  */
 export type FormatFunction<From, To = From, Options = unknown> = (
   val: From,
-  options?: Options
+  options?: Options,
 ) => To | undefined;
 
 export type FormatHandler<From, To = From> = (val: From) => To;
@@ -30,7 +30,7 @@ export interface FormatDefinition<DataModelType, UserDisplayType> {
 export interface FormatType<
   DataModelType,
   UserDisplayType = DataModelType,
-  Options = undefined
+  Options = undefined,
 > {
   /**
    * The name of the formatter.

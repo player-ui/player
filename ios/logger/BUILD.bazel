@@ -1,0 +1,10 @@
+load("//tools/ios:util.bzl", "ios_pipeline")
+
+ios_pipeline(
+    name = "PlayerUILogger",
+    resources = [],
+    deps = ["@swiftpkg_swift_hooks//:Sources_SwiftHooks"],
+    test_deps = [],
+    hasUnitTests = True,
+    hasViewInspectorTests = False
+)

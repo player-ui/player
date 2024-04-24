@@ -1,17 +1,17 @@
 export interface Store {
   useLocalState<T>(initialState: T): readonly [T, (value: T) => void];
   useSharedState<T>(
-    key: string | symbol
+    key: string | symbol,
   ): (initialState: T) => readonly [T, (value: T) => void];
 }
 
 interface SharedStore {
   getLocalStateFunction<T>(
     key: string | symbol,
-    countKey: symbol
+    countKey: symbol,
   ): (initialState: T) => readonly [T, (value: T) => void];
   useSharedState<T>(
-    key: string | symbol
+    key: string | symbol,
   ): (initialState: T) => readonly [T, (value: T) => void];
 }
 

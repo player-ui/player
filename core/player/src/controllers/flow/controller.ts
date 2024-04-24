@@ -1,8 +1,8 @@
-import { SyncHook } from 'tapable-ts';
-import type { Navigation, NavigationFlowEndState } from '@player-ui/types';
-import type { Logger } from '../../logger';
-import type { NamedState, TransitionOptions } from './flow';
-import { FlowInstance } from './flow';
+import { SyncHook } from "tapable-ts";
+import type { Navigation, NavigationFlowEndState } from "@player-ui/types";
+import type { Logger } from "../../logger";
+import type { TransitionOptions } from "./flow";
+import { FlowInstance } from "./flow";
 
 /** A manager for the navigation section of a Content blob */
 export class FlowController {
@@ -20,7 +20,7 @@ export class FlowController {
     options?: {
       /** A logger instance to use */
       logger?: Logger;
-    }
+    },
   ) {
     this.navigation = navigation;
     this.navStack = [];
@@ -35,7 +35,7 @@ export class FlowController {
   /** Navigate to another state in the state-machine */
   public transition(stateTransition: string, options?: TransitionOptions) {
     if (this.current === undefined) {
-      throw new Error('Not currently in a flow. Cannot transition.');
+      throw new Error("Not currently in a flow. Cannot transition.");
     }
 
     this.current.transition(stateTransition, options);
@@ -54,9 +54,9 @@ export class FlowController {
 
     const startFlow = this.navigation[startState];
 
-    if (startFlow === null || typeof startFlow !== 'object') {
+    if (startFlow === null || typeof startFlow !== "object") {
       return Promise.reject(
-        new Error(`Flow: ${startState} needs to be an object`)
+        new Error(`Flow: ${startState} needs to be an object`),
       );
     }
 
@@ -65,13 +65,13 @@ export class FlowController {
     const flow = new FlowInstance(startState, startFlow, { logger: this.log });
     this.addNewFlow(flow);
 
-    flow.hooks.afterTransition.tap('flow-controller', (flowInstance) => {
-      if (flowInstance.currentState?.value.state_type === 'FLOW') {
+    flow.hooks.afterTransition.tap("flow-controller", (flowInstance) => {
+      if (flowInstance.currentState?.value.state_type === "FLOW") {
         const subflowId = flowInstance.currentState?.value.ref;
         this.log?.debug(`Loading subflow ${subflowId}`);
         this.run(subflowId).then((subFlowEndState) => {
           this.log?.debug(
-            `Subflow ended. Using outcome: ${subFlowEndState.outcome}`
+            `Subflow ended. Using outcome: ${subFlowEndState.outcome}`,
           );
           flowInstance.transition(subFlowEndState?.outcome);
         });
@@ -91,7 +91,7 @@ export class FlowController {
 
   public async start(): Promise<NavigationFlowEndState> {
     if (!this.navigation.BEGIN) {
-      return Promise.reject(new Error('Must supply a BEGIN state'));
+      return Promise.reject(new Error("Must supply a BEGIN state"));
     }
 
     return this.run(this.navigation.BEGIN);

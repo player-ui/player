@@ -1,10 +1,9 @@
-import { SyncWaterfallHook } from 'tapable-ts';
-import type { Node, ParseObjectOptions, Parser } from '../parser';
-import { NodeType } from '../parser';
-import type { ViewPlugin } from '.';
-import type { View } from './plugin';
-import type { Options } from './options';
-import type { Resolver } from '../resolver';
+import { SyncWaterfallHook } from "tapable-ts";
+import type { Node, ParseObjectOptions, Parser } from "../parser";
+import { NodeType } from "../parser";
+import type { Options } from "./options";
+import type { Resolver } from "../resolver";
+import { ViewInstance, ViewPlugin } from "../view";
 
 export interface TemplateItemInfo {
   /** The index of the data for the current iteration of the template */
@@ -24,7 +23,7 @@ export interface TemplateSubstitution {
 
 export type TemplateSubstitutionsFunc = (
   baseSubstitutions: TemplateSubstitution[],
-  templateItemInfo: TemplateItemInfo
+  templateItemInfo: TemplateItemInfo,
 ) => TemplateSubstitution[];
 
 /** A view plugin to resolve/manage templates */
@@ -44,7 +43,7 @@ export default class TemplatePlugin implements ViewPlugin {
   private parseTemplate(
     parseObject: any,
     node: Node.Template,
-    options: Options
+    options: Options,
   ): Node.Node | null {
     const { template, depth } = node;
     const data = options.data.model.get(node.data);
@@ -64,7 +63,7 @@ export default class TemplatePlugin implements ViewPlugin {
         this.hooks.resolveTemplateSubstitutions.call(
           [
             {
-              expression: new RegExp(`_index${depth || ''}_`),
+              expression: new RegExp(`_index${depth || ""}_`),
               value: String(index),
             },
           ],
@@ -72,14 +71,14 @@ export default class TemplatePlugin implements ViewPlugin {
             depth,
             data: dataItem,
             index,
-          }
+          },
         );
       let templateStr = JSON.stringify(template);
 
       for (const { expression, value } of templateSubstitutions) {
-        let flags = 'g';
-        if (typeof expression === 'object') {
-          flags = `${expression.flags}${expression.global ? '' : 'g'}`;
+        let flags = "g";
+        if (typeof expression === "object") {
+          flags = `${expression.flags}${expression.global ? "" : "g"}`;
         }
 
         templateStr = templateStr.replace(new RegExp(expression, flags), value);
@@ -104,31 +103,31 @@ export default class TemplatePlugin implements ViewPlugin {
   }
 
   applyParser(parser: Parser) {
-    parser.hooks.onCreateASTNode.tap('template', (node) => {
+    parser.hooks.onCreateASTNode.tap("template", (node) => {
       if (node && node.type === NodeType.Template && !node.dynamic) {
         return this.parseTemplate(
           parser.parseObject.bind(parser),
           node,
-          this.options
+          this.options,
         );
       }
 
       return node;
     });
 
-    parser.hooks.determineNodeType.tap('template', (obj: any) => {
-      if (obj === 'template') {
+    parser.hooks.determineNodeType.tap("template", (obj: any) => {
+      if (obj === "template") {
         return NodeType.Template;
       }
     });
 
     parser.hooks.parseNode.tap(
-      'template',
+      "template",
       (
         obj: any,
-        nodeType: Node.ChildrenTypes,
+        _nodeType: Node.ChildrenTypes,
         options: ParseObjectOptions,
-        determinedNodeType: null | NodeType
+        determinedNodeType: null | NodeType,
       ) => {
         if (determinedNodeType === NodeType.Template) {
           const templateNode = parser.createASTNode(
@@ -139,19 +138,19 @@ export default class TemplatePlugin implements ViewPlugin {
               template: obj.value,
               dynamic: obj.dynamic ?? false,
             },
-            obj
+            obj,
           );
 
           if (templateNode) {
             return templateNode;
           }
         }
-      }
+      },
     );
   }
 
   applyResolverHooks(resolver: Resolver) {
-    resolver.hooks.beforeResolve.tap('template', (node, options) => {
+    resolver.hooks.beforeResolve.tap("template", (node, options) => {
       if (node && node.type === NodeType.Template && node.dynamic) {
         return this.parseTemplate(options.parseNode, node, options);
       }
@@ -160,8 +159,8 @@ export default class TemplatePlugin implements ViewPlugin {
     });
   }
 
-  apply(view: View) {
-    view.hooks.parser.tap('template', this.applyParser.bind(this));
-    view.hooks.resolver.tap('template', this.applyResolverHooks.bind(this));
+  apply(view: ViewInstance) {
+    view.hooks.parser.tap("template", this.applyParser.bind(this));
+    view.hooks.resolver.tap("template", this.applyResolverHooks.bind(this));
   }
 }

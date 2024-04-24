@@ -1,7 +1,7 @@
-import type { ReactPlayer, ReactPlayerPlugin } from '@player-ui/react';
-import type { Player } from '@player-ui/player';
-import React from 'react';
-import { AutoScrollProvider } from './hooks';
+import type { ReactPlayer, ReactPlayerPlugin } from "@player-ui/react";
+import type { Player } from "@player-ui/react";
+import React from "react";
+import { AutoScrollProvider } from "./hooks";
 
 export enum ScrollType {
   ValidationError,
@@ -22,7 +22,7 @@ export interface AutoScrollManagerConfig {
 
 /** A plugin to manage scrolling behavior */
 export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
-  name = 'auto-scroll-manager';
+  name = "auto-scroll-manager";
 
   /** Toggles if we should auto scroll to to the first failed validation on page load */
   private autoScrollOnLoad: boolean;
@@ -45,7 +45,7 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
   /** map of scroll type to set of ids that are registered under that type */
   private alreadyScrolledTo: Array<string>;
   private scrollFn: (
-    scrollableElements: Map<ScrollType, Set<string>>
+    scrollableElements: Map<ScrollType, Set<string>>,
   ) => string;
 
   constructor(config: AutoScrollManagerConfig) {
@@ -61,7 +61,7 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
 
   getFirstScrollableElement(idList: Set<string>, type: ScrollType) {
     const highestElement = {
-      id: '',
+      id: "",
       ypos: 0,
     };
     const ypos = window.scrollY;
@@ -71,7 +71,7 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
       // if we are looking at validation errors, make sure the element is invalid
       if (
         type === ScrollType.ValidationError &&
-        element?.getAttribute('aria-invalid') === 'false'
+        element?.getAttribute("aria-invalid") === "false"
       ) {
         return;
       }
@@ -89,7 +89,7 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
       const epos = element?.getBoundingClientRect().top;
       if (
         epos !== undefined &&
-        (epos + ypos < highestElement.ypos || highestElement.id === '')
+        (epos + ypos < highestElement.ypos || highestElement.id === "")
       ) {
         highestElement.id = id;
         highestElement.ypos = ypos + epos;
@@ -118,12 +118,12 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
     if (elementList) {
       const element = this.getFirstScrollableElement(
         elementList,
-        currentScroll
+        currentScroll,
       );
-      return element ?? '';
+      return element ?? "";
     }
 
-    return '';
+    return "";
   }
 
   // Hooks into player flow to determine what scroll targets need to be evaluated at specific lifecycle points
@@ -149,8 +149,9 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
 
   applyReact(reactPlayer: ReactPlayer) {
     reactPlayer.hooks.webComponent.tap(this.name, (Comp) => {
-      return () => {
-        const { scrollFn, getBaseElement, offset } = this;
+      const { scrollFn, getBaseElement, offset } = this;
+
+      function AutoScrollManagerComponent() {
         return (
           <AutoScrollProvider
             getElementToScrollTo={scrollFn}
@@ -160,7 +161,9 @@ export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
             <Comp />
           </AutoScrollProvider>
         );
-      };
+      }
+
+      return AutoScrollManagerComponent;
     });
   }
 }

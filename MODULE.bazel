@@ -1,0 +1,76 @@
+module(name = "player", version = "1.0")
+
+bazel_dep(name = "rules_player")
+
+git_override(
+    remote = "https://github.com/player-ui/rules_player.git",
+    # bazel-6 branch
+    commit = "e71339c96deeec1f4976fbc04815143ee23d8541",
+    module_name = "rules_player",
+)
+# local_path_override(module_name = "rules_player", path = "../rules_player")
+
+bazel_dep(name = "aspect_bazel_lib", version = "1.32.0")
+bazel_dep(name = "aspect_rules_js", version = "1.34.1")
+bazel_dep(name = "bazel_skylib", version = "1.4.1")
+bazel_dep(name = "rules_pkg", version = "0.9.1")
+bazel_dep(name = "aspect_rules_ts", version = "2.1.0")
+
+####### Node.js version #########
+bazel_dep(name = "rules_nodejs", version = "6.0.2")
+node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
+node.toolchain(node_version = "18.18.0")
+#################################
+
+###### Start iOS ######
+## Rule Dependencies
+bazel_dep(name = "rules_swift", version = "1.18.0", repo_name = "build_bazel_rules_swift")
+bazel_dep(name = "rules_apple", version = "3.5.1", repo_name = "build_bazel_rules_apple")
+bazel_dep(name = "rules_ios", version = "4.3.1", repo_name = "build_bazel_rules_ios")
+bazel_dep(name = "rules_xcodeproj", version = "2.2.0")
+
+bazel_dep(name = "gazelle", version = "0.34.0", repo_name = "bazel_gazelle")
+bazel_dep(name = "rules_swift_package_manager", version = "0.22.0")
+
+## This section is handled by rules_swift_package_manager
+swift_deps = use_extension(
+    "@rules_swift_package_manager//:extensions.bzl",
+    "swift_deps",
+)
+swift_deps.from_file(
+    deps_index = "//:swift_deps_index.json",
+)
+
+## SPM Dependencies
+### need to be listed here to be available as a target in BUILD files
+### Add dependency in xcode/Package.swift and then run `bazel run //:update_swift_pkgs`
+### before adding it here
+use_repo(
+    swift_deps,
+    "swiftpkg_swift_hooks",
+    "swiftpkg_viewinspector"
+)
+###### End iOS ######
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+
+npm.npm_translate_lock(
+    name = "npm",
+    pnpm_lock = "//:pnpm-lock.yaml",
+    data = [
+        "//:package.json",
+    ],
+    npmrc = "//:.npmrc",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+
+use_repo(npm, "npm")
+
+rules_ts_ext = use_extension(
+    "@aspect_rules_ts//ts:extensions.bzl",
+    "ext",
+    dev_dependency = True,
+)
+
+rules_ts_ext.deps()
+
+use_repo(rules_ts_ext, "npm_typescript")

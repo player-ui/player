@@ -1,11 +1,11 @@
-import { isEmptyObject } from './helpers';
+import { isEmptyObject } from "./helpers";
 
 /**
  * Combines a URL with any additional parameters
  */
 export function buildUrl(
   url: string,
-  params: Record<string, unknown> = {}
+  params: Record<string, unknown> = {},
 ): string {
   const baseUrl = new URL(url);
 

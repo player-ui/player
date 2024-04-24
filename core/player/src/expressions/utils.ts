@@ -1,4 +1,4 @@
-import { isExpressionNode } from './types';
+import { isExpressionNode } from "./types";
 import type {
   ErrorWithLocation,
   ExpressionHandler,
@@ -7,11 +7,11 @@ import type {
   ExpressionType,
   NodeLocation,
   NodePosition,
-} from './types';
+} from "./types";
 
 /** Generates a function by removing the first context argument */
 export function withoutContext<T extends unknown[], Return>(
-  fn: (...args: T) => Return
+  fn: (...args: T) => Return,
 ): ExpressionHandler<T, Return> {
   return (_context, ...args) => fn(...args);
 }
@@ -27,16 +27,16 @@ function isInRange(position: NodePosition, location: NodeLocation) {
 /** Get the node in the expression that's closest to the desired position */
 export function findClosestNodeAtPosition(
   node: ExpressionNode,
-  position: NodePosition
+  position: NodePosition,
 ): ExpressionNode | undefined {
   // This is just mapping recursively over nodes in the tree
 
   // eslint-disable-next-line default-case
   switch (node.type) {
-    case 'Modification':
-    case 'Assignment':
-    case 'LogicalExpression':
-    case 'BinaryExpression': {
+    case "Modification":
+    case "Assignment":
+    case "LogicalExpression":
+    case "BinaryExpression": {
       const check =
         findClosestNodeAtPosition(node.left, position) ??
         findClosestNodeAtPosition(node.right, position);
@@ -47,7 +47,7 @@ export function findClosestNodeAtPosition(
       break;
     }
 
-    case 'UnaryExpression': {
+    case "UnaryExpression": {
       const checkArg = findClosestNodeAtPosition(node.argument, position);
       if (checkArg) {
         return checkArg;
@@ -56,7 +56,7 @@ export function findClosestNodeAtPosition(
       break;
     }
 
-    case 'MemberExpression': {
+    case "MemberExpression": {
       const checkObject =
         findClosestNodeAtPosition(node.object, position) ??
         findClosestNodeAtPosition(node.property, position);
@@ -67,7 +67,7 @@ export function findClosestNodeAtPosition(
       break;
     }
 
-    case 'ConditionalExpression': {
+    case "ConditionalExpression": {
       const checkObject =
         findClosestNodeAtPosition(node.test, position) ??
         findClosestNodeAtPosition(node.consequent, position) ??
@@ -79,13 +79,13 @@ export function findClosestNodeAtPosition(
       break;
     }
 
-    case 'ArrayExpression':
-    case 'Compound': {
+    case "ArrayExpression":
+    case "Compound": {
       const elements =
-        node.type === 'ArrayExpression' ? node.elements : node.body;
+        node.type === "ArrayExpression" ? node.elements : node.body;
 
       const anyElements = elements.find((e) =>
-        findClosestNodeAtPosition(e, position)
+        findClosestNodeAtPosition(e, position),
       );
 
       if (anyElements) {
@@ -95,7 +95,7 @@ export function findClosestNodeAtPosition(
       break;
     }
 
-    case 'Object': {
+    case "Object": {
       const checkObject = node.attributes.reduce<ExpressionNode | undefined>(
         (found, next) => {
           return (
@@ -104,7 +104,7 @@ export function findClosestNodeAtPosition(
             findClosestNodeAtPosition(next.value, position)
           );
         },
-        undefined
+        undefined,
       );
 
       if (checkObject) {
@@ -114,7 +114,7 @@ export function findClosestNodeAtPosition(
       break;
     }
 
-    case 'CallExpression': {
+    case "CallExpression": {
       const anyArgs =
         node.args.find((arg) => {
           return findClosestNodeAtPosition(arg, position);
@@ -136,17 +136,17 @@ export function findClosestNodeAtPosition(
 
 /** Checks if the expression is a simple type */
 export function isObjectExpression(
-  expr: ExpressionType
+  expr: ExpressionType,
 ): expr is ExpressionObjectType {
   if (isExpressionNode(expr)) {
     return false;
   }
 
   return (
-    typeof expr === 'object' &&
+    typeof expr === "object" &&
     expr !== null &&
     !Array.isArray(expr) &&
-    'value' in expr
+    "value" in expr
   );
 }
 

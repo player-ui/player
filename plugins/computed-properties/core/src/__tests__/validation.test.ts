@@ -1,35 +1,35 @@
-/* eslint-disable jest/expect-expect */
-import { CommonExpressionsPlugin } from '@player-ui/common-expressions-plugin';
-import { CommonTypesPlugin } from '@player-ui/common-types-plugin';
-import { Registry } from '@player-ui/partial-match-registry';
-import { AssetTransformPlugin } from '@player-ui/asset-transform-plugin';
-import { makeFlow } from '@player-ui/make-flow';
-import { Player } from '@player-ui/player';
+import { test, expect, describe } from "vitest";
+import { CommonExpressionsPlugin } from "@player-ui/common-expressions-plugin";
+import { CommonTypesPlugin } from "@player-ui/common-types-plugin";
+import { Registry } from "@player-ui/partial-match-registry";
+import { AssetTransformPlugin } from "@player-ui/asset-transform-plugin";
+import { makeFlow } from "@player-ui/make-flow";
+import { Player } from "@player-ui/player";
 import type {
   Asset,
   BindingInstance,
   TransformFunction,
   ValidationResponse,
-} from '@player-ui/player';
-import { ComputedPropertiesPlugin } from '..';
+} from "@player-ui/player";
+import { ComputedPropertiesPlugin } from "..";
 
 // This is a flow that uses computed properties for evaluating cross field validation
 const flowWithComputedValidation = makeFlow({
-  id: 'view-1',
-  type: 'view',
+  id: "view-1",
+  type: "view",
   template: [
     {
-      data: 'items',
-      output: 'bindings',
-      value: 'items._index_.isRelevant',
+      data: "items",
+      output: "bindings",
+      value: "items._index_.isRelevant",
     },
   ],
   validation: [
     {
-      type: 'expression',
-      ref: 'items.0.isRelevant',
-      message: 'Please select at least one item.',
-      exp: '{{expressions.SelectionValidation}}',
+      type: "expression",
+      ref: "items.0.isRelevant",
+      message: "Please select at least one item.",
+      exp: "{{expressions.SelectionValidation}}",
     },
   ],
 });
@@ -37,24 +37,24 @@ const flowWithComputedValidation = makeFlow({
 flowWithComputedValidation.schema = {
   ROOT: {
     items: {
-      type: 'ItemType',
+      type: "ItemType",
       isArray: true,
     },
     expressions: {
-      type: 'ExpressionsType',
+      type: "ExpressionsType",
     },
   },
   itemType: {
     name: {
-      type: 'TextType',
+      type: "TextType",
     },
     isRelevant: {
-      type: 'BooleanType',
+      type: "BooleanType",
     },
   },
   ExpressionsType: {
     SelectionValidation: {
-      type: 'Expression',
+      type: "Expression",
       exp: 'findProperty({{items}}, "isRelevant", true, "isRelevant", false)',
     },
   },
@@ -63,17 +63,17 @@ flowWithComputedValidation.schema = {
 flowWithComputedValidation.data = {
   items: [
     {
-      name: 'One',
+      name: "One",
       isRelevant: false,
     },
     {
-      name: 'Two',
+      name: "Two",
       isRelevant: false,
     },
   ],
 };
 
-interface ValidationView extends Asset<'view'> {
+interface ValidationView extends Asset<"view"> {
   /**
    *
    */
@@ -107,7 +107,7 @@ const validationTrackerTransform: TransformFunction<
   };
 };
 
-describe('cross field validation can use computed properties', () => {
+describe("cross field validation can use computed properties", () => {
   /**
    *
    */
@@ -124,7 +124,7 @@ describe('cross field validation can use computed properties', () => {
 
         // necessary to track validations
         new AssetTransformPlugin(
-          new Registry([[{ type: 'view' }, validationTrackerTransform]])
+          new Registry([[{ type: "view" }, validationTrackerTransform]]),
         ),
       ],
     });
@@ -136,7 +136,7 @@ describe('cross field validation can use computed properties', () => {
      */
     const getControllers = () => {
       const state = player.getState();
-      if (state.status === 'in-progress') {
+      if (state.status === "in-progress") {
         return state.controllers;
       }
     };
@@ -162,20 +162,20 @@ describe('cross field validation can use computed properties', () => {
          *
          */
         validations?: Map<BindingInstance, ValidationResponse>;
-      }) => void
+      }) => void,
     ) => assertions(getControllers()!.validation.validateView()!);
 
-    expect(getCurrentView()?.initialView.id).toBe('view-1');
+    expect(getCurrentView()?.initialView.id).toBe("view-1");
 
     withValidations(({ canTransition, validations }) => {
       expect(canTransition).toBe(false);
       expect(validations?.size).toBe(1);
     });
 
-    getControllers()?.flow.transition('Next');
+    getControllers()?.flow.transition("Next");
 
     // Transition fails do to blocking validation
-    expect(getCurrentView()?.initialView.id).toBe('view-1');
+    expect(getCurrentView()?.initialView.id).toBe("view-1");
 
     getControllers()?.data.set(dataUpdate);
 
@@ -184,35 +184,34 @@ describe('cross field validation can use computed properties', () => {
       expect(validations).toBeUndefined();
     });
 
-    getControllers()?.flow.transition('Next');
+    getControllers()?.flow.transition("Next");
 
     const { endState } = await result;
-    // eslint-disable-next-line jest/no-standalone-expect
     expect(endState).toStrictEqual({
-      outcome: 'done',
-      state_type: 'END',
+      outcome: "done",
+      state_type: "END",
     });
   };
 
   test(
-    'updating ref data should remove validation',
+    "updating ref data should remove validation",
     baseValidationTest({
-      'items.0.isRelevant': true,
-    })
+      "items.0.isRelevant": true,
+    }),
   );
 
   test(
-    'updating non-ref data should remove validation',
+    "updating non-ref data should remove validation",
     baseValidationTest({
-      'items.1.isRelevant': true,
-    })
+      "items.1.isRelevant": true,
+    }),
   );
 
   test(
-    'updating both should remove validation',
+    "updating both should remove validation",
     baseValidationTest({
-      'items.0.isRelevant': true,
-      'items.1.isRelevant': true,
-    })
+      "items.0.isRelevant": true,
+      "items.1.isRelevant": true,
+    }),
   );
 });

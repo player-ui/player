@@ -1,6 +1,6 @@
-import type React from 'react';
-import type { CompletedState, Flow, FlowResult } from '@player-ui/player';
-import type { ReactPlayer, ReactPlayerOptions } from '../player';
+import type React from "react";
+import type { CompletedState, Flow, FlowResult } from "@player-ui/player";
+import type { ReactPlayer, ReactPlayerOptions } from "../player";
 
 export interface FinalState {
   /** Mark the iteration as complete */
@@ -24,14 +24,14 @@ export interface FlowManager {
    * @param previousValue - The result of the previous flow.
    */
   next: (
-    previousValue?: CompletedState
+    previousValue?: CompletedState,
   ) => Promise<FinalState | NextState<Flow>>;
 
   /**
    * Called when the flow is ended early (the react tree is torn down)
    * Allows clients the opportunity to save-data before destroying the tree
    */
-  terminate?: (data?: FlowResult['data']) => void;
+  terminate?: (data?: FlowResult["data"]) => void;
 }
 
 export interface FallbackProps {
@@ -76,14 +76,14 @@ export type ManagedPlayerContext = {
 export type ManagedPlayerState =
   | {
       /** The managed player hasn't started yet */
-      value: 'not_started';
+      value: "not_started";
 
       /** The context for the managed state */
       context: ManagedPlayerContext;
     }
   | {
       /** The managed-player is awaiting a response from the flow manager */
-      value: 'pending';
+      value: "pending";
 
       /** The context for the managed state */
       context: ManagedPlayerContext & {
@@ -96,7 +96,7 @@ export type ManagedPlayerState =
     }
   | {
       /** A flow was retrieved from the flow manager, but hasn't been processed yet */
-      value: 'loaded';
+      value: "loaded";
 
       /** The context for the managed state */
       context: ManagedPlayerContext & {
@@ -109,7 +109,7 @@ export type ManagedPlayerState =
     }
   | {
       /** Player is currently executing a flow */
-      value: 'running';
+      value: "running";
       /** The context for the managed state */
       context: ManagedPlayerContext & {
         /** The currently running flow */
@@ -124,7 +124,7 @@ export type ManagedPlayerState =
     }
   | {
       /** Player has completed a flow */
-      value: 'completed';
+      value: "completed";
 
       /** The context for the managed state */
       context: ManagedPlayerContext & {
@@ -134,7 +134,7 @@ export type ManagedPlayerState =
     }
   | {
       /** The entire flow iteration has completed */
-      value: 'ended';
+      value: "ended";
 
       /** The context for the managed state */
       context: ManagedPlayerContext & {
@@ -144,7 +144,7 @@ export type ManagedPlayerState =
     }
   | {
       /** One of the steps in the flow has resulted in an error */
-      value: 'error';
+      value: "error";
 
       /** The context for the managed state */
       context: ManagedPlayerContext & {

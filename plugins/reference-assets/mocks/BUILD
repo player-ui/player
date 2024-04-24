@@ -1,34 +1,75 @@
-load("//:index.bzl", "generate_manifest", "javascript_pipeline")
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@rules_player//player:defs.bzl", compile_dsl = "compile", create_base_dsl_config = "create_base_config")
+
+npm_link_all_packages(name = "node_modules")
+
+create_base_dsl_config(
+    name = "dsl_config",
+    plugins = [],
+)
+
+DSL_SRCS = glob([
+    "action/*.tsx",
+    "collection/*.tsx",
+    "image/*.tsx",
+    "info/*.tsx",
+    "input/*.tsx",
+    "text/*.tsx",
+])
+
+compile_dsl(
+    name = "all_flows",
+    srcs = DSL_SRCS,
+    config = ":player.config.json",
+    data = [
+        ":node_modules/@player-ui/reference-assets-plugin-components",
+        "//:node_modules/@player-tools/dsl",
+        "//:node_modules/dlv",
+        "//:node_modules/react",
+    ],
+)
+
+# generate_manifest(
+#     name = "mocks",
+#     mocks = glob(["**/*.json"]),
+#     visibility = ["//visibility:public"],
+# )
 
 filegroup(
+    name = "mock-files",
+    srcs = glob(["**/*.json"]) + [":all_flows"],
+)
+
+js_library(
+    name = "mocks-js-library",
+    srcs = [":mock-files"],
+)
+
+npm_package(
     name = "mocks",
-    srcs = glob(["**/*.json"]),
+    srcs = [":mocks-js-library"] + DSL_SRCS,
     visibility = ["//visibility:public"],
 )
 
-generate_manifest(
-    name = "manifest",
-    mocks = [":mocks"],
-    visibility = ["//visibility:public"],
-)
+# javascript_pipeline(
+#     name = "@player-ui/reference-assets-plugin-mocks",
+#     entry = "index.ts",
+#      dependencies = [
+#         "@npm//@player-tools/dsl",
+#         "//plugins/reference-assets/components:@player-ui/reference-assets-components"
+#     ],
+#     other_srcs = [
+#         "index.ts",
+#         ":mocks",
+#     ] + glob(["**/*.tsx"]),
+#     out_dir = "",
+# )
 
-javascript_pipeline(
-    name = "@player-ui/reference-assets-plugin-mocks",
-    entry = "index.ts",
-    dependencies = [
-        "@npm//@player-tools/dsl",
-        "//plugins/reference-assets/components:@player-ui/reference-assets-components"
-    ],
-    other_srcs = [
-        "index.ts",
-        ":manifest",
-    ] + glob(["**/*.tsx"]),
-    out_dir = "",
-)
-
-java_library(
-    name = "jar",
-    resources = [":manifest"],
-    resource_strip_prefix = "plugins/reference-assets/mocks",
-    visibility = ["//visibility:public"],
-)
+# java_library(
+#     name = "jar",
+#     resources = [":mocks"],
+#     resource_strip_prefix = "plugins/reference-assets/mocks",
+#     visibility = ["//visibility:public"],
+# )

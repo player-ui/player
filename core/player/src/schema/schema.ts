@@ -1,16 +1,16 @@
-import { SyncWaterfallHook } from 'tapable-ts';
-import type { Schema as SchemaType, Formatting } from '@player-ui/types';
+import { SyncWaterfallHook } from "tapable-ts";
+import type { Schema as SchemaType, Formatting } from "@player-ui/types";
 
-import type { BindingInstance } from '../binding';
-import type { ValidationProvider, ValidationObject } from '../validator';
-import type { FormatDefinition, FormatOptions, FormatType } from './types';
+import type { BindingInstance } from "../binding";
+import type { ValidationProvider, ValidationObject } from "../validator";
+import type { FormatDefinition, FormatOptions, FormatType } from "./types";
 
 /** A function that returns itself */
 const identify = (val: any) => val;
 
 /** Expand the authored schema into a set of paths -> DataTypes */
 export function parse(
-  schema: SchemaType.Schema
+  schema: SchemaType.Schema,
 ): Map<string, SchemaType.DataTypes> {
   const expandedPaths = new Map<string, SchemaType.DataTypes>();
 
@@ -41,29 +41,29 @@ export function parse(
     Object.entries(node).forEach(([prop, type]) => {
       const nestedPath = [...path, prop];
 
-      const nestedPathStr = nestedPath.join('.');
+      const nestedPathStr = nestedPath.join(".");
 
       if (expandedPaths.has(nestedPathStr)) {
         // We've gone in a loop. Panic
         throw new Error(
-          "Path has already been processed. There's either a loop somewhere or a bug"
+          "Path has already been processed. There's either a loop somewhere or a bug",
         );
       }
 
       if (visited.has(type.type)) {
         throw new Error(
-          `Path already contained type: ${type.type}. This likely indicates a loop in the schema`
+          `Path already contained type: ${type.type}. This likely indicates a loop in the schema`,
         );
       }
 
       expandedPaths.set(nestedPathStr, type);
 
       if (type.isArray) {
-        nestedPath.push('[]');
+        nestedPath.push("[]");
       }
 
       if (type.isRecord) {
-        nestedPath.push('{}');
+        nestedPath.push("{}");
       }
 
       if (type.type && schema[type.type]) {
@@ -117,7 +117,7 @@ export class SchemaController implements ValidationProvider {
   }
 
   getValidationsForBinding(
-    binding: BindingInstance
+    binding: BindingInstance,
   ): Array<ValidationObject> | undefined {
     const typeDef = this.getApparentType(binding);
 
@@ -127,8 +127,8 @@ export class SchemaController implements ValidationProvider {
 
     // Set the defaults for schema-level validations
     return typeDef.validation.map((vRef) => ({
-      severity: 'error',
-      trigger: 'change',
+      severity: "error",
+      trigger: "change",
       ...vRef,
     }));
   }
@@ -141,22 +141,22 @@ export class SchemaController implements ValidationProvider {
 
     let bindingArray = binding.asArray();
     let normalized = bindingArray
-      .map((p) => (typeof p === 'number' ? '[]' : p))
-      .join('.');
+      .map((p) => (typeof p === "number" ? "[]" : p))
+      .join(".");
 
     if (normalized) {
       this.bindingSchemaNormalizedCache.set(binding, normalized);
-      bindingArray = normalized.split('.');
+      bindingArray = normalized.split(".");
     }
 
     bindingArray.forEach((item) => {
       const recordBinding = bindingArray
-        .map((p) => (p === item ? '{}' : p))
-        .join('.');
+        .map((p) => (p === item ? "{}" : p))
+        .join(".");
 
       if (this.schema.get(recordBinding)) {
         this.bindingSchemaNormalizedCache.set(binding, recordBinding);
-        bindingArray = recordBinding.split('.');
+        bindingArray = recordBinding.split(".");
         normalized = recordBinding;
       }
     });
@@ -167,12 +167,12 @@ export class SchemaController implements ValidationProvider {
   public getType(binding: BindingInstance): SchemaType.DataTypes | undefined {
     return this.hooks.resolveTypeForBinding.call(
       this.schema.get(this.normalizeBinding(binding)),
-      binding
+      binding,
     );
   }
 
   public getApparentType(
-    binding: BindingInstance
+    binding: BindingInstance,
   ): SchemaType.DataTypes | undefined {
     const schemaType = this.getType(binding);
 
@@ -201,7 +201,7 @@ export class SchemaController implements ValidationProvider {
   }
 
   public getFormatterForType(
-    formatReference: Formatting.Reference
+    formatReference: Formatting.Reference,
   ): FormatDefinition<unknown, unknown> | undefined {
     const { type: formatType, ...options } = formatReference;
 
@@ -226,7 +226,7 @@ export class SchemaController implements ValidationProvider {
    * If no formatter is registered, it will return undefined
    */
   public getFormatter(
-    binding: BindingInstance
+    binding: BindingInstance,
   ): FormatDefinition<unknown, unknown> | undefined {
     const type = this.getApparentType(binding);
 

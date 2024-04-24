@@ -1,6 +1,6 @@
-import type { Asset } from '@player-ui/player';
+import type { Asset } from "@player-ui/player";
 
-export interface ImageAsset extends Asset<'image'> {
+export interface ImageAsset extends Asset<"image"> {
   /** Reference to the image */
   metaData: ImageMetaData;
 

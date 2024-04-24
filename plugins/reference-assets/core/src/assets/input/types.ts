@@ -4,15 +4,15 @@ import type {
   Schema,
   Binding,
   ValidationResponse,
-} from '@player-ui/player';
-import type { BeaconDataType } from '@player-ui/beacon-plugin';
+} from "@player-ui/player";
+import type { BeaconDataType } from "@player-ui/beacon-plugin";
 
 /**
  * This is the most generic way of gathering data. The input is bound to a data model using the 'binding' property.
  * Players can get field type information from the 'schema' definition, thus to decide the input controls for visual rendering.
  * */
 export interface InputAsset<AnyTextAsset extends Asset = Asset>
-  extends Asset<'input'> {
+  extends Asset<"input"> {
   /** Asset container for a field label. */
   label?: AssetWrapper<AnyTextAsset>;
 

@@ -1,6 +1,6 @@
-import type { FormatType } from '../../schema';
-import type { ValidationController } from '../../controllers/validation';
-import type { Player, PlayerPlugin } from '../../player';
+import type { FormatType } from "../../schema";
+import type { ValidationController } from "../../controllers/validation";
+import type { Player, PlayerPlugin } from "../../player";
 
 /**
  * Adds a validation provider to the validator registry
@@ -8,21 +8,21 @@ import type { Player, PlayerPlugin } from '../../player';
  * @param vc - validation controller
  */
 export const addValidator = (vc: ValidationController) => {
-  vc.hooks.createValidatorRegistry.tap('test', (registry) => {
+  vc.hooks.createValidatorRegistry.tap("test", (registry) => {
     registry.register<{
       /** specific names to match against */
       names: string[];
-    }>('names', (context, val, options) => {
+    }>("names", (context, val, options) => {
       if (options?.names?.includes(val)) {
         return undefined;
       }
 
       return {
-        message: `Names just be in: ${options?.names?.join(',')}`,
+        message: `Names just be in: ${options?.names?.join(",")}`,
       };
     });
 
-    registry.register<any>('expression', (context, value, options) => {
+    registry.register<any>("expression", (context, value, options) => {
       if (options?.exp === undefined) {
         return;
       }
@@ -30,29 +30,29 @@ export const addValidator = (vc: ValidationController) => {
       const result = context.evaluate(options.exp);
 
       if (!result) {
-        return { message: 'Expression evaluation failed' };
+        return { message: "Expression evaluation failed" };
       }
     });
 
-    registry.register('required', (context, value) => {
-      if (value === undefined || value === null || value === '') {
+    registry.register("required", (context, value) => {
+      if (value === undefined || value === null || value === "") {
         return {
-          message: 'A value is required',
-          severity: 'error',
+          message: "A value is required",
+          severity: "error",
         };
       }
     });
 
-    registry.register<any>('integer', (context, value) => {
-      if (typeof value !== 'number' || Math.floor(value) !== value) {
+    registry.register<any>("integer", (context, value) => {
+      if (typeof value !== "number" || Math.floor(value) !== value) {
         return {
-          message: 'Value must be an integer',
+          message: "Value must be an integer",
           parameters: {
             type: typeof value,
             flooredValue: Math.floor(value),
             value,
           },
-          severity: 'error',
+          severity: "error",
         };
       }
     });
@@ -61,7 +61,7 @@ export const addValidator = (vc: ValidationController) => {
 
 /** A plugin that tracks bindings and attaches validations to anything w/ a binding property */
 export default class TrackBindingPlugin implements PlayerPlugin {
-  name = 'track-binding';
+  name = "track-binding";
 
   apply(player: Player) {
     player.hooks.validationController.tap(this.name, (validationProvider) => {
@@ -78,29 +78,29 @@ export default class TrackBindingPlugin implements PlayerPlugin {
         options: Array<string>;
       }
     > = {
-      name: 'indexOf',
+      name: "indexOf",
       format: (val, options) => {
-        if (typeof val === 'number' && options?.options) {
+        if (typeof val === "number" && options?.options) {
           return options.options[val];
         }
 
         return undefined;
       },
       deformat: (val, options) => {
-        if (typeof val === 'string' && options?.options) {
+        if (typeof val === "string" && options?.options) {
           return options.options.indexOf(val);
         }
       },
     };
 
-    player.hooks.schema.tap('test', (schema) => {
+    player.hooks.schema.tap("test", (schema) => {
       schema.addFormatters([indexFormatter] as any);
     });
 
-    player.hooks.viewController.tap('test', (vc) => {
-      vc.hooks.view.tap('test', (view) => {
-        view.hooks.resolver.tap('test', (resolver) => {
-          resolver.hooks.resolve.tap('test', (val, node, options) => {
+    player.hooks.viewController.tap("test", (vc) => {
+      vc.hooks.view.tap("test", (view) => {
+        view.hooks.resolver.tap("test", (resolver) => {
+          resolver.hooks.resolve.tap("test", (val, node, options) => {
             if (val?.binding) {
               const currentValue = options?.data.model.get(val.binding);
               options.validation?.track(val.binding);

@@ -1,1 +1,1 @@
-export const CheckPathPluginSymbol = Symbol.for('CheckPathPlugin');
+export const CheckPathPluginSymbol = Symbol.for("CheckPathPlugin");

@@ -1,12 +1,13 @@
-import React from 'react';
-import { ReactPlayer } from '@player-ui/react';
-import { findByTestId, render } from '@testing-library/react';
-import { makeFlow } from '@player-ui/make-flow';
-import { BeaconPlugin, useBeacon } from '..';
+import { describe, test, vitest, expect } from "vitest";
+import React from "react";
+import { ReactPlayer } from "@player-ui/react";
+import { findByTestId, render } from "@testing-library/react";
+import { makeFlow } from "@player-ui/make-flow";
+import { BeaconPlugin, useBeacon } from "..";
 
-describe('beacon web plugin', () => {
-  test('loads in a player', async () => {
-    const beaconCallback = jest.fn();
+describe("beacon web plugin", () => {
+  test("loads in a player", async () => {
+    const beaconCallback = vitest.fn();
 
     const rp = new ReactPlayer({
       plugins: [
@@ -17,13 +18,13 @@ describe('beacon web plugin', () => {
     });
 
     const flow = makeFlow({
-      id: 'action',
-      type: 'action',
-      value: 'Next',
+      id: "action",
+      type: "action",
+      value: "Next",
     });
 
-    rp.assetRegistry.set({ type: 'action' }, (props: any) => {
-      const beacon = useBeacon({ element: 'button' });
+    rp.assetRegistry.set({ type: "action" }, (props: any) => {
+      const beacon = useBeacon({ element: "button" });
 
       beacon();
 
@@ -36,13 +37,17 @@ describe('beacon web plugin', () => {
         <React.Suspense fallback="loading...">
           <rp.Component />
         </React.Suspense>
-      </div>
+      </div>,
     );
 
-    await findByTestId(container, 'action');
+    await findByTestId(container, "action");
 
-    expect(rp.player.getState().status).toBe('in-progress');
+    expect(rp.player.getState().status).toBe("in-progress");
 
-    expect(beaconCallback).toHaveBeenCalledTimes(1);
+    await vitest.waitFor(() => {
+      expect(beaconCallback).toHaveBeenCalledWith(
+        expect.objectContaining({ element: "button" }),
+      );
+    });
   });
 });

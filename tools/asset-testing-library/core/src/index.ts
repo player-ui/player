@@ -1,5 +1,5 @@
-import type { TransformFunction, Asset, Flow, View } from '@player-ui/player';
-import { Player } from '@player-ui/player';
+import type { TransformFunction, Asset, Flow, View } from "@player-ui/player";
+import { Player } from "@player-ui/player";
 import { AssetTransformPlugin } from '@player-ui/asset-transform-plugin';
 import { makeFlow } from '@player-ui/make-flow';
 

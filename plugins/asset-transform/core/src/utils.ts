@@ -4,7 +4,7 @@ import type {
   BeforeTransformFunction,
   TransformFunction,
   TransformFunctions,
-} from '@player-ui/player';
+} from "@player-ui/player";
 
 function composeTransforms(
   ...args: TransformFunction<any>[]
@@ -65,7 +65,7 @@ export function compose(
   const resolveFns: TransformFunction<any>[] = [];
 
   for (const arg of args) {
-    if (typeof arg === 'function') {
+    if (typeof arg === "function") {
       resolveFns.push(arg);
     } else {
       if (arg?.resolve) {

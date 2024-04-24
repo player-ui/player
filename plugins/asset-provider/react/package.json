@@ -1,0 +1,11 @@
+{
+  "name": "@player-ui/asset-provider-plugin-react",
+  "version": "0.0.0-PLACEHOLDER",
+  "main": "src/index.tsx",
+  "dependencies": {
+    "@player-ui/react-subscribe": "workspace:*"
+  },
+  "peerDependencies": {
+    "@player-ui/react": "workspace:*"
+  }
+}

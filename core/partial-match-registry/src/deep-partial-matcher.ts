@@ -1,4 +1,4 @@
-import dlv from 'dlv';
+import dlv from "dlv";
 
 /** A function that checks overlapping properties against a reference value */
 export type Matcher = ((searchObj: object) => boolean) & {
@@ -10,14 +10,14 @@ export type Matcher = ((searchObj: object) => boolean) & {
 function traverseObj(
   object: Record<any, any>,
   path: string[] = [],
-  pairs: Map<string[], any> = new Map()
+  pairs: Map<string[], any> = new Map(),
 ): Map<string[], any> {
   for (const key of Object.keys(object)) {
     const val: any = object[key];
     const nestedPath = [...path, key];
-    ('');
+    ("");
 
-    if (typeof val === 'object') {
+    if (typeof val === "object") {
       traverseObj(val, nestedPath, pairs);
     } else {
       pairs.set(nestedPath, val);
@@ -34,7 +34,7 @@ export default function createMatcher(partialObj: object): Matcher {
 
   /** Generate a function to match against all of the properties we care about */
   const matchFunction = (searchObj: object) => {
-    for (const entry of pairs) {
+    for (const entry of Array.from(pairs)) {
       const [path, value] = entry;
 
       if (dlv(searchObj, path) !== value) {

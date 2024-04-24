@@ -1,18 +1,18 @@
-import { SyncBailHook, SyncWaterfallHook } from 'tapable-ts';
-import { NestedError } from 'ts-nested-error';
-import type { ParserResult, AnyNode } from '../binding-grammar';
+import { SyncBailHook, SyncWaterfallHook } from "tapable-ts";
+import { NestedError } from "ts-nested-error";
+import type { ParserResult, AnyNode } from "../binding-grammar/index";
 import {
   // We can swap this with whichever parser we want to use
   parseCustom as parseBinding,
-} from '../binding-grammar';
-import type { BindingParserOptions, BindingLike } from './binding';
-import { BindingInstance } from './binding';
-import { isBinding } from './utils';
-import type { NormalizedResult, ResolveBindingASTOptions } from './resolver';
-import { resolveBindingAST } from './resolver';
+} from "../binding-grammar";
+import type { BindingParserOptions, BindingLike } from "./binding";
+import { BindingInstance } from "./binding";
+import { isBinding } from "./utils";
+import type { NormalizedResult, ResolveBindingASTOptions } from "./resolver";
+import { resolveBindingAST } from "./resolver";
 
-export * from './utils';
-export * from './binding';
+export * from "./utils";
+export * from "./binding";
 
 export const SIMPLE_BINDING_REGEX = /^[\w\-@]+(\.[\w\-@]+)*$/;
 export const BINDING_BRACKETS_REGEX = /[\s()*=`{}'"[\]]/;
@@ -20,13 +20,13 @@ const LAZY_BINDING_REGEX = /^[^.]+(\..+)*$/;
 
 const DEFAULT_OPTIONS: BindingParserOptions = {
   get: () => {
-    throw new Error('Not Implemented');
+    throw new Error("Not Implemented");
   },
   set: () => {
-    throw new Error('Not Implemented');
+    throw new Error("Not Implemented");
   },
   evaluate: () => {
-    throw new Error('Not Implemented');
+    throw new Error("Not Implemented");
   },
 };
 
@@ -59,7 +59,7 @@ export class BindingParser {
    */
   private normalizePath(
     path: string,
-    resolveOptions: ResolveBindingASTOptions
+    resolveOptions: ResolveBindingASTOptions,
   ) {
     /**
      * Ensure no binding characters exist in path and the characters remaining
@@ -70,15 +70,15 @@ export class BindingParser {
       LAZY_BINDING_REGEX.test(path) &&
       this.hooks.skipOptimization.call(path) !== true
     ) {
-      return { path: path.split('.'), updates: undefined } as NormalizedResult;
+      return { path: path.split("."), updates: undefined } as NormalizedResult;
     }
 
     const ast = this.parseCache[path] ?? parseBinding(path);
     this.parseCache[path] = ast;
 
-    if (typeof ast !== 'object' || !ast?.status) {
+    if (typeof ast !== "object" || !ast?.status) {
       throw new TypeError(
-        `Cannot normalize path "${path}": ${ast?.error ?? 'Unknown Error.'}`
+        `Cannot normalize path "${path}": ${ast?.error ?? "Unknown Error."}`,
       );
     }
 
@@ -90,17 +90,17 @@ export class BindingParser {
   }
 
   private getBindingForNormalizedResult(
-    normalized: NormalizedResult
+    normalized: NormalizedResult,
   ): BindingInstance {
-    const normalizedStr = normalized.path.join('.');
+    const normalizedStr = normalized.path.join(".");
 
     if (this.cache[normalizedStr]) {
       return this.cache[normalizedStr];
     }
 
     const created = new BindingInstance(
-      normalizedStr === '' ? [] : normalized.path,
-      this.parse
+      normalizedStr === "" ? [] : normalized.path,
+      this.parse,
     );
     this.cache[normalizedStr] = created;
 
@@ -109,7 +109,7 @@ export class BindingParser {
 
   public parse(
     rawBinding: BindingLike,
-    overrides: Partial<BindingParserOptions> = {}
+    overrides: Partial<BindingParserOptions> = {},
   ): BindingInstance {
     if (isBinding(rawBinding)) {
       return rawBinding;
@@ -123,12 +123,12 @@ export class BindingParser {
     let updates: Record<string, any> = {};
 
     const joined = Array.isArray(rawBinding)
-      ? rawBinding.join('.')
+      ? rawBinding.join(".")
       : String(rawBinding);
 
     const normalizeConfig: ResolveBindingASTOptions = {
       getValue: (path: Array<string | number>) => {
-        const normalized = this.normalizePath(path.join('.'), normalizeConfig);
+        const normalized = this.normalizePath(path.join("."), normalizeConfig);
 
         return options.get(this.getBindingForNormalizedResult(normalized));
       },
@@ -138,17 +138,17 @@ export class BindingParser {
       convertToPath: (path: any) => {
         if (path === undefined) {
           throw new Error(
-            'Attempted to convert undefined value to binding path'
+            "Attempted to convert undefined value to binding path",
           );
         }
 
         if (
-          typeof path !== 'string' &&
-          typeof path !== 'number' &&
-          typeof path !== 'boolean'
+          typeof path !== "string" &&
+          typeof path !== "number" &&
+          typeof path !== "boolean"
         ) {
           throw new Error(
-            `Attempting to convert ${typeof path} to a binding path.`
+            `Attempting to convert ${typeof path} to a binding path.`,
           );
         }
 
@@ -161,10 +161,10 @@ export class BindingParser {
           };
         }
 
-        const joinedNormalizedPath = normalized.path.join('.');
+        const joinedNormalizedPath = normalized.path.join(".");
 
-        if (joinedNormalizedPath === '') {
-          throw new Error('Nested path resolved to an empty path');
+        if (joinedNormalizedPath === "") {
+          throw new Error("Nested path resolved to an empty path");
         }
 
         return joinedNormalizedPath;
@@ -187,7 +187,7 @@ export class BindingParser {
         (updatedBinding) => [
           this.parse(updatedBinding),
           updates[updatedBinding],
-        ]
+        ],
       );
 
       options.set(updateTransaction);

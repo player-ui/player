@@ -1,6 +1,6 @@
-import type { Player, PlayerPlugin } from '@player-ui/player';
-import { BindingInstance } from '@player-ui/player';
-import get from 'dlv';
+import type { Player, PlayerPlugin } from "@player-ui/player";
+import { BindingInstance } from "@player-ui/player";
+import get from "dlv";
 
 export interface ConstantsPluginConfig {
   /** Constants defined in an Content */
@@ -18,7 +18,7 @@ export interface ConstantsPluginConfig {
  * It allows for runtime extensions/overrides through a `constants` property in the flow
  */
 export class ConstantsPlugin implements PlayerPlugin {
-  name = 'constants';
+  name = "constants";
 
   /**
    * Namespace to store the constants under
@@ -40,9 +40,9 @@ export class ConstantsPlugin implements PlayerPlugin {
    */
   constructor(params: ConstantsPluginConfig) {
     this.data = params.data;
-    this.namespace = params.namespace ?? 'constants';
+    this.namespace = params.namespace ?? "constants";
     this.dataPath = new BindingInstance(
-      params.dataPath ?? ['data', 'constants']
+      params.dataPath ?? ["data", "constants"],
     );
   }
 

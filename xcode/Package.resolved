@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "swift-hooks",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/intuit/swift-hooks.git",
+      "state" : {
+        "revision" : "5f3136ac2a3c27aa469e3f9a1222b15080d431d3",
+        "version" : "0.1.0"
+      }
+    },
+    {
+      "identity" : "viewinspector",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nalexn/ViewInspector",
+      "state" : {
+        "revision" : "67319287749b83f39dcc2f20edd520c610c012fd",
+        "version" : "0.9.10"
+      }
+    }
+  ],
+  "version" : 2
+}

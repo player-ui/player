@@ -2,24 +2,24 @@ import type {
   Schema,
   Formatting,
   Validation as ValidationTypes,
-} from '@player-ui/types';
+} from "@player-ui/types";
 import type {
   BindingInstance,
   BindingLike,
   BindingFactory,
-} from '../../binding';
+} from "../../binding";
 import type {
   DataModelWithParser,
   DataModelImpl,
   DataModelOptions,
-} from '../../data';
-import type { ConstantsProvider } from '../../controllers/constants';
-import type { TransitionFunction } from '../../controllers';
-import type { ExpressionEvaluator, ExpressionType } from '../../expressions';
-import type { ValidationResponse } from '../../validator';
-import type { Logger } from '../../logger';
-import type { SchemaController } from '../../schema';
-import type { Node } from '../parser';
+} from "../../data";
+import type { ConstantsProvider } from "../../controllers/constants";
+import type { TransitionFunction } from "../../controllers";
+import type { ExpressionEvaluator, ExpressionType } from "../../expressions";
+import type { ValidationResponse } from "../../validator";
+import type { Logger } from "../../logger";
+import type { SchemaController } from "../../schema";
+import type { Node } from "../parser";
 
 export interface ValidationGetResolveOptions {
   /**
@@ -33,6 +33,7 @@ export interface PlayerUtils {
   findPlugin<Plugin = unknown>(symbol: symbol): Plugin | undefined;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export declare namespace Resolve {
   export interface Validation {
     /** Fetch the data-type for the given binding */
@@ -40,7 +41,7 @@ export declare namespace Resolve {
 
     /** Get all currently applicable validation errors */
     getAll(
-      options?: ValidationGetResolveOptions
+      options?: ValidationGetResolveOptions,
     ): Map<BindingInstance, ValidationResponse> | undefined;
 
     /** Internal Method to lookup if there is a validation for the given binding */
@@ -48,12 +49,12 @@ export declare namespace Resolve {
       | {
           /** Get the validation for the given binding */
           get: (
-            options?: ValidationGetResolveOptions
+            options?: ValidationGetResolveOptions,
           ) => ValidationResponse | undefined;
 
           /** Get all validations for the given binding */
           getAll: (
-            options?: ValidationGetResolveOptions
+            options?: ValidationGetResolveOptions,
           ) => Array<ValidationResponse>;
         }
       | undefined;
@@ -64,7 +65,7 @@ export declare namespace Resolve {
       options?: {
         /** If this binding should also be tracked for validations */
         track?: boolean;
-      } & ValidationGetResolveOptions
+      } & ValidationGetResolveOptions,
     ): ValidationResponse | undefined;
 
     getValidationsForBinding(
@@ -72,12 +73,12 @@ export declare namespace Resolve {
       options?: {
         /** If this binding should also be tracked for validations */
         track?: boolean;
-      } & ValidationGetResolveOptions
+      } & ValidationGetResolveOptions,
     ): Array<ValidationResponse>;
 
     /** Get errors for all children regardless of section */
     getChildren(
-      type?: ValidationTypes.DisplayTarget
+      type?: ValidationTypes.DisplayTarget,
     ): Array<ValidationResponse>;
 
     /** Get errors for all children solely in this section */
@@ -89,7 +90,7 @@ export declare namespace Resolve {
     /** Register node as a section */
     register: (options?: {
       /** While type of Display Target group it should register as */
-      type: Exclude<ValidationTypes.DisplayTarget, 'field'>;
+      type: Exclude<ValidationTypes.DisplayTarget, "field">;
     }) => void;
   }
 
@@ -141,7 +142,7 @@ export declare namespace Resolve {
     data: NodeDataOptions;
 
     /** The data dependencies that were requested during the resolution */
-    getDependencies?(scope?: 'core' | 'children'): Set<BindingInstance>;
+    getDependencies?(scope?: "core" | "children"): Set<BindingInstance>;
 
     /** original node */
     node?: Node.Node;
@@ -180,13 +181,13 @@ export declare namespace Resolve {
 
   export type NodeTransformFunction = (
     node: Node.Node,
-    options: NodeResolveOptions
+    options: NodeResolveOptions,
   ) => Node.Node | null;
 
   export type NodeResolveFunction = (
     value: any,
     node: Node.Node,
-    options: NodeResolveOptions
+    options: NodeResolveOptions,
   ) => any;
 
   export interface Plugin {

@@ -1,0 +1,25 @@
+import { Meta, Story, Canvas } from "@storybook/addon-docs";
+import { Image } from "@player-ui/reference-assets-plugin-react";
+import * as ImageStories from "./Image.stories";
+
+<Meta title="Reference Assets/Image" component={Image} />
+
+# Image Asset
+
+The Image asset allows you to render an image from a reference.
+
+<Story of={ImageStories.Basic} />
+
+## Image with Caption
+
+You can include a caption which appears underneath the image. This must be a text asset.
+
+<Story of={ImageStories.Caption} />
+
+## Image with alt text
+
+You can also provide a placeholder string and/or an accessibility string. The alt text for the image will be the accessibility string. If not provided, it will be the placeholder string. If that is also not provided, it will be the caption text.
+
+<Story of={ImageStories.Accessibility} />
+
+<Story of={ImageStories.Placeholder} />

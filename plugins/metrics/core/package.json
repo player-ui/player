@@ -1,0 +1,11 @@
+{
+  "name": "@player-ui/metrics-plugin",
+  "version": "0.0.0-PLACEHOLDER",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@player-ui/beacon-plugin": "workspace:*"
+  },
+  "peerDependencies": {
+    "@player-ui/player": "workspace:*"
+  }
+}
