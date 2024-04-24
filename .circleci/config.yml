@@ -125,6 +125,14 @@ jobs:
       - run: bazel build --config=ci -- //ios/demo:PlayerUIDemo
 
       - run:
+          name: Core Prebuild
+          command: |
+            bazel build \
+              --config=ci \
+              $(bazel query 'filter("_native_bundle", //plugins/...)') \
+              $(bazel query 'filter("_native_bundle", //core/...)')
+
+      - run:
           name: Test Prebuild
           command: |
             bazel build \
