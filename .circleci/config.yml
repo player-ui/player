@@ -122,7 +122,11 @@ jobs:
           platform: "iOS"
           device: "iPhone 15"
 
-      - run: bazel build --config=ci -- //ios/demo:PlayerUIDemo
+
+      - run:
+          name: Clean
+          command: |
+            bazel clean && bazel shutdown
 
       - run:
           name: Core Prebuild
@@ -131,6 +135,8 @@ jobs:
               --config=ci \
               $(bazel query 'filter("_native_bundle", //plugins/...)') \
               $(bazel query 'filter("_native_bundle", //core/...)')
+
+      - run: bazel build --config=ci -- //ios/demo:PlayerUIDemo
 
       - run:
           name: Test Prebuild
