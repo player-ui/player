@@ -121,6 +121,10 @@ export class Parser {
     );
   }
 
+  private hasSwitchKey(localKey: string){
+    return localKey.toLocaleLowerCase() === ('staticswitch' || 'dynamicswitch')
+  }
+
   public parseObject(
     obj: object,
     type: Node.ChildrenTypes = NodeType.Value,
@@ -236,10 +240,10 @@ export class Parser {
           } as NestedObj;
         } else if (
           (localValue && 
-          this.hooks.determineNodeType.call(localValue) === NodeType.Switch) || localKey === 'staticSwitch'
+          this.hooks.determineNodeType.call(localValue) === NodeType.Switch) || this.hasSwitchKey(localKey)
         ) {
           const localSwitch = this.hooks.parseNode.call(
-            localKey === 'staticSwitch' ? {"staticSwitch":localValue}:localValue,
+            this.hasSwitchKey(localKey) ? {[localKey]:localValue}:localValue,
             NodeType.Value,
             options,
             NodeType.Switch

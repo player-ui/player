@@ -34,7 +34,6 @@ export default class SwitchPlugin implements ViewPlugin {
     });
 
     parser.hooks.determineNodeType.tap('switch', (obj) => {
-      console.log('** determining switch nodetype:',obj)
       if (
         Object.prototype.hasOwnProperty.call(obj, 'dynamicSwitch') ||
         Object.prototype.hasOwnProperty.call(obj, 'staticSwitch')
