@@ -7,7 +7,7 @@ npm_link_all_packages(name = "node_modules")
 
 create_base_dsl_config(
     name = "dsl_config",
-    plugins = [],
+    plugins = [":node_modules/@player-ui/reference-assets-cli-plugin"],
 )
 
 DSL_SRCS = glob([
@@ -22,10 +22,12 @@ DSL_SRCS = glob([
 compile_dsl(
     name = "all_flows",
     srcs = DSL_SRCS,
-    config = ":player.config.json",
+    config = ":dsl_config",
     data = [
+        ":node_modules/@player-ui/reference-assets-cli-plugin",
         ":node_modules/@player-ui/reference-assets-plugin-components",
         "//:node_modules/@player-tools/dsl",
+        "//:node_modules/@types/react",
         "//:node_modules/dlv",
         "//:node_modules/react",
     ],

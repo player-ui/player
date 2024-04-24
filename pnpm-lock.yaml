@@ -740,6 +740,15 @@ importers:
         specifier: workspace:*
         version: link:../../../core/player
 
+  plugins/reference-assets/cli:
+    dependencies:
+      '@player-ui/reference-assets-plugin-react':
+        specifier: workspace:*
+        version: link:../react
+      '@player-ui/types':
+        specifier: workspace:*
+        version: link:../../../core/types
+
   plugins/reference-assets/components:
     dependencies:
       '@player-ui/common-types-plugin':
@@ -770,9 +779,18 @@ importers:
 
   plugins/reference-assets/mocks:
     dependencies:
+      '@player-ui/reference-assets-cli-plugin':
+        specifier: workspace:*
+        version: link:../cli
       '@player-ui/reference-assets-plugin-components':
         specifier: workspace:*
         version: link:../components
+      '@player-ui/reference-assets-plugin-react':
+        specifier: workspace:*
+        version: link:../react
+      '@player-ui/types':
+        specifier: workspace:*
+        version: link:../../../core/types
 
   plugins/reference-assets/react:
     dependencies:
@@ -8902,6 +8920,7 @@ packages:
   /clone@1.0.4:
     resolution: {integrity: sha512-JQHZ2QMW6l3aH/j6xCqQThY/9OH4D/9ls34cgkUBiEeocRTU04tHfKPBsUK1PqZCUQM7GiA0IIXJSuXHI64Kbg==, tarball: https://registry.npmjs.org/clone/-/clone-1.0.4.tgz}
     engines: {node: '>=0.8'}
+    requiresBuild: true
     dev: false
 
   /clone@2.1.2:
@@ -9396,6 +9415,7 @@ packages:
 
   /defaults@1.0.4:
     resolution: {integrity: sha512-eFuaLoy/Rxalv2kr+lqMlUnrDWV+3j4pljOIJgLIhI058IQfWJ7vXhyEIHu+HtC738klGALYxOKDO0bQP3tg8A==, tarball: https://registry.npmjs.org/defaults/-/defaults-1.0.4.tgz}
+    requiresBuild: true
     dependencies:
       clone: 1.0.4
     dev: false

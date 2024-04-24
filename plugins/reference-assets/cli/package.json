@@ -1,0 +1,9 @@
+{
+  "name": "@player-ui/reference-assets-cli-plugin",
+  "version": "0.0.0-PLACEHOLDER",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@player-ui/reference-assets-plugin-react": "workspace:*",
+    "@player-ui/types": "workspace:*"
+  }
+}
