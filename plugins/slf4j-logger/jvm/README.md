@@ -2,4 +2,4 @@
 
 ## Gradle Dependency
 
-`implementation("com.intuit.player.jvm.plugins", "slf4j-logger", version)`
+`implementation("com.intuit.playerui.plugins", "slf4j-logger", version)`

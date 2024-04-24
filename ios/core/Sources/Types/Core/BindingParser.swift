@@ -34,7 +34,7 @@ public class BindingParser {
 }
 
 /// A path in the data model
-public class BindingInstance {
+public class BindingInstance: Decodable {
     internal var value: JSValue?
 
     /// Create a BindingInstance, a path to data in the data model
@@ -51,6 +51,11 @@ public class BindingInstance {
     /// - Parameter value: The JSValue that represents a JavaScript BindingInstance
     public init(from value: JSValue?) {
         self.value = value
+    }
+
+    ///Create a BindingInstance from a decoder
+    required public init(from decoder: Decoder) throws {
+        value = try decoder.getJSValue()
     }
 
     /// Retrieve this Binding as an array

@@ -1,0 +1,34 @@
+{
+  "id": "flow_1",
+  "views": [
+    {
+      "id": "first_view",
+      "type": "action",
+      "value": "end",
+      "label": {
+        "asset": {
+          "id": "next-view-label",
+          "type": "text",
+          "value": "End Flow 1"
+        }
+      }
+    }
+  ],
+  "navigation": {
+    "BEGIN": "flow_1",
+    "flow_1": {
+      "startState": "view_1",
+      "view_1": {
+        "state_type": "VIEW",
+        "ref": "first_view",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}

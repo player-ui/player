@@ -8,6 +8,7 @@ import type {
   ExpressionEvaluator,
   BindingInstance,
   BindingParser,
+  ValidationController,
 } from "@player-ui/player";
 import { isExpressionNode } from "@player-ui/player";
 
@@ -166,22 +167,20 @@ function extractDataChangeListeners(
       );
 
       if (listenerKey.match(WILDCARD_REGEX)) {
-        return [
-          ...allListeners,
+        allListeners.push(
           createWildcardHandler(listenerRawBinding, listenerExp, bindingParser),
-        ];
+        );
+        return allListeners;
       }
 
       const parsedOriginalBinding = bindingParser.parse(listenerRawBinding);
 
-      return [
-        ...allListeners,
-        (context, binding) => {
-          if (parsedOriginalBinding.contains(binding)) {
-            context.expressionEvaluator.evaluate(listenerExp);
-          }
-        },
-      ];
+      allListeners.push((context, binding) => {
+        if (parsedOriginalBinding.contains(binding)) {
+          context.expressionEvaluator.evaluate(listenerExp);
+        }
+      });
+      return allListeners;
     },
     [],
   );
@@ -196,6 +195,7 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
   apply(player: Player) {
     let expressionEvaluator: ExpressionEvaluator;
     let dataChangeListeners: Array<ViewListenerHandler> = [];
+    let validationController: ValidationController;
 
     player.hooks.expressionEvaluator.tap(
       this.name,
@@ -236,8 +236,9 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
         const { silent = false } = options || {};
         if (silent) return;
         const validUpdates = updates.filter((update) => {
-          const committedVal = options?.context?.model.get(update.binding);
-          return committedVal === update.newValue;
+          return !validationController
+            .getValidationForBinding(update.binding)
+            ?.getAll().length;
         });
         onFieldUpdateHandler(validUpdates.map((t) => t.binding));
       }),
@@ -278,6 +279,10 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
         });
       },
     );
+
+    player.hooks.validationController.tap(this.name, (vc) => {
+      validationController = vc;
+    });
 
     player.hooks.flowController.tap(this.name, (flowController) => {
       flowController.hooks.flow.tap(this.name, (flow) => {

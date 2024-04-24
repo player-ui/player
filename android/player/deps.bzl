@@ -16,7 +16,7 @@ maven = [
 ]
 
 main_exports = [
-    "//jvm/j2v8:j2v8-android"
+    "//jvm/j2v8:j2v8-android",
 ]
 
 main_deps = main_exports + parse_coordinates(maven) + [
@@ -36,4 +36,5 @@ test_deps = [
     "@grab_bazel_common//tools/test:mockable-android-jar",
     "@maven//:io_mockk_mockk",
     "//jvm/testutils",
+    "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_test",
 ]

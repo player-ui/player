@@ -20,7 +20,7 @@ public class StageRevertDataPlugin: JSBasePlugin, NativePlugin {
         #if SWIFT_PACKAGE
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
         #else
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: StageRevertDataPlugin.self), pathComponent: "StageRevertDataPlugin.bundle")
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: StageRevertDataPlugin.self), pathComponent: "PlayerUI_StageRevertDataPlugin.bundle")
         #endif
     }
 }

@@ -80,7 +80,7 @@ open class JSBasePlugin {
      */
     private func getPlugin(context: JSContext, fileName: String, pluginName: String, arguments: [Any] = []) -> JSValue {
         guard
-            let plugin = context.getClassReference(pluginName, load: {loadJSResource(into: $0, fileName: fileName)}),
+            let plugin = context.getClassReference(pluginName, load: {loadJSResource(into: $0, fileName: fileName)}), !plugin.isUndefined,
             let pluginValue = plugin.construct(withArguments: arguments)
         else {
             fatalError("Unable To Construct \(pluginName)")

@@ -1,17 +1,7 @@
 import type { Schema } from "@player-ui/player";
-import {
-  BooleanTypeRef,
-  CollectionTypeRef,
-  DateTypeRef,
-  IntegerPosTypeRef,
-  IntegerTypeRef,
-  PhoneTypeRef,
-  StringTypeRef,
-  IntegerNNTypeRef,
-} from "./refs";
 
 export const BooleanType: Schema.DataType<boolean> = {
-  ...BooleanTypeRef,
+  type: "BooleanType",
   default: false,
   validation: [
     {
@@ -23,7 +13,7 @@ export const BooleanType: Schema.DataType<boolean> = {
 };
 
 export const IntegerType: Schema.DataType<number> = {
-  ...IntegerTypeRef,
+  type: "IntegerType",
   validation: [
     {
       type: "integer",
@@ -35,7 +25,7 @@ export const IntegerType: Schema.DataType<number> = {
 };
 
 export const IntegerPosType: Schema.DataType<number> = {
-  ...IntegerPosTypeRef,
+  type: "IntegerPosType",
   validation: [
     {
       type: "integer",
@@ -51,7 +41,7 @@ export const IntegerPosType: Schema.DataType<number> = {
 };
 
 export const IntegerNNType: Schema.DataType<number> = {
-  ...IntegerNNTypeRef,
+  type: "IntegerNNType",
   validation: [
     {
       type: "integer",
@@ -67,7 +57,7 @@ export const IntegerNNType: Schema.DataType<number> = {
 };
 
 export const StringType: Schema.DataType<string> = {
-  ...StringTypeRef,
+  type: "StringType",
   default: "",
   validation: [
     {
@@ -80,7 +70,7 @@ export const StringType: Schema.DataType<string> = {
 };
 
 export const CollectionType: Schema.DataType<Array<unknown>> = {
-  ...CollectionTypeRef,
+  type: "CollectionType",
   validation: [
     {
       type: "collection",
@@ -89,7 +79,7 @@ export const CollectionType: Schema.DataType<Array<unknown>> = {
 };
 
 export const DateType: Schema.DataType<string> = {
-  ...DateTypeRef,
+  type: "DateType",
   validation: [
     {
       type: "string",
@@ -101,7 +91,7 @@ export const DateType: Schema.DataType<string> = {
 };
 
 export const PhoneType: Schema.DataType<string> = {
-  ...PhoneTypeRef,
+  type: "PhoneType",
   validation: [
     {
       type: "phone",

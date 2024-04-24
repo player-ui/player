@@ -5,5 +5,5 @@
 #     name = "set-time-out",
 #     main_deps = main_deps,
 #     main_exports = main_exports,
-#     test_package = "com.intuit.player.plugins.settimeout",
+#     test_package = "com.intuit.playerui.plugins.settimeout",
 # )

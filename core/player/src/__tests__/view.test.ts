@@ -625,3 +625,91 @@ describe("state node expression tests", () => {
     expect(state().controllers.data.get("count")).toBe(11);
   });
 });
+
+describe("view update scheduling", () => {
+  test("schedules view updates", async () => {
+    const player = new Player();
+    player.start(minimal as any);
+
+    const view = (player.getState() as InProgressState).controllers.view
+      .currentView?.lastUpdate;
+
+    expect(view).toStrictEqual({
+      id: "view-1",
+      type: "view",
+      label: {
+        asset: {
+          id: "action-label",
+          type: "text",
+          value: "Clicked 0 times",
+        },
+      },
+    });
+
+    (player.getState() as InProgressState).controllers.data.set([["count", 1]]);
+
+    await vitest.waitFor(() => {
+      expect(
+        (player.getState() as InProgressState).controllers.view.currentView
+          ?.lastUpdate,
+      ).toStrictEqual({
+        id: "view-1",
+        type: "view",
+        label: {
+          asset: {
+            id: "action-label",
+            type: "text",
+            value: "Clicked 1 times",
+          },
+        },
+      });
+    });
+
+    (player.getState() as InProgressState).controllers.data.set(
+      [["count", 2]],
+      { silent: true },
+    );
+
+    // Add a delay here to flush any queued updates
+    await new Promise((resolve) => {
+      setTimeout(resolve, 10);
+    });
+
+    expect(
+      (player.getState() as InProgressState).controllers.view.currentView
+        ?.lastUpdate,
+    ).toStrictEqual({
+      id: "view-1",
+      type: "view",
+      label: {
+        asset: {
+          id: "action-label",
+          type: "text",
+          value: "Clicked 1 times",
+        },
+      },
+    });
+
+    // non-silent update an unrelated field, should trigger an update to the original
+    (player.getState() as InProgressState).controllers.data.set([
+      ["not-count", 1],
+    ]);
+
+    await vitest.waitFor(() => {
+      expect(
+        (player.getState() as InProgressState).controllers.view.currentView
+          ?.lastUpdate,
+      ).toStrictEqual({
+        id: "view-1",
+        type: "view",
+        label: {
+          asset: {
+            id: "action-label",
+            type: "text",
+            value: "Clicked 2 times",
+          },
+        },
+      });
+    });
+  });
+});

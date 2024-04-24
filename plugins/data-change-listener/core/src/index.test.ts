@@ -343,3 +343,91 @@ describe("Data-Change-Listener with Validations", () => {
     expect(getCurrentView()?.initialView?.listeners).toBeUndefined();
   });
 });
+
+describe("Data-Change-Listener that are chained", () => {
+  let player: Player;
+  let dataController: DataController;
+  let testExpression: Mock<any, any>;
+
+  const flow: Flow = {
+    id: "test-flow",
+    data: {
+      name: {
+        first: "",
+        second: "",
+        third: "",
+      },
+    },
+    views: [
+      {
+        id: "view-1",
+        type: "info",
+        fields: {
+          asset: {
+            id: "input",
+            type: "input",
+            binding: "name.first",
+          },
+        },
+        listeners: {
+          "dataChange.name.first": ["{{name.second}} = 'update 1'"],
+          "dataChange.name.second": ["{{name.third}} = 'update 2'"],
+        },
+      },
+    ],
+    navigation: {
+      BEGIN: "FLOW_1",
+      FLOW_1: {
+        startState: "VIEW_1",
+        VIEW_1: {
+          state_type: "VIEW",
+          ref: "view-1",
+          transitions: {
+            "*": "END",
+          },
+        },
+      },
+    },
+  };
+
+  beforeEach(() => {
+    player = new Player({
+      plugins: [
+        new DataChangeListenerPlugin(),
+        new AssetTransformPlugin(
+          new Registry([[{ type: "input" }, transform]]),
+        ),
+      ],
+    });
+
+    testExpression = vitest.fn();
+
+    player.hooks.expressionEvaluator.tap("test", (ev) => {
+      ev.addExpressionFunction("test", (context, ...args) => {
+        testExpression(...args);
+      });
+    });
+
+    player.hooks.dataController.tap("test", (dc) => {
+      dataController = dc;
+    });
+
+    player.start(flow);
+  });
+
+  function getState() {
+    return player.getState() as InProgressState;
+  }
+
+  function getInputAsset() {
+    return getState().controllers.view.currentView?.lastUpdate?.fields.asset;
+  }
+
+  it("chained listeners that set data trigger each other", async () => {
+    getInputAsset().set("something");
+    await vitest.waitFor(() => {
+      expect(dataController.get("name.second")).toStrictEqual("update 1");
+      expect(dataController.get("name.third")).toStrictEqual("update 2");
+    });
+  });
+});

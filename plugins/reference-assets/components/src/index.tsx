@@ -2,8 +2,18 @@ import React from "react";
 import type {
   AssetPropsWithChildren,
   BindingTemplateInstance,
+  ExpressionTemplateInstance,
+  DSLSchema as PlayerDSLSchema,
+  DataTypeReference,
+  DataTypeRefs,
+  ValidatorFunctionRefs,
 } from "@player-tools/dsl";
-import { createSlot, Asset } from "@player-tools/dsl";
+import {
+  createSlot,
+  Asset,
+  View,
+  getObjectReferences,
+} from "@player-tools/dsl";
 import type { Asset as AssetType } from "@player-ui/player";
 import type {
   ActionAsset,
@@ -13,6 +23,21 @@ import type {
   InputAsset,
   ImageAsset,
 } from "@player-ui/reference-assets-plugin";
+import { dataTypes, validators } from "@player-ui/common-types-plugin";
+
+export const dataRefs = getObjectReferences<
+  typeof dataTypes,
+  DataTypeRefs<typeof dataTypes>
+>(dataTypes);
+
+export const validationRefs = getObjectReferences<
+  typeof validators,
+  ValidatorFunctionRefs<typeof validators>
+>(validators);
+
+export type DSLSchema = PlayerDSLSchema<
+  DataTypeReference<typeof dataTypes, ValidatorFunctionRefs<typeof validators>>
+>;
 
 export const Text = (
   props: Omit<AssetPropsWithChildren<TextAsset>, "value"> & {
@@ -64,8 +89,20 @@ Collection.Values = createSlot({
 
 Collection.Label = LabelSlot;
 
-export const Action = (props: AssetPropsWithChildren<ActionAsset>) => {
-  return <Asset type="action" {...props} />;
+export const Action = (
+  props: Omit<AssetPropsWithChildren<ActionAsset>, "exp"> & {
+    /** An optional expression to execute before transitioning */
+    exp?: ExpressionTemplateInstance;
+  },
+) => {
+  const { exp, children, ...rest } = props;
+
+  return (
+    <Asset type="action" {...rest}>
+      <property name="exp">{exp?.toValue()}</property>
+      {children}
+    </Asset>
+  );
 };
 
 Action.Label = LabelSlot;
@@ -95,7 +132,7 @@ Input.Label = LabelSlot;
 Input.Note = slotFactory("note");
 
 export const Info = (props: AssetPropsWithChildren<InfoAsset>) => {
-  return <Asset type="info" {...props} />;
+  return <View type="info" {...props} />;
 };
 
 Info.Title = TitleSlot;

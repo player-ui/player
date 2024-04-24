@@ -7,12 +7,13 @@ import { URL } from 'url';
 const __dirname = new URL('.', import.meta.url).pathname;
 
 // This will be replaced during the build stamping
-export const BASE_PREFIX = process.env.NODE_ENV === 'production' ? '/DOCS_BASE_PATH' : undefined;
+export const BASE_PREFIX =
+  process.env.NODE_ENV === 'production' ? '/DOCS_BASE_PATH' : undefined;
 
 export default {
   reactStrictMode: true,
   env: {
-    NEXT_PUBLIC_BASE_PATH: BASE_PREFIX
+    NEXT_PUBLIC_BASE_PATH: BASE_PREFIX,
   },
   basePath: BASE_PREFIX,
   assetPrefix: BASE_PREFIX,
@@ -20,7 +21,7 @@ export default {
   webpack: (config, { dev, isServer, ...options }) => ({
     ...config,
     infrastructureLogging: {
-      level: "error",
+      level: 'error',
     },
     module: {
       ...config.module,
@@ -28,15 +29,11 @@ export default {
         ...config.module.rules,
         {
           test: /plugin-nav-data.json$/,
-          use: [
-            path.join(__dirname, './plugins/plugin-nav-generator')
-          ]
+          use: [path.join(__dirname, './plugins/plugin-nav-generator')],
         },
         {
           test: /search-index.json$/,
-          use: [
-            path.join(__dirname, './plugins/search-index-loader')
-          ]
+          use: [path.join(__dirname, './plugins/search-index-loader')],
         },
         {
           test: /.mdx?$/, // load both .md and .mdx files
@@ -51,11 +48,12 @@ export default {
                 ],
                 rehypePlugins: [
                   rehypeSlug, // Add ids to headings
-                  [rehypeAutolinkHeadings, { behavior: 'wrap'}] // Make headings links
-                ]
+                  [rehypeAutolinkHeadings, { behavior: 'wrap' }], // Make headings links
+                ],
               },
             },
             path.join(__dirname, './plugins/md-layout-loader'),
+            path.join(__dirname, './plugins/mdx-link-append-loader.js'),
           ],
         },
       ],
