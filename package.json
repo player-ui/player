@@ -14,7 +14,7 @@
     "test": "bazel test -- $(bazel query \"kind(nodejs_test, //...)\" --output label 2>/dev/null | tr '\\n' ' ')"
   },
   "engines": {
-    "node": "^16.14.0",
+    "node": "^18.8.0",
     "pnpm": "^8.9.2"
   },
   "packageManager": "pnpm@8.9.2",
@@ -156,7 +156,7 @@
     "vitest": "^1.0.2"
   },
   "volta": {
-    "node": "18.18.2",
+    "node": "18.18.0",
     "yarn": "1.22.19"
   },
   "resolutions": {

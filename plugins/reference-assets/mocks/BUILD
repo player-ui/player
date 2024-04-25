@@ -8,19 +8,10 @@ npm_link_all_packages(name = "node_modules")
 
 create_base_dsl_config(
     name = "dsl_config",
-    plugins = [
-        ":node_modules/@player-ui/reference-assets-cli-plugin",
+    presets = [
+        ":node_modules/@player-ui/reference-assets-cli-preset",
     ],
 )
-
-DSL_SRCS = glob([
-    "action/*.tsx",
-    "collection/*.tsx",
-    "image/*.tsx",
-    "info/*.tsx",
-    "input/*.tsx",
-    "text/*.tsx",
-])
 
 MOCK_DIRS = [
     "action",
@@ -31,33 +22,14 @@ MOCK_DIRS = [
     "text",
 ]
 
+DSL_SRCS = glob(["{}/*.tsx".format(d) for d in MOCK_DIRS])
+
 generate_all_dsl_mocks(MOCK_DIRS)
 
 filegroup(
     name = "all_flows",
     srcs = [":dsl_mocks_" + mock_dir for mock_dir in MOCK_DIRS],
 )
-
-# compile_dsl(
-#     name = "all_flows",
-#     srcs = DSL_SRCS,
-#     config = ":dsl_config",
-#     data = [
-#         ":node_modules/@player-ui/reference-assets-cli-plugin",
-#         ":node_modules/@player-ui/reference-assets-plugin-components",
-#         "//:node_modules/@player-tools/dsl",
-#         "//:node_modules/@types/react",
-#         "//:node_modules/dlv",
-#         "//:node_modules/react",
-#     ],
-#     skip_test = True,
-# )
-
-# generate_manifest(
-#     name = "mocks",
-#     mocks = glob(["**/*.json"]),
-#     visibility = ["//visibility:public"],
-# )
 
 filegroup(
     name = "mock-files",

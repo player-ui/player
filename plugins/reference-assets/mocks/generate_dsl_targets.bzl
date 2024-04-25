@@ -7,11 +7,10 @@ def generate_all_dsl_mocks(MOCK_DIRS):
             srcs = native.glob([
                 mock_dir + "/*.tsx",
             ]),
-            # TODO: Load xlr configs properly
-            skip_test = True,
+            input_dir = mock_dir,
             config = ":dsl_config",
             data = [
-                ":node_modules/@player-ui/reference-assets-cli-plugin",
+                ":node_modules/@player-ui/reference-assets-cli-preset",
                 ":node_modules/@player-ui/reference-assets-plugin-components",
                 "//:node_modules/@player-tools/dsl",
                 "//:node_modules/@types/react",

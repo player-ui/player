@@ -9,12 +9,12 @@ tsup_config(name = "tsup_config")
 vitest_config(name = "vitest_config")
 
 js_pipeline(
-    package_name = "@player-ui/reference-assets-cli-plugin",
+    package_name = "@player-ui/reference-assets-cli-preset",
     peer_deps = [
         "//:node_modules/@player-tools/cli",
     ],
     deps = [
-        ":node_modules/@player-ui/reference-assets-plugin-react",
+        ":node_modules/@player-ui/reference-assets-plugin",
         ":node_modules/@player-ui/types",
     ],
 )

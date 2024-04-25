@@ -54,7 +54,7 @@ plugins/meta-plugin/core/node_modules
 plugins/partial-match-fingerprint/core/node_modules
 plugins/pubsub/core/node_modules
 plugins/reference-assets/components/node_modules
-plugins/reference-assets/cli/node_modules
+plugins/reference-assets/cli-preset/node_modules
 plugins/reference-assets/core/node_modules
 plugins/reference-assets/react/node_modules
 plugins/shared-constants/core/node_modules
