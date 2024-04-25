@@ -35,7 +35,7 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
         - handler: The callback that is used to tap into the core `onAsyncNode` hook
                    exposed to users of the plugin allowing them to supply the replacement node used in the tap callback
      */
-    public convenience init(plugins: [JSBasePlugin] = [], _ handler: @escaping AsyncHookHandler) {
+    public convenience init(plugins: [JSBasePlugin] = [AsyncNodePluginPlugin()], _ handler: @escaping AsyncHookHandler) {
 
         self.init(fileName: "AsyncNodePlugin.native", pluginName: "AsyncNodePlugin.AsyncNodePlugin")
         self.asyncHookHandler = handler
