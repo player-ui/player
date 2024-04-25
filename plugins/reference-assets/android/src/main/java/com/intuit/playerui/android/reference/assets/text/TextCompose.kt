@@ -4,23 +4,23 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import com.intuit.playerui.android.asset.ComposableAsset
 import com.intuit.playerui.android.AssetContext
+import com.intuit.playerui.android.asset.ComposableAsset
 import kotlinx.serialization.Serializable
 
-internal class TextComposeAsset(assetContext: AssetContext) :
-    ComposableAsset<TextComposeAsset.Data>(assetContext, Data.serializer()) {
+internal class TextCompose(assetContext: AssetContext) :
+    ComposableAsset<TextCompose.Data>(assetContext, Data.serializer()) {
 
     @Serializable
     data class Data(
-        val value: String
+        val value: String,
     )
 
     @Composable
     override fun content(data: Data) {
         Text(
             text = data.value,
-            Modifier.testTag("text-composable")
+            Modifier.testTag("text-composable"),
         )
     }
 }
