@@ -1,6 +1,5 @@
 package com.intuit.playerui.android.asset
 
-
 import android.view.View
 import android.widget.FrameLayout
 import androidx.compose.material.LocalTextStyle
@@ -17,7 +16,6 @@ import com.intuit.playerui.android.build
 import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.withContext
-
 import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
 
@@ -28,7 +26,7 @@ import kotlinx.serialization.KSerializer
  */
 public abstract class ComposableAsset<Data> (
     assetContext: AssetContext,
-    serializer: KSerializer<Data>
+    serializer: KSerializer<Data>,
 ) : SuspendableAsset<Data>(assetContext, serializer) {
 
     override suspend fun initView(data: Data) = ComposeView(requireContext()).apply {
@@ -60,12 +58,10 @@ public abstract class ComposableAsset<Data> (
         }
 
         dataState.value?.let { content(it) }
-
-
     }
+
     @Composable
     abstract fun content(data: Data)
-
 }
 
 @Composable
@@ -75,12 +71,13 @@ fun RenderableAsset.compose(style: Style? = null) {
         else -> composeAndroidView(style?.xmlStyles)
     }
 }
+
 @Composable
 private fun ComposableAsset<*>.composeComposableAsset(textStyle: TextStyle?) {
     CompositionLocalProvider(
         *listOfNotNull(
-            textStyle?.let { LocalTextStyle provides it }
-        ).toTypedArray()
+            textStyle?.let { LocalTextStyle provides it },
+        ).toTypedArray(),
     ) { compose() }
 }
 
@@ -97,7 +94,5 @@ private fun RenderableAsset.composeAndroidView(styles: Styles?) {
 
 data class Style(
     val xmlStyles: Styles? = null,
-    val composeTextStyle: TextStyle? = null
+    val composeTextStyle: TextStyle? = null,
 )
-
-
