@@ -6,7 +6,10 @@ const config: PlayerConfigFileShape = {
   plugins: [
     new LSPAssetsPlugin(
       ["@player-ui/types", "@player-ui/reference-assets-plugin"].map((pkg) => ({
-        path: path.dirname(require.resolve(`${pkg}/package.json`)),
+        path: path.join(
+          path.dirname(require.resolve(`${pkg}/package.json`)),
+          "dist",
+        ),
       })),
     ),
   ],

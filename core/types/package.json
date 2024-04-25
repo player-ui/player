@@ -1,11 +1,5 @@
 {
   "name": "@player-ui/types",
   "version": "0.0.0-PLACEHOLDER",
-  "main": "src/index.ts",
-  "files": [
-    "src",
-    "dist",
-    "xlr",
-    "types"
-  ]
+  "main": "src/index.ts"
 }
