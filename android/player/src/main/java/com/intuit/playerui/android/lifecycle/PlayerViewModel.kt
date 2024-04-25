@@ -101,7 +101,6 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
                     AsyncIterationManager.State.NotStarted -> _state.emit(ManagedPlayerState.NotStarted)
                     AsyncIterationManager.State.Pending -> _state.emit(ManagedPlayerState.Pending)
                     AsyncIterationManager.State.Done -> _state.emit(ManagedPlayerState.Done(player.completedState))
-                    // here
                     is AsyncIterationManager.State.Item<*> -> start(it.value as String)
                     is AsyncIterationManager.State.Error -> _state.emit(ManagedPlayerState.Error(it.error)) // player.fail()
                 }

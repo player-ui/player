@@ -22,6 +22,7 @@ import com.intuit.playerui.core.player.Player
 import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.player.state.fail
 import com.intuit.playerui.core.player.state.inProgressState
+import com.intuit.playerui.core.utils.InternalPlayerApi
 import com.intuit.playerui.plugins.beacon.beacon
 import com.intuit.playerui.plugins.coroutines.subScope
 import kotlinx.coroutines.CoroutineScope
@@ -109,6 +110,7 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
      * also automatically caches the instance of the [View] and detects
      * when it needs to reconstruct or rehydrate.
      */
+    @OptIn(InternalPlayerApi::class)
     private fun render(): View = cachedAssetView.let { (cachedAssetContext, cachedView) ->
         requireContext()
         when {
