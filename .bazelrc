@@ -58,7 +58,8 @@ build:ci --local_cpu_resources=8
 # Circle xlarge has 8 CPU cores/16GB mem
 build:ci --local_ram_resources=15000
 # Circle macos.m1.large.gen1 has 12gb ram
-common:ci-mac --config=ci --local_ram_resources=11000
+build:ci-mac --config=ci --local_ram_resources=11000
+coverage:ci-mac --config=ci --local_ram_resources=11000
 
 build:release --stamp --workspace_status_command=./scripts/workspace-status.sh
 
