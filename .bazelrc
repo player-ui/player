@@ -54,8 +54,8 @@ build:ci --build_metadata=ROLE=CI --workspace_status_command=./scripts/workspace
 
 # Circle xlarge has 8 CPU cores/16GB mem
 # Circle macos.m1.large.gen1 has 12gb ram
-build:ci --local_cpu_resources=8
-build:ci --local_ram_resources=12000
+build:ci --local_resources=cpu=8
+build:ci --local_resources=memory=12000
 build:ci --config="release"
 
 build:release --stamp --workspace_status_command=./scripts/workspace-status.sh
