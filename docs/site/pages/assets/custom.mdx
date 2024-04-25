@@ -71,7 +71,7 @@ SwiftUI Player assets are made of 3 parts:
 - [View](/#View): A SwiftUI View
 - [Asset](/#Asset): SwiftUIAsset implementation to tie the two together
 
-[Registering Your Asset](/#Registering-your-Asset): Additional Topic
+[Registering Your Asset](#registering-your-asset): Additional Topic
 
 ### Data
 
@@ -355,19 +355,19 @@ fun View.hydrate() {
 </PlatformTabs>
 
 
-#### Registering your Asset
+### Registering your Asset
 
 When registering your asset with an `AssetRegistry`, it can either be registered as a new type, if it is an entirely new construct, or registered as a variant of an existing asset type, to only be rendered under certain conditions.
 
 <PlatformTabs>
   <react>
 
-```javascript
+```tsx
 // Using WebAssetProvider from '@player-ui/asset-provider-plugin-react'
 new WebAssetProvider([
 	// This will register a match on { type: 'example' }
 	['example', ExampleAsset],
-	//  This will register a match on { type: 'example', metaData: {"role": "someRole"} }
+	//This will register a match on { type: 'example', metaData: {"role": "someRole"} }
 	[{ type: 'example', metaData: {"role": "someRole"}}, ExampleAsset])
 ```
   </react>
@@ -410,36 +410,45 @@ In the latter case, it is recommended to extend the original asset, so as to avo
 
 For more info on transform registration see [Asset Transform Plugin](https://player-ui.github.io/latest/plugins/asset-transform#asset-transform-plugin)
 
+### Use Cases
 Below are 3 different use cases for different ways to mix and match the asset and transform registry to simplify the asset implementation
 
-Use Case 1: Same type with different variants and asset implementations that can share the same transform
+#### Use Case 1: Same type with different variants and asset implementations that can share the same transform
+
+
 
 <PlatformTabs>
   <react>
-```javascript
+
+  ```tsx
 // Using WebAssetProvider from '@player-ui/asset-provider-plugin-react'
 new WebAssetProvider([
-	['input', InputAsset],
-	[{ type: 'input', dataType: "dataType": {"type": "DateType"}}, DateInputAsset]
-])
+	//This will register a match on { type: 'example' }
+	['example', ExampleAsset],
+	//This will register a match on { type: 'example', metaData: {"role": "someRole"} }
+	[{ type: 'example', metaData: {"role": "someRole"}}, ExampleAsset]
+  ]) 
 ```
-</react>
+
+  </react>
   <ios>
-  
+
 ```swift
 player.assetRegistry.register("input", asset: InputAsset.self)
 
 player.assetRegistry.register(["type": "input", "dataType": ["type": "DateType"]], for: DateInputAsset.self)
 ```
+
  </ios>
   <android>
-  
-```kotlin
+
+  ```kotlin
 androidPlayer.registerAsset("input", ::InputAsset)
 
 val map = mapOf("type" to "input", "dataType" to mapOf("type" to "DateType"))
 androidPlayer.assetRegistry.set(map, ::DateInputAsset)
 ```
+
 
  </android>
 </PlatformTabs>
@@ -448,8 +457,9 @@ If the common InputData fields for the decoded data looks like:
 
 <PlatformTabs>
   <react>
-  
-```javascript
+
+Taken from the reference asset Input Asset example, see [full transform implementation](https://github.com/player-ui/player/blob/main/plugins/reference-assets/core/src/assets/input/transform.ts)
+```tsx
 export interface InputAsset {
    id: String
    type: String
@@ -459,13 +469,17 @@ export interface InputAsset {
 export interface TransformedInput extends InputAsset {
   /** A function to commit the new value to the data-model */
   set: (newValue:  ValueType) =>  void;
+  /**   The `DataType` associated with this asset, for formatting the keyboard */
+  dataType?: DataType;
 }
 ```
-Taken from the reference asset Input Asset example, see [full transform implementation](https://github.com/player-ui/player/blob/main/plugins/reference-assets/core/src/assets/input/transform.ts)
 
-</react>
+
+  </react>
   <ios>
-  
+
+The InputData used in Swift and Android is using the TransformedInput which includes the original web input properties plus additional transform specific properties
+
 ```swift
 struct InputData: AssetData {
   var id: String
@@ -477,8 +491,12 @@ struct InputData: AssetData {
   var dataType: DataType?
 }
 ```
+
  </ios>
   <android>
+
+The InputData used in Swift and Android is using the TransformedInput which includes the original web input properties plus additional transform specific properties
+
 ```kotlin
 @Serializable
 data class InputData(
@@ -495,34 +513,42 @@ data class InputData(
 
 And we would like to render two different assets based on whether or not "dataType" is present then both InputAsset and DateInputAsset can share the same InputData which can contain a transform (such as the function to perform after input data is set) but show different content for the views such as input accessories like a calender based on the DataType
 
-Use Case 2: Same type with different variants and asset implementations that don't share the same transform
+
+#### Use Case 2: Same type with different variants and asset implementations that don't share the same transform
+
+
 
 <PlatformTabs>
   <react>
-```javascript
+
+```tsx
 // Using WebAssetProvider from '@player-ui/asset-provider-plugin-react'
 new WebAssetProvider([
 	['input', InputAsset],
 	[{ type: 'input', dataType: "dataType": {"type": "DateType"}}, DateInputAsset]
 ])
 ```
-</react>
+
+  </react>
   <ios>
-  
+
+
 ```swift
 player.assetRegistry.register("input", asset: InputAsset.self)
 
 player.assetRegistry.register(["type": "input", "dataType": ["type": "DateType"]], for: DateInputAsset.self)
 ```
+
  </ios>
   <android>
-  
+
 ```kotlin
 androidPlayer.registerAsset("input", ::InputAsset)
 
 val map = mapOf("type" to "input", "dataType" to mapOf("type" to "DateType"))
 androidPlayer.assetRegistry.set(map, ::DateInputAsset)
 ```
+
  </android>
 </PlatformTabs>
 
@@ -530,9 +556,15 @@ If the common InputData fields for the decoded data looks like:
 
 <PlatformTabs>
   <react>
-  
-```javascript
+
+```tsx
 export interface InputAsset {
+   id: String
+   type: String
+   value: String?
+}
+
+export interface DateInputAsset {
    id: String
    type: String
    value: String?
@@ -544,16 +576,18 @@ export interface TransformedInput extends InputAsset {
   set: (newValue:  ValueType) =>  void;
 }
 
-// Used in the transform function for inputTranform
-export interface TransformedDateInput extends InputAsset {
-  ///  The `DataType` associated with this asset, for formatting the keyboard
+// Used in the transform function for inputDateTranform
+export interface TransformedDateInput extends DateInputAsset {
+   /** A function to commit the new value to the data-model */
+  set: (newValue:  ValueType) =>  void;
+  /**  The `DataType` associated with this asset, for formatting the keyboard */
   dataType?: DataType;
 }
 ```
 
 In the case where the regular InputAsset and the DateInputAsset should not share the same transform, its possible to target the variant in the transform registration (since transform also use the partial match registry) to specify a different transform when the "dataType" is present for example:
 
-```jsx
+```tsx
 import { Player } from '@player-ui/player';
 import { AssetTransformPlugin } from '@player-ui/asset-transform-plugin';
 
@@ -572,9 +606,12 @@ const player = new Player({
   ]
 });      
 ```
-</react>
+
+  </react>
   <ios>
-  
+
+The InputData used in Swift and Android is using the TransformedInput which includes the original web input properties plus additional transform specific properties
+
 ```swift
 struct InputData: AssetData {
   var id: String
@@ -586,8 +623,12 @@ struct InputData: AssetData {
   var dataType: DataType?
 }
 ```
+
  </ios>
   <android>
+
+The InputData used in Swift and Android is using the TransformedInput which includes the original web input properties plus additional transform specific properties
+
 ```kotlin
 @Serializable
 data class InputData(
@@ -603,62 +644,66 @@ data class InputData(
 </PlatformTabs>
 
 
-Use Case 3: Different type, same asset implementation, different transforms
+
+#### Use Case 3: Different type, same asset implementation, different transforms
+
+
 
 <PlatformTabs>
   <react>
-```javascript
+
+  ```tsx
 // Using WebAssetProvider from '@player-ui/asset-provider-plugin-react'
 new WebAssetProvider([
-	['choiceA', ChoiceAsset],
-	['choiceB', ChoiceAsset]
+	['choiceA', Choice],
+	['choiceB', Choice]
 ])
 ```
-</react>
+
+
+  </react>
   <ios>
-  
+
 ```swift
 player.assetRegistry.register("choiceA", asset: ChoiceAsset.self)
 
 player.assetRegistry.register("choiceB", asset: ChoiceAsset.self)
 ```
-</ios>
+
+ </ios>
   <android>
-  
+
 ```kotlin
 androidPlayer.registerAsset("choiceA", ::ChoiceAsset)
 
 androidPlayer.registerAsset("choiceB", ::ChoiceAsset)
 ```
 
-</android>
+ </android>
 </PlatformTabs>
 
-Its possible to register the same asset implementation to different type names with the same variant, this may be needed if the two types visually look the same but behaviourally is different such as when the choice is clicked "choiceA" does one action but "choiceB" does something else which is defined in the transform 
+Its possible to register the same asset implementation to different type names with the same variant, this may be needed if the two types visually look the same but behaviourally is different such as when the choice is clicked "choiceA" does one action but "choiceB" does something else which is defined in the transform
+
+Since the transform is called on "select" of the `WrappedFunction` or `Invokable<Unit>` in the data this doesnt change the ChoiceData (only the values of select function itself change depending on if we get ChoiceA or ChoiceB) which means they can both be registered to ChoiceAsset
 
 <PlatformTabs>
   <react>
-  
-```javascript
+
+```jsx
 export interface Choice {
    id: String
    type: String
    value: String?
 }
 
-// select of TransformedChoiceA will have different implementation details than select of TransformedChoiceB
-export interface TransformedChoiceA extends Choice {
-  /** A function to commit the new value to the data-model */
-  select: (newValue:  ValueType) =>  void;
-}
-
-export interface TransformedChoiceB extends Choice {
+export interface TransformedChoice extends Choice {
   /** A function to commit the new value to the data-model */
   select: (newValue:  ValueType) =>  void;
 }
 ```
 
-Then in the web transform registration choiceA and choiceB are registered to different transforms
+Create two transforms choiceATransform and choiceBTransform that both return TransformedChoice but have different functions on select.
+Then in the web transform registration choiceA and choiceB are registered to those different transforms
 
 ```jsx
 import { Player } from '@player-ui/player';
@@ -680,9 +725,10 @@ const player = new Player({
 });      
 ```
 
-</react>
+  </react>
   <ios>
-  
+
+The ChoiceData used in Swift and Android is using the TransformedChoice which includes the original web choice properties plus additional transform specific properties
 ```swift
 struct ChoiceData: AssetData {
   var id: String
@@ -692,9 +738,11 @@ struct ChoiceData: AssetData {
   var select: WrappedFunction<Void>?
 }
 ```
-</ios>
+
+ </ios>
   <android>
-  
+
+The ChoiceData used in Swift and Android is using the TransformedChoice which includes the original web choice properties plus additional transform specific properties
 ```kotlin
 @Serializable
 data class ChoiceData(
@@ -706,10 +754,9 @@ data class ChoiceData(
 )
 ```
 
-</android>
+ </android>
 </PlatformTabs>
 
-Since the transform is called on "select" of the `WrappedFunction` or `Invokable<Unit>` in the data this doesnt change the ChoiceData (only the values of select function itself change depending on if we get ChoiceA or ChoiceB) which means they can both be registered to ChoiceAsset
+
 
 Overall the asset and transform registry gives developers a lot of flexibility for extending and simplifying assets based on given constraints
-
