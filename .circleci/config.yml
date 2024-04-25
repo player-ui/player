@@ -132,7 +132,7 @@ jobs:
           name: Core Prebuild
           command: |
             bazel build \
-              --config=ci \
+              --config=ci-mac \
               $(bazel query 'filter("_native_bundle", //plugins/...)') \
               $(bazel query 'filter("_native_bundle", //core/...)')
 
@@ -142,7 +142,7 @@ jobs:
           name: Test Prebuild
           command: |
             bazel build \
-              --config=ci \
+              --config=ci-mac \
               $(bazel query "kind(ios_unit_test, //ios/...)") \
               $(bazel query "kind(ios_unit_test, //plugins/...)") \
               $(bazel query "kind(ios_ui_test, //ios/...)") \
@@ -151,7 +151,7 @@ jobs:
           name: Tests
           command: |
             bazel coverage \
-              --config=ci \
+              --config=ci-mac \
               --jobs=2 \
               --experimental_use_llvm_covmap \
               --combined_report=lcov \
