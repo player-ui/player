@@ -1,16 +1,5 @@
 common --enable_bzlmod
-
 test --test_output=errors
-
-build:ci --experimental_remote_cache_compression --experimental_remote_cache_async
-test:ci --experimental_remote_cache_compression --experimental_remote_cache_async
-coverage:ci --experimental_remote_cache_compression --experimental_remote_cache_async
-
-# TODO: Migrate away from managed directories (https://github.com/bazelbuild/bazel/issues/15463)
-# TODO: Re-upgrade to Bazel 6.+
-# sync --noincompatible_disable_managed_directories
-# query --noincompatible_disable_managed_directories
-# build --noincompatible_disable_managed_directories
 
 # Android databinding flags
 build --experimental_android_databinding_v2
@@ -24,32 +13,32 @@ sync --experimental_google_legacy_api
 build --noincremental_dexing --fat_apk_cpu=armeabi-v7a,arm64-v8a,x86,x86_64
 mobile-install --start=warm
 
-# build --bes_results_url=https://app.buildbuddy.io/invocation/
-# build --bes_backend=grpcs://remote.buildbuddy.io
-# build --remote_cache=grpcs://remote.buildbuddy.io
-# build --experimental_remote_cache_compression
-# build --experimental_remote_cache_async
-# build --remote_download_toplevel
-# build --remote_timeout=3600
-# build --build_metadata=REPO_URL=https://github.com/player-ui/player.git
+build --bes_results_url=https://app.buildbuddy.io/invocation/
+build --bes_backend=grpcs://remote.buildbuddy.io
+build --remote_cache=grpcs://remote.buildbuddy.io
+build --experimental_remote_cache_compression
+build --experimental_remote_cache_async
+build --remote_download_toplevel
+build --remote_timeout=3600
+build --build_metadata=REPO_URL=https://github.com/player-ui/player.git
 
-# test --bes_results_url=https://app.buildbuddy.io/invocation/
-# test --bes_backend=grpcs://remote.buildbuddy.io
-# test --remote_cache=grpcs://remote.buildbuddy.io
-# test --experimental_remote_cache_compression
-# test --experimental_remote_cache_async
-# test --remote_download_toplevel
-# test --remote_timeout=3600
-# test --build_metadata=REPO_URL=https://github.com/player-ui/player.git
+test --bes_results_url=https://app.buildbuddy.io/invocation/
+test --bes_backend=grpcs://remote.buildbuddy.io
+test --remote_cache=grpcs://remote.buildbuddy.io
+test --experimental_remote_cache_compression
+test --experimental_remote_cache_async
+test --remote_download_toplevel
+test --remote_timeout=3600
+test --build_metadata=REPO_URL=https://github.com/player-ui/player.git
 
-# coverage --bes_results_url=https://app.buildbuddy.io/invocation/
-# coverage --bes_backend=grpcs://remote.buildbuddy.io
-# coverage --remote_cache=grpcs://remote.buildbuddy.io
-# coverage --experimental_remote_cache_compression
-# coverage --experimental_remote_cache_async
-# coverage --remote_download_toplevel
-# coverage --remote_timeout=3600
-# coverage --build_metadata=REPO_URL=https://github.com/player-ui/player.git
+coverage --bes_results_url=https://app.buildbuddy.io/invocation/
+coverage --bes_backend=grpcs://remote.buildbuddy.io
+coverage --remote_cache=grpcs://remote.buildbuddy.io
+coverage --experimental_remote_cache_compression
+coverage --experimental_remote_cache_async
+coverage --remote_download_toplevel
+coverage --remote_timeout=3600
+coverage --build_metadata=REPO_URL=https://github.com/player-ui/player.git
 
 build:ci --build_metadata=ROLE=CI --workspace_status_command=./scripts/workspace-status.sh
 
