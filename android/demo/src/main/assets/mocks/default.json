@@ -7,7 +7,7 @@
       "title": {
         "asset": {
           "id": "view-title",
-          "type": "text-compose",
+          "type": "text",
           "value": "Android Reference Assets"
         }
       },
