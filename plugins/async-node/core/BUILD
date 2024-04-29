@@ -10,6 +10,7 @@ vitest_config(name = "vitest_config")
 
 js_pipeline(
     package_name = "@player-ui/async-node-plugin",
+    native_bundle = "AsyncNodePlugin",
     deps = [
         "//:node_modules/tapable-ts",
         "//:node_modules/queue-microtask",
@@ -18,5 +19,4 @@ js_pipeline(
     peer_deps = [
         ":node_modules/@player-ui/player",
     ]
-
 )

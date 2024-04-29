@@ -133,6 +133,16 @@ The `name` passed into `ios_plugin` or `swiftui_plugin` is prefixed with `Player
 ios_plugin(name = "ExamplePlugin")
 ```
 
+For iOS plugins the `js_pipeline` for the core plugin should have `native_bundle` set to `ExamplePlugin` to match the `name` in the ios_plugin
+
+```python
+js_pipeline(
+    native_bundle = "ExamplePlugin"
+    ...
+)
+```
+
+
 Will produce a `swift_library` target called `PlayerUIExamplePlugin`.
 
 ### Xcode

@@ -8,6 +8,10 @@
 import Foundation
 import JavaScriptCore
 
+#if SWIFT_PACKAGE
+import PlayerUI
+#endif
+
 public typealias AsyncHookHandler = (JSValue) async throws -> AsyncNodeHandlerType
 
 public enum AsyncNodeHandlerType {
@@ -23,21 +27,25 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
 
     private var asyncHookHandler: AsyncHookHandler?
 
+    public var plugins: [JSBasePlugin] = []
+
     /**
      Constructs the AsyncNodePlugin
      - Parameters:
         - handler: The callback that is used to tap into the core `onAsyncNode` hook
                    exposed to users of the plugin allowing them to supply the replacement node used in the tap callback
      */
-    public convenience init(_ handler: @escaping AsyncHookHandler) {
-        self.init(fileName: "async-node-plugin.prod", pluginName: "AsyncNodePlugin.AsyncNodePlugin")
+    public convenience init(plugins: [JSBasePlugin] = [AsyncNodePluginPlugin()], _ handler: @escaping AsyncHookHandler) {
+
+        self.init(fileName: "AsyncNodePlugin.native", pluginName: "AsyncNodePlugin.AsyncNodePlugin")
         self.asyncHookHandler = handler
+        self.plugins = plugins
     }
 
     override public func setup(context: JSContext) {
         super.setup(context: context)
 
-        if let pluginRef = self.pluginRef {
+        if let pluginRef = pluginRef {
             self.hooks = AsyncNodeHook(onAsyncNode: AsyncHook(baseValue: pluginRef, name: "onAsyncNode"))
         }
 
@@ -88,8 +96,30 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
         })
     }
 
+    /**
+     Retrieves the arguments for constructing this plugin, this is necessary because the arguments need to be supplied after
+     construction of the swift object, once the context has been provided
+     - returns: An array of arguments to construct the plugin
+     */
+    override public func getArguments() -> [Any] {
+           for plugin in plugins {
+               plugin.context = self.context
+           }
+
+           return [["plugins": plugins.map { $0.pluginRef }]]
+       }
+
     override open func getUrlForFile(fileName: String) -> URL? {
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: AsyncNodePlugin.self), pathComponent: "PlayerUI_AsyncNodePlugin.bundle")
+        #if SWIFT_PACKAGE
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
+        #else
+        ResourceUtilities.urlForFile(
+            name: fileName,
+            ext: "js",
+            bundle: Bundle(for: AsyncNodePlugin.self),
+            pathComponent: "PlayerUIAsyncNodePlugin.bundle"
+        )
+        #endif
     }
 }
 
@@ -138,5 +168,27 @@ public struct AsyncNode: Codable, Equatable {
 
     public init(id: String) {
         self.id = id
+    }
+}
+
+/**
+ Wraps the core AsyncNodePlugins AsyncNodePluginPlugin, which has functionality that should be applied to each AsyncNodePluginPlugin passed in
+ */
+public class AsyncNodePluginPlugin: JSBasePlugin {
+    public convenience init() {
+        self.init(fileName: "AsyncNodePlugin.native", pluginName: "AsyncNodePlugin.AsyncNodePluginPlugin")
+    }
+
+    override open func getUrlForFile(fileName: String) -> URL? {
+        #if SWIFT_PACKAGE
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
+        #else
+        ResourceUtilities.urlForFile(
+            name: fileName,
+            ext: "js",
+            bundle: Bundle(for: AsyncNodePluginPlugin.self),
+            pathComponent: "PlayerUIAsyncNodePlugin.bundle"
+        )
+        #endif
     }
 }

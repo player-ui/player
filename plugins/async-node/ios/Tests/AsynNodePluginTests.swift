@@ -8,13 +8,16 @@
 import Foundation
 import XCTest
 import SwiftUI
-import ViewInspector
 import JavaScriptCore
+
 @testable import PlayerUI
+@testable import PlayerUIInternalTestUtilities
+@testable import PlayerUIReferenceAssets
+@testable import PlayerUIAsyncNodePlugin
 
-class AsyncNodePluginTests: SwiftUIAssetUnitTestCase {
+class AsyncNodePluginTests: XCTestCase {
 
-    func testConstruction() {
+    func testConstructionAsyncPlugin() {
         let context = JSContext()
         let plugin = AsyncNodePlugin { _ in
             return .singleNode(.concrete(JSValue()))
@@ -24,33 +27,15 @@ class AsyncNodePluginTests: SwiftUIAssetUnitTestCase {
         XCTAssertNotNil(plugin.pluginRef)
     }
 
-    func testAsyncNodeWithSwiftUIPlayerUsingJSValue() {
-        let handlerExpectation = XCTestExpectation(description: "handler called")
-        let jsContext = JSContext()
+    func testConstructionAsyncPluginPlugin() {
+        let context = JSContext()
 
-        let plugin = AsyncNodePlugin { _ in
-            handlerExpectation.fulfill()
+        let plugin = AsyncNodePluginPlugin()
+        plugin.context = context
 
-            return .singleNode(.concrete(jsContext?.evaluateScript("""
-                ({"asset": {"id": "text", "type": "text", "value":"new node from the hook"}})
-                """) ?? JSValue()))
-        }
-
-        plugin.context = jsContext
-
-        let context = SwiftUIPlayer.Context { jsContext ?? JSContext() }
-
-        let player = SwiftUIPlayer(
-            flow: .asyncNodeJson, plugins: [ReferenceAssetsPlugin(), plugin], context: context)
-
-        ViewHosting.host(view: player)
-
-        let viewExpectation = player.inspection.inspect(after: 0.5) { view in
-            _ = try view.vStack().first?.anyView().find(text: "new node from the hook")
-        }
-
-        wait(for: [handlerExpectation, viewExpectation], timeout: 1)
+        XCTAssertNotNil(plugin.pluginRef)
     }
+
 
     func testAsyncNodeWithAnotherAsyncNodeDelay() {
         let handlerExpectation = XCTestExpectation(description: "first data did not change")
@@ -70,9 +55,12 @@ class AsyncNodePluginTests: SwiftUIAssetUnitTestCase {
                     """) ?? JSValue()))
         }
 
-        let plugin = AsyncNodePlugin(resolveHandler)
+        let asyncNodePluginPlugin = AsyncNodePluginPlugin()
+        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolveHandler)
 
         plugin.context = context
+
+        XCTAssertNotNil(asyncNodePluginPlugin.context)
 
         let player = HeadlessPlayerImpl(plugins: [ReferenceAssetsPlugin(), plugin], context: context ?? JSContext())
 
@@ -138,9 +126,12 @@ class AsyncNodePluginTests: SwiftUIAssetUnitTestCase {
             return .singleNode(ReplacementNode.concrete(context?.evaluateScript("") ?? JSValue()))
         }
 
-        let plugin = AsyncNodePlugin(resolve)
+        let asyncNodePluginPlugin = AsyncNodePluginPlugin()
+        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolve)
 
         plugin.context = context
+
+        XCTAssertNotNil(asyncNodePluginPlugin.context)
 
         let player = HeadlessPlayerImpl(plugins: [ReferenceAssetsPlugin(), plugin], context: context ?? JSContext())
 
@@ -241,9 +232,12 @@ class AsyncNodePluginTests: SwiftUIAssetUnitTestCase {
             return .singleNode(ReplacementNode.concrete(context?.evaluateScript("") ?? JSValue()))
         }
 
-        let plugin = AsyncNodePlugin(resolve)
+        let asyncNodePluginPlugin = AsyncNodePluginPlugin()
+        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolve)
 
         plugin.context = context
+
+        XCTAssertNotNil(asyncNodePluginPlugin.context)
 
         let player = HeadlessPlayerImpl(plugins: [ReferenceAssetsPlugin(), plugin], context: context ?? JSContext())
 
