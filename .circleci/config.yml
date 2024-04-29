@@ -124,13 +124,13 @@ jobs:
           platform: "iOS"
           device: "iPhone 15"
 
-      - run: bazel build --config=ci -- //ios/demo:PlayerUIDemo
+      - run: bazel build --config=ci-mac -- //ios/demo:PlayerUIDemo
 
       - run:
           name: Test Prebuild
           command: |
             bazel build \
-              --config=ci \
+              --config=ci-mac \
               $(bazel query "kind(ios_unit_test, //ios/...)") \
               $(bazel query "kind(ios_unit_test, //plugins/...)") \
               $(bazel query "kind(ios_ui_test, //ios/...)") \
@@ -139,8 +139,8 @@ jobs:
           name: Tests
           command: |
             bazel coverage \
-              --config=ci \
-              --jobs=2 \
+              --config=ci-mac \
+              --jobs=1 \
               --experimental_use_llvm_covmap \
               --combined_report=lcov \
               --test_output=all \
