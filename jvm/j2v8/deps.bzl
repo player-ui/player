@@ -1,5 +1,5 @@
 load("//jvm/dependencies:versions.bzl", "versions")
-load("@rules_player//maven:parse_coordinates.bzl", "parse_coordinates")
+load("@rules_player//maven:defs.bzl", "parse_coordinates")
 
 maven_main = []
 
@@ -19,7 +19,7 @@ main_deps = main_exports + parse_coordinates(maven_main) + [
 
 # TODO: These should probably just be dependencies of headless
 main_resources = [
-    "//core/player:player_native_bundle"
+    "//core/player:player_native_bundle",
 ]
 
 test_deps = [

@@ -170,6 +170,7 @@ public constructor(
     internal companion object {
 
         private const val bundledSourcePath = "core/player/dist/Player.native.js"
+
         // TODO: Actually bundle debug source
         private const val debugSourcePath = "core/player/dist/Player.native.js"
 

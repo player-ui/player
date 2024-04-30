@@ -1,5 +1,5 @@
 load("//jvm/dependencies:versions.bzl", "versions")
-load("@rules_player//maven:parse_coordinates.bzl", "parse_coordinates")
+load("@rules_player//maven:defs.bzl", "parse_coordinates")
 
 maven = [
     "androidx.test:core:%s" % versions.androidx.test.core,
