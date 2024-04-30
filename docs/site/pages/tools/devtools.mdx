@@ -1,23 +1,19 @@
 # Devtools
 
 ## Introduction
-https://github.com/player-ui/browser-devtools 
-Our Devtools Player leverages plugins to handle communication between the inspected Player instance and the devtools extension panel.
+It is essential to have developer tool extensions to ensure efficient debugging and inspection of the Player while it runs in the user's application. To make this possible, we have decided to utilize the Player's content and plugin system instead of defining a limited set of features. This approach enables users to represent their specific requirements and utilize the Player to its full potential.
 
 ## Devtools Architecture
-The devtools extension is running an instance of Player. By running an instance of Player in the devtools extension; we are able to leverage the Player plugin system. The plugin author can select which hooks to tap in, what information to gather, and how to interact with it.
+The Devtools extension utilizes an instance of Player to take advantage of its plugin system. Plugin authors can choose which hooks to use, what information to collect, and how to interact with it.
 
-The two instances of Player [The extension and the inspected instance] are communicating through a Messenger class injected into the content script. This messenger class acts as a communication layer this is agnostic, self-sufficient, and a loss-less messenger designed for seamless communication between instances.
-It operates indepdently without a bookkeeper ensuring no data loss during communication.
+The extension and the inspected instance of Player communicate through a Messenger class that is injected into the content script. The Messenger class is an efficient, agnostic, and self-sufficient layer that enables seamless communication between instances. You can find more information about the Devtools Messenger here: https://github.com/player-ui/tools/blob/3ca98bdc70c76e290084b75c5b8f26ebb35b0dd0/devtools/messenger/README.md.
 
-Read more about the Devtools Messenger here https://github.com/player-ui/tools/blob/3ca98bdc70c76e290084b75c5b8f26ebb35b0dd0/devtools/messenger/README.md
-
-The `@player-tools/devtools-client` exposes the Panel containing the ReactPlayer responsible for running the content sent by the Player devtool plugins on the inspected Player UI instance and the navigation bar.
+The @player-tools/devtools-client package provides a ReactPlayer panel that displays the content sent by the Player dev tool plugins on the inspected Player UI instance and the navigation bar. This allows users to create plugins according to their specific needs, rather than being restricted to a pre-defined set of features. Additionally, they can combine plugins and use different sets for each Player instance. This browser extension provides users with a high degree of flexibility and customization.
 
 ## Usage
-Install the devtool extension from the chrome store and firefox store. [Link TBA]
+To install the dev tool extension, go to the Chrome or Firefox store and download it. After that, register the dev tool plugins into the Player instance by following the same procedure as any other plugin. You can find more information about this in the Player configuration docs.
 
-In order for the devtools extension communicating with the Player in your content; you must have a plugin that is using devtools-client. You may use our `BasicWevDevtoolsPlugin` as one the plugins in your Player integration and that will connect to the browser extension if it is installed.
+Please note that dev tools plugins can affect your application's performance. Therefore, we recommend that you only register them when working in development environments. In case you accidentally register a plugin, the browser extension has a checkbox that you can use to enable or disable it. This is an effective way to avoid running plugins unnecessarily or forcing them on production environments.
 
 ```javascript
 const testingPlugins: ReactPlayerOptions["plugins"] = [
@@ -34,38 +30,13 @@ const config: ReactPlayerOptions = {
 
 
 ## Devtools Basic Plugin
-We provide a basic devtools plugin that displays information about the inspected Player Instance. [devtools/plugins/desktop/basic]. This is essentially a Player plugin that provides plugin information, flow, logs, and exposes a console for expression evaluation. It uses our devtools-assets to render the UI.
+We offer a basic devtools plugin at devtools/plugins/desktop/basic. This plugin includes features that we expect from a dev tools extension and can serve as an example for creating your own.
 
-As of the current state; the basic plugin will help debug flows, data, and views within player. In the future; we hope to release plugins that will also help with content authoring.
 
 ## Devtools Assets
-https://github.com/player-ui/devtools-assets, devtools UI is our collection of asset packages and assets that's designed to be leveraged with our devtools basic plugin.
+You have the freedom to generate any content for your plugin, leveraging all the hooks that Player exposes. However, if you wish to use the Player's dev tool extension, you must use the devtools-assets as assets plugin. On the other hand, if you plan to maintain your extension, you are free to use any assets plugin.
 
 
 ## How To Write Your Own Devtools Plugins
-You may create your own plugins and test them by adding them into the ReactPlayerOptions as plugins. In our BasicWebDevtoolsPlugin, we are leveraging the `@player-tools/devtools-messenger` to communicate with the extension.
-
-```javascript
-import { Messenger } from "@player-tools/devtools-messenger";
-
-const messenger = useMemo(() => {
-    const options: MessengerOptions<ExtensionSupportedEvents> = {
-      id: playerID,
-      context: "player",
-      messageCallback: (message) =>
-        dispatch(message as Parameters<typeof dispatch>[0]),
-      sendMessage,
-      addListener,
-      removeListener,
-      logger: console,
-    };
-
-    return new Messenger(options);
-  }, [addListener, removeListener, sendMessage]);
-  ```
-
-You may write other plugins that talk to our extension; or even extend our BasicWebDevtoolsPlugin to add additional views.
-
-Check out our Player UI Devtools Plugin template thats coming soon.
-
+We're currently working on a template for bootstraping you dev tools plugins. Meanwhile, you can use the (basic devtools plugin)[devtools/plugins/desktop/basic] and test it locally using the (test-env)[devtools/plugins/desktop/basic].
 
