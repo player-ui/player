@@ -11,6 +11,7 @@ For small bug-fixes, documentation updates, or other trivial changes, feel free 
 If the changes are larger (API design, architecture, etc), [opening an issue](https://github.com/player-ui/player/issues/new/choose) can be helpful to reduce implementation churn as we hash out the design.
 
 ## Requirements
+* [bazelisk](https://github.com/bazelbuild/bazelisk)
 * [npm >= 8.19.2](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 * [yarn >= 1.22.19](https://yarnpkg.com/)
 
