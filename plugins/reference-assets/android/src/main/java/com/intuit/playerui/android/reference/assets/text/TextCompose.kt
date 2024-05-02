@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.ComposableAsset
+import com.intuit.playerui.android.compose.ComposableAsset
 import kotlinx.serialization.Serializable
 
 internal class TextCompose(assetContext: AssetContext) :

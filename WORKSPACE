@@ -31,7 +31,6 @@ http_archive(
 
 load("@rules_player//:workspace.bzl", "deps")
 
-deps()
 
 load("@rules_player//:conf.bzl", "apple", "javascript")
 

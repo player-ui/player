@@ -1,4 +1,4 @@
-package com.intuit.playerui.android.asset
+package com.intuit.playerui.android.compose
 
 import android.view.View
 import android.widget.FrameLayout
@@ -12,10 +12,13 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.viewinterop.AndroidView
 import com.intuit.playerui.android.AssetContext
+import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.build
 import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.withContext
+import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
 
@@ -24,6 +27,7 @@ import kotlinx.serialization.KSerializer
  * @param assetContext The context of the asset.
  * @param serializer The serializer for the Data type.
  */
+@ExperimentalPlayerApi
 public abstract class ComposableAsset<Data> (
     assetContext: AssetContext,
     serializer: KSerializer<Data>,
