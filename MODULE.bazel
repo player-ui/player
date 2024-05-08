@@ -31,6 +31,7 @@ bazel_dep(name = "rules_xcodeproj", version = "2.2.0")
 
 bazel_dep(name = "gazelle", version = "0.34.0", repo_name = "bazel_gazelle")
 bazel_dep(name = "rules_swift_package_manager", version = "0.22.0")
+bazel_dep(name = "swiftlint", version = "0.54.0", repo_name = "SwiftLint")
 
 ## This section is handled by rules_swift_package_manager
 swift_deps = use_extension(
@@ -48,7 +49,8 @@ swift_deps.from_file(
 use_repo(
     swift_deps,
     "swiftpkg_swift_hooks",
-    "swiftpkg_viewinspector"
+    "swiftpkg_viewinspector",
+    "swiftpkg_swiftlint"
 )
 ###### End iOS ######
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")

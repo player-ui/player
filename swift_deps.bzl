@@ -9,6 +9,22 @@ def swift_dependencies():
         remote = "https://github.com/tadija/AEXML.git",
     )
 
+    # version: 0.2.0
+    swift_package(
+        name = "swiftpkg_collectionconcurrencykit",
+        commit = "b4f23e24b5a1bff301efc5e70871083ca029ff95",
+        dependencies_index = "@//:swift_deps_index.json",
+        remote = "https://github.com/JohnSundell/CollectionConcurrencyKit.git",
+    )
+
+    # version: 1.8.2
+    swift_package(
+        name = "swiftpkg_cryptoswift",
+        commit = "c9c3df6ab812de32bae61fc0cd1bf6d45170ebf0",
+        dependencies_index = "@//:swift_deps_index.json",
+        remote = "https://github.com/krzyzanowskim/CryptoSwift.git",
+    )
+
     # version: 8.9.1
     swift_package(
         name = "swiftpkg_eyes_xcui_swift_package",
@@ -49,12 +65,28 @@ def swift_dependencies():
         remote = "https://github.com/onevcat/Rainbow.git",
     )
 
+    # version: 0.34.1
+    swift_package(
+        name = "swiftpkg_sourcekitten",
+        commit = "b6dc09ee51dfb0c66e042d2328c017483a1a5d56",
+        dependencies_index = "@//:swift_deps_index.json",
+        remote = "https://github.com/jpsim/SourceKitten.git",
+    )
+
     # version: 0.10.1
     swift_package(
         name = "swiftpkg_spectre",
         commit = "26cc5e9ae0947092c7139ef7ba612e34646086c7",
         dependencies_index = "@//:swift_deps_index.json",
         remote = "https://github.com/kylef/Spectre.git",
+    )
+
+    # version: 1.2.3
+    swift_package(
+        name = "swiftpkg_swift_argument_parser",
+        commit = "8f4d2753f0e4778c76d5f05ad16c74f707390531",
+        dependencies_index = "@//:swift_deps_index.json",
+        remote = "https://github.com/apple/swift-argument-parser.git",
     )
 
     # version: 0.1.0
@@ -65,12 +97,44 @@ def swift_dependencies():
         remote = "https://github.com/intuit/swift-hooks.git",
     )
 
+    # version: 509.0.2
+    swift_package(
+        name = "swiftpkg_swift_syntax",
+        commit = "6ad4ea24b01559dde0773e3d091f1b9e36175036",
+        dependencies_index = "@//:swift_deps_index.json",
+        remote = "https://github.com/apple/swift-syntax.git",
+    )
+
     # version: 6.0.3
     swift_package(
         name = "swiftpkg_swiftcli",
         commit = "2e949055d9797c1a6bddcda0e58dada16cc8e970",
         dependencies_index = "@//:swift_deps_index.json",
         remote = "https://github.com/jakeheis/SwiftCLI.git",
+    )
+
+    # version: 0.54.0
+    swift_package(
+        name = "swiftpkg_swiftlint",
+        commit = "f17a4f9dfb6a6afb0408426354e4180daaf49cee",
+        dependencies_index = "@//:swift_deps_index.json",
+        remote = "https://github.com/realm/SwiftLint.git",
+    )
+
+    # version: 0.9.0
+    swift_package(
+        name = "swiftpkg_swiftytexttable",
+        commit = "c6df6cf533d120716bff38f8ff9885e1ce2a4ac3",
+        dependencies_index = "@//:swift_deps_index.json",
+        remote = "https://github.com/scottrhoyt/SwiftyTextTable.git",
+    )
+
+    # version: 7.0.2
+    swift_package(
+        name = "swiftpkg_swxmlhash",
+        commit = "a853604c9e9a83ad9954c7e3d2a565273982471f",
+        dependencies_index = "@//:swift_deps_index.json",
+        remote = "https://github.com/drmohundro/SWXMLHash.git",
     )
 
     # version: 2.0.1
@@ -108,7 +172,7 @@ def swift_dependencies():
     # version: 5.0.6
     swift_package(
         name = "swiftpkg_yams",
-        commit = "0d9ee7ea8c4ebd4a489ad7a73d5c6cad55d6fed3",
+        commit = "9234124cff5e22e178988c18d8b95a8ae8007f76",
         dependencies_index = "@//:swift_deps_index.json",
         remote = "https://github.com/jpsim/Yams.git",
     )

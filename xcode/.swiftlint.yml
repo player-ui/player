@@ -1,0 +1,3 @@
+line_length:
+    error: 160
+    ignores_comments: true
