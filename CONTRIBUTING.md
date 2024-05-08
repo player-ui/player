@@ -12,8 +12,7 @@ If the changes are larger (API design, architecture, etc), [opening an issue](ht
 
 ## Requirements
 * [bazelisk](https://github.com/bazelbuild/bazelisk)
-* [npm >= 8.19.2](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
-* [yarn >= 1.22.19](https://yarnpkg.com/)
+* [pnpm >= 8.0.0](https://pnpm.io/installation)
 
 * [Swift >= 5.2](https://www.swift.org/download/)
 * [Xcode 14.3](https://developer.apple.com/download/all/) 
@@ -42,17 +41,17 @@ env node
 ### Player
 For speed and consistency, this repo leverages `bazel` as it's main build tool. Check out the [bazel](https://bazel.build/) docs for more info.
 
-After forking the repo, run builds using:
+After forking the repo, you can use bazel to build, test and run your files. 
+
+## Docs Sites
+These require the [Android NDK](https://developer.android.com/ndk).
+The docs site can be ran using:
 
 ```bash
-bazel build //...
+bazel build //docs/site:start
+bazel run //docs/site:start
 ```
-
-Tests can also be ran using:
-
-```bash
-bazel test //...
-```
+which will run an instance on `http://localhost:3000`.
 
 #### Skipping iOS builds
 The `.bazelrc` contains a convenience to build everything but the iOS targets, as the toolchain for those is platform specific.
@@ -66,18 +65,6 @@ If you are interested in only contributing for android, follow our [android guid
 
 ## For iOS Only builds
 If you are interested in only contributing for iOS, follow our [iOS guide](https://github.com/player-ui/player)
-
-
-
-## Docs Sites
-These require the [Android NDK](https://developer.android.com/ndk).
-The docs site can be ran using:
-
-```bash
-bazel build //docs/site:start
-bazel run //docs/site:start
-```
-which will run an instance on `http://localhost:3000`.
 
 
 ## Submitting a Pull Request
