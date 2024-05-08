@@ -53,6 +53,26 @@ dependencies {
     implementation("com.intuit.player.android:assets:$playerVersion")
 }
 ```
+
+#### Release Optimization
+
+The Android Player dependency automatically pulls in both the `dev` as well as the `prod` versions of the underlying JS scripts.
+
+The `dev` scripts are handy for debugging shared JS code through the JS debugger in debug builds, but they are not necessary for consumer facing release builds.
+
+To optimize the release bundles, it is highly recommended to exclude the `dev` scripts, as well as enabling V8 to strip out unused code from the final bundle.
+
+```kotlin
+buildTypes {
+    getByName("release") {
+        isMinifyEnabled = true
+        isShrinkResources = true
+        packagingOptions {
+            exclude("**/*.dev.js")
+        }
+    }
+}
+```
   </android>
 </PlatformTabs>
 
@@ -194,3 +214,4 @@ class SimplePlayerFragment(override val flow: String) : PlayerFragment() {
 </PlatformTabs>
 
 Congrats! You've got Player up and running. If you need additional functionality you can add more plugins to extend Player's functionality. Head over to the [Plugins](./plugins) section to take a look at the Plugins we've developed or take a look at the [Architecture](./architecture) section to see how you can write your own.
+
