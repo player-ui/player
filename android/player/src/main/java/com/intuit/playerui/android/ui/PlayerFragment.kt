@@ -20,6 +20,7 @@ import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.databinding.FallbackViewBinding
 import com.intuit.playerui.android.databinding.PlayerFragmentBinding
 import com.intuit.playerui.android.extensions.into
+import com.intuit.playerui.android.extensions.intoOnMain
 import com.intuit.playerui.android.extensions.transitionInto
 import com.intuit.playerui.android.lifecycle.ManagedPlayerState
 import com.intuit.playerui.android.lifecycle.ManagedPlayerState.Done
@@ -91,7 +92,7 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
     public abstract val playerViewModel: PlayerViewModel
 
     init {
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.Default) {
             repeatOnLifecycle(State.STARTED) {
                 // forward state events to callbacks
                 playerViewModel.state.onEach {
@@ -102,12 +103,12 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
                         is Error -> onError(it)
                         is Done -> onDone(it)
                     }
-                }.launchIn(this + Dispatchers.Default)
+                }.launchIn(this)
 
                 // update UI for latest state
                 playerViewModel.state.collectLatest {
                     when (it) {
-                        NotStarted, Pending -> buildLoadingView() into binding.playerCanvas
+                        NotStarted, Pending -> buildLoadingView() intoOnMain binding.playerCanvas
                         is Running -> try {
                             handleAssetUpdate(it.asset, it.animateViewTransition)
                         } catch (exception: Exception) {
@@ -116,8 +117,8 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
                             playerViewModel.fail("Error rendering asset", exception)
                         }
 
-                        is Error -> buildFallbackView(it.exception) into binding.playerCanvas
-                        is Done -> buildDoneView() into binding.playerCanvas
+                        is Error -> buildFallbackView(it.exception) intoOnMain binding.playerCanvas
+                        is Done -> buildDoneView() intoOnMain binding.playerCanvas
                     }
                 }
             }

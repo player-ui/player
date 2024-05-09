@@ -6,7 +6,12 @@ import android.widget.FrameLayout
 import androidx.core.view.children
 import androidx.transition.Transition
 import androidx.transition.TransitionManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
+internal suspend infix fun View?.intoOnMain(root: FrameLayout) = withContext(Dispatchers.Main) {
+    into(root)
+}
 /**
  * Helper method to replace the existing [FrameLayout] child
  * with a specific [View]. It will hide the [root] if the
