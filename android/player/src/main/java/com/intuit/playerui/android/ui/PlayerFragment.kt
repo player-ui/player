@@ -111,10 +111,9 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
                         is Running -> try {
                             handleAssetUpdate(it.asset, it.animateViewTransition)
                         } catch (exception: Exception) {
-                            if (exception !is CancellationException) {
-                                exception.printStackTrace()
-                                playerViewModel.fail("Error rendering asset", exception)
-                            }
+                            if (exception is CancellationException) throw exception
+                            exception.printStackTrace()
+                            playerViewModel.fail("Error rendering asset", exception)
                         }
 
                         is Error -> buildFallbackView(it.exception) into binding.playerCanvas
