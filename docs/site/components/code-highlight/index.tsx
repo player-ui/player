@@ -1,11 +1,11 @@
-import React from 'react';
-import { Box, useColorModeValue } from '@chakra-ui/react';
+import React from "react";
+import { Box, useColorModeValue } from "@chakra-ui/react";
 import {
   Prism as SyntaxHighlighter,
   SyntaxHighlighterProps,
-} from 'react-syntax-highlighter';
+} from "react-syntax-highlighter";
 
-import { light, dark } from './prism-colors';
+import { light, dark } from "./prism-colors";
 
 export const useCodeStyle = () => {
   const style = useColorModeValue(light, dark);
@@ -14,13 +14,13 @@ export const useCodeStyle = () => {
 };
 
 export const CodeHighlight = (props: SyntaxHighlighterProps) => {
-  const borderColor = useColorModeValue('gray.100', 'gray.800');
+  const borderColor = useColorModeValue("gray.100", "gray.800");
 
   return (
     <Box borderWidth="1px" borderColor={borderColor} borderRadius="base" my="4">
       <SyntaxHighlighter
         wrapLongLines
-        style={useCodeStyle()}
+        style={useCodeStyle() as any}
         {...props}
         customStyle={{
           margin: 0,

@@ -35,7 +35,8 @@ module.exports = async function (src) {
     path.join(__dirname, "..", "components", "Layout", `MDXPageLayout`),
   );
 
-  const code = `import withLayout from '${compDir}';
+  const code = `
+import withLayout from '${compDir}';
 export default withLayout(${JSON.stringify({
     ...data,
     tableOfContents: getTableOfContents(content),

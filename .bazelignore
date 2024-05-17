@@ -63,3 +63,4 @@ docs/storybook/node_modules
 plugins/reference-assets/mocks/node_modules
 tools/addon-storybook/node_modules
 tools/components/node_modules
+docs/site/node_modules

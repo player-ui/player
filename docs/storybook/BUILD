@@ -60,7 +60,7 @@ storybook_bin.storybook_binary(
         ".storybook/*",
     ]) + deps,
     tags = [
-        # "ibazel_notify_changes",
+        "ibazel_notify_changes",
     ],
     visibility = ["//visibility:public"],
 )
