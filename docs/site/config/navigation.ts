@@ -49,8 +49,12 @@ const navigation: Navigation = {
               path: "/writing-plugins",
             },
             {
-              title: "Multi-Flow Experiences",
-              path: "/guides/multi-flow-experiences",
+              title: 'Plugin Implementation',
+              path: '/plugin-implementation',
+            },
+            {
+              title: 'Multi-Flow Experiences',
+              path: '/guides/multi-flow-experiences',
             },
             {
               title: "Designing Semantic Assets",
@@ -66,20 +70,37 @@ const navigation: Navigation = {
               path: "/content",
             },
             {
-              title: "Assets & Views",
-              path: "/content/assets-views",
+              title: 'Navigation',
+              path: '/content/navigation',
+            },
+            {
+              title: 'Assets & Views',
+              path: '/content/assets-views',
             },
             {
               title: "Data & Expressions",
               path: "/content/data-expressions",
             },
             {
-              title: "Navigation",
-              path: "/content/navigation",
+              title: 'Schema',
+              path: '/content/schema',
+            },
+          ],
+        },
+        {
+          title: 'Authoring',
+          routes: [
+            {
+              title: 'Overview',
+              path: '/dsl',
             },
             {
-              title: "Templates",
-              path: "/content/templates",
+              title: 'Views',
+              path: '/dsl/views',
+            },
+            {
+              title: 'Schema',
+              path: '/dsl/schema',
             },
           ],
         },
@@ -102,6 +123,10 @@ const navigation: Navigation = {
               title: "Custom Assets",
               path: "/assets/custom",
             },
+            {
+              title: 'DSL Components',
+              path: '/assets/dsl',
+            },
           ],
         },
         {
@@ -110,10 +135,6 @@ const navigation: Navigation = {
             {
               title: "Storybook",
               path: "/tools/storybook",
-            },
-            {
-              title: "TSX Content Authoring",
-              path: "/tools/dsl",
             },
             {
               title: "CLI",

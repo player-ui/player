@@ -17,6 +17,7 @@ js_pipeline(
         ":node_modules/@player-ui/player",
     ],
     deps = [
+        ":node_modules/@player-ui/common-types-plugin",
         ":node_modules/@player-ui/reference-assets-plugin",
     ],
 )

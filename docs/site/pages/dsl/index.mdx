@@ -138,6 +138,9 @@ const navigation: Navigation = {
   },
 };
 ```
+
+_Note: The `Navigation` type we're importing here from the `@player-ui/types` package is different than the `Navigation` type from the `@player-tools/dsl` package. The former is the core definition for what the Navigation section of Player content is. The latter has specific replacements to take DSL constructs where normal objects would be defined._
+
 ### Bindings and Expressions
 
 Both `binding` and `expression` in the JSX authoring leverages a tagged template, typically abbreviated as `b` and `e` respectively. In a similar fashion to using `css` or `graphql` in a JS file, this enables syntax-highlighting and validation of bindings and expressions within a JS file.

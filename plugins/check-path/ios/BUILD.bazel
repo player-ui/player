@@ -1,41 +1,6 @@
-load("@rules_pkg//:mappings.bzl", "pkg_files", "strip_prefix")
-load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
-load("@build_bazel_rules_apple//apple:resources.bzl", "apple_resource_bundle")
+load("//tools/ios:util.bzl", "ios_plugin")
 
-load("@build_bazel_rules_ios//rules:test.bzl", "ios_unit_test")
-
-load("//tools/ios:util.bzl", "ios_bundle_module_shim")
-
-apple_resource_bundle(
-    name = "PlayerUICheckPathResourceBundle",
-    bundle_name = "CheckPathPlugin",
-    bundle_id = "com.intuit.ios.player.resources.core",
+ios_plugin(
+    name = "CheckPathPlugin",
     resources = ["//plugins/check-path/core:core_native_bundle"]
-)
-
-ios_bundle_module_shim("CheckPathPlugin")
-
-pkg_files(
-    name = "PlayerUICheckPathPlugin_Sources",
-    srcs = glob(["Sources/**/*.swift"]),
-    strip_prefix = strip_prefix.from_pkg(),
-    visibility = ["//visibility:public"],
-)
-
-swift_library(
-    name = "PlayerUICheckPathPlugin",
-    module_name = "PlayerUICheckPathPlugin",
-    srcs = [":PlayerUICheckPathPlugin", ":CheckPathPluginResourceShim"],
-    visibility = ["//visibility:public"],
-    deps = ["//ios/core:PlayerUI"],
-    data = [":PlayerUICheckPathResourceBundle"],
-    defines = ["BAZEL_TARGET"]
-)
-
-ios_unit_test(
-    name = "PlayerUICheckPathPluginTests",
-    srcs = glob(["Tests/**/*.swift"]),
-    minimum_os_version = "14.0",
-    deps = [":PlayerUICheckPathPlugin", "//ios/internal-test-utils:PlayerUIInternalTestUtilities"],
-    visibility = ["//visibility:public"]
 )

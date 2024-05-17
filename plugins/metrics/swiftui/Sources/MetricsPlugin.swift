@@ -55,7 +55,7 @@ class RequestTimeWebPlugin: JSBasePlugin {
             name: fileName,
             ext: "js",
             bundle: Bundle(for: MetricsPlugin.self),
-            pathComponent: "MetricsPlugin.bundle"
+            pathComponent: "PlayerUI_MetricsPlugin.bundle"
         )
         #endif
     }
@@ -111,12 +111,16 @@ public class MetricsPlugin: JSBasePlugin, NativePlugin, WithSymbol {
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
+        #if SWIFT_PACKAGE
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
+        #else
         ResourceUtilities.urlForFile(
             name: fileName,
             ext: "js",
             bundle: Bundle(for: MetricsPlugin.self),
-            pathComponent: "MetricsPlugin.bundle"
+            pathComponent: "PlayerUI_MetricsPlugin.bundle"
         )
+        #endif
     }
 
     /**

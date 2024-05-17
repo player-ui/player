@@ -21,7 +21,7 @@ public class CommonExpressionsPlugin: JSBasePlugin, NativePlugin {
         #if SWIFT_PACKAGE
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
         #else
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: CommonExpressionsPlugin.self), pathComponent: "CommonExpressionsPlugin.bundle")
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: CommonExpressionsPlugin.self), pathComponent: "PlayerUI_CommonExpressionsPlugin.bundle")
         #endif
     }
 }

@@ -103,13 +103,12 @@ export const formatAsEnum = (
         return validCompletions;
       }
 
-      return [
-        ...validCompletions,
-        {
-          count: overlap,
-          target: validValue,
-        },
-      ];
+      validCompletions.push({
+        count: overlap,
+        target: validValue,
+      });
+
+      return validCompletions;
     }, [])
     .sort((e) => e.count);
 

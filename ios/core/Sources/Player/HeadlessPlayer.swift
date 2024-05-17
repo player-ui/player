@@ -187,7 +187,7 @@ public extension HeadlessPlayer {
         let warn = JSValue(object: logger.getJSLogFor(level: .warning), in: context)
         let error = JSValue(object: logger.getJSLogFor(level: .error), in: context)
         for plugin in plugins {
-            if let plugin = plugin as? JSBasePlugin {
+            if let plugin = plugin as? JSBasePlugin, plugin.context != context {
                 plugin.context = context
             }
         }

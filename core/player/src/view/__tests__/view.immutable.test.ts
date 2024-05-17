@@ -3,7 +3,7 @@ import { LocalModel, withParser, PipelinedDataModel } from "../../data";
 import { ExpressionEvaluator } from "../../expressions";
 import { BindingParser } from "../../binding";
 import { SchemaController } from "../../schema";
-import { ViewInstance } from "..";
+import { ApplicabilityPlugin, StringResolverPlugin, ViewInstance } from "..";
 import { NodeType } from "../parser";
 
 const parseBinding = new BindingParser().parse;
@@ -32,6 +32,8 @@ test("uses the exact same object if nothing changes", () => {
       schema,
     },
   );
+
+  new StringResolverPlugin().apply(view);
 
   view.hooks.resolver.tap("input", (resolver) => {
     resolver.hooks.resolve.tap("input", (value, astNode, options) => {
@@ -89,6 +91,9 @@ test("applicability is immutable", () => {
       schema,
     },
   );
+
+  new StringResolverPlugin().apply(view);
+  new ApplicabilityPlugin().apply(view);
 
   const resolved = view.update();
   const batUpdate = view.update(new Set([parseBinding("foo.bat")]));
@@ -150,6 +155,8 @@ test("binding normalization", () => {
     },
   );
 
+  new StringResolverPlugin().apply(view);
+
   const resolved = view.update();
   let barUpdate = view.update(new Set([parseBinding("boo")]));
 
@@ -196,6 +203,8 @@ test("hardcore immutability", () => {
       schema,
     },
   );
+
+  new StringResolverPlugin().apply(view);
 
   const resolved = view.update();
 
@@ -245,6 +254,8 @@ test("should only update if data is used in view", () => {
       schema,
     },
   );
+
+  new StringResolverPlugin().apply(view);
 
   const hook = vitest.fn();
   view.hooks.onUpdate.tap("update", hook);

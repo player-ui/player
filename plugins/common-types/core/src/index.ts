@@ -3,7 +3,6 @@ import { TypesProviderPlugin } from "@player-ui/types-provider-plugin";
 
 import * as validators from "./validators";
 import * as dataTypes from "./data-types/types";
-import * as dataRefs from "./data-types/refs";
 import * as formats from "./formats";
 import type {
   BooleanType,
@@ -16,7 +15,8 @@ import type {
   PhoneType,
 } from "./data-types/types";
 
-export { validators, dataTypes, dataRefs, formats };
+export { validators, dataTypes, formats };
+
 export * from "./formats/utils";
 
 /**

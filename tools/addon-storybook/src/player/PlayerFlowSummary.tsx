@@ -62,7 +62,11 @@ export const PlayerFlowSummary = (
         </pre>
       )}
 
-      {props.error && <pre>{props.error?.message}</pre>}
+      {props.error && (
+        <pre colorScheme="red">
+          Error Message: <span>{props.error?.message}</span>
+        </pre>
+      )}
 
       <button onClick={props.reset}>Reset</button>
     </div>

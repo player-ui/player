@@ -20,13 +20,8 @@ let package = Package(
         // Actual Dependencies
         .package(url: "https://github.com/intuit/swift-hooks.git", .upToNextMajor(from: "0.1.0")),
 
-        
-        // Tools
-        .package(url: "https://github.com/yonaskolb/XcodeGen.git", .upToNextMajor(from: "2.38.0")),
-
-        // Testing
-        .package(url: "https://github.com/applitools/eyes-xcui-swift-package.git", exact: "8.9.1"),
-        .package(url: "https://github.com/nalexn/viewinspector.git", .upToNextMajor(from: "0.9.7"))
+        // Testing Dependencies
+        .package(url: "https://github.com/nalexn/viewinspector.git", .upToNextMajor(from: "0.9.10"))
     ],
     targets: []
 )

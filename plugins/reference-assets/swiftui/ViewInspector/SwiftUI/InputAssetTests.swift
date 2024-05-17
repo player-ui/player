@@ -18,8 +18,6 @@ import JavaScriptCore
 @testable import PlayerUIReferenceAssets
 @testable import PlayerUISwiftUI
 
-extension InputAssetView: Inspectable {}
-extension ValidationView: Inspectable {}
 
 class InputAssetTests: SwiftUIAssetUnitTestCase {
     override func register(registry: SwiftUIRegistry) {
@@ -235,12 +233,12 @@ class InputAssetTests: SwiftUIAssetUnitTestCase {
 
         let stack = try view.inspect().vStack()
 
-        let field = try stack.textField(1)
-
         model.text = "new text"
 
-        try field.callOnEditingChanged()
-//        model.set()
+        // When iOS 15 is the minimum and we can use @FocusState in the InputAsset
+        // we can update and call through ViewInspector for the new APIs
+        // for some reason it only ever calls it with true as it stands
+        view.onEditingChanged(false)
 
         wait(for: [setExpectation], timeout: 1)
     }

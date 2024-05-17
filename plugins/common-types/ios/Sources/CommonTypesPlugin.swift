@@ -19,7 +19,7 @@ public class CommonTypesPlugin: JSBasePlugin, NativePlugin {
         #if SWIFT_PACKAGE
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
         #else
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: CommonTypesPlugin.self), pathComponent: "CommonTypesPlugin.bundle")
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: CommonTypesPlugin.self), pathComponent: "PlayerUI_CommonTypesPlugin.bundle")
         #endif
     }
 }

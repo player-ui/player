@@ -1,8 +1,8 @@
-import type { View, ViewPlugin } from "./plugin";
 import type { Options } from "./options";
 import type { Parser, Node, ParseObjectOptions } from "../parser";
 import { EMPTY_NODE, NodeType } from "../parser";
 import type { Resolver } from "../resolver";
+import { ViewInstance, ViewPlugin } from "../view";
 
 /** A view plugin to resolve switches */
 export default class SwitchPlugin implements ViewPlugin {
@@ -59,7 +59,13 @@ export default class SwitchPlugin implements ViewPlugin {
           const cases: Node.SwitchCase[] = [];
 
           switchContent.forEach(
-            (switchCase: { [x: string]: any; case: any }) => {
+            (switchCase: {
+              [x: string]: any;
+              /**
+               *
+               */
+              case: any;
+            }) => {
               const { case: switchCaseExpr, ...switchBody } = switchCase;
               const value = parser.parseObject(
                 switchBody,
@@ -113,7 +119,7 @@ export default class SwitchPlugin implements ViewPlugin {
     });
   }
 
-  apply(view: View) {
+  apply(view: ViewInstance) {
     view.hooks.parser.tap("switch", this.applyParser.bind(this));
     view.hooks.resolver.tap("switch", this.applyResolver.bind(this));
   }

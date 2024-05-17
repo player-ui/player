@@ -1,6 +1,5 @@
-# load("@rules_player//cocoapods:cocoapod.bzl", "assemble_pod", "pod_push")
+# load("@rules_player//cocoapods:cocoapod.bzl", "pod_push")
 # load("@rules_player//internal:stamp.bzl", "stamp")
-# load("//:generated.bzl", "PlayerUI", "PlayerUI_Demo", "ui_tests", "unit_tests")
 load("//tools/ios:util.bzl", "assemble_pod")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@aspect_rules_js//js:defs.bzl", "js_library")
@@ -23,7 +22,7 @@ exports_files([
     ".editorconfig",
     ".all-contributorsrc",
     "README.md",
-    "patches/@chakra-ui__system@2.6.2.patch",
+    # "patches/@chakra-ui__system@2.6.2.patch",
 ])
 
 js_library(
@@ -85,13 +84,6 @@ js_library(
     ] + glob(["typings/*"]),
     visibility = ["//visibility:public"],
 )
-# PlayerUI(deps = [])
-
-# PlayerUI_Demo(deps = [])
-
-# unit_tests()
-
-# ui_tests()
 
 # # Update the version in the podspec
 # stamp(

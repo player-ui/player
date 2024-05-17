@@ -39,8 +39,8 @@
     "@mdx-js/react": "^1.6.22",
     "@mdx-js/rollup": "^3.0.1",
     "@monaco-editor/react": "^4.6.0",
-    "@player-tools/cli": "0.5.0--canary.62.1176",
-    "@player-tools/dsl": "0.5.0--canary.62.1176",
+    "@player-tools/cli": "0.5.2",
+    "@player-tools/dsl": "0.5.2",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-separator": "^1.0.3",
     "@radix-ui/react-slot": "^1.0.2",
@@ -184,7 +184,8 @@
     "webpack-dev-server": "^5.0.4"
   },
   "volta": {
-    "node": "18.18.2"
+    "node": "18.18.2",
+    "yarn": "1.22.19"
   },
   "resolutions": {
     "esbuild": "0.19.8",

@@ -202,11 +202,13 @@ class AnyTypeTests: XCTestCase {
         XCTAssertEqual("[\"test\",\"data\"]", doEncode(AnyType.array(data: ["test", "data"])))
         XCTAssertEqual("[1,2]", doEncode(AnyType.numberArray(data: [1, 2])))
         XCTAssertEqual("[false,true]", doEncode(AnyType.booleanArray(data: [false, true])))
-        XCTAssertEqual("{\"key\":false,\"key2\":1}", doEncode(AnyType.anyDictionary(data: ["key": false, "key2": 1])))
+        XCTAssertEqual("{\"a\":false,\"b\":1}", doEncode(AnyType.anyDictionary(data: ["a": false, "b": 1])))
     }
 
     func doEncode(_ data: AnyType) -> String? {
-        let data = try? JSONEncoder().encode(data)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .sortedKeys
+        let data = try? encoder.encode(data)
         guard let data = data else { return nil }
         return String(data: data, encoding: .utf8)
     }

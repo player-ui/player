@@ -72,7 +72,7 @@ public class PubSubPlugin: JSBasePlugin, NativePlugin {
         #if SWIFT_PACKAGE
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
         #else
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: PubSubPlugin.self), pathComponent: "PubSubPlugin.bundle")
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: PubSubPlugin.self), pathComponent: "PlayerUI_PubSubPlugin.bundle")
         #endif
     }
 

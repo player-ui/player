@@ -12,19 +12,23 @@ import SwiftUI
 import ViewInspector
 
 @testable import PlayerUI
+@testable import PlayerUIReferenceAssets
+@testable import PlayerUITestUtilities
+@testable import PlayerUITestUtilitiesCore
+@testable import PlayerUISwiftUI
+@testable import PlayerUIInternalTestUtilities
 
-extension AssetFlowView: Inspectable {}
-
-class AssetFlowViewTests: ViewInspectorTestCase {
+class AssetFlowViewTests: XCTestCase {
+  override func setUp() {
+        XCUIApplication().terminate()
+    }
     func testVersionBodies() throws {
         let flow = FlowData.COUNTER
 
         let view = AssetFlowView(
             flow: flow,
             plugins: [
-                ReferenceAssetsPlugin(),
-                BeaconPlugin<DefaultBeacon> {_ in},
-                CommonTypesPlugin()
+                ReferenceAssetsPlugin()
             ]
         ) { _ in
         }
@@ -103,8 +107,6 @@ class AssetFlowViewTests: ViewInspectorTestCase {
             flow: flow,
             plugins: [
                 ReferenceAssetsPlugin(),
-                BeaconPlugin<DefaultBeacon> {_ in},
-                CommonTypesPlugin(),
                 ForceTransitionPlugin()
             ]
         ) { _ in
@@ -122,13 +124,17 @@ class ForceTransitionPlugin: NativePlugin {
 
     func apply<P>(player: P) where P: HeadlessPlayer {
         guard let player = player as? SwiftUIPlayer else { return }
-        player.hooks?.viewController.tap { viewController in
-            viewController.hooks.view.tap { view in
-                view.hooks.onUpdate.tap { _ in
+        player.hooks?.flowController.tap({ flowController in
+            flowController.hooks.flow.tap { flow in
+                flow.hooks.afterTransition.tap { _ in
                     guard let state = player.state as? InProgressState else { return }
-                    state.controllers?.flow.transition(with: "Next")
+                    do {
+                        try flowController.transition(with: "NEXT")
+                    } catch {
+                        XCTFail("Transition with 'NEXT' failed")
+                    }
                 }
             }
-        }
+        })
     }
 }

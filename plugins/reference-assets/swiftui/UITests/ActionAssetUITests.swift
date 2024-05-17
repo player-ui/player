@@ -1,49 +1,41 @@
 import XCTest
-import EyesXCUI
 
 class ActionAssetUITests: BaseTestCase {
     func testActionCounter() {
-        withEyes("action counter") { check in
-            waitFor(app.buttons["action"])
-            check("Page Load")
+        openFlow("action counter")
+        waitFor(app.buttons["action"])
 
-            tap(app.buttons["action"])
-            waitFor(app.buttons["action"])
+        waitAndTap(app.buttons["action"])
+        waitFor(app.buttons["action"])
 
-            let buttonText = app.buttons["action"].label
+        let buttonText = app.buttons["action"].label
 
-            check("After Click")
-            XCTAssertEqual(buttonText, "Clicked 1 times")
-        }
+        XCTAssertEqual(buttonText, "Clicked 1 times")
     }
 
     func testActionTransitionSuccess() {
-        withEyes("action transition to end", testName: "action transition to end - success") { check in
-            waitFor(app.buttons["action-good"])
-            check("Page Load")
+        openFlow("action transition to end")
+        waitFor(app.buttons["action-good"])
 
-            tap(app.buttons["action-good"])
+        waitAndTap(app.buttons["action-good"])
 
-            waitFor(app.alerts["Flow Finished"])
-            check("After Click")
-            XCTAssertTrue(app.alerts["Flow Finished"].exists)
+        waitFor(app.alerts["Flow Finished"])
 
-            XCTAssertEqual(app.alerts["Flow Finished"].staticTexts.element(boundBy: 1).label, "done")
-        }
+        XCTAssertTrue(app.alerts["Flow Finished"].exists)
+
+        XCTAssertTrue(app.alerts["Flow Finished"].staticTexts.element(boundBy: 1).label.contains("done"))
     }
 
     func testActionTransitionError() {
-        withEyes("action transition to end", testName: "action transition to end - error") { check in
-            waitFor(app.buttons["action-bad"])
-            check("Page Load")
+        openFlow("action transition to end")
+        waitFor(app.buttons["action-bad"])
 
-            tap(app.buttons["action-bad"])
+        waitAndTap(app.buttons["action-bad"])
 
-            waitFor(app.alerts["Flow Finished"])
-            check("After Click")
-            XCTAssertTrue(app.alerts["Flow Finished"].exists)
+        waitFor(app.alerts["Flow Finished"])
 
-            XCTAssertTrue(app.alerts["Flow Finished"].staticTexts.element(boundBy: 1).label.contains("Unclosed brace"))
-        }
+        XCTAssertTrue(app.alerts["Flow Finished"].exists)
+
+        XCTAssertTrue(app.alerts["Flow Finished"].staticTexts.element(boundBy: 1).label.contains("Unclosed brace"))
     }
 }

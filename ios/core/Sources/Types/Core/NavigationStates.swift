@@ -43,8 +43,8 @@ public class NavigationFlowViewState: NavigationFlowTransitionableState {
     public var ref: String { rawValue.objectForKeyedSubscript("ref").toString() }
 
     /// View meta-properties
-    public var attributes: [String: String]? {
-        rawValue.objectForKeyedSubscript("attributes").toObject() as? [String: String]
+    public var attributes: [String: Any]? {
+        rawValue.objectForKeyedSubscript("attributes").toObject() as? [String: Any]
     }
 
     public subscript<T>(dynamicMember member: String) -> T? {

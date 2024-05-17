@@ -1,27 +1,10 @@
-load("@rules_pkg//:mappings.bzl", "pkg_files", "strip_prefix")
-load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+load("//tools/ios:util.bzl", "ios_pipeline")
 
-load("@build_bazel_rules_ios//rules:test.bzl", "ios_unit_test")
-
-pkg_files(
-    name = "PlayerUILogger_Sources",
-    srcs = glob(["Sources/**/*.swift"]),
-    strip_prefix = strip_prefix.from_pkg(),
-    visibility = ["//visibility:public"],
-)
-
-swift_library(
+ios_pipeline(
     name = "PlayerUILogger",
-    module_name = "PlayerUILogger",
-    srcs = [":PlayerUILogger_Sources"],
-    visibility = ["//visibility:public"],
-    deps = ["@swiftpkg_swift_hooks//:Sources_SwiftHooks"]
-)
-
-ios_unit_test(
-    name = "PlayerUILoggerTests",
-    srcs = glob(["Tests/**/*.swift"]),
-    minimum_os_version = "14.0",
-    deps = [":PlayerUILogger"],
-    visibility = ["//visibility:public"],
+    resources = [],
+    deps = ["@swiftpkg_swift_hooks//:Sources_SwiftHooks"],
+    test_deps = [],
+    hasUnitTests = True,
+    hasViewInspectorTests = False
 )

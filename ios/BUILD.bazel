@@ -6,7 +6,7 @@ load(
 
 xcodeproj(
     name = "xcodeproj",
-    project_name = "Player",
+    project_name = "PlayerUI",
     tags = ["manual"],
     top_level_targets = [
         top_level_target("//ios/demo:PlayerUIDemo", target_environments = ["simulator"]),
@@ -14,8 +14,14 @@ xcodeproj(
         "//ios/logger:PlayerUILoggerTests",
         "//ios/swiftui:PlayerUISwiftUITests",
         "//ios/swiftui:PlayerUISwiftUIViewInspectorTests",
+        "//ios/test-utils-core:PlayerUITestUtilitiesCoreTests",
+        "//ios/test-utils:PlayerUITestUtilitiesTests",
+        "//ios/test-utils:PlayerUITestUtilitiesViewInspectorTests",
 
         # plugins
+	"//plugins/async-node/ios:PlayerUIAsyncNodePluginTests",
+        "//plugins/async-node/ios:PlayerUIAsyncNodePluginViewInspectorTests",
+
         "//plugins/beacon/ios:PlayerUIBaseBeaconPluginTests",
         "//plugins/beacon/swiftui:PlayerUIBeaconPluginViewInspectorTests",
 
@@ -43,6 +49,8 @@ xcodeproj(
 
         "//plugins/reference-assets/swiftui:PlayerUIReferenceAssetsViewInspectorTests",
         "//plugins/reference-assets/swiftui:PlayerUIReferenceAssetsUITests",
+
+        "//plugins/stage-revert-data/ios:PlayerUIStageRevertDataPluginTests",
 
         "//plugins/transition/swiftui:PlayerUITransitionPluginViewInspectorTests",
         "//plugins/types-provider/ios:PlayerUITypesProviderPluginTests"

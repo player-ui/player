@@ -41,6 +41,8 @@ export class ViewController {
   private pendingUpdate?: {
     /** pending data binding changes */
     changedBindings?: Set<BindingInstance>;
+    /** Whether we have a microtask queued to handle this pending update */
+    scheduled?: boolean;
   };
 
   public currentView?: ViewInstance;
@@ -53,10 +55,11 @@ export class ViewController {
   ) {
     this.viewOptions = options;
     this.viewMap = initialViews.reduce<Record<string, View>>(
-      (viewMap, view) => ({
-        ...viewMap,
-        [view.id]: view,
-      }),
+      (viewMap, view) => {
+        // eslint-disable-next-line no-param-reassign
+        viewMap[view.id] = view;
+        return viewMap;
+      },
       {},
     );
 
@@ -76,19 +79,25 @@ export class ViewController {
     );
 
     /** Trigger a view update */
-    const update = (updates: Set<BindingInstance>) => {
+    const update = (updates: Set<BindingInstance>, silent = false) => {
       if (this.currentView) {
         if (this.optimizeUpdates) {
-          this.queueUpdate(updates);
+          this.queueUpdate(updates, silent);
         } else {
           this.currentView.update();
         }
       }
     };
 
-    options.model.hooks.onUpdate.tap("viewController", (updates) => {
-      update(new Set(updates.map((t) => t.binding)));
-    });
+    options.model.hooks.onUpdate.tap(
+      "viewController",
+      (updates, updateOptions) => {
+        update(
+          new Set(updates.map((t) => t.binding)),
+          updateOptions?.silent ?? false,
+        );
+      },
+    );
 
     options.model.hooks.onDelete.tap("viewController", (binding) => {
       const parentBinding = binding.parent();
@@ -103,14 +112,21 @@ export class ViewController {
     });
   }
 
-  private queueUpdate(bindings: Set<BindingInstance>) {
+  private queueUpdate(bindings: Set<BindingInstance>, silent = false) {
     if (this.pendingUpdate?.changedBindings) {
+      // If there's already a pending update, just add to it don't worry about silent updates here yet
       this.pendingUpdate.changedBindings = new Set([
         ...this.pendingUpdate.changedBindings,
         ...bindings,
       ]);
     } else {
-      this.pendingUpdate = { changedBindings: bindings };
+      this.pendingUpdate = { changedBindings: bindings, scheduled: false };
+    }
+
+    // If there's no pending update, schedule one only if this one isn't silent
+    // otherwise if this is silent, we'll just wait for the next non-silent update and make sure our bindings are included
+    if (!this.pendingUpdate.scheduled && !silent) {
+      this.pendingUpdate.scheduled = true;
       queueMicrotask(() => {
         const updates = this.pendingUpdate?.changedBindings;
         this.pendingUpdate = undefined;
