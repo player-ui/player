@@ -8,6 +8,7 @@ def generate_all_dsl_mocks(MOCK_DIRS):
                 mock_dir + "/*.tsx",
             ]),
             input_dir = mock_dir,
+            output_dir = mock_dir,
             config = ":dsl_config",
             data = [
                 ":node_modules/@player-ui/reference-assets-cli-preset",
