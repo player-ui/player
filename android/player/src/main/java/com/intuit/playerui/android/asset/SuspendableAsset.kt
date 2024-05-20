@@ -38,7 +38,6 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
     // To be launched in Dispatchers.Default
     public abstract suspend fun initView(data: Data): View
 
-    @OptIn(InternalPlayerApi::class)
     final override fun initView(): View {
         // ensure we pre-track hydration to ensure all assets are accounted for during async hydration
         player.asyncHydrationTrackerPlugin?.trackHydration(this@SuspendableAsset)

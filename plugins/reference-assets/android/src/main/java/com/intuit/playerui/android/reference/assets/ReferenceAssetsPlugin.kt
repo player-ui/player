@@ -11,6 +11,7 @@ import com.intuit.playerui.android.reference.assets.action.Action
 import com.intuit.playerui.android.reference.assets.collection.Collection
 import com.intuit.playerui.android.reference.assets.info.Info
 import com.intuit.playerui.android.reference.assets.input.Input
+import com.intuit.playerui.android.reference.assets.input.InputCompose
 import com.intuit.playerui.android.reference.assets.text.Text
 import com.intuit.playerui.android.reference.assets.text.TextCompose
 import com.intuit.playerui.core.player.Player
@@ -32,6 +33,7 @@ class ReferenceAssetsPlugin : AndroidPlayerPlugin, JSPluginWrapper by Transforms
         androidPlayer.registerAsset("action", ::Action)
         androidPlayer.registerAsset("text", ::Text)
         androidPlayer.registerAsset("text-compose", ::TextCompose)
+        androidPlayer.registerAsset("input-compose", ::InputCompose)
         androidPlayer.registerAsset("collection", ::Collection)
         androidPlayer.registerAsset("info", ::Info)
         androidPlayer.registerAsset("input", ::Input)
