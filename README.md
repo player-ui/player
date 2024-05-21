@@ -66,3 +66,4 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 ## License
 
 `player` is provided under the [MIT](./LICENSE) license.
+
