@@ -317,6 +317,6 @@ public class AndroidPlayer private constructor(
     public data class Config(
         override var debuggable: Boolean = false,
         override var coroutineExceptionHandler: CoroutineExceptionHandler? = null,
-        override var timeout: Long = if (debuggable) Int.MAX_VALUE.toLong() else 5000
+        override var timeout: Long = if (debuggable) Int.MAX_VALUE.toLong() else 5000,
     ) : PlayerRuntimeConfig()
 }

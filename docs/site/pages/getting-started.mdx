@@ -123,8 +123,8 @@ val player = AndroidPlayer(
 )
 ```
 Apart from providing a list of plugins while setting up `AndroidPlayer`, you can also provide a `config` object that has the following options:
- - `debuggable` - Flag to indicate if this is a debug build
- - `coroutineExceptionHandler` - Custom coroutine exception handler
+ - `debuggable` - Indicates if the runtime is debuggable on android through chromium devtools, enabling this would let you set breakpoints in js code as you're running it on android.
+ - `coroutineExceptionHandler` - [CoroutineExceptionHandler](https://kotlinlang.org/docs/exception-handling.html#coroutineexceptionhandler) should handle all uncaught exceptions while using the runtime coroutine scope.
  - `timeout` - Timeout for the JS thread. If none is provided then it is set as `if (debuggable) Int.MAX_VALUE.toLong() else 5000`.
 
 
