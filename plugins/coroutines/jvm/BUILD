@@ -5,5 +5,5 @@ kt_player_plugin(
     name = "coroutines",
     main_deps = main_deps,
     main_exports = main_exports,
-    test_package = "com.intuit.player.plugins.coroutines",
+    test_package = "com.intuit.playerui.plugins.coroutines",
 )

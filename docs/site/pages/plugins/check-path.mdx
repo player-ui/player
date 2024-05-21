@@ -95,13 +95,13 @@ var body: some View {
 In build.gradle
 
 ```kotlin
-implementation "com.intuit.player.plugins:check-path:$PLAYER_VERSION"
+implementation "com.intuit.playerui.plugins:check-path:$PLAYER_VERSION"
 ```
 
 In Player constructor
 
 ```kotlin
-import com.intuit.player.plugins.checkpath.CheckPathPlugin
+import com.intuit.playerui.plugins.checkpath.CheckPathPlugin
 
 val plugins = listOf(CheckPathPlugin())
 AndroidPlayer(plugins)

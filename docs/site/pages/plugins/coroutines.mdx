@@ -19,12 +19,12 @@ Plugin using a `ReceiveChannel` to provide an updated asset whenever the Player 
 In build.gradle
 
 ```kotlin
-implementation "com.intuit.player.plugins:coroutines:$PLAYER_VERSION"
+implementation "com.intuit.playerui.plugins:coroutines:$PLAYER_VERSION"
 ```
 
 In Player constructor
 ```kotlin
-import com.intuit.player.plugins.coroutines.UpdatesPlugin
+import com.intuit.playerui.plugins.coroutines.UpdatesPlugin
 
 val plugins = listOf(UpdatesPlugin())
 AndroidPlayer(plugins)
@@ -57,12 +57,12 @@ All operations launched using the scope will be cancelled when player changes st
 In build.gradle
 
 ```kotlin
-implementation "com.intuit.player.plugins:coroutines:$PLAYER_VERSION"
+implementation "com.intuit.playerui.plugins:coroutines:$PLAYER_VERSION"
 ```
 
 In Player constructor
 ```kotlin
-import com.intuit.player.plugins.coroutines.FlowScopePlugin
+import com.intuit.playerui.plugins.coroutines.FlowScopePlugin
 
 val plugins = listOf(FlowScopePlugin())
 AndroidPlayer(plugins)
