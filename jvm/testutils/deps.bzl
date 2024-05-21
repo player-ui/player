@@ -12,7 +12,7 @@ main_exports = [
     "//jvm/graaljs",
     "//plugins/common-types/jvm:common-types",
     "//plugins/reference-assets/jvm:reference-assets",
-    #    "//plugins/mocks:jar",
+    "//tools/mocks:jar",
 ]
 
 main_deps = main_exports

@@ -196,7 +196,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         val state = player.state
         assertTrue(state is InProgressState)
         assertEquals(PlayerFlowStatus.IN_PROGRESS, state.status)
-        assertEquals("Symbol(generated-flow)", state.ref)
+        assertEquals("Symbol(collection-basic)", state.ref)
 
         state as InProgressState
         val flowResultCompletable = state.flowResult
