@@ -23,7 +23,7 @@ executors:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   ios:
     working_directory: ~/player
-    resource_class: macos.m1.large.gen1
+    resource_class: macos.x86.medium.gen2
     macos:
       xcode: 15.3.0
     environment:
@@ -125,6 +125,14 @@ jobs:
           device: "iPhone 15"
 
       - run: bazel build --config=ci-mac -- //ios/demo:PlayerUIDemo
+
+      - run:
+          name: Core Prebuild
+          command: |
+            bazel build \
+              --config=ci-mac \
+              $(bazel query 'filter("_native_bundle", //plugins/...)') \
+              $(bazel query 'filter("_native_bundle", //core/...)')
 
       - run:
           name: Test Prebuild

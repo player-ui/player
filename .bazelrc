@@ -89,3 +89,6 @@ fetch --@aspect_rules_ts//ts:skipLibCheck=always
 query --@aspect_rules_ts//ts:skipLibCheck=always
 
 try-import %workspace%/.bazelrc.local
+
+# Bug with Aspect Rules to silence issues about dep checking directories -> https://github.com/aspect-build/rules_js/issues/1408
+startup --host_jvm_args=-DBAZEL_TRACK_SOURCE_DIRECTORIES=1
