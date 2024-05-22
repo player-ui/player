@@ -1,0 +1,12 @@
+import { createConfig } from "%PREFIX%tsup.config";
+import ESBuildPluginExternalGlobal from "esbuild-plugin-external-global";
+
+const overrides: any = {};
+if (process.env.PLAYER_NATIVE_BUNDLE) {
+    overrides.esbuildPlugins = [ESBuildPluginExternalGlobal.externalGlobalPlugin({
+       // TODO: Would be cool to automatically populate this given all the native bundles we create
+      "@player-ui/player": "globalThis.Player",
+    })];
+}
+
+export default createConfig(overrides);
