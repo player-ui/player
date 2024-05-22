@@ -17,3 +17,6 @@ identifier_name:
         - drop_down
         - radio_button
         - search_input
+included:
+    - ios
+    - plugins

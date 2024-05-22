@@ -55,9 +55,7 @@ xcodeproj(
         "//plugins/transition/swiftui:PlayerUITransitionPluginViewInspectorTests",
         "//plugins/types-provider/ios:PlayerUITypesProviderPluginTests",
 
-        "@SwiftLint//:swiftlint",
-        "@SwiftLint//Tests:ExtraRulesTests"
-
+        "@SwiftLint//:swiftlint"
 
     ],
 )

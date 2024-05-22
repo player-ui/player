@@ -57,6 +57,25 @@ def ios_pipeline(
   needsXCTest = False,
   bundle_name = None
 ):
+
+  native.sh_test(
+      name = "ios_lint_test",
+      srcs = ["//:.sample.sh"],
+      data = ["swiftlint_genrule"],
+  )
+
+  native.genrule(
+  name = "swiftlint_genrule",
+  tools = [
+    "@SwiftLint//:swiftlint"
+  ],
+
+  srcs = native.glob(["Sources/**/*.swift"]),
+  outs = ["output_file1.txt"],
+  cmd="""
+   $(location @SwiftLint//:swiftlint) $(SRCS) > $@
+  """
+)
   """Packages source files, creates swift library and tests for a swift PlayerUI plugin
 
   Args:
