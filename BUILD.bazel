@@ -249,3 +249,5 @@ gazelle(
     name = "update_build_files",
     gazelle = ":gazelle_bin",
 )
+
+exports_files([".sample.sh"])
