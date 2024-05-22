@@ -2,7 +2,8 @@ load("@aspect_rules_js//js:defs.bzl", "js_library")
 
 exports_files([
     "tsup.config.ts.tmpl",
-    "vitest.config.mts.tmpl",
+    "tsup.config.native.ts.tmpl",
+    "vitest.config.ts.tmpl",
 ])
 
 js_library(
