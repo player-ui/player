@@ -29,24 +29,6 @@ describe("Input Asset Transform", () => {
           binding: "foo.bar",
         },
       ],
-      data: {},
-      navigation: {
-        BEGIN: "FLOW_1",
-        FLOW_1: {
-          startState: "VIEW_1",
-          VIEW_1: {
-            state_type: "VIEW",
-            ref: "input-1",
-            transitions: {
-              "*": "END_Done",
-            },
-          },
-          END_Done: {
-            state_type: "END",
-            outcome: "done",
-          },
-        },
-      },
       schema: {
         ROOT: {
           foo: {
@@ -96,23 +78,6 @@ describe("Input Asset Transform", () => {
         },
       ],
       data: {},
-      navigation: {
-        BEGIN: "FLOW_1",
-        FLOW_1: {
-          startState: "VIEW_1",
-          VIEW_1: {
-            state_type: "VIEW",
-            ref: "input-1",
-            transitions: {
-              "*": "END_Done",
-            },
-          },
-          END_Done: {
-            state_type: "END",
-            outcome: "done",
-          },
-        },
-      },
       schema: {
         ROOT: {
           foo: {
