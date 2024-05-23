@@ -187,9 +187,9 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
         override fun onAttachedToWindow() {}
 
         @SuppressLint("MissingSuperCall")
-        override fun draw(canvas: Canvas?) {}
+        override fun draw(canvas: Canvas) {}
 
-        override fun dispatchDraw(canvas: Canvas?) {}
+        override fun dispatchDraw(canvas: Canvas) {}
 
         private fun replaceSelfWithView(view: View) {
             val parent = parent as? ViewGroup ?: return

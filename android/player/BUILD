@@ -1,5 +1,6 @@
 load(":defs.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
 load("@build_constants//:constants.bzl", "VERSION")
+load("@rules_kotlin//kotlin:core.bzl", "kt_kotlinc_options")
 load("//jvm:defs.bzl", "distribution")
 load("@grab_bazel_common//tools/databinding:databinding.bzl", "kt_db_android_library")
 load("@rules_android//android:rules.bzl", "android_binary", "android_library")

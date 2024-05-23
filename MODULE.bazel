@@ -234,5 +234,8 @@ maven.install(
 )
 use_repo(maven, "maven")
 
+# Attempted to use this for annotation opt-ins, doesn't work
+# register_toolchains("//jvm:kotlin_toolchain")
+
 
 
