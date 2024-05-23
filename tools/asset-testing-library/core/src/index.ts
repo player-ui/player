@@ -1,4 +1,4 @@
-import type { TransformFunction, Asset, Flow, View } from "@player-ui/player";
+import type { TransformFunction, Asset, Flow, View, PlayerPlugin } from "@player-ui/player";
 import { Player } from "@player-ui/player";
 import { AssetTransformPlugin } from '@player-ui/asset-transform-plugin';
 import { makeFlow } from '@player-ui/make-flow';
@@ -12,10 +12,11 @@ export function runTransform<
 >(
   type: string,
   transform: TransformFunction<BaseAssetType, TransformedAssetType>,
-  content: BaseAssetType | Flow | Array<View>
+  content: BaseAssetType | Flow | Array<View>,
+  plugins: PlayerPlugin[] = [],
 ) {
   const player = new Player({
-    plugins: [new AssetTransformPlugin([[{ type }, transform]])],
+    plugins: [new AssetTransformPlugin([[{ type }, transform]]), ...plugins],
   });
 
   player.start(makeFlow(content));

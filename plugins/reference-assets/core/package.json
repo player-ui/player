@@ -7,7 +7,8 @@
     "@player-ui/beacon-plugin": "workspace:*"
   },
   "devDependencies": {
-    "@player-ui/asset-testing-library": "workspace:*"
+    "@player-ui/asset-testing-library": "workspace:*",
+    "@player-ui/common-types-plugin": "workspace:*"
   },
   "peerDependencies": {
     "@player-ui/player": "workspace:*"

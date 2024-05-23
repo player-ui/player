@@ -863,6 +863,9 @@ importers:
       '@player-ui/asset-testing-library':
         specifier: workspace:*
         version: link:../../../tools/asset-testing-library/core
+      '@player-ui/common-types-plugin':
+        specifier: workspace:*
+        version: link:../../common-types/core
 
   plugins/reference-assets/mocks:
     dependencies:

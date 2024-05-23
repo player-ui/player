@@ -17,6 +17,7 @@ js_pipeline(
     test_deps = [
         ":node_modules/@player-ui/asset-testing-library",
         "//:vitest_config",
+        ":node_modules/@player-ui/common-types-plugin"
     ],
     deps = [
         ":node_modules/@player-ui/asset-transform-plugin",
