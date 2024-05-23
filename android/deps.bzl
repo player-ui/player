@@ -1,6 +1,6 @@
 load("//jvm/dependencies:versions.bzl", "versions")
 load("//android/player:deps.bzl", player = "maven")
-load("//android/demo:deps.bzl", demo = "maven")
+load("//android/demo:defs.bzl", demo = "maven")
 
 android = [
     # Grab Databinding

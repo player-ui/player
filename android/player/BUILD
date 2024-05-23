@@ -1,9 +1,9 @@
-load(":deps.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
+load(":defs.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
 load("@build_constants//:constants.bzl", "VERSION")
 load("//jvm:defs.bzl", "distribution")
-load("@junit//junit5-jupiter-starter-bazel:junit5.bzl", "kt_jvm_junit5_test")
-load("@rules_player//kotlin:lint.bzl", "lint")
 load("@grab_bazel_common//tools/databinding:databinding.bzl", "kt_db_android_library")
+load("@rules_android//android:rules.bzl", "android_binary", "android_library")
+load("@rules_player//kotlin:defs.bzl", "kt_jvm_junit5_test", "lint")
 
 kt_db_android_library(
     name = "player",
@@ -14,15 +14,14 @@ kt_db_android_library(
     resources = main_resources,
     tags = ["maven_coordinates=com.intuit.playerui:android:aar:%s" % VERSION],
     visibility = ["//visibility:public"],
-    exports = main_exports,
     deps = main_deps,
 )
 
-distribution(
-    name = "player",
-    lib_name = "player-databinding",
-    maven_coordinates = "com.intuit.playerui:android:%s" % VERSION,
-)
+#distribution(
+#    name = "player",
+#    lib_name = "player-databinding",
+#    maven_coordinates = "com.intuit.playerui:android:%s" % VERSION,
+#)
 
 kt_jvm_junit5_test(
     name = "player-tests",

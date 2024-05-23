@@ -1,5 +1,4 @@
 load("//jvm/dependencies:versions.bzl", "versions")
-load("@rules_player//maven:defs.bzl", "parse_coordinates")
 
 maven = [
     "androidx.test:core:%s" % versions.androidx.test.core,
@@ -9,7 +8,7 @@ maven = [
     "org.jetbrains.kotlinx:kotlinx-coroutines-test:%s" % versions.kotlin.coroutines,
 ]
 
-main_deps = parse_coordinates(maven) + [
+main_deps = [
     "//plugins/mocks:jar",
     "@robolectric//bazel:android-all",
     "//jvm/utils",
