@@ -249,3 +249,26 @@ gazelle(
     name = "update_build_files",
     gazelle = ":gazelle_bin",
 )
+
+alias(
+    name = "android_tools",
+    actual = "@bazel_tools//src/tools/android/java/com/google/devtools/build/android:all_android_tools",
+    visibility = ["//visibility:public"],
+)
+
+java_plugin(
+    name = "compiler_annotation_processor",
+    generates_api = False,
+    processor_class = "android.databinding.annotationprocessor.ProcessDataBinding",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":android_tools",
+    ],
+)
+
+java_import(
+    name = "android_sdk",
+    jars = ["@bazel_tools//tools/android:android_jar"],
+    neverlink = 1,
+    visibility = ["//visibility:public"],
+)

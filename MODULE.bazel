@@ -98,6 +98,16 @@ bazel_dep(name = "rules_android", version = "0.1.1")
 #    "@rules_android//toolchains/android_sdk:android_sdk_tools",
 #)
 
+bazel_dep(name = "grab_bazel_common")
+local_path_override(module_name = "grab_bazel_common", path = "../grab-bazel-common")
+
+#bazel_common_setup = use_extension("@grab_bazel_common//rules:setup.bzl", "ext")
+#bazel_common_setup.setup(
+#    patched_android_tools = True, # Optionally use patched android_tools jars
+#    buildifier_version = "6.3.3",
+#    pinned_maven_install = True,
+#)
+
 remote_android_extensions = use_extension("@bazel_tools//tools/android:android_extensions.bzl", "remote_android_tools_extensions")
 use_repo(remote_android_extensions, "android_gmaven_r8")
 
@@ -120,7 +130,7 @@ maven.install(
         # Testing
         "io.mockk:mockk:1.9.3",
         "org.amshove.kluent:kluent:1.68",
-        "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2",
+        "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0",
 
         # Android
         "androidx.databinding:databinding-adapters:7.2.2",

@@ -27,7 +27,7 @@ kt_db_android_library(
 kt_jvm_junit5_test(
     name = "player-tests",
     srcs = glob(["src/test/java/**"]),
-    associates = [":player-kotlin"],
+    associates = [":player_kt"],
     kotlinc_opts = "//jvm:test_options",
     test_package = "com.intuit.playerui.android",
     deps = [":player"] + test_deps,

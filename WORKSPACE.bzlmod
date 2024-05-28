@@ -8,15 +8,20 @@ android_sdk_repository(
     name = "androidsdk",
 )
 
-git_repository(
-    name = "grab_bazel_common",
-    commit = "9a783408c28e70f8b96d0326aeb2bb2c31d2b590",
-    remote = "https://github.com/brocollie08/grab-bazel-common.git",
-)
+#git_repository(
+#    name = "grab_bazel_common",
+#    commit = "0d92aeec448b39018b9a8df158f5568910e78571",
+#    remote = "https://github.com/brocollie08/grab-bazel-common.git",
+#)
 
 load("@grab_bazel_common//rules:repositories.bzl", "bazel_common_dependencies")
 
 bazel_common_dependencies()
+
+bind(
+    name = "databinding_annotation_processor",
+    actual = "//:compiler_annotation_processor",
+)
 
 load("@grab_bazel_common//rules:setup.bzl", "bazel_common_setup")
 
@@ -25,8 +30,10 @@ bazel_common_setup(
     buildifier_version = "6.3.3",
 )
 
-load("@grab_bazel_common//rules:maven.bzl", "pin_bazel_common_dependencies")
-pin_bazel_common_dependencies()
+#load(":android.bzl", "android")
+#android()
+#load("@grab_bazel_common//rules:maven.bzl", "pin_bazel_common_dependencies")
+#pin_bazel_common_dependencies()
 
 http_file(
     name = "android_test_orchestrator_apk",
