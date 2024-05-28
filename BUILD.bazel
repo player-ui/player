@@ -1,9 +1,10 @@
 # load("@rules_player//cocoapods:cocoapod.bzl", "pod_push")
 # load("@rules_player//internal:stamp.bzl", "stamp")
 load("//tools/ios:util.bzl", "assemble_pod")
-
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@bazel_gazelle//:def.bzl", "gazelle", "gazelle_binary")
+load("@rules_swift_package_manager//swiftpkg:defs.bzl", "swift_update_packages")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -21,6 +22,7 @@ exports_files([
     ".editorconfig",
     ".all-contributorsrc",
     "README.md",
+    # "patches/@chakra-ui__system@2.6.2.patch",
 ])
 
 js_library(
@@ -94,7 +96,7 @@ js_library(
 # )
 
 exports_files([
-    "PlayerUI.podspec"
+    "PlayerUI.podspec",
 ])
 
 assemble_pod(
@@ -201,9 +203,6 @@ assemble_pod(
 #     ],
 # )
 
-load("@bazel_gazelle//:def.bzl", "gazelle", "gazelle_binary")
-load("@rules_swift_package_manager//swiftpkg:defs.bzl", "swift_update_packages")
-
 # Ignore the `.build` folder that is created by running Swift package manager
 # commands. The Swift Gazelle plugin executes some Swift package manager
 # commands to resolve external dependencies. This results in a `.build` file
@@ -236,11 +235,11 @@ gazelle_binary(
 swift_update_packages(
     name = "swift_update_pkgs",
     gazelle = ":gazelle_bin",
+    generate_swift_deps_for_workspace = True,
+    package_manifest = "./xcode/Package.swift",
     swift_deps = "swift_deps.bzl",
     swift_deps_index = "swift_deps_index.json",
-    generate_swift_deps_for_workspace = True,
     update_bzlmod_stanzas = False,
-    package_manifest = "./xcode/Package.swift"
 )
 
 # This target updates the Bazel build files for your project. Run this target

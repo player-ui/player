@@ -1,5 +1,5 @@
 {
-  "exclude": ["node_modules", "_backup", "bazel-*"],
+  "exclude": ["node_modules", "bazel-*"],
   "compilerOptions": {
     "jsx": "react",
     "emitDeclarationOnly": true,

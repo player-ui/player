@@ -60,6 +60,7 @@ npm.npm_translate_lock(
     pnpm_lock = "//:pnpm-lock.yaml",
     data = [
         "//:package.json",
+        "//:patches/@chakra-ui__system@2.6.2.patch",
     ],
     npmrc = "//:.npmrc",
     verify_node_modules_ignored = "//:.bazelignore",
