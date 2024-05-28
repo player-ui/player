@@ -150,7 +150,7 @@ jobs:
               $(bazel query "kind(ios_unit_test, //ios/...)") \
               $(bazel query "kind(ios_unit_test, //plugins/...)") \
               $(bazel query "kind(ios_ui_test, //ios/...)") \
-              $(bazel query "kind(ios_ui_test, //plugins/...)")
+              $(bazel query "kind(ios_ui_test, //plugins/...)") \
               $(bazel query "kind(ios_lint_test, //ios/...)") \
               $(bazel query "kind(ios_lint_test, //plugins/...)") 
 
