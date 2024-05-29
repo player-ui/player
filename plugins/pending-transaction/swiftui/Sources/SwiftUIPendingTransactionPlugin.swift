@@ -23,7 +23,8 @@ public class SwiftUIPendingTransactionPlugin<T>: NativePlugin where T: Identifia
     /**
      Constructs the SwiftUIPendingTransactionPlugin
      - parameters:
-        - keypath: Takes a keypath from the EnvironmentValues extension with generics of the TransactionContext<T> matching a user defined object, `\.transactionContext` which uses TransactionContext<PendingTransactionPhases> is the default.
+        - keypath: Takes a keypath from the EnvironmentValues extension with generics of the TransactionContext<T> matching a user defined object,
+                   `\.transactionContext` which uses TransactionContext<PendingTransactionPhases> is the default.
      */
     public init(keyPath: WritableKeyPath<EnvironmentValues, TransactionContext<T>>) {
         self.keyPath = keyPath
