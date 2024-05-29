@@ -20,7 +20,7 @@ main_deps = maven_main + [
     "//plugins/reference-assets/android:assets",
     "//plugins/common-types/jvm:common-types",
     "//plugins/pending-transaction/jvm:pending-transaction",
-    "//plugins/reference-assets/mocks:mocks",
+    "//tools/mocks:jar",
 ]
 
 test_deps = maven_test + [

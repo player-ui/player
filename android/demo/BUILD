@@ -57,13 +57,13 @@ kt_android_library(
     deps = test_deps + [":demo_lib"],
 )
 
-#android_binary(
-#    name = "demo_test_app",
-#    custom_package = "com.intuit.playerui.android.reference.demo",
-#    instruments = ":demo",
-#    manifest = ":src/androidTest/AndroidManifest.xml",
-#    deps = ["demo_ui_test"],
-#)
+android_binary(
+    name = "demo_test_app",
+    custom_package = "com.intuit.playerui.android.reference.demo",
+    instruments = ":demo",
+    manifest = ":src/androidTest/AndroidManifest.xml",
+    deps = ["demo_ui_test"],
+)
 
 sh_binary(
     name = "install",
