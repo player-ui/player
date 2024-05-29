@@ -11,12 +11,6 @@ function_body_length: 50
 identifier_name:
     excluded:
         - id
-        - file_input
-        - text_input
-        - check_box
-        - drop_down
-        - radio_button
-        - search_input
 included:
     - ios
     - plugins
