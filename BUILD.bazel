@@ -250,4 +250,4 @@ gazelle(
 )
 
 #dummy file
-exports_files([".sample.sh"])
+exports_files([".sample.sh", ".swiftlint.yml"])

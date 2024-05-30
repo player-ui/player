@@ -69,11 +69,10 @@ def ios_pipeline(
   tools = [
     "@SwiftLint//:swiftlint"
   ],
-
-  srcs = native.glob(["Sources/**/*.swift"]),
+  srcs = native.glob(["Sources/**/*.swift"]) + ["//:.swiftlint.yml"],
   outs = ["output_file1.txt"],
   cmd="""
-   $(location @SwiftLint//:swiftlint) $(SRCS) > $@
+   $(location @SwiftLint//:swiftlint) --config $(location //:.swiftlint.yml) $(SRCS) > $@
   """
 )
   """Packages source files, creates swift library and tests for a swift PlayerUI plugin
