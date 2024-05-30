@@ -382,7 +382,7 @@ test('should call onAsyncNode hook when async node is encountered', async () => 
 
   // Call the deferredResolve with type 'Async'
   if (deferredResolve) {
-    //we are passing the objects variable to the deferredResolve function and then expecting the type of the object to be 'Async'
+    // we are passing the objects variable to the deferredResolve function and then expecting the type of the object to be 'Async'
     const objects = [
       {
         asset: {
@@ -393,12 +393,13 @@ test('should call onAsyncNode hook when async node is encountered', async () => 
       },
       {
         id: 'another-async',
-        type: 'Async',
+        type: NodeType.Async,
         async: true,
       },
     ];
     deferredResolve(objects);
-    const types = objects.map(obj => obj.asset ? obj.asset.type : obj.type);
-    expect(types).toContain('Async');
+    const types = objects.map((obj) => (obj.asset ? obj.asset.type : obj.type));
+    // eslint-disable-next-line jest/no-conditional-expect
+    expect(types).toContain(NodeType.Async);
   }
 });
