@@ -43,7 +43,7 @@ test('replaces async nodes with provided node', async () => {
 
   let deferredResolve: ((value: any) => void) | undefined;
 
-  plugin.hooks.onAsyncNode.tap('test', async (node: Node.Node) => {
+  plugin.hooks.onAsyncNode.tap('test', async (node: Node.Async) => {
     return new Promise((resolve) => {
       deferredResolve = resolve;
     });
@@ -167,7 +167,7 @@ test('replaces async nodes with chained multiNodes', async () => {
 
   let deferredResolve: ((value: any) => void) | undefined;
 
-  plugin.hooks.onAsyncNode.tap('test', async (node: Node.Node) => {
+  plugin.hooks.onAsyncNode.tap('test', async (node: Node.Async) => {
     return new Promise((resolve) => {
       deferredResolve = resolve;
     });
@@ -262,7 +262,7 @@ test('replaces async nodes with chained multiNodes singular', async () => {
 
   let deferredResolve: ((value: any) => void) | undefined;
 
-  plugin.hooks.onAsyncNode.tap('test', async (node: Node.Node) => {
+  plugin.hooks.onAsyncNode.tap('test', async (node: Node.Async) => {
     return new Promise((resolve) => {
       deferredResolve = resolve;
     });
@@ -339,4 +339,67 @@ test('replaces async nodes with chained multiNodes singular', async () => {
   expect(view?.actions[0].asset.type).toBe('action');
   expect(view?.actions[1].asset.type).toBe('text');
   expect(view?.actions[2].asset.type).toBe('text');
+});
+
+test('should call onAsyncNode hook when async node is encountered', async () => {
+  const plugin = new AsyncNodePlugin();
+
+  let deferredResolve: ((value: any) => void) | undefined;
+
+  plugin.hooks.onAsyncNode.tap('test', async (node: Node.Async) => {
+    return new Promise((resolve) => {
+      deferredResolve = resolve;
+    });
+  });
+  let updateNumber = 0;
+
+  const player = new Player({ plugins: [plugin] });
+
+  player.hooks.viewController.tap('async-node-test', (vc) => {
+    vc.hooks.view.tap('async-node-test', (view) => {
+      view.hooks.onUpdate.tap('async-node-test', (update) => {
+        updateNumber++;
+      });
+    });
+  });
+
+  player.start(basicFRFWithActions as any);
+
+  let view = (player.getState() as InProgressState).controllers.view.currentView
+    ?.lastUpdate;
+
+  expect(view).toBeDefined();
+  expect(view?.actions[1]).toBeUndefined();
+
+  await waitFor(() => {
+    expect(updateNumber).toBe(1);
+    expect(deferredResolve).toBeDefined();
+  });
+
+  if (deferredResolve) {
+    deferredResolve([
+      {
+        asset: {
+          id: 'value-1',
+          type: 'text',
+          value: '1st value in the multinode',
+        },
+      },
+      {
+        id: 'another-async',
+        async: true,
+      },
+    ]);
+  }
+
+  await waitFor(() => {
+    expect(updateNumber).toBe(2);
+  });
+
+  view = (player.getState() as InProgressState).controllers.view.currentView
+    ?.lastUpdate;
+
+  expect(view?.actions[0].asset.type).toBe('action');
+  expect(view?.actions[1].asset.type).toBe('text');
+  expect(view?.actions[2]).toBeUndefined();
 });
