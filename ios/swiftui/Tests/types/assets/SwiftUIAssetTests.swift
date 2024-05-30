@@ -13,6 +13,7 @@ import JavaScriptCore
 @testable import PlayerUI
 @testable import PlayerUISwiftUI
 @testable import PlayerUILogger
+@testable import PlayerUIReferenceAssets
 
 class SwiftUIAssetTests: XCTestCase {
     let context: JSContext = JSContext()
