@@ -10,7 +10,7 @@ async function setup() {
 
   initializedPromise = initialize({
     worker: true,
-    wasmURL: "https://unpkg.com/esbuild-wasm@0.19.9/esbuild.wasm",
+    wasmURL: "https://unpkg.com/esbuild-wasm@0.19.12/esbuild.wasm",
   });
 
   return initializedPromise;
