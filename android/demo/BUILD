@@ -31,17 +31,6 @@ android_binary(
     ],
 )
 
-#kt_jvm_import(
-#    name = "kotlinx_coroutines_core_jvm_fixed",
-#    jars = ["@kotlinx_coroutines_core_fixed//:v1/https/repo1.maven.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-core-jvm/1.5.2/kotlinx-coroutines-core-jvm-1.5.2.jar"],
-#    visibility = ["//visibility:public"],
-#    deps = [
-#        ":sun_dependencies_neverlink",
-#        "@maven//:org_jetbrains_kotlin_kotlin_stdlib_common",
-#        "@maven//:org_jetbrains_kotlin_kotlin_stdlib_jdk8",
-#    ],
-#)
-
 java_library(
     name = "sun_dependencies_neverlink",
     srcs = [
