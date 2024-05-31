@@ -17,7 +17,7 @@ export * from './types';
  */
 export class AsyncNodePlugin implements PlayerPlugin {
   public readonly hooks = {
-    onAsyncNode: new AsyncParallelBailHook<[Node.Async], any>(),
+    onAsyncNode: new AsyncParallelBailHook<[Node.Node], Node.Node>(),
   };
 
   name = 'AsyncNode';
