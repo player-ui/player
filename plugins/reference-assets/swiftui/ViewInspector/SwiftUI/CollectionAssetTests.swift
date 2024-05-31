@@ -17,10 +17,7 @@ import SwiftUI
 @testable import PlayerUISwiftUI
 
 class CollectionAssetTests: SwiftUIAssetUnitTestCase {
-    override func register(registry: SwiftUIRegistry) {
-        registry.register("collection", asset: CollectionAsset.self)
-        registry.register("text", asset: TextAsset.self)
-    }
+    override open func plugins() -> [NativePlugin] { [ReferenceAssetsPlugin()] }
 
     func testDecoding() async throws {
         let json = """

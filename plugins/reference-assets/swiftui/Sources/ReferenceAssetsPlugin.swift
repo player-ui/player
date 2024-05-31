@@ -15,12 +15,12 @@ public class ReferenceAssetsPlugin: JSBasePlugin, NativePlugin {
        - player: The `HeadlessPlayer` that is applying this plugin
     */
     public func apply<P>(player: P) where P: HeadlessPlayer {
-        if let player = player as? SwiftUIPlayer {
-            player.assetRegistry.register("action", asset: ActionAsset.self)
-            player.assetRegistry.register("text", asset: TextAsset.self)
-            player.assetRegistry.register("collection", asset: CollectionAsset.self)
-            player.assetRegistry.register("input", asset: InputAsset.self)
-            player.assetRegistry.register("info", asset: InfoAsset.self)
+        if let registry = player.assetRegistry as? SwiftUIRegistry {
+            registry.register("action", asset: ActionAsset.self)
+            registry.register("text", asset: TextAsset.self)
+            registry.register("collection", asset: CollectionAsset.self)
+            registry.register("input", asset: InputAsset.self)
+            registry.register("info", asset: InfoAsset.self)
         }
     }
     /**
