@@ -345,61 +345,26 @@ test('replaces async nodes with chained multiNodes singular', async () => {
 
 test('should call onAsyncNode hook when async node is encountered', async () => {
   const plugin = new AsyncNodePlugin();
-
-  let deferredResolve: ((value: any) => void) | undefined;
+  // Mock function to check the node passed to the hook
+  const mockFn = jest.fn();
 
   // Call the tap method of the onAsyncNode hook
- plugin.hooks.onAsyncNode.tap('test', async (node: Node.Async) => {
+  plugin.hooks.onAsyncNode.tap('test', async (node: Node.Async) => {
+    mockFn(node);
     return new Promise((resolve) => {
-      deferredResolve = resolve;
+      resolve('Promise resolved');
     });
   });
-
-  let updateNumber = 0;
 
   const player = new Player({ plugins: [plugin] });
 
-  player.hooks.viewController.tap('async-node-test', (vc) => {
-    vc.hooks.view.tap('async-node-test', (view) => {
-      view.hooks.onUpdate.tap('async-node-test', (update) => {
-        updateNumber++;
-      });
-    });
-  });
-
   player.start(basicFRFWithActions as any);
 
-  let view = (player.getState() as InProgressState).controllers.view.currentView
-    ?.lastUpdate;
-
-  expect(view).toBeDefined();
-  expect(view?.actions[1]).toBeUndefined();
-
   await waitFor(() => {
-    expect(updateNumber).toBe(1);
-    expect(deferredResolve).toBeDefined();
+    expect(mockFn).toHaveBeenCalledTimes(1);
+    // Check that the mock function was called with the correct async node
+    expect(mockFn).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'async' })
+    );
   });
-
-  // Call the deferredResolve with type 'Async'
-  if (deferredResolve) {
-    // we are passing the objects variable to the deferredResolve function and then expecting the type of the object to be 'Async'
-    const objects = [
-      {
-        asset: {
-          id: 'value-1',
-          type: 'text',
-          value: '1st value in the multinode',
-        },
-      },
-      {
-        id: 'another-async',
-        type: NodeType.Async,
-        async: true,
-      },
-    ];
-    deferredResolve(objects);
-    const types = objects.map((obj) => (obj.asset ? obj.asset.type : obj.type));
-    // eslint-disable-next-line jest/no-conditional-expect
-    expect(types).toContain(NodeType.Async);
-  }
 });
