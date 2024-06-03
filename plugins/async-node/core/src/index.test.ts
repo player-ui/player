@@ -1,9 +1,9 @@
 import type { Node, InProgressState } from '@player-ui/player';
 import { NodeType, Player } from '@player-ui/player';
 import { waitFor } from '@testing-library/react';
-import { AsyncNodePlugin } from './index';
 import { any } from 'parsimmon';
 import { type } from 'node:os';
+import { AsyncNodePlugin } from './index';
 
 jest.useFakeTimers();
 
@@ -345,12 +345,13 @@ test('replaces async nodes with chained multiNodes singular', async () => {
 
 test('should call onAsyncNode hook when async node is encountered', async () => {
   const plugin = new AsyncNodePlugin();
-  // Mock function to check the node passed to the hook
-  const mockFn = jest.fn();
-
-  // Call the tap method of the onAsyncNode hook
+  let localNode: Node.Async;
   plugin.hooks.onAsyncNode.tap('test', async (node: Node.Async) => {
-    mockFn(node);
+    if (node !== null) {
+      // assigns node value to a local variable
+      localNode = node;
+    }
+
     return new Promise((resolve) => {
       resolve('Promise resolved');
     });
@@ -361,10 +362,7 @@ test('should call onAsyncNode hook when async node is encountered', async () => 
   player.start(basicFRFWithActions as any);
 
   await waitFor(() => {
-    expect(mockFn).toHaveBeenCalledTimes(1);
-    // Check that the mock function was called with the correct async node
-    expect(mockFn).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'async' })
-    );
+    expect(localNode.id).toStrictEqual('uhh');
+    expect(localNode.type).toStrictEqual('async');
   });
 });
