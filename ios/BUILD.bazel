@@ -53,9 +53,6 @@ xcodeproj(
         "//plugins/stage-revert-data/ios:PlayerUIStageRevertDataPluginTests",
 
         "//plugins/transition/swiftui:PlayerUITransitionPluginViewInspectorTests",
-        "//plugins/types-provider/ios:PlayerUITypesProviderPluginTests",
-
-        "@SwiftLint//:swiftlint"
-
+        "//plugins/types-provider/ios:PlayerUITypesProviderPluginTests"
     ],
 )

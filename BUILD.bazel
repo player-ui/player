@@ -250,4 +250,4 @@ gazelle(
 )
 
 #SwiftLint
-exports_files([".swiftlint.yml", "output.sh"])
+exports_files([".swiftlint.yml"])
