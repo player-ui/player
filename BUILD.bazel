@@ -249,5 +249,5 @@ gazelle(
     gazelle = ":gazelle_bin",
 )
 
-#dummy file
-exports_files([".sample.sh", ".swiftlint.yml"])
+#SwiftLint
+exports_files([".swiftlint.yml", "output.sh"])

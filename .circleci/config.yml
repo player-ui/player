@@ -135,8 +135,8 @@ jobs:
               $(bazel query "kind(ios_unit_test, //plugins/...)") \
               $(bazel query "kind(ios_ui_test, //ios/...)") \
               $(bazel query "kind(ios_ui_test, //plugins/...)") \
-              $(bazel query "attr(name, "ios_lint_test", //ios/...)") \
-              $(bazel query "attr(name, "ios_lint_test", //plugins/...)")
+              $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
+              $(bazel query "attr(name, '.*SwiftLint', //plugins/...)")
       - run:
           name: Tests
           command: |
@@ -151,8 +151,8 @@ jobs:
               $(bazel query "kind(ios_unit_test, //plugins/...)") \
               $(bazel query "kind(ios_ui_test, //ios/...)") \
               $(bazel query "kind(ios_ui_test, //plugins/...)") \
-              $(bazel query "attr(name, "ios_lint_test", //ios/...)") \
-              $(bazel query "attr(name, "ios_lint_test", //plugins/...)")
+              $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
+              $(bazel query "attr(name, '.*SwiftLint', //plugins/...)")
 
       - run:
           when: always

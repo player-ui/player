@@ -59,22 +59,34 @@ def ios_pipeline(
 ):
 
   native.sh_test(
-      name = "ios_lint_test",
-      srcs = ["//:.sample.sh"],
-      data = ["swiftlint_genrule"],
+    name = name + "SwiftLint",
+    srcs = [":"+ name + "_Lint"]
   )
 
   native.genrule(
-  name = "swiftlint_genrule",
-  tools = [
-    "@SwiftLint//:swiftlint"
-  ],
-  srcs = native.glob(["Sources/**/*.swift"]) + ["//:.swiftlint.yml"],
-  outs = ["output_file1.txt"],
-  cmd="""
-   $(location @SwiftLint//:swiftlint) --config $(location //:.swiftlint.yml) $(SRCS) > $@
+    name = name + "_Lint",
+    tools = [
+      "@SwiftLint//:swiftlint"
+    ],
+    srcs = native.glob(["Sources/**/*.swift"]) + ["//:.swiftlint.yml"],
+    outs = ["output.sh"],
+    executable = True,
+    cmd="""
+      echo `$(location @SwiftLint//:swiftlint) --config $(location //:.swiftlint.yml) $(SRCS) || true` > lint_results.txt
+      LINT=$$(cat lint_results.txt)
+
+      echo '#!/bin/bash' > $(location output.sh)
+      echo "echo '$$LINT'" > $(location output.sh)
+
+      LINESWITHERROR=$$(echo grep error lint_results.txt) || true
+
+      if $$LINESWITHERROR=0; then
+        echo "exit 0" >> $(location output.sh)
+      fi 
+        echo "exit $$(($$LINESWITHERROR) | wc -l)" >> $(location output.sh)
   """
-)
+  )
+  
   """Packages source files, creates swift library and tests for a swift PlayerUI plugin
 
   Args:
