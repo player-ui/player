@@ -16,9 +16,8 @@ import SwiftUI
 @testable import PlayerUITestUtilities
 
 class TextAssetTests: SwiftUIAssetUnitTestCase {
-    override func register(registry: SwiftUIRegistry) {
-        registry.register("text", asset: TextAsset.self)
-    }
+    override open func plugins() -> [NativePlugin] { [ReferenceAssetsPlugin()] }
+
     func testAssetDecoding() async throws {
         let json = """
         {
