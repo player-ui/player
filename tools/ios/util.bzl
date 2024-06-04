@@ -60,7 +60,8 @@ def ios_pipeline(
 
   native.sh_test(
     name = name + "SwiftLint",
-    srcs = [":"+ name + "_Lint"]
+    srcs = [":"+ name + "_Lint"],
+    visibility = ["//visibility:public"],
   )
 
   native.genrule(
@@ -71,6 +72,7 @@ def ios_pipeline(
     srcs = native.glob(["Sources/**/*.swift"]) + ["//:.swiftlint.yml"],
     outs = ["output.sh"],
     executable = True,
+    visibility = ["//visibility:public"],
     cmd="""
       echo `$(location @SwiftLint//:swiftlint) --config $(location //:.swiftlint.yml) $(SRCS) || true` > lint_results.txt
       LINT=$$(cat lint_results.txt)
@@ -78,12 +80,8 @@ def ios_pipeline(
       echo '#!/bin/bash' > $(location output.sh)
       echo "echo '$$LINT'" > $(location output.sh)
 
-      LINESWITHERROR=$$(echo grep error lint_results.txt) || true
-
-      if $$LINESWITHERROR=0; then
-        echo "exit 0" >> $(location output.sh)
-      fi 
-        echo "exit $$(($$LINESWITHERROR) | wc -l)" >> $(location output.sh)
+      LINESWITHERROR=$$(echo grep error lint_results.txt || true)
+      echo "exit $$(($$LINESWITHERROR) | wc -l)" >> $(location output.sh)
   """
   )
   
