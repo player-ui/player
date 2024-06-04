@@ -1,7 +1,7 @@
 import React from "react";
 import { describe, test, expect } from "vitest";
 import { render, binding as b } from "@player-tools/dsl";
-import { Text, Action, Info, Collection, Input } from ".";
+import { Text, Action, Info, Collection, Input, Choice } from ".";
 
 describe("JSON serialization", () => {
   describe("text", () => {
@@ -154,6 +154,126 @@ describe("JSON serialization", () => {
                   type: "text",
                   value: "Continue",
                 },
+              },
+            },
+          },
+        ],
+      });
+    });
+  });
+
+  describe("choice", () => {
+    test("works for title and choices", async () => {
+      expect(
+        (
+          await render(
+            <Choice id="choice-without-note" binding={b`foo.bar`}>
+              <Choice.Title>This is a list of choices</Choice.Title>
+              <Choice.Items>
+                <Choice.Item id="item-1" value="Item 1">
+                  <Choice.Item.Label>Item 1</Choice.Item.Label>
+                </Choice.Item>
+                <Choice.Item id="item-2" value="Item 2">
+                  <Choice.Item.Label>Item 2</Choice.Item.Label>
+                </Choice.Item>
+              </Choice.Items>
+            </Choice>,
+          )
+        ).jsonValue,
+      ).toStrictEqual({
+        id: "choice-without-note",
+        type: "choice",
+        binding: "foo.bar",
+        title: {
+          asset: {
+            id: "choice-without-note-title",
+            type: "text",
+            value: "This is a list of choices",
+          },
+        },
+        items: [
+          {
+            id: "item-1",
+            value: "Item 1",
+            label: {
+              asset: {
+                id: "choice-without-note-items-0-label",
+                type: "text",
+                value: "Item 1",
+              },
+            },
+          },
+          {
+            id: "item-2",
+            value: "Item 2",
+            label: {
+              asset: {
+                id: "choice-without-note-items-1-label",
+                type: "text",
+                value: "Item 2",
+              },
+            },
+          },
+        ],
+      });
+    });
+
+    test("works with a note", async () => {
+      expect(
+        (
+          await render(
+            <Choice id="choice-with-note" binding={b`foo.bar`}>
+              <Choice.Title>This is a list of choices</Choice.Title>
+              <Choice.Note>This is a note</Choice.Note>
+              <Choice.Items>
+                <Choice.Item id="item-1" value="Item 1">
+                  <Choice.Item.Label>Item 1</Choice.Item.Label>
+                </Choice.Item>
+                <Choice.Item id="item-2" value="Item 2">
+                  <Choice.Item.Label>Item 2</Choice.Item.Label>
+                </Choice.Item>
+              </Choice.Items>
+            </Choice>,
+          )
+        ).jsonValue,
+      ).toStrictEqual({
+        id: "choice-with-note",
+        type: "choice",
+        binding: "foo.bar",
+        title: {
+          asset: {
+            id: "choice-with-note-title",
+            type: "text",
+            value: "This is a list of choices",
+          },
+        },
+        note: {
+          asset: {
+            id: "choice-with-note-note",
+            type: "text",
+            value: "This is a note",
+          },
+        },
+        items: [
+          {
+            id: "item-1",
+            value: "Item 1",
+            label: {
+              asset: {
+                id: "choice-with-note-items-0-label",
+                type: "text",
+                value: "Item 1",
+              },
+            },
+          },
+          {
+            id: "item-2",
+            value: "Item 2",
+            label: {
+              asset: {
+                id: "choice-with-note-items-1-label",
+                type: "text",
+                value: "Item 2",
               },
             },
           },
