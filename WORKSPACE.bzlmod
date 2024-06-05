@@ -37,8 +37,7 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 # Hermes
 git_repository(
     name = "hermes",
-    build_file = "//third_party:hermes.BUILD",
-    # TODO: Pin to specific release
+    build_file = "//third_party/hermes:BUILD",
     commit = "c16bd411cdb20d424f843ea8623c00fa3d493a6c",
     remote = "https://github.com/facebook/hermes",
 )
