@@ -57,6 +57,7 @@ def ios_pipeline(
   needsXCTest = False,
   bundle_name = None
 ):
+  
   """Packages source files, creates swift library and tests for a swift PlayerUI plugin
 
   Args:
@@ -139,6 +140,35 @@ def ios_pipeline(
         visibility = ["//visibility:public"],
         test_host = "//ios/demo:PlayerUIDemo"
     )
+
+  # Runs SwiftLint as a test calling the genrule target which outputs the result of linting
+  native.sh_test(
+    name = name + "SwiftLint",
+    srcs = [":"+ name + "_Lint"],
+    visibility = ["//visibility:public"],
+  )
+
+  # Runs the SwiftLint as part of the build, if lint fails with serious violations defer the results for the test
+  native.genrule(
+    name = name + "_Lint",
+    tools = [
+      "@SwiftLint//:swiftlint"
+    ],
+    srcs = [":" + name + "_Sources"] + ["//:.swiftlint.yml"],
+    outs = ["output.sh"],
+    executable = True,
+    visibility = ["//visibility:public"],
+    cmd="""
+      echo `$(location @SwiftLint//:swiftlint) --config $(location //:.swiftlint.yml) $(SRCS) || true` > lint_results.txt
+      LINT=$$(cat lint_results.txt)
+
+      echo '#!/bin/bash' > $(location output.sh)
+      echo "echo '$$LINT'" > $(location output.sh)
+
+      LINESWITHERROR=$$(echo grep error lint_results.txt || true)
+      echo "exit $$(($$LINESWITHERROR) | wc -l)" >> $(location output.sh)
+  """
+  )
 
 default_dependencies = ["//ios/core:PlayerUI"]
 default_test_dependencies = ["//ios/internal-test-utils:PlayerUIInternalTestUtilities"]

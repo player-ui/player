@@ -248,3 +248,6 @@ gazelle(
     name = "update_build_files",
     gazelle = ":gazelle_bin",
 )
+
+#SwiftLint
+exports_files([".swiftlint.yml"])

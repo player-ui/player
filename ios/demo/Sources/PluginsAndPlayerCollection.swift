@@ -78,7 +78,7 @@ public struct PluginsAndPlayerCollection: View {
 
             switch eventData {
             case .string(data: let string):
-                $beaconAndPubsubInfo.wrappedValue = $beaconAndPubsubInfo.wrappedValue + "Published: `\(eventName)` with message: `\(string)` \n"
+                $beaconAndPubsubInfo.wrappedValue += "Published: `\(eventName)` with message: `\(string)` \n"
             default: break
             }
         })])
@@ -87,7 +87,7 @@ public struct PluginsAndPlayerCollection: View {
             $alertPresented.wrappedValue = true
             let encoder = JSONEncoder()
             if let data = try? encoder.encode(beaconStruct), let jsonString = String(data: data, encoding: .utf8) {
-                $beaconAndPubsubInfo.wrappedValue = $beaconAndPubsubInfo.wrappedValue  + "Beacon: \(jsonString) \n"
+                $beaconAndPubsubInfo.wrappedValue += "Beacon: \(jsonString) \n"
             }
         }
 
