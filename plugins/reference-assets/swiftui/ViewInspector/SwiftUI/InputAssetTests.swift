@@ -20,10 +20,7 @@ import JavaScriptCore
 
 
 class InputAssetTests: SwiftUIAssetUnitTestCase {
-    override func register(registry: SwiftUIRegistry) {
-        registry.register("input", asset: InputAsset.self)
-        registry.register("text", asset: TextAsset.self)
-    }
+    override open func plugins() -> [NativePlugin] { [ReferenceAssetsPlugin()] }
 
     func testDecoding() async throws {
         let json = """
