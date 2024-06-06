@@ -273,7 +273,7 @@ Both `ios_plugin` and `swiftui_plugin` call the same `ios_pipeline` macro, and h
 Example:
 
 ```python
-load("//tools/ios:util.bzl", "ios_pipeline")
+load("@rules_player//ios:defs.bzl", "ios_pipeline")
 
 ios_pipeline(
     name = "PlayerUITestUtilitiesCore",

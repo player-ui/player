@@ -1,4 +1,4 @@
-load("//tools/ios:util.bzl", "assemble_pod")
+load("@rules_player//ios:defs.bzl", "assemble_pod")
 load("@rules_player//internal:defs.bzl", "stamp")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@aspect_rules_js//js:defs.bzl", "js_library")
