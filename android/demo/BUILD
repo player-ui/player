@@ -3,7 +3,6 @@ load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_import")
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load(":defs.bzl", "main_deps", "test_deps")
 load("@rules_player//kotlin:defs.bzl", "lint")
-load("@rules_java//java:defs.bzl", "java_binary")
 
 kt_android_library(
     name = "demo_lib",
