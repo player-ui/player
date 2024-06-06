@@ -26,6 +26,21 @@ bind(
     actual = "//:compiler_annotation_processor",
 )
 
+bind(
+    name = "d8_dexbuilder",
+    actual = "//android/demo:d8_dex_builder",
+)
+
+bind(
+    name = "dexbuilder",
+    actual = "//android/demo:d8_dex_builder",
+)
+
+bind(
+    name = "dexbuilder_after_proguard",
+    actual = "//android/demo:d8_dex_builder",
+)
+
 load("@grab_bazel_common//rules:setup.bzl", "bazel_common_setup")
 
 bazel_common_setup(
