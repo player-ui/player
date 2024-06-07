@@ -27,4 +27,5 @@ cmake(
 alias(
     name = "hermes",
     actual = "hermes_osx",
+    visibility = ["//visibility:public"],
 )
