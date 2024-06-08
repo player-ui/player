@@ -14,7 +14,7 @@ internal class RegistryPlugin<T> : JSPluginWrapper {
     /** apply core transforms */
     override fun apply(runtime: Runtime<*>) {
         runtime.execute(readSource("plugins/partial-match-fingerprint/core/dist/PartialMatchFingerprintPlugin.native.js"))
-        runtime.execute(readSource("core/partial-match-registry/dist/PartialMatchRegistry.native.js"))
+        runtime.execute(readSource("core/partial-match-registry/dist/Registry.native.js"))
         instance = runtime.execute(
             """(new PartialMatchFingerprintPlugin.PartialMatchFingerprintPlugin(new Registry.Registry()))""",
         ) as Node
@@ -35,6 +35,6 @@ internal class RegistryPlugin<T> : JSPluginWrapper {
     private fun getAssetIndex(id: String): Int? = instance.getInvokable<Any?>("get")!!.invoke(id) as? Int
 
     private fun readSource(source: String) = RegistryPlugin::class.java.classLoader!!
-        .getResource(source)
+        .getResource(source)!!
         .readText()
 }

@@ -53,7 +53,7 @@ public class PubSubPlugin(public val config: Config? = null) : JSScriptPluginWra
 
     private companion object {
         private const val pluginName = "PubSubPlugin.PubSubPlugin"
-        private const val bundledSourcePath = "plugins/pubsub/core/dist/PubsubPlugin.native.js"
+        private const val bundledSourcePath = "plugins/pubsub/core/dist/PubSubPlugin.native.js"
     }
 }
 

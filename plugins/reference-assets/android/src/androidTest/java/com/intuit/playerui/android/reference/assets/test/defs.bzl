@@ -9,7 +9,13 @@ maven = [
 ]
 
 main_deps = [
-    "//plugins/mocks:jar",
+    "@maven//:androidx_test_core",
+    "@maven//:androidx_test_runner",
+    "@maven//:junit_junit",
+    "@maven//:org_robolectric_robolectric",
+    "@maven//:org_robolectric_android_all_instrumented",
+    "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_test",
+    "//tools/mocks:jar",
     "@robolectric//bazel:android-all",
     "//jvm/utils",
     "//plugins/common-types/jvm:common-types",
