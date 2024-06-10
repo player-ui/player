@@ -4,3 +4,4 @@ export * from "./collection";
 export * from "./info";
 export * from "./text";
 export * from "./image";
+export * from "./choice";

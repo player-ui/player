@@ -1,9 +1,8 @@
-# load("@rules_player//cocoapods:cocoapod.bzl", "pod_push")
-# load("@rules_player//internal:stamp.bzl", "stamp")
-load("//tools/ios:util.bzl", "assemble_pod")
+load("@rules_player//ios:defs.bzl", "assemble_pod")
+load("@rules_player//internal:defs.bzl", "stamp")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@aspect_rules_js//js:defs.bzl", "js_library")
-load("@bazel_gazelle//:def.bzl", "gazelle", "gazelle_binary")
+load("@bazel_gazelle//:def.bzl", "gazelle_binary")
 load("@rules_swift_package_manager//swiftpkg:defs.bzl", "swift_update_packages")
 
 package(default_visibility = ["//visibility:public"])
@@ -86,17 +85,18 @@ js_library(
 )
 
 # # Update the version in the podspec
-# stamp(
-#     name = "PlayerUI_Podspec",
-#     files = ["//:PlayerUI.podspec"],
-#     stable = True,
-#     substitutions = {
-#         "0.0.1-placeholder": "{STABLE_VERSION}",
-#     },
-# )
+stamp(
+    name = "PlayerUI_Podspec",
+    files = ["//:PlayerUI.podspec"],
+    stable = True,
+    substitutions = {
+        "0.0.1-placeholder": "{STABLE_VERSION}",
+    },
+    stamp = -1,
+)
 
 exports_files([
-    "PlayerUI.podspec",
+    "PlayerUI.podspec"
 ])
 
 assemble_pod(
@@ -186,7 +186,7 @@ assemble_pod(
         "//plugins/types-provider/ios:PlayerUITypesProviderPlugin_Sources": "plugins/types-provider/ios/",
         "//plugins/types-provider/core:core_native_bundle": "plugins/types-provider/ios/Resources/",
     },
-    podspec = ":PlayerUI.podspec",
+    podspec = ":PlayerUI_Podspec",
 )
 
 # # Push podspec to specs repo
@@ -242,9 +242,5 @@ swift_update_packages(
     update_bzlmod_stanzas = False,
 )
 
-# This target updates the Bazel build files for your project. Run this target
-# whenever you add or remove source files from your project.
-gazelle(
-    name = "update_build_files",
-    gazelle = ":gazelle_bin",
-)
+#SwiftLint
+exports_files([".swiftlint.yml"])

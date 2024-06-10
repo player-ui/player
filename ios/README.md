@@ -270,10 +270,12 @@ Adding external dependencies to package manifests follows the normal convention 
 ### Bazel Macros
 Both `ios_plugin` and `swiftui_plugin` call the same `ios_pipeline` macro, and hardcode some of the parameters to that pipeline. For more complex usecases, `ios_pipeline` can be used directly, to generate tests for packages that have both regular unit tests, as well as SwiftUI ViewInspector based tests.
 
+Note: the `ios_pipeline` macro is a common macro loaded from rules_player repo, it requires a few peer dependencies that must be added in this main repo in order to work with the `ios_pipeline` including SwiftLint and ViewInspector (SPM dependencies) and build_bazel_rules_apple and build_bazel_rules_ios (Rule dependencies)
+
 Example:
 
 ```python
-load("//tools/ios:util.bzl", "ios_pipeline")
+load("@rules_player//ios:defs.bzl", "ios_pipeline")
 
 ios_pipeline(
     name = "PlayerUITestUtilitiesCore",

@@ -5,6 +5,7 @@ import {
   actionTransform,
   imageTransform,
   infoTransform,
+  choiceTransform,
 } from "./assets";
 
 /**
@@ -20,6 +21,7 @@ export class ReferenceAssetsPlugin implements PlayerPlugin {
         [{ type: "input" }, inputTransform],
         [{ type: "image" }, imageTransform],
         [{ type: "info" }, infoTransform],
+        [{ type: "choice" }, choiceTransform],
       ]),
     );
   }

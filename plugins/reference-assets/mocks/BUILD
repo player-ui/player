@@ -12,6 +12,7 @@ create_base_dsl_config(
 
 DSL_SRCS = glob([
     "action/*.tsx",
+    "choice/*.tsx",
     "collection/*.tsx",
     "image/*.tsx",
     "info/*.tsx",

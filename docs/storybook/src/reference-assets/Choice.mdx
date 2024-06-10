@@ -1,0 +1,17 @@
+import { Meta, Story } from "@storybook/addon-docs";
+import { Choice } from "@player-ui/reference-assets-plugin-react";
+import * as ChoiceStories from "./Choice.stories";
+
+<Meta title="Reference Assets/Choice" component={Choice} />
+
+# Choice Asset
+
+The choice asset is used to display a list of "choices" for the user to select from.
+
+<Story of={ChoiceStories.Basic} />
+
+## Validation
+
+Choices can include validations, with `errors` preventing users from advancing the flow.
+
+<Story of={ChoiceStories.Validation} />
