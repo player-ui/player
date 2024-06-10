@@ -14,35 +14,7 @@ import SwiftUI
 @testable import PlayerUI
 @testable import PlayerUISwiftUI
 @testable import PlayerUILogger
-
-internal struct ActionData: AssetData {
-    var id: String
-    var type: String
-    var label: WrappedAsset?
-    var run: WrappedFunction<Void>?
-}
-internal struct TextData: AssetData {
-    var id: String
-    var type: String
-    var value: ModelReference
-}
-
-internal struct CollectionData: AssetData {
-    var id: String
-    var type: String
-    var values: [WrappedAsset?]
-}
-
-internal class ActionAsset: UncontrolledAsset<ActionData> {
-    override var view: AnyView { AnyView(EmptyView()) }
-}
-
-internal class TextAsset: UncontrolledAsset<TextData> {
-    override var view: AnyView { AnyView(EmptyView()) }
-}
-internal class CollectionAsset: UncontrolledAsset<CollectionData> {
-    override var view: AnyView { AnyView(EmptyView()) }
-}
+@testable import PlayerUIReferenceAssets
 
 // swiftlint:disable type_body_length file_length
 class SwiftUIRegistryTests: XCTestCase {
