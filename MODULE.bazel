@@ -5,7 +5,7 @@ bazel_dep(name = "rules_player")
 git_override(
     remote = "https://github.com/player-ui/rules_player.git",
     # bazel-6 branch
-    commit = "ebb436079557ab5dab2c48c6081282c4459b8b47",
+    commit = "e495a5d27dbd144043483d3aa7861101175ef2cb",
     module_name = "rules_player",
 )
 # local_path_override(module_name = "rules_player", path = "../rules_player")
@@ -24,7 +24,6 @@ node.toolchain(node_version = "18.18.0")
 
 ###### Start iOS ######
 ## Rule Dependencies
-bazel_dep(name = "rules_swift", version = "1.18.0", repo_name = "build_bazel_rules_swift")
 bazel_dep(name = "rules_apple", version = "3.5.1", repo_name = "build_bazel_rules_apple")
 bazel_dep(name = "rules_ios", version = "4.3.1", repo_name = "build_bazel_rules_ios")
 bazel_dep(name = "rules_xcodeproj", version = "2.2.0")
