@@ -5,6 +5,10 @@
 
 namespace intuit::playerui {
 
+struct HermesRuntimeException : std::runtime_error {
+    explicit HermesRuntimeException(const char* msg) : std::runtime_error(msg) {}
+};
+
 // Executor - TODO: It's possible we want to extend jsi::Runtime and delegate through a runtime instance
 class HermesRuntimeHolder {
 public:
@@ -13,24 +17,41 @@ public:
 
     facebook::jsi::Value execute(const std::string& script, const std::string& sourceURL = "unknown.js") const;
 
-    void release();
+    void release() {
+        if (runtime_) {
+            std::cout << "Releasing" << std::endl;
+            runtime_.reset();
+        }
+    }
 
-    facebook::hermes::HermesRuntime* runtime;
+    // NOTE: We would have to do this if we don't support a release API - we could, and maybe should, just delete *this*
+    void assertNotReleased() const {
+        if (!runtime_) {
+            throw HermesRuntimeException("Runtime released!");
+        }
+    };
 
-    operator facebook::jsi::Runtime&() const {
-        return *runtime;
+    operator facebook::jsi::Runtime&() const { return get_runtime(); }
+
+    facebook::jsi::Runtime& get_runtime() const {
+        assertNotReleased();
+        return *runtime_;
+    }
+
+    hermes::vm::RuntimeConfig& get_config() const noexcept {
+        return *config_;
     }
 
 private:
-    // TODO: Maybe these should be unique_ptrs
-    hermes::vm::RuntimeConfig* config_;
-
-    HermesRuntimeHolder(hermes::vm::RuntimeConfig &config, facebook::hermes::HermesRuntime &runtime) {
-        this->config_ = &config;
-        this->runtime = &runtime;
-
-        std::cout << "Primary constructor\nConfig: " << this->config_ << "\nRuntime: " << this->runtime->description() << std::endl;
+    HermesRuntimeHolder(
+        hermes::vm::RuntimeConfig &config,
+        std::unique_ptr<facebook::hermes::HermesRuntime> runtime
+    ) : config_(std::make_unique<hermes::vm::RuntimeConfig>(config)), runtime_(std::move(runtime)) {
+        std::cout << "Primary constructor\nConfig: " << &get_config() << "\nRuntime: " << get_runtime().description() << std::endl;
     }
+
+    std::unique_ptr<hermes::vm::RuntimeConfig> config_;
+    std::unique_ptr<facebook::hermes::HermesRuntime> runtime_;
 };
 
 }

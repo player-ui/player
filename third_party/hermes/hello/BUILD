@@ -6,7 +6,7 @@ cc_library(
     hdrs = [
         "hello-world.hpp",
     ],
-    deps = ["@hermes//:hermes_osx"],
+    deps = ["@hermes"],
 )
 
 cc_binary(

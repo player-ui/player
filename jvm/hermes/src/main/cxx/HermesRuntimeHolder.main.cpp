@@ -20,16 +20,9 @@ int main() {
 
     try {
         auto runtime = HermesRuntimeHolder();
-
-        facebook::jsi::Value result = runtime.execute(CODE);
-        std::cout << "Result: " << result.toString(runtime).utf8(runtime);
-
-        std::cout << "Releasing" << std::endl;
+        runtime.execute(CODE);
         runtime.release();
-
-        std::cout << "Executing: " << CODE << std::endl;
-        result = runtime.execute(CODE);
-        std::cout << "Result: " << result.toString(runtime).utf8(runtime);
+        runtime.execute(CODE);
     } catch (facebook::jsi::JSError &e) {
         // Handle JS exceptions here.
         std::cout << "JS Exception: " << e.getStack() << std::endl;
