@@ -19,7 +19,7 @@ const basicFRFWithActions = {
           },
         },
         {
-          id: 'uhh',
+          id: 'testId',
           async: 'true',
         },
       ],
@@ -360,7 +360,7 @@ test('should call onAsyncNode hook when async node is encountered', async () => 
   player.start(basicFRFWithActions as any);
 
   await waitFor(() => {
-    expect(localNode.id).toStrictEqual('uhh');
+    expect(localNode.id).toStrictEqual('testId');
     expect(localNode.type).toStrictEqual('async');
   });
 });

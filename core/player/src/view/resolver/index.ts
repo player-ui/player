@@ -24,11 +24,14 @@ export * from './types';
 export * from './utils';
 
 interface NodeUpdate extends Resolve.ResolvedNode {
-  /** A flag to track if a node has changed since the last resolution */
+  /** A flag to track if a node has changed since the last resolution and to resolve the updated view*/
   updated: boolean;
 }
 
-/** Add model context to the data model */
+/** Adding model context to the data model allows for more flexibility and extensibility,
+    * as it enables the data model to be aware of its environment and its state.
+    * This can be useful in various scenarios,
+    * such as when dealing with complex data structures or when working with multiple data sources. */
 const withContext = (model: DataModelWithParser): DataModelWithParser => {
   return {
     get: (binding: BindingLike, options?: DataModelOptions): any => {
@@ -185,8 +188,6 @@ export class Resolver {
 
     if (id) {
       if (this.idCache.has(id)) {
-        // Only log this conflict once to cut down on noise
-        // May want to swap this to logging when we first see the id -- which may not be the first render
         if (isFirstUpdate) {
           if (node.type === NodeType.Asset || node.type === NodeType.View) {
             this.logger?.error(
@@ -194,12 +195,10 @@ export class Resolver {
             );
           } else if (node.type === NodeType.Value) {
             this.logger?.info(
-              `Cache conflict: Found Value nodes that have conflicting ids: ${id}, may cause cache issues. To improve performance make value node IDs globally unique.`
+              `Found Value node with id: ${id}. Performance can be improved by making value node IDs globally unique.`
             );
           }
         }
-
-        // Don't use anything from a prev result if there's a duplicate id detected
         return;
       }
 
@@ -265,7 +264,6 @@ export class Resolver {
     );
 
     // Shallow clone the node so that changes to it during the resolve steps don't impact the original.
-    // We are trusting that this becomes a deep clone once the whole node tree has been traversed.
     const clonedNode = {
       ...this.cloneNode(node),
       parent: partiallyResolvedParent,

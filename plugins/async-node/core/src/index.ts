@@ -12,8 +12,8 @@ import { omit } from 'timm';
 export * from './types';
 
 /**
- * Async node plugin used to resolve async nodes in the content
- * If an async node is present, allow users to provide a replacement node to be rendered when ready
+ * An async player node plugin used to resolve async nodes in the content
+ * It automatically keeps track of the async node (if present), and provides a replacement node to be rendered when ready.
  */
 export class AsyncNodePlugin implements PlayerPlugin {
   public readonly hooks = {
