@@ -24,14 +24,16 @@ export * from './types';
 export * from './utils';
 
 interface NodeUpdate extends Resolve.ResolvedNode {
-  /** A flag to track if a node has changed since the last resolution and to resolve the updated view*/
+  /** A flag to track if a node has changed since the last resolution and to resolve the updated view */
   updated: boolean;
 }
 
-/** Adding model context to the data model allows for more flexibility and extensibility,
-    * as it enables the data model to be aware of its environment and its state.
-    * This can be useful in various scenarios,
-    * such as when dealing with complex data structures or when working with multiple data sources. */
+/**
+ * Adding model context to the data model allows for more flexibility and extensibility,
+ * as it enables the data model to be aware of its environment and its state.
+ * This can be useful in various scenarios,
+ * such as when dealing with complex data structures or when working with multiple data sources.
+ */
 const withContext = (model: DataModelWithParser): DataModelWithParser => {
   return {
     get: (binding: BindingLike, options?: DataModelOptions): any => {
