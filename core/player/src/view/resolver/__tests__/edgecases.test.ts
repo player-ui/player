@@ -481,7 +481,7 @@ describe('Duplicate IDs', () => {
 
     expect(testLogger.info).toBeCalledTimes(1);
     expect(testLogger.info).toBeCalledWith(
-      'Cache conflict: Found Value nodes that have conflicting ids: value-1, may cause cache issues. To improve performance make value node IDs globally unique.'
+      'Found Value node with id: value-1. Performance can be improved by making value node IDs globally unique.'
     );
     (testLogger.info as jest.Mock).mockClear();
     expect(firstUpdate).toStrictEqual(content);
