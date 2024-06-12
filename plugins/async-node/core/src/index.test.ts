@@ -45,7 +45,6 @@ test("replaces async nodes with provided node", async () => {
   let deferredResolve: ((value: any) => void) | undefined;
 
   plugin.hooks.onAsyncNode.tap("test", async (node: Node.Node) => {
-    console.log("tapped");
     return new Promise((resolve) => {
       deferredResolve = resolve;
     });
