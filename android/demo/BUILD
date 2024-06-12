@@ -1,4 +1,4 @@
-load("@rules_android//android:rules.bzl", "android_binary")
+load("@rules_android//android:rules.bzl", "android_binary", "android_library")
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_import")
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load(":defs.bzl", "main_deps", "test_deps")
@@ -7,8 +7,6 @@ load("@rules_player//kotlin:defs.bzl", "lint")
 kt_android_library(
     name = "demo_lib",
     srcs = glob(["src/main/java/**"]),
-    assets = glob(["src/main/assets/mocks/**"]),
-    assets_dir = "src/main/assets",
     custom_package = "com.intuit.playerui.android.reference.demo",
     manifest = ":src/main/AndroidManifest.xml",
     resource_files = glob(["src/main/res/**"]),
@@ -18,6 +16,8 @@ kt_android_library(
 android_binary(
     name = "demo",
     custom_package = "com.intuit.playerui.android.reference.demo",
+    assets = glob(["src/main/assets/mocks/**"]),
+    assets_dir = "src/main/assets",
     dex_shards = 3,
     enable_data_binding = True,
     manifest = ":src/main/AndroidManifest.xml",
@@ -25,6 +25,7 @@ android_binary(
     deps = [
         ":demo_lib",
         "//jvm/j2v8:j2v8-android",
+        "@android_j2v8//aar",
         "@maven//:androidx_databinding_databinding_common",
         "@maven//:androidx_databinding_databinding_runtime",
         "@maven//:org_jetbrains_kotlin_kotlin_reflect",

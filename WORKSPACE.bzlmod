@@ -50,3 +50,10 @@ http_file(
     sha256 = "c6bc74268b29bdabad8da962e00e2f6fd613c24b42c69e81b258397b4819f156",
     url = "https://dl.google.com/android/maven2/androidx/test/services/test-services/1.4.2/test-services-1.4.2.apk"
 )
+
+load("@bazel_tools//tools/build_defs/repo:maven_rules.bzl", "maven_aar")
+
+maven_aar(
+    name = "android_j2v8",
+    artifact = "com.eclipsesource.j2v8:j2v8:6.1.0",
+)
