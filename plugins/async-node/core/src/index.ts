@@ -85,6 +85,7 @@ export class AsyncNodePlugin implements PlayerPlugin {
             if (!resolvedNode && node?.type === NodeType.Async) {
               queueMicrotask(async () => {
                 const result = await this.hooks.onAsyncNode.call(node);
+                // console.log('result--',result.toString());
                 const parsedNode = options.parseNode
                   ? options.parseNode(result)
                   : undefined;

@@ -38,6 +38,30 @@ const basicFRFWithActions = {
   },
 };
 
+test('should return original node when onAsyncNode hook does not return a result', async () => {
+  const plugin = new AsyncNodePlugin();
+
+  plugin.hooks.onAsyncNode.tap('test', async (node: Node.Async) => {
+    // Do not return a result
+    return null;
+  });
+
+  const player = new Player({ plugins: [plugin] });
+
+  player.start(basicFRFWithActions as any);
+
+  let view = (player.getState() as InProgressState).controllers.view.currentView
+    ?.lastUpdate;
+
+  expect(view).toBeDefined();
+  expect(view?.actions[1]).toBeUndefined();
+
+  await waitFor(() => {
+    // Check that the original node is still present
+    expect(view?.actions[1]).toBeUndefined();
+  });
+});
+
 test('replaces async nodes with provided node', async () => {
   const plugin = new AsyncNodePlugin();
 
