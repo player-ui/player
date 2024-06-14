@@ -1,4 +1,12 @@
 # PlayerUI iOS Development Guide
+
+### Sections:
+1. [Setup](#Setup)
+2. [Adding a new plugin](#adding-a-new-plugin)
+3. [Advance Usage](#advanced-Usage)
+	* [External dependencies](#external-dependencies)
+	* [Bazel Macros](#bazel-macros)
+
 ## Setup
 ### Xcode Project generation
 Generate the `.xcodeproj` to open and work in Xcode. Builds and tests will be executed through bazel, to ensure behavioral parity.
@@ -16,6 +24,12 @@ The demo app can also be built and launched in a simulator from the command line
 ```bash
 bazel run //ios/demo:PlayerUIDemo
 ```
+
+Note: 
+When building/testing targets with Bazel it is not recommended to build all targets under a package using `/...` because some targets such as those using `swift_library` for example `PlayerUIInternalTestUtilities` and `PlayerUIReferenceAssets` are not buildable due to running on MacOS. It is recommended to build the individual targets and build those that depend on the underlying targets using `swift_library`.
+For example, you can't build `PlayerUIInternalTestUtilities` but you can build `//ios/core:PlayerUITests` which builds `PlayerUIInternalTestUtilities` through it being a test dependency.
+
+It is not an issue to use `/...` when [querying](#Examining-Targets) all targets under a package because querying just lists targets and nothing is being built.
 
 ## Adding a new plugin
 Adding a new plugin is simple using predefined macros for `BUILD.bazel` files. Additional steps are required to include new code in the final artifacts, and in the Xcode project.
