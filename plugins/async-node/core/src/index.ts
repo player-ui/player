@@ -162,16 +162,17 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         if (!resolvedNode && node?.type === NodeType.Async) {
           queueMicrotask(async () => {
             const result = await this.basePlugin?.hooks.onAsyncNode.call(node);
-            console.log("result--",result);
             const parsedNode =
               options.parseNode && result
                 ? options.parseNode(result)
                 : undefined;
-
             if (parsedNode) {
               this.resolvedMapping.set(node.id, parsedNode);
-              view.updateAsync();
+            } else {
+              // If parsedNode is undefined, update the resolvedMapping with the existing node (supporting null | undefined) as of now
+              this.resolvedMapping.set(node.id, node);
             }
+            view.updateAsync();
           });
 
           return node;
