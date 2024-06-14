@@ -1,4 +1,4 @@
-load("//tools/ios:util.bzl", "ios_pipeline")
+load("@rules_player//ios:defs.bzl", "ios_pipeline")
 
 ios_pipeline(
     name = "PlayerUISwiftUI",
@@ -12,5 +12,6 @@ ios_pipeline(
         "//ios/internal-test-utils:PlayerUIInternalTestUtilities"
     ],
     hasUnitTests = True,
-    hasViewInspectorTests = True
+    hasViewInspectorTests = True,
+    test_host = "//ios/demo:PlayerUIDemo"
 )

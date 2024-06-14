@@ -1,4 +1,4 @@
-load("//tools/ios:util.bzl", "ios_pipeline")
+load("@rules_player//ios:defs.bzl", "ios_pipeline")
 
 ios_pipeline(
     name = "PlayerUIAsyncNodePlugin",
@@ -13,5 +13,6 @@ ios_pipeline(
     ],
 
     hasUnitTests = True,
-    hasViewInspectorTests = True
+    hasViewInspectorTests = True,
+    test_host = "//ios/demo:PlayerUIDemo"
 )
