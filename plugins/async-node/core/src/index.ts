@@ -162,6 +162,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         if (!resolvedNode && node?.type === NodeType.Async) {
           queueMicrotask(async () => {
             const result = await this.basePlugin?.hooks.onAsyncNode.call(node);
+            console.log("result--",result);
             const parsedNode =
               options.parseNode && result
                 ? options.parseNode(result)
