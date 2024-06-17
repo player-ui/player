@@ -117,7 +117,7 @@ bazel_dep(name = "rules_jvm_external")
 git_override(
     remote = "https://github.com/brocollie08/rules_jvm_external.git",
     # bazel-6 branch
-    commit = "61e782a1fff3bfb2823bda47cbba74d068ccc6eb",
+    commit = "9f645825f56257d51f53af1360037c447c42a4e5",
     module_name = "rules_jvm_external",
 )
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")

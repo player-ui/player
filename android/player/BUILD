@@ -3,7 +3,6 @@ load("@build_constants//:constants.bzl", "VERSION")
 load("@rules_kotlin//kotlin:core.bzl", "kt_kotlinc_options")
 load("//jvm:defs.bzl", "distribution")
 load("@grab_bazel_common//tools/databinding:databinding.bzl", "kt_db_android_library")
-load("@rules_android//android:rules.bzl", "android_binary", "android_library")
 load("@rules_player//kotlin:defs.bzl", "kt_jvm_junit5_test", "lint")
 
 kt_db_android_library(
@@ -27,7 +26,7 @@ kt_db_android_library(
 kt_jvm_junit5_test(
     name = "player-tests",
     srcs = glob(["src/test/java/**"]),
-    associates = [":player_kt"],
+    associates = [":player-kotlin"],
     kotlinc_opts = "//jvm:test_options",
     test_package = "com.intuit.playerui.android",
     deps = [":player"] + test_deps,
