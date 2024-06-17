@@ -66,7 +66,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
   name = "AsyncNode";
 
-  private resolvedMapping = new Map<string, Node.Node>();
+  private resolvedMapping = new Map<string, any>();
 
   private currentView: ViewInstance | undefined;
 
@@ -166,15 +166,8 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
               options.parseNode && result
                 ? options.parseNode(result)
                 : undefined;
-            if (parsedNode) {
-              this.resolvedMapping.set(node.id, parsedNode);
-            } else {
-              // If parsedNode is undefined, update the resolvedMapping with the existing node (supporting null | undefined) as of now
-              // This is to ensure that the node is not resolved again
-              if (!this.resolvedMapping.has(node.id)) {
-                this.resolvedMapping.set(node.id, node);
-              }
-            }
+
+            this.resolvedMapping.set(node.id, parsedNode);
             view.updateAsync();
           });
 
