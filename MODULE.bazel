@@ -2,13 +2,13 @@ module(name = "player", version = "1.0")
 
 bazel_dep(name = "rules_player")
 
-#git_override(
-#    remote = "https://github.com/player-ui/rules_player.git",
-#    # bazel-6 branch
-#    commit = "0be9db40b0a322f1979a4b5fea4eeee1482e2e97",
-#    module_name = "rules_player",
-#)
-local_path_override(module_name = "rules_player", path = "../rules_player")
+git_override(
+    remote = "https://github.com/player-ui/rules_player.git",
+    # bazel-6 branch
+    commit = "749b5d489b4bb03390233cf740b32fcaffc71c49",
+    module_name = "rules_player",
+)
+#local_path_override(module_name = "rules_player", path = "../rules_player")
 
 bazel_dep(name = "aspect_bazel_lib", version = "1.32.0")
 bazel_dep(name = "aspect_rules_js", version = "1.34.1")
@@ -100,7 +100,13 @@ bazel_dep(name = "rules_android", version = "0.1.1")
 
 # Databinding
 bazel_dep(name = "grab_bazel_common")
-local_path_override(module_name = "grab_bazel_common", path = "../grab-bazel-common")
+git_override(
+    remote = "https://github.com/brocollie08/grab-bazel-common.git",
+    # bazel-6 branch
+    commit = "0103313728c0c94020513a55ce098d64e831f94f",
+    module_name = "grab_bazel_common",
+)
+#local_path_override(module_name = "grab_bazel_common", path = "../grab-bazel-common")
 
 #bazel_common_setup = use_extension("@grab_bazel_common//rules:setup.bzl", "ext")
 #bazel_common_setup.setup(
