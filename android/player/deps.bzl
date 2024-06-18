@@ -13,6 +13,10 @@ maven = [
 
     # Default fallback
     "androidx.constraintlayout:constraintlayout:%s" % versions.androidx.constraintlayout,
+
+    "androidx.compose.ui:ui:%s" % versions.androidx.compose,
+    "androidx.compose.ui:ui-tooling:%s" % versions.androidx.compose,
+    "androidx.compose.runtime:runtime:%s" % versions.androidx.compose,
 ]
 
 main_exports = [

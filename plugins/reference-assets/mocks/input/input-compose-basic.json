@@ -1,0 +1,20 @@
+{
+  "id": "view-1",
+  "type": "collection",
+  "values": [
+    {
+      "asset": {
+        "id": "input-compose",
+        "type": "input-compose",
+        "label": {
+          "asset": {
+            "type": "text-compose",
+            "id": "text-compose",
+            "value": "label"
+          }
+
+        }
+      }
+    }
+  ]
+}

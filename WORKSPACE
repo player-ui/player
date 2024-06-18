@@ -31,9 +31,9 @@ http_archive(
 
 load("@rules_player//:workspace.bzl", "deps")
 
-deps()
+deps(android_api_version = 31)
 
-load("@rules_player//:conf.bzl", "apple", "javascript", "kotlin")
+load("@rules_player//:conf.bzl", "apple", "javascript")
 
 #####################
 # Yarn Dependencies #
@@ -75,7 +75,14 @@ pod_install(
 ######################
 # Kotlin Setup       #
 ######################
-kotlin()
+load("@io_bazel_rules_kotlin//kotlin:repositories.bzl", "kotlin_repositories", "kotlinc_version")
+
+kotlin_repositories(
+    compiler_release = kotlinc_version(
+        release = "1.7.0",
+        sha256 = "f5216644ad81571e5db62ec2322fe07468927bda40f51147ed626a2884b55f9a",
+    ),
+)
 
 load("@io_bazel_rules_kotlin//kotlin:core.bzl", "kt_register_toolchains")
 
@@ -146,7 +153,10 @@ overridden_targets = {
     "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm": "@//android/demo:kotlinx_coroutines_core_jvm_fixed",
 }
 
-android_ndk_repository(name = "androidndk")
+android_ndk_repository(
+    name = "androidndk",
+   api_level=21
+)
 
 register_toolchains("@androidndk//:all")
 
