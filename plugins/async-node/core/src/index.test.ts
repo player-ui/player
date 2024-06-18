@@ -1,8 +1,9 @@
 import { expect, test } from "vitest";
 import type { Node, InProgressState } from "@player-ui/player";
-import { Player } from "@player-ui/player";
+import { Player } from '@player-ui/player';
 import { waitFor } from "@testing-library/react";
 import { AsyncNodePlugin, AsyncNodePluginPlugin } from "./index";
+
 
 const basicFRFWithActions = {
   id: "test-flow",
@@ -62,6 +63,14 @@ const asyncNodeTest = async (resolvedValue: any, expectedActionType: string) => 
     });
   });
 
+  player.hooks.viewController.tap('async-node-test', (vc) => {
+    vc.hooks.view.tap('async-node-test', (view) => {
+      view.hooks.resolver.tap('async-node-test', () => {
+        updateNumber++;
+      });
+    });
+  });
+
   player.start(basicFRFWithActions as any);
 
   let view = (player.getState() as InProgressState).controllers.view.currentView
@@ -75,6 +84,7 @@ const asyncNodeTest = async (resolvedValue: any, expectedActionType: string) => 
     expect(deferredResolve).toBeDefined();
   });
 
+  // Consumer responds with null/undefined
   if (deferredResolve) {
     deferredResolve(resolvedValue);
   }
@@ -88,6 +98,20 @@ const asyncNodeTest = async (resolvedValue: any, expectedActionType: string) => 
 
   expect(view?.actions[0].asset.type).toBe('action');
   expect(view?.actions[1]?.asset.type).toBe(expectedActionType);
+  expect(view?.actions[2]?.asset.type).toBe(expectedActionType);
+
+  await waitFor(() => {
+    expect(updateNumber).toBe(3);
+  });
+
+  view = (player.getState() as InProgressState).controllers.view.currentView
+    ?.lastUpdate;
+
+  expect(view?.actions[0].asset.type).toBe('action');
+  expect(view?.actions[1]?.asset.type).toBe(expectedActionType);
+  expect(view?.actions[2]?.asset.type).toBe(expectedActionType);
+  expect(view?.actions[3]?.asset.type).toBe(expectedActionType);
+  expect(updateNumber).toBe(3); // Replace with the actual expected number of updates
 };
 
 test('should return current node view when the resolved node is null', async () => {
