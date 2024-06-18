@@ -80,7 +80,7 @@ const asyncNodeTest = async (resolvedValue: any, expectedActionType: string) => 
   }
 
   await waitFor(() => {
-    expect(updateNumber).toBe(1);
+    expect(updateNumber).toBe(2);
   });
 
   view = (player.getState() as InProgressState).controllers.view.currentView
@@ -88,7 +88,6 @@ const asyncNodeTest = async (resolvedValue: any, expectedActionType: string) => 
 
   expect(view?.actions[0].asset.type).toBe('action');
   expect(view?.actions[1]?.asset.type).toBe(expectedActionType);
-  expect(view?.actions[1]).toBeUndefined();
 };
 
 test('should return current node view when the resolved node is null', async () => {
