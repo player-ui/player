@@ -198,6 +198,7 @@ jobs:
           name: Create avd
           command: |
             sdkmanager "system-images;android-29;default;x86"
+            sdkmanager "system-images;android-33;default;x86_64"
             echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-29;default;x86"
 
       - run:
