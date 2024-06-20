@@ -170,8 +170,6 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
             if (parsedNode) {
               this.resolvedMapping.set(node.id, parsedNode);
             } else {
-              //will remove this log after PR review
-              console.log('inside else returning same node');
               this.resolvedMapping.set(node.id, node);
             }
             view.updateAsync();

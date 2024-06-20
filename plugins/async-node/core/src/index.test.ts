@@ -44,13 +44,9 @@ const asyncNodeTest = async (resolvedValue: any, expectedActionType: string) => 
 
   let deferredResolve: ((value: any) => void) | undefined;
 
-  let updateOnAsyncCounter = 0;
-
   let resolverInstance: Resolver;
-  let beforeResolveCalled = false;
 
   plugin.hooks.onAsyncNode.tap('test', async (node: Node.Node) => {
-    updateOnAsyncCounter++; // The Async Node can be tapped multiple times
     return new Promise((resolve) => {
       deferredResolve = resolve; // Promise would be resolved only once
     });
@@ -72,10 +68,6 @@ const asyncNodeTest = async (resolvedValue: any, expectedActionType: string) => 
     vc.hooks.view.tap("async-node-test", (view) => {
       view.hooks.resolver.tap("async-node-test", (resolver) => {
         resolverInstance = resolver;
-        resolverInstance.hooks.beforeResolve.tap("async-node-test", (node, options) => {
-          beforeResolveCalled = true;
-          return node; // return the original node if there's no meaningful Node to return
-        });
       });
     });
   });
@@ -106,19 +98,15 @@ const asyncNodeTest = async (resolvedValue: any, expectedActionType: string) => 
     ?.lastUpdate;
 
   expect(view?.actions[0].asset.type).toBe('action');
+  expect(view?.actions[1]?.asset.type).toBe(expectedActionType);
   expect(updateNumber).toBe(2); // Replace with the actual expected number of updates
 
   await waitFor(() => {
     expect(resolverInstance).toBeDefined();
-    expect(beforeResolveCalled).toBe(true);
   });
 
   // Now we will force update the view using the resolver instance
-  const thirdForcedUpdate = resolverInstance.update();
-
-  if (deferredResolve) {
-    deferredResolve(thirdForcedUpdate);
-  }
+  resolverInstance.update();
 
   // Updated this to 2 as the resolver is getting updated only twice and the onAsyncNode is not getting called as assumed and the test is failing when we expect it to be 3
   await waitFor(() => {
@@ -129,8 +117,7 @@ const asyncNodeTest = async (resolvedValue: any, expectedActionType: string) => 
     ?.lastUpdate;
 
   expect(view?.actions[0].asset.type).toBe("action");
-  // updateOnAsyncCounter is also getting updated only once , I think there is no need of this variable
-  expect(updateOnAsyncCounter).toBe(1);
+  expect(view?.actions[1]?.asset.type).toBe(expectedActionType);
   expect(updateNumber).toBe(2);
 };
 
