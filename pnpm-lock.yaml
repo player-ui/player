@@ -126,6 +126,9 @@ importers:
       '@storybook/types':
         specifier: ^7.6.10
         version: 7.6.19
+      '@swc/core':
+        specifier: ^1.3.74
+        version: 1.5.7
       '@swc/wasm-web':
         specifier: ^1.3.74
         version: 1.5.7
@@ -836,6 +839,15 @@ importers:
         specifier: workspace:*
         version: link:../../../core/player
 
+  plugins/reference-assets/cli-preset:
+    dependencies:
+      '@player-ui/reference-assets-plugin':
+        specifier: workspace:*
+        version: link:../core
+      '@player-ui/types':
+        specifier: workspace:*
+        version: link:../../../core/types
+
   plugins/reference-assets/components:
     dependencies:
       '@player-ui/common-types-plugin':
@@ -869,6 +881,9 @@ importers:
 
   plugins/reference-assets/mocks:
     dependencies:
+      '@player-ui/reference-assets-cli-preset':
+        specifier: workspace:*
+        version: link:../cli-preset
       '@player-ui/reference-assets-plugin-components':
         specifier: workspace:*
         version: link:../components
