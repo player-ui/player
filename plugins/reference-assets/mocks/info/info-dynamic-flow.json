@@ -11,6 +11,13 @@
           "value": "View 1"
         }
       },
+      "footer": {
+        "asset": {
+          "id": "view-footer",
+          "type": "text",
+          "value": "View Footer 1"
+        }
+      },
       "actions": [
         {
           "asset": {
@@ -36,6 +43,13 @@
           "id": "view-title",
           "type": "text",
           "value": "View 2"
+        }
+      },
+      "footer": {
+        "asset": {
+          "id": "view-2-footer",
+          "type": "text",
+          "value": "View Footer 2"
         }
       },
       "actions": [
@@ -79,6 +93,13 @@
           "value": "View 3"
         }
       },
+      "footer": {
+        "asset": {
+          "id": "view-3-footer",
+          "type": "text",
+          "value": "View Footer 3"
+        }
+      },
       "actions": [
         {
           "asset": {
@@ -104,6 +125,13 @@
           "id": "view-4-title",
           "type": "text",
           "value": "View 4"
+        }
+      },
+      "footer": {
+        "asset": {
+          "id": "view-4-footer",
+          "type": "text",
+          "value": "View Footer 4"
         }
       },
       "actions": [
