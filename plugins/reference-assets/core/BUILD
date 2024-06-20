@@ -29,6 +29,7 @@ js_xlr_pipeline(
     ],
     test_deps = [
         ":node_modules/@player-ui/asset-testing-library",
+        ":node_modules/@player-ui/common-types-plugin",
         "//:vitest_config",
     ],
     deps = [

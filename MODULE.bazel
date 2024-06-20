@@ -24,13 +24,13 @@ node.toolchain(node_version = "18.18.0")
 
 ###### Start iOS ######
 ## Rule Dependencies
-bazel_dep(name = "rules_swift", version = "1.18.0", repo_name = "build_bazel_rules_swift")
 bazel_dep(name = "rules_apple", version = "3.5.1", repo_name = "build_bazel_rules_apple")
 bazel_dep(name = "rules_ios", version = "4.3.1", repo_name = "build_bazel_rules_ios")
 bazel_dep(name = "rules_xcodeproj", version = "2.2.0")
 
 bazel_dep(name = "gazelle", version = "0.34.0", repo_name = "bazel_gazelle")
 bazel_dep(name = "rules_swift_package_manager", version = "0.22.0")
+bazel_dep(name = "swiftlint", version = "0.54.0", repo_name = "SwiftLint")
 
 ## This section is handled by rules_swift_package_manager
 swift_deps = use_extension(
@@ -49,6 +49,7 @@ use_repo(
     swift_deps,
     "swiftpkg_swift_hooks",
     "swiftpkg_viewinspector",
+    "swiftpkg_swiftlint"
 )
 
 ###### End iOS ######
@@ -59,6 +60,7 @@ npm.npm_translate_lock(
     pnpm_lock = "//:pnpm-lock.yaml",
     data = [
         "//:package.json",
+        "//:patches/@chakra-ui__system@2.6.2.patch",
     ],
     npmrc = "//:.npmrc",
     verify_node_modules_ignored = "//:.bazelignore",

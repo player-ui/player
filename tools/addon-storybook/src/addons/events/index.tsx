@@ -66,6 +66,7 @@ const ExtraCells = (event: EventType) => {
 export const EventsPanel = (props: EventsPanelProps) => {
   const events = useSelector<StateType, EventType[]>((state) => state.events);
   const contentType = useContentKind();
+  const darkMode = useDarkMode();
 
   if (!props.active) {
     return null;

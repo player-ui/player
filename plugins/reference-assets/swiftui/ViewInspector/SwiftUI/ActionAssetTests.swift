@@ -18,10 +18,7 @@ import ViewInspector
 @testable import PlayerUIBeaconPlugin
 
 class ActionAssetTests: SwiftUIAssetUnitTestCase {
-    override func register(registry: SwiftUIRegistry) {
-        registry.register("action", asset: ActionAsset.self)
-        registry.register("text", asset: TextAsset.self)
-    }
+    override open func plugins() -> [NativePlugin] { [ReferenceAssetsPlugin()] }
 
     func setup() {
         XCUIApplication().terminate()

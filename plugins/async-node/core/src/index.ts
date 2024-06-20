@@ -39,10 +39,6 @@ export class AsyncNodePlugin implements PlayerPlugin {
       this.plugins = options.plugins;
       options.plugins.forEach((plugin) => {
         plugin.applyPlugin(this);
-        // plugin.asyncNode.tap('test', async (node: Node.Node) => {
-        //   console.log('got async node')
-        //   return await this.hooks.onAsyncNode.call(node)
-        // });
       });
     }
   }
@@ -131,11 +127,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
       const newNode = resolvedNode || node;
       if (!resolvedNode && node?.type === NodeType.Async) {
         queueMicrotask(async () => {
-          if (this.basePlugin) {
-            console.log("calling async node");
-          }
           const result = await this.basePlugin?.hooks.onAsyncNode.call(node);
-          console.log(`result is ${result}`);
           const parsedNode =
             options.parseNode && result ? options.parseNode(result) : undefined;
 
@@ -154,7 +146,6 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
   apply(view: ViewInstance): void {
     view.hooks.parser.tap("template", this.applyParser.bind(this));
-    console.log(`wtf ${this.basePlugin}`);
     view.hooks.resolver.tap("template", (resolver) => {
       resolver.hooks.beforeResolve.tap(this.name, (node, options) => {
         let resolvedNode;
@@ -170,11 +161,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         const newNode = resolvedNode || node;
         if (!resolvedNode && node?.type === NodeType.Async) {
           queueMicrotask(async () => {
-            if (this.basePlugin) {
-              console.log("calling async node");
-            }
             const result = await this.basePlugin?.hooks.onAsyncNode.call(node);
-            console.log(`result is ${result}`);
             const parsedNode =
               options.parseNode && result
                 ? options.parseNode(result)

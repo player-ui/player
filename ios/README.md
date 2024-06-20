@@ -1,4 +1,12 @@
 # PlayerUI iOS Development Guide
+
+### Sections:
+1. [Setup](#Setup)
+2. [Adding a new plugin](#adding-a-new-plugin)
+3. [Advance Usage](#advanced-Usage)
+	* [External dependencies](#external-dependencies)
+	* [Bazel Macros](#bazel-macros)
+
 ## Setup
 ### Xcode Project generation
 Generate the `.xcodeproj` to open and work in Xcode. Builds and tests will be executed through bazel, to ensure behavioral parity.
@@ -16,6 +24,12 @@ The demo app can also be built and launched in a simulator from the command line
 ```bash
 bazel run //ios/demo:PlayerUIDemo
 ```
+
+Note: 
+When building/testing targets with Bazel it is not recommended to build all targets under a package using `/...` because some targets such as those using `swift_library` for example `PlayerUIInternalTestUtilities` and `PlayerUIReferenceAssets` are not buildable due to running on MacOS. It is recommended to build the individual targets and build those that depend on the underlying targets using `swift_library`.
+For example, you can't build `PlayerUIInternalTestUtilities` but you can build `//ios/core:PlayerUITests` which builds `PlayerUIInternalTestUtilities` through it being a test dependency.
+
+It is not an issue to use `/...` when [querying](#Examining-Targets) all targets under a package because querying just lists targets and nothing is being built.
 
 ## Adding a new plugin
 Adding a new plugin is simple using predefined macros for `BUILD.bazel` files. Additional steps are required to include new code in the final artifacts, and in the Xcode project.
@@ -270,10 +284,12 @@ Adding external dependencies to package manifests follows the normal convention 
 ### Bazel Macros
 Both `ios_plugin` and `swiftui_plugin` call the same `ios_pipeline` macro, and hardcode some of the parameters to that pipeline. For more complex usecases, `ios_pipeline` can be used directly, to generate tests for packages that have both regular unit tests, as well as SwiftUI ViewInspector based tests.
 
+Note: the `ios_pipeline` macro is a common macro loaded from rules_player repo, it requires a few peer dependencies that must be added in this main repo in order to work with the `ios_pipeline` including SwiftLint and ViewInspector (SPM dependencies) and build_bazel_rules_apple and build_bazel_rules_ios (Rule dependencies)
+
 Example:
 
 ```python
-load("//tools/ios:util.bzl", "ios_pipeline")
+load("@rules_player//ios:defs.bzl", "ios_pipeline")
 
 ios_pipeline(
     name = "PlayerUITestUtilitiesCore",

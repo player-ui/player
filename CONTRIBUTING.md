@@ -12,8 +12,7 @@ If the changes are larger (API design, architecture, etc), [opening an issue](ht
 
 ## Requirements
 * [bazelisk](https://github.com/bazelbuild/bazelisk)
-* [npm >= 8.19.2](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
-* [yarn >= 1.22.19](https://yarnpkg.com/)
+* [pnpm >= 8.0.0](https://pnpm.io/installation)
 
 * [Swift >= 5.5](https://www.swift.org/download/)
 * [Xcode 15.3](https://developer.apple.com/download/all/) 
@@ -24,17 +23,18 @@ If the changes are larger (API design, architecture, etc), [opening an issue](ht
 ### Player
 For speed and consistency, this repo leverages `bazel` as it's main build tool. Check out the [bazel](https://bazel.build/) docs for more info.
 
-After forking the repo, run builds using:
+After forking the repo, run builds using bazel to test, build and run:
+
+## Docs Sites
+These require the [Android NDK](https://developer.android.com/ndk).
+The docs site can be ran using:
 
 ```bash
-bazel build //...
+bazel build //docs/site:start
+bazel run //docs/site:start
 ```
+which will run an instance on `http://localhost:3000`.
 
-Tests can also be ran using:
-
-```bash
-bazel test //...
-```
 
 ## For Android Only builds
 If you are interested in only contributing for android, follow our [android guide](https://github.com/player-ui/player/blob/main/android/demo/README.md)
@@ -56,17 +56,6 @@ The demo app can also be built and launched in a simulator from the command line
 ```bash
 bazel run //ios/demo:PlayerUIDemo
 ```
-
-## Docs Sites
-These require the [Android NDK](https://developer.android.com/ndk).
-The docs site can be ran using:
-
-```bash
-bazel build //docs/site:start
-bazel run //docs/site:start
-```
-which will run an instance on `http://localhost:3000`.
-
 
 ## Submitting a Pull Request
 

@@ -13,6 +13,7 @@ import {
   actionTransform,
   imageTransform,
   infoTransform,
+  choiceTransform,
 } from "./assets";
 
 /**
@@ -34,6 +35,7 @@ export class ReferenceAssetsPlugin
         [{ type: "input" }, inputTransform],
         [{ type: "image" }, imageTransform],
         [{ type: "info" }, infoTransform],
+        [{ type: "choice" }, choiceTransform],
       ]),
     );
   }

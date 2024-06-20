@@ -17,11 +17,7 @@ import XCTest
 @testable import PlayerUISwiftUI
 
 class InfoAssetTests: SwiftUIAssetUnitTestCase {
-    override func register(registry: SwiftUIRegistry) {
-        registry.register("info", asset: InfoAsset.self)
-        registry.register("text", asset: TextAsset.self)
-        registry.register("action", asset: ActionAsset.self)
-    }
+    override open func plugins() -> [NativePlugin] { [ReferenceAssetsPlugin()] }
 
     func testDecoding() async throws {
         let json = """
