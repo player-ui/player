@@ -121,9 +121,9 @@ use_repo(remote_android_extensions, "android_gmaven_r8")
 # Maven
 bazel_dep(name = "rules_jvm_external")
 git_override(
-    remote = "https://github.com/brocollie08/rules_jvm_external.git",
+    remote = "https://github.com/sugarmanz/rules_jvm_external.git",
     # bazel-6 branch
-    commit = "9f645825f56257d51f53af1360037c447c42a4e5",
+    commit = "44f4355b2dbe0d6fd73d690ad66bf5744d482a29",
     module_name = "rules_jvm_external",
 )
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
