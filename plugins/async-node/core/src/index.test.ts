@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { Node, InProgressState, Resolver } from '@player-ui/player';
+import { Node, InProgressState, Resolver, ViewInstance } from '@player-ui/player';
 import { Player } from '@player-ui/player';
 import { waitFor } from '@testing-library/react';
 import { AsyncNodePlugin, AsyncNodePluginPlugin } from './index';
@@ -44,8 +44,6 @@ const asyncNodeTest = async (resolvedValue: any, expectedActionType: string) => 
 
   let deferredResolve: ((value: any) => void) | undefined;
 
-  let resolverInstance: Resolver;
-
   plugin.hooks.onAsyncNode.tap('test', async (node: Node.Node) => {
     return new Promise((resolve) => {
       deferredResolve = resolve; // Promise would be resolved only once
@@ -56,18 +54,12 @@ const asyncNodeTest = async (resolvedValue: any, expectedActionType: string) => 
 
   const player = new Player({ plugins: [plugin] });
 
+  let viewInstance : ViewInstance;
   player.hooks.viewController.tap('async-node-test', (vc) => {
     vc.hooks.view.tap('async-node-test', (view) => {
+      viewInstance = view;
       view.hooks.onUpdate.tap('async-node-test', () => {
         updateNumber++;
-      });
-    });
-  });
-
-  player.hooks.viewController.tap("async-node-test", (vc) => {
-    vc.hooks.view.tap("async-node-test", (view) => {
-      view.hooks.resolver.tap("async-node-test", (resolver) => {
-        resolverInstance = resolver;
       });
     });
   });
@@ -98,27 +90,22 @@ const asyncNodeTest = async (resolvedValue: any, expectedActionType: string) => 
     ?.lastUpdate;
 
   expect(view?.actions[0].asset.type).toBe('action');
-  expect(view?.actions[1]?.asset.type).toBe(expectedActionType);
+  expect(view?.actions.length).toBe(1);
   expect(updateNumber).toBe(2); // Replace with the actual expected number of updates
 
-  await waitFor(() => {
-    expect(resolverInstance).toBeDefined();
-  });
-
-  // Now we will force update the view using the resolver instance
-  resolverInstance.update();
+  viewInstance.update();
 
   // Updated this to 2 as the resolver is getting updated only twice and the onAsyncNode is not getting called as assumed and the test is failing when we expect it to be 3
   await waitFor(() => {
-    expect(updateNumber).toBe(2);
+    expect(updateNumber).toBe(3);
   });
 
   view = (player.getState() as InProgressState).controllers.view.currentView
     ?.lastUpdate;
 
   expect(view?.actions[0].asset.type).toBe("action");
-  expect(view?.actions[1]?.asset.type).toBe(expectedActionType);
-  expect(updateNumber).toBe(2);
+  expect(view?.actions.length).toBe(1);
+  expect(updateNumber).toBe(3);
 };
 
 test('should return current node view when the resolved node is null', async () => {
