@@ -1,12 +1,11 @@
 cc_library(
     name = "hermes_jni",
     srcs = [
+        "JHermesRuntime.cpp",
         "OnLoad.cpp",
-        # TODO: Rename JHermesRuntime
-        "com_intuit_playerui_hermes_bridge_runtime_HermesRuntimeImpl.cpp",
     ],
     hdrs = [
-        "com_intuit_playerui_hermes_bridge_runtime_HermesRuntimeImpl.h",
+        "JHermesRuntime.h",
     ],
     copts = ["-std=c++17"],
     visibility = ["//visibility:public"],

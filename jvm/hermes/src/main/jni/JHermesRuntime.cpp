@@ -1,6 +1,6 @@
 #include <hermes/hermes.h>
 
-#include "com_intuit_playerui_hermes_bridge_runtime_HermesRuntimeImpl.h"
+#include "JHermesRuntime.h"
 
 namespace intuit::playerui {
 

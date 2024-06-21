@@ -8,6 +8,7 @@ main_deps = main_exports + [
     #    "@maven//:com_facebook_react_hermes_android",
     "@maven//:com_facebook_fbjni_fbjni_java_only",
     "@maven//:com_facebook_soloader_soloader",
+    ":fbjni",
 ]
 
 # TODO: These should probably just be dependencies of headless

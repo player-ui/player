@@ -1,4 +1,4 @@
-#include "com_intuit_playerui_hermes_bridge_runtime_HermesRuntimeImpl.h"
+#include "JHermesRuntime.h"
 
 using namespace facebook::jni;
 
