@@ -25,7 +25,7 @@ android_binary(
     deps = [
         ":demo_lib",
         "//jvm/j2v8:j2v8-android",
-        "@android_j2v8//aar",
+        "@maven//:com_eclipsesource_j2v8_j2v8",
         "@maven//:androidx_databinding_databinding_common",
         "@maven//:androidx_databinding_databinding_runtime",
         "@maven//:org_jetbrains_kotlin_kotlin_reflect",
