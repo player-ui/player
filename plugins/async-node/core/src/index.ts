@@ -167,7 +167,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
                 ? options.parseNode(result)
                 : undefined;
 
-            this.resolvedMapping.set(node.id, parsedNode? parsedNode : node)
+            this.resolvedMapping.set(node.id, parsedNode ? parsedNode : node);
             view.updateAsync();
           });
 

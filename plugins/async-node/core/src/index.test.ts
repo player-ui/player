@@ -1,50 +1,50 @@
 import { expect, test } from "vitest";
-import { Node, InProgressState, Resolver, ViewInstance } from '@player-ui/player';
-import { Player } from '@player-ui/player';
-import { waitFor } from '@testing-library/react';
-import { AsyncNodePlugin, AsyncNodePluginPlugin } from './index';
+import { Node, InProgressState, ViewInstance } from "@player-ui/player";
+import { Player } from "@player-ui/player";
+import { waitFor } from "@testing-library/react";
+import { AsyncNodePlugin, AsyncNodePluginPlugin } from "./index";
 
 const basicFRFWithActions = {
-  id: 'test-flow',
+  id: "test-flow",
   views: [
     {
-      id: 'my-view',
+      id: "my-view",
       actions: [
         {
           asset: {
-            id: 'action-0',
-            type: 'action',
-            value: '{{foo.bar}}'
-          }
+            id: "action-0",
+            type: "action",
+            value: "{{foo.bar}}",
+          },
         },
         {
-          id: 'uhh',
-          async: 'true'
-        }
-      ]
-    }
+          id: "nodeId",
+          async: "true",
+        },
+      ],
+    },
   ],
   navigation: {
-    BEGIN: 'FLOW_1',
+    BEGIN: "FLOW_1",
     FLOW_1: {
-      startState: 'VIEW_1',
+      startState: "VIEW_1",
       VIEW_1: {
-        state_type: 'VIEW',
-        ref: 'my-view',
-        transitions: {}
-      }
-    }
-  }
+        state_type: "VIEW",
+        ref: "my-view",
+        transitions: {},
+      },
+    },
+  },
 };
 
-const asyncNodeTest = async (resolvedValue: any, expectedActionType: string) => {
+const asyncNodeTest = async (resolvedValue: any) => {
   const plugin = new AsyncNodePlugin({
-    plugins: [new AsyncNodePluginPlugin()]
+    plugins: [new AsyncNodePluginPlugin()],
   });
 
   let deferredResolve: ((value: any) => void) | undefined;
 
-  plugin.hooks.onAsyncNode.tap('test', async (node: Node.Node) => {
+  plugin.hooks.onAsyncNode.tap("test", async (node: Node.Node) => {
     return new Promise((resolve) => {
       deferredResolve = resolve; // Promise would be resolved only once
     });
@@ -54,11 +54,12 @@ const asyncNodeTest = async (resolvedValue: any, expectedActionType: string) => 
 
   const player = new Player({ plugins: [plugin] });
 
-  let viewInstance : ViewInstance;
-  player.hooks.viewController.tap('async-node-test', (vc) => {
-    vc.hooks.view.tap('async-node-test', (view) => {
+  let viewInstance: ViewInstance | undefined;
+
+  player.hooks.viewController.tap("async-node-test", (vc) => {
+    vc.hooks.view.tap("async-node-test", (view) => {
       viewInstance = view;
-      view.hooks.onUpdate.tap('async-node-test', () => {
+      view.hooks.onUpdate.tap("async-node-test", () => {
         updateNumber++;
       });
     });
@@ -70,7 +71,7 @@ const asyncNodeTest = async (resolvedValue: any, expectedActionType: string) => 
     ?.lastUpdate;
 
   expect(view).toBeDefined();
-  expect(view?.actions[0].asset.type).toBe('action');
+  expect(view?.actions[0].asset.type).toBe("action");
   expect(view?.actions[1]).toBeUndefined();
 
   await waitFor(() => {
@@ -89,7 +90,7 @@ const asyncNodeTest = async (resolvedValue: any, expectedActionType: string) => 
   view = (player.getState() as InProgressState).controllers.view.currentView
     ?.lastUpdate;
 
-  expect(view?.actions[0].asset.type).toBe('action');
+  expect(view?.actions[0].asset.type).toBe("action");
   expect(view?.actions.length).toBe(1);
 
   viewInstance.update();
@@ -105,12 +106,12 @@ const asyncNodeTest = async (resolvedValue: any, expectedActionType: string) => 
   expect(view?.actions.length).toBe(1);
 };
 
-test('should return current node view when the resolved node is null', async () => {
-  await asyncNodeTest(null, undefined);
+test("should return current node view when the resolved node is null", async () => {
+  await asyncNodeTest(null);
 });
 
-test('should return current node view when the resolved node is undefined', async () => {
-  await asyncNodeTest(undefined, undefined);
+test("should return current node view when the resolved node is undefined", async () => {
+  await asyncNodeTest(undefined);
 });
 
 test("replaces async nodes with provided node", async () => {
