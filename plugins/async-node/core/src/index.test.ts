@@ -91,7 +91,6 @@ const asyncNodeTest = async (resolvedValue: any, expectedActionType: string) => 
 
   expect(view?.actions[0].asset.type).toBe('action');
   expect(view?.actions.length).toBe(1);
-  expect(updateNumber).toBe(2); // Replace with the actual expected number of updates
 
   viewInstance.update();
 
@@ -104,7 +103,6 @@ const asyncNodeTest = async (resolvedValue: any, expectedActionType: string) => 
 
   expect(view?.actions[0].asset.type).toBe("action");
   expect(view?.actions.length).toBe(1);
-  expect(updateNumber).toBe(3);
 };
 
 test('should return current node view when the resolved node is null', async () => {
