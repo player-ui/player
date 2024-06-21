@@ -95,7 +95,6 @@ const asyncNodeTest = async (resolvedValue: any, expectedActionType: string) => 
 
   viewInstance.update();
 
-  // Updated this to 2 as the resolver is getting updated only twice and the onAsyncNode is not getting called as assumed and the test is failing when we expect it to be 3
   await waitFor(() => {
     expect(updateNumber).toBe(3);
   });
