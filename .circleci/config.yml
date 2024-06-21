@@ -30,7 +30,7 @@ executors:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   android:
     machine:
-      image: android:202102-01
+      image: android:2024.04.1
     working_directory: ~/player
     resource_class: large
     environment:
