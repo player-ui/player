@@ -3,7 +3,7 @@ import { SyncBailHook, SyncWaterfallHook } from 'tapable-ts';
 import type { Template } from '@player-ui/types';
 import type { AnyAssetType, Node } from './types';
 import { NodeType } from './types';
-import { getNodeID, hasAsync } from './utils';
+import { getNodeID, hasAsync, hasSwitchKey, hasTemplateValues } from './utils';
 
 export * from './types';
 export * from './utils';
@@ -52,7 +52,10 @@ export class Parser {
       [Node.Node | undefined | null, object]
     >(),
 
-    determineNodeType: new SyncBailHook<[object | string], NodeType>(),
+    determineNodeType: new SyncBailHook<
+      [object | string | undefined | null],
+      NodeType
+    >(),
 
     parseNode: new SyncBailHook<
       [
@@ -106,25 +109,6 @@ export class Parser {
     return tapped;
   }
 
-  /**
-   * Checks if there are templated values in the object
-   *
-   * @param obj - The Parsed Object to check to see if we have a template array type for
-   * @param localKey - The key being checked
-   */
-  private hasTemplateValues(obj: any, localKey: string) {
-    return (
-      Object.hasOwnProperty.call(obj, 'template') &&
-      Array.isArray(obj?.template) &&
-      obj.template.length &&
-      obj.template.find((tmpl: any) => tmpl.output === localKey)
-    );
-  }
-
-  private hasSwitchKey(localKey: string) {
-    return localKey === ('staticSwitch' || 'dynamicSwitch');
-  }
-
   public parseObject(
     obj: object,
     type: Node.ChildrenTypes = NodeType.Value,
@@ -175,7 +159,8 @@ export class Parser {
       };
 
       const newValue = objEntries.reduce((accumulation, current): NestedObj => {
-        const { children, ...rest } = accumulation;
+        let { value } = accumulation;
+        const { children } = accumulation;
         const [localKey, localValue] = current;
 
         if (localKey === 'asset' && typeof localValue === 'object') {
@@ -186,199 +171,143 @@ export class Parser {
           );
 
           if (assetAST) {
-            return {
-              ...rest,
-              children: [
-                ...children,
-                {
-                  path: [...path, 'asset'],
-                  value: assetAST,
-                },
-              ],
-            };
+            children.push({
+              path: [...path, localKey],
+              value: assetAST,
+            });
           }
         } else if (
-          this.hooks.determineNodeType.call(localKey) === NodeType.Template &&
-          Array.isArray(localValue)
+          this.hooks.determineNodeType.call(localKey) === NodeType.Template
         ) {
-          const templateChildren = localValue
+          const templateChildren: Array<Node.Child> = localValue
             .map((template: Template) => {
-              const templateAST = this.hooks.onCreateASTNode.call(
-                {
-                  type: NodeType.Template,
-                  depth: options.templateDepth ?? 0,
-                  data: template.data,
-                  template: template.value,
-                  dynamic: template.dynamic ?? false,
-                },
-                template
+              const templateAST = this.hooks.parseNode.call(
+                template,
+                NodeType.Value,
+                options,
+                NodeType.Template
               );
-
-              if (templateAST?.type === NodeType.MultiNode) {
-                templateAST.values.forEach((v) => {
-                  // eslint-disable-next-line no-param-reassign
-                  v.parent = templateAST;
-                });
-              }
 
               if (templateAST) {
                 return {
                   path: [...path, template.output],
                   value: templateAST,
-                };
+                } as Node.Child;
               }
 
               // eslint-disable-next-line no-useless-return
               return;
             })
-            .filter((element) => !!element);
+            .filter(Boolean);
 
-          return {
-            ...rest,
-            children: [...children, ...templateChildren],
-          } as NestedObj;
+          children.push(...templateChildren);
         } else if (
-          (localValue &&
-            this.hooks.determineNodeType.call(localValue) ===
-              NodeType.Switch) ||
-          this.hasSwitchKey(localKey)
+          this.hooks.determineNodeType.call(localValue) === NodeType.Switch ||
+          hasSwitchKey(localKey)
         ) {
           const localSwitch = this.hooks.parseNode.call(
-            this.hasSwitchKey(localKey)
-              ? { [localKey]: localValue }
-              : localValue,
+            hasSwitchKey(localKey) ? { [localKey]: localValue } : localValue,
             NodeType.Value,
             options,
             NodeType.Switch
           );
 
-          if (
-            localSwitch &&
-            localSwitch.type === NodeType.Value &&
-            localSwitch.children?.length === 1 &&
-            localSwitch.value === undefined
-          ) {
-            const firstChild = localSwitch.children[0];
-
-            return {
-              ...rest,
-              children: [
-                ...children,
-                {
-                  path: [...path, localKey, ...firstChild.path],
-                  value: firstChild.value,
-                },
-              ],
-            };
-          }
-
           if (localSwitch) {
-            return {
-              ...rest,
-              children: [
-                ...children,
-                {
-                  path: [...path, localKey],
-                  value: localSwitch,
-                },
-              ],
-            };
+            let currPath = [...path, localKey];
+            let currValue = localSwitch;
+
+            if (
+              localSwitch.type === NodeType.Value &&
+              localSwitch.children?.length === 1 &&
+              localSwitch.value === undefined
+            ) {
+              const firstChild = localSwitch.children[0];
+              currPath = [...currPath, ...firstChild.path];
+              currValue = firstChild.value;
+            }
+
+            children.push({
+              path: currPath,
+              value: currValue,
+            });
           }
-        } else if (localValue && hasAsync(localValue)) {
+        } else if (hasAsync(localValue)) {
           const localAsync = this.parseAsync(
             localValue,
             NodeType.Value,
             options
           );
+
           if (localAsync) {
             children.push({
               path: [...path, localKey],
               value: localAsync,
             });
           }
-        } else if (localValue && Array.isArray(localValue)) {
+        } else if (Array.isArray(localValue)) {
           const childValues = localValue
             .map((childVal) =>
               this.parseObject(childVal, NodeType.Value, options)
             )
             .filter((child): child is Node.Node => !!child);
 
-          if (childValues.length > 0) {
+          if (childValues.length) {
             const multiNode = this.hooks.onCreateASTNode.call(
               {
                 type: NodeType.MultiNode,
-                override: !this.hasTemplateValues(localObj, localKey),
+                override: !hasTemplateValues(localObj, localKey),
                 values: childValues,
               },
               localValue
             );
 
-            if (multiNode?.type === NodeType.MultiNode) {
-              multiNode.values.forEach((v) => {
-                // eslint-disable-next-line no-param-reassign
-                v.parent = multiNode;
+            if (multiNode) {
+              if (multiNode.type === NodeType.MultiNode) {
+                multiNode.values.forEach((v) => {
+                  // eslint-disable-next-line no-param-reassign
+                  v.parent = multiNode;
+                });
+              }
+
+              children.push({
+                path: [...path, localKey],
+                value: multiNode,
               });
             }
-            if (multiNode) {
-              return {
-                ...rest,
-                children: [
-                  ...children,
-                  {
-                    path: [...path, localKey],
-                    value: multiNode,
-                  },
-                ],
-              };
-            }
           }
-        } else if (localValue && typeof localValue === 'object') {
-          const determineNodeType =
-            this.hooks.determineNodeType.call(localValue);
-
-          if (determineNodeType === NodeType.Applicability) {
-            const parsedNode = this.hooks.parseNode.call(
-              localValue,
-              NodeType.Value,
-              options,
-              determineNodeType
-            );
-            if (parsedNode) {
-              return {
-                ...rest,
-                children: [
-                  ...children,
-                  {
-                    path: [...path, localKey],
-                    value: parsedNode,
-                  },
-                ],
-              };
-            }
-          } else {
-            const result = parseLocalObject(accumulation.value, localValue, [
-              ...path,
-              localKey,
-            ]);
-            return {
-              value: result.value,
-              children: [...children, ...result.children],
-            };
-          }
-        } else {
-          const value = setIn(
-            accumulation.value,
-            [...path, localKey],
-            localValue
+        } else if (
+          this.hooks.determineNodeType.call(localValue) ===
+          NodeType.Applicability
+        ) {
+          const parsedNode = this.hooks.parseNode.call(
+            localValue,
+            NodeType.Value,
+            options,
+            NodeType.Applicability
           );
 
-          return {
-            children,
-            value,
-          };
+          if (parsedNode) {
+            children.push({
+              path: [...path, localKey],
+              value: parsedNode,
+            });
+          }
+        } else if (localValue && typeof localValue === 'object') {
+          const result = parseLocalObject(accumulation.value, localValue, [
+            ...path,
+            localKey,
+          ]);
+
+          value = result.value;
+          children.push(...result.children);
+        } else {
+          value = setIn(accumulation.value, [...path, localKey], localValue);
         }
 
-        return accumulation;
+        return {
+          value,
+          children,
+        };
       }, defaultValue);
 
       return newValue;
@@ -387,15 +316,15 @@ export class Parser {
     const { value, children } = parseLocalObject(undefined, obj);
 
     const baseAst =
-      value === undefined && children.length === 0
+      value === undefined && !children.length
         ? undefined
         : {
             type,
             value,
           };
 
-    if (baseAst !== undefined && children.length > 0) {
-      const parent = baseAst as Node.BaseWithChildren<any>;
+    if (baseAst && children.length) {
+      const parent: Node.BaseWithChildren<any> = baseAst;
       parent.children = children;
       children.forEach((child) => {
         // eslint-disable-next-line no-param-reassign

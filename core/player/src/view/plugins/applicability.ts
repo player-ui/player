@@ -31,7 +31,7 @@ export default class ApplicabilityPlugin implements ViewPlugin {
   applyParser(parser: Parser) {
     /** Switches resolved during the parsing phase are static */
     parser.hooks.determineNodeType.tap('applicability', (obj: any) => {
-      if (Object.prototype.hasOwnProperty.call(obj, 'applicability')) {
+      if (obj && Object.prototype.hasOwnProperty.call(obj, 'applicability')) {
         return NodeType.Applicability;
       }
     });
@@ -50,6 +50,7 @@ export default class ApplicabilityPlugin implements ViewPlugin {
             nodeType,
             options
           );
+
           if (parsedApplicability !== null) {
             const applicabilityNode = parser.createASTNode(
               {
