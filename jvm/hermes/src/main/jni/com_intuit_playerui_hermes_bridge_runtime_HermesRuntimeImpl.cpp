@@ -1,40 +1,39 @@
-/*
-* This is free and unencumbered software released into the public domain.
-* For more information, please refer to the LICENSE file in the root directory
-* or at <http://unlicense.org/>
-*/
-
 #include <hermes/hermes.h>
-#include <iostream>
 
-/// JS code to be executed.
-static const char *code = R"(
-    print("Hello, World!");
-    throw Error("Surprise!");
-)";
+#include "com_intuit_playerui_hermes_bridge_runtime_HermesRuntimeImpl.h"
 
-int main() {
-  // You can Customize the runtime config here.
-  auto runtimeConfig =
-      hermes::vm::RuntimeConfig::Builder().withIntl(false).build();
+using namespace facebook;
 
-  // Create the Hermes runtime.
-  auto runtime = facebook::hermes::makeHermesRuntime(runtimeConfig);
+namespace intuit::playerui {
 
-  // Execute some JS.
-  int status = 0;
-  try {
-    runtime->evaluateJavaScript(
-        std::make_unique<facebook::jsi::StringBuffer>(code), "main.js");
-  } catch (facebook::jsi::JSError &e) {
-    // Handle JS exceptions here.
-    std::cerr << "JS Exception: " << e.getStack() << std::endl;
-    status = 1;
-  } catch (facebook::jsi::JSIException &e) {
-    // Handle JSI exceptions here.
-    std::cerr << "JSI Exception: " << e.what() << std::endl;
-    status = 1;
-  }
-
-  return status;
+std::string JHermesRuntime::execute(std::string script) {
+    jsi::Value result = runtime_->execute(script);
+    return result.toString(*runtime_).utf8(*runtime_);
 }
+
+jni::local_ref<JHermesRuntime::jhybridobject> JHermesRuntime::create(jni::alias_ref<jclass>) {
+    // throw HermesRuntimeException("u wot m8?");
+    // TODO: Verify we should make_global, and how to track references
+    // static auto instance = jni::make_global();
+    return newObjectCxxArgs();
+}
+
+void JHermesRuntime::registerNatives() {
+//     registerHybrid({
+//         makeNativeMethod("execute", JHermesRuntime::execute),
+// //            makeNativeMethod("execute", JHermesRuntime::execute, "Ljava/lang/String;")
+//     });
+     javaClassStatic()->registerNatives( {
+         makeNativeMethod("create", JHermesRuntime::create),
+     });
+}
+
+//    // TODO: Maybe externalize
+//extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void*) {
+//    return initialize(vm, [] {
+//        throw std::runtime_error("help");
+//        JHermesRuntime::registerNatives();
+//    });
+//}
+
+};

@@ -3,12 +3,21 @@
 #include <iostream>
 #include <hermes/hermes.h>
 
+#define LOG(level) std::cout
+
 namespace intuit::playerui {
+
+static void hermesFatalHandler(const std::string& reason) {
+    LOG(ERROR) << "Hermes Fatal: " << reason << "\n";
+    // TODO: Reconnect to Android logger
+    // __android_log_assert(nullptr, "Hermes", "%s", reason.c_str());
+}
 
 struct HermesRuntimeException : std::runtime_error {
     explicit HermesRuntimeException(const char* msg) : std::runtime_error(msg) {}
 };
 
+// TODO: The Holder nomenclature is typically used to hold a reference to Java objects
 // Executor - TODO: It's possible we want to extend jsi::Runtime and delegate through a runtime instance
 class HermesRuntimeHolder {
 public:
@@ -48,6 +57,8 @@ private:
         std::unique_ptr<facebook::hermes::HermesRuntime> runtime
     ) : config_(std::make_unique<hermes::vm::RuntimeConfig>(config)), runtime_(std::move(runtime)) {
         std::cout << "Primary constructor\nConfig: " << &get_config() << "\nRuntime: " << get_runtime().description() << std::endl;
+
+        facebook::hermes::HermesRuntime::setFatalHandler(hermesFatalHandler);
     }
 
     std::unique_ptr<hermes::vm::RuntimeConfig> config_;
