@@ -3,6 +3,7 @@ cc_library(
     srcs = ["HermesRuntimeHolder.cpp"],
     hdrs = ["HermesRuntimeHolder.hpp"],
     copts = ["-std=c++17"],
+    visibility = ["//visibility:public"],
     deps = ["@hermes"],
 )
 
