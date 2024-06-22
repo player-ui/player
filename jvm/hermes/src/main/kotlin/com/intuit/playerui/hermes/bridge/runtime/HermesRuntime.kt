@@ -3,7 +3,9 @@ package com.intuit.playerui.hermes.bridge.runtime
 import com.facebook.jni.HybridData
 import com.facebook.jni.annotations.DoNotStrip
 import com.facebook.soloader.nativeloader.NativeLoader
+import com.intuit.playerui.hermes.bridge.JSIValue
 import com.intuit.playerui.hermes.bridge.ResourceLoaderDelegate
+import kotlin.system.exitProcess
 
 public class HermesRuntime {
 
@@ -18,15 +20,10 @@ public class HermesRuntime {
             //  2. hermes (does this rely on fbjni?)
             //  3. jsi (almost certain this'd need to be before hermes)
             //  4. hermes_jni (our code)
-            try {
-                NativeLoader.loadLibrary("fbjni")
-                NativeLoader.loadLibrary("jsi")
-                NativeLoader.loadLibrary("hermes")
-                NativeLoader.loadLibrary("hermes_jni")
-            } catch (e: Throwable) {
-                e.printStackTrace()
-                throw e
-            }
+            NativeLoader.loadLibrary("fbjni")
+            NativeLoader.loadLibrary("jsi")
+            NativeLoader.loadLibrary("hermes")
+            NativeLoader.loadLibrary("hermes_jni")
         }
     }
 
@@ -38,7 +35,7 @@ public class HermesRuntime {
 
     private external fun initHybrid(): HybridData
 
-    public external fun execute(script: String): String
+    public external fun execute(script: String): JSIValue
 }
 
 public fun main(args: Array<String>) {
@@ -46,5 +43,7 @@ public fun main(args: Array<String>) {
     println("Trying to execute 2 + 2")
     val runtime = HermesRuntime()
     println("Runtime: $runtime")
-    runtime.execute("2 + 2").also(::println)
+    runtime.execute("2 + 2").asInt().also(::println)
+    runtime.execute("3 + 3").asBoolean().also(::println)
+    exitProcess(0)
 }

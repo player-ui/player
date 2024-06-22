@@ -31,6 +31,7 @@ internal class ResourceLoaderDelegate : NativeLoaderDelegate {
 
         val rewritten = resource.writeTemp("lib$shortName", ".so")
         System.load(rewritten.toString())
+        // TODO: Should we track what shortNames we've loaded and early exit if we've already loaded?
         return true
     }
 

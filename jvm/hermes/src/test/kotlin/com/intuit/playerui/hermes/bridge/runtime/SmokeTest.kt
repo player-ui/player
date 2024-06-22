@@ -21,6 +21,7 @@ internal class SmokeTest {
 //            runtime.execute("2 + 2")
 //        }.message)
 //    }
+
     companion object {
         @JvmStatic @BeforeAll fun setupNativeLoader(): Unit {
             NativeLoader.init(ResourceLoaderDelegate())

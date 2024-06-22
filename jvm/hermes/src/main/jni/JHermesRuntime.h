@@ -4,6 +4,7 @@
 #include <fbjni/fbjni.h>
 
 #include "jvm/hermes/src/main/cxx/HermesRuntimeHolder.hpp"
+#include "JJSIValue.h"
 
 namespace intuit::playerui {
 
@@ -17,8 +18,8 @@ public:
         return makeCxxInstance();
     }
 
-    // TODO: Wrap Value w/ HybridClass
-    std::string execute(std::string script);
+    facebook::jni::local_ref<JJSIValue::javaobject> execute(std::string script);
+
 
 private:
     friend HybridBase;

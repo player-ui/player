@@ -2,10 +2,13 @@ cc_library(
     name = "hermes_jni",
     srcs = [
         "JHermesRuntime.cpp",
+        "JJSIValue.cpp",
         "OnLoad.cpp",
     ],
     hdrs = [
         "JHermesRuntime.h",
+        "JJSIValue.h",
+        "ValueHelpers.h",
     ],
     copts = ["-std=c++17"],
     visibility = ["//visibility:public"],
