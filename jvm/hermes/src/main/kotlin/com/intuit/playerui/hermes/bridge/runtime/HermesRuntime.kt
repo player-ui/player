@@ -3,8 +3,10 @@ package com.intuit.playerui.hermes.bridge.runtime
 import com.facebook.jni.HybridData
 import com.facebook.jni.annotations.DoNotStrip
 import com.facebook.soloader.nativeloader.NativeLoader
-import com.intuit.playerui.hermes.bridge.JSIValue
 import com.intuit.playerui.hermes.bridge.ResourceLoaderDelegate
+import com.intuit.playerui.jsi.Value
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlin.system.exitProcess
 
 public class HermesRuntime {
@@ -35,15 +37,24 @@ public class HermesRuntime {
 
     private external fun initHybrid(): HybridData
 
-    public external fun execute(script: String): JSIValue
+    public external fun execute(script: String): Value
 }
 
-public fun main(args: Array<String>) {
-    NativeLoader.init(ResourceLoaderDelegate())
-    println("Trying to execute 2 + 2")
-    val runtime = HermesRuntime()
-    println("Runtime: $runtime")
-    runtime.execute("2 + 2").asInt().also(::println)
-    runtime.execute("3 + 3").asBoolean().also(::println)
+public fun main() {
+    try {
+        NativeLoader.init(ResourceLoaderDelegate())
+        println("Trying to execute 2 + 2")
+        val runtime = HermesRuntime()
+        println("Runtime: $runtime")
+        runtime.execute("2 + 2").asNumber().let(::println)
+
+        runBlocking(Dispatchers.Default) {
+            val result = runtime.execute("20 + 20")
+            result.asNumber().let(::println)
+        }
+    } catch (t: Throwable) {
+        t.printStackTrace()
+        exitProcess(1)
+    }
     exitProcess(0)
 }
