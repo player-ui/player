@@ -9,6 +9,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
         intuit::playerui::JJSIObject::registerNatives();
         intuit::playerui::JJSIArray::registerNatives();
         intuit::playerui::JJSIFunction::registerNatives();
+        intuit::playerui::JJSISymbol::registerNatives();
         intuit::playerui::JHermesRuntime::registerNatives();
     });
 }

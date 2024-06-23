@@ -30,6 +30,9 @@ using JJSIArray_jhybridobject = JJSIArrayHybridClass::jhybridobject;
 class JJSIFunction;
 using JJSIFunctionHybridClass = HybridClass<JJSIFunction>;
 using JJSIFunction_jhybridobject = JJSIFunctionHybridClass::jhybridobject;
+class JJSISymbol;
+using JJSISymbolHybridClass = HybridClass<JJSISymbol>;
+using JJSISymbol_jhybridobject = JJSISymbolHybridClass::jhybridobject;
 
 class JJSIValue : public HybridClass<JJSIValue> {
 public:
@@ -58,9 +61,9 @@ public:
     double asNumber();
     std::string asString(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     int64_t asBigInt(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
-    std::string asSymbol(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
+    local_ref<JJSISymbol_jhybridobject> asSymbol(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     // MARK: This is b/c we're forward declaring JJSIObject, but need to give enough information to declare _what_ it's going to be
-    local_ref<HybridClass<JJSIObject>::jhybridobject> asObject(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
+    local_ref<JJSIObject_jhybridobject> asObject(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     std::string toString(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
 
     Value& get_value() const { return *value_; }
@@ -137,5 +140,20 @@ public:
 private:
     friend HybridBase;
     std::shared_ptr<Function> function_;
+};
+
+class JJSISymbol : public JJSISymbolHybridClass {
+public:
+    static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Symbol;";
+    static void registerNatives();
+
+    explicit JJSISymbol(Symbol&& symbol) : symbol_(std::make_shared<Symbol>(std::move(symbol))) {}
+
+    std::string toString(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
+
+    Symbol& get_symbol() const { return *symbol_; }
+private:
+    friend HybridBase;
+    std::shared_ptr<Symbol> symbol_;
 };
 };

@@ -74,6 +74,10 @@ public fun main() {
         val funcRes = func.asObject(runtime).asFunction(runtime).call(runtime, Value.from(3))
         funcRes.let(::println)
         funcRes.toString(runtime).let(::println)
+
+        val symbol = runtime.execute("Symbol.for('hello-world')")
+        symbol.isSymbol().let(::println)
+        symbol.asSymbol(runtime).toString(runtime).let(::println)
     } catch (t: Throwable) {
         t.printStackTrace()
         exitProcess(1)

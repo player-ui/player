@@ -27,7 +27,7 @@ public class Value private constructor(@DoNotStrip private val mHybridData: Hybr
     public external fun asNumber(): Double
     public external fun asString(runtime: Runtime): String
     public external fun asBigInt(runtime: Runtime): Long
-    public external fun asSymbol(runtime: Runtime): String
+    public external fun asSymbol(runtime: Runtime): Symbol
     public external fun asObject(runtime: Runtime): Object
     public external fun toString(runtime: Runtime): String
 
@@ -110,4 +110,6 @@ public class Function private constructor(mHybridData: HybridData) : Object(mHyb
     public external fun callAsConstructor(runtime: Runtime, vararg value: Value): Value
 }
 
-public class Symbol private constructor(mHybridData: HybridData) : Object(mHybridData) {}
+public class Symbol private constructor(mHybridData: HybridData) : Object(mHybridData) {
+    public external fun toString(runtime: Runtime): String
+}

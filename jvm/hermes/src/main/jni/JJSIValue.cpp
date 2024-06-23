@@ -99,12 +99,8 @@ int64_t JJSIValue::asBigInt(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
     return value_->asBigInt(runtime).asInt64(runtime);
 }
 
-// TODO: This is string support for symbols, on par w/ existing runtimes
-//       Wrapping symbol should be easy enough, but JSI doesn't even have
-//       full suport but at least we'd get an equality API :P
-std::string JJSIValue::asSymbol(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
-    Runtime& runtime = cthis(jRuntime)->get_runtime();
-    return value_->asSymbol(runtime).toString(runtime);
+local_ref<JJSISymbol::jhybridobject> JJSIValue::asSymbol(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
+    return JJSISymbol::newObjectCxxArgs(value_->asSymbol(jRuntime->cthis()->get_runtime()));
 }
 
 local_ref<JJSIObject::jhybridobject> JJSIValue::asObject(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
@@ -289,4 +285,13 @@ void JJSIFunction::registerNatives() {
     });
 }
 
+std::string JJSISymbol::toString(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
+    return symbol_->toString(jRuntime->cthis()->get_runtime());
+}
+
+void JJSISymbol::registerNatives() {
+    registerHybrid({
+        makeNativeMethod("toString", JJSISymbol::toString),
+    });
+}
 };
