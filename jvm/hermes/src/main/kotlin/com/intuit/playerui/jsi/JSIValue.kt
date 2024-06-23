@@ -40,6 +40,8 @@ public class Value private constructor(@DoNotStrip private val mHybridData: Hybr
     // TODO: if the underlying hybridclass maintains a reference to the runtime, it'd be nice to expose that for the node impl
 
     public companion object {
+        @JvmStatic public external fun from(value: Int): Value
+
         // TODO: Settle on API
         public val undefined: Value @JvmStatic external get
         @JvmStatic public external fun undefined(): Value
@@ -102,6 +104,10 @@ public class Array private constructor(mHybridData: HybridData) : Object(mHybrid
     }
 }
 
-public class Function private constructor(mHybridData: HybridData) : Object(mHybridData) {}
+public class Function private constructor(mHybridData: HybridData) : Object(mHybridData) {
+    public external fun call(runtime: Runtime, vararg args: Value): Value
+    public external fun callWithThis(runtime: Runtime, jsThis: Object, vararg value: Value): Value
+    public external fun callAsConstructor(runtime: Runtime, vararg value: Value): Value
+}
 
 public class Symbol private constructor(mHybridData: HybridData) : Object(mHybridData) {}

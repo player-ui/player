@@ -67,6 +67,13 @@ public fun main() {
         json.isObject().let(::println)
         json.asObject(runtime).let(::println)
         json.asObject(runtime).getProperty(runtime, "hello").toString(runtime).let(::println)
+
+        val func = runtime.execute("((i) => 3 + i)")
+        func.isObject().let(::println)
+        func.asObject(runtime).isFunction(runtime).let(::println)
+        val funcRes = func.asObject(runtime).asFunction(runtime).call(runtime, Value.from(3))
+        funcRes.let(::println)
+        funcRes.toString(runtime).let(::println)
     } catch (t: Throwable) {
         t.printStackTrace()
         exitProcess(1)

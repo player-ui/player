@@ -5,8 +5,21 @@
 
 namespace intuit::playerui {
 
+std::vector<Value> unwrapJJSIValues(alias_ref<JArrayClass<JJSIValue::jhybridobject>> wrapped) {
+    std::vector<Value> values = {};
+    values.reserve(wrapped->size());
+    for (int i = 0; i < wrapped->size(); ++i) {
+        values.push_back(std::move(wrapped->getElement(i)->cthis()->get_value()));
+    }
+    return values;
+}
+
 void JJSIRuntime::registerNatives() {
     registerHybrid({});
+}
+
+local_ref<HybridClass<JJSIValue>::jhybridobject> JJSIValue::from(alias_ref<jclass>, int i) {
+    return newObjectCxxArgs(Value(i));
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIValue::undefined(alias_ref<jclass>) {
@@ -106,6 +119,8 @@ std::string JJSIValue::toString(alias_ref<JJSIRuntime::jhybridobject> jRuntime) 
 
 void JJSIValue::registerNatives() {
     registerHybrid({
+        makeNativeMethod("from", JJSIValue::from),
+
         // TODO: Settle on getter API
         // MARK: Static Value APIs
         makeNativeMethod("undefined", JJSIValue::undefined),
@@ -214,6 +229,7 @@ void JJSIObject::registerNatives() {
 
 local_ref<JJSIArray::jhybridobject> JJSIArray::createWithElements(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> elements) {
     // TODO: Better way to convert JArrayClass<JJSIValue::jhybridobject> -> initializer_list<Value>
+    // TODO: This doesn't work anyways
     std::initializer_list<Value> values = [&]() {
         std::initializer_list<Value> result;
         for (int i = 0; i < elements->size(); ++i) {
@@ -250,9 +266,27 @@ void JJSIArray::registerNatives() {
     });
 }
 
+local_ref<JJSIValue::jhybridobject> JJSIFunction::call(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> args) {
+    auto values = unwrapJJSIValues(args);
+    return JJSIValue::newObjectCxxArgs(function_->call(jRuntime->cthis()->get_runtime(), static_cast<const Value*>(values.data()), values.size()));
+}
+
+local_ref<JJSIValue::jhybridobject> JJSIFunction::callWithThis(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIObject::jhybridobject> jsThis, alias_ref<JArrayClass<JJSIValue::jhybridobject>> args) {
+    auto values = unwrapJJSIValues(args);
+    return JJSIValue::newObjectCxxArgs(function_->callWithThis(jRuntime->cthis()->get_runtime(), jsThis->cthis()->get_object(), static_cast<const Value*>(values.data()), values.size()));
+}
+
+local_ref<JJSIValue::jhybridobject> JJSIFunction::callAsConstructor(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> args) {
+    auto values = unwrapJJSIValues(args);
+    return JJSIValue::newObjectCxxArgs(function_->callAsConstructor(jRuntime->cthis()->get_runtime(), static_cast<const Value*>(values.data()), values.size()));
+}
 
 void JJSIFunction::registerNatives() {
-    registerHybrid({});
+    registerHybrid({
+        makeNativeMethod("call", JJSIFunction::call),
+        makeNativeMethod("callWithThis", JJSIFunction::callWithThis),
+        makeNativeMethod("callAsConstructor", JJSIFunction::callAsConstructor),
+    });
 }
 
 };
