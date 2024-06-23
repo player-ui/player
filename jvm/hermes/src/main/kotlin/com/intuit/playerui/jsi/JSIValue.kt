@@ -30,6 +30,9 @@ public class Value private constructor(@DoNotStrip private val mHybridData: Hybr
     public external fun asSymbol(runtime: Runtime): String
     public external fun asObject(runtime: Runtime): Object
     public external fun toString(runtime: Runtime): String
+
+    // TODO: I want to enable this, but requires runtime access
+    //       Either, we store the runtime in the obj, or we make all runtime accesses explicit
 //    public external override fun toString(): String
 
     public fun strictEquals(runtime: Runtime, other: Value): Boolean = strictEquals(runtime, this, other)
@@ -71,7 +74,18 @@ public class Value private constructor(@DoNotStrip private val mHybridData: Hybr
 public open class Object internal constructor(@DoNotStrip private val mHybridData: HybridData) {
 
     public external fun instanceOf(runtime: Runtime, ctor: Function): Boolean
+
+    public external fun isArray(runtime: Runtime): Boolean
+    public external fun isFunction(runtime: Runtime): Boolean
+    public external fun asArray(runtime: Runtime): Array
+    public external fun asFunction(runtime: Runtime): Function
+
+    public external fun hasProperty(runtime: Runtime, name: String): Boolean
+    public external fun setProperty(runtime: Runtime, name: String, value: Value)
+    public external fun getPropertyNames(runtime: Runtime): Array
     public external fun getProperty(runtime: Runtime, name: String): Value
+    public external fun getPropertyAsObject(runtime: Runtime, name: String): Object
+    public external fun getPropertyAsFunction(runtime: Runtime, name: String): Function
 
     public companion object {
         @JvmStatic public external fun strictEquals(runtime: Runtime, a: Object, b: Object): Boolean

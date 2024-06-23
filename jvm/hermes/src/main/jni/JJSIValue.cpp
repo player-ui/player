@@ -127,7 +127,6 @@ void JJSIValue::registerNatives() {
         makeNativeMethod("isSymbol", JJSIValue::isSymbol),
         makeNativeMethod("isObject", JJSIValue::isObject),
 
-
         // peferring `as` APIs to let native exceptions bubble to JVM but let JSI tell us if it's actually that type
         // but maybe need to walk back this strategy to allow us to use null as a type signifier, and avoid exceptions
         // implicit naming conversion for JVM<->native
@@ -151,8 +150,45 @@ bool JJSIObject::instanceOf(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alia
     return object_->instanceOf(cthis(jRuntime)->get_runtime(), ctor->cthis()->get_function());
 }
 
+bool JJSIObject::isArray(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
+    return object_->isArray(cthis(jRuntime)->get_runtime());
+}
+
+bool JJSIObject::isFunction(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
+    return object_->isFunction(cthis(jRuntime)->get_runtime());
+}
+
+local_ref<JJSIArray::jhybridobject> JJSIObject::asArray(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
+    return JJSIArray::newObjectCxxArgs(object_->asArray(jRuntime->cthis()->get_runtime()));
+}
+
+local_ref<JJSIFunction::jhybridobject> JJSIObject::asFunction(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
+    return JJSIFunction::newObjectCxxArgs(object_->asFunction(jRuntime->cthis()->get_runtime()));
+}
+
+bool JJSIObject::hasProperty(alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name) {
+    return object_->hasProperty(jRuntime->cthis()->get_runtime(), name.c_str());
+}
+
+void JJSIObject::setProperty(alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name, alias_ref<JJSIValue::jhybridobject> value) {
+    // TODO: Need to test value unwrapping
+    object_->setProperty(jRuntime->cthis()->get_runtime(), name.c_str(), value->cthis()->get_value());
+}
+
+local_ref<JJSIArray::jhybridobject> JJSIObject::getPropertyNames(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
+    return JJSIArray::newObjectCxxArgs(object_->getPropertyNames(jRuntime->cthis()->get_runtime()));
+}
+
 local_ref<JJSIValue::jhybridobject> JJSIObject::getProperty(alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name) {
     return JJSIValue::newObjectCxxArgs(object_->getProperty(cthis(jRuntime)->get_runtime(), name.c_str()));
+}
+
+local_ref<JJSIObject::jhybridobject> JJSIObject::getPropertyAsObject(alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name) {
+    return newObjectCxxArgs(object_->getPropertyAsObject(jRuntime->cthis()->get_runtime(), name.c_str()));
+}
+
+local_ref<JJSIFunction::jhybridobject> JJSIObject::getPropertyAsFunction(alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name) {
+    return JJSIFunction::newObjectCxxArgs(object_->getPropertyAsFunction(jRuntime->cthis()->get_runtime(), name.c_str()));
 }
 
 void JJSIObject::registerNatives() {
@@ -162,7 +198,17 @@ void JJSIObject::registerNatives() {
 
         // MARK: Object APIs
         makeNativeMethod("instanceOf", JJSIObject::instanceOf),
+        makeNativeMethod("isArray", JJSIObject::isArray),
+        makeNativeMethod("isFunction", JJSIObject::isFunction),
+        makeNativeMethod("asArray", JJSIObject::asArray),
+        makeNativeMethod("asFunction", JJSIObject::asFunction),
+
+        makeNativeMethod("hasProperty", JJSIObject::hasProperty),
+        makeNativeMethod("setProperty", JJSIObject::setProperty),
+        makeNativeMethod("getPropertyNames", JJSIObject::getPropertyNames),
         makeNativeMethod("getProperty", JJSIObject::getProperty),
+        makeNativeMethod("getPropertyAsObject", JJSIObject::getPropertyAsObject),
+        makeNativeMethod("getPropertyAsFunction", JJSIObject::getPropertyAsFunction),
     });
 }
 

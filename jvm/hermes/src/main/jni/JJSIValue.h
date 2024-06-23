@@ -18,8 +18,18 @@ public:
     virtual Runtime& get_runtime() = 0;
 };
 
+/** Forward declarations to prevent circular references - jhybridobjects will need to ensure they have the same signature as the actual classes. Prefer using actual references when possible */
 class JJSIObject;
+// TODO: Can we hide these from the implementation (C++) to ensure they use the real types?
+using JJSIObjectHybridClass = HybridClass<JJSIObject>;
+using JJSIObject_jhybridobject = JJSIObjectHybridClass::jhybridobject;
+class JJSIArray;
+// TODO: Technically, this should provide the same class heirarchy (HybridClass<JJSIArray, JJSIObject>)
+using JJSIArrayHybridClass = HybridClass<JJSIArray>;
+using JJSIArray_jhybridobject = JJSIArrayHybridClass::jhybridobject;
 class JJSIFunction;
+using JJSIFunctionHybridClass = HybridClass<JJSIFunction>;
+using JJSIFunction_jhybridobject = JJSIFunctionHybridClass::jhybridobject;
 
 class JJSIValue : public HybridClass<JJSIValue> {
 public:
@@ -58,7 +68,8 @@ private:
     std::shared_ptr<Value> value_;
 };
 
-class JJSIObject : public HybridClass<JJSIObject> {
+/** JSI Object hybrid class - initially ignoring support for host object, native state, and array buffers. */
+class JJSIObject : public JJSIObjectHybridClass {
 public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Object;";
     static void registerNatives();
@@ -68,7 +79,20 @@ public:
     explicit JJSIObject(Object&& object) : object_(std::make_shared<Object>(std::move(object))) {}
 
     bool instanceOf(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<HybridClass<JJSIFunction>::jhybridobject> ctor);
+
+    bool isArray(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
+    bool isFunction(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
+
+    local_ref<JJSIArray_jhybridobject> asArray(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
+    local_ref<JJSIFunction_jhybridobject> asFunction(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
+
+    bool hasProperty(alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name);
+    void setProperty(alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name, alias_ref<JJSIValue::jhybridobject> value);
+
+    local_ref<JJSIArray_jhybridobject> getPropertyNames(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     local_ref<JJSIValue::jhybridobject> getProperty(alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name);
+    local_ref<jhybridobject> getPropertyAsObject(alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name);
+    local_ref<JJSIFunction_jhybridobject> getPropertyAsFunction(alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name);
 
     Object& get_object() const { return *object_; }
 private:
@@ -77,7 +101,20 @@ private:
     std::shared_ptr<Object> object_;
 };
 
-class JJSIFunction : public HybridClass<JJSIFunction> {
+class JJSIArray : public JJSIArrayHybridClass {
+public:
+    static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Array;";
+    static void registerNatives();
+
+    explicit JJSIArray(Array&& function) : array_(std::make_shared<Array>(std::move(function))) {}
+
+    Array& get_array() const { return *array_; }
+private:
+    friend HybridBase;
+    std::shared_ptr<Array> array_;
+};
+
+class JJSIFunction : public JJSIFunctionHybridClass {
 public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Function;";
     static void registerNatives();

@@ -6,10 +6,9 @@
 #include "jvm/hermes/src/main/cxx/HermesRuntimeHolder.hpp"
 #include "JJSIValue.h"
 
-// using namespace facebook::jni;
-// using namespace facebook::jsi;
 
 namespace intuit::playerui {
+    // TODO: Can I push a lot of the common impls to JJSIRuntime and just provide a Hermes constructor?
     class JHermesRuntime : public HybridClass<JHermesRuntime, JJSIRuntime> {
 public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/hermes/bridge/runtime/HermesRuntime;";
