@@ -2,6 +2,10 @@ package com.intuit.playerui.jsi
 
 import com.facebook.jni.HybridData
 import com.facebook.jni.annotations.DoNotStrip
+import kotlinx.serialization.json.JsonElement
+import java.nio.ByteBuffer
+
+public abstract class Runtime(@DoNotStrip private val mHybridData: HybridData)
 
 // TODO: Do we just tie these to specific runtimes? I feel like that'd help w/ ergonomics and ensuring values are used with the same runtime context
 
@@ -21,6 +25,16 @@ public class Value private constructor(@DoNotStrip private val mHybridData: Hybr
 
     public external fun asBoolean(): Boolean
     public external fun asNumber(): Double
+    public external fun asString(runtime: Runtime): String
+    public external fun asBigInt(runtime: Runtime): Long
+    public external fun asSymbol(runtime: Runtime): String
+
+    public external fun toString(runtime: Runtime): String
+//    public external override fun toString(): String
+
+    public fun strictEquals(runtime: Runtime, other: Value): Boolean = strictEquals(runtime, this, other)
+
+    // TODO: if the underlying hybridclass maintains a reference to the runtime, it'd be nice to expose that for the node impl
 
     public companion object {
         // TODO: Settle on API
@@ -30,11 +44,27 @@ public class Value private constructor(@DoNotStrip private val mHybridData: Hybr
         public val `null`: Value @JvmStatic external get
         @JvmStatic public external fun `null`(): Value
 
-//        @JvmStatic public external fun createFromJsonUtf8(
-//            runtime: Runtime<*>,
-//            json: ByteArray, // TODO: Confirm this works? Maybe ByteBuffer?
-//            length: Int, // TODO: This probably doesn't work
-//        ): Value
+        @JvmStatic public external fun createFromJsonUtf8(
+            runtime: Runtime,
+            json: ByteBuffer,
+        ): Value
+
+        @JvmStatic public fun createFromJsonUtf8(
+            runtime: Runtime,
+            json: ByteArray,
+        ): Value = createFromJsonUtf8(runtime, ByteBuffer.allocateDirect(json.size).apply { put(json) })
+
+        @JvmStatic public fun createFromJsonUtf8(
+            runtime: Runtime,
+            json: String,
+        ): Value = createFromJsonUtf8(runtime, json.toByteArray())
+
+        @JvmStatic public fun createFromJson(
+            runtime: Runtime,
+            json: JsonElement,
+        ): Value = createFromJsonUtf8(runtime, json.toString())
+
+        @JvmStatic public external fun strictEquals(runtime: Runtime, a: Value, b: Value): Boolean
     }
 }
 

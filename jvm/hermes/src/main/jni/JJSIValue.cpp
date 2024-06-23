@@ -1,11 +1,13 @@
 // ReSharper disable CppMemberFunctionMayBeConst (breaks JNI registration)
 #include "JJSIValue.h"
-#include "ValueHelpers.h"
 
 #include <iostream>
 
-// namespace intuit::playerui {
-using namespace intuit::playerui;
+namespace intuit::playerui {
+
+void JJSIRuntime::registerNatives() {
+    registerHybrid({});
+}
 
 local_ref<JJSIValue::jhybridobject> JJSIValue::undefined(alias_ref<jclass>) {
     return newObjectCxxArgs(Value::undefined());
@@ -15,12 +17,21 @@ local_ref<JJSIValue::jhybridobject> JJSIValue::null(alias_ref<jclass>) {
     return newObjectCxxArgs(Value::null());
 }
 
-local_ref<JJSIValue::jhybridobject> JJSIValue::createFromJsonUtf8(alias_ref<jclass>, Runtime &runtime, const uint8_t *json, size_t length) {
-    return newObjectCxxArgs(Value::createFromJsonUtf8(runtime, json, length));
+local_ref<JJSIValue::jhybridobject> JJSIValue::createFromJsonUtf8(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JByteBuffer> json) {
+    Runtime& runtime = cthis(jRuntime)->get_runtime();
+
+    // Direct ByteBuffers are an efficient way to transfer bulk data between Java and C++.
+    if (!json->isDirect()) {
+        // TODO: Verify if we even need this
+        throw std::runtime_error("Argument is not a direct buffer.");
+    }
+
+    return newObjectCxxArgs(Value::createFromJsonUtf8(runtime, json->getDirectBytes(), json->getDirectSize()));
 }
 
-bool JJSIValue::strictEquals(alias_ref<jclass>, Runtime &runtime, const Value &a, const Value &b) {
-    return Value::strictEquals(runtime, a, b);
+bool JJSIValue::strictEquals(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b) {
+    Runtime& runtime = cthis(jRuntime)->get_runtime();
+    return Value::strictEquals(runtime, cthis(a)->get_value(), cthis(b)->get_value());
 }
 
 bool JJSIValue::isUndefined() {
@@ -65,18 +76,21 @@ double JJSIValue::asNumber() {
 
 // TODO: Ensure this is what we want to do - we can return the JSI String container
 //       instead to help be more optimistic about memory, but this helps w/ runtime access
-std::string JJSIValue::asString(Runtime& runtime) {
+std::string JJSIValue::asString(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
+    Runtime& runtime = cthis(jRuntime)->get_runtime();
     return value_->asString(runtime).utf8(runtime);
 }
 
-int64_t JJSIValue::asBigInt(Runtime& runtime) {
+int64_t JJSIValue::asBigInt(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
+    Runtime& runtime = cthis(jRuntime)->get_runtime();
     return value_->asBigInt(runtime).asInt64(runtime);
 }
 
 // TODO: This is string support for symbols, on par w/ existing runtimes
 //       Wrapping symbol should be easy enough, but JSI doesn't even have
 //       full suport but at least we'd get an equality API :P
-std::string JJSIValue::asSymbol(Runtime& runtime) {
+std::string JJSIValue::asSymbol(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
+    Runtime& runtime = cthis(jRuntime)->get_runtime();
     return value_->asSymbol(runtime).toString(runtime);
 }
 
@@ -84,7 +98,8 @@ std::string JJSIValue::asSymbol(Runtime& runtime) {
 //     return JJSIObject::newObjectCxxArgs(value_->asObject(runtime));
 // }
 
-std::string JJSIValue::toString(Runtime& runtime) {
+std::string JJSIValue::toString(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
+    Runtime& runtime = cthis(jRuntime)->get_runtime();
     return value_->toString(runtime).utf8(runtime);
 }
 
@@ -98,9 +113,8 @@ void JJSIValue::registerNatives() {
         makeNativeMethod("null", JJSIValue::null),
         makeNativeMethod("getNull", JJSIValue::null),
 
-        // makeNativeMethod("createFromJsonUtf8", JJSIValue::null),
-        // makeNativeMethod("strictEquals", JJSIValue::strictEquals),
-
+        makeNativeMethod("createFromJsonUtf8", JJSIValue::createFromJsonUtf8),
+        makeNativeMethod("strictEquals", JJSIValue::strictEquals),
 
         // MARK: Value APIs
         makeNativeMethod("isUndefined", JJSIValue::isUndefined),
@@ -118,12 +132,12 @@ void JJSIValue::registerNatives() {
         // implicit naming conversion for JVM<->native
         makeNativeMethod("asBoolean", JJSIValue::asBool),
         makeNativeMethod("asNumber", JJSIValue::asNumber),
-        // makeNativeMethod("asSymbol", JJSIValue::asSymbol),
-        // makeNativeMethod("asBigInt", JJSIValue::asBigInt),
-        // makeNativeMethod("asString", JJSIValue::asString),
+        makeNativeMethod("asSymbol", JJSIValue::asSymbol),
+        makeNativeMethod("asBigInt", JJSIValue::asBigInt),
+        makeNativeMethod("asString", JJSIValue::asString),
         // makeNativeMethod("asObject", JJSIValue::asObject),
 
-        // makeNativeMethod("toString", JJSIValue::toString),
+        makeNativeMethod("toString", JJSIValue::toString),
     });
 }
 
@@ -150,4 +164,4 @@ void JJSIValue::registerNatives() {
 //     });
 // }
 
-// };
+};

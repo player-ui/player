@@ -3,11 +3,21 @@
 #include <iostream>
 #include <jsi/jsi.h>
 #include <fbjni/fbjni.h>
+#include <fbjni/ByteBuffer.h>
 
 using namespace facebook::jni;
 using namespace facebook::jsi;
 
 namespace intuit::playerui {
+
+/** Java class wrapper providing some native getter for a Runtime. This exists to prevent a circular dependency for JJSIRuntime based methods. */
+class JJSIRuntime : public HybridClass<JJSIRuntime> {
+public:
+    static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Runtime;";
+    static void registerNatives();
+    virtual Runtime& get_runtime() = 0;
+};
+    // class JHermesRuntime;
 // class JJSIValue;
 // class JJSIObject : public HybridClass<JJSIObject> {
 // public:
@@ -34,17 +44,10 @@ public:
 
     static local_ref<jhybridobject> undefined(alias_ref<jclass>);
     static local_ref<jhybridobject> null(alias_ref<jclass>);
-    // TODO: Verify the types for the next two will just come along? Doubtful
-    static local_ref<jhybridobject> createFromJsonUtf8(alias_ref<jclass>, Runtime& runtime, const uint8_t* json, size_t length);
-    static bool strictEquals(alias_ref<jclass>, Runtime& runtime, const Value& a, const Value& b);
+    static local_ref<jhybridobject> createFromJsonUtf8(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JByteBuffer> json);
+    static bool strictEquals(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b);
 
-    explicit JJSIValue(
-        // TODO: Probably need to maintain runtime reference for value apis, maybe even just weak ref? would help us with a isReleased API
-        // std::unique_ptr<facebook::jsi::Runtime> runtime,
-        Value&& value
-    ) :
-        // runtime_(std::move(runtime)),
-        value_(std::make_shared<Value>(std::move(value))) {}
+    explicit JJSIValue(Value&& value) : value_(std::make_shared<Value>(std::move(value))) {}
 
     bool isUndefined();
     bool isNull();
@@ -57,17 +60,16 @@ public:
 
     bool asBool();
     double asNumber();
-    // TODO: If we can store the associated runtime (similar to Node), we don't need to keep
-    std::string asString(Runtime& runtime);
-    int64_t asBigInt(Runtime& runtime);
-    std::string asSymbol(Runtime& runtime);
-    // local_ref<JJSIObject::jhybridobject> asObject(Runtime& runtime);
-    std::string toString(Runtime& runtime);
+    std::string asString(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
+    int64_t asBigInt(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
+    std::string asSymbol(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
+    // local_ref<JJSIObject::jhybridobject> asObject(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
+    std::string toString(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
 
+    Value& get_value() const { return *value_; }
 private:
     friend HybridBase;
     // needs to exist on heap to persist through JNI calls
     std::shared_ptr<Value> value_;
-    // std::unique_ptr<facebook::jsi::Runtime> runtime_;
 };
 };

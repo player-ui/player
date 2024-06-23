@@ -1,15 +1,19 @@
 package com.intuit.playerui.hermes.bridge.runtime
 
 import com.facebook.jni.HybridData
-import com.facebook.jni.annotations.DoNotStrip
 import com.facebook.soloader.nativeloader.NativeLoader
 import com.intuit.playerui.hermes.bridge.ResourceLoaderDelegate
+import com.intuit.playerui.jsi.Runtime
 import com.intuit.playerui.jsi.Value
+import com.intuit.playerui.jsi.Value.Companion.createFromJson
+import com.intuit.playerui.jsi.Value.Companion.createFromJsonUtf8
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import kotlin.system.exitProcess
 
-public class HermesRuntime {
+public class HermesRuntime(mHybridData: HybridData) : Runtime(mHybridData) {
 
     public companion object {
         init {
@@ -27,15 +31,19 @@ public class HermesRuntime {
             NativeLoader.loadLibrary("hermes")
             NativeLoader.loadLibrary("hermes_jni")
         }
+
+        @JvmStatic public external fun create(): HermesRuntime
+
+        public operator fun invoke(): HermesRuntime = create()
     }
 
-    @DoNotStrip private val mHybridData: HybridData
+//    @DoNotStrip override val mHybridData: HybridData
 
-    init {
-        mHybridData = initHybrid()
-    }
+//    init {
+//        mHybridData = initHybrid()
+//    }
 
-    private external fun initHybrid(): HybridData
+//    private external fun initHybrid(): HybridData
 
     public external fun execute(script: String): Value
 }
@@ -51,7 +59,13 @@ public fun main() {
         runBlocking(Dispatchers.Default) {
             val result = runtime.execute("20 + 20")
             result.asNumber().let(::println)
+            result.let(::println)
+            result.toString(runtime).let(::println)
         }
+
+        val json = createFromJson(runtime, buildJsonObject { put("hello", "world") })
+        json.isObject().let(::println)
+        json.toString(runtime).let(::println)
     } catch (t: Throwable) {
         t.printStackTrace()
         exitProcess(1)
