@@ -17,25 +17,9 @@ public:
     static void registerNatives();
     virtual Runtime& get_runtime() = 0;
 };
-    // class JHermesRuntime;
-// class JJSIValue;
-// class JJSIObject : public HybridClass<JJSIObject> {
-// public:
-//     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Object;";
-//     static void registerNatives();
-//
-//     static bool strictEquals(alias_ref<jclass>, Runtime& runtime, const Object& a, const Object& b);
-//
-//     explicit JJSIObject(Object&& object) : object_(std::make_shared<Object>(std::move(object))) {}
-//
-//     bool instanceOf(Runtime& runtime, const Function& ctor);
-//     local_ref<JJSIValue::jhybridobject> getProperty(Runtime& runtime, std::string name);
-//
-// private:
-//     friend HybridBase;
-//     friend class JJSIValue;
-//     std::shared_ptr<Object> object_;
-// };
+
+class JJSIObject;
+class JJSIFunction;
 
 class JJSIValue : public HybridClass<JJSIValue> {
 public:
@@ -63,7 +47,8 @@ public:
     std::string asString(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     int64_t asBigInt(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     std::string asSymbol(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
-    // local_ref<JJSIObject::jhybridobject> asObject(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
+    // MARK: This is b/c we're forward declaring JJSIObject, but need to give enough information to declare _what_ it's going to be
+    local_ref<HybridClass<JJSIObject>::jhybridobject> asObject(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     std::string toString(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
 
     Value& get_value() const { return *value_; }
@@ -71,5 +56,39 @@ private:
     friend HybridBase;
     // needs to exist on heap to persist through JNI calls
     std::shared_ptr<Value> value_;
+};
+
+class JJSIObject : public HybridClass<JJSIObject> {
+public:
+    static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Object;";
+    static void registerNatives();
+
+    static bool strictEquals(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b);
+
+    explicit JJSIObject(Object&& object) : object_(std::make_shared<Object>(std::move(object))) {}
+
+    bool instanceOf(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<HybridClass<JJSIFunction>::jhybridobject> ctor);
+    local_ref<JJSIValue::jhybridobject> getProperty(alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name);
+
+    Object& get_object() const { return *object_; }
+private:
+    friend HybridBase;
+    friend class JJSIValue;
+    std::shared_ptr<Object> object_;
+};
+
+class JJSIFunction : public HybridClass<JJSIFunction> {
+public:
+    static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Function;";
+    static void registerNatives();
+
+    explicit JJSIFunction(Function&& function) : function_(std::make_shared<Function>(std::move(function))) {}
+
+    // local_ref<JJSIValue::jhybridobject> call(alias_ref<JJSIRuntime>, )
+
+    Function& get_function() const { return *function_; }
+private:
+    friend HybridBase;
+    std::shared_ptr<Function> function_;
 };
 };

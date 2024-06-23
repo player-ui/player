@@ -28,7 +28,7 @@ public class Value private constructor(@DoNotStrip private val mHybridData: Hybr
     public external fun asString(runtime: Runtime): String
     public external fun asBigInt(runtime: Runtime): Long
     public external fun asSymbol(runtime: Runtime): String
-
+    public external fun asObject(runtime: Runtime): Object
     public external fun toString(runtime: Runtime): String
 //    public external override fun toString(): String
 
@@ -68,7 +68,15 @@ public class Value private constructor(@DoNotStrip private val mHybridData: Hybr
     }
 }
 
-public open class Object internal constructor(@DoNotStrip private val mHybridData: HybridData) {}
+public open class Object internal constructor(@DoNotStrip private val mHybridData: HybridData) {
+
+    public external fun instanceOf(runtime: Runtime, ctor: Function): Boolean
+    public external fun getProperty(runtime: Runtime, name: String): Value
+
+    public companion object {
+        @JvmStatic public external fun strictEquals(runtime: Runtime, a: Object, b: Object): Boolean
+    }
+}
 
 public class Array private constructor(mHybridData: HybridData) : Object(mHybridData) {}
 public class Function private constructor(mHybridData: HybridData) : Object(mHybridData) {}

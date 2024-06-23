@@ -94,9 +94,10 @@ std::string JJSIValue::asSymbol(alias_ref<JJSIRuntime::jhybridobject> jRuntime) 
     return value_->asSymbol(runtime).toString(runtime);
 }
 
-// local_ref<JJSIObject::jhybridobject> JJSIValue::asObject(Runtime& runtime) {
-//     return JJSIObject::newObjectCxxArgs(value_->asObject(runtime));
-// }
+local_ref<JJSIObject::jhybridobject> JJSIValue::asObject(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
+    Runtime& runtime = cthis(jRuntime)->get_runtime();
+    return JJSIObject::newObjectCxxArgs(value_->asObject(runtime));
+}
 
 std::string JJSIValue::toString(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
     Runtime& runtime = cthis(jRuntime)->get_runtime();
@@ -135,33 +136,38 @@ void JJSIValue::registerNatives() {
         makeNativeMethod("asSymbol", JJSIValue::asSymbol),
         makeNativeMethod("asBigInt", JJSIValue::asBigInt),
         makeNativeMethod("asString", JJSIValue::asString),
-        // makeNativeMethod("asObject", JJSIValue::asObject),
+        makeNativeMethod("asObject", JJSIValue::asObject),
 
         makeNativeMethod("toString", JJSIValue::toString),
     });
 }
 
-// bool JJSIObject::strictEquals(alias_ref<jclass>, Runtime &runtime, const Object &a, const Object &b) {
-//     return Object::strictEquals(runtime, a, b);
-// }
-//
-// bool JJSIObject::instanceOf(Runtime &runtime, const Function &ctor) {
-//     return object_->instanceOf(runtime, ctor);
-// }
-//
-// local_ref<JJSIValue::jhybridobject> JJSIObject::getProperty(Runtime &runtime, std::string name) {
-//     return JJSIValue::newObjectCxxArgs(object_->getProperty(runtime, name.c_str()));
-// }
-//
-// void JJSIObject::registerNatives() {
-//     registerHybrid({
-//         // MARK: Static Object APIs
-//         makeNativeMethod("strictEquals", JJSIObject::strictEquals),
-//
-//         // MARK Object APIs
-//         makeNativeMethod("instanceOf", JJSIObject::instanceOf),
-//         makeNativeMethod("getProperty", JJSIObject::getProperty),
-//     });
-// }
+bool JJSIObject::strictEquals(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b) {
+    // TODO: Settle on cthis API approach
+    return Object::strictEquals(jRuntime->cthis()->get_runtime(), a->cthis()->get_object(), b->cthis()->get_object());
+}
+
+bool JJSIObject::instanceOf(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIFunction::jhybridobject> ctor) {
+    return object_->instanceOf(cthis(jRuntime)->get_runtime(), ctor->cthis()->get_function());
+}
+
+local_ref<JJSIValue::jhybridobject> JJSIObject::getProperty(alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name) {
+    return JJSIValue::newObjectCxxArgs(object_->getProperty(cthis(jRuntime)->get_runtime(), name.c_str()));
+}
+
+void JJSIObject::registerNatives() {
+    registerHybrid({
+        // MARK: Static Object APIs
+        makeNativeMethod("strictEquals", JJSIObject::strictEquals),
+
+        // MARK: Object APIs
+        makeNativeMethod("instanceOf", JJSIObject::instanceOf),
+        makeNativeMethod("getProperty", JJSIObject::getProperty),
+    });
+}
+
+void JJSIFunction::registerNatives() {
+    registerHybrid({});
+}
 
 };

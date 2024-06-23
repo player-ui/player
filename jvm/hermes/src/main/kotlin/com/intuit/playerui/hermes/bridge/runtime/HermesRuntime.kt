@@ -6,7 +6,6 @@ import com.intuit.playerui.hermes.bridge.ResourceLoaderDelegate
 import com.intuit.playerui.jsi.Runtime
 import com.intuit.playerui.jsi.Value
 import com.intuit.playerui.jsi.Value.Companion.createFromJson
-import com.intuit.playerui.jsi.Value.Companion.createFromJsonUtf8
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.buildJsonObject
@@ -65,7 +64,8 @@ public fun main() {
 
         val json = createFromJson(runtime, buildJsonObject { put("hello", "world") })
         json.isObject().let(::println)
-        json.toString(runtime).let(::println)
+        json.asObject(runtime).let(::println)
+        json.asObject(runtime).getProperty(runtime, "hello").toString(runtime).let(::println)
     } catch (t: Throwable) {
         t.printStackTrace()
         exitProcess(1)
