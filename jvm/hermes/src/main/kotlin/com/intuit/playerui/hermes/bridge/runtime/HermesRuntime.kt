@@ -53,7 +53,8 @@ public fun main() {
         println("Trying to execute 2 + 2")
         val runtime = HermesRuntime()
         println("Runtime: $runtime")
-        runtime.execute("2 + 2").asNumber().let(::println)
+        val four = runtime.execute("2 + 2")
+        four.asNumber().let(::println)
 
         runBlocking(Dispatchers.Default) {
             val result = runtime.execute("20 + 20")

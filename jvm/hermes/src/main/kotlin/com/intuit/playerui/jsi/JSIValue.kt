@@ -92,7 +92,16 @@ public open class Object internal constructor(@DoNotStrip private val mHybridDat
     }
 }
 
-public class Array private constructor(mHybridData: HybridData) : Object(mHybridData) {}
+public class Array private constructor(mHybridData: HybridData) : Object(mHybridData) {
+    public external fun size(runtime: Runtime): Int
+    public external fun getValueAtIndex(runtime: Runtime, index: Int): Value
+    public external fun setValueAtIndex(runtime: Runtime, index: Int, value: Value)
+
+    public companion object {
+        @JvmStatic public external fun createWithElements(runtime: Runtime, vararg elements: Value): Array
+    }
+}
+
 public class Function private constructor(mHybridData: HybridData) : Object(mHybridData) {}
 
 public class Symbol private constructor(mHybridData: HybridData) : Object(mHybridData) {}

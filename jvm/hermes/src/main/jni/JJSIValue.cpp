@@ -212,6 +212,45 @@ void JJSIObject::registerNatives() {
     });
 }
 
+local_ref<JJSIArray::jhybridobject> JJSIArray::createWithElements(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> elements) {
+    // TODO: Better way to convert JArrayClass<JJSIValue::jhybridobject> -> initializer_list<Value>
+    std::initializer_list<Value> values = [&]() {
+        std::initializer_list<Value> result;
+        for (int i = 0; i < elements->size(); ++i) {
+            result = {result.begin(), std::move(elements->getElement(i)->cthis()->get_value())};
+        }
+        return result;
+    }();
+
+    return newObjectCxxArgs(Array::createWithElements(jRuntime->cthis()->get_runtime(), values));
+}
+
+int JJSIArray::size(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
+    // TODO: Do we care about potential loss of data here? ASSUMPTION: our JS arrays are not likely to be beyond max_int
+    return static_cast<int>(array_->size(jRuntime->cthis()->get_runtime()));
+}
+
+local_ref<JJSIValue::jhybridobject> JJSIArray::getValueAtIndex(alias_ref<JJSIRuntime::jhybridobject> jRuntime, int i) {
+    return JJSIValue::newObjectCxxArgs(array_->getValueAtIndex(jRuntime->cthis()->get_runtime(), i));
+}
+
+void JJSIArray::setValueAtIndex(alias_ref<JJSIRuntime::jhybridobject> jRuntime, int i, alias_ref<JJSIValue::jhybridobject> value) {
+    array_->setValueAtIndex(jRuntime->cthis()->get_runtime(), i, value->cthis()->get_value());
+}
+
+void JJSIArray::registerNatives() {
+    registerHybrid({
+        // MARK: Static Array APIs
+        makeNativeMethod("createWithElements", JJSIArray::createWithElements),
+
+        // MARK: Array APIs
+        makeNativeMethod("size", JJSIArray::size),
+        makeNativeMethod("getValueAtIndex", JJSIArray::getValueAtIndex),
+        makeNativeMethod("setValueAtIndex", JJSIArray::setValueAtIndex),
+    });
+}
+
+
 void JJSIFunction::registerNatives() {
     registerHybrid({});
 }

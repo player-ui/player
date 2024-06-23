@@ -106,7 +106,13 @@ public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Array;";
     static void registerNatives();
 
+    static local_ref<jhybridobject> createWithElements(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> elements);
+
     explicit JJSIArray(Array&& function) : array_(std::make_shared<Array>(std::move(function))) {}
+
+    int size(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
+    local_ref<JJSIValue::jhybridobject> getValueAtIndex(alias_ref<JJSIRuntime::jhybridobject> jRuntime, int i);
+    void setValueAtIndex(alias_ref<JJSIRuntime::jhybridobject> jRuntime, int i, alias_ref<JJSIValue::jhybridobject> value);
 
     Array& get_array() const { return *array_; }
 private:
