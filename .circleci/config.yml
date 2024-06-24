@@ -199,11 +199,17 @@ jobs:
             sudo ln -s /opt/bazelisk-v1.11.0/bazelisk /usr/local/bin/bazel
 
       - run:
-          name: Create avd
+          name: Install Android tools
           command: |
-            sdkmanager "system-images;android-29;default;x86"
-            sdkmanager "system-images;android-33;default;x86_64"
-            echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-29;default;x86"
+            rm -rf $ANDROID_HOME/build-tools/*
+            JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64 \
+              $ANDROID_HOME/tools/bin/sdkmanager "build-tools;33.0.1"\
+              "ndk;21.4.7075529" \
+              "system-images;android-33;default;x86_64"
+            echo "export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/21.4.7075529"  >> $BASH_ENV
+            source $BASH_ENV
+            echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-33;default;x86_64" -g default
+             source $BASH_ENV
 
       - run:
           name: Launch emulator
