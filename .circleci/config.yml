@@ -228,6 +228,8 @@ jobs:
             source $BASH_ENV
             echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-33;default;x86_64" -g default
              source $BASH_ENV
+          environment:
+            JAVA_HOME: /usr/local/opt/openjdk@8
 
       - run:
           name: Launch emulator
