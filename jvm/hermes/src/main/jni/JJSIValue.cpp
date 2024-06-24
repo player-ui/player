@@ -58,8 +58,20 @@ void JJSIRuntime::registerNatives() {
     });
 }
 
-local_ref<HybridClass<JJSIValue>::jhybridobject> JJSIValue::from(alias_ref<jclass>, int i) {
+local_ref<HybridClass<JJSIValue>::jhybridobject> JJSIValue::fromBool(alias_ref<jclass>, bool b) {
+    return newObjectCxxArgs(Value(b));
+}
+
+local_ref<HybridClass<JJSIValue>::jhybridobject> JJSIValue::fromDouble(alias_ref<jclass>, double d) {
+    return newObjectCxxArgs(Value(d));
+}
+
+local_ref<HybridClass<JJSIValue>::jhybridobject> JJSIValue::fromInt(alias_ref<jclass>, int i) {
     return newObjectCxxArgs(Value(i));
+}
+
+local_ref<HybridClass<JJSIValue>::jhybridobject> JJSIValue::fromString(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string str) {
+    return newObjectCxxArgs(String::createFromUtf8(jRuntime->cthis()->get_runtime(), str));
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIValue::undefined(alias_ref<jclass>) {
@@ -155,7 +167,10 @@ std::string JJSIValue::toString(alias_ref<JJSIRuntime::jhybridobject> jRuntime) 
 
 void JJSIValue::registerNatives() {
     registerHybrid({
-        makeNativeMethod("from", JJSIValue::from),
+        makeNativeMethod("from", JJSIValue::fromBool),
+        makeNativeMethod("from", JJSIValue::fromDouble),
+        makeNativeMethod("from", JJSIValue::fromInt),
+        makeNativeMethod("from", JJSIValue::fromString),
 
         // TODO: Settle on getter API
         // MARK: Static Value APIs

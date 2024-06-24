@@ -66,7 +66,10 @@ public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Value;";
     static void registerNatives();
 
-    static local_ref<jhybridobject> from(alias_ref<jclass>, int i);
+    static local_ref<jhybridobject> fromBool(alias_ref<jclass>, bool b);
+    static local_ref<jhybridobject> fromDouble(alias_ref<jclass>, double d);
+    static local_ref<jhybridobject> fromInt(alias_ref<jclass>, int i);
+    static local_ref<jhybridobject> fromString(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject>, std::string str);
 
     static local_ref<jhybridobject> undefined(alias_ref<jclass>);
     static local_ref<jhybridobject> null(alias_ref<jclass>);
@@ -89,7 +92,6 @@ public:
     std::string asString(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     int64_t asBigInt(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     local_ref<JJSISymbol_jhybridobject> asSymbol(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
-    // MARK: This is b/c we're forward declaring JJSIObject, but need to give enough information to declare _what_ it's going to be
     local_ref<JJSIObject_jhybridobject> asObject(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     std::string toString(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
 

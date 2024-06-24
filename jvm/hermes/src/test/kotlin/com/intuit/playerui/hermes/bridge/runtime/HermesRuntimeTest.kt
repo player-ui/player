@@ -2,15 +2,16 @@ package com.intuit.playerui.hermes.bridge.runtime
 
 import com.facebook.soloader.nativeloader.NativeLoader
 import com.intuit.playerui.hermes.bridge.ResourceLoaderDelegate
-import org.junit.jupiter.api.Assertions.assertEquals
+import com.intuit.playerui.jsi.Value
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 
-internal class SmokeTest {
+internal class HermesRuntimeTest {
 
     @Test fun `execute arbitrary JS`() {
         val runtime = HermesRuntime()
-        assertEquals("4", runtime.execute("2 + 2"))
+        assertTrue(Value.strictEquals(runtime, Value.from(4), runtime.evaluateJavaScript("2 + 2")))
     }
 
 //    @Test fun `exception on execution after release`() {

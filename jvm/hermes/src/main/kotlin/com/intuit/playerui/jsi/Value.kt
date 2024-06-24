@@ -51,7 +51,11 @@ public class Value private constructor(@DoNotStrip private val mHybridData: Hybr
     // TODO: if the underlying hybridclass maintains a reference to the runtime, it'd be nice to expose that for the node impl
 
     public companion object {
+        @JvmStatic public external fun from(value: Boolean): Value
+        @JvmStatic public external fun from(value: Double): Value
         @JvmStatic public external fun from(value: Int): Value
+
+        @JvmStatic public external fun from(runtime: Runtime, value: String): Value
 
         // TODO: Settle on API
         public val undefined: Value @JvmStatic external get
