@@ -1,6 +1,7 @@
 import React from "react";
 import { Action, Info } from "@player-ui/reference-assets-plugin-components";
 import type { DSLFlow } from "@player-tools/dsl";
+import InfoFooter from './info-footer';
 
 const view1 = (
   <Info id="info-view">
@@ -13,6 +14,7 @@ const view1 = (
         <Action.Label>Back</Action.Label>
       </Action>
     </Info.Actions>
+    <Info.Footer>Footer text</Info.Footer>
   </Info>
 );
 

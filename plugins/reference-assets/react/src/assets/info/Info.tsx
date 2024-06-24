@@ -38,6 +38,11 @@ export const Info = (props: InfoAssetTransform) => {
             </div>
           </div>
         </div>
+        <div>
+          {props.footer && (
+            <ReactAsset {...props.footer} />
+          )}
+        </div>
       </div>
     </div>
   );

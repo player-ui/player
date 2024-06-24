@@ -13,6 +13,9 @@ export interface InfoAsset extends Asset<"info"> {
 
   /** List of actions to show at the bottom of the page */
   actions?: Array<AssetWrapper>;
+
+  /** Footer to show at the bottom of the page below the actions info */
+  footer?: AssetWrapper;
 }
 
 export interface InfoAssetTransform extends InfoAsset {
