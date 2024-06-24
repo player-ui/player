@@ -15,12 +15,11 @@ public:
     static void registerNatives();
 
     // TODO: Expose the config options that make sense
-    static local_ref<jhybridobject> create(alias_ref<jclass>, bool intl) {
+    static local_ref<jhybridobject> create(alias_ref<jclass>, bool intl, bool microtaskQueue) {
         auto config = hermes::vm::RuntimeConfig::Builder()
             .withIntl(intl)
+            .withMicrotaskQueue(microtaskQueue)
             .build();
-
-        std::cout << config.getIntl() << std::endl;
 
         return newObjectCxxArgs(std::move(config));
     }

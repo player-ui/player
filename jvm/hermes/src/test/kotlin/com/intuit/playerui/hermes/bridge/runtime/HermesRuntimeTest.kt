@@ -1,13 +1,11 @@
 package com.intuit.playerui.hermes.bridge.runtime
 
-import com.facebook.soloader.nativeloader.NativeLoader
-import com.intuit.playerui.hermes.bridge.ResourceLoaderDelegate
+import com.intuit.playerui.jsi.HermesRuntimeTest
 import com.intuit.playerui.jsi.Value
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 
-internal class HermesRuntimeTest {
+internal class HermesRuntimeTest : HermesRuntimeTest() {
 
     @Test fun `execute arbitrary JS`() {
         val runtime = HermesRuntime()
@@ -22,10 +20,4 @@ internal class HermesRuntimeTest {
 //            runtime.execute("2 + 2")
 //        }.message)
 //    }
-
-    companion object {
-        @JvmStatic @BeforeAll fun setupNativeLoader(): Unit {
-            NativeLoader.init(ResourceLoaderDelegate())
-        }
-    }
 }

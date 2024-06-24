@@ -14,7 +14,7 @@ kt_player_module(
     main_resource_strip_prefix = "jvm/hermes/src/main/jni",
     main_resources = main_resources + glob(["src/main/resources/**"]),
     test_deps = test_deps,
-    test_package = "com.intuit.playerui.hermes.bridge.runtime",
+    test_package = "com.intuit.playerui",
 )
 
 java_binary(

@@ -42,9 +42,16 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
 
     public class Config private constructor(@DoNotStrip private val mHybridData: HybridData) {
         public companion object {
-            @JvmStatic public external fun create(intl: Boolean = false): Config
+            @JvmStatic public external fun create(
+                intl: Boolean,
+                microtaskQueue: Boolean,
+            ): Config
 
-            public operator fun invoke(intl: Boolean = false): Config = create(intl)
+            // Pulling defaults from JSI RuntimeConfig defaults
+            public operator fun invoke(
+                intl: Boolean = true,
+                microtaskQueue: Boolean = false,
+            ): Config = create(intl, microtaskQueue)
         }
     }
 }
