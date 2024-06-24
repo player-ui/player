@@ -114,10 +114,12 @@ jobs:
       - attach_workspace:
           at: ~/player
 
+      - macos/install-rosetta
+
       - run:
           name: Homebrew Dependencies
           command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk lcov openjdk@11
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk lcov openjdk@8
 
       - restore_cache:
           keys:
@@ -127,6 +129,7 @@ jobs:
 
       - run:
           name: Install Android tools
+          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
           command: |
             eval which java
             eval java --version
@@ -139,7 +142,7 @@ jobs:
             echo 'export PATH=$ANDROID_SDK_HOME/emulator:$PATH'  >> $BASH_ENV
             source $BASH_ENV
           environment:
-            JAVA_HOME: /opt/homebrew/opt/openjdk@11
+            JAVA_HOME: /opt/homebrew/opt/openjdk@8
 
       - macos/preboot-simulator:
           version: "17.4"
