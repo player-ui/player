@@ -20,7 +20,6 @@ accept_all_android_licenses() {
   accept_license_of android-sdk-preview-license 84831b9409646a918e30573bab4c9c91346d8abd
   accept_license_of android-sdk-preview-license 504667f4c0de7af1a06de9f4b1727b84351f2910
   accept_license_of google-gdk-license 33b6a2b64607f11b759f320ef9dff4ae5c47d97a
-  accept_license_of intel-android-extra-license d975f751698a77b662f1254ddbeed3901e976f5a
 }
 
 accept_license_of() {
