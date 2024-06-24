@@ -23,7 +23,7 @@ executors:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   ios:
     working_directory: ~/player
-    resource_class: macos.x86.medium.gen2
+    resource_class: macos.m1.medium.gen1
     macos:
       xcode: 14.3
     environment:
@@ -42,6 +42,8 @@ commands:
     steps:
       - attach_workspace:
           at: ~/player
+
+      - macos/install-rosetta
 
       - restore_cache:
           keys:
@@ -117,7 +119,10 @@ jobs:
       - run:
           name: Homebrew Dependencies
           command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@8
+            arch -x86_64 zsh
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+            HOMEBREW_NO_AUTO_UPDATE=1 arch -x86_64 /usr/local/bin/brew install bazelisk maven openjdk@17
 
       - run:
           name: Set Ruby Version
@@ -143,7 +148,7 @@ jobs:
             echo 'export PATH=$ANDROID_SDK_HOME/emulator:$PATH'  >> $BASH_ENV
             source $BASH_ENV
           environment:
-            JAVA_HOME: /usr/local/opt/openjdk@8
+            JAVA_HOME: /usr/local/opt/openjdk@17
 
       - save_cache:
           key: android-tools-{{ arch }}-{{ checksum "scripts/install-android-tools.sh" }}
@@ -157,7 +162,11 @@ jobs:
             - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
             - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
 
-      - run: bundle install
+      - run: 
+          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
+           command: |
+             gem install bundler:2.3.19
+             bundle install
 
       - save_cache:
           key: gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
@@ -169,17 +178,22 @@ jobs:
           platform: "iOS"
           device: "iPhone 13"
 
-      - run: bazel sync
+      - run: 
+          command: bazel sync
 
       - run: |
           BUNDLE_TARGETS=$(bazel query "attr(name, '^.*_Bundles$', //...)" --output label 2>/dev/null | tr '\n' ' ')
           bazel build --config=ci $BUNDLE_TARGETS
 
       - run: bazel shutdown
-      - run: cd xcode && bundle exec pod install
-      - run: bazel build --config=ci -- //:PlayerUI //:PlayerUI-Demo //:PlayerUI_Pod
+      - run: 
+          command: cd xcode && bundle exec pod install
+      - run: 
+          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
+          command: bazel build --config=ci -- //:PlayerUI //:PlayerUI-Demo //:PlayerUI_Pod
       # TODO: the timeout should be added to the test itself
-      - run: bazel test --test_timeout=1200 --jobs=1 --verbose_failures --config=ci  -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
+      - run: 
+          command: bazel test --test_timeout=1200 --jobs=1 --verbose_failures --config=ci  -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
 
       - run:
           when: always

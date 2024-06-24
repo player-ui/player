@@ -41,19 +41,19 @@ accept_license_of() {
 }
 
 ANDROID_SDK_VERSION=4333796
-ANDROID_VERSION=29
-ANDROID_BUILD_TOOLS_VERSION=30.0.0
+ANDROID_VERSION=30
+ANDROID_BUILD_TOOLS_VERSION=30.0.2
 ANDROID_NDK_VERSION=21.4.7075529
 
 mkdir -p $ANDROID_HOME
 cd $ANDROID_HOME
-curl https://dl.google.com/android/repository/sdk-tools-darwin-$ANDROID_SDK_VERSION.zip -o sdk-tools.zip
+curl https://dl.google.com/android/repository/commandlinetools-mac-$ANDROID_CMDLINE_TOOLS_VERSION.zip -o cmdline-tools.zip
 
 unzip sdk-tools.zip
 
 accept_all_android_licenses
 
-SDK_MANAGER=$ANDROID_HOME/tools/bin/sdkmanager
+SDK_MANAGER=$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
 
 yes | $SDK_MANAGER --licenses
 yes | $SDK_MANAGER --update
