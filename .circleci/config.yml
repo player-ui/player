@@ -120,9 +120,13 @@ jobs:
           name: Homebrew Dependencies
           command: |
             echo "A" | softwareupdate --install-rosetta
+      - run: 
+          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
+          command: |
             env /usr/bin/arch -x86_64 /bin/bash
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
+      - run:
+          command: |
             HOMEBREW_NO_AUTO_UPDATE=1 arch -x86_64 /usr/local/bin/brew install bazelisk maven openjdk@17
 
       - run:
