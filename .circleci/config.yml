@@ -162,9 +162,9 @@ jobs:
             - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
             - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
 
-      - run: 
+      - run:
           shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
-           command: |
+          command: |
              gem install bundler:2.3.19
              bundle install
 
