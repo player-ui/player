@@ -120,6 +120,7 @@ jobs:
           name: Homebrew Dependencies
           command: |
             softwareupdate --install-rosetta
+            echo "A" |
             arch -x86_64 zsh
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
