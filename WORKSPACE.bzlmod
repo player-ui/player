@@ -41,3 +41,11 @@ git_repository(
     commit = "c16bd411cdb20d424f843ea8623c00fa3d493a6c",
     remote = "https://github.com/facebook/hermes",
 )
+
+git_repository(
+    name = "fbjni",
+    build_file = "//third_party/fbjni:BUILD",
+    commit = "968e3815f92aeb0670f5d88ae975fbbd47a4b482",
+    patches = ["//patches:fbjni.install_headers.patch"],
+    remote = "https://github.com/facebookincubator/fbjni",
+)
