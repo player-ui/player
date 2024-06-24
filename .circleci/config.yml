@@ -122,15 +122,14 @@ jobs:
       - run:
           name: Install Android tools
           command: |
-            rm -rf $ANDROID_HOME/build-tools/*
-            JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64 \
-              $ANDROID_HOME/tools/bin/sdkmanager "build-tools;33.0.1"\
-              "ndk;21.4.7075529" \
-              "system-images;android-33;default;x86_64"
-            echo "export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/21.4.7075529"  >> $BASH_ENV
+            sh scripts/install-android-tools.sh
+            echo 'export ANDROID_SDK_HOME=$ANDROID_HOME'  >> $BASH_ENV
+            echo 'export ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk/21.4.7075529'  >> $BASH_ENV
+            echo 'export PATH=$ANDROID_SDK_HOME/tools/bin:$PATH'  >> $BASH_ENV
+            echo 'export PATH=$ANDROID_SDK_HOME/tools:$PATH'  >> $BASH_ENV
+            echo 'export PATH=$ANDROID_SDK_HOME/platform-tools:$PATH'  >> $BASH_ENV
+            echo 'export PATH=$ANDROID_SDK_HOME/emulator:$PATH'  >> $BASH_ENV
             source $BASH_ENV
-            echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-33;default;x86_64" -g default
-             source $BASH_ENV
 
       - macos/preboot-simulator:
           version: "17.4"
