@@ -5,7 +5,18 @@ import com.facebook.jni.annotations.DoNotStrip
 import kotlinx.serialization.json.JsonElement
 import java.nio.ByteBuffer
 
-public abstract class Runtime(@DoNotStrip private val mHybridData: HybridData)
+public class PreparedJavaScript(@DoNotStrip private val mHybridData: HybridData)
+
+// NOTE: mHybridData is required to be a member field, so we put it in the constructor
+public abstract class Runtime(@DoNotStrip private val mHybridData: HybridData) {
+    public external fun evaluateJavaScript(script: String, sourceURL: String = "unknown"): Value
+    public external fun prepareJavaScript(script: String, sourceURL: String = "unknown"): PreparedJavaScript
+    public external fun evaluatePreparedJavaScript(js: PreparedJavaScript): Value
+    public external fun queueMicrotask(callback: Function)
+    public external fun drainMicrotasks(maxMicrotasksHint: Int = -1): Boolean
+    public external fun global(): Object
+    public external fun description(): String
+}
 
 // TODO: Do we just tie these to specific runtimes? I feel like that'd help w/ ergonomics and ensuring values are used with the same runtime context
 

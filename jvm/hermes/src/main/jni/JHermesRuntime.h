@@ -3,37 +3,63 @@
 #include <hermes/hermes.h>
 #include <fbjni/fbjni.h>
 
-#include "jvm/hermes/src/main/cxx/HermesRuntimeHolder.hpp"
 #include "JJSIValue.h"
 
+using namespace facebook::hermes;
 
 namespace intuit::playerui {
-    // TODO: Can I push a lot of the common impls to JJSIRuntime and just provide a Hermes constructor?
-    class JHermesRuntime : public HybridClass<JHermesRuntime, JJSIRuntime> {
+
+class JHermesConfig : public HybridClass<JHermesConfig> {
+public:
+    static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/hermes/bridge/runtime/HermesRuntime$Config;";
+    static void registerNatives();
+
+    // TODO: Expose the config options that make sense
+    static local_ref<jhybridobject> create(alias_ref<jclass>, bool intl) {
+        auto config = hermes::vm::RuntimeConfig::Builder()
+            .withIntl(intl)
+            .build();
+
+        std::cout << config.getIntl() << std::endl;
+
+        return newObjectCxxArgs(std::move(config));
+    }
+
+    hermes::vm::RuntimeConfig& get_config() const {
+        return *config_;
+    }
+private:
+    friend HybridBase;
+    std::unique_ptr<hermes::vm::RuntimeConfig> config_;
+    explicit JHermesConfig(hermes::vm::RuntimeConfig&& config) : config_(std::make_unique<hermes::vm::RuntimeConfig>(config)) {}
+};
+
+
+class JHermesRuntime : public HybridClass<JHermesRuntime, JJSIRuntime> {
 public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/hermes/bridge/runtime/HermesRuntime;";
-
     static void registerNatives();
 
     static local_ref<jhybridobject> create(alias_ref<jclass>) {
         return newObjectCxxArgs();
     }
 
-    static local_ref<jhybriddata> initHybrid(alias_ref<jhybridobject>) {
-        return makeCxxInstance();
+    static local_ref<jhybridobject> createWithConfig(alias_ref<jclass>, alias_ref<JHermesConfig::jhybridobject> config) {
+        return newObjectCxxArgs(config->cthis()->get_config());
     }
-
-    local_ref<JJSIValue::javaobject> execute(std::string script);
 
     Runtime& get_runtime() override {
-        return runtime_->get_runtime();
+        return *runtime_;
     }
 
-    operator facebook::jsi::Runtime&() const { return runtime_->get_runtime(); }
+    operator facebook::jsi::Runtime&() { return get_runtime(); }
 
 private:
     friend HybridBase;
-    std::unique_ptr<HermesRuntimeHolder> runtime_;
-    JHermesRuntime() : HybridClass(), runtime_(std::make_unique<HermesRuntimeHolder>(HermesRuntimeHolder())) {}
+    std::unique_ptr<HermesRuntime> runtime_;
+    explicit JHermesRuntime(std::unique_ptr<HermesRuntime> runtime) : HybridClass(), runtime_(std::move(runtime)) {}
+    explicit JHermesRuntime(hermes::vm::RuntimeConfig& config) : JHermesRuntime(makeHermesRuntime(config)) {}
+    explicit JHermesRuntime() : JHermesRuntime(makeHermesRuntime()) {}
 };
+
 };

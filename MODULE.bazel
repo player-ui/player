@@ -19,6 +19,7 @@ bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "rules_pkg", version = "1.0.1")
 bazel_dep(name = "aspect_rules_ts", version = "2.4.2")
 bazel_dep(name = "rules_foreign_cc", version = "0.10.1")
+bazel_dep(name = "rules_jni", version = "0.10.1")
 bazel_dep(name = "googletest", version = "1.14.0")
 
 ####### Node.js version #########
@@ -80,6 +81,7 @@ rules_ts_ext.deps()
 use_repo(rules_ts_ext, "npm_typescript")
 
 # Kotlin
+bazel_dep(name = "rules_java", version = "6.5.2")
 bazel_dep(
     name = "rules_kotlin",
     version = "1.9.1",
@@ -184,6 +186,8 @@ maven.install(
         # Hermes
         # TODO: Using prebuilt android hermes artifact for POC, can build manually for optimization
         "com.facebook.react:hermes-android:0.74.1",
+        "com.facebook.fbjni:fbjni-java-only:0.6.0",
+        "com.facebook.soloader:soloader:0.11.0",
 
         # Test utils
         "org.junit.jupiter:junit-jupiter-api:5.6.0",

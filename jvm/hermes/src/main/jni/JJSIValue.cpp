@@ -14,8 +14,48 @@ std::vector<Value> unwrapJJSIValues(alias_ref<JArrayClass<JJSIValue::jhybridobje
     return values;
 }
 
-void JJSIRuntime::registerNatives() {
+void JJSIPreparedJavaScript::registerNatives() {
     registerHybrid({});
+}
+
+local_ref<JJSIValue::jhybridobject> JJSIRuntime::evaluateJavaScript(std::string script, std::string sourceURL) {
+    return JJSIValue::newObjectCxxArgs(get_runtime().evaluateJavaScript(std::make_shared<StringBuffer>(script), sourceURL));
+}
+
+local_ref<JJSIPreparedJavaScript::jhybridobject> JJSIRuntime::prepareJavaScript(std::string script, std::string sourceURL) {
+    return JJSIPreparedJavaScript::newObjectCxxArgs(get_runtime().prepareJavaScript(std::make_shared<StringBuffer>(script), sourceURL));
+}
+
+local_ref<JJSIValue::jhybridobject> JJSIRuntime::evaluatePreparedJavaScript(alias_ref<JJSIPreparedJavaScript::jhybridobject> js) {
+    return JJSIValue::newObjectCxxArgs(get_runtime().evaluatePreparedJavaScript(js->cthis()->get_prepared()));
+}
+
+void JJSIRuntime::queueMicrotask(alias_ref<JJSIFunction_jhybridobject> callback) {
+    get_runtime().queueMicrotask(callback->cthis()->get_function());
+}
+
+bool JJSIRuntime::drainMicrotasks(int maxMicrotasksHint) {
+    return get_runtime().drainMicrotasks(maxMicrotasksHint);
+}
+
+local_ref<JJSIObject::jhybridobject> JJSIRuntime::global() {
+    return JJSIObject::newObjectCxxArgs(get_runtime().global());
+}
+
+std::string JJSIRuntime::description() {
+    return get_runtime().description();
+}
+
+void JJSIRuntime::registerNatives() {
+    registerHybrid({
+        makeNativeMethod("evaluateJavaScript", JJSIRuntime::evaluateJavaScript),
+        makeNativeMethod("prepareJavaScript", JJSIRuntime::prepareJavaScript),
+        makeNativeMethod("evaluatePreparedJavaScript", JJSIRuntime::evaluatePreparedJavaScript),
+        makeNativeMethod("queueMicrotask", JJSIRuntime::queueMicrotask),
+        makeNativeMethod("drainMicrotasks", JJSIRuntime::drainMicrotasks),
+        makeNativeMethod("global", JJSIRuntime::global),
+        makeNativeMethod("description", JJSIRuntime::description),
+    });
 }
 
 local_ref<HybridClass<JJSIValue>::jhybridobject> JJSIValue::from(alias_ref<jclass>, int i) {

@@ -10,29 +10,56 @@ using namespace facebook::jsi;
 
 namespace intuit::playerui {
 
+/**
+ * Forward declarations to prevent circular references - jhybridobjects
+ * will need to ensure they have the same signature as the actual classes.
+ * NOTE: Prefer using actual references when possible.
+ */
+// TODO: Can we hide these from the implementation (C++) to ensure they use the real types?
+#define FORWARD_HYBRID_CLASS(name) \
+class name; \
+using name ## HybridClass = HybridClass<name>; \
+using name ## _jhybridobject = name ## HybridClass::jhybridobject;
+
+FORWARD_HYBRID_CLASS(JJSIValue)
+FORWARD_HYBRID_CLASS(JJSIObject)
+// TODO: Technically, this should provide the same class heirarchy (HybridClass<JJSIArray, JJSIObject>) -- add base support to the macro
+FORWARD_HYBRID_CLASS(JJSIArray)
+FORWARD_HYBRID_CLASS(JJSIFunction)
+FORWARD_HYBRID_CLASS(JJSISymbol)
+
+class JJSIPreparedJavaScript : public HybridClass<JJSIPreparedJavaScript> {
+public:
+    static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/PreparedJavaScript;";
+    static void registerNatives();
+
+    explicit JJSIPreparedJavaScript(std::shared_ptr<const PreparedJavaScript> prepared) : prepared_(std::move(prepared)) {}
+
+    std::shared_ptr<const PreparedJavaScript> get_prepared() const { return prepared_; }
+private:
+    std::shared_ptr<const PreparedJavaScript> prepared_;
+};
+
 /** Java class wrapper providing some native getter for a Runtime. This exists to prevent a circular dependency for JJSIRuntime based methods. */
 class JJSIRuntime : public HybridClass<JJSIRuntime> {
 public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Runtime;";
     static void registerNatives();
+
+    local_ref<JJSIValue_jhybridobject> evaluateJavaScript(std::string script, std::string sourceURL);
+    local_ref<JJSIPreparedJavaScript::jhybridobject> prepareJavaScript(std::string script, std::string sourceURL);
+    local_ref<JJSIValue_jhybridobject> evaluatePreparedJavaScript(alias_ref<JJSIPreparedJavaScript::jhybridobject> js);
+    void queueMicrotask(alias_ref<JJSIFunction_jhybridobject> callback);
+    bool drainMicrotasks(int maxMicrotasksHint = -1);
+    local_ref<JJSIObject_jhybridobject> global();
+    std::string description();
+
+    // TODO: Come back and implement this for CDT support
+    // bool isInspectable();
+    // local_ref<JJSIInstrumentation_jhybridobject> instrumentation();
+
     virtual Runtime& get_runtime() = 0;
 };
-
-/** Forward declarations to prevent circular references - jhybridobjects will need to ensure they have the same signature as the actual classes. Prefer using actual references when possible */
-class JJSIObject;
-// TODO: Can we hide these from the implementation (C++) to ensure they use the real types?
-using JJSIObjectHybridClass = HybridClass<JJSIObject>;
-using JJSIObject_jhybridobject = JJSIObjectHybridClass::jhybridobject;
-class JJSIArray;
-// TODO: Technically, this should provide the same class heirarchy (HybridClass<JJSIArray, JJSIObject>)
-using JJSIArrayHybridClass = HybridClass<JJSIArray>;
-using JJSIArray_jhybridobject = JJSIArrayHybridClass::jhybridobject;
-class JJSIFunction;
-using JJSIFunctionHybridClass = HybridClass<JJSIFunction>;
-using JJSIFunction_jhybridobject = JJSIFunctionHybridClass::jhybridobject;
-class JJSISymbol;
-using JJSISymbolHybridClass = HybridClass<JJSISymbol>;
-using JJSISymbol_jhybridobject = JJSISymbolHybridClass::jhybridobject;
 
 class JJSIValue : public HybridClass<JJSIValue> {
 public:

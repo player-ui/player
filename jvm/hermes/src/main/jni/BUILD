@@ -8,12 +8,11 @@ cc_library(
     hdrs = [
         "JHermesRuntime.h",
         "JJSIValue.h",
-        "ValueHelpers.h",
     ],
     copts = ["-std=c++17"],
     visibility = ["//visibility:public"],
     deps = [
-        "//jvm/hermes/src/main/cxx:lib",
+        "@hermes",
         "@fbjni",
         # TODO: Wrap in select for Android so it uses NDK
         "@rules_jni//jni",

@@ -1,8 +1,10 @@
 package com.intuit.playerui.hermes.bridge.runtime
 
 import com.facebook.jni.HybridData
+import com.facebook.jni.annotations.DoNotStrip
 import com.facebook.soloader.nativeloader.NativeLoader
 import com.intuit.playerui.hermes.bridge.ResourceLoaderDelegate
+import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime.Config
 import com.intuit.playerui.jsi.Runtime
 import com.intuit.playerui.jsi.Value
 import com.intuit.playerui.jsi.Value.Companion.createFromJson
@@ -12,7 +14,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlin.system.exitProcess
 
-public class HermesRuntime(mHybridData: HybridData) : Runtime(mHybridData) {
+public class HermesRuntime private constructor(mHybridData: HybridData) : Runtime(mHybridData) {
 
     public companion object {
         init {
@@ -32,19 +34,19 @@ public class HermesRuntime(mHybridData: HybridData) : Runtime(mHybridData) {
         }
 
         @JvmStatic public external fun create(): HermesRuntime
+        @JvmStatic public external fun create(runtimeConfig: Config): HermesRuntime
 
         public operator fun invoke(): HermesRuntime = create()
+        public operator fun invoke(runtimeConfig: Config): HermesRuntime = create(runtimeConfig)
     }
 
-//    @DoNotStrip override val mHybridData: HybridData
+    public class Config private constructor(@DoNotStrip private val mHybridData: HybridData) {
+        public companion object {
+            @JvmStatic public external fun create(intl: Boolean = false): Config
 
-//    init {
-//        mHybridData = initHybrid()
-//    }
-
-//    private external fun initHybrid(): HybridData
-
-    public external fun execute(script: String): Value
+            public operator fun invoke(intl: Boolean = false): Config = create(intl)
+        }
+    }
 }
 
 public fun main() {
@@ -53,11 +55,11 @@ public fun main() {
         println("Trying to execute 2 + 2")
         val runtime = HermesRuntime()
         println("Runtime: $runtime")
-        val four = runtime.execute("2 + 2")
+        val four = runtime.evaluateJavaScript("2 + 2")
         four.asNumber().let(::println)
 
         runBlocking(Dispatchers.Default) {
-            val result = runtime.execute("20 + 20")
+            val result = runtime.evaluateJavaScript("20 + 20")
             result.asNumber().let(::println)
             result.let(::println)
             result.toString(runtime).let(::println)
@@ -68,16 +70,22 @@ public fun main() {
         json.asObject(runtime).let(::println)
         json.asObject(runtime).getProperty(runtime, "hello").toString(runtime).let(::println)
 
-        val func = runtime.execute("((i) => 3 + i)")
+        val func = runtime.evaluateJavaScript("((i) => 3 + i)")
         func.isObject().let(::println)
         func.asObject(runtime).isFunction(runtime).let(::println)
         val funcRes = func.asObject(runtime).asFunction(runtime).call(runtime, Value.from(3))
         funcRes.let(::println)
         funcRes.toString(runtime).let(::println)
 
-        val symbol = runtime.execute("Symbol.for('hello-world')")
+        val symbol = runtime.evaluateJavaScript("Symbol.for('hello-world')")
         symbol.isSymbol().let(::println)
         symbol.asSymbol(runtime).toString(runtime).let(::println)
+
+        val r2 = HermesRuntime(Config(false))
+        r2.global().getProperty(r2, "Intl").toString(r2).let(::println)
+        val r3 = HermesRuntime(Config(true))
+        r3.global().getProperty(r3, "Intl").toString(r3).let(::println)
+        r3.global().getProperty(r3, "Intl").toString(r2).let(::println)
     } catch (t: Throwable) {
         t.printStackTrace()
         exitProcess(1)
