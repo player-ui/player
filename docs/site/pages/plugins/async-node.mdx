@@ -34,11 +34,9 @@ The `AsyncNodePlugin` exposes an `onAsyncNode` hook on all platforms. The `onAsy
 
 User should tap into the `onAsyncNode` hook to examine the node's metadata before making a decision on what to replace the async node with. The return could be a single asset node or an array of asset nodes.
 
-### Improvements
+### Edge cases
 
-The AsyncNodePluginPlugin class is now capable of handling the below :
-- The resolvedMapping map now sets the node.id as the key and either parsedNode or node as the value, depending on whether parsedNode is truthy.
-- This means that the plugin is now capable of resolving the async node even when the consumer returns a null/undefined value.
+If for some reason, the process for resolving some `AsyncNode` fails, or is no longer relevant, you can resolve the promise for that `AsyncNode` with `undefined` or `null` to replace that node with "nothing" in the UI.
 
 ### Continuous Streaming
 
