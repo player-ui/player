@@ -219,6 +219,8 @@ jobs:
       - run:
           name: Install Android tools
           command: |
+            eval which java
+            eval java --version
             rm -rf $ANDROID_HOME/build-tools/*
             JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64 \
               $ANDROID_HOME/tools/bin/sdkmanager "build-tools;33.0.1"\
