@@ -166,13 +166,7 @@ jobs:
             - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
 
       - run:
-          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
           command: |
-             rm -rf ~/.pyenv
-             curl https://pyenv.run | bash
-             rbenv global 2.7.8
-            
-             gem install bundler:2.3.19
              bundle install
 
       - save_cache:
