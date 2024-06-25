@@ -10,6 +10,7 @@ const view1 = (
         <Action.Label>Continue</Action.Label>
       </Action>
     </Info.Actions>
+    <Info.Footer>Footer text</Info.Footer>
   </Info>
 );
 

@@ -13,6 +13,7 @@ const view1 = (
         <Action.Label>Back</Action.Label>
       </Action>
     </Info.Actions>
+    <Info.Footer>Footer text</Info.Footer>
   </Info>
 );
 

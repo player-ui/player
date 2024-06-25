@@ -36,6 +36,11 @@ export const Info = (props: InfoAssetTransform) => {
                 <ReactAsset key={a.asset.id} {...a} />
               ))}
             </div>
+            <div>
+              {props.footer && (
+                <ReactAsset {...props.footer} />
+              )}
+            </div>
           </div>
         </div>
       </div>
