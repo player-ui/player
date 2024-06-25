@@ -58,20 +58,28 @@ void JJSIRuntime::registerNatives() {
     });
 }
 
-local_ref<HybridClass<JJSIValue>::jhybridobject> JJSIValue::fromBool(alias_ref<jclass>, bool b) {
+void JJSIRuntimeWrapper::registerNatives() {
+    registerHybrid({});
+}
+
+local_ref<JJSIValue::jhybridobject> JJSIValue::fromBool(alias_ref<jclass>, bool b) {
     return newObjectCxxArgs(Value(b));
 }
 
-local_ref<HybridClass<JJSIValue>::jhybridobject> JJSIValue::fromDouble(alias_ref<jclass>, double d) {
+local_ref<JJSIValue::jhybridobject> JJSIValue::fromDouble(alias_ref<jclass>, double d) {
     return newObjectCxxArgs(Value(d));
 }
 
-local_ref<HybridClass<JJSIValue>::jhybridobject> JJSIValue::fromInt(alias_ref<jclass>, int i) {
+local_ref<JJSIValue::jhybridobject> JJSIValue::fromInt(alias_ref<jclass>, int i) {
     return newObjectCxxArgs(Value(i));
 }
 
-local_ref<HybridClass<JJSIValue>::jhybridobject> JJSIValue::fromString(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string str) {
+local_ref<JJSIValue::jhybridobject> JJSIValue::fromString(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string str) {
     return newObjectCxxArgs(String::createFromUtf8(jRuntime->cthis()->get_runtime(), str));
+}
+
+local_ref<JJSIValue::jhybridobject> JJSIValue::fromLong(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, jlong l) {
+    return newObjectCxxArgs(BigInt::fromInt64(jRuntime->cthis()->get_runtime(), l));
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIValue::undefined(alias_ref<jclass>) {
@@ -146,7 +154,7 @@ std::string JJSIValue::asString(alias_ref<JJSIRuntime::jhybridobject> jRuntime) 
     return value_->asString(runtime).utf8(runtime);
 }
 
-int64_t JJSIValue::asBigInt(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
+jlong JJSIValue::asBigInt(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
     Runtime& runtime = cthis(jRuntime)->get_runtime();
     return value_->asBigInt(runtime).asInt64(runtime);
 }
@@ -171,6 +179,7 @@ void JJSIValue::registerNatives() {
         makeNativeMethod("from", JJSIValue::fromDouble),
         makeNativeMethod("from", JJSIValue::fromInt),
         makeNativeMethod("from", JJSIValue::fromString),
+        makeNativeMethod("from", JJSIValue::fromLong),
 
         // TODO: Settle on getter API
         // MARK: Static Value APIs
@@ -279,17 +288,13 @@ void JJSIObject::registerNatives() {
 }
 
 local_ref<JJSIArray::jhybridobject> JJSIArray::createWithElements(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> elements) {
-    // TODO: Better way to convert JArrayClass<JJSIValue::jhybridobject> -> initializer_list<Value>
-    // TODO: This doesn't work anyways
-    std::initializer_list<Value> values = [&]() {
-        std::initializer_list<Value> result;
-        for (int i = 0; i < elements->size(); ++i) {
-            result = {result.begin(), std::move(elements->getElement(i)->cthis()->get_value())};
-        }
-        return result;
-    }();
+    Runtime& runtime = jRuntime->cthis()->get_runtime();
+    Array array = Array(runtime, elements->size());
+    for (int i = 0; i < elements->size(); i++) {
+        array.setValueAtIndex(runtime, i, elements->getElement(i)->cthis()->get_value());
+    }
 
-    return newObjectCxxArgs(Array::createWithElements(jRuntime->cthis()->get_runtime(), values));
+    return newObjectCxxArgs(std::move(array));
 }
 
 int JJSIArray::size(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
@@ -317,6 +322,18 @@ void JJSIArray::registerNatives() {
     });
 }
 
+local_ref<JJSIFunction::jhybridobject> JJSIFunction::createFromHostFunction(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name, int paramCount, alias_ref<JJSIHostFunction> func) {
+    auto propName = PropNameID::forUtf8(jRuntime->cthis()->get_runtime(), name);
+
+    auto jFunc = make_global(func);
+    // TODO: Verify if this enough count as storage for a global, I would think so, since we're storing the lambda in the runtime?
+    HostFunctionType hostFunc = [jFunc](Runtime& runtime, Value& thisVal, Value* args, size_t count) -> Value {
+        return JJSIHostFunction::call(jFunc, runtime, thisVal, args, count);
+    };
+
+    return newObjectCxxArgs(Function::createFromHostFunction(jRuntime->cthis()->get_runtime(), propName, paramCount, hostFunc));
+}
+
 local_ref<JJSIValue::jhybridobject> JJSIFunction::call(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> args) {
     auto values = unwrapJJSIValues(args);
     return JJSIValue::newObjectCxxArgs(function_->call(jRuntime->cthis()->get_runtime(), static_cast<const Value*>(values.data()), values.size()));
@@ -332,12 +349,23 @@ local_ref<JJSIValue::jhybridobject> JJSIFunction::callAsConstructor(alias_ref<JJ
     return JJSIValue::newObjectCxxArgs(function_->callAsConstructor(jRuntime->cthis()->get_runtime(), static_cast<const Value*>(values.data()), values.size()));
 }
 
+bool JJSIFunction::isHostFunction(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
+    return function_->isHostFunction(jRuntime->cthis()->get_runtime());
+}
+
 void JJSIFunction::registerNatives() {
     registerHybrid({
+        makeNativeMethod("createFromHostFunction", JJSIFunction::createFromHostFunction),
+
         makeNativeMethod("call", JJSIFunction::call),
         makeNativeMethod("callWithThis", JJSIFunction::callWithThis),
         makeNativeMethod("callAsConstructor", JJSIFunction::callAsConstructor),
+        makeNativeMethod("isHostFunction", JJSIFunction::isHostFunction),
     });
+}
+
+bool JJSISymbol::strictEquals(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b) {
+    return Symbol::strictEquals(jRuntime->cthis()->get_runtime(), a->cthis()->get_symbol(), b->cthis()->get_symbol());
 }
 
 std::string JJSISymbol::toString(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
@@ -346,7 +374,33 @@ std::string JJSISymbol::toString(alias_ref<JJSIRuntime::jhybridobject> jRuntime)
 
 void JJSISymbol::registerNatives() {
     registerHybrid({
+        makeNativeMethod("strictEquals", JJSISymbol::strictEquals),
         makeNativeMethod("toString", JJSISymbol::toString),
     });
 }
+
+Value JJSIHostFunction::call(alias_ref<JJSIHostFunction> jThis, Runtime &runtime, Value &thisVal, Value *args, size_t count) {
+    return jThis->call(runtime, thisVal, args, count);
+}
+
+Value JJSIHostFunction::call(Runtime &runtime, Value &thisVal, Value *args, size_t count) {
+    local_ref<JArrayClass<JJSIValue::jhybridobject>> values = JArrayClass<JJSIValue::jhybridobject>::newArray(count);
+    for (size_t i = 0; i < count; i++) {
+        values->setElement(i, JJSIValue::newObjectCxxArgs(std::move(args[i])).get());
+    }
+
+    static const auto method = getClass()->getMethod<
+        local_ref<JJSIValue::jhybridobject>(
+            alias_ref<JJSIRuntime::jhybridobject>,
+            alias_ref<JJSIValue::jhybridobject>,
+            alias_ref<JArrayClass<JJSIValue::jhybridobject>>
+        )>("call");
+
+    return std::move(method(self(),
+        JJSIRuntimeWrapper::newObjectCxxArgs(runtime),
+        JJSIValue::newObjectCxxArgs(std::move(thisVal)).releaseAlias(),
+        values.releaseAlias()
+    )->cthis()->get_value());
+}
+
 };

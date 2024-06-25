@@ -5,10 +5,16 @@ import com.facebook.jni.annotations.DoNotStrip
 import kotlinx.serialization.json.JsonElement
 import java.nio.ByteBuffer
 
+public fun interface HostFunctionInterface {
+    public fun call(runtime: Runtime, thisVal: Value, args: kotlin.Array<Value>): Value
+}
+
+public class HostFunction(private val func: HostFunctionInterface): HostFunctionInterface by func
+
 public class PreparedJavaScript(@DoNotStrip private val mHybridData: HybridData)
 
 // NOTE: mHybridData is required to be a member field, so we put it in the constructor
-public abstract class Runtime(@DoNotStrip private val mHybridData: HybridData) {
+public open class Runtime(@DoNotStrip private val mHybridData: HybridData) {
     public external fun evaluateJavaScript(script: String, sourceURL: String = "unknown"): Value
     public external fun prepareJavaScript(script: String, sourceURL: String = "unknown"): PreparedJavaScript
     public external fun evaluatePreparedJavaScript(js: PreparedJavaScript): Value
@@ -56,6 +62,7 @@ public class Value private constructor(@DoNotStrip private val mHybridData: Hybr
         @JvmStatic public external fun from(value: Int): Value
 
         @JvmStatic public external fun from(runtime: Runtime, value: String): Value
+        @JvmStatic public external fun from(runtime: Runtime, value: Long): Value
 
         // TODO: Settle on API
         public val undefined: Value @JvmStatic external get
@@ -97,6 +104,7 @@ public open class Object internal constructor(@DoNotStrip private val mHybridDat
     public external fun asArray(runtime: Runtime): Array
     public external fun asFunction(runtime: Runtime): Function
 
+    // TODO: Expand name to accept PropNameID for non-string based identifiers
     public external fun hasProperty(runtime: Runtime, name: String): Boolean
     public external fun setProperty(runtime: Runtime, name: String, value: Value)
     public external fun getPropertyNames(runtime: Runtime): Array
@@ -123,8 +131,17 @@ public class Function private constructor(mHybridData: HybridData) : Object(mHyb
     public external fun call(runtime: Runtime, vararg args: Value): Value
     public external fun callWithThis(runtime: Runtime, jsThis: Object, vararg value: Value): Value
     public external fun callAsConstructor(runtime: Runtime, vararg value: Value): Value
+    public external fun isHostFunction(runtime: Runtime): Boolean
+
+    public companion object {
+        @JvmStatic public external fun createFromHostFunction(runtime: Runtime, name: String, paramCount: Int, func: HostFunction): Function
+    }
 }
 
 public class Symbol private constructor(mHybridData: HybridData) : Object(mHybridData) {
     public external fun toString(runtime: Runtime): String
+
+    public companion object {
+        @JvmStatic public external fun strictEquals(runtime: Runtime, a: Symbol, b: Symbol): Boolean
+    }
 }

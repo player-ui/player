@@ -39,6 +39,7 @@ git_repository(
     name = "hermes",
     build_file = "//third_party/hermes:BUILD",
     commit = "c16bd411cdb20d424f843ea8623c00fa3d493a6c",
+    patches = ["//patches:hermes.loosen_host_function_params.patch"],
     remote = "https://github.com/facebook/hermes",
 )
 

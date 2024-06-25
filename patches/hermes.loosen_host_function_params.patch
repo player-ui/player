@@ -1,0 +1,76 @@
+diff --git API/hermes/TimerStats.cpp API/hermes/TimerStats.cpp
+index b6d156d93..fb9e87f54 100644
+--- API/hermes/TimerStats.cpp
++++ API/hermes/TimerStats.cpp
+@@ -190,8 +190,8 @@ class TimedHostFunction final : public jsi::DecoratedHostFunction {
+       : DHF(rt, std::move(plainHF)), rts_(rts) {}
+   jsi::Value operator()(
+       jsi::Runtime &rt,
+-      const jsi::Value &thisVal,
+-      const jsi::Value *args,
++      jsi::Value &thisVal,
++      jsi::Value *args,
+       size_t count) {
+     auto timer = rts_.outgoingTimer("HostFunction");
+     return DHF::operator()(rt, thisVal, args, count);
+diff --git API/hermes/TracingRuntime.cpp API/hermes/TracingRuntime.cpp
+index fb36c488b..3c6e807c6 100644
+--- API/hermes/TracingRuntime.cpp
++++ API/hermes/TracingRuntime.cpp
+@@ -706,8 +706,8 @@ jsi::Function TracingRuntime::createFunctionFromHostFunction(
+ 
+     jsi::Value operator()(
+         jsi::Runtime &rt,
+-        const jsi::Value &thisVal,
+-        const jsi::Value *args,
++        jsi::Value &thisVal,
++        jsi::Value *args,
+         size_t count) {
+       TracingRuntime &trt = static_cast<TracingRuntime &>(decoratedRuntime());
+ 
+diff --git API/hermes/hermes.cpp API/hermes/hermes.cpp
+index 2def3da35..843d0592b 100644
+--- API/hermes/hermes.cpp
++++ API/hermes/hermes.cpp
+@@ -817,12 +817,13 @@ class HermesRuntimeImpl final : public HermesRuntime,
+       }
+ 
+       jsi::Value ret;
+-      const jsi::Value *args = apiArgs.empty() ? nullptr : &apiArgs.front();
++      jsi::Value *args = apiArgs.empty() ? nullptr : &apiArgs.front();
++      jsi::Value thisVal = rt.valueFromHermesValue(hvArgs.getThisArg());
+ 
+       try {
+         ret = (hfc->hostFunction)(
+             rt,
+-            rt.valueFromHermesValue(hvArgs.getThisArg()),
++            thisVal,
+             args,
+             apiArgs.size());
+       }
+diff --git API/jsi/jsi/decorator.h API/jsi/jsi/decorator.h
+index 6f4351a42..3a566c6f5 100644
+--- API/jsi/jsi/decorator.h
++++ API/jsi/jsi/decorator.h
+@@ -32,7 +32,7 @@ class DecoratedHostFunction {
+   }
+ 
+   Value
+-  operator()(Runtime&, const Value& thisVal, const Value* args, size_t count) {
++  operator()(Runtime&, Value& thisVal, Value* args, size_t count) {
+     return plainHF_(decoratedRuntime(), thisVal, args, count);
+   }
+ 
+diff --git API/jsi/jsi/jsi.h API/jsi/jsi/jsi.h
+index 16e251dc5..20c34a7d7 100644
+--- API/jsi/jsi/jsi.h
++++ API/jsi/jsi/jsi.h
+@@ -109,7 +109,7 @@ class JSError;
+ /// can be any value - it will not necessarily be coerced to an object or
+ /// or set to the global object.
+ using HostFunctionType = std::function<
+-    Value(Runtime& rt, const Value& thisVal, const Value* args, size_t count)>;
++    Value(Runtime& rt, Value& thisVal, Value* args, size_t count)>;
+ 
+ /// An object which implements this interface can be registered as an
+ /// Object with the JS runtime.

@@ -40,7 +40,7 @@ private:
     std::shared_ptr<const PreparedJavaScript> prepared_;
 };
 
-/** Java class wrapper providing some native getter for a Runtime. This exists to prevent a circular dependency for JJSIRuntime based methods. */
+/** Java class wrapper for facebook::jsi::Runtime */
 class JJSIRuntime : public HybridClass<JJSIRuntime> {
 public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Runtime;";
@@ -61,6 +61,25 @@ public:
     virtual Runtime& get_runtime() = 0;
 };
 
+
+// Base implementation can't partake in memory management b/c we don't
+// know the concrete runtime type to create smart pointers for. So, we
+// just wrap the reference up for use at a later point.
+class JJSIRuntimeWrapper : public HybridClass<JJSIRuntimeWrapper, JJSIRuntime> {
+public:
+    static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Runtime;";
+    static void registerNatives();
+
+    Runtime& get_runtime() override {
+        return runtime_;
+    };
+
+    JJSIRuntimeWrapper(Runtime& runtime) : HybridClass(), runtime_(runtime) {}
+
+private:
+    std::reference_wrapper<Runtime> runtime_;
+};
+
 class JJSIValue : public HybridClass<JJSIValue> {
 public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Value;";
@@ -69,7 +88,8 @@ public:
     static local_ref<jhybridobject> fromBool(alias_ref<jclass>, bool b);
     static local_ref<jhybridobject> fromDouble(alias_ref<jclass>, double d);
     static local_ref<jhybridobject> fromInt(alias_ref<jclass>, int i);
-    static local_ref<jhybridobject> fromString(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject>, std::string str);
+    static local_ref<jhybridobject> fromString(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string str);
+    static local_ref<jhybridobject> fromLong(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, jlong l);
 
     static local_ref<jhybridobject> undefined(alias_ref<jclass>);
     static local_ref<jhybridobject> null(alias_ref<jclass>);
@@ -90,7 +110,7 @@ public:
     bool asBool();
     double asNumber();
     std::string asString(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
-    int64_t asBigInt(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
+    jlong asBigInt(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     local_ref<JJSISymbol_jhybridobject> asSymbol(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     local_ref<JJSIObject_jhybridobject> asObject(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     std::string toString(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
@@ -154,16 +174,30 @@ private:
     std::shared_ptr<Array> array_;
 };
 
+struct JJSIHostFunction : JavaClass<JJSIHostFunction> {
+    static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/HostFunction;";
+
+    // Explicitly static API to allow the JJSIHostFunction reference to be passed in, as it usually comes in as
+    // a reference that we need to explicitly make_global to ensure it persists until the time the host function
+    // is actually called.
+    static Value call(alias_ref<JJSIHostFunction> jThis, Runtime& runtime, Value& thisVal, Value* args, size_t count);
+
+    Value call(Runtime& runtime, Value& thisVal, Value* args, size_t count);
+};
+
 class JJSIFunction : public JJSIFunctionHybridClass {
 public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Function;";
     static void registerNatives();
+
+    static local_ref<jhybridobject> createFromHostFunction(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name, int paramCount, alias_ref<JJSIHostFunction> func);
 
     explicit JJSIFunction(Function&& function) : function_(std::make_shared<Function>(std::move(function))) {}
 
     local_ref<JJSIValue::jhybridobject> call(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> args);
     local_ref<JJSIValue::jhybridobject> callWithThis(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIObject::jhybridobject> jsThis, alias_ref<JArrayClass<JJSIValue::jhybridobject>> args);
     local_ref<JJSIValue::jhybridobject> callAsConstructor(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> args);
+    bool isHostFunction(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
 
     Function& get_function() const { return *function_; }
 private:
@@ -175,6 +209,8 @@ class JJSISymbol : public JJSISymbolHybridClass {
 public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Symbol;";
     static void registerNatives();
+
+    static bool strictEquals(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b);
 
     explicit JJSISymbol(Symbol&& symbol) : symbol_(std::make_shared<Symbol>(std::move(symbol))) {}
 
