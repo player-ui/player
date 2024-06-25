@@ -58,4 +58,7 @@ SDK_MANAGER=$ANDROID_HOME/tools/bin/sdkmanager
 yes | $SDK_MANAGER --licenses
 yes | $SDK_MANAGER --update
 
-$SDK_MANAGER "ndk;${ANDROID_NDK_VERSION}"
+$SDK_MANAGER "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
+    "platforms;android-${ANDROID_VERSION}" \
+    "platform-tools" \
+    "ndk;${ANDROID_NDK_VERSION}"
