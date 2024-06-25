@@ -140,7 +140,7 @@ jobs:
             echo 'export PATH=$ANDROID_SDK_HOME/emulator:$PATH'  >> $BASH_ENV
             source $BASH_ENV
           environment:
-            JAVA_HOME: /usr/libexec/java_home -v 1.8
+            JAVA_HOME: /opt/homebrew/opt/zulu@8
 
       - macos/preboot-simulator:
           version: "17.4"
