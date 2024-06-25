@@ -61,21 +61,21 @@ public:
     virtual Runtime& get_runtime() = 0;
 };
 
-
-// Base implementation can't partake in memory management b/c we don't
-// know the concrete runtime type to create smart pointers for. So, we
-// just wrap the reference up for use at a later point.
+/**
+ * Runtime agnostic reference wrapper runtime implementation. Neither the
+ * base implementation, nor this, can partake in memory management b/c we don't
+ * know the concrete runtime type to create smart pointers for. So, we just wrap
+ * the reference up for use at a later point. This shouldn't be used for creating
+ * and managing instances of a runtime, that should be done with the runtime
+ * specific JNI constructs to ensure it can hold the correct smart pointer.
+ */
 class JJSIRuntimeWrapper : public HybridClass<JJSIRuntimeWrapper, JJSIRuntime> {
 public:
-    static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Runtime;";
-    static void registerNatives();
-
     Runtime& get_runtime() override {
         return runtime_;
     };
 
     JJSIRuntimeWrapper(Runtime& runtime) : HybridClass(), runtime_(runtime) {}
-
 private:
     std::reference_wrapper<Runtime> runtime_;
 };
@@ -182,6 +182,10 @@ struct JJSIHostFunction : JavaClass<JJSIHostFunction> {
     // is actually called.
     static Value call(alias_ref<JJSIHostFunction> jThis, Runtime& runtime, Value& thisVal, Value* args, size_t count);
 
+    // TODO: HostFunctionType declares thisVal and args as const, which makes it difficult to wrap
+    //       with JJSIValue for cross-jni usage. We've applied a patch to loosen the parameter
+    //       constraints, but a better solution would likely be to follow a const (read-only)
+    //       approach in a JJSIConstValue class.
     Value call(Runtime& runtime, Value& thisVal, Value* args, size_t count);
 };
 

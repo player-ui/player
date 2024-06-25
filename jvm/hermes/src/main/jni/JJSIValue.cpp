@@ -58,10 +58,6 @@ void JJSIRuntime::registerNatives() {
     });
 }
 
-void JJSIRuntimeWrapper::registerNatives() {
-    registerHybrid({});
-}
-
 local_ref<JJSIValue::jhybridobject> JJSIValue::fromBool(alias_ref<jclass>, bool b) {
     return newObjectCxxArgs(Value(b));
 }
