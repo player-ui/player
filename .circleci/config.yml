@@ -132,8 +132,6 @@ jobs:
       - run:
           name: Install Android tools
           command: |
-            eval which java
-            eval java --version
             sh scripts/install-android-tools.sh
             echo 'export ANDROID_SDK_HOME=$ANDROID_HOME'  >> $BASH_ENV
             echo 'export ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk/21.4.7075529'  >> $BASH_ENV
