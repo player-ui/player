@@ -51,9 +51,4 @@ curl https://dl.google.com/android/repository/sdk-tools-darwin-$ANDROID_SDK_VERS
 
 unzip sdk-tools.zip
 
-SDK_MANAGER=$ANDROID_HOME/tools/bin/sdkmanager
-
-yes | $SDK_MANAGER --licenses
-yes | $SDK_MANAGER --update
-
-$SDK_MANAGER "ndk;${ANDROID_NDK_VERSION}"
+mkdir -p $ANDROID_HOME/ndk/21.4.7075529
