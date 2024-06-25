@@ -25,12 +25,12 @@ internal abstract class HermesRuntimeTest(val runtime: HermesRuntime = HermesRun
 /// Set of tests for the JSI JNI wrappers - uses Hermes as the basis for testing against APIs that require a runtime
 internal class RuntimeTests : HermesRuntimeTest() {
 
-    @Test fun `can evaluate valid js and get the result`() {
+    @Test fun `evaluate valid js and get the result`() {
         val result = runtime.evaluateJavaScript("2 + 2")
         assertEquals(4.0, result.asNumber())
     }
 
-    @Test fun `can handle errors thrown from JS on the JVM`() {
+    @Test fun `handle errors thrown from JS on the JVM`() {
         assertEquals("""hello
 
 Error: hello
@@ -39,7 +39,7 @@ Error: hello
         }.message)
     }
 
-    @Test fun `can prepare js and execute later`() {
+    @Test fun `prepare js and execute later`() {
         val prepared = runtime.prepareJavaScript("() => 3")
         val result = runtime.evaluatePreparedJavaScript(prepared)
         assertEquals(3.0, result.asObject(runtime).asFunction(runtime).call(runtime).asNumber())
@@ -52,7 +52,7 @@ Error: hello
         }.message)
     }
 
-    @Test fun `can queue and drain microtasks`() {
+    @Test fun `queue and drain microtasks`() {
         val runtime = HermesRuntime(Config(microtaskQueue = true))
         val function = runtime.evaluateJavaScript("() => { a = 2 }").asObject(runtime).asFunction(runtime)
         assertTrue(runtime.global().getProperty(runtime, "a").isUndefined())
@@ -61,31 +61,31 @@ Error: hello
         assertEquals(2.0, runtime.global().getProperty(runtime, "a").asNumber())
     }
 
-    @Test fun `can get the description`() {
+    @Test fun `get the description`() {
         assertEquals("HermesRuntime", runtime.description())
     }
 }
 
 internal class ValueTests : HermesRuntimeTest() {
-    @Test fun `can create and detect undefined`() {
+    @Test fun `create and detect undefined`() {
         val undefined = Value.undefined()
         assertTrue(undefined.isUndefined())
         assertEquals("undefined", undefined.toString(runtime))
     }
 
-    @Test fun `can create and detect null`() {
+    @Test fun `create and detect null`() {
         val `null` = Value.`null`()
         assertTrue(`null`.isNull())
         assertEquals("null", `null`.toString(runtime))
     }
 
-    @Test fun `can create and detect boolean`() {
+    @Test fun `create and detect boolean`() {
         val boolean = Value.from(true)
         assertTrue(boolean.isBoolean())
         assertTrue(boolean.asBoolean())
     }
 
-    @Test fun `can create and detect number`() {
+    @Test fun `create and detect number`() {
         val int = Value.from(100)
         assertTrue(int.isNumber())
         assertEquals(100, int.asNumber().toInt())
@@ -95,13 +95,13 @@ internal class ValueTests : HermesRuntimeTest() {
         assertEquals(5.5, double.asNumber())
     }
 
-    @Test fun `can create and detect string`() {
+    @Test fun `create and detect string`() {
         val string = Value.from(runtime, "Hello")
         assertTrue(string.isString())
         assertEquals("Hello", string.asString(runtime))
     }
 
-    @Test fun `can create and detect big int as long`() {
+    @Test fun `create and detect big int as long`() {
         val bigInt = runtime.evaluateJavaScript("0n")
         assertTrue(bigInt.isBigInt())
         assertEquals(0L, bigInt.asBigInt(runtime))
@@ -138,12 +138,30 @@ internal class ObjectTests : HermesRuntimeTest() {
         val `object` = value.asObject(runtime)
         assertFalse(`object`.isArray(runtime))
         assertFalse(`object`.isFunction(runtime))
+        assertTrue(`object`.hasProperty(runtime, "hello"))
+        assertFalse(`object`.hasProperty(runtime, "world"))
         assertEquals(3, `object`.getPropertyNames(runtime).size(runtime))
         assertEquals("world", `object`.getProperty(runtime, "hello").asString(runtime))
         assertEquals("data", `object`.getPropertyAsObject(runtime, "nested").getProperty(runtime, "some").asString(runtime))
         val multiply = `object`.getPropertyAsFunction(runtime, "multiply").asFunction(runtime)
         val result = multiply.call(runtime, Value.from(2), Value.from(3)).asNumber().toInt()
         assertEquals(6, result)
+    }
+
+    @Test fun `check if instanceOf`() {
+        val mapCtor = runtime.global().getPropertyAsFunction(runtime, "Map")
+        val map = mapCtor.callAsConstructor(runtime).asObject(runtime)
+        assertTrue(map.instanceOf(runtime, mapCtor))
+        val setCtor = runtime.global().getPropertyAsFunction(runtime, "Set")
+        assertFalse(map.instanceOf(runtime, setCtor))
+    }
+
+    @Test fun `set property on object`() {
+        val obj = runtime.evaluateJavaScript("({})").asObject(runtime)
+        assertFalse(obj.hasProperty(runtime, "hello"))
+        obj.setProperty(runtime, "hello", Value.from(runtime, "world"))
+        assertTrue(obj.hasProperty(runtime, "hello"))
+        assertEquals("world", obj.getProperty(runtime, "hello").asString(runtime))
     }
 }
 
@@ -174,6 +192,12 @@ internal class ArrayTests : HermesRuntimeTest() {
     @Test fun `can create array via helper`() {
         val value = Array.createWithElements(runtime, Value.from(1), Value.from(runtime, "two"), Value.from(runtime, 3L))
         value.assertValues()
+    }
+
+    @Test fun `can set values in an array`() {
+        val array = Array.createWithElements(runtime, Value.from(20))
+        array.setValueAtIndex(runtime, 0, Value.from(40))
+        assertEquals(40, array.getValueAtIndex(runtime, 0).asNumber().toInt())
     }
 }
 

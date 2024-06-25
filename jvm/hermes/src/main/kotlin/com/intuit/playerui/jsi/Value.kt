@@ -5,12 +5,6 @@ import com.facebook.jni.annotations.DoNotStrip
 import kotlinx.serialization.json.JsonElement
 import java.nio.ByteBuffer
 
-public fun interface HostFunctionInterface {
-    public fun call(runtime: Runtime, thisVal: Value, args: kotlin.Array<Value>): Value
-}
-
-public class HostFunction(private val func: HostFunctionInterface): HostFunctionInterface by func
-
 public class PreparedJavaScript(@DoNotStrip private val mHybridData: HybridData)
 
 // NOTE: mHybridData is required to be a member field, so we put it in the constructor
@@ -126,6 +120,12 @@ public class Array private constructor(mHybridData: HybridData) : Object(mHybrid
         @JvmStatic public external fun createWithElements(runtime: Runtime, vararg elements: Value): Array
     }
 }
+
+public fun interface HostFunctionInterface {
+    public fun call(runtime: Runtime, thisVal: Value, args: kotlin.Array<Value>): Value
+}
+
+public class HostFunction(private val func: HostFunctionInterface): HostFunctionInterface by func
 
 public class Function private constructor(mHybridData: HybridData) : Object(mHybridData) {
     public external fun call(runtime: Runtime, vararg args: Value): Value
