@@ -130,7 +130,6 @@ jobs:
       - run:
           name: Set Ruby Version
           command: |
-            rbenv install 2.7.8
             rbenv global 2.7.8
             rbenv rehash
 
@@ -170,6 +169,7 @@ jobs:
           shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
           command: |
              curl https://pyenv.run | bash
+             rbenv global 2.7.8
             
              gem install bundler:2.3.19
              bundle install
