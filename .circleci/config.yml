@@ -117,8 +117,7 @@ jobs:
       - run:
           name: Homebrew Dependencies
           command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk lcov
-            brew install --cask zulu@8
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk lcov openjdk@11
 
       - restore_cache:
           keys:
@@ -140,7 +139,7 @@ jobs:
             echo 'export PATH=$ANDROID_SDK_HOME/emulator:$PATH'  >> $BASH_ENV
             source $BASH_ENV
           environment:
-            JAVA_HOME: /opt/homebrew/Caskroom/zulu@8
+            JAVA_HOME: /opt/homebrew/opt/openjdk@11
 
       - macos/preboot-simulator:
           version: "17.4"
