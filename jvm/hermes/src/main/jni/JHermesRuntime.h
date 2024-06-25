@@ -48,6 +48,7 @@ public:
     }
 
     // TODO: Add the rest of the HermesRuntime API
+    // TODO: Add release API - would likely just release the pointer
 
     Runtime& get_runtime() override {
         return *runtime_;

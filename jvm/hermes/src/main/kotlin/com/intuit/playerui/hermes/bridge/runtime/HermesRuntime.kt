@@ -3,9 +3,11 @@ package com.intuit.playerui.hermes.bridge.runtime
 import com.facebook.jni.HybridData
 import com.facebook.jni.annotations.DoNotStrip
 import com.facebook.soloader.nativeloader.NativeLoader
+import com.intuit.playerui.core.bridge.runtime.Runtime
+import com.intuit.playerui.hermes.bridge.JSIValue
 import com.intuit.playerui.hermes.bridge.ResourceLoaderDelegate
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime.Config
-import com.intuit.playerui.jsi.Runtime
+import com.intuit.playerui.jsi.Runtime as JSIRuntime
 import com.intuit.playerui.jsi.Value
 import com.intuit.playerui.jsi.Value.Companion.createFromJson
 import kotlinx.coroutines.Dispatchers
@@ -14,7 +16,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlin.system.exitProcess
 
-public class HermesRuntime private constructor(mHybridData: HybridData) : Runtime(mHybridData) {
+public class HermesRuntime private constructor(mHybridData: HybridData) : Runtime<JSIValue>, JSIRuntime(mHybridData) {
 
     public companion object {
         init {
