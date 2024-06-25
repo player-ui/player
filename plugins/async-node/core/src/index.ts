@@ -66,7 +66,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
   name = "AsyncNode";
 
-  private resolvedMapping = new Map<string, Node.Node>();
+  private resolvedMapping = new Map<string, any>();
 
   private currentView: ViewInstance | undefined;
 
@@ -167,10 +167,8 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
                 ? options.parseNode(result)
                 : undefined;
 
-            if (parsedNode) {
-              this.resolvedMapping.set(node.id, parsedNode);
-              view.updateAsync();
-            }
+            this.resolvedMapping.set(node.id, parsedNode ? parsedNode : node);
+            view.updateAsync();
           });
 
           return node;
