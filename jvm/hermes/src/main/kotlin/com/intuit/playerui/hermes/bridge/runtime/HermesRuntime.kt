@@ -3,32 +3,64 @@ package com.intuit.playerui.hermes.bridge.runtime
 import com.facebook.jni.HybridData
 import com.facebook.jni.annotations.DoNotStrip
 import com.facebook.soloader.nativeloader.NativeLoader
+import com.intuit.playerui.core.bridge.Invokable
+import com.intuit.playerui.core.bridge.Node
+import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.playerui.core.bridge.runtime.Runtime
-import com.intuit.playerui.hermes.bridge.JSIValue
+import com.intuit.playerui.core.bridge.runtime.ScriptContext
+import com.intuit.playerui.core.bridge.serialization.format.RuntimeFormat
+import com.intuit.playerui.core.utils.InternalPlayerApi
 import com.intuit.playerui.hermes.bridge.ResourceLoaderDelegate
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime.Config
-import com.intuit.playerui.jsi.Runtime as JSIRuntime
+import com.intuit.playerui.hermes.extensions.handleValue
+import com.intuit.playerui.hermes.extensions.toNode
 import com.intuit.playerui.jsi.Value
 import com.intuit.playerui.jsi.Value.Companion.createFromJson
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExecutorCoroutineDispatcher
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import kotlinx.serialization.modules.SerializersModule
+import java.util.concurrent.Executors
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.system.exitProcess
+import com.intuit.playerui.jsi.Runtime as JSIRuntime
 
-public class HermesRuntime private constructor(mHybridData: HybridData) : Runtime<JSIValue>, JSIRuntime(mHybridData) {
+
+public class HermesRuntimeFormat(override val runtime: HermesRuntime) : RuntimeFormat<Value> {
+    override fun registerSerializersModule(serializersModule: SerializersModule) {
+        TODO("Not yet implemented")
+    }
+
+    override fun <T> encodeToRuntimeValue(serializer: SerializationStrategy<T>, value: T): Value {
+        TODO("Not yet implemented")
+    }
+
+    override fun <T> decodeFromRuntimeValue(deserializer: DeserializationStrategy<T>, element: Value): T {
+        TODO("Not yet implemented")
+    }
+
+    override fun parseToRuntimeValue(string: String): Value {
+        TODO("Not yet implemented")
+    }
+
+    override val serializersModule: SerializersModule
+        get() = TODO("Not yet implemented")
+}
+
+// TODO: Likely split up JNI & Runtime impl
+public class HermesRuntime private constructor(mHybridData: HybridData) : Runtime<Value>, JSIRuntime(mHybridData) {
 
     public companion object {
         init {
-            // TODO: Iterate on load order,
-            //  1.a. native loader?
-            //  1. fbjni? -- MARK: This actually doesn't need to be loaded manually - just reference FBJNI and it'll load the native lib through NativeLoader
-            //                     which means we actually should probably just delegate loading through the NativeLoader entirely since that'll ensure we set
-            //                     things up correctly for dependent native libs, as well as our custom native libs.
-            //                     This _does_ rely on the SoLoader, which is technically Android only? But maybe that's why things are loaded through NativeLoader?
-            //  2. hermes (does this rely on fbjni?)
-            //  3. jsi (almost certain this'd need to be before hermes)
-            //  4. hermes_jni (our code)
+            // need to load fbjni -> jsi|hermes -> hermes_jni
             NativeLoader.loadLibrary("fbjni")
             NativeLoader.loadLibrary("jsi")
             NativeLoader.loadLibrary("hermes")
@@ -42,7 +74,79 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
         public operator fun invoke(runtimeConfig: Config): HermesRuntime = create(runtimeConfig)
     }
 
-    public class Config private constructor(@DoNotStrip private val mHybridData: HybridData) {
+    override val config: Config external get
+
+    override val dispatcher: ExecutorCoroutineDispatcher = Executors.newSingleThreadExecutor {
+        Executors.defaultThreadFactory().newThread(it).apply {
+            name = "hermes-runtime"
+        }
+    }.asCoroutineDispatcher()
+
+    override val format: HermesRuntimeFormat = HermesRuntimeFormat(this)
+
+    override val scope: CoroutineScope by lazy {
+        // explicitly not using the JS specific dispatcher to avoid clogging up that thread
+        CoroutineScope(Dispatchers.Default + SupervisorJob() + (config.coroutineExceptionHandler ?: EmptyCoroutineContext))
+    }
+
+    override fun execute(script: String): Any? = evaluateJavaScript(script).handleValue(format)
+
+    // TODO: Add debuggable sources if necessary, tho we'd likely go towards HBC anyways
+    override fun load(scriptContext: ScriptContext): Any? = execute(scriptContext.script)
+
+    override fun add(name: String, value: Value) {
+        global().setProperty(runtime, name, value)
+    }
+
+    override fun <T> serialize(serializer: SerializationStrategy<T>, value: T): Any? =
+        format.encodeToRuntimeValue(serializer, value).handleValue(format)
+
+    override fun release() {
+        // cancel work in runtime scope
+        scope.cancel("releasing runtime")
+        // swap to dispatcher to release everything
+        runBlocking(dispatcher) {
+            // TODO: Release scopes & runtime
+        }
+        // close dispatcher
+        dispatcher.close()
+    }
+
+    @InternalPlayerApi
+    override var checkBlockingThread: Thread.() -> Unit = {}
+
+    override fun toString(): String = "HermesRuntime"
+
+    // Delegated Node members
+    private val backingNode: Node = global().toNode(format)
+
+    override val runtime: HermesRuntime = this
+    override val entries: Set<Map.Entry<String, Any?>> by backingNode::entries
+    override val keys: Set<String> by backingNode::keys
+    override val size: Int by backingNode::size
+    override val values: Collection<Any?> by backingNode::values
+    override fun containsKey(key: String): Boolean = backingNode.containsKey(key)
+    override fun containsValue(value: Any?): Boolean = backingNode.containsValue(value)
+    override fun get(key: String): Any? = backingNode[key]
+    override fun isEmpty(): Boolean = backingNode.isEmpty()
+    override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>): T? =
+        backingNode.getSerializable(key, deserializer)
+
+    override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T = backingNode.deserialize(deserializer)
+    override fun isReleased(): Boolean = backingNode.isReleased()
+    override fun isUndefined(): Boolean = backingNode.isUndefined()
+    override fun nativeReferenceEquals(other: Any?): Boolean = backingNode.nativeReferenceEquals(other)
+    override fun getString(key: String): String? = backingNode.getString(key)
+    override fun getInt(key: String): Int? = backingNode.getInt(key)
+    override fun getDouble(key: String): Double? = backingNode.getDouble(key)
+    override fun getLong(key: String): Long? = backingNode.getLong(key)
+    override fun getBoolean(key: String): Boolean? = backingNode.getBoolean(key)
+    override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = backingNode.getInvokable(key, deserializationStrategy)
+    override fun <R> getFunction(key: String): Invokable<R>? = backingNode.getFunction(key)
+    override fun getList(key: String): List<*>? = backingNode.getList(key)
+    override fun getObject(key: String): Node? = backingNode.getObject(key)
+
+    public class Config private constructor(@DoNotStrip private val mHybridData: HybridData) : PlayerRuntimeConfig() {
         public companion object {
             @JvmStatic public external fun create(
                 intl: Boolean,
@@ -58,6 +162,7 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
     }
 }
 
+// TODO: Remove - just a POC testbed to be able to get native crash logs easier
 public fun main() {
     try {
         NativeLoader.init(ResourceLoaderDelegate())
