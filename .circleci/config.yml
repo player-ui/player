@@ -118,7 +118,7 @@ jobs:
           name: Homebrew Dependencies
           command: |
             HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk lcov
-            brew install --cask zulu8
+            brew install --cask zulu@8
 
       - restore_cache:
           keys:
