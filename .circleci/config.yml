@@ -216,6 +216,11 @@ jobs:
       - attach_workspace:
           at: ~/player
 
+      - run:
+          command: |
+            echo "export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/21.4.7075529"  >> $BASH_ENV
+            source $BASH_ENV
+      
       - run: bazel test --config=skip-ios --config=ci -- //... -//docs/site -//android/demo:android_instrumentation_test
 
       - run:
