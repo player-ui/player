@@ -191,7 +191,6 @@ jobs:
       - run: 
           command: cd xcode && bundle exec pod install
       - run: 
-          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
           command: bazel build --config=ci -- //:PlayerUI //:PlayerUI-Demo //:PlayerUI_Pod
       # TODO: the timeout should be added to the test itself
       - run: 
@@ -222,6 +221,7 @@ jobs:
               $ANDROID_HOME/tools/bin/sdkmanager "\
               "ndk;21.4.7075529" \
             echo "export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/21.4.7075529"  >> $BASH_ENV
+            echo "export ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk/21.4.7075529" >> $BASH_ENV
             source $BASH_ENV
       
       - run: bazel test --config=skip-ios --config=ci -- //... -//docs/site -//android/demo:android_instrumentation_test
