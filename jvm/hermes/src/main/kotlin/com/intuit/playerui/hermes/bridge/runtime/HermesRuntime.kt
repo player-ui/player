@@ -6,6 +6,8 @@ import com.facebook.soloader.nativeloader.NativeLoader
 import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeConfig
+import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeContainer
+import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeFactory
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.ScriptContext
 import com.intuit.playerui.core.bridge.serialization.format.RuntimeFormat
@@ -60,6 +62,7 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
 
     public companion object {
         init {
+            if (!NativeLoader.isInitialized()) NativeLoader.init(ResourceLoaderDelegate())
             // need to load fbjni -> jsi|hermes -> hermes_jni
             NativeLoader.loadLibrary("fbjni")
             NativeLoader.loadLibrary("jsi")
@@ -160,6 +163,18 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
             ): Config = create(intl, microtaskQueue)
         }
     }
+}
+
+public object Hermes : PlayerRuntimeFactory<Config> {
+    override fun create(block: Config.() -> Unit): HermesRuntime =
+        HermesRuntime.create(Config.invoke())
+
+    override fun toString(): String = "Hermes"
+}
+
+public class HermesRuntimeContainer : PlayerRuntimeContainer {
+    override val factory: Hermes = Hermes
+    override fun toString(): String = "Hermes"
 }
 
 // TODO: Remove - just a POC testbed to be able to get native crash logs easier

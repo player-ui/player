@@ -65,7 +65,13 @@ private:
     friend HybridBase;
     std::unique_ptr<HermesRuntime> runtime_;
     global_ref<JHermesConfig::jhybridobject> jConfig_;
-    explicit JHermesRuntime(std::unique_ptr<HermesRuntime> runtime, alias_ref<JHermesConfig::jhybridobject> jConfig) : HybridClass(), runtime_(std::move(runtime)), jConfig_(make_global(jConfig)) {}
+    explicit JHermesRuntime(std::unique_ptr<HermesRuntime> runtime, alias_ref<JHermesConfig::jhybridobject> jConfig) : HybridClass(), runtime_(std::move(runtime)), jConfig_(make_global(jConfig)) {
+        // TODO: Add dynamic fatal handler
+        runtime->setFatalHandler([](const std::string& msg) {
+            std::cout << "FATAL: " << msg << std::endl;
+        });
+    }
+
     explicit JHermesRuntime(alias_ref<JHermesConfig::jhybridobject> jConfig) : JHermesRuntime(makeHermesRuntime(jConfig->cthis()->get_config()), jConfig) {}
     explicit JHermesRuntime() : JHermesRuntime(JHermesConfig::create(JHermesConfig::javaClassStatic())) {}
 };

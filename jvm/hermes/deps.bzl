@@ -9,13 +9,11 @@ main_deps = main_exports + [
     "@maven//:com_facebook_fbjni_fbjni_java_only",
     "@maven//:com_facebook_soloader_soloader",
     ":fbjni",
+    "//jvm/hermes/src/main/jni:resources",
 ]
 
 # TODO: These should probably just be dependencies of headless
 main_resources = [
-    "//jvm/hermes/src/main/jni:libhermes_jni.so",
-    "//jvm/hermes/src/main/jni:libhermes.dylib",
-    "//jvm/hermes/src/main/jni:libjsi.dylib",
     #    "//core/player:player_native_bundle",
 ]
 

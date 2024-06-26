@@ -10,7 +10,6 @@ cc_library(
         "JJSIValue.h",
     ],
     copts = ["-std=c++17"],
-    visibility = ["//visibility:public"],
     deps = [
         "@hermes",
         "@fbjni",
@@ -23,11 +22,16 @@ cc_library(
 cc_binary(
     name = "libhermes_jni.so",
     linkshared = True,
-    visibility = ["//visibility:public"],
     deps = [":hermes_jni"],
 )
 
-exports_files([
-    "libhermes.dylib",
-    "libjsi.dylib",
-])
+java_library(
+    name = "resources",
+    resource_strip_prefix = "jvm/hermes/src/main/jni",
+    resources = [
+        ":libhermes.dylib",
+        ":libhermes_jni.so",
+        ":libjsi.dylib",
+    ],
+    visibility = ["//visibility:public"],
+)
