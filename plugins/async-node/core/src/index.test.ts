@@ -44,7 +44,7 @@ const asyncNodeTest = async (resolvedValue: any) => {
 
   let deferredResolve: ((value: any) => void) | undefined;
 
-  plugin.hooks.onAsyncNode.tap("test", async (node: Node.Node) => {
+  plugin.hooks.onAsyncNode.tap('test', async (node: Node.Async) => {
     return new Promise((resolve) => {
       deferredResolve = resolve; // Promise would be resolved only once
     });
@@ -249,7 +249,7 @@ test("replaces async nodes with chained multiNodes", async () => {
 
   let deferredResolve: ((value: any) => void) | undefined;
 
-  plugin.hooks.onAsyncNode.tap("test", async (node: Node.Node) => {
+  plugin.hooks.onAsyncNode.tap('test', async (node: Node.Async) => {
     return new Promise((resolve) => {
       deferredResolve = resolve;
     });
@@ -346,7 +346,7 @@ test("replaces async nodes with chained multiNodes singular", async () => {
 
   let deferredResolve: ((value: any) => void) | undefined;
 
-  plugin.hooks.onAsyncNode.tap("test", async (node: Node.Node) => {
+  plugin.hooks.onAsyncNode.tap('test', async (node: Node.Async) => {
     return new Promise((resolve) => {
       deferredResolve = resolve;
     });
@@ -423,4 +423,28 @@ test("replaces async nodes with chained multiNodes singular", async () => {
   expect(view?.actions[0].asset.type).toBe("action");
   expect(view?.actions[1].asset.type).toBe("text");
   expect(view?.actions[2].asset.type).toBe("text");
+});
+
+test('should call onAsyncNode hook when async node is encountered', async () => {
+  const plugin = new AsyncNodePlugin();
+  let localNode: Node.Async;
+  plugin.hooks.onAsyncNode.tap('test', async (node: Node.Async) => {
+    if (node !== null) {
+      // assigns node value to a local variable
+      localNode = node;
+    }
+
+    return new Promise((resolve) => {
+      resolve('Promise resolved');
+    });
+  });
+
+  const player = new Player({ plugins: [plugin] });
+
+  player.start(basicFRFWithActions as any);
+
+  await waitFor(() => {
+    expect(localNode.id).toStrictEqual('uhh');
+    expect(localNode.type).toStrictEqual('async');
+  });
 });

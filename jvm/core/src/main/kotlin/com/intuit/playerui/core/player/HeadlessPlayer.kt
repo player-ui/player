@@ -31,8 +31,8 @@ import kotlinx.coroutines.launch
 import java.net.URL
 
 /**
- * Headless [Player] wrapping a core JS player with a [Runtime]. The [player] will
- * be instantiated from the [bundledSource] unless supplied with
+ * Headless [Player] wrapping a core JS player with a [Runtime]. The [player]
+ * will be instantiated from the [bundledSource] unless supplied with
  * a different [source] to read from.
  *
  * Though this accepts a collection of generic [Plugin]s, this

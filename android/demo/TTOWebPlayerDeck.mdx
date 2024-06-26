@@ -1,0 +1,124 @@
+---
+title: Owning your destiny with TTO Web Player
+---
+
+
+# Current State && Pain Points
+-CGPlayerPlugin is really a TurboTaxPlayerPlugin
+	-tax types, expressions, etc
+	-legacy plugins
+-tto-web-player is general purpose TurboTax Player integration
+	-where is mobile? who owns it?
+	-what about desktop? (currently use the webplayerplugin)
+
+	
+-What external actions are supported by TurboTax
+
+## Any other pain points?
+  We support all of this legacy stuff; but is there a way to not support this?
+  Not really a way to remove legacy support due to previous tax years that we support.
+  no good path for reducing this tech debt.
+  Not an option to not support it.
+  
+  Future pain point (early p3) Turbotax web plugin; very catered to running in the turbo tax application. IEP uses it. The root integration are not the same. (beaconing, very exclusive areas that are running in areas)
+
+  Error remediation uses our assets; is it our responsibility?
+
+  Visibility on errors down stream services and plugins. 
+
+  ease of onboarding other people; where does a team contribute a plugin for a feature.
+  TTO web player is the best location; but is it really the best location?
+  how do they integrate those points more easily and how do we get awareness when things blow up.
+
+  How is this reflected in mobile and desktop?
+    -Nothing in mobile platform; 
+  
+  Having the web stuff managed by us; but its hard to get it supported by mobile. hard to get them to prioitize.
+  There was a crash that happened on native because they didnt test for it. They only tested on Web.
+
+  TTMobile had no plans to consume; no parity.
+  Numerous issues with updating dependencies; and that caused issues with TTM. causing crashes and UI bugs.
+
+  Integration with ios and android is NOT the same. Finding where to make the change for both is not consitent. 
+
+
+# Use Cases
+  - Think about current state vs target state
+  - Consider turbotax as a product, not specific platforms
+  - These are geared to get you thinkin about what the problem areas are
+
+## Use case 1 How do we introduce a new asset?
+  - Guidelines written out to what types we use; and theyre consistent across all platforms
+  - RCA process; priorities
+  - Design driving a new experience -> then adding a new asset 
+  - RCA - Look at the assets we currently have and see if we already have something similar.
+  - When we get requests for new assets; developers arent looped in at the appropriate stages.
+
+## use case 2: How do we deprecate an asset? ... but in an ideal scenario
+  - We dont. 
+  - We can pin TTO to prior tax year.
+  - Major release every tax year.
+  - The easy thing is to talk about the legacy stuff that is now built into player core. A lot of plugins that just check if string is true. We can deprecate these plugins and implement better ones.
+  - Remove a lot of the bloat.
+  - Removing assets is a harder thing to deprecate. Some assets just dont get used, but we can deprecate pieces of the API for it. Some arent designed for the semantic way. 
+  - [Is there a strategy for removing an asset API?]
+  - Remove the docs or have something saying that says its deprecated and use x instead.
+
+## Use case 3: how do we introduce a new external action?
+- Adding it into a map of our external actions
+- Bigger issue; how do we get it onto mobile and native
+- Is there a quantity of usage in order to introduce one?
+- "backdoor to app integration"
+- Idea that there are more external actions
+
+## Any other use cases you can think of?
+- View type assets - all are the same but they have different names.
+  - suppose to be design intent 
+- Similar properties on all the views
+- Maps to a singular component the same way.
+- Needs to be some reconcilliation for assets that have overlap.
+- We switch out patterns; i.e. tax hub replaces landing tables. [ how do we do this? what pain points do we have]
+  - do we a design for mobile? 
+  - how do you introduce a component that has functionality that may or may not be differnt somewhere else in the stack. What kinda transforms exist
+  - a potential solution would be to load it into a different slice of player. 
+  - we can change the DSL representation of an asset to change the ui without changing the content
+  - how do we solve for legacy assets that dont have DSL?
+- hard to get the confidence to know that someone isnt using the old asset.
+- Too many changes came in at once for landing tables; hard to compare. 
+
+## What is the turbotax player integration? and who owns it?
+  - Need to define a player integration?
+    - assets, expressions, types
+    - external actions, beacon handling, flow manager
+
+  - How do the content authors know what features are supported?
+    - storybook, plugin documentation
+    - validator can be used
+    - code
+  
+  - What parts of Turbotax player integration do you own?
+    - What do you WANT to own
+  
+
+# Going Forward
+- Needs 
+  - Account for ALL Platforms (even appletv)
+  - Explicilty define set of Player capabilities
+    - For integrators, content authors, plugin authors
+    - versioning
+  - Need to be clear what parts can be reused 
+  - Process for introducing new capabilities 
+    -removing old
+
+# Outcome
+  - need to define what the TurboTax Player integration encapsulates and how to govern it.
+
+  - What role does the cgds team play here
+    - where are the gaps that we need others to fill
+  
+
+# Q&A
+-Something that creates more gaps
+  - our team is 3 platforms
+  - if a team wants a new external action; almost hard to figure out who wants it, and if that team knows the platforms thats required to make it happen
+  - May make sense to define the platforms up front in the proposal but also be open to having it scale.
