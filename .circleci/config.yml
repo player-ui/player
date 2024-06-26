@@ -243,9 +243,10 @@ jobs:
               $ANDROID_HOME/tools/bin/sdkmanager \
               "ndk;21.4.7075529"
               
-            echo 'export ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk/21.4.7075529'  >> $BASH_ENV
+            echo "export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/21.4.7075529" >> $BASH_ENV
             source $BASH_ENV
             echo $ANDROID_NDK_HOME
+            echo $ANDROID_HOME
       
       - run:
           name: Install Bazel
