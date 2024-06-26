@@ -8,16 +8,6 @@ tsup_config(name = "tsup_config")
 
 vitest_config(name = "vitest_config")
 
-# xlr_compile(
-#     name = "types_xlr",
-#     srcs = glob(["src/**"]),
-#     data = [
-#         # TODO: Fix for missing dlv in @player-ui
-#         "//:node_modules/dlv",
-#     ],
-#     mode = "types",
-# )
-
 js_xlr_pipeline(
     package_name = "@player-ui/types",
     xlr_mode = "types",

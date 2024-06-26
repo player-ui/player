@@ -82,23 +82,7 @@ use_repo(rules_ts_ext, "npm_typescript")
 bazel_dep(name = "rules_kotlin", version = "1.9.1")
 
 # Android
-
-# The following uses an unreleased version of rules_android
-# The commit points to the last commit before rules_android updated to use rules_java 7.x,
-# which is only compatible with bazel 7+
-# Toolchains doesn't seem to register properly at this point, which is why android_sdk_repository is in WORKSPACE.bzlmod
-# TODO: remove that from WORKSPACE.bzlmod
-
 bazel_dep(name = "rules_android", version = "0.1.1")
-#git_override(
-#    remote = "https://github.com/bazelbuild/rules_android.git",
-#    commit = "ca961d95e5e32377820b4b8668673d494c6e52a2",
-#    module_name = "bazel_build_rules_android"
-#)
-#register_toolchains(
-#    "@rules_android//toolchains/android:android_default_toolchain",
-#    "@rules_android//toolchains/android_sdk:android_sdk_tools",
-#)
 
 # Databinding
 bazel_dep(name = "grab_bazel_common")
@@ -109,13 +93,6 @@ git_override(
     module_name = "grab_bazel_common",
 )
 #local_path_override(module_name = "grab_bazel_common", path = "../grab-bazel-common")
-
-#bazel_common_setup = use_extension("@grab_bazel_common//rules:setup.bzl", "ext")
-#bazel_common_setup.setup(
-#    patched_android_tools = True, # Optionally use patched android_tools jars
-#    buildifier_version = "6.3.3",
-#    pinned_maven_install = True,
-#)
 
 remote_android_extensions = use_extension("@bazel_tools//tools/android:android_extensions.bzl", "remote_android_tools_extensions")
 use_repo(remote_android_extensions, "android_gmaven_r8")
@@ -234,9 +211,9 @@ maven.install(
         "org.junit.platform:junit-platform-suite-api:1.7.2",
         "org.apiguardian:apiguardian-api:1.0.0",
         "org.opentest4j:opentest4j:1.1.1",
-        "org.junit.jupiter:junit-jupiter-api:5.7.2",
-        "org.junit.jupiter:junit-jupiter-engine:5.7.2",
-        "org.junit.jupiter:junit-jupiter-params:5.7.2",
+        "org.junit.jupiter:junit-jupiter-api:5.6.0",
+        "org.junit.jupiter:junit-jupiter-engine:5.6.0",
+        "org.junit.jupiter:junit-jupiter-params:5.6.0",
     ],
     fetch_sources = True,
     repositories = [
@@ -261,9 +238,3 @@ maven.install(
 use_repo(maven, "maven")
 
 bazel_dep(name = "rules_robolectric", version = "4.10", repo_name = "robolectric")
-
-# Attempted to use this for annotation opt-ins, doesn't work
-# register_toolchains("//jvm:kotlin_toolchain")
-
-
-
