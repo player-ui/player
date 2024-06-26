@@ -307,10 +307,6 @@ jobs:
       - when:
           condition: << pipeline.parameters.should_release >>
           steps:
-            - run:
-                when: always
-                command: |
-                  git rm -r -f _ios_coverage/
             - auto_shipit
 
   release:
