@@ -1,13 +1,13 @@
 import type { Player, ExtendedPlayerPlugin } from "@player-ui/player";
 import { AssetTransformPlugin } from "@player-ui/asset-transform-plugin";
 import type {
-    ActionAsset,
-    InputAsset,
-    ImageAsset,
-    InfoAsset,
-    TextAsset,
-    CollectionAsset,
-    ChoiceAsset,
+  ActionAsset,
+  InputAsset,
+  ImageAsset,
+  InfoAsset,
+  TextAsset,
+  CollectionAsset,
+  ChoiceAsset,
 } from "./assets";
 import {
   inputTransform,
@@ -23,7 +23,14 @@ import {
 export class ReferenceAssetsPlugin
   implements
     ExtendedPlayerPlugin<
-      [ActionAsset, InputAsset, ImageAsset, TextAsset, CollectionAsset, ChoiceAsset],
+      [
+        ActionAsset,
+        InputAsset,
+        ImageAsset,
+        TextAsset,
+        CollectionAsset,
+        ChoiceAsset,
+      ],
       [InfoAsset]
     >
 {
