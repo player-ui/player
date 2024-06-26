@@ -240,7 +240,7 @@ jobs:
       - run:
           command: |
             JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64 \
-              $ANDROID_HOME/tools/bin/sdkmanager "\
+              $ANDROID_HOME/tools/bin/sdkmanager \
               "ndk;21.4.7075529"
               
             echo 'export ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk/21.4.7075529'  >> $BASH_ENV
