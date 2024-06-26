@@ -202,6 +202,11 @@ jobs:
           paths:
             - _ios_coverage
 
+      - run:
+          when: always
+          command: |
+            rm -rf _ios_coverage/
+
       - store_test_results:
           path: _test_results
 
