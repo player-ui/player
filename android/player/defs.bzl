@@ -21,7 +21,6 @@ main_resources = [
 ]
 
 test_deps = [
-    # "@grab_bazel_common//tools/test:mockable-android-jar",
     "@maven//:io_mockk_mockk",
     "//jvm/testutils",
     "@maven//:org_robolectric_robolectric",
