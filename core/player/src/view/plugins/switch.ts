@@ -15,7 +15,6 @@ export default class SwitchPlugin implements ViewPlugin {
   private resolveSwitch(node: Node.Switch, options: Options): Node.Node {
     for (const switchCase of node.cases) {
       const isApplicable = options.evaluate(switchCase.case);
-
       if (isApplicable) {
         return switchCase.value;
       }

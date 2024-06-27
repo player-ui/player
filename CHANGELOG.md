@@ -1,3 +1,34 @@
+# 0.7.3 (Thu May 02 2024)
+
+#### 🐛 Bug Fix
+
+- Release main [#353](https://github.com/player-ui/player/pull/353) ([@intuit-svc](https://github.com/intuit-svc))
+- Trigger prerelease [#352](https://github.com/player-ui/player/pull/352) ([@sugarmanz](https://github.com/sugarmanz))
+- Parse multi node switch fixv1 [#347](https://github.com/player-ui/player/pull/347) (marlon_ercillo@intuit.com [@mercillo](https://github.com/mercillo))
+- [Android] Reorganize `PlayerFragment` state updates [#343](https://github.com/player-ui/player/pull/343) ([@sugarmanz](https://github.com/sugarmanz))
+- iOS: expose data controller onUpdate hook [#336](https://github.com/player-ui/player/pull/336) (nancy_wu1@intuit.com [@nancywu1](https://github.com/nancywu1))
+
+#### 📝 Documentation
+
+- Android Build Optimization Docs [#308](https://github.com/player-ui/player/pull/308) (sentony03@gmail.com [@brocollie08](https://github.com/brocollie08))
+- Add bazelisk to list of requirements; be more specific in Android build instructions [#344](https://github.com/player-ui/player/pull/344) (paul_millerd@intuit.com)
+- [Docs] DSL docs additions [#339](https://github.com/player-ui/player/pull/339) ([@lexfm](https://github.com/lexfm))
+
+#### Authors: 10
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Alex Fimbres ([@lexfm](https://github.com/lexfm))
+- brocollie08 (sentony03@gmail.com)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- marky ercillo (marlon_ercillo@intuit.com)
+- Marlon "Marky" Ercillo ([@mercillo](https://github.com/mercillo))
+- nancywu1 (nancy_wu1@intuit.com)
+- Paul Millerd ([@paulmillerd](https://github.com/paulmillerd))
+
+---
+
 # 0.7.2 (Wed Apr 10 2024)
 
 ### Release Notes

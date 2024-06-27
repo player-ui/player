@@ -179,12 +179,13 @@ export const VALID_AST_PARSER_TESTS: Array<[string, PathNode]> = [
 ];
 
 export const INVALID_AST_PARSER_TESTS: Array<string> = [
-  " ",
-  "@#$%^&*()",
-  ".",
-  "foo.bar[",
-  "foo.bar.{{nested.}",
-  "foo.bar`not done()",
+  ' ',
+  '@#$%^&*()',
+  '.',
+  'foo.bar[',
+  'foo.bar.{{nested.}',
+  'foo.bar`not done()',
+  '{foo.bar',
 ];
 
 export const VALID_AST_PARSER_CUSTOM_TESTS: Array<[string, PathNode]> = [

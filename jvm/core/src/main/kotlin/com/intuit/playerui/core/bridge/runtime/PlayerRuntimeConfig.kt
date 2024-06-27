@@ -6,4 +6,5 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 public open class PlayerRuntimeConfig {
     public open var debuggable: Boolean = false
     public open var coroutineExceptionHandler: CoroutineExceptionHandler? = null
+    public open var timeout: Long = if (debuggable) Int.MAX_VALUE.toLong() else 5000
 }
