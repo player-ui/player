@@ -10,14 +10,23 @@ import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeContainer
 import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeFactory
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.ScriptContext
-import com.intuit.playerui.core.bridge.serialization.format.RuntimeFormat
+import com.intuit.playerui.core.bridge.serialization.serializers.playerSerializersModule
+import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.utils.InternalPlayerApi
-import com.intuit.playerui.hermes.bridge.ResourceLoaderDelegate
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime.Config
 import com.intuit.playerui.hermes.extensions.handleValue
 import com.intuit.playerui.hermes.extensions.toNode
+import com.intuit.playerui.jni.ResourceLoaderDelegate
+import com.intuit.playerui.jsi.Array
+import com.intuit.playerui.jsi.Function
+import com.intuit.playerui.jsi.JSIValueContainer
+import com.intuit.playerui.jsi.Object
+import com.intuit.playerui.jsi.Symbol
 import com.intuit.playerui.jsi.Value
 import com.intuit.playerui.jsi.Value.Companion.createFromJson
+import com.intuit.playerui.jsi.serialization.format.JSIFormat
+import com.intuit.playerui.jsi.serialization.format.JSIFormatConfiguration
+import com.intuit.playerui.jsi.serialization.serializers.JSIValueContainerSerializer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
@@ -30,32 +39,12 @@ import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.plus
 import java.util.concurrent.Executors
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.system.exitProcess
 import com.intuit.playerui.jsi.Runtime as JSIRuntime
 
-
-public class HermesRuntimeFormat(override val runtime: HermesRuntime) : RuntimeFormat<Value> {
-    override fun registerSerializersModule(serializersModule: SerializersModule) {
-        TODO("Not yet implemented")
-    }
-
-    override fun <T> encodeToRuntimeValue(serializer: SerializationStrategy<T>, value: T): Value {
-        TODO("Not yet implemented")
-    }
-
-    override fun <T> decodeFromRuntimeValue(deserializer: DeserializationStrategy<T>, element: Value): T {
-        TODO("Not yet implemented")
-    }
-
-    override fun parseToRuntimeValue(string: String): Value {
-        TODO("Not yet implemented")
-    }
-
-    override val serializersModule: SerializersModule
-        get() = TODO("Not yet implemented")
-}
 
 // TODO: Likely split up JNI & Runtime impl
 public class HermesRuntime private constructor(mHybridData: HybridData) : Runtime<Value>, JSIRuntime(mHybridData) {
@@ -85,14 +74,29 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
         }
     }.asCoroutineDispatcher()
 
-    override val format: HermesRuntimeFormat = HermesRuntimeFormat(this)
+    override val format: JSIFormat = JSIFormat(
+        JSIFormatConfiguration(
+        this,
+        playerSerializersModule + SerializersModule {
+            // TODO: Do we get this all for free with a sealed class?
+            contextual(JSIValueContainer::class, JSIValueContainerSerializer)
+            contextual(Value::class, JSIValueContainerSerializer.conform())
+            contextual(Object::class, JSIValueContainerSerializer.conform())
+            contextual(Array::class, JSIValueContainerSerializer.conform())
+            contextual(Function::class, JSIValueContainerSerializer.conform())
+            contextual(Symbol::class, JSIValueContainerSerializer.conform())
+        },
+    ),)
 
     override val scope: CoroutineScope by lazy {
         // explicitly not using the JS specific dispatcher to avoid clogging up that thread
         CoroutineScope(Dispatchers.Default + SupervisorJob() + (config.coroutineExceptionHandler ?: EmptyCoroutineContext))
     }
 
-    override fun execute(script: String): Any? = evaluateJavaScript(script).handleValue(format)
+    @OptIn(ExperimentalPlayerApi::class)
+    override fun executeRaw(script: String): Value = evaluateJavaScript(script)
+
+    override fun execute(script: String): Any? = executeRaw(script).handleValue(format)
 
     // TODO: Add debuggable sources if necessary, tho we'd likely go towards HBC anyways
     override fun load(scriptContext: ScriptContext): Any? = execute(scriptContext.script)

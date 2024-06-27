@@ -4,6 +4,7 @@ import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.serialization.format.RuntimeFormat
 import com.intuit.playerui.core.bridge.serialization.format.encodeToRuntimeValue
 import com.intuit.playerui.core.bridge.serialization.format.serializer
+import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.utils.InternalPlayerApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -21,6 +22,10 @@ public interface Runtime<Value> : Node {
     public val scope: CoroutineScope
 
     override val format: RuntimeFormat<Value>
+
+    @ExperimentalPlayerApi
+    public fun executeRaw(script: String): Value =
+        throw UnsupportedOperationException("This experimental method is not implemented for ${this::class.simpleName}")
 
     /** Execute some arbitrary [script] and return the deserialized result */
     public fun execute(script: String): Any?

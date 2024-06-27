@@ -1,29 +1,21 @@
 package com.intuit.playerui.jsi
 
 import com.facebook.jni.CppException
-import com.facebook.soloader.nativeloader.NativeLoader
-import com.intuit.playerui.hermes.bridge.ResourceLoaderDelegate
+import com.intuit.playerui.hermes.base.HermesTest
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime.Config
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-internal abstract class HermesRuntimeTest(val runtime: HermesRuntime = HermesRuntime()) {
-    companion object {
-        @JvmStatic @BeforeAll fun setupNativeLoader() {
-            if (!NativeLoader.isInitialized()) NativeLoader.init(ResourceLoaderDelegate())
-        }
-    }
-}
-
 /// Set of tests for the JSI JNI wrappers - uses Hermes as the basis for testing against APIs that require a runtime
-internal class RuntimeTests : HermesRuntimeTest() {
+internal class RuntimeTests : HermesTest() {
 
     @Test fun `evaluate valid js and get the result`() {
         val result = runtime.evaluateJavaScript("2 + 2")
@@ -66,7 +58,7 @@ Error: hello
     }
 }
 
-internal class ValueTests : HermesRuntimeTest() {
+internal class ValueTests : HermesTest() {
     @Test fun `create and detect undefined`() {
         val undefined = Value.undefined()
         assertTrue(undefined.isUndefined())
@@ -121,9 +113,15 @@ internal class ValueTests : HermesRuntimeTest() {
         assertTrue(Value.strictEquals(runtime, instance, instance))
         assertFalse(Value.strictEquals(runtime, instance, Value.createFromJson(runtime, json)))
     }
+
+    @Test fun `create from json can accept primitives`() {
+        assertTrue(Value.createFromJson(runtime, JsonNull).isNull())
+        assertEquals(1, Value.createFromJson(runtime, JsonPrimitive(1)).asNumber().toInt())
+        assertEquals("hello", Value.createFromJson(runtime, JsonPrimitive("hello")).asString(runtime))
+    }
 }
 
-internal class ObjectTests : HermesRuntimeTest() {
+internal class ObjectTests : HermesTest() {
     @Test fun `can create and detect object`() {
         val value = runtime.evaluateJavaScript("""
             ({
@@ -165,7 +163,7 @@ internal class ObjectTests : HermesRuntimeTest() {
     }
 }
 
-internal class ArrayTests : HermesRuntimeTest() {
+internal class ArrayTests : HermesTest() {
     // helper for asserting the same values within an Array constructed by arbitrary means
     private fun Array.assertValues() {
         assertEquals(3, size(runtime))
@@ -199,9 +197,17 @@ internal class ArrayTests : HermesRuntimeTest() {
         array.setValueAtIndex(runtime, 0, Value.from(40))
         assertEquals(40, array.getValueAtIndex(runtime, 0).asNumber().toInt())
     }
+
+    @Test fun `asValue works for object subclasses`() {
+        Array.createWithElements(runtime,
+            Value.from(1),
+            Value.from(runtime, "two"),
+            Value.from(runtime, 3L)
+        ).asValue().asObject(runtime).asArray(runtime).assertValues()
+    }
 }
 
-internal class FunctionTests : HermesRuntimeTest() {
+internal class FunctionTests : HermesTest() {
     @Test fun `can call a JS function`() {
         val value = runtime.evaluateJavaScript("(a, b) => a * b")
         assertTrue(value.isObject())
@@ -220,9 +226,17 @@ internal class FunctionTests : HermesRuntimeTest() {
         assertTrue(multiply.isHostFunction(runtime))
         assertEquals(6, multiply.call(runtime, Value.from(2), Value.from(3.0)).asNumber().toInt())
     }
+
+    @Test fun `asValue works for object subclasses`() {
+        val multiply = Function.createFromHostFunction(format) { args ->
+            args.filterIsInstance<Number>().fold(1.0) { acc, value -> acc * value.toDouble()}
+        }.asValue().asObject(runtime).asFunction(runtime)
+        assertTrue(multiply.isHostFunction(runtime))
+        assertEquals(6, multiply.call(runtime, Value.from(2), Value.from(3.0)).asNumber().toInt())
+    }
 }
 
-internal class SymbolTests : HermesRuntimeTest() {
+internal class SymbolTests : HermesTest() {
     @Test fun `can create symbols and test equality`() {
         // No JSI creator for Symbols yet
         val symbol = runtime.evaluateJavaScript("Symbol.for('hello-world')")

@@ -1,11 +1,11 @@
 package com.intuit.playerui.hermes.bridge.runtime
 
-import com.intuit.playerui.jsi.HermesRuntimeTest
+import com.intuit.playerui.hermes.base.HermesTest
 import com.intuit.playerui.jsi.Value
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
-internal class HermesRuntimeTest : HermesRuntimeTest() {
+internal class HermesRuntimeTest : HermesTest() {
 
     @Test fun `execute arbitrary JS`() {
         val runtime = HermesRuntime()

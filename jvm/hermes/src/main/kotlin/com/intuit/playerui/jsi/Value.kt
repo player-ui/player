@@ -2,8 +2,19 @@ package com.intuit.playerui.jsi
 
 import com.facebook.jni.HybridData
 import com.facebook.jni.annotations.DoNotStrip
+import com.intuit.playerui.core.bridge.NodeWrapper
+import com.intuit.playerui.core.bridge.invokeVararg
+import com.intuit.playerui.hermes.bridge.JSIValueWrapper
+import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime
+import com.intuit.playerui.hermes.extensions.handleValue
+import com.intuit.playerui.jsi.Function.Companion.createFromHostFunction
+import com.intuit.playerui.jsi.serialization.format.JSIFormat
+import com.intuit.playerui.jsi.serialization.format.decodeFromValue
+import com.intuit.playerui.jsi.serialization.format.encodeToValue
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.JsonElement
 import java.nio.ByteBuffer
+import kotlin.reflect.KClass
 
 public class PreparedJavaScript(@DoNotStrip private val mHybridData: HybridData)
 
@@ -22,8 +33,11 @@ public open class Runtime(@DoNotStrip private val mHybridData: HybridData) {
 
 // TODO: For serializing into JS objects, can we just make a HostObject?
 
+/** Base interface for native JSI Value instance */
+public sealed class JSIValueContainer(@DoNotStrip private val mHybridData: HybridData)
+
 /** FBJNI wrapper for accessing facebook::jsi::Value APIs */
-public class Value private constructor(@DoNotStrip private val mHybridData: HybridData) {
+public class Value private constructor(mHybridData: HybridData) : JSIValueContainer(mHybridData) {
 
     public external fun isUndefined(): Boolean
     public external fun isNull(): Boolean
@@ -58,6 +72,9 @@ public class Value private constructor(@DoNotStrip private val mHybridData: Hybr
         @JvmStatic public external fun from(runtime: Runtime, value: String): Value
         @JvmStatic public external fun from(runtime: Runtime, value: Long): Value
 
+        @JvmStatic public external fun from(value: Symbol): Value
+        @JvmStatic public external fun from(value: Object): Value
+
         // TODO: Settle on API
         public val undefined: Value @JvmStatic external get
         @JvmStatic public external fun undefined(): Value
@@ -78,7 +95,7 @@ public class Value private constructor(@DoNotStrip private val mHybridData: Hybr
         @JvmStatic public fun createFromJsonUtf8(
             runtime: Runtime,
             json: String,
-        ): Value = createFromJsonUtf8(runtime, json.toByteArray())
+        ): Value = createFromJsonUtf8(runtime, json.toByteArray(Charsets.UTF_8))
 
         @JvmStatic public fun createFromJson(
             runtime: Runtime,
@@ -86,10 +103,64 @@ public class Value private constructor(@DoNotStrip private val mHybridData: Hybr
         ): Value = createFromJsonUtf8(runtime, json.toString())
 
         @JvmStatic public external fun strictEquals(runtime: Runtime, a: Value, b: Value): Boolean
+
+        // TODO: It'd be nice to just serialize any into Value if we support that
+        public fun from(runtime: Runtime, value: Any?): Value = when (value) {
+            null -> `null`()
+            Unit -> undefined()
+            is NodeWrapper -> from(runtime, value.node)
+            is JSIValueWrapper -> value.value
+            is Boolean -> from(value)
+            is Double -> from(value)
+            is Int -> from(value)
+            is String -> from(runtime, value)
+            is Long -> from(runtime, value)
+            is Symbol -> from(value)
+            is Object -> from(value)
+            is JsonElement -> createFromJson(runtime, value)
+            // TODO: Move these to Function.from
+            // TODO: Might need a UUID on the name if collisions are an issue
+            // NOTE: Using JVM highest defined FunctionN (ignoring the actual FunctionN) param count here, but that could probably be increased if necessary
+//            is Invokable<*> -> createFromHostFunction(runtime, value::class.qualifiedName ?: "unknown", 22, HostFunction { _, _, args ->
+//                val encodedArgs = args.map { it.handleValue((runtime as HermesRuntime).format) }.toTypedArray()
+//                from(runtime, value(encodedArgs))
+//            }).asValue()
+            is kotlin.Function<*> -> createFromHostFunction(runtime, value::class.qualifiedName ?: "unknown", 22, HostFunction { _, _, args ->
+                val encodedArgs = args.map { it.handleValue((runtime as HermesRuntime).format) }
+
+                // Hate that we need to look at an internal class for arity
+                val arity = (value as kotlin.jvm.internal.FunctionBase<*>).arity
+
+                // trim and pad args to fit arity constraints,
+                // note that padding will fail if arg types are non-nullable
+                val matchedArgs = (0 until arity)
+                    .map { encodedArgs.getOrNull(it) }
+                    .toTypedArray()
+
+                // TODO: Serialization could go through runtime, or just a format func? (runtime as HermesRuntime).serialize()
+                from(runtime, handleInvocation(value::class, matchedArgs) {
+                    value.invokeVararg(*it)
+                })
+            }).asValue()
+            else -> throw IllegalArgumentException("cannot automatically create Value from type ${value::class.qualifiedName}")
+        }
     }
 }
 
-public open class Object internal constructor(@DoNotStrip private val mHybridData: HybridData) {
+// TODO: Make common
+private fun handleInvocation(reference: KClass<*>, args: kotlin.Array<Any?>, block: (kotlin.Array<Any?>) -> Any?) = try {
+    block(args)
+} catch (e: Throwable) {
+    when (e) {
+        is IllegalArgumentException, is ClassCastException ->
+            // TODO: throw jsi encoding serialization exception
+            throw SerializationException("arguments passed to $reference do not conform:\n${args.toList()}", e)
+        else -> throw e
+    }
+}
+
+// TODO: Could we make everything a JSIValueWrapper, so it's easy enough to do "asValue" dynamically?
+public open class Object internal constructor(mHybridData: HybridData) : JSIValueContainer(mHybridData) {
 
     public external fun instanceOf(runtime: Runtime, ctor: Function): Boolean
 
@@ -106,10 +177,16 @@ public open class Object internal constructor(@DoNotStrip private val mHybridDat
     public external fun getPropertyAsObject(runtime: Runtime, name: String): Object
     public external fun getPropertyAsFunction(runtime: Runtime, name: String): Function
 
+    public fun asValue(): Value = Value.from(this)
+
     public companion object {
+        @JvmStatic public external fun create(runtime: Runtime): Object
         @JvmStatic public external fun strictEquals(runtime: Runtime, a: Object, b: Object): Boolean
     }
 }
+
+// TODO: Decide on approach, companion invokes vs psuedo constructors
+public fun Object(runtime: Runtime): Object = Object.create(runtime)
 
 public class Array private constructor(mHybridData: HybridData) : Object(mHybridData) {
     public external fun size(runtime: Runtime): Int
@@ -121,8 +198,9 @@ public class Array private constructor(mHybridData: HybridData) : Object(mHybrid
     }
 }
 
+// TODO: Enhanced HostFunction implementation that contains info about the method reference, so we can stop dealing in limitless lambda wrappers
 public fun interface HostFunctionInterface {
-    public fun call(runtime: Runtime, thisVal: Value, args: kotlin.Array<Value>): Value
+    public fun call(runtime: Runtime, thisVal: Value, vararg args: Value): Value
 }
 
 public class HostFunction(private val func: HostFunctionInterface): HostFunctionInterface by func
@@ -135,11 +213,20 @@ public class Function private constructor(mHybridData: HybridData) : Object(mHyb
 
     public companion object {
         @JvmStatic public external fun createFromHostFunction(runtime: Runtime, name: String, paramCount: Int, func: HostFunction): Function
+        public fun createFromHostFunction(runtime: Runtime, func: Value.(runtime: Runtime, args: kotlin.Array<out Value>) -> Value): Function =
+            createFromHostFunction(runtime, "unknown", 22, HostFunction { runtime, thisVal, args -> thisVal.func(runtime, args) })
+        public fun createFromHostFunction(runtime: Runtime, func: Value.(args: kotlin.Array<out Value>) -> Value): Function =
+            createFromHostFunction(runtime, "unknown", 22, HostFunction { _, thisVal, args -> thisVal.func(args) })
+        public fun createFromHostFunction(format: JSIFormat, func: (args: kotlin.Array<out Any?>) -> Any?): Function =
+            createFromHostFunction(format.runtime, "unknown", 22, HostFunction { _, _, args ->
+                format.encodeToValue(func(args.map { format.decodeFromValue<Any?>(it) }.toTypedArray()))
+            })
     }
 }
 
-public class Symbol private constructor(mHybridData: HybridData) : Object(mHybridData) {
+public class Symbol private constructor(mHybridData: HybridData) : JSIValueContainer(mHybridData) {
     public external fun toString(runtime: Runtime): String
+    public fun asValue(): Value = Value.from(this)
 
     public companion object {
         @JvmStatic public external fun strictEquals(runtime: Runtime, a: Symbol, b: Symbol): Boolean

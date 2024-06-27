@@ -4,7 +4,6 @@ import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime
-import com.intuit.playerui.hermes.bridge.runtime.HermesRuntimeFormat
 import com.intuit.playerui.hermes.extensions.handleValue
 import com.intuit.playerui.hermes.extensions.toInvokable
 import com.intuit.playerui.hermes.extensions.toList
@@ -13,11 +12,18 @@ import com.intuit.playerui.jsi.Array
 import com.intuit.playerui.jsi.Function
 import com.intuit.playerui.jsi.Object
 import com.intuit.playerui.jsi.Value
+import com.intuit.playerui.jsi.serialization.format.JSIFormat
 import kotlinx.serialization.DeserializationStrategy
 
-public class HermesNode(private val jsiObject: Object, override val runtime: HermesRuntime) : Node {
+public interface JSIValueWrapper {
+    public val value: Value
+}
 
-    override val format: HermesRuntimeFormat get() = TODO("format")
+public class HermesNode(private val jsiObject: Object, override val runtime: HermesRuntime) : Node, JSIValueWrapper {
+
+    override val value: Value by lazy { jsiObject.asValue() }
+
+    override val format: JSIFormat get() = runtime.format
 
     override val keys: Set<String> by lazy {
         val names = jsiObject.getPropertyNames(runtime)
@@ -90,7 +96,7 @@ public class HermesNode(private val jsiObject: Object, override val runtime: Her
     }
 
     // TODO: Figure out how to support both Object and Value (and others), as they don't share a common ancestor
-    override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T = TODO()//format.decodeFromRuntimeValue(deserializer, jsiObject)
+    override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T = format.decodeFromRuntimeValue(deserializer, jsiObject.asValue())
 
     // TODO: Incorporate release strategy
     override fun isReleased(): Boolean = false

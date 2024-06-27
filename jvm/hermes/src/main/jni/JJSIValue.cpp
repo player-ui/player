@@ -78,6 +78,14 @@ local_ref<JJSIValue::jhybridobject> JJSIValue::fromLong(alias_ref<jclass>, alias
     return newObjectCxxArgs(BigInt::fromInt64(jRuntime->cthis()->get_runtime(), l));
 }
 
+local_ref<JJSIValue::jhybridobject> JJSIValue::fromSymbol(alias_ref<jclass>,  alias_ref<JJSISymbol::jhybridobject> symbol) {
+    return newObjectCxxArgs(Value(std::move(symbol->cthis()->get_symbol())));
+}
+
+local_ref<JJSIValue::jhybridobject> JJSIValue::fromObject(alias_ref<jclass>,  alias_ref<JJSIObject::jhybridobject> object) {
+    return newObjectCxxArgs(Value(std::move(object->cthis()->get_object())));
+}
+
 local_ref<JJSIValue::jhybridobject> JJSIValue::undefined(alias_ref<jclass>) {
     return newObjectCxxArgs(Value::undefined());
 }
@@ -176,6 +184,8 @@ void JJSIValue::registerNatives() {
         makeNativeMethod("from", JJSIValue::fromInt),
         makeNativeMethod("from", JJSIValue::fromString),
         makeNativeMethod("from", JJSIValue::fromLong),
+        makeNativeMethod("from", JJSIValue::fromSymbol),
+        makeNativeMethod("from", JJSIValue::fromObject),
 
         // TODO: Settle on getter API
         // MARK: Static Value APIs
@@ -210,6 +220,10 @@ void JJSIValue::registerNatives() {
 
         makeNativeMethod("toString", JJSIValue::toString),
     });
+}
+
+local_ref<JJSIObject::jhybridobject> JJSIObject::create(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
+    return newObjectCxxArgs(Object(jRuntime->cthis()->get_runtime()));
 }
 
 bool JJSIObject::strictEquals(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b) {
@@ -265,6 +279,7 @@ local_ref<JJSIFunction::jhybridobject> JJSIObject::getPropertyAsFunction(alias_r
 void JJSIObject::registerNatives() {
     registerHybrid({
         // MARK: Static Object APIs
+        makeNativeMethod("create", JJSIObject::create),
         makeNativeMethod("strictEquals", JJSIObject::strictEquals),
 
         // MARK: Object APIs
