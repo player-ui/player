@@ -122,7 +122,6 @@ describe("view", () => {
       new SwitchPlugin(pluginOptions).apply(view);
       new StringResolverPlugin().apply(view);
       const resolved = view.update();
-      console.log('@@ RESOLVED: ',resolved)
 
       expect(resolved).toStrictEqual({
         id: 'test',
