@@ -16,7 +16,7 @@ orbs:
 executors:
   base:
     docker:
-      - image: docker.io/playerui/bazel-docker:7
+      - image: docker.io/playerui/bazel-docker:8
     working_directory: ~/player
     resource_class: xlarge
     environment:
@@ -238,17 +238,6 @@ jobs:
           at: ~/player
 
       - run:
-          command: |
-            JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64 \
-              $ANDROID_HOME/tools/bin/sdkmanager \
-              "ndk;21.4.7075529"
-              
-            echo "export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/21.4.7075529" >> $BASH_ENV
-            source $BASH_ENV
-            echo $ANDROID_NDK_HOME
-            echo $ANDROID_HOME
-      
-      - run:
           name: Install Bazel
           command: |
             wget -q https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-linux-amd64 -O bazelisk && \
@@ -257,12 +246,26 @@ jobs:
             sudo mv bazelisk /opt/bazelisk-v1.11.0 && \
             sudo ln -s /opt/bazelisk-v1.11.0/bazelisk /usr/local/bin/bazel
 
-      - run:
-          name: Create avd
-          command: |
-            sdkmanager "system-images;android-29;default;x86"
-            echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-29;default;x86"
 
+      - run:
+          name: Install Android Tools
+          command: |
+            rm -rf $ANDROID_HOME/build-tools/*
+             JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64 \
+               $ANDROID_HOME/tools/bin/sdkmanager "build-tools;30.0.3"\
+               "ndk;21.4.7075529" \
+               "system-images;android-31;default;x86_64"
+             echo "export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/21.4.7075529"  >> $BASH_ENV
+             source $BASH_ENV
+             echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-31;default;x86_64" -g default
+              source $BASH_ENV
+
+      - run:
+           name: Set python to 2.7
+           command: |
+             pyenv global 2.7 
+      
+      
       - run:
           name: Launch emulator
           command: |
@@ -274,7 +277,7 @@ jobs:
           command: |
             circle-android wait-for-boot
 
-      - run: bazel test --config=ci -- //android/demo:android_instrumentation_test --incompatible_use_python_toolchains=false
+      - run: bazel test --config=ci -- //android/demo:android_instrumentation_test
 
       - run:
           when: always
