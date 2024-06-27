@@ -13,6 +13,6 @@ public class CommonExpressionsPlugin: JSBasePlugin, NativePlugin {
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: CommonExpressionsPlugin.self), pathComponent: "CommonExpressionsPlugin.bundle")
+        ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle(for: CommonExpressionsPlugin.self), pathComponent: "PlayerUI_CommonExpressionsPlugin.bundle")
     }
 }

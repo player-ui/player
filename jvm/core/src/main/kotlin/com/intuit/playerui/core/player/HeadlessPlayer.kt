@@ -3,6 +3,7 @@ package com.intuit.playerui.core.player
 import com.intuit.playerui.core.bridge.Completable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
+import com.intuit.playerui.core.bridge.Promise
 import com.intuit.playerui.core.bridge.getInvokable
 import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.playerui.core.bridge.runtime.Runtime
@@ -14,6 +15,7 @@ import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.logger.TapableLogger
 import com.intuit.playerui.core.player.HeadlessPlayer.Companion.bundledSource
 import com.intuit.playerui.core.player.state.CompletedState
+import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.core.player.state.PlayerFlowState
 import com.intuit.playerui.core.player.state.ReleasedState
 import com.intuit.playerui.core.player.state.inProgressState
@@ -29,8 +31,8 @@ import kotlinx.coroutines.launch
 import java.net.URL
 
 /**
- * Headless [Player] wrapping a core JS player with a [Runtime]. The [player] will
- * be instantiated from the [bundledSource] unless supplied with
+ * Headless [Player] wrapping a core JS player with a [Runtime]. The [player]
+ * will be instantiated from the [bundledSource] unless supplied with
  * a different [source] to read from.
  *
  * Though this accepts a collection of generic [Plugin]s, this
@@ -121,15 +123,17 @@ public constructor(
         runtime.add("player", player)
 
         // we only have access to the logger after we have the player instance
-        runtime.checkBlockingThread = {
-            if (name == "main") {
-                scope.launch {
-                    logger.warn(
-                        "Main thread is blocking on JS runtime access: $this",
-                        stackTrace.joinToString("\n") {
-                            "\tat $it"
-                        }.replaceFirst("\tat ", "\n"),
-                    )
+        if (runtime.config.debuggable) {
+            runtime.checkBlockingThread = {
+                if (name == "main") {
+                    scope.launch {
+                        logger.warn(
+                            "Main thread is blocking on JS runtime access: $this",
+                            stackTrace.joinToString("\n") {
+                                "\tat $it"
+                            }.replaceFirst("\tat ", "\n"),
+                        )
+                    }
                 }
             }
         }
@@ -140,7 +144,13 @@ public constructor(
             .onEach { it.apply(this) }
     }
 
-    override fun start(flow: String): Completable<CompletedState> = start(runtime.execute("($flow)") as Node)
+    override fun start(flow: String): Completable<CompletedState> = try {
+        start(runtime.execute("($flow)") as Node)
+    } catch (exception: Exception) {
+        val wrapped = PlayerException("Could not load Player content", exception)
+        inProgressState?.fail(wrapped) ?: hooks.state.call(hashMapOf(), arrayOf(ErrorState.from(wrapped)))
+        PlayerCompletable(Promise.reject(wrapped))
+    }
 
     public fun start(flow: Node): Completable<CompletedState> = PlayerCompletable(player.getInvokable<Node>("start")!!.invoke(flow))
 

@@ -129,25 +129,25 @@ public final class com/intuit/player/android/asset/RenderableAsset$Serializer : 
 public abstract interface class com/intuit/player/android/asset/RenderableAsset$ViewportAsset {
 }
 
-public final class com/intuit/player/android/databinding/DefaultFallbackBinding : androidx/viewbinding/ViewBinding {
+public final class com/intuit/player/android/databinding/FallbackViewBinding : androidx/viewbinding/ViewBinding {
 	public final field error Landroid/widget/TextView;
 	public final field reset Landroid/widget/Button;
 	public final field retry Landroid/widget/Button;
 	public final field title Landroid/widget/TextView;
-	public static fun bind (Landroid/view/View;)Lcom/intuit/player/android/databinding/DefaultFallbackBinding;
+	public static fun bind (Landroid/view/View;)Lcom/intuit/player/android/databinding/FallbackViewBinding;
 	public synthetic fun getRoot ()Landroid/view/View;
 	public fun getRoot ()Landroidx/constraintlayout/widget/ConstraintLayout;
-	public static fun inflate (Landroid/view/LayoutInflater;)Lcom/intuit/player/android/databinding/DefaultFallbackBinding;
-	public static fun inflate (Landroid/view/LayoutInflater;Landroid/view/ViewGroup;Z)Lcom/intuit/player/android/databinding/DefaultFallbackBinding;
+	public static fun inflate (Landroid/view/LayoutInflater;)Lcom/intuit/player/android/databinding/FallbackViewBinding;
+	public static fun inflate (Landroid/view/LayoutInflater;Landroid/view/ViewGroup;Z)Lcom/intuit/player/android/databinding/FallbackViewBinding;
 }
 
-public final class com/intuit/player/android/databinding/FragmentPlayerBinding : androidx/viewbinding/ViewBinding {
+public final class com/intuit/player/android/databinding/PlayerFragmentBinding : androidx/viewbinding/ViewBinding {
 	public final field playerCanvas Landroid/widget/FrameLayout;
-	public static fun bind (Landroid/view/View;)Lcom/intuit/player/android/databinding/FragmentPlayerBinding;
+	public static fun bind (Landroid/view/View;)Lcom/intuit/player/android/databinding/PlayerFragmentBinding;
 	public synthetic fun getRoot ()Landroid/view/View;
 	public fun getRoot ()Landroid/widget/ScrollView;
-	public static fun inflate (Landroid/view/LayoutInflater;)Lcom/intuit/player/android/databinding/FragmentPlayerBinding;
-	public static fun inflate (Landroid/view/LayoutInflater;Landroid/view/ViewGroup;Z)Lcom/intuit/player/android/databinding/FragmentPlayerBinding;
+	public static fun inflate (Landroid/view/LayoutInflater;)Lcom/intuit/player/android/databinding/PlayerFragmentBinding;
+	public static fun inflate (Landroid/view/LayoutInflater;Landroid/view/ViewGroup;Z)Lcom/intuit/player/android/databinding/PlayerFragmentBinding;
 }
 
 public final class com/intuit/player/android/extensions/IntoKt {
@@ -260,7 +260,7 @@ public abstract class com/intuit/player/android/ui/PlayerFragment : androidx/fra
 	public fun buildFallbackView (Ljava/lang/Exception;)Landroid/view/View;
 	public fun buildLoadingView ()Landroid/view/View;
 	public fun buildTransitionAnimation ()Landroidx/transition/Transition;
-	protected final fun getBinding ()Lcom/intuit/player/android/databinding/FragmentPlayerBinding;
+	protected final fun getBinding ()Lcom/intuit/player/android/databinding/PlayerFragmentBinding;
 	public abstract fun getPlayerViewModel ()Lcom/intuit/player/android/lifecycle/PlayerViewModel;
 	protected fun handleAssetUpdate (Lcom/intuit/player/android/asset/RenderableAsset;Z)V
 	public fun onCreateView (Landroid/view/LayoutInflater;Landroid/view/ViewGroup;Landroid/os/Bundle;)Landroid/view/View;

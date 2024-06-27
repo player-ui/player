@@ -4,9 +4,13 @@ import android.widget.LinearLayout
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.SuspendableAsset
+import com.intuit.playerui.android.asset.SuspendableAsset.AsyncHydrationTrackerPlugin
+import com.intuit.playerui.android.asset.SuspendableAsset.AsyncViewStub
+import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
 import com.intuit.playerui.android.utils.NestedAsset
 import com.intuit.playerui.android.utils.SimpleAsset
 import com.intuit.playerui.android.utils.awaitFirstView
+import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.flow.Flow
 import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.utils.test.runBlockingTest
@@ -14,6 +18,7 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
@@ -21,7 +26,7 @@ internal class NestedAssetTest : BaseRenderableAssetTest() {
 
     override val asset get() = NestedAsset.sampleAsset
 
-    override val player get() = AndroidPlayer(beaconPlugin).apply {
+    override val player get() = AndroidPlayer(beaconPlugin, AsyncHydrationTrackerPlugin()).apply {
         registerAsset("simple", ::SimpleAsset)
         registerAsset("nested", ::NestedAsset)
         val inProgressState = mockk<InProgressState>()
@@ -51,5 +56,31 @@ internal class NestedAssetTest : BaseRenderableAssetTest() {
         NestedAsset.dummy2?.forEach {
             assertEquals(mockContext, it?.context)
         } ?: Unit
+    }
+
+    @OptIn(ExperimentalPlayerApi::class)
+    @Test
+    fun `test hydration tracker`() = runBlockingTest {
+        val player = player
+        val plugin = player.asyncHydrationTrackerPlugin!!
+        var onHydrationStarted = false
+        plugin.hooks.onHydrationStarted.tap("test") {
+            onHydrationStarted = true
+        }
+        var onHydrationCompleted = false
+        plugin.hooks.onHydrationComplete.tap("test") {
+            onHydrationCompleted = true
+        }
+
+        val asset = player.awaitFirstView(NestedAsset.sampleFlow) as NestedAsset
+
+        assertFalse(onHydrationStarted)
+        assertFalse(onHydrationCompleted)
+        val view = asset.render(mockContext) as AsyncViewStub
+        assertTrue(onHydrationStarted)
+        assertFalse(onHydrationCompleted)
+        view.awaitView()
+        assertTrue(onHydrationStarted)
+        assertTrue(onHydrationCompleted)
     }
 }

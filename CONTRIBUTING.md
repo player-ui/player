@@ -11,6 +11,7 @@ For small bug-fixes, documentation updates, or other trivial changes, feel free 
 If the changes are larger (API design, architecture, etc), [opening an issue](https://github.com/player-ui/player/issues/new/choose) can be helpful to reduce implementation churn as we hash out the design.
 
 ## Requirements
+* [bazelisk](https://github.com/bazelbuild/bazelisk)
 * [npm >= 8.19.2](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 * [yarn >= 1.22.19](https://yarnpkg.com/)
 
@@ -19,6 +20,9 @@ If the changes are larger (API design, architecture, etc), [opening an issue](ht
 * [Ruby >= 2.6 && <= 3.0](https://github.com/rbenv/rbenv)
 
 * [Android NDK >= 19.2.5345600, <= 21](https://github.com/android/ndk/wiki/Unsupported-Downloads#r19c). Any version > 21 will not work, period. You'll need to add `ANDROID_NDK_HOME` to your environment manually.
+* Python < 3 (recommended 2.7.18) - you can use [pyenv](https://realpython.com/intro-to-pyenv/) to manage different python versions with ease. 
+
+* [Signed Commits](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification). For convenience it is recommended to set git to sign all commits by default as mentioned [here](https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key)
 
 ## Building and Testing Locally (All platforms)
 #### Presetup
@@ -32,6 +36,12 @@ CocoaPods does not directly integrate with `bazel`, when core targets are update
 ./tools/build_ios_bundles.sh
 ```
 This will query `bazel` for dependent targets, copy their output and regenerate the `.xcworkspace`.
+
+`bazel` does not process resources the same way CocoaPods does, so in order to share the same [mocks](https://github.com/player-ui/player/tree/main/plugins/reference-assets/mocks) as the other platforms, there is a [precompile script](https://github.com/player-ui/player/blob/main/PlayerUI.podspec#L84-L91) that generates a `.swift` file with the mocks. In order for this to work, `node` must be accessible in your environment. To verify this, run:
+```sh
+env node
+```
+
 ### Player
 For speed and consistency, this repo leverages `bazel` as it's main build tool. Check out the [bazel](https://bazel.build/) docs for more info.
 

@@ -194,6 +194,79 @@ and like this in the final schema:
 }
 ```
 
+# DSLSchema Type
+
+A `DSLSchema` Type is provided in order be able to customize a set of the acceptable data types and validator functions to be used for authoring the DSL data schema in your workspace. This is useful as it allows content authors to get realtime feedback on their data schema. It can catch any structural issues that may produce an invalid schema at compile time or produce a schema that uses functionality thats not available at runtime.
+
+_Note: A ready-to-use DSLSchema type is shipped with `@player-ui/reference-assets-components`. This type is predefined with the `DataType` and `ValidatorFunction` references inferred from the `@player-ui/common-types-plugin`. Next, you'll be presented the steps in its creation for reference._
+
+The first step to fill in the `DSLSchema` type with your integration specific values is importing the `DSLSchema` type and the relevant helper types and utilities from `@player-tools/dsl`. For this example we are importing the `@player-ui/common-types-plugin` in order to use its data types and validators. Our first step is to generate the `DataType` and `ValidatorFunction` object types and references:
+
+```typescript
+import { 
+  DSLSchema,
+  DataTypeReference 
+  DataTypeRefs,
+  ValidatorFunctionRefs,
+  getObjectReferences
+} from "@player-tools/dsl"
+import {
+  dataTypes as commonDataTypes,
+  validators as commonValidators
+} from "@player-ui/common-types-plugin";
+
+/** Abstracting the types from commonDataTypes to be passed as generic to the DataTypeRefs type for dynamically generating the data type reference Types */
+type myCommonDataTypesRefs = DataTypeRefs<typeof commonDataTypes>
+
+/** Using getObjectReferences helper to generate the actual data type references to be used in your schema by passing inferred types from commonDataTypes and myCommonDataTypesRefs */
+export const dataRefs = getObjectReferences<typeof commonDataTypes, myCommonDataTypesRefs>(
+  coreDataSet
+);
+```
+
+We'll proceed generating the validation function types:
+
+```typescript
+/** Abstracting types from coreValidators and using as generic of ValidatorFunctionRefs for dynamically generating the data validation function reference Types */
+type commonValidatorRefs = ValidatorFunctionRefs<typeof commonValidators>
+```
+
+The final step is to provide the data Types set and validator function reference Types as generics for the `DataTypeReference` type which is the sole generic type passed into the `DSLSchema` instance:
+```typescript
+type CommonDSLSchema = DSLSchema<
+  DataTypeReference<typeof commonDataTypes, commonValidatorRefs>
+>
+```
+
+Finally, this is how to use the custom schema type to type check your schema. By adding the `satisfies` keyword followed by your `DSLSchema` generated type, your editor's LSP will show if there is anything not compliant with the data types and validation functions you defined in the schema:
+
+```typescript
+import { CommonDSLSchema, dataRefs } from "./MyTypes"
+
+const { BooleanTypeRef } = dataRefs
+
+const exampleSchema = {
+  myDataSet = {
+    /** Simply using the BooleanTypeReference to define "firstPath" type to Boolean */
+    firstPath: BooleanTypeRef
+    secondPath: {
+      /** For adding custom validation for "secondPath", define an object definition with the data "type" property, which is "TextType" for this example */
+      type: "TextType",
+      /**  In the validation array open another object definition specifying the use of the "required" validator with the "type" property, with a custom "message" value */
+      validation: [
+        {
+          type: "required",
+          message: "This field is required"
+        }
+      ]
+    }
+  }
+} satisfies CommonDSLSchema
+```
+
+_Note: The `satisfies` Typescript operator is used instead of type assignment (`exampleSchema:DSLSChema`), because `satisfies` doesn't lose the inferred type of your value by changing and broadening the type unlike using assignment, it simply type-checks, creating localised feedback if anything is incorrect._
+
+
 # Using the Schema Object in JSX/TSX Content
 
 As the schema is now a TypeScript obejct, you can now directly reference the schema anywhere in content. The `makeBindingsForObject()` function takes your schema object and constructs the bindings opaquely within the object. This allows the use of the native path in your authored content and for the actual underlying binding to be used when the content is compiled. Additionally, as the underlying bindings are exposed, can you can use the native object path with functions like `.toString()`, `.toValue()`, and `toRefString()` like you could with regular string template bindings.
@@ -225,8 +298,11 @@ export default {
 }
 ```
 
-# DSL Benefit in Schema
+# DSL Benefits in Schema
+Player's schema has a few issues that makes it both hard to write and very susceptible to experience breaking mistakes. The DSL Schema aims to mitigate all of these pitfalls. 
 
 ## Format
+The flattened nature of Player's schema makes it confusing to write for content authors new to Player and tedius to write for more experienced content authors. By allowing the schema to be represented in a tree format, the schema is both easier to write and more closely resembles the shape that the data will take in the data model. 
 
 ## Ease of Use
+The biggest quality of life improvement the DSL schema brings is that the schema object can be directly used in content. This almost completely eliminates the positiblity of mistyping a schema path leading to runtime errors and massively reduces how verbose content needs to be. Additionally, with plugins able to export references to the data types and validation functions they export, content can now directly reference those artifacts further reducing the possibility of producing invalid content. Lastly, given the number of features that are available in the schema, it can be overwhelming to remember what can/should be used where. By making the schema a normal TypeScript object and assigning it the proper type, content authors are given autocomplete suggestions and a cursory level of validation in their development environment while they are writing their schema. 

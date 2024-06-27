@@ -115,7 +115,6 @@ export const commaNumber: FormatType<
 
     // Beautify
     preDecDigits = preDecDigits.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
     if (preDecDigits === '' && firstDecimal === 0) {
       preDecDigits = '0';
     }
@@ -127,7 +126,10 @@ export const commaNumber: FormatType<
       retVal = `-${retVal}`;
     }
 
-    if (firstDecimal >= 0 || options?.precision !== undefined) {
+    if (
+      (firstDecimal >= 0 || options?.precision !== undefined) &&
+      postDecDigits !== ''
+    ) {
       retVal += `.${postDecDigits}`;
     }
 

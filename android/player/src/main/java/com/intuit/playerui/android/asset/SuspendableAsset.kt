@@ -8,10 +8,17 @@ import android.view.View
 import android.view.View.OnAttachStateChangeListener
 import android.view.ViewGroup
 import androidx.core.view.children
+import com.intuit.hooks.HookContext
+import com.intuit.hooks.SyncHook
+import com.intuit.playerui.android.AndroidPlayer
+import com.intuit.playerui.android.AndroidPlayerPlugin
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.R
+import com.intuit.playerui.android.asset.SuspendableAsset.AsyncHydrationTrackerPlugin
+import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.player.state.inProgressState
+import com.intuit.playerui.core.plugins.findPlugin
 import com.intuit.playerui.core.utils.InternalPlayerApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -30,11 +37,15 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
     // To be launched in Dispatchers.Default
     public abstract suspend fun initView(data: Data): View
 
-    final override fun initView(): View = AsyncViewStub(
-        hydrationScope,
-        hydrationScope.async { doInitView() },
-        requireContext(),
-    ) { doHydrate(); player.cacheAssetView(assetContext, this) }
+    final override fun initView(): View {
+        // ensure we pre-track hydration to ensure all assets are accounted for during async hydration
+        player.asyncHydrationTrackerPlugin?.trackHydration(this@SuspendableAsset)
+        return AsyncViewStub(
+            hydrationScope,
+            hydrationScope.async { doInitView() },
+            requireContext(),
+        ) { doHydrate(); player.cacheAssetView(assetContext, this) }
+    }
 
     private suspend fun doInitView() = withContext(Dispatchers.Default) {
         initView(getData()).apply { setTag(R.bool.view_hydrated, false) }
@@ -46,6 +57,7 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
     final override fun View.hydrate() {
         if (this is AsyncViewStub) return
 
+        player.asyncHydrationTrackerPlugin?.trackHydration(this@SuspendableAsset)
         setTag(R.bool.view_hydrated, false)
         hydrationScope.launch(Dispatchers.Main) { doHydrate() }
     }
@@ -57,6 +69,58 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
         } catch (exception: StaleViewException) {
             // b/c we're launched in a scope that isn't cared about anymore, we can't appropriately handle this, so just fast fail
             player.inProgressState?.fail(PlayerException("SuspendableAssets can't appropriately handle invalidateViews currently, this should be handled in a future major", exception))
+        } finally {
+            player.asyncHydrationTrackerPlugin?.hydrationDone(this@SuspendableAsset)
+        }
+    }
+
+    @ExperimentalPlayerApi
+    public class AsyncHydrationTrackerPlugin : AndroidPlayerPlugin {
+        private var trackedHydrations = mutableSetOf<String>()
+
+        public val hooks: Hooks = Hooks()
+
+        public fun trackHydration(asset: SuspendableAsset<*>) {
+            synchronized(trackedHydrations) {
+                if (trackedHydrations.isEmpty()) hooks.onHydrationStarted.call()
+                trackedHydrations.add(asset.assetContext.id)
+            }
+        }
+
+        public fun hydrationDone(asset: SuspendableAsset<*>) {
+            val doneHydrating = synchronized(trackedHydrations) {
+                trackedHydrations.remove(asset.assetContext.id)
+                trackedHydrations.isEmpty()
+            }
+
+            if (doneHydrating) {
+                hooks.onHydrationComplete.call()
+            }
+        }
+
+        override fun apply(androidPlayer: AndroidPlayer) {
+            androidPlayer.onUpdate { _, _ ->
+                synchronized(trackedHydrations) {
+                    trackedHydrations.clear()
+                }
+            }
+        }
+
+        public class Hooks {
+            public class OnHydrationStartedHook : SyncHook<(HookContext) -> Unit>() {
+                public fun call(): Unit = super.call { f, context ->
+                    f(context)
+                }
+            }
+
+            public class OnHydrationCompleteHook : SyncHook<(HookContext) -> Unit>() {
+                public fun call(): Unit = super.call { f, context ->
+                    f(context)
+                }
+            }
+
+            public val onHydrationStarted: OnHydrationStartedHook = OnHydrationStartedHook()
+            public val onHydrationComplete: OnHydrationCompleteHook = OnHydrationCompleteHook()
         }
     }
 
@@ -141,3 +205,5 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
         }
     }
 }
+
+public val AndroidPlayer.asyncHydrationTrackerPlugin: AsyncHydrationTrackerPlugin? get() = findPlugin()

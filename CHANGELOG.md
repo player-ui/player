@@ -1,3 +1,167 @@
+# 0.7.3 (Thu May 02 2024)
+
+#### 🐛 Bug Fix
+
+- Release main [#353](https://github.com/player-ui/player/pull/353) ([@intuit-svc](https://github.com/intuit-svc))
+- Trigger prerelease [#352](https://github.com/player-ui/player/pull/352) ([@sugarmanz](https://github.com/sugarmanz))
+- Parse multi node switch fixv1 [#347](https://github.com/player-ui/player/pull/347) (marlon_ercillo@intuit.com [@mercillo](https://github.com/mercillo))
+- [Android] Reorganize `PlayerFragment` state updates [#343](https://github.com/player-ui/player/pull/343) ([@sugarmanz](https://github.com/sugarmanz))
+- iOS: expose data controller onUpdate hook [#336](https://github.com/player-ui/player/pull/336) (nancy_wu1@intuit.com [@nancywu1](https://github.com/nancywu1))
+
+#### 📝 Documentation
+
+- Android Build Optimization Docs [#308](https://github.com/player-ui/player/pull/308) (sentony03@gmail.com [@brocollie08](https://github.com/brocollie08))
+- Add bazelisk to list of requirements; be more specific in Android build instructions [#344](https://github.com/player-ui/player/pull/344) (paul_millerd@intuit.com)
+- [Docs] DSL docs additions [#339](https://github.com/player-ui/player/pull/339) ([@lexfm](https://github.com/lexfm))
+
+#### Authors: 10
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Alex Fimbres ([@lexfm](https://github.com/lexfm))
+- brocollie08 (sentony03@gmail.com)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- marky ercillo (marlon_ercillo@intuit.com)
+- Marlon "Marky" Ercillo ([@mercillo](https://github.com/mercillo))
+- nancywu1 (nancy_wu1@intuit.com)
+- Paul Millerd ([@paulmillerd](https://github.com/paulmillerd))
+
+---
+
+# 0.7.2 (Wed Apr 10 2024)
+
+### Release Notes
+
+#### Update Player Tools Version ([#334](https://github.com/player-ui/player/pull/334))
+
+- Update Player Tools to latest
+
+
+### Does your PR have any documentation updates?
+- [ ] Updated docs
+- [x] No Update needed
+- [ ] Unable to update docs
+
+#### Version Selector Fixes ([#330](https://github.com/player-ui/player/pull/330))
+
+Docs - Fix version selector not working and preserve route when changing versions
+
+#### [Docs] Update the DSL Benefits in Schema Section ([#326](https://github.com/player-ui/player/pull/326))
+
+Docs - Update DSL Schema benefits section 
+
+### Does your PR have any documentation updates?
+- [x] Updated docs
+- [ ] No Update needed
+- [ ] Unable to update docs
+
+#### Expose More Information About Expression Parsing Errors ([#328](https://github.com/player-ui/player/pull/328))
+
+Types - Expose types/utilities around expression parsing errors
+
+### Does your PR have any documentation updates?
+- [ ] Updated docs
+- [x] No Update needed
+- [ ] Unable to update docs
+
+#### Fix `commaNumber` Formatting when Using a Precision of 0 ([#319](https://github.com/player-ui/player/pull/319))
+
+Common Types Plugin - Fix `commaNumber` Formatting when Using a Precision of 0
+
+#### Expression Parser Strictness ([#315](https://github.com/player-ui/player/pull/315))
+
+Expose Expression Parser's strictness option via the `resolveOptions` hook
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#335](https://github.com/player-ui/player/pull/335) ([@intuit-svc](https://github.com/intuit-svc))
+- Update Player Tools Version [#334](https://github.com/player-ui/player/pull/334) ([@KetanReddy](https://github.com/KetanReddy))
+- Version Selector Fixes [#330](https://github.com/player-ui/player/pull/330) ([@KetanReddy](https://github.com/KetanReddy))
+- Move managed player mock flows to shared reference asset mocks [#217](https://github.com/player-ui/player/pull/217) (nancy_wu1@intuit.com [@nancywu1](https://github.com/nancywu1))
+- Android: Preserve old rendering path for non-suspendable assets [#314](https://github.com/player-ui/player/pull/314) ([@sugarmanz](https://github.com/sugarmanz) [@brocollie08](https://github.com/brocollie08))
+- Expose More Information About Expression Parsing Errors [#328](https://github.com/player-ui/player/pull/328) ([@KetanReddy](https://github.com/KetanReddy))
+- update iOS contributing guide [#323](https://github.com/player-ui/player/pull/323) ([@hborawski](https://github.com/hborawski))
+- update rules_player to latest 0.12.0 [#322](https://github.com/player-ui/player/pull/322) ([@hborawski](https://github.com/hborawski) [@brocollie08](https://github.com/brocollie08))
+- Fix `commaNumber` Formatting when Using a Precision of 0 [#319](https://github.com/player-ui/player/pull/319) ([@KetanReddy](https://github.com/KetanReddy))
+- Expression Parser Strictness [#315](https://github.com/player-ui/player/pull/315) ([@KetanReddy](https://github.com/KetanReddy))
+- Common Types Plugin restoring old dataRefs [#302](https://github.com/player-ui/player/pull/302) (alejandro_fimbres@intuit.com [@lexfm](https://github.com/lexfm) [@KetanReddy](https://github.com/KetanReddy))
+
+#### 📝 Documentation
+
+- [Docs] Update the DSL Benefits in Schema Section [#326](https://github.com/player-ui/player/pull/326) ([@KetanReddy](https://github.com/KetanReddy))
+- refactor nav docs slightly to better call out onEnd expressions [#321](https://github.com/player-ui/player/pull/321) ([@hborawski](https://github.com/hborawski))
+- PR Checklist update [#309](https://github.com/player-ui/player/pull/309) (marlon_ercillo@intuit.com [@mercillo](https://github.com/mercillo))
+- add syntax examples for default expressions [#317](https://github.com/player-ui/player/pull/317) ([@hborawski](https://github.com/hborawski))
+
+#### Authors: 11
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- afimbres (alejandro_fimbres@intuit.com)
+- Alex Fimbres ([@lexfm](https://github.com/lexfm))
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Marlon "Marky" Ercillo ([@mercillo](https://github.com/mercillo))
+- mercillo (marlon_ercillo@intuit.com)
+- zwu01 (nancy_wu1@intuit.com)
+
+---
+
+# 0.7.1 (Tue Mar 05 2024)
+
+### Release Notes
+
+#### [Android] `AsyncHydrationTrackerPlugin` ([#296](https://github.com/player-ui/player/pull/296))
+
+Introduction of `AsyncHydrationTrackerPlugin` to provide a mechanism for reacting when `SuspendableAsset` hydration is completely finished.
+
+```kotlin
+androidPlayer.asyncHydrationTrackerPlugin!!.hooks.onHydrationComplete.tap(this::class.java.name) {
+    // process effects after hydration is complete
+}
+```
+
+#### [Sync] Performance and Bugfix ([#306](https://github.com/player-ui/player/pull/306))
+
+- Skip view updates for silent data changes
+- Replace `reduce` calls for performance reasons
+- Fix data change events not cascading properly when setting data
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#313](https://github.com/player-ui/player/pull/313) ([@intuit-svc](https://github.com/intuit-svc))
+- bump @player-tools packages to 0.5.1 [#312](https://github.com/player-ui/player/pull/312) ([@hborawski](https://github.com/hborawski))
+- iOS: prefix resource bundles to prevent naming collisions [#310](https://github.com/player-ui/player/pull/310) ([@hborawski](https://github.com/hborawski))
+- [Android] `AsyncHydrationTrackerPlugin` [#296](https://github.com/player-ui/player/pull/296) ([@sugarmanz](https://github.com/sugarmanz))
+- [Docs] Platform consolidation [#287](https://github.com/player-ui/player/pull/287) ([@sugarmanz](https://github.com/sugarmanz) nancy_wu1@intuit.com)
+- [JVM] Handle invalid JSON as Player error [#303](https://github.com/player-ui/player/pull/303) ([@sugarmanz](https://github.com/sugarmanz))
+- [Sync] Performance and Bugfix [#306](https://github.com/player-ui/player/pull/306) (ketan_reddy@intuit.com)
+
+#### 📝 Documentation
+
+- Fix documentation error on custom asset [#311](https://github.com/player-ui/player/pull/311) ([@ktamilvanan](https://github.com/ktamilvanan))
+- [Docs] Update: DSLSchema [#304](https://github.com/player-ui/player/pull/304) (alejandro_fimbres@intuit.com [@lexfm](https://github.com/lexfm))
+
+#### Authors: 8
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- afimbres (alejandro_fimbres@intuit.com)
+- Alex Fimbres ([@lexfm](https://github.com/lexfm))
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- KT ([@ktamilvanan](https://github.com/ktamilvanan))
+- nancywu1 (nancy_wu1@intuit.com)
+
+---
+
 # 0.7.0 (Thu Feb 15 2024)
 
 ### Release Notes
