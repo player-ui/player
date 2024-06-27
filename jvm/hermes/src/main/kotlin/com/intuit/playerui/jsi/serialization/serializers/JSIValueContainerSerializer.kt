@@ -11,7 +11,7 @@ import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-@Serializer(forClass = Value::class)
+@Serializer(forClass = JSIValueContainer::class)
 internal object JSIValueContainerSerializer : KSerializer<JSIValueContainer> {
 
     fun <T : JSIValueContainer> conform(): KSerializer<T> = this as KSerializer<T>

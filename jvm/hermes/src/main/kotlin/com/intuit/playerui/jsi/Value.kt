@@ -2,6 +2,7 @@ package com.intuit.playerui.jsi
 
 import com.facebook.jni.HybridData
 import com.facebook.jni.annotations.DoNotStrip
+import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.core.bridge.invokeVararg
 import com.intuit.playerui.hermes.bridge.JSIValueWrapper
@@ -27,6 +28,12 @@ public open class Runtime(@DoNotStrip private val mHybridData: HybridData) {
     public external fun drainMicrotasks(maxMicrotasksHint: Int = -1): Boolean
     public external fun global(): Object
     public external fun description(): String
+
+    protected val areEquals: Function by lazy {
+        evaluateJavaScript("(a, b) => a == b").asObject(this).asFunction(this)
+    }
+
+    public fun areEquals(a: Value, b: Value): Boolean = areEquals.call(this, a, b).asBoolean()
 }
 
 // TODO: Do we just tie these to specific runtimes? I feel like that'd help w/ ergonomics and ensuring values are used with the same runtime context
@@ -59,6 +66,11 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
     // TODO: I want to enable this, but requires runtime access
     //       Either, we store the runtime in the obj, or we make all runtime accesses explicit
 //    public external override fun toString(): String
+
+    // TODO: Add implementation that is pointer based?
+//    override fun equals(other: Any?): Boolean {
+//        return super.equals(other)
+//    }
 
     public fun strictEquals(runtime: Runtime, other: Value): Boolean = strictEquals(runtime, this, other)
 
@@ -121,10 +133,11 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
             // TODO: Move these to Function.from
             // TODO: Might need a UUID on the name if collisions are an issue
             // NOTE: Using JVM highest defined FunctionN (ignoring the actual FunctionN) param count here, but that could probably be increased if necessary
-//            is Invokable<*> -> createFromHostFunction(runtime, value::class.qualifiedName ?: "unknown", 22, HostFunction { _, _, args ->
-//                val encodedArgs = args.map { it.handleValue((runtime as HermesRuntime).format) }.toTypedArray()
-//                from(runtime, value(encodedArgs))
-//            }).asValue()
+            is Invokable<*> -> createFromHostFunction(runtime, value::class.qualifiedName ?: "unknown", 22, HostFunction { _, _, args ->
+                val encodedArgs = args.map { it.handleValue((runtime as HermesRuntime).format) }.toTypedArray()
+                // TODO: Wrap in try/catch so we can help preserve error message
+                from(runtime, value(*encodedArgs))
+            }).asValue()
             is kotlin.Function<*> -> createFromHostFunction(runtime, value::class.qualifiedName ?: "unknown", 22, HostFunction { _, _, args ->
                 val encodedArgs = args.map { it.handleValue((runtime as HermesRuntime).format) }
 

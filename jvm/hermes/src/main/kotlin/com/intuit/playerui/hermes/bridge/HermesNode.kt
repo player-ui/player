@@ -114,7 +114,8 @@ public class HermesNode(private val jsiObject: Object, override val runtime: Her
 
     // compare object equality first, then dive deeper to expand until we can just compare values
     override fun equals(other: Any?): Boolean = when (other) {
-        is Object -> Object.strictEquals(runtime, jsiObject, other) // TODO: This probably shouldn't be strict equals
+        // TODO: Does this invalidate the jsiObject reference?
+        is Object -> runtime.areEquals(jsiObject.asValue(), other.asValue())
         is HermesNode -> equals(other.jsiObject)
         is NodeWrapper -> equals(other.node)
         is Map<*, *> -> keys == other.keys && keys.all { get(it) == other[it] }
