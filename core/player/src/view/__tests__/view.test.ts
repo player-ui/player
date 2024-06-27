@@ -88,9 +88,8 @@ describe("view", () => {
       const view = new ViewInstance(
         {
           id: 'test',
-          type: 'view',
-          title: [
-            {
+          type:'view',
+          title: {
               staticSwitch: [
                 {
                   case: false,
@@ -110,8 +109,7 @@ describe("view", () => {
                 },
               ],
             },
-          ],
-        },
+        } as any,
         {
           model,
           parseBinding,
@@ -120,7 +118,11 @@ describe("view", () => {
         }
       );
 
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new SwitchPlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
       const resolved = view.update();
+      console.log('@@ RESOLVED: ',resolved)
 
       expect(resolved).toStrictEqual({
         id: 'test',
