@@ -33,7 +33,7 @@ load("@rules_player//:workspace.bzl", "deps")
 
 deps(android_api_version = 31)
 
-load("@rules_player//:conf.bzl", "apple", "javascript")
+load("@rules_player//:conf.bzl", "apple", "javascript", "kotlin")
 
 #####################
 # Yarn Dependencies #
@@ -75,6 +75,7 @@ pod_install(
 ######################
 # Kotlin Setup       #
 ######################
+kotlin()
 
 load("@io_bazel_rules_kotlin//kotlin:core.bzl", "kt_register_toolchains")
 
