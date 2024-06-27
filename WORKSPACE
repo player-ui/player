@@ -22,17 +22,18 @@ git_repository(
     remote = "https://github.com/sugarmanz/rules_jvm_external",
 )
 
-git_repository(
-    name = "rules_player",
-    branch = "maven-export-distribution",
-    remote = "https://github.com/player-ui/rules_player",
+http_archive(
+  name = "rules_player",
+  strip_prefix = "rules_player-0.12.0",
+  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v0.12.0.tar.gz"],
+  sha256 = "44dd1cd289166f7ccb7932e88f4fb71446132fe247c1caf1a2e59ffe3344ffcc"
 )
 
 load("@rules_player//:workspace.bzl", "deps")
 
-deps()
+deps(android_api_version = 31)
 
-load("@rules_player//:conf.bzl", "apple", "javascript", "kotlin")
+load("@rules_player//:conf.bzl", "apple", "javascript")
 
 #####################
 # Yarn Dependencies #
@@ -74,7 +75,6 @@ pod_install(
 ######################
 # Kotlin Setup       #
 ######################
-kotlin()
 
 load("@io_bazel_rules_kotlin//kotlin:core.bzl", "kt_register_toolchains")
 
@@ -89,7 +89,7 @@ junit5()
 ######################
 grab_remote = "https://github.com/sugarmanz/grab-bazel-common.git"
 
-grab_commit = "35317b3d1c0da07b42af6e6a2137ebdec0ffe400"
+grab_commit = "d1d4b28bab4bdc2810dfdfdf38a83d71a3eb36d4"
 
 git_repository(
     name = "grab_bazel_common",
@@ -145,7 +145,10 @@ overridden_targets = {
     "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm": "@//android/demo:kotlinx_coroutines_core_jvm_fixed",
 }
 
-android_ndk_repository(name = "androidndk")
+android_ndk_repository(
+    name = "androidndk",
+   api_level=21
+)
 
 register_toolchains("@androidndk//:all")
 
