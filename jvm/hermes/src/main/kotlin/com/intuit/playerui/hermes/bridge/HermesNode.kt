@@ -76,10 +76,10 @@ public class HermesNode(private val jsiObject: Object, override val runtime: Her
         .handleValue(format)
 
     override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = getJSIFunction(key)
-        ?.toInvokable(format, deserializationStrategy)
+        ?.toInvokable(format, jsiObject, deserializationStrategy)
 
     override fun <R> getFunction(key: String): Invokable<R>? = getJSIFunction(key)
-        ?.toInvokable(format, null)
+        ?.toInvokable(format, jsiObject, null)
 
     override fun getList(key: String): List<*>? = getJSIArray(key)
         ?.toList(format)
