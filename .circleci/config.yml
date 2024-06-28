@@ -117,7 +117,6 @@ jobs:
 
       - run:
           name: Homebrew Dependencies
-      - run: 
           shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
           command: |
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
