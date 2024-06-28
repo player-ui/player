@@ -23,7 +23,7 @@ executors:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   ios:
     working_directory: ~/player
-    resource_class: macos.x86.medium.gen2
+    resource_class: macos.m1.medium.gen1
     macos:
       xcode: 14.3
     environment:
@@ -42,6 +42,8 @@ commands:
     steps:
       - attach_workspace:
           at: ~/player
+
+      - macos/install-rosetta
 
       - restore_cache:
           keys:
@@ -117,7 +119,14 @@ jobs:
       - run:
           name: Homebrew Dependencies
           command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@8
+            echo "A" | softwareupdate --install-rosetta
+      - run: 
+          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
+          command: |
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      - run:
+          command: |
+            HOMEBREW_NO_AUTO_UPDATE=1 arch -x86_64 /usr/local/bin/brew install bazelisk maven openjdk@8
 
       - run:
           name: Set Ruby Version
@@ -157,7 +166,10 @@ jobs:
             - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
             - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
 
-      - run: bundle install
+      - run:
+          command: |
+            bundle config build.nokogiri --use-system-libraries
+            bundle install
 
       - save_cache:
           key: gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
