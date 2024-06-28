@@ -84,8 +84,8 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
         @JvmStatic public external fun from(runtime: Runtime, value: String): Value
         @JvmStatic public external fun from(runtime: Runtime, value: Long): Value
 
-        @JvmStatic public external fun from(value: Symbol): Value
-        @JvmStatic public external fun from(value: Object): Value
+        @JvmStatic public external fun from(runtime: Runtime, value: Symbol): Value
+        @JvmStatic public external fun from(runtime: Runtime, value: Object): Value
 
         // TODO: Settle on API
         public val undefined: Value @JvmStatic external get
@@ -127,8 +127,8 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
             is Int -> from(value)
             is String -> from(runtime, value)
             is Long -> from(runtime, value)
-            is Symbol -> from(value)
-            is Object -> from(value)
+            is Symbol -> from(runtime, value)
+            is Object -> from(runtime, value)
             is JsonElement -> createFromJson(runtime, value)
             // TODO: Move these to Function.from
             // TODO: Might need a UUID on the name if collisions are an issue
@@ -137,7 +137,7 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
                 val encodedArgs = args.map { it.handleValue((runtime as HermesRuntime).format) }.toTypedArray()
                 // TODO: Wrap in try/catch so we can help preserve error message
                 from(runtime, value(*encodedArgs))
-            }).asValue()
+            }).asValue(runtime)
             is kotlin.Function<*> -> createFromHostFunction(runtime, value::class.qualifiedName ?: "unknown", 22, HostFunction { _, _, args ->
                 val encodedArgs = args.map { it.handleValue((runtime as HermesRuntime).format) }
 
@@ -154,7 +154,7 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
                 from(runtime, handleInvocation(value::class, matchedArgs) {
                     value.invokeVararg(*it)
                 })
-            }).asValue()
+            }).asValue(runtime)
             else -> throw IllegalArgumentException("cannot automatically create Value from type ${value::class.qualifiedName}")
         }
     }
@@ -190,7 +190,7 @@ public open class Object internal constructor(mHybridData: HybridData) : JSIValu
     public external fun getPropertyAsObject(runtime: Runtime, name: String): Object
     public external fun getPropertyAsFunction(runtime: Runtime, name: String): Function
 
-    public fun asValue(): Value = Value.from(this)
+    public fun asValue(runtime: Runtime): Value = Value.from(runtime, this)
 
     public companion object {
         @JvmStatic public external fun create(runtime: Runtime): Object
@@ -239,7 +239,7 @@ public class Function private constructor(mHybridData: HybridData) : Object(mHyb
 
 public class Symbol private constructor(mHybridData: HybridData) : JSIValueContainer(mHybridData) {
     public external fun toString(runtime: Runtime): String
-    public fun asValue(): Value = Value.from(this)
+    public fun asValue(runtime: Runtime): Value = Value.from(runtime, this)
 
     public companion object {
         @JvmStatic public external fun strictEquals(runtime: Runtime, a: Symbol, b: Symbol): Boolean

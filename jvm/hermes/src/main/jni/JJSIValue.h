@@ -91,8 +91,8 @@ public:
     static local_ref<jhybridobject> fromString(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string str);
     static local_ref<jhybridobject> fromLong(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, jlong l);
 
-    static local_ref<jhybridobject> fromSymbol(alias_ref<jclass>, alias_ref<JJSISymbol_jhybridobject> symbol);
-    static local_ref<jhybridobject> fromObject(alias_ref<jclass>, alias_ref<JJSIObject_jhybridobject> object);
+    static local_ref<jhybridobject> fromSymbol(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSISymbol_jhybridobject> symbol);
+    static local_ref<jhybridobject> fromObject(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIObject_jhybridobject> object);
 
     static local_ref<jhybridobject> undefined(alias_ref<jclass>);
     static local_ref<jhybridobject> null(alias_ref<jclass>);

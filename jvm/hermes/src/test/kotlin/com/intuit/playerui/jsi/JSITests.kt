@@ -203,7 +203,7 @@ internal class ArrayTests : HermesTest() {
             Value.from(1),
             Value.from(runtime, "two"),
             Value.from(runtime, 3L)
-        ).asValue().asObject(runtime).asArray(runtime).assertValues()
+        ).asValue(runtime).asObject(runtime).asArray(runtime).assertValues()
     }
 }
 
@@ -230,7 +230,7 @@ internal class FunctionTests : HermesTest() {
     @Test fun `asValue works for object subclasses`() {
         val multiply = Function.createFromHostFunction(format) { args ->
             args.filterIsInstance<Number>().fold(1.0) { acc, value -> acc * value.toDouble()}
-        }.asValue().asObject(runtime).asFunction(runtime)
+        }.asValue(runtime).asObject(runtime).asFunction(runtime)
         assertTrue(multiply.isHostFunction(runtime))
         assertEquals(6, multiply.call(runtime, Value.from(2), Value.from(3.0)).asNumber().toInt())
     }
