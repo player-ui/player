@@ -207,6 +207,9 @@ public open class Object internal constructor(mHybridData: HybridData) : JSIValu
 
     public override fun asValue(runtime: Runtime): Value = Value.from(runtime, this)
 
+    public fun setProperty(runtime: Runtime, name: String, value: JSIValueContainer): Unit =
+        setProperty(runtime, name, value.asValue(runtime))
+
     public companion object {
         @JvmStatic public external fun create(runtime: Runtime): Object
         @JvmStatic public external fun strictEquals(runtime: Runtime, a: Object, b: Object): Boolean
@@ -247,12 +250,17 @@ public class Function private constructor(mHybridData: HybridData) : Object(mHyb
     public external fun callAsConstructor(runtime: Runtime, vararg value: Value): Value
     public external fun isHostFunction(runtime: Runtime): Boolean
 
+    public fun callWithThis(runtime: Runtime, jsThis: Value, vararg value: Value): Value =
+        if (jsThis.isObject()) callWithThis(runtime, jsThis.asObject(runtime), *value)
+        else call(runtime, *value)
+
     public companion object {
         @JvmStatic public external fun createFromHostFunction(runtime: Runtime, name: String, paramCount: Int, func: HostFunction): Function
-        public fun createFromHostFunction(runtime: Runtime, func: Value.(runtime: Runtime, args: kotlin.Array<out Value>) -> Value): Function =
-            createFromHostFunction(runtime, "unknown", 22, HostFunction { runtime, thisVal, args -> thisVal.func(runtime, args) })
-        public fun createFromHostFunction(runtime: Runtime, func: Value.(args: kotlin.Array<out Value>) -> Value): Function =
-            createFromHostFunction(runtime, "unknown", 22, HostFunction { _, thisVal, args -> thisVal.func(args) })
+        // TODO: Use paramCount to validate args against?
+        public fun createFromHostFunction(runtime: Runtime, name: String = "unknown", paramCount: Int = 22, func: Value.(runtime: Runtime, args: kotlin.Array<out Value>) -> Value): Function =
+            createFromHostFunction(runtime, name, paramCount, HostFunction { runtime, thisVal, args -> thisVal.func(runtime, args) })
+        public fun createFromHostFunction(runtime: Runtime, name: String = "unknown", paramCount: Int = 22, func: Value.(args: kotlin.Array<out Value>) -> Value): Function =
+            createFromHostFunction(runtime, name, paramCount, HostFunction { _, thisVal, args -> thisVal.func(args) })
         public fun createFromHostFunction(format: JSIFormat, func: (args: kotlin.Array<out Any?>) -> Any?): Function =
             createFromHostFunction(format.runtime, "unknown", 22, HostFunction { _, _, args ->
                 format.encodeToValue(func(args.map { format.decodeFromValue<Any?>(it) }.toTypedArray()))

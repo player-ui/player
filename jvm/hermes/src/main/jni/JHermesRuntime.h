@@ -19,6 +19,8 @@ public:
         auto config = hermes::vm::RuntimeConfig::Builder()
             .withIntl(intl)
             .withMicrotaskQueue(microtaskQueue)
+        // maybe replace w/ custom promise impl
+        // .withES6Promise(false)
             .build();
 
         return newObjectCxxArgs(std::move(config));

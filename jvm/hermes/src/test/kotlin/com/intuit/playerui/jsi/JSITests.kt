@@ -4,6 +4,8 @@ import com.facebook.jni.CppException
 import com.intuit.playerui.hermes.base.HermesTest
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime.Config
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -42,6 +44,26 @@ Error: hello
             val function = runtime.evaluateJavaScript("() => {}").asObject(runtime).asFunction(runtime)
             runtime.queueMicrotask(function)
         }.message)
+    }
+
+    @Test fun `can't queue a microtask in JS if it's disabled`() {
+        runtime.global().setProperty(runtime, "queueMicrotask", Function.createFromHostFunction(runtime, "queueMicrotask", 1) { args ->
+            require(args.size == 1 && args[0].isObject() && args[0].asObject(runtime).isFunction(runtime)) { "queueMicrotask expects exactly one argument, the function to enqueue" }
+
+            // TODO: suspend on JS thread to allow current JS execution path to finish
+            runtime.scope.launch {
+                delay(0)
+                args[0].asObject(runtime).asFunction(runtime).callWithThis(runtime, this@createFromHostFunction)
+            }
+
+            Value.undefined
+        })
+        runtime.evaluateJavaScript("""(() => {
+            a = 1
+            queueMicrotask(() => { a = 2 })
+            a = 3
+        })()""".trimMargin())
+        assertEquals(Value.from(2), runtime.global().getProperty(runtime, "a"))
     }
 
     @Test fun `queue and drain microtasks`() {

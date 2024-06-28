@@ -6,8 +6,10 @@ import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime
 import com.intuit.playerui.jni.ResourceLoaderDelegate
 import com.intuit.playerui.jsi.Object
 import com.intuit.playerui.jsi.Value
+import com.intuit.playerui.jsi.serialization.format.decodeFromValue
 import com.intuit.playerui.utils.test.PromiseUtils
 import com.intuit.playerui.utils.test.ThreadUtils
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
 
@@ -24,7 +26,7 @@ internal abstract class HermesTest(val runtime: HermesRuntime = HermesRuntime())
     override val exceptions = mutableListOf<Throwable>()
 
     fun assertEquals(a: Value, b: Value) {
-        assertTrue(runtime.jsEquals(a, b), "${a.toString(runtime)} != ${b.toString(runtime)}")
+        Assertions.assertEquals(format.decodeFromValue<Any?>(a), format.decodeFromValue<Any?>(b))
     }
 
     fun assertEquivalent(a: Object, b: Object) {
