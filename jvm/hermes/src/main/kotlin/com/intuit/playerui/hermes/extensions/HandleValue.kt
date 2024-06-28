@@ -3,8 +3,8 @@ package com.intuit.playerui.hermes.extensions
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
+import com.intuit.playerui.core.bridge.serialization.format.encodeToRuntimeValue
 import com.intuit.playerui.core.bridge.serialization.format.serializer
-import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.playerui.hermes.bridge.HermesNode
 import com.intuit.playerui.jsi.Array
 import com.intuit.playerui.jsi.Function
@@ -12,7 +12,6 @@ import com.intuit.playerui.jsi.Object
 import com.intuit.playerui.jsi.Value
 import com.intuit.playerui.jsi.serialization.format.JSIFormat
 import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.builtins.ArraySerializer
 
 internal fun Any?.handleValue(format: JSIFormat): Any? = when (this) {
     is Value -> transform(format)
@@ -49,16 +48,13 @@ internal fun Array.toList(format: JSIFormat): List<Any?> = (0 until size(format.
 
 internal fun <R> Function.toInvokable(format: JSIFormat, deserializationStrategy: DeserializationStrategy<R>?): Invokable<R> = Invokable { args ->
     try {
+        val encodedArgs = args.map { format.encodeToRuntimeValue(it) }.toTypedArray()
+        val result = call(format.runtime, *encodedArgs)
 
-        // TODO: Instead of handling the value, and then deserializing, could we just deserialize since we know the result will be a Value?
-        val result = callWithThis(format.runtime, this, format.encodeToRuntimeValue(
-            ArraySerializer(GenericSerializer()),
-            args as kotlin.Array<Any?>, // TODO: Anything we can do about this cast?
-        )).handleValue(format)
-
-        if (result is Node && deserializationStrategy != null) {
-            result.deserialize(deserializationStrategy)
-        } else result as R
+        // TODO: Unsafe cast really, so we might want to require a deserialization strategy
+        if (deserializationStrategy != null) {
+            format.decodeFromRuntimeValue(deserializationStrategy, result)
+        } else result.handleValue(format) as R
     } catch (e: Throwable) {
         e.printStackTrace()
         throw e

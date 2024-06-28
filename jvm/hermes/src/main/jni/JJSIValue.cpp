@@ -78,12 +78,12 @@ local_ref<JJSIValue::jhybridobject> JJSIValue::fromLong(alias_ref<jclass>, alias
     return newObjectCxxArgs(BigInt::fromInt64(jRuntime->cthis()->get_runtime(), l));
 }
 
-local_ref<JJSIValue::jhybridobject> JJSIValue::fromSymbol(alias_ref<jclass>,  alias_ref<JJSISymbol::jhybridobject> symbol) {
-    return newObjectCxxArgs(Value(std::move(symbol->cthis()->get_symbol())));
+local_ref<JJSIValue::jhybridobject> JJSIValue::fromSymbol(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSISymbol::jhybridobject> symbol) {
+    return newObjectCxxArgs(Value(jRuntime->cthis()->get_runtime(), symbol->cthis()->get_symbol()));
 }
 
-local_ref<JJSIValue::jhybridobject> JJSIValue::fromObject(alias_ref<jclass>,  alias_ref<JJSIObject::jhybridobject> object) {
-    return newObjectCxxArgs(Value(std::move(object->cthis()->get_object())));
+local_ref<JJSIValue::jhybridobject> JJSIValue::fromObject(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIObject::jhybridobject> object) {
+    return newObjectCxxArgs(Value(jRuntime->cthis()->get_runtime(), object->cthis()->get_object()));
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIValue::undefined(alias_ref<jclass>) {

@@ -54,7 +54,7 @@ internal class HermesNodeTest : HermesTest() {
         }).asObject(runtime).apply {
             setProperty(runtime, "function", Function.createFromHostFunction(runtime, "function", 0, HostFunction { r, t, a ->
                 Value.from(runtime,"classicstring")
-            }).asValue())
+            }).asValue(runtime))
         }.toNode(format)
 
         assertEquals("thisisastring", node["string"])

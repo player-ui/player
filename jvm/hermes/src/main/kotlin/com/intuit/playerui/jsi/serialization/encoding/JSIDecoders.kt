@@ -59,7 +59,7 @@ internal class JSIObjectMapDecoder(override val format: JSIFormat, override val 
         val names = jsiObject.getPropertyNames(format.runtime)
         val size = names.size(format.runtime)
 
-        (0..size).map { i -> names.getValueAtIndex(format.runtime, i) }
+        (0 until size).map { i -> names.getValueAtIndex(format.runtime, i) }
             .filterNot(Value::isUndefined)
             .map { it.toString(format.runtime) }
     }
@@ -103,7 +103,7 @@ internal class JSIObjectClassDecoder(override val format: JSIFormat, override va
         val names = jsiObject.getPropertyNames(format.runtime)
         val size = names.size(format.runtime)
 
-        (0..size).map { i -> names.getValueAtIndex(format.runtime, i) }
+        (0 until size).map { i -> names.getValueAtIndex(format.runtime, i) }
             .filterNot(Value::isUndefined)
             .map { it.toString(format.runtime) }
     }

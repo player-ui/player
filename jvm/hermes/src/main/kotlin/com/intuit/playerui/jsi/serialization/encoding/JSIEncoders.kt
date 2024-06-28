@@ -53,8 +53,8 @@ internal open class JSIValueEncoder(private val format: JSIFormat, private val m
     }
 
     private val currentContent: Value get() = when (mode) {
-        Mode.MAP -> contentMap.asValue()
-        Mode.LIST -> Array.createWithElements(format.runtime, *contentList.toTypedArray()).asValue()
+        Mode.MAP -> contentMap.asValue(format.runtime)
+        Mode.LIST -> Array.createWithElements(format.runtime, *contentList.toTypedArray()).asValue(format.runtime)
         Mode.PRIMITIVE,
         Mode.UNDECIDED,
         -> content

@@ -1,8 +1,12 @@
 package com.intuit.playerui.jsi.serialization.encoding
 
+import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.hermes.base.HermesTest
+import com.intuit.playerui.jsi.Function
+import com.intuit.playerui.jsi.Object
 import com.intuit.playerui.jsi.Value
 import com.intuit.playerui.jsi.serialization.format.decodeFromValue
+import kotlinx.serialization.Serializable
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -39,49 +43,49 @@ internal class PrimitiveDecodingTests : HermesTest() {
     }
 }
 
-//internal class FunctionDecodingTests : HermesRuntimeTest() {
-//
-//    @Test fun `decode typed lambda`() {
-//        val function = Function.createFromHostFunction(runtime) { runtime, args ->
-//            Value.from(runtime, "${args[0].toString(runtime)}: ${args[1].toString(runtime)}")
-//        }
-//
-//        assertEquals("PLAYER: 1", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(1)))
-//        assertEquals(
-//            "PLAYER: 2",
-//            format.decodeFromValue<Function2<String, Int, String>>(function.asValue())("PLAYER", 2),
-//        )
-//    }
-//
-//    @Test fun `decode invokable`() {
-//        val function = Function.createFromHostFunction(runtime) { runtime, args ->
-//            Value.from(runtime, "${args[0].toString(runtime)}: ${args[1].toString(runtime)}")
-//        }
-//
-//        assertEquals("PLAYER: 1", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(1)))
-//        assertEquals(
-//            "PLAYER: 2",
-//            format.decodeFromValue<Invokable<String>>(function.asValue())("PLAYER", 2),
-//        )
-//    }
-//
-//    @Test fun `decode kcallable`() {
-//        @Serializable
-//        data class Container(
-//            val method: (String, Int) -> String,
-//        )
-//
-//        val function = Function.createFromHostFunction(runtime) { runtime, args ->
-//            Value.from(runtime, "${args[0].toString(runtime)}: ${args[1].toString(runtime)}")
-//        }
-//        val containerValue = Object(runtime).apply {
-//            setProperty(runtime, "method", function.asValue())
-//        }
-//
-//        assertEquals("PLAYER: 1", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(1)))
-//        assertEquals(
-//            "PLAYER: 2",
-//            format.decodeFromValue<Container>(containerValue.asValue()).method("PLAYER", 2),
-//        )
-//    }
-//}
+internal class FunctionDecodingTests : HermesTest() {
+
+    @Test fun `decode typed lambda`() {
+        val function = Function.createFromHostFunction(runtime) { runtime, args ->
+            Value.from(runtime, "${args[0].toString(runtime)}: ${args[1].toString(runtime)}")
+        }
+
+        assertEquals("PLAYER: 1", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(1)).asString(runtime))
+        assertEquals(
+            "PLAYER: 2",
+            format.decodeFromValue<Function2<String, Int, String>>(function.asValue(runtime))("PLAYER", 2),
+        )
+    }
+
+    @Test fun `decode invokable`() {
+        val function = Function.createFromHostFunction(runtime) { runtime, args ->
+            Value.from(runtime, "${args[0].toString(runtime)}: ${args[1].toString(runtime)}")
+        }
+
+        assertEquals("PLAYER: 1", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(1)).asString(runtime))
+        assertEquals(
+            "PLAYER: 2",
+            format.decodeFromValue<Invokable<String>>(function.asValue(runtime))("PLAYER", 2),
+        )
+    }
+
+    @Test fun `decode kcallable`() {
+        @Serializable
+        data class Container(
+            val method: (String, Int) -> String,
+        )
+
+        val function = Function.createFromHostFunction(runtime) { runtime, args ->
+            Value.from(runtime, "${args[0].toString(runtime)}: ${args[1].toString(runtime)}")
+        }
+        val containerValue = Object(runtime).apply {
+            setProperty(runtime, "method", function.asValue(runtime))
+        }
+
+        assertEquals("PLAYER: 1", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(1)).asString(runtime))
+        assertEquals(
+            "PLAYER: 2",
+            format.decodeFromValue<Container>(containerValue.asValue(runtime)).method("PLAYER", 2),
+        )
+    }
+}

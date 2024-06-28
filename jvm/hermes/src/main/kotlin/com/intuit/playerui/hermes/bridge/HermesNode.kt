@@ -21,7 +21,7 @@ public interface JSIValueWrapper {
 
 public class HermesNode(private val jsiObject: Object, override val runtime: HermesRuntime) : Node, JSIValueWrapper {
 
-    override val value: Value by lazy { jsiObject.asValue() }
+    override val value: Value by lazy { jsiObject.asValue(runtime) }
 
     override val format: JSIFormat get() = runtime.format
 
@@ -30,7 +30,7 @@ public class HermesNode(private val jsiObject: Object, override val runtime: Her
         val size = names.size(runtime)
 
         // TODO: This could probably be handled via handleValue
-        (0..size).map { i -> names.getValueAtIndex(runtime, i) }
+        (0 until size).map { i -> names.getValueAtIndex(runtime, i) }
             .filterNot(Value::isUndefined)
             // NOTE: since we don't have proper propname support, we just toString it - this may not be suitable for all use cases
             .map { it.toString(runtime) }
@@ -70,7 +70,7 @@ public class HermesNode(private val jsiObject: Object, override val runtime: Her
         ?.takeIf { it.isFunction(runtime) }
         ?.asFunction(runtime)
 
-    override fun get(key: String): Any? = jsiObject.getProperty(runtime, key)
+    override operator fun get(key: String): Any? = jsiObject.getProperty(runtime, key)
         .handleValue(format)
 
     override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = getJSIFunction(key)
@@ -96,7 +96,7 @@ public class HermesNode(private val jsiObject: Object, override val runtime: Her
     }
 
     // TODO: Figure out how to support both Object and Value (and others), as they don't share a common ancestor
-    override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T = format.decodeFromRuntimeValue(deserializer, jsiObject.asValue())
+    override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T = format.decodeFromRuntimeValue(deserializer, jsiObject.asValue(runtime))
 
     // TODO: Incorporate release strategy
     override fun isReleased(): Boolean = false
@@ -114,15 +114,15 @@ public class HermesNode(private val jsiObject: Object, override val runtime: Her
 
     // compare object equality first, then dive deeper to expand until we can just compare values
     override fun equals(other: Any?): Boolean = when (other) {
-        // TODO: Does this invalidate the jsiObject reference?
-        is Object -> runtime.areEquals(jsiObject.asValue(), other.asValue())
-        is HermesNode -> equals(other.jsiObject)
+        is Map<*, *> -> keys == other.keys && keys.all {
+            get(it) == other[it]
+        }
         is NodeWrapper -> equals(other.node)
-        is Map<*, *> -> keys == other.keys && keys.all { get(it) == other[it] }
+        is Object -> equals(HermesNode(other, runtime))
         else -> false
     }
 
-    // TODO: Need to go implement this so the object layer defines the hashcode from the native ref ptr
+    // TODO: Need to go implement this so the object layer defines the hashcode from the native ref ptr or PropNameId
     override fun hashCode(): Int = jsiObject.hashCode()
 
     override fun toString(): String = keys.associateWith(::get).toString()
