@@ -29,11 +29,16 @@ public open class Runtime(@DoNotStrip private val mHybridData: HybridData) {
     public external fun global(): Object
     public external fun description(): String
 
-    protected val areEquals: Function by lazy {
+    protected val jsEquals: Function by lazy {
         evaluateJavaScript("(a, b) => a == b").asObject(this).asFunction(this)
     }
 
-    public fun areEquals(a: Value, b: Value): Boolean = areEquals.call(this, a, b).asBoolean()
+    public fun jsEquals(a: Value, b: Value): Boolean = jsEquals.call(this, a, b).asBoolean()
+
+    public fun stringify(value: Value): String = global().getPropertyAsObject(this, "JSON")
+        .getPropertyAsFunction(this, "stringify")
+        .call(this, value, Value.`null`, Value.from(2))
+        .asString(this)
 }
 
 // TODO: Do we just tie these to specific runtimes? I feel like that'd help w/ ergonomics and ensuring values are used with the same runtime context
@@ -41,7 +46,9 @@ public open class Runtime(@DoNotStrip private val mHybridData: HybridData) {
 // TODO: For serializing into JS objects, can we just make a HostObject?
 
 /** Base interface for native JSI Value instance */
-public sealed class JSIValueContainer(@DoNotStrip private val mHybridData: HybridData)
+public sealed class JSIValueContainer(@DoNotStrip private val mHybridData: HybridData) {
+    public abstract fun asValue(runtime: Runtime): Value
+}
 
 /** FBJNI wrapper for accessing facebook::jsi::Value APIs */
 public class Value private constructor(mHybridData: HybridData) : JSIValueContainer(mHybridData) {
@@ -56,6 +63,7 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
     public external fun isObject(): Boolean
 
     public external fun asBoolean(): Boolean
+    // TODO: Consider making this return Number directly, so there aren't assumptions about what will come out of this?
     public external fun asNumber(): Double
     public external fun asString(runtime: Runtime): String
     public external fun asBigInt(runtime: Runtime): Long
@@ -74,7 +82,7 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
 
     public fun strictEquals(runtime: Runtime, other: Value): Boolean = strictEquals(runtime, this, other)
 
-    // TODO: if the underlying hybridclass maintains a reference to the runtime, it'd be nice to expose that for the node impl
+    override fun asValue(runtime: Runtime): Value = this
 
     public companion object {
         @JvmStatic public external fun from(value: Boolean): Value
@@ -134,9 +142,14 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
             // TODO: Might need a UUID on the name if collisions are an issue
             // NOTE: Using JVM highest defined FunctionN (ignoring the actual FunctionN) param count here, but that could probably be increased if necessary
             is Invokable<*> -> createFromHostFunction(runtime, value::class.qualifiedName ?: "unknown", 22, HostFunction { _, _, args ->
-                val encodedArgs = args.map { it.handleValue((runtime as HermesRuntime).format) }.toTypedArray()
-                // TODO: Wrap in try/catch so we can help preserve error message
-                from(runtime, value(*encodedArgs))
+                // TODO: Can we wrap the execution in FBJNI for better error handling
+                try {
+                    val encodedArgs = args.map { it.handleValue((runtime as HermesRuntime).format) }.toTypedArray()
+                    from(runtime, value(*encodedArgs))
+                } catch (e: Throwable) {
+                    e.printStackTrace()
+                    throw e
+                }
             }).asValue(runtime)
             is kotlin.Function<*> -> createFromHostFunction(runtime, value::class.qualifiedName ?: "unknown", 22, HostFunction { _, _, args ->
                 val encodedArgs = args.map { it.handleValue((runtime as HermesRuntime).format) }
@@ -155,7 +168,9 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
                     value.invokeVararg(*it)
                 })
             }).asValue(runtime)
-            else -> throw IllegalArgumentException("cannot automatically create Value from type ${value::class.qualifiedName}")
+            else -> (runtime as? HermesRuntime).let {
+                it ?: throw IllegalArgumentException("cannot automatically create Value from type ${value::class.qualifiedName}")
+            }.format.encodeToValue(value)
         }
     }
 }
@@ -190,7 +205,7 @@ public open class Object internal constructor(mHybridData: HybridData) : JSIValu
     public external fun getPropertyAsObject(runtime: Runtime, name: String): Object
     public external fun getPropertyAsFunction(runtime: Runtime, name: String): Function
 
-    public fun asValue(runtime: Runtime): Value = Value.from(runtime, this)
+    public override fun asValue(runtime: Runtime): Value = Value.from(runtime, this)
 
     public companion object {
         @JvmStatic public external fun create(runtime: Runtime): Object
@@ -216,7 +231,15 @@ public fun interface HostFunctionInterface {
     public fun call(runtime: Runtime, thisVal: Value, vararg args: Value): Value
 }
 
-public class HostFunction(private val func: HostFunctionInterface): HostFunctionInterface by func
+internal fun HostFunctionInterface.wrapWithStacktraceLogger(): HostFunctionInterface = HostFunctionInterface { runtime, thisVal, args ->
+    try { call(runtime, thisVal, *args) } catch (e: Throwable) {
+        // TODO: Maybe there is something better we can do here for helping FBJNI use this error
+        e.printStackTrace()
+        throw e
+    }
+}
+
+public class HostFunction(private val func: HostFunctionInterface): HostFunctionInterface by func.wrapWithStacktraceLogger()
 
 public class Function private constructor(mHybridData: HybridData) : Object(mHybridData) {
     public external fun call(runtime: Runtime, vararg args: Value): Value
@@ -239,7 +262,7 @@ public class Function private constructor(mHybridData: HybridData) : Object(mHyb
 
 public class Symbol private constructor(mHybridData: HybridData) : JSIValueContainer(mHybridData) {
     public external fun toString(runtime: Runtime): String
-    public fun asValue(runtime: Runtime): Value = Value.from(runtime, this)
+    public override fun asValue(runtime: Runtime): Value = Value.from(runtime, this)
 
     public companion object {
         @JvmStatic public external fun strictEquals(runtime: Runtime, a: Symbol, b: Symbol): Boolean

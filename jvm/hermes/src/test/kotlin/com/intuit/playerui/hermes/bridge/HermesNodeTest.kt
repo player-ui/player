@@ -9,16 +9,11 @@ import com.intuit.playerui.core.bridge.toJson
 import com.intuit.playerui.core.flow.Flow
 import com.intuit.playerui.hermes.base.HermesTest
 import com.intuit.playerui.hermes.extensions.toNode
-import com.intuit.playerui.jsi.Function
-import com.intuit.playerui.jsi.HostFunction
-import com.intuit.playerui.jsi.Value
 import com.intuit.playerui.jsi.serialization.format.`object`
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.add
-import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -32,29 +27,13 @@ internal class HermesNodeTest : HermesTest() {
 
     @Test
     fun get() {
-//        val node = format.`object` {
-//            set("string",  "thisisastring")
-//            set("int", 1)
-//            set("object", mapOf("string" to "anotherstring"))
-//            set("list", listOf(1, "two", mapOf("string" to "onemorestring"), null))
-//            set("function", Invokable { "classicstring" })
-//            set("null", null)
-//        }.toNode(format)
-        val node = Value.createFromJson(runtime, buildJsonObject {
-            put("string",  "thisisastring")
-            put("int", 1)
-            put("object", buildJsonObject { put("string", "anotherstring") })
-            put("list", buildJsonArray {
-                add(1)
-                add("two")
-                add(buildJsonObject { put("string", "onemorestring") })
-                add(JsonNull)
-            })
-            put("null", JsonNull)
-        }).asObject(runtime).apply {
-            setProperty(runtime, "function", Function.createFromHostFunction(runtime, "function", 0, HostFunction { r, t, a ->
-                Value.from(runtime,"classicstring")
-            }).asValue(runtime))
+        val node = format.`object` {
+            set("string",  "thisisastring")
+            set("int", 1)
+            set("object", mapOf("string" to "anotherstring"))
+            set("list", listOf(1, "two", mapOf("string" to "onemorestring"), null))
+            set("function", Invokable { "classicstring" })
+            set("null", null)
         }.toNode(format)
 
         assertEquals("thisisastring", node["string"])
@@ -68,7 +47,7 @@ internal class HermesNodeTest : HermesTest() {
         assertEquals(null, node["null"])
     }
 
-//    @Test
+    @Test
     fun getString() {
         val node = format.`object` {
             set("string", "string")
@@ -80,7 +59,7 @@ internal class HermesNodeTest : HermesTest() {
         assertNull(node.getString("notthere"))
     }
 
-//    @Test
+    @Test
     fun getFunction() {
         val node = format.`object` {
             set("function", Invokable { "classicstring" })
@@ -89,24 +68,24 @@ internal class HermesNodeTest : HermesTest() {
         }.toNode(format)
 
         assertEquals("classicstring", node.getInvokable<String>("function")?.invoke())
-        assertEquals(listOf("1", 2), node.getInvokable<Any?>("tuple")?.invoke("1", 2))
+        assertEquals(listOf("1", 2.0), node.getInvokable<Any?>("tuple")?.invoke("1", 2))
         assertEquals(null, node.getInvokable<Any>("notafunction"))
         assertEquals(null, node.getInvokable<Any>("notthere"))
     }
 
-//    @Test
+    @Test
     fun getList() {
         val node = format.`object` {
             set("list", listOf(1, 2, 3))
             set("notalist", 1)
         }.toNode(format)
 
-        assertEquals(listOf(1, 2, 3), node.getList("list"))
+        assertEquals(listOf(1.0, 2.0, 3.0), node.getList("list"))
         assertNull(node.getList("notalist"))
         assertNull(node.getList("notthere"))
     }
 
-//    @Test
+    @Test
     fun getObject() {
         val node = format.`object` {
             set("object", mapOf(
@@ -121,7 +100,7 @@ internal class HermesNodeTest : HermesTest() {
         assertNull(node.getObject("notthere"))
     }
 
-//    @Test
+    @Test
     fun getAsset() {
         val node = format.`object` {
             set("asset", mapOf("id" to "testId", "type" to "testType"))
@@ -132,7 +111,7 @@ internal class HermesNodeTest : HermesTest() {
         assertEquals(type, "testType")
     }
 
-//    @Test
+    @Test
     fun getListHandlesObjects() {
         val node = format.`object` {
             set("assets", listOf(
@@ -158,12 +137,12 @@ internal class HermesNodeTest : HermesTest() {
         assertNotNull(assets[1] as Node)
         assertNull(assets[1] as? Asset)
 
-        assertEquals(1, assets[2])
+        assertEquals(1.0, assets[2])
 
         assertNull(node.getList("notassets"))
     }
 
-//    @Test
+    @Test
     fun getInt() {
         val node = format.`object` {
             set("int", 1)
@@ -175,7 +154,7 @@ internal class HermesNodeTest : HermesTest() {
         assertNull(node.getInt("notthere"))
     }
 
-//    @Test
+    @Test
     fun getJson() {
         val node = format.`object` {
             set("beacon", mapOf("key" to "value"))
@@ -184,7 +163,7 @@ internal class HermesNodeTest : HermesTest() {
         assertEquals(buildJsonObject { put("key", "value") }, node.getJson("beacon"))
     }
 
-//    @Test
+    @Test
     fun toJson() {
         val node = format.`object` {
             set("beacon", mapOf("key" to "value"))
@@ -203,7 +182,7 @@ internal class HermesNodeTest : HermesTest() {
         )
     }
 
-//    @Test
+    @Test
     fun getBoolean() {
         val node = format.`object` {
             set("isSelected", true)
@@ -259,7 +238,7 @@ internal class HermesNodeTest : HermesTest() {
         verifyThreads()
     }
 
-//    @Test
+    @Test
     fun getSerializablePrimitive() {
         val node = format.`object` {
             set("number", 9)
@@ -267,7 +246,7 @@ internal class HermesNodeTest : HermesTest() {
         assertEquals(9, node.getSerializable("number", Int.serializer()))
     }
 
-//    @Test
+    @Test
     fun getSerializable() {
         val node = format.`object` {
             set("flow", mapOf(

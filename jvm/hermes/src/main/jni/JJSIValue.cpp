@@ -339,6 +339,7 @@ local_ref<JJSIFunction::jhybridobject> JJSIFunction::createFromHostFunction(alia
     auto jFunc = make_global(func);
     // TODO: Verify if this enough count as storage for a global, I would think so, since we're storing the lambda in the runtime?
     HostFunctionType hostFunc = [jFunc](Runtime& runtime, Value& thisVal, Value* args, size_t count) -> Value {
+        // TODO: We need to handle JVM errors here, or up a level
         return JJSIHostFunction::call(jFunc, runtime, thisVal, args, count);
     };
 
@@ -407,6 +408,7 @@ Value JJSIHostFunction::call(Runtime &runtime, Value &thisVal, Value *args, size
             alias_ref<JArrayClass<JJSIValue::jhybridobject>>
         )>("call");
 
+    // TODO: I thought method would handle JVM exceptions, but it doesn't seem to be
     return std::move(method(self(),
         JJSIRuntimeWrapper::newObjectCxxArgs(runtime),
         JJSIValue::newObjectCxxArgs(std::move(thisVal)).releaseAlias(),

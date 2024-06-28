@@ -5,6 +5,7 @@ import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime
 import com.intuit.playerui.hermes.extensions.handleValue
+import com.intuit.playerui.hermes.extensions.mapUndefinedToNull
 import com.intuit.playerui.hermes.extensions.toInvokable
 import com.intuit.playerui.hermes.extensions.toList
 import com.intuit.playerui.hermes.extensions.toNode
@@ -56,6 +57,7 @@ public class HermesNode(private val jsiObject: Object, override val runtime: Her
 
     override fun isEmpty(): Boolean = size == 0
 
+    // TODO: Should we make this getNonNullishJSIValue() to push mapUndefinedToNull up?
     private fun getJSIValue(key: String): Value = jsiObject.getProperty(runtime, key)
 
     private fun getJSIObject(key: String): Object? = getJSIValue(key)
@@ -87,15 +89,9 @@ public class HermesNode(private val jsiObject: Object, override val runtime: Her
         //       consumers to be able to leverage the Node API for arbitrary object types
         ?.toNode(format)
 
-    override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>): T? {
-        return getJSIValue(key).let {
-            // TODO: We could probably handle this within the decoder
-//            .mapUndefinedToNull()?.let {
-            format.decodeFromRuntimeValue(deserializer, it)
-        }
-    }
+    override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>): T? = getJSIValue(key)
+        .mapUndefinedToNull()?.let { format.decodeFromRuntimeValue(deserializer, it) }
 
-    // TODO: Figure out how to support both Object and Value (and others), as they don't share a common ancestor
     override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T = format.decodeFromRuntimeValue(deserializer, jsiObject.asValue(runtime))
 
     // TODO: Incorporate release strategy
@@ -112,7 +108,6 @@ public class HermesNode(private val jsiObject: Object, override val runtime: Her
         else -> false
     }
 
-    // compare object equality first, then dive deeper to expand until we can just compare values
     override fun equals(other: Any?): Boolean = when (other) {
         is Map<*, *> -> keys == other.keys && keys.all {
             get(it) == other[it]

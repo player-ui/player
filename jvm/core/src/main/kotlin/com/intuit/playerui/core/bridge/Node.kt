@@ -29,19 +29,19 @@ public interface Node : Map<String, Any?> {
      * Returns the value corresponding to the given [key] as a [Int],
      * or `null` if such a key is not present in the node or if the value is not a [Int]
      */
-    public fun getInt(key: String): Int? = get(key).safeCast()
+    public fun getInt(key: String): Int? = get(key).safeCast<Number>()?.toInt()
 
     /**
      * Returns the value corresponding to the given [key] as a [Double],
      * or `null` if such a key is not present in the node or if the value is not a [Double]
      */
-    public fun getDouble(key: String): Double? = get(key).safeCast()
+    public fun getDouble(key: String): Double? = get(key).safeCast<Number>()?.toDouble()
 
     /**
      * Returns the value corresponding to the given [key] as a [Long],
      * or `null` if such a key is not present in the node or if the value is not a [Long]
      */
-    public fun getLong(key: String): Long? = get(key).safeCast()
+    public fun getLong(key: String): Long? = get(key).safeCast<Number>()?.toLong()
 
     /**
      * Returns the value corresponding to the given [key] as a [Boolean],

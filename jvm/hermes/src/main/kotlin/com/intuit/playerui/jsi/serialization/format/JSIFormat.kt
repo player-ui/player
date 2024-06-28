@@ -5,6 +5,7 @@ import com.intuit.playerui.core.bridge.serialization.format.AbstractRuntimeForma
 import com.intuit.playerui.core.bridge.serialization.format.RuntimeFormatConfiguration
 import com.intuit.playerui.core.bridge.serialization.format.serializer
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime
+import com.intuit.playerui.jsi.JSIValueContainer
 import com.intuit.playerui.jsi.Value
 import com.intuit.playerui.jsi.serialization.encoding.readFromValue
 import com.intuit.playerui.jsi.serialization.encoding.writeToValue
@@ -29,6 +30,11 @@ public class JSIFormat(
 
     override fun parseToRuntimeValue(string: String): Value =
         runtime.executeRaw("($string)")
+
+    override fun <T> encodeToString(serializer: SerializationStrategy<T>, value: T): String = when (value) {
+        is JSIValueContainer -> runtime.stringify(value.asValue(runtime))
+        else -> super.encodeToString(serializer, value)
+    }
 }
 
 public data class JSIFormatConfiguration internal constructor(
