@@ -27,6 +27,9 @@ export interface AsyncNodeViewPlugin extends ViewPlugin {
   asyncNode: AsyncParallelBailHook<[Node.Node], Node.Node>;
 }
 
+let counter =0;
+let count = 0;
+
 /**
  * Async node plugin used to resolve async nodes in the content
  * If an async node is present, allow users to provide a replacement node to be rendered when ready
@@ -149,31 +152,39 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     view.hooks.resolver.tap("template", (resolver) => {
       resolver.hooks.beforeResolve.tap(this.name, (node, options) => {
         let resolvedNode;
-        if (this.isAsync(node)) {
+        if (this.isAsync(node) && this.resolvedMapping.has(node.id)) {
           const mappedValue = this.resolvedMapping.get(node.id);
+          count++;
+          console.log("mappedValue", mappedValue + '-----', count);
           if (mappedValue) {
             resolvedNode = mappedValue;
           }
+
         } else {
           resolvedNode = null;
         }
 
+
         const newNode = resolvedNode || node;
+
+        console.log("newNode", newNode);
         if (!resolvedNode && node?.type === NodeType.Async) {
           queueMicrotask(async () => {
-            const result = await this.basePlugin?.hooks.onAsyncNode.call(node);
-            const parsedNode =
-              options.parseNode && result
-                ? options.parseNode(result)
-                : undefined;
+            this.basePlugin?.hooks.onAsyncNode.call(node).then((result) => {
+              const parsedNode =
+                options.parseNode && result
+                  ? options.parseNode(result)
+                  : undefined;
 
-            this.resolvedMapping.set(node.id, parsedNode ? parsedNode : node);
-            view.updateAsync();
+              counter++;
+              console.log("parsedNode---", parsedNode + '-----'+'counter---', counter);
+              this.resolvedMapping.set(node.id, parsedNode ? parsedNode : {});
+              view.updateAsync();
+            });
+
+            return node;
           });
-
-          return node;
         }
-
         return newNode;
       });
     });
