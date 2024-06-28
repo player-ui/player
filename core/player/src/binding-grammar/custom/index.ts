@@ -146,15 +146,13 @@ export const parse: Parser = (path) => {
   const nestedPath = (): PathNode | undefined => {
     if (ch === OPEN_CURL) {
       next(OPEN_CURL);
-      if (ch === OPEN_CURL) {
-        next(OPEN_CURL);
+      next(OPEN_CURL);
 
-        /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-        const modelRef = parsePath();
-        next(CLOSE_CURL);
-        next(CLOSE_CURL);
-        return modelRef;
-      }
+      /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
+      const modelRef = parsePath();
+      next(CLOSE_CURL);
+      next(CLOSE_CURL);
+      return modelRef;
     }
   };
 
