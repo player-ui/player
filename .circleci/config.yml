@@ -246,11 +246,11 @@ jobs:
             sudo mv bazelisk /opt/bazelisk-v1.11.0 && \
             sudo ln -s /opt/bazelisk-v1.11.0/bazelisk /usr/local/bin/bazel
 
-     - run:
-           name: Create avd
-           command: |
-             sdkmanager "system-images;android-29;default;x86"
-             echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-29;default;x86"
+      - run:
+          name: Create avd
+          command: |
+            sdkmanager "system-images;android-29;default;x86"
+            echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-29;default;x86"
       - run:
           name: Launch emulator
           command: |
