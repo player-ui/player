@@ -42,9 +42,6 @@ commands:
     steps:
       - attach_workspace:
           at: ~/player
-
-      - macos/install-rosetta
-
       - restore_cache:
           keys:
             - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
@@ -115,12 +112,9 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/player
-
+      - macos/install-rosetta
       - run:
           name: Homebrew Dependencies
-          command: |
-            echo "A" | softwareupdate --install-rosetta
-      - run: 
           shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
           command: |
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
