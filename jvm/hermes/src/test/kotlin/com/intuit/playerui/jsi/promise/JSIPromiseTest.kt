@@ -12,7 +12,7 @@ internal class JSIPromiseTest : HermesTest() {
     fun testErrorStacktraceFromJSError() {
         val (promise) = runtime.execute(
             """
-           (function a() {
+           (function() {
                var resolver;
                const promise = new Promise(function(resolve, reject) { asdf.asdf.asdf.asdf });
                return [promise, resolver];

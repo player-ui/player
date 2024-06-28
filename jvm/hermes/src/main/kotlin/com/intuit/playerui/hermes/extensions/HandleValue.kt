@@ -6,6 +6,7 @@ import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.serialization.format.encodeToRuntimeValue
 import com.intuit.playerui.core.bridge.serialization.format.serializer
 import com.intuit.playerui.hermes.bridge.HermesNode
+import com.intuit.playerui.hermes.bridge.runtime.PlayerRuntimeException
 import com.intuit.playerui.jsi.Array
 import com.intuit.playerui.jsi.Function
 import com.intuit.playerui.jsi.Object
@@ -32,7 +33,7 @@ internal fun Value.transform(format: JSIFormat): Any? = when {
 
 internal fun Object.transform(format: JSIFormat): Any = when {
     isArray(format.runtime) -> asArray(format.runtime).toList(format)
-    isFunction(format.runtime) -> asFunction(format.runtime).toInvokable<Any?>(format, format.serializer())
+    isFunction(format.runtime) -> asFunction(format.runtime).toInvokable<Any?>(format, this, format.serializer())
     else ->  toNode(format)
 }
 
@@ -46,10 +47,10 @@ internal fun Array.toList(format: JSIFormat): List<Any?> = (0 until size(format.
     .map { i -> getValueAtIndex(format.runtime, i) }
     .map { it.transform(format) }
 
-internal fun <R> Function.toInvokable(format: JSIFormat, deserializationStrategy: DeserializationStrategy<R>?): Invokable<R> = Invokable { args ->
+internal fun <R> Function.toInvokable(format: JSIFormat, thisVal: Object, deserializationStrategy: DeserializationStrategy<R>?): Invokable<R> = Invokable { args ->
     try {
         val encodedArgs = args.map { format.encodeToRuntimeValue(it) }.toTypedArray()
-        val result = call(format.runtime, *encodedArgs)
+        val result = callWithThis(format.runtime, thisVal, *encodedArgs)
 
         // TODO: Unsafe cast really, so we might want to require a deserialization strategy
         if (deserializationStrategy != null) {
@@ -57,6 +58,6 @@ internal fun <R> Function.toInvokable(format: JSIFormat, deserializationStrategy
         } else result.handleValue(format) as R
     } catch (e: Throwable) {
         e.printStackTrace()
-        throw e
+        throw PlayerRuntimeException(format.runtime, "Error invoking JS function (${asValue(format.runtime).toString(format.runtime)}) with args (${args.joinToString(",")})", e)
     }
 }

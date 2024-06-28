@@ -44,7 +44,8 @@ internal sealed class AbstractJSIValueDecoder(
 
     override fun <R> decodeFunction(returnTypeSerializer: KSerializer<R>): Invokable<R> {
         // TODO: Probably make sure our decoders wrap up underlying cpp exceptions
-        return currentValue.asObject(format.runtime).asFunction(format.runtime).toInvokable(format, returnTypeSerializer) ?: error("Unable to decode JSI function using return type serializer ${returnTypeSerializer.descriptor}")
+        // TODO: Not sure the function is the correct thisVal -- maybe value?
+        return currentValue.asObject(format.runtime).asFunction(format.runtime).toInvokable(format, value.asObject(format.runtime), returnTypeSerializer) ?: error("Unable to decode JSI function using return type serializer ${returnTypeSerializer.descriptor}")
     }
 }
 
