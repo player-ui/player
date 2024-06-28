@@ -39,7 +39,7 @@ internal fun Object.transform(format: JSIFormat): Any = when {
 // Object can be an Array or Function here, prefer using transform, unless you specifically need a Node
 internal fun Object.toNode(format: JSIFormat): Node = HermesNode(this, format.runtime).let {
     // Auto wrapping as asset if it meets the criteria - it's still a node, but a special one
-    if (false && it.containsKey("id") && it.containsKey("value")) Asset(it) else it
+    if (it.containsKey("id") && it.containsKey("type")) Asset(it) else it
 }
 
 internal fun Array.toList(format: JSIFormat): List<Any?> = (0 until size(format.runtime))

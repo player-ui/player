@@ -33,21 +33,22 @@ internal sealed class AbstractJSIValueDecoder(
 
     override fun decodeNotNullMark(): Boolean = !currentValue.isNull() && !currentValue.isUndefined()
 
-    override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder = when (descriptor.kind) {
-        // TODO: The _as_ APIs will throw a CppException, we'll likely just want to wrap that ourselves
-        StructureKind.LIST -> JSIArrayListDecoder(format, currentValue)
-        StructureKind.MAP -> JSIObjectMapDecoder(format, currentValue)
-        StructureKind.CLASS -> JSIObjectClassDecoder(format, currentValue)
-        PolymorphicKind.SEALED -> JSISealedClassDecoder(format, currentValue)
+    override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder = when {
+        !currentValue.isObject() -> error("Current value is not a composite structure and can't be used to decode into $descriptor")
+        descriptor.kind is StructureKind.LIST -> JSIArrayListDecoder(format, currentValue)
+        descriptor.kind is StructureKind.MAP -> JSIObjectMapDecoder(format, currentValue)
+        descriptor.kind is StructureKind.CLASS -> JSIObjectClassDecoder(format, currentValue)
+        descriptor.kind is PolymorphicKind.SEALED -> JSISealedClassDecoder(format, currentValue)
         else -> error("Runtime format decoders can't decode kinds of (${descriptor.kind}) into structures for $descriptor")
     }
 
     override fun <R> decodeFunction(returnTypeSerializer: KSerializer<R>): Invokable<R> {
-        return currentValue.asObject(format.runtime).asFunction(format.runtime).toInvokable(format, returnTypeSerializer) ?: error("Unable to decode V8 function using return type serializer ${returnTypeSerializer.descriptor}")
+        // TODO: Probably make sure our decoders wrap up underlying cpp exceptions
+        return currentValue.asObject(format.runtime).asFunction(format.runtime).toInvokable(format, returnTypeSerializer) ?: error("Unable to decode JSI function using return type serializer ${returnTypeSerializer.descriptor}")
     }
 }
 
-/** Simple implementation of [AbstractV8Decoder] can be treated as the entry point for [value] decoding */
+/** Simple implementation of [AbstractJSIValueDecoder] can be treated as the entry point for [value] decoding */
 internal class JSIValueDecoder(format: JSIFormat, value: Value) : AbstractJSIValueDecoder(format, value)
 
 internal class JSIObjectMapDecoder(override val format: JSIFormat, override val value: Value, private val jsiObject: Object) : AbstractRuntimeObjectMapDecoder<Value>(), NodeDecoder by JSIValueDecoder(format, value) {

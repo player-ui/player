@@ -24,7 +24,7 @@ internal abstract class HermesTest(val runtime: HermesRuntime = HermesRuntime())
     override val exceptions = mutableListOf<Throwable>()
 
     fun assertEquals(a: Value, b: Value) {
-        assertTrue(runtime.areEquals(a, b)) { "${a.toString(runtime)} != ${b.toString(runtime)}" }
+        assertTrue(runtime.jsEquals(a, b), "${a.toString(runtime)} != ${b.toString(runtime)}")
     }
 
     fun assertEquivalent(a: Object, b: Object) {

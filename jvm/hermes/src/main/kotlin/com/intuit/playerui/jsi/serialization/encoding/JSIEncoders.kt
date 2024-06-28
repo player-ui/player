@@ -89,7 +89,7 @@ internal open class JSIValueEncoder(private val format: JSIFormat, private val m
         when (mode) {
             Mode.LIST -> contentList.add(content)
             Mode.MAP -> when (val tag = tag) {
-                null -> this.tag = content.toString()
+                null -> this.tag = content.toString(format.runtime)
                 else -> {
                     contentMap.setProperty(format.runtime, tag, content)
                     this.tag = null
@@ -117,7 +117,7 @@ internal open class JSIValueEncoder(private val format: JSIFormat, private val m
         }
 
         return if (descriptor == ThrowableSerializer().descriptor) {
-            V8ExceptionEncoder(format, ::putContent)
+            JSIExceptionEncoder(format, ::putContent)
         } else {
             when (descriptor.kind) {
                 StructureKind.CLASS -> JSIValueEncoder(format, Mode.MAP, consumer)
@@ -195,7 +195,7 @@ internal open class JSIValueEncoder(private val format: JSIFormat, private val m
 }
 
 // TODO: Likely just wrap JSIException
-internal class V8ExceptionEncoder(format: JSIFormat, consumer: (Value) -> Unit) : JSIValueEncoder(format, Mode.MAP, consumer) {
+internal class JSIExceptionEncoder(format: JSIFormat, consumer: (Value) -> Unit) : JSIValueEncoder(format, Mode.MAP, consumer) {
 
     override val contentMap by lazy {
         format.runtime.global()
