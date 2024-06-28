@@ -37,6 +37,8 @@ const basicFRFWithActions = {
   },
 };
 
+let count = 0;
+
 const asyncNodeTest = async (resolvedValue: any) => {
   const plugin = new AsyncNodePlugin({
     plugins: [new AsyncNodePluginPlugin()],
@@ -47,6 +49,7 @@ const asyncNodeTest = async (resolvedValue: any) => {
   plugin.hooks.onAsyncNode.tap("test", async (node: Node.Node) => {
     return new Promise((resolve) => {
       deferredResolve = resolve; // Promise would be resolved only once
+      console.log('count--',count++);
     });
   });
 
@@ -120,13 +123,18 @@ test("replaces async nodes with provided node", async () => {
   });
 
   let deferredResolve: ((value: any) => void) | undefined;
-
+  let value=0;
   plugin.hooks.onAsyncNode.tap("test", async (node: Node.Node) => {
+    console.log('value1--',value++);
+
     return new Promise((resolve) => {
       deferredResolve = resolve;
+      console.log('value inside--',value++);
     });
   });
   let updateNumber = 0;
+
+  console.log("updateNumber--", updateNumber);
 
   const player = new Player({ plugins: [plugin] });
 
@@ -138,10 +146,14 @@ test("replaces async nodes with provided node", async () => {
     });
   });
 
+  console.log("No after updateNumber--", updateNumber);
+
   player.start(basicFRFWithActions as any);
 
   let view = (player.getState() as InProgressState).controllers.view.currentView
     ?.lastUpdate;
+
+  console.log("view--", view);
 
   expect(view).toBeDefined();
   expect(view?.actions[0].asset.type).toBe("action");
