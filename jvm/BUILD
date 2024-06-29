@@ -40,6 +40,7 @@ optins = [
 kt_kotlinc_options(
     name = "main_options",
     visibility = ["//visibility:public"],
+    x_context_receivers = True,
     x_explicit_api_mode = "strict",
     x_optin = optins,
 )

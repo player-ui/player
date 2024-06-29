@@ -1,12 +1,14 @@
-module(name = "player", version = "1.0")
+module(
+    name = "player",
+    version = "1.0",
+)
 
 bazel_dep(name = "rules_player")
-
 git_override(
-    remote = "https://github.com/player-ui/rules_player.git",
+    module_name = "rules_player",
     # bazel-6 branch
     commit = "0be9db40b0a322f1979a4b5fea4eeee1482e2e97",
-    module_name = "rules_player",
+    remote = "https://github.com/player-ui/rules_player.git",
 )
 #local_path_override(module_name = "rules_player", path = "../rules_player")
 
@@ -80,6 +82,10 @@ use_repo(rules_ts_ext, "npm_typescript")
 # Kotlin
 bazel_dep(name = "rules_java", version = "6.5.2")
 bazel_dep(name = "rules_kotlin", version = "1.9.1")
+single_version_override(
+    module_name = "rules_kotlin",
+    patches = ["//patches:rules_kotlin.context_receivers.patch"],
+)
 
 # Android
 
