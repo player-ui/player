@@ -82,9 +82,10 @@ use_repo(rules_ts_ext, "npm_typescript")
 
 # Kotlin
 bazel_dep(name = "rules_java", version = "6.5.2")
-bazel_dep(
-    name = "rules_kotlin",
-    version = "1.9.1",
+bazel_dep(name = "rules_kotlin", version = "1.9.1")
+single_version_override(
+    module_name = "rules_kotlin",
+    patches = ["//patches:rules_kotlin.context_receivers.patch"],
 )
 
 # TODO: Custom compiler version breaks embedded jdeps generator plugin - enable when removing custom kotlinc (see .bazelrc jvm_emit_jdeps)
