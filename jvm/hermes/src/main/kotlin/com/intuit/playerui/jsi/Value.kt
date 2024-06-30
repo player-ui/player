@@ -70,7 +70,7 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
 
     public external fun asBoolean(): Boolean
     // TODO: Consider making this return Number directly, so there aren't assumptions about what will come out of this?
-    public external fun asNumber(): Double
+    public external fun asNumber(): Int // TODO: Doing this for Player runtime compat
     /** context(RuntimeThreadContext) */ public external fun asString(runtime: Runtime): String
     /** context(RuntimeThreadContext) */ public external fun asBigInt(runtime: Runtime): Long
     /** context(RuntimeThreadContext) */ public external fun asSymbol(runtime: Runtime): Symbol

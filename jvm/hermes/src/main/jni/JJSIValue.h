@@ -111,7 +111,7 @@ public:
     bool isObject();
 
     bool asBool();
-    double asNumber();
+    jint asNumber();
     std::string asString(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     jlong asBigInt(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     local_ref<JJSISymbol_jhybridobject> asSymbol(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
