@@ -11,7 +11,6 @@ kt_player_module(
     name = "hermes",
     main_deps = main_deps,
     main_exports = main_exports,
-    main_resource_strip_prefix = "jvm/hermes/src/main/jni",
     main_resources = main_resources + glob(["src/main/resources/**"]),
     test_deps = test_deps,
     test_package = "com.intuit.playerui",

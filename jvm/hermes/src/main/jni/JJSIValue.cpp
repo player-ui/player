@@ -78,6 +78,14 @@ local_ref<JJSIValue::jhybridobject> JJSIValue::fromLong(alias_ref<jclass>, alias
     return newObjectCxxArgs(BigInt::fromInt64(jRuntime->cthis()->get_runtime(), l));
 }
 
+local_ref<JJSIValue::jhybridobject> JJSIValue::fromSymbol(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSISymbol::jhybridobject> symbol) {
+    return newObjectCxxArgs(Value(jRuntime->cthis()->get_runtime(), symbol->cthis()->get_symbol()));
+}
+
+local_ref<JJSIValue::jhybridobject> JJSIValue::fromObject(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIObject::jhybridobject> object) {
+    return newObjectCxxArgs(Value(jRuntime->cthis()->get_runtime(), object->cthis()->get_object()));
+}
+
 local_ref<JJSIValue::jhybridobject> JJSIValue::undefined(alias_ref<jclass>) {
     return newObjectCxxArgs(Value::undefined());
 }
@@ -139,8 +147,8 @@ bool JJSIValue::asBool() {
     return value_->asBool();
 }
 
-double JJSIValue::asNumber() {
-    return value_->asNumber();
+jint JJSIValue::asNumber() {
+    return static_cast<jint>(value_->asNumber());
 }
 
 // TODO: Ensure this is what we want to do - we can return the JSI String container
@@ -176,6 +184,8 @@ void JJSIValue::registerNatives() {
         makeNativeMethod("from", JJSIValue::fromInt),
         makeNativeMethod("from", JJSIValue::fromString),
         makeNativeMethod("from", JJSIValue::fromLong),
+        makeNativeMethod("from", JJSIValue::fromSymbol),
+        makeNativeMethod("from", JJSIValue::fromObject),
 
         // TODO: Settle on getter API
         // MARK: Static Value APIs
@@ -210,6 +220,10 @@ void JJSIValue::registerNatives() {
 
         makeNativeMethod("toString", JJSIValue::toString),
     });
+}
+
+local_ref<JJSIObject::jhybridobject> JJSIObject::create(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
+    return newObjectCxxArgs(Object(jRuntime->cthis()->get_runtime()));
 }
 
 bool JJSIObject::strictEquals(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b) {
@@ -265,6 +279,7 @@ local_ref<JJSIFunction::jhybridobject> JJSIObject::getPropertyAsFunction(alias_r
 void JJSIObject::registerNatives() {
     registerHybrid({
         // MARK: Static Object APIs
+        makeNativeMethod("create", JJSIObject::create),
         makeNativeMethod("strictEquals", JJSIObject::strictEquals),
 
         // MARK: Object APIs
@@ -324,6 +339,7 @@ local_ref<JJSIFunction::jhybridobject> JJSIFunction::createFromHostFunction(alia
     auto jFunc = make_global(func);
     // TODO: Verify if this enough count as storage for a global, I would think so, since we're storing the lambda in the runtime?
     HostFunctionType hostFunc = [jFunc](Runtime& runtime, Value& thisVal, Value* args, size_t count) -> Value {
+        // TODO: We need to handle JVM errors here, or up a level
         return JJSIHostFunction::call(jFunc, runtime, thisVal, args, count);
     };
 
@@ -392,6 +408,7 @@ Value JJSIHostFunction::call(Runtime &runtime, Value &thisVal, Value *args, size
             alias_ref<JArrayClass<JJSIValue::jhybridobject>>
         )>("call");
 
+    // TODO: I thought method would handle JVM exceptions, but it doesn't seem to be
     return std::move(method(self(),
         JJSIRuntimeWrapper::newObjectCxxArgs(runtime),
         JJSIValue::newObjectCxxArgs(std::move(thisVal)).releaseAlias(),

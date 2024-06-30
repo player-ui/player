@@ -15,10 +15,12 @@ public:
     static void registerNatives();
 
     // TODO: Expose the config options that make sense
-    static local_ref<jhybridobject> create(alias_ref<jclass>, bool intl, bool microtaskQueue) {
+    static local_ref<jhybridobject> create(alias_ref<jclass>, bool intl = true, bool microtaskQueue = false) {
         auto config = hermes::vm::RuntimeConfig::Builder()
             .withIntl(intl)
             .withMicrotaskQueue(microtaskQueue)
+        // maybe replace w/ custom promise impl
+        // .withES6Promise(false)
             .build();
 
         return newObjectCxxArgs(std::move(config));
@@ -44,10 +46,12 @@ public:
     }
 
     static local_ref<jhybridobject> createWithConfig(alias_ref<jclass>, alias_ref<JHermesConfig::jhybridobject> config) {
-        return newObjectCxxArgs(config->cthis()->get_config());
+        // TODO: Maybe have to move? Or just make global?
+        return newObjectCxxArgs(config);
     }
 
     // TODO: Add the rest of the HermesRuntime API
+    // TODO: Add release API - would likely just release the pointer
 
     Runtime& get_runtime() override {
         return *runtime_;
@@ -55,12 +59,23 @@ public:
 
     operator facebook::jsi::Runtime&() { return get_runtime(); }
 
+    local_ref<JHermesConfig::jhybridobject> get_config() {
+        return make_local(jConfig_);
+    }
+
 private:
     friend HybridBase;
     std::unique_ptr<HermesRuntime> runtime_;
-    explicit JHermesRuntime(std::unique_ptr<HermesRuntime> runtime) : HybridClass(), runtime_(std::move(runtime)) {}
-    explicit JHermesRuntime(hermes::vm::RuntimeConfig& config) : JHermesRuntime(makeHermesRuntime(config)) {}
-    explicit JHermesRuntime() : JHermesRuntime(makeHermesRuntime()) {}
+    global_ref<JHermesConfig::jhybridobject> jConfig_;
+    explicit JHermesRuntime(std::unique_ptr<HermesRuntime> runtime, alias_ref<JHermesConfig::jhybridobject> jConfig) : HybridClass(), runtime_(std::move(runtime)), jConfig_(make_global(jConfig)) {
+        // TODO: Add dynamic fatal handler
+        runtime->setFatalHandler([](const std::string& msg) {
+            std::cout << "FATAL: " << msg << std::endl;
+        });
+    }
+
+    explicit JHermesRuntime(alias_ref<JHermesConfig::jhybridobject> jConfig) : JHermesRuntime(makeHermesRuntime(jConfig->cthis()->get_config()), jConfig) {}
+    explicit JHermesRuntime() : JHermesRuntime(JHermesConfig::create(JHermesConfig::javaClassStatic())) {}
 };
 
 };

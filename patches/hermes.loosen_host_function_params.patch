@@ -14,7 +14,7 @@ index b6d156d93..fb9e87f54 100644
      auto timer = rts_.outgoingTimer("HostFunction");
      return DHF::operator()(rt, thisVal, args, count);
 diff --git API/hermes/TracingRuntime.cpp API/hermes/TracingRuntime.cpp
-index fb36c488b..3c6e807c6 100644
+index 6a71d9255..3f1fe7f83 100644
 --- API/hermes/TracingRuntime.cpp
 +++ API/hermes/TracingRuntime.cpp
 @@ -706,8 +706,8 @@ jsi::Function TracingRuntime::createFunctionFromHostFunction(
@@ -29,10 +29,21 @@ index fb36c488b..3c6e807c6 100644
        TracingRuntime &trt = static_cast<TracingRuntime &>(decoratedRuntime());
  
 diff --git API/hermes/hermes.cpp API/hermes/hermes.cpp
-index 2def3da35..843d0592b 100644
+index 2def3da35..bc5ab8905 100644
 --- API/hermes/hermes.cpp
 +++ API/hermes/hermes.cpp
-@@ -817,12 +817,13 @@ class HermesRuntimeImpl final : public HermesRuntime,
+@@ -82,10 +82,6 @@ namespace facebook {
+ namespace hermes {
+ namespace detail {
+ 
+-#if !defined(NDEBUG) && !defined(ASSERT_ON_DANGLING_VM_REFS)
+-#define ASSERT_ON_DANGLING_VM_REFS
+-#endif
+-
+ static void (*sApiFatalHandler)(const std::string &) = nullptr;
+ /// Handler called by HermesVM to report unrecoverable errors.
+ /// This is a forward declaration to prevent a compiler warning.
+@@ -817,12 +813,13 @@ class HermesRuntimeImpl final : public HermesRuntime,
        }
  
        jsi::Value ret;
@@ -48,6 +59,19 @@ index 2def3da35..843d0592b 100644
              args,
              apiArgs.size());
        }
+@@ -911,9 +908,9 @@ class HermesRuntimeImpl final : public HermesRuntime,
+ 
+     void invalidate() override {
+ #ifdef ASSERT_ON_DANGLING_VM_REFS
+-      assert(
+-          ((1u << 31) & refCount_) == 0 &&
+-          "This PointerValue was left dangling after the Runtime was destroyed.");
++      if (((1u << 31) & refCount_) == 0) {
++        std::cout << "This PointerValue was left dangling after the Runtime was destroyed." << std::endl;
++      }
+ #endif
+       dec();
+     }
 diff --git API/jsi/jsi/decorator.h API/jsi/jsi/decorator.h
 index 6f4351a42..3a566c6f5 100644
 --- API/jsi/jsi/decorator.h

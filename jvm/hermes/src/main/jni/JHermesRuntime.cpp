@@ -13,6 +13,8 @@ void JHermesRuntime::registerNatives() {
     registerHybrid({
         makeNativeMethod("create", JHermesRuntime::create),
         makeNativeMethod("create", JHermesRuntime::createWithConfig),
+
+        makeNativeMethod("getConfig", JHermesRuntime::get_config),
     });
 }
 

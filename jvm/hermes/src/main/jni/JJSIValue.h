@@ -91,6 +91,9 @@ public:
     static local_ref<jhybridobject> fromString(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string str);
     static local_ref<jhybridobject> fromLong(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, jlong l);
 
+    static local_ref<jhybridobject> fromSymbol(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSISymbol_jhybridobject> symbol);
+    static local_ref<jhybridobject> fromObject(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIObject_jhybridobject> object);
+
     static local_ref<jhybridobject> undefined(alias_ref<jclass>);
     static local_ref<jhybridobject> null(alias_ref<jclass>);
     static local_ref<jhybridobject> createFromJsonUtf8(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JByteBuffer> json);
@@ -108,7 +111,7 @@ public:
     bool isObject();
 
     bool asBool();
-    double asNumber();
+    jint asNumber();
     std::string asString(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     jlong asBigInt(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     local_ref<JJSISymbol_jhybridobject> asSymbol(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
@@ -128,6 +131,7 @@ public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Object;";
     static void registerNatives();
 
+    static local_ref<jhybridobject> create(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     static bool strictEquals(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b);
 
     explicit JJSIObject(Object&& object) : object_(std::make_shared<Object>(std::move(object))) {}
