@@ -4,6 +4,7 @@ import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.Promise
 import com.intuit.playerui.hermes.base.HermesTest
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime
+import com.intuit.playerui.hermes.extensions.evaluateInJSThreadBlocking
 import com.intuit.playerui.jsi.Function
 import com.intuit.playerui.jsi.HostFunction
 import com.intuit.playerui.jsi.Value
@@ -15,7 +16,7 @@ import org.junit.jupiter.api.Test
 internal class JSIPromiseTest : HermesTest() {
 
     @Test
-    fun testErrorStacktraceFromJSError() {
+    fun testErrorStacktraceFromJSError() = runtime.evaluateInJSThreadBlocking {
         runtime.global().setProperty(runtime, "setTimeout", Function.createFromHostFunction(runtime, "setTimeout", 2, HostFunction { runtime, thisVal, args ->
             val callback = args[0].asObject(runtime).asFunction(runtime)
             val timeout = args.getOrElse(1) { Value.from(0) }.asNumber().toLong()

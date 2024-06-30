@@ -49,6 +49,7 @@ kt_kotlinc_options(
 kt_kotlinc_options(
     name = "test_options",
     visibility = ["//visibility:public"],
+    x_context_receivers = True,
     x_optin = optins,
 )
 

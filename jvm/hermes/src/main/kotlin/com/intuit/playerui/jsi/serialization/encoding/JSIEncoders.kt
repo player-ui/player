@@ -11,6 +11,8 @@ import com.intuit.playerui.core.bridge.serialization.serializers.FunctionLikeSer
 import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.playerui.core.bridge.serialization.serializers.ThrowableSerializer
 import com.intuit.playerui.hermes.bridge.JSIValueWrapper
+import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime
+import com.intuit.playerui.hermes.extensions.evaluateInJSThreadBlocking
 import com.intuit.playerui.jsi.Array
 import com.intuit.playerui.jsi.Object
 import com.intuit.playerui.jsi.Value
@@ -43,6 +45,8 @@ internal open class JSIValueEncoder(private val format: JSIFormat, private val m
 
     internal constructor(format: JSIFormat, consumer: (Value) -> Unit) : this(format, Mode.UNDECIDED, consumer)
 
+    protected val runtime: HermesRuntime by format::runtime
+
     override val serializersModule: SerializersModule by format::serializersModule
 
     enum class Mode {
@@ -53,8 +57,10 @@ internal open class JSIValueEncoder(private val format: JSIFormat, private val m
     }
 
     private val currentContent: Value get() = when (mode) {
-        Mode.MAP -> contentMap.asValue(format.runtime)
-        Mode.LIST -> Array.createWithElements(format.runtime, *contentList.toTypedArray()).asValue(format.runtime)
+        Mode.MAP -> runtime.evaluateInJSThreadBlocking { contentMap.asValue(runtime) }
+        Mode.LIST -> runtime.evaluateInJSThreadBlocking {
+            Array.createWithElements(runtime, *contentList.toTypedArray()).asValue(runtime)
+        }
         Mode.PRIMITIVE,
         Mode.UNDECIDED,
         -> content
@@ -76,7 +82,7 @@ internal open class JSIValueEncoder(private val format: JSIFormat, private val m
             else -> error("cannot get list unless in LIST mode")
         }
 
-    protected open val contentMap = Object(format.runtime)
+    protected open val contentMap = runtime.evaluateInJSThreadBlocking { Object(runtime) }
         get() = when (mode) {
             Mode.MAP -> field
             else -> error("cannot get map unless in MAP mode")
@@ -89,10 +95,10 @@ internal open class JSIValueEncoder(private val format: JSIFormat, private val m
         when (mode) {
             Mode.LIST -> contentList.add(content)
             Mode.MAP -> when (val tag = tag) {
-                null -> this.tag = content.toString(format.runtime)
-                else -> {
-                    contentMap.setProperty(format.runtime, tag, content)
-                    this.tag = null
+                null -> this.tag = runtime.evaluateInJSThreadBlocking { content.toString(runtime) }
+                else -> runtime.evaluateInJSThreadBlocking {
+                    contentMap.setProperty(runtime, tag, content)
+                    this@JSIValueEncoder.tag = null
                 }
             }
             Mode.PRIMITIVE,
@@ -135,7 +141,7 @@ internal open class JSIValueEncoder(private val format: JSIFormat, private val m
         when (value) {
             is Value -> value
             // this checks for everything we can, including wrappers
-            else -> Value.from(format.runtime, value)
+            else -> runtime.evaluateInJSThreadBlocking { Value.from(runtime, value) }
         }
     )
 
@@ -181,27 +187,29 @@ internal open class JSIValueEncoder(private val format: JSIFormat, private val m
         }
     }
 
-    override fun encodeFunction(invokable: Invokable<*>) = putContent(
-        Value.from(format.runtime, invokable)
-    )
+    override fun encodeFunction(invokable: Invokable<*>) = runtime.evaluateInJSThreadBlocking {
+        putContent(Value.from(runtime, invokable))
+    }
 
-    override fun encodeFunction(kCallable: KCallable<*>) = putContent(
-        Value.from(format.runtime, kCallable)
-    )
+    override fun encodeFunction(kCallable: KCallable<*>) = runtime.evaluateInJSThreadBlocking {
+        putContent(Value.from(runtime, kCallable))
+    }
 
-    override fun encodeFunction(function: Function<*>) = putContent(
-        Value.from(format.runtime, function)
-    )
+    override fun encodeFunction(function: Function<*>) = runtime.evaluateInJSThreadBlocking {
+        putContent(Value.from(runtime, function))
+    }
 }
 
 // TODO: Likely just wrap JSIException
 internal class JSIExceptionEncoder(format: JSIFormat, consumer: (Value) -> Unit) : JSIValueEncoder(format, Mode.MAP, consumer) {
 
     override val contentMap by lazy {
-        format.runtime.global()
-            .getPropertyAsFunction(format.runtime, "Error")
-            .callAsConstructor(format.runtime)
-            .asObject(format.runtime)
+        runtime.evaluateInJSThreadBlocking {
+            runtime.global()
+                .getPropertyAsFunction(runtime, "Error")
+                .callAsConstructor(runtime)
+                .asObject(runtime)
+        }
     }
 
     override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {

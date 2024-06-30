@@ -14,11 +14,15 @@ import com.intuit.playerui.core.bridge.serialization.serializers.playerSerialize
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.utils.InternalPlayerApi
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime.Config
+import com.intuit.playerui.hermes.extensions.UnsafeRuntimeThreadAPI
+import com.intuit.playerui.hermes.extensions.UnsafeRuntimeThreadContext
+import com.intuit.playerui.hermes.extensions.evaluateInJSThreadBlocking
 import com.intuit.playerui.hermes.extensions.handleValue
 import com.intuit.playerui.hermes.extensions.toNode
 import com.intuit.playerui.jni.ResourceLoaderDelegate
 import com.intuit.playerui.jsi.Array
 import com.intuit.playerui.jsi.Function
+import com.intuit.playerui.jsi.HostFunction
 import com.intuit.playerui.jsi.JSIValueContainer
 import com.intuit.playerui.jsi.Object
 import com.intuit.playerui.jsi.Symbol
@@ -33,6 +37,8 @@ import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
@@ -94,19 +100,25 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
     }
 
     @OptIn(ExperimentalPlayerApi::class)
-    override fun executeRaw(script: String): Value = evaluateJavaScript(script)
+    override fun executeRaw(script: String): Value =  evaluateInJSThreadBlocking {
+        evaluateJavaScript(script)
+    }
 
-    override fun execute(script: String): Any? = executeRaw(script).handleValue(format)
+    override fun execute(script: String): Any? = evaluateInJSThreadBlocking { executeRaw(script).handleValue(format) }
 
     // TODO: Add debuggable sources if necessary, tho we'd likely go towards HBC anyways
     override fun load(scriptContext: ScriptContext): Any? = execute(scriptContext.script)
 
+
     override fun add(name: String, value: Value) {
-        global().setProperty(runtime, name, value)
+        evaluateInJSThreadBlocking {
+            global().setProperty(runtime, name, value)
+        }
     }
 
-    override fun <T> serialize(serializer: SerializationStrategy<T>, value: T): Any? =
+    override fun <T> serialize(serializer: SerializationStrategy<T>, value: T): Any? = runtime.evaluateInJSThreadBlocking {
         format.encodeToRuntimeValue(serializer, value).handleValue(format)
+    }
 
     override fun release() {
         // cancel work in runtime scope
@@ -125,7 +137,9 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
     override fun toString(): String = "HermesRuntime"
 
     // Delegated Node members
-    private val backingNode: Node = global().toNode(format)
+    private val backingNode: Node by lazy {
+        evaluateInJSThreadBlocking { global() }.toNode(format)
+    }
 
     override val runtime: HermesRuntime = this
     override val entries: Set<Map.Entry<String, Any?>> by backingNode::entries
@@ -140,7 +154,7 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
         backingNode.getSerializable(key, deserializer)
 
     override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T = backingNode.deserialize(deserializer)
-    override fun isReleased(): Boolean = backingNode.isReleased()
+    override fun isReleased(): Boolean = false// backingNode.isReleased()
     override fun isUndefined(): Boolean = backingNode.isUndefined()
     override fun nativeReferenceEquals(other: Any?): Boolean = backingNode.nativeReferenceEquals(other)
     override fun getString(key: String): String? = backingNode.getString(key)
@@ -171,7 +185,37 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
 
 public object Hermes : PlayerRuntimeFactory<Config> {
     override fun create(block: Config.() -> Unit): HermesRuntime =
-        HermesRuntime.create(Config.invoke())
+        HermesRuntime.create(Config.invoke()).apply {
+            evaluateInJSThreadBlocking {
+                global().setProperty(
+                    runtime,
+                    "setTimeout",
+                    Function.createFromHostFunction(runtime, "setTimeout", 2, HostFunction { runtime, thisVal, args ->
+                        val callback = args[0].asObject(runtime).asFunction(runtime)
+                        val timeout = args.getOrElse(1) { Value.from(0) }.asNumber().toLong()
+
+                        val runTask = {
+                            if (thisVal.isObject()) callback.callWithThis(runtime, thisVal.asObject(runtime), *args)
+                            else callback.call(runtime, *args)
+                        }
+
+                        if (timeout == 0L) {
+                            runTask()
+                        } else (runtime as HermesRuntime).scope.launch {
+                            delay(timeout)
+                            runTask()
+                        }
+
+                        Value.undefined
+                    }).asValue(runtime)
+                )
+                global().setProperty(
+                    runtime,
+                    "setImmediate",
+                    runtime.evaluateJavaScript("""((callback) => setTimeout(callback, 0))""")
+                )
+            }
+        }
 
     override fun toString(): String = "Hermes"
 }
@@ -182,7 +226,8 @@ public class HermesRuntimeContainer : PlayerRuntimeContainer {
 }
 
 // TODO: Remove - just a POC testbed to be able to get native crash logs easier
-public fun main() {
+@OptIn(UnsafeRuntimeThreadAPI::class)
+public fun main(): Unit = with(UnsafeRuntimeThreadContext) {
     try {
         NativeLoader.init(ResourceLoaderDelegate())
         println("Trying to execute 2 + 2")

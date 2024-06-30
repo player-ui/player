@@ -3,6 +3,8 @@ package com.intuit.playerui.jsi.serialization.encoding
 import com.intuit.playerui.core.flow.FlowResult
 import com.intuit.playerui.hermes.base.HermesTest
 import com.intuit.playerui.hermes.bridge.HermesNode
+import com.intuit.playerui.hermes.extensions.RuntimeThreadContext
+import com.intuit.playerui.hermes.extensions.evaluateInJSThreadBlocking
 import com.intuit.playerui.jsi.Value
 import com.intuit.playerui.jsi.serialization.format.encodeToValue
 import kotlinx.serialization.encodeToString
@@ -25,36 +27,36 @@ internal class JsonEncodingTests : HermesTest() {
         )
     }
     private val expectedJsonString = expectedJson.toString()
-    private val expectedValue get() = Value.createFromJson(runtime, expectedJson)
-    private val expectedObject get() = expectedValue.asObject(runtime)
-    private val expectedFlowResult get() = FlowResult(HermesNode(expectedObject, runtime))
+    context(RuntimeThreadContext) private val expectedValue get() = Value.createFromJson(runtime, expectedJson)
+    context(RuntimeThreadContext) private val expectedObject get() = expectedValue.asObject(runtime)
+    context(RuntimeThreadContext) private val expectedFlowResult get() = FlowResult(HermesNode(expectedObject, runtime))
 
     @Test
-    fun testStringify() {
+    fun testStringify() = runtime.evaluateInJSThreadBlocking {
         val stringified = Json.encodeToString(expectedFlowResult)
         Assertions.assertEquals(expectedJsonString, stringified)
     }
 
     @Test
-    fun testToJson() {
+    fun testToJson() = runtime.evaluateInJSThreadBlocking {
         val json = format.decodeFromRuntimeValue(JsonElement.serializer(), expectedValue)
         Assertions.assertEquals(expectedJson, json)
     }
 
     @Test
-    fun testToValue() {
+    fun testToValue() = runtime.evaluateInJSThreadBlocking {
         val value = format.encodeToValue(expectedFlowResult)
         assertEquivalent(expectedObject, value.asObject(runtime))
     }
 
     @Test
-    fun testFromValue() {
+    fun testFromValue() = runtime.evaluateInJSThreadBlocking {
         val flow = format.decodeFromRuntimeValue(FlowResult.serializer(), expectedValue)
         Assertions.assertEquals(expectedFlowResult, flow)
     }
 
     @Test
-    fun testToAndFromValue() {
+    fun testToAndFromValue() = runtime.evaluateInJSThreadBlocking {
         val value = format.encodeToValue(expectedFlowResult)
         assertEquivalent(expectedObject, value.asObject(runtime))
 

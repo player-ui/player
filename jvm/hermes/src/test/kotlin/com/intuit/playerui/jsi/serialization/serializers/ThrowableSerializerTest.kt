@@ -4,6 +4,7 @@ import com.intuit.playerui.core.bridge.serialization.serializers.ThrowableSerial
 import com.intuit.playerui.core.bridge.serialization.serializers.ThrowableSerializer.SerializableStackTraceElement
 import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.hermes.base.HermesTest
+import com.intuit.playerui.hermes.extensions.evaluateInJSThreadBlocking
 import com.intuit.playerui.jsi.Value
 import com.intuit.playerui.jsi.serialization.format.decodeFromValue
 import com.intuit.playerui.utils.normalizeStackTraceElements
@@ -15,7 +16,7 @@ import kotlin.test.currentStackTrace
 internal class ThrowableSerializerTest : HermesTest() {
 
     @Test
-    fun `JS Error is deserialized as PlayerException (using regex)`() {
+    fun `JS Error is deserialized as PlayerException (using regex)`() = runtime.evaluateInJSThreadBlocking {
         val error = runtime.global().getPropertyAsFunction(runtime, "Error")
             .callAsConstructor(runtime, Value.from(runtime, "hello"))
         val exception = format.decodeFromRuntimeValue(ThrowableSerializer(), error)
@@ -31,7 +32,7 @@ internal class ThrowableSerializerTest : HermesTest() {
     }
 
     @Test
-    fun `PlayerException is serialized as JS Error`() {
+    fun `PlayerException is serialized as JS Error`() = runtime.evaluateInJSThreadBlocking {
         val stackTraceElement = currentStackTrace().first()
         val className = stackTraceElement.className
         val methodName = stackTraceElement.methodName
@@ -76,7 +77,7 @@ internal class ThrowableSerializerTest : HermesTest() {
     }
 
     @Test
-    fun `PlayerException with cause`() {
+    fun `PlayerException with cause`() = runtime.evaluateInJSThreadBlocking {
         val stackTraceElement = currentStackTrace().first()
         val className = stackTraceElement.className
         val methodName = stackTraceElement.methodName

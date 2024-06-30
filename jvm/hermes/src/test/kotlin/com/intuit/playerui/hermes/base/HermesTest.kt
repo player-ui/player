@@ -3,6 +3,7 @@ package com.intuit.playerui.hermes.base
 import com.facebook.soloader.nativeloader.NativeLoader
 import com.intuit.playerui.hermes.bridge.HermesNode
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime
+import com.intuit.playerui.hermes.extensions.RuntimeThreadContext
 import com.intuit.playerui.jni.ResourceLoaderDelegate
 import com.intuit.playerui.jsi.Object
 import com.intuit.playerui.jsi.Value
@@ -29,7 +30,7 @@ internal abstract class HermesTest(val runtime: HermesRuntime = HermesRuntime())
         Assertions.assertEquals(format.decodeFromValue<Any?>(a), format.decodeFromValue<Any?>(b))
     }
 
-    fun assertEquivalent(a: Object, b: Object) {
+    context(RuntimeThreadContext) fun assertEquivalent(a: Object, b: Object) {
         // verify that all missing keys from another are null or undefined
         val aKeys = HermesNode(a, runtime).keys
         val bKeys = HermesNode(b, runtime).keys
