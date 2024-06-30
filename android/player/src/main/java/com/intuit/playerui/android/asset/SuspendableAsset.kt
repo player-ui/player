@@ -134,12 +134,10 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
         attrs: AttributeSet? = null,
         defStyle: Int = 0,
         private val onView: suspend View.() -> Unit = {},
-    ) : View(context, attrs, defStyle), OnAttachStateChangeListener {
-
+    ) : View(context, attrs, defStyle), View.OnAttachStateChangeListener {
         private val hydratedView: Deferred<View> = scope.async {
             view.await().also { onView(it) }
         }
-
         init {
             addOnAttachStateChangeListener(this)
         }
@@ -154,7 +152,6 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
                     }
                 }
             }
-
             hydratedView.await().also { parent ->
                 (parent as? ViewGroup)?.awaitAsyncChildren()
             }
@@ -170,15 +167,12 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
                 awaitView()?.let(handler)
             }
         }
-
         override fun onViewAttachedToWindow(v: View) {
             scope.launch(Dispatchers.Main) {
                 awaitView()?.let(::replaceSelfWithView)
             }
         }
-
         override fun onViewDetachedFromWindow(v: View) {}
-
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
             setMeasuredDimension(0, 0)
         }
