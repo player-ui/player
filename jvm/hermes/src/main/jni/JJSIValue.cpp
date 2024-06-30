@@ -147,8 +147,8 @@ bool JJSIValue::asBool() {
     return value_->asBool();
 }
 
-double JJSIValue::asNumber() {
-    return value_->asNumber();
+jint JJSIValue::asNumber() {
+    return static_cast<jint>(value_->asNumber());
 }
 
 // TODO: Ensure this is what we want to do - we can return the JSI String container
