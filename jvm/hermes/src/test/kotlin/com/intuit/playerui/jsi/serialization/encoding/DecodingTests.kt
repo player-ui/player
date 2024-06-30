@@ -2,6 +2,7 @@ package com.intuit.playerui.jsi.serialization.encoding
 
 import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.hermes.base.HermesTest
+import com.intuit.playerui.hermes.extensions.evaluateInJSThreadBlocking
 import com.intuit.playerui.jsi.Function
 import com.intuit.playerui.jsi.Object
 import com.intuit.playerui.jsi.Value
@@ -13,7 +14,7 @@ import org.junit.jupiter.api.Test
 internal class PrimitiveDecodingTests : HermesTest() {
 
     @Test
-    fun `decode string primitive`() {
+    fun `decode string primitive`() = runtime.evaluateInJSThreadBlocking {
         assertEquals("hello", format.decodeFromValue<String>(Value.from(runtime, "hello")))
     }
 
@@ -45,10 +46,12 @@ internal class PrimitiveDecodingTests : HermesTest() {
 
 internal class FunctionDecodingTests : HermesTest() {
 
-    @Test fun `decode typed lambda`() {
+    @Test fun `decode typed lambda`() = runtime.evaluateInJSThreadBlocking {
         val function = Function.createFromHostFunction(runtime) { runtime, args ->
+            // TODO: I'm sad that this doesn't error out -- we likely need to experiment with @DslMarker more
             Value.from(runtime, "${args[0].toString(runtime)}: ${args[1].toString(runtime)}")
         }
+
 
         assertEquals("PLAYER: 1", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(1)).asString(runtime))
         assertEquals(
@@ -57,7 +60,7 @@ internal class FunctionDecodingTests : HermesTest() {
         )
     }
 
-    @Test fun `decode invokable`() {
+    @Test fun `decode invokable`() = runtime.evaluateInJSThreadBlocking {
         val function = Function.createFromHostFunction(runtime) { runtime, args ->
             Value.from(runtime, "${args[0].toString(runtime)}: ${args[1].toString(runtime)}")
         }
@@ -69,7 +72,7 @@ internal class FunctionDecodingTests : HermesTest() {
         )
     }
 
-    @Test fun `decode kcallable`() {
+    @Test fun `decode kcallable`() = runtime.evaluateInJSThreadBlocking {
         @Serializable
         data class Container(
             val method: (String, Int) -> String,

@@ -14,12 +14,16 @@ import com.intuit.playerui.jsi.Value
 import com.intuit.playerui.jsi.serialization.format.JSIFormat
 import kotlinx.serialization.DeserializationStrategy
 
-internal fun Any?.handleValue(format: JSIFormat): Any? = when (this) {
+// These APIs require RuntimeThreadContext to ensure the consumer uses them within the context of the dedicated runtime
+// thread, rather than these methods trying to figure out when they should defer to evaluateInJSThread, which should
+// help prevent inefficiencies trying to, possibly redundantly, defer to the runtime thread when the APIs require.
+
+context(RuntimeThreadContext) internal fun Any?.handleValue(format: JSIFormat): Any? = when (this) {
     is Value -> transform(format)
     else -> this
 }
 
-internal fun Value.transform(format: JSIFormat): Any? = when {
+context(RuntimeThreadContext) private fun Value.transform(format: JSIFormat): Any? = when {
     isUndefined() -> null
     isNull() -> null
     isBoolean() -> asBoolean()
@@ -31,10 +35,12 @@ internal fun Value.transform(format: JSIFormat): Any? = when {
     else -> null
 }
 
-internal fun Object.transform(format: JSIFormat): Any = when {
-    isArray(format.runtime) -> asArray(format.runtime).toList(format)
-    isFunction(format.runtime) -> asFunction(format.runtime).toInvokable<Any?>(format, this, format.serializer())
-    else ->  toNode(format)
+context(RuntimeThreadContext) internal fun Object.transform(format: JSIFormat): Any = format.runtime.evaluateInJSThreadBlocking {
+    when {
+        isArray(format.runtime) -> asArray(format.runtime).toList(format)
+        isFunction(format.runtime) -> asFunction(format.runtime).toInvokable<Any?>(format, this@transform, format.serializer())
+        else -> toNode(format)
+    }
 }
 
 // Object can be an Array or Function here, prefer using transform, unless you specifically need a Node
@@ -43,21 +49,23 @@ internal fun Object.toNode(format: JSIFormat): Node = HermesNode(this, format.ru
     if (it.containsKey("id") && it.containsKey("type")) Asset(it) else it
 }
 
-internal fun Array.toList(format: JSIFormat): List<Any?> = (0 until size(format.runtime))
+context(RuntimeThreadContext) internal fun Array.toList(format: JSIFormat): List<Any?> = (0 until size(format.runtime))
     .map { i -> getValueAtIndex(format.runtime, i) }
     .map { it.transform(format) }
 
 internal fun <R> Function.toInvokable(format: JSIFormat, thisVal: Object, deserializationStrategy: DeserializationStrategy<R>?): Invokable<R> = Invokable { args ->
-    try {
-        val encodedArgs = args.map { format.encodeToRuntimeValue(it) }.toTypedArray()
-        val result = callWithThis(format.runtime, thisVal, *encodedArgs)
+    format.runtime.evaluateInJSThreadBlocking {
+        try {
+            val encodedArgs = args.map { format.encodeToRuntimeValue(it) }.toTypedArray()
+            val result = callWithThis(format.runtime, thisVal, *encodedArgs)
 
-        // TODO: Unsafe cast really, so we might want to require a deserialization strategy
-        if (deserializationStrategy != null) {
-            format.decodeFromRuntimeValue(deserializationStrategy, result)
-        } else result.handleValue(format) as R
-    } catch (e: Throwable) {
-        e.printStackTrace()
-        throw PlayerRuntimeException(format.runtime, "Error invoking JS function (${asValue(format.runtime).toString(format.runtime)}) with args (${args.joinToString(",")})", e)
+            // TODO: Unsafe cast really, so we might want to require a deserialization strategy
+            if (deserializationStrategy != null) {
+                format.decodeFromRuntimeValue(deserializationStrategy, result)
+            } else result.handleValue(format) as R
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            throw PlayerRuntimeException(format.runtime, "Error invoking JS function (${asValue(format.runtime).toString(format.runtime)}) with args (${args.joinToString(",")})", e)
+        }
     }
 }

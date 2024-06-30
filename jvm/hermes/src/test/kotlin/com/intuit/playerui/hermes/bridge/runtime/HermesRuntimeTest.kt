@@ -1,14 +1,14 @@
 package com.intuit.playerui.hermes.bridge.runtime
 
 import com.intuit.playerui.hermes.base.HermesTest
+import com.intuit.playerui.hermes.extensions.evaluateInJSThreadBlocking
 import com.intuit.playerui.jsi.Value
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 internal class HermesRuntimeTest : HermesTest() {
 
-    @Test fun `execute arbitrary JS`() {
-        val runtime = HermesRuntime()
+    @Test fun `execute arbitrary JS`() = runtime.evaluateInJSThreadBlocking {
         assertTrue(Value.strictEquals(runtime, Value.from(4), runtime.evaluateJavaScript("2 + 2")))
     }
 

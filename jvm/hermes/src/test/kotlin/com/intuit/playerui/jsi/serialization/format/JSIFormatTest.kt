@@ -5,6 +5,7 @@ import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.core.bridge.getInvokable
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.playerui.hermes.base.HermesTest
+import com.intuit.playerui.hermes.extensions.evaluateInJSThreadBlocking
 import com.intuit.playerui.jsi.Function
 import com.intuit.playerui.jsi.Object
 import com.intuit.playerui.jsi.Value
@@ -16,7 +17,7 @@ import org.junit.jupiter.api.Test
 
 internal class JSIFormatTest : HermesTest() {
 
-    @Test fun `encode simple map into Value with explicit serializers`() {
+    @Test fun `encode simple map into Value with explicit serializers`() = runtime.evaluateInJSThreadBlocking {
         val map = mapOf(
             "one" to 1,
             "two" to 2,
@@ -29,7 +30,7 @@ internal class JSIFormatTest : HermesTest() {
         assertEquals(Value.undefined, value.getProperty(runtime, "three"))
     }
 
-    @Test fun `encode simple map into Value with implicit serializers`() {
+    @Test fun `encode simple map into Value with implicit serializers`() = runtime.evaluateInJSThreadBlocking {
         val map = mapOf(
             "one" to 1,
             "two" to 2,
@@ -42,7 +43,7 @@ internal class JSIFormatTest : HermesTest() {
         assertEquals(Value.undefined, value.getProperty(runtime, "three"))
     }
 
-    @Test fun `encode nested map into Value with implicit serializers`() {
+    @Test fun `encode nested map into Value with implicit serializers`() = runtime.evaluateInJSThreadBlocking {
         val map = mapOf(
             "one" to mapOf("three" to 3),
             "two" to mapOf("four" to 4),
@@ -55,7 +56,7 @@ internal class JSIFormatTest : HermesTest() {
         assertEquals(Value.undefined, value.getProperty(runtime, "five"))
     }
 
-    @Test fun `encode serializable into Value with implicit serializers`() {
+    @Test fun `encode serializable into Value with implicit serializers`() = runtime.evaluateInJSThreadBlocking {
         @Serializable
         data class Simple(
             val one: Int = 1,
@@ -69,7 +70,7 @@ internal class JSIFormatTest : HermesTest() {
         assertEquals(Value.undefined, value.getProperty(runtime, "three"))
     }
 
-    @Test fun `decode Value into serializable with implicit serializers`() {
+    @Test fun `decode Value into serializable with implicit serializers`() = runtime.evaluateInJSThreadBlocking {
         @Serializable
         data class Simple(
             val one: Int = 1,
@@ -88,7 +89,7 @@ internal class JSIFormatTest : HermesTest() {
         assertEquals(4, simple.two)
     }
 
-    @Test fun `decode into Node backed serializable`() {
+    @Test fun `decode into Node backed serializable`() = runtime.evaluateInJSThreadBlocking {
         data class Simple(override val node: Node) : NodeWrapper {
             fun increment(value: Int) = node.getInvokable<Int>("increment")!!(value)
         }
@@ -105,7 +106,7 @@ internal class JSIFormatTest : HermesTest() {
         assertEquals(1, simple.increment(0))
     }
 
-    @Test fun `decode function into data class`() {
+    @Test fun `decode function into data class`() = runtime.evaluateInJSThreadBlocking {
         @Serializable
         data class Data(
             val one: Int = 1,

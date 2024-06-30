@@ -2,6 +2,7 @@ package com.intuit.playerui.jsi.serialization.encoding
 
 import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.hermes.base.HermesTest
+import com.intuit.playerui.hermes.extensions.evaluateInJSThreadBlocking
 import com.intuit.playerui.jsi.Value
 import com.intuit.playerui.jsi.serialization.format.encodeToValue
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -9,7 +10,7 @@ import org.junit.jupiter.api.Test
 
 internal class PrimitiveEncodingTests : HermesTest() {
 
-    @Test fun `encode string primitive`() {
+    @Test fun `encode string primitive`() = runtime.evaluateInJSThreadBlocking {
         assertEquals(Value.from(runtime, "hello"), format.encodeToValue("hello"))
     }
 
@@ -25,7 +26,7 @@ internal class PrimitiveEncodingTests : HermesTest() {
         assertEquals(Value.from(2.2), format.encodeToValue(2.2))
     }
 
-    @Test fun `encode long primitive`() {
+    @Test fun `encode long primitive`() = runtime.evaluateInJSThreadBlocking {
         assertEquals(Value.from(runtime, 20L), format.encodeToValue(20L))
     }
 
@@ -40,7 +41,7 @@ internal class PrimitiveEncodingTests : HermesTest() {
 
 internal class FunctionEncodingTests : HermesTest() {
 
-    @Test fun `encode typed lambda`() {
+    @Test fun `encode typed lambda`() = runtime.evaluateInJSThreadBlocking {
         val callback = { p0: String, p1: Int -> "$p0: $p1" }
         val function = format.encodeToValue(callback).asObject(runtime).asFunction(runtime)
 
@@ -48,7 +49,7 @@ internal class FunctionEncodingTests : HermesTest() {
         assertEquals("PLAYER: 2", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(2)).asString(runtime))
     }
 
-    @Test fun `encode invokable`() {
+    @Test fun `encode invokable`() = runtime.evaluateInJSThreadBlocking {
         val callback = Invokable { (p0, p1) -> "$p0: $p1" }
         val function = format.encodeToValue(callback).asObject(runtime).asFunction(runtime)
 
@@ -56,7 +57,7 @@ internal class FunctionEncodingTests : HermesTest() {
         assertEquals("PLAYER: 2.0", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(2)).asString(runtime))
     }
 
-    @Test fun `encode kcallable`() {
+    @Test fun `encode kcallable`() = runtime.evaluateInJSThreadBlocking {
         class Container {
             fun callback(p0: String, p1: Int) = "$p0: $p1"
         }
