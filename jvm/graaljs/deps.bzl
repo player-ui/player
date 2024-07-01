@@ -18,7 +18,7 @@ main_deps = main_exports + [
 ]
 
 main_resources = [
-    "//core/player:Player_Bundles"
+    "//core/player:player_native_bundle"
 ]
 
 test_deps = [

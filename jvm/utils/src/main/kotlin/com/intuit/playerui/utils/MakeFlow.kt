@@ -10,7 +10,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 
-public open class MakeFlowModule internal constructor() : JSScriptPluginWrapper("MakeFlow", sourcePath = "core/make-flow/dist/make-flow.prod.js") {
+public open class MakeFlowModule internal constructor() : JSScriptPluginWrapper("MakeFlow", sourcePath = "core/make-flow/dist/MakeFlow.native.js") {
 
     override fun apply(runtime: Runtime<*>) {
         runtime.execute(script)

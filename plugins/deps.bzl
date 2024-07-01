@@ -7,7 +7,7 @@ load("//plugins/java-logger/jvm:deps.bzl", java_logger = "maven")
 load("//plugins/metrics/jvm:deps.bzl", metrics = "maven")
 load("//plugins/pending-transaction/jvm:deps.bzl", pending_transaction = "maven")
 load("//plugins/pubsub/jvm:deps.bzl", pubsub = "maven")
-load("//plugins/reference-assets/android:deps.bzl", reference_assets = "maven")
+load("//plugins/reference-assets/android:defs.bzl", reference_assets = "maven")
 load("//plugins/set-time-out/jvm:deps.bzl", set_time_out = "maven")
 load("//plugins/slf4j-logger/jvm:deps.bzl", slf4j_logger = "maven")
 

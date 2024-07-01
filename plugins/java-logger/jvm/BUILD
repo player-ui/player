@@ -1,9 +1,9 @@
-# load("//plugins:build.bzl", "kt_player_plugin")
-# load(":deps.bzl", "main_deps", "main_exports")
+load("//plugins:defs.bzl", "kt_player_plugin")
+load(":deps.bzl", "main_deps", "main_exports")
 
-# kt_player_plugin(
-#     name = "java-logger",
-#     main_deps = main_deps,
-#     main_exports = main_exports,
-#     test_package = "com.intuit.playerui.plugins.logging.jul",
-# )
+kt_player_plugin(
+    name = "java-logger",
+    main_deps = main_deps,
+    main_exports = main_exports,
+    test_package = "com.intuit.playerui.plugins.logging.jul",
+)

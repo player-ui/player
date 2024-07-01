@@ -1,5 +1,4 @@
-load("@rules_player//kotlin:kt_jvm.bzl", _kt_jvm = "kt_jvm")
-load("@rules_player//kotlin:distribution.bzl", _distribution = "distribution")
+load("@rules_player//kotlin:defs.bzl", _distribution = "distribution", _kt_jvm = "kt_jvm")
 load("@build_constants//:constants.bzl", "VERSION")
 load("//jvm/dependencies:common.bzl", common_main_deps = "main_deps", common_test_deps = "test_deps")
 
@@ -10,6 +9,8 @@ DEFAULT_DEVELOPERS = {
     "sugarmanz": ["name=Jeremiah Zucker", "email=zucker.jeremiah@gmail.com"],
     "brocollie08": ["name=Tony Lin", "email=sentony93@gmail.com"],
 }
+GIT_REPO = "https://github.com/player-ui/player-ui.git"
+DOCS_URL = "https://player-ui.github.io"
 DEFAULT_RELEASE_REPO = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
 DEFAULT_SNAPSHOT_REPO = "https://oss.sonatype.org/content/repositories/snapshots/"
 

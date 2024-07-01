@@ -193,7 +193,7 @@ class HeadlessPlayerTests: XCTestCase {
             case .failure(let error):
                 switch error {
                 case .promiseRejected(let errorState):
-                    XCTAssertEqual(errorState.error, "undefined is not an object (evaluating 'this.navigation.BEGIN')")
+                    XCTAssertEqual(errorState.error, "undefined is not an object (evaluating '_this.navigation.BEGIN')")
                 default: break
                 }
             }

@@ -34,12 +34,12 @@ private fun Value.transform(format: RuntimeFormat<Value>): Any? = when {
         is Double, is Long -> try { asInt() } catch (e: Exception) { asDouble() }
         is String -> asString()
         is Boolean -> asBoolean()
-        /*
-        * this is kind of awful, Graal's execute returns the result slightly differently
-        * from J2V8, so if a node is the return result of an execution, the Value passed here
-        * will have all the map methods instead of the actual map
-        * Refer to the tests in NodeSerializationTest
-        * */
+        /**
+         * this is kind of awful, Graal's execute returns the result slightly differently
+         * from J2V8, so if a node is the return result of an execution, the Value passed here
+         * will have all the map methods instead of the actual map
+         * Refer to the tests in NodeSerializationTest
+         */
         is Map<*, *> -> if (canInvokeMember("getGraalObject")) invokeMember("getGraalObject").toNode(format) else toNode(format)
         else -> throw SerializationException("Value ($this) of type (${this::class.java}) is unknown")
     }

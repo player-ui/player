@@ -100,12 +100,12 @@ The `JVM` Metrics plugin can track render time for views in a flow.
 
 In build.gradle
 ```kotlin
-implementation "com.intuit.player.plugins:metrics:$PLAYER_VERSION"
+implementation "com.intuit.playerui.plugins:metrics:$PLAYER_VERSION"
 ```
 
 In Player constructor
 ```kotlin
-import com.intuit.player.plugins.expression.ExpressionPlugin
+import com.intuit.playerui.plugins.expression.ExpressionPlugin
 
 val metricsPlugin = MetricsPlugin { timing, renderMetrics, flowMetrics ->
   ...

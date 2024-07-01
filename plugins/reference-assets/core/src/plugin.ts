@@ -1,5 +1,14 @@
-import type { Player, PlayerPlugin } from "@player-ui/player";
+import type { Player, ExtendedPlayerPlugin } from "@player-ui/player";
 import { AssetTransformPlugin } from "@player-ui/asset-transform-plugin";
+import type {
+  ActionAsset,
+  InputAsset,
+  ImageAsset,
+  InfoAsset,
+  TextAsset,
+  CollectionAsset,
+  ChoiceAsset,
+} from "./assets";
 import {
   inputTransform,
   actionTransform,
@@ -11,7 +20,20 @@ import {
 /**
  * A plugin to add transforms for the reference assets
  */
-export class ReferenceAssetsPlugin implements PlayerPlugin {
+export class ReferenceAssetsPlugin
+  implements
+    ExtendedPlayerPlugin<
+      [
+        ActionAsset,
+        InputAsset,
+        ImageAsset,
+        TextAsset,
+        CollectionAsset,
+        ChoiceAsset,
+      ],
+      [InfoAsset]
+    >
+{
   name = "reference-assets-transforms";
 
   apply(player: Player) {

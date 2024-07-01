@@ -85,3 +85,4 @@ ios/*/*/Resources/**/*.js
 .ios-build-number
 
 .bazelrc.local
+_ios_coverage/

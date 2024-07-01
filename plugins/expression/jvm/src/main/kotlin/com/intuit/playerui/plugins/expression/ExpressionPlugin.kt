@@ -43,7 +43,7 @@ public class ExpressionPlugin(
     }
 
     private companion object {
-        private const val bundledSourcePath = "plugins/expression/core/dist/expression-plugin.prod.js"
+        private const val bundledSourcePath = "plugins/expression/core/dist/ExpressionPlugin.native.js"
         private const val pluginName = "ExpressionPlugin.ExpressionPlugin"
     }
 }

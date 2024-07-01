@@ -41,7 +41,7 @@ internal class RuntimePerfTest : JSEngineTest() {
 
     @TestTemplate
     fun executePlayerScript() = captureTime {
-        runtime.execute(this@RuntimePerfTest::class.java.classLoader.getResource("core/player/dist/player.prod.js")!!.readText())
+        runtime.execute(this@RuntimePerfTest::class.java.classLoader.getResource("core/player/dist/Player.native.js")!!.readText())
     }
 
     @TestTemplate
@@ -51,7 +51,7 @@ internal class RuntimePerfTest : JSEngineTest() {
             .filterIsInstance<JSPluginWrapper>()
             .let(::JSPlayerConfig)
         var player: Node? = null
-        runtime.execute(this@RuntimePerfTest::class.java.classLoader.getResource("core/player/dist/player.prod.js")!!.readText())
+        runtime.execute(this@RuntimePerfTest::class.java.classLoader.getResource("core/player/dist/Player.native.js")!!.readText())
         captureTime {
             runtime.add("config", config)
             player = runtime.execute("new Player.Player(config)") as? Node

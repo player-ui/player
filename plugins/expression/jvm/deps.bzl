@@ -7,5 +7,5 @@ main_exports = [
 main_deps = main_exports
 
 main_resources = [
-    "//plugins/expression/core:ExpressionPlugin_Bundles"
+    "//plugins/expression/core:core_native_bundle"
 ]

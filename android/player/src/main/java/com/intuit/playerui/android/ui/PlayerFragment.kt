@@ -75,14 +75,14 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
         }
     }
 
-    private var _binding: PlayerFragmentBinding? = null
+    private var _binding: PlayerBinding? = null
 
     /**
      * [PlayerFragmentBinding] instance
      * This property is only valid between onCreateView and onDestroyView.
      * Will throw a NPE if called out of turn.
      */
-    protected val binding: PlayerFragmentBinding get() = _binding!!
+    protected val binding: PlayerBinding get() = _binding!!
 
     /**
      * [ViewModel][androidx.lifecycle.ViewModel] responsible for managing an [AndroidPlayer]
@@ -128,7 +128,7 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View = PlayerFragmentBinding.inflate(inflater, container, false).run {
+    ): View = PlayerBinding.inflate(inflater, container, false).run {
         _binding = this
         root
     }

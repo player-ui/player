@@ -52,7 +52,7 @@ public class ExternalActionPlugin(
 
     private companion object {
         private const val pluginName = "ExternalActionPlugin.ExternalActionPlugin"
-        private const val bundledSourcePath = "plugins/external-action/core/dist/external-action-plugin.prod.js"
+        private const val bundledSourcePath = "plugins/external-action/core/dist/ExternalActionPlugin.native.js"
     }
 }
 

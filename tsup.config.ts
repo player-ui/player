@@ -30,6 +30,7 @@ export function createConfig() {
           define: {
             "process.env.NODE_ENV": JSON.stringify("production"),
           },
+          target: "es5",
           format: ["iife"],
           async onSuccess() {
             await fs.promises.copyFile(

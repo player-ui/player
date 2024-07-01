@@ -1,4 +1,4 @@
-import type { Asset } from "@player-ui/player";
+import type { Asset, AssetWrapper } from "@player-ui/player";
 
 export interface ImageAsset extends Asset<"image"> {
   /** Reference to the image */
@@ -8,7 +8,7 @@ export interface ImageAsset extends Asset<"image"> {
   placeholder?: string;
 
   /** Optional caption */
-  caption?: Asset;
+  caption?: AssetWrapper;
 }
 
 /** A modifier to turn the text into a link */

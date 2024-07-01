@@ -55,7 +55,7 @@ class ActionTest : AssetTest("reference-assets") {
         }
 
         currentState.shouldBePlayerState<CompletedState> {
-            assertEquals("done", endState.outcome)
+            assertEquals("DONE", endState.outcome)
         }
     }
 

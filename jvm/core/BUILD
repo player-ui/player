@@ -1,4 +1,4 @@
-load("//jvm:build.bzl", "kt_player_module")
+load("//jvm:defs.bzl", "kt_player_module")
 load(":deps.bzl", "main_deps", "main_exports", "test_deps")
 
 # TODO: Sources jar for src/main/kotlin includes main/kotlin

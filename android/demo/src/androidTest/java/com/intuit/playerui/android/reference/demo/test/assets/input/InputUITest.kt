@@ -45,8 +45,8 @@ class InputUITest : AssetUITest("reference-assets") {
     }
 
     @Test
-    fun validation() {
-        launchMock("input-validation")
+    fun transitionValidation() {
+        launchMock("input-transition")
 
         verifyIsDisplayed(
             allOf(

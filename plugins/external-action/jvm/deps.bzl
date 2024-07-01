@@ -9,5 +9,5 @@ main_deps = main_exports + [
 ]
 
 main_resources = [
-    "//plugins/external-action/core:ExternalActionPlugin_Bundles"
+    "//plugins/external-action/core:core_native_bundle"
 ]

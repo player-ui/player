@@ -70,7 +70,7 @@ public class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JSScrip
 
     private companion object {
         private const val pluginName = "BeaconPlugin"
-        private const val bundledSourcePath = "plugins/beacon/core/dist/beacon-plugin.prod.js"
+        private const val bundledSourcePath = "plugins/beacon/core/dist/BeaconPlugin.native.js"
     }
 
     @Serializable

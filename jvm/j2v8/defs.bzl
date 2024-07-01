@@ -1,4 +1,4 @@
-load("//jvm:build.bzl", "DEFAULT_GROUP", "distribution")
+load("//jvm:defs.bzl", "DEFAULT_GROUP", "distribution")
 load("@build_constants//:constants.bzl", "VERSION")
 
 deps = {
