@@ -4,6 +4,7 @@ load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@bazel_gazelle//:def.bzl", "gazelle_binary", "gazelle")
 load("@rules_swift_package_manager//swiftpkg:defs.bzl", "swift_update_packages")
+load("@bazel_tools//tools/jdk:default_java_toolchain.bzl", "default_java_toolchain")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -270,6 +271,12 @@ java_import(
     jars = ["@bazel_tools//tools/android:android_jar"],
     neverlink = 1,
     visibility = ["//visibility:public"],
+)
+
+java_runtime(
+    name = "jdk8",
+    java_home = "/Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home",
+    visibility = ["//visibility:public"]
 )
 
 #SwiftLint
