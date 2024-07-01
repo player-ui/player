@@ -113,6 +113,8 @@ export class ReactPlayer {
       this.options.suspend = true;
     }
 
+    console.error(`@@ ReactPlayer.constructor`);
+
     const Devtools = _window?.__PLAYER_DEVTOOLS_PLUGIN;
     const onUpdatePlugin = new OnUpdatePlugin(
       this.viewUpdateSubscription.publish
