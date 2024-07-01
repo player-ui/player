@@ -1,6 +1,6 @@
-build --javabase=@bazel_tools//tools/jdk:remote_jdk8
-build --host_javabase=@bazel_tools//tools/jdk:remote_jdk8
-build --java_toolchain=@bazel_tools//tools/jdk:toolchain_hostjdk8
+build --javabase=@bazel_tools//tools/jdk:remote_jdk11
+build --host_javabase=@bazel_tools//tools/jdk:remote_jdk11
+build --java_toolchain=@bazel_tools//tools/jdk:toolchain_hostjdk11
 
 common --enable_bzlmod
 test --test_output=errors
