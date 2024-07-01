@@ -1,5 +1,5 @@
 # Use embedded JDK
-build --repo_env=JAVA_HOME=../bazel_tools/jdk
+build --javabase=@bazel_tools//tools/jdk:remote_jdk8
 common --enable_bzlmod
 test --test_output=errors
 coverage --combined_report=lcov
