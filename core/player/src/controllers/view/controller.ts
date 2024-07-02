@@ -157,6 +157,7 @@ export class ViewController {
   }
 
   public onView(state: NavigationFlowViewState) {
+    this.pendingUpdate = undefined;
     const viewId = state.ref;
 
     const source = this.hooks.resolveView.call(
