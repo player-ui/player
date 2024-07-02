@@ -10,24 +10,7 @@ swiftui_plugin(
         "//plugins/pending-transaction/swiftui:PlayerUISwiftUIPendingTransactionPlugin"
     ],
     test_deps = [
-        "//ios/test-utils:PlayerUITestUtilities",
-    ]
-)
-
-# This is the only plugin with XCUITests
-# so it's not in the macro currently
-ios_ui_test(
-    name = "PlayerUIReferenceAssetsUITests",
-    srcs = glob(["UITests/**/*.swift"]),
-    minimum_os_version = "14.0",
-    deps = [
-        "//ios/swiftui:PlayerUISwiftUI", 
-        "//ios/core:PlayerUI", 
-        "//ios/test-utils:PlayerUITestUtilities", 
-        "//ios/test-utils-core:PlayerUITestUtilitiesCore", 
-        "//ios/internal-test-utils:PlayerUIInternalTestUtilities",
-        ":PlayerUIReferenceAssets"
+        "//ios/test-utils:PlayerUITestUtilities"
     ],
-    visibility = ["//visibility:public"],
-    test_host = "//ios/demo:PlayerUIDemo"
+    hasUITests = True
 )
