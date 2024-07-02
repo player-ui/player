@@ -12,10 +12,16 @@ cc_library(
         "JJSIValue.h",
     ],
     copts = ["-std=c++17"],
+    visibility = ["//visibility:public"],
+    # TODO: Wrap in select for Android so it dynamically uses NDK vs @rules_jni//jni
     deps = [
-        "@hermes",
-        "@fbjni",
-        # TODO: Wrap in select for Android so it uses NDK
+        # Android deps
+        #        "@fbjni//:android",
+        "@hermes_android//:libhermes_headers",
+        # Host deps
+        "@fbjni//:host",
+        "@hermes//:libjsi_headers",
+        #        "@hermes//:host",
         "@rules_jni//jni",
     ],
     alwayslink = True,
@@ -24,19 +30,20 @@ cc_library(
 cc_binary(
     name = "libhermes_jni.so",
     linkshared = True,
+    visibility = ["//visibility:public"],
     deps = [":hermes_jni"],
 )
 
 # Extract out our shared libraries for packaging so we can control where they're at in the JAR
 copy_output(
     name = "libhermes",
-    srcs = ["@hermes"],
+    srcs = ["@hermes//:host"],
     file = "libhermes.dylib",
 )
 
 copy_output(
     name = "libjsi",
-    srcs = ["@hermes"],
+    srcs = ["@hermes//:host"],
     file = "libjsi.dylib",
 )
 

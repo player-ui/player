@@ -6,7 +6,9 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "@hermes_android//:libhermes_headers",
+        # RN JSI headers do change runtime
         "@hermes_jsi//:libjsi_headers",
+        # "@hermes//:libjsi_headers",
     ],
 )
 

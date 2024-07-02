@@ -4,7 +4,7 @@ load(":deps.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
 java_library(
     name = "fbjni",
     resource_strip_prefix = "external/fbjni",
-    resources = ["@fbjni"],
+    resources = ["@fbjni//:host"],
 )
 
 kt_player_module(
@@ -20,7 +20,8 @@ java_binary(
     name = "app",
     main_class = "com.intuit.playerui.hermes.bridge.runtime.HermesRuntimeKt",
     runtime_deps = [
-        #        ":fbjni",
+        ":fbjni",
         ":hermes",
+        "//jvm/hermes/src/main/jni:resources",
     ],
 )
