@@ -7,8 +7,8 @@ maven_main = [
     #"@maven//:com_squareup_leakcanary_leakcanary_android",
 
     # TODO: Pull these from j2v8-android-debug
-    "@android_j2v8//aar",
-    "@maven//:com_facebook_stetho_stetho",
+    #    "@maven//:com_github_AlexTrotsenko_j2v8_debugger",
+    #    "@maven//:com_facebook_stetho_stetho",
 
     # TODO: Pull these from hermes-android
     #    "@maven//:com_facebook_fbjni_fbjni",

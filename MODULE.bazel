@@ -185,9 +185,8 @@ maven.install(
         "com.facebook.stetho:stetho:1.5.1",
 
         # Hermes
-        # TODO: Using prebuilt android hermes artifact for POC, can build manually for optimization
-        "com.facebook.react:hermes-android:0.74.1",
         "com.facebook.fbjni:fbjni-java-only:0.6.0",
+        "com.facebook.fbjni:fbjni:0.6.0",
         "com.facebook.soloader:soloader:0.11.0",
 
         # Test utils
