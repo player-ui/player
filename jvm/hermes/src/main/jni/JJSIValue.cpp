@@ -31,7 +31,7 @@ local_ref<JJSIValue::jhybridobject> JJSIRuntime::evaluatePreparedJavaScript(alia
 }
 
 void JJSIRuntime::queueMicrotask(alias_ref<JJSIFunction_jhybridobject> callback) {
-    get_runtime().queueMicrotask(callback->cthis()->get_function());
+//    get_runtime().queueMicrotask(callback->cthis()->get_function());
 }
 
 bool JJSIRuntime::drainMicrotasks(int maxMicrotasksHint) {

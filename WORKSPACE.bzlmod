@@ -62,6 +62,7 @@ http_archive(
 git_repository(
     name = "react_native",
     build_file = "//third_party/rn:react_native.BUILD",
+    patches = ["//patches:react_native.loosen_host_function_params.patch"],
     remote = "https://github.com/facebook/react-native",
     tag = "v{}".format(RN_VERSION),
 )

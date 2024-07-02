@@ -1,7 +1,7 @@
 load(":copy_output.bzl", "copy_output")
 
 cc_library(
-    name = "hermes_jni",
+    name = "hermes_jni_lib",
     srcs = [
         "JHermesRuntime.cpp",
         "JJSIValue.cpp",
@@ -16,13 +16,14 @@ cc_library(
     # TODO: Wrap in select for Android so it dynamically uses NDK vs @rules_jni//jni
     deps = [
         # Android deps
-        #        "@fbjni//:android",
+        "@fbjni//:android",
         "@rn_hermes_android//:libhermes_headers",
+        "@react_native//:libjsi_headers",
         # Host deps
-        "@fbjni//:host",
-        "@hermes//:libjsi_headers",
+        #        "@fbjni//:host",
+        #        "@hermes//:libjsi_headers",
         #        "@hermes//:host",
-        "@rules_jni//jni",
+        #        "@rules_jni//jni",
     ],
     alwayslink = True,
 )
@@ -31,7 +32,12 @@ cc_binary(
     name = "libhermes_jni.so",
     linkshared = True,
     visibility = ["//visibility:public"],
-    deps = [":hermes_jni"],
+    deps = [
+        ":hermes_jni_lib",
+
+        # This is the prebuilt Android binary
+        "//jvm/hermes/libs:libfbjni",
+    ],
 )
 
 # Extract out our shared libraries for packaging so we can control where they're at in the JAR

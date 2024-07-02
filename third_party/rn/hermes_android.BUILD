@@ -26,16 +26,45 @@ config_setting(
     },
 )
 
+cc_import(
+    name = "arm64-v8a_hermes",
+    shared_library = ":prefab/modules/libhermes/libs/android.arm64-v8a/libhermes.so",
+    visibility = ["//visibility:public"],
+)
+
+cc_import(
+    name = "armeabi-v7a_hermes",
+    shared_library = ":prefab/modules/libhermes/libs/android.armeabi-v7a/libhermes.so",
+    visibility = ["//visibility:public"],
+)
+
+cc_import(
+    name = "x86_hermes",
+    shared_library = ":prefab/modules/libhermes/libs/android.x86/libhermes.so",
+    visibility = ["//visibility:public"],
+)
+
+cc_import(
+    name = "x86_64_hermes",
+    shared_library = ":prefab/modules/libhermes/libs/android.x86_64/libhermes.so",
+    visibility = ["//visibility:public"],
+)
+
 cc_library(
     name = "libhermes_headers",
     hdrs = glob(["prefab/modules/libhermes/include/**/*.h"]),
-    #    shared_library = select({
-    #        ":arm64-v8a": "prefab/modules/libhermes/libs/android.arm64-v8a/libhermes.so",
-    #        ":armeabi-v7a": "prefab/modules/libhermes/libs/android.armeabi-v7a/libhermes.so",
-    #        ":x86": "prefab/modules/libhermes/libs/android.x86/libhermes.so",
-    #        ":x86_64": "prefab/modules/libhermes/libs/android.x86_64/libhermes.so",
-    #        "//conditions:default": "prefab/modules/libhermes/libs/android.arm64-v8a/libhermes.so",
-    #    }),
     strip_include_prefix = "prefab/modules/libhermes/include",
     visibility = ["//visibility:public"],
+)
+
+java_library(
+    name = "prebuilt-rn-hermes-android",
+    visibility = ["//visibility:public"],
+    runtime_deps = select({
+        ":arm64-v8a": [":arm64-v8a_hermes"],
+        ":armeabi-v7a": [":armeabi-v7a_hermes"],
+        ":x86": [":x86_hermes"],
+        ":x86_64": [":x86_64_hermes"],
+        "//conditions:default": [],
+    }),
 )
