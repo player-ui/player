@@ -1,5 +1,7 @@
 main_exports = [
-    "//jvm/j2v8:j2v8-android",
+    # TODO: These should absolutely not be exported via android player
+    #    "//jvm/j2v8:j2v8-android",
+    "//jvm/hermes:hermes-android",
 ]
 
 dev_exports = [

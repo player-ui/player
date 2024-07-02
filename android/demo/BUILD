@@ -1,8 +1,9 @@
 load("@rules_android//android:rules.bzl", "android_binary", "android_library")
+load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_import")
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
-load(":deps.bzl", "main_deps", "test_deps")
 load("@rules_player//kotlin:defs.bzl", "lint")
+load(":deps.bzl", "main_deps", "test_deps")
 
 kt_android_library(
     name = "demo_lib",
@@ -15,15 +16,24 @@ kt_android_library(
 
 android_binary(
     name = "demo",
-    custom_package = "com.intuit.playerui.android.reference.demo",
     assets = glob(["src/main/assets/mocks/**"]),
     assets_dir = "src/main/assets",
+    custom_package = "com.intuit.playerui.android.reference.demo",
     dex_shards = 3,
     manifest = ":src/main/AndroidManifest.xml",
     multidex = "native",
     deps = [
         ":demo_lib",
-        "@maven//:org_jetbrains_kotlin_kotlin_reflect",
+        #        "@maven//:com_eclipsesource_j2v8_j2v8",
+        #        "@maven//:com_facebook_react_hermes_android",
+        #        "//jvm/hermes/libs:hermes-android",
+        #        "//jvm/hermes/libs:jsi-android",
+        #        "@maven//:org_jetbrains_kotlin_kotlin_reflect",
+        #        "//jvm/hermes/libs:arm64-v8a-jsi",
+        #        "//jvm/hermes/src/main/jni:hermes_jni",
+        #        "//jvm/hermes/libs:armeabi-v7a-jsi",
+        #        "//jvm/hermes/libs:x86_64_jsi",
+        #        "//jvm/hermes/libs:x86_jsi",
     ],
 )
 
