@@ -33,7 +33,7 @@ export class AsyncNodePlugin implements PlayerPlugin {
       viewController.hooks.view.tap(this.name, (view) => {
         view.hooks.parser.tap(this.name, (parser) => {
           parser.hooks.determineNodeType.tap(this.name, (obj) => {
-            if (Object.prototype.hasOwnProperty.call(obj, 'async')) {
+            if (obj && Object.prototype.hasOwnProperty.call(obj, 'async')) {
               return NodeType.Async;
             }
           });

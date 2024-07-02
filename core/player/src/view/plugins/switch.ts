@@ -35,8 +35,9 @@ export default class SwitchPlugin implements ViewPlugin {
 
     parser.hooks.determineNodeType.tap('switch', (obj) => {
       if (
-        Object.prototype.hasOwnProperty.call(obj, 'dynamicSwitch') ||
-        Object.prototype.hasOwnProperty.call(obj, 'staticSwitch')
+        obj &&
+        (Object.prototype.hasOwnProperty.call(obj, 'dynamicSwitch') ||
+          Object.prototype.hasOwnProperty.call(obj, 'staticSwitch'))
       ) {
         return NodeType.Switch;
       }
@@ -55,31 +56,34 @@ export default class SwitchPlugin implements ViewPlugin {
           const switchContent =
             'dynamicSwitch' in obj ? obj.dynamicSwitch : obj.staticSwitch;
 
-          const cases: Node.SwitchCase[] = [];
+          const cases: Node.SwitchCase[] = switchContent
+            .map(
+              (switchCase: {
+                [x: string]: any;
+                /**
+                 *
+                 */
+                case: any;
+              }) => {
+                const { case: switchCaseExpr, ...switchBody } = switchCase;
+                const value = parser.parseObject(
+                  switchBody,
+                  NodeType.Value,
+                  options
+                );
 
-          switchContent.forEach(
-            (switchCase: {
-              [x: string]: any;
-              /**
-               *
-               */
-              case: any;
-            }) => {
-              const { case: switchCaseExpr, ...switchBody } = switchCase;
-              const value = parser.parseObject(
-                switchBody,
-                NodeType.Value,
-                options
-              );
+                if (value) {
+                  return {
+                    case: switchCaseExpr,
+                    value: value as Node.Value,
+                  };
+                }
 
-              if (value) {
-                cases.push({
-                  case: switchCaseExpr,
-                  value: value as Node.Value,
-                });
+                // eslint-disable-next-line no-useless-return
+                return;
               }
-            }
-          );
+            )
+            .filter(Boolean);
 
           const switchAST = parser.hooks.onCreateASTNode.call(
             {
@@ -90,18 +94,18 @@ export default class SwitchPlugin implements ViewPlugin {
             obj
           );
 
-          if (switchAST?.type === NodeType.Switch) {
+          if (!switchAST || switchAST.type === NodeType.Empty) {
+            return null;
+          }
+
+          if (switchAST.type === NodeType.Switch) {
             switchAST.cases.forEach((sCase) => {
               // eslint-disable-next-line no-param-reassign
               sCase.value.parent = switchAST;
             });
           }
 
-          if (switchAST?.type === NodeType.Empty) {
-            return null;
-          }
-
-          return switchAST ?? null;
+          return switchAST;
         }
       }
     );

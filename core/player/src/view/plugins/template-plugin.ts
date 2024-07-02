@@ -100,6 +100,11 @@ export default class TemplatePlugin implements ViewPlugin {
       values,
     };
 
+    result.values.forEach((value) => {
+      // eslint-disable-next-line no-param-reassign
+      value.parent = result;
+    });
+
     return result;
   }
 
