@@ -11,5 +11,6 @@ swiftui_plugin(
     ],
     test_deps = [
         "//ios/test-utils:PlayerUITestUtilities"
-    ]
+    ],
+    hasUITests = True
 )
