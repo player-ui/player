@@ -1,7 +1,7 @@
 import get from 'dlv';
 
 import type { ParserSuccessResult } from '../../binding-grammar';
-import { parseParsimmon } from '../../binding-grammar';
+import { parseCustom } from '../../binding-grammar';
 import { resolveBindingAST } from '../resolver';
 import { getBindingSegments } from '../utils';
 
@@ -33,7 +33,7 @@ const testCases: Array<[string, string]> = [
 ];
 
 test.each(testCases)('Resolving binding: %s', (binding, expectedResolved) => {
-  const parsedBinding = parseParsimmon(binding);
+  const parsedBinding = parseCustom(binding);
   expect(parsedBinding.status).toBe(true);
   const actual = resolveBindingAST(
     (parsedBinding as ParserSuccessResult).path,
@@ -48,7 +48,7 @@ test.each(testCases)('Resolving binding: %s', (binding, expectedResolved) => {
 });
 
 test('works for nested keys', () => {
-  const parsedBinding = parseParsimmon('foo.{{BASE_PATH}}.bar');
+  const parsedBinding = parseCustom('foo.{{BASE_PATH}}.bar');
   expect(parsedBinding.status).toBe(true);
 
   const resolved = resolveBindingAST(
@@ -65,7 +65,7 @@ test('works for nested keys', () => {
 
 describe('expressions', () => {
   test('evaluates expressions as paths', () => {
-    const parsedBinding = parseParsimmon('foo.bar.`exp()`');
+    const parsedBinding = parseCustom('foo.bar.`exp()`');
 
     const evaluate = jest.fn().mockReturnValue(100);
     const resolved = resolveBindingAST(
