@@ -31,7 +31,7 @@ http_archive(
 
 load("@rules_player//:workspace.bzl", "deps")
 
-deps()
+deps(android_api_version = 31)
 
 load("@rules_player//:conf.bzl", "apple", "javascript", "kotlin")
 
@@ -146,7 +146,10 @@ overridden_targets = {
     "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm": "@//android/demo:kotlinx_coroutines_core_jvm_fixed",
 }
 
-android_ndk_repository(name = "androidndk")
+android_ndk_repository(
+    name = "androidndk",
+   api_level=21
+)
 
 register_toolchains("@androidndk//:all")
 

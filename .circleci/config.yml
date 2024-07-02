@@ -16,21 +16,21 @@ orbs:
 executors:
   base:
     docker:
-      - image: docker.io/playerui/bazel-docker:7
+      - image: docker.io/playerui/bazel-docker:8
     working_directory: ~/player
     resource_class: xlarge
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   ios:
     working_directory: ~/player
-    resource_class: macos.x86.medium.gen2
+    resource_class: macos.m1.medium.gen1
     macos:
       xcode: 14.3
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   android:
     machine:
-      image: android:202102-01
+      image: android:2024.04.1
     working_directory: ~/player
     resource_class: large
     environment:
@@ -42,7 +42,6 @@ commands:
     steps:
       - attach_workspace:
           at: ~/player
-
       - restore_cache:
           keys:
             - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
@@ -114,10 +113,16 @@ jobs:
       - attach_workspace:
           at: ~/player
 
+      - macos/install-rosetta
+
       - run:
           name: Homebrew Dependencies
+          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
           command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@8
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      - run:
+          command: |
+            HOMEBREW_NO_AUTO_UPDATE=1 arch -x86_64 /usr/local/bin/brew install bazelisk maven openjdk@8
 
       - run:
           name: Set Ruby Version
@@ -157,7 +162,10 @@ jobs:
             - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
             - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
 
-      - run: bundle install
+      - run:
+          command: |
+            bundle config build.nokogiri --use-system-libraries
+            bundle install
 
       - save_cache:
           key: gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
@@ -233,10 +241,22 @@ jobs:
             sudo ln -s /opt/bazelisk-v1.11.0/bazelisk /usr/local/bin/bazel
 
       - run:
-          name: Create avd
+          name: Install Android tools
           command: |
-            sdkmanager "system-images;android-29;default;x86"
-            echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-29;default;x86"
+            rm -rf $ANDROID_HOME/build-tools/*
+            JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64 \
+              $ANDROID_HOME/tools/bin/sdkmanager "build-tools;30.0.3"\
+              "ndk;21.4.7075529" \
+              "system-images;android-31;default;x86_64"
+            echo "export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/21.4.7075529"  >> $BASH_ENV
+            source $BASH_ENV
+            echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-31;default;x86_64" -g default
+             source $BASH_ENV
+
+      - run:
+          name: Set python to 2.7
+          command: |
+            pyenv global 2.7  
 
       - run:
           name: Launch emulator
