@@ -5,9 +5,9 @@ cc_library(
     copts = ["-std=c++17"],
     visibility = ["//visibility:public"],
     deps = [
-        "@hermes_android//:libhermes_headers",
+        "@rn_hermes_android//:libhermes_headers",
         # RN JSI headers do change runtime
-        "@hermes_jsi//:libjsi_headers",
+        "@react_native//:libjsi_headers",
         # "@hermes//:libjsi_headers",
     ],
 )

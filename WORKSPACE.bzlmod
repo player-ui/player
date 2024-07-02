@@ -51,16 +51,17 @@ git_repository(
 
 RN_VERSION = "0.74.1"
 
-# TODO: Rename repos for RN
+# Pull prefab Android Hermes built against React Native JSI
 http_archive(
-    name = "hermes_android",
-    build_file = "//third_party/hermes_android:BUILD",
+    name = "rn_hermes_android",
+    build_file = "//third_party/rn:hermes_android.BUILD",
     url = "https://repo1.maven.org/maven2/com/facebook/react/hermes-android/{}/hermes-android-{}-debug.aar".format(RN_VERSION, RN_VERSION),
 )
 
+# Access to React Native JSI override
 git_repository(
-    name = "hermes_jsi",
-    build_file = "//third_party/hermes_jsi:BUILD",
+    name = "react_native",
+    build_file = "//third_party/rn:react_native.BUILD",
     remote = "https://github.com/facebook/react-native",
     tag = "v{}".format(RN_VERSION),
 )

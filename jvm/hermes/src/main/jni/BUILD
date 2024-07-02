@@ -17,7 +17,7 @@ cc_library(
     deps = [
         # Android deps
         #        "@fbjni//:android",
-        "@hermes_android//:libhermes_headers",
+        "@rn_hermes_android//:libhermes_headers",
         # Host deps
         "@fbjni//:host",
         "@hermes//:libjsi_headers",
