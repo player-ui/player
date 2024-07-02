@@ -7,48 +7,37 @@ filegroup(
     srcs = glob(["**"]),
 )
 
-filegroup(
-    name = "headers",
-    srcs = glob(["cxx/**/*.h"]),
+cmake(
+    name = "host",
+    cache_entries = {
+        # JAVA_HOME: "$(JAVABASE)",
+        "JAVA_HOME": "/Users/jzucker/.sdkman/candidates/java/current",  # TODO: This won't work
+        "CMAKE_BUILD_TYPE": "Release",
+        "FBJNI_SKIP_TESTS": "true",
+    },
+    generate_args = ["-G Ninja"],
+    lib_name = "fbjni",
+    lib_source = "working_directory",
+    out_shared_libs = ["libfbjni.dylib"],
     visibility = ["//visibility:public"],
 )
 
 cmake(
-    # NOTE: This _may_ only be compatible with OSX, will need to x-compile for other platforms
-    name = "fbjni_osx",
+    name = "android",
     cache_entries = {
-        #        "JAVA_HOME": "$(JAVA_HOME)",
-        #        "JAVA_HOME": java_home("@bazel_tools//tools/jdk:current_java_runtime"),
-        "JAVA_HOME": "/Users/jzucker/.sdkman/candidates/java/current",  # TODO: This won't work
-        "CMAKE_BUILD_TYPE": "Debug",
-        #        "CMAKE_INSTALL_MODE": "COPY",
-        #        "GTEST_LIB": "@googletest",
+        "ANDROID_ABI": "True",
+        "CMAKE_BUILD_TYPE": "Release",
         "FBJNI_SKIP_TESTS": "true",
     },
-    #    install_args = ["install_args"]
-    #    env = {
-    #        "CMAKE_INSTALL_MODE": "COPY",
-    #    },
-    generate_args = ["-GNinja"],
+    generate_args = ["-G Ninja"],
     lib_name = "fbjni",
     lib_source = "working_directory",
-    #    out_lib_dir = "",
-    out_shared_libs = [
-        "libfbjni.dylib",
-    ],
-    #    tags = ["no-sandbox"],
+    out_shared_libs = ["libfbjni.dylib"],
     visibility = ["//visibility:public"],
 )
 
-#cc_library(
-#    name = "fbjni",
-#    hdrs = [":headers"],
-#    visibility = ["//visibility:public"],
-#    deps = [":fbjni_osx"],
-#)
-#
 alias(
     name = "fbjni",
-    actual = "fbjni_osx",
+    actual = "fbjni_host",
     visibility = ["//visibility:public"],
 )

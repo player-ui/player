@@ -1,13 +1,13 @@
-load("//:build_constants.bzl", "build_constants")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 load("@bazel_tools//tools/build_defs/repo:maven_rules.bzl", "maven_aar")
+load("//:build_constants.bzl", "build_constants")
 
 build_constants()
 
 android_sdk_repository(
     name = "androidsdk",
-    api_level = 33
+    api_level = 33,
 )
 
 maven_aar(
@@ -23,16 +23,14 @@ bind(
 http_file(
     name = "android_test_orchestrator_apk",
     sha256 = "b7a2e7d0184b03e12c7357f3914d539da40b52a11e90815edff1022c655f459b",
-    url = "https://dl.google.com/android/maven2/androidx/test/orchestrator/1.4.2/orchestrator-1.4.2.apk"
+    url = "https://dl.google.com/android/maven2/androidx/test/orchestrator/1.4.2/orchestrator-1.4.2.apk",
 )
 
 http_file(
     name = "android_test_services_apk",
     sha256 = "c6bc74268b29bdabad8da962e00e2f6fd613c24b42c69e81b258397b4819f156",
-    url = "https://dl.google.com/android/maven2/androidx/test/services/test-services/1.4.2/test-services-1.4.2.apk"
+    url = "https://dl.google.com/android/maven2/androidx/test/services/test-services/1.4.2/test-services-1.4.2.apk",
 )
-
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 # Hermes
 git_repository(
@@ -49,4 +47,20 @@ git_repository(
     commit = "968e3815f92aeb0670f5d88ae975fbbd47a4b482",
     patches = ["//patches:fbjni.install_headers.patch"],
     remote = "https://github.com/facebookincubator/fbjni",
+)
+
+RN_VERSION = "0.74.1"
+
+# TODO: Rename repos for RN
+http_archive(
+    name = "hermes_android",
+    build_file = "//third_party/hermes_android:BUILD",
+    url = "https://repo1.maven.org/maven2/com/facebook/react/hermes-android/{}/hermes-android-{}-debug.aar".format(RN_VERSION, RN_VERSION),
+)
+
+git_repository(
+    name = "hermes_jsi",
+    build_file = "//third_party/hermes_jsi:BUILD",
+    remote = "https://github.com/facebook/react-native",
+    tag = "v{}".format(RN_VERSION),
 )

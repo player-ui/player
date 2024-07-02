@@ -1,11 +1,15 @@
 diff --git CMakeLists.txt CMakeLists.txt
-index 74425a2..2e592aa 100644
+index 74425a2..35cb8cc 100644
 --- CMakeLists.txt
 +++ CMakeLists.txt
-@@ -110,6 +110,10 @@ install(TARGETS fbjni EXPORT fbjniLibraryConfig
+@@ -110,6 +110,14 @@ install(TARGETS fbjni EXPORT fbjniLibraryConfig
  install(EXPORT fbjniLibraryConfig DESTINATION share/cmake/fbjni
    FILE fbjniLibraryConfig.cmake)
  
++install(EXPORT fbjniLibraryConfig DESTINATION share/cmake/fbjni
++        FILE fbjniConfig.cmake
++        NAMESPACE fbjni::)
++
 +install(DIRECTORY $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/cxx/> DESTINATION include
 +  FILES_MATCHING PATTERN "*.h"
 +  PATTERN "")
