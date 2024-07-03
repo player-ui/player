@@ -7,6 +7,13 @@ filegroup(
     srcs = glob(["**"]),
 )
 
+cc_library(
+    name = "libfbjni_headers",
+    hdrs = glob(["cxx/fbjni/**/*.h"]),
+    strip_include_prefix = "cxx",
+    visibility = ["//visibility:public"],
+)
+
 cmake(
     name = "host",
     cache_entries = {

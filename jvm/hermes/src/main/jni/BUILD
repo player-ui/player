@@ -29,7 +29,7 @@ cc_library(
     deps = [
         # Android deps
         # TODO: make the below just the headers to push all linking to platform specific targets
-        "@fbjni//:android",
+        "@fbjni//:libfbjni_headers",
         "@rn_hermes_android//:libhermes_headers",
         "@react_native//:libjsi_headers",
         # Host deps
@@ -45,13 +45,8 @@ cc_library(
 cc_binary(
     name = "libhermes_jni.so",
     linkshared = True,
-    visibility = ["//visibility:public"],
     deps = [
         ":hermes_jni_lib",
-
-        # This is the prebuilt Android binary
-        #        "//jvm/hermes/libs:libfbjni",
-        #        "//jvm/hermes/libs:libc++_shared",
     ],
 )
 

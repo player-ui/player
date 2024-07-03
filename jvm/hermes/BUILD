@@ -24,8 +24,6 @@ java_library(
         ":hermes",
         "//jvm/hermes/src/main/jni:resources",
     ],
-    # TODO: Move to resources
-    runtime_deps = ["//jvm/hermes/src/main/jni:libhermes_jni.so"],
 )
 
 android_library(
@@ -37,14 +35,14 @@ android_library(
         ":hermes",
 
         # Prebuilt TODO: We'd like to build all these at some point
+        "//jvm/hermes/libs:prebuilt-rn-libc++_shared-android",
         "//jvm/hermes/libs:prebuilt-rn-libfbjni-android",
         "//jvm/hermes/libs:prebuilt-rn-libjsi-android",
         "@rn_hermes_android//:libhermes",
-        # Looks like this needs to pull in the library to be built for the app
         "//jvm/hermes/src/main/jni:hermes_jni_lib",
-        # NOTE: Keep this so we get the transitive dep in the POM
-        "@maven//:com_facebook_fbjni_fbjni",
-        "@maven//:com_facebook_react_hermes_android",
+        # NOTE: Keep this so we get the transitive dep in the POM - unless we bundle everything together into 1 so
+        #        "@maven//:com_facebook_fbjni_fbjni",
+        #        "@maven//:com_facebook_react_hermes_android",
     ],
 )
 
