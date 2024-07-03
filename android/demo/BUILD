@@ -24,16 +24,6 @@ android_binary(
     multidex = "native",
     deps = [
         ":demo_lib",
-        #        "@maven//:com_eclipsesource_j2v8_j2v8",
-        #        "@maven//:com_facebook_react_hermes_android",
-        #        "//jvm/hermes/libs:hermes-android",
-        #        "//jvm/hermes/libs:jsi-android",
-        #        "@maven//:org_jetbrains_kotlin_kotlin_reflect",
-        #        "//jvm/hermes/libs:arm64-v8a-jsi",
-        #        "//jvm/hermes/src/main/jni:hermes_jni",
-        #        "//jvm/hermes/libs:armeabi-v7a-jsi",
-        #        "//jvm/hermes/libs:x86_64_jsi",
-        #        "//jvm/hermes/libs:x86_jsi",
     ],
 )
 

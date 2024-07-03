@@ -55,7 +55,7 @@ RN_VERSION = "0.74.1"
 http_archive(
     name = "rn_hermes_android",
     build_file = "//third_party/rn:hermes_android.BUILD",
-    url = "https://repo1.maven.org/maven2/com/facebook/react/hermes-android/{}/hermes-android-{}-debug.aar".format(RN_VERSION, RN_VERSION),
+    url = "https://repo1.maven.org/maven2/com/facebook/react/hermes-android/{}/hermes-android-{}-release.aar".format(RN_VERSION, RN_VERSION),
 )
 
 # Access to React Native JSI override

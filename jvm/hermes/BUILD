@@ -17,24 +17,35 @@ kt_player_module(
     test_package = "com.intuit.playerui",
 )
 
+# TODO: This should be the thing that contains the resource delegate loader source code and auto-initializer
+java_library(
+    name = "hermes-host",
+    exports = [
+        ":hermes",
+        "//jvm/hermes/src/main/jni:resources",
+    ],
+    # TODO: Move to resources
+    runtime_deps = ["//jvm/hermes/src/main/jni:libhermes_jni.so"],
+)
+
 android_library(
     name = "hermes-android",
-    # TODO: Build RN libjsi if we can
-    # resources = ["@react_native//:libjsi.so"],
     tags = ["maven_coordinates=%s:%s:%s" % (DEFAULT_GROUP, "hermes-android", VERSION)],
     visibility = ["//visibility:public"],
     exports = [
+        # Kotlin Hermes JNI Runtime
         ":hermes",
 
-        # TODO: Gonna look into if these are actually compatible
+        # Prebuilt TODO: We'd like to build all these at some point
         "//jvm/hermes/libs:prebuilt-rn-libfbjni-android",
         "//jvm/hermes/libs:prebuilt-rn-libjsi-android",
+        "@rn_hermes_android//:libhermes",
         # Looks like this needs to pull in the library to be built for the app
         "//jvm/hermes/src/main/jni:hermes_jni_lib",
+        # NOTE: Keep this so we get the transitive dep in the POM
         "@maven//:com_facebook_fbjni_fbjni",
-        "@rn_hermes_android//:prebuilt-rn-hermes-android",
+        "@maven//:com_facebook_react_hermes_android",
     ],
-    #    runtime_deps = ["//jvm/hermes/src/main/jni:libhermes_jni.so"],
 )
 
 distribution(
@@ -42,10 +53,12 @@ distribution(
     maven_coordinates = "%s:%s:%s" % (DEFAULT_GROUP, "hermes-android", VERSION),
 )
 
+# TODO: This probably isn't necessary anymore
 java_binary(
     name = "app",
     main_class = "com.intuit.playerui.hermes.bridge.runtime.HermesRuntimeKt",
     runtime_deps = [
+        # TODO: Swap to hermes-host w/ app src
         ":fbjni",
         ":hermes",
         "//jvm/hermes/src/main/jni:resources",

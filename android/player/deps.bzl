@@ -1,8 +1,4 @@
-main_exports = [
-    # TODO: These should absolutely not be exported via android player
-    #    "//jvm/j2v8:j2v8-android",
-    "//jvm/hermes:hermes-android",
-]
+main_exports = []
 
 dev_exports = [
     "//jvm/j2v8:j2v8-android-debug",
@@ -16,6 +12,11 @@ main_deps = [
     "@maven//:androidx_lifecycle_lifecycle_runtime_ktx",
     "@maven//:androidx_lifecycle_lifecycle_viewmodel_ktx",
     "@maven//:androidx_constraintlayout_constraintlayout",
+
+    # Runtime Implementation
+    # TODO: Should this default to hermes? It'd be nice to have a trial configuration.. maybe we add documentation for how to opt in?
+    "//jvm/hermes:hermes-android",
+
     # JVM plugin deps
     "//plugins/beacon/jvm:beacon",
     "//plugins/pubsub/jvm:pubsub",

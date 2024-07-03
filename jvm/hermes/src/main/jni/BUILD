@@ -11,11 +11,24 @@ cc_library(
         "JHermesRuntime.h",
         "JJSIValue.h",
     ],
-    copts = ["-std=c++17"],
+    # TODO: Likely need to add the flags to disable parts of Hermes that is excluded from MinRelSize release build
+    copts = [
+        "-std=c++17",
+
+        # cmake Release
+        # "-O3",
+        # "-DNDEBUG",
+
+        # cmake MinSizeRel
+        # TODO: we should really create a config setting to map cmake build type to copts and use to pass to cmake builds too
+        "-Os",
+        "-DNDEBUG",
+    ],
     visibility = ["//visibility:public"],
     # TODO: Wrap in select for Android so it dynamically uses NDK vs @rules_jni//jni
     deps = [
         # Android deps
+        # TODO: make the below just the headers to push all linking to platform specific targets
         "@fbjni//:android",
         "@rn_hermes_android//:libhermes_headers",
         "@react_native//:libjsi_headers",
@@ -28,6 +41,7 @@ cc_library(
     alwayslink = True,
 )
 
+# This is really only for host
 cc_binary(
     name = "libhermes_jni.so",
     linkshared = True,
@@ -36,7 +50,8 @@ cc_binary(
         ":hermes_jni_lib",
 
         # This is the prebuilt Android binary
-        "//jvm/hermes/libs:libfbjni",
+        #        "//jvm/hermes/libs:libfbjni",
+        #        "//jvm/hermes/libs:libc++_shared",
     ],
 )
 

@@ -5,15 +5,6 @@ maven_main = [
     "@maven//:com_afollestad_material_dialogs_core",
     "@maven//:com_google_android_material_material",
     #"@maven//:com_squareup_leakcanary_leakcanary_android",
-
-    # TODO: Pull these from j2v8-android-debug
-    #    "@maven//:com_github_AlexTrotsenko_j2v8_debugger",
-    #    "@maven//:com_facebook_stetho_stetho",
-
-    # TODO: Pull these from hermes-android
-    #    "@maven//:com_facebook_fbjni_fbjni",
-    #    "@maven//:com_facebook_react_hermes_android",
-    "@maven//:com_facebook_fbjni_fbjni",
 ]
 
 maven_test = [
