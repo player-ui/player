@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import type { Node, InProgressState } from "@player-ui/player";
+import { Node, InProgressState, ViewInstance } from "@player-ui/player";
 import { Player } from "@player-ui/player";
 import { waitFor } from "@testing-library/react";
 import { AsyncNodePlugin, AsyncNodePluginPlugin } from "./index";
@@ -18,7 +18,7 @@ const basicFRFWithActions = {
           },
         },
         {
-          id: "uhh",
+          id: "nodeId",
           async: "true",
         },
       ],
@@ -36,6 +36,83 @@ const basicFRFWithActions = {
     },
   },
 };
+
+const asyncNodeTest = async (resolvedValue: any) => {
+  const plugin = new AsyncNodePlugin({
+    plugins: [new AsyncNodePluginPlugin()],
+  });
+
+  let deferredResolve: ((value: any) => void) | undefined;
+
+  plugin.hooks.onAsyncNode.tap("test", async (node: Node.Node) => {
+    return new Promise((resolve) => {
+      deferredResolve = resolve; // Promise would be resolved only once
+    });
+  });
+
+  let updateNumber = 0;
+
+  const player = new Player({ plugins: [plugin] });
+
+  let viewInstance: ViewInstance | undefined;
+
+  player.hooks.viewController.tap("async-node-test", (vc) => {
+    vc.hooks.view.tap("async-node-test", (view) => {
+      viewInstance = view;
+      view.hooks.onUpdate.tap("async-node-test", () => {
+        updateNumber++;
+      });
+    });
+  });
+
+  player.start(basicFRFWithActions as any);
+
+  let view = (player.getState() as InProgressState).controllers.view.currentView
+    ?.lastUpdate;
+
+  expect(view).toBeDefined();
+  expect(view?.actions[0].asset.type).toBe("action");
+  expect(view?.actions[1]).toBeUndefined();
+
+  await waitFor(() => {
+    expect(deferredResolve).toBeDefined();
+  });
+
+  // Consumer responds with null/undefined
+  if (deferredResolve) {
+    deferredResolve(resolvedValue);
+  }
+
+  await waitFor(() => {
+    expect(updateNumber).toBe(2);
+  });
+
+  view = (player.getState() as InProgressState).controllers.view.currentView
+    ?.lastUpdate;
+
+  expect(view?.actions[0].asset.type).toBe("action");
+  expect(view?.actions.length).toBe(1);
+
+  viewInstance.update();
+
+  await waitFor(() => {
+    expect(updateNumber).toBe(3);
+  });
+
+  view = (player.getState() as InProgressState).controllers.view.currentView
+    ?.lastUpdate;
+
+  expect(view?.actions[0].asset.type).toBe("action");
+  expect(view?.actions.length).toBe(1);
+};
+
+test("should return current node view when the resolved node is null", async () => {
+  await asyncNodeTest(null);
+});
+
+test("should return current node view when the resolved node is undefined", async () => {
+  await asyncNodeTest(undefined);
+});
 
 test("replaces async nodes with provided node", async () => {
   const plugin = new AsyncNodePlugin({
