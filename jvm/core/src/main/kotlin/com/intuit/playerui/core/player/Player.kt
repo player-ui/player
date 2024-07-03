@@ -64,8 +64,7 @@ public abstract class Player : Pluggable {
 
         public companion object {
             internal interface HooksByNode : Hooks, NodeWrapper
-            public fun serializer(): KSerializer<Hooks> = Serializer
-            internal operator fun invoke(node: Node): HooksByNode = object : HooksByNode, NodeWrapper {
+            internal operator fun invoke(node: Node): HooksByNode = object : HooksByNode {
                 override val node: Node = node
                 override val flowController: NodeSyncHook1<FlowController> by NodeSerializableField(NodeSyncHook1.serializer(FlowController.serializer()))
                 override val viewController: NodeSyncHook1<ViewController> by NodeSerializableField(NodeSyncHook1.serializer(ViewController.serializer()))
