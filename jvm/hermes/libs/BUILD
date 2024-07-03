@@ -26,19 +26,29 @@ config_setting(
     },
 )
 
+cc_import(
+    name = "empty",
+    system_provided = True,
+)
+
+alias(
+    name = "libc++_shared",
+    actual = select({
+        ":arm64-v8a": "//jvm/hermes/libs/arm64-v8a:libc++_shared",
+        ":armeabi-v7a": "//jvm/hermes/libs/armeabi-v7a:libc++_shared",
+        ":x86": "//jvm/hermes/libs/x86:libc++_shared",
+        ":x86_64": "//jvm/hermes/libs/x86_64:libc++_shared",
+        "//conditions:default": "empty",
+    }),
+    visibility = ["//visibility:public"],
+)
+
 java_library(
     name = "prebuilt-rn-libc++_shared-android",
     visibility = ["//visibility:public"],
-    runtime_deps = select({
-        ":arm64-v8a": ["//jvm/hermes/libs/arm64-v8a:libc++_shared"],
-        ":armeabi-v7a": ["//jvm/hermes/libs/armeabi-v7a:libc++_shared"],
-        ":x86": ["//jvm/hermes/libs/x86:libc++_shared"],
-        ":x86_64": ["//jvm/hermes/libs/x86_64:libc++_shared"],
-        "//conditions:default": [],
-    }),
+    runtime_deps = [":libc++_shared"],
 )
 
-# TODO: Settle on approach for selecting cc_libs - likely just use the alias for the java_library
 alias(
     name = "libfbjni",
     actual = select({
@@ -46,7 +56,7 @@ alias(
         ":armeabi-v7a": "//jvm/hermes/libs/armeabi-v7a:libfbjni",
         ":x86": "//jvm/hermes/libs/x86:libfbjni",
         ":x86_64": "//jvm/hermes/libs/x86_64:libfbjni",
-        "//conditions:default": "//jvm/hermes/libs/arm64-v8a:libfbjni",
+        "//conditions:default": "empty",
     }),
     visibility = ["//visibility:public"],
 )
@@ -54,35 +64,41 @@ alias(
 java_library(
     name = "prebuilt-rn-libfbjni-android",
     visibility = ["//visibility:public"],
-    runtime_deps = select({
-        ":arm64-v8a": ["//jvm/hermes/libs/arm64-v8a:libfbjni"],
-        ":armeabi-v7a": ["//jvm/hermes/libs/armeabi-v7a:libfbjni"],
-        ":x86": ["//jvm/hermes/libs/x86:libfbjni"],
-        ":x86_64": ["//jvm/hermes/libs/x86_64:libfbjni"],
-        "//conditions:default": [],
+    runtime_deps = [":libfbjni"],
+)
+
+alias(
+    name = "libhermes",
+    actual = select({
+        ":arm64-v8a": "//jvm/hermes/libs/arm64-v8a:libhermes",
+        ":armeabi-v7a": "//jvm/hermes/libs/armeabi-v7a:libhermes",
+        ":x86": "//jvm/hermes/libs/x86:libhermes",
+        ":x86_64": "//jvm/hermes/libs/x86_64:libhermes",
+        "//conditions:default": "empty",
     }),
+    visibility = ["//visibility:public"],
 )
 
 java_library(
     name = "prebuilt-rn-libhermes-android",
     visibility = ["//visibility:public"],
-    runtime_deps = select({
-        ":arm64-v8a": ["//jvm/hermes/libs/arm64-v8a:libhermes"],
-        ":armeabi-v7a": ["//jvm/hermes/libs/armeabi-v7a:libhermes"],
-        ":x86": ["//jvm/hermes/libs/x86:libhermes"],
-        ":x86_64": ["//jvm/hermes/libs/x86_64:libhermes"],
-        "//conditions:default": [],
+    runtime_deps = [":libhermes"],
+)
+
+alias(
+    name = "libjsi",
+    actual = select({
+        ":arm64-v8a": "//jvm/hermes/libs/arm64-v8a:libjsi",
+        ":armeabi-v7a": "//jvm/hermes/libs/armeabi-v7a:libjsi",
+        ":x86": "//jvm/hermes/libs/x86:libjsi",
+        ":x86_64": "//jvm/hermes/libs/x86_64:libjsi",
+        "//conditions:default": "empty",
     }),
+    visibility = ["//visibility:public"],
 )
 
 java_library(
     name = "prebuilt-rn-libjsi-android",
     visibility = ["//visibility:public"],
-    runtime_deps = select({
-        ":arm64-v8a": ["//jvm/hermes/libs/arm64-v8a:libjsi"],
-        ":armeabi-v7a": ["//jvm/hermes/libs/armeabi-v7a:libjsi"],
-        ":x86": ["//jvm/hermes/libs/x86:libjsi"],
-        ":x86_64": ["//jvm/hermes/libs/x86_64:libjsi"],
-        "//conditions:default": [],
-    }),
+    runtime_deps = [":libjsi"],
 )

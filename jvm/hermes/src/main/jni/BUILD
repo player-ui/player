@@ -25,29 +25,36 @@ cc_library(
         "-DNDEBUG",
     ],
     visibility = ["//visibility:public"],
-    # TODO: Wrap in select for Android so it dynamically uses NDK vs @rules_jni//jni
     deps = [
-        # Android deps
-        # TODO: make the below just the headers to push all linking to platform specific targets
+        # Just headers, let the binaries link for specific platforms
         "@fbjni//:libfbjni_headers",
         "@rn_hermes_android//:libhermes_headers",
         "@react_native//:libjsi_headers",
-        # Host deps
-        #        "@fbjni//:host",
-        #        "@hermes//:libjsi_headers",
-        #        "@hermes//:host",
-        #        "@rules_jni//jni",
+        # TODO: Definitely need this for host, but it breaks Android
+        # "@rules_jni//jni",
     ],
     alwayslink = True,
+)
+
+# TODO: Hook up to transition and build aar rather than using android_binary
+cc_binary(
+    name = "libhermes_jni_android",
+    linkshared = True,
+    linkstatic = True,
+    deps = [
+        ":hermes_jni_lib",
+        "//jvm/hermes/libs:libc++_shared",
+        "//jvm/hermes/libs:libfbjni",
+        "//jvm/hermes/libs:libjsi",
+        "@rn_hermes_android//:libhermes",
+    ],
 )
 
 # This is really only for host
 cc_binary(
     name = "libhermes_jni.so",
     linkshared = True,
-    deps = [
-        ":hermes_jni_lib",
-    ],
+    deps = [":hermes_jni_lib"],
 )
 
 # Extract out our shared libraries for packaging so we can control where they're at in the JAR
@@ -63,10 +70,18 @@ copy_output(
     file = "libjsi.dylib",
 )
 
+copy_output(
+    name = "libfbjni",
+    srcs = ["@fbjni//:host"],
+    file = "fbjni.dylib",
+)
+
 java_library(
     name = "resources",
     resource_strip_prefix = "jvm/hermes/src/main/jni",
     resources = [
+        # TODO: Do we also need the c++ layer? I don't think so, just need to link the right things
+        ":libfbjni",
         ":libhermes",
         ":libhermes_jni.so",
         ":libjsi",

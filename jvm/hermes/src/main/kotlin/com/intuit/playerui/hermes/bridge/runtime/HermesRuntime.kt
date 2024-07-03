@@ -59,11 +59,10 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
         init {
             if (!NativeLoader.isInitialized()) NativeLoader.init(ResourceLoaderDelegate())
             // need to load fbjni -> jsi|hermes -> hermes_jni
-//            NativeLoader.loadLibrary("fbjni")
-//            NativeLoader.loadLibrary("jsi")
-//            NativeLoader.loadLibrary("hermes")
-//            NativeLoader.loadLibrary("hermes_jni")
-            NativeLoader.loadLibrary("demo")
+            NativeLoader.loadLibrary("fbjni")
+            NativeLoader.loadLibrary("jsi")
+            NativeLoader.loadLibrary("hermes")
+            NativeLoader.loadLibrary("hermes_jni")
         }
 
         @JvmStatic public external fun create(): HermesRuntime

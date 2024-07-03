@@ -2,12 +2,6 @@ load("@build_constants//:constants.bzl", "VERSION")
 load("//jvm:defs.bzl", "DEFAULT_GROUP", "distribution", "kt_player_module")
 load(":deps.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
 
-java_library(
-    name = "fbjni",
-    resource_strip_prefix = "external/fbjni",
-    resources = ["@fbjni//:host"],
-)
-
 kt_player_module(
     name = "hermes",
     main_deps = main_deps,
@@ -26,26 +20,76 @@ java_library(
     ],
 )
 
+genrule(
+    name = "manifest",
+    outs = ["AndroidManifest.xml"],
+    cmd = """
+cat > $(OUTS) <<EOF
+<manifest
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  package="does.not.matter">
+  <uses-sdk android:minSdkVersion="999"/>
+</manifest>
+EOF
+""",
+)
+
+android_binary(
+    # name corresponds to compiled cc_lib
+    name = "hermes_jni",
+    custom_package = "does.not.matter",
+    manifest = ":manifest",
+    deps = [
+        "hermes",
+        "//jvm/hermes/libs:libc++_shared",
+        "//jvm/hermes/libs:libfbjni",
+        "//jvm/hermes/libs:libjsi",
+        "//jvm/hermes/src/main/jni:hermes_jni_lib",
+        "@rn_hermes_android//:libhermes",
+    ],
+)
+
 android_library(
-    name = "hermes-android",
-    tags = ["maven_coordinates=%s:%s:%s" % (DEFAULT_GROUP, "hermes-android", VERSION)],
+    name = "hermes-android-lib",
+    custom_package = "com.intuit.playerui.hermes",
     visibility = ["//visibility:public"],
     exports = [
         # Kotlin Hermes JNI Runtime
         ":hermes",
-
-        # Prebuilt TODO: We'd like to build all these at some point
-        "//jvm/hermes/libs:prebuilt-rn-libc++_shared-android",
-        "//jvm/hermes/libs:prebuilt-rn-libfbjni-android",
-        "//jvm/hermes/libs:prebuilt-rn-libjsi-android",
-        "@rn_hermes_android//:libhermes",
-        "//jvm/hermes/src/main/jni:hermes_jni_lib",
-        # NOTE: Keep this so we get the transitive dep in the POM - unless we bundle everything together into 1 so
-        #        "@maven//:com_facebook_fbjni_fbjni",
-        #        "@maven//:com_facebook_react_hermes_android",
     ],
 )
 
+# TODO: Likely need to wrap in a rule for publishing to work well (using aar_import to test)
+genrule(
+    name = "hermes-android-jni",
+    srcs = [
+        "hermes-android-lib.aar",
+        "hermes_jni_unsigned.apk",
+    ],
+    outs = ["hermes-android-jni.aar"],
+    cmd = """
+cp $(location {}.aar) $(location :{}.aar)
+chmod +w $(location :{}.aar)
+unzip $(location :{}.apk) "lib/*" -d apk
+cp -r apk/lib jni
+zip -r $(location :{}.aar) jni/*/*.so
+""".format("hermes-android-lib", "hermes-android-jni", "hermes-android-jni", "hermes_jni_unsigned", "hermes-android-jni"),
+)
+
+# This is messy as all hell, because we ultimately rely on android_binary for cross compiling our native binaries
+# So, we create an android library to define the base library, and then copy the libs from the apk into the aar
+# and then import it so we get our providers.
+# If we can rely on transitions, then we could potentially create a cc_binary to rely on and pass through a rule
+# that specifies the toolchain for the cc_binary dep and then add to an existing android_library .aar (and re-import (for export))
+aar_import(
+    name = "hermes-android",
+    aar = "hermes-android-jni.aar",
+    tags = ["maven_coordinates=%s:%s:%s" % (DEFAULT_GROUP, "hermes-android", VERSION)],
+    visibility = ["//visibility:public"],
+    deps = [":hermes"],
+)
+
+# TODO: This isn't picking up the AAR, so we'll likely need to wrap in the AAR in a real rule to provide the aar info
 distribution(
     name = "hermes-android",
     maven_coordinates = "%s:%s:%s" % (DEFAULT_GROUP, "hermes-android", VERSION),
@@ -57,8 +101,6 @@ java_binary(
     main_class = "com.intuit.playerui.hermes.bridge.runtime.HermesRuntimeKt",
     runtime_deps = [
         # TODO: Swap to hermes-host w/ app src
-        ":fbjni",
-        ":hermes",
-        "//jvm/hermes/src/main/jni:resources",
+        ":hermes-host",
     ],
 )
