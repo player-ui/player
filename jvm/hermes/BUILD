@@ -31,13 +31,6 @@ android_library(
         # Kotlin Hermes JNI Runtime
         ":hermes",
     ],
-    #    deps = [
-    #        "//jvm/hermes/libs:libc++_shared",
-    #        "//jvm/hermes/libs:libfbjni",
-    #        "//jvm/hermes/libs:libjsi",
-    #        "//jvm/hermes/src/main/jni:hermes_jni_lib",
-    #        "@rn_hermes_android//:libhermes",
-    #    ],
 )
 
 MAVEN_COORDINATES = "%s:%s:aar:%s" % (DEFAULT_GROUP, "hermes-android", VERSION)
@@ -57,7 +50,6 @@ merge_jni_into_android_library(
     exports = [":hermes"],
 )
 
-# TODO: This isn't picking up the AAR, so we'll likely need to wrap in the AAR in a real rule to provide the aar info
 distribution(
     name = "hermes-android",
     lib_name = "hermes-android-merged",
