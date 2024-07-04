@@ -33,8 +33,6 @@ android_library(
     ],
 )
 
-MAVEN_COORDINATES = "%s:%s:aar:%s" % (DEFAULT_GROUP, "hermes-android", VERSION)
-
 merge_jni_into_android_library(
     name = "hermes-android",
     android_library = ":hermes-android-lib",
@@ -46,14 +44,14 @@ merge_jni_into_android_library(
         "@rn_hermes_android//:libhermes",
     ],
     cc_name = "hermes_jni",
-    tags = ["maven_coordinates={}".format(MAVEN_COORDINATES)],
+    tags = ["maven_coordinates=%s:%s:aar:%s" % (DEFAULT_GROUP, "hermes-android", VERSION)],
     exports = [":hermes"],
 )
 
 distribution(
     name = "hermes-android",
     lib_name = "hermes-android-merged",
-    maven_coordinates = MAVEN_COORDINATES,
+    maven_coordinates = "%s:%s:%s" % (DEFAULT_GROUP, "hermes-android", VERSION),
 )
 
 # TODO: This probably isn't necessary anymore
