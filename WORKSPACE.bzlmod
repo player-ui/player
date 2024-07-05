@@ -8,9 +8,6 @@ android_sdk_repository(
     name = "androidsdk",
     api_level = 33
 )
-android_ndk_repository(
-    name = "androidndk",
-)
 
 #git_repository(
 #    name = "grab_bazel_common",
