@@ -83,6 +83,17 @@ bazel_dep(name = "rules_kotlin", version = "1.9.1")
 
 # Android
 bazel_dep(name = "rules_android", version = "0.1.1")
+bazel_dep(name = "rules_android_ndk")
+git_override(
+    module_name = "rules_android_ndk",
+    commit = "d5c9d46a471e8fcd80e7ec5521b78bb2df48f4e0",
+    remote = "https://github.com/bazelbuild/rules_android_ndk",
+)
+
+android_ndk_repository_extension = use_extension("@rules_android_ndk//:extension.bzl", "android_ndk_repository_extension")
+use_repo(android_ndk_repository_extension, "androidndk")
+
+register_toolchains("@androidndk//:all")
 
 # Databinding
 bazel_dep(name = "grab_bazel_common")
