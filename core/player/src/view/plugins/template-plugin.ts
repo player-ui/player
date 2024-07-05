@@ -1,5 +1,7 @@
 import { SyncWaterfallHook } from 'tapable-ts';
+import type { Template } from '@player-ui/types';
 import type { Node, ParseObjectOptions, Parser } from '../parser';
+import { hasTemplateKey } from '../parser/utils';
 import { NodeType } from '../parser';
 import type { ViewPlugin } from '.';
 import type { View } from './plugin';
@@ -150,6 +152,39 @@ export default class TemplatePlugin implements ViewPlugin {
           if (templateNode) {
             return templateNode;
           }
+        }
+      }
+    );
+
+    parser.hooks.parseAndCreateChildNode.tap(
+      'template',
+      (
+        options: ParseObjectOptions,
+        localKey: string,
+        localValue: any,
+        path: Node.PathSegment[]
+      ) => {
+        if (hasTemplateKey(localKey)) {
+          return localValue
+            .map((template: Template) => {
+              const templateAST = parser.hooks.parseNode.call(
+                template,
+                NodeType.Value,
+                options,
+                NodeType.Template
+              );
+
+              if (templateAST) {
+                return {
+                  path: [...path, template.output],
+                  value: templateAST,
+                } as Node.Child;
+              }
+
+              // eslint-disable-next-line no-useless-return
+              return;
+            })
+            .filter(Boolean);
         }
       }
     );

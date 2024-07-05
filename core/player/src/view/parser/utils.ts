@@ -29,6 +29,11 @@ export function hasSwitchKey(localKey: string) {
   return localKey === ('staticSwitch' || 'dynamicSwitch');
 }
 
+/** Check to see if the string is a valid template key */
+export function hasTemplateKey(localKey: string) {
+  return localKey === 'template';
+}
+
 /** Get the ID of the Node if there is one */
 export function getNodeID(node?: Node.Node | null): string | undefined {
   if (!node) {

@@ -1,6 +1,7 @@
 import type { View, ViewPlugin } from './plugin';
 import type { Options } from './options';
 import type { Parser, Node, ParseObjectOptions } from '../parser';
+import { hasSwitchKey } from '../parser/utils';
 import { EMPTY_NODE, NodeType } from '../parser';
 import type { Resolver } from '../resolver';
 
@@ -105,6 +106,47 @@ export default class SwitchPlugin implements ViewPlugin {
           }
 
           return switchAST;
+        }
+      }
+    );
+
+    parser.hooks.parseAndCreateChildNode.tap(
+      'switch',
+      (
+        options: ParseObjectOptions,
+        localKey: string,
+        localValue: any,
+        path: Node.PathSegment[]
+      ) => {
+        if (
+          parser.hooks.determineNodeType.call(localValue) === NodeType.Switch ||
+          hasSwitchKey(localKey)
+        ) {
+          const localSwitch = parser.hooks.parseNode.call(
+            hasSwitchKey(localKey) ? { [localKey]: localValue } : localValue,
+            NodeType.Value,
+            options,
+            NodeType.Switch
+          );
+
+          if (localSwitch) {
+            let newPath = [...path, localKey];
+            let newValue = localSwitch;
+
+            if (
+              localSwitch.type === NodeType.Value &&
+              localSwitch.children?.length === 1 &&
+              localSwitch.value === undefined
+            ) {
+              const firstChild = localSwitch.children[0];
+              newPath = [...newPath, ...firstChild.path];
+              newValue = firstChild.value;
+            }
+
+            return [{ path: newPath, value: newValue }];
+          }
+
+          return [];
         }
       }
     );

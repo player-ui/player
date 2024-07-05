@@ -70,6 +70,32 @@ export default class ApplicabilityPlugin implements ViewPlugin {
         }
       }
     );
+
+    parser.hooks.parseAndCreateChildNode.tap(
+      'applicability',
+      (
+        options: ParseObjectOptions,
+        localKey: string,
+        localValue: any,
+        path: Node.PathSegment[]
+      ) => {
+        if (
+          parser.hooks.determineNodeType.call(localValue) ===
+          NodeType.Applicability
+        ) {
+          const parsedNode = parser.hooks.parseNode.call(
+            localValue,
+            NodeType.Value,
+            options,
+            NodeType.Applicability
+          );
+
+          return parsedNode
+            ? [{ path: [...path, localKey], value: parsedNode }]
+            : [];
+        }
+      }
+    );
   }
 
   apply(view: View) {
