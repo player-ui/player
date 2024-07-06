@@ -1,7 +1,6 @@
 load("@build_constants//:constants.bzl", "VERSION")
 load("//jvm:defs.bzl", "DEFAULT_GROUP", "distribution", "kt_player_module")
-load("//jvm/hermes/src/main/jni:defs.bzl", "attach_jni")
-load(":defs.bzl", "decorate_aar_import", "merge_jni_into_android_library")
+load(":defs.bzl", "merge_jni_into_android_library")
 load(":deps.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
 
 kt_player_module(

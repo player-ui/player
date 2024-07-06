@@ -25,7 +25,7 @@ public sealed interface RuntimeThreadContext : CoroutineContext.Element {
 public annotation class UnsafeRuntimeThreadAPI
 
 @UnsafeRuntimeThreadAPI
-internal data object UnsafeRuntimeThreadContext : RuntimeThreadContext
+internal object UnsafeRuntimeThreadContext : RuntimeThreadContext
 
 internal abstract class DedicatedRuntimeThreadContext internal constructor(): RuntimeThreadContext {
     companion object : DedicatedRuntimeThreadContext()
