@@ -2,6 +2,9 @@ common --enable_bzlmod
 test --test_output=errors
 coverage --combined_report=lcov
 
+# TODO: Custom compiler version breaks embedded jdeps generator plugin - enable when removing custom kotlinc
+build --@rules_kotlin//kotlin/settings:jvm_emit_jdeps=False
+
 # Android databinding flags
 # TODO: Verify the follow doesn't break host compil
 build --android_crosstool_top=@androidndk//:toolchain
