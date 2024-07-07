@@ -61,7 +61,7 @@ public:
         return runtime_ == nullptr;
     }
 
-    Runtime& get_runtime() override {
+    HermesRuntime& get_runtime() override {
         return *runtime_;
     }
 

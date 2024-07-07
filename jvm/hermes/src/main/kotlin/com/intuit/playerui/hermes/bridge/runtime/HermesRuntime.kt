@@ -10,6 +10,7 @@ import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeContainer
 import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeFactory
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.ScriptContext
+import com.intuit.playerui.core.bridge.runtime.config
 import com.intuit.playerui.core.bridge.serialization.serializers.playerSerializersModule
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.utils.InternalPlayerApi
@@ -26,6 +27,7 @@ import com.intuit.playerui.jsi.Value
 import com.intuit.playerui.jsi.serialization.format.JSIFormat
 import com.intuit.playerui.jsi.serialization.format.JSIFormatConfiguration
 import com.intuit.playerui.jsi.serialization.serializers.JSIValueContainerSerializer
+import com.intuit.playerui.plugins.settimeout.SetTimeoutPlugin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
@@ -127,7 +129,7 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
         scope.cancel("releasing runtime")
         // swap to dispatcher to release everything
         runBlocking(dispatcher) {
-            releaseRuntime()
+//            releaseRuntime()
             // TODO: Release scopes & runtime
         }
         // close dispatcher
@@ -186,8 +188,10 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
 }
 
 public object Hermes : PlayerRuntimeFactory<Config> {
-    override fun create(block: Config.() -> Unit): HermesRuntime =
-        HermesRuntime.create(Config.invoke().apply(block))
+    override fun create(block: Config.() -> Unit): HermesRuntime = Config.invoke().apply(block).let { config ->
+        // TODO: Move SetTimeoutPlugin to HeadlessPlayer init once cyclical dep is handled (split out headless impl)
+        HermesRuntime.create(config).also(SetTimeoutPlugin(config.coroutineExceptionHandler)::apply)
+    }
 
     override fun toString(): String = "Hermes"
 }

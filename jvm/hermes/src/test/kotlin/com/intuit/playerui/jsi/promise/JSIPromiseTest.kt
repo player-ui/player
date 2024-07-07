@@ -20,7 +20,6 @@ internal class JSIPromiseTest : HermesTest() {
 
     @Test
     fun testErrorStacktraceFromJSError() {
-        SetTimeoutPlugin().apply(runtime)
         val (promise) = runtime.execute(
             """
            (function() {
