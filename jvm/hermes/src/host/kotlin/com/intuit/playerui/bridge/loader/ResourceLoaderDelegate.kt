@@ -47,6 +47,6 @@ public class ResourceLoaderDelegate : NativeLoaderDelegate {
         private val classLoader = ResourceLoaderDelegate::class.java.classLoader
 
         private fun getResourceAsStream(resourceName: String): InputStream? =
-            classLoader.getResourceAsStream(resourceName)?.also { println("found $resourceName") }
+            classLoader.getResourceAsStream(resourceName)
     }
 }

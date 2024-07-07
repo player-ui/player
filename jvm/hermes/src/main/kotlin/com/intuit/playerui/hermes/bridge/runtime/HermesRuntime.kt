@@ -177,7 +177,7 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
 
 public object Hermes : PlayerRuntimeFactory<Config> {
     override fun create(block: Config.() -> Unit): HermesRuntime =
-        HermesRuntime.create(Config.invoke()).apply {
+        HermesRuntime.create(Config.invoke().apply(block)).apply {
             evaluateInJSThreadBlocking {
                 global().setProperty(
                     runtime,

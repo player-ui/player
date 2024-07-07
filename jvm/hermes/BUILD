@@ -17,8 +17,8 @@ kt_jvm_library(
     name = "hermes-host",
     srcs = glob(["src/host/kotlin/**/*.kt"]),
     associates = [":hermes"],
+    visibility = ["//visibility:public"],
     exports = [
-        #        ":hermes",
         "//jvm/hermes/src/main/jni:resources",
     ],
     deps = [

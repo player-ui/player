@@ -48,7 +48,8 @@ Error: hello
         }.message)
     }
 
-    @Test fun `can't queue a microtask in JS if it's disabled`() = runtime.evaluateInJSThreadBlocking {
+    // TODO: Test in Player b/c we have microtask polyfill in Player
+    fun `can't queue a microtask in JS if it's disabled`() = runtime.evaluateInJSThreadBlocking {
         runtime.global().setProperty(runtime, "queueMicrotask", Function.createFromHostFunction(runtime, "queueMicrotask", 1) { args ->
             require(args.size == 1 && args[0].isObject() && args[0].asObject(runtime).isFunction(runtime)) { "queueMicrotask expects exactly one argument, the function to enqueue" }
 

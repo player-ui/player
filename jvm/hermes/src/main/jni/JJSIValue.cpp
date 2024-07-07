@@ -31,7 +31,7 @@ local_ref<JJSIValue::jhybridobject> JJSIRuntime::evaluatePreparedJavaScript(alia
 }
 
 void JJSIRuntime::queueMicrotask(alias_ref<JJSIFunction_jhybridobject> callback) {
-//    get_runtime().queueMicrotask(callback->cthis()->get_function());
+    get_runtime().queueMicrotask(callback->cthis()->get_function());
 }
 
 bool JJSIRuntime::drainMicrotasks(int maxMicrotasksHint) {
@@ -147,8 +147,8 @@ bool JJSIValue::asBool() {
     return value_->asBool();
 }
 
-jint JJSIValue::asNumber() {
-    return static_cast<jint>(value_->asNumber());
+double JJSIValue::asNumber() {
+    return value_->asNumber();
 }
 
 // TODO: Ensure this is what we want to do - we can return the JSI String container
