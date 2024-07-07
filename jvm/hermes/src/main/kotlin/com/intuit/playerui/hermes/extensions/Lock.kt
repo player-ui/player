@@ -6,6 +6,7 @@ import com.intuit.playerui.hermes.extensions.RuntimeThreadContext.Key.currentThr
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.coroutineContext
 
 @DslMarker
@@ -58,6 +59,7 @@ internal fun <T> Runtime<*>.evaluateInJSThreadBlocking(
             evaluateInJSThread { block() }
         }
     } catch (throwable: Throwable) {
+        if (throwable is CancellationException) throw throwable
         // rethrow outside coroutine to capture stack before continuation
         throw PlayerRuntimeException(runtime, "Exception caught evaluating JS", throwable)
     }

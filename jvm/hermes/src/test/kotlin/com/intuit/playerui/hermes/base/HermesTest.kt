@@ -1,10 +1,11 @@
 package com.intuit.playerui.hermes.base
 
 import com.facebook.soloader.nativeloader.NativeLoader
+import com.intuit.playerui.bridge.loader.ResourceLoaderDelegate
 import com.intuit.playerui.hermes.bridge.HermesNode
+import com.intuit.playerui.hermes.bridge.runtime.Hermes
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime
 import com.intuit.playerui.hermes.extensions.RuntimeThreadContext
-import com.intuit.playerui.bridge.loader.ResourceLoaderDelegate
 import com.intuit.playerui.jsi.Object
 import com.intuit.playerui.jsi.Value
 import com.intuit.playerui.jsi.serialization.format.decodeFromValue
@@ -14,7 +15,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
 
-internal abstract class HermesTest(val runtime: HermesRuntime = HermesRuntime()) : PromiseUtils, ThreadUtils {
+internal abstract class HermesTest(val runtime: HermesRuntime = Hermes.create()) : PromiseUtils, ThreadUtils {
 
     val format = runtime.format
 

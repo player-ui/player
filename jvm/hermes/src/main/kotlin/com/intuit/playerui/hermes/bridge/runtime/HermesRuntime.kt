@@ -10,7 +10,6 @@ import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeContainer
 import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeFactory
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.ScriptContext
-import com.intuit.playerui.core.bridge.runtime.config
 import com.intuit.playerui.core.bridge.serialization.serializers.playerSerializersModule
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.utils.InternalPlayerApi
@@ -43,17 +42,21 @@ import java.util.concurrent.Executors
 import kotlin.coroutines.EmptyCoroutineContext
 import com.intuit.playerui.jsi.Runtime as JSIRuntime
 
+private fun loadHermesJni() {
+    // need to load fbjni -> jsi|hermes -> hermes_jni
+    // some loaders are able to load dependencies, but not all, so we explicitly load what we need, in order
+    NativeLoader.loadLibrary("fbjni")
+    NativeLoader.loadLibrary("jsi")
+    NativeLoader.loadLibrary("hermes")
+    NativeLoader.loadLibrary("hermes_jni")
+}
 
 // TODO: Likely split up JNI & Runtime impl
 public class HermesRuntime private constructor(mHybridData: HybridData) : Runtime<Value>, JSIRuntime(mHybridData) {
 
     public companion object {
         init {
-            // need to load fbjni -> jsi|hermes -> hermes_jni
-            NativeLoader.loadLibrary("fbjni")
-            NativeLoader.loadLibrary("jsi")
-            NativeLoader.loadLibrary("hermes")
-            NativeLoader.loadLibrary("hermes_jni")
+            loadHermesJni()
         }
 
         @JvmStatic public external fun create(): HermesRuntime
@@ -188,9 +191,11 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
 }
 
 public object Hermes : PlayerRuntimeFactory<Config> {
-    override fun create(block: Config.() -> Unit): HermesRuntime = Config.invoke().apply(block).let { config ->
+    override fun create(block: Config.() -> Unit): HermesRuntime {
+        loadHermesJni()
+        val config = Config().apply(block)
         // TODO: Move SetTimeoutPlugin to HeadlessPlayer init once cyclical dep is handled (split out headless impl)
-        HermesRuntime.create(config).also(SetTimeoutPlugin(config.coroutineExceptionHandler)::apply)
+        return HermesRuntime.create(config).also(SetTimeoutPlugin(config.coroutineExceptionHandler)::apply)
     }
 
     override fun toString(): String = "Hermes"
