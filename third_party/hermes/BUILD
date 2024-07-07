@@ -6,29 +6,26 @@ filegroup(
     srcs = glob(["**"]),
 )
 
-config_setting(
-    name = "hermes_debug",
-    define_values = {"HERMES_DEBUG": ""},
-)
-
 cmake(
     name = "host",
     cache_entries = {
         "HERMES_BUILD_APPLE_FRAMEWORK": "OFF",
-        # TODO: Consider moving into hermes_debug select
-        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_BUILD_TYPE": "$CMAKE_BUILD_TYPE",
     } | select({
-        ":hermes_debug": {
-            # NOTE: This is to fix a compilation issue with NDEBUG
-            "HERMES_SLOW_DEBUG": "OFF",
-        },
+        #        ":hermes_debug": {
+        #            # NOTE: This is to fix a compilation issue with NDEBUG
+        #            #            "HERMES_SLOW_DEBUG": "OFF",
+        #        },
         "//conditions:default": {},
     }),
-    copts = select({
-        # NOTE: This is to enable debug builds
-        ":hermes_debug": ["-DNDEBUG"],
-        "//conditions:default": None,
-    }),
+    #    copts = select({
+    #        # NOTE: This is to enable debug builds
+    #        ":hermes_debug": ["-DNDEBUG"],
+    #        "//conditions:default": None,
+    #    }),
+    env = {
+        "CMAKE_BUILD_TYPE": "$(CMAKE_BUILD_TYPE)",
+    },
     generate_args = ["-G Ninja"],
     lib_name = "hermes",
     lib_source = "working_directory",
@@ -38,6 +35,7 @@ cmake(
     ],
     # NOTE: Uses vars set by build script from rule to "install" JSI lib
     postfix_script = "cp -L $BUILD_TMPDIR/jsi/libjsi.dylib $INSTALLDIR/lib",
+    toolchains = ["@player//:cmake_build_type"],
     visibility = ["//visibility:public"],
 )
 
@@ -61,8 +59,7 @@ cmake(
 cmake(
     name = "android",
     cache_entries = {
-        # TODO: Consider moving into config_setting select -- should match for all cmakes
-        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_BUILD_TYPE": "$CMAKE_BUILD_TYPE",
         "HERMES_IS_ANDROID": "True",
         "IMPORT_HERMESC": "$(location :hermesc)",  # TODO: Link unproven since I couldn't figure out host compile
         "HERMES_BUILD_SHARED_JSI": "True",
@@ -77,6 +74,9 @@ cmake(
         "-DANDROID_STL=c++_shared",
         "-DANDROID_PIE=True",
     ],
+    env = {
+        "CMAKE_BUILD_TYPE": "$(CMAKE_BUILD_TYPE)",
+    },
     generate_args = ["-G Ninja"],
     lib_name = "hermes",
     lib_source = "working_directory",
@@ -88,6 +88,7 @@ cmake(
     # NOTE: Uses vars set by build script from rule to "install" JSI lib
     postfix_script = "cp -L $BUILD_TMPDIR/jsi/libjsi.so $INSTALLDIR/lib",
     tags = ["no-sandbox"],
+    toolchains = ["@player//:cmake_build_type"],
     visibility = ["//visibility:public"],
     deps = [
         ":hermesc",

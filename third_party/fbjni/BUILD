@@ -35,13 +35,14 @@ genrule(
 cmake(
     name = "host",
     cache_entries = {
+        "CMAKE_BUILD_TYPE": "$CMAKE_BUILD_TYPE",
         # Normalize path relative to fbjni.build_tmpdir
         "JNI_HEADER": "$(realpath ../../$JNI_HEADER)",
-        "CMAKE_BUILD_TYPE": "Release",
         "FBJNI_SKIP_TESTS": "true",
     },
     data = [":jni_include"],
     env = {
+        "CMAKE_BUILD_TYPE": "$(CMAKE_BUILD_TYPE)",
         # Resolves to fbjni/jni/include
         "JNI_HEADER": "$(rlocationpath :jni_include)",
     },
@@ -49,6 +50,7 @@ cmake(
     lib_name = "fbjni",
     lib_source = "working_directory",
     out_shared_libs = ["libfbjni.dylib"],
+    toolchains = ["@player//:cmake_build_type"],
     visibility = ["//visibility:public"],
 )
 
@@ -56,18 +58,16 @@ cmake(
     name = "android",
     cache_entries = {
         "ANDROID_ABI": "True",
-        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_BUILD_TYPE": "$CMAKE_BUILD_TYPE",
         "FBJNI_SKIP_TESTS": "true",
+    },
+    env = {
+        "CMAKE_BUILD_TYPE": "$(CMAKE_BUILD_TYPE)",
     },
     generate_args = ["-G Ninja"],
     lib_name = "fbjni",
     lib_source = "working_directory",
     out_shared_libs = ["libfbjni.dylib"],
-    visibility = ["//visibility:public"],
-)
-
-alias(
-    name = "fbjni",
-    actual = "fbjni_host",
+    toolchains = ["@player//:cmake_build_type"],
     visibility = ["//visibility:public"],
 )

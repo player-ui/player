@@ -1,4 +1,5 @@
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+load("//:cmake.bzl", "CMAKE_BUILD_TYPE_COPTS", "CMAKE_BUILD_TYPE_COPT_MAPPINGS")
 load(":cc_binary_host_jni.bzl", "cc_library_host_jni")
 load(":copy_output.bzl", "copy_output")
 
@@ -27,19 +28,7 @@ cc_library(
         "JHermesRuntime.h",
         "JJSIValue.h",
     ],
-    # TODO: Likely need to add the flags to disable parts of Hermes that is excluded from MinRelSize release build
-    copts = [
-        "-std=c++17",
-
-        # cmake Release
-        # "-O3",
-        # "-DNDEBUG",
-
-        # cmake MinSizeRel
-        # TODO: we should really create a config setting to map cmake build type to copts and use to pass to cmake builds too
-        "-Os",
-        "-DNDEBUG",
-    ] + select({
+    copts = ["-std=c++17"] + CMAKE_BUILD_TYPE_COPTS + select({
         # TODO: Using React Natives JSI doesn't contain microtask - come back to this if we build it ourselves
         ":should_include_jni": ["-DJSI_MICROTASK"],
         "//conditions:default": [],
@@ -62,7 +51,7 @@ cc_library(
     alwayslink = True,
 )
 
-# Trigger transition for :should_include_jni
+# Trigger transition for :should_include_jni (makes it so we have a target that is for host, rather than needing to specify on the command line)
 cc_library_host_jni(
     name = "hermes_jni_lib_host",
     cc_library = ":hermes_jni_lib",

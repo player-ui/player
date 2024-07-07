@@ -1,32 +1,3 @@
-# TODO: Enable platform support for detecting Android
-config_setting(
-    name = "arm64-v8a",
-    values = {
-        "cpu": "arm64-v8a",
-    },
-)
-
-config_setting(
-    name = "armeabi-v7a",
-    values = {
-        "cpu": "armeabi-v7a",
-    },
-)
-
-config_setting(
-    name = "x86",
-    values = {
-        "cpu": "x86",
-    },
-)
-
-config_setting(
-    name = "x86_64",
-    values = {
-        "cpu": "x86_64",
-    },
-)
-
 cc_import(
     name = "arm64-v8a_libhermes",
     shared_library = "jni/arm64-v8a/libhermes.so",

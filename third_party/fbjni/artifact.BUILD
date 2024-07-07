@@ -1,32 +1,3 @@
-# TODO: Enable platform support for detecting Android
-config_setting(
-    name = "arm64-v8a",
-    values = {
-        "cpu": "arm64-v8a",
-    },
-)
-
-config_setting(
-    name = "armeabi-v7a",
-    values = {
-        "cpu": "armeabi-v7a",
-    },
-)
-
-config_setting(
-    name = "x86",
-    values = {
-        "cpu": "x86",
-    },
-)
-
-config_setting(
-    name = "x86_64",
-    values = {
-        "cpu": "x86_64",
-    },
-)
-
 cc_import(
     name = "arm64-v8a_libfbjni",
     shared_library = "jni/arm64-v8a/libfbjni.so",
@@ -75,10 +46,10 @@ cc_import(
 alias(
     name = "libfbjni",
     actual = select({
-        ":arm64-v8a": ":arm64-v8a_libfbjni",
-        ":armeabi-v7a": ":armeabi-v7a_libfbjni",
-        ":x86": ":x86_libfbjni",
-        ":x86_64": ":x86_64_libfbjni",
+        "//:arm64-v8a": ":arm64-v8a_libfbjni",
+        "//:armeabi-v7a": ":armeabi-v7a_libfbjni",
+        "//:x86": ":x86_libfbjni",
+        "//:x86_64": ":x86_64_libfbjni",
         "//conditions:default": ":empty",
     }),
     visibility = ["//visibility:public"],
@@ -87,10 +58,10 @@ alias(
 alias(
     name = "libc++_shared",
     actual = select({
-        ":arm64-v8a": ":arm64-v8a_libc++_shared",
-        ":armeabi-v7a": ":armeabi-v7a_libc++_shared",
-        ":x86": ":x86_libc++_shared",
-        ":x86_64": ":x86_64_libc++_shared",
+        "//:arm64-v8a": ":arm64-v8a_libc++_shared",
+        "//:armeabi-v7a": ":armeabi-v7a_libc++_shared",
+        "//:x86": ":x86_libc++_shared",
+        "//:x86_64": ":x86_64_libc++_shared",
         "//conditions:default": ":empty",
     }),
     visibility = ["//visibility:public"],
