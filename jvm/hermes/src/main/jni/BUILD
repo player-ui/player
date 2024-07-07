@@ -39,7 +39,11 @@ cc_library(
         # TODO: we should really create a config setting to map cmake build type to copts and use to pass to cmake builds too
         "-Os",
         "-DNDEBUG",
-    ],
+    ] + select({
+        # TODO: Using React Natives JSI doesn't contain microtask - come back to this if we build it ourselves
+        ":should_include_jni": ["-DJSI_MICROTASK"],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
     deps = [
         # Just headers, let the binaries link for specific platforms

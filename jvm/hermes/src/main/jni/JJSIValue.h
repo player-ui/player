@@ -49,8 +49,12 @@ public:
     local_ref<JJSIValue_jhybridobject> evaluateJavaScript(std::string script, std::string sourceURL);
     local_ref<JJSIPreparedJavaScript::jhybridobject> prepareJavaScript(std::string script, std::string sourceURL);
     local_ref<JJSIValue_jhybridobject> evaluatePreparedJavaScript(alias_ref<JJSIPreparedJavaScript::jhybridobject> js);
+
+#ifdef JSI_MICROTASK
     void queueMicrotask(alias_ref<JJSIFunction_jhybridobject> callback);
     bool drainMicrotasks(int maxMicrotasksHint = -1);
+#endif
+
     local_ref<JJSIObject_jhybridobject> global();
     std::string description();
 

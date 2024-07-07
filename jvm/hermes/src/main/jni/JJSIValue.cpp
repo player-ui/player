@@ -30,6 +30,7 @@ local_ref<JJSIValue::jhybridobject> JJSIRuntime::evaluatePreparedJavaScript(alia
     return JJSIValue::newObjectCxxArgs(get_runtime().evaluatePreparedJavaScript(js->cthis()->get_prepared()));
 }
 
+#ifdef JSI_MICROTASK
 void JJSIRuntime::queueMicrotask(alias_ref<JJSIFunction_jhybridobject> callback) {
     get_runtime().queueMicrotask(callback->cthis()->get_function());
 }
@@ -37,6 +38,7 @@ void JJSIRuntime::queueMicrotask(alias_ref<JJSIFunction_jhybridobject> callback)
 bool JJSIRuntime::drainMicrotasks(int maxMicrotasksHint) {
     return get_runtime().drainMicrotasks(maxMicrotasksHint);
 }
+#endif
 
 local_ref<JJSIObject::jhybridobject> JJSIRuntime::global() {
     return JJSIObject::newObjectCxxArgs(get_runtime().global());
@@ -51,8 +53,10 @@ void JJSIRuntime::registerNatives() {
         makeNativeMethod("evaluateJavaScript", JJSIRuntime::evaluateJavaScript),
         makeNativeMethod("prepareJavaScript", JJSIRuntime::prepareJavaScript),
         makeNativeMethod("evaluatePreparedJavaScript", JJSIRuntime::evaluatePreparedJavaScript),
+#ifdef JSI_MICROTASK
         makeNativeMethod("queueMicrotask", JJSIRuntime::queueMicrotask),
         makeNativeMethod("drainMicrotasks", JJSIRuntime::drainMicrotasks),
+#endif
         makeNativeMethod("global", JJSIRuntime::global),
         makeNativeMethod("description", JJSIRuntime::description),
     });
