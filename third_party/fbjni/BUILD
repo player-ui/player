@@ -1,6 +1,4 @@
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
-#load("@build_constants//:constants.bzl", "JAVA_HOME")
-#load("@player//third_party/fbjni:java_home.bzl", "java_home")
 
 filegroup(
     name = "working_directory",
@@ -14,13 +12,35 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
+filegroup(
+    name = "jni",
+    srcs = ["@bazel_tools//tools/jdk:jni_header"] + select({
+        "@bazel_tools//src/conditions:darwin": ["@bazel_tools//tools/jdk:jni_md_header-darwin"],
+        "@bazel_tools//src/conditions:freebsd": ["@bazel_tools//tools/jdk:jni_md_header-freebsd"],
+        "@bazel_tools//src/conditions:openbsd": ["@bazel_tools//tools/jdk:jni_md_header-openbsd"],
+        "@bazel_tools//src/conditions:windows": ["@bazel_tools//tools/jdk:jni_md_header-windows"],
+        "@bazel_tools//src/conditions:linux": ["@bazel_tools//tools/jdk:jni_md_header-linux"],
+        "//conditions:default": [],
+    }),
+)
+
+genrule(
+    name = "copy_jni",
+    srcs = [":jni"],
+    outs = ["jni/include"],
+    cmd = "mkdir $(OUTS) && cp $(SRCS) $$_",
+)
+
 cmake(
     name = "host",
     cache_entries = {
-        # JAVA_HOME: "$(JAVABASE)",
-        "JAVA_HOME": "/Users/jzucker/.sdkman/candidates/java/current",  # TODO: This won't work
+        "JNI_HEADER": "$(realpath ../../$JNI_HEADER)",
         "CMAKE_BUILD_TYPE": "Release",
         "FBJNI_SKIP_TESTS": "true",
+    },
+    data = [":copy_jni"],
+    env = {
+        "JNI_HEADER": "$(rlocationpath :copy_jni)",
     },
     generate_args = ["-G Ninja"],
     lib_name = "fbjni",
