@@ -8,6 +8,7 @@ import com.intuit.playerui.hermes.extensions.evaluateInJSThreadBlocking
 import com.intuit.playerui.jsi.Function
 import com.intuit.playerui.jsi.HostFunction
 import com.intuit.playerui.jsi.Value
+import com.intuit.playerui.plugins.settimeout.SetTimeoutPlugin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.junit.jupiter.api.Assertions
@@ -16,28 +17,8 @@ import org.junit.jupiter.api.Test
 internal class JSIPromiseTest : HermesTest() {
 
     @Test
-    fun testErrorStacktraceFromJSError() = runtime.evaluateInJSThreadBlocking {
-        runtime.global().setProperty(runtime, "setTimeout", Function.createFromHostFunction(runtime, "setTimeout", 2, HostFunction { runtime, thisVal, args ->
-            val callback = args[0].asObject(runtime).asFunction(runtime)
-            val timeout = args.getOrElse(1) { Value.from(0) }.asNumber().toLong()
-
-            val runTask = {
-                if (thisVal.isObject()) callback.callWithThis(runtime, thisVal.asObject(runtime), *args)
-                else callback.call(runtime, *args)
-            }
-
-            if (timeout == 0L) {
-                runTask()
-            } else (runtime as HermesRuntime).scope.launch {
-                delay(timeout)
-                runTask()
-            }
-
-            Value.undefined
-        }).asValue(runtime))
-        runtime.global().setProperty(runtime, "setImmediate", runtime.evaluateJavaScript("""((callback) => setTimeout(callback, 0))"""))
-//        // ev -> runtime.drainMicrotasks()
-
+    fun testErrorStacktraceFromJSError() {
+        SetTimeoutPlugin().apply(runtime)
         val (promise) = runtime.execute(
             """
            (function() {

@@ -17,4 +17,5 @@ test_deps = [
     "//jvm:kotlin_serialization",
     "//jvm/hermes/src/main/jni:resources",
     ":hermes-host",
+    "//plugins/set-time-out/jvm:set-time-out",
 ]

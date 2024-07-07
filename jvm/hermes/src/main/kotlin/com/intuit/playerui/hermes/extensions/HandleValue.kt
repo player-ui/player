@@ -27,7 +27,10 @@ context(RuntimeThreadContext) private fun Value.transform(format: JSIFormat): An
     isUndefined() -> null
     isNull() -> null
     isBoolean() -> asBoolean()
-    isNumber() -> asNumber()
+    isNumber() -> asNumber().let { double ->
+        // this is currently done to work well with existing Player runtime integration, but should go away when JSI convergence happens
+        if (double % 1 == 0.0) double.toInt() else double
+    }
     isString() -> asString(format.runtime)
     isBigInt() -> asBigInt(format.runtime)
     isSymbol() -> asSymbol(format.runtime).toString(format.runtime) // TODO: This is what we do w/ symbols?

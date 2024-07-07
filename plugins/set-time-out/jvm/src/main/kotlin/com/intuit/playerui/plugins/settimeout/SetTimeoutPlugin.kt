@@ -3,6 +3,7 @@ package com.intuit.playerui.plugins.settimeout
 import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.add
+import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.player.Player
 import com.intuit.playerui.core.player.state.inProgressState
 import com.intuit.playerui.core.plugins.PlayerPlugin
@@ -18,10 +19,12 @@ public class SetTimeoutPlugin(private val exceptionHandler: CoroutineExceptionHa
 
     private var player: Player? = null
 
+    @OptIn(ExperimentalPlayerApi::class)
     override fun apply(runtime: Runtime<*>) {
         if (!runtime.contains("setTimeout")) {
             runtime.add("setTimeout") { callback: Invokable<Any?>, timeout: Double ->
                 runtime.scope.launch(
+                    // TODO: Potentially just forward to runtime coroutine exception handler
                     exceptionHandler ?: CoroutineExceptionHandler { _, exception ->
                         PlayerPluginException(
                             "SetTimeoutPlugin",
@@ -37,6 +40,10 @@ public class SetTimeoutPlugin(private val exceptionHandler: CoroutineExceptionHa
                 }
                 return@add
             }
+        }
+
+        if (!runtime.contains("setImmediate")) {
+            runtime.add("setImmediate", runtime.executeRaw("(callback => setTimeout(callback, 0))"))
         }
     }
 
