@@ -41,8 +41,8 @@ merge_jni_into_android_library(
     name = "hermes-android",
     android_library = ":hermes-android-lib",
     cc_libs = [
-        "//jvm/hermes/libs:libc++_shared",
-        "//jvm/hermes/libs:libfbjni",
+        "@fbjni_artifact//:libc++_shared",
+        "@fbjni_artifact//:libfbjni",
         "//jvm/hermes/libs:libjsi",
         "//jvm/hermes/src/main/jni:hermes_jni_lib",
         "@rn_hermes_android//:libhermes",

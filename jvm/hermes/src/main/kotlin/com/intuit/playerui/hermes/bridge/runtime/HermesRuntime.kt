@@ -19,7 +19,6 @@ import com.intuit.playerui.hermes.extensions.handleValue
 import com.intuit.playerui.hermes.extensions.toNode
 import com.intuit.playerui.jsi.Array
 import com.intuit.playerui.jsi.Function
-import com.intuit.playerui.jsi.HostFunction
 import com.intuit.playerui.jsi.JSIValueContainer
 import com.intuit.playerui.jsi.Object
 import com.intuit.playerui.jsi.Symbol
@@ -33,8 +32,6 @@ import kotlinx.coroutines.ExecutorCoroutineDispatcher
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
@@ -91,6 +88,8 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
         CoroutineScope(Dispatchers.Default + SupervisorJob() + (config.coroutineExceptionHandler ?: EmptyCoroutineContext))
     }
 
+    private external fun evaluateJavaScriptWithSourceMap(script: String, sourceMap: String, sourceURL: String): Value
+
     @OptIn(ExperimentalPlayerApi::class)
     override fun executeRaw(script: String): Value =  evaluateInJSThreadBlocking {
         evaluateJavaScript(script)
@@ -99,7 +98,14 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
     override fun execute(script: String): Any? = evaluateInJSThreadBlocking { executeRaw(script).handleValue(format) }
 
     // TODO: Add debuggable sources if necessary, tho we'd likely go towards HBC anyways
-    override fun load(scriptContext: ScriptContext): Any? = execute(scriptContext.script)
+    override fun load(scriptContext: ScriptContext): Any? = evaluateInJSThreadBlocking {
+        val sourceMap = scriptContext.sourceMap
+        if (sourceMap != null) {
+            evaluateJavaScriptWithSourceMap(scriptContext.script, sourceMap, scriptContext.id)
+        } else {
+            evaluateJavaScript(scriptContext.script, scriptContext.id)
+        }.handleValue(format)
+    }
 
 
     override fun add(name: String, value: Value) {

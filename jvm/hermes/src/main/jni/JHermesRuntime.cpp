@@ -18,6 +18,7 @@ void JHermesRuntime::registerNatives() {
         // name conflict with Runtime.kt
         makeNativeMethod("releaseRuntime", JHermesRuntime::release),
         makeNativeMethod("isReleased", JHermesRuntime::isReleased),
+        makeNativeMethod("evaluateJavaScriptWithSourceMap", JHermesRuntime::evaluateJavaScriptWithSourceMap),
     });
 }
 

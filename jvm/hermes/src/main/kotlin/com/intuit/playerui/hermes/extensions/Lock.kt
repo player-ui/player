@@ -53,8 +53,13 @@ internal fun <T> Runtime<*>.evaluateInJSThreadBlocking(
 ): T {
     ensureNotReleased()
     val currentRuntimeThreadContext = currentThreadRuntimeThreadContext.get()
-    return if (currentRuntimeThreadContext != null) block(currentRuntimeThreadContext) else runBlocking {
-        evaluateInJSThread { block() }
+    return if (currentRuntimeThreadContext != null) block(currentRuntimeThreadContext) else try {
+        runBlocking {
+            evaluateInJSThread { block() }
+        }
+    } catch (throwable: Throwable) {
+        // rethrow outside coroutine to capture stack before continuation
+        throw PlayerRuntimeException(runtime, "Exception caught evaluating JS", throwable)
     }
 }
 

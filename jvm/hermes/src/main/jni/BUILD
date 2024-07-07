@@ -45,17 +45,16 @@ cc_library(
         "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
-    deps = [
-        # Just headers, let the binaries link for specific platforms
-        "@fbjni//:libfbjni_headers",
-    ] + select({
+    deps = select({
         # Host build
         ":should_include_jni": [
             "@bazel_tools//tools/jdk:jni",
+            "@fbjni//:host",
             "@hermes//:host",
         ],
         # Android build
         "//conditions:default": [
+            "@fbjni_artifact//:libfbjni_headers",
             "@react_native//:libjsi_headers",
             "@rn_hermes_android//:libhermes_headers",
         ],

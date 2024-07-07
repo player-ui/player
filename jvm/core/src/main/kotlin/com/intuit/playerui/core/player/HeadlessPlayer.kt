@@ -99,7 +99,7 @@ public constructor(
 
     init {
         /** 1. load source into the [runtime] and release lock */
-        runtime.load(ScriptContext(if (runtime.config.debuggable) debugSource.readText() else source.readText(), bundledSourcePath))
+        runtime.load(ScriptContext(if (runtime.config.debuggable) debugSource.readText() else source.readText(), bundledSourcePath, sourceMap.readText()))
 
         /** 2. merge explicit [LoggerPlugin]s with ones created by service loader */
         val loggerPlugins = plugins.filterIsInstance<LoggerPlugin>().let { explicitLoggers ->
@@ -179,5 +179,8 @@ public constructor(
 
         private val debugSource get() = this::class.java
             .classLoader.getResource(debugSourcePath)!!
+
+        private val sourceMap get() = this::class.java
+            .classLoader.getResource("$bundledSourcePath.map")
     }
 }

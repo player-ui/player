@@ -48,6 +48,9 @@ public:
     }
 
     // TODO: Add the rest of the HermesRuntime API (like loading bytecode)
+    local_ref<JJSIValue::jhybridobject> evaluateJavaScriptWithSourceMap(std::string script, std::string sourceMap, std::string sourceURL) {
+        return JJSIValue::newObjectCxxArgs(get_runtime().evaluateJavaScriptWithSourceMap(std::make_shared<StringBuffer>(script), std::make_shared<StringBuffer>(sourceMap), sourceURL));
+    }
 
     void release() {
         if (jConfig_) jConfig_.reset();

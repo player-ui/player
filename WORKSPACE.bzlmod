@@ -66,3 +66,9 @@ git_repository(
     remote = "https://github.com/facebook/react-native",
     tag = "v{}".format(RN_VERSION),
 )
+
+http_archive(
+    name = "fbjni_artifact",
+    build_file = "//third_party/fbjni:artifact.BUILD",
+    url = "https://repo1.maven.org/maven2/com/facebook/fbjni/fbjni/0.6.0/fbjni-0.6.0.aar",
+)
