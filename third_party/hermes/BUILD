@@ -11,18 +11,7 @@ cmake(
     cache_entries = {
         "HERMES_BUILD_APPLE_FRAMEWORK": "OFF",
         "CMAKE_BUILD_TYPE": "$CMAKE_BUILD_TYPE",
-    } | select({
-        #        ":hermes_debug": {
-        #            # NOTE: This is to fix a compilation issue with NDEBUG
-        #            #            "HERMES_SLOW_DEBUG": "OFF",
-        #        },
-        "//conditions:default": {},
-    }),
-    #    copts = select({
-    #        # NOTE: This is to enable debug builds
-    #        ":hermes_debug": ["-DNDEBUG"],
-    #        "//conditions:default": None,
-    #    }),
+    },
     env = {
         "CMAKE_BUILD_TYPE": "$(CMAKE_BUILD_TYPE)",
     },
