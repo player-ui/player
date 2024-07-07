@@ -181,37 +181,7 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
 
 public object Hermes : PlayerRuntimeFactory<Config> {
     override fun create(block: Config.() -> Unit): HermesRuntime =
-        HermesRuntime.create(Config.invoke().apply(block)).apply {
-            evaluateInJSThreadBlocking {
-                global().setProperty(
-                    runtime,
-                    "setTimeout",
-                    Function.createFromHostFunction(runtime, "setTimeout", 2, HostFunction { runtime, thisVal, args ->
-                        val callback = args[0].asObject(runtime).asFunction(runtime)
-                        val timeout = args.getOrElse(1) { Value.from(0) }.asNumber().toLong()
-
-                        val runTask = {
-                            if (thisVal.isObject()) callback.callWithThis(runtime, thisVal.asObject(runtime), *args)
-                            else callback.call(runtime, *args)
-                        }
-
-                        if (timeout == 0L) {
-                            runTask()
-                        } else (runtime as HermesRuntime).scope.launch {
-                            delay(timeout)
-                            runTask()
-                        }
-
-                        Value.undefined
-                    }).asValue(runtime)
-                )
-                global().setProperty(
-                    runtime,
-                    "setImmediate",
-                    runtime.evaluateJavaScript("""((callback) => setTimeout(callback, 0))""")
-                )
-            }
-        }
+        HermesRuntime.create(Config.invoke().apply(block))
 
     override fun toString(): String = "Hermes"
 }
