@@ -11,13 +11,6 @@ config_setting(
     define_values = {"HERMES_DEBUG": ""},
 )
 
-cc_library(
-    name = "libjsi_headers",
-    hdrs = glob(["API/jsi/**/*.h"]),
-    strip_include_prefix = "API/jsi",
-    visibility = ["//visibility:public"],
-)
-
 cmake(
     name = "host",
     cache_entries = {

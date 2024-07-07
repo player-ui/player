@@ -1,19 +1,18 @@
-package com.intuit.playerui.jni
+package com.intuit.playerui.bridge.loader
 
 import com.facebook.soloader.nativeloader.NativeLoaderDelegate
 import java.io.InputStream
 import kotlin.io.path.createTempFile
 import kotlin.io.path.outputStream
 
-// TODO: Is there a perf hit from loading a SO from resources? Does it matter since it has to be that way on Android?
-internal class ResourceLoaderDelegate : NativeLoaderDelegate {
+/** Simple [NativeLoaderDelegate] for loading a native library packed as resources */
+public class ResourceLoaderDelegate : NativeLoaderDelegate {
+    private val loaded = mutableListOf<String>()
+
     override fun loadLibrary(shortName: String, flags: Int): Boolean {
-        // TODO: Somehow reconcile shortName w/ path to long?
-        //       1. try just shortName.so/dylib
-        //       2. try just libshortName.so/dylib
-        //       3. try shortName/shortName.so/dylib
-        //       4. try shortName/libshortName.so/dylib
-        //       5. try shortName/lib/libshortName.so/dylib
+        if (loaded.contains(shortName)) return true
+
+        // Try to find any resources that might match the shortName - this doesn't account for checking platform compatibility, and should only be used to load host-compatible libraries
         val resource = getResourceAsStream("$shortName.so")
             ?: getResourceAsStream("$shortName.dylib")
             ?: getResourceAsStream("lib$shortName.so")
@@ -26,12 +25,13 @@ internal class ResourceLoaderDelegate : NativeLoaderDelegate {
             ?: getResourceAsStream("$shortName/lib/$shortName.dylib")
             ?: getResourceAsStream("$shortName/lib/lib$shortName.so")
             ?: getResourceAsStream("$shortName/lib/lib$shortName.dylib")
-            // TODO: Potentially delegate to SystemDelegate?
             ?: throw UnsatisfiedLinkError("Unable to load resource for $shortName")
 
         val rewritten = resource.writeTemp("lib$shortName", ".so")
         System.load(rewritten.toString())
-        // TODO: Should we track what shortNames we've loaded and early exit if we've already loaded?
+
+        loaded.add(shortName)
+
         return true
     }
 
@@ -43,7 +43,7 @@ internal class ResourceLoaderDelegate : NativeLoaderDelegate {
         createTempFile(prefix, suffix).apply { outputStream().use(::copyTo) }
     }
 
-    companion object {
+    private companion object {
         private val classLoader = ResourceLoaderDelegate::class.java.classLoader
 
         private fun getResourceAsStream(resourceName: String): InputStream? =

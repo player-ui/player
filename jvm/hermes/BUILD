@@ -1,4 +1,5 @@
 load("@build_constants//:constants.bzl", "VERSION")
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_binary", "kt_jvm_library")
 load("//jvm:defs.bzl", "DEFAULT_GROUP", "distribution", "kt_player_module")
 load(":defs.bzl", "merge_jni_into_android_library")
 load(":deps.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
@@ -12,12 +13,16 @@ kt_player_module(
     test_package = "com.intuit.playerui",
 )
 
-# TODO: This should be the thing that contains the resource delegate loader source code and auto-initializer
-java_library(
+kt_jvm_library(
     name = "hermes-host",
+    srcs = glob(["src/host/kotlin/**/*.kt"]),
+    associates = [":hermes"],
     exports = [
-        ":hermes",
+        #        ":hermes",
         "//jvm/hermes/src/main/jni:resources",
+    ],
+    deps = [
+        "@maven//:com_facebook_soloader_soloader",
     ],
 )
 
@@ -54,11 +59,10 @@ distribution(
 )
 
 # TODO: This probably isn't necessary anymore
-java_binary(
-    name = "app",
-    main_class = "com.intuit.playerui.hermes.bridge.runtime.HermesRuntimeKt",
-    runtime_deps = [
-        # TODO: Swap to hermes-host w/ app src
-        ":hermes-host",
-    ],
+kt_jvm_binary(
+    name = "main",
+    srcs = ["main.kt"],
+    associates = [":hermes"],
+    main_class = "MainKt",
+    deps = [":hermes-host"],
 )

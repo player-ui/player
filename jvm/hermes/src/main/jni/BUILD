@@ -1,4 +1,20 @@
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+load(":cc_binary_host_jni.bzl", "cc_library_host_jni")
 load(":copy_output.bzl", "copy_output")
+
+# Functionally, represents non-Android builds because NDK JNI will be attached by default
+# Transitioned with cc_library_host_jni
+bool_flag(
+    name = "include_jni",
+    build_setting_default = False,
+)
+
+config_setting(
+    name = "should_include_jni",
+    flag_values = {
+        ":include_jni": "true",
+    },
+)
 
 cc_library(
     name = "hermes_jni_lib",
@@ -28,33 +44,32 @@ cc_library(
     deps = [
         # Just headers, let the binaries link for specific platforms
         "@fbjni//:libfbjni_headers",
-        "@rn_hermes_android//:libhermes_headers",
-        "@react_native//:libjsi_headers",
-        # TODO: Definitely need this for host, but it breaks Android
-        # "@rules_jni//jni",
-    ],
+    ] + select({
+        # Host build
+        ":should_include_jni": [
+            "@bazel_tools//tools/jdk:jni",
+            "@hermes//:host",
+        ],
+        # Android build
+        "//conditions:default": [
+            "@react_native//:libjsi_headers",
+            "@rn_hermes_android//:libhermes_headers",
+        ],
+    }),
     alwayslink = True,
 )
 
-# TODO: Hook up to transition and build aar rather than using android_binary
-cc_binary(
-    name = "libhermes_jni_android",
-    linkshared = True,
-    linkstatic = True,
-    deps = [
-        ":hermes_jni_lib",
-        "//jvm/hermes/libs:libc++_shared",
-        "//jvm/hermes/libs:libfbjni",
-        "//jvm/hermes/libs:libjsi",
-        "@rn_hermes_android//:libhermes",
-    ],
+# Trigger transition for :should_include_jni
+cc_library_host_jni(
+    name = "hermes_jni_lib_host",
+    cc_library = ":hermes_jni_lib",
 )
 
 # This is really only for host
 cc_binary(
     name = "libhermes_jni.so",
     linkshared = True,
-    deps = [":hermes_jni_lib"],
+    deps = [":hermes_jni_lib_host"],
 )
 
 # Extract out our shared libraries for packaging so we can control where they're at in the JAR
@@ -80,7 +95,6 @@ java_library(
     name = "resources",
     resource_strip_prefix = "jvm/hermes/src/main/jni",
     resources = [
-        # TODO: Do we also need the c++ layer? I don't think so, just need to link the right things
         ":libfbjni",
         ":libhermes",
         ":libhermes_jni.so",

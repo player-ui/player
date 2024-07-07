@@ -16,5 +16,5 @@ main_resources = [
 test_deps = [
     "//jvm:kotlin_serialization",
     "//jvm/hermes/src/main/jni:resources",
-    ":fbjni",
+    ":hermes-host",
 ]

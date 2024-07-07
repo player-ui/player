@@ -4,7 +4,7 @@ import com.facebook.soloader.nativeloader.NativeLoader
 import com.intuit.playerui.hermes.bridge.HermesNode
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime
 import com.intuit.playerui.hermes.extensions.RuntimeThreadContext
-import com.intuit.playerui.jni.ResourceLoaderDelegate
+import com.intuit.playerui.bridge.loader.ResourceLoaderDelegate
 import com.intuit.playerui.jsi.Object
 import com.intuit.playerui.jsi.Value
 import com.intuit.playerui.jsi.serialization.format.decodeFromValue

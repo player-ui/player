@@ -14,12 +14,9 @@ import com.intuit.playerui.core.bridge.serialization.serializers.playerSerialize
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.utils.InternalPlayerApi
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime.Config
-import com.intuit.playerui.hermes.extensions.UnsafeRuntimeThreadAPI
-import com.intuit.playerui.hermes.extensions.UnsafeRuntimeThreadContext
 import com.intuit.playerui.hermes.extensions.evaluateInJSThreadBlocking
 import com.intuit.playerui.hermes.extensions.handleValue
 import com.intuit.playerui.hermes.extensions.toNode
-import com.intuit.playerui.jni.ResourceLoaderDelegate
 import com.intuit.playerui.jsi.Array
 import com.intuit.playerui.jsi.Function
 import com.intuit.playerui.jsi.HostFunction
@@ -27,7 +24,6 @@ import com.intuit.playerui.jsi.JSIValueContainer
 import com.intuit.playerui.jsi.Object
 import com.intuit.playerui.jsi.Symbol
 import com.intuit.playerui.jsi.Value
-import com.intuit.playerui.jsi.Value.Companion.createFromJson
 import com.intuit.playerui.jsi.serialization.format.JSIFormat
 import com.intuit.playerui.jsi.serialization.format.JSIFormatConfiguration
 import com.intuit.playerui.jsi.serialization.serializers.JSIValueContainerSerializer
@@ -42,13 +38,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.plus
 import java.util.concurrent.Executors
 import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.system.exitProcess
 import com.intuit.playerui.jsi.Runtime as JSIRuntime
 
 
@@ -57,7 +50,6 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
 
     public companion object {
         init {
-            if (!NativeLoader.isInitialized()) NativeLoader.init(ResourceLoaderDelegate())
             // need to load fbjni -> jsi|hermes -> hermes_jni
             NativeLoader.loadLibrary("fbjni")
             NativeLoader.loadLibrary("jsi")
@@ -223,50 +215,4 @@ public object Hermes : PlayerRuntimeFactory<Config> {
 public class HermesRuntimeContainer : PlayerRuntimeContainer {
     override val factory: Hermes = Hermes
     override fun toString(): String = "Hermes"
-}
-
-// TODO: Remove - just a POC testbed to be able to get native crash logs easier
-@OptIn(UnsafeRuntimeThreadAPI::class)
-public fun main(): Unit = with(UnsafeRuntimeThreadContext) {
-    try {
-        NativeLoader.init(ResourceLoaderDelegate())
-        println("Trying to execute 2 + 2")
-        val runtime = HermesRuntime()
-        println("Runtime: $runtime")
-        val four = runtime.evaluateJavaScript("2 + 2")
-        four.asNumber().let(::println)
-
-        runBlocking(Dispatchers.Default) {
-            val result = runtime.evaluateJavaScript("20 + 20")
-            result.asNumber().let(::println)
-            result.let(::println)
-            result.toString(runtime).let(::println)
-        }
-
-        val json = createFromJson(runtime, buildJsonObject { put("hello", "world") })
-        json.isObject().let(::println)
-        json.asObject(runtime).let(::println)
-        json.asObject(runtime).getProperty(runtime, "hello").toString(runtime).let(::println)
-
-        val func = runtime.evaluateJavaScript("((i) => 3 + i)")
-        func.isObject().let(::println)
-        func.asObject(runtime).isFunction(runtime).let(::println)
-        val funcRes = func.asObject(runtime).asFunction(runtime).call(runtime, Value.from(3))
-        funcRes.let(::println)
-        funcRes.toString(runtime).let(::println)
-
-        val symbol = runtime.evaluateJavaScript("Symbol.for('hello-world')")
-        symbol.isSymbol().let(::println)
-        symbol.asSymbol(runtime).toString(runtime).let(::println)
-
-        val r2 = HermesRuntime(Config(false))
-        r2.global().getProperty(r2, "Intl").toString(r2).let(::println)
-        val r3 = HermesRuntime(Config(true))
-        r3.global().getProperty(r3, "Intl").toString(r3).let(::println)
-        r3.global().getProperty(r3, "Intl").toString(r2).let(::println)
-    } catch (t: Throwable) {
-        t.printStackTrace()
-        exitProcess(1)
-    }
-    exitProcess(0)
 }
