@@ -44,12 +44,19 @@ public:
     }
 
     static local_ref<jhybridobject> createWithConfig(alias_ref<jclass>, alias_ref<JHermesConfig::jhybridobject> config) {
-        // TODO: Maybe have to move? Or just make global?
         return newObjectCxxArgs(config);
     }
 
-    // TODO: Add the rest of the HermesRuntime API
-    // TODO: Add release API - would likely just release the pointer
+    // TODO: Add the rest of the HermesRuntime API (like loading bytecode)
+
+    void release() {
+        if (jConfig_) jConfig_.reset();
+        if (runtime_) runtime_.reset();
+    }
+
+    bool isReleased() {
+        return runtime_ == nullptr;
+    }
 
     Runtime& get_runtime() override {
         return *runtime_;
@@ -58,7 +65,9 @@ public:
     operator facebook::jsi::Runtime&() { return get_runtime(); }
 
     local_ref<JHermesConfig::jhybridobject> get_config() {
-        return make_local(jConfig_);
+        if (jConfig_) return make_local(jConfig_);
+
+        throwNewJavaException("com/intuit/playerui/core/player/PlayerException", "Runtime released - can't access config");
     }
 
 private:

@@ -29,6 +29,7 @@ genrule(
     srcs = [":jni"],
     outs = ["jni/include"],
     cmd = "mkdir $(OUTS) && cp $(SRCS) $$_",
+    tags = ["no-cache"],
 )
 
 cmake(

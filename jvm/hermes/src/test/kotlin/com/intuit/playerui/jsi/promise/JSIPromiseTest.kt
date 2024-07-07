@@ -2,6 +2,7 @@ package com.intuit.playerui.jsi.promise
 
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.Promise
+import com.intuit.playerui.core.bridge.toCompletable
 import com.intuit.playerui.hermes.base.HermesTest
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime
 import com.intuit.playerui.hermes.extensions.evaluateInJSThreadBlocking
@@ -11,6 +12,7 @@ import com.intuit.playerui.jsi.Value
 import com.intuit.playerui.plugins.settimeout.SetTimeoutPlugin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -30,6 +32,10 @@ internal class JSIPromiseTest : HermesTest() {
         ) as List<*>
 
         Promise(promise as Node).thenRecord.catchRecord
+
+        runBlocking {
+            while (catchChain.size < 1) delay(5)
+        }
 
         catchChain.filterIsInstance<Throwable>().forEach { it.printStackTrace() }
 

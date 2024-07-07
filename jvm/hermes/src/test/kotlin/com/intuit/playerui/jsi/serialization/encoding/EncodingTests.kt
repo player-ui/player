@@ -54,7 +54,7 @@ internal class FunctionEncodingTests : HermesTest() {
         val function = format.encodeToValue(callback).asObject(runtime).asFunction(runtime)
 
         assertEquals("PLAYER: 1", callback("PLAYER", 1))
-        assertEquals("PLAYER: 2.0", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(2)).asString(runtime))
+        assertEquals("PLAYER: 2", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(2)).asString(runtime))
     }
 
     @Test fun `encode kcallable`() = runtime.evaluateInJSThreadBlocking {

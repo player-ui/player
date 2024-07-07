@@ -40,9 +40,9 @@ internal class HermesNodeTest : HermesTest() {
         }.toNode(format)
 
         assertEquals("thisisastring", node["string"])
-        assertEquals(1.0, node["int"])
+        assertEquals(1, node["int"])
         assertEquals("anotherstring", (node["object"] as Node)["string"])
-        assertEquals(1.0, (node["list"] as List<*>)[0])
+        assertEquals(1, (node["list"] as List<*>)[0])
         assertEquals("two", (node["list"] as List<*>)[1])
         assertEquals("onemorestring", ((node["list"] as List<*>)[2] as Node)["string"])
         assertEquals(null, (node["list"] as List<*>)[3])
@@ -75,7 +75,7 @@ internal class HermesNodeTest : HermesTest() {
         }.toNode(format)
 
         assertEquals("classicstring", node.getInvokable<String>("function")?.invoke())
-        assertEquals(listOf("1", 2.0), node.getInvokable<Any?>("tuple")?.invoke("1", 2))
+        assertEquals(listOf("1", 2), node.getInvokable<Any?>("tuple")?.invoke("1", 2))
         assertEquals(null, node.getInvokable<Any>("notafunction"))
         assertEquals(null, node.getInvokable<Any>("notthere"))
     }
@@ -84,12 +84,12 @@ internal class HermesNodeTest : HermesTest() {
     fun getList() {
         val node = runtime.evaluateInJSThreadBlocking {
             format.`object` {
-                set("list", listOf(1, 2, 3))
+                set("list", listOf(1, 2.2, 3))
                 set("notalist", 1)
             }
         }.toNode(format)
 
-        assertEquals(listOf(1.0, 2.0, 3.0), node.getList("list"))
+        assertEquals(listOf(1, 2.2, 3), node.getList("list"))
         assertNull(node.getList("notalist"))
         assertNull(node.getList("notthere"))
     }
@@ -156,7 +156,7 @@ internal class HermesNodeTest : HermesTest() {
         assertNotNull(assets[1] as Node)
         assertNull(assets[1] as? Asset)
 
-        assertEquals(1.0, assets[2])
+        assertEquals(1, assets[2])
 
         assertNull(node.getList("notassets"))
     }

@@ -15,6 +15,9 @@ void JHermesRuntime::registerNatives() {
         makeNativeMethod("create", JHermesRuntime::createWithConfig),
 
         makeNativeMethod("getConfig", JHermesRuntime::get_config),
+        // name conflict with Runtime.kt
+        makeNativeMethod("releaseRuntime", JHermesRuntime::release),
+        makeNativeMethod("isReleased", JHermesRuntime::isReleased),
     });
 }
 

@@ -108,8 +108,7 @@ public class HermesNode(private val jsiObject: Object, override val runtime: Her
         jsiObject.asValue(runtime)
     }.let { format.decodeFromRuntimeValue(deserializer, it) }
 
-    // TODO: Incorporate release strategy
-    override fun isReleased(): Boolean = false
+    override fun isReleased(): Boolean = runtime.isReleased()
 
     // JSI Object can't be undefined, Value can be
     override fun isUndefined(): Boolean = false

@@ -10,6 +10,12 @@ using namespace facebook::jsi;
 
 namespace intuit::playerui {
 
+struct Releasable {
+    virtual void release();
+    virtual bool isReleased();
+    virtual ~Releasable() = default;
+};
+
 /**
  * Forward declarations to prevent circular references - jhybridobjects
  * will need to ensure they have the same signature as the actual classes.
@@ -34,6 +40,14 @@ public:
     static void registerNatives();
 
     explicit JJSIPreparedJavaScript(std::shared_ptr<const PreparedJavaScript> prepared) : prepared_(std::move(prepared)) {}
+
+//    void release() override {
+//        prepared_.reset();
+//    }
+//
+//    bool isReleased() override {
+//        return !prepared_;
+//    }
 
     std::shared_ptr<const PreparedJavaScript> get_prepared() const { return prepared_; }
 private:

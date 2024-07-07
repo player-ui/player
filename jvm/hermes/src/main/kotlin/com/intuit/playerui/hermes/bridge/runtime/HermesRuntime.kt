@@ -112,11 +112,16 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
         format.encodeToRuntimeValue(serializer, value).handleValue(format)
     }
 
+    override external fun isReleased(): Boolean
+
+    private external fun releaseRuntime()
+
     override fun release() {
         // cancel work in runtime scope
         scope.cancel("releasing runtime")
         // swap to dispatcher to release everything
         runBlocking(dispatcher) {
+            releaseRuntime()
             // TODO: Release scopes & runtime
         }
         // close dispatcher
@@ -146,7 +151,6 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
         backingNode.getSerializable(key, deserializer)
 
     override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T = backingNode.deserialize(deserializer)
-    override fun isReleased(): Boolean = false// backingNode.isReleased()
     override fun isUndefined(): Boolean = backingNode.isUndefined()
     override fun nativeReferenceEquals(other: Any?): Boolean = backingNode.nativeReferenceEquals(other)
     override fun getString(key: String): String? = backingNode.getString(key)
