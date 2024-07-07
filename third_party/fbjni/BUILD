@@ -25,7 +25,7 @@ filegroup(
 )
 
 genrule(
-    name = "copy_jni",
+    name = "jni_include",
     srcs = [":jni"],
     outs = ["jni/include"],
     cmd = "mkdir $(OUTS) && cp $(SRCS) $$_",
@@ -34,13 +34,15 @@ genrule(
 cmake(
     name = "host",
     cache_entries = {
+        # Normalize path relative to fbjni.build_tmpdir
         "JNI_HEADER": "$(realpath ../../$JNI_HEADER)",
         "CMAKE_BUILD_TYPE": "Release",
         "FBJNI_SKIP_TESTS": "true",
     },
-    data = [":copy_jni"],
+    data = [":jni_include"],
     env = {
-        "JNI_HEADER": "$(rlocationpath :copy_jni)",
+        # Resolves to fbjni/jni/include
+        "JNI_HEADER": "$(rlocationpath :jni_include)",
     },
     generate_args = ["-G Ninja"],
     lib_name = "fbjni",
