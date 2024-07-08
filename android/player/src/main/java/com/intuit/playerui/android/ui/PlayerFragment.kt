@@ -17,6 +17,8 @@ import androidx.transition.Transition
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.SuspendableAsset
+import com.intuit.playerui.android.databinding.FallbackViewBinding
+import com.intuit.playerui.android.databinding.PlayerFragmentBinding
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.extensions.transitionInto
 import com.intuit.playerui.android.lifecycle.ManagedPlayerState
@@ -76,7 +78,7 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
     private var _binding: PlayerBinding? = null
 
     /**
-     * [PlayerBinding] instance
+     * [PlayerFragmentBinding] instance
      * This property is only valid between onCreateView and onDestroyView.
      * Will throw a NPE if called out of turn.
      */
@@ -202,7 +204,7 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
      * [PlayerViewModel] encounters an [exception]. Defaults to an instance of [FallbackViewBinding].
      */
     public open fun buildFallbackView(exception: Exception): View? =
-        FallbackBinding.inflate(layoutInflater).apply {
+        FallbackViewBinding.inflate(layoutInflater).apply {
             this.error.text = exception.localizedMessage
 
             retry.setOnClickListener {
