@@ -26,10 +26,10 @@ cc_import(
 alias(
     name = "libhermes",
     actual = select({
-        ":arm64-v8a": ":arm64-v8a_libhermes",
-        ":armeabi-v7a": ":armeabi-v7a_libhermes",
-        ":x86": ":x86_libhermes",
-        ":x86_64": ":x86_64_libhermes",
+        "@player//:arm64-v8a": ":arm64-v8a_libhermes",
+        "@player//:armeabi-v7a": ":armeabi-v7a_libhermes",
+        "@player//:x86": ":x86_libhermes",
+        "@player//:x86_64": ":x86_64_libhermes",
         "//conditions:default": ":empty",
     }),
     visibility = ["//visibility:public"],
