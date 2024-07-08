@@ -4,6 +4,7 @@ import com.alexii.j2v8debugger.ScriptSourceProvider
 import com.eclipsesource.v8.V8
 import com.eclipsesource.v8.V8Array
 import com.eclipsesource.v8.V8Object
+import com.eclipsesource.v8.V8Function
 import com.eclipsesource.v8.V8Value
 import com.eclipsesource.v8.utils.MemoryManager
 import com.intuit.playerui.core.bridge.Invokable
@@ -20,6 +21,7 @@ import com.intuit.playerui.core.utils.InternalPlayerApi
 import com.intuit.playerui.core.utils.await
 import com.intuit.playerui.j2v8.V8Null
 import com.intuit.playerui.j2v8.V8Primitive
+import com.intuit.playerui.j2v8.V8Value
 import com.intuit.playerui.j2v8.addPrimitive
 import com.intuit.playerui.j2v8.bridge.V8Node
 import com.intuit.playerui.j2v8.bridge.serialization.format.J2V8Format
@@ -71,6 +73,7 @@ internal class V8Runtime(override val config: J2V8RuntimeConfig) : Runtime<V8Val
             this,
             playerSerializersModule + SerializersModule {
                 contextual(V8Value::class, V8ValueSerializer)
+                contextual(V8Function::class, V8ValueSerializer.conform())
                 contextual(V8Object::class, V8ValueSerializer.conform())
                 contextual(V8Array::class, V8ValueSerializer.conform())
                 contextual(V8Primitive::class, V8ValueSerializer.conform())
@@ -110,6 +113,10 @@ internal class V8Runtime(override val config: J2V8RuntimeConfig) : Runtime<V8Val
             }
             memoryScope = MemoryManager(v8)
         }
+    }
+
+    override fun executeRaw(script: String): V8Value = v8.evaluateInJSThreadBlocking(runtime) {
+        V8Value(executeScript(script))
     }
 
     override fun execute(script: String): Any? = v8.evaluateInJSThreadBlocking(runtime) {
