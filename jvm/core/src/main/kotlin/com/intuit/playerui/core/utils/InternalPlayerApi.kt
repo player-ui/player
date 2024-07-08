@@ -7,5 +7,5 @@ package com.intuit.playerui.core.utils
  * and will be changed without any warnings or migration aids.
  */
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.CONSTRUCTOR)
-@RequiresOptIn(message = "This API is internal and is not intended for public usage.", level = RequiresOptIn.Level.WARNING)
+@RequiresOptIn(message = "This API is internal and is not intended for public usage.", level = RequiresOptIn.Level.ERROR)
 public annotation class InternalPlayerApi
