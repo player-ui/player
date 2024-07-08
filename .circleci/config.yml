@@ -205,6 +205,27 @@ jobs:
       - store_test_results:
           path: _test_results
 
+  test:
+    executor: base
+    steps:
+      - attach_workspace:
+          at: ~/player
+
+      - run: bazel test --config=skip-ios --config=ci -- //... -//docs/site -//android/demo:android_instrumentation_test
+
+      - run:
+          when: always
+          command: |
+            RESULTS_DIR=_test_results
+            find -L ./bazel-testlogs -name test.xml | while read line
+            do
+              mkdir -p $RESULTS_DIR/$(dirname $line)
+              cp $line $RESULTS_DIR/$(dirname $line)
+            done
+
+      - store_test_results:
+          path: _test_results
+
   android_test:
     executor: android
     steps:
@@ -276,7 +297,7 @@ jobs:
 
       # union the bundle targets until //... doesnt explode analyzing jvm/android targets
       - run: |
-          BUNDLE_TARGETS=$(bazel query "kind(js_test, //plugins/...) union kind(js_test, //react/...) union kind(js_test, //core/...) union kind(test, //jvm/...) union kind(test, //android/...) - //android/demo:android_instrumentation_test" --output label 2>/dev/null | tr '\n' ' ')
+          BUNDLE_TARGETS=$(bazel query "kind(js_test, //plugins/...) union kind(js_test, //react/...) union kind(js_test, //core/...)" --output label 2>/dev/null | tr '\n' ' ')
           bazel coverage --combined_report=lcov --config=ci -- $BUNDLE_TARGETS
 
       - run:
