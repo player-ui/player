@@ -123,17 +123,13 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
         format.encodeToRuntimeValue(serializer, value).handleValue(format)
     }
 
-    override external fun isReleased(): Boolean
-
-    private external fun releaseRuntime()
-
     override fun release() {
         // cancel work in runtime scope
         scope.cancel("releasing runtime")
         // swap to dispatcher to release everything
         runBlocking(dispatcher) {
-//            releaseRuntime()
-            // TODO: Release scopes & runtime
+            // will call ~JHermesRuntime() -> release() to release scope, then config, then runtime
+            mHybridData.resetNative()
         }
         // close dispatcher
         dispatcher.close()

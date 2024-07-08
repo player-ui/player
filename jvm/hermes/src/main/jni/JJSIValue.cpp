@@ -5,6 +5,16 @@
 
 namespace intuit::playerui {
 
+[[noreturn]] void throwNativeHandleReleasedException(std::string nativeHandle) {
+    // TODO: create a new exception type for this (or maybe use cpp exception?) -- would need to create jthrowable instance here
+    auto throwableClass = findClassLocal("com/intuit/playerui/core/player/PlayerException");
+    JConstructor<jthrowable(jstring)> constructor = throwableClass->getConstructor<jthrowable(jstring)>();
+    local_ref<JThrowable> throwable = throwableClass->newObject(constructor, make_jstring("Native handle for " + nativeHandle + " released!").release());
+
+    throwNewJavaException(throwable.get());
+    FACEBOOK_JNI_THROW_PENDING_EXCEPTION();
+}
+
 std::vector<Value> unwrapJJSIValues(alias_ref<JArrayClass<JJSIValue::jhybridobject>> wrapped) {
     std::vector<Value> values = {};
     values.reserve(wrapped->size());

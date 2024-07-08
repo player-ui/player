@@ -12,18 +12,28 @@ import com.intuit.playerui.hermes.extensions.UnsafeRuntimeThreadAPI
 import com.intuit.playerui.hermes.extensions.evaluateInCurrentThread
 import com.intuit.playerui.hermes.extensions.handleValue
 import com.intuit.playerui.jsi.Function.Companion.createFromHostFunction
+import com.intuit.playerui.jsi.serialization.format.JSIEncodingException
 import com.intuit.playerui.jsi.serialization.format.JSIFormat
 import com.intuit.playerui.jsi.serialization.format.decodeFromValue
 import com.intuit.playerui.jsi.serialization.format.encodeToValue
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.JsonElement
 import java.nio.ByteBuffer
 import kotlin.reflect.KClass
 
-public class PreparedJavaScript(@DoNotStrip private val mHybridData: HybridData)
+public abstract class HybridClass internal constructor(@DoNotStrip protected val mHybridData: HybridData) {
+    public fun isReleased(): Boolean = synchronized(mHybridData) {
+        !mHybridData.isValid
+    }
+
+    public open fun release() {
+        mHybridData.resetNative()
+    }
+}
+
+public class PreparedJavaScript(mHybridData: HybridData) : HybridClass(mHybridData)
 
 // NOTE: mHybridData is required to be a member field, so we put it in the constructor
-public open class Runtime(@DoNotStrip private val mHybridData: HybridData) {
+public open class Runtime(mHybridData: HybridData) : HybridClass(mHybridData) {
     /** context(RuntimeThreadContext) */ public external fun evaluateJavaScript(script: String, sourceURL: String = "unknown"): Value
     /** context(RuntimeThreadContext) */ public external fun prepareJavaScript(script: String, sourceURL: String = "unknown"): PreparedJavaScript
     /** context(RuntimeThreadContext) */ public external fun evaluatePreparedJavaScript(js: PreparedJavaScript): Value
@@ -52,7 +62,7 @@ public open class Runtime(@DoNotStrip private val mHybridData: HybridData) {
 // TODO: For serializing into JS objects, can we just make a HostObject?
 
 /** Base interface for native JSI Value instance */
-public sealed class JSIValueContainer(@DoNotStrip private val mHybridData: HybridData) {
+public sealed class JSIValueContainer(mHybridData: HybridData) : HybridClass(mHybridData) {
     /** context(RuntimeThreadContext) */ public abstract fun asValue(runtime: Runtime): Value
 }
 
@@ -197,8 +207,7 @@ private fun handleInvocation(reference: KClass<*>, args: kotlin.Array<Any?>, blo
 } catch (e: Throwable) {
     when (e) {
         is IllegalArgumentException, is ClassCastException ->
-            // TODO: throw jsi encoding serialization exception
-            throw SerializationException("arguments passed to $reference do not conform:\n${args.toList()}", e)
+            throw JSIEncodingException("arguments passed to $reference do not conform:\n${args.toList()}", e)
         else -> throw e
     }
 }
@@ -275,7 +284,7 @@ public class Function private constructor(mHybridData: HybridData) : Object(mHyb
         /** context(RuntimeThreadContext) */ @JvmStatic public external fun createFromHostFunction(runtime: Runtime, name: String, paramCount: Int, func: HostFunction): Function
         // TODO: Use paramCount to validate args against?
         context(RuntimeThreadContext) public fun createFromHostFunction(runtime: Runtime, name: String = "unknown", paramCount: Int = 22, func: Value.(runtime: Runtime, args: kotlin.Array<out Value>) -> Value): Function =
-            createFromHostFunction(runtime, name, paramCount, HostFunction { runtime, thisVal, args -> thisVal.func(runtime, args) })
+            createFromHostFunction(runtime, name, paramCount, HostFunction { _, thisVal, args -> thisVal.func(runtime, args) })
         context(RuntimeThreadContext) public fun createFromHostFunction(runtime: Runtime, name: String = "unknown", paramCount: Int = 22, func: Value.(args: kotlin.Array<out Value>) -> Value): Function =
             createFromHostFunction(runtime, name, paramCount, HostFunction { _, thisVal, args -> thisVal.func(args) })
         context(RuntimeThreadContext) public fun createFromHostFunction(format: JSIFormat, func: (args: kotlin.Array<out Any?>) -> Any?): Function =

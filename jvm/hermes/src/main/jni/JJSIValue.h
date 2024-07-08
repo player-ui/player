@@ -10,10 +10,15 @@ using namespace facebook::jsi;
 
 namespace intuit::playerui {
 
-struct Releasable {
-    virtual void release();
-    virtual bool isReleased();
-    virtual ~Releasable() = default;
+[[noreturn]] void throwNativeHandleReleasedException(std::string nativeHandle);
+
+class JHybridClass : public HybridClass<JHybridClass> {
+public:
+    static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/HybridClass;";
+    virtual void release() = 0;
+    virtual bool isReleased() = 0;
+
+    ~JHybridClass() override = default;
 };
 
 /**
@@ -24,7 +29,7 @@ struct Releasable {
 // TODO: Can we hide these from the implementation (C++) to ensure they use the real types?
 #define FORWARD_HYBRID_CLASS(name) \
 class name; \
-using name ## HybridClass = HybridClass<name>; \
+using name ## HybridClass = HybridClass<name, JHybridClass>; \
 using name ## _jhybridobject = name ## HybridClass::jhybridobject;
 
 FORWARD_HYBRID_CLASS(JJSIValue)
@@ -39,17 +44,13 @@ public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/PreparedJavaScript;";
     static void registerNatives();
 
-    explicit JJSIPreparedJavaScript(std::shared_ptr<const PreparedJavaScript> prepared) : prepared_(std::move(prepared)) {}
+    explicit JJSIPreparedJavaScript(std::shared_ptr<const PreparedJavaScript> prepared) : prepared_(prepared) {}
 
-//    void release() override {
-//        prepared_.reset();
-//    }
-//
-//    bool isReleased() override {
-//        return !prepared_;
-//    }
+    std::shared_ptr<const PreparedJavaScript> get_prepared() const {
+        if (prepared_) return prepared_;
 
-    std::shared_ptr<const PreparedJavaScript> get_prepared() const { return prepared_; }
+        throwNativeHandleReleasedException("PreparedJavaScript");
+    }
 private:
     std::shared_ptr<const PreparedJavaScript> prepared_;
 };
@@ -60,6 +61,7 @@ public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Runtime;";
     static void registerNatives();
 
+    // TODO: Evaluate optimization of accepting byte buffer
     local_ref<JJSIValue_jhybridobject> evaluateJavaScript(std::string script, std::string sourceURL);
     local_ref<JJSIPreparedJavaScript::jhybridobject> prepareJavaScript(std::string script, std::string sourceURL);
     local_ref<JJSIValue_jhybridobject> evaluatePreparedJavaScript(alias_ref<JJSIPreparedJavaScript::jhybridobject> js);
@@ -75,6 +77,9 @@ public:
     // TODO: Come back and implement this for CDT support
     // bool isInspectable();
     // local_ref<JJSIInstrumentation_jhybridobject> instrumentation();
+
+    /** Ensure the runtime knows about our wrappers, so it can release runtime values before releasing the runtimes */
+    virtual void trackRef(alias_ref<JHybridClass::jhybridobject> ref) = 0;
 
     virtual Runtime& get_runtime() = 0;
 };
@@ -93,12 +98,16 @@ public:
         return runtime_;
     };
 
+    void trackRef(alias_ref<JHybridClass::jhybridobject> ref) override {
+        throw std::runtime_error("Agnostic runtime wrapper cannot be used to track references. Ensure you track references with the concrete runtime wrapper.");
+    }
+
     JJSIRuntimeWrapper(Runtime& runtime) : HybridClass(), runtime_(runtime) {}
 private:
     std::reference_wrapper<Runtime> runtime_;
 };
 
-class JJSIValue : public HybridClass<JJSIValue> {
+class JJSIValue : public JJSIValueHybridClass {
 public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Value;";
     static void registerNatives();
@@ -117,7 +126,7 @@ public:
     static local_ref<jhybridobject> createFromJsonUtf8(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JByteBuffer> json);
     static bool strictEquals(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b);
 
-    explicit JJSIValue(Value&& value) : value_(std::make_shared<Value>(std::move(value))) {}
+    explicit JJSIValue(Value&& value) : HybridClass(), value_(std::make_unique<Value>(std::move(value))) {}
 
     bool isUndefined();
     bool isNull();
@@ -136,11 +145,22 @@ public:
     local_ref<JJSIObject_jhybridobject> asObject(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     std::string toString(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
 
-    Value& get_value() const { return *value_; }
+    void release() override {
+        value_.reset();
+    }
+
+    bool isReleased() override {
+        return value_ == nullptr;
+    }
+
+    Value& get_value() const {
+        if (value_) return *value_;
+
+        throwNativeHandleReleasedException("Value");
+    }
 private:
     friend HybridBase;
-    // needs to exist on heap to persist through JNI calls
-    std::shared_ptr<Value> value_;
+    std::unique_ptr<Value> value_;
 };
 
 /** JSI Object hybrid class - initially ignoring support for host object, native state, and array buffers. */
@@ -152,9 +172,9 @@ public:
     static local_ref<jhybridobject> create(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     static bool strictEquals(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b);
 
-    explicit JJSIObject(Object&& object) : object_(std::make_shared<Object>(std::move(object))) {}
+    explicit JJSIObject(Object&& object) : HybridClass(), object_(std::make_unique<Object>(std::move(object))) {}
 
-    bool instanceOf(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<HybridClass<JJSIFunction>::jhybridobject> ctor);
+    bool instanceOf(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIFunction_jhybridobject> ctor);
 
     bool isArray(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     bool isFunction(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
@@ -170,11 +190,23 @@ public:
     local_ref<jhybridobject> getPropertyAsObject(alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name);
     local_ref<JJSIFunction_jhybridobject> getPropertyAsFunction(alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name);
 
-    Object& get_object() const { return *object_; }
+    void release() override {
+        object_.reset();
+    }
+
+    bool isReleased() override {
+        return object_ == nullptr;
+    }
+
+    Object& get_object() const {
+        if (object_) return *object_;
+
+        throwNativeHandleReleasedException("Object");
+    }
 private:
     friend HybridBase;
     friend class JJSIValue;
-    std::shared_ptr<Object> object_;
+    std::unique_ptr<Object> object_;
 };
 
 class JJSIArray : public JJSIArrayHybridClass {
@@ -184,16 +216,28 @@ public:
 
     static local_ref<jhybridobject> createWithElements(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> elements);
 
-    explicit JJSIArray(Array&& function) : array_(std::make_shared<Array>(std::move(function))) {}
+    explicit JJSIArray(Array&& function) : HybridClass(), array_(std::make_unique<Array>(std::move(function))) {}
 
     int size(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     local_ref<JJSIValue::jhybridobject> getValueAtIndex(alias_ref<JJSIRuntime::jhybridobject> jRuntime, int i);
     void setValueAtIndex(alias_ref<JJSIRuntime::jhybridobject> jRuntime, int i, alias_ref<JJSIValue::jhybridobject> value);
 
-    Array& get_array() const { return *array_; }
+    void release() override {
+        array_.reset();
+    }
+
+    bool isReleased() override {
+        return array_ == nullptr;
+    }
+
+    Array& get_array() const {
+        if (array_) return *array_;
+
+        throwNativeHandleReleasedException("Array");
+    }
 private:
     friend HybridBase;
-    std::shared_ptr<Array> array_;
+    std::unique_ptr<Array> array_;
 };
 
 struct JJSIHostFunction : JavaClass<JJSIHostFunction> {
@@ -218,17 +262,29 @@ public:
 
     static local_ref<jhybridobject> createFromHostFunction(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name, int paramCount, alias_ref<JJSIHostFunction> func);
 
-    explicit JJSIFunction(Function&& function) : function_(std::make_shared<Function>(std::move(function))) {}
+    explicit JJSIFunction(Function&& function) : HybridClass(), function_(std::make_unique<Function>(std::move(function))) {}
 
     local_ref<JJSIValue::jhybridobject> call(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> args);
     local_ref<JJSIValue::jhybridobject> callWithThis(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIObject::jhybridobject> jsThis, alias_ref<JArrayClass<JJSIValue::jhybridobject>> args);
     local_ref<JJSIValue::jhybridobject> callAsConstructor(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> args);
     bool isHostFunction(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
 
-    Function& get_function() const { return *function_; }
+    void release() override {
+        function_.reset();
+    }
+
+    bool isReleased() override {
+        return function_ == nullptr;
+    }
+
+    Function& get_function() const {
+        if (function_) return *function_;
+
+        throwNativeHandleReleasedException("Function");
+    }
 private:
     friend HybridBase;
-    std::shared_ptr<Function> function_;
+    std::unique_ptr<Function> function_;
 };
 
 class JJSISymbol : public JJSISymbolHybridClass {
@@ -238,13 +294,25 @@ public:
 
     static bool strictEquals(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b);
 
-    explicit JJSISymbol(Symbol&& symbol) : symbol_(std::make_shared<Symbol>(std::move(symbol))) {}
+    explicit JJSISymbol(Symbol&& symbol) : HybridClass(), symbol_(std::make_unique<Symbol>(std::move(symbol))) {}
 
     std::string toString(alias_ref<JJSIRuntime::jhybridobject> jRuntime);
 
-    Symbol& get_symbol() const { return *symbol_; }
+    void release() override {
+        symbol_.reset();
+    }
+
+    bool isReleased() override {
+        return symbol_ == nullptr;
+    }
+
+    Symbol& get_symbol() const {
+        if (symbol_) return *symbol_;
+
+        throwNativeHandleReleasedException("Symbol");
+    }
 private:
     friend HybridBase;
-    std::shared_ptr<Symbol> symbol_;
+    std::unique_ptr<Symbol> symbol_;
 };
 };

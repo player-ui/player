@@ -52,7 +52,20 @@ public:
         return JJSIValue::newObjectCxxArgs(get_runtime().evaluateJavaScriptWithSourceMap(std::make_shared<StringBuffer>(script), std::make_shared<StringBuffer>(sourceMap), sourceURL));
     }
 
+    void trackRef(alias_ref<JHybridClass::jhybridobject> ref) override {
+        scope_.push_back(make_weak(ref));
+    }
+
+    ~JHermesRuntime() override {
+        // make sure we release in order, values before runtime
+        release();
+    }
+
     void release() {
+        for (auto weak : scope_) {
+            // // TODO: Maybe this'll work, but maybe we need to call into JVM to delete native pointer for hybrid class, which'll invoke the deleter and reset all smart pointers
+            if (auto ref = weak.lockLocal()) ref->cthis()->release();
+        }
         if (jConfig_) jConfig_.reset();
         if (runtime_) runtime_.reset();
     }
@@ -62,7 +75,9 @@ public:
     }
 
     HermesRuntime& get_runtime() override {
-        return *runtime_;
+        if (runtime_) return *runtime_;
+
+        throwNativeHandleReleasedException("HermesRuntime");
     }
 
     operator facebook::jsi::Runtime&() { return get_runtime(); }
@@ -70,14 +85,15 @@ public:
     local_ref<JHermesConfig::jhybridobject> get_config() {
         if (jConfig_) return make_local(jConfig_);
 
-        throwNewJavaException("com/intuit/playerui/core/player/PlayerException", "Runtime released - can't access config");
+        throwNativeHandleReleasedException("JHermesConfig");
     }
 
 private:
     friend HybridBase;
     std::unique_ptr<HermesRuntime> runtime_;
     global_ref<JHermesConfig::jhybridobject> jConfig_;
-    explicit JHermesRuntime(std::unique_ptr<HermesRuntime> runtime, alias_ref<JHermesConfig::jhybridobject> jConfig) : HybridClass(), runtime_(std::move(runtime)), jConfig_(make_global(jConfig)) {
+    std::vector<weak_ref<JHybridClass::jhybridobject>> scope_;
+    explicit JHermesRuntime(std::unique_ptr<HermesRuntime> runtime, alias_ref<JHermesConfig::jhybridobject> jConfig) : HybridClass(), runtime_(std::move(runtime)), jConfig_(make_global(jConfig)), scope_() {
         // TODO: Add dynamic fatal handler
         runtime->setFatalHandler([](const std::string& msg) {
             std::cout << "FATAL: " << msg << std::endl;
