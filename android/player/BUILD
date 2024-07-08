@@ -1,16 +1,18 @@
 load(":defs.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
 load("@build_constants//:constants.bzl", "VERSION")
 load("@rules_kotlin//kotlin:core.bzl", "kt_kotlinc_options")
+load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load("//jvm:defs.bzl", "distribution")
 load("@grab_bazel_common//tools/databinding:databinding.bzl", "kt_db_android_library")
 load("@rules_player//kotlin:defs.bzl", "kt_jvm_junit5_test", "lint")
 
-kt_db_android_library(
+kt_android_library(
     name = "player",
     srcs = glob(["src/main/java/**/*.kt"]),
     custom_package = "com.intuit.playerui.android",
     manifest = ":src/main/AndroidManifest.xml",
     resource_files = glob(["src/main/res/**"]),
+    enable_data_binding = True,
     resources = main_resources,
     tags = ["maven_coordinates=com.intuit.playerui:android:aar:%s" % VERSION],
     visibility = ["//visibility:public"],
@@ -19,7 +21,7 @@ kt_db_android_library(
 
 distribution(
     name = "player",
-    lib_name = "player-databinding",
+    lib_name = "player-no-db",
     maven_coordinates = "com.intuit.playerui:android:%s" % VERSION,
 )
 

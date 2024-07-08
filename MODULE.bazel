@@ -112,15 +112,6 @@ use_repo(android_ndk_repository_extension, "androidndk")
 
 register_toolchains("@androidndk//:all")
 
-# Databinding
-bazel_dep(name = "grab_bazel_common")
-git_override(
-    module_name = "grab_bazel_common",
-    # bazel-6 branch
-    commit = "75e9fd4d280329d3b13fc6f6bde1ab0f05fd2e86",
-    remote = "https://github.com/sugarmanz/grab-bazel-common.git",
-)
-
 remote_android_extensions = use_extension("@bazel_tools//tools/android:android_extensions.bzl", "remote_android_tools_extensions")
 use_repo(remote_android_extensions, "android_gmaven_r8")
 
@@ -210,6 +201,12 @@ maven.install(
         # slf4j
         "org.slf4j:slf4j-api:1.7.36",
         "ch.qos.logback:logback-classic:1.2.10",
+
+        "androidx.annotation:annotation:1.5.0",
+        "androidx.databinding:databinding-adapters:7.2.2",
+        "androidx.databinding:databinding-common:7.2.2",
+        "androidx.databinding:databinding-runtime:7.2.2",
+        "androidx.databinding:viewbinding:7.2.2",
 
         # Junit5
         "org.junit.platform:junit-platform-commons:1.7.2",
