@@ -265,19 +265,5 @@ java_plugin(
         ":android_tools",
     ],
 )
-
-java_import(
-    name = "android_sdk",
-    jars = ["@bazel_tools//tools/android:android_jar"],
-    neverlink = 1,
-    visibility = ["//visibility:public"],
-)
-
-java_runtime(
-    name = "jdk8",
-    java_home = "/Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home",
-    visibility = ["//visibility:public"]
-)
-
 #SwiftLint
 exports_files([".swiftlint.yml"])

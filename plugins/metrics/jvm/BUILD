@@ -6,5 +6,5 @@ kt_player_plugin(
     main_deps = main_deps,
     main_exports = main_exports,
     main_resources = main_resources,
-    test_package = "com.intuit.playerui.jvm.plugins.metrics",
+    test_package = "com.intuit.playerui.plugins.metrics",
 )

@@ -8,18 +8,6 @@ tsup_config(name = "tsup_config")
 
 vitest_config(name = "vitest_config")
 
-# xlr_compile(
-#     name = "assets_xlr",
-#     srcs = glob(["src/**"]),
-#     data = [
-#         # TODO: Fix for missing dlv in @player-ui
-#         "//:node_modules/dlv",
-#         ":node_modules/@player-ui/asset-transform-plugin",
-#         ":node_modules/@player-ui/beacon-plugin",
-#         ":node_modules/@player-ui/player",
-#     ],
-# )
-
 js_xlr_pipeline(
     package_name = "@player-ui/reference-assets-plugin",
     build_deps = NATIVE_BUILD_DEPS,

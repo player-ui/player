@@ -232,16 +232,6 @@ maven.install(
         "https://jitpack.io/",
     ],
 )
-maven.install(
-    name = "kotlinx_coroutines_core_fixed",
-    artifacts = [
-        "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:jar:1.5.2",
-    ],
-    fetch_sources = True,
-    repositories = [
-        "https://repo1.maven.org/maven2",
-    ],
-)
 use_repo(maven, "maven")
 
 bazel_dep(name = "rules_robolectric", version = "4.10", repo_name = "robolectric")

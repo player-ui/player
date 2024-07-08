@@ -9,8 +9,6 @@ DEFAULT_DEVELOPERS = {
     "sugarmanz": ["name=Jeremiah Zucker", "email=zucker.jeremiah@gmail.com"],
     "brocollie08": ["name=Tony Lin", "email=sentony93@gmail.com"],
 }
-GIT_REPO = "https://github.com/player-ui/player-ui.git"
-DOCS_URL = "https://player-ui.github.io"
 DEFAULT_RELEASE_REPO = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
 DEFAULT_SNAPSHOT_REPO = "https://oss.sonatype.org/content/repositories/snapshots/"
 
