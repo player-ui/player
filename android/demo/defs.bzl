@@ -15,8 +15,6 @@ maven_test = [
     "@maven//:androidx_test_ext_junit_ktx"
 ]
 
-maven = maven_main + maven_test
-
 main_deps = maven_main + [
     "//jvm/utils",
     "//plugins/reference-assets/android:assets",
