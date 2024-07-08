@@ -49,10 +49,13 @@ public:
 
     // TODO: Add the rest of the HermesRuntime API (like loading bytecode)
     local_ref<JJSIValue::jhybridobject> evaluateJavaScriptWithSourceMap(std::string script, std::string sourceMap, std::string sourceURL) {
-        return JJSIValue::newObjectCxxArgs(get_runtime().evaluateJavaScriptWithSourceMap(std::make_shared<StringBuffer>(script), std::make_shared<StringBuffer>(sourceMap), sourceURL));
+        auto result = JJSIValue::newObjectCxxArgs(get_runtime().evaluateJavaScriptWithSourceMap(std::make_shared<StringBuffer>(script), std::make_shared<StringBuffer>(sourceMap), sourceURL));
+        trackRef(result);
+        return result;
     }
 
     void trackRef(alias_ref<JHybridClass::jhybridobject> ref) override {
+        // TODO: Maybe we could do a periodic pruning of the vector to remove obsolete refs?
         scope_.push_back(make_weak(ref));
     }
 
@@ -63,7 +66,6 @@ public:
 
     void release() {
         for (auto weak : scope_) {
-            // // TODO: Maybe this'll work, but maybe we need to call into JVM to delete native pointer for hybrid class, which'll invoke the deleter and reset all smart pointers
             if (auto ref = weak.lockLocal()) ref->cthis()->release();
         }
         if (jConfig_) jConfig_.reset();
@@ -90,10 +92,13 @@ public:
 
 private:
     friend HybridBase;
-    std::unique_ptr<HermesRuntime> runtime_;
-    global_ref<JHermesConfig::jhybridobject> jConfig_;
     std::vector<weak_ref<JHybridClass::jhybridobject>> scope_;
-    explicit JHermesRuntime(std::unique_ptr<HermesRuntime> runtime, alias_ref<JHermesConfig::jhybridobject> jConfig) : HybridClass(), runtime_(std::move(runtime)), jConfig_(make_global(jConfig)), scope_() {
+    global_ref<JHermesConfig::jhybridobject> jConfig_;
+    std::unique_ptr<HermesRuntime> runtime_;
+    explicit JHermesRuntime(
+        std::unique_ptr<HermesRuntime> runtime,
+        alias_ref<JHermesConfig::jhybridobject> jConfig
+    ) : HybridClass(), scope_(), jConfig_(make_global(jConfig)), runtime_(std::move(runtime)) {
         // TODO: Add dynamic fatal handler
         runtime->setFatalHandler([](const std::string& msg) {
             std::cout << "FATAL: " << msg << std::endl;

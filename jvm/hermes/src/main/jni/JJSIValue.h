@@ -246,13 +246,9 @@ struct JJSIHostFunction : JavaClass<JJSIHostFunction> {
     // Explicitly static API to allow the JJSIHostFunction reference to be passed in, as it usually comes in as
     // a reference that we need to explicitly make_global to ensure it persists until the time the host function
     // is actually called.
-    static Value call(alias_ref<JJSIHostFunction> jThis, Runtime& runtime, Value& thisVal, Value* args, size_t count);
+    static Value call(alias_ref<JJSIHostFunction> jThis, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIValue::jhybridobject> thisVal, alias_ref<JArrayClass<JJSIValue::jhybridobject>> values);
 
-    // TODO: HostFunctionType declares thisVal and args as const, which makes it difficult to wrap
-    //       with JJSIValue for cross-jni usage. We've applied a patch to loosen the parameter
-    //       constraints, but a better solution would likely be to follow a const (read-only)
-    //       approach in a JJSIConstValue class.
-    Value call(Runtime& runtime, Value& thisVal, Value* args, size_t count);
+    Value call(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIValue::jhybridobject> thisVal, alias_ref<JArrayClass<JJSIValue::jhybridobject>> values);
 };
 
 class JJSIFunction : public JJSIFunctionHybridClass {

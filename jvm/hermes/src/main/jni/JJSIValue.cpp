@@ -3,13 +3,23 @@
 
 #include <iostream>
 
+/**
+ * IMPORTANT: Our current scoping strategy is to ensure all JHybridClass constructs (JSI Value wrappers)
+ *  are tracked as weak_refs with the runtime that they're created in. This allows the runtime to explicitly
+ *  release any lingering runtime pointer values before releasing the runtime itself. This prevents dangling
+ *  pointers that could cause undefined behavior (likely segfault - or assert if in debug mode).
+ *
+ *  Currently, this requires careful consideration for every newObjectCxxArgs call. If it creates a wrapper
+ *  around a runtime PointerValue, and we don't have a guarantee it won't go out of scope, then we need to
+ *  make sure it's tracked. TODO: Make it more foolproof, maybe inside the ctors for our wrappers
+ */
 namespace intuit::playerui {
 
 [[noreturn]] void throwNativeHandleReleasedException(std::string nativeHandle) {
-    // TODO: create a new exception type for this (or maybe use cpp exception?) -- would need to create jthrowable instance here
+    // TODO: create a new exception type for this to hook into PlayerRuntimeException
     auto throwableClass = findClassLocal("com/intuit/playerui/core/player/PlayerException");
-    JConstructor<jthrowable(jstring)> constructor = throwableClass->getConstructor<jthrowable(jstring)>();
-    local_ref<JThrowable> throwable = throwableClass->newObject(constructor, make_jstring("Native handle for " + nativeHandle + " released!").release());
+    auto constructor = throwableClass->getConstructor<jthrowable(jstring)>();
+    auto throwable = throwableClass->newObject(constructor, make_jstring("Native handle for " + nativeHandle + " released!").release());
 
     throwNewJavaException(throwable.get());
     FACEBOOK_JNI_THROW_PENDING_EXCEPTION();
@@ -29,7 +39,9 @@ void JJSIPreparedJavaScript::registerNatives() {
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIRuntime::evaluateJavaScript(std::string script, std::string sourceURL) {
-    return JJSIValue::newObjectCxxArgs(get_runtime().evaluateJavaScript(std::make_shared<StringBuffer>(script), sourceURL));
+    auto value = JJSIValue::newObjectCxxArgs(get_runtime().evaluateJavaScript(std::make_shared<StringBuffer>(script), sourceURL));
+    trackRef(value);
+    return value;
 }
 
 local_ref<JJSIPreparedJavaScript::jhybridobject> JJSIRuntime::prepareJavaScript(std::string script, std::string sourceURL) {
@@ -37,7 +49,9 @@ local_ref<JJSIPreparedJavaScript::jhybridobject> JJSIRuntime::prepareJavaScript(
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIRuntime::evaluatePreparedJavaScript(alias_ref<JJSIPreparedJavaScript::jhybridobject> js) {
-    return JJSIValue::newObjectCxxArgs(get_runtime().evaluatePreparedJavaScript(js->cthis()->get_prepared()));
+    auto value = JJSIValue::newObjectCxxArgs(get_runtime().evaluatePreparedJavaScript(js->cthis()->get_prepared()));
+    trackRef(value);
+    return value;
 }
 
 #ifdef JSI_MICROTASK
@@ -51,7 +65,9 @@ bool JJSIRuntime::drainMicrotasks(int maxMicrotasksHint) {
 #endif
 
 local_ref<JJSIObject::jhybridobject> JJSIRuntime::global() {
-    return JJSIObject::newObjectCxxArgs(get_runtime().global());
+    auto global = JJSIObject::newObjectCxxArgs(get_runtime().global());
+    trackRef(global);
+    return global;
 }
 
 std::string JJSIRuntime::description() {
@@ -85,19 +101,27 @@ local_ref<JJSIValue::jhybridobject> JJSIValue::fromInt(alias_ref<jclass>, int i)
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIValue::fromString(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string str) {
-    return newObjectCxxArgs(String::createFromUtf8(jRuntime->cthis()->get_runtime(), str));
+    auto value = newObjectCxxArgs(String::createFromUtf8(jRuntime->cthis()->get_runtime(), str));
+    jRuntime->cthis()->trackRef(value);
+    return value;
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIValue::fromLong(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, jlong l) {
-    return newObjectCxxArgs(BigInt::fromInt64(jRuntime->cthis()->get_runtime(), l));
+    auto value = newObjectCxxArgs(BigInt::fromInt64(jRuntime->cthis()->get_runtime(), l));
+    jRuntime->cthis()->trackRef(value);
+    return value;
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIValue::fromSymbol(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSISymbol::jhybridobject> symbol) {
-    return newObjectCxxArgs(Value(jRuntime->cthis()->get_runtime(), symbol->cthis()->get_symbol()));
+    auto value = newObjectCxxArgs(Value(jRuntime->cthis()->get_runtime(), symbol->cthis()->get_symbol()));
+    jRuntime->cthis()->trackRef(value);
+    return value;
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIValue::fromObject(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIObject::jhybridobject> object) {
-    return newObjectCxxArgs(Value(jRuntime->cthis()->get_runtime(), object->cthis()->get_object()));
+    auto value = newObjectCxxArgs(Value(jRuntime->cthis()->get_runtime(), object->cthis()->get_object()));
+    jRuntime->cthis()->trackRef(value);
+    return value;
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIValue::undefined(alias_ref<jclass>) {
@@ -109,7 +133,7 @@ local_ref<JJSIValue::jhybridobject> JJSIValue::null(alias_ref<jclass>) {
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIValue::createFromJsonUtf8(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JByteBuffer> json) {
-    Runtime& runtime = cthis(jRuntime)->get_runtime();
+    Runtime& runtime = jRuntime->cthis()->get_runtime();
 
     // Direct ByteBuffers are an efficient way to transfer bulk data between Java and C++.
     if (!json->isDirect()) {
@@ -117,12 +141,14 @@ local_ref<JJSIValue::jhybridobject> JJSIValue::createFromJsonUtf8(alias_ref<jcla
         throw std::runtime_error("Argument is not a direct buffer.");
     }
 
-    return newObjectCxxArgs(Value::createFromJsonUtf8(runtime, json->getDirectBytes(), json->getDirectSize()));
+    auto value = newObjectCxxArgs(Value::createFromJsonUtf8(runtime, json->getDirectBytes(), json->getDirectSize()));
+    jRuntime->cthis()->trackRef(value);
+    return value;
 }
 
 bool JJSIValue::strictEquals(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b) {
-    Runtime& runtime = cthis(jRuntime)->get_runtime();
-    return Value::strictEquals(runtime, cthis(a)->get_value(), cthis(b)->get_value());
+    Runtime& runtime = jRuntime->cthis()->get_runtime();
+    return Value::strictEquals(runtime, a->cthis()->get_value(), b->cthis()->get_value());
 }
 
 bool JJSIValue::isUndefined() {
@@ -168,26 +194,29 @@ double JJSIValue::asNumber() {
 // TODO: Ensure this is what we want to do - we can return the JSI String container
 //       instead to help be more optimistic about memory, but this helps w/ runtime access
 std::string JJSIValue::asString(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
-    Runtime& runtime = cthis(jRuntime)->get_runtime();
+    Runtime& runtime = jRuntime->cthis()->get_runtime();
     return value_->asString(runtime).utf8(runtime);
 }
 
 jlong JJSIValue::asBigInt(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
-    Runtime& runtime = cthis(jRuntime)->get_runtime();
+    Runtime& runtime = jRuntime->cthis()->get_runtime();
     return value_->asBigInt(runtime).asInt64(runtime);
 }
 
 local_ref<JJSISymbol::jhybridobject> JJSIValue::asSymbol(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
-    return JJSISymbol::newObjectCxxArgs(value_->asSymbol(jRuntime->cthis()->get_runtime()));
+    auto symbol = JJSISymbol::newObjectCxxArgs(value_->asSymbol(jRuntime->cthis()->get_runtime()));
+    jRuntime->cthis()->trackRef(symbol);
+    return symbol;
 }
 
 local_ref<JJSIObject::jhybridobject> JJSIValue::asObject(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
-    Runtime& runtime = cthis(jRuntime)->get_runtime();
-    return JJSIObject::newObjectCxxArgs(value_->asObject(runtime));
+    auto object = JJSIObject::newObjectCxxArgs(value_->asObject(jRuntime->cthis()->get_runtime()));
+    jRuntime->cthis()->trackRef(object);
+    return object;
 }
 
 std::string JJSIValue::toString(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
-    Runtime& runtime = cthis(jRuntime)->get_runtime();
+    Runtime& runtime = jRuntime->cthis()->get_runtime();
     return value_->toString(runtime).utf8(runtime);
 }
 
@@ -237,32 +266,37 @@ void JJSIValue::registerNatives() {
 }
 
 local_ref<JJSIObject::jhybridobject> JJSIObject::create(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
-    return newObjectCxxArgs(Object(jRuntime->cthis()->get_runtime()));
+    auto object = newObjectCxxArgs(Object(jRuntime->cthis()->get_runtime()));
+    jRuntime->cthis()->trackRef(object);
+    return object;
 }
 
 bool JJSIObject::strictEquals(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b) {
-    // TODO: Settle on cthis API approach
     return Object::strictEquals(jRuntime->cthis()->get_runtime(), a->cthis()->get_object(), b->cthis()->get_object());
 }
 
 bool JJSIObject::instanceOf(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIFunction::jhybridobject> ctor) {
-    return object_->instanceOf(cthis(jRuntime)->get_runtime(), ctor->cthis()->get_function());
+    return object_->instanceOf(jRuntime->cthis()->get_runtime(), ctor->cthis()->get_function());
 }
 
 bool JJSIObject::isArray(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
-    return object_->isArray(cthis(jRuntime)->get_runtime());
+    return object_->isArray(jRuntime->cthis()->get_runtime());
 }
 
 bool JJSIObject::isFunction(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
-    return object_->isFunction(cthis(jRuntime)->get_runtime());
+    return object_->isFunction(jRuntime->cthis()->get_runtime());
 }
 
 local_ref<JJSIArray::jhybridobject> JJSIObject::asArray(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
-    return JJSIArray::newObjectCxxArgs(object_->asArray(jRuntime->cthis()->get_runtime()));
+    auto array = JJSIArray::newObjectCxxArgs(object_->asArray(jRuntime->cthis()->get_runtime()));
+    jRuntime->cthis()->trackRef(array);
+    return array;
 }
 
 local_ref<JJSIFunction::jhybridobject> JJSIObject::asFunction(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
-    return JJSIFunction::newObjectCxxArgs(object_->asFunction(jRuntime->cthis()->get_runtime()));
+    auto function = JJSIFunction::newObjectCxxArgs(object_->asFunction(jRuntime->cthis()->get_runtime()));
+    jRuntime->cthis()->trackRef(function);
+    return function;
 }
 
 bool JJSIObject::hasProperty(alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name) {
@@ -275,19 +309,27 @@ void JJSIObject::setProperty(alias_ref<JJSIRuntime::jhybridobject> jRuntime, std
 }
 
 local_ref<JJSIArray::jhybridobject> JJSIObject::getPropertyNames(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
-    return JJSIArray::newObjectCxxArgs(object_->getPropertyNames(jRuntime->cthis()->get_runtime()));
+    auto names = JJSIArray::newObjectCxxArgs(object_->getPropertyNames(jRuntime->cthis()->get_runtime()));
+    jRuntime->cthis()->trackRef(names);
+    return names;
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIObject::getProperty(alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name) {
-    return JJSIValue::newObjectCxxArgs(object_->getProperty(cthis(jRuntime)->get_runtime(), name.c_str()));
+    auto value = JJSIValue::newObjectCxxArgs(object_->getProperty(jRuntime->cthis()->get_runtime(), name.c_str()));
+    jRuntime->cthis()->trackRef(value);
+    return value;
 }
 
 local_ref<JJSIObject::jhybridobject> JJSIObject::getPropertyAsObject(alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name) {
-    return newObjectCxxArgs(object_->getPropertyAsObject(jRuntime->cthis()->get_runtime(), name.c_str()));
+    auto object = newObjectCxxArgs(object_->getPropertyAsObject(jRuntime->cthis()->get_runtime(), name.c_str()));
+    jRuntime->cthis()->trackRef(object);
+    return object;
 }
 
 local_ref<JJSIFunction::jhybridobject> JJSIObject::getPropertyAsFunction(alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name) {
-    return JJSIFunction::newObjectCxxArgs(object_->getPropertyAsFunction(jRuntime->cthis()->get_runtime(), name.c_str()));
+    auto function = JJSIFunction::newObjectCxxArgs(object_->getPropertyAsFunction(jRuntime->cthis()->get_runtime(), name.c_str()));
+    jRuntime->cthis()->trackRef(function);
+    return function;
 }
 
 void JJSIObject::registerNatives() {
@@ -319,7 +361,9 @@ local_ref<JJSIArray::jhybridobject> JJSIArray::createWithElements(alias_ref<jcla
         array.setValueAtIndex(runtime, i, elements->getElement(i)->cthis()->get_value());
     }
 
-    return newObjectCxxArgs(std::move(array));
+    auto jArray = newObjectCxxArgs(std::move(array));
+    jRuntime->cthis()->trackRef(jArray);
+    return jArray;
 }
 
 int JJSIArray::size(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
@@ -328,7 +372,9 @@ int JJSIArray::size(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIArray::getValueAtIndex(alias_ref<JJSIRuntime::jhybridobject> jRuntime, int i) {
-    return JJSIValue::newObjectCxxArgs(array_->getValueAtIndex(jRuntime->cthis()->get_runtime(), i));
+    auto value = JJSIValue::newObjectCxxArgs(array_->getValueAtIndex(jRuntime->cthis()->get_runtime(), i));
+    jRuntime->cthis()->trackRef(value);
+    return value;
 }
 
 void JJSIArray::setValueAtIndex(alias_ref<JJSIRuntime::jhybridobject> jRuntime, int i, alias_ref<JJSIValue::jhybridobject> value) {
@@ -351,28 +397,51 @@ local_ref<JJSIFunction::jhybridobject> JJSIFunction::createFromHostFunction(alia
     auto propName = PropNameID::forUtf8(jRuntime->cthis()->get_runtime(), name);
 
     auto jFunc = make_global(func);
-    // TODO: Verify if this enough count as storage for a global, I would think so, since we're storing the lambda in the runtime?
-    HostFunctionType hostFunc = [jFunc](Runtime& runtime, Value& thisVal, Value* args, size_t count) -> Value {
+    global_ref<JJSIRuntime::jhybridobject> gRuntime = make_global(jRuntime);
+    // TODO: HostFunctionType declares thisVal and args as const, which makes it difficult to wrap
+    //       with JJSIValue for cross-jni usage. We've applied a patch to loosen the parameter
+    //       constraints, but a better solution would likely be to follow a const (read-only)
+    //       approach in a JJSIConstValue class.
+    HostFunctionType hostFunc = [jFunc, gRuntime](Runtime& runtime, Value& thisVal, Value* args, size_t count) -> Value {
+        local_ref<JArrayClass<JJSIValue::jhybridobject>> values = JArrayClass<JJSIValue::jhybridobject>::newArray(count);
+        for (size_t i = 0; i < count; i++) {
+            auto arg = JJSIValue::newObjectCxxArgs(std::move(args[i]));
+            // TODO: This might not be enough since it's a local_ref to begin with, and then we dereference it anyways -- maybe we need to pass the local_ref as part of the array class?
+            gRuntime->cthis()->trackRef(arg);
+            values->setElement(i, arg.get());
+        }
+
+        auto reciever = JJSIValue::newObjectCxxArgs(std::move(thisVal));
+        gRuntime->cthis()->trackRef(reciever);
+
         // TODO: We need to handle JVM errors here, or up a level
-        return JJSIHostFunction::call(jFunc, runtime, thisVal, args, count);
+        return JJSIHostFunction::call(jFunc, gRuntime, reciever, values);
     };
 
-    return newObjectCxxArgs(Function::createFromHostFunction(jRuntime->cthis()->get_runtime(), propName, paramCount, hostFunc));
+    auto function = newObjectCxxArgs(Function::createFromHostFunction(jRuntime->cthis()->get_runtime(), propName, paramCount, hostFunc));
+    jRuntime->cthis()->trackRef(function);
+    return function;
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIFunction::call(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> args) {
     auto values = unwrapJJSIValues(args);
-    return JJSIValue::newObjectCxxArgs(function_->call(jRuntime->cthis()->get_runtime(), static_cast<const Value*>(values.data()), values.size()));
+    auto result = JJSIValue::newObjectCxxArgs(function_->call(jRuntime->cthis()->get_runtime(), static_cast<const Value*>(values.data()), values.size()));
+    jRuntime->cthis()->trackRef(result);
+    return result;
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIFunction::callWithThis(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIObject::jhybridobject> jsThis, alias_ref<JArrayClass<JJSIValue::jhybridobject>> args) {
     auto values = unwrapJJSIValues(args);
-    return JJSIValue::newObjectCxxArgs(function_->callWithThis(jRuntime->cthis()->get_runtime(), jsThis->cthis()->get_object(), static_cast<const Value*>(values.data()), values.size()));
+    auto result = JJSIValue::newObjectCxxArgs(function_->callWithThis(jRuntime->cthis()->get_runtime(), jsThis->cthis()->get_object(), static_cast<const Value*>(values.data()), values.size()));
+    jRuntime->cthis()->trackRef(result);
+    return result;
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIFunction::callAsConstructor(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> args) {
     auto values = unwrapJJSIValues(args);
-    return JJSIValue::newObjectCxxArgs(function_->callAsConstructor(jRuntime->cthis()->get_runtime(), static_cast<const Value*>(values.data()), values.size()));
+    auto result = JJSIValue::newObjectCxxArgs(function_->callAsConstructor(jRuntime->cthis()->get_runtime(), static_cast<const Value*>(values.data()), values.size()));
+    jRuntime->cthis()->trackRef(result);
+    return result;
 }
 
 bool JJSIFunction::isHostFunction(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
@@ -405,16 +474,11 @@ void JJSISymbol::registerNatives() {
     });
 }
 
-Value JJSIHostFunction::call(alias_ref<JJSIHostFunction> jThis, Runtime &runtime, Value &thisVal, Value *args, size_t count) {
-    return jThis->call(runtime, thisVal, args, count);
+Value JJSIHostFunction::call(alias_ref<JJSIHostFunction> jThis, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIValue::jhybridobject> thisVal, alias_ref<JArrayClass<JJSIValue::jhybridobject>> args) {
+    return jThis->call(jRuntime, thisVal, args);
 }
 
-Value JJSIHostFunction::call(Runtime &runtime, Value &thisVal, Value *args, size_t count) {
-    local_ref<JArrayClass<JJSIValue::jhybridobject>> values = JArrayClass<JJSIValue::jhybridobject>::newArray(count);
-    for (size_t i = 0; i < count; i++) {
-        values->setElement(i, JJSIValue::newObjectCxxArgs(std::move(args[i])).get());
-    }
-
+Value JJSIHostFunction::call(alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIValue::jhybridobject> thisVal, alias_ref<JArrayClass<JJSIValue::jhybridobject>> args) {
     static const auto method = getClass()->getMethod<
         local_ref<JJSIValue::jhybridobject>(
             alias_ref<JJSIRuntime::jhybridobject>,
@@ -423,11 +487,7 @@ Value JJSIHostFunction::call(Runtime &runtime, Value &thisVal, Value *args, size
         )>("call");
 
     // TODO: I thought method would handle JVM exceptions, but it doesn't seem to be
-    return std::move(method(self(),
-        JJSIRuntimeWrapper::newObjectCxxArgs(runtime),
-        JJSIValue::newObjectCxxArgs(std::move(thisVal)).releaseAlias(),
-        values.releaseAlias()
-    )->cthis()->get_value());
+    return std::move(method(self(), jRuntime, thisVal, args)->cthis()->get_value());
 }
 
 };
