@@ -22,7 +22,7 @@ describe("view", () => {
             baz: false,
           },
         }),
-        parseBinding,
+        parseBinding
       );
       const evaluator = new ExpressionEvaluator({ model });
       const schema = new SchemaController();
@@ -54,7 +54,7 @@ describe("view", () => {
           parseBinding,
           evaluator,
           schema,
-        },
+        }
       );
 
       const pluginOptions = toNodeResolveOptions(view.resolverOptions);
@@ -80,35 +80,35 @@ describe("view", () => {
       expect(updated).toBe(resolved);
     });
 
-    test('works with no valid switch cases in an array', () => {
+    test("works with no valid switch cases in an array", () => {
       const model = withParser(new LocalModel({}), parseBinding);
       const evaluator = new ExpressionEvaluator({ model });
       const schema = new SchemaController();
 
       const view = new ViewInstance(
         {
-          id: 'test',
-          type:'view',
+          id: "test",
+          type: "view",
           title: {
-              staticSwitch: [
-                {
-                  case: false,
-                  asset: {
-                    id: 'false-case',
-                    type: 'text',
-                    value: 'some text',
-                  },
+            staticSwitch: [
+              {
+                case: false,
+                asset: {
+                  id: "false-case",
+                  type: "text",
+                  value: "some text",
                 },
-                {
-                  case: false,
-                  asset: {
-                    id: 'false-case-2',
-                    type: 'text',
-                    value: 'some text',
-                  },
+              },
+              {
+                case: false,
+                asset: {
+                  id: "false-case-2",
+                  type: "text",
+                  value: "some text",
                 },
-              ],
-            },
+              },
+            ],
+          },
         } as any,
         {
           model,
@@ -124,12 +124,12 @@ describe("view", () => {
       const resolved = view.update();
 
       expect(resolved).toStrictEqual({
-        id: 'test',
-        type: 'view',
+        id: "test",
+        type: "view",
       });
     });
 
-    it('does not return a field object if the case does not resolve an asset', () => {
+    it("does not return a field object if the case does not resolve an asset", () => {
       const model = withParser(
         new LocalModel({
           foo: {
@@ -137,7 +137,7 @@ describe("view", () => {
             baz: false,
           },
         }),
-        parseBinding,
+        parseBinding
       );
       const evaluator = new ExpressionEvaluator({ model });
       const schema = new SchemaController();
@@ -165,7 +165,7 @@ describe("view", () => {
           parseBinding,
           evaluator,
           schema,
-        },
+        }
       );
 
       const pluginOptions = toNodeResolveOptions(view.resolverOptions);
@@ -192,7 +192,7 @@ describe("view", () => {
             baz: "bad",
           },
         }),
-        parseBinding,
+        parseBinding
       );
       const evaluator = new ExpressionEvaluator({ model });
       const schema = new SchemaController();
@@ -224,7 +224,7 @@ describe("view", () => {
           parseBinding,
           evaluator,
           schema,
-        },
+        }
       );
 
       const pluginOptions = toNodeResolveOptions(view.resolverOptions);
@@ -252,7 +252,7 @@ describe("view", () => {
             baz: false,
           },
         }),
-        parseBinding,
+        parseBinding
       );
 
       const evaluator = new ExpressionEvaluator({ model });
@@ -285,7 +285,7 @@ describe("view", () => {
           model,
           parseBinding,
           evaluator,
-        },
+        }
       );
 
       const pluginOptions = toNodeResolveOptions(view.resolverOptions);
@@ -326,7 +326,7 @@ describe("view", () => {
             baz: "bad",
           },
         }),
-        parseBinding,
+        parseBinding
       );
       const evaluator = new ExpressionEvaluator({ model });
       const schema = new SchemaController();
@@ -373,7 +373,7 @@ describe("view", () => {
           parseBinding,
           evaluator,
           schema,
-        },
+        }
       );
 
       const pluginOptions = toNodeResolveOptions(view.resolverOptions);
@@ -471,7 +471,7 @@ describe("view", () => {
           parseBinding,
           evaluator,
           schema,
-        },
+        }
       );
 
       const pluginOptions = toNodeResolveOptions(view.resolverOptions);
@@ -516,7 +516,7 @@ describe("view", () => {
             world: "World",
           },
         }),
-        parseBinding,
+        parseBinding
       );
       const schema = new SchemaController();
       const evaluator = new ExpressionEvaluator({ model });
@@ -537,7 +537,7 @@ describe("view", () => {
           parseBinding,
           evaluator,
           schema,
-        },
+        }
       );
 
       new StringResolverPlugin().apply(view);
@@ -572,7 +572,7 @@ describe("view", () => {
 
       model.set([[parseBinding("foo.unrelated"), "other stuff"]]);
       expect(view.update(new Set([parseBinding("foo.unrelated")]))).toBe(
-        updated,
+        updated
       );
     });
   });
@@ -594,7 +594,7 @@ describe("view", () => {
         parseBinding,
         evaluator,
         schema,
-      },
+      }
     );
 
     expect(view).toBeDefined();
