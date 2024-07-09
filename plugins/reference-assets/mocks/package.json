@@ -1,8 +1,6 @@
 {
   "name": "@player-ui/reference-assets-plugin-mocks",
   "version": "0.0.0-PLACEHOLDER",
-  "main":"",
-  "module": "",
   "dependencies": {
     "@player-ui/reference-assets-cli-preset": "workspace:*",
     "@player-ui/reference-assets-plugin-components": "workspace:*"
