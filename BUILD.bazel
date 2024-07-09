@@ -2,8 +2,9 @@ load("@rules_player//ios:defs.bzl", "assemble_pod")
 load("@rules_player//internal:defs.bzl", "stamp")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@aspect_rules_js//js:defs.bzl", "js_library")
-load("@bazel_gazelle//:def.bzl", "gazelle_binary")
+load("@bazel_gazelle//:def.bzl", "gazelle_binary", "gazelle")
 load("@rules_swift_package_manager//swiftpkg:defs.bzl", "swift_update_packages")
+load("@bazel_tools//tools/jdk:default_java_toolchain.bzl", "default_java_toolchain")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -242,5 +243,27 @@ swift_update_packages(
     update_bzlmod_stanzas = False,
 )
 
+# This target updates the Bazel build files for your project. Run this target
+# whenever you add or remove source files from your project.
+gazelle(
+    name = "update_build_files",
+    gazelle = ":gazelle_bin",
+)
+
+alias(
+    name = "android_tools",
+    actual = "@bazel_tools//src/tools/android/java/com/google/devtools/build/android:all_android_tools",
+    visibility = ["//visibility:public"],
+)
+
+java_plugin(
+    name = "compiler_annotation_processor",
+    generates_api = False,
+    processor_class = "android.databinding.annotationprocessor.ProcessDataBinding",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":android_tools",
+    ],
+)
 #SwiftLint
 exports_files([".swiftlint.yml"])

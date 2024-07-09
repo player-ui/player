@@ -1,0 +1,38 @@
+load("//:build_constants.bzl", "build_constants")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+
+build_constants()
+
+android_sdk_repository(
+    name = "androidsdk",
+    api_level = 33
+)
+
+load("@grab_bazel_common//rules:repositories.bzl", "bazel_common_dependencies")
+
+bazel_common_dependencies()
+
+bind(
+    name = "databinding_annotation_processor",
+    actual = "//:compiler_annotation_processor",
+)
+
+load("@grab_bazel_common//rules:setup.bzl", "bazel_common_setup")
+
+bazel_common_setup(
+    patched_android_tools = True, # Optionally use patched android_tools jars
+    buildifier_version = "6.3.3",
+)
+
+http_file(
+    name = "android_test_orchestrator_apk",
+    sha256 = "b7a2e7d0184b03e12c7357f3914d539da40b52a11e90815edff1022c655f459b",
+    url = "https://dl.google.com/android/maven2/androidx/test/orchestrator/1.4.2/orchestrator-1.4.2.apk"
+)
+
+http_file(
+    name = "android_test_services_apk",
+    sha256 = "c6bc74268b29bdabad8da962e00e2f6fd613c24b42c69e81b258397b4819f156",
+    url = "https://dl.google.com/android/maven2/androidx/test/services/test-services/1.4.2/test-services-1.4.2.apk"
+)

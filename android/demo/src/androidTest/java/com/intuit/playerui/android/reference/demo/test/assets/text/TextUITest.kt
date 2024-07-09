@@ -22,7 +22,7 @@ class TextUITest : AssetUITest("reference-assets") {
     fun basic() {
         launchMock("text-basic")
 
-        waitForViewInRoot(withText("This is some text."))
+        waitForViewInRoot(withText("This is some text"))
             .check(matches(isDisplayed()))
     }
 
@@ -32,7 +32,7 @@ class TextUITest : AssetUITest("reference-assets") {
 
         val openLink = allOf(
             hasAction(ACTION_VIEW),
-            hasData("http://www.intuit.com"),
+            hasData("https://www.intuit.com"),
         )
 
         intending(openLink).respondWith(ActivityResult(RESULT_CANCELED, null))

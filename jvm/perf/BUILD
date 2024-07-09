@@ -1,5 +1,5 @@
-load("//jvm:build.bzl", "kt_player_module")
-load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+load("//jvm:defs.bzl", "kt_player_module")
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 
 kt_player_module(
     name = "perf_tests",
@@ -25,7 +25,7 @@ kt_jvm_library(
         "//jvm/core",
         "//jvm/graaljs",
         "//jvm/j2v8:j2v8-all",
-        "@com_github_jetbrains_kotlin//:kotlin-reflect",
+        "@rules_kotlin//kotlin/compiler:kotlin-reflect",
         "@maven//:org_openjdk_jmh_jmh_core",
     ],
 )

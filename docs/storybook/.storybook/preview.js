@@ -1,4 +1,4 @@
-// import { PlayerDecorator } from "@player-ui/storybook-addon-player";
+import { PlayerDecorator } from "@player-ui/storybook-addon-player";
 import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin-react";
 import { CommonTypesPlugin } from "@player-ui/common-types-plugin";
 import { DataChangeListenerPlugin } from "@player-ui/data-change-listener-plugin";
@@ -31,4 +31,14 @@ export const parameters = {
       ],
     },
   },
+  chakra: {
+    theme: {},
+  },
 };
+
+const preview = {
+  parameters,
+  decorators: [PlayerDecorator]
+};
+
+export default preview;

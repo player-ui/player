@@ -9,7 +9,7 @@
     "@player-ui/data-change-listener-plugin": "workspace:*",
     "@player-ui/computed-properties-plugin": "workspace:*",
     "@player-ui/reference-assets-plugin-components": "workspace:*",
-    "@player-ui/reference-assets-plugin-mocks": "workspace:*",
+    "@player-ui/mocks": "workspace:*",
     "@player-ui/react": "workspace:*",
     "@player-ui/storybook-addon-player": "workspace:*"
   }

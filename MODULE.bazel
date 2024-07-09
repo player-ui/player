@@ -1,23 +1,26 @@
-module(name = "player", version = "1.0")
+module(
+    name = "player",
+    version = "1.0",
+)
 
 bazel_dep(name = "rules_player")
-
 git_override(
-    remote = "https://github.com/player-ui/rules_player.git",
-    # bazel-6 branch
-    commit = "e495a5d27dbd144043483d3aa7861101175ef2cb",
     module_name = "rules_player",
+    # bazel-6 branch
+    commit = "10252ce6e603ed24eec1137fbded6112a9669e76",
+    remote = "https://github.com/player-ui/rules_player.git",
 )
-# local_path_override(module_name = "rules_player", path = "../rules_player")
+#local_path_override(module_name = "rules_player", path = "../rules_player")
 
-bazel_dep(name = "aspect_bazel_lib", version = "1.32.0")
+bazel_dep(name = "aspect_bazel_lib", version = "1.39.0")
 bazel_dep(name = "aspect_rules_js", version = "1.34.1")
-bazel_dep(name = "bazel_skylib", version = "1.4.1")
+bazel_dep(name = "bazel_skylib", version = "1.4.2")
 bazel_dep(name = "rules_pkg", version = "0.9.1")
 bazel_dep(name = "aspect_rules_ts", version = "2.1.0")
 
 ####### Node.js version #########
 bazel_dep(name = "rules_nodejs", version = "6.0.2")
+
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 node.toolchain(node_version = "18.18.0")
 #################################
@@ -27,7 +30,6 @@ node.toolchain(node_version = "18.18.0")
 bazel_dep(name = "rules_apple", version = "3.5.1", repo_name = "build_bazel_rules_apple")
 bazel_dep(name = "rules_ios", version = "4.3.1", repo_name = "build_bazel_rules_ios")
 bazel_dep(name = "rules_xcodeproj", version = "2.2.0")
-
 bazel_dep(name = "gazelle", version = "0.34.0", repo_name = "bazel_gazelle")
 bazel_dep(name = "rules_swift_package_manager", version = "0.22.0")
 bazel_dep(name = "swiftlint", version = "0.54.0", repo_name = "SwiftLint")
@@ -48,23 +50,22 @@ swift_deps.from_file(
 use_repo(
     swift_deps,
     "swiftpkg_swift_hooks",
+    "swiftpkg_swiftlint",
     "swiftpkg_viewinspector",
-    "swiftpkg_swiftlint"
 )
+
 ###### End iOS ######
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
-
 npm.npm_translate_lock(
     name = "npm",
-    pnpm_lock = "//:pnpm-lock.yaml",
     data = [
         "//:package.json",
         "//:patches/@chakra-ui__system@2.6.2.patch",
     ],
     npmrc = "//:.npmrc",
+    pnpm_lock = "//:pnpm-lock.yaml",
     verify_node_modules_ignored = "//:.bazelignore",
 )
-
 use_repo(npm, "npm")
 
 rules_ts_ext = use_extension(
@@ -72,7 +73,164 @@ rules_ts_ext = use_extension(
     "ext",
     dev_dependency = True,
 )
-
 rules_ts_ext.deps()
-
 use_repo(rules_ts_ext, "npm_typescript")
+
+# Kotlin
+bazel_dep(
+    name = "rules_kotlin",
+    version = "1.9.1",
+)
+
+# TODO: Custom compiler version breaks embedded jdeps generator plugin - enable when removing custom kotlinc (see .bazelrc jvm_emit_jdeps)
+rules_kotlin_extensions = use_extension(
+    "@rules_kotlin//src/main/starlark/core/repositories:bzlmod_setup.bzl",
+    "rules_kotlin_extensions",
+)
+rules_kotlin_extensions.kotlinc_version(
+    sha256 = "9db4b467743c1aea8a21c08e1c286bc2aeb93f14c7ba2037dbd8f48adc357d83",
+    version = "1.7.22",
+)
+use_repo(
+    rules_kotlin_extensions,
+    "com_github_jetbrains_kotlin",
+)
+
+register_toolchains("//jvm:kotlin_toolchain")
+
+# Android
+bazel_dep(name = "rules_android", version = "0.1.1")
+bazel_dep(name = "rules_android_ndk")
+git_override(
+    module_name = "rules_android_ndk",
+    commit = "d5c9d46a471e8fcd80e7ec5521b78bb2df48f4e0",
+    remote = "https://github.com/bazelbuild/rules_android_ndk",
+)
+
+android_ndk_repository_extension = use_extension("@rules_android_ndk//:extension.bzl", "android_ndk_repository_extension")
+use_repo(android_ndk_repository_extension, "androidndk")
+
+register_toolchains("@androidndk//:all")
+
+# Databinding
+bazel_dep(name = "grab_bazel_common")
+git_override(
+    module_name = "grab_bazel_common",
+    # bazel-6 branch
+    commit = "75e9fd4d280329d3b13fc6f6bde1ab0f05fd2e86",
+    remote = "https://github.com/sugarmanz/grab-bazel-common.git",
+)
+
+remote_android_extensions = use_extension("@bazel_tools//tools/android:android_extensions.bzl", "remote_android_tools_extensions")
+use_repo(remote_android_extensions, "android_gmaven_r8")
+
+# Maven
+bazel_dep(name = "rules_jvm_external")
+git_override(
+    module_name = "rules_jvm_external",
+    # bazel-6 branch
+    commit = "44f4355b2dbe0d6fd73d690ad66bf5744d482a29",
+    remote = "https://github.com/sugarmanz/rules_jvm_external.git",
+)
+
+maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
+maven.install(
+    artifacts = [
+        "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0",
+        "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0",
+        "com.intuit.hooks:hooks:0.15.0",
+
+        # Testing
+        "io.mockk:mockk:1.9.3",
+        "org.amshove.kluent:kluent:1.68",
+        "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0",
+
+        # Android
+        "androidx.databinding:databinding-adapters:7.2.2",
+        "androidx.databinding:databinding-common:7.2.2",
+        "androidx.databinding:databinding-runtime:7.2.2",
+
+        # Android Demo
+        "androidx.navigation:navigation-runtime:2.3.3",
+        "androidx.navigation:navigation-ui-ktx:2.3.3",
+        "androidx.navigation:navigation-fragment-ktx:2.3.3",
+        "com.afollestad.material-dialogs:core:3.3.0",
+        "com.google.android.material:material:1.4.0",
+
+        # Android Demo Testing
+        "androidx.test.espresso:espresso-intents:3.3.0",
+        "androidx.test.ext:junit-ktx:1.1.3",
+
+        # Reference Assets Testing
+        "androidx.test:core:1.3.0",
+        "androidx.test:runner:1.3.0",
+        "org.robolectric:robolectric:4.11.1",
+
+        # Android Player
+        "androidx.core:core-ktx:1.6.0",
+        "androidx.appcompat:appcompat:1.3.0",
+        "androidx.transition:transition:1.4.1",
+        "androidx.lifecycle:lifecycle-runtime-ktx:2.4.0",
+        "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0",
+        "androidx.constraintlayout:constraintlayout:2.1.4",
+
+        # AndroidX Resolutions
+        "androidx.activity:activity-ktx:1.2.3",
+        "androidx.fragment:fragment-ktx:1.3.4",
+
+        # Graal
+        "org.graalvm.js:js:21.2.0",
+        "org.graalvm.js:js-scriptengine:21.2.0",
+        "org.graalvm.sdk:graal-sdk:21.2.0",
+
+        # J2V8 debug
+        "com.github.AlexTrotsenko:j2v8-debugger:0.2.3",
+        "com.facebook.stetho:stetho:1.5.1",
+
+        # Test utils
+        "org.junit.jupiter:junit-jupiter-api:5.6.0",
+
+        # Perf
+        "org.openjdk.jmh:jmh-core:1.21",
+        "org.openjdk.jmh:jmh-generator-annprocess:1.21",
+
+        # Distribution
+        "com.eclipsesource.minimal-json:minimal-json:0.9.5",
+        "com.electronwill.night-config:core:3.6.5",
+        "com.electronwill.night-config:toml:3.6.5",
+        "com.google.http-client:google-http-client:1.34.2",
+        "info.picocli:picocli:4.3.2",
+        "org.apache.commons:commons-compress:1.21",
+        "org.zeroturnaround:zt-exec:1.10",
+        "com.github.ajalt.clikt:clikt-jvm:3.4.0",
+        "io.github.gradle-nexus:publish-plugin:1.1.0",
+        "ch.qos.logback:logback-classic:1.2.11",
+
+        # slf4j
+        "org.slf4j:slf4j-api:1.7.36",
+        "ch.qos.logback:logback-classic:1.2.10",
+
+        # Junit5
+        "org.junit.platform:junit-platform-commons:1.7.2",
+        "org.junit.platform:junit-platform-console:1.7.2",
+        "org.junit.platform:junit-platform-engine:1.7.2",
+        "org.junit.platform:junit-platform-launcher:1.7.2",
+        "org.junit.platform:junit-platform-suite-api:1.7.2",
+        "org.apiguardian:apiguardian-api:1.0.0",
+        "org.opentest4j:opentest4j:1.1.1",
+        "org.junit.jupiter:junit-jupiter-api:5.6.0",
+        "org.junit.jupiter:junit-jupiter-engine:5.6.0",
+        "org.junit.jupiter:junit-jupiter-params:5.6.0",
+    ],
+    fetch_sources = True,
+    repositories = [
+        "https://repo1.maven.org/maven2",
+        "https://maven.google.com/",
+        "https://plugins.gradle.org/m2/",
+        "https://jcenter.bintray.com/",
+        "https://jitpack.io/",
+    ],
+)
+use_repo(maven, "maven")
+
+bazel_dep(name = "rules_robolectric", version = "4.11.1")
