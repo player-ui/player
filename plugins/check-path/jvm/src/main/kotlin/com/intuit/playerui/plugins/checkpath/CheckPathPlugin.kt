@@ -13,7 +13,7 @@ public class CheckPathPlugin : JSScriptPluginWrapper(pluginName, sourcePath = bu
     public fun getAsset(id: String): Asset? = instance.getInvokable<Any?>("getAsset")?.invoke(id) as? Asset
 
     private companion object {
-        private const val bundledSourcePath = "plugins/check-path/core/dist/check-path-plugin.prod.js"
+        private const val bundledSourcePath = "plugins/check-path/core/dist/CheckPathPlugin.native.js"
         private const val pluginName = "CheckPathPlugin.CheckPathPlugin"
     }
 }

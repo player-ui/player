@@ -56,7 +56,7 @@ val mocks: Map<ContentID, Update> = mapOf(
     )
 )
 
-private const val playerSourcePath = "core/player/dist/player.prod.js"
+private const val playerSourcePath = "core/player/dist/Player.native.js"
 
 private val playerSource by lazy {
     readResource(playerSourcePath)

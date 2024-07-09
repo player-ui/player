@@ -128,12 +128,12 @@ The `ExternalActionPlugin` adds support for handling `EXTERNAL` navigation state
 ## Usage
 In build.gradle
 ```kotlin
-implementation "com.intuit.player.plugins:external-action:$PLAYER_VERSION"
+implementation "com.intuit.playerui.plugins:external-action:$PLAYER_VERSION"
 ```
 
 In Player constructor
 ```kotlin
-import com.intuit.player.plugins.externalAction.ExternalActionPlugin
+import com.intuit.playerui.plugins.externalAction.ExternalActionPlugin
 
 val externalActionPlugin = ExternalActionPlugin { state, options, transition ->
     // access external state node

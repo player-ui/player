@@ -29,7 +29,7 @@ def ios_plugin(name, resources = [], deps = [], test_deps = []):
       bundle_name = name
   )
 
-def swiftui_plugin(name, resources = [], deps = [], test_deps = []):
+def swiftui_plugin(name, resources = [], deps = [], test_deps = [], hasUITests = False):
   """Packages source files, creates swift library and tests for a SwiftUI PlayerUI plugin
 
   Args:
@@ -48,6 +48,7 @@ def swiftui_plugin(name, resources = [], deps = [], test_deps = []):
       hasUnitTests = False, 
       hasViewInspectorTests = True,
       test_host = test_host,
+      hasUITests = hasUITests,
       needsXCTest = False,
       bundle_name = name
   )

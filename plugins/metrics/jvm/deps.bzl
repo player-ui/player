@@ -9,5 +9,5 @@ main_deps = main_exports + [
 ]
 
 main_resources = [
-    "//plugins/metrics/core:MetricsPlugin_Bundles",
+    "//plugins/metrics/core:core_native_bundle",
 ]

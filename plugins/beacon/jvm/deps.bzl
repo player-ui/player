@@ -10,5 +10,5 @@ main_deps = main_exports + [
 ]
 
 main_resources = [
-    "//plugins/beacon/core:BeaconPlugin_Bundles",
+    "//plugins/beacon/core:core_native_bundle",
 ]

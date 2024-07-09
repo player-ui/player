@@ -16,7 +16,7 @@ orbs:
 executors:
   base:
     docker:
-      - image: docker.io/playerui/bazel-docker:7
+      - image: docker.io/playerui/bazel-docker:10
     working_directory: ~/player
     resource_class: xlarge
     environment:
@@ -30,7 +30,7 @@ executors:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   android:
     machine:
-      image: android:202102-01
+      image: android:2024.04.1
     working_directory: ~/player
     resource_class: large
     environment:
@@ -114,10 +114,34 @@ jobs:
       - attach_workspace:
           at: ~/player
 
+      - macos/install-rosetta
+
       - run:
           name: Homebrew Dependencies
           command: |
             HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk lcov
+            brew install --cask temurin@8
+            sudo installer -pkg /opt/homebrew/Caskroom/temurin@8/8,412,08/OpenJDK8U-jdk_x64_mac_hotspot_8u412b08.pkg -target /
+
+      - restore_cache:
+          keys:
+            - android-tools-{{ arch }}-{{ checksum "scripts/install-android-tools.sh" }}
+
+      - run: echo 'export ANDROID_HOME=~/android-tools'  >> $BASH_ENV
+
+      - run:
+          name: Install Android tools
+          command: |
+            sh scripts/install-android-tools.sh
+            echo 'export ANDROID_SDK_HOME=$ANDROID_HOME'  >> $BASH_ENV
+            echo 'export ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk/23.2.8568313'  >> $BASH_ENV
+            echo 'export PATH=$ANDROID_SDK_HOME/tools/bin:$PATH'  >> $BASH_ENV
+            echo 'export PATH=$ANDROID_SDK_HOME/tools:$PATH'  >> $BASH_ENV
+            echo 'export PATH=$ANDROID_SDK_HOME/platform-tools:$PATH'  >> $BASH_ENV
+            echo 'export PATH=$ANDROID_SDK_HOME/emulator:$PATH'  >> $BASH_ENV
+            source $BASH_ENV
+          environment:
+            JAVA_HOME: /Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home
 
       - macos/preboot-simulator:
           version: "17.4"
@@ -181,6 +205,28 @@ jobs:
       - store_test_results:
           path: _test_results
 
+  test:
+    executor: base
+    steps:
+      - attach_workspace:
+          at: ~/player
+
+      - run: |
+          bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
+
+      - run:
+          when: always
+          command: |
+            RESULTS_DIR=_test_results
+            find -L ./bazel-testlogs -name test.xml | while read line
+            do
+              mkdir -p $RESULTS_DIR/$(dirname $line)
+              cp $line $RESULTS_DIR/$(dirname $line)
+            done
+
+      - store_test_results:
+          path: _test_results
+
   android_test:
     executor: android
     steps:
@@ -199,10 +245,17 @@ jobs:
             sudo ln -s /opt/bazelisk-v1.11.0/bazelisk /usr/local/bin/bazel
 
       - run:
-          name: Create avd
+          name: Install Android tools
           command: |
-            sdkmanager "system-images;android-29;default;x86"
-            echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-29;default;x86"
+            rm -rf $ANDROID_HOME/build-tools/*
+            JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64 \
+              $ANDROID_HOME/tools/bin/sdkmanager "build-tools;33.0.1"\
+              "ndk;23.2.8568313" \
+              "system-images;android-33;default;x86_64"
+            echo "export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/23.2.8568313"  >> $BASH_ENV
+            source $BASH_ENV
+            echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-33;default;x86_64" -g default
+             source $BASH_ENV
 
       - run:
           name: Launch emulator
@@ -248,7 +301,7 @@ jobs:
       # union the bundle targets until //... doesnt explode analyzing jvm/android targets
       - run: |
           BUNDLE_TARGETS=$(bazel query "kind(js_test, //plugins/...) union kind(js_test, //react/...) union kind(js_test, //core/...)" --output label 2>/dev/null | tr '\n' ' ')
-          bazel coverage --combined_report=lcov --config=ci -- $BUNDLE_TARGETS -//plugins/reference-assets/mocks:all_flows_test_binary 
+          bazel coverage --combined_report=lcov --config=ci -- $BUNDLE_TARGETS
 
       - run:
           when: always
@@ -350,6 +403,24 @@ workflows:
           requires:
             - build-trunk
             - build-ios-trunk
+
+      - test:
+          name: test-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          requires:
+            - build-trunk
+
+      - test:
+          name: test-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - build-fork
 
       - android_test:
           name: android-test-trunk

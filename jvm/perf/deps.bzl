@@ -1,4 +1,3 @@
-load("@rules_player//maven:parse_coordinates.bzl", "parse_coordinates")
 load("//jvm/dependencies:versions.bzl", "versions")
 
 maven = [

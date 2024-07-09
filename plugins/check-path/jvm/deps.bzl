@@ -9,5 +9,5 @@ main_exports = [
 main_deps = main_exports
 
 main_resources = [
-    "//plugins/check-path/core:CheckPathPlugin_Bundles",
+    "//plugins/check-path/core:core_native_bundle",
 ]

@@ -9,5 +9,5 @@ main_deps = main_exports + [
 ]
 
 main_resources = [
-    "//plugins/pubsub/core:PubSubPlugin_Bundles",
+    "//plugins/pubsub/core:core_native_bundle",
 ]

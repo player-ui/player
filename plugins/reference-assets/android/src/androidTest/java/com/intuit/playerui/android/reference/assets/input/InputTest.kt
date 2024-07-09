@@ -50,8 +50,8 @@ class InputTest : AssetTest("reference-assets") {
     }
 
     @Test
-    fun validation() {
-        launchMock("input-validation")
+    fun transition() {
+        launchMock("input-transition")
 
         val view = currentView.shouldBeView<ConstraintLayout>()
         val inputLabelContainer = view.findViewById<FrameLayout>(R.id.input_label_container)

@@ -12,27 +12,27 @@ export default meta;
 export const Basic = createDSLStory(
   () =>
     import(
-      "!!raw-loader!@player-ui/reference-assets-plugin-mocks/info/info-basic.tsx"
+      "!!raw-loader!@player-ui/mocks/info/info-basic.tsx"
     ),
 );
 
 export const DynamicFlow = createDSLStory(
   () =>
     import(
-      "!!raw-loader!@player-ui/reference-assets-plugin-mocks/info/info-dynamic-flow.tsx"
+      "!!raw-loader!@player-ui/mocks/info/info-dynamic-flow.tsx"
     ),
 );
 
 export const Footer = createDSLStory(
   () =>
     import(
-      "!!raw-loader!@player-ui/reference-assets-plugin-mocks/info/info-footer.tsx"
+      "!!raw-loader!@player-ui/mocks/info/info-footer.tsx"
     ),
 );
 
 export const ModalFlow = createDSLStory(
   () =>
     import(
-      "!!raw-loader!@player-ui/reference-assets-plugin-mocks/info/info-modal-flow.tsx"
+      "!!raw-loader!@player-ui/mocks/info/info-modal-flow.tsx"
     ),
 );
