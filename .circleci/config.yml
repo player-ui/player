@@ -36,8 +36,8 @@ executors:
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   android:
-    docker:
-      - image: docker.io/cimg/android:2024.04.1-ndk
+    machine:
+      image: android:2024.04.1
     working_directory: ~/player
     resource_class: large
     environment:
