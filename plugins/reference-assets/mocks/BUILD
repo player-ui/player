@@ -40,11 +40,14 @@ filegroup(
     ),
 )
 
-filegroup(
-    name = "mocks",
-    srcs = [
-        ":compiled_mocks",
-        ":json_mocks",
-    ],
-    visibility = ["//visibility:public"],
-)
+npm_package(
+        name = "mocks",
+        visibility = ["//visibility:public"],
+        package = "@player-ui/reference-assets-plugin-mocks",
+        srcs = [
+            ":compiled_mocks",
+            ":json_mocks",
+            "package.json"
+        ] + DSL_SRCS,
+        tags = ["do-not-publish"],
+    )
