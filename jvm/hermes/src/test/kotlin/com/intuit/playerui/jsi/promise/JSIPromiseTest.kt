@@ -32,10 +32,6 @@ internal class JSIPromiseTest : HermesTest() {
 
         Promise(promise as Node).thenRecord.catchRecord
 
-        runBlocking {
-            while (catchChain.size < 1) delay(5)
-        }
-
         catchChain.filterIsInstance<Throwable>().forEach { it.printStackTrace() }
 
         assertCatch("ReferenceError: Property 'asdf' doesn't exist")

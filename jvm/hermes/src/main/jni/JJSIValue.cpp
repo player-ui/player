@@ -137,7 +137,6 @@ local_ref<JJSIValue::jhybridobject> JJSIValue::createFromJsonUtf8(alias_ref<jcla
 
     // Direct ByteBuffers are an efficient way to transfer bulk data between Java and C++.
     if (!json->isDirect()) {
-        // TODO: Verify if we even need this
         throw std::runtime_error("Argument is not a direct buffer.");
     }
 
@@ -414,7 +413,6 @@ local_ref<JJSIFunction::jhybridobject> JJSIFunction::createFromHostFunction(alia
         auto reciever = JJSIValue::newObjectCxxArgs(std::move(thisVal));
         gRuntime->cthis()->trackRef(reciever);
 
-        // TODO: We need to handle JVM errors here, or up a level
         return JJSIHostFunction::call(jFunc, gRuntime, reciever, values);
     };
 
@@ -486,7 +484,6 @@ Value JJSIHostFunction::call(alias_ref<JJSIRuntime::jhybridobject> jRuntime, ali
             alias_ref<JArrayClass<JJSIValue::jhybridobject>>
         )>("call");
 
-    // TODO: I thought method would handle JVM exceptions, but it doesn't seem to be
     return std::move(method(self(), jRuntime, thisVal, args)->cthis()->get_value());
 }
 

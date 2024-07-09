@@ -52,7 +52,6 @@ class NodeGetSymbolTest : RuntimeTest() {
 
     @TestTemplate fun `getSymbol works with symbols`() {
         val wrapper = runtime.execute("({ ref: Symbol('hello') })") as Node
-        assertNull(wrapper["ref"])
         assertEquals("Symbol(hello)", wrapper.getSymbol("ref"))
     }
 

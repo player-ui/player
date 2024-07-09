@@ -306,7 +306,10 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         val message = "oh no!"
         player.hooks.viewController.tap { _ ->
             // Different runtimes might actually handle this differently, i.e.
-            // J2V8 will just serialize [message] but Graal will actually serialize this instance
+            //  - J2V8 will just serialize [message]
+            //  - Graal will actually serialize this instance
+            //  - Hermes, FBJNI will translate exception instance,
+            //      but will wrap exceptions from host functions as JSErrors
             throw Exception(message)
         }
 
@@ -316,8 +319,8 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
             }
         }
 
-        assertEquals(message, exception.message)
-        assertEquals("uncaught exception: $message", player.errorState?.error?.message)
+        assertTrue(exception.message!!.endsWith(message))
+        assertTrue(player.errorState?.error?.message!!.endsWith(message))
     }
 
     @TestTemplate

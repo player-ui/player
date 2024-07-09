@@ -22,8 +22,10 @@ public class SetTimeoutPlugin(private val exceptionHandler: CoroutineExceptionHa
     @OptIn(ExperimentalPlayerApi::class)
     override fun apply(runtime: Runtime<*>) {
         if (!runtime.contains("setTimeout")) {
-            runtime.add("setTimeout") { callback: Invokable<Any?>, timeout: Double ->
-                runtime.scope.launch(
+            runtime.add("setTimeout") { callback: Invokable<Any?>, timeout: Long ->
+                if (timeout == 0L) {
+                    callback()
+                } else runtime.scope.launch(
                     // TODO: Potentially just forward to runtime coroutine exception handler
                     exceptionHandler ?: CoroutineExceptionHandler { _, exception ->
                         PlayerPluginException(
@@ -35,7 +37,7 @@ public class SetTimeoutPlugin(private val exceptionHandler: CoroutineExceptionHa
                         }
                     },
                 ) {
-                    delay(timeout.toLong())
+                    delay(timeout)
                     callback()
                 }
                 return@add

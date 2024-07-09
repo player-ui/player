@@ -44,7 +44,7 @@ git_repository(
 git_repository(
     name = "fbjni",
     build_file = "//third_party/fbjni:BUILD",
-    commit = "968e3815f92aeb0670f5d88ae975fbbd47a4b482",
+    commit = "1cf763714e99d45c23dfb316d702ebfa8290af64",
     patches = ["//patches:fbjni.install_headers.patch"],
     remote = "https://github.com/facebookincubator/fbjni",
 )
