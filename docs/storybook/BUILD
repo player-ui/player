@@ -9,7 +9,7 @@ deps = [
     ":node_modules/@player-ui/common-types-plugin",
     ":node_modules/@player-ui/make-flow",
     ":node_modules/@player-ui/reference-assets-plugin-react",
-    ":node_modules/@player-ui/reference-assets-plugin-mocks",
+    ":node_modules/@player-ui/mocks",
     ":node_modules/@player-ui/reference-assets-plugin-components",
     ":node_modules/@player-ui/data-change-listener-plugin",
     ":node_modules/@player-ui/computed-properties-plugin",

@@ -1,4 +1,3 @@
-load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@rules_player//player:defs.bzl", create_base_dsl_config = "create_base_config")
@@ -40,14 +39,11 @@ filegroup(
     ),
 )
 
-npm_package(
-        name = "mocks",
-        visibility = ["//visibility:public"],
-        package = "@player-ui/reference-assets-plugin-mocks",
-        srcs = [
-            ":compiled_mocks",
-            ":json_mocks",
-            "package.json"
-        ] + DSL_SRCS,
-        tags = ["do-not-publish"],
-    )
+filegroup(
+    name = "mocks",
+    srcs = [
+        ":compiled_mocks",
+        ":json_mocks"
+    ] + DSL_SRCS,
+    visibility = ["//visibility:public"]
+)

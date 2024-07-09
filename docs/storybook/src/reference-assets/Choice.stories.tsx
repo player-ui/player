@@ -12,13 +12,13 @@ export default meta;
 export const Basic = createDSLStory(
   () =>
     import(
-      "!!raw-loader!@player-ui/reference-assets-plugin-mocks/choice/choice-basic.tsx"
+      "!!raw-loader!@player-ui/mocks/choice/choice-basic.tsx"
     ),
 );
 
 export const Validation = createDSLStory(
   () =>
     import(
-      "!!raw-loader!@player-ui/reference-assets-plugin-mocks/choice/choice-validation.tsx"
+      "!!raw-loader!@player-ui/mocks/choice/choice-validation.tsx"
     ),
 );

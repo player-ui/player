@@ -12,6 +12,6 @@ export default meta;
 export const Basic = createDSLStory(
   () =>
     import(
-      "!!raw-loader!@player-ui/reference-assets-plugin-mocks/text/text-basic.tsx"
+      "!!raw-loader!@player-ui/mocks/text/text-basic.tsx"
     ),
 );

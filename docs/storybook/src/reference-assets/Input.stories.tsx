@@ -12,13 +12,13 @@ export default meta;
 export const Basic = createDSLStory(
   () =>
     import(
-      "!!raw-loader!@player-ui/reference-assets-plugin-mocks/input/input-basic.tsx"
+      "!!raw-loader!@player-ui/mocks/input/input-basic.tsx"
     ),
 );
 
 export const Validation = createDSLStory(
   () =>
     import(
-      "!!raw-loader!@player-ui/reference-assets-plugin-mocks/input/input-transition.tsx"
+      "!!raw-loader!@player-ui/mocks/input/input-transition.tsx"
     ),
 );

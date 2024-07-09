@@ -553,15 +553,15 @@ importers:
       '@player-ui/make-flow':
         specifier: workspace:*
         version: link:../../core/make-flow
+      '@player-ui/mocks':
+        specifier: workspace:*
+        version: link:../../tools/mocks
       '@player-ui/react':
         specifier: workspace:*
         version: link:../../react/player
       '@player-ui/reference-assets-plugin-components':
         specifier: workspace:*
         version: link:../../plugins/reference-assets/components
-      '@player-ui/reference-assets-plugin-mocks':
-        specifier: workspace:*
-        version: link:../../plugins/reference-assets/mocks
       '@player-ui/reference-assets-plugin-react':
         specifier: workspace:*
         version: link:../../plugins/reference-assets/react
@@ -1005,6 +1005,8 @@ importers:
       '@player-ui/player':
         specifier: workspace:*
         version: link:../../../core/player
+
+  tools/mocks: {}
 
 packages:
 
