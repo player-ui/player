@@ -8,8 +8,8 @@ import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.utils.start
 import io.mockk.every
+import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import io.mockk.spyk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -18,8 +18,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 internal class AssetContextTest {
-    private val context = spyk<Context>()
-    private val context2 = spyk<Context>()
+    @MockK lateinit var context: Context
+
+    @MockK lateinit var context2: Context
     private var asset = mockk<Asset>()
     private val player = AndroidPlayer()
     private var renderable = mockk<RenderableAsset>()
