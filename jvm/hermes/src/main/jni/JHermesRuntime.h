@@ -60,12 +60,12 @@ public:
     }
 
     ~JHermesRuntime() override {
-        // make sure we release in order, values before runtime
+        // make sure we release the runtime value holders that are not yet out of scope
         release();
     }
 
     void release() {
-        for (auto weak : scope_) {
+        for (auto& weak : scope_) {
             if (auto ref = weak.lockLocal()) ref->cthis()->release();
         }
         if (jConfig_) jConfig_.reset();
@@ -92,13 +92,13 @@ public:
 
 private:
     friend HybridBase;
-    std::vector<weak_ref<JHybridClass::jhybridobject>> scope_;
-    global_ref<JHermesConfig::jhybridobject> jConfig_;
     std::unique_ptr<HermesRuntime> runtime_;
+    global_ref<JHermesConfig::jhybridobject> jConfig_;
+    std::vector<weak_ref<JHybridClass::jhybridobject>> scope_;
     explicit JHermesRuntime(
         std::unique_ptr<HermesRuntime> runtime,
         alias_ref<JHermesConfig::jhybridobject> jConfig
-    ) : HybridClass(), scope_(), jConfig_(make_global(jConfig)), runtime_(std::move(runtime)) {
+    ) : HybridClass(), runtime_(std::move(runtime)), jConfig_(make_global(jConfig)), scope_() {
         // TODO: Add dynamic fatal handler
         runtime->setFatalHandler([](const std::string& msg) {
             std::cout << "FATAL: " << msg << std::endl;

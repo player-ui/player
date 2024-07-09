@@ -124,6 +124,8 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
     }
 
     override fun release() {
+        if (isReleased()) return
+
         // cancel work in runtime scope
         scope.cancel("releasing runtime")
         // swap to dispatcher to release everything

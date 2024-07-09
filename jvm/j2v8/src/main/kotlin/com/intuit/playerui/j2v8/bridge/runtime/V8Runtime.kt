@@ -145,6 +145,8 @@ internal class V8Runtime(override val config: J2V8RuntimeConfig) : Runtime<V8Val
     }
 
     override fun release() {
+        if (isReleased()) return
+
         // cancel work in runtime scope
         scope.cancel("releasing runtime")
         // swap to dispatcher to release everything
