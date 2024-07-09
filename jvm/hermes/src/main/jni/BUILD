@@ -68,19 +68,28 @@ cc_binary(
 copy_output(
     name = "libhermes",
     srcs = ["@hermes//:host"],
-    file = "libhermes.dylib",
+    file = select({
+        "@bazel_tools//src/conditions:darwin": ["libhermes.dylib"],
+        "//conditions:default": ["libhermes.so"],
+    }),
 )
 
 copy_output(
     name = "libjsi",
     srcs = ["@hermes//:host"],
-    file = "libjsi.dylib",
+    file = select({
+        "@bazel_tools//src/conditions:darwin": ["libjsi.dylib"],
+        "//conditions:default": ["libjsi.so"],
+    }),
 )
 
 copy_output(
     name = "libfbjni",
     srcs = ["@fbjni//:host"],
-    file = "fbjni.dylib",
+    file = select({
+        "@bazel_tools//src/conditions:darwin": ["libfbjni.dylib"],
+        "//conditions:default": ["libfbjni.so"],
+    }),
 )
 
 java_library(

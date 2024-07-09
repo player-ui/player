@@ -49,7 +49,10 @@ cmake(
     generate_args = ["-G Ninja"],
     lib_name = "fbjni",
     lib_source = "working_directory",
-    out_shared_libs = ["libfbjni.dylib"],
+    out_shared_libs = select({
+        "@bazel_tools//src/conditions:darwin": ["libfbjni.dylib"],
+        "//conditions:default": ["libfbjni.so"],
+    }),
     toolchains = ["@player//:cmake_build_type"],
     visibility = ["//visibility:public"],
 )

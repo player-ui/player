@@ -18,12 +18,22 @@ cmake(
     generate_args = ["-G Ninja"],
     lib_name = "hermes",
     lib_source = "working_directory",
-    out_shared_libs = [
-        "libhermes.dylib",
-        "libjsi.dylib",
-    ],
+    out_shared_libs = select({
+        "@bazel_tools//src/conditions:darwin": [
+            "libhermes.dylib",
+            "libjsi.dylib",
+        ],
+        "//conditions:default": [
+            "libhermes.so",
+            "libjsi.so",
+        ],
+    }),
+
     # NOTE: Uses vars set by build script from rule to "install" JSI lib
-    postfix_script = "cp -L $BUILD_TMPDIR/jsi/libjsi.dylib $INSTALLDIR/lib",
+    postfix_script = select({
+        "@bazel_tools//src/conditions:darwin": ["cp -L $BUILD_TMPDIR/jsi/libjsi.dylib $INSTALLDIR/lib"],
+        "//conditions:default": ["cp -L $BUILD_TMPDIR/jsi/libjsi.so $INSTALLDIR/lib"],
+    }),
     toolchains = ["@player//:cmake_build_type"],
     visibility = ["//visibility:public"],
 )
