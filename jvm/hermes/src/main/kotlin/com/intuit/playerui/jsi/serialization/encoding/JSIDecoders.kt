@@ -1,5 +1,6 @@
 package com.intuit.playerui.jsi.serialization.encoding
 
+import com.facebook.jni.CppException
 import com.intuit.playerui.core.bridge.serialization.encoding.AbstractRuntimeArrayListDecoder
 import com.intuit.playerui.core.bridge.serialization.encoding.AbstractRuntimeObjectClassDecoder
 import com.intuit.playerui.core.bridge.serialization.encoding.AbstractRuntimeObjectMapDecoder
@@ -51,9 +52,12 @@ internal sealed class AbstractJSIValueDecoder(
     } }
 
     override fun <R> decodeFunction(returnTypeSerializer: KSerializer<R>) = runtime.evaluateInJSThreadBlocking {
-        // TODO: Probably make sure our decoders wrap up underlying cpp exceptions
-        // TODO: Not sure the function is the correct thisVal -- maybe value?
-        currentValue.asObject(runtime).asFunction(runtime).toInvokable(format, value.asObject(runtime), returnTypeSerializer) ?: error("Unable to decode JSI function using return type serializer ${returnTypeSerializer.descriptor}")
+        try {
+            currentValue.asObject(runtime).asFunction(runtime)
+                .toInvokable(format, currentValue.asObject(runtime), returnTypeSerializer)
+        } catch (exception: CppException) {
+            error("Unable to decode JSI function using return type serializer ${returnTypeSerializer.descriptor}", exception)
+        }
     }
 }
 
