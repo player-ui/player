@@ -1,3 +1,63 @@
+# 0.7.4 (Tue Jul 02 2024)
+
+#### 🐛 Bug Fix
+
+- Release main [#409](https://github.com/player-ui/player/pull/409) ([@intuit-svc](https://github.com/intuit-svc))
+- ios buildabling on arm mac with rosetta + Aish's Android fixes [#402](https://github.com/player-ui/player/pull/402) ([@A1shK](https://github.com/A1shK) nancy_wu1@intuit.com [@nancywu1](https://github.com/nancywu1))
+- Update getting-started.mdx [#393](https://github.com/player-ui/player/pull/393) ([@brocollie08](https://github.com/brocollie08))
+- Fix binding tracking for validations within nested multi-nodes [#382](https://github.com/player-ui/player/pull/382) ([@tmarmer](https://github.com/tmarmer))
+- Adding troubleshooting info for `Module not found: six.moves` error [#381](https://github.com/player-ui/player/pull/381) ([@A1shK](https://github.com/A1shK))
+- Update CONTRIBUTING.md to include python dependency. [#380](https://github.com/player-ui/player/pull/380) ([@A1shK](https://github.com/A1shK))
+- Player 8901 - Fix typings for onAsyncNode hook [#371](https://github.com/player-ui/player/pull/371) ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+- Add Info on Commit Signing to Docs. [#375](https://github.com/player-ui/player/pull/375) ([@KetanReddy](https://github.com/KetanReddy))
+- [Android] Allowing timeout to be configured through PlayerRuntimeConfig [#359](https://github.com/player-ui/player/pull/359) ([@A1shK](https://github.com/A1shK))
+- Fix false positive binding with opening { [#342](https://github.com/player-ui/player/pull/342) ([@DukeManh](https://github.com/DukeManh))
+
+#### Authors: 9
+
+- [@A1shK](https://github.com/A1shK)
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- [@sakuntala-motukuri](https://github.com/sakuntala-motukuri)
+- Duc Manh ([@DukeManh](https://github.com/DukeManh))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- nancywu1 (nancy_wu1@intuit.com)
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.7.3 (Thu May 02 2024)
+
+#### 🐛 Bug Fix
+
+- Release main [#353](https://github.com/player-ui/player/pull/353) ([@intuit-svc](https://github.com/intuit-svc))
+- Trigger prerelease [#352](https://github.com/player-ui/player/pull/352) ([@sugarmanz](https://github.com/sugarmanz))
+- Parse multi node switch fixv1 [#347](https://github.com/player-ui/player/pull/347) (marlon_ercillo@intuit.com [@mercillo](https://github.com/mercillo))
+- [Android] Reorganize `PlayerFragment` state updates [#343](https://github.com/player-ui/player/pull/343) ([@sugarmanz](https://github.com/sugarmanz))
+- iOS: expose data controller onUpdate hook [#336](https://github.com/player-ui/player/pull/336) (nancy_wu1@intuit.com [@nancywu1](https://github.com/nancywu1))
+
+#### 📝 Documentation
+
+- Android Build Optimization Docs [#308](https://github.com/player-ui/player/pull/308) (sentony03@gmail.com [@brocollie08](https://github.com/brocollie08))
+- Add bazelisk to list of requirements; be more specific in Android build instructions [#344](https://github.com/player-ui/player/pull/344) (paul_millerd@intuit.com)
+- [Docs] DSL docs additions [#339](https://github.com/player-ui/player/pull/339) ([@lexfm](https://github.com/lexfm))
+
+#### Authors: 10
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Alex Fimbres ([@lexfm](https://github.com/lexfm))
+- brocollie08 (sentony03@gmail.com)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- marky ercillo (marlon_ercillo@intuit.com)
+- Marlon "Marky" Ercillo ([@mercillo](https://github.com/mercillo))
+- nancywu1 (nancy_wu1@intuit.com)
+- Paul Millerd ([@paulmillerd](https://github.com/paulmillerd))
+
+---
+
 # 0.7.2 (Wed Apr 10 2024)
 
 ### Release Notes

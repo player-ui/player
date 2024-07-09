@@ -121,6 +121,10 @@ export class Parser {
     );
   }
 
+  private hasSwitchKey(localKey: string) {
+    return localKey === ('staticSwitch' || 'dynamicSwitch');
+  }
+
   public parseObject(
     obj: object,
     type: Node.ChildrenTypes = NodeType.Value,
@@ -236,11 +240,15 @@ export class Parser {
             children: [...children, ...templateChildren],
           } as NestedObj;
         } else if (
-          localValue &&
-          this.hooks.determineNodeType.call(localValue) === NodeType.Switch
+          (localValue &&
+            this.hooks.determineNodeType.call(localValue) ===
+              NodeType.Switch) ||
+          this.hasSwitchKey(localKey)
         ) {
           const localSwitch = this.hooks.parseNode.call(
-            localValue,
+            this.hasSwitchKey(localKey)
+              ? { [localKey]: localValue }
+              : localValue,
             NodeType.Value,
             options,
             NodeType.Switch,
@@ -313,7 +321,6 @@ export class Parser {
                 v.parent = multiNode;
               });
             }
-
             if (multiNode) {
               return {
                 ...rest,

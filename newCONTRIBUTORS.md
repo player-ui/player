@@ -8,7 +8,7 @@ This will assume that this will be your first time contributing to an open sourc
 ## Forking the repo
 The git workflow for forking is slightly different than the normal branch workflow. Rather than cloning the main repo and pushing a new branch, each person works off of their own fork and pushes their own branches there. This helps limit the need (especially for non-team members) to give out access rights to the repo to push up a branch, and also helps keep the main repo clean from stale branches.
 
-The easiest way to maintain your own fork is via the GitHub CLI, which you can easily install through Homebrew. After you've gone through the intial setup, the CLI gives us a few powerful commands that do most of the legwork for us when working with a fork. I'll start by cloning the repo that'd I'd like to contribute to:
+The easiest way to maintain your own fork is via the GitHub CLI, which you can easily install through Homebrew. After you've gone through the initial setup, the CLI gives us a few powerful commands that do most of the legwork for us when working with a fork. I'll start by cloning the repo that'd I'd like to contribute to:
 
 ```
 git clone https://github.com/player-ui/player.git

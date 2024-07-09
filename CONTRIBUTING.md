@@ -18,6 +18,9 @@ If the changes are larger (API design, architecture, etc), [opening an issue](ht
 * [Xcode 15.3](https://developer.apple.com/download/all/) 
 
 * [Android NDK >= 19.2.5345600, <= 21](https://github.com/android/ndk/wiki/Unsupported-Downloads#r19c). Any version > 21 will not work, period. You'll need to add `ANDROID_NDK_HOME` to your environment manually.
+* Python < 3 (recommended 2.7.18) - you can use [pyenv](https://realpython.com/intro-to-pyenv/) to manage different python versions with ease. 
+
+* [Signed Commits](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification). For convenience it is recommended to set git to sign all commits by default as mentioned [here](https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key)
 
 ## Building and Testing Locally (All platforms)
 ### Player

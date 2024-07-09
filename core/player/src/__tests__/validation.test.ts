@@ -172,6 +172,67 @@ const simpleExpressionFlow: Flow = {
   },
 };
 
+const flowWithMultiNode: Flow = {
+  id: 'test-flow',
+  views: [
+    {
+      id: 'view-1',
+      type: 'view',
+      multiNode: [
+        {
+          nestedMultiNode: [
+            {
+              asset: {
+                type: 'asset-type',
+                id: 'nested-asset',
+                binding: 'data.foo',
+              },
+            },
+          ],
+        },
+      ],
+    },
+  ],
+  data: {},
+  schema: {
+    ROOT: {
+      data: {
+        type: 'DataType',
+      },
+    },
+    DataType: {
+      foo: {
+        type: 'CatType',
+        validation: [
+          {
+            type: 'names',
+            names: ['frodo', 'sam'],
+            trigger: 'navigation',
+            severity: 'warning',
+          },
+        ],
+      },
+    },
+  },
+  navigation: {
+    BEGIN: 'FLOW_1',
+    FLOW_1: {
+      startState: 'VIEW_1',
+      VIEW_1: {
+        state_type: 'VIEW',
+        ref: 'view-1',
+        transitions: {
+          '*': 'END_1',
+        },
+      },
+      END_1: {
+        state_type: 'END',
+        outcome: 'test',
+      },
+    },
+  },
+};
+
 const flowWithThings: Flow = {
   id: "test-flow",
   views: [
@@ -784,6 +845,14 @@ describe("validation", () => {
 
       await vitest.waitFor(() =>
         expect(validationController?.getBindings().size).toStrictEqual(6),
+      );
+    });
+
+    it('track bindings in nested multi nodes', async () => {
+      player.start(flowWithMultiNode);
+
+      await waitFor(() =>
+        expect(validationController?.getBindings().size).toStrictEqual(1)
       );
     });
   });

@@ -424,3 +424,27 @@ test("replaces async nodes with chained multiNodes singular", async () => {
   expect(view?.actions[1].asset.type).toBe("text");
   expect(view?.actions[2].asset.type).toBe("text");
 });
+
+test('should call onAsyncNode hook when async node is encountered', async () => {
+  const plugin = new AsyncNodePlugin();
+  let localNode: Node.Async;
+  plugin.hooks.onAsyncNode.tap('test', async (node: Node.Async) => {
+    if (node !== null) {
+      // assigns node value to a local variable
+      localNode = node;
+    }
+
+    return new Promise((resolve) => {
+      resolve('Promise resolved');
+    });
+  });
+
+  const player = new Player({ plugins: [plugin] });
+
+  player.start(basicFRFWithActions as any);
+
+  await waitFor(() => {
+    expect(localNode.id).toStrictEqual('uhh');
+    expect(localNode.type).toStrictEqual('async');
+  });
+});
