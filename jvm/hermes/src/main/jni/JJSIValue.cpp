@@ -405,7 +405,6 @@ local_ref<JJSIFunction::jhybridobject> JJSIFunction::createFromHostFunction(alia
         local_ref<JArrayClass<JJSIValue::jhybridobject>> values = JArrayClass<JJSIValue::jhybridobject>::newArray(count);
         for (size_t i = 0; i < count; i++) {
             auto arg = JJSIValue::newObjectCxxArgs(std::move(args[i]));
-            // TODO: This might not be enough since it's a local_ref to begin with, and then we dereference it anyways -- maybe we need to pass the local_ref as part of the array class?
             gRuntime->cthis()->trackRef(arg);
             values->setElement(i, arg.get());
         }

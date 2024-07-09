@@ -55,8 +55,22 @@ public:
     }
 
     void trackRef(alias_ref<JHybridClass::jhybridobject> ref) override {
+        // TODO: From my current understanding, holding a global prevents the class from being
+        //       GC'd when it goes out of scope in Java land, which would prevent the JSI Value reference
+        //       from being reset. I originally wanted to keep a weak_ref, but was getting intermittent
+        //       segfaults from untracked (or incorrectly tracked) references that were then not being
+        //       released because the weak_ref was out of scope. The assumption there was that if the
+        //       weak_ref was out of scope, it was already released. But this doesn't seem to be true,
+        //       otherwise we wouldn't be getting segfaults. Making them global does prevent the segfaults,
+        //       reaffirming the above. Since all the wrapper classes are holding are pointers
+        //       this probably isn't a huge deal, but is certainly an inefficiency we should look
+        //       to remove. I'd like to just create weak_ptrs on the JSI values themselves,
+        //       which requires the holders to use shared_ptrs and expose a getter for accessing.
+        //       Then we'd also need a way to hold arbitrary weak_ptrs. We could also maybe try
+        //       to get weak refs to _just_ the CXX parts of the hybrid class to avoid leaking things
+        //       on the JVM side?
         // TODO: Maybe we could do a periodic pruning of the vector to remove obsolete refs?
-        scope_.push_back(make_weak(ref));
+        scope_.push_back(make_global(ref));
     }
 
     ~JHermesRuntime() override {
@@ -65,8 +79,8 @@ public:
     }
 
     void release() {
-        for (auto& weak : scope_) {
-            if (auto ref = weak.lockLocal()) ref->cthis()->release();
+        for (auto& ref : scope_) {
+            ref->cthis()->release();
         }
         if (jConfig_) jConfig_.reset();
         if (runtime_) runtime_.reset();
@@ -94,7 +108,7 @@ private:
     friend HybridBase;
     std::unique_ptr<HermesRuntime> runtime_;
     global_ref<JHermesConfig::jhybridobject> jConfig_;
-    std::vector<weak_ref<JHybridClass::jhybridobject>> scope_;
+    std::vector<global_ref<JHybridClass::jhybridobject>> scope_;
     explicit JHermesRuntime(
         std::unique_ptr<HermesRuntime> runtime,
         alias_ref<JHermesConfig::jhybridobject> jConfig
