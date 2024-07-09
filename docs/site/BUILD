@@ -45,7 +45,6 @@ deps = [
     "//:node_modules/tslib",
     "//:node_modules/@types/react",
     "//:node_modules/@types/node",
-    # "//:node_modules/next",
     "//:node_modules/tailwindcss",
     "//:node_modules/tailwindcss-animate",
     "//:node_modules/postcss",
