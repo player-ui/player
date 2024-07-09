@@ -122,7 +122,7 @@ export class Parser {
   }
 
   private hasSwitchKey(localKey: string) {
-    return localKey === ('staticSwitch' || 'dynamicSwitch');
+    return localKey === ("staticSwitch" || "dynamicSwitch");
   }
 
   public parseObject(
