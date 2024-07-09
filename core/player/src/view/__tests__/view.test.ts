@@ -89,29 +89,29 @@ describe("view", () => {
         {
           id: "test",
           type: "view",
-          title: [
-            {
-              staticSwitch: [
-                {
-                  case: false,
-                  asset: {
-                    id: "false-case",
-                    type: "text",
-                    value: "some text",
-                  },
+
+          title: {
+            staticSwitch: [
+              {
+                case: false,
+                asset: {
+                  id: "false-case",
+                  type: "text",
+                  value: "some text",
                 },
-                {
-                  case: false,
-                  asset: {
-                    id: "false-case-2",
-                    type: "text",
-                    value: "some text",
-                  },
+              },
+              {
+                case: false,
+                asset: {
+                  id: "false-case-2",
+                  type: "text",
+                  value: "some text",
                 },
-              ],
-            },
-          ],
-        },
+              },
+            ],
+          },
+        } as any,
+
         {
           model,
           parseBinding,
@@ -119,6 +119,11 @@ describe("view", () => {
           schema,
         },
       );
+
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new SwitchPlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
 
       const resolved = view.update();
 
