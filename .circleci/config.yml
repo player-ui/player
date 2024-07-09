@@ -212,7 +212,7 @@ jobs:
           at: ~/player
 
       - run: |
-          bazel test --config=ci -- $(bazel query '//... except filter("ios|swiftui", //...)') -//docs/... -//android/demo:android_instrumentation_test
+          bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
       - run:
           when: always
