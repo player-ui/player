@@ -30,15 +30,6 @@ android_binary(
     ],
 )
 
-java_library(
-    name = "sun_dependencies_neverlink",
-    srcs = [
-        "Signal.java",
-        "SignalHandler.java",
-    ],
-    neverlink = True,
-)
-
 kt_android_library(
     name = "demo_ui_test",
     srcs = glob(["src/androidTest/**/*.kt"]),

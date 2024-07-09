@@ -14,6 +14,7 @@ kt_db_android_library(
     resources = main_resources,
     tags = ["maven_coordinates=com.intuit.playerui:android:aar:%s" % VERSION],
     visibility = ["//visibility:public"],
+    exports = main_exports,
     deps = main_deps,
 )
 

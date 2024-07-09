@@ -205,6 +205,28 @@ jobs:
       - store_test_results:
           path: _test_results
 
+  test:
+    executor: base
+    steps:
+      - attach_workspace:
+          at: ~/player
+
+      - run: |
+          bazel test --config=ci -- $(bazel query '//... except filter("ios|swiftui", //...)') -//docs/... -//android/demo:android_instrumentation_test
+
+      - run:
+          when: always
+          command: |
+            RESULTS_DIR=_test_results
+            find -L ./bazel-testlogs -name test.xml | while read line
+            do
+              mkdir -p $RESULTS_DIR/$(dirname $line)
+              cp $line $RESULTS_DIR/$(dirname $line)
+            done
+
+      - store_test_results:
+          path: _test_results
+
   android_test:
     executor: android
     steps:
@@ -228,7 +250,9 @@ jobs:
             rm -rf $ANDROID_HOME/build-tools/*
             JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64 \
               $ANDROID_HOME/tools/bin/sdkmanager "build-tools;33.0.1"\
+              "ndk;23.2.8568313" \
               "system-images;android-33;default;x86_64"
+            echo "export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/23.2.8568313"  >> $BASH_ENV
             source $BASH_ENV
             echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-33;default;x86_64" -g default
              source $BASH_ENV
@@ -276,7 +300,7 @@ jobs:
 
       # union the bundle targets until //... doesnt explode analyzing jvm/android targets
       - run: |
-          BUNDLE_TARGETS=$(bazel query "kind(js_test, //plugins/...) union kind(js_test, //react/...) union kind(js_test, //core/...) union kind(test, //jvm/...) union kind(test, //android/...) - //android/demo:android_instrumentation_test" --output label 2>/dev/null | tr '\n' ' ')
+          BUNDLE_TARGETS=$(bazel query "kind(js_test, //plugins/...) union kind(js_test, //react/...) union kind(js_test, //core/...)" --output label 2>/dev/null | tr '\n' ' ')
           bazel coverage --combined_report=lcov --config=ci -- $BUNDLE_TARGETS
 
       - run:
@@ -379,6 +403,24 @@ workflows:
           requires:
             - build-trunk
             - build-ios-trunk
+
+      - test:
+          name: test-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          requires:
+            - build-trunk
+
+      - test:
+          name: test-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - build-fork
 
       - android_test:
           name: android-test-trunk
