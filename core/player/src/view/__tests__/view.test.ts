@@ -120,7 +120,6 @@ describe("view", () => {
         },
       );
 
-
       const pluginOptions = toNodeResolveOptions(view.resolverOptions);
       new SwitchPlugin(pluginOptions).apply(view);
       new StringResolverPlugin().apply(view);

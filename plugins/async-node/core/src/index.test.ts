@@ -425,17 +425,17 @@ test("replaces async nodes with chained multiNodes singular", async () => {
   expect(view?.actions[2].asset.type).toBe("text");
 });
 
-test('should call onAsyncNode hook when async node is encountered', async () => {
+test("should call onAsyncNode hook when async node is encountered", async () => {
   const plugin = new AsyncNodePlugin();
   let localNode: Node.Async;
-  plugin.hooks.onAsyncNode.tap('test', async (node: Node.Async) => {
+  plugin.hooks.onAsyncNode.tap("test", async (node: Node.Async) => {
     if (node !== null) {
       // assigns node value to a local variable
       localNode = node;
     }
 
     return new Promise((resolve) => {
-      resolve('Promise resolved');
+      resolve("Promise resolved");
     });
   });
 
@@ -444,7 +444,7 @@ test('should call onAsyncNode hook when async node is encountered', async () => 
   player.start(basicFRFWithActions as any);
 
   await waitFor(() => {
-    expect(localNode.id).toStrictEqual('uhh');
-    expect(localNode.type).toStrictEqual('async');
+    expect(localNode.id).toStrictEqual("uhh");
+    expect(localNode.type).toStrictEqual("async");
   });
 });
