@@ -6,7 +6,7 @@ import kotlin.io.path.createTempFile
 import kotlin.io.path.outputStream
 
 /** Simple [NativeLoaderDelegate] for loading a native library packed as resources */
-public class ResourceLoaderDelegate : NativeLoaderDelegate {
+internal class ResourceLoaderDelegate : NativeLoaderDelegate {
     private val loaded = mutableListOf<String>()
 
     override fun loadLibrary(shortName: String, flags: Int): Boolean {
@@ -25,7 +25,7 @@ public class ResourceLoaderDelegate : NativeLoaderDelegate {
             ?: getResourceAsStream("$shortName/lib/$shortName.dylib")
             ?: getResourceAsStream("$shortName/lib/lib$shortName.so")
             ?: getResourceAsStream("$shortName/lib/lib$shortName.dylib")
-            ?: throw UnsatisfiedLinkError("Unable to load resource for $shortName")
+            ?: throw UnsatisfiedLinkError("Unable to load resource for $shortName. This is a fallback used when the NativeLoader is not initialized. If this is in an Android context, make sure you initialize with SoLoader in your application, or containing activity. Otherwise, ensure you have provided the host-compatible Hermes libraries as resources (i.e. //jvm/hermes:hermes-host).")
 
         val rewritten = resource.writeTemp("lib$shortName", ".so")
         System.load(rewritten.toString())

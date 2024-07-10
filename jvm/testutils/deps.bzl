@@ -10,7 +10,7 @@ main_exports = [
     "//jvm/utils",
     "//jvm/j2v8:j2v8-all",
     "//jvm/graaljs",
-    "//jvm/hermes:hermes-host",
+    "//jvm/hermes",
     "//plugins/common-types/jvm:common-types",
     "//plugins/reference-assets/jvm:reference-assets",
     "//tools/mocks:jar",

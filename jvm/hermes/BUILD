@@ -15,15 +15,9 @@ kt_player_module(
 
 kt_jvm_library(
     name = "hermes-host",
-    srcs = glob(["src/host/kotlin/**/*.kt"]),
     associates = [":hermes"],
     visibility = ["//visibility:public"],
-    exports = [
-        "//jvm/hermes/src/main/jni:resources",
-    ],
-    deps = [
-        "@maven//:com_facebook_soloader_soloader",
-    ],
+    exports = ["//jvm/hermes/src/main/jni:resources"],
 )
 
 android_library(
@@ -31,10 +25,8 @@ android_library(
     custom_package = "com.intuit.playerui.hermes",
     manifest = ":AndroidManifest.xml",
     visibility = ["//visibility:public"],
-    exports = [
-        # Kotlin Hermes JNI Runtime
-        ":hermes",
-    ],
+    # Kotlin Hermes JNI Runtime
+    exports = [":hermes"],
 )
 
 merge_jni_into_android_library(

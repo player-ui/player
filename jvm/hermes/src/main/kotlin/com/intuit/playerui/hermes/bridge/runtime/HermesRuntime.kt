@@ -3,6 +3,7 @@ package com.intuit.playerui.hermes.bridge.runtime
 import com.facebook.jni.HybridData
 import com.facebook.jni.annotations.DoNotStrip
 import com.facebook.soloader.nativeloader.NativeLoader
+import com.intuit.playerui.bridge.loader.ResourceLoaderDelegate
 import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeConfig
@@ -43,6 +44,8 @@ import kotlin.coroutines.EmptyCoroutineContext
 import com.intuit.playerui.jsi.Runtime as JSIRuntime
 
 private fun loadHermesJni() {
+    if (!NativeLoader.isInitialized()) NativeLoader.init(ResourceLoaderDelegate())
+
     // need to load fbjni -> jsi|hermes -> hermes_jni
     // some loaders are able to load dependencies, but not all, so we explicitly load what we need, in order
     NativeLoader.loadLibrary("fbjni")

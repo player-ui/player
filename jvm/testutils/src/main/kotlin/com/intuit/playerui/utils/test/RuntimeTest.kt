@@ -1,7 +1,5 @@
 package com.intuit.playerui.utils.test
 
-import com.facebook.soloader.nativeloader.NativeLoader
-import com.intuit.playerui.bridge.loader.ResourceLoaderDelegate
 import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeContainer
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.runtimeContainers
@@ -47,7 +45,6 @@ private class RuntimeSetterExtension(val runtimeContainer: PlayerRuntimeContaine
 
     override fun beforeEach(context: ExtensionContext) {
         val runtimeTestInstance = context.requiredTestInstance as RuntimeTest
-        if (!NativeLoader.isInitialized()) NativeLoader.init(ResourceLoaderDelegate())
         // TODO: Maybe provide a way configure runtime?
         runtimeTestInstance.runtime = runtimeContainer.factory.create()
     }
