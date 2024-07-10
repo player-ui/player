@@ -427,7 +427,6 @@ workflows:
             - Publish
           requires:
             - build-trunk
-            - build-ios-trunk
 
       - test:
           name: test-trunk
