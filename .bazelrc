@@ -49,11 +49,11 @@ coverage --build_metadata=REPO_URL=https://github.com/player-ui/player.git
 build:ci --build_metadata=ROLE=CI --workspace_status_command=./scripts/workspace-status.sh
 
 # Circle xlarge has 8 CPU cores/16GB mem
-build:ci --local_cpu_resources=8
-build:ci --local_ram_resources=15000
+# build:ci --local_cpu_resources=8
+# build:ci --local_ram_resources=15000
 build:ci --config="release"
 # Circle macos.m1.medium.gen1 4 cores 6gb ram
-common:ci-mac --config=ci --local_cpu_resources=4 --local_ram_resources=5800
+common:ci-mac --config=ci
 
 build:release --stamp --workspace_status_command=./scripts/workspace-status.sh
 
