@@ -5,6 +5,10 @@ maven_main = [
     "@maven//:com_afollestad_material_dialogs_core",
     "@maven//:com_google_android_material_material",
     #"@maven//:com_squareup_leakcanary_leakcanary_android",
+    # For when hermes-android _isn't_ included
+    "@maven//:com_facebook_soloader_soloader",
+    # For when j2v8-android _is_ included (not sure why transitive dep isn't included)
+    "@maven//:com_eclipsesource_j2v8_j2v8",
 ]
 
 maven_test = [
