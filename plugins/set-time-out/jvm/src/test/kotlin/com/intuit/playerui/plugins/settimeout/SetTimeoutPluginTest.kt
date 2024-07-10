@@ -22,12 +22,12 @@ internal class SetTimeoutPluginTest : RuntimeTest() {
 
     @TestTemplate fun `works as intended`() = runBlockingTest {
         val exceptions = mutableListOf<Throwable>()
-        Assertions.assertNull(runtime["setTimeout"])
         SetTimeoutPlugin(
             CoroutineExceptionHandler { _, exception ->
                 exception.printStackTrace()
                 exceptions.add(exception)
             },
+            true,
         ).apply(runtime)
         Assertions.assertNotNull(runtime["setTimeout"])
         val promise = (
@@ -54,12 +54,12 @@ internal class SetTimeoutPluginTest : RuntimeTest() {
 
     @TestTemplate fun `JS exceptions bubble up to the exception handler`() = runBlockingTest {
         val exceptions = mutableListOf<Throwable>()
-        Assertions.assertNull(runtime["setTimeout"])
         SetTimeoutPlugin(
             CoroutineExceptionHandler { _, exception ->
                 exception.printStackTrace()
                 exceptions.add(exception)
             },
+            true,
         ).apply(runtime)
         Assertions.assertNotNull(runtime["setTimeout"])
         runtime.execute(
@@ -78,12 +78,12 @@ internal class SetTimeoutPluginTest : RuntimeTest() {
     @TestTemplate fun `releasing runtime doesn't cause a failure`() = runBlockingTest {
         val exceptions = mutableListOf<Throwable>()
         Assertions.assertTrue(runtime.scope.isActive)
-        Assertions.assertNull(runtime["setTimeout"])
         SetTimeoutPlugin(
             CoroutineExceptionHandler { _, exception ->
                 exception.printStackTrace()
                 exceptions.add(exception)
             },
+            true,
         ).apply(runtime)
         Assertions.assertNotNull(runtime["setTimeout"])
         runtime.execute(
