@@ -177,6 +177,10 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
 
     public class Config private constructor(@DoNotStrip private val mHybridData: HybridData) : PlayerRuntimeConfig() {
         public companion object {
+            init {
+                loadHermesJni()
+            }
+
             @JvmStatic public external fun create(
                 intl: Boolean,
                 microtaskQueue: Boolean,
@@ -192,12 +196,8 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
 }
 
 public object Hermes : PlayerRuntimeFactory<Config> {
-    override fun create(block: Config.() -> Unit): HermesRuntime {
-        loadHermesJni()
-        val config = Config().apply(block)
-        // TODO: Move SetTimeoutPlugin to HeadlessPlayer init once cyclical dep is handled (split out headless impl)
-        return HermesRuntime.create(config).also(SetTimeoutPlugin(config.coroutineExceptionHandler)::apply)
-    }
+    override fun create(block: Config.() -> Unit): HermesRuntime =
+        HermesRuntime.create(Config().apply(block))
 
     override fun toString(): String = "Hermes"
 }

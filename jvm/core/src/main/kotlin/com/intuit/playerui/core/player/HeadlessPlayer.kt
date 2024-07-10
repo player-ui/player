@@ -86,12 +86,14 @@ public constructor(
     public val runtime: Runtime<*> = explicitRuntime ?: runtimeFactory.create {
         debuggable = config.debuggable
         coroutineExceptionHandler = config.coroutineExceptionHandler ?: CoroutineExceptionHandler { _, throwable ->
-            if (state !is ReleasedState) inProgressState?.fail(throwable) ?: logger.error(
-                "Exception caught in Player scope: ${throwable.message}",
-                throwable.stackTrace.joinToString("\n") {
-                    "\tat $it"
-                }.replaceFirst("\tat ", "\n"),
-            )
+            if (state !is ReleasedState) {
+                inProgressState?.fail(throwable) ?: logger.error(
+                    "Exception caught in Player scope: ${throwable.message}",
+                    throwable.stackTrace.joinToString("\n") {
+                        "\tat $it"
+                    }.replaceFirst("\tat ", "\n"),
+                )
+            }
         }
     }
 

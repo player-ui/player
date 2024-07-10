@@ -15,6 +15,7 @@ main_deps = [
 
     # Runtime Implementation
     # TODO: Should this default to hermes? It'd be nice to have a trial configuration.. maybe we add documentation for how to opt in?
+    # TODO: Add build config setting to swap between supported runtimes (would let us run android player tests against both too)
     "//jvm/hermes:hermes-android",
 
     # JVM plugin deps
@@ -32,6 +33,7 @@ main_resources = [
 test_deps = [
     "@maven//:io_mockk_mockk",
     "//jvm/testutils",
+    "//jvm/hermes:hermes-host",
     "@maven//:org_robolectric_robolectric",
     "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_test",
 ]

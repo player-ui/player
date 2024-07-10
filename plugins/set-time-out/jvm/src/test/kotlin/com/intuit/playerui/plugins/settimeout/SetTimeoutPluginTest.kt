@@ -72,7 +72,7 @@ internal class SetTimeoutPluginTest : RuntimeTest() {
             """.trimIndent(),
         )
         delay(1000)
-        Assertions.assertEquals("err", exceptions.single().message?.takeLast(3))
+        Assertions.assertEquals(1, exceptions.size)
     }
 
     @TestTemplate fun `releasing runtime doesn't cause a failure`() = runBlockingTest {

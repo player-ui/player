@@ -3,8 +3,8 @@ package com.intuit.playerui.j2v8.bridge.runtime
 import com.alexii.j2v8debugger.ScriptSourceProvider
 import com.eclipsesource.v8.V8
 import com.eclipsesource.v8.V8Array
-import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.V8Function
+import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.V8Value
 import com.eclipsesource.v8.utils.MemoryManager
 import com.intuit.playerui.core.bridge.Invokable

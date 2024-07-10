@@ -26,8 +26,7 @@ public class SetTimeoutPlugin(private val exceptionHandler: CoroutineExceptionHa
                 if (timeout == 0L) {
                     callback()
                 } else runtime.scope.launch(
-                    // TODO: Potentially just forward to runtime coroutine exception handler
-                    exceptionHandler ?: CoroutineExceptionHandler { _, exception ->
+                    exceptionHandler ?: runtime.config.coroutineExceptionHandler ?: CoroutineExceptionHandler { _, exception ->
                         PlayerPluginException(
                             "SetTimeoutPlugin",
                             "Exception throw during setTimeout invocation",
