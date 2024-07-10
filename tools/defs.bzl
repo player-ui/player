@@ -4,10 +4,9 @@ NATIVE_BUILD_DEPS = [
     "//:tsup_config",
     "//:typings",
     "//:node_modules/@swc/core",
-    "//:node_modules/esbuild-plugin-external-global",
 ]
 
-def tsup_config(name, native_bundle = False):
+def tsup_config(name):
     prefix = "../" * len(native.package_name().split("/"))
 
     expand_template(
@@ -16,7 +15,7 @@ def tsup_config(name, native_bundle = False):
         substitutions = {
             "%PREFIX%": prefix,
         },
-        template = "//tools:tsup.config.native.ts.tmpl" if native_bundle else "//tools:tsup.config.ts.tmpl",
+        template = "//tools:tsup.config.ts.tmpl",
     )
 
 def vitest_config(name):

@@ -6,7 +6,7 @@ import path from "path";
 // https://github.com/reduxjs/redux/blob/c9e06506f88926e252daf5275495eba0c04bf8e3/tsup.config.ts#L2
 // https://blog.isquaredsoftware.com/2023/08/esm-modernization-lessons/
 
-export function createConfig(overrides: Options = {}) {
+export function createConfig() {
   return defineConfig((options: Options) => {
     const pkgJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
 
@@ -14,7 +14,6 @@ export function createConfig(overrides: Options = {}) {
       entry: [pkgJson.main],
       sourcemap: true,
       ...options,
-      ...overrides,
     };
 
     if (process.env.PLAYER_NATIVE_BUNDLE) {
