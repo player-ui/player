@@ -11,7 +11,7 @@ def _generate_mocks_manifest(context):
             "group": group,
             "name": file.replace(".json", ""),
             "path": "./%s/%s/%s" % (root, group, file),
-        } for root, group, file in [_determine_mock_info(mock) for mock in mocks]]),
+        } for root, group, file in [_determine_mock_info(mock) for mock in mocks if mock.basename.endswith(".json")]]),
     )
 
     # we re-write the mocks so that we have a consistent prefix to trim
