@@ -107,3 +107,8 @@ build:debug --compilation_mode=dbg
 
 
 try-import %workspace%/.bazelrc.local
+
+# Flags for using the D8 dexer.
+build:d8 --define=android_incremental_dexing_tool=d8_dexbuilder
+build:d8 --define=android_standalone_dexing_tool=d8_compat_dx
+build:d8 --nouse_workers_with_dexbuilder

@@ -249,7 +249,8 @@ In order to render an asset a renderer for that type must be registered in the A
     2. [Define data structure](#accessing-data)
     3. [Nested assets](#nested-assets)
     4. [Styling](#styling)
-2. [Registering assets](#registering-assets)
+2. [Extending ComposableAsset](#extending-composableasset) - Experimental
+3. [Registering assets](#registering-assets)
 
 ### Extending DecodableAsset
 
@@ -371,6 +372,45 @@ fun View.hydrate() {
         else -> invalidateView()
     }
 }
+```
+
+### Extending ComposableAsset (Experimental)
+
+
+`ComposableAsset` is a subclass of `SuspendableAsset` designed for use with Jetpack Compose, Google's modern toolkit for building native UIs for Android. Subclassing `ComposableAsset` requires passing a `KSerializer<Data>` for the data class that represents the data for that asset. It also requires the implementation of an abstract `content` composable function which defines how the asset should be rendered with the data provided.
+
+```
+ @Composable
+override fun content(data: Data) {
+    Text(
+        text = data.value,
+        Modifier.testTag("text-composable"),
+    )
+}
+```
+
+#### Nesting assets
+It is recommended to only nest `ComposableAsset` within another `ComposableAsset`. To render an asset within a `ComposableAsset`, you can simply use the `compose` function as follows
+
+```
+OutlinedTextField(
+    // ... other config
+    label = { data.label.compose() }
+)
+```
+
+#### Styling
+While rendering a `ComposableAsset` within another asset, you might need to pass down styling. You can do so by passing the `Style` object while calling `compose`.
+```
+OutlinedTextField(
+    // ... other congig
+    label = { data.label.compose(
+        Style(
+            xmlStyles = listOf(R.style.Center),
+            composeTextStyle = TextStyle(textAlign = TextAlign.Center)
+        ))
+    }
+)
 ```
 
 ### Registering assets

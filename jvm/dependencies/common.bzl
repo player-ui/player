@@ -6,6 +6,9 @@ maven = [
     "org.jetbrains.kotlinx:kotlinx-serialization-json:%s" % versions.kotlin.serialization,
     "com.intuit.hooks:hooks:%s" % versions.hooks,
 
+    # Compiler plugins
+    "androidx.compose.compiler:compiler:%s" % versions.androidx.compose,
+
     # Testing
     "io.mockk:mockk:%s" % versions.testing.mockk,
     "org.amshove.kluent:kluent:%s" % versions.testing.kluent,

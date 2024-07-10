@@ -1,0 +1,13 @@
+{
+  "id": "view-1",
+  "type": "collection",
+  "values": [
+    {
+      "asset": {
+        "id": "text-1",
+        "type": "text-compose",
+        "value": "This is some text...using Jetpack Compose"
+      }
+    }
+  ]
+}
