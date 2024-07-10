@@ -18,7 +18,7 @@ executors:
     docker:
       - image: docker.io/playerui/bazel-docker
     working_directory: ~/player
-    resource_class: xlarge
+    resource_class: 2xlarge
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   minimal:
