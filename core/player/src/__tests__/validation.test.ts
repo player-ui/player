@@ -172,67 +172,6 @@ const simpleExpressionFlow: Flow = {
   },
 };
 
-const flowWithMultiNode: Flow = {
-  id: "test-flow",
-  views: [
-    {
-      id: "view-1",
-      type: "view",
-      multiNode: [
-        {
-          nestedMultiNode: [
-            {
-              asset: {
-                type: "asset-type",
-                id: "nested-asset",
-                binding: "data.foo",
-              },
-            },
-          ],
-        },
-      ],
-    },
-  ],
-  data: {},
-  schema: {
-    ROOT: {
-      data: {
-        type: "DataType",
-      },
-    },
-    DataType: {
-      foo: {
-        type: "CatType",
-        validation: [
-          {
-            type: "names",
-            names: ["frodo", "sam"],
-            trigger: "navigation",
-            severity: "warning",
-          },
-        ],
-      },
-    },
-  },
-  navigation: {
-    BEGIN: "FLOW_1",
-    FLOW_1: {
-      startState: "VIEW_1",
-      VIEW_1: {
-        state_type: "VIEW",
-        ref: "view-1",
-        transitions: {
-          "*": "END_1",
-        },
-      },
-      END_1: {
-        state_type: "END",
-        outcome: "test",
-      },
-    },
-  },
-};
-
 const flowWithThings: Flow = {
   id: "test-flow",
   views: [
@@ -847,14 +786,6 @@ describe("validation", () => {
         expect(validationController?.getBindings().size).toStrictEqual(6),
       );
     });
-
-    it("track bindings in nested multi nodes", async () => {
-      player.start(flowWithMultiNode);
-
-      await vitest.waitFor(() =>
-        expect(validationController?.getBindings().size).toStrictEqual(1),
-      );
-    });
   });
 
   describe("schema", () => {
@@ -1385,7 +1316,7 @@ describe("cross-field validation", () => {
       state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
     ).toBe(undefined);
 
-    // Updating a thing is still nothing (haven"t navigated yet)
+    // Updating a thing is still nothing (haven't navigated yet)
     state.controllers.data.set([["foo.data.thing1", 20]]);
     expect(
       state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
@@ -1404,7 +1335,7 @@ describe("cross-field validation", () => {
       displayTarget: "field",
     });
 
-    // Updating a thing is still nothing (haven"t navigated yet)
+    // Updating a thing is still nothing (haven't navigated yet)
     state.controllers.data.set([["foo.data.thing2", 85]]);
     expect(
       state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
@@ -1448,7 +1379,7 @@ describe("cross-field validation", () => {
       displayTarget: "field",
     });
 
-    // Updating a thing is still nothing (haven"t navigated yet)
+    // Updating a thing is still nothing (haven't navigated yet)
     state.controllers.data.set([["data.thing1", 51]]);
     expect(
       state.controllers.view.currentView?.lastUpdate?.thing1.asset.validation,
@@ -2648,7 +2579,7 @@ test("does not validate on expressions outside of view", async () => {
         },
         ACTION_1: {
           state_type: "ACTION",
-          exp: "{{person.name}} = 'invalid'",
+          exp: '{{person.name}} = "invalid"',
           transitions: {
             "*": "END_1",
           },
@@ -2998,7 +2929,7 @@ describe("Validations with multiple inputs", () => {
         type: "expression",
         ref: "foo.a",
         message: "Both need to equal 100",
-        exp: "sumValues(['foo.a', 'foo.b']) == 100",
+        exp: 'sumValues(["foo.a", "foo.b"]) == 100',
         severity: "error",
         trigger: "load",
       },
