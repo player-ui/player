@@ -1038,7 +1038,7 @@ describe("validation", () => {
       // Try to transition again
       state.controllers.flow.transition("foo");
 
-      // Should work now that there"s no error
+      // Should work now that there's no error
       const result = await flowResult;
       expect(result.endState.outcome).toBe("test");
     });
@@ -1084,7 +1084,7 @@ describe("validation", () => {
         state.controllers.flow.current?.currentState?.value.state_type,
       ).toBe("END");
 
-      // Should work now that there"s no error
+      // Should work now that there's no error
       const result = await flowResult;
       expect(result.endState.outcome).toBe("test");
     });
@@ -1175,7 +1175,7 @@ describe("validation", () => {
       // Try to transition again
       state.controllers.flow.transition("foo");
 
-      // Should work now that there"s no error
+      // Should work now that there's no error
       const result = await flowResult;
       expect(result.endState.outcome).toBe("test");
     });
@@ -1222,7 +1222,7 @@ describe("validation", () => {
         state.controllers.flow.current?.currentState?.value.state_type,
       ).toBe("END");
 
-      // Should work now that there"s no error
+      // Should work now that there's no error
       const result = await flowResult;
       expect(result.endState.outcome).toBe("test");
     });
@@ -1269,7 +1269,7 @@ describe("validation", () => {
         state.controllers.flow.current?.currentState?.value.state_type,
       ).toBe("END");
 
-      // Should work now that there"s no error
+      // Should work now that there's no error
       const result = await flowResult;
       expect(result.endState.outcome).toBe("done");
     });
