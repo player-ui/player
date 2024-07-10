@@ -28,7 +28,7 @@ cc_library(
         "JHermesRuntime.h",
         "JJSIValue.h",
     ],
-    copts = ["-std=c++17"] + CMAKE_BUILD_TYPE_COPTS + select({
+    copts = CMAKE_BUILD_TYPE_COPTS + select({
         # TODO: Using React Natives JSI doesn't contain microtask - come back to this if we build it ourselves
         ":should_include_jni": ["-DJSI_MICROTASK"],
         "//conditions:default": [],
