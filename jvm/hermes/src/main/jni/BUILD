@@ -1,7 +1,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 load("//:cmake.bzl", "CMAKE_BUILD_TYPE_COPTS", "CMAKE_BUILD_TYPE_COPT_MAPPINGS")
 load(":cc_binary_host_jni.bzl", "cc_library_host_jni")
-load(":copy_output.bzl", "copy_output")
+load(":copy_shared_lib.bzl", "copy_shared_lib")
 
 # Functionally, represents non-Android builds because NDK JNI will be attached by default
 # Transitioned with cc_library_host_jni
@@ -65,31 +65,19 @@ cc_binary(
 )
 
 # Extract out our shared libraries for packaging so we can control where they're at in the JAR
-copy_output(
+copy_shared_lib(
     name = "libhermes",
     srcs = ["@hermes//:host"],
-    file = select({
-        "@bazel_tools//src/conditions:darwin": "libhermes.dylib",
-        "//conditions:default": "libhermes.so",
-    }),
 )
 
-copy_output(
+copy_shared_lib(
     name = "libjsi",
     srcs = ["@hermes//:host"],
-    file = select({
-        "@bazel_tools//src/conditions:darwin": "libjsi.dylib",
-        "//conditions:default": "libjsi.so",
-    }),
 )
 
-copy_output(
+copy_shared_lib(
     name = "libfbjni",
     srcs = ["@fbjni//:host"],
-    file = select({
-        "@bazel_tools//src/conditions:darwin": "libfbjni.dylib",
-        "//conditions:default": "libfbjni.so",
-    }),
 )
 
 java_library(
