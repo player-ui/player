@@ -31,8 +31,8 @@ cmake(
 
     # NOTE: Uses vars set by build script from rule to "install" JSI lib
     postfix_script = select({
-        "@bazel_tools//src/conditions:darwin": ["cp -L $BUILD_TMPDIR/jsi/libjsi.dylib $INSTALLDIR/lib"],
-        "//conditions:default": ["cp -L $BUILD_TMPDIR/jsi/libjsi.so $INSTALLDIR/lib"],
+        "@bazel_tools//src/conditions:darwin": "cp -L $BUILD_TMPDIR/jsi/libjsi.dylib $INSTALLDIR/lib",
+        "//conditions:default": "cp -L $BUILD_TMPDIR/jsi/libjsi.so $INSTALLDIR/lib",
     }),
     toolchains = ["@player//:cmake_build_type"],
     visibility = ["//visibility:public"],

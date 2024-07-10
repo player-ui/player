@@ -69,8 +69,8 @@ copy_output(
     name = "libhermes",
     srcs = ["@hermes//:host"],
     file = select({
-        "@bazel_tools//src/conditions:darwin": ["libhermes.dylib"],
-        "//conditions:default": ["libhermes.so"],
+        "@bazel_tools//src/conditions:darwin": "libhermes.dylib",
+        "//conditions:default": "libhermes.so",
     }),
 )
 
@@ -78,8 +78,8 @@ copy_output(
     name = "libjsi",
     srcs = ["@hermes//:host"],
     file = select({
-        "@bazel_tools//src/conditions:darwin": ["libjsi.dylib"],
-        "//conditions:default": ["libjsi.so"],
+        "@bazel_tools//src/conditions:darwin": "libjsi.dylib",
+        "//conditions:default": "libjsi.so",
     }),
 )
 
@@ -87,8 +87,8 @@ copy_output(
     name = "libfbjni",
     srcs = ["@fbjni//:host"],
     file = select({
-        "@bazel_tools//src/conditions:darwin": ["libfbjni.dylib"],
-        "//conditions:default": ["libfbjni.so"],
+        "@bazel_tools//src/conditions:darwin": "libfbjni.dylib",
+        "//conditions:default": "libfbjni.so",
     }),
 )
 
