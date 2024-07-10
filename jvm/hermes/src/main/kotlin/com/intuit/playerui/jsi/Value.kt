@@ -160,16 +160,11 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
                     value::class.qualifiedName ?: "unknown",
                     22,
                     HostFunction { _, _, args ->
-                        // TODO: Can we wrap the execution in FBJNI for better error handling
-                        try {
-                            val encodedArgs =
-                                args.map { it.handleValue((runtime as HermesRuntime).format) }.toTypedArray()
-                            from(runtime, value(*encodedArgs))
-                        } catch (e: Throwable) {
-                            e.printStackTrace()
-                            throw e
-                        }
-                    }).asValue(runtime)
+                        val encodedArgs =
+                            args.map { it.handleValue((runtime as HermesRuntime).format) }.toTypedArray()
+                        from(runtime, value(*encodedArgs))
+                    }
+                ).asValue(runtime)
             }
             is kotlin.Function<*> -> evaluateInCurrentThread {
                 createFromHostFunction(
