@@ -75,4 +75,9 @@ export class Registry<V> {
   clear() {
     this.store = createSortedArray<V>();
   }
+
+  /** Check if the registry is empty*/
+  isRegistryEmpty() {
+    return this.store.array.length === 0;
+  }
 }
