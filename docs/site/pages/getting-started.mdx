@@ -48,9 +48,29 @@ Configure the Android Player dependencies in your `build.gradle(.kts)` files.
 ```kotlin
 dependencies {
     // Android Player
-    implementation("com.intuit.playerui.android:player:$playerVersion")
+    implementation("com.intuit.playerui:player:$playerVersion")
     // Optional - reference assets
-    implementation("com.intuit.playerui.android:assets:$playerVersion")
+    implementation("com.intuit.playerui.plugins:reference-assets:$playerVersion")
+}
+```
+
+#### Release Optimization
+
+The Android Player dependency automatically pulls in both the `dev` as well as the `prod` versions of the underlying JS scripts.
+
+The `dev` scripts are handy for debugging shared JS code through the JS debugger in debug builds, but they are not necessary for consumer facing release builds.
+
+To optimize the release bundles, it is highly recommended to exclude the `dev` scripts, as well as enabling V8 to strip out unused code from the final bundle.
+
+```kotlin
+buildTypes {
+    getByName("release") {
+        isMinifyEnabled = true
+        isShrinkResources = true
+        packagingOptions {
+            exclude("**/*.dev.js")
+        }
+    }
 }
 ```
   </android>
