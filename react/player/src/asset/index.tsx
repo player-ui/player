@@ -49,11 +49,30 @@ export const ReactAsset = (
     throw Error(`Asset is missing type for ${info}`);
   }
 
+  if (!registry || registry.isRegistryEmpty()) {
+    throw Error(`No asset found in registry. This could happen for one of the following reasons: \n
+      1. You might have no assets registered or no plugins added to the Player instance. \n
+      2. You might have mismatching versions of React Asset Registry Context. \n
+      See https://player-ui.github.io/latest/tools/cli#player-dependency-versions-check for tips about how to debug and fix this problem`);
+  }
+
   const Impl = registry?.get(unwrapped);
+
+  const matchList: object[] = [];
+
+  registry.forEach((asset) => {
+    matchList.push(asset.key);
+  });
 
   if (!Impl) {
     throw Error(
-      `No implementation found for id: ${unwrapped.id} type: ${unwrapped.type}`,
+      `No implementation found for id: ${unwrapped.id} type: ${
+        unwrapped.type
+      }. This could happen for one of the following reasons: \n
+      1. You might not have the asset id: ${unwrapped.id} type: ${unwrapped.type} registered. \n
+      2. You might have multiple assets libraries in the same app. \n
+      See match list below for more information: \n
+      ${JSON.stringify(matchList)}`,
     );
   }
 
