@@ -89,6 +89,7 @@ describe("view", () => {
         {
           id: "test",
           type: "view",
+
           title: {
             staticSwitch: [
               {
@@ -110,6 +111,7 @@ describe("view", () => {
             ],
           },
         } as any,
+
         {
           model,
           parseBinding,
@@ -121,6 +123,7 @@ describe("view", () => {
       const pluginOptions = toNodeResolveOptions(view.resolverOptions);
       new SwitchPlugin(pluginOptions).apply(view);
       new StringResolverPlugin().apply(view);
+
       const resolved = view.update();
 
       expect(resolved).toStrictEqual({
@@ -128,6 +131,7 @@ describe("view", () => {
         type: "view",
       });
     });
+
     it("does not return a field object if the case does not resolve an asset", () => {
       const model = withParser(
         new LocalModel({
@@ -202,7 +206,7 @@ describe("view", () => {
           fields: {
             staticSwitch: [
               {
-                case: '{{foo.baz}} === "good"',
+                case: "{{foo.baz}} === 'good'",
                 asset: {
                   id: "input-1",
                   type: "input",
@@ -341,14 +345,14 @@ describe("view", () => {
                 {
                   dynamicSwitch: [
                     {
-                      case: '{{foo.baz}} === "good"',
+                      case: "{{foo.baz}} === 'good'",
                       asset: {
                         id: "input-1",
                         type: "input",
                       },
                     },
                     {
-                      case: '{{foo.baz}} === "bad"',
+                      case: "{{foo.baz}} === 'bad'",
                       asset: {
                         id: "input-2",
                         type: "input",
@@ -527,7 +531,7 @@ describe("view", () => {
             asset: {
               id: "test",
               type: "text",
-              value: 'Before @[ {{foo.hello}} + " " + {{foo.world}} ]@ After',
+              value: "Before @[ {{foo.hello}} + ' ' + {{foo.world}} ]@ After",
             },
           },
         } as any,

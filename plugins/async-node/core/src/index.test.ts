@@ -44,7 +44,7 @@ const asyncNodeTest = async (resolvedValue: any) => {
 
   let deferredResolve: ((value: any) => void) | undefined;
 
-  plugin.hooks.onAsyncNode.tap("test", async (node: Node.Node) => {
+  plugin.hooks.onAsyncNode.tap("test", async (node: Node.Async) => {
     return new Promise((resolve) => {
       deferredResolve = resolve; // Promise would be resolved only once
     });
@@ -121,7 +121,7 @@ test("replaces async nodes with provided node", async () => {
 
   let deferredResolve: ((value: any) => void) | undefined;
 
-  plugin.hooks.onAsyncNode.tap("test", async (node: Node.Node) => {
+  plugin.hooks.onAsyncNode.tap("test", async (node: Node.Async) => {
     return new Promise((resolve) => {
       deferredResolve = resolve;
     });
@@ -249,7 +249,7 @@ test("replaces async nodes with chained multiNodes", async () => {
 
   let deferredResolve: ((value: any) => void) | undefined;
 
-  plugin.hooks.onAsyncNode.tap("test", async (node: Node.Node) => {
+  plugin.hooks.onAsyncNode.tap("test", async (node: Node.Async) => {
     return new Promise((resolve) => {
       deferredResolve = resolve;
     });
