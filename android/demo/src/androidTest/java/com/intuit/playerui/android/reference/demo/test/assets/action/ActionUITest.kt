@@ -8,6 +8,7 @@ import com.intuit.playerui.android.reference.demo.test.base.AssetUITest
 import com.intuit.playerui.android.reference.demo.test.base.shouldBePlayerState
 import com.intuit.playerui.android.reference.demo.test.base.waitForViewInRoot
 import com.intuit.playerui.core.player.state.CompletedState
+import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.player.state.dataModel
 import org.junit.Assert.assertEquals
