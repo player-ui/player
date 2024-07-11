@@ -17,7 +17,10 @@ kt_jvm_library(
     name = "hermes-host",
     associates = [":hermes"],
     visibility = ["//visibility:public"],
-    exports = ["//jvm/hermes/src/main/jni:resources"],
+    exports = [
+        ":hermes",
+        "//jvm/hermes/src/main/jni:resources",
+    ],
 )
 
 android_library(

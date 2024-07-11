@@ -203,7 +203,9 @@ public object Hermes : PlayerRuntimeFactory<Config> {
         return HermesRuntime.create(config).also(SetTimeoutPlugin(config.coroutineExceptionHandler)::apply)
     }
 
-    override fun toString(): String = "Hermes"
+    override fun toString(): String = name
+
+    public const val name: String = "Hermes"
 }
 
 public class HermesRuntimeContainer : PlayerRuntimeContainer {
