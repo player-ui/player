@@ -56,3 +56,13 @@ Make sure you have done a `bundle install`
 **Possible Solution:** Check your SDK and NDK versions in SDK Manager in Android Studio. As well as your `ANDROID_HOME` and `ANDROID_NDK_HOME` in your bash or zsh profiles to make sure they are properly set.
 
 You can also do `ls $ANDROID_HOME/platforms` and make sure that there are no versions higher than 30.
+
+### 3. Error Message :
+```
+ModuleNotFoundError: No module named 'six.moves'
+...
+from six.moves import range  # pylint: disable=redefined-builtin
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+```
+**Possible Solution:** Check your `python --version` is less than 3 (recommended 2.7.18). If it is and you are still getting the error try running you bazel commands with the flag `--incompatible_use_python_toolchains=false`
+
