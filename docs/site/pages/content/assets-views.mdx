@@ -41,7 +41,7 @@ The `id` of the views are used in the navigation section to reference a specific
 
 ## Cross-field validation
 
-The other special property of a `view` vs. an `asset` is the addition of a `validation` property on the view. These contain [`validation` objects](/schema) that are used for validations crossing multiple fields, and are ran on user navigation rather than data change.
+The other special property of a `view` vs. an `asset` is the addition of a `validation` property on the view. These contain [`validation` objects](/content/schema) that are used for validations crossing multiple fields, and are ran on user navigation rather than data change.
 
 Example:
 
@@ -72,14 +72,14 @@ Any object in the tree (including _assets_) may contain an `applicability` prope
 
 # Switches
 
-Switches are ways of dynamically changing the structure of the view based on data. There are 2 types of switches: `static` and `dynamic`, but their structures are identical. `switches` can appear anywhere you'd find a normal asset, and (similar to [templates](./templates)) are removed from the view before it reaches the UI layer.
+Switches are ways of dynamically changing the structure of the view based on data. There are 2 types of switches: `static` and `dynamic`, but their structures are identical. `switches` can appear anywhere you'd find a normal asset, and (similar to [templates](#templates)) are removed from the view before it reaches the UI layer.
 
 ## Usage
 
 The switch is simply a list of objects with `case` and `asset` properties:
 
 - `asset` - The asset that will replace the switch if the case is true
-- `case` - An [expression](./expression) to evaluate.
+- `case` - An [expression](/content/data-expressions) to evaluate.
 
 The switch will run through each _case_ statement until the first case expression evaluates to true. For the _default_ case, simple use a value of `true` at the end of the array.
 

@@ -42,6 +42,11 @@ From here, you can create a new branch
 git checkout -b my-new-feature
 ```
 
+And when we're ready to commit and push to GitHub, we just run the same command as usual:
+```
+git push -u origin my-new-feature
+```
+
 The -u here is important because it allows any future push-es to this repo to always use origin as the remote that it wants to push to.
 
 When you're ready to submit a Pull Request, there's a great CLI command for that one too:
