@@ -41,7 +41,7 @@ class ActionUITest : AssetUITest("reference-assets") {
             .perform(click())
 
         currentState.shouldBePlayerState<CompletedState> {
-            assertEquals("DONE", endState.outcome)
+            assertEquals("done", endState.outcome)
         }
     }
 
