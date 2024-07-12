@@ -1,5 +1,6 @@
 import type { Validation } from "@player-ui/types";
 import type { ViewPlugin, Resolver, Node, ViewInstance } from "../../view";
+import { NodeType } from "../../view";
 import type {
   BindingInstance,
   BindingLike,
@@ -67,25 +68,15 @@ export class ValidationBindingTrackerViewPlugin
 
     let lastViewUpdateChangeSet: Set<BindingInstance> | undefined;
 
-    const nodeTree = new Map<Node.Node, Set<Node.Node>>();
-
     /** Map of node to all bindings in children */
-    let lastComputedBindingTree = new Map<Node.Node, Set<BindingInstance>>();
+    const lastComputedBindingTree = new Map<Node.Node, Set<BindingInstance>>();
     let currentBindingTree = new Map<Node.Node, Set<BindingInstance>>();
 
     /** Map of registered section nodes to bindings */
     const lastSectionBindingTree = new Map<Node.Node, Set<BindingInstance>>();
 
-    /** Add the given child to the parent's tree. Create the parent entry if none exists */
-    function addToTree(child: Node.Node, parent: Node.Node) {
-      if (nodeTree.has(parent)) {
-        nodeTree.get(parent)?.add(child);
-
-        return;
-      }
-
-      nodeTree.set(parent, new Set([child]));
-    }
+    /** Map of resolved nodes to their original nodes. */
+    const resolvedNodeMap: Map<Node.Node, Node.Node> = new Map();
 
     resolver.hooks.beforeUpdate.tap(CONTEXT, (changes) => {
       lastViewUpdateChangeSet = changes;
@@ -215,46 +206,66 @@ export class ValidationBindingTrackerViewPlugin
       };
     });
 
-    resolver.hooks.afterNodeUpdate.tap(CONTEXT, (node, parent, update) => {
-      if (parent) {
-        addToTree(node, parent);
-      }
+    resolver.hooks.afterNodeUpdate.tap(
+      CONTEXT,
+      (originalNode, parent, update) => {
+        // Compute the new tree for this node
+        // If it's not-updated, use the last known value
 
-      // Compute the new tree for this node
-      // If it's not-updated, use the last known value
+        const { updated, node: resolvedNode } = update;
+        resolvedNodeMap.set(resolvedNode, originalNode);
 
-      if (update.updated) {
-        const newlyComputed = new Set(tracked.get(node));
-        nodeTree.get(node)?.forEach((child) => {
-          currentBindingTree.get(child)?.forEach((b) => newlyComputed.add(b));
-        });
-        currentBindingTree.set(node, newlyComputed);
-      } else {
-        currentBindingTree.set(
-          node,
-          lastComputedBindingTree.get(node) ?? new Set(),
-        );
-      }
+        if (updated) {
+          const newlyComputed = new Set(tracked.get(originalNode));
+          if (resolvedNode.type === NodeType.MultiNode) {
+            resolvedNode.values.forEach((value) =>
+              currentBindingTree
+                .get(value)
+                ?.forEach((b) => newlyComputed.add(b)),
+            );
+          }
 
-      if (node === resolver.root) {
-        this.trackedBindings = new Set(currentBindingTree.get(node));
-        lastComputedBindingTree = currentBindingTree;
+          if ("children" in resolvedNode && resolvedNode.children) {
+            resolvedNode.children.forEach((child) => {
+              currentBindingTree
+                .get(child.value)
+                ?.forEach((b) => newlyComputed.add(b));
+            });
+          }
 
-        lastSectionBindingTree.clear();
-        sections.forEach((nodeSet, sectionNode) => {
-          const temp = new Set<BindingInstance>();
-          nodeSet.forEach((n) => {
-            tracked.get(n)?.forEach(temp.add, temp);
+          currentBindingTree.set(resolvedNode, newlyComputed);
+        } else {
+          currentBindingTree.set(
+            resolvedNode,
+            lastComputedBindingTree.get(originalNode) ?? new Set(),
+          );
+        }
+
+        if (originalNode === resolver.root) {
+          this.trackedBindings = new Set(currentBindingTree.get(resolvedNode));
+          lastComputedBindingTree.clear();
+          currentBindingTree.forEach((value, key) => {
+            const node = resolvedNodeMap.get(key);
+            if (node) {
+              lastComputedBindingTree.set(node, value);
+            }
           });
-          lastSectionBindingTree.set(sectionNode, temp);
-        });
 
-        nodeTree.clear();
-        tracked.clear();
-        sections.clear();
-        currentBindingTree = new Map();
-      }
-    });
+          lastSectionBindingTree.clear();
+          sections.forEach((nodeSet, sectionNode) => {
+            const temp = new Set<BindingInstance>();
+            nodeSet.forEach((n) => {
+              tracked.get(n)?.forEach(temp.add, temp);
+            });
+            lastSectionBindingTree.set(sectionNode, temp);
+          });
+
+          tracked.clear();
+          sections.clear();
+          currentBindingTree = new Map();
+        }
+      },
+    );
   }
 
   apply(view: ViewInstance) {
