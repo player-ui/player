@@ -58,20 +58,16 @@ export const ReactAsset = (
 
   const Impl = registry?.get(unwrapped);
 
-  const matchList: object[] = [];
-
-  registry.forEach((asset) => {
-    matchList.push(asset.key);
-  });
-
   if (!Impl) {
+    const matchList: object[] = [];
+
+    registry.forEach((asset) => {
+      matchList.push(asset.key);
+    });
+
     throw Error(
-      `No implementation found for id: ${unwrapped.id} type: ${
-        unwrapped.type
-      }. This could happen for one of the following reasons: \n
-      1. You might not have the asset id: ${unwrapped.id} type: ${unwrapped.type} registered. \n
-      2. You might have multiple assets libraries in the same app. \n
-      See match list below for more information: \n
+      `No implementation found for id: ${unwrapped.id} type: ${unwrapped.type}. \n 
+      Registered Asset matching functions are listed below: \n
       ${JSON.stringify(matchList)}`,
     );
   }

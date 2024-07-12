@@ -48,11 +48,8 @@ test("throws an error for an asset missing implementation or not registered", ()
         <ReactAsset {...assetDef} />
       </AssetContext.Provider>,
     ),
-  )
-    .toThrowError(`No implementation found for id: bar-id type: bar. This could happen for one of the following reasons: \n
-      1. You might not have the asset id: bar-id type: bar registered. \n
-      2. You might have multiple assets libraries in the same app. \n
-      See match list below for more information: \n
+  ).toThrowError(`No implementation found for id: bar-id type: bar. \n 
+      Registered Asset matching functions are listed below: \n
       [{"type":"foo","key":"foo-key"}]`);
 });
 
