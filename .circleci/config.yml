@@ -42,7 +42,6 @@ commands:
     steps:
       - attach_workspace:
           at: ~/player
-
       - restore_cache:
           keys:
             - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
