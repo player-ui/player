@@ -24,7 +24,7 @@ export interface AsyncNodeViewPlugin extends ViewPlugin {
   /** Use this to tap into the async node plugin hooks */
   applyPlugin: (asyncNodePlugin: AsyncNodePlugin) => void;
 
-  asyncNode: AsyncParallelBailHook<[Node.Node], Node.Node>;
+  asyncNode: AsyncParallelBailHook<[Node.Async], any>;
 }
 
 /**
@@ -61,7 +61,7 @@ export class AsyncNodePlugin implements PlayerPlugin {
 }
 
 export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
-  public asyncNode = new AsyncParallelBailHook<[Node.Node], Node.Node>();
+  public asyncNode = new AsyncParallelBailHook<[Node.Async], any>();
   private basePlugin: AsyncNodePlugin | undefined;
 
   name = "AsyncNode";
