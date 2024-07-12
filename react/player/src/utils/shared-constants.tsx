@@ -1,4 +1,4 @@
-import { usePlayer } from './player-context';
+import { usePlayer } from "./player-context";
 
 /** Hook to get a constant under a specific namespace */
 export function useGetConstantByType(type: string, key: string): unknown {
@@ -11,5 +11,5 @@ export function useGetConstantByType(type: string, key: string): unknown {
 export function useGetConstant(key: string): unknown {
   const player = usePlayer();
 
-  return player?.constantsController.getConstants(key, 'constants');
+  return player?.constantsController.getConstants(key, "constants");
 }

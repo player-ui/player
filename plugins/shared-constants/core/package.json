@@ -1,0 +1,12 @@
+{
+  "name": "@player-ui/shared-constants-plugin",
+  "version": "0.0.0-PLACEHOLDER",
+  "main": "src/index.ts",
+  "devDependencies": {
+    "@player-ui/common-types-plugin": "workspace:*",
+    "@player-ui/make-flow": "workspace:*"
+  },
+  "peerDependencies": {
+    "@player-ui/player": "workspace:*"
+  }
+}

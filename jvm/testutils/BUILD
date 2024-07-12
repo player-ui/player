@@ -1,4 +1,4 @@
-load("//jvm:build.bzl", "kt_player_module")
+load("//jvm:defs.bzl", "kt_player_module")
 load(":deps.bzl", "main_deps", "main_exports", "main_resources")
 
 kt_player_module(

@@ -1,6 +1,5 @@
-import React from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
+import React from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Flex,
   Image,
@@ -22,17 +21,17 @@ import {
   AlertTitle,
   AlertDescription,
   Select,
-} from '@chakra-ui/react';
-import { FaReact, FaApple, FaAndroid, FaPuzzlePiece } from 'react-icons/fa';
-import { HamburgerIcon } from '@chakra-ui/icons';
-import type { Route } from '../config/navigation';
-import NAV, { PATH_TO_NAV, Platform } from '../config/navigation';
-import { ColorSchemeSwitch } from './ColorSchemeSwitch';
-import { DOCS_BASE_URL, GITHUB_URL } from '../config/constants';
-import { withBasePrefix } from './Image';
-import { SearchInput } from './Search';
-import { GithubIcon } from './gh-icon';
-import { WarningBanner } from './SiteBanner';
+} from "@chakra-ui/react";
+import { FaReact, FaApple, FaAndroid, FaPuzzlePiece } from "react-icons/fa";
+import { HamburgerIcon } from "@chakra-ui/icons";
+import type { Route } from "../config/navigation";
+import NAV, { PATH_TO_NAV, Platform } from "../config/navigation";
+import { ColorSchemeSwitch } from "./ColorSchemeSwitch";
+import { DOCS_BASE_URL, GITHUB_URL } from "../config/constants";
+import { withBasePrefix } from "./Image";
+import { SearchInput } from "./Search";
+import { GithubIcon } from "./gh-icon";
+import { WarningBanner } from "./SiteBanner";
 
 const getPathFromRoute = (route: Route): string => {
   if (route.path) {
@@ -48,7 +47,7 @@ const getPathFromRoute = (route: Route): string => {
     }
   }
 
-  return '';
+  return "";
 };
 
 const PlatformIcon = (props: any) => {
@@ -69,38 +68,30 @@ const PlatformIcon = (props: any) => {
 
 const NavTitleOrLink = (props: { route: Route }) => {
   const { route } = props;
-  const { pathname } = useRouter();
-  const router = useRouter();
-  const langpref = router.query.lang;
-  const selectedButtonColor = useColorModeValue('blue.800', 'blue.600');
+  const { pathname, search } = useLocation();
+  const selectedButtonColor = useColorModeValue("blue.800", "blue.600");
 
   if (route.path) {
     return (
-      <chakra.li>
-        <Link
-          passHref
-          href={{
-            pathname: route.path,
-            query: langpref ? { lang: langpref } : undefined,
-          }}
-        >
-          <Button
-            as="a"
-            size="sm"
-            variant="ghost"
-            mx="3"
-            colorScheme={pathname === route.path ? 'blue' : 'gray'}
-            color={pathname === route.path ? selectedButtonColor : undefined}
-          >
-            <HStack spacing="2">
-              <Text>{route.title}</Text>
-              {route.metaData?.platform?.map((p) => (
-                <PlatformIcon key={p} platform={p} />
-              ))}
-            </HStack>
-          </Button>
-        </Link>
-      </chakra.li>
+      <Button
+        as={Link}
+        size="sm"
+        variant="ghost"
+        mx="3"
+        colorScheme={pathname === route.path ? "blue" : "gray"}
+        to={{
+          pathname: route.path,
+          search,
+        }}
+        color={pathname === route.path ? selectedButtonColor : undefined}
+      >
+        <HStack spacing="2">
+          <Text>{route.title}</Text>
+          {route.metaData?.platform?.map((p) => (
+            <PlatformIcon key={p} platform={p} />
+          ))}
+        </HStack>
+      </Button>
     );
   }
 
@@ -130,7 +121,7 @@ const SideNavigationList = (props: { route: Route }) => {
 };
 
 export const SideNavigation = () => {
-  const { pathname } = useRouter();
+  const { pathname } = useLocation();
   const subRoutes = PATH_TO_NAV.get(pathname);
 
   const route = NAV.routes.find((r) => r.title === subRoutes?.[0]);
@@ -152,7 +143,7 @@ export const Footer = () => {
 
 export const GitHubButton = () => {
   return (
-    <Link aria-label="Go to our GitHub page" href={GITHUB_URL}>
+    <Link aria-label="Go to our GitHub page" to={GITHUB_URL}>
       <IconButton
         variant="ghost"
         aria-label="Go to our Github page"
@@ -181,13 +172,13 @@ const useGetReleasedVersions = () => {
   React.useEffect(() => {
     const send = async () => {
       const response = await fetch(
-        'https://api.github.com/repos/player-ui/player-ui.github.io/contents/'
+        "https://api.github.com/repos/player-ui/player-ui.github.io/contents/",
       );
 
       const data = await response.json();
       const versions = data
-        .filter((d) => d.type === 'dir' && d.name.match(/^v\d/))
-        .map((d) => ({
+        .filter((d: any) => d.type === "dir" && d.name.match(/^v\d/))
+        .map((d: any) => ({
           label: d.name,
           path: d.name,
         }));
@@ -202,7 +193,8 @@ const useGetReleasedVersions = () => {
 };
 
 export const VersionSelector = () => {
-  const router = useRouter();
+  const location = useLocation();
+  const navigate = useNavigate();
   const released = useGetReleasedVersions();
 
   return (
@@ -210,27 +202,13 @@ export const VersionSelector = () => {
       aria-label="Select the version of the Player docs you with to see"
       variant="unstyled"
       rootProps={{
-        width: 'auto',
-        display: 'flex',
-        flexShrink: '0',
+        width: "auto",
+        display: "flex",
+        flexShrink: "0",
       }}
-      value={router.basePath || 'latest'}
+      value={location.pathname || "/latest"}
       onChange={(e) => {
-        const currentRoute = router.pathname
-        .split('/')
-        .filter((s) => {
-          // filter out empty string and url elements that include the version
-          if (
-            s &&
-            !['latest', 'next', ...released.map((r) => r.path)].includes(s)
-          ) {
-            return true;
-          }
-    
-          return false;
-        })
-        .join('/');
-        router.push(`${DOCS_BASE_URL}${e.target.value}/${currentRoute}`);
+        navigate(`${DOCS_BASE_URL}/${e.target.value}`);
       }}
     >
       <option value="latest">Latest</option>
@@ -245,26 +223,26 @@ export const VersionSelector = () => {
 };
 
 export const TopNavigation = () => {
-  const { pathname } = useRouter();
+  const { pathname, search } = useLocation();
   const subRoutes = PATH_TO_NAV.get(pathname);
   const mobileNavDisclosure = useDisclosure();
 
   const currentTopLevelRoute = NAV.routes.find(
-    (r) => r.title === subRoutes?.[0]
+    (r) => r.title === subRoutes?.[0],
   );
 
   const logoSrc = useBreakpointValue({
     base: useColorModeValue(
-      withBasePrefix('/logo/logo-light-small.png'),
-      withBasePrefix('/logo/logo-dark-small.png')
+      withBasePrefix("/logo/logo-light-small.png"),
+      withBasePrefix("/logo/logo-dark-small.png"),
     ),
     lg: useColorModeValue(
-      withBasePrefix('/logo/logo-light-large.png'),
-      withBasePrefix('/logo/logo-dark-large.png')
+      withBasePrefix("/logo/logo-light-large.png"),
+      withBasePrefix("/logo/logo-dark-large.png"),
     ),
   });
 
-  const selectedButtonColor = useColorModeValue('blue.800', 'blue.600');
+  const selectedButtonColor = useColorModeValue("blue.800", "blue.600");
 
   return (
     <Flex w="100%" h="100%" direction="column" align="center">
@@ -273,26 +251,26 @@ export const TopNavigation = () => {
           <IconButton
             variant="ghost"
             icon={<HamburgerIcon />}
-            display={{ base: 'flex', md: 'none' }}
+            display={{ base: "flex", md: "none" }}
             aria-label="Open Side Navigation Menu"
             onClick={mobileNavDisclosure.onOpen}
           />
-          <Link passHref href="/">
-            <CLink
-              display={{
-                base: 'none',
-                md: 'block',
-              }}
-              py="2"
-            >
-              <Image alt="Player Logo" height="48px" src={logoSrc} />
-            </CLink>
-          </Link>
+          <CLink
+            as={Link}
+            to="/"
+            display={{
+              base: "none",
+              md: "block",
+            }}
+            py="2"
+          >
+            <Image alt="Player Logo" height="48px" src={logoSrc} />
+          </CLink>
         </HStack>
 
         <Box>
           <HStack spacing="4">
-            <Box display={{ base: 'none', lg: 'block' }}>
+            <Box display={{ base: "none", lg: "block" }}>
               <SearchInput />
             </Box>
             {NAV.routes.map((topRoute) => {
@@ -300,18 +278,21 @@ export const TopNavigation = () => {
               const isSelected = currentTopLevelRoute?.title === topRoute.title;
 
               return (
-                <Link key={topRoute.title} passHref href={navRoute}>
-                  <Button
-                    as="a"
-                    variant="ghost"
-                    colorScheme={isSelected ? 'blue' : 'gray'}
-                    color={isSelected ? selectedButtonColor : undefined}
-                    size="md"
-                    ml="0"
-                  >
-                    {topRoute.title}
-                  </Button>
-                </Link>
+                <Button
+                  as={Link}
+                  key={topRoute.title}
+                  to={{
+                    pathname: navRoute,
+                    search,
+                  }}
+                  variant="ghost"
+                  colorScheme={isSelected ? "blue" : "gray"}
+                  color={isSelected ? selectedButtonColor : undefined}
+                  size="md"
+                  ml="0"
+                >
+                  {topRoute.title}
+                </Button>
               );
             })}
             <VersionSelector />
@@ -337,9 +318,9 @@ export const TopNavigation = () => {
           Player and its documentation are still in early development.
         </AlertTitle>
         <AlertDescription>
-          If you find any issues, please report them to us on{' '}
+          If you find any issues, please report them to us on{" "}
           <CLink
-            color={useColorModeValue('blue.800', 'blue.600')}
+            color={useColorModeValue("blue.800", "blue.600")}
             href="https://github.com/player-ui/player/issues"
           >
             GitHub

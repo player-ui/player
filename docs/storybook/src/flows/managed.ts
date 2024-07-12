@@ -1,9 +1,8 @@
-import { FlowManager, Flow, CompletedState } from '@player-ui/react';
-import { makeFlow } from '@player-ui/make-flow';
-import firstFlow from '@player-ui/reference-assets-plugin-mocks/flow-manager/first-flow.json';
-import secondFlow from '@player-ui/reference-assets-plugin-mocks/flow-manager/second-flow.json';
-import errorFlow from '@player-ui/reference-assets-plugin-mocks/flow-manager/error-flow.json';
-import assetErrorFlow from '@player-ui/reference-assets-plugin-mocks/flow-manager/asset-error-flow.json';
+import { FlowManager, Flow, CompletedState } from "@player-ui/react";
+import firstFlow from "@player-ui/mocks/flow-manager/first-flow.json";
+import secondFlow from "@player-ui/mocks/flow-manager/second-flow.json";
+import errorFlow from "@player-ui/mocks/flow-manager/error-flow.json";
+import assetErrorFlow from "@player-ui/mocks/flow-manager/asset-error-flow.json";
 
 export const SIMPLE_FLOWS = [firstFlow, secondFlow];
 export const ERROR_CONTENT_FLOW = [firstFlow, errorFlow];

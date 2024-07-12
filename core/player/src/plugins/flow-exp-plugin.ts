@@ -2,10 +2,10 @@ import type {
   Expression,
   ExpressionObject,
   NavigationFlowState,
-} from '@player-ui/types';
-import type { ExpressionEvaluator, ExpressionType } from '../expressions';
-import type { FlowInstance } from '../controllers';
-import type { Player, PlayerPlugin } from '../player';
+} from "@player-ui/types";
+import type { ExpressionEvaluator, ExpressionType } from "../expressions";
+import type { FlowInstance } from "../controllers";
+import type { Player, PlayerPlugin } from "../player";
 
 /**
  * A plugin that taps into the flow controller to evaluate available expressions
@@ -13,7 +13,7 @@ import type { Player, PlayerPlugin } from '../player';
  * e.g: onStart, onEnd
  */
 export class FlowExpPlugin implements PlayerPlugin {
-  name = 'flow-exp-plugin';
+  name = "flow-exp-plugin";
 
   apply(player: Player) {
     let expressionEvaluator: ExpressionEvaluator | undefined;
@@ -25,7 +25,7 @@ export class FlowExpPlugin implements PlayerPlugin {
      */
     const handleEval = (exp: Expression | ExpressionObject) => {
       if (exp) {
-        if (typeof exp === 'object' && 'exp' in exp) {
+        if (typeof exp === "object" && "exp" in exp) {
           expressionEvaluator?.evaluate(exp.exp);
         } else {
           expressionEvaluator?.evaluate(exp as ExpressionType);

@@ -1,10 +1,10 @@
-import type { Player, PlayerPlugin } from '@player-ui/player';
+import type { Player, PlayerPlugin } from "@player-ui/player";
 
 /**
  * A plugin that can wrap a set of other plugins.
  */
 export class MetaPlugin implements PlayerPlugin {
-  name = 'meta-plugin';
+  name = "meta-plugin";
 
   public readonly plugins: Array<PlayerPlugin>;
 

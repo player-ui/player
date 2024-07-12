@@ -1,9 +1,9 @@
-import type { Node, ParseObjectOptions } from '@player-ui/player';
-import { NodeType } from '@player-ui/player';
-import type { Asset } from '@player-ui/types';
-import { fromMarkdown } from 'mdast-util-from-markdown';
-import type { Mappers } from '../types';
-import { transformers } from './transformers';
+import type { Node, ParseObjectOptions } from "@player-ui/player";
+import { NodeType } from "@player-ui/player";
+import type { Asset } from "@player-ui/types";
+import { fromMarkdown } from "mdast-util-from-markdown";
+import type { Mappers } from "../types";
+import { transformers } from "./transformers";
 
 /**
  * Parses markdown content using a provided mappers record.
@@ -29,7 +29,7 @@ export function parseAssetMarkdownContent({
   parser?: (
     obj: object,
     type?: Node.ChildrenTypes,
-    options?: ParseObjectOptions
+    options?: ParseObjectOptions,
   ) => Node.Node | null;
 }): Node.Node | null {
   const { children } = fromMarkdown(asset.value as string);

@@ -11,7 +11,8 @@ main_exports = [
     "//jvm/j2v8:j2v8-all",
     "//jvm/graaljs",
     "//plugins/common-types/jvm:common-types",
-    "//plugins/mocks:jar",
+    "//plugins/reference-assets/jvm:reference-assets",
+    "//tools/mocks:jar",
 ]
 
 main_deps = main_exports

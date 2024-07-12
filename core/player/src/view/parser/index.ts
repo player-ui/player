@@ -1,12 +1,12 @@
-import { omit, setIn } from 'timm';
-import { SyncBailHook, SyncWaterfallHook } from 'tapable-ts';
-import type { Template } from '@player-ui/types';
-import type { AnyAssetType, Node } from './types';
-import { NodeType } from './types';
-import { getNodeID, hasAsync } from './utils';
+import { omit, setIn } from "timm";
+import { SyncBailHook, SyncWaterfallHook } from "tapable-ts";
+import type { Template } from "@player-ui/types";
+import type { AnyAssetType, Node } from "./types";
+import { NodeType } from "./types";
+import { getNodeID, hasAsync } from "./utils";
 
-export * from './types';
-export * from './utils';
+export * from "./types";
+export * from "./utils";
 
 export const EMPTY_NODE: Node.Empty = {
   type: NodeType.Empty,
@@ -59,7 +59,7 @@ export class Parser {
         obj: object,
         nodeType: Node.ChildrenTypes,
         parseOptions: ParseObjectOptions,
-        determinedNodeType: NodeType | null
+        determinedNodeType: NodeType | null,
       ],
       Node.Node
     >(),
@@ -69,7 +69,7 @@ export class Parser {
     const viewNode = this.parseObject(value, NodeType.View);
 
     if (!viewNode) {
-      throw new Error('Unable to parse object into a view');
+      throw new Error("Unable to parse object into a view");
     }
 
     return viewNode as Node.View;
@@ -78,9 +78,9 @@ export class Parser {
   private parseAsync(
     obj: object,
     type: Node.ChildrenTypes,
-    options: ParseObjectOptions
+    options: ParseObjectOptions,
   ): Node.Node | null {
-    const parsedAsync = this.parseObject(omit(obj, 'async'), type, options);
+    const parsedAsync = this.parseObject(omit(obj, "async"), type, options);
     const parsedNodeId = getNodeID(parsedAsync);
     if (parsedAsync !== null && parsedNodeId) {
       return this.createASTNode(
@@ -89,7 +89,7 @@ export class Parser {
           type: NodeType.Async,
           value: parsedAsync,
         },
-        obj
+        obj,
       );
     }
 
@@ -114,7 +114,7 @@ export class Parser {
    */
   private hasTemplateValues(obj: any, localKey: string) {
     return (
-      Object.hasOwnProperty.call(obj, 'template') &&
+      Object.hasOwnProperty.call(obj, "template") &&
       Array.isArray(obj?.template) &&
       obj.template.length &&
       obj.template.find((tmpl: any) => tmpl.output === localKey)
@@ -122,13 +122,13 @@ export class Parser {
   }
 
   private hasSwitchKey(localKey: string) {
-    return localKey === ('staticSwitch' || 'dynamicSwitch');
+    return localKey === ("staticSwitch" || "dynamicSwitch");
   }
 
   public parseObject(
     obj: object,
     type: Node.ChildrenTypes = NodeType.Value,
-    options: ParseObjectOptions = { templateDepth: 0 }
+    options: ParseObjectOptions = { templateDepth: 0 },
   ): Node.Node | null {
     const nodeType = this.hooks.determineNodeType.call(obj);
 
@@ -137,19 +137,22 @@ export class Parser {
         obj,
         type,
         options,
-        nodeType
+        nodeType,
       );
       if (parsedNode) {
         return parsedNode;
       }
     }
 
+    /**
+     *
+     */
     const parseLocalObject = (
       currentValue: any,
       objToParse: unknown,
-      path: string[] = []
+      path: string[] = [],
     ): NestedObj => {
-      if (typeof objToParse !== 'object' || objToParse === null) {
+      if (typeof objToParse !== "object" || objToParse === null) {
         return { value: objToParse, children: [] };
       }
 
@@ -177,12 +180,11 @@ export class Parser {
       const newValue = objEntries.reduce((accumulation, current): NestedObj => {
         const { children, ...rest } = accumulation;
         const [localKey, localValue] = current;
-
-        if (localKey === 'asset' && typeof localValue === 'object') {
+        if (localKey === "asset" && typeof localValue === "object") {
           const assetAST = this.parseObject(
             localValue,
             NodeType.Asset,
-            options
+            options,
           );
 
           if (assetAST) {
@@ -191,7 +193,7 @@ export class Parser {
               children: [
                 ...children,
                 {
-                  path: [...path, 'asset'],
+                  path: [...path, "asset"],
                   value: assetAST,
                 },
               ],
@@ -211,7 +213,7 @@ export class Parser {
                   template: template.value,
                   dynamic: template.dynamic ?? false,
                 },
-                template
+                template,
               );
 
               if (templateAST?.type === NodeType.MultiNode) {
@@ -249,7 +251,7 @@ export class Parser {
               : localValue,
             NodeType.Value,
             options,
-            NodeType.Switch
+            NodeType.Switch,
           );
 
           if (
@@ -288,7 +290,7 @@ export class Parser {
           const localAsync = this.parseAsync(
             localValue,
             NodeType.Value,
-            options
+            options,
           );
           if (localAsync) {
             children.push({
@@ -299,7 +301,7 @@ export class Parser {
         } else if (localValue && Array.isArray(localValue)) {
           const childValues = localValue
             .map((childVal) =>
-              this.parseObject(childVal, NodeType.Value, options)
+              this.parseObject(childVal, NodeType.Value, options),
             )
             .filter((child): child is Node.Node => !!child);
 
@@ -310,7 +312,7 @@ export class Parser {
                 override: !this.hasTemplateValues(localObj, localKey),
                 values: childValues,
               },
-              localValue
+              localValue,
             );
 
             if (multiNode?.type === NodeType.MultiNode) {
@@ -332,7 +334,7 @@ export class Parser {
               };
             }
           }
-        } else if (localValue && typeof localValue === 'object') {
+        } else if (localValue && typeof localValue === "object") {
           const determineNodeType =
             this.hooks.determineNodeType.call(localValue);
 
@@ -341,7 +343,7 @@ export class Parser {
               localValue,
               NodeType.Value,
               options,
-              determineNodeType
+              determineNodeType,
             );
             if (parsedNode) {
               return {
@@ -369,7 +371,7 @@ export class Parser {
           const value = setIn(
             accumulation.value,
             [...path, localKey],
-            localValue
+            localValue,
           );
 
           return {

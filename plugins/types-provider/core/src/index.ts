@@ -3,8 +3,8 @@ import type {
   PlayerPlugin,
   ValidatorFunction,
   FormatType,
-} from '@player-ui/player';
-import type { Schema } from '@player-ui/types';
+  Schema,
+} from "@player-ui/player";
 
 export interface TypesConfig {
   /**
@@ -27,7 +27,7 @@ export interface TypesConfig {
  * The TypesProvider plugin provides an easy way for users to expose custom validators, DataTypes, or formatters to the content
  */
 export class TypesProviderPlugin implements PlayerPlugin {
-  name = 'TypesProviderPlugin';
+  name = "TypesProviderPlugin";
 
   private config: TypesConfig;
 
@@ -56,9 +56,9 @@ export class TypesProviderPlugin implements PlayerPlugin {
               this.config.validators?.forEach(([name, handler]) => {
                 validationRegistry.register(name, handler);
               });
-            }
+            },
           );
-        }
+        },
       );
     }
   }

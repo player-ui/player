@@ -1,0 +1,16 @@
+load("//tools/ios:util.bzl", "swiftui_plugin")
+load("@build_bazel_rules_ios//rules:test.bzl", "ios_ui_test")
+
+swiftui_plugin(
+    name = "ReferenceAssets",
+    resources = ["//plugins/reference-assets/swiftui/Resources:PlayerUIReferenceAssets_Resources", "//plugins/reference-assets/core:core_native_bundle"],
+    deps = [
+        "//ios/swiftui:PlayerUISwiftUI",
+        "//plugins/beacon/swiftui:PlayerUIBeaconPlugin",
+        "//plugins/pending-transaction/swiftui:PlayerUISwiftUIPendingTransactionPlugin"
+    ],
+    test_deps = [
+        "//ios/test-utils:PlayerUITestUtilities"
+    ],
+    hasUITests = True
+)

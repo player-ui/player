@@ -1,0 +1,16 @@
+{
+  "name": "@player-ui/reference-assets-plugin",
+  "version": "0.0.0-PLACEHOLDER",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@player-ui/asset-transform-plugin": "workspace:*",
+    "@player-ui/beacon-plugin": "workspace:*"
+  },
+  "devDependencies": {
+    "@player-ui/asset-testing-library": "workspace:*",
+    "@player-ui/common-types-plugin": "workspace:*"
+  },
+  "peerDependencies": {
+    "@player-ui/player": "workspace:*"
+  }
+}

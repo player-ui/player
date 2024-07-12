@@ -1,26 +1,26 @@
 /* eslint-disable react/no-this-in-sfc */
-import React from 'react';
-import { SyncWaterfallHook, AsyncParallelHook } from 'tapable-ts';
-import { Subscribe, useSubscribedState } from '@player-ui/react-subscribe';
-import { Registry } from '@player-ui/partial-match-registry';
+import React from "react";
+import { SyncWaterfallHook, AsyncParallelHook } from "tapable-ts";
+import { Subscribe, useSubscribedState } from "@player-ui/react-subscribe";
+import { Registry } from "@player-ui/partial-match-registry";
 import type {
   CompletedState,
   PlayerPlugin,
   Flow,
   View,
-} from '@player-ui/player';
-import { Player } from '@player-ui/player';
-import { ErrorBoundary } from 'react-error-boundary';
-import type { AssetRegistryType } from './asset';
-import { AssetContext } from './asset';
-import { PlayerContext } from './utils';
+} from "@player-ui/player";
+import { Player } from "@player-ui/player";
+import { ErrorBoundary } from "react-error-boundary";
+import type { AssetRegistryType } from "./asset";
+import { AssetContext } from "./asset";
+import { PlayerContext } from "./utils";
 
-import type { ReactPlayerProps } from './app';
-import PlayerComp from './app';
-import OnUpdatePlugin from './plugins/onupdate-plugin';
+import type { ReactPlayerProps } from "./app";
+import PlayerComp from "./app";
+import OnUpdatePlugin from "./plugins/onupdate-plugin";
 
-const WEB_PLAYER_VERSION = '__VERSION__';
-const COMMIT = '__GIT_COMMIT__';
+const WEB_PLAYER_VERSION = "__VERSION__";
+const COMMIT = "__GIT_COMMIT__";
 
 export interface DevtoolsGlobals {
   /** A global for a plugin to load to Player for devtools */
@@ -32,7 +32,7 @@ export interface DevtoolsGlobals {
 export type DevtoolsWindow = typeof window & DevtoolsGlobals;
 
 const _window: DevtoolsWindow | undefined =
-  typeof window === 'undefined' ? undefined : window;
+  typeof window === "undefined" ? undefined : window;
 
 export interface ReactPlayerInfo {
   /** Version of the running player */
@@ -64,12 +64,6 @@ export interface ReactPlayerOptions {
 
   /** A set of plugins to apply to this player */
   plugins?: Array<ReactPlayerPlugin>;
-
-  /**
-   * If the underlying reactPlayer.Component should use `React.Suspense` to trigger a loading state while waiting for content or content updates.
-   * It requires that a `React.Suspense` component handler be somewhere in the `reactPlayer.Component` hierarchy.
-   */
-  suspend?: boolean;
 }
 
 export type ReactPlayerComponentProps = Record<string, unknown>;
@@ -107,15 +101,9 @@ export class ReactPlayer {
   constructor(options?: ReactPlayerOptions) {
     this.options = options ?? {};
 
-    // Default the suspend option to `true` unless explicitly unset
-    // Remove the suspend option in the next major
-    if (!('suspend' in this.options)) {
-      this.options.suspend = true;
-    }
-
     const Devtools = _window?.__PLAYER_DEVTOOLS_PLUGIN;
     const onUpdatePlugin = new OnUpdatePlugin(
-      this.viewUpdateSubscription.publish
+      this.viewUpdateSubscription.publish,
     );
 
     const plugins = options?.plugins ?? [];
@@ -125,7 +113,7 @@ export class ReactPlayer {
     }
 
     const playerPlugins = plugins.filter((p) =>
-      Boolean(p.apply)
+      Boolean(p.apply),
     ) as PlayerPlugin[];
 
     this.player = options?.player ?? new Player({ plugins: playerPlugins });
@@ -159,7 +147,7 @@ export class ReactPlayer {
 
   /** Find instance of [Plugin] that has been registered to the web player */
   public findPlugin<Plugin extends ReactPlayerPlugin>(
-    symbol: symbol
+    symbol: symbol,
   ): Plugin | undefined {
     return this.options.plugins?.find((el) => el.symbol === symbol) as Plugin;
   }
@@ -193,7 +181,7 @@ export class ReactPlayer {
           onError={(err) => {
             const playerState = this.player.getState();
 
-            if (playerState.status === 'in-progress') {
+            if (playerState.status === "in-progress") {
               playerState.fail(err);
             }
           }}
@@ -214,10 +202,7 @@ export class ReactPlayer {
     /** the component to use to render the player */
     const WebPlayerComponent = () => {
       const view = useSubscribedState<View>(this.viewUpdateSubscription);
-
-      if (this.options.suspend) {
-        this.viewUpdateSubscription.suspend();
-      }
+      this.viewUpdateSubscription.suspend();
 
       return (
         <AssetContext.Provider
@@ -238,12 +223,10 @@ export class ReactPlayer {
    * If the `suspense` option is set, this will suspend while an update is pending, otherwise nothing will be rendered.
    */
   public setWaitForNextViewUpdate() {
-    // If the `suspend` option isn't set, then we need to reset immediately otherwise we risk flashing the old view while the new one is processing
-    const shouldCallResetHook =
-      this.options.suspend && this.hooks.onBeforeViewReset.isUsed();
+    const shouldCallResetHook = this.hooks.onBeforeViewReset.isUsed();
 
     return this.viewUpdateSubscription.reset(
-      shouldCallResetHook ? this.hooks.onBeforeViewReset.call() : undefined
+      shouldCallResetHook ? this.hooks.onBeforeViewReset.call() : undefined,
     );
   }
 
@@ -251,9 +234,7 @@ export class ReactPlayer {
     this.setWaitForNextViewUpdate();
 
     return this.player.start(flow).finally(async () => {
-      if (this.options?.suspend) {
-        await this.setWaitForNextViewUpdate();
-      }
+      await this.setWaitForNextViewUpdate();
     });
   }
 }

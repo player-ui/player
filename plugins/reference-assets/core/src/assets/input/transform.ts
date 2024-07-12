@@ -1,12 +1,12 @@
-import type { TransformFunction } from '@player-ui/player';
-import type { InputAsset, TransformedInput } from './types';
+import type { TransformFunction } from "@player-ui/player";
+import type { InputAsset, TransformedInput } from "./types";
 
 /**
  * Docs about the asset transform
  */
 export const inputTransform: TransformFunction<InputAsset, TransformedInput> = (
   asset,
-  options
+  options,
 ) => {
   return {
     ...asset,
@@ -28,7 +28,7 @@ export const inputTransform: TransformFunction<InputAsset, TransformedInput> = (
     },
     value:
       asset.binding === undefined
-        ? ''
+        ? ""
         : options.data.model.get(asset.binding, {
             includeInvalid: true,
             formatted: true,

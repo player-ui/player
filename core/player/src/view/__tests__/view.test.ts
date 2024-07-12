@@ -1,14 +1,20 @@
-import { LocalModel, withParser } from '../../data';
-import { ExpressionEvaluator } from '../../expressions';
-import { BindingParser } from '../../binding';
-import { SchemaController } from '../../schema';
-import { ViewInstance } from '..';
+import { describe, it, expect, test } from "vitest";
+import { LocalModel, withParser } from "../../data";
+import { ExpressionEvaluator } from "../../expressions";
+import { BindingParser } from "../../binding";
+import { SchemaController } from "../../schema";
+import {
+  StringResolverPlugin,
+  SwitchPlugin,
+  ViewInstance,
+  toNodeResolveOptions,
+} from "..";
 
 const parseBinding = new BindingParser().parse;
 
-describe('view', () => {
-  describe('switch', () => {
-    it('works on a static switch', () => {
+describe("view", () => {
+  describe("switch", () => {
+    it("works on a static switch", () => {
       const model = withParser(
         new LocalModel({
           foo: {
@@ -16,28 +22,28 @@ describe('view', () => {
             baz: false,
           },
         }),
-        parseBinding
+        parseBinding,
       );
       const evaluator = new ExpressionEvaluator({ model });
       const schema = new SchemaController();
 
       const view = new ViewInstance(
         {
-          id: 'foo',
+          id: "foo",
           fields: {
             staticSwitch: [
               {
-                case: '{{foo.baz}}',
+                case: "{{foo.baz}}",
                 asset: {
-                  id: 'input-1',
-                  type: 'input',
+                  id: "input-1",
+                  type: "input",
                 },
               },
               {
-                case: '{{foo.bar}}',
+                case: "{{foo.bar}}",
                 asset: {
-                  id: 'input-2',
-                  type: 'input',
+                  id: "input-2",
+                  type: "input",
                 },
               },
             ],
@@ -48,54 +54,58 @@ describe('view', () => {
           parseBinding,
           evaluator,
           schema,
-        }
+        },
       );
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new SwitchPlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
 
       const resolved = view.update();
 
       expect(resolved).toStrictEqual({
-        id: 'foo',
+        id: "foo",
         fields: {
           asset: {
-            id: 'input-2',
-            type: 'input',
+            id: "input-2",
+            type: "input",
           },
         },
       });
 
-      const bazBinding = parseBinding('foo.baz');
+      const bazBinding = parseBinding("foo.baz");
       model.set([[bazBinding, true]]);
 
       const updated = view.update(new Set([bazBinding]));
       expect(updated).toBe(resolved);
     });
 
-    test('works with no valid switch cases in an array', () => {
+    test("works with no valid switch cases in an array", () => {
       const model = withParser(new LocalModel({}), parseBinding);
       const evaluator = new ExpressionEvaluator({ model });
       const schema = new SchemaController();
 
       const view = new ViewInstance(
         {
-          id: 'test',
-          type: 'view',
+          id: "test",
+          type: "view",
           title: [
             {
               staticSwitch: [
                 {
                   case: false,
                   asset: {
-                    id: 'false-case',
-                    type: 'text',
-                    value: 'some text',
+                    id: "false-case",
+                    type: "text",
+                    value: "some text",
                   },
                 },
                 {
                   case: false,
                   asset: {
-                    id: 'false-case-2',
-                    type: 'text',
-                    value: 'some text',
+                    id: "false-case-2",
+                    type: "text",
+                    value: "some text",
                   },
                 },
               ],
@@ -107,18 +117,22 @@ describe('view', () => {
           parseBinding,
           evaluator,
           schema,
-        }
+        },
       );
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new SwitchPlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
 
       const resolved = view.update();
 
       expect(resolved).toStrictEqual({
-        id: 'test',
-        type: 'view',
+        id: "test",
+        type: "view",
       });
     });
 
-    it('does not return a field object if the case does not resolve an asset', () => {
+    it("does not return a field object if the case does not resolve an asset", () => {
       const model = withParser(
         new LocalModel({
           foo: {
@@ -126,25 +140,25 @@ describe('view', () => {
             baz: false,
           },
         }),
-        parseBinding
+        parseBinding,
       );
       const evaluator = new ExpressionEvaluator({ model });
       const schema = new SchemaController();
 
       const view = new ViewInstance(
         {
-          id: 'foo',
+          id: "foo",
           fields: {
             staticSwitch: [
               {
-                case: '{{foo.baz}}',
+                case: "{{foo.baz}}",
                 asset: {
-                  id: 'input-1',
-                  type: 'input',
+                  id: "input-1",
+                  type: "input",
                 },
               },
               {
-                case: '{{foo.bar}}',
+                case: "{{foo.bar}}",
               },
             ],
           },
@@ -154,51 +168,55 @@ describe('view', () => {
           parseBinding,
           evaluator,
           schema,
-        }
+        },
       );
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new SwitchPlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
 
       const resolved = view.update();
 
       expect(resolved).toStrictEqual({
-        id: 'foo',
+        id: "foo",
       });
 
-      const bazBinding = parseBinding('foo.baz');
+      const bazBinding = parseBinding("foo.baz");
       model.set([[bazBinding, true]]);
 
       const updated = view.update(new Set([bazBinding]));
       expect(updated).toBe(resolved);
     });
 
-    it('works with default case', () => {
+    it("works with default case", () => {
       const model = withParser(
         new LocalModel({
           foo: {
-            baz: 'bad',
+            baz: "bad",
           },
         }),
-        parseBinding
+        parseBinding,
       );
       const evaluator = new ExpressionEvaluator({ model });
       const schema = new SchemaController();
 
       const view = new ViewInstance(
         {
-          id: 'foo',
+          id: "foo",
           fields: {
             staticSwitch: [
               {
                 case: '{{foo.baz}} === "good"',
                 asset: {
-                  id: 'input-1',
-                  type: 'input',
+                  id: "input-1",
+                  type: "input",
                 },
               },
               {
                 case: true,
                 asset: {
-                  id: 'input-2',
-                  type: 'input',
+                  id: "input-2",
+                  type: "input",
                 },
               },
             ],
@@ -209,23 +227,27 @@ describe('view', () => {
           parseBinding,
           evaluator,
           schema,
-        }
+        },
       );
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new SwitchPlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
 
       const resolved = view.update();
 
       expect(resolved).toStrictEqual({
-        id: 'foo',
+        id: "foo",
         fields: {
           asset: {
-            id: 'input-2',
-            type: 'input',
+            id: "input-2",
+            type: "input",
           },
         },
       });
     });
 
-    it('works on a dynamic switch', () => {
+    it("works on a dynamic switch", () => {
       const model = withParser(
         new LocalModel({
           foo: {
@@ -233,7 +255,7 @@ describe('view', () => {
             baz: false,
           },
         }),
-        parseBinding
+        parseBinding,
       );
 
       const evaluator = new ExpressionEvaluator({ model });
@@ -241,21 +263,21 @@ describe('view', () => {
 
       const view = new ViewInstance(
         {
-          id: 'foo',
+          id: "foo",
           fields: {
             dynamicSwitch: [
               {
-                case: '{{foo.baz}}',
+                case: "{{foo.baz}}",
                 asset: {
-                  id: 'input-1',
-                  type: 'input',
+                  id: "input-1",
+                  type: "input",
                 },
               },
               {
-                case: '{{foo.bar}}',
+                case: "{{foo.bar}}",
                 asset: {
-                  id: 'input-2',
-                  type: 'input',
+                  id: "input-2",
+                  type: "input",
                 },
               },
             ],
@@ -266,79 +288,83 @@ describe('view', () => {
           model,
           parseBinding,
           evaluator,
-        }
+        },
       );
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new SwitchPlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
 
       const resolved = view.update();
 
       expect(resolved).toStrictEqual({
-        id: 'foo',
+        id: "foo",
         fields: {
           asset: {
-            id: 'input-2',
-            type: 'input',
+            id: "input-2",
+            type: "input",
           },
         },
       });
 
-      const bazBinding = parseBinding('foo.baz');
+      const bazBinding = parseBinding("foo.baz");
       model.set([[bazBinding, true]]);
 
       const updated = view.update(new Set([bazBinding]));
       expect(updated).toStrictEqual({
-        id: 'foo',
+        id: "foo",
         fields: {
           asset: {
-            id: 'input-1',
-            type: 'input',
+            id: "input-1",
+            type: "input",
           },
         },
       });
     });
 
-    it('dynamic - works inside of an array', () => {
+    it("dynamic - works inside of an array", () => {
       const model = withParser(
         new LocalModel({
           foo: {
-            baz: 'bad',
+            baz: "bad",
           },
         }),
-        parseBinding
+        parseBinding,
       );
       const evaluator = new ExpressionEvaluator({ model });
       const schema = new SchemaController();
 
       const view = new ViewInstance(
         {
-          id: 'foo',
+          id: "foo",
           fields: {
             asset: {
-              type: 'collection',
-              id: 'collection',
+              type: "collection",
+              id: "collection",
               values: [
                 {
                   dynamicSwitch: [
                     {
                       case: '{{foo.baz}} === "good"',
                       asset: {
-                        id: 'input-1',
-                        type: 'input',
+                        id: "input-1",
+                        type: "input",
                       },
                     },
                     {
                       case: '{{foo.baz}} === "bad"',
                       asset: {
-                        id: 'input-2',
-                        type: 'input',
+                        id: "input-2",
+                        type: "input",
                       },
                     },
                   ],
                 },
                 {
                   asset: {
-                    id: 'other-asset',
-                    type: 'text',
-                    value: 'other value',
+                    id: "other-asset",
+                    type: "text",
+                    value: "other value",
                   },
                 },
               ],
@@ -350,29 +376,33 @@ describe('view', () => {
           parseBinding,
           evaluator,
           schema,
-        }
+        },
       );
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new SwitchPlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
 
       const resolved = view.update();
 
       expect(resolved).toStrictEqual({
-        id: 'foo',
+        id: "foo",
         fields: {
           asset: {
-            id: 'collection',
-            type: 'collection',
+            id: "collection",
+            type: "collection",
             values: [
               {
                 asset: {
-                  id: 'input-2',
-                  type: 'input',
+                  id: "input-2",
+                  type: "input",
                 },
               },
               {
                 asset: {
-                  id: 'other-asset',
-                  type: 'text',
-                  value: 'other value',
+                  id: "other-asset",
+                  type: "text",
+                  value: "other value",
                 },
               },
             ],
@@ -380,22 +410,22 @@ describe('view', () => {
         },
       });
 
-      const bazBinding = parseBinding('foo.baz');
+      const bazBinding = parseBinding("foo.baz");
       model.set([[bazBinding, true]]);
 
       const updated = view.update(new Set([bazBinding]));
       expect(updated).toStrictEqual({
-        id: 'foo',
+        id: "foo",
         fields: {
           asset: {
-            id: 'collection',
-            type: 'collection',
+            id: "collection",
+            type: "collection",
             values: [
               {
                 asset: {
-                  id: 'other-asset',
-                  type: 'text',
-                  value: 'other value',
+                  id: "other-asset",
+                  type: "text",
+                  value: "other value",
                 },
               },
             ],
@@ -404,35 +434,291 @@ describe('view', () => {
       });
     });
 
-    it('static - works inside of an array', () => {
+    it("static - works inside of an array", () => {
       const model = withParser(new LocalModel({}), parseBinding);
       const evaluator = new ExpressionEvaluator({ model });
       const schema = new SchemaController();
 
       const view = new ViewInstance(
         {
-          id: 'foo',
+          id: "test",
+          type: "view",
+
+          title: {
+            staticSwitch: [
+              {
+                case: false,
+                asset: {
+                  id: "false-case",
+                  type: "text",
+                  value: "some text",
+                },
+              },
+              {
+                case: false,
+                asset: {
+                  id: "false-case-2",
+                  type: "text",
+                  value: "some text",
+                },
+              },
+            ],
+          },
+        } as any,
+
+        {
+          model,
+          parseBinding,
+          evaluator,
+          schema,
+        },
+      );
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new SwitchPlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
+
+      const resolved = view.update();
+
+      expect(resolved).toStrictEqual({
+        id: "test",
+        type: "view",
+      });
+    });
+
+    it("does not return a field object if the case does not resolve an asset", () => {
+      const model = withParser(
+        new LocalModel({
+          foo: {
+            bar: true,
+            baz: false,
+          },
+        }),
+        parseBinding,
+      );
+      const evaluator = new ExpressionEvaluator({ model });
+      const schema = new SchemaController();
+
+      const view = new ViewInstance(
+        {
+          id: "foo",
+          fields: {
+            staticSwitch: [
+              {
+                case: "{{foo.baz}}",
+                asset: {
+                  id: "input-1",
+                  type: "input",
+                },
+              },
+              {
+                case: "{{foo.bar}}",
+              },
+            ],
+          },
+        } as any,
+        {
+          model,
+          parseBinding,
+          evaluator,
+          schema,
+        },
+      );
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new SwitchPlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
+
+      const resolved = view.update();
+
+      expect(resolved).toStrictEqual({
+        id: "foo",
+      });
+
+      const bazBinding = parseBinding("foo.baz");
+      model.set([[bazBinding, true]]);
+
+      const updated = view.update(new Set([bazBinding]));
+      expect(updated).toBe(resolved);
+    });
+
+    it("works with default case", () => {
+      const model = withParser(
+        new LocalModel({
+          foo: {
+            baz: "bad",
+          },
+        }),
+        parseBinding,
+      );
+      const evaluator = new ExpressionEvaluator({ model });
+      const schema = new SchemaController();
+
+      const view = new ViewInstance(
+        {
+          id: "foo",
+          fields: {
+            staticSwitch: [
+              {
+                case: "{{foo.baz}} === 'good'",
+                asset: {
+                  id: "input-1",
+                  type: "input",
+                },
+              },
+              {
+                case: true,
+                asset: {
+                  id: "input-2",
+                  type: "input",
+                },
+              },
+            ],
+          },
+        } as any,
+        {
+          model,
+          parseBinding,
+          evaluator,
+          schema,
+        },
+      );
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new SwitchPlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
+
+      const resolved = view.update();
+
+      expect(resolved).toStrictEqual({
+        id: "foo",
+        fields: {
+          asset: {
+            id: "input-2",
+            type: "input",
+          },
+        },
+      });
+    });
+
+    it("works on a dynamic switch", () => {
+      const model = withParser(
+        new LocalModel({
+          foo: {
+            bar: true,
+            baz: false,
+          },
+        }),
+        parseBinding,
+      );
+
+      const evaluator = new ExpressionEvaluator({ model });
+      const schema = new SchemaController();
+
+      const view = new ViewInstance(
+        {
+          id: "foo",
+          fields: {
+            dynamicSwitch: [
+              {
+                case: "{{foo.baz}}",
+                asset: {
+                  id: "input-1",
+                  type: "input",
+                },
+              },
+              {
+                case: "{{foo.bar}}",
+                asset: {
+                  id: "input-2",
+                  type: "input",
+                },
+              },
+            ],
+          },
+        } as any,
+        {
+          schema,
+          model,
+          parseBinding,
+          evaluator,
+        },
+      );
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new SwitchPlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
+
+      const resolved = view.update();
+
+      expect(resolved).toStrictEqual({
+        id: "foo",
+        fields: {
+          asset: {
+            id: "input-2",
+            type: "input",
+          },
+        },
+      });
+
+      const bazBinding = parseBinding("foo.baz");
+      model.set([[bazBinding, true]]);
+
+      const updated = view.update(new Set([bazBinding]));
+      expect(updated).toStrictEqual({
+        id: "foo",
+        fields: {
+          asset: {
+            id: "input-1",
+            type: "input",
+          },
+        },
+      });
+    });
+
+    it("dynamic - works inside of an array", () => {
+      const model = withParser(
+        new LocalModel({
+          foo: {
+            baz: "bad",
+          },
+        }),
+        parseBinding,
+      );
+      const evaluator = new ExpressionEvaluator({ model });
+      const schema = new SchemaController();
+
+      const view = new ViewInstance(
+        {
+          id: "foo",
           fields: {
             asset: {
-              type: 'collection',
-              id: 'collection',
+              type: "collection",
+              id: "collection",
               values: [
                 {
-                  staticSwitch: [
+                  dynamicSwitch: [
                     {
-                      case: true,
+                      case: "{{foo.baz}} === 'good'",
                       asset: {
-                        id: 'input-2',
-                        type: 'input',
+                        id: "input-1",
+                        type: "input",
+                      },
+                    },
+                    {
+                      case: "{{foo.baz}} === 'bad'",
+                      asset: {
+                        id: "input-2",
+                        type: "input",
                       },
                     },
                   ],
                 },
                 {
                   asset: {
-                    id: 'other-asset',
-                    type: 'text',
-                    value: 'other value',
+                    id: "other-asset",
+                    type: "text",
+                    value: "other value",
                   },
                 },
               ],
@@ -444,29 +730,131 @@ describe('view', () => {
           parseBinding,
           evaluator,
           schema,
-        }
+        },
       );
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new SwitchPlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
 
       const resolved = view.update();
 
       expect(resolved).toStrictEqual({
-        id: 'foo',
+        id: "foo",
         fields: {
           asset: {
-            id: 'collection',
-            type: 'collection',
+            id: "collection",
+            type: "collection",
             values: [
               {
                 asset: {
-                  id: 'input-2',
-                  type: 'input',
+                  id: "input-2",
+                  type: "input",
                 },
               },
               {
                 asset: {
-                  id: 'other-asset',
-                  type: 'text',
-                  value: 'other value',
+                  id: "other-asset",
+                  type: "text",
+                  value: "other value",
+                },
+              },
+            ],
+          },
+        },
+      });
+
+      const bazBinding = parseBinding("foo.baz");
+      model.set([[bazBinding, true]]);
+
+      const updated = view.update(new Set([bazBinding]));
+      expect(updated).toStrictEqual({
+        id: "foo",
+        fields: {
+          asset: {
+            id: "collection",
+            type: "collection",
+            values: [
+              {
+                asset: {
+                  id: "other-asset",
+                  type: "text",
+                  value: "other value",
+                },
+              },
+            ],
+          },
+        },
+      });
+    });
+
+    it("static - works inside of an array", () => {
+      const model = withParser(new LocalModel({}), parseBinding);
+      const evaluator = new ExpressionEvaluator({ model });
+      const schema = new SchemaController();
+
+      const view = new ViewInstance(
+        {
+          id: "foo",
+          fields: {
+            asset: {
+              type: "collection",
+              id: "collection",
+              values: [
+                {
+                  staticSwitch: [
+                    {
+                      case: true,
+                      asset: {
+                        id: "input-2",
+                        type: "input",
+                      },
+                    },
+                  ],
+                },
+                {
+                  asset: {
+                    id: "other-asset",
+                    type: "text",
+                    value: "other value",
+                  },
+                },
+              ],
+            },
+          },
+        } as any,
+        {
+          model,
+          parseBinding,
+          evaluator,
+          schema,
+        },
+      );
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new SwitchPlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
+
+      const resolved = view.update();
+
+      expect(resolved).toStrictEqual({
+        id: "foo",
+        fields: {
+          asset: {
+            id: "collection",
+            type: "collection",
+            values: [
+              {
+                asset: {
+                  id: "input-2",
+                  type: "input",
+                },
+              },
+              {
+                asset: {
+                  id: "other-asset",
+                  type: "text",
+                  value: "other value",
                 },
               },
             ],
@@ -476,28 +864,28 @@ describe('view', () => {
     });
   });
 
-  describe('string-updates', () => {
-    it('works on expressions', () => {
+  describe("string-updates", () => {
+    it("works on expressions", () => {
       const model = withParser(
         new LocalModel({
           foo: {
-            hello: 'Hello',
-            world: 'World',
+            hello: "Hello",
+            world: "World",
           },
         }),
-        parseBinding
+        parseBinding,
       );
       const schema = new SchemaController();
       const evaluator = new ExpressionEvaluator({ model });
 
       const view = new ViewInstance(
         {
-          id: 'foo',
+          id: "foo",
           fields: {
             asset: {
-              id: 'test',
-              type: 'text',
-              value: 'Before @[ {{foo.hello}} + " " + {{foo.world}} ]@ After',
+              id: "test",
+              type: "text",
+              value: "Before @[ {{foo.hello}} + ' ' + {{foo.world}} ]@ After",
             },
           },
         } as any,
@@ -506,52 +894,54 @@ describe('view', () => {
           parseBinding,
           evaluator,
           schema,
-        }
+        },
       );
+
+      new StringResolverPlugin().apply(view);
 
       const resolved = view.update();
 
       expect(resolved).toStrictEqual({
-        id: 'foo',
+        id: "foo",
         fields: {
           asset: {
-            id: 'test',
-            type: 'text',
-            value: 'Before Hello World After',
+            id: "test",
+            type: "text",
+            value: "Before Hello World After",
           },
         },
       });
 
-      const worldBinding = parseBinding('foo.world');
-      model.set([[worldBinding, 'Adam']]);
+      const worldBinding = parseBinding("foo.world");
+      model.set([[worldBinding, "Adam"]]);
 
       const updated = view.update(new Set([worldBinding]));
       expect(updated).toStrictEqual({
-        id: 'foo',
+        id: "foo",
         fields: {
           asset: {
-            id: 'test',
-            type: 'text',
-            value: 'Before Hello Adam After',
+            id: "test",
+            type: "text",
+            value: "Before Hello Adam After",
           },
         },
       });
 
-      model.set([[parseBinding('foo.unrelated'), 'other stuff']]);
-      expect(view.update(new Set([parseBinding('foo.unrelated')]))).toBe(
-        updated
+      model.set([[parseBinding("foo.unrelated"), "other stuff"]]);
+      expect(view.update(new Set([parseBinding("foo.unrelated")]))).toBe(
+        updated,
       );
     });
   });
 
-  test('handles a top level validation thats not an array', () => {
+  test("handles a top level validation thats not an array", () => {
     const model = withParser(new LocalModel({}), parseBinding);
     const evaluator = new ExpressionEvaluator({ model });
     const schema = new SchemaController();
 
     const view = new ViewInstance(
       {
-        id: 'foo',
+        id: "foo",
         validation: {
           broken: true,
         },
@@ -561,7 +951,7 @@ describe('view', () => {
         parseBinding,
         evaluator,
         schema,
-      }
+      },
     );
 
     expect(view).toBeDefined();

@@ -11,21 +11,21 @@ parameters:
 orbs:
   macos: circleci/macos@2
   android: circleci/android@2.0
-  codecov: codecov/codecov@3.2.2
+  codecov: codecov/codecov@3.3.0
 
 executors:
   base:
     docker:
-      - image: docker.io/playerui/bazel-docker:8
+      - image: docker.io/playerui/bazel-docker:10
     working_directory: ~/player
     resource_class: xlarge
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   ios:
     working_directory: ~/player
-    resource_class: macos.m1.medium.gen1
+    resource_class: macos.m1.large.gen1
     macos:
-      xcode: 14.3
+      xcode: 15.3.0
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   android:
@@ -94,8 +94,8 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/player
-
-      - run: bazel build --config=ci --config=skip-ios -- //...
+      # need to filter because //android/demo rules dont resolve
+      - run: bazel build --config=ci -- $(bazel query '//plugins/... except filter("ios|swiftui|jvm|android", //plugins/...)') $(bazel query '//core/... except filter("ios|swiftui|jvm|android", //core/...)') $(bazel query '//react/... except filter("ios|swiftui|jvm|android", //react/...)')
 
       - save_cache:
           paths:
@@ -117,18 +117,10 @@ jobs:
 
       - run:
           name: Homebrew Dependencies
-          shell: env /usr/bin/arch -x86_64 /bin/bash --login -eo pipefail
           command: |
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-      - run:
-          command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 arch -x86_64 /usr/local/bin/brew install bazelisk maven openjdk@8
-
-      - run:
-          name: Set Ruby Version
-          command: |
-            rbenv global 2.7.8
-            rbenv rehash
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk lcov
+            brew install --cask temurin@8
+            sudo installer -pkg /opt/homebrew/Caskroom/temurin@8/8,412,08/OpenJDK8U-jdk_x64_mac_hotspot_8u412b08.pkg -target /
 
       - restore_cache:
           keys:
@@ -141,53 +133,49 @@ jobs:
           command: |
             sh scripts/install-android-tools.sh
             echo 'export ANDROID_SDK_HOME=$ANDROID_HOME'  >> $BASH_ENV
-            echo 'export ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk/21.4.7075529'  >> $BASH_ENV
+            echo 'export ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk/23.2.8568313'  >> $BASH_ENV
             echo 'export PATH=$ANDROID_SDK_HOME/tools/bin:$PATH'  >> $BASH_ENV
             echo 'export PATH=$ANDROID_SDK_HOME/tools:$PATH'  >> $BASH_ENV
             echo 'export PATH=$ANDROID_SDK_HOME/platform-tools:$PATH'  >> $BASH_ENV
             echo 'export PATH=$ANDROID_SDK_HOME/emulator:$PATH'  >> $BASH_ENV
             source $BASH_ENV
           environment:
-            JAVA_HOME: /usr/local/opt/openjdk@8
-
-      - save_cache:
-          key: android-tools-{{ arch }}-{{ checksum "scripts/install-android-tools.sh" }}
-          paths:
-            - ~/android-tools
-
-      - run: gem install bundler -v 2.4.22
-
-      - restore_cache:
-          keys:
-            - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
-            - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
-
-      - run:
-          command: |
-            bundle config build.nokogiri --use-system-libraries
-            bundle install
-
-      - save_cache:
-          key: gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
-          paths:
-            - ~/.gem/ruby/2.7.8
+            JAVA_HOME: /Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home
 
       - macos/preboot-simulator:
-          version: "15.5"
+          version: "17.4"
           platform: "iOS"
-          device: "iPhone 13"
+          device: "iPhone 15"
 
-      - run: bazel sync
+      - run: bazel build --config=ci-mac -- //ios/demo:PlayerUIDemo
 
-      - run: |
-          BUNDLE_TARGETS=$(bazel query "attr(name, '^.*_Bundles$', //...)" --output label 2>/dev/null | tr '\n' ' ')
-          bazel build --config=ci $BUNDLE_TARGETS
-
-      - run: bazel shutdown
-      - run: cd xcode && bundle exec pod install
-      - run: bazel build --config=ci -- //:PlayerUI //:PlayerUI-Demo //:PlayerUI_Pod
-      # TODO: the timeout should be added to the test itself
-      - run: bazel test --test_timeout=1200 --jobs=1 --verbose_failures --config=ci  -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
+      - run:
+          name: Test Prebuild
+          command: |
+            bazel build \
+              --config=ci-mac \
+              $(bazel query "kind(ios_unit_test, //ios/...)") \
+              $(bazel query "kind(ios_unit_test, //plugins/...)") \
+              $(bazel query "kind(ios_ui_test, //ios/...)") \
+              $(bazel query "kind(ios_ui_test, //plugins/...)") \
+              $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
+              $(bazel query "attr(name, '.*SwiftLint', //plugins/...)")
+      - run:
+          name: Tests
+          command: |
+            bazel coverage \
+              --config=ci-mac \
+              --jobs=1 \
+              --experimental_use_llvm_covmap \
+              --combined_report=lcov \
+              --test_output=all \
+              --test_timeout=1800 \
+              $(bazel query "kind(ios_unit_test, //ios/...)") \
+              $(bazel query "kind(ios_unit_test, //plugins/...)") \
+              $(bazel query "kind(ios_ui_test, //ios/...)") \
+              $(bazel query "kind(ios_ui_test, //plugins/...)") \
+              $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
+              $(bazel query "attr(name, '.*SwiftLint', //plugins/...)")
 
       - run:
           when: always
@@ -198,6 +186,20 @@ jobs:
               mkdir -p $RESULTS_DIR/$(dirname $line)
               cp $line $RESULTS_DIR/$(dirname $line)
             done
+      - run:
+          when: always
+          command: |
+            mkdir -p _ios_coverage/lcov
+            mkdir -p _ios_coverage/html
+            cp -r $(bazel info output_path)/_coverage/_coverage_report.dat _ios_coverage/lcov/
+            genhtml --branch-coverage --output-directory=_ios_coverage/html/ "$(bazel info output_path)/_coverage/_coverage_report.dat"
+            zip -r _ios_coverage/html.zip _ios_coverage/html/
+            rm -r _ios_coverage/html/
+      
+      - persist_to_workspace:
+          root: .
+          paths:
+            - _ios_coverage
 
       - store_test_results:
           path: _test_results
@@ -208,7 +210,8 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel test --config=skip-ios --config=ci -- //... -//docs/site -//android/demo:android_instrumentation_test
+      - run: |
+          bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
       - run:
           when: always
@@ -245,18 +248,13 @@ jobs:
           command: |
             rm -rf $ANDROID_HOME/build-tools/*
             JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64 \
-              $ANDROID_HOME/tools/bin/sdkmanager "build-tools;30.0.3"\
-              "ndk;21.4.7075529" \
-              "system-images;android-31;default;x86_64"
-            echo "export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/21.4.7075529"  >> $BASH_ENV
+              $ANDROID_HOME/tools/bin/sdkmanager "build-tools;33.0.1"\
+              "ndk;23.2.8568313" \
+              "system-images;android-33;default;x86_64"
+            echo "export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/23.2.8568313"  >> $BASH_ENV
             source $BASH_ENV
-            echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-31;default;x86_64" -g default
+            echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-33;default;x86_64" -g default
              source $BASH_ENV
-
-      - run:
-          name: Set python to 2.7
-          command: |
-            pyenv global 2.7  
 
       - run:
           name: Launch emulator
@@ -299,12 +297,29 @@ jobs:
             - v1-bazel-cache-core-{{ .Branch }}
             - v1-bazel-cache-core-main
 
+      # union the bundle targets until //... doesnt explode analyzing jvm/android targets
       - run: |
-          BUNDLE_TARGETS=$(bazel query "kind(nodejs_test, //...)" --output label 2>/dev/null | tr '\n' ' ')
-          bazel coverage --config=ci -- $BUNDLE_TARGETS
+          BUNDLE_TARGETS=$(bazel query "kind(js_test, //plugins/...) union kind(js_test, //react/...) union kind(js_test, //core/...)" --output label 2>/dev/null | tr '\n' ' ')
+          bazel coverage --combined_report=lcov --config=ci -- $BUNDLE_TARGETS
+
+      - run:
+          when: always
+          command: |
+            RESULTS_DIR=_test_results
+            find -L ./bazel-testlogs -name test.xml | while read line
+            do
+              mkdir -p $RESULTS_DIR/$(dirname $line)
+              cp $line $RESULTS_DIR/$(dirname $line)
+            done
+
+      - store_test_results:
+          path: _test_results
 
       - codecov/upload:
           file: ./bazel-out/_coverage/_coverage_report.dat
+
+      - codecov/upload:
+          file: _ios_coverage/lcov/_coverage_report.dat
 
   maybe_release:
     executor: base
@@ -432,6 +447,7 @@ workflows:
                 - /pull\/.*/
           requires:
             - build-trunk
+            - build-ios-trunk
 
       - coverage:
           name: coverage-fork
@@ -441,6 +457,7 @@ workflows:
                 - /pull\/.*/
           requires:
             - build-fork
+            - build-ios-fork
 
   build_and_test_main:
     when:
@@ -461,10 +478,6 @@ workflows:
           requires:
             - setup
 
-      - test:
-          requires:
-            - build
-
       - android_test:
           requires:
             - build
@@ -472,13 +485,13 @@ workflows:
       - coverage:
           requires:
             - build
+            - build_ios
 
       - release:
           context:
             - Publish
           requires:
             - android_test
-            - test
             - coverage
             - build_ios
 
@@ -496,10 +509,6 @@ workflows:
           requires:
             - setup
 
-      - test:
-          requires:
-            - build
-
       - android_test:
           requires:
             - build
@@ -513,6 +522,5 @@ workflows:
             - Publish
           requires:
             - android_test
-            - test
             - coverage
             - build_ios

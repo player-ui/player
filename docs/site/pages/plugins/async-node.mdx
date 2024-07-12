@@ -42,6 +42,8 @@ This means there must be a constant renewal of new `AsyncNode`s after the previo
 
 ## Usage
 
+The AsyncNodePlugin itself accepts a list of plugins and should take the AsyncNodePluginPlugin to be passed in. The AsyncNodePluginPlugin also comes from the `'@player-ui/async-node-plugin'` and contains the resolver and parser functionality
+
 <PlatformTabs>
   <core>
 
@@ -49,9 +51,11 @@ Add the plugin to Player:
 
 ```js
 import { Player } from '@player-ui/player';
-import { AsyncNodePlugin } from '@player-ui/async-node-plugin';
+import { AsyncNodePlugin, AsyncNodePluginPlugin } from '@player-ui/async-node-plugin';
 
-const asyncNodePlugin = new AsyncNodePlugin();
+const asyncNodePlugin = new AsyncNodePlugin({
+    plugins: [new AsyncNodePluginPlugin()],
+});
 
 // Configuring async node behaviour
 asyncNodePlugin.hooks.onAsyncNode.tap('handleAsync', async (node: Node.Node) => {
@@ -72,9 +76,11 @@ The `react` version of the AsyncNodePlugin is identical to using the core plugin
 
 ```js
 import { ReactPlayer } from '@player-ui/react';
-import { MetricsPlugin } from '@player-ui/async-node-plugin';
+import { AsyncNodePlugin, AsyncNodePluginPlugin } from '@player-ui/async-node-plugin';
 
-const asyncNodePlugin = new AsyncNodePlugin();
+const asyncNodePlugin = new AsyncNodePlugin({
+    plugins: [new AsyncNodePluginPlugin()],
+});
 
 const player = new ReactPlayer({
   plugins: [
@@ -103,7 +109,7 @@ var body: some View {
     SwiftUIPlayer(
         flow: flow,
         plugins: [
-          AsyncNodePlugin { node in
+          AsyncNodePlugin(plugins: [AsyncNodePluginPlugin()]) { node in
               // Determine what to return either using the singleNode or multiNode case
               // Then JSON can be provided using the concrete case, see below for using the encodable case
               return .singleNode(.concrete(jsContext?.evaluateScript("""
@@ -165,14 +171,14 @@ As a convenience to the user, the AsyncNodePlugin just takes a callback which ha
 
 In build.gradle
 ```kotlin
-implementation "com.intuit.player.plugins:async-node:$PLAYER_VERSION"
+implementation "com.intuit.playerui.plugins:async-node:$PLAYER_VERSION"
 ```
 
 In integration code
 ```kotlin
-import com.intuit.player.plugins.asyncnode.AsyncNodePlugin
+import com.intuit.playerui.plugins.asyncnode.AsyncNodePlugin
 
-val asyncNodePlugin = AsyncNodePlugin()
+val asyncNodePlugin = AsyncNodePlugin(plugins: [AsyncNodePluginPlugin()])
 
 // Configuring async node behaviour
 asyncNodePlugin.hooks.onAsyncNode.tap("handleAsync") { hookContext, node ->

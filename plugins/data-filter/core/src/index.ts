@@ -1,6 +1,6 @@
-import type { Player, PlayerPlugin } from '@player-ui/player';
-import get from 'dlv';
-import { omit, setIn } from 'timm';
+import type { Player, PlayerPlugin } from "@player-ui/player";
+import get from "dlv";
+import { omit, setIn } from "timm";
 
 export interface DataFilterPluginOptions {
   /** Paths in the model that should be omitted from the serialized result */
@@ -12,9 +12,9 @@ export interface DataFilterPluginOptions {
  */
 export function omitIn(
   obj: Record<string, unknown>,
-  path: string | Array<string>
+  path: string | Array<string>,
 ): unknown {
-  if (typeof path === 'string') {
+  if (typeof path === "string") {
     return omit(obj, path);
   }
 
@@ -39,7 +39,7 @@ export function omitIn(
  * It allows for runtime extensions/overrides through a `constants` property in the flow
  */
 export class DataFilterPlugin implements PlayerPlugin {
-  name = 'data-filter';
+  name = "data-filter";
 
   private readonly options: DataFilterPluginOptions;
 
@@ -53,7 +53,7 @@ export class DataFilterPlugin implements PlayerPlugin {
         let updatedModel = serializedModel;
 
         this.options.paths?.forEach((path) => {
-          const arrPath = Array.isArray(path) ? path : path.split('.');
+          const arrPath = Array.isArray(path) ? path : path.split(".");
           updatedModel = omitIn(updatedModel, arrPath);
         });
 

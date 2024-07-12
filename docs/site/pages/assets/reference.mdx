@@ -51,7 +51,7 @@ struct MyApp: View {
 Alongside distributing the Android Player framework, there is a reference assets library used as an example of how Player APIs work for building assets. These are intended to serve as a reference, but can be used early on in development as a means of understanding how to work with Player. This asset set uses the shared TypeScript transform functions that the Web and Android players use for their reference assets, ensuring consistent behavior across platforms. These assets can be loaded into Player like so:
 
 ```kotlin
-import com.intuit.player.android.reference.assets.ReferenceAssetsPlugin
+import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin
 
 val player = AndroidPlayer(context, ReferenceAssetsPlugin())
 ```

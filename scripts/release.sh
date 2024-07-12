@@ -3,7 +3,7 @@
 
 set -u -o pipefail
 
-readonly PKG_NPM_LABELS=`bazel query --output=label 'kind("pkg_npm rule", //...) - attr("tags", "\[.*do-not-publish.*\]", //...)'`
+readonly PKG_NPM_LABELS=`bazel query --output=label 'kind("npm_package rule", //...) - attr("tags", "\[.*do-not-publish.*\]", //...)'`
 NPM_TAG=canary
 
 # Called by auto -- `release` for normal releases or `snapshot` for canary/next.

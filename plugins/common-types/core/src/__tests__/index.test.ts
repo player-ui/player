@@ -1,15 +1,15 @@
-import { waitFor } from '@testing-library/react';
-import type { InProgressState } from '@player-ui/player';
-import { Player } from '@player-ui/player';
-import { AssetTransformPlugin } from '@player-ui/asset-transform-plugin';
-import { makeFlow } from '@player-ui/make-flow';
-import { Registry } from '@player-ui/partial-match-registry';
-import { CommonTypesPlugin } from '..';
+import { expect, test, vitest } from "vitest";
+import type { InProgressState } from "@player-ui/player";
+import { Player } from "@player-ui/player";
+import { AssetTransformPlugin } from "@player-ui/asset-transform-plugin";
+import { makeFlow } from "@player-ui/make-flow";
+import { Registry } from "@player-ui/partial-match-registry";
+import { CommonTypesPlugin } from "..";
 
 const basicInputTransform = new AssetTransformPlugin(
   new Registry([
     [
-      { type: 'input' },
+      { type: "input" },
       (value, options) => {
         return {
           ...value,
@@ -26,18 +26,18 @@ const basicInputTransform = new AssetTransformPlugin(
         };
       },
     ],
-  ])
+  ]),
 );
 
-test('works in real life', async () => {
+test("works in real life", async () => {
   const flow = makeFlow({
-    id: 'view-1',
-    type: 'info',
+    id: "view-1",
+    type: "info",
     fields: {
       asset: {
-        id: 'input-1',
-        type: 'input',
-        binding: 'person.age',
+        id: "input-1",
+        type: "input",
+        binding: "person.age",
       },
     },
   });
@@ -45,15 +45,15 @@ test('works in real life', async () => {
   flow.schema = {
     ROOT: {
       person: {
-        type: 'PersonType',
+        type: "PersonType",
       },
     },
     PersonType: {
       age: {
-        type: 'IntegerType',
+        type: "IntegerType",
         validation: [
           {
-            type: 'required',
+            type: "required",
           },
         ],
       },
@@ -73,30 +73,30 @@ test('works in real life', async () => {
 
   expect(getInputAsset().validation).toBe(undefined);
 
-  getInputAsset().set('50.1');
+  getInputAsset().set("50.1");
 
-  await waitFor(() => expect(getInputAsset().value).toBe('50'));
+  await vitest.waitFor(() => expect(getInputAsset().value).toBe("50"));
   expect(
-    (player.getState() as InProgressState).controllers.data.get('person.age')
+    (player.getState() as InProgressState).controllers.data.get("person.age"),
   ).toBe(50);
 });
 
-test('works with default values', () => {
+test("works with default values", () => {
   const flow = makeFlow({
-    id: 'view-1',
-    type: 'info',
+    id: "view-1",
+    type: "info",
     fields: {
       asset: {
-        id: 'input-1',
-        type: 'input',
-        binding: 'person.checkbox',
+        id: "input-1",
+        type: "input",
+        binding: "person.checkbox",
       },
     },
     other: {
       asset: {
-        id: 'input-2',
-        type: 'input',
-        binding: 'person.checkboxDefaultTrue',
+        id: "input-2",
+        type: "input",
+        binding: "person.checkboxDefaultTrue",
       },
     },
   });
@@ -104,15 +104,15 @@ test('works with default values', () => {
   flow.schema = {
     ROOT: {
       person: {
-        type: 'PersonType',
+        type: "PersonType",
       },
     },
     PersonType: {
       checkbox: {
-        type: 'BooleanType',
+        type: "BooleanType",
       },
       checkboxDefaultTrue: {
-        type: 'BooleanType',
+        type: "BooleanType",
         default: true,
       },
     },
@@ -126,33 +126,33 @@ test('works with default values', () => {
 
   expect(
     (player.getState() as InProgressState).controllers.view.currentView
-      ?.lastUpdate?.fields.asset.value
+      ?.lastUpdate?.fields.asset.value,
   ).toBe(false);
 
   expect(
     (player.getState() as InProgressState).controllers.view.currentView
-      ?.lastUpdate?.other.asset.value
+      ?.lastUpdate?.other.asset.value,
   ).toBe(true);
 });
 
-test('works with cross-field validation', async () => {
+test("works with cross-field validation", async () => {
   const flow = makeFlow({
-    id: 'view-1',
-    type: 'info',
+    id: "view-1",
+    type: "info",
     fields: {
       asset: {
-        id: 'input',
-        type: 'input',
-        binding: 'choice1',
+        id: "input",
+        type: "input",
+        binding: "choice1",
       },
     },
     validation: [
       {
-        ref: 'choice1',
-        type: 'expression',
+        ref: "choice1",
+        type: "expression",
         exp: '{{choice1}} == "Adam"',
-        message: 'Adam is always the right option',
-        trigger: 'navigation',
+        message: "Adam is always the right option",
+        trigger: "navigation",
       },
     ],
   });
@@ -179,18 +179,20 @@ test('works with cross-field validation', async () => {
 
   expect(getInputAsset().validation).toBe(undefined);
 
-  getState().controllers.flow.transition('Next');
+  getState().controllers.flow.transition("Next");
   expect(getInputAsset().validation).toMatchObject({
-    severity: 'error',
-    message: 'Adam is always the right option',
-    displayTarget: 'field',
+    severity: "error",
+    message: "Adam is always the right option",
+    displayTarget: "field",
   });
 
-  getInputAsset().set('Adam');
-  await waitFor(() => expect(getInputAsset().validation).toBe(undefined));
-  getState().controllers.flow.transition('Next');
+  getInputAsset().set("Adam");
+  await vitest.waitFor(() =>
+    expect(getInputAsset().validation).toBe(undefined),
+  );
+  getState().controllers.flow.transition("Next");
 
   const completed = await result;
-  expect(completed.data.choice1).toBe('Adam');
-  expect(player.getState().status).toBe('completed');
+  expect(completed.data.choice1).toBe("Adam");
+  expect(player.getState().status).toBe("completed");
 });

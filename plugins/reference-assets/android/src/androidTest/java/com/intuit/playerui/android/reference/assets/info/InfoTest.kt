@@ -16,7 +16,7 @@ import org.junit.Test
 class InfoTest : AssetTest("reference-assets") {
 
     enum class PlayerAction {
-        Next, Dismiss
+        Continue, Dismiss, Next
     }
 
     private fun verifyAndProceed(view: Int, action: PlayerAction? = null) {
@@ -28,7 +28,8 @@ class InfoTest : AssetTest("reference-assets") {
         }
 
         action?.let {
-            infoActions[action.ordinal].shouldBeView<Button> {
+            val buttonOrdinal = if (action.ordinal != 1) 0 else action.ordinal
+            infoActions[buttonOrdinal].shouldBeView<Button> {
                 assertEquals(action.name, text.toString())
                 performClick()
                 blockUntilRendered()
@@ -40,9 +41,9 @@ class InfoTest : AssetTest("reference-assets") {
     fun infoBasic() {
         launchMock("info-modal-flow")
 
-        verifyAndProceed(1, PlayerAction.Next)
+        verifyAndProceed(1, PlayerAction.Continue)
         verifyAndProceed(2, PlayerAction.Dismiss)
-        verifyAndProceed(1, PlayerAction.Next)
+        verifyAndProceed(1, PlayerAction.Continue)
         verifyAndProceed(2, PlayerAction.Next)
         verifyAndProceed(3, PlayerAction.Next)
         verifyAndProceed(1)

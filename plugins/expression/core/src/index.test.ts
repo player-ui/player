@@ -1,44 +1,45 @@
-import type { InProgressState } from '@player-ui/player';
-import { Player } from '@player-ui/player';
-import { ExpressionPlugin } from '.';
+import { test, expect } from "vitest";
+import type { InProgressState } from "@player-ui/player";
+import { Player } from "@player-ui/player";
+import { ExpressionPlugin } from ".";
 
 const minimal = {
-  id: 'minimal',
+  id: "minimal",
   views: [
     {
-      id: 'view-1',
-      type: 'info',
+      id: "view-1",
+      type: "info",
     },
   ],
   navigation: {
-    BEGIN: 'FLOW_1',
+    BEGIN: "FLOW_1",
     FLOW_1: {
       onStart: 'testExp("arguments")',
-      startState: 'VIEW_1',
+      startState: "VIEW_1",
       VIEW_1: {
-        ref: 'view-1',
-        state_type: 'VIEW',
+        ref: "view-1",
+        state_type: "VIEW",
         transitions: {
-          Next: 'VIEW_2',
-          '*': 'END_Done',
+          Next: "VIEW_2",
+          "*": "END_Done",
         },
       },
     },
   },
 };
 
-test('loads an expression', () => {
+test("loads an expression", () => {
   const player = new Player({
     plugins: [
       new ExpressionPlugin(
         new Map([
           [
-            'testExp',
+            "testExp",
             (ctx, arg1) => {
-              ctx.model.set([['foo.bar', `it works! ${arg1}`]]);
+              ctx.model.set([["foo.bar", `it works! ${arg1}`]]);
             },
           ],
-        ])
+        ]),
       ),
     ],
   });
@@ -46,7 +47,7 @@ test('loads an expression', () => {
   player.start(minimal as any);
   const state = player.getState() as InProgressState;
 
-  expect(state.controllers.data.get('foo')).toStrictEqual({
-    bar: 'it works! arguments',
+  expect(state.controllers.data.get("foo")).toStrictEqual({
+    bar: "it works! arguments",
   });
 });

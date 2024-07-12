@@ -1,4 +1,4 @@
-import type { Logger } from './types';
+import type { Logger } from "./types";
 
 /** An empty function so the logger ignore everything */
 const noop = () => {};

@@ -1,15 +1,15 @@
-import type { Player, PlayerPlugin } from '@player-ui/player';
-import { SyncHook, SyncBailHook } from 'tapable-ts';
-import type { BeaconPluginPlugin, BeaconArgs } from '@player-ui/beacon-plugin';
-import { BeaconPlugin } from '@player-ui/beacon-plugin';
+import type { Player, PlayerPlugin } from "@player-ui/player";
+import { SyncHook, SyncBailHook } from "tapable-ts";
+import type { BeaconPluginPlugin, BeaconArgs } from "@player-ui/beacon-plugin";
+import { BeaconPlugin } from "@player-ui/beacon-plugin";
 import {
   MetricsCorePluginSymbol,
   MetricsViewBeaconPluginContextSymbol,
-} from './symbols';
+} from "./symbols";
 
 // Try to use performance.now() but fall back to Date.now() if you can't
 export const defaultGetTime =
-  typeof performance === 'undefined'
+  typeof performance === "undefined"
     ? () => Date.now()
     : () => performance.now();
 
@@ -67,16 +67,16 @@ export interface PlayerFlowMetrics {
 }
 
 const callbacks = [
-  'onFlowBegin',
-  'onFlowEnd',
-  'onInteractive',
-  'onNodeStart',
-  'onNodeEnd',
-  'onRenderStart',
-  'onRenderEnd',
-  'onUpdateStart',
-  'onUpdateEnd',
-  'onUpdate',
+  "onFlowBegin",
+  "onFlowEnd",
+  "onInteractive",
+  "onNodeStart",
+  "onNodeEnd",
+  "onRenderStart",
+  "onRenderEnd",
+  "onUpdateStart",
+  "onUpdateEnd",
+  "onUpdate",
 ] as const;
 
 /** Context structure for 'viewed' beacons rendering metrics */
@@ -99,13 +99,13 @@ export class MetricsViewBeaconPlugin implements BeaconPluginPlugin {
   constructor(metricsPlugin: MetricsCorePlugin) {
     this.metricsPlugin = metricsPlugin;
     this.metricsPlugin.hooks.onRenderEnd.tap(
-      'MetricsViewBeaconPlugin',
+      "MetricsViewBeaconPlugin",
       (timing) => {
         if (timing.completed && this.resolvePendingRenderTime) {
           this.resolvePendingRenderTime(timing.duration);
           this.resolvePendingRenderTime = undefined;
         }
-      }
+      },
     );
   }
 
@@ -113,7 +113,7 @@ export class MetricsViewBeaconPlugin implements BeaconPluginPlugin {
     beaconPlugin.hooks.buildBeacon.intercept({
       context: true,
       call: (context: any, beacon) => {
-        if (context && (beacon as BeaconArgs).action === 'viewed') {
+        if (context && (beacon as BeaconArgs).action === "viewed") {
           context[this.symbol] = this.buildContext();
         }
       },
@@ -133,7 +133,7 @@ export class MetricsViewBeaconPlugin implements BeaconPluginPlugin {
     if (flow) {
       const lastItem = flow.timeline[flow.timeline.length - 1];
 
-      if ('render' in lastItem && lastItem.render.completed) {
+      if ("render" in lastItem && lastItem.render.completed) {
         return lastItem.render.duration;
       }
     }
@@ -163,41 +163,41 @@ export interface MetricsWebPluginOptions {
   /** Called when a new node is started */
   onNodeStart?: (
     nodeMetrics: NodeMetrics | NodeRenderMetrics,
-    update: PlayerFlowMetrics
+    update: PlayerFlowMetrics,
   ) => void;
 
   /** Called when a node is ended */
   onNodeEnd?: (
     nodeMetrics: NodeMetrics | NodeRenderMetrics,
-    update: PlayerFlowMetrics
+    update: PlayerFlowMetrics,
   ) => void;
 
   /** Called when rendering for a node begins */
   onRenderStart?: (
     timing: Timing,
     nodeMetrics: NodeRenderMetrics,
-    update: PlayerFlowMetrics
+    update: PlayerFlowMetrics,
   ) => void;
 
   /** Called when rendering for a node ends */
   onRenderEnd?: (
     timing: Timing,
     nodeMetrics: NodeRenderMetrics,
-    update: PlayerFlowMetrics
+    update: PlayerFlowMetrics,
   ) => void;
 
   /** Called when an update for a node begins */
   onUpdateStart?: (
     timing: Timing,
     nodeMetrics: NodeRenderMetrics,
-    update: PlayerFlowMetrics
+    update: PlayerFlowMetrics,
   ) => void;
 
   /** Called when an update for a node ends */
   onUpdateEnd?: (
     timing: Timing,
     nodeMetrics: NodeRenderMetrics,
-    update: PlayerFlowMetrics
+    update: PlayerFlowMetrics,
   ) => void;
 
   /** Callback to subscribe to updates for any metric */
@@ -224,7 +224,7 @@ export interface MetricsWebPluginOptions {
  */
 export class RequestTimeWebPlugin {
   getRequestTime: () => number | undefined;
-  name = 'RequestTimeWebPlugin';
+  name = "RequestTimeWebPlugin";
 
   constructor(getRequestTime: () => number | undefined) {
     this.getRequestTime = getRequestTime;
@@ -241,7 +241,7 @@ export class RequestTimeWebPlugin {
  * A plugin that enables gathering of render metrics
  */
 export class MetricsCorePlugin implements PlayerPlugin {
-  name = 'metrics';
+  name = "metrics";
 
   static Symbol = MetricsCorePluginSymbol;
   public readonly symbol = MetricsCorePluginSymbol;
@@ -300,7 +300,7 @@ export class MetricsCorePlugin implements PlayerPlugin {
 
     callbacks.forEach((hookName) => {
       if (options?.[hookName] !== undefined) {
-        (this.hooks[hookName] as any).tap('options', options?.[hookName]);
+        (this.hooks[hookName] as any).tap("options", options?.[hookName]);
       }
     });
   }
@@ -323,7 +323,7 @@ export class MetricsCorePlugin implements PlayerPlugin {
 
     const lastItem = timeline[timeline.length - 1];
 
-    if ('updates' in lastItem) {
+    if ("updates" in lastItem) {
       // Get the last update, make sure it's completed
       if (lastItem.updates.length > 0) {
         const lastUpdate = lastItem.updates[lastItem.updates.length - 1];
@@ -364,7 +364,7 @@ export class MetricsCorePlugin implements PlayerPlugin {
       this.hooks.onRenderStart.call(
         renderInfo.render,
         renderInfo,
-        this.metrics
+        this.metrics,
       );
     }
   }
@@ -373,7 +373,7 @@ export class MetricsCorePlugin implements PlayerPlugin {
   public renderEnd(): void {
     if (!this.trackRender) {
       throw new Error(
-        'Must start the metrics-plugin with render tracking enabled'
+        "Must start the metrics-plugin with render tracking enabled",
       );
     }
 
@@ -391,7 +391,7 @@ export class MetricsCorePlugin implements PlayerPlugin {
 
     const lastItem = timeline[timeline.length - 1];
 
-    if (!('render' in lastItem)) {
+    if (!("render" in lastItem)) {
       return;
     }
 
@@ -466,7 +466,7 @@ export class MetricsCorePlugin implements PlayerPlugin {
     });
 
     player.hooks.state.tap(this.name, (state) => {
-      if (state.status === 'completed' || state.status === 'error') {
+      if (state.status === "completed" || state.status === "error") {
         const endTime = defaultGetTime();
         const { flow } = this.metrics;
 
@@ -556,7 +556,7 @@ export class MetricsCorePlugin implements PlayerPlugin {
       });
 
       player.applyTo<BeaconPlugin>(BeaconPlugin.Symbol, (beaconPlugin) =>
-        new MetricsViewBeaconPlugin(this).apply(beaconPlugin)
+        new MetricsViewBeaconPlugin(this).apply(beaconPlugin),
       );
     }
   }

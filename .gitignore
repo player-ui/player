@@ -73,6 +73,11 @@ CoverageData/
 bep.json
 xcui.json
 
+#SPM
+.build
+.swiftpm
+ios/PlayerUI.xcodeproj
+
 # Bundles used by cocoapods for development
 ios/*/*/Resources/**/*.js
 
@@ -80,3 +85,4 @@ ios/*/*/Resources/**/*.js
 .ios-build-number
 
 .bazelrc.local
+_ios_coverage/

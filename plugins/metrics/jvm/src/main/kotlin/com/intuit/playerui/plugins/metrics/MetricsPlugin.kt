@@ -37,7 +37,7 @@ public class MetricsPlugin(
     public fun renderEnd(): Unit = instance.getInvokable<Unit>("renderEnd")!!()
 
     private companion object {
-        private const val bundledSourcePath = "plugins/metrics/core/dist/metrics-plugin.prod.js"
+        private const val bundledSourcePath = "plugins/metrics/core/dist/MetricsPlugin.native.js"
         private const val pluginName = "MetricsPlugin.MetricsCorePlugin"
     }
 }
@@ -68,7 +68,7 @@ internal class RequestTimeWebPlugin(
     }
 
     private companion object {
-        private const val bundledSourcePath = "plugins/metrics/core/dist/metrics-plugin.prod.js"
+        private const val bundledSourcePath = "plugins/metrics/core/dist/MetricsPlugin.native.js"
         private const val pluginName = "MetricsPlugin.RequestTimeWebPlugin"
     }
 }

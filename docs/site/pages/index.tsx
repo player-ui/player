@@ -1,6 +1,6 @@
-import React from 'react';
-import Link from 'next/link';
-import Head from 'next/head';
+import React from "react";
+import { Link } from "react-router-dom";
+
 import {
   ButtonGroup,
   VStack,
@@ -11,21 +11,17 @@ import {
   Text,
   Link as CLink,
   Divider,
-  IconButton,
   Container,
   HStack,
   SimpleGrid,
-  Icon,
   useColorModeValue,
-} from '@chakra-ui/react';
-import { EditIcon, LinkIcon, UnlockIcon, SettingsIcon } from '@chakra-ui/icons';
-import { Img } from '../components/mdx-components';
-import { GitHubButton } from '../components/Navigation';
-import { GITHUB_URL } from '../config/constants';
-import { ColorSchemeSwitch } from '../components/ColorSchemeSwitch';
-import { GithubIcon } from '../components/gh-icon';
-import { withBasePrefix } from '../components/Image';
-import { PlayerDemo } from '../components/player-demo/PlayerDemo';
+} from "@chakra-ui/react";
+import { EditIcon, LinkIcon, UnlockIcon, SettingsIcon } from "@chakra-ui/icons";
+import { Img } from "../components/mdx-components";
+import { GitHubButton } from "../components/Navigation";
+import { ColorSchemeSwitch } from "../components/ColorSchemeSwitch";
+import { withBasePrefix } from "../components/Image";
+import { PlayerDemo } from "../components/player-demo/PlayerDemo";
 
 const TagLine = (props: {
   title: React.ReactNode;
@@ -35,7 +31,7 @@ const TagLine = (props: {
 }) => {
   return (
     <Box>
-      <HStack size="xl">
+      <HStack>
         <props.icon w={10} h={10} />
         <Container w="sm">
           <Heading as="h3" size="md">
@@ -63,10 +59,10 @@ const TagLines = () => {
         description={
           <span>
             Player works seamlessly with your existing UI components to fit
-            application. Define your own patterns through{' '}
-            <Link passHref href="/assets">
-              <CLink color="blue.600">assets</CLink>
-            </Link>{' '}
+            application. Define your own patterns through{" "}
+            <CLink as={Link} color="blue.600" to="/assets">
+              assets
+            </CLink>{" "}
             and render them exactly as your designers intended.
           </span>
         }
@@ -77,10 +73,14 @@ const TagLines = () => {
         description={
           <span>
             Need to figure out where go next? Chaining multiple pages together
-            with Player is a breeze. Check out the{' '}
-            <Link passHref href="/guides/multi-flow-experiences">
-              <CLink color="blue.600">docs</CLink>
-            </Link>{' '}
+            with Player is a breeze. Check out the{" "}
+            <CLink
+              as={Link}
+              color="blue.600"
+              to="/guides/multi-flow-experiences"
+            >
+              docs
+            </CLink>{" "}
             for more details.
           </span>
         }
@@ -90,10 +90,10 @@ const TagLines = () => {
         title="Plugin Ready"
         description={
           <span>
-            Player is designed from the ground up with plugins in mind.{' '}
-            <Link passHref href="/plugins">
-              <CLink color="blue.600">Read more</CLink>
-            </Link>{' '}
+            Player is designed from the ground up with plugins in mind.{" "}
+            <CLink as={Link} color="blue.600" to="/plugins">
+              Read more
+            </CLink>{" "}
             about the 20+ provided plugins, or how to write your own.
           </span>
         }
@@ -104,8 +104,8 @@ const TagLines = () => {
 
 const Banner = () => {
   const logoSrc = useColorModeValue(
-    withBasePrefix('/logo/logo-light-large.png'),
-    withBasePrefix('/logo/logo-dark-large.png')
+    withBasePrefix("/logo/logo-light-large.png"),
+    withBasePrefix("/logo/logo-dark-large.png"),
   );
 
   return (
@@ -121,9 +121,9 @@ const Banner = () => {
 const Home = () => {
   return (
     <Box pb="40">
-      <Head>
+      {/* <Head>
         <title>Player</title>
-      </Head>
+      </Head> */}
       <Box>
         <HStack
           px="6"
@@ -142,11 +142,11 @@ const Home = () => {
           <Banner />
 
           <ButtonGroup spacing="6" size="lg">
-            <Link passHref href="/about">
+            <Link to="/about">
               <Button variant="outline">Learn More</Button>
             </Link>
 
-            <Link passHref href="/getting-started">
+            <Link to="/getting-started">
               <Button variant="solid">Get Started</Button>
             </Link>
           </ButtonGroup>

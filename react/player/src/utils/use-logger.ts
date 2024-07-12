@@ -1,6 +1,6 @@
-import type { Logger } from '@player-ui/player';
-import { NoopLogger } from '@player-ui/player';
-import { usePlayer } from './player-context';
+import type { Logger } from "@player-ui/player";
+import { NoopLogger } from "@player-ui/player";
+import { usePlayer } from "./player-context";
 
 const noopLogger = new NoopLogger();
 

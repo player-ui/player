@@ -1,8 +1,8 @@
-import { SyncHook, SyncWaterfallHook, SyncBailHook } from 'tapable-ts';
-import { dequal } from 'dequal';
-import type { Logger } from '../../logger';
-import type { BindingParser, BindingLike } from '../../binding';
-import { BindingInstance } from '../../binding';
+import { SyncHook, SyncWaterfallHook, SyncBailHook } from "tapable-ts";
+import { dequal } from "dequal";
+import type { Logger } from "../../logger";
+import type { BindingParser, BindingLike } from "../../binding";
+import { BindingInstance } from "../../binding";
 import type {
   BatchSetTransaction,
   Updates,
@@ -10,10 +10,10 @@ import type {
   DataModelWithParser,
   DataPipeline,
   DataModelMiddleware,
-} from '../../data';
-import { PipelinedDataModel, LocalModel } from '../../data';
-import type { RawSetTransaction } from '../../types';
-import { ReadOnlyDataController } from './utils';
+} from "../../data";
+import { PipelinedDataModel, LocalModel } from "../../data";
+import type { RawSetTransaction } from "../../types";
+import { ReadOnlyDataController } from "./utils";
 
 /** The orchestrator for player data */
 export class DataController implements DataModelWithParser<DataModelOptions> {
@@ -56,7 +56,7 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
 
       /** A logger to use  */
       logger?: Logger;
-    }
+    },
   ) {
     this.logger = options.logger;
     const middleware = options.middleware || [];
@@ -80,7 +80,7 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
   private resolveDataValue(
     binding: BindingInstance,
     value: any,
-    deformat: boolean
+    deformat: boolean,
   ) {
     if (deformat) {
       return this.hooks.deformat.call(value, binding);
@@ -91,7 +91,7 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
 
   public set(
     transaction: RawSetTransaction,
-    options?: DataModelOptions
+    options?: DataModelOptions,
   ): Updates {
     let normalizedTransaction: BatchSetTransaction = [];
 
@@ -114,7 +114,7 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
             parsed,
             this.resolveDataValue(parsed, val, Boolean(options?.formatted)),
           ];
-        }
+        },
       ) as BatchSetTransaction;
     }
 
@@ -131,19 +131,19 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
 
         if (dequal(oldVal, newVal)) {
           this.logger?.debug(
-            `Skipping update for path: ${binding.asString()}. Value was unchanged: ${oldVal}`
+            `Skipping update for path: ${binding.asString()}. Value was unchanged: ${oldVal}`,
           );
         } else {
           updates.push(update);
 
           this.logger?.debug(
-            `Setting path: ${binding.asString()} from: ${oldVal} to: ${newVal}`
+            `Setting path: ${binding.asString()} from: ${oldVal} to: ${newVal}`,
           );
         }
 
         return updates;
       },
-      []
+      [],
     );
 
     // Get the applied update
@@ -159,7 +159,7 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
         this.logger?.debug(
           `Path: ${tr.binding.asString()} was changed from: ${
             tr.oldValue
-          } to: ${tr.newValue}`
+          } to: ${tr.newValue}`,
         );
         setUpdates.push(tr);
       }
@@ -175,7 +175,7 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
   }
 
   private resolve(binding: BindingLike, readOnly: boolean): BindingInstance {
-    return Array.isArray(binding) || typeof binding === 'string'
+    return Array.isArray(binding) || typeof binding === "string"
       ? this.pathResolver.parse(binding, { readOnly })
       : binding;
   }
@@ -208,11 +208,11 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
 
   public delete(binding: BindingLike, options?: DataModelOptions) {
     if (
-      typeof binding !== 'string' &&
+      typeof binding !== "string" &&
       !Array.isArray(binding) &&
       !(binding instanceof BindingInstance)
     ) {
-      throw new Error('Invalid arguments: delete expects a data path (string)');
+      throw new Error("Invalid arguments: delete expects a data path (string)");
     }
 
     const resolved =
@@ -225,7 +225,7 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
     const parentValue = this.get(parentBinding);
 
     const existedBeforeDelete =
-      typeof parentValue === 'object' &&
+      typeof parentValue === "object" &&
       parentValue !== null &&
       Object.prototype.hasOwnProperty.call(parentValue, property);
 
@@ -239,7 +239,7 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
   }
 
   public serialize(): object {
-    return this.hooks.serialize.call(this.get(''));
+    return this.hooks.serialize.call(this.get(""));
   }
 
   public makeReadOnly(): ReadOnlyDataController {

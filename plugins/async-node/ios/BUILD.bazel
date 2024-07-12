@@ -1,0 +1,18 @@
+load("@rules_player//ios:defs.bzl", "ios_pipeline")
+
+ios_pipeline(
+    name = "PlayerUIAsyncNodePlugin",
+    resources = ["//plugins/async-node/core:core_native_bundle"],
+    deps = [
+        "//ios/core:PlayerUI"
+    ],
+
+    test_deps = [
+	"//plugins/reference-assets/swiftui:PlayerUIReferenceAssets",
+	"//ios/internal-test-utils:PlayerUIInternalTestUtilities"
+    ],
+
+    hasUnitTests = True,
+    hasViewInspectorTests = True,
+    test_host = "//ios/demo:PlayerUIDemo"
+)

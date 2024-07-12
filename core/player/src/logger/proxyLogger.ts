@@ -1,4 +1,4 @@
-import type { Logger, Severity, LoggerProvider } from './types';
+import type { Logger, Severity, LoggerProvider } from "./types";
 
 /**
  * The ProxyLogger allows a user to log to another Logger instance that may not exist yet
@@ -17,9 +17,9 @@ export default class ProxyLogger implements Logger {
     };
   }
 
-  public readonly trace = this.createHandler('trace');
-  public readonly debug = this.createHandler('debug');
-  public readonly info = this.createHandler('info');
-  public readonly warn = this.createHandler('warn');
-  public readonly error = this.createHandler('error');
+  public readonly trace = this.createHandler("trace");
+  public readonly debug = this.createHandler("debug");
+  public readonly info = this.createHandler("info");
+  public readonly warn = this.createHandler("warn");
+  public readonly error = this.createHandler("error");
 }

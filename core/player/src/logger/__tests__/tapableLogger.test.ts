@@ -1,16 +1,17 @@
-import { TapableLogger } from '..';
-import type { Logger } from '../types';
-import { severities } from '../types';
+import { test, expect, vitest } from "vitest";
+import { TapableLogger } from "..";
+import type { Logger } from "../types";
+import { severities } from "../types";
 
-test('works via logger api', () => {
+test("works via logger api", () => {
   const logger = new TapableLogger();
 
   const testLogger: Logger = {
-    trace: jest.fn(),
-    debug: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
+    trace: vitest.fn(),
+    debug: vitest.fn(),
+    info: vitest.fn(),
+    warn: vitest.fn(),
+    error: vitest.fn(),
   };
 
   logger.addHandler(testLogger);

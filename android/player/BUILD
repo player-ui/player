@@ -1,11 +1,9 @@
-load(":deps.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
+load(":defs.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
 load("@build_constants//:constants.bzl", "VERSION")
-load("//jvm:build.bzl", "distribution")
-load("@io_bazel_rules_kotlin//kotlin:android.bzl", "kt_android_library")
-load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
-load("@junit//junit5-jupiter-starter-bazel:junit5.bzl", "kt_jvm_junit5_test")
-load("@rules_player//kotlin:lint.bzl", "lint")
+load("@rules_kotlin//kotlin:core.bzl", "kt_kotlinc_options")
+load("//jvm:defs.bzl", "distribution")
 load("@grab_bazel_common//tools/databinding:databinding.bzl", "kt_db_android_library")
+load("@rules_player//kotlin:defs.bzl", "kt_jvm_junit5_test", "lint")
 
 kt_db_android_library(
     name = "player",

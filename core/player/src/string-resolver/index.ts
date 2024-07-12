@@ -1,9 +1,9 @@
-import { setIn } from 'timm';
-import type { Expression } from '@player-ui/types';
-import type { DataModelWithParser } from '../data';
+import { setIn } from "timm";
+import type { Expression } from "@player-ui/types";
+import type { DataModelWithParser } from "../data";
 
-const DOUBLE_OPEN_CURLY = '{{';
-const DOUBLE_CLOSE_CURLY = '}}';
+const DOUBLE_OPEN_CURLY = "{{";
+const DOUBLE_CLOSE_CURLY = "}}";
 
 export interface Options {
   /**
@@ -52,7 +52,7 @@ export function findNextExp(str: string) {
       // Move everything over and bump our close count by 1
       count++;
       workingString = workingString.substring(
-        nextOpenCurly + DOUBLE_OPEN_CURLY.length
+        nextOpenCurly + DOUBLE_OPEN_CURLY.length,
       );
       offset += nextOpenCurly + DOUBLE_OPEN_CURLY.length;
     } else {
@@ -60,7 +60,7 @@ export function findNextExp(str: string) {
       // Decrement our count and updates offsets
       count--;
       workingString = workingString.substring(
-        nextCloseCurly + DOUBLE_CLOSE_CURLY.length
+        nextCloseCurly + DOUBLE_CLOSE_CURLY.length,
       );
       offset += nextCloseCurly + DOUBLE_CLOSE_CURLY.length;
     }
@@ -79,7 +79,7 @@ export function findNextExp(str: string) {
 /** Finds any subset of the string wrapped in @[]@ and evaluates it as an expression */
 export function resolveExpressionsInString(
   val: string,
-  { evaluate }: Options
+  { evaluate }: Options,
 ): string {
   if (!evaluate) {
     return val;
@@ -94,8 +94,8 @@ export function resolveExpressionsInString(
     const matchStart = newVal.indexOf(expStrWithBrackets);
 
     const expString = expStrWithBrackets.substr(
-      '@['.length,
-      expStrWithBrackets.length - '@['.length - ']@'.length
+      "@[".length,
+      expStrWithBrackets.length - "@[".length - "]@".length,
     );
     const expValue = evaluate(expString);
 
@@ -103,7 +103,7 @@ export function resolveExpressionsInString(
     if (
       matchStart === 0 &&
       expStrWithBrackets === val &&
-      typeof expValue !== 'string'
+      typeof expValue !== "string"
     ) {
       return expValue;
     }
@@ -126,7 +126,7 @@ export function resolveDataRefsInString(val: string, options: Options): string {
 
   if (
     !model ||
-    typeof workingString !== 'string' ||
+    typeof workingString !== "string" ||
     workingString.indexOf(DOUBLE_OPEN_CURLY) === -1
   ) {
     return workingString;
@@ -145,7 +145,7 @@ export function resolveDataRefsInString(val: string, options: Options): string {
     const binding = workingString
       .substring(
         start + DOUBLE_OPEN_CURLY.length,
-        end - DOUBLE_OPEN_CURLY.length
+        end - DOUBLE_OPEN_CURLY.length,
       )
       .trim();
 
@@ -156,7 +156,7 @@ export function resolveDataRefsInString(val: string, options: Options): string {
     if (
       start === 0 &&
       end === workingString.length &&
-      typeof evaledVal !== 'string'
+      typeof evaledVal !== "string"
     ) {
       return evaledVal;
     }
@@ -171,11 +171,11 @@ export function resolveDataRefsInString(val: string, options: Options): string {
 /** Traverse the thing and replace any model refs */
 function traverseObject<T>(val: T, options: Options): T {
   switch (typeof val) {
-    case 'string': {
+    case "string": {
       return resolveDataRefsInString(val as string, options) as unknown as T;
     }
 
-    case 'object': {
+    case "object": {
       if (!val) return val;
       // TODO: Do we care refs in keys?
       const keys = Object.keys(val);
@@ -186,7 +186,7 @@ function traverseObject<T>(val: T, options: Options): T {
           newVal = setIn(
             newVal as any,
             [key],
-            traverseObject((val as any)[key], options)
+            traverseObject((val as any)[key], options),
           ) as any;
         });
       }
