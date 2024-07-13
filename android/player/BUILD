@@ -1,4 +1,4 @@
-load(":defs.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
+load(":deps.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
 load("@build_constants//:constants.bzl", "VERSION")
 load("@rules_kotlin//kotlin:core.bzl", "kt_kotlinc_options")
 load("//jvm:defs.bzl", "distribution")
