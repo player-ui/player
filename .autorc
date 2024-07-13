@@ -18,10 +18,7 @@
       "version-file",
       {
         "versionFile": "./VERSION",
-        "publishScript": "./scripts/release.sh",
-        "publishScriptReleaseTypeArgs": {
-          "next": ["release"]
-        }
+        "publishScript": "./scripts/release.sh"
       }
     ],
     [
