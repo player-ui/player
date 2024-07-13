@@ -12,15 +12,15 @@ importers:
 
   .:
     dependencies:
-      '@auto-it/omit-release-notes':
-        specifier: ^11.0.4
-        version: 11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.3.2)
-      '@auto-it/upload-assets':
-        specifier: ^11.0.4
-        version: 11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.3.2)
-      '@auto-it/version-file':
-        specifier: ^11.0.4
-        version: 11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.3.2)
+      '@auto-canary/omit-release-notes':
+        specifier: 11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0
+        version: 11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.3.2)
+      '@auto-canary/upload-assets':
+        specifier: 11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0
+        version: 11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.3.2)
+      '@auto-canary/version-file':
+        specifier: 11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0
+        version: 11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.3.2)
       '@babel/preset-env':
         specifier: ^7.23.8
         version: 7.24.5(@babel/core@7.24.5)
@@ -1177,6 +1177,122 @@ packages:
       '@jridgewell/trace-mapping': 0.3.25
     dev: false
 
+  /@auto-canary/bot-list@11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0:
+    resolution: {integrity: sha512-TAClILAYgI7YyavptcNVVtKpz+VoRtgN9tu2wWe0OYJO83su/uycRSQCHZP7aKelQslUWSzjC9SnRK+tNAA/BA==, tarball: https://registry.npmjs.org/@auto-canary/bot-list/-/bot-list-11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0.tgz}
+    engines: {node: '>=10.x'}
+    dev: false
+
+  /@auto-canary/core@11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.3.2):
+    resolution: {integrity: sha512-ZQAS1qV2V8EQfjMIuI5mp/Nz82uj9TY1AYpO0eSHo0GFn43TyAi7l0xX23WYTFArfdQ0koiVSgRT471cagirVw==, tarball: https://registry.npmjs.org/@auto-canary/core/-/core-11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0.tgz}
+    peerDependencies:
+      '@types/node': '*'
+      typescript: '>=2.7'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+    dependencies:
+      '@auto-canary/bot-list': 11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0
+      '@endemolshinegroup/cosmiconfig-typescript-loader': 3.0.2(cosmiconfig@7.0.0)(typescript@5.3.2)
+      '@octokit/core': 3.6.0
+      '@octokit/plugin-enterprise-compatibility': 1.3.0
+      '@octokit/plugin-retry': 3.0.9
+      '@octokit/plugin-throttling': 3.7.0(@octokit/core@3.6.0)
+      '@octokit/rest': 18.12.0
+      '@types/node': 18.19.33
+      await-to-js: 3.0.0
+      chalk: 4.1.2
+      cosmiconfig: 7.0.0
+      deepmerge: 4.3.1
+      dotenv: 8.6.0
+      endent: 2.1.0
+      enquirer: 2.4.1
+      env-ci: 5.5.0
+      fast-glob: 3.3.2
+      fp-ts: 2.16.5
+      fromentries: 1.3.2
+      gitlog: 4.0.8
+      https-proxy-agent: 5.0.1
+      import-cwd: 3.0.0
+      import-from: 3.0.0
+      io-ts: 2.2.21(fp-ts@2.16.5)
+      lodash.chunk: 4.2.0
+      log-symbols: 4.1.0
+      node-fetch: 2.6.7
+      parse-author: 2.0.0
+      parse-github-url: 1.0.2
+      pretty-ms: 7.0.1
+      requireg: 0.2.2
+      semver: 7.6.2
+      signale: 1.4.0
+      tapable: 2.2.1
+      terminal-link: 2.1.1
+      tinycolor2: 1.6.0
+      ts-node: 10.9.2(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.3.2)
+      tslib: 2.1.0
+      type-fest: 0.21.3
+      typescript: 5.3.2
+      typescript-memoize: 1.1.1
+      url-join: 4.0.1
+    transitivePeerDependencies:
+      - '@swc/core'
+      - '@swc/wasm'
+      - encoding
+      - supports-color
+    dev: false
+
+  /@auto-canary/omit-release-notes@11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.3.2):
+    resolution: {integrity: sha512-cjreStgOcXGp58WHhfFxlphC6t9/wGp8igqlme0OaYdQ+jg6EgvFs6WGJDAU0FnE0jvaqKQjYlfmsxRhuNZ2Yw==, tarball: https://registry.npmjs.org/@auto-canary/omit-release-notes/-/omit-release-notes-11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0.tgz}
+    dependencies:
+      '@auto-canary/core': 11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.3.2)
+      fp-ts: 2.16.5
+      io-ts: 2.2.21(fp-ts@2.16.5)
+      tslib: 2.1.0
+    transitivePeerDependencies:
+      - '@swc/core'
+      - '@swc/wasm'
+      - '@types/node'
+      - encoding
+      - supports-color
+      - typescript
+    dev: false
+
+  /@auto-canary/upload-assets@11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.3.2):
+    resolution: {integrity: sha512-AJWrzL0zhVR6XD4GXM/drHUEdVSExzvKdUE7twSQV2PXxL1FdJqUbwUl+84sjEQ170QtBJqr9w4tJJLvFjTs0Q==, tarball: https://registry.npmjs.org/@auto-canary/upload-assets/-/upload-assets-11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0.tgz}
+    dependencies:
+      '@auto-canary/core': 11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.3.2)
+      endent: 2.1.0
+      fast-glob: 3.3.2
+      file-type: 16.5.4
+      fp-ts: 2.16.5
+      io-ts: 2.2.21(fp-ts@2.16.5)
+      terminal-link: 2.1.1
+      tslib: 2.1.0
+    transitivePeerDependencies:
+      - '@swc/core'
+      - '@swc/wasm'
+      - '@types/node'
+      - encoding
+      - supports-color
+      - typescript
+    dev: false
+
+  /@auto-canary/version-file@11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.3.2):
+    resolution: {integrity: sha512-92dU46g6FAnPsLqCW6/QMvAGANiqD+J+TIVdVTY7rZnvDQz37aq9Ywp7owEvFVz8zheNMvsq4VKPfpxg4n4d4A==, tarball: https://registry.npmjs.org/@auto-canary/version-file/-/version-file-11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0.tgz}
+    dependencies:
+      '@auto-canary/core': 11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.3.2)
+      fp-ts: 2.16.5
+      io-ts: 2.2.21(fp-ts@2.16.5)
+      semver: 7.6.2
+      tslib: 1.10.0
+    transitivePeerDependencies:
+      - '@swc/core'
+      - '@swc/wasm'
+      - '@types/node'
+      - encoding
+      - supports-color
+      - typescript
+    dev: false
+
   /@auto-it/bot-list@11.1.6:
     resolution: {integrity: sha512-3Qdphiw9JlzYX15moLZSaP+jNuM3UAFDHTgIpsfnfIQwQDNSjZhM4rwxqsAY/r1mJAyxt16c6wbqisi7KNFD/A==, tarball: https://registry.npmjs.org/@auto-it/bot-list/-/bot-list-11.1.6.tgz}
     engines: {node: '>=10.x'}
@@ -1266,22 +1382,6 @@ packages:
       - typescript
     dev: false
 
-  /@auto-it/omit-release-notes@11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.3.2):
-    resolution: {integrity: sha512-b2F2d1zMQX1P/gH9MYfrO7ydKPaZNCt/mimbjHHk5wG3lgAmc23Pfs8ghRH0LPcZ/7P9mKTGpq79A8MM4jJGLw==, tarball: https://registry.npmjs.org/@auto-it/omit-release-notes/-/omit-release-notes-11.1.6.tgz}
-    dependencies:
-      '@auto-it/core': 11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.3.2)
-      fp-ts: 2.16.5
-      io-ts: 2.2.21(fp-ts@2.16.5)
-      tslib: 2.1.0
-    transitivePeerDependencies:
-      - '@swc/core'
-      - '@swc/wasm'
-      - '@types/node'
-      - encoding
-      - supports-color
-      - typescript
-    dev: false
-
   /@auto-it/package-json-utils@11.1.6:
     resolution: {integrity: sha512-RSXmO+KegaEY7uw1vt8iXL9FShiinFigKNFuIWM9oLSaSHJfeQ2ZD291i9nV+tz86bPGySBb5ktdJ3uo2pAZ+Q==, tarball: https://registry.npmjs.org/@auto-it/package-json-utils/-/package-json-utils-11.1.6.tgz}
     engines: {node: '>=10.x'}
@@ -1298,26 +1398,6 @@ packages:
       deepmerge: 4.3.1
       fp-ts: 2.16.5
       io-ts: 2.2.21(fp-ts@2.16.5)
-      tslib: 2.1.0
-    transitivePeerDependencies:
-      - '@swc/core'
-      - '@swc/wasm'
-      - '@types/node'
-      - encoding
-      - supports-color
-      - typescript
-    dev: false
-
-  /@auto-it/upload-assets@11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.3.2):
-    resolution: {integrity: sha512-2QR1j9tR0R+RrNWrvFnZitgeg4xUCvh5GNOL4RQXrqdTsf0ewLhi/70jsXFlyk+32c/JH2e5aK9oCFGmqOCnoA==, tarball: https://registry.npmjs.org/@auto-it/upload-assets/-/upload-assets-11.1.6.tgz}
-    dependencies:
-      '@auto-it/core': 11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.3.2)
-      endent: 2.1.0
-      fast-glob: 3.3.2
-      file-type: 16.5.4
-      fp-ts: 2.16.5
-      io-ts: 2.2.21(fp-ts@2.16.5)
-      terminal-link: 2.1.1
       tslib: 2.1.0
     transitivePeerDependencies:
       - '@swc/core'
@@ -5160,7 +5240,7 @@ packages:
       '@octokit/request-error': 2.1.0
       '@octokit/types': 6.41.0
       is-plain-object: 5.0.0
-      node-fetch: 2.6.7
+      node-fetch: 2.7.0
       universal-user-agent: 6.0.1
     transitivePeerDependencies:
       - encoding

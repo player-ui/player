@@ -19,9 +19,9 @@
   },
   "packageManager": "pnpm@8.9.2",
   "dependencies": {
-    "@auto-it/omit-release-notes": "^11.0.4",
-    "@auto-it/upload-assets": "^11.0.4",
-    "@auto-it/version-file": "^11.0.4",
+    "@auto-canary/omit-release-notes": "11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0",
+    "@auto-canary/upload-assets": "11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0",
+    "@auto-canary/version-file": "11.2.0--canary.2467.bb9bf1e8d1186bc73fa8deffb2f661a893697f58.0",
     "@babel/preset-env": "^7.23.8",
     "@babel/preset-react": "^7.24.1",
     "@babel/preset-typescript": "^7.23.3",
