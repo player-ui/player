@@ -6,8 +6,8 @@ import {
   VALID_AST_PARSER_CUSTOM_TESTS,
 } from "./test-utils/ast-cases";
 import type { ParserSuccessResult, ParserFailureResult } from "../ast";
-import { parse as parseParsimmon } from "../parsimmon";
-import { parse as parseEBNF } from "../ebnf";
+import { parse as parseParsimmon } from "./parsimmon";
+import { parse as parseEBNF } from "./ebnf";
 import { parse as parseCustom } from "../custom";
 
 describe("parsimmon", () => {
