@@ -53,8 +53,7 @@ class InputTest : AssetTest("input") {
     fun transition() {
         launchMock("input-transition")
 
-        val info = currentView.shouldBeView<ConstraintLayout>()
-        val view = info.findViewById<FrameLayout>(R.id.info_primary_info).getChildAt(0).shouldBeView<ConstraintLayout>()
+        val view = currentView.shouldBeView<ConstraintLayout>()
 
         val inputLabelContainer = view.findViewById<FrameLayout>(R.id.input_label_container)
         val inputNoteContainer = view.findViewById<FrameLayout>(R.id.input_note_container)
