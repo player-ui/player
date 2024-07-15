@@ -17,6 +17,7 @@ class Info(assetContext: AssetContext) : SuspendableAsset<Info.Data>(assetContex
         val title: RenderableAsset? = null,
         val primaryInfo: RenderableAsset? = null,
         val actions: List<RenderableAsset?> = emptyList(),
+        val footer: RenderableAsset? = null,
     )
 
     override suspend fun initView(data: Data) = LayoutInflater.from(context).inflate(R.layout.info, null).rootView
@@ -27,5 +28,6 @@ class Info(assetContext: AssetContext) : SuspendableAsset<Info.Data>(assetContex
         data.actions.filterNotNull().map {
             it.render()
         } into findViewById(R.id.info_actions)
+        data.footer?.render() into findViewById(R.id.info_footer)
     }
 }

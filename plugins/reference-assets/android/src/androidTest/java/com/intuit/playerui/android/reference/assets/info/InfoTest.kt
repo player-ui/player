@@ -22,6 +22,8 @@ class InfoTest : AssetTest("reference-assets") {
     private fun verifyAndProceed(view: Int, action: PlayerAction? = null) {
         val infoTitle = currentView?.findViewById<FrameLayout>(R.id.info_title) ?: throw AssertionError("current view is null")
         val infoActions = currentView?.findViewById<LinearLayout>(R.id.info_actions) ?: throw AssertionError("current view is null")
+        val infoFooter =
+            currentView?.findViewById<FrameLayout>(R.id.info_footer) ?: throw AssertionError("current view is null")
 
         infoTitle[0].shouldBeView<TextView> {
             assertEquals("View $view", text.toString())
@@ -34,6 +36,10 @@ class InfoTest : AssetTest("reference-assets") {
                 performClick()
                 blockUntilRendered()
             }
+        }
+
+        infoFooter[0].shouldBeView<TextView> {
+            assertEquals("Footer Text", text.toString())
         }
     }
 
