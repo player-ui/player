@@ -13,7 +13,7 @@ import com.intuit.playerui.core.player.state.InProgressState
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class InfoTest : AssetTest("reference-assets") {
+class InfoTest : AssetTest("info") {
 
     enum class PlayerAction {
         Continue, Dismiss, Next

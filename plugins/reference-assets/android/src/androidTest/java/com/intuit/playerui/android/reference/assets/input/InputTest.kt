@@ -13,7 +13,7 @@ import com.intuit.playerui.core.player.state.dataModel
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class InputTest : AssetTest("reference-assets") {
+class InputTest : AssetTest("input") {
 
     private fun FormattedEditText.type(text: String) {
         requestFocus()
