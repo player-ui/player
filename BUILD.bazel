@@ -194,7 +194,7 @@ ios_publish(
     name = "spm_publish",
     zip = ":PlayerUI_Pod",
     # SPM Release Repo
-    repository = "https://github.com/player-ui/playerui-swift-package.git",
+    repository = "git@github.com:player-ui/playerui-swift-package.git",
     # CocoaPods
     podspec = ":PlayerUI_Podspec",
     executable = "bundle exec pod",
