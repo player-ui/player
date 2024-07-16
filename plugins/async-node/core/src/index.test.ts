@@ -83,20 +83,17 @@ const asyncNodeTest = async (resolvedValue: any) => {
     deferredResolve(resolvedValue);
   }
 
-  await waitFor(() => {
-    expect(updateNumber).toBe(2);
-  });
-
   view = (player.getState() as InProgressState).controllers.view.currentView
     ?.lastUpdate;
 
   expect(view?.actions[0].asset.type).toBe("action");
   expect(view?.actions.length).toBe(1);
 
-  viewInstance?.update();
+  viewInstance.update();
 
+  //Even after a manual update, the view should not change as we are deleting the resolved node if there is no view update
   await waitFor(() => {
-    expect(updateNumber).toBe(3);
+    expect(updateNumber).toBe(2);
   });
 
   view = (player.getState() as InProgressState).controllers.view.currentView
@@ -112,6 +109,66 @@ test("should return current node view when the resolved node is null", async () 
 
 test("should return current node view when the resolved node is undefined", async () => {
   await asyncNodeTest(undefined);
+});
+
+test("should handle the promise using .then", async () => {
+  const plugin = new AsyncNodePlugin({
+    plugins: [new AsyncNodePluginPlugin()],
+  });
+
+  let deferredResolve: ((value: any) => void) | undefined;
+
+  plugin.hooks.onAsyncNode.tap("test", async (node: Node.Node) => {
+    return new Promise((resolve) => {
+      deferredResolve = resolve;
+    });
+  });
+  let updateNumber = 0;
+
+  const player = new Player({ plugins: [plugin] });
+
+  player.hooks.viewController.tap("async-node-test", (vc) => {
+    vc.hooks.view.tap("async-node-test", (view) => {
+      view.hooks.onUpdate.tap("async-node-test", (update) => {
+        updateNumber++;
+      });
+    });
+  });
+
+  player.start(basicFRFWithActions as any);
+
+  let view = (player.getState() as InProgressState).controllers.view.currentView
+    ?.lastUpdate;
+
+  expect(view).toBeDefined();
+  expect(view?.actions[1]).toBeUndefined();
+
+  await waitFor(() => {
+    expect(updateNumber).toBe(1);
+    expect(deferredResolve).toBeDefined();
+  });
+
+  if (deferredResolve) {
+    deferredResolve({
+      asset: {
+        id: "next-label-action",
+        type: "action",
+        value: "dummy value",
+      },
+    });
+  }
+
+  await waitFor(() => {
+    expect(updateNumber).toBe(2);
+  });
+
+  view = (player.getState() as InProgressState).controllers.view.currentView
+    ?.lastUpdate;
+
+  expect(view?.actions[0].asset.type).toBe("action");
+  expect(view?.actions[1].asset.type).toBe("action");
+  expect(view?.actions[2]).toBeUndefined();
+  expect(updateNumber).toBe(2);
 });
 
 test("replaces async nodes with provided node", async () => {
@@ -346,7 +403,7 @@ test("replaces async nodes with chained multiNodes singular", async () => {
 
   let deferredResolve: ((value: any) => void) | undefined;
 
-  plugin.hooks.onAsyncNode.tap("test", async (node: Node.Async) => {
+  plugin.hooks.onAsyncNode.tap("test", async (node: Node.Node) => {
     return new Promise((resolve) => {
       deferredResolve = resolve;
     });
@@ -423,31 +480,4 @@ test("replaces async nodes with chained multiNodes singular", async () => {
   expect(view?.actions[0].asset.type).toBe("action");
   expect(view?.actions[1].asset.type).toBe("text");
   expect(view?.actions[2].asset.type).toBe("text");
-});
-
-test("should call onAsyncNode hook when async node is encountered", async () => {
-  const plugin = new AsyncNodePlugin({
-    plugins: [new AsyncNodePluginPlugin()],
-  });
-
-  let localNode: Node.Async;
-  plugin.hooks.onAsyncNode.tap("test", async (node: Node.Async) => {
-    if (node !== null) {
-      // assigns node value to a local variable
-      localNode = node;
-    }
-
-    return new Promise((resolve) => {
-      resolve("Promise resolved");
-    });
-  });
-
-  const player = new Player({ plugins: [plugin] });
-
-  player.start(basicFRFWithActions as any);
-
-  await waitFor(() => {
-    expect(localNode.id).toStrictEqual("nodeId");
-    expect(localNode.type).toStrictEqual("async");
-  });
 });

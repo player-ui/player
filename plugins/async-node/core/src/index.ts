@@ -70,6 +70,8 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
   private currentView: ViewInstance | undefined;
 
+  private pendingUpdates = new Set<string>();
+
   private isAsync(node: Node.Node | null): node is Node.Async {
     return node?.type === NodeType.Async;
   }
@@ -151,8 +153,12 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         let resolvedNode;
         if (this.isAsync(node)) {
           const mappedValue = this.resolvedMapping.get(node.id);
+          if (this.pendingUpdates.has(node.id)) {
+            return; // Skip processing if already scheduled
+          }
           if (mappedValue) {
             resolvedNode = mappedValue;
+            this.pendingUpdates.add(node.id);
           }
         } else {
           resolvedNode = null;
@@ -161,19 +167,26 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         const newNode = resolvedNode || node;
         if (!resolvedNode && node?.type === NodeType.Async) {
           queueMicrotask(async () => {
-            const result = await this.basePlugin?.hooks.onAsyncNode.call(node);
-            const parsedNode =
-              options.parseNode && result
-                ? options.parseNode(result)
-                : undefined;
+            if (!this.basePlugin) {
+              return;
+            }
+            this.basePlugin?.hooks.onAsyncNode.call(node).then((result) => {
+              const parsedNode =
+                options.parseNode && result
+                  ? options.parseNode(result)
+                  : undefined;
 
-            this.resolvedMapping.set(node.id, parsedNode ? parsedNode : node);
-            view.updateAsync();
+              if (parsedNode) {
+                this.resolvedMapping.set(node.id, parsedNode);
+                view.updateAsync();
+                console.log("pending updates--", this.pendingUpdates.size);
+                this.pendingUpdates.delete(node.id);
+              }
+            });
           });
 
           return node;
         }
-
         return newNode;
       });
     });
