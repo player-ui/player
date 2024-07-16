@@ -100,6 +100,7 @@ describe("JSON serialization", () => {
                   <Action.Label>Continue</Action.Label>
                 </Action>
               </Info.Actions>
+              <Info.Footer>Footer Text</Info.Footer>
             </Info>,
           )
         ).jsonValue,
@@ -158,6 +159,13 @@ describe("JSON serialization", () => {
             },
           },
         ],
+        footer: {
+          asset: {
+            id: "info-view-footer",
+            type: "text",
+            value: "Footer Text",
+          },
+        },
       });
     });
   });

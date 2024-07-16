@@ -10,6 +10,7 @@ const view1 = (
         <Action.Label>Continue</Action.Label>
       </Action>
     </Info.Actions>
+    <Info.Footer>Footer Text</Info.Footer>
   </Info>
 );
 
@@ -24,6 +25,7 @@ const view2 = (
         <Action.Label>Dismiss</Action.Label>
       </Action>
     </Info.Actions>
+    <Info.Footer>Footer Text</Info.Footer>
   </Info>
 );
 
@@ -35,6 +37,7 @@ const view3 = (
         <Action.Label>Next</Action.Label>
       </Action>
     </Info.Actions>
+    <Info.Footer>Footer Text</Info.Footer>
   </Info>
 );
 
