@@ -26,7 +26,7 @@ done
 # Rebuild to stamp the release podspec
 bazel build --config=release //:PlayerUI_Podspec //:PlayerUI_Pod
 
-bazel run --config=release //:spm_publish
+bazel run --config=release //:ios_publish
 
 # Maven Central publishing
 bazel run @rules_player//distribution:staged-maven-deploy -- "$RELEASE_TYPE" --package-group=com.intuit.playerui --legacy --client-timeout=600 --connect-timeout=600
