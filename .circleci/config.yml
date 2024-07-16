@@ -51,13 +51,9 @@ commands:
             - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
 
       - run: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-<<<<<<< Updated upstream
-      - run: echo "//registry.npmjs.com/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-=======
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
       - run: git config --global user.email intuit-svc@intuit.com
       - run: git config --global user.name "Intuit Service"
->>>>>>> Stashed changes
       - run: |
             echo -e $GPG_KEY | gpg --import --batch
             echo -e "pinentry-mode loopback\npassphrase $DEPLOY_MAVEN_GPG_PASSPHRASE" > ~/.gnupg/gpg.conf
