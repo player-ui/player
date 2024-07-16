@@ -19,7 +19,6 @@ android_binary(
     assets = glob(["src/main/assets/mocks/**"]),
     assets_dir = "src/main/assets",
     dex_shards = 3,
-    enable_data_binding = True,
     manifest = ":src/main/AndroidManifest.xml",
     multidex = "native",
     deps = [

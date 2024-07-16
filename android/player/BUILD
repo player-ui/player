@@ -3,12 +3,12 @@ load("@build_constants//:constants.bzl", "VERSION")
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load("@rules_kotlin//kotlin:core.bzl", "kt_kotlinc_options")
 load("//jvm:defs.bzl", "distribution")
+load(":aar_packaging.bzl", "aar_packaging")
 load("@rules_player//kotlin:defs.bzl", "kt_jvm_junit5_test", "lint")
 
 kt_android_library(
     name = "player",
     srcs = glob(["src/main/java/**/*.kt"]),
-    enable_data_binding = True,
     custom_package = "com.intuit.playerui.android",
     manifest = ":src/main/AndroidManifest.xml",
     resource_files = glob(["src/main/res/**"]),
@@ -21,7 +21,7 @@ kt_android_library(
 
 distribution(
     name = "player",
-    lib_name = "player",
+    lib_name = "player_base",
     maven_coordinates = "com.intuit.playerui:android:%s" % VERSION,
 )
 

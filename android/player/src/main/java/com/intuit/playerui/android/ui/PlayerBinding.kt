@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ScrollView
-import androidx.viewbinding.ViewBinding
 import com.intuit.playerui.android.R
 
 /**
@@ -16,10 +15,9 @@ public class PlayerBinding private constructor(
     private val rootView: ScrollView,
     public val playerCanvas: FrameLayout,
     public val scrollContainer: ScrollView,
-) : ViewBinding {
-    override fun getRoot(): ScrollView {
-        return rootView
-    }
+) {
+    public val root: ScrollView
+        get() = rootView
 
     public companion object {
         @JvmOverloads
