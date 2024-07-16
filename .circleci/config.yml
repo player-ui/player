@@ -59,6 +59,7 @@ commands:
             echo -e "pinentry-mode loopback\npassphrase $DEPLOY_MAVEN_GPG_PASSPHRASE" > ~/.gnupg/gpg.conf
       - run: |
             source ~/.bashrc
+            git config --list
             bundle install
             npx auto shipit --only-graduate-with-release-label -vv
 
@@ -67,6 +68,7 @@ jobs:
     executor: base
     steps:
       - checkout
+      - run: git config --list
 
       - restore_cache:
           keys:
