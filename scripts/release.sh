@@ -28,9 +28,6 @@ bazel build --config=release //:PlayerUI_Podspec //:PlayerUI_Pod
 
 bazel run --config=release //:spm_publish
 
-# VScode extension publishing
-bazel run --config=release //language/vscode-player-syntax:vscode-plugin.publish
-
 # Maven Central publishing
 bazel run @rules_player//distribution:staged-maven-deploy -- "$RELEASE_TYPE" --package-group=com.intuit.playerui --legacy --client-timeout=600 --connect-timeout=600
 
