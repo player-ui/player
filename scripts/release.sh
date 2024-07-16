@@ -26,6 +26,8 @@ done
 # Rebuild to stamp the release podspec
 bazel build --config=release //:PlayerUI_Podspec //:PlayerUI_Pod
 
+bazel run --config=release //:spm_publish
+
 # VScode extension publishing
 bazel run --config=release //language/vscode-player-syntax:vscode-plugin.publish
 

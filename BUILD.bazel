@@ -1,4 +1,4 @@
-load("@rules_player//ios:defs.bzl", "assemble_pod")
+load("@rules_player//ios:defs.bzl", "assemble_pod", "ios_publish")
 load("@rules_player//internal:defs.bzl", "stamp")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@aspect_rules_js//js:defs.bzl", "js_library")
@@ -188,6 +188,25 @@ assemble_pod(
         "//plugins/types-provider/core:core_native_bundle": "plugins/types-provider/ios/Resources/",
     },
     podspec = ":PlayerUI_Podspec",
+)
+
+ios_publish(
+    name = "spm_publish",
+    zip = ":PlayerUI_Pod",
+    # SPM Release Repo
+    repository = "https://github.com/player-ui/playerui-swift-package.git",
+    # CocoaPods
+    podspec = ":PlayerUI_Podspec",
+    executable = "bundle exec pod",
+    globalFlags = [
+        # because jenkins runs as root
+        "--allow-root",
+    ],
+    pushFlags = [
+        # skip tests because it never runs them right
+        # and they're run as part of the build pipeline anyway
+        "--skip-tests",
+    ],
 )
 
 # # Push podspec to specs repo
