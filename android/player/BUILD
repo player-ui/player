@@ -28,7 +28,7 @@ distribution(
 kt_jvm_junit5_test(
     name = "player-tests",
     srcs = glob(["src/test/java/**"]),
-    associates = ["libplayer.jar"],
+    associates = [":player_kt"],
     kotlinc_opts = "//jvm:test_options",
     test_package = "com.intuit.playerui.android",
     deps = [":player"] + test_deps,
