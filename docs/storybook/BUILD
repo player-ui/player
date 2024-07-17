@@ -37,6 +37,7 @@ deps = [
     "//:node_modules/raw-loader",
     "//:node_modules/react",
     "//:node_modules/react-dom",
+    "//:node_modules/@storybook/addon-webpack5-compiler-babel",
     "//:typings",
     "tsconfig.json",
     "package.json",
