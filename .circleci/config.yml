@@ -142,6 +142,11 @@ jobs:
           environment:
             JAVA_HOME: /Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home
 
+      - save_cache:
+          key: android-tools-{{ arch }}-{{ checksum "scripts/install-android-tools.sh" }}
+          paths:
+            - ~/android-tools
+
       - macos/preboot-simulator:
           version: "17.4"
           platform: "iOS"
