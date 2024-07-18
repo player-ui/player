@@ -149,9 +149,6 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
       const newNode = resolvedNode || node;
       if (!resolvedNode && node?.type === NodeType.Async) {
         queueMicrotask(async () => {
-          if (!this.basePlugin) {
-            return;
-          }
           const result = await this.basePlugin?.hooks.onAsyncNode.call(
             node,
             (result) => {
@@ -185,9 +182,6 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         const newNode = resolvedNode || node;
         if (!resolvedNode && node?.type === NodeType.Async) {
           queueMicrotask(async () => {
-            if (!this.basePlugin) {
-              return;
-            }
             const result = await this.basePlugin?.hooks.onAsyncNode.call(
               node,
               (result) => {

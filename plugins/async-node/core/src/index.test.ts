@@ -211,62 +211,6 @@ test("can handle multiple updates through callback mechanism", async () => {
   expect(view?.actions[1]).toBeUndefined();
 });
 
-test.only("should not proceed with async node resolution if basePlugin is not set", async () => {
-  const plugin = new AsyncNodePlugin({
-    plugins: [],
-  });
-
-  plugin.apply(new Player());
-
-  let updateNumber = 0;
-  let deferredResolve: ((value: any) => void) | undefined;
-
-  const player = new Player({ plugins: [plugin] });
-
-  player.hooks.viewController.tap("async-node-test", (vc) => {
-    vc.hooks.view.tap("async-node-test", (view) => {
-      view.hooks.onUpdate.tap("async-node-test", (update) => {
-        updateNumber++;
-      });
-    });
-  });
-
-  // Define a basic flow that includes an async node
-  const basicFRFWithAsyncNode = {
-    id: "test-flow",
-    views: [
-      {
-        id: "my-view",
-        actions: [
-          {
-            id: "asyncNodeId",
-            async: "true",
-          },
-        ],
-      },
-    ],
-    navigation: {
-      BEGIN: "FLOW_1",
-      FLOW_1: {
-        startState: "VIEW_1",
-        VIEW_1: {
-          state_type: "VIEW",
-          ref: "my-view",
-          transitions: {},
-        },
-      },
-    },
-  };
-
-  player.start(basicFRFWithAsyncNode as any);
-
-  // Wait for any asynchronous operations to potentially complete
-  await waitFor(() => {
-    expect(updateNumber).toBe(1);
-    expect(deferredResolve).toBeUndefined();
-  });
-});
-
 test("replaces async nodes with provided node", async () => {
   const plugin = new AsyncNodePlugin({
     plugins: [new AsyncNodePluginPlugin()],
