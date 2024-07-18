@@ -261,10 +261,10 @@ test("should not proceed with async node resolution if basePlugin is not set", a
   player.start(basicFRFWithAsyncNode as any);
 
   // Wait for any asynchronous operations to potentially complete
-  await new Promise((resolve) => setTimeout(resolve, 100));
-
-  expect(updateNumber).toBe(1);
-  expect(deferredResolve).toBeUndefined();
+  await waitFor(() => {
+    expect(updateNumber).toBe(1);
+    expect(deferredResolve).toBeUndefined();
+  });
 });
 
 test("replaces async nodes with provided node", async () => {
