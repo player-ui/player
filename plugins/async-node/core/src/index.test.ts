@@ -215,15 +215,21 @@ test("should not proceed with async node resolution if basePlugin is not set", a
   const plugin = new AsyncNodePlugin({
     plugins: [new AsyncNodePluginPlugin()],
   });
-  //const asyncNodePlugin = new AsyncNodePluginPlugin();
-  // Do not set basePlugin to simulate the condition
-  // asyncNodePluginPlugin.applyPlugin(plugin); // This line is intentionally omitted
 
   plugin.apply(new Player());
 
-  const updateNumber = 0;
+  let updateNumber = 0;
+  let deferredResolve: ((value: any) => void) | undefined;
 
   const player = new Player({ plugins: [plugin] });
+
+  player.hooks.viewController.tap("async-node-test", (vc) => {
+    vc.hooks.view.tap("async-node-test", (view) => {
+      view.hooks.onUpdate.tap("async-node-test", (update) => {
+        updateNumber++;
+      });
+    });
+  });
 
   // Define a basic flow that includes an async node
   const basicFRFWithAsyncNode = {
@@ -257,8 +263,8 @@ test("should not proceed with async node resolution if basePlugin is not set", a
   // Wait for any asynchronous operations to potentially complete
   await new Promise((resolve) => setTimeout(resolve, 100));
 
-  // Verify that the updateNumber is still 0, indicating that the async node was not resolved
-  expect(updateNumber).toBe(0);
+  expect(updateNumber).toBe(1);
+  expect(deferredResolve).toBeUndefined();
 });
 
 test("replaces async nodes with provided node", async () => {
@@ -493,7 +499,7 @@ test("replaces async nodes with chained multiNodes singular", async () => {
 
   let deferredResolve: ((value: any) => void) | undefined;
 
-  plugin.hooks.onAsyncNode.tap("test", async (node: Node.Node) => {
+  plugin.hooks.onAsyncNode.tap("test", async (node: Node.Async) => {
     return new Promise((resolve) => {
       deferredResolve = resolve;
     });
