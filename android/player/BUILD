@@ -13,7 +13,6 @@ kt_android_library(
     manifest = ":src/main/AndroidManifest.xml",
     resource_files = glob(["src/main/res/**"]),
     resources = main_resources,
-    visibility = ["//visibility:public"],
     deps = main_deps,
 )
 
