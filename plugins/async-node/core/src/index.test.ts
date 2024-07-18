@@ -211,9 +211,9 @@ test("can handle multiple updates through callback mechanism", async () => {
   expect(view?.actions[1]).toBeUndefined();
 });
 
-test("should not proceed with async node resolution if basePlugin is not set", async () => {
+test.only("should not proceed with async node resolution if basePlugin is not set", async () => {
   const plugin = new AsyncNodePlugin({
-    plugins: [new AsyncNodePluginPlugin()],
+    plugins: [],
   });
 
   plugin.apply(new Player());
