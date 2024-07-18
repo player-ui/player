@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
 import { Node, InProgressState, ViewInstance } from "@player-ui/player";
 import { Player } from "@player-ui/player";
 import { waitFor } from "@testing-library/react";
@@ -44,11 +44,20 @@ const asyncNodeTest = async (resolvedValue: any) => {
 
   let deferredResolve: ((value: any) => void) | undefined;
 
-  plugin.hooks.onAsyncNode.tap("test", async (node: Node.Async) => {
-    return new Promise((resolve) => {
-      deferredResolve = resolve; // Promise would be resolved only once
-    });
-  });
+  let updateContent: any;
+
+  plugin.hooks.onAsyncNode.tap(
+    "test",
+    async (node: Node.Async, update: (content: any) => void) => {
+      const result = new Promise((resolve) => {
+        deferredResolve = resolve; // Promise would be resolved only once
+      });
+
+      updateContent = update;
+      // Return the result to follow the same mechanism as before
+      return result;
+    },
+  );
 
   let updateNumber = 0;
 
@@ -83,17 +92,24 @@ const asyncNodeTest = async (resolvedValue: any) => {
     deferredResolve(resolvedValue);
   }
 
+  await waitFor(() => {
+    expect(updateNumber).toBe(1);
+  });
+
   view = (player.getState() as InProgressState).controllers.view.currentView
     ?.lastUpdate;
 
   expect(view?.actions[0].asset.type).toBe("action");
   expect(view?.actions.length).toBe(1);
 
-  viewInstance.update();
+  // Consumer responds with null/undefined
+  if (deferredResolve) {
+    updateContent(resolvedValue);
+  }
 
-  //Even after a manual update, the view should not change as we are deleting the resolved node if there is no view update
+  //Even after an update, the view should not change as we are deleting the resolved node if there is no view update
   await waitFor(() => {
-    expect(updateNumber).toBe(2);
+    expect(updateNumber).toBe(1);
   });
 
   view = (player.getState() as InProgressState).controllers.view.currentView
@@ -118,11 +134,21 @@ test("should handle the promise using .then", async () => {
 
   let deferredResolve: ((value: any) => void) | undefined;
 
-  plugin.hooks.onAsyncNode.tap("test", async (node: Node.Node) => {
-    return new Promise((resolve) => {
-      deferredResolve = resolve;
-    });
-  });
+  let updateContent: any;
+
+  plugin.hooks.onAsyncNode.tap(
+    "test",
+    async (node: Node.Async, update: (content: any) => void) => {
+      const result = new Promise((resolve) => {
+        deferredResolve = resolve; // Promise would be resolved only once
+      });
+
+      updateContent = update;
+      // Return the result to follow the same mechanism as before
+      return result;
+    },
+  );
+
   let updateNumber = 0;
 
   const player = new Player({ plugins: [plugin] });
@@ -169,6 +195,20 @@ test("should handle the promise using .then", async () => {
   expect(view?.actions[1].asset.type).toBe("action");
   expect(view?.actions[2]).toBeUndefined();
   expect(updateNumber).toBe(2);
+
+  if (deferredResolve) {
+    updateContent(null);
+  }
+
+  await waitFor(() => {
+    expect(updateNumber).toBe(3);
+  });
+
+  view = (player.getState() as InProgressState).controllers.view.currentView
+    ?.lastUpdate;
+
+  expect(view?.actions[0].asset.type).toBe("action");
+  expect(view?.actions[1]).toBeUndefined();
 });
 
 test("replaces async nodes with provided node", async () => {
