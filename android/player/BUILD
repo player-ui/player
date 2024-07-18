@@ -22,7 +22,7 @@ android_library(
 )
 
 kt_jvm_library(
-    name = "player_jvm",
+    name = "player_kt",
     srcs = glob(["src/main/java/**/*.kt"]),
     resources = main_resources,
     exports = main_exports,
@@ -38,11 +38,8 @@ android_library(
     resource_files = glob(["src/main/res/**"]),
     manifest = ":src/main/AndroidManifest.xml",
     tags = ["maven_coordinates=com.intuit.playerui:android:aar:%s" % VERSION],
-    deps = main_deps + [
-        ":android_sdk",
-        ":player_base"
-    ],
-    exports = main_exports + [":player_jvm"],
+    deps = main_deps,
+    exports = main_exports + [":player_kt"],
     visibility = ["//visibility:public"],
 )
 
@@ -55,7 +52,7 @@ distribution(
 kt_jvm_junit5_test(
     name = "player-tests",
     srcs = glob(["src/test/java/**"]),
-    associates = [":player_jvm"],
+    associates = [":player_kt"],
     kotlinc_opts = "//jvm:test_options",
     test_package = "com.intuit.playerui.android",
     deps = [":player"] + test_deps,
