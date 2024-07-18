@@ -152,8 +152,8 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
                 }
             }
             hydratedView.await().also { parent ->
-                replaceSelfWithView(parent)
                 (parent as? ViewGroup)?.awaitAsyncChildren()
+                replaceSelfWithView(parent)
             }
         } catch (e: CancellationException) {
             // if it was the calling scope that is cancelled, this will re-raise
