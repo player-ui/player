@@ -96,7 +96,7 @@ and display it as a SwiftUI view comprised of registered assets.
       subspec.source_files = "plugins/#{path}/ios/Sources/**/*"
       if resources == TRUE
         subspec.resource_bundles = {
-          name => ["plugins/#{path}/ios/Resources/**/*.js"]
+          "PlayerUI_#{name}" => ["plugins/#{path}/ios/Resources/**/*.js"]
         }
       end
     end
@@ -112,7 +112,7 @@ and display it as a SwiftUI view comprised of registered assets.
       subspec.source_files = "plugins/#{path}/swiftui/Sources/**/*"
       if resources == TRUE
         subspec.resource_bundles = {
-          name => ["plugins/#{path}/swiftui/Resources/**/*.js"]
+          "PlayerUI_#{name}" => ["plugins/#{path}/swiftui/Resources/**/*.js"]
         }
       end
     end
