@@ -139,9 +139,7 @@ maven.install(
         "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0",
 
         # Android
-        "androidx.databinding:databinding-adapters:7.2.2",
-        "androidx.databinding:databinding-common:7.2.2",
-        "androidx.databinding:databinding-runtime:7.2.2",
+        "androidx.databinding:viewbinding:7.2.2",
         "androidx.annotation:annotation:1.1.0",
 
         # Android Demo

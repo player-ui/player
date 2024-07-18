@@ -212,7 +212,7 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
             reset.setOnClickListener {
                 reset()
             }
-        }.root
+        }.getRoot()
 
     /**
      * Builder method to provide a [View] to be shown when the [PlayerViewModel]

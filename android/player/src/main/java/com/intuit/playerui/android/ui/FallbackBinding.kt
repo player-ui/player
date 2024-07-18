@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.viewbinding.ViewBinding
 import com.intuit.playerui.android.R
 
 /**
@@ -18,9 +19,10 @@ public class FallbackBinding private constructor(
     public val reset: Button,
     public val retry: Button,
     public val title: TextView,
-) {
-    public val root: ConstraintLayout
-        get() = rootView
+) : ViewBinding {
+    override fun getRoot(): ConstraintLayout {
+        return rootView
+    }
 
     public companion object {
         @JvmOverloads
