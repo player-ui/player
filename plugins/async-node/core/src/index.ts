@@ -77,7 +77,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
   private currentView: ViewInstance | undefined;
 
-  private updateAsyncFunc(
+  private handleAsyncUpdate(
     node: Node.Async,
     result: any,
     options: Resolve.NodeResolveOptions,
@@ -149,19 +149,16 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
       const newNode = resolvedNode || node;
       if (!resolvedNode && node?.type === NodeType.Async) {
         queueMicrotask(async () => {
+          if (!this.basePlugin) {
+            return;
+          }
           const result = await this.basePlugin?.hooks.onAsyncNode.call(
             node,
             (result) => {
-              this.updateAsyncFunc(node, result, options, this.currentView);
+              this.handleAsyncUpdate(node, result, options, this.currentView);
             },
           );
-          const parsedNode =
-            options.parseNode && result ? options.parseNode(result) : undefined;
-
-          if (parsedNode) {
-            this.resolvedMapping.set(node.id, parsedNode);
-            this.currentView?.updateAsync();
-          }
+          this.handleAsyncUpdate(node, result, options, this.currentView);
         });
 
         return node;
@@ -194,10 +191,10 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
             const result = await this.basePlugin?.hooks.onAsyncNode.call(
               node,
               (result) => {
-                this.updateAsyncFunc(node, result, options, view);
+                this.handleAsyncUpdate(node, result, options, view);
               },
             );
-            this.updateAsyncFunc(node, result, options, view);
+            this.handleAsyncUpdate(node, result, options, view);
           });
 
           return node;

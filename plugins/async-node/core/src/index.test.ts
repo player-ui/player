@@ -127,7 +127,7 @@ test("should return current node view when the resolved node is undefined", asyn
   await asyncNodeTest(undefined);
 });
 
-test("should handle the promise using .then", async () => {
+test("can handle multiple updates through callback mechanism", async () => {
   const plugin = new AsyncNodePlugin({
     plugins: [new AsyncNodePluginPlugin()],
   });
@@ -209,6 +209,56 @@ test("should handle the promise using .then", async () => {
 
   expect(view?.actions[0].asset.type).toBe("action");
   expect(view?.actions[1]).toBeUndefined();
+});
+
+test("should not proceed with async node resolution if basePlugin is not set", async () => {
+  const plugin = new AsyncNodePlugin({
+    plugins: [new AsyncNodePluginPlugin()],
+  });
+  //const asyncNodePlugin = new AsyncNodePluginPlugin();
+  // Do not set basePlugin to simulate the condition
+  // asyncNodePluginPlugin.applyPlugin(plugin); // This line is intentionally omitted
+
+  plugin.apply(new Player());
+
+  const updateNumber = 0;
+
+  const player = new Player({ plugins: [plugin] });
+
+  // Define a basic flow that includes an async node
+  const basicFRFWithAsyncNode = {
+    id: "test-flow",
+    views: [
+      {
+        id: "my-view",
+        actions: [
+          {
+            id: "asyncNodeId",
+            async: "true",
+          },
+        ],
+      },
+    ],
+    navigation: {
+      BEGIN: "FLOW_1",
+      FLOW_1: {
+        startState: "VIEW_1",
+        VIEW_1: {
+          state_type: "VIEW",
+          ref: "my-view",
+          transitions: {},
+        },
+      },
+    },
+  };
+
+  player.start(basicFRFWithAsyncNode as any);
+
+  // Wait for any asynchronous operations to potentially complete
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
+  // Verify that the updateNumber is still 0, indicating that the async node was not resolved
+  expect(updateNumber).toBe(0);
 });
 
 test("replaces async nodes with provided node", async () => {
@@ -520,4 +570,31 @@ test("replaces async nodes with chained multiNodes singular", async () => {
   expect(view?.actions[0].asset.type).toBe("action");
   expect(view?.actions[1].asset.type).toBe("text");
   expect(view?.actions[2].asset.type).toBe("text");
+});
+
+test("should call onAsyncNode hook when async node is encountered", async () => {
+  const plugin = new AsyncNodePlugin({
+    plugins: [new AsyncNodePluginPlugin()],
+  });
+
+  let localNode: Node.Async;
+  plugin.hooks.onAsyncNode.tap("test", async (node: Node.Async) => {
+    if (node !== null) {
+      // assigns node value to a local variable
+      localNode = node;
+    }
+
+    return new Promise((resolve) => {
+      resolve("Promise resolved");
+    });
+  });
+
+  const player = new Player({ plugins: [plugin] });
+
+  player.start(basicFRFWithActions as any);
+
+  await waitFor(() => {
+    expect(localNode.id).toStrictEqual("nodeId");
+    expect(localNode.type).toStrictEqual("async");
+  });
 });
