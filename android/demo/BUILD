@@ -1,7 +1,7 @@
 load("@rules_android//android:rules.bzl", "android_binary", "android_library")
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_import")
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
-load(":defs.bzl", "main_deps", "test_deps")
+load(":deps.bzl", "main_deps", "test_deps")
 load("@rules_player//kotlin:defs.bzl", "lint")
 
 kt_android_library(
@@ -19,13 +19,10 @@ android_binary(
     assets = glob(["src/main/assets/mocks/**"]),
     assets_dir = "src/main/assets",
     dex_shards = 3,
-    enable_data_binding = True,
     manifest = ":src/main/AndroidManifest.xml",
     multidex = "native",
     deps = [
         ":demo_lib",
-        "@maven//:androidx_databinding_databinding_common",
-        "@maven//:androidx_databinding_databinding_runtime",
         "@maven//:org_jetbrains_kotlin_kotlin_reflect",
     ],
 )

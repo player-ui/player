@@ -3,6 +3,8 @@ main_exports = [
 ]
 
 main_deps = main_exports + [
+    "@maven//:androidx_databinding_viewbinding",
+    "@maven//:androidx_annotation_annotation",
     "@maven//:androidx_core_core_ktx",
     "@maven//:androidx_transition_transition",
     "@maven//:androidx_lifecycle_lifecycle_runtime_ktx",

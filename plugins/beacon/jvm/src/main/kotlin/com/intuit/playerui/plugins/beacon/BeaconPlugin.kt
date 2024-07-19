@@ -43,7 +43,7 @@ public class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JSScrip
                 }
             }
 
-        runtime.load(ScriptContext(if (runtime.config.debuggable) debugScript else script, bundledSourcePath))
+        runtime.load(ScriptContext(script, bundledSourcePath))
         runtime.add("beaconOptions", config)
         instance = runtime.buildInstance("(new $name.$name(beaconOptions))")
     }

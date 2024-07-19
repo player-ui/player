@@ -21,7 +21,7 @@ import org.hamcrest.Matchers.allOf
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class InputUITest : AssetUITest("reference-assets") {
+class InputUITest : AssetUITest("input") {
 
     fun verifyIsDisplayed(matcher: Matcher<View>) = waitForViewInRoot(matcher)
         .check(matches(isDisplayed()))

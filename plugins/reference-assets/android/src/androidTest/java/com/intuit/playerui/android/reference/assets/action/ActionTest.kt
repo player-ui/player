@@ -16,7 +16,7 @@ import com.intuit.playerui.core.player.state.dataModel
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class ActionTest : AssetTest("reference-assets") {
+class ActionTest : AssetTest("action") {
 
     @Test
     fun actionExpression() {

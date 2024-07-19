@@ -18,15 +18,10 @@ public abstract class JSScriptPluginWrapper(public val name: String, protected v
 
     final override lateinit var instance: Node protected set
 
-    protected val debugScript: String
-        get() = loadDebugScript() ?: script
-
-    private fun loadDebugScript(): String? = JSScriptPluginWrapper::class.java.classLoader.getResource(sourcePath?.substringBeforeLast(".") + ".dev." + sourcePath?.substringAfterLast("."))?.readText()
-
     public val isInstantiated: Boolean get() = ::instance.isInitialized
 
     override fun apply(runtime: Runtime<*>) {
-        runtime.load(ScriptContext(if (runtime.config.debuggable) debugScript else script, sourcePath ?: "$name.js"))
+        runtime.load(ScriptContext(script, sourcePath ?: "$name.js"))
         instance = runtime.buildInstance()
     }
 

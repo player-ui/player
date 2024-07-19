@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.View
-import android.view.View.OnAttachStateChangeListener
 import android.view.ViewGroup
 import androidx.core.view.children
 import com.intuit.hooks.HookContext
@@ -154,6 +153,7 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
             }
             hydratedView.await().also { parent ->
                 (parent as? ViewGroup)?.awaitAsyncChildren()
+                replaceSelfWithView(parent)
             }
         } catch (e: CancellationException) {
             // if it was the calling scope that is cancelled, this will re-raise
@@ -169,7 +169,7 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
         }
         override fun onViewAttachedToWindow(v: View) {
             scope.launch(Dispatchers.Main) {
-                awaitView()?.let(::replaceSelfWithView)
+                awaitView()
             }
         }
         override fun onViewDetachedFromWindow(v: View) {}

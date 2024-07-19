@@ -1,5 +1,3 @@
-load("//jvm/dependencies:versions.bzl", "versions")
-
 main_deps = [
     "@maven//:androidx_test_core",
     "@maven//:androidx_test_runner",
