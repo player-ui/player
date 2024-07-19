@@ -1,5 +1,5 @@
 {
-  "name": "@player-ui/storybook-addon-player",
+  "name": "@player-ui/storybook",
   "version": "0.0.0-PLACEHOLDER",
   "exports": {
     ".": {

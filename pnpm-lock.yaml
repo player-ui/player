@@ -568,9 +568,9 @@ importers:
       '@player-ui/reference-assets-plugin-react':
         specifier: workspace:*
         version: link:../../plugins/reference-assets/react
-      '@player-ui/storybook-addon-player':
+      '@player-ui/storybook':
         specifier: workspace:*
-        version: link:../../tools/addon-storybook
+        version: link:../../tools/storybook
 
   plugins/asset-provider/react:
     dependencies:
@@ -985,7 +985,21 @@ importers:
 
   react/subscribe: {}
 
-  tools/addon-storybook:
+  tools/asset-testing-library/core:
+    dependencies:
+      '@player-ui/asset-transform-plugin':
+        specifier: workspace:*
+        version: link:../../../plugins/asset-transform/core
+      '@player-ui/make-flow':
+        specifier: workspace:*
+        version: link:../../../core/make-flow
+      '@player-ui/player':
+        specifier: workspace:*
+        version: link:../../../core/player
+
+  tools/mocks: {}
+
+  tools/storybook:
     dependencies:
       '@player-ui/beacon-plugin-react':
         specifier: workspace:*
@@ -1005,20 +1019,6 @@ importers:
       '@player-ui/types':
         specifier: workspace:*
         version: link:../../core/types
-
-  tools/asset-testing-library/core:
-    dependencies:
-      '@player-ui/asset-transform-plugin':
-        specifier: workspace:*
-        version: link:../../../plugins/asset-transform/core
-      '@player-ui/make-flow':
-        specifier: workspace:*
-        version: link:../../../core/make-flow
-      '@player-ui/player':
-        specifier: workspace:*
-        version: link:../../../core/player
-
-  tools/mocks: {}
 
 packages:
 
