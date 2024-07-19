@@ -56,7 +56,7 @@ commands:
 
       - run: mkdir -p ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run: echo "//registry.npmjs.com/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      - run: git config --global user.name "Intuit Servce"
+      - run: git config --global user.name "Intuit Service"
       - run: git config --global user.email "opensource-svc@intuit.com"
       - run: |
             echo -e $GPG_KEY | gpg --import --batch
