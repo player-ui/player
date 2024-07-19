@@ -101,7 +101,7 @@ jobs:
       - attach_workspace:
           at: ~/player
       # need to filter because //android/demo rules dont resolve
-      - run: bazel build --config=ci -- $(bazel query '//plugins/... except filter("ios|swiftui|jvm|android", //plugins/...)') $(bazel query '//core/... except filter("ios|swiftui|jvm|android", //core/...)') $(bazel query '//react/... except filter("ios|swiftui|jvm|android", //react/...)')
+      - run: bazel build --config=ci -- $(bazel query 'filter("native_bundle$", //...)')
 
       - save_cache:
           paths:
@@ -147,6 +147,11 @@ jobs:
             source $BASH_ENV
           environment:
             JAVA_HOME: /Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home
+
+      - save_cache:
+          key: android-tools-{{ arch }}-{{ checksum "scripts/install-android-tools.sh" }}
+          paths:
+            - ~/android-tools
 
       - macos/preboot-simulator:
           version: "17.4"
@@ -388,6 +393,7 @@ workflows:
                 - /pull\/.*/
           requires:
             - bazelrc
+            - build-trunk
 
       - build_ios:
           name: build-ios-fork
@@ -396,7 +402,7 @@ workflows:
               only:
                 - /pull\/.*/
           requires:
-            - setup
+            - build-fork
 
       - maybe_release:
           filters:

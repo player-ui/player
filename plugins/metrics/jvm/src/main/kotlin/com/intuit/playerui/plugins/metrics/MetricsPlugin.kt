@@ -17,7 +17,7 @@ public class MetricsPlugin(
 ) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
 
     override fun apply(runtime: Runtime<*>) {
-        runtime.load(ScriptContext(if (runtime.config.debuggable) debugScript else script, bundledSourcePath))
+        runtime.load(ScriptContext(script, bundledSourcePath))
         runtime.add(
             "handlers",
             mapOf(

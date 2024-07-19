@@ -2,16 +2,6 @@ load("//jvm/dependencies:versions.bzl", "versions")
 load("@rules_player//kotlin:defs.bzl", "lint")
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_local_test")
 
-main_exports = [
-    "//android/player",
-]
-
-main_deps = main_exports + [
-    "//jvm:kotlin_serialization",
-    "//plugins/reference-assets/jvm:reference-assets",
-    "//plugins/pending-transaction/jvm:pending-transaction",
-]
-
 def kt_asset_test(
         name,
         test_class,
