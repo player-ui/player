@@ -32,7 +32,11 @@ In the example below, node with the id "some-async-node" will not be rendered on
 
 The `AsyncNodePlugin` exposes an `onAsyncNode` hook on all platforms. The `onAsyncNode` hook will be invoked with the current node when the plugin is available and an `AsyncNode` is detected during the resolve process. The node used to call the hook with could contain metadata according to content spec.
 
-User should tap into the `onAsyncNode` hook to examine the node's metadata before making a decision on what to replace the async node with. The return could be a single asset node or an array of asset nodes.
+User should tap into the `onAsyncNode` hook to examine the node's metadata before making a decision on what to replace the async node with. The return could be a single asset node or an array of asset nodes. accepts an options object with a `plugins` array, enabling the integration of multiple view plugins for extended functionality.
+
+### Edge cases
+
+If for some reason, the process for resolving some `AsyncNode` fails, or is no longer relevant, you can resolve the promise for that `AsyncNode` with `undefined` or `null` to replace that node with "existing node".
 
 
 ### Continuous Streaming
