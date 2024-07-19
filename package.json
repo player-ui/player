@@ -142,7 +142,6 @@
     "react-redux": "^7.2.6",
     "react-router": "^6.22.3",
     "react-router-dom": "^6.22.3",
-    "react-json-reconciler": "^2.0.0",
     "react-syntax-highlighter": "^15.4.5",
     "redux": "^4.1.2",
     "redux-state-sync": "^3.1.4",

@@ -372,9 +372,6 @@ importers:
       react-icons:
         specifier: ^4.3.1
         version: 4.12.0(react@18.3.1)
-      react-json-reconciler:
-        specifier: ^2.0.0
-        version: 2.0.0(react@18.3.1)
       react-redux:
         specifier: ^7.2.6
         version: 7.2.9(react-dom@18.3.1)(react@18.3.1)
@@ -592,15 +589,6 @@ importers:
       '@player-ui/types':
         specifier: workspace:*
         version: link:../../../core/types
-
-  plugins/async-node/components:
-    dependencies:
-      '@player-ui/async-node-plugin':
-        specifier: workspace:*
-        version: link:../core
-      '@player-ui/player':
-        specifier: workspace:*
-        version: link:../../../core/player
 
   plugins/async-node/core:
     dependencies:
