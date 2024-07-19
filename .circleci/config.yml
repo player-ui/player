@@ -488,7 +488,7 @@ workflows:
 
       - build_ios:
           requires:
-            - setup
+            - build
 
       - android_test:
           requires:
@@ -519,7 +519,7 @@ workflows:
 
       - build_ios:
           requires:
-            - setup
+            - build
 
       - android_test:
           requires:
