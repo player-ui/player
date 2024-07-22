@@ -125,8 +125,8 @@ jobs:
           name: Homebrew Dependencies
           command: |
             HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk lcov
-            brew install --cask temurin@8
-            sudo installer -pkg /opt/homebrew/Caskroom/temurin@8/8,412,08/OpenJDK8U-jdk_x64_mac_hotspot_8u412b08.pkg -target /
+            wget -P /tmp/temurin https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u422-b05/OpenJDK8U-jdk_x64_mac_hotspot_8u422b05.pkg
+            sudo installer -pkg /tmp/temurin/OpenJDK8U-jdk_x64_mac_hotspot_8u422b05.pkg -target /
 
       - restore_cache:
           keys:
