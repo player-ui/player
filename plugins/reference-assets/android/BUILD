@@ -1,6 +1,6 @@
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load("@rules_player//kotlin:defs.bzl", "lint")
-load(":defs.bzl", "main_deps", "main_exports")
+load(":deps.bzl", "main_deps", "main_exports")
 
 kt_android_library(
     name = "assets",

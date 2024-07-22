@@ -24,7 +24,7 @@ public class ExpressionPlugin(
     public constructor(vararg expressions: Pair<String, ExpressionHandler>) : this(expressions.toMap())
 
     override fun apply(runtime: Runtime<*>) {
-        runtime.load(ScriptContext(if (runtime.config.debuggable) debugScript else script, bundledSourcePath))
+        runtime.load(ScriptContext(script, bundledSourcePath))
         runtime.add(
             "expressionHandlers",
             map.entries.fold(runtime.execute("new Map()") as Node) { acc, entry ->
