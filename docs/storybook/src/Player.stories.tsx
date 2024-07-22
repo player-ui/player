@@ -1,4 +1,4 @@
-import { createDSLStory } from "@player-ui/storybook-addon-player";
+import { createDSLStory } from "@player-ui/storybook";
 import { Meta } from "@storybook/react";
 
 const meta: Meta = {
