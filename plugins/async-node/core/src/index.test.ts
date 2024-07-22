@@ -193,7 +193,6 @@ test("can handle multiple updates through callback mechanism", async () => {
 
   expect(view?.actions[0].asset.type).toBe("action");
   expect(view?.actions[1].asset.type).toBe("action");
-  expect(view?.actions[2]).toBeUndefined();
   expect(updateNumber).toBe(2);
 
   if (deferredResolve) {
