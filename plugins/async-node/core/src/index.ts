@@ -77,6 +77,16 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
   private currentView: ViewInstance | undefined;
 
+  /**
+   * Updates the node asynchronously based on the result provided.
+   * This method is responsible for handling the update logic of asynchronous nodes.
+   * It checks if the node needs to be updated based on the new result and updates the mapping accordingly.
+   * If an update is necessary, it triggers an asynchronous update on the view.
+   * @param node The asynchronous node that might be updated.
+   * @param result The result obtained from resolving the async node. This could be any data structure or value.
+   * @param options Options provided for node resolution, including a potential parseNode function to process the result.
+   * @param view The view instance where the node resides. This can be undefined if the view is not currently active.
+   */
   private handleAsyncUpdate(
     node: Node.Async,
     result: any,
@@ -90,6 +100,42 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
       this.resolvedMapping.set(node.id, parsedNode ? parsedNode : node);
       view?.updateAsync();
     }
+  }
+
+  /**
+   * Handles the asynchronous API integration for resolving nodes.
+   * This method sets up a hook on the resolver's `beforeResolve` event to process async nodes.
+   * @param resolver The resolver instance to attach the hook to.
+   * @param view The current view instance.
+   */
+  private handleAsyncApi(resolver: Resolver, view: ViewInstance | undefined) {
+    resolver.hooks.beforeResolve.tap(this.name, (node, options) => {
+      let resolvedNode;
+      if (this.isAsync(node)) {
+        const mappedValue = this.resolvedMapping.get(node.id);
+        if (mappedValue) {
+          resolvedNode = mappedValue;
+        }
+      } else {
+        resolvedNode = null;
+      }
+
+      const newNode = resolvedNode || node;
+      if (!resolvedNode && node?.type === NodeType.Async) {
+        queueMicrotask(async () => {
+          const result = await this.basePlugin?.hooks.onAsyncNode.call(
+            node,
+            (result) => {
+              this.handleAsyncUpdate(node, result, options, view);
+            },
+          );
+          this.handleAsyncUpdate(node, result, options, view);
+        });
+
+        return node;
+      }
+      return newNode;
+    });
   }
 
   private isAsync(node: Node.Node | null): node is Node.Async {
@@ -135,66 +181,13 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
   }
 
   applyResolverHooks(resolver: Resolver) {
-    resolver.hooks.beforeResolve.tap(this.name, (node, options) => {
-      let resolvedNode;
-      if (this.isAsync(node)) {
-        const mappedValue = this.resolvedMapping.get(node.id);
-        if (mappedValue) {
-          resolvedNode = mappedValue;
-        }
-      } else {
-        resolvedNode = null;
-      }
-
-      const newNode = resolvedNode || node;
-      if (!resolvedNode && node?.type === NodeType.Async) {
-        queueMicrotask(async () => {
-          const result = await this.basePlugin?.hooks.onAsyncNode.call(
-            node,
-            (result) => {
-              this.handleAsyncUpdate(node, result, options, this.currentView);
-            },
-          );
-          this.handleAsyncUpdate(node, result, options, this.currentView);
-        });
-
-        return node;
-      }
-
-      return newNode;
-    });
+    this.handleAsyncApi(resolver, this.currentView);
   }
 
   apply(view: ViewInstance): void {
     view.hooks.parser.tap("template", this.applyParser.bind(this));
     view.hooks.resolver.tap("template", (resolver) => {
-      resolver.hooks.beforeResolve.tap(this.name, (node, options) => {
-        let resolvedNode;
-        if (this.isAsync(node)) {
-          const mappedValue = this.resolvedMapping.get(node.id);
-          if (mappedValue) {
-            resolvedNode = mappedValue;
-          }
-        } else {
-          resolvedNode = null;
-        }
-
-        const newNode = resolvedNode || node;
-        if (!resolvedNode && node?.type === NodeType.Async) {
-          queueMicrotask(async () => {
-            const result = await this.basePlugin?.hooks.onAsyncNode.call(
-              node,
-              (result) => {
-                this.handleAsyncUpdate(node, result, options, view);
-              },
-            );
-            this.handleAsyncUpdate(node, result, options, view);
-          });
-
-          return node;
-        }
-        return newNode;
-      });
+      this.handleAsyncApi(resolver, view);
     });
   }
 
