@@ -1,5 +1,5 @@
 import type { Meta } from "@storybook/react";
-import { createDSLStory } from "@player-ui/storybook-addon-player";
+import { createDSLStory, PlayerStory } from "@player-ui/storybook";
 import { Action } from "@player-ui/reference-assets-plugin-react";
 
 const meta: Meta<typeof Action> = {
@@ -10,29 +10,23 @@ const meta: Meta<typeof Action> = {
 export default meta;
 
 export const Basic = createDSLStory(
-  () =>
-    import(
-      "!!raw-loader!@player-ui/mocks/action/action-basic.tsx"
-    ),
+  () => import("!!raw-loader!@player-ui/mocks/action/action-basic.tsx"),
 );
 
 export const Expression = createDSLStory(
-  () =>
-    import(
-      "!!raw-loader!@player-ui/mocks/action/action-counter.tsx"
-    ),
+  () => import("!!raw-loader!@player-ui/mocks/action/action-counter.tsx"),
 );
 
 export const Navigation = createDSLStory(
-  () =>
-    import(
-      "!!raw-loader!@player-ui/mocks/action/action-navigation.tsx"
-    ),
+  () => import("!!raw-loader!@player-ui/mocks/action/action-navigation.tsx"),
 );
 
-export const TransitionToEnd = createDSLStory(
-  () =>
-    import(
-      "!!raw-loader!@player-ui/mocks/action/action-transition-to-end.tsx"
-    ),
+export const TransitionToEnd = () => (
+  <PlayerStory
+    flow={() =>
+      import(
+        "@player-ui/mocks/action/action-transition-to-end.json"
+      )
+    }
+  />
 );
