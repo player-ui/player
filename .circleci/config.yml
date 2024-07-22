@@ -118,6 +118,7 @@ jobs:
       - run:
           name: Homebrew Dependencies
           command: |
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk lcov
             wget -P /tmp/temurin https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u422-b05/OpenJDK8U-jdk_x64_mac_hotspot_8u422b05.pkg
             sudo installer -pkg /tmp/temurin/OpenJDK8U-jdk_x64_mac_hotspot_8u422b05.pkg -target /
 
