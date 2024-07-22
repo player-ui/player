@@ -59,3 +59,11 @@ test("updates registry entries with new registry values", () => {
   expect(registry.get({ type: "bar" })).toBe("registry2");
   expect(registry.get({ type: "baz" })).toBe("registry1");
 });
+
+test("check if registry is empty", () => {
+  registry = new Registry([[{ type: "foo" }, "foo-bar"]]);
+  const emptyRegistry = new Registry([]);
+
+  expect(registry.isRegistryEmpty()).toBe(false);
+  expect(emptyRegistry.isRegistryEmpty()).toBe(true);
+});
