@@ -93,6 +93,9 @@ importers:
       '@storybook/addon-docs':
         specifier: ^7.6.10
         version: 7.6.19(@types/react-dom@18.3.0)(@types/react@18.3.2)(react-dom@18.3.1)(react@18.3.1)
+      '@storybook/addon-webpack5-compiler-babel':
+        specifier: ^3.0.3
+        version: 3.0.3(webpack@5.91.0)
       '@storybook/builder-vite':
         specifier: ^7.6.10
         version: 7.6.19(typescript@5.3.2)(vite@4.5.3)
@@ -571,9 +574,9 @@ importers:
       '@player-ui/reference-assets-plugin-react':
         specifier: workspace:*
         version: link:../../plugins/reference-assets/react
-      '@player-ui/storybook-addon-player':
+      '@player-ui/storybook':
         specifier: workspace:*
-        version: link:../../tools/addon-storybook
+        version: link:../../tools/storybook
 
   plugins/asset-provider/react:
     dependencies:
@@ -988,7 +991,21 @@ importers:
 
   react/subscribe: {}
 
-  tools/addon-storybook:
+  tools/asset-testing-library/core:
+    dependencies:
+      '@player-ui/asset-transform-plugin':
+        specifier: workspace:*
+        version: link:../../../plugins/asset-transform/core
+      '@player-ui/make-flow':
+        specifier: workspace:*
+        version: link:../../../core/make-flow
+      '@player-ui/player':
+        specifier: workspace:*
+        version: link:../../../core/player
+
+  tools/mocks: {}
+
+  tools/storybook:
     dependencies:
       '@player-ui/beacon-plugin-react':
         specifier: workspace:*
@@ -1008,20 +1025,6 @@ importers:
       '@player-ui/types':
         specifier: workspace:*
         version: link:../../core/types
-
-  tools/asset-testing-library/core:
-    dependencies:
-      '@player-ui/asset-transform-plugin':
-        specifier: workspace:*
-        version: link:../../../plugins/asset-transform/core
-      '@player-ui/make-flow':
-        specifier: workspace:*
-        version: link:../../../core/make-flow
-      '@player-ui/player':
-        specifier: workspace:*
-        version: link:../../../core/player
-
-  tools/mocks: {}
 
 packages:
 
@@ -6291,6 +6294,17 @@ packages:
       - '@types/react-dom'
       - encoding
       - supports-color
+    dev: false
+
+  /@storybook/addon-webpack5-compiler-babel@3.0.3(webpack@5.91.0):
+    resolution: {integrity: sha512-rVQTTw+oxJltbVKaejIWSHwVKOBJs3au21f/pYXhV0aiNgNhxEa3vr79t/j0j8ox8uJtzM8XYOb7FlkvGfHlwQ==, tarball: https://registry.npmjs.org/@storybook/addon-webpack5-compiler-babel/-/addon-webpack5-compiler-babel-3.0.3.tgz}
+    engines: {node: '>=18'}
+    dependencies:
+      '@babel/core': 7.24.5
+      babel-loader: 9.1.3(@babel/core@7.24.5)(webpack@5.91.0)
+    transitivePeerDependencies:
+      - supports-color
+      - webpack
     dev: false
 
   /@storybook/blocks@7.6.19(@types/react-dom@18.3.0)(@types/react@18.3.2)(react-dom@18.3.1)(react@18.3.1):
