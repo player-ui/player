@@ -8,14 +8,14 @@ import type {
   ConcatenatedNode,
   QueryNode,
   ExpressionNode,
-} from "../ast";
+} from "../../ast";
 import {
   toValue,
   toQuery,
   toPath,
   toConcatenatedNode,
   toExpression,
-} from "../ast";
+} from "../../ast";
 import type {
   ValueToken,
   ModelRefToken,

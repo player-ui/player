@@ -9,7 +9,7 @@ import com.intuit.playerui.android.reference.assets.test.shouldBeView
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class TextTest : AssetTest("reference-assets") {
+class TextTest : AssetTest("text") {
 
     @Test
     fun basic() {

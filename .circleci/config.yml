@@ -16,7 +16,7 @@ orbs:
 executors:
   base:
     docker:
-      - image: docker.io/playerui/bazel-docker:10
+      - image: docker.io/playerui/bazel-docker
     working_directory: ~/player
     resource_class: xlarge
     environment:
@@ -50,8 +50,14 @@ commands:
             - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
             - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
 
-      - run: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:hUAWVYdfSW5ml6ufbfyEHUcuPwUJ88xVhsZc21b2lA8"
+
+      - run: mkdir -p ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run: echo "//registry.npmjs.com/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      - run: git config --global user.name "Intuit Service"
+      - run: git config --global user.email "opensource-svc@intuit.com"
       - run: |
             echo -e $GPG_KEY | gpg --import --batch
             echo -e "pinentry-mode loopback\npassphrase $DEPLOY_MAVEN_GPG_PASSPHRASE" > ~/.gnupg/gpg.conf
@@ -95,7 +101,7 @@ jobs:
       - attach_workspace:
           at: ~/player
       # need to filter because //android/demo rules dont resolve
-      - run: bazel build --config=ci -- $(bazel query '//plugins/... except filter("ios|swiftui|jvm|android", //plugins/...)') $(bazel query '//core/... except filter("ios|swiftui|jvm|android", //core/...)') $(bazel query '//react/... except filter("ios|swiftui|jvm|android", //react/...)')
+      - run: bazel build --config=ci -- $(bazel query 'filter("native_bundle$", //...)')
 
       - save_cache:
           paths:
@@ -119,8 +125,8 @@ jobs:
           name: Homebrew Dependencies
           command: |
             HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk lcov
-            brew install --cask temurin@8
-            sudo installer -pkg /opt/homebrew/Caskroom/temurin@8/8,412,08/OpenJDK8U-jdk_x64_mac_hotspot_8u412b08.pkg -target /
+            wget -P /tmp/temurin https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u422-b05/OpenJDK8U-jdk_x64_mac_hotspot_8u422b05.pkg
+            sudo installer -pkg /tmp/temurin/OpenJDK8U-jdk_x64_mac_hotspot_8u422b05.pkg -target /
 
       - restore_cache:
           keys:
@@ -141,6 +147,11 @@ jobs:
             source $BASH_ENV
           environment:
             JAVA_HOME: /Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home
+
+      - save_cache:
+          key: android-tools-{{ arch }}-{{ checksum "scripts/install-android-tools.sh" }}
+          paths:
+            - ~/android-tools
 
       - macos/preboot-simulator:
           version: "17.4"
@@ -382,6 +393,7 @@ workflows:
                 - /pull\/.*/
           requires:
             - bazelrc
+            - build-trunk
 
       - build_ios:
           name: build-ios-fork
@@ -390,7 +402,7 @@ workflows:
               only:
                 - /pull\/.*/
           requires:
-            - setup
+            - build-fork
 
       - maybe_release:
           filters:
@@ -476,7 +488,7 @@ workflows:
 
       - build_ios:
           requires:
-            - setup
+            - build
 
       - android_test:
           requires:
@@ -507,7 +519,7 @@ workflows:
 
       - build_ios:
           requires:
-            - setup
+            - build
 
       - android_test:
           requires:

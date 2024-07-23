@@ -13,14 +13,14 @@ importers:
   .:
     dependencies:
       '@auto-it/omit-release-notes':
-        specifier: ^11.0.4
-        version: 11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
+        specifier: ^11.2.0
+        version: 11.2.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
       '@auto-it/upload-assets':
-        specifier: ^11.0.4
-        version: 11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
+        specifier: ^11.2.0
+        version: 11.2.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
       '@auto-it/version-file':
-        specifier: ^11.0.4
-        version: 11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
+        specifier: ^11.2.0
+        version: 11.2.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
       '@babel/preset-env':
         specifier: ^7.23.8
         version: 7.24.5(@babel/core@7.24.5)
@@ -93,6 +93,9 @@ importers:
       '@storybook/addon-docs':
         specifier: ^7.6.10
         version: 7.6.19(@types/react-dom@18.3.0)(@types/react@18.3.2)(react-dom@18.3.1)(react@18.3.1)
+      '@storybook/addon-webpack5-compiler-babel':
+        specifier: ^3.0.3
+        version: 3.0.3(webpack@5.91.0)
       '@storybook/builder-vite':
         specifier: ^7.6.10
         version: 7.6.19(typescript@5.5.3)(vite@4.5.3)
@@ -211,8 +214,8 @@ importers:
         specifier: ^1.1.0
         version: 1.1.0
       auto:
-        specifier: ^11.0.4
-        version: 11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
+        specifier: ^11.2.0
+        version: 11.2.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
       autoprefixer:
         specifier: ^10.4.17
         version: 10.4.19(postcss@8.4.38)
@@ -267,6 +270,9 @@ importers:
       framer-motion:
         specifier: ^10.16.4
         version: 10.18.0(react-dom@18.3.1)(react@18.3.1)
+      fuse.js:
+        specifier: ^7.0.0
+        version: 7.0.0
       gh-pages:
         specifier: ^4.0.0
         version: 4.0.0
@@ -372,6 +378,9 @@ importers:
       react-icons:
         specifier: ^4.3.1
         version: 4.12.0(react@18.3.1)
+      react-json-reconciler:
+        specifier: ^2.0.0
+        version: 2.0.0(react@18.3.1)
       react-redux:
         specifier: ^7.2.6
         version: 7.2.9(react-dom@18.3.1)(react@18.3.1)
@@ -565,9 +574,9 @@ importers:
       '@player-ui/reference-assets-plugin-react':
         specifier: workspace:*
         version: link:../../plugins/reference-assets/react
-      '@player-ui/storybook-addon-player':
+      '@player-ui/storybook':
         specifier: workspace:*
-        version: link:../../tools/addon-storybook
+        version: link:../../tools/storybook
 
   plugins/asset-provider/react:
     dependencies:
@@ -589,6 +598,15 @@ importers:
       '@player-ui/types':
         specifier: workspace:*
         version: link:../../../core/types
+
+  plugins/async-node/components:
+    dependencies:
+      '@player-ui/async-node-plugin':
+        specifier: workspace:*
+        version: link:../core
+      '@player-ui/player':
+        specifier: workspace:*
+        version: link:../../../core/player
 
   plugins/async-node/core:
     dependencies:
@@ -973,7 +991,21 @@ importers:
 
   react/subscribe: {}
 
-  tools/addon-storybook:
+  tools/asset-testing-library/core:
+    dependencies:
+      '@player-ui/asset-transform-plugin':
+        specifier: workspace:*
+        version: link:../../../plugins/asset-transform/core
+      '@player-ui/make-flow':
+        specifier: workspace:*
+        version: link:../../../core/make-flow
+      '@player-ui/player':
+        specifier: workspace:*
+        version: link:../../../core/player
+
+  tools/mocks: {}
+
+  tools/storybook:
     dependencies:
       '@player-ui/beacon-plugin-react':
         specifier: workspace:*
@@ -993,20 +1025,6 @@ importers:
       '@player-ui/types':
         specifier: workspace:*
         version: link:../../core/types
-
-  tools/asset-testing-library/core:
-    dependencies:
-      '@player-ui/asset-transform-plugin':
-        specifier: workspace:*
-        version: link:../../../plugins/asset-transform/core
-      '@player-ui/make-flow':
-        specifier: workspace:*
-        version: link:../../../core/make-flow
-      '@player-ui/player':
-        specifier: workspace:*
-        version: link:../../../core/player
-
-  tools/mocks: {}
 
 packages:
 
@@ -1177,13 +1195,13 @@ packages:
       '@jridgewell/trace-mapping': 0.3.25
     dev: false
 
-  /@auto-it/bot-list@11.1.6:
-    resolution: {integrity: sha512-3Qdphiw9JlzYX15moLZSaP+jNuM3UAFDHTgIpsfnfIQwQDNSjZhM4rwxqsAY/r1mJAyxt16c6wbqisi7KNFD/A==, tarball: https://registry.npmjs.org/@auto-it/bot-list/-/bot-list-11.1.6.tgz}
+  /@auto-it/bot-list@11.2.0:
+    resolution: {integrity: sha512-GMJe2L4cq6XdPKytWtuwvKp62SD8x4P3ggZaez747kgD8xt3rBA3s5OkfXacuokvCg+yPuzMbYm9GMiEPd7u4Q==, tarball: https://registry.npmjs.org/@auto-it/bot-list/-/bot-list-11.2.0.tgz}
     engines: {node: '>=10.x'}
     dev: false
 
-  /@auto-it/core@11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3):
-    resolution: {integrity: sha512-bxiUXJVyRYs7Bf4DH/JLT5pdR14RYSpoX0eBw0ilkU9qNqylTCbThuKofM7Bqn7jaQF2PDUoC72c8xCkqvHGQg==, tarball: https://registry.npmjs.org/@auto-it/core/-/core-11.1.6.tgz}
+  /@auto-it/core@11.2.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3):
+    resolution: {integrity: sha512-ZR4SGZvambY/FjgCqVenMhsntWLhZuXqPJFSuirgBoFoyHQcC0CbhS/yVOGsy7h70Qg5Cle6R6vyweTU5si+DA==, tarball: https://registry.npmjs.org/@auto-it/core/-/core-11.2.0.tgz}
     peerDependencies:
       '@types/node': '*'
       typescript: '>=2.7'
@@ -1191,7 +1209,7 @@ packages:
       '@types/node':
         optional: true
     dependencies:
-      '@auto-it/bot-list': 11.1.6
+      '@auto-it/bot-list': 11.2.0
       '@endemolshinegroup/cosmiconfig-typescript-loader': 3.0.2(cosmiconfig@7.0.0)(typescript@5.5.3)
       '@octokit/core': 3.6.0
       '@octokit/plugin-enterprise-compatibility': 1.3.0
@@ -1240,11 +1258,11 @@ packages:
       - supports-color
     dev: false
 
-  /@auto-it/npm@11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3):
-    resolution: {integrity: sha512-eFWzR+6N1lMSXi32BunnlIdXIFikX6mieaFLmPk9VNM4vOXqsfkc7BQ0xhsZRsn5sxSR/XBwlQXoExAHybjs3g==, tarball: https://registry.npmjs.org/@auto-it/npm/-/npm-11.1.6.tgz}
+  /@auto-it/npm@11.2.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3):
+    resolution: {integrity: sha512-vuf043mNhpYYxS2QB0cbEq91OxBwbun8bl3AzCaiGsy+jYAxIkx7YsciiSLUIUB29r8VXjeKjjuA7efClyETCg==, tarball: https://registry.npmjs.org/@auto-it/npm/-/npm-11.2.0.tgz}
     dependencies:
-      '@auto-it/core': 11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
-      '@auto-it/package-json-utils': 11.1.6
+      '@auto-it/core': 11.2.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
+      '@auto-it/package-json-utils': 11.2.0
       await-to-js: 3.0.0
       endent: 2.1.0
       env-ci: 5.5.0
@@ -1266,10 +1284,10 @@ packages:
       - typescript
     dev: false
 
-  /@auto-it/omit-release-notes@11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3):
-    resolution: {integrity: sha512-b2F2d1zMQX1P/gH9MYfrO7ydKPaZNCt/mimbjHHk5wG3lgAmc23Pfs8ghRH0LPcZ/7P9mKTGpq79A8MM4jJGLw==, tarball: https://registry.npmjs.org/@auto-it/omit-release-notes/-/omit-release-notes-11.1.6.tgz}
+  /@auto-it/omit-release-notes@11.2.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3):
+    resolution: {integrity: sha512-CASKGYyun/MovDtndNxpjNtWxKCGA1AX/XFHnRimPnBl0KlT4ew6jnidOCrJ90EBO0pkb2OGCvGDqgEdMQlDUA==, tarball: https://registry.npmjs.org/@auto-it/omit-release-notes/-/omit-release-notes-11.2.0.tgz}
     dependencies:
-      '@auto-it/core': 11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
+      '@auto-it/core': 11.2.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
       fp-ts: 2.16.5
       io-ts: 2.2.21(fp-ts@2.16.5)
       tslib: 2.1.0
@@ -1282,19 +1300,19 @@ packages:
       - typescript
     dev: false
 
-  /@auto-it/package-json-utils@11.1.6:
-    resolution: {integrity: sha512-RSXmO+KegaEY7uw1vt8iXL9FShiinFigKNFuIWM9oLSaSHJfeQ2ZD291i9nV+tz86bPGySBb5ktdJ3uo2pAZ+Q==, tarball: https://registry.npmjs.org/@auto-it/package-json-utils/-/package-json-utils-11.1.6.tgz}
+  /@auto-it/package-json-utils@11.2.0:
+    resolution: {integrity: sha512-Rd1379d5FUOdA0+bGelTAXfncZaG+s9LznWAFharbXRYhUM4oxd5Zc5goN7SZ1z14ZGDMRch7G6ejZpF197Qgg==, tarball: https://registry.npmjs.org/@auto-it/package-json-utils/-/package-json-utils-11.2.0.tgz}
     engines: {node: '>=10.x'}
     dependencies:
       parse-author: 2.0.0
       parse-github-url: 1.0.2
     dev: false
 
-  /@auto-it/released@11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3):
-    resolution: {integrity: sha512-RHTSjq5fAQxkhcC84aWItotyPGH67o+bzSxzr9H4mzvP8OrIxj7Jsfmk8wT4rjgupCTl9fu8DiGoCGjcQpCdCw==, tarball: https://registry.npmjs.org/@auto-it/released/-/released-11.1.6.tgz}
+  /@auto-it/released@11.2.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3):
+    resolution: {integrity: sha512-5uvQPtH066Y1SzGCZx4HMJp8DowJ6D6Jk44n/y0AO4NuvPa/YpEat0DQ25rlSSTagxAYKgJz7J0QYrRfdY8AFw==, tarball: https://registry.npmjs.org/@auto-it/released/-/released-11.2.0.tgz}
     dependencies:
-      '@auto-it/bot-list': 11.1.6
-      '@auto-it/core': 11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
+      '@auto-it/bot-list': 11.2.0
+      '@auto-it/core': 11.2.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
       deepmerge: 4.3.1
       fp-ts: 2.16.5
       io-ts: 2.2.21(fp-ts@2.16.5)
@@ -1308,10 +1326,10 @@ packages:
       - typescript
     dev: false
 
-  /@auto-it/upload-assets@11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3):
-    resolution: {integrity: sha512-2QR1j9tR0R+RrNWrvFnZitgeg4xUCvh5GNOL4RQXrqdTsf0ewLhi/70jsXFlyk+32c/JH2e5aK9oCFGmqOCnoA==, tarball: https://registry.npmjs.org/@auto-it/upload-assets/-/upload-assets-11.1.6.tgz}
+  /@auto-it/upload-assets@11.2.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3):
+    resolution: {integrity: sha512-2PU1D7FwaOxo+9TWYDqLXkd2yk66GKHkp4G6Kq7PzoNKknDTw4TBnxBRpUrK7Ci6D/uWy6puIasGoXdP8CKZFw==, tarball: https://registry.npmjs.org/@auto-it/upload-assets/-/upload-assets-11.2.0.tgz}
     dependencies:
-      '@auto-it/core': 11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
+      '@auto-it/core': 11.2.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
       endent: 2.1.0
       fast-glob: 3.3.2
       file-type: 16.5.4
@@ -1328,10 +1346,10 @@ packages:
       - typescript
     dev: false
 
-  /@auto-it/version-file@11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3):
-    resolution: {integrity: sha512-iDAK0IrCYFPDgkX4DGB97VFbiFEfxN+IMW1NiF+Qk7Kd3SX2899vwuFxyVvGwovX7ssuCi/4tSTrvx6PLhH6zw==, tarball: https://registry.npmjs.org/@auto-it/version-file/-/version-file-11.1.6.tgz}
+  /@auto-it/version-file@11.2.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3):
+    resolution: {integrity: sha512-0WIaPGbJ8QXk65AVV/aGK8fJhubYyfxFASSL5ul2uPmp7rvkanmz90/9pHEnoCxZI4NNGEQUpibBxCMlUOd+Lg==, tarball: https://registry.npmjs.org/@auto-it/version-file/-/version-file-11.2.0.tgz}
     dependencies:
-      '@auto-it/core': 11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
+      '@auto-it/core': 11.2.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
       fp-ts: 2.16.5
       io-ts: 2.2.21(fp-ts@2.16.5)
       semver: 7.6.2
@@ -5160,7 +5178,7 @@ packages:
       '@octokit/request-error': 2.1.0
       '@octokit/types': 6.41.0
       is-plain-object: 5.0.0
-      node-fetch: 2.6.7
+      node-fetch: 2.7.0
       universal-user-agent: 6.0.1
     transitivePeerDependencies:
       - encoding
@@ -6276,6 +6294,17 @@ packages:
       - '@types/react-dom'
       - encoding
       - supports-color
+    dev: false
+
+  /@storybook/addon-webpack5-compiler-babel@3.0.3(webpack@5.91.0):
+    resolution: {integrity: sha512-rVQTTw+oxJltbVKaejIWSHwVKOBJs3au21f/pYXhV0aiNgNhxEa3vr79t/j0j8ox8uJtzM8XYOb7FlkvGfHlwQ==, tarball: https://registry.npmjs.org/@storybook/addon-webpack5-compiler-babel/-/addon-webpack5-compiler-babel-3.0.3.tgz}
+    engines: {node: '>=18'}
+    dependencies:
+      '@babel/core': 7.24.5
+      babel-loader: 9.1.3(@babel/core@7.24.5)(webpack@5.91.0)
+    transitivePeerDependencies:
+      - supports-color
+      - webpack
     dev: false
 
   /@storybook/blocks@7.6.19(@types/react-dom@18.3.0)(@types/react@18.3.2)(react-dom@18.3.1)(react@18.3.1):
@@ -8575,15 +8604,15 @@ packages:
     engines: {node: '>=0.8'}
     dev: false
 
-  /auto@11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3):
-    resolution: {integrity: sha512-GKeZbFWPp7V9d+yWuFvaffVNyLSGFpR/+SrzXt29YKhg8axx5bKQKzbBN0eSzX5DLmhBwS81tWXS+SYpECil9Q==, tarball: https://registry.npmjs.org/auto/-/auto-11.1.6.tgz}
+  /auto@11.2.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3):
+    resolution: {integrity: sha512-cQv+X2fLJtc/UATPpjQjQ9MqCxXZkl+mHSo1hZs3rZDWrUCP+SZUfevns9N8bfgSIGhaGau0CMgHScuVbvqz9A==, tarball: https://registry.npmjs.org/auto/-/auto-11.2.0.tgz}
     engines: {node: '>=10.x'}
     hasBin: true
     dependencies:
-      '@auto-it/core': 11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
-      '@auto-it/npm': 11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
-      '@auto-it/released': 11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
-      '@auto-it/version-file': 11.1.6(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
+      '@auto-it/core': 11.2.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
+      '@auto-it/npm': 11.2.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
+      '@auto-it/released': 11.2.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
+      '@auto-it/version-file': 11.2.0(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
       await-to-js: 3.0.0
       chalk: 4.1.2
       command-line-application: 0.10.1
@@ -11391,6 +11420,11 @@ packages:
 
   /functions-have-names@1.2.3:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==, tarball: https://registry.npmjs.org/functions-have-names/-/functions-have-names-1.2.3.tgz}
+    dev: false
+
+  /fuse.js@7.0.0:
+    resolution: {integrity: sha512-14F4hBIxqKvD4Zz/XjDc3y94mNZN6pRv3U13Udo0lNLCWRBUsrMv2xwcF/y/Z5sV6+FQW+/ow68cHpm4sunt8Q==, tarball: https://registry.npmjs.org/fuse.js/-/fuse.js-7.0.0.tgz}
+    engines: {node: '>=10'}
     dev: false
 
   /gensync@1.0.0-beta.2:
