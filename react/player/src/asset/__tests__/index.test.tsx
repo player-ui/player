@@ -50,7 +50,7 @@ test("throws an error for an asset missing implementation or not registered", ()
       </AssetContext.Provider>,
     ),
   )
-    .toThrowError(`No implementation found for id: bar-id type: bar. Did you mean bar1? \n 
+    .toThrowError(`No implementation found for id: bar-id type: bar. Did you mean {"type":"bar1","key":"bar-key"}? \n 
       Registered Asset matching functions are listed below: \n
       [{"type":"bar1","key":"bar-key"},{"type":"foo","key":"foo-key"}]`);
 });

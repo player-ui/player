@@ -27,7 +27,6 @@ js_pipeline(
         ":node_modules/@player-ui/react-subscribe",
         "//:node_modules/react-error-boundary",
         "//:node_modules/tapable-ts",
-        "//:node_modules/string-similarity",
-        "//:node_modules/@types/string-similarity",
+        "//:node_modules/fuse.js",
     ],
 )

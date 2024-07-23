@@ -189,9 +189,6 @@ importers:
       '@types/std-mocks':
         specifier: ^1.0.1
         version: 1.0.4
-      '@types/string-similarity':
-        specifier: ^4.0.2
-        version: 4.0.2
       '@types/uuid':
         specifier: ^8.3.4
         version: 8.3.4
@@ -270,6 +267,9 @@ importers:
       framer-motion:
         specifier: ^10.16.4
         version: 10.18.0(react-dom@18.3.1)(react@18.3.1)
+      fuse.js:
+        specifier: ^7.0.0
+        version: 7.0.0
       gh-pages:
         specifier: ^4.0.0
         version: 4.0.0
@@ -444,9 +444,6 @@ importers:
       storybook:
         specifier: ^7.6.10
         version: 7.6.19
-      string-similarity:
-        specifier: ^4.0.4
-        version: 4.0.4
       style-loader:
         specifier: ^3.3.4
         version: 3.3.4(webpack@5.91.0)
@@ -7681,10 +7678,6 @@ packages:
     resolution: {integrity: sha512-rtIF2umvrhu7jdIfMQDnGOG98x30s5nZnq1Llvw/DXDGoT2/InGOoWKLbHetRl+Fn6LBzVEqrPx5HdwMC+dh7A==, tarball: https://registry.npmjs.org/@types/std-mocks/-/std-mocks-1.0.4.tgz}
     dev: false
 
-  /@types/string-similarity@4.0.2:
-    resolution: {integrity: sha512-LkJQ/jsXtCVMK+sKYAmX/8zEq+/46f1PTQw7YtmQwb74jemS1SlNLmARM2Zml9DgdDTWKAtc5L13WorpHPDjDA==, tarball: https://registry.npmjs.org/@types/string-similarity/-/string-similarity-4.0.2.tgz}
-    dev: false
-
   /@types/unist@2.0.10:
     resolution: {integrity: sha512-IfYcSBWE3hLpBg8+X2SEa8LVkJdJEkT2Ese2aaLs3ptGdVtABxndrMaxuFlQ1qdFf9Q5rDvDpxI3WwgvKFAsQA==, tarball: https://registry.npmjs.org/@types/unist/-/unist-2.0.10.tgz}
     dev: false
@@ -11413,6 +11406,11 @@ packages:
 
   /functions-have-names@1.2.3:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==, tarball: https://registry.npmjs.org/functions-have-names/-/functions-have-names-1.2.3.tgz}
+    dev: false
+
+  /fuse.js@7.0.0:
+    resolution: {integrity: sha512-14F4hBIxqKvD4Zz/XjDc3y94mNZN6pRv3U13Udo0lNLCWRBUsrMv2xwcF/y/Z5sV6+FQW+/ow68cHpm4sunt8Q==, tarball: https://registry.npmjs.org/fuse.js/-/fuse.js-7.0.0.tgz}
+    engines: {node: '>=10'}
     dev: false
 
   /gensync@1.0.0-beta.2:
@@ -17103,11 +17101,6 @@ packages:
   /string-argv@0.3.1:
     resolution: {integrity: sha512-a1uQGz7IyVy9YwhqjZIZu1c8JO8dNIe20xBmSS6qu9kv++k3JGzCVmprbNN5Kn+BgzD5E7YYwg1CcjuJMRNsvg==, tarball: https://registry.npmjs.org/string-argv/-/string-argv-0.3.1.tgz}
     engines: {node: '>=0.6.19'}
-    dev: false
-
-  /string-similarity@4.0.4:
-    resolution: {integrity: sha512-/q/8Q4Bl4ZKAPjj8WerIBJWALKkaPRfrvhfF8k/B23i4nzrlRj2/go1m90In7nG/3XDSbOo0+pu6RvCTM9RGMQ==, tarball: https://registry.npmjs.org/string-similarity/-/string-similarity-4.0.4.tgz}
-    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
     dev: false
 
   /string-width@4.2.3:
