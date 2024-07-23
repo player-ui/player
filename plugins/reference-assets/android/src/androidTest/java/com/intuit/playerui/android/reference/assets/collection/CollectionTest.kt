@@ -12,7 +12,7 @@ import com.intuit.playerui.core.player.state.InProgressState
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class CollectionTest : AssetTest("reference-assets") {
+class CollectionTest : AssetTest("collection") {
 
     @Test
     fun basic() {

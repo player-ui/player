@@ -1,11 +1,15 @@
 load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@rules_player//javascript:defs.bzl", "create_package_json")
+load("@aspect_rules_js//js:defs.bzl", "js_binary")
 load("@npm//:tsup/package_json.bzl", tsup_bin = "bin")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
 npm_link_all_packages(
     name = "node_modules",
 )
+
+name = "storybook"
 
 dependencies = [
     "//:node_modules/@storybook/manager-api",
@@ -24,8 +28,11 @@ dev_dependencies = [
     "//:node_modules/@storybook/preview",
 ]
 
+tsup_name = name + "_tsup"
+tsup_target = ":" + tsup_name
+
 tsup_bin.tsup_node(
-    name = "addon-storybook-tsup",
+    name = tsup_name,
     srcs = glob(["src/**"]) + [
         "package.json",
         "tsconfig.json",
@@ -40,22 +47,55 @@ tsup_bin.tsup_node(
     chdir = package_name(),
 )
 
+package_json_name = name + "_package_json"
+package_json_target = ":" + package_json_name
+
+create_package_json(
+    name = package_json_name,
+    base_package_json = "package.json",
+    root_package_json = "//:package.json",
+    dependencies = dependencies,
+    stamp = -1,
+    substitutions = {
+        "0.0.0-PLACEHOLDER": "{STABLE_VERSION}",
+    },
+    custom_entrypoints = True,
+)
+
+library_name = name + "_library"
+library_target = ":" + library_name
+
 js_library(
-    name = "addon-storybook-library",
+    name = library_name,
     srcs = glob(["src/**"]) + [
         "manager.mjs",
-        "package.json",
         "preview.mjs",
-        ":addon-storybook-tsup",
+        tsup_target,
+        package_json_target,
     ],
 )
 
+pkg_name = name
+pkg_target = ":" + pkg_name
+
 npm_package(
-    name = "addon-storybook",
+    name = pkg_name,
+    package = pkg_name,
     srcs = [
-        ":addon-storybook-library",
-        ":addon-storybook-tsup",
+        library_target
     ],
-    package = "@player-ui/storybook-addon-player",
+    allow_overwrites = True,
+    replace_prefixes = {
+        package_json_name: "package",
+    },
     visibility = ["//visibility:public"],
+)
+
+js_binary(
+    name = name + ".npm-publish",
+    chdir = package_name() + "/" + pkg_name,
+    data = [pkg_target],
+    entry_point = "@aspect_rules_js//npm/private:npm_publish_mjs",
+    # required to make npm to be available in PATH
+    include_npm = True,
 )

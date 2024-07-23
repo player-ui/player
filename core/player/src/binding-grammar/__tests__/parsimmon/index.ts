@@ -1,14 +1,14 @@
 import flatten from "arr-flatten";
 import type { Parser } from "parsimmon";
 import P from "parsimmon";
-import type { Parser as BindingParser } from "../ast";
+import type { Parser as BindingParser } from "../../ast";
 import {
   toValue,
   toConcatenatedNode,
   toQuery,
   toPath,
   toExpression,
-} from "../ast";
+} from "../../ast";
 
 const doubleQuote = P.string('"');
 const singleQuote = P.string("'");

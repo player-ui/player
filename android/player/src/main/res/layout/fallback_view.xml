@@ -1,11 +1,10 @@
-<layout>
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="match_parent">
 
-        <TextView
+    <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -15,7 +14,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+    <TextView
             android:id="@+id/error"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,7 +28,7 @@
             app:layout_constraintTop_toBottomOf="@+id/title"
             tools:text="This is my error" />
 
-        <Button
+    <Button
             android:id="@+id/retry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -37,12 +36,11 @@
             android:text="Retry"
             app:layout_constraintTop_toBottomOf="@+id/error" />
 
-        <Button
+    <Button
             android:id="@+id/reset"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Reset"
             app:layout_constraintTop_toBottomOf="@+id/retry" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+</androidx.constraintlayout.widget.ConstraintLayout>

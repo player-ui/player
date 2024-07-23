@@ -26,7 +26,9 @@ abstract class AssetUITest(val group: String? = null) {
 
     protected val currentState: PlayerFlowState? get() = playerViewModel.playerFlowState.value
 
-    protected val mocks get() = viewModel.mocks
+    protected val mocks get() = viewModel.mocks.filter {
+        group == null || group == it.group
+    }
 
     @Before
     fun before() {
