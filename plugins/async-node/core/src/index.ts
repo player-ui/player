@@ -4,6 +4,7 @@ import type {
   PlayerPlugin,
   Node,
   ParseObjectOptions,
+  ParseObjectChildOptions,
   ViewInstance,
   Parser,
   ViewPlugin,
@@ -142,39 +143,52 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     return node?.type === NodeType.Async;
   }
 
+  private isDeterminedAsync(obj: any) {
+    return obj && Object.prototype.hasOwnProperty.call(obj, "async");
+  }
+
   applyParser(parser: Parser) {
-    parser.hooks.determineNodeType.tap(this.name, (obj) => {
-      if (Object.prototype.hasOwnProperty.call(obj, "async")) {
-        return NodeType.Async;
-      }
-    });
     parser.hooks.parseNode.tap(
       this.name,
       (
         obj: any,
         nodeType: Node.ChildrenTypes,
         options: ParseObjectOptions,
-        determinedNodeType: null | NodeType,
+        childOptions?: ParseObjectChildOptions,
       ) => {
-        if (determinedNodeType === NodeType.Async) {
+        if (this.isDeterminedAsync(obj)) {
           const parsedAsync = parser.parseObject(
             omit(obj, "async"),
             nodeType,
             options,
           );
           const parsedNodeId = getNodeID(parsedAsync);
-          if (parsedAsync !== null && parsedNodeId) {
-            return parser.createASTNode(
-              {
-                id: parsedNodeId,
-                type: NodeType.Async,
-                value: parsedAsync,
-              },
-              obj,
-            );
+
+          if (parsedAsync === null || !parsedNodeId) {
+            return childOptions ? [] : null;
           }
 
-          return null;
+          const asyncAST = parser.createASTNode(
+            {
+              id: parsedNodeId,
+              type: NodeType.Async,
+              value: parsedAsync,
+            },
+            obj,
+          );
+
+          if (childOptions) {
+            return asyncAST
+              ? [
+                  {
+                    path: [...childOptions.path, childOptions.key],
+                    value: asyncAST,
+                  },
+                ]
+              : [];
+          }
+
+          return asyncAST;
         }
       },
     );
