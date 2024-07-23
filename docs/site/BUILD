@@ -1,10 +1,14 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//:webpack-cli/package_json.bzl", webpack_bin = "bin")
 load("@npm//:webpack-dev-server/package_json.bzl", webpack_dev_server_bin = "bin")
+# load("@build_bazel_rules_nodejs//toolchains/esbuild:esbuild_repositories.bzl", "esbuild_repositories")
+# load("@aspect_rules_esbuild//esbuild/private:esbuild.bzl", "esbuild_bundle")
+
 
 npm_link_all_packages(
     name = "node_modules",
 )
+
 
 srcs = glob([
     "public/**/*",
