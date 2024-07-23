@@ -106,9 +106,9 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
    * Handles the asynchronous API integration for resolving nodes.
    * This method sets up a hook on the resolver's `beforeResolve` event to process async nodes.
    * @param resolver The resolver instance to attach the hook to.
-   * @param view The current view instance.
+   * @param view
    */
-  private applyResolver(resolver: Resolver, view: ViewInstance | undefined) {
+  applyResolver(resolver: Resolver, view: ViewInstance) {
     resolver.hooks.beforeResolve.tap(this.name, (node, options) => {
       let resolvedNode;
       if (this.isAsync(node)) {
@@ -180,15 +180,11 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     );
   }
 
-  applyResolverHooks(resolver: Resolver) {
-    this.applyResolver(resolver, this.currentView);
-  }
-
   apply(view: ViewInstance): void {
     view.hooks.parser.tap("template", this.applyParser.bind(this));
-    view.hooks.resolver.tap("template", (resolver) => {
-      this.applyResolver(resolver, view);
-    });
+    view.hooks.resolver.tap("template", (resolver) =>
+      this.applyResolver(resolver, view),
+    );
   }
 
   applyPlugin(asyncNodePlugin: AsyncNodePlugin): void {
