@@ -1,5 +1,5 @@
 main_exports = [
-    "//jvm/j2v8:j2v8-android",
+    "//jvm/j2v8:j2v8-android-debug",
 ]
 
 main_deps = main_exports + [
