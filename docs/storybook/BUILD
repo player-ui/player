@@ -52,10 +52,6 @@ storybook_bin.storybook(
         "src/**/*",
         ".storybook/*",
     ]) + deps,
-    chdir = package_name(),
-    env = {
-        "CACHE_DIR": ".cache",
-    },
     args = [
         "build",
         "--output-dir",
@@ -63,6 +59,10 @@ storybook_bin.storybook(
         "--debug",
         "--disable-telemetry",
     ],
+    chdir = package_name(),
+    env = {
+        "CACHE_DIR": ".cache",
+    },
     out_dirs = ["storybook"],
     visibility = ["//visibility:public"],
 )
