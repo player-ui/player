@@ -108,7 +108,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
    * @param resolver The resolver instance to attach the hook to.
    * @param view
    */
-  applyResolver(resolver: Resolver, view: ViewInstance) {
+  applyResolver(resolver: Resolver) {
     resolver.hooks.beforeResolve.tap(this.name, (node, options) => {
       let resolvedNode;
       if (this.isAsync(node)) {
@@ -126,10 +126,10 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
           const result = await this.basePlugin?.hooks.onAsyncNode.call(
             node,
             (result) => {
-              this.handleAsyncUpdate(node, result, options, view);
+              this.handleAsyncUpdate(node, result, options, this.currentView);
             },
           );
-          this.handleAsyncUpdate(node, result, options, view);
+          this.handleAsyncUpdate(node, result, options, this.currentView);
         });
 
         return node;
@@ -181,10 +181,9 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
   }
 
   apply(view: ViewInstance): void {
-    view.hooks.parser.tap("template", this.applyParser.bind(this));
-    view.hooks.resolver.tap("template", (resolver) =>
-      this.applyResolver(resolver, view),
-    );
+    this.currentView = view;
+    view.hooks.parser.tap("async", this.applyParser.bind(this));
+    view.hooks.resolver.tap("async", this.applyResolver.bind(this));
   }
 
   applyPlugin(asyncNodePlugin: AsyncNodePlugin): void {
