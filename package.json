@@ -14,7 +14,7 @@
     "test": "bazel test -- $(bazel query \"kind(nodejs_test, //...)\" --output label 2>/dev/null | tr '\\n' ' ')"
   },
   "engines": {
-    "node": "^18.8.0",
+    "node": "^20.14.0",
     "pnpm": "^8.9.2"
   },
   "packageManager": "pnpm@8.9.2",
@@ -179,7 +179,7 @@
     "tsconfig-paths-webpack-plugin": "^4.1.0",
     "tslib": "^2.6.2",
     "tsup": "^8.0.1",
-    "typescript": "5.3.2",
+    "typescript": "5.5.3",
     "uuid": "^8.3.2",
     "vite": "^4.0.0",
     "vitest": "^1.0.2",
@@ -188,9 +188,8 @@
     "webpack-dev-server": "^5.0.4"
   },
   "volta": {
-    "node": "18.18.0",
-    "yarn": "1.22.19",
-    "pnpm": "8.9.2"
+    "node": "20.14.0",
+    "pnpm": "8.15.1"
   },
   "resolutions": {
     "esbuild": "0.19.8",

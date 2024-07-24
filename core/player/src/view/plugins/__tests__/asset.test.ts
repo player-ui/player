@@ -14,8 +14,6 @@ import {
   SwitchPlugin,
 } from "..";
 
-const parseBinding = new BindingParser().parse;
-
 describe("asset", () => {
   let parser: Parser;
 
@@ -72,6 +70,7 @@ describe("asset", () => {
   });
 
   it("template", () => {
+    const parseBinding = new BindingParser().parse;
     const model: DataModelWithParser = withParser(
       new LocalModel(),
       parseBinding,

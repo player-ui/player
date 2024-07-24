@@ -54,7 +54,7 @@ export default class ApplicabilityPlugin implements ViewPlugin {
           );
 
           if (!parsedApplicability) {
-            return childOptions ? [] : undefined;
+            return childOptions ? [] : null;
           }
 
           const applicabilityNode = parser.createASTNode(
@@ -67,7 +67,7 @@ export default class ApplicabilityPlugin implements ViewPlugin {
           );
 
           if (!applicabilityNode) {
-            return childOptions ? [] : undefined;
+            return childOptions ? [] : null;
           }
 
           if (applicabilityNode.type === NodeType.Applicability) {

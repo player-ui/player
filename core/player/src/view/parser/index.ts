@@ -96,15 +96,12 @@ export class Parser {
       obj,
       type,
       options,
-    ) as Node.Node;
+    ) as Node.Node | null;
 
-    if (parsedNode) {
+    if (parsedNode || parsedNode === null) {
       return parsedNode;
     }
 
-    /**
-     *
-     */
     const parseLocalObject = (
       currentValue: any,
       objToParse: unknown,
