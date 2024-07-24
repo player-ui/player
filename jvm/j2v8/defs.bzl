@@ -15,7 +15,7 @@ deps = {
         "//jvm/j2v8:j2v8_script_provider"
     ],
     "android-debug": [
-        "//jvm/j2v8:j2v8-android",
+        "@maven//:com_eclipsesource_j2v8_j2v8",
         "@maven//:com_github_AlexTrotsenko_j2v8_debugger",
     ],
     "all": [
