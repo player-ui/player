@@ -5,6 +5,9 @@ import { Action } from "@player-ui/reference-assets-plugin-react";
 const meta: Meta<typeof Action> = {
   title: "Reference Assets/Action",
   component: Action,
+  parameters: {
+    assetDocs: ["ActionAsset"],
+  },
 };
 
 export default meta;
@@ -23,10 +26,6 @@ export const Navigation = createDSLStory(
 
 export const TransitionToEnd = () => (
   <PlayerStory
-    flow={() =>
-      import(
-        "@player-ui/mocks/action/action-transition-to-end.json"
-      )
-    }
+    flow={() => import("@player-ui/mocks/action/action-transition-to-end.json")}
   />
 );

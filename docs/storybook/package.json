@@ -5,6 +5,7 @@
   "dependencies": {
     "@player-ui/common-types-plugin": "workspace:*",
     "@player-ui/make-flow": "workspace:*",
+    "@player-ui/reference-assets-plugin": "workspace:*",
     "@player-ui/reference-assets-plugin-react": "workspace:*",
     "@player-ui/data-change-listener-plugin": "workspace:*",
     "@player-ui/computed-properties-plugin": "workspace:*",

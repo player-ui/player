@@ -15,6 +15,8 @@ dependencies = [
     "//:node_modules/@storybook/preview-api",
     "//:node_modules/@storybook/types",
     "//:node_modules/@storybook/components",
+    "//:node_modules/@player-tools/xlr",
+    "//:node_modules/@player-tools/xlr-utils",
     ":node_modules/@player-ui/react",
     ":node_modules/@player-ui/beacon-plugin-react",
     ":node_modules/@player-ui/make-flow",

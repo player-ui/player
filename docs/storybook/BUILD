@@ -8,6 +8,7 @@ npm_link_all_packages(
 deps = [
     ":node_modules/@player-ui/common-types-plugin",
     ":node_modules/@player-ui/make-flow",
+    ":node_modules/@player-ui/reference-assets-plugin",
     ":node_modules/@player-ui/reference-assets-plugin-react",
     ":node_modules/@player-ui/mocks",
     ":node_modules/@player-ui/reference-assets-plugin-components",

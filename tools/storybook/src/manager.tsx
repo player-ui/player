@@ -5,17 +5,30 @@ import {
   ADDON_ID,
   EVENT_PANEL_ID,
   FLOW_PANEL_ID,
+  DOCS_PANEL_ID,
   FLOW_REFRESH_TOOL_ID,
   RENDER_SELECT_TOOL_ID,
 } from "./addons/constants";
 import { EditorPanel } from "./addons/editor";
 import { EventsPanel } from "./addons/events";
+import { DocsPanel } from "./addons/docs";
 import { FlowRefresh } from "./addons/refresh";
 import { RenderSelection } from "./addons/appetize";
 import { StateProvider } from "./redux";
 
 export const register = () => {
   addons.register(ADDON_ID, () => {
+    addons.add(DOCS_PANEL_ID, {
+      type: Addon_TypesEnum.PANEL,
+      title: "Asset Docs",
+      match: ({ viewMode }) => viewMode === "story",
+      render: ({ active }) => (
+        <StateProvider>
+          <DocsPanel active={active} />
+        </StateProvider>
+      ),
+    });
+
     addons.add(EVENT_PANEL_ID, {
       type: Addon_TypesEnum.PANEL,
       title: "Events",
