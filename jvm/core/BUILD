@@ -5,7 +5,7 @@ load(":deps.bzl", "main_deps", "main_exports", "test_deps")
 kt_player_module(
     name = "core",
     deploy_env = [
-        "@com_github_jetbrains_kotlin//:kotlin-stdlib",
+        "@rules_kotlin//kotlin/compiler:kotlin-stdlib",
     ],
     main_deps = main_deps,
     main_exports = main_exports,
