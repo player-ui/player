@@ -32,11 +32,15 @@ android_library(
     resource_files = glob(["src/main/res/**"]),
     manifest = ":src/main/AndroidManifest.xml",
     tags = ["maven_coordinates=com.intuit.playerui:android:aar:%s" % VERSION],
-    deps = main_deps,
+    deps = main_deps + select({
+        ":dev": dev_exports,
+        ":prod": main_exports,
+        "//conditions:default": dev_exports,
+    }),
     exports = [":player_android"] + select({
         ":dev": dev_exports,
         ":prod": main_exports,
-        "//conditions:default": main_exports,
+        "//conditions:default": dev_exports,
     }),
     visibility = ["//visibility:public"],
 )
