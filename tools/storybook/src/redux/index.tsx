@@ -237,14 +237,20 @@ const eventsReducer = createReducer<Array<EventType>>([], (builder) => {
 });
 
 const STATE_SYNC_CHANNEL_NAME = (() => {
-  if (window?.sessionStorage.getItem("player:channel")) {
+  if (
+    typeof window !== "undefined" &&
+    window.sessionStorage.getItem("player:channel")
+  ) {
     return window?.sessionStorage.getItem("player:channel") as string;
   }
 
   const channel =
     Math.random().toString(36).substring(2, 15) +
     Math.random().toString(36).substring(2, 15);
-  window?.sessionStorage.setItem("player:channel", channel);
+
+  if (typeof window !== "undefined") {
+    window?.sessionStorage.setItem("player:channel", channel);
+  }
 
   return channel;
 })();
