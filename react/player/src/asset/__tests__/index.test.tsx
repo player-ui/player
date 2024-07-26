@@ -30,7 +30,7 @@ test("it prioritizes local type and id", () => {
   expect(asset.getByText("foo")).not.toBeUndefined();
 });
 
-test("throws an error for an asset missing implementation or not registered", () => {
+test("throws an error for an asset missing implementation or not registered WITHOUT similar matching type", () => {
   const assetDef = {
     asset: {
       id: "bar-id",
@@ -51,6 +51,31 @@ test("throws an error for an asset missing implementation or not registered", ()
     ),
   )
     .toThrowError(`No implementation found for id: bar-id type: test. Did you mean bar? \n 
+      Registered Asset matching functions are listed below: \n
+      [{"type":"foo","key":"foo-key"},{"type":"bar","key":"bar-key"}]`);
+});
+
+test("throws an error for an asset missing implementation or not registered WITH similar matching type", () => {
+  const assetDef = {
+    asset: {
+      id: "foo-id",
+      type: "foo1",
+    },
+  } as unknown as AssetType;
+
+  const registry: AssetRegistryType = new Registry([
+    [{ type: "bar", key: "bar-key" }, () => <div>bar</div>],
+    [{ type: "foo", key: "foo-key" }, () => <div>foo</div>],
+  ]);
+
+  expect(() =>
+    render(
+      <AssetContext.Provider value={{ registry }}>
+        <ReactAsset {...assetDef} />
+      </AssetContext.Provider>,
+    ),
+  )
+    .toThrowError(`No implementation found for id: foo-id type: foo1. Did you mean foo? \n 
       Registered Asset matching functions are listed below: \n
       [{"type":"foo","key":"foo-key"},{"type":"bar","key":"bar-key"}]`);
 });
