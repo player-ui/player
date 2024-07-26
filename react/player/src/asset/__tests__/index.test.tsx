@@ -34,13 +34,13 @@ test("throws an error for an asset missing implementation or not registered", ()
   const assetDef = {
     asset: {
       id: "bar-id",
-      type: "bar",
+      type: "test",
     },
   } as unknown as AssetType;
 
   const registry: AssetRegistryType = new Registry([
+    [{ type: "bar", key: "bar-key" }, () => <div>bar</div>],
     [{ type: "foo", key: "foo-key" }, () => <div>foo</div>],
-    [{ type: "bar1", key: "bar-key" }, () => <div>bar</div>],
   ]);
 
   expect(() =>
@@ -50,9 +50,9 @@ test("throws an error for an asset missing implementation or not registered", ()
       </AssetContext.Provider>,
     ),
   )
-    .toThrowError(`No implementation found for id: bar-id type: bar. Did you mean {"type":"bar1","key":"bar-key"}? \n 
+    .toThrowError(`No implementation found for id: bar-id type: test. Did you mean bar? \n 
       Registered Asset matching functions are listed below: \n
-      [{"type":"bar1","key":"bar-key"},{"type":"foo","key":"foo-key"}]`);
+      [{"type":"foo","key":"foo-key"},{"type":"bar","key":"bar-key"}]`);
 });
 
 test("throws an error for an asset missing type", () => {

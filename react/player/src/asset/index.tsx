@@ -1,7 +1,7 @@
 import React from "react";
+import leven from "leven";
 import type { Asset as AssetType, AssetWrapper } from "@player-ui/player";
 import type { Registry } from "@player-ui/partial-match-registry";
-import Fuse from "fuse.js";
 
 export type AssetRegistryType = Registry<React.ComponentType<any>>;
 
@@ -66,10 +66,15 @@ export const ReactAsset = (
       matchList.push(asset.key);
     });
 
-    const fuse = new Fuse(matchList, { keys: ["type", "key"] });
-    const similarType = JSON.stringify(
-      fuse.search(unwrapped.type as string)[0].item,
+    const typeList = matchList.map(
+      (match) => JSON.parse(JSON.stringify(match)).type,
     );
+
+    const similarType = typeList.reduce((prev, curr) => {
+      return leven(unwrapped.type, prev) < leven(unwrapped.type, curr)
+        ? prev
+        : curr;
+    }, typeList[0]);
 
     throw Error(
       `No implementation found for id: ${unwrapped.id} type: ${unwrapped.type}. Did you mean ${similarType}? \n 
