@@ -13,6 +13,13 @@
     "./package.json": "./package.json"
   },
   "main": "./src/index.ts",
+  "files": [
+    "src",
+    "dist",
+    "types",
+    "preview.mjs",
+    "manager.mjs"
+  ],
   "dependencies": {
     "@player-ui/beacon-plugin-react": "workspace:*",
     "@player-ui/make-flow": "workspace:*",
