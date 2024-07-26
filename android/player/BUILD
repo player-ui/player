@@ -18,12 +18,12 @@ kt_android_library(
 
 config_setting(
     name = "dev",
-    values = {"define": "env=dev"},
+    values = {"define": "build_type=debug"},
 )
 
 config_setting(
     name = "prod",
-    values = {"define": "env=prod"},
+    values = {"define": "build_type=release"},
 )
 
 android_library(
