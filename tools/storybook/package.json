@@ -18,9 +18,5 @@
     "@player-ui/make-flow": "workspace:*",
     "@player-ui/react": "workspace:*",
     "@player-ui/metrics-plugin-react": "workspace:*"
-  },
-  "peerDependencies": {
-    "@player-ui/player": "workspace:*",
-    "@player-ui/types": "workspace:*"
   }
 }

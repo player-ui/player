@@ -11,20 +11,40 @@ npm_link_all_packages(
 name = "storybook"
 
 dependencies = [
+    ":node_modules/@player-ui/react",
+    ":node_modules/@player-ui/beacon-plugin-react",
+    ":node_modules/@player-ui/make-flow",
+    ":node_modules/@player-ui/metrics-plugin-react",
     "//:node_modules/@storybook/manager-api",
     "//:node_modules/@storybook/preview-api",
     "//:node_modules/@storybook/types",
     "//:node_modules/@storybook/components",
     "//:node_modules/@player-tools/xlr",
     "//:node_modules/@player-tools/xlr-utils",
-    ":node_modules/@player-ui/react",
-    ":node_modules/@player-ui/beacon-plugin-react",
-    ":node_modules/@player-ui/make-flow",
-    ":node_modules/@player-ui/metrics-plugin-react",
+    "//:node_modules/@types/react-redux",
+    "//:node_modules/react-redux",
+    "//:node_modules/redux-state-sync",
+    "//:node_modules/lz-string",
+    "//:node_modules/dequal",
+    "//:node_modules/@babel/preset-typescript",
+    "//:node_modules/@babel/preset-env",
+    "//:node_modules/uuid",
+    "//:node_modules/clsx",
+    "//:node_modules/@player-tools/dsl",
+    "//:node_modules/@reduxjs/toolkit",
+    "//:node_modules/@monaco-editor/react",
+    "//:node_modules/esbuild-wasm",
+    "//:node_modules/@devtools-ds/table",
+    "//:node_modules/dlv",
+    "//:node_modules/ts-loader",
+    "//:node_modules/tslib",
 ]
 
 dev_dependencies = [
     "//:node_modules/tsup",
+]
+
+peer_deps = [
     "//:node_modules/typescript",
     "//:node_modules/@storybook/manager",
     "//:node_modules/@storybook/preview",
@@ -40,7 +60,7 @@ tsup_bin.tsup_node(
         "package.json",
         "tsconfig.json",
         "tsup.config.ts",
-    ] + dependencies + dev_dependencies,
+    ] + dependencies + dev_dependencies + peer_deps,
     outs = [
         "dist/index.js",
         "dist/index.mjs",
@@ -59,6 +79,7 @@ create_package_json(
     base_package_json = "package.json",
     custom_entrypoints = True,
     dependencies = dependencies,
+    peer_dependencies = peer_deps,
     root_package_json = "//:package.json",
     stamp = -1,
     substitutions = {
@@ -89,6 +110,8 @@ npm_package(
     name = pkg_name,
     srcs = [
         library_target,
+        "manager.mjs",
+        "preview.mjs",
     ],
     allow_overwrites = True,
     package = "@player-ui/storybook",
