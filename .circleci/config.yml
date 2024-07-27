@@ -22,8 +22,12 @@ executors:
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   minimal:
-    machine:
-      image: ubuntu-2004:current
+    docker:
+      - image: cimg/base:current
+    working_directory: ~/player
+    resource_class: medium
+    environment:
+      TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   ios:
     working_directory: ~/player
     resource_class: macos.m1.large.gen1
