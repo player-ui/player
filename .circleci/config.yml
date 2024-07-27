@@ -222,7 +222,7 @@ jobs:
           at: ~/player
 
       - run: |
-          bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
+          bazel test --config=ci --config=remote-linux -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
       - run:
           when: always
@@ -311,7 +311,7 @@ jobs:
       # union the bundle targets until //... doesnt explode analyzing jvm/android targets
       - run: |
           BUNDLE_TARGETS=$(bazel query "kind(js_test, //plugins/...) union kind(js_test, //react/...) union kind(js_test, //core/...)" --output label 2>/dev/null | tr '\n' ' ')
-          bazel coverage --combined_report=lcov --config=ci -- $BUNDLE_TARGETS
+          bazel coverage --config=remote-linux --combined_report=lcov --config=ci -- $BUNDLE_TARGETS
 
       - run:
           when: always
