@@ -59,12 +59,12 @@ commands:
       - run: git config --global user.name "Intuit Service"
       - run: git config --global user.email "opensource-svc@intuit.com"
       - run: |
-            echo -e $GPG_KEY | gpg --import --batch
-            echo -e "pinentry-mode loopback\npassphrase $DEPLOY_MAVEN_GPG_PASSPHRASE" > ~/.gnupg/gpg.conf
+          echo -e $GPG_KEY | gpg --import --batch
+          echo -e "pinentry-mode loopback\npassphrase $DEPLOY_MAVEN_GPG_PASSPHRASE" > ~/.gnupg/gpg.conf
       - run: |
-            source ~/.bashrc
-            bundle install
-            npx auto shipit --only-graduate-with-release-label -vv
+          source ~/.bashrc
+          bundle install
+          npx auto shipit --only-graduate-with-release-label -vv
 
 jobs:
   setup:
@@ -101,7 +101,7 @@ jobs:
       - attach_workspace:
           at: ~/player
       # need to filter because //android/demo rules dont resolve
-      - run: bazel build --config=ci -- $(bazel query 'filter("native_bundle$", //...)')
+      - run: bazel build --config=ci --config=remote-linux -- $(bazel query 'filter("native_bundle$", //...)')
 
       - save_cache:
           paths:
@@ -206,7 +206,7 @@ jobs:
             genhtml --branch-coverage --output-directory=_ios_coverage/html/ "$(bazel info output_path)/_coverage/_coverage_report.dat"
             zip -r _ios_coverage/html.zip _ios_coverage/html/
             rm -r _ios_coverage/html/
-      
+
       - persist_to_workspace:
           root: .
           paths:
@@ -473,7 +473,7 @@ workflows:
 
   build_and_test_main:
     when:
-      equal: [ "", << pipeline.parameters.GHA_Action >> ]
+      equal: ["", << pipeline.parameters.GHA_Action >>]
     jobs:
       - setup:
           filters:
@@ -509,7 +509,7 @@ workflows:
 
   release:
     when:
-      equal: [ release, << pipeline.parameters.GHA_Action >> ]
+      equal: [release, << pipeline.parameters.GHA_Action >>]
     jobs:
       - setup
 
