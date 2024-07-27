@@ -22,10 +22,14 @@ mobile-install --start=warm
 common:remote --remote_timeout=3600
 common:remote --remote_executor=grpcs://remote.buildbuddy.io
 common:remote --jobs=100
+common:remote --incompatible_strict_action_env
+
 common:remote-linux --config=remote
+common:remote-linux --host_platform=@buildbuddy_toolchain//:platform
 common:remote-linux --platforms=@buildbuddy_toolchain//:platform_linux
 common:remote-linux --extra_execution_platforms=@buildbuddy_toolchain//:platform_linux
 common:remote-linux --extra_toolchains=@buildbuddy_toolchain//:ubuntu_cc_toolchain
+common:remote-linux --crosstool_top=@buildbuddy_toolchain//:toolchain
 
 build --bes_results_url=https://app.buildbuddy.io/invocation/
 build --bes_backend=grpcs://remote.buildbuddy.io
