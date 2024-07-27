@@ -19,6 +19,8 @@ elif [ "$RELEASE_TYPE" == "release" ] && [ "$CURRENT_BRANCH" == "main" ]; then
   NPM_TAG=latest
 fi
 
+echo "Publishing NPM Packages using tag: ${NPM_TAG} from release type: ${RELEASE_TYPE} on branch: ${CURRENT_BRANCH}"
+
 for pkg in $PKG_NPM_LABELS ; do
   bazel run --config=release -- ${pkg}.publish --access public --tag ${NPM_TAG}
 done
