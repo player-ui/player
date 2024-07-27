@@ -21,6 +21,9 @@ executors:
     resource_class: xlarge
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
+  minimal:
+    machine:
+      image: ubuntu-2004:current
   ios:
     working_directory: ~/player
     resource_class: macos.m1.large.gen1
@@ -68,7 +71,7 @@ commands:
 
 jobs:
   setup:
-    executor: base
+    executor: minimal
     steps:
       - checkout
 
@@ -82,7 +85,7 @@ jobs:
             - .
 
   bazelrc:
-    executor: base
+    executor: minimal
     steps:
       - attach_workspace:
           at: ~/player
