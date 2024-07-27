@@ -1,6 +1,6 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("//tools:defs.bzl", "tsup_config", "vitest_config")
 load("@rules_player//javascript:defs.bzl", "js_pipeline")
+load("//tools:defs.bzl", "tsup_config", "vitest_config")
 
 npm_link_all_packages(name = "node_modules")
 
@@ -15,6 +15,7 @@ js_pipeline(
         "//:node_modules/@types/react",
         "//:node_modules/@player-tools/dsl",
         ":node_modules/@player-ui/player",
+        "//:node_modules/dlv",
     ],
     deps = [
         ":node_modules/@player-ui/common-types-plugin",
