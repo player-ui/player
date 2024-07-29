@@ -21,6 +21,13 @@ executors:
     resource_class: xlarge
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
+  minimal:
+    docker:
+      - image: cimg/base:current
+    working_directory: ~/player
+    resource_class: medium
+    environment:
+      TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   ios:
     working_directory: ~/player
     resource_class: macos.m1.large.gen1
@@ -59,16 +66,16 @@ commands:
       - run: git config --global user.name "Intuit Service"
       - run: git config --global user.email "opensource-svc@intuit.com"
       - run: |
-            echo -e $GPG_KEY | gpg --import --batch
-            echo -e "pinentry-mode loopback\npassphrase $DEPLOY_MAVEN_GPG_PASSPHRASE" > ~/.gnupg/gpg.conf
+          echo -e $GPG_KEY | gpg --import --batch
+          echo -e "pinentry-mode loopback\npassphrase $DEPLOY_MAVEN_GPG_PASSPHRASE" > ~/.gnupg/gpg.conf
       - run: |
-            source ~/.bashrc
-            bundle install
-            npx auto shipit --only-graduate-with-release-label -vv
+          source ~/.bashrc
+          bundle install
+          npx auto shipit --only-graduate-with-release-label -vv
 
 jobs:
   setup:
-    executor: base
+    executor: minimal
     steps:
       - checkout
 
@@ -82,7 +89,7 @@ jobs:
             - .
 
   bazelrc:
-    executor: base
+    executor: minimal
     steps:
       - attach_workspace:
           at: ~/player
@@ -206,7 +213,7 @@ jobs:
             genhtml --branch-coverage --output-directory=_ios_coverage/html/ "$(bazel info output_path)/_coverage/_coverage_report.dat"
             zip -r _ios_coverage/html.zip _ios_coverage/html/
             rm -r _ios_coverage/html/
-      
+
       - persist_to_workspace:
           root: .
           paths:
@@ -473,7 +480,7 @@ workflows:
 
   build_and_test_main:
     when:
-      equal: [ "", << pipeline.parameters.GHA_Action >> ]
+      equal: ["", << pipeline.parameters.GHA_Action >>]
     jobs:
       - setup:
           filters:
@@ -509,7 +516,7 @@ workflows:
 
   release:
     when:
-      equal: [ release, << pipeline.parameters.GHA_Action >> ]
+      equal: [release, << pipeline.parameters.GHA_Action >>]
     jobs:
       - setup
 
