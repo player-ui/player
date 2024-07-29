@@ -1,9 +1,14 @@
 import { test, expect, describe } from "vitest";
 import type { Node } from "@player-ui/player";
-import { Parser } from "@player-ui/player";
+import { Parser, AssetPlugin, MultiNodePlugin } from "@player-ui/player";
 import { composeBefore, propertiesToSkipTransform } from "..";
 
 const parser = new Parser();
+const assetPlugin = new AssetPlugin();
+const multiNodePlugin = new MultiNodePlugin();
+
+assetPlugin.applyParser(parser);
+multiNodePlugin.applyParser(parser);
 
 const actionAsset = {
   id: "action",

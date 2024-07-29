@@ -3,7 +3,12 @@ import { LocalModel, withParser, PipelinedDataModel } from "../../data";
 import { ExpressionEvaluator } from "../../expressions";
 import { BindingParser } from "../../binding";
 import { SchemaController } from "../../schema";
-import { ApplicabilityPlugin, StringResolverPlugin, ViewInstance } from "..";
+import {
+  ApplicabilityPlugin,
+  AssetPlugin,
+  StringResolverPlugin,
+  ViewInstance,
+} from "..";
 import { NodeType } from "../parser";
 
 const parseBinding = new BindingParser().parse;
@@ -34,6 +39,7 @@ test("uses the exact same object if nothing changes", () => {
   );
 
   new StringResolverPlugin().apply(view);
+  new AssetPlugin().apply(view);
 
   view.hooks.resolver.tap("input", (resolver) => {
     resolver.hooks.resolve.tap("input", (value, astNode, options) => {
@@ -205,6 +211,7 @@ test("hardcore immutability", () => {
   );
 
   new StringResolverPlugin().apply(view);
+  new AssetPlugin().apply(view);
 
   const resolved = view.update();
 

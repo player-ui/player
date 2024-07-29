@@ -4,6 +4,7 @@ import { ExpressionEvaluator } from "../../expressions";
 import { BindingParser } from "../../binding";
 import { SchemaController } from "../../schema";
 import {
+  MultiNodePlugin,
   StringResolverPlugin,
   SwitchPlugin,
   ViewInstance,
@@ -122,6 +123,7 @@ describe("view", () => {
 
       const pluginOptions = toNodeResolveOptions(view.resolverOptions);
       new SwitchPlugin(pluginOptions).apply(view);
+      new MultiNodePlugin().apply(view);
       new StringResolverPlugin().apply(view);
 
       const resolved = view.update();
@@ -381,6 +383,7 @@ describe("view", () => {
 
       const pluginOptions = toNodeResolveOptions(view.resolverOptions);
       new SwitchPlugin(pluginOptions).apply(view);
+      new MultiNodePlugin().apply(view);
       new StringResolverPlugin().apply(view);
 
       const resolved = view.update();
@@ -735,6 +738,7 @@ describe("view", () => {
 
       const pluginOptions = toNodeResolveOptions(view.resolverOptions);
       new SwitchPlugin(pluginOptions).apply(view);
+      new MultiNodePlugin().apply(view);
       new StringResolverPlugin().apply(view);
 
       const resolved = view.update();

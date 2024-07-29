@@ -8,7 +8,7 @@ import type { Resolve } from "../../resolver";
 import { Resolver } from "../../resolver";
 import type { Node } from "../../parser";
 import { Parser } from "../../parser";
-import { ApplicabilityPlugin, StringResolverPlugin } from "..";
+import { ApplicabilityPlugin, MultiNodePlugin, StringResolverPlugin } from "..";
 
 const parseBinding = new BindingParser().parse;
 
@@ -37,8 +37,10 @@ describe("applicability", () => {
   it("undefined does not remove asset", () => {
     const aP = new ApplicabilityPlugin();
     const sP = new StringResolverPlugin();
+    const mnP = new MultiNodePlugin();
 
     aP.applyParser(parser);
+    mnP.applyParser(parser);
 
     const root = parser.parseObject({
       asset: {
@@ -70,6 +72,7 @@ describe("applicability", () => {
 
   it("removes empty objects", () => {
     new ApplicabilityPlugin().applyParser(parser);
+    new MultiNodePlugin().applyParser(parser);
     const root = parser.parseObject({
       asset: {
         values: [
@@ -245,21 +248,26 @@ describe("applicability", () => {
     });
   });
 
-  it("determines if nodeType is applicability", () => {
-    new ApplicabilityPlugin().applyParser(parser);
-    const nodeTest = {
-      applicability: "{{bar}} == true",
-    };
-    const nodeType = parser.hooks.determineNodeType.call(nodeTest);
-    expect(nodeType).toStrictEqual("applicability");
-  });
+  it("does not return field object if applicability node does not resolve", () => {
+    const applicabilityPlugin = new ApplicabilityPlugin();
+    const stringResolverPlugin = new StringResolverPlugin();
 
-  it("Does not return a nodeType", () => {
-    new ApplicabilityPlugin().applyParser(parser);
-    const nodeTest = {
-      value: "foo",
-    };
-    const nodeType = parser.hooks.determineNodeType.call(nodeTest);
-    expect(nodeType).toBe(undefined);
+    applicabilityPlugin.applyParser(parser);
+    const root = parser.parseObject({
+      id: "foo",
+      fields: {
+        applicability: "{{foo.bar}}",
+      },
+    } as any);
+    const resolver = new Resolver(root as Node.Node, resolverOptions);
+
+    applicabilityPlugin.applyResolver(resolver);
+    stringResolverPlugin.applyResolver(resolver);
+
+    const resolved = resolver.update();
+
+    expect(resolved).toStrictEqual({
+      id: "foo",
+    });
   });
 });

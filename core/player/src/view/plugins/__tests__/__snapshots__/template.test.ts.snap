@@ -1,67 +1,69 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`dynamic templates > Works with template items plus value items > Should show template item first when coming before values on lexical order 1`] = `
-{
-  "asset": {
-    "id": "overviewItem3",
-    "label": {
-      "asset": {
-        "id": "overviewItem3-label",
-        "type": "text",
-        "value": "1099-A",
-      },
+[
+  {
+    "asset": {
+      "id": "value-0",
+      "type": "text",
+      "value": "item 1",
     },
-    "type": "overviewItem",
-    "values": [
-      {
-        "asset": {
-          "id": "overviewItem3-year",
-          "type": "text",
-          "value": "Desciption of concept 1099 1",
-        },
-      },
-      {
-        "asset": {
-          "id": "loverviewItem3-cy",
-          "type": "text",
-          "value": "4000",
-        },
-      },
-    ],
   },
-}
+  {
+    "asset": {
+      "id": "value-1",
+      "type": "text",
+      "value": "item 2",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-2",
+      "type": "text",
+      "value": "First value in the collection",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-3",
+      "type": "text",
+      "value": "Second value in the collection",
+    },
+  },
+]
 `;
 
 exports[`dynamic templates > Works with template items plus value items > Should show template item last when coming after values on lexical order 1`] = `
-{
-  "asset": {
-    "id": "overviewItem1",
-    "label": {
-      "asset": {
-        "id": "overviewItem1-label",
-        "type": "text",
-        "value": "First Summary",
-      },
+[
+  {
+    "asset": {
+      "id": "value-2",
+      "type": "text",
+      "value": "First value in the collection",
     },
-    "type": "overviewItem",
-    "values": [
-      {
-        "asset": {
-          "id": "overviewItem1-year",
-          "type": "text",
-          "value": "Desciption of year summary 1",
-        },
-      },
-      {
-        "asset": {
-          "id": "loverviewItem1-cy",
-          "type": "text",
-          "value": "14000",
-        },
-      },
-    ],
   },
-}
+  {
+    "asset": {
+      "id": "value-3",
+      "type": "text",
+      "value": "Second value in the collection",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-0",
+      "type": "text",
+      "value": "item 1",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-1",
+      "type": "text",
+      "value": "item 2",
+    },
+  },
+]
 `;
 
 exports[`templates > works with nested templates 1`] = `

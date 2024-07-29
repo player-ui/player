@@ -9,7 +9,11 @@ import { TapableLogger } from "../../../logger";
 import { Resolver } from "..";
 import type { Node } from "../../parser";
 import { NodeType, Parser } from "../../parser";
-import { StringResolverPlugin } from "../../plugins";
+import {
+  StringResolverPlugin,
+  MultiNodePlugin,
+  AssetPlugin,
+} from "../../plugins";
 
 describe("Dynamic AST Transforms", () => {
   const content = {
@@ -40,6 +44,8 @@ describe("Dynamic AST Transforms", () => {
       year: "2021",
     });
     const parser = new Parser();
+    new MultiNodePlugin().applyParser(parser);
+
     const bindingParser = new BindingParser();
     const inputBinding = bindingParser.parse("year");
     const rootNode = parser.parseObject(content);
@@ -218,6 +224,7 @@ describe("Dynamic AST Transforms", () => {
       year: "2021",
     });
     const parser = new Parser();
+    new AssetPlugin().applyParser(parser);
     const bindingParser = new BindingParser();
     const inputBinding = bindingParser.parse("year");
     const rootNode = parser.parseObject(view);
@@ -271,6 +278,7 @@ describe("Dynamic AST Transforms", () => {
       year: "2021",
     });
     const parser = new Parser();
+    new AssetPlugin().applyParser(parser);
     const bindingParser = new BindingParser();
     const rootNode = parser.parseObject(content);
 
@@ -354,6 +362,7 @@ describe("Duplicate IDs", () => {
       count2: 0,
     });
     const parser = new Parser();
+    new AssetPlugin().applyParser(parser);
     const bindingParser = new BindingParser();
     const rootNode = parser.parseObject(content, NodeType.View);
 
@@ -449,6 +458,8 @@ describe("Duplicate IDs", () => {
       count2: 0,
     });
     const parser = new Parser();
+    new MultiNodePlugin().applyParser(parser);
+
     const bindingParser = new BindingParser();
     const rootNode = parser.parseObject(content, NodeType.View);
 
@@ -512,6 +523,8 @@ describe("AST caching", () => {
 
     const model = new LocalModel();
     const parser = new Parser();
+    new MultiNodePlugin().applyParser(parser);
+
     const bindingParser = new BindingParser();
     const rootNode = parser.parseObject(content, NodeType.View);
     const resolver = new Resolver(rootNode!, {
