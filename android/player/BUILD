@@ -13,7 +13,11 @@ kt_android_library(
     manifest = ":src/main/AndroidManifest.xml",
     resource_files = glob(["src/main/res/**"]),
     resources = main_resources,
-    deps = main_deps,
+    deps = main_deps + select({
+        ":dev": dev_exports,
+        ":prod": main_exports,
+        "//conditions:default": main_exports,
+    }),
 )
 
 config_setting(
@@ -35,12 +39,12 @@ android_library(
     deps = main_deps + select({
         ":dev": dev_exports,
         ":prod": main_exports,
-        "//conditions:default": dev_exports,
+        "//conditions:default": main_exports,
     }),
     exports = [":player_android"] + select({
         ":dev": dev_exports,
         ":prod": main_exports,
-        "//conditions:default": dev_exports,
+        "//conditions:default": main_exports,
     }),
     visibility = ["//visibility:public"],
 )
