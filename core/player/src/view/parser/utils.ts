@@ -17,7 +17,7 @@ export function hasTemplateValues(obj: any, localKey: string) {
 
 /** Check to see if the string is a valid switch key */
 export function hasSwitchKey(localKey: string) {
-  return localKey === ("staticSwitch" || "dynamicSwitch");
+  return localKey === "staticSwitch" || localKey === "dynamicSwitch";
 }
 
 /** Check to see if the string is a valid template key */
