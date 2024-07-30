@@ -4,12 +4,15 @@ load("@build_constants//:constants.bzl", "VERSION")
 deps = {
     "macos": [
         "//jvm/j2v8/libs:j2v8_macos",
+        "//jvm/j2v8:j2v8_script_provider"
     ],
     "linux": [
         "//jvm/j2v8/libs:j2v8_linux",
+        "//jvm/j2v8:j2v8_script_provider"
     ],
     "android": [
-        "@android_j2v8//aar"
+        "@android_j2v8//aar",
+        "//jvm/j2v8:j2v8_script_provider"
     ],
     "android-debug": [
         "@android_j2v8//aar",
