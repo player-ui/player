@@ -71,13 +71,20 @@ export const ReactAsset = (
     );
 
     const similarType = typeList.reduce((prev, curr) => {
-      return leven(unwrapped.type, prev) < leven(unwrapped.type, curr)
-        ? prev
-        : curr;
-    }, typeList[0]);
+      const next = {
+        value: leven(unwrapped.type, curr),
+        type: curr,
+      };
+
+      if (prev !== undefined && prev.value < next.value) {
+        return prev;
+      }
+
+      return next;
+    }, undefined);
 
     throw Error(
-      `No implementation found for id: ${unwrapped.id} type: ${unwrapped.type}. Did you mean ${similarType}? \n 
+      `No implementation found for id: ${unwrapped.id} type: ${unwrapped.type}. Did you mean ${similarType.type}? \n 
       Registered Asset matching functions are listed below: \n
       ${JSON.stringify(matchList)}`,
     );
