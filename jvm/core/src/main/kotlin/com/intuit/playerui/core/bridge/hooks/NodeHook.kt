@@ -9,6 +9,7 @@ import com.intuit.playerui.core.utils.InternalPlayerApi
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.capturedKClass
+import com.intuit.playerui.core.bridge.Promise
 
 /** Contains common logic for configuring a [NodeHook] to tap any JS hook */
 internal interface NodeHook<R> : NodeWrapper {
@@ -36,6 +37,15 @@ internal interface NodeHook<R> : NodeWrapper {
     }
 
     fun call(context: HookContext, serializedArgs: Array<Any?>): R
+}
+
+internal interface AsyncNodeHook<R : Any> : NodeHook<Promise> {
+    override fun call(context: HookContext, serializedArgs: Array<Any?>): Promise = node.runtime.Promise { resolve, reject ->
+        val result = callAsync(context, serializedArgs)
+        resolve(result)
+    }
+
+    suspend fun callAsync(context: HookContext, serializedArgs: Array<Any?>): R
 }
 
 @InternalPlayerApi
