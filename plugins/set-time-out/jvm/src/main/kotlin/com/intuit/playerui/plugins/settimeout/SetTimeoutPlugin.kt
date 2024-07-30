@@ -23,9 +23,7 @@ public class SetTimeoutPlugin(private val exceptionHandler: CoroutineExceptionHa
     override fun apply(runtime: Runtime<*>) {
         if (override || !runtime.contains("setTimeout")) {
             runtime.add("setTimeout") { callback: Invokable<Any?>, timeout: Long ->
-                if (timeout == 0L) {
-                    callback()
-                } else runtime.scope.launch(
+                runtime.scope.launch(
                     // TODO: Potentially just forward to runtime coroutine exception handler
                     exceptionHandler ?: CoroutineExceptionHandler { _, exception ->
                         PlayerPluginException(
@@ -45,7 +43,7 @@ public class SetTimeoutPlugin(private val exceptionHandler: CoroutineExceptionHa
         }
 
         if (override || !runtime.contains("setImmediate")) {
-            runtime.add("setImmediate", runtime.executeRaw("(callback => setTimeout(callback, 0))"))
+            runtime.add("setImmediate") { callback: Invokable<Any?> -> callback() }
         }
     }
 
