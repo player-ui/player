@@ -78,7 +78,9 @@ internal fun <R> Function.toInvokable(format: JSIFormat, thisVal: Object, deseri
             // TODO: Unsafe cast really, so we might want to require a deserialization strategy
             if (deserializationStrategy != null) {
                 format.decodeFromRuntimeValue(deserializationStrategy, result)
-            } else result.handleValue(format) as R
+            } else {
+                result.handleValue(format) as R
+            }
         } catch (e: Throwable) {
             e.printStackTrace()
             throw PlayerRuntimeException(format.runtime, "Error invoking JS function (${asValue(format.runtime).toString(format.runtime)}) with args (${args.joinToString(",")})", e)

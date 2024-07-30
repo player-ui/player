@@ -99,9 +99,10 @@ internal class HermesNodeTest : HermesTest() {
         val node = runtime.evaluateInJSThreadBlocking {
             format.`object` {
                 set(
-                    "object", mapOf(
+                    "object",
+                    mapOf(
                         "string" to "thisisastring",
-                    )
+                    ),
                 )
                 set("notaobject", 1234)
             }
@@ -131,7 +132,8 @@ internal class HermesNodeTest : HermesTest() {
         val node = runtime.evaluateInJSThreadBlocking {
             format.`object` {
                 set(
-                    "assets", listOf(
+                    "assets",
+                    listOf(
                         mapOf(
                             "id" to "testId1",
                             "type" to "testType",
@@ -140,7 +142,7 @@ internal class HermesNodeTest : HermesTest() {
                             "id" to "notAnAsset",
                         ),
                         1,
-                    )
+                    ),
                 )
                 set("notassets", "justastring")
             }
@@ -282,9 +284,10 @@ internal class HermesNodeTest : HermesTest() {
         val node = runtime.evaluateInJSThreadBlocking {
             format.`object` {
                 set(
-                    "flow", mapOf(
+                    "flow",
+                    mapOf(
                         "id" to "testId",
-                    )
+                    ),
                 )
             }
         }.toNode(format)

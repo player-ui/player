@@ -97,10 +97,14 @@ internal class JSIFormatTest : HermesTest() {
         val simple = format.decodeFromRuntimeValue(
             NodeWrapperSerializer(::Simple),
             Object.create(runtime).apply {
-                setProperty(runtime, "increment", Function.createFromHostFunction(runtime) { args ->
-                    Value.from(args[0].asNumber() + 1)
-                }.asValue(runtime))
-            }.asValue(runtime)
+                setProperty(
+                    runtime,
+                    "increment",
+                    Function.createFromHostFunction(runtime) { args ->
+                        Value.from(args[0].asNumber() + 1)
+                    }.asValue(runtime),
+                )
+            }.asValue(runtime),
         )
 
         assertEquals(1, simple.increment(0))
@@ -117,10 +121,14 @@ internal class JSIFormatTest : HermesTest() {
             Data.serializer(),
             Object.create(runtime).apply {
                 setProperty(runtime, "one", Value.from(3))
-                setProperty(runtime, "increment", Function.createFromHostFunction(runtime) { args ->
-                    Value.from(args[0].asNumber() + 1)
-                }.asValue(runtime))
-            }.asValue(runtime)
+                setProperty(
+                    runtime,
+                    "increment",
+                    Function.createFromHostFunction(runtime) { args ->
+                        Value.from(args[0].asNumber() + 1)
+                    }.asValue(runtime),
+                )
+            }.asValue(runtime),
         )
 
         assertEquals(3, simple.one)

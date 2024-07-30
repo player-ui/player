@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-/// Set of tests for the JSI JNI wrappers - uses Hermes as the basis for testing against APIs that require a runtime
+// / Set of tests for the JSI JNI wrappers - uses Hermes as the basis for testing against APIs that require a runtime
 internal class RuntimeTests : HermesTest() {
 
     @Test fun `evaluate valid js and get the result`() = runtime.evaluateInJSThreadBlocking {
@@ -27,12 +27,15 @@ internal class RuntimeTests : HermesTest() {
     }
 
     @Test fun `handle errors thrown from JS on the JVM`() = runtime.evaluateInJSThreadBlocking {
-        assertEquals("""hello
+        assertEquals(
+            """hello
 
 Error: hello
-    at global (unknown:1:12)""", assertThrows<CppException> {
-            runtime.evaluateJavaScript("throw Error('hello')")
-        }.message)
+    at global (unknown:1:12)""",
+            assertThrows<CppException> {
+                runtime.evaluateJavaScript("throw Error('hello')")
+            }.message,
+        )
     }
 
     @Test fun `prepare js and execute later`() = runtime.evaluateInJSThreadBlocking {
@@ -42,31 +45,41 @@ Error: hello
     }
 
     @Test fun `can't queue a microtask if it's disabled (by default)`() = runtime.evaluateInJSThreadBlocking {
-        assertEquals("Could not enqueue microtask because they are disabled in this runtime", assertThrows<CppException> {
-            val function = runtime.evaluateJavaScript("() => {}").asObject(runtime).asFunction(runtime)
-            runtime.queueMicrotask(function)
-        }.message)
+        assertEquals(
+            "Could not enqueue microtask because they are disabled in this runtime",
+            assertThrows<CppException> {
+                val function = runtime.evaluateJavaScript("() => {}").asObject(runtime).asFunction(runtime)
+                runtime.queueMicrotask(function)
+            }.message,
+        )
     }
 
     // TODO: Test in Player b/c we have microtask polyfill in Player
     fun `can't queue a microtask in JS if it's disabled`() = runtime.evaluateInJSThreadBlocking {
-        runtime.global().setProperty(runtime, "queueMicrotask", Function.createFromHostFunction(runtime, "queueMicrotask", 1) { args ->
-            require(args.size == 1 && args[0].isObject() && args[0].asObject(runtime).isFunction(runtime)) { "queueMicrotask expects exactly one argument, the function to enqueue" }
+        runtime.global().setProperty(
+            runtime,
+            "queueMicrotask",
+            Function.createFromHostFunction(runtime, "queueMicrotask", 1) { args ->
+                require(args.size == 1 && args[0].isObject() && args[0].asObject(runtime).isFunction(runtime)) { "queueMicrotask expects exactly one argument, the function to enqueue" }
 
-            // TODO: suspend on JS thread to allow current JS execution path to finish
-            runtime.scope.launch {
-                delay(50)
-                args[0].asObject(runtime).asFunction(runtime).callWithThis(runtime, this@createFromHostFunction)
-                println("hello")
-            }
+                // TODO: suspend on JS thread to allow current JS execution path to finish
+                runtime.scope.launch {
+                    delay(50)
+                    args[0].asObject(runtime).asFunction(runtime).callWithThis(runtime, this@createFromHostFunction)
+                    println("hello")
+                }
 
-            Value.undefined
-        })
-        runtime.evaluateJavaScript("""(() => {
+                Value.undefined
+            },
+        )
+        runtime.evaluateJavaScript(
+            """(() => {
             a = 1
             queueMicrotask(() => { a = 2 })
             a = 3
-        })()""".trimMargin())
+        })()
+            """.trimMargin(),
+        )
         assertEquals(Value.from(2), runtime.global().getProperty(runtime, "a"))
     }
 
@@ -149,7 +162,8 @@ internal class ValueTests : HermesTest() {
 
 internal class ObjectTests : HermesTest() {
     @Test fun `can create and detect object`() = runtime.evaluateInJSThreadBlocking {
-        val value = runtime.evaluateJavaScript("""
+        val value = runtime.evaluateJavaScript(
+            """
             ({
                 hello: 'world',
                 nested: {
@@ -157,7 +171,8 @@ internal class ObjectTests : HermesTest() {
                 },
                 multiply: (a, b) => a * b,
             })
-        """.trimIndent())
+            """.trimIndent(),
+        )
         assertTrue(value.isObject())
         val `object` = value.asObject(runtime)
         assertFalse(`object`.isArray(runtime))
@@ -225,10 +240,11 @@ internal class ArrayTests : HermesTest() {
     }
 
     @Test fun `asValue works for object subclasses`() = runtime.evaluateInJSThreadBlocking {
-        Array.createWithElements(runtime,
+        Array.createWithElements(
+            runtime,
             Value.from(1),
             Value.from(runtime, "two"),
-            Value.from(runtime, 3L)
+            Value.from(runtime, 3L),
         ).asValue(runtime).asObject(runtime).asArray(runtime).assertValues()
     }
 }
@@ -255,7 +271,7 @@ internal class FunctionTests : HermesTest() {
 
     @Test fun `asValue works for object subclasses`() = runtime.evaluateInJSThreadBlocking {
         val multiply = Function.createFromHostFunction(format) { args ->
-            args.filterIsInstance<Number>().fold(1.0) { acc, value -> acc * value.toDouble()}
+            args.filterIsInstance<Number>().fold(1.0) { acc, value -> acc * value.toDouble() }
         }.asValue(runtime).asObject(runtime).asFunction(runtime)
         assertTrue(multiply.isHostFunction(runtime))
         assertEquals(6, multiply.call(runtime, Value.from(2), Value.from(3.0)).asNumber().toInt())
@@ -274,4 +290,3 @@ internal class SymbolTests : HermesTest() {
         assertTrue(Symbol.strictEquals(runtime, symbol.asSymbol(runtime), runtime.evaluateJavaScript("Symbol.for('hello-world')").asSymbol(runtime)))
     }
 }
-

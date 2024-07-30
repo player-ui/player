@@ -19,8 +19,11 @@ internal class HermesRuntimeTest : HermesTest() {
         val runtime = HermesRuntime()
         runtime.release()
 
-        assertEquals("[HermesRuntime] Runtime object has been released!", assertThrows<PlayerRuntimeException> {
-            runtime.execute("2 + 2")
-        }.message)
+        assertEquals(
+            "[HermesRuntime] Runtime object has been released!",
+            assertThrows<PlayerRuntimeException> {
+                runtime.execute("2 + 2")
+            }.message,
+        )
     }
 }

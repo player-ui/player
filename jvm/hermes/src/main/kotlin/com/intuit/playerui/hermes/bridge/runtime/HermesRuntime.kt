@@ -63,6 +63,7 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
         }
 
         @JvmStatic public external fun create(): HermesRuntime
+
         @JvmStatic public external fun create(runtimeConfig: Config): HermesRuntime
 
         public operator fun invoke(): HermesRuntime = create()
@@ -79,17 +80,18 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
 
     override val format: JSIFormat = JSIFormat(
         JSIFormatConfiguration(
-        this,
-        playerSerializersModule + SerializersModule {
-            // TODO: Do we get this all for free with a sealed class?
-            contextual(JSIValueContainer::class, JSIValueContainerSerializer)
-            contextual(Value::class, JSIValueContainerSerializer.conform())
-            contextual(Object::class, JSIValueContainerSerializer.conform())
-            contextual(Array::class, JSIValueContainerSerializer.conform())
-            contextual(Function::class, JSIValueContainerSerializer.conform())
-            contextual(Symbol::class, JSIValueContainerSerializer.conform())
-        },
-    ),)
+            this,
+            playerSerializersModule + SerializersModule {
+                // TODO: Do we get this all for free with a sealed class?
+                contextual(JSIValueContainer::class, JSIValueContainerSerializer)
+                contextual(Value::class, JSIValueContainerSerializer.conform())
+                contextual(Object::class, JSIValueContainerSerializer.conform())
+                contextual(Array::class, JSIValueContainerSerializer.conform())
+                contextual(Function::class, JSIValueContainerSerializer.conform())
+                contextual(Symbol::class, JSIValueContainerSerializer.conform())
+            },
+        ),
+    )
 
     override val scope: CoroutineScope by lazy {
         // explicitly not using the JS specific dispatcher to avoid clogging up that thread
@@ -99,7 +101,7 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
     private external fun evaluateJavaScriptWithSourceMap(script: String, sourceMap: String, sourceURL: String): Value
 
     @OptIn(ExperimentalPlayerApi::class)
-    override fun executeRaw(script: String): Value =  evaluateInJSThreadBlocking {
+    override fun executeRaw(script: String): Value = evaluateInJSThreadBlocking {
         evaluateJavaScript(script)
     }
 
@@ -114,7 +116,6 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
             evaluateJavaScript(scriptContext.script, scriptContext.id)
         }.handleValue(format)
     }
-
 
     override fun add(name: String, value: Value) {
         evaluateInJSThreadBlocking {

@@ -58,7 +58,6 @@ internal abstract class HermesTest(val runtime: HermesRuntime = Hermes.create())
         }
     }
 
-
     companion object {
         @JvmStatic @BeforeAll
         fun setupNativeLoader() {

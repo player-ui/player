@@ -52,7 +52,6 @@ internal class FunctionDecodingTests : HermesTest() {
             Value.from(runtime, "${args[0].toString(runtime)}: ${args[1].toString(runtime)}")
         }
 
-
         assertEquals("PLAYER: 1", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(1)).asString(runtime))
         assertEquals(
             "PLAYER: 2",

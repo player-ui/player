@@ -28,7 +28,7 @@ public annotation class UnsafeRuntimeThreadAPI
 @UnsafeRuntimeThreadAPI
 internal object UnsafeRuntimeThreadContext : RuntimeThreadContext
 
-internal abstract class DedicatedRuntimeThreadContext internal constructor(): RuntimeThreadContext {
+internal abstract class DedicatedRuntimeThreadContext internal constructor() : RuntimeThreadContext {
     companion object : DedicatedRuntimeThreadContext()
 }
 
@@ -37,35 +37,43 @@ private fun Runtime<*>.ensureNotReleased() {
 }
 
 internal suspend fun <T> Runtime<*>.evaluateInJSThread(
-    block: suspend RuntimeThreadContext.() -> T
+    block: suspend RuntimeThreadContext.() -> T,
 ): T {
     ensureNotReleased()
     val currentRuntimeThreadContext = coroutineContext[RuntimeThreadContext]
     // TODO: Put Dedicated Runtime Thread Context in the dispatcher context if we can?
-    return if (currentRuntimeThreadContext != null) block(currentRuntimeThreadContext) else withContext(runtime.dispatcher + DedicatedRuntimeThreadContext) {
-        val runtimeThreadContext = coroutineContext[RuntimeThreadContext] ?: throw PlayerRuntimeException(runtime, "In this context, we should always have a RuntimeThreadContext")
-        currentThreadRuntimeThreadContext.set(runtimeThreadContext)
-        block(runtimeThreadContext)
+    return if (currentRuntimeThreadContext != null) {
+        block(currentRuntimeThreadContext)
+    } else {
+        withContext(runtime.dispatcher + DedicatedRuntimeThreadContext) {
+            val runtimeThreadContext = coroutineContext[RuntimeThreadContext] ?: throw PlayerRuntimeException(runtime, "In this context, we should always have a RuntimeThreadContext")
+            currentThreadRuntimeThreadContext.set(runtimeThreadContext)
+            block(runtimeThreadContext)
+        }
     }
 }
 
 internal fun <T> Runtime<*>.evaluateInJSThreadBlocking(
-    block: RuntimeThreadContext.() -> T
+    block: RuntimeThreadContext.() -> T,
 ): T {
     ensureNotReleased()
     val currentRuntimeThreadContext = currentThreadRuntimeThreadContext.get()
-    return if (currentRuntimeThreadContext != null) block(currentRuntimeThreadContext) else try {
-        runBlocking {
-            evaluateInJSThread { block() }
+    return if (currentRuntimeThreadContext != null) {
+        block(currentRuntimeThreadContext)
+    } else {
+        try {
+            runBlocking {
+                evaluateInJSThread { block() }
+            }
+        } catch (throwable: Throwable) {
+            if (throwable is CancellationException) throw throwable
+            // rethrow outside coroutine to capture stack before continuation
+            throw PlayerRuntimeException(runtime, "Exception caught evaluating JS", throwable)
         }
-    } catch (throwable: Throwable) {
-        if (throwable is CancellationException) throw throwable
-        // rethrow outside coroutine to capture stack before continuation
-        throw PlayerRuntimeException(runtime, "Exception caught evaluating JS", throwable)
     }
 }
 
 @UnsafeRuntimeThreadAPI
 internal fun <T> evaluateInCurrentThread(
-    block: RuntimeThreadContext.() -> T
+    block: RuntimeThreadContext.() -> T,
 ): T = block(UnsafeRuntimeThreadContext)

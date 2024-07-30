@@ -142,7 +142,7 @@ internal open class JSIValueEncoder(private val format: JSIFormat, private val m
             is Value -> value
             // this checks for everything we can, including wrappers
             else -> runtime.evaluateInJSThreadBlocking { Value.from(runtime, value) }
-        }
+        },
     )
 
     override fun encodeNull(): Unit = putContent(Value.`null`())

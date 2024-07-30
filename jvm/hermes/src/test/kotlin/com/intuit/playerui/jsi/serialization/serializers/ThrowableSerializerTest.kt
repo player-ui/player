@@ -52,8 +52,12 @@ internal class ThrowableSerializerTest : HermesTest() {
         Assertions.assertEquals(exception.stackTraceToString(), error.getProperty(runtime, "stack").asString(runtime))
 
         Assertions.assertEquals(true, error.getProperty(runtime, "serialized").asBoolean())
-        Assertions.assertEquals(serializableStackTraceElement, format.decodeFromValue<SerializableStackTraceElement>(
-            error.getPropertyAsObject(runtime, "stackTrace").asArray(runtime).getValueAtIndex(runtime, 0)))
+        Assertions.assertEquals(
+            serializableStackTraceElement,
+            format.decodeFromValue<SerializableStackTraceElement>(
+                error.getPropertyAsObject(runtime, "stackTrace").asArray(runtime).getValueAtIndex(runtime, 0),
+            ),
+        )
     }
 
     @Test
@@ -71,7 +75,7 @@ internal class ThrowableSerializerTest : HermesTest() {
         Assertions.assertEquals("hello world", exception.message)
         Assertions.assertEquals(
             arrayOf(stackTraceElement).normalizeStackTraceElements(),
-            exception.stackTrace.normalizeStackTraceElements()
+            exception.stackTrace.normalizeStackTraceElements(),
         )
         exception.printStackTrace()
     }
@@ -105,14 +109,18 @@ internal class ThrowableSerializerTest : HermesTest() {
         Assertions.assertEquals(exception.stackTraceToString(), error.getProperty(runtime, "stack").asString(runtime))
 
         Assertions.assertEquals(true, error.getProperty(runtime, "serialized").asBoolean())
-        Assertions.assertEquals(serializableStackTraceElement, format.decodeFromValue<SerializableStackTraceElement>(
-            error.getPropertyAsObject(runtime, "stackTrace").asArray(runtime).getValueAtIndex(runtime, 0)))
+        Assertions.assertEquals(
+            serializableStackTraceElement,
+            format.decodeFromValue<SerializableStackTraceElement>(
+                error.getPropertyAsObject(runtime, "stackTrace").asArray(runtime).getValueAtIndex(runtime, 0),
+            ),
+        )
 
         val cause = format.decodeFromValue<Throwable>(error.getProperty(runtime, "cause"))
         Assertions.assertEquals("world", cause.message)
         Assertions.assertEquals(
             exception.cause!!.stackTrace.normalizeStackTraceElements(),
-            cause.stackTrace.normalizeStackTraceElements()
+            cause.stackTrace.normalizeStackTraceElements(),
         )
     }
 }

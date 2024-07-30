@@ -41,16 +41,18 @@ internal sealed class AbstractJSIValueDecoder(
 
     override fun decodeNotNullMark(): Boolean = !currentValue.isNull() && !currentValue.isUndefined()
 
-    override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder = runtime.evaluateInJSThreadBlocking { when {
-        // Used for Unit
-        descriptor.kind is StructureKind.OBJECT -> JSIObjectInstanceDecoder(format, currentValue)
-        !currentValue.isObject() -> error("Current value is not a composite structure and can't be used to decode into $descriptor")
-        descriptor.kind is StructureKind.LIST -> JSIArrayListDecoder(format, currentValue, currentValue.asObject(runtime).asArray(runtime))
-        descriptor.kind is StructureKind.MAP -> JSIObjectMapDecoder(format, currentValue, currentValue.asObject(runtime))
-        descriptor.kind is StructureKind.CLASS -> JSIObjectClassDecoder(format, currentValue, currentValue.asObject(runtime))
-        descriptor.kind is PolymorphicKind.SEALED -> JSISealedClassDecoder(format, currentValue, currentValue.asObject(runtime))
-        else -> error("Runtime format decoders can't decode kinds of (${descriptor.kind}) into structures for $descriptor")
-    } }
+    override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder = runtime.evaluateInJSThreadBlocking {
+        when {
+            // Used for Unit
+            descriptor.kind is StructureKind.OBJECT -> JSIObjectInstanceDecoder(format, currentValue)
+            !currentValue.isObject() -> error("Current value is not a composite structure and can't be used to decode into $descriptor")
+            descriptor.kind is StructureKind.LIST -> JSIArrayListDecoder(format, currentValue, currentValue.asObject(runtime).asArray(runtime))
+            descriptor.kind is StructureKind.MAP -> JSIObjectMapDecoder(format, currentValue, currentValue.asObject(runtime))
+            descriptor.kind is StructureKind.CLASS -> JSIObjectClassDecoder(format, currentValue, currentValue.asObject(runtime))
+            descriptor.kind is PolymorphicKind.SEALED -> JSISealedClassDecoder(format, currentValue, currentValue.asObject(runtime))
+            else -> error("Runtime format decoders can't decode kinds of (${descriptor.kind}) into structures for $descriptor")
+        }
+    }
 
     override fun <R> decodeFunction(returnTypeSerializer: KSerializer<R>) = runtime.evaluateInJSThreadBlocking {
         try {
@@ -144,10 +146,10 @@ internal class JSISealedClassDecoder(override val format: JSIFormat, override va
 
     override fun decodeValueElement(descriptor: SerialDescriptor, index: Int): Any? {
         val discriminator = (
-                descriptor.annotations.firstOrNull {
-                    it is RuntimeClassDiscriminator
-                } as? RuntimeClassDiscriminator
-                )?.discriminator ?: format.config.discriminator
+            descriptor.annotations.firstOrNull {
+                it is RuntimeClassDiscriminator
+            } as? RuntimeClassDiscriminator
+            )?.discriminator ?: format.config.discriminator
 
         return runtime.evaluateInJSThreadBlocking {
             jsiObject.getProperty(runtime, discriminator).handleValue(format)
