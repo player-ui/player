@@ -270,9 +270,6 @@ importers:
       framer-motion:
         specifier: ^10.16.4
         version: 10.18.0(react-dom@18.3.1)(react@18.3.1)
-      fuse.js:
-        specifier: ^7.0.0
-        version: 7.0.0
       gh-pages:
         specifier: ^4.0.0
         version: 4.0.0
@@ -300,6 +297,9 @@ importers:
       lcov-result-merger:
         specifier: ^3.1.0
         version: 3.3.0
+      leven:
+        specifier: 4.0.0
+        version: 4.0.0
       lint-staged:
         specifier: ^11.2.3
         version: 11.2.6
@@ -11422,11 +11422,6 @@ packages:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==, tarball: https://registry.npmjs.org/functions-have-names/-/functions-have-names-1.2.3.tgz}
     dev: false
 
-  /fuse.js@7.0.0:
-    resolution: {integrity: sha512-14F4hBIxqKvD4Zz/XjDc3y94mNZN6pRv3U13Udo0lNLCWRBUsrMv2xwcF/y/Z5sV6+FQW+/ow68cHpm4sunt8Q==, tarball: https://registry.npmjs.org/fuse.js/-/fuse.js-7.0.0.tgz}
-    engines: {node: '>=10'}
-    dev: false
-
   /gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==, tarball: https://registry.npmjs.org/gensync/-/gensync-1.0.0-beta.2.tgz}
     engines: {node: '>=6.9.0'}
@@ -13193,6 +13188,11 @@ packages:
   /leven@3.1.0:
     resolution: {integrity: sha512-qsda+H8jTaUaN/x5vzW2rzc+8Rw4TAQ/4KjB46IwK5VH+IlVeeeje/EoZRpiXvIqjFgK84QffqPztGI3VBLG1A==, tarball: https://registry.npmjs.org/leven/-/leven-3.1.0.tgz}
     engines: {node: '>=6'}
+    dev: false
+
+  /leven@4.0.0:
+    resolution: {integrity: sha512-puehA3YKku3osqPlNuzGDUHq8WpwXupUg1V6NXdV38G+gr+gkBwFC8g1b/+YcIvp8gnqVIus+eJCH/eGsRmJNw==, tarball: https://registry.npmjs.org/leven/-/leven-4.0.0.tgz}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     dev: false
 
   /levn@0.4.1:
