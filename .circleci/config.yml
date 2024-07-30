@@ -76,6 +76,15 @@ jobs:
           keys:
             - v1-dependencies-{ { checksum "package.json" }}
 
+      - run:
+          name: Set build type
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "main" ]; then
+              echo "Running on main"
+              echo 'export BUILD_TYPE=release' >> $BASH_ENV
+            elif [ -n "${CIRCLE_PULL_REQUEST}" ]; then
+              echo "Running on PR"
+              echo 'export BUILD_TYPE=debug' >> $BASH_ENV
       - persist_to_workspace:
           root: .
           paths:
@@ -101,7 +110,7 @@ jobs:
       - attach_workspace:
           at: ~/player
       # need to filter because //android/demo rules dont resolve
-      - run: bazel build --config=ci -- $(bazel query 'filter("native_bundle$", //...)')
+      - run: bazel build --config=ci --define build_type=$BUILD_TYPE -- $(bazel query 'filter("native_bundle$", //...)')
 
       - save_cache:
           paths:
@@ -222,7 +231,7 @@ jobs:
           at: ~/player
 
       - run: |
-          bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
+          bazel test --config=ci --define build_type=$BUILD_TYPE -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
       - run:
           when: always
@@ -278,7 +287,7 @@ jobs:
           command: |
             circle-android wait-for-boot
 
-      - run: bazel test --config=ci -- //android/demo:android_instrumentation_test
+      - run: bazel test --config=ci --define build_type=$BUILD_TYPE -- //android/demo:android_instrumentation_test
 
       - run:
           when: always

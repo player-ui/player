@@ -8,7 +8,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
-import com.alexii.j2v8debugger.StethoHelper
 import com.intuit.playerui.android.lifecycle.ManagedPlayerState
 import com.intuit.playerui.android.lifecycle.PlayerViewModel
 import com.intuit.playerui.android.reference.demo.lifecycle.DemoPlayerViewModel
@@ -31,7 +30,7 @@ abstract class BasePlayerFragment : PlayerFragment() {
     private val currentPlayerCanvas get() = binding.playerCanvas.getChildAt(0)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        StethoHelper.initializeDebugger(requireContext(), playerViewModel.player)
+        if (playerViewModel.isDebug) com.alexii.j2v8debugger.StethoHelper.initializeDebugger(requireContext(), playerViewModel.player)
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 

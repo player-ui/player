@@ -57,9 +57,6 @@ common:ci-mac --config=ci --local_cpu_resources=8 --local_ram_resources=11000
 
 build:release --stamp --workspace_status_command=./scripts/workspace-status.sh
 
-build:release --define build_type=release
-build:ci --define build_type=debug
-
 # Cache action outputs on disk so they persist across output_base and bazel shutdown (eg. changing branches)
 # build --disk_cache=~/.cache/bazel-disk-cache
 

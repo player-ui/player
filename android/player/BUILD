@@ -16,7 +16,7 @@ kt_android_library(
     deps = main_deps + select({
         ":dev": dev_exports,
         ":prod": main_exports,
-        "//conditions:default": main_exports,
+        "//conditions:default": dev_exports,
     }),
 )
 
@@ -39,12 +39,12 @@ android_library(
     deps = main_deps + select({
         ":dev": dev_exports,
         ":prod": main_exports,
-        "//conditions:default": main_exports,
+        "//conditions:default": dev_exports,
     }),
     exports = [":player_android"] + select({
         ":dev": dev_exports,
         ":prod": main_exports,
-        "//conditions:default": main_exports,
+        "//conditions:default": dev_exports,
     }),
     visibility = ["//visibility:public"],
 )
