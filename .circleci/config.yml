@@ -236,7 +236,6 @@ jobs:
           at: ~/player
 
       - run: |
-          bazel test --config=ci -- //third_party/hermes/hello:test
           bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
       - run:

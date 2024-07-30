@@ -4,60 +4,39 @@ coverage --combined_report=lcov
 
 # TODO: Custom compiler version breaks embedded jdeps generator plugin - enable when removing custom kotlinc
 build --@rules_kotlin//kotlin/settings:jvm_emit_jdeps=False
-build:release --//:cmake_build_type=MinSizeRel
 build --cxxopt=-std=c++17
 
 # Android databinding flags
-# TODO: Verify the follow doesn't break host compil
-build --android_crosstool_top=@androidndk//:toolchain
-build --experimental_android_databinding_v2
-build --android_databinding_use_v3_4_args
-build --android_databinding_use_androidx
-build --experimental_google_legacy_api
-query --experimental_google_legacy_api
-sync --experimental_google_legacy_api
+common --android_crosstool_top=@androidndk//:toolchain
+common --experimental_android_databinding_v2
+common --android_databinding_use_v3_4_args
+common --android_databinding_use_androidx
+common --experimental_google_legacy_api
 
 # Android demo app flags
 build --noincremental_dexing --fat_apk_cpu=armeabi-v7a,arm64-v8a,x86,x86_64
 mobile-install --start=warm
 
-build --bes_results_url=https://app.buildbuddy.io/invocation/
-build --bes_backend=grpcs://remote.buildbuddy.io
-build --remote_cache=grpcs://remote.buildbuddy.io
-build --experimental_remote_cache_compression
-build --experimental_remote_cache_async
-build --remote_download_toplevel
-build --remote_timeout=3600
-build --build_metadata=REPO_URL=https://github.com/player-ui/player.git
+common --bes_results_url=https://app.buildbuddy.io/invocation/
+common --bes_backend=grpcs://remote.buildbuddy.io
+common --remote_cache=grpcs://remote.buildbuddy.io
+common --experimental_remote_cache_compression
+common --experimental_remote_cache_async
+common --remote_download_toplevel
+common --remote_timeout=3600
+common --build_metadata=REPO_URL=https://github.com/player-ui/player.git
 
-test --bes_results_url=https://app.buildbuddy.io/invocation/
-test --bes_backend=grpcs://remote.buildbuddy.io
-test --remote_cache=grpcs://remote.buildbuddy.io
-test --experimental_remote_cache_compression
-test --experimental_remote_cache_async
-test --remote_download_toplevel
-test --remote_timeout=3600
-test --build_metadata=REPO_URL=https://github.com/player-ui/player.git
-
-coverage --bes_results_url=https://app.buildbuddy.io/invocation/
-coverage --bes_backend=grpcs://remote.buildbuddy.io
-coverage --remote_cache=grpcs://remote.buildbuddy.io
-coverage --experimental_remote_cache_compression
-coverage --experimental_remote_cache_async
-coverage --remote_download_toplevel
-coverage --remote_timeout=3600
-coverage --build_metadata=REPO_URL=https://github.com/player-ui/player.git
-
-build:ci --build_metadata=ROLE=CI --workspace_status_command=./scripts/workspace-status.sh
+common:ci --build_metadata=ROLE=CI --workspace_status_command=./scripts/workspace-status.sh
 
 # Circle xlarge has 8 CPU cores/16GB mem
-build:ci --local_cpu_resources=8
-build:ci --local_ram_resources=15000
-build:ci --config="release"
+common:ci --local_cpu_resources=8
+common:ci --local_ram_resources=15000
+common:ci --config="release"
 # Circle macos.m1.large.gen1 8 cores 12gb ram
 common:ci-mac --config=ci --local_cpu_resources=8 --local_ram_resources=11000
 
 build:release --stamp --workspace_status_command=./scripts/workspace-status.sh
+build:release --//:cmake_build_type=MinSizeRel
 
 # Cache action outputs on disk so they persist across output_base and bazel shutdown (eg. changing branches)
 # build --disk_cache=~/.cache/bazel-disk-cache
