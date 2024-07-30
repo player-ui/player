@@ -43,7 +43,7 @@ public typealias AndroidPlayerConfig = AndroidPlayer.Config
  * [HeadlessPlayer] and [injectDefaultPlugins].
  */
 public class AndroidPlayer private constructor(
-    private val player: HeadlessPlayer,
+    public val player: HeadlessPlayer,
     override val plugins: List<Plugin> = player.plugins,
 ) : Player() {
 

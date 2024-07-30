@@ -85,7 +85,7 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
 
     protected val manager: FlowManager = FlowManager(flows)
 
-    public var runtime: Runtime<*>? = null
+    private var runtime: Runtime<*>? = null
 
     private var _state = MutableStateFlow<ManagedPlayerState>(ManagedPlayerState.NotStarted)
     private val _beacons = MutableSharedFlow<String>()
