@@ -82,9 +82,10 @@ jobs:
             if [ "${CIRCLE_BRANCH}" == "main" ]; then
               echo "Running on main"
               echo 'export BUILD_TYPE=release' >> $BASH_ENV
-            elif [ -n "${CIRCLE_PULL_REQUEST}" ]; then
+            else
               echo "Running on PR"
               echo 'export BUILD_TYPE=debug' >> $BASH_ENV
+            fi
       - persist_to_workspace:
           root: .
           paths:
