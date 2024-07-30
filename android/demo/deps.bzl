@@ -6,7 +6,7 @@ maven_main = [
     "@maven//:com_afollestad_material_dialogs_core",
     "@maven//:com_google_android_material_material",
     #"@maven//:com_squareup_leakcanary_leakcanary_android",
-    "@maven//:com_github_AlexTrotsenko_j2v8_debugger",
+    "@android_j2v8//aar",
     "@maven//:com_facebook_stetho_stetho"
 ]
 

@@ -1,4 +1,4 @@
-load(":deps.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
+load(":deps.bzl", "main_deps", "main_exports", "dev_exports", "main_resources", "test_deps")
 load("@build_constants//:constants.bzl", "VERSION")
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load("@rules_kotlin//kotlin:core.bzl", "kt_kotlinc_options")
@@ -13,7 +13,21 @@ kt_android_library(
     manifest = ":src/main/AndroidManifest.xml",
     resource_files = glob(["src/main/res/**"]),
     resources = main_resources,
-    deps = main_deps,
+    deps = main_deps + select({
+        ":dev": dev_exports,
+        ":prod": main_exports,
+        "//conditions:default": dev_exports,
+    }),
+)
+
+config_setting(
+    name = "dev",
+    values = {"define": "build_type=debug"},
+)
+
+config_setting(
+    name = "prod",
+    values = {"define": "build_type=release"},
 )
 
 android_library(
@@ -22,8 +36,16 @@ android_library(
     resource_files = glob(["src/main/res/**"]),
     manifest = ":src/main/AndroidManifest.xml",
     tags = ["maven_coordinates=com.intuit.playerui:android:aar:%s" % VERSION],
-    deps = main_deps,
-    exports = main_exports + [":player_android"],
+    deps = main_deps + select({
+        ":dev": dev_exports,
+        ":prod": main_exports,
+        "//conditions:default": dev_exports,
+    }),
+    exports = [":player_android"] + select({
+        ":dev": dev_exports,
+        ":prod": main_exports,
+        "//conditions:default": dev_exports,
+    }),
     visibility = ["//visibility:public"],
 )
 

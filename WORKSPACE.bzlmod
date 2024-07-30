@@ -1,12 +1,18 @@
 load("//:build_constants.bzl", "build_constants")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+load("@bazel_tools//tools/build_defs/repo:maven_rules.bzl", "maven_aar")
 
 build_constants()
 
 android_sdk_repository(
     name = "androidsdk",
     api_level = 33
+)
+
+maven_aar(
+    name = "android_j2v8",
+    artifact = "com.eclipsesource.j2v8:j2v8:6.1.0",
 )
 
 bind(
