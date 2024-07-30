@@ -1,4 +1,4 @@
-import { useParameter } from "@storybook/manager-api";
+import { API, useParameter } from "@storybook/manager-api";
 import type { NamedType, NodeType, ObjectType } from "@player-tools/xlr";
 import { isPrimitiveTypeNode } from "@player-tools/xlr-utils";
 import React from "react";
@@ -6,6 +6,9 @@ import React from "react";
 interface DocsPanelProps {
   /** if the panel is actively shown to the user */
   active: boolean;
+
+  /** Storybook API */
+  api: API;
 }
 
 function XLRObjectDocs(props: { xlr: NamedType<ObjectType> }) {
@@ -27,13 +30,13 @@ function XLRObjectDocs(props: { xlr: NamedType<ObjectType> }) {
           {Object.entries(props.xlr.properties)
             .sort((a, b) =>
               // bubble up the required props first
-              a[1].required === b[1].required ? 0 : a[1].required ? -1 : 1,
+              a[1].required === b[1].required ? 0 : a[1].required ? -1 : 1
             )
             .map(([propKey, propType]) => {
               return (
                 <tr key={propKey}>
                   <td>{propKey}</td>
-                  <td>{propType.required ? "true" : "false"}</td>
+                  <td>{propType.required ? <b>yes</b> : "no"}</td>
                   <td>
                     {propType.node.type === "ref"
                       ? propType.node.ref
@@ -52,10 +55,10 @@ function XLRObjectDocs(props: { xlr: NamedType<ObjectType> }) {
 /** Panel to show doc info about asset props */
 export function DocsPanel(props: DocsPanelProps) {
   const assetDocsToRender = useParameter<Array<string> | undefined>(
-    "assetDocs",
+    "assetDocs"
   );
   const defaultXLRSources = useParameter<Array<any> | undefined>(
-    "assetXLRSources",
+    "assetXLRSources"
   );
 
   if (!props.active) {
@@ -66,8 +69,12 @@ export function DocsPanel(props: DocsPanelProps) {
     return <div>Loading...</div>;
   }
 
-  if (assetDocsToRender && defaultXLRSources === undefined) {
+  if (defaultXLRSources === undefined) {
     return <div>No assetXLRSources configured. Unable to generate docs.</div>;
+  }
+
+  if (assetDocsToRender === undefined) {
+    return <div>Story is not configured to generate asset docs.</div>;
   }
 
   const assetsToRender = assetDocsToRender.map((name) => {
@@ -91,7 +98,7 @@ export function DocsPanel(props: DocsPanelProps) {
       {assetsToRender.map((assetXLR) =>
         assetDocsToRender === undefined ? null : (
           <XLRObjectDocs key={assetXLR.name} xlr={assetXLR} />
-        ),
+        )
       )}
     </div>
   );

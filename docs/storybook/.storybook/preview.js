@@ -1,3 +1,4 @@
+import { addons } from "@storybook/manager-api";
 import { PlayerDecorator } from "@player-ui/storybook";
 import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin-react";
 import { CommonTypesPlugin } from "@player-ui/common-types-plugin";
@@ -5,6 +6,13 @@ import { DataChangeListenerPlugin } from "@player-ui/data-change-listener-plugin
 import { ComputedPropertiesPlugin } from "@player-ui/computed-properties-plugin";
 import * as dslRefComponents from "@player-ui/reference-assets-plugin-components";
 import RefXLR from "@player-ui/reference-assets-plugin/dist/xlr/manifest.js";
+
+addons.setConfig({
+  player: {
+    assetDocs: false,
+  },
+});
+
 import "@player-ui/reference-assets-plugin-react/dist/index.css";
 
 const reactPlayerPlugins = [

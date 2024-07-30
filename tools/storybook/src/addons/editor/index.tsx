@@ -12,6 +12,7 @@ import {
   useJSONEditorValue,
 } from "../../redux";
 import { useDarkMode } from "../useDarkMode";
+import { API } from "@storybook/manager-api";
 
 if (typeof window !== "undefined") {
   monaco.init().then((m) => {
@@ -25,11 +26,14 @@ if (typeof window !== "undefined") {
 interface EditorPanelProps {
   /** if the panel is shown */
   active: boolean;
+
+  /** Storybook API */
+  api: API;
 }
 
 /** the panel for the flow editor */
-export const JSONEditorPanel = () => {
-  const darkMode = useDarkMode();
+export const JSONEditorPanel = (props: EditorPanelProps) => {
+  const darkMode = useDarkMode(props.api);
 
   const jsonEditorValue = useJSONEditorValue();
 
@@ -113,8 +117,8 @@ const CompileErrors = ({
 };
 
 /** A panel with the TSX editor built-in */
-const DSLEditorPanel = () => {
-  const darkMode = useDarkMode();
+const DSLEditorPanel = (props: EditorPanelProps) => {
+  const darkMode = useDarkMode(props.api);
 
   const jsonEditorValue = useJSONEditorValue();
   const dslEditorValue = useDSLEditorValue();
@@ -208,11 +212,11 @@ export const EditorPanel = (props: EditorPanelProps) => {
   }
 
   if (contentType === "dsl") {
-    return <DSLEditorPanel />;
+    return <DSLEditorPanel {...props} />;
   }
 
   if (contentType === "json") {
-    return <JSONEditorPanel />;
+    return <JSONEditorPanel {...props} />;
   }
 
   return (

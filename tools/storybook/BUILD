@@ -1,8 +1,8 @@
-load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_library")
-load("@rules_player//javascript:defs.bzl", "create_package_json")
-load("@npm//:tsup/package_json.bzl", tsup_bin = "bin")
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//:tsup/package_json.bzl", tsup_bin = "bin")
+load("@rules_player//javascript:defs.bzl", "create_package_json")
 
 npm_link_all_packages(
     name = "node_modules",
@@ -15,6 +15,7 @@ dependencies = [
     ":node_modules/@player-ui/beacon-plugin-react",
     ":node_modules/@player-ui/make-flow",
     ":node_modules/@player-ui/metrics-plugin-react",
+    "//:node_modules/storybook-dark-mode",
     "//:node_modules/@storybook/manager-api",
     "//:node_modules/@storybook/preview-api",
     "//:node_modules/@storybook/types",
@@ -41,6 +42,7 @@ dependencies = [
 ]
 
 dev_dependencies = [
+    "//:node_modules/postcss",
     "//:node_modules/tsup",
 ]
 

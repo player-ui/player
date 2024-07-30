@@ -8,6 +8,7 @@
       "require": "./dist/index.js",
       "import": "./dist/index.mjs"
     },
+    "./dist/index.css": "./dist/index.css",
     "./manager": "./manager.mjs",
     "./preview": "./preview.mjs",
     "./package.json": "./package.json"

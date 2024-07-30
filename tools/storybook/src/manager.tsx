@@ -1,4 +1,5 @@
 import React from "react";
+import {} from "@storybook/preview-api";
 import { addons } from "@storybook/manager-api";
 import { Addon_TypesEnum } from "@storybook/types";
 import {
@@ -17,14 +18,14 @@ import { RenderSelection } from "./addons/appetize";
 import { StateProvider } from "./redux";
 
 export const register = () => {
-  addons.register(ADDON_ID, () => {
+  addons.register(ADDON_ID, (api) => {
     addons.add(DOCS_PANEL_ID, {
       type: Addon_TypesEnum.PANEL,
       title: "Asset Docs",
       match: ({ viewMode }) => viewMode === "story",
       render: ({ active }) => (
         <StateProvider>
-          <DocsPanel active={active} />
+          <DocsPanel api={api} active={active} />
         </StateProvider>
       ),
     });
@@ -35,7 +36,7 @@ export const register = () => {
       match: ({ viewMode }) => viewMode === "story",
       render: ({ active }) => (
         <StateProvider>
-          <EventsPanel active={Boolean(active)} />
+          <EventsPanel api={api} active={Boolean(active)} />
         </StateProvider>
       ),
     });
@@ -46,7 +47,7 @@ export const register = () => {
       match: ({ viewMode }) => viewMode === "story",
       render: ({ active }) => (
         <StateProvider>
-          <EditorPanel active={Boolean(active)} />
+          <EditorPanel api={api} active={Boolean(active)} />
         </StateProvider>
       ),
     });
