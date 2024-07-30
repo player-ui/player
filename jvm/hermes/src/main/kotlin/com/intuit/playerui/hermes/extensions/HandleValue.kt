@@ -10,6 +10,7 @@ import com.intuit.playerui.hermes.bridge.runtime.PlayerRuntimeException
 import com.intuit.playerui.jsi.Array
 import com.intuit.playerui.jsi.Function
 import com.intuit.playerui.jsi.Object
+import com.intuit.playerui.jsi.Runtime
 import com.intuit.playerui.jsi.Value
 import com.intuit.playerui.jsi.serialization.format.JSIFormat
 import kotlinx.serialization.DeserializationStrategy
@@ -44,6 +45,18 @@ context(RuntimeThreadContext) internal fun Object.transform(format: JSIFormat): 
         isFunction(format.runtime) -> asFunction(format.runtime).toInvokable<Any?>(format, this@transform, format.serializer())
         else -> toNode(format)
     }
+}
+
+// TODO: Can we pull the runtime from the thread context?
+context(RuntimeThreadContext) internal fun Object.filteredKeys(runtime: Runtime): Set<String> {
+    val names = getPropertyNames(runtime)
+    val size = names.size(runtime)
+
+    return (0 until size).map { i -> names.getValueAtIndex(runtime, i) }
+        // NOTE: since we don't have proper propname support, we just toString it - this may not be suitable for all use cases
+        .map { it.toString(runtime) }
+        .filter { !getProperty(runtime, it).isUndefined() }
+        .toSet()
 }
 
 // Object can be an Array or Function here, prefer using transform, unless you specifically need a Node

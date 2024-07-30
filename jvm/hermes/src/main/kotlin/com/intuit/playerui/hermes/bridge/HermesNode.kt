@@ -6,6 +6,7 @@ import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime
 import com.intuit.playerui.hermes.extensions.RuntimeThreadContext
 import com.intuit.playerui.hermes.extensions.evaluateInJSThreadBlocking
+import com.intuit.playerui.hermes.extensions.filteredKeys
 import com.intuit.playerui.hermes.extensions.handleValue
 import com.intuit.playerui.hermes.extensions.mapUndefinedToNull
 import com.intuit.playerui.hermes.extensions.toInvokable
@@ -34,15 +35,7 @@ public class HermesNode(private val jsiObject: Object, override val runtime: Her
 
     override val keys: Set<String> by lazy {
         runtime.evaluateInJSThreadBlocking {
-            val names = jsiObject.getPropertyNames(runtime)
-            val size = names.size(runtime)
-
-            // TODO: This could probably be handled via handleValue
-            (0 until size).map { i -> names.getValueAtIndex(runtime, i) }
-                .filterNot(Value::isUndefined)
-                // NOTE: since we don't have proper propname support, we just toString it - this may not be suitable for all use cases
-                .map { it.toString(runtime) }
-                .toSet()
+            jsiObject.filteredKeys(runtime)
         }
     }
 

@@ -10,6 +10,7 @@ import com.intuit.playerui.core.bridge.serialization.encoding.RuntimeValueDecode
 import com.intuit.playerui.core.experimental.RuntimeClassDiscriminator
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime
 import com.intuit.playerui.hermes.extensions.evaluateInJSThreadBlocking
+import com.intuit.playerui.hermes.extensions.filteredKeys
 import com.intuit.playerui.hermes.extensions.handleValue
 import com.intuit.playerui.hermes.extensions.toInvokable
 import com.intuit.playerui.jsi.Array
@@ -68,14 +69,8 @@ internal class JSIObjectMapDecoder(override val format: JSIFormat, override val 
 
     override val keys: List<String> by lazy {
         runtime.evaluateInJSThreadBlocking {
-            // TODO: Consolidate w/ HermesNode::keys
-            val names = jsiObject.getPropertyNames(runtime)
-            val size = names.size(runtime)
-
-            (0 until size).map { i -> names.getValueAtIndex(runtime, i) }
-                .filterNot(Value::isUndefined)
-                .map { it.toString(runtime) }
-        }
+            jsiObject.filteredKeys(runtime)
+        }.toList()
     }
 
     override fun getElementAtIndex(index: Int): Value = runtime.evaluateInJSThreadBlocking {
@@ -116,14 +111,8 @@ internal class JSIObjectClassDecoder(override val format: JSIFormat, override va
 
     override val keys: List<String> by lazy {
         runtime.evaluateInJSThreadBlocking {
-            // TODO: Consolidate w/ HermesNode::keys
-            val names = jsiObject.getPropertyNames(runtime)
-            val size = names.size(runtime)
-
-            (0 until size).map { i -> names.getValueAtIndex(runtime, i) }
-                .filterNot(Value::isUndefined)
-                .map { it.toString(runtime) }
-        }
+            jsiObject.filteredKeys(runtime)
+        }.toList()
     }
 
     override fun getElementAtIndex(index: Int): Value = runtime.evaluateInJSThreadBlocking {
