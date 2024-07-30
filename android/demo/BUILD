@@ -1,7 +1,6 @@
 load("@rules_android//android:rules.bzl", "android_binary", "android_library")
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_import")
-load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load("@rules_player//kotlin:defs.bzl", "lint")
 load(":deps.bzl", "main_deps", "test_deps")
 
@@ -19,7 +18,7 @@ android_binary(
     assets = glob(["src/main/assets/mocks/**"]),
     assets_dir = "src/main/assets",
     custom_package = "com.intuit.playerui.android.reference.demo",
-    dex_shards = 3,
+    dex_shards = 4,
     manifest = ":src/main/AndroidManifest.xml",
     multidex = "native",
     deps = [
