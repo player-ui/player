@@ -1,8 +1,6 @@
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
-load("@rules_player//distribution/tar:stamp_tar_files.bzl", "stamp_tar_files")
-
-
-load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+load("@rules_player//distribution/tar:defs.bzl", "stamp_tar_files")
+load("@rules_player//gh-pages:defs.bzl","gh_pages")
 
 genrule(
   name = "full_site",
@@ -21,7 +19,6 @@ genrule(
   """
 )
 
-
 stamp_tar_files(
    name = "full_site_stamped",
    tar = ":full_site",
@@ -32,9 +29,17 @@ stamp_tar_files(
   },
 )
 
-#gh_pages(
-#  name="deploy_docs",
-#  source_dir="$(location :full_site_stamped)",
-#  repo="player-ui/player-ui.github.io",
-#  data = [":full_site_stamped"]
-#)
+genrule(
+  name = "get_version",
+  srcs = ["//:VERSION"],
+  outs = ["VERSION"],
+  cmd = "cat $(SRCS) > $@"
+)
+
+gh_pages(
+  name="gh_deploy",
+  source_dir="$(location :full_site_stamped)",
+  repo="player-ui/player-ui.github.io",
+  data = [":full_site_stamped", ":get_version"],
+  version = "$(location :get_version)",
+)
