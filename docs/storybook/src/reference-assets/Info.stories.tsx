@@ -1,5 +1,5 @@
 import type { Meta } from "@storybook/react";
-import { createDSLStory } from "@player-ui/storybook-addon-player";
+import { createDSLStory } from "@player-ui/storybook";
 import { Info } from "@player-ui/reference-assets-plugin-react";
 
 const meta: Meta<typeof Info> = {

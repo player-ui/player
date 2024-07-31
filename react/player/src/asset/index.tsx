@@ -1,4 +1,5 @@
 import React from "react";
+import leven from "leven";
 import type { Asset as AssetType, AssetWrapper } from "@player-ui/player";
 import type { Registry } from "@player-ui/partial-match-registry";
 
@@ -49,11 +50,43 @@ export const ReactAsset = (
     throw Error(`Asset is missing type for ${info}`);
   }
 
+  if (!registry || registry.isRegistryEmpty()) {
+    throw Error(`No asset found in registry. This could happen for one of the following reasons: \n
+      1. You might have no assets registered or no plugins added to the Player instance. \n
+      2. You might have mismatching versions of React Asset Registry Context. \n
+      See https://player-ui.github.io/latest/tools/cli#player-dependency-versions-check for tips about how to debug and fix this problem`);
+  }
+
   const Impl = registry?.get(unwrapped);
 
   if (!Impl) {
+    const matchList: object[] = [];
+
+    registry.forEach((asset) => {
+      matchList.push(asset.key);
+    });
+
+    const typeList = matchList.map(
+      (match) => JSON.parse(JSON.stringify(match)).type,
+    );
+
+    const similarType = typeList.reduce((prev, curr) => {
+      const next = {
+        value: leven(unwrapped.type, curr),
+        type: curr,
+      };
+
+      if (prev !== undefined && prev.value < next.value) {
+        return prev;
+      }
+
+      return next;
+    }, undefined);
+
     throw Error(
-      `No implementation found for id: ${unwrapped.id} type: ${unwrapped.type}`,
+      `No implementation found for id: ${unwrapped.id} type: ${unwrapped.type}. Did you mean ${similarType.type}? \n 
+      Registered Asset matching functions are listed below: \n
+      ${JSON.stringify(matchList)}`,
     );
   }
 

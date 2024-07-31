@@ -99,7 +99,9 @@ abstract class AssetTest(val group: String? = null) {
 
     protected val currentState: PlayerFlowState get() = player.state
 
-    protected val mocks get() = ClassLoaderMocksReader(context.classLoader).mocks
+    protected val mocks get() = ClassLoaderMocksReader(context.classLoader).mocks.filter {
+        group == null || group == it.group
+    }
 
     private val emptyView = View(context)
 

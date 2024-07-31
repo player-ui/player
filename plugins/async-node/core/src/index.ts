@@ -4,10 +4,12 @@ import type {
   PlayerPlugin,
   Node,
   ParseObjectOptions,
+  ParseObjectChildOptions,
   ViewInstance,
   Parser,
   ViewPlugin,
   Resolver,
+  Resolve,
 } from "@player-ui/player";
 import { AsyncParallelBailHook } from "tapable-ts";
 import queueMicrotask from "queue-microtask";
@@ -24,7 +26,7 @@ export interface AsyncNodeViewPlugin extends ViewPlugin {
   /** Use this to tap into the async node plugin hooks */
   applyPlugin: (asyncNodePlugin: AsyncNodePlugin) => void;
 
-  asyncNode: AsyncParallelBailHook<[Node.Async], any>;
+  asyncNode: AsyncParallelBailHook<[Node.Async, (result: any) => void], any>;
 }
 
 /**
@@ -44,7 +46,10 @@ export class AsyncNodePlugin implements PlayerPlugin {
   }
 
   public readonly hooks = {
-    onAsyncNode: new AsyncParallelBailHook<[Node.Async], any>(),
+    onAsyncNode: new AsyncParallelBailHook<
+      [Node.Async, (result: any) => void],
+      any
+    >(),
   };
 
   name = "AsyncNode";
@@ -61,7 +66,10 @@ export class AsyncNodePlugin implements PlayerPlugin {
 }
 
 export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
-  public asyncNode = new AsyncParallelBailHook<[Node.Async], any>();
+  public asyncNode = new AsyncParallelBailHook<
+    [Node.Async, (result: any) => void],
+    any
+  >();
   private basePlugin: AsyncNodePlugin | undefined;
 
   name = "AsyncNode";
@@ -70,49 +78,38 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
   private currentView: ViewInstance | undefined;
 
-  private isAsync(node: Node.Node | null): node is Node.Async {
-    return node?.type === NodeType.Async;
+  /**
+   * Updates the node asynchronously based on the result provided.
+   * This method is responsible for handling the update logic of asynchronous nodes.
+   * It checks if the node needs to be updated based on the new result and updates the mapping accordingly.
+   * If an update is necessary, it triggers an asynchronous update on the view.
+   * @param node The asynchronous node that might be updated.
+   * @param result The result obtained from resolving the async node. This could be any data structure or value.
+   * @param options Options provided for node resolution, including a potential parseNode function to process the result.
+   * @param view The view instance where the node resides. This can be undefined if the view is not currently active.
+   */
+  private handleAsyncUpdate(
+    node: Node.Async,
+    result: any,
+    options: Resolve.NodeResolveOptions,
+    view: ViewInstance | undefined,
+  ) {
+    const parsedNode =
+      options.parseNode && result ? options.parseNode(result) : undefined;
+
+    if (this.resolvedMapping.get(node.id) !== parsedNode) {
+      this.resolvedMapping.set(node.id, parsedNode ? parsedNode : node);
+      view?.updateAsync();
+    }
   }
 
-  applyParser(parser: Parser) {
-    parser.hooks.determineNodeType.tap(this.name, (obj) => {
-      if (Object.prototype.hasOwnProperty.call(obj, "async")) {
-        return NodeType.Async;
-      }
-    });
-    parser.hooks.parseNode.tap(
-      this.name,
-      (
-        obj: any,
-        nodeType: Node.ChildrenTypes,
-        options: ParseObjectOptions,
-        determinedNodeType: null | NodeType,
-      ) => {
-        if (determinedNodeType === NodeType.Async) {
-          const parsedAsync = parser.parseObject(
-            omit(obj, "async"),
-            nodeType,
-            options,
-          );
-          const parsedNodeId = getNodeID(parsedAsync);
-          if (parsedAsync !== null && parsedNodeId) {
-            return parser.createASTNode(
-              {
-                id: parsedNodeId,
-                type: NodeType.Async,
-                value: parsedAsync,
-              },
-              obj,
-            );
-          }
-
-          return null;
-        }
-      },
-    );
-  }
-
-  applyResolverHooks(resolver: Resolver) {
+  /**
+   * Handles the asynchronous API integration for resolving nodes.
+   * This method sets up a hook on the resolver's `beforeResolve` event to process async nodes.
+   * @param resolver The resolver instance to attach the hook to.
+   * @param view
+   */
+  applyResolver(resolver: Resolver) {
     resolver.hooks.beforeResolve.tap(this.name, (node, options) => {
       let resolvedNode;
       if (this.isAsync(node)) {
@@ -127,56 +124,80 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
       const newNode = resolvedNode || node;
       if (!resolvedNode && node?.type === NodeType.Async) {
         queueMicrotask(async () => {
-          const result = await this.basePlugin?.hooks.onAsyncNode.call(node);
-          const parsedNode =
-            options.parseNode && result ? options.parseNode(result) : undefined;
-
-          if (parsedNode) {
-            this.resolvedMapping.set(node.id, parsedNode);
-            this.currentView?.updateAsync();
-          }
+          const result = await this.basePlugin?.hooks.onAsyncNode.call(
+            node,
+            (result) => {
+              this.handleAsyncUpdate(node, result, options, this.currentView);
+            },
+          );
+          this.handleAsyncUpdate(node, result, options, this.currentView);
         });
 
         return node;
       }
-
       return newNode;
     });
   }
 
-  apply(view: ViewInstance): void {
-    view.hooks.parser.tap("template", this.applyParser.bind(this));
-    view.hooks.resolver.tap("template", (resolver) => {
-      resolver.hooks.beforeResolve.tap(this.name, (node, options) => {
-        let resolvedNode;
-        if (this.isAsync(node)) {
-          const mappedValue = this.resolvedMapping.get(node.id);
-          if (mappedValue) {
-            resolvedNode = mappedValue;
+  private isAsync(node: Node.Node | null): node is Node.Async {
+    return node?.type === NodeType.Async;
+  }
+
+  private isDeterminedAsync(obj: any) {
+    return obj && Object.prototype.hasOwnProperty.call(obj, "async");
+  }
+
+  applyParser(parser: Parser) {
+    parser.hooks.parseNode.tap(
+      this.name,
+      (
+        obj: any,
+        nodeType: Node.ChildrenTypes,
+        options: ParseObjectOptions,
+        childOptions?: ParseObjectChildOptions,
+      ) => {
+        if (this.isDeterminedAsync(obj)) {
+          const parsedAsync = parser.parseObject(
+            omit(obj, "async"),
+            nodeType,
+            options,
+          );
+          const parsedNodeId = getNodeID(parsedAsync);
+
+          if (parsedAsync === null || !parsedNodeId) {
+            return childOptions ? [] : null;
           }
-        } else {
-          resolvedNode = null;
+
+          const asyncAST = parser.createASTNode(
+            {
+              id: parsedNodeId,
+              type: NodeType.Async,
+              value: parsedAsync,
+            },
+            obj,
+          );
+
+          if (childOptions) {
+            return asyncAST
+              ? [
+                  {
+                    path: [...childOptions.path, childOptions.key],
+                    value: asyncAST,
+                  },
+                ]
+              : [];
+          }
+
+          return asyncAST;
         }
+      },
+    );
+  }
 
-        const newNode = resolvedNode || node;
-        if (!resolvedNode && node?.type === NodeType.Async) {
-          queueMicrotask(async () => {
-            const result = await this.basePlugin?.hooks.onAsyncNode.call(node);
-            const parsedNode =
-              options.parseNode && result
-                ? options.parseNode(result)
-                : undefined;
-
-            this.resolvedMapping.set(node.id, parsedNode ? parsedNode : node);
-            view.updateAsync();
-          });
-
-          return node;
-        }
-
-        return newNode;
-      });
-    });
+  apply(view: ViewInstance): void {
+    this.currentView = view;
+    view.hooks.parser.tap("async", this.applyParser.bind(this));
+    view.hooks.resolver.tap("async", this.applyResolver.bind(this));
   }
 
   applyPlugin(asyncNodePlugin: AsyncNodePlugin): void {

@@ -21,6 +21,8 @@
     "importHelpers": true,
     "resolveJsonModule": true,
     "composite": true,
-    "lib": ["DOM", "ES2020"]
+    "lib": ["DOM", "ES2020"],
+    "isolatedDeclarations": true,
+    "noUncheckedIndexedAccess": true,
   }
 }

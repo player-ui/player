@@ -3,7 +3,13 @@ import { BindingParser } from "../../../binding";
 import { LocalModel, withParser } from "../../../data";
 import { SchemaController } from "../../../schema";
 import { NodeType, Parser } from "../index";
-import { SwitchPlugin, ApplicabilityPlugin, TemplatePlugin } from "../..";
+import {
+  SwitchPlugin,
+  ApplicabilityPlugin,
+  TemplatePlugin,
+  MultiNodePlugin,
+  AssetPlugin,
+} from "../..";
 import type { Options } from "../../plugins/options";
 import { ExpressionEvaluator } from "../../../expressions";
 import type { DataModelWithParser } from "../../../data";
@@ -30,9 +36,11 @@ describe("generates the correct AST", () => {
         model,
       },
     };
+    new AssetPlugin().applyParser(parser);
     new TemplatePlugin(options).applyParser(parser);
     new ApplicabilityPlugin().applyParser(parser);
     new SwitchPlugin(options).applyParser(parser);
+    new MultiNodePlugin().applyParser(parser);
   });
 
   test("works with basic objects", () => {
@@ -154,8 +162,10 @@ describe("parseView", () => {
         model,
       },
     };
+    new AssetPlugin().applyParser(parser);
     new TemplatePlugin(options).applyParser(parser);
     new ApplicabilityPlugin().applyParser(parser);
+    new MultiNodePlugin().applyParser(parser);
     new SwitchPlugin(options).applyParser(parser);
   });
 
@@ -249,8 +259,13 @@ describe("generates the correct AST when using switch plugin", () => {
       return true;
     },
   } as any);
+  const multiNodePlugin = new MultiNodePlugin();
+  const assetPlugin = new AssetPlugin();
+
   const parser = new Parser();
   switchPlugin.applyParser(parser);
+  multiNodePlugin.applyParser(parser);
+  assetPlugin.applyParser(parser);
 
   test("works with asset wrapped objects", () => {
     expect(parser.parseObject(toughStaticSwitchView)).toMatchSnapshot();

@@ -4,135 +4,27 @@ import type { DataModelWithParser } from "../../../data";
 import { LocalModel, withParser } from "../../../data";
 import { ExpressionEvaluator } from "../../../expressions";
 import { SchemaController } from "../../../schema";
-import { NodeType } from "../../parser";
 import { Parser } from "../../parser";
 import { ViewInstance } from "../../view";
 import type { Options } from "../options";
-import TemplatePlugin from "../template-plugin";
+import { TemplatePlugin, MultiNodePlugin, AssetPlugin } from "../";
 import { StringResolverPlugin, toNodeResolveOptions } from "../..";
 
 const templateJoinValues = {
-  id: "snippet-of-json",
-  topic: "Snippet",
-  schema: {},
-  data: {
-    forms: {
-      "1099-A": [
-        {
-          description: "Desciption of concept 1099 1",
-          amount: "Help",
-        },
-      ],
-      "1099-B": [
-        {
-          description: "Desciption of concept 1099 2",
-          amount: "Help",
-        },
-      ],
-    },
-  },
+  id: "generated-flow",
   views: [
     {
-      id: "overviewGroup",
-      type: "overviewGroup",
-      metaData: {
-        role: "stateful",
-      },
-      modifiers: [
-        {
-          type: "tag",
-          value: "fancy-header",
-        },
-      ],
-      headers: {
-        label: {
-          asset: {
-            id: "line-of-work-summary-gh-header-label",
-            type: "text",
-            value: "Header",
-          },
-        },
-        values: [
-          {
-            asset: {
-              id: "line-of-work-summary-gh-expenses-simple-header-previous-year",
-              type: "text",
-              value: "Type",
-            },
-          },
-          {
-            asset: {
-              id: "line-of-work-summary-gh-expenses-simple-header-cy",
-              type: "text",
-              value: "2022",
-            },
-          },
-        ],
-      },
+      id: "collection",
+      type: "collection",
       template: [
         {
-          data: "forms.1099-A",
+          data: "foo",
           output: "values",
           value: {
             asset: {
-              id: "overviewItem3",
-              type: "overviewItem",
-              label: {
-                asset: {
-                  id: "overviewItem3-label",
-                  type: "text",
-                  value: "1099-A",
-                },
-              },
-              values: [
-                {
-                  asset: {
-                    id: "overviewItem3-year",
-                    type: "text",
-                    value: "Desciption of concept 1099 1",
-                  },
-                },
-                {
-                  asset: {
-                    id: "loverviewItem3-cy",
-                    type: "text",
-                    value: "4000",
-                  },
-                },
-              ],
-            },
-          },
-        },
-        {
-          data: "forms.1099-B",
-          output: "values",
-          value: {
-            asset: {
-              id: "overviewItem4",
-              type: "overviewItem",
-              label: {
-                asset: {
-                  id: "overviewItem4-label",
-                  type: "text",
-                  value: "1099-B",
-                },
-              },
-              values: [
-                {
-                  asset: {
-                    id: "overviewItem4-year",
-                    type: "text",
-                    value: "Desciption of concept 1099 2",
-                  },
-                },
-                {
-                  asset: {
-                    id: "loverviewItem3-cy",
-                    type: "text",
-                    value: "6000",
-                  },
-                },
-              ],
+              id: "value-_index_",
+              type: "text",
+              value: "item {{foo._index_}}",
             },
           },
         },
@@ -140,238 +32,71 @@ const templateJoinValues = {
       values: [
         {
           asset: {
-            id: "overviewItem1",
-            type: "overviewItem",
-            label: {
-              asset: {
-                id: "overviewItem1-label",
-                type: "text",
-                value: "First Summary",
-              },
-            },
-            values: [
-              {
-                asset: {
-                  id: "overviewItem1-year",
-                  type: "text",
-                  value: "Desciption of year summary 1",
-                },
-              },
-              {
-                asset: {
-                  id: "loverviewItem1-cy",
-                  type: "text",
-                  value: "14000",
-                },
-              },
-            ],
+            id: "value-2",
+            type: "text",
+            value: "First value in the collection",
           },
         },
         {
           asset: {
-            id: "overviewItem2",
-            type: "overviewItem",
-            label: {
-              asset: {
-                id: "overviewItem2-label",
-                type: "text",
-                value: "Second year Summary",
-              },
-            },
-            values: [
-              {
-                asset: {
-                  id: "overviewItem2-year",
-                  type: "text",
-                  value: "Desciption of year summary item 2",
-                },
-              },
-              {
-                asset: {
-                  id: "loverviewItem1-cy",
-                  type: "text",
-                  value: "19000",
-                },
-              },
-            ],
+            id: "value-3",
+            type: "text",
+            value: "Second value in the collection",
           },
         },
       ],
     },
     {
-      id: "overviewGroup",
-      type: "overviewGroup",
-      metaData: {
-        role: "stateful",
-      },
-      modifiers: [
-        {
-          type: "tag",
-          value: "fancy-header",
-        },
-      ],
-      headers: {
-        label: {
-          asset: {
-            id: "line-of-work-summary-gh-header-label",
-            type: "text",
-            value: "Header",
-          },
-        },
-        values: [
-          {
-            asset: {
-              id: "line-of-work-summary-gh-expenses-simple-header-previous-year",
-              type: "text",
-              value: "Type",
-            },
-          },
-          {
-            asset: {
-              id: "line-of-work-summary-gh-expenses-simple-header-cy",
-              type: "text",
-              value: "2022",
-            },
-          },
-        ],
-      },
+      id: "collection",
+      type: "collection",
       values: [
         {
           asset: {
-            id: "overviewItem1",
-            type: "overviewItem",
-            label: {
-              asset: {
-                id: "overviewItem1-label",
-                type: "text",
-                value: "First Summary",
-              },
-            },
-            values: [
-              {
-                asset: {
-                  id: "overviewItem1-year",
-                  type: "text",
-                  value: "Desciption of year summary 1",
-                },
-              },
-              {
-                asset: {
-                  id: "loverviewItem1-cy",
-                  type: "text",
-                  value: "14000",
-                },
-              },
-            ],
+            id: "value-2",
+            type: "text",
+            value: "First value in the collection",
           },
         },
         {
           asset: {
-            id: "overviewItem2",
-            type: "overviewItem",
-            label: {
-              asset: {
-                id: "overviewItem2-label",
-                type: "text",
-                value: "Second year Summary",
-              },
-            },
-            values: [
-              {
-                asset: {
-                  id: "overviewItem2-year",
-                  type: "text",
-                  value: "Desciption of year summary item 2",
-                },
-              },
-              {
-                asset: {
-                  id: "loverviewItem1-cy",
-                  type: "text",
-                  value: "19000",
-                },
-              },
-            ],
+            id: "value-3",
+            type: "text",
+            value: "Second value in the collection",
           },
         },
       ],
       template: [
         {
-          data: "forms.1099-A",
+          data: "foo",
           output: "values",
           value: {
             asset: {
-              id: "overviewItem3",
-              type: "overviewItem",
-              label: {
-                asset: {
-                  id: "overviewItem3-label",
-                  type: "text",
-                  value: "1099-A",
-                },
-              },
-              values: [
-                {
-                  asset: {
-                    id: "overviewItem3-year",
-                    type: "text",
-                    value: "Desciption of concept 1099 1",
-                  },
-                },
-                {
-                  asset: {
-                    id: "loverviewItem3-cy",
-                    type: "text",
-                    value: "4000",
-                  },
-                },
-              ],
-            },
-          },
-        },
-        {
-          data: "forms.1099-B",
-          output: "values",
-          value: {
-            asset: {
-              id: "overviewItem4",
-              type: "overviewItem",
-              label: {
-                asset: {
-                  id: "overviewItem4-label",
-                  type: "text",
-                  value: "1099-B",
-                },
-              },
-              values: [
-                {
-                  asset: {
-                    id: "overviewItem4-year",
-                    type: "text",
-                    value: "Desciption of concept 1099 2",
-                  },
-                },
-                {
-                  asset: {
-                    id: "loverviewItem3-cy",
-                    type: "text",
-                    value: "6000",
-                  },
-                },
-              ],
+              id: "value-_index_",
+              type: "text",
+              value: "item {{foo._index_}}",
             },
           },
         },
       ],
     },
   ],
+  data: {
+    foo: [1, 2],
+  },
   navigation: {
-    BEGIN: "SnippetFlow",
-    SnippetFlow: {
-      startState: "VIEW_Snippet-View1",
-      "VIEW_Snippet-View1": {
-        ref: "overviewGroup",
+    BEGIN: "FLOW_1",
+    FLOW_1: {
+      startState: "VIEW_1",
+      VIEW_1: {
         state_type: "VIEW",
+        ref: "collection",
+        transitions: {
+          "*": "END_Done",
+        },
+      },
+      END_Done: {
+        state_type: "END",
+        outcome: "done",
       },
     },
   },
@@ -401,6 +126,7 @@ describe("templates", () => {
       },
     };
     new TemplatePlugin(options).applyParser(parser);
+    new AssetPlugin().applyParser(parser);
   });
 
   it("works with simple ones", () => {
@@ -458,76 +184,6 @@ describe("templates", () => {
         ],
       }),
     ).toMatchSnapshot();
-  });
-
-  it("determines if nodeType is template", () => {
-    const nodeTest = "template";
-    const nodeType = parser.hooks.determineNodeType.call(nodeTest);
-    expect(nodeType).toStrictEqual("template");
-  });
-
-  it("Does not return a nodeType", () => {
-    const nodeTest = {
-      value: "foo",
-    };
-    const nodeType = parser.hooks.determineNodeType.call(nodeTest);
-    expect(nodeType).toBe(undefined);
-  });
-
-  it("returns templateNode if template exists", () => {
-    const obj = {
-      dynamic: true,
-      data: "foo.bar",
-      output: "values",
-      value: {
-        value: "{{foo.bar._index_}}",
-      },
-    };
-    const nodeOptions = {
-      templateDepth: 1,
-    };
-    const parsedNode = parser.hooks.parseNode.call(
-      obj,
-      NodeType.Value,
-      nodeOptions,
-      NodeType.Template,
-    );
-    expect(parsedNode).toStrictEqual({
-      data: "foo.bar",
-      depth: 1,
-      dynamic: true,
-      template: {
-        value: "{{foo.bar._index_}}",
-      },
-      type: "template",
-    });
-  });
-
-  it("returns templateNode if template exists, and templateDepth is not set", () => {
-    const obj = {
-      data: "foo.bar2",
-      output: "values",
-      dynamic: true,
-      value: {
-        value: "{{foo.bar2._index_}}",
-      },
-    };
-    const nodeOptions = {};
-    const parsedNode = parser.hooks.parseNode.call(
-      obj,
-      NodeType.Value,
-      nodeOptions,
-      NodeType.Template,
-    );
-    expect(parsedNode).toStrictEqual({
-      data: "foo.bar2",
-      depth: 0,
-      dynamic: true,
-      template: {
-        value: "{{foo.bar2._index_}}",
-      },
-      type: "template",
-    });
   });
 });
 
@@ -695,13 +351,15 @@ describe("dynamic templates", () => {
       });
 
       const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new AssetPlugin().apply(view);
       new TemplatePlugin(pluginOptions).apply(view);
       new StringResolverPlugin().apply(view);
+      new MultiNodePlugin().apply(view);
 
       const resolved = view.update();
 
       expect(resolved.values).toHaveLength(4);
-      expect(resolved.values[0]).toMatchSnapshot();
+      expect(resolved.values).toMatchSnapshot();
     });
     it("Should show template item last when coming after values on lexical order", () => {
       const view = new ViewInstance(templateJoinValues.views[1], {
@@ -712,13 +370,15 @@ describe("dynamic templates", () => {
       });
 
       const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new AssetPlugin().apply(view);
       new TemplatePlugin(pluginOptions).apply(view);
       new StringResolverPlugin().apply(view);
+      new MultiNodePlugin().apply(view);
 
       const resolved = view.update();
 
       expect(resolved.values).toHaveLength(4);
-      expect(resolved.values[0]).toMatchSnapshot();
+      expect(resolved.values).toMatchSnapshot();
     });
   });
 });

@@ -1,4 +1,5 @@
 load("//jvm:defs.bzl", "kt_player_module")
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load(":deps.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
 load(":defs.bzl", "j2v8_platform")
 
@@ -6,11 +7,17 @@ load(":defs.bzl", "j2v8_platform")
 #       May require creating shared module_name space.
 kt_player_module(
     name = "j2v8",
+    main_srcs = glob(["src/main/kotlin/com/intuit/**/*.kt"]),
     main_deps = main_deps,
     main_exports = main_exports,
     main_resources = main_resources + glob(["src/main/resources/**"]),
     test_deps = test_deps,
     test_package = "com.intuit.playerui.j2v8",
+)
+
+kt_jvm_library(
+    name = "j2v8_script_provider",
+    srcs = ["src/main/kotlin/com/alexii/j2v8debugger/ScriptSourceProvider.kt"]
 )
 
 j2v8_platform("macos")

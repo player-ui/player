@@ -37,6 +37,7 @@ plugins/asset-provider/react/node_modules
 plugins/asset-transform/core/node_modules
 plugins/async-node/core/node_modules
 plugins/common-types/core/node_modules
+plugins/async-node/components/node_modules
 plugins/types-provider/core/node_modules
 plugins/auto-scroll/react/node_modules
 plugins/beacon/react/node_modules
@@ -62,7 +63,7 @@ plugins/stage-revert-data/core/node_modules
 tools/asset-testing-library/core/node_modules
 docs/storybook/node_modules
 plugins/reference-assets/mocks/node_modules
-tools/addon-storybook/node_modules
+tools/storybook/node_modules
 tools/components/node_modules
 tools/mocks/node_modules
 docs/site/node_modules

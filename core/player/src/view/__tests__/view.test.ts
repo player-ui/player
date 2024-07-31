@@ -4,6 +4,7 @@ import { ExpressionEvaluator } from "../../expressions";
 import { BindingParser } from "../../binding";
 import { SchemaController } from "../../schema";
 import {
+  MultiNodePlugin,
   StringResolverPlugin,
   SwitchPlugin,
   ViewInstance,
@@ -80,7 +81,7 @@ describe("view", () => {
       expect(updated).toBe(resolved);
     });
 
-    test("works with no valid switch cases in an array", () => {
+    test("works with no valid static switch cases in an array", () => {
       const model = withParser(new LocalModel({}), parseBinding);
       const evaluator = new ExpressionEvaluator({ model });
       const schema = new SchemaController();
@@ -122,12 +123,67 @@ describe("view", () => {
 
       const pluginOptions = toNodeResolveOptions(view.resolverOptions);
       new SwitchPlugin(pluginOptions).apply(view);
+      new MultiNodePlugin().apply(view);
       new StringResolverPlugin().apply(view);
 
       const resolved = view.update();
 
       expect(resolved).toStrictEqual({
         id: "test",
+        type: "view",
+      });
+    });
+
+    test("works with no valid dynamic switch cases in an array", () => {
+      const model = withParser(new LocalModel({}), parseBinding);
+      const evaluator = new ExpressionEvaluator({ model });
+      const schema = new SchemaController();
+
+      const view = new ViewInstance(
+        {
+          id: "test",
+          type: "view",
+          title: [
+            {
+              dynamicSwitch: [
+                {
+                  case: false,
+                  asset: {
+                    id: "false-case",
+                    type: "text",
+                    value: "some text",
+                  },
+                },
+                {
+                  case: false,
+                  asset: {
+                    id: "false-case-2",
+                    type: "text",
+                    value: "some text",
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        {
+          model,
+          parseBinding,
+          evaluator,
+          schema,
+        },
+      );
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new SwitchPlugin(pluginOptions).apply(view);
+      new MultiNodePlugin().apply(view);
+      new StringResolverPlugin().apply(view);
+
+      const resolved = view.update();
+
+      expect(resolved).toStrictEqual({
+        id: "test",
+        title: [],
         type: "view",
       });
     });
@@ -381,6 +437,7 @@ describe("view", () => {
 
       const pluginOptions = toNodeResolveOptions(view.resolverOptions);
       new SwitchPlugin(pluginOptions).apply(view);
+      new MultiNodePlugin().apply(view);
       new StringResolverPlugin().apply(view);
 
       const resolved = view.update();
@@ -735,6 +792,7 @@ describe("view", () => {
 
       const pluginOptions = toNodeResolveOptions(view.resolverOptions);
       new SwitchPlugin(pluginOptions).apply(view);
+      new MultiNodePlugin().apply(view);
       new StringResolverPlugin().apply(view);
 
       const resolved = view.update();

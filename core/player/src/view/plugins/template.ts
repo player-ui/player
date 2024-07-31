@@ -1,9 +1,16 @@
 import { SyncWaterfallHook } from "tapable-ts";
-import type { Node, ParseObjectOptions, Parser } from "../parser";
+import type { Template } from "@player-ui/types";
+import type {
+  Node,
+  ParseObjectOptions,
+  ParseObjectChildOptions,
+  Parser,
+} from "../parser";
 import { NodeType } from "../parser";
+import { ViewInstance, ViewPlugin } from "../view";
 import type { Options } from "./options";
 import type { Resolver } from "../resolver";
-import { ViewInstance, ViewPlugin } from "../view";
+import { hasTemplateKey } from "../parser/utils";
 
 export interface TemplateItemInfo {
   /** The index of the data for the current iteration of the template */
@@ -115,35 +122,42 @@ export default class TemplatePlugin implements ViewPlugin {
       return node;
     });
 
-    parser.hooks.determineNodeType.tap("template", (obj: any) => {
-      if (obj === "template") {
-        return NodeType.Template;
-      }
-    });
-
     parser.hooks.parseNode.tap(
       "template",
       (
         obj: any,
         _nodeType: Node.ChildrenTypes,
         options: ParseObjectOptions,
-        determinedNodeType: null | NodeType,
+        childOptions?: ParseObjectChildOptions,
       ) => {
-        if (determinedNodeType === NodeType.Template) {
-          const templateNode = parser.createASTNode(
-            {
-              type: NodeType.Template,
-              depth: options.templateDepth ?? 0,
-              data: obj.data,
-              template: obj.value,
-              dynamic: obj.dynamic ?? false,
-            },
-            obj,
-          );
+        if (childOptions && hasTemplateKey(childOptions.key)) {
+          return obj
+            .map((template: Template) => {
+              const templateAST = parser.createASTNode(
+                {
+                  type: NodeType.Template,
+                  depth: options.templateDepth ?? 0,
+                  data: template.data,
+                  template: template.value,
+                  dynamic: template.dynamic ?? false,
+                },
+                template,
+              );
 
-          if (templateNode) {
-            return templateNode;
-          }
+              if (!templateAST) return;
+
+              if (templateAST.type === NodeType.MultiNode) {
+                templateAST.values.forEach((v) => {
+                  v.parent = templateAST;
+                });
+              }
+
+              return {
+                path: [...childOptions.path, template.output],
+                value: templateAST,
+              };
+            })
+            .filter(Boolean);
         }
       },
     );

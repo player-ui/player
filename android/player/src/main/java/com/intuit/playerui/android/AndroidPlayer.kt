@@ -2,14 +2,12 @@ package com.intuit.playerui.android
 
 import android.content.Context
 import android.view.View
-import com.alexii.j2v8debugger.ScriptSourceProvider
 import com.intuit.hooks.BailResult
 import com.intuit.hooks.HookContext
 import com.intuit.hooks.SyncBailHook
 import com.intuit.hooks.SyncHook
 import com.intuit.hooks.SyncWaterfallHook
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.debug.UnsupportedScriptProvider
 import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.overlayStyles
 import com.intuit.playerui.android.extensions.removeSelf
@@ -45,9 +43,9 @@ public typealias AndroidPlayerConfig = AndroidPlayer.Config
  * [HeadlessPlayer] and [injectDefaultPlugins].
  */
 public class AndroidPlayer private constructor(
-    private val player: HeadlessPlayer,
+    public val player: HeadlessPlayer,
     override val plugins: List<Plugin> = player.plugins,
-) : Player(), ScriptSourceProvider by player.runtime as? ScriptSourceProvider ?: UnsupportedScriptProvider(player.runtime) {
+) : Player() {
 
     /** Convenience constructor to provide vararg style [plugins] parameter */
     public constructor(

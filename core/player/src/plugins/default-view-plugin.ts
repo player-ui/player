@@ -1,6 +1,8 @@
 import type { Player, PlayerPlugin } from "../player";
 import {
   ApplicabilityPlugin,
+  AssetPlugin,
+  MultiNodePlugin,
   StringResolverPlugin,
   SwitchPlugin,
   TemplatePlugin,
@@ -17,12 +19,14 @@ export class DefaultViewPlugin implements PlayerPlugin {
     player.hooks.viewController.tap(this.name, (viewController) => {
       viewController.hooks.view.tap(this.name, (view) => {
         const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+        new AssetPlugin().apply(view);
         new SwitchPlugin(pluginOptions).apply(view);
         new ApplicabilityPlugin().apply(view);
         new StringResolverPlugin().apply(view);
         const templatePlugin = new TemplatePlugin(pluginOptions);
         templatePlugin.apply(view);
         view.hooks.onTemplatePluginCreated.call(templatePlugin);
+        new MultiNodePlugin().apply(view);
       });
     });
   }

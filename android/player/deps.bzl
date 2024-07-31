@@ -2,7 +2,13 @@ main_exports = [
     "//jvm/j2v8:j2v8-android",
 ]
 
-main_deps = main_exports + [
+dev_exports = [
+    "//jvm/j2v8:j2v8-android-debug",
+]
+
+main_deps = [
+    "@maven//:androidx_databinding_viewbinding",
+    "@maven//:androidx_annotation_annotation",
     "@maven//:androidx_core_core_ktx",
     "@maven//:androidx_transition_transition",
     "@maven//:androidx_lifecycle_lifecycle_runtime_ktx",

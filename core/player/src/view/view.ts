@@ -4,15 +4,10 @@ import type { BindingInstance, BindingFactory } from "../binding";
 import type { ValidationProvider, ValidationObject } from "../validator";
 import type { Logger } from "../logger";
 import type { Resolve } from "./resolver";
-import { Resolver, toNodeResolveOptions } from "./resolver";
+import { Resolver } from "./resolver";
 import type { Node } from "./parser";
 import { Parser } from "./parser";
-import {
-  TemplatePlugin,
-  StringResolverPlugin,
-  ApplicabilityPlugin,
-  SwitchPlugin,
-} from "./plugins";
+import { TemplatePlugin } from "./plugins";
 
 /**
  * Manages the view level validations

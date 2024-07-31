@@ -24,8 +24,10 @@ class DemoPlayerViewModel(iterator: AsyncFlowIterator) : PlayerViewModel(iterato
         AsyncHydrationTrackerPlugin(),
     )
 
+    public val isDebug = false
+
     override val config: Config = Config(
-        debuggable = true,
+        debuggable = isDebug,
     )
 
     private val _playerFlowState = MutableStateFlow<PlayerFlowState?>(null)

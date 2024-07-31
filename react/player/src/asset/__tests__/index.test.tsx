@@ -30,16 +30,17 @@ test("it prioritizes local type and id", () => {
   expect(asset.getByText("foo")).not.toBeUndefined();
 });
 
-test("throws an error for an asset missing implementation", () => {
+test("throws an error for an asset missing implementation or not registered WITHOUT similar matching type", () => {
   const assetDef = {
     asset: {
       id: "bar-id",
-      type: "bar",
+      type: "test",
     },
   } as unknown as AssetType;
 
   const registry: AssetRegistryType = new Registry([
-    [{ type: "foo" }, () => <div>foo</div>],
+    [{ type: "bar", key: "bar-key" }, () => <div>bar</div>],
+    [{ type: "foo", key: "foo-key" }, () => <div>foo</div>],
   ]);
 
   expect(() =>
@@ -48,7 +49,35 @@ test("throws an error for an asset missing implementation", () => {
         <ReactAsset {...assetDef} />
       </AssetContext.Provider>,
     ),
-  ).toThrowError("No implementation found for id: bar-id type: bar");
+  )
+    .toThrowError(`No implementation found for id: bar-id type: test. Did you mean bar? \n 
+      Registered Asset matching functions are listed below: \n
+      [{"type":"foo","key":"foo-key"},{"type":"bar","key":"bar-key"}]`);
+});
+
+test("throws an error for an asset missing implementation or not registered WITH similar matching type", () => {
+  const assetDef = {
+    asset: {
+      id: "foo-id",
+      type: "foo1",
+    },
+  } as unknown as AssetType;
+
+  const registry: AssetRegistryType = new Registry([
+    [{ type: "bar", key: "bar-key" }, () => <div>bar</div>],
+    [{ type: "foo", key: "foo-key" }, () => <div>foo</div>],
+  ]);
+
+  expect(() =>
+    render(
+      <AssetContext.Provider value={{ registry }}>
+        <ReactAsset {...assetDef} />
+      </AssetContext.Provider>,
+    ),
+  )
+    .toThrowError(`No implementation found for id: foo-id type: foo1. Did you mean foo? \n 
+      Registered Asset matching functions are listed below: \n
+      [{"type":"foo","key":"foo-key"},{"type":"bar","key":"bar-key"}]`);
 });
 
 test("throws an error for an asset missing type", () => {
@@ -126,4 +155,29 @@ test("throws an error for an asset that unwraps nothing", () => {
       </AssetContext.Provider>,
     ),
   ).toThrowError("Cannot determine asset type for props: {}");
+});
+
+test("throw an error for no assets in registry", () => {
+  const assetDef = {
+    id: "foo",
+    type: "foo",
+    asset: {
+      id: "bar",
+      type: "bar",
+    },
+  };
+
+  const registry: AssetRegistryType = new Registry([]);
+
+  expect(() =>
+    render(
+      <AssetContext.Provider value={{ registry }}>
+        <ReactAsset {...assetDef} />
+      </AssetContext.Provider>,
+    ),
+  )
+    .toThrowError(`No asset found in registry. This could happen for one of the following reasons: \n
+      1. You might have no assets registered or no plugins added to the Player instance. \n
+      2. You might have mismatching versions of React Asset Registry Context. \n
+      See https://player-ui.github.io/latest/tools/cli#player-dependency-versions-check for tips about how to debug and fix this problem`);
 });
