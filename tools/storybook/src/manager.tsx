@@ -51,6 +51,17 @@ export const register = () => {
         </StateProvider>
       ),
     });
+
+    addons.add(FLOW_REFRESH_TOOL_ID, {
+      title: "Refresh Flow",
+      type: Addon_TypesEnum.TOOL,
+      match: ({ viewMode }) => viewMode === "story",
+      render: () => (
+        <StateProvider>
+          <FlowRefresh />
+        </StateProvider>
+      ),
+    });
   });
 };
 
@@ -59,16 +70,6 @@ export const register = () => {
 //   addons.register(ADDON_ID, (api) => {
 
 //     // Tools show up in the top panel
-
-//     addons.add(FLOW_REFRESH_TOOL_ID, {
-//       title: "Refresh Flow",
-//       type: types.TOOL,
-//       render: () => (
-//         <StateProvider>
-//           <FlowRefresh />
-//         </StateProvider>
-//       ),
-//     });
 
 //     addons.add(RENDER_SELECT_TOOL_ID, {
 //       title: "Render Selection",

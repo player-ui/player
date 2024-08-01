@@ -13,6 +13,8 @@ export const FlowRefresh = () => {
       <IconButton
         placeholder="Flow Reset"
         title="Reset the current flow"
+        onPointerEnterCapture={() => {}}
+        onPointerLeaveCapture={() => {}}
         onClick={() => {
           dispatch(resetEditor());
         }}
