@@ -46,3 +46,12 @@ mvn-install:
   done
 
 alias maven-install := mvn-install
+
+[doc('Generate and open the xcodeproj for Player')]
+dev-ios:
+  bazel run //ios:xcodeproj
+  open -a Xcode ios/PlayerUI.xcodeproj/
+
+[doc('Build and run the iOS demo app in a simulator')]
+start-ios-demo:
+  bazel run //ios/demo:PlayerUIDemo
