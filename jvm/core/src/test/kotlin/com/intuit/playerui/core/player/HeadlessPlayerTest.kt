@@ -2,7 +2,6 @@ package com.intuit.playerui.core.player
 
 import com.intuit.playerui.core.bridge.JSErrorException
 import com.intuit.playerui.core.bridge.PlayerRuntimeException
-import com.intuit.playerui.core.bridge.global.JSMap
 import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.playerui.core.data.get
 import com.intuit.playerui.core.data.set
@@ -25,8 +24,6 @@ import com.intuit.playerui.core.player.state.errorState
 import com.intuit.playerui.core.player.state.inProgressState
 import com.intuit.playerui.core.player.state.lastViewUpdate
 import com.intuit.playerui.core.plugins.Plugin
-import com.intuit.playerui.core.validation.BindingInstance
-import com.intuit.playerui.core.validation.ValidationResponse
 import com.intuit.playerui.core.validation.getWarningsAndErrors
 import com.intuit.playerui.plugins.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.plugins.types.CommonTypesPlugin

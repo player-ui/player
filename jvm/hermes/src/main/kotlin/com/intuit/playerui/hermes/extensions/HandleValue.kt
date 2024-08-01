@@ -47,7 +47,6 @@ context(RuntimeThreadContext) internal fun Object.transform(format: JSIFormat): 
     }
 }
 
-// TODO: Can we pull the runtime from the thread context?
 context(RuntimeThreadContext) internal fun Object.filteredKeys(runtime: Runtime): Set<String> {
     val names = getPropertyNames(runtime)
     val size = names.size(runtime)
