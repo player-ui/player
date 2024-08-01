@@ -7,6 +7,8 @@ maven_main = [
     #"@maven//:com_squareup_leakcanary_leakcanary_android",
     # For when hermes-android _isn't_ included
     "@maven//:com_facebook_soloader_soloader",
+    # For when j2v8-android _isn't_ included
+    "@maven//:com_facebook_stetho_stetho"
     # For when j2v8-android _is_ included (not sure why transitive dep isn't included)
     "@android_j2v8//aar",
 ]
