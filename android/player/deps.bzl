@@ -1,9 +1,8 @@
-# TODO: These should probably not be exports
-main_exports = [
+j2v8_prod_exports = [
     "//jvm/j2v8:j2v8-android",
 ]
 
-dev_exports = [
+j2v8_dev_exports = [
     "//jvm/j2v8:j2v8-android-debug",
 ]
 
@@ -11,7 +10,15 @@ hermes_exports = [
     "//jvm/hermes:hermes-android",
 ]
 
-main_deps = [
+# TODO: Runtime dependencies should probably not be exports
+main_exports = select({
+    "//android/player:hermes_runtime": hermes_exports,
+    "//android/player:j2v8_dev_runtime": j2v8_dev_exports,
+    "//android/player:j2v8_prod_runtime": j2v8_prod_exports,
+    "//conditions:default": [],
+})
+
+main_deps = main_exports + [
     "@maven//:androidx_databinding_viewbinding",
     "@maven//:androidx_annotation_annotation",
     "@maven//:androidx_core_core_ktx",

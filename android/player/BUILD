@@ -1,10 +1,11 @@
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 load("@build_constants//:constants.bzl", "VERSION")
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load("@rules_kotlin//kotlin:core.bzl", "kt_kotlinc_options")
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@rules_player//kotlin:defs.bzl", "kt_jvm_junit5_test", "lint")
 load("//jvm:defs.bzl", "distribution")
-load(":deps.bzl", "dev_exports", "hermes_exports", "main_deps", "main_exports", "main_resources", "test_deps")
+load(":deps.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
 
 string_flag(
     name = "runtime",
@@ -20,6 +21,18 @@ config_setting(
     flag_values = {":runtime": "hermes"},
 )
 
+config_setting(
+    name = "j2v8_dev_runtime",
+    flag_values = {":runtime": "j2v8"},
+    values = {"define": "build_type=debug"},
+)
+
+config_setting(
+    name = "j2v8_prod_runtime",
+    flag_values = {":runtime": "j2v8"},
+    values = {"define": "build_type=release"},
+)
+
 kt_android_library(
     name = "player_android",
     srcs = glob(["src/main/java/**/*.kt"]),
@@ -27,22 +40,7 @@ kt_android_library(
     manifest = ":src/main/AndroidManifest.xml",
     resource_files = glob(["src/main/res/**"]),
     resources = main_resources,
-    deps = main_deps + select({
-        ":hermes_runtime": hermes_exports,
-        ":dev": dev_exports,
-        ":prod": main_exports,
-        "//conditions:default": dev_exports,
-    }),
-)
-
-config_setting(
-    name = "dev",
-    values = {"define": "build_type=debug"},
-)
-
-config_setting(
-    name = "prod",
-    values = {"define": "build_type=release"},
+    deps = main_deps,
 )
 
 android_library(
@@ -52,18 +50,8 @@ android_library(
     resource_files = glob(["src/main/res/**"]),
     tags = ["maven_coordinates=com.intuit.playerui:android:aar:%s" % VERSION],
     visibility = ["//visibility:public"],
-    exports = [":player_android"] + select({
-        ":hermes_runtime": hermes_exports,
-        ":dev": dev_exports,
-        ":prod": main_exports,
-        "//conditions:default": dev_exports,
-    }),
-    deps = main_deps + select({
-        ":hermes_runtime": hermes_exports,
-        ":dev": dev_exports,
-        ":prod": main_exports,
-        "//conditions:default": dev_exports,
-    }),
+    exports = [":player_android"] + main_exports,
+    deps = main_deps,
 )
 
 distribution(

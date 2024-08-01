@@ -125,6 +125,7 @@ public constructor(
         runtime.add("player", player)
 
         // we only have access to the logger after we have the player instance
+        logger.info("Player created using $runtime")
         if (runtime.config.debuggable) {
             runtime.checkBlockingThread = {
                 if (name == "main") {
