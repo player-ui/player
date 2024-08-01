@@ -43,7 +43,7 @@ public class SetTimeoutPlugin(private val exceptionHandler: CoroutineExceptionHa
         }
 
         if (override || !runtime.contains("setImmediate")) {
-            runtime.add("setImmediate") { callback: Invokable<Any?> -> callback() }
+            runtime.add("setImmediate", runtime.executeRaw("(callback => setTimeout(callback, 0))"))
         }
     }
 
