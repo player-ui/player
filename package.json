@@ -7,12 +7,6 @@
     "type": "git",
     "url": "https://github.com/player-ui/player.git"
   },
-  "scripts": {
-    "dev:docs": "ibazel run //docs/site:start",
-    "lint": "eslint --cache --ext .js,.jsx,.ts,.tsx $(scripts/pkg-roots.sh)",
-    "prepare": "is-ci || husky install",
-    "test": "bazel test -- $(bazel query \"kind(nodejs_test, //...)\" --output label 2>/dev/null | tr '\\n' ' ')"
-  },
   "engines": {
     "node": "^20.14.0",
     "pnpm": "^8.9.2"
@@ -114,7 +108,7 @@
     "husky": "^7.0.2",
     "is-ci-cli": "^2.2.0",
     "lcov-result-merger": "^3.1.0",
-    "leven":"4.0.0",
+    "leven": "4.0.0",
     "lint-staged": "^11.2.3",
     "lucide-react": "^0.316.0",
     "lunr": "^2.3.9",
