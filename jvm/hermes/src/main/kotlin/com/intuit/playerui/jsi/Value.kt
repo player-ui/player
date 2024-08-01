@@ -140,8 +140,7 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
 
         context(RuntimeThreadContext) @JvmStatic public external fun strictEquals(runtime: Runtime, a: Value, b: Value): Boolean
 
-        context(RuntimeThreadContext) @OptIn(UnsafeRuntimeThreadAPI::class)
-        public fun from(runtime: Runtime, value: Any?): Value = when (value) {
+        context(RuntimeThreadContext) public fun from(runtime: Runtime, value: Any?): Value = when (value) {
             null -> `null`
             Unit -> undefined
             is NodeWrapper -> from(runtime, value.node)
@@ -153,45 +152,41 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
             is Long -> from(runtime, value)
             is Symbol -> from(runtime, value)
             is Object -> from(runtime, value)
-            is JsonElement -> evaluateInCurrentThread { createFromJson(runtime, value) }
-            is Invokable<*> -> evaluateInCurrentThread {
-                createFromHostFunction(
-                    runtime,
-                    value::class.qualifiedName ?: "unknown",
-                    22, // NOTE: using max constrained jvm arity
-                    HostFunction { _, _, args ->
-                        val encodedArgs =
-                            args.map { it.handleValue((runtime as HermesRuntime).format) }.toTypedArray()
-                        from(runtime, value(*encodedArgs))
-                    },
-                ).asValue(runtime)
-            }
-            is kotlin.Function<*> -> evaluateInCurrentThread {
-                createFromHostFunction(
-                    runtime,
-                    value::class.qualifiedName ?: "unknown",
-                    22,
-                    HostFunction { _, _, args ->
-                        val encodedArgs = args.map { it.handleValue((runtime as HermesRuntime).format) }
+            is JsonElement -> createFromJson(runtime, value)
+            is Invokable<*> -> createFromHostFunction(
+                runtime,
+                value::class.qualifiedName ?: "unknown",
+                22, // NOTE: using max constrained jvm arity
+                HostFunction { _, _, args ->
+                    val encodedArgs =
+                        args.map { it.handleValue((runtime as HermesRuntime).format) }.toTypedArray()
+                    from(runtime, value(*encodedArgs))
+                },
+            ).asValue(runtime)
+            is kotlin.Function<*> -> createFromHostFunction(
+                runtime,
+                value::class.qualifiedName ?: "unknown",
+                22,
+                HostFunction { _, _, args ->
+                    val encodedArgs = args.map { it.handleValue((runtime as HermesRuntime).format) }
 
-                        // Hate that we need to look at an internal class for arity
-                        val arity = (value as kotlin.jvm.internal.FunctionBase<*>).arity
+                    // Hate that we need to look at an internal class for arity
+                    val arity = (value as kotlin.jvm.internal.FunctionBase<*>).arity
 
-                        // trim and pad args to fit arity constraints,
-                        // note that padding will fail if arg types are non-nullable
-                        val matchedArgs = (0 until arity)
-                            .map { encodedArgs.getOrNull(it) }
-                            .toTypedArray()
+                    // trim and pad args to fit arity constraints,
+                    // note that padding will fail if arg types are non-nullable
+                    val matchedArgs = (0 until arity)
+                        .map { encodedArgs.getOrNull(it) }
+                        .toTypedArray()
 
-                        from(
-                            runtime,
-                            handleInvocation(value::class, matchedArgs) {
-                                value.invokeVararg(*it)
-                            },
-                        )
-                    },
-                ).asValue(runtime)
-            }
+                    from(
+                        runtime,
+                        handleInvocation(value::class, matchedArgs) {
+                            value.invokeVararg(*it)
+                        },
+                    )
+                },
+            ).asValue(runtime)
             else -> (runtime as? HermesRuntime).let {
                 it ?: throw IllegalArgumentException("cannot automatically create Value from type ${value::class.qualifiedName}")
             }.format.encodeToValue(value)

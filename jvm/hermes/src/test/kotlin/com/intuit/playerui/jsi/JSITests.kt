@@ -6,8 +6,6 @@ import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime.Config
 import com.intuit.playerui.hermes.extensions.RuntimeThreadContext
 import com.intuit.playerui.hermes.extensions.evaluateInJSThreadBlocking
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
