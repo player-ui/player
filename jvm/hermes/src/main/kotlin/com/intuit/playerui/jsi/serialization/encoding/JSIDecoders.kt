@@ -79,7 +79,6 @@ internal class JSIObjectMapDecoder(override val format: JSIFormat, override val 
         jsiObject.getProperty(runtime, getKeyAtIndex(index))
     }
 
-    // TODO: Evaluate ability to use context receiver here
     override fun decodeElement(descriptor: SerialDescriptor, index: Int): Value = runtime.evaluateInJSThreadBlocking {
         jsiObject.getProperty(runtime, descriptor.getElementName(index))
     }

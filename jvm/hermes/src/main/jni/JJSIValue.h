@@ -61,7 +61,6 @@ public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Runtime;";
     static void registerNatives();
 
-    // TODO: Evaluate optimization of accepting byte buffer
     local_ref<JJSIValue_jhybridobject> evaluateJavaScript(std::string script, std::string sourceURL);
     local_ref<JJSIPreparedJavaScript::jhybridobject> prepareJavaScript(std::string script, std::string sourceURL);
     local_ref<JJSIValue_jhybridobject> evaluatePreparedJavaScript(alias_ref<JJSIPreparedJavaScript::jhybridobject> js);

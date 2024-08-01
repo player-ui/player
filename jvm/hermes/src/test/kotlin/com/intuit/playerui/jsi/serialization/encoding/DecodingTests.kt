@@ -35,12 +35,12 @@ internal class PrimitiveDecodingTests : HermesTest() {
 
     @Test
     fun `decode unit`() {
-        assertEquals(null, format.decodeFromValue<Boolean?>(Value.undefined()))
+        assertEquals(null, format.decodeFromValue<Boolean?>(Value.undefined))
     }
 
     @Test
     fun `decode null`() {
-        assertEquals(null, format.decodeFromValue<Boolean?>(Value.`null`()))
+        assertEquals(null, format.decodeFromValue<Boolean?>(Value.`null`))
     }
 }
 

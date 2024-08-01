@@ -13,6 +13,7 @@ import kotlin.coroutines.coroutineContext
 @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE)
 public annotation class RuntimeThreadContextMarker
 
+// TODO: Would be nice if this could be used to dynamically retrieve associated runtime, or maybe we could pull it from a thread local
 @RuntimeThreadContextMarker
 public sealed interface RuntimeThreadContext : CoroutineContext.Element {
     override val key: CoroutineContext.Key<RuntimeThreadContext> get() = Key

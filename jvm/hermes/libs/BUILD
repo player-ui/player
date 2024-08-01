@@ -15,9 +15,3 @@ alias(
     }),
     visibility = ["//visibility:public"],
 )
-
-java_library(
-    name = "prebuilt-rn-libjsi-android",
-    visibility = ["//visibility:public"],
-    runtime_deps = [":libjsi"],
-)

@@ -56,13 +56,10 @@ public open class Runtime(mHybridData: HybridData) : HybridClass(mHybridData) {
     public external fun description(): String
 
     context(RuntimeThreadContext) protected val jsEquals: Function by lazy {
-        // TODO: maybe see if I can clean this up, but usage of evaluateInCurrentThread should be guarded against, so this might just be okay
         @OptIn(UnsafeRuntimeThreadAPI::class)
-        (
-            evaluateInCurrentThread() {
-                evaluateJavaScript("(a, b) => a == b").asObject(this@Runtime).asFunction(this@Runtime)
-            }
-            )
+        evaluateInCurrentThread {
+            evaluateJavaScript("(a, b) => a == b").asObject(this@Runtime).asFunction(this@Runtime)
+        }
     }
 
     context(RuntimeThreadContext) public fun jsEquals(a: Value, b: Value): Boolean = jsEquals.call(this, a, b).asBoolean()
@@ -72,10 +69,6 @@ public open class Runtime(mHybridData: HybridData) : HybridClass(mHybridData) {
         .call(this, value, Value.`null`, Value.from(2))
         .asString(this)
 }
-
-// TODO: Do we just tie these to specific runtimes? I feel like that'd help w/ ergonomics and ensuring values are used with the same runtime context
-
-// TODO: For serializing into JS objects, can we just make a HostObject?
 
 /** Base interface for native JSI Value instance */
 public sealed class JSIValueContainer(mHybridData: HybridData) : HybridClass(mHybridData) {
@@ -91,14 +84,14 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
     public external fun isBoolean(): Boolean
     public external fun isNumber(): Boolean
     public external fun isString(): Boolean
-    public external fun isBigInt(): Boolean // TODO: Consider isLong
+    public external fun isBigInt(): Boolean
     public external fun isSymbol(): Boolean
     public external fun isObject(): Boolean
 
     public external fun asBoolean(): Boolean
 
-    // TODO: Consider making this return Number directly, so there aren't assumptions about what will come out of this?
-    public external fun asNumber(): Double // TODO: Doing this for Player runtime compat
+    // TODO: Consider making this return Number directly, so there aren't assumptions about what will come out of this
+    public external fun asNumber(): Double
 
     /** context(RuntimeThreadContext) */
     public external fun asString(runtime: Runtime): String
@@ -114,11 +107,6 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
 
     /** context(RuntimeThreadContext) */
     public external fun toString(runtime: Runtime): String
-
-    // TODO: Add implementation that is pointer based?
-//    override fun equals(other: Any?): Boolean {
-//        return super.equals(other)
-//    }
 
     context(RuntimeThreadContext) public fun strictEquals(runtime: Runtime, other: Value): Boolean = strictEquals(runtime, this, other)
 
@@ -144,14 +132,9 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
         /** context(RuntimeThreadContext) */
         @JvmStatic public external fun from(runtime: Runtime, value: Object): Value
 
-        // TODO: Settle on API
         public val undefined: Value @JvmStatic external get
 
-        @JvmStatic public external fun undefined(): Value
-
         public val `null`: Value @JvmStatic external get
-
-        @JvmStatic public external fun `null`(): Value
 
         /** context(RuntimeThreadContext) */
         @JvmStatic public external fun createFromJsonUtf8(
@@ -177,30 +160,26 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
         /** context(RuntimeThreadContext) */
         @JvmStatic public external fun strictEquals(runtime: Runtime, a: Value, b: Value): Boolean
 
-        // TODO: It'd be nice to just serialize any into Value if we support that
         /** context(RuntimeThreadContext) */
         @OptIn(UnsafeRuntimeThreadAPI::class)
         public fun from(runtime: Runtime, value: Any?): Value = when (value) {
-            null -> `null`()
-            Unit -> undefined()
+            null -> `null`
+            Unit -> undefined
             is NodeWrapper -> from(runtime, value.node)
             is JSIValueWrapper -> value.value
             is Boolean -> from(value)
             is Double -> from(value)
             is Int -> from(value)
-            is String -> from(runtime, value as String)
+            is String -> from(runtime, value)
             is Long -> from(runtime, value)
             is Symbol -> from(runtime, value)
             is Object -> from(runtime, value)
             is JsonElement -> evaluateInCurrentThread { createFromJson(runtime, value) }
-            // TODO: Move these to Function.from
-            // TODO: Might need a UUID on the name if collisions are an issue
-            // NOTE: Using JVM highest defined FunctionN (ignoring the actual FunctionN) param count here, but that could probably be increased if necessary
             is Invokable<*> -> evaluateInCurrentThread {
                 createFromHostFunction(
                     runtime,
                     value::class.qualifiedName ?: "unknown",
-                    22,
+                    22, // NOTE: using max constrained jvm arity
                     HostFunction { _, _, args ->
                         val encodedArgs =
                             args.map { it.handleValue((runtime as HermesRuntime).format) }.toTypedArray()
@@ -225,7 +204,6 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
                             .map { encodedArgs.getOrNull(it) }
                             .toTypedArray()
 
-                        // TODO: Serialization could go through runtime, or just a format func? (runtime as HermesRuntime).serialize()
                         from(
                             runtime,
                             handleInvocation(value::class, matchedArgs) {
@@ -253,7 +231,6 @@ private fun handleInvocation(reference: KClass<*>, args: kotlin.Array<Any?>, blo
     }
 }
 
-// TODO: Could we make everything a JSIValueWrapper, so it's easy enough to do "asValue" dynamically?
 public open class Object internal constructor(mHybridData: HybridData) : JSIValueContainer(mHybridData) {
 
     /** context(RuntimeThreadContext) */
@@ -306,7 +283,6 @@ public open class Object internal constructor(mHybridData: HybridData) : JSIValu
     }
 }
 
-// TODO: Decide on approach, companion invokes vs psuedo constructors
 context(RuntimeThreadContext) public fun Object(runtime: Runtime): Object = Object.create(runtime)
 
 public class Array private constructor(mHybridData: HybridData) : Object(mHybridData) {
@@ -325,21 +301,12 @@ public class Array private constructor(mHybridData: HybridData) : Object(mHybrid
     }
 }
 
-// TODO: Enhanced HostFunction implementation that contains info about the method reference, so we can stop dealing in limitless lambda wrappers
+// TODO: Enhance HostFunction implementation that contains info about the method reference, so we can stop dealing in limitless lambda wrappers
 public fun interface HostFunctionInterface {
-    // TODO: Likely add RuntimeThreadContext here since this'll almost always be invoked from the JS thread
     public fun call(runtime: Runtime, thisVal: Value, vararg args: Value): Value
 }
 
-internal fun HostFunctionInterface.wrapWithStacktraceLogger(): HostFunctionInterface = HostFunctionInterface { runtime, thisVal, args ->
-    try { call(runtime, thisVal, *args) } catch (e: Throwable) {
-        // TODO: Maybe there is something better we can do here for helping FBJNI use this error
-        e.printStackTrace()
-        throw e
-    }
-}
-
-public class HostFunction(private val func: HostFunctionInterface) : HostFunctionInterface by func.wrapWithStacktraceLogger()
+public class HostFunction(private val func: HostFunctionInterface) : HostFunctionInterface by func
 
 public class Function private constructor(mHybridData: HybridData) : Object(mHybridData) {
     /** context(RuntimeThreadContext) */

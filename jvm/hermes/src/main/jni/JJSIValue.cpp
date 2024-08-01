@@ -5,7 +5,7 @@
 
 /**
  * IMPORTANT: Our current scoping strategy is to ensure all JHybridClass constructs (JSI Value wrappers)
- *  are tracked as weak_refs with the runtime that they're created in. This allows the runtime to explicitly
+ *  are tracked as refs with the runtime that they're created in. This allows the runtime to explicitly
  *  release any lingering runtime pointer values before releasing the runtime itself. This prevents dangling
  *  pointers that could cause undefined behavior (likely segfault - or assert if in debug mode).
  *
@@ -190,8 +190,6 @@ double JJSIValue::asNumber() {
     return value_->asNumber();
 }
 
-// TODO: Ensure this is what we want to do - we can return the JSI String container
-//       instead to help be more optimistic about memory, but this helps w/ runtime access
 std::string JJSIValue::asString(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
     Runtime& runtime = jRuntime->cthis()->get_runtime();
     return value_->asString(runtime).utf8(runtime);
@@ -229,12 +227,8 @@ void JJSIValue::registerNatives() {
         makeNativeMethod("from", JJSIValue::fromSymbol),
         makeNativeMethod("from", JJSIValue::fromObject),
 
-        // TODO: Settle on getter API
         // MARK: Static Value APIs
-        makeNativeMethod("undefined", JJSIValue::undefined),
         makeNativeMethod("getUndefined", JJSIValue::undefined),
-
-        makeNativeMethod("null", JJSIValue::null),
         makeNativeMethod("getNull", JJSIValue::null),
 
         makeNativeMethod("createFromJsonUtf8", JJSIValue::createFromJsonUtf8),
@@ -303,7 +297,6 @@ bool JJSIObject::hasProperty(alias_ref<JJSIRuntime::jhybridobject> jRuntime, std
 }
 
 void JJSIObject::setProperty(alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name, alias_ref<JJSIValue::jhybridobject> value) {
-    // TODO: Need to test value unwrapping
     object_->setProperty(jRuntime->cthis()->get_runtime(), name.c_str(), value->cthis()->get_value());
 }
 
@@ -366,7 +359,6 @@ local_ref<JJSIArray::jhybridobject> JJSIArray::createWithElements(alias_ref<jcla
 }
 
 int JJSIArray::size(alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
-    // TODO: Do we care about potential loss of data here? ASSUMPTION: our JS arrays are not likely to be beyond max_int
     return static_cast<int>(array_->size(jRuntime->cthis()->get_runtime()));
 }
 

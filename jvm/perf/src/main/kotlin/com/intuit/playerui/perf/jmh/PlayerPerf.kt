@@ -101,16 +101,6 @@ public open class BenchRuntimeCreation : RuntimePerformance() {
 
     @CompilerControl(CompilerControl.Mode.DONT_INLINE)
     @Benchmark public fun createRuntime(consumer: Blackhole) {
-        // TODO: Somehow this creates a segfault - this only happens very rarely
-        //       but it's really weird. At least it's happening in such a simple
-        //       test. Something might not being tracked when creating the runtime?
-        //       UPDATE: Ohhh, we're attaching the SetTimeoutPlugin. Which registers
-        //       host functions. Great, we'll need to make sure we're guarding those
-        //       appropriately.
-        //       UPDATE 2: Well, the segfault happens on objects, which won't be
-        //       UPDATE 3: Only global & empty are created :( so, tracking ref isn't foolproof?
-        //       UPDATE 4: Reproduced it with value, so now i'm thinking tracking isn't foolproof
-        //       UPDATE 5: Weak ref is killing us :(
         consumer.consume(setupRuntime())
         runtime.release()
     }

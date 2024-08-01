@@ -34,7 +34,7 @@ context(RuntimeThreadContext) private fun Value.transform(format: JSIFormat): An
     }
     isString() -> asString(format.runtime)
     isBigInt() -> asBigInt(format.runtime)
-    isSymbol() -> asSymbol(format.runtime).toString(format.runtime) // TODO: This is what we do w/ symbols?
+    isSymbol() -> asSymbol(format.runtime).toString(format.runtime)
     isObject() -> asObject(format.runtime).transform(format)
     else -> null
 }

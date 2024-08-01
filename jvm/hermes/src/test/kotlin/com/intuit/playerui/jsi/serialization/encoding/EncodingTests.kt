@@ -31,11 +31,11 @@ internal class PrimitiveEncodingTests : HermesTest() {
     }
 
     @Test fun `encode unit`() {
-        assertEquals(Value.undefined(), format.encodeToValue(Unit))
+        assertEquals(Value.undefined, format.encodeToValue(Unit))
     }
 
     @Test fun `encode null`() {
-        assertEquals(Value.`null`(), format.encodeToValue<Int?>(null))
+        assertEquals(Value.`null`, format.encodeToValue<Int?>(null))
     }
 }
 

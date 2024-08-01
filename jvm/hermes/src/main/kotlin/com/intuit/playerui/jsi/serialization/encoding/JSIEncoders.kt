@@ -66,7 +66,7 @@ internal open class JSIValueEncoder(private val format: JSIFormat, private val m
         -> content
     }
 
-    private var content: Value = Value.undefined()
+    private var content: Value = Value.undefined
         get() = when (mode) {
             Mode.UNDECIDED,
             Mode.PRIMITIVE,
@@ -88,7 +88,7 @@ internal open class JSIValueEncoder(private val format: JSIFormat, private val m
             else -> error("cannot get map unless in MAP mode")
         }
 
-    // TODO: Should really be a PropNameID to allow non-string keys
+    // TODO: Should really be a PropNameID when supported to allow non-string keys
     private var tag: String? = null
 
     private fun putContent(content: Value) {
@@ -145,7 +145,7 @@ internal open class JSIValueEncoder(private val format: JSIFormat, private val m
         },
     )
 
-    override fun encodeNull(): Unit = putContent(Value.`null`())
+    override fun encodeNull(): Unit = putContent(Value.`null`)
 
     override fun encodeElement(descriptor: SerialDescriptor, index: Int): Boolean {
         if (descriptor.kind == StructureKind.CLASS) encodeString(descriptor.getElementName(index))
@@ -163,7 +163,6 @@ internal open class JSIValueEncoder(private val format: JSIFormat, private val m
 
     override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
         when {
-            // TODO: Reconcile this with Value.from(rt, v)
             serializer.descriptor == FunctionLikeSerializer.descriptor -> encodeFunction(value)
             value is Function<*> -> encodeFunction(value)
             value is KCallable<*> -> encodeFunction(value)
@@ -200,7 +199,6 @@ internal open class JSIValueEncoder(private val format: JSIFormat, private val m
     }
 }
 
-// TODO: Likely just wrap JSIException
 internal class JSIExceptionEncoder(format: JSIFormat, consumer: (Value) -> Unit) : JSIValueEncoder(format, Mode.MAP, consumer) {
 
     override val contentMap by lazy {

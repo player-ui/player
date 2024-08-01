@@ -52,12 +52,3 @@ distribution(
     lib_name = "hermes-android-merged",
     maven_coordinates = "%s:%s:%s" % (DEFAULT_GROUP, "hermes-android", VERSION),
 )
-
-# TODO: This probably isn't necessary anymore
-kt_jvm_binary(
-    name = "main",
-    srcs = ["main.kt"],
-    associates = [":hermes"],
-    main_class = "MainKt",
-    deps = [":hermes-host"],
-)

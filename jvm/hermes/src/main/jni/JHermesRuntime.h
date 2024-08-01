@@ -14,7 +14,6 @@ public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/hermes/bridge/runtime/HermesRuntime$Config;";
     static void registerNatives();
 
-    // TODO: Expose the config options that make sense
     static local_ref<jhybridobject> create(alias_ref<jclass>, bool intl = true, bool microtaskQueue = false) {
         auto config = hermes::vm::RuntimeConfig::Builder()
             .withIntl(intl)
@@ -112,12 +111,7 @@ private:
     explicit JHermesRuntime(
         std::unique_ptr<HermesRuntime> runtime,
         alias_ref<JHermesConfig::jhybridobject> jConfig
-    ) : HybridClass(), runtime_(std::move(runtime)), jConfig_(make_global(jConfig)), scope_() {
-        // TODO: Add dynamic fatal handler
-        runtime->setFatalHandler([](const std::string& msg) {
-            std::cout << "FATAL: " << msg << std::endl;
-        });
-    }
+    ) : HybridClass(), runtime_(std::move(runtime)), jConfig_(make_global(jConfig)), scope_() {}
 
     explicit JHermesRuntime(alias_ref<JHermesConfig::jhybridobject> jConfig) : JHermesRuntime(makeHermesRuntime(jConfig->cthis()->get_config()), jConfig) {}
     explicit JHermesRuntime() : JHermesRuntime(JHermesConfig::create(JHermesConfig::javaClassStatic())) {}

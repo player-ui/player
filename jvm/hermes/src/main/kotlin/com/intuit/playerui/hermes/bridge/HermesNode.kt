@@ -39,7 +39,6 @@ public class HermesNode(private val jsiObject: Object, override val runtime: Her
         }
     }
 
-    // TODO: The next six could be default impls
     override val size: Int by lazy {
         keys.size
     }
@@ -58,7 +57,6 @@ public class HermesNode(private val jsiObject: Object, override val runtime: Her
 
     override fun isEmpty(): Boolean = size == 0
 
-    // TODO: Should we make this getNonNullishJSIValue() to push mapUndefinedToNull up?
     context(RuntimeThreadContext) private fun getJSIValue(key: String): Value = jsiObject.getProperty(runtime, key)
 
     context(RuntimeThreadContext) private fun getJSIObject(key: String): Object? = getJSIValue(key)
@@ -110,8 +108,11 @@ public class HermesNode(private val jsiObject: Object, override val runtime: Her
         is Object -> runtime.evaluateInJSThreadBlocking {
             Object.strictEquals(runtime, jsiObject, other)
         }
-        // TODO: Or just ValueWrapper
+        is Value -> other.isObject() && runtime.evaluateInJSThreadBlocking {
+            nativeReferenceEquals(other.asObject(runtime))
+        }
         is HermesNode -> nativeReferenceEquals(other.jsiObject)
+        is JSIValueWrapper -> nativeReferenceEquals(other.value)
         is NodeWrapper -> nativeReferenceEquals(other.node)
         else -> false
     }
@@ -125,7 +126,7 @@ public class HermesNode(private val jsiObject: Object, override val runtime: Her
         else -> false
     }
 
-    // TODO: Need to go implement this so the object layer defines the hashcode from the native ref ptr or PropNameId
+    // TODO: Should implement this in the object layer defines the hashcode from the native ref ptr or PropNameId
     override fun hashCode(): Int = jsiObject.hashCode()
 
     override fun toString(): String = keys.associateWith(::get).toString()

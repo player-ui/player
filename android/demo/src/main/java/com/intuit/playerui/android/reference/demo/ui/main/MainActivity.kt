@@ -59,7 +59,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // TODO: Can we push this into PlayerFragment to dynamically load if class is found?
         SoLoader.init(this, false)
 
         setContentView(R.layout.activity_main)

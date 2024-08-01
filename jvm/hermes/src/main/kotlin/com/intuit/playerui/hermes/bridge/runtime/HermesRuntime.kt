@@ -54,7 +54,6 @@ private fun loadHermesJni() {
     NativeLoader.loadLibrary("hermes_jni")
 }
 
-// TODO: Likely split up JNI & Runtime impl
 public class HermesRuntime private constructor(mHybridData: HybridData) : Runtime<Value>, JSIRuntime(mHybridData) {
 
     public companion object {
@@ -82,7 +81,6 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
         JSIFormatConfiguration(
             this,
             playerSerializersModule + SerializersModule {
-                // TODO: Do we get this all for free with a sealed class?
                 contextual(JSIValueContainer::class, JSIValueContainerSerializer)
                 contextual(Value::class, JSIValueContainerSerializer.conform())
                 contextual(Object::class, JSIValueContainerSerializer.conform())
@@ -107,7 +105,6 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
 
     override fun execute(script: String): Any? = evaluateInJSThreadBlocking { executeRaw(script).handleValue(format) }
 
-    // TODO: Add debuggable sources if necessary, tho we'd likely go towards HBC anyways
     override fun load(scriptContext: ScriptContext): Any? = evaluateInJSThreadBlocking {
         val sourceMap = scriptContext.sourceMap
         if (sourceMap != null) {

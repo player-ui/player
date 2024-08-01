@@ -18,7 +18,6 @@ public class JSIFormat(
     config: JSIFormatConfiguration,
 ) : AbstractRuntimeFormat<Value>(config) {
 
-    // TODO: Do we need to cast?
     override val runtime: HermesRuntime by lazy {
         config.runtime as HermesRuntime
     }
