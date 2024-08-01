@@ -17,6 +17,12 @@ import { API } from "@storybook/manager-api";
 if (typeof window !== "undefined") {
   monaco.init().then((m) => {
     m.languages.typescript.javascriptDefaults.setEagerModelSync(true);
+
+    // TODO: Re-add these when we can load `.d.ts` definitions into the editor
+    m.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+      noSemanticValidation: true,
+      noSyntaxValidation: true,
+    });
     m.languages.typescript.typescriptDefaults.setCompilerOptions({
       jsx: m.languages.typescript.JsxEmit.React,
     });
