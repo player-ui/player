@@ -1,1 +1,0 @@
-bazel query "kind(js_library, //...)" --output package 2> /dev/null 
