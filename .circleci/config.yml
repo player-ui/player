@@ -114,7 +114,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/player
-      # need to filter because //android/demo rules dont resolve
+
       - run: bazel build --config=ci -- $(bazel query 'filter("native_bundle$", //...)')
 
       - save_cache:
@@ -237,6 +237,7 @@ jobs:
 
       - run: |
           bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
+          bazel test --config=ci --//android/player:runtime=hermes -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
       - run:
           when: always
@@ -292,7 +293,9 @@ jobs:
           command: |
             circle-android wait-for-boot
 
-      - run: bazel test --config=ci -- //android/demo:android_instrumentation_test
+      - run: |
+          bazel test --config=ci -- //android/demo:android_instrumentation_test
+          bazel test --config=ci --//android/player:runtime=hermes -- //android/demo:android_instrumentation_test
 
       - run:
           when: always

@@ -1,10 +1,24 @@
-load(":deps.bzl", "main_deps", "main_exports", "dev_exports", "main_resources", "test_deps")
 load("@build_constants//:constants.bzl", "VERSION")
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load("@rules_kotlin//kotlin:core.bzl", "kt_kotlinc_options")
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
-load("//jvm:defs.bzl", "distribution")
 load("@rules_player//kotlin:defs.bzl", "kt_jvm_junit5_test", "lint")
+load("//jvm:defs.bzl", "distribution")
+load(":deps.bzl", "dev_exports", "hermes_exports", "main_deps", "main_exports", "main_resources", "test_deps")
+
+string_flag(
+    name = "runtime",
+    build_setting_default = "j2v8",
+    values = [
+        "j2v8",
+        "hermes",
+    ],
+)
+
+config_setting(
+    name = "hermes_runtime",
+    flag_values = {":runtime": "hermes"},
+)
 
 kt_android_library(
     name = "player_android",
@@ -14,6 +28,7 @@ kt_android_library(
     resource_files = glob(["src/main/res/**"]),
     resources = main_resources,
     deps = main_deps + select({
+        ":hermes_runtime": hermes_exports,
         ":dev": dev_exports,
         ":prod": main_exports,
         "//conditions:default": dev_exports,
@@ -33,20 +48,22 @@ config_setting(
 android_library(
     name = "player",
     custom_package = "com.intuit.playerui.android",
-    resource_files = glob(["src/main/res/**"]),
     manifest = ":src/main/AndroidManifest.xml",
+    resource_files = glob(["src/main/res/**"]),
     tags = ["maven_coordinates=com.intuit.playerui:android:aar:%s" % VERSION],
-    deps = main_deps + select({
-        ":dev": dev_exports,
-        ":prod": main_exports,
-        "//conditions:default": dev_exports,
-    }),
-    exports = [":player_android"] + select({
-        ":dev": dev_exports,
-        ":prod": main_exports,
-        "//conditions:default": dev_exports,
-    }),
     visibility = ["//visibility:public"],
+    exports = [":player_android"] + select({
+        ":hermes_runtime": hermes_exports,
+        ":dev": dev_exports,
+        ":prod": main_exports,
+        "//conditions:default": dev_exports,
+    }),
+    deps = main_deps + select({
+        ":hermes_runtime": hermes_exports,
+        ":dev": dev_exports,
+        ":prod": main_exports,
+        "//conditions:default": dev_exports,
+    }),
 )
 
 distribution(
