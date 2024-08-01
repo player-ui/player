@@ -16,6 +16,7 @@ internal interface NodeHook<R> : NodeWrapper {
 
     @OptIn(ExperimentalSerializationApi::class)
     fun init(vararg serializers: KSerializer<*>) {
+        println("NodeHook initialized with node: $node")
         node.getInvokable<Any?>("tap")?.invoke(
             mapOf("name" to "name", "context" to true),
             Invokable { args ->

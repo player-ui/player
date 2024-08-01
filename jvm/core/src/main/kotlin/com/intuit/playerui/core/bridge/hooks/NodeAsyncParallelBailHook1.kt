@@ -15,14 +15,17 @@ import kotlinx.serialization.Serializable
 @Serializable(with = NodeAsyncParallelBailHook1.Serializer::class)
 public class NodeAsyncParallelBailHook1<T1, R : Any>(override val node: Node, serializer1: KSerializer<T1>) : AsyncParallelBailHook<(HookContext, T1) -> BailResult<R>, R>(), AsyncNodeHook<R> {
 
-    init { init(serializer1) }
+    init {
+        init(serializer1)
+    }
 
     override suspend fun callAsync(context: HookContext, serializedArgs: Array<Any?>): R {
-        require(serializedArgs.size == 1)
+        require(serializedArgs.size == 1) { "Expected exactly one argument, but got ${serializedArgs.size}" }
         val (p1) = serializedArgs
-        return call(10) { f, _ ->
+        val result = call(10) { f, _ ->
             f(context, p1 as T1)
         } as R
+        return result
     }
 
     /** The return type serializer is never used, but in order to generate the serializer with @Serializable for [NodeAsyncParallelBailHook1], it's needed */

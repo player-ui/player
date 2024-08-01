@@ -5,7 +5,9 @@ import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.utils.test.PlayerTest
 import com.intuit.playerui.utils.test.runBlockingTest
 import io.mockk.junit5.MockKExtension
-import kotlinx.coroutines.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.TestTemplate
 import org.junit.jupiter.api.extension.ExtendWith
@@ -21,11 +23,16 @@ internal class AsyncNodePluginTest : PlayerTest() {
               "id": 'action',
               "actions": [
                 {
-                  "id": "next-label-action",
-                  "type": "action",
-                  "value": "{{foo.bar}}",
-                  "async": true,
-                },
+            "asset": {
+              "id": "action-0",
+              "type": "action",
+              "value": "{{foo.bar}}",
+            },
+          },
+          {
+            "id": "nodeId",
+            "async": true,
+          },
               ],
             },
           ],
@@ -53,17 +60,20 @@ internal class AsyncNodePluginTest : PlayerTest() {
               }
             }
           }
-        }""".trimMargin()
+        }
+        """.trimMargin()
 
     override val plugins = listOf(AsyncNodePlugin())
 
-    private val plugin get() = player.asyncNodePlugin
+    private val plugin get() = player.asyncNodePlugin!!
 
     @TestTemplate
-    fun `plugin is not null`() = Assertions.assertNotNull(plugin)
+    fun `plugin is not null`() {
+        Assertions.assertNotNull(plugin)
+    }
 
     @TestTemplate
-    fun `async node hook is tappable`() = runBlockingTest {
+    fun `async node hook is tappable`() = runBlockingTest() {
         var update: Asset? = null
         plugin?.hooks?.onAsyncNode?.tap("") { _, node ->
             BailResult.Bail(
@@ -72,17 +82,17 @@ internal class AsyncNodePluginTest : PlayerTest() {
                         "asset" to mapOf(
                             "id" to "asset-1",
                             "type" to "text",
-                            "value" to "New asset!"
-                        )
-                    )
-                )
+                            "value" to "New asset!",
+                        ),
+                    ),
+                ),
             )
         }
         var count = 0
         suspendCancellableCoroutine { cont ->
             player.hooks.view.tap { v ->
                 v?.hooks?.onUpdate?.tap { asset ->
-                    count ++
+                    count++
                     update = asset
                     if (count == 2) cont.resume(true) {}
                 }
@@ -103,24 +113,24 @@ internal class AsyncNodePluginTest : PlayerTest() {
                         "asset" to mapOf(
                             "id" to "asset-1",
                             "type" to "text",
-                            "value" to "New asset!"
-                        )
+                            "value" to "New asset!",
+                        ),
                     ),
                     mapOf(
                         "asset" to mapOf(
                             "id" to "asset-2",
                             "type" to "text",
-                            "value" to "New asset!"
-                        )
-                    )
-                )
+                            "value" to "New asset!",
+                        ),
+                    ),
+                ),
             )
         }
         var count = 0
         suspendCancellableCoroutine { cont ->
             player.hooks.view.tap { v ->
                 v?.hooks?.onUpdate?.tap { asset ->
-                    count ++
+                    count++
                     update = asset
                     if (count == 2) cont.resume(true) {}
                 }
@@ -128,7 +138,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
             player.start(asyncNodeFlowSimple)
         }
         Assertions.assertTrue(count == 2)
-        Assertions.assertTrue((update?.get("actions") as List<*>).size == 2)
+        Assertions.assertTrue((update?.get("actions") as List<*>).size == 3)
     }
 
     @TestTemplate
@@ -137,7 +147,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
         var updateNumber = 0
         player.hooks.view.tap { v ->
             v?.hooks?.onUpdate?.tap { asset ->
-                updateNumber ++
+                updateNumber++
                 when (updateNumber) {
                     1 -> {}
                     2 -> {
@@ -153,7 +163,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
             }
         }
         plugin?.hooks?.onAsyncNode?.tap("") { _, node ->
-            asyncTaps ++
+            asyncTaps++
             when (asyncTaps) {
                 1 -> BailResult.Bail(
                     listOf(
@@ -161,14 +171,14 @@ internal class AsyncNodePluginTest : PlayerTest() {
                             "asset" to mapOf(
                                 "id" to "asset-1",
                                 "type" to "text",
-                                "value" to "New asset!"
-                            )
+                                "value" to "New asset!",
+                            ),
                         ),
                         mapOf(
                             "id" to "another-async",
-                            "async" to true
-                        )
-                    )
+                            "async" to true,
+                        ),
+                    ),
                 )
                 2 -> BailResult.Bail(
                     listOf(
@@ -176,14 +186,14 @@ internal class AsyncNodePluginTest : PlayerTest() {
                             "asset" to mapOf(
                                 "id" to "asset-2",
                                 "type" to "text",
-                                "value" to "Another new asset!"
-                            )
+                                "value" to "Another new asset!",
+                            ),
                         ),
                         mapOf(
                             "id" to "yet-another",
-                            "async" to true
-                        )
-                    )
+                            "async" to true,
+                        ),
+                    ),
                 )
                 else -> BailResult.Bail(
                     listOf(
@@ -191,17 +201,17 @@ internal class AsyncNodePluginTest : PlayerTest() {
                             "asset" to mapOf(
                                 "id" to "asset-3",
                                 "type" to "text",
-                                "value" to "Third new asset!"
-                            )
+                                "value" to "Third new asset!",
+                            ),
                         ),
                         mapOf(
                             "asset" to mapOf(
                                 "id" to "asset-4",
                                 "type" to "text",
-                                "value" to "Fourth new asset!"
-                            )
-                        )
-                    )
+                                "value" to "Fourth new asset!",
+                            ),
+                        ),
+                    ),
                 )
             }
         }

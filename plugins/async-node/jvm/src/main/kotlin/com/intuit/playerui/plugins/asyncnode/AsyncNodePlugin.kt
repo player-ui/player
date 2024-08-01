@@ -4,6 +4,7 @@ import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.core.bridge.hooks.NodeAsyncParallelBailHook1
 import com.intuit.playerui.core.bridge.runtime.Runtime
+import com.intuit.playerui.core.bridge.runtime.ScriptContext
 import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializer
@@ -22,8 +23,8 @@ public class AsyncNodePlugin : JSScriptPluginWrapper(pluginName, sourcePath = bu
     public lateinit var hooks: Hooks
 
     override fun apply(runtime: Runtime<*>) {
-        runtime.execute(script)
-        instance = runtime.buildInstance("(new $name())")
+        runtime.load(ScriptContext(script, bundledSourcePath))
+        instance = runtime.buildInstance("(new $pluginName({plugins: [new AsyncNodePlugin.AsyncNodePluginPlugin()]}))")
         hooks = instance.getSerializable("hooks", Hooks.serializer()) ?: throw PlayerException("AsyncNodePlugin is not loaded correctly")
     }
 
@@ -35,10 +36,10 @@ public class AsyncNodePlugin : JSScriptPluginWrapper(pluginName, sourcePath = bu
     }
 
     private companion object {
-        private const val bundledSourcePath = "async-node-plugin.js"
-        private const val pluginName = "AsyncNodePlugin"
+        private const val bundledSourcePath = "plugins/async-node/core/dist/AsyncNodePlugin.native.js"
+        private const val pluginName = "AsyncNodePlugin.AsyncNodePlugin"
     }
 }
 
-/** Convenience getter to find the first [PubSubPlugin] registered to the [Player] */
+/** Convenience getter to find the first [AsyncNodePlugin] registered to the [Player] */
 public val Player.asyncNodePlugin: AsyncNodePlugin? get() = findPlugin()
