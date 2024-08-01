@@ -2,9 +2,12 @@ package com.intuit.playerui.jsi.promise
 
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.Promise
+import com.intuit.playerui.core.bridge.toCompletable
 import com.intuit.playerui.hermes.base.HermesTest
 import com.intuit.playerui.hermes.bridge.runtime.HermesRuntime
 import com.intuit.playerui.plugins.settimeout.SetTimeoutPlugin
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -12,7 +15,7 @@ internal class JSIPromiseTest : HermesTest(HermesRuntime.create().apply(SetTimeo
 
     @Test
     fun testErrorStacktraceFromJSError() {
-        val (promise) = runtime.execute(
+        val (promiseInstance) = runtime.execute(
             """
            (function() {
                var resolver;
@@ -22,7 +25,14 @@ internal class JSIPromiseTest : HermesTest(HermesRuntime.create().apply(SetTimeo
             """.trimIndent(),
         ) as List<*>
 
-        Promise(promise as Node).thenRecord.catchRecord
+        val promise = Promise(promiseInstance as Node).thenRecord.catchRecord
+        catchChain.filterIsInstance<Throwable>().forEach { it.printStackTrace() }
+
+        runBlocking {
+            suspendCancellableCoroutine { continuation ->
+                promise.toCompletable<Any>().onComplete(continuation::resumeWith)
+            }
+        }
 
         catchChain.filterIsInstance<Throwable>().forEach { it.printStackTrace() }
 
