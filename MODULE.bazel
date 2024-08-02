@@ -4,12 +4,11 @@ module(
 )
 
 bazel_dep(name = "rules_player")
-
 archive_override(
-  module_name = "rules_player",
-  strip_prefix = "rules_player-1.0.1",
-  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v1.0.1.tar.gz"],
-  integrity = "sha256-zIbxx1Bh/X4E8OwbPJz1nY9mOd2uAgmTZyf1Hs2mq+U="
+    module_name = "rules_player",
+    integrity = "sha256-zIbxx1Bh/X4E8OwbPJz1nY9mOd2uAgmTZyf1Hs2mq+U=",
+    strip_prefix = "rules_player-1.0.1",
+    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v1.0.1.tar.gz"],
 )
 #local_path_override(module_name = "rules_player", path = "../rules_player")
 
@@ -179,7 +178,8 @@ maven.install(
         "org.graalvm.js:js-scriptengine:21.2.0",
         "org.graalvm.sdk:graal-sdk:21.2.0",
 
-        # J2V8 debug
+        # J2V8
+        "com.eclipsesource.j2v8:j2v8:aar:6.1.0",
         "com.github.AlexTrotsenko:j2v8-debugger:0.2.3",
         "com.facebook.stetho:stetho:1.5.1",
 

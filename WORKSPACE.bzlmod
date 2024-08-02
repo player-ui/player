@@ -10,11 +10,6 @@ android_sdk_repository(
     api_level = 33,
 )
 
-maven_aar(
-    name = "android_j2v8",
-    artifact = "com.eclipsesource.j2v8:j2v8:6.1.0",
-)
-
 bind(
     name = "databinding_annotation_processor",
     actual = "//:compiler_annotation_processor",
