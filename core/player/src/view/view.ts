@@ -113,11 +113,12 @@ export class ViewInstance implements ValidationProvider {
     })
   }
 
-  public updateAsync() {
+  public updateAsync(fromTransitioning: Boolean = false) {
     const update = this.resolver?.update();
     this.lastUpdate = update;
-    this.hooks.onUpdate.call(update);
-    this.transitioning = false
+    if (!this.transitioning || (this.transitioning && fromTransitioning)) {
+      this.hooks.onUpdate.call(update);
+    }
   }
 
   public update(changes?: Set<BindingInstance>, fromTransitioning: Boolean = false) {
