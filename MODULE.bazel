@@ -5,10 +5,10 @@ module(
 
 bazel_dep(name = "rules_player")
 archive_override(
-    module_name = "rules_player",
-    integrity = "sha256-zIbxx1Bh/X4E8OwbPJz1nY9mOd2uAgmTZyf1Hs2mq+U=",
-    strip_prefix = "rules_player-1.0.1",
-    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v1.0.1.tar.gz"],
+  module_name = "rules_player",
+  strip_prefix = "rules_player-1.1.1",
+  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v1.1.1.tar.gz"],
+  integrity = "sha256-OiKyosV0bu3RJsg6DIsYPLvlIdnlkW1c6tcDMfH6yT8="
 )
 #local_path_override(module_name = "rules_player", path = "../rules_player")
 
