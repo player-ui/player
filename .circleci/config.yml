@@ -99,10 +99,10 @@ jobs:
           echo "coverage --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
           if [ "${CIRCLE_BRANCH}" == "main" ]; then
             echo "Running on main"
-            echo 'build:ci --define build_type=release' >> .bazelrc.local
+            echo 'common --//android/player:runtime=j2v8 >> .bazelrc.local
           else
             echo "Running on PR"
-            echo 'build:ci --define build_type=debug' >> .bazelrc.local
+            echo 'common --//android/player:runtime=j2v8-debug >> .bazelrc.local
           fi
       - persist_to_workspace:
           root: .
