@@ -12,25 +12,24 @@ string_flag(
     build_setting_default = "j2v8",
     values = [
         "j2v8",
+        "j2v8-debug",
         "hermes",
     ],
 )
 
 config_setting(
+    name = "j2v8_runtime",
+    flag_values = {":runtime": "j2v8"},
+)
+
+config_setting(
+    name = "j2v8_debug_runtime",
+    flag_values = {":runtime": "j2v8-debug"},
+)
+
+config_setting(
     name = "hermes_runtime",
     flag_values = {":runtime": "hermes"},
-)
-
-config_setting(
-    name = "j2v8_dev_runtime",
-    flag_values = {":runtime": "j2v8"},
-    values = {"define": "build_type=debug"},
-)
-
-config_setting(
-    name = "j2v8_prod_runtime",
-    flag_values = {":runtime": "j2v8"},
-    values = {"define": "build_type=release"},
 )
 
 kt_android_library(
@@ -55,8 +54,7 @@ android_library(
 )
 
 distribution(
-    name = "player-distribution",
-    lib_name = "player",
+    name = "player",
     maven_coordinates = "com.intuit.playerui:android:%s" % VERSION,
 )
 
