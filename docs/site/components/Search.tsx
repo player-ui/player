@@ -74,7 +74,8 @@ const useSearch = () => {
           .slice(0, 10)
           .map((r) => {
             return searchIndex.searchIndex[r.ref];
-          });
+          })
+          .filter((e) => e !== undefined);
 
         setResults(searchResults);
       }
@@ -103,7 +104,7 @@ const SearchResult = (props: SearchIndex) => {
   );
 };
 
-export const FallbackSearchInput = () => {
+export const FallbackSearchInput = (): React.JSX.Element => {
   const { search, results, clear } = useSearch();
   const [searchActive, setSearchActive] = React.useState(false);
   const [query, setQuery] = React.useState("");
@@ -162,7 +163,7 @@ export const FallbackSearchInput = () => {
   );
 };
 
-export const SearchInput = () => {
+export const SearchInput = (): React.JSX.Element => {
   // Only use algolia search if we're on the /latest/ version
   // it's the only one that's indexed
   if (

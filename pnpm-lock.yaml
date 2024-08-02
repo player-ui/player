@@ -536,8 +536,6 @@ importers:
 
   core/types: {}
 
-  docs/package: {}
-
   docs/site:
     dependencies:
       '@player-ui/asset-provider-plugin-react':
