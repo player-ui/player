@@ -155,11 +155,7 @@ export class ViewInstance implements ValidationProvider {
     }
 
     this.lastUpdate = update;
-    if (!this.transitioning) {
-      this.resolverOptions.logger?.debug("calling update while not transitioning")
-      this.hooks.onUpdate.call(update);
-    } else if (this.transitioning && fromTransitioning) {
-      this.resolverOptions.logger?.debug("calling update during transition")
+    if (!this.transitioning || (this.transitioning && fromTransitioning)) {
       this.hooks.onUpdate.call(update);
     }
 
