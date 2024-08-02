@@ -102,7 +102,6 @@ export class ViewInstance implements ValidationProvider {
     this.hooks.onTemplatePluginCreated.tap("view", (templatePlugin) => {
       this.templatePlugin = templatePlugin;
     });
-    this.resolverOptions.logger?.info("created view instance")
     resolverOptions.flowController.current?.hooks.transition.tap("view", (state1, state2) => {
       this.transitioning = true;
     })
