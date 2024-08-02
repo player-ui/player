@@ -8,6 +8,7 @@ import { Resolver } from "./resolver";
 import type { Node } from "./parser";
 import { Parser } from "./parser";
 import { TemplatePlugin } from "./plugins";
+import {FlowInstance, ViewControllerOptions} from "../controllers";
 
 /**
  * Manages the view level validations
@@ -86,6 +87,7 @@ export class ViewInstance implements ValidationProvider {
   public readonly initialView: ViewType;
   public readonly resolverOptions: Resolve.ResolverOptions;
   private rootNode?: Node.Node;
+  private transitioning: Boolean = true;
 
   private validationProvider?: CrossfieldProvider;
 
@@ -94,21 +96,31 @@ export class ViewInstance implements ValidationProvider {
   // TODO might want to add a version/timestamp to this to compare updates
   public lastUpdate: Record<string, any> | undefined;
 
-  constructor(initialView: ViewType, resolverOptions: Resolve.ResolverOptions) {
+  constructor(initialView: ViewType, resolverOptions: Resolve.ResolverOptions & ViewControllerOptions) {
     this.initialView = initialView;
     this.resolverOptions = resolverOptions;
     this.hooks.onTemplatePluginCreated.tap("view", (templatePlugin) => {
       this.templatePlugin = templatePlugin;
     });
+    this.resolverOptions.logger?.info("created view instance")
+    resolverOptions.flowController.current?.hooks.transition.tap("view", (state1, state2) => {
+      this.resolverOptions.logger?.info(`${this.initialView.id} is transitioning`)
+      this.transitioning = true;
+    })
+    resolverOptions.flowController.current?.hooks.afterTransition.tap("view", (flowInstance) => {
+      this.resolverOptions.logger?.info(`${this.initialView.id} is done transitioning`)
+      this.transitioning = false;
+    })
   }
 
   public updateAsync() {
     const update = this.resolver?.update();
     this.lastUpdate = update;
     this.hooks.onUpdate.call(update);
+    this.transitioning = false
   }
 
-  public update(changes?: Set<BindingInstance>) {
+  public update(changes?: Set<BindingInstance>, fromTransitioning: Boolean = false) {
     if (this.rootNode === undefined) {
       /** On initialization of the view, also create a validation parser */
       this.validationProvider = new CrossfieldProvider(
@@ -143,8 +155,15 @@ export class ViewInstance implements ValidationProvider {
     }
 
     this.lastUpdate = update;
-    this.hooks.onUpdate.call(update);
+    if (!this.transitioning) {
+      this.resolverOptions.logger?.debug("calling update while not transitioning")
+      this.hooks.onUpdate.call(update);
+    } else if (this.transitioning && fromTransitioning) {
+      this.resolverOptions.logger?.debug("calling update during transition")
+      this.hooks.onUpdate.call(update);
+    }
 
+    this.transitioning = false
     return update;
   }
 

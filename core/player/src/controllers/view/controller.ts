@@ -175,6 +175,6 @@ export class ViewController {
     // Give people a chance to attach their
     // own listeners to the view before we resolve it
     this.hooks.view.call(view);
-    view.update();
+    view.update(undefined, true);
   }
 }
