@@ -19,6 +19,8 @@ deps = [
     "//:node_modules/@babel/preset-env",
     "//:node_modules/@storybook/react-webpack5",
     "//:node_modules/@storybook/addon-docs",
+    "//:node_modules/@storybook/components",
+    "//:node_modules/@storybook/manager-api",
     "//:node_modules/@types/react-redux",
     "//:node_modules/react-redux",
     "//:node_modules/redux-state-sync",
