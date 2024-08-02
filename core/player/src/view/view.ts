@@ -104,11 +104,9 @@ export class ViewInstance implements ValidationProvider {
     });
     this.resolverOptions.logger?.info("created view instance")
     resolverOptions.flowController.current?.hooks.transition.tap("view", (state1, state2) => {
-      this.resolverOptions.logger?.info(`${this.initialView.id} is transitioning`)
       this.transitioning = true;
     })
     resolverOptions.flowController.current?.hooks.afterTransition.tap("view", (flowInstance) => {
-      this.resolverOptions.logger?.info(`${this.initialView.id} is done transitioning`)
       this.transitioning = false;
     })
   }
