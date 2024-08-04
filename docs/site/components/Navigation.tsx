@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   Flex,
   Image,
@@ -10,7 +10,6 @@ import {
   Icon,
   Link as CLink,
   IconButton,
-  chakra,
   Drawer,
   Heading,
   Text,
@@ -27,7 +26,7 @@ import { HamburgerIcon } from "@chakra-ui/icons";
 import type { Route } from "../config/navigation";
 import NAV, { PATH_TO_NAV, Platform } from "../config/navigation";
 import { ColorSchemeSwitch } from "./ColorSchemeSwitch";
-import { DOCS_BASE_URL, GITHUB_URL } from "../config/constants";
+import { DOCS_BASE_URL, GITHUB_URL, BASE_PREFIX } from "../config/constants";
 import { withBasePrefix } from "./Image";
 import { SearchInput } from "./Search";
 import { GithubIcon } from "./gh-icon";
@@ -120,7 +119,7 @@ const SideNavigationList = (props: { route: Route }) => {
   );
 };
 
-export const SideNavigation = () => {
+export const SideNavigation = (): React.JSX.Element | null => {
   const { pathname } = useLocation();
   const subRoutes = PATH_TO_NAV.get(pathname);
 
@@ -141,7 +140,7 @@ export const Footer = () => {
   return null;
 };
 
-export const GitHubButton = () => {
+export const GitHubButton = (): React.JSX.Element => {
   return (
     <Link aria-label="Go to our GitHub page" to={GITHUB_URL}>
       <IconButton
@@ -192,9 +191,8 @@ const useGetReleasedVersions = () => {
   return releasedVersions;
 };
 
-export const VersionSelector = () => {
+export const VersionSelector = (): React.JSX.Element => {
   const location = useLocation();
-  const navigate = useNavigate();
   const released = useGetReleasedVersions();
 
   return (
@@ -206,9 +204,9 @@ export const VersionSelector = () => {
         display: "flex",
         flexShrink: "0",
       }}
-      value={location.pathname || "/latest"}
+      value={BASE_PREFIX || "latest"}
       onChange={(e) => {
-        navigate(`${DOCS_BASE_URL}/${e.target.value}`);
+        window.location.href = `${DOCS_BASE_URL}${e.target.value}/#${location.pathname}`;
       }}
     >
       <option value="latest">Latest</option>
@@ -222,7 +220,7 @@ export const VersionSelector = () => {
   );
 };
 
-export const TopNavigation = () => {
+export const TopNavigation = (): React.JSX.Element => {
   const { pathname, search } = useLocation();
   const subRoutes = PATH_TO_NAV.get(pathname);
   const mobileNavDisclosure = useDisclosure();
