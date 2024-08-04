@@ -29,6 +29,7 @@ stamp_tar_files(
      "DOCS_BASE_PATH": "{STABLE_DOCS_BASE_PATH}",
      "ALGOLIA_SEARCH_API_KEY": "{STABLE_ALGOLIA_SEARCH_API_KEY}",
   },
+  stable = True
 )
 
 genrule(
