@@ -1,6 +1,7 @@
 {
   "name": "@player-ui/docs",
   "private": true,
+  "homepage": "https://player-ui.github.io",
   "type": "module",
   "dependencies": {
     "@player-ui/react": "workspace:*",
