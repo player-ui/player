@@ -12,10 +12,6 @@ import fs from "fs";
 
 const __dirname = new URL(".", import.meta.url).pathname;
 
-// This will be replaced during the build stamping
-export const BASE_PREFIX =
-  process.env.NODE_ENV === "production" ? "/DOCS_BASE_PATH" : undefined;
-
 const findPageRoutes = (searchPath = "./pages") => {
   const files = fs.readdirSync(searchPath);
   const routes: string[] = [];

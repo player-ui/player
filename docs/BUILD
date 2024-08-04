@@ -1,4 +1,3 @@
-load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
 load("@rules_player//distribution/tar:defs.bzl", "stamp_tar_files")
 load("@rules_player//gh-pages:defs.bzl","gh_pages")
 
