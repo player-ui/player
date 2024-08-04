@@ -3,6 +3,7 @@ package com.intuit.playerui.j2v8.bridge.runtime
 import com.alexii.j2v8debugger.ScriptSourceProvider
 import com.eclipsesource.v8.V8
 import com.eclipsesource.v8.V8Array
+import com.eclipsesource.v8.V8Function
 import com.eclipsesource.v8.V8Object
 import com.eclipsesource.v8.V8Value
 import com.eclipsesource.v8.utils.MemoryManager
@@ -20,6 +21,7 @@ import com.intuit.playerui.core.utils.InternalPlayerApi
 import com.intuit.playerui.core.utils.await
 import com.intuit.playerui.j2v8.V8Null
 import com.intuit.playerui.j2v8.V8Primitive
+import com.intuit.playerui.j2v8.V8Value
 import com.intuit.playerui.j2v8.addPrimitive
 import com.intuit.playerui.j2v8.bridge.V8Node
 import com.intuit.playerui.j2v8.bridge.serialization.format.J2V8Format
@@ -71,6 +73,7 @@ internal class V8Runtime(override val config: J2V8RuntimeConfig) : Runtime<V8Val
             this,
             playerSerializersModule + SerializersModule {
                 contextual(V8Value::class, V8ValueSerializer)
+                contextual(V8Function::class, V8ValueSerializer.conform())
                 contextual(V8Object::class, V8ValueSerializer.conform())
                 contextual(V8Array::class, V8ValueSerializer.conform())
                 contextual(V8Primitive::class, V8ValueSerializer.conform())
@@ -112,6 +115,10 @@ internal class V8Runtime(override val config: J2V8RuntimeConfig) : Runtime<V8Val
         }
     }
 
+    override fun executeRaw(script: String): V8Value = v8.evaluateInJSThreadBlocking(runtime) {
+        V8Value(executeScript(script))
+    }
+
     override fun execute(script: String): Any? = v8.evaluateInJSThreadBlocking(runtime) {
         executeScript(script).handleValue(format)
     }
@@ -138,6 +145,8 @@ internal class V8Runtime(override val config: J2V8RuntimeConfig) : Runtime<V8Val
     }
 
     override fun release() {
+        if (isReleased()) return
+
         // cancel work in runtime scope
         scope.cancel("releasing runtime")
         // swap to dispatcher to release everything
@@ -196,7 +205,8 @@ public object J2V8 : PlayerRuntimeFactory<J2V8RuntimeConfig> {
     override fun create(block: J2V8RuntimeConfig.() -> Unit): Runtime<V8Value> =
         V8Runtime(J2V8RuntimeConfig().apply(block))
 
-    override fun toString(): String = "J2V8"
+    override fun toString(): String = name
+    public const val name: String = "J2V8"
 }
 
 public data class J2V8RuntimeConfig(

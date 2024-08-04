@@ -2,7 +2,6 @@ package com.intuit.playerui.core.player
 
 import com.intuit.playerui.core.bridge.JSErrorException
 import com.intuit.playerui.core.bridge.PlayerRuntimeException
-import com.intuit.playerui.core.bridge.global.JSMap
 import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.playerui.core.data.get
 import com.intuit.playerui.core.data.set
@@ -25,8 +24,6 @@ import com.intuit.playerui.core.player.state.errorState
 import com.intuit.playerui.core.player.state.inProgressState
 import com.intuit.playerui.core.player.state.lastViewUpdate
 import com.intuit.playerui.core.plugins.Plugin
-import com.intuit.playerui.core.validation.BindingInstance
-import com.intuit.playerui.core.validation.ValidationResponse
 import com.intuit.playerui.core.validation.getWarningsAndErrors
 import com.intuit.playerui.plugins.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.plugins.types.CommonTypesPlugin
@@ -146,7 +143,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
 
     @TestTemplate
     fun `test player can transition and skip validation`() = runBlockingTest {
-        player.start(mocks.findMockByName("input-transition")!!.getFlow())
+        val flow = player.start(mocks.findMockByName("input-transition")!!.getFlow())
 
         assertEquals("VIEW_1", player.inProgressState!!.currentFlowState?.name)
 
@@ -157,37 +154,31 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         assertEquals("VIEW_1", player.inProgressState!!.currentFlowState?.name)
         player.inProgressState!!.forceTransition("Next")
 
+        flow.await()
+
         assertTrue(player.state is CompletedState)
         assertEquals("DONE", player.completedState!!.endState.outcome)
     }
 
     @TestTemplate
     fun `test player can get validation errors and warnings`() = runBlockingTest {
-        var mapping: JSMap<BindingInstance, ValidationResponse>? = null
-        player.hooks.viewController.tap { viewController ->
-            viewController?.hooks?.view?.tap { view ->
-                view?.hooks?.resolver?.tap { resolver ->
-                    resolver?.hooks?.resolveOptions?.tap { resolveOptions, _ ->
-                        mapping = resolveOptions?.validation?.getWarningsAndErrors()
-                        resolveOptions
-                    }
-                }
-            }
-        }
         player.start(mocks.findMockByName("input-transition")!!.getFlow())
 
-        val validationController = player.inProgressState!!.controllers.validation
+        val inProgressState = player.inProgressState ?: throw AssertionError("Player is not in progress state")
+        val validationController = inProgressState.controllers.validation
+        val resolverOptions = inProgressState.currentView?.resolverOptions ?: throw AssertionError("Current view not defined")
 
-        player.inProgressState!!.dataModel.set("foo.bar" to 21)
-        assertNull(mapping)
+        inProgressState.dataModel.set("foo.bar" to 21)
         assertTrue(validationController.validateView().canTransition)
+        assertNull(resolverOptions.validation?.getWarningsAndErrors())
 
-        player.inProgressState!!.dataModel.set("foo.bar" to "asdf")
+        inProgressState.dataModel.set("foo.bar" to "asdf")
 
-        assertNotNull(mapping)
         assertFalse(validationController.validateView().canTransition)
-        assertEquals("foo.bar", mapping!!.keys.first().asString())
-        assertEquals("Value must be an integer", mapping!!.values.first().message)
+        val mapping = resolverOptions.validation?.getWarningsAndErrors()
+            ?: throw AssertionError("Expected validations to not be null")
+        assertEquals("foo.bar", mapping.keys.first().asString())
+        assertEquals("Value must be an integer", mapping.values.first().message)
     }
 
     @TestTemplate
@@ -306,7 +297,10 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         val message = "oh no!"
         player.hooks.viewController.tap { _ ->
             // Different runtimes might actually handle this differently, i.e.
-            // J2V8 will just serialize [message] but Graal will actually serialize this instance
+            //  - J2V8 will just serialize [message]
+            //  - Graal will actually serialize this instance
+            //  - Hermes, FBJNI will translate exception instance,
+            //      but will wrap exceptions from host functions as JSErrors
             throw Exception(message)
         }
 
@@ -316,8 +310,8 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
             }
         }
 
-        assertEquals(message, exception.message)
-        assertEquals("uncaught exception: $message", player.errorState?.error?.message)
+        assertTrue(exception.message!!.endsWith(message))
+        assertTrue(player.errorState?.error?.message!!.endsWith(message))
     }
 
     @TestTemplate

@@ -86,12 +86,14 @@ public constructor(
     public val runtime: Runtime<*> = explicitRuntime ?: runtimeFactory.create {
         debuggable = config.debuggable
         coroutineExceptionHandler = config.coroutineExceptionHandler ?: CoroutineExceptionHandler { _, throwable ->
-            inProgressState?.fail(throwable) ?: logger.error(
-                "Exception caught in Player scope: ${throwable.message}",
-                throwable.stackTrace.joinToString("\n") {
-                    "\tat $it"
-                }.replaceFirst("\tat ", "\n"),
-            )
+            if (state !is ReleasedState) {
+                inProgressState?.fail(throwable) ?: logger.error(
+                    "Exception caught in Player scope: ${throwable.message}",
+                    throwable.stackTrace.joinToString("\n") {
+                        "\tat $it"
+                    }.replaceFirst("\tat ", "\n"),
+                )
+            }
         }
     }
 
@@ -99,7 +101,7 @@ public constructor(
 
     init {
         /** 1. load source into the [runtime] and release lock */
-        runtime.load(ScriptContext(if (runtime.config.debuggable) debugSource.readText() else source.readText(), bundledSourcePath))
+        runtime.load(ScriptContext(if (runtime.config.debuggable) debugSource.readText() else source.readText(), bundledSourcePath, sourceMap.readText()))
 
         /** 2. merge explicit [LoggerPlugin]s with ones created by service loader */
         val loggerPlugins = plugins.filterIsInstance<LoggerPlugin>().let { explicitLoggers ->
@@ -123,6 +125,7 @@ public constructor(
         runtime.add("player", player)
 
         // we only have access to the logger after we have the player instance
+        logger.info("Player created using $runtime")
         if (runtime.config.debuggable) {
             runtime.checkBlockingThread = {
                 if (name == "main") {
@@ -179,5 +182,8 @@ public constructor(
 
         private val debugSource get() = this::class.java
             .classLoader.getResource(debugSourcePath)!!
+
+        private val sourceMap get() = this::class.java
+            .classLoader.getResource("$bundledSourcePath.map")
     }
 }
