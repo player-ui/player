@@ -1,12 +1,12 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { RouterProvider, createHashRouter } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
 
 import { PATH_TO_NAV } from "../config/navigation";
 import { Context } from "./Context";
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: "/",
     Component: React.lazy(() => import("../pages")),

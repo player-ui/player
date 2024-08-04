@@ -12,7 +12,7 @@
         "versionFile": "./VERSION",
         "publishScript": "./scripts/release.sh",
         "publishScriptReleaseTypeArgs": {
-          "next": ["release"]
+          "next": ["next"]
         }
       }
     ],

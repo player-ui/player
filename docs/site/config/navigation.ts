@@ -102,6 +102,10 @@ const navigation: Navigation = {
               title: 'Schema',
               path: '/dsl/schema',
             },
+            {
+              title: 'Plugins',
+              path: '/dsl/plugins',
+            },
           ],
         },
         {
