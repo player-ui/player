@@ -73,11 +73,17 @@ importers:
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.48.0)(react-dom@18.3.1)(react@18.3.1)
       '@player-tools/cli':
-        specifier: 0.5.2
-        version: 0.5.2(@babel/core@7.24.5)(@oclif/config@1.18.17)(@swc/core@1.5.7)(@types/node@18.19.33)(@types/react@18.3.2)(jsonc-parser@2.3.1)
+        specifier: 0.6.1-next.2
+        version: 0.6.1-next.2(@babel/core@7.24.5)(@oclif/config@1.18.17)(@swc/core@1.5.7)(@types/node@18.19.33)(@types/react@18.3.2)(jsonc-parser@2.3.1)
       '@player-tools/dsl':
         specifier: 0.6.1-next.2
         version: 0.6.1-next.2(@swc/core@1.5.7)(@types/node@18.19.33)(@types/react@18.3.2)(react@18.3.1)
+      '@player-tools/xlr':
+        specifier: 0.6.1-next.2
+        version: 0.6.1-next.2
+      '@player-tools/xlr-utils':
+        specifier: 0.6.1-next.2
+        version: 0.6.1-next.2(jsonc-parser@2.3.1)(typescript@5.5.3)
       '@radix-ui/react-label':
         specifier: ^2.0.2
         version: 2.0.2(@types/react-dom@18.3.0)(@types/react@18.3.2)(react-dom@18.3.1)(react@18.3.1)
@@ -447,6 +453,9 @@ importers:
       storybook:
         specifier: ^7.6.10
         version: 7.6.19
+      storybook-dark-mode:
+        specifier: 3.0.3
+        version: 3.0.3(@types/react-dom@18.3.0)(@types/react@18.3.2)(react-dom@18.3.1)(react@18.3.1)
       style-loader:
         specifier: ^3.3.4
         version: 3.3.4(webpack@5.91.0)
@@ -568,6 +577,9 @@ importers:
       '@player-ui/react':
         specifier: workspace:*
         version: link:../../react/player
+      '@player-ui/reference-assets-plugin':
+        specifier: workspace:*
+        version: link:../../plugins/reference-assets/core
       '@player-ui/reference-assets-plugin-components':
         specifier: workspace:*
         version: link:../../plugins/reference-assets/components
@@ -1016,15 +1028,9 @@ importers:
       '@player-ui/metrics-plugin-react':
         specifier: workspace:*
         version: link:../../plugins/metrics/react
-      '@player-ui/player':
-        specifier: workspace:*
-        version: link:../../core/player
       '@player-ui/react':
         specifier: workspace:*
         version: link:../../react/player
-      '@player-ui/types':
-        specifier: workspace:*
-        version: link:../../core/types
 
 packages:
 
@@ -5213,8 +5219,8 @@ packages:
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
     dev: false
 
-  /@player-tools/cli@0.5.2(@babel/core@7.24.5)(@oclif/config@1.18.17)(@swc/core@1.5.7)(@types/node@18.19.33)(@types/react@18.3.2)(jsonc-parser@2.3.1):
-    resolution: {integrity: sha512-uaXxUsy4DXd1qPmhP/bm8eJ6PI5Z5p736aCqf97wTlMJXOGacTMjXXuRlCIuETGtxo6g7Wc4a1iNO5Y9B3mJNQ==, tarball: https://registry.npmjs.org/@player-tools/cli/-/cli-0.5.2.tgz}
+  /@player-tools/cli@0.6.1-next.2(@babel/core@7.24.5)(@oclif/config@1.18.17)(@swc/core@1.5.7)(@types/node@18.19.33)(@types/react@18.3.2)(jsonc-parser@2.3.1):
+    resolution: {integrity: sha512-cBT9kIv8Y/4KPQDidtZ3BnQ0D+jD0JYQp5rMd/k64KyauBoZPQwAzA2voSTSDTyCXwZtXUvtJi71VBDcdzXwiQ==, tarball: https://registry.npmjs.org/@player-tools/cli/-/cli-0.6.1-next.2.tgz}
     hasBin: true
     dependencies:
       '@babel/plugin-transform-react-jsx-source': 7.24.1(@babel/core@7.24.5)
@@ -5225,12 +5231,12 @@ packages:
       '@oclif/core': 1.9.0
       '@oclif/plugin-legacy': 1.3.6(@oclif/config@1.18.17)
       '@oclif/plugin-plugins': 1.10.11(@oclif/config@1.18.17)
-      '@player-tools/dsl': 0.5.2(@swc/core@1.5.7)(@types/node@18.19.33)(@types/react@18.3.2)(react@18.3.1)
-      '@player-tools/json-language-service': 0.5.2
-      '@player-tools/xlr': 0.5.2
-      '@player-tools/xlr-converters': 0.5.2(jsonc-parser@2.3.1)(typescript@5.5.3)
-      '@player-tools/xlr-sdk': 0.5.2(typescript@5.5.3)
-      '@player-tools/xlr-utils': 0.5.2(jsonc-parser@2.3.1)(typescript@5.5.3)
+      '@player-tools/dsl': 0.6.1-next.2(@swc/core@1.5.7)(@types/node@18.19.33)(@types/react@18.3.2)(react@18.3.1)
+      '@player-tools/json-language-service': 0.6.1-next.2
+      '@player-tools/xlr': 0.6.1-next.2
+      '@player-tools/xlr-converters': 0.6.1-next.2(jsonc-parser@2.3.1)(typescript@5.5.3)
+      '@player-tools/xlr-sdk': 0.6.1-next.2(typescript@5.5.3)
+      '@player-tools/xlr-utils': 0.6.1-next.2(jsonc-parser@2.3.1)(typescript@5.5.3)
       chalk: 4.1.2
       cosmiconfig: 7.1.0
       cross-fetch: 3.1.8
@@ -5259,36 +5265,6 @@ packages:
       - encoding
       - jsonc-parser
       - supports-color
-    dev: false
-
-  /@player-tools/dsl@0.5.2(@swc/core@1.5.7)(@types/node@18.19.33)(@types/react@18.3.2)(react@18.3.1):
-    resolution: {integrity: sha512-Jqp1Eu1UDX5yRI7e5kPaKM0avY/uDExWNAM7wu+RCQte0C+4A5CwC3DCohoQW++XsSHyD5yB2gE93e4eTTHQhA==, tarball: https://registry.npmjs.org/@player-tools/dsl/-/dsl-0.5.2.tgz}
-    peerDependencies:
-      '@types/react': ^18.2.51
-      react: ^18.2.0
-    dependencies:
-      '@player-ui/player': 0.7.2-next.4
-      '@player-ui/types': 0.7.2-next.4
-      '@types/mkdirp': 1.0.2
-      '@types/react': 18.3.2
-      chalk: 4.1.2
-      command-line-application: 0.10.1
-      dequal: 2.0.3
-      fs-extra: 10.1.0
-      globby: 11.1.0
-      jsonc-parser: 2.3.1
-      mkdirp: 1.0.4
-      react: 18.3.1
-      react-json-reconciler: 2.0.0(react@18.3.1)
-      source-map-js: 1.2.0
-      tapable-ts: 0.2.4
-      ts-node: 10.9.2(@swc/core@1.5.7)(@types/node@18.19.33)(typescript@5.5.3)
-      tslib: 2.6.2
-      typescript: 5.5.3
-    transitivePeerDependencies:
-      - '@swc/core'
-      - '@swc/wasm'
-      - '@types/node'
     dev: false
 
   /@player-tools/dsl@0.6.1-next.2(@swc/core@1.5.7)(@types/node@18.19.33)(@types/react@18.3.2)(react@18.3.1):
@@ -5321,12 +5297,12 @@ packages:
       - '@types/node'
     dev: false
 
-  /@player-tools/json-language-service@0.5.2:
-    resolution: {integrity: sha512-vpXjJ3irqQMwdwQWzzB4vNl7Reskq9XSXXj+M61G0ZLTScXRZa83hLeRgTYHfsuW39IWu0AYufHNgbR6uDZi9A==, tarball: https://registry.npmjs.org/@player-tools/json-language-service/-/json-language-service-0.5.2.tgz}
+  /@player-tools/json-language-service@0.6.1-next.2:
+    resolution: {integrity: sha512-iE/H7GgF93IDBhulan3PxPwHxHZ/r1HZvKUgNdQ1zcsBUQNo69QqGg5RE/6tNeGX+dzI/1aleG8DjQCp4bsUsg==, tarball: https://registry.npmjs.org/@player-tools/json-language-service/-/json-language-service-0.6.1-next.2.tgz}
     dependencies:
-      '@player-tools/xlr': 0.5.2
-      '@player-tools/xlr-sdk': 0.5.2(typescript@5.5.3)
-      '@player-tools/xlr-utils': 0.5.2(jsonc-parser@2.3.1)(typescript@5.5.3)
+      '@player-tools/xlr': 0.6.1-next.2
+      '@player-tools/xlr-sdk': 0.6.1-next.2(typescript@5.5.3)
+      '@player-tools/xlr-utils': 0.6.1-next.2(jsonc-parser@2.3.1)(typescript@5.5.3)
       change-case: 4.1.2
       cross-fetch: 3.1.8
       detect-indent: 6.1.0
@@ -5342,13 +5318,13 @@ packages:
       - supports-color
     dev: false
 
-  /@player-tools/xlr-converters@0.5.2(jsonc-parser@2.3.1)(typescript@5.5.3):
-    resolution: {integrity: sha512-5M644wJwyGz5gVV0+yHxwIFGkB7aL25Bll08TnqTFhLjYAIuy/Q12tE4DWklaNemvySkRUvRakh4EqFM1J3zDw==, tarball: https://registry.npmjs.org/@player-tools/xlr-converters/-/xlr-converters-0.5.2.tgz}
+  /@player-tools/xlr-converters@0.6.1-next.2(jsonc-parser@2.3.1)(typescript@5.5.3):
+    resolution: {integrity: sha512-swu6kgoIQVEBCSP9nz5D4uyGzoirRCn44WWBWdRrK+/aISYf5k6T/ky1H4bkdmnss9SyV6ypLb5gaL+jn1C4dw==, tarball: https://registry.npmjs.org/@player-tools/xlr-converters/-/xlr-converters-0.6.1-next.2.tgz}
     peerDependencies:
       typescript: ^5.4.4
     dependencies:
-      '@player-tools/xlr': 0.5.2
-      '@player-tools/xlr-utils': 0.5.2(jsonc-parser@2.3.1)(typescript@5.5.3)
+      '@player-tools/xlr': 0.6.1-next.2
+      '@player-tools/xlr-utils': 0.6.1-next.2(jsonc-parser@2.3.1)(typescript@5.5.3)
       tslib: 2.6.2
       typescript: 5.5.3
     transitivePeerDependencies:
@@ -5356,14 +5332,14 @@ packages:
       - supports-color
     dev: false
 
-  /@player-tools/xlr-sdk@0.5.2(typescript@5.5.3):
-    resolution: {integrity: sha512-ZguEmjpgUARPo+8Bu8NJz4ojAYYOOj3AXjWScG7vCvGJdHJ70azPM9og/gYkSIxt12xAr1lAHeM1FSSf2kRmEg==, tarball: https://registry.npmjs.org/@player-tools/xlr-sdk/-/xlr-sdk-0.5.2.tgz}
+  /@player-tools/xlr-sdk@0.6.1-next.2(typescript@5.5.3):
+    resolution: {integrity: sha512-/oQcHiTMcpbrX9aKoxbQjmvdV1SkE2cR/upbfU3IpC7pxW5Se1MizubsIK+1zeJTF1X9sfdjpNrGAPAM/0mJEg==, tarball: https://registry.npmjs.org/@player-tools/xlr-sdk/-/xlr-sdk-0.6.1-next.2.tgz}
     peerDependencies:
       typescript: ^5.4.4
     dependencies:
-      '@player-tools/xlr': 0.5.2
-      '@player-tools/xlr-converters': 0.5.2(jsonc-parser@2.3.1)(typescript@5.5.3)
-      '@player-tools/xlr-utils': 0.5.2(jsonc-parser@2.3.1)(typescript@5.5.3)
+      '@player-tools/xlr': 0.6.1-next.2
+      '@player-tools/xlr-converters': 0.6.1-next.2(jsonc-parser@2.3.1)(typescript@5.5.3)
+      '@player-tools/xlr-utils': 0.6.1-next.2(jsonc-parser@2.3.1)(typescript@5.5.3)
       '@types/fs-extra': 9.0.13
       '@types/node': 18.19.33
       fs-extra: 10.1.0
@@ -5374,13 +5350,13 @@ packages:
       - supports-color
     dev: false
 
-  /@player-tools/xlr-utils@0.5.2(jsonc-parser@2.3.1)(typescript@5.5.3):
-    resolution: {integrity: sha512-kCLMySi8TGaB3Zij8UWPOgRW/4bmfkqA00khiI9IKEnEr2sFAqTM9abGDGhO9d9Pxd3OFJjVGKO+7qBTM8Lklg==, tarball: https://registry.npmjs.org/@player-tools/xlr-utils/-/xlr-utils-0.5.2.tgz}
+  /@player-tools/xlr-utils@0.6.1-next.2(jsonc-parser@2.3.1)(typescript@5.5.3):
+    resolution: {integrity: sha512-PW75fDlkVkQCE9l5JtMywhNutTSfrVX7EC7w00xznFQRXKeCwbg/QwicnuWGvDPTuQp7AjN5czcUM7KkVF6ZXg==, tarball: https://registry.npmjs.org/@player-tools/xlr-utils/-/xlr-utils-0.6.1-next.2.tgz}
     peerDependencies:
       jsonc-parser: ^2.3.1
       typescript: ^5.4.4
     dependencies:
-      '@player-tools/xlr': 0.5.2
+      '@player-tools/xlr': 0.6.1-next.2
       '@typescript/vfs': 1.5.0
       jsonc-parser: 2.3.1
       tslib: 2.6.2
@@ -5389,19 +5365,10 @@ packages:
       - supports-color
     dev: false
 
-  /@player-tools/xlr@0.5.2:
-    resolution: {integrity: sha512-3rMN/W/9QKNeUPmeLwciFyAYXYH6pInQpXyqd4GaR+x3FrkZI5XYcFYP4dCKrx1xFfiug/IZdBsbBXnThyOLkA==, tarball: https://registry.npmjs.org/@player-tools/xlr/-/xlr-0.5.2.tgz}
+  /@player-tools/xlr@0.6.1-next.2:
+    resolution: {integrity: sha512-0wAtiDR/7Xjxe3zVrYP+i1MuhR1VyEgu8x2FiSqxfTwWPP3cQn9UGPt2jL6W2hdVZRER3JBQpe1Giw8WM+xH7w==, tarball: https://registry.npmjs.org/@player-tools/xlr/-/xlr-0.6.1-next.2.tgz}
     dependencies:
       tslib: 2.6.2
-    dev: false
-
-  /@player-ui/partial-match-registry@0.7.2-next.4:
-    resolution: {integrity: sha512-7I2YorvboXBbv4l6f9Bh95/CrRDkDsPw0Angh6B+UVntR2F6UJBMEhCNMG/rnv2Xv1nQpTzDCGK6SYuA+k1DxQ==, tarball: https://registry.npmjs.org/@player-ui/partial-match-registry/-/partial-match-registry-0.7.2-next.4.tgz}
-    dependencies:
-      '@babel/runtime': 7.15.4
-      '@types/dlv': 1.1.4
-      dlv: 1.1.3
-      sorted-array: 2.0.4
     dev: false
 
   /@player-ui/partial-match-registry@0.7.3:
@@ -5411,25 +5378,6 @@ packages:
       '@types/dlv': 1.1.4
       dlv: 1.1.3
       sorted-array: 2.0.4
-    dev: false
-
-  /@player-ui/player@0.7.2-next.4:
-    resolution: {integrity: sha512-TqdoMz/GDYPBeAEIIoK7GM3+oRJTN4g71HG8lOV2BxzTb2cwvyddRlUz6A0E/JSnkG9D0lR8ommv3w7bcKYpqA==, tarball: https://registry.npmjs.org/@player-ui/player/-/player-0.7.2-next.4.tgz}
-    dependencies:
-      '@babel/runtime': 7.15.4
-      '@player-ui/partial-match-registry': 0.7.2-next.4
-      '@player-ui/types': 0.7.2-next.4
-      '@types/parsimmon': 1.10.9
-      arr-flatten: 1.1.0
-      dequal: 2.0.3
-      ebnf: 1.9.1
-      error-polyfill: 0.1.3
-      p-defer: 3.0.0
-      parsimmon: 1.18.1
-      queue-microtask: 1.2.3
-      tapable-ts: 0.2.4
-      timm: 1.7.1
-      ts-nested-error: 1.2.1
     dev: false
 
   /@player-ui/player@0.7.3:
@@ -5449,12 +5397,6 @@ packages:
       tapable-ts: 0.2.4
       timm: 1.7.1
       ts-nested-error: 1.2.1
-    dev: false
-
-  /@player-ui/types@0.7.2-next.4:
-    resolution: {integrity: sha512-wvKlmu+ZJSVT5fs/vHHwpv4KhgZmqinJBvHhttU4LHzqrEauaRcS/DVCItABXt6ABxhIakPInnxQtH1xCwdDyQ==, tarball: https://registry.npmjs.org/@player-ui/types/-/types-0.7.2-next.4.tgz}
-    dependencies:
-      '@babel/runtime': 7.15.4
     dev: false
 
   /@player-ui/types@0.7.3:
@@ -6307,6 +6249,17 @@ packages:
       - webpack
     dev: false
 
+  /@storybook/addons@7.6.17(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-Ok18Y698Ccyg++MoUNJNHY0cXUvo8ETFIRLJk1g9ElJ70j6kPgNnzW2pAtZkBNmswHtofZ7pT156cj96k/LgfA==, tarball: https://registry.npmjs.org/@storybook/addons/-/addons-7.6.17.tgz}
+    dependencies:
+      '@storybook/manager-api': 7.6.17(react-dom@18.3.1)(react@18.3.1)
+      '@storybook/preview-api': 7.6.17
+      '@storybook/types': 7.6.17
+    transitivePeerDependencies:
+      - react
+      - react-dom
+    dev: false
+
   /@storybook/blocks@7.6.19(@types/react-dom@18.3.0)(@types/react@18.3.2)(react-dom@18.3.1)(react@18.3.1):
     resolution: {integrity: sha512-/c/bVQRmyRPoviJhPrFdLfubRcrnZWTwkjxsCvrOTJ/UDOyEl0t/H8yY1mGq7KWWTdbIznnZWhAIofHnH4/Esw==, tarball: https://registry.npmjs.org/@storybook/blocks/-/blocks-7.6.19.tgz}
     peerDependencies:
@@ -6464,6 +6417,17 @@ packages:
       - webpack-cli
     dev: false
 
+  /@storybook/channels@7.6.17:
+    resolution: {integrity: sha512-GFG40pzaSxk1hUr/J/TMqW5AFDDPUSu+HkeE/oqSWJbOodBOLJzHN6CReJS6y1DjYSZLNFt1jftPWZZInG/XUA==, tarball: https://registry.npmjs.org/@storybook/channels/-/channels-7.6.17.tgz}
+    dependencies:
+      '@storybook/client-logger': 7.6.17
+      '@storybook/core-events': 7.6.17
+      '@storybook/global': 5.0.0
+      qs: 6.12.1
+      telejson: 7.2.0
+      tiny-invariant: 1.3.3
+    dev: false
+
   /@storybook/channels@7.6.19:
     resolution: {integrity: sha512-2JGh+i95GwjtjqWqhtEh15jM5ifwbRGmXeFqkY7dpdHH50EEWafYHr2mg3opK3heVDwg0rJ/VBptkmshloXuvA==, tarball: https://registry.npmjs.org/@storybook/channels/-/channels-7.6.19.tgz}
     dependencies:
@@ -6524,6 +6488,12 @@ packages:
       - encoding
       - supports-color
       - utf-8-validate
+    dev: false
+
+  /@storybook/client-logger@7.6.17:
+    resolution: {integrity: sha512-6WBYqixAXNAXlSaBWwgljWpAu10tPRBJrcFvx2gPUne58EeMM20Gi/iHYBz2kMCY+JLAgeIH7ZxInqwO8vDwiQ==, tarball: https://registry.npmjs.org/@storybook/client-logger/-/client-logger-7.6.17.tgz}
+    dependencies:
+      '@storybook/global': 5.0.0
     dev: false
 
   /@storybook/client-logger@7.6.19:
@@ -6612,6 +6582,12 @@ packages:
     transitivePeerDependencies:
       - encoding
       - supports-color
+    dev: false
+
+  /@storybook/core-events@7.6.17:
+    resolution: {integrity: sha512-AriWMCm/k1cxlv10f+jZ1wavThTRpLaN3kY019kHWbYT9XgaSuLU67G7GPr3cGnJ6HuA6uhbzu8qtqVCd6OfXA==, tarball: https://registry.npmjs.org/@storybook/core-events/-/core-events-7.6.17.tgz}
+    dependencies:
+      ts-dedent: 2.2.0
     dev: false
 
   /@storybook/core-events@7.6.19:
@@ -6738,6 +6714,28 @@ packages:
     resolution: {integrity: sha512-FcOqPAXACP0I3oJ/ws6/rrPT9WGhu915Cg8D02a9YxLo0DE9zI+a9A5gRGvmQ09fiWPukqI8ZAEoQEdWUKMQdQ==, tarball: https://registry.npmjs.org/@storybook/global/-/global-5.0.0.tgz}
     dev: false
 
+  /@storybook/manager-api@7.6.17(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-IJIV1Yc6yw1dhCY4tReHCfBnUKDqEBnMyHp3mbXpsaHxnxJZrXO45WjRAZIKlQKhl/Ge1CrnznmHRCmYgqmrWg==, tarball: https://registry.npmjs.org/@storybook/manager-api/-/manager-api-7.6.17.tgz}
+    dependencies:
+      '@storybook/channels': 7.6.17
+      '@storybook/client-logger': 7.6.17
+      '@storybook/core-events': 7.6.17
+      '@storybook/csf': 0.1.7
+      '@storybook/global': 5.0.0
+      '@storybook/router': 7.6.17
+      '@storybook/theming': 7.6.17(react-dom@18.3.1)(react@18.3.1)
+      '@storybook/types': 7.6.17
+      dequal: 2.0.3
+      lodash: 4.17.21
+      memoizerific: 1.11.3
+      store2: 2.14.3
+      telejson: 7.2.0
+      ts-dedent: 2.2.0
+    transitivePeerDependencies:
+      - react
+      - react-dom
+    dev: false
+
   /@storybook/manager-api@7.6.19(react-dom@18.3.1)(react@18.3.1):
     resolution: {integrity: sha512-dVCx1Q+HZEA4U08XqYljiG88BeS3I3ahnPAQLZAeWQXQRkoc9G2jMgLNPKYPIqEtq7Xrn6SRlFMIofhwWrwZpg==, tarball: https://registry.npmjs.org/@storybook/manager-api/-/manager-api-7.6.19.tgz}
     dependencies:
@@ -6824,6 +6822,25 @@ packages:
       - webpack-dev-server
       - webpack-hot-middleware
       - webpack-plugin-serve
+    dev: false
+
+  /@storybook/preview-api@7.6.17:
+    resolution: {integrity: sha512-wLfDdI9RWo1f2zzFe54yRhg+2YWyxLZvqdZnSQ45mTs4/7xXV5Wfbv3QNTtcdw8tT3U5KRTrN1mTfTCiRJc0Kw==, tarball: https://registry.npmjs.org/@storybook/preview-api/-/preview-api-7.6.17.tgz}
+    dependencies:
+      '@storybook/channels': 7.6.17
+      '@storybook/client-logger': 7.6.17
+      '@storybook/core-events': 7.6.17
+      '@storybook/csf': 0.1.7
+      '@storybook/global': 5.0.0
+      '@storybook/types': 7.6.17
+      '@types/qs': 6.9.15
+      dequal: 2.0.3
+      lodash: 4.17.21
+      memoizerific: 1.11.3
+      qs: 6.12.1
+      synchronous-promise: 2.0.17
+      ts-dedent: 2.2.0
+      util-deprecate: 1.0.2
     dev: false
 
   /@storybook/preview-api@7.6.19:
@@ -6957,6 +6974,14 @@ packages:
       - supports-color
     dev: false
 
+  /@storybook/router@7.6.17:
+    resolution: {integrity: sha512-GnyC0j6Wi5hT4qRhSyT8NPtJfGmf82uZw97LQRWeyYu5gWEshUdM7aj40XlNiScd5cZDp0owO1idduVF2k2l2A==, tarball: https://registry.npmjs.org/@storybook/router/-/router-7.6.17.tgz}
+    dependencies:
+      '@storybook/client-logger': 7.6.17
+      memoizerific: 1.11.3
+      qs: 6.12.1
+    dev: false
+
   /@storybook/router@7.6.19:
     resolution: {integrity: sha512-q2/AvY8rG0znFEfbg50OIhkS5yQ6OmyzdCdztoEsDDdsbq87YPmsDj7k8Op1EkTa2T5CB8XhBOCQDtcj7gUUtg==, tarball: https://registry.npmjs.org/@storybook/router/-/router-7.6.19.tgz}
     dependencies:
@@ -6981,6 +7006,20 @@ packages:
       - supports-color
     dev: false
 
+  /@storybook/theming@7.6.17(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-ZbaBt3KAbmBtfjNqgMY7wPMBshhSJlhodyMNQypv+95xLD/R+Az6aBYbpVAOygLaUQaQk4ar7H/Ww6lFIoiFbA==, tarball: https://registry.npmjs.org/@storybook/theming/-/theming-7.6.17.tgz}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@emotion/use-insertion-effect-with-fallbacks': 1.0.1(react@18.3.1)
+      '@storybook/client-logger': 7.6.17
+      '@storybook/global': 5.0.0
+      memoizerific: 1.11.3
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+    dev: false
+
   /@storybook/theming@7.6.19(react-dom@18.3.1)(react@18.3.1):
     resolution: {integrity: sha512-sAho13MmtA80ctOaLn8lpkQBsPyiqSdLcOPH5BWFhatQzzBQCpTAKQk+q/xGju8bNiPZ+yQBaBzbN8SfX8ceCg==, tarball: https://registry.npmjs.org/@storybook/theming/-/theming-7.6.19.tgz}
     peerDependencies:
@@ -6993,6 +7032,15 @@ packages:
       memoizerific: 1.11.3
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
+    dev: false
+
+  /@storybook/types@7.6.17:
+    resolution: {integrity: sha512-GRY0xEJQ0PrL7DY2qCNUdIfUOE0Gsue6N+GBJw9ku1IUDFLJRDOF+4Dx2BvYcVCPI5XPqdWKlEyZdMdKjiQN7Q==, tarball: https://registry.npmjs.org/@storybook/types/-/types-7.6.17.tgz}
+    dependencies:
+      '@storybook/channels': 7.6.17
+      '@types/babel__core': 7.20.5
+      '@types/express': 4.17.21
+      file-system-cache: 2.3.0
     dev: false
 
   /@storybook/types@7.6.19:
@@ -17089,6 +17137,32 @@ packages:
 
   /store2@2.14.3:
     resolution: {integrity: sha512-4QcZ+yx7nzEFiV4BMLnr/pRa5HYzNITX2ri0Zh6sT9EyQHbBHacC6YigllUPU9X3D0f/22QCgfokpKs52YRrUg==, tarball: https://registry.npmjs.org/store2/-/store2-2.14.3.tgz}
+    dev: false
+
+  /storybook-dark-mode@3.0.3(@types/react-dom@18.3.0)(@types/react@18.3.2)(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-ZLBLVpkuKTdtUv3DTuOjeP/bE7DHhOxVpDROKc0NtEYq9JHLUu6z05LLZinE3v6QPXQZ9TMQPm3Xe/0BcLEZlw==, tarball: https://registry.npmjs.org/storybook-dark-mode/-/storybook-dark-mode-3.0.3.tgz}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+    peerDependenciesMeta:
+      react:
+        optional: true
+      react-dom:
+        optional: true
+    dependencies:
+      '@storybook/addons': 7.6.17(react-dom@18.3.1)(react@18.3.1)
+      '@storybook/components': 7.6.19(@types/react-dom@18.3.0)(@types/react@18.3.2)(react-dom@18.3.1)(react@18.3.1)
+      '@storybook/core-events': 7.6.19
+      '@storybook/global': 5.0.0
+      '@storybook/manager-api': 7.6.19(react-dom@18.3.1)(react@18.3.1)
+      '@storybook/theming': 7.6.19(react-dom@18.3.1)(react@18.3.1)
+      fast-deep-equal: 3.1.3
+      memoizerific: 1.11.3
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+    transitivePeerDependencies:
+      - '@types/react'
+      - '@types/react-dom'
     dev: false
 
   /storybook@7.6.19:

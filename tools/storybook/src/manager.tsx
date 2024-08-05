@@ -1,28 +1,42 @@
 import React from "react";
+import {} from "@storybook/preview-api";
 import { addons } from "@storybook/manager-api";
 import { Addon_TypesEnum } from "@storybook/types";
 import {
   ADDON_ID,
   EVENT_PANEL_ID,
   FLOW_PANEL_ID,
+  DOCS_PANEL_ID,
   FLOW_REFRESH_TOOL_ID,
   RENDER_SELECT_TOOL_ID,
 } from "./addons/constants";
 import { EditorPanel } from "./addons/editor";
 import { EventsPanel } from "./addons/events";
+import { DocsPanel } from "./addons/docs";
 import { FlowRefresh } from "./addons/refresh";
 import { RenderSelection } from "./addons/appetize";
 import { StateProvider } from "./redux";
 
 export const register = () => {
-  addons.register(ADDON_ID, () => {
+  addons.register(ADDON_ID, (api) => {
+    addons.add(DOCS_PANEL_ID, {
+      type: Addon_TypesEnum.PANEL,
+      title: "Asset Docs",
+      match: ({ viewMode }) => viewMode === "story",
+      render: ({ active }) => (
+        <StateProvider>
+          <DocsPanel api={api} active={active} />
+        </StateProvider>
+      ),
+    });
+
     addons.add(EVENT_PANEL_ID, {
       type: Addon_TypesEnum.PANEL,
       title: "Events",
       match: ({ viewMode }) => viewMode === "story",
       render: ({ active }) => (
         <StateProvider>
-          <EventsPanel active={Boolean(active)} />
+          <EventsPanel api={api} active={Boolean(active)} />
         </StateProvider>
       ),
     });
@@ -33,7 +47,18 @@ export const register = () => {
       match: ({ viewMode }) => viewMode === "story",
       render: ({ active }) => (
         <StateProvider>
-          <EditorPanel active={Boolean(active)} />
+          <EditorPanel api={api} active={Boolean(active)} />
+        </StateProvider>
+      ),
+    });
+
+    addons.add(FLOW_REFRESH_TOOL_ID, {
+      title: "Refresh Flow",
+      type: Addon_TypesEnum.TOOL,
+      match: ({ viewMode }) => viewMode === "story",
+      render: () => (
+        <StateProvider>
+          <FlowRefresh />
         </StateProvider>
       ),
     });
@@ -45,16 +70,6 @@ export const register = () => {
 //   addons.register(ADDON_ID, (api) => {
 
 //     // Tools show up in the top panel
-
-//     addons.add(FLOW_REFRESH_TOOL_ID, {
-//       title: "Refresh Flow",
-//       type: types.TOOL,
-//       render: () => (
-//         <StateProvider>
-//           <FlowRefresh />
-//         </StateProvider>
-//       ),
-//     });
 
 //     addons.add(RENDER_SELECT_TOOL_ID, {
 //       title: "Render Selection",
