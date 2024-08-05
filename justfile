@@ -1,7 +1,3 @@
-[doc('Build all targets in the project')]
-build-all:
-  bazel build //...
-
 [doc('Build all JS/TS files')]
 build-js:
     bazel build -- $(bazel query "kind(npm_package, //...)" --output label 2>/dev/null | tr '\n' ' ')
