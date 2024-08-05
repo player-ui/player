@@ -8,7 +8,7 @@ import com.intuit.playerui.core.player.state.PlayerFlowState
 import com.intuit.playerui.utils.normalizeStackTraceElements
 import com.intuit.playerui.utils.test.PromiseUtils
 import com.intuit.playerui.utils.test.RuntimeTest
-import com.intuit.player.jvm.utils.test.runBlockingTest
+import com.intuit.playerui.utils.test.runBlockingTest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.builtins.serializer
