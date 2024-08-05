@@ -138,7 +138,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
             player.start(asyncNodeFlowSimple)
         }
         Assertions.assertTrue(count == 2)
-        Assertions.assertTrue((update?.get("actions") as List<*>).size == 3)
+        Assertions.assertEquals(3, update?.getList("actions")?.size)
     }
 
     @TestTemplate
@@ -153,9 +153,11 @@ internal class AsyncNodePluginTest : PlayerTest() {
                     2 -> {
                         Assertions.assertEquals(1, (asset?.get("actions") as List<*>).size)
                     }
+
                     3 -> {
                         Assertions.assertEquals(2, (asset?.get("actions") as List<*>).size)
                     }
+
                     4 -> {
                         Assertions.assertEquals(4, (asset?.get("actions") as List<*>).size)
                     }
@@ -180,6 +182,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
                         ),
                     ),
                 )
+
                 2 -> BailResult.Bail(
                     listOf(
                         mapOf(
@@ -195,6 +198,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
                         ),
                     ),
                 )
+
                 else -> BailResult.Bail(
                     listOf(
                         mapOf(

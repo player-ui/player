@@ -4,19 +4,18 @@ import com.intuit.hooks.HookContext
 import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
+import com.intuit.playerui.core.bridge.Promise
 import com.intuit.playerui.core.bridge.getInvokable
 import com.intuit.playerui.core.utils.InternalPlayerApi
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.capturedKClass
-import com.intuit.playerui.core.bridge.Promise
 
 /** Contains common logic for configuring a [NodeHook] to tap any JS hook */
 internal interface NodeHook<R> : NodeWrapper {
 
     @OptIn(ExperimentalSerializationApi::class)
     fun init(vararg serializers: KSerializer<*>) {
-        println("NodeHook initialized with node: $node")
         node.getInvokable<Any?>("tap")?.invoke(
             mapOf("name" to "name", "context" to true),
             Invokable { args ->
