@@ -4,12 +4,14 @@ module(
 )
 
 bazel_dep(name = "rules_player")
+
 archive_override(
     module_name = "rules_player",
-    strip_prefix = "rules_player-1.1.3",
-    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v1.1.3.tar.gz"],
-    integrity = "sha256-Fqe4Y9aY5R0Y2yL9k+fsNKDrNPFP5/utyS5DQaoeYBA=",
+    strip_prefix = "rules_player-1.1.4",
+    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v1.1.4.tar.gz"],
+    integrity = "sha256-5YsvzRBeBV2dVgRorGouQfdkb/lu1W8k24QAIModpLw=",
 )
+
 # local_path_override(module_name = "rules_player", path = "../rules_player")
 
 bazel_dep(name = "aspect_bazel_lib", version = "2.7.8")

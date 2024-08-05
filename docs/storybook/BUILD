@@ -16,6 +16,7 @@ deps = [
     ":node_modules/@player-ui/computed-properties-plugin",
     ":node_modules/@player-ui/react",
     ":node_modules/@player-ui/storybook",
+    "//:node_modules/typescript",
     "//:node_modules/@babel/preset-typescript",
     "//:node_modules/@babel/preset-env",
     "//:node_modules/@storybook/react-webpack5",
