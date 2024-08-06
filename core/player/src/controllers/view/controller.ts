@@ -46,6 +46,7 @@ export class ViewController {
   };
 
   public currentView?: ViewInstance;
+  private previousView?: ViewInstance;
   public transformRegistry: TransformRegistry = new Registry();
   public optimizeUpdates = true;
 
@@ -70,10 +71,14 @@ export class ViewController {
       (flow: FlowInstance) => {
         flow.hooks.transition.tap("viewController", (_oldState, newState) => {
           if (newState.value.state_type === "VIEW") {
+            this.setViewsTransition(true);
             this.onView(newState.value);
           } else {
             this.currentView = undefined;
           }
+        });
+        flow.hooks.afterTransition.tap("view", (flowInstance) => {
+          this.setViewsTransition(false);
         });
       },
     );
@@ -81,6 +86,7 @@ export class ViewController {
     /** Trigger a view update */
     const update = (updates: Set<BindingInstance>, silent = false) => {
       if (this.currentView) {
+        this.setViewsTransition(true);
         if (this.optimizeUpdates) {
           this.queueUpdate(updates, silent);
         } else {
@@ -110,6 +116,11 @@ export class ViewController {
         update(new Set([binding]));
       }
     });
+  }
+
+  private setViewsTransition(transition: boolean) {
+    this.previousView?.setTransition(transition);
+    this.currentView?.setTransition(transition);
   }
 
   private queueUpdate(bindings: Set<BindingInstance>, silent = false) {
@@ -169,6 +180,7 @@ export class ViewController {
       throw new Error(`No view with id ${viewId}`);
     }
 
+    this.previousView = this.currentView;
     const view = new ViewInstance(source, this.viewOptions);
     this.currentView = view;
 
