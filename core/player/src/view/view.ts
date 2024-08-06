@@ -85,8 +85,7 @@ export class ViewInstance implements ValidationProvider {
 
   private resolver?: Resolver;
   public readonly initialView: ViewType;
-  public readonly resolverOptions: Resolve.ResolverOptions &
-    ViewControllerOptions;
+  public readonly resolverOptions: Resolve.ResolverOptions;
   private rootNode?: Node.Node;
   private transitioning = true;
 
@@ -97,10 +96,7 @@ export class ViewInstance implements ValidationProvider {
   // TODO might want to add a version/timestamp to this to compare updates
   public lastUpdate: Record<string, any> | undefined;
 
-  constructor(
-    initialView: ViewType,
-    resolverOptions: Resolve.ResolverOptions & ViewControllerOptions,
-  ) {
+  constructor(initialView: ViewType, resolverOptions: Resolve.ResolverOptions) {
     this.initialView = initialView;
     this.resolverOptions = resolverOptions;
     this.hooks.onTemplatePluginCreated.tap("view", (templatePlugin) => {
