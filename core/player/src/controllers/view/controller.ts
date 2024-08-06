@@ -86,7 +86,6 @@ export class ViewController {
     /** Trigger a view update */
     const update = (updates: Set<BindingInstance>, silent = false) => {
       if (this.currentView) {
-        this.setViewsTransition(true);
         if (this.optimizeUpdates) {
           this.queueUpdate(updates, silent);
         } else {
