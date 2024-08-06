@@ -24,4 +24,5 @@ test_deps = [
     "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_test",
     "//jvm/testutils",
     # We don't publish this, so we need to specify it manually as a common test dep (can remove once we publish host and include in testutils)
+    "//jvm/hermes:hermes-host",
 ]
