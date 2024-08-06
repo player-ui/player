@@ -8,7 +8,6 @@ import { Resolver } from "./resolver";
 import type { Node } from "./parser";
 import { Parser } from "./parser";
 import { TemplatePlugin } from "./plugins";
-import { FlowInstance, ViewControllerOptions } from "../controllers";
 
 /**
  * Manages the view level validations

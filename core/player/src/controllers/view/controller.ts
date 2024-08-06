@@ -77,9 +77,6 @@ export class ViewController {
             this.currentView = undefined;
           }
         });
-        flow.hooks.afterTransition.tap("view", (flowInstance) => {
-          this.setViewsTransition(false);
-        });
       },
     );
 
