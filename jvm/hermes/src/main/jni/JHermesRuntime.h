@@ -17,6 +17,7 @@ public:
     static local_ref<jhybridobject> create(alias_ref<jclass>, bool intl = true, bool microtaskQueue = false) {
         auto config = hermes::vm::RuntimeConfig::Builder()
             .withIntl(intl)
+            .withES6Class(true)
             .withMicrotaskQueue(microtaskQueue)
             .build();
 
