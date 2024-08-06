@@ -1,5 +1,6 @@
 package com.intuit.playerui.core.bridge
 
+import com.intuit.playerui.core.bridge.runtime.add
 import com.intuit.playerui.core.bridge.runtime.serialize
 import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.player.PlayerFlowStatus
@@ -226,18 +227,17 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
     fun testPromiseConstructor() = runBlockingTest {
         runtime.execute(
             """
-            class TestClass {
-                name = 'foo';
-                constructor(promise) {
-                    promise.then((value) => {
-                        this.name = value;
-                    });
-                };
-            }""",
+        class TestClass {
+            name = 'foo';
+            constructor(promise) {
+                promise.then((value) => {
+                    this.name = value;
+                });
+            };
+        }""",
         )
         val promise = runtime.Promise<String> { jsRes, _ ->
-            val result = "bar"
-            jsRes(result)
+            jsRes("bar")
         }
         runtime.add("myPromise", promise)
         val value = runtime.execute("new TestClass(myPromise)") as Node
