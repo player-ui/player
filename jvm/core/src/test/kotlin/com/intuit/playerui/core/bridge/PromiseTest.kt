@@ -227,17 +227,18 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
     fun testPromiseConstructor() = runBlockingTest {
         runtime.execute(
             """
-        class TestClass {
-            name = 'foo';
-            constructor(promise) {
-                promise.then((value) => {
-                    this.name = value;
-                });
-            };
-        }""",
+            class TestClass {
+                name = 'foo';
+                constructor(promise) {
+                    promise.then((value) => {
+                        this.name = value;
+                    });
+                };
+            }""",
         )
         val promise = runtime.Promise<String> { jsRes, _ ->
-            jsRes("bar")
+            val result = "bar"
+            jsRes(result)
         }
         runtime.add("myPromise", promise)
         val value = runtime.execute("new TestClass(myPromise)") as Node
