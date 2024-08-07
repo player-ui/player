@@ -114,12 +114,12 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
     }
 
     public func apply<P>(player: P) where P: HeadlessPlayer {
-        player.hooks?.state.tap({ (state) in
+        player.hooks?.state.tap({ [weak self] (state) in
             guard let inProgress = state as? InProgressState else {
-                self.currentState = nil
+                self?.currentState = nil
                 return
             }
-            self.currentState = inProgress
+            self?.currentState = inProgress
         })
     }
 
