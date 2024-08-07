@@ -1,6 +1,7 @@
 package com.intuit.playerui.android
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import com.intuit.hooks.BailResult
 import com.intuit.hooks.HookContext
@@ -175,12 +176,15 @@ public class AndroidPlayer private constructor(
         player.hooks.viewController.tap { viewController ->
             viewController?.hooks?.view?.tap { view ->
                 transition.value = true
+                val initialViewId = view?.initialView?.id
                 clearCaches()
                 view?.hooks?.onUpdate?.tap { asset ->
                     try {
-                        expandAsset(asset).let { expandedAsset ->
-                            hooks.update.call(expandedAsset) {
-                                assetHandler(expandedAsset, transition.value)
+                        if (asset?.id == initialViewId) {
+                            expandAsset(asset).let { expandedAsset ->
+                                hooks.update.call(expandedAsset) {
+                                    assetHandler(expandedAsset, transition.value)
+                                }
                             }
                         }
                     } catch (exception: Exception) {

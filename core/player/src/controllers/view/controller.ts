@@ -71,7 +71,6 @@ export class ViewController {
       (flow: FlowInstance) => {
         flow.hooks.transition.tap("viewController", (_oldState, newState) => {
           if (newState.value.state_type === "VIEW") {
-            this.setViewsTransition(true);
             this.onView(newState.value);
           } else {
             this.currentView = undefined;
@@ -179,6 +178,7 @@ export class ViewController {
     this.previousView = this.currentView;
     const view = new ViewInstance(source, this.viewOptions);
     this.currentView = view;
+    this.setViewsTransition(true);
 
     // Give people a chance to attach their
     // own listeners to the view before we resolve it
