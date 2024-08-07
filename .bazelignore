@@ -37,7 +37,6 @@ plugins/asset-provider/react/node_modules
 plugins/asset-transform/core/node_modules
 plugins/async-node/core/node_modules
 plugins/common-types/core/node_modules
-plugins/async-node/components/node_modules
 plugins/types-provider/core/node_modules
 plugins/auto-scroll/react/node_modules
 plugins/beacon/react/node_modules
