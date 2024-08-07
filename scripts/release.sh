@@ -23,12 +23,12 @@ echo "Publishing NPM Packages using tag: ${NPM_TAG} from release type: ${RELEASE
 readonly PKG_NPM_LABELS=`bazel query --output=label 'kind("npm_package rule", //...) - attr("tags", "\[.*do-not-publish.*\]", //...)'`
 
 for pkg in $PKG_NPM_LABELS ; do
-  bazel run --config=release -- ${pkg}.publish --access public --tag ${NPM_TAG}
+  bazel run --config=ci -- ${pkg}.publish --access public --tag ${NPM_TAG}
 done
 
 # Rebuild to stamp the release podspec
-bazel build --config=release //:PlayerUI_Podspec //:PlayerUI_Pod
-bazel run --config=release //:ios_publish
+bazel build --config=ci //:PlayerUI_Podspec //:PlayerUI_Pod
+bazel run --config=ci //:ios_publish
 
 # Maven Central publishing
 MVN_RELEASE_TYPE=snapshot
@@ -47,13 +47,13 @@ bazel run @rules_player//distribution:staged-maven-deploy -- "$MVN_RELEASE_TYPE"
 # Docs publishing
 echo "Publishing Docs with release type: ${RELEASE_TYPE} on branch: ${CURRENT_BRANCH}"
 if [ "$RELEASE_TYPE" == "next" ] && [ "$CURRENT_BRANCH" == "main" ]; then
- STABLE_DOCS_BASE_PATH=next bazel run --verbose_failures --config=release //docs:gh_deploy -- --dest_dir next
+ STABLE_DOCS_BASE_PATH=next bazel run --verbose_failures --config=ci //docs:gh_deploy -- --dest_dir next
 elif [ "$RELEASE_TYPE" == "release" ] && [ "$CURRENT_BRANCH" == "main" ]; then
- STABLE_DOCS_BASE_PATH=latest bazel run --verbose_failures --config=release //docs:gh_deploy -- --dest_dir latest
+ STABLE_DOCS_BASE_PATH=latest bazel run --verbose_failures --config=ci //docs:gh_deploy -- --dest_dir latest
 fi
 
 # Also deploy to the versioned folder for main releases
 if [ "$RELEASE_TYPE" == "release" ]; then
   SEMVER_MAJOR=$(cat VERSION | cut -d. -f1)
-  STABLE_DOCS_BASE_PATH=$SEMVER_MAJOR bazel run --verbose_failures --config=release //docs:gh_deploy -- --dest_dir "$SEMVER_MAJOR"
+  STABLE_DOCS_BASE_PATH=$SEMVER_MAJOR bazel run --verbose_failures --config=ci //docs:gh_deploy -- --dest_dir "$SEMVER_MAJOR"
 fi
