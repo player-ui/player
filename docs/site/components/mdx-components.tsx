@@ -59,11 +59,11 @@ const CodeTabsNameMap = new Map([
 ]);
 
 const ContentTabsNameMap = new Map([
-  ['json', 'JSON'],
-  ['tsx', 'TSX'],
+  ["json", "JSON"],
+  ["tsx", "TSX"],
 ]);
 
-const CodeTabsMap = new Map([['gradle', GradleTab]]);
+const CodeTabsMap = new Map([["gradle", GradleTab]]);
 
 /**
  * Generic wrapper around Chakra's tab to make use in mdx easier.
@@ -204,21 +204,17 @@ export const Img = (props: JSX.IntrinsicElements["img"]) => {
  * Normalize URL to conform to local path rules
  */
 export const useNormalizedUrl = (url: string) => {
-  return url;
+  // Ignore any external urls
+  if (!url.startsWith(".") && !url.startsWith("/")) {
+    return url;
+  }
 
-  // const router = useRouter();
+  if (url.startsWith(".")) {
+    return url;
+  }
 
-  // if (!url.startsWith(".")) {
-  //   return url;
-  // }
-
-  // const ext = path.extname(url);
-  // let withoutExt = url;
-  // if (ext) {
-  //   withoutExt = path.join(path.dirname(url), path.basename(url, ext));
-  // }
-
-  // return path.join(path.dirname(router.pathname), withoutExt);
+  const prefixed = withBasePrefix(url) ?? url;
+  return prefixed;
 };
 
 export const InlineCode = (props: JSX.IntrinsicElements["code"]) => {
@@ -235,31 +231,43 @@ type ChakraAlertProps = React.PropsWithChildren<{
   status?: AlertStatus;
   title?: string;
   description?: string;
-}>
+}>;
 
 export const Alert = (props: ChakraAlertProps) => {
   return (
-      <ChakraAlert status={props.status} variant='left-accent'>
-        <AlertIcon />
-        <Box flex={1}>
-          {props.title && <AlertTitle>{props.title}</AlertTitle>}
-          {props.description && <AlertDescription>{props.description}</AlertDescription>}
-          {props.children}
-        </Box>
-      </ChakraAlert>
+    <ChakraAlert status={props.status} variant="left-accent">
+      <AlertIcon />
+      <Box flex={1}>
+        {props.title && <AlertTitle>{props.title}</AlertTitle>}
+        {props.description && (
+          <AlertDescription>{props.description}</AlertDescription>
+        )}
+        {props.children}
+      </Box>
+    </ChakraAlert>
   );
 };
-
 
 /**
  * Anchor tab component wrapping Chakra's
  */
 const A = (props: JSX.IntrinsicElements["a"]) => {
   const { href, ...other } = props;
+
+  if (href?.startsWith(".")) {
+    return (
+      <CLink
+        as={Link}
+        to={useNormalizedUrl(href || "")}
+        color={useColorModeValue("blue.800", "blue.600")}
+        {...other}
+      />
+    );
+  }
+
   return (
     <CLink
-      as={Link}
-      to={useNormalizedUrl(href || "")}
+      href={useNormalizedUrl(href || "")}
       color={useColorModeValue("blue.800", "blue.600")}
       {...other}
     />
