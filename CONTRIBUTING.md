@@ -23,6 +23,9 @@ If the changes are larger (API design, architecture, etc), [opening an issue](ht
 * [Signed Commits](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification). For convenience it is recommended to set git to sign all commits by default as mentioned [here](https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key)
 
 ## Building and Testing Locally (All platforms)
+
+> This project also contains [just](https://github.com/casey/just) recipes for many common commands. They can be listed using `just -l`
+
 ### Player
 For speed and consistency, this repo leverages `bazel` as it's main build tool. Check out the [bazel](https://bazel.build/) docs for more info.
 
