@@ -268,7 +268,7 @@ test("should only update if data is used in view", () => {
   view.hooks.onUpdate.tap("update", hook);
 
   model.set([["foo.bar.baz", 20]]);
-  view.update(new Set([parseBinding("foo.bar.baz")]), true);
+  view.update(new Set([parseBinding("foo.bar.baz")]));
   model.set([["foo.bar.baz", 30]]);
   view.update(new Set([parseBinding("foo.bar.baz")]));
 

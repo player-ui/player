@@ -86,7 +86,6 @@ export class ViewInstance implements ValidationProvider {
   public readonly initialView: ViewType;
   public readonly resolverOptions: Resolve.ResolverOptions;
   private rootNode?: Node.Node;
-  private transitioning = true;
 
   private validationProvider?: CrossfieldProvider;
 
@@ -103,19 +102,13 @@ export class ViewInstance implements ValidationProvider {
     });
   }
 
-  public setTransition(isTransitioning: boolean) {
-    this.transitioning = isTransitioning;
-  }
-
-  public updateAsync(fromTransitioning = false) {
+  public updateAsync() {
     const update = this.resolver?.update();
     this.lastUpdate = update;
-    if (!this.transitioning || (this.transitioning && fromTransitioning)) {
-      this.hooks.onUpdate.call(update);
-    }
+    this.hooks.onUpdate.call(update);
   }
 
-  public update(changes?: Set<BindingInstance>, fromTransitioning = false) {
+  public update(changes?: Set<BindingInstance>) {
     if (this.rootNode === undefined) {
       /** On initialization of the view, also create a validation parser */
       this.validationProvider = new CrossfieldProvider(
@@ -150,11 +143,8 @@ export class ViewInstance implements ValidationProvider {
     }
 
     this.lastUpdate = update;
-    if (!this.transitioning || (this.transitioning && fromTransitioning)) {
-      this.hooks.onUpdate.call(update);
-    }
+    this.hooks.onUpdate.call(update);
 
-    this.transitioning = false;
     return update;
   }
 

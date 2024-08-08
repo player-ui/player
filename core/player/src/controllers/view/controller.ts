@@ -46,7 +46,6 @@ export class ViewController {
   };
 
   public currentView?: ViewInstance;
-  private previousView?: ViewInstance;
   public transformRegistry: TransformRegistry = new Registry();
   public optimizeUpdates = true;
 
@@ -113,11 +112,6 @@ export class ViewController {
     });
   }
 
-  private setViewsTransition(transition: boolean) {
-    this.previousView?.setTransition(transition);
-    this.currentView?.setTransition(transition);
-  }
-
   private queueUpdate(bindings: Set<BindingInstance>, silent = false) {
     if (this.pendingUpdate?.changedBindings) {
       // If there's already a pending update, just add to it don't worry about silent updates here yet
@@ -175,14 +169,12 @@ export class ViewController {
       throw new Error(`No view with id ${viewId}`);
     }
 
-    this.previousView = this.currentView;
     const view = new ViewInstance(source, this.viewOptions);
     this.currentView = view;
-    this.setViewsTransition(true);
 
     // Give people a chance to attach their
     // own listeners to the view before we resolve it
     this.hooks.view.call(view);
-    view.update(undefined, true);
+    view.update();
   }
 }
