@@ -186,11 +186,10 @@ internal class PlayerViewModelTest {
         viewModel.apply(runtime)
         viewModel.onCleared()
         assertPlayerState<ReleasedState>()
-        assertEquals(
-            "[J2V8] Runtime object has been released!",
+        assertTrue(
             assertThrows<PlayerRuntimeException> {
                 viewModel.player.start(SimpleAsset.sampleFlow.toString())
-            }.message,
+            }.message!!.endsWith("Runtime object has been released!"),
         )
     }
 

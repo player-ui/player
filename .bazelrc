@@ -4,16 +4,14 @@ coverage --combined_report=lcov
 
 # TODO: Custom compiler version breaks embedded jdeps generator plugin - enable when removing custom kotlinc
 build --@rules_kotlin//kotlin/settings:jvm_emit_jdeps=False
+build --cxxopt=-std=c++17
 
 # Android databinding flags
-# TODO: Verify the follow doesn't break host compil
-build --android_crosstool_top=@androidndk//:toolchain
-build --experimental_android_databinding_v2
-build --android_databinding_use_v3_4_args
-build --android_databinding_use_androidx
-build --experimental_google_legacy_api
-query --experimental_google_legacy_api
-sync --experimental_google_legacy_api
+common --android_crosstool_top=@androidndk//:toolchain
+common --experimental_android_databinding_v2
+common --android_databinding_use_v3_4_args
+common --android_databinding_use_androidx
+common --experimental_google_legacy_api
 
 # Android demo app flags
 build --noincremental_dexing --fat_apk_cpu=armeabi-v7a,arm64-v8a,x86,x86_64
@@ -46,16 +44,17 @@ coverage --remote_download_toplevel
 coverage --remote_timeout=3600
 coverage --build_metadata=REPO_URL=https://github.com/player-ui/player.git
 
-build:ci --build_metadata=ROLE=CI --workspace_status_command=./scripts/workspace-status.sh
+common:ci --build_metadata=ROLE=CI --workspace_status_command=./scripts/workspace-status.sh
 
 # Circle xlarge has 8 CPU cores/16GB mem
-build:ci --local_cpu_resources=8
-build:ci --local_ram_resources=15000
-build:ci --config="release"
+common:ci --local_cpu_resources=8
+common:ci --local_ram_resources=15000
+common:ci --config="release"
 # Circle macos.m1.large.gen1 8 cores 12gb ram
 common:ci-mac --config=ci --local_cpu_resources=8 --local_ram_resources=11000
 
 build:release --stamp --workspace_status_command=./scripts/workspace-status.sh
+build:release --//:cmake_build_type=MinSizeRel
 
 # Cache action outputs on disk so they persist across output_base and bazel shutdown (eg. changing branches)
 # build --disk_cache=~/.cache/bazel-disk-cache

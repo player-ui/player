@@ -7,6 +7,7 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.activityScenarioRule
+import com.facebook.soloader.SoLoader
 import com.intuit.playerui.android.reference.demo.test.base.waitForViewInRoot
 import com.intuit.playerui.android.reference.demo.ui.splash.SplashActivity
 import com.intuit.playerui.utils.makeFlow
@@ -33,6 +34,7 @@ class SplashActivityTest {
     }
 
     private val intent by lazy {
+        SoLoader.init(ApplicationProvider.getApplicationContext(), false)
         Intent(ApplicationProvider.getApplicationContext(), SplashActivity::class.java).apply {
             action = "ACTION_VIEW"
             data = Uri.parse("player://domain.com/demo?json=$json")

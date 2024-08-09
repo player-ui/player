@@ -10,4 +10,7 @@ main_deps = [
     "//plugins/common-types/jvm:common-types",
     "//plugins/pending-transaction/jvm:pending-transaction",
     "//plugins/reference-assets/android:assets",
+    # TODO: If we build a config for swapping between default android player runtimes,
+    #  we could dynamically depend on this and make sure we run all android player tests against all supported runtimes
+    "//jvm/hermes:hermes-host",
 ]

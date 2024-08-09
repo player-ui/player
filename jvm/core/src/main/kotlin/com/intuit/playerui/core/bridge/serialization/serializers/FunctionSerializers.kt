@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED_PARAMETER")
+
 package com.intuit.playerui.core.bridge.serialization.serializers
 
 import com.intuit.playerui.core.bridge.Invokable

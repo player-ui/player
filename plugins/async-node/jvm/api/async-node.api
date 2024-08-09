@@ -1,0 +1,21 @@
+public final class com/intuit/player/jvm/plugins/asyncnode/AsyncNodePlugin : com/intuit/player/jvm/core/plugins/JSScriptPluginWrapper {
+	public field hooks Lcom/intuit/player/jvm/plugins/asyncnode/AsyncNodePlugin$Hooks;
+	public fun <init> ()V
+	public fun apply (Lcom/intuit/player/jvm/core/bridge/runtime/Runtime;)V
+	public final fun getHooks ()Lcom/intuit/player/jvm/plugins/asyncnode/AsyncNodePlugin$Hooks;
+	public final fun setHooks (Lcom/intuit/player/jvm/plugins/asyncnode/AsyncNodePlugin$Hooks;)V
+}
+
+public final class com/intuit/player/jvm/plugins/asyncnode/AsyncNodePlugin$Hooks : com/intuit/player/jvm/core/bridge/NodeWrapper {
+	public static final field Companion Lcom/intuit/player/jvm/plugins/asyncnode/AsyncNodePlugin$Hooks$Companion;
+	public fun getNode ()Lcom/intuit/player/jvm/core/bridge/Node;
+	public final fun getOnAsyncNode ()Lcom/intuit/player/jvm/core/bridge/hooks/NodeAsyncParallelBailHook1;
+}
+
+public final class com/intuit/player/jvm/plugins/asyncnode/AsyncNodePlugin$Hooks$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/intuit/player/jvm/plugins/asyncnode/AsyncNodePluginKt {
+	public static final fun getAsyncNodePlugin (Lcom/intuit/player/jvm/core/player/Player;)Lcom/intuit/player/jvm/plugins/asyncnode/AsyncNodePlugin;
+}

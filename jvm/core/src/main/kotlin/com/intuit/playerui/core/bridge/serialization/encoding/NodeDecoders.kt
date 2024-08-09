@@ -40,6 +40,8 @@ public fun Encoder.requireNodeEncoder(): NodeEncoder = this as? NodeEncoder
 public interface FunctionEncoder : Encoder {
 
     // TODO: Can we encodeFunctions such that we can get the original function instance back on decode?
+    //       We actually can by checking if it's a host function (then we could probably get the actual
+    //       host function impl back, maybe even the method reference if it's enhanced
     public fun encodeFunction(any: Any?) {
         when (any) {
             is KCallable<*> -> encodeFunction(any)

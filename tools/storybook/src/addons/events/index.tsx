@@ -1,18 +1,20 @@
 import React from "react";
 import { Table, Head, HeadCell, Cell, Body, Row } from "@devtools-ds/table";
-import { clsx } from "clsx";
 import { useSelector } from "react-redux";
 import { Placeholder } from "@storybook/components";
 import type { EventType } from "../../state";
 import type { StateType } from "../../redux";
 import { useContentKind } from "../../redux";
 
-import styles from "./events.css";
 import { useDarkMode } from "../useDarkMode";
+import { API } from "@storybook/manager-api";
 
 interface EventsPanelProps {
   /** if the panel is shown */
   active: boolean;
+
+  /** Storybook manager API */
+  api: API;
 }
 
 /** Pad the cells to give room */
@@ -66,7 +68,7 @@ const ExtraCells = (event: EventType) => {
 export const EventsPanel = (props: EventsPanelProps) => {
   const events = useSelector<StateType, EventType[]>((state) => state.events);
   const contentType = useContentKind();
-  const darkMode = useDarkMode();
+  const darkMode = useDarkMode(props.api);
 
   if (!props.active) {
     return null;
@@ -81,13 +83,9 @@ export const EventsPanel = (props: EventsPanelProps) => {
   }
 
   return (
-    <div
-      className={clsx(styles.wrapper, {
-        [styles.dark]: darkMode,
-      })}
-    >
+    <div>
       <Table colorScheme={darkMode ? "dark" : "light"}>
-        <Head className={styles.header}>
+        <Head>
           <Row>
             <HeadCell>Time</HeadCell>
             <HeadCell>Type</HeadCell>
@@ -95,7 +93,7 @@ export const EventsPanel = (props: EventsPanelProps) => {
             <HeadCell />
           </Row>
         </Head>
-        <Body className={styles.body}>
+        <Body>
           {events.map((evt) => (
             <Row key={evt.id}>
               <Cell>{evt.time}</Cell>

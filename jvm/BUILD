@@ -31,6 +31,7 @@ kt_jvm_library(
 optins = [
     "kotlin.RequiresOptIn",
     "com.intuit.playerui.core.utils.InternalPlayerApi",
+    "com.intuit.playerui.core.experimental.ExperimentalPlayerApi",
     "kotlinx.serialization.ExperimentalSerializationApi",
     "kotlinx.coroutines.ExperimentalCoroutinesApi",
     "kotlin.contracts.ExperimentalContracts",
@@ -40,6 +41,7 @@ optins = [
 kt_kotlinc_options(
     name = "main_options",
     visibility = ["//visibility:public"],
+    x_context_receivers = True,
     x_explicit_api_mode = "strict",
     x_optin = optins,
 )
@@ -48,6 +50,7 @@ kt_kotlinc_options(
 kt_kotlinc_options(
     name = "test_options",
     visibility = ["//visibility:public"],
+    x_context_receivers = True,
     x_optin = optins,
 )
 

@@ -164,10 +164,7 @@ public protocol HeadlessPlayer {
 public extension HeadlessPlayer {
     /// The current state of Player
     var state: BaseFlowState? {
-        guard
-            let jsState = jsPlayerReference?.invokeMethod("getState", withArguments: [])
-        else { return nil }
-        return BaseFlowState.createInstance(value: jsState)
+        return jsPlayerReference?.getState()
     }
 
     /**
@@ -221,6 +218,10 @@ public extension HeadlessPlayer {
         - completion: A completion handler for when the flow has completed
      */
     func start(flow: String, completion: @escaping (Result<CompletedState, PlayerError>) -> Void) {
+        // declare these variables outside and reference them inside the errorHandler to prevent retain cycle
+        let playerRef = jsPlayerReference
+        let loggerRef = logger
+
         let promiseHandler: @convention(block) (JSValue?) -> Void = { completedState in
             guard
                 let result = CompletedState.createInstance(from: completedState)
@@ -231,17 +232,17 @@ public extension HeadlessPlayer {
         }
         let errorHandler: @convention(block) (JSValue?) -> Void = { _ in
             guard
-                let result = self.state as? ErrorState
-            else {
+                let result = playerRef?.getState() as? ErrorState else {
                 return completion(.failure(PlayerError.jsConversionFailure))
             }
-            logger.e(result.error)
+
+            loggerRef.e(result.error)
             completion(.failure(PlayerError.promiseRejected(error: result)))
         }
 
         // Ensure these get created because otherwise we will never know when the flow ends/errors
         guard
-            let context = jsPlayerReference?.context,
+            let context = playerRef?.context,
             let flowObject = context.evaluateScript("(\(flow))"),
             !flowObject.isUndefined,
             let callback = JSValue(object: promiseHandler, in: context),
@@ -251,7 +252,7 @@ public extension HeadlessPlayer {
         }
 
         // Should not be possible due to fatalError in constructor, but just for handling optionals safely
-        guard let player = jsPlayerReference else { return completion(.failure(PlayerError.playerNotInstantiated)) }
+        guard let player = playerRef else { return completion(.failure(PlayerError.playerNotInstantiated)) }
         player
             .invokeMethod("start", withArguments: [flowObject])
             .invokeMethod("then", withArguments: [callback])
@@ -345,5 +346,14 @@ internal extension JSContext {
             value = value?.objectForKeyedSubscript(segment)
         }
         return value
+    }
+}
+
+private extension JSValue {
+    // put getState in extension so it can be accessed by the computed property in HeadlessPlayer.state and also inside the ErrorHandler by the playerReference
+    func getState() -> BaseFlowState? {
+        guard let jsState = self.invokeMethod("getState", withArguments: [])
+        else { return nil }
+        return BaseFlowState.createInstance(value: jsState)
     }
 }
