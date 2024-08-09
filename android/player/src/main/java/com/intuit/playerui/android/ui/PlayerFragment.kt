@@ -32,6 +32,8 @@ import com.intuit.playerui.core.managed.AsyncFlowIterator
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -87,6 +89,8 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
      * with respect to a specific [FlowManager][com.intuit.playerui.core.managed.FlowManager].
      */
     public abstract val playerViewModel: PlayerViewModel
+
+    private var renderingJob: Job? = null
 
     init {
         lifecycleScope.launch {
@@ -175,7 +179,8 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
      * styles and inject that into the view tree.
      */
     protected open fun handleAssetUpdate(asset: RenderableAsset?, animateTransition: Boolean) {
-        lifecycleScope.launch(if (asset is SuspendableAsset<*>) Dispatchers.Default else Dispatchers.Main) {
+        renderingJob?.cancel("handling new update")
+        renderingJob = lifecycleScope.launch(if (asset is SuspendableAsset<*>) Dispatchers.Default else Dispatchers.Main) {
             whenStarted { // TODO: This'll go away when we can call a suspend version of this
                 try {
                     renderIntoPlayerCanvas(asset, animateTransition)

@@ -15,6 +15,8 @@ import kotlinx.serialization.builtins.nullable
 public class View internal constructor(override val node: Node) : NodeWrapper {
     public val hooks: ViewHooks by NodeSerializableField(ViewHooks.serializer())
 
+    public val initialView: Asset? by NodeSerializableField(Asset.serializer().nullable)
+
     public val lastUpdate: Asset? by NodeSerializableField(Asset.serializer().nullable)
 
     public val resolverOptions: ResolveOptions by NodeSerializableField(ResolveOptions.serializer())
