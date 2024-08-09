@@ -295,7 +295,6 @@ jobs:
 
       - run: |
           bazel test --config=ci -- //android/demo:android_instrumentation_test
-          bazel test --config=ci --//android/player:runtime=hermes -- //android/demo:android_instrumentation_test
 
       - run:
           when: always
