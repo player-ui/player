@@ -205,6 +205,7 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
     public var body: some View {
         bodyContent
             .environment(\.inProgressState, (state as? InProgressState))
+            .environment(\.constantsController, constantsController)
             // forward results from our Context along to our result binding
             .onReceive(context.$result.debounce(for: 0.1, scheduler: RunLoop.main)) {
                 self.result = $0
@@ -238,11 +239,22 @@ struct InProgressStateKey: EnvironmentKey {
     static var defaultValue: InProgressState?
 }
 
+/// EnvironmentKey for storing `constantsController`
+struct ConstantsControllerStateKey: EnvironmentKey {
+    /// The default value for `@Environment(\.constantsController)`
+    static var defaultValue: ConstantsController? = nil
+}
+
 public extension EnvironmentValues {
     /// The `InProgressState` of Player if it is in progress, and in scope
     var inProgressState: InProgressState? {
         get { self[InProgressStateKey.self] }
         set { self[InProgressStateKey.self] = newValue }
+    }
+
+    var constantsController: ConstantsController? {
+        get { self[ConstantsControllerStateKey.self] }
+        set { self[ConstantsControllerStateKey.self] = newValue }
     }
 }
 
