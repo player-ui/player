@@ -73,7 +73,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
     }
 
     @TestTemplate
-    fun `async node hook is tappable`() = runBlockingTest() {
+    fun `async node hook is tappable`() = runBlockingTest {
         var update: Asset? = null
         plugin?.hooks?.onAsyncNode?.tap("") { _, node ->
             BailResult.Bail(

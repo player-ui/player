@@ -3,12 +3,10 @@ package com.intuit.playerui.plugins.asyncnode
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.core.bridge.hooks.NodeAsyncParallelBailHook1
+import com.intuit.playerui.core.bridge.hooks.NodeAsyncParallelBailHook2
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.ScriptContext
-import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
-import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
-import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializer
-import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
+import com.intuit.playerui.core.bridge.serialization.serializers.*
 import com.intuit.playerui.core.player.Player
 import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.plugins.JSScriptPluginWrapper
@@ -31,7 +29,7 @@ public class AsyncNodePlugin : JSScriptPluginWrapper(pluginName, sourcePath = bu
     @Serializable(with = Hooks.Serializer::class)
     public class Hooks internal constructor(override val node: Node) : NodeWrapper {
         /** The hook right before the View starts resolving. Attach anything custom here */
-        public val onAsyncNode: NodeAsyncParallelBailHook1<Node, List<Map<String, Any?>>> by NodeSerializableField(NodeAsyncParallelBailHook1.serializer(NodeSerializer(), ListSerializer(MapSerializer(String.serializer(), GenericSerializer()))))
+        public val onAsyncNode: NodeAsyncParallelBailHook2<Node, (Map<String, Any?>) -> Unit, List<Map<String, Any?>>> by NodeSerializableField(NodeAsyncParallelBailHook2.serializer(NodeSerializer(), Function1Serializer(MapSerializer(String.serializer(), GenericSerializer()), GenericSerializer()), ListSerializer(MapSerializer(String.serializer(), GenericSerializer()))))
         internal object Serializer : NodeWrapperSerializer<Hooks>(AsyncNodePlugin::Hooks)
     }
 
