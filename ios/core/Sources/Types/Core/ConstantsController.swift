@@ -12,10 +12,10 @@ public class ConstantsController {
     public func getConstants<T>(key: Any, namespace: String, fallback: Any? = nil) -> T? {
         if let fallbackValue = fallback {
             let value = self.constantsController?.invokeMethod("getConstants", withArguments: [key, namespace, fallbackValue])
-            return value?.toString() as? T
+            return value?.toObject() as? T
         } else {
             let value = self.constantsController?.invokeMethod("getConstants", withArguments: [key, namespace])
-            return value?.toString() as? T
+            return value?.toObject() as? T
         }
     }
     

@@ -284,7 +284,8 @@ class HeadlessPlayerTests: XCTestCase {
             "lastname": "doe",
             "favorite": [
                 "color": "red"
-            ]
+            ],
+            "age": 1
         ]
         
         constantsController.addConstants(data: data, namespace: "constants")
@@ -293,16 +294,19 @@ class HeadlessPlayerTests: XCTestCase {
         XCTAssertEqual(firstname, "john")
 
         let middleName: String? = constantsController.getConstants(key:"middlename", namespace: "constants")
-        XCTAssertEqual(middleName, "undefined")
+        XCTAssertNil(middleName)
 
         let middleNameSafe: String? = constantsController.getConstants(key:"middlename", namespace: "constants", fallback: "A")
         XCTAssertEqual(middleNameSafe, "A")
 
         let favoriteColor: String? = constantsController.getConstants(key:"favorite.color", namespace: "constants")
         XCTAssertEqual(favoriteColor, "red")
+        
+        let age: Int? = constantsController.getConstants(key:"age", namespace: "constants")
+        XCTAssertEqual(age, 1)
 
         let nonExistantNamespace: String? = constantsController.getConstants(key:"test", namespace: "foo")
-        XCTAssertEqual(nonExistantNamespace, "undefined")
+        XCTAssertNil(nonExistantNamespace)
 
         let nonExistantNamespaceWithFallback: String? = constantsController.getConstants(key:"test", namespace: "foo", fallback: "B")
         XCTAssertEqual(nonExistantNamespaceWithFallback, "B")
