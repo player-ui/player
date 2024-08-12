@@ -611,15 +611,6 @@ importers:
         specifier: workspace:*
         version: link:../../../core/types
 
-  plugins/async-node/components:
-    dependencies:
-      '@player-ui/async-node-plugin':
-        specifier: workspace:*
-        version: link:../core
-      '@player-ui/player':
-        specifier: workspace:*
-        version: link:../../../core/player
-
   plugins/async-node/core:
     dependencies:
       '@player-ui/player':
