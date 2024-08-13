@@ -35,16 +35,16 @@ public class AsyncNodePlugin : JSScriptPluginWrapper(pluginName, sourcePath = bu
     public class Hooks internal constructor(override val node: Node) : NodeWrapper {
         /** The hook right before the View starts resolving. Attach anything custom here */
         public val onAsyncNode: NodeAsyncParallelBailHook2<Node, (Map<String, Any?>) -> Unit, List<Map<String, Any?>>> by
-        NodeSerializableField(
-            NodeAsyncParallelBailHook2.serializer(
-                NodeSerializer(),
-                Function1Serializer(
-                    MapSerializer(String.serializer(), GenericSerializer()),
-                    GenericSerializer()
-                ) as KSerializer<(Map<String, Any?>) -> Unit>,
-                ListSerializer(MapSerializer(String.serializer(), GenericSerializer())),
+            NodeSerializableField(
+                NodeAsyncParallelBailHook2.serializer(
+                    NodeSerializer(),
+                    Function1Serializer(
+                        MapSerializer(String.serializer(), GenericSerializer()),
+                        GenericSerializer(),
+                    ) as KSerializer<(Map<String, Any?>) -> Unit>,
+                    ListSerializer(MapSerializer(String.serializer(), GenericSerializer())),
+                ),
             )
-        )
 
         internal object Serializer : NodeWrapperSerializer<Hooks>(AsyncNodePlugin::Hooks)
     }
