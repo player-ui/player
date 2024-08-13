@@ -75,7 +75,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
     @TestTemplate
     fun `async node hook is tappable`() = runBlockingTest {
         var update: Asset? = null
-        plugin?.hooks?.onAsyncNode?.tap("") { _, node ->
+        plugin?.hooks?.onAsyncNode?.tap("") { _, node, callback ->
             BailResult.Bail(
                 listOf(
                     mapOf(
@@ -106,7 +106,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
     @TestTemplate
     fun `replace async node with multiNode`() = runBlockingTest {
         var update: Asset? = null
-        plugin?.hooks?.onAsyncNode?.tap("") { _, node ->
+        plugin?.hooks?.onAsyncNode?.tap("") { _, node, callback ->
             BailResult.Bail(
                 listOf(
                     mapOf(
@@ -164,7 +164,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
                 }
             }
         }
-        plugin?.hooks?.onAsyncNode?.tap("") { _, node ->
+        plugin?.hooks?.onAsyncNode?.tap("") { _, node, callback ->
             asyncTaps++
             when (asyncTaps) {
                 1 -> BailResult.Bail(
@@ -227,5 +227,65 @@ internal class AsyncNodePluginTest : PlayerTest() {
             if (updateNumber == 4) cont.resume(true) {}
         }
         Assertions.assertTrue(true)
+    }
+
+    @TestTemplate
+    fun `handle multiple updates through callback mechanism`() = runBlockingTest {
+        var update: Asset? = null
+        var updateCount = 0
+
+        plugin?.hooks?.onAsyncNode?.tap("") { _, node, callback ->
+            when (updateCount) {
+                0 -> {
+                    callback(mapOf("asset" to mapOf("id" to "asset-1", "type" to "text", "value" to "First update")))
+                }
+
+                1 -> {
+                    callback(mapOf("asset" to mapOf("id" to "asset-2", "type" to "text", "value" to "Second update")))
+                }
+
+                2 -> {
+                    callback(mapOf("asset" to mapOf("id" to "asset-3", "type" to "text", "value" to "Third update")))
+                }
+            }
+            updateCount++
+            BailResult.Bail(emptyList())
+        }
+
+        var count = 0
+        suspendCancellableCoroutine { cont ->
+            player.hooks.view.tap { v ->
+                v?.hooks?.onUpdate?.tap { asset ->
+                    count++
+                    update = asset
+                    if (count == 3) cont.resume(true) {}
+                }
+            }
+            player.start(asyncNodeFlowSimple)
+        }
+
+        Assertions.assertTrue(count == 3)
+        Assertions.assertTrue((update?.get("actions") as List<*>).isNotEmpty())
+    }
+
+    @TestTemplate
+    fun `handle undefined node`() = runBlockingTest {
+        var update: Asset? = null
+        plugin?.hooks?.onAsyncNode?.tap("") { _, node, callback ->
+            BailResult.Bail(emptyList())
+        }
+        var count = 0
+        suspendCancellableCoroutine { cont ->
+            player.hooks.view.tap { v ->
+                v?.hooks?.onUpdate?.tap { asset ->
+                    count++
+                    update = asset
+                    if (count == 2) cont.resume(true) {}
+                }
+            }
+            player.start(asyncNodeFlowSimple)
+        }
+        Assertions.assertTrue(count == 2)
+        Assertions.assertTrue((update?.get("actions") as List<*>).isNotEmpty())
     }
 }
