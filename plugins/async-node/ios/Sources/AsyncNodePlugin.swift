@@ -12,11 +12,12 @@ import JavaScriptCore
 import PlayerUI
 #endif
 
-public typealias AsyncHookHandler = (JSValue) async throws -> AsyncNodeHandlerType
+public typealias AsyncHookHandler = (JSValue?) async throws -> AsyncNodeHandlerType
 
 public enum AsyncNodeHandlerType {
     case multiNode([ReplacementNode])
     case singleNode(ReplacementNode)
+    case nullOrUndefinedNode(ReplacementNode)
 }
 
 /**
@@ -42,58 +43,74 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
         self.plugins = plugins
     }
 
-    override public func setup(context: JSContext) {
-        super.setup(context: context)
+   override public func setup(context: JSContext) {
+           super.setup(context: context)
 
-        if let pluginRef = pluginRef {
-            self.hooks = AsyncNodeHook(onAsyncNode: AsyncHook(baseValue: pluginRef, name: "onAsyncNode"))
-        }
+           if let pluginRef = pluginRef {
+               self.hooks = AsyncNodeHook(onAsyncNode: AsyncHook(baseValue: pluginRef, name: "onAsyncNode"))
+           }
 
-        hooks?.onAsyncNode.tap({ node in
-            // hook value is the original node
-            guard let asyncHookHandler = self.asyncHookHandler else {
-                return JSValue()
-            }
+           hooks?.onAsyncNode.tap({ node in
+               // hook value is the original node
+               guard let asyncHookHandler = self.asyncHookHandler else {
+                   return JSValue()
+               }
 
-            let replacementNode = try await (asyncHookHandler)(node)
+               let replacementNode = try await (asyncHookHandler)(node)
+               var result: JSValue?
 
-            switch replacementNode {
-            case .multiNode(let replacementNodes):
-                let jsValueArray = replacementNodes.compactMap({ node in
-                    switch node {
-                    case .concrete(let jsValue):
-                        return jsValue
-                    case .encodable(let encodable):
-                        let encoder = JSONEncoder()
-                        do {
-                            let res = try encoder.encode(encodable)
-                            return context.evaluateScript("(\(String(data: res, encoding: .utf8) ?? ""))") as JSValue
-                        } catch {
-                            return nil
-                        }
-                    }
-                })
+               switch replacementNode {
+               case .multiNode(let replacementNodes):
+                   let jsValueArray = replacementNodes.compactMap({ node in
+                       switch node {
+                       case .concrete(let jsValue):
+                           return jsValue
+                       case .encodable(let encodable):
+                           let encoder = JSONEncoder()
+                           do {
+                               let res = try encoder.encode(encodable)
+                               result = context.evaluateScript("(\(String(data: res, encoding: .utf8) ?? ""))") as JSValue
+                               return result
+                           } catch {
+                               return nil
+                           }
+                       }
+                   })
 
-                return context.objectForKeyedSubscript("Array").objectForKeyedSubscript("from").call(withArguments: [jsValueArray])
+                   result = context.objectForKeyedSubscript("Array").objectForKeyedSubscript("from").call(withArguments: [jsValueArray])
 
-            case .singleNode(let replacementNode):
-                switch replacementNode {
+               case .singleNode(let replacementNode):
+                   switch replacementNode {
+                   case .encodable(let encodable):
+                       let encoder = JSONEncoder()
+                       do {
+                           let res = try encoder.encode(encodable)
+                           result = context.evaluateScript("(\(String(data: res, encoding: .utf8) ?? ""))") as JSValue
+                       } catch {
+                           result = nil
+                       }
+                   case .concrete(let jsValue):
+                       return jsValue
+                   }
 
-                case .encodable(let encodable):
-                    let encoder = JSONEncoder()
-                    do {
-                        let res = try encoder.encode(encodable)
-                        return context.evaluateScript("(\(String(data: res, encoding: .utf8) ?? ""))") as JSValue
-                    } catch {
-                        break
-                    }
-                case .concrete(let jsValue):
-                    return jsValue
-                }
-            }
+              case .nullOrUndefinedNode(let replacementNode):
+                  switch replacementNode {
+                  case .encodable(let encodable):
+                      let encoder = JSONEncoder()
+                      do {
+                          let res = try encoder.encode(encodable)
+                          result = context.evaluateScript("(\(String(data: res, encoding: .utf8) ?? ""))") as JSValue
+                      } catch {
+                          result = nil
+                      }
+                  case .concrete(let jsValue):
+                      return jsValue
+                  }
 
-            return nil
-        })
+               }
+
+               return result
+           })
     }
 
     /**
