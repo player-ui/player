@@ -169,6 +169,7 @@ public extension HeadlessPlayer {
         return jsPlayerReference?.getState()
     }
     
+    /// The constants and context for player
     var constantsController: ConstantsController? {
         guard 
             let constantControllerJSValue = jsPlayerReference?.objectForKeyedSubscript("constantsController") 
