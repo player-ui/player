@@ -137,6 +137,8 @@ public protocol HeadlessPlayer {
     var hooks: HooksType? { get }
     /// A logger reference for use in plugins to log through the shared player logger
     var logger: TapableLogger { get }
+    /// A reference to the Key/Value store for constants and context for player
+    var constantsController: ConstantsController? { get }
 
     /**
      Sets up the core javascript player in the given context
@@ -165,6 +167,16 @@ public extension HeadlessPlayer {
     /// The current state of Player
     var state: BaseFlowState? {
         return jsPlayerReference?.getState()
+    }
+    
+    /// The constants and context for player
+    var constantsController: ConstantsController? {
+        guard 
+            let constantControllerJSValue = jsPlayerReference?.objectForKeyedSubscript("constantsController") 
+        else {
+            return nil
+        }
+        return ConstantsController(constantsController: constantControllerJSValue)
     }
 
     /**
