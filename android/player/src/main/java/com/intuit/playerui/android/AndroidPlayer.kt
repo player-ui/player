@@ -90,6 +90,8 @@ public class AndroidPlayer private constructor(
 
     override val logger: TapableLogger by player::logger
 
+    override val constantsController: ConstantsController by player::constantsController
+
     public class Hooks internal constructor(hooks: Player.Hooks) : Player.Hooks by hooks {
         public class ContextHook : SyncWaterfallHook<(HookContext, Context) -> Context, Context>() {
             public fun call(context: Context): Context = super.call(
