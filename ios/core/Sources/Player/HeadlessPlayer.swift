@@ -172,6 +172,7 @@ public extension HeadlessPlayer {
         return BaseFlowState.createInstance(value: jsState)
     }
     
+    /// The constants and context for player
     var constantsController: ConstantsController? {
         guard 
             let constantControllerJSValue = jsPlayerReference?.objectForKeyedSubscript("constantsController") 

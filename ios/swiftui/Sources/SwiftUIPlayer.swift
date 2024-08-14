@@ -245,7 +245,8 @@ public extension EnvironmentValues {
         get { self[InProgressStateKey.self] }
         set { self[InProgressStateKey.self] = newValue }
     }
-
+    
+    /// The ConstantsController reference of Player
     var constantsController: ConstantsController? {
         get { self[ConstantsControllerStateKey.self] }
         set { self[ConstantsControllerStateKey.self] = newValue }
