@@ -455,4 +455,94 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
 
         assertTrue(player.state is ErrorState)
     }
+
+    @TestTemplate
+    fun `test constantsController get and set`() = runBlockingTest {
+        player.start(simpleFlowString)
+        val constantsController = player.constantsController
+
+        val data = mapOf(
+            "firstname" to "john",
+            "lastname" to "doe",
+            "favorite" to mapOf("color" to "red"),
+            "age" to 1,
+        )
+
+        constantsController.addConstants(data = data, namespace = "constants")
+
+        val firstname = constantsController.getConstants(key = "firstname", namespace = "constants")
+        assertEquals("john", firstname)
+
+        val middleName = constantsController.getConstants(key = "middlename", namespace = "constants")
+        assertNull(middleName)
+
+        val middleNameSafe = constantsController.getConstants(key = "middlename", namespace = "constants", fallback = "A")
+        assertEquals("A", middleNameSafe)
+
+        val favoriteColor = constantsController.getConstants(key = "favorite.color", namespace = "constants")
+        assertEquals("red", favoriteColor)
+
+        val age = constantsController.getConstants(key = "age", namespace = "constants")
+        assertEquals(1, age)
+
+        val nonExistentNamespace = constantsController.getConstants(key = "test", namespace = "foo")
+        assertNull(nonExistentNamespace)
+
+        val nonExistentNamespaceWithFallback = constantsController.getConstants(key = "test", namespace = "foo", fallback = "B")
+        assertEquals("B", nonExistentNamespaceWithFallback)
+
+        // Test and make sure keys override properly
+        val newData = mapOf(
+            "favorite" to mapOf("color" to "blue"),
+        )
+
+        constantsController.addConstants(data = newData, namespace = "constants")
+
+        val newFavoriteColor = constantsController.getConstants(key = "favorite.color", namespace = "constants")
+        assertEquals("blue", newFavoriteColor)
+    }
+
+    @TestTemplate
+    fun `test constantsController temp override functionality`() = runBlockingTest {
+        player.start(simpleFlowString)
+        val constantsController = player.constantsController
+
+        // Add initial constants
+        val data = mapOf(
+            "firstname" to "john",
+            "lastname" to "doe",
+            "favorite" to mapOf("color" to "red"),
+        )
+        constantsController.addConstants(data = data, namespace = "constants")
+
+        // Override with temporary values
+        val tempData = mapOf(
+            "firstname" to "jane",
+            "favorite" to mapOf("color" to "blue"),
+        )
+        constantsController.setTemporaryValues(data = tempData, namespace = "constants")
+
+        // Test temporary override
+        val firstnameTemp = constantsController.getConstants(key = "firstname", namespace = "constants")
+        assertEquals("jane", firstnameTemp)
+
+        val favoriteColorTemp = constantsController.getConstants(key = "favorite.color", namespace = "constants")
+        assertEquals("blue", favoriteColorTemp)
+
+        // Test fallback to original values when temporary values are not present
+        val lastnameTemp = constantsController.getConstants(key = "lastname", namespace = "constants")
+        assertEquals("doe", lastnameTemp)
+
+        // Reset temp and values should be the same as the original data
+        constantsController.clearTemporaryValues()
+
+        val firstname = constantsController.getConstants(key = "firstname", namespace = "constants")
+        assertEquals("john", firstname)
+
+        val favoriteColor = constantsController.getConstants(key = "favorite.color", namespace = "constants")
+        assertEquals("red", favoriteColor)
+
+        val lastname = constantsController.getConstants(key = "lastname", namespace = "constants")
+        assertEquals("doe", lastname)
+    }
 }
