@@ -97,12 +97,8 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
                   switch replacementNode {
                   case .encodable(let encodable):
                       let encoder = JSONEncoder()
-                      do {
                           let res = try encoder.encode(encodable)
                           result = context.evaluateScript("(\(String(data: res, encoding: .utf8) ?? ""))") as JSValue
-                      } catch {
-                          result = nil
-                      }
                   case .concrete(let jsValue):
                       return jsValue
                   }

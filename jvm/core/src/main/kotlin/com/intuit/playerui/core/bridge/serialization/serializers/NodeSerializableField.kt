@@ -115,17 +115,6 @@ public fun <T> NodeWrapper.NodeSerializableField(
     defaultValue: (Node.(String) -> T)? = null,
 ): NodeSerializableField<T> = NodeSerializableField(::node, serializer, strategy, name, defaultValue)
 
-//@ExperimentalPlayerApi
-//public inline fun <reified T : Any> NodeWrapper.NodeSerializableField(
-//    serializer: KSerializer<T>? = null,
-//    strategy: NodeSerializableField.CacheStrategy? = null,
-//    name: String? = null,
-//    noinline defaultValue: (Node.(String) -> T)? = null,
-//): NodeSerializableField<T> {
-//    val effectiveSerializer = serializer ?: node.format.serializer<T>()
-//    return NodeSerializableField(::node, effectiveSerializer, strategy, name, defaultValue)
-//}
-
 @ExperimentalPlayerApi
 public inline fun <reified T> NodeWrapper.NodeSerializableField(
     strategy: NodeSerializableField.CacheStrategy? = null,
