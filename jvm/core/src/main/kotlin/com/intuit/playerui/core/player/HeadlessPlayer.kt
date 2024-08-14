@@ -78,7 +78,7 @@ public constructor(
 
     override val hooks: Hooks by NodeSerializableField(Hooks.serializer(), NodeSerializableField.CacheStrategy.Full)
 
-    public val constantsController: ConstantsController by NodeSerializableField(ConstantsController.serializer(), NodeSerializableField.CacheStrategy.Full)
+    override val constantsController: ConstantsController by NodeSerializableField(ConstantsController.serializer(), NodeSerializableField.CacheStrategy.Full)
 
     override val state: PlayerFlowState get() = if (player.isReleased()) {
         ReleasedState
