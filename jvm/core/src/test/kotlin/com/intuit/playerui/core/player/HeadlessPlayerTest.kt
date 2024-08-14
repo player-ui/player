@@ -458,7 +458,6 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
 
     @TestTemplate
     fun `test constantsController get and set`() = runBlockingTest {
-        player.start(simpleFlowString)
         val constantsController = player.constantsController
 
         val data = mapOf(
@@ -504,7 +503,6 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
 
     @TestTemplate
     fun `test constantsController temp override functionality`() = runBlockingTest {
-        player.start(simpleFlowString)
         val constantsController = player.constantsController
 
         // Add initial constants
