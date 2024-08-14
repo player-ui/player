@@ -22,7 +22,7 @@ public class ConstantsController(override val node: Node) : NodeWrapper {
      * @param namespace namespace values were loaded under (defined in the plugin)
      * @param fallback Optional - if key doesn't exist in namespace what to return (will return unknown if not provided)
      */
-    public fun getConstants(key: Any, namespace: String, fallback: Any? = null): Any? {
+    public fun getConstants(key: String, namespace: String, fallback: Any? = null): Any? {
         return node.getInvokable<Any?>("getConstants")?.invoke(key, namespace, fallback)
     }
 
