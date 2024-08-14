@@ -18,6 +18,7 @@ import com.intuit.playerui.core.bridge.Completable
 import com.intuit.playerui.core.bridge.format
 import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.playerui.core.bridge.serialization.format.registerContextualSerializer
+import com.intuit.playerui.core.constants.ConstantsController
 import com.intuit.playerui.core.logger.TapableLogger
 import com.intuit.playerui.core.player.HeadlessPlayer
 import com.intuit.playerui.core.player.Player
@@ -88,6 +89,8 @@ public class AndroidPlayer private constructor(
     )
 
     override val logger: TapableLogger by player::logger
+
+    override val constantsController: ConstantsController by player::constantsController
 
     public class Hooks internal constructor(hooks: Player.Hooks) : Player.Hooks by hooks {
         public class ContextHook : SyncWaterfallHook<(HookContext, Context) -> Context, Context>() {

@@ -11,6 +11,7 @@ import com.intuit.playerui.core.bridge.runtime.ScriptContext
 import com.intuit.playerui.core.bridge.runtime.add
 import com.intuit.playerui.core.bridge.runtime.runtimeFactory
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
+import com.intuit.playerui.core.constants.ConstantsController
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.logger.TapableLogger
 import com.intuit.playerui.core.player.HeadlessPlayer.Companion.bundledSource
@@ -76,6 +77,8 @@ public constructor(
     override val logger: TapableLogger by NodeSerializableField(TapableLogger.serializer(), NodeSerializableField.CacheStrategy.Full)
 
     override val hooks: Hooks by NodeSerializableField(Hooks.serializer(), NodeSerializableField.CacheStrategy.Full)
+
+    override val constantsController: ConstantsController by NodeSerializableField(ConstantsController.serializer(), NodeSerializableField.CacheStrategy.Full)
 
     override val state: PlayerFlowState get() = if (player.isReleased()) {
         ReleasedState

@@ -6,6 +6,7 @@ import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.core.bridge.hooks.NodeSyncHook1
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
+import com.intuit.playerui.core.constants.ConstantsController
 import com.intuit.playerui.core.data.DataController
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.expressions.ExpressionController
@@ -32,6 +33,8 @@ import kotlin.coroutines.EmptyCoroutineContext
 public abstract class Player : Pluggable {
 
     public abstract val logger: TapableLogger
+
+    public abstract val constantsController: ConstantsController
 
     /**
      * Expose [PlayerHooks] which allow consumers to plug
