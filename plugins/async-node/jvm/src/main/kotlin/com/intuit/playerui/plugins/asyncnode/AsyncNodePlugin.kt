@@ -18,8 +18,10 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 
+public typealias asyncNodeUpdate = List<Map<String, Any?>>?
 public class AsyncNodePlugin : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
 
     public lateinit var hooks: Hooks
@@ -34,15 +36,15 @@ public class AsyncNodePlugin : JSScriptPluginWrapper(pluginName, sourcePath = bu
     @Serializable(with = Hooks.Serializer::class)
     public class Hooks internal constructor(override val node: Node) : NodeWrapper {
         /** The hook right before the View starts resolving. Attach anything custom here */
-        public val onAsyncNode: NodeAsyncParallelBailHook2<Node, (Map<String, Any?>) -> Unit, List<Map<String, Any?>>> by
+        public val onAsyncNode: NodeAsyncParallelBailHook2<Node, (asyncNodeUpdate) -> Unit, asyncNodeUpdate> by
             NodeSerializableField(
                 NodeAsyncParallelBailHook2.serializer(
                     NodeSerializer(),
                     Function1Serializer(
-                        MapSerializer(String.serializer(), GenericSerializer()),
+                        ListSerializer(MapSerializer(String.serializer(), GenericSerializer())).nullable,
                         GenericSerializer(),
-                    ) as KSerializer<(Map<String, Any?>) -> Unit>,
-                    ListSerializer(MapSerializer(String.serializer(), GenericSerializer())),
+                    ) as KSerializer<(asyncNodeUpdate) -> Unit>,
+                    ListSerializer(MapSerializer(String.serializer(), GenericSerializer())).nullable,
                 ),
             )
 

@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Serializable(with = NodeAsyncParallelBailHook2.Serializer::class)
-public class NodeAsyncParallelBailHook2<T1, T2, R : Any>(
+public class NodeAsyncParallelBailHook2<T1, T2, R : Any?>(
     override val node: Node,
     serializer1: KSerializer<T1>,
     serializer2: KSerializer<T2>

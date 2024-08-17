@@ -47,10 +47,11 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
            super.setup(context: context)
 
            if let pluginRef = pluginRef {
-               self.hooks = AsyncNodeHook(onAsyncNode: AsyncHook(baseValue: pluginRef, name: "onAsyncNode"))
+               self.hooks = AsyncNodeHook(onAsyncNode: AsyncHook2(baseValue: pluginRef, name: "onAsyncNode"))
            }
 
-           hooks?.onAsyncNode.tap({ node in
+           hooks?.onAsyncNode.tap({ node, callback in
+               print("Value of callback \(callback)")
                // hook value is the original node
                guard let asyncHookHandler = self.asyncHookHandler else {
                    return JSValue()
@@ -93,19 +94,6 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
                        return jsValue
                    }
 
-              case .nullOrUndefinedNode(let replacementNode):
-                  switch replacementNode {
-                  case .encodable(let encodable):
-                      let encoder = JSONEncoder()
-                          let res = try encoder.encode(encodable)
-                          result = context.evaluateScript("(\(String(data: res, encoding: .utf8) ?? ""))") as JSValue
-                  case .concrete(let jsValue):
-                      return jsValue
-                  }
-
-               }
-
-               return result
            })
     }
 
@@ -137,7 +125,7 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
 }
 
 public struct AsyncNodeHook {
-    public let onAsyncNode: AsyncHook<JSValue>
+               public let onAsyncNode: AsyncHook2<JSValue, JSValue>
 }
 
 /**

@@ -15,7 +15,11 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(MockKExtension::class)
 internal class AsyncNodePluginTest : PlayerTest() {
 
-    val asyncNodeFlowSimple =
+    // TODO: This typing is not great - need to go fix hook types
+    private var deferredResolve: ((asyncNodeUpdate) -> Unit)? = null;
+    private var updateContent: ((asyncNodeUpdate) -> Unit)? = null;
+
+    private val asyncNodeFlowSimple =
         """{
           "id": "counter-flow",
           "views": [
@@ -231,61 +235,177 @@ internal class AsyncNodePluginTest : PlayerTest() {
 
     @TestTemplate
     fun `handle multiple updates through callback mechanism`() = runBlockingTest {
-        var update: Asset? = null
-        var updateCount = 0
 
-        plugin?.hooks?.onAsyncNode?.tap("") { _, node, callback ->
-            when (updateCount) {
-                0 -> {
-                    callback(mapOf("asset" to mapOf("id" to "asset-1", "type" to "text", "value" to "First update")))
-                }
-
-                1 -> {
-                    callback(mapOf("asset" to mapOf("id" to "asset-2", "type" to "text", "value" to "Second update")))
-                }
-
-                2 -> {
-                    callback(mapOf("asset" to mapOf("id" to "asset-3", "type" to "text", "value" to "Third update")))
+        plugin.hooks.onAsyncNode.tap("") { _, node, callback ->
+            updateContent = callback
+            val result = suspendCoroutine { cont ->
+                deferredResolve = { value ->
+                    cont.resume(value)
                 }
             }
-            updateCount++
-            BailResult.Bail(emptyList())
+
+            BailResult.Bail(result)
         }
 
+        var viewUpdateContinuation: Continuation<Asset?>? = null
         var count = 0
-        suspendCancellableCoroutine { cont ->
-            player.hooks.view.tap { v ->
-                v?.hooks?.onUpdate?.tap { asset ->
-                    count++
-                    update = asset
-                    if (count == 3) cont.resume(true) {}
-                }
+
+        player.hooks.view.tap { v ->
+            v?.hooks?.onUpdate?.tap { asset ->
+                count++
+                println("Update after callback undefined node $count: $asset") // Debug statement
+                viewUpdateContinuation?.resume(asset)
+                viewUpdateContinuation = null
             }
-            player.start(asyncNodeFlowSimple)
         }
 
-        Assertions.assertTrue(count == 3)
-        Assertions.assertTrue((update?.get("actions") as List<*>).isNotEmpty())
+        player.start(asyncNodeFlowSimple)
+
+        var view = player.inProgressState?.lastViewUpdate
+        Assertions.assertNotNull(view);
+        Assertions.assertEquals(
+            "action",
+            view!!.getList("actions")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("type")
+        )
+        Assertions.assertEquals(1, view.getList("actions")?.size)
+
+        while (true) {
+            if (deferredResolve != null)
+                break
+
+            yield()
+        }
+
+        suspendCancellableCoroutine { cont ->
+            viewUpdateContinuation = cont
+
+            val updates = listOf(
+                mapOf(
+                    "asset" to mapOf(
+                        "id" to "next-label-action-1",
+                        "type" to "action",
+                        "value" to "dummy value 1"
+                    )
+                ),
+                mapOf(
+                    "asset" to mapOf(
+                        "id" to "next-label-action-2",
+                        "type" to "action",
+                        "value" to "dummy value 2"
+                    )
+                ),
+                mapOf(
+                    "asset" to mapOf(
+                        "id" to "next-label-action-3",
+                        "type" to "action",
+                        "value" to "dummy value 3"
+                    )
+                )
+            )
+
+            runBlocking {
+                for (update in updates) {
+                    deferredResolve?.invoke(listOf(update))
+                    yield() // Allow coroutine to be suspended and resumed
+                }
+            }
+        }
+
+        Assertions.assertEquals(1, count)
+
+        view = player.inProgressState?.lastViewUpdate
+
+        Assertions.assertNotNull(view);
+        Assertions.assertEquals(
+            "action",
+            view!!.getList("actions")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("type")
+        )
+        Assertions.assertEquals(
+            "action",
+            view.getList("actions")?.filterIsInstance<Node>()?.get(1)?.getObject("asset")?.get("type")
+        )
+        Assertions.assertEquals(2, view.getList("actions")?.size)
+
+        updateContent!!.invoke(null)
+
+        Assertions.assertEquals(3, count)
+        view = player.inProgressState?.lastViewUpdate
+
+        Assertions.assertNotNull(view);
+        Assertions.assertEquals(
+            "action",
+            view!!.getList("actions")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("type")
+        )
+        Assertions.assertEquals(1, view.getList("actions")?.size)
     }
 
     @TestTemplate
-    fun `handle undefined node`() = runBlockingTest {
-        var update: Asset? = null
-        plugin?.hooks?.onAsyncNode?.tap("") { _, node, callback ->
-            BailResult.Bail(emptyList())
-        }
-        var count = 0
-        suspendCancellableCoroutine { cont ->
-            player.hooks.view.tap { v ->
-                v?.hooks?.onUpdate?.tap { asset ->
-                    count++
-                    update = asset
-                    if (count == 2) cont.resume(true) {}
+    fun `handle null node`() = runBlockingTest {
+
+        plugin.hooks.onAsyncNode.tap("") { _, node, callback ->
+
+            updateContent = callback
+            val result = suspendCoroutine { cont ->
+                deferredResolve = { value ->
+                    cont.resume(value)
                 }
             }
-            player.start(asyncNodeFlowSimple)
+
+            BailResult.Bail(result)
         }
-        Assertions.assertTrue(count == 2)
-        Assertions.assertTrue((update?.get("actions") as List<*>).isNotEmpty())
+        var count = 0
+        player.hooks.view.tap { v ->
+            v?.hooks?.onUpdate?.tap { asset ->
+                count++
+                println("Update after callback undefined node $count: $asset") // Debug statement
+                viewUpdateContinuation?.resume(asset)
+                viewUpdateContinuation = null
+            }
+        }
+
+        player.start(asyncNodeFlowSimple)
+
+        var view = player.inProgressState?.lastViewUpdate
+
+        Assertions.assertNotNull(view);
+        Assertions.assertEquals(
+            "action",
+            view!!.getList("actions")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("type")
+        )
+        Assertions.assertEquals(1, view.getList("actions")?.size)
+
+        while (true) {
+
+            if (deferredResolve != null)
+                break
+
+            yield()
+        }
+
+        deferredResolve!!.invoke(null)
+
+        Assertions.assertEquals(1, count)
+
+        view = player.inProgressState?.lastViewUpdate
+
+        Assertions.assertNotNull(view);
+        Assertions.assertEquals(
+            "action",
+            view!!.getList("actions")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("type")
+        )
+        Assertions.assertEquals(1, view.getList("actions")?.size)
+
+        updateContent!!.invoke(null)
+
+        Assertions.assertEquals(1, count)
+
+        view = player.inProgressState?.lastViewUpdate
+
+        Assertions.assertNotNull(view);
+        Assertions.assertEquals(
+            "action",
+            view!!.getList("actions")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("type")
+        )
+        Assertions.assertEquals(1, view.getList("actions")?.size)
     }
 }
