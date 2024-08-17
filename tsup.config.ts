@@ -13,6 +13,7 @@ export function createConfig() {
     const defaultOptions: Options = {
       entry: [pkgJson.main],
       sourcemap: true,
+      target: "es2020",
       ...options,
     };
 
