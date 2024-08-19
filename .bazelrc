@@ -48,7 +48,7 @@ common:ci --build_metadata=ROLE=CI --workspace_status_command=./scripts/workspac
 
 # Circle xlarge has 8 CPU cores/16GB mem
 common:ci --local_cpu_resources=8
-common:ci --local_ram_resources=14000
+common:ci --local_ram_resources=15000
 common:ci --config="release"
 common:ci --experimental_remote_build_event_upload=minimal 
 common:ci --nolegacy_important_outputs
