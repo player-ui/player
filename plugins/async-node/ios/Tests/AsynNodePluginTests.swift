@@ -342,18 +342,17 @@ func testHandleMultipleUpdatesThroughCallback() {
         }
         plugin.context = context
 
-        let replacementResult = handleReplacement(plugin: plugin, context: context, count: count)
+        let replacementResult = self.handleReplacement(plugin: plugin, context: context, count: count)
         args = [plugin.handleAsyncNodeReplacement(replacementResult, context: context) ?? JSValue()]
 
-        return callback.call(withArguments: args)
+        callback.call(withArguments: args)
+        return replacementResult
     }
 
     let asyncNodePluginPlugin = AsyncNodePluginPlugin()
     let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolve)
 
     plugin.context = context
-
-    var handleFunc = plugin.handleAsyncNodeReplacement(.emptyNode, context: context)
 
     XCTAssertNotNil(asyncNodePluginPlugin.context)
 
@@ -401,10 +400,12 @@ func testHandleMultipleUpdatesThroughCallback() {
 
     wait(for: [handlerExpectation, textExpectation], timeout: 5)
 
-    callbackFunction(handleFunc)
-    
     XCTAssert(count == 2)
     XCTAssertEqual(expectedMultiNode1Text, "new node from the hook 1")
+    
+    if let callbackFunction = callbackFunction {
+            callbackFunction.call(withArguments: args)
+        }
 
     wait(for: [textExpectation2], timeout: 5)
 

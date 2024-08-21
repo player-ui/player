@@ -7,10 +7,7 @@
 
 import Foundation
 import JavaScriptCore
-
-#if SWIFT_PACKAGE
 import PlayerUI
-#endif
 
 public typealias AsyncHookHandler = (JSValue) async throws -> AsyncNodeHandlerType
 
@@ -89,7 +86,6 @@ func handleAsyncNodeReplacement(_ replacementNode: AsyncNodeHandlerType, context
         }
 
         hooks?.onAsyncNode.tap({ node, callback in
-           print("Value of callback \(callback)")
             // hook value is the original node
             guard let asyncHookHandler = self.asyncHookHandler else {
                 return JSValue()
