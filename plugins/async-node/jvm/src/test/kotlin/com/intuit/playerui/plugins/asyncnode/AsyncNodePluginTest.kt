@@ -2,6 +2,9 @@ package com.intuit.playerui.plugins.asyncnode
 
 import com.intuit.hooks.BailResult
 import com.intuit.playerui.core.asset.Asset
+import com.intuit.playerui.core.bridge.Node
+import com.intuit.playerui.core.player.state.inProgressState
+import com.intuit.playerui.core.player.state.lastViewUpdate
 import com.intuit.playerui.utils.test.PlayerTest
 import com.intuit.playerui.utils.test.runBlockingTest
 import io.mockk.junit5.MockKExtension
@@ -12,7 +15,6 @@ import kotlinx.coroutines.yield
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.TestTemplate
 import org.junit.jupiter.api.extension.ExtendWith
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -251,12 +253,9 @@ internal class AsyncNodePluginTest : PlayerTest() {
             BailResult.Bail(result)
         }
 
-        var viewUpdateContinuation: Continuation<Asset?>? = null
         player.hooks.view.tap { v ->
             v?.hooks?.onUpdate?.tap { asset ->
                 count++
-                viewUpdateContinuation?.resume(asset)
-                viewUpdateContinuation = null
             }
         }
         player.start(asyncNodeFlowSimple)
@@ -334,14 +333,10 @@ internal class AsyncNodePluginTest : PlayerTest() {
             BailResult.Bail(result)
         }
 
-        var viewUpdateContinuation: Continuation<Asset?>? = null
         var count = 0
         player.hooks.view.tap { v ->
             v?.hooks?.onUpdate?.tap { asset ->
                 count++
-                println("Update after callback undefined node $count: $asset") // Debug statement
-                viewUpdateContinuation?.resume(asset)
-                viewUpdateContinuation = null
             }
         }
 

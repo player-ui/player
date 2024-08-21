@@ -12,12 +12,12 @@ import JavaScriptCore
 import PlayerUI
 #endif
 
-public typealias AsyncHookHandler = (JSValue?) async throws -> AsyncNodeHandlerType
+public typealias AsyncHookHandler = (JSValue) async throws -> AsyncNodeHandlerType
 
 public enum AsyncNodeHandlerType {
     case multiNode([ReplacementNode])
     case singleNode(ReplacementNode)
-    case nullOrUndefinedNode(ReplacementNode)
+    case emptyNode
 }
 
 /**
@@ -43,58 +43,61 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
         self.plugins = plugins
     }
 
-   override public func setup(context: JSContext) {
-           super.setup(context: context)
+func handleAsyncNodeReplacement(_ replacementNode: AsyncNodeHandlerType, context: JSContext) -> JSValue? {
+        switch replacementNode {
+        case .multiNode(let replacementNodes):
+            let jsValueArray = replacementNodes.compactMap { node in
+                switch node {
+                case .concrete(let jsValue):
+                    return jsValue
+                case .encodable(let encodable):
+                    let encoder = JSONEncoder()
+                    do {
+                        let res = try encoder.encode(encodable)
+                        return context.evaluateScript("(\(String(data: res, encoding: .utf8) ?? ""))") as JSValue
+                    } catch {
+                        return nil
+                    }
+                }
+            }
+            return context.objectForKeyedSubscript("Array").objectForKeyedSubscript("from").call(withArguments: [jsValueArray])
 
-           if let pluginRef = pluginRef {
-               self.hooks = AsyncNodeHook(onAsyncNode: AsyncHook2(baseValue: pluginRef, name: "onAsyncNode"))
-           }
+        case .singleNode(let replacementNode):
+            switch replacementNode {
+            case .encodable(let encodable):
+                let encoder = JSONEncoder()
+                do {
+                    let res = try encoder.encode(encodable)
+                    return context.evaluateScript("(\(String(data: res, encoding: .utf8) ?? ""))") as JSValue
+                } catch {
+                    return nil
+                }
+            case .concrete(let jsValue):
+                return jsValue
+            }
 
-           hooks?.onAsyncNode.tap({ node, callback in
-               print("Value of callback \(callback)")
-               // hook value is the original node
-               guard let asyncHookHandler = self.asyncHookHandler else {
-                   return JSValue()
-               }
+        case .emptyNode:
+            return nil
+        }
+        }
 
-               let replacementNode = try await (asyncHookHandler)(node)
-               var result: JSValue?
+    override public func setup(context: JSContext) {
+        super.setup(context: context)
 
-               switch replacementNode {
-               case .multiNode(let replacementNodes):
-                   let jsValueArray = replacementNodes.compactMap({ node in
-                       switch node {
-                       case .concrete(let jsValue):
-                           return jsValue
-                       case .encodable(let encodable):
-                           let encoder = JSONEncoder()
-                           do {
-                               let res = try encoder.encode(encodable)
-                               result = context.evaluateScript("(\(String(data: res, encoding: .utf8) ?? ""))") as JSValue
-                               return result
-                           } catch {
-                               return nil
-                           }
-                       }
-                   })
+        if let pluginRef = pluginRef {
+            self.hooks = AsyncNodeHook(onAsyncNode: AsyncHook2(baseValue: pluginRef, name: "onAsyncNode"))
+        }
 
-                   result = context.objectForKeyedSubscript("Array").objectForKeyedSubscript("from").call(withArguments: [jsValueArray])
+        hooks?.onAsyncNode.tap({ node, callback in
+           print("Value of callback \(callback)")
+            // hook value is the original node
+            guard let asyncHookHandler = self.asyncHookHandler else {
+                return JSValue()
+            }
 
-               case .singleNode(let replacementNode):
-                   switch replacementNode {
-                   case .encodable(let encodable):
-                       let encoder = JSONEncoder()
-                       do {
-                           let res = try encoder.encode(encodable)
-                           result = context.evaluateScript("(\(String(data: res, encoding: .utf8) ?? ""))") as JSValue
-                       } catch {
-                           result = nil
-                       }
-                   case .concrete(let jsValue):
-                       return jsValue
-                   }
-
-           })
+            let replacementNode = try await (asyncHookHandler)(node)
+            return self.handleAsyncNodeReplacement(replacementNode, context: context) ?? JSValue()
+        })
     }
 
     /**
@@ -125,7 +128,7 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
 }
 
 public struct AsyncNodeHook {
-               public let onAsyncNode: AsyncHook2<JSValue, JSValue>
+    public let onAsyncNode: AsyncHook2<JSValue, JSValue>
 }
 
 /**
