@@ -330,7 +330,7 @@ func testHandleMultipleUpdatesThroughCallback() {
     }
 
     let asyncNodePluginPlugin = AsyncNodePluginPlugin()
-    var plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolve)
+    let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolve)
 
     plugin.context = context
 
@@ -411,7 +411,7 @@ func testHandleMultipleUpdatesThroughCallback() {
 
     wait(for: [textExpectation2], timeout: 5)
     
-    replacementResult = AsyncNodeHandlerType.singleNode(.concrete( context.evaluateScript("null")))
+    replacementResult = AsyncNodeHandlerType.emptyNode
     
     args = [plugin.handleAsyncNodeReplacement(replacementResult) ?? JSValue()]
     
