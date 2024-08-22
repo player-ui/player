@@ -345,7 +345,6 @@ func testHandleMultipleUpdatesThroughCallback() {
         let replacementResult = self.handleReplacement(plugin: plugin, context: context, count: count)
         args = [plugin.handleAsyncNodeReplacement(replacementResult, context: context) ?? JSValue()]
 
-        callback.call(withArguments: args)
         return replacementResult
     }
 
@@ -402,7 +401,7 @@ func testHandleMultipleUpdatesThroughCallback() {
 
     XCTAssert(count == 2)
     XCTAssertEqual(expectedMultiNode1Text, "new node from the hook 1")
-    
+
     if let callbackFunction = callbackFunction {
             callbackFunction.call(withArguments: args)
         }
