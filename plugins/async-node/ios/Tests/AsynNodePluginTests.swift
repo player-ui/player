@@ -19,7 +19,7 @@ class AsyncNodePluginTests: XCTestCase {
 
     func testConstructionAsyncPlugin() {
         let context = JSContext()
-        let plugin = AsyncNodePlugin { _ in
+        let plugin = AsyncNodePlugin { _,_ in
             return .singleNode(.concrete(JSValue()))
         }
         plugin.context = context
@@ -44,7 +44,7 @@ class AsyncNodePluginTests: XCTestCase {
 
         var count = 0
 
-        let resolveHandler: AsyncHookHandler = { _ in
+        let resolveHandler: AsyncHookHandler = { _,_ in
             handlerExpectation.fulfill()
 
             sleep(3)
@@ -102,7 +102,7 @@ class AsyncNodePluginTests: XCTestCase {
         let context = JSContext()
         var count = 0
 
-        let resolve: AsyncHookHandler = { _ in
+        let resolve: AsyncHookHandler = { _,_ in
             handlerExpectation.fulfill()
 
             if count == 1 {
@@ -213,7 +213,7 @@ class AsyncNodePluginTests: XCTestCase {
 
         var count = 0
 
-        let resolve: AsyncHookHandler = { _ in
+        let resolve: AsyncHookHandler = { _,_ in
             handlerExpectation.fulfill()
 
             if count == 1 {
@@ -295,33 +295,18 @@ class AsyncNodePluginTests: XCTestCase {
 
     func handleEmptyNode() {
         let context = JSContext()
-        let plugin = AsyncNodePlugin { _ in
+        let plugin = AsyncNodePlugin { _,_ in
             return .emptyNode
         }
         plugin.context = context
 
-        let result = plugin.handleAsyncNodeReplacement(.emptyNode, context: context!)
+        let result = plugin.handleAsyncNodeReplacement(.emptyNode)
         XCTAssertNil(result)
     }
 
-func handleReplacement(plugin: AsyncNodePlugin, context: JSContext, count: Int) -> AsyncNodeHandlerType {
-    if count == 1 {
-        return .multiNode([
-            ReplacementNode.encodable(AssetPlaceholderNode(asset: PlaceholderNode(id: "text", type: "text", value: "new node from the hook 1"))),
-            ReplacementNode.encodable(AsyncNode(id: "id"))
-        ])
-    } else if count == 2 {
-        return .singleNode(.concrete(context.evaluateScript("""
-            (
-                {"asset": {"id": "text", "type": "text", "value":"new node from the hook 2"}}
-            )
-        """) ?? JSValue()))
-    } else {
-        return .singleNode(.concrete(context.evaluateScript("") ?? JSValue()))
-    }
-}
 
 func testHandleMultipleUpdatesThroughCallback() {
+    
     let handlerExpectation = XCTestExpectation(description: "first data did not change")
 
     guard let context = JSContext() else {
@@ -333,23 +318,19 @@ func testHandleMultipleUpdatesThroughCallback() {
     var args: [JSValue] = []
     var callbackFunction: JSValue?
 
-    let resolve: AsyncHookHandler = { callback in
+    let resolve: AsyncHookHandler = { node, callback in
         handlerExpectation.fulfill()
         callbackFunction = callback
 
-        let plugin = AsyncNodePlugin { _ in
-            return .singleNode(.concrete(JSValue()))
-        }
-        plugin.context = context
-
-        let replacementResult = self.handleReplacement(plugin: plugin, context: context, count: count)
-        args = [plugin.handleAsyncNodeReplacement(replacementResult, context: context) ?? JSValue()]
-
-        return replacementResult
+        return .singleNode(.concrete(context.evaluateScript("""
+            (
+                {"asset": {"id": "text", "type": "text", "value":"new node from the hook 1"}}
+            )
+        """) ?? JSValue()))
     }
 
     let asyncNodePluginPlugin = AsyncNodePluginPlugin()
-    let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolve)
+    var plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolve)
 
     plugin.context = context
 
@@ -362,7 +343,7 @@ func testHandleMultipleUpdatesThroughCallback() {
 
     var expectedMultiNode1Text: String = ""
     var expectedMultiNode2Text: String = ""
-
+    
     player.hooks?.viewController.tap({ (viewController) in
         viewController.hooks.view.tap { (view) in
             view.hooks.onUpdate.tap { val in
@@ -383,12 +364,24 @@ func testHandleMultipleUpdatesThroughCallback() {
                 if count == 3 {
                     let newText2 = val
                         .objectForKeyedSubscript("values")
-                        .objectAtIndexedSubscript(2)
+                        .objectAtIndexedSubscript(1)
                         .objectForKeyedSubscript("asset")
                         .objectForKeyedSubscript("value")
                     guard let textString2 = newText2?.toString() else { return XCTFail("newText was not a string") }
 
                     expectedMultiNode2Text = textString2
+                    textExpectation2.fulfill()
+                }
+                
+                if count == 4 {
+                    let newText3 = val
+                        .objectForKeyedSubscript("values")
+                        .objectAtIndexedSubscript(1)
+                        .objectForKeyedSubscript("asset")
+                        .objectForKeyedSubscript("value")
+                    guard let textString3 = newText3?.toString() else { return XCTFail("newText was not a string") }
+
+                    expectedMultiNode2Text = textString3
                     textExpectation2.fulfill()
                 }
             }
@@ -402,14 +395,30 @@ func testHandleMultipleUpdatesThroughCallback() {
     XCTAssert(count == 2)
     XCTAssertEqual(expectedMultiNode1Text, "new node from the hook 1")
 
-    if let callbackFunction = callbackFunction {
-            callbackFunction.call(withArguments: args)
-        }
-
-    wait(for: [textExpectation2], timeout: 5)
-
+     var replacementResult = AsyncNodeHandlerType.singleNode(.concrete(context.evaluateScript("""
+                (
+                    {"asset": {"id": "text", "type": "text", "value":"new node from the hook 2"}}
+                )
+            """) ?? JSValue()))
+    
+     args = [plugin.handleAsyncNodeReplacement(replacementResult) ?? JSValue()]
+    
+    let _ = callbackFunction?.call(withArguments: args)
+    
     XCTAssert(count == 3)
     XCTAssertEqual(expectedMultiNode2Text, "new node from the hook 2")
+
+
+    wait(for: [textExpectation2], timeout: 5)
+    
+    replacementResult = AsyncNodeHandlerType.singleNode(.concrete( context.evaluateScript("null")))
+    
+    args = [plugin.handleAsyncNodeReplacement(replacementResult) ?? JSValue()]
+    
+    _ = callbackFunction?.call(withArguments: args)
+
+    XCTAssert(count == 4)
+    XCTAssertEqual(expectedMultiNode2Text, "undefined")
 }
 }
 
@@ -438,6 +447,7 @@ extension String {
              },
              {
                "id": "async",
+
                "async": true
              }
            ]

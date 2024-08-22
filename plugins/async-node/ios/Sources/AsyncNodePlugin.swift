@@ -9,7 +9,7 @@ import Foundation
 import JavaScriptCore
 import PlayerUI
 
-public typealias AsyncHookHandler = (JSValue) async throws -> AsyncNodeHandlerType
+public typealias AsyncHookHandler = (JSValue, JSValue) async throws -> AsyncNodeHandlerType
 
 public enum AsyncNodeHandlerType {
     case multiNode([ReplacementNode])
@@ -40,7 +40,10 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
         self.plugins = plugins
     }
 
-func handleAsyncNodeReplacement(_ replacementNode: AsyncNodeHandlerType, context: JSContext) -> JSValue? {
+func handleAsyncNodeReplacement(_ replacementNode: AsyncNodeHandlerType) -> JSValue? {
+    guard let context = context else {
+        return JSValue()
+    }
         switch replacementNode {
         case .multiNode(let replacementNodes):
             let jsValueArray = replacementNodes.compactMap { node in
@@ -91,8 +94,8 @@ func handleAsyncNodeReplacement(_ replacementNode: AsyncNodeHandlerType, context
                 return JSValue()
             }
 
-            let replacementNode = try await (asyncHookHandler)(node)
-            return self.handleAsyncNodeReplacement(replacementNode, context: context) ?? JSValue()
+            let replacementNode = try await (asyncHookHandler)(node, callback)
+            return self.handleAsyncNodeReplacement(replacementNode) ?? JSValue()
         })
     }
 
