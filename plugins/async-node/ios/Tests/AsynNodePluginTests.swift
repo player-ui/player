@@ -343,6 +343,8 @@ func testHandleMultipleUpdatesThroughCallback() {
 
     var expectedMultiNode1Text: String = ""
     var expectedMultiNode2Text: String = ""
+    var expectedMultiNode3Text: String = ""
+    var expectedMultiNode4Text: String = ""
     
     player.hooks?.viewController.tap({ (viewController) in
         viewController.hooks.view.tap { (view) in
@@ -374,14 +376,23 @@ func testHandleMultipleUpdatesThroughCallback() {
                 }
                 
                 if count == 4 {
-                    let newText3 = val
+
+                let newText3 = val
                         .objectForKeyedSubscript("values")
-                        .objectAtIndexedSubscript(1)
+                        .objectAtIndexedSubscript(0)
                         .objectForKeyedSubscript("asset")
                         .objectForKeyedSubscript("value")
                     guard let textString3 = newText3?.toString() else { return XCTFail("newText was not a string") }
 
-                    expectedMultiNode2Text = textString3
+                    let newText4 = val
+                        .objectForKeyedSubscript("values")
+                        .objectAtIndexedSubscript(1)
+                        .objectForKeyedSubscript("asset")
+                        .objectForKeyedSubscript("value")
+                    guard let textString4 = newText4?.toString() else { return XCTFail("newText was not a string") }
+
+                    expectedMultiNode3Text = textString3
+                    expectedMultiNode4Text = textString4
                     textExpectation2.fulfill()
                 }
             }
@@ -418,7 +429,9 @@ func testHandleMultipleUpdatesThroughCallback() {
     _ = callbackFunction?.call(withArguments: args)
 
     XCTAssert(count == 4)
-    XCTAssertEqual(expectedMultiNode2Text, "undefined")
+    // asset that the value at index 0 for the object
+    XCTAssertEqual(expectedMultiNode3Text, "undefined")
+    XCTAssertEqual(expectedMultiNode4Text, "undefined")
 }
 }
 
