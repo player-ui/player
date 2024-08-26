@@ -40,6 +40,14 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
         self.plugins = plugins
     }
     
+    /**
+     Converts a given `ReplacementNode` to a `JSValue` that can be used in the JavaScript context.
+     
+     - Parameters:
+     - replacementNode: The `ReplacementNode` to be converted.
+     - context: The `JSContext` in which the `JSValue` will be used.
+     - Returns: A `JSValue` representing the given `ReplacementNode`, or `nil` if the conversion fails.
+     */
     func convertReplacementNodeToJSValue(_ replacementNode: ReplacementNode, context: JSContext) -> JSValue? {
         switch replacementNode {
         case .encodable(let encodable):
