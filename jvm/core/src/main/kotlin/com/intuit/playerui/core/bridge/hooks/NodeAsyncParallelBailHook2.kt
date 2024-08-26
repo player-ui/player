@@ -14,7 +14,7 @@ import kotlinx.serialization.Serializable
 public class NodeAsyncParallelBailHook2<T1, T2, R : Any?>(
     override val node: Node,
     serializer1: KSerializer<T1>,
-    serializer2: KSerializer<T2>
+    serializer2: KSerializer<T2>,
 ) : AsyncParallelBailHook<suspend (HookContext, T1, T2) -> BailResult<R>, R>(), AsyncNodeHook<R> {
 
     init {
@@ -33,7 +33,7 @@ public class NodeAsyncParallelBailHook2<T1, T2, R : Any?>(
     internal class Serializer<T1, T2, R : Any>(
         private val serializer1: KSerializer<T1>,
         private val serializer2: KSerializer<T2>,
-        `_`: KSerializer<R>
+        `_`: KSerializer<R>,
     ) : NodeWrapperSerializer<NodeAsyncParallelBailHook2<T1, T2, R>>({
         NodeAsyncParallelBailHook2(it, serializer1, serializer2)
     })
