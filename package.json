@@ -15,9 +15,9 @@
   },
   "engines": {
     "node": "^20.14.0",
-    "pnpm": "^8.9.2"
+    "pnpm": "^9.7.0"
   },
-  "packageManager": "pnpm@8.9.2",
+  "packageManager": "pnpm@9.7.0",
   "dependencies": {
     "@auto-it/omit-release-notes": "^11.2.0",
     "@auto-it/upload-assets": "^11.2.0",
@@ -192,7 +192,10 @@
   },
   "volta": {
     "node": "20.16.0",
-    "pnpm": "8.15.1"
+    "pnpm": "9.7.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": []
   },
   "resolutions": {
     "esbuild": "0.19.8",
