@@ -1,3 +1,106 @@
+# 0.8.0 (Sun Aug 04 2024)
+
+### Release Notes
+
+#### Docs and Release Fixes ([#474](https://github.com/player-ui/player/pull/474))
+
+- Fix next releases being tagged as latest on npm
+- Fix doc site issues with github pages
+- Fix missing dsl plugins page
+
+#### Update to use TypeScript 5.5 and enable `isolatedDeclarations` ([#431](https://github.com/player-ui/player/pull/431))
+
+Update to use TypeScript 5.5 and enable `isolatedDeclarations`
+
+#### bump js rules, use node 20 ([#430](https://github.com/player-ui/player/pull/430))
+
+Use Node 20 for builds
+
+#### JS Package Cleanup ([#442](https://github.com/player-ui/player/pull/442))
+
+Fix migration issues in JS packages
+
+
+### Does your PR have any documentation updates?
+- [ ] Updated docs
+- [x] No Update needed
+- [ ] Unable to update docs
+<!--
+In an effort to standardize our process and code, please make sure you include documentation and/or update any existing documentation.
+Please refer to our site https://player-ui.github.io/latest/about, and include any neccesary information that would be helpful to coders, developers, and learners.
+
+If you are unable to update the current documents, please create an issue for us to get back to it.
+
+-->
+
+#### Bazel 6 Migration ([#252](https://github.com/player-ui/player/pull/252))
+
+Swaps the repo internals to use `bazel@6`, `rules_js`, bazel modules, `vitest` and `tsup` for the core + plugin builds
+
+---
+
+#### 🚀 Enhancement
+
+- Bazel 6 Migration [#252](https://github.com/player-ui/player/pull/252) ([@adierkens](https://github.com/adierkens) [@hborawski](https://github.com/hborawski) [@brocollie08](https://github.com/brocollie08) [@KetanReddy](https://github.com/KetanReddy) [@sugarmanz](https://github.com/sugarmanz) nancy_wu1@intuit.com [@nancywu1](https://github.com/nancywu1) [@mercillo](https://github.com/mercillo) [@mrigankmg](https://github.com/mrigankmg) [@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+
+#### 🐛 Bug Fix
+
+- Release main [#476](https://github.com/player-ui/player/pull/476) ([@intuit-svc](https://github.com/intuit-svc))
+- Docsite Fixes [#475](https://github.com/player-ui/player/pull/475) ([@KetanReddy](https://github.com/KetanReddy) [@mercillo](https://github.com/mercillo))
+- Docs and Release Fixes [#474](https://github.com/player-ui/player/pull/474) ([@KetanReddy](https://github.com/KetanReddy) [@mercillo](https://github.com/mercillo))
+- Update rules1.1.2 [#473](https://github.com/player-ui/player/pull/473) ([@mercillo](https://github.com/mercillo))
+- Update to rules player 1.1.1 [#472](https://github.com/player-ui/player/pull/472) ([@mercillo](https://github.com/mercillo))
+- bazel - added rules player back for docs site [#470](https://github.com/player-ui/player/pull/470) ([@KetanReddy](https://github.com/KetanReddy) [@mercillo](https://github.com/mercillo))
+- Fix J2V8 Debugger [#443](https://github.com/player-ui/player/pull/443) ([@brocollie08](https://github.com/brocollie08))
+- fix: replace fuse.js with leven to fix no similar matching name error [#452](https://github.com/player-ui/player/pull/452) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Fixed switch parsing syntax issue for dynamic switches [#458](https://github.com/player-ui/player/pull/458) ([@mrigankmg](https://github.com/mrigankmg))
+- View Parser Plugin Decomposition [#413](https://github.com/player-ui/player/pull/413) ([@mrigankmg](https://github.com/mrigankmg))
+- Ability to remove a resolved async node [#404](https://github.com/player-ui/player/pull/404) ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri) [@brocollie08](https://github.com/brocollie08))
+- ReactAsset improve error messages [#444](https://github.com/player-ui/player/pull/444) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- JS Package Cleanup [#442](https://github.com/player-ui/player/pull/442) ([@KetanReddy](https://github.com/KetanReddy))
+- Specific Temurin Version [#445](https://github.com/player-ui/player/pull/445) ([@brocollie08](https://github.com/brocollie08))
+- iOS: Canary release support + SPM automated releases [#434](https://github.com/player-ui/player/pull/434) ([@hborawski](https://github.com/hborawski))
+- apply strategy from pr builds to main & release builds [#440](https://github.com/player-ui/player/pull/440) ([@sugarmanz](https://github.com/sugarmanz))
+- Add dsl component to async node [#439](https://github.com/player-ui/player/pull/439) ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+- Bazel clean up [#435](https://github.com/player-ui/player/pull/435) ([@brocollie08](https://github.com/brocollie08))
+- [JVM] Publish next releases to release repository (fixed versions) [#428](https://github.com/player-ui/player/pull/428) ([@sugarmanz](https://github.com/sugarmanz))
+- This PR enables to add footer component to info reference asset in android [#411](https://github.com/player-ui/player/pull/411) ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+- Fix NPM Registry URL [#427](https://github.com/player-ui/player/pull/427) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 🏠 Internal
+
+- Use smaller docker image for circle setup [#456](https://github.com/player-ui/player/pull/456) ([@adierkens](https://github.com/adierkens))
+- Log debug info for npm next release [#454](https://github.com/player-ui/player/pull/454) ([@adierkens](https://github.com/adierkens))
+- Remove alternate binding parsers from bundle [#432](https://github.com/player-ui/player/pull/432) ([@adierkens](https://github.com/adierkens))
+- Revert "[JVM] Publish next releases to release repository" [#429](https://github.com/player-ui/player/pull/429) ([@sugarmanz](https://github.com/sugarmanz))
+- [JVM] Publish next releases to release repository [#426](https://github.com/player-ui/player/pull/426) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### 📝 Documentation
+
+- Update CONTRIBUTING.md [#433](https://github.com/player-ui/player/pull/433) ([@brocollie08](https://github.com/brocollie08))
+
+#### 🔩 Dependency Updates
+
+- Update to use TypeScript 5.5 and enable `isolatedDeclarations` [#431](https://github.com/player-ui/player/pull/431) ([@KetanReddy](https://github.com/KetanReddy))
+- bump js rules, use node 20 [#430](https://github.com/player-ui/player/pull/430) ([@KetanReddy](https://github.com/KetanReddy) [@hborawski](https://github.com/hborawski) [@mercillo](https://github.com/mercillo))
+
+#### Authors: 12
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Chloe ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Marlon "Marky" Ercillo ([@mercillo](https://github.com/mercillo))
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+- nancywu1 (nancy_wu1@intuit.com)
+- Niharika Motukuri ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+
+---
+
 # 0.7.4 (Tue Jul 02 2024)
 
 #### 🐛 Bug Fix

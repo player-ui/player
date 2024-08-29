@@ -1,0 +1,51 @@
+diff --git CMakeLists.txt CMakeLists.txt
+index 74425a2..390ef56 100644
+--- CMakeLists.txt
++++ CMakeLists.txt
+@@ -45,18 +45,23 @@ target_include_directories(fbjni BEFORE
+   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/cxx>
+ )
+ 
++
+ if (NOT ANDROID_ABI)
+-  if (NOT JAVA_HOME)
++  if (JAVA_HOME)
++    target_include_directories(fbjni PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${JAVA_HOME}/include>)
++    if (CMAKE_SYSTEM_NAME STREQUAL Linux)
++      target_include_directories(fbjni PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${JAVA_HOME}/include/linux>)
++    endif()
++    if (CMAKE_SYSTEM_NAME STREQUAL Darwin)
++      target_include_directories(fbjni PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${JAVA_HOME}/include/darwin>)
++    endif()
++  elseif (JNI_HEADER)
++    target_include_directories(fbjni PUBLIC ${JNI_HEADER})
++  else()
+     message(FATAL_ERROR
+       "fbjni requires JAVA_HOME to be defined for non-Android builds.")
+   endif()
+-  target_include_directories(fbjni PUBLIC ${JAVA_HOME}/include)
+-  if (CMAKE_SYSTEM_NAME STREQUAL Linux)
+-    target_include_directories(fbjni PUBLIC ${JAVA_HOME}/include/linux)
+-  endif()
+-  if (CMAKE_SYSTEM_NAME STREQUAL Darwin)
+-    target_include_directories(fbjni PUBLIC ${JAVA_HOME}/include/darwin)
+-  endif()
++  
+   # win32/jni_md.h typedefs jint as long, because apparently
+   # long is 32 bits on Windows.  This breaks a lot of stuff.
+   # It could probably be fixed, but for now just require
+@@ -110,6 +115,14 @@ install(TARGETS fbjni EXPORT fbjniLibraryConfig
+ install(EXPORT fbjniLibraryConfig DESTINATION share/cmake/fbjni
+   FILE fbjniLibraryConfig.cmake)
+ 
++install(EXPORT fbjniLibraryConfig DESTINATION share/cmake/fbjni
++        FILE fbjniConfig.cmake
++        NAMESPACE fbjni::)
++
++install(DIRECTORY $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/cxx/> DESTINATION include
++  FILES_MATCHING PATTERN "*.h"
++  PATTERN "")
++
+ if(MSVC)
+     install(FILES $<TARGET_PDB_FILE:fbjni> DESTINATION ${CMAKE_INSTALL_LIBDIR} OPTIONAL)
+     install(TARGETS fbjni DESTINATION ${CMAKE_INSTALL_LIBDIR})

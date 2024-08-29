@@ -19,6 +19,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.facebook.soloader.SoLoader
 import com.google.android.material.navigation.NavigationView
 import com.intuit.playerui.android.reference.demo.R
 import com.intuit.playerui.android.reference.demo.model.AssetMock
@@ -57,6 +58,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        SoLoader.init(this, false)
 
         setContentView(R.layout.activity_main)
 

@@ -33,5 +33,5 @@ public val runtimeContainers: List<PlayerRuntimeContainer> = PlayerRuntimeContai
 /** Default [PlayerRuntimeFactory] to use if none are specified */
 public val runtimeFactory: PlayerRuntimeFactory<*> = runtimeContainers.firstOrNull()?.factory ?: error(
     "Failed to find JS Player runtime implementation in the classpath: consider adding player runtime dependency. " +
-        "See https://TODO",
+        "See https://player-ui.github.io/latest/getting-started?lang=android#js-runtime for more details",
 )

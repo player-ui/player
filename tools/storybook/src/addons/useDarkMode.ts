@@ -1,7 +1,19 @@
-export function useDarkMode() {
-  if (typeof window === "undefined") {
-    return false;
-  }
+import { API } from "@storybook/manager-api";
+import { useEffect, useState } from "react";
+import { DARK_MODE_EVENT_NAME } from "storybook-dark-mode";
 
-  return matchMedia("(prefers-color-scheme: dark)").matches;
+export const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)");
+
+export function useDarkMode(api: API) {
+  const [isDark, setIsDark] = useState(prefersDark);
+
+  useEffect(function () {
+    var chan = api.getChannel();
+    chan.on(DARK_MODE_EVENT_NAME, setIsDark);
+    return function () {
+      return chan.off(DARK_MODE_EVENT_NAME, setIsDark);
+    };
+  }, []);
+
+  return isDark;
 }

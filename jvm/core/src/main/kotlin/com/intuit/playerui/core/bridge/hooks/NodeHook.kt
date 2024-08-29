@@ -4,6 +4,7 @@ import com.intuit.hooks.HookContext
 import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
+import com.intuit.playerui.core.bridge.Promise
 import com.intuit.playerui.core.bridge.getInvokable
 import com.intuit.playerui.core.utils.InternalPlayerApi
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -36,6 +37,15 @@ internal interface NodeHook<R> : NodeWrapper {
     }
 
     fun call(context: HookContext, serializedArgs: Array<Any?>): R
+}
+
+internal interface AsyncNodeHook<R : Any> : NodeHook<Promise> {
+    override fun call(context: HookContext, serializedArgs: Array<Any?>): Promise = node.runtime.Promise { resolve, reject ->
+        val result = callAsync(context, serializedArgs)
+        resolve(result)
+    }
+
+    suspend fun callAsync(context: HookContext, serializedArgs: Array<Any?>): R
 }
 
 @InternalPlayerApi

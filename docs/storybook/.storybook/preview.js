@@ -4,6 +4,7 @@ import { CommonTypesPlugin } from "@player-ui/common-types-plugin";
 import { DataChangeListenerPlugin } from "@player-ui/data-change-listener-plugin";
 import { ComputedPropertiesPlugin } from "@player-ui/computed-properties-plugin";
 import * as dslRefComponents from "@player-ui/reference-assets-plugin-components";
+import RefXLR from "@player-ui/reference-assets-plugin/dist/xlr/manifest.js";
 
 import "@player-ui/reference-assets-plugin-react/dist/index.css";
 
@@ -16,6 +17,7 @@ const reactPlayerPlugins = [
 
 export const parameters = {
   reactPlayerPlugins,
+  assetXLRSources: [RefXLR],
   dslEditor: {
     additionalModules: {
       "@player-ui/reference-assets-plugin-components": dslRefComponents,
@@ -38,7 +40,7 @@ export const parameters = {
 
 const preview = {
   parameters,
-  decorators: [PlayerDecorator]
+  decorators: [PlayerDecorator],
 };
 
 export default preview;

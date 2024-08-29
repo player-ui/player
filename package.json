@@ -33,8 +33,10 @@
     "@mdx-js/react": "^1.6.22",
     "@mdx-js/rollup": "^3.0.1",
     "@monaco-editor/react": "^4.6.0",
-    "@player-tools/cli": "0.5.2",
+    "@player-tools/cli": "0.6.1-next.2",
     "@player-tools/dsl": "0.6.1-next.2",
+    "@player-tools/xlr": "0.6.1-next.2",
+    "@player-tools/xlr-utils": "0.6.1-next.2",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-separator": "^1.0.3",
     "@radix-ui/react-slot": "^1.0.2",
@@ -158,6 +160,7 @@
     "source-map-js": "^1.0.2",
     "std-mocks": "^1.0.1",
     "storybook": "^7.6.10",
+    "storybook-dark-mode": "3.0.3",
     "style-loader": "^3.3.4",
     "tailwind-merge": "^2.2.1",
     "tailwindcss": "^3.4.1",
@@ -182,7 +185,7 @@
     "webpack-dev-server": "^5.0.4"
   },
   "volta": {
-    "node": "20.14.0",
+    "node": "20.16.0",
     "pnpm": "8.15.1"
   },
   "resolutions": {

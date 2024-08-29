@@ -1,5 +1,5 @@
-export const PARAM_KEY = 'web-player';
-export const ADDON_ID = 'web-player/addon';
+export const PARAM_KEY = "web-player";
+export const ADDON_ID = "@player-ui/storybook";
 
 export const FLOW_PANEL_ID = `${ADDON_ID}/flow-editor-panel`;
 export const EVENT_PANEL_ID = `${ADDON_ID}/events-panel`;

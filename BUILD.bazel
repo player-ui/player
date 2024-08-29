@@ -1,10 +1,10 @@
-load("@rules_player//ios:defs.bzl", "assemble_pod", "ios_publish")
-load("@rules_player//internal:defs.bzl", "stamp")
-load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@bazel_gazelle//:def.bzl", "gazelle_binary", "gazelle")
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@rules_player//internal:defs.bzl", "stamp")
+load("@rules_player//ios:defs.bzl", "assemble_pod", "ios_publish")
 load("@rules_swift_package_manager//swiftpkg:defs.bzl", "swift_update_packages")
-load("@bazel_tools//tools/jdk:default_java_toolchain.bzl", "default_java_toolchain")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -90,14 +90,14 @@ stamp(
     name = "PlayerUI_Podspec",
     files = ["//:PlayerUI.podspec"],
     stable = True,
+    stamp = -1,
     substitutions = {
         "0.0.1-placeholder": "{STABLE_VERSION}",
     },
-    stamp = -1,
 )
 
 exports_files([
-    "PlayerUI.podspec"
+    "PlayerUI.podspec",
 ])
 
 assemble_pod(
@@ -286,3 +286,66 @@ java_plugin(
 )
 #SwiftLint
 exports_files([".swiftlint.yml"])
+
+# Native platform settings
+
+string_flag(
+    name = "cmake_build_type",
+    build_setting_default = "Debug",
+    make_variable = "CMAKE_BUILD_TYPE",
+    values = [
+        "Debug",
+        "Release",
+        "MinSizeRel",
+        "RelWithDebInfo",
+    ],
+)
+
+config_setting(
+    name = "cmake_build_type_debug",
+    flag_values = {
+        ":cmake_build_type": "Debug",
+    },
+)
+
+config_setting(
+    name = "cmake_build_type_release",
+    flag_values = {
+        ":cmake_build_type": "Release",
+    },
+)
+
+config_setting(
+    name = "cmake_build_type_minsizerel",
+    flag_values = {
+        ":cmake_build_type": "MinSizeRel",
+    },
+)
+
+config_setting(
+    name = "cmake_build_type_relwithdebinfo",
+    flag_values = {
+        ":cmake_build_type": "RelWithDebInfo",
+    },
+)
+
+# TODO: Enable platform support for detecting Android OS as well as cpu
+config_setting(
+    name = "arm64-v8a",
+    values = {"cpu": "arm64-v8a"},
+)
+
+config_setting(
+    name = "armeabi-v7a",
+    values = {"cpu": "armeabi-v7a"},
+)
+
+config_setting(
+    name = "x86",
+    values = {"cpu": "x86"},
+)
+
+config_setting(
+    name = "x86_64",
+    values = {"cpu": "x86_64"},
+)

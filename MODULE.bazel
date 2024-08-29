@@ -6,18 +6,23 @@ module(
 bazel_dep(name = "rules_player")
 
 archive_override(
-  module_name = "rules_player",
-  strip_prefix = "rules_player-1.0.1",
-  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v1.0.1.tar.gz"],
-  integrity = "sha256-zIbxx1Bh/X4E8OwbPJz1nY9mOd2uAgmTZyf1Hs2mq+U="
+    module_name = "rules_player",
+    strip_prefix = "rules_player-1.1.4",
+    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v1.1.4.tar.gz"],
+    integrity = "sha256-5YsvzRBeBV2dVgRorGouQfdkb/lu1W8k24QAIModpLw=",
 )
-#local_path_override(module_name = "rules_player", path = "../rules_player")
+
+# local_path_override(module_name = "rules_player", path = "../rules_player")
 
 bazel_dep(name = "aspect_bazel_lib", version = "2.7.8")
 bazel_dep(name = "aspect_rules_js", version = "1.42.3")
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "rules_pkg", version = "1.0.1")
 bazel_dep(name = "aspect_rules_ts", version = "2.4.2")
+
+# C++
+bazel_dep(name = "rules_foreign_cc", version = "0.11.1")
+bazel_dep(name = "googletest", version = "1.14.0")
 
 ####### Node.js version #########
 bazel_dep(name = "rules_nodejs", version = "6.2.0")
@@ -78,9 +83,10 @@ rules_ts_ext.deps()
 use_repo(rules_ts_ext, "npm_typescript")
 
 # Kotlin
-bazel_dep(
-    name = "rules_kotlin",
-    version = "1.9.1",
+bazel_dep(name = "rules_kotlin", version = "1.9.1")
+single_version_override(
+    module_name = "rules_kotlin",
+    patches = ["//patches:rules_kotlin.context_receivers.patch"],
 )
 
 # TODO: Custom compiler version breaks embedded jdeps generator plugin - enable when removing custom kotlinc (see .bazelrc jvm_emit_jdeps)
@@ -120,8 +126,7 @@ use_repo(remote_android_extensions, "android_gmaven_r8")
 bazel_dep(name = "rules_jvm_external")
 git_override(
     module_name = "rules_jvm_external",
-    # bazel-6 branch
-    commit = "44f4355b2dbe0d6fd73d690ad66bf5744d482a29",
+    commit = "73b63ba801f14d1bde7807994cc8c15db226ceec",
     remote = "https://github.com/sugarmanz/rules_jvm_external.git",
 )
 
@@ -175,9 +180,15 @@ maven.install(
         "org.graalvm.js:js-scriptengine:21.2.0",
         "org.graalvm.sdk:graal-sdk:21.2.0",
 
-        # J2V8 debug
+        # J2V8
+        "com.eclipsesource.j2v8:j2v8:aar:6.1.0",
         "com.github.AlexTrotsenko:j2v8-debugger:0.2.3",
         "com.facebook.stetho:stetho:1.5.1",
+
+        # Hermes
+        "com.facebook.fbjni:fbjni-java-only:0.6.0",
+        "com.facebook.fbjni:fbjni:0.6.0",
+        "com.facebook.soloader:soloader:0.11.0",
 
         # Test utils
         "org.junit.jupiter:junit-jupiter-api:5.6.0",

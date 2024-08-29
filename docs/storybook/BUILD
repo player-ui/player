@@ -8,6 +8,7 @@ npm_link_all_packages(
 deps = [
     ":node_modules/@player-ui/common-types-plugin",
     ":node_modules/@player-ui/make-flow",
+    ":node_modules/@player-ui/reference-assets-plugin",
     ":node_modules/@player-ui/reference-assets-plugin-react",
     ":node_modules/@player-ui/mocks",
     ":node_modules/@player-ui/reference-assets-plugin-components",
@@ -15,10 +16,13 @@ deps = [
     ":node_modules/@player-ui/computed-properties-plugin",
     ":node_modules/@player-ui/react",
     ":node_modules/@player-ui/storybook",
+    "//:node_modules/typescript",
     "//:node_modules/@babel/preset-typescript",
     "//:node_modules/@babel/preset-env",
     "//:node_modules/@storybook/react-webpack5",
     "//:node_modules/@storybook/addon-docs",
+    "//:node_modules/@storybook/components",
+    "//:node_modules/@storybook/manager-api",
     "//:node_modules/@types/react-redux",
     "//:node_modules/react-redux",
     "//:node_modules/redux-state-sync",
@@ -50,10 +54,6 @@ storybook_bin.storybook(
         "src/**/*",
         ".storybook/*",
     ]) + deps,
-    chdir = package_name(),
-    env = {
-        "CACHE_DIR": ".cache",
-    },
     args = [
         "build",
         "--output-dir",
@@ -61,6 +61,10 @@ storybook_bin.storybook(
         "--debug",
         "--disable-telemetry",
     ],
+    chdir = package_name(),
+    env = {
+        "CACHE_DIR": ".cache",
+    },
     out_dirs = ["storybook"],
     visibility = ["//visibility:public"],
 )
