@@ -78,7 +78,6 @@ jobs:
     executor: minimal
     steps:
       - checkout
-
       - restore_cache:
           keys:
             - v1-dependencies-{ { checksum "package.json" }}
@@ -108,6 +107,14 @@ jobs:
           root: .
           paths:
             - .
+
+  skip-build:
+    executor: base
+    steps:
+      - attach_workspace:
+          at: ~/player
+
+      - run: rec=$(npx auto label | grep "skip-build" || true); if [ "$rec" ]; then circleci-agent step halt; fi
 
   build:
     executor: base
@@ -386,6 +393,18 @@ workflows:
           requires:
             - setup
 
+      - skip-build:
+          name: skip-build
+          filters:
+            branches:
+              ignore:
+                - main
+                - /version-.*/
+            tags:
+              ignore: /.*/
+          requires:
+            - setup
+
       - build:
           name: build-trunk
           filters:
@@ -394,6 +413,7 @@ workflows:
                 - /pull\/.*/
           requires:
             - bazelrc
+            - skip-build
 
       - build:
           name: build-fork
@@ -402,7 +422,7 @@ workflows:
               only:
                 - /pull\/.*/
           requires:
-            - setup
+            - skip-build
 
       - build_ios:
           name: build-ios-trunk
