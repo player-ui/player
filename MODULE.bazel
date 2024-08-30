@@ -5,7 +5,12 @@ module(
 
 bazel_dep(name = "rules_player")
 
-git_override(module_name = "rules_player", remote = "https://github.com/player-ui/rules_player.git", commit = "d779041ede60f7b8e90fb1ca4a235ca6d952eca3")
+archive_override(
+  module_name = "rules_player",
+  strip_prefix = "rules_player-1.1.5",
+  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v1.1.5.tar.gz"],
+  integrity = "sha256-sotB/beOkcn7FD+NurO6Uqi2OoKbbXHd7ya4ZO9nBCg="
+)
 
 # local_path_override(module_name = "rules_player", path = "../rules_player")
 bazel_dep(name = "aspect_bazel_lib", version = "2.8.0")
