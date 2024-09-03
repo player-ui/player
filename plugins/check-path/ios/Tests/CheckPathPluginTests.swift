@@ -12,6 +12,7 @@ import JavaScriptCore
 
 @testable import PlayerUI
 @testable import PlayerUIInternalTestUtilities
+@testable import PlayerUITestUtilitiesCore
 @testable import PlayerUICheckPathPlugin
 
 class CheckPathPluginTests: XCTestCase {

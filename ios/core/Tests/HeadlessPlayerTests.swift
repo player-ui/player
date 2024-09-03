@@ -11,6 +11,7 @@ import XCTest
 import JavaScriptCore
 @testable import PlayerUI
 @testable import PlayerUIInternalTestUtilities
+@testable import PlayerUITestUtilitiesCore
 
 class HeadlessPlayerTests: XCTestCase {
     func testViewId() {

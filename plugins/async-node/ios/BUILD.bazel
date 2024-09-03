@@ -9,7 +9,8 @@ ios_pipeline(
 
     test_deps = [
 	"//plugins/reference-assets/swiftui:PlayerUIReferenceAssets",
-	"//ios/internal-test-utils:PlayerUIInternalTestUtilities"
+	"//ios/internal-test-utils:PlayerUIInternalTestUtilities",
+        "//ios/test-utils-core:PlayerUITestUtilitiesCore"
     ],
 
     hasUnitTests = True,

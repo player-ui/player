@@ -10,7 +10,7 @@ import Foundation
 import XCTest
 import JavaScriptCore
 @testable import PlayerUI
-@testable import PlayerUIInternalTestUtilities
+@testable import PlayerUITestUtilitiesCore
 @testable import PlayerUIPubSubPlugin
 
 class PubSubPluginTests: XCTestCase {

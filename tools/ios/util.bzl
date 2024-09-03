@@ -3,7 +3,7 @@ load("@rules_pkg//:mappings.bzl", "pkg_files", "strip_prefix")
 load("@rules_player//ios:defs.bzl", "ios_pipeline")
 
 default_dependencies = ["//ios/core:PlayerUI"]
-default_test_dependencies = ["//ios/internal-test-utils:PlayerUIInternalTestUtilities"]
+default_test_dependencies = ["//ios/internal-test-utils:PlayerUIInternalTestUtilities", "//ios/test-utils-core:PlayerUITestUtilitiesCore"]
 test_host = "//ios/demo:PlayerUIDemo"
 
 def ios_plugin(name, resources = [], deps = [], test_deps = []):
