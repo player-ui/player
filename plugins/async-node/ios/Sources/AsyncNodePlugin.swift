@@ -52,10 +52,10 @@ public extension AsyncNodeHandlerType {
                 $0.toJSValue(context: context)
             }
             return context.objectForKeyedSubscript("Array").objectForKeyedSubscript("from").call(withArguments: [jsValueArray])
-            
+
         case .singleNode(let replacementNode):
             return replacementNode.toJSValue(context: context)
-            
+
         case .emptyNode:
             return nil
         }
@@ -67,11 +67,11 @@ public extension AsyncNodeHandlerType {
  */
 public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
     public var hooks: AsyncNodeHook?
-    
+
     private var asyncHookHandler: AsyncHookHandler?
-    
+
     public var plugins: [JSBasePlugin] = []
-    
+
     /**
      Constructs the AsyncNodePlugin
      - Parameters:
@@ -79,30 +79,30 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
      exposed to users of the plugin allowing them to supply the replacement node used in the tap callback
      */
     public convenience init(plugins: [JSBasePlugin] = [AsyncNodePluginPlugin()], _ handler: @escaping AsyncHookHandler) {
-        
+
         self.init(fileName: "AsyncNodePlugin.native", pluginName: "AsyncNodePlugin.AsyncNodePlugin")
         self.asyncHookHandler = handler
         self.plugins = plugins
     }
-    
+
     override public func setup(context: JSContext) {
         super.setup(context: context)
-        
+
         if let pluginRef = pluginRef {
             self.hooks = AsyncNodeHook(onAsyncNode: AsyncHook2(baseValue: pluginRef, name: "onAsyncNode"))
         }
-        
+
         hooks?.onAsyncNode.tap({ node, callback in
             // hook value is the original node
             guard let asyncHookHandler = self.asyncHookHandler else {
                 return JSValue()
             }
-            
+
             let replacementNode = try await (asyncHookHandler)(node, callback)
             return replacementNode.handlerTypeToJSValue(context:context) ?? JSValue()
         })
     }
-    
+
     /**
      Retrieves the arguments for constructing this plugin, this is necessary because the arguments need to be supplied after
      construction of the swift object, once the context has been provided
@@ -112,10 +112,10 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
         for plugin in plugins {
             plugin.context = self.context
         }
-        
+
         return [["plugins": plugins.map { $0.pluginRef }]]
     }
-    
+
     override open func getUrlForFile(fileName: String) -> URL? {
 #if SWIFT_PACKAGE
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
@@ -140,10 +140,10 @@ public struct AsyncNodeHook {
 public enum ReplacementNode: Encodable {
     case concrete(JSValue)
     case encodable(Encodable)
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
-        
+
         switch self {
         case .encodable(let value):
             try container.encode(value)
@@ -157,12 +157,12 @@ public struct AssetPlaceholderNode: Encodable {
     public enum CodingKeys: String, CodingKey {
         case asset
     }
-    
+
     var asset: Encodable
     public init(asset: Encodable) {
         self.asset = asset
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try? container.encode(asset, forKey: .asset)
@@ -185,7 +185,7 @@ public class AsyncNodePluginPlugin: JSBasePlugin {
     public convenience init() {
         self.init(fileName: "AsyncNodePlugin.native", pluginName: "AsyncNodePlugin.AsyncNodePluginPlugin")
     }
-    
+
     override open func getUrlForFile(fileName: String) -> URL? {
 #if SWIFT_PACKAGE
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
