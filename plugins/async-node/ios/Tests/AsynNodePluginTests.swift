@@ -302,7 +302,7 @@ class AsyncNodePluginTests: XCTestCase {
         }
         
         var count = 0
-        var args: [JSValue] = []
+        var args: JSValue?
         var callbackFunction: JSValue?
         
         let resolve: AsyncHookHandler = { node, callback in
@@ -372,9 +372,9 @@ class AsyncNodePluginTests: XCTestCase {
         
         let replacementResult = AsyncNodeHandlerType.emptyNode
         
-        args = [plugin.replacementNodeToJSValue(replacementResult) ?? JSValue()]
+        args = replacementResult.handlerTypeToJSValue(context: context ?? JSContext())
         
-        let _ = callbackFunction?.call(withArguments: args)
+        let _ = callbackFunction?.call(withArguments: [args])
         
         XCTAssert(count == 3)
         XCTAssertEqual(expectedMultiNode2Text, "undefined")
@@ -391,7 +391,7 @@ class AsyncNodePluginTests: XCTestCase {
         }
         
         var count = 0
-        var args: [JSValue] = []
+        var args: JSValue?
         var callbackFunction: JSValue?
         
         let resolve: AsyncHookHandler = { node, callback in
@@ -491,9 +491,9 @@ class AsyncNodePluginTests: XCTestCase {
                 )
             """) ?? JSValue()))
         
-        args = [plugin.replacementNodeToJSValue(replacementResult) ?? JSValue()]
+        args = replacementResult.handlerTypeToJSValue(context: context ?? JSContext())
         
-        let _ = callbackFunction?.call(withArguments: args)
+        let _ = callbackFunction?.call(withArguments: [args])
         
         XCTAssert(count == 3)
         XCTAssertEqual(expectedMultiNode2Text, "new node from the hook 2")
@@ -503,9 +503,9 @@ class AsyncNodePluginTests: XCTestCase {
         
         replacementResult = AsyncNodeHandlerType.emptyNode
         
-        args = [plugin.replacementNodeToJSValue(replacementResult) ?? JSValue()]
+        args = replacementResult.handlerTypeToJSValue(context: context ?? JSContext())
         
-        _ = callbackFunction?.call(withArguments: args)
+        _ = callbackFunction?.call(withArguments: [args])
         
         XCTAssert(count == 4)
         // asset that the value at index 0 for the object

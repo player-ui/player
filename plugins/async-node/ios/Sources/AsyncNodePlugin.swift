@@ -17,6 +17,51 @@ public enum AsyncNodeHandlerType {
     case emptyNode
 }
 
+/// Extension for `ReplacementNode` to convert it to a `JSValue` in a given `JSContext`.
+public extension ReplacementNode {
+    /// Converts the `ReplacementNode` to a `JSValue` in the provided `JSContext`.
+    ///
+    /// - Parameter context: The `JSContext` in which the `JSValue` will be created.
+    /// - Returns: A `JSValue` representing the `ReplacementNode`, or `nil` if the conversion fails.
+    func toJSValue(context: JSContext) -> JSValue? {
+        switch self {
+        case .encodable(let encodable):
+            let encoder = JSONEncoder()
+            do {
+                let res = try encoder.encode(encodable)
+                return context.evaluateScript("(\(String(data: res, encoding: .utf8) ?? ""))") as JSValue
+            } catch {
+                return nil
+            }
+        case .concrete(let jsValue):
+            return jsValue
+        }
+    }
+}
+
+/// Extension for `AsyncNodeHandlerType` to convert it to a `JSValue` in a given `JSContext`.
+public extension AsyncNodeHandlerType {
+    /// Converts the `AsyncNodeHandlerType` to a `JSValue` in the provided `JSContext`.
+    ///
+    /// - Parameter context: The `JSContext` in which the `JSValue` will be created.
+    /// - Returns: A `JSValue` representing the `AsyncNodeHandlerType`, or `nil` if the conversion fails.
+    func handlerTypeToJSValue(context: JSContext) -> JSValue? {
+        switch self {
+        case .multiNode(let replacementNodes):
+            let jsValueArray = replacementNodes.compactMap {
+                $0.toJSValue(context: context)
+            }
+            return context.objectForKeyedSubscript("Array").objectForKeyedSubscript("from").call(withArguments: [jsValueArray])
+            
+        case .singleNode(let replacementNode):
+            return replacementNode.toJSValue(context: context)
+            
+        case .emptyNode:
+            return nil
+        }
+    }
+}
+
 /**
  Wraps the core AsyncNodePlugin and taps into the `onAsyncNode` hook to allow asynchronous replacement of the node object that contains `async`
  */
@@ -40,69 +85,6 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
         self.plugins = plugins
     }
     
-    /**
-     Converts a given `ReplacementNode` to a `JSValue` that can be used in the JavaScript context.
-     
-     - Parameters:
-     - replacementNode: The `ReplacementNode` to be converted.
-     - context: The `JSContext` in which the `JSValue` will be used.
-     - Returns: A `JSValue` representing the given `ReplacementNode`, or `nil` if the conversion fails.
-     */
-    func convertReplacementNodeToJSValue(_ replacementNode: ReplacementNode, context: JSContext) -> JSValue? {
-        switch replacementNode {
-        case .encodable(let encodable):
-            let encoder = JSONEncoder()
-            do {
-                let res = try encoder.encode(encodable)
-                return context.evaluateScript("(\(String(data: res, encoding: .utf8) ?? ""))") as JSValue
-            } catch {
-                return nil
-            }
-        case .concrete(let jsValue):
-            return jsValue
-        }
-    }
-    
-    /**
-     Converts a given `AsyncNodeHandlerType` to a `JSValue` that can be used in the JavaScript context.
-     
-     - Parameter replacementNode: The `AsyncNodeHandlerType` to be converted.
-     - Returns: A `JSValue` representing the given `AsyncNodeHandlerType`, or `nil` if the conversion fails.
-     */
-    
-    func replacementNodeToJSValue(_ replacementNode: AsyncNodeHandlerType) -> JSValue? {
-        guard let context = context else {
-            return JSValue()
-        }
-        switch replacementNode {
-        case .multiNode(let replacementNodes):
-            let jsValueArray = replacementNodes.compactMap { node in
-                switch node {
-                    
-                case .encodable(let encodable):
-                    return convertReplacementNodeToJSValue(.encodable(encodable), context: context)
-                case .concrete(let jsValue):
-                    return convertReplacementNodeToJSValue(.concrete(jsValue), context: context)
-                    
-                }
-            }
-            return context.objectForKeyedSubscript("Array").objectForKeyedSubscript("from").call(withArguments: [jsValueArray])
-            
-        case .singleNode(let replacementNode):
-            switch replacementNode {
-                
-            case .encodable(let encodable):
-                return convertReplacementNodeToJSValue(.encodable(encodable), context: context)
-            case .concrete(let jsValue):
-                return convertReplacementNodeToJSValue(.concrete(jsValue), context: context)
-                
-            }
-            
-        case .emptyNode:
-            return nil
-        }
-    }
-    
     override public func setup(context: JSContext) {
         super.setup(context: context)
         
@@ -117,7 +99,7 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
             }
             
             let replacementNode = try await (asyncHookHandler)(node, callback)
-            return self.replacementNodeToJSValue(replacementNode) ?? JSValue()
+            return replacementNode.handlerTypeToJSValue(context:context) ?? JSValue()
         })
     }
     
