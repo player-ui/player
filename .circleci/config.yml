@@ -500,10 +500,16 @@ workflows:
               only:
                 - main
                 - /version-.*/
+    
+      - bazelrc:
+          context:
+            - Build
+          requires:
+            - setup
 
       - build:
           requires:
-            - setup
+            - bazelrc
 
       - build_ios:
           requires:
@@ -526,11 +532,17 @@ workflows:
             - coverage
             - build_ios
 
-  release:
+  full_release:
     when:
       equal: [release, << pipeline.parameters.GHA_Action >>]
     jobs:
       - setup
+
+      - bazelrc:
+          context:
+            - Build
+          requires:
+            - setup
 
       - build:
           requires:
@@ -538,7 +550,7 @@ workflows:
 
       - build_ios:
           requires:
-            - build
+            - bazelrc
 
       - android_test:
           requires:
