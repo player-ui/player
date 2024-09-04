@@ -1,9 +1,8 @@
 import { describe, test, vitest, expect, beforeEach } from "vitest";
-import React from "react";
+import React, { act } from "react";
 import {
   screen,
   render,
-  act,
   fireEvent,
   waitFor,
   configure,

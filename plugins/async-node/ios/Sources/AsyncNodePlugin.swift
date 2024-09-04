@@ -7,16 +7,59 @@
 
 import Foundation
 import JavaScriptCore
-
-#if SWIFT_PACKAGE
 import PlayerUI
-#endif
 
-public typealias AsyncHookHandler = (JSValue) async throws -> AsyncNodeHandlerType
+public typealias AsyncHookHandler = (JSValue, JSValue) async throws -> AsyncNodeHandlerType
 
 public enum AsyncNodeHandlerType {
     case multiNode([ReplacementNode])
     case singleNode(ReplacementNode)
+    case emptyNode
+}
+
+/// Extension for `ReplacementNode` to convert it to a `JSValue` in a given `JSContext`.
+public extension ReplacementNode {
+    /// Converts the `ReplacementNode` to a `JSValue` in the provided `JSContext`.
+    ///
+    /// - Parameter context: The `JSContext` in which the `JSValue` will be created.
+    /// - Returns: A `JSValue` representing the `ReplacementNode`, or `nil` if the conversion fails.
+    func toJSValue(context: JSContext) -> JSValue? {
+        switch self {
+        case .encodable(let encodable):
+            let encoder = JSONEncoder()
+            do {
+                let res = try encoder.encode(encodable)
+                return context.evaluateScript("(\(String(data: res, encoding: .utf8) ?? ""))") as JSValue
+            } catch {
+                return nil
+            }
+        case .concrete(let jsValue):
+            return jsValue
+        }
+    }
+}
+
+/// Extension for `AsyncNodeHandlerType` to convert it to a `JSValue` in a given `JSContext`.
+public extension AsyncNodeHandlerType {
+    /// Converts the `AsyncNodeHandlerType` to a `JSValue` in the provided `JSContext`.
+    ///
+    /// - Parameter context: The `JSContext` in which the `JSValue` will be created.
+    /// - Returns: A `JSValue` representing the `AsyncNodeHandlerType`, or `nil` if the conversion fails.
+    func handlerTypeToJSValue(context: JSContext) -> JSValue? {
+        switch self {
+        case .multiNode(let replacementNodes):
+            let jsValueArray = replacementNodes.compactMap {
+                $0.toJSValue(context: context)
+            }
+            return context.objectForKeyedSubscript("Array").objectForKeyedSubscript("from").call(withArguments: [jsValueArray])
+
+        case .singleNode(let replacementNode):
+            return replacementNode.toJSValue(context: context)
+
+        case .emptyNode:
+            return nil
+        }
+    }
 }
 
 /**
@@ -32,8 +75,8 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
     /**
      Constructs the AsyncNodePlugin
      - Parameters:
-        - handler: The callback that is used to tap into the core `onAsyncNode` hook
-                   exposed to users of the plugin allowing them to supply the replacement node used in the tap callback
+     - handler: The callback that is used to tap into the core `onAsyncNode` hook
+     exposed to users of the plugin allowing them to supply the replacement node used in the tap callback
      */
     public convenience init(plugins: [JSBasePlugin] = [AsyncNodePluginPlugin()], _ handler: @escaping AsyncHookHandler) {
 
@@ -46,53 +89,17 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
         super.setup(context: context)
 
         if let pluginRef = pluginRef {
-            self.hooks = AsyncNodeHook(onAsyncNode: AsyncHook(baseValue: pluginRef, name: "onAsyncNode"))
+            self.hooks = AsyncNodeHook(onAsyncNode: AsyncHook2(baseValue: pluginRef, name: "onAsyncNode"))
         }
 
-        hooks?.onAsyncNode.tap({ node in
+        hooks?.onAsyncNode.tap({ node, callback in
             // hook value is the original node
             guard let asyncHookHandler = self.asyncHookHandler else {
                 return JSValue()
             }
 
-            let replacementNode = try await (asyncHookHandler)(node)
-
-            switch replacementNode {
-            case .multiNode(let replacementNodes):
-                let jsValueArray = replacementNodes.compactMap({ node in
-                    switch node {
-                    case .concrete(let jsValue):
-                        return jsValue
-                    case .encodable(let encodable):
-                        let encoder = JSONEncoder()
-                        do {
-                            let res = try encoder.encode(encodable)
-                            return context.evaluateScript("(\(String(data: res, encoding: .utf8) ?? ""))") as JSValue
-                        } catch {
-                            return nil
-                        }
-                    }
-                })
-
-                return context.objectForKeyedSubscript("Array").objectForKeyedSubscript("from").call(withArguments: [jsValueArray])
-
-            case .singleNode(let replacementNode):
-                switch replacementNode {
-
-                case .encodable(let encodable):
-                    let encoder = JSONEncoder()
-                    do {
-                        let res = try encoder.encode(encodable)
-                        return context.evaluateScript("(\(String(data: res, encoding: .utf8) ?? ""))") as JSValue
-                    } catch {
-                        break
-                    }
-                case .concrete(let jsValue):
-                    return jsValue
-                }
-            }
-
-            return nil
+            let replacementNode = try await (asyncHookHandler)(node, callback)
+            return replacementNode.handlerTypeToJSValue(context:context) ?? JSValue()
         })
     }
 
@@ -102,29 +109,29 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
      - returns: An array of arguments to construct the plugin
      */
     override public func getArguments() -> [Any] {
-           for plugin in plugins {
-               plugin.context = self.context
-           }
+        for plugin in plugins {
+            plugin.context = self.context
+        }
 
-           return [["plugins": plugins.map { $0.pluginRef }]]
-       }
+        return [["plugins": plugins.map { $0.pluginRef }]]
+    }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        #if SWIFT_PACKAGE
+#if SWIFT_PACKAGE
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
-        #else
+#else
         ResourceUtilities.urlForFile(
             name: fileName,
             ext: "js",
             bundle: Bundle(for: AsyncNodePlugin.self),
             pathComponent: "PlayerUIAsyncNodePlugin.bundle"
         )
-        #endif
+#endif
     }
 }
 
 public struct AsyncNodeHook {
-    public let onAsyncNode: AsyncHook<JSValue>
+    public let onAsyncNode: AsyncHook2<JSValue, JSValue>
 }
 
 /**
@@ -165,7 +172,7 @@ public struct AssetPlaceholderNode: Encodable {
 public struct AsyncNode: Codable, Equatable {
     var id: String
     var async: Bool = true
-
+    
     public init(id: String) {
         self.id = id
     }
@@ -180,15 +187,15 @@ public class AsyncNodePluginPlugin: JSBasePlugin {
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        #if SWIFT_PACKAGE
+#if SWIFT_PACKAGE
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
-        #else
+#else
         ResourceUtilities.urlForFile(
             name: fileName,
             ext: "js",
             bundle: Bundle(for: AsyncNodePluginPlugin.self),
             pathComponent: "PlayerUIAsyncNodePlugin.bundle"
         )
-        #endif
+#endif
     }
 }

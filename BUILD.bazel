@@ -22,7 +22,6 @@ exports_files([
     ".editorconfig",
     ".all-contributorsrc",
     "README.md",
-    # "patches/@chakra-ui__system@2.6.2.patch",
 ])
 
 js_library(
