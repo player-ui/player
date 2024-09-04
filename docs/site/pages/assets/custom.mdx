@@ -29,12 +29,12 @@ Assuming your authored JSON has a string property named text, this will render t
 
 Now that we have a React component to render our asset, let's create a plugin to register with Player:
 
-import WebAssetProvider from '@player-ui/asset-provider-plugin-react';
+import AssetProviderPlugin from '@player-ui/asset-provider-plugin-react';
 
 ```javascript
 class CustomAssetPlugin implements ReactPlayerPlugin{
   applyReact(reactPlayer) {
-    new WebAssetProvider([['custom', CustomAssetComp]]).applyReact(reactPlayer);
+    new AssetProviderPlugin([['custom', CustomAssetComp]]).applyReact(reactPlayer);
   }
 }
 ```
@@ -363,8 +363,8 @@ When registering your asset with an `AssetRegistry`, it can either be registered
   <react>
 
 ```tsx
-// Using WebAssetProvider from '@player-ui/asset-provider-plugin-react'
-new WebAssetProvider([
+// Using AssetProviderPlugin from '@player-ui/asset-provider-plugin-react'
+new AssetProviderPlugin([
 	// This will register a match on { type: 'example' }
 	['example', ExampleAsset],
 	//This will register a match on { type: 'example', metaData: {"role": "someRole"} }
@@ -421,8 +421,8 @@ Below are 3 different use cases for different ways to mix and match the asset an
   <react>
 
   ```tsx
-// Using WebAssetProvider from '@player-ui/asset-provider-plugin-react'
-new WebAssetProvider([
+// Using AssetProviderPlugin from '@player-ui/asset-provider-plugin-react'
+new AssetProviderPlugin([
 	//This will register a match on { type: 'example' }
 	['example', ExampleAsset],
 	//This will register a match on { type: 'example', metaData: {"role": "someRole"} }
@@ -522,8 +522,8 @@ And we would like to render two different assets based on whether or not "dataTy
   <react>
 
 ```tsx
-// Using WebAssetProvider from '@player-ui/asset-provider-plugin-react'
-new WebAssetProvider([
+// Using AssetProviderPlugin from '@player-ui/asset-provider-plugin-react'
+new AssetProviderPlugin([
 	['input', InputAsset],
 	[{ type: 'input', dataType: "dataType": {"type": "DateType"}}, DateInputAsset]
 ])
@@ -653,8 +653,8 @@ data class InputData(
   <react>
 
   ```tsx
-// Using WebAssetProvider from '@player-ui/asset-provider-plugin-react'
-new WebAssetProvider([
+// Using AssetProviderPlugin from '@player-ui/asset-provider-plugin-react'
+new AssetProviderPlugin([
 	['choiceA', Choice],
 	['choiceB', Choice]
 ])
