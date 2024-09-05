@@ -3,29 +3,34 @@
 import Default from "@astrojs/starlight/components/SocialIcons.astro";
 import type { Props } from "@astrojs/starlight/props";
 
-type SidebarEntry = typeof Astro.props.sidebar[number]
+type SidebarEntry = (typeof Astro.props.sidebar)[number];
 
 function getFirstEntry(entry: SidebarEntry) {
-  if (entry.type === 'group') {
+  if (entry.type === "group") {
     if (entry.entries.length === 0) {
       return;
     }
 
-    return getFirstEntry(entry.entries[0])
+    return getFirstEntry(entry.entries[0]);
   }
 
   return entry;
 }
 
-const topEntries = Astro.props.sidebar.map(s => ({
+const topEntries = Astro.props.sidebar.map((s) => ({
   label: s.label,
-  href: getFirstEntry(s)?.href
-}))
-
+  href: getFirstEntry(s)?.href,
+}));
 ---
 
-{topEntries.map(entry => {
-  return <a href={entry.href}>{entry.label}</a>
-})}
+{
+  topEntries.map((entry) => {
+    return (
+      <a class="btn" href={entry.href}>
+        {entry.label}
+      </a>
+    );
+  })
+}
 
 <Default {...Astro.props} />

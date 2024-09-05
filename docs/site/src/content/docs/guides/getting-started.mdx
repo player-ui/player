@@ -3,6 +3,7 @@ title: "Getting Started"
 ---
 
 import PlatformTabs from "../../../components/PlatformTabs.astro";
+import Alert from "../../../components/Alert.astro";
 
 # Getting Started
 
@@ -81,8 +82,10 @@ buildTypes {
   </Fragment>
 </PlatformTabs>
 
-> [!WARNING]
-> The reference assets aren't intended for production use. They exist as an example of how to create assets and can be used to help get started.
+<Alert
+  status="warning"
+  description="The reference assets aren't intended for production use. They exist as an example of how to create assets and can be used to help get started."
+/>
 
 ### Configuration
 
@@ -249,8 +252,10 @@ To support a specific runtime implementation, there needs to be code connecting 
 | [Hermes](https://github.com/facebook/hermes)  | `android`                   |
 | [GraalJS](https://github.com/oracle/graaljs)  | `linux`, `macos`, `win`     |
 
-> [!NOTE]
-> Each of the artifacts for the above are defined as `com.intuit.playerui:$runtime-$platform`, i.e. `com.intuit.playerui:j2v8-android`
+<Alert
+  status="info"
+  description="Each of the artifacts for the above are defined as `com.intuit.playerui:$runtime-$platform`, i.e. `com.intuit.playerui:j2v8-android`"
+/>
 
 The `HeadlessPlayer` does not define a hard dependency on any specific runtime, however, the `AndroidPlayer` does transitively depends on the `j2v8` runtime, as the first class approach. To override, the transitive dependency would need to be explicitly excluded and the actual runtime dependency would need to be added:
 
@@ -268,8 +273,10 @@ dependencies {
 }
 ```
 
-> [!WARNING]
-> If your application includes dependencies that may transitively depend on `com.intuit.playerui:android`, you would likely need to ensure the default runtime is transitively excluded from those as well, either manually or as a global strategy.
+<Alert
+  status="warning"
+  description="If your application includes dependencies that may transitively depend on `com.intuit.playerui:android`, you would likely need to ensure the default runtime is transitively excluded from those as well, either manually or as a global strategy."
+/>
 
   </Fragment>
 </PlatformTabs>

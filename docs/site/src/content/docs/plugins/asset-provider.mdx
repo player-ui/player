@@ -4,6 +4,7 @@ platform: react
 ---
 
 import PlatformTabs from "../../../components/PlatformTabs.astro";
+import ContentTabs from "../../../components/ContentTabs.astro";
 
 # Asset Provider
 
@@ -49,7 +50,7 @@ This will register a match on `{ type: 'custom-asset' }` and `{ type: 'custom', 
 In this example, when your content has assets of type `custom-asset` and `custom`, they will render `<div>Hello World!</div>` and `<div>Other Custom Asset</div>`.
 
 <ContentTabs>
-  <tsx>
+  <Fragment slot='tsx'>
 
 ```tsx
 import { Custom, CustomAsset, Collection } from "my-assets";
@@ -62,8 +63,8 @@ const view = (
 );
 ```
 
-</tsx>
-  <json>
+</Fragment>
+  <Fragment slot='json'>
 
 ```json
 {
@@ -117,6 +118,6 @@ const view = (
 
 This will register a match on `{ type: 'custom-asset' }` and `{ type: 'custom', key: 'asset' }` in the view to use your React components.
 
-  </json>
+  </Fragment>
 
 </ContentTabs>

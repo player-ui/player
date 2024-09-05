@@ -1,0 +1,41 @@
+---
+const slotNames = ["tsx", "json"];
+const populatedSlots = Object.fromEntries(
+  slotNames.map((slotName) => [slotName, Astro.slots.has(slotName)])
+);
+
+const name = crypto.randomUUID();
+---
+
+<div role="tablist" class="tabs tabs-lifted">
+  <input
+    type="radio"
+    name={name}
+    role="tab"
+    class="tab"
+    aria-label="TSX"
+    value="tsx"
+    checked
+  />
+  <div
+    role="tabpanel"
+    class="tab-content bg-base-100 border-base-300 rounded-box p-6"
+  >
+    <slot name="tsx" />
+  </div>
+
+  <input
+    type="radio"
+    name={name}
+    role="tab"
+    class="tab"
+    aria-label="JSON"
+    value="json"
+  />
+  <div
+    role="tabpanel"
+    class="tab-content bg-base-100 border-base-300 rounded-box p-6"
+  >
+    <slot name="json" />
+  </div>
+</div>
