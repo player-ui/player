@@ -3,6 +3,8 @@ title: Stage Revert Data
 platform: core,ios
 ---
 
+import PlatformTabs from "../../../components/PlatformTabs.astro";
+
 # Stage Revert Data Plugin
 
 This plugin enables users to temporarily stage data changes before committing to the actual data model
@@ -31,22 +33,23 @@ It also should include a list of acceptable `commitTransitions` valid `VIEW` nam
 ## Example
 
 <PlatformTabs>
-  <core>
+  <Fragment slot='core'>
 
 Simply add the plugin to the config when constructing a player instance.
 
 ```javascript
-import StageRevertPlugin from '@player/stage-revert-data';
+import StageRevertPlugin from "@player/stage-revert-data";
 
 const player = new Player({
   plugins: [new StageRevertPlugin()],
 });
 ```
 
-  </core>
-  <ios>
+  </Fragment>
+  <Fragment slot='ios'>
 
 ### CocoaPods
+
 Add the subspec to your `Podfile`
 
 ```ruby
@@ -54,7 +57,9 @@ pod 'PlayerUI/StageRevertDataPlugin'
 ```
 
 ### Swift Usage
+
 This plugin takes no parameters, and the configuration comes from content, it can just be added to the plugin array:
+
 ```swift
 var body: some View {
   SwiftUIPlayer(
@@ -66,5 +71,6 @@ var body: some View {
   )
 }
 ```
-  </ios>
+
+  </Fragment>
 </PlatformTabs>

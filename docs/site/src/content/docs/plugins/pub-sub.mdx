@@ -3,30 +3,32 @@ title: PubSub
 platform: core,react,ios,android
 ---
 
+import PlatformTabs from "../../../components/PlatformTabs.astro";
+
 # PubSub Plugin
 
-The PubSub plugin adds a publish/subscribe interface between the host app and Player's content. 
+The PubSub plugin adds a publish/subscribe interface between the host app and Player's content.
 
 ## Usage
 
 <PlatformTabs>
-  <core>
+  <Fragment slot='core'>
 
 Add the plugin to Player:
 
 ```ts
-import { Player } from '@player-ui/player';
-import { PubSubPlugin } from '@player-ui/pub-sub-plugin';
+import { Player } from "@player-ui/player";
+import { PubSubPlugin } from "@player-ui/pub-sub-plugin";
 
 const pubsub = new PubSubPlugin();
 
-const token = pubsub.subscribe('some-event', () => {
+const token = pubsub.subscribe("some-event", () => {
   // Callback
 });
 
 const player = new Player({
-  plugins: [pubsub]
-})
+  plugins: [pubsub],
+});
 ```
 
 To unsubscribe:
@@ -35,12 +37,13 @@ To unsubscribe:
 pubsub.unsubscribe(token);
 ```
 
-  </core>
-  <ios>
+  </Fragment>
+  <Fragment slot='ios'>
 
 If your content uses the `@[ publish() ]@` expression for actions, you can subscribe to these events by using the `PubSubPlugin`.
 
 ### CocoaPods
+
 Add the subspec to your `Podfile`
 
 ```ruby
@@ -48,6 +51,7 @@ pod 'PlayerUI/PubSubPlugin'
 ```
 
 ### Swift Usage
+
 ```swift
 let eventHandler: (String, AnyType?) -> Void = { (eventName, eventData) in
   // Handle event
@@ -62,6 +66,7 @@ let plugin = PubSubPlugin([("eventName", eventHandler)], options: PubSubPluginOp
 ```
 
 Then, just include it in your `plugins` to a Player instance:
+
 ```swift
 var body: some View {
   SwiftUIPlayer(
@@ -76,8 +81,8 @@ var body: some View {
 
 _Note: AnyType is a custom enum type to handle the arbitrary types that can be received from these events, as the data is set in your Player Content, ensure that it matches either String, [String], or [String: String]._
 
-  </ios>
-  <android>
+  </Fragment>
+  <Fragment slot='android'>
 
 The `PubSubPlugin` provides support for handling the publish expressions in Player content at the app level. The PubSubPlugin is included by default in the Android Player, so configuring events subscriptions can be done on Player using the provided extension methods.
 
@@ -88,6 +93,7 @@ The `PubSubPlugin` provides support for handling the publish expressions in Play
   "exp": "@[ publish('some-event', {{foo.bar}}) ]@"
 }
 ```
+
 ```kotlin
 val player = AndroidPlayer(context)
 
@@ -98,16 +104,16 @@ val token = player.subscribe("some-event") { name: String, data: Any? ->
     // handle event
 }
 
-// extension method for removing a specific event subscription 
+// extension method for removing a specific event subscription
 player.unsubscribe(token)
 ```
 
-  </android>
+  </Fragment>
 </PlatformTabs>
 
 ## Publish Expression
 
-To trigger an event to be published, use the `publish()` expression in Player's content: 
+To trigger an event to be published, use the `publish()` expression in Player's content:
 
 ```json
 {

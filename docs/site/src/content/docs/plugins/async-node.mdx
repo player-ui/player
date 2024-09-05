@@ -3,9 +3,11 @@ title: AsyncNode Plugin
 platform: core,react,ios,android
 ---
 
+import PlatformTabs from "../../../components/PlatformTabs.astro";
+
 # Async Node Plugin
 
-The AsyncNode Plugin is used to enable streaming additional content into a flow that has already been loaded and rendered.    
+The AsyncNode Plugin is used to enable streaming additional content into a flow that has already been loaded and rendered.  
 A common use case for this plugin is conversational UI, as the users input more dialogue, new content must be streamed into Player in order to keep the UI up to date.
 
 The pillar that makes this possible is the concept of an `AsyncNode`. An `AsyncNode` is any tree node with the property `async: true`, it represents a placeholder node that will be replaced by a concrete node in the future.
@@ -38,7 +40,7 @@ Returning a value in the above context enables uses cases where the async node o
 
 ### Continuous Streaming
 
-In order to keep streaming in new content, there must be at least 1 or more `AsyncNode`s in the view tree at all times.    
+In order to keep streaming in new content, there must be at least 1 or more `AsyncNode`s in the view tree at all times.  
 This means there must be a constant renewal of new `AsyncNode`s after the previous ones are resolved by the user.
 
 ## Usage
@@ -47,7 +49,7 @@ The `AsyncNodePlugin` itself accepts an options object with a `plugins` array, e
 The `AsyncNodePluginPlugin` is provided as a default way of handling asset-async nodes, it is just one handler for one possible way of using async nodes. If the default behavior does not align with the desired usage, users are able to provide their own implementation of the handler in the form of a plugin to be passed to the base `AsyncNodePlugin`. The `AsyncNodePluginPlugin` also comes from the `'@player-ui/async-node-plugin'` and contains the resolver and parser functionality.
 
 <PlatformTabs>
-  <core>
+  <Fragment slot='core'>
 
 Add the plugin to Player:
 
@@ -83,28 +85,30 @@ const player = new Player({
   ]
 })
 ```
-  </core>
-  <react>
+
+  </Fragment>
+  <Fragment slot='react'>
 
 The `react` version of the AsyncNodePlugin is identical to using the core plugin. Refer to core usage for handler configuration:
 
 ```js
-import { ReactPlayer } from '@player-ui/react';
-import { AsyncNodePlugin, AsyncNodePluginPlugin } from '@player-ui/async-node-plugin';
+import { ReactPlayer } from "@player-ui/react";
+import {
+  AsyncNodePlugin,
+  AsyncNodePluginPlugin,
+} from "@player-ui/async-node-plugin";
 
 const asyncNodePlugin = new AsyncNodePlugin({
-    plugins: [new AsyncNodePluginPlugin()],
+  plugins: [new AsyncNodePluginPlugin()],
 });
 
 const player = new ReactPlayer({
-  plugins: [
-    asyncNodePlugin
-  ]
-})
+  plugins: [asyncNodePlugin],
+});
 ```
 
-  </react>
-  <ios>
+  </Fragment>
+  <Fragment slot='ios'>
 
 ### CocoaPods
 
@@ -180,15 +184,17 @@ Note: the AsyncNode struct is already defined in the plugin with the `async` pro
 
 As a convenience to the user, the AsyncNodePlugin just takes a callback which has the content to be returned, this is provided to the plugin which calls the the `onAsyncNode` hook tap method. The return could be a single asset node or an array of asset nodes, or null if the async node is no longer relevant.
 
-  </ios>
-  <android>
+  </Fragment>
+  <Fragment slot='android'>
 
 In build.gradle
+
 ```kotlin
 implementation "com.intuit.playerui.plugins:async-node:$PLAYER_VERSION"
 ```
 
 In integration code
+
 ```kotlin
 import com.intuit.playerui.plugins.asyncnode.AsyncNodePlugin
 
@@ -212,5 +218,6 @@ asyncNodePlugin.hooks.onAsyncNode.tap("handleAsync") { hookContext, node ->
 
 AndroidPlayer(asyncNodePlugin)
 ```
-  </android>
+
+  </Fragment>
 </PlatformTabs>

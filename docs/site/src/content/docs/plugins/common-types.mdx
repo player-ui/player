@@ -3,6 +3,8 @@ title: Common Types
 platform: react,core,ios
 ---
 
+import PlatformTabs from "../../../components/PlatformTabs.astro";
+
 # Common Types Plugin
 
 This plugin exposes some basic `DataTypes`, `validations`, and `formats` into Player content.
@@ -12,7 +14,7 @@ It also serves as a good reference to adding your own custom types into Player.
 ## Usage
 
 <PlatformTabs>
-  <core>
+  <Fragment slot='core'>
 
 Install the plugin:
 
@@ -21,8 +23,9 @@ yarn add @player-ui/common-types-plugin
 ```
 
 Add it to Player:
+
 ```js
-import CommonTypesPlugin from '@player-ui/common-types-plugin';
+import CommonTypesPlugin from "@player-ui/common-types-plugin";
 
 const commonTypesPlugin = new CommonTypesPlugin();
 const player = new Player({ plugins: [commonTypesPlugin] });
@@ -33,9 +36,9 @@ player.start(myFlow);
 
 This will allow any `DataTypes`, `formats`, `validations` and custom data types to be used in the content
 
-  </core>
+  </Fragment>
 
-<ios>
+<Fragment slot='ios'>
 
 ### CocoaPods
 
@@ -64,18 +67,16 @@ var body: some View {
 }
 ```
 
-</ios>
+</Fragment>
 
 </PlatformTabs>
-
 
 ## Formats
 
 #### commaNumber
 
-
-* **format**: Formats a number (or string containing only numbers) into a comma delineated string.
-* **deformat**: Converts a comma delineated string into a number
+- **format**: Formats a number (or string containing only numbers) into a comma delineated string.
+- **deformat**: Converts a comma delineated string into a number
 
 Options:
 
@@ -87,11 +88,11 @@ Options:
 
 #### integer
 
-* **deformat**: converts a string containing only integers to an integer
+- **deformat**: converts a string containing only integers to an integer
 
 #### date
 
-* **format**: Formats a string of numbers into a slash separated date
+- **format**: Formats a string of numbers into a slash separated date
 
 Options:
 
@@ -103,8 +104,8 @@ Options:
 
 #### currency
 
-* **format**: Formats a number of string into a currency value
-* **deformat**: Converts a currency value into a number
+- **format**: Formats a number of string into a currency value
+- **deformat**: Converts a currency value into a number
 
 Options:
 
@@ -118,7 +119,7 @@ Options:
 
 #### phone
 
-* **format**: Formats the value as a phone number
+- **format**: Formats the value as a phone number
 
 Options:
 
@@ -133,9 +134,11 @@ Options:
 ## Validations
 
 #### required
+
 > Asserts that a value is not `null`, `undefined`, or an empty string
 
-Options: 
+Options:
+
 ```ts
 {
   /** An expression to limit the assertion only if the expression evaluates to truthy **/
@@ -146,13 +149,14 @@ Options:
 }
 ```
 
-**Constants Support**: 
+**Constants Support**:
 
-* namespace: `constants`
-* path: `validation.required`
-* message: "A value is required"
+- namespace: `constants`
+- path: `validation.required`
+- message: "A value is required"
 
 #### expression
+
 > Uses an expression to evaluate the validation assertion
 
 Options:
@@ -164,77 +168,80 @@ Options:
 }
 ```
 
-**Constants Support**: 
+**Constants Support**:
 
-* namespace: `constants`
-* path: `validation.expression`
-* message: "Expression evaluation failed"
-
+- namespace: `constants`
+- path: `validation.expression`
+- message: "Expression evaluation failed"
 
 #### readonly
+
 > Asserts that the value cannot change
 
-**Constants Support**: 
+**Constants Support**:
 
-* namespace: `constants`
-* path: `validation.readonly`
-* message: "Value cannot be modified"
+- namespace: `constants`
+- path: `validation.readonly`
+- message: "Value cannot be modified"
 
 #### string
+
 > Asserts that the value is a string
 
-**Constants Support**: 
+**Constants Support**:
 
-* namespace: `constants`
-* path: `validation.string`
-* message: "Value must be a string"
-* parameters: 
+- namespace: `constants`
+- path: `validation.string`
+- message: "Value must be a string"
+- parameters:
   - `type`: the type of value being validated
 
-
 #### integer
+
 > Asserts that the value is an integer
 
-**Constants Support**: 
+**Constants Support**:
 
-* namespace: `constants`
-* path: `validation.integer`
-* message: "Value must be an integer"
-* parameters: 
+- namespace: `constants`
+- path: `validation.integer`
+- message: "Value must be an integer"
+- parameters:
   - `type`: the type of value being validated
   - `flooredValue`: the floored value of the value being validated
 
-
 #### collection
+
 > Asserts that the value is an array
 
-**Constants Support**: 
+**Constants Support**:
 
-* namespace: `constants`
-* path: `validation.collection`
-* message: "Cannot set collection to non-array"
+- namespace: `constants`
+- path: `validation.collection`
+- message: "Cannot set collection to non-array"
 
 #### oneOf
+
 > Asserts that the value is one of the pre-defined accepted values
 
-Options: 
+Options:
+
 ```ts
 {
   options?: Array;
 }
 ```
 
-**Constants Support**: 
+**Constants Support**:
 
-* namespace: `constants`
-* path: `validation.oneof`
-* message: "Cannot set collection to non-array"
-
+- namespace: `constants`
+- path: `validation.oneof`
+- message: "Cannot set collection to non-array"
 
 #### regex
+
 > Asserts that the value matches the provided regular expression
 
-Options: 
+Options:
 
 ```ts
 {
@@ -242,16 +249,17 @@ Options:
 }
 ```
 
-**Constants Support**: 
+**Constants Support**:
 
-* namespace: `constants`
-* path: `validation.regex`
-
+- namespace: `constants`
+- path: `validation.regex`
 
 #### length
+
 > Asserts that the value matches the given length criteria. Uses character counts for strings, and key-length for objects, and array length for arrays.
 
 Options:
+
 ```ts
 {
   min?: number;
@@ -260,115 +268,125 @@ Options:
 }
 ```
 
-**Constants Support**: 
+**Constants Support**:
 
-* namespace: `constants`
-* path: `validation.minimum`, `validation.maximum`
-* message: "At least ${min} items needed", "Up to ${max} items allowed"
-* parameters: 
+- namespace: `constants`
+- path: `validation.minimum`, `validation.maximum`
+- message: "At least \$\{min\} items needed", "Up to \$\{max\} items allowed"
+- parameters:
   - `validationLength`: Returns the length of the value being validated
 
-
-
 #### min
+
 > Assets that the numeric value is at least as large as the target
 
 Options:
+
 ```ts
 {
   value: number;
 }
 ```
 
-**Constants Support**: 
+**Constants Support**:
 
-* namespace: `constants`
-* path: `validation.min`
-* message: "Must be at least ${value}"
+- namespace: `constants`
+- path: `validation.min`
+- message: "Must be at least \$\{value\}"
 
 #### max
+
 > Assets that the numeric value is at no larger the target
 
 Options:
+
 ```ts
 {
   value: number;
 }
 ```
 
-**Constants Support**: 
+**Constants Support**:
 
-* namespace: `constants`
-* path: `validation.max`
-* message: "Cannot exceed ${value}"
+- namespace: `constants`
+- path: `validation.max`
+- message: "Cannot exceed \$\{value\}"
 
 #### email
+
 > Asserts that the value follows an email pattern
 
-**Constants Support**: 
+**Constants Support**:
 
-* namespace: `constants`
-* path: `validation.email`
-* message: "Improper email format"
-
+- namespace: `constants`
+- path: `validation.email`
+- message: "Improper email format"
 
 #### phone
+
 > Asserts that the value follows an phone number pattern
 
-**Constants Support**: 
+**Constants Support**:
 
-* namespace: `constants`
-* path: `validation.phone`
-* message: "Invalid phone number"
+- namespace: `constants`
+- path: `validation.phone`
+- message: "Invalid phone number"
 
 #### zip
+
 > Asserts that the value follows an zip-code pattern
 
-**Constants Support**: 
+**Constants Support**:
 
-* namespace: `constants`
-* path: `validation.zip`
-* message: "Invalid zip code"
-
+- namespace: `constants`
+- path: `validation.zip`
+- message: "Invalid zip code"
 
 ---
 
 ## Data Types
 
 #### BooleanType
+
 > A true or false value.
 
-* **validations**: `oneOf([true, false])`
+- **validations**: `oneOf([true, false])`
 
 #### IntegerType
+
 > An integer value
 
-* **validations**: `integer`
-* **format**: `integer`
+- **validations**: `integer`
+- **format**: `integer`
 
 #### IntegerPosType
+
 > An integer value greater than 0
 
-* **validations**: `integer`, `min(1)`
-* **format**: `integer`
+- **validations**: `integer`, `min(1)`
+- **format**: `integer`
 
 #### StringType
+
 > A string value
 
-* **validations**: `string`
+- **validations**: `string`
 
 #### CollectionType
+
 > An array of items
 
-* **validations**: `collection`
+- **validations**: `collection`
 
 #### DateType
+
 > A value representing a date
 
-* **format**: `date`
+- **format**: `date`
 
 #### PhoneType
+
 > A value representing a phone number
 
-* **validations**: `phone`
-* **format**: `phone` (`(###) ###-####`)
+- **validations**: `phone`
+- **format**: `phone` (`(###) ###-####`)

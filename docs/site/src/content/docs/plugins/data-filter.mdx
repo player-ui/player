@@ -3,6 +3,8 @@ title: Data Filter
 platform: react,core
 ---
 
+import PlatformTabs from "../../../components/PlatformTabs.astro";
+
 # Data Filter Plugin
 
 The `data-filter-plugin` enables users to filter out segments of the data-model during serialization.
@@ -10,18 +12,18 @@ The `data-filter-plugin` enables users to filter out segments of the data-model 
 ## Usage
 
 <PlatformTabs>
-  <core>
+  <Fragment slot='core'>
 
 Add the plugin to Player and configure the exclusion paths:
 
 ```ts
-import { Player } from '@player-ui/player';
-import { DataFilterPlugin } from '@player-ui/data-filter-plugin';
+import { Player } from "@player-ui/player";
+import { DataFilterPlugin } from "@player-ui/data-filter-plugin";
 
 const player = new Player({
   plugins: [
     new DataFilterPlugin({
-      paths: ['local', 'constants'],
+      paths: ["local", "constants"],
     }),
   ],
 });
@@ -29,5 +31,5 @@ const player = new Player({
 
 This will exclude any top-level `local` or `constants` paths in the data-model from appearing in the serialized response.
 
-  </core>
+  </Fragment>
 </PlatformTabs>

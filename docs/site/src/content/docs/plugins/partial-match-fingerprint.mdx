@@ -3,51 +3,52 @@ title: Partial Match
 platform: core, ios
 ---
 
+import PlatformTabs from "../../../components/PlatformTabs.astro";
+
 # Partial Match Plugin
 
-This plugin enables users to map matches of assets to any arbitrary value in a partial-match-registry. 
-For each asset in a resolved view, the matches will be computed. 
-
+This plugin enables users to map matches of assets to any arbitrary value in a partial-match-registry.
+For each asset in a resolved view, the matches will be computed.
 
 ## Usage
 
 <PlatformTabs>
-  <core>
+  <Fragment slot='core'>
 
 Create a registry and add matches:
 
 ```ts
-import { Registry } from '@player-ui/partial-match-registry';
+import { Registry } from "@player-ui/partial-match-registry";
 
-const registry = new Registry([
-  [{ type: 'action' }, 'ABC']
-])
+const registry = new Registry([[{ type: "action" }, "ABC"]]);
 ```
 
 Add the registy to a plugin:
 
 ```ts
-import { Player } from '@player-ui/player';
-import { PartialMatchFingerprintPlugin } from '@player-ui/partial-match-fingerprint-plugin';
+import { Player } from "@player-ui/player";
+import { PartialMatchFingerprintPlugin } from "@player-ui/partial-match-fingerprint-plugin";
 
 const matchPlugin = new PartialMatchFingerprintPlugin(registry);
 
 const player = new Player({
-  plugins: [matchPlugin]
-})
+  plugins: [matchPlugin],
+});
 ```
 
 Query the plugin for matches:
 
 ```ts
-const value = matchPlugin.get('asset-id') // 'ABC'
+const value = matchPlugin.get("asset-id"); // 'ABC'
 ```
-  </core>
-  <ios>
+
+  </Fragment>
+  <Fragment slot='ios'>
 
 This plugin is used by `BaseAssetRegistry` to handle matching resolved asset nodes with their native implementation, to decode for rendering. It is unlikely to be needed to be used directly in iOS use cases.
 
 ### CocoaPods
+
 Add the subspec to your `Podfile`
 
 ```ruby
@@ -55,6 +56,7 @@ pod 'PlayerUI'
 ```
 
 ### Swift Usage
+
 ```swift
 let plugin = PartialMatchFingerprintPlugin()
 
@@ -65,5 +67,6 @@ plugin.register(match: ["type": "text"], index: 1)
 // get the index for the asset with matching ID if it was resolved in the core plugin
 plugin.get(assetId: "test")
 ```
-  </ios>
+
+  </Fragment>
 </PlatformTabs>

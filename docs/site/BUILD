@@ -30,7 +30,7 @@ astro_bin.astro(
     name = "site",
     srcs = srcs + build_deps,
     args = ["build"],
-    chdir = "docs/astro",
+    chdir = package_name(),
     out_dirs = ["dist"],
 )
 

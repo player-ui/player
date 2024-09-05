@@ -3,14 +3,16 @@ title: External Action
 platform: react,core,ios,android
 ---
 
+import PlatformTabs from "../../../components/PlatformTabs.astro";
+
 # External Action Plugin
 
-The External Action Plugin is an easy way to handle External states from the navigation of a Player flow. 
+The External Action Plugin is an easy way to handle External states from the navigation of a Player flow.
 
 ## Usage
 
 <PlatformTabs>
-  <core>
+  <Fragment slot='core'>
 
 Install the plugin:
 
@@ -33,22 +35,21 @@ const externalActionHandler: ExternalStateHandler = async (state, options) => {
 Add it to Player:
 
 ```js
-import { Player } from '@player-ui/player';
-import { ExternalActionPlugin } from '@player-ui/external-action-plugin';
+import { Player } from "@player-ui/player";
+import { ExternalActionPlugin } from "@player-ui/external-action-plugin";
 
 const player = new Player({
-  plugins: [
-    new ExternalActionPlugin(externalActionHandler)
-  ]
-})
+  plugins: [new ExternalActionPlugin(externalActionHandler)],
+});
 ```
 
 This will transition any `EXTERNAL` state in Player's navigation, with a `ref` property of `custom` using the `next` transition.
 
-  </core>
-  <ios>
+  </Fragment>
+  <Fragment slot='ios'>
 
 ### CocoaPods
+
 Add the subspec to your `Podfile`
 
 ```ruby
@@ -116,8 +117,8 @@ var body: some View {
 }
 ```
 
-  </ios>
-  <android>
+  </Fragment>
+  <Fragment slot='android'>
 
 The `ExternalActionPlugin` adds support for handling `EXTERNAL` navigation states in the application. The handler, which can be provided during plugin initialization, receives three parameters:
 
@@ -126,12 +127,15 @@ The `ExternalActionPlugin` adds support for handling `EXTERNAL` navigation state
 3. transition: `(String) -> Unit` is provided to enable the handler to "complete" the `EXTERNAL` state and transition using the provided `String` value
 
 ## Usage
+
 In build.gradle
+
 ```kotlin
 implementation "com.intuit.playerui.plugins:external-action:$PLAYER_VERSION"
 ```
 
 In Player constructor
+
 ```kotlin
 import com.intuit.playerui.plugins.externalAction.ExternalActionPlugin
 
@@ -157,6 +161,7 @@ androidPlayer.onExernalAction { /** handle external action */ }
 ```
 
 In Player content
+
 ```json
 {
   "navigation": {
@@ -190,5 +195,6 @@ In Player content
 Public API available from sources here:
 
 [ExternalActionPlugin](https://github.com/player-ui/player/blob/main/plugins/external-action/jvm/src/main/kotlin/com/intuit/player/plugins/externalAction/ExternalActionPlugin.kt)
-  </android>
+
+  </Fragment>
 </PlatformTabs>

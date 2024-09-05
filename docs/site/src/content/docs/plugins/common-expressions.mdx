@@ -3,6 +3,8 @@ title: Common Expressions
 platform: react,core,ios
 ---
 
+import PlatformTabs from "../../../components/PlatformTabs.astro";
+
 # Common Expressions Plugin
 
 This plugin exposes some basic expressions into Player content.
@@ -12,7 +14,7 @@ It also serves as a good reference to adding your own custom expressions into Pl
 ## Usage
 
 <PlatformTabs>
-  <core>
+  <Fragment slot='core'>
 
 Install the plugin:
 
@@ -21,8 +23,9 @@ yarn add @player-ui/common-types-plugin
 ```
 
 Add it to Player:
+
 ```js
-import CommonExpressionsPlugin from '@player-ui/common-expressions-plugin';
+import CommonExpressionsPlugin from "@player-ui/common-expressions-plugin";
 
 const commonExpressionsPlugin = new CommonExpressionsPlugin();
 const player = new Player({ plugins: [commonExpressionsPlugin] });
@@ -33,9 +36,9 @@ player.start(myFlow);
 
 This will allow any included expressions or custom expressions to be used in the content
 
-  </core>
+  </Fragment>
 
-<ios>
+<Fragment slot='ios'>
 
 ### CocoaPods
 
@@ -63,7 +66,8 @@ var body: some View {
     )
 }
 ```
-</ios>
+
+</Fragment>
 
 </PlatformTabs>
 
@@ -76,7 +80,7 @@ var body: some View {
 > Gets the size of a value. This is the number of keys in an object, the length of a string, or the number of items in an array.
 
 ```ts
-function size(value: string | array | object): number
+function size(value: string | array | object): number;
 ```
 
 #### length
@@ -88,19 +92,19 @@ function size(value: string | array | object): number
 > Concatenates arrays together, or strings into 1 value
 
 ```ts
-function concat(...values: Array): Array
+function concat(...values: Array): Array;
 ```
 
 ---
 
-## Strings 
+## Strings
 
 #### trim
 
 > Trims whitespace from the leading and trailing edges of a string
 
 ```ts
-function trim(value: string): string
+function trim(value: string): string;
 ```
 
 #### upperCase
@@ -108,7 +112,7 @@ function trim(value: string): string
 > Transforms the string to all uppercase.
 
 ```ts
-function upperCase(value: string): string
+function upperCase(value: string): string;
 ```
 
 #### lowerCase
@@ -116,7 +120,7 @@ function upperCase(value: string): string
 > Transforms the string to all lowercase.
 
 ```ts
-function lowerCase(value: string): string
+function lowerCase(value: string): string;
 ```
 
 #### titleCase
@@ -124,7 +128,7 @@ function lowerCase(value: string): string
 > Transforms the string to title case. Each word is capitalized.
 
 ```ts
-function titleCase(value: string): string
+function titleCase(value: string): string;
 ```
 
 #### sentenceCase
@@ -132,7 +136,7 @@ function titleCase(value: string): string
 > Transforms the string to sentence case. The first word is capitalized.
 
 ```ts
-function sentenceCase(value: string): string
+function sentenceCase(value: string): string;
 ```
 
 #### replace
@@ -140,7 +144,11 @@ function sentenceCase(value: string): string
 > Replaces all instances of pattern in string with replacement. The pattern can also be a regex.
 
 ```ts
-function replace(value: string, pattern: string | RegExp, replacement: string): string
+function replace(
+  value: string,
+  pattern: string | RegExp,
+  replacement: string,
+): string;
 ```
 
 #### containsAny
@@ -148,7 +156,7 @@ function replace(value: string, pattern: string | RegExp, replacement: string): 
 > Checks if a given string contains any keywords present in the given array.
 
 ```ts
-function containsAny(value: string, keywords: Array<string>): boolean
+function containsAny(value: string, keywords: Array<string>): boolean;
 ```
 
 ---
@@ -160,7 +168,7 @@ function containsAny(value: string, keywords: Array<string>): boolean
 > Converts the given value to a number if possible. Will handle removing currency modifiers and comma delimitated values.
 
 ```ts
-function number(value: string): number | undefined
+function number(value: string): number | undefined;
 ```
 
 #### round
@@ -168,7 +176,7 @@ function number(value: string): number | undefined
 > Rounds the given number to the nearest integer.
 
 ```ts
-function round(value: number): number
+function round(value: number): number;
 ```
 
 #### floor
@@ -176,7 +184,7 @@ function round(value: number): number
 > Rounds the number down the the nearest integer
 
 ```ts
-function floor(value: number): number
+function floor(value: number): number;
 ```
 
 #### ceil
@@ -184,7 +192,7 @@ function floor(value: number): number
 > Rounds the number up the the nearest integer
 
 ```ts
-function ceil(value: number): number
+function ceil(value: number): number;
 ```
 
 #### sum
@@ -192,7 +200,7 @@ function ceil(value: number): number
 > Sums up all arguments
 
 ```ts
-function sum(...values: Array<number>): number
+function sum(...values: Array<number>): number;
 ```
 
 ---
@@ -204,7 +212,11 @@ function sum(...values: Array<number>): number
 > Finds the index of the item in the given array (or array reference). Returns -1 for indexes that aren't found
 
 ```ts
-function findPropertyIndex(binding: Binding | Array, searchProperty: string, searchValue: any): number
+function findPropertyIndex(
+  binding: Binding | Array,
+  searchProperty: string,
+  searchValue: any,
+): number;
 ```
 
 ### findProperty
@@ -212,5 +224,11 @@ function findPropertyIndex(binding: Binding | Array, searchProperty: string, sea
 > Finds the item in the given array that matches the search criteria. Optionally return a specific property or a fallback value if not found
 
 ```ts
-function findPropertyIndex(binding: Binding | Array, searchProperty: string, searchValue: any, fallBackProperty?: string, fallBackValue?: T): T
+function findPropertyIndex(
+  binding: Binding | Array,
+  searchProperty: string,
+  searchValue: any,
+  fallBackProperty?: string,
+  fallBackValue?: T,
+): T;
 ```

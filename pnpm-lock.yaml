@@ -563,19 +563,7 @@ importers:
 
   core/types: {}
 
-  docs/astro: {}
-
-  docs/site:
-    dependencies:
-      '@player-ui/asset-provider-plugin-react':
-        specifier: workspace:*
-        version: link:../../plugins/asset-provider/react
-      '@player-ui/react':
-        specifier: workspace:*
-        version: link:../../react/player
-      '@player-ui/reference-assets-plugin-react':
-        specifier: workspace:*
-        version: link:../../plugins/reference-assets/react
+  docs/site: {}
 
   docs/storybook:
     dependencies:

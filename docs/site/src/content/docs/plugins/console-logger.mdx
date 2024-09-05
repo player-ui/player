@@ -3,6 +3,8 @@ title: Console Logger
 platform: react,core,ios
 ---
 
+import PlatformTabs from "../../../components/PlatformTabs.astro";
+
 # Console Logger Plugin
 
 A plugin to easily enable logs to be written to the JS console. Extremely helpful for local Player development and debugging.
@@ -10,31 +12,32 @@ A plugin to easily enable logs to be written to the JS console. Extremely helpfu
 ## Usage
 
 <PlatformTabs>
-  <core>
+  <Fragment slot='core'>
 
 Install the plugin:
 
 ```js
-import { Player } from '@player-ui/player';
-import { ConsoleLoggerPlugin } from '@player-ui/console-logger-plugin';
+import { Player } from "@player-ui/player";
+import { ConsoleLoggerPlugin } from "@player-ui/console-logger-plugin";
 
 const consoleLogger = new ConsoleLoggerPlugin();
 
 const player = new Player({
-  plugins: [consoleLogger]
+  plugins: [consoleLogger],
 });
 ```
 
 To change the severity:
 
 ```js
-consoleLogger.setSeverity('warn');
+consoleLogger.setSeverity("warn");
 ```
 
-  </core>
-  <ios>
+  </Fragment>
+  <Fragment slot='ios'>
 
 ### CocoaPods
+
 Add the subspec to your `Podfile`
 
 ```ruby
@@ -56,9 +59,10 @@ var body: some View {
 ```
 
 To change the severity, supply it as an argument to the constructor:
+
 ```swift
 PrintLoggerPlugin(level: .warn)
 ```
 
-  </ios>
+  </Fragment>
 </PlatformTabs>

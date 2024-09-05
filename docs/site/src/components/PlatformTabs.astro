@@ -1,0 +1,122 @@
+---
+const slotNames = ["core", "react", "android", "ios"];
+const populatedSlots = Object.fromEntries(
+  slotNames.map((slotName) => [slotName, Astro.slots.has(slotName)])
+);
+
+const name = crypto.randomUUID();
+
+---
+<platform-tabs-select>
+<div role="tablist" class="tabs tabs-lifted">
+  {
+    populatedSlots["core"] && (
+        <input
+          type="radio"
+          name={name}
+          role="tab"
+          class="tab"
+          aria-label="Core"
+          value="core"
+        />
+        <div
+          role="tabpanel"
+          class="tab-content bg-base-100 border-base-300 rounded-box p-6"
+        >
+          <slot name="core" />
+        </div>
+    )
+  }
+  {
+    populatedSlots["react"] && (
+        <input
+          type="radio"
+          name={name}
+          role="tab"
+          class="tab"
+          aria-label="React"
+          value="react"
+        />
+        <div
+          role="tabpanel"
+          class="tab-content bg-base-100 border-base-300 rounded-box p-6"
+        >
+          <slot name="react" />
+        </div>
+    )
+  }
+  {
+    populatedSlots["android"] && (
+        <input
+          type="radio"
+          name={name}
+          role="tab"
+          class="tab"
+          aria-label="Android"
+          value="android"
+        />
+        <div
+          role="tabpanel"
+          class="tab-content bg-base-100 border-base-300 rounded-box p-6"
+        >
+          <slot name="android" />
+        </div>
+    )
+  }
+  {
+    populatedSlots["ios"] && (
+        <input
+          type="radio"
+          name={name}
+          role="tab"
+          class="tab"
+          aria-label="iOS"
+          value="ios"
+        />
+        <div
+          role="tabpanel"
+          class="tab-content bg-base-100 border-base-300 rounded-box p-6"
+        >
+          <slot name="ios" />
+        </div>
+    )
+  }
+  </div>
+</platform-tabs-select>
+
+<script>
+  class PlatformTabsSelect extends HTMLElement {
+    constructor() {
+      super();
+
+      const searchParams = new URLSearchParams(location.search);
+      const langSearch = searchParams.get("lang");
+
+      const inputs = this.querySelectorAll("input");
+      const slotNames = Array.from(inputs).map(e => e.value);
+
+      let selectedTab = slotNames[0];
+
+      if (langSearch && slotNames.includes(langSearch)) {
+        selectedTab = langSearch;
+      }
+
+      inputs.forEach(input => {
+
+        if (input.value === selectedTab) {
+          input.checked = true;
+        }
+
+        input.addEventListener("change", (e) => {
+          if (e.currentTarget instanceof HTMLInputElement) {
+            let newSearchParams = new URLSearchParams(location.search);
+            newSearchParams.set('lang', e.currentTarget.value);
+            window.location.search = newSearchParams.toString();
+          }
+        });
+      });
+
+    }
+  }
+  customElements.define("platform-tabs-select", PlatformTabsSelect);
+</script>

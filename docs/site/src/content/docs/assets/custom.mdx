@@ -1,13 +1,15 @@
 ---
-title: 'Custom Assets'
+title: "Custom Assets"
 ---
+
+import PlatformTabs from "../../../components/PlatformTabs.astro";
 
 # Custom Assets
 
 One of the conscious design decisions we made when building Player was to abstract away the actual asset implementation and open it up for users to bring their own when using Player. This way you can seamlessly integrate Player into your existing experiences and reuse UI assets you may have already built. Below we've outlined the way to build custom assets on the various platforms Player supports.
 
 <PlatformTabs>
-  <react>
+  <Fragment slot='react'>
 
 ### Create Your Asset
 
@@ -16,7 +18,7 @@ First and foremost you need to create a component to handle rendering of your as
 ```tsx
 const CustomAssetComp = (props) => {
   return (
-    <div id={props.id} style={{ color: 'purple' }}>
+    <div id={props.id} style={{ color: "purple" }}>
       {props.text}
     </div>
   );
@@ -29,9 +31,9 @@ Assuming your authored JSON has a string property named text, this will render t
 
 Now that we have a React component to render our asset, let's create a plugin to register with Player:
 
-import WebAssetProvider from '@player-ui/asset-provider-plugin-react';
-
 ```javascript
+import WebAssetProvider from "@player-ui/asset-provider-plugin-react";
+
 class CustomAssetPlugin implements ReactPlayerPlugin{
   applyReact(reactPlayer) {
     new WebAssetProvider([['custom', CustomAssetComp]]).applyReact(reactPlayer);
@@ -48,11 +50,11 @@ Often times, assets contain a reference or slot to another asset. For this to fu
 Use the ReactAsset Component from the `@player-ui/react` package with the nested asset as props to dynamically determine the rendering implementation to use:
 
 ```jsx
-import { ReactAsset } from '@player-ui/react';
+import { ReactAsset } from "@player-ui/react";
 
 const CustomAssetComp = (props) => {
   return (
-    <div id={props.id} style={{ color: 'purple' }}>
+    <div id={props.id} style={{ color: "purple" }}>
       {props.header && <ReactAsset {...props.header} />}
       {props.text}
     </div>
@@ -62,8 +64,8 @@ const CustomAssetComp = (props) => {
 
 This would automatically find the appropriate handler for the `props.header` asset and use that to render.
 
-  </react>
-  <ios>
+  </Fragment>
+  <Fragment slot='ios'>
 
 SwiftUI Player assets are made of 3 parts:
 
@@ -232,27 +234,23 @@ In the latter case, it is recommended to extend the original asset, so as to avo
 
 ##### Why Would I Register my Asset as a Variant?
 
-
 1. Transform backed assets have functions that are attached to them, through shared JavaScript plugins. This simplifies setting data from the asset, by giving simple functions like `run` in the reference `ActionAsset` for example. Swift only asset types will not have any convenience functions.
 
 2. Registering as a variant allows you to maintain usage of the transform backed asset as well as your new asset, so both can be used by the same `SwiftUIPlayer` instance, including in the same flow. This also maintains the semantics of Player content, an `action` asset is always an `action` type of interaction, but with `metaData`, it can be displayed differently.
 
-
-
-  </ios>
-  <android>
+  </Fragment>
+  <Fragment slot='android'>
 
 In order to render an asset a renderer for that type must be registered in the Android Player. If a renderer is found, then Player will delegate rendering when that type is encountered, otherwise Player will skip that node. Creating and registering such a renderer requires the following:
 
 1. [Extending DecodableAsset](#extending-decodableasset)
-    1. [Implementing `initView` and `hydrate`](#implementing-initview)
-    2. [Define data structure](#accessing-data)
-    3. [Nested assets](#nested-assets)
-    4. [Styling](#styling)
+   1. [Implementing `initView` and `hydrate`](#implementing-initview)
+   2. [Define data structure](#accessing-data)
+   3. [Nested assets](#nested-assets)
+   4. [Styling](#styling)
 2. [Registering assets](#registering-assets)
 
 ### Extending DecodableAsset
-
 
 `DecodableAsset` is a subclass of `RenderableAsset` that contains data decoding capabilities built on [Kotlinx Serialization](https://github.com/Kotlin/kotlinx.serialization). This is the recommended approach for creating an asset and will be consolidated with `RenderableAsset` in future versions of the Android Player. On top of the requirements for subclassing `RenderableAsset`, subclassing `DecodableAsset` requires passing a `KSerializer<Data>` for the data class that represents the data for that asset.
 
@@ -315,16 +313,18 @@ val stringToRender: String = asset.getString("value")
 ```json
 // ...
 {
-    "id": "some-card",
-    "type": "card",
-    "title": {
-        "asset": {
-            "id": "some-text",
-            "type": "text",
-            "value": "This is a text asset"
-        }
+  "id": "some-card",
+  "type": "card",
+  "title": {
+    "asset": {
+      "id": "some-text",
+      "type": "text",
+      "value": "This is a text asset"
     }
+  }
 }
+
+
 // ...
 ```
 
@@ -383,6 +383,7 @@ androidPlayer.registerAsset("some-asset", ::SomeAsset)
 ```
 
 #### Partial match asset registration overrides
+
 This allows registration of multiple assets for the same type, but can match based on other parts of the object
 
 Consider the following asset structure with metaData:
@@ -415,6 +416,5 @@ In this scenario, the custom action asset implementation would still have access
 
 When creating a new plugin, remember to register it when building the AndroidPlayer!
 
-
-  </android>
+  </Fragment>
 </PlatformTabs>

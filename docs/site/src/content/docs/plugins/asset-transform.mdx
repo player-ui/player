@@ -7,7 +7,7 @@ platform: core,react
 
 ## What are _transforms_?
 
-Transforms are functions that map the authored JSON representation of an asset into a stateful JavaScript object, including all of the properties required for that asset to interact with the data-model, navigation, and the rest of Player. This allows UI implementations to have consistent treatment and behavior. While the transform plugin is registered in the _core_ layer, it can be wrapped by the native platforms. 
+Transforms are functions that map the authored JSON representation of an asset into a stateful JavaScript object, including all of the properties required for that asset to interact with the data-model, navigation, and the rest of Player. This allows UI implementations to have consistent treatment and behavior. While the transform plugin is registered in the _core_ layer, it can be wrapped by the native platforms.
 
 ## Partial Matching
 
@@ -15,18 +15,16 @@ The transform plugin makes use of the `partial-match-registry` which ranks match
 
 ## Usage
 
-
 <PlatformTabs>
-  <core>
+  <Fragment slot='core'>
 
 ## Transform Arguments
 
 Each `transform` is a function that is passed 3 arguments: the current `asset` node, and an _options_ object containing a data-model, expression-evaluator, binding-parser, and a flow transition function, and a store for state management. The transforms should return an immutable representation of the asset, including any means of interacting with the _player_.
 
-
 ```javascript
-import { Player } from '@player-ui/player';
-import { AssetTransformPlugin } from '@player-ui/asset-transform-plugin';
+import { Player } from "@player-ui/player";
+import { AssetTransformPlugin } from "@player-ui/asset-transform-plugin";
 
 // Add it to Player
 
@@ -36,20 +34,19 @@ const player = new Player({
       new Registry([
         // Register a match for any _action_ type with a custom transform.
         [
-          { type: 'action' },
-          value => {
+          { type: "action" },
+          (value) => {
             return {
               ...value,
-              hello: () => console.log('hello world')
+              hello: () => console.log("hello world"),
             };
-          }
-        ]
-      ])
-    )
-  ]
+          },
+        ],
+      ]),
+    ),
+  ],
 });
 ```
-
 
 ### State Management
 
@@ -67,18 +64,18 @@ const transform = (asset, options, store) => {
     count,
     increment() {
       setCount(count + 1);
-    }
+    },
   };
 };
 ```
 
-  </core>
+  </Fragment>
 </PlatformTabs>
 
 ## Example
 
 <PlatformTabs>
-  <core>
+  <Fragment slot='core'>
 
 If the authored JSON is:
 
@@ -102,14 +99,14 @@ the transform-plugin would run the transform on the `action` asset, attaching a 
   actions: [
     {
       asset: {
-        id: 'foo',
-        type: 'action',
-        hello: () => console.log('hello world')
-      }
-    }
+        id: "foo",
+        type: "action",
+        hello: () => console.log("hello world"),
+      },
+    },
   ];
 }
 ```
 
-  </core>
+  </Fragment>
 </PlatformTabs>

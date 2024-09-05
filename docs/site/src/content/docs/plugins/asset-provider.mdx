@@ -3,15 +3,18 @@ title: Asset Provider Plugin
 platform: react
 ---
 
+import PlatformTabs from "../../../components/PlatformTabs.astro";
+
 # Asset Provider
 
 The Asset Provider Plugin enables users to easily register UI components to render their assets. It's used internally by the [Reference Assets](../assets/reference). The matches follow the same rules as asset transforms (more specific matches take priority).
 
-##  Usage
+## Usage
 
 ### Platform
+
 <PlatformTabs>
-  <react>
+  <Fragment slot='react'>
 
 Install the plugin:
 
@@ -19,25 +22,26 @@ Install the plugin:
 yarn add @player-ui/asset-provider-plugin-react
 ```
 
-Create an instance, and add it to your Player instance. 
+Create an instance, and add it to your Player instance.
 The API is similar to the JavaScript `Map`, and takes a list of `[match, Component]` tuples.
 
 ```tsx
-import { ReactPlayer } from '@player-ui/react';
-import { AssetProviderPlugin } from '@player-ui/asset-provider-plugin-react';
+import { ReactPlayer } from "@player-ui/react";
+import { AssetProviderPlugin } from "@player-ui/asset-provider-plugin-react";
 
 const player = new ReactPlayer({
   plugins: [
     new AssetProviderPlugin([
-      ['custom-asset', () => <div>Hello World!</div>],
-      [{ type: 'custom', key: 'asset' }, () => <div>Other Custom Asset</div>],
-    ])
-  ]
-})
+      ["custom-asset", () => <div>Hello World!</div>],
+      [{ type: "custom", key: "asset" }, () => <div>Other Custom Asset</div>],
+    ]),
+  ],
+});
 ```
 
-  This will register a match on `{ type: 'custom-asset' }` and `{ type: 'custom', key: 'asset' }` in the view to use your React components.
-  </react>
+This will register a match on `{ type: 'custom-asset' }` and `{ type: 'custom', key: 'asset' }` in the view to use your React components.
+
+  </Fragment>
 </PlatformTabs>
 
 ### Content
@@ -48,12 +52,12 @@ In this example, when your content has assets of type `custom-asset` and `custom
   <tsx>
 
 ```tsx
-import { Custom, CustomAsset, Collection } from 'my-assets';
+import { Custom, CustomAsset, Collection } from "my-assets";
 
 const view = (
   <Collection>
-    <CustomAsset/>
-    <Custom/>
+    <CustomAsset />
+    <Custom />
   </Collection>
 );
 ```
@@ -79,13 +83,13 @@ const view = (
         {
           "asset": {
             "id": "custom-1",
-            "type": "custom-asset",
+            "type": "custom-asset"
           }
         },
         {
           "asset": {
             "id": "custom-2",
-            "type": "custom",
+            "type": "custom"
           }
         }
       ]
@@ -111,9 +115,8 @@ const view = (
 }
 ```
 
-  This will register a match on `{ type: 'custom-asset' }` and `{ type: 'custom', key: 'asset' }` in the view to use your React components.
+This will register a match on `{ type: 'custom-asset' }` and `{ type: 'custom', key: 'asset' }` in the view to use your React components.
+
   </json>
-  
 
 </ContentTabs>
-  

@@ -3,6 +3,8 @@ title: Types Provider
 platform: core,ios
 ---
 
+import PlatformTabs from "../../../components/PlatformTabs.astro";
+
 # Types Provider Plugin
 
 Similar to the [Expression Plugin](./expression), this plugin adds support for easily exposing new `DataTypes`, `formats`, and `validations` to Player's content.
@@ -10,52 +12,50 @@ Similar to the [Expression Plugin](./expression), this plugin adds support for e
 ## Example
 
 <PlatformTabs>
-  <core>
+  <Fragment slot='core'>
 
 Define a new validation type:
 
 ```ts
-import { ValidatorFunction } from '@player-ui/player';
+import { ValidatorFunction } from "@player-ui/player";
 
 const customValidator: ValidatorFunction = (context, value) => {
-  if (value === 'bad-value') {
+  if (value === "bad-value") {
     return {
-      message: "This is a bad value."
-    }
+      message: "This is a bad value.",
+    };
   }
-}
+};
 ```
 
-Create a new `DataType` that references it: 
+Create a new `DataType` that references it:
 
 ```ts
-import { Schema } from '@player-ui/player';
+import { Schema } from "@player-ui/player";
 
 const CustomDataType: Schema.DataType = {
-  name: 'CustomType',
+  name: "CustomType",
   validation: [
     {
-      type: "custom-validator"
-    }
-  ]
-}
+      type: "custom-validator",
+    },
+  ],
+};
 ```
 
 Register it with Player:
 
 ```ts
-import { Player } from '@player-ui/player';
-import { TypesProviderPlugin } from '@player-ui/types-provider-plugin';
+import { Player } from "@player-ui/player";
+import { TypesProviderPlugin } from "@player-ui/types-provider-plugin";
 
 const player = new Player({
   plugins: [
     new TypesProviderPlugin({
       types: [CustomDataType],
-      validations: [
-        ['custom-validator', customValidator]
-      ]
-    })
-  ]
+      validations: [["custom-validator", customValidator]],
+    }),
+  ],
 });
 ```
 
@@ -73,12 +73,13 @@ Given a data-type reference to `CustomType` in the content, your new validation 
 }
 ```
 
-  </core>
-  <ios>
+  </Fragment>
+  <Fragment slot='ios'>
 
 The swift `TypesProviderPlugin` enables adding custom data types, formatters and validation purely through swift code. While in general, the recommendation would be to share a single JavaScript implementation to multiple platforms, some use cases may need a native integration.
 
 ### CocoaPods
+
 Add the subspec to your `Podfile`
 
 ```ruby
@@ -127,7 +128,7 @@ let formatFunction = {value, options in
   if let stringValue = value as? String {
     return stringValue.replacingOccurrences(of: ".", with: ",") // Turn all periods into commas
   } else {
-  	return value 
+  	return value
   }
 }
 
@@ -171,7 +172,7 @@ let formatFunction = {value, options in
     return stringValue.replacingOccurrences(of: ".", with: char)
     // Turn all periods into the specified character
   } else {
-  	return value 
+  	return value
   }
 }
 ```
@@ -219,5 +220,5 @@ let type = CustomType(
 )
 ```
 
-  </ios>
+  </Fragment>
 </PlatformTabs>

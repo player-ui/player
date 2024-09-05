@@ -3,9 +3,11 @@ title: Beacon Plugin
 platform: core,react,ios,android
 ---
 
+import PlatformTabs from "../../../components/PlatformTabs.astro";
+
 # Beacon Plugin
 
-The beacon plugin enables users to send and/or collect beaconing information from assets in a normalized API. It exposes a common API for publishing beacons from an asset library, and will automatically attach itself to the current view, enabling additional meta-data to be added to each event. 
+The beacon plugin enables users to send and/or collect beaconing information from assets in a normalized API. It exposes a common API for publishing beacons from an asset library, and will automatically attach itself to the current view, enabling additional meta-data to be added to each event.
 
 ## Consuming Beacons
 
@@ -16,7 +18,7 @@ By default, the beacon plugin returns beacons in the following format:
 ```ts
 interface DefaultBeacon {
   /** The user action taken ('clicked', 'visited') **/
-  action: string; 
+  action: string;
 
   /** The type of UI element interacted with ('button', 'menu') **/
   element: string;
@@ -35,23 +37,22 @@ interface DefaultBeacon {
 ## Usage
 
 <PlatformTabs>
-  <core>
+  <Fragment slot='core'>
 
 Add the beacon plugin to a player:
 
 ```ts
-import { Player } from '@player-ui/player';
-import { BeaconPlugin } from '@player-ui/beacon-plugin';
+import { Player } from "@player-ui/player";
+import { BeaconPlugin } from "@player-ui/beacon-plugin";
 
 const player = new Player({
   plugins: [
     new BeaconPlugin({
-
       // Any plugins to the beacon-plugin
       plugins: [],
 
       // Callback to handle any beacon event
-      callback: () => {}
+      callback: () => {},
     }),
   ],
 });
@@ -61,31 +62,30 @@ Beacons can be published directly by the plugin, but in most cases, a platform s
 
 ```ts
 beaconPlugin.beacon({
-  action: 'click',
-  element: 'button',
-  asset: asset // The entire Asset object, for use in the plugin pipeline
+  action: "click",
+  element: "button",
+  asset: asset, // The entire Asset object, for use in the plugin pipeline
   // other metadata
 });
 ```
 
-  </core>
-  <react>
+  </Fragment>
+  <Fragment slot='react'>
 
 Just like with the _core_ variant, to add support for beaconing in the `react` player, add the plugin to Player:
 
 ```ts
-import { ReactPlayer } from '@player-ui/react';
-import { BeaconPlugin } from '@player-ui/beacon-plugin-react';
+import { ReactPlayer } from "@player-ui/react";
+import { BeaconPlugin } from "@player-ui/beacon-plugin-react";
 
 const player = new ReactPlayer({
   plugins: [
     new BeaconPlugin({
-
       // Any plugins to the beacon-plugin
       plugins: [],
 
       // Callback to handle any beacon event
-      callback: () => {}
+      callback: () => {},
     }),
   ],
 });
@@ -93,10 +93,11 @@ const player = new ReactPlayer({
 
 This will add additional React Context to the running player for the producers from asset-libraries to leverage.
 
-  </react>
-  <ios>
+  </Fragment>
+  <Fragment slot='ios'>
 
 ### CocoaPods
+
 Add the subspec to your `Podfile`
 
 ```ruby
@@ -156,8 +157,8 @@ var body: some View {
 }
 ```
 
-  </ios>
-  <android>
+  </Fragment>
+  <Fragment slot='android'>
 
 Beaconing on the JVM platform (including Android) is done with an instance of the `BeaconPlugin`. By default, the Android Player includes a wrapper of the core beacon plugin. The Android Player can be configured to override the default BeaconPlugin by passing a different BeaconPlugin implementation on instantiation which can contain further configuration.
 
@@ -203,12 +204,12 @@ The base `RenderableAsset` class provides an additional helper to make beaconing
 
 [Helper in RenderableAsset](https://github.com/player-ui/player/blob/2a2110caf87ab752207c82ec9ab8ce72316d20f5/android/player/src/main/java/com/intuit/player/android/asset/RenderableAsset.kt#L253)
 
-  </android>
+  </Fragment>
 </PlatformTabs>
 
 ### Beacon Plugins
 
-Similar to how Player accepts plugins, the beacon-plugin itself accepts a list of plugins. These are able to mutate and augment the beacon payload as it makes its way through the publishing pipeline. 
+Similar to how Player accepts plugins, the beacon-plugin itself accepts a list of plugins. These are able to mutate and augment the beacon payload as it makes its way through the publishing pipeline.
 
 There are 3 hooks that are currently exposed:
 
@@ -235,30 +236,30 @@ The beacon plugin adds support for a `beacon` expression that can be referenced 
 ### Assets
 
 <PlatformTabs>
-  <react>
+  <Fragment slot='react'>
 
 #### useBeacon hook
 
-The `@player-ui/beacon-plugin-react` package exports a hook that assets can leverage to publish beacons. 
+The `@player-ui/beacon-plugin-react` package exports a hook that assets can leverage to publish beacons.
 
 The `useBeacon` hook takes base options that apply broadly, and returns a function with those options as the base. You can then pass event specific information when calling `beacon`.
 
 **Example**
 
 ```jsx
-import { useBeacon } from '@player-ui/beacon-plugin-react';
+import { useBeacon } from "@player-ui/beacon-plugin-react";
 
 // inside of your asset
 export const Component = (props) => {
-  const beacon = useBeacon({ action: 'clicked', asset: props });
+  const beacon = useBeacon({ action: "clicked", asset: props });
 
   return (
     <button
       onClick={() =>
         beacon({
-          element: 'button',
+          element: "button",
           data: {
-            custom: 'fields',
+            custom: "fields",
           },
         })
       }
@@ -269,8 +270,8 @@ export const Component = (props) => {
 };
 ```
 
-  </react>
-  <ios>
+  </Fragment>
+  <Fragment slot='ios'>
 
 The SwiftUIBeaconPlugin attaches a BeaconContext to the root of the SwiftUI view tree as an environment value, so when included any asset can use that context to send a beacon, if the context is in the environment:
 
@@ -284,11 +285,11 @@ struct ActionAssetView: View {
 }
 ```
 
-  </ios>
+  </Fragment>
 
-  <android>
+  <Fragment slot='android'>
 
-  Using the base `RenderableAsset`'s helper function in this example fires off a basic beacon with no adjustment to format as well as empty data upon button click
+Using the base `RenderableAsset`'s helper function in this example fires off a basic beacon with no adjustment to format as well as empty data upon button click
 
 **Example**
 
@@ -320,5 +321,5 @@ class MyAsset(assetContext: AssetContext) :
 }
 ```
 
-  </android>
+  </Fragment>
 </PlatformTabs>

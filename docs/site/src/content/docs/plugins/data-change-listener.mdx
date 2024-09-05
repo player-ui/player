@@ -3,6 +3,8 @@ title: Data Change Listener
 platform: react,core
 ---
 
+import PlatformTabs from "../../../components/PlatformTabs.astro";
+
 # Data Change Listener Plugin
 
 This plugin enables users to subscribe to data-change events within a view, and run expressions when the target value changes. Expressions are added to a listeners property of the view, with events prefixed by `dataChange` and the target binding:
@@ -21,20 +23,20 @@ This plugin enables users to subscribe to data-change events within a view, and 
 ## Installation
 
 <PlatformTabs>
-  <core>
+  <Fragment slot='core'>
 
 Add it to Player:
 
 ```js
-import { Player } from '@player-ui/player';
-import { DataChangePlugin } from '@player-ui/data-change-plugin';
+import { Player } from "@player-ui/player";
+import { DataChangePlugin } from "@player-ui/data-change-plugin";
 
 const player = new Player({
-  plugins: [new DataChangePlugin()]
+  plugins: [new DataChangePlugin()],
 });
 ```
 
-  </core>
+  </Fragment>
 </PlatformTabs>
 
 ## Usage
