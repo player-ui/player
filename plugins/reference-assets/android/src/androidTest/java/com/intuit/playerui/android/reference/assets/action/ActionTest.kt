@@ -16,7 +16,7 @@ import com.intuit.playerui.core.player.state.dataModel
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class ActionTest : AssetTest("reference-assets") {
+class ActionTest : AssetTest("action") {
 
     @Test
     fun actionExpression() {
@@ -59,6 +59,7 @@ class ActionTest : AssetTest("reference-assets") {
         }
     }
 
+    // TODO: Fix invalid expression not throwing error in core
     @Test
     fun transitionToEndError() {
         launchMock("action-transition-to-end")

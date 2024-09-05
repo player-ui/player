@@ -1,7 +1,6 @@
 package com.intuit.playerui.android.reference.assets.test
 
 import android.content.Context
-import android.os.Build.VERSION_CODES.P
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.children
@@ -45,7 +44,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
-@Config(sdk = [P])
+@Config(sdk = [28])
 @OptIn(ExperimentalCoroutinesApi::class)
 abstract class AssetTest(val group: String? = null) {
 

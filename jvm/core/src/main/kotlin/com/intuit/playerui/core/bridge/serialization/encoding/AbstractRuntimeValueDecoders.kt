@@ -135,6 +135,9 @@ public sealed class AbstractRuntimeValueCompositeDecoder<T, K> : RuntimeValueCom
         is T -> value
         else -> error("value ($value) cannot be decoded as ${T::class.simpleName}")
     }
+
+    protected inline fun error(message: String?, cause: Throwable? = null): Nothing =
+        throw RuntimeDecodingException(message, cause)
 }
 
 /** Map-like [value] composite decoder which handles decoding keys & values */

@@ -1,7 +1,7 @@
-import { SyncHook } from 'tapable-ts';
-import type { BindingLike, BindingFactory } from '../binding';
-import { BindingInstance, isBinding } from '../binding';
-import { NOOP_MODEL } from './noop-model';
+import { SyncHook } from "tapable-ts";
+import type { BindingLike, BindingFactory } from "../binding";
+import { BindingInstance, isBinding } from "../binding";
+import { NOOP_MODEL } from "./noop-model";
 
 export const ROOT_BINDING = new BindingInstance([]);
 export type BatchSetTransaction = [BindingInstance, any][];
@@ -72,19 +72,19 @@ export interface DataModelMiddleware {
   set(
     transaction: BatchSetTransaction,
     options?: DataModelOptions,
-    next?: DataModelImpl
+    next?: DataModelImpl,
   ): Updates;
 
   get(
     binding: BindingInstance,
     options?: DataModelOptions,
-    next?: DataModelImpl
+    next?: DataModelImpl,
   ): any;
 
   delete?(
     binding: BindingInstance,
     options?: DataModelOptions,
-    next?: DataModelImpl
+    next?: DataModelImpl,
   ): void;
 
   reset?(): void;
@@ -93,12 +93,12 @@ export interface DataModelMiddleware {
 /** Wrap the inputs of the DataModel with calls to parse raw binding inputs */
 export function withParser<Options = unknown>(
   model: DataModelImpl<Options>,
-  parseBinding: BindingFactory
+  parseBinding: BindingFactory,
 ): DataModelWithParser<Options> {
   /** Parse something into a binding if it requires it */
   function maybeParse(
     binding: BindingLike,
-    readOnly: boolean
+    readOnly: boolean,
   ): BindingInstance {
     const parsed = isBinding(binding)
       ? binding
@@ -109,7 +109,7 @@ export function withParser<Options = unknown>(
         });
 
     if (!parsed) {
-      throw new Error('Unable to parse binding');
+      throw new Error("Unable to parse binding");
     }
 
     return parsed;
@@ -122,7 +122,7 @@ export function withParser<Options = unknown>(
     set(transaction, options?: Options) {
       return model.set(
         transaction.map(([key, val]) => [maybeParse(key, false), val]),
-        options
+        options,
       );
     },
     delete(binding, options?: Options) {
@@ -135,7 +135,7 @@ export function withParser<Options = unknown>(
 export function toModel(
   middleware: DataModelMiddleware,
   defaultOptions?: DataModelOptions,
-  next?: DataModelImpl
+  next?: DataModelImpl,
 ): DataModelImpl {
   if (!next) {
     return middleware as DataModelImpl;
@@ -178,7 +178,7 @@ export type DataPipeline = Array<DataModelMiddleware | DataModelImpl>;
  * Given a set of steps in a pipeline, create the effective data-model
  */
 export function constructModelForPipeline(
-  pipeline: DataPipeline
+  pipeline: DataPipeline,
 ): DataModelImpl {
   if (pipeline.length === 0) {
     return NOOP_MODEL;
@@ -193,7 +193,7 @@ export function constructModelForPipeline(
     const model: DataModelImpl =
       pipeline.reduce<DataModelImpl | undefined>(
         (nextModel, middleware) => toModel(middleware, options, nextModel),
-        undefined
+        undefined,
       ) ?? NOOP_MODEL;
 
     return model;
@@ -238,7 +238,7 @@ export class PipelinedDataModel implements DataModelImpl {
 
   public reset(model = {}) {
     this.pipeline.forEach((middleware) => {
-      if ('reset' in middleware) {
+      if ("reset" in middleware) {
         middleware.reset?.();
       }
     });
@@ -248,11 +248,11 @@ export class PipelinedDataModel implements DataModelImpl {
 
   public set(
     transaction: BatchSetTransaction,
-    options?: DataModelOptions
+    options?: DataModelOptions,
   ): Updates {
     const appliedTransaction = this.effectiveDataModel.set(
       transaction,
-      options
+      options,
     );
     this.hooks.onSet.call(transaction);
     return appliedTransaction;

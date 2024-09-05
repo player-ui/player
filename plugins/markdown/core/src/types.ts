@@ -1,4 +1,4 @@
-import type { Asset } from '@player-ui/types';
+import type { Asset } from "@player-ui/types";
 
 export interface BaseArgs {
   /**
@@ -14,7 +14,7 @@ export type LiteralMapper<T extends object = object> = (
      */
     value: string;
   } & BaseArgs &
-    T
+    T,
 ) => Asset;
 
 export type CompositeMapper<T extends object = object> = (
@@ -24,7 +24,7 @@ export type CompositeMapper<T extends object = object> = (
      */
     value: Asset[];
   } & BaseArgs &
-    T
+    T,
 ) => Asset;
 
 export type FallbackMapper = (
@@ -33,7 +33,7 @@ export type FallbackMapper = (
      * markdown element value
      */
     value: string | Asset[];
-  } & BaseArgs
+  } & BaseArgs,
 ) => Asset;
 
 export interface Mappers {

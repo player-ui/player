@@ -1,5 +1,5 @@
-load("//jvm:build.bzl", "kt_player_module")
-load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+load("//jvm:defs.bzl", "kt_player_module")
 
 kt_player_module(
     name = "perf_tests",
@@ -21,15 +21,16 @@ kt_jvm_library(
     plugins = [":jmh_annotation_processor"],
     resources = glob(["src/main/resources/*.json"]),
     deps = [
-        "//jvm:kotlin_serialization",
         "//jvm/core",
         "//jvm/graaljs",
+        "//jvm/hermes:hermes-host",
         "//jvm/j2v8:j2v8-all",
-        "@com_github_jetbrains_kotlin//:kotlin-reflect",
+        "//tools/mocks:jar",
         "@maven//:org_openjdk_jmh_jmh_core",
     ],
 )
 
+# TODO: Potentially transition to ensure //:cmake_build_type is MinSizeRel
 java_binary(
     name = "perf",
     main_class = "org.openjdk.jmh.Main",

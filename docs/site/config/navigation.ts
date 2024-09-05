@@ -1,10 +1,10 @@
-import pluginNavData from './plugin-nav-data.json';
+import pluginNavData from "./plugin-nav-data.json";
 
 export const enum Platform {
-  core = 'core',
-  react = 'react',
-  ios = 'ios',
-  android = 'android',
+  core = "core",
+  react = "react",
+  ios = "ios",
+  android = "android",
 }
 
 export interface Route {
@@ -23,30 +23,30 @@ interface Navigation {
 const navigation: Navigation = {
   routes: [
     {
-      title: 'Player',
+      title: "Player",
       routes: [
         {
-          title: 'About',
-          path: '/about',
+          title: "About",
+          path: "/about",
         },
         {
-          title: 'Team',
-          path: '/team',
+          title: "Team",
+          path: "/team",
         },
         {
-          title: 'FAQs',
-          path: '/faqs',
+          title: "FAQs",
+          path: "/faqs",
         },
         {
-          title: 'Guides',
+          title: "Guides",
           routes: [
             {
-              title: 'Getting Started',
-              path: '/getting-started',
+              title: "Getting Started",
+              path: "/getting-started",
             },
             {
-              title: 'Writing Plugins',
-              path: '/writing-plugins',
+              title: "Writing Plugins",
+              path: "/writing-plugins",
             },
             {
               title: 'Plugin Implementation',
@@ -57,17 +57,17 @@ const navigation: Navigation = {
               path: '/guides/multi-flow-experiences',
             },
             {
-              title: 'Designing Semantic Assets',
-              path: '/guides/designing-semantic-assets',
+              title: "Designing Semantic Assets",
+              path: "/guides/designing-semantic-assets",
             },
           ],
         },
         {
-          title: 'Content',
+          title: "Content",
           routes: [
             {
-              title: 'Overview',
-              path: '/content',
+              title: "Overview",
+              path: "/content",
             },
             {
               title: 'Navigation',
@@ -78,8 +78,8 @@ const navigation: Navigation = {
               path: '/content/assets-views',
             },
             {
-              title: 'Data & Expressions',
-              path: '/content/data-expressions',
+              title: "Data & Expressions",
+              path: "/content/data-expressions",
             },
             {
               title: 'Schema',
@@ -102,26 +102,30 @@ const navigation: Navigation = {
               title: 'Schema',
               path: '/dsl/schema',
             },
+            {
+              title: 'Plugins',
+              path: '/dsl/plugins',
+            },
           ],
         },
         {
-          title: 'Assets',
+          title: "Assets",
           routes: [
             {
-              title: 'Overview',
-              path: '/assets',
+              title: "Overview",
+              path: "/assets",
             },
             {
-              title: 'Transforms',
-              path: '/assets/transforms',
+              title: "Transforms",
+              path: "/assets/transforms",
             },
             {
-              title: 'Reference Assets',
-              path: '/assets/reference',
+              title: "Reference Assets",
+              path: "/assets/reference",
             },
             {
-              title: 'Custom Assets',
-              path: '/assets/custom',
+              title: "Custom Assets",
+              path: "/assets/custom",
             },
             {
               title: 'DSL Components',
@@ -130,39 +134,39 @@ const navigation: Navigation = {
           ],
         },
         {
-          title: 'Tools',
+          title: "Tools",
           routes: [
             {
-              title: 'Storybook',
-              path: '/tools/storybook',
+              title: "Storybook",
+              path: "/tools/storybook",
             },
             {
-              title: 'CLI',
-              path: '/tools/cli',
+              title: "CLI",
+              path: "/tools/cli",
             },
           ],
         },
         {
-          title: 'XLR',
+          title: "XLR",
           routes: [
             {
-              title: 'Intro',
-              path: '/xlr/intro',
+              title: "Intro",
+              path: "/xlr/intro",
             },
             {
-              title: 'Concepts',
-              path: '/xlr/concepts',
+              title: "Concepts",
+              path: "/xlr/concepts",
             },
             {
-              title: 'Usage',
-              path: '/xlr/usage',
+              title: "Usage",
+              path: "/xlr/usage",
             },
           ],
         },
       ],
     },
     {
-      title: 'Plugins',
+      title: "Plugins",
       routes: pluginNavData.routes,
     },
   ],

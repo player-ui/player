@@ -1,18 +1,13 @@
-import { SyncHook } from 'tapable-ts';
-import type { View as ViewType } from '@player-ui/types';
-import type { BindingInstance, BindingFactory } from '../binding';
-import type { ValidationProvider, ValidationObject } from '../validator';
-import type { Logger } from '../logger';
-import type { Resolve } from './resolver';
-import { Resolver, toNodeResolveOptions } from './resolver';
-import type { Node } from './parser';
-import { Parser } from './parser';
-import {
-  TemplatePlugin,
-  StringResolverPlugin,
-  ApplicabilityPlugin,
-  SwitchPlugin,
-} from './plugins';
+import { SyncHook } from "tapable-ts";
+import type { View as ViewType } from "@player-ui/types";
+import type { BindingInstance, BindingFactory } from "../binding";
+import type { ValidationProvider, ValidationObject } from "../validator";
+import type { Logger } from "../logger";
+import type { Resolve } from "./resolver";
+import { Resolver } from "./resolver";
+import type { Node } from "./parser";
+import { Parser } from "./parser";
+import { TemplatePlugin } from "./plugins";
 
 /**
  * Manages the view level validations
@@ -36,7 +31,7 @@ class CrossfieldProvider implements ValidationProvider {
 
     if (!Array.isArray(xfieldRefs)) {
       this.logger?.warn(
-        `Unable to register view validations for id: ${contentView.id}. 'validation' property must be an Array.`
+        `Unable to register view validations for id: ${contentView.id}. 'validation' property must be an Array.`,
       );
 
       return;
@@ -49,8 +44,8 @@ class CrossfieldProvider implements ValidationProvider {
       // x-field validations by default are triggered by navigating away from the page
       // the reference can also override that _or_ the severity
       const withDefaults: ValidationObject = {
-        trigger: 'navigation',
-        severity: 'error',
+        trigger: "navigation",
+        severity: "error",
         ...vRef,
       };
 
@@ -83,6 +78,7 @@ export class ViewInstance implements ValidationProvider {
     onUpdate: new SyncHook<[ViewType]>(),
     parser: new SyncHook<[Parser]>(),
     resolver: new SyncHook<[Resolver]>(),
+    onTemplatePluginCreated: new SyncHook<[TemplatePlugin]>(),
     templatePlugin: new SyncHook<[TemplatePlugin]>(),
   };
 
@@ -93,7 +89,7 @@ export class ViewInstance implements ValidationProvider {
 
   private validationProvider?: CrossfieldProvider;
 
-  private templatePlugin: TemplatePlugin;
+  private templatePlugin: TemplatePlugin | undefined;
 
   // TODO might want to add a version/timestamp to this to compare updates
   public lastUpdate: Record<string, any> | undefined;
@@ -101,12 +97,9 @@ export class ViewInstance implements ValidationProvider {
   constructor(initialView: ViewType, resolverOptions: Resolve.ResolverOptions) {
     this.initialView = initialView;
     this.resolverOptions = resolverOptions;
-    const pluginOptions = toNodeResolveOptions(resolverOptions);
-    new SwitchPlugin(pluginOptions).apply(this);
-    new ApplicabilityPlugin().apply(this);
-    new StringResolverPlugin().apply(this);
-    this.templatePlugin = new TemplatePlugin(pluginOptions);
-    this.templatePlugin.apply(this);
+    this.hooks.onTemplatePluginCreated.tap("view", (templatePlugin) => {
+      this.templatePlugin = templatePlugin;
+    });
   }
 
   public updateAsync() {
@@ -121,10 +114,16 @@ export class ViewInstance implements ValidationProvider {
       this.validationProvider = new CrossfieldProvider(
         this.initialView,
         this.resolverOptions.parseBinding,
-        this.resolverOptions.logger
+        this.resolverOptions.logger,
       );
 
-      this.hooks.templatePlugin.call(this.templatePlugin);
+      if (this.templatePlugin) {
+        this.hooks.templatePlugin.call(this.templatePlugin);
+      } else {
+        this.resolverOptions.logger?.warn(
+          "templatePlugin not set for View, legacy templates may not work",
+        );
+      }
 
       const parser = new Parser();
       this.hooks.parser.call(parser);
@@ -152,4 +151,10 @@ export class ViewInstance implements ValidationProvider {
   getValidationsForBinding(binding: BindingInstance) {
     return this.validationProvider?.getValidationsForBinding(binding);
   }
+}
+
+/** A plugin for a view */
+export interface ViewPlugin {
+  /** Called with a view instance */
+  apply(view: ViewInstance): void;
 }

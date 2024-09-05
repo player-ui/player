@@ -1,5 +1,5 @@
-import type { Node, AnyAssetType } from '../parser';
-import { NodeType } from '../parser';
+import type { Node, AnyAssetType } from "../parser";
+import { NodeType } from "../parser";
 
 /**
  * Functions for building AST nodes (relatively) easily
@@ -62,7 +62,7 @@ export class Builder {
   static addChild<N extends Node.BaseWithChildren<NT>, NT extends NodeType>(
     node: N,
     path: Node.PathSegment | Node.PathSegment[],
-    child: Node.Node
+    child: Node.Node,
   ) {
     // eslint-disable-next-line no-param-reassign
     child.parent = node as Node.Node;

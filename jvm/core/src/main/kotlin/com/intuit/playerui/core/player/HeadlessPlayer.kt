@@ -11,6 +11,7 @@ import com.intuit.playerui.core.bridge.runtime.ScriptContext
 import com.intuit.playerui.core.bridge.runtime.add
 import com.intuit.playerui.core.bridge.runtime.runtimeFactory
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
+import com.intuit.playerui.core.constants.ConstantsController
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.logger.TapableLogger
 import com.intuit.playerui.core.player.HeadlessPlayer.Companion.bundledSource
@@ -77,6 +78,8 @@ public constructor(
 
     override val hooks: Hooks by NodeSerializableField(Hooks.serializer(), NodeSerializableField.CacheStrategy.Full)
 
+    override val constantsController: ConstantsController by NodeSerializableField(ConstantsController.serializer(), NodeSerializableField.CacheStrategy.Full)
+
     override val state: PlayerFlowState get() = if (player.isReleased()) {
         ReleasedState
     } else {
@@ -86,12 +89,14 @@ public constructor(
     public val runtime: Runtime<*> = explicitRuntime ?: runtimeFactory.create {
         debuggable = config.debuggable
         coroutineExceptionHandler = config.coroutineExceptionHandler ?: CoroutineExceptionHandler { _, throwable ->
-            inProgressState?.fail(throwable) ?: logger.error(
-                "Exception caught in Player scope: ${throwable.message}",
-                throwable.stackTrace.joinToString("\n") {
-                    "\tat $it"
-                }.replaceFirst("\tat ", "\n"),
-            )
+            if (state !is ReleasedState) {
+                inProgressState?.fail(throwable) ?: logger.error(
+                    "Exception caught in Player scope: ${throwable.message}",
+                    throwable.stackTrace.joinToString("\n") {
+                        "\tat $it"
+                    }.replaceFirst("\tat ", "\n"),
+                )
+            }
         }
     }
 
@@ -99,7 +104,7 @@ public constructor(
 
     init {
         /** 1. load source into the [runtime] and release lock */
-        runtime.load(ScriptContext(if (runtime.config.debuggable) debugSource.readText() else source.readText(), bundledSourcePath))
+        runtime.load(ScriptContext(if (runtime.config.debuggable) debugSource.readText() else source.readText(), bundledSourcePath, sourceMap.readText()))
 
         /** 2. merge explicit [LoggerPlugin]s with ones created by service loader */
         val loggerPlugins = plugins.filterIsInstance<LoggerPlugin>().let { explicitLoggers ->
@@ -123,6 +128,7 @@ public constructor(
         runtime.add("player", player)
 
         // we only have access to the logger after we have the player instance
+        logger.info("Player created using $runtime")
         if (runtime.config.debuggable) {
             runtime.checkBlockingThread = {
                 if (name == "main") {
@@ -169,8 +175,9 @@ public constructor(
 
     internal companion object {
 
-        private const val bundledSourcePath = "core/player/dist/player.prod.js"
-        private const val debugSourcePath = "core/player/dist/player.dev.js"
+        private const val bundledSourcePath = "core/player/dist/Player.native.js"
+
+        private const val debugSourcePath = "core/player/dist/Player.native.js"
 
         /** Gets [URL] of the bundled source */
         private val bundledSource get() = this::class.java
@@ -178,5 +185,8 @@ public constructor(
 
         private val debugSource get() = this::class.java
             .classLoader.getResource(debugSourcePath)!!
+
+        private val sourceMap get() = this::class.java
+            .classLoader.getResource("$bundledSourcePath.map")
     }
 }

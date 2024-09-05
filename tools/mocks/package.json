@@ -1,0 +1,19 @@
+{
+  "name": "@player-ui/mocks",
+  "version": "0.0.0-PLACEHOLDER",
+  "main": "",
+  "module": "",
+  "dependencies": {
+  },
+  "files": [
+    "action",
+    "choice",
+    "collection",
+    "collection",
+    "flow-manager",
+    "image",
+    "info",
+    "input",
+    "text"
+  ]
+}

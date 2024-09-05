@@ -1,5 +1,5 @@
-load("@io_bazel_rules_kotlin//kotlin:android.bzl", "kt_android_library")
-load("@rules_player//kotlin:lint.bzl", "lint")
+load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
+load("@rules_player//kotlin:defs.bzl", "lint")
 load(":deps.bzl", "main_deps")
 
 kt_android_library(

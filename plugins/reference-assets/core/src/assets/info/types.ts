@@ -1,7 +1,7 @@
-import type { AssetWrapper, Asset } from '@player-ui/player';
-import type { ActionAsset } from '../action/types';
+import type { AssetWrapper, Asset } from "@player-ui/player";
+import type { ActionAsset } from "../action/types";
 
-export interface InfoAsset extends Asset<'info'> {
+export interface InfoAsset extends Asset<"info"> {
   /** The string value to show */
   title?: AssetWrapper;
 

@@ -48,9 +48,9 @@ Configure the Android Player dependencies in your `build.gradle(.kts)` files.
 ```kotlin
 dependencies {
     // Android Player
-    implementation("com.intuit.player.android:player:$playerVersion")
+    implementation("com.intuit.playerui:player:$playerVersion")
     // Optional - reference assets
-    implementation("com.intuit.player.android:assets:$playerVersion")
+    implementation("com.intuit.playerui.plugins:reference-assets:$playerVersion")
 }
 ```
 
@@ -221,6 +221,38 @@ class SimplePlayerFragment(override val flow: String) : PlayerFragment() {
     }
 }
 ```
+
+#### JS Runtime
+
+As the core Player is written in TypeScript, we need a JVM compatible JavaScript runtime to power a JVM based Player. There are several options to choose from, however, deciding on a specific runtime implementation is difficult to do at the library layer. Different use cases may demand different trade-offs regarding supporting multiple platforms, size, and speed. Thus, the base JVM Player implementation was done with a custom runtime abstraction, powered by [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization), to enable consumers to choose the runtime based on their needs.
+
+To support a specific runtime implementation, there needs to be code connecting the runtime constructs to the Player runtime abstraction. The Player project has implemented this layer for several runtimes, described below. It is possible to define your own, but the abstraction definition is not yet final, and therefore not appropriately documented. You can take inspiration from the existing implementations, or file an issue for a runtime you wish to see supported by our team.
+
+| Runtimes | Platforms |
+| -------- | --------- |
+| [J2V8](https://github.com/eclipsesource/J2V8) | `android`, `linux`, `macos` |
+| [Hermes](https://github.com/facebook/hermes) | `android` |
+| [GraalJS](https://github.com/oracle/graaljs) | `linux`, `macos`, `win` |
+
+<Alert status="info" description="Each of the artifacts for the above are defined as `com.intuit.playerui:$runtime-$platform`, i.e. `com.intuit.playerui:j2v8-android`" />
+
+The `HeadlessPlayer` does not define a hard dependency on any specific runtime, however, the `AndroidPlayer` does transitively depends on the `j2v8` runtime, as the first class approach. To override, the transitive dependency would need to be explicitly excluded and the actual runtime dependency would need to be added:
+
+```kotlin
+dependencies {
+    // Android Player dependency
+    implementation("com.intuit.playerui", "android", PLAYER_VERSION) {
+        // J2V8 included for release versions
+        exclude(group = "com.intuit.playerui", module = "j2v8-android")
+        // Debuggable J2V8 included for canary versions
+        exclude(group = "com.intuit.playerui", module = "j2v8-android-debug")
+    }
+    // Override with Hermes runtime for example
+    implementation("com.intuit.playerui", "hermes-android", PLAYER_VERSION)
+}
+```
+
+<Alert status="warning" description="If your application includes dependencies that may transitively depend on `com.intuit.playerui:android`, you would likely need to ensure the default runtime is transitively exlucded from those as well, either manually or as a global strategy." />
   </android>
 </PlatformTabs>
 

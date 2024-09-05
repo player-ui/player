@@ -11,10 +11,10 @@ import com.intuit.playerui.android.reference.demo.test.base.waitForViewInRoot
 import com.intuit.playerui.core.player.state.InProgressState
 import org.junit.Test
 
-class InfoUITest : AssetUITest("reference-assets") {
+class InfoUITest : AssetUITest("info") {
 
     enum class Action {
-        Next, Dismiss
+        Next, Dismiss, CONTINUE
     }
 
     fun verifyView(view: Int) {
@@ -36,9 +36,9 @@ class InfoUITest : AssetUITest("reference-assets") {
     fun basic() {
         launchMock("info-modal-flow")
 
-        verifyAndProceed(1, Action.Next)
+        verifyAndProceed(1, Action.CONTINUE)
         verifyAndProceed(2, Action.Dismiss)
-        verifyAndProceed(1, Action.Next)
+        verifyAndProceed(1, Action.CONTINUE)
         verifyAndProceed(2, Action.Next)
         verifyAndProceed(3, Action.Next)
         verifyView(1)

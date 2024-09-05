@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.View
-import android.view.View.OnAttachStateChangeListener
 import android.view.ViewGroup
 import androidx.core.view.children
 import com.intuit.hooks.HookContext
@@ -134,12 +133,10 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
         attrs: AttributeSet? = null,
         defStyle: Int = 0,
         private val onView: suspend View.() -> Unit = {},
-    ) : View(context, attrs, defStyle), OnAttachStateChangeListener {
-
+    ) : View(context, attrs, defStyle), View.OnAttachStateChangeListener {
         private val hydratedView: Deferred<View> = scope.async {
             view.await().also { onView(it) }
         }
-
         init {
             addOnAttachStateChangeListener(this)
         }
@@ -154,9 +151,9 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
                     }
                 }
             }
-
             hydratedView.await().also { parent ->
                 (parent as? ViewGroup)?.awaitAsyncChildren()
+                replaceSelfWithView(parent)
             }
         } catch (e: CancellationException) {
             // if it was the calling scope that is cancelled, this will re-raise
@@ -170,15 +167,12 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
                 awaitView()?.let(handler)
             }
         }
-
         override fun onViewAttachedToWindow(v: View) {
             scope.launch(Dispatchers.Main) {
-                awaitView()?.let(::replaceSelfWithView)
+                awaitView()
             }
         }
-
         override fun onViewDetachedFromWindow(v: View) {}
-
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
             setMeasuredDimension(0, 0)
         }
@@ -187,9 +181,9 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
         override fun onAttachedToWindow() {}
 
         @SuppressLint("MissingSuperCall")
-        override fun draw(canvas: Canvas?) {}
+        override fun draw(canvas: Canvas) {}
 
-        override fun dispatchDraw(canvas: Canvas?) {}
+        override fun dispatchDraw(canvas: Canvas) {}
 
         private fun replaceSelfWithView(view: View) {
             val parent = parent as? ViewGroup ?: return

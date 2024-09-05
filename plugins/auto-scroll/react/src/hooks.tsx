@@ -1,12 +1,12 @@
-import type { PropsWithChildren } from 'react';
-import React, { useEffect, useState } from 'react';
-import scrollIntoViewWithOffset from './scrollIntoViewWithOffset';
-import type { ScrollType } from './index';
+import type { PropsWithChildren } from "react";
+import React, { useEffect, useState } from "react";
+import scrollIntoViewWithOffset from "./scrollIntoViewWithOffset";
+import type { ScrollType } from "./index";
 
 export interface AutoScrollProviderProps {
   /** Return the element to scroll to based on the registered types */
   getElementToScrollTo: (
-    scrollableElements: Map<ScrollType, Set<string>>
+    scrollableElements: Map<ScrollType, Set<string>>,
   ) => string;
   /** Optional function to get container element, which is used for calculating offset (default: document.body) */
   getBaseElement: () => HTMLElement | undefined | null;

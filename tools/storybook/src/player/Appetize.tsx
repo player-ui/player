@@ -1,6 +1,6 @@
-import React from 'react';
-import type { Flow } from '@player-ui/player';
-import { compressToEncodedURIComponent } from 'lz-string';
+import React from "react";
+import type { Flow } from "@player-ui/react";
+import { compressToEncodedURIComponent } from "lz-string";
 
 export interface AppetizeVersions {
   /** The iOS version to load */
@@ -11,7 +11,7 @@ export interface AppetizeVersions {
 
 export interface AppetizeProps {
   /** the platform to load */
-  platform: 'ios' | 'android';
+  platform: "ios" | "android";
 
   /** the token for the build */
   token: string;
@@ -38,7 +38,7 @@ export const AppetizePhones = [
   // 'iphone8',
   // 'iphone8plus',
   // 'iphonex',
-  'iphonexs',
+  "iphonexs",
   // 'iphonexsmax',
   // 'iphone11pro',
   // 'iphone11promax',
@@ -46,7 +46,7 @@ export const AppetizePhones = [
   // 'ipadair2'
 ] as const;
 
-export type AppetizePhone = typeof AppetizePhones[number];
+export type AppetizePhone = (typeof AppetizePhones)[number];
 
 const DEVICE_HEIGHT: Record<AppetizePhone, number> = {
   iphonexs: 845,
@@ -58,7 +58,7 @@ interface AppetizeParams {
   /** the device type */
   device: AppetizePhone;
   /** color */
-  deviceColor: 'black' | 'white';
+  deviceColor: "black" | "white";
 
   /** render scale */
   scale: number;
@@ -74,24 +74,24 @@ interface AppetizeParams {
 export const toAppetizeUrl = (
   baseUrl: string,
   key: string,
-  params: AppetizeParams
+  params: AppetizeParams,
 ) =>
   `https://${baseUrl}/embed/${key}?${Object.entries(params)
     .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
-    .join('&')}`;
+    .join("&")}`;
 
 /** A component to render something using appetize */
 export const Appetize = (props: AppetizeProps) => {
-  const device: AppetizePhone = 'iphonexs';
+  const device: AppetizePhone = "iphonexs";
   const height = DEVICE_HEIGHT[device];
 
   const defaultVersions: AppetizeVersions = {
-    ios: '13.7',
-    android: '8.1',
+    ios: "13.7",
+    android: "8.1",
   };
 
   const {
-    baseUrl = 'appetize.io',
+    baseUrl = "appetize.io",
     token,
     flow,
     osVersions = defaultVersions,
@@ -103,17 +103,17 @@ export const Appetize = (props: AppetizeProps) => {
   return (
     <iframe
       title="native app"
-      style={{ height: `${height}px`, border: 'none', width: '100%' }}
+      style={{ height: `${height}px`, border: "none", width: "100%" }}
       src={toAppetizeUrl(baseUrl, token, {
         autoplay: true,
-        device: 'iphonexs',
-        deviceColor: 'black',
+        device: "iphonexs",
+        deviceColor: "black",
         scale: 100,
         osVersion,
         params: encodeURIComponent(
           JSON.stringify({
             json: compressToEncodedURIComponent(JSON.stringify(flow)),
-          })
+          }),
         ),
       })}
     />

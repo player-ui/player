@@ -2,7 +2,7 @@ import type {
   Player,
   PlayerPlugin,
   ExpressionHandler,
-} from '@player-ui/player';
+} from "@player-ui/player";
 
 export type ExpressionMap = Map<string, ExpressionHandler<any[], any>>;
 
@@ -13,7 +13,7 @@ export type ExpressionMap = Map<string, ExpressionHandler<any[], any>>;
  * Any subsequent expressions registered with the same name will override previous handlers.
  */
 export class ExpressionPlugin implements PlayerPlugin {
-  name = 'ExpressionPlugin';
+  name = "ExpressionPlugin";
   private expressions: ExpressionMap;
 
   constructor(expressionMap: ExpressionMap) {

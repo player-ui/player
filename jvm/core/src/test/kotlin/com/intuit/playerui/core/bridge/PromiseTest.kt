@@ -1,5 +1,6 @@
 package com.intuit.playerui.core.bridge
 
+import com.intuit.playerui.core.bridge.runtime.add
 import com.intuit.playerui.core.bridge.runtime.serialize
 import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.player.PlayerFlowStatus
@@ -8,8 +9,10 @@ import com.intuit.playerui.core.player.state.PlayerFlowState
 import com.intuit.playerui.utils.normalizeStackTraceElements
 import com.intuit.playerui.utils.test.PromiseUtils
 import com.intuit.playerui.utils.test.RuntimeTest
+import com.intuit.playerui.utils.test.runBlockingTest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -218,5 +221,28 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
         caught as Throwable
         assertEquals(exception.message, caught.message)
         assertEquals(exception.stackTrace.normalizeStackTraceElements(), caught.stackTrace.normalizeStackTraceElements())
+    }
+
+    @TestTemplate
+    fun testPromiseConstructor() = runBlockingTest {
+        runtime.execute(
+            """
+            class TestClass {
+                name = 'foo';
+                constructor(promise) {
+                    promise.then((value) => {
+                        this.name = value;
+                    });
+                };
+            }""",
+        )
+        val promise = runtime.Promise<String> { jsRes, _ ->
+            val result = "bar"
+            jsRes(result)
+        }
+        runtime.add("myPromise", promise)
+        val value = runtime.execute("new TestClass(myPromise)") as Node
+        promise.toCompletable(String.serializer()).await()
+        assertEquals("bar", value["name"])
     }
 }

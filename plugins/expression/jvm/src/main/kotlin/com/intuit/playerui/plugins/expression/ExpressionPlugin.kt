@@ -24,7 +24,7 @@ public class ExpressionPlugin(
     public constructor(vararg expressions: Pair<String, ExpressionHandler>) : this(expressions.toMap())
 
     override fun apply(runtime: Runtime<*>) {
-        runtime.load(ScriptContext(if (runtime.config.debuggable) debugScript else script, bundledSourcePath))
+        runtime.load(ScriptContext(script, bundledSourcePath))
         runtime.add(
             "expressionHandlers",
             map.entries.fold(runtime.execute("new Map()") as Node) { acc, entry ->
@@ -43,7 +43,7 @@ public class ExpressionPlugin(
     }
 
     private companion object {
-        private const val bundledSourcePath = "plugins/expression/core/dist/expression-plugin.prod.js"
+        private const val bundledSourcePath = "plugins/expression/core/dist/ExpressionPlugin.native.js"
         private const val pluginName = "ExpressionPlugin.ExpressionPlugin"
     }
 }

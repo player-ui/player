@@ -1,14 +1,14 @@
-import type { Logger, Severity } from './types';
-import { severities } from './types';
+import type { Logger, Severity } from "./types";
+import { severities } from "./types";
 
-export type ConsoleHandler = Pick<typeof console, 'log' | 'warn' | 'error'>;
+export type ConsoleHandler = Pick<typeof console, "log" | "warn" | "error">;
 
 /** A Logger implementation that uses console */
 export default class ConsoleLogger implements Logger {
   private severity: Severity;
   private _console: ConsoleHandler;
 
-  constructor(severity: Severity = 'warn', _console: ConsoleHandler = console) {
+  constructor(severity: Severity = "warn", _console: ConsoleHandler = console) {
     this.severity = severity;
     this._console = _console;
   }
@@ -41,9 +41,9 @@ export default class ConsoleLogger implements Logger {
     };
   }
 
-  public readonly trace = this.createHandler('trace');
-  public readonly debug = this.createHandler('debug');
-  public readonly info = this.createHandler('info');
-  public readonly warn = this.createHandler('warn');
-  public readonly error = this.createHandler('error');
+  public readonly trace = this.createHandler("trace");
+  public readonly debug = this.createHandler("debug");
+  public readonly info = this.createHandler("info");
+  public readonly warn = this.createHandler("warn");
+  public readonly error = this.createHandler("error");
 }

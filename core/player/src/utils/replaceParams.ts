@@ -9,7 +9,7 @@ const ANY_CHAR_REGEX = /%([a-zA-Z]+)/g;
  */
 export function replaceParams(
   message: string,
-  params: Record<string, any>
+  params: Record<string, any>,
 ): string {
   return message
     .slice()

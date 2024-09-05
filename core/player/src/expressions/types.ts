@@ -1,5 +1,5 @@
-import type { DataModelWithParser } from '../data';
-import type { Logger } from '../logger';
+import type { DataModelWithParser } from "../data";
+import type { Logger } from "../logger";
 
 export type ExpressionObjectType = {
   /** The expression to eval */
@@ -52,16 +52,16 @@ export interface ExpressionContext {
 
 export type ExpressionHandler<
   T extends readonly unknown[] = unknown[],
-  R = void
+  R = void,
 > = ((context: ExpressionContext, ...args: T) => R) &
   Partial<OperatorProcessingOptions>;
 
-export const ExpNodeOpaqueIdentifier = Symbol('Expression Node ID');
+export const ExpNodeOpaqueIdentifier = Symbol("Expression Node ID");
 
 /** Checks if the input is an already processed Expression node */
 export function isExpressionNode(x: any): x is ExpressionNode {
   return (
-    typeof x === 'object' &&
+    typeof x === "object" &&
     x !== null &&
     !Array.isArray(x) &&
     x.__id === ExpNodeOpaqueIdentifier
@@ -110,7 +110,7 @@ export interface DirectionalNode {
   right: ExpressionNode;
 }
 
-export interface LiteralNode extends BaseNode<'Literal'> {
+export interface LiteralNode extends BaseNode<"Literal"> {
   /** A node that holds a literal value */
   value: string | number;
 
@@ -119,20 +119,20 @@ export interface LiteralNode extends BaseNode<'Literal'> {
 }
 
 export interface BinaryNode
-  extends BaseNode<'BinaryExpression'>,
+  extends BaseNode<"BinaryExpression">,
     DirectionalNode {
   /** The operation to perform on the nodes */
   operator: string;
 }
 
 export interface LogicalNode
-  extends BaseNode<'LogicalExpression'>,
+  extends BaseNode<"LogicalExpression">,
     DirectionalNode {
   /** The logical operation to perform on the nodes */
   operator: string;
 }
 
-export interface UnaryNode extends BaseNode<'UnaryExpression'> {
+export interface UnaryNode extends BaseNode<"UnaryExpression"> {
   /** The operation to perform on the node */
   operator: string;
 
@@ -140,14 +140,14 @@ export interface UnaryNode extends BaseNode<'UnaryExpression'> {
   argument: ExpressionNode;
 }
 
-export type ThisNode = BaseNode<'ThisExpression'>;
+export type ThisNode = BaseNode<"ThisExpression">;
 
-export interface ModelRefNode extends BaseNode<'ModelRef'> {
+export interface ModelRefNode extends BaseNode<"ModelRef"> {
   /** The binding that the model reference points to */
   ref: string;
 }
 
-export interface ObjectNode extends BaseNode<'Object'> {
+export interface ObjectNode extends BaseNode<"Object"> {
   /**  */
   attributes: Array<{
     /** The property name of the object */
@@ -158,7 +158,7 @@ export interface ObjectNode extends BaseNode<'Object'> {
   }>;
 }
 
-export interface MemberExpressionNode extends BaseNode<'MemberExpression'> {
+export interface MemberExpressionNode extends BaseNode<"MemberExpression"> {
   /** The object to be introspected */
   object: ExpressionNode;
 
@@ -170,7 +170,7 @@ export interface MemberExpressionNode extends BaseNode<'MemberExpression'> {
 }
 
 export interface ConditionalExpressionNode
-  extends BaseNode<'ConditionalExpression'> {
+  extends BaseNode<"ConditionalExpression"> {
   /** The test for the ternary */
   test: ExpressionNode;
 
@@ -181,12 +181,12 @@ export interface ConditionalExpressionNode
   alternate: ExpressionNode;
 }
 
-export interface CompoundNode extends BaseNode<'Compound'> {
+export interface CompoundNode extends BaseNode<"Compound"> {
   /** The contents of the compound expression */
   body: ExpressionNode[];
 }
 
-export interface CallExpressionNode extends BaseNode<'CallExpression'> {
+export interface CallExpressionNode extends BaseNode<"CallExpression"> {
   /** The arguments to the function */
   args: ExpressionNode[];
 
@@ -194,20 +194,20 @@ export interface CallExpressionNode extends BaseNode<'CallExpression'> {
   callTarget: IdentifierNode;
 }
 
-export interface ArrayExpressionNode extends BaseNode<'ArrayExpression'> {
+export interface ArrayExpressionNode extends BaseNode<"ArrayExpression"> {
   /** The items in an array */
   elements: ExpressionNode[];
 }
 
-export interface IdentifierNode extends BaseNode<'Identifier'> {
+export interface IdentifierNode extends BaseNode<"Identifier"> {
   /** The variable name */
   name: string;
 }
 
-export type AssignmentNode = BaseNode<'Assignment'> & DirectionalNode;
+export type AssignmentNode = BaseNode<"Assignment"> & DirectionalNode;
 
 export interface ModificationNode
-  extends BaseNode<'Modification'>,
+  extends BaseNode<"Modification">,
     DirectionalNode {
   /** The operator for the modification */
   operator: string;
@@ -230,7 +230,7 @@ export type ExpressionNode =
   | ModificationNode
   | ObjectNode;
 
-export type ExpressionNodeType = ExpressionNode['type'];
+export type ExpressionNodeType = ExpressionNode["type"];
 
 export interface ErrorWithLocation extends Error {
   /** The place in the string where the error occurs */

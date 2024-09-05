@@ -1,198 +1,198 @@
-import type { PathNode } from '../../ast';
+import type { PathNode } from "../../ast";
 import {
   toValue,
   toQuery,
   toConcatenatedNode,
   toPath,
   toExpression,
-} from '../../ast';
+} from "../../ast";
 
 export const VALID_AST_PARSER_TESTS: Array<[string, PathNode]> = [
   // Basic ones
-  ['', toPath([])],
-  ['foo', toPath([toValue('foo')])],
-  ['foo.bar', toPath([toValue('foo'), toValue('bar')])],
-  ['1234567890_ABC_abc', toPath([toValue('1234567890_ABC_abc')])],
-  ['a-b-c-d-', toPath([toValue('a-b-c-d-')])],
+  ["", toPath([])],
+  ["foo", toPath([toValue("foo")])],
+  ["foo.bar", toPath([toValue("foo"), toValue("bar")])],
+  ["1234567890_ABC_abc", toPath([toValue("1234567890_ABC_abc")])],
+  ["a-b-c-d-", toPath([toValue("a-b-c-d-")])],
 
   // Queries
   [
-    'foo[x=something]',
-    toPath([toValue('foo'), toQuery(toValue('x'), toValue('something'))]),
+    "foo[x=something]",
+    toPath([toValue("foo"), toQuery(toValue("x"), toValue("something"))]),
   ],
   [
-    'foo[x == something]',
-    toPath([toValue('foo'), toQuery(toValue('x'), toValue('something'))]),
+    "foo[x == something]",
+    toPath([toValue("foo"), toQuery(toValue("x"), toValue("something"))]),
   ],
   [
-    'foo[x === something]',
-    toPath([toValue('foo'), toQuery(toValue('x'), toValue('something'))]),
+    "foo[x === something]",
+    toPath([toValue("foo"), toQuery(toValue("x"), toValue("something"))]),
   ],
   [
     `foo[x = 'something']`,
-    toPath([toValue('foo'), toQuery(toValue('x'), toValue('something'))]),
+    toPath([toValue("foo"), toQuery(toValue("x"), toValue("something"))]),
   ],
   [
     'foo[x == "something"]',
-    toPath([toValue('foo'), toQuery(toValue('x'), toValue('something'))]),
+    toPath([toValue("foo"), toQuery(toValue("x"), toValue("something"))]),
   ],
   [
     'foo["x"         =           "something"]',
-    toPath([toValue('foo'), toQuery(toValue('x'), toValue('something'))]),
+    toPath([toValue("foo"), toQuery(toValue("x"), toValue("something"))]),
   ],
   [
     `foo['x'='hello [!@#$%^&*().]']`,
     toPath([
-      toValue('foo'),
-      toQuery(toValue('x'), toValue('hello [!@#$%^&*().]')),
+      toValue("foo"),
+      toQuery(toValue("x"), toValue("hello [!@#$%^&*().]")),
     ]),
   ],
   [
     `foo['Month'='New[.]]Mo,nth.']`,
     toPath([
-      toValue('foo'),
-      toQuery(toValue('Month'), toValue('New[.]]Mo,nth.')),
+      toValue("foo"),
+      toQuery(toValue("Month"), toValue("New[.]]Mo,nth.")),
     ]),
   ],
 
   // Nested Paths
-  ['{{foo}}', toPath([toPath([toValue('foo')])])],
-  ['{{hello.world}}', toPath([toPath([toValue('hello'), toValue('world')])])],
+  ["{{foo}}", toPath([toPath([toValue("foo")])])],
+  ["{{hello.world}}", toPath([toPath([toValue("hello"), toValue("world")])])],
   [
-    'foo.bar.{{nested}}.baz',
+    "foo.bar.{{nested}}.baz",
     toPath([
-      toValue('foo'),
-      toValue('bar'),
-      toPath([toValue('nested')]),
-      toValue('baz'),
+      toValue("foo"),
+      toValue("bar"),
+      toPath([toValue("nested")]),
+      toValue("baz"),
     ]),
   ],
   [
-    'foo[{{bar}}].baz',
-    toPath([toValue('foo'), toPath([toValue('bar')]), toValue('baz')]),
+    "foo[{{bar}}].baz",
+    toPath([toValue("foo"), toPath([toValue("bar")]), toValue("baz")]),
   ],
 
   // Brackets
   [
-    'foo[a][b][c]',
-    toPath([toValue('foo'), toValue('a'), toValue('b'), toValue('c')]),
+    "foo[a][b][c]",
+    toPath([toValue("foo"), toValue("a"), toValue("b"), toValue("c")]),
   ],
   [
     `foo['a']["b"][c="bar"]`,
     toPath([
-      toValue('foo'),
-      toValue('a'),
-      toValue('b'),
-      toQuery(toValue('c'), toValue('bar')),
+      toValue("foo"),
+      toValue("a"),
+      toValue("b"),
+      toQuery(toValue("c"), toValue("bar")),
     ]),
   ],
   [
     'foo[a][b == " [x    ]" ][c]',
     toPath([
-      toValue('foo'),
-      toValue('a'),
-      toQuery(toValue('b'), toValue(' [x    ]')),
-      toValue('c'),
+      toValue("foo"),
+      toValue("a"),
+      toQuery(toValue("b"), toValue(" [x    ]")),
+      toValue("c"),
     ]),
   ],
 
   // Multi-Nodes
   [
-    '_hello_{{world}}',
+    "_hello_{{world}}",
     toPath([
-      toConcatenatedNode([toValue('_hello_'), toPath([toValue('world')])]),
+      toConcatenatedNode([toValue("_hello_"), toPath([toValue("world")])]),
     ]),
   ],
   [
-    '_hello_{{world}}_foo_',
+    "_hello_{{world}}_foo_",
     toPath([
       toConcatenatedNode([
-        toValue('_hello_'),
-        toPath([toValue('world')]),
-        toValue('_foo_'),
+        toValue("_hello_"),
+        toPath([toValue("world")]),
+        toValue("_foo_"),
       ]),
     ]),
   ],
   [
-    '{{hello}}{{world}}',
+    "{{hello}}{{world}}",
     toPath([
       toConcatenatedNode([
-        toPath([toValue('hello')]),
-        toPath([toValue('world')]),
+        toPath([toValue("hello")]),
+        toPath([toValue("world")]),
       ]),
     ]),
   ],
   [
-    '{{hello}}_foobar_{{world}}',
+    "{{hello}}_foobar_{{world}}",
     toPath([
       toConcatenatedNode([
-        toPath([toValue('hello')]),
-        toValue('_foobar_'),
-        toPath([toValue('world')]),
+        toPath([toValue("hello")]),
+        toValue("_foobar_"),
+        toPath([toValue("world")]),
       ]),
     ]),
   ],
   [
-    '{{hello}}_world_',
+    "{{hello}}_world_",
     toPath([
-      toConcatenatedNode([toPath([toValue('hello')]), toValue('_world_')]),
+      toConcatenatedNode([toPath([toValue("hello")]), toValue("_world_")]),
     ]),
   ],
   [
-    '{{hello}}_world',
+    "{{hello}}_world",
     toPath([
-      toConcatenatedNode([toPath([toValue('hello')]), toValue('_world')]),
+      toConcatenatedNode([toPath([toValue("hello")]), toValue("_world")]),
     ]),
   ],
   [
-    'foo.{{hello}}_world',
+    "foo.{{hello}}_world",
     toPath([
-      toValue('foo'),
-      toConcatenatedNode([toPath([toValue('hello')]), toValue('_world')]),
+      toValue("foo"),
+      toConcatenatedNode([toPath([toValue("hello")]), toValue("_world")]),
     ]),
   ],
 
   // Expressions
   [
-    'foo.`bar()`.baz',
-    toPath([toValue('foo'), toExpression('bar()'), toValue('baz')]),
+    "foo.`bar()`.baz",
+    toPath([toValue("foo"), toExpression("bar()"), toValue("baz")]),
   ],
   [
-    'foo`bar()`.baz',
+    "foo`bar()`.baz",
     toPath([
-      toConcatenatedNode([toValue('foo'), toExpression('bar()')]),
-      toValue('baz'),
+      toConcatenatedNode([toValue("foo"), toExpression("bar()")]),
+      toValue("baz"),
     ]),
   ],
   [
-    'foo[`bar()`].baz',
-    toPath([toValue('foo'), toExpression('bar()'), toValue('baz')]),
+    "foo[`bar()`].baz",
+    toPath([toValue("foo"), toExpression("bar()"), toValue("baz")]),
   ],
   [
     'foo["readonly" = `foo() == bar()`].baz',
     toPath([
-      toValue('foo'),
-      toQuery(toValue('readonly'), toExpression('foo() == bar()')),
-      toValue('baz'),
+      toValue("foo"),
+      toQuery(toValue("readonly"), toExpression("foo() == bar()")),
+      toValue("baz"),
     ]),
   ],
 ];
 
 export const INVALID_AST_PARSER_TESTS: Array<string> = [
-  ' ',
-  '@#$%^&*()',
-  '.',
-  'foo.bar[',
-  'foo.bar.{{nested.}',
-  'foo.bar`not done()',
-  '{foo.bar',
+  " ",
+  "@#$%^&*()",
+  ".",
+  "foo.bar[",
+  "foo.bar.{{nested.}",
+  "foo.bar`not done()",
+  "{foo.bar",
 ];
 
 export const VALID_AST_PARSER_CUSTOM_TESTS: Array<[string, PathNode]> = [
-  ['foo‑<>~¡¢£', toPath([toValue('foo‑<>~¡¢£')])],
-  ['foo.bar<>~¡¢£', toPath([toValue('foo'), toValue('bar<>~¡¢£')])],
+  ["foo‑<>~¡¢£", toPath([toValue("foo‑<>~¡¢£")])],
+  ["foo.bar<>~¡¢£", toPath([toValue("foo"), toValue("bar<>~¡¢£")])],
   [
-    'foo[{{b‑ar}}].baz',
-    toPath([toValue('foo'), toPath([toValue('b‑ar')]), toValue('baz')]),
+    "foo[{{b‑ar}}].baz",
+    toPath([toValue("foo"), toPath([toValue("b‑ar")]), toValue("baz")]),
   ],
 ];

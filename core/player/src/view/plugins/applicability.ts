@@ -1,15 +1,24 @@
-import { omit } from 'timm';
-import type { ViewPlugin, View } from './plugin';
-import type { Options } from './options';
-import type { Resolver } from '../resolver';
-import type { Node, ParseObjectOptions, Parser } from '../parser';
-import { NodeType } from '../parser';
+import { omit } from "timm";
+import type { Options } from "./options";
+import type { Resolver } from "../resolver";
+import type {
+  Node,
+  ParseObjectOptions,
+  ParseObjectChildOptions,
+  Parser,
+} from "../parser";
+import { NodeType } from "../parser";
+import { ViewInstance, ViewPlugin } from "../view";
 
 /** A view plugin to remove inapplicable assets from the tree */
 export default class ApplicabilityPlugin implements ViewPlugin {
+  private isApplicability(obj: any) {
+    return obj && Object.prototype.hasOwnProperty.call(obj, "applicability");
+  }
+
   applyResolver(resolver: Resolver) {
     resolver.hooks.beforeResolve.tap(
-      'applicability',
+      "applicability",
       (node: Node.Node | null, options: Options) => {
         let newNode = node;
 
@@ -24,55 +33,62 @@ export default class ApplicabilityPlugin implements ViewPlugin {
         }
 
         return newNode;
-      }
+      },
     );
   }
 
   applyParser(parser: Parser) {
-    /** Switches resolved during the parsing phase are static */
-    parser.hooks.determineNodeType.tap('applicability', (obj: any) => {
-      if (Object.prototype.hasOwnProperty.call(obj, 'applicability')) {
-        return NodeType.Applicability;
-      }
-    });
-
     parser.hooks.parseNode.tap(
-      'applicability',
+      "applicability",
       (
         obj: any,
         nodeType: Node.ChildrenTypes,
         options: ParseObjectOptions,
-        determinedNodeType: null | NodeType
+        childOptions?: ParseObjectChildOptions,
       ) => {
-        if (determinedNodeType === NodeType.Applicability) {
+        if (this.isApplicability(obj)) {
           const parsedApplicability = parser.parseObject(
-            omit(obj, 'applicability'),
+            omit(obj, "applicability"),
             nodeType,
-            options
+            options,
           );
-          if (parsedApplicability !== null) {
-            const applicabilityNode = parser.createASTNode(
-              {
-                type: NodeType.Applicability,
-                expression: (obj as any).applicability,
-                value: parsedApplicability,
-              },
-              obj
-            );
 
-            if (applicabilityNode?.type === NodeType.Applicability) {
-              applicabilityNode.value.parent = applicabilityNode;
-            }
-
-            return applicabilityNode;
+          if (!parsedApplicability) {
+            return childOptions ? [] : null;
           }
+
+          const applicabilityNode = parser.createASTNode(
+            {
+              type: NodeType.Applicability,
+              expression: (obj as any).applicability,
+              value: parsedApplicability,
+            },
+            obj,
+          );
+
+          if (!applicabilityNode) {
+            return childOptions ? [] : null;
+          }
+
+          if (applicabilityNode.type === NodeType.Applicability) {
+            applicabilityNode.value.parent = applicabilityNode;
+          }
+
+          return childOptions
+            ? [
+                {
+                  path: [...childOptions.path, childOptions.key],
+                  value: applicabilityNode,
+                },
+              ]
+            : applicabilityNode;
         }
-      }
+      },
     );
   }
 
-  apply(view: View) {
-    view.hooks.resolver.tap('applicability', this.applyResolver.bind(this));
-    view.hooks.parser.tap('applicability', this.applyParser.bind(this));
+  apply(view: ViewInstance) {
+    view.hooks.resolver.tap("applicability", this.applyResolver.bind(this));
+    view.hooks.parser.tap("applicability", this.applyParser.bind(this));
   }
 }

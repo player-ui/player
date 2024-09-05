@@ -7,18 +7,13 @@
   "repo": "player",
   "plugins": [
     [
-      "upload-assets",
-      {
-        "assets": [
-          "./bazel-bin/PlayerUI_Pod.zip"
-        ]
-      }
-    ],
-    [
       "version-file",
       {
         "versionFile": "./VERSION",
-        "publishScript": "./scripts/release.sh"
+        "publishScript": "./scripts/release.sh",
+        "publishScriptReleaseTypeArgs": {
+          "next": ["next"]
+        }
       }
     ],
     [
@@ -27,7 +22,6 @@
         "labels": "release"
       }
     ],
-    "./scripts/after-shipit-pod-push.js",
     "./scripts/delete-old-prerelease.js"
   ]
 }

@@ -113,8 +113,8 @@ internal class RuntimeBlockingTest : RuntimeTest() {
     }
 
     @TestTemplate fun `blocking during JS execution handled gracefully when releasing`() = runBlockingTest {
-        // This behavior is only really supported by j2v8 w/ a dedicated runtime
-        if (runtime.toString() != "J2V8") return@runBlockingTest
+        // This behavior is not currently supported in Graal
+        if (runtime.toString() == "Graal") return@runBlockingTest
 
         val (job, handle) = blockOnJvmAsync()
         handle.await()

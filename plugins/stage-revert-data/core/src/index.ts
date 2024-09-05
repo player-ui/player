@@ -1,12 +1,12 @@
-import type { Player, DataController, PlayerPlugin } from '@player-ui/player';
-import { ValidationMiddleware } from '@player-ui/player';
+import type { Player, DataController, PlayerPlugin } from "@player-ui/player";
+import { ValidationMiddleware } from "@player-ui/player";
 
 /**
  * this plugin is supposed to stage/store changes in a local object/cache, until a transition happens,
  *  then changes are committed to the Data Model
  */
 export class StageRevertDataPlugin implements PlayerPlugin {
-  name = 'stage-revert-data-plugin';
+  name = "stage-revert-data-plugin";
 
   apply(player: Player) {
     let dataController: DataController;
@@ -19,10 +19,10 @@ export class StageRevertDataPlugin implements PlayerPlugin {
         commitShadowModel
           ? undefined
           : {
-              message: 'staging data',
-              severity: 'error',
+              message: "staging data",
+              severity: "error",
             },
-      { shouldIncludeInvalid: () => true }
+      { shouldIncludeInvalid: () => true },
     );
 
     /**
@@ -52,8 +52,8 @@ export class StageRevertDataPlugin implements PlayerPlugin {
             if (commitTransitions.includes(to.name)) {
               commitShadowModel = true;
               player.logger.debug(
-                'Shadow Model Data to be committed %s',
-                GatedDataMiddleware.shadowModelPaths
+                "Shadow Model Data to be committed %s",
+                GatedDataMiddleware.shadowModelPaths,
               );
               dataController.set(GatedDataMiddleware.shadowModelPaths);
             }

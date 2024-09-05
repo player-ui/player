@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react';
-import type { CompletedState } from '@player-ui/player';
-import { BindingParser, LocalModel } from '@player-ui/player';
-import { VStack, Code, Heading, Button, Text } from '@chakra-ui/react';
+import React, { useEffect } from "react";
+import type { CompletedState } from "@player-ui/react";
+import { BindingParser, LocalModel } from "@player-ui/react";
 
 export type PlayerFlowSummaryProps = {
   /** Reset the flow */
@@ -34,7 +33,9 @@ declare global {
 }
 
 /** A component to show at the end of a flow */
-export const PlayerFlowSummary = (props: PlayerFlowSummaryProps) => {
+export const PlayerFlowSummary = (
+  props: PlayerFlowSummaryProps,
+): React.ReactElement => {
   useEffect(() => {
     const model = new LocalModel(props.completedState?.data);
     // Point back to local model for data lookups when
@@ -53,24 +54,21 @@ export const PlayerFlowSummary = (props: PlayerFlowSummaryProps) => {
   }, [props.completedState, props.beacons]);
 
   return (
-    <VStack gap="10">
-      <Heading>Flow Completed {props.error ? 'with Error' : ''}</Heading>
+    <div>
+      <h1>Flow Completed {props.error ? "with Error" : ""}</h1>
       {props.completedState?.endState.outcome && (
-        <Code>
-          Outcome:{' '}
-          <Text as="strong">{props.completedState?.endState.outcome}</Text>
-        </Code>
+        <pre>
+          Outcome: <span>{props.completedState?.endState.outcome}</span>
+        </pre>
       )}
 
       {props.error && (
-        <Code colorScheme="red">
-          <pre data-automation-id="Error-Content">{props.error?.message}</pre>
-        </Code>
+        <pre colorScheme="red">
+          Error Message: <span>{props.error?.message}</span>
+        </pre>
       )}
 
-      <Button variant="solid" onClick={props.reset}>
-        Reset
-      </Button>
-    </VStack>
+      <button onClick={props.reset}>Reset</button>
+    </div>
   );
 };

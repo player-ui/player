@@ -1,26 +1,30 @@
-import React from 'react';
-import type { DecoratorFn } from '@storybook/react';
-import { useSelector } from 'react-redux';
-import type { StateType } from '../redux';
-import { StateProvider } from '../redux';
+import React from "react";
+import type {
+  Renderer,
+  PartialStoryFn,
+  StoryContext,
+  DecoratorFunction,
+} from "@storybook/types";
+import { useSelector } from "react-redux";
+import { StateProvider, type StateType } from "../redux";
 import {
   ReactPlayerPluginContext,
   PlayerRenderContext,
   DSLPluginContext,
-} from '../player';
-import type { PlayerParametersType, RenderTarget } from '../types';
+} from "../player";
+import type { PlayerParametersType, RenderTarget } from "../types";
 
 /** Wrap the component in a PlayerContext provider w/ proper platform attribution */
-const PlayerRenderContextWrapper = (
+export const PlayerRenderContextWrapper = (
   props: React.PropsWithChildren<{
     /** Params for the story */
     playerParams: PlayerParametersType;
-  }>
+  }>,
 ) => {
   const { playerParams } = props;
 
-  const platform = useSelector<StateType, RenderTarget['platform']>(
-    (s) => s.platform.platform ?? 'web'
+  const platform = useSelector<StateType, RenderTarget["platform"]>(
+    (s) => s.platform.platform ?? "web",
   );
 
   return (
@@ -28,7 +32,7 @@ const PlayerRenderContextWrapper = (
       value={{
         platform,
         token:
-          platform === 'web'
+          platform === "web"
             ? undefined
             : playerParams?.appetizeTokens?.[platform],
         baseUrl: playerParams.appetizeBaseUrl,
@@ -43,7 +47,7 @@ const PlayerRenderContextWrapper = (
 /**
  * A story decorator for rendering player content
  */
-export const PlayerDecorator: DecoratorFn = (story, ctx) => {
+export const PlayerDecorator: DecoratorFunction = (Story, ctx) => {
   const playerParams = ctx.parameters as PlayerParametersType;
 
   return (
@@ -53,7 +57,7 @@ export const PlayerDecorator: DecoratorFn = (story, ctx) => {
           value={{ plugins: playerParams.reactPlayerPlugins ?? [] }}
         >
           <DSLPluginContext.Provider value={playerParams.dslEditor ?? {}}>
-            {story()}
+            {Story() as any}
           </DSLPluginContext.Provider>
         </ReactPlayerPluginContext.Provider>
       </PlayerRenderContextWrapper>

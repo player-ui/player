@@ -46,6 +46,16 @@ public class Promise(override val node: Node) : NodeWrapper {
                     try {
                         block(
                             when (arg) {
+                                // NOTE: JSI Value type structure would solve this - then I could make a single
+                                //  JSI decoder/encoder and create wrappers for runtime concepts into the JSI concepts
+                                //   CURRENT_V8(V8Value <- V8Decoder -> Node -> NodeWrapper)
+                                //   CURRENT_HERMES(Value <- JSIDecoder -> Node -> NodeWrapper)
+                                //   Abstract JSI definition such that we can translate non-JSI runtime JVM bindings into J(VM)JSI
+                                //   TARGET(V8Value -> Value <- JSIDecoder -> JSIHybridClass) ValueWrapper probably could use a better name -- maybe could adopt FBJNI (JSI)HybridClass nomeclature too?
+                                //   TARGET(JJSIValue -> Value <- JSIDecoder -> JSIHybridClass)
+                                //  ^ The value here would be to consolidate our serialization layer since a lot of it
+                                //    is already pretty similar. The decoders would access the runtime through the JJSI
+                                //    runtime and value APIs.
                                 // TODO: This part kinda sucks.. I feel like maybe we need a `NodePrimitive` or
                                 //  some more sophisticated strategy for things that aren't object-like --
                                 //  This would actually probably be fixed if we able to pass the [deserializer]
@@ -168,7 +178,7 @@ public val Runtime<*>.Promise: Promise.Api get() = getObject("Promise")?.let { p
 } ?: throw PlayerRuntimeException("'Promise' not defined in runtime")
 
 /** Helper to bridge complex [Promise] logic with the JS promise constructor */
-public fun <T : Any> Runtime<*>.Promise(block: suspend ((T) -> Unit, (Throwable) -> Unit) -> Unit): Promise {
+public fun <T : Any?> Runtime<*>.Promise(block: suspend ((T) -> Unit, (Throwable) -> Unit) -> Unit): Promise {
     val key = "promiseHandler_${UUID.randomUUID().toString().replace("-", "")}"
     add(key) { resolve: Invokable<Any?>, reject: Invokable<Any?> ->
         runtime.scope.launch {

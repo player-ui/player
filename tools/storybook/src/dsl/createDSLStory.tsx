@@ -1,5 +1,5 @@
-import React from 'react';
-import { DSLPlayerStory } from '../player';
+import React from "react";
+import { DSLPlayerStory } from "../player";
 
 /** Create a story */
 export function createDSLStory(
@@ -10,14 +10,18 @@ export function createDSLStory(
         default: string;
       }
   >,
-  options?: any
+  options?: any,
 ) {
   /** The story to render */
-  const Comp = () => <DSLPlayerStory dslContent={loader} />;
+  const Comp = () => {
+    return <DSLPlayerStory dslContent={loader} />;
+  };
 
   if (options?.args) {
     Comp.args = options.args;
   }
 
-  return Comp;
+  return {
+    render: Comp,
+  };
 }

@@ -1,22 +1,27 @@
-import { NodeType } from '@player-ui/player';
-import type { Player, PlayerPlugin, Node, Resolver } from '@player-ui/player';
-import type { Asset } from '@player-ui/types';
-import { createObjectMatcher } from '@player-ui/partial-match-registry';
-import dlv from 'dlv';
-import { CheckPathPluginSymbol } from './symbols';
+import { NodeType } from "@player-ui/player";
+import type {
+  Player,
+  Asset,
+  PlayerPlugin,
+  Node,
+  Resolver,
+} from "@player-ui/player";
+import { createObjectMatcher } from "@player-ui/partial-match-registry";
+import dlv from "dlv";
+import { CheckPathPluginSymbol } from "./symbols";
 
 export type QueryFunction = (asset: Asset) => boolean;
 export type Query = QueryFunction | string | object;
 
 /** Generate a function that matches on the given input */
 function createMatcher(
-  match: number | string | object | QueryFunction
+  match: number | string | object | QueryFunction,
 ): QueryFunction {
-  if (typeof match === 'string' || typeof match === 'number') {
+  if (typeof match === "string" || typeof match === "number") {
     return createObjectMatcher({ type: match });
   }
 
-  if (typeof match === 'function') {
+  if (typeof match === "function") {
     return match as QueryFunction;
   }
 
@@ -52,7 +57,7 @@ interface ViewInfo {
  */
 function getParent(
   node: Node.Node,
-  viewInfo?: ViewInfo
+  viewInfo?: ViewInfo,
 ): Node.ViewOrAsset | undefined {
   let working = node;
 
@@ -79,7 +84,7 @@ function getParent(
  * This is best suited to be referenced during the UI rendering phase, where one can make decisions about the rendering of an asset based on where it lies in the tree.
  */
 export class CheckPathPlugin implements PlayerPlugin {
-  name = 'check-path';
+  name = "check-path";
   private viewInfo?: ViewInfo;
   public readonly symbol = CheckPathPluginSymbol;
 
@@ -104,7 +109,7 @@ export class CheckPathPlugin implements PlayerPlugin {
               });
 
               if (node.type === NodeType.Asset || node.type === NodeType.View) {
-                const id = dlv(value, 'id');
+                const id = dlv(value, "id");
 
                 if (id) {
                   viewInfo.assetIdMap.set(id, node);
@@ -128,7 +133,7 @@ export class CheckPathPlugin implements PlayerPlugin {
    */
   public getParent(
     id: string,
-    query?: Query | Array<Query>
+    query?: Query | Array<Query>,
   ): Asset | undefined {
     const assetNode = this.viewInfo?.assetIdMap.get(id);
 
@@ -156,7 +161,7 @@ export class CheckPathPlugin implements PlayerPlugin {
     while (potentialMatch && parentQuery) {
       if (depth++ >= 50) {
         throw new Error(
-          'Recursion depth exceeded. Check for cycles in the AST graph'
+          "Recursion depth exceeded. Check for cycles in the AST graph",
         );
       }
 
@@ -207,9 +212,9 @@ export class CheckPathPlugin implements PlayerPlugin {
       working = working?.parent;
     }
 
-    if (parent && 'children' in parent) {
+    if (parent && "children" in parent) {
       const childProp = parent.children?.find(
-        (child) => child.value === working
+        (child) => child.value === working,
       );
 
       return childProp?.path?.[0];
@@ -221,7 +226,7 @@ export class CheckPathPlugin implements PlayerPlugin {
   /** Given a node, return itself, or the nested asset if the node is an applicability node */
   private getSourceAssetNode(node: Node.Node) {
     let sourceNode = this.viewInfo?.resolver.getSourceNode(node);
-    if (sourceNode?.type === 'applicability') {
+    if (sourceNode?.type === "applicability") {
       sourceNode = sourceNode.value;
     }
 
@@ -242,7 +247,7 @@ export class CheckPathPlugin implements PlayerPlugin {
   private findChildPath(
     node: Node.Node,
     query: Array<Query>,
-    includeSelfMatch = true
+    includeSelfMatch = true,
   ): boolean {
     if (query.length === 0) {
       return true;
@@ -275,7 +280,7 @@ export class CheckPathPlugin implements PlayerPlugin {
 
       if (
         children?.some((childNode) =>
-          this.findChildPath(childNode.value, childQuery)
+          this.findChildPath(childNode.value, childQuery),
         )
       ) {
         return true;
@@ -286,9 +291,9 @@ export class CheckPathPlugin implements PlayerPlugin {
     ) {
       return true;
     } else if (
-      'children' in node &&
+      "children" in node &&
       node.children?.some((childNode) =>
-        this.findChildPath(childNode.value, query)
+        this.findChildPath(childNode.value, query),
       )
     ) {
       return true;
@@ -326,7 +331,7 @@ export class CheckPathPlugin implements PlayerPlugin {
    * Gets the value for an asset from an asset node
    */
   public getAssetFromAssetNode(
-    assetNode: Node.Asset | Node.View
+    assetNode: Node.Asset | Node.View,
   ): Asset | undefined {
     const sourceNode = this.getSourceAssetNode(assetNode);
     if (!sourceNode) return;
@@ -340,7 +345,7 @@ export class CheckPathPlugin implements PlayerPlugin {
    */
   public getPath(
     id: string,
-    query?: Query | Array<Query>
+    query?: Query | Array<Query>,
   ): Array<string | number> | undefined {
     const assetNode = this.viewInfo?.assetIdMap.get(id);
 
@@ -382,12 +387,12 @@ export class CheckPathPlugin implements PlayerPlugin {
                     this.getResolvedValue(next) === undefined
                       ? undefCount + 1
                       : undefCount,
-                  0
+                  0,
                 );
 
             path = [actualIndex, ...path];
           }
-        } else if ('children' in parent) {
+        } else if ("children" in parent) {
           const childProp = findWorkingChild(parent);
           path = [...(childProp?.path ?? []), ...path];
         }

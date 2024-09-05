@@ -1,0 +1,12 @@
+load("//tools/ios:util.bzl", "swiftui_plugin")
+
+swiftui_plugin(
+    name = "TransitionPlugin",
+    resources = [],
+    deps = [
+        "//ios/swiftui:PlayerUISwiftUI",
+    ],
+    test_deps = [
+        "//plugins/reference-assets/swiftui:PlayerUIReferenceAssets",
+    ]
+)

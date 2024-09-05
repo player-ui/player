@@ -1,4 +1,4 @@
-import { Meta } from '@storybook/addon-docs/blocks';
+import { Meta } from "@storybook/addon-docs";
 
 <Meta title="Reference Assets/Intro" />
 
@@ -7,20 +7,20 @@ import { Meta } from '@storybook/addon-docs/blocks';
 The assets in this section are an example implementation of an Asset Library for Player.
 Each of the Asset components follows the same basic pattern:
 
-| Export                   | Description                                                                                                                                                                                                     |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `<Name>Asset`            | Typescript type interface representing the authored player content                                                                                                                                              |
-| `Transformed<Name>Asset` | (optional) - A Typescript interface representing the _transformed_ version of the asset interface. This extends the base interface and includes any state/properties added by the associated transform.         |
-| `transform`              | (optional) - A function (used by the `AssetTransformPlugin`) to adopt Player's current state with the component state. If no `transfrom` is present, the component state is the same as the authored content.   |
-| `Component`              | React component rendering of the given asset. The props are the _transformed_ type (if supplied) or the _authored_ type.                                                                                        |
+| Export                   | Description                                                                                                                                                                                                   |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<Name>Asset`            | Typescript type interface representing the authored player content                                                                                                                                            |
+| `Transformed<Name>Asset` | (optional) - A Typescript interface representing the _transformed_ version of the asset interface. This extends the base interface and includes any state/properties added by the associated transform.       |
+| `transform`              | (optional) - A function (used by the `AssetTransformPlugin`) to adopt Player's current state with the component state. If no `transfrom` is present, the component state is the same as the authored content. |
+| `Component`              | React component rendering of the given asset. The props are the _transformed_ type (if supplied) or the _authored_ type.                                                                                      |
 
 ## Usage
 
 To import and use these Assets in your App, simply import the `plugin` and attach it to Player:
 
 ```tsx
-import { useReactPlayer, ReactPlayerPlugin } from '@player-ui/react';
-import ReferenceAssetsPlugin from '@player-ui/reference-assets/plugin-react';
+import { useReactPlayer, ReactPlayerPlugin } from "@player-ui/react";
+import ReferenceAssetsPlugin from "@player-ui/reference-assets/plugin-react";
 
 const plugins: Array<ReactPlayerPlugin> = [new ReferenceAssetsPlugin()];
 

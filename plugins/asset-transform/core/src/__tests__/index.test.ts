@@ -1,55 +1,56 @@
-import type { InProgressState, TransformRegistry } from '@player-ui/player';
-import { waitFor } from '@testing-library/react';
-import { Player } from '@player-ui/player';
-import type { Flow } from '@player-ui/types';
-import { Registry } from '@player-ui/partial-match-registry';
+import { test, expect, vitest } from "vitest";
+import type { InProgressState, TransformRegistry } from "@player-ui/player";
+import { waitFor } from "@testing-library/react";
+import { Player } from "@player-ui/player";
+import type { Flow } from "@player-ui/types";
+import { Registry } from "@player-ui/partial-match-registry";
 import {
   AssetTransformPlugin,
   compose,
   composeBefore,
   propertiesToSkipTransform,
-} from '..';
+} from "..";
 
 const basicContentWithActions: Flow<any> = {
-  id: 'test-flow',
+  id: "test-flow",
   views: [
     {
-      id: 'my-view',
+      id: "my-view",
       actions: [
         {
           asset: {
-            id: 'next-label-action',
-            type: 'action',
-            value: '{{foo.bar}}',
+            id: "next-label-action",
+            type: "action",
+            value: "{{foo.bar}}",
           },
         },
       ],
     },
   ],
   navigation: {
-    BEGIN: 'FLOW_1',
+    BEGIN: "FLOW_1",
     FLOW_1: {
-      startState: 'VIEW_1',
+      startState: "VIEW_1",
       VIEW_1: {
-        state_type: 'VIEW',
-        ref: 'my-view',
+        state_type: "VIEW",
+        ref: "my-view",
         transitions: {},
       },
     },
   },
 };
 
-const basicFRFWithActionsAndExpressions = (asset = 'action'): Flow<any> => ({
-  id: 'test-flow',
+const basicFRFWithActionsAndExpressions = (asset = "action"): Flow<any> => ({
+  id: "test-flow",
   views: [
     {
-      id: 'my-view',
+      id: "my-view",
       actions: [
         {
           asset: {
-            id: 'next-label-action',
+            id: "next-label-action",
             type: asset,
-            value: '{{foo.bar}}',
+            value: "{{foo.bar}}",
             example: ['{{foo.bar}} = "test"'],
           },
         },
@@ -58,16 +59,16 @@ const basicFRFWithActionsAndExpressions = (asset = 'action'): Flow<any> => ({
   ],
   data: {
     foo: {
-      bar: '1',
+      bar: "1",
     },
   },
   navigation: {
-    BEGIN: 'FLOW_1',
+    BEGIN: "FLOW_1",
     FLOW_1: {
-      startState: 'VIEW_1',
+      startState: "VIEW_1",
       VIEW_1: {
-        state_type: 'VIEW',
-        ref: 'my-view',
+        state_type: "VIEW",
+        ref: "my-view",
         transitions: {},
       },
     },
@@ -78,12 +79,12 @@ const otherAction: Flow<any> = {
   ...basicContentWithActions,
   views: [
     {
-      id: 'my-view',
+      id: "my-view",
       actions: [
         {
           asset: {
-            id: 'next-label-action',
-            type: 'stateful-action',
+            id: "next-label-action",
+            type: "stateful-action",
           },
         },
       ],
@@ -92,21 +93,21 @@ const otherAction: Flow<any> = {
 };
 
 const choice: Flow<any> = {
-  id: 'some view',
+  id: "some view",
   views: [
     {
-      id: 'my-view',
+      id: "my-view",
       actions: [
         {
           asset: {
-            id: 'choice',
-            type: 'choice',
-            value: 'some value',
+            id: "choice",
+            type: "choice",
+            value: "some value",
             choiceDetail: {
               asset: {
-                id: 'choiceDetail',
-                type: 'choiceItem',
-                value: 'choice detail',
+                id: "choiceDetail",
+                type: "choiceItem",
+                value: "choice detail",
               },
             },
           },
@@ -115,12 +116,12 @@ const choice: Flow<any> = {
     },
   ],
   navigation: {
-    BEGIN: 'FLOW_1',
+    BEGIN: "FLOW_1",
     FLOW_1: {
-      startState: 'VIEW_1',
+      startState: "VIEW_1",
       VIEW_1: {
-        state_type: 'VIEW',
-        ref: 'my-view',
+        state_type: "VIEW",
+        ref: "my-view",
         transitions: {},
       },
     },
@@ -128,29 +129,32 @@ const choice: Flow<any> = {
 };
 
 const registry: TransformRegistry = new Registry();
-registry.set({ type: 'action' }, (asset, options) => {
+registry.set({ type: "action" }, (asset, options) => {
   return {
     ...asset,
     run: () => {
-      options.data.model.set([['foo.bar', 'it worked!']]);
+      options.data.model.set([["foo.bar", "it worked!"]]);
     },
   };
 });
 registry.set(
-  { type: 'action-2' },
-  compose((asset, options) => {
-    return {
-      ...asset,
-      run: () => {
-        options.data.model.set([['foo.bar', 'it worked!']]);
-      },
-    };
-  }, composeBefore(propertiesToSkipTransform(['example'])))
+  { type: "action-2" },
+  compose(
+    (asset, options) => {
+      return {
+        ...asset,
+        run: () => {
+          options.data.model.set([["foo.bar", "it worked!"]]);
+        },
+      };
+    },
+    composeBefore(propertiesToSkipTransform(["example"])),
+  ),
 );
 
-registry.set({ type: 'stateful-action' }, (asset, options, store) => {
+registry.set({ type: "stateful-action" }, (asset, options, store) => {
   const [count, setCount] = store.useLocalState(1);
-  const [label] = store.useLocalState('some text');
+  const [label] = store.useLocalState("some text");
 
   return {
     ...asset,
@@ -163,10 +167,10 @@ registry.set({ type: 'stateful-action' }, (asset, options, store) => {
 });
 
 registry.set(
-  { type: 'choice' },
+  { type: "choice" },
   {
     beforeResolve: (asset, options, store) => {
-      store.useSharedState('shared')('choice before resolve');
+      store.useSharedState("shared")("choice before resolve");
       store.useLocalState(5);
 
       return {
@@ -176,7 +180,7 @@ registry.set(
     },
     resolve: (asset, options, store) => {
       const [count, setCount] = store.useLocalState(2);
-      const [label, setLabel] = store.useSharedState('shared')('newValue');
+      const [label, setLabel] = store.useSharedState("shared")("newValue");
 
       return {
         ...asset,
@@ -184,24 +188,24 @@ registry.set(
         label,
         after: () => {
           setCount(count + 1);
-          setLabel('i can reset this');
+          setLabel("i can reset this");
         },
       };
     },
-  }
+  },
 );
 
-test('transforms matching assets', () => {
+test("transforms matching assets", () => {
   const player = new Player({ plugins: [new AssetTransformPlugin(registry)] });
   player.start(basicContentWithActions);
 
   // Should now add a run function
   const view = (player.getState() as InProgressState).controllers.view
     .currentView?.lastUpdate;
-  expect(typeof view?.actions[0].asset.run).toBe('function');
+  expect(typeof view?.actions[0].asset.run).toBe("function");
 });
 
-test('transforms matching assets and does not skip string resolution', () => {
+test("transforms matching assets and does not skip string resolution", () => {
   const player = new Player({ plugins: [new AssetTransformPlugin(registry)] });
   player.start(basicFRFWithActionsAndExpressions());
 
@@ -209,35 +213,35 @@ test('transforms matching assets and does not skip string resolution', () => {
   const view = (player.getState() as InProgressState).controllers.view
     .currentView?.lastUpdate;
 
-  expect(typeof view?.actions[0].asset.run).toBe('function');
+  expect(typeof view?.actions[0].asset.run).toBe("function");
   expect(view?.actions[0].asset.example).toStrictEqual(['1 = "test"']);
 });
 
-test('transforms matching assets and skips string resolution', () => {
+test("transforms matching assets and skips string resolution", () => {
   const player = new Player({ plugins: [new AssetTransformPlugin(registry)] });
-  player.start(basicFRFWithActionsAndExpressions('action-2'));
+  player.start(basicFRFWithActionsAndExpressions("action-2"));
 
   // Should now add a run function
   const view = (player.getState() as InProgressState).controllers.view
     .currentView?.lastUpdate;
 
-  expect(typeof view?.actions[0].asset.run).toBe('function');
+  expect(typeof view?.actions[0].asset.run).toBe("function");
   expect(view?.actions[0].asset.example).toStrictEqual([
     '{{foo.bar}} = "test"',
   ]);
 });
 
-test('uses shorthand version', () => {
+test("uses shorthand version", () => {
   const player = new Player({
     plugins: [
       new AssetTransformPlugin([
         [
-          { type: 'action' },
+          { type: "action" },
           (asset, options) => {
             return {
               ...asset,
               run: () => {
-                options.data.model.set([['foo.bar', 'it worked!']]);
+                options.data.model.set([["foo.bar", "it worked!"]]);
               },
             };
           },
@@ -250,10 +254,10 @@ test('uses shorthand version', () => {
   // Should now add a run function
   const view = (player.getState() as InProgressState).controllers.view
     .currentView?.lastUpdate;
-  expect(typeof view?.actions[0].asset.run).toBe('function');
+  expect(typeof view?.actions[0].asset.run).toBe("function");
 });
 
-test('transforms matching assets with all transform types', () => {
+test("transforms matching assets with all transform types", () => {
   const player = new Player({ plugins: [new AssetTransformPlugin(registry)] });
   player.start(choice);
 
@@ -261,11 +265,11 @@ test('transforms matching assets with all transform types', () => {
   const view = (player.getState() as InProgressState).controllers.view
     .currentView?.lastUpdate;
 
-  expect(typeof view?.actions[0].asset.choiceDetail).toBe('undefined');
-  expect(typeof view?.actions[0].asset.after).toBe('function');
+  expect(typeof view?.actions[0].asset.choiceDetail).toBe("undefined");
+  expect(typeof view?.actions[0].asset.after).toBe("function");
 });
 
-test('keeps same transform when data stays the same', async () => {
+test("keeps same transform when data stays the same", async () => {
   const player = new Player({ plugins: [new AssetTransformPlugin(registry)] });
   player.start(basicContentWithActions);
 
@@ -281,10 +285,10 @@ test('keeps same transform when data stays the same', async () => {
   await waitFor(() => {
     updatedView = (player.getState() as InProgressState).controllers.view
       .currentView?.lastUpdate;
-    expect(updatedView?.actions[0].asset.value).toBe('it worked!');
+    expect(updatedView?.actions[0].asset.value).toBe("it worked!");
   });
 
-  expect(updatedView?.actions[0].asset.value).toBe('it worked!');
+  expect(updatedView?.actions[0].asset.value).toBe("it worked!");
 
   updatedView?.actions[0].asset.run();
   const nonUpdatedView = (player.getState() as InProgressState).controllers.view
@@ -292,7 +296,7 @@ test('keeps same transform when data stays the same', async () => {
   expect(nonUpdatedView).toBe(updatedView);
 });
 
-test('updates when the transform store updates', () => {
+test("updates when the transform store updates", () => {
   const player = new Player({ plugins: [new AssetTransformPlugin(registry)] });
   player.start(otherAction);
 
@@ -301,7 +305,7 @@ test('updates when the transform store updates', () => {
     .currentView?.lastUpdate;
   expect(initialView?.actions[0].asset.count).toBe(1);
 
-  expect(initialView?.actions[0].asset.label).toBe('some text');
+  expect(initialView?.actions[0].asset.label).toBe("some text");
 
   initialView?.actions[0].asset.increment();
 
@@ -315,7 +319,7 @@ test('updates when the transform store updates', () => {
   expect(nonUpdatedView).toBe(updatedView);
 });
 
-test('uses the same store', () => {
+test("uses the same store", () => {
   const player = new Player({ plugins: [new AssetTransformPlugin(registry)] });
   player.start(choice);
 
@@ -323,23 +327,23 @@ test('uses the same store', () => {
   const initialView = (player.getState() as InProgressState).controllers.view
     .currentView?.lastUpdate;
   expect(initialView?.actions[0].asset.count).toBe(2);
-  expect(initialView?.actions[0].asset.label).toBe('choice before resolve');
+  expect(initialView?.actions[0].asset.label).toBe("choice before resolve");
   initialView?.actions[0].asset.after();
 
   const updatedView = (player.getState() as InProgressState).controllers.view
     .currentView?.lastUpdate;
   expect(updatedView?.actions[0].asset.count).toBe(3);
-  expect(updatedView?.actions[0].asset.label).toBe('i can reset this');
+  expect(updatedView?.actions[0].asset.label).toBe("i can reset this");
 });
 
-test('merges registries', () => {
-  const actionFn1 = jest.fn();
-  const actionFn2 = jest.fn();
+test("merges registries", () => {
+  const actionFn1 = vitest.fn();
+  const actionFn2 = vitest.fn();
 
   const player = new Player({
     plugins: [
-      new AssetTransformPlugin([[{ type: 'action' }, actionFn1]]),
-      new AssetTransformPlugin([[{ type: 'action' }, actionFn2]]),
+      new AssetTransformPlugin([[{ type: "action" }, actionFn1]]),
+      new AssetTransformPlugin([[{ type: "action" }, actionFn2]]),
     ],
   });
 
@@ -347,7 +351,7 @@ test('merges registries', () => {
   const { transformRegistry } = (player.getState() as InProgressState)
     .controllers.view;
 
-  const transform = transformRegistry.get({ type: 'action' });
+  const transform = transformRegistry.get({ type: "action" });
   transform?.resolve?.({}, {} as any, {} as any);
 
   expect(actionFn1).not.toHaveBeenCalled();

@@ -1,0 +1,18 @@
+import { Meta, Story } from "@storybook/addon-docs";
+import { Input } from "@player-ui/reference-assets-plugin-react";
+import * as InputStories from "./Input.stories";
+
+<Meta title="Reference Assets/Input" component={Input} />
+
+# Input Asset
+
+The text asset is the core means of rendering text.
+Modifiers can be used to customize the display, including making text a hyperlink.
+
+<Story of={InputStories.Basic} />
+
+## Validation
+
+User input can include validations, with `errors` preventing users from advancing the flow.
+
+<Story of={InputStories.Validation} />

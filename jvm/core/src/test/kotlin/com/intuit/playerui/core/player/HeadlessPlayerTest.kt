@@ -2,7 +2,6 @@ package com.intuit.playerui.core.player
 
 import com.intuit.playerui.core.bridge.JSErrorException
 import com.intuit.playerui.core.bridge.PlayerRuntimeException
-import com.intuit.playerui.core.bridge.global.JSMap
 import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.playerui.core.data.get
 import com.intuit.playerui.core.data.set
@@ -25,8 +24,6 @@ import com.intuit.playerui.core.player.state.errorState
 import com.intuit.playerui.core.player.state.inProgressState
 import com.intuit.playerui.core.player.state.lastViewUpdate
 import com.intuit.playerui.core.plugins.Plugin
-import com.intuit.playerui.core.validation.BindingInstance
-import com.intuit.playerui.core.validation.ValidationResponse
 import com.intuit.playerui.core.validation.getWarningsAndErrors
 import com.intuit.playerui.plugins.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.plugins.types.CommonTypesPlugin
@@ -78,8 +75,8 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         player.inProgressState?.transition("Next")
 
         val result = flow.await()
-        assertEquals("done", result.endState.outcome)
-        assertEquals("generated-flow", result.flow.id)
+        assertEquals("DONE", result.endState.outcome)
+        assertEquals("collection-basic", result.flow.id)
     }
 
     @TestTemplate
@@ -146,7 +143,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
 
     @TestTemplate
     fun `test player can transition and skip validation`() = runBlockingTest {
-        player.start(mocks.findMockByName("input-validation")!!.getFlow())
+        val flow = player.start(mocks.findMockByName("input-transition")!!.getFlow())
 
         assertEquals("VIEW_1", player.inProgressState!!.currentFlowState?.name)
 
@@ -157,37 +154,31 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         assertEquals("VIEW_1", player.inProgressState!!.currentFlowState?.name)
         player.inProgressState!!.forceTransition("Next")
 
+        flow.await()
+
         assertTrue(player.state is CompletedState)
-        assertEquals("done", player.completedState!!.endState.outcome)
+        assertEquals("DONE", player.completedState!!.endState.outcome)
     }
 
     @TestTemplate
     fun `test player can get validation errors and warnings`() = runBlockingTest {
-        var mapping: JSMap<BindingInstance, ValidationResponse>? = null
-        player.hooks.viewController.tap { viewController ->
-            viewController?.hooks?.view?.tap { view ->
-                view?.hooks?.resolver?.tap { resolver ->
-                    resolver?.hooks?.resolveOptions?.tap { resolveOptions, _ ->
-                        mapping = resolveOptions?.validation?.getWarningsAndErrors()
-                        resolveOptions
-                    }
-                }
-            }
-        }
-        player.start(mocks.findMockByName("input-validation")!!.getFlow())
+        player.start(mocks.findMockByName("input-transition")!!.getFlow())
 
-        val validationController = player.inProgressState!!.controllers.validation
+        val inProgressState = player.inProgressState ?: throw AssertionError("Player is not in progress state")
+        val validationController = inProgressState.controllers.validation
+        val resolverOptions = inProgressState.currentView?.resolverOptions ?: throw AssertionError("Current view not defined")
 
-        player.inProgressState!!.dataModel.set("foo.bar" to 21)
-        assertNull(mapping)
+        inProgressState.dataModel.set("foo.bar" to 21)
         assertTrue(validationController.validateView().canTransition)
+        assertNull(resolverOptions.validation?.getWarningsAndErrors())
 
-        player.inProgressState!!.dataModel.set("foo.bar" to "asdf")
+        inProgressState.dataModel.set("foo.bar" to "asdf")
 
-        assertNotNull(mapping)
         assertFalse(validationController.validateView().canTransition)
-        assertEquals("foo.bar", mapping!!.keys.first().asString())
-        assertEquals("Value must be an integer", mapping!!.values.first().message)
+        val mapping = resolverOptions.validation?.getWarningsAndErrors()
+            ?: throw AssertionError("Expected validations to not be null")
+        assertEquals("foo.bar", mapping.keys.first().asString())
+        assertEquals("Value must be an integer", mapping.values.first().message)
     }
 
     @TestTemplate
@@ -196,7 +187,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         val state = player.state
         assertTrue(state is InProgressState)
         assertEquals(PlayerFlowStatus.IN_PROGRESS, state.status)
-        assertEquals("Symbol(generated-flow)", state.ref)
+        assertEquals("Symbol(collection-basic)", state.ref)
 
         state as InProgressState
         val flowResultCompletable = state.flowResult
@@ -242,7 +233,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
 
         state.transition("Next")
 
-        assertEquals("done", flowResultCompletable.await()!!.endState.outcome)
+        assertEquals("DONE", flowResultCompletable.await()!!.endState.outcome)
     }
 
     @TestTemplate
@@ -306,7 +297,10 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         val message = "oh no!"
         player.hooks.viewController.tap { _ ->
             // Different runtimes might actually handle this differently, i.e.
-            // J2V8 will just serialize [message] but Graal will actually serialize this instance
+            //  - J2V8 will just serialize [message]
+            //  - Graal will actually serialize this instance
+            //  - Hermes, FBJNI will translate exception instance,
+            //      but will wrap exceptions from host functions as JSErrors
             throw Exception(message)
         }
 
@@ -316,8 +310,8 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
             }
         }
 
-        assertEquals(message, exception.message)
-        assertEquals("uncaught exception: $message", player.errorState?.error?.message)
+        assertTrue(exception.message!!.endsWith(message))
+        assertTrue(player.errorState?.error?.message!!.endsWith(message))
     }
 
     @TestTemplate
@@ -332,8 +326,8 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
 
         assertTrue(result.isSuccess)
 
-        assertEquals("done", result.getOrThrow().endState.outcome)
-        assertEquals("generated-flow", result.getOrThrow().flow.id)
+        assertEquals("DONE", result.getOrThrow().endState.outcome)
+        assertEquals("collection-basic", result.getOrThrow().flow.id)
     }
 
     @TestTemplate
@@ -364,8 +358,8 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
             runBlocking {
                 delay(1000)
                 val result = flow.await()
-                assertEquals("done", result.endState.outcome)
-                assertEquals("generated-flow", result.flow.id)
+                assertEquals("DONE", result.endState.outcome)
+                assertEquals("collection-basic", result.flow.id)
             }
         }
 
@@ -380,8 +374,8 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         player.inProgressState?.transition("Next")
 
         val result = flow.await()
-        assertEquals("done", result.endState.outcome)
-        assertEquals("generated-flow", result.flow.id)
+        assertEquals("DONE", result.endState.outcome)
+        assertEquals("collection-basic", result.flow.id)
     }
 
     @TestTemplate
@@ -451,7 +445,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
                   },
                   "END_Done": {
                     "state_type": "END",
-                    "outcome": "done"
+                    "outcome": "DONE"
                   }
                 }
               }
@@ -460,5 +454,93 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         )
 
         assertTrue(player.state is ErrorState)
+    }
+
+    @TestTemplate
+    fun `test constantsController get and set`() = runBlockingTest {
+        val constantsController = player.constantsController
+
+        val data = mapOf(
+            "firstname" to "john",
+            "lastname" to "doe",
+            "favorite" to mapOf("color" to "red"),
+            "age" to 1,
+        )
+
+        constantsController.addConstants(data = data, namespace = "constants")
+
+        val firstname = constantsController.getConstants(key = "firstname", namespace = "constants")
+        assertEquals("john", firstname)
+
+        val middleName = constantsController.getConstants(key = "middlename", namespace = "constants")
+        assertNull(middleName)
+
+        val middleNameSafe = constantsController.getConstants(key = "middlename", namespace = "constants", fallback = "A")
+        assertEquals("A", middleNameSafe)
+
+        val favoriteColor = constantsController.getConstants(key = "favorite.color", namespace = "constants")
+        assertEquals("red", favoriteColor)
+
+        val age = constantsController.getConstants(key = "age", namespace = "constants")
+        assertEquals(1, age)
+
+        val nonExistentNamespace = constantsController.getConstants(key = "test", namespace = "foo")
+        assertNull(nonExistentNamespace)
+
+        val nonExistentNamespaceWithFallback = constantsController.getConstants(key = "test", namespace = "foo", fallback = "B")
+        assertEquals("B", nonExistentNamespaceWithFallback)
+
+        // Test and make sure keys override properly
+        val newData = mapOf(
+            "favorite" to mapOf("color" to "blue"),
+        )
+
+        constantsController.addConstants(data = newData, namespace = "constants")
+
+        val newFavoriteColor = constantsController.getConstants(key = "favorite.color", namespace = "constants")
+        assertEquals("blue", newFavoriteColor)
+    }
+
+    @TestTemplate
+    fun `test constantsController temp override functionality`() = runBlockingTest {
+        val constantsController = player.constantsController
+
+        // Add initial constants
+        val data = mapOf(
+            "firstname" to "john",
+            "lastname" to "doe",
+            "favorite" to mapOf("color" to "red"),
+        )
+        constantsController.addConstants(data = data, namespace = "constants")
+
+        // Override with temporary values
+        val tempData = mapOf(
+            "firstname" to "jane",
+            "favorite" to mapOf("color" to "blue"),
+        )
+        constantsController.setTemporaryValues(data = tempData, namespace = "constants")
+
+        // Test temporary override
+        val firstnameTemp = constantsController.getConstants(key = "firstname", namespace = "constants")
+        assertEquals("jane", firstnameTemp)
+
+        val favoriteColorTemp = constantsController.getConstants(key = "favorite.color", namespace = "constants")
+        assertEquals("blue", favoriteColorTemp)
+
+        // Test fallback to original values when temporary values are not present
+        val lastnameTemp = constantsController.getConstants(key = "lastname", namespace = "constants")
+        assertEquals("doe", lastnameTemp)
+
+        // Reset temp and values should be the same as the original data
+        constantsController.clearTemporaryValues()
+
+        val firstname = constantsController.getConstants(key = "firstname", namespace = "constants")
+        assertEquals("john", firstname)
+
+        val favoriteColor = constantsController.getConstants(key = "favorite.color", namespace = "constants")
+        assertEquals("red", favoriteColor)
+
+        val lastname = constantsController.getConstants(key = "lastname", namespace = "constants")
+        assertEquals("doe", lastname)
     }
 }

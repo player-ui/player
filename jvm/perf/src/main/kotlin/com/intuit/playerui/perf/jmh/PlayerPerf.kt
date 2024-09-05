@@ -1,21 +1,19 @@
 package com.intuit.playerui.perf.jmh
 
-import com.intuit.playerui.core.asset.Asset
-import com.intuit.playerui.core.bridge.Invokable
-import com.intuit.playerui.core.bridge.Node
-import com.intuit.playerui.core.bridge.Promise
+import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeFactory
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.runtimeContainers
-import com.intuit.playerui.core.data.DataController
-import com.intuit.playerui.core.data.set
 import com.intuit.playerui.core.player.HeadlessPlayer
+import com.intuit.playerui.hermes.bridge.runtime.Hermes
+import com.intuit.playerui.j2v8.bridge.runtime.J2V8
+import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Contextual
-import kotlinx.serialization.Serializable
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.CompilerControl
+import org.openjdk.jmh.annotations.Level.Invocation
 import org.openjdk.jmh.annotations.Mode
 import org.openjdk.jmh.annotations.OutputTimeUnit
 import org.openjdk.jmh.annotations.Param
@@ -26,6 +24,7 @@ import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+
 
 @Serializable
 data class Update(
@@ -53,10 +52,14 @@ val mocks: Map<ContentID, Update> = mapOf(
     ContentID("three") to Update(
         "foo",
         3
-    )
+    ),
+    ContentID("mocks/info/info-modal-flow") to Update(
+        "foo",
+        3
+    ),
 )
 
-private const val playerSourcePath = "core/player/dist/player.prod.js"
+private const val playerSourcePath = "core/player/dist/Player.native.js"
 
 private val playerSource by lazy {
     readResource(playerSourcePath)
@@ -72,208 +75,109 @@ private fun readResource(path: String): String = classLoader.getResource(path)?.
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-@State(Scope.Benchmark)
-abstract class RuntimePerformance {
+@State(Scope.Thread)
+public abstract class RuntimePerformance {
 
-    @Param("J2V8", "Graal")
-    lateinit var runtime: String
+    @Param(Hermes.name, J2V8.name)
+    protected lateinit var runtimeName: String; private set
 
-    lateinit var factory: PlayerRuntimeFactory<*>
+    private lateinit var factory: PlayerRuntimeFactory<*>
 
-    protected fun findRuntimeFactory(runtime: String): PlayerRuntimeFactory<*> =
-        runtimeContainers.single { "$it" == runtime }.factory
+    protected lateinit var runtime: Runtime<*>; private set
 
-    protected fun setupRuntime(runtime: String = this.runtime) {
-        factory = findRuntimeFactory(runtime)
+    @Setup public fun setupRuntimeFactory() {
+        factory = findRuntimeFactory(runtimeName)
     }
+
+    protected fun setupRuntime(block: PlayerRuntimeConfig.() -> Unit = {}): Runtime<*> = factory.create(block).also {
+        runtime = it
+    }
+
+    private fun findRuntimeFactory(runtimeName: String): PlayerRuntimeFactory<*> =
+        runtimeContainers.single { "$it" == runtimeName }.factory
 }
 
-open class RuntimeCreation : RuntimePerformance() {
-
-    @Setup fun setup() {
-        setupRuntime()
-    }
+public open class BenchRuntimeCreation : RuntimePerformance() {
 
     @CompilerControl(CompilerControl.Mode.DONT_INLINE)
-    @Benchmark fun createRuntime(consumer: Blackhole) {
-        consumer.consume(factory.create())
-    }
-
-}
-
-open class RuntimePlayerCreation : RuntimePerformance() {
-
-    lateinit var jsRuntime: Runtime<*>
-
-    @Setup fun setup() {
-        setupRuntime(runtime)
-        jsRuntime = factory.create()
-        playerSource
+    @Benchmark public fun createRuntime(consumer: Blackhole) {
+        consumer.consume(setupRuntime())
+        runtime.release()
     }
 
     @CompilerControl(CompilerControl.Mode.DONT_INLINE)
     @Benchmark fun createHeadlessPlayer(consumer: Blackhole) {
-        consumer.consume(HeadlessPlayer(explicitRuntime = jsRuntime))
+        // measures runtime headless player creation + runtime creation
+        // this doesn't technically work the same way it does when the
+        // player usually is created, because it just pulls the first
+        // runtime factory it can find. we use our setupRuntime method
+        // to ensure we release the runtime.
+        consumer.consume(HeadlessPlayer(explicitRuntime = setupRuntime()))
+        // we always release the runtime to make sure jmh isn't waiting
+        // for the runtime thread to be released
+        runtime.release()
     }
-
-    @CompilerControl(CompilerControl.Mode.DONT_INLINE)
-    @Benchmark fun createPlayer(consumer: Blackhole) {
-        jsRuntime.execute(playerSource)
-        consumer.consume(jsRuntime.execute("""(new Player.Player())"""))
-    }
-
 }
 
-open class ContentPerformance : RuntimePerformance() {
+public open class BenchPlayerCreation : RuntimePerformance() {
 
-    @Param("w2", "pi", "cli")
-    lateinit var content: String
-
-    lateinit var flow: String
-
-    lateinit var update: Update
-
-    lateinit var jsRuntime: Runtime<*>
-
-    protected fun readContent(content: String): String =
-        readResource("$content.json")
-
-    protected fun setupContent(content: String = this.content) {
+    // if we don't release the runtime on each bench, we wouldn't need to reload the runtime
+    // on each invocation it might be useful to see how "warm" the runtime can actually get
+    @Setup(Invocation) public fun setup() {
+        // load up runtime and player source in setup to isolate benchmarks
         setupRuntime()
-        jsRuntime = factory.create()
-        flow = readContent(content)
-        update = mocks[ContentID(content)]!!
-    }
-
-}
-
-open class HeadlessPlayerFlowPerformance : ContentPerformance() {
-
-    lateinit var runtimeFactory: PlayerRuntimeFactory<*>
-
-    @Setup fun setup() {
-        setupContent()
+        playerSource
     }
 
     @CompilerControl(CompilerControl.Mode.DONT_INLINE)
-    @Benchmark fun startFlow(consumer: Blackhole) {
-        val player = HeadlessPlayer(explicitRuntime = jsRuntime)
-        consumer.consume(runBlocking {
-            suspendCoroutine<Asset?> {
-                player.hooks.viewController.tap("perf") { vc ->
-                    vc?.hooks?.view?.tap("new view") { v ->
-                        v?.hooks?.onUpdate?.tap("test") { a ->
+    @Benchmark public fun createJSPlayer(consumer: Blackhole) {
+        consumer.consume(runtime.execute(playerSource))
+        consumer.consume(runtime.execute("""(new Player.Player())"""))
+        runtime.release()
+    }
+
+    @CompilerControl(CompilerControl.Mode.DONT_INLINE)
+    @Benchmark public fun createHeadlessPlayer(consumer: Blackhole) {
+        // uses runtime created outside benchmark
+        consumer.consume(HeadlessPlayer(explicitRuntime = runtime))
+        runtime.release()
+    }
+}
+
+public open class BenchPlayerFlow : RuntimePerformance() {
+
+    @Param("mocks/info/info-modal-flow")
+    public lateinit var content: String
+
+    public lateinit var flow: String
+
+    public lateinit var update: Update
+
+    @Setup(Invocation)
+    public fun setup() {
+        flow = readResource("$content.json")
+        update = mocks[ContentID(content)] ?: throw RuntimeException("update not defined for $content")
+    }
+
+    @CompilerControl(CompilerControl.Mode.DONT_INLINE)
+    @Benchmark
+    fun firstViewUpdate(consumer: Blackhole) {
+        val player = HeadlessPlayer(explicitRuntime = setupRuntime())
+        val pending = player.scope.async {
+            suspendCoroutine {
+                player.hooks.viewController.tap { vc ->
+                    vc?.hooks?.view?.tap { v ->
+                        v?.hooks?.onUpdate?.tap { a ->
                             it.resume(a)
                         }
                     }
                 }
-
                 player.start(flow)
             }
-        })
+        }
+        runBlocking {
+            pending.await()
+        }
+        runtime.release()
     }
-
-    @CompilerControl(CompilerControl.Mode.DONT_INLINE)
-    @Benchmark fun startAndUpdateFlow(consumer: Blackhole) {
-        val player = HeadlessPlayer(explicitRuntime = jsRuntime)
-        consumer.consume(runBlocking {
-            suspendCoroutine<Asset?> {
-                var dataController: DataController? = null
-                player.hooks.dataController.tap("perf") { dc ->
-                    dataController = dc
-                }
-
-                var updateCount = 0
-                player.hooks.viewController.tap("perf") { vc ->
-                    vc?.hooks?.view?.tap("new view") { v ->
-                        v?.hooks?.onUpdate?.tap("test") { a ->
-                            if (updateCount++ == 0)
-                                dataController!!.set(update.binding to update.value)
-
-                            else it.resume(a)
-                        }
-                    }
-                }
-
-                player.start(flow)
-            }
-        })
-    }
-
-}
-
-open class RuntimePlayerFlowPerformance : ContentPerformance() {
-
-    lateinit var runtimeFactory: PlayerRuntimeFactory<*>
-
-    lateinit var flowNode: Node
-
-    @Setup fun setup() {
-        setupContent()
-        flowNode = jsRuntime.execute("""($flow)""") as Node
-    }
-
-    @CompilerControl(CompilerControl.Mode.DONT_INLINE)
-    @Benchmark fun startFlow(consumer: Blackhole) {
-        jsRuntime.execute(playerSource)
-
-        val runner = jsRuntime.execute("""
-((content, playerFactory = () => new Player.Player()) => {
-    return new Promise((resolve, reject) => {
-        try {
-            const player = playerFactory();
-            player.hooks.viewController.tap("perf", (vc) => {
-                vc.hooks.view.tap("new view", (v) => {
-                    v.hooks.onUpdate.tap("test", (a) => {
-                        resolve(a);
-                    });
-                });
-            });
-            player.start(content).catch(reject);
-        } catch (e) { reject(e); }
-    });
-})
-""") as Invokable<Node>
-        val promise = Promise(runner(flowNode))
-
-        consumer.consume(runBlocking {
-            promise.toCompletable<Asset>(Asset.serializer()).await()
-        })
-    }
-
-    @CompilerControl(CompilerControl.Mode.DONT_INLINE)
-    @Benchmark fun startAndUpdateFlow(consumer: Blackhole) {
-        jsRuntime.execute(playerSource)
-
-        val runner = jsRuntime.execute("""
-((content, update, playerFactory = () => new Player.Player()) => {
-    return new Promise((resolve, reject) => {
-        try {
-            const player = playerFactory();
-            let dataController;
-            player.hooks.dataController.tap("perf", (dc) => {
-                dataController = dc;
-            });
-            let updateCount = 0;
-            player.hooks.viewController.tap("perf", (vc) => {
-                vc.hooks.view.tap("new view", (v) => {
-                    v.hooks.onUpdate.tap("test", (a) => {
-                        if (updateCount++ == 0)
-                            dataController.set({ [update.binding]: update.value });
-                        else resolve(a);
-                    });
-                });
-            });
-            player.start(content).catch(reject);
-        } catch (e) { reject(e); }
-    });
-})
-""") as Invokable<Node>
-        val promise = Promise(runner(flowNode, update))
-
-        consumer.consume(runBlocking {
-            promise.toCompletable<Asset>(Asset.serializer()).await()
-        })
-    }
-
 }

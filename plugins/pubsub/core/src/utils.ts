@@ -1,6 +1,6 @@
-import type { Player } from '@player-ui/player';
-import { PubSubPlugin } from './plugin';
-import { PubSubPluginSymbol } from './symbols';
+import type { Player } from "@player-ui/player";
+import { PubSubPlugin } from "./plugin";
+import { PubSubPluginSymbol } from "./symbols";
 
 /**
  * Returns the existing PubSubPlugin or creates and registers a new plugin

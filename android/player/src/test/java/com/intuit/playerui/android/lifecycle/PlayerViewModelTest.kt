@@ -2,6 +2,7 @@ package com.intuit.playerui.android.lifecycle
 
 import android.util.Level
 import android.util.clearLogs
+import com.intuit.playerui.android.extensions.CoroutineTestDispatcherExtension
 import com.intuit.playerui.android.utils.SimpleAsset
 import com.intuit.playerui.core.bridge.PlayerRuntimeException
 import com.intuit.playerui.core.bridge.runtime.Runtime
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
+@ExtendWith(CoroutineTestDispatcherExtension::class)
 internal class PlayerViewModelTest {
 
     private val validFlow = "{\"id\": \"id\",\"navigation\": {\"BEGIN\": \"FLOW_1\",\"FLOW_1\": {\"startState\": \"END_Done\",\"END_Done\": {\"state_type\": \"END\",\"outcome\": \"done\"}}}}"
@@ -184,11 +186,10 @@ internal class PlayerViewModelTest {
         viewModel.apply(runtime)
         viewModel.onCleared()
         assertPlayerState<ReleasedState>()
-        assertEquals(
-            "[J2V8] Runtime object has been released!",
+        assertTrue(
             assertThrows<PlayerRuntimeException> {
                 viewModel.player.start(SimpleAsset.sampleFlow.toString())
-            }.message,
+            }.message!!.endsWith("Runtime object has been released!"),
         )
     }
 

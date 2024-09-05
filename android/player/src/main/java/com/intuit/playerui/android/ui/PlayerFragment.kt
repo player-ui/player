@@ -17,8 +17,6 @@ import androidx.transition.Transition
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.SuspendableAsset
-import com.intuit.playerui.android.databinding.FallbackViewBinding
-import com.intuit.playerui.android.databinding.PlayerFragmentBinding
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.extensions.transitionInto
 import com.intuit.playerui.android.lifecycle.ManagedPlayerState
@@ -34,6 +32,8 @@ import com.intuit.playerui.core.managed.AsyncFlowIterator
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -75,20 +75,22 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
         }
     }
 
-    private var _binding: PlayerFragmentBinding? = null
+    private var _binding: PlayerBinding? = null
 
     /**
-     * [PlayerFragmentBinding] instance
+     * [PlayerBinding] instance
      * This property is only valid between onCreateView and onDestroyView.
      * Will throw a NPE if called out of turn.
      */
-    protected val binding: PlayerFragmentBinding get() = _binding!!
+    protected val binding: PlayerBinding get() = _binding!!
 
     /**
      * [ViewModel][androidx.lifecycle.ViewModel] responsible for managing an [AndroidPlayer]
      * with respect to a specific [FlowManager][com.intuit.playerui.core.managed.FlowManager].
      */
     public abstract val playerViewModel: PlayerViewModel
+
+    private var renderingJob: Job? = null
 
     init {
         lifecycleScope.launch {
@@ -128,7 +130,7 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View = PlayerFragmentBinding.inflate(inflater, container, false).run {
+    ): View = PlayerBinding.inflate(inflater, container, false).run {
         _binding = this
         root
     }
@@ -177,7 +179,8 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
      * styles and inject that into the view tree.
      */
     protected open fun handleAssetUpdate(asset: RenderableAsset?, animateTransition: Boolean) {
-        lifecycleScope.launch(if (asset is SuspendableAsset<*>) Dispatchers.Default else Dispatchers.Main) {
+        renderingJob?.cancel("handling new update")
+        renderingJob = lifecycleScope.launch(if (asset is SuspendableAsset<*>) Dispatchers.Default else Dispatchers.Main) {
             whenStarted { // TODO: This'll go away when we can call a suspend version of this
                 try {
                     renderIntoPlayerCanvas(asset, animateTransition)
@@ -201,10 +204,10 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
 
     /**
      * Builder method to provide a fallback [View] to be shown when the
-     * [PlayerViewModel] encounters an [exception]. Defaults to an instance of [FallbackViewBinding].
+     * [PlayerViewModel] encounters an [exception]. Defaults to an instance of [FallbackBinding].
      */
     public open fun buildFallbackView(exception: Exception): View? =
-        FallbackViewBinding.inflate(layoutInflater).apply {
+        FallbackBinding.inflate(layoutInflater).apply {
             this.error.text = exception.localizedMessage
 
             retry.setOnClickListener {
@@ -214,7 +217,7 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
             reset.setOnClickListener {
                 reset()
             }
-        }.root
+        }.getRoot()
 
     /**
      * Builder method to provide a [View] to be shown when the [PlayerViewModel]

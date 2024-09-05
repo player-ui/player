@@ -32,8 +32,9 @@ In the example below, node with the id "some-async-node" will not be rendered on
 
 The `AsyncNodePlugin` exposes an `onAsyncNode` hook on all platforms. The `onAsyncNode` hook will be invoked with the current node when the plugin is available and an `AsyncNode` is detected during the resolve process. The node used to call the hook with could contain metadata according to content spec.
 
-User should tap into the `onAsyncNode` hook to examine the node's metadata before making a decision on what to replace the async node with. The return could be a single asset node or an array of asset nodes.
+User should tap into the `onAsyncNode` hook to examine the node's metadata before making a decision on what to replace the async node with. The return could be a single asset node or an array of asset nodes, or the return could be even a null|undefined if the async node is no longer relevant.
 
+Returning a value in the above context enables uses cases where the async node only needs to be resolved once. For use cases where the async node needs to be updated multiple times, the onAsyncNode hook provides a second callback argument that can be used to update the value multiple times. For example, if the async node is used to represent some placeholder for toasts, or notifications, the async node handler could initially resolve with some content, and then update with null after some time to remove those views.
 
 ### Continuous Streaming
 
@@ -42,6 +43,9 @@ This means there must be a constant renewal of new `AsyncNode`s after the previo
 
 ## Usage
 
+The `AsyncNodePlugin` itself accepts an options object with a `plugins` array, enabling the integration of multiple view plugins for extended functionality.
+The `AsyncNodePluginPlugin` is provided as a default way of handling asset-async nodes, it is just one handler for one possible way of using async nodes. If the default behavior does not align with the desired usage, users are able to provide their own implementation of the handler in the form of a plugin to be passed to the base `AsyncNodePlugin`. The `AsyncNodePluginPlugin` also comes from the `'@player-ui/async-node-plugin'` and contains the resolver and parser functionality.
+
 <PlatformTabs>
   <core>
 
@@ -49,14 +53,28 @@ Add the plugin to Player:
 
 ```js
 import { Player } from '@player-ui/player';
-import { AsyncNodePlugin } from '@player-ui/async-node-plugin';
+import { AsyncNodePlugin, AsyncNodePluginPlugin } from '@player-ui/async-node-plugin';
 
-const asyncNodePlugin = new AsyncNodePlugin();
+const asyncNodePlugin = new AsyncNodePlugin({
+    plugins: [new AsyncNodePluginPlugin()],
+});
 
 // Configuring async node behaviour
 asyncNodePlugin.hooks.onAsyncNode.tap('handleAsync', async (node: Node.Node) => {
   ...
   // Determine what to return to be parsed into a concrete UI asset
+});
+
+// For use cases where the async node needs to be updated multiple times
+
+asyncNodePlugin.hooks.onAsyncNode.tap("toast-provider", async (node: Node.Async, update: (content) => void) => {
+    ...
+  // do some async task to get content
+  const toastContent = await makeToastFor(node.id);
+  // set timer for 5 seconds to remove the toast content from the view
+  setTimeout(() => update(null), 5000);
+  // uses same mechanism as before
+  return toastContent;
 });
 
 const player = new Player({
@@ -72,9 +90,11 @@ The `react` version of the AsyncNodePlugin is identical to using the core plugin
 
 ```js
 import { ReactPlayer } from '@player-ui/react';
-import { MetricsPlugin } from '@player-ui/async-node-plugin';
+import { AsyncNodePlugin, AsyncNodePluginPlugin } from '@player-ui/async-node-plugin';
 
-const asyncNodePlugin = new AsyncNodePlugin();
+const asyncNodePlugin = new AsyncNodePlugin({
+    plugins: [new AsyncNodePluginPlugin()],
+});
 
 const player = new ReactPlayer({
   plugins: [
@@ -103,7 +123,7 @@ var body: some View {
     SwiftUIPlayer(
         flow: flow,
         plugins: [
-          AsyncNodePlugin { node in
+          AsyncNodePlugin(plugins: [AsyncNodePluginPlugin()]) { node in
               // Determine what to return either using the singleNode or multiNode case
               // Then JSON can be provided using the concrete case, see below for using the encodable case
               return .singleNode(.concrete(jsContext?.evaluateScript("""
@@ -158,21 +178,21 @@ return .multiNode([
 
 Note: the AsyncNode struct is already defined in the plugin with the `async` property defaulted to true so only `id` needs to be passed in
 
-As a convenience to the user, the AsyncNodePlugin just takes a callback which has the content to be returned, this is provided to the plugin which calls the the `onAsyncNode` hook tap method
+As a convenience to the user, the AsyncNodePlugin just takes a callback which has the content to be returned, this is provided to the plugin which calls the the `onAsyncNode` hook tap method. The return could be a single asset node or an array of asset nodes, or null if the async node is no longer relevant.
 
   </ios>
   <android>
 
 In build.gradle
 ```kotlin
-implementation "com.intuit.player.plugins:async-node:$PLAYER_VERSION"
+implementation "com.intuit.playerui.plugins:async-node:$PLAYER_VERSION"
 ```
 
 In integration code
 ```kotlin
-import com.intuit.player.plugins.asyncnode.AsyncNodePlugin
+import com.intuit.playerui.plugins.asyncnode.AsyncNodePlugin
 
-val asyncNodePlugin = AsyncNodePlugin()
+val asyncNodePlugin = AsyncNodePlugin(plugins: [AsyncNodePluginPlugin()])
 
 // Configuring async node behaviour
 asyncNodePlugin.hooks.onAsyncNode.tap("handleAsync") { hookContext, node ->

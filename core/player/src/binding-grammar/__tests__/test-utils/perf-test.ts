@@ -1,9 +1,9 @@
-import { VALID_AST_PARSER_TESTS } from './ast-cases';
-import { parse as parseParsimmon } from '../../parsimmon';
-import { parse as parseEBNF } from '../../ebnf';
-import { parse as parseCustom } from '../../custom';
+import { VALID_AST_PARSER_TESTS } from "./ast-cases";
+import { parse as parseParsimmon } from "../../parsimmon";
+import { parse as parseEBNF } from "../../ebnf";
+import { parse as parseCustom } from "../../custom";
 
-import type { Parser } from '../../ast';
+import type { Parser } from "../../ast";
 
 const parsers: Array<{
   /** The name of the parser being tested */
@@ -12,9 +12,9 @@ const parsers: Array<{
   /** The parse function  */
   parser: Parser;
 }> = [
-  { name: 'parsimmon', parser: parseParsimmon },
-  { name: 'ebnf', parser: parseEBNF },
-  { name: 'custom', parser: parseCustom },
+  { name: "parsimmon", parser: parseParsimmon },
+  { name: "ebnf", parser: parseEBNF },
+  { name: "custom", parser: parseCustom },
 ];
 
 const VALID_ITERATIONS = 1000;

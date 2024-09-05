@@ -32,7 +32,7 @@ public class ExternalActionPlugin(
 
     override fun apply(runtime: Runtime<*>) {
         SetTimeoutPlugin().apply(runtime)
-        runtime.load(ScriptContext(if (runtime.config.debuggable) debugScript else script, bundledSourcePath))
+        runtime.load(ScriptContext(script, bundledSourcePath))
         runtime.add("externalActionHandler") externalActionHandler@{ state: Node, options: Node ->
             val state = state.deserialize(NavigationFlowState.serializer())
                 as? NavigationFlowExternalState ?: return@externalActionHandler null
@@ -52,7 +52,7 @@ public class ExternalActionPlugin(
 
     private companion object {
         private const val pluginName = "ExternalActionPlugin.ExternalActionPlugin"
-        private const val bundledSourcePath = "plugins/external-action/core/dist/external-action-plugin.prod.js"
+        private const val bundledSourcePath = "plugins/external-action/core/dist/ExternalActionPlugin.native.js"
     }
 }
 

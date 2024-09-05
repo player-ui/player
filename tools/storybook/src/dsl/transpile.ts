@@ -1,15 +1,20 @@
-import { initialize, transform } from 'esbuild-wasm/lib/browser';
-import * as React from 'react';
-import * as PlayerDSL from '@player-tools/dsl';
+import { initialize, transform } from "esbuild-wasm/lib/browser";
+import * as React from "react";
+import * as PlayerDSL from "@player-tools/dsl";
 
-const setup = (async () => {
-  try {
-    await initialize({
-      worker: true,
-      wasmURL: 'https://unpkg.com/esbuild-wasm@0.14.23/esbuild.wasm',
-    });
-  } catch (e: any) {}
-})();
+let initializedPromise: undefined | Promise<void>;
+async function setup() {
+  if (initializedPromise) {
+    return initializedPromise;
+  }
+
+  initializedPromise = initialize({
+    worker: true,
+    wasmURL: "https://unpkg.com/esbuild-wasm@0.19.12/esbuild.wasm",
+  });
+
+  return initializedPromise;
+}
 
 /** Eval the code and check imports */
 export const execute = async (
@@ -17,15 +22,19 @@ export const execute = async (
   options?: {
     /** Other modules to include in the compilation */
     additionalModules?: Record<string, any>;
-  }
+  },
 ) => {
   const { additionalModules = {} } = options ?? {};
 
-  await setup;
+  try {
+    await setup();
+  } catch (e) {
+    console.error(e);
+  }
 
   const result = await transform(code, {
-    loader: 'tsx',
-    format: 'cjs',
+    loader: "tsx",
+    format: "cjs",
     tsconfigRaw: {
       compilerOptions: {},
     },
@@ -33,7 +42,7 @@ export const execute = async (
 
   const mods = {
     react: React,
-    '@player-tools/dsl': PlayerDSL,
+    "@player-tools/dsl": PlayerDSL,
     ...additionalModules,
   };
 

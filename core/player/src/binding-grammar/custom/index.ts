@@ -6,24 +6,24 @@ import type {
   ValueNode,
   QueryNode,
   ExpressionNode,
-} from '../ast';
+} from "../ast";
 import {
   toValue,
   toPath,
   toConcatenatedNode,
   toQuery,
   toExpression,
-} from '../ast';
+} from "../ast";
 
-const SEGMENT_SEPARATOR = '.';
-const OPEN_CURL = '{';
-const CLOSE_CURL = '}';
-const OPEN_BRACKET = '[';
-const CLOSE_BRACKET = ']';
-const EQUALS = '=';
+const SEGMENT_SEPARATOR = ".";
+const OPEN_CURL = "{";
+const CLOSE_CURL = "}";
+const OPEN_BRACKET = "[";
+const CLOSE_BRACKET = "]";
+const EQUALS = "=";
 const SINGLE_QUOTE = "'";
 const DOUBLE_QUOTE = '"';
-const BACK_TICK = '`';
+const BACK_TICK = "`";
 // const IDENTIFIER_REGEX = /[\w\-@]+/;
 
 /** A _faster_ way to match chars instead of a regex. */
@@ -65,14 +65,13 @@ export const parse: Parser = (path) => {
 
     ch = path.charAt(index);
     index += 1;
-    // console.log(`Index: ${index} Char: ${ch}`);
     return ch;
   };
 
   /** gobble all whitespace */
   const whitespace = () => {
     /* eslint-disable no-unmodified-loop-condition */
-    while (ch === ' ') {
+    while (ch === " ") {
       next();
     }
   };
@@ -252,7 +251,7 @@ export const parse: Parser = (path) => {
   const parseSegmentAndBrackets = (): Array<AnyNode> => {
     // try to parse a segment first
 
-    const parsed = [];
+    const parsed: Array<AnyNode> = [];
 
     const firstSegment = segment();
 

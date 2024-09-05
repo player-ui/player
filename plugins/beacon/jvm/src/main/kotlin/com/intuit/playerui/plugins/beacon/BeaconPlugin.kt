@@ -43,7 +43,7 @@ public class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JSScrip
                 }
             }
 
-        runtime.load(ScriptContext(if (runtime.config.debuggable) debugScript else script, bundledSourcePath))
+        runtime.load(ScriptContext(script, bundledSourcePath))
         runtime.add("beaconOptions", config)
         instance = runtime.buildInstance("(new $name.$name(beaconOptions))")
     }
@@ -70,7 +70,7 @@ public class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JSScrip
 
     private companion object {
         private const val pluginName = "BeaconPlugin"
-        private const val bundledSourcePath = "plugins/beacon/core/dist/beacon-plugin.prod.js"
+        private const val bundledSourcePath = "plugins/beacon/core/dist/BeaconPlugin.native.js"
     }
 
     @Serializable

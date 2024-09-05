@@ -1,6 +1,7 @@
-import React from 'react';
-import { ManagedPlayer, Flow, FlowManager } from '@player-ui/react';
-import { ReferenceAssetsPlugin } from '@player-ui/reference-assets-plugin-react';
+import React from "react";
+import { ManagedPlayer, Flow, FlowManager } from "@player-ui/react";
+import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin-react";
+import "@player-ui/reference-assets-plugin-react/dist/index.css";
 import {
   Box,
   VStack,
@@ -10,16 +11,16 @@ import {
   Heading,
   HStack,
   Stack,
-} from '@chakra-ui/react';
-import { CodeHighlight } from '../code-highlight';
-import { basicFlowManager } from './sample-flows/sample-flow-manager';
+} from "@chakra-ui/react";
+import { CodeHighlight } from "../code-highlight";
+import { basicFlowManager } from "./sample-flows/sample-flow-manager";
 
 export const PlayerDemo = () => {
   const config = React.useMemo(
     () => ({
       plugins: [new ReferenceAssetsPlugin()],
     }),
-    []
+    [],
   );
 
   const [completed, setCompleted] = React.useState(false);
@@ -42,39 +43,30 @@ export const PlayerDemo = () => {
     };
   }, [setCurrentFlow]);
 
-  if (!(process as any).browser) {
-    // Suspense has issues with SSR in next
-    return null;
-  }
-
   return (
     <Stack
-      gap={{ base: 20, md: '40' }}
+      gap={{ base: 20, md: "40" }}
       alignItems="center"
-      direction={{ base: 'column', lg: 'row' }}
+      direction={{ base: "column", lg: "row" }}
     >
       <Box
         w={{
-          base: '100%',
-          md: 'calc(var(--chakra-sizes-md) + (2 * var(--chakra-space-4)))',
+          base: "100%",
+          md: "calc(var(--chakra-sizes-md) + (2 * var(--chakra-space-4)))",
         }}
       >
         <CodeHighlight
           customStyle={{
-            style: { width: '100%' },
+            width: "100%",
           }}
           codeTagProps={{
-            style: { height: 'var(--shakra-sizes-sm)' },
+            style: { height: "var(--shakra-sizes-sm)" },
           }}
           language="json"
         >
           {currentFlow
-            ? JSON.stringify(
-                currentFlow.views?.map((a) => a.title),
-                null,
-                2
-              )
-            : 'Start again'}
+            ? JSON.stringify(currentFlow.views?.map((a) => a.title), null, 2)
+            : "Start again"}
         </CodeHighlight>
       </Box>
 
@@ -88,8 +80,8 @@ export const PlayerDemo = () => {
           alignItems="center"
           justifyContent="center"
           w={{
-            base: '100%',
-            md: 'calc(var(--chakra-sizes-md) + (2 * var(--chakra-space-4)))',
+            base: "100%",
+            md: "calc(var(--chakra-sizes-md) + (2 * var(--chakra-space-4)))",
           }}
           h="sm"
           overflowY="auto"

@@ -1,30 +1,34 @@
-import React from 'react';
-import { Table, HeadCell, Cell, Body, Row } from '@devtools-ds/table';
-import { useSelector } from 'react-redux';
-import { Placeholder } from '@storybook/components';
-import type { EventType } from '../../state';
-import type { StateType } from '../../redux';
-import { useContentKind } from '../../redux';
+import React from "react";
+import { Table, Head, HeadCell, Cell, Body, Row } from "@devtools-ds/table";
+import { useSelector } from "react-redux";
+import { Placeholder } from "@storybook/components";
+import type { EventType } from "../../state";
+import type { StateType } from "../../redux";
+import { useContentKind } from "../../redux";
 
-import styles from './events.css';
+import { useDarkMode } from "../useDarkMode";
+import { API } from "@storybook/manager-api";
 
 interface EventsPanelProps {
   /** if the panel is shown */
   active: boolean;
+
+  /** Storybook manager API */
+  api: API;
 }
 
 /** Pad the cells to give room */
 const ExtraCells = (event: EventType) => {
-  if (event.type === 'log') {
+  if (event.type === "log") {
     return (
       <>
         <td>{event.severity}</td>
-        <td>{event.message.map((a) => JSON.stringify(a)).join(' ')}</td>
+        <td>{event.message.map((a) => JSON.stringify(a)).join(" ")}</td>
       </>
     );
   }
 
-  if (event.type === 'dataChange') {
+  if (event.type === "dataChange") {
     return (
       <>
         <td>{event.binding}</td>
@@ -33,22 +37,22 @@ const ExtraCells = (event: EventType) => {
     );
   }
 
-  if (event.type === 'stateChange') {
+  if (event.type === "stateChange") {
     let name: string = event.state;
 
-    if (event.state === 'completed') {
-      name = `${name} (${event.error ? 'error' : 'success'})`;
+    if (event.state === "completed") {
+      name = `${name} (${event.error ? "error" : "success"})`;
     }
 
     return (
       <>
         <td>{name}</td>
-        <td>{event.outcome ?? event.error ?? ''}</td>
+        <td>{event.outcome ?? event.error ?? ""}</td>
       </>
     );
   }
 
-  if (event.type === 'metric') {
+  if (event.type === "metric") {
     return (
       <>
         <td>{event.metricType}</td>
@@ -64,6 +68,7 @@ const ExtraCells = (event: EventType) => {
 export const EventsPanel = (props: EventsPanelProps) => {
   const events = useSelector<StateType, EventType[]>((state) => state.events);
   const contentType = useContentKind();
+  const darkMode = useDarkMode(props.api);
 
   if (!props.active) {
     return null;
@@ -78,22 +83,26 @@ export const EventsPanel = (props: EventsPanelProps) => {
   }
 
   return (
-    <Table>
-      <Table.HeadCell className={styles.header}>
-        <Table.Row>
-          <Table.Cell>Time</Table.Cell>
-          <Table.Cell>Type</Table.Cell>
-        </Table.Row>
-      </Table.HeadCell>
-      <Table.Body>
-        {events.map((evt) => (
-          <Table.Row key={evt.id}>
-            <Table.Cell>{evt.time}</Table.Cell>
-            <Table.Cell>{evt.type}</Table.Cell>
-            <ExtraCells {...evt} />
-          </Table.Row>
-        ))}
-      </Table.Body>
-    </Table>
+    <div>
+      <Table colorScheme={darkMode ? "dark" : "light"}>
+        <Head>
+          <Row>
+            <HeadCell>Time</HeadCell>
+            <HeadCell>Type</HeadCell>
+            <HeadCell />
+            <HeadCell />
+          </Row>
+        </Head>
+        <Body>
+          {events.map((evt) => (
+            <Row key={evt.id}>
+              <Cell>{evt.time}</Cell>
+              <Cell>{evt.type}</Cell>
+              <ExtraCells {...evt} />
+            </Row>
+          ))}
+        </Body>
+      </Table>
+    </div>
   );
 };

@@ -1,6 +1,6 @@
-import { LocalModel } from '../../data';
-import { BindingInstance } from '../../binding';
-import { objectToBatchSet } from './utils';
+import { LocalModel } from "../../data";
+import { BindingInstance } from "../../binding";
+import { objectToBatchSet } from "./utils";
 
 export interface ConstantsProvider {
   /**

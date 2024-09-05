@@ -14,7 +14,7 @@ public class PubSubPlugin(public val config: Config? = null) : JSScriptPluginWra
 
     override fun apply(runtime: Runtime<*>) {
         config?.let {
-            runtime.load(ScriptContext(if (runtime.config.debuggable) debugScript else script, bundledSourcePath))
+            runtime.load(ScriptContext(script, bundledSourcePath))
             runtime.add("pubsubConfig", config)
             instance = runtime.buildInstance("(new $name(pubsubConfig))")
         } ?: super.apply(runtime)
@@ -53,7 +53,7 @@ public class PubSubPlugin(public val config: Config? = null) : JSScriptPluginWra
 
     private companion object {
         private const val pluginName = "PubSubPlugin.PubSubPlugin"
-        private const val bundledSourcePath = "plugins/pubsub/core/dist/pubsub-plugin.prod.js"
+        private const val bundledSourcePath = "plugins/pubsub/core/dist/PubSubPlugin.native.js"
     }
 }
 

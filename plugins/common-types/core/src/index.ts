@@ -1,9 +1,9 @@
-import type { Player, ExtendedPlayerPlugin } from '@player-ui/player';
-import { TypesProviderPlugin } from '@player-ui/types-provider-plugin';
+import type { Player, ExtendedPlayerPlugin } from "@player-ui/player";
+import { TypesProviderPlugin } from "@player-ui/types-provider-plugin";
 
-import * as validators from './validators';
-import * as dataTypes from './data-types/types';
-import * as formats from './formats';
+import * as validators from "./validators";
+import * as dataTypes from "./data-types/types";
+import * as formats from "./formats";
 import type {
   BooleanType,
   IntegerType,
@@ -13,11 +13,11 @@ import type {
   CollectionType,
   DateType,
   PhoneType,
-} from './data-types/types';
+} from "./data-types/types";
 
 export { validators, dataTypes, formats };
 
-export * from './formats/utils';
+export * from "./formats/utils";
 
 /**
  * Exposes a lot of common DataTypes, validations, and formats to Player instance.
@@ -36,11 +36,11 @@ export class CommonTypesPlugin
         typeof StringType,
         typeof CollectionType,
         typeof DateType,
-        typeof PhoneType
+        typeof PhoneType,
       ]
     >
 {
-  name = 'CommonTypes';
+  name = "CommonTypes";
 
   apply(player: Player) {
     player.registerPlugin(
@@ -48,7 +48,7 @@ export class CommonTypesPlugin
         types: Object.values(dataTypes),
         formats: Object.values(formats),
         validators: Object.entries(validators),
-      })
+      }),
     );
   }
 }

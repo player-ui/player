@@ -1,5 +1,5 @@
-import React from 'react';
-import type { Player, NavigationFlowViewState } from '@player-ui/player';
+import React from "react";
+import type { Player, NavigationFlowViewState } from "@player-ui/player";
 
 export interface PlayerContextType {
   /**
