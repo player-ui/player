@@ -1,0 +1,7 @@
+html[data-theme="dark"] img[src*="lightModeOnly"] {
+  display: none !important;
+}
+
+html[data-theme="light"] img[src*="darkModeOnly"] {
+  display: none !important;
+}

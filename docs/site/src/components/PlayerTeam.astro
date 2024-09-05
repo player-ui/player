@@ -1,0 +1,67 @@
+---
+const TeamData = [
+  {
+    name: "Adam Dierkens",
+    domain: ["React", "Core"],
+    avatar: "https://avatars.githubusercontent.com/u/13004162?v=4",
+  },
+  {
+    name: "Harris Borawski",
+    domain: ["iOS"],
+    avatar: "https://avatars.githubusercontent.com/u/1325154?v=4",
+  },
+  {
+    name: "Jeremiah Zucker",
+    domain: ["Android"],
+    avatar: "https://avatars.githubusercontent.com/u/9255651?&v=4",
+  },
+  {
+    name: "Ketan Reddy",
+    domain: ["Core", "Tools"],
+    avatar: "https://avatars.githubusercontent.com/u/8703262?v=4",
+  },
+  {
+    name: "Spencer Hamm",
+    domain: ["React", "Core"],
+    avatar: "https://avatars.githubusercontent.com/u/1043478?v=4",
+  },
+  {
+    name: "Tony Lin",
+    domain: ["Android"],
+    avatar: "https://avatars.githubusercontent.com/u/13474011?v=4",
+  },
+  {
+    name: "Rafael Campos",
+    domain: ["Tools"],
+    avatar: "https://avatars.githubusercontent.com/u/26394217?v=4",
+  },
+  {
+    name: "Marlon Ercillo",
+    domain: ["React"],
+    avatar: "https://avatars.githubusercontent.com/u/3643493?v=4",
+  },
+  {
+    name: "Nancy Wu",
+    domain: ["iOS"],
+    avatar: "https://avatars.githubusercontent.com/u/66387473?v=4",
+  },
+];
+---
+
+<div class="grid grid-cols-4 gap-4">
+  {
+    TeamData.sort(() => 0.5 - Math.random()).map((teamMember) => (
+      <div class="flex flex-col gap-0 items-center justify-between">
+        <div class="avatar">
+          <div class="w-24 rounded-xl">
+            <img alt={teamMember.name} src={teamMember.avatar} />
+          </div>
+        </div>
+        <div class="min-w-24">
+          <h6>{teamMember.name}</h6>
+          {teamMember.domain.join(", ")}
+        </div>
+      </div>
+    ))
+  }
+</div>
