@@ -11,6 +11,7 @@ import XCTest
 
 @testable import PlayerUI
 @testable import PlayerUIInternalTestUtilities
+@testable import PlayerUITestUtilitiesCore
 
 class ExpressionEvaluatorTests: XCTestCase {
     func testExpressionEvaluator() {

@@ -14,6 +14,7 @@ import JavaScriptCore
 @testable import PlayerUI
 @testable import PlayerUISwiftUI
 @testable import PlayerUIInternalTestUtilities
+@testable import PlayerUITestUtilitiesCore
 
 class ManagedPlayerViewModelTests: XCTestCase {
     let flow1 = FlowData.COUNTER

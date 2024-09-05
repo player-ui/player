@@ -1,17 +1,20 @@
 import JavaScriptCore
+
 import PlayerUI
+#if SWIFT_PACKAGE
 import PlayerUILogger
+#endif
 
-class HeadlessPlayerImpl: HeadlessPlayer {
-    var assetRegistry: BaseAssetRegistry<TestWrapper>
-    var hooks: HeadlessHooks?
-    var logger = TapableLogger()
+open class HeadlessPlayerImpl: HeadlessPlayer {
+    public var assetRegistry: BaseAssetRegistry<TestWrapper>
+    public var hooks: HeadlessHooks?
+    public var logger = TapableLogger()
 
-    var jsPlayerReference: JSValue?
+    public var jsPlayerReference: JSValue?
 
     let match = PartialMatchFingerprintPlugin()
 
-    init(plugins: [NativePlugin], context: JSContext = JSContext()) {
+    public init(plugins: [NativePlugin], context: JSContext = JSContext()) {
         assetRegistry = BaseAssetRegistry<TestWrapper>(logger: logger)
         jsPlayerReference = setupPlayer(context: context, plugins: plugins + [match])
         assetRegistry.partialMatchRegistry = match
@@ -21,16 +24,16 @@ class HeadlessPlayerImpl: HeadlessPlayer {
     }
 }
 
-class HeadlessHooks: CoreHooks {
-    var flowController: Hook<FlowController>
+public class HeadlessHooks: CoreHooks {
+    public var flowController: Hook<FlowController>
 
-    var viewController: Hook<ViewController>
+    public var viewController: Hook<ViewController>
 
-    var dataController: Hook<DataController>
+    public var dataController: Hook<DataController>
 
-    var state: Hook<BaseFlowState>
+    public var state: Hook<BaseFlowState>
 
-    required init(from value: JSValue) {
+    required public init(from value: JSValue) {
         flowController = Hook(baseValue: value, name: "flowController")
         viewController = Hook(baseValue: value, name: "viewController")
         dataController = Hook(baseValue: value, name: "dataController")
@@ -38,17 +41,17 @@ class HeadlessHooks: CoreHooks {
     }
 }
 
-class TestAssetType: PlayerAsset, Decodable {
+public class TestAssetType: PlayerAsset, Decodable {
     var rawValue: JSValue?
-    var id: String
-    var type: String
+    public var id: String
+    public var type: String
     var value: String?
     struct Data: Decodable {
         var id: String
         var type: String
         var value: String?
     }
-    required init(from decoder: Decoder) throws {
+    required public init(from decoder: Decoder) throws {
         let data = try decoder.singleValueContainer().decode(Data.self)
         id = data.id
         type = data.type
@@ -56,12 +59,12 @@ class TestAssetType: PlayerAsset, Decodable {
     }
 }
 
-class TestWrapper: AssetContainer, Decodable {
+public class TestWrapper: AssetContainer, Decodable {
     public enum CodingKeys: String, CodingKey {
         case asset
     }
-    var asset: TestAssetType?
-    required init(forAsset: TestAssetType) {
+    public var asset: TestAssetType?
+    required public init(forAsset: TestAssetType) {
         self.asset = forAsset
     }
 

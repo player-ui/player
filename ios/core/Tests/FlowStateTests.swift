@@ -10,6 +10,7 @@ import XCTest
 import JavaScriptCore
 @testable import PlayerUI
 @testable import PlayerUIInternalTestUtilities
+@testable import PlayerUITestUtilitiesCore
 
 class FlowStateTests: XCTestCase {
     func testViewFlowState() {

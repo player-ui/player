@@ -12,7 +12,7 @@ import XCTest
 @testable import PlayerUI
 @testable import PlayerUIPrintLoggerPlugin
 @testable import PlayerUILogger
-@testable import PlayerUIInternalTestUtilities
+@testable import PlayerUITestUtilitiesCore
 
 class PrintLoggerPluginTests: XCTestCase {
     func testPrintLogger() {
