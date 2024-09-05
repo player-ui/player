@@ -1,9 +1,4 @@
 ---
-const slotNames = ["tsx", "json"];
-const populatedSlots = Object.fromEntries(
-  slotNames.map((slotName) => [slotName, Astro.slots.has(slotName)])
-);
-
 const name = crypto.randomUUID();
 ---
 
