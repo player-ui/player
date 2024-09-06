@@ -2,6 +2,8 @@
 title: "Assets & Views"
 ---
 
+import ContentTabs from "../../../components/ContentTabs.astro";
+
 ## Assets
 
 An asset is a generic term given to a semantic bit of information that we wish to convey to the user. Assets are the primitive elements that make up the content Player presents as user experiences. Though there are many different types of assets, they all follow the same basic principles:
@@ -18,6 +20,20 @@ Each asset must have 2 properties: an `id` and `type`:
 
 Nested assets are represented as objects containing an `asset` property. For example:
 
+<ContentTabs>
+  <Fragment slot='tsx'>
+```tsx
+import { Asset } from '@player-tools/dsl';
+
+<Asset id="parent" type="parent">
+  <Asset.Label>
+    <Asset id="child-asset" type="child">
+  </Asset.Label>
+</Asset>
+```
+
+  </Fragment>
+  <Fragment slot="json">
 ```json
 {
   "id": "parent",
@@ -30,6 +46,8 @@ Nested assets are represented as objects containing an `asset` property. For exa
   }
 }
 ```
+  </Fragment>
+</ContentTabs>
 
 The `label` of the parent contains a nested asset reference. These are _slots_ that can usually contain any asset type.
 
@@ -45,6 +63,26 @@ The other special property of a `view` vs. an `asset` is the addition of a `vali
 
 Example:
 
+<ContentTabs>
+  <Fragment slot='tsx'>
+```tsx
+import { View, expression as e, binding as b } from '@player-tools/dsl';
+
+<View 
+  type="view"
+  validation=[
+    {
+      type: 'expression',
+      ref: b`foo.data.thing1`,
+      message: "Both need to equal 100",
+      exp: `${b`foo.data.thing`} + ${b`foo.data.thing2`} == 100`,
+    }
+   ]
+/>
+```
+
+  </Fragment>
+  <Fragment slot="json">
 ```json
 {
   ...
@@ -63,6 +101,8 @@ Example:
   ]
 }
 ```
+  </Fragment>
+</ContentTabs>
 
 They follow the same guidelines for normal validation references, with the addition of a `ref` property that points to the binding that this validation is tied to.
 
@@ -95,11 +135,33 @@ A `dynamicSwitch` will always update the applicable case statement whenever data
 
 Anywhere you can place an `asset` node, a `dynamicSwitch` or `staticSwitch` can be placed instead.
 
+<ContentTabs>
+  <Fragment slot='tsx'>
+```tsx
+import { Switch, Asset, expression as e, binding as b } from '@player-tools/dsl';
+
+<Switch>
+  <Switch.Case exp={e`${b`name.first`} == 'John'`}>
+    <Asset id="name" type="text" value="Yay" />
+  </Switch.Case>
+  <Switch.Case exp={e`${b`name.first`} == 'Jane'`}>
+    <Asset id="name" type="text" value="Nay" />
+  </Switch.Case>
+  <Switch.Case exp}>
+    <Asset id="name" type="text" value="🤷" />
+  </Switch.Case>
+<Switch>
+
+````
+
+  </Fragment>
+  <Fragment slot="json">
+
 ```json
 {
   "staticSwitch": [
     {
-      "case": "{{name.first}} == 'adam'",
+      "case": "{{name.first}} == 'John'",
       "asset": {
         "id": "name",
         "type": "text",
@@ -107,7 +169,7 @@ Anywhere you can place an `asset` node, a `dynamicSwitch` or `staticSwitch` can 
       }
     },
     {
-      "case": "{{name.first}} == 'notadam'",
+      "case": "{{name.first}} == 'Jane'",
       "asset": {
         "id": "name",
         "type": "text",
@@ -124,7 +186,10 @@ Anywhere you can place an `asset` node, a `dynamicSwitch` or `staticSwitch` can 
     }
   ]
 }
-```
+````
+
+  </Fragment>
+</ContentTabs>
 
 ## Templates
 
