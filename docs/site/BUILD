@@ -22,9 +22,15 @@ build_deps = [
     "//:node_modules/@astrojs/starlight-tailwind",
     "//:node_modules/rehype-mermaid",
     "//:node_modules/astro",
+    "//:node_modules/@astrojs/react",
+    "//:node_modules/react",
+    "//:node_modules/react-dom",
     "//:node_modules/daisyui",
     "//:node_modules/tailwindcss",
     "//:node_modules/sharp",
+    "//:node_modules/@monaco-editor/react",
+    "//:node_modules/json5",
+    "//:node_modules/stringify-object",
 ]
 
 astro_bin.astro(

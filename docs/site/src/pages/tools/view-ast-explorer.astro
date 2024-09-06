@@ -1,0 +1,10 @@
+---
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import ASTExplorer from "../../components/tools/ASTExplorer";
+---
+
+<StarlightPage frontmatter={{ title: "View AST Explorer" }}>
+  <p>This is a custom page with a custom component:</p>
+
+  <ASTExplorer client:only />
+</StarlightPage>

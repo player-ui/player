@@ -2,10 +2,12 @@ import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
 import starlight from "@astrojs/starlight";
 import rehypeMermaid from "rehype-mermaid";
+import react from "@astrojs/react";
 
 // https://astro.build/config
 export default defineConfig({
   integrations: [
+    react(),
     tailwind({
       applyBaseStyles: false,
     }),
@@ -59,6 +61,15 @@ export default defineConfig({
             {
               label: "Plugins",
               autogenerate: { directory: "plugins" },
+            },
+          ],
+        },
+        {
+          label: "Tools",
+          items: [
+            {
+              label: "View AST Explorer",
+              link: "/tools/view-ast-explorer",
             },
           ],
         },
