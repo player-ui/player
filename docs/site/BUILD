@@ -20,6 +20,7 @@ build_deps = [
     "//:node_modules/@astrojs/starlight",
     "//:node_modules/@astrojs/tailwind",
     "//:node_modules/@astrojs/starlight-tailwind",
+    "//:node_modules/rehype-mermaid",
     "//:node_modules/astro",
     "//:node_modules/daisyui",
     "//:node_modules/tailwindcss",

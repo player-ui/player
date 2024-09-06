@@ -2,6 +2,12 @@
 title: Player + Storybook Integration
 ---
 
+import Image from "../../../components/Image.astro";
+import eventsAddonGif from "../../../assets/tools/storybook/events-addon.gif";
+import flowAddonGif from "../../../assets/tools/storybook/flow-addon.gif";
+import docsAddonGif from "../../../assets/tools/storybook/docs-addon.gif";
+import flowResetGif from "../../../assets/tools/storybook/flow-reset.gif";
+
 ## Reference Assets
 
 The reference asset set, complete with the storybook-plugin integration below is available [here](/storybook-demo)
@@ -60,19 +66,19 @@ export const parameters = {
 
 The events panel addon shows a timeline of events as the flow is processed. Here you will see logs, render/update metrics, data mutations, and more.
 
-![Events Addon Panel](/tools/storybook/events-addon.gif)
+<Image alt="Events Addon Panel" src={eventsAddonGif} />
 
 #### Flow
 
 The flow panel addon enables users to view and edit the JSON content in the running Player.
 
-![Flow Addon Panel](/tools/storybook/flow-addon.gif)
+<Image alt="Flow Addon Panel" src={flowAddonGif} />
 
 #### Asset Docs
 
 The asset docs panel will show the data-types for the configured Assets.
 
-![Docs Addon Panel](/tools/storybook/docs-addon.gif)
+<Image alt="Docs Addon Panel" src={docsAddonGif} />
 
 In order to configure the panel to show specific asset documentation, first include the `assetXLRSources` as a parameter in your `preview.js`:
 
@@ -100,4 +106,4 @@ const meta: Meta<typeof Action> = {
 
 The reset button in the toolbar will reset the running Player with the initial content. This is useful for clearing any data or validation state, or for resetting a completed flow.
 
-![Flow Reset Button](/tools/storybook/flow-reset.gif)
+<Image alt="Flow Reset Button" src={flowResetGif} />

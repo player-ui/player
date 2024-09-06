@@ -4,14 +4,14 @@ platform: core,react,ios,android
 ---
 
 import PlatformTabs from "../../../components/PlatformTabs.astro";
-
-# Metrics Plugin
+import Image from "../../../components/Image.astro";
+import metricsTiming from "../../../assets/metrics-timing.png";
 
 The Metrics Plugin is used to gather timing information about Player's execution of a flow. There are also platform specific integrations to include `render` and `update` times.
 
 The diagram below illistrates some of the timing information gathered:
 
-![Metrics Timing Diagram](/metrics-timing.png?darkModeInvert)
+<Image darkModeInvert src={metricsTiming} alt="Metrics Timing Diagram" />
 
 ## Usage
 

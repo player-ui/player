@@ -5,3 +5,7 @@ html[data-theme="dark"] img[src*="lightModeOnly"] {
 html[data-theme="light"] img[src*="darkModeOnly"] {
   display: none !important;
 }
+
+:root {
+  --sl-content-width: 80rem;
+}

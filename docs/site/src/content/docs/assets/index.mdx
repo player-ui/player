@@ -1,8 +1,9 @@
 ---
-title: 'Assets'
+title: "Assets"
 ---
 
-# Assets
+import Image from "../../../components/Image.astro";
+import assetPartsImage from "../../../assets/asset-parts.png";
 
 An asset is a generic term given to a semantic bit of information that we wish to convey to the user. Assets are the backbone that make up the content that Player renders. Though there are many different types of assets, they all follow the same basic principles:
 
@@ -19,7 +20,7 @@ There are a few key components that make up an asset:
 - How it interacts with Player
 - How it should render
 
-![Asset Parts](/asset-parts.png?darkModeInvert)
+<Image darkModeInvert alt="Asset Parts" src={assetPartsImage} />
 
 With few exceptions, an asset requires all three of these to be defined to fully function.
 

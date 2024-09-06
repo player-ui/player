@@ -1,6 +1,7 @@
 import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
 import starlight from "@astrojs/starlight";
+import rehypeMermaid from "rehype-mermaid";
 
 // https://astro.build/config
 export default defineConfig({
@@ -12,6 +13,9 @@ export default defineConfig({
       title: "Player",
       social: {
         github: "https://github.com/player-ui/player",
+      },
+      editLink: {
+        baseUrl: "https://github.com/player-ui/player/edit/main/docs/site",
       },
       customCss: ["./src/styles/custom.css", "./src/tailwind.css"],
       components: {
@@ -34,10 +38,6 @@ export default defineConfig({
             {
               label: "Content",
               autogenerate: { directory: "content" },
-            },
-            {
-              label: "Authoring",
-              autogenerate: { directory: "authoring" },
             },
             {
               label: "Assets",
@@ -65,4 +65,7 @@ export default defineConfig({
       ],
     }),
   ],
+  markdown: {
+    rehypePlugins: [[rehypeMermaid, { strategy: "img-svg", dark: true }]],
+  },
 });

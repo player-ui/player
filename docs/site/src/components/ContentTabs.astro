@@ -14,7 +14,7 @@ const name = crypto.randomUUID();
   />
   <div
     role="tabpanel"
-    class="tab-content bg-base-100 border-base-300 rounded-box p-6"
+    class="tab-content content bg-base-100 border-base-300 rounded-box p-6"
   >
     <slot name="tsx" />
   </div>
@@ -29,8 +29,14 @@ const name = crypto.randomUUID();
   />
   <div
     role="tabpanel"
-    class="tab-content bg-base-100 border-base-300 rounded-box p-6"
+    class="tab-content content bg-base-100 border-base-300 rounded-box p-6"
   >
     <slot name="json" />
   </div>
 </div>
+
+<style>
+  .content {
+    max-width: var(--sl-content-width);
+  }
+</style>

@@ -2,7 +2,8 @@
 title: Navigation
 ---
 
-# Navigation
+import Image from "../../../components/Image.astro";
+import simpleFlowImage from "../../../assets/simple-flow.png";
 
 The `navigation` section of the content describes the path the user goes through as they progress. In simple terms, this can be thought of as a set of finite state machines, and the user progresses through each state until they hit a `DONE` node.
 
@@ -100,9 +101,9 @@ State types can also contain `onStart` and `onEnd` properties for evaluating exp
 
 1. `onStart` - Evaluated at the start of a node's lifecycle; useful for updating data before it's resolved
 2. `exp`
-3. `onEnd` - Evaluated last, right before transition. 
-    1. For an `onEnd` expression defined on an individual state, if a transition is halted (by validation or otherwise), the `onEnd` expressions for that state won't be executed.
-    2. As Player's navigation is a state machine, `onEnd` expressions defined for the entire flow will only execute when the state machine ends the flow, by reaching an `END` state. Terminating the flow by unmounting Player (on any given platform) will not execute flow defined `onEnd` expressions as it would not have reached an `END` state.
+3. `onEnd` - Evaluated last, right before transition.
+   1. For an `onEnd` expression defined on an individual state, if a transition is halted (by validation or otherwise), the `onEnd` expressions for that state won't be executed.
+   2. As Player's navigation is a state machine, `onEnd` expressions defined for the entire flow will only execute when the state machine ends the flow, by reaching an `END` state. Terminating the flow by unmounting Player (on any given platform) will not execute flow defined `onEnd` expressions as it would not have reached an `END` state.
 
 ## Examples
 
@@ -130,7 +131,7 @@ State types can also contain `onStart` and `onEnd` properties for evaluating exp
 
 This is the simplest of flows. The navigation begins with executing `FLOW_1`. `FLOW_1` begins with the `VIEW_1` state. `VIEW_1` shows the view with id `view-1`, and any transition from that view goes to `END_1` which completes Player's execution with the `Done` outcome.
 
-![Single Flow Example](/simple-flow.png?darkModeInvert)
+<Image darkModeInvert src={simpleFlowImage} alt="Single Flow Example" />
 
 ### Flow with `onStart` expression on a `VIEW` state
 

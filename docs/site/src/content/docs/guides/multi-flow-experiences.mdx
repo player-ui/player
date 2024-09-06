@@ -3,8 +3,8 @@ title: Multi-Flow Experiences
 ---
 
 import PlatformTabs from "../../../components/PlatformTabs.astro";
-
-# Multi-Flow Experiences
+import Image from "../../../components/Image.astro";
+import flowManagerImage from "../../../assets/flow-manager.png";
 
 One large use-case for Player involves orchestrating experiences that span multiple screens that may need to communicate with a back-end between stages. This is commonly used for stepped-flows, onboarding workflows, etc, and manifests as using the response from one Player flow to determine the next one. To facilitate this back-and-forth, Player ships with support for creating a flow-manager.
 
@@ -12,7 +12,7 @@ One large use-case for Player involves orchestrating experiences that span multi
 
 A flow-manager is an interface for asynchronously stepping through a series of flows in a multi-flow experience. Its API mirrors that of the JavaScript [iteration protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols); each flow is loaded by calling `.next()` using the result of the previous flow (if one exists). Implementations are able to leverage this response to retrieve the _next_ flow in the series, or mark the cycle as complete by returning `done`.
 
-![Flow Manager](/flow-manager.png?darkModeInvert)
+<Image darkModeInvert src={flowManagerImage} alt="Flow Manager" />
 
 The standardization of this contract allows any client to manage a series of Player flows without needing to repeat the underlying Player-side orchestration.
 
