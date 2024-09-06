@@ -7,10 +7,9 @@ import DSLContentPlayground from "../../components/tools/DSLContentPlayground";
   frontmatter={{ title: "DSL Content Playground", tableOfContents: false }}
 >
   <p class="mb-4">
-    The internal representation of the View parses into an AST structure. This
-    is often used during the transform phase to edit the content prior to
-    rendering. Below is an interactive way of previewing the internal AST
-    representation for the given content.
+    Content can be authored using JSON, or (preferred) with a TypeScript/React
+    API. Below is a sample editor where you can explore authoring content using
+    the DSL and our reference assets.
   </p>
   <DSLContentPlayground client:only />
 </StarlightPage>
