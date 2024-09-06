@@ -3,5 +3,8 @@
   "private": true,
   "homepage": "https://player-ui.github.io",
   "type": "module",
-  "dependencies": {}
+  "dependencies": {
+    "@player-ui/player": "workspace:*",
+    "@player-ui/reference-assets-plugin-components": "workspace:*"
+  }
 }

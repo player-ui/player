@@ -581,7 +581,14 @@ importers:
 
   core/types: {}
 
-  docs/site: {}
+  docs/site:
+    dependencies:
+      '@player-ui/player':
+        specifier: workspace:*
+        version: link:../../core/player
+      '@player-ui/reference-assets-plugin-components':
+        specifier: workspace:*
+        version: link:../../plugins/reference-assets/components
 
   docs/storybook:
     dependencies:

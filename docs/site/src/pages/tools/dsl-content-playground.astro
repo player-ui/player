@@ -1,10 +1,10 @@
 ---
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
-import ASTExplorer from "../../components/tools/ASTExplorer";
+import DSLContentPlayground from "../../components/tools/DSLContentPlayground";
 ---
 
 <StarlightPage
-  frontmatter={{ title: "View AST Explorer", tableOfContents: false }}
+  frontmatter={{ title: "DSL Content Playground", tableOfContents: false }}
 >
   <p class="mb-4">
     The internal representation of the View parses into an AST structure. This
@@ -12,5 +12,5 @@ import ASTExplorer from "../../components/tools/ASTExplorer";
     rendering. Below is an interactive way of previewing the internal AST
     representation for the given content.
   </p>
-  <ASTExplorer client:only />
+  <DSLContentPlayground client:only />
 </StarlightPage>

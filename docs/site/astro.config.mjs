@@ -71,6 +71,10 @@ export default defineConfig({
               label: "View AST Explorer",
               link: "/tools/view-ast-explorer",
             },
+            {
+              label: "DSL Content Playground",
+              link: "/tools/dsl-content-playground",
+            },
           ],
         },
       ],

@@ -31,6 +31,10 @@ build_deps = [
     "//:node_modules/@monaco-editor/react",
     "//:node_modules/json5",
     "//:node_modules/stringify-object",
+    "//:node_modules/esbuild-wasm",
+    "//:node_modules/@player-tools/dsl",
+    ":node_modules/@player-ui/player",
+    ":node_modules/@player-ui/reference-assets-plugin-components",
 ]
 
 astro_bin.astro(
