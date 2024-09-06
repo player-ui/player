@@ -3,11 +3,10 @@ title: Transition Plugin
 platform: ios
 ---
 
-# Transition Plugin
-
 The `TransitionPlugin` allows for specifying transitions for when Player loads a flow, and for transition between views in the same flow.
 
 ### CocoaPods
+
 Add the subspec to your `Podfile`
 
 ```ruby
@@ -15,6 +14,7 @@ pod 'PlayerUI/TransitionPlugin'
 ```
 
 ### Swift Usage
+
 ```swift
 SwiftUIPlayer(flow: flowString, plugins: [TransitionPlugin(popTransition: .pop)], result: $resultBinding)
 ```

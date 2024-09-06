@@ -2,11 +2,11 @@
 title: Data & Expressions
 ---
 
-# Data
+## Data
 
 Data is central to a lot of the functionality and features of Player. The easiest way to deal with data is to supply it in the initial payload when starting a flow. This will _seed_ the model with data and allow you to easily reference values
 
-## Bindings
+### Bindings
 
 A binding is a representation of a path within the data-model. In simple terms, it's a dot (`.`) separated string showing the path of the properties within the data object.
 
@@ -39,7 +39,7 @@ For most bindings, it is recommended to use the dot-notation for all properties 
 
 Note that you can also use integers to access into arrays in the data model. `foo.bar.array.0.property` will reference `"another value"`.
 
-### Query Syntax
+#### Query Syntax
 
 Bindings also allow for query access into arrays using a `key`/`value` pair to find the first matching item in the array.
 
@@ -50,16 +50,16 @@ data: {
   model: {
     array: [
       {
-        name: 'alpha',
-        foo: 'bar',
+        name: "alpha",
+        foo: "bar",
       },
       {
-        name: 'bravo',
-        foo: 'baz',
+        name: "bravo",
+        foo: "baz",
       },
       {
-        name: 'charlie',
-        foo: 'qux',
+        name: "charlie",
+        foo: "qux",
       },
     ];
   }
@@ -76,7 +76,7 @@ Quotes around the key or the value of the query are only required when needing t
 
 Note that the query syntax resolves to the object of the matching query, not to any specific property on the object. If you want to access a specific property, add additional path information after the query. E.g., `model.array[name=bravo].name`.
 
-### Nested Bindings
+#### Nested Bindings
 
 Nested bindings allow you to construct a binding path that is relative to a 2nd path or based on some dynamic property. This behavior follows similar model lookup rules that can be used elsewhere in Player.
 
@@ -106,7 +106,7 @@ With this data model, `colors.{{favorite.color}}.hex` will return the hex value 
 
 References to bindings that contains sub-paths `{{favorite.nestedPath}}.hex` will expand to `colors.yellow.hex`.
 
-### Nested Expressions
+#### Nested Expressions
 
 Just like binding segments can contain other bindings, segments can also contain expressions. For this, they use a segment surrounded by `:
 
@@ -122,7 +122,7 @@ Similar to the bracket notation: `[]`. Paths can use brackets instead of dots fo
 colors[`getFavoriteColor()`].hex
 ```
 
-# Expressions
+## Expressions
 
 Expressions are callable functions that allow for dynamic behavior of Player and it's views.
 
@@ -130,7 +130,7 @@ These functions can be used in `ACTION` nodes in the navigation section, calcula
 
 Check out the [Expression Plugin](../plugins/expression) for registering custom functions.
 
-## Using Expressions and Data in a View
+### Using Expressions and Data in a View
 
 Expressions in the view are strings wrapped in: `@[` and `]@`.
 
@@ -158,7 +158,7 @@ Data is referenced by wrapping the binding in `{{` and `}}`. This can be used in
 
 Similar to expressions, any property only consisting of a data value lookup, will get replaced by the raw value.
 
-## Using Expressions for Inline Text Formatting
+### Using Expressions for Inline Text Formatting
 
 `format` expression is used to replace provided value with appropriate format.
 For instance, to format a number into `currency`, you may use:
@@ -171,41 +171,45 @@ For instance, to format a number into `currency`, you may use:
 
 To see the list of currently supported format types, check out [Common Types Plugin](../plugins/common-types.md).
 
-## Built-in Expressions
+### Built-in Expressions
 
 There are a few expressions built into Player. These are pretty basic, so if you're looking for extend this -- check out the [Common Expressions Plugin](../plugins/common-expressions) or the [Expression Plugin](../plugins/expression) to add more.
 
-| name            | description                                                                           | arguments          |
-| --------------- | ------------------------------------------------------------------------------------- | ------------------ |
-| `getDataVal`    | Fetches a value from the model. This is equivalent to using the `{{foo.bar}}` syntax. | `binding`          |
-| `setDataVal`    | Sets a value from the model. This is equivalent to using `{{foo.bar}} = 'value'`      | `binding`, `value` |
-| `deleteDataVal` | Clears a value from the model.                                                        | `binding`          |
+| name            | description                                                                           | arguments                                  |
+| --------------- | ------------------------------------------------------------------------------------- | ------------------------------------------ |
+| `getDataVal`    | Fetches a value from the model. This is equivalent to using the `{{foo.bar}}` syntax. | `binding`                                  |
+| `setDataVal`    | Sets a value from the model. This is equivalent to using `{{foo.bar}} = 'value'`      | `binding`, `value`                         |
+| `deleteDataVal` | Clears a value from the model.                                                        | `binding`                                  |
 | `conditional`   | Execute expressions, or return data based on an expression condition                  | `condition`, `valueIfTrue`, `valueIfFalse` |
 
-### Examples
+#### Examples
 
-#### `getDataVal` 
+##### `getDataVal`
+
 ```json
 {
   "value": "Hello @[getDataVal('user.name')]@"
 }
 ```
 
-#### `setDataVal` 
+##### `setDataVal`
+
 ```json
 {
   "exp": "setDataVal('user.name', 'Test User')"
 }
 ```
 
-#### `deleteDataVal` 
+##### `deleteDataVal`
+
 ```json
 {
   "exp": "deleteDataVal('user.name')"
 }
 ```
 
-#### `conditional` 
+##### `conditional`
+
 ```json
 {
   "value": "It is @[ conditional({{foo.bar}} == 'DAY', 'daytime', 'nighttime') ]@."

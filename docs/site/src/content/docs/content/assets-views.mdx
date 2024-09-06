@@ -1,8 +1,8 @@
 ---
-title: 'Assets & Views'
+title: "Assets & Views"
 ---
 
-# Assets
+## Assets
 
 An asset is a generic term given to a semantic bit of information that we wish to convey to the user. Assets are the primitive elements that make up the content Player presents as user experiences. Though there are many different types of assets, they all follow the same basic principles:
 
@@ -33,13 +33,13 @@ Nested assets are represented as objects containing an `asset` property. For exa
 
 The `label` of the parent contains a nested asset reference. These are _slots_ that can usually contain any asset type.
 
-# Views
+## Views
 
 Views are _assets_ that exist at the top level of the tree. They typically include the navigation actions, a title, or other top-level information.
 
 The `id` of the views are used in the navigation section to reference a specific view from the list.
 
-## Cross-field validation
+### Cross-field validation
 
 The other special property of a `view` vs. an `asset` is the addition of a `validation` property on the view. These contain [`validation` objects](/schema) that are used for validations crossing multiple fields, and are ran on user navigation rather than data change.
 
@@ -70,11 +70,11 @@ They follow the same guidelines for normal validation references, with the addit
 
 Any object in the tree (including _assets_) may contain an `applicability` property. This is an _expression_ that may conditionally show or hide an asset (and all of it's children) from the view tree. Applicability is dynamically calculated and will automatically update as data changes on the page.
 
-# Switches
+## Switches
 
 Switches are ways of dynamically changing the structure of the view based on data. There are 2 types of switches: `static` and `dynamic`, but their structures are identical. `switches` can appear anywhere you'd find a normal asset, and (similar to [templates](./templates)) are removed from the view before it reaches the UI layer.
 
-## Usage
+### Usage
 
 The switch is simply a list of objects with `case` and `asset` properties:
 
@@ -83,7 +83,7 @@ The switch is simply a list of objects with `case` and `asset` properties:
 
 The switch will run through each _case_ statement until the first case expression evaluates to true. For the _default_ case, simple use a value of `true` at the end of the array.
 
-## Static v Dynamic Switches
+### Static v Dynamic Switches
 
 The only difference between a `static` and `dynamic` switch is the timing update behavior after the first rendering of a view.
 
@@ -91,7 +91,7 @@ A `staticSwitch` calculates the applicable case when a view first renders. It wi
 
 A `dynamicSwitch` will always update the applicable case statement whenever data changes. If data is changed while a view is still showing, the switch will be updated to reflect the new case.
 
-## Example
+### Example
 
 Anywhere you can place an `asset` node, a `dynamicSwitch` or `staticSwitch` can be placed instead.
 
@@ -126,11 +126,11 @@ Anywhere you can place an `asset` node, a `dynamicSwitch` or `staticSwitch` can 
 }
 ```
 
-# Templates
+## Templates
 
 Templates provide a way to dynamically create a list of assets, or _any_ object, based on data from the model. All of the templating semantics are removed by the time it reaches an asset's transform or UI layer.
 
-## Usage
+### Usage
 
 Within any asset, specify a `template` property as an array of:
 
@@ -141,7 +141,7 @@ Within any asset, specify a `template` property as an array of:
 
 Within a template, the `_index_` string can be used to substitute the array-index of the item being mapped.
 
-### Example
+#### Example
 
 **Authored**
 
@@ -194,17 +194,17 @@ Within a template, the `_index_` string can be used to substitute the array-inde
 }
 ```
 
-## Multiple templates
+### Multiple templates
 
 There's a few ways to leverage multiple templates within a single asset. Templates can be _nested_ or multiple used on a single node. These can also be combined to build out complicated nested expansion.
 
-### Nested Templates
+#### Nested Templates
 
 Templates can contain other templates. When referencing a nested template, append the template depth to the `_index_` string to reference the correct data-item.
 
 For example, if 1 template contains another, use `_index_` to reference the outer-loop, and `_index1_` to reference the inner loop. Furthermore, if templates are nested three levels deep, the first level loop will still be referenced by `_index_`, the second level will be referenced by `_index1_` and the bottom most loop will be referenced by `_index2_`.
 
-### Multiple Templates - Single Output
+#### Multiple Templates - Single Output
 
 Templates will, by default, create an array, if needed, for the `output` property of each template. If that array already exits (either by manually writing it in the JSON, or from a previous template run), each item will be appended to the end of the existing array.
 
@@ -282,7 +282,7 @@ The template below will append it's values to the pre-existing `values` array.
 }
 ```
 
-## Dynamic and Static Templates
+### Dynamic and Static Templates
 
 Like switches, the only difference between a `static` and `dynamic` template is the timing update behavior after the first rendering of a view. If not defined, the value of `dynamic` is default to `false`.
 
@@ -316,8 +316,8 @@ If `dynamic` is `true`, template will be always updated whenever data changes. I
 ```
 
 ```typescript
-model.set([['list.of.names', ['Jain']]]);
-model.set([['list.of.names', ['Jain', 'Erica']]]);
+model.set([["list.of.names", ["Jain"]]]);
+model.set([["list.of.names", ["Jain", "Erica"]]]);
 ```
 
 **Output**

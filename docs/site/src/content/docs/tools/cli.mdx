@@ -2,9 +2,7 @@
 title: CLI
 ---
 
-# CLI
-
-The `CLI` package is a simple way for users to interact with some of the build/validation tooling. As new capabilities are added to the ecosystem, they may be exposed via this cli to use of use for developers. 
+The `CLI` package is a simple way for users to interact with some of the build/validation tooling. As new capabilities are added to the ecosystem, they may be exposed via this cli to use of use for developers.
 
 ## Config
 
@@ -24,10 +22,10 @@ Example:
 
 ```js
 module.exports = {
-  extends: '@my-scope/base',
+  extends: "@my-scope/base",
   plugins: [
-    'plugin-npm-package',
-    ['some-plugin-with-config', { config: true }],
+    "plugin-npm-package",
+    ["some-plugin-with-config", { config: true }],
     {
       // Plugins can also be defined inline
       handler: () => {},
@@ -42,10 +40,10 @@ Options defined via the CLI arguments will take precedence over the config files
 
 Plugins are the way to change runtime behavior of the CLI actions. This includes augmenting the behavior of the DSL compiler, language-service, and more.
 
-# Commands
+## Commands
 
 - [`player dsl compile`](#player-dsl-compile)
-Compile Player DSL files into JSON after running TSC compiler against Typescript files
+  Compile Player DSL files into JSON after running TSC compiler against Typescript files
 
 ```
 USAGE
@@ -64,11 +62,11 @@ DESCRIPTION
 ```
 
 - [`player dsl validate`](#player-dsl-validate)
-Runs isolated TSC compiler on authored Player DSL Typescript files.
+  Runs isolated TSC compiler on authored Player DSL Typescript files.
 
 ```
 USAGE
-  $ player dsl validate [-f <value>] [-c <value>] 
+  $ player dsl validate [-f <value>] [-c <value>]
 
 FLAGS
   -c, --config=<value>  Path to a specific config file to load.
@@ -80,7 +78,7 @@ DESCRIPTION
 ```
 
 - [`player json validate`](#player-json-validate)
-Validate Player JSON content
+  Validate Player JSON content
 
 ```
 USAGE
@@ -96,7 +94,7 @@ DESCRIPTION
 ```
 
 - [`player dependency-versions check`](#player-dependency-versions-check)
-Checks for `@player-ui/@player-tools` dependency version mismatches and issues warnings/solutions accordingly
+  Checks for `@player-ui/@player-tools` dependency version mismatches and issues warnings/solutions accordingly
 
 ```
 USAGE
