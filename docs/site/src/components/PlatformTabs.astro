@@ -1,129 +1,54 @@
 ---
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
 const slotNames = ["core", "react", "android", "ios"];
 const populatedSlots = Object.fromEntries(
   slotNames.map((slotName) => [slotName, Astro.slots.has(slotName)])
 );
-
-const name = crypto.randomUUID();
-
 ---
-<platform-tabs-select>
-<div role="tablist" class="tabs tabs-lifted">
+
+<style>
+  .card {
+    padding: 1rem;
+    border: 1px solid var(--sl-color-gray-5);
+  }
+</style>
+
+<Tabs syncKey="platform-type">
   {
     populatedSlots["core"] && (
-        <input
-          type="radio"
-          name={name}
-          role="tab"
-          class="tab"
-          aria-label="Core"
-          value="core"
-        />
-        <div
-          role="tabpanel"
-          class="tab-content content bg-base-100 border-base-300 rounded-box p-6"
-          >
+      <TabItem label="Core">
+        <div class="card">
           <slot name="core" />
         </div>
+      </TabItem>
     )
   }
   {
     populatedSlots["react"] && (
-        <input
-          type="radio"
-          name={name}
-          role="tab"
-          class="tab"
-          aria-label="React"
-          value="react"
-        />
-        <div
-          role="tabpanel"
-          class="tab-content content bg-base-100 border-base-300 rounded-box p-6"
-          >
+      <TabItem label="React">
+        <div class="card">
           <slot name="react" />
         </div>
+      </TabItem>
     )
   }
   {
     populatedSlots["android"] && (
-        <input
-          type="radio"
-          name={name}
-          role="tab"
-          class="tab"
-          aria-label="Android"
-          value="android"
-        />
-        <div
-          role="tabpanel"
-          class="tab-content content bg-base-100 border-base-300 rounded-box p-6"
-          >
+      <TabItem label="Android">
+        <div class="card">
           <slot name="android" />
         </div>
+      </TabItem>
     )
   }
   {
     populatedSlots["ios"] && (
-        <input
-          type="radio"
-          name={name}
-          role="tab"
-          class="tab"
-          aria-label="iOS"
-          value="ios"
-        />
-        <div
-          role="tabpanel"
-          class="tab-content content bg-base-100 border-base-300 rounded-box p-6"
-          >
+      <TabItem label="iOS">
+        <div class="card">
           <slot name="ios" />
         </div>
+      </TabItem>
     )
   }
-  </div>
-</platform-tabs-select>
-
-<style>
-  .content {
-    max-width: var(--sl-content-width);
-  }
-</style>
-
-
-<script>
-  class PlatformTabsSelect extends HTMLElement {
-    constructor() {
-      super();
-
-      const searchParams = new URLSearchParams(location.search);
-      const langSearch = searchParams.get("lang");
-
-      const inputs = this.querySelectorAll("input");
-      const slotNames = Array.from(inputs).map(e => e.value);
-
-      let selectedTab = slotNames[0];
-
-      if (langSearch && slotNames.includes(langSearch)) {
-        selectedTab = langSearch;
-      }
-
-      inputs.forEach(input => {
-
-        if (input.value === selectedTab) {
-          input.checked = true;
-        }
-
-        input.addEventListener("change", (e) => {
-          if (e.currentTarget instanceof HTMLInputElement) {
-            let newSearchParams = new URLSearchParams(location.search);
-            newSearchParams.set('lang', e.currentTarget.value);
-            window.location.search = newSearchParams.toString();
-          }
-        });
-      });
-
-    }
-  }
-  customElements.define("platform-tabs-select", PlatformTabsSelect);
-</script>
+</Tabs>

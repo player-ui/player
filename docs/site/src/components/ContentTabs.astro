@@ -1,42 +1,12 @@
 ---
-const name = crypto.randomUUID();
+import { Tabs, TabItem } from "@astrojs/starlight/components";
 ---
 
-<div role="tablist" class="tabs tabs-lifted">
-  <input
-    type="radio"
-    name={name}
-    role="tab"
-    class="tab"
-    aria-label="TSX"
-    value="tsx"
-    checked
-  />
-  <div
-    role="tabpanel"
-    class="tab-content content bg-base-100 border-base-300 rounded-box p-6"
-  >
+<Tabs syncKey="content-lang">
+  <TabItem label="TSX">
     <slot name="tsx" />
-  </div>
-
-  <input
-    type="radio"
-    name={name}
-    role="tab"
-    class="tab"
-    aria-label="JSON"
-    value="json"
-  />
-  <div
-    role="tabpanel"
-    class="tab-content content bg-base-100 border-base-300 rounded-box p-6"
-  >
+  </TabItem>
+  <TabItem label="JSON">
     <slot name="json" />
-  </div>
-</div>
-
-<style>
-  .content {
-    max-width: var(--sl-content-width);
-  }
-</style>
+  </TabItem>
+</Tabs>
