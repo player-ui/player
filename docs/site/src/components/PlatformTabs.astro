@@ -17,7 +17,7 @@ const populatedSlots = Object.fromEntries(
 <Tabs syncKey="platform-type">
   {
     populatedSlots["core"] && (
-      <TabItem label="Core">
+      <TabItem label="Core" icon="seti:javascript">
         <div class="card">
           <slot name="core" />
         </div>
@@ -26,7 +26,7 @@ const populatedSlots = Object.fromEntries(
   }
   {
     populatedSlots["react"] && (
-      <TabItem label="React">
+      <TabItem label="React" icon="seti:react">
         <div class="card">
           <slot name="react" />
         </div>
@@ -35,7 +35,7 @@ const populatedSlots = Object.fromEntries(
   }
   {
     populatedSlots["android"] && (
-      <TabItem label="Android">
+      <TabItem label="Android" icon="linux">
         <div class="card">
           <slot name="android" />
         </div>
@@ -44,7 +44,7 @@ const populatedSlots = Object.fromEntries(
   }
   {
     populatedSlots["ios"] && (
-      <TabItem label="iOS">
+      <TabItem label="iOS" icon="apple">
         <div class="card">
           <slot name="ios" />
         </div>

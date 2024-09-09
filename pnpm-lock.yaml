@@ -16,11 +16,11 @@ importers:
         specifier: ^3.6.2
         version: 3.6.2(@types/react-dom@18.3.0)(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vite@4.5.3(@types/node@18.19.33)(terser@5.31.0))
       '@astrojs/starlight':
-        specifier: ^0.26.2
-        version: 0.26.2(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))
+        specifier: ^0.27.1
+        version: 0.27.1(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))
       '@astrojs/starlight-tailwind':
         specifier: ^2.0.3
-        version: 2.0.3(@astrojs/starlight@0.26.2(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3)))(@astrojs/tailwind@5.1.0(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))
+        version: 2.0.3(@astrojs/starlight@0.27.1(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3)))(@astrojs/tailwind@5.1.0(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))
       '@astrojs/tailwind':
         specifier: ^5.1.0
         version: 5.1.0(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3))
@@ -1172,8 +1172,8 @@ packages:
       '@astrojs/tailwind': ^5.0.0
       tailwindcss: ^3.3.3
 
-  '@astrojs/starlight@0.26.2':
-    resolution: {integrity: sha512-368jO5hfhvNd6XvOnVHTntrRWBkRGmpnmtQMXdDhMdXR1XgNuEyEdtcDGXHLlUaY7ZwHItNrjSf5J1iKsdP2Zg==, tarball: https://registry.npmjs.org/@astrojs/starlight/-/starlight-0.26.2.tgz}
+  '@astrojs/starlight@0.27.1':
+    resolution: {integrity: sha512-L2hEgN/Tk7tfBDeaqUOgOpey5NcUL78FuQa06iNxyZ6RjyYyuXSniOoFxZYIo5PpY9O1dLdK22PkZyCDpO729g==, tarball: https://registry.npmjs.org/@astrojs/starlight/-/starlight-0.27.1.tgz}
     peerDependencies:
       astro: ^4.8.6
 
@@ -10790,9 +10790,6 @@ packages:
   unified@10.1.2:
     resolution: {integrity: sha512-pUSWAi/RAnVy1Pif2kAoeWNBa3JVrx0MId2LASj8G+7AiHWoKZNTomq6LG326T68U7/e263X6fTdcXIy7XnF7Q==, tarball: https://registry.npmjs.org/unified/-/unified-10.1.2.tgz}
 
-  unified@11.0.4:
-    resolution: {integrity: sha512-apMPnyLjAX+ty4OrNap7yumyVAMlKx5IWU2wlzzUdYJO9A8f1p9m/gywF/GM2ZDFcjQPrx59Mc90KwmxsoklxQ==, tarball: https://registry.npmjs.org/unified/-/unified-11.0.4.tgz}
-
   unified@11.0.5:
     resolution: {integrity: sha512-xKvGhPWw3k84Qjh8bI3ZeJjqnyadK+GEFtazSfZv/rKeTkTjOJho6mFqh2SM96iIcZokxiOpg78GazTSg8+KHA==, tarball: https://registry.npmjs.org/unified/-/unified-11.0.5.tgz}
 
@@ -11704,13 +11701,13 @@ snapshots:
       stream-replace-string: 2.0.0
       zod: 3.23.8
 
-  '@astrojs/starlight-tailwind@2.0.3(@astrojs/starlight@0.26.2(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3)))(@astrojs/tailwind@5.1.0(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))':
+  '@astrojs/starlight-tailwind@2.0.3(@astrojs/starlight@0.27.1(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3)))(@astrojs/tailwind@5.1.0(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))':
     dependencies:
-      '@astrojs/starlight': 0.26.2(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))
+      '@astrojs/starlight': 0.27.1(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))
       '@astrojs/tailwind': 5.1.0(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3))
       tailwindcss: 3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3))
 
-  '@astrojs/starlight@0.26.2(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))':
+  '@astrojs/starlight@0.27.1(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))':
     dependencies:
       '@astrojs/mdx': 3.1.5(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))
       '@astrojs/sitemap': 3.1.6
@@ -17189,6 +17186,10 @@ snapshots:
     dependencies:
       acorn: 8.11.3
 
+  acorn-jsx@5.3.2(acorn@8.12.1):
+    dependencies:
+      acorn: 8.12.1
+
   acorn-walk@7.2.0: {}
 
   acorn-walk@8.3.2: {}
@@ -21657,8 +21658,8 @@ snapshots:
 
   micromark-extension-mdxjs@3.0.0:
     dependencies:
-      acorn: 8.11.3
-      acorn-jsx: 5.3.2(acorn@8.11.3)
+      acorn: 8.12.1
+      acorn-jsx: 5.3.2(acorn@8.12.1)
       micromark-extension-mdx-expression: 3.0.0
       micromark-extension-mdx-jsx: 3.0.0
       micromark-extension-mdx-md: 2.0.0
@@ -21995,7 +21996,7 @@ snapshots:
 
   mlly@1.7.0:
     dependencies:
-      acorn: 8.11.3
+      acorn: 8.12.1
       pathe: 1.1.2
       pkg-types: 1.1.1
       ufo: 1.5.3
@@ -23261,7 +23262,7 @@ snapshots:
       '@types/hast': 3.0.4
       rehype-parse: 9.0.0
       rehype-stringify: 10.0.0
-      unified: 11.0.4
+      unified: 11.0.5
 
   relateurl@0.2.7: {}
 
@@ -24700,16 +24701,6 @@ snapshots:
       trough: 2.2.0
       vfile: 5.3.7
 
-  unified@11.0.4:
-    dependencies:
-      '@types/unist': 3.0.2
-      bail: 2.0.2
-      devlop: 1.1.0
-      extend: 3.0.2
-      is-plain-obj: 4.1.0
-      trough: 2.2.0
-      vfile: 6.0.3
-
   unified@11.0.5:
     dependencies:
       '@types/unist': 3.0.2
@@ -24869,7 +24860,7 @@ snapshots:
 
   unplugin@1.10.1:
     dependencies:
-      acorn: 8.11.3
+      acorn: 8.12.1
       chokidar: 3.6.0
       webpack-sources: 3.2.3
       webpack-virtual-modules: 0.6.1

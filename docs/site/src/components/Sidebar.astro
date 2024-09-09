@@ -50,8 +50,12 @@ if (
   multiSidebarData[0].isCurrentSidebar = true;
 }
 
-const activeSidebar = multiSidebarData.find(s => s.isCurrentSidebar) ?? multiSidebarData[0];
+const activeSidebar =
+  multiSidebarData.find((s) => s.isCurrentSidebar) ?? multiSidebarData[0];
 
+if (activeSidebar.labelEntry.type === "group") {
+  activeSidebar.labelEntry.entries.forEach((entry) => {});
+}
 ---
 
-<Default {...Astro.props} sidebar={(activeSidebar.labelEntry as any).entries}  />
+<Default {...Astro.props} sidebar={(activeSidebar.labelEntry as any).entries} />
