@@ -13,6 +13,11 @@ export default defineConfig({
     }),
     starlight({
       title: "Player",
+      logo: {
+        dark: "./src/assets/logo/logo-dark-large.png",
+        light: "./src/assets/logo/logo-light-large.png",
+        replacesTitle: true,
+      },
       social: {
         github: "https://github.com/player-ui/player",
       },
