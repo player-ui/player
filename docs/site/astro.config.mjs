@@ -27,7 +27,7 @@ export default defineConfig({
       customCss: ["./src/styles/custom.css", "./src/tailwind.css"],
       components: {
         Sidebar: "./src/components/Sidebar.astro",
-        SocialIcons: "./src/components/SocialIcons.astro",
+        Search: "./src/components/Search.astro",
       },
       plugins: [],
       sidebar: [
