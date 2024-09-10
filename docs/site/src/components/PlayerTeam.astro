@@ -48,16 +48,22 @@ const TeamData = [
 ];
 ---
 
+<style>
+
+</style>
+
 <div class="grid grid-cols-4 gap-4">
   {
     TeamData.sort(() => 0.5 - Math.random()).map((teamMember) => (
       <div class="flex flex-col gap-0 items-center justify-between mt-4">
-        <div class="w-24">
-          <img alt={teamMember.name} src={teamMember.avatar} />
+        <div class="w-48">
+          <img class="rounded-full" alt={teamMember.name} src={teamMember.avatar} />
         </div>
-        <div class="min-w-24">
+        <div class="min-w-24 text-center">
           <h6>{teamMember.name}</h6>
-          {teamMember.domain.join(", ")}
+          <h7 class="text-center">
+            {teamMember.domain.join(", ")}
+          </h7>
         </div>
       </div>
     ))
