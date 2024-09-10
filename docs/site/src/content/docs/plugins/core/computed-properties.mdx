@@ -1,9 +1,8 @@
 ---
 title: Computed Properties
-platform: react,core
 ---
 
-import PlatformTabs from "../../../components/PlatformTabs.astro";
+import PlatformTabs from "../../../../components/PlatformTabs.astro";
 
 This plugin allows users to specify a path in the data-model (binding) as a computed property in the schema.
 Anytime this binding is read from, the given expression will be evaluated and returned instead of the it being read from the actual model. Writes to the binding will be prevented, and an error will be thrown.

@@ -65,7 +65,32 @@ export default defineConfig({
           items: [
             {
               label: "Plugins",
-              autogenerate: { directory: "plugins" },
+              items: [
+                {
+                  label: "Plugins Overview",
+                  slug:"plugins"
+                },
+                {
+                  label: "Android/JVM Plugins",
+                  autogenerate: { directory: "plugins/android" },
+                },
+                {
+                  label: "Core Plugins",
+                  autogenerate: { directory: "plugins/core" },
+                },
+                {
+                  label: "iOS Plugins",
+                  autogenerate: { directory: "plugins/iOS" },
+                },
+                {
+                  label: "React Plugins",
+                  autogenerate: { directory: "plugins/react" },
+                },
+                {
+                  label: "Multiplatform Plugins",
+                  autogenerate: { directory: "plugins/multiplatform" },
+                }
+              ]
             },
           ],
         },
