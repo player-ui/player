@@ -53,7 +53,11 @@ const TeamData = [
     TeamData.sort(() => 0.5 - Math.random()).map((teamMember) => (
       <div class="flex flex-col gap-0 items-center justify-between mt-4">
         <div class="w-24">
-          <img alt={teamMember.name} src={teamMember.avatar} />
+          <img
+            class="rounded-full"
+            alt={teamMember.name}
+            src={teamMember.avatar}
+          />
         </div>
         <div class="min-w-24">
           <h6>{teamMember.name}</h6>
