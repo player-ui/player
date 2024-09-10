@@ -1,5 +1,6 @@
 import * as React from "react";
 import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin-react";
+import "@player-ui/reference-assets-plugin-react/dist/index.css";
 import { loader, Editor } from "@monaco-editor/react";
 import { ManagedPlayer, type Flow, type FlowManager } from "@player-ui/react";
 import { basicFlowManager } from "./sample-flow-manager";
@@ -21,7 +22,6 @@ loader
   .catch((e: unknown) => {
     console.error("Error initializing monaco", e);
   });
-
 
 export default function PlayerPreview() {
   const theme = localStorage.getItem("starlight-theme") ?? "light";
@@ -76,20 +76,18 @@ export default function PlayerPreview() {
       </div>
       <div className="w-full">
         <h5 className="mb-2">Player View</h5>
-        {completed && (
-            <div> Done </div>
-          )}
-          {!completed && (
-            <React.Suspense fallback={<div> Loading... </div>}>
-              <ManagedPlayer
-                manager={flowManager}
-                {...config}
-                onComplete={() => {
-                  setCompleted(true);
-                }}
-              />
-            </React.Suspense>
-          )}
+        {completed && <div> Done </div>}
+        {!completed && (
+          <React.Suspense fallback={<div> Loading... </div>}>
+            <ManagedPlayer
+              manager={flowManager}
+              {...config}
+              onComplete={() => {
+                setCompleted(true);
+              }}
+            />
+          </React.Suspense>
+        )}
       </div>
     </div>
   );
