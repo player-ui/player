@@ -79,6 +79,7 @@
     "@types/redux-state-sync": "^3.1.5",
     "@types/signale": "^1.4.2",
     "@types/std-mocks": "^1.0.1",
+    "@types/stringify-object": "^4.0.5",
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.1.0",
     "@typescript-eslint/parser": "^5.1.0",

@@ -17,6 +17,7 @@ srcs = glob([
 
 build_deps = [
     "//:typings",
+    "//:node_modules/@types/stringify-object",
     "//:node_modules/@astrojs/starlight",
     "//:node_modules/@astrojs/tailwind",
     "//:node_modules/@astrojs/starlight-tailwind",
@@ -34,7 +35,9 @@ build_deps = [
     "//:node_modules/esbuild-wasm",
     "//:node_modules/@player-tools/dsl",
     ":node_modules/@player-ui/player",
+    ":node_modules/@player-ui/react",
     ":node_modules/@player-ui/reference-assets-plugin-components",
+    ":node_modules/@player-ui/reference-assets-plugin-react",
 ]
 
 astro_bin.astro(

@@ -12,7 +12,7 @@ export const Input = (props: TransformedInput) => {
   const inputProps = useInputAsset(props);
 
   return (
-    <div className="grid w-full max-w-sm items-center gap-1.5">
+    <div className="player-grid player-w-full player-max-w-sm player-items-center player-gap-1.5">
       {label && (
         <Label htmlFor={id}>
           <ReactAsset {...label} />
@@ -27,13 +27,13 @@ export const Input = (props: TransformedInput) => {
       {validation && (
         <Label
           id={`${id}-validation`}
-          className="text-[0.8rem] font-medium text-destructive"
+          className="player-text-[0.8rem] player-font-medium player-text-destructive"
         >
           {validation.message}
         </Label>
       )}
       {note && (
-        <Label className="text-[0.8rem] text-muted-foreground">
+        <Label className="player-text-[0.8rem] player-text-muted-foreground">
           <ReactAsset {...note} />
         </Label>
       )}

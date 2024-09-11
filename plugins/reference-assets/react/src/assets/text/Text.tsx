@@ -23,7 +23,7 @@ export const Text = (props: TextAsset) => {
   if (linkModifier) {
     return (
       <a
-        className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+        className="player-underline player-text-blue-600 hover:player-text-blue-800 visited:player-text-purple-600"
         href={linkModifier.metaData.ref}
       >
         {value}
