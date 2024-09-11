@@ -40,6 +40,105 @@ const actions = {
   ],
 };
 
+const nestedActions = {
+  id: "action",
+  type: "collection",
+  values: [
+    {
+      asset: {
+        id: "action-1",
+        type: "action",
+        label: {
+          asset: {
+            id: "action-label-1",
+            type: "text",
+            value: "Clicked {{count1}} times",
+          },
+        },
+      },
+    },
+    [
+      {
+        asset: {
+          id: "action-2",
+          type: "action",
+          label: {
+            asset: {
+              id: "action-label-2",
+              type: "text",
+              value: "Clicked {{count2}} times",
+            },
+          },
+        },
+      },
+      {
+        asset: {
+          id: "action-3",
+          type: "action",
+          label: {
+            asset: {
+              id: "action-label-3",
+              type: "text",
+              value: "Clicked {{count2}} times",
+            },
+          },
+        },
+      },
+    ]
+  ],
+}
+
+const nestedActionsFlattened = {
+  id: "action",
+  type: "collection",
+  values: [
+    {
+      asset: {
+        id: "action-1",
+        type: "action",
+        label: {
+          asset: {
+            id: "action-label-1",
+            type: "text",
+            value: "Clicked {{count1}} times",
+          },
+        },
+      },
+    },
+    {
+      flatten: true,
+      values: [
+        {
+          asset: {
+            id: "action-2",
+            type: "action",
+            label: {
+              asset: {
+                id: "action-label-2",
+                type: "text",
+                value: "Clicked {{count2}} times",
+              },
+            },
+          },
+        },
+        {
+          asset: {
+            id: "action-3",
+            type: "action",
+            label: {
+              asset: {
+                id: "action-label-3",
+                type: "text",
+                value: "Clicked {{count2}} times",
+              },
+            },
+          },
+        },
+      ]
+    },
+  ],
+}
+
 describe("resolver", () => {
   it("works with child dependencies", () => {
     const model = new LocalModel({
@@ -318,4 +417,145 @@ describe("resolver", () => {
       progressAmount: ["", "local.progress"],
     });
   });
+
+  it("do not flatten nested array without marker", () => {
+    const model = new LocalModel({
+      count1: 0,
+      count2: 0,
+    });
+    const parser = new Parser();
+    const bindingParser = new BindingParser();
+    const rootNode = parser.parseObject(nestedActions);
+
+    const resolver = new Resolver(rootNode!, {
+      model,
+      parseBinding: bindingParser.parse.bind(bindingParser),
+      parseNode: parser.parseObject.bind(parser),
+      evaluator: new ExpressionEvaluator({
+        model: withParser(model, bindingParser.parse),
+      }),
+      schema: new SchemaController(),
+    });
+
+    new StringResolverPlugin().applyResolver(resolver);
+
+    const firstUpdate = resolver.update();
+
+    expect(firstUpdate).toStrictEqual({
+      id: "action",
+      type: "collection",
+      values: [
+        {
+          asset: {
+            id: "action-1",
+            type: "action",
+            label: {
+              asset: {
+                id: "action-label-1",
+                type: "text",
+                value: "Clicked 0 times",
+              },
+            },
+          },
+        },
+        [
+          {
+            asset: {
+              id: 'action-2',
+              type: 'action',
+              label: {
+                asset: {
+                  id: 'action-label-2',
+                  type: 'text',
+                  value: 'Clicked 0 times',
+                },
+              },
+            },
+          },
+          {
+            asset: {
+              id: 'action-3',
+              type: 'action',
+              label: {
+                asset: {
+                  id: 'action-label-3',
+                  type: 'text',
+                  value: 'Clicked 0 times',
+                },
+              },
+            },
+          },
+        ],
+      ],
+    });
+  })
+  it("flattens nested array with marker", () => {
+    const model = new LocalModel({
+      count1: 0,
+      count2: 0,
+    });
+    const parser = new Parser();
+    const bindingParser = new BindingParser();
+    const rootNode = parser.parseObject(nestedActionsFlattened);
+
+    const resolver = new Resolver(rootNode!, {
+      model,
+      parseBinding: bindingParser.parse.bind(bindingParser),
+      parseNode: parser.parseObject.bind(parser),
+      evaluator: new ExpressionEvaluator({
+        model: withParser(model, bindingParser.parse),
+      }),
+      schema: new SchemaController(),
+    });
+
+    new StringResolverPlugin().applyResolver(resolver);
+
+    const firstUpdate = resolver.update();
+
+    expect(firstUpdate).toStrictEqual({
+      id: "action",
+      type: "collection",
+      values: [
+        {
+          asset: {
+            id: "action-1",
+            type: "action",
+            label: {
+              asset: {
+                id: "action-label-1",
+                type: "text",
+                value: "Clicked 0 times",
+              },
+            },
+          },
+        },
+        {
+          asset: {
+            id: 'action-2',
+            type: 'action',
+            label: {
+              asset: {
+                id: 'action-label-2',
+                type: 'text',
+                value: 'Clicked 0 times',
+              },
+            },
+          },
+        },
+        {
+          asset: {
+            id: 'action-3',
+            type: 'action',
+            label: {
+              asset: {
+                id: 'action-label-3',
+                type: 'text',
+                value: 'Clicked 0 times',
+              },
+            },
+          },
+        },
+      ],
+    });
+  })
 });
