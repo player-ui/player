@@ -73,9 +73,9 @@ export default {
         "accordion-up": "player-accordion-up 0.2s ease-out",
       },
     },
-    corePlugins: {
-      preflight: false,
-    },
+  },
+  corePlugins: {
+    preflight: false,
   },
   plugins: [require("tailwindcss-animate")],
 };

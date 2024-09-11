@@ -69,15 +69,3 @@
     --player-radius: 0.5rem;
   }
 }
-
-/* @layer base {
-  * {
-    @apply player-border-border;
-  }
-  body {
-    @apply player-bg-background player-text-foreground;
-    font-feature-settings:
-      "rlig" 1,
-      "calt" 1;
-  }
-} */
