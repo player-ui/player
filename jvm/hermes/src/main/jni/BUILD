@@ -31,14 +31,10 @@ cc_library(
     copts = CMAKE_BUILD_TYPE_COPTS + select({
         # TODO: Using React Natives JSI doesn't contain microtask - come back to this if we build it ourselves
         ":should_include_jni": [
-            "-DJSI_MICROTASK",
-            "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
+            "-DJSI_MICROTASK"
         ],
-        "//conditions:default": [
-            "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
-        ],
+        "//conditions:default": [],
     }),
-    defines = ["DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"],
     linkopts = ["-Wl,-z,max-page-size=16384"],
     visibility = ["//visibility:public"],
     deps = select({
