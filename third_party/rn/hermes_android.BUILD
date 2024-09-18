@@ -24,7 +24,7 @@ cc_import(
 )
 
 alias(
-    name = "libhermes",
+    name = "libhermes_pulled",
     actual = select({
         "@player//:arm64-v8a": ":arm64-v8a_libhermes",
         "@player//:armeabi-v7a": ":armeabi-v7a_libhermes",
