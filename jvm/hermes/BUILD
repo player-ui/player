@@ -38,7 +38,7 @@ merge_jni_into_android_library(
     cc_libs = [
         "//jvm/hermes/libs:libc++_shared",
         "//jvm/hermes/libs:libfbjni",
-        "//jvm/hermes/libs:libjsi",
+        "//third_party/rn:libjsi",
         "//jvm/hermes/src/main/jni:hermes_jni_lib",
         "//third_party/rn:libhermes",
     ],
