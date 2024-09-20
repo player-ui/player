@@ -198,6 +198,267 @@ exports[`generates the correct AST > works with applicability things 4`] = `
 }
 `;
 
+exports[`generates the correct AST when using switch plugin > work with objects with flatten marker in a multiNode 1`] = `
+{
+  "children": [
+    {
+      "path": [
+        "values",
+      ],
+      "value": {
+        "flatten": true,
+        "override": true,
+        "parent": [Circular],
+        "type": "multi-node",
+        "values": [
+          {
+            "children": [
+              {
+                "path": [
+                  "asset",
+                ],
+                "value": {
+                  "children": [
+                    {
+                      "path": [
+                        "label",
+                        "asset",
+                      ],
+                      "value": {
+                        "parent": [Circular],
+                        "type": "asset",
+                        "value": {
+                          "id": "action-label-1",
+                          "type": "text",
+                          "value": "Clicked {{count1}} times",
+                        },
+                      },
+                    },
+                  ],
+                  "parent": [Circular],
+                  "type": "asset",
+                  "value": {
+                    "id": "action-1",
+                    "type": "action",
+                  },
+                },
+              },
+            ],
+            "parent": [Circular],
+            "type": "value",
+            "value": undefined,
+          },
+          {
+            "children": [
+              {
+                "path": [
+                  0,
+                  "asset",
+                ],
+                "value": {
+                  "children": [
+                    {
+                      "path": [
+                        "label",
+                        "asset",
+                      ],
+                      "value": {
+                        "parent": [Circular],
+                        "type": "asset",
+                        "value": {
+                          "id": "action-label-2",
+                          "type": "text",
+                          "value": "Clicked {{count2}} times",
+                        },
+                      },
+                    },
+                  ],
+                  "parent": [Circular],
+                  "type": "asset",
+                  "value": {
+                    "id": "action-2",
+                    "type": "action",
+                  },
+                },
+              },
+              {
+                "path": [
+                  1,
+                  "asset",
+                ],
+                "value": {
+                  "children": [
+                    {
+                      "path": [
+                        "label",
+                        "asset",
+                      ],
+                      "value": {
+                        "parent": [Circular],
+                        "type": "asset",
+                        "value": {
+                          "id": "action-label-3",
+                          "type": "text",
+                          "value": "Clicked {{count2}} times",
+                        },
+                      },
+                    },
+                  ],
+                  "parent": [Circular],
+                  "type": "asset",
+                  "value": {
+                    "id": "action-3",
+                    "type": "action",
+                  },
+                },
+              },
+            ],
+            "parent": [Circular],
+            "type": "value",
+            "value": undefined,
+          },
+        ],
+      },
+    },
+  ],
+  "type": "value",
+  "value": {
+    "id": "action",
+    "type": "collection",
+  },
+}
+`;
+
+exports[`generates the correct AST when using switch plugin > work with objects without flatten marker in a multiNode 1`] = `
+{
+  "children": [
+    {
+      "path": [
+        "values",
+      ],
+      "value": {
+        "override": true,
+        "parent": [Circular],
+        "type": "multi-node",
+        "values": [
+          {
+            "children": [
+              {
+                "path": [
+                  "asset",
+                ],
+                "value": {
+                  "children": [
+                    {
+                      "path": [
+                        "label",
+                        "asset",
+                      ],
+                      "value": {
+                        "parent": [Circular],
+                        "type": "asset",
+                        "value": {
+                          "id": "action-label-1",
+                          "type": "text",
+                          "value": "Clicked {{count1}} times",
+                        },
+                      },
+                    },
+                  ],
+                  "parent": [Circular],
+                  "type": "asset",
+                  "value": {
+                    "id": "action-1",
+                    "type": "action",
+                  },
+                },
+              },
+            ],
+            "parent": [Circular],
+            "type": "value",
+            "value": undefined,
+          },
+          {
+            "children": [
+              {
+                "path": [
+                  0,
+                  "asset",
+                ],
+                "value": {
+                  "children": [
+                    {
+                      "path": [
+                        "label",
+                        "asset",
+                      ],
+                      "value": {
+                        "parent": [Circular],
+                        "type": "asset",
+                        "value": {
+                          "id": "action-label-2",
+                          "type": "text",
+                          "value": "Clicked {{count2}} times",
+                        },
+                      },
+                    },
+                  ],
+                  "parent": [Circular],
+                  "type": "asset",
+                  "value": {
+                    "id": "action-2",
+                    "type": "action",
+                  },
+                },
+              },
+              {
+                "path": [
+                  1,
+                  "asset",
+                ],
+                "value": {
+                  "children": [
+                    {
+                      "path": [
+                        "label",
+                        "asset",
+                      ],
+                      "value": {
+                        "parent": [Circular],
+                        "type": "asset",
+                        "value": {
+                          "id": "action-label-3",
+                          "type": "text",
+                          "value": "Clicked {{count2}} times",
+                        },
+                      },
+                    },
+                  ],
+                  "parent": [Circular],
+                  "type": "asset",
+                  "value": {
+                    "id": "action-3",
+                    "type": "action",
+                  },
+                },
+              },
+            ],
+            "parent": [Circular],
+            "type": "value",
+            "value": undefined,
+          },
+        ],
+      },
+    },
+  ],
+  "type": "value",
+  "value": {
+    "id": "action",
+    "type": "collection",
+  },
+}
+`;
+
 exports[`generates the correct AST when using switch plugin > works with asset wrapped objects 1`] = `
 {
   "children": [

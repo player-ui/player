@@ -276,4 +276,110 @@ describe("generates the correct AST when using switch plugin", () => {
       parser.parseObject(toughStaticSwitchMultiNodeView),
     ).toMatchSnapshot();
   });
+
+  const multinodeViewWithFlatten = {
+    id: "action",
+    type: "collection",
+    values: [
+      {
+        asset: {
+          id: "action-1",
+          type: "action",
+          label: {
+            asset: {
+              id: "action-label-1",
+              type: "text",
+              value: "Clicked {{count1}} times",
+            },
+          },
+        },
+      },
+      {
+        flatten: true,
+        values: [
+          {
+            asset: {
+              id: "action-2",
+              type: "action",
+              label: {
+                asset: {
+                  id: "action-label-2",
+                  type: "text",
+                  value: "Clicked {{count2}} times",
+                },
+              },
+            },
+          },
+          {
+            asset: {
+              id: "action-3",
+              type: "action",
+              label: {
+                asset: {
+                  id: "action-label-3",
+                  type: "text",
+                  value: "Clicked {{count2}} times",
+                },
+              },
+            },
+          },
+        ],
+      },
+    ],
+  };
+  test("work with objects with flatten marker in a multiNode", () => {
+    expect(parser.parseObject(multinodeViewWithFlatten)).toMatchSnapshot();
+  });
+
+  const nestedActions = {
+    id: "action",
+    type: "collection",
+    values: [
+      {
+        asset: {
+          id: "action-1",
+          type: "action",
+          label: {
+            asset: {
+              id: "action-label-1",
+              type: "text",
+              value: "Clicked {{count1}} times",
+            },
+          },
+        },
+      },
+      [
+        {
+          asset: {
+            id: "action-2",
+            type: "action",
+            label: {
+              asset: {
+                id: "action-label-2",
+                type: "text",
+                value: "Clicked {{count2}} times",
+              },
+            },
+          },
+        },
+        {
+          asset: {
+            id: "action-3",
+            type: "action",
+            label: {
+              asset: {
+                id: "action-label-3",
+                type: "text",
+                value: "Clicked {{count2}} times",
+              },
+            },
+          },
+        },
+      ],
+    ],
+  };
+
+  test("work with objects without flatten marker in a multiNode", () => {
+    expect(parser.parseObject(nestedActions)).toMatchSnapshot();
+  });
 });

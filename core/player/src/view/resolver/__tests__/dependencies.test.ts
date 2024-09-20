@@ -5,7 +5,7 @@ import { LocalModel, withParser } from "../../../data";
 import { SchemaController } from "../../../schema";
 import { Resolver } from "..";
 import { Parser } from "../../parser";
-import { StringResolverPlugin } from "../../plugins";
+import { StringResolverPlugin, MultiNodePlugin } from "../../plugins";
 
 const actions = {
   id: "action",
@@ -84,9 +84,9 @@ const nestedActions = {
           },
         },
       },
-    ]
+    ],
   ],
-}
+};
 
 const nestedActionsFlattened = {
   id: "action",
@@ -134,10 +134,10 @@ const nestedActionsFlattened = {
             },
           },
         },
-      ]
+      ],
     },
   ],
-}
+};
 
 describe("resolver", () => {
   it("works with child dependencies", () => {
@@ -424,9 +424,10 @@ describe("resolver", () => {
       count2: 0,
     });
     const parser = new Parser();
+
+    new MultiNodePlugin().applyParser(parser);
     const bindingParser = new BindingParser();
     const rootNode = parser.parseObject(nestedActions);
-
     const resolver = new Resolver(rootNode!, {
       model,
       parseBinding: bindingParser.parse.bind(bindingParser),
@@ -461,26 +462,26 @@ describe("resolver", () => {
         [
           {
             asset: {
-              id: 'action-2',
-              type: 'action',
+              id: "action-2",
+              type: "action",
               label: {
                 asset: {
-                  id: 'action-label-2',
-                  type: 'text',
-                  value: 'Clicked 0 times',
+                  id: "action-label-2",
+                  type: "text",
+                  value: "Clicked 0 times",
                 },
               },
             },
           },
           {
             asset: {
-              id: 'action-3',
-              type: 'action',
+              id: "action-3",
+              type: "action",
               label: {
                 asset: {
-                  id: 'action-label-3',
-                  type: 'text',
-                  value: 'Clicked 0 times',
+                  id: "action-label-3",
+                  type: "text",
+                  value: "Clicked 0 times",
                 },
               },
             },
@@ -488,13 +489,15 @@ describe("resolver", () => {
         ],
       ],
     });
-  })
+  });
   it("flattens nested array with marker", () => {
     const model = new LocalModel({
       count1: 0,
       count2: 0,
     });
     const parser = new Parser();
+
+    new MultiNodePlugin().applyParser(parser);
     const bindingParser = new BindingParser();
     const rootNode = parser.parseObject(nestedActionsFlattened);
 
@@ -531,31 +534,31 @@ describe("resolver", () => {
         },
         {
           asset: {
-            id: 'action-2',
-            type: 'action',
+            id: "action-2",
+            type: "action",
             label: {
               asset: {
-                id: 'action-label-2',
-                type: 'text',
-                value: 'Clicked 0 times',
+                id: "action-label-2",
+                type: "text",
+                value: "Clicked 0 times",
               },
             },
           },
         },
         {
           asset: {
-            id: 'action-3',
-            type: 'action',
+            id: "action-3",
+            type: "action",
             label: {
               asset: {
-                id: 'action-label-3',
-                type: 'text',
-                value: 'Clicked 0 times',
+                id: "action-label-3",
+                type: "text",
+                value: "Clicked 0 times",
               },
             },
           },
         },
       ],
     });
-  })
+  });
 });

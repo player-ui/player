@@ -1,3 +1,4 @@
+//@ts-check
 import { ViewInstance, ViewPlugin } from "../view";
 import type {
   Parser,
@@ -24,12 +25,28 @@ export default class MultiNodePlugin implements ViewPlugin {
           !hasTemplateKey(childOptions.key) &&
           Array.isArray(obj)
         ) {
-          const values = obj
-            .map((childVal) =>
-              parser.parseObject(childVal, NodeType.Value, options),
-            )
-            .filter((child): child is Node.Node => !!child);
+          let flatten = false;
 
+          obj = obj.map((childVal: object) => {
+            if (
+              typeof childVal === "object" &&
+              childVal !== null &&
+              "flatten" in childVal &&
+              childVal.flatten === true
+            ) {
+              flatten = true;
+              //@ts-ignore
+              return childVal.values;
+            } else {
+              return childVal;
+            }
+          });
+
+          const values = obj
+            .map((childVal: object) =>
+              parser.parseObject(childVal, NodeType.Value, options)
+            )
+            .filter((child: any): child is Node.Node => !!child);
           if (!values.length) {
             return [];
           }
@@ -37,10 +54,11 @@ export default class MultiNodePlugin implements ViewPlugin {
           const multiNode = parser.createASTNode(
             {
               type: NodeType.MultiNode,
-              override: !hasTemplateValues(
+              ...(flatten ? { flatten } : {}),
+              override: childOptions? !hasTemplateValues(
                 childOptions.parentObj,
                 childOptions.key,
-              ),
+              ): true,
               values,
             },
             obj,

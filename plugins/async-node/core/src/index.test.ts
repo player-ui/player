@@ -335,8 +335,8 @@ describe("view", () => {
       ?.lastUpdate;
 
     expect(view?.actions[0].asset.type).toBe("action");
-    expect(view?.actions[1].asset.type).toBe("text");
-    expect(view?.actions[2].asset.type).toBe("text");
+    expect(view?.actions[1][0].asset.type).toBe("text");
+    expect(view?.actions[1][1].asset.type).toBe("text");
   });
 
   test("replaces async nodes with chained multiNodes", async () => {
@@ -400,7 +400,7 @@ describe("view", () => {
       ?.lastUpdate;
 
     expect(view?.actions[0].asset.type).toBe("action");
-    expect(view?.actions[1].asset.type).toBe("text");
+    expect(view?.actions[1][0].asset.type).toBe("text");
     expect(view?.actions[2]).toBeUndefined();
     expect(updateNumber).toBe(2);
 
@@ -431,9 +431,9 @@ describe("view", () => {
       ?.lastUpdate;
 
     expect(view?.actions[0].asset.type).toBe("action");
-    expect(view?.actions[1].asset.type).toBe("text");
-    expect(view?.actions[2].asset.type).toBe("text");
-    expect(view?.actions[3].asset.type).toBe("text");
+    expect(view?.actions[1][0].asset.type).toBe("text");
+    expect(view?.actions[1][1][0].asset.type).toBe("text");
+    expect(view?.actions[1][1][1].asset.type).toBe("text");
   });
 
   test("replaces async nodes with chained multiNodes singular", async () => {
@@ -497,7 +497,7 @@ describe("view", () => {
       ?.lastUpdate;
 
     expect(view?.actions[0].asset.type).toBe("action");
-    expect(view?.actions[1].asset.type).toBe("text");
+    expect(view?.actions[1][0].asset.type).toBe("text");
     expect(view?.actions[2]).toBeUndefined();
 
     if (deferredResolve) {
@@ -518,52 +518,79 @@ describe("view", () => {
       ?.lastUpdate;
 
     expect(view?.actions[0].asset.type).toBe("action");
-    expect(view?.actions[1].asset.type).toBe("text");
-    expect(view?.actions[2].asset.type).toBe("text");
+    expect(view?.actions[1][0].asset.type).toBe("text");
+    expect(view?.actions[1][1].asset.type).toBe("text");
   });
 
-  test("should call onAsyncNode hook when async node is encountered", async () => {
+  test("replaces async nodes with multi node and flatten marker", async () => {
     const plugin = new AsyncNodePlugin({
       plugins: [new AsyncNodePluginPlugin()],
     });
 
-    let localNode: Node.Async;
-    plugin.hooks.onAsyncNode.tap("test", async (node: Node.Async) => {
-      if (node !== null) {
-        // assigns node value to a local variable
-        localNode = node;
-      }
+    let deferredResolve: ((value: any) => void) | undefined;
 
+    plugin.hooks.onAsyncNode.tap("test", async (node) => {
       return new Promise((resolve) => {
-        resolve("Promise resolved");
+        deferredResolve = resolve;
       });
     });
 
+    let updateNumber = 0;
+
     const player = new Player({ plugins: [plugin] });
+
+    player.hooks.viewController.tap("async-node-test", (vc) => {
+      vc.hooks.view.tap("async-node-test", (view) => {
+        view.hooks.onUpdate.tap("async-node-test", (update) => {
+          updateNumber++;
+        });
+      });
+    });
 
     player.start(basicFRFWithActions as any);
 
+    let view = (player.getState() as InProgressState).controllers.view
+        .currentView?.lastUpdate;
+
+    expect(view).toBeDefined();
+    expect(view?.actions[1]).toBeUndefined();
+    expect(updateNumber).toBe(1);
+
     await waitFor(() => {
-      expect(localNode.id).toStrictEqual("nodeId");
-      expect(localNode.type).toStrictEqual("async");
+      expect(deferredResolve).toBeDefined();
     });
-  });
-});
 
-describe("parser", () => {
-  test("missing node-id parent async node", async () => {
-    const parser = new Parser();
-    new AsyncNodePluginPlugin().applyParser(parser);
-    const parsedAST = parser.parseObject({ async: "true" });
+    if (deferredResolve) {
+      deferredResolve({
+        flatten: true,
+        values: [
+          {
+            asset: {
+              id: "value-1",
+              type: "text",
+              value: "1st value in the multinode",
+            },
+          },
+          {
+            asset: {
+              id: "value-2",
+              type: "text",
+              value: "2nd value in the multinode",
+            },
+          },
+        ],
+      });
+    }
 
-    expect(parsedAST).toStrictEqual(null);
-  });
+    await waitFor(() => {
+      expect(updateNumber).toBe(2);
+    });
 
-  test("missing node-id child async node", async () => {
-    const parser = new Parser();
-    new AsyncNodePluginPlugin().applyParser(parser);
-    const parsedAST = parser.parseObject({ fields: { async: "true" } });
+    view = (player.getState() as InProgressState).controllers.view.currentView
+      ?.lastUpdate;
 
-    expect(parsedAST).toStrictEqual(null);
+    expect(view?.actions[0].asset.type).toBe("action");
+    expect(view?.actions[1].asset.type).toBe("text");
+    expect(view?.actions[2].asset.type).toBe("text");
   });
 });

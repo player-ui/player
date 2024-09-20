@@ -355,7 +355,6 @@ export class Resolver {
 
     const childDependencies = new Set<BindingInstance>();
     dependencyModel.trackSubset("children");
-
     if ("children" in resolvedAST) {
       const newChildren = resolvedAST.children?.map((child) => {
         const computedChildTree = this.computeTree(
@@ -414,6 +413,7 @@ export class Resolver {
         if (mTree.value !== undefined && mTree.value !== null) {
           if (
             mTree.node.parent?.type === NodeType.MultiNode &&
+            mTree.node.parent?.flatten &&
             Array.isArray(mTree.value)
           ) {
             mTree.value.forEach((v: any) => {
