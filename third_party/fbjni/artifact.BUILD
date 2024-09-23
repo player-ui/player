@@ -44,7 +44,7 @@ cc_import(
 )
 
 alias(
-    name = "libfbjni",
+    name = "libfbjni_pulled",
     actual = select({
         "@player//:arm64-v8a": ":arm64-v8a_libfbjni",
         "@player//:armeabi-v7a": ":armeabi-v7a_libfbjni",
@@ -56,7 +56,7 @@ alias(
 )
 
 alias(
-    name = "libc++_shared",
+    name = "libc++_shared_pulled",
     actual = select({
         "@player//:arm64-v8a": ":arm64-v8a_libc++_shared",
         "@player//:armeabi-v7a": ":armeabi-v7a_libc++_shared",
