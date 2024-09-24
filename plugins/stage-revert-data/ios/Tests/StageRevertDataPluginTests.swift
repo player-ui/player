@@ -1,7 +1,7 @@
 import Foundation
 import XCTest
 @testable import PlayerUI
-@testable import PlayerUIInternalTestUtilities
+@testable import PlayerUITestUtilitiesCore
 @testable import PlayerUIStageRevertDataPlugin
 
 class StageRevertDataPluginTests: XCTestCase {

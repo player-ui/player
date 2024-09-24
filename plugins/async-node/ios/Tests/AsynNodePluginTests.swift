@@ -11,7 +11,7 @@ import SwiftUI
 import JavaScriptCore
 
 @testable import PlayerUI
-@testable import PlayerUIInternalTestUtilities
+@testable import PlayerUITestUtilitiesCore
 @testable import PlayerUIReferenceAssets
 @testable import PlayerUIAsyncNodePlugin
 
