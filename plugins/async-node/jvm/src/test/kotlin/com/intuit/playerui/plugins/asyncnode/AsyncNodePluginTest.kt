@@ -103,6 +103,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
                     if (count == 2) cont.resume(true) {}
                 }
             }
+
             player.start(asyncNodeFlowSimple)
         }
         Assertions.assertTrue(count == 2)
@@ -144,7 +145,9 @@ internal class AsyncNodePluginTest : PlayerTest() {
             player.start(asyncNodeFlowSimple)
         }
         Assertions.assertTrue(count == 2)
+        print(update?.get("actions"))
         Assertions.assertEquals(2, update?.getList("actions")?.size)
+        Assertions.assertEquals(2, update?.getList("actions")?.filterIsInstance<ArrayList<Node>>()?.get(0)?.size)
     }
 
     @TestTemplate
