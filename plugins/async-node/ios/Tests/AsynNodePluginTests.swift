@@ -77,6 +77,7 @@ class AsyncNodePluginTests: XCTestCase {
                         let newText1 = val
                             .objectForKeyedSubscript("values")
                             .objectAtIndexedSubscript(1)
+                            .objectAtIndexedSubscript(0)
                             .objectForKeyedSubscript("asset")
                             .objectForKeyedSubscript("value")
                         guard let textString1 = newText1?.toString() else { return XCTFail("newText1 was not a string") }
@@ -152,6 +153,7 @@ class AsyncNodePluginTests: XCTestCase {
                         let newText1 = val
                             .objectForKeyedSubscript("values")
                             .objectAtIndexedSubscript(1)
+                            .objectAtIndexedSubscript(0)
                             .objectForKeyedSubscript("asset")
                             .objectForKeyedSubscript("value")
                         guard let textString1 = newText1?.toString() else { return XCTFail("newText was not a string") }
@@ -163,7 +165,9 @@ class AsyncNodePluginTests: XCTestCase {
                     if count == 3 {
                         let newText2 = val
                             .objectForKeyedSubscript("values")
-                            .objectAtIndexedSubscript(2)
+                            .objectAtIndexedSubscript(1)
+                            .objectAtIndexedSubscript(1)
+                            .objectAtIndexedSubscript(0)
                             .objectForKeyedSubscript("asset")
                             .objectForKeyedSubscript("value")
                         guard let textString2 = newText2?.toString() else { return XCTFail("newText was not a string") }
@@ -176,7 +180,9 @@ class AsyncNodePluginTests: XCTestCase {
                     if count == 4 {
                         let newText3 = val
                             .objectForKeyedSubscript("values")
-                            .objectAtIndexedSubscript(3)
+                            .objectAtIndexedSubscript(1)
+                            .objectAtIndexedSubscript(1)
+                            .objectAtIndexedSubscript(1)
                             .objectForKeyedSubscript("asset")
                             .objectForKeyedSubscript("value")
                         guard let textString3 = newText3?.toString() else { return XCTFail("newText was not a string") }
@@ -256,6 +262,7 @@ class AsyncNodePluginTests: XCTestCase {
                         let newText1 = val
                             .objectForKeyedSubscript("values")
                             .objectAtIndexedSubscript(1)
+                            .objectAtIndexedSubscript(0)
                             .objectForKeyedSubscript("asset")
                             .objectForKeyedSubscript("value")
                         guard let textString1 = newText1?.toString() else { return XCTFail("newText was not a string") }
@@ -267,7 +274,8 @@ class AsyncNodePluginTests: XCTestCase {
                     if count == 3 {
                         let newText2 = val
                             .objectForKeyedSubscript("values")
-                            .objectAtIndexedSubscript(2)
+                            .objectAtIndexedSubscript(1)
+                            .objectAtIndexedSubscript(1)
                             .objectForKeyedSubscript("asset")
                             .objectForKeyedSubscript("value")
                         guard let textString2 = newText2?.toString() else { return XCTFail("newText was not a string") }
