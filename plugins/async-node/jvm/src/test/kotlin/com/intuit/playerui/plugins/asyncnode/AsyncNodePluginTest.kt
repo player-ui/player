@@ -290,7 +290,6 @@ internal class AsyncNodePluginTest : PlayerTest() {
         Assertions.assertEquals(1, count)
 
         view = player.inProgressState?.lastViewUpdate
-        
         Assertions.assertNotNull(view)
         Assertions.assertEquals(
             "action",
