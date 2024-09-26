@@ -39,7 +39,8 @@ git_repository(
 git_repository(
     name = "fbjni",
     build_file = "//third_party/fbjni:BUILD",
-    commit = "474795fa9ff0dda60b838871171be935432bae16",
+    # this is not the same release as the fbjni AAR due to this change breaking exception handling in C++ https://github.com/facebookincubator/fbjni/commit/cd6e61a96129bdf70dc1e3c967c5ec29f4d4eeb1
+    commit = "1cf763714e99d45c23dfb316d702ebfa8290af64",
     patches = ["//patches:fbjni.install_headers.patch"],
     remote = "https://github.com/facebookincubator/fbjni",
 )
