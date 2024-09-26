@@ -35,7 +35,12 @@ cc_library(
         ],
         "//conditions:default": [],
     }),
-    linkopts = ["-Wl,-z,max-page-size=16384"],
+    linkopts = select({
+        # Host build
+        ":should_include_jni": [],
+        # Android build
+        "//conditions:default": ["-Wl,-z,max-page-size=16384"],
+    }),
     visibility = ["//visibility:public"],
     deps = select({
         # Host build
