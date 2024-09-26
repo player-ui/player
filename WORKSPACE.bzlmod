@@ -39,7 +39,7 @@ git_repository(
 git_repository(
     name = "fbjni",
     build_file = "//third_party/fbjni:BUILD",
-    commit = "1cf763714e99d45c23dfb316d702ebfa8290af64",
+    commit = "474795fa9ff0dda60b838871171be935432bae16",
     patches = ["//patches:fbjni.install_headers.patch"],
     remote = "https://github.com/facebookincubator/fbjni",
 )
@@ -65,5 +65,5 @@ git_repository(
 http_archive(
     name = "fbjni_artifact",
     build_file = "//third_party/fbjni:artifact.BUILD",
-    url = "https://repo1.maven.org/maven2/com/facebook/fbjni/fbjni/0.6.0/fbjni-0.6.0.aar",
+    url = "https://repo1.maven.org/maven2/com/facebook/fbjni/fbjni/0.7.0/fbjni-0.7.0.aar",
 )
