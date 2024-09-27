@@ -251,7 +251,8 @@ class AnyTypeTests: XCTestCase {
         XCTAssertEqual("[1,2]", doEncode(AnyType.numberArray(data: [1, 2])))
         XCTAssertEqual("[false,true]", doEncode(AnyType.booleanArray(data: [false, true])))
         XCTAssertEqual("{\"a\":false,\"b\":1}", doEncode(AnyType.anyDictionary(data: ["a": false, "b": 1])))
-        XCTAssertEqual("{\"container\":{\"key\":[{\"nestedKey\":\"nestedValue\"}],\"key2\":1}}", doEncode(AnyType.anyDictionary(data: ["container": AnyType.anyDictionary(data: ["key2": 1, "key": AnyType.anyArray(data: [["nestedKey": "nestedValue"]])])])))
+        XCTAssertEqual("[1,\"a\",true]", doEncode(AnyType.anyArray(data: [1, "a", true])))
+        XCTAssertEqual("{\"key\":[{\"nestedKey\":\"nestedValue\"},1,{}],\"key2\":1}", doEncode(AnyType.anyDictionary(data: ["key2": 1, "key": AnyType.anyArray(data: [["nestedKey": "nestedValue"], 1, [:] as Any])])))
     }
 
     func doEncode(_ data: AnyType) -> String? {
@@ -280,7 +281,7 @@ class AnyTypeTests: XCTestCase {
         XCTAssertNotEqual(AnyType.numberArray(data: [1, 2]).hashValue, 0)
         XCTAssertNotEqual(AnyType.booleanArray(data: [false, true]).hashValue, 0)
         XCTAssertNotEqual(AnyType.anyDictionary(data: ["key": false, "key2": 1]).hashValue, 0)
-        XCTAssertNotEqual(AnyType.anyArray(data: [1, false]).hashValue, 0)
+        XCTAssertNotEqual(AnyType.anyArray(data: [1, "a", true]).hashValue, 0)
         XCTAssertNotEqual(AnyType.unknownData.hashValue, 0)
     }
 
@@ -297,6 +298,7 @@ class AnyTypeTests: XCTestCase {
         XCTAssertEqual(AnyType.numberArray(data: [1, 2]), AnyType.numberArray(data: [1, 2]))
         XCTAssertEqual(AnyType.booleanArray(data: [false, true]), AnyType.booleanArray(data: [false, true]))
         XCTAssertEqual(AnyType.anyDictionary(data: ["key": false, "key2": 1]), AnyType.anyDictionary(data: ["key": false, "key2": 1]))
+        XCTAssertEqual(AnyType.anyArray(data: [1, "a", true]), AnyType.anyArray(data: [1, "a", true]))
         XCTAssertNotEqual(AnyType.unknownData, AnyType.string(data: "test"))
     }
 
