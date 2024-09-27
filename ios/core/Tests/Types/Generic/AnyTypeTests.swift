@@ -166,6 +166,53 @@ class AnyTypeTests: XCTestCase {
         }
     }
 
+    func testAnyArray() {
+        let string = "[1, true]"
+        guard
+            let data = string.data(using: .utf8),
+            let anyType = try? AnyTypeDecodingContext(rawData: string.data(using: .utf8)!).inject(to: JSONDecoder()).decode(AnyType.self, from: data)
+        else { return XCTFail("could not decode") }
+        switch anyType {
+        case .anyArray(let result):
+            XCTAssertEqual(1, result[0] as? Int)
+            XCTAssertEqual(true, result[1] as? Bool)
+        default:
+            XCTFail("data was not anyArray")
+        }
+    }
+
+    func testAnyDictionaryDataWithArray() {
+        let string = "{\"key2\":1,\"key\":[false]}"
+        guard
+            let data = string.data(using: .utf8),
+            let anyType = try? AnyTypeDecodingContext(rawData: string.data(using: .utf8)!).inject(to: JSONDecoder()).decode(AnyType.self, from: data)
+        else { return XCTFail("could not decode") }
+        switch anyType {
+        case .anyDictionary(let result):
+            XCTAssertEqual(false, (result["key"] as? [Bool])?.first)
+            XCTAssertEqual(1, result["key2"] as? Double)
+        default:
+            XCTFail("data was not dictionary")
+        }
+    }
+
+    func testAnyDictionaryDataWithDeepNestedTypes() {
+        let string = "{\"key2\":1,\"key\":[{\"nestedKey\": \"nestedValue\"}]}"
+        guard
+            let data = string.data(using: .utf8),
+            let anyType = try? AnyTypeDecodingContext(rawData: string.data(using: .utf8)!).inject(to: JSONDecoder()).decode(AnyType.self, from: data)
+        else { return XCTFail("could not decode") }
+        switch anyType {
+        case .anyDictionary(let result):
+            let nestedArray = result["key"] as? [Any]
+            let nestedDict = nestedArray?.first as? [String: Any]
+            XCTAssertEqual("nestedValue", nestedDict?["nestedKey"] as? String)
+            XCTAssertEqual(1, result["key2"] as? Double)
+        default:
+            XCTFail("data was not dictionary")
+        }
+    }
+
     func testUnknownData() {
         let string = "{\"key\":\"value\", \"key2\": 2}"
         guard
