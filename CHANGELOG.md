@@ -1,3 +1,27 @@
+# 0.9.1 (Thu Sep 26 2024)
+
+#### 🐛 Bug Fix
+
+- Release main [#518](https://github.com/player-ui/player/pull/518) ([@intuit-svc](https://github.com/intuit-svc))
+- hermes_jni linkopt select [#517](https://github.com/player-ui/player/pull/517) ([@brocollie08](https://github.com/brocollie08))
+- Remove FBJNI local binaries [#516](https://github.com/player-ui/player/pull/516) ([@brocollie08](https://github.com/brocollie08))
+- revert async node flatten [#512](https://github.com/player-ui/player/pull/512) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Hermes support Android 15 [#509](https://github.com/player-ui/player/pull/509) ([@brocollie08](https://github.com/brocollie08))
+- Fix js Package Releases [#507](https://github.com/player-ui/player/pull/507) ([@KetanReddy](https://github.com/KetanReddy))
+- Update Custom Asset doc page with use cases on asset registering [#348](https://github.com/player-ui/player/pull/348) (nancy_wu1@intuit.com [@nancywu1](https://github.com/nancywu1))
+- iOS: move HeadlessPlayerImpl from PlayerUIInternalTestUtilities to PlayerUITestUtilitiesCore [#500](https://github.com/player-ui/player/pull/500) ([@nancywu1](https://github.com/nancywu1))
+
+#### Authors: 6
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- nancywu1 (nancy_wu1@intuit.com)
+
+---
+
 # 0.9.0 (Wed Sep 04 2024)
 
 ### Release Notes
