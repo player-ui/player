@@ -250,6 +250,7 @@ class AnyTypeTests: XCTestCase {
         XCTAssertEqual("[1,2]", doEncode(AnyType.numberArray(data: [1, 2])))
         XCTAssertEqual("[false,true]", doEncode(AnyType.booleanArray(data: [false, true])))
         XCTAssertEqual("{\"a\":false,\"b\":1}", doEncode(AnyType.anyDictionary(data: ["a": false, "b": 1])))
+        XCTAssertEqual("{\"key\":[{\"nestedKey\":\"nestedValue\"}],\"key2\":1}", doEncode(AnyType.anyDictionary(data: ["key2": 1, "key": AnyType.anyArray(data: [["nestedKey": "nestedValue"]])])))
     }
 
     func doEncode(_ data: AnyType) -> String? {
