@@ -1,0 +1,52 @@
+---
+title: "Content"
+---
+
+Player is driven off of JSON content that describes the user interactions. It mainly consists of a state-machine, some views to drive display, data, and a schema. Player, once started with the JSON content, will _play_ the flow until it reaches a terminal state in the state-machine, and return the outcome, data, and other relevant information about the flow's execution.
+
+The structure of the JSON payload is described below.
+
+## Structure
+
+The high level JSON payload for Player to render consists of: `id`, `views`, `data`, `schema`, `navigation`
+
+**id** - (required) - A string that identifies the payload.
+
+[**data**](./data-expressions) - (optional) - A JSON object that contains data you can reference in the `navigation` or `views` section.
+
+[**schema**](./schema) - (optional) - A schema that describes the structure of the `data` model, including default values, validation rules, etc.
+
+[**views**](./assets-views) - (optional) - The views section is an array of assets that are meant to display pages to the user. These can be referenced by ID in the navigation section, and can transition between states in the state machine. Assets are typically semantic in nature, as they are used to render content with dissimilar UIs depending on the context of the user.
+
+[**navigation**](./navigation) - (required) - The `navigation` section describes a finite state machine that is responsible driving the core Player experience. The nodes can either be: `VIEW`, `ACTION`, `EXTERNAL`, or `FLOW`
+
+## Example
+
+Below is a minimal example of Player content that loads a view.
+
+```json
+{
+  "id": "example-flow",
+  "views": [
+    {
+      "id": "view-1",
+      "type": "text",
+      "value": "{{label}}"
+    }
+  ],
+  "data": {
+    "label": "Some Text"
+  },
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "view-1",
+        "transitions": {}
+      }
+    }
+  }
+}
+```

@@ -1,0 +1,26 @@
+---
+title: SetTimeout Plugin
+---
+
+The only explicit runtime plugin in the core Android plugin set, the `SetTimeoutPlugin` is a `RuntimePlugin` written to provide the global `setTimeout` method to the runtime.
+
+## Usage
+
+In build.gradle
+
+```kotlin
+implementation "com.intuit.playerui.plugins:set-time-out:$PLAYER_VERSION"
+```
+
+In plugin implementation
+
+```kotlin
+class PluginThatNeedsSetTimeout : RuntimePlugin {
+
+    override fun apply(runtime: Runtime) {
+        SetTimeoutPlugin().apply(runtime)
+        // do other plugin setup
+    }
+
+}
+```

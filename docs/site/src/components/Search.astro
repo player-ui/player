@@ -1,0 +1,79 @@
+---
+import Default from "@astrojs/starlight/components/Search.astro";
+import type { Props } from "@astrojs/starlight/props";
+
+type SidebarEntry = (typeof Astro.props.sidebar)[number];
+
+function getFirstEntry(entry: SidebarEntry) {
+  if (entry.type === "group") {
+    if (entry.entries.length === 0) {
+      return;
+    }
+
+    return getFirstEntry(entry.entries[0]);
+  }
+
+  return entry;
+}
+
+function isCurrent(entry: SidebarEntry) {
+  if (entry.type === "link" && entry.isCurrent) {
+    return true;
+  }
+
+  if (entry.type === "group") {
+    return entry.entries.some((s): boolean => isCurrent(s));
+  }
+
+  return false;
+}
+
+const topEntries = Astro.props.sidebar.map((s) => ({
+  label: s.label,
+  href: getFirstEntry(s)?.href,
+  isCurrent: isCurrent(s),
+}));
+---
+
+<style>
+  .nav-item {
+    font-size: var(--sl-text-base);
+    font-weight: 600;
+    color: var(--sl-color-gray-2);
+    border: 1px solid var(--sl-color-text-accent);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    border-radius: 0.25rem;
+    padding: 0 1rem;
+  }
+
+  .nav-item:hover {
+    background-color: var(--sl-color-text-accent);
+    color: var(--sl-color-text-invert);
+  }
+
+  .nav-item.current {
+    background-color: var(--sl-color-white);
+    color: var(--sl-color-text-invert);
+  }
+</style>
+
+<Default {...Astro.props} />
+
+<div class="flex flex-row flex-1 justify-end gap-2 ml-4">
+  {
+    topEntries.map((entry) => {
+      return (
+        <a
+          class:list={["nav-item", entry.isCurrent && "current"].filter(
+            Boolean
+          )}
+          href={entry.href}
+        >
+          {entry.label}
+        </a>
+      );
+    })
+  }
+</div>

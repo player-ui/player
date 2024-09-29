@@ -1,11 +1,12 @@
 {
-  "name": "@player-ui/docs",
+  "name": "@player-ui/astro-docs",
   "private": true,
   "homepage": "https://player-ui.github.io",
   "type": "module",
   "dependencies": {
+    "@player-ui/player": "workspace:*",
     "@player-ui/react": "workspace:*",
-    "@player-ui/reference-assets-plugin-react": "workspace:*",
-    "@player-ui/asset-provider-plugin-react": "workspace:*"
+    "@player-ui/reference-assets-plugin-components": "workspace:*",
+    "@player-ui/reference-assets-plugin-react": "workspace:*"
   }
 }
