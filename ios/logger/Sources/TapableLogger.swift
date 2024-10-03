@@ -60,7 +60,18 @@ public class TapableLogger {
     /**
      Logs an `error` level message
      - parameters:
-        - message: The message(s) to log
+     - error: An error object to log
+     */
+    public func e(_ error: Error) {
+        guard LogLevel.error.shouldLog(currentLevel: logLevel) else { return }
+        hooks.error.call((nil, error))
+    }
+
+    /**
+     Logs an `error` level message
+     - parameters:
+     - message: The message(s) to log
+     - error: An associated error object
      */
     public func e(_ messages: Any..., er error: Error? = nil) {
         guard LogLevel.error.shouldLog(currentLevel: logLevel) else { return }
@@ -69,6 +80,15 @@ public class TapableLogger {
         } else {
             hooks.error.call((messages, nil))
         }
+    }
+
+    /**
+     Logs an `error` level message
+     - parameters:
+     - message: The message(s) to log
+     */
+    public func e(_ messages: Any...) {
+        log(level: .error, messages: messages)
     }
 
     /// Function signature for log messages from the JS layer
@@ -151,7 +171,4 @@ public class LoggerHooks {
 
     /// Called to convert a JSValue from the core player into `[Any]` before logging
     public let convertJSValue = SyncBailHook<JSValue, [Any]>()
-
-    /// Called to get a logging prefix for a given log level for a log message
-    public let prefixMessage = SyncBailHook<LogLevel, String>()
 }

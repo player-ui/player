@@ -61,9 +61,6 @@ class TapableLoggerTests: XCTestCase {
     func testMessage() {
         let logger = TapableLogger()
         logger.logLevel = .info
-        logger.hooks.prefixMessage.tap(name: "test") { (level) -> BailResult<String?> in
-            return .bail("[Test][\(level)]: ")
-        }
 
         let logExpect = expectation(description: "Prefixed message logged")
         logger.hooks.info.tap(name: "test") { (message) in
