@@ -43,21 +43,6 @@ class TapableLoggerTests: XCTestCase {
         XCTAssertEqual(logger.convertJSValue(arrayOfObjectAndStrings) as? [AnyHashable], ["message 1", ["a":1], "message 2"])
     }
 
-    enum ArrayObjects: Decodable, Equatable {
-        case string(String)
-        case dictionary([String:Int])
-
-        public init(from decoder: Decoder) throws {
-            let container = try decoder.singleValueContainer()
-            do {
-                self = .string(try container.decode(String.self))
-            } catch {
-                self = .dictionary(try container.decode([String:Int].self))
-            }
-        }
-    }
-
-
     func testMessage() {
         let logger = TapableLogger()
         logger.logLevel = .info
@@ -86,15 +71,22 @@ class TapableLoggerTests: XCTestCase {
         let warningExpect = expectation(description: "warning message logged")
         let errorMsgExpect = expectation(description: "error message logged")
         let errorExpect = expectation(description: "error message logged")
+        let errorMsgAndErrorType = expectation(description: "error message and TestError logged")
         logger.hooks.trace.tap(name: "test") { _ in traceExpect.fulfill() }
         logger.hooks.debug.tap(name: "test") { _ in debugExpect.fulfill() }
         logger.hooks.info.tap(name: "test") { _ in infoExpect.fulfill() }
         logger.hooks.warn.tap(name: "test") { _ in warningExpect.fulfill() }
-        logger.hooks.error.tap(name: "test") { err in
-            if let _ = err.1 {
-                errorExpect.fulfill()
-            } else if let _ = err.0 {
+        logger.hooks.error.tap(name: "test") { msg in
+            if let err = msg.1, let message = msg.0 {
+                XCTAssertEqual(err as? TestError, TestError.errored)
+                XCTAssertEqual((message as? [String] ?? []).first, "Message")
+                errorMsgAndErrorType.fulfill()
+            } else if let message = msg.0 {
+                XCTAssertEqual((message as? [String] ?? []).first, "Message")
                 errorMsgExpect.fulfill()
+            } else if let err = msg.1 {
+                XCTAssertEqual(err as? TestError, TestError.errored)
+                errorExpect.fulfill()
             }
         }
 
@@ -104,7 +96,8 @@ class TapableLoggerTests: XCTestCase {
         logger.w("Message")
         logger.e("Message")
         logger.e(TestError.errored)
+        logger.e("Message", er: TestError.errored)
 
-        wait(for: [traceExpect, debugExpect, infoExpect, warningExpect, errorExpect, errorMsgExpect], timeout: 1)
+        wait(for: [traceExpect, debugExpect, infoExpect, warningExpect, errorExpect, errorMsgExpect, errorMsgAndErrorType], timeout: 1)
     }
 }

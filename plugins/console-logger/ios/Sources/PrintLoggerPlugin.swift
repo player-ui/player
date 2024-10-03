@@ -42,7 +42,7 @@ public class PrintLoggerPlugin: NativePlugin {
         player.logger.hooks.debug.tap(name: pluginName, { print("\(prefixedMessage)\(($0))" ) })
         player.logger.hooks.info.tap(name: pluginName, { print("\(prefixedMessage)\(($0))" ) })
         player.logger.hooks.warn.tap(name: pluginName, { print("\(prefixedMessage)\(($0))" ) })
-        player.logger.hooks.error.tap(name: pluginName, { print("\(prefixedMessage)\(($0))", $1?.localizedDescription ?? "") })
+        player.logger.hooks.error.tap(name: pluginName, { print("\(prefixedMessage)\((String(describing: $0)))", $1?.localizedDescription ?? "") })
     }
 }
 

@@ -144,7 +144,7 @@ public class TapableLogger {
         else { return nil }
 
         // return as aAray if JSValue can be converted to array otherwise return object in an Array
-        return value.isArray ? value.toArray() : [value.toObject()]
+        return value.isArray ? value.toArray() : [value.toObject() as Any]
     }
 }
 
