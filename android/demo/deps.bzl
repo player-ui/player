@@ -9,6 +9,7 @@ maven_main = [
     "@maven//:com_facebook_soloader_soloader",
     # For when j2v8-android _isn't_ included
     "@maven//:com_github_AlexTrotsenko_j2v8_debugger",
+    "@maven//:com_intuit_playerui_plugins_logging",
 ]
 
 maven_test = [
