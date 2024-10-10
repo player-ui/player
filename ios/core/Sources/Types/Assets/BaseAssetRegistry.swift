@@ -166,7 +166,8 @@ open class BaseAssetRegistry<WrapperType>: PlayerRegistry where
     public func decode(_ value: JSValue) throws -> WrapperType.AssetType {
         assert(Thread.isMainThread, "decoder must be accessed from main")
         typealias Shim = RegistryDecodeShim<WrapperType.AssetType>
-        return try decoder.decode(Shim.self, from: value).asset
+        let localDecoder = AnyTypeDecodingContext(value).map { $0.inject(to: decoder) } ?? decoder
+        return try localDecoder.decode(Shim.self, from: value).asset
     }
 
     /**
@@ -177,7 +178,8 @@ open class BaseAssetRegistry<WrapperType>: PlayerRegistry where
      */
     public func decodeWrapper(_ value: JSValue) throws -> WrapperType {
         assert(Thread.isMainThread, "decoder must be accessed from main")
-        return try decoder.decode(WrapperType.self, from: value)
+        let localDecoder = AnyTypeDecodingContext(value).map { $0.inject(to: decoder) } ?? decoder
+        return try localDecoder.decode(WrapperType.self, from: value)
     }
 }
 
@@ -187,6 +189,16 @@ public struct RegistryDecodeShim<Asset>: Decodable {
     public init(from decoder: Decoder) throws {
         let decodeFunction: DecodeAssetFunction<Asset> = try decoder.getDecodeAssetFunction()
         asset = try decodeFunction(decoder)
+    }
+}
+
+extension AnyTypeDecodingContext {
+    init?(_ value: JSValue) {
+        guard
+            let obj = value.toObject(),
+            let data = try? JSONSerialization.data(withJSONObject: obj)
+        else { return nil }
+        self.init(rawData: data)
     }
 }
 
