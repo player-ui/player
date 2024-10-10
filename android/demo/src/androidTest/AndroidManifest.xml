@@ -3,7 +3,7 @@
           xmlns:tools="http://schemas.android.com/tools"
           package="com.intuit.playerui.android.reference.demo.test">
 
-    <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="30" />
+    <uses-sdk android:minSdkVersion="25" android:targetSdkVersion="30" />
     <instrumentation android:targetPackage="com.intuit.playerui.android.reference.demo"
                      android:name="androidx.test.runner.AndroidJUnitRunner"/>
 </manifest>

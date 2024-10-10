@@ -131,6 +131,15 @@ git_override(
 )
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
+maven.artifact(
+    group = "com.intuit.playerui.plugins",
+    artifact = "logging",
+    version = "1.3.7--canary.100.15-SNAPSHOT",
+    exclusions = [
+        "androidx.appcompat:appcompat",
+        "androidx.activity:activity-ktx",
+    ]
+)
 maven.install(
     artifacts = [
         "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0",
@@ -224,6 +233,8 @@ maven.install(
         "org.junit.jupiter:junit-jupiter-api:5.6.0",
         "org.junit.jupiter:junit-jupiter-engine:5.6.0",
         "org.junit.jupiter:junit-jupiter-params:5.6.0",
+
+        "com.intuit.playerui.plugins:logging:1.3.7--canary.100.15-SNAPSHOT"
     ],
     fetch_sources = True,
     repositories = [
@@ -232,6 +243,8 @@ maven.install(
         "https://plugins.gradle.org/m2/",
         "https://jcenter.bintray.com/",
         "https://jitpack.io/",
+        "https://artifact.intuit.com/artifactory/CG.PD.Intuit-Snapshots/",
+        "https://artifact.intuit.com/artifactory/maven.AppFabric.appfabricmobile-releases",
     ],
 )
 use_repo(maven, "maven")
