@@ -73,13 +73,9 @@ public class TapableLogger {
      - message: The message(s) to log
      - error: An associated error object
      */
-    public func e(_ messages: Any..., er error: Error? = nil) {
+    public func e(_ messages: Any..., er error: Error) {
         guard LogLevel.error.shouldLog(currentLevel: logLevel) else { return }
-        if let error = error {
             hooks.error.call((messages, error))
-        } else {
-            hooks.error.call((messages, nil))
-        }
     }
 
     /**
