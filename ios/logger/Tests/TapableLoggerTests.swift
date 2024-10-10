@@ -28,27 +28,28 @@ class TapableLoggerTests: XCTestCase {
 
         let object = context.evaluateScript("({a: 1})")!
 
+        let arrayOfObjectAndStrings = context.evaluateScript("(['message 1', {a: 1}, 'message 2'])")!
+
         XCTAssertNil(logger.convertJSValue(undef))
 
-        XCTAssertEqual(logger.convertJSValue(string), "\"a\"")
+        XCTAssertEqual(logger.convertJSValue(string) as? [String], ["a"])
 
-        XCTAssertEqual(logger.convertJSValue(number), "1")
+        XCTAssertEqual(logger.convertJSValue(number) as? [Int] , [1])
 
-        XCTAssertEqual(logger.convertJSValue(array), "[\"a\",\"b\"]")
+        XCTAssertEqual(logger.convertJSValue(array) as? [String] , ["a","b"])
 
-        XCTAssertEqual(logger.convertJSValue(object), "{\"a\":1}")
+        XCTAssertEqual(logger.convertJSValue(object) as? [[String: Int]] , [["a":1]])
+
+        XCTAssertEqual(logger.convertJSValue(arrayOfObjectAndStrings) as? [AnyHashable], ["message 1", ["a":1], "message 2"])
     }
 
-    func testMessagePrefixing() {
+    func testMessage() {
         let logger = TapableLogger()
         logger.logLevel = .info
-        logger.hooks.prefixMessage.tap(name: "test") { (level) -> BailResult<String?> in
-            return .bail("[Test][\(level)]: ")
-        }
 
         let logExpect = expectation(description: "Prefixed message logged")
         logger.hooks.info.tap(name: "test") { (message) in
-            XCTAssertEqual("[Test][ info]: Message", message)
+            XCTAssertEqual("Message", (message as? [String])?.first)
             logExpect.fulfill()
         }
 
@@ -70,15 +71,22 @@ class TapableLoggerTests: XCTestCase {
         let warningExpect = expectation(description: "warning message logged")
         let errorMsgExpect = expectation(description: "error message logged")
         let errorExpect = expectation(description: "error message logged")
+        let errorMsgAndErrorType = expectation(description: "error message and TestError logged")
         logger.hooks.trace.tap(name: "test") { _ in traceExpect.fulfill() }
         logger.hooks.debug.tap(name: "test") { _ in debugExpect.fulfill() }
         logger.hooks.info.tap(name: "test") { _ in infoExpect.fulfill() }
         logger.hooks.warn.tap(name: "test") { _ in warningExpect.fulfill() }
-        logger.hooks.error.tap(name: "test") { err in
-            if let _ = err.1 {
-                errorExpect.fulfill()
-            } else if let _ = err.0 {
+        logger.hooks.error.tap(name: "test") { msg in
+            if let err = msg.1, let message = msg.0 {
+                XCTAssertEqual(err as? TestError, TestError.errored)
+                XCTAssertEqual((message as? [String] ?? []).first, "Message")
+                errorMsgAndErrorType.fulfill()
+            } else if let message = msg.0 {
+                XCTAssertEqual((message as? [String] ?? []).first, "Message")
                 errorMsgExpect.fulfill()
+            } else if let err = msg.1 {
+                XCTAssertEqual(err as? TestError, TestError.errored)
+                errorExpect.fulfill()
             }
         }
 
@@ -88,45 +96,8 @@ class TapableLoggerTests: XCTestCase {
         logger.w("Message")
         logger.e("Message")
         logger.e(TestError.errored)
+        logger.e("Message", er: TestError.errored)
 
-        wait(for: [traceExpect, debugExpect, infoExpect, warningExpect, errorExpect, errorMsgExpect], timeout: 1)
-    }
-
-    func testLogAutoclosures() {
-        let logger = TapableLogger()
-        logger.logLevel = .warning
-        var messageCalled = false
-        var message: String {
-            messageCalled = true
-            return "message"
-        }
-
-        var tapMessage: String?
-        logger.tapLogs { message in
-            tapMessage = message
-        }
-
-        logger.t(message)
-        XCTAssertFalse(messageCalled)
-        XCTAssertNil(tapMessage)
-        logger.w(message)
-        XCTAssertTrue(messageCalled)
-        XCTAssertTrue(tapMessage?.hasSuffix("\(LogLevel.warning.description)] message") ?? false)
-    }
-
-    func testTapAllLogs() {
-        let logger = TapableLogger()
-        logger.logLevel = .trace
-        var messages: [String] = []
-        logger.tapLogs { message in
-            messages.append(message)
-        }
-
-        for level in LogLevel.allCases {
-            logger.log(level: level, message: "msg")
-        }
-
-        let expected = LogLevel.allCases.map { "\($0)] msg" }
-        XCTAssertTrue(zip(messages, expected).map({ $0.0.hasSuffix($0.1) }).allSatisfy({ $0 }))
+        wait(for: [traceExpect, debugExpect, infoExpect, warningExpect, errorExpect, errorMsgExpect, errorMsgAndErrorType], timeout: 1)
     }
 }
