@@ -34,11 +34,15 @@ public class PrintLoggerPlugin: NativePlugin {
      */
     public func apply<P>(player: P) where P: HeadlessPlayer {
         player.logger.logLevel = logLevel
-        player.logger.hooks.prefixMessage.tap(name: pluginName) { .bail("[Player] [\($0.description)]: ") }
-        player.logger.hooks.trace.tap(name: pluginName, { print($0) })
-        player.logger.hooks.debug.tap(name: pluginName, { print($0) })
-        player.logger.hooks.info.tap(name: pluginName, { print($0) })
-        player.logger.hooks.warn.tap(name: pluginName, { print($0) })
-        player.logger.hooks.error.tap(name: pluginName, { print($0 ?? "", $1?.localizedDescription ?? "") })
+
+        /// logging prefix for a given log level before the log message
+        let prefixedMessage = "[Player] [\(logLevel)]: "
+
+        player.logger.hooks.trace.tap(name: pluginName, { print("\(prefixedMessage)\(($0))" ) })
+        player.logger.hooks.debug.tap(name: pluginName, { print("\(prefixedMessage)\(($0))" ) })
+        player.logger.hooks.info.tap(name: pluginName, { print("\(prefixedMessage)\(($0))" ) })
+        player.logger.hooks.warn.tap(name: pluginName, { print("\(prefixedMessage)\(($0))" ) })
+        player.logger.hooks.error.tap(name: pluginName, { print("\(prefixedMessage)\((String(describing: $0)))", $1?.localizedDescription ?? "") })
     }
 }
+

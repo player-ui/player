@@ -26,12 +26,14 @@ class SwiftUIRegistryTests: XCTestCase {
         operationSkipped.expectedFulfillmentCount = 2
         let logger = TapableLogger()
         logger.logLevel = .trace
-        logger.hooks.trace.tap(name: "test", { message in
-            guard message.contains("Duplicate Registration skipped for") else { return }
+        logger.hooks.trace.tap(name: "test", { messages in
+            let message: String = (messages as? [String] ?? []).first ?? ""
+            guard  message.contains("Duplicate Registration skipped for") else { return }
             operationSkipped.fulfill()
         })
 
-        logger.hooks.warn.tap(name: "test", { message in
+        logger.hooks.warn.tap(name: "test", { messages in
+            let message: String = (messages as? [String] ?? []).first ?? ""
             guard message.contains("Overriding registration for match") else { return }
             override.fulfill()
         })

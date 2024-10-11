@@ -24,23 +24,23 @@ class JSLoggerTests: XCTestCase {
         let warningExpect = expectation(description: "warning message logged")
         let errorExpect = expectation(description: "error message logged")
         player.logger.hooks.trace.tap(name: "test") { message in
-            guard message == "\"Message\"" else { return }
+            guard (message as? [String] ?? []).first == "Message" else { return }
             traceExpect.fulfill()
         }
         player.logger.hooks.debug.tap(name: "test") { message in
-            guard message == "\"Message\"" else { return }
+            guard (message as? [String] ?? []).first == "Message" else { return }
             debugExpect.fulfill()
         }
         player.logger.hooks.info.tap(name: "test") { message in
-            guard message == "\"Message\"" else { return }
+            guard (message as? [String] ?? []).first == "Message" else { return }
             infoExpect.fulfill()
         }
         player.logger.hooks.warn.tap(name: "test") { message in
-            guard message == "\"Message\"" else { return }
+            guard (message as? [String] ?? []).first == "Message" else { return }
             warningExpect.fulfill()
         }
-        player.logger.hooks.error.tap(name: "test") { message in
-            guard message.0 == "\"Message\"" else { return }
+        player.logger.hooks.error.tap(name: "test") {
+            guard ($0.0 as? [String] ?? []).first == "Message" else { return }
             errorExpect.fulfill()
         }
 
