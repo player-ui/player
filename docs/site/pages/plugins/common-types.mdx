@@ -22,7 +22,7 @@ yarn add @player-ui/common-types-plugin
 
 Add it to Player:
 ```js
-import CommonTypesPlugin from '@player-ui/common-types-plugin';
+import { CommonTypesPlugin } from '@player-ui/common-types-plugin';
 
 const commonTypesPlugin = new CommonTypesPlugin();
 const player = new Player({ plugins: [commonTypesPlugin] });
@@ -135,7 +135,7 @@ Options:
 #### required
 > Asserts that a value is not `null`, `undefined`, or an empty string
 
-Options: 
+Options:
 ```ts
 {
   /** An expression to limit the assertion only if the expression evaluates to truthy **/
@@ -146,7 +146,7 @@ Options:
 }
 ```
 
-**Constants Support**: 
+**Constants Support**:
 
 * namespace: `constants`
 * path: `validation.required`
@@ -164,7 +164,7 @@ Options:
 }
 ```
 
-**Constants Support**: 
+**Constants Support**:
 
 * namespace: `constants`
 * path: `validation.expression`
@@ -174,7 +174,7 @@ Options:
 #### readonly
 > Asserts that the value cannot change
 
-**Constants Support**: 
+**Constants Support**:
 
 * namespace: `constants`
 * path: `validation.readonly`
@@ -183,24 +183,24 @@ Options:
 #### string
 > Asserts that the value is a string
 
-**Constants Support**: 
+**Constants Support**:
 
 * namespace: `constants`
 * path: `validation.string`
 * message: "Value must be a string"
-* parameters: 
+* parameters:
   - `type`: the type of value being validated
 
 
 #### integer
 > Asserts that the value is an integer
 
-**Constants Support**: 
+**Constants Support**:
 
 * namespace: `constants`
 * path: `validation.integer`
 * message: "Value must be an integer"
-* parameters: 
+* parameters:
   - `type`: the type of value being validated
   - `flooredValue`: the floored value of the value being validated
 
@@ -208,7 +208,7 @@ Options:
 #### collection
 > Asserts that the value is an array
 
-**Constants Support**: 
+**Constants Support**:
 
 * namespace: `constants`
 * path: `validation.collection`
@@ -217,14 +217,14 @@ Options:
 #### oneOf
 > Asserts that the value is one of the pre-defined accepted values
 
-Options: 
+Options:
 ```ts
 {
   options?: Array;
 }
 ```
 
-**Constants Support**: 
+**Constants Support**:
 
 * namespace: `constants`
 * path: `validation.oneof`
@@ -234,7 +234,7 @@ Options:
 #### regex
 > Asserts that the value matches the provided regular expression
 
-Options: 
+Options:
 
 ```ts
 {
@@ -242,7 +242,7 @@ Options:
 }
 ```
 
-**Constants Support**: 
+**Constants Support**:
 
 * namespace: `constants`
 * path: `validation.regex`
@@ -260,12 +260,12 @@ Options:
 }
 ```
 
-**Constants Support**: 
+**Constants Support**:
 
 * namespace: `constants`
 * path: `validation.minimum`, `validation.maximum`
 * message: "At least ${min} items needed", "Up to ${max} items allowed"
-* parameters: 
+* parameters:
   - `validationLength`: Returns the length of the value being validated
 
 
@@ -280,7 +280,7 @@ Options:
 }
 ```
 
-**Constants Support**: 
+**Constants Support**:
 
 * namespace: `constants`
 * path: `validation.min`
@@ -296,7 +296,7 @@ Options:
 }
 ```
 
-**Constants Support**: 
+**Constants Support**:
 
 * namespace: `constants`
 * path: `validation.max`
@@ -305,7 +305,7 @@ Options:
 #### email
 > Asserts that the value follows an email pattern
 
-**Constants Support**: 
+**Constants Support**:
 
 * namespace: `constants`
 * path: `validation.email`
@@ -315,7 +315,7 @@ Options:
 #### phone
 > Asserts that the value follows an phone number pattern
 
-**Constants Support**: 
+**Constants Support**:
 
 * namespace: `constants`
 * path: `validation.phone`
@@ -324,7 +324,7 @@ Options:
 #### zip
 > Asserts that the value follows an zip-code pattern
 
-**Constants Support**: 
+**Constants Support**:
 
 * namespace: `constants`
 * path: `validation.zip`
