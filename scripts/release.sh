@@ -23,7 +23,7 @@ echo "Publishing NPM Packages using tag: ${NPM_TAG} from release type: ${RELEASE
 readonly PKG_NPM_LABELS=`bazel query --output=label 'kind("npm_package rule", //...) - attr("tags", "\[.*do-not-publish.*\]", //...)'`
 
 for pkg in $PKG_NPM_LABELS ; do
-  bazel run --config=ci -- ${pkg}.publish --access public --tag ${NPM_TAG}
+  bazel run --config=ci -- ${pkg}.npm-publish --access public --tag ${NPM_TAG}
 done
 
 # Rebuild to stamp the release podspec

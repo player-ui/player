@@ -11,6 +11,7 @@ import XCTest
 import JavaScriptCore
 @testable import PlayerUI
 @testable import PlayerUIInternalTestUtilities
+@testable import PlayerUITestUtilitiesCore
 
 class HeadlessPlayerTests: XCTestCase {
     func testViewId() {
@@ -271,6 +272,105 @@ class HeadlessPlayerTests: XCTestCase {
 
         player.start(flow: FlowData.COUNTER) { _ in}
         wait(for: [updateExp], timeout: 1)
+    }
+
+    func testConstantsController() {
+        let player = HeadlessPlayerImpl(plugins: [])
+        
+        guard let constantsController = player.constantsController else { return }
+        
+        // Basic get/set tests
+        let data: Any = [
+            "firstname": "john",
+            "lastname": "doe",
+            "favorite": [
+                "color": "red"
+            ],
+            "age": 1
+        ]
+        
+        constantsController.addConstants(data: data, namespace: "constants")
+
+        let firstname: String? = constantsController.getConstants(key: "firstname", namespace: "constants")
+        XCTAssertEqual(firstname, "john")
+
+        let middleName: String? = constantsController.getConstants(key:"middlename", namespace: "constants")
+        XCTAssertNil(middleName)
+
+        let middleNameSafe: String? = constantsController.getConstants(key:"middlename", namespace: "constants", fallback: "A")
+        XCTAssertEqual(middleNameSafe, "A")
+
+        let favoriteColor: String? = constantsController.getConstants(key:"favorite.color", namespace: "constants")
+        XCTAssertEqual(favoriteColor, "red")
+        
+        let age: Int? = constantsController.getConstants(key:"age", namespace: "constants")
+        XCTAssertEqual(age, 1)
+
+        let nonExistantNamespace: String? = constantsController.getConstants(key:"test", namespace: "foo")
+        XCTAssertNil(nonExistantNamespace)
+
+        let nonExistantNamespaceWithFallback: String? = constantsController.getConstants(key:"test", namespace: "foo", fallback: "B")
+        XCTAssertEqual(nonExistantNamespaceWithFallback, "B")
+        
+        // Test and make sure keys override properly
+        let newData: Any = [
+           "favorite": [
+             "color": "blue",
+           ],
+        ];
+
+        constantsController.addConstants(data: newData, namespace: "constants");
+        
+        let newFavoriteColor: String? = constantsController.getConstants(key: "favorite.color", namespace:"constants")
+        XCTAssertEqual(newFavoriteColor, "blue")
+    }
+    
+    func testConstantsControllerTempValues() {
+        let player = HeadlessPlayerImpl(plugins: [])
+        
+        guard let constantsController = player.constantsController else { return }
+        
+        // Add initial constants
+        let data: Any = [
+            "firstname": "john",
+            "lastname": "doe",
+            "favorite": [
+                "color": "red"
+            ]
+        ]
+        constantsController.addConstants(data: data, namespace: "constants")
+
+        // Override with temporary values
+        let tempData: Any = [
+            "firstname": "jane",
+            "favorite": [
+                "color": "blue"
+            ]
+        ]
+        constantsController.setTemporaryValues(data:tempData, namespace: "constants")
+
+        // Test temporary override
+        let firstnameTemp: String? = constantsController.getConstants(key:"firstname", namespace: "constants")
+        XCTAssertEqual(firstnameTemp, "jane")
+
+        let favoriteColorTemp: String? = constantsController.getConstants(key: "favorite.color", namespace: "constants")
+        XCTAssertEqual(favoriteColorTemp, "blue")
+
+        // Test fallback to original values when temporary values are not present
+        let lastnameTemp: String? = constantsController.getConstants(key: "lastname", namespace: "constants")
+        XCTAssertEqual(lastnameTemp, "doe")
+        
+        // Reset temp and values should be the same as the original data
+        constantsController.clearTemporaryValues();
+        
+        let firstname: String? = constantsController.getConstants(key:"firstname", namespace: "constants")
+        XCTAssertEqual(firstname, "john")
+
+        let favoriteColor: String? = constantsController.getConstants(key: "favorite.color", namespace: "constants")
+        XCTAssertEqual(favoriteColor, "red")
+
+        let lastname: String? = constantsController.getConstants(key: "lastname", namespace: "constants")
+        XCTAssertEqual(lastname, "doe")
     }
 }
 

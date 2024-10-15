@@ -39,7 +39,7 @@ internal interface NodeHook<R> : NodeWrapper {
     fun call(context: HookContext, serializedArgs: Array<Any?>): R
 }
 
-internal interface AsyncNodeHook<R : Any> : NodeHook<Promise> {
+internal interface AsyncNodeHook<R : Any?> : NodeHook<Promise> {
     override fun call(context: HookContext, serializedArgs: Array<Any?>): Promise = node.runtime.Promise { resolve, reject ->
         val result = callAsync(context, serializedArgs)
         resolve(result)

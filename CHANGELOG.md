@@ -1,3 +1,136 @@
+# 0.9.1 (Thu Sep 26 2024)
+
+#### 🐛 Bug Fix
+
+- Release main [#518](https://github.com/player-ui/player/pull/518) ([@intuit-svc](https://github.com/intuit-svc))
+- hermes_jni linkopt select [#517](https://github.com/player-ui/player/pull/517) ([@brocollie08](https://github.com/brocollie08))
+- Remove FBJNI local binaries [#516](https://github.com/player-ui/player/pull/516) ([@brocollie08](https://github.com/brocollie08))
+- revert async node flatten [#512](https://github.com/player-ui/player/pull/512) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Hermes support Android 15 [#509](https://github.com/player-ui/player/pull/509) ([@brocollie08](https://github.com/brocollie08))
+- Fix js Package Releases [#507](https://github.com/player-ui/player/pull/507) ([@KetanReddy](https://github.com/KetanReddy))
+- Update Custom Asset doc page with use cases on asset registering [#348](https://github.com/player-ui/player/pull/348) (nancy_wu1@intuit.com [@nancywu1](https://github.com/nancywu1))
+- iOS: move HeadlessPlayerImpl from PlayerUIInternalTestUtilities to PlayerUITestUtilitiesCore [#500](https://github.com/player-ui/player/pull/500) ([@nancywu1](https://github.com/nancywu1))
+
+#### Authors: 6
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- nancywu1 (nancy_wu1@intuit.com)
+
+---
+
+# 0.9.0 (Wed Sep 04 2024)
+
+### Release Notes
+
+#### Update Rules Versions ([#496](https://github.com/player-ui/player/pull/496))
+
+Update JS Rules to latest Aspect major
+
+#### Android/JVM - expose constantController ([#489](https://github.com/player-ui/player/pull/489))
+
+Expose the core Player [constantsController](https://github.com/player-ui/player/blob/9efce22c0cf315568213f7d2811b81096c1806df/core/player/src/player.ts#L91) to Android/JVM consumers
+
+AndroidPlayer provides top-level api and plugins access including `constantsController` with [AssetContext](https://github.com/player-ui/player/blob/bfd6a11a8d6c7138daec4724a8f08e9d9c4b370b/android/player/src/main/java/com/intuit/playerui/android/AssetContext.kt#L19-L23)
+
+Sample usage: 
+`assetContext.player.constantsController.getConstants(key, namespace)`
+
+#### Storybook Addon Fixes ([#449](https://github.com/player-ui/player/pull/449))
+
+- Re-adds the ability to render Asset properties as a tab in storybook
+- Re-adds the flow-refresh addon
+- Fixes the dependencies & package layout for the storybook addon
+- Fix dark-mode support
+
+#### [Hermes] Android integration ([#410](https://github.com/player-ui/player/pull/410))
+
+Initial integration with the [Hermes](https://github.com/facebook/hermes) JavaScript runtime. This shows a tremendous size improvement over the existing [J2V8](https://github.com/eclipsesource/J2V8) integration of ~70% (7.6 MB -> 2.3 MB, architecture dependent). 
+
+### Opt-in
+
+For now, the default runtime integration provided by the Android Player will still be `com.intuit.playerui:j2v8-android`, but Hermes can be opted in manually by excluding the J2V8 transitive dependency and including the Hermes artifact:
+
+```kotlin
+dependencies {
+    // Android Player dependency
+    implementation("com.intuit.playerui", "android", PLAYER_VERSION) {
+        // J2V8 included for release versions
+        exclude(group = "com.intuit.playerui", module = "j2v8-android")
+        // Debuggable J2V8 included for canary versions
+        exclude(group = "com.intuit.playerui", module = "j2v8-android-debug")
+    }
+    // Override with Hermes runtime
+    implementation("com.intuit.playerui", "hermes-android", PLAYER_VERSION)
+}
+
+// Exclude J2V8 transitive dependency for all configurations in this module
+configurations { 
+    all {
+        exclude(group = "com.intuit.playerui", module = "j2v8-android")
+        // Debuggable J2V8 included for canary versions
+        exclude(group = "com.intuit.playerui", module = "j2v8-android-debug")
+    }
+}
+```
+
+> [!TIP]
+> If your application includes dependencies that may transitively depend on `com.intuit.playerui:android`, you would likely need to ensure the default runtime is transitively excluded from those as well, either manually or as a global strategy.
+> 
+> The `AndroidPlayer` will pick the first runtime it finds on the classpath - you can at least verify which runtime was used for the `Player` with a new log: `Player created using $runtime`. But that won't tell you for certain if the other runtimes were successfully excluded. You'll need to examine your APK, or your apps dependency tree, to tell for sure that redundant runtimes aren't unintentionally included.
+
+Most of the setup for this integration is done simply by including the right dependency (and excluding the wrong one), however, the `hermes-android` integration also relies on the [SoLoader](https://github.com/facebook/SoLoader) for loading the native libraries. All that's needed is to initialize the `SoLoader` (should be on your classpath with the `hermes-android` dependency) with an Android `Context` somewhere before you use the `AndroidPlayer`, potentially in your activities `onCreate`:
+
+```kotlin
+override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+
+    SoLoader.init(this, false)
+    // ...
+}
+```
+
+---
+
+#### 🚀 Enhancement
+
+- Storybook Addon Fixes [#449](https://github.com/player-ui/player/pull/449) ([@adierkens](https://github.com/adierkens))
+- [Hermes] Android integration [#410](https://github.com/player-ui/player/pull/410) ([@sugarmanz](https://github.com/sugarmanz) [@brocollie08](https://github.com/brocollie08))
+
+#### 🐛 Bug Fix
+
+- Release main [#501](https://github.com/player-ui/player/pull/501) ([@intuit-svc](https://github.com/intuit-svc))
+- jvm and ios-async-node-ability-to-remove-resolved-async-node [#488](https://github.com/player-ui/player/pull/488) ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri) [@cehan-Chloe](https://github.com/cehan-Chloe))
+- Update Rules Versions [#496](https://github.com/player-ui/player/pull/496) ([@KetanReddy](https://github.com/KetanReddy))
+- fix:no matching toolchains:ninja_toolchain [#490](https://github.com/player-ui/player/pull/490) ([@cehan-Chloe](https://github.com/cehan-Chloe) [@KetanReddy](https://github.com/KetanReddy) [@brocollie08](https://github.com/brocollie08))
+- Android/JVM - expose constantController [#489](https://github.com/player-ui/player/pull/489) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- ios expose constantsController #446 [#487](https://github.com/player-ui/player/pull/487) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- On update race condition [#471](https://github.com/player-ui/player/pull/471) ([@brocollie08](https://github.com/brocollie08))
+- iOS: fix memory leak issues [#486](https://github.com/player-ui/player/pull/486) ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri) [@nancywu1](https://github.com/nancywu1))
+- Remove async node dsl component [#484](https://github.com/player-ui/player/pull/484) ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+- [CI] Swap release script to use `config=ci` [#482](https://github.com/player-ui/player/pull/482) ([@sugarmanz](https://github.com/sugarmanz))
+- Async node android [#469](https://github.com/player-ui/player/pull/469) ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+
+#### 🏠 Internal
+
+- Add recipes for just [#468](https://github.com/player-ui/player/pull/468) ([@adierkens](https://github.com/adierkens))
+
+#### Authors: 8
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Niharika Motukuri ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+
+---
+
 # 0.8.0 (Sun Aug 04 2024)
 
 ### Release Notes

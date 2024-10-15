@@ -12,11 +12,7 @@ import { DependencyModel, withParser } from "../../data";
 import type { Logger } from "../../logger";
 import type { Node } from "../parser";
 import { NodeType } from "../parser";
-import {
-  caresAboutDataChanges,
-  toNodeResolveOptions,
-  unpackAndPush,
-} from "./utils";
+import { caresAboutDataChanges, toNodeResolveOptions } from "./utils";
 import type { Resolve } from "./types";
 import { getNodeID } from "../parser/utils";
 
@@ -412,16 +408,7 @@ export class Resolver {
         );
 
         if (mTree.value !== undefined && mTree.value !== null) {
-          if (
-            mTree.node.parent?.type === NodeType.MultiNode &&
-            Array.isArray(mTree.value)
-          ) {
-            mTree.value.forEach((v: any) => {
-              unpackAndPush(v, childValue);
-            });
-          } else {
-            childValue.push(mTree.value);
-          }
+          childValue.push(mTree.value);
         }
 
         mTree.dependencies.forEach((bindingDep) =>

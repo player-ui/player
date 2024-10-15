@@ -2,7 +2,7 @@ import Foundation
 import XCTest
 import JavaScriptCore
 @testable import PlayerUI
-@testable import PlayerUIInternalTestUtilities
+@testable import PlayerUITestUtilitiesCore
 @testable import PlayerUIComputedPropertiesPlugin
 
 class ComputedPropertiesPluginTests: XCTestCase {

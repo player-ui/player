@@ -26,7 +26,7 @@ class AsyncNodePluginViewInspectorTests: XCTestCase {
 
         let asyncNodePluginPlugin = AsyncNodePluginPlugin()
 
-        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin]) { _ in
+        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin]) { _,_ in
             handlerExpectation.fulfill()
 
             return .singleNode(.concrete(jsContext?.evaluateScript("""

@@ -8,7 +8,7 @@ ios_pipeline(
         "//plugins/partial-match-fingerprint/core:core_native_bundle"
     ],
     deps = ["@swiftpkg_swift_hooks//:Sources_SwiftHooks", "//ios/logger:PlayerUILogger"],
-    test_deps = ["//ios/internal-test-utils:PlayerUIInternalTestUtilities"],
+    test_deps = ["//ios/test-utils-core:PlayerUITestUtilitiesCore", "//ios/internal-test-utils:PlayerUIInternalTestUtilities"],
     hasUnitTests = True,
     hasViewInspectorTests = False,
     test_host = "//ios/demo:PlayerUIDemo"

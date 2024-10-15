@@ -84,8 +84,8 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
                 self.onViewController(controller)
             }
 
-            hooks.state.tap { newState in
-                self.state = newState
+            hooks.state.tap { [weak self] newState in
+                self?.state = newState
             }
 
             guard !flow.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -107,6 +107,12 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             flow = nil
             DispatchQueue.main.async { self.result = nil }
             registry.resetView()
+        }
+
+        /// Clear the exceptionHandler of the context to remove reference to the logger
+        /// should be called when ManagedPlayer gets tore down
+        public func clearExceptionHandler() {
+            player?.context.exceptionHandler = nil
         }
 
         /// Returns `player` but asserts that it is not nil. Used from methods that should not be called
@@ -199,6 +205,7 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
     public var body: some View {
         bodyContent
             .environment(\.inProgressState, (state as? InProgressState))
+            .environment(\.constantsController, constantsController)
             // forward results from our Context along to our result binding
             .onReceive(context.$result.debounce(for: 0.1, scheduler: RunLoop.main)) {
                 self.result = $0
@@ -232,11 +239,23 @@ struct InProgressStateKey: EnvironmentKey {
     static var defaultValue: InProgressState?
 }
 
+/// EnvironmentKey for storing `constantsController`
+struct ConstantsControllerStateKey: EnvironmentKey {
+    /// The default value for `@Environment(\.constantsController)`
+    static var defaultValue: ConstantsController? = nil
+}
+
 public extension EnvironmentValues {
     /// The `InProgressState` of Player if it is in progress, and in scope
     var inProgressState: InProgressState? {
         get { self[InProgressStateKey.self] }
         set { self[InProgressStateKey.self] = newValue }
+    }
+    
+    /// The ConstantsController reference of Player
+    var constantsController: ConstantsController? {
+        get { self[ConstantsControllerStateKey.self] }
+        set { self[ConstantsControllerStateKey.self] = newValue }
     }
 }
 
