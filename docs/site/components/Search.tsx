@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Input,
   Box,
@@ -14,11 +14,11 @@ import {
   UnorderedList,
   InputLeftElement,
   HStack,
-} from '@chakra-ui/react';
-import { SearchIcon, ChevronRightIcon } from '@chakra-ui/icons';
-import Link from 'next/link';
-import lunr from 'lunr';
-import { AlgoliaSearch } from './AlgoliaSearch';
+} from "@chakra-ui/react";
+import { SearchIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import { Link } from "react-router-dom";
+import lunr from "lunr";
+import { AlgoliaSearch } from "./AlgoliaSearch";
 
 interface SearchIndex {
   /** The title of the page */
@@ -37,16 +37,16 @@ interface SearchIndex {
 
 const createSearchIndex = async () => {
   const searchIndex = (await import(
-    '../config/search-index.json'
+    "../config/search-index.json"
   )) as unknown as {
     default: Record<string, SearchIndex>;
   };
 
   const idx = lunr((builder) => {
-    builder.ref('path');
-    builder.field('title');
-    builder.field('header');
-    builder.field('content');
+    builder.ref("path");
+    builder.field("title");
+    builder.field("header");
+    builder.field("content");
 
     Object.values(searchIndex.default).forEach((page) => {
       builder.add(page);
@@ -65,7 +65,7 @@ const useSearch = () => {
 
   return {
     search: async (query: string) => {
-      if (query === '') {
+      if (query === "") {
         setResults([]);
       } else {
         const searchIndex = await index;
@@ -74,7 +74,8 @@ const useSearch = () => {
           .slice(0, 10)
           .map((r) => {
             return searchIndex.searchIndex[r.ref];
-          });
+          })
+          .filter((e) => e !== undefined);
 
         setResults(searchResults);
       }
@@ -89,7 +90,7 @@ const useSearch = () => {
 const SearchResult = (props: SearchIndex) => {
   return (
     <chakra.li overflow="hidden">
-      <Link passHref href={props.path}>
+      <Link to={props.path}>
         <Button as="a" variant="link" colorScheme="blue">
           <HStack gap="2px" divider={<ChevronRightIcon border="none" />}>
             <Heading as="h4" size="sm">
@@ -103,16 +104,16 @@ const SearchResult = (props: SearchIndex) => {
   );
 };
 
-export const FallbackSearchInput = () => {
+export const FallbackSearchInput = (): React.JSX.Element => {
   const { search, results, clear } = useSearch();
   const [searchActive, setSearchActive] = React.useState(false);
-  const [query, setQuery] = React.useState('');
+  const [query, setQuery] = React.useState("");
   const inputRef = React.useRef<HTMLInputElement>(null);
   const searchRef = React.useRef<HTMLDivElement>(null);
 
   const reset = React.useCallback(() => {
     clear();
-    setQuery('');
+    setQuery("");
     setSearchActive(false);
   }, [clear, setQuery, setSearchActive]);
 
@@ -162,12 +163,12 @@ export const FallbackSearchInput = () => {
   );
 };
 
-export const SearchInput = () => {
+export const SearchInput = (): React.JSX.Element => {
   // Only use algolia search if we're on the /latest/ version
   // it's the only one that's indexed
   if (
-    typeof window !== 'undefined' &&
-    window.location.pathname.includes('/latest/')
+    typeof window !== "undefined" &&
+    window.location.pathname.includes("/latest/")
   ) {
     return <AlgoliaSearch />;
   }

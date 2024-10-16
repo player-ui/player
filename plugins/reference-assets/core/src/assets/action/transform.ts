@@ -2,12 +2,15 @@ import type {
   Asset,
   TransformFunction,
   BeforeTransformFunction,
-} from '@player-ui/player';
-import { compose, composeBefore } from '@player-ui/asset-transform-plugin';
-import type { ActionAsset, TransformedAction } from './types';
+} from "@player-ui/player";
+import { compose, composeBefore } from "@player-ui/asset-transform-plugin";
+import type { ActionAsset, TransformedAction } from "./types";
 
+/**
+ * Function to find prev button
+ */
 export function isBackAction(action: ActionAsset): boolean {
-  return action.value === 'Prev';
+  return action.value === "Prev";
 }
 
 /**
@@ -15,7 +18,7 @@ export function isBackAction(action: ActionAsset): boolean {
  */
 const transform: TransformFunction<ActionAsset, TransformedAction> = (
   action,
-  options
+  options,
 ) => {
   return {
     ...action,
@@ -33,6 +36,28 @@ const transform: TransformFunction<ActionAsset, TransformedAction> = (
 };
 
 /**
+ * De couples back button from the back icon
+ */
+const backIconTransform: TransformFunction<ActionAsset, ActionAsset> = (
+  action,
+) => {
+  /** For previous versions of player, the back button would already have the back icon.
+   *  This ensures that the old functionality does not break and back button is still visible when they update the player.
+   */
+  if (isBackAction(action) && action?.metaData?.role === undefined) {
+    return {
+      ...action,
+      metaData: {
+        ...action?.metaData,
+        role: "back",
+      },
+    };
+  }
+
+  return action;
+};
+
+/**
  * Appends `exp` to the plugins.stringResolver.propertiesToSkip array or creates it if it doesn't exist
  *
  * @param asset - Asset to apply the transform to
@@ -40,7 +65,7 @@ const transform: TransformFunction<ActionAsset, TransformedAction> = (
 export const expPropTransform: BeforeTransformFunction<Asset> = (asset) => {
   const skipArray = asset.plugins?.stringResolver?.propertiesToSkip;
 
-  if (skipArray && skipArray.indexOf('exp') > 1) {
+  if (skipArray && skipArray.indexOf("exp") > 1) {
     return asset;
   }
 
@@ -52,7 +77,7 @@ export const expPropTransform: BeforeTransformFunction<Asset> = (asset) => {
         ...asset?.plugins?.stringResolver,
         propertiesToSkip: [
           ...(asset.plugins?.stringResolver?.propertiesToSkip ?? []),
-          'exp',
+          "exp",
         ],
       },
     },
@@ -61,5 +86,6 @@ export const expPropTransform: BeforeTransformFunction<Asset> = (asset) => {
 
 export const actionTransform = compose(
   transform,
-  composeBefore(expPropTransform)
+  backIconTransform,
+  composeBefore(expPropTransform),
 );

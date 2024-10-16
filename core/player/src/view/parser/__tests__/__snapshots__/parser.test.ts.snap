@@ -1,0 +1,394 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`generates the correct AST > parses an exp array 1`] = `
+{
+  "children": [
+    {
+      "path": [
+        "exp",
+      ],
+      "value": {
+        "override": true,
+        "parent": [Circular],
+        "type": "multi-node",
+        "values": [
+          {
+            "parent": [Circular],
+            "type": "value",
+            "value": "{{please}} = "work"",
+          },
+        ],
+      },
+    },
+  ],
+  "type": "asset",
+  "value": {
+    "id": "foo",
+    "type": "action",
+  },
+}
+`;
+
+exports[`generates the correct AST > parses an object 1`] = `
+{
+  "children": [
+    {
+      "path": [
+        "asset",
+      ],
+      "value": {
+        "parent": [Circular],
+        "type": "asset",
+        "value": {
+          "type": "bar",
+        },
+      },
+    },
+  ],
+  "type": "value",
+  "value": undefined,
+}
+`;
+
+exports[`generates the correct AST > works with applicability things 1`] = `
+{
+  "expression": "{{baz}}",
+  "type": "applicability",
+  "value": {
+    "parent": [Circular],
+    "type": "value",
+    "value": {
+      "foo": "bar",
+    },
+  },
+}
+`;
+
+exports[`generates the correct AST > works with applicability things 2`] = `
+{
+  "children": [
+    {
+      "path": [
+        "asset",
+      ],
+      "value": {
+        "children": [
+          {
+            "path": [
+              "values",
+            ],
+            "value": {
+              "override": true,
+              "parent": [Circular],
+              "type": "multi-node",
+              "values": [
+                {
+                  "expression": "{{foo}}",
+                  "parent": [Circular],
+                  "type": "applicability",
+                  "value": {
+                    "parent": [Circular],
+                    "type": "value",
+                    "value": {
+                      "value": "foo",
+                    },
+                  },
+                },
+                {
+                  "parent": [Circular],
+                  "type": "value",
+                  "value": {
+                    "value": "bar",
+                  },
+                },
+              ],
+            },
+          },
+        ],
+        "parent": [Circular],
+        "type": "asset",
+        "value": undefined,
+      },
+    },
+  ],
+  "type": "value",
+  "value": undefined,
+}
+`;
+
+exports[`generates the correct AST > works with applicability things 3`] = `
+{
+  "children": [
+    {
+      "path": [
+        "asset",
+      ],
+      "value": {
+        "children": [
+          {
+            "path": [
+              "someProp",
+            ],
+            "value": {
+              "expression": "{{foo}}",
+              "parent": [Circular],
+              "type": "applicability",
+              "value": {
+                "parent": [Circular],
+                "type": "value",
+                "value": {
+                  "description": {
+                    "value": "description",
+                  },
+                  "label": {
+                    "value": "label",
+                  },
+                },
+              },
+            },
+          },
+        ],
+        "parent": [Circular],
+        "type": "asset",
+        "value": undefined,
+      },
+    },
+  ],
+  "type": "value",
+  "value": undefined,
+}
+`;
+
+exports[`generates the correct AST > works with applicability things 4`] = `
+{
+  "children": [
+    {
+      "path": [
+        "asset",
+      ],
+      "value": {
+        "children": [
+          {
+            "path": [
+              "someProp",
+              "asset",
+            ],
+            "value": {
+              "expression": "{{foo}}",
+              "parent": [Circular],
+              "type": "applicability",
+              "value": {
+                "parent": [Circular],
+                "type": "asset",
+                "value": {
+                  "type": "someAsset",
+                },
+              },
+            },
+          },
+        ],
+        "parent": [Circular],
+        "type": "asset",
+        "value": undefined,
+      },
+    },
+  ],
+  "type": "value",
+  "value": undefined,
+}
+`;
+
+exports[`generates the correct AST when using switch plugin > works with asset wrapped objects 1`] = `
+{
+  "children": [
+    {
+      "path": [
+        "title",
+        "asset",
+      ],
+      "value": {
+        "parent": [Circular],
+        "type": "asset",
+        "value": {
+          "id": "businessprofile-tile-screen-yoy-subtitle",
+          "type": "text",
+          "value": "If it's changed since last year, let us know. Feel free to pick more than one.",
+        },
+      },
+    },
+  ],
+  "type": "value",
+  "value": {
+    "id": "toughView",
+    "type": "view",
+  },
+}
+`;
+
+exports[`generates the correct AST when using switch plugin > works with objects in a multiNode 1`] = `
+{
+  "children": [
+    {
+      "path": [
+        "title",
+        "asset",
+      ],
+      "value": {
+        "children": [
+          {
+            "path": [
+              "values",
+            ],
+            "value": {
+              "override": true,
+              "parent": [Circular],
+              "type": "multi-node",
+              "values": [
+                {
+                  "children": [
+                    {
+                      "path": [
+                        "asset",
+                      ],
+                      "value": {
+                        "parent": [Circular],
+                        "type": "asset",
+                        "value": {
+                          "id": "businessprofile-tile-screen-yoy-subtitle-1",
+                          "type": "text",
+                          "value": "If it's changed since last year, let us know. Feel free to pick more than one.",
+                        },
+                      },
+                    },
+                  ],
+                  "parent": [Circular],
+                  "type": "value",
+                  "value": undefined,
+                },
+                {
+                  "children": [
+                    {
+                      "path": [
+                        "asset",
+                      ],
+                      "value": {
+                        "parent": [Circular],
+                        "type": "asset",
+                        "value": {
+                          "id": "businessprofile-tile-screen-yoy-subtitle-2",
+                          "type": "text",
+                          "value": "More text",
+                        },
+                      },
+                    },
+                  ],
+                  "parent": [Circular],
+                  "type": "value",
+                  "value": undefined,
+                },
+              ],
+            },
+          },
+        ],
+        "parent": [Circular],
+        "type": "asset",
+        "value": {
+          "id": "someMultiNode",
+          "type": "type",
+        },
+      },
+    },
+  ],
+  "type": "value",
+  "value": {
+    "id": "toughView",
+    "type": "view",
+  },
+}
+`;
+
+exports[`parseView > parses a simple view 1`] = `
+{
+  "children": [
+    {
+      "path": [
+        "fields",
+        "asset",
+      ],
+      "value": {
+        "children": [
+          {
+            "path": [
+              "values",
+            ],
+            "value": {
+              "override": true,
+              "parent": [Circular],
+              "type": "multi-node",
+              "values": [
+                {
+                  "children": [
+                    {
+                      "path": [
+                        "asset",
+                      ],
+                      "value": {
+                        "parent": [Circular],
+                        "type": "asset",
+                        "value": {
+                          "id": "text-asset",
+                          "type": "text",
+                          "value": "bar",
+                        },
+                      },
+                    },
+                  ],
+                  "parent": [Circular],
+                  "type": "value",
+                  "value": undefined,
+                },
+                {
+                  "children": [
+                    {
+                      "path": [
+                        "asset",
+                      ],
+                      "value": {
+                        "expression": "foo.bar",
+                        "parent": [Circular],
+                        "type": "applicability",
+                        "value": {
+                          "parent": [Circular],
+                          "type": "asset",
+                          "value": {
+                            "id": "input-asset",
+                            "type": "input",
+                          },
+                        },
+                      },
+                    },
+                  ],
+                  "parent": [Circular],
+                  "type": "value",
+                  "value": undefined,
+                },
+              ],
+            },
+          },
+        ],
+        "parent": [Circular],
+        "type": "asset",
+        "value": {
+          "id": "foo-asset",
+          "type": "collection",
+        },
+      },
+    },
+  ],
+  "type": "view",
+  "value": {
+    "id": "foo-view",
+    "type": "viewtype",
+  },
+}
+`;

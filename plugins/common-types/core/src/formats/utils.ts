@@ -1,6 +1,6 @@
-import type { FormatType } from '@player-ui/schema';
+import type { FormatType } from "@player-ui/player";
 
-export const PLACEHOLDER = '#';
+export const PLACEHOLDER = "#";
 
 /**
  * Remove any formatting characters in the 'mask' from 'value'
@@ -15,17 +15,41 @@ export const PLACEHOLDER = '#';
 export const removeFormatCharactersFromMaskedString = (
   value: string,
   mask: string,
-  reserved: string[] = [PLACEHOLDER]
+  reserved: string[] = [PLACEHOLDER],
 ): string => {
-  return value.split('').reduce((newString, nextChar, nextIndex) => {
+  const reservedMatchesLength = mask
+    .split("")
+    .filter((val) => reserved.includes(val)).length;
+  let replacements = 0;
+
+  return value.split("").reduce((newString, nextChar, nextIndex) => {
     const maskedVal = mask[nextIndex];
 
+    if (maskedVal === undefined) {
+      return newString;
+    }
+
+    if (reservedMatchesLength === replacements) {
+      return newString;
+    }
+
     if (reserved.includes(maskedVal)) {
+      replacements++;
+      return newString + nextChar;
+    }
+
+    /**
+     * Characters will match when the incoming value is formatted, but in cases
+     * where it's being pulled from the model and deformatted again, ensure we
+     * don't skip over characters.
+     */
+    if (maskedVal !== nextChar) {
+      replacements++;
       return newString + nextChar;
     }
 
     return newString;
-  }, '');
+  }, "");
 };
 
 /**
@@ -42,7 +66,7 @@ export const formatAsEnum = (
 
     /** If only 1 option is viable, autocomplete the value to the accepted one */
     autocomplete?: boolean;
-  }
+  },
 ): string | undefined => {
   const autoCompletionsByOverlapCount = acceptedValues
     .reduce<
@@ -79,13 +103,12 @@ export const formatAsEnum = (
         return validCompletions;
       }
 
-      return [
-        ...validCompletions,
-        {
-          count: overlap,
-          target: validValue,
-        },
-      ];
+      validCompletions.push({
+        count: overlap,
+        target: validValue,
+      });
+
+      return validCompletions;
     }, [])
     .sort((e) => e.count);
 
@@ -99,7 +122,7 @@ export const formatAsEnum = (
 
   return autoCompletionsByOverlapCount[0].target.substr(
     0,
-    autoCompletionsByOverlapCount[0].count
+    autoCompletionsByOverlapCount[0].count,
   );
 };
 
@@ -113,13 +136,13 @@ export const formatAsEnum = (
 export const formatAsMasked = (
   value: string | number,
   valueCharMaskMatch: RegExp,
-  mask: string
+  mask: string,
 ): string => {
   const valStr = String(value);
   let withMask = mask;
 
-  if (valStr.trim() === '') {
-    return '';
+  if (valStr.trim() === "") {
+    return "";
   }
 
   valStr.replace(valueCharMaskMatch, (match) => {
@@ -137,7 +160,7 @@ export const formatAsMasked = (
  */
 export const createMaskedNumericFormatter = (
   name: string,
-  mask: string
+  mask: string,
 ): FormatType<
   string,
   string,
@@ -149,7 +172,7 @@ export const createMaskedNumericFormatter = (
   return {
     name,
     format: (value, options) => {
-      if (typeof value !== 'string') {
+      if (typeof value !== "string") {
         return value;
       }
 
@@ -160,7 +183,7 @@ export const createMaskedNumericFormatter = (
           {
             autocomplete: true,
             ignoreCase: true,
-          }
+          },
         );
 
         if (formattedUsingExceptions !== undefined) {
@@ -171,7 +194,7 @@ export const createMaskedNumericFormatter = (
       return formatAsMasked(value, /\d/g, mask);
     },
     deformat: (value, options) => {
-      if (typeof value !== 'string') {
+      if (typeof value !== "string") {
         return value;
       }
 
@@ -186,7 +209,7 @@ export const createMaskedNumericFormatter = (
         }
       }
 
-      return removeFormatCharactersFromMaskedString(value, mask);
+      return formatAsMasked(value, /\d/g, mask.replace(/[^#]/g, ""));
     },
   };
 };

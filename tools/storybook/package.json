@@ -1,0 +1,30 @@
+{
+  "name": "@player-ui/storybook",
+  "version": "0.0.0-PLACEHOLDER",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "node": "./dist/index.js",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    },
+    "./dist/index.css": "./dist/index.css",
+    "./manager": "./manager.mjs",
+    "./preview": "./preview.mjs",
+    "./package.json": "./package.json"
+  },
+  "main": "./src/index.ts",
+  "files": [
+    "src",
+    "dist",
+    "types",
+    "preview.mjs",
+    "manager.mjs"
+  ],
+  "dependencies": {
+    "@player-ui/beacon-plugin-react": "workspace:*",
+    "@player-ui/make-flow": "workspace:*",
+    "@player-ui/react": "workspace:*",
+    "@player-ui/metrics-plugin-react": "workspace:*"
+  }
+}

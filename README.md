@@ -10,7 +10,7 @@
 > **Warning**
 > Player is still in early development, some features may still be in progress.
 
-[![CircleCI](https://circleci.com/gh/player-ui/player/tree/main.svg?style=svg&circle-token=9d5479869b748b7a041bbf08249f3d24fa82d810)](https://circleci.com/gh/player-ui/player/tree/main) [![codecov](https://codecov.io/gh/player-ui/player/branch/main/graph/badge.svg?token=YY8Bp8DuZN)](https://codecov.io/gh/player-ui/player) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![CircleCI](https://circleci.com/gh/player-ui/player/tree/main.svg?style=svg)](https://circleci.com/gh/player-ui/player/tree/main) [![codecov](https://codecov.io/gh/player-ui/player/branch/main/graph/badge.svg?token=YY8Bp8DuZN)](https://codecov.io/gh/player-ui/player) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg)](#contributors)
 
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
@@ -36,7 +36,7 @@ Ready to get started? Check out the [docs](https://player-ui.github.io) for more
 
 ## Contributing
 
-We actively welcome pull requests. Learn how to [contribute](./CONTRIBUTING.md). Be sure to read our [code of conduct](./CODE_OF_CONDUCT.md).
+We actively welcome pull requests. Learn how to [contribute](./CONTRIBUTING.md). Be sure to read our [code of conduct](./.github/CODE_OF_CONDUCT.md).
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->

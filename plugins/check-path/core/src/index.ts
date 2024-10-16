@@ -1,22 +1,27 @@
-import type { Player, PlayerPlugin } from '@player-ui/player';
-import type { Node, Resolver } from '@player-ui/view';
-import { NodeType } from '@player-ui/view';
-import type { Asset } from '@player-ui/types';
-import { createObjectMatcher } from '@player-ui/partial-match-registry';
-import dlv from 'dlv';
+import { NodeType } from "@player-ui/player";
+import type {
+  Player,
+  Asset,
+  PlayerPlugin,
+  Node,
+  Resolver,
+} from "@player-ui/player";
+import { createObjectMatcher } from "@player-ui/partial-match-registry";
+import dlv from "dlv";
+import { CheckPathPluginSymbol } from "./symbols";
 
 export type QueryFunction = (asset: Asset) => boolean;
 export type Query = QueryFunction | string | object;
 
 /** Generate a function that matches on the given input */
 function createMatcher(
-  match: number | string | object | QueryFunction
+  match: number | string | object | QueryFunction,
 ): QueryFunction {
-  if (typeof match === 'string' || typeof match === 'number') {
+  if (typeof match === "string" || typeof match === "number") {
     return createObjectMatcher({ type: match });
   }
 
-  if (typeof match === 'function') {
+  if (typeof match === "function") {
     return match as QueryFunction;
   }
 
@@ -52,7 +57,7 @@ interface ViewInfo {
  */
 function getParent(
   node: Node.Node,
-  viewInfo: ViewInfo
+  viewInfo?: ViewInfo,
 ): Node.ViewOrAsset | undefined {
   let working = node;
 
@@ -70,8 +75,7 @@ function getParent(
     parent &&
     (parent.type === NodeType.Asset || parent.type === NodeType.View)
   ) {
-    return (viewInfo.resolver.getSourceNode(parent) ??
-      parent) as Node.ViewOrAsset;
+    return parent;
   }
 }
 
@@ -80,8 +84,9 @@ function getParent(
  * This is best suited to be referenced during the UI rendering phase, where one can make decisions about the rendering of an asset based on where it lies in the tree.
  */
 export class CheckPathPlugin implements PlayerPlugin {
-  name = 'check-path';
+  name = "check-path";
   private viewInfo?: ViewInfo;
+  public readonly symbol = CheckPathPluginSymbol;
 
   apply(player: Player) {
     player.hooks.viewController.tap(this.name, (viewController) => {
@@ -104,7 +109,7 @@ export class CheckPathPlugin implements PlayerPlugin {
               });
 
               if (node.type === NodeType.Asset || node.type === NodeType.View) {
-                const id = dlv(value, 'id');
+                const id = dlv(value, "id");
 
                 if (id) {
                   viewInfo.assetIdMap.set(id, node);
@@ -128,7 +133,7 @@ export class CheckPathPlugin implements PlayerPlugin {
    */
   public getParent(
     id: string,
-    query?: Query | Array<Query>
+    query?: Query | Array<Query>,
   ): Asset | undefined {
     const assetNode = this.viewInfo?.assetIdMap.get(id);
 
@@ -136,14 +141,12 @@ export class CheckPathPlugin implements PlayerPlugin {
       return undefined;
     }
 
-    let potentialMatch = getParent(assetNode, this.viewInfo);
+    let potentialMatch = getParent(assetNode);
 
     // Handle the case of an empty query (just get the immediate parent)
     if (query === undefined) {
       if (potentialMatch) {
-        const resolved = this.viewInfo.resolvedMap.get(potentialMatch);
-
-        return resolved?.value;
+        return this.getAssetFromAssetNode(potentialMatch);
       }
 
       return;
@@ -158,23 +161,23 @@ export class CheckPathPlugin implements PlayerPlugin {
     while (potentialMatch && parentQuery) {
       if (depth++ >= 50) {
         throw new Error(
-          'Recursion depth exceeded. Check for cycles in the AST graph'
+          "Recursion depth exceeded. Check for cycles in the AST graph",
         );
       }
 
       const matcher = createMatcher(parentQuery);
-      const resolved = this.viewInfo.resolvedMap.get(potentialMatch);
+      const resolved = this.getAssetFromAssetNode(potentialMatch);
 
-      if (resolved && matcher(resolved.value)) {
+      if (resolved && matcher(resolved)) {
         // This is the last match.
         if (queryArray.length === 0) {
-          return resolved.value;
+          return resolved;
         }
 
         parentQuery = queryArray.shift();
       }
 
-      potentialMatch = getParent(potentialMatch, this.viewInfo);
+      potentialMatch = getParent(potentialMatch);
     }
 
     return undefined;
@@ -197,9 +200,7 @@ export class CheckPathPlugin implements PlayerPlugin {
     let parent;
 
     while (working) {
-      parent =
-        working?.parent &&
-        this.viewInfo.resolvedMap.get(working.parent)?.resolved;
+      parent = working?.parent;
 
       if (
         parent &&
@@ -211,9 +212,9 @@ export class CheckPathPlugin implements PlayerPlugin {
       working = working?.parent;
     }
 
-    if (parent && 'children' in parent) {
+    if (parent && "children" in parent) {
       const childProp = parent.children?.find(
-        (child) => child.value === working
+        (child) => child.value === working,
       );
 
       return childProp?.path?.[0];
@@ -225,7 +226,7 @@ export class CheckPathPlugin implements PlayerPlugin {
   /** Given a node, return itself, or the nested asset if the node is an applicability node */
   private getSourceAssetNode(node: Node.Node) {
     let sourceNode = this.viewInfo?.resolver.getSourceNode(node);
-    if (sourceNode?.type === 'applicability') {
+    if (sourceNode?.type === "applicability") {
       sourceNode = sourceNode.value;
     }
 
@@ -246,7 +247,7 @@ export class CheckPathPlugin implements PlayerPlugin {
   private findChildPath(
     node: Node.Node,
     query: Array<Query>,
-    includeSelfMatch = true
+    includeSelfMatch = true,
   ): boolean {
     if (query.length === 0) {
       return true;
@@ -255,23 +256,31 @@ export class CheckPathPlugin implements PlayerPlugin {
     const [first, ...rest] = query;
     const matcher = createMatcher(first);
 
-    if (node.type === NodeType.Asset || node.type === NodeType.View) {
-      const resolved = this.viewInfo?.resolvedMap.get(node);
+    if (
+      node.type === NodeType.Asset ||
+      node.type === NodeType.View ||
+      node.type === NodeType.Applicability
+    ) {
+      const resolvedValue = this.getResolvedValue(node);
       const includesSelf =
-        (includeSelfMatch && resolved && matcher(resolved.value)) ?? false;
+        (includeSelfMatch && matcher(resolvedValue)) ?? false;
       const childQuery = includesSelf ? rest : query;
 
       if (childQuery.length === 0 && includesSelf) {
         return true;
       }
 
-      if (childQuery.length && (!node.children || node.children.length === 0)) {
+      const children =
+        node.type === NodeType.Applicability
+          ? (node.value as Node.ViewOrAsset).children
+          : node.children;
+      if (childQuery.length && (!children || children.length === 0)) {
         return false;
       }
 
       if (
-        node.children?.some((childNode) =>
-          this.findChildPath(childNode.value, childQuery)
+        children?.some((childNode) =>
+          this.findChildPath(childNode.value, childQuery),
         )
       ) {
         return true;
@@ -282,9 +291,9 @@ export class CheckPathPlugin implements PlayerPlugin {
     ) {
       return true;
     } else if (
-      'children' in node &&
+      "children" in node &&
       node.children?.some((childNode) =>
-        this.findChildPath(childNode.value, query)
+        this.findChildPath(childNode.value, query),
       )
     ) {
       return true;
@@ -315,6 +324,15 @@ export class CheckPathPlugin implements PlayerPlugin {
     const assetNode = this.viewInfo?.assetIdMap.get(id);
     if (!assetNode) return;
 
+    return this.getAssetFromAssetNode(assetNode);
+  }
+
+  /**
+   * Gets the value for an asset from an asset node
+   */
+  public getAssetFromAssetNode(
+    assetNode: Node.Asset | Node.View,
+  ): Asset | undefined {
     const sourceNode = this.getSourceAssetNode(assetNode);
     if (!sourceNode) return;
 
@@ -327,7 +345,7 @@ export class CheckPathPlugin implements PlayerPlugin {
    */
   public getPath(
     id: string,
-    query?: Query | Array<Query>
+    query?: Query | Array<Query>,
   ): Array<string | number> | undefined {
     const assetNode = this.viewInfo?.assetIdMap.get(id);
 
@@ -353,42 +371,38 @@ export class CheckPathPlugin implements PlayerPlugin {
     };
 
     while (working !== undefined) {
-      const parent =
-        working?.parent && this.viewInfo.resolvedMap.get(working.parent);
+      const { parent } = working;
 
-      const parentNode = parent?.resolved;
-
-      if (parentNode) {
-        if (parentNode.type === NodeType.MultiNode) {
-          const index = parentNode.values.indexOf(working);
+      if (parent) {
+        if (parent.type === NodeType.MultiNode) {
+          const index = parent.values.indexOf(working);
 
           if (index !== -1) {
             const actualIndex =
               index -
-              parentNode.values
+              parent.values
                 .slice(0, index)
                 .reduce(
                   (undefCount, next) =>
-                    this.viewInfo?.resolvedMap.get(next)?.value === undefined
+                    this.getResolvedValue(next) === undefined
                       ? undefCount + 1
                       : undefCount,
-                  0
+                  0,
                 );
 
             path = [actualIndex, ...path];
           }
-        } else if ('children' in parentNode) {
-          const childProp = findWorkingChild(parentNode);
+        } else if ("children" in parent) {
+          const childProp = findWorkingChild(parent);
           path = [...(childProp?.path ?? []), ...path];
         }
-      }
 
-      if (parentQuery) {
-        const matcher = createMatcher(parentQuery);
-
-        if (matcher(parent?.value)) {
-          parentQuery = queryArray.shift();
-          if (!parentQuery) return path;
+        if (parentQuery) {
+          const matcher = createMatcher(parentQuery);
+          if (matcher(this.getResolvedValue(parent))) {
+            parentQuery = queryArray.shift();
+            if (!parentQuery) return path;
+          }
         }
       }
 
@@ -397,6 +411,11 @@ export class CheckPathPlugin implements PlayerPlugin {
 
     /* if at the end all queries haven't been consumed, 
        it means we couldn't find a path till the matching query */
-    return queryArray.length === 0 ? path : undefined;
+    return parentQuery ? undefined : path;
+  }
+
+  private getResolvedValue(node: Node.Node) {
+    const sourceNode = this.getSourceAssetNode(node);
+    return this.viewInfo?.resolvedMap.get(sourceNode ?? node)?.value;
   }
 }

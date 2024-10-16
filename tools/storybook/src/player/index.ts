@@ -1,1 +1,1 @@
-export * from './PlayerStory';
+export * from "./PlayerStory";

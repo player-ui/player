@@ -1,26 +1,32 @@
-load("//:index.bzl", "javascript_pipeline")
+load("@rules_player//javascript:defs.bzl", "js_pipeline")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//tools:defs.bzl", "tsup_config", "vitest_config")
 
-javascript_pipeline(
-    name = "@player-ui/react",
-    entry = "src/index.tsx",
-    dependencies = [
-        "//core/player:@player-ui/player",
-        "//core/partial-match-registry:@player-ui/partial-match-registry",
-        "//plugins/metrics/core:@player-ui/metrics-plugin",
-        "//react/asset:@player-ui/react-asset",
-        "//react/subscribe:@player-ui/react-subscribe",
-        "//react/utils:@player-ui/react-utils",
-        "@npm//react-error-boundary",
-        "@npm//tapable-ts"
+npm_link_all_packages(name = "node_modules")
+
+tsup_config(name = "tsup_config")
+
+vitest_config(name = "vitest_config")
+
+js_pipeline(
+    name = "player",
+    package_name = "@player-ui/react",
+    peer_deps = [
+        "//:node_modules/@types/react",
+        "//:node_modules/react",
+        "//:node_modules/react-dom",
     ],
-    test_data = [
-        "//core/make-flow:@player-ui/make-flow",
-        "@npm//@testing-library/react",
-        "@npm//@testing-library/react-hooks",
+    test_deps = [
+        ":node_modules/@player-ui/make-flow",
+        "//:vitest_config",
     ],
-    peer_dependencies = [
-        "@npm//@types/react",
-        "@npm//react",
-        "@npm//react-dom",
+    deps = [
+        ":node_modules/@player-ui/metrics-plugin",
+        ":node_modules/@player-ui/partial-match-registry",
+        ":node_modules/@player-ui/player",
+        ":node_modules/@player-ui/react-subscribe",
+        "//:node_modules/react-error-boundary",
+        "//:node_modules/tapable-ts",
+        "//:node_modules/leven",
     ],
 )

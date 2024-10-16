@@ -1,16 +1,27 @@
-load("//:index.bzl", "javascript_pipeline")
+load("@rules_player//javascript:defs.bzl", "js_pipeline")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//tools:defs.bzl", "NATIVE_BUILD_DEPS", "tsup_config", "vitest_config")
 
-javascript_pipeline(
-    name = "@player-ui/types-provider-plugin",
-    dependencies = [
-        "@npm//tapable-ts",
+npm_link_all_packages(name = "node_modules")
+
+tsup_config(name = "tsup_config")
+
+vitest_config(name = "vitest_config")
+
+js_pipeline(
+    package_name = "@player-ui/types-provider-plugin",
+    build_deps = NATIVE_BUILD_DEPS,
+    native_bundle = "TypesProviderPlugin",
+    peer_deps = [
+        ":node_modules/@player-ui/player",
     ],
-    test_data = [
-        "//core/make-flow:@player-ui/make-flow",
-        "//plugins/asset-transform/core:@player-ui/asset-transform-plugin",
+    test_deps = [
+        ":node_modules/@player-ui/asset-transform-plugin",
+        ":node_modules/@player-ui/make-flow",
+        ":node_modules/@player-ui/partial-match-registry",
+        "//:vitest_config",
     ],
-    peer_dependencies = [
-        "//core/player:@player-ui/player",
+    deps = [
+        "//:node_modules/tapable-ts",
     ],
-    library_name = "TypesProviderPlugin"
 )

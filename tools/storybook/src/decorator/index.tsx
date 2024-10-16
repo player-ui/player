@@ -1,46 +1,66 @@
-import React from 'react';
-import type { DecoratorFn } from '@storybook/react';
-import addons from '@storybook/addons';
-import type { PlatformSetType } from '../state/hooks';
-import { subscribe } from '../state/hooks';
-import { WebPlayerPluginContext, PlayerRenderContext } from '../player';
-import type { PlayerParametersType, RenderTarget } from '../types';
+import React from "react";
+import type {
+  Renderer,
+  PartialStoryFn,
+  StoryContext,
+  DecoratorFunction,
+} from "@storybook/types";
+import { useSelector } from "react-redux";
+import { StateProvider, type StateType } from "../redux";
+import {
+  ReactPlayerPluginContext,
+  PlayerRenderContext,
+  DSLPluginContext,
+} from "../player";
+import type { PlayerParametersType, RenderTarget } from "../types";
 
-/**
- * A story decorator for rendering player content
- */
-export const PlayerDecorator: DecoratorFn = (story, ctx) => {
-  const playerParams = ctx.parameters as PlayerParametersType;
-  const [selectedPlatform, setPlatform] =
-    React.useState<RenderTarget['platform']>('web');
+/** Wrap the component in a PlayerContext provider w/ proper platform attribution */
+export const PlayerRenderContextWrapper = (
+  props: React.PropsWithChildren<{
+    /** Params for the story */
+    playerParams: PlayerParametersType;
+  }>,
+) => {
+  const { playerParams } = props;
 
-  React.useEffect(() => {
-    return subscribe<PlatformSetType>(
-      addons.getChannel(),
-      '@@player/platform/set',
-      (evt) => {
-        setPlatform(evt.platform);
-      }
-    );
-  }, []);
+  const platform = useSelector<StateType, RenderTarget["platform"]>(
+    (s) => s.platform.platform ?? "web",
+  );
 
   return (
     <PlayerRenderContext.Provider
       value={{
-        platform: selectedPlatform,
+        platform,
         token:
-          selectedPlatform === 'web'
+          platform === "web"
             ? undefined
-            : playerParams?.appetizeTokens?.[selectedPlatform],
+            : playerParams?.appetizeTokens?.[platform],
         baseUrl: playerParams.appetizeBaseUrl,
         appetizeVersions: playerParams.appetizeVersions,
       }}
     >
-      <WebPlayerPluginContext.Provider
-        value={{ plugins: playerParams.webplayerPlugins }}
-      >
-        {story()}
-      </WebPlayerPluginContext.Provider>
+      {props.children}
     </PlayerRenderContext.Provider>
+  );
+};
+
+/**
+ * A story decorator for rendering player content
+ */
+export const PlayerDecorator: DecoratorFunction = (Story, ctx) => {
+  const playerParams = ctx.parameters as PlayerParametersType;
+
+  return (
+    <StateProvider>
+      <PlayerRenderContextWrapper playerParams={playerParams}>
+        <ReactPlayerPluginContext.Provider
+          value={{ plugins: playerParams.reactPlayerPlugins ?? [] }}
+        >
+          <DSLPluginContext.Provider value={playerParams.dslEditor ?? {}}>
+            {Story() as any}
+          </DSLPluginContext.Provider>
+        </ReactPlayerPluginContext.Provider>
+      </PlayerRenderContextWrapper>
+    </StateProvider>
   );
 };

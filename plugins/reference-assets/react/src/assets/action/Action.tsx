@@ -1,10 +1,10 @@
-import React from 'react';
-import { Asset } from '@player-ui/react-asset';
-import { Button, Text } from '@chakra-ui/react';
-import { ChevronLeftIcon } from '@chakra-ui/icons';
-import type { TransformedAction } from '@player-ui/reference-assets-plugin';
-import { isBackAction } from '@player-ui/reference-assets-plugin';
-import { useAction } from './hooks';
+import React from "react";
+import { ReactAsset } from "@player-ui/react";
+import { ChevronLeftIcon } from "lucide-react";
+import type { TransformedAction } from "@player-ui/reference-assets-plugin";
+import { isBackAction } from "@player-ui/reference-assets-plugin";
+import { useAction } from "./hooks";
+import { Button } from "../../components/Button";
 
 /**
  * An action that a user can take
@@ -16,15 +16,11 @@ export const Action = (props: TransformedAction) => {
   return (
     <div>
       <Button
-        variant={isBackAction(props) ? 'ghost' : 'solid'}
+        variant={isBackAction(props) ? "outline" : undefined}
         {...buttonProps}
       >
-        {isBackAction(props) && <ChevronLeftIcon />}
-        {label && (
-          <Text>
-            <Asset {...label} />
-          </Text>
-        )}
+        {props?.metaData?.role === "back" && <ChevronLeftIcon />}
+        {label && <ReactAsset {...label} />}
       </Button>
     </div>
   );

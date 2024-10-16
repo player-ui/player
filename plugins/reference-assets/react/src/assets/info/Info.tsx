@@ -1,71 +1,44 @@
-import React from 'react';
-import type {
-  ActionAsset,
-  InfoAsset,
-} from '@player-ui/reference-assets-plugin';
-import { isBackAction } from '@player-ui/reference-assets-plugin';
-import { Asset } from '@player-ui/react-asset';
-import {
-  ButtonGroup,
-  Box,
-  Heading,
-  Divider,
-  Stack,
-  HStack,
-} from '@chakra-ui/react';
-import type { AssetWrapper } from '@player-ui/react';
+import React from "react";
+import type { InfoAssetTransform } from "@player-ui/reference-assets-plugin";
+import { ReactAsset } from "@player-ui/react";
+import { Separator } from "../../components/Separator";
 
 /** The info view type is used to show information to the user */
-export const Info = (props: InfoAsset) => {
-  const segmentedActions = React.useMemo(() => {
-    if (!props.actions?.length) {
-      return;
-    }
-
-    return props.actions?.reduce(
-      (memo, next) => {
-        memo[isBackAction(next.asset as ActionAsset) ? 'prev' : 'next'].push(
-          next as AssetWrapper<ActionAsset>
-        );
-        return memo;
-      },
-      { prev: [], next: [] } as {
-        prev: Array<AssetWrapper<ActionAsset>>;
-        next: Array<AssetWrapper<ActionAsset>>;
-      }
-    );
-  }, [props.actions]);
-
+export const Info = (props: InfoAssetTransform) => {
   return (
-    <Box minW={{ base: undefined, md: 'md' }}>
-      <Stack gap="10">
+    <div className="max-w-full">
+      <div className="flex flex-col gap-4">
         {props.title && (
-          <Heading size="lg" as="h1">
-            <Asset {...props.title} />
-          </Heading>
+          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+            <ReactAsset {...props.title} />
+          </h1>
         )}
         {props.subTitle && (
-          <Heading size="md" as="h3">
-            <Asset {...props.subTitle} />
-          </Heading>
+          <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+            <ReactAsset {...props.subTitle} />
+          </h3>
         )}
-        <Box>{props.primaryInfo && <Asset {...props.primaryInfo} />}</Box>
-        <Stack gap="4">
-          {segmentedActions && <Divider />}
-          <HStack justifyContent="space-between">
-            <ButtonGroup spacing="6">
-              {segmentedActions?.prev?.map((a) => (
-                <Asset key={a.asset.id} {...a} />
+        {props.primaryInfo && (
+          <div>
+            <ReactAsset {...props.primaryInfo} />
+          </div>
+        )}
+        <div className="flex flex-col gap-4">
+          {props?.segmentedActions && <Separator />}
+          <div className="flex justify-between sm:flex-row flex-col-reverse gap-4">
+            <div className="flex gap-4">
+              {props?.segmentedActions?.prev?.map((a) => (
+                <ReactAsset key={a.asset.id} {...a} />
               ))}
-            </ButtonGroup>
-            <ButtonGroup spacing="6">
-              {segmentedActions?.next?.map((a) => (
-                <Asset key={a.asset.id} {...a} />
+            </div>
+            <div className="flex gap-4">
+              {props?.segmentedActions?.next?.map((a) => (
+                <ReactAsset key={a.asset.id} {...a} />
               ))}
-            </ButtonGroup>
-          </HStack>
-        </Stack>
-      </Stack>
-    </Box>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };

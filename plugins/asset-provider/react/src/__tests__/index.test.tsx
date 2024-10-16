@@ -1,22 +1,23 @@
-import React from 'react';
-import { WebPlayer } from '@player-ui/react';
-import { AssetProviderPlugin } from '..';
+import { test, expect } from "vitest";
+import React from "react";
+import { ReactPlayer } from "@player-ui/react";
+import { AssetProviderPlugin } from "..";
 
 /**
  *
  */
 const DummyComp = () => <div>Test</div>;
 
-test('loads entries into the web-player registry', () => {
-  const wp = new WebPlayer({
+test("loads entries into the web-player registry", () => {
+  const rp = new ReactPlayer({
     plugins: [
       new AssetProviderPlugin([
-        ['test-string', DummyComp],
-        [{ type: 'full-match' }, DummyComp],
+        ["test-string", DummyComp],
+        [{ type: "full-match" }, DummyComp],
       ]),
     ],
   });
 
-  expect(wp.assetRegistry.get({ type: 'test-string' })).toBe(DummyComp);
-  expect(wp.assetRegistry.get({ type: 'full-match' })).toBe(DummyComp);
+  expect(rp.assetRegistry.get({ type: "test-string" })).toBe(DummyComp);
+  expect(rp.assetRegistry.get({ type: "full-match" })).toBe(DummyComp);
 });

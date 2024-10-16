@@ -1,0 +1,280 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`dynamic templates > Works with template items plus value items > Should show template item first when coming before values on lexical order 1`] = `
+[
+  {
+    "asset": {
+      "id": "value-0",
+      "type": "text",
+      "value": "item 1",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-1",
+      "type": "text",
+      "value": "item 2",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-2",
+      "type": "text",
+      "value": "First value in the collection",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-3",
+      "type": "text",
+      "value": "Second value in the collection",
+    },
+  },
+]
+`;
+
+exports[`dynamic templates > Works with template items plus value items > Should show template item last when coming after values on lexical order 1`] = `
+[
+  {
+    "asset": {
+      "id": "value-2",
+      "type": "text",
+      "value": "First value in the collection",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-3",
+      "type": "text",
+      "value": "Second value in the collection",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-0",
+      "type": "text",
+      "value": "item 1",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-1",
+      "type": "text",
+      "value": "item 2",
+    },
+  },
+]
+`;
+
+exports[`templates > works with nested templates 1`] = `
+{
+  "children": [
+    {
+      "path": [
+        "values",
+      ],
+      "value": {
+        "override": false,
+        "parent": [Circular],
+        "type": "multi-node",
+        "values": [
+          {
+            "children": [
+              {
+                "path": [
+                  "asset",
+                ],
+                "value": {
+                  "children": [
+                    {
+                      "path": [
+                        "values",
+                      ],
+                      "value": {
+                        "override": false,
+                        "parent": [Circular],
+                        "type": "multi-node",
+                        "values": [
+                          {
+                            "parent": [Circular],
+                            "type": "value",
+                            "value": {
+                              "text": "{{foo.pets.0}} + {{foo.people.0}}",
+                            },
+                          },
+                          {
+                            "parent": [Circular],
+                            "type": "value",
+                            "value": {
+                              "text": "{{foo.pets.0}} + {{foo.people.1}}",
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                  "parent": [Circular],
+                  "type": "asset",
+                  "value": {
+                    "id": "outer-collection-0",
+                    "type": "collection",
+                  },
+                },
+              },
+            ],
+            "parent": [Circular],
+            "type": "value",
+            "value": undefined,
+          },
+          {
+            "children": [
+              {
+                "path": [
+                  "asset",
+                ],
+                "value": {
+                  "children": [
+                    {
+                      "path": [
+                        "values",
+                      ],
+                      "value": {
+                        "override": false,
+                        "parent": [Circular],
+                        "type": "multi-node",
+                        "values": [
+                          {
+                            "parent": [Circular],
+                            "type": "value",
+                            "value": {
+                              "text": "{{foo.pets.1}} + {{foo.people.0}}",
+                            },
+                          },
+                          {
+                            "parent": [Circular],
+                            "type": "value",
+                            "value": {
+                              "text": "{{foo.pets.1}} + {{foo.people.1}}",
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                  "parent": [Circular],
+                  "type": "asset",
+                  "value": {
+                    "id": "outer-collection-1",
+                    "type": "collection",
+                  },
+                },
+              },
+            ],
+            "parent": [Circular],
+            "type": "value",
+            "value": undefined,
+          },
+          {
+            "children": [
+              {
+                "path": [
+                  "asset",
+                ],
+                "value": {
+                  "children": [
+                    {
+                      "path": [
+                        "values",
+                      ],
+                      "value": {
+                        "override": false,
+                        "parent": [Circular],
+                        "type": "multi-node",
+                        "values": [
+                          {
+                            "parent": [Circular],
+                            "type": "value",
+                            "value": {
+                              "text": "{{foo.pets.2}} + {{foo.people.0}}",
+                            },
+                          },
+                          {
+                            "parent": [Circular],
+                            "type": "value",
+                            "value": {
+                              "text": "{{foo.pets.2}} + {{foo.people.1}}",
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                  "parent": [Circular],
+                  "type": "asset",
+                  "value": {
+                    "id": "outer-collection-2",
+                    "type": "collection",
+                  },
+                },
+              },
+            ],
+            "parent": [Circular],
+            "type": "value",
+            "value": undefined,
+          },
+        ],
+      },
+    },
+  ],
+  "type": "value",
+  "value": {
+    "id": "foo",
+    "type": "collection",
+  },
+}
+`;
+
+exports[`templates > works with simple ones 1`] = `
+{
+  "children": [
+    {
+      "path": [
+        "values",
+      ],
+      "value": {
+        "override": false,
+        "parent": [Circular],
+        "type": "multi-node",
+        "values": [
+          {
+            "parent": [Circular],
+            "type": "value",
+            "value": {
+              "value": "{{foo.bar.0}}",
+            },
+          },
+          {
+            "parent": [Circular],
+            "type": "value",
+            "value": {
+              "value": "{{foo.bar.1}}",
+            },
+          },
+          {
+            "parent": [Circular],
+            "type": "value",
+            "value": {
+              "value": "{{foo.bar.2}}",
+            },
+          },
+        ],
+      },
+    },
+  ],
+  "type": "value",
+  "value": {
+    "id": "foo",
+    "type": "collection",
+  },
+}
+`;

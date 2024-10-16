@@ -1,0 +1,854 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`expression parser > objects- in parser 1`] = `
+{
+  "__id": Symbol(Expression Node ID),
+  "attributes": [
+    {
+      "key": {
+        "__id": Symbol(Expression Node ID),
+        "location": {
+          "end": {
+            "character": 6,
+          },
+          "start": {
+            "character": 2,
+          },
+        },
+        "raw": ""foo"",
+        "type": "Literal",
+        "value": "foo",
+      },
+      "value": {
+        "__id": Symbol(Expression Node ID),
+        "location": {
+          "end": {
+            "character": 15,
+          },
+          "start": {
+            "character": 9,
+          },
+        },
+        "raw": ""value"",
+        "type": "Literal",
+        "value": "value",
+      },
+    },
+  ],
+  "location": {
+    "end": {
+      "character": 16,
+    },
+    "start": {
+      "character": 0,
+    },
+  },
+  "type": "Object",
+}
+`;
+
+exports[`expression parser > objects- in parser 2`] = `
+{
+  "__id": Symbol(Expression Node ID),
+  "attributes": [
+    {
+      "key": {
+        "__id": Symbol(Expression Node ID),
+        "location": {
+          "end": {
+            "character": 6,
+          },
+          "start": {
+            "character": 2,
+          },
+        },
+        "raw": ""foo"",
+        "type": "Literal",
+        "value": "foo",
+      },
+      "value": {
+        "__id": Symbol(Expression Node ID),
+        "location": {
+          "end": {
+            "character": 24,
+          },
+          "start": {
+            "character": 8,
+          },
+        },
+        "ref": "some.binding",
+        "type": "ModelRef",
+      },
+    },
+  ],
+  "location": {
+    "end": {
+      "character": 25,
+    },
+    "start": {
+      "character": 0,
+    },
+  },
+  "type": "Object",
+}
+`;
+
+exports[`expression parser > objects- in parser 3`] = `
+{
+  "__id": Symbol(Expression Node ID),
+  "attributes": [
+    {
+      "key": {
+        "__id": Symbol(Expression Node ID),
+        "location": {
+          "end": {
+            "character": 6,
+          },
+          "start": {
+            "character": 2,
+          },
+        },
+        "raw": ""foo"",
+        "type": "Literal",
+        "value": "foo",
+      },
+      "value": {
+        "__id": Symbol(Expression Node ID),
+        "left": {
+          "__id": Symbol(Expression Node ID),
+          "location": {
+            "end": {
+              "character": 9,
+            },
+            "start": {
+              "character": 8,
+            },
+          },
+          "raw": "1",
+          "type": "Literal",
+          "value": 1,
+        },
+        "location": {
+          "end": {
+            "character": 13,
+          },
+          "start": {
+            "character": 8,
+          },
+        },
+        "operator": "+",
+        "right": {
+          "__id": Symbol(Expression Node ID),
+          "location": {
+            "end": {
+              "character": 13,
+            },
+            "start": {
+              "character": 12,
+            },
+          },
+          "raw": "2",
+          "type": "Literal",
+          "value": 2,
+        },
+        "type": "BinaryExpression",
+      },
+    },
+  ],
+  "location": {
+    "end": {
+      "character": 14,
+    },
+    "start": {
+      "character": 0,
+    },
+  },
+  "type": "Object",
+}
+`;
+
+exports[`expression parser > objects- in parser 4`] = `
+{
+  "__id": Symbol(Expression Node ID),
+  "attributes": [
+    {
+      "key": {
+        "__id": Symbol(Expression Node ID),
+        "location": {
+          "end": {
+            "character": 6,
+          },
+          "start": {
+            "character": 2,
+          },
+        },
+        "raw": ""foo"",
+        "type": "Literal",
+        "value": "foo",
+      },
+      "value": {
+        "__id": Symbol(Expression Node ID),
+        "location": {
+          "end": {
+            "character": 15,
+          },
+          "start": {
+            "character": 9,
+          },
+        },
+        "raw": ""value"",
+        "type": "Literal",
+        "value": "value",
+      },
+    },
+    {
+      "key": {
+        "__id": Symbol(Expression Node ID),
+        "location": {
+          "end": {
+            "character": 22,
+          },
+          "start": {
+            "character": 18,
+          },
+        },
+        "raw": ""bar"",
+        "type": "Literal",
+        "value": "bar",
+      },
+      "value": {
+        "__id": Symbol(Expression Node ID),
+        "location": {
+          "end": {
+            "character": 29,
+          },
+          "start": {
+            "character": 25,
+          },
+        },
+        "raw": ""baz"",
+        "type": "Literal",
+        "value": "baz",
+      },
+    },
+  ],
+  "location": {
+    "end": {
+      "character": 30,
+    },
+    "start": {
+      "character": 0,
+    },
+  },
+  "type": "Object",
+}
+`;
+
+exports[`expression parser > objects- in parser 5`] = `
+{
+  "__id": Symbol(Expression Node ID),
+  "attributes": [
+    {
+      "key": {
+        "__id": Symbol(Expression Node ID),
+        "location": {
+          "end": {
+            "character": 6,
+          },
+          "start": {
+            "character": 2,
+          },
+        },
+        "raw": ""foo"",
+        "type": "Literal",
+        "value": "foo",
+      },
+      "value": {
+        "__id": Symbol(Expression Node ID),
+        "location": {
+          "end": {
+            "character": 15,
+          },
+          "start": {
+            "character": 9,
+          },
+        },
+        "raw": ""value"",
+        "type": "Literal",
+        "value": "value",
+      },
+    },
+    {
+      "key": {
+        "__id": Symbol(Expression Node ID),
+        "location": {
+          "end": {
+            "character": 22,
+          },
+          "start": {
+            "character": 18,
+          },
+        },
+        "raw": ""bar"",
+        "type": "Literal",
+        "value": "bar",
+      },
+      "value": {
+        "__id": Symbol(Expression Node ID),
+        "attributes": [
+          {
+            "key": {
+              "__id": Symbol(Expression Node ID),
+              "location": {
+                "end": {
+                  "character": 31,
+                },
+                "start": {
+                  "character": 27,
+                },
+              },
+              "raw": ""baz"",
+              "type": "Literal",
+              "value": "baz",
+            },
+            "value": {
+              "__id": Symbol(Expression Node ID),
+              "location": {
+                "end": {
+                  "character": 39,
+                },
+                "start": {
+                  "character": 35,
+                },
+              },
+              "raw": ""foo"",
+              "type": "Literal",
+              "value": "foo",
+            },
+          },
+        ],
+        "location": {
+          "end": {
+            "character": 41,
+          },
+          "start": {
+            "character": 24,
+          },
+        },
+        "type": "Object",
+      },
+    },
+  ],
+  "location": {
+    "end": {
+      "character": 42,
+    },
+    "start": {
+      "character": 0,
+    },
+  },
+  "type": "Object",
+}
+`;
+
+exports[`expression parser > objects- in parser 6`] = `
+{
+  "__id": Symbol(Expression Node ID),
+  "args": [
+    {
+      "__id": Symbol(Expression Node ID),
+      "location": {
+        "end": {
+          "character": 14,
+        },
+        "start": {
+          "character": 9,
+        },
+      },
+      "raw": ""test"",
+      "type": "Literal",
+      "value": "test",
+    },
+    {
+      "__id": Symbol(Expression Node ID),
+      "attributes": [
+        {
+          "key": {
+            "__id": Symbol(Expression Node ID),
+            "location": {
+              "end": {
+                "character": 22,
+              },
+              "start": {
+                "character": 18,
+              },
+            },
+            "raw": ""key"",
+            "type": "Literal",
+            "value": "key",
+          },
+          "value": {
+            "__id": Symbol(Expression Node ID),
+            "location": {
+              "end": {
+                "character": 31,
+              },
+              "start": {
+                "character": 25,
+              },
+            },
+            "raw": ""value"",
+            "type": "Literal",
+            "value": "value",
+          },
+        },
+      ],
+      "location": {
+        "end": {
+          "character": 32,
+        },
+        "start": {
+          "character": 16,
+        },
+      },
+      "type": "Object",
+    },
+  ],
+  "callTarget": {
+    "__id": Symbol(Expression Node ID),
+    "location": {
+      "end": {
+        "character": 7,
+      },
+      "start": {
+        "character": 0,
+      },
+    },
+    "name": "publish",
+    "type": "Identifier",
+  },
+  "location": {
+    "end": {
+      "character": 33,
+    },
+    "start": {
+      "character": 7,
+    },
+  },
+  "type": "CallExpression",
+}
+`;
+
+exports[`the happy stuff 1`] = `
+{
+  "__id": Symbol(Expression Node ID),
+  "location": {
+    "end": {
+      "character": 3,
+    },
+    "start": {
+      "character": 0,
+    },
+  },
+  "name": "foo",
+  "type": "Identifier",
+}
+`;
+
+exports[`the happy stuff 2`] = `
+{
+  "__id": Symbol(Expression Node ID),
+  "left": {
+    "__id": Symbol(Expression Node ID),
+    "location": {
+      "end": {
+        "character": 3,
+      },
+      "start": {
+        "character": 0,
+      },
+    },
+    "name": "foo",
+    "type": "Identifier",
+  },
+  "location": {
+    "end": {
+      "character": 11,
+    },
+    "start": {
+      "character": 0,
+    },
+  },
+  "operator": "===",
+  "right": {
+    "__id": Symbol(Expression Node ID),
+    "location": {
+      "end": {
+        "character": 11,
+      },
+      "start": {
+        "character": 8,
+      },
+    },
+    "name": "bar",
+    "type": "Identifier",
+  },
+  "type": "BinaryExpression",
+}
+`;
+
+exports[`the happy stuff 3`] = `
+{
+  "__id": Symbol(Expression Node ID),
+  "left": {
+    "__id": Symbol(Expression Node ID),
+    "location": {
+      "end": {
+        "character": 3,
+      },
+      "start": {
+        "character": 0,
+      },
+    },
+    "name": "foo",
+    "type": "Identifier",
+  },
+  "location": {
+    "end": {
+      "character": 10,
+    },
+    "start": {
+      "character": 0,
+    },
+  },
+  "operator": "||",
+  "right": {
+    "__id": Symbol(Expression Node ID),
+    "location": {
+      "end": {
+        "character": 10,
+      },
+      "start": {
+        "character": 7,
+      },
+    },
+    "name": "bar",
+    "type": "Identifier",
+  },
+  "type": "LogicalExpression",
+}
+`;
+
+exports[`the happy stuff 4`] = `
+{
+  "__id": Symbol(Expression Node ID),
+  "args": [
+    {
+      "__id": Symbol(Expression Node ID),
+      "location": {
+        "end": {
+          "character": 7,
+        },
+        "start": {
+          "character": 4,
+        },
+      },
+      "name": "bar",
+      "type": "Identifier",
+    },
+  ],
+  "callTarget": {
+    "__id": Symbol(Expression Node ID),
+    "location": {
+      "end": {
+        "character": 3,
+      },
+      "start": {
+        "character": 0,
+      },
+    },
+    "name": "foo",
+    "type": "Identifier",
+  },
+  "location": {
+    "end": {
+      "character": 8,
+    },
+    "start": {
+      "character": 3,
+    },
+  },
+  "type": "CallExpression",
+}
+`;
+
+exports[`the happy stuff 5`] = `
+{
+  "__id": Symbol(Expression Node ID),
+  "left": {
+    "__id": Symbol(Expression Node ID),
+    "location": {
+      "end": {
+        "character": 7,
+      },
+      "start": {
+        "character": 0,
+      },
+    },
+    "ref": "foo",
+    "type": "ModelRef",
+  },
+  "location": {
+    "end": {
+      "character": 15,
+    },
+    "start": {
+      "character": 0,
+    },
+  },
+  "operator": "=",
+  "right": {
+    "__id": Symbol(Expression Node ID),
+    "location": {
+      "end": {
+        "character": 15,
+      },
+      "start": {
+        "character": 11,
+      },
+    },
+    "raw": ""bar"",
+    "type": "Literal",
+    "value": "bar",
+  },
+  "type": "Assignment",
+}
+`;
+
+exports[`the happy stuff 6`] = `
+{
+  "__id": Symbol(Expression Node ID),
+  "alternate": {
+    "__id": Symbol(Expression Node ID),
+    "location": {
+      "end": {
+        "character": 23,
+      },
+      "start": {
+        "character": 19,
+      },
+    },
+    "raw": ""baz"",
+    "type": "Literal",
+    "value": "baz",
+  },
+  "consequent": {
+    "__id": Symbol(Expression Node ID),
+    "location": {
+      "end": {
+        "character": 15,
+      },
+      "start": {
+        "character": 11,
+      },
+    },
+    "raw": ""bar"",
+    "type": "Literal",
+    "value": "bar",
+  },
+  "location": {
+    "end": {
+      "character": 23,
+    },
+    "start": {
+      "character": 8,
+    },
+  },
+  "test": {
+    "__id": Symbol(Expression Node ID),
+    "location": {
+      "end": {
+        "character": 7,
+      },
+      "start": {
+        "character": 0,
+      },
+    },
+    "ref": "foo",
+    "type": "ModelRef",
+  },
+  "type": "ConditionalExpression",
+}
+`;
+
+exports[`the happy stuff 7`] = `
+{
+  "__id": Symbol(Expression Node ID),
+  "computed": true,
+  "location": {
+    "end": {
+      "character": 7,
+    },
+    "start": {
+      "character": 3,
+    },
+  },
+  "object": {
+    "__id": Symbol(Expression Node ID),
+    "location": {
+      "end": {
+        "character": 3,
+      },
+      "start": {
+        "character": 0,
+      },
+    },
+    "name": "foo",
+    "type": "Identifier",
+  },
+  "property": {
+    "__id": Symbol(Expression Node ID),
+    "location": {
+      "end": {
+        "character": 7,
+      },
+      "start": {
+        "character": 4,
+      },
+    },
+    "name": "bar",
+    "type": "Identifier",
+  },
+  "type": "MemberExpression",
+}
+`;
+
+exports[`the happy stuff 8`] = `
+{
+  "__id": Symbol(Expression Node ID),
+  "left": {
+    "__id": Symbol(Expression Node ID),
+    "location": {
+      "end": {
+        "character": 7,
+      },
+      "start": {
+        "character": 0,
+      },
+    },
+    "ref": "foo",
+    "type": "ModelRef",
+  },
+  "location": {
+    "end": {
+      "character": 31,
+    },
+    "start": {
+      "character": 0,
+    },
+  },
+  "operator": "==",
+  "right": {
+    "__id": Symbol(Expression Node ID),
+    "location": {
+      "end": {
+        "character": 31,
+      },
+      "start": {
+        "character": 12,
+      },
+    },
+    "raw": ""string
+with	breaks"",
+    "type": "Literal",
+    "value": "string
+with	breaks",
+  },
+  "type": "BinaryExpression",
+}
+`;
+
+exports[`the happy stuff 9`] = `
+{
+  "__id": Symbol(Expression Node ID),
+  "left": {
+    "__id": Symbol(Expression Node ID),
+    "location": {
+      "end": {
+        "character": 3,
+      },
+      "start": {
+        "character": 0,
+      },
+    },
+    "name": "foo",
+    "type": "Identifier",
+  },
+  "location": {
+    "end": {
+      "character": 15,
+    },
+    "start": {
+      "character": 0,
+    },
+  },
+  "operator": "=",
+  "right": {
+    "__id": Symbol(Expression Node ID),
+    "elements": [
+      {
+        "__id": Symbol(Expression Node ID),
+        "location": {
+          "end": {
+            "character": 8,
+          },
+          "start": {
+            "character": 7,
+          },
+        },
+        "raw": "1",
+        "type": "Literal",
+        "value": 1,
+      },
+      {
+        "__id": Symbol(Expression Node ID),
+        "location": {
+          "end": {
+            "character": 11,
+          },
+          "start": {
+            "character": 10,
+          },
+        },
+        "raw": "2",
+        "type": "Literal",
+        "value": 2,
+      },
+      {
+        "__id": Symbol(Expression Node ID),
+        "location": {
+          "end": {
+            "character": 14,
+          },
+          "start": {
+            "character": 13,
+          },
+        },
+        "raw": "3",
+        "type": "Literal",
+        "value": 3,
+      },
+    ],
+    "location": {
+      "end": {
+        "character": 15,
+      },
+      "start": {
+        "character": 6,
+      },
+    },
+    "type": "ArrayExpression",
+  },
+  "type": "Assignment",
+}
+`;

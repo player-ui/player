@@ -1,25 +1,20 @@
-load("//jvm/dependencies:versions.bzl", "versions")
-load("@rules_player//maven:parse_coordinates.bzl", "parse_coordinates")
+# TODO: Runtime dependencies should probably not be exports
+main_exports = select({
+    "//android/player:j2v8_runtime": ["//jvm/j2v8:j2v8-android"],
+    "//android/player:j2v8_debug_runtime": ["//jvm/j2v8:j2v8-android-debug"],
+    "//android/player:hermes_runtime": ["//jvm/hermes:hermes-android"],
+    "//conditions:default": [],
+})
 
-maven = [
-    # UI helpers
-    "androidx.core:core-ktx:%s" % versions.androidx.core,
-    "androidx.appcompat:appcompat:%s" % versions.androidx.appcompat,
-    "androidx.transition:transition:%s" % versions.androidx.transition,
+main_deps = main_exports + [
+    "@maven//:androidx_databinding_viewbinding",
+    "@maven//:androidx_annotation_annotation",
+    "@maven//:androidx_core_core_ktx",
+    "@maven//:androidx_transition_transition",
+    "@maven//:androidx_lifecycle_lifecycle_runtime_ktx",
+    "@maven//:androidx_lifecycle_lifecycle_viewmodel_ktx",
+    "@maven//:androidx_constraintlayout_constraintlayout",
 
-    # Lifecycle
-    "androidx.lifecycle:lifecycle-runtime-ktx:%s" % versions.androidx.lifecycle,
-    "androidx.lifecycle:lifecycle-viewmodel-ktx:%s" % versions.androidx.lifecycle,
-
-    # Default fallback
-    "androidx.constraintlayout:constraintlayout:%s" % versions.androidx.constraintlayout,
-]
-
-main_exports = [
-    "//jvm/j2v8:j2v8-android"
-]
-
-main_deps = main_exports + parse_coordinates(maven) + [
     # JVM plugin deps
     "//plugins/beacon/jvm:beacon",
     "//plugins/pubsub/jvm:pubsub",
@@ -28,12 +23,14 @@ main_deps = main_exports + parse_coordinates(maven) + [
 
 main_resources = [
     # TS core deps
-    "//plugins/partial-match-fingerprint/core:PartialMatchFingerprintPlugin_Bundles",
-    "//core/partial-match-registry:Registry_Bundles",
+    "//plugins/partial-match-fingerprint/core:core_native_bundle",
+    "//core/partial-match-registry:partial-match-registry_native_bundle",
 ]
 
 test_deps = [
-    "@grab_bazel_common//tools/test:mockable-android-jar",
     "@maven//:io_mockk_mockk",
     "//jvm/testutils",
+    "//jvm/hermes:hermes-host",
+    "@maven//:org_robolectric_robolectric",
+    "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_test",
 ]

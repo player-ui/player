@@ -1,22 +1,17 @@
+common --enable_bzlmod
 test --test_output=errors
 coverage --combined_report=lcov
 
-build:ci --experimental_remote_cache_compression --experimental_remote_cache_async
-test:ci --experimental_remote_cache_compression --experimental_remote_cache_async
-coverage:ci --experimental_remote_cache_compression --experimental_remote_cache_async
-
-# TODO: Migrate away from managed directories (https://github.com/bazelbuild/bazel/issues/15463)
-# TODO: Re-upgrade to Bazel 6.+
-# sync --noincompatible_disable_managed_directories
-# query --noincompatible_disable_managed_directories
-# build --noincompatible_disable_managed_directories
+# TODO: Custom compiler version breaks embedded jdeps generator plugin - enable when removing custom kotlinc
+build --@rules_kotlin//kotlin/settings:jvm_emit_jdeps=False
+build --cxxopt=-std=c++17
 
 # Android databinding flags
-build --experimental_android_databinding_v2
-build --android_databinding_use_v3_4_args
-build --android_databinding_use_androidx
-build --experimental_google_legacy_api
-query --experimental_google_legacy_api
+common --android_crosstool_top=@androidndk//:toolchain
+common --experimental_android_databinding_v2
+common --android_databinding_use_v3_4_args
+common --android_databinding_use_androidx
+common --experimental_google_legacy_api
 
 # Android demo app flags
 build --noincremental_dexing --fat_apk_cpu=armeabi-v7a,arm64-v8a,x86,x86_64
@@ -49,28 +44,23 @@ coverage --remote_download_toplevel
 coverage --remote_timeout=3600
 coverage --build_metadata=REPO_URL=https://github.com/player-ui/player.git
 
-build:ci --build_metadata=ROLE=CI --workspace_status_command=./scripts/workspace-status.sh
+common:ci --build_metadata=ROLE=CI --workspace_status_command=./scripts/workspace-status.sh
 
-# Circle large has 4 CPU cores/8GB mem
-build:ci --local_cpu_resources=8
-build:ci --local_ram_resources=15000
-build:ci --config="release"
+# Circle xlarge has 8 CPU cores/16GB mem
+common:ci --local_cpu_resources=8
+common:ci --local_ram_resources=15000
+common:ci --config="release"
+common:ci --experimental_remote_build_event_upload=minimal 
+common:ci --nolegacy_important_outputs
+
+# Circle macos.m1.large.gen1 8 cores 12gb ram
+common:ci-mac --config=ci --local_cpu_resources=8 --local_ram_resources=11000
 
 build:release --stamp --workspace_status_command=./scripts/workspace-status.sh
+build:release --//:cmake_build_type=MinSizeRel
 
 # Cache action outputs on disk so they persist across output_base and bazel shutdown (eg. changing branches)
 # build --disk_cache=~/.cache/bazel-disk-cache
-
-build:skip-ios -- \
-  -//:PlayerUI \
-  -//:PlayerUI_Pod \
-  -//:PlayerUI-Demo \
-  -//:PlayerUI-Unit-Unit \
-  -//:PlayerUI-Unit-Unit.__internal__.__test_bundle \
-  -//:PlayerUI-UI-ViewInspectorTests \
-  -//:PlayerUI-UI-ViewInspectorTests.__internal__.__test_bundle \
-  -//:PlayerUI-UI-XCUITests \
-  -//:PlayerUI-UI-XCUITests.__internal__.__test_bundle
 
 # Support for debugging NodeJS tests
 # Add the Bazel option `--config=debug` to enable this
@@ -102,5 +92,8 @@ run:debug --define=VERBOSE_LOGS=1 -- --node_options=--inspect-brk
 # The following option will change the build output of certain rules such as terser and may not be desirable in all cases
 build:debug --compilation_mode=dbg
 
+build --@aspect_rules_ts//ts:skipLibCheck=always
+fetch --@aspect_rules_ts//ts:skipLibCheck=always
+query --@aspect_rules_ts//ts:skipLibCheck=always
 
 try-import %workspace%/.bazelrc.local

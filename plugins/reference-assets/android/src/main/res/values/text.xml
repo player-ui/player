@@ -22,4 +22,10 @@
         <item name="android:textAlignment">viewStart</item>
     </style>
 
+    <style name="Text.Note">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">#757575</item>
+        <item name="android:textAlignment">viewStart</item>
+    </style>
+
 </resources>

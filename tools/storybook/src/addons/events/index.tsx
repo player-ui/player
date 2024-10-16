@@ -1,31 +1,34 @@
-import React from 'react';
-import { Table, Head, HeadCell, Cell, Body, Row } from '@devtools-ds/table';
-import makeClass from 'clsx';
-import { useDarkMode } from 'storybook-dark-mode';
-import type { API } from '@storybook/api';
-import { useEventState } from '../../state/hooks';
-import type { EventType } from '../../state';
-import styles from './events.css';
+import React from "react";
+import { Table, Head, HeadCell, Cell, Body, Row } from "@devtools-ds/table";
+import { useSelector } from "react-redux";
+import { Placeholder } from "@storybook/components";
+import type { EventType } from "../../state";
+import type { StateType } from "../../redux";
+import { useContentKind } from "../../redux";
+
+import { useDarkMode } from "../useDarkMode";
+import { API } from "@storybook/manager-api";
 
 interface EventsPanelProps {
   /** if the panel is shown */
   active: boolean;
-  /** storybook api */
+
+  /** Storybook manager API */
   api: API;
 }
 
 /** Pad the cells to give room */
 const ExtraCells = (event: EventType) => {
-  if (event.type === 'log') {
+  if (event.type === "log") {
     return (
       <>
         <td>{event.severity}</td>
-        <td>{event.message.map((a) => JSON.stringify(a)).join(' ')}</td>
+        <td>{event.message.map((a) => JSON.stringify(a)).join(" ")}</td>
       </>
     );
   }
 
-  if (event.type === 'dataChange') {
+  if (event.type === "dataChange") {
     return (
       <>
         <td>{event.binding}</td>
@@ -34,22 +37,22 @@ const ExtraCells = (event: EventType) => {
     );
   }
 
-  if (event.type === 'stateChange') {
+  if (event.type === "stateChange") {
     let name: string = event.state;
 
-    if (event.state === 'completed') {
-      name = `${name} (${event.error ? 'error' : 'success'})`;
+    if (event.state === "completed") {
+      name = `${name} (${event.error ? "error" : "success"})`;
     }
 
     return (
       <>
         <td>{name}</td>
-        <td>{event.outcome ?? event.error ?? ''}</td>
+        <td>{event.outcome ?? event.error ?? ""}</td>
       </>
     );
   }
 
-  if (event.type === 'metric') {
+  if (event.type === "metric") {
     return (
       <>
         <td>{event.metricType}</td>
@@ -63,21 +66,26 @@ const ExtraCells = (event: EventType) => {
 
 /** The panel to show events */
 export const EventsPanel = (props: EventsPanelProps) => {
-  const events = useEventState(props.api.getChannel());
-  const darkMode = useDarkMode();
+  const events = useSelector<StateType, EventType[]>((state) => state.events);
+  const contentType = useContentKind();
+  const darkMode = useDarkMode(props.api);
 
   if (!props.active) {
     return null;
   }
 
+  if (contentType === undefined) {
+    return (
+      <Placeholder>
+        This story is not configured to receive Player events.
+      </Placeholder>
+    );
+  }
+
   return (
-    <div
-      className={makeClass(styles.wrapper, {
-        [styles.dark]: darkMode,
-      })}
-    >
-      <Table colorScheme={darkMode ? 'dark' : 'light'}>
-        <Head className={styles.header}>
+    <div>
+      <Table colorScheme={darkMode ? "dark" : "light"}>
+        <Head>
           <Row>
             <HeadCell>Time</HeadCell>
             <HeadCell>Type</HeadCell>
@@ -85,7 +93,7 @@ export const EventsPanel = (props: EventsPanelProps) => {
             <HeadCell />
           </Row>
         </Head>
-        <Body className={styles.body}>
+        <Body>
           {events.map((evt) => (
             <Row key={evt.id}>
               <Cell>{evt.time}</Cell>

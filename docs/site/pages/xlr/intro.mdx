@@ -1,0 +1,24 @@
+---
+title: Into to XLR
+---
+
+# What is XLR
+
+XLR, short for cross(x) language representation, is a way to export a static and language agnostic description of a TypeScript type or interface packaged along with the original type or interface. XLR started as a fork of [core-types](https://github.com/grantila/core-types) to add support for some missing features (generics, supported types, inheritance) that are heavily used in Player but has evolved into a superset of its features with some opinionated functionality to support Player specific conventions. XLR now powers a majority of the Player language features such as content validation, editor suggestions, and in editor documentation.  
+
+# Why Do We Need it
+
+XLR was developed to fill in one of the major gaps in the Player ecosystem: Because everything is dynamic, there is no way to statically/programmatically know what plugin provides what capabilities (assets, data types, validations, etc) to Player and what that capability looks like. This becomes a real issue in the tooling around Player when things like content authoring and validation. In both use-cases information on what assets are available for use, what parameters do those assets require, what types are those parameters, etc. is required but cannot be assumed. Historically we have seen this gap bridged by hardcoding the set of capabilities that are available but that has proven to be a never ending cycle of keeping those definitions updated when things change and knowing about the *entire* set of capabilities, even those that people develop silently. With XLR, a static description of all capabilities provided by a plugin can be compiled at build time, included in the package, and used at any point in the future for a multitude of capabilities.
+
+
+# How Do I Leverage XLR
+
+How much you use XLR is pretty dependant on your niche in the Player ecosystem. 
+
+## As a TypeScript Plugin/Capability Author
+
+If you are developing Player capabilities for Core/React, all you need to do is have your Plugin fill in the `ExtendedPlayerPlugin` interface and run the Player CLI during build time and the CLI will take care of compiling and bundling the capabilities. You can see an example of this in the [Exporting Plugin Capabilities](./usage#exporting-plugin-capabilities) section.
+
+## As Someone Building Capabilities Around Player
+
+If you want to leverage XLRs to develop capabilities around Player, you'll want to start with the [SDK](./concepts#xlr-sdk) and use it to load the XLRs from published packages. Then, using the SDK, you can access all the loaded types and information about them for use in your application. 

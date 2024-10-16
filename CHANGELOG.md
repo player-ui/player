@@ -1,3 +1,771 @@
+# 0.9.1 (Thu Sep 26 2024)
+
+#### 🐛 Bug Fix
+
+- Release main [#518](https://github.com/player-ui/player/pull/518) ([@intuit-svc](https://github.com/intuit-svc))
+- hermes_jni linkopt select [#517](https://github.com/player-ui/player/pull/517) ([@brocollie08](https://github.com/brocollie08))
+- Remove FBJNI local binaries [#516](https://github.com/player-ui/player/pull/516) ([@brocollie08](https://github.com/brocollie08))
+- revert async node flatten [#512](https://github.com/player-ui/player/pull/512) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Hermes support Android 15 [#509](https://github.com/player-ui/player/pull/509) ([@brocollie08](https://github.com/brocollie08))
+- Fix js Package Releases [#507](https://github.com/player-ui/player/pull/507) ([@KetanReddy](https://github.com/KetanReddy))
+- Update Custom Asset doc page with use cases on asset registering [#348](https://github.com/player-ui/player/pull/348) (nancy_wu1@intuit.com [@nancywu1](https://github.com/nancywu1))
+- iOS: move HeadlessPlayerImpl from PlayerUIInternalTestUtilities to PlayerUITestUtilitiesCore [#500](https://github.com/player-ui/player/pull/500) ([@nancywu1](https://github.com/nancywu1))
+
+#### Authors: 6
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- nancywu1 (nancy_wu1@intuit.com)
+
+---
+
+# 0.9.0 (Wed Sep 04 2024)
+
+### Release Notes
+
+#### Update Rules Versions ([#496](https://github.com/player-ui/player/pull/496))
+
+Update JS Rules to latest Aspect major
+
+#### Android/JVM - expose constantController ([#489](https://github.com/player-ui/player/pull/489))
+
+Expose the core Player [constantsController](https://github.com/player-ui/player/blob/9efce22c0cf315568213f7d2811b81096c1806df/core/player/src/player.ts#L91) to Android/JVM consumers
+
+AndroidPlayer provides top-level api and plugins access including `constantsController` with [AssetContext](https://github.com/player-ui/player/blob/bfd6a11a8d6c7138daec4724a8f08e9d9c4b370b/android/player/src/main/java/com/intuit/playerui/android/AssetContext.kt#L19-L23)
+
+Sample usage: 
+`assetContext.player.constantsController.getConstants(key, namespace)`
+
+#### Storybook Addon Fixes ([#449](https://github.com/player-ui/player/pull/449))
+
+- Re-adds the ability to render Asset properties as a tab in storybook
+- Re-adds the flow-refresh addon
+- Fixes the dependencies & package layout for the storybook addon
+- Fix dark-mode support
+
+#### [Hermes] Android integration ([#410](https://github.com/player-ui/player/pull/410))
+
+Initial integration with the [Hermes](https://github.com/facebook/hermes) JavaScript runtime. This shows a tremendous size improvement over the existing [J2V8](https://github.com/eclipsesource/J2V8) integration of ~70% (7.6 MB -> 2.3 MB, architecture dependent). 
+
+### Opt-in
+
+For now, the default runtime integration provided by the Android Player will still be `com.intuit.playerui:j2v8-android`, but Hermes can be opted in manually by excluding the J2V8 transitive dependency and including the Hermes artifact:
+
+```kotlin
+dependencies {
+    // Android Player dependency
+    implementation("com.intuit.playerui", "android", PLAYER_VERSION) {
+        // J2V8 included for release versions
+        exclude(group = "com.intuit.playerui", module = "j2v8-android")
+        // Debuggable J2V8 included for canary versions
+        exclude(group = "com.intuit.playerui", module = "j2v8-android-debug")
+    }
+    // Override with Hermes runtime
+    implementation("com.intuit.playerui", "hermes-android", PLAYER_VERSION)
+}
+
+// Exclude J2V8 transitive dependency for all configurations in this module
+configurations { 
+    all {
+        exclude(group = "com.intuit.playerui", module = "j2v8-android")
+        // Debuggable J2V8 included for canary versions
+        exclude(group = "com.intuit.playerui", module = "j2v8-android-debug")
+    }
+}
+```
+
+> [!TIP]
+> If your application includes dependencies that may transitively depend on `com.intuit.playerui:android`, you would likely need to ensure the default runtime is transitively excluded from those as well, either manually or as a global strategy.
+> 
+> The `AndroidPlayer` will pick the first runtime it finds on the classpath - you can at least verify which runtime was used for the `Player` with a new log: `Player created using $runtime`. But that won't tell you for certain if the other runtimes were successfully excluded. You'll need to examine your APK, or your apps dependency tree, to tell for sure that redundant runtimes aren't unintentionally included.
+
+Most of the setup for this integration is done simply by including the right dependency (and excluding the wrong one), however, the `hermes-android` integration also relies on the [SoLoader](https://github.com/facebook/SoLoader) for loading the native libraries. All that's needed is to initialize the `SoLoader` (should be on your classpath with the `hermes-android` dependency) with an Android `Context` somewhere before you use the `AndroidPlayer`, potentially in your activities `onCreate`:
+
+```kotlin
+override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+
+    SoLoader.init(this, false)
+    // ...
+}
+```
+
+---
+
+#### 🚀 Enhancement
+
+- Storybook Addon Fixes [#449](https://github.com/player-ui/player/pull/449) ([@adierkens](https://github.com/adierkens))
+- [Hermes] Android integration [#410](https://github.com/player-ui/player/pull/410) ([@sugarmanz](https://github.com/sugarmanz) [@brocollie08](https://github.com/brocollie08))
+
+#### 🐛 Bug Fix
+
+- Release main [#501](https://github.com/player-ui/player/pull/501) ([@intuit-svc](https://github.com/intuit-svc))
+- jvm and ios-async-node-ability-to-remove-resolved-async-node [#488](https://github.com/player-ui/player/pull/488) ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri) [@cehan-Chloe](https://github.com/cehan-Chloe))
+- Update Rules Versions [#496](https://github.com/player-ui/player/pull/496) ([@KetanReddy](https://github.com/KetanReddy))
+- fix:no matching toolchains:ninja_toolchain [#490](https://github.com/player-ui/player/pull/490) ([@cehan-Chloe](https://github.com/cehan-Chloe) [@KetanReddy](https://github.com/KetanReddy) [@brocollie08](https://github.com/brocollie08))
+- Android/JVM - expose constantController [#489](https://github.com/player-ui/player/pull/489) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- ios expose constantsController #446 [#487](https://github.com/player-ui/player/pull/487) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- On update race condition [#471](https://github.com/player-ui/player/pull/471) ([@brocollie08](https://github.com/brocollie08))
+- iOS: fix memory leak issues [#486](https://github.com/player-ui/player/pull/486) ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri) [@nancywu1](https://github.com/nancywu1))
+- Remove async node dsl component [#484](https://github.com/player-ui/player/pull/484) ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+- [CI] Swap release script to use `config=ci` [#482](https://github.com/player-ui/player/pull/482) ([@sugarmanz](https://github.com/sugarmanz))
+- Async node android [#469](https://github.com/player-ui/player/pull/469) ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+
+#### 🏠 Internal
+
+- Add recipes for just [#468](https://github.com/player-ui/player/pull/468) ([@adierkens](https://github.com/adierkens))
+
+#### Authors: 8
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Niharika Motukuri ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+
+---
+
+# 0.8.0 (Sun Aug 04 2024)
+
+### Release Notes
+
+#### Docs and Release Fixes ([#474](https://github.com/player-ui/player/pull/474))
+
+- Fix next releases being tagged as latest on npm
+- Fix doc site issues with github pages
+- Fix missing dsl plugins page
+
+#### Update to use TypeScript 5.5 and enable `isolatedDeclarations` ([#431](https://github.com/player-ui/player/pull/431))
+
+Update to use TypeScript 5.5 and enable `isolatedDeclarations`
+
+#### bump js rules, use node 20 ([#430](https://github.com/player-ui/player/pull/430))
+
+Use Node 20 for builds
+
+#### JS Package Cleanup ([#442](https://github.com/player-ui/player/pull/442))
+
+Fix migration issues in JS packages
+
+
+### Does your PR have any documentation updates?
+- [ ] Updated docs
+- [x] No Update needed
+- [ ] Unable to update docs
+<!--
+In an effort to standardize our process and code, please make sure you include documentation and/or update any existing documentation.
+Please refer to our site https://player-ui.github.io/latest/about, and include any neccesary information that would be helpful to coders, developers, and learners.
+
+If you are unable to update the current documents, please create an issue for us to get back to it.
+
+-->
+
+#### Bazel 6 Migration ([#252](https://github.com/player-ui/player/pull/252))
+
+Swaps the repo internals to use `bazel@6`, `rules_js`, bazel modules, `vitest` and `tsup` for the core + plugin builds
+
+---
+
+#### 🚀 Enhancement
+
+- Bazel 6 Migration [#252](https://github.com/player-ui/player/pull/252) ([@adierkens](https://github.com/adierkens) [@hborawski](https://github.com/hborawski) [@brocollie08](https://github.com/brocollie08) [@KetanReddy](https://github.com/KetanReddy) [@sugarmanz](https://github.com/sugarmanz) nancy_wu1@intuit.com [@nancywu1](https://github.com/nancywu1) [@mercillo](https://github.com/mercillo) [@mrigankmg](https://github.com/mrigankmg) [@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+
+#### 🐛 Bug Fix
+
+- Release main [#476](https://github.com/player-ui/player/pull/476) ([@intuit-svc](https://github.com/intuit-svc))
+- Docsite Fixes [#475](https://github.com/player-ui/player/pull/475) ([@KetanReddy](https://github.com/KetanReddy) [@mercillo](https://github.com/mercillo))
+- Docs and Release Fixes [#474](https://github.com/player-ui/player/pull/474) ([@KetanReddy](https://github.com/KetanReddy) [@mercillo](https://github.com/mercillo))
+- Update rules1.1.2 [#473](https://github.com/player-ui/player/pull/473) ([@mercillo](https://github.com/mercillo))
+- Update to rules player 1.1.1 [#472](https://github.com/player-ui/player/pull/472) ([@mercillo](https://github.com/mercillo))
+- bazel - added rules player back for docs site [#470](https://github.com/player-ui/player/pull/470) ([@KetanReddy](https://github.com/KetanReddy) [@mercillo](https://github.com/mercillo))
+- Fix J2V8 Debugger [#443](https://github.com/player-ui/player/pull/443) ([@brocollie08](https://github.com/brocollie08))
+- fix: replace fuse.js with leven to fix no similar matching name error [#452](https://github.com/player-ui/player/pull/452) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Fixed switch parsing syntax issue for dynamic switches [#458](https://github.com/player-ui/player/pull/458) ([@mrigankmg](https://github.com/mrigankmg))
+- View Parser Plugin Decomposition [#413](https://github.com/player-ui/player/pull/413) ([@mrigankmg](https://github.com/mrigankmg))
+- Ability to remove a resolved async node [#404](https://github.com/player-ui/player/pull/404) ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri) [@brocollie08](https://github.com/brocollie08))
+- ReactAsset improve error messages [#444](https://github.com/player-ui/player/pull/444) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- JS Package Cleanup [#442](https://github.com/player-ui/player/pull/442) ([@KetanReddy](https://github.com/KetanReddy))
+- Specific Temurin Version [#445](https://github.com/player-ui/player/pull/445) ([@brocollie08](https://github.com/brocollie08))
+- iOS: Canary release support + SPM automated releases [#434](https://github.com/player-ui/player/pull/434) ([@hborawski](https://github.com/hborawski))
+- apply strategy from pr builds to main & release builds [#440](https://github.com/player-ui/player/pull/440) ([@sugarmanz](https://github.com/sugarmanz))
+- Add dsl component to async node [#439](https://github.com/player-ui/player/pull/439) ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+- Bazel clean up [#435](https://github.com/player-ui/player/pull/435) ([@brocollie08](https://github.com/brocollie08))
+- [JVM] Publish next releases to release repository (fixed versions) [#428](https://github.com/player-ui/player/pull/428) ([@sugarmanz](https://github.com/sugarmanz))
+- This PR enables to add footer component to info reference asset in android [#411](https://github.com/player-ui/player/pull/411) ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+- Fix NPM Registry URL [#427](https://github.com/player-ui/player/pull/427) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 🏠 Internal
+
+- Use smaller docker image for circle setup [#456](https://github.com/player-ui/player/pull/456) ([@adierkens](https://github.com/adierkens))
+- Log debug info for npm next release [#454](https://github.com/player-ui/player/pull/454) ([@adierkens](https://github.com/adierkens))
+- Remove alternate binding parsers from bundle [#432](https://github.com/player-ui/player/pull/432) ([@adierkens](https://github.com/adierkens))
+- Revert "[JVM] Publish next releases to release repository" [#429](https://github.com/player-ui/player/pull/429) ([@sugarmanz](https://github.com/sugarmanz))
+- [JVM] Publish next releases to release repository [#426](https://github.com/player-ui/player/pull/426) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### 📝 Documentation
+
+- Update CONTRIBUTING.md [#433](https://github.com/player-ui/player/pull/433) ([@brocollie08](https://github.com/brocollie08))
+
+#### 🔩 Dependency Updates
+
+- Update to use TypeScript 5.5 and enable `isolatedDeclarations` [#431](https://github.com/player-ui/player/pull/431) ([@KetanReddy](https://github.com/KetanReddy))
+- bump js rules, use node 20 [#430](https://github.com/player-ui/player/pull/430) ([@KetanReddy](https://github.com/KetanReddy) [@hborawski](https://github.com/hborawski) [@mercillo](https://github.com/mercillo))
+
+#### Authors: 12
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Chloe ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Marlon "Marky" Ercillo ([@mercillo](https://github.com/mercillo))
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+- nancywu1 (nancy_wu1@intuit.com)
+- Niharika Motukuri ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+
+---
+
+# 0.7.4 (Tue Jul 02 2024)
+
+#### 🐛 Bug Fix
+
+- Release main [#409](https://github.com/player-ui/player/pull/409) ([@intuit-svc](https://github.com/intuit-svc))
+- ios buildabling on arm mac with rosetta + Aish's Android fixes [#402](https://github.com/player-ui/player/pull/402) ([@A1shK](https://github.com/A1shK) nancy_wu1@intuit.com [@nancywu1](https://github.com/nancywu1))
+- Update getting-started.mdx [#393](https://github.com/player-ui/player/pull/393) ([@brocollie08](https://github.com/brocollie08))
+- Fix binding tracking for validations within nested multi-nodes [#382](https://github.com/player-ui/player/pull/382) ([@tmarmer](https://github.com/tmarmer))
+- Adding troubleshooting info for `Module not found: six.moves` error [#381](https://github.com/player-ui/player/pull/381) ([@A1shK](https://github.com/A1shK))
+- Update CONTRIBUTING.md to include python dependency. [#380](https://github.com/player-ui/player/pull/380) ([@A1shK](https://github.com/A1shK))
+- Player 8901 - Fix typings for onAsyncNode hook [#371](https://github.com/player-ui/player/pull/371) ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+- Add Info on Commit Signing to Docs. [#375](https://github.com/player-ui/player/pull/375) ([@KetanReddy](https://github.com/KetanReddy))
+- [Android] Allowing timeout to be configured through PlayerRuntimeConfig [#359](https://github.com/player-ui/player/pull/359) ([@A1shK](https://github.com/A1shK))
+- Fix false positive binding with opening { [#342](https://github.com/player-ui/player/pull/342) ([@DukeManh](https://github.com/DukeManh))
+
+#### Authors: 9
+
+- [@A1shK](https://github.com/A1shK)
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- [@sakuntala-motukuri](https://github.com/sakuntala-motukuri)
+- Duc Manh ([@DukeManh](https://github.com/DukeManh))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- nancywu1 (nancy_wu1@intuit.com)
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.7.3 (Thu May 02 2024)
+
+#### 🐛 Bug Fix
+
+- Release main [#353](https://github.com/player-ui/player/pull/353) ([@intuit-svc](https://github.com/intuit-svc))
+- Trigger prerelease [#352](https://github.com/player-ui/player/pull/352) ([@sugarmanz](https://github.com/sugarmanz))
+- Parse multi node switch fixv1 [#347](https://github.com/player-ui/player/pull/347) (marlon_ercillo@intuit.com [@mercillo](https://github.com/mercillo))
+- [Android] Reorganize `PlayerFragment` state updates [#343](https://github.com/player-ui/player/pull/343) ([@sugarmanz](https://github.com/sugarmanz))
+- iOS: expose data controller onUpdate hook [#336](https://github.com/player-ui/player/pull/336) (nancy_wu1@intuit.com [@nancywu1](https://github.com/nancywu1))
+
+#### 📝 Documentation
+
+- Android Build Optimization Docs [#308](https://github.com/player-ui/player/pull/308) (sentony03@gmail.com [@brocollie08](https://github.com/brocollie08))
+- Add bazelisk to list of requirements; be more specific in Android build instructions [#344](https://github.com/player-ui/player/pull/344) (paul_millerd@intuit.com)
+- [Docs] DSL docs additions [#339](https://github.com/player-ui/player/pull/339) ([@lexfm](https://github.com/lexfm))
+
+#### Authors: 10
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Alex Fimbres ([@lexfm](https://github.com/lexfm))
+- brocollie08 (sentony03@gmail.com)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- marky ercillo (marlon_ercillo@intuit.com)
+- Marlon "Marky" Ercillo ([@mercillo](https://github.com/mercillo))
+- nancywu1 (nancy_wu1@intuit.com)
+- Paul Millerd ([@paulmillerd](https://github.com/paulmillerd))
+
+---
+
+# 0.7.2 (Wed Apr 10 2024)
+
+### Release Notes
+
+#### Update Player Tools Version ([#334](https://github.com/player-ui/player/pull/334))
+
+- Update Player Tools to latest
+
+
+### Does your PR have any documentation updates?
+- [ ] Updated docs
+- [x] No Update needed
+- [ ] Unable to update docs
+
+#### Version Selector Fixes ([#330](https://github.com/player-ui/player/pull/330))
+
+Docs - Fix version selector not working and preserve route when changing versions
+
+#### [Docs] Update the DSL Benefits in Schema Section ([#326](https://github.com/player-ui/player/pull/326))
+
+Docs - Update DSL Schema benefits section 
+
+### Does your PR have any documentation updates?
+- [x] Updated docs
+- [ ] No Update needed
+- [ ] Unable to update docs
+
+#### Expose More Information About Expression Parsing Errors ([#328](https://github.com/player-ui/player/pull/328))
+
+Types - Expose types/utilities around expression parsing errors
+
+### Does your PR have any documentation updates?
+- [ ] Updated docs
+- [x] No Update needed
+- [ ] Unable to update docs
+
+#### Fix `commaNumber` Formatting when Using a Precision of 0 ([#319](https://github.com/player-ui/player/pull/319))
+
+Common Types Plugin - Fix `commaNumber` Formatting when Using a Precision of 0
+
+#### Expression Parser Strictness ([#315](https://github.com/player-ui/player/pull/315))
+
+Expose Expression Parser's strictness option via the `resolveOptions` hook
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#335](https://github.com/player-ui/player/pull/335) ([@intuit-svc](https://github.com/intuit-svc))
+- Update Player Tools Version [#334](https://github.com/player-ui/player/pull/334) ([@KetanReddy](https://github.com/KetanReddy))
+- Version Selector Fixes [#330](https://github.com/player-ui/player/pull/330) ([@KetanReddy](https://github.com/KetanReddy))
+- Move managed player mock flows to shared reference asset mocks [#217](https://github.com/player-ui/player/pull/217) (nancy_wu1@intuit.com [@nancywu1](https://github.com/nancywu1))
+- Android: Preserve old rendering path for non-suspendable assets [#314](https://github.com/player-ui/player/pull/314) ([@sugarmanz](https://github.com/sugarmanz) [@brocollie08](https://github.com/brocollie08))
+- Expose More Information About Expression Parsing Errors [#328](https://github.com/player-ui/player/pull/328) ([@KetanReddy](https://github.com/KetanReddy))
+- update iOS contributing guide [#323](https://github.com/player-ui/player/pull/323) ([@hborawski](https://github.com/hborawski))
+- update rules_player to latest 0.12.0 [#322](https://github.com/player-ui/player/pull/322) ([@hborawski](https://github.com/hborawski) [@brocollie08](https://github.com/brocollie08))
+- Fix `commaNumber` Formatting when Using a Precision of 0 [#319](https://github.com/player-ui/player/pull/319) ([@KetanReddy](https://github.com/KetanReddy))
+- Expression Parser Strictness [#315](https://github.com/player-ui/player/pull/315) ([@KetanReddy](https://github.com/KetanReddy))
+- Common Types Plugin restoring old dataRefs [#302](https://github.com/player-ui/player/pull/302) (alejandro_fimbres@intuit.com [@lexfm](https://github.com/lexfm) [@KetanReddy](https://github.com/KetanReddy))
+
+#### 📝 Documentation
+
+- [Docs] Update the DSL Benefits in Schema Section [#326](https://github.com/player-ui/player/pull/326) ([@KetanReddy](https://github.com/KetanReddy))
+- refactor nav docs slightly to better call out onEnd expressions [#321](https://github.com/player-ui/player/pull/321) ([@hborawski](https://github.com/hborawski))
+- PR Checklist update [#309](https://github.com/player-ui/player/pull/309) (marlon_ercillo@intuit.com [@mercillo](https://github.com/mercillo))
+- add syntax examples for default expressions [#317](https://github.com/player-ui/player/pull/317) ([@hborawski](https://github.com/hborawski))
+
+#### Authors: 11
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- afimbres (alejandro_fimbres@intuit.com)
+- Alex Fimbres ([@lexfm](https://github.com/lexfm))
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Marlon "Marky" Ercillo ([@mercillo](https://github.com/mercillo))
+- mercillo (marlon_ercillo@intuit.com)
+- zwu01 (nancy_wu1@intuit.com)
+
+---
+
+# 0.7.1 (Tue Mar 05 2024)
+
+### Release Notes
+
+#### [Android] `AsyncHydrationTrackerPlugin` ([#296](https://github.com/player-ui/player/pull/296))
+
+Introduction of `AsyncHydrationTrackerPlugin` to provide a mechanism for reacting when `SuspendableAsset` hydration is completely finished.
+
+```kotlin
+androidPlayer.asyncHydrationTrackerPlugin!!.hooks.onHydrationComplete.tap(this::class.java.name) {
+    // process effects after hydration is complete
+}
+```
+
+#### [Sync] Performance and Bugfix ([#306](https://github.com/player-ui/player/pull/306))
+
+- Skip view updates for silent data changes
+- Replace `reduce` calls for performance reasons
+- Fix data change events not cascading properly when setting data
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#313](https://github.com/player-ui/player/pull/313) ([@intuit-svc](https://github.com/intuit-svc))
+- bump @player-tools packages to 0.5.1 [#312](https://github.com/player-ui/player/pull/312) ([@hborawski](https://github.com/hborawski))
+- iOS: prefix resource bundles to prevent naming collisions [#310](https://github.com/player-ui/player/pull/310) ([@hborawski](https://github.com/hborawski))
+- [Android] `AsyncHydrationTrackerPlugin` [#296](https://github.com/player-ui/player/pull/296) ([@sugarmanz](https://github.com/sugarmanz))
+- [Docs] Platform consolidation [#287](https://github.com/player-ui/player/pull/287) ([@sugarmanz](https://github.com/sugarmanz) nancy_wu1@intuit.com)
+- [JVM] Handle invalid JSON as Player error [#303](https://github.com/player-ui/player/pull/303) ([@sugarmanz](https://github.com/sugarmanz))
+- [Sync] Performance and Bugfix [#306](https://github.com/player-ui/player/pull/306) (ketan_reddy@intuit.com)
+
+#### 📝 Documentation
+
+- Fix documentation error on custom asset [#311](https://github.com/player-ui/player/pull/311) ([@ktamilvanan](https://github.com/ktamilvanan))
+- [Docs] Update: DSLSchema [#304](https://github.com/player-ui/player/pull/304) (alejandro_fimbres@intuit.com [@lexfm](https://github.com/lexfm))
+
+#### Authors: 8
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- afimbres (alejandro_fimbres@intuit.com)
+- Alex Fimbres ([@lexfm](https://github.com/lexfm))
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- KT ([@ktamilvanan](https://github.com/ktamilvanan))
+- nancywu1 (nancy_wu1@intuit.com)
+
+---
+
+# 0.7.0 (Thu Feb 15 2024)
+
+### Release Notes
+
+#### `com.intuit.playerui` publishing scope ([#253](https://github.com/player-ui/player/pull/253))
+
+Embracing the `player-ui` namespace, the base group ID, and correlating package scopes, have changed:
+`com.intuit.player` -> `com.intuit.playerui`
+
+1. Dropping `.jvm` from non-android artifacts
+   - This was originally done to leave room for intermediate JS resource artifacts. This is no longer necessary due to improvements in our build process, and enables us to remove this redundancy.
+
+| Artifact | Internal | External |
+| -------- | -------- | -------- |
+| Headless Player | `com.intuit.player.jvm:core` | `com.intuit.playerui:core` |
+| Android Player | `com.intuit.player.android:player` | `com.intuit.playerui:android` |
+| Plugins | `com.intuit.player.plugins`<br/>`com.intuit.player.jvm.plugins`<br/>`com.intuit.player.android.plugins` | `com.intuit.playerui.plugins` |
+
+#### Refactor existing DSL docs. ([#288](https://github.com/player-ui/player/pull/288))
+
+Update DSL docs
+
+#### Remove Applitools ([#277](https://github.com/player-ui/player/pull/277))
+
+Enhance `AsyncViewStub.awaitView()` to ensure any child `AsyncViewStub`s are resolved as well. This really only affects initial hydration, preventing weird isolated rendering jank by ensuring everything is ready to be shown on screen before actually rendering the top-level asset.
+
+<!--
+  To include release notes in the automatic changelong, just add a level 1 markdown header below
+  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
+
+  Example:
+
+  # Release Notes
+  Added new plugin, to use it:
+  ```typescript
+  const plugin = new Plugin(...)
+  ```
+-->
+
+---
+
+#### 🚀 Enhancement
+
+- `com.intuit.playerui` publishing scope [#253](https://github.com/player-ui/player/pull/253) ([@sugarmanz](https://github.com/sugarmanz))
+- feat: add github.dev links to docs [#278](https://github.com/player-ui/player/pull/278) (rafael_campos@intuit.com [@rafbcampos](https://github.com/rafbcampos))
+
+#### 🐛 Bug Fix
+
+- Release main [#301](https://github.com/player-ui/player/pull/301) ([@intuit-svc](https://github.com/intuit-svc))
+- iOS: add asyncnodeplugin resource path to bazel.build zip [#300](https://github.com/player-ui/player/pull/300) (nancy_wu1@intuit.com [@nancywu1](https://github.com/nancywu1))
+- fix: missing docs/site on docs links [#299](https://github.com/player-ui/player/pull/299) (rafael_campos@intuit.com [@rafbcampos](https://github.com/rafbcampos))
+- fix: help to improve docs links with relative path [#298](https://github.com/player-ui/player/pull/298) (rafael_campos@intuit.com [@rafbcampos](https://github.com/rafbcampos))
+- Refactor existing DSL docs. [#288](https://github.com/player-ui/player/pull/288) ([@KetanReddy](https://github.com/KetanReddy))
+- AsyncNodePlugin- use named export, port iOS plugin [#295](https://github.com/player-ui/player/pull/295) (nancy_wu1@intuit.com [@nancywu1](https://github.com/nancywu1))
+- Fix broken link in CONTRIBUTING.md [#291](https://github.com/player-ui/player/pull/291) ([@KetanReddy](https://github.com/KetanReddy))
+- Remove Applitools [#277](https://github.com/player-ui/player/pull/277) ([@sugarmanz](https://github.com/sugarmanz) [@hborawski](https://github.com/hborawski))
+
+#### 📝 Documentation
+
+- [Docs] plugin and cli updates, links fix [#294](https://github.com/player-ui/player/pull/294) (alejandro_fimbres@intuit.com [@lexfm](https://github.com/lexfm))
+- AssetProviderPlugin - Docs update [#283](https://github.com/player-ui/player/pull/283) (marlon_ercillo@intuit.com [@mercillo](https://github.com/mercillo))
+- Plugins android clean up [#290](https://github.com/player-ui/player/pull/290) (sentony03@gmail.com nancy_wu1@intuit.com [@brocollie08](https://github.com/brocollie08))
+- docDays/updated FAQS [#282](https://github.com/player-ui/player/pull/282) (marlon_ercillo@intuit.com [@mercillo](https://github.com/mercillo))
+- iOS: Update plugin documentation [#284](https://github.com/player-ui/player/pull/284) ([@hborawski](https://github.com/hborawski) nancy_wu1@intuit.com)
+- Update Team Page with New Members [#280](https://github.com/player-ui/player/pull/280) ([@KetanReddy](https://github.com/KetanReddy))
+- iOS: Update Writing Plugins guide [#279](https://github.com/player-ui/player/pull/279) ([@hborawski](https://github.com/hborawski))
+- [JVM] pom with minimal oss requirements [#275](https://github.com/player-ui/player/pull/275) ([@sugarmanz](https://github.com/sugarmanz))
+- Fix SwiftUIPendingTransactionPlugin Docs Page [#276](https://github.com/player-ui/player/pull/276) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 14
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- afimbres (alejandro_fimbres@intuit.com)
+- Alex Fimbres ([@lexfm](https://github.com/lexfm))
+- brocollie08 (sentony03@gmail.com)
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Marlon "Marky" Ercillo ([@mercillo](https://github.com/mercillo))
+- mercillo (marlon_ercillo@intuit.com)
+- nancywu1 (nancy_wu1@intuit.com)
+- Rafael Campos ([@rafbcampos](https://github.com/rafbcampos))
+- rcampos2 (rafael_campos@intuit.com)
+
+---
+
+# 0.6.0 (Thu Jan 25 2024)
+
+#### 🚀 Enhancement
+
+- Latest sync including AsyncNodePlugin [#263](https://github.com/player-ui/player/pull/263) (sentony03@gmail.com [@nancywu1](https://github.com/nancywu1) [@brocollie08](https://github.com/brocollie08))
+
+#### 🐛 Bug Fix
+
+- Release main [#274](https://github.com/player-ui/player/pull/274) ([@intuit-svc](https://github.com/intuit-svc))
+- Playa 8756 - iOS add callTryCatchWrapper function on JSValue [#270](https://github.com/player-ui/player/pull/270) (nancy_wu1@intuit.com [@nancywu1](https://github.com/nancywu1))
+- Release main [#273](https://github.com/player-ui/player/pull/273) ([@intuit-svc](https://github.com/intuit-svc))
+- Fix `com.intuit.player:j2v8` transitive deps [#256](https://github.com/player-ui/player/pull/256) ([@sugarmanz](https://github.com/sugarmanz))
+- update iOS StageRevertDataPluginTests [#264](https://github.com/player-ui/player/pull/264) (nancy_wu1@intuit.com [@nancywu1](https://github.com/nancywu1))
+
+#### 📝 Documentation
+
+- DSL documentation changes [#266](https://github.com/player-ui/player/pull/266) (rafael_campos@intuit.com [@rafbcampos](https://github.com/rafbcampos))
+
+#### Authors: 9
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- brocollie08 (sentony03@gmail.com)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- nancywu1 (nancy_wu1@intuit.com)
+- Rafael Campos ([@rafbcampos](https://github.com/rafbcampos))
+- rcampos2 (rafael_campos@intuit.com)
+- zwu01 (nancy_wu1@intuit.com)
+
+---
+
+# 0.5.1 (Thu Dec 07 2023)
+
+#### 🐛 Bug Fix
+
+- Release main [#259](https://github.com/player-ui/player/pull/259) ([@intuit-svc](https://github.com/intuit-svc))
+- iOS - allow navigationFlowViewState attributes to take Any instead of string [#258](https://github.com/player-ui/player/pull/258) ([@zwu011](https://github.com/zwu011) [@nancywu1](https://github.com/nancywu1))
+
+#### Authors: 3
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- [@zwu011](https://github.com/zwu011)
+
+---
+
+# 0.5.0 (Tue Dec 05 2023)
+
+### Release Notes
+
+#### Sync Android and JVM packages to latest ([#222](https://github.com/player-ui/player/pull/222))
+
+
+
+---
+
+#### 🚀 Enhancement
+
+- Sync Android and JVM packages to latest [#222](https://github.com/player-ui/player/pull/222) ([@Kiwiegg](https://github.com/Kiwiegg) [@sugarmanz](https://github.com/sugarmanz))
+
+#### 🐛 Bug Fix
+
+- Release main [#254](https://github.com/player-ui/player/pull/254) ([@intuit-svc](https://github.com/intuit-svc))
+
+#### Authors: 3
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Larry ([@Kiwiegg](https://github.com/Kiwiegg))
+
+---
+
+# 0.4.5 (Mon Nov 27 2023)
+
+#### 🐛 Bug Fix
+
+- Release main [#251](https://github.com/player-ui/player/pull/251) ([@intuit-svc](https://github.com/intuit-svc))
+- 177/ add plugin examples and managed player to demo app [#215](https://github.com/player-ui/player/pull/215) ([@zwu011](https://github.com/zwu011) [@nancywu1](https://github.com/nancywu1))
+- iOS: add SwiftUIPendingTransactionPlugin to reference asset dependencies [#250](https://github.com/player-ui/player/pull/250) ([@hborawski](https://github.com/hborawski))
+- Mocks for plugins [#206](https://github.com/player-ui/player/pull/206) (marlon_ercillo@intuit.com [@mercillo](https://github.com/mercillo) [@zwu011](https://github.com/zwu011) [@hborawski](https://github.com/hborawski) [@brocollie08](https://github.com/brocollie08) [@adierkens](https://github.com/adierkens) [@intuit-svc](https://github.com/intuit-svc))
+- store cancellables in ManagedPlayerViewModelTests [#210](https://github.com/player-ui/player/pull/210) ([@hborawski](https://github.com/hborawski))
+- apply swift 6 warning fix to flaky iOS tests [#207](https://github.com/player-ui/player/pull/207) ([@hborawski](https://github.com/hborawski))
+- iOS: make AssetBeacon equatable and add public init for metadata [#248](https://github.com/player-ui/player/pull/248) ([@hborawski](https://github.com/hborawski))
+- Singular workflow for CI [#214](https://github.com/player-ui/player/pull/214) (sentony03@gmail.com [@brocollie08](https://github.com/brocollie08))
+- update Gemfile.lock [#208](https://github.com/player-ui/player/pull/208) ([@hborawski](https://github.com/hborawski))
+
+#### 🏠 Internal
+
+- Update ruby version in build [#246](https://github.com/player-ui/player/pull/246) ([@adierkens](https://github.com/adierkens))
+
+#### Authors: 9
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- [@zwu011](https://github.com/zwu011)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- brocollie08 (sentony03@gmail.com)
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Marlon "Marky" Ercillo ([@mercillo](https://github.com/mercillo))
+- mercillo (marlon_ercillo@intuit.com)
+
+---
+
+# 0.4.4 (Mon Nov 20 2023)
+
+#### 🐛 Bug Fix
+
+- Release main [#249](https://github.com/player-ui/player/pull/249) ([@intuit-svc](https://github.com/intuit-svc))
+- iOS: make AssetBeacon equatable and add public init for metadata [#248](https://github.com/player-ui/player/pull/248) ([@hborawski](https://github.com/hborawski))
+
+#### 🏠 Internal
+
+- Update ruby version in build [#246](https://github.com/player-ui/player/pull/246) ([@adierkens](https://github.com/adierkens))
+
+#### Authors: 3
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+
+---
+
+# 0.4.3 (Fri Nov 17 2023)
+
+### Release Notes
+
+#### Add Automation ID to Error Element in Storybook ([#245](https://github.com/player-ui/player/pull/245))
+
+Storybook error element has a `data-automation-id` property which allows it to be programmably found in tests
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#247](https://github.com/player-ui/player/pull/247) ([@intuit-svc](https://github.com/intuit-svc))
+- Add Automation ID to Error Element in Storybook [#245](https://github.com/player-ui/player/pull/245) ([@KetanReddy](https://github.com/KetanReddy))
+- iOS: port async WrappedFunction update [#244](https://github.com/player-ui/player/pull/244) ([@hborawski](https://github.com/hborawski))
+- iOS: rewrite publisher assertions to be async [#234](https://github.com/player-ui/player/pull/234) ([@hborawski](https://github.com/hborawski))
+- Fix PR Titles Created During Release [#242](https://github.com/player-ui/player/pull/242) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 🏠 Internal
+
+- Update auto version. Filter release trigger from changelogs [#243](https://github.com/player-ui/player/pull/243) ([@adierkens](https://github.com/adierkens))
+
+#### 📝 Documentation
+
+- Update broken link in contributing docs [#238](https://github.com/player-ui/player/pull/238) ([@adierkens](https://github.com/adierkens))
+
+#### Authors: 4
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.4.2 (Thu Nov 16 2023)
+
+### Release Notes
+
+#### Add better error messaging for failed expression eval and parsing ([#239](https://github.com/player-ui/player/pull/239))
+
+Improved error messages for parse and eval failures for expressions
+
+---
+
+#### 🐛 Bug Fix
+
+- Release ${GITHUB_REF##*/} [#241](https://github.com/player-ui/player/pull/241) ([@intuit-svc](https://github.com/intuit-svc))
+- adding swiftuipendingtransactionplugin [#237](https://github.com/player-ui/player/pull/237) ([@zwu011](https://github.com/zwu011) [@nancywu1](https://github.com/nancywu1))
+- Add better error messaging for failed expression eval and parsing [#239](https://github.com/player-ui/player/pull/239) ([@adierkens](https://github.com/adierkens))
+
+#### Authors: 4
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- [@zwu011](https://github.com/zwu011)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+
+---
+
+# 0.4.1 (Wed Nov 15 2023)
+
+### Release Notes
+
+#### Pin @moncao-editor/react to non `.mjs` Only Version ([#230](https://github.com/player-ui/player/pull/230))
+
+Pin `@moncao-editor/react` to `4.3.1`
+
+---
+
+#### 🐛 Bug Fix
+
+- Release ${GITHUB_REF##*/} [#236](https://github.com/player-ui/player/pull/236) ([@intuit-svc](https://github.com/intuit-svc))
+- build: comment out major doc deploy for now [#235](https://github.com/player-ui/player/pull/235) ([@hborawski](https://github.com/hborawski))
+- Release ${GITHUB_REF##*/} [#233](https://github.com/player-ui/player/pull/233) ([@intuit-svc](https://github.com/intuit-svc))
+- remove version prefix from doc release path [#232](https://github.com/player-ui/player/pull/232) ([@hborawski](https://github.com/hborawski))
+- iOS: Update precompile script to source zshrc [#226](https://github.com/player-ui/player/pull/226) ([@hborawski](https://github.com/hborawski))
+- Release ${GITHUB_REF##*/} [#231](https://github.com/player-ui/player/pull/231) ([@intuit-svc](https://github.com/intuit-svc))
+- Pin @moncao-editor/react to non `.mjs` Only Version [#230](https://github.com/player-ui/player/pull/230) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 3
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.3.0 (Thu Nov 03 2022)
+
+#### 🚀 Enhancement
+
+- Core package organization, and renaming to `ReactPlayer` [#93](https://github.com/player-ui/player/pull/93) ([@adierkens](https://github.com/adierkens))
+- Enhancement/Parser Rewrite for plugins [#80](https://github.com/player-ui/player/pull/80) (marlon_ercillo@intuit.com [@mercillo](https://github.com/mercillo))
+
+#### 🐛 Bug Fix
+
+- Release main [#101](https://github.com/player-ui/player/pull/101) ([@intuit-svc](https://github.com/intuit-svc))
+- Update documentation [#96](https://github.com/player-ui/player/pull/96) ([@KVSRoyal](https://github.com/KVSRoyal))
+- run a separate workflow for forked PRs without write capable cache keys [#97](https://github.com/player-ui/player/pull/97) ([@hborawski](https://github.com/hborawski))
+- [iOS] relax requirements for sending beacon metadata [#88](https://github.com/player-ui/player/pull/88) ([@hborawski](https://github.com/hborawski))
+- [iOS] fix TestPlayer test helper dependency [#83](https://github.com/player-ui/player/pull/83) ([@hborawski](https://github.com/hborawski))
+- [iOS] fix runtime warnings for published variables in Xcode14 [#84](https://github.com/player-ui/player/pull/84) ([@hborawski](https://github.com/hborawski))
+- [iOS] make some additional properties public [#82](https://github.com/player-ui/player/pull/82) ([@hborawski](https://github.com/hborawski))
+- change platform groupid [#81](https://github.com/player-ui/player/pull/81) (sentony03@gmail.com [@brocollie08](https://github.com/brocollie08))
+- [iOS] add registerPlugin(_:) to HeadlessPlayer API [#79](https://github.com/player-ui/player/pull/79) ([@hborawski](https://github.com/hborawski))
+- Cleanup Android dependencies [#77](https://github.com/player-ui/player/pull/77) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### 📝 Documentation
+
+- Docs: fix sidenav scrolling on mobile [#100](https://github.com/player-ui/player/pull/100) ([@adierkens](https://github.com/adierkens))
+- Add algolia search to /latest/ site [#76](https://github.com/player-ui/player/pull/76) ([@adierkens](https://github.com/adierkens))
+
+#### Authors: 9
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- brocollie08 (sentony03@gmail.com)
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Kori South ([@KVSRoyal](https://github.com/KVSRoyal))
+- Marlon Ercillo ([@mercillo](https://github.com/mercillo))
+- mercillo (marlon_ercillo@intuit.com)
+
+---
+
 # 0.2.0 (Tue Aug 30 2022)
 
 #### 🚀 Enhancement

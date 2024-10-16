@@ -33,10 +33,6 @@ Nested assets are represented as objects containing an `asset` property. For exa
 
 The `label` of the parent contains a nested asset reference. These are _slots_ that can usually contain any asset type.
 
-## Applicability
-
-Any object in the tree (including _assets_) may contain an `applicability` property. This is an _expression_ that may conditionally show or hide an asset (and all of it's children) from the view tree. Applicability is dynamically calculated and will automatically update as data changes on the page.
-
 # Views
 
 Views are _assets_ that exist at the top level of the tree. They typically include the navigation actions, a title, or other top-level information.
@@ -45,7 +41,7 @@ The `id` of the views are used in the navigation section to reference a specific
 
 ## Cross-field validation
 
-The other special property of a `view` vs. an `asset` is the addition of a `validation` property on the view. These contains [`validation` objects](../guides/validation) that are used for validations crossing multiple fields, and are ran on user navigation rather than data change.
+The other special property of a `view` vs. an `asset` is the addition of a `validation` property on the view. These contain [`validation` objects](/schema) that are used for validations crossing multiple fields, and are ran on user navigation rather than data change.
 
 Example:
 
@@ -69,3 +65,284 @@ Example:
 ```
 
 They follow the same guidelines for normal validation references, with the addition of a `ref` property that points to the binding that this validation is tied to.
+
+## Applicability
+
+Any object in the tree (including _assets_) may contain an `applicability` property. This is an _expression_ that may conditionally show or hide an asset (and all of it's children) from the view tree. Applicability is dynamically calculated and will automatically update as data changes on the page.
+
+# Switches
+
+Switches are ways of dynamically changing the structure of the view based on data. There are 2 types of switches: `static` and `dynamic`, but their structures are identical. `switches` can appear anywhere you'd find a normal asset, and (similar to [templates](./templates)) are removed from the view before it reaches the UI layer.
+
+## Usage
+
+The switch is simply a list of objects with `case` and `asset` properties:
+
+- `asset` - The asset that will replace the switch if the case is true
+- `case` - An [expression](./expression) to evaluate.
+
+The switch will run through each _case_ statement until the first case expression evaluates to true. For the _default_ case, simple use a value of `true` at the end of the array.
+
+## Static v Dynamic Switches
+
+The only difference between a `static` and `dynamic` switch is the timing update behavior after the first rendering of a view.
+
+A `staticSwitch` calculates the applicable case when a view first renders. It will not re-calculate any of the case statements as data in the view is updated. If you transition away from view-node, and revisit it later-on in the flow, the switch will re-compute the appropriate case statement.
+
+A `dynamicSwitch` will always update the applicable case statement whenever data changes. If data is changed while a view is still showing, the switch will be updated to reflect the new case.
+
+## Example
+
+Anywhere you can place an `asset` node, a `dynamicSwitch` or `staticSwitch` can be placed instead.
+
+```json
+{
+  "staticSwitch": [
+    {
+      "case": "{{name.first}} == 'adam'",
+      "asset": {
+        "id": "name",
+        "type": "text",
+        "value": "Yay"
+      }
+    },
+    {
+      "case": "{{name.first}} == 'notadam'",
+      "asset": {
+        "id": "name",
+        "type": "text",
+        "value": "Nay"
+      }
+    },
+    {
+      "case": true,
+      "asset": {
+        "id": "name",
+        "type": "text",
+        "value": "🤷"
+      }
+    }
+  ]
+}
+```
+
+# Templates
+
+Templates provide a way to dynamically create a list of assets, or _any_ object, based on data from the model. All of the templating semantics are removed by the time it reaches an asset's transform or UI layer.
+
+## Usage
+
+Within any asset, specify a `template` property as an array of:
+
+- `data` - A binding that points to an array in the model
+- `output` - A property to put the mapped objects
+- `value` - The template to use for each object/item in the data array.
+- `dynamic` - (optional, false by default) A boolean that specifies whether template should be recomputed when data changes
+
+Within a template, the `_index_` string can be used to substitute the array-index of the item being mapped.
+
+### Example
+
+**Authored**
+
+```json
+{
+  "asset": {
+    "id": "top-level",
+    "type": "collection",
+    "template": [
+      {
+        "data": "list.of.names",
+        "output": "values",
+        "value": {
+          "asset": {
+            "id": "value-_index_",
+            "type": "text",
+            "value": "{{list.of.names._index_}}"
+          }
+        }
+      }
+    ]
+  }
+}
+```
+
+**Output**
+
+```json
+{
+  "asset": {
+    "id": "top-level",
+    "type": "collection",
+    "values": [
+      {
+        "asset": {
+          "id": "value-0",
+          "type": "text",
+          "value": "Adam"
+        }
+      },
+      {
+        "asset": {
+          "id": "value-1",
+          "type": "text",
+          "value": "Not Adam"
+        }
+      }
+    ]
+  }
+}
+```
+
+## Multiple templates
+
+There's a few ways to leverage multiple templates within a single asset. Templates can be _nested_ or multiple used on a single node. These can also be combined to build out complicated nested expansion.
+
+### Nested Templates
+
+Templates can contain other templates. When referencing a nested template, append the template depth to the `_index_` string to reference the correct data-item.
+
+For example, if 1 template contains another, use `_index_` to reference the outer-loop, and `_index1_` to reference the inner loop. Furthermore, if templates are nested three levels deep, the first level loop will still be referenced by `_index_`, the second level will be referenced by `_index1_` and the bottom most loop will be referenced by `_index2_`.
+
+### Multiple Templates - Single Output
+
+Templates will, by default, create an array, if needed, for the `output` property of each template. If that array already exits (either by manually writing it in the JSON, or from a previous template run), each item will be appended to the end of the existing array.
+
+This can be leveraged by combining multiple template directives that use the same `output` property, or by having an `output` use an existing array:
+
+**_Example_**
+
+Both templates in the example below output to the `values` array on the parent object. Since no `values` array exists, the first template will create said array, and the second will append to that.
+
+```json
+{
+  "asset": {
+    "id": "top-level",
+    "type": "collection",
+    "template": [
+      {
+        "data": "list.of.names",
+        "output": "values",
+        "value": {
+          "asset": {
+            "id": "name-_index_",
+            "type": "text",
+            "value": "{{list.of.names._index_}}"
+          }
+        }
+      },
+      {
+        "data": "list.of.other-names",
+        "output": "values",
+        "value": {
+          "asset": {
+            "id": "other-name-_index_",
+            "type": "text",
+            "value": "{{list.of.names._index_}}"
+          }
+        }
+      }
+    ]
+  }
+}
+```
+
+**_Example_**
+
+The template below will append it's values to the pre-existing `values` array.
+
+```json
+{
+  "asset": {
+    "id": "top-level",
+    "type": "collection",
+    "values": [
+      {
+        "asset": {
+          "id": "existing-name",
+          "type": "text",
+          "value": "Something hard-coded"
+        }
+      }
+    ],
+    "template": [
+      {
+        "data": "list.of.names",
+        "output": "values",
+        "value": {
+          "asset": {
+            "id": "name-_index_",
+            "type": "text",
+            "value": "{{list.of.names._index_}}"
+          }
+        }
+      }
+    ]
+  }
+}
+```
+
+## Dynamic and Static Templates
+
+Like switches, the only difference between a `static` and `dynamic` template is the timing update behavior after the first rendering of a view. If not defined, the value of `dynamic` is default to `false`.
+
+If `dynamic` is `false`, the template will be parsed when a view first renders. The template will not be parsed again as data in the view is updated.
+
+If `dynamic` is `true`, template will be always updated whenever data changes. If data is changed while a view is still showing, the template will be updated to reflect the new data.
+
+**_Example_**
+
+```json
+{
+  "asset": {
+    "id": "top-level",
+    "type": "collection",
+    "template": [
+      {
+        "dynamic": true,
+        "data": "list.of.names",
+        "output": "values",
+        "value": {
+          "asset": {
+            "id": "value-_index_",
+            "type": "text",
+            "value": "{{list.of.names._index_}}"
+          }
+        }
+      }
+    ]
+  }
+}
+```
+
+```typescript
+model.set([['list.of.names', ['Jain']]]);
+model.set([['list.of.names', ['Jain', 'Erica']]]);
+```
+
+**Output**
+
+```json
+{
+  "asset": {
+    "id": "top-level",
+    "type": "collection",
+    "values": [
+      {
+        "asset": {
+          "id": "value-0",
+          "type": "text",
+          "value": "Jain"
+        }
+      },
+      {
+        "asset": {
+          "id": "value-1",
+          "type": "text",
+          "value": "Erica"
+        }
+      }
+    ]
+  }
+}
+```

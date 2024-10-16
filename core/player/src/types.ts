@@ -1,24 +1,22 @@
-import type { Flow, FlowResult } from '@player-ui/types';
-import { Expression } from '@player-ui/types';
-import type { DataModelWithParser } from '@player-ui/data';
-import { DataModelOptions } from '@player-ui/data';
-import type { FlowController } from '@player-ui/flow';
-import { NamedState, TransitionFunction } from '@player-ui/flow';
-import { ViewInstance } from '@player-ui/view';
-import type { BindingParser, BindingLike } from '@player-ui/binding';
-import type { SchemaController } from '@player-ui/schema';
-import type { ExpressionEvaluator } from '@player-ui/expressions';
-import type { Logger } from '@player-ui/logger';
-import type { ViewController } from './view';
-import type { DataController } from './data';
-import type { ValidationController } from './validation';
+import type { Flow, FlowResult } from "@player-ui/types";
+import type { BindingParser, BindingLike } from "./binding";
+import type { SchemaController } from "./schema";
+import type { ExpressionEvaluator } from "./expressions";
+import type { Logger } from "./logger";
+import type {
+  ViewController,
+  DataController,
+  ValidationController,
+  FlowController,
+} from "./controllers";
+import type { ReadOnlyDataController } from "./controllers/data/utils";
 
 /** The status for a flow's execution state */
 export type PlayerFlowStatus =
-  | 'not-started'
-  | 'in-progress'
-  | 'completed'
-  | 'error';
+  | "not-started"
+  | "in-progress"
+  | "completed"
+  | "error";
 
 /** Common interface for the state of Player's flow execution */
 export interface BaseFlowState<T extends PlayerFlowStatus> {
@@ -30,11 +28,11 @@ export interface BaseFlowState<T extends PlayerFlowStatus> {
 }
 
 /** The beginning state of Player, before it's seen a flow  */
-export type NotStartedState = BaseFlowState<'not-started'>;
+export type NotStartedState = BaseFlowState<"not-started">;
 
 export const NOT_STARTED_STATE: NotStartedState = {
-  ref: Symbol('not-started'),
-  status: 'not-started',
+  ref: Symbol("not-started"),
+  status: "not-started",
 };
 
 /** Shared properties for a flow in any state of execution (in-progress, completed successfully, or errored out) */
@@ -67,7 +65,7 @@ export interface ControllerState {
 }
 
 /** A flow is currently executing */
-export type InProgressState = BaseFlowState<'in-progress'> &
+export type InProgressState = BaseFlowState<"in-progress"> &
   PlayerFlowExecutionData & {
     /** A promise that resolves when the flow is completed */
     flowResult: Promise<FlowResult>;
@@ -85,15 +83,18 @@ export type InProgressState = BaseFlowState<'in-progress'> &
   };
 
 /** The flow completed properly */
-export type CompletedState = BaseFlowState<'completed'> &
+export type CompletedState = BaseFlowState<"completed"> &
   PlayerFlowExecutionData &
   FlowResult & {
-    /** The top-level data-model for the flow */
-    dataModel: DataModelWithParser;
+    /** Readonly Player controllers to provide Player functionality after the flow has ended */
+    controllers: {
+      /** A read only instance of the Data Controller */
+      data: ReadOnlyDataController;
+    };
   };
 
 /** The flow finished but not successfully */
-export type ErrorState = BaseFlowState<'error'> & {
+export type ErrorState = BaseFlowState<"error"> & {
   /** The currently executing flow */
   flow: Flow;
 

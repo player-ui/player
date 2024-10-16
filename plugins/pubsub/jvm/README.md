@@ -2,4 +2,4 @@
 
 ## Gradle Dependency
 
-`implementation("com.intuit.player.jvm.plugins:pubsub:$VERSION")`
+`implementation("com.intuit.playerui.plugins:pubsub:$VERSION")`

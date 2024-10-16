@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="3" failures="0" errors="0" time="0.364">
+    <testsuite name="src/index.test.ts" timestamp="2023-11-22T06:02:31.215Z" hostname="macos-PG72J7VT9J" tests="3" failures="0" errors="0" skipped="0" time="0.107">
+        <testcase classname="src/index.test.ts" name="Passes events to subscriptions" time="0.053">
+        </testcase>
+        <testcase classname="src/index.test.ts" name="Removes subscriptions" time="0.001">
+        </testcase>
+        <testcase classname="src/index.test.ts" name="Calls multiple" time="0.051">
+        </testcase>
+    </testsuite>
+</testsuites>

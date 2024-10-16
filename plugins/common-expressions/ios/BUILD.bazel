@@ -1,0 +1,6 @@
+load("//tools/ios:util.bzl", "ios_plugin")
+
+ios_plugin(
+    name = "CommonExpressionsPlugin",
+    resources = ["//plugins/common-expressions/core:core_native_bundle"]
+)

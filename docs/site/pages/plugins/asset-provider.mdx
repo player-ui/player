@@ -7,8 +7,9 @@ platform: react
 
 The Asset Provider Plugin enables users to easily register UI components to render their assets. It's used internally by the [Reference Assets](../assets/reference). The matches follow the same rules as asset transforms (more specific matches take priority).
 
-### Usage
+##  Usage
 
+### Platform
 <PlatformTabs>
   <react>
 
@@ -22,20 +23,97 @@ Create an instance, and add it to your Player instance.
 The API is similar to the JavaScript `Map`, and takes a list of `[match, Component]` tuples.
 
 ```tsx
-import { WebPlayer } from '@player-ui/react';
+import { ReactPlayer } from '@player-ui/react';
 import { AssetProviderPlugin } from '@player-ui/asset-provider-plugin-react';
 
-const player = new WebPlayer({
+const player = new ReactPlayer({
   plugins: [
-    new AssetProviderPlugin({
+    new AssetProviderPlugin([
       ['custom-asset', () => <div>Hello World!</div>],
       [{ type: 'custom', key: 'asset' }, () => <div>Other Custom Asset</div>],
-    })
+    ])
   ]
 })
 ```
 
-This will register a match on `{ type: 'custom-asset' }` and `{ type: 'custom', key: 'asset' }` in the view to use your React components.
-
+  This will register a match on `{ type: 'custom-asset' }` and `{ type: 'custom', key: 'asset' }` in the view to use your React components.
   </react>
 </PlatformTabs>
+
+### Content
+
+In this example, when your content has assets of type `custom-asset` and `custom`, they will render `<div>Hello World!</div>` and `<div>Other Custom Asset</div>`.
+
+<ContentTabs>
+  <tsx>
+
+```tsx
+import { Custom, CustomAsset, Collection } from 'my-assets';
+
+const view = (
+  <Collection>
+    <CustomAsset/>
+    <Custom/>
+  </Collection>
+);
+```
+
+</tsx>
+  <json>
+
+```json
+{
+  "id": "test-flow",
+  "views": [
+    {
+      "id": "view-1",
+      "type": "collection",
+      "label": {
+        "asset": {
+          "id": "title",
+          "type": "text",
+          "value": "Collections are used to group assets."
+        }
+      },
+      "values": [
+        {
+          "asset": {
+            "id": "custom-1",
+            "type": "custom-asset",
+          }
+        },
+        {
+          "asset": {
+            "id": "custom-2",
+            "type": "custom",
+          }
+        }
+      ]
+    }
+  ],
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "view-1",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "DONE"
+      }
+    }
+  }
+}
+```
+
+  This will register a match on `{ type: 'custom-asset' }` and `{ type: 'custom', key: 'asset' }` in the view to use your React components.
+  </json>
+  
+
+</ContentTabs>
+  

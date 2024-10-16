@@ -1,7 +1,7 @@
-import type { WebPlayer, WebPlayerPlugin } from '@player-ui/react';
-import type { Player } from '@player-ui/player';
-import React from 'react';
-import { AutoScrollProvider } from './hooks';
+import type { ReactPlayer, ReactPlayerPlugin } from "@player-ui/react";
+import type { Player } from "@player-ui/react";
+import React from "react";
+import { AutoScrollProvider } from "./hooks";
 
 export enum ScrollType {
   ValidationError,
@@ -14,11 +14,15 @@ export interface AutoScrollManagerConfig {
   autoScrollOnLoad?: boolean;
   /** Config to auto-focus on an error */
   autoFocusOnErrorField?: boolean;
+  /** Optional function to get container element, which is used for calculating offset (default: document.body) */
+  getBaseElement?: () => HTMLElement | undefined | null;
+  /** Additional offset to be used (default: 0) */
+  offset?: number;
 }
 
 /** A plugin to manage scrolling behavior */
-export class AutoScrollManagerPlugin implements WebPlayerPlugin {
-  name = 'auto-scroll-manager';
+export class AutoScrollManagerPlugin implements ReactPlayerPlugin {
+  name = "auto-scroll-manager";
 
   /** Toggles if we should auto scroll to to the first failed validation on page load */
   private autoScrollOnLoad: boolean;
@@ -32,15 +36,23 @@ export class AutoScrollManagerPlugin implements WebPlayerPlugin {
   /** tracks if the navigation failed */
   private failedNavigation: boolean;
 
+  /** function to return the base of the scrollable area */
+  private getBaseElement: () => HTMLElement | undefined | null;
+
+  /** static offset */
+  private offset: number;
+
   /** map of scroll type to set of ids that are registered under that type */
   private alreadyScrolledTo: Array<string>;
   private scrollFn: (
-    scrollableElements: Map<ScrollType, Set<string>>
+    scrollableElements: Map<ScrollType, Set<string>>,
   ) => string;
 
   constructor(config: AutoScrollManagerConfig) {
     this.autoScrollOnLoad = config.autoScrollOnLoad ?? false;
     this.autoFocusOnErrorField = config.autoFocusOnErrorField ?? false;
+    this.getBaseElement = config.getBaseElement ?? (() => null);
+    this.offset = config.offset ?? 0;
     this.initialRender = false;
     this.failedNavigation = false;
     this.alreadyScrolledTo = [];
@@ -48,7 +60,10 @@ export class AutoScrollManagerPlugin implements WebPlayerPlugin {
   }
 
   getFirstScrollableElement(idList: Set<string>, type: ScrollType) {
-    const highestElement = { id: '', ypos: 0 };
+    const highestElement = {
+      id: "",
+      ypos: 0,
+    };
     const ypos = window.scrollY;
     idList.forEach((id) => {
       const element = document.getElementById(id);
@@ -56,7 +71,7 @@ export class AutoScrollManagerPlugin implements WebPlayerPlugin {
       // if we are looking at validation errors, make sure the element is invalid
       if (
         type === ScrollType.ValidationError &&
-        element?.getAttribute('aria-invalid') === 'false'
+        element?.getAttribute("aria-invalid") === "false"
       ) {
         return;
       }
@@ -72,22 +87,19 @@ export class AutoScrollManagerPlugin implements WebPlayerPlugin {
       }
 
       const epos = element?.getBoundingClientRect().top;
-
       if (
-        epos &&
-        (epos + ypos > highestElement.ypos || highestElement.ypos === 0)
+        epos !== undefined &&
+        (epos + ypos < highestElement.ypos || highestElement.id === "")
       ) {
         highestElement.id = id;
-        highestElement.ypos = ypos - epos;
+        highestElement.ypos = ypos + epos;
       }
     });
-
     return highestElement.id;
   }
 
   calculateScroll(scrollableElements: Map<ScrollType, Set<string>>) {
     let currentScroll = ScrollType.FirstAppearance;
-
     if (this.initialRender) {
       if (this.autoScrollOnLoad) {
         currentScroll = ScrollType.ValidationError;
@@ -103,17 +115,15 @@ export class AutoScrollManagerPlugin implements WebPlayerPlugin {
     }
 
     const elementList = scrollableElements.get(currentScroll);
-
     if (elementList) {
       const element = this.getFirstScrollableElement(
         elementList,
-        currentScroll
+        currentScroll,
       );
-
-      return element ?? '';
+      return element ?? "";
     }
 
-    return '';
+    return "";
   }
 
   // Hooks into player flow to determine what scroll targets need to be evaluated at specific lifecycle points
@@ -125,29 +135,35 @@ export class AutoScrollManagerPlugin implements WebPlayerPlugin {
           this.initialRender = true;
           this.failedNavigation = false;
           this.alreadyScrolledTo = [];
+          // Reset scroll position for new view
+          window.scroll(0, 0);
         });
-        flow.hooks.beforeTransition.tap(this.name, (state) => {
-          // will get reset to false if view successfully transitions
-          // otherwise stays as true when view get rerendered with errors
-          this.failedNavigation = true;
-
-          return state;
+        flow.hooks.skipTransition.intercept({
+          call: () => {
+            this.failedNavigation = true;
+          },
         });
       });
     });
   }
 
-  applyWeb(webPlayer: WebPlayer) {
-    webPlayer.hooks.webComponent.tap(this.name, (Comp) => {
-      return () => {
-        const { scrollFn } = this;
+  applyReact(reactPlayer: ReactPlayer) {
+    reactPlayer.hooks.webComponent.tap(this.name, (Comp) => {
+      const { scrollFn, getBaseElement, offset } = this;
 
+      function AutoScrollManagerComponent() {
         return (
-          <AutoScrollProvider getElementToScrollTo={scrollFn}>
+          <AutoScrollProvider
+            getElementToScrollTo={scrollFn}
+            getBaseElement={getBaseElement}
+            offset={offset}
+          >
             <Comp />
           </AutoScrollProvider>
         );
-      };
+      }
+
+      return AutoScrollManagerComponent;
     });
   }
 }

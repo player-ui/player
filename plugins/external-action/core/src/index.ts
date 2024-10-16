@@ -1,16 +1,21 @@
-import type { Player, PlayerPlugin, InProgressState } from '@player-ui/player';
-import type { NavigationFlowExternalState } from '@player-ui/types';
+import type {
+  Player,
+  PlayerPlugin,
+  InProgressState,
+  PlayerFlowState,
+  NavigationFlowExternalState,
+} from "@player-ui/player";
 
 export type ExternalStateHandler = (
   state: NavigationFlowExternalState,
-  options: InProgressState['controllers']
+  options: InProgressState["controllers"],
 ) => string | undefined | Promise<string | undefined>;
 
 /**
  * A plugin to handle external actions states
  */
 export class ExternalActionPlugin implements PlayerPlugin {
-  name = 'ExternalActionPlugin';
+  name = "ExternalActionPlugin";
   private handler: ExternalStateHandler;
 
   constructor(handler: ExternalStateHandler) {
@@ -22,24 +27,34 @@ export class ExternalActionPlugin implements PlayerPlugin {
       flowController.hooks.flow.tap(this.name, (flow) => {
         flow.hooks.transition.tap(this.name, (fromState, toState) => {
           const { value: state } = toState;
-
-          if (state.state_type === 'EXTERNAL') {
+          if (state.state_type === "EXTERNAL") {
             setTimeout(async () => {
-              const currentState = player.getState();
-
-              if (
-                currentState.status === 'in-progress' &&
+              /** Helper for ensuring state is still current relative to external state this is handling */
+              const shouldTransition = (
+                currentState: PlayerFlowState,
+              ): currentState is InProgressState =>
+                currentState.status === "in-progress" &&
                 currentState.controllers.flow.current?.currentState?.value ===
-                  state
-              ) {
+                  state;
+
+              const currentState = player.getState();
+              if (shouldTransition(currentState)) {
                 try {
                   const transitionValue = await this.handler(
                     state,
-                    currentState.controllers
+                    currentState.controllers,
                   );
 
                   if (transitionValue !== undefined) {
-                    currentState.controllers.flow.transition(transitionValue);
+                    // Ensure the Player is still in the same state after waiting for transitionValue
+                    const latestState = player.getState();
+                    if (shouldTransition(latestState)) {
+                      latestState.controllers.flow.transition(transitionValue);
+                    } else {
+                      player.logger.warn(
+                        `External state resolved with [${transitionValue}], but Player already navigated away from [${toState.name}]`,
+                      );
+                    }
                   }
                 } catch (error) {
                   if (error instanceof Error) {

@@ -4,17 +4,18 @@ title: 'Reference Assets'
 
 # Reference Assets
 
-To help users get started with Player, we have created a minimal set of useable assets for React, iOS and Android. These reference assets showcase the design philosophy we encourage when building your own asset sets. While these components are functional we _do not_ recommend shipping them to production as they have not been tested to be production ready. 
+To help users get started with Player, we have created a minimal set of useable assets for React, iOS and Android. These reference assets showcase the design philosophy we encourage when building your own asset sets. While these components are functional we _do not_ recommend shipping them to production as they have not been tested to be production ready.
 
-## React
+<PlatformTabs>
+  <react>
 
 For the React Player, we ship a package (`@player-ui/reference-assets-plugin-react`) that provides the reference set of assets. Each asset package exposes a `Component`, type, and optional transform. They also export hooks for easily consuming the transformed component and supplying your own UI for a custom look and feel. These components are all then exposed via a plugin that can be added to Player like so:
 
 ```javascript
-import { WebPlayer } from '@player-ui/react';
+import { ReactPlayer } from '@player-ui/react';
 import { ReferenceAssetsPlugin } from '@player-ui/reference-assets-plugin-react';
 
-const webPlayer = new WebPlayer({
+const reactPlayer = new ReactPlayer({
   plugins: [new ReferenceAssetsPlugin()],
 });
 ```
@@ -23,8 +24,8 @@ const webPlayer = new WebPlayer({
 
 The reference assets + React player can be viewed in [Storybook](/latest/storybook-demo)
 
-
-## iOS 
+  </react>
+  <ios>
 
 Alongside distributing the `PlayerUI` pod, there is a `PlayerUI/ReferenceAssets` subspec used as examples of how Player APIs work for building assets. This pod uses the shared TypeScript transform functions that the React and Android players use for their reference assets, ensuring consistent behavior across platforms. These assets can be loaded into Player like so:
 
@@ -44,12 +45,15 @@ struct MyApp: View {
 }
 ```
 
-## Android 
+  </ios>
+  <android>
 
 Alongside distributing the Android Player framework, there is a reference assets library used as an example of how Player APIs work for building assets. These are intended to serve as a reference, but can be used early on in development as a means of understanding how to work with Player. This asset set uses the shared TypeScript transform functions that the Web and Android players use for their reference assets, ensuring consistent behavior across platforms. These assets can be loaded into Player like so:
 
 ```kotlin
-import com.intuit.player.android.reference.assets.ReferenceAssetsPlugin
+import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin
 
 val player = AndroidPlayer(context, ReferenceAssetsPlugin())
 ```
+  </android>
+</PlatformTabs>

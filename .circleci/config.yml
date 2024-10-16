@@ -1,50 +1,81 @@
 version: 2.1
 
 parameters:
-  GHA_Actor:
-    type: string
-    default: ""
   GHA_Action:
     type: string
     default: ""
-  GHA_Event:
-    type: string
-    default: ""
-  GHA_Meta:
-    type: string
-    default: ""
+  should_release:
+    type: boolean
+    default: false
 
 orbs:
   macos: circleci/macos@2
   android: circleci/android@2.0
-  codecov: codecov/codecov@3.2.2
+  codecov: codecov/codecov@3.3.0
 
 executors:
   base:
     docker:
-      - image: docker.io/playerui/bazel-docker
+      - image: docker.io/playerui/bazel-docker:11
     working_directory: ~/player
     resource_class: xlarge
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
+  minimal:
+    docker:
+      - image: cimg/base:current
+    working_directory: ~/player
+    resource_class: medium
+    environment:
+      TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   ios:
     working_directory: ~/player
-    resource_class: macos.x86.medium.gen2
+    resource_class: macos.m1.large.gen1
     macos:
-      xcode: 13.4.1
+      xcode: 15.3.0
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   android:
     machine:
-      image: android:202102-01
+      image: android:2024.04.1
     working_directory: ~/player
     resource_class: large
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
 
+commands:
+  auto_shipit:
+    description: Perform Auto shipit
+    steps:
+      - attach_workspace:
+          at: ~/player
+      - restore_cache:
+          keys:
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+            - v1-bazel-cache-core-{{ .Branch }}
+            - v1-bazel-cache-core-main
+            - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+            - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
+
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:hUAWVYdfSW5ml6ufbfyEHUcuPwUJ88xVhsZc21b2lA8"
+
+      - run: mkdir -p ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+      - run: echo "//registry.npmjs.com/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      - run: git config --global user.name "Intuit Service"
+      - run: git config --global user.email "opensource-svc@intuit.com"
+      - run: |
+          echo -e $GPG_KEY | gpg --import --batch
+          echo -e "pinentry-mode loopback\npassphrase $DEPLOY_MAVEN_GPG_PASSPHRASE" > ~/.gnupg/gpg.conf
+      - run: |
+          source ~/.bashrc
+          bundle install
+          npx auto shipit --only-graduate-with-release-label -vv
+
 jobs:
   setup:
-    executor: base
+    executor: minimal
     steps:
       - checkout
 
@@ -57,13 +88,34 @@ jobs:
           paths:
             - .
 
+  bazelrc:
+    executor: minimal
+    steps:
+      - attach_workspace:
+          at: ~/player
+      - run: |
+          echo "build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
+          echo "test --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
+          echo "coverage --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
+          if [ "${CIRCLE_BRANCH}" == "main" ]; then
+            echo "Running on main"
+            echo "common --//android/player:runtime=j2v8" >> .bazelrc.local
+          else
+            echo "Running on PR"
+            echo "common --//android/player:runtime=j2v8-debug" >> .bazelrc.local
+          fi
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
   build:
     executor: base
     steps:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci --config=skip-ios -- //...
+      - run: bazel build --config=ci -- $(bazel query 'filter("native_bundle$", //...)')
 
       - save_cache:
           paths:
@@ -81,7 +133,14 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk maven openjdk@8
+      - macos/install-rosetta
+
+      - run:
+          name: Homebrew Dependencies
+          command: |
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk lcov
+            wget -P /tmp/temurin https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u422-b05/OpenJDK8U-jdk_x64_mac_hotspot_8u422b05.pkg
+            sudo installer -pkg /tmp/temurin/OpenJDK8U-jdk_x64_mac_hotspot_8u422b05.pkg -target /
 
       - restore_cache:
           keys:
@@ -94,52 +153,56 @@ jobs:
           command: |
             sh scripts/install-android-tools.sh
             echo 'export ANDROID_SDK_HOME=$ANDROID_HOME'  >> $BASH_ENV
-            echo 'export ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk/21.4.7075529'  >> $BASH_ENV
+            echo 'export ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk/23.2.8568313'  >> $BASH_ENV
             echo 'export PATH=$ANDROID_SDK_HOME/tools/bin:$PATH'  >> $BASH_ENV
             echo 'export PATH=$ANDROID_SDK_HOME/tools:$PATH'  >> $BASH_ENV
             echo 'export PATH=$ANDROID_SDK_HOME/platform-tools:$PATH'  >> $BASH_ENV
             echo 'export PATH=$ANDROID_SDK_HOME/emulator:$PATH'  >> $BASH_ENV
             source $BASH_ENV
           environment:
-            JAVA_HOME: /usr/local/opt/openjdk@8
+            JAVA_HOME: /Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home
 
       - save_cache:
           key: android-tools-{{ arch }}-{{ checksum "scripts/install-android-tools.sh" }}
           paths:
             - ~/android-tools
 
-      - run: gem install bundler
-
-      - restore_cache:
-          keys:
-            - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
-            - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
-
-      - run: bundle install
-
-      - save_cache:
-          key: gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
-          paths:
-            - ~/.gem/ruby/2.7.5
-
       - macos/preboot-simulator:
-          version: "15.5"
+          version: "17.4"
           platform: "iOS"
-          device: "iPhone 13"
+          device: "iPhone 15"
 
-      - run: bazel sync
+      - run: bazel build --config=ci-mac -- //ios/demo:PlayerUIDemo
 
-      - run: |
-          BUNDLE_TARGETS=$(bazel query "attr(name, '_Bundles', //...)" --output label 2>/dev/null | tr '\n' ' ')
-          bazel build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci $BUNDLE_TARGETS
+      - run:
+          name: Test Prebuild
+          command: |
+            bazel build \
+              --config=ci-mac \
+              $(bazel query "kind(ios_unit_test, //ios/...)") \
+              $(bazel query "kind(ios_unit_test, //plugins/...)") \
+              $(bazel query "kind(ios_ui_test, //ios/...)") \
+              $(bazel query "kind(ios_ui_test, //plugins/...)") \
+              $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
+              $(bazel query "attr(name, '.*SwiftLint', //plugins/...)")
+      - run:
+          name: Tests
+          command: |
+            bazel coverage \
+              --config=ci-mac \
+              --jobs=1 \
+              --experimental_use_llvm_covmap \
+              --combined_report=lcov \
+              --test_output=all \
+              --test_timeout=1800 \
+              $(bazel query "kind(ios_unit_test, //ios/...)") \
+              $(bazel query "kind(ios_unit_test, //plugins/...)") \
+              $(bazel query "kind(ios_ui_test, //ios/...)") \
+              $(bazel query "kind(ios_ui_test, //plugins/...)") \
+              $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
+              $(bazel query "attr(name, '.*SwiftLint', //plugins/...)")
 
-      - run: bazel shutdown
-      - run: cd xcode && bundle exec pod install
-      - run: bazel build --config=ci --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} -- //:PlayerUI //:PlayerUI-Demo //:PlayerUI_Pod
-      # TODO: the timeout should be added to the test itself
-      - run: bazel test --test_env=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --test_env=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --test_env=APPLITOOLS_PR_NUMBER=${CIRCLE_PULL_REQUEST##*/} --test_timeout=600 --jobs=1 --verbose_failures --config=ci  --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} -- //:PlayerUI-Unit-Unit //:PlayerUI-UI-ViewInspectorTests //:PlayerUI-UI-XCUITests
-
-      - run: 
+      - run:
           when: always
           command: |
             RESULTS_DIR=_test_results
@@ -148,6 +211,20 @@ jobs:
               mkdir -p $RESULTS_DIR/$(dirname $line)
               cp $line $RESULTS_DIR/$(dirname $line)
             done
+      - run:
+          when: always
+          command: |
+            mkdir -p _ios_coverage/lcov
+            mkdir -p _ios_coverage/html
+            cp -r $(bazel info output_path)/_coverage/_coverage_report.dat _ios_coverage/lcov/
+            genhtml --branch-coverage --output-directory=_ios_coverage/html/ "$(bazel info output_path)/_coverage/_coverage_report.dat"
+            zip -r _ios_coverage/html.zip _ios_coverage/html/
+            rm -r _ios_coverage/html/
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - _ios_coverage
 
       - store_test_results:
           path: _test_results
@@ -158,7 +235,11 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel test --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=skip-ios --config=ci -- //... -//docs/site -//android/demo:android_instrumentation_test
+      - run: bazel test --config=ci -- //third_party/hermes/hello:test
+
+      - run: bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
+
+      - run: bazel test --config=ci --//android/player:runtime=hermes -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
       - run:
           when: always
@@ -191,10 +272,17 @@ jobs:
             sudo ln -s /opt/bazelisk-v1.11.0/bazelisk /usr/local/bin/bazel
 
       - run:
-          name: Create avd
+          name: Install Android tools
           command: |
-            sdkmanager "system-images;android-29;default;x86"
-            echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-29;default;x86"
+            rm -rf $ANDROID_HOME/build-tools/*
+            JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64 \
+              $ANDROID_HOME/tools/bin/sdkmanager "build-tools;33.0.1"\
+              "ndk;23.2.8568313" \
+              "system-images;android-33;default;x86_64"
+            echo "export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/23.2.8568313"  >> $BASH_ENV
+            source $BASH_ENV
+            echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-33;default;x86_64" -g default
+             source $BASH_ENV
 
       - run:
           name: Launch emulator
@@ -207,7 +295,22 @@ jobs:
           command: |
             circle-android wait-for-boot
 
-      - run: bazel test --define=APPLITOOLS_API_KEY=${APPLITOOLS_API_KEY} --define=APPLITOOLS_BATCH_ID=${CIRCLE_SHA1} --define=APPLITOOLS_PR_NUMBER=${CIRCLE_PULL_REQUEST##*/} --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci -- //android/demo:android_instrumentation_test
+      - run: bazel test --config=ci -- //android/demo:android_instrumentation_test
+
+      - run: bazel test --config=ci --//android/player:runtime=hermes -- //android/demo:android_instrumentation_test
+
+      - run:
+          when: always
+          command: |
+            RESULTS_DIR=_test_results
+            find -L ./bazel-testlogs -name test.xml | while read line
+            do
+              mkdir -p $RESULTS_DIR/$(dirname $line)
+              cp $line $RESULTS_DIR/$(dirname $line)
+            done
+
+      - store_test_results:
+          path: _test_results
 
       - store_artifacts:
           path: screenshots
@@ -224,47 +327,43 @@ jobs:
             - v1-bazel-cache-core-{{ .Branch }}
             - v1-bazel-cache-core-main
 
+      # union the bundle targets until //... doesnt explode analyzing jvm/android targets
       - run: |
-          BUNDLE_TARGETS=$(bazel query "kind(nodejs_test, //...)" --output label 2>/dev/null | tr '\n' ' ')
-          bazel coverage --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY} --config=ci -- $BUNDLE_TARGETS
+          BUNDLE_TARGETS=$(bazel query "kind(js_test, //plugins/...) union kind(js_test, //react/...) union kind(js_test, //core/...)" --output label 2>/dev/null | tr '\n' ' ')
+          bazel coverage --combined_report=lcov --config=ci -- $BUNDLE_TARGETS
+
+      - run:
+          when: always
+          command: |
+            RESULTS_DIR=_test_results
+            find -L ./bazel-testlogs -name test.xml | while read line
+            do
+              mkdir -p $RESULTS_DIR/$(dirname $line)
+              cp $line $RESULTS_DIR/$(dirname $line)
+            done
+
+      - store_test_results:
+          path: _test_results
 
       - codecov/upload:
           file: ./bazel-out/_coverage/_coverage_report.dat
 
+      - codecov/upload:
+          file: _ios_coverage/lcov/_coverage_report.dat
+
+  maybe_release:
+    executor: base
+    steps:
+      - run: echo "Should I release? (<< pipeline.parameters.should_release >>)"
+      - when:
+          condition: << pipeline.parameters.should_release >>
+          steps:
+            - auto_shipit
+
   release:
     executor: base
     steps:
-      - attach_workspace:
-          at: ~/player
-
-      - restore_cache:
-          keys: 
-            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }} 
-            - v1-bazel-cache-core-{{ .Branch }} 
-            - v1-bazel-cache-core-main 
-            - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
-            - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
-
-      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      - run: echo -e $GPG_KEY | gpg --import --batch
-      - run: |
-            source ~/.bashrc
-            bundle install
-            npx auto shipit --only-graduate-with-release-label -vv
-
-  applitools_init:
-    executor: base
-    steps:
-      - run:
-          name: Initialize Applitools
-          command: curl -L -d '' -X POST "$APPLITOOLS_SERVER_URL/api/externals/github/push?apiKey=$APPLITOOLS_API_KEY&CommitSha=$CIRCLE_SHA1&BranchName=$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/$CIRCLE_BRANCH"
-
-  applitools_cleanup:
-    executor: base
-    steps:
-      - run:
-          name: Cleanup Applitools
-          command: "curl -X POST \"$APPLITOOLS_SERVER_URL/api/externals/github/servers/github.com/commit/$CIRCLE_SHA1/complete?apiKey=$APPLITOOLS_API_KEY\" -H Content-Type:application/json --data '{\"serverId\": \"github.com\", \"commitSha\": \"$CIRCLE_SHA1\"}' -v -L"
+      - auto_shipit
 
 workflows:
   build_and_test_pr:
@@ -277,49 +376,123 @@ workflows:
                 - /version-.*/
             tags:
               ignore: /.*/
-
-      - applitools_init:
+      - bazelrc:
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
           context:
-            - applitools
+            - Build
           requires:
             - setup
 
       - build:
+          name: build-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          requires:
+            - bazelrc
+
+      - build:
+          name: build-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
           requires:
             - setup
 
       - build_ios:
-          context:
-            - applitools
+          name: build-ios-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
           requires:
-            - applitools_init
-            - setup
+            - bazelrc
+            - build-trunk
+
+      - build_ios:
+          name: build-ios-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - build-fork
+
+      - maybe_release:
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          context:
+            - Publish
+          requires:
+            - build-trunk
+            - build-ios-trunk
 
       - test:
+          name: test-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
           requires:
-            - build
+            - build-trunk
+
+      - test:
+          name: test-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - build-fork
 
       - android_test:
-          context:
-            - applitools
+          name: android-test-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
           requires:
-            - applitools_init
-            - build
+            - build-trunk
+
+      - android_test:
+          name: android-test-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - build-fork
 
       - coverage:
+          name: coverage-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
           requires:
-            - build
+            - build-trunk
+            - build-ios-trunk
 
-      - applitools_cleanup:
-          context:
-            - applitools
+      - coverage:
+          name: coverage-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
           requires:
-            - android_test
-            - build_ios
+            - build-fork
+            - build-ios-fork
 
   build_and_test_main:
     when:
-      equal: [ "", << pipeline.parameters.GHA_Action >> ]
+      equal: ["", << pipeline.parameters.GHA_Action >>]
     jobs:
       - setup:
           filters:
@@ -327,63 +500,59 @@ workflows:
               only:
                 - main
                 - /version-.*/
+    
+      - bazelrc:
+          context:
+            - Build
+          requires:
+            - setup
 
       - build:
           requires:
-            - setup
+            - bazelrc
 
       - build_ios:
-          context:
-            - applitools
-          requires:
-            - setup
-
-      - test:
           requires:
             - build
 
       - android_test:
-          context:
-            - applitools
           requires:
             - build
 
       - coverage:
           requires:
             - build
+            - build_ios
 
       - release:
           context:
             - Publish
           requires:
             - android_test
-            - test
             - coverage
             - build_ios
 
-  release:
+  full_release:
     when:
-      equal: [ release, << pipeline.parameters.GHA_Action >> ]
+      equal: [release, << pipeline.parameters.GHA_Action >>]
     jobs:
       - setup
+
+      - bazelrc:
+          context:
+            - Build
+          requires:
+            - setup
 
       - build:
           requires:
             - setup
 
       - build_ios:
-          context:
-            - applitools
           requires:
-            - setup
-
-      - test:
-          requires:
-            - build
+            - bazelrc
 
       - android_test:
-          context:
-            - applitools
           requires:
             - build
 
@@ -396,6 +565,5 @@ workflows:
             - Publish
           requires:
             - android_test
-            - test
             - coverage
             - build_ios

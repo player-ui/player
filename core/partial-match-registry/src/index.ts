@@ -1,8 +1,8 @@
-import SortedArray from 'sorted-array';
-import type { Matcher } from './deep-partial-matcher';
-import createObjectMatcher from './deep-partial-matcher';
+import SortedArray from "sorted-array";
+import type { Matcher } from "./deep-partial-matcher";
+import createObjectMatcher from "./deep-partial-matcher";
 
-export { default as createObjectMatcher } from './deep-partial-matcher';
+export { default as createObjectMatcher } from "./deep-partial-matcher";
 
 /** create a matcher function that matches exactly */
 function createBasicMatcher(seed: any): Matcher {
@@ -44,7 +44,7 @@ export class Registry<V> {
   /** Add match -> value mapping to the registry */
   set(match: any, value: V) {
     const matcher =
-      typeof match === 'object'
+      typeof match === "object"
         ? createObjectMatcher(match)
         : createBasicMatcher(match);
 
@@ -74,5 +74,10 @@ export class Registry<V> {
   /** Reset the items in the registry */
   clear() {
     this.store = createSortedArray<V>();
+  }
+
+  /** Check if the registry is empty*/
+  isRegistryEmpty() {
+    return this.store.array.length === 0;
   }
 }

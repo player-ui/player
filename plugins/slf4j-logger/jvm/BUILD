@@ -1,4 +1,4 @@
-load("//plugins:build.bzl", "kt_player_plugin")
+load("//plugins:defs.bzl", "kt_player_plugin")
 load(":deps.bzl", "main_deps", "main_exports", "test_deps")
 
 kt_player_plugin(
@@ -6,5 +6,5 @@ kt_player_plugin(
     main_deps = main_deps,
     main_exports = main_exports,
     test_deps = test_deps,
-    test_package = "com.intuit.player.jvm.plugins.logging.slf4j",
+    test_package = "com.intuit.playerui.plugins.logging.slf4j",
 )

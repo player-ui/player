@@ -1,0 +1,64 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`dependency model > tracks dependency sets correctly 1`] = `
+Set {
+  BindingInstance {
+    "factory": [Function],
+    "joined": "foo.bar",
+    "split": [
+      "foo",
+      "bar",
+    ],
+  },
+}
+`;
+
+exports[`dependency model > tracks dependency sets correctly 2`] = `
+Set {
+  BindingInstance {
+    "factory": [Function],
+    "joined": "foo.baz",
+    "split": [
+      "foo",
+      "baz",
+    ],
+  },
+  BindingInstance {
+    "factory": [Function],
+    "joined": "foo.bad",
+    "split": [
+      "foo",
+      "bad",
+    ],
+  },
+}
+`;
+
+exports[`dependency model > tracks dependency sets correctly 3`] = `
+Set {
+  BindingInstance {
+    "factory": [Function],
+    "joined": "foo.bar",
+    "split": [
+      "foo",
+      "bar",
+    ],
+  },
+  BindingInstance {
+    "factory": [Function],
+    "joined": "foo.baz",
+    "split": [
+      "foo",
+      "baz",
+    ],
+  },
+  BindingInstance {
+    "factory": [Function],
+    "joined": "foo.bad",
+    "split": [
+      "foo",
+      "bad",
+    ],
+  },
+}
+`;

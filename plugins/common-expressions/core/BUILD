@@ -1,16 +1,25 @@
-load("//:index.bzl", "javascript_pipeline")
+load("@rules_player//javascript:defs.bzl", "js_pipeline")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//tools:defs.bzl", "NATIVE_BUILD_DEPS", "tsup_config", "vitest_config")
 
-javascript_pipeline(
-    name = "@player-ui/common-expressions-plugin",
-    dependencies = [
-        "//core/utils:@player-ui/utils",
-        "//plugins/expression/core:@player-ui/expression-plugin",
+npm_link_all_packages(name = "node_modules")
+
+tsup_config(name = "tsup_config")
+
+vitest_config(name = "vitest_config")
+
+js_pipeline(
+    package_name = "@player-ui/common-expressions-plugin",
+    build_deps = NATIVE_BUILD_DEPS,
+    native_bundle = "CommonExpressionsPlugin",
+    peer_deps = [
+        ":node_modules/@player-ui/player",
     ],
-    peer_dependencies = [
-        "//core/player:@player-ui/player",
+    test_deps = [
+        ":node_modules/@player-ui/make-flow",
+        "//:vitest_config",
     ],
-    test_data = [
-        "//core/make-flow:@player-ui/make-flow"
+    deps = [
+        ":node_modules/@player-ui/expression-plugin",
     ],
-    library_name = 'CommonExpressionsPlugin'
 )

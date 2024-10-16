@@ -1,5 +1,5 @@
 ---
-title: setTimeout Plugin
+title: SetTimeout Plugin
 platform: android
 ---
 
@@ -9,6 +9,12 @@ The only explicit runtime plugin in the core Android plugin set, the `SetTimeout
 
 ## Usage 
 
+In build.gradle
+```kotlin
+implementation "com.intuit.playerui.plugins:set-time-out:$PLAYER_VERSION"
+```
+
+In plugin implementation
 ```kotlin
 class PluginThatNeedsSetTimeout : RuntimePlugin {
 

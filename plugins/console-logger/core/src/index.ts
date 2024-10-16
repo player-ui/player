@@ -1,12 +1,11 @@
-import type { Player, PlayerPlugin } from '@player-ui/player';
-import type { Severity } from '@player-ui/logger';
-import { ConsoleLogger } from '@player-ui/logger';
+import type { Player, PlayerPlugin, Severity } from "@player-ui/player";
+import { ConsoleLogger } from "@player-ui/player";
 
 /**
  * The ConsoleLogger plugin is an easy way to debug Player locally by sending all log events to the js console
  */
 export class ConsoleLoggerPlugin implements PlayerPlugin {
-  name = 'console-logger';
+  name = "console-logger";
 
   private consoleLogger: ConsoleLogger;
 

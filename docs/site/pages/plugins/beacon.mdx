@@ -32,6 +32,8 @@ interface DefaultBeacon {
 }
 ```
 
+## Usage
+
 <PlatformTabs>
   <core>
 
@@ -72,10 +74,10 @@ beaconPlugin.beacon({
 Just like with the _core_ variant, to add support for beaconing in the `react` player, add the plugin to Player:
 
 ```ts
-import { WebPlayer } from '@player-ui/react';
+import { ReactPlayer } from '@player-ui/react';
 import { BeaconPlugin } from '@player-ui/beacon-plugin-react';
 
-const player = new WebPlayer({
+const player = new ReactPlayer({
   plugins: [
     new BeaconPlugin({
 
@@ -94,6 +96,15 @@ This will add additional React Context to the running player for the producers f
   </react>
   <ios>
 
+### CocoaPods
+Add the subspec to your `Podfile`
+
+```ruby
+pod 'PlayerUI/BeaconPlugin'
+```
+
+### Swift Usage
+
 To receive Beacon events from Player in iOS, add the `BeaconPlugin` to your plugin array:
 
 ```swift
@@ -102,7 +113,7 @@ var body: some View {
     flow: flow,
     plugins: [
       BeaconPlugin<DefaultBeacon> { (beacon: DefaultBeacon) in
-				// Process beacon into the format you need for Segment/Trinity and send it on
+				// Process beacon into the format you need for your analytics platform
 			}
     ]
   )
@@ -175,12 +186,12 @@ For convenience, there are several extension methods for utilizing a pre-install
 
 ```kotlin
 // registering handler
-player.onBeacon { beacon: String ->
+androidPlayer.onBeacon { beacon: String ->
     // Process beacon and send to analytics platform
 }
 
 // fire beacon
-player.beacon(
+androidPlayer.beacon(
     "clicked",
     "button",
     assetThatIsBeaconing,
@@ -190,10 +201,7 @@ player.beacon(
 
 The base `RenderableAsset` class provides an additional helper to make beaconing less verbose from an asset perspective.
 
-```kotlin
-// within RenderableAsset implementation
-beacon(BeaconAction.clicked, BeaconElement.button)
-```
+[Helper in RenderableAsset](https://github.com/player-ui/player/blob/2a2110caf87ab752207c82ec9ab8ce72316d20f5/android/player/src/main/java/com/intuit/player/android/asset/RenderableAsset.kt#L253)
 
   </android>
 </PlatformTabs>
@@ -264,6 +272,8 @@ export const Component = (props) => {
   </react>
   <ios>
 
+The SwiftUIBeaconPlugin attaches a BeaconContext to the root of the SwiftUI view tree as an environment value, so when included any asset can use that context to send a beacon, if the context is in the environment:
+
 ```swift
 struct ActionAssetView: View {
   @ObservedObject var viewModel: AssetViewModel<ActionData>
@@ -275,4 +285,40 @@ struct ActionAssetView: View {
 ```
 
   </ios>
+
+  <android>
+
+  Using the base `RenderableAsset`'s helper function in this example fires off a basic beacon with no adjustment to format as well as empty data upon button click
+
+**Example**
+
+```kotlin
+class MyAsset(assetContext: AssetContext) :
+    DecodableAsset<>(assetContext, Data.serializer()) {
+
+    @Serializable
+    data class Data(
+      ...
+    ) : AssetData()
+
+    override fun createView(): View {
+      ...
+    }
+
+    override fun View.hydrate() {
+        val binding = MyCustomViewBinding.bind(this)
+        binding.button.setOnClickListener {
+          this@MyAsset.beacon(
+            action = BeaconAction.clicked,
+            element = BeaconElement.button,
+            asset = this@MyAsset,
+            data = null
+          )
+        }
+        ...
+    }
+}
+```
+
+  </android>
 </PlatformTabs>

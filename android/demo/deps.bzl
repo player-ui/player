@@ -1,33 +1,29 @@
-load("//jvm/dependencies:versions.bzl", "versions")
-load("@rules_player//maven:parse_coordinates.bzl", "parse_coordinates")
-
 maven_main = [
-    "androidx.navigation:navigation-runtime:%s" % versions.androidx.navigation,
-    "androidx.navigation:navigation-ui-ktx:%s" % versions.androidx.navigation,
-    "androidx.navigation:navigation-fragment-ktx:%s" % versions.androidx.navigation,
-
-    "com.afollestad.material-dialogs:core:%s" % versions.material_dialogs,
-    "com.google.android.material:material:%s" % versions.material,
-    #"com.squareup.leakcanary:leakcanary-android:2.2",
+    "@maven//:androidx_navigation_navigation_runtime",
+    "@maven//:androidx_navigation_navigation_ui_ktx",
+    "@maven//:androidx_navigation_navigation_fragment_ktx",
+    "@maven//:com_afollestad_material_dialogs_core",
+    "@maven//:com_google_android_material_material",
+    #"@maven//:com_squareup_leakcanary_leakcanary_android",
+    # For when hermes-android _isn't_ included
+    "@maven//:com_facebook_soloader_soloader",
+    # For when j2v8-android _isn't_ included
+    "@maven//:com_github_AlexTrotsenko_j2v8_debugger",
 ]
 
 maven_test = [
-    "androidx.test.espresso:espresso-intents:%s" % versions.androidx.test.espresso,
-    "androidx.test.ext:junit-ktx:%s" % versions.androidx.test.junit,
-    "com.applitools:eyes-android-espresso:%s" % versions.testing.applitools,
+    "@maven//:androidx_test_espresso_espresso_intents",
+    "@maven//:androidx_test_ext_junit_ktx",
 ]
 
-maven = maven_main + maven_test
-
-main_deps = parse_coordinates(maven_main) + [
+main_deps = maven_main + [
     "//jvm/utils",
     "//plugins/reference-assets/android:assets",
     "//plugins/common-types/jvm:common-types",
     "//plugins/pending-transaction/jvm:pending-transaction",
-    "//plugins/reference-assets/mocks:jar",
+    "//tools/mocks:jar",
 ]
 
-test_deps = parse_coordinates(maven_test) + [
+test_deps = maven_test + [
     "//jvm/utils",
-    "@androidx_eyes_components//aar",
 ]

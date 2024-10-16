@@ -1,5 +1,8 @@
-import type { Player, PlayerPlugin } from '@player-ui/player';
-import type { ExpressionHandler } from '@player-ui/expressions';
+import type {
+  Player,
+  PlayerPlugin,
+  ExpressionHandler,
+} from "@player-ui/player";
 
 export type ExpressionMap = Map<string, ExpressionHandler<any[], any>>;
 
@@ -10,7 +13,7 @@ export type ExpressionMap = Map<string, ExpressionHandler<any[], any>>;
  * Any subsequent expressions registered with the same name will override previous handlers.
  */
 export class ExpressionPlugin implements PlayerPlugin {
-  name = 'ExpressionPlugin';
+  name = "ExpressionPlugin";
   private expressions: ExpressionMap;
 
   constructor(expressionMap: ExpressionMap) {

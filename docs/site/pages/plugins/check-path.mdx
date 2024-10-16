@@ -1,6 +1,6 @@
 ---
 title: Check Path Plugin
-platform: react,core
+platform: react,core,android
 ---
 
 # Check Path Plugin
@@ -48,14 +48,14 @@ Install the plugin:
 ```bash
 yarn add @player-ui/check-path-plugin-react
 ```
-
+6474792156
 Add it to Player:
 
 ```js
-import { WebPlayer } from '@player-ui/react';
+import { ReactPlayer } from '@player-ui/react';
 import { CheckPathPlugin } from '@player-ui/check-path-plugin-react';
 
-const wp = new WebPlayer({
+const rp = new ReactPlayer({
   plugins: [new CheckPathPlugin()],
 });
 ```
@@ -63,6 +63,51 @@ const wp = new WebPlayer({
 This will automatically create the underlying _core_ version of the `CheckPathPlugin` to be made available via `React` Context for the hooks.
 
   </react>
+
+<ios>
+
+### CocoaPods
+
+Add the subspec to your `Podfile`
+
+```ruby
+pod 'PlayerUI/SwiftUICheckPathPlugin'
+```
+
+### Swift Usage
+
+This plugin takes no parameters, and the configuration comes from content, it can just be added to the plugin array:
+
+```swift
+var body: some View {
+    SwiftUIPlayer(
+        flow: flow,
+        plugins: [
+          SwiftUICheckPathPlugin()
+        ],
+        result: $resultBinding
+    )
+}
+```
+</ios>
+
+  <android>
+In build.gradle
+
+```kotlin
+implementation "com.intuit.playerui.plugins:check-path:$PLAYER_VERSION"
+```
+
+In Player constructor
+
+```kotlin
+import com.intuit.playerui.plugins.checkpath.CheckPathPlugin
+
+val plugins = listOf(CheckPathPlugin())
+AndroidPlayer(plugins)
+```
+  </android>
+
 </PlatformTabs>
 
 
@@ -149,6 +194,39 @@ export const MyAsset = ({ id }) => {
 ```
 
   </react>
+  <ios>
+
+### Swift Usage
+
+The SwiftUICheckPathPlugin attaches the `BaseCheckPathPlugin`  named `checkPath` to the root of the SwiftUI view tree as an environment value, so when included any asset can use that environment value to access the base functionality
+
+```swift
+
+struct MyAsset: View {
+    @ObservedObject var viewModel: AssetViewModel<AssetData>
+    @Environment(\.checkPath) var checkPath
+
+    var body: some View {
+       let isInForm = checkPath?.hasParentContext(id: viewModal.data.id, query: "form")
+       if isInForm {
+         SelectChoice()
+       } else {
+         RadioGroup()
+    }
+}
+
+```
+</ios>
+
+  <android>
+
+The JVM CheckPathPlugin API contains partial functionality in comparison to the core plugin, ideally this should not be used, and all logic where pathing is concerned should be handled in transforms
+If the situation arises and this plugin is absolutely necessary, the API from the following source are available at the moment. This is subject to change in future releases:
+
+[CheckPathPlugin](https://github.com/player-ui/player/blob/main/plugins/check-path/jvm/src/main/kotlin/CheckPathPlugin.kt)
+
+  </android>
+
 </PlatformTabs>
 
 

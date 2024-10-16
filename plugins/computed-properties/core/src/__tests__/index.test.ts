@@ -1,31 +1,31 @@
-import { waitFor } from '@testing-library/react';
-import type { InProgressState } from '@player-ui/player';
-import { Player } from '@player-ui/player';
-import { makeFlow } from '@player-ui/make-flow';
-import { ComputedPropertiesPlugin } from '..';
+import { test, expect, vitest } from "vitest";
+import type { InProgressState, Flow } from "@player-ui/player";
+import { Player } from "@player-ui/player";
+import { makeFlow } from "@player-ui/make-flow";
+import { ComputedPropertiesPlugin } from "..";
 
 const flowWithComputedValues = makeFlow({
-  id: 'view-1',
-  type: 'view',
-  value: '{{foo.bar.computedValue}}',
-  otherValue: '{{foo.bar.otherValue}}',
+  id: "view-1",
+  type: "view",
+  value: "{{foo.bar.computedValue}}",
+  otherValue: "{{foo.bar.otherValue}}",
 });
 
 flowWithComputedValues.schema = {
   ROOT: {
     foo: {
-      type: 'FooType',
+      type: "FooType",
     },
   },
   FooType: {
     bar: {
-      type: 'BarType',
+      type: "BarType",
     },
   },
   BarType: {
     computedValue: {
-      type: 'Expression',
-      exp: '1 + 2 + 3',
+      type: "Expression",
+      exp: "1 + 2 + 3",
     },
   },
 } as any;
@@ -33,58 +33,58 @@ flowWithComputedValues.schema = {
 flowWithComputedValues.data = {
   foo: {
     bar: {
-      otherValue: 'not 6',
+      otherValue: "not 6",
     },
   },
 };
 
-test('computes property values for Expression schema types', () => {
+test("computes property values for Expression schema types", () => {
   const player = new Player({ plugins: [new ComputedPropertiesPlugin()] });
   player.start(flowWithComputedValues);
 
   const currentState = player.getState() as InProgressState;
 
   expect(currentState.controllers.view.currentView?.lastUpdate).toStrictEqual({
-    id: 'view-1',
-    type: 'view',
+    id: "view-1",
+    type: "view",
     value: 6,
-    otherValue: 'not 6',
+    otherValue: "not 6",
   });
 });
 
-test('throws an error if writing to a computed value', () => {
+test("throws an error if writing to a computed value", () => {
   const player = new Player({ plugins: [new ComputedPropertiesPlugin()] });
   player.start(flowWithComputedValues);
 
   const state = player.getState() as InProgressState;
 
   expect(() =>
-    state.controllers.data.set([['foo.bar.computedValue', 'val']])
+    state.controllers.data.set([["foo.bar.computedValue", "val"]]),
   ).toThrowError(
-    "Invalid 'set' operation on computed property: foo.bar.computedValue"
+    "Invalid 'set' operation on computed property: foo.bar.computedValue",
   );
 });
 
-test('sets fall through', () => {
+test("sets fall through", () => {
   const player = new Player({ plugins: [new ComputedPropertiesPlugin()] });
   player.start(flowWithComputedValues);
 
   const state = player.getState() as InProgressState;
 
-  expect(state.controllers.data.get('foo.bar.otherValue')).toBe('not 6');
-  state.controllers.data.set([['foo.bar.otherValue', 'updated']]);
-  expect(state.controllers.data.get('foo.bar.otherValue')).toBe('updated');
+  expect(state.controllers.data.get("foo.bar.otherValue")).toBe("not 6");
+  state.controllers.data.set([["foo.bar.otherValue", "updated"]]);
+  expect(state.controllers.data.get("foo.bar.otherValue")).toBe("updated");
 });
 
 const flowWithComputedApplicability = makeFlow({
-  id: 'view-1',
-  type: 'view',
+  id: "view-1",
+  type: "view",
   label: {
     asset: {
-      applicability: '{{foo.computedValue}}',
-      id: 'label',
-      type: 'text',
-      value: 'view label',
+      applicability: "{{foo.computedValue}}",
+      id: "label",
+      type: "text",
+      value: "view label",
     },
   },
 });
@@ -92,22 +92,22 @@ const flowWithComputedApplicability = makeFlow({
 flowWithComputedApplicability.schema = {
   ROOT: {
     foo: {
-      type: 'FooType',
+      type: "FooType",
     },
   },
   FooType: {
     computedValue: {
-      type: 'Expression',
+      type: "Expression",
       exp: '{{foo.type}} === "valid"',
     },
   },
 };
 
 flowWithComputedApplicability.data = {
-  foo: { type: 'not-valid' },
+  foo: { type: "not-valid" },
 };
 
-test('updates work across computations', async () => {
+test("updates work across computations", async () => {
   const player = new Player({ plugins: [new ComputedPropertiesPlugin()] });
   player.start(flowWithComputedApplicability);
 
@@ -121,22 +121,99 @@ test('updates work across computations', async () => {
   expect(getView().label).toBe(undefined);
 
   (player.getState() as InProgressState).controllers.data.set([
-    ['foo.type', 'valid'],
+    ["foo.type", "valid"],
   ]);
 
-  await waitFor(() =>
+  await vitest.waitFor(() =>
     expect(getView().label).toStrictEqual({
       asset: {
-        id: 'label',
-        type: 'text',
-        value: 'view label',
+        id: "label",
+        type: "text",
+        value: "view label",
       },
-    })
+    }),
   );
 
   (player.getState() as InProgressState).controllers.data.set([
-    ['foo', { type: 'not-valid' }],
+    ["foo", { type: "not-valid" }],
   ]);
 
-  await waitFor(() => expect(getView().label).toBe(undefined));
+  await vitest.waitFor(() => expect(getView().label).toBe(undefined));
+});
+
+test("expressions update dependent expressions", async () => {
+  const flowWithDependentComputedValues: Flow = makeFlow({
+    views: [
+      {
+        id: "view-1",
+        type: "view",
+        computed: {
+          asset: {
+            id: "computed",
+            type: "text",
+            applicability: "{{foo.bar.computedValue}}",
+          },
+        },
+        dependent: {
+          asset: {
+            id: "dependent",
+            type: "text",
+            applicability: "{{foo.bar.dependentValue}}",
+          },
+        },
+      },
+    ],
+    data: {
+      foo: {
+        bar: {
+          sourceValue: false,
+        },
+      },
+    },
+    schema: {
+      ROOT: {
+        foo: {
+          type: "FooType",
+        },
+      },
+      FooType: {
+        bar: {
+          type: "BarType",
+        },
+      },
+      BarType: {
+        sourceValue: {
+          type: "boolean",
+        },
+        computedValue: {
+          type: "Expression",
+          exp: "{{foo.bar.sourceValue}} == true",
+        },
+        dependentValue: {
+          type: "Expression",
+          exp: "{{foo.bar.computedValue}} == false",
+        },
+      },
+    },
+  });
+  const player = new Player({ plugins: [new ComputedPropertiesPlugin()] });
+  player.start(flowWithDependentComputedValues);
+
+  const getView = () => {
+    return (player.getState() as InProgressState).controllers.view.currentView
+      ?.lastUpdate as any;
+  };
+
+  // The label should start off as not there
+
+  expect(getView().computed).toBeUndefined();
+  expect(getView().dependent).toBeDefined();
+
+  (player.getState() as InProgressState).controllers.data.set([
+    ["foo.bar.sourceValue", true],
+  ]);
+  await vitest.waitFor(() => {
+    expect(getView().computed).toBeDefined();
+    expect(getView().dependent).toBeUndefined();
+  });
 });

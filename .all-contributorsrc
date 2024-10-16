@@ -75,7 +75,8 @@
         "code",
         "doc",
         "ideas",
-        "infra"
+        "infra",
+        "example"
       ]
     },
     {
@@ -97,6 +98,28 @@
       "profile": "https://github.com/kharrop",
       "contributions": [
         "design"
+      ]
+    },
+    {
+      "login": "lexfm",
+      "name": "Alejandro Fimbres",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9345943?v=4",
+      "profile": "https://github.com/lexfm",
+      "contributions": [
+        "doc",
+        "test",
+        "code"
+      ]
+    },
+    {
+      "login": "rafbcampos",
+      "name": "Rafael Campos",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26394217?v=4",
+      "profile": "https://github.com/rafbcampos",
+      "contributions": [
+        "doc",
+        "test",
+        "code"
       ]
     }
   ],

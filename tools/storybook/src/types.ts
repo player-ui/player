@@ -1,9 +1,15 @@
-import type { WebPlayerPlugin } from '@player-ui/react';
-import type { AppetizeVersions } from './player/Appetize';
+import type { ReactPlayerPlugin } from "@player-ui/react";
+import type { AppetizeVersions } from "./player/Appetize";
 
 export interface PlayerParametersType {
+  /** Options for the dsl editor */
+  dslEditor?: {
+    /** Enable more imports */
+    additionalModules?: Record<string, any>;
+  };
+
   /** plugins to use for any loaded player */
-  webplayerPlugins?: Array<WebPlayerPlugin>;
+  reactPlayerPlugins?: Array<ReactPlayerPlugin>;
 
   /** Appetize tokens to use */
   appetizeTokens?: {
@@ -28,7 +34,7 @@ export type AsyncImportFactory<T> = () => Promise<{
 
 export type RenderTarget = {
   /** platform to render on */
-  platform: 'ios' | 'android' | 'web';
+  platform: "ios" | "android" | "web";
 
   /** the token to use if applicable */
   token?: string;

@@ -1,5 +1,0 @@
-{
-  "extends": "@test-extension",
-  "presets": ["@test-preset-1"],
-  "plugins": ["@test-plugin-1"]
-}

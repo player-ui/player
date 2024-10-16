@@ -1,6 +1,6 @@
 ---
 title: Metrics
-platform: core,react,ios
+platform: core,react,ios,android
 ---
 
 # Metrics Plugin
@@ -51,10 +51,10 @@ For extensions of this plugin that wish to track the render (and update) times o
 The `react` version of the Metrics Plugin adds support for `render` and `update` times to events. The API mirrors that of the core version:
 
 ```js
-import { WebPlayer } from '@player-ui/react';
+import { ReactPlayer } from '@player-ui/react';
 import { MetricsPlugin } from '@player-ui/metrics-plugin-react';
 
-const player = new WebPlayer({
+const player = new ReactPlayer({
   plugins: [
     new MetricsPlugin({
       onUpdate: (metrics) => {
@@ -68,23 +68,51 @@ const player = new WebPlayer({
   </react>
   <ios>
 
-The `ios` version of the Metrics Plugin will track initial render time for each view in a flow. Due to current SwiftUI limitations, update time can't be tracked yet. It should be used in conjunction with a core plugin that utilizes the events.
+The `ios` version of the Metrics Plugin will track initial render time for each view in a flow. Due to current SwiftUI limitations, update time can't be tracked yet. It can be used in conjunction with a core plugin that utilizes the events, through `findPlugin`, or standalone.
 
-Add the subspec:
+### CocoaPods
+Add the subspec to your `Podfile`
+
 ```ruby
 pod 'PlayerUI/MetricsPlugin'
-
-Construct the plugin:
-
-```swift
-SwiftUIPlayer(
-  flow: flow,
-  plugins: [MetricsPlugin()],
-  result: $result
-)
 ```
 
+### Swift Usage
+```swift
+var body: some View {
+  SwiftUIPlayer(
+    flow: flow,
+    plugins: [
+      // Tracking render time can be controlled with a parameter
+      MetricsPlugin(trackRenderTime: true) { timing, nodeMetrics, flowMetrics in
+        // Handle metrics payload
+        log(timing.duration ?? -1)
+      }
+    ],
+    result: $resultBinding
+  )
+}
+```
   </ios>
+  <android>
+
+The `JVM` Metrics plugin can track render time for views in a flow.
+
+In build.gradle
+```kotlin
+implementation "com.intuit.playerui.plugins:metrics:$PLAYER_VERSION"
+```
+
+In Player constructor
+```kotlin
+import com.intuit.playerui.plugins.expression.ExpressionPlugin
+
+val metricsPlugin = MetricsPlugin { timing, renderMetrics, flowMetrics ->
+  ...
+}
+AndroidPlayer(metricsPlugin)
+```
+  </android>
 </PlatformTabs>
 
 
@@ -103,7 +131,7 @@ import { BeaconPluginPlugin } from '@player-ui/beacon-plugin';
 
 class MyBeaconPluginPlugin implements BeaconPluginPlugin {
   apply(beaconPlugin: BeaconPlugin) {
-    beaconPlugin.hooks.buildBeacon.tapPromise(
+    beaconPlugin.hooks.buildBeacon.tap(
       { name: 'my-beacon-plugin', context: true } as Tap,
       async (context, beacon) => {
         const { renderTime } =

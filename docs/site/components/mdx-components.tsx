@@ -1,7 +1,7 @@
-import React from 'react';
-import path from 'path';
-import Link from 'next/link';
+import React from "react";
 import {
+  Alert as ChakraAlert,
+  AlertStatus,
   Heading,
   Text,
   UnorderedList,
@@ -23,12 +23,17 @@ import {
   Tr,
   Td,
   Link as CLink,
-} from '@chakra-ui/react';
-import { MDXProviderComponents } from '@mdx-js/react';
-import { withRouter, useRouter } from 'next/router';
-import { CodeHighlight } from './code-highlight';
-import { withBasePrefix } from './Image';
-import { PlayerTeam } from './PlayerTeam';
+  AlertIcon,
+  Box,
+  AlertTitle,
+  AlertDescription,
+} from "@chakra-ui/react";
+import { MDXProviderComponents } from "@mdx-js/react";
+import { useNavigate } from "react-router";
+import { Link, useSearchParams } from "react-router-dom";
+import { CodeHighlight } from "./code-highlight";
+import { withBasePrefix } from "./Image";
+import { PlayerTeam } from "./PlayerTeam";
 
 /**
  * Generic Tab Component that extends Chakra's Tab
@@ -47,10 +52,15 @@ const GradleTab = (props: any) => {
 };
 
 const CodeTabsNameMap = new Map([
-  ['core', 'Core'],
-  ['react', 'React'],
-  ['ios', 'iOS'],
-  ['android', 'Android'],
+  ["core", "Core"],
+  ["react", "React"],
+  ["ios", "iOS"],
+  ["android", "Android"],
+]);
+
+const ContentTabsNameMap = new Map([
+  ['json', 'JSON'],
+  ['tsx', 'TSX'],
 ]);
 
 const CodeTabsMap = new Map([['gradle', GradleTab]]);
@@ -62,7 +72,7 @@ const Tabs = (props: any) => {
   return (
     <ChakraTabs
       colorScheme="blue"
-      defaultIndex={props.defaultTab}
+      index={props.defaultTab}
       onChange={(index) => props.callback?.(index)}
     >
       <TabList>
@@ -95,18 +105,15 @@ const Tabs = (props: any) => {
  * Tabs specifically for plugin docs that only allow certain tabs
  */
 const PlatformTabs = (props: React.PropsWithChildren<unknown>) => {
-  const router = useRouter();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const children = React.Children.toArray(props.children).filter((c: any) =>
-    CodeTabsNameMap.has(c.props.mdxType.toLowerCase())
+    CodeTabsNameMap.has(c.props.mdxType.toLowerCase()),
   );
 
-  if (!router.isReady) {
-    return <Progress isIndeterminate size="xs" />;
-  }
-
   const langPrefIndex = children.findIndex(
-    (c: any) => c.props.mdxType.toLowerCase() === router.query.lang
+    (c: any) => c.props.mdxType.toLowerCase() === searchParams.get("lang"),
   );
 
   const defaultTab = Math.max(langPrefIndex, 0);
@@ -117,13 +124,10 @@ const PlatformTabs = (props: React.PropsWithChildren<unknown>) => {
       nameMap={CodeTabsNameMap}
       callback={(tabIndex: number) => {
         const lang = (children[tabIndex] as any).props.mdxType.toLowerCase();
-        router.push({
-          pathname: router.pathname,
-          query: {
-            ...router.query,
-            lang,
-          },
-        });
+
+        setSearchParams(
+          Object.fromEntries([...searchParams.entries(), ["lang", lang]]),
+        );
       }}
     >
       {children}
@@ -131,16 +135,27 @@ const PlatformTabs = (props: React.PropsWithChildren<unknown>) => {
   );
 };
 
+/**
+ * Tab section for Content Authoring. This should include tsx and/or example JSON files.
+ */
+const ContentTabs = (props: React.PropsWithChildren<unknown>) => {
+  const children = React.Children.toArray(props.children).filter((c: any) => {
+    return ContentTabsNameMap.has(c.props.mdxType.toLowerCase());
+  });
+
+  return <Tabs nameMap={ContentTabsNameMap}>{children}</Tabs>;
+};
+
 const langMap: Record<string, string> = {
-  js: 'javascript',
-  ts: 'typescript',
+  js: "javascript",
+  ts: "typescript",
 };
 
 /**
  * Code Block comopnent
  */
 const Code = (props: any) => {
-  let lang = props.className?.split('-')[1];
+  let lang = props.className?.split("-")[1];
   if (langMap[lang] !== undefined) {
     lang = langMap[lang];
   }
@@ -155,21 +170,21 @@ const Code = (props: any) => {
 /**
  * Image Component
  */
-export const Img = (props: JSX.IntrinsicElements['img']) => {
-  const darkModeInvert = props.src?.includes('darkModeInvert');
-  const darkModeOnly = props.src?.includes('darkModeOnly');
-  const lightModeOnly = props.src?.includes('lightModeOnly');
+export const Img = (props: JSX.IntrinsicElements["img"]) => {
+  const darkModeInvert = props.src?.includes("darkModeInvert");
+  const darkModeOnly = props.src?.includes("darkModeOnly");
+  const lightModeOnly = props.src?.includes("lightModeOnly");
 
   const { colorMode } = useColorMode();
 
   const filterStyles = useColorModeValue(
     undefined,
-    'invert(80%) hue-rotate(180deg);'
+    "invert(80%) hue-rotate(180deg);",
   );
 
   if (
-    (colorMode === 'light' && darkModeOnly) ||
-    (colorMode === 'dark' && lightModeOnly)
+    (colorMode === "light" && darkModeOnly) ||
+    (colorMode === "dark" && lightModeOnly)
   ) {
     return null;
   }
@@ -189,40 +204,65 @@ export const Img = (props: JSX.IntrinsicElements['img']) => {
  * Normalize URL to conform to local path rules
  */
 export const useNormalizedUrl = (url: string) => {
-  const router = useRouter();
+  return url;
 
-  if (!url.startsWith('.')) {
-    return url;
-  }
+  // const router = useRouter();
 
-  const ext = path.extname(url);
-  let withoutExt = url;
-  if (ext) {
-    withoutExt = path.join(path.dirname(url), path.basename(url, ext));
-  }
+  // if (!url.startsWith(".")) {
+  //   return url;
+  // }
 
-  return path.join(path.dirname(router.pathname), withoutExt);
+  // const ext = path.extname(url);
+  // let withoutExt = url;
+  // if (ext) {
+  //   withoutExt = path.join(path.dirname(url), path.basename(url, ext));
+  // }
+
+  // return path.join(path.dirname(router.pathname), withoutExt);
 };
 
-export const InlineCode = (props: JSX.IntrinsicElements['code']) => {
+export const InlineCode = (props: JSX.IntrinsicElements["code"]) => {
   return (
     <ChakraCode
       colorScheme="gray"
-      bg={useColorModeValue('blue.50', 'gray.800')}
+      bg={useColorModeValue("blue.50", "gray.800")}
       {...props}
     />
   );
 };
 
+type ChakraAlertProps = React.PropsWithChildren<{
+  status?: AlertStatus;
+  title?: string;
+  description?: string;
+}>
+
+export const Alert = (props: ChakraAlertProps) => {
+  return (
+      <ChakraAlert status={props.status} variant='left-accent'>
+        <AlertIcon />
+        <Box flex={1}>
+          {props.title && <AlertTitle>{props.title}</AlertTitle>}
+          {props.description && <AlertDescription>{props.description}</AlertDescription>}
+          {props.children}
+        </Box>
+      </ChakraAlert>
+  );
+};
+
+
 /**
  * Anchor tab component wrapping Chakra's
  */
-const A = (props: JSX.IntrinsicElements['a']) => {
+const A = (props: JSX.IntrinsicElements["a"]) => {
   const { href, ...other } = props;
   return (
-    <Link passHref href={useNormalizedUrl(href || '')}>
-      <CLink color={useColorModeValue('blue.800', 'blue.600')} {...other} />
-    </Link>
+    <CLink
+      as={Link}
+      to={useNormalizedUrl(href || "")}
+      color={useColorModeValue("blue.800", "blue.600")}
+      {...other}
+    />
   );
 };
 
@@ -245,7 +285,9 @@ export const MDXComponents: MDXProviderComponents = {
 
   PlayerTeam,
 
-  PlatformTabs: withRouter(PlatformTabs),
+  PlatformTabs,
+
+  ContentTabs,
 
   table: Table,
   th: Th,
@@ -253,4 +295,8 @@ export const MDXComponents: MDXProviderComponents = {
   td: Td,
 
   inlineCode: InlineCode,
+
+  Alert,
+  AlertTitle,
+  AlertDescription,
 };

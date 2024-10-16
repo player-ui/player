@@ -1,19 +1,21 @@
 versions = struct(
     kotlin = struct(
-        coroutines = "1.5.2",
-        serialization = "1.2.2",
+        coroutines = "1.6.0",
+        serialization = "1.3.0",
     ),
     runtimes = struct(
         graaljs = "21.2.0",
         j2v8 = "6.1.0",
     ),
+    j2v8 = struct(
+        debugger = "0.2.3",
+    ),
     logging = struct(
         slf4j = "1.7.36",
         logback = "1.2.10",
     ),
-    hooks = "0.11.1",
+    hooks = "0.15.0",
     testing = struct(
-        applitools = "4.7.6",
         junit = "4.12",
         jupiter = "5.6.0",
         kluent = "1.68",
@@ -43,4 +45,7 @@ versions = struct(
     ),
     material_dialogs = "3.3.0",
     material = "1.4.0",
+    facebook = struct(
+        stetho = "1.5.1",
+    ),
 )

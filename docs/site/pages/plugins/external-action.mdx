@@ -48,6 +48,15 @@ This will transition any `EXTERNAL` state in Player's navigation, with a `ref` p
   </core>
   <ios>
 
+### CocoaPods
+Add the subspec to your `Podfile`
+
+```ruby
+pod 'PlayerUI/ExternalActionPlugin'
+```
+
+### Swift Usage
+
 For an example flow with an external state such as:
 
 ```json
@@ -82,7 +91,7 @@ For an example flow with an external state such as:
 }
 ```
 
-The plugin can be declared to handle this external state:
+The plugin can be declared to handle this external state, whether that means integrating an existing platform native experience, or doing headless processing:
 
 ```swift
 let plugin = ExternalActionPlugin { state, options, transition in
@@ -96,7 +105,15 @@ let plugin = ExternalActionPlugin { state, options, transition in
 		transition(transitionValue ?? "Next")
 }
 
-let player = Player(plugins: [plugin])
+var body: some View {
+  SwiftUIPlayer(
+    flow: flow,
+    plugins: [
+      plugin
+    ],
+    result: $resultBinding
+  )
+}
 ```
 
   </ios>
@@ -108,6 +125,38 @@ The `ExternalActionPlugin` adds support for handling `EXTERNAL` navigation state
 2. options: `ControllerState` provides access to the current player controllers
 3. transition: `(String) -> Unit` is provided to enable the handler to "complete" the `EXTERNAL` state and transition using the provided `String` value
 
+## Usage
+In build.gradle
+```kotlin
+implementation "com.intuit.playerui.plugins:external-action:$PLAYER_VERSION"
+```
+
+In Player constructor
+```kotlin
+import com.intuit.playerui.plugins.externalAction.ExternalActionPlugin
+
+val externalActionPlugin = ExternalActionPlugin { state, options, transition ->
+    // access external state node
+    val extraProperty = state["extraProperty"]
+    // access data model
+    options.data.get("{{foo.bar}}")
+    // evaluate expression
+    options.expression.evaluate("{{foo.bar}} = 1")
+    // do other processing or show non-player experience
+
+    // transition to the next node using "Next"
+    transition("Next")
+}
+AndroidPlayer(externalActionPlugin)
+
+// handler can be configured after instantiation
+externalActionPlugin.onExternalAction { /** handle external action */ }
+
+// extension method for configuring plugin with player instance
+androidPlayer.onExernalAction { /** handle external action */ }
+```
+
+In Player content
 ```json
 {
   "navigation": {
@@ -135,27 +184,11 @@ The `ExternalActionPlugin` adds support for handling `EXTERNAL` navigation state
   }
 }
 ```
-```kotlin
-val externalActionPlugin = ExternalActionPlugin { state, options, transition ->
-    // access external state node
-    val extraProperty = state["extraProperty"]
-    // access data model
-    options.data.get("{{foo.bar}}")
-    // evaluate expression
-    options.expression.evaluate("{{foo.bar}} = 1")
-    // do other processing or show non-player experience
 
-    // transition to the next node using "Next"
-    transition("Next")
-}
+## API
 
-// handler can be configured after instantiation
-externalActionPlugin.onExternalAction { /** handle external action */ }
+Public API available from sources here:
 
-val player = AndroidPlayer(context, externalActionPlugin)
-// extension method for configuring plugin with player instance
-player.onExernalAction { /** handle external action */ }
-```
-
+[ExternalActionPlugin](https://github.com/player-ui/player/blob/main/plugins/external-action/jvm/src/main/kotlin/com/intuit/player/plugins/externalAction/ExternalActionPlugin.kt)
   </android>
 </PlatformTabs>
