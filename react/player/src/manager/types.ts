@@ -60,6 +60,8 @@ export interface ManagedPlayerProps extends ReactPlayerOptions {
 
   /** A component to render when there are errors */
   fallbackComponent?: React.ComponentType<FallbackProps>;
+  /** A property to store global values */
+  data?: Record<string, any>
 }
 
 export type ManagedPlayerContext = {

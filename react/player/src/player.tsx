@@ -68,12 +68,15 @@ export interface ReactPlayerOptions {
 
 export type ReactPlayerComponentProps = Record<string, unknown>;
 
+export type ReactPlayerData = Record<string, any>
+
 /** A Player that renders UI through React */
 export class ReactPlayer {
   public readonly options: ReactPlayerOptions;
   public readonly player: Player;
   public readonly assetRegistry: AssetRegistryType = new Registry();
   public readonly Component: React.ComponentType<ReactPlayerComponentProps>;
+  public data: ReactPlayerData;
   public readonly hooks = {
     /**
      * A hook to create a React Component to be used for Player, regardless of the current flow state
@@ -127,6 +130,7 @@ export class ReactPlayer {
     onUpdatePlugin.apply(this.player);
 
     this.Component = this.createReactPlayerComponent();
+    this.data = {};
     this.reactPlayerInfo = {
       playerVersion: this.player.getVersion(),
       playerCommit: this.player.getCommit(),
