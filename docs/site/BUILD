@@ -34,6 +34,7 @@ build_deps = [
     "//:node_modules/stringify-object",
     "//:node_modules/esbuild-wasm",
     "//:node_modules/@player-tools/dsl",
+    "//:node_modules/@astrojs/starlight-docsearch",
     ":node_modules/@player-ui/player",
     ":node_modules/@player-ui/react",
     ":node_modules/@player-ui/reference-assets-plugin-components",

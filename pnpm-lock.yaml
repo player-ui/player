@@ -16,14 +16,14 @@ importers:
         specifier: ^3.6.2
         version: 3.6.2(@types/react-dom@18.3.0)(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vite@4.5.3(@types/node@18.19.33)(terser@5.31.0))
       '@astrojs/starlight':
-        specifier: ^0.27.1
-        version: 0.27.1(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))
+        specifier: ^0.28.3
+        version: 0.28.3(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))
       '@astrojs/starlight-docsearch':
         specifier: ^0.2.0
-        version: 0.2.0(@algolia/client-search@4.23.3)(@astrojs/starlight@0.27.1(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3)))(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(search-insights@2.13.0)
+        version: 0.2.0(@algolia/client-search@4.23.3)(@astrojs/starlight@0.28.3(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3)))(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(search-insights@2.13.0)
       '@astrojs/starlight-tailwind':
         specifier: ^2.0.3
-        version: 2.0.3(@astrojs/starlight@0.27.1(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3)))(@astrojs/tailwind@5.1.0(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))
+        version: 2.0.3(@astrojs/starlight@0.28.3(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3)))(@astrojs/tailwind@5.1.0(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))
       '@astrojs/tailwind':
         specifier: ^5.1.0
         version: 5.1.0(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3))
@@ -1189,10 +1189,10 @@ packages:
       '@astrojs/tailwind': ^5.0.0
       tailwindcss: ^3.3.3
 
-  '@astrojs/starlight@0.27.1':
-    resolution: {integrity: sha512-L2hEgN/Tk7tfBDeaqUOgOpey5NcUL78FuQa06iNxyZ6RjyYyuXSniOoFxZYIo5PpY9O1dLdK22PkZyCDpO729g==, tarball: https://registry.npmjs.org/@astrojs/starlight/-/starlight-0.27.1.tgz}
+  '@astrojs/starlight@0.28.3':
+    resolution: {integrity: sha512-GXXIPKSu5d50mLVtgI4jf6pb3FPQm8n4MI6ZXuQQqqnA0xg7PJQ76WFSVyrICeqM5fKABSqcBksp/glyEJes/A==, tarball: https://registry.npmjs.org/@astrojs/starlight/-/starlight-0.28.3.tgz}
     peerDependencies:
-      astro: ^4.8.6
+      astro: ^4.14.0
 
   '@astrojs/tailwind@5.1.0':
     resolution: {integrity: sha512-BJoCDKuWhU9FT2qYg+fr6Nfb3qP4ShtyjXGHKA/4mHN94z7BGcmauQK23iy+YH5qWvTnhqkd6mQPQ1yTZTe9Ig==, tarball: https://registry.npmjs.org/@astrojs/tailwind/-/tailwind-5.1.0.tgz}
@@ -7215,6 +7215,9 @@ packages:
     resolution: {integrity: sha512-Ty8UblRWFEcfSuIaajM34LdPXIhbs1ajEX/BBPv24J+enSVaEVY63xQ6lTO9VRYS5LAoghIG0IDJ+p+IPzKUQQ==, tarball: https://registry.npmjs.org/hyperlinker/-/hyperlinker-1.0.0.tgz}
     engines: {node: '>=4'}
 
+  i18next@23.16.2:
+    resolution: {integrity: sha512-dFyxwLXxEQK32f6tITBMaRht25mZPJhQ0WbC0p3bO2mWBal9lABTMqSka5k+GLSRWLzeJBKDpH7BeIA9TZI7Jg==, tarball: https://registry.npmjs.org/i18next/-/i18next-23.16.2.tgz}
+
   iconv-lite@0.4.24:
     resolution: {integrity: sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==, tarball: https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.4.24.tgz}
     engines: {node: '>=0.10.0'}
@@ -11746,9 +11749,9 @@ snapshots:
       stream-replace-string: 2.0.0
       zod: 3.23.8
 
-  '@astrojs/starlight-docsearch@0.2.0(@algolia/client-search@4.23.3)(@astrojs/starlight@0.27.1(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3)))(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(search-insights@2.13.0)':
+  '@astrojs/starlight-docsearch@0.2.0(@algolia/client-search@4.23.3)(@astrojs/starlight@0.28.3(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3)))(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(search-insights@2.13.0)':
     dependencies:
-      '@astrojs/starlight': 0.27.1(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))
+      '@astrojs/starlight': 0.28.3(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))
       '@docsearch/css': 3.6.0
       '@docsearch/js': 3.6.2(@algolia/client-search@4.23.3)(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(search-insights@2.13.0)
     transitivePeerDependencies:
@@ -11758,13 +11761,13 @@ snapshots:
       - react-dom
       - search-insights
 
-  '@astrojs/starlight-tailwind@2.0.3(@astrojs/starlight@0.27.1(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3)))(@astrojs/tailwind@5.1.0(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))':
+  '@astrojs/starlight-tailwind@2.0.3(@astrojs/starlight@0.28.3(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3)))(@astrojs/tailwind@5.1.0(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))':
     dependencies:
-      '@astrojs/starlight': 0.27.1(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))
+      '@astrojs/starlight': 0.28.3(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))
       '@astrojs/tailwind': 5.1.0(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)))(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3))
       tailwindcss: 3.4.3(ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3))
 
-  '@astrojs/starlight@0.27.1(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))':
+  '@astrojs/starlight@0.28.3(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))':
     dependencies:
       '@astrojs/mdx': 3.1.5(astro@4.15.2(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))
       '@astrojs/sitemap': 3.1.6
@@ -11778,6 +11781,7 @@ snapshots:
       hast-util-select: 6.0.2
       hast-util-to-string: 3.0.0
       hastscript: 9.0.0
+      i18next: 23.16.2
       mdast-util-directive: 3.0.0
       mdast-util-to-markdown: 2.1.0
       mdast-util-to-string: 4.0.0
@@ -20420,6 +20424,10 @@ snapshots:
   hyperdyperid@1.2.0: {}
 
   hyperlinker@1.0.0: {}
+
+  i18next@23.16.2:
+    dependencies:
+      '@babel/runtime': 7.24.5
 
   iconv-lite@0.4.24:
     dependencies:

@@ -5,6 +5,9 @@ import rehypeMermaid from "rehype-mermaid";
 import react from "@astrojs/react";
 import starlightDocSearch from "@astrojs/starlight-docsearch";
 
+export const BASE_PREFIX =
+  process.env.NODE_ENV === "production" ? "DOCS_BASE_PATH" : undefined;
+
 // https://astro.build/config
 export default defineConfig({
   integrations: [
@@ -28,7 +31,6 @@ export default defineConfig({
       customCss: ["./src/styles/custom.css", "./src/tailwind.css"],
       components: {
         Sidebar: "./src/components/Sidebar.astro",
-        Search: "./src/components/Search.astro",
       },
       plugins: [
         starlightDocSearch({
@@ -117,6 +119,7 @@ export default defineConfig({
       ],
     }),
   ],
+  base: BASE_PREFIX,
   markdown: {
     rehypePlugins: [[rehypeMermaid, { strategy: "img-svg", dark: true }]],
   },
