@@ -285,8 +285,10 @@ export const ManagedPlayer = (props: ManagedPlayerProps) => {
   }, [props.manager, state?.context.reactPlayer.player, state?.value]);
 
   React.useEffect(() => {
-    props.player.data = props.data
-  }, [props.player])
+    if (props.player) {
+      props.player.data = props.data || {};
+    }
+  }, [props.player]);
 
   if (state?.value === "error") {
     if (props.fallbackComponent) {

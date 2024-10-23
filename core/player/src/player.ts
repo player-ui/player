@@ -69,7 +69,7 @@ export interface PlayerConfigOptions {
   /** A logger to use */
   logger?: Logger;
   /** An object to pass data */
-  data?: Record<string, any>
+  data?: Record<string, any>;
 }
 
 export interface PlayerInfo {

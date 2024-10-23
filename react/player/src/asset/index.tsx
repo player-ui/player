@@ -22,7 +22,7 @@ export const ReactAsset = (
 ) => {
   const { registry } = React.useContext(AssetContext);
 
-  let unwrapped;
+  let unwrapped: any;
 
   if ("type" in props && "id" in props) {
     unwrapped = props;
