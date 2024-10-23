@@ -3,6 +3,7 @@ import tailwind from "@astrojs/tailwind";
 import starlight from "@astrojs/starlight";
 import rehypeMermaid from "rehype-mermaid";
 import react from "@astrojs/react";
+import starlightDocSearch from "@astrojs/starlight-docsearch";
 
 // https://astro.build/config
 export default defineConfig({
@@ -29,7 +30,13 @@ export default defineConfig({
         Sidebar: "./src/components/Sidebar.astro",
         Search: "./src/components/Search.astro",
       },
-      plugins: [],
+      plugins: [
+        starlightDocSearch({
+          appId: "OX3UZKXCOH",
+          apiKey: "ALGOLIA_SEARCH_API_KEY",
+          indexName: "player-ui",
+        }),
+      ],
       sidebar: [
         {
           label: "Player",
@@ -68,7 +75,7 @@ export default defineConfig({
               items: [
                 {
                   label: "Plugins Overview",
-                  slug:"plugins"
+                  slug: "plugins",
                 },
                 {
                   label: "Android/JVM Plugins",
@@ -89,8 +96,8 @@ export default defineConfig({
                 {
                   label: "Multiplatform Plugins",
                   autogenerate: { directory: "plugins/multiplatform" },
-                }
-              ]
+                },
+              ],
             },
           ],
         },
