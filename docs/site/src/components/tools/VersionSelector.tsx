@@ -42,6 +42,7 @@ const VersionSelector = (props: VersionSelectorProps) => {
     <select
       aria-label="Select the version of the Player docs you with to see"
       value={BASE_PREFIX || "latest"}
+      style={{ backgroundColor: "rgba(0, 0, 0, 0)" }}
       onChange={(e) => {
         console.error("test");
         window.location.href = `${DOCS_BASE_URL}${e.target.value}/${location}`;
