@@ -335,8 +335,8 @@ describe("view", () => {
       ?.lastUpdate;
 
     expect(view?.actions[0].asset.type).toBe("action");
-    expect(view?.actions[1].asset.type).toBe("text");
-    expect(view?.actions[2].asset.type).toBe("text");
+    expect(view?.actions[1][0].asset.type).toBe("text");
+    expect(view?.actions[1][1].asset.type).toBe("text");
   });
 
   test("replaces async nodes with chained multiNodes", async () => {
@@ -400,7 +400,7 @@ describe("view", () => {
       ?.lastUpdate;
 
     expect(view?.actions[0].asset.type).toBe("action");
-    expect(view?.actions[1].asset.type).toBe("text");
+    expect(view?.actions[1][0].asset.type).toBe("text");
     expect(view?.actions[2]).toBeUndefined();
     expect(updateNumber).toBe(2);
 
@@ -431,9 +431,9 @@ describe("view", () => {
       ?.lastUpdate;
 
     expect(view?.actions[0].asset.type).toBe("action");
-    expect(view?.actions[1].asset.type).toBe("text");
-    expect(view?.actions[2].asset.type).toBe("text");
-    expect(view?.actions[3].asset.type).toBe("text");
+    expect(view?.actions[1][0].asset.type).toBe("text");
+    expect(view?.actions[1][1][0].asset.type).toBe("text");
+    expect(view?.actions[1][1][1].asset.type).toBe("text");
   });
 
   test("replaces async nodes with chained multiNodes singular", async () => {
@@ -497,7 +497,7 @@ describe("view", () => {
       ?.lastUpdate;
 
     expect(view?.actions[0].asset.type).toBe("action");
-    expect(view?.actions[1].asset.type).toBe("text");
+    expect(view?.actions[1][0].asset.type).toBe("text");
     expect(view?.actions[2]).toBeUndefined();
 
     if (deferredResolve) {
@@ -518,8 +518,8 @@ describe("view", () => {
       ?.lastUpdate;
 
     expect(view?.actions[0].asset.type).toBe("action");
-    expect(view?.actions[1].asset.type).toBe("text");
-    expect(view?.actions[2].asset.type).toBe("text");
+    expect(view?.actions[1][0].asset.type).toBe("text");
+    expect(view?.actions[1][1].asset.type).toBe("text");
   });
 
   test("should call onAsyncNode hook when async node is encountered", async () => {

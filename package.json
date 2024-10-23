@@ -119,7 +119,7 @@
     "is-ci-cli": "^2.2.0",
     "json5": "^2.2.3",
     "lcov-result-merger": "^3.1.0",
-    "leven": "4.0.0",
+    "leven": "3.1.0",
     "lint-staged": "^11.2.3",
     "lucide-react": "^0.316.0",
     "lunr": "^2.3.9",

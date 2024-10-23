@@ -103,6 +103,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
                     if (count == 2) cont.resume(true) {}
                 }
             }
+
             player.start(asyncNodeFlowSimple)
         }
         Assertions.assertTrue(count == 2)
@@ -144,7 +145,9 @@ internal class AsyncNodePluginTest : PlayerTest() {
             player.start(asyncNodeFlowSimple)
         }
         Assertions.assertTrue(count == 2)
-        Assertions.assertEquals(3, update?.getList("actions")?.size)
+        print(update?.get("actions"))
+        Assertions.assertEquals(2, update?.getList("actions")?.size)
+        Assertions.assertEquals(2, update?.getList("actions")?.filterIsInstance<ArrayList<Node>>()?.get(0)?.size)
     }
 
     @TestTemplate
@@ -290,7 +293,6 @@ internal class AsyncNodePluginTest : PlayerTest() {
         Assertions.assertEquals(1, count)
 
         view = player.inProgressState?.lastViewUpdate
-
         Assertions.assertNotNull(view)
         Assertions.assertEquals(
             "action",
@@ -298,7 +300,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
         )
         Assertions.assertEquals(
             "action",
-            view.getList("actions")?.filterIsInstance<Node>()?.get(1)?.getObject("asset")?.get("type"),
+            view.getList("actions")?.filterIsInstance<ArrayList<Node>>()?.get(0)?.get(0)?.getObject("asset")?.get("type"),
         )
         Assertions.assertEquals(2, view.getList("actions")?.size)
         Assertions.assertEquals(2, count)
