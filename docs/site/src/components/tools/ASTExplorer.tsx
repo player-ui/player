@@ -1,10 +1,43 @@
 import React from "react";
 import { loader, Editor } from "@monaco-editor/react";
-import { Parser, type Node } from "@player-ui/player";
+import {
+  ApplicabilityPlugin,
+  AssetPlugin,
+  BindingParser,
+  ExpressionEvaluator,
+  LocalModel,
+  MultiNodePlugin,
+  Parser,
+  SchemaController,
+  SwitchPlugin,
+  TemplatePlugin,
+  withParser,
+} from "@player-ui/player";
+import type { Node } from "@player-ui/player";
 import JSON5 from "json5";
 import stringify from "stringify-object";
 
 const parser = new Parser();
+
+const model = withParser(new LocalModel(), new BindingParser().parse);
+const expressionEvaluator = new ExpressionEvaluator({
+  model,
+});
+const options = {
+  evaluate: expressionEvaluator.evaluate,
+  schema: new SchemaController(),
+  data: {
+    format: (binding: any, val: any) => val,
+    formatValue: (val: any) => val,
+    model,
+  },
+};
+
+new AssetPlugin().applyParser(parser);
+new TemplatePlugin(options).applyParser(parser);
+new ApplicabilityPlugin().applyParser(parser);
+new SwitchPlugin(options).applyParser(parser);
+new MultiNodePlugin().applyParser(parser);
 
 const initialView = {
   _comment: "Insert your View's AST here",
@@ -76,7 +109,6 @@ export default function ASTExplorer() {
   const [astTree, setTree] = React.useState<Node.View | undefined>(
     parser.parseView(initialView),
   );
-
   const parsed = stringify(astTree, { indent: "  ", inlineCharacterLimit: 12 });
 
   return (
@@ -99,6 +131,7 @@ export default function ASTExplorer() {
 
               const normalized = JSON5.parse(value);
               const newAST = parser.parseView(normalized);
+              console.error(newAST);
               setTree(newAST);
             } catch (e) {
               setTree(undefined);
