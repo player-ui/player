@@ -1,6 +1,7 @@
 ---
-import Default from "@astrojs/starlight/components/Search.astro";
+import Default from "@astrojs/starlight/components/SocialIcons.astro";
 import type { Props } from "@astrojs/starlight/props";
+import VersionSelector from "./tools/VersionSelector";
 
 type SidebarEntry = (typeof Astro.props.sidebar)[number];
 
@@ -59,7 +60,7 @@ const topEntries = Astro.props.sidebar.map((s) => ({
   }
 </style>
 
-<Default {...Astro.props} />
+<VersionSelector route={Astro.params.slug} client:only/>
 
 <div class="flex flex-row flex-1 justify-end gap-2 ml-4">
   {
@@ -77,3 +78,5 @@ const topEntries = Astro.props.sidebar.map((s) => ({
     })
   }
 </div>
+
+<Default {...Astro.props} />

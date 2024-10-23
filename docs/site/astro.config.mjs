@@ -31,6 +31,7 @@ export default defineConfig({
       customCss: ["./src/styles/custom.css", "./src/tailwind.css"],
       components: {
         Sidebar: "./src/components/Sidebar.astro",
+        SocialIcons: "./src/components/NavBar.astro",
       },
       plugins: [
         starlightDocSearch({
