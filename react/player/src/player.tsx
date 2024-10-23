@@ -58,17 +58,20 @@ export interface ReactPlayerPlugin extends Partial<PlayerPlugin> {
   applyReact?: (reactPlayer: ReactPlayer) => void;
 }
 
+export type ReactPlayerData = Record<string, any>
+
 export interface ReactPlayerOptions {
   /** A headless player instance to use */
   player?: Player;
 
   /** A set of plugins to apply to this player */
   plugins?: Array<ReactPlayerPlugin>;
+
+  /** An object of optional data */
+  data?: ReactPlayerData;
 }
 
 export type ReactPlayerComponentProps = Record<string, unknown>;
-
-export type ReactPlayerData = Record<string, any>
 
 /** A Player that renders UI through React */
 export class ReactPlayer {
@@ -119,7 +122,9 @@ export class ReactPlayer {
       Boolean(p.apply),
     ) as PlayerPlugin[];
 
-    this.player = options?.player ?? new Player({ plugins: playerPlugins });
+    this.player =
+      options?.player ??
+      new Player({ plugins: playerPlugins, data: options?.data ?? {} });
 
     plugins.forEach((plugin) => {
       if (plugin.applyReact) {
@@ -130,7 +135,7 @@ export class ReactPlayer {
     onUpdatePlugin.apply(this.player);
 
     this.Component = this.createReactPlayerComponent();
-    this.data = {};
+    this.data = this.options?.data ?? {};
     this.reactPlayerInfo = {
       playerVersion: this.player.getVersion(),
       playerCommit: this.player.getCommit(),

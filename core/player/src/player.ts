@@ -68,6 +68,8 @@ export interface PlayerConfigOptions {
 
   /** A logger to use */
   logger?: Logger;
+  /** An object to pass data */
+  data?: Record<string, any>
 }
 
 export interface PlayerInfo {
@@ -89,6 +91,7 @@ export class Player {
 
   public readonly logger = new TapableLogger();
   public readonly constantsController = new ConstantsController();
+  public data: Record<string, any>;
   private config: PlayerConfigOptions;
   private state: PlayerFlowState = NOT_STARTED_STATE;
 
@@ -134,6 +137,7 @@ export class Player {
       this.logger.addHandler(config.logger);
     }
 
+    this.data = config?.data || {};
     this.config = config || {};
     this.config.plugins = [
       new DefaultExpPlugin(),
