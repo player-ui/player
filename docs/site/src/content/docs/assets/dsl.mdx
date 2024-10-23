@@ -91,6 +91,8 @@ const myView = (
 );
 ```
 
+which can also be written as the following because the slot has a `TextComp` passed in for it which allows the automatic creation of a text asset for any regular text that is passed in the slot
+
 ```tsx
 import React from "react";
 
@@ -101,7 +103,7 @@ const myView = (
 );
 ```
 
-which when compiled would look like (note the auto injection of the `Text` asset and corresponding Asset Wrapper):
+When compiled, both examples would look like (note the auto injection of the `Text` asset and corresponding Asset Wrapper):
 
 ```json
 {
