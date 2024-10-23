@@ -60,7 +60,7 @@ const topEntries = Astro.props.sidebar.map((s) => ({
   }
 </style>
 
-<VersionSelector route={Astro.params.slug} client:only/>
+<VersionSelector route={Astro.params.slug} client:only="react"/>
 
 <div class="flex flex-row flex-1 justify-end gap-2 ml-4">
   {
