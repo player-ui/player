@@ -52,7 +52,7 @@ apply(player: Player) {
 
 It is not uncommon for core plugins to have constructors for cases where the plugin needs to take some configuration. In cases where plugin configs are more complicated than basic feature flags, it is recommended to make an interface to represent the config object. As an added benefit it also makes it easier to down stream consumers to use your plugin.
 
-For a more comprehensive guide on plugins, check out this [Plugin Implementation](./plugin-implementation) example.
+For a more comprehensive guide on plugins, check out this [Plugin Implementation](/guides/plugin-implementation) example.
 
 _Note: For the React Player you can import and load the plugin the same way you would a React Player Plugin but for the iOS and Android Players you will need to wrap the javascript bundle in a iOS/Android plugin to ensure it is available on your platform._
 
@@ -209,7 +209,7 @@ class SharedJSPlugin: JSBasePlugin {
 
 **Note**: As `JavaScriptCore` cannot resolve dependencies at runtime, using a module bundler such as [tsup](https://github.com/egoist/tsup) is required.
 
-**Note**: `JSBasePlugin` implementations do not necessarily need to be a `PlayerPlugin`, for example, the [BeaconPlugin](https://github.com/player-ui/player/blob/main/ios/plugins/BaseBeaconPlugin/Sources/BaseBeaconPlugin.swift#L63) can take plugins in it's constructor, that are not `PlayerPlugin`.
+**Note**: `JSBasePlugin` implementations do not necessarily need to be a `PlayerPlugin`, for example, the [BeaconPlugin](https://github.com/player-ui/player/blob/main/plugins/beacon/ios/Sources/BaseBeaconPlugin.swift#L59) can take plugins in it's constructor, that are not `PlayerPlugin`.
 
   </Fragment>
  </PlatformTabs>

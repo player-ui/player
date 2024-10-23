@@ -41,13 +41,13 @@ Now the path `myProperty1.name` in the model points to a `StringType`. There are
 
 ## Data Types
 
-A `DataType` is a collection of the validation rules, formatting, and default values for a given path in the model. See the above [structure](#Structure) docs on how to author these in JSON content.
+A `DataType` is a collection of the validation rules, formatting, and default values for a given path in the model. See the above [structure](#structure) docs on how to author these in JSON content.
 
-As in the above `StringType` example, there are a number of pre-existing base types that can be utilized in the schema to describe a data type, and an extension mechanism for supplying additional base-types for use in the authored content. See the [types-provider-plugin](/plugins/types-provider) for an easy way to extend these.
+As in the above `StringType` example, there are a number of pre-existing base types that can be utilized in the schema to describe a data type, and an extension mechanism for supplying additional base-types for use in the authored content. See the [types-provider-plugin](/plugins/core/types-provider) for an easy way to extend these.
 
 For any given path described by the schema, Player will merge the rules defined by the _base_ type (if one exists), and the rules defined specifically for that path in the authored content. Any custom formatter/default values take precedence over the default ones, and any custom validations are ran _before_ the base ones.
 
-Check out the [CommonTypes](/plugins/common-types) plugin for a list of easy to consume DataTypes for your application.
+Check out the [CommonTypes](/plugins/core/common-types) plugin for a list of easy to consume DataTypes for your application.
 
 ## Arrays
 
@@ -112,7 +112,7 @@ To attach a validation to a path in the data-model, add a reference to a validat
 }
 ```
 
-Each _validation_ reference must include a `type` property which corresponds to the name of the validator to run. Player includes some validators out-of-the-box, and custom `validators` can be registered as well. See [the Common Types Plugin](../plugins/common-types) docs for more details around which validators are supported, and how to add custom ones.
+Each _validation_ reference must include a `type` property which corresponds to the name of the validator to run. Player includes some validators out-of-the-box, and custom `validators` can be registered as well. See [the Common Types Plugin](/plugins/core/common-types) docs for more details around which validators are supported, and how to add custom ones.
 
 Any additional properties on the validation reference are passed as _options_ to the `validator`. In the example above, a hypothetical `length` validator can take a `min` and `max` as the boundaries for the length of a string.
 

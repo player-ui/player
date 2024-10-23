@@ -4,7 +4,7 @@ title: Plugin Implementation
 
 The main purpose of a Plugin is to extend or add new functionality by tapping into Player's pipeline of components via hooks. In this section we'll go over the steps to implement a plugin.
 
-We'll use the [stage-revert-data](./plugins/stage-revert-data) plugin as example. After creating our plugin class, we'll use the `apply` method which provides access to the Player instance, which then gives access to the necessary hooks.
+We'll use the [stage-revert-data](/plugins/core/stage-revert-data) plugin as example. After creating our plugin class, we'll use the `apply` method which provides access to the Player instance, which then gives access to the necessary hooks.
 
 ```typescript
 export default class StageRevertDataPlugin implements PlayerPlugin {

@@ -30,7 +30,7 @@ The schema of an asset describes the contract between the input content (what us
 
 #### Data Interaction
 
-The next logical step is the contract between Player (it's data-model, validation rules, etc.) and an instance of an asset in a view. These are described through transform functions, which are stateless mapping functions orchestrated during the view reconciliation processing. You can read more about asset transforms [here](./assets/transforms)
+The next logical step is the contract between Player (it's data-model, validation rules, etc.) and an instance of an asset in a view. These are described through transform functions, which are stateless mapping functions orchestrated during the view reconciliation processing. You can read more about asset transforms [here](./transforms)
 
 #### UI Rendering
 
@@ -38,4 +38,4 @@ The last step of the puzzle is how the asset is physically displayed to a user. 
 
 ## Asset Bundles
 
-In many cases, sets of assets are bundled together and loaded via a single [plugin](../plugins/asset-provider). For the three platforms we support (iOS, Android, and React), a reference set is created as an example. These provide a variety of common types of assets users may end up creating. While they _are_ capable of being used in a production application, they shouldn't be viewed as a standard set -- but merely an example for teams and apps to create their own standard set. To read more about the reference assets check out the [reference](./assets/reference) section.
+In many cases, sets of assets are bundled together and loaded via a single [plugin](../plugins/multiplatform/asset-provider). For the three platforms we support (iOS, Android, and React), a reference set is created as an example. These provide a variety of common types of assets users may end up creating. While they _are_ capable of being used in a production application, they shouldn't be viewed as a standard set -- but merely an example for teams and apps to create their own standard set. To read more about the reference assets check out the [reference](./reference) section.

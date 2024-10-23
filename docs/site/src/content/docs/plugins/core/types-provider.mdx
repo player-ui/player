@@ -4,7 +4,7 @@ title: Types Provider
 
 import PlatformTabs from "../../../../components/PlatformTabs.astro";
 
-Similar to the [Expression Plugin](./expression), this plugin adds support for easily exposing new `DataTypes`, `formats`, and `validations` to Player's content.
+Similar to the [Expression Plugin](/plugins/core/expression), this plugin adds support for easily exposing new `DataTypes`, `formats`, and `validations` to Player's content.
 
 ## Example
 
@@ -176,7 +176,7 @@ let formatFunction = {value, options in
 
 #### Custom Types
 
-Just as you can define custom formats and validation, you can define a custom type that encapsulates that functionality into a type, to avoid the need to keep specifying options, this is how the [common-types](./plugins/common-types) are defined, so when you choose a type like `DateType` the formatting is already set up.
+Just as you can define custom formats and validation, you can define a custom type that encapsulates that functionality into a type, to avoid the need to keep specifying options, this is how the [common-types](/plugins/core/common-types) are defined, so when you choose a type like `DateType` the formatting is already set up.
 
 ```swift
 let type = CustomType(

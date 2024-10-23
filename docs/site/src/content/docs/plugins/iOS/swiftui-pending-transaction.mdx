@@ -80,7 +80,7 @@ public extension EnvironmentValues {
 
 To start registering transactions with the assets, access the transactionContext through the default environment variable above or the new one you created
 
-Register the transaction with the "input" phase (the view update) when a user starts editing the input, (code snippet taken from [InputAsset](https://github.com/player-ui/player/blob/main/ios/packages/reference-assets/Sources/SwiftUI/InputAsset.swift)
+Register the transaction with the "input" phase (the view update) when a user starts editing the input, (code snippet taken from [InputAsset](https://github.com/player-ui/player/blob/main/plugins/reference-assets/swiftui/Sources/SwiftUI/InputAsset.swift)
 
 ```swift
 onEditingChanged: { editing in
@@ -105,7 +105,7 @@ Note: we can register multiple transactions under a single phase and we commit b
 
 Commit the transaction (view update) before the action to navigate takes place. The WrappedFunction provides access to the userInfo where the TransactionContext is stored and users can use this how they see fit.
 
-Now in the [ActionAsset](https://github.com/player-ui/player/blob/main/ios/packages/reference-assets/Sources/SwiftUI/ActionAsset.swift) instead of calling WrappedFunction `run` directly, we can extend the WrappedFunction and create another function called commitCallbacksThenCall which does the same thing as the normal call function except it will check for any input callbacks and commit then if they exist.
+Now in the [ActionAsset](https://github.com/player-ui/player/blob/main/plugins/reference-assets/swiftui/Sources/SwiftUI/ActionAsset.swift) instead of calling WrappedFunction `run` directly, we can extend the WrappedFunction and create another function called commitCallbacksThenCall which does the same thing as the normal call function except it will check for any input callbacks and commit then if they exist.
 
 ```swift
 extension WrappedFunction {
