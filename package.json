@@ -171,6 +171,7 @@
     "signale": "^1.4.0",
     "sorted-array": "^2.0.4",
     "source-map-js": "^1.0.2",
+    "starlight-package-managers": "^0.7.0",
     "std-mocks": "^1.0.1",
     "storybook": "^7.6.10",
     "storybook-dark-mode": "3.0.3",

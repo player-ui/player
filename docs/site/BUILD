@@ -37,6 +37,7 @@ build_deps = [
     "//:node_modules/@astrojs/starlight-docsearch",
     "//:node_modules/dlv",
     "//:node_modules/unist-util-visit",
+    "//:node_modules/starlight-package-managers",
     ":node_modules/@player-ui/player",
     ":node_modules/@player-ui/react",
     ":node_modules/@player-ui/reference-assets-plugin-components",

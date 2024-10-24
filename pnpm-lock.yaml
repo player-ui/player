@@ -486,6 +486,9 @@ importers:
       source-map-js:
         specifier: ^1.0.2
         version: 1.2.0
+      starlight-package-managers:
+        specifier: ^0.7.0
+        version: 0.7.0(@astrojs/starlight@0.28.3(astro@4.16.7(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3)))(astro@4.16.7(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))
       std-mocks:
         specifier: ^1.0.1
         version: 1.0.1
@@ -10318,6 +10321,13 @@ packages:
 
   stackframe@1.3.4:
     resolution: {integrity: sha512-oeVtt7eWQS+Na6F//S4kJ2K2VbRlS9D43mAlMyVpVWovy9o+jfgH8O9agzANzaiLjclA0oYzUXEM4PurhSUChw==, tarball: https://registry.npmjs.org/stackframe/-/stackframe-1.3.4.tgz}
+
+  starlight-package-managers@0.7.0:
+    resolution: {integrity: sha512-7T0Wd4OhtyTxr7yxplO1gt1B0Ped4dxRQ0T3uOp7qM+5UmQiyQE6PMxwmN+4hVuaVQ1zpDdZR6nQrptewS+m9g==, tarball: https://registry.npmjs.org/starlight-package-managers/-/starlight-package-managers-0.7.0.tgz}
+    engines: {node: '>=18.14.1'}
+    peerDependencies:
+      '@astrojs/starlight': '>=0.22.0'
+      astro: '>=4.2.7'
 
   state-local@1.0.7:
     resolution: {integrity: sha512-HTEHMNieakEnoe33shBYcZ7NX83ACUjCu8c40iOGEZsngj9zRnkqS9j1pqQPXwobB0ZcVTk27REb7COQ0UR59w==, tarball: https://registry.npmjs.org/state-local/-/state-local-1.0.7.tgz}
@@ -24531,6 +24541,11 @@ snapshots:
   stackback@0.0.2: {}
 
   stackframe@1.3.4: {}
+
+  starlight-package-managers@0.7.0(@astrojs/starlight@0.28.3(astro@4.16.7(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3)))(astro@4.16.7(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3)):
+    dependencies:
+      '@astrojs/starlight': 0.28.3(astro@4.16.7(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))
+      astro: 4.16.7(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3)
 
   state-local@1.0.7: {}
 
