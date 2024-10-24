@@ -7,36 +7,28 @@
       "values": [
         {
           "asset": {
-            "id": "action-good",
+            "id": "action-1",
             "type": "action",
-            "value": "Next",
+            "exp": "requestOpenAI()",
             "label": {
               "asset": {
-                "id": "action-good-label",
+                "id": "test",
                 "type": "text",
-                "value": "End the flow (success)"
+                "value": "test"
               }
             }
           }
         },
         {
-          "asset": {
-            "id": "action-bad",
-            "type": "action",
-            "exp": "{{foo.bar..}",
-            "label": {
-              "asset": {
-                "id": "action-bad-label",
-                "type": "text",
-                "value": "End the flow (error)"
-              }
-            }
-          }
+          "id": "async",
+          "async": true
         }
       ]
     }
   ],
-  "data": {},
+  "data": {
+    "count": 0
+  },
   "navigation": {
     "BEGIN": "FLOW_1",
     "FLOW_1": {

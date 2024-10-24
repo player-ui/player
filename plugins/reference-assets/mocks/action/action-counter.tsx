@@ -48,3 +48,37 @@ const flow: DSLFlow = {
 };
 
 export default flow;
+
+
+const basicFRFWithActions = {
+    id: "test-flow",
+    views: [
+      {
+        id: "my-view",
+        actions: [
+          {
+            asset: {
+              id: "action-0",
+              type: "action",
+              exp: "requestOpenAI()",
+            },
+          },
+          {
+            id: "nodeId",
+            async: "true",
+          },
+        ],
+      },
+    ],
+    navigation: {
+      BEGIN: "FLOW_1",
+      FLOW_1: {
+        startState: "VIEW_1",
+        VIEW_1: {
+          state_type: "VIEW",
+          ref: "my-view",
+          transitions: {},
+        },
+      },
+    },
+  };

@@ -1,26 +1,41 @@
 {
-  "id": "flow_1",
+  "id": "generated-flow",
   "views": [
     {
-      "id": "first_view",
-      "type": "action",
-      "value": "end",
-      "label": {
-        "asset": {
-          "id": "next-view-label",
-          "type": "text",
-          "value": "End Flow 1"
+      "id": "collection",
+      "type": "collection",
+      "values": [
+        {
+          "asset": {
+            "id": "action",
+            "type": "action",
+            "exp": "requestOpenAI()",
+            "label": {
+              "asset": {
+                "id": "test",
+                "type": "text",
+                "value": "test"
+              }
+            }
+          }
+        },
+        {
+          "id": "async",
+          "async": true
         }
-      }
+      ]
     }
   ],
+  "data": {
+    "count": 0
+  },
   "navigation": {
-    "BEGIN": "flow_1",
-    "flow_1": {
-      "startState": "view_1",
-      "view_1": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
         "state_type": "VIEW",
-        "ref": "first_view",
+        "ref": "collection",
         "transitions": {
           "*": "END_Done"
         }
