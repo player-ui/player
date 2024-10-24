@@ -162,6 +162,17 @@ describe("errors", () => {
     );
   });
 
+  test("works for bindings with escaped numeric bindings", () => {
+    const parser = new BindingParser({
+      get: () => {
+        return true;
+      },
+    });
+
+    expect(parser.parse("foo['01'].baz").asString()).toBe("foo.01.baz");
+    expect(parser.parse("foo.01.baz").asString()).toBe("foo.1.baz");
+  });
+
   test("throws when set is used but not wired up", () => {
     const parser = new BindingParser({
       get: () => [],
