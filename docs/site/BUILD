@@ -48,6 +48,7 @@ astro_bin.astro(
     args = ["build"],
     chdir = package_name(),
     out_dirs = ["dist"],
+    visibility = ["//visibility:public"]
 )
 
 astro_bin.astro_binary(
