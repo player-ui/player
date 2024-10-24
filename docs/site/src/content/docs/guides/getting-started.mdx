@@ -3,6 +3,7 @@ title: "Getting Started"
 ---
 
 import PlatformTabs from "../../../components/PlatformTabs.astro";
+import { PackageManagers } from 'starlight-package-managers'
 
 Getting started with Player is simple.
 
@@ -13,19 +14,9 @@ The first dependency you'll need to pull in is the Player itself. Additionally, 
 <PlatformTabs>
   <Fragment slot='react'>
 
-You can do this by running
+You can do this by installing the React Player and Reference Assets Packages
 
-```bash
-yarn add @player-ui/react
-yarn add @player-ui/reference-assets-plugin-react
-```
-
-or
-
-```bash
-npm install @player-ui/react
-npm install @player-ui/reference-assets-plugin-react
-```
+<PackageManagers pkg="@player-ui/react @player-ui/reference-assets-plugin-react"/>
 
   </Fragment>
   <Fragment slot='ios'>

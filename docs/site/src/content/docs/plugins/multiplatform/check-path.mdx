@@ -3,6 +3,7 @@ title: Check Path Plugin
 ---
 
 import PlatformTabs from "../../../../components/PlatformTabs.astro";
+import { PackageManagers } from 'starlight-package-managers'
 
 The Check Path Plugin enables users to query segments of the view tree for contextual rendering or behavior.
 This is best suited to be referenced during the UI rendering phase, where one can make decisions about the rendering of an asset based on where it lies in the tree.
@@ -14,9 +15,7 @@ This is best suited to be referenced during the UI rendering phase, where one ca
 
 Install the plugin:
 
-```bash
-yarn add @player-ui/check-path-plugin
-```
+<PackageManagers pkg="@player-ui/check-path-plugin" />
 
 Add it to Player:
 
@@ -44,11 +43,8 @@ const isCustomThing = checkPathPlugin.hasParentContext("my-asset-id", [
 
 Install the plugin:
 
-```bash
-yarn add @player-ui/check-path-plugin-react
-```
+<PackageManagers pkg="@player-ui/check-path-plugin-react" />
 
-6474792156
 Add it to Player:
 
 ```js

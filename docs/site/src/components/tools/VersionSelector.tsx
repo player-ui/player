@@ -35,7 +35,7 @@ const useGetReleasedVersions = () => {
   return releasedVersions;
 };
 const VersionSelector = (props: VersionSelectorProps) => {
-  const location = props.route;
+  const location = props.route ?? "";
   const released = useGetReleasedVersions();
 
   return (
