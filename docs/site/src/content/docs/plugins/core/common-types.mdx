@@ -1,0 +1,389 @@
+---
+title: Common Types
+---
+
+import PlatformTabs from "../../../../components/PlatformTabs.astro";
+
+This plugin exposes some basic `DataTypes`, `validations`, and `formats` into Player content.
+
+It also serves as a good reference to adding your own custom types into Player.
+
+## Usage
+
+<PlatformTabs>
+  <Fragment slot='core'>
+
+Install the plugin:
+
+```bash
+yarn add @player-ui/common-types-plugin
+```
+
+Add it to Player:
+
+```js
+import CommonTypesPlugin from "@player-ui/common-types-plugin";
+
+const commonTypesPlugin = new CommonTypesPlugin();
+const player = new Player({ plugins: [commonTypesPlugin] });
+
+// Start your flow
+player.start(myFlow);
+```
+
+This will allow any `DataTypes`, `formats`, `validations` and custom data types to be used in the content
+
+  </Fragment>
+
+<Fragment slot='ios'>
+
+### CocoaPods
+
+Add the subspec to your `Podfile`
+
+```ruby
+
+pod 'PlayerUI/CommonTypesPlugin'
+
+```
+
+### Swift Usage
+
+This plugin takes no parameters, and the configuration comes from content, it can just be added to the plugin array:
+
+```swift
+
+var body: some View {
+    SwiftUIPlayer(
+        flow: flow,
+        plugins: [
+          CommonTypesPlugin()
+        ],
+        result: $resultBinding
+    )
+}
+```
+
+</Fragment>
+
+</PlatformTabs>
+
+## Formats
+
+#### commaNumber
+
+- **format**: Formats a number (or string containing only numbers) into a comma delineated string.
+- **deformat**: Converts a comma delineated string into a number
+
+Options:
+
+```ts
+{
+  precision?: number
+}
+```
+
+#### integer
+
+- **deformat**: converts a string containing only integers to an integer
+
+#### date
+
+- **format**: Formats a string of numbers into a slash separated date
+
+Options:
+
+```ts
+{
+  mask?: string
+}
+```
+
+#### currency
+
+- **format**: Formats a number of string into a currency value
+- **deformat**: Converts a currency value into a number
+
+Options:
+
+```ts
+{
+  precision?: number;
+  currencySymbol?: string;
+  useParensForNeg?: boolean;
+}
+```
+
+#### phone
+
+- **format**: Formats the value as a phone number
+
+Options:
+
+```ts
+{
+  mask?: string;
+}
+```
+
+---
+
+## Validations
+
+#### required
+
+> Asserts that a value is not `null`, `undefined`, or an empty string
+
+Options:
+
+```ts
+{
+  /** An expression to limit the assertion only if the expression evaluates to truthy **/
+  if?: Expression;
+
+  /** An expression to limit the assertion only if the expression evaluates to falsy **/
+  ifNot?: Expression;
+}
+```
+
+**Constants Support**:
+
+- namespace: `constants`
+- path: `validation.required`
+- message: "A value is required"
+
+#### expression
+
+> Uses an expression to evaluate the validation assertion
+
+Options:
+
+```ts
+{
+  /** The expression to evaluate. If truthy, the value/validation passes. If falsy, it does not. **/
+  exp: Expression;
+}
+```
+
+**Constants Support**:
+
+- namespace: `constants`
+- path: `validation.expression`
+- message: "Expression evaluation failed"
+
+#### readonly
+
+> Asserts that the value cannot change
+
+**Constants Support**:
+
+- namespace: `constants`
+- path: `validation.readonly`
+- message: "Value cannot be modified"
+
+#### string
+
+> Asserts that the value is a string
+
+**Constants Support**:
+
+- namespace: `constants`
+- path: `validation.string`
+- message: "Value must be a string"
+- parameters:
+  - `type`: the type of value being validated
+
+#### integer
+
+> Asserts that the value is an integer
+
+**Constants Support**:
+
+- namespace: `constants`
+- path: `validation.integer`
+- message: "Value must be an integer"
+- parameters:
+  - `type`: the type of value being validated
+  - `flooredValue`: the floored value of the value being validated
+
+#### collection
+
+> Asserts that the value is an array
+
+**Constants Support**:
+
+- namespace: `constants`
+- path: `validation.collection`
+- message: "Cannot set collection to non-array"
+
+#### oneOf
+
+> Asserts that the value is one of the pre-defined accepted values
+
+Options:
+
+```ts
+{
+  options?: Array;
+}
+```
+
+**Constants Support**:
+
+- namespace: `constants`
+- path: `validation.oneof`
+- message: "Cannot set collection to non-array"
+
+#### regex
+
+> Asserts that the value matches the provided regular expression
+
+Options:
+
+```ts
+{
+  regex: RegExp;
+}
+```
+
+**Constants Support**:
+
+- namespace: `constants`
+- path: `validation.regex`
+
+#### length
+
+> Asserts that the value matches the given length criteria. Uses character counts for strings, and key-length for objects, and array length for arrays.
+
+Options:
+
+```ts
+{
+  min?: number;
+  max?: number;
+  exact?: number;
+}
+```
+
+**Constants Support**:
+
+- namespace: `constants`
+- path: `validation.minimum`, `validation.maximum`
+- message: "At least \$\{min\} items needed", "Up to \$\{max\} items allowed"
+- parameters:
+  - `validationLength`: Returns the length of the value being validated
+
+#### min
+
+> Assets that the numeric value is at least as large as the target
+
+Options:
+
+```ts
+{
+  value: number;
+}
+```
+
+**Constants Support**:
+
+- namespace: `constants`
+- path: `validation.min`
+- message: "Must be at least \$\{value\}"
+
+#### max
+
+> Assets that the numeric value is at no larger the target
+
+Options:
+
+```ts
+{
+  value: number;
+}
+```
+
+**Constants Support**:
+
+- namespace: `constants`
+- path: `validation.max`
+- message: "Cannot exceed \$\{value\}"
+
+#### email
+
+> Asserts that the value follows an email pattern
+
+**Constants Support**:
+
+- namespace: `constants`
+- path: `validation.email`
+- message: "Improper email format"
+
+#### phone
+
+> Asserts that the value follows an phone number pattern
+
+**Constants Support**:
+
+- namespace: `constants`
+- path: `validation.phone`
+- message: "Invalid phone number"
+
+#### zip
+
+> Asserts that the value follows an zip-code pattern
+
+**Constants Support**:
+
+- namespace: `constants`
+- path: `validation.zip`
+- message: "Invalid zip code"
+
+---
+
+## Data Types
+
+#### BooleanType
+
+> A true or false value.
+
+- **validations**: `oneOf([true, false])`
+
+#### IntegerType
+
+> An integer value
+
+- **validations**: `integer`
+- **format**: `integer`
+
+#### IntegerPosType
+
+> An integer value greater than 0
+
+- **validations**: `integer`, `min(1)`
+- **format**: `integer`
+
+#### StringType
+
+> A string value
+
+- **validations**: `string`
+
+#### CollectionType
+
+> An array of items
+
+- **validations**: `collection`
+
+#### DateType
+
+> A value representing a date
+
+- **format**: `date`
+
+#### PhoneType
+
+> A value representing a phone number
+
+- **validations**: `phone`
+- **format**: `phone` (`(###) ###-####`)

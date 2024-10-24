@@ -1,0 +1,109 @@
+---
+title: Player + Storybook Integration
+---
+
+import Image from "../../../components/Image.astro";
+import eventsAddonGif from "../../../assets/tools/storybook/events-addon.gif";
+import flowAddonGif from "../../../assets/tools/storybook/flow-addon.gif";
+import docsAddonGif from "../../../assets/tools/storybook/docs-addon.gif";
+import flowResetGif from "../../../assets/tools/storybook/flow-reset.gif";
+
+## Reference Assets
+
+The reference asset set, complete with the storybook-plugin integration below is available [here](/storybook-demo)
+
+## Storybook Plugin
+
+The `@player-ui/storybook` package is a storybook addon + wrapper that provides easy-to-use mechanisms for integrating Player flows into storybook.
+
+### Installation
+
+There are a few different parts required to integrate with storybook.
+
+Start by installing `@player-ui/storybook`:
+
+```bash
+yarn add @player-ui/storybook
+```
+
+Next, add `@player-ui/storybook` to the `addons` section in `.storybook/main.js`
+
+```js
+module.exports = {
+  addons: ["@player-ui/storybook"],
+};
+```
+
+In `.storybook/preview.js` add the `PlayerDecorator`:
+
+```jsx
+import { PlayerDecorator } from "@player-ui/storybook";
+
+export const decorators = [PlayerDecorator];
+```
+
+Lastly use the `PlayerStory` component to render a flow:
+
+```jsx
+import { PlayerStory } from "@player-ui/storybook";
+
+export const MyStory = <PlayerStory flow={initialFlow} />;
+```
+
+The `reactPlayerPlugins` story parameter allows you to add any custom plugins (like asset providers) to a story. This can also be set in the `.storybook/preview.js` file as a global option:
+
+```js
+import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin-react";
+
+export const parameters = {
+  reactPlayerPlugins: [new ReferenceAssetsPlugin()],
+};
+```
+
+### Panels
+
+#### Events
+
+The events panel addon shows a timeline of events as the flow is processed. Here you will see logs, render/update metrics, data mutations, and more.
+
+<Image alt="Events Addon Panel" src={eventsAddonGif} />
+
+#### Flow
+
+The flow panel addon enables users to view and edit the JSON content in the running Player.
+
+<Image alt="Flow Addon Panel" src={flowAddonGif} />
+
+#### Asset Docs
+
+The asset docs panel will show the data-types for the configured Assets.
+
+<Image alt="Docs Addon Panel" src={docsAddonGif} />
+
+In order to configure the panel to show specific asset documentation, first include the `assetXLRSources` as a parameter in your `preview.js`:
+
+```ts
+import RefXLR from "@player-ui/reference-assets-plugin/dist/xlr/manifest.js";
+
+export const parameters = {
+  assetXLRSources: [RefXLR],
+};
+```
+
+then use the `assetDocs` parameter in each story to set the asset types to render:
+
+```ts
+const meta: Meta<typeof Action> = {
+  title: "Reference Assets/Action",
+  component: Action,
+  parameters: {
+    assetDocs: ["ActionAsset"],
+  },
+};
+```
+
+#### Reset
+
+The reset button in the toolbar will reset the running Player with the initial content. This is useful for clearing any data or validation state, or for resetting a completed flow.
+
+<Image alt="Flow Reset Button" src={flowResetGif} />

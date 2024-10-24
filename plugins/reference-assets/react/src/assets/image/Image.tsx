@@ -6,10 +6,14 @@ export const Image = (props: TransformedImage) => {
   const { metaData, caption, altText } = props;
 
   return (
-    <figure className="figure">
-      <img className="figure-img img-fluid" src={metaData.ref} alt={altText} />
+    <figure className="player-figure">
+      <img
+        className="player-figure-img player-img-fluid"
+        src={metaData.ref}
+        alt={altText}
+      />
       {caption && (
-        <figcaption className="figure-caption" style={{ marginTop: 15 }}>
+        <figcaption className="player-figure-caption" style={{ marginTop: 15 }}>
           <ReactAsset {...caption} />
         </figcaption>
       )}

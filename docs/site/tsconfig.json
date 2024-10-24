@@ -1,16 +1,3 @@
 {
-  "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "module": "esnext",
-    "emitDeclarationOnly": false
-  },
-  "include": [
-    "components",
-    "components/**/*.json",
-    "config",
-    "config/**/*.json",
-    "public",
-    "pages",
-    "plugins"
-  ]
+  "extends": "astro/tsconfigs/strict"
 }

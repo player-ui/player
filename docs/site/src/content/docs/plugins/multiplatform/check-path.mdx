@@ -1,0 +1,230 @@
+---
+title: Check Path Plugin
+---
+
+import PlatformTabs from "../../../../components/PlatformTabs.astro";
+
+The Check Path Plugin enables users to query segments of the view tree for contextual rendering or behavior.
+This is best suited to be referenced during the UI rendering phase, where one can make decisions about the rendering of an asset based on where it lies in the tree.
+
+## Usage
+
+<PlatformTabs>
+  <Fragment slot='core'>
+
+Install the plugin:
+
+```bash
+yarn add @player-ui/check-path-plugin
+```
+
+Add it to Player:
+
+```js
+import CheckPathPlugin from "@player-ui/check-path-plugin";
+
+const checkPathPlugin = new CheckPathPlugin();
+const player = new Player({ plugins: [checkPathPlugin] });
+
+// Start your flow
+player.start(myFlow);
+```
+
+Then use the plugin to query the view:
+
+```js
+const isCustomThing = checkPathPlugin.hasParentContext("my-asset-id", [
+  "input",
+  "myCustomViewType",
+]);
+```
+
+  </Fragment>
+  <Fragment slot='react'>
+
+Install the plugin:
+
+```bash
+yarn add @player-ui/check-path-plugin-react
+```
+
+6474792156
+Add it to Player:
+
+```js
+import { ReactPlayer } from "@player-ui/react";
+import { CheckPathPlugin } from "@player-ui/check-path-plugin-react";
+
+const rp = new ReactPlayer({
+  plugins: [new CheckPathPlugin()],
+});
+```
+
+This will automatically create the underlying _core_ version of the `CheckPathPlugin` to be made available via `React` Context for the hooks.
+
+  </Fragment>
+
+<Fragment slot='ios'>
+
+### CocoaPods
+
+Add the subspec to your `Podfile`
+
+```ruby
+pod 'PlayerUI/SwiftUICheckPathPlugin'
+```
+
+### Swift Usage
+
+This plugin takes no parameters, and the configuration comes from content, it can just be added to the plugin array:
+
+```swift
+var body: some View {
+    SwiftUIPlayer(
+        flow: flow,
+        plugins: [
+          SwiftUICheckPathPlugin()
+        ],
+        result: $resultBinding
+    )
+}
+```
+
+</Fragment>
+
+  <Fragment slot='android'>
+In build.gradle
+
+```kotlin
+implementation "com.intuit.playerui.plugins:check-path:$PLAYER_VERSION"
+```
+
+In Player constructor
+
+```kotlin
+import com.intuit.playerui.plugins.checkpath.CheckPathPlugin
+
+val plugins = listOf(CheckPathPlugin())
+AndroidPlayer(plugins)
+```
+
+  </Fragment>
+
+</PlatformTabs>
+
+## API
+
+<PlatformTabs>
+  <Fragment slot='core'>
+
+### Query
+
+In most of the methods, the `Query` type is referenced.
+This can either be a `function`, `string`, or an `object`.
+
+- `string` - an alias for `{ type: '<string>' }`
+- `object` - uses a partial-object match to query the object
+- `function` - a filter that gets passed an object, and returns a boolean
+
+There are a few different functions exposed by the plugin you can use:
+
+### getParent
+
+```ts
+function getParent(id: string, query: Query | Query[]): Asset | undefined;
+```
+
+The `getParent` method allows you to query up the tree, and return the first parent that matches the given query, or `undefined`.
+If an array is passed, the tree is parsed matching on each query item from left to right. The parent object that matches the last query item is returned.
+
+---
+
+### getParentProp
+
+```ts
+function getParentProp(id: string): string | undefined;
+```
+
+The `getParentProp` method returns the property on the parent object that the current object falls under.
+For example, an `input` with a `text` asset as the label, will return `label` for the parentProp of the `text` asset.
+
+---
+
+### hasParentContext
+
+```ts
+function hasParentContext(id: string, query: Query | Query[]): boolean;
+```
+
+Similar to `getParent`, the `hasParentContext` method responds with the _existence_ of a parent with the given context.
+
+---
+
+### hasChildContext
+
+```ts
+function hasChildContext(id: string, query: Query | Query[]): boolean;
+```
+
+The compliment of `hasParentContext`, `hasChildContext` traverses _down_ the tree for _any_ path from the given node that satisfies the context requirements.
+
+  </Fragment>
+  <Fragment slot='react'>
+
+The API for the `React` version of the `CheckPathPlugin` is similar to the _core_ version, just exposed through `React` hooks for easy use in custom assets:
+
+```ts
+function useGetParent(id: string, query: Query | Query[]): Asset | undefined;
+function useGetParentProp(id: string): string | undefined;
+function useHasParentContext(id: string, query: Query | Query[]): boolean;
+function useHasChildContext(id: string, query: Query | Query[]): boolean;
+```
+
+## Example
+
+```tsx
+import { useHasParentContext } from "@player-ui/check-path-plugin-react";
+
+export const MyAsset = ({ id }) => {
+  // If the asset is rendered within a form, render as a select instead of a radio button
+  const isInForm = useHasParentContext(id, "form");
+  return isInForm ? <Select /> : <RadioGroup />;
+};
+```
+
+  </Fragment>
+  <Fragment slot='ios'>
+
+### Swift Usage
+
+The SwiftUICheckPathPlugin attaches the `BaseCheckPathPlugin` named `checkPath` to the root of the SwiftUI view tree as an environment value, so when included any asset can use that environment value to access the base functionality
+
+```swift
+
+struct MyAsset: View {
+    @ObservedObject var viewModel: AssetViewModel<AssetData>
+    @Environment(\.checkPath) var checkPath
+
+    var body: some View {
+       let isInForm = checkPath?.hasParentContext(id: viewModal.data.id, query: "form")
+       if isInForm {
+         SelectChoice()
+       } else {
+         RadioGroup()
+    }
+}
+
+```
+
+</Fragment>
+
+  <Fragment slot='android'>
+
+The JVM CheckPathPlugin API contains partial functionality in comparison to the core plugin, ideally this should not be used, and all logic where pathing is concerned should be handled in transforms
+If the situation arises and this plugin is absolutely necessary, the API from the following source are available at the moment. This is subject to change in future releases:
+
+[CheckPathPlugin](https://github.com/player-ui/player/blob/main/plugins/check-path/jvm/src/main/kotlin/com/intuit/playerui/plugins/checkpath/CheckPathPlugin.kt)
+
+  </Fragment>
+
+</PlatformTabs>
