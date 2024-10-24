@@ -25,6 +25,7 @@ import {
   useCompiledEditorValue,
   useInitialJsonEditorValue,
   useJSONEditorValue,
+  usePlayerStoryControls,
 } from "../redux";
 import { useFlowSetListener } from "./useFlowSet";
 
@@ -75,6 +76,8 @@ const PlayerJsonEditorStory = () => {
 
   const { plugins } = React.useContext(ReactPlayerPluginContext);
 
+  const controlsData = usePlayerStoryControls();
+
   const dispatch = useDispatch();
 
   const [playerState, setPlayerState] =
@@ -89,10 +92,25 @@ const PlayerJsonEditorStory = () => {
         setTrackedBeacons((t) => [...t, beacon]);
       },
     });
+
     return new ReactPlayer({
       plugins: [new StorybookPlayerPlugin(dispatch), beaconPlugin, ...plugins],
     });
   }, [dispatch, plugins]);
+
+  React.useEffect(() => {
+    const playerState = wp.player.getState();
+
+    console.log("Updating Player");
+
+    if (playerState.status !== "in-progress" || !controlsData) {
+      return;
+    }
+
+    playerState.controllers.data.set(controlsData.data, {
+      silent: false,
+    });
+  }, [wp, controlsData]);
 
   /** A callback to start the flow */
   const startFlow = () => {
@@ -281,6 +299,8 @@ export const DSLLocalPlayerStory = (
   props: Omit<PlayerStoryProps, "flow"> & {
     /** Initial state of the dsl content */
     dslContent: string;
+
+    controlsContent?: () => Promise<Flow>;
   },
 ) => {
   const dslContext = React.useContext(DSLPluginContext);
@@ -289,6 +309,8 @@ export const DSLLocalPlayerStory = (
   useCompiledEditorValue(props.dslContent, {
     additionalModules: dslContext?.additionalModules,
   });
+
+  usePlayerStoryControls(props.controlsContent);
 
   return <PlayerJsonEditorStory />;
 };
@@ -334,6 +356,8 @@ export const DSLPlayerStory = (
           default: string;
         }
     >;
+
+    controlsContent?: () => Promise<Flow>;
   },
 ) => {
   const { dslContent, ...other } = props;
