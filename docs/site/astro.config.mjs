@@ -121,6 +121,11 @@ export default defineConfig({
     }),
   ],
   base: BASE_PREFIX,
+  vite: {
+    ssr: {
+      noExternal: ["@astrojs/react"],
+    },
+  },
   markdown: {
     rehypePlugins: [[rehypeMermaid, { strategy: "img-svg", dark: true }]],
   },
