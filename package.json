@@ -46,6 +46,7 @@
     "@storybook/builder-vite": "^7.6.10",
     "@storybook/channels": "^7.6.10",
     "@storybook/components": "^7.6.10",
+    "@storybook/blocks": "^7.6.10",
     "@storybook/core-events": "^7.6.10",
     "@storybook/manager": "^7.6.10",
     "@storybook/manager-api": "^7.6.10",

@@ -1,12 +1,9 @@
 import React from "react";
-import { Action } from "@player-ui/reference-assets-plugin-components";
+import { Action, Input } from "@player-ui/reference-assets-plugin-components";
 import type { DSLFlow } from "@player-tools/dsl";
 import { expression as e, makeBindingsForObject } from "@player-tools/dsl";
 
-const schema = {
-  count: {
-    type: "NumberType",
-  },
+export const baseSchema = {
   controls: {
     actionLabel: {
       type: "StringType",
@@ -14,26 +11,23 @@ const schema = {
   },
 };
 
-const data = makeBindingsForObject(schema);
+const data = makeBindingsForObject(baseSchema);
 
 const view1 = (
-  <Action exp={e`${data.count} = ${data.count} + 1`}>
-    <Action.Label>
-      {data.controls.actionLabel}: {data.count}
-    </Action.Label>
-  </Action>
+  <Input binding={data.controls.actionLabel}>
+    <Input.Label>Action Label</Input.Label>
+  </Input>
 );
 
 const flow: DSLFlow = {
-  id: "action-basic",
+  id: "action-basic-controls",
   views: [view1],
   data: {
-    count: 0,
     controls: {
       actionLabel: "Count",
     },
   },
-  schema,
+  schema: baseSchema,
   navigation: {
     BEGIN: "FLOW_1",
     FLOW_1: {

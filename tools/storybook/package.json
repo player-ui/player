@@ -25,6 +25,8 @@
     "@player-ui/beacon-plugin-react": "workspace:*",
     "@player-ui/make-flow": "workspace:*",
     "@player-ui/react": "workspace:*",
-    "@player-ui/metrics-plugin-react": "workspace:*"
+    "@player-ui/metrics-plugin-react": "workspace:*",
+    "@player-ui/asset-provider-plugin-react": "workspace:*",
+    "@player-ui/reference-assets-plugin": "workspace:*"
   }
 }

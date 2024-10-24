@@ -102,6 +102,9 @@ importers:
       '@storybook/addon-webpack5-compiler-babel':
         specifier: ^3.0.3
         version: 3.0.3(webpack@5.91.0(@swc/core@1.5.7(@swc/helpers@0.5.2))(esbuild@0.19.8)(webpack-cli@5.1.4))
+      '@storybook/blocks':
+        specifier: ^7.6.10
+        version: 7.6.19(@types/react-dom@18.3.0)(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@storybook/builder-vite':
         specifier: ^7.6.10
         version: 7.6.19(typescript@5.5.3)(vite@4.5.3(@types/node@18.19.33)(terser@5.31.0))
@@ -1010,6 +1013,9 @@ importers:
 
   tools/storybook:
     dependencies:
+      '@player-ui/asset-provider-plugin-react':
+        specifier: workspace:*
+        version: link:../../plugins/asset-provider/react
       '@player-ui/beacon-plugin-react':
         specifier: workspace:*
         version: link:../../plugins/beacon/react
@@ -1022,6 +1028,9 @@ importers:
       '@player-ui/react':
         specifier: workspace:*
         version: link:../../react/player
+      '@player-ui/reference-assets-plugin':
+        specifier: workspace:*
+        version: link:../../plugins/reference-assets/core
 
 packages:
 

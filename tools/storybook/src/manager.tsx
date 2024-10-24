@@ -16,6 +16,7 @@ import { DocsPanel } from "./addons/docs";
 import { FlowRefresh } from "./addons/refresh";
 import { RenderSelection } from "./addons/appetize";
 import { StateProvider } from "./redux";
+import { ControlsPanel } from "./addons/controls";
 
 export const register = () => {
   addons.register(ADDON_ID, (api) => {
@@ -48,6 +49,17 @@ export const register = () => {
       render: ({ active }) => (
         <StateProvider>
           <EditorPanel api={api} active={Boolean(active)} />
+        </StateProvider>
+      ),
+    });
+
+    addons.add("test-123", {
+      type: Addon_TypesEnum.PANEL,
+      title: "Controls",
+      match: ({ viewMode }) => viewMode === "story",
+      render: ({ active }) => (
+        <StateProvider>
+          <ControlsPanel api={api} active={Boolean(active)} />
         </StateProvider>
       ),
     });

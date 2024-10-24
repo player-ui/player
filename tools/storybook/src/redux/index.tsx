@@ -129,6 +129,12 @@ export const setCompilationErrors = createAction<CompilationErrorType>(
   "setCompilationErrors",
 );
 
+export const clearControlFlow = createAction("@@player/controls/clear");
+export const setControlFlow = createAction<Flow>("@@player/controls/set");
+export const setControlData = createAction<Record<string, any>>(
+  "@@player/controls/data/set",
+);
+
 const flowEditorReducer = createReducer<{
   /** The primary content type for the editor */
   contentType?: "json" | "dsl";
@@ -145,6 +151,11 @@ const flowEditorReducer = createReducer<{
         /** The value of the editor */
         value: Flow;
       };
+
+  controls?: {
+    flow: Flow;
+    data: Record<string, any>;
+  };
 
   /** The state of the DSL portion of the editor */
   dsl?:
@@ -167,9 +178,25 @@ const flowEditorReducer = createReducer<{
   {
     json: { state: "initial" },
     dsl: { state: "initial" },
+    controls: undefined,
     contentType: undefined,
   },
   (builder) => {
+    builder.addCase(clearControlFlow, (state, action) => {
+      state.controls = undefined;
+    });
+
+    builder.addCase(setControlFlow, (state, action) => {
+      state.controls = {
+        flow: action.payload,
+        data: action.payload.data ?? {},
+      };
+    });
+
+    builder.addCase(setControlData, (state, action) => {
+      state.controls.data = action.payload ?? {};
+    });
+
     builder.addCase(setEditorContentType, (state, action) => {
       state.contentType = action.payload.contentType;
 
@@ -200,6 +227,10 @@ const flowEditorReducer = createReducer<{
     builder.addCase(resetEditor, (state) => {
       state.json = { state: "initial" };
       state.dsl = { state: "initial" };
+      state.controls = {
+        flow: state.controls.flow,
+        data: state.controls.flow.data,
+      };
     });
 
     builder.addCase(updateAndCompileDSLFlow.rejected, (state) => {
@@ -383,5 +414,23 @@ export const useInitialJsonEditorValue = (initialValue: Flow) => {
 
   return jsonEditorValue;
 };
+
+export function usePlayerStoryControls(controlsContent?: () => Promise<Flow>) {
+  const dispatch = useDispatch();
+
+  const savedControlFlow = useSelector((s: StateType) => {
+    return s.editor.controls;
+  });
+
+  React.useEffect(() => {
+    if (!savedControlFlow && controlsContent) {
+      controlsContent().then((loaded) => {
+        dispatch(setControlFlow(loaded));
+      });
+    }
+  }, [savedControlFlow, controlsContent]);
+
+  return savedControlFlow;
+}
 
 export type StateType = ReturnType<typeof store.getState>;

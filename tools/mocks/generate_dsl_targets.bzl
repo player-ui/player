@@ -10,7 +10,9 @@ def generate_all_dsl_mocks(MOCK_DIRS):
             input_dir = mock_dir,
             output_dir = mock_dir,
             config = ":dsl_config",
-            data = [
+            data = native.glob([
+                mock_dir + "/*.ts",
+            ]) + [
                 ":node_modules/@player-ui/reference-assets-cli-preset",
                 ":node_modules/@player-ui/reference-assets-plugin-components",
                 "//:node_modules/@player-tools/dsl",
