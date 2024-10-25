@@ -21,7 +21,7 @@ Install the plugin:
 Add it to Player:
 
 ```js
-import CommonTypesPlugin from "@player-ui/common-types-plugin";
+import { CommonTypesPlugin } from '@player-ui/common-types-plugin';
 
 const commonTypesPlugin = new CommonTypesPlugin();
 const player = new Player({ plugins: [commonTypesPlugin] });
@@ -134,7 +134,6 @@ Options:
 > Asserts that a value is not `null`, `undefined`, or an empty string
 
 Options:
-
 ```ts
 {
   /** An expression to limit the assertion only if the expression evaluates to truthy **/
@@ -220,7 +219,6 @@ Options:
 > Asserts that the value is one of the pre-defined accepted values
 
 Options:
-
 ```ts
 {
   options?: Array;
