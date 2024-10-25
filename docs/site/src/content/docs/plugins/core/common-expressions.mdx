@@ -1,0 +1,230 @@
+---
+title: Common Expressions
+---
+
+import PlatformTabs from "../../../../components/PlatformTabs.astro";
+import { PackageManagers } from 'starlight-package-managers'
+
+This plugin exposes some basic expressions into Player content.
+
+It also serves as a good reference to adding your own custom expressions into Player.
+
+## Usage
+
+<PlatformTabs>
+  <Fragment slot='core'>
+
+Install the plugin:
+
+<PackageManagers pkg="@player-ui/common-expressions-plugin" />
+
+Add it to Player:
+
+```js
+import { CommonExpressionsPlugin } from '@player-ui/common-expressions-plugin';
+
+const commonExpressionsPlugin = new CommonExpressionsPlugin();
+const player = new Player({ plugins: [commonExpressionsPlugin] });
+
+// Start your flow
+player.start(myFlow);
+```
+
+This will allow any included expressions or custom expressions to be used in the content
+
+  </Fragment>
+
+<Fragment slot='ios'>
+
+### CocoaPods
+
+Add the subspec to your `Podfile`
+
+```ruby
+
+pod 'PlayerUI/CommonExpressionsPlugin'
+
+```
+
+### Swift Usage
+
+This plugin takes no parameters, and the configuration comes from content, it can just be added to the plugin array:
+
+```swift
+
+var body: some View {
+    SwiftUIPlayer(
+        flow: flow,
+        plugins: [
+          CommonExpressionsPlugin()
+        ],
+        result: $resultBinding
+    )
+}
+```
+
+</Fragment>
+
+</PlatformTabs>
+
+---
+
+## General
+
+#### size
+
+> Gets the size of a value. This is the number of keys in an object, the length of a string, or the number of items in an array.
+
+```ts
+function size(value: string | array | object): number;
+```
+
+#### length
+
+> Alias for `size`
+
+#### concat
+
+> Concatenates arrays together, or strings into 1 value
+
+```ts
+function concat(...values: Array): Array;
+```
+
+---
+
+## Strings
+
+#### trim
+
+> Trims whitespace from the leading and trailing edges of a string
+
+```ts
+function trim(value: string): string;
+```
+
+#### upperCase
+
+> Transforms the string to all uppercase.
+
+```ts
+function upperCase(value: string): string;
+```
+
+#### lowerCase
+
+> Transforms the string to all lowercase.
+
+```ts
+function lowerCase(value: string): string;
+```
+
+#### titleCase
+
+> Transforms the string to title case. Each word is capitalized.
+
+```ts
+function titleCase(value: string): string;
+```
+
+#### sentenceCase
+
+> Transforms the string to sentence case. The first word is capitalized.
+
+```ts
+function sentenceCase(value: string): string;
+```
+
+#### replace
+
+> Replaces all instances of pattern in string with replacement. The pattern can also be a regex.
+
+```ts
+function replace(
+  value: string,
+  pattern: string | RegExp,
+  replacement: string,
+): string;
+```
+
+#### containsAny
+
+> Checks if a given string contains any keywords present in the given array.
+
+```ts
+function containsAny(value: string, keywords: Array<string>): boolean;
+```
+
+---
+
+## Math
+
+#### number
+
+> Converts the given value to a number if possible. Will handle removing currency modifiers and comma delimitated values.
+
+```ts
+function number(value: string): number | undefined;
+```
+
+#### round
+
+> Rounds the given number to the nearest integer.
+
+```ts
+function round(value: number): number;
+```
+
+#### floor
+
+> Rounds the number down the the nearest integer
+
+```ts
+function floor(value: number): number;
+```
+
+#### ceil
+
+> Rounds the number up the the nearest integer
+
+```ts
+function ceil(value: number): number;
+```
+
+#### sum
+
+> Sums up all arguments
+
+```ts
+function sum(...values: Array<number>): number;
+```
+
+---
+
+## Objects/Arrays
+
+### findPropertyIndex
+
+> Finds the index of the item in the given array (or array reference). Returns -1 for indexes that aren't found
+
+```ts
+function findPropertyIndex(
+  binding: Binding | Array,
+  searchProperty: string,
+  searchValue: any,
+): number;
+```
+
+### findProperty
+
+> Finds the item in the given array that matches the search criteria. Optionally return a specific property or a fallback value if not found
+
+```ts
+function findPropertyIndex(
+  binding: Binding | Array,
+  searchProperty: string,
+  searchValue: any,
+  fallBackProperty?: string,
+  fallBackValue?: T,
+): T;
+```

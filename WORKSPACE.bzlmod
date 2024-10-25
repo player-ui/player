@@ -39,6 +39,7 @@ git_repository(
 git_repository(
     name = "fbjni",
     build_file = "//third_party/fbjni:BUILD",
+    # this is not the same release as the fbjni AAR due to this change breaking exception handling in C++ https://github.com/facebookincubator/fbjni/commit/cd6e61a96129bdf70dc1e3c967c5ec29f4d4eeb1
     commit = "1cf763714e99d45c23dfb316d702ebfa8290af64",
     patches = ["//patches:fbjni.install_headers.patch"],
     remote = "https://github.com/facebookincubator/fbjni",
@@ -65,5 +66,5 @@ git_repository(
 http_archive(
     name = "fbjni_artifact",
     build_file = "//third_party/fbjni:artifact.BUILD",
-    url = "https://repo1.maven.org/maven2/com/facebook/fbjni/fbjni/0.6.0/fbjni-0.6.0.aar",
+    url = "https://repo1.maven.org/maven2/com/facebook/fbjni/fbjni/0.7.0/fbjni-0.7.0.aar",
 )

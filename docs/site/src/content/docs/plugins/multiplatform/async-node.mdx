@@ -1,0 +1,220 @@
+---
+title: AsyncNode Plugin
+---
+
+import PlatformTabs from "../../../../components/PlatformTabs.astro";
+
+The AsyncNode Plugin is used to enable streaming additional content into a flow that has already been loaded and rendered.  
+A common use case for this plugin is conversational UI, as the users input more dialogue, new content must be streamed into Player in order to keep the UI up to date.
+
+The pillar that makes this possible is the concept of an `AsyncNode`. An `AsyncNode` is any tree node with the property `async: true`, it represents a placeholder node that will be replaced by a concrete node in the future.
+
+In the example below, node with the id "some-async-node" will not be rendered on first render, but will be replaced with a UI asset node at a later time:
+
+```json
+{
+  "id": "flow-1",
+    "views": [
+      {
+        "id": 'action',
+        "actions": [
+          {
+            "id": "some-async-node",
+            "async": true,
+          },
+        ],
+      },
+    ],
+  ...
+}
+```
+
+The `AsyncNodePlugin` exposes an `onAsyncNode` hook on all platforms. The `onAsyncNode` hook will be invoked with the current node when the plugin is available and an `AsyncNode` is detected during the resolve process. The node used to call the hook with could contain metadata according to content spec.
+
+User should tap into the `onAsyncNode` hook to examine the node's metadata before making a decision on what to replace the async node with. The return could be a single asset node or an array of asset nodes, or the return could be even a null|undefined if the async node is no longer relevant.
+
+Returning a value in the above context enables uses cases where the async node only needs to be resolved once. For use cases where the async node needs to be updated multiple times, the onAsyncNode hook provides a second callback argument that can be used to update the value multiple times. For example, if the async node is used to represent some placeholder for toasts, or notifications, the async node handler could initially resolve with some content, and then update with null after some time to remove those views.
+
+### Continuous Streaming
+
+In order to keep streaming in new content, there must be at least 1 or more `AsyncNode`s in the view tree at all times.  
+This means there must be a constant renewal of new `AsyncNode`s after the previous ones are resolved by the user.
+
+## Usage
+
+The `AsyncNodePlugin` itself accepts an options object with a `plugins` array, enabling the integration of multiple view plugins for extended functionality.
+The `AsyncNodePluginPlugin` is provided as a default way of handling asset-async nodes, it is just one handler for one possible way of using async nodes. If the default behavior does not align with the desired usage, users are able to provide their own implementation of the handler in the form of a plugin to be passed to the base `AsyncNodePlugin`. The `AsyncNodePluginPlugin` also comes from the `'@player-ui/async-node-plugin'` and contains the resolver and parser functionality.
+
+<PlatformTabs>
+  <Fragment slot='core'>
+
+Add the plugin to Player:
+
+```js
+import { Player } from '@player-ui/player';
+import { AsyncNodePlugin, AsyncNodePluginPlugin } from '@player-ui/async-node-plugin';
+
+const asyncNodePlugin = new AsyncNodePlugin({
+    plugins: [new AsyncNodePluginPlugin()],
+});
+
+// Configuring async node behaviour
+asyncNodePlugin.hooks.onAsyncNode.tap('handleAsync', async (node: Node.Node) => {
+  ...
+  // Determine what to return to be parsed into a concrete UI asset
+});
+
+// For use cases where the async node needs to be updated multiple times
+
+asyncNodePlugin.hooks.onAsyncNode.tap("toast-provider", async (node: Node.Async, update: (content) => void) => {
+    ...
+  // do some async task to get content
+  const toastContent = await makeToastFor(node.id);
+  // set timer for 5 seconds to remove the toast content from the view
+  setTimeout(() => update(null), 5000);
+  // uses same mechanism as before
+  return toastContent;
+});
+
+const player = new Player({
+  plugins: [
+    asyncNodePlugin
+  ]
+})
+```
+
+  </Fragment>
+  <Fragment slot='react'>
+
+The `react` version of the AsyncNodePlugin is identical to using the core plugin. Refer to core usage for handler configuration:
+
+```js
+import { ReactPlayer } from "@player-ui/react";
+import {
+  AsyncNodePlugin,
+  AsyncNodePluginPlugin,
+} from "@player-ui/async-node-plugin";
+
+const asyncNodePlugin = new AsyncNodePlugin({
+  plugins: [new AsyncNodePluginPlugin()],
+});
+
+const player = new ReactPlayer({
+  plugins: [asyncNodePlugin],
+});
+```
+
+  </Fragment>
+  <Fragment slot='ios'>
+
+### CocoaPods
+
+Add the subspec to your `Podfile`
+
+```ruby
+pod 'PlayerUI/AsyncNodePlugin'
+```
+
+### Swift Usage
+
+In integration code
+
+```swift
+var body: some View {
+    SwiftUIPlayer(
+        flow: flow,
+        plugins: [
+          AsyncNodePlugin(plugins: [AsyncNodePluginPlugin()]) { node in
+              // Determine what to return either using the singleNode or multiNode case
+              // Then JSON can be provided using the concrete case, see below for using the encodable case
+              return .singleNode(.concrete(jsContext?.evaluateScript("""
+                  ({"asset": {"id": "text", "type": "text", "value":"new node from the hook"}})
+                  """) ?? JSValue()))
+
+              // OR
+              return .multiNode([
+                .concrete(jsContext?.evaluateScript("""
+                  ({"asset": {"id": "text", "type": "text", "value":"1st value in the multinode"}})
+                  """) ?? JSValue()),
+                .concrete(jsContext?.evaluateScript("""
+                  ({"asset": {"id": "async-node-2", "async": "true" }})
+                  """) ?? JSValue())
+              ])
+
+          }
+        ],
+        result: $resultBinding
+    )
+}
+```
+
+The plugin also provides a default asset placeholder struct that is encodable, instead of passing in the JSON string users can use
+`AssetPlaceholderNode` which includes an `asset` key that takes any user defined Encodable struct as the value. Assuming the following encodable struct is defined:
+
+```swift
+struct PlaceholderNode: Codable, Equatable, AssetData {
+    public var id: String
+    public var type: String
+    var value: String?
+
+    public init(id: String, type: String, value: String? = nil) {
+        self.id = id
+        self.type = type
+        self.value = value
+    }
+}
+```
+
+Instead of using the JSON string above, the following can be used:
+
+```swift
+return .singleNode(.encodable(PlaceholderNode(id: "text", type: "text", value: "new node from the hook")))
+
+// OR
+
+return .multiNode([
+    ReplacementNode.encodable(PlaceholderNode(id: "text", type: "text", value: "1st value in the multinode")),
+    ReplacementNode.encodable(AsyncNode(id: "id"))])
+```
+
+Note: the AsyncNode struct is already defined in the plugin with the `async` property defaulted to true so only `id` needs to be passed in
+
+As a convenience to the user, the AsyncNodePlugin just takes a callback which has the content to be returned, this is provided to the plugin which calls the the `onAsyncNode` hook tap method. The return could be a single asset node or an array of asset nodes, or null if the async node is no longer relevant.
+
+  </Fragment>
+  <Fragment slot='android'>
+
+In build.gradle
+
+```kotlin
+implementation "com.intuit.playerui.plugins:async-node:$PLAYER_VERSION"
+```
+
+In integration code
+
+```kotlin
+import com.intuit.playerui.plugins.asyncnode.AsyncNodePlugin
+
+val asyncNodePlugin = AsyncNodePlugin(plugins: [AsyncNodePluginPlugin()])
+
+// Configuring async node behaviour
+asyncNodePlugin.hooks.onAsyncNode.tap("handleAsync") { hookContext, node ->
+    ...
+    // Determine what to return in the form of a list of maps representing UI asset to be parsed
+    // e.g.
+    // listOf(
+    //  mapOf(
+    //    "asset" to mapOf(
+    //      "id" to "asset-1",
+    //      "type" to "text",
+    //      "value" to "new asset!"
+    //    )
+    //  )
+    // )
+}
+
+AndroidPlayer(asyncNodePlugin)
+```
+
+  </Fragment>
+</PlatformTabs>

@@ -30,8 +30,16 @@ cc_library(
     ],
     copts = CMAKE_BUILD_TYPE_COPTS + select({
         # TODO: Using React Natives JSI doesn't contain microtask - come back to this if we build it ourselves
-        ":should_include_jni": ["-DJSI_MICROTASK"],
+        ":should_include_jni": [
+            "-DJSI_MICROTASK"
+        ],
         "//conditions:default": [],
+    }),
+    linkopts = select({
+        # Host build
+        ":should_include_jni": [],
+        # Android build
+        "//conditions:default": ["-Wl,-z,max-page-size=16384"],
     }),
     visibility = ["//visibility:public"],
     deps = select({
