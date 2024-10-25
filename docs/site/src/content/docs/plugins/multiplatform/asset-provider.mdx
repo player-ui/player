@@ -4,6 +4,7 @@ title: Asset Provider Plugin
 
 import PlatformTabs from "../../../../components/PlatformTabs.astro";
 import ContentTabs from "../../../../components/ContentTabs.astro";
+import { PackageManagers } from 'starlight-package-managers'
 
 The Asset Provider Plugin enables users to easily register UI components to render their assets. It's used internally by the [Reference Assets](/assets/reference). The matches follow the same rules as asset transforms (more specific matches take priority).
 
@@ -16,9 +17,7 @@ The Asset Provider Plugin enables users to easily register UI components to rend
 
 Install the plugin:
 
-```bash
-yarn add @player-ui/asset-provider-plugin-react
-```
+<PackageManagers pkg="@player-ui/asset-provider-plugin-react" />
 
 Create an instance, and add it to your Player instance.
 The API is similar to the JavaScript `Map`, and takes a list of `[match, Component]` tuples.

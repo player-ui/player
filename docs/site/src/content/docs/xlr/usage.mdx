@@ -2,13 +2,15 @@
 title: Using XLR
 ---
 
+import { PackageManagers } from 'starlight-package-managers'
+
+
 # Part 1 - Creating XLRs
 
 XLR creation is done through the Player CLI which can be added to your project like so:
 
-```bash
-yarn install @player-tools/cli
-```
+<PackageManagers pkg="@player-tools/cli" />
+
 
 ## Exporting Base Type Definitions
 
@@ -43,9 +45,7 @@ player xlr compile -m plugin <other options>
 
 To start using the XLR SDK you'll need to install the SDK package
 
-```bash
-yarn install @player-tools/xlr-sdk
-```
+<PackageManagers pkg="@player-tools/xlr-sdk" />
 
 Next, import the SDK 
 

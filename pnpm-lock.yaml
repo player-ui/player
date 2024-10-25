@@ -486,6 +486,9 @@ importers:
       source-map-js:
         specifier: ^1.0.2
         version: 1.2.0
+      starlight-package-managers:
+        specifier: ^0.7.0
+        version: 0.7.0(@astrojs/starlight@0.28.3(astro@4.16.7(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3)))(astro@4.16.7(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))
       std-mocks:
         specifier: ^1.0.1
         version: 1.0.1
@@ -546,6 +549,9 @@ importers:
       typescript:
         specifier: 5.5.3
         version: 5.5.3
+      unist-util-visit:
+        specifier: ^5.0.0
+        version: 5.0.0
       uuid:
         specifier: ^8.3.2
         version: 8.3.2
@@ -2349,12 +2355,12 @@ packages:
   '@chakra-ui/react-children-utils@2.0.6':
     resolution: {integrity: sha512-QVR2RC7QsOsbWwEnq9YduhpqSFnZGvjjGREV8ygKi8ADhXh93C8azLECCUVgRJF2Wc+So1fgxmjLcbZfY2VmBA==, tarball: https://registry.npmjs.org/@chakra-ui/react-children-utils/-/react-children-utils-2.0.6.tgz}
     peerDependencies:
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/react-context@2.1.0':
     resolution: {integrity: sha512-iahyStvzQ4AOwKwdPReLGfDesGG+vWJfEsn0X/NoGph/SkN+HXtv2sCfYFFR9k7bb+Kvc6YfpLlSuLvKMHi2+w==, tarball: https://registry.npmjs.org/@chakra-ui/react-context/-/react-context-2.1.0.tgz}
     peerDependencies:
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/react-env@3.1.0':
     resolution: {integrity: sha512-Vr96GV2LNBth3+IKzr/rq1IcnkXv+MLmwjQH6C8BRtn3sNskgDFD5vLkVXcEhagzZMCh8FR3V/bzZPojBOyNhw==, tarball: https://registry.npmjs.org/@chakra-ui/react-env/-/react-env-3.1.0.tgz}
@@ -2364,7 +2370,7 @@ packages:
   '@chakra-ui/react-types@2.0.7':
     resolution: {integrity: sha512-12zv2qIZ8EHwiytggtGvo4iLT0APris7T0qaAWqzpUGS0cdUtR8W+V1BJ5Ocq+7tA6dzQ/7+w5hmXih61TuhWQ==, tarball: https://registry.npmjs.org/@chakra-ui/react-types/-/react-types-2.0.7.tgz}
     peerDependencies:
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/react-use-animation-state@2.1.0':
     resolution: {integrity: sha512-CFZkQU3gmDBwhqy0vC1ryf90BVHxVN8cTLpSyCpdmExUEtSEInSCGMydj2fvn7QXsz/za8JNdO2xxgJwxpLMtg==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-animation-state/-/react-use-animation-state-2.1.0.tgz}
@@ -2374,12 +2380,12 @@ packages:
   '@chakra-ui/react-use-callback-ref@2.1.0':
     resolution: {integrity: sha512-efnJrBtGDa4YaxDzDE90EnKD3Vkh5a1t3w7PhnRQmsphLy3g2UieasoKTlT2Hn118TwDjIv5ZjHJW6HbzXA9wQ==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-callback-ref/-/react-use-callback-ref-2.1.0.tgz}
     peerDependencies:
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/react-use-controllable-state@2.1.0':
     resolution: {integrity: sha512-QR/8fKNokxZUs4PfxjXuwl0fj/d71WPrmLJvEpCTkHjnzu7LnYvzoe2wB867IdooQJL0G1zBxl0Dq+6W1P3jpg==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-controllable-state/-/react-use-controllable-state-2.1.0.tgz}
     peerDependencies:
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/react-use-disclosure@2.1.0':
     resolution: {integrity: sha512-Ax4pmxA9LBGMyEZJhhUZobg9C0t3qFE4jVF1tGBsrLDcdBeLR9fwOogIPY9Hf0/wqSlAryAimICbr5hkpa5GSw==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-disclosure/-/react-use-disclosure-2.1.0.tgz}
@@ -2389,7 +2395,7 @@ packages:
   '@chakra-ui/react-use-event-listener@2.1.0':
     resolution: {integrity: sha512-U5greryDLS8ISP69DKDsYcsXRtAdnTQT+jjIlRYZ49K/XhUR/AqVZCK5BkR1spTDmO9H8SPhgeNKI70ODuDU/Q==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-event-listener/-/react-use-event-listener-2.1.0.tgz}
     peerDependencies:
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/react-use-focus-effect@2.1.0':
     resolution: {integrity: sha512-xzVboNy7J64xveLcxTIJ3jv+lUJKDwRM7Szwn9tNzUIPD94O3qwjV7DDCUzN2490nSYDF4OBMt/wuDBtaR3kUQ==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-focus-effect/-/react-use-focus-effect-2.1.0.tgz}
@@ -2399,7 +2405,7 @@ packages:
   '@chakra-ui/react-use-focus-on-pointer-down@2.1.0':
     resolution: {integrity: sha512-2jzrUZ+aiCG/cfanrolsnSMDykCAbv9EK/4iUyZno6BYb3vziucmvgKuoXbMPAzWNtwUwtuMhkby8rc61Ue+Lg==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-focus-on-pointer-down/-/react-use-focus-on-pointer-down-2.1.0.tgz}
     peerDependencies:
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/react-use-interval@2.1.0':
     resolution: {integrity: sha512-8iWj+I/+A0J08pgEXP1J1flcvhLBHkk0ln7ZvGIyXiEyM6XagOTJpwNhiu+Bmk59t3HoV/VyvyJTa+44sEApuw==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-interval/-/react-use-interval-2.1.0.tgz}
@@ -2414,7 +2420,7 @@ packages:
   '@chakra-ui/react-use-merge-refs@2.1.0':
     resolution: {integrity: sha512-lERa6AWF1cjEtWSGjxWTaSMvneccnAVH4V4ozh8SYiN9fSPZLlSG3kNxfNzdFvMEhM7dnP60vynF7WjGdTgQbQ==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-merge-refs/-/react-use-merge-refs-2.1.0.tgz}
     peerDependencies:
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/react-use-outside-click@2.2.0':
     resolution: {integrity: sha512-PNX+s/JEaMneijbgAM4iFL+f3m1ga9+6QK0E5Yh4s8KZJQ/bLwZzdhMz8J/+mL+XEXQ5J0N8ivZN28B82N1kNw==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-outside-click/-/react-use-outside-click-2.2.0.tgz}
@@ -2434,7 +2440,7 @@ packages:
   '@chakra-ui/react-use-safe-layout-effect@2.1.0':
     resolution: {integrity: sha512-Knbrrx/bcPwVS1TorFdzrK/zWA8yuU/eaXDkNj24IrKoRlQrSBFarcgAEzlCHtzuhufP3OULPkELTzz91b0tCw==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-safe-layout-effect/-/react-use-safe-layout-effect-2.1.0.tgz}
     peerDependencies:
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/react-use-size@2.1.0':
     resolution: {integrity: sha512-tbLqrQhbnqOjzTaMlYytp7wY8BW1JpL78iG7Ru1DlV4EWGiAmXFGvtnEt9HftU0NJ0aJyjgymkxfVGI55/1Z4A==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-size/-/react-use-size-2.1.0.tgz}
@@ -2449,7 +2455,7 @@ packages:
   '@chakra-ui/react-use-update-effect@2.1.0':
     resolution: {integrity: sha512-ND4Q23tETaR2Qd3zwCKYOOS1dfssojPLJMLvUtUbW5M9uW1ejYWgGUobeAiOVfSplownG8QYMmHTP86p/v0lbA==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-update-effect/-/react-use-update-effect-2.1.0.tgz}
     peerDependencies:
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/react-utils@2.0.12':
     resolution: {integrity: sha512-GbSfVb283+YA3kA8w8xWmzbjNWk14uhNpntnipHCftBibl0lxtQ9YqMFQLwuFOO0U2gYVocszqqDWX+XNKq9hw==, tarball: https://registry.npmjs.org/@chakra-ui/react-utils/-/react-utils-2.0.12.tgz}
@@ -2462,8 +2468,8 @@ packages:
       '@emotion/react': ^11.0.0
       '@emotion/styled': ^11.0.0
       framer-motion: '>=4.0.0'
-      react: '>=18'
-      react-dom: '>=18'
+      react: ^18.2.0
+      react-dom: ^18.2.0
 
   '@chakra-ui/select@2.1.2':
     resolution: {integrity: sha512-ZwCb7LqKCVLJhru3DXvKXpZ7Pbu1TDZ7N0PdQ0Zj1oyVLJyrpef1u9HR5u0amOpqcH++Ugt0f5JSmirjNlctjA==, tarball: https://registry.npmjs.org/@chakra-ui/select/-/select-2.1.2.tgz}
@@ -2525,7 +2531,7 @@ packages:
     peerDependencies:
       '@emotion/react': ^11.0.0
       '@emotion/styled': ^11.0.0
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/table@2.1.0':
     resolution: {integrity: sha512-o5OrjoHCh5uCLdiUb0Oc0vq9rIAeHSIRScc2ExTC9Qg/uVZl2ygLrjToCaKfaaKl1oQexIeAcZDKvPG8tVkHyQ==, tarball: https://registry.npmjs.org/@chakra-ui/table/-/table-2.1.0.tgz}
@@ -2611,8 +2617,8 @@ packages:
     resolution: {integrity: sha512-Y/d2Zzr+JJfN6u1gbuBUb1ufBuLMJJRZQk+dRmw8GaTpqKx5uf7cGUYGTwN02dIb3I+Tf+cW8jcGBTRiFxdYFg==, tarball: https://registry.npmjs.org/@design-systems/utils/-/utils-2.12.0.tgz}
     peerDependencies:
       '@types/react': '*'
-      react: '>= 16.8.6'
-      react-dom: '>= 16.8.6'
+      react: ^18.2.0
+      react-dom: ^18.2.0
 
   '@devtools-ds/table@1.2.1':
     resolution: {integrity: sha512-wib8YqZIVU9Y74/jCh6PRPYHQQJl0jrECgxA0hnnfEp4NXCWXcND58RFNKWdr3/QSyMaVjitHy2n34YjxfBNJw==, tarball: https://registry.npmjs.org/@devtools-ds/table/-/table-1.2.1.tgz}
@@ -3780,7 +3786,7 @@ packages:
   '@reduxjs/toolkit@1.9.7':
     resolution: {integrity: sha512-t7v8ZPxhhKgOKtU+uyJT13lu4vL7az5aFi4IdoDs/eS548edn2M8Ik9h8fxgvMjGoAUVFSt6ZC1P5cWmQ014QQ==, tarball: https://registry.npmjs.org/@reduxjs/toolkit/-/toolkit-1.9.7.tgz}
     peerDependencies:
-      react: ^16.9.0 || ^17.0.0 || ^18
+      react: ^18.2.0
       react-redux: ^7.2.1 || ^8.0.2
     peerDependenciesMeta:
       react:
@@ -10316,6 +10322,13 @@ packages:
   stackframe@1.3.4:
     resolution: {integrity: sha512-oeVtt7eWQS+Na6F//S4kJ2K2VbRlS9D43mAlMyVpVWovy9o+jfgH8O9agzANzaiLjclA0oYzUXEM4PurhSUChw==, tarball: https://registry.npmjs.org/stackframe/-/stackframe-1.3.4.tgz}
 
+  starlight-package-managers@0.7.0:
+    resolution: {integrity: sha512-7T0Wd4OhtyTxr7yxplO1gt1B0Ped4dxRQ0T3uOp7qM+5UmQiyQE6PMxwmN+4hVuaVQ1zpDdZR6nQrptewS+m9g==, tarball: https://registry.npmjs.org/starlight-package-managers/-/starlight-package-managers-0.7.0.tgz}
+    engines: {node: '>=18.14.1'}
+    peerDependencies:
+      '@astrojs/starlight': '>=0.22.0'
+      astro: '>=4.2.7'
+
   state-local@1.0.7:
     resolution: {integrity: sha512-HTEHMNieakEnoe33shBYcZ7NX83ACUjCu8c40iOGEZsngj9zRnkqS9j1pqQPXwobB0ZcVTk27REb7COQ0UR59w==, tarball: https://registry.npmjs.org/state-local/-/state-local-1.0.7.tgz}
 
@@ -15318,7 +15331,7 @@ snapshots:
     dependencies:
       '@oclif/errors': 1.3.6
       '@oclif/parser': 3.8.17
-      debug: 4.3.6
+      debug: 4.3.7
       globby: 11.1.0
       is-wsl: 2.2.0
       tslib: 2.6.2
@@ -24528,6 +24541,11 @@ snapshots:
   stackback@0.0.2: {}
 
   stackframe@1.3.4: {}
+
+  starlight-package-managers@0.7.0(@astrojs/starlight@0.28.3(astro@4.16.7(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3)))(astro@4.16.7(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3)):
+    dependencies:
+      '@astrojs/starlight': 0.28.3(astro@4.16.7(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3))
+      astro: 4.16.7(@types/node@18.19.33)(rollup@4.21.2)(terser@5.31.0)(typescript@5.5.3)
 
   state-local@1.0.7: {}
 
