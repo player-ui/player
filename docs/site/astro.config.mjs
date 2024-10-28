@@ -33,6 +33,9 @@ export const rehypeLinks = (options) => {
 export const BASE_PREFIX =
   process.env.NODE_ENV === "production" ? "DOCS_BASE_PATH" : undefined;
 
+export const SEARCH_INDEX =
+  BASE_PREFIX === "latest" ? "player-ui" : "crawler_next_Player Next";
+
 // https://astro.build/config
 export default defineConfig({
   integrations: [
@@ -62,7 +65,7 @@ export default defineConfig({
         starlightDocSearch({
           appId: "OX3UZKXCOH",
           apiKey: "ALGOLIA_SEARCH_API_KEY",
-          indexName: "player-ui",
+          indexName: SEARCH_INDEX,
         }),
       ],
       sidebar: [
