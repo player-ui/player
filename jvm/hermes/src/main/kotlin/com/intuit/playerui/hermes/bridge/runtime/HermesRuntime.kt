@@ -107,7 +107,10 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
 
     override fun load(scriptContext: ScriptContext): Any? = evaluateInJSThreadBlocking {
         val sourceMap = scriptContext.sourceMap
-        if (sourceMap != null) {
+        val hbc = scriptContext.preCompiledScript
+        if (hbc != null) {
+            TODO("Need to call into Hermes runtime to load HBC (loadSegment?)")
+        } else if (sourceMap != null) {
             evaluateJavaScriptWithSourceMap(scriptContext.script, sourceMap, scriptContext.id)
         } else {
             evaluateJavaScript(scriptContext.script, scriptContext.id)
