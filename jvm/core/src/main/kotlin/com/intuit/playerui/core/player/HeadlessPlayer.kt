@@ -114,7 +114,8 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
                 if (runtime.config.debuggable) debugSource.readText() else source.readText(),
                 BUNDLED_SOURCE_PATH,
                 sourceMap.readText(),
-            ),
+                precompiledSource.readText()
+            )
         )
 
         /** 2. merge explicit [LoggerPlugin]s with ones created by service loader */
@@ -196,6 +197,8 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
 
         private const val DEBUG_SOURCE_PATH = "core/player/dist/Player.native.js"
 
+        private const val hbcSourcePath = "core/player/dist/Player.native.js.hbc"
+
         /** Gets [URL] of the bundled source */
         private val bundledSource get() = this::class.java
             .classLoader
@@ -208,5 +211,8 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
         private val sourceMap get() = this::class.java
             .classLoader
             .getResource("$BUNDLED_SOURCE_PATH.map")
+
+        private val precompiledSource get() = this::class.java
+            .classLoader.getResource(hbcSourcePath)
     }
 }
