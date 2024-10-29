@@ -63,4 +63,5 @@ public data class ScriptContext(
     val script: String,
     val id: String,
     val sourceMap: String? = null,
+    val preCompiledScript: String? = null,
 )

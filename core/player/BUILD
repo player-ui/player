@@ -1,5 +1,6 @@
-load("@rules_player//javascript:defs.bzl", "js_pipeline")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@rules_player//javascript:defs.bzl", "js_pipeline")
+load("//jvm/hermes:hermesc.bzl", "hermes_compile")
 load("//tools:defs.bzl", "NATIVE_BUILD_DEPS", "tsup_config", "vitest_config")
 
 npm_link_all_packages(name = "node_modules")
@@ -34,4 +35,16 @@ js_pipeline(
         "//:node_modules/timm",
         "//:node_modules/ts-nested-error",
     ],
+)
+
+genrule(
+    name = "native",
+    srcs = [":player_native_bundle"],
+    outs = ["Player.native.js"],
+    cmd = "echo $(SRCS) | tr ' ' '\\n' | grep %s$$ | xargs -I {} cp {} $(OUTS)" % "Player.native.js",
+)
+
+hermes_compile(
+    name = "hbc",
+    js = ":native",
 )

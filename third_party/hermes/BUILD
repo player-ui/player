@@ -45,7 +45,7 @@ cmake(
 ## Hermes X-compile requires two steps:
 ## 1. Compile hermesc against host
 cmake(
-    name = "hermesc",
+    name = "hermesc_",
     env = {
         "CMAKE_BUILD_PARALLEL_LEVEL": "$(CMAKE_BUILD_PARALLEL_LEVEL)",
     },
@@ -53,6 +53,7 @@ cmake(
     install = False,
     lib_source = "working_directory",
     out_binaries = ["hermesc"],
+    out_include_dir = None,
     postfix_script = "cp -L $$BUILD_TMPDIR/bin/hermesc $$INSTALLDIR/bin",
     tags = ["no-sandbox"],
     targets = ["hermesc"],
@@ -61,6 +62,15 @@ cmake(
         "@bazel_tools//tools/cpp:toolchain",
         "@player//:cmake_build_parallel_level",
     ],
+)
+
+genrule(
+    name = "hermesc",
+    srcs = [":hermesc_"],
+    outs = ["hermesc_bin"],
+    cmd = "echo $(SRCS) | tr ' ' '\\n' | grep hermesc$$ | xargs -I {} cp {} $(OUTS)",
+    executable = True,
+    visibility = ["//visibility:public"],
 )
 
 ## 2. X-compile hermes for Android referencing host built hermesc
