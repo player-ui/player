@@ -61,4 +61,5 @@ genrule(
 hermes_compile(
     name = "hbc",
     js = ":native",
+    visibility = ["//visibility:public"],
 )
