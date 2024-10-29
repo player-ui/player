@@ -13,6 +13,7 @@ main_deps = main_exports + [
 # TODO: These should probably just be dependencies of headless
 main_resources = [
     "//core/player:player_native_bundle",
+    "//core/player:hbc",
 ]
 
 test_deps = [

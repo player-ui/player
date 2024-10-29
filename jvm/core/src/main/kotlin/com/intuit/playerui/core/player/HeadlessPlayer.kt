@@ -105,7 +105,7 @@ public constructor(
 
     init {
         /** 1. load source into the [runtime] and release lock */
-        runtime.load(ScriptContext(if (runtime.config.debuggable) debugSource.readText() else source.readText(), bundledSourcePath, sourceMap.readText()))
+        runtime.load(ScriptContext(if (runtime.config.debuggable) debugSource.readText() else source.readText(), bundledSourcePath, sourceMap.readText(), precompiledSource.readText()))
 
         /** 2. merge explicit [LoggerPlugin]s with ones created by service loader */
         val loggerPlugins = plugins.filterIsInstance<LoggerPlugin>().let { explicitLoggers ->
@@ -178,6 +178,8 @@ public constructor(
 
         private const val debugSourcePath = "core/player/dist/Player.native.js"
 
+        private const val hbcSourcePath = "core/player/Player.native.js.hbc"
+
         /** Gets [URL] of the bundled source */
         private val bundledSource get() = this::class.java
             .classLoader.getResource(bundledSourcePath)!!
@@ -187,5 +189,8 @@ public constructor(
 
         private val sourceMap get() = this::class.java
             .classLoader.getResource("$bundledSourcePath.map")
+
+        private val precompiledSource get() = this::class.java
+            .classLoader.getResource(hbcSourcePath)
     }
 }
