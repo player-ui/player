@@ -52,6 +52,8 @@ public struct DefaultBeacon: Codable, Hashable {
  Used as a base for framework specific integrations
  */
 open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
+
+    public var hooks: BeaconPluginHooks?
     /// The callback to call when a beacon is fired from the plugin
     public var callback: ((BeaconStruct) -> Void)?
 
@@ -131,5 +133,4 @@ public struct BeaconPluginHooks {
     }
 }
 
-    public var hooks: BeaconPluginHooks?
 }

@@ -19,13 +19,21 @@ import PlayerUIBaseBeaconPlugin
  Plugin used by `SwiftUIPlayer` for beaconing in a uniform format between platforms
  */
 open class BeaconPlugin<BeaconStruct: Decodable>: BaseBeaconPlugin<BeaconStruct>, NativePlugin {
-    public convenience init(plugins: [JSBasePlugin] = [], onBeacon: ((BeaconStruct) -> Void)?) {
-        self.init(fileName: "BeaconPlugin.native", pluginName: "BeaconPlugin.BeaconPlugin")
-        self.callback = onBeacon
-        self.plugins = plugins
-    }
+public convenience init(plugins: [JSBasePlugin] = [], onBeacon: ((BeaconStruct) -> Void)?, hooks: BeaconPluginHooks? = nil) {
+    self.init(fileName: "BeaconPlugin.native", pluginName: "BeaconPlugin.BeaconPlugin")
+    self.callback = onBeacon
+    self.plugins = plugins
+    self.hooks = hooks
+}
 
     open func apply<P>(player: P) where P: HeadlessPlayer {
+
+        if let pluginRef = pluginRef {
+            self.hooks = BeaconPluginHooks(
+                buildBeacon: AsyncHook2(baseValue: pluginRef, name: "buildBeacon"),
+                cancelBeacon: Hook2(baseValue: pluginRef, name: "cancelBeacon")
+            )
+        }
         guard let player = player as? SwiftUIPlayer else { return }
         let beacon = self.beacon(assetBeacon:)
         player.hooks?.view.tap(name: "BeaconPlugin") { view in
