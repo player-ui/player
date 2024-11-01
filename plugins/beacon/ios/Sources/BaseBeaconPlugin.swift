@@ -120,4 +120,16 @@ open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
         else { return }
         pluginRef?.invokeMethod("beacon", withArguments: [beaconObject])
     }
+
+public struct BeaconPluginHooks {
+    public let buildBeacon: AsyncHook2<JSValue, JSValue>
+    public let cancelBeacon: Hook2<JSValue, JSValue>
+
+    public init(buildBeacon: AsyncHook2<JSValue, JSValue>, cancelBeacon: Hook2<JSValue, JSValue>) {
+        self.buildBeacon = buildBeacon
+        self.cancelBeacon = cancelBeacon
+    }
+}
+
+    public var hooks: BeaconPluginHooks?
 }

@@ -18,26 +18,32 @@ import PlayerUIBaseBeaconPlugin
 /**
  Plugin used by `SwiftUIPlayer` for beaconing in a uniform format between platforms
  */
-public class BeaconPlugin<BeaconStruct: Decodable>: BaseBeaconPlugin<BeaconStruct>, NativePlugin {
-    /**
-     Constructs a BeaconPlugin
-     - parameters:
-        - context: The context to load the plugin into
-        - onBeacon: A callback to receive beacon events
-     */
+open class BeaconPlugin<BeaconStruct: Decodable>: BaseBeaconPlugin<BeaconStruct>, NativePlugin {
     public convenience init(plugins: [JSBasePlugin] = [], onBeacon: ((BeaconStruct) -> Void)?) {
         self.init(fileName: "BeaconPlugin.native", pluginName: "BeaconPlugin.BeaconPlugin")
         self.callback = onBeacon
         self.plugins = plugins
     }
 
-    public func apply<P>(player: P) where P: HeadlessPlayer {
-        guard let player = player as? SwiftUIPlayer else { return }
-        let beacon = self.beacon(assetBeacon:)
-        player.hooks?.view.tap(name: "BeaconPlugin") { view in
-            AnyView(view.environment(\.beaconContext, BeaconContext(beacon)))
-        }
+    public var hooks: BeaconPluginHooks?
+
+open func apply<P>(player: P) where P: HeadlessPlayer {
+
+    super.apply(player: player)
+    if let pluginRef = pluginRef {
+        self.hooks = BeaconPluginHooks(
+            buildBeacon: AsyncHook2(baseValue: pluginRef, name: "buildBeacon"),
+            cancelBeacon: Hook2(baseValue: pluginRef, name: "cancelBeacon")
+        )
     }
+
+    guard let player = player as? SwiftUIPlayer else { return }
+    let beacon = self.beacon(assetBeacon:)
+    player.hooks?.view.tap(name: "BeaconPlugin") { view in
+        AnyView(view.environment(\.beaconContext, BeaconContext(beacon)))
+    }
+}
+
 }
 
 /**
