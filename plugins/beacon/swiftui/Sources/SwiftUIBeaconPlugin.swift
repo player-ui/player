@@ -25,25 +25,13 @@ open class BeaconPlugin<BeaconStruct: Decodable>: BaseBeaconPlugin<BeaconStruct>
         self.plugins = plugins
     }
 
-    public var hooks: BeaconPluginHooks?
-
-open func apply<P>(player: P) where P: HeadlessPlayer {
-
-    super.apply(player: player)
-    if let pluginRef = pluginRef {
-        self.hooks = BeaconPluginHooks(
-            buildBeacon: AsyncHook2(baseValue: pluginRef, name: "buildBeacon"),
-            cancelBeacon: Hook2(baseValue: pluginRef, name: "cancelBeacon")
-        )
+    open func apply<P>(player: P) where P: HeadlessPlayer {
+        guard let player = player as? SwiftUIPlayer else { return }
+        let beacon = self.beacon(assetBeacon:)
+        player.hooks?.view.tap(name: "BeaconPlugin") { view in
+            AnyView(view.environment(\.beaconContext, BeaconContext(beacon)))
+        }
     }
-
-    guard let player = player as? SwiftUIPlayer else { return }
-    let beacon = self.beacon(assetBeacon:)
-    player.hooks?.view.tap(name: "BeaconPlugin") { view in
-        AnyView(view.environment(\.beaconContext, BeaconContext(beacon)))
-    }
-}
-
 }
 
 /**
