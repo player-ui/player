@@ -88,14 +88,14 @@ importers:
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.51.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@player-tools/cli':
-        specifier: 0.6.1-next.2
-        version: 0.6.1-next.2(@babel/core@7.24.5)(@oclif/config@1.18.17)(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(@types/react@18.3.2)(jsonc-parser@2.3.1)
+        specifier: 0.8.1
+        version: 0.8.1(@babel/core@7.24.5)(@oclif/config@1.18.17)(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(@types/react@18.3.2)(jsonc-parser@2.3.1)
       '@player-tools/dsl':
-        specifier: 0.6.1-next.2
-        version: 0.6.1-next.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(@types/react@18.3.2)(react@18.3.1)
+        specifier: 0.8.1
+        version: 0.8.1(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(@types/react@18.3.2)(react@18.3.1)
       '@player-tools/xlr':
-        specifier: 0.6.1-next.2
-        version: 0.6.1-next.2
+        specifier: 0.8.1
+        version: 0.8.1
       '@player-tools/xlr-utils':
         specifier: 0.6.1-next.2
         version: 0.6.1-next.2(jsonc-parser@2.3.1)(typescript@5.5.3)
@@ -3386,28 +3386,28 @@ packages:
     resolution: {integrity: sha512-cq8o4cWH0ibXh9VGi5P20Tu9XF/0fFXl9EUinr9QfTM7a7p0oTA4iJRCQWppXR1Pg8dSM0UCItCkPwsk9qWWYA==, tarball: https://registry.npmjs.org/@pkgr/core/-/core-0.1.1.tgz}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
-  '@player-tools/cli@0.6.1-next.2':
-    resolution: {integrity: sha512-cBT9kIv8Y/4KPQDidtZ3BnQ0D+jD0JYQp5rMd/k64KyauBoZPQwAzA2voSTSDTyCXwZtXUvtJi71VBDcdzXwiQ==, tarball: https://registry.npmjs.org/@player-tools/cli/-/cli-0.6.1-next.2.tgz}
+  '@player-tools/cli@0.8.1':
+    resolution: {integrity: sha512-4/fAipuzQPDAZvnlkE/zpPdm2iYoAev6OuDES/CG1MgYeajO9N211Kbpz4psnTLfVi0xy0IrqTK9wtSbyqbCEw==, tarball: https://registry.npmjs.org/@player-tools/cli/-/cli-0.8.1.tgz}
     hasBin: true
 
-  '@player-tools/dsl@0.6.1-next.2':
-    resolution: {integrity: sha512-h31+f3gbs//7TDbtMu2yqNwbMUErAofoR5n8W+60arqTnGRDYBHXJ5UbG3QqZFMRhZwcBhBCR49ZvX98dFj3uQ==, tarball: https://registry.npmjs.org/@player-tools/dsl/-/dsl-0.6.1-next.2.tgz}
+  '@player-tools/dsl@0.8.1':
+    resolution: {integrity: sha512-66TX4/MR6+XjtUvsws+vC0oEvIa42zUdVpAV2jHFc4+E23MY0A2+c7MX1STBTp4/uO+/SUDsG/Q9IyVlF1senQ==, tarball: https://registry.npmjs.org/@player-tools/dsl/-/dsl-0.8.1.tgz}
     peerDependencies:
       '@types/react': ^18.2.51
       react: ^18.2.0
 
-  '@player-tools/json-language-service@0.6.1-next.2':
-    resolution: {integrity: sha512-iE/H7GgF93IDBhulan3PxPwHxHZ/r1HZvKUgNdQ1zcsBUQNo69QqGg5RE/6tNeGX+dzI/1aleG8DjQCp4bsUsg==, tarball: https://registry.npmjs.org/@player-tools/json-language-service/-/json-language-service-0.6.1-next.2.tgz}
+  '@player-tools/json-language-service@0.8.1':
+    resolution: {integrity: sha512-kY+/2afiXMuRYQjEkNNonc9tfguCufxFdESW9mjR1UxAe52EtINouMeqd0PiP1a+2EvDxYXoTcSWY+SHCvkwLw==, tarball: https://registry.npmjs.org/@player-tools/json-language-service/-/json-language-service-0.8.1.tgz}
 
-  '@player-tools/xlr-converters@0.6.1-next.2':
-    resolution: {integrity: sha512-swu6kgoIQVEBCSP9nz5D4uyGzoirRCn44WWBWdRrK+/aISYf5k6T/ky1H4bkdmnss9SyV6ypLb5gaL+jn1C4dw==, tarball: https://registry.npmjs.org/@player-tools/xlr-converters/-/xlr-converters-0.6.1-next.2.tgz}
+  '@player-tools/xlr-converters@0.8.1':
+    resolution: {integrity: sha512-ySJqwcAJEy89H5qhfUfmMWyfuyvEc1Pfbe9QwbNxHh8C5BopCv3WqCisRZREbA7Lc28oIQhn775Y112jpyDRbg==, tarball: https://registry.npmjs.org/@player-tools/xlr-converters/-/xlr-converters-0.8.1.tgz}
     peerDependencies:
-      typescript: ^5.4.4
+      typescript: 5.5.4
 
-  '@player-tools/xlr-sdk@0.6.1-next.2':
-    resolution: {integrity: sha512-/oQcHiTMcpbrX9aKoxbQjmvdV1SkE2cR/upbfU3IpC7pxW5Se1MizubsIK+1zeJTF1X9sfdjpNrGAPAM/0mJEg==, tarball: https://registry.npmjs.org/@player-tools/xlr-sdk/-/xlr-sdk-0.6.1-next.2.tgz}
+  '@player-tools/xlr-sdk@0.8.1':
+    resolution: {integrity: sha512-iq1Qig+A7UdC1BBdQEBiMAmAyykToqdy+P+wjYayQTU1R/socT78+1o8OrsXeYL09c9fSRxlRRXN00RkLFfeRg==, tarball: https://registry.npmjs.org/@player-tools/xlr-sdk/-/xlr-sdk-0.8.1.tgz}
     peerDependencies:
-      typescript: ^5.4.4
+      typescript: 5.5.4
 
   '@player-tools/xlr-utils@0.6.1-next.2':
     resolution: {integrity: sha512-PW75fDlkVkQCE9l5JtMywhNutTSfrVX7EC7w00xznFQRXKeCwbg/QwicnuWGvDPTuQp7AjN5czcUM7KkVF6ZXg==, tarball: https://registry.npmjs.org/@player-tools/xlr-utils/-/xlr-utils-0.6.1-next.2.tgz}
@@ -3415,8 +3415,17 @@ packages:
       jsonc-parser: ^2.3.1
       typescript: ^5.4.4
 
+  '@player-tools/xlr-utils@0.8.1':
+    resolution: {integrity: sha512-xgl2ec6AbSDBfeEQRuabUxwtn3iP2PeqidKJsYge2vklFYT/0O7ZhDSafzi/3kn/FVNuJTGNlWIjM0iTLq2Ivg==, tarball: https://registry.npmjs.org/@player-tools/xlr-utils/-/xlr-utils-0.8.1.tgz}
+    peerDependencies:
+      jsonc-parser: ^2.3.1
+      typescript: 5.5.4
+
   '@player-tools/xlr@0.6.1-next.2':
     resolution: {integrity: sha512-0wAtiDR/7Xjxe3zVrYP+i1MuhR1VyEgu8x2FiSqxfTwWPP3cQn9UGPt2jL6W2hdVZRER3JBQpe1Giw8WM+xH7w==, tarball: https://registry.npmjs.org/@player-tools/xlr/-/xlr-0.6.1-next.2.tgz}
+
+  '@player-tools/xlr@0.8.1':
+    resolution: {integrity: sha512-F7MlLX7M0QfoX8I2V89M4NAaDvb5zuerZUkM15FSHLimxfya2/QRndnEeRS2CioaZnkaQgZSu51b/TmEJ1pnJA==, tarball: https://registry.npmjs.org/@player-tools/xlr/-/xlr-0.8.1.tgz}
 
   '@player-ui/partial-match-registry@0.7.3':
     resolution: {integrity: sha512-3Lo5jFKGQ6QkUagrhu9guAepA5eChz2YRDNru+5SSxR2CfcMfDUdTfPAkhUyjU/fB9Re7FUPtNSX4FOyt4YKPg==, tarball: https://registry.npmjs.org/@player-ui/partial-match-registry/-/partial-match-registry-0.7.3.tgz}
@@ -10929,6 +10938,11 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  typescript@5.5.4:
+    resolution: {integrity: sha512-Mtq29sKDAEYP7aljRgtPOpTvOfbwRWlS6dPRzwjdE+C0R4brX/GUyhHSecbHMFLNBLcJIPt9nl9yG5TZ1weH+Q==, tarball: https://registry.npmjs.org/typescript/-/typescript-5.5.4.tgz}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
   typical@4.0.0:
     resolution: {integrity: sha512-VAH4IvQ7BDFYglMd7BPRDfLgxZZX4O4TFcRDA6EN5X7erNJJq+McIEp8np9aVtxrCJ6qx4GTYVfOWNjcqwZgRw==, tarball: https://registry.npmjs.org/typical/-/typical-4.0.0.tgz}
     engines: {node: '>=8'}
@@ -14915,7 +14929,7 @@ snapshots:
       '@heroku-cli/color': 1.1.16
       '@oclif/errors': 1.3.6
       cli-ux: 4.9.3
-      debug: 4.3.4(supports-color@8.1.1)
+      debug: 4.3.7(supports-color@8.1.1)
       fs-extra: 7.0.1
       heroku-client: 3.1.0
       http-call: 5.3.0
@@ -15260,8 +15274,8 @@ snapshots:
       '@oclif/errors': 1.3.6
       '@oclif/help': 1.0.15(supports-color@8.1.1)
       '@oclif/parser': 3.8.17
-      debug: 4.3.4(supports-color@8.1.1)
-      semver: 7.6.2
+      debug: 4.3.7(supports-color@8.1.1)
+      semver: 7.6.3
     transitivePeerDependencies:
       - supports-color
 
@@ -15297,7 +15311,7 @@ snapshots:
       chalk: 4.1.2
       clean-stack: 3.0.1
       cli-progress: 3.12.0
-      debug: 4.3.4(supports-color@8.1.1)
+      debug: 4.3.7(supports-color@8.1.1)
       ejs: 3.1.10
       fs-extra: 9.1.0
       get-package-type: 0.1.0
@@ -15309,7 +15323,7 @@ snapshots:
       natural-orderby: 2.0.3
       object-treeify: 1.1.33
       password-prompt: 1.1.3
-      semver: 7.6.2
+      semver: 7.6.3
       string-width: 4.2.3
       strip-ansi: 6.0.1
       supports-color: 8.1.1
@@ -15355,8 +15369,8 @@ snapshots:
       '@oclif/color': 0.1.2
       '@oclif/command': 1.8.36(@oclif/config@1.18.17)(supports-color@8.1.1)
       ansi-escapes: 4.3.2
-      debug: 4.3.4(supports-color@8.1.1)
-      semver: 7.6.2
+      debug: 4.3.7(supports-color@8.1.1)
+      semver: 7.6.3
       tslib: 2.6.2
     transitivePeerDependencies:
       - '@oclif/config'
@@ -15369,12 +15383,12 @@ snapshots:
       '@oclif/errors': 1.3.6
       chalk: 4.1.2
       cli-ux: 5.6.7(@oclif/config@1.18.17)
-      debug: 4.3.4(supports-color@8.1.1)
+      debug: 4.3.7(supports-color@8.1.1)
       fs-extra: 9.1.0
       http-call: 5.3.0
       load-json-file: 5.3.0
       npm-run-path: 4.0.1
-      semver: 7.6.2
+      semver: 7.6.3
       tslib: 2.6.2
       yarn: 1.22.22
     transitivePeerDependencies:
@@ -15502,7 +15516,7 @@ snapshots:
 
   '@pkgr/core@0.1.1': {}
 
-  '@player-tools/cli@0.6.1-next.2(@babel/core@7.24.5)(@oclif/config@1.18.17)(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(@types/react@18.3.2)(jsonc-parser@2.3.1)':
+  '@player-tools/cli@0.8.1(@babel/core@7.24.5)(@oclif/config@1.18.17)(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(@types/react@18.3.2)(jsonc-parser@2.3.1)':
     dependencies:
       '@babel/plugin-transform-react-jsx-source': 7.24.1(@babel/core@7.24.5)
       '@babel/preset-env': 7.24.5(@babel/core@7.24.5)
@@ -15512,12 +15526,12 @@ snapshots:
       '@oclif/core': 1.9.0
       '@oclif/plugin-legacy': 1.3.6(@oclif/config@1.18.17)
       '@oclif/plugin-plugins': 1.10.11(@oclif/config@1.18.17)
-      '@player-tools/dsl': 0.6.1-next.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(@types/react@18.3.2)(react@18.3.1)
-      '@player-tools/json-language-service': 0.6.1-next.2
-      '@player-tools/xlr': 0.6.1-next.2
-      '@player-tools/xlr-converters': 0.6.1-next.2(jsonc-parser@2.3.1)(typescript@5.5.3)
-      '@player-tools/xlr-sdk': 0.6.1-next.2(typescript@5.5.3)
-      '@player-tools/xlr-utils': 0.6.1-next.2(jsonc-parser@2.3.1)(typescript@5.5.3)
+      '@player-tools/dsl': 0.8.1(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(@types/react@18.3.2)(react@18.3.1)
+      '@player-tools/json-language-service': 0.8.1
+      '@player-tools/xlr': 0.8.1
+      '@player-tools/xlr-converters': 0.8.1(jsonc-parser@2.3.1)(typescript@5.5.4)
+      '@player-tools/xlr-sdk': 0.8.1(typescript@5.5.4)
+      '@player-tools/xlr-utils': 0.8.1(jsonc-parser@2.3.1)(typescript@5.5.4)
       chalk: 4.1.2
       cosmiconfig: 7.1.0
       cross-fetch: 3.1.8
@@ -15533,7 +15547,7 @@ snapshots:
       react: 18.3.1
       tapable-ts: 0.2.4
       tslib: 2.6.2
-      typescript: 5.5.3
+      typescript: 5.5.4
       vscode-languageserver-textdocument: 1.0.11
       vscode-languageserver-types: 3.17.5
     transitivePeerDependencies:
@@ -15547,7 +15561,7 @@ snapshots:
       - jsonc-parser
       - supports-color
 
-  '@player-tools/dsl@0.6.1-next.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(@types/react@18.3.2)(react@18.3.1)':
+  '@player-tools/dsl@0.8.1(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(@types/react@18.3.2)(react@18.3.1)':
     dependencies:
       '@player-ui/player': 0.7.3
       '@player-ui/types': 0.7.3
@@ -15564,19 +15578,19 @@ snapshots:
       react-json-reconciler: 2.0.0(react@18.3.1)
       source-map-js: 1.2.0
       tapable-ts: 0.2.4
-      ts-node: 10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.3)
+      ts-node: 10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.4)
       tslib: 2.6.2
-      typescript: 5.5.3
+      typescript: 5.5.4
     transitivePeerDependencies:
       - '@swc/core'
       - '@swc/wasm'
       - '@types/node'
 
-  '@player-tools/json-language-service@0.6.1-next.2':
+  '@player-tools/json-language-service@0.8.1':
     dependencies:
-      '@player-tools/xlr': 0.6.1-next.2
-      '@player-tools/xlr-sdk': 0.6.1-next.2(typescript@5.5.3)
-      '@player-tools/xlr-utils': 0.6.1-next.2(jsonc-parser@2.3.1)(typescript@5.5.3)
+      '@player-tools/xlr': 0.8.1
+      '@player-tools/xlr-sdk': 0.8.1(typescript@5.5.4)
+      '@player-tools/xlr-utils': 0.8.1(jsonc-parser@2.3.1)(typescript@5.5.4)
       change-case: 4.1.2
       cross-fetch: 3.1.8
       detect-indent: 6.1.0
@@ -15584,34 +15598,34 @@ snapshots:
       tapable-ts: 0.2.4
       timm: 1.7.1
       tslib: 2.6.2
-      typescript: 5.5.3
+      typescript: 5.5.4
       vscode-languageserver-textdocument: 1.0.11
       vscode-languageserver-types: 3.17.5
     transitivePeerDependencies:
       - encoding
       - supports-color
 
-  '@player-tools/xlr-converters@0.6.1-next.2(jsonc-parser@2.3.1)(typescript@5.5.3)':
+  '@player-tools/xlr-converters@0.8.1(jsonc-parser@2.3.1)(typescript@5.5.4)':
     dependencies:
-      '@player-tools/xlr': 0.6.1-next.2
-      '@player-tools/xlr-utils': 0.6.1-next.2(jsonc-parser@2.3.1)(typescript@5.5.3)
+      '@player-tools/xlr': 0.8.1
+      '@player-tools/xlr-utils': 0.8.1(jsonc-parser@2.3.1)(typescript@5.5.4)
       tslib: 2.6.2
-      typescript: 5.5.3
+      typescript: 5.5.4
     transitivePeerDependencies:
       - jsonc-parser
       - supports-color
 
-  '@player-tools/xlr-sdk@0.6.1-next.2(typescript@5.5.3)':
+  '@player-tools/xlr-sdk@0.8.1(typescript@5.5.4)':
     dependencies:
-      '@player-tools/xlr': 0.6.1-next.2
-      '@player-tools/xlr-converters': 0.6.1-next.2(jsonc-parser@2.3.1)(typescript@5.5.3)
-      '@player-tools/xlr-utils': 0.6.1-next.2(jsonc-parser@2.3.1)(typescript@5.5.3)
+      '@player-tools/xlr': 0.8.1
+      '@player-tools/xlr-converters': 0.8.1(jsonc-parser@2.3.1)(typescript@5.5.4)
+      '@player-tools/xlr-utils': 0.8.1(jsonc-parser@2.3.1)(typescript@5.5.4)
       '@types/fs-extra': 9.0.13
       '@types/node': 18.19.33
       fs-extra: 10.1.0
       jsonc-parser: 2.3.1
       tslib: 2.6.2
-      typescript: 5.5.3
+      typescript: 5.5.4
     transitivePeerDependencies:
       - supports-color
 
@@ -15625,7 +15639,21 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@player-tools/xlr-utils@0.8.1(jsonc-parser@2.3.1)(typescript@5.5.4)':
+    dependencies:
+      '@player-tools/xlr': 0.8.1
+      '@typescript/vfs': 1.5.0
+      jsonc-parser: 2.3.1
+      tslib: 2.6.2
+      typescript: 5.5.4
+    transitivePeerDependencies:
+      - supports-color
+
   '@player-tools/xlr@0.6.1-next.2':
+    dependencies:
+      tslib: 2.6.2
+
+  '@player-tools/xlr@0.8.1':
     dependencies:
       tslib: 2.6.2
 
@@ -18503,7 +18531,7 @@ snapshots:
       natural-orderby: 2.0.3
       object-treeify: 1.1.33
       password-prompt: 1.1.3
-      semver: 7.6.2
+      semver: 7.6.3
       string-width: 4.2.3
       strip-ansi: 6.0.1
       supports-color: 8.1.1
@@ -20694,7 +20722,7 @@ snapshots:
   http-call@5.3.0:
     dependencies:
       content-type: 1.0.5
-      debug: 4.3.4(supports-color@8.1.1)
+      debug: 4.3.7(supports-color@8.1.1)
       is-retry-allowed: 1.2.0
       is-stream: 2.0.1
       parse-json: 4.0.0
@@ -24980,6 +25008,26 @@ snapshots:
     optionalDependencies:
       '@swc/core': 1.5.7(@swc/helpers@0.5.2)
 
+  ts-node@10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@18.19.33)(typescript@5.5.4):
+    dependencies:
+      '@cspotcode/source-map-support': 0.8.1
+      '@tsconfig/node10': 1.0.11
+      '@tsconfig/node12': 1.0.11
+      '@tsconfig/node14': 1.0.3
+      '@tsconfig/node16': 1.0.4
+      '@types/node': 18.19.33
+      acorn: 8.11.3
+      acorn-walk: 8.3.2
+      arg: 4.1.3
+      create-require: 1.1.1
+      diff: 4.0.2
+      make-error: 1.3.6
+      typescript: 5.5.4
+      v8-compile-cache-lib: 3.0.1
+      yn: 3.1.1
+    optionalDependencies:
+      '@swc/core': 1.5.7(@swc/helpers@0.5.2)
+
   ts-node@9.1.1(typescript@5.5.3):
     dependencies:
       arg: 4.1.3
@@ -25111,6 +25159,8 @@ snapshots:
   typescript-memoize@1.1.1: {}
 
   typescript@5.5.3: {}
+
+  typescript@5.5.4: {}
 
   typical@4.0.0: {}
 
