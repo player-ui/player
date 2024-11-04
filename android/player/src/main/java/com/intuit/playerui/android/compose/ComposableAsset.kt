@@ -69,11 +69,11 @@ fun RenderableAsset.compose(androidViewAttributes: AndroidViewAttributes? = null
 private fun RenderableAsset.composeAndroidView(androidViewAttributes: AndroidViewAttributes? = null) {
     val modifier = androidViewAttributes?.modifier ?: Modifier
     val styles = androidViewAttributes?.styles
+    val tag = androidViewAttributes?.tag
+
     AndroidView(factory = ::FrameLayout, modifier) {
         assetContext.withContext(it.context).build().run {
-            styles?.let { styles ->
-                render(styles)
-            } ?: render()
+            render(styles, tag ?: this@composeAndroidView.asset.id)
         } into it
     }
 }
@@ -81,4 +81,5 @@ private fun RenderableAsset.composeAndroidView(androidViewAttributes: AndroidVie
 data class AndroidViewAttributes(
     val modifier: Modifier = Modifier,
     val styles: Styles? = null,
+    val tag: String? = null,
 )
