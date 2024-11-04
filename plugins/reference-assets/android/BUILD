@@ -2,6 +2,10 @@ load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load("@rules_player//kotlin:defs.bzl", "lint")
 load(":deps.bzl", "main_deps", "main_exports")
 
+exports_files([
+    "src/main/AndroidManifest.xml"
+])
+
 kt_android_library(
     name = "assets",
     srcs = glob(["src/main/java/**/*.kt"]),
