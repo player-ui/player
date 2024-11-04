@@ -35,15 +35,17 @@ class Collection(assetContext: AssetContext) : ComposableAsset<Collection.Data>(
         Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
             CompositionLocalProvider(LocalTextStyle provides TextStyle(fontSize = 16.sp)) {
                 data.label?.compose(
-                    modifier = Modifier.padding(top = 10.dp).fillMaxWidth(),
                     androidViewAttributes = AndroidViewAttributes(
+                        modifier = Modifier.padding(top = 10.dp).fillMaxWidth(),
                         styles = listOf(R.style.Text_Label),
                     ),
                 )
             }
             Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 data.values.map {
-                    it.compose(modifier = Modifier.fillMaxWidth())
+                    it.compose(androidViewAttributes = AndroidViewAttributes(
+                        modifier = Modifier.fillMaxWidth()
+                    ))
                 }
             }
         }
