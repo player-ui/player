@@ -58,15 +58,16 @@ public abstract class ComposableAsset<Data> (
 
 // TODO: What kind of logging do we want?
 @Composable
-fun RenderableAsset.compose(modifier: Modifier = Modifier, androidViewAttributes: AndroidViewAttributes? = null) {
+fun RenderableAsset.compose(androidViewAttributes: AndroidViewAttributes? = null) {
     when (this) {
         is ComposableAsset<*> -> compose()
-        else -> composeAndroidView(modifier, androidViewAttributes)
+        else -> composeAndroidView(androidViewAttributes)
     }
 }
 
 @Composable
-private fun RenderableAsset.composeAndroidView(modifier: Modifier = Modifier, androidViewAttributes: AndroidViewAttributes? = null) {
+private fun RenderableAsset.composeAndroidView(androidViewAttributes: AndroidViewAttributes? = null) {
+    val modifier = androidViewAttributes?.modifier ?: Modifier
     val styles = androidViewAttributes?.styles
     AndroidView(factory = ::FrameLayout, modifier) {
         assetContext.withContext(it.context).build().run {
@@ -78,5 +79,6 @@ private fun RenderableAsset.composeAndroidView(modifier: Modifier = Modifier, an
 }
 
 data class AndroidViewAttributes(
+    val modifier: Modifier = Modifier,
     val styles: Styles? = null,
 )
