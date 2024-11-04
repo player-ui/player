@@ -10,6 +10,7 @@ kt_android_library(
     resource_files = glob(["src/main/res/**"]),
     deps = main_deps,
     exports = main_exports,
+    plugins = ["//android/player:jetpack_compose_compiler_plugin"],
     visibility = ["//visibility:public"],
 )
 
