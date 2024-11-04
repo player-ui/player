@@ -30,6 +30,7 @@ export const testCases: Array<[string, string]> = [
   ["foo.pets.1.name", "foo.pets.1.name"],
   ["foo.pets.01.name", "foo.pets.1.name"],
   ["foo.pets['01'].name", "foo.pets.01.name"],
+  ["foo.pets[01].name", "foo.pets.1.name"],
   ['foo.pets[name = "frodo"].type', "foo.pets.2.type"],
   ['foo.pets["name" = "sprinkles"].type', "foo.pets.4.type"],
 ];
