@@ -3,6 +3,7 @@ title: Common Expressions
 ---
 
 import PlatformTabs from "../../../../components/PlatformTabs.astro";
+import { PackageManagers } from 'starlight-package-managers'
 
 This plugin exposes some basic expressions into Player content.
 
@@ -15,14 +16,12 @@ It also serves as a good reference to adding your own custom expressions into Pl
 
 Install the plugin:
 
-```bash
-yarn add @player-ui/common-types-plugin
-```
+<PackageManagers pkg="@player-ui/common-expressions-plugin" />
 
 Add it to Player:
 
 ```js
-import CommonExpressionsPlugin from "@player-ui/common-expressions-plugin";
+import { CommonExpressionsPlugin } from '@player-ui/common-expressions-plugin';
 
 const commonExpressionsPlugin = new CommonExpressionsPlugin();
 const player = new Player({ plugins: [commonExpressionsPlugin] });

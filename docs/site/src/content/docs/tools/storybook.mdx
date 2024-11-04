@@ -7,6 +7,7 @@ import eventsAddonGif from "../../../assets/tools/storybook/events-addon.gif";
 import flowAddonGif from "../../../assets/tools/storybook/flow-addon.gif";
 import docsAddonGif from "../../../assets/tools/storybook/docs-addon.gif";
 import flowResetGif from "../../../assets/tools/storybook/flow-reset.gif";
+import { PackageManagers } from 'starlight-package-managers'
 
 ## Reference Assets
 
@@ -22,9 +23,7 @@ There are a few different parts required to integrate with storybook.
 
 Start by installing `@player-ui/storybook`:
 
-```bash
-yarn add @player-ui/storybook
-```
+<PackageManagers pkg="@player-ui/storybook" />
 
 Next, add `@player-ui/storybook` to the `addons` section in `.storybook/main.js`
 
