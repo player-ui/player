@@ -10,12 +10,14 @@ import Foundation
 import XCTest
 import SwiftUI
 import ViewInspector
+import JavaScriptCore
 @testable import PlayerUI
 @testable import PlayerUIInternalTestUtilities
 @testable import PlayerUISwiftUI
 @testable import PlayerUIReferenceAssets
 @testable import PlayerUIBaseBeaconPlugin
 @testable import PlayerUIBeaconPlugin
+
 
 class BeaconPluginTests: XCTestCase {
     override func setUp() {
@@ -97,6 +99,56 @@ class BeaconPluginTests: XCTestCase {
 
         ViewHosting.expel()
     }
+
+
+   func testCancelsSpecificBeaconsUsingHooks() {
+        let handlerExpectation = expectation(description: "Handler called")
+        let handler = MockHandler()
+        let plugin = BeaconPlugin<DefaultBeacon>(plugins: []) { (beacon) in
+            handler.handle(beacon.viewId!, beacon.data)
+        }
+
+        let context = JSContext()!
+        JSUtilities.polyfill(context)
+        plugin.context = context
+        plugin.setup(context: context)
+
+        guard let hooks = plugin.hooks else {
+            XCTFail("Hooks are not initialized")
+            return
+        }
+
+    hooks.cancelBeacon.tap { (arg1: JSValue, arg2: JSValue) -> Void in
+        if arg1.toString() == "view-1" {
+            return
+        }
+    }
+
+    let player = SwiftUIPlayer(
+        flow: FlowData.COUNTER,
+        plugins: [ReferenceAssetsPlugin(), plugin]
+    )
+    ViewHosting.host(view: player)
+
+//     let asset = BeaconableAsset(id: "test", metaData: nil)
+//     let assetBeacon = AssetBeacon(action: "clicked", element: "button", asset: asset, viewId: "view-1", data: nil)
+//     plugin.beacon(assetBeacon: assetBeacon)
+
+    wait(for: [handlerExpectation], timeout: 10)
+//     XCTAssertEqual(handler.calls.count, 1)
+//     XCTAssertEqual(handler.calls[0].0, "view-2") // Accessing the correct element from the tuple
+
+    ViewHosting.expel()
+    }
+}
+
+class MockHandler {
+    var calls: [(String, Any?)] = []
+
+    func handle(_ action: String, _ data: Any? = nil) {
+        calls.append((action, data))
+    }
+
 }
 
 struct TestButton: View {

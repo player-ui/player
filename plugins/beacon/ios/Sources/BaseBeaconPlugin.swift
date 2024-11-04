@@ -66,10 +66,21 @@ open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
         - context: The context to load the plugin into
         - onBeacon: A callback to receive beacon events
      */
-    public convenience init(plugins: [JSBasePlugin] = [], onBeacon: ((BeaconStruct) -> Void)?) {
+   public convenience init(plugins: [JSBasePlugin] = [], onBeacon: ((BeaconStruct) -> Void)?) {
         self.init(fileName: "BeaconPlugin.native", pluginName: "BeaconPlugin.BeaconPlugin")
         self.callback = onBeacon
         self.plugins = plugins
+    }
+
+    override open func setup(context: JSContext) {
+        super.setup(context: context)
+        guard let pluginRef = self.pluginRef else {
+            fatalError("pluginRef is nil after setup")
+        }
+        self.hooks = BeaconPluginHooks(
+            buildBeacon: AsyncHook2(baseValue: pluginRef, name: "buildBeacon"),
+            cancelBeacon: Hook2(baseValue: pluginRef, name: "cancelBeacon")
+        )
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
@@ -123,14 +134,13 @@ open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
         pluginRef?.invokeMethod("beacon", withArguments: [beaconObject])
     }
 
-public struct BeaconPluginHooks {
-    public let buildBeacon: AsyncHook2<JSValue, JSValue>
-    public let cancelBeacon: Hook2<JSValue, JSValue>
+    public struct BeaconPluginHooks {
+        public let buildBeacon: AsyncHook2<JSValue, JSValue>
+        public let cancelBeacon: Hook2<JSValue, JSValue>
 
-    public init(buildBeacon: AsyncHook2<JSValue, JSValue>, cancelBeacon: Hook2<JSValue, JSValue>) {
-        self.buildBeacon = buildBeacon
-        self.cancelBeacon = cancelBeacon
+        public init(buildBeacon: AsyncHook2<JSValue, JSValue>, cancelBeacon: Hook2<JSValue, JSValue>) {
+            self.buildBeacon = buildBeacon
+            self.cancelBeacon = cancelBeacon
+        }
     }
-}
-
 }
