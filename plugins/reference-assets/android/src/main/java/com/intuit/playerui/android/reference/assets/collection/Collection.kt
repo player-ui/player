@@ -43,9 +43,11 @@ class Collection(assetContext: AssetContext) : ComposableAsset<Collection.Data>(
             }
             Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 data.values.map {
-                    it.compose(androidViewAttributes = AndroidViewAttributes(
-                        modifier = Modifier.fillMaxWidth()
-                    ))
+                    it.compose(
+                        androidViewAttributes = AndroidViewAttributes(
+                            modifier = Modifier.fillMaxWidth(),
+                        ),
+                    )
                 }
             }
         }
