@@ -42,6 +42,7 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
      Construct a plugin to handle external states
      - parameters:
         - handler: the function to call when an external state is transitioned to
+        - transitionHandler:the function to call when an a transition action is triggered, nil by default
      */
     public init(handler: @escaping ExternalStateViewModifierHandler, transitionHandler: TransitionHandler? = nil, fileName: String = "ExternalActionPlugin.native", pluginName: String = "ExternalActionPlugin.ExternalActionPlugin") {
            self.handler = handler
