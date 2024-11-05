@@ -18,19 +18,19 @@ import PlayerUI
 public struct DefaultBeacon: Codable, Hashable {
     /// The action the user performed
     public let action: String
-
+    
     /// The element that performed the action
     public let element: String
-
+    
     /// The ID of the asset triggering the beacon
     public let assetId: String?
-
+    
     /// The ID of the view triggering the beacon
     public let viewId: String?
-
+    
     /// Additional data added from the asset or metaData
     public let data: AnyType?
-
+    
     /// Construct a ``DefaultBeacon``
     /// - Parameters:
     ///   - action: The action the user performed
@@ -52,26 +52,26 @@ public struct DefaultBeacon: Codable, Hashable {
  Used as a base for framework specific integrations
  */
 open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
-
+    
     public var hooks: BeaconPluginHooks?
     /// The callback to call when a beacon is fired from the plugin
     public var callback: ((BeaconStruct) -> Void)?
-
+    
     /// BeaconPluginPlugin's to use for this BeaconPlugin
     public var plugins: [JSBasePlugin] = []
-
+    
     /**
      Constructs a BeaconPlugin
      - parameters:
-        - context: The context to load the plugin into
-        - onBeacon: A callback to receive beacon events
+     - context: The context to load the plugin into
+     - onBeacon: A callback to receive beacon events
      */
-   public convenience init(plugins: [JSBasePlugin] = [], onBeacon: ((BeaconStruct) -> Void)?) {
+    public convenience init(plugins: [JSBasePlugin] = [], onBeacon: ((BeaconStruct) -> Void)?) {
         self.init(fileName: "BeaconPlugin.native", pluginName: "BeaconPlugin.BeaconPlugin")
         self.callback = onBeacon
         self.plugins = plugins
     }
-
+    
     override open func setup(context: JSContext) {
         super.setup(context: context)
         guard let pluginRef = self.pluginRef else {
@@ -82,20 +82,20 @@ open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
             cancelBeacon: Hook2(baseValue: pluginRef, name: "cancelBeacon")
         )
     }
-
+    
     override open func getUrlForFile(fileName: String) -> URL? {
-        #if SWIFT_PACKAGE
+#if SWIFT_PACKAGE
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
-        #else
+#else
         ResourceUtilities.urlForFile(
             name: fileName,
             ext: "js",
             bundle: Bundle(for: BaseBeaconPlugin<DefaultBeacon>.self),
             pathComponent: "PlayerUI_BaseBeaconPlugin.bundle"
         )
-        #endif
+#endif
     }
-
+    
     /**
      Retrieves the arguments for constructing this plugin, this is necessary because the arguments need to be supplied after
      construction of the swift object, once the context has been provided
@@ -118,12 +118,12 @@ open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
         let jsCallback = JSValue(object: callback, in: context) as Any
         return [["callback": jsCallback, "plugins": plugins.map { $0.pluginRef }]]
     }
-
+    
     /**
      Function to send a beacon event through the plugin for processing
      - parameters:
-        - action: The action that was taken for the beacon
-        - args: The context of the beacon
+     - action: The action that was taken for the beacon
+     - args: The context of the beacon
      */
     public func beacon(assetBeacon: AssetBeacon) {
         guard
@@ -133,11 +133,11 @@ open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
         else { return }
         pluginRef?.invokeMethod("beacon", withArguments: [beaconObject])
     }
-
+    
     public struct BeaconPluginHooks {
         public let buildBeacon: AsyncHook2<JSValue, JSValue>
         public let cancelBeacon: Hook2<JSValue, JSValue>
-
+        
         public init(buildBeacon: AsyncHook2<JSValue, JSValue>, cancelBeacon: Hook2<JSValue, JSValue>) {
             self.buildBeacon = buildBeacon
             self.cancelBeacon = cancelBeacon
