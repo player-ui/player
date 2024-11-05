@@ -47,13 +47,13 @@ bazel run @rules_player//distribution:staged-maven-deploy -- "$MVN_RELEASE_TYPE"
 # Docs publishing
 echo "Publishing Docs with release type: ${RELEASE_TYPE} on branch: ${CURRENT_BRANCH}"
 if [ "$RELEASE_TYPE" == "next" ] && [ "$CURRENT_BRANCH" == "main" ]; then
- STABLE_DOCS_BASE_PATH=next bazel run --verbose_failures --config=ci //docs:gh_deploy -- --dest_dir next
+ STABLE_DOCS_BASE_PATH=next STABLE_ALGOLIA_SEARCH_API_KEY=$ALGOLIA_NEXT_SEARCH_API_KEY bazel run --verbose_failures --config=ci //docs:gh_deploy -- --dest_dir next
 elif [ "$RELEASE_TYPE" == "release" ] && [ "$CURRENT_BRANCH" == "main" ]; then
- STABLE_DOCS_BASE_PATH=latest bazel run --verbose_failures --config=ci //docs:gh_deploy -- --dest_dir latest
+ STABLE_DOCS_BASE_PATH=latest STABLE_ALGOLIA_SEARCH_API_KEY=$ALGOLIA_SEARCH_API_KEY bazel run --verbose_failures --config=ci //docs:gh_deploy -- --dest_dir latest
 fi
 
 # Also deploy to the versioned folder for main releases
 if [ "$RELEASE_TYPE" == "release" ]; then
   SEMVER_MAJOR=$(cat VERSION | cut -d. -f1)
-  STABLE_DOCS_BASE_PATH=$SEMVER_MAJOR bazel run --verbose_failures --config=ci //docs:gh_deploy -- --dest_dir "$SEMVER_MAJOR"
+  STABLE_DOCS_BASE_PATH=$SEMVER_MAJOR STABLE_ALGOLIA_SEARCH_API_KEY=$ALGOLIA_SEARCH_API_KEY bazel run --verbose_failures --config=ci //docs:gh_deploy -- --dest_dir "$SEMVER_MAJOR"
 fi
