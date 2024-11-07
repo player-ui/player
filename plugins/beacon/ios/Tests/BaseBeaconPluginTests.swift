@@ -136,4 +136,105 @@ class BaseBeaconPluginTests: XCTestCase {
         ))
         wait(for: [expectation], timeout: 2)
     }
+    
+    func testCancelSpecificBeaconsUsingHooks() {
+        let context = JSContext()!
+        JSUtilities.polyfill(context)
+        
+        let cancelBeaconHandler = expectation(description: "Cancel Beacon Handler called")
+        let handlerExpectation = expectation(description: "Handler called")
+        handlerExpectation.isInverted = true
+        
+        let handler = MockHandler()
+        
+        let plugin = BaseBeaconPlugin<DefaultBeacon>(plugins: []) { (beacon) in
+            if handler.calls.isEmpty {
+                handler.handle(beacon.viewId!, beacon.data)
+                handlerExpectation.fulfill()
+            }
+        }
+        
+        plugin.context = context
+        plugin.setup(context: context)
+        
+        plugin.beacon(assetBeacon: AssetBeacon(
+            action: BeaconAction.clicked.rawValue,
+            element: BeaconElement.button.rawValue,
+            asset: BeaconableAsset(id: "test"),
+            data: .string(data: "example")
+        ))
+        
+        guard let hooks = plugin.hooks else {
+            XCTFail("Hooks are not initialized")
+            return
+        }
+        
+        hooks.cancelBeacon.tap { (arg1: JSValue, arg2: JSValue) -> Bool in
+            cancelBeaconHandler.fulfill()
+            if let action = arg1.toDictionary()?["action"] as? String, action == BeaconAction.clicked.rawValue {
+                return true
+            }
+            return false
+        }
+        
+        wait(for: [handlerExpectation, cancelBeaconHandler], timeout: 10)
+    }
+    
+    class MockHandler {
+        var calls: [(String, Any?)] = []
+        
+        func handle(_ action: String, _ data: Any? = nil) {
+            calls.append((action, data))
+        }
+        
+    }
+    
+    func testBuildSpecificBeaconsUsingHooks() {
+        let context = JSContext()!
+        JSUtilities.polyfill(context)
+        let buildBeaconHandler = expectation(description: "Build Beacon Handler called")
+        let handlerExpectation = expectation(description: "Handler called")
+        let handler = MockHandler()
+        
+        let plugin = BaseBeaconPlugin<DefaultBeacon>(plugins: []) { (beacon) in
+            if handler.calls.isEmpty {
+                handler.handle(beacon.viewId!, beacon.data)
+                handlerExpectation.fulfill()
+            }
+        }
+        
+        plugin.context = context
+        plugin.setup(context: context)
+        
+        plugin.beacon(assetBeacon: AssetBeacon(
+            action: BeaconAction.clicked.rawValue,
+            element: BeaconElement.button.rawValue,
+            asset: BeaconableAsset(id: "test"),
+            data: .string(data: "example")
+        ))
+        
+        guard let hooks = plugin.hooks else {
+            XCTFail("Hooks are not initialized")
+            return
+        }
+        
+        hooks.buildBeacon.tap { (arg1: JSValue, arg2: JSValue) -> JSValue? in
+            buildBeaconHandler.fulfill()
+            if let actionDict = arg1.toDictionary(),
+               let action = actionDict["action"] as? String,
+               action == BeaconAction.clicked.rawValue {
+                handler.handle(action, actionDict)
+                handlerExpectation.fulfill() // Fulfill the handler expectation
+                return JSValue(object: actionDict, in: arg1.context)
+            }
+            return nil
+        }
+        
+        wait(for: [handlerExpectation, buildBeaconHandler], timeout: 10)
+        
+        // Assert that the modified beacon data is received in the handler
+        XCTAssertEqual(handler.calls.count, 1)
+        
+    }
+    
 }

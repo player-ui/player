@@ -24,7 +24,7 @@ open class BeaconPlugin<BeaconStruct: Decodable>: BaseBeaconPlugin<BeaconStruct>
         self.callback = onBeacon
         self.plugins = plugins
     }
-    
+
     open func apply<P>(player: P) where P: HeadlessPlayer {
         guard let player = player as? SwiftUIPlayer else { return }
         let beacon = self.beacon(assetBeacon:)
@@ -39,7 +39,7 @@ open class BeaconPlugin<BeaconStruct: Decodable>: BaseBeaconPlugin<BeaconStruct>
  */
 public class BeaconContext: ObservableObject {
     private let beaconFn: (AssetBeacon) -> Void
-    
+
     /**
      Constructs a BeaconContext
      - parameters:
@@ -48,7 +48,7 @@ public class BeaconContext: ObservableObject {
     public init(_ beacon: @escaping (AssetBeacon) -> Void) {
         self.beaconFn = beacon
     }
-    
+
     /**
      Sends a beacon through the JavaScript beacon plugin
      - parameters:
@@ -75,7 +75,7 @@ public class BeaconContext: ObservableObject {
             )
         )
     }
-    
+
     /**
      Sends a beacon through the JavaScript beacon plugin
      - parameters:

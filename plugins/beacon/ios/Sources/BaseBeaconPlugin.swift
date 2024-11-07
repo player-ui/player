@@ -107,13 +107,25 @@ open class BaseBeaconPlugin<BeaconStruct: Decodable>: JSBasePlugin {
         }
         let callback: @convention(block) (JSValue?) -> Void = { [weak self] rawBeacon in
             guard
-                let object = rawBeacon?.toObject(),
-                let data = try? JSONSerialization.data(withJSONObject: object),
-                let beacon = try? AnyTypeDecodingContext(rawData: data)
+                let object = rawBeacon?.toObject() else {
+                print("Failed to convert rawBeacon to object")
+                return
+            }
+            
+            print("Raw beacon object: \(object)")
+            
+            do {
+                let data = try JSONSerialization.data(withJSONObject: object)
+                print("Serialized data: \(String(data: data, encoding: .utf8) ?? "nil")")
+                
+                let beacon = try AnyTypeDecodingContext(rawData: data)
                     .inject(to: JSONDecoder())
                     .decode(BeaconStruct.self, from: data)
-            else { return }
-            self?.callback?(beacon)
+                
+                self?.callback?(beacon)
+            } catch {
+                print("Error during JSON serialization or deserialization: \(error)")
+            }
         }
         let jsCallback = JSValue(object: callback, in: context) as Any
         return [["callback": jsCallback, "plugins": plugins.map { $0.pluginRef }]]
