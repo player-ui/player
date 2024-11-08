@@ -19,12 +19,18 @@ import PlayerUIBaseBeaconPlugin
  Plugin used by `SwiftUIPlayer` for beaconing in a uniform format between platforms
  */
 open class BeaconPlugin<BeaconStruct: Decodable>: BaseBeaconPlugin<BeaconStruct>, NativePlugin {
+    /**
+     Constructs a BeaconPlugin
+     - parameters:
+     - context: The context to load the plugin into
+     - onBeacon: A callback to receive beacon events
+     */
     public convenience init(plugins: [JSBasePlugin] = [], onBeacon: ((BeaconStruct) -> Void)?) {
         self.init(fileName: "BeaconPlugin.native", pluginName: "BeaconPlugin.BeaconPlugin")
         self.callback = onBeacon
         self.plugins = plugins
     }
-
+    
     open func apply<P>(player: P) where P: HeadlessPlayer {
         guard let player = player as? SwiftUIPlayer else { return }
         let beacon = self.beacon(assetBeacon:)
@@ -39,7 +45,7 @@ open class BeaconPlugin<BeaconStruct: Decodable>: BaseBeaconPlugin<BeaconStruct>
  */
 public class BeaconContext: ObservableObject {
     private let beaconFn: (AssetBeacon) -> Void
-
+    
     /**
      Constructs a BeaconContext
      - parameters:
@@ -48,7 +54,7 @@ public class BeaconContext: ObservableObject {
     public init(_ beacon: @escaping (AssetBeacon) -> Void) {
         self.beaconFn = beacon
     }
-
+    
     /**
      Sends a beacon through the JavaScript beacon plugin
      - parameters:
@@ -75,7 +81,7 @@ public class BeaconContext: ObservableObject {
             )
         )
     }
-
+    
     /**
      Sends a beacon through the JavaScript beacon plugin
      - parameters:
