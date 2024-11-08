@@ -1,4 +1,5 @@
 import { configDefaults, defineConfig } from "vitest/config";
+import type { UserConfig } from "vitest/node";
 import path from "node:path";
 
 export default defineConfig({
@@ -10,7 +11,9 @@ export default defineConfig({
       process.env.XML_OUTPUT_FILE ? "junit" : "basic",
       path.join(__dirname, "tools", "vitest_coverage_mapper.ts"),
     ],
-
+    benchmark: {
+      exclude: [...configDefaults.exclude, "bazel-*/**"],
+    },
     setupFiles: [
       path.join(
         process.env.XML_OUTPUT_FILE ? "" : __dirname,
@@ -41,4 +44,4 @@ export default defineConfig({
       reporter: ["text", "html", "lcovonly"],
     },
   },
-});
+}) as UserConfig;
