@@ -149,8 +149,10 @@ describe("Integration tests", () => {
           fireEvent.click(itemNode);
         });
 
-        itemNode = await screen.findByTestId(item.id);
-        expect(itemNode.checked).toEqual(true);
+        await waitFor(async () => {
+          itemNode = await screen.findByTestId(item.id);
+          expect(itemNode.checked).toEqual(true);
+        });
       }
     });
   });
