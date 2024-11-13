@@ -5,7 +5,14 @@ import path from "node:path";
 export default defineConfig({
   test: {
     environment: "happy-dom",
-    exclude: [...configDefaults.exclude, "helpers"],
+    exclude: [
+      ...configDefaults.exclude,
+      "helpers",
+      "bazel-bin",
+      "bazel-out",
+      "bazel-player",
+      "bazel-testlogs",
+    ],
     reporters: [
       "default",
       process.env.XML_OUTPUT_FILE ? "junit" : "basic",
