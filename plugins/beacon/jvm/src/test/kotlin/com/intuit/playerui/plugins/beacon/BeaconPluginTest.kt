@@ -1,5 +1,6 @@
 package com.intuit.playerui.plugins.beacon
 
+import com.intuit.hooks.BailResult
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.runtime.serialize
@@ -94,6 +95,40 @@ internal class BeaconPluginTest : RuntimePluginTest<BeaconPlugin>() {
         plugin.beacon(action, element, asset, data) shouldBe Unit
         while (beaconed == null) runBlocking { delay(100) }
         assertEquals(shouldBeacon, beaconed)
+    }
+
+    @TestTemplate
+    fun `beacon should trigger cancel hook`() {
+        var beaconed: JsonElement? = null
+        var cancelBeaconVal: Boolean? = null
+
+        plugin.registerHandler { beaconed = Json.parseToJsonElement(it) }
+
+        val action = "clicked"
+        val element = "button"
+        val (id, type) = "test-id" to "test"
+
+        val shouldBeacon = buildJsonObject {
+            put("action", action)
+            put("element", element)
+            put("assetId", id)
+        }
+
+        val asset = buildJsonObject {
+            put("id", id)
+            put("type", type)
+        }.asAsset()
+
+        plugin.hooks.cancelBeacon.tap { beacon ->
+            val isRightBeacon: Boolean = beacon?.asset?.id == id
+            plugin.registerHandler { cancelBeaconVal = isRightBeacon }
+            BailResult.Bail(isRightBeacon)
+        }
+
+        plugin.beacon(action, element, asset) shouldBe Unit
+        while (beaconed == null || cancelBeaconVal == null) runBlocking { delay(100) }
+        assertEquals(shouldBeacon, beaconed)
+        assertEquals(true, cancelBeaconVal)
     }
 
     @TestTemplate
