@@ -5,8 +5,8 @@ import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.core.bridge.getInvokable
-import com.intuit.playerui.core.bridge.hooks.NodeSyncBailHook1
 import com.intuit.playerui.core.bridge.hooks.NodeAsyncWaterfallHook2
+import com.intuit.playerui.core.bridge.hooks.NodeSyncBailHook1
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.ScriptContext
 import com.intuit.playerui.core.bridge.runtime.add
@@ -15,6 +15,7 @@ import com.intuit.playerui.core.bridge.serialization.serializers.InvokableSerial
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.playerui.core.player.Player
+import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.player.state.PlayerFlowState
 import com.intuit.playerui.core.plugins.JSPluginWrapper
 import com.intuit.playerui.core.plugins.JSScriptPluginWrapper
@@ -38,7 +39,7 @@ public class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JSScrip
 
     public constructor(vararg plugins: JSPluginWrapper) : this(plugins.toList())
 
-    public val hooks: Hooks by NodeSerializableField(Hooks.serializer())
+    public lateinit var hooks: Hooks
 
     override fun apply(runtime: Runtime<*>) {
         SetTimeoutPlugin().apply(runtime)
@@ -63,6 +64,8 @@ public class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JSScrip
         runtime.load(ScriptContext(script, bundledSourcePath))
         runtime.add("beaconOptions", config)
         instance = runtime.buildInstance("(new $name.$name(beaconOptions))")
+        hooks = instance.getSerializable("hooks", Hooks.serializer())
+            ?: throw PlayerException("BeaconPlugin is not loaded correctly")
     }
 
     private val handlers: MutableList<(String) -> Unit> = mutableListOf()
@@ -89,7 +92,8 @@ public class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JSScrip
     public class Hooks internal constructor(override val node: Node) : NodeWrapper {
         /** A hook to build beacon */
         public val buildBeacon: NodeAsyncWaterfallHook2<Any?, HookArgs>
-                by NodeSerializableField(NodeAsyncWaterfallHook2.serializer(GenericSerializer(), HookArgs.serializer()))
+            by NodeSerializableField(NodeAsyncWaterfallHook2.serializer(GenericSerializer(), HookArgs.serializer()))
+
         /** A hook to cancel beacon */
         public val cancelBeacon: NodeSyncBailHook1<HookArgs, Boolean>
             by NodeSerializableField(NodeSyncBailHook1.serializer(HookArgs.serializer(), Boolean.serializer()))

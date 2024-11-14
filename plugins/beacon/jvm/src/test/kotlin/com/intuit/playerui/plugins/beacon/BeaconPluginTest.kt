@@ -3,6 +3,7 @@ package com.intuit.playerui.plugins.beacon
 import com.intuit.hooks.BailResult
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Invokable
+import com.intuit.playerui.core.bridge.Promise
 import com.intuit.playerui.core.bridge.runtime.serialize
 import com.intuit.playerui.core.plugins.JSScriptPluginWrapper
 import com.intuit.playerui.utils.test.RuntimePluginTest
@@ -98,20 +99,50 @@ internal class BeaconPluginTest : RuntimePluginTest<BeaconPlugin>() {
     }
 
     @TestTemplate
-    fun `beacon should trigger cancel hook`() {
+    fun `should trigger cancel hook`() {
+        var cancelBeaconVal: Boolean = false
+
+        val action = "clicked"
+        val element = "button"
+        val (id, type) = "test-id" to "test"
+
+        val asset = buildJsonObject {
+            put("id", id)
+            put("type", type)
+        }.asAsset()
+
+        plugin.hooks.cancelBeacon.tap { beaconOptions ->
+            cancelBeaconVal = beaconOptions?.asset?.id == id
+            BailResult.Bail(cancelBeaconVal)
+        }
+
+        plugin.beacon(action, element, asset) shouldBe Unit
+        while (!cancelBeaconVal) runBlocking { delay(100) }
+        assertEquals(true, cancelBeaconVal)
+    }
+
+    @TestTemplate
+    fun `should trigger build hook`() {
         var beaconed: JsonElement? = null
-        var cancelBeaconVal: Boolean? = null
 
         plugin.registerHandler { beaconed = Json.parseToJsonElement(it) }
 
         val action = "clicked"
         val element = "button"
         val (id, type) = "test-id" to "test"
+        val data = buildJsonObject {
+            put("extra", "data")
+        }
+
+        val modifiedData = buildJsonObject {
+            put("extra", "modified-data")
+        }
 
         val shouldBeacon = buildJsonObject {
             put("action", action)
             put("element", element)
             put("assetId", id)
+            put("data", modifiedData)
         }
 
         val asset = buildJsonObject {
@@ -119,16 +150,21 @@ internal class BeaconPluginTest : RuntimePluginTest<BeaconPlugin>() {
             put("type", type)
         }.asAsset()
 
-        plugin.hooks.cancelBeacon.tap { beacon ->
-            val isRightBeacon: Boolean = beacon?.asset?.id == id
-            plugin.registerHandler { cancelBeaconVal = isRightBeacon }
-            BailResult.Bail(isRightBeacon)
+        plugin.hooks.buildBeacon.tap("") { _, beacon, beaconOptions ->
+            if (beaconOptions?.asset?.id == id) {
+                runtime.Promise<Any?> { resolve, _ ->
+                    resolve(shouldBeacon)
+                }
+            } else {
+                runtime.Promise<Any?> { resolve, _ ->
+                    resolve(null)
+                }
+            }
         }
 
-        plugin.beacon(action, element, asset) shouldBe Unit
-        while (beaconed == null || cancelBeaconVal == null) runBlocking { delay(100) }
+        plugin.beacon(action, element, asset, data) shouldBe Unit
+        while (beaconed == null) runBlocking { delay(100) }
         assertEquals(shouldBeacon, beaconed)
-        assertEquals(true, cancelBeaconVal)
     }
 
     @TestTemplate
