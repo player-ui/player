@@ -14,6 +14,10 @@ export default meta;
 
 export const Basic = createDSLStory(
   () => import("!!raw-loader!@player-ui/mocks/action/action-basic.tsx"),
+  {
+    controlsLoader: () =>
+      import("@player-ui/mocks/action/action-basic.controls.json"),
+  },
 );
 
 export const Expression = createDSLStory(
