@@ -19,9 +19,6 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
     /// The current state if player is in an EXTERNAL state
     @Published public var state: NavigationFlowExternalState?
 
-    /// The Object for access to the controllers during a flow
-    public var controllers: PlayerControllers?
-
     /**
      The handler function to run when an external state is transitioned to
      - parameters:
@@ -42,14 +39,11 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
      Construct a plugin to handle external states
      - parameters:
         - handler: the function to call when an external state is transitioned to
-        - transitionHandler:the function to call when an a transition action is triggered, nil by default
      */
-    public init(handler: @escaping ExternalStateViewModifierHandler, transitionHandler: TransitionHandler? = nil, fileName: String = "ExternalActionPlugin.native", pluginName: String = "ExternalActionPlugin.ExternalActionPlugin") {
-           self.handler = handler
-           self.transitionHandler = transitionHandler
-
-           super.init(fileName: fileName, pluginName: pluginName)
-       }
+    public convenience init(handler: @escaping ExternalStateViewModifierHandler) {
+        self.init(fileName: "ExternalActionPlugin.native", pluginName: "ExternalActionPlugin.ExternalActionPlugin")
+        self.handler = handler
+    }
 
     open func apply<P>(player: P) where P: HeadlessPlayer {
         guard let player = player as? SwiftUIPlayer else { return }
@@ -88,10 +82,6 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
                     let state = NavigationFlowExternalState(state)
                     self?.state = state
                     do {
-                        if let transitionHandler = self?.transitionHandler {
-                            resolve(transitionHandler)
-                        }
-
                         self?.content = try self?.handler?(state, controllers) { transition in
                             resolve(transition)
                             withAnimation {
