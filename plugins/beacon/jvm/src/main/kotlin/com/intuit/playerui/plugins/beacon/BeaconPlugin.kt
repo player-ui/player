@@ -35,7 +35,7 @@ public typealias LoggerType = Map<LogSeverity, Invokable<Unit>>
 /**
  * Core beaconing plugin wrapper for the JVM. Beaconing format can be augmented with a wrapped core beaconing plugin passed in as [JSPluginWrapper]s.
  */
-public class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath), Pluggable {
+public open class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath), Pluggable {
 
     public constructor(vararg plugins: JSPluginWrapper) : this(plugins.toList())
 
