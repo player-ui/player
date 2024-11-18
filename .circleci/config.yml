@@ -215,11 +215,7 @@ jobs:
           when: always
           command: |
             mkdir -p _ios_coverage/lcov
-            mkdir -p _ios_coverage/html
             cp -r $(bazel info output_path)/_coverage/_coverage_report.dat _ios_coverage/lcov/
-            genhtml --branch-coverage --output-directory=_ios_coverage/html/ "$(bazel info output_path)/_coverage/_coverage_report.dat"
-            zip -r _ios_coverage/html.zip _ios_coverage/html/
-            rm -r _ios_coverage/html/
 
       - persist_to_workspace:
           root: .
