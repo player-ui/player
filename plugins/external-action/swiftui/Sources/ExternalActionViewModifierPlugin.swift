@@ -31,10 +31,6 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
 
     private var handler: ExternalStateViewModifierHandler?
 
-    /// The handler function to run when a transition call is made
-    public typealias TransitionHandler = ((String) -> Void)
-    public var transitionHandler: TransitionHandler?
-
     /**
      Construct a plugin to handle external states
      - parameters:
