@@ -88,6 +88,10 @@ export default defineConfig({
               autogenerate: { directory: "guides" },
             },
             {
+              label: "Authoring",
+              autogenerate: { directory: "authoring" },
+            },
+            {
               label: "Content",
               autogenerate: { directory: "content" },
             },
