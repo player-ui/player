@@ -21,7 +21,6 @@
       {
         "labels": "release"
       }
-    ],
-    "./scripts/delete-old-prerelease.js"
+    ]
   ]
 }
