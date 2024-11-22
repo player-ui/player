@@ -1,5 +1,7 @@
 package com.intuit.playerui.core.player
 
+import com.intuit.hooks.BailResult
+import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.JSErrorException
 import com.intuit.playerui.core.bridge.PlayerRuntimeException
 import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
@@ -26,6 +28,9 @@ import com.intuit.playerui.core.player.state.lastViewUpdate
 import com.intuit.playerui.core.plugins.Plugin
 import com.intuit.playerui.core.validation.getWarningsAndErrors
 import com.intuit.playerui.plugins.assets.ReferenceAssetsPlugin
+import com.intuit.playerui.plugins.beacon.LoggerType
+import com.intuit.playerui.plugins.beacon.LogSeverity
+import com.intuit.playerui.plugins.beacon.BeaconPlugin
 import com.intuit.playerui.plugins.types.CommonTypesPlugin
 import com.intuit.playerui.utils.filterKeys
 import com.intuit.playerui.utils.normalizeStackTraceElements
@@ -40,8 +45,12 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import org.amshove.kluent.shouldBe
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -58,7 +67,8 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
     override val threads = mutableListOf<Thread>()
     override val exceptions = mutableListOf<Throwable>()
 
-    override val plugins: List<Plugin> = listOf(ReferenceAssetsPlugin(), CommonTypesPlugin())
+    val beaconPlugin = BeaconPlugin()
+    override val plugins: List<Plugin> = listOf(ReferenceAssetsPlugin(), CommonTypesPlugin(), beaconPlugin)
 
     @TestTemplate
     fun `test player not started state`() {
@@ -543,4 +553,33 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         val lastname = constantsController.getConstants(key = "lastname", namespace = "constants")
         assertEquals("doe", lastname)
     }
+
+    @TestTemplate
+    fun `beacon plugin receives logger`() = runBlockingTest {
+        var logger: LoggerType? = null;
+
+        val action = "clicked"
+        val element = "button"
+        val (id, type) = "test-id" to "test"
+
+        val asset = buildJsonObject {
+            put("id", id)
+            put("type", type)
+        }.asAsset()
+
+        beaconPlugin.hooks.cancelBeacon.tap { beaconOptions ->
+            logger = beaconOptions?.logger
+            BailResult.Bail(false)
+        }
+
+        beaconPlugin.beacon(action, element, asset) shouldBe Unit
+        while (logger == null) runBlocking { delay(100) }
+        logger?.get(LogSeverity.trace)?.invoke("Beacon Plugin trace logged") shouldBe Unit
+        logger?.get(LogSeverity.debug)?.invoke("Beacon Plugin debug logged") shouldBe Unit
+        logger?.get(LogSeverity.info)?.invoke("Beacon Plugin info logged") shouldBe Unit
+        logger?.get(LogSeverity.warn)?.invoke("Beacon Plugin warn logged") shouldBe Unit
+        logger?.get(LogSeverity.trace)?.invoke("Beacon Plugin error logged") shouldBe Unit
+    }
+
+    private fun JsonObject.asAsset(): Asset = runtime.serialize(this) as Asset
 }

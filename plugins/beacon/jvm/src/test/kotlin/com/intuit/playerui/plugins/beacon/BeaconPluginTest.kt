@@ -150,7 +150,7 @@ internal class BeaconPluginTest : RuntimePluginTest<BeaconPlugin>() {
             put("type", type)
         }.asAsset()
 
-        plugin.hooks.buildBeacon.tap("") { _, beacon, beaconOptions ->
+        plugin.hooks.buildBeacon.tap("") { _, _, beaconOptions ->
             if (beaconOptions?.asset?.id == id) {
                 runtime.Promise<Any?> { resolve, _ ->
                     resolve(shouldBeacon)

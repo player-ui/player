@@ -107,11 +107,12 @@ public open class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JS
         public val state: PlayerFlowState? by NodeSerializableField(PlayerFlowState.serializer().nullable)
 
         /** The beacon plugin logger */
-        public val logger: LoggerType by NodeSerializableField(
+        public val logger: LoggerType? get() = node.getSerializable<LoggerType?>(
+            "logger",
             MapSerializer(
                 LogSeverity.serializer(),
-                InvokableSerializer(GenericSerializer()) as KSerializer<Invokable<Unit>>,
-            ),
+                InvokableSerializer<Any?>(GenericSerializer())
+            ) as KSerializer<LoggerType?>
         )
 
         /** The action being performed */
@@ -146,7 +147,7 @@ public open class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JS
 
 @Serializable
 public enum class LogSeverity {
-    TRACE, DEBUG, INFO, WARN, ERROR
+    trace, debug, info, warn, error
 }
 
 /** Convenience getter to find the first [BeaconPlugin] registered to the [Player] */
