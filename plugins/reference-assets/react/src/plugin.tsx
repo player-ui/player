@@ -29,7 +29,7 @@ import {
   AsyncNodePlugin,
   AsyncNodePluginPlugin,
 } from "@player-ui/async-node-plugin";
-
+import { Node } from "@player-ui/player";
 /**
  * A plugin to register the base reference assets
  */
@@ -59,6 +59,27 @@ export class ReferenceAssetsPlugin
   }
 
   apply(player: Player) {
+    const plugin = new AsyncNodePlugin({
+      plugins: [new AsyncNodePluginPlugin()],
+    });
+
+    let deferredResolve: ((value: any) => void) | undefined;
+
+    let updateContent: any;
+
+    plugin.hooks.onAsyncNode.tap(
+      "test",
+      async (node: Node.Async, update: (content: any) => void) => {
+        const result = new Promise((resolve) => {
+          deferredResolve = resolve; // Promise would be resolved only once
+        });
+
+        updateContent = update;
+        // Return the result to follow the same mechanism as before
+        return result;
+      },
+    );
+
     player.registerPlugin(
       new AsyncNodePlugin({
         plugins: [new AsyncNodePluginPlugin()],

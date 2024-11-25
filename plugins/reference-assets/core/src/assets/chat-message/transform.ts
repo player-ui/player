@@ -5,7 +5,7 @@ import type {
 } from "@player-ui/player";
 import { v4 as uuid } from "uuid";
 import { NodeType } from "@player-ui/player";
-import { composeBefore } from "@player-ui/asset-transform-plugin";
+import { composeBefore, compose } from "@player-ui/asset-transform-plugin";
 
 /**
  * In beforeTransform function, pass in flatten marker and call beforeResolve function
@@ -97,5 +97,6 @@ export const transform: BeforeTransformFunction<Asset> = (asset) => {
 //   return multiNode;
 // };
 
-export const chatMessageTransform: TransformFunctions =
-  composeBefore(transform);
+export const chatMessageTransform: TransformFunctions = compose(
+  composeBefore(transform),
+);

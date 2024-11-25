@@ -45,5 +45,6 @@ js_pipeline(
         "//:node_modules/clsx",
         "//:node_modules/lucide-react",
         "//:node_modules/tailwind-merge",
+        ":node_modules/@player-ui/player",
     ],
 )
