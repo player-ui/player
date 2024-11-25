@@ -92,6 +92,11 @@ export declare namespace Node {
      */
     override?: boolean;
 
+    /**
+     * Should this list be flattened in resolver
+     */
+    flatten?: boolean;
+
     /** A list of values that comprise this node */
     values: Array<Node>;
   }
@@ -115,7 +120,7 @@ export declare namespace Node {
     /** The unique id of the node */
     id: string;
     /** The value representing the node */
-    value: Node;
+    value?: Node;
   }
 
   export interface PluginOptions {

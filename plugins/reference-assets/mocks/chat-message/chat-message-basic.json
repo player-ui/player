@@ -1,0 +1,49 @@
+{
+  "id": "collection-basic",
+  "views": [
+    {
+      "id": "view-1",
+      "type": "collection",
+      "values": [
+        {
+          "asset": {
+            "type": "chat-message",
+            "id": "1",
+            "value": "Hello World!"
+          }
+        },
+        {
+          "asset": {
+            "id": "view-1-values-1",
+            "type": "action",
+            "exp": "{{count}} = 100",
+            "label": {
+              "asset": {
+                "id": "view-1-values-1-label",
+                "type": "text",
+                "value": "Count: {{count}}"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "view-1",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "DONE"
+      }
+    }
+  }
+}

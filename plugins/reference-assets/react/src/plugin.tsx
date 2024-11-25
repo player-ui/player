@@ -15,7 +15,20 @@ import type {
   ChoiceAsset,
 } from "@player-ui/reference-assets-plugin";
 import { ReferenceAssetsPlugin as ReferenceAssetsCorePlugin } from "@player-ui/reference-assets-plugin";
-import { Input, Text, Collection, Action, Info, Image, Choice } from "./assets";
+import {
+  Input,
+  Text,
+  Collection,
+  Action,
+  Info,
+  Image,
+  Choice,
+  ChatMessage,
+} from "./assets";
+import {
+  AsyncNodePlugin,
+  AsyncNodePluginPlugin,
+} from "@player-ui/async-node-plugin";
 
 /**
  * A plugin to register the base reference assets
@@ -40,11 +53,17 @@ export class ReferenceAssetsPlugin
         ["collection", Collection],
         ["image", Image],
         ["choice", Choice],
+        ["chat-message", ChatMessage],
       ]),
     );
   }
 
   apply(player: Player) {
+    player.registerPlugin(
+      new AsyncNodePlugin({
+        plugins: [new AsyncNodePluginPlugin()],
+      }),
+    );
     player.registerPlugin(new ReferenceAssetsCorePlugin());
   }
 }

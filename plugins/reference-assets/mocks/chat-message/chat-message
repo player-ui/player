@@ -1,0 +1,35 @@
+{
+    "id": "test-flow",
+    "views": [
+      {
+        "id": "my-view",
+        "actions": [
+          {
+            "asset": {
+              "id": "action-0",
+              "type": "action",
+              "value": "{{foo.bar}}"
+            }
+          },
+          {
+            "asset": {
+              "id": "action-1",
+              "type": "action",
+              "value": "{{foo.bar}}"
+            }
+          }
+        ]
+      }
+    ],
+    "navigation": {
+      "BEGIN": "FLOW_1",
+      "FLOW_1": {
+        "startState": "VIEW_1",
+        "VIEW_1": {
+          "state_type": "VIEW",
+          "ref": "my-view",
+          "transitions": {}
+        }
+      }
+    }
+  }

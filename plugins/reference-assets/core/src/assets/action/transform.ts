@@ -5,6 +5,7 @@ import type {
 } from "@player-ui/player";
 import { compose, composeBefore } from "@player-ui/asset-transform-plugin";
 import type { ActionAsset, TransformedAction } from "./types";
+import { NodeType } from "@player-ui/player";
 
 /**
  * Function to find prev button
@@ -20,6 +21,7 @@ const transform: TransformFunction<ActionAsset, TransformedAction> = (
   action,
   options,
 ) => {
+  console.log("action transform");
   return {
     ...action,
     run() {
@@ -68,8 +70,7 @@ export const expPropTransform: BeforeTransformFunction<Asset> = (asset) => {
   if (skipArray && skipArray.indexOf("exp") > 1) {
     return asset;
   }
-
-  return {
+  const result = {
     ...asset,
     plugins: {
       ...asset.plugins,
@@ -82,10 +83,34 @@ export const expPropTransform: BeforeTransformFunction<Asset> = (asset) => {
       },
     },
   };
+
+  return result;
+};
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export const twoActions: BeforeTransformFunction<Asset> = (asset) => {
+  const result = {
+    type: NodeType.MultiNode,
+    values: [
+      {
+        ...asset.value,
+        id: "1",
+      },
+      {
+        ...asset.value,
+        id: "2",
+      },
+    ],
+  };
+  return {
+    ...asset,
+    value: result,
+  };
+  // return result;
 };
 
 export const actionTransform = compose(
   transform,
   backIconTransform,
-  composeBefore(expPropTransform),
+  composeBefore(expPropTransform, twoActions),
 );

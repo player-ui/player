@@ -163,7 +163,7 @@ export class Resolver {
     );
     this.resolveCache = resolveCache;
     this.hooks.afterUpdate.call(updated.value);
-
+    console.log("updated", updated);
     return updated.value;
   }
 
@@ -178,7 +178,8 @@ export class Resolver {
 
     const isFirstUpdate = this.resolveCache.size === 0;
     const id = getNodeID(node);
-
+    // can't find id for new asset since obj is like node: {asset: {id, type, value}}.
+    // try change the transform to not using asset but with value only
     if (id) {
       if (this.idCache.has(id)) {
         // Only log this conflict once to cut down on noise
@@ -230,7 +231,7 @@ export class Resolver {
     prevASTMap: Map<Node.Node, Node.Node>,
   ): NodeUpdate {
     const dependencyModel = new DependencyModel(options.data.model);
-
+    console.log("node", node);
     dependencyModel.trackSubset("core");
     const depModelWithParser = withContext(
       withParser(dependencyModel, this.options.parseBinding),
@@ -332,11 +333,14 @@ export class Resolver {
     }
 
     resolvedAST.parent = partiallyResolvedParent;
-
+    // partiallyResolvedParent.children = resolvedAST;
     resolveOptions.node = resolvedAST;
-
+    // ASTMap has multinode map to asset is correct
     this.ASTMap.set(resolvedAST, node);
 
+    // why resolved is undefined? then updated is false.
+    // how we register resolve hooks? why multi-node plugin is not called
+    // for multi-node this resolved is also undefined.
     let resolved = this.hooks.resolve.call(
       undefined,
       resolvedAST,
@@ -351,8 +355,10 @@ export class Resolver {
 
     const childDependencies = new Set<BindingInstance>();
     dependencyModel.trackSubset("children");
-
+    // does multi-node have children -> no
     if ("children" in resolvedAST) {
+      // problem is here. resolvedAST for view has children but the beforeTransformed one not new multinode
+      // hmmm may not...
       const newChildren = resolvedAST.children?.map((child) => {
         const computedChildTree = this.computeTree(
           child.value,
@@ -394,8 +400,8 @@ export class Resolver {
       const childValue: any = [];
       const rawParentToPassIn = isNestedMultiNode
         ? partiallyResolvedParent?.parent
-        : node;
-
+        : node;// why not use resolvedAST?
+      // rawParentToPassIn -> asset beforeTransform should it be multinode???
       const newValues = resolvedAST.values.map((mValue) => {
         const mTree = this.computeTree(
           mValue,
@@ -406,9 +412,12 @@ export class Resolver {
           resolvedAST,
           prevASTMap,
         );
-
+        // how about multi-node test. does it have mTree value?
+        // for values of multinode. mTree structure is mTree.value -> asset
         if (mTree.value !== undefined && mTree.value !== null) {
           childValue.push(mTree.value);
+        } else if (mTree.node !== undefined && mTree.node !== null) {
+          childValue.push(mTree.node);
         }
 
         mTree.dependencies.forEach((bindingDep) =>

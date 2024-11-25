@@ -1,0 +1,81 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`chatMessage transform > generates a new multi-node with async node placeholder > 
+[
+  {
+    "id": "1",
+    "parent": {
+      "flatten": true,
+      "parent": undefined,
+      "type": "multi-node",
+      "values": [
+        [Circular],
+        {
+          "id": Any<String>,
+          "parent": [Circular],
+          "type": "async",
+        },
+      ],
+    },
+    "type": "chat-message",
+    "value": "Hello World!",
+  },
+  {
+    "id": Any<String>,
+    "parent": {
+      "flatten": true,
+      "parent": undefined,
+      "type": "multi-node",
+      "values": [
+        {
+          "id": "1",
+          "parent": [Circular],
+          "type": "chat-message",
+          "value": "Hello World!",
+        },
+        [Circular],
+      ],
+    },
+    "type": "async",
+  },
+]
+ 1`] = `
+[
+  {
+    "id": "1",
+    "parent": {
+      "flatten": true,
+      "parent": undefined,
+      "type": "multi-node",
+      "values": [
+        [Circular],
+        {
+          "id": "5bc9088a-b3be-47a4-9c17-603b0521e5d8",
+          "parent": [Circular],
+          "type": "async",
+        },
+      ],
+    },
+    "type": "chat-message",
+    "value": "Hello World!",
+  },
+  {
+    "id": "5bc9088a-b3be-47a4-9c17-603b0521e5d8",
+    "parent": {
+      "flatten": true,
+      "parent": undefined,
+      "type": "multi-node",
+      "values": [
+        {
+          "id": "1",
+          "parent": [Circular],
+          "type": "chat-message",
+          "value": "Hello World!",
+        },
+        [Circular],
+      ],
+    },
+    "type": "async",
+  },
+]
+`;

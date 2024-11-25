@@ -12,6 +12,7 @@ describe("action transform", () => {
     });
 
     ref.current?.run();
+    expect(ref.current).toBe("");
 
     expect(ref.controllers?.data.get("count")).toBe(100);
   });

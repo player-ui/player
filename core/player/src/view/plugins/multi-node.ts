@@ -56,6 +56,13 @@ export default class MultiNodePlugin implements ViewPlugin {
             });
           }
 
+          const returnVal = [
+            {
+              path: [...childOptions.path, childOptions.key],
+              value: multiNode,
+            },
+          ]
+
           return [
             {
               path: [...childOptions.path, childOptions.key],
