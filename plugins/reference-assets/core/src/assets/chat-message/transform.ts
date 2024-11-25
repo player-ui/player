@@ -35,56 +35,23 @@ import { composeBefore } from "@player-ui/asset-transform-plugin";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-// export const transform: BeforeTransformFunction<Asset> = (asset) => {
-//   // return asset;
-//   const id = uuid();
-//   // const flatten = asset.value.flatten ? asset.value.flatten : true;
-//   console.log("chatmessage transform", asset);
-//   const multiNode = {
-//     type: NodeType.MultiNode,
-//     flatten: true,
-//     values: [
-//       {
-//         asset: {
-//           ...asset.value,
-//         },
-//       },
-//       // { ...asset.value },
-//       {
-//         id: id,
-//         async: "true",
-//       },
-//     ],
-//   };
-//
-//   // multiNode.values.forEach((value) => {
-//   //   value.parent = multiNode;
-//   // });
-//   // console.log("multiNode", multiNode);
-//   return {
-//     ...asset,
-//     value: multiNode,
-//   };
-// };
-
 export const transform: BeforeTransformFunction<Asset> = (asset) => {
   // return asset;
   const id = uuid();
   // const flatten = asset.value.flatten ? asset.value.flatten : true;
-  console.log("asset", asset);
-  debugger;
+  console.log("chatmessage transform", asset);
   const multiNode = {
     type: NodeType.MultiNode,
     flatten: true,
     values: [
       {
         asset: {
-          value: asset.value,
+          ...asset.value,
         },
       },
+      // { ...asset.value },
       {
         id: id,
-        // type: NodeType.Async,
         async: "true",
       },
     ],
@@ -94,8 +61,41 @@ export const transform: BeforeTransformFunction<Asset> = (asset) => {
   //   value.parent = multiNode;
   // });
   // console.log("multiNode", multiNode);
-  return multiNode;
+  return {
+    ...asset,
+    value: multiNode,
+  };
 };
+
+// export const transform: BeforeTransformFunction<Asset> = (asset) => {
+//   // return asset;
+//   const id = uuid();
+//   // const flatten = asset.value.flatten ? asset.value.flatten : true;
+//   console.log("asset", asset);
+//   debugger;
+//   const multiNode = {
+//     type: NodeType.MultiNode,
+//     flatten: true,
+//     values: [
+//       {
+//         asset: {
+//           value: asset.value,
+//         },
+//       },
+//       {
+//         id: id,
+//         // type: NodeType.Async,
+//         async: "true",
+//       },
+//     ],
+//   };
+
+// multiNode.values.forEach((value) => {
+//   value.parent = multiNode;
+// });
+// console.log("multiNode", multiNode);
+//   return multiNode;
+// };
 
 export const chatMessageTransform: TransformFunctions =
   composeBefore(transform);
