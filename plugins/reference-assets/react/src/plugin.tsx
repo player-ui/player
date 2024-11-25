@@ -80,11 +80,7 @@ export class ReferenceAssetsPlugin
       },
     );
 
-    player.registerPlugin(
-      new AsyncNodePlugin({
-        plugins: [new AsyncNodePluginPlugin()],
-      }),
-    );
+    player.registerPlugin(plugin);
     player.registerPlugin(new ReferenceAssetsCorePlugin());
   }
 }
