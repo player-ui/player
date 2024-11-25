@@ -38,12 +38,12 @@ internal class ConsoleLoggerPluginTest : RuntimeTest() {
         verify(exactly = 1) { logger.debug("Hello world", mapOf("foo" to "bar")) }
     }
 
-    /*@TestTemplate fun `info works as intended`() = runBlockingTest {
+    @TestTemplate fun `info works as intended`() = runBlockingTest {
         ConsoleLoggerPlugin(logger, true).apply(runtime)
         Assertions.assertNotNull(runtime["console"])
 
-        runtime.execute("console.info('Hello world')")
-        verify(exactly = 1) { logger.info("Hello world") }
+        runtime.execute("console.info('Hello world', 'this is a log', {'foo': 'bar'})")
+        verify(exactly = 1) { logger.info("Hello world", "this is a log", mapOf("foo" to "bar")) }
     }
 
     @TestTemplate fun `warning works as intended`() = runBlockingTest {
@@ -68,6 +68,6 @@ internal class ConsoleLoggerPluginTest : RuntimeTest() {
 
         runtime.execute("console.trace('Hello world')")
         verify(exactly = 1) { logger.trace("Hello world") }
-    }*/
+    }
 }
 
