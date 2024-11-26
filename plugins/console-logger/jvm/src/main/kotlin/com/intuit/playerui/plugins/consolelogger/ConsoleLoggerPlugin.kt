@@ -3,7 +3,6 @@ package com.intuit.playerui.plugins.consolelogger
 import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.add
-import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.player.Player
 import com.intuit.playerui.core.plugins.LoggerPlugin
 import com.intuit.playerui.core.plugins.PlayerPlugin
