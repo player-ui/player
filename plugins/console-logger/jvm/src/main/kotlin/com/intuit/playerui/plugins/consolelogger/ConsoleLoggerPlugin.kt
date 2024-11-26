@@ -15,29 +15,28 @@ public class ConsoleLoggerPlugin(private val logger: LoggerPlugin? = null, priva
 
     private var player: Player? = null
 
-    @OptIn(ExperimentalPlayerApi::class)
     override fun apply(runtime: Runtime<*>) {
         if (override || !runtime.contains("console")) {
             runtime.add(
                 "console",
                 mapOf(
                     "log" to Invokable { args ->
-                        logger?.debug(*args) ?: printToConsole(*args)
+                        logger?.debug(*args) ?: player?.logger?.debug(*args) ?: printToConsole(*args)
                     },
                     "debug" to Invokable { args ->
-                        logger?.debug(*args) ?: printToConsole(*args)
+                        logger?.debug(*args) ?: player?.logger?.debug(*args) ?: printToConsole(*args)
                     },
                     "warn" to Invokable { args ->
-                        logger?.warn(*args) ?: printToConsole(*args)
+                        logger?.warn(*args) ?: player?.logger?.warn(*args) ?: printToConsole(*args)
                     },
                     "info" to Invokable { args ->
-                        logger?.info(*args) ?: printToConsole(*args)
+                        logger?.info(*args) ?: player?.logger?.info(*args) ?: printToConsole(*args)
                     },
                     "error" to Invokable { args ->
-                        logger?.error(*args) ?: printToConsole(*args)
+                        logger?.error(*args) ?: player?.logger?.error(*args) ?: printToConsole(*args)
                     },
                     "trace" to Invokable { args ->
-                        logger?.trace(*args) ?: printToConsole(*args)
+                        logger?.trace(*args) ?: player?.logger?.trace(*args) ?: printToConsole(*args)
                     },
                 ),
             )
