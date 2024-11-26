@@ -45,6 +45,7 @@ public class ConsoleLoggerPlugin(private val logger: LoggerPlugin? = null, priva
     }
 
     private fun printToConsole(vararg args: Any?) {
+        println(args.joinToString(", "))
     }
 
     override fun apply(player: Player) {
