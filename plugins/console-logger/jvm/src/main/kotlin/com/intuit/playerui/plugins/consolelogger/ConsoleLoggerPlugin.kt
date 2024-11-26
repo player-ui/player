@@ -18,31 +18,33 @@ public class ConsoleLoggerPlugin(private val logger: LoggerPlugin? = null, priva
     @OptIn(ExperimentalPlayerApi::class)
     override fun apply(runtime: Runtime<*>) {
         if (override || !runtime.contains("console")) {
-            runtime.add("console", mapOf(
-                "log" to Invokable { args ->
-                    logger?.debug(*args) ?: printToConsole(*args)
-                },
-                "debug" to Invokable { args ->
-                    logger?.debug(*args) ?: printToConsole(*args)
-                },
-                "warn" to Invokable { args ->
-                    logger?.warn(*args) ?: printToConsole(*args)
-                },
-                "info" to Invokable { args ->
-                    logger?.info(*args) ?: printToConsole(*args)
-                },
-                "error" to Invokable { args ->
-                    logger?.error(*args) ?: printToConsole(*args)
-                },
-                "trace" to Invokable { args ->
-                    logger?.trace(*args) ?: printToConsole(*args)
-                },
-            ))
+            runtime.add(
+                "console",
+                mapOf(
+                    "log" to Invokable { args ->
+                        logger?.debug(*args) ?: printToConsole(*args)
+                    },
+                    "debug" to Invokable { args ->
+                        logger?.debug(*args) ?: printToConsole(*args)
+                    },
+                    "warn" to Invokable { args ->
+                        logger?.warn(*args) ?: printToConsole(*args)
+                    },
+                    "info" to Invokable { args ->
+                        logger?.info(*args) ?: printToConsole(*args)
+                    },
+                    "error" to Invokable { args ->
+                        logger?.error(*args) ?: printToConsole(*args)
+                    },
+                    "trace" to Invokable { args ->
+                        logger?.trace(*args) ?: printToConsole(*args)
+                    },
+                ),
+            )
         }
     }
 
     private fun printToConsole(vararg args: Any?) {
-
     }
 
     override fun apply(player: Player) {

@@ -1,26 +1,20 @@
 package com.intuit.playerui.plugins.consolelogger
 
-import com.intuit.playerui.core.bridge.runtime.add
 import com.intuit.playerui.core.plugins.LoggerPlugin
 import com.intuit.playerui.utils.test.RuntimeTest
 import com.intuit.playerui.utils.test.runBlockingTest
-import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestTemplate
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
 internal class ConsoleLoggerPluginTest : RuntimeTest() {
 
-    @MockK(relaxed = true) lateinit var logger: LoggerPlugin
-
-    @BeforeEach
-    fun setup() {
-    }
+    @MockK(relaxed = true)
+    lateinit var logger: LoggerPlugin
 
     @TestTemplate fun `log works as intended`() = runBlockingTest {
         ConsoleLoggerPlugin(logger, true).apply(runtime)
@@ -70,4 +64,3 @@ internal class ConsoleLoggerPluginTest : RuntimeTest() {
         verify(exactly = 1) { logger.trace("Hello world") }
     }
 }
-
