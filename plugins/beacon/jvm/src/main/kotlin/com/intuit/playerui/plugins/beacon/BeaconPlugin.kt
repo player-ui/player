@@ -30,8 +30,6 @@ import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 
-public typealias LoggerType = Map<LogSeverity, Invokable<Unit>>
-
 /**
  * Core beaconing plugin wrapper for the JVM. Beaconing format can be augmented with a wrapped core beaconing plugin passed in as [JSPluginWrapper]s.
  */
@@ -101,19 +99,22 @@ public open class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JS
         internal object Serializer : NodeWrapperSerializer<Hooks>(::Hooks)
     }
 
+    @Serializable
+    public data class LoggerType(
+        val trace: Invokable<Unit?>,
+        val error: Invokable<Unit?>,
+        val debug: Invokable<Unit?>,
+        val info: Invokable<Unit?>,
+        val warn: Invokable<Unit?>,
+    )
+
     @Serializable(HookArgs.Serializer::class)
     public class HookArgs internal constructor(override val node: Node) : NodeWrapper {
         /** The current player state */
         public val state: PlayerFlowState? by NodeSerializableField(PlayerFlowState.serializer().nullable)
 
         /** The beacon plugin logger */
-        public val logger: LoggerType? get() = node.getSerializable<LoggerType?>(
-            "logger",
-            MapSerializer(
-                LogSeverity.serializer(),
-                InvokableSerializer<Any?>(GenericSerializer())
-            ) as KSerializer<LoggerType?>
-        )
+        public val logger: LoggerType? by NodeSerializableField(LoggerType.serializer())
 
         /** The action being performed */
         public val action: String by NodeSerializableField(String.serializer())

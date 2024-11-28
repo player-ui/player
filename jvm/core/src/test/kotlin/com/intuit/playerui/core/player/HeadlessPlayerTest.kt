@@ -31,9 +31,9 @@ import com.intuit.playerui.core.player.state.lastViewUpdate
 import com.intuit.playerui.core.plugins.Plugin
 import com.intuit.playerui.core.validation.getWarningsAndErrors
 import com.intuit.playerui.plugins.assets.ReferenceAssetsPlugin
-import com.intuit.playerui.plugins.beacon.LoggerType
-import com.intuit.playerui.plugins.beacon.LogSeverity
 import com.intuit.playerui.plugins.beacon.BeaconPlugin
+import com.intuit.playerui.plugins.beacon.beaconPlugin
+import com.intuit.playerui.plugins.beacon.beacon
 import com.intuit.playerui.plugins.types.CommonTypesPlugin
 import com.intuit.playerui.utils.filterKeys
 import com.intuit.playerui.utils.normalizeStackTraceElements
@@ -559,8 +559,11 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
 
     @TestTemplate
     fun `beacon plugin cancelBeacon hook receives logger`() = runBlockingTest {
-        var logger: LoggerType? = null;
-
+        var beaconed: String? = null
+        var logger: BeaconPlugin.LoggerType? = null
+        beaconPlugin.registerHandler { beacon ->
+            beaconed = beacon
+        }
         val action = "clicked"
         val element = "button"
         val (id, type) = "test-id" to "test"
@@ -576,8 +579,10 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         }
 
         beaconPlugin.beacon(action, element, asset) shouldBe Unit
-        while (logger == null) runBlocking { delay(100) }
-        assertLogger(logger)
+        while (beaconed == null || logger == null) {
+            delay(100)
+        }
+        assertLogger(logger!!)
     }
 
 //    @TestTemplate
@@ -607,21 +612,11 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
 
     private fun JsonObject.asAsset(): Asset = runtime.serialize(this) as Asset
 
-    private fun assertLogger(logger: LoggerType?) {
-        if (logger?.get(LogSeverity.trace) != null) {
-            logger[LogSeverity.trace]?.invoke("Beacon Plugin trace logged") shouldBe Unit
-        }
-        if (logger?.get(LogSeverity.debug)  != null) {
-            logger[LogSeverity.debug]?.invoke("Beacon Plugin debug logged") shouldBe Unit
-        }
-        if (logger?.get(LogSeverity.info) != null) {
-            logger[LogSeverity.info]?.invoke("Beacon Plugin info logged") shouldBe Unit
-        }
-        if (logger?.get(LogSeverity.warn) != null) {
-            logger[LogSeverity.warn]?.invoke("Beacon Plugin warn logged") shouldBe Unit
-        }
-        if (logger?.get(LogSeverity.error) != null) {
-            logger[LogSeverity.error]?.invoke("Beacon Plugin error logged") shouldBe Unit
-        }
+    private fun assertLogger(logger: BeaconPlugin.LoggerType) {
+        logger.trace.invoke("Beacon plugin trace logged") shouldBe null
+        logger.debug.invoke("Beacon plugin debug logged") shouldBe null
+        logger.warn.invoke("Beacon plugin warn logged") shouldBe null
+        logger.error.invoke("Beacon plugin error logged") shouldBe null
+        logger.info.invoke("Beacon plugin info logged") shouldBe null
     }
 }
