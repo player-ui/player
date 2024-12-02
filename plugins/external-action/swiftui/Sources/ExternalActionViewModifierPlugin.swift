@@ -41,7 +41,7 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
         self.handler = handler
     }
 
-    public func apply<P>(player: P) where P: HeadlessPlayer {
+    open func apply<P>(player: P) where P: HeadlessPlayer {
         guard let player = player as? SwiftUIPlayer else { return }
         player.hooks?.view.tap(name: pluginName, { (view) -> AnyView in
             return AnyView(view.modifier(ModifierType.init(plugin: self)))
