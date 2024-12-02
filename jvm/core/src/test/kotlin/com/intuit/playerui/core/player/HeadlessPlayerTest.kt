@@ -558,7 +558,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
     }
 
     @TestTemplate
-    fun `beacon plugin cancelBeacon hook receives logger`() = runBlockingTest {
+    fun `beacon plugin cancelBeacon hook receives logger`() {
         var beaconed: String? = null
         var logger: BeaconPlugin.LoggerType? = null
         beaconPlugin.registerHandler { beacon ->
@@ -579,36 +579,39 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         }
 
         beaconPlugin.beacon(action, element, asset) shouldBe Unit
-        while (beaconed == null || logger == null) {
+        while (beaconed == null || logger == null) runBlocking {
             delay(100)
         }
         assertLogger(logger!!)
     }
 
-//    @TestTemplate
-//    fun `beacon plugin buildBeacon hook receives logger`() = runBlockingTest {
-//        var logger: LoggerType? = null;
-//
-//        val action = "clicked"
-//        val element = "button"
-//        val (id, type) = "test-id" to "test"
-//
-//        val asset = buildJsonObject {
-//            put("id", id)
-//            put("type", type)
-//        }.asAsset()
-//
-//        beaconPlugin.hooks.buildBeacon.tap("") { _, _, beaconOptions ->
-//            runtime.Promise<Any?> { resolve, _ ->
-//                logger = beaconOptions?.logger
-//                resolve(null)
-//            }
-//        }
-//
-//        beaconPlugin.beacon(action, element, asset) shouldBe Unit
-//        while (logger == null) runBlocking { delay(100) }
-//        assertLogger(logger)
-//    }
+    @TestTemplate
+    fun `beacon plugin buildBeacon hook receives logger`() {
+        var beaconed: String? = null
+        var logger: BeaconPlugin.LoggerType? = null
+        beaconPlugin.registerHandler { beacon ->
+            beaconed = beacon
+        }
+        val action = "clicked"
+        val element = "button"
+        val (id, type) = "test-id" to "test"
+
+        val asset = buildJsonObject {
+            put("id", id)
+            put("type", type)
+        }.asAsset()
+
+        beaconPlugin.hooks.buildBeacon.tap("") { _, _, beaconOptions ->
+            runtime.Promise<Any?> { resolve, _ ->
+                logger = beaconOptions?.logger
+                resolve(null)
+            }
+        }
+
+        beaconPlugin.beacon(action, element, asset) shouldBe Unit
+        while (beaconed == null || logger == null) runBlocking { delay(100) }
+        assertLogger(logger!!)
+    }
 
     private fun JsonObject.asAsset(): Asset = runtime.serialize(this) as Asset
 
