@@ -2,6 +2,7 @@ package com.intuit.playerui.android.compose
 
 import android.view.View
 import android.widget.FrameLayout
+import androidx.annotation.StyleRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -15,6 +16,7 @@ import com.intuit.playerui.android.build
 import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.withContext
+import com.intuit.playerui.android.withTag
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import kotlinx.serialization.KSerializer
 
@@ -32,54 +34,59 @@ public abstract class ComposableAsset<Data> (
 
     override suspend fun initView(data: Data) = ComposeView(requireContext()).apply {
         setContent {
-            compose(data)
+            compose(data = data)
         }
     }
 
     override suspend fun View.hydrate(data: Data) {
         require(this is ComposeView)
         setContent {
-            compose(data)
+            compose(data = data)
         }
     }
 
     @Composable
-    fun compose(data: Data? = null) {
+    fun compose(modifier: Modifier? = Modifier, data: Data? = null) {
         val data: Data? by produceState<Data?>(initialValue = data, key1 = this) {
             value = getData()
         }
 
-        data?.let { content(it) }
+        data?.let { content(modifier ?: Modifier, it) }
     }
 
     @Composable
-    abstract fun content(data: Data)
+    abstract fun content(modifier: Modifier, data: Data)
 }
 
 // TODO: What kind of logging do we want?
 @Composable
-fun RenderableAsset.compose(androidViewAttributes: AndroidViewAttributes? = null) {
-    when (this) {
-        is ComposableAsset<*> -> compose()
-        else -> composeAndroidView(androidViewAttributes)
+fun RenderableAsset.compose(
+    modifier: Modifier = Modifier,
+    androidViewAttributes: AndroidViewAttributes? = null,
+    tag: String? = null,
+) {
+    assetContext.withTag(tag ?: asset.id).build().run {
+        when (this) {
+            is ComposableAsset<*> -> compose()
+            else -> composeAndroidView(modifier, androidViewAttributes)
+        }
     }
 }
 
 @Composable
-private fun RenderableAsset.composeAndroidView(androidViewAttributes: AndroidViewAttributes? = null) {
-    val modifier = androidViewAttributes?.modifier ?: Modifier
+private fun RenderableAsset.composeAndroidView(
+    modifier: Modifier = Modifier,
+    androidViewAttributes: AndroidViewAttributes? = null,
+) {
     val styles = androidViewAttributes?.styles
-    val tag = androidViewAttributes?.tag
 
     AndroidView(factory = ::FrameLayout, modifier) {
         assetContext.withContext(it.context).build().run {
-            render(styles, tag ?: this@composeAndroidView.asset.id)
+            render(styles)
         } into it
     }
 }
 
 data class AndroidViewAttributes(
-    val modifier: Modifier = Modifier,
-    val styles: Styles? = null,
-    val tag: String? = null,
+    @StyleRes val styles: Styles? = null,
 )
