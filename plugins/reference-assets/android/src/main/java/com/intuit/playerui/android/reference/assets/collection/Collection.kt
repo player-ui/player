@@ -31,12 +31,12 @@ class Collection(assetContext: AssetContext) : ComposableAsset<Collection.Data>(
     )
 
     @Composable
-    override fun content(data: Data) {
-        Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+    override fun content(modifier: Modifier, data: Data) {
+        Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(20.dp)) {
             CompositionLocalProvider(LocalTextStyle provides TextStyle(fontSize = 16.sp)) {
                 data.label?.compose(
+                    modifier = Modifier.padding(top = 10.dp).fillMaxWidth(),
                     androidViewAttributes = AndroidViewAttributes(
-                        modifier = Modifier.padding(top = 10.dp).fillMaxWidth(),
                         styles = listOf(R.style.Text_Label),
                     ),
                 )
@@ -44,9 +44,7 @@ class Collection(assetContext: AssetContext) : ComposableAsset<Collection.Data>(
             Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 data.values.map {
                     it.compose(
-                        androidViewAttributes = AndroidViewAttributes(
-                            modifier = Modifier.fillMaxWidth(),
-                        ),
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
             }

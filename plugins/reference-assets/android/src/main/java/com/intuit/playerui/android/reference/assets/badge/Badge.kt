@@ -28,11 +28,11 @@ internal class Badge(
     )
 
     @Composable
-    override fun content(data: Data) {
+    override fun content(modifier: Modifier, data: Data) {
         val label = data.label ?: ""
         Row(
             modifier =
-            Modifier
+            modifier
                 .height(24.dp)
                 .wrapContentSize()
                 .clip(RoundedCornerShape(4.dp))
