@@ -143,11 +143,6 @@ public open class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JS
     )
 }
 
-@Serializable
-public enum class LogSeverity {
-    trace, debug, info, warn, error
-}
-
 /** Convenience getter to find the first [BeaconPlugin] registered to the [Player] */
 public val Player.beaconPlugin: BeaconPlugin? get() = findPlugin()
 
