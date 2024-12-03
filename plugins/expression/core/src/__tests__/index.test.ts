@@ -1,7 +1,7 @@
 import { test, expect } from "vitest";
 import type { InProgressState } from "@player-ui/player";
 import { Player } from "@player-ui/player";
-import { ExpressionPlugin } from ".";
+import { ExpressionPlugin } from "..";
 
 const minimal = {
   id: "minimal",

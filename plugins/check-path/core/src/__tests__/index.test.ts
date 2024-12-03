@@ -9,8 +9,8 @@ import { Player } from "@player-ui/player";
 import type { TransformFunction } from "@player-ui/player";
 import { makeFlow } from "@player-ui/make-flow";
 import { AssetTransformPlugin } from "@player-ui/asset-transform-plugin";
-import { CheckPathPlugin } from ".";
-import { CheckPathPluginSymbol } from "./symbols";
+import { CheckPathPlugin } from "..";
+import { CheckPathPluginSymbol } from "../symbols";
 
 const nestedAssetFlow = makeFlow({
   id: "view-1",

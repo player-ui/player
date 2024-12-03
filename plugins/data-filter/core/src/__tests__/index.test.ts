@@ -2,7 +2,7 @@ import { test, expect, describe } from "vitest";
 import type { InProgressState } from "@player-ui/player";
 import { Player } from "@player-ui/player";
 import { makeFlow } from "@player-ui/make-flow";
-import { DataFilterPlugin, omitIn } from ".";
+import { DataFilterPlugin, omitIn } from "..";
 
 test("removes top level keys", async () => {
   const player = new Player({

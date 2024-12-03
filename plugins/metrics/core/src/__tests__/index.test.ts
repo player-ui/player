@@ -3,12 +3,12 @@ import type { BeaconPluginPlugin } from "@player-ui/beacon-plugin";
 import { BeaconPlugin } from "@player-ui/beacon-plugin";
 import type { InProgressState, Flow } from "@player-ui/player";
 import { Player } from "@player-ui/player";
-import type { NodeRenderMetrics } from ".";
+import type { NodeRenderMetrics } from "..";
 import {
   MetricsCorePlugin,
   MetricsViewBeaconPlugin,
   RequestTimeWebPlugin,
-} from ".";
+} from "..";
 
 const basicContentWithActions: Flow<any> = {
   id: "test-flow",

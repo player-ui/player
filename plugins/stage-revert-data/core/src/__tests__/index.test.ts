@@ -2,7 +2,7 @@ import { describe, it, expect, vitest, beforeEach, beforeAll } from "vitest";
 import type { DataController, InProgressState } from "@player-ui/player";
 import { Player } from "@player-ui/player";
 import type { Flow } from "@player-ui/types";
-import { StageRevertDataPlugin } from "./index";
+import { StageRevertDataPlugin } from "../index";
 
 const dataChangeFlow: Flow = {
   id: "test-flow",

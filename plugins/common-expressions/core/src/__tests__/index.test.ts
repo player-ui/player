@@ -2,7 +2,7 @@ import { expect, test } from "vitest";
 import type { InProgressState } from "@player-ui/player";
 import { Player } from "@player-ui/player";
 import { makeFlow } from "@player-ui/make-flow";
-import { CommonExpressionsPlugin } from ".";
+import { CommonExpressionsPlugin } from "..";
 
 test("works in real life", () => {
   const flow = makeFlow({

@@ -9,7 +9,7 @@ import { Player } from "@player-ui/player";
 import { CommonTypesPlugin } from "@player-ui/common-types-plugin";
 import { AssetTransformPlugin } from "@player-ui/asset-transform-plugin";
 import { Registry } from "@player-ui/partial-match-registry";
-import { DataChangeListenerPlugin } from "./index";
+import { DataChangeListenerPlugin } from "../index";
 
 /** Test transform function to add validation to asset */
 const transform: TransformFunction = (asset: any, options: any) => {
