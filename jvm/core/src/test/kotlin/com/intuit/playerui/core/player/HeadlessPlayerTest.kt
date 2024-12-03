@@ -2,10 +2,9 @@ package com.intuit.playerui.core.player
 
 import com.intuit.hooks.BailResult
 import com.intuit.playerui.core.asset.Asset
-import com.intuit.playerui.core.bridge.Invokable
-import com.intuit.playerui.core.bridge.Promise
 import com.intuit.playerui.core.bridge.JSErrorException
 import com.intuit.playerui.core.bridge.PlayerRuntimeException
+import com.intuit.playerui.core.bridge.Promise
 import com.intuit.playerui.core.bridge.runtime.serialize
 import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.playerui.core.data.get
@@ -32,8 +31,8 @@ import com.intuit.playerui.core.plugins.Plugin
 import com.intuit.playerui.core.validation.getWarningsAndErrors
 import com.intuit.playerui.plugins.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.plugins.beacon.BeaconPlugin
-import com.intuit.playerui.plugins.beacon.beaconPlugin
 import com.intuit.playerui.plugins.beacon.beacon
+import com.intuit.playerui.plugins.beacon.beaconPlugin
 import com.intuit.playerui.plugins.types.CommonTypesPlugin
 import com.intuit.playerui.utils.filterKeys
 import com.intuit.playerui.utils.normalizeStackTraceElements
@@ -49,9 +48,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
 import org.amshove.kluent.shouldBe
 import org.junit.jupiter.api.Assertions.assertEquals
