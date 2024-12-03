@@ -12,7 +12,7 @@ const getLatestReleaseTag = () => {
       (tag) =>
         tag.includes("-next.") ||
         tag.match(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/),
-    );
+    )[0];
 };
 
 class NextChangelogsPlugin {
@@ -21,9 +21,8 @@ class NextChangelogsPlugin {
   apply(auto) {
     auto.hooks.next.tapPromise(this.name, async ({ dryRun }) => {
       const latestRelease = getLatestReleaseTag();
-
       if (dryRun) {
-        auto.logger.log.info(`Dry run: making changelog for: ${latestRelease}`);
+        auto.logger.log.info(`Dry run: making changelog from last release: ${latestRelease}`);
       } else {
         await auto.changelog({ from: latestRelease });
       }
