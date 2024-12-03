@@ -3,8 +3,8 @@ import type { InProgressState, FlowController, Asset } from "@player-ui/player";
 import { waitFor } from "@testing-library/react";
 import { Player } from "@player-ui/player";
 import { makeFlow } from "@player-ui/make-flow";
-import type { BeaconPluginPlugin } from ".";
-import { BeaconPlugin } from ".";
+import type { BeaconPluginPlugin } from "..";
+import { BeaconPlugin } from "..";
 
 const minimal = {
   id: "minimal",

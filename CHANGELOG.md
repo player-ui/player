@@ -1,3 +1,23 @@
+# 0.10.1 (Tue Dec 03 2024)
+
+### Release Notes
+
+#### Add Changelogs from `next` releases to CHANGELOG.md file ([#554](https://github.com/player-ui/player/pull/554))
+
+Preserve `next` releases in CHANGELOG.md file
+
+---
+
+#### 🐛 Bug Fix
+
+- Add Changelogs from `next` releases to CHANGELOG.md file [#554](https://github.com/player-ui/player/pull/554) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 1
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.9.1 (Thu Sep 26 2024)
 
 #### 🐛 Bug Fix

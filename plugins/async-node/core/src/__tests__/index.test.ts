@@ -2,7 +2,7 @@ import { expect, test, describe } from "vitest";
 import { Node, InProgressState, ViewInstance } from "@player-ui/player";
 import { Player, Parser } from "@player-ui/player";
 import { waitFor } from "@testing-library/react";
-import { AsyncNodePlugin, AsyncNodePluginPlugin } from "./index";
+import { AsyncNodePlugin, AsyncNodePluginPlugin } from "../index";
 
 describe("view", () => {
   const basicFRFWithActions = {

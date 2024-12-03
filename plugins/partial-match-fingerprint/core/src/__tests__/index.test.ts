@@ -2,7 +2,7 @@ import { test, expect } from "vitest";
 import { Player } from "@player-ui/player";
 import { Registry } from "@player-ui/partial-match-registry";
 import { makeFlow } from "@player-ui/make-flow";
-import { PartialMatchFingerprintPlugin } from ".";
+import { PartialMatchFingerprintPlugin } from "..";
 
 const action = makeFlow({
   id: "action",
