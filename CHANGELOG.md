@@ -1,3 +1,328 @@
+# 0.10.0 (Wed Dec 04 2024)
+
+### Release Notes
+
+#### Fix Releases ([#556](https://github.com/player-ui/player/pull/556))
+
+Push up new changelog before continuing release process so new version is tagged to a commit that exists
+
+### Change Type (required)
+Indicate the type of change your pull request is:
+
+<!-- 
+  We use semantic versioning: https://semver.org/. Review that documentation for 
+  more detailed guidelines.
+-->
+- [x] `patch`
+- [ ] `minor`
+- [ ] `major`
+- [ ] `N/A`
+
+
+### Does your PR have any documentation updates?
+- [ ] Updated docs
+- [x] No Update needed
+- [ ] Unable to update docs
+<!--
+In an effort to standardize our process and code, please make sure you include documentation and/or update any existing documentation.
+Please refer to our site https://player-ui.github.io/latest/about, and include any neccesary information that would be helpful to coders, developers, and learners.
+
+If you are unable to update the current documents, please create an issue for us to get back to it.
+
+-->
+
+<!--
+  To include release notes in the automatic changelong, just add a level 1 markdown header below
+  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
+
+  Example:
+
+  # Release Notes
+  Added new plugin, to use it:
+  ```typescript
+  const plugin = new Plugin(...)
+  ```
+-->
+
+#### Miscellaneous Maintainance Fixes ([#555](https://github.com/player-ui/player/pull/555))
+
+- Internal: Fix changelog creation for next releases
+- Internal: Align on test file location for js packages
+- Internal: Omit config files from coverage
+
+#### Add Changelogs from `next` releases to CHANGELOG.md file ([#554](https://github.com/player-ui/player/pull/554))
+
+Preserve `next` releases in CHANGELOG.md file
+
+#### Add Missing DSL Docs ([#548](https://github.com/player-ui/player/pull/548))
+
+Docs - Add DSL docs
+
+#### Applicability docs ([#544](https://github.com/player-ui/player/pull/544))
+
+- Update applicability docs to reflect desired patterns and behaviors
+- Fix flaky react reference asset test
+- Fix misc vitest issues when running outside of bazel (cjs environment, excluded directories) 
+
+### Change Type (required)
+Indicate the type of change your pull request is:
+
+<!-- 
+  We use semantic versioning: https://semver.org/. Review that documentation for 
+  more detailed guidelines.
+-->
+- [x] `patch`
+- [ ] `minor`
+- [ ] `major`
+
+<!--
+  To include release notes in the automatic changelong, just add a level 1 markdown header below
+  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
+
+  Example:
+
+  # Release Notes
+  Added new plugin, to use it:
+  ```typescript
+  const plugin = new Plugin(...)
+  ```
+-->
+
+
+### Does your PR have any documentation updates?
+- [x] Updated docs
+- [ ] No Update needed
+- [ ] Unable to update docs
+<!--
+In an effort to standardize our process and code, please make sure you include documentation and/or update any existing documentation.
+Please refer to our site https://player-ui.github.io/latest/about, and include any neccesary information that would be helpful to coders, developers, and learners.
+
+If you are unable to update the current documents, please create an issue for us to get back to it.
+
+-->
+
+#### Remove unneeded dependency on `pubsub-js` ([#547](https://github.com/player-ui/player/pull/547))
+
+Remove dead dependencies
+
+### Change Type (required)
+Indicate the type of change your pull request is:
+
+<!-- 
+  We use semantic versioning: https://semver.org/. Review that documentation for 
+  more detailed guidelines.
+-->
+- [ ] `patch`
+- [ ] `minor`
+- [ ] `major`
+
+<!--
+  To include release notes in the automatic changelong, just add a level 1 markdown header below
+  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
+
+  Example:
+
+  # Release Notes
+  Added new plugin, to use it:
+  ```typescript
+  const plugin = new Plugin(...)
+  ```
+-->
+
+
+### Does your PR have any documentation updates?
+- [ ] Updated docs
+- [ ] No Update needed
+- [ ] Unable to update docs
+<!--
+In an effort to standardize our process and code, please make sure you include documentation and/or update any existing documentation.
+Please refer to our site https://player-ui.github.io/latest/about, and include any neccesary information that would be helpful to coders, developers, and learners.
+
+If you are unable to update the current documents, please create an issue for us to get back to it.
+
+-->
+
+#### Minor Docs Fixes ([#538](https://github.com/player-ui/player/pull/538))
+
+- Fix search on `next` subdomain searching against and redirecting to `latest`
+- Update page description on the landing page
+
+### Change Type (required)
+Indicate the type of change your pull request is:
+
+<!-- 
+  We use semantic versioning: https://semver.org/. Review that documentation for 
+  more detailed guidelines.
+-->
+- [ ] `patch`
+- [ ] `minor`
+- [ ] `major`
+
+### Does your PR have any documentation updates?
+- [x] Updated docs
+- [ ] No Update needed
+- [ ] Unable to update docs
+<!--
+In an effort to standardize our process and code, please make sure you include documentation and/or update any existing documentation.
+Please refer to our site https://player-ui.github.io/latest/about, and include any neccesary information that would be helpful to coders, developers, and learners.
+
+If you are unable to update the current documents, please create an issue for us to get back to it.
+
+-->
+
+#### More Doc Fixes ([#532](https://github.com/player-ui/player/pull/532))
+
+- Fix links for `latest` and `next` pages
+- Add package manager tabs for js install instructions
+- Fix version selector breaking on main page
+
+### Change Type (required)
+Indicate the type of change your pull request is:
+
+<!-- 
+  We use semantic versioning: https://semver.org/. Review that documentation for 
+  more detailed guidelines.
+-->
+- [x] `patch`
+- [ ] `minor`
+- [ ] `major`
+
+<!--
+  To include release notes in the automatic changelong, just add a level 1 markdown header below
+  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
+
+  Example:
+
+  # Release Notes
+  Added new plugin, to use it:
+  ```typescript
+  const plugin = new Plugin(...)
+  ```
+-->
+
+
+### Does your PR have any documentation updates?
+- [ ] Updated docs
+- [ ] No Update needed
+- [ ] Unable to update docs
+<!--
+In an effort to standardize our process and code, please make sure you include documentation and/or update any existing documentation.
+Please refer to our site https://player-ui.github.io/latest/about, and include any neccesary information that would be helpful to coders, developers, and learners.
+
+If you are unable to update the current documents, please create an issue for us to get back to it.
+
+-->
+
+#### Fix docs build visibility ([#531](https://github.com/player-ui/player/pull/531))
+
+Fix visibility of docs build
+
+#### ios: enhance tapable logger to handle variadic args from the JS log ([#524](https://github.com/player-ui/player/pull/524))
+
+Prefixing message with the format `[Player] [\(logLevel)]:`  moved out of the Tapable logger and moved to PrintLoggerPlugin. Any consumers using their own LoggerPlugin will need to append the logLevel if they want to print it 
+
+Before
+```swift
+public class CustomLoggingPlugin: NativePlugin {
+    
+    public let pluginName = "CustomLoggingPlugin"
+
+    public func apply<P>(player: P) where P: HeadlessPlayer {
+        guard let player = player as? SwiftUIPlayer else { return }
+        player.logger.logLevel = .trace
+        player.logger.hooks.trace.tap(name: pluginName, { print("Custom message")\(($0))" ) })
+        ...
+    }
+```
+
+After
+```swift
+public class CustomLoggingPlugin: NativePlugin {
+    
+    public let pluginName = "CustomLoggingPlugin"
+
+    public func apply<P>(player: P) where P: HeadlessPlayer {
+        guard let player = player as? SwiftUIPlayer else { return }
+        player.logger.logLevel = .trace
+        let prefixedMessage = "[Player] [trace]: "
+        player.logger.hooks.trace.tap(name: pluginName, { print("\(prefixedMessage) Custom message \(($0))" ) })
+        ...
+    }
+```
+
+
+## Breaking Changes
+
+Any usage of the `player.logger.hooks` taps will have breaking changes in the callback because the calls have been changed to provide a `[Any]` type instead of `String` so it can be returned in the form of messages instead of a single message. Unless nothing is done in the callback to access the value but just to print it, there should be breaking changes
+
+
+Example:
+```swift
+
+// this should be no breaking change
+player.logger.hooks.trace.tap(name: "log", { print("\(($0))" ) })
+
+// if `values` should be accessed in anyway, i.e want the first value, or want to seperate the values
+ player.logger.hooks.debug.tap(name: "log") { values in
+            // values is of type [Any], if you want to print only the first value
+            print("\((message as? [String])?.first))" )
+        }
+```
+
+---
+
+#### 🚀 Enhancement
+
+- ios: enhance tapable logger to handle variadic args from the JS log [#524](https://github.com/player-ui/player/pull/524) ([@nancywu1](https://github.com/nancywu1))
+
+#### 🐛 Bug Fix
+
+- Release main [#557](https://github.com/player-ui/player/pull/557) ([@intuit-svc](https://github.com/intuit-svc))
+- Fix Releases [#556](https://github.com/player-ui/player/pull/556) ([@KetanReddy](https://github.com/KetanReddy))
+- Miscellaneous Maintainance Fixes [#555](https://github.com/player-ui/player/pull/555) ([@KetanReddy](https://github.com/KetanReddy))
+- Implemented cancelBeacon and buildBeacon hooks for Android [#542](https://github.com/player-ui/player/pull/542) ([@mrigankmg](https://github.com/mrigankmg) [@brocollie08](https://github.com/brocollie08))
+- Add Changelogs from `next` releases to CHANGELOG.md file [#554](https://github.com/player-ui/player/pull/554) ([@KetanReddy](https://github.com/KetanReddy))
+- iOS ExternalActionViewModifierPlugin: make apply func open [#539](https://github.com/player-ui/player/pull/539) ([@nancywu1](https://github.com/nancywu1))
+- JVM ConsoleLoggerPlugin [#552](https://github.com/player-ui/player/pull/552) ([@brocollie08](https://github.com/brocollie08))
+- Applicability docs [#544](https://github.com/player-ui/player/pull/544) ([@KetanReddy](https://github.com/KetanReddy) [@nancywu1](https://github.com/nancywu1))
+- iOS: Expose builldBeacon and cancelBeacon hooks inside of BaseBeaconPlugin and make BeaconPlugin open class [#536](https://github.com/player-ui/player/pull/536) ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+- Remove unneeded dependency on `pubsub-js` [#547](https://github.com/player-ui/player/pull/547) ([@KetanReddy](https://github.com/KetanReddy))
+- remove unneeded HTML report generation steps from build [#545](https://github.com/player-ui/player/pull/545) ([@nancywu1](https://github.com/nancywu1))
+- Fix parsing of Bindings with Escaped Numbers [#533](https://github.com/player-ui/player/pull/533) ([@KetanReddy](https://github.com/KetanReddy))
+- Update getting-started.mdx [#534](https://github.com/player-ui/player/pull/534) ([@aarora-pm](https://github.com/aarora-pm))
+- More Doc Fixes [#532](https://github.com/player-ui/player/pull/532) ([@KetanReddy](https://github.com/KetanReddy))
+- Fix docs build visibility [#531](https://github.com/player-ui/player/pull/531) ([@KetanReddy](https://github.com/KetanReddy))
+- Fix CJS support for React Player [#525](https://github.com/player-ui/player/pull/525) ([@KetanReddy](https://github.com/KetanReddy))
+- iOS: Expand AnyType to handle deeply nested AnyType for beacon encoding [#519](https://github.com/player-ui/player/pull/519) ([@hborawski](https://github.com/hborawski))
+- Updating Main Page Content [#508](https://github.com/player-ui/player/pull/508) ([@KetanReddy](https://github.com/KetanReddy) [@adierkens](https://github.com/adierkens))
+
+#### 🏠 Internal
+
+- Fix circleci badge in README [#480](https://github.com/player-ui/player/pull/480) ([@adierkens](https://github.com/adierkens) [@KetanReddy](https://github.com/KetanReddy))
+
+#### 📝 Documentation
+
+- Add Missing DSL Docs [#548](https://github.com/player-ui/player/pull/548) ([@KetanReddy](https://github.com/KetanReddy))
+- improve prominence of bazel build guidance for iOS targets [#546](https://github.com/player-ui/player/pull/546) ([@hborawski](https://github.com/hborawski))
+- Minor Docs Fixes [#538](https://github.com/player-ui/player/pull/538) ([@KetanReddy](https://github.com/KetanReddy))
+- fix exports in docs [#511](https://github.com/player-ui/player/pull/511) ([@spentacular](https://github.com/spentacular) [@KetanReddy](https://github.com/KetanReddy))
+- Docs refresh with Astro [#506](https://github.com/player-ui/player/pull/506) ([@adierkens](https://github.com/adierkens) [@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 10
+
+- [@aarora-pm](https://github.com/aarora-pm)
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+- Niharika Motukuri ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
 # 0.10.1 (Tue Dec 03 2024)
 
 ### Release Notes
