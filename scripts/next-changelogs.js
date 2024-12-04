@@ -22,9 +22,12 @@ class NextChangelogsPlugin {
     auto.hooks.next.tapPromise(this.name, async ({ dryRun }) => {
       const latestRelease = getLatestReleaseTag();
       if (dryRun) {
-        auto.logger.log.info(`Dry run: making changelog from last release: ${latestRelease}`);
+        auto.logger.log.info(
+          `Dry run: making changelog from last release: ${latestRelease}`,
+        );
       } else {
         await auto.changelog({ from: latestRelease });
+        await await execPromise("git", ["push", auto.remote, auto.baseBranch]);
       }
     });
   }
