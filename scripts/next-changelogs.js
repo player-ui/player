@@ -27,7 +27,7 @@ class NextChangelogsPlugin {
         );
       } else {
         await auto.changelog({ from: latestRelease });
-        await await execPromise("git", ["push", auto.remote, auto.baseBranch]);
+        execSync(`git push ${auto.remote} ${auto.baseBranch}`);
       }
     });
   }
