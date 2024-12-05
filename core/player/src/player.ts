@@ -134,7 +134,7 @@ export class Player {
     if (config?.logger) {
       this.logger.addHandler(config.logger);
     }
-    this.test = "foo";
+    this.test = "bar";
 
     this.config = config || {};
     this.config.plugins = [
