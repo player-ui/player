@@ -36,7 +36,11 @@ jobs:
               repo,
               pull_number,
             });
-            return branch;
+            if(fork){
+              return "pull/" + pull_number;
+            } else {
+              return branch;
+            }
       - name: Not a collaborator
         if: ${{ failure() }}
         uses: actions/github-script@v6
