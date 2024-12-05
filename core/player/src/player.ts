@@ -91,6 +91,7 @@ export class Player {
   public readonly constantsController = new ConstantsController();
   private config: PlayerConfigOptions;
   private state: PlayerFlowState = NOT_STARTED_STATE;
+  private test: string;
 
   public readonly hooks = {
     /** The hook that fires every time we create a new flowController (a new Content blob is passed in) */
