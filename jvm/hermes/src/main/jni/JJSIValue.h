@@ -148,6 +148,10 @@ public:
     local_ref<JJSIObject_jhybridobject> asObject(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     std::string toString(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime);
 
+    ~JJSIValue() override {
+        release();
+    }
+
     void release() override {
         value_.reset();
     }
@@ -193,6 +197,10 @@ public:
     local_ref<jhybridobject> getPropertyAsObject(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name);
     local_ref<JJSIFunction_jhybridobject> getPropertyAsFunction(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name);
 
+    ~JJSIObject() override {
+        release();
+    }
+
     void release() override {
         object_.reset();
     }
@@ -224,6 +232,10 @@ public:
     int size(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     local_ref<JJSIValue::jhybridobject> getValueAtIndex(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, int i);
     void setValueAtIndex(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, int i, alias_ref<JJSIValue::jhybridobject> value);
+
+    ~JJSIArray() override {
+        release();
+    }
 
     void release() override {
         array_.reset();
@@ -268,6 +280,10 @@ public:
     local_ref<JJSIValue::jhybridobject> callAsConstructor(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> args);
     bool isHostFunction(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime);
 
+    ~JJSIFunction() override {
+        release();
+    }
+
     void release() override {
         function_.reset();
     }
@@ -296,6 +312,10 @@ public:
     explicit JJSISymbol(Symbol&& symbol) : HybridClass(), symbol_(std::make_unique<Symbol>(std::move(symbol))) {}
 
     std::string toString(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime);
+
+    ~JJSISymbol() override {
+        release();
+    }
 
     void release() override {
         symbol_.reset();
