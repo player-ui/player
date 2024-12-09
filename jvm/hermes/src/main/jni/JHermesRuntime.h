@@ -83,7 +83,7 @@ public:
 
     Value* getRef(void* ptr) override;
 
-    voi
+    void clearRef(void* ptr) override;
 
     ~JHermesRuntime() override {
         // make sure we release the runtime value holders that are not yet out of scope

@@ -167,7 +167,7 @@ public:
     }
 
     bool isReleased() override {
-        return runtime_ && runtime_->cthis()->getRef(this);
+        return runtime_ && runtime_->cthis()->getRef(this) == nullptr;
     }
 
     Value& get_value() const {
