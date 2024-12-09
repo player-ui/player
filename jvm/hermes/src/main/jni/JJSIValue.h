@@ -64,6 +64,11 @@ class JJSIRuntime : public HybridClass<JJSIRuntime> {
 public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Runtime;";
     static void registerNatives();
+    global_ref<jhybridobject> global_ref;
+
+    virtual void storeRef(void* ptr, Value&& value) = 0;
+    virtual Value* getRef(void* ptr) = 0;
+    virtual void clearRef(void* ptr) = 0;
 
     local_ref<JJSIValue_jhybridobject> evaluateJavaScript(alias_ref<JRuntimeThreadContext>, std::string script, std::string sourceURL);
     local_ref<JJSIPreparedJavaScript::jhybridobject> prepareJavaScript(alias_ref<JRuntimeThreadContext>, std::string script, std::string sourceURL);
@@ -114,6 +119,7 @@ class JJSIValue : public JJSIValueHybridClass {
 public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Value;";
     static void registerNatives();
+    private global_ref<JJSIRuntime::jhybridobject> runtime_;
 
     static local_ref<jhybridobject> fromBool(alias_ref<jclass>, bool b);
     static local_ref<jhybridobject> fromDouble(alias_ref<jclass>, double d);
@@ -129,7 +135,11 @@ public:
     static local_ref<jhybridobject> createFromJsonUtf8(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JByteBuffer> json);
     static bool strictEquals(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b);
 
-    explicit JJSIValue(Value&& value) : HybridClass(), value_(std::make_unique<Value>(std::move(value))) {}
+    explicit JJSIValue(global_ref<JJSIRuntime::jhybridobject> runtime, Value&& value) : HybridClass(), runtime_(runtime) {
+
+        // internally creates unique ptr
+        runtime->cthis()->storeRef(this, value);
+    }
 
     bool isUndefined();
     bool isNull();
@@ -153,21 +163,21 @@ public:
     }
 
     void release() override {
-        value_.reset();
+        if (runtime_) runtime_->cthis()->clearRef(this);
     }
 
     bool isReleased() override {
-        return value_ == nullptr;
+        return runtime_ && runtime_->cthis()->getRef(this);
     }
 
     Value& get_value() const {
-        if (value_) return *value_;
+
+        if (runtime_) return runtime_->cthis()->getRef(this);
 
         throwNativeHandleReleasedException("Value");
     }
 private:
     friend HybridBase;
-    std::unique_ptr<Value> value_;
 };
 
 /** JSI Object hybrid class - initially ignoring support for host object, native state, and array buffers. */

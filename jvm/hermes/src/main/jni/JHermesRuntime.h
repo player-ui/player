@@ -40,11 +40,15 @@ public:
     static void registerNatives();
 
     static local_ref<jhybridobject> create(alias_ref<jclass>) {
-        return newObjectCxxArgs();
+        auto ref = newObjectCxxArgs();
+        ref->cthis()->global_ref = make_global(ref);
+        return ref;
     }
 
     static local_ref<jhybridobject> createWithConfig(alias_ref<jclass>, alias_ref<JHermesConfig::jhybridobject> config) {
-        return newObjectCxxArgs(config);
+        auto ref = newObjectCxxArgs();
+        //something = make_global(ref)
+        return ref;
     }
 
     // TODO: Add the rest of the HermesRuntime API (like loading bytecode)
@@ -74,6 +78,12 @@ public:
         // TODO: Maybe we could do a periodic pruning of the vector to remove obsolete refs?
         scope_.push_back(make_weak(ref));
     }
+
+    void storeRef(void* ptr, Value &&value) override;
+
+    Value* getRef(void* ptr) override;
+
+    voi
 
     ~JHermesRuntime() override {
         // make sure we release the runtime value holders that are not yet out of scope
@@ -110,7 +120,7 @@ private:
     friend HybridBase;
     std::unique_ptr<HermesRuntime> runtime_;
     global_ref<JHermesConfig::jhybridobject> jConfig_;
-    std::vector<weak_ref<JHybridClass::jhybridobject>> scope_;
+    std::unordered_map<void*, unique_ptr<Value>> scope_;
     explicit JHermesRuntime(
         std::unique_ptr<HermesRuntime> runtime,
         alias_ref<JHermesConfig::jhybridobject> jConfig
