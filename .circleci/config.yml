@@ -30,7 +30,7 @@ executors:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   ios:
     working_directory: ~/player
-    resource_class: macos.m1.large.gen1
+    resource_class: m2pro.large
     macos:
       xcode: 15.3.0
     environment:
@@ -190,7 +190,7 @@ jobs:
           command: |
             bazel coverage \
               --config=ci-mac \
-              --jobs=1 \
+              --jobs=2 \
               --experimental_use_llvm_covmap \
               --combined_report=lcov \
               --test_output=all \
