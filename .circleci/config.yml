@@ -190,7 +190,7 @@ jobs:
           command: |
             bazel coverage \
               --config=ci-mac \
-              --jobs=1 \
+              --jobs=2 \
               --experimental_use_llvm_covmap \
               --combined_report=lcov \
               --test_output=all \
