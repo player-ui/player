@@ -66,8 +66,8 @@ public:
     static void registerNatives();
     global_ref<jhybridobject> global_ref;
 
-    virtual void storeRef(void* ptr, Value&& value) = 0;
-    virtual Value* getRef(void* ptr) = 0;
+    virtual void storeRef(void* ptr, std::variant<Value, Object, Array, Function> value) = 0;
+    virtual std::variant<Value, Object, Array, Function>& getRef(void* ptr) = 0;
     virtual void clearRef(void* ptr) = 0;
 
     local_ref<JJSIValue_jhybridobject> evaluateJavaScript(alias_ref<JRuntimeThreadContext>, std::string script, std::string sourceURL);
@@ -119,11 +119,10 @@ class JJSIValue : public JJSIValueHybridClass {
 public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Value;";
     static void registerNatives();
-    private global_ref<JJSIRuntime::jhybridobject> runtime_;
 
-    static local_ref<jhybridobject> fromBool(alias_ref<jclass>, bool b);
-    static local_ref<jhybridobject> fromDouble(alias_ref<jclass>, double d);
-    static local_ref<jhybridobject> fromInt(alias_ref<jclass>, int i);
+    static local_ref<jhybridobject> fromBool(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, bool b);
+    static local_ref<jhybridobject> fromDouble(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, double d);
+    static local_ref<jhybridobject> fromInt(alias_ref<jclass>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, int i);
     static local_ref<jhybridobject> fromString(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string str);
     static local_ref<jhybridobject> fromLong(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, jlong l);
 
@@ -136,10 +135,11 @@ public:
     static bool strictEquals(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b);
 
     explicit JJSIValue(global_ref<JJSIRuntime::jhybridobject> runtime, Value&& value) : HybridClass(), runtime_(runtime) {
-
         // internally creates unique ptr
-        runtime->cthis()->storeRef(this, value);
+        runtime->cthis()->storeRef(this, std::move(value));
     }
+
+    explicit JJSIValue(Value&& value) : HybridClass() {}
 
     bool isUndefined();
     bool isNull();
@@ -167,17 +167,18 @@ public:
     }
 
     bool isReleased() override {
-        return runtime_ && runtime_->cthis()->getRef(this) == nullptr;
+        return false;
     }
 
     Value& get_value() const {
-
-        if (runtime_) return runtime_->cthis()->getRef(this);
+        //void* nonConstPtr = const_cast<void*>(static_cast<const void*>(this));
+        if (runtime_) return std::get<Value>(runtime_->cthis()->getRef((void *) this));
 
         throwNativeHandleReleasedException("Value");
     }
 private:
     friend HybridBase;
+    global_ref<JJSIRuntime::jhybridobject> runtime_;
 };
 
 /** JSI Object hybrid class - initially ignoring support for host object, native state, and array buffers. */
@@ -189,7 +190,9 @@ public:
     static local_ref<jhybridobject> create(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     static bool strictEquals(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b);
 
-    explicit JJSIObject(Object&& object) : HybridClass(), object_(std::make_unique<Object>(std::move(object))) {}
+    explicit JJSIObject(global_ref<JJSIRuntime::jhybridobject> runtime, Object&& object) : HybridClass(), object_(std::make_unique<Object>(std::move(object))), runtime_(runtime) {
+        runtime->cthis()->storeRef(this, std::move(object));
+    }
 
     bool instanceOf(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIFunction_jhybridobject> ctor);
 
@@ -228,6 +231,7 @@ private:
     friend HybridBase;
     friend class JJSIValue;
     std::unique_ptr<Object> object_;
+    global_ref<JJSIRuntime::jhybridobject> runtime_;
 };
 
 class JJSIArray : public JJSIArrayHybridClass {
@@ -237,7 +241,9 @@ public:
 
     static local_ref<jhybridobject> createWithElements(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> elements);
 
-    explicit JJSIArray(Array&& function) : HybridClass(), array_(std::make_unique<Array>(std::move(function))) {}
+    explicit JJSIArray(global_ref<JJSIRuntime::jhybridobject> runtime, Array&& array) : HybridClass(), array_(std::make_unique<Array>(std::move(array))), runtime_(runtime) {
+        runtime->cthis()->storeRef(this, std::move(array));
+    }
 
     int size(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     local_ref<JJSIValue::jhybridobject> getValueAtIndex(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, int i);
@@ -263,6 +269,7 @@ public:
 private:
     friend HybridBase;
     std::unique_ptr<Array> array_;
+    global_ref<JJSIRuntime::jhybridobject> runtime_;
 };
 
 struct JJSIHostFunction : JavaClass<JJSIHostFunction> {
@@ -283,7 +290,9 @@ public:
 
     static local_ref<jhybridobject> createFromHostFunction(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name, int paramCount, alias_ref<JJSIHostFunction> func);
 
-    explicit JJSIFunction(Function&& function) : HybridClass(), function_(std::make_unique<Function>(std::move(function))) {}
+    explicit JJSIFunction(global_ref<JJSIRuntime::jhybridobject> runtime, Function&& function) : HybridClass(), function_(std::make_unique<Function>(std::move(function))), runtime_(runtime) {
+        runtime->cthis()->storeRef(this, std::move(function));
+    }
 
     local_ref<JJSIValue::jhybridobject> call(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> args);
     local_ref<JJSIValue::jhybridobject> callWithThis(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIObject::jhybridobject> jsThis, alias_ref<JArrayClass<JJSIValue::jhybridobject>> args);
@@ -310,6 +319,7 @@ public:
 private:
     friend HybridBase;
     std::unique_ptr<Function> function_;
+    global_ref<JJSIRuntime::jhybridobject> runtime_;
 };
 
 class JJSISymbol : public JJSISymbolHybridClass {
@@ -319,7 +329,9 @@ public:
 
     static bool strictEquals(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b);
 
-    explicit JJSISymbol(Symbol&& symbol) : HybridClass(), symbol_(std::make_unique<Symbol>(std::move(symbol))) {}
+    explicit JJSISymbol(global_ref<JJSIRuntime::jhybridobject> runtime, Symbol&& symbol) : HybridClass(), symbol_(std::make_unique<Symbol>(std::move(symbol))), runtime_(runtime) {
+        runtime->cthis()->storeRef(this, std::move(symbol));
+    }
 
     std::string toString(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime);
 
@@ -343,5 +355,6 @@ public:
 private:
     friend HybridBase;
     std::unique_ptr<Symbol> symbol_;
+    global_ref<JJSIRuntime::jhybridobject> runtime_;
 };
 };

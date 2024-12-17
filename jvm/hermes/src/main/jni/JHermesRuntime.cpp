@@ -19,15 +19,15 @@ void JHermesRuntime::registerNatives() {
     });
 }
 
-void JHermesRuntime::storeRef(void* ptr, facebook::jsi::Value &&value) {
-    scope_[ptr] = std::make_unique<Value>(std::move(value));
+void JHermesRuntime::storeRef(void* ptr, std::variant<Value, Object, Array, Function> value) {
+    scope_[ptr] = std::make_unique<std::variant<Value, Object, Array, Function>>(std::move(value));
 }
 
-Value* JHermesRuntime::getRef(void* ptr) {
+std::variant<Value, Object, Array, Function>& JHermesRuntime::getRef(void* ptr) {
     return *scope_[ptr];
 }
 
 void JHermesRuntime::clearRef(void* ptr) {
-    scope_[ptr]
+    scope_[ptr] = nullptr;
 }
 };

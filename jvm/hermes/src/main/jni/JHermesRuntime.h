@@ -46,15 +46,14 @@ public:
     }
 
     static local_ref<jhybridobject> createWithConfig(alias_ref<jclass>, alias_ref<JHermesConfig::jhybridobject> config) {
-        auto ref = newObjectCxxArgs();
-        //something = make_global(ref)
+        auto ref = newObjectCxxArgs(config);
+        ref->cthis()->global_ref = make_global(ref);
         return ref;
     }
 
     // TODO: Add the rest of the HermesRuntime API (like loading bytecode)
     local_ref<JJSIValue::jhybridobject> evaluateJavaScriptWithSourceMap(std::string script, std::string sourceMap, std::string sourceURL) {
-        auto result = JJSIValue::newObjectCxxArgs(get_runtime().evaluateJavaScriptWithSourceMap(std::make_shared<StringBuffer>(script), std::make_shared<StringBuffer>(sourceMap), sourceURL));
-        trackRef(result);
+        auto result = JJSIValue::newObjectCxxArgs(this->global_ref, get_runtime().evaluateJavaScriptWithSourceMap(std::make_shared<StringBuffer>(script), std::make_shared<StringBuffer>(sourceMap), sourceURL));
         return result;
     }
 
@@ -76,12 +75,12 @@ public:
         //       to get weak refs to _just_ the CXX parts of the hybrid class to avoid leaking things
         //       on the JVM side?
         // TODO: Maybe we could do a periodic pruning of the vector to remove obsolete refs?
-        scope_.push_back(make_weak(ref));
+        //scope_.push_back(make_weak(ref));
     }
 
-    void storeRef(void* ptr, Value &&value) override;
+    void storeRef(void* ptr, std::variant<Value, Object, Array, Function> value) override;
 
-    Value* getRef(void* ptr) override;
+    std::variant<Value, Object, Array, Function>& getRef(void* ptr) override;
 
     void clearRef(void* ptr) override;
 
@@ -91,8 +90,8 @@ public:
     }
 
     void release() {
-        for (auto& weak : scope_) {
-            if (auto ref = weak.lockLocal()) ref->cthis()->release();
+        for (auto& ptr : scope_) {
+            ptr.second.release();
         }
         if (jConfig_) jConfig_.reset();
         if (runtime_) runtime_.reset();
@@ -119,8 +118,8 @@ public:
 private:
     friend HybridBase;
     std::unique_ptr<HermesRuntime> runtime_;
-    global_ref<JHermesConfig::jhybridobject> jConfig_;
-    std::unordered_map<void*, unique_ptr<Value>> scope_;
+    ::global_ref<JHermesConfig::jhybridobject> jConfig_;
+    std::unordered_map<void*, std::unique_ptr<std::variant<Value, Object, Array, Function>>> scope_;
     explicit JHermesRuntime(
         std::unique_ptr<HermesRuntime> runtime,
         alias_ref<JHermesConfig::jhybridobject> jConfig
