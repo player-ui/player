@@ -1,20 +1,28 @@
 #include "RuntimeScope.h"
 #include <stdexcept>
-
-using namespace std;
+#include "iostream"
 
 namespace intuit::playerui {
 
 void RuntimeScope::trackRef(void* ptr, VariantType value) {
-    scope[ptr] = make_unique<variant<Value, Object, Array, Function>>(move(value));
+    std::cout << "=====" << std::endl;
+    std::cout << ptr << std::endl;
+    std::cout << &value << std::endl;
+    scope->insert({ptr, make_unique<VariantType>(std::move(value))});
+    std::cout << scope->at(ptr).get() << std::endl;
+    std::cout << "=====" << std::endl;
 }
 
-VariantType& RuntimeScope::getRef(void* ptr) {
-    return *scope[ptr];
+VariantType* RuntimeScope::getRef(void* ptr) {
+    std::cout << "++++" << std::endl;
+    std::cout << ptr << std::endl;
+    std::cout << scope->at(ptr).get() << std::endl;
+    std::cout << "++++" << std::endl;
+    return scope->at(ptr).get();
 }
 
 void RuntimeScope::clearRef(void* ptr) {
-    scope[ptr].reset();
+    scope->at(ptr).reset();
 }
 
 }

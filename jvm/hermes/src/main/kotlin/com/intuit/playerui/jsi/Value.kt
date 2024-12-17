@@ -100,11 +100,11 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
     context(RuntimeThreadContext) override fun asValue(runtime: Runtime): Value = this
 
     public companion object {
-        @JvmStatic public external fun from(runtime: Runtime, value: Boolean): Value
+        context(RuntimeThreadContext) @JvmStatic public external fun from(runtime: Runtime, value: Boolean): Value
 
-        @JvmStatic public external fun from(runtime: Runtime, value: Double): Value
+        context(RuntimeThreadContext) @JvmStatic public external fun from(runtime: Runtime, value: Double): Value
 
-        @JvmStatic public external fun from(runtime: Runtime, value: Int): Value
+        context(RuntimeThreadContext) @JvmStatic public external fun from(runtime: Runtime, value: Int): Value
 
         context(RuntimeThreadContext) @JvmStatic public external fun from(runtime: Runtime, value: String): Value
 

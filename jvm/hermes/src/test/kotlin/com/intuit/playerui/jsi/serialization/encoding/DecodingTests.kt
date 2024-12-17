@@ -19,18 +19,18 @@ internal class PrimitiveDecodingTests : HermesTest() {
     }
 
     @Test
-    fun `decode boolean primitive`() {
-        assertEquals(true, format.decodeFromValue<Boolean>(Value.from(true)))
+    fun `decode boolean primitive`() = runtime.evaluateInJSThreadBlocking {
+        assertEquals(true, format.decodeFromValue<Boolean>(Value.from(runtime, true)))
     }
 
     @Test
-    fun `decode int primitive`() {
-        assertEquals(20, format.decodeFromValue(Value.from(20)))
+    fun `decode int primitive`() = runtime.evaluateInJSThreadBlocking {
+        assertEquals(20, format.decodeFromValue(Value.from(runtime, 20)))
     }
 
     @Test
-    fun `decode double primitive`() {
-        assertEquals(2.2, format.decodeFromValue(Value.from(2.2)))
+    fun `decode double primitive`() = runtime.evaluateInJSThreadBlocking {
+        assertEquals(2.2, format.decodeFromValue(Value.from(runtime, 2.2)))
     }
 
     @Test
@@ -52,7 +52,7 @@ internal class FunctionDecodingTests : HermesTest() {
             Value.from(runtime, "${args[0].toString(runtime)}: ${args[1].toString(runtime)}")
         }
 
-        assertEquals("PLAYER: 1", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(1)).asString(runtime))
+        assertEquals("PLAYER: 1", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(runtime, 1)).asString(runtime))
         assertEquals(
             "PLAYER: 2",
             format.decodeFromValue<Function2<String, Int, String>>(function.asValue(runtime))("PLAYER", 2),
@@ -64,7 +64,7 @@ internal class FunctionDecodingTests : HermesTest() {
             Value.from(runtime, "${args[0].toString(runtime)}: ${args[1].toString(runtime)}")
         }
 
-        assertEquals("PLAYER: 1", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(1)).asString(runtime))
+        assertEquals("PLAYER: 1", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(runtime, 1)).asString(runtime))
         assertEquals(
             "PLAYER: 2",
             format.decodeFromValue<Invokable<String>>(function.asValue(runtime))("PLAYER", 2),
@@ -84,7 +84,7 @@ internal class FunctionDecodingTests : HermesTest() {
             setProperty(runtime, "method", function.asValue(runtime))
         }
 
-        assertEquals("PLAYER: 1", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(1)).asString(runtime))
+        assertEquals("PLAYER: 1", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(runtime, 1)).asString(runtime))
         assertEquals(
             "PLAYER: 2",
             format.decodeFromValue<Container>(containerValue.asValue(runtime)).method("PLAYER", 2),

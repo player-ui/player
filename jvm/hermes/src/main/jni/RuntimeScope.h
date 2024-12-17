@@ -1,12 +1,8 @@
 #pragma once
 
-#ifndef REFTRACKER_H
-#define REFTRACKER_H
-
 #include <jsi/jsi.h>
 #include <unordered_map>
 #include <variant>
-#include "JJSIValue.h"
 
 using namespace std;
 using namespace facebook::jsi;
@@ -16,15 +12,15 @@ namespace intuit::playerui {
 using VariantType = variant<Value, Object, Array, Function>;
 
 class RuntimeScope {
-private:
-    unordered_map<void *, unique_ptr<VariantType>> scope;
-
 public:
+    unique_ptr<unordered_map<void*, unique_ptr<VariantType>>> scope;
+
     void trackRef(void* ptr, VariantType value);
 
-    VariantType& getRef(void* ptr);
+    VariantType* getRef(void* ptr);
 
     void clearRef(void* ptr);
+
+    explicit RuntimeScope(): scope(make_unique<unordered_map<void*, unique_ptr<VariantType>>>()){}
 };
 }
-#endif // REFTRACKER_H
