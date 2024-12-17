@@ -23,10 +23,12 @@ cc_library(
         "JHermesRuntime.cpp",
         "JJSIValue.cpp",
         "OnLoad.cpp",
+        "ReferenceTracker.cpp",
     ],
     hdrs = [
         "JHermesRuntime.h",
         "JJSIValue.h",
+        "ReferenceTracker.h",
     ],
     copts = CMAKE_BUILD_TYPE_COPTS + select({
         # TODO: Using React Natives JSI doesn't contain microtask - come back to this if we build it ourselves
