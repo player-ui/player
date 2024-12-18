@@ -30,12 +30,12 @@ internal class PrimitiveEncodingTests : HermesTest() {
         assertEquals(Value.from(runtime, 20L), format.encodeToValue(20L))
     }
 
-    @Test fun `encode unit`() {
-        assertEquals(Value.undefined, format.encodeToValue(Unit))
+    @Test fun `encode unit`() = runtime.evaluateInJSThreadBlocking {
+        assertEquals(Value.getUndefined(runtime), format.encodeToValue(Unit))
     }
 
-    @Test fun `encode null`() {
-        assertEquals(Value.`null`, format.encodeToValue<Int?>(null))
+    @Test fun `encode null`() = runtime.evaluateInJSThreadBlocking {
+        assertEquals(Value.getNull(runtime), format.encodeToValue<Int?>(null))
     }
 }
 

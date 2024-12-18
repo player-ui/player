@@ -121,8 +121,8 @@ public:
     static local_ref<jhybridobject> fromSymbol(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSISymbol_jhybridobject> symbol);
     static local_ref<jhybridobject> fromObject(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIObject_jhybridobject> object);
 
-    static local_ref<jhybridobject> undefined(alias_ref<jclass>);
-    static local_ref<jhybridobject> null(alias_ref<jclass>);
+    static local_ref<jhybridobject> getUndefined(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime);
+    static local_ref<jhybridobject> getNull(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime);
     static local_ref<jhybridobject> createFromJsonUtf8(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JByteBuffer> json);
     static bool strictEquals(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b);
 
@@ -163,8 +163,9 @@ public:
     }
 
     Value& get_value() const {
-        //void* nonConstPtr = const_cast<void*>(static_cast<const void*>(this));
         if (scope_) {
+            std::cout << "scope is not null" << std::endl;
+            std::cout << scope_ << std::endl;
             if (auto ref = scope_->getValue((void *)this)) {
                 try {
                     Value& func = *ref;
@@ -175,9 +176,14 @@ public:
                     std::cout << ref << std::endl;
                     std::cout << "threw error" << std::endl;
                 }
+            } else {
+                std::cout << "CAN'T FIND REF" << std::endl;
+                std::cout << this << std::endl;
             }
         }
 
+        std::cout << "wtf do you mean scope is gone" << std::endl;
+        std::cout << scope_ << std::endl;
         throwNativeHandleReleasedException("Value");
     }
 private:
@@ -228,6 +234,8 @@ public:
 
     Object& get_object() const {
         if (scope_) {
+            std::cout << "scope is not null" << std::endl;
+            std::cout << scope_ << std::endl;
             std::cout << "getting object" << std::endl;
             if (auto ref = scope_->getObject((void *)this)) {
                 Object& func = *ref;
@@ -273,6 +281,8 @@ public:
 
     Array& get_array() const {
         if (scope_) {
+            std::cout << "scope is not null" << std::endl;
+            std::cout << scope_ << std::endl;
             if (auto ref = scope_->getArray((void *)this)) {
                 try {
                     Array& func = *ref;
@@ -334,6 +344,8 @@ public:
 
     Function& get_function() const {
         if (scope_) {
+            std::cout << "scope is not null" << std::endl;
+            std::cout << scope_ << std::endl;
             if (auto ref = scope_->getFunction((void *)this)) {
                 try {
                     Function& func = *ref;

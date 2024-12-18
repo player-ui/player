@@ -117,12 +117,12 @@ local_ref<JJSIValue::jhybridobject> JJSIValue::fromObject(alias_ref<jclass>, ali
     return value;
 }
 
-local_ref<JJSIValue::jhybridobject> JJSIValue::undefined(alias_ref<jclass>) {
-    return newObjectCxxArgs(Value::undefined());
+local_ref<JJSIValue::jhybridobject> JJSIValue::getUndefined(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
+    return newObjectCxxArgs(jRuntime->cthis()->get_scope(), Value::undefined());
 }
 
-local_ref<JJSIValue::jhybridobject> JJSIValue::null(alias_ref<jclass>) {
-    return newObjectCxxArgs(Value::null());
+local_ref<JJSIValue::jhybridobject> JJSIValue::getNull(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
+    return newObjectCxxArgs(jRuntime->cthis()->get_scope(), Value::null());
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIValue::createFromJsonUtf8(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JByteBuffer> json) {
@@ -218,8 +218,8 @@ void JJSIValue::registerNatives() {
         makeNativeMethod("from", JJSIValue::fromObject),
 
         // MARK: Static Value APIs
-        makeNativeMethod("getUndefined", JJSIValue::undefined),
-        makeNativeMethod("getNull", JJSIValue::null),
+        makeNativeMethod("getUndefined", JJSIValue::getUndefined),
+        makeNativeMethod("getNull", JJSIValue::getNull),
 
         makeNativeMethod("createFromJsonUtf8", JJSIValue::createFromJsonUtf8),
         makeNativeMethod("strictEquals", JJSIValue::strictEquals),

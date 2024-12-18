@@ -101,20 +101,27 @@ Symbol* RuntimeScope::getSymbol(void *ptr) {
 }
 
 void RuntimeScope::clearRef(void* ptr) {
-    if (auto& ref = valueScope->at(ptr)) {
-        ref.reset();
+    if (valueScope->find(ptr) != valueScope->end()) {
+        std::cout << "CLEARING REF" << std::endl;
+        std::cout << ptr << std::endl;
+        valueScope->at(ptr).reset();
+        valueScope->erase(ptr);
     }
-    if (auto& ref = objectScope->at(ptr)) {
-        ref.reset();
+    if (objectScope->find(ptr) != objectScope->end()) {
+        objectScope->at(ptr).reset();
+        objectScope->erase(ptr);
     }
-    if (auto& ref = functionScope->at(ptr)) {
-        ref.reset();
+    if (functionScope->find(ptr) != functionScope->end()) {
+        functionScope->at(ptr).reset();
+        functionScope->erase(ptr);
     }
-    if (auto& ref = arrayScope->at(ptr)) {
-        ref.reset();
+    if (arrayScope->find(ptr) != arrayScope->end()) {
+        arrayScope->at(ptr).reset();
+        arrayScope->erase(ptr);
     }
-    if (auto& ref = symbolScope->at(ptr)) {
-        ref.reset();
+    if (symbolScope->find(ptr) != symbolScope->end()) {
+        symbolScope->at(ptr).reset();
+        symbolScope->erase(ptr);
     }
 }
 
