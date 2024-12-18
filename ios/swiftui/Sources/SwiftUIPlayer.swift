@@ -79,6 +79,16 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             for plugin in allPlugins { plugin.apply(player: player) }
             registry.partialMatchRegistry = partialMatchPlugin
 
+            hooks.flowController.tap { flowController in
+                flowController.hooks.flow.tap { flow in
+                    flow.hooks.transition.tap { [weak self] _, newState in
+                        if (newState.value as? NavigationFlowViewState) == nil {
+                            self?.registry.resetView(releasePartialMatch: false)
+                        }
+                    }
+                }
+            }
+
             hooks.viewController.tap { [weak self] controller in
                 guard let self = self, self.player == playerValue else { return }
                 self.onViewController(controller)
