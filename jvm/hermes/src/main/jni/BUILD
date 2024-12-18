@@ -7,7 +7,7 @@ load(":copy_shared_lib.bzl", "copy_shared_lib")
 # Transitioned with cc_library_host_jni
 bool_flag(
     name = "include_jni",
-    build_setting_default = True,
+    build_setting_default = False,
 )
 
 config_setting(
