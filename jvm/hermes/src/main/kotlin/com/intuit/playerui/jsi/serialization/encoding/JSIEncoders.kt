@@ -66,7 +66,7 @@ internal open class JSIValueEncoder(private val format: JSIFormat, private val m
         -> content
     }
 
-    private var content: Value = Value.undefined
+    private var content: Value = runtime.evaluateInJSThreadBlocking { Value.getUndefined(runtime) }
         get() = when (mode) {
             Mode.UNDECIDED,
             Mode.PRIMITIVE,
@@ -145,7 +145,7 @@ internal open class JSIValueEncoder(private val format: JSIFormat, private val m
         },
     )
 
-    override fun encodeNull(): Unit = putContent(Value.`null`)
+    override fun encodeNull(): Unit = runtime.evaluateInJSThreadBlocking { putContent(Value.getNull(runtime)) }
 
     override fun encodeElement(descriptor: SerialDescriptor, index: Int): Boolean {
         if (descriptor.kind == StructureKind.CLASS) encodeString(descriptor.getElementName(index))

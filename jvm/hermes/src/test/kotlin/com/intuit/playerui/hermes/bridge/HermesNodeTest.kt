@@ -101,14 +101,14 @@ internal class HermesNodeTest : HermesTest() {
                 set(
                     "object",
                     mapOf(
-                        "string" to "thisisastring",
+                        "strings" to "thisisastring",
                     ),
                 )
                 set("notaobject", 1234)
             }
         }.toNode(format)
 
-        assertEquals("thisisastring", node.getObject("object")?.getString("string"))
+        assertEquals("thisisastring", node.getObject("object")?.getString("strings"))
 
         assertNull(node.getObject("notaobject"))
         assertNull(node.getObject("notthere"))

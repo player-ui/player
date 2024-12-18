@@ -10,6 +10,7 @@ import com.intuit.playerui.j2v8.bridge.runtime.J2V8
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.CompilerControl

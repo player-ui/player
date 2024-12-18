@@ -59,7 +59,7 @@ public open class Runtime(mHybridData: HybridData) : HybridClass(mHybridData) {
 
     context(RuntimeThreadContext) public fun stringify(value: Value): String = global().getPropertyAsObject(this, "JSON")
         .getPropertyAsFunction(this, "stringify")
-        .call(this, value, Value.`null`, Value.from(2))
+        .call(this, value, Value.getNull(this), Value.from(this, 2))
         .asString(this)
 }
 
@@ -100,11 +100,11 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
     context(RuntimeThreadContext) override fun asValue(runtime: Runtime): Value = this
 
     public companion object {
-        @JvmStatic public external fun from(value: Boolean): Value
+        context(RuntimeThreadContext) @JvmStatic public external fun from(runtime: Runtime, value: Boolean): Value
 
-        @JvmStatic public external fun from(value: Double): Value
+        context(RuntimeThreadContext) @JvmStatic public external fun from(runtime: Runtime, value: Double): Value
 
-        @JvmStatic public external fun from(value: Int): Value
+        context(RuntimeThreadContext) @JvmStatic public external fun from(runtime: Runtime, value: Int): Value
 
         context(RuntimeThreadContext) @JvmStatic public external fun from(runtime: Runtime, value: String): Value
 
@@ -114,9 +114,9 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
 
         context(RuntimeThreadContext) @JvmStatic public external fun from(runtime: Runtime, value: Object): Value
 
-        public val undefined: Value @JvmStatic external get
+        context(RuntimeThreadContext) @JvmStatic public external fun getUndefined(runtime: Runtime): Value
 
-        public val `null`: Value @JvmStatic external get
+        context(RuntimeThreadContext) @JvmStatic public external fun getNull(runtime: Runtime): Value
 
         context(RuntimeThreadContext) @JvmStatic public external fun createFromJsonUtf8(
             runtime: Runtime,
@@ -141,13 +141,13 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
         context(RuntimeThreadContext) @JvmStatic public external fun strictEquals(runtime: Runtime, a: Value, b: Value): Boolean
 
         context(RuntimeThreadContext) public fun from(runtime: Runtime, value: Any?): Value = when (value) {
-            null -> `null`
-            Unit -> undefined
+            null -> getNull(runtime)
+            Unit -> getUndefined(runtime)
             is NodeWrapper -> from(runtime, value.node)
             is JSIValueWrapper -> value.value
-            is Boolean -> from(value)
-            is Double -> from(value)
-            is Int -> from(value)
+            is Boolean -> from(runtime, value)
+            is Double -> from(runtime, value)
+            is Int -> from(runtime, value)
             is String -> from(runtime, value)
             is Long -> from(runtime, value)
             is Symbol -> from(runtime, value)
