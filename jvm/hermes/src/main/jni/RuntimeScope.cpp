@@ -1,9 +1,11 @@
 #include "RuntimeScope.h"
+#include <jsi/jsi.h>
 #include <stdexcept>
 #include "iostream"
 
 namespace intuit::playerui {
 
+//template<typename T>
 void RuntimeScope::trackRef(void* ptr, VariantType value) {
     std::cout << "=====" << std::endl;
     std::cout << ptr << std::endl;
@@ -12,6 +14,10 @@ void RuntimeScope::trackRef(void* ptr, VariantType value) {
     std::cout << scope->at(ptr).get() << std::endl;
     std::cout << "=====" << std::endl;
 }
+
+/*void RuntimeScope::trackFunctionRef(void* ptr, Function value) {
+    scope->insert({ptr, make_unique<VariantType>(std::move(value))});
+}*/
 
 VariantType* RuntimeScope::getRef(void* ptr) {
     std::cout << "++++" << std::endl;

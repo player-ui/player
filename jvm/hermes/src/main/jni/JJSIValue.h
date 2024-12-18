@@ -67,10 +67,6 @@ public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Runtime;";
     static void registerNatives();
 
-/*    virtual void storeRef(void* ptr, std::variant<Value, Object, Array, Function> value) = 0;
-    virtual std::variant<Value, Object, Array, Function>& getRef(void* ptr) = 0;
-    virtual void clearRef(void* ptr) = 0;*/
-
     local_ref<JJSIValue_jhybridobject> evaluateJavaScript(alias_ref<JRuntimeThreadContext>, std::string script, std::string sourceURL);
     local_ref<JJSIPreparedJavaScript::jhybridobject> prepareJavaScript(alias_ref<JRuntimeThreadContext>, std::string script, std::string sourceURL);
     local_ref<JJSIValue_jhybridobject> evaluatePreparedJavaScript(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIPreparedJavaScript::jhybridobject> js);
@@ -169,7 +165,17 @@ public:
     Value& get_value() const {
         //void* nonConstPtr = const_cast<void*>(static_cast<const void*>(this));
         if (scope_) {
-            if (auto ref = scope_->getRef((void *)this)) return std::get<Value>(*ref);
+            if (auto ref = scope_->getRef((void *)this)) {
+                try {
+                    Value& func = std::get<Value>(*ref);
+                    std::cout << "getting VALUE pointer SUCCESSFUL" << std::endl;
+                    return func;
+                } catch (...) {
+                    std::cout << "getting VALUE pointer at" << std::endl;
+                    std::cout << ref << std::endl;
+                    std::cout << "threw error" << std::endl;
+                }
+            }
         }
 
         throwNativeHandleReleasedException("Value");
@@ -222,7 +228,41 @@ public:
 
     Object& get_object() const {
         if (scope_) {
-            if (auto ref = scope_->getRef((void *)this)) return std::get<Object>(*ref);
+            if (auto ref = scope_->getRef((void *)this)) {
+                try {
+                    Object& func = std::get<Object>(*ref);
+                    std::cout << "getting OBJECT pointer SUCCESSFUL" << std::endl;
+                    return func;
+                } catch (...) {
+                    /*std::cout << "getting OBJECT pointer at" << std::endl;
+                    std::cout << ref << std::endl;
+                    std::cout << "threw error because type was" << std::endl;
+                    try {
+                        std::get<Value>(*ref);
+                        std::cout << "VALUE" << std::endl;
+                    } catch (...) {
+
+                    }
+                    try {
+                        std::get<Function>(*ref);
+                        std::cout << "FUNCTION" << std::endl;
+                    } catch (...) {
+
+                    }
+                    try {
+                        std::get<Array>(*ref);
+                        std::cout << "ARRAY" << std::endl;
+                    } catch (...) {
+
+                    }
+                    try {
+                        std::get<Symbol>(*ref);
+                        std::cout << "SYMBOL" << std::endl;
+                    } catch (...) {
+
+                    }*/
+                }
+            }
         }
 
         throwNativeHandleReleasedException("Object");
@@ -240,7 +280,7 @@ public:
 
     static local_ref<jhybridobject> createWithElements(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> elements);
 
-    explicit JJSIArray(shared_ptr<RuntimeScope> scope, Array&& array) : HybridClass(), array_(std::make_unique<Array>(std::move(array))), scope_(scope) {
+    explicit JJSIArray(shared_ptr<RuntimeScope> scope, Array&& array) : HybridClass(), scope_(scope) {
         scope->trackRef(this, std::move(array));
     }
 
@@ -253,21 +293,32 @@ public:
     }
 
     void release() override {
-        array_.reset();
+        if (scope_) scope_->clearRef(this);
     }
 
     bool isReleased() override {
-        return array_ == nullptr;
+        return scope_->getRef((void *)this) == nullptr;
     }
 
     Array& get_array() const {
-        if (array_) return *array_;
+        if (scope_) {
+            if (auto ref = scope_->getRef((void *)this)) {
+                try {
+                    Array& func = std::get<Array>(*ref);
+                    std::cout << "getting ARRAY pointer SUCCESSFUL" << std::endl;
+                    return func;
+                } catch (...) {
+                    std::cout << "getting ARRAY pointer at" << std::endl;
+                    std::cout << ref << std::endl;
+                    std::cout << "threw error" << std::endl;
+                }
+            }
+        }
 
         throwNativeHandleReleasedException("Array");
     }
 private:
     friend HybridBase;
-    std::unique_ptr<Array> array_;
     shared_ptr<RuntimeScope> scope_;
 };
 
@@ -289,7 +340,7 @@ public:
 
     static local_ref<jhybridobject> createFromHostFunction(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name, int paramCount, alias_ref<JJSIHostFunction> func);
 
-    explicit JJSIFunction(shared_ptr<RuntimeScope> scope, Function&& function) : HybridClass(), function_(std::make_unique<Function>(std::move(function))), scope_(scope) {
+    explicit JJSIFunction(shared_ptr<RuntimeScope> scope, Function&& function) : HybridClass(), scope_(scope) {
         scope->trackRef(this, std::move(function));
     }
 
@@ -303,21 +354,32 @@ public:
     }
 
     void release() override {
-        function_.reset();
+        if (scope_) scope_->clearRef(this);
     }
 
     bool isReleased() override {
-        return function_ == nullptr;
+        return scope_->getRef((void *)this) == nullptr;
     }
 
     Function& get_function() const {
-        if (function_) return *function_;
+        if (scope_) {
+            if (auto ref = scope_->getRef((void *)this)) {
+                try {
+                    Function& func = std::get<Function>(*ref);
+                    std::cout << "getting SYMBOL pointer SUCCESSFUL" << std::endl;
+                    return func;
+                } catch (...) {
+                    std::cout << "getting FUNCTION pointer at" << std::endl;
+                    std::cout << ref << std::endl;
+                    std::cout << "threw error" << std::endl;
+                }
+            }
+        }
 
         throwNativeHandleReleasedException("Function");
     }
 private:
     friend HybridBase;
-    std::unique_ptr<Function> function_;
     shared_ptr<RuntimeScope> scope_;
 };
 
@@ -328,7 +390,7 @@ public:
 
     static bool strictEquals(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b);
 
-    explicit JJSISymbol(shared_ptr<RuntimeScope> scope, Symbol&& symbol) : HybridClass(), symbol_(std::make_unique<Symbol>(std::move(symbol))), scope_(scope) {
+    explicit JJSISymbol(shared_ptr<RuntimeScope> scope, Symbol&& symbol) : HybridClass(), scope_(scope) {
         scope->trackRef(this, std::move(symbol));
     }
 
@@ -339,21 +401,32 @@ public:
     }
 
     void release() override {
-        symbol_.reset();
+        if (scope_) scope_->clearRef(this);
     }
 
     bool isReleased() override {
-        return symbol_ == nullptr;
+        return scope_->getRef((void *)this) == nullptr;
     }
 
     Symbol& get_symbol() const {
-        if (symbol_) return *symbol_;
+        if (scope_) {
+            if (auto ref = scope_->getRef((void *)this)) {
+                try {
+                    Symbol& func = std::get<Symbol>(*ref);
+                    std::cout << "getting SYMBOL pointer SUCCESSFUL" << std::endl;
+                    return func;
+                } catch (...) {
+                    std::cout << "getting SYMBOL pointer at" << std::endl;
+                    std::cout << ref << std::endl;
+                    std::cout << "threw error" << std::endl;
+                }
+            }
+        }
 
         throwNativeHandleReleasedException("Symbol");
     }
 private:
     friend HybridBase;
-    std::unique_ptr<Symbol> symbol_;
     shared_ptr<RuntimeScope> scope_;
 };
 };
