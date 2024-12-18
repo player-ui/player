@@ -128,7 +128,7 @@ public:
 
     explicit JJSIValue(std::shared_ptr<RuntimeScope> scope, Value&& value) : HybridClass(), scope_(scope) {
         // internally creates unique ptr
-        scope->trackRef(this, std::move(value));
+        scope->trackValue(this, std::move(value));
     }
 
     explicit JJSIValue(Value&& value) : HybridClass() {}
@@ -159,15 +159,15 @@ public:
     }
 
     bool isReleased() override {
-        return scope_->getRef((void *)this) == nullptr;
+        return scope_->getValue((void *)this) == nullptr;
     }
 
     Value& get_value() const {
         //void* nonConstPtr = const_cast<void*>(static_cast<const void*>(this));
         if (scope_) {
-            if (auto ref = scope_->getRef((void *)this)) {
+            if (auto ref = scope_->getValue((void *)this)) {
                 try {
-                    Value& func = std::get<Value>(*ref);
+                    Value& func = *ref;
                     std::cout << "getting VALUE pointer SUCCESSFUL" << std::endl;
                     return func;
                 } catch (...) {
@@ -195,7 +195,7 @@ public:
     static bool strictEquals(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b);
 
     explicit JJSIObject(shared_ptr<RuntimeScope> scope, Object&& object) : HybridClass(), scope_(scope) {
-        scope->trackRef(this, std::move(object));
+        scope->trackObject(this, std::move(object));
     }
 
     bool instanceOf(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIFunction_jhybridobject> ctor);
@@ -223,45 +223,16 @@ public:
     }
 
     bool isReleased() override {
-        return scope_->getRef((void *)this) == nullptr;
+        return scope_->getObject((void *)this) == nullptr;
     }
 
     Object& get_object() const {
         if (scope_) {
-            if (auto ref = scope_->getRef((void *)this)) {
-                try {
-                    Object& func = std::get<Object>(*ref);
-                    std::cout << "getting OBJECT pointer SUCCESSFUL" << std::endl;
-                    return func;
-                } catch (...) {
-                    /*std::cout << "getting OBJECT pointer at" << std::endl;
-                    std::cout << ref << std::endl;
-                    std::cout << "threw error because type was" << std::endl;
-                    try {
-                        std::get<Value>(*ref);
-                        std::cout << "VALUE" << std::endl;
-                    } catch (...) {
-
-                    }
-                    try {
-                        std::get<Function>(*ref);
-                        std::cout << "FUNCTION" << std::endl;
-                    } catch (...) {
-
-                    }
-                    try {
-                        std::get<Array>(*ref);
-                        std::cout << "ARRAY" << std::endl;
-                    } catch (...) {
-
-                    }
-                    try {
-                        std::get<Symbol>(*ref);
-                        std::cout << "SYMBOL" << std::endl;
-                    } catch (...) {
-
-                    }*/
-                }
+            std::cout << "getting object" << std::endl;
+            if (auto ref = scope_->getObject((void *)this)) {
+                Object& func = *ref;
+                std::cout << "getting OBJECT pointer SUCCESSFUL" << std::endl;
+                return func;
             }
         }
 
@@ -281,7 +252,7 @@ public:
     static local_ref<jhybridobject> createWithElements(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> elements);
 
     explicit JJSIArray(shared_ptr<RuntimeScope> scope, Array&& array) : HybridClass(), scope_(scope) {
-        scope->trackRef(this, std::move(array));
+        scope->trackArray(this, std::move(array));
     }
 
     int size(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime);
@@ -297,14 +268,14 @@ public:
     }
 
     bool isReleased() override {
-        return scope_->getRef((void *)this) == nullptr;
+        return scope_->getArray((void *)this) == nullptr;
     }
 
     Array& get_array() const {
         if (scope_) {
-            if (auto ref = scope_->getRef((void *)this)) {
+            if (auto ref = scope_->getArray((void *)this)) {
                 try {
-                    Array& func = std::get<Array>(*ref);
+                    Array& func = *ref;
                     std::cout << "getting ARRAY pointer SUCCESSFUL" << std::endl;
                     return func;
                 } catch (...) {
@@ -341,7 +312,7 @@ public:
     static local_ref<jhybridobject> createFromHostFunction(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name, int paramCount, alias_ref<JJSIHostFunction> func);
 
     explicit JJSIFunction(shared_ptr<RuntimeScope> scope, Function&& function) : HybridClass(), scope_(scope) {
-        scope->trackRef(this, std::move(function));
+        scope->trackFunction(this, std::move(function));
     }
 
     local_ref<JJSIValue::jhybridobject> call(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> args);
@@ -358,14 +329,14 @@ public:
     }
 
     bool isReleased() override {
-        return scope_->getRef((void *)this) == nullptr;
+        return scope_->getFunction((void *)this) == nullptr;
     }
 
     Function& get_function() const {
         if (scope_) {
-            if (auto ref = scope_->getRef((void *)this)) {
+            if (auto ref = scope_->getFunction((void *)this)) {
                 try {
-                    Function& func = std::get<Function>(*ref);
+                    Function& func = *ref;
                     std::cout << "getting SYMBOL pointer SUCCESSFUL" << std::endl;
                     return func;
                 } catch (...) {
@@ -391,7 +362,7 @@ public:
     static bool strictEquals(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b);
 
     explicit JJSISymbol(shared_ptr<RuntimeScope> scope, Symbol&& symbol) : HybridClass(), scope_(scope) {
-        scope->trackRef(this, std::move(symbol));
+        scope->trackSymbol(this, std::move(symbol));
     }
 
     std::string toString(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime);
@@ -405,14 +376,14 @@ public:
     }
 
     bool isReleased() override {
-        return scope_->getRef((void *)this) == nullptr;
+        return scope_->getSymbol((void *)this) == nullptr;
     }
 
     Symbol& get_symbol() const {
         if (scope_) {
-            if (auto ref = scope_->getRef((void *)this)) {
+            if (auto ref = scope_->getSymbol((void *)this)) {
                 try {
-                    Symbol& func = std::get<Symbol>(*ref);
+                    Symbol& func = *ref;
                     std::cout << "getting SYMBOL pointer SUCCESSFUL" << std::endl;
                     return func;
                 } catch (...) {

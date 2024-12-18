@@ -62,7 +62,19 @@ public:
     }
 
     void release() {
-        for (auto& ptr : *runtimeScope_->scope) {
+        for (auto& ptr : *runtimeScope_->valueScope) {
+            ptr.second.reset();
+        }
+        for (auto& ptr : *runtimeScope_->objectScope) {
+            ptr.second.reset();
+        }
+        for (auto& ptr : *runtimeScope_->functionScope) {
+            ptr.second.reset();
+        }
+        for (auto& ptr : *runtimeScope_->arrayScope) {
+            ptr.second.reset();
+        }
+        for (auto& ptr : *runtimeScope_->symbolScope) {
             ptr.second.reset();
         }
         if (jConfig_) jConfig_.reset();
