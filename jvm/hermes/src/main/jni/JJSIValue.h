@@ -164,26 +164,13 @@ public:
 
     Value& get_value() const {
         if (scope_) {
-            std::cout << "scope is not null" << std::endl;
-            std::cout << scope_ << std::endl;
             if (auto ref = scope_->getValue((void *)this)) {
-                try {
-                    Value& func = *ref;
-                    std::cout << "getting VALUE pointer SUCCESSFUL" << std::endl;
-                    return func;
-                } catch (...) {
-                    std::cout << "getting VALUE pointer at" << std::endl;
-                    std::cout << ref << std::endl;
-                    std::cout << "threw error" << std::endl;
-                }
+                return *ref;
             } else {
-                std::cout << "CAN'T FIND REF" << std::endl;
-                std::cout << this << std::endl;
+                throw std::runtime_error("Value reference cleaned up and is no longer in RuntimeScope");
             }
         }
 
-        std::cout << "wtf do you mean scope is gone" << std::endl;
-        std::cout << scope_ << std::endl;
         throwNativeHandleReleasedException("Value");
     }
 private:
@@ -234,13 +221,10 @@ public:
 
     Object& get_object() const {
         if (scope_) {
-            std::cout << "scope is not null" << std::endl;
-            std::cout << scope_ << std::endl;
-            std::cout << "getting object" << std::endl;
             if (auto ref = scope_->getObject((void *)this)) {
-                Object& func = *ref;
-                std::cout << "getting OBJECT pointer SUCCESSFUL" << std::endl;
-                return func;
+                return *ref;
+            } else {
+                throw std::runtime_error("Object reference cleaned up and is no longer in RuntimeScope");
             }
         }
 
@@ -281,17 +265,11 @@ public:
 
     Array& get_array() const {
         if (scope_) {
-            std::cout << "scope is not null" << std::endl;
-            std::cout << scope_ << std::endl;
             if (auto ref = scope_->getArray((void *)this)) {
                 try {
-                    Array& func = *ref;
-                    std::cout << "getting ARRAY pointer SUCCESSFUL" << std::endl;
-                    return func;
+                    return *ref;
                 } catch (...) {
-                    std::cout << "getting ARRAY pointer at" << std::endl;
-                    std::cout << ref << std::endl;
-                    std::cout << "threw error" << std::endl;
+                    throw std::runtime_error("Array reference cleaned up and is no longer in RuntimeScope");
                 }
             }
         }
@@ -344,17 +322,11 @@ public:
 
     Function& get_function() const {
         if (scope_) {
-            std::cout << "scope is not null" << std::endl;
-            std::cout << scope_ << std::endl;
             if (auto ref = scope_->getFunction((void *)this)) {
                 try {
-                    Function& func = *ref;
-                    std::cout << "getting SYMBOL pointer SUCCESSFUL" << std::endl;
-                    return func;
+                    return *ref;
                 } catch (...) {
-                    std::cout << "getting FUNCTION pointer at" << std::endl;
-                    std::cout << ref << std::endl;
-                    std::cout << "threw error" << std::endl;
+                    throw std::runtime_error("Function reference cleaned up and is no longer in RuntimeScope");
                 }
             }
         }
@@ -395,13 +367,9 @@ public:
         if (scope_) {
             if (auto ref = scope_->getSymbol((void *)this)) {
                 try {
-                    Symbol& func = *ref;
-                    std::cout << "getting SYMBOL pointer SUCCESSFUL" << std::endl;
-                    return func;
+                    return *ref;
                 } catch (...) {
-                    std::cout << "getting SYMBOL pointer at" << std::endl;
-                    std::cout << ref << std::endl;
-                    std::cout << "threw error" << std::endl;
+                    throw std::runtime_error("Symbol reference cleaned up and is no longer in RuntimeScope");
                 }
             }
         }
