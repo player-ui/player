@@ -118,11 +118,11 @@ local_ref<JJSIValue::jhybridobject> JJSIValue::fromObject(alias_ref<jclass>, ali
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIValue::getUndefined(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
-    return newObjectCxxArgs(jRuntime->cthis()->get_scope(), Value::undefined());
+    return newObjectCxxArgs(Value::undefined());
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIValue::getNull(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime) {
-    return newObjectCxxArgs(jRuntime->cthis()->get_scope(), Value::null());
+    return newObjectCxxArgs(Value::null());
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIValue::createFromJsonUtf8(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JByteBuffer> json) {

@@ -131,7 +131,9 @@ public:
         scope->trackValue(this, std::move(value));
     }
 
-    explicit JJSIValue(Value&& value) : HybridClass() {}
+    explicit JJSIValue(Value&& value) : HybridClass(), value_(std::make_unique<Value>(std::move(value))) {
+        tracked = false;
+    }
 
     bool isUndefined();
     bool isNull();
@@ -155,14 +157,18 @@ public:
     }
 
     void release() override {
+        if (!tracked && value_) value_.reset();
         if (scope_) scope_->clearRef(this);
     }
 
     bool isReleased() override {
-        return scope_->getValue((void *)this) == nullptr;
+        return (!tracked && value_ == nullptr) || scope_->getValue((void *)this) == nullptr;
     }
 
     Value& get_value() const {
+        if (!tracked && value_) {
+            return *value_;
+        }
         if (scope_) {
             if (auto ref = scope_->getValue((void *)this)) {
                 return *ref;
@@ -176,6 +182,8 @@ public:
 private:
     friend HybridBase;
     shared_ptr<RuntimeScope> scope_;
+    bool tracked = true;
+    std::unique_ptr<Value> value_;
 };
 
 /** JSI Object hybrid class - initially ignoring support for host object, native state, and array buffers. */
