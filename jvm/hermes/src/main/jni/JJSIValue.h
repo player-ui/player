@@ -121,8 +121,8 @@ public:
     static local_ref<jhybridobject> fromSymbol(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSISymbol_jhybridobject> symbol);
     static local_ref<jhybridobject> fromObject(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIObject_jhybridobject> object);
 
-    static local_ref<jhybridobject> getUndefined(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime);
-    static local_ref<jhybridobject> getNull(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime);
+    static local_ref<jhybridobject> undefined(alias_ref<jclass>);
+    static local_ref<jhybridobject> null(alias_ref<jclass>);
     static local_ref<jhybridobject> createFromJsonUtf8(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JByteBuffer> json);
     static bool strictEquals(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b);
 

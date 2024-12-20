@@ -68,13 +68,13 @@ Error: hello
 
 internal class ValueTests : HermesTest() {
     @Test fun `create and detect undefined`() = runtime.evaluateInJSThreadBlocking {
-        val undefined = Value.getUndefined(runtime)
+        val undefined = Value.undefined
         assertTrue(undefined.isUndefined())
         assertEquals("undefined", undefined.toString(runtime))
     }
 
     @Test fun `create and detect null`() = runtime.evaluateInJSThreadBlocking {
-        val `null` = Value.getNull(runtime)
+        val `null` = Value.`null`
         assertTrue(`null`.isNull())
         assertEquals("null", `null`.toString(runtime))
     }

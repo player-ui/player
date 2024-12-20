@@ -34,13 +34,13 @@ internal class PrimitiveDecodingTests : HermesTest() {
     }
 
     @Test
-    fun `decode unit`() = runtime.evaluateInJSThreadBlocking {
-        assertEquals(null, format.decodeFromValue<Boolean?>(Value.getUndefined(runtime)))
+    fun `decode unit`() {
+        assertEquals(null, format.decodeFromValue<Boolean?>(Value.undefined))
     }
 
     @Test
-    fun `decode null`() = runtime.evaluateInJSThreadBlocking {
-        assertEquals(null, format.decodeFromValue<Boolean?>(Value.getNull(runtime)))
+    fun `decode null`() {
+        assertEquals(null, format.decodeFromValue<Boolean?>(Value.`null`))
     }
 }
 

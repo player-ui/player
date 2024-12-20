@@ -59,7 +59,7 @@ public open class Runtime(mHybridData: HybridData) : HybridClass(mHybridData) {
 
     context(RuntimeThreadContext) public fun stringify(value: Value): String = global().getPropertyAsObject(this, "JSON")
         .getPropertyAsFunction(this, "stringify")
-        .call(this, value, Value.getNull(this), Value.from(this, 2))
+        .call(this, value, Value.`null`, Value.from(this, 2))
         .asString(this)
 }
 
@@ -114,9 +114,9 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
 
         context(RuntimeThreadContext) @JvmStatic public external fun from(runtime: Runtime, value: Object): Value
 
-        context(RuntimeThreadContext) @JvmStatic public external fun getUndefined(runtime: Runtime): Value
+        public val undefined: Value @JvmStatic external get
 
-        context(RuntimeThreadContext) @JvmStatic public external fun getNull(runtime: Runtime): Value
+        public val `null`: Value @JvmStatic external get
 
         context(RuntimeThreadContext) @JvmStatic public external fun createFromJsonUtf8(
             runtime: Runtime,
@@ -141,8 +141,8 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
         context(RuntimeThreadContext) @JvmStatic public external fun strictEquals(runtime: Runtime, a: Value, b: Value): Boolean
 
         context(RuntimeThreadContext) public fun from(runtime: Runtime, value: Any?): Value = when (value) {
-            null -> getNull(runtime)
-            Unit -> getUndefined(runtime)
+            null -> `null`
+            Unit -> undefined
             is NodeWrapper -> from(runtime, value.node)
             is JSIValueWrapper -> value.value
             is Boolean -> from(runtime, value)

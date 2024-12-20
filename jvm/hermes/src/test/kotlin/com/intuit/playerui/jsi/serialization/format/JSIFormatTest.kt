@@ -27,7 +27,7 @@ internal class JSIFormatTest : HermesTest() {
 
         assertEquals(Value.from(runtime, 1), value.getProperty(runtime, "one"))
         assertEquals(Value.from(runtime, 2), value.getProperty(runtime, "two"))
-        assertEquals(Value.getUndefined(runtime), value.getProperty(runtime, "three"))
+        assertEquals(Value.undefined, value.getProperty(runtime, "three"))
     }
 
     @Test fun `encode simple map into Value with implicit serializers`() = runtime.evaluateInJSThreadBlocking {
@@ -40,7 +40,7 @@ internal class JSIFormatTest : HermesTest() {
 
         assertEquals(Value.from(runtime, 1), value.getProperty(runtime, "one"))
         assertEquals(Value.from(runtime, 2), value.getProperty(runtime, "two"))
-        assertEquals(Value.getUndefined(runtime), value.getProperty(runtime, "three"))
+        assertEquals(Value.undefined, value.getProperty(runtime, "three"))
     }
 
     @Test fun `encode nested map into Value with implicit serializers`() = runtime.evaluateInJSThreadBlocking {
@@ -53,7 +53,7 @@ internal class JSIFormatTest : HermesTest() {
 
         assertEquals(Value.from(runtime, 3), value.getPropertyAsObject(runtime, "one").getProperty(runtime, "three"))
         assertEquals(Value.from(runtime, 4), value.getPropertyAsObject(runtime, "two").getProperty(runtime, "four"))
-        assertEquals(Value.getUndefined(runtime), value.getProperty(runtime, "five"))
+        assertEquals(Value.undefined, value.getProperty(runtime, "five"))
     }
 
     @Test fun `encode serializable into Value with implicit serializers`() = runtime.evaluateInJSThreadBlocking {
@@ -67,7 +67,7 @@ internal class JSIFormatTest : HermesTest() {
 
         assertEquals(Value.from(runtime, 1), value.getProperty(runtime, "one"))
         assertEquals(Value.from(runtime, 2), value.getProperty(runtime, "two"))
-        assertEquals(Value.getUndefined(runtime), value.getProperty(runtime, "three"))
+        assertEquals(Value.undefined, value.getProperty(runtime, "three"))
     }
 
     @Test fun `decode Value into serializable with implicit serializers`() = runtime.evaluateInJSThreadBlocking {
