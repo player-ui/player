@@ -172,8 +172,6 @@ public:
         if (scope_) {
             if (auto ref = scope_->getValue((void *)this)) {
                 return *ref;
-            } else {
-                throw std::runtime_error("Value reference cleaned up and is no longer in RuntimeScope");
             }
         }
 
@@ -214,7 +212,7 @@ public:
     local_ref<JJSIValue::jhybridobject> getProperty(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name);
     local_ref<jhybridobject> getPropertyAsObject(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name);
     local_ref<JJSIFunction_jhybridobject> getPropertyAsFunction(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name);
-    
+
     void release() override {
         if (scope_) scope_->clearRef(this);
     }
@@ -227,8 +225,6 @@ public:
         if (scope_) {
             if (auto ref = scope_->getObject((void *)this)) {
                 return *ref;
-            } else {
-                throw std::runtime_error("Object reference cleaned up and is no longer in RuntimeScope");
             }
         }
 
@@ -270,11 +266,7 @@ public:
     Array& get_array() const {
         if (scope_) {
             if (auto ref = scope_->getArray((void *)this)) {
-                try {
-                    return *ref;
-                } catch (...) {
-                    throw std::runtime_error("Array reference cleaned up and is no longer in RuntimeScope");
-                }
+                return *ref;
             }
         }
 
@@ -327,11 +319,7 @@ public:
     Function& get_function() const {
         if (scope_) {
             if (auto ref = scope_->getFunction((void *)this)) {
-                try {
-                    return *ref;
-                } catch (...) {
-                    throw std::runtime_error("Function reference cleaned up and is no longer in RuntimeScope");
-                }
+                return *ref;
             }
         }
 
@@ -370,11 +358,7 @@ public:
     Symbol& get_symbol() const {
         if (scope_) {
             if (auto ref = scope_->getSymbol((void *)this)) {
-                try {
-                    return *ref;
-                } catch (...) {
-                    throw std::runtime_error("Symbol reference cleaned up and is no longer in RuntimeScope");
-                }
+                return *ref;
             }
         }
 

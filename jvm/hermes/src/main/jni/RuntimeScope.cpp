@@ -31,7 +31,7 @@ Value* RuntimeScope::getValue(void* ptr) {
     if (it != valueScope->end()) {
         return valueScope->at(ptr).get();
     }
-    throw std::runtime_error("Value was not found in the RuntimeScope");
+    return nullptr;
 }
 
 Object* RuntimeScope::getObject(void *ptr) {
@@ -42,7 +42,7 @@ Object* RuntimeScope::getObject(void *ptr) {
     } else if (arrayScope->find(ptr) != arrayScope->end()) {
         return arrayScope->at(ptr).get();
     }
-    throw std::runtime_error("Object/Function/Array was not found in the RuntimeScope");
+    return nullptr;
 }
 
 Function* RuntimeScope::getFunction(void *ptr) {
@@ -50,7 +50,7 @@ Function* RuntimeScope::getFunction(void *ptr) {
     if (it != functionScope->end()) {
         return functionScope->at(ptr).get();
     }
-    throw std::runtime_error("Function was not found in the RuntimeScope");
+    return nullptr;
 }
 
 Array* RuntimeScope::getArray(void *ptr) {
@@ -58,7 +58,7 @@ Array* RuntimeScope::getArray(void *ptr) {
     if (it != arrayScope->end()) {
         return arrayScope->at(ptr).get();
     }
-    throw std::runtime_error("Array was not found in the RuntimeScope");
+    return nullptr;
 }
 
 Symbol* RuntimeScope::getSymbol(void *ptr) {
@@ -66,7 +66,7 @@ Symbol* RuntimeScope::getSymbol(void *ptr) {
     if (it != symbolScope->end()) {
         return symbolScope->at(ptr).get();
     }
-    throw std::runtime_error("Symbol was not found in the RuntimeScope");
+    return nullptr;
 }
 
 void RuntimeScope::clearRef(void* ptr) {
