@@ -4,5 +4,5 @@ export interface CollectionAsset extends Asset<"collection"> {
   /** An optional label to title the collection */
   label?: AssetWrapper;
   /** The string value to show */
-  values?: Array<AssetWrapper>;
+  values?: Array<AssetWrapper> | Array<Asset>;
 }

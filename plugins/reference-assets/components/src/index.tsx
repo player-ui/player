@@ -88,6 +88,7 @@ export const SubtitleSlot = slotFactory("subtitle");
 export const ActionsSlot = slotFactory("actions", true);
 export const PrimaryInfoSlot = slotFactory("primaryInfo");
 export const ItemsSlot = slotFactory("items", true, false);
+// export const MessageSlot = slotFactory("message");
 
 Collection.Values = createSlot({
   name: "values",
@@ -196,3 +197,18 @@ const ChoiceItem = (
 
 ChoiceItem.Label = LabelSlot;
 Choice.Item = ChoiceItem;
+
+// export const ChatMessage = (
+//   props: WithChildren<WithPlayerTypes<{ message: string, flatten: boolean }>>,
+// ) => {
+//   return (
+//     <Asset type="chat-message" flatten={flatten}>
+//       <property name="message">{props.message}</property>
+//       {props.children}
+//     </Asset>
+//   );
+// };
+
+export const ChatMessage = () => {
+  return <Asset type="chat-message" />;
+};

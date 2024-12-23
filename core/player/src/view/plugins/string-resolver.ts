@@ -123,6 +123,7 @@ export default class StringResolverPlugin implements ViewPlugin {
       if (node.type === NodeType.Empty || node.type === NodeType.Unknown) {
         return null;
       }
+      debugger;
 
       if (
         node.type === NodeType.Value ||

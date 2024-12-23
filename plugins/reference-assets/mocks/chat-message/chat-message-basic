@@ -1,0 +1,54 @@
+// import React from "react";
+// import {
+//   ChatMessage,
+//   Collection,
+//   Input,
+// } from "@player-ui/reference-assets-plugin-components";
+// import type { DSLFlow } from "@player-tools/dsl";
+// import { makeBindingsForObject } from "@player-tools/dsl";
+
+// const schema = {
+//   text: {
+//     type: "TextType",
+//   },
+// };
+
+// const data = makeBindingsForObject(schema);
+
+// const view1 = (
+//   <Collection id="view-1">
+//     <Collection.Label>Async node basic</Collection.Label>
+//     <Collection.Values>
+//       <ChatMessage message={"hello"} />
+//     </Collection.Values>
+//     <Input id="input" binding={data.text}></Input>
+//   </Collection>
+// );
+
+// const flow: DSLFlow = {
+//   id: "chat-message-basic",
+//   views: [view1],
+//   data: {
+//     count: 0,
+//   },
+//   schema,
+//   navigation: {
+//     BEGIN: "FLOW_1",
+//     FLOW_1: {
+//       startState: "VIEW_1",
+//       VIEW_1: {
+//         state_type: "VIEW",
+//         ref: view1,
+//         transitions: {
+//           "*": "END_Done",
+//         },
+//       },
+//       END_Done: {
+//         state_type: "END",
+//         outcome: "DONE",
+//       },
+//     },
+//   },
+// };
+
+// export default flow;

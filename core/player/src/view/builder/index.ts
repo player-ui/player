@@ -36,7 +36,7 @@ export class Builder {
    * @param values - the value or applicability nodes to put in the multinode
    */
   static multiNode(
-    ...values: (Node.Value | Node.Applicability)[]
+    ...values: (Node.Value | Node.Applicability | Node.Asset)[]
   ): Node.MultiNode {
     const m: Node.MultiNode = {
       type: NodeType.MultiNode,

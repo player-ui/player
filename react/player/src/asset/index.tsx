@@ -21,7 +21,6 @@ export const ReactAsset = (
   props: AssetType<string> | AssetWrapper<AssetType<string>>,
 ) => {
   const { registry } = React.useContext(AssetContext);
-
   let unwrapped;
 
   if ("type" in props && "id" in props) {
@@ -29,6 +28,8 @@ export const ReactAsset = (
   } else if ("asset" in props) {
     unwrapped = (props as unknown as AssetWrapper).asset;
   }
+
+  console.log("unwrapped", unwrapped);
 
   if (!unwrapped) {
     throw Error(

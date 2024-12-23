@@ -163,7 +163,8 @@ export class Resolver {
     );
     this.resolveCache = resolveCache;
     this.hooks.afterUpdate.call(updated.value);
-
+    debugger;
+    console.log("updated", updated);
     return updated.value;
   }
 
@@ -343,6 +344,8 @@ export class Resolver {
       resolveOptions,
     );
 
+    debugger;
+
     let updated = !dequal(previousResult?.value, resolved);
 
     if (previousResult && !updated) {
@@ -380,6 +383,7 @@ export class Resolver {
             );
             resolved = setIn(resolved, child.path, arr);
           } else {
+            debugger;
             resolved = setIn(resolved, child.path, childValue);
           }
         }
@@ -407,6 +411,8 @@ export class Resolver {
           prevASTMap,
         );
 
+        debugger;
+
         if (mTree.value !== undefined && mTree.value !== null) {
           childValue.push(mTree.value);
         }
@@ -432,7 +438,7 @@ export class Resolver {
     if (previousResult && !updated) {
       resolved = previousResult?.value;
     }
-
+    // resolved here is obj not array
     resolved = this.hooks.afterResolve.call(resolved, resolvedAST, {
       ...resolveOptions,
       getDependencies: (scope?: "core" | "children") =>
