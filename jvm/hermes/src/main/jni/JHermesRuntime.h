@@ -3,7 +3,6 @@
 #include <hermes/hermes.h>
 #include <fbjni/fbjni.h>
 
-#include "RuntimeScope.h"
 #include "JJSIValue.h"
 
 using namespace facebook::hermes;
@@ -41,19 +40,16 @@ public:
     static void registerNatives();
 
     static local_ref<jhybridobject> create(alias_ref<jclass>) {
-        auto ref = newObjectCxxArgs();
-        return ref;
+        return newObjectCxxArgs();
     }
 
     static local_ref<jhybridobject> createWithConfig(alias_ref<jclass>, alias_ref<JHermesConfig::jhybridobject> config) {
-        auto ref = newObjectCxxArgs(config);
-        return ref;
+        return newObjectCxxArgs(config);
     }
 
     // TODO: Add the rest of the HermesRuntime API (like loading bytecode)
     local_ref<JJSIValue::jhybridobject> evaluateJavaScriptWithSourceMap(std::string script, std::string sourceMap, std::string sourceURL) {
-        auto result = JJSIValue::newObjectCxxArgs(this->runtimeScope_, get_runtime().evaluateJavaScriptWithSourceMap(std::make_shared<StringBuffer>(script), std::make_shared<StringBuffer>(sourceMap), sourceURL));
-        return result;
+        return JJSIValue::newObjectCxxArgs(this->runtimeScope_, get_runtime().evaluateJavaScriptWithSourceMap(std::make_shared<StringBuffer>(script), std::make_shared<StringBuffer>(sourceMap), sourceURL));;
     }
 
     ~JHermesRuntime() override {
@@ -106,7 +102,7 @@ public:
 private:
     friend HybridBase;
     std::unique_ptr<HermesRuntime> runtime_;
-    ::global_ref<JHermesConfig::jhybridobject> jConfig_;
+    global_ref<JHermesConfig::jhybridobject> jConfig_;
     shared_ptr<RuntimeScope> runtimeScope_;
     explicit JHermesRuntime(
         std::unique_ptr<HermesRuntime> runtime,
