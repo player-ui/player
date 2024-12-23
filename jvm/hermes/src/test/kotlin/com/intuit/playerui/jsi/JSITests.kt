@@ -80,17 +80,17 @@ internal class ValueTests : HermesTest() {
     }
 
     @Test fun `create and detect boolean`() = runtime.evaluateInJSThreadBlocking {
-        val boolean = Value.from(runtime, true)
+        val boolean = Value.from(true)
         assertTrue(boolean.isBoolean())
         assertTrue(boolean.asBoolean())
     }
 
     @Test fun `create and detect number`() = runtime.evaluateInJSThreadBlocking {
-        val int = Value.from(runtime, 100)
+        val int = Value.from(100)
         assertTrue(int.isNumber())
         assertEquals(100, int.asNumber().toInt())
 
-        val double = Value.from(runtime, 5.5)
+        val double = Value.from(5.5)
         assertTrue(double.isNumber())
         assertEquals(5.5, double.asNumber())
     }
@@ -108,8 +108,8 @@ internal class ValueTests : HermesTest() {
     }
 
     @Test fun `can check if values are strictEquals`() = runtime.evaluateInJSThreadBlocking {
-        assertTrue(Value.strictEquals(runtime, Value.from(runtime, 1), Value.from(runtime, 1)))
-        assertFalse(Value.strictEquals(runtime, Value.from(runtime, 1), Value.from(runtime, 2)))
+        assertTrue(Value.strictEquals(runtime, Value.from(1), Value.from(1)))
+        assertFalse(Value.strictEquals(runtime, Value.from(1), Value.from(2)))
 
         assertTrue(Value.strictEquals(runtime, Value.from(runtime, "hello"), Value.from(runtime, "hello")))
         assertFalse(Value.strictEquals(runtime, Value.from(runtime, "hello"), Value.from(runtime, "world")))
@@ -152,7 +152,7 @@ internal class ObjectTests : HermesTest() {
         assertEquals("world", `object`.getProperty(runtime, "hello").asString(runtime))
         assertEquals("data", `object`.getPropertyAsObject(runtime, "nested").getProperty(runtime, "some").asString(runtime))
         val multiply = `object`.getPropertyAsFunction(runtime, "multiply").asFunction(runtime)
-        val result = multiply.call(runtime, Value.from(runtime, 2), Value.from(runtime, 3)).asNumber().toInt()
+        val result = multiply.call(runtime, Value.from(2), Value.from(3)).asNumber().toInt()
         assertEquals(6, result)
     }
 
@@ -198,20 +198,20 @@ internal class ArrayTests : HermesTest() {
     }
 
     @Test fun `can create array via helper`() = runtime.evaluateInJSThreadBlocking {
-        val value = Array.createWithElements(runtime, Value.from(runtime, 1), Value.from(runtime, "two"), Value.from(runtime, 3L))
+        val value = Array.createWithElements(runtime, Value.from(1), Value.from(runtime, "two"), Value.from(runtime, 3L))
         value.assertValues()
     }
 
     @Test fun `can set values in an array`() = runtime.evaluateInJSThreadBlocking {
-        val array = Array.createWithElements(runtime, Value.from(runtime, 20))
-        array.setValueAtIndex(runtime, 0, Value.from(runtime, 40))
+        val array = Array.createWithElements(runtime, Value.from(20))
+        array.setValueAtIndex(runtime, 0, Value.from(40))
         assertEquals(40, array.getValueAtIndex(runtime, 0).asNumber().toInt())
     }
 
     @Test fun `asValue works for object subclasses`() = runtime.evaluateInJSThreadBlocking {
         Array.createWithElements(
             runtime,
-            Value.from(runtime, 1),
+            Value.from(1),
             Value.from(runtime, "two"),
             Value.from(runtime, 3L),
         ).asValue(runtime).asObject(runtime).asArray(runtime).assertValues()
@@ -226,16 +226,16 @@ internal class FunctionTests : HermesTest() {
         assertTrue(`object`.isFunction(runtime))
         val multiply = `object`.asFunction(runtime)
         assertFalse(multiply.isHostFunction(runtime))
-        assertEquals(6, multiply.call(runtime, Value.from(runtime, 1), Value.from(runtime, 6)).asNumber().toInt())
+        assertEquals(6, multiply.call(runtime, Value.from(1), Value.from(6)).asNumber().toInt())
     }
 
     @Test fun `can execute a host function`() = runtime.evaluateInJSThreadBlocking {
         val hostMultiply = HostFunction { _, _, args ->
-            Value.from(runtime, args.filter(Value::isNumber).fold(1.0) { acc, value -> acc * value.asNumber() })
+            args.filter(Value::isNumber).fold(1.0) { acc, value -> acc * value.asNumber() }.let(Value::from)
         }
         val multiply = Function.createFromHostFunction(runtime, "multiply", 2, hostMultiply)
         assertTrue(multiply.isHostFunction(runtime))
-        assertEquals(6, multiply.call(runtime, Value.from(runtime, 2), Value.from(runtime, 3.0)).asNumber().toInt())
+        assertEquals(6, multiply.call(runtime, Value.from(2), Value.from(3.0)).asNumber().toInt())
     }
 
     @Test fun `asValue works for object subclasses`() = runtime.evaluateInJSThreadBlocking {
@@ -243,7 +243,7 @@ internal class FunctionTests : HermesTest() {
             args.filterIsInstance<Number>().fold(1.0) { acc, value -> acc * value.toDouble() }
         }.asValue(runtime).asObject(runtime).asFunction(runtime)
         assertTrue(multiply.isHostFunction(runtime))
-        assertEquals(6, multiply.call(runtime, Value.from(runtime, 2), Value.from(runtime, 3.0)).asNumber().toInt())
+        assertEquals(6, multiply.call(runtime, Value.from(2), Value.from(3.0)).asNumber().toInt())
     }
 }
 

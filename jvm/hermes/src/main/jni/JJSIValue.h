@@ -112,9 +112,9 @@ public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/Value;";
     static void registerNatives();
 
-    static local_ref<jhybridobject> fromBool(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, bool b);
-    static local_ref<jhybridobject> fromDouble(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, double d);
-    static local_ref<jhybridobject> fromInt(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, int i);
+    static local_ref<jhybridobject> fromBool(alias_ref<jclass>, bool b);
+    static local_ref<jhybridobject> fromDouble(alias_ref<jclass>, double d);
+    static local_ref<jhybridobject> fromInt(alias_ref<jclass>, int i);
     static local_ref<jhybridobject> fromString(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string str);
     static local_ref<jhybridobject> fromLong(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, jlong l);
 

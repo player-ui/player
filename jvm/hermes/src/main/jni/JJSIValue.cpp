@@ -72,16 +72,16 @@ void JJSIRuntime::registerNatives() {
     });
 }
 
-local_ref<JJSIValue::jhybridobject> JJSIValue::fromBool(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, bool b) {
-    return newObjectCxxArgs(jRuntime->cthis()->get_scope(), Value(b));
+local_ref<JJSIValue::jhybridobject> JJSIValue::fromBool(alias_ref<jclass>, bool b) {
+    return newObjectCxxArgs(Value(b));
 }
 
-local_ref<JJSIValue::jhybridobject> JJSIValue::fromDouble(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, double d) {
-    return newObjectCxxArgs(jRuntime->cthis()->get_scope(), Value(d));
+local_ref<JJSIValue::jhybridobject> JJSIValue::fromDouble(alias_ref<jclass>, double d) {
+    return newObjectCxxArgs(Value(d));
 }
 
-local_ref<JJSIValue::jhybridobject> JJSIValue::fromInt(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, int i) {
-    return newObjectCxxArgs(jRuntime->cthis()->get_scope(), Value(i));
+local_ref<JJSIValue::jhybridobject> JJSIValue::fromInt(alias_ref<jclass>, int i) {
+    return newObjectCxxArgs(Value(i));
 }
 
 local_ref<JJSIValue::jhybridobject> JJSIValue::fromString(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string str) {
