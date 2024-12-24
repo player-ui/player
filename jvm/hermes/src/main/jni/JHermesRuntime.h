@@ -58,21 +58,26 @@ public:
     }
 
     void release() {
-        for (auto& ptr : *runtimeScope_->valueScope) {
-            ptr.second.reset();
+        for (auto& ptr_pair : *runtimeScope_->valueScope) {
+            ptr_pair.second.reset();
         }
-        for (auto& ptr : *runtimeScope_->objectScope) {
-            ptr.second.reset();
+        for (auto& ptr_pair : *runtimeScope_->objectScope) {
+            ptr_pair.second.reset();
         }
-        for (auto& ptr : *runtimeScope_->functionScope) {
-            ptr.second.reset();
+        for (auto& ptr_pair : *runtimeScope_->functionScope) {
+            ptr_pair.second.reset();
         }
-        for (auto& ptr : *runtimeScope_->arrayScope) {
-            ptr.second.reset();
+        for (auto& ptr_pair : *runtimeScope_->arrayScope) {
+            ptr_pair.second.reset();
         }
-        for (auto& ptr : *runtimeScope_->symbolScope) {
-            ptr.second.reset();
+        for (auto& ptr_pair : *runtimeScope_->symbolScope) {
+            ptr_pair.second.reset();
         }
+        runtimeScope_->valueScope->clear();
+        runtimeScope_->objectScope->clear();
+        runtimeScope_->functionScope->clear();
+        runtimeScope_->arrayScope->clear();
+        runtimeScope_->symbolScope->clear();
         if (jConfig_) jConfig_.reset();
         if (runtime_) runtime_.reset();
     }
