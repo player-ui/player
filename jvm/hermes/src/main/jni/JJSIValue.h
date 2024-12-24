@@ -128,7 +128,12 @@ public:
 
     explicit JJSIValue(std::shared_ptr<RuntimeScope> scope, Value&& value) : HybridClass(), scope_(scope) {
         // internally creates unique ptr
-        scope->trackValue(this, std::move(value));
+        if (!std::is_fundamental<decltype(value)>::value && !value.isUndefined() && !value.isNull()) {
+            scope->trackValue(this, std::move(value));
+        } else {
+            tracked = false;
+            value_ = std::make_unique<Value>(std::move(value));
+        }
     }
 
     explicit JJSIValue(Value&& value) : HybridClass(), value_(std::make_unique<Value>(std::move(value))) {
