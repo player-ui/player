@@ -218,6 +218,10 @@ public:
     local_ref<jhybridobject> getPropertyAsObject(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name);
     local_ref<JJSIFunction_jhybridobject> getPropertyAsFunction(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name);
 
+    ~JJSIObject() override {
+        release();
+    }
+
     void release() override {
         if (scope_) scope_->clearRef(this);
     }
