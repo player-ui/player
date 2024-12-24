@@ -50,6 +50,7 @@ _backup
 .eslintcache
 .next
 android-tools
+*.iml
 
 
 # Xcode
