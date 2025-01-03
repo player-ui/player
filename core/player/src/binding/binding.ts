@@ -53,7 +53,9 @@ export class BindingInstance {
       }
 
       const tryNum = Number(segment);
-      return isNaN(tryNum) ? segment : tryNum;
+      // test to make sure turning a numerical string to a number doesn't change
+      // the actual value of the string by getting rid of a leading zero
+      return isNaN(tryNum) || String(tryNum) !== segment ? segment : tryNum;
     });
     Object.freeze(this.split);
     this.joined = this.split.join(".");
