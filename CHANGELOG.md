@@ -1,3 +1,23 @@
+# 0.10.2-next.0 Fri Jan 03 2025 (Fri Jan 03 2025)
+
+### Release Notes
+
+#### Fix Binding Instantiation of Escaped Numerical Bindings ([#565](https://github.com/player-ui/player/pull/565))
+
+Fixed instantiation of `BindingInstance`s with escaped numerical segments
+
+---
+
+#### 🐛 Bug Fix
+
+- Fix Binding Instantiation of Escaped Numerical Bindings [#565](https://github.com/player-ui/player/pull/565) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 1
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.10.1 (Thu Jan 02 2025)
 
 ### Release Notes
