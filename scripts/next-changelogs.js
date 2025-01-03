@@ -29,7 +29,7 @@ class NextChangelogsPlugin {
         await auto.changelog({
           from: second,
           to: latest,
-          title: `${latest} ${new Date().toDateString()}`,
+          title: `${latest}`,
         });
         execSync(`git push ${auto.remote} ${auto.baseBranch}`);
       }

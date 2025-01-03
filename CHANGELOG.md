@@ -1,4 +1,4 @@
-# 0.10.2-next.0 Fri Jan 03 2025 (Fri Jan 03 2025)
+# 0.10.2-next.0 (Fri Jan 03 2025)
 
 ### Release Notes
 
