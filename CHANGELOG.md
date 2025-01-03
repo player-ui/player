@@ -1,6 +1,52 @@
-# 0.10.2 (Wed Dec 04 2024)
+# 0.10.2-next.0 (Fri Jan 03 2025)
 
+### Release Notes
 
+#### Fix Binding Instantiation of Escaped Numerical Bindings ([#565](https://github.com/player-ui/player/pull/565))
+
+Fixed instantiation of `BindingInstance`s with escaped numerical segments
+
+---
+
+#### 🐛 Bug Fix
+
+- Fix Binding Instantiation of Escaped Numerical Bindings [#565](https://github.com/player-ui/player/pull/565) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 1
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.10.1 (Thu Jan 02 2025)
+
+### Release Notes
+
+#### More Release Fixes ([#558](https://github.com/player-ui/player/pull/558))
+
+- Fix git push of changelog for next builds
+- Fix stamping of search config for latest doc site releases
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#568](https://github.com/player-ui/player/pull/568) ([@intuit-svc](https://github.com/intuit-svc))
+- Hermes reference tracking [#563](https://github.com/player-ui/player/pull/563) ([@sugarmanz](https://github.com/sugarmanz) [@brocollie08](https://github.com/brocollie08))
+- Use m2 Medium executor [#560](https://github.com/player-ui/player/pull/560) ([@KetanReddy](https://github.com/KetanReddy))
+- More Release Fixes [#558](https://github.com/player-ui/player/pull/558) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 📝 Documentation
+
+- Updated Authoring content section in docs.mdx [#567](https://github.com/player-ui/player/pull/567) ([@AkshayArora-repo](https://github.com/AkshayArora-repo))
+
+#### Authors: 5
+
+- [@AkshayArora-repo](https://github.com/AkshayArora-repo)
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
 
 ---
 
