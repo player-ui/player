@@ -134,18 +134,16 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
     }
 
     func next(_ state: CompletedState? = nil) async {
-        DispatchQueue.main.async { [weak self] in
-            self?.loadingState = .loading
-            self?.flow = nil
-        }
+        Task { @MainActor in
+            self.loadingState = .loading
+            self.flow = nil
 
-        do {
-            let nextState = try await self.manager.next(state)
-            DispatchQueue.main.async { [weak self] in
-                self?.handleNextState(nextState)
+            do {
+                let nextState = try await self.manager.next(state)
+                self.handleNextState(nextState)
+            } catch {
+                self.loadingState = .failed(error)
             }
-        } catch {
-            self.loadingState = .failed(error)
         }
     }
 
