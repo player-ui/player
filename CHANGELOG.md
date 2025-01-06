@@ -1,3 +1,29 @@
+# 0.10.2-next.1 (Mon Jan 06 2025)
+
+### Release Notes
+
+#### Fix Duplicate Date in Title for `next` Changelog Entries ([#569](https://github.com/player-ui/player/pull/569))
+
+fix duplicate date in title for next changelogs
+
+---
+
+#### 🐛 Bug Fix
+
+- Only mutate ManagedPlayerViewModel.loadingState on main thread [#566](https://github.com/player-ui/player/pull/566) ([@ap-for-work](https://github.com/ap-for-work) [@hborawski](https://github.com/hborawski))
+
+#### 📝 Documentation
+
+- Fix Duplicate Date in Title for `next` Changelog Entries [#569](https://github.com/player-ui/player/pull/569) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 3
+
+- [@ap-for-work](https://github.com/ap-for-work)
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.10.2-next.0 (Fri Jan 03 2025)
 
 ### Release Notes
