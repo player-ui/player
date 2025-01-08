@@ -115,6 +115,8 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
     private var plugins: [NativePlugin]
     @ObservedObject private var context: SwiftUIPlayer.Context
 
+    @State private var inViewState = false
+
     private var loading: () -> Loading
     private var fallback: (ManagedPlayerErrorContext) -> Fallback
 
@@ -152,6 +154,11 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
             }
     }
 
+    private var isViewLoaded: Bool {
+        guard case .loaded = viewModel.loadingState else { return false }
+        return inViewState
+    }
+
     private func bodyContent(_ transitionInfo: PlayerViewTransition) -> some View {
         VStack {
             Group {
@@ -166,13 +173,14 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
                         context.unload()
                         Task { await viewModel.next(prevResult) }
                     }
-                case .loading:
-                    loading().onAppear { context.unload() }
                 case .failed(let error):
                     fallback(ManagedPlayerErrorContext(error: error, retry: viewModel.retry, reset: viewModel.reset)).onAppear { context.unload() }
                 case .loaded(let flow):
-                    makePlayerView(flow: flow)
-                        .transition(transitionInfo.transition)
+                    /// to prevent alternative between loaded and loading state when flows reach multiple non VIEW states after another causing flickering of the loading spinner, change the opacity to show either the loading view or the player view
+                    ZStack {
+                        loading().onAppear { context.unload() }.opacity(isViewLoaded ? 0 : 1)
+                        makePlayerView(flow: flow).opacity(isViewLoaded ? 1 : 0)
+                    }
                 }
             }
         }
@@ -182,7 +190,7 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
     func makePlayerView(flow: String) -> some View {
         SwiftUIPlayer(
             flow: flow,
-            plugins: plugins + [viewModel] + scrollPlugin,
+            plugins: plugins + [viewModel] + scrollPlugin + [ToggleInViewPlugin(isViewLoaded: self.$inViewState)],
             result: $viewModel.result,
             context: context,
             unloadOnDisappear: false
@@ -195,6 +203,41 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
             handleScroll
         else { return [] }
         return [ScrollPlugin()]
+    }
+}
+
+/// A plugin for the passed into the SwiftUIPlayer for determining when a view has been loaded based on the binding passed in
+/// updates that binding to false once the view disappears
+fileprivate class ToggleInViewPlugin: NativePlugin {
+
+    @Binding public var isViewLoaded: Bool
+
+    public init(isViewLoaded: Binding<Bool>) {
+        self._isViewLoaded = isViewLoaded
+    }
+
+   public var pluginName: String = "ToggleInViewPlugin"
+
+   public func apply<P>(player: P) where P: HeadlessPlayer {
+        guard let player = player as? SwiftUIPlayer else { return }
+
+        player.hooks?.viewController.tap({ (viewController) in
+            player.hooks?.view.tap(name: self.pluginName) { [weak self] view in
+                return AnyView(view.onDisappear {
+                    DispatchQueue.main.async {
+                        self?.$isViewLoaded.wrappedValue = false
+                    }
+                })
+            }
+
+            viewController.hooks.view.tap { (view) in
+                view.hooks.onUpdate.tap { [weak self] val in
+                    DispatchQueue.main.async {
+                        self?.$isViewLoaded.wrappedValue = true
+                    }
+                }
+            }
+        })
     }
 }
 

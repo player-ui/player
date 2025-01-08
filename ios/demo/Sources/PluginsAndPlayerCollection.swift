@@ -64,6 +64,11 @@ public struct PluginsAndPlayerCollection: View {
                     FlowManagerView(flowSequence: [.firstFlow, .assetErrorFlow], navTitle: "Error Asset Flow")
                         .padding(padding)
                 }.accessibility(identifier: "Error Asset Flow")
+
+                NavigationLink("Action state flows before View flow") {
+                    FlowManagerView(flowSequence: [.firstFlowAction, .secondFlowAction, .secondFlow], navTitle: "Action state flows before View flow")
+                        .padding(padding)
+                }.accessibility(identifier: "Action state flows before View flow")
             }  header: {
                 Text("Managed Player")
             }

@@ -36,7 +36,6 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
         public static func == (lhs: Self, rhs: Self) -> Bool {
             switch (lhs, rhs) {
             case (.idle, .idle):                                        return true
-            case (.loading, .loading):                                  return true
             case (.loaded(let lll), .loaded(let rrr)) where lll == rrr: return true
             case (.retry(let lll), .retry(let rrr)) where lll === rrr:  return true
             default:                                                    return false
@@ -52,8 +51,6 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
         case idle
         /// An error occurred and a retry can be attempted
         case retry(CompletedState)
-        /// Loading the next flow
-        case loading
         /// The flow failed with an error
         case failed(Error)
         /// Flow was successfully loaded
@@ -135,7 +132,8 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
 
     func next(_ state: CompletedState? = nil) async {
         Task { @MainActor in
-            self.loadingState = .loading
+            // loaded state with no flow means flow is still loading
+            self.loadingState = .loaded("")
             self.flow = nil
 
             do {
