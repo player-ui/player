@@ -1,4 +1,4 @@
-common --enable_bzlmod
+common --enable_bzlmod --nolegacy_important_outputs --experimental_remote_build_event_upload=minimal
 test --test_output=errors
 coverage --combined_report=lcov
 
