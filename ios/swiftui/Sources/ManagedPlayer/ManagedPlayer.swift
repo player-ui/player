@@ -221,15 +221,22 @@ fileprivate class ToggleInViewPlugin: NativePlugin {
    public func apply<P>(player: P) where P: HeadlessPlayer {
         guard let player = player as? SwiftUIPlayer else { return }
 
-        player.hooks?.viewController.tap({ (viewController) in
-            player.hooks?.view.tap(name: self.pluginName) { [weak self] view in
-                return AnyView(view.onDisappear {
-                    DispatchQueue.main.async {
-                        self?.$isViewLoaded.wrappedValue = false
-                    }
-                })
-            }
+       player.hooks?.flowController.tap { flowController in
+            flowController.hooks.flow.tap { flow in
+                flow.hooks.transition.tap { [weak self] _, newState in
+                    // set isViewLoaded back to false to show loading spinner when we transition to non view
+                    if (newState.value as? NavigationFlowViewState) == nil {
+                        DispatchQueue.main.async {
+                          self?.$isViewLoaded.wrappedValue = false
+                        }
 
+                    }
+                }
+            }
+        }
+
+       // ensures we only set isViewLoaded to true once a view has been loaded
+        player.hooks?.viewController.tap({ (viewController) in
             viewController.hooks.view.tap { (view) in
                 view.hooks.onUpdate.tap { [weak self] val in
                     DispatchQueue.main.async {

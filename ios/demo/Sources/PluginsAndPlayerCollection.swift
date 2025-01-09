@@ -65,10 +65,15 @@ public struct PluginsAndPlayerCollection: View {
                         .padding(padding)
                 }.accessibility(identifier: "Error Asset Flow")
 
-                NavigationLink("Action state flows before View flow") {
-                    FlowManagerView(flowSequence: [.firstFlowAction, .secondFlowAction, .secondFlow], navTitle: "Action state flows before View flow")
+                NavigationLink("Multi Action state before multi view flow") {
+                    FlowManagerView(flowSequence: [.firstFlowAction, .secondFlowAction,  .multiViewTransitionFlow, .secondFlow], navTitle: "Multi Action state before multi view flow")
                         .padding(padding)
-                }.accessibility(identifier: "Action state flows before View flow")
+                }.accessibility(identifier: "Multi Action state before multi view flow")
+
+                NavigationLink("External Action transition flow") {
+                    FlowManagerView(flowSequence: [.externalActionFlow, .secondFlow], navTitle: "External Action transition flow")
+                        .padding(padding)
+                }.accessibility(identifier: "External Action transition flow")
             }  header: {
                 Text("Managed Player")
             }
