@@ -21,6 +21,7 @@ kt_jvm_library(
         ":hermes",
         "//jvm/hermes/src/main/jni:resources",
     ],
+    tags = ["kt_abi_plugin_incompatible"],
 )
 
 android_library(
