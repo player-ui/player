@@ -31,16 +31,12 @@ jobs:
               content: "eyes",
             });
             const { number: pull_number } = context.payload.issue;
-            const { data: { head: { ref: branch, repo: { fork }}}} = await github.rest.pulls.get({
+            const { data: { head: { ref: branch }}} = await github.rest.pulls.get({
               owner,
               repo,
               pull_number,
             });
-            if(fork){
-              return "pull/" + pull_number;
-            } else {
-              return branch;
-            }
+            return branch;
       - name: Not a collaborator
         if: ${{ failure() }}
         uses: actions/github-script@v6

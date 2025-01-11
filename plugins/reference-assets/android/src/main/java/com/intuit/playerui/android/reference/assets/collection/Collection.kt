@@ -4,13 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.LocalTextStyle
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.compose.ComposableAsset
@@ -32,14 +28,11 @@ class Collection(assetContext: AssetContext) : ComposableAsset<Collection.Data>(
 
     @Composable
     override fun content(modifier: Modifier, data: Data) {
-
         Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(20.dp)) {
-            CompositionLocalProvider(LocalTextStyle provides TextStyle(fontSize = 16.sp)) {
-                data.label?.compose(
-                    modifier = Modifier.padding(top = 10.dp).fillMaxWidth(),
-                    styles = XmlAssetStyleParser(requireContext()).parse(R.style.Text_Label)
-                )
-            }
+            data.label?.compose(
+                modifier = Modifier.padding(top = 10.dp).fillMaxWidth(),
+                styles = XmlAssetStyleParser(requireContext()).parse(R.style.Text_Label),
+            )
             Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 data.values.map {
                     it.compose(

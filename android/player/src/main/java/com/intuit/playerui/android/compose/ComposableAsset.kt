@@ -2,28 +2,25 @@ package com.intuit.playerui.android.compose
 
 import android.view.View
 import android.widget.FrameLayout
-import androidx.annotation.StyleRes
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.material.LocalTextStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.viewinterop.AndroidView
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.build
-import com.intuit.playerui.android.extensions.Style
 import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withTag
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import kotlinx.serialization.KSerializer
-
 
 /**
  * Base class for assets that render using Jetpack Compose.
@@ -63,7 +60,6 @@ public abstract class ComposableAsset<Data> (
     abstract fun content(modifier: Modifier, data: Data)
 }
 
-// TODO: What kind of logging do we want?
 @Composable
 fun RenderableAsset.compose(
     modifier: Modifier = Modifier,
@@ -89,4 +85,3 @@ private fun RenderableAsset.composeAndroidView(
         } into it
     }
 }
-

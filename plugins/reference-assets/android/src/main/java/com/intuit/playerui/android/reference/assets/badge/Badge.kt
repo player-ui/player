@@ -10,7 +10,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.intuit.playerui.android.AssetContext
@@ -35,13 +34,10 @@ internal class Badge(
             modifier
                 .height(24.dp)
                 .wrapContentSize()
-                .clip(RoundedCornerShape(4.dp))
-                .background(color = if (data.status == "info") Color.Blue else Color.Red)
+                .background(color = if (data.status == "info") Color.Blue else Color.Red, RoundedCornerShape(4.dp))
                 .padding(
-                    start = 4.dp,
-                    top = 2.dp,
-                    end = 4.dp,
-                    bottom = 4.dp,
+                    horizontal = 4.dp,
+                    vertical = 2.dp,
                 ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
