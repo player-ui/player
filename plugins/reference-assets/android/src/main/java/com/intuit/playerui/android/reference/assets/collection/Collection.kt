@@ -13,10 +13,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.compose.AndroidViewAttributes
 import com.intuit.playerui.android.compose.ComposableAsset
 import com.intuit.playerui.android.compose.compose
 import com.intuit.playerui.android.reference.assets.R
+import com.intuit.playerui.android.reference.assets.XmlAssetStyleParser
 import kotlinx.serialization.Serializable
 
 /** Asset that renders a group of assets as children with little semantic meaning */
@@ -32,13 +32,12 @@ class Collection(assetContext: AssetContext) : ComposableAsset<Collection.Data>(
 
     @Composable
     override fun content(modifier: Modifier, data: Data) {
+
         Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(20.dp)) {
             CompositionLocalProvider(LocalTextStyle provides TextStyle(fontSize = 16.sp)) {
                 data.label?.compose(
                     modifier = Modifier.padding(top = 10.dp).fillMaxWidth(),
-                    androidViewAttributes = AndroidViewAttributes(
-                        styles = listOf(R.style.Text_Label),
-                    ),
+                    styles = XmlAssetStyleParser(requireContext()).parse(R.style.Text_Label)
                 )
             }
             Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {

@@ -7,18 +7,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.material.LocalTextStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.viewinterop.AndroidView
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.build
+import com.intuit.playerui.android.extensions.Style
 import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withTag
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import kotlinx.serialization.KSerializer
+
 
 /**
  * Base class for assets that render using Jetpack Compose.
@@ -62,13 +67,13 @@ public abstract class ComposableAsset<Data> (
 @Composable
 fun RenderableAsset.compose(
     modifier: Modifier = Modifier,
-    androidViewAttributes: AndroidViewAttributes? = null,
+    styles: AssetStyle? = null,
     tag: String? = null,
 ) {
     assetContext.withTag(tag ?: asset.id).build().run {
         when (this) {
-            is ComposableAsset<*> -> compose()
-            else -> composeAndroidView(modifier, androidViewAttributes)
+            is ComposableAsset<*> -> CompositionLocalProvider(LocalTextStyle provides (styles?.textStyle ?: TextStyle())) { compose() }
+            else -> composeAndroidView(modifier, styles?.xmlStyles)
         }
     }
 }
@@ -76,10 +81,8 @@ fun RenderableAsset.compose(
 @Composable
 private fun RenderableAsset.composeAndroidView(
     modifier: Modifier = Modifier,
-    androidViewAttributes: AndroidViewAttributes? = null,
+    styles: Styles? = null,
 ) {
-    val styles = androidViewAttributes?.styles
-
     AndroidView(factory = ::FrameLayout, modifier) {
         assetContext.withContext(it.context).build().run {
             render(styles)
@@ -87,6 +90,3 @@ private fun RenderableAsset.composeAndroidView(
     }
 }
 
-data class AndroidViewAttributes(
-    @StyleRes val styles: Styles? = null,
-)
