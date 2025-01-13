@@ -51,7 +51,7 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
         /// Player has been constructed but not yet fetching
         case idle
         /// An error occurred and a retry can be attempted
-        /// /// Loading the next flow
+        /// Loading the next flow
         case loading
         case retry(CompletedState)
         /// The flow failed with an error
