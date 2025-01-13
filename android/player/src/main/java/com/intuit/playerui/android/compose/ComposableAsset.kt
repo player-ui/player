@@ -5,6 +5,7 @@ import android.widget.FrameLayout
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ProvidedValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
@@ -47,13 +48,24 @@ public abstract class ComposableAsset<Data> (
         }
     }
 
+    fun updateProvidedValues(values: List<ProvidedValue<*>>) {
+        // Update the internal state or perform actions with the new values
+        player.providedValues.addAll(values)
+    }
+
     @Composable
     fun compose(modifier: Modifier? = Modifier, data: Data? = null) {
         val data: Data? by produceState<Data?>(initialValue = data, key1 = this) {
             value = getData()
         }
 
-        data?.let { content(modifier ?: Modifier, it) }
+        data?.let {
+            // Getting the local values provided by the plugin hook
+            player.hooks.compositionLocalProvidedValues.call(hashMapOf(), ::updateProvidedValues)
+            CompositionLocalProvider(*(player.providedValues).toTypedArray()) {
+                content(modifier ?: Modifier, it)
+            }
+        }
     }
 
     @Composable

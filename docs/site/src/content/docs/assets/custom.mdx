@@ -391,8 +391,16 @@ interface AssetStyle {
 ```
 
 This interface optionally accepts compose TextStyle and xmlStyles. In order to reduce defining both these styles separately, we recommend implementing a custom converter that converts one style to another. 
-As an example, our reference assets implement an XmlStyleParser that parses an XML style and returns its equivalent Compose TextStyle. 
+As an example, our reference assets implement an XmlStyleParser that parses an XML style and returns its equivalent Compose TextStyle. An instance of this style can be passed in the `compose` call to render child assets.
 
+#### Theming
+In order to support theming and allow consumers to set values in a CompositionLocalProvider, AndroidPlayer now exposes a hook called `compositionLocalProvidedValues`. As an example, you can use it to set LocalColorScheme as follows:
+
+```
+androidPlayer.hooks.compositionLocalProvidedValues.tap("Custom Theme") { _, updateProvidedValues ->
+    updateProvidedValues(listOf(LocalColorScheme provides customColorScheme))
+}
+```
 
   </Fragment>
 </PlatformTabs>

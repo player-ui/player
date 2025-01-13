@@ -7,8 +7,6 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.intuit.playerui.android.reference.demo.test.base.ComposeUITest
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import com.intuit.playerui.android.reference.demo.test.base.waitForViewInRoot
 import org.junit.Test
 
