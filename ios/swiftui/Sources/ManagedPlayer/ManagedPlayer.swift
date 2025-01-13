@@ -175,11 +175,15 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
                     }
                 case .failed(let error):
                     fallback(ManagedPlayerErrorContext(error: error, retry: viewModel.retry, reset: viewModel.reset)).onAppear { context.unload() }
-                case .loaded(let flow):
+                case .loading, .loaded:
                     /// to prevent alternative between loaded and loading state when flows reach multiple non VIEW states after another causing flickering of the loading spinner, change the opacity to show either the loading view or the player view
                     ZStack {
+                        // use isViewLoaded to determine when the loader is shown instead of checking for .loading case
                         loading().onAppear { context.unload() }.opacity(isViewLoaded ? 0 : 1)
-                        makePlayerView(flow: flow).opacity(isViewLoaded ? 1 : 0)
+
+                        if case .loaded(let flow) = viewModel.loadingState {
+                            makePlayerView(flow: flow).opacity(isViewLoaded ? 1 : 0)
+                        }
                     }
                 }
             }
