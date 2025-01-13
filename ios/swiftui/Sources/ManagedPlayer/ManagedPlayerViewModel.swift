@@ -135,7 +135,6 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
 
     func next(_ state: CompletedState? = nil) async {
         Task { @MainActor in
-            // loaded state with no flow means flow is still loading
             self.loadingState = .loading
             self.flow = nil
 
