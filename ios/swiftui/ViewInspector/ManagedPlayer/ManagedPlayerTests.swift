@@ -72,6 +72,7 @@ class ManagedPlayer14Tests: XCTestCase {
                 .find(ManagedPlayer14<Text, EmptyView>.self)
                 .vStack()
                 .group(0)
+                .zStack(0)
                 .view(SwiftUIPlayer.self, 0)
                 .vStack()
                 .first?
