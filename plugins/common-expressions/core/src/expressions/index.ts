@@ -53,7 +53,7 @@ export const isNotEmpty: ExpressionHandler<[unknown], boolean> = (ctx, val) => {
 
 export const concat = withoutContext((...args: Array<unknown>) => {
   if (args.every((v) => Array.isArray(v))) {
-    const arrayArgs = args as Array<Array<unknown>>;
+    const arrayArgs = args.map((a) => structuredClone(a)) as Array<Array<unknown>>;
 
     return arrayArgs.reduce((merged, next) => {
       merged.push(...next);

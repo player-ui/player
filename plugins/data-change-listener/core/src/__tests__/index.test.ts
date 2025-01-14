@@ -466,7 +466,7 @@ describe("Data-Change-Listener with array modification", () => {
             asset: {
               id: "action",
               type: "action",
-              exp: "concat({{array}}, [4])",
+              exp: "{{array}} = concat({{array}}, [4])",
               label: {
                 asset: {
                   id: "actions-0-label",
@@ -607,7 +607,7 @@ describe("Data-Change-Listener with array modification", () => {
       1, 2, 3, 4,
     ]);
 
-    expect(testExpression).toHaveBeenCalledWith("array has changed");
+    expect(testExpression).toHaveBeenCalledWith("array has changed 1,2,3,4");
   });
 
   it("should call expression evaluator when count is tracked changes", () => {
