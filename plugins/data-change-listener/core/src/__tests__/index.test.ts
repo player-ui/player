@@ -466,7 +466,7 @@ describe("Data-Change-Listener with array modification", () => {
             asset: {
               id: "action",
               type: "action",
-              exp: "concat({{array}}, [{{array[`size({{array}}) - 1`]}} + 1])",
+              exp: "concat({{array}}, [4])",
               label: {
                 asset: {
                   id: "actions-0-label",
@@ -481,6 +481,69 @@ describe("Data-Change-Listener with array modification", () => {
     ],
     data: {
       array: [1, 2, 3],
+    },
+    navigation: {
+      BEGIN: "FLOW_1",
+      FLOW_1: {
+        startState: "VIEW_1",
+        VIEW_1: {
+          state_type: "VIEW",
+          ref: "root",
+          transitions: {
+            "*": "END_Done",
+          },
+        },
+        END_Done: {
+          state_type: "END",
+          outcome: "done",
+        },
+      },
+    },
+  };
+
+  const flowNum = {
+    id: "action-with-expression",
+    views: [
+      {
+        id: "root",
+        type: "info",
+        listeners: {
+          "dataChange.count": ["test('count has changed ' + {{count}})"],
+        },
+        title: {
+          asset: {
+            id: "title",
+            type: "text",
+            value: "Hello",
+          },
+        },
+        primaryInfo: {
+          asset: {
+            id: "primaryInfo",
+            type: "text",
+            value: "Count: {{count}}\\",
+          },
+        },
+        actions: [
+          {
+            asset: {
+              id: "action",
+              type: "action",
+              exp: "{{count}} = {{count}} + 1",
+              label: {
+                asset: {
+                  id: "actions-0-label",
+                  type: "text",
+                  value: "Add to collection",
+                },
+              },
+            },
+          },
+        ],
+      },
+    ],
+    data: {
+      count: 0,
     },
     navigation: {
       BEGIN: "FLOW_1",
@@ -536,6 +599,8 @@ describe("Data-Change-Listener with array modification", () => {
       }
     };
 
+    expect(getState().controllers.data.get("array")).toStrictEqual([1, 2, 3]);
+
     getCurrent()?.actions[0].asset.run();
 
     expect(getState().controllers.data.get("array")).toStrictEqual([
@@ -543,5 +608,44 @@ describe("Data-Change-Listener with array modification", () => {
     ]);
 
     expect(testExpression).toHaveBeenCalledWith("array has changed");
+  });
+
+  it("should call expression evaluator when count is tracked changes", () => {
+    player = new Player({
+      plugins: [
+        new CommonTypesPlugin(),
+        new DataChangeListenerPlugin(),
+        new ReferenceAssetsPlugin(),
+        new CommonExpressionsPlugin(),
+      ],
+    });
+
+    testExpression = vitest.fn();
+
+    player.hooks.expressionEvaluator.tap("test", (ev) => {
+      ev.addExpressionFunction("test", (context, ...args) => {
+        testExpression(...args);
+      });
+    });
+
+    player.start(flowNum);
+
+    const getCurrent = () => {
+      const status = player.getState();
+      if (status.status === "in-progress") {
+        const view = status.controllers.view.currentView?.lastUpdate;
+        if (view) {
+          return view;
+        }
+      }
+    };
+
+    expect(getState().controllers.data.get("count")).toStrictEqual(0);
+
+    getCurrent()?.actions[0].asset.run();
+
+    expect(getState().controllers.data.get("count")).toStrictEqual(1);
+
+    expect(testExpression).toHaveBeenCalledWith("count has changed 1");
   });
 });
