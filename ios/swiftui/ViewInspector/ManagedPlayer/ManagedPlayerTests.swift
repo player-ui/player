@@ -73,7 +73,7 @@ class ManagedPlayer14Tests: XCTestCase {
                 .vStack()
                 .group(0)
                 .zStack(0)
-                .view(SwiftUIPlayer.self, 0)
+                .find(SwiftUIPlayer.self)
                 .vStack()
                 .first?
                 .anyView()
@@ -109,7 +109,8 @@ class ManagedPlayer14Tests: XCTestCase {
                 .find(ManagedPlayer14<Text, EmptyView>.self)
                 .vStack()
                 .group(0)
-                .view(SwiftUIPlayer.self, 0)
+                .zStack(0)
+                .find(SwiftUIPlayer.self)
                 .vStack()
                 .first?
                 .anyView()
@@ -146,7 +147,7 @@ class ManagedPlayer14Tests: XCTestCase {
                 .vStack()
                 .group(0)
                 .zStack(0)
-                .view(SwiftUIPlayer.self, 0)
+                .find(SwiftUIPlayer.self)
                 .vStack()
                 .first?
                 .anyView()
