@@ -8,6 +8,7 @@ import type {
   TextAsset,
   CollectionAsset,
   ChoiceAsset,
+  ChatMessageWrapperAsset,
 } from "./assets";
 import {
   inputTransform,
@@ -15,6 +16,7 @@ import {
   imageTransform,
   infoTransform,
   choiceTransform,
+  chatMessageTransform,
 } from "./assets";
 
 /**
@@ -30,6 +32,7 @@ export class ReferenceAssetsPlugin
         TextAsset,
         CollectionAsset,
         ChoiceAsset,
+        ChatMessageWrapperAsset,
       ],
       [InfoAsset]
     >
@@ -44,6 +47,7 @@ export class ReferenceAssetsPlugin
         [{ type: "image" }, imageTransform],
         [{ type: "info" }, infoTransform],
         [{ type: "choice" }, choiceTransform],
+        [{ type: "chat-message" }, chatMessageTransform],
       ]),
     );
   }

@@ -937,13 +937,22 @@ importers:
       '@player-ui/player':
         specifier: workspace:*
         version: link:../../../core/player
+      uuid:
+        specifier: ^8.3.2
+        version: 8.3.2
     devDependencies:
       '@player-ui/asset-testing-library':
         specifier: workspace:*
         version: link:../../../tools/asset-testing-library/core
+      '@player-ui/async-node-plugin':
+        specifier: workspace:*
+        version: link:../../async-node/core
       '@player-ui/common-types-plugin':
         specifier: workspace:*
         version: link:../../common-types/core
+      '@types/uuid':
+        specifier: ^8.3.4
+        version: 8.3.4
 
   plugins/reference-assets/mocks:
     dependencies:
@@ -959,12 +968,18 @@ importers:
       '@player-ui/asset-provider-plugin-react':
         specifier: workspace:*
         version: link:../../asset-provider/react
+      '@player-ui/async-node-plugin':
+        specifier: workspace:*
+        version: link:../../async-node/core
       '@player-ui/beacon-plugin-react':
         specifier: workspace:*
         version: link:../../beacon/react
       '@player-ui/partial-match-registry':
         specifier: workspace:*
         version: link:../../../core/partial-match-registry
+      '@player-ui/player':
+        specifier: workspace:*
+        version: link:../../../core/player
       '@player-ui/react':
         specifier: workspace:*
         version: link:../../../react/player
