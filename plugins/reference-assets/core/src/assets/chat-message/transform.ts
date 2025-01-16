@@ -45,14 +45,13 @@ export const transform: BeforeTransformFunction<Asset> = (
   const asyncNode = Builder.asyncNode(id);
   const multiNode = Builder.multiNode(assetNode, asyncNode);
 
-  const collectionAsset = Builder.asset({
+  const wrapperAsset = Builder.asset({
     id: "chat-message-wrapper",
     type: "chat-message-wrapper",
   });
 
-  Builder.addChild(collectionAsset, ["values"], multiNode);
-
-  return collectionAsset;
+  Builder.addChild(wrapperAsset, ["values"], multiNode);
+  return wrapperAsset;
 };
 
 export const chatMessageTransform: TransformFunctions = compose(
