@@ -1,3 +1,15 @@
+# 0.10.2-next.2 (Thu Jan 16 2025)
+
+#### 🐛 Bug Fix
+
+- J2V8 Config from Consumer [#576](https://github.com/player-ui/player/pull/576) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
 # 0.10.2-next.1 (Mon Jan 06 2025)
 
 ### Release Notes
