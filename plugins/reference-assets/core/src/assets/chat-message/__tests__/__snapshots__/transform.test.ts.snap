@@ -1,0 +1,15 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`chatMessage transform > generates a new multi-node with async node placeholder 1`] = `
+{
+  "id": "chat-message-wrapper",
+  "type": "chat-message-wrapper",
+  "values": [
+    {
+      "id": "1",
+      "type": "text",
+      "value": "Hello World!",
+    },
+  ],
+}
+`;
