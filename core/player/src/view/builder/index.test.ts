@@ -34,6 +34,12 @@ describe("multiNode", () => {
   });
 });
 
+test("async node", () => {
+  const result = Builder.asyncNode("1");
+  expect(result.type).toBe(NodeType.Async);
+  expect(result.id).toBe("1");
+});
+
 describe("addChild", () => {
   test("sets the parent on the child node", () => {
     const asset = Builder.asset({ id: "asset", type: "text" });
