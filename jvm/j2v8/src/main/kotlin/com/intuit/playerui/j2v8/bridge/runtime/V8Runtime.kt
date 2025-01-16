@@ -30,7 +30,6 @@ import com.intuit.playerui.j2v8.bridge.serialization.serializers.V8ValueSerializ
 import com.intuit.playerui.j2v8.extensions.evaluateInJSThreadBlocking
 import com.intuit.playerui.j2v8.extensions.handleValue
 import com.intuit.playerui.j2v8.extensions.unlock
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
