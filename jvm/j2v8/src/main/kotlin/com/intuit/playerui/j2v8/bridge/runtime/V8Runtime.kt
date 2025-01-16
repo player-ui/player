@@ -212,9 +212,6 @@ public object J2V8 : PlayerRuntimeFactory<J2V8RuntimeConfig> {
 public data class J2V8RuntimeConfig(
     var runtime: V8? = null,
     private val explicitExecutorService: ExecutorService? = null,
-    override var debuggable: Boolean = false,
-    override var coroutineExceptionHandler: CoroutineExceptionHandler? = null,
-    override var timeout: Long = if (debuggable) Int.MAX_VALUE.toLong() else 5000,
 ) : PlayerRuntimeConfig() {
     public val executorService: ExecutorService by lazy {
         explicitExecutorService ?: Executors.newSingleThreadExecutor {
