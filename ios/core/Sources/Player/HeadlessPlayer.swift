@@ -356,7 +356,11 @@ internal extension JSContext {
         var splitPath = path.split(separator: ".")
         var value = objectForKeyedSubscript(splitPath.remove(at: 0))
         for segment in splitPath {
-            value = value?.objectForKeyedSubscript(segment)
+            if value?.isUndefined != true, value?.hasProperty(segment) == true {
+                value = value?.objectForKeyedSubscript(segment)
+            } else {
+                return nil
+            }
         }
         return value
     }
