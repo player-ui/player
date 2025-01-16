@@ -88,6 +88,7 @@ public constructor(
 
     public val runtime: Runtime<*> = explicitRuntime ?: runtimeFactory.create {
         debuggable = config.debuggable
+        timeout = config.timeout
         coroutineExceptionHandler = config.coroutineExceptionHandler ?: CoroutineExceptionHandler { _, throwable ->
             if (state !is ReleasedState) {
                 inProgressState?.fail(throwable) ?: logger.error(
