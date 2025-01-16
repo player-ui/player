@@ -1,9 +1,9 @@
 import type {
-  TransformFunction,
   Asset,
   Flow,
   View,
   PlayerPlugin,
+  TransformFunctions,
 } from "@player-ui/player";
 import { Player } from "@player-ui/player";
 import { AssetTransformPlugin } from "@player-ui/asset-transform-plugin";
@@ -17,7 +17,7 @@ export function runTransform<
   TransformedAssetType extends Asset = BaseAssetType,
 >(
   type: string,
-  transform: TransformFunction<BaseAssetType, TransformedAssetType>,
+  transform: TransformFunctions,
   content: BaseAssetType | Flow | Array<View>,
   additionalPlugins: Array<PlayerPlugin> = [],
 ) {
