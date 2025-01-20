@@ -1,7 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-nocheck
 import type {
-  Asset,
   BeforeTransformFunction,
   TransformFunctions,
 } from "@player-ui/player";
@@ -36,14 +33,16 @@ import type { ChatMessageAsset } from "./types";
   }
  */
 
-export const transform: BeforeTransformFunction<Asset> = (
-  asset: ChatMessageAsset,
-) => {
+export const transform: BeforeTransformFunction<ChatMessageAsset> = (asset) => {
   const id = uuid();
 
   const assetNode = Builder.asset({ ...asset.value, type: "text" });
   const asyncNode = Builder.asyncNode(id);
-  const multiNode = Builder.multiNode(assetNode, asyncNode);
+  const multiNode = Builder.multiNode(
+    asset.value.flatten,
+    assetNode,
+    asyncNode,
+  );
 
   const wrapperAsset = Builder.asset({
     id: "chat-message-wrapper",
