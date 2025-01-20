@@ -20,4 +20,8 @@ js_pipeline(
         ":node_modules/@player-ui/common-types-plugin",
         ":node_modules/@player-ui/reference-assets-plugin",
     ],
+    test_deps = [
+        "//:vitest_config",
+        "//:node_modules/dlv"
+    ],
 )

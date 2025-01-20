@@ -1,0 +1,172 @@
+---
+title: Overview
+---
+
+# TSX/JSX Content Authoring (Player DSL)
+
+While Player content _can_ be written directly in JSON, it's definitely not the preferable authoring format. To take advantage of existing developer tool-chains, Player provides a mechanism for authoring content in (J/T)SX as React components and simple TypeScript objects. The Player CLI can then be used to transpile the React tree into a JSON content.
+
+## DSL Benefits
+
+At a high level, the benefits to writing Player content in the DSL can be summarized by three key factors:
+
+#### Easier maintainability 
+Simply put, DSL code more concise than its JSON equivalent. That means there is less code for you to have to maintain. Also, as its easier to read than JSON, when you do need to make updates to it, its much more wieldy to work with. 
+
+#### Better development experience
+Since the DSL leverages a lot of standard TypeScript language features, most editors will offer quality of life features like typechecking, suggestions, and code generation. All of this is in service of shortening the feedback loop of writing content and ensuring it is what you intended for it. 
+
+#### Easier to extend
+The DSL now offers a easily accessible programatic hook into Player content. This allows custom tooling to be created around your DSL integration much easier that before. Common patterns can be extracted into higher level compoennts, functions can be created to generate code, and code generation can be integrated into almost any process where relevant data is present. 
+
+For a further explination on the benefits, see the DSL Benefits section in the [DSL Views](./views.mdx#dsl-benefits-in-views) and the [DSL Schema](./schema.mdx#dsl-benefit-in-schema)
+
+## Writing DSL Content
+
+In order to use the DSL to write content, your plugin library should ship a DSL component package. These will define the primitive _components_ to use to build up the tree. Authorship of these components is covered in the [Writing DSL Components](../assets/dsl) secton. The Player Reference Assets ship their own DSL Components via the `@player-ui/reference-assets-components` pacakge.
+
+In the examples below, we will use the Player Reference Assets Components.
+
+### Basic Setup 
+
+To get started, you'll need the following dependencies in your `package.json`:
+
+```json
+{
+    "dependencies": {
+        "@player-tools/dsl": "0.4.1",
+        "@player-tools/cli": "0.4.1",
+        "@player-ui/reference-assets-components": "0.6.0",
+        "@types/react": "17.0.39",
+        "react": "17.0.2"
+    }
+}
+```
+
+Next, you'll need to configure your environment for DSL Compilation and JSON validation. Below is a basic configuration that can be added in your `package.json`. For a more detailed explination and examples on further customization please refer to the [CLI](../tools/cli) section. 
+
+```json
+{
+    "player": {
+        "dsl": {
+        "src": "./src/main/tsx",
+        "outDir": "./out"
+        },
+        "json": {
+        "src": "./out/*.json"
+        },
+    }
+}
+```
+
+### Basic Format and File Layout
+
+By default, all files that contain a Player Flow should be exported as a `.tsx` file and the schema should be in a `.ts` file. For how to change this behavior, please refer to the [DSL Plugins](./plugins) section of the docs. Each of these files should contain a default export of their appropriate object. For example a file that exports a flow should look like the following:
+
+```tsx
+export default {
+    id: 'my-flow',
+    views: [....],
+    navigation: {....}
+}
+```
+
+and a file that exports the schema should look like: 
+
+```typescript
+const mySchema = {...}
+
+export default mySchema
+
+```
+
+### Navigation
+
+At this time the `navigation` section is a basic JS object. The `@player-ui/types` package provides typescript typings for this.
+
+```tsx
+import { Navigation } from '@player-ui/types';
+
+const navigation: Navigation = {
+  BEGIN: 'Start',
+  Start: {
+    startState: 'VIEW_1',
+    VIEW_1: {
+      state_type: 'VIEW',
+      ref: 'view-1',
+      transitions: {
+        '*': 'END_Done',
+      },
+    },
+    END_Done: {
+      state_type: 'END',
+      outcome: 'done',
+    },
+  },
+};
+```
+
+One convenience feature is the auto injection of the the `ref` property for a `VIEW` type state if the corresponding view is a React tree. 
+
+```tsx
+import { Navigation } from '@player-ui/types';
+
+const view = (
+  <Collection id="my-view">
+    <Text>Some value</Text>
+    <Input>
+      <Input.Label>Some label</Input.Label>
+    </Input>
+  </Collection>
+);
+
+const navigation: Navigation = {
+  BEGIN: 'Start',
+  Start: {
+    startState: 'VIEW_1',
+    VIEW_1: {
+      state_type: 'VIEW',
+      ref: view,
+      transitions: {
+        '*': 'END_Done',
+      },
+    },
+    END_Done: {
+      state_type: 'END',
+      outcome: 'done',
+    },
+  },
+};
+```
+
+_Note: The `Navigation` type we're importing here from the `@player-ui/types` package is different than the `Navigation` type from the `@player-tools/dsl` package. The former is the core definition for what the Navigation section of Player content is. The latter has specific replacements to take DSL constructs where normal objects would be defined._
+
+### Bindings and Expressions
+
+Both `binding` and `expression` in the JSX authoring leverages a tagged template, typically abbreviated as `b` and `e` respectively. In a similar fashion to using `css` or `graphql` in a JS file, this enables syntax-highlighting and validation of bindings and expressions within a JS file.
+
+```tsx
+import { binding as b, expression as e } from '@player-tools/dsl';
+
+const myBinding = b`foo.bar`;
+const myExpression = e`foo()`;
+```
+
+The binding and expression instances can also automatically dereference themselves when used inside of another string:
+
+```tsx
+const stringWithBinding = `Some text: ${myBinding}`; // 'Some text: {{foo.bar}}'
+const stringWithExp = `Some expr: ${myExpression}`; // 'Some expr: @[foo()]@'
+```
+
+### View
+
+Please refer to the [Views](./views) section for a detailed overview of how to write DSL Views
+
+### Schema
+
+Please refer to the [Schema](./schema) section for a detailed overview of how to write DSL Schemas
+
+## Compiling DSL Content
+
+Once your DSL content is authored, you can use the Player CLI to compile and validate your content. For documentation on this functionality, please refer to the [Player CLI](../tools/cli) section

@@ -16,8 +16,6 @@ js_pipeline(
         ":node_modules/@player-ui/player",
     ],
     deps = [
-        "//:node_modules/@types/pubsub-js",
-        "//:node_modules/pubsub-js",
         "//:node_modules/tapable-ts",
     ],
 )

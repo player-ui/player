@@ -30,7 +30,6 @@ import com.intuit.playerui.j2v8.bridge.serialization.serializers.V8ValueSerializ
 import com.intuit.playerui.j2v8.extensions.evaluateInJSThreadBlocking
 import com.intuit.playerui.j2v8.extensions.handleValue
 import com.intuit.playerui.j2v8.extensions.unlock
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExecutorCoroutineDispatcher
@@ -212,9 +211,6 @@ public object J2V8 : PlayerRuntimeFactory<J2V8RuntimeConfig> {
 public data class J2V8RuntimeConfig(
     var runtime: V8? = null,
     private val explicitExecutorService: ExecutorService? = null,
-    override var debuggable: Boolean = false,
-    override var coroutineExceptionHandler: CoroutineExceptionHandler? = null,
-    override var timeout: Long = if (debuggable) Int.MAX_VALUE.toLong() else 5000,
 ) : PlayerRuntimeConfig() {
     public val executorService: ExecutorService by lazy {
         explicitExecutorService ?: Executors.newSingleThreadExecutor {

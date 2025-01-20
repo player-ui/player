@@ -1,0 +1,55 @@
+---
+import { Image as Default, type LocalImageProps } from "astro:assets";
+
+type Props = Omit<LocalImageProps, "src"> &
+  (
+    | {
+        src: LocalImageProps["src"];
+        darkModeInvert?: boolean;
+      }
+    | {
+        lightSrc: LocalImageProps["src"];
+        darkSrc: LocalImageProps["src"];
+      }
+  );
+---
+
+<div class="flex justify-center">
+  {
+    "src" in Astro.props && (
+      <Default
+        class:list={[Astro.props.darkModeInvert && "dark-mode-invert"].filter(
+          Boolean
+        )}
+        {...(Astro.props as LocalImageProps)}
+      />
+    )
+  }
+  {
+    "lightSrc" in Astro.props && (
+      <Default
+        class:list={["light-mode-only"]}
+        src={Astro.props.lightSrc}
+        {...(Astro.props as any)}
+      />
+      <Default
+        class:list={["dark-mode-only"]}
+        src={Astro.props.darkSrc}
+        {...(Astro.props as any)}
+      />
+    )
+  }
+  <style>
+    html[data-theme="dark"] .dark-mode-invert {
+      filter: invert(80%) hue-rotate(180deg);
+    }
+    
+    html[data-theme="light"] .dark-mode-only {
+      display: none;
+    }
+
+    html[data-theme="dark"] .light-mode-only {
+      display: none;
+    }
+  </style>
+</div>

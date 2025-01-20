@@ -1,0 +1,98 @@
+---
+title: External Action View Modifier
+platform: ios
+---
+
+This plugin is used to handle EXTERNAL states, allowing you to asynchronously tell Player when, and what to transition with once you have finished processing the external state request.
+
+### CocoaPods
+
+Add the subspec to your `Podfile`
+
+```ruby
+pod 'PlayerUI/ExternalActionViewModifierPlugin'
+```
+
+### Swift Usage
+
+For an example flow with an external state such as:
+
+```json
+{
+  "id": "test-flow",
+  "data": {
+    "transitionValue": "Next"
+  },
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "EXT_1",
+      "EXT_1": {
+        "state_type": "EXTERNAL",
+        "ref": "test-1",
+        "transitions": {
+          "Next": "END_FWD",
+          "Prev": "END_BCK"
+        },
+        "extraProperty": "extraValue"
+      },
+      "END_FWD": {
+        "state_type": "END",
+        "outcome": "FWD"
+      },
+      "END_BCK": {
+        "state_type": "END",
+        "outcome": "BCK"
+      }
+    }
+  }
+}
+```
+
+The plugin can be declared to handle this external state by showing some user interface, and letting the user trigger the transition to the next state:
+
+```swift
+let plugin = ExternalActionViewModifierPlugin<ExternalStateSheetModifier> { state, options, transition in
+		return AnyView(
+      VStack {
+        Text("External State")
+        Button(action: {transition("Next")}) { Text("Continue") }
+      }
+    )
+}
+
+var body: some View {
+  SwiftUIPlayer(
+    flow: flow,
+    plugins: [
+      plugin
+    ],
+    result: $resultBinding
+  )
+}
+```
+
+#### ExternalStateViewModifier
+
+`ExternalStateSheetModifier` is a provided modifier to present the external content with the `.sheet` SwiftUI ViewModifier, however, you can easily define your own.
+
+Adhere to the `ExternalStateViewModifier` protocol:
+
+```swift
+struct ExternalAlertModifier: ExternalStateViewModifier {
+    @ObservedObject var plugin: ExternalStateViewModifierPlugin<Self>
+    init(plugin: ExternalStateViewModifierPlugin<Self>) {
+      self.plugin = plugin
+    }
+
+    func body(content: Content) -> some View {
+      // content is the SwiftUIPlayer root view
+
+      // plugin.content is the external state content
+
+      content.alert(isPresented: $plugin.isExternalState) {
+        plugin.content
+      }
+    }
+}
+```

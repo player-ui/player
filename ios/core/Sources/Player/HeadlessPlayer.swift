@@ -190,11 +190,12 @@ public extension HeadlessPlayer {
         JSGarbageCollect(context.jsGlobalContextRef)
         JSUtilities.polyfill(context)
         attachExceptionHandler(to: context)
-        let trace = JSValue(object: logger.getJSLogFor(level: .trace), in: context)
-        let debug = JSValue(object: logger.getJSLogFor(level: .debug), in: context)
-        let info = JSValue(object: logger.getJSLogFor(level: .info), in: context)
-        let warn = JSValue(object: logger.getJSLogFor(level: .warning), in: context)
-        let error = JSValue(object: logger.getJSLogFor(level: .error), in: context)
+        let trace = logger.getJSLogFor(level: .trace, context)
+        let debug = logger.getJSLogFor(level: .debug, context)
+        let info = logger.getJSLogFor(level: .info, context)
+        let warn = logger.getJSLogFor(level: .warning, context)
+        let error = logger.getJSLogFor(level: .error, context)
+
         for plugin in plugins {
             if let plugin = plugin as? JSBasePlugin, plugin.context != context {
                 plugin.context = context

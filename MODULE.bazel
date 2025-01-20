@@ -139,7 +139,7 @@ maven.install(
         "com.intuit.hooks:hooks:0.15.0",
 
         # Testing
-        "io.mockk:mockk:1.9.3",
+        "io.mockk:mockk:1.12.0",
         "org.amshove.kluent:kluent:1.68",
         "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0",
 

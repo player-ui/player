@@ -18,7 +18,7 @@ export const Choice = (props: TransformedChoice) => {
     ));
 
   return (
-    <div className="grid w-full max-w-sm items-center gap-3">
+    <div className="player-grid player-w-full player-max-w-sm player-items-center player-gap-3">
       {title && (
         <Label htmlFor={id}>
           <ReactAsset {...title} />
@@ -26,7 +26,7 @@ export const Choice = (props: TransformedChoice) => {
       )}
       <div
         id={props.id}
-        className="grid gap-2"
+        className="player-grid player-gap-2"
         aria-invalid={Boolean(validation)}
         aria-describedby={validation ? `${id}-validation` : undefined}
       >
@@ -35,13 +35,13 @@ export const Choice = (props: TransformedChoice) => {
       {validation && (
         <Label
           id={`${id}-validation`}
-          className="text-[0.8rem] font-medium text-destructive"
+          className="player-text-[0.8rem] player-font-medium player-text-destructive"
         >
           {validation.message}
         </Label>
       )}
       {note && (
-        <Label className="text-[0.8rem] text-muted-foreground">
+        <Label className="player-text-[0.8rem] player-text-muted-foreground">
           <ReactAsset {...note} />
         </Label>
       )}

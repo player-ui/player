@@ -111,3 +111,13 @@ describe("descendent binding", () => {
     ]);
   });
 });
+
+describe("Edge cases", () => {
+  it("Bindings with escaped numbers", () => {
+    expect(new BindingInstance("foo.01.bar").asArray()).toStrictEqual([
+      "foo",
+      "01",
+      "bar",
+    ]);
+  });
+});

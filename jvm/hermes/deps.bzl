@@ -7,6 +7,7 @@ main_deps = main_exports + [
     "@maven//:com_facebook_fbjni_fbjni_java_only",
     "@maven//:com_facebook_soloader_soloader",
     "//plugins/set-time-out/jvm:set-time-out",
+    "//plugins/console-logger/jvm:console-logger"
 ]
 
 # TODO: These should probably just be dependencies of headless

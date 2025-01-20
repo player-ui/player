@@ -1,0 +1,55 @@
+---
+title: Player
+description: Player, A cross-platform semantic rendering engine for React, iOS, and JVM/Android
+template: splash
+hero:
+  tagline: A cross-platform semantic rendering engine
+  image:
+    file: ../../assets/logo/logo-dark-small.png
+  actions:
+    - text: Learn More
+      link: ./player/about
+      icon: information
+    - text: Get Started
+      link: ./guides/getting-started/
+      icon: right-arrow
+      variant: minimal
+---
+
+import { Card, CardGrid } from "@astrojs/starlight/components";
+import Image from "../../components/Image.astro";
+import playerPlatformDiagram from "../../assets/platform_diagram.png";
+import PlayerPreview from "../../components/PlayerPreview.astro";
+
+<Image
+  darkModeInvert
+  alt="Player Platform diagram"
+  src={playerPlatformDiagram}
+/>
+
+## Why Player?
+
+<CardGrid>
+  <Card title="Write once, render everywhere" icon="pen">
+    Sharing content across platforms enables you to quickly release new
+    features, on all platforms, with just a simple content deployment.
+  </Card>
+  <Card title="Bring your own design system" icon="puzzle">
+    Player works seamlessly with your existing UI components to fit application.
+    Define your own patterns through assets and render them exactly as your
+    designers intended.
+  </Card>
+  <Card title="Server Driven Navigation" icon="random">
+    Need to figure out where go next? Chaining multiple pages together with
+    Player is a breeze. Check out the [docs](/guides/multi-flow-experiences) for
+    more details.
+  </Card>
+  <Card title="Plugin Ready" icon="setting">
+    Player is designed from the ground up with plugins in mind. [Read
+    more](/plugins/) about the 20+ provided plugins, or how to write your own.
+  </Card>
+</CardGrid>
+
+## What does it look like?
+
+<PlayerPreview />

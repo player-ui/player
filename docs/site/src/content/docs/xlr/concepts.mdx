@@ -1,0 +1,29 @@
+---
+title: XLR Definitions
+---
+
+When talking about anything its helpful to make sure everyone is on the same page, XLR is no exception. In this section we'll explore some concepts related to XLRs, how they work, and how they're used.
+
+## Capability
+
+When we talk about a Capability, we are essentially talking about what it provides to Player. Most, if not all, capabilities are provided by Plugins. Capabilities are described in the manifest file in the `xlr` folder of a distribution. The manifest file, provided as both a `.json` and a `.js` file for static or dynamic use, contains the mapping of capabilities to a list of the XLRs.
+
+## XLR Objects
+
+XLRs contain all of the information about a TypeScript type or interface. For an interface it will have the information on what parameters it has, the types of those parameters, and if those parameters are optional. For a type, it will similarly describe the properties/types that compose it. There is no distinction in XLR on whether the XLR came from a type or an interface as everything is just represented by a Node.
+
+### XLR Nodes
+
+XLR nodes are similar to TypeScripts internal AST nodes but a bit simpler. Almost every type/language feature you would use in TypeScript has an equivalent XLR node type. The definitions for these types are available in the `@player-tools/xlr` [package](https://github.com/player-ui/tools/tree/main/xlr/types).
+
+### Named Types
+
+Named Types represent a top level interface/type and can be _any_ XLR Node. Named types are generated from interfaces/types that are exported from a source file or plugin. It should be noted that when generating a Named Type, all referenced types are also serialized and included in place in the Named Type and _not_ exported separately. That is unless The type is listed as a _Custom Primitive_. A reason to do this would be if that type definition changes based on use case or platform. For example, in the Player ecosystem `Asset` is considered a Custom Primitive because depending on the context, we might need to swap it out with a different type.
+
+# XLR SDK
+
+The XLR SDK is used to abstract away the more tedious interactions XLRs like loading them from their package, managing them when they're loaded, and validating content against them. The SDK does include an simple object store so that it can be used out of the box, however if your use case requires some different logic it can be extended quite easily. In fact, [we do that in the Player LSP](https://github.com/player-ui/tools/blob/main/language/json-language-service/src/xlr/registry.ts).
+
+## Transform Functions
+
+Transform functions can be used to modify XLRs when they're loaded and when they're exported. There is no real limit to what you can do in a transform function but typical use cases are things like adding new properties to object and substituting type references with different ones.

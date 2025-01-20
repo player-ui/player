@@ -54,7 +54,7 @@ common:ci --experimental_remote_build_event_upload=minimal
 common:ci --nolegacy_important_outputs
 
 # Circle macos.m1.large.gen1 8 cores 12gb ram
-common:ci-mac --config=ci --local_cpu_resources=8 --local_ram_resources=11000
+common:ci-mac --config=ci --local_cpu_resources=4 --local_ram_resources=7000
 
 build:release --stamp --workspace_status_command=./scripts/workspace-status.sh
 build:release --//:cmake_build_type=MinSizeRel

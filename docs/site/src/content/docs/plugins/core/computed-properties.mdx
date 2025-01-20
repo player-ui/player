@@ -1,0 +1,92 @@
+---
+title: Computed Properties
+---
+
+import PlatformTabs from "../../../../components/PlatformTabs.astro";
+
+This plugin allows users to specify a path in the data-model (binding) as a computed property in the schema.
+Anytime this binding is read from, the given expression will be evaluated and returned instead of the it being read from the actual model. Writes to the binding will be prevented, and an error will be thrown.
+
+## Usage
+
+<PlatformTabs>
+  <Fragment slot='core'>
+
+Add the plugin to Player:
+
+```js
+import { Player } from "@player-ui/player";
+import { ComputedPropertiesPlugin } from "@player-ui/computed-properties-plugin";
+
+const player = new Player({
+  plugins: [new ComputedPropertiesPlugin()],
+});
+```
+
+  </Fragment>
+
+  <Fragment slot='ios'>
+
+### CocoaPods
+
+Add the subspec to your `Podfile`
+
+```ruby
+pod 'PlayerUI/ComputedPropertiesPlugin'
+```
+
+### Swift Usage
+
+This plugin takes no parameters, and the configuration comes from content, it can just be added to the plugin array:
+
+```swift
+var body: some View {
+    SwiftUIPlayer(
+        flow: flow,
+        plugins: [
+          ComputedPropertiesPlugin()
+        ],
+        result: $resultBinding
+    )
+}
+```
+
+  </Fragment>
+</PlatformTabs>
+
+## Expression Data Type
+
+The computed properties plugin introspects the schema, looking for any `DataType` that uses the `Expression`:
+
+```json
+{
+  "type": "Expression",
+  "exp": "@[ someExpression() ]@"
+}
+```
+
+Any data-lookup for that binding path will evaluate the given expression and return that value. Results are _not_ cached, and will be recomputed on every fetch.
+
+## Example
+
+```json
+{
+  "schema": {
+    "ROOT": {
+      "foo": {
+        "type:" "FooType"
+      }
+    },
+    "FooType": {
+      "computedValue": {
+        "type": "Expression",
+        "exp": "1 + 2 + 3"
+      }
+    }
+  }
+}
+```
+
+Using the above schema, any reference to `{{foo.computedValue}}` will compute the `1 + 2 + 3` expression and use that as the underlying value for that path.
+
+Any write or set operation to `{{foo.computedValue}}` will result in a thrown exception for writing to a read-only path.

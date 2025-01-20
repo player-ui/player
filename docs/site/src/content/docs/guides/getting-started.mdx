@@ -1,0 +1,269 @@
+---
+title: "Getting Started"
+---
+
+import PlatformTabs from "../../../components/PlatformTabs.astro";
+import { PackageManagers } from 'starlight-package-managers'
+
+Getting started with Player is simple.
+
+### Install Dependencies
+
+The first dependency you'll need to pull in is the Player itself. Additionally, you'll need an assets plugin to define any UI -- we'll use the reference assets as an example.
+
+<PlatformTabs>
+  <Fragment slot='react'>
+
+You can do this by installing the React Player and Reference Assets Packages
+
+<PackageManagers pkg="@player-ui/react @player-ui/reference-assets-plugin-react"/>
+
+  </Fragment>
+  <Fragment slot='ios'>
+
+In your `Podfile` you'll need to add `PlayerUI` as a dependency and the `ReferenceAssets` plugin to use the base set of assets.
+
+```ruby
+source 'https://github.com/player-ui/player'
+
+target 'MyApp' do
+  # Add the pod to your target
+  pod 'PlayerUI'
+  pod 'PlayerUI/ReferenceAssets' # For example only
+end
+```
+
+  </Fragment>
+  <Fragment slot='android'>
+
+Configure the Android Player dependencies in your `build.gradle(.kts)` files.
+
+```kotlin
+dependencies {
+    // Android Player
+    implementation("com.intuit.playerui:player:$playerVersion")
+    // Optional - reference assets
+    implementation("com.intuit.playerui.plugins:reference-assets:$playerVersion")
+}
+```
+
+#### Release Optimization
+
+The Android Player dependency automatically pulls in both the `dev` as well as the `prod` versions of the underlying JS scripts.
+
+The `dev` scripts are handy for debugging shared JS code through the JS debugger in debug builds, but they are not necessary for consumer facing release builds.
+
+To optimize the release bundles, it is highly recommended to exclude the `dev` scripts, as well as enabling V8 to strip out unused code from the final bundle.
+
+```kotlin
+buildTypes {
+    getByName("release") {
+        isMinifyEnabled = true
+        isShrinkResources = true
+        packagingOptions {
+            exclude("**/*.dev.js")
+        }
+    }
+}
+```
+
+  </Fragment>
+</PlatformTabs>
+
+:::caution
+The reference assets aren't intended for production use. They exist as an example of how to create assets and can be used to help get started.
+:::
+
+### Configuration
+
+Next, in your code you'll need to initialize Player. This is where you would also initialize any plugins you want to use with Player and create the configuration for Player itself. Below is a minimal example of this.
+
+<PlatformTabs>
+  <Fragment slot='react'>
+
+```javascript
+import { ReactPlayer } from "@player-ui/react";
+import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin-react";
+
+// create a new web-player instance
+
+const reactPlayer = new ReactPlayer({
+  plugins: [new ReferenceAssetsPlugin()],
+});
+```
+
+  </Fragment>
+  <Fragment slot='ios'>
+
+`SwiftUIPlayer` is just a normal SwiftUI View and can be inserted anywhere in your hierarchy.
+
+```swift
+import PlayerUI
+
+var body: some View {
+  SwiftUIPlayer(
+    plugins: [ReferenceAssetsPlugin()],
+  )
+}
+```
+
+  </Fragment>
+
+  <Fragment slot='android'>
+
+```kotlin
+// create Android Player with reference assets plugin
+val player = AndroidPlayer(
+    listOf(
+        ReferenceAssetsPlugin(),
+        // Any other plugins
+    )
+)
+```
+
+Apart from providing a list of plugins while setting up `AndroidPlayer`, you can also provide a `config` object that has the following options:
+
+- `debuggable` - Indicates if the runtime is debuggable on android through chromium devtools, enabling this would let you set breakpoints in js code as you're running it on android.
+- `coroutineExceptionHandler` - [CoroutineExceptionHandler](https://kotlinlang.org/docs/exception-handling.html#coroutineexceptionhandler) should handle all uncaught exceptions while using the runtime coroutine scope.
+- `timeout` - Timeout for the JS thread. If none is provided then it is set as `if (debuggable) Int.MAX_VALUE.toLong() else 5000`.
+
+</Fragment>
+
+</PlatformTabs>
+
+### Render Content
+
+Now that you have a Player instance created. You'll need to start it with some [content](/content).
+
+<PlatformTabs>
+
+  <Fragment slot='react'>
+
+```javascript
+const content = {
+  /* your content here */
+};
+reactPlayer.start(content);
+```
+
+With Player running your content, you'll need to actually render out what is processed. To do this, you can use the React Player's component API to insert it into your React tree.
+
+```javascript
+const MyApp = () => {
+  return <reactPlayer.Component />;
+};
+```
+
+  </Fragment>
+  <Fragment slot='ios'>
+
+Expanding on the `SwiftUIPlayer` creation above, providing a `flow` will start the Player automatically, and the `result` will update the `Binding<Result<CompletedState, PlayerError>?>` that you pass to it:
+
+```swift
+import PlayerUI
+
+struct MyApp: View {
+  @State var result: Result<CompletedState, PlayerError>? = nil
+  @ObservedObject var viewModel: MyViewModel
+  var body: some View {
+    SwiftUIPlayer(
+      flow: $viewModel.flowString,
+      plugins: [ReferenceAssetsPlugin()],
+      result: $result
+    )
+  }
+}
+```
+
+  </Fragment>
+  <Fragment slot='android'>
+
+To receive view updates, you must add a handler to render the views which are represented as `RenderableAsset`s.
+
+```kotlin
+// handle view updates - should be done before starting the Player
+player.onUpdate { asset: RenderableAsset? ->
+    // render asset as View `into` view tree
+    asset?.render() into binding.playerContainer
+}
+
+// start Player
+player.start(content)
+```
+
+When you're done with Player, release any native runtime memory used to instantiate Player or run the flow.
+
+```kotlin
+player.release()
+```
+
+Creating your own `AndroidPlayer` instance is fairly simple, but it grows in complexity when considering proper resources management and app orchestration. We provide a Fragment/ViewModel integration to make it easier to properly integrate into your app and account for these concerns.
+
+#### ViewModel
+
+With the `PlayerViewModel` and `PlayerFragment`, the above orchestration is done for you. All that is needed is to provide concrete implementations of each and add the fragment to your app.
+
+##### PlayerViewModel
+
+The `PlayerViewModel` requires an `AsyncFlowIterator` to be supplied in the constructor. The AsyncFlowIterator is what tells Player which flows to run. This can be hardcoded into the view model or expected as an argument, as shown below.
+
+```kotlin
+class SimplePlayerViewModel(flows: AsyncFlowIterator) : PlayerViewModel(flows) {
+    override val plugins = listOf(ReferenceAssetsPlugin())
+}
+```
+
+##### PlayerFragment
+
+The `PlayerFragment` is a simple Android `Fragment` that only requires a specific `PlayerViewModel` to be defined. If your view model requires the `AsyncFlowIterator` to be passed as part of the constructor, you can leverage the `PlayerViewModel.Factory` to produce it, as shown below.
+
+Specifically, this fragment takes a flow as an argument to the constructor and creates a single-flow `AsyncFlowIterator` instance using the pseudo-constructor helper.
+
+```kotlin
+class SimplePlayerFragment(override val flow: String) : PlayerFragment() {
+    override val playerViewModel by viewModels<SimplePlayerViewModel> {
+        PlayerViewModel.Factory(AsyncFlowIterator(flow), ::SimplePlayerViewModel)
+    }
+}
+```
+
+#### JS Runtime
+
+As the core Player is written in TypeScript, we need a JVM compatible JavaScript runtime to power a JVM based Player. There are several options to choose from, however, deciding on a specific runtime implementation is difficult to do at the library layer. Different use cases may demand different trade-offs regarding supporting multiple platforms, size, and speed. Thus, the base JVM Player implementation was done with a custom runtime abstraction, powered by [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization), to enable consumers to choose the runtime based on their needs.
+
+To support a specific runtime implementation, there needs to be code connecting the runtime constructs to the Player runtime abstraction. The Player project has implemented this layer for several runtimes, described below. It is possible to define your own, but the abstraction definition is not yet final, and therefore not appropriately documented. You can take inspiration from the existing implementations, or file an issue for a runtime you wish to see supported by our team.
+
+| Runtimes                                      | Platforms                   |
+| --------------------------------------------- | --------------------------- |
+| [J2V8](https://github.com/eclipsesource/J2V8) | `android`, `linux`, `macos` |
+| [Hermes](https://github.com/facebook/hermes)  | `android`                   |
+| [GraalJS](https://github.com/oracle/graaljs)  | `linux`, `macos`, `win`     |
+
+:::note
+Each of the artifacts for the above are defined as `com.intuit.playerui:$runtime-$platform`, i.e. `com.intuit.playerui:j2v8-android`
+:::
+
+The `HeadlessPlayer` does not define a hard dependency on any specific runtime, however, the `AndroidPlayer` does transitively depends on the `j2v8` runtime, as the first class approach. To override, the transitive dependency would need to be explicitly excluded and the actual runtime dependency would need to be added:
+
+```kotlin
+dependencies {
+    // Android Player dependency
+    implementation("com.intuit.playerui", "android", PLAYER_VERSION) {
+        // J2V8 included for release versions
+        exclude(group = "com.intuit.playerui", module = "j2v8-android")
+        // Debuggable J2V8 included for canary versions
+        exclude(group = "com.intuit.playerui", module = "j2v8-android-debug")
+    }
+    // Override with Hermes runtime for example
+    implementation("com.intuit.playerui", "hermes-android", PLAYER_VERSION)
+}
+```
+
+:::caution
+If your application includes dependencies that may transitively depend on `com.intuit.playerui:android`, you would likely need to ensure the default runtime is transitively excluded from those as well, either manually or as a global strategy.
+:::
+
+  </Fragment>
+</PlatformTabs>
+
+Congrats! You've got Player up and running. If you need additional functionality you can add more plugins to extend Player's functionality. Head over to the [Plugins](/plugins) section to take a look at the Plugins we've developed or take a look at the [Architecture](./architecture) section to see how you can write your own.

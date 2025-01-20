@@ -30,7 +30,7 @@ executors:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   ios:
     working_directory: ~/player
-    resource_class: macos.m1.large.gen1
+    resource_class: m2pro.medium
     macos:
       xcode: 15.3.0
     environment:
@@ -215,11 +215,7 @@ jobs:
           when: always
           command: |
             mkdir -p _ios_coverage/lcov
-            mkdir -p _ios_coverage/html
             cp -r $(bazel info output_path)/_coverage/_coverage_report.dat _ios_coverage/lcov/
-            genhtml --branch-coverage --output-directory=_ios_coverage/html/ "$(bazel info output_path)/_coverage/_coverage_report.dat"
-            zip -r _ios_coverage/html.zip _ios_coverage/html/
-            rm -r _ios_coverage/html/
 
       - persist_to_workspace:
           root: .

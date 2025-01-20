@@ -12,10 +12,10 @@ export const ChoiceItem = (props: ChoiceItemProps) => {
   const { label, id, ...rest } = props;
 
   return (
-    <div className="flex items-center gap-1.5">
+    <div className="player-flex player-items-center player-gap-1.5">
       <InputComp
         type="radio"
-        className="h-fit w-fit shadow-none"
+        className="player-h-fit player-w-fit player-shadow-none"
         id={id}
         {...rest}
       />

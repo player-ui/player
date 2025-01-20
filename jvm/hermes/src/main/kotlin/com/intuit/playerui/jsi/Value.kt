@@ -59,7 +59,7 @@ public open class Runtime(mHybridData: HybridData) : HybridClass(mHybridData) {
 
     context(RuntimeThreadContext) public fun stringify(value: Value): String = global().getPropertyAsObject(this, "JSON")
         .getPropertyAsFunction(this, "stringify")
-        .call(this, value, Value.`null`, Value.from(2))
+        .call(this, value, Value.`null`, Value.from(this, 2))
         .asString(this)
 }
 

@@ -1,0 +1,51 @@
+---
+title: Markdown
+---
+
+import PlatformTabs from "../../../../components/PlatformTabs.astro";
+
+The `markdown-plugin` adds support for parsing markdown content to Player Assets. This plugin is asset set agnostic, so it expects a mappers record to inform how to transform markdown content into valid Player Content with support from your asset set.
+
+## Usage
+
+<PlatformTabs>
+  <Fragment slot='core'>
+
+### Defining The Mappers
+
+```ts
+import type { Mappers } from "@player-ui/markdown-plugin";
+
+export const mappers: Mappers = {
+  text: ({ originalAsset, value }) => ({
+    id: `${originalAsset.id}-text`,
+    type: "text",
+    value,
+  }),
+  image: ({ originalAsset, value, src }) => ({
+    id: `${originalAsset.id}-image`,
+    type: "image",
+    accessibility: value,
+    metaData: {
+      ref: src,
+    },
+  }),
+  //...
+};
+```
+
+## Add the plugin to Player
+
+```ts
+import { MarkdownPlugin } from "@player-ui/markdown-plugin";
+import mappers from "./mappers";
+
+const markdownPlugin = new MarkdownPlugin(myMarkdownMappers);
+// Add it to the player
+const player = new Player({
+  plugins: [markdownPlugin],
+});
+```
+
+  </Fragment>
+</PlatformTabs>

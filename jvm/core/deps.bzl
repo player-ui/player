@@ -17,5 +17,6 @@ main_runtime_deps = []
 # Test dependencies
 test_deps = [
     "//plugins/reference-assets/jvm:reference-assets",
+    "//plugins/beacon/jvm:beacon",
 ]
 test_runtime_deps = []

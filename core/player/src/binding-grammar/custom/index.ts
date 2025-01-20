@@ -82,7 +82,7 @@ export const parse: Parser = (path) => {
       return;
     }
 
-    let value = ch;
+    let value: string | number = ch;
 
     while (next()) {
       if (!isIdentifierChar(ch)) {
@@ -93,6 +93,8 @@ export const parse: Parser = (path) => {
     }
 
     if (value) {
+      const maybeNumber = Number(value);
+      value = isNaN(maybeNumber) ? value : maybeNumber;
       return toValue(value);
     }
   };
@@ -259,6 +261,14 @@ export const parse: Parser = (path) => {
       parsed.push(firstSegment);
 
       let bracketSegment = parseBracket();
+
+      if (bracketSegment?.name === "Value") {
+        const maybeNumber = Number(bracketSegment.value);
+        bracketSegment.value =
+          isNaN(maybeNumber) || String(maybeNumber) !== bracketSegment.value
+            ? bracketSegment.value
+            : maybeNumber;
+      }
 
       while (bracketSegment !== undefined) {
         parsed.push(bracketSegment);

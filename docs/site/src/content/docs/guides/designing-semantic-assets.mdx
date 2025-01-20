@@ -1,0 +1,34 @@
+---
+title: Designing Semantic Assets
+---
+
+While not a _hard_ requirement by Player, the API design for assets plays an important role in it's adoption, especially if the intent is to re-use content across platforms. In many cases, Player content is written, and edited many more times than assets are created, and thus it's schema plays an important role in it's effective adoption.
+
+Player ships with a set of [Reference Assets](/assets/reference) to get started, but intentionally doesn't include anything beyond some basics. We believe it's up to each consumer to define their own semantics (if at all), that best suites their applications.
+
+## Intent Based Schema
+
+That being said, building off the learnings from using Player internally, we've developed a few guidelines and best practices for how we design asset APIs to help us scale effectively in our applications:
+
+assets are described using their semantic intent regardless of their UI implementation
+
+- assets should leverage context, where applicable, to modify their behavior
+
+A prime example of an _intent_ based asset is a `choice`, which may have an API such as:
+
+```ts
+interface ChoiceAsset extends Asset<"choice"> {
+  binding: Binding;
+
+  options: Array<{
+    id: string;
+    value: string;
+    label: TextAsset;
+  }>;
+}
+```
+
+Here we have a list of choices that a user may select from, the value of which is written to the provided binding.
+This may take the shape of a radio-group, select, or any number of other rendering options, but the platform specific asset implementations are able to derive the correct rendering without changing the content. The platform implementations may also want to query the asset's context as additional input into it's rendering -- i.e. if the `choice` is within a broader `form`, then render as a `select`.
+
+Using an intent based approach enables content to outlive design changes and the freedom for each platform to choose the best rendering mechanism for itself. It helps to avoid referencing colors/layouts/styles directly but provides additional _context_ to the assets when needed. (Supplying metaData to force a `chocie` to be compact).

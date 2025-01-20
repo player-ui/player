@@ -5,7 +5,7 @@ import { parseCustom } from "../../binding-grammar";
 import { resolveBindingAST } from "../resolver";
 import { getBindingSegments } from "../utils";
 
-const testModel = {
+export const testModel = {
   foo: {
     pets: [
       {
@@ -23,11 +23,14 @@ const testModel = {
       "other",
     ],
   },
-};
+} as const;
 
-const testCases: Array<[string, string]> = [
+export const testCases: Array<[string, string]> = [
   ["foo.bar", "foo.bar"],
   ["foo.pets.1.name", "foo.pets.1.name"],
+  ["foo.pets.01.name", "foo.pets.1.name"],
+  ["foo.pets['01'].name", "foo.pets.01.name"],
+  ["foo.pets[01].name", "foo.pets.1.name"],
   ['foo.pets[name = "frodo"].type', "foo.pets.2.type"],
   ['foo.pets["name" = "sprinkles"].type', "foo.pets.4.type"],
 ];

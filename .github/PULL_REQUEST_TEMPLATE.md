@@ -19,19 +19,7 @@ Indicate the type of change your pull request is:
 - [ ] `patch`
 - [ ] `minor`
 - [ ] `major`
-
-<!--
-  To include release notes in the automatic changelong, just add a level 1 markdown header below
-  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
-
-  Example:
-
-  # Release Notes
-  Added new plugin, to use it:
-  ```typescript
-  const plugin = new Plugin(...)
-  ```
--->
+- [ ] `N/A`
 
 
 ### Does your PR have any documentation updates?
@@ -44,4 +32,17 @@ Please refer to our site https://player-ui.github.io/latest/about, and include a
 
 If you are unable to update the current documents, please create an issue for us to get back to it.
 
+-->
+
+<!--
+  To include release notes in the automatic changelong, just add a level 1 markdown header below
+  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
+
+  Example:
+
+  # Release Notes
+  Added new plugin, to use it:
+  ```typescript
+  const plugin = new Plugin(...)
+  ```
 -->
