@@ -1,3 +1,17 @@
+# 0.10.2-next.3 (Tue Jan 21 2025)
+
+#### 🐛 Bug Fix
+
+- iOS: JavascriptCore Exceptions when finding classes [#577](https://github.com/player-ui/player/pull/577) ([@hborawski](https://github.com/hborawski))
+- Broken links fix for docs [#573](https://github.com/player-ui/player/pull/573) ([@chetanddesai](https://github.com/chetanddesai))
+
+#### Authors: 2
+
+- Chetan Desai ([@chetanddesai](https://github.com/chetanddesai))
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+
+---
+
 # 0.10.2-next.2 (Thu Jan 16 2025)
 
 #### 🐛 Bug Fix
