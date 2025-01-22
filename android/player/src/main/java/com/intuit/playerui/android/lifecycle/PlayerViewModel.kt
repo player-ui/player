@@ -1,6 +1,7 @@
 package com.intuit.playerui.android.lifecycle
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -35,6 +36,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -78,7 +80,7 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
             deferredPlayer.getCompleted()
         } else {
             runBlocking {
-                deferredPlayer.await()
+                if (viewModelScope.isActive) deferredPlayer.await() else throw IllegalAccessError("Accessing Player instance when ViewModelScope is no longer active")
             }
         }
     }
@@ -160,7 +162,11 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
             }
         }
 
-        release()
+        try {
+            release()
+        } catch (e: IllegalAccessError) {
+            Log.e("AndroidPlayer", e.message ?: "IllegalAccessError in AndroidPlayer")
+        }
     }
 
     public fun recycle() {
