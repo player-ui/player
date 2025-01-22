@@ -25,8 +25,8 @@ internal class JSIFormatTest : HermesTest() {
 
         val value = format.encodeToRuntimeValue(MapSerializer(String.serializer(), Int.serializer()), map).asObject(runtime)
 
-        assertEquals(Value.from(runtime, 1), value.getProperty(runtime, "one"))
-        assertEquals(Value.from(runtime, 2), value.getProperty(runtime, "two"))
+        assertEquals(Value.from(1), value.getProperty(runtime, "one"))
+        assertEquals(Value.from(2), value.getProperty(runtime, "two"))
         assertEquals(Value.undefined, value.getProperty(runtime, "three"))
     }
 
@@ -38,8 +38,8 @@ internal class JSIFormatTest : HermesTest() {
 
         val value = format.encodeToValue(map).asObject(runtime)
 
-        assertEquals(Value.from(runtime, 1), value.getProperty(runtime, "one"))
-        assertEquals(Value.from(runtime, 2), value.getProperty(runtime, "two"))
+        assertEquals(Value.from(1), value.getProperty(runtime, "one"))
+        assertEquals(Value.from(2), value.getProperty(runtime, "two"))
         assertEquals(Value.undefined, value.getProperty(runtime, "three"))
     }
 
@@ -51,8 +51,8 @@ internal class JSIFormatTest : HermesTest() {
 
         val value = format.encodeToValue(map).asObject(runtime)
 
-        assertEquals(Value.from(runtime, 3), value.getPropertyAsObject(runtime, "one").getProperty(runtime, "three"))
-        assertEquals(Value.from(runtime, 4), value.getPropertyAsObject(runtime, "two").getProperty(runtime, "four"))
+        assertEquals(Value.from(3), value.getPropertyAsObject(runtime, "one").getProperty(runtime, "three"))
+        assertEquals(Value.from(4), value.getPropertyAsObject(runtime, "two").getProperty(runtime, "four"))
         assertEquals(Value.undefined, value.getProperty(runtime, "five"))
     }
 
@@ -65,8 +65,8 @@ internal class JSIFormatTest : HermesTest() {
 
         val value = format.encodeToValue(Simple()).asObject(runtime)
 
-        assertEquals(Value.from(runtime, 1), value.getProperty(runtime, "one"))
-        assertEquals(Value.from(runtime, 2), value.getProperty(runtime, "two"))
+        assertEquals(Value.from(1), value.getProperty(runtime, "one"))
+        assertEquals(Value.from(2), value.getProperty(runtime, "two"))
         assertEquals(Value.undefined, value.getProperty(runtime, "three"))
     }
 
@@ -80,8 +80,8 @@ internal class JSIFormatTest : HermesTest() {
         val simple = format.decodeFromRuntimeValue(
             Simple.serializer(),
             Object.create(runtime).apply {
-                setProperty(runtime, "one", Value.from(runtime, 3))
-                setProperty(runtime, "two", Value.from(runtime, 4))
+                setProperty(runtime, "one", Value.from(3))
+                setProperty(runtime, "two", Value.from(4))
             }.asValue(runtime),
         )
 
@@ -101,7 +101,7 @@ internal class JSIFormatTest : HermesTest() {
                     runtime,
                     "increment",
                     Function.createFromHostFunction(runtime) { args ->
-                        Value.from(runtime, args[0].asNumber() + 1)
+                        Value.from(args[0].asNumber() + 1)
                     }.asValue(runtime),
                 )
             }.asValue(runtime),
@@ -120,12 +120,12 @@ internal class JSIFormatTest : HermesTest() {
         val simple = format.decodeFromRuntimeValue(
             Data.serializer(),
             Object.create(runtime).apply {
-                setProperty(runtime, "one", Value.from(runtime, 3))
+                setProperty(runtime, "one", Value.from(3))
                 setProperty(
                     runtime,
                     "increment",
                     Function.createFromHostFunction(runtime) { args ->
-                        Value.from(runtime, args[0].asNumber() + 1)
+                        Value.from(args[0].asNumber() + 1)
                     }.asValue(runtime),
                 )
             }.asValue(runtime),
