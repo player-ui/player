@@ -14,16 +14,16 @@ internal class PrimitiveEncodingTests : HermesTest() {
         assertEquals(Value.from(runtime, "hello"), format.encodeToValue("hello"))
     }
 
-    @Test fun `encode boolean primitive`() {
-        assertEquals(Value.from(true), format.encodeToValue(true))
+    @Test fun `encode boolean primitive`() = runtime.evaluateInJSThreadBlocking {
+        assertEquals(Value.from(runtime, true), format.encodeToValue(true))
     }
 
-    @Test fun `encode int primitive`() {
-        assertEquals(Value.from(20), format.encodeToValue(20))
+    @Test fun `encode int primitive`() = runtime.evaluateInJSThreadBlocking {
+        assertEquals(Value.from(runtime, 20), format.encodeToValue(20))
     }
 
-    @Test fun `encode double primitive`() {
-        assertEquals(Value.from(2.2), format.encodeToValue(2.2))
+    @Test fun `encode double primitive`() = runtime.evaluateInJSThreadBlocking {
+        assertEquals(Value.from(runtime, 2.2), format.encodeToValue(2.2))
     }
 
     @Test fun `encode long primitive`() = runtime.evaluateInJSThreadBlocking {
@@ -46,7 +46,7 @@ internal class FunctionEncodingTests : HermesTest() {
         val function = format.encodeToValue(callback).asObject(runtime).asFunction(runtime)
 
         assertEquals("PLAYER: 1", callback("PLAYER", 1))
-        assertEquals("PLAYER: 2", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(2)).asString(runtime))
+        assertEquals("PLAYER: 2", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(runtime, 2)).asString(runtime))
     }
 
     @Test fun `encode invokable`() = runtime.evaluateInJSThreadBlocking {
@@ -54,7 +54,7 @@ internal class FunctionEncodingTests : HermesTest() {
         val function = format.encodeToValue(callback).asObject(runtime).asFunction(runtime)
 
         assertEquals("PLAYER: 1", callback("PLAYER", 1))
-        assertEquals("PLAYER: 2", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(2)).asString(runtime))
+        assertEquals("PLAYER: 2", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(runtime, 2)).asString(runtime))
     }
 
     @Test fun `encode kcallable`() = runtime.evaluateInJSThreadBlocking {
@@ -66,6 +66,6 @@ internal class FunctionEncodingTests : HermesTest() {
         val function = format.encodeToValue(callback).asObject(runtime).asFunction(runtime)
 
         assertEquals("PLAYER: 1", callback("PLAYER", 1))
-        assertEquals("PLAYER: 2", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(2)).asString(runtime))
+        assertEquals("PLAYER: 2", function.call(runtime, Value.from(runtime, "PLAYER"), Value.from(runtime, 2)).asString(runtime))
     }
 }

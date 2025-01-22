@@ -100,11 +100,11 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
     context(RuntimeThreadContext) override fun asValue(runtime: Runtime): Value = this
 
     public companion object {
-        @JvmStatic public external fun from(value: Boolean): Value
+        context(RuntimeThreadContext) @JvmStatic public external fun from(runtime: Runtime, value: Boolean): Value
 
-        @JvmStatic public external fun from(value: Double): Value
+        context(RuntimeThreadContext) @JvmStatic public external fun from(runtime: Runtime, value: Double): Value
 
-        @JvmStatic public external fun from(value: Int): Value
+        context(RuntimeThreadContext) @JvmStatic public external fun from(runtime: Runtime, value: Int): Value
 
         context(RuntimeThreadContext) @JvmStatic public external fun from(runtime: Runtime, value: String): Value
 
@@ -145,9 +145,9 @@ public class Value private constructor(mHybridData: HybridData) : JSIValueContai
             Unit -> undefined
             is NodeWrapper -> from(runtime, value.node)
             is JSIValueWrapper -> value.value
-            is Boolean -> from(value)
-            is Double -> from(value)
-            is Int -> from(value)
+            is Boolean -> from(runtime, value)
+            is Double -> from(runtime, value)
+            is Int -> from(runtime, value)
             is String -> from(runtime, value)
             is Long -> from(runtime, value)
             is Symbol -> from(runtime, value)
