@@ -1,3 +1,15 @@
+# 0.10.2-next.4 (Wed Jan 22 2025)
+
+#### 🐛 Bug Fix
+
+- Check scope active for awaiting player [#578](https://github.com/player-ui/player/pull/578) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
 # 0.10.2-next.3 (Tue Jan 21 2025)
 
 #### 🐛 Bug Fix
