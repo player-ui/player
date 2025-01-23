@@ -80,7 +80,7 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
             deferredPlayer.getCompleted()
         } else {
             runBlocking {
-                if (viewModelScope.isActive) deferredPlayer.await() else throw IllegalAccessError("Accessing Player instance when ViewModelScope is no longer active")
+                deferredPlayer.await()
             }
         }
     }
@@ -162,11 +162,7 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
             }
         }
 
-        try {
-            release()
-        } catch (e: IllegalAccessError) {
-            Log.e("AndroidPlayer", e.message ?: "IllegalAccessError in AndroidPlayer")
-        }
+        release()
     }
 
     public fun recycle() {
@@ -174,7 +170,7 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
     }
 
     public fun release() {
-        player.release()
+        if (deferredPlayer.isCompleted) player.release()
     }
 
     internal fun logRenderTime(asset: RenderableAsset, completionTime: Long) {
