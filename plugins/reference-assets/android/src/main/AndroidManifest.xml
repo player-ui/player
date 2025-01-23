@@ -1,1 +1,14 @@
-<manifest package="com.intuit.playerui.android.reference" />
+<manifest package="com.intuit.playerui.android.reference"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-sdk android:minSdkVersion="24" />
+
+    <!-- Resolve a conflict issue while building with Bazel. -->
+    <application>
+    <provider
+        android:name="androidx.startup.InitializationProvider"
+        android:authorities="${applicationId}.androidx-startup"
+        tools:node="remove" />
+    </application>
+</manifest>
