@@ -10,6 +10,7 @@ import PlayerUI
 import PlayerUISwiftUI
 import PlayerUIReferenceAssets
 import PlayerUIMetricsPlugin
+import PlayerUIExternalActionViewModifierPlugin
 
 /**
  SwiftUI View to wrap the `ManagedPlayer` and handle the result
@@ -34,6 +35,15 @@ public struct FlowManagerView: View {
                             ReferenceAssetsPlugin(),
                             MetricsPlugin { (render, _, flow) in
                                 print("Render: \(render?.duration ?? 0 )ms | Request \(flow?.flow.requestTime ?? 0)ms")
+                            },
+                            ExternalActionViewModifierPlugin<ExternalStateSheetModifier> { (state, _, transition) in
+
+                                return AnyView(
+                                    Text("External State")
+                                        .onDisappear {
+                                            transition("Next")
+                                        }
+                                )
                             }
                         ],
                         flowManager: ConstantFlowManager(flowSequence),
