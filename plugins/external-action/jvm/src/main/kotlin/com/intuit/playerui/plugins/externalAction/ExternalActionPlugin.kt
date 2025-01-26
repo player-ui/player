@@ -20,7 +20,7 @@ public fun interface ExternalActionHandler {
 }
 
 /** Core plugin wrapper providing external action support for the JVM Player */
-public class ExternalActionPlugin(
+public open class ExternalActionPlugin(
     private var handler: ExternalActionHandler? = null,
 ) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath), PlayerPlugin {
 
