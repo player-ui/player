@@ -6,31 +6,29 @@
 namespace intuit::playerui {
 
 //template<typename T>
-std::shared_ptr<Value> RuntimeScope::trackValue(std::weak_ptr<Value>& wp, Value value) {
+std::shared_ptr<Value> RuntimeScope::trackValue(Value value) {
     std::shared_ptr<Value> sp = make_shared<Value>(std::move(value));
-    wp = sp;
-        if (auto lock = wp.lock()) {
-            std::cout << "THIS IS DOING SOMETHING" << std::endl;
-            std::cout << lock << std::endl;
-        }
-        return sp;
-    //valueScope->insert({ptr, make_unique<Value>(std::move(value))});
+    return sp;
 }
 
-void RuntimeScope::trackFunction(void* ptr, Function value) {
-    functionScope->insert({ptr, make_unique<Function>(std::move(value))});
+std::shared_ptr<Function> RuntimeScope::trackFunction(Function value) {
+    std::shared_ptr<Function> sp = make_shared<Function>(std::move(value));
+    return sp;
 }
 
-void RuntimeScope::trackArray(void *ptr, facebook::jsi::Array value) {
-    arrayScope->insert({ptr, make_unique<Array>(std::move(value))});
+std::shared_ptr<facebook::jsi::Array> RuntimeScope::trackArray(facebook::jsi::Array value) {
+    std::shared_ptr<facebook::jsi::Array> sp = make_shared<facebook::jsi::Array>(std::move(value));
+    return sp;
 }
 
-void RuntimeScope::trackObject(void *ptr, facebook::jsi::Object value) {
-    objectScope->insert({ptr, make_unique<Object>(std::move(value))});
+std::shared_ptr<facebook::jsi::Object> RuntimeScope::trackObject(facebook::jsi::Object value) {
+    std::shared_ptr<facebook::jsi::Object> sp = make_shared<facebook::jsi::Object>(std::move(value));
+    return sp;
 }
 
-void RuntimeScope::trackSymbol(void *ptr, facebook::jsi::Symbol value) {
-    symbolScope->insert({ptr, make_unique<Symbol>(std::move(value))});
+std::shared_ptr<facebook::jsi::Symbol> RuntimeScope::trackSymbol(facebook::jsi::Symbol value) {
+    std::shared_ptr<facebook::jsi::Symbol> sp = make_shared<facebook::jsi::Symbol>(std::move(value));
+    return sp;
 }
 
 Value* RuntimeScope::getValue(void* ptr) {
