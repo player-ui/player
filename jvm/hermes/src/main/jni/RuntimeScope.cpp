@@ -6,8 +6,15 @@
 namespace intuit::playerui {
 
 //template<typename T>
-void RuntimeScope::trackValue(void* ptr, Value value) {
-    valueScope->insert({ptr, make_unique<Value>(std::move(value))});
+std::shared_ptr<Value> RuntimeScope::trackValue(std::weak_ptr<Value>& wp, Value value) {
+    std::shared_ptr<Value> sp = make_shared<Value>(std::move(value));
+    wp = sp;
+        if (auto lock = wp.lock()) {
+            std::cout << "THIS IS DOING SOMETHING" << std::endl;
+            std::cout << lock << std::endl;
+        }
+        return sp;
+    //valueScope->insert({ptr, make_unique<Value>(std::move(value))});
 }
 
 void RuntimeScope::trackFunction(void* ptr, Function value) {

@@ -127,17 +127,20 @@ public:
     static bool strictEquals(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b);
 
     explicit JJSIValue(std::shared_ptr<RuntimeScope> scope, Value&& value) : HybridClass(), scope_(scope) {
-        // internally creates unique ptr
-        if (!std::is_fundamental<decltype(value)>::value && !value.isUndefined() && !value.isNull()) {
-            scope->trackValue(this, std::move(value));
+        shareRef_ = scope_->trackValue(weakRef_, std::move(value));
+        /*if (auto lock = wp.lock()) {
+            std::cout << lock << std::endl;
         } else {
-            tracked = false;
-            value_ = std::make_unique<Value>(std::move(value));
-        }
+            std::cout << "yo wtf" << std::endl;
+        }*/
+        std::cout << "this is new sharedRef" << std::endl;
+        std::cout << shareRef_ << std::endl;
     }
 
-    explicit JJSIValue(Value&& value) : HybridClass(), value_(std::make_unique<Value>(std::move(value))) {
-        tracked = false;
+    explicit JJSIValue(Value&& value) : HybridClass() {
+        std::shared_ptr<Value> sp = make_shared<Value>(std::move(value));
+        //std::weak_ptr<Value> wp = sp;
+        shareRef_ = sp;
     }
 
     bool isUndefined();
@@ -162,31 +165,38 @@ public:
     }
 
     void release() override {
-        if (!tracked && value_) value_.reset();
-        if (scope_) scope_->clearRef(this);
+        /*if (auto lock = weakRef_.lock()) {
+            std::cout << "releasing weakPtr explicit" << std::endl;
+            shareRef_.reset();
+        }*/
+        if (shareRef_) shareRef_.reset();
     }
 
     bool isReleased() override {
-        return (!tracked && value_ == nullptr) || scope_->getValue((void *)this) == nullptr;
+        return shareRef_ == nullptr;
     }
 
     Value& get_value() const {
-        if (!tracked && value_) {
+        /*if (!tracked && value_) {
             return *value_;
         }
         if (scope_) {
             if (auto ref = scope_->getValue((void *)this)) {
                 return *ref;
             }
-        }
+        }*/
+
+        std::cout << "getting VALUE pointer at" << std::endl;
+        std::cout << shareRef_ << std::endl;
+        if (shareRef_) return *shareRef_;
 
         throwNativeHandleReleasedException("Value");
     }
 private:
     friend HybridBase;
     shared_ptr<RuntimeScope> scope_;
-    bool tracked = true;
-    std::unique_ptr<Value> value_;
+    std::weak_ptr<Value> weakRef_;
+    std::shared_ptr<Value> shareRef_;
 };
 
 /** JSI Object hybrid class - initially ignoring support for host object, native state, and array buffers. */

@@ -19,7 +19,7 @@ public:
     unique_ptr<unordered_map<void*, unique_ptr<Function>>> functionScope;
     unique_ptr<unordered_map<void*, unique_ptr<Symbol>>> symbolScope;
 
-    void trackValue(void* ptr, Value value);
+    std::shared_ptr<Value> trackValue(std::weak_ptr<Value>& wp, Value value);
 
     void trackFunction(void* ptr, Function value);
 
