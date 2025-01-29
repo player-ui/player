@@ -6,34 +6,39 @@
 namespace intuit::playerui {
 
 //template<typename T>
-std::shared_ptr<Value> RuntimeScope::trackValue(Value value) {
+std::weak_ptr<Value> RuntimeScope::trackValue(Value value) {
     std::shared_ptr<Value> sp = make_shared<Value>(std::move(value));
-    //valueScope->insert(sp);
-    return sp;
+    valueScope->insert(sp);
+    weak_ptr wp = sp;
+    return wp;
 }
 
-std::shared_ptr<Function> RuntimeScope::trackFunction(Function value) {
+std::weak_ptr<Function> RuntimeScope::trackFunction(Function value) {
     std::shared_ptr<Function> sp = make_shared<Function>(std::move(value));
-    //functionScope->insert(sp);
-    return sp;
+    functionScope->insert(sp);
+    weak_ptr wp = sp;
+    return wp;
 }
 
-std::shared_ptr<facebook::jsi::Array> RuntimeScope::trackArray(facebook::jsi::Array value) {
+std::weak_ptr<facebook::jsi::Array> RuntimeScope::trackArray(facebook::jsi::Array value) {
     std::shared_ptr<facebook::jsi::Array> sp = make_shared<facebook::jsi::Array>(std::move(value));
-    //arrayScope->insert(sp);
-    return sp;
+    arrayScope->insert(sp);
+    weak_ptr wp = sp;
+    return wp;
 }
 
-std::shared_ptr<facebook::jsi::Object> RuntimeScope::trackObject(facebook::jsi::Object value) {
+std::weak_ptr<facebook::jsi::Object> RuntimeScope::trackObject(facebook::jsi::Object value) {
     std::shared_ptr<facebook::jsi::Object> sp = make_shared<facebook::jsi::Object>(std::move(value));
-    //objectScope->insert(sp);
-    return sp;
+    objectScope->insert(sp);
+    weak_ptr wp = sp;
+    return wp;
 }
 
-std::shared_ptr<facebook::jsi::Symbol> RuntimeScope::trackSymbol(facebook::jsi::Symbol value) {
+std::weak_ptr<facebook::jsi::Symbol> RuntimeScope::trackSymbol(facebook::jsi::Symbol value) {
     std::shared_ptr<facebook::jsi::Symbol> sp = make_shared<facebook::jsi::Symbol>(std::move(value));
-    //symbolScope->insert(sp);
-    return sp;
+    symbolScope->insert(sp);
+    weak_ptr wp = sp;
+    return wp;
 }
 
 Value* RuntimeScope::getValue(void* ptr) {
@@ -79,34 +84,34 @@ Symbol* RuntimeScope::getSymbol(void *ptr) {
     return nullptr;
 }
 
-void RuntimeScope::clearSymbol(shared_ptr<Symbol> ptr) {
+/*void RuntimeScope::clearSymbol(weak_ptr<Symbol> ptr) {
     if (symbolScope->find(ptr) != symbolScope->end()) {
         symbolScope->erase(ptr);
     }
 }
 
-void RuntimeScope::clearObject(shared_ptr<Object> ptr) {
+void RuntimeScope::clearObject(weak_ptr<Object> ptr) {
     if (objectScope->find(ptr) != objectScope->end()) {
         objectScope->erase(ptr);
     }
 }
 
-void RuntimeScope::clearArray(shared_ptr<Array> ptr) {
+void RuntimeScope::clearArray(weak_ptr<Array> ptr) {
     if (arrayScope->find(ptr) != arrayScope->end()) {
         arrayScope->erase(ptr);
     }
 }
 
-void RuntimeScope::clearValue(shared_ptr<Value> ptr) {
+void RuntimeScope::clearValue(weak_ptr<Value> ptr) {
     if (valueScope->find(ptr) != valueScope->end()) {
         valueScope->erase(ptr);
     }
 }
 
-void RuntimeScope::clearFunction(shared_ptr<Function> ptr) {
+void RuntimeScope::clearFunction(weak_ptr<Function> ptr) {
     if (functionScope->find(ptr) != functionScope->end()) {
         functionScope->erase(ptr);
     }
-}
+}*/
 
 }

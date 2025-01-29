@@ -20,15 +20,15 @@ public:
     unique_ptr<set<shared_ptr<Function>>> functionScope;
     unique_ptr<set<shared_ptr<Symbol>>> symbolScope;
 
-    std::shared_ptr<Value> trackValue(Value value);
+    std::weak_ptr<Value> trackValue(Value value);
 
-    std::shared_ptr<Function> trackFunction(Function value);
+    std::weak_ptr<Function> trackFunction(Function value);
 
-    std::shared_ptr<Object> trackObject(Object value);
+    std::weak_ptr<Object> trackObject(Object value);
 
-    std::shared_ptr<Array> trackArray(Array value);
+    std::weak_ptr<Array> trackArray(Array value);
 
-    std::shared_ptr<Symbol> trackSymbol(Symbol value);
+    std::weak_ptr<Symbol> trackSymbol(Symbol value);
 
     Value* getValue(void* ptr);
 
@@ -40,15 +40,15 @@ public:
 
     Symbol* getSymbol(void* ptr);
 
-    void clearSymbol(shared_ptr<Symbol> ptr);
+/*    void clearSymbol(weak_ptr<Symbol> ptr);
 
-    void clearObject(shared_ptr<Object> ptr);
+    void clearObject(weak_ptr<Object> ptr);
 
-    void clearArray(shared_ptr<Array> ptr);
+    void clearArray(weak_ptr<Array> ptr);
 
-    void clearValue(shared_ptr<Value> ptr);
+    void clearValue(weak_ptr<Value> ptr);
 
-    void clearFunction(shared_ptr<Function> ptr);
+    void clearFunction(weak_ptr<Function> ptr);*/
 
     explicit RuntimeScope(): valueScope(make_unique<set<shared_ptr<Value>>>()), objectScope(make_unique<set<shared_ptr<Object>>>()), arrayScope(make_unique<set<shared_ptr<Array>>>()), functionScope(make_unique<set<shared_ptr<Function>>>()), symbolScope(make_unique<set<shared_ptr<Symbol>>>()){}
 };
