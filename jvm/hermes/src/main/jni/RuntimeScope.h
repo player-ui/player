@@ -1,6 +1,7 @@
 #pragma once
 
 #include <jsi/jsi.h>
+#include <set>
 #include <unordered_map>
 #include <variant>
 
@@ -13,11 +14,11 @@ using VariantType = variant<Value, Object, Array, Function, Symbol>;
 
 class RuntimeScope {
 public:
-    unique_ptr<unordered_map<void*, unique_ptr<Value>>> valueScope;
-    unique_ptr<unordered_map<void*, unique_ptr<Object>>> objectScope;
-    unique_ptr<unordered_map<void*, unique_ptr<Array>>> arrayScope;
-    unique_ptr<unordered_map<void*, unique_ptr<Function>>> functionScope;
-    unique_ptr<unordered_map<void*, unique_ptr<Symbol>>> symbolScope;
+    unique_ptr<set<shared_ptr<Value>>> valueScope;
+    unique_ptr<set<shared_ptr<Object>>> objectScope;
+    unique_ptr<set<shared_ptr<Array>>> arrayScope;
+    unique_ptr<set<shared_ptr<Function>>> functionScope;
+    unique_ptr<set<shared_ptr<Symbol>>> symbolScope;
 
     std::shared_ptr<Value> trackValue(Value value);
 
@@ -39,8 +40,16 @@ public:
 
     Symbol* getSymbol(void* ptr);
 
-    void clearRef(void* ptr);
+    void clearSymbol(shared_ptr<Symbol> ptr);
 
-    explicit RuntimeScope(): valueScope(make_unique<unordered_map<void*, unique_ptr<Value>>>()), objectScope(make_unique<unordered_map<void*, unique_ptr<Object>>>()), arrayScope(make_unique<unordered_map<void*, unique_ptr<Array>>>()), functionScope(make_unique<unordered_map<void*, unique_ptr<Function>>>()), symbolScope(make_unique<unordered_map<void*, unique_ptr<Symbol>>>()){}
+    void clearObject(shared_ptr<Object> ptr);
+
+    void clearArray(shared_ptr<Array> ptr);
+
+    void clearValue(shared_ptr<Value> ptr);
+
+    void clearFunction(shared_ptr<Function> ptr);
+
+    explicit RuntimeScope(): valueScope(make_unique<set<shared_ptr<Value>>>()), objectScope(make_unique<set<shared_ptr<Object>>>()), arrayScope(make_unique<set<shared_ptr<Array>>>()), functionScope(make_unique<set<shared_ptr<Function>>>()), symbolScope(make_unique<set<shared_ptr<Symbol>>>()){}
 };
 }

@@ -157,7 +157,10 @@ public:
     }
 
     void release() override {
-        if (shareRef_) shareRef_.reset();
+        if (shareRef_ != nullptr) {
+            //scope_->clearValue(shareRef_);
+            shareRef_.reset();
+        }
     }
 
     bool isReleased() override {
@@ -209,7 +212,10 @@ public:
     }
 
     void release() override {
-        if (shareRef_) shareRef_.reset();
+        if (shareRef_ != nullptr) {
+            //scope_->clearObject(shareRef_);
+            shareRef_.reset();
+        }
     }
 
     bool isReleased() override {
@@ -248,7 +254,10 @@ public:
     }
 
     void release() override {
-        if (shareRef_) shareRef_.reset();
+        if (shareRef_ != nullptr) {
+            //scope_->clearArray(shareRef_);
+            shareRef_.reset();
+        }
     }
 
     bool isReleased() override {
@@ -298,7 +307,10 @@ public:
     }
 
     void release() override {
-        if (shareRef_) shareRef_.reset();
+        if (shareRef_ != nullptr) {
+            //scope_->clearFunction(shareRef_);
+            shareRef_.reset();
+        }
     }
 
     bool isReleased() override {
@@ -334,7 +346,10 @@ public:
     }
 
     void release() override {
-        if (shareRef_) shareRef_.reset();
+        if (shareRef_ != nullptr) {
+            //scope_->clearSymbol(shareRef_);
+            shareRef_.reset();
+        }
     }
 
     bool isReleased() override {
