@@ -18,4 +18,5 @@ export interface AssetType extends Asset {
 export type AsyncTransformFunc = (
   asset: Node.Asset<AssetType> | Node.View<AssetType>,
   transformedAssetType: string,
+  wrapperAssetType: string,
 ) => Node.Node;

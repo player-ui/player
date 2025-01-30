@@ -1,26 +1,13 @@
 import React from "react";
 import { ReactAsset } from "@player-ui/react";
-import type { ChatMessageWrapperAsset } from "@player-ui/reference-assets-plugin";
+import type { TransformedChatMessageWrapperAsset } from "@player-ui/reference-assets-plugin";
 
-export const ChatMessageWrapper = (props: ChatMessageWrapperAsset) => {
-  const res: any[] = [];
-
-  props.values?.forEach((a) => unpackAndPush(a, res));
-
+export const ChatMessageWrapper = (props: TransformedChatMessageWrapperAsset) => {
+  console.log("props.values", props.values);
+  debugger;
   return (
     <div className="flex flex-col gap-4">
-      {res.length > 0 &&
-        res.map((a) => <ReactAsset key={a?.asset?.id} {...a} />)}
+      {props.values?.map((a) => <ReactAsset key={a.asset.id} {...a} />)}
     </div>
   );
 };
-
-function unpackAndPush(item: any | any[], initial: any[]) {
-  if (Array.isArray(item)) {
-    item.forEach((i) => {
-      unpackAndPush(i, initial);
-    });
-  } else {
-    initial.push(item);
-  }
-}
