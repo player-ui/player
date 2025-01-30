@@ -17,6 +17,7 @@ import {
   infoTransform,
   choiceTransform,
   chatMessageTransform,
+  chatMessageWrapperTransform,
 } from "./assets";
 
 /**
@@ -48,6 +49,7 @@ export class ReferenceAssetsPlugin
         [{ type: "info" }, infoTransform],
         [{ type: "choice" }, choiceTransform],
         [{ type: "chat-message" }, chatMessageTransform],
+        [{ type: "chat-message-wrapper" }, chatMessageWrapperTransform],
       ]),
     );
   }
