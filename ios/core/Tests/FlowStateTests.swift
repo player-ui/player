@@ -105,7 +105,7 @@ class FlowStateTests: XCTestCase {
     }
 
     func testFlowControllerTransitionHooks() {
-        let player = HeadlessPlayerImpl(plugins: [PrintLoggerPlugin(level: .info)])
+        let player = HeadlessPlayerImpl(plugins: [])
 
         var pendingTransition: (currentState: NamedState?, transitionValue: String?)?
         var completedTransition: (from: NamedState?, to: NamedState?)?
