@@ -16,6 +16,7 @@ import queueMicrotask from "queue-microtask";
 import { omit } from "timm";
 
 export * from "./types";
+export * from "./transform";
 
 export interface AsyncNodePluginOptions {
   /** A set of plugins to load  */

@@ -5,13 +5,11 @@
   "dependencies": {
     "@player-ui/asset-transform-plugin": "workspace:*",
     "@player-ui/beacon-plugin": "workspace:*",
-    "uuid": "^8.3.2"
+    "@player-ui/async-node-plugin": "workspace:*"
   },
   "devDependencies": {
     "@player-ui/asset-testing-library": "workspace:*",
-    "@player-ui/common-types-plugin": "workspace:*",
-    "@types/uuid": "^8.3.4",
-    "@player-ui/async-node-plugin": "workspace:*"
+    "@player-ui/common-types-plugin": "workspace:*"
   },
   "peerDependencies": {
     "@player-ui/player": "workspace:*"
