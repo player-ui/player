@@ -39,6 +39,11 @@ class FlowStateTests: XCTestCase {
     func testActionFlowState() {
         let player = HeadlessPlayerImpl(plugins: [])
         let hitActionNode = expectation(description: "ACTION state hit")
+
+        player.hooks?.onStart.tap { flow in
+            XCTAssertEqual(flow.id, "counter-flow")
+        }
+
         player.hooks?.flowController.tap({ flowController in
             flowController.hooks.flow.tap { flow in
                 flow.hooks.transition.tap { oldState, _ in
@@ -97,5 +102,62 @@ class FlowStateTests: XCTestCase {
 
         wait(for: [endStateHit], timeout: 1)
 
+    }
+
+    func testFlowControllerTransitionHooks() {
+        let player = HeadlessPlayerImpl(plugins: [PrintLoggerPlugin(level: .info)])
+
+        var pendingTransition: (currentState: NamedState?, transitionValue: String?)?
+        var completedTransition: (from: NamedState?, to: NamedState?)?
+
+        let hitForceBeforeTransition = expectation(description: "BeforeTransition Hit with *")
+        let hitForceTransition = expectation(description: "transition Hit with *")
+
+        player.hooks?.flowController.tap({ flowController in
+            flowController.hooks.flow.tap { flow in
+
+                flow.hooks.beforeTransition.tap { state, transitionValue in
+                    pendingTransition = (currentState: flow.currentState, transitionValue: transitionValue)
+
+                    XCTAssertEqual(flow.currentState?.name, "VIEW_1")
+                    hitForceBeforeTransition.fulfill()
+
+                    return state
+                }
+
+                flow.hooks.transition.tap { from, to in
+                    if from?.name == "VIEW_1" && to.name == "END_Done" {
+                        XCTAssertEqual(from?.name, "VIEW_1")
+                        XCTAssertEqual(to.name, "END_Done")
+
+                        hitForceTransition .fulfill()
+                    }
+
+                    completedTransition = (from: from, to: to)
+                }
+            }
+        })
+
+        player.start(flow: FlowData.flowControllerFlow) { _ in}
+
+        XCTAssertNil(pendingTransition)
+        XCTAssertNil(completedTransition?.from)
+        XCTAssertEqual(completedTransition?.to?.name, "VIEW_1")
+
+        do {
+            try (player.state as? InProgressState)?.controllers?.flow.transition(with: "*")
+        } catch let error {
+            XCTFail("Transition with * failed with \(error)")
+        }
+
+        let pendingFrom = pendingTransition?.currentState?.value as? NavigationFlowTransitionableState
+
+        XCTAssertNotNil(pendingFrom)
+        XCTAssertEqual((pendingFrom as? NavigationFlowViewState)?.ref, "view-1")
+        XCTAssertEqual(pendingTransition?.transitionValue, "*")
+        XCTAssertEqual(completedTransition?.from?.name, "VIEW_1")
+        XCTAssertEqual(completedTransition?.to?.name, "END_Done")
+
+        wait(for: [hitForceTransition, hitForceBeforeTransition], timeout: 15)
     }
 }
