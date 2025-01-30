@@ -15,11 +15,7 @@ export const asyncTransform: AsyncTransformFunc = (
   });
 
   const asyncNode = Builder.asyncNode(id);
-  const multiNode = Builder.multiNode(
-    asset.value.flatten,
-    assetNode,
-    asyncNode,
-  );
+  const multiNode = Builder.multiNode(assetNode, asyncNode);
 
   const wrapperAsset = Builder.asset({
     id: wrapperAssetType + "-" + id,

@@ -14,7 +14,6 @@ js_pipeline(
     native_bundle = "AsyncNodePlugin",
     peer_deps = [
         ":node_modules/@player-ui/player",
-        ":node_modules/@player-ui/react",
         "//:node_modules/react",
         "//:node_modules/@types/react",
     ],
