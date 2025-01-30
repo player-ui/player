@@ -19,12 +19,10 @@ js_xlr_pipeline(
         ":node_modules/@player-ui/asset-testing-library",
         ":node_modules/@player-ui/common-types-plugin",
         "//:vitest_config",
-        ":node_modules/@player-ui/async-node-plugin",
     ],
     deps = [
         ":node_modules/@player-ui/asset-transform-plugin",
         ":node_modules/@player-ui/beacon-plugin",
-        "//:node_modules/uuid",
-        "//:node_modules/@types/uuid",
+        ":node_modules/@player-ui/async-node-plugin",
     ],
 )

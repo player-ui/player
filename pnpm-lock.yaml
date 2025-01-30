@@ -661,6 +661,16 @@ importers:
       '@player-ui/player':
         specifier: workspace:*
         version: link:../../../core/player
+      '@player-ui/react':
+        specifier: workspace:*
+        version: link:../../../react/player
+      uuid:
+        specifier: ^8.3.2
+        version: 8.3.2
+    devDependencies:
+      '@types/uuid':
+        specifier: ^8.3.4
+        version: 8.3.4
 
   plugins/auto-scroll/react:
     dependencies:
