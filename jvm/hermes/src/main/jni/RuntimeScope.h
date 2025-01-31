@@ -1,6 +1,7 @@
 #pragma once
 
 #include <jsi/jsi.h>
+#include <set>
 #include <unordered_map>
 #include <variant>
 
@@ -8,39 +9,25 @@ using namespace std;
 using namespace facebook::jsi;
 
 namespace intuit::playerui {
-// Define the supported types for the variant
-using VariantType = variant<Value, Object, Array, Function, Symbol>;
 
 class RuntimeScope {
 public:
-    unique_ptr<unordered_map<void*, unique_ptr<Value>>> valueScope;
-    unique_ptr<unordered_map<void*, unique_ptr<Object>>> objectScope;
-    unique_ptr<unordered_map<void*, unique_ptr<Array>>> arrayScope;
-    unique_ptr<unordered_map<void*, unique_ptr<Function>>> functionScope;
-    unique_ptr<unordered_map<void*, unique_ptr<Symbol>>> symbolScope;
+    unique_ptr<set<shared_ptr<Value>>> valueScope;
+    unique_ptr<set<shared_ptr<Object>>> objectScope;
+    unique_ptr<set<shared_ptr<Array>>> arrayScope;
+    unique_ptr<set<shared_ptr<Function>>> functionScope;
+    unique_ptr<set<shared_ptr<Symbol>>> symbolScope;
 
-    void trackValue(void* ptr, Value value);
+    std::weak_ptr<Value> trackValue(Value value);
 
-    void trackFunction(void* ptr, Function value);
+    std::weak_ptr<Function> trackFunction(Function value);
 
-    void trackObject(void* ptr, Object value);
+    std::weak_ptr<Object> trackObject(Object value);
 
-    void trackArray(void* ptr, Array value);
+    std::weak_ptr<Array> trackArray(Array value);
 
-    void trackSymbol(void* ptr, Symbol value);
+    std::weak_ptr<Symbol> trackSymbol(Symbol value);
 
-    Value* getValue(void* ptr);
-
-    Function* getFunction(void* ptr);
-
-    Array* getArray(void* ptr);
-
-    Object* getObject(void* ptr);
-
-    Symbol* getSymbol(void* ptr);
-
-    void clearRef(void* ptr);
-
-    explicit RuntimeScope(): valueScope(make_unique<unordered_map<void*, unique_ptr<Value>>>()), objectScope(make_unique<unordered_map<void*, unique_ptr<Object>>>()), arrayScope(make_unique<unordered_map<void*, unique_ptr<Array>>>()), functionScope(make_unique<unordered_map<void*, unique_ptr<Function>>>()), symbolScope(make_unique<unordered_map<void*, unique_ptr<Symbol>>>()){}
+    explicit RuntimeScope(): valueScope(make_unique<set<shared_ptr<Value>>>()), objectScope(make_unique<set<shared_ptr<Object>>>()), arrayScope(make_unique<set<shared_ptr<Array>>>()), functionScope(make_unique<set<shared_ptr<Function>>>()), symbolScope(make_unique<set<shared_ptr<Symbol>>>()){}
 };
 }
