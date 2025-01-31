@@ -1,3 +1,15 @@
+# 0.10.3-next.0 (Fri Jan 31 2025)
+
+#### 🐛 Bug Fix
+
+- Hermes tracker update [#580](https://github.com/player-ui/player/pull/580) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
 # 0.10.2 (Wed Jan 29 2025)
 
 ### Release Notes
