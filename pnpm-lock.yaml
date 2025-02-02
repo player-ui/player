@@ -661,6 +661,9 @@ importers:
       '@player-ui/player':
         specifier: workspace:*
         version: link:../../../core/player
+      '@player-ui/react':
+        specifier: workspace:*
+        version: link:../../../react/player
 
   plugins/auto-scroll/react:
     dependencies:

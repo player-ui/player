@@ -39,7 +39,7 @@ import type { ChatMessageAsset } from "./types";
 export const transform: BeforeTransformFunction<Asset> = (
   asset: ChatMessageAsset,
 ) => {
-  const id = uuid();
+  const id = "async-";
 
   const assetNode = Builder.asset({ ...asset.value, type: "text" });
   const asyncNode = Builder.asyncNode(id);
