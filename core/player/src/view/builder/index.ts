@@ -36,11 +36,12 @@ export class Builder {
    * @param values - the value or applicability nodes to put in the multinode
    */
   static multiNode(
-    ...values: (Node.Value | Node.Applicability)[]
+    ...values: (Node.Value | Node.Applicability | Node.Asset)[]
   ): Node.MultiNode {
     const m: Node.MultiNode = {
       type: NodeType.MultiNode,
       override: true,
+      flatten: false,
       values,
     };
 
@@ -50,6 +51,24 @@ export class Builder {
     });
 
     return m;
+  }
+
+  /**
+   * Creates an async node
+   *
+   * @param id - the id of async node. It should be identical for each async node
+   */
+  static asyncNode(id: string): Node.Async {
+    return {
+      id,
+      type: NodeType.Async,
+      value: {
+        type: NodeType.Value,
+        value: {
+          id,
+        },
+      },
+    };
   }
 
   /**
