@@ -3,7 +3,7 @@
   "views": [
       {
       "id": "1",
-      "type": "chat-message",
+      "type": "-[;/']+",
       "value": "Hello World!"
       }
   ],
