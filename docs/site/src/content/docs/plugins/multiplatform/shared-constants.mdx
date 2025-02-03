@@ -23,7 +23,7 @@ const constantsPlugin = new ConstantsPlugin({
     prop2: "B",
   },
   namespace: "constants",
-  dataPath: "data.constants",
+  dataPath: "data.props",
 });
 
 const player = new Player({
@@ -42,8 +42,21 @@ constantsPlugin.getConstants("prop1"); // 'A'
 
 ### Overriding Values in Content
 
-The `dataPath` configuration option enables content to override specific values for a particular flow:
+The `dataPath` configuration option allows content to override specific values for a particular flow:
 
+```json
+{
+  "data": {
+    "props": {
+      "prop1": "B"
+    }
+  }
+}
+```
+
+using a similar query for `prop1`, the value in the content takes precidence and would return `B`.
+
+If no `dataPath` is defined, then it defaults to `constants` and you can still do this
 ```json
 {
   "data": {
@@ -53,8 +66,6 @@ The `dataPath` configuration option enables content to override specific values 
   }
 }
 ```
-
-using a similar query for `prop1`, the value in the content takes precidence and would return `B`.
 
 ### Fallback Values
 
