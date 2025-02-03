@@ -89,11 +89,20 @@ abstract class AssetTest(val group: String? = null) {
         }
     }
 
-    var currentView: View? = null; get() = field ?: blockUntilRendered()
+    var currentView: View? = null
+        get() {
+            println("Getting currentView")
+            return field ?: blockUntilRendered().also {
+                println("blockUntilRendered called, currentView set to: $it")
+            }
+        }
         set(value) {
+            println("Setting currentView to: $value")
             field = value.also {
                 // reset replay cache to clear value if the current value is set to null
-                it ?: viewChannel.resetReplayCache()
+                it ?: viewChannel.resetReplayCache().also {
+                    println("viewChannel replay cache reset")
+                }
             }
         }
 
@@ -126,6 +135,13 @@ abstract class AssetTest(val group: String? = null) {
 
     fun launchMock(name: String) = launchMock(
         mocks.find { it.name == name || it.name == "$group-$name" }
+            ?.also { mock ->
+                val json = when (mock) {
+                    is ClassLoaderMock -> Json.encodeToString(mock.getFlow(context.classLoader))
+                    else -> throw IllegalArgumentException("mock of type ${mock::class.java.simpleName} not supported")
+                }
+                println("Loaded mock: $json")
+            }
             ?: throw IllegalArgumentException("$name not found in mocks: ${mocks.map { "${it.group}/${it.name}" }}"),
     )
 
