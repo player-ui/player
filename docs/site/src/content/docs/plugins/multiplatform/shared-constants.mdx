@@ -42,7 +42,7 @@ constantsPlugin.getConstants("prop1"); // 'A'
 
 ### Overriding Values in Content
 
-The `dataPath` configuration option allows content to override specific values for a particular flow:
+By default, data can be provided in the `constants` path of the `data` object to override the constants that the plugin was initialized with. This can be overridden though via the `dataPath` configuration option. In the above example, `dataPath` was initialized with the path `data.props` therefore the following code snippet could be used to override the `prop1` constant:
 
 ```json
 {
