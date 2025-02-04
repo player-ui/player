@@ -243,7 +243,7 @@ export const usePersistentStateMachine = (options: {
     return unsub;
   }, []);
 
-  return { managedState, state };
+  return { state, managedState };
 };
 
 /**
@@ -252,7 +252,9 @@ export const usePersistentStateMachine = (options: {
  *
  * `suspense` must be enabled to wait for results in flight.
  */
-export const ManagedPlayer = (props: ManagedPlayerProps) => {
+export const ManagedPlayer = (
+  props: ManagedPlayerProps,
+): React.ReactElement | null => {
   const { withRequestTime, RequestTimeMetricsPlugin } = useRequestTime();
 
   const { state, managedState } = usePersistentStateMachine({
@@ -283,6 +285,12 @@ export const ManagedPlayer = (props: ManagedPlayerProps) => {
       }
     };
   }, [props.manager, state?.context.reactPlayer.player, state?.value]);
+
+  React.useEffect(() => {
+    if (managedState.state) {
+      managedState.state.context.manager = props.manager;
+    }
+  }, [props.manager]);
 
   if (state?.value === "error") {
     if (props.fallbackComponent) {
