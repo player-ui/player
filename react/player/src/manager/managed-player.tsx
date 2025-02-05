@@ -208,6 +208,18 @@ const managedPlayerStateMachines = new WeakMap<
   ManagedState
 >();
 
+function getOrCreateNewManagedState(
+  key: ManagedPlayerStateKey,
+  middleware?: ManagerMiddleware,
+): ManagedState {
+  const newManagedState =
+    managedPlayerStateMachines.get(key) ??
+    new ManagedState({ middleware: middleware });
+  managedPlayerStateMachines.set(key, newManagedState);
+
+  return newManagedState;
+}
+
 /** Creates an x-state state machine that persists when this component is no longer renders (due to Suspense) */
 export const usePersistentStateMachine = (options: {
   /** the flow manager to use */
@@ -223,11 +235,23 @@ export const usePersistentStateMachine = (options: {
     _key: Symbol("managed-player"),
   });
 
-  const managedState =
-    managedPlayerStateMachines.get(keyRef.current) ??
-    new ManagedState({ middleware: options.middleware });
-  managedPlayerStateMachines.set(keyRef.current, managedState);
+  const initialManagedState = getOrCreateNewManagedState(
+    keyRef.current,
+    options.middleware,
+  );
+
+  const [managedState, setManagedState] = React.useState(initialManagedState);
   const [state, setState] = React.useState(managedState.state);
+
+  React.useEffect(() => {
+    if (state?.value === "completed") {
+      const newManagedState = getOrCreateNewManagedState(
+        keyRef.current,
+        options.middleware,
+      );
+      setManagedState(newManagedState);
+    }
+  }, [options.manager, options.playerConfig]);
 
   React.useEffect(() => {
     const unsub = managedState.addListener({
@@ -241,7 +265,7 @@ export const usePersistentStateMachine = (options: {
     }
 
     return unsub;
-  }, []);
+  }, [managedState]);
 
   return { state, managedState };
 };
@@ -285,12 +309,6 @@ export const ManagedPlayer = (
       }
     };
   }, [props.manager, state?.context.reactPlayer.player, state?.value]);
-
-  React.useEffect(() => {
-    if (managedState.state?.value === "completed") {
-      managedState.state.context.manager = props.manager;
-    }
-  }, [props.manager]);
 
   if (state?.value === "error") {
     if (props.fallbackComponent) {
