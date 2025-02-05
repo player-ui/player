@@ -287,7 +287,7 @@ export const ManagedPlayer = (
   }, [props.manager, state?.context.reactPlayer.player, state?.value]);
 
   React.useEffect(() => {
-    if (managedState.state) {
+    if (managedState.state?.value === "completed") {
       managedState.state.context.manager = props.manager;
     }
   }, [props.manager]);
