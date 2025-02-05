@@ -1,3 +1,25 @@
+# 0.10.3-next.1 (Tue Feb 04 2025)
+
+### Release Notes
+
+#### Update  to explicitly call out the default value for dataPath ([#584](https://github.com/player-ui/player/pull/584))
+
+Updated docs for Shared Constants Plugin to highlight the default dataPath used for overriding values
+
+---
+
+#### 🐛 Bug Fix
+
+- Support Smoother Experience When Loading a Viewless Flow on iOS [#570](https://github.com/player-ui/player/pull/570) ([@nancywu1](https://github.com/nancywu1))
+- Update  to explicitly call out the default value for dataPath [#584](https://github.com/player-ui/player/pull/584) ([@A1shK](https://github.com/A1shK))
+
+#### Authors: 2
+
+- [@A1shK](https://github.com/A1shK)
+- [@nancywu1](https://github.com/nancywu1)
+
+---
+
 # 0.10.3-next.0 (Fri Jan 31 2025)
 
 #### 🐛 Bug Fix
