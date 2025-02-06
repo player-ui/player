@@ -59,7 +59,7 @@ class ManagedState {
 
     /** the config to use when creating a player */
     playerConfig: ReactPlayerOptions;
-  }) {
+  }): this {
     const initialState: ManagedPlayerState = {
       value: "not_started",
       context: {
@@ -75,7 +75,7 @@ class ManagedState {
   }
 
   /** reset starts from nothing */
-  public reset() {
+  public reset(): void {
     if (this.state?.value === "error") {
       const { playerConfig, manager } = this.state.context;
       this.start({ playerConfig, manager });
@@ -85,7 +85,7 @@ class ManagedState {
   }
 
   /** restart starts from the last result */
-  public restart() {
+  public restart(): void {
     if (this.state?.value === "error") {
       const { playerConfig, manager, prevResult, reactPlayer } =
         this.state.context;
@@ -230,7 +230,7 @@ export const usePersistentStateMachine = (options: {
 
   /** Any middleware for the manager */
   middleware?: ManagerMiddleware;
-}) => {
+}): { state: ManagedPlayerState | undefined; managedState: ManagedState } => {
   const keyRef = React.useRef<ManagedPlayerStateKey>({
     _key: Symbol("managed-player"),
   });
@@ -240,7 +240,8 @@ export const usePersistentStateMachine = (options: {
     options.middleware,
   );
 
-  const [managedState, setManagedState] = React.useState(initialManagedState);
+  const managedStateRef = React.useRef(initialManagedState);
+  let managedState = managedStateRef.current;
   const [state, setState] = React.useState(managedState.state);
 
   React.useEffect(() => {
@@ -249,7 +250,7 @@ export const usePersistentStateMachine = (options: {
         keyRef.current,
         options.middleware,
       );
-      setManagedState(newManagedState);
+      managedState = newManagedState;
     }
   }, [options.manager, options.playerConfig]);
 
