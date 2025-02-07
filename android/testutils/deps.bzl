@@ -1,4 +1,4 @@
-main_deps = [
+main_exports = [
     "@maven//:androidx_test_core",
     "@maven//:androidx_test_runner",
     "@maven//:junit_junit",
@@ -13,4 +13,9 @@ main_deps = [
     # TODO: If we build a config for swapping between default android player runtimes,
     #  we could dynamically depend on this and make sure we run all android player tests against all supported runtimes
     "//jvm/hermes:hermes-host",
+]
+
+main_deps = main_exports
+
+main_resources = [
 ]
