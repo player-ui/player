@@ -49,13 +49,13 @@ import org.robolectric.annotation.Config
 public abstract class AssetTest(private val group: String? = null) {
 
     @get:Rule
-    public val name: TestName = TestName()
+    protected val name: TestName = TestName()
 
-    public open val plugins: List<Plugin> by lazy { listOf(ReferenceAssetsPlugin(), CommonTypesPlugin(), PendingTransactionPlugin()) }
+    protected open val plugins: List<Plugin> by lazy { listOf(ReferenceAssetsPlugin(), CommonTypesPlugin(), PendingTransactionPlugin()) }
 
-    public val context: Context get() = ApplicationProvider.getApplicationContext()
+    protected val context: Context get() = ApplicationProvider.getApplicationContext()
 
-    public val player: AndroidPlayer by lazy {
+    protected val player: AndroidPlayer by lazy {
         AndroidPlayer(plugins)
     }
 
@@ -75,7 +75,7 @@ public abstract class AssetTest(private val group: String? = null) {
         throw AssertionError("Expected view to update, but it did not.", exception)
     }
 
-    public var currentAssetTree: RenderableAsset? = null; private set(value) {
+    protected var currentAssetTree: RenderableAsset? = null; private set(value) {
         // reset view on new asset
         currentView = null
 
@@ -89,7 +89,7 @@ public abstract class AssetTest(private val group: String? = null) {
         }
     }
 
-    public var currentView: View? = null; get() = field ?: blockUntilRendered()
+    protected var currentView: View? = null; get() = field ?: blockUntilRendered()
         set(value) {
             field = value.also {
                 // reset replay cache to clear value if the current value is set to null
@@ -106,7 +106,7 @@ public abstract class AssetTest(private val group: String? = null) {
     private val emptyView = View(context)
 
     @Before
-    public fun beforeEach() {
+    protected fun beforeEach() {
         Dispatchers.setMain(TestCoroutineDispatcher())
         player.onUpdate { asset, _ -> currentAssetTree = asset }
         player.hooks.state.tap { state ->
@@ -118,34 +118,34 @@ public abstract class AssetTest(private val group: String? = null) {
     }
 
     @After
-    public fun afterEach() {
+    protected fun afterEach() {
         Dispatchers.resetMain()
     }
 
-    public fun launchMock(): Unit = launchMock(name.methodName)
+    protected fun launchMock(): Unit = launchMock(name.methodName)
 
-    public fun launchMock(name: String): Unit = launchMock(
+    protected fun launchMock(name: String): Unit = launchMock(
         mocks.find { it.name == name || it.name == "$group-$name" }
             ?: throw IllegalArgumentException("$name not found in mocks: ${mocks.map { "${it.group}/${it.name}" }}"),
     )
 
-    public fun launchMock(mock: Mock<*>): Unit = launchJson(
+    protected fun launchMock(mock: Mock<*>): Unit = launchJson(
         when (mock) {
             is ClassLoaderMock -> mock.getFlow(context.classLoader)
             else -> throw IllegalArgumentException("mock of type ${mock::class.java.simpleName} not supported")
         },
     )
 
-    public fun launchJson(json: JsonElement): Unit = launchJson(Json.encodeToString(json))
+    protected fun launchJson(json: JsonElement): Unit = launchJson(Json.encodeToString(json))
 
-    public fun launchJson(json: String): Unit = player.start(makeFlow(json)).onComplete {
+    protected fun launchJson(json: String): Unit = player.start(makeFlow(json)).onComplete {
         it.exceptionOrNull()?.printStackTrace()
     }
 
     /** Suspend until we have a [View] representation of [currentAssetTree] that is _completely_ hydrated */
-    public suspend fun awaitRendered(timeout: Long = 5_000): View = consumeLatestView(timeout)
+    protected suspend fun awaitRendered(timeout: Long = 5_000): View = consumeLatestView(timeout)
 
-    public fun blockUntilRendered(timeout: Long = 5_000): View = runBlocking {
+    protected fun blockUntilRendered(timeout: Long = 5_000): View = runBlocking {
         awaitRendered(timeout)
     }
 
