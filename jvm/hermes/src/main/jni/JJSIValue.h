@@ -174,7 +174,11 @@ public:
 
     Value& get_value() const {
         if (!tracked && value_) return *value_;
-        if (auto lock = weakRef_.lock()) return *lock;
+        /*if (auto lock = weakRef_.lock()) {
+            if (auto value = get_if<Value>(&*lock)) {
+                return *value;
+            }
+        }*/
 
         throwNativeHandleReleasedException("Value");
     }
@@ -182,7 +186,7 @@ private:
     friend HybridBase;
     shared_ptr<RuntimeScope> scope_;
     bool tracked = true;
-    std::weak_ptr<Value> weakRef_;
+    std::weak_ptr<VariantType> weakRef_;
     std::unique_ptr<Value> value_;
 };
 
@@ -231,7 +235,11 @@ public:
     }
 
     Object& get_object() const {
-        if (auto lock = weakRef_.lock()) return *lock;
+        /*if (auto lock = weakRef_.lock()) {
+            if (auto obj = get_if<Object>(&*lock)) {
+                return *obj;
+            }
+        }*/
 
         throwNativeHandleReleasedException("Object");
     }
@@ -239,7 +247,7 @@ private:
     friend HybridBase;
     friend class JJSIValue;
     std::shared_ptr<RuntimeScope> scope_;
-    std::weak_ptr<Object> weakRef_;
+    std::weak_ptr<VariantType> weakRef_;
 };
 
 class JJSIArray : public JJSIArrayHybridClass {
@@ -273,14 +281,18 @@ public:
     }
 
     Array& get_array() const {
-        if (auto lock = weakRef_.lock()) return *lock;
+        /*if (auto lock = weakRef_.lock()) {
+            if (auto array = get_if<Array>(&*lock)) {
+                return *array;
+            }
+        };*/
 
         throwNativeHandleReleasedException("Array");
     }
 private:
     friend HybridBase;
     shared_ptr<RuntimeScope> scope_;
-    weak_ptr<Array> weakRef_;
+    weak_ptr<VariantType> weakRef_;
 };
 
 struct JJSIHostFunction : JavaClass<JJSIHostFunction> {
@@ -326,14 +338,17 @@ public:
     }
 
     Function& get_function() const {
-        if (auto lock = weakRef_.lock()) return *lock;
+        /*if (auto lock = weakRef_.lock()) {
+            if (auto function = get_if<Function>(&*lock))
+            return *function;
+        }*/
 
         throwNativeHandleReleasedException("Function");
     }
 private:
     friend HybridBase;
     shared_ptr<RuntimeScope> scope_;
-    weak_ptr<Function> weakRef_;
+    weak_ptr<VariantType> weakRef_;
 };
 
 class JJSISymbol : public JJSISymbolHybridClass {
@@ -365,13 +380,17 @@ public:
     }
 
     Symbol& get_symbol() const {
-        if (auto lock = weakRef_.lock()) return *lock;
+        /*if (auto lock = weakRef_.lock()) {
+            if (auto symbol = get_if<Symbol>(&*lock)){
+                return *symbol;
+            }
+        }*/
 
         throwNativeHandleReleasedException("Symbol");
     }
 private:
     friend HybridBase;
     shared_ptr<RuntimeScope> scope_;
-    weak_ptr<Symbol> weakRef_;
+    weak_ptr<VariantType> weakRef_;
 };
 };
