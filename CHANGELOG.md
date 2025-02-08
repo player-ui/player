@@ -1,3 +1,76 @@
+# 0.10.3-next.1 (Tue Feb 04 2025)
+
+### Release Notes
+
+#### Update  to explicitly call out the default value for dataPath ([#584](https://github.com/player-ui/player/pull/584))
+
+Updated docs for Shared Constants Plugin to highlight the default dataPath used for overriding values
+
+---
+
+#### 🐛 Bug Fix
+
+- Support Smoother Experience When Loading a Viewless Flow on iOS [#570](https://github.com/player-ui/player/pull/570) ([@nancywu1](https://github.com/nancywu1))
+- Update  to explicitly call out the default value for dataPath [#584](https://github.com/player-ui/player/pull/584) ([@A1shK](https://github.com/A1shK))
+
+#### Authors: 2
+
+- [@A1shK](https://github.com/A1shK)
+- [@nancywu1](https://github.com/nancywu1)
+
+---
+
+# 0.10.3-next.0 (Fri Jan 31 2025)
+
+#### 🐛 Bug Fix
+
+- Hermes tracker update [#580](https://github.com/player-ui/player/pull/580) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
+# 0.10.2 (Wed Jan 29 2025)
+
+### Release Notes
+
+#### Fix Duplicate Date in Title for `next` Changelog Entries ([#569](https://github.com/player-ui/player/pull/569))
+
+fix duplicate date in title for next changelogs
+
+#### Fix Binding Instantiation of Escaped Numerical Bindings ([#565](https://github.com/player-ui/player/pull/565))
+
+Fixed instantiation of `BindingInstance`s with escaped numerical segments
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#581](https://github.com/player-ui/player/pull/581) ([@intuit-svc](https://github.com/intuit-svc))
+- Check scope active for awaiting player [#578](https://github.com/player-ui/player/pull/578) ([@brocollie08](https://github.com/brocollie08))
+- iOS: JavascriptCore Exceptions when finding classes [#577](https://github.com/player-ui/player/pull/577) ([@hborawski](https://github.com/hborawski))
+- Broken links fix for docs [#573](https://github.com/player-ui/player/pull/573) ([@chetanddesai](https://github.com/chetanddesai))
+- J2V8 Config from Consumer [#576](https://github.com/player-ui/player/pull/576) ([@brocollie08](https://github.com/brocollie08))
+- Only mutate ManagedPlayerViewModel.loadingState on main thread [#566](https://github.com/player-ui/player/pull/566) ([@ap-for-work](https://github.com/ap-for-work) [@hborawski](https://github.com/hborawski))
+- Fix Binding Instantiation of Escaped Numerical Bindings [#565](https://github.com/player-ui/player/pull/565) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 📝 Documentation
+
+- Fix Duplicate Date in Title for `next` Changelog Entries [#569](https://github.com/player-ui/player/pull/569) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 6
+
+- [@ap-for-work](https://github.com/ap-for-work)
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- Chetan Desai ([@chetanddesai](https://github.com/chetanddesai))
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.10.2-next.4 (Wed Jan 22 2025)
 
 #### 🐛 Bug Fix
