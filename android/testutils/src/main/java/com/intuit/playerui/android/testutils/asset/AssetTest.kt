@@ -49,7 +49,7 @@ import org.robolectric.annotation.Config
 public abstract class AssetTest(private val group: String? = null) {
 
     @get:Rule
-    protected val name: TestName = TestName()
+    public val name: TestName = TestName()
 
     protected open val plugins: List<Plugin> by lazy { listOf(ReferenceAssetsPlugin(), CommonTypesPlugin(), PendingTransactionPlugin()) }
 
@@ -106,7 +106,7 @@ public abstract class AssetTest(private val group: String? = null) {
     private val emptyView = View(context)
 
     @Before
-    protected fun beforeEach() {
+    public fun beforeEach() {
         Dispatchers.setMain(TestCoroutineDispatcher())
         player.onUpdate { asset, _ -> currentAssetTree = asset }
         player.hooks.state.tap { state ->
@@ -118,7 +118,7 @@ public abstract class AssetTest(private val group: String? = null) {
     }
 
     @After
-    protected fun afterEach() {
+    public fun afterEach() {
         Dispatchers.resetMain()
     }
 
