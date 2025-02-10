@@ -1,3 +1,19 @@
+# 0.10.3-next.2 (Mon Feb 10 2025)
+
+#### 🐛 Bug Fix
+
+- vector common scope ([@brocollie08](https://github.com/brocollie08))
+
+#### ⚠️ Pushed to `main`
+
+- Revert "vector common scope" ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
 # 0.10.3-next.1 (Tue Feb 04 2025)
 
 ### Release Notes
