@@ -288,6 +288,8 @@ public struct SwiftUIPlayerHooks: CoreHooks {
     /// Provide Transition Animation information for transition views in the same flow
     public var transition: SyncBailHook<Void, PlayerViewTransition>
 
+    public var onStart: Hook<FlowType>
+
     /// Initialize hooks from reference to javascript core player
     public init(from player: JSValue) {
         flowController = Hook<FlowController>(baseValue: player, name: "flowController")
@@ -296,6 +298,7 @@ public struct SwiftUIPlayerHooks: CoreHooks {
         state = Hook<BaseFlowState>(baseValue: player, name: "state")
         view = SyncWaterfallHook<AnyView>()
         transition = SyncBailHook<Void, PlayerViewTransition>()
+        onStart = Hook<FlowType>(baseValue: player, name: "onStart")
     }
 }
 

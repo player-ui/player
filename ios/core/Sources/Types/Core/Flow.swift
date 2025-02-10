@@ -10,6 +10,7 @@ import JavaScriptCore
 
 /**
 A wrapper around the JS Flow in the core player
+The Content navigation state machine
 */
 public class Flow: CreatedFromJSValue {
     /// Typealias for associated type
@@ -44,11 +45,17 @@ public class Flow: CreatedFromJSValue {
     */
     public init(_ value: JSValue) {
         self.value = value
-        hooks = FlowHooks(transition: Hook2(baseValue: value, name: "transition"), afterTransition: Hook(baseValue: value, name: "afterTransition"))
+        hooks = FlowHooks(
+            beforeTransition: SyncWaterfallHook2SecondStringJS<NavigationFlowTransitionableState, NavigationFlowTransitionableState>(baseValue: value, name: "beforeTransition"),
+            transition: Hook2(baseValue: value, name: "transition"),
+            afterTransition: Hook(baseValue: value, name: "afterTransition")
+        )
     }
 }
 
 public struct FlowHooks {
+      /// A chance to manipulate the flow-node used to calculate the given transition used, excludes NavigationFlowEndState
+    public var beforeTransition: SyncWaterfallHook2SecondStringJS<NavigationFlowTransitionableState, NavigationFlowTransitionableState>
     /// A hook that fires when transitioning states and giving the old and new states as parameters
     public var transition: Hook2<NamedState?, NamedState>
 
