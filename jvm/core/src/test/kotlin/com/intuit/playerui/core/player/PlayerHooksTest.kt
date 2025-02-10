@@ -3,6 +3,7 @@ package com.intuit.playerui.core.player
 import com.intuit.playerui.core.NodeBaseTest
 import com.intuit.playerui.core.bridge.hooks.NodeSyncHook1
 import com.intuit.playerui.core.data.DataController
+import com.intuit.playerui.core.flow.Flow
 import com.intuit.playerui.core.flow.FlowController
 import com.intuit.playerui.core.player.state.PlayerFlowState
 import com.intuit.playerui.core.view.ViewController
@@ -25,6 +26,9 @@ internal class PlayerHooksTest : NodeBaseTest() {
     @MockK
     private lateinit var state: NodeSyncHook1<PlayerFlowState>
 
+    @MockK
+    private lateinit var onStart: NodeSyncHook1<Flow>
+
     private val hooks by lazy {
         Player.Hooks(node)
     }
@@ -36,6 +40,7 @@ internal class PlayerHooksTest : NodeBaseTest() {
         every { node.getSerializable<NodeSyncHook1<ViewController>>("viewController", any()) } returns vc
         every { node.getSerializable<NodeSyncHook1<DataController>>("dataController", any()) } returns dc
         every { node.getSerializable<NodeSyncHook1<PlayerFlowState>>("state", any()) } returns state
+        every { node.getSerializable<NodeSyncHook1<Flow>>("onStart", any()) } returns onStart
         every { node.nativeReferenceEquals(any()) } returns true
     }
 
@@ -60,5 +65,10 @@ internal class PlayerHooksTest : NodeBaseTest() {
     @Test
     fun state() {
         assertNotNull(hooks.state)
+    }
+
+    @Test
+    fun onStart() {
+        assertNotNull(hooks.onStart)
     }
 }
