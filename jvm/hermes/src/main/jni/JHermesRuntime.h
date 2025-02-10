@@ -58,7 +58,11 @@ public:
     }
 
     void release() {
-        runtimeScope_->sharedScope->clear();
+        runtimeScope_->valueScope->clear();
+        runtimeScope_->objectScope->clear();
+        runtimeScope_->functionScope->clear();
+        runtimeScope_->arrayScope->clear();
+        runtimeScope_->symbolScope->clear();
         if (jConfig_) jConfig_.reset();
         if (runtime_) runtime_.reset();
     }
