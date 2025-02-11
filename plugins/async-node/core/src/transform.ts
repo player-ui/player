@@ -9,7 +9,7 @@ export const asyncTransform: AsyncTransformFunc = (
 ) => {
   const id = uuid();
 
-  const assetNode = Builder.asset({
+  const assetNode = Builder.assetWrapper({
     ...asset.value,
     type: transformedAssetType,
   });

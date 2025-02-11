@@ -32,7 +32,7 @@ import { asyncTransform } from "@player-ui/async-node-plugin";
  */
 
 export const transform: BeforeTransformFunction<ChatMessageAsset> = (asset) => {
-  return asyncTransform(asset, "text", "chat-message-wrapper");
+  return asyncTransform(asset, "text", "collection");
 };
 
 export const chatMessageTransform: TransformFunctions = compose(

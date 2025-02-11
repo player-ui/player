@@ -17,6 +17,13 @@ export class Builder {
     };
   }
 
+  static assetWrapper<T extends AnyAssetType>(value: T): Node.Value {
+    const asset = Builder.asset(value);
+    const valueNode = Builder.value();
+    Builder.addChild(valueNode, "asset", asset);
+    return valueNode;
+  }
+
   /**
    * Creates a value node
    *
@@ -61,6 +68,7 @@ export class Builder {
     return {
       id,
       type: NodeType.Async,
+      flatten: true,
       value: {
         type: NodeType.Value,
         value: {

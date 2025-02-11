@@ -1,14 +1,9 @@
-import type { AssetWrapper, Asset, Node } from "@player-ui/player";
+import type { Asset, Node } from "@player-ui/player";
 
 export type AsyncNodeHandler = (
   node: Node.Node,
   update: (object: any) => void,
 ) => void;
-
-export interface AsyncNodeWrapperAsset extends Asset {
-  /** The string value to show */
-  values?: Array<AssetWrapper> | Array<Asset>;
-}
 
 export interface AssetType extends Asset {
   /** Flatten flag */
@@ -16,7 +11,7 @@ export interface AssetType extends Asset {
 }
 
 export type AsyncTransformFunc = (
-  asset: Node.Asset<AssetType> | Node.View<AssetType>,
+  asset: Node.Asset | Node.View,
   transformedAssetType: string,
   wrapperAssetType: string,
 ) => Node.Node;

@@ -24,4 +24,7 @@ js_pipeline(
         "//:node_modules/uuid",
         "//:node_modules/@types/uuid",
     ],
+    test_deps = [
+	    ":node_modules/@player-ui/reference-assets-plugin",
+    ]
 )

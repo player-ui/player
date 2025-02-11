@@ -40,6 +40,14 @@ test("async node", () => {
   expect(result.id).toBe("1");
 });
 
+test("asset wrapper", () => {
+  const result = Builder.assetWrapper({ id: "asset", type: "text" });
+
+  expect(result.type).toBe(NodeType.Value);
+  expect(result.children?.[0]?.value.type).toBe("asset");
+  expect(result.children?.[0]?.value.value.id).toBe("asset");
+});
+
 describe("addChild", () => {
   test("sets the parent on the child node", () => {
     const asset = Builder.asset({ id: "asset", type: "text" });

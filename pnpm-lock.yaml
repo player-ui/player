@@ -668,6 +668,9 @@ importers:
         specifier: ^8.3.2
         version: 8.3.2
     devDependencies:
+      '@player-ui/reference-assets-plugin':
+        specifier: workspace:*
+        version: link:../../reference-assets/core
       '@types/uuid':
         specifier: ^8.3.4
         version: 8.3.4
@@ -941,28 +944,22 @@ importers:
       '@player-ui/asset-transform-plugin':
         specifier: workspace:*
         version: link:../../asset-transform/core
+      '@player-ui/async-node-plugin':
+        specifier: workspace:*
+        version: link:../../async-node/core
       '@player-ui/beacon-plugin':
         specifier: workspace:*
         version: link:../../beacon/core
       '@player-ui/player':
         specifier: workspace:*
         version: link:../../../core/player
-      uuid:
-        specifier: ^8.3.2
-        version: 8.3.2
     devDependencies:
       '@player-ui/asset-testing-library':
         specifier: workspace:*
         version: link:../../../tools/asset-testing-library/core
-      '@player-ui/async-node-plugin':
-        specifier: workspace:*
-        version: link:../../async-node/core
       '@player-ui/common-types-plugin':
         specifier: workspace:*
         version: link:../../common-types/core
-      '@types/uuid':
-        specifier: ^8.3.4
-        version: 8.3.4
 
   plugins/reference-assets/mocks:
     dependencies:
