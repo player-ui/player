@@ -1,4 +1,4 @@
-package com.intuit.playerui.android.reference.assets.test
+package com.intuit.playerui.android.testutils.asset
 
 import android.content.Context
 import android.view.View
@@ -46,16 +46,16 @@ import org.robolectric.annotation.Config
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [28])
 @OptIn(ExperimentalCoroutinesApi::class)
-abstract class AssetTest(val group: String? = null) {
+public abstract class AssetTest(private val group: String? = null) {
 
     @get:Rule
-    val name = TestName()
+    public val name: TestName = TestName()
 
-    open val plugins: List<Plugin> by lazy { listOf(ReferenceAssetsPlugin(), CommonTypesPlugin(), PendingTransactionPlugin()) }
+    protected open val plugins: List<Plugin> by lazy { listOf(ReferenceAssetsPlugin(), CommonTypesPlugin(), PendingTransactionPlugin()) }
 
-    val context: Context get() = ApplicationProvider.getApplicationContext()
+    protected val context: Context get() = ApplicationProvider.getApplicationContext()
 
-    val player by lazy {
+    protected val player: AndroidPlayer by lazy {
         AndroidPlayer(plugins)
     }
 
@@ -75,7 +75,7 @@ abstract class AssetTest(val group: String? = null) {
         throw AssertionError("Expected view to update, but it did not.", exception)
     }
 
-    var currentAssetTree: RenderableAsset? = null; private set(value) {
+    protected var currentAssetTree: RenderableAsset? = null; private set(value) {
         // reset view on new asset
         currentView = null
 
@@ -89,7 +89,7 @@ abstract class AssetTest(val group: String? = null) {
         }
     }
 
-    var currentView: View? = null; get() = field ?: blockUntilRendered()
+    protected var currentView: View? = null; get() = field ?: blockUntilRendered()
         set(value) {
             field = value.also {
                 // reset replay cache to clear value if the current value is set to null
@@ -99,14 +99,14 @@ abstract class AssetTest(val group: String? = null) {
 
     protected val currentState: PlayerFlowState get() = player.state
 
-    protected val mocks get() = ClassLoaderMocksReader(context.classLoader).mocks.filter {
+    protected val mocks: List<ClassLoaderMock> get() = ClassLoaderMocksReader(context.classLoader).mocks.filter {
         group == null || group == it.group
     }
 
     private val emptyView = View(context)
 
     @Before
-    fun beforeEach() {
+    public fun beforeEach() {
         Dispatchers.setMain(TestCoroutineDispatcher())
         player.onUpdate { asset, _ -> currentAssetTree = asset }
         player.hooks.state.tap { state ->
@@ -118,34 +118,34 @@ abstract class AssetTest(val group: String? = null) {
     }
 
     @After
-    fun afterEach() {
+    public fun afterEach() {
         Dispatchers.resetMain()
     }
 
-    fun launchMock() = launchMock(name.methodName)
+    protected fun launchMock(): Unit = launchMock(name.methodName)
 
-    fun launchMock(name: String) = launchMock(
+    protected fun launchMock(name: String): Unit = launchMock(
         mocks.find { it.name == name || it.name == "$group-$name" }
             ?: throw IllegalArgumentException("$name not found in mocks: ${mocks.map { "${it.group}/${it.name}" }}"),
     )
 
-    fun launchMock(mock: Mock<*>) = launchJson(
+    protected fun launchMock(mock: Mock<*>): Unit = launchJson(
         when (mock) {
             is ClassLoaderMock -> mock.getFlow(context.classLoader)
             else -> throw IllegalArgumentException("mock of type ${mock::class.java.simpleName} not supported")
         },
     )
 
-    fun launchJson(json: JsonElement) = launchJson(Json.encodeToString(json))
+    protected fun launchJson(json: JsonElement): Unit = launchJson(Json.encodeToString(json))
 
-    fun launchJson(json: String) = player.start(makeFlow(json)).onComplete {
+    protected fun launchJson(json: String): Unit = player.start(makeFlow(json)).onComplete {
         it.exceptionOrNull()?.printStackTrace()
     }
 
     /** Suspend until we have a [View] representation of [currentAssetTree] that is _completely_ hydrated */
-    suspend fun awaitRendered(timeout: Long = 5_000): View = consumeLatestView(timeout)
+    protected suspend fun awaitRendered(timeout: Long = 5_000): View = consumeLatestView(timeout)
 
-    fun blockUntilRendered(timeout: Long = 5_000) = runBlocking {
+    protected fun blockUntilRendered(timeout: Long = 5_000): View = runBlocking {
         awaitRendered(timeout)
     }
 

@@ -14,7 +14,7 @@ def kt_asset_test(
         test_class = test_class,
         deps = deps + [
             "//tools/mocks:jar",
-            "//plugins/reference-assets/android/src/androidTest/java/com/intuit/playerui/android/reference/assets/test",
+            "//android/testutils",
             "//jvm/j2v8:j2v8-all",
         ],
         resources = [

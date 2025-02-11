@@ -4,11 +4,11 @@ import android.widget.Button
 import android.widget.LinearLayout
 import androidx.core.view.get
 import com.intuit.playerui.android.reference.assets.R
-import com.intuit.playerui.android.reference.assets.test.AssetTest
-import com.intuit.playerui.android.reference.assets.test.shouldBeAsset
-import com.intuit.playerui.android.reference.assets.test.shouldBePlayerState
-import com.intuit.playerui.android.reference.assets.test.shouldBeView
 import com.intuit.playerui.android.reference.assets.text.Text
+import com.intuit.playerui.android.testutils.asset.AssetTest
+import com.intuit.playerui.android.testutils.asset.shouldBeAsset
+import com.intuit.playerui.android.testutils.asset.shouldBePlayerState
+import com.intuit.playerui.android.testutils.asset.shouldBeView
 import com.intuit.playerui.core.player.state.CompletedState
 import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.core.player.state.InProgressState

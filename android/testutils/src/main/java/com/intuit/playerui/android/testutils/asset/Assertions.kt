@@ -1,4 +1,4 @@
-package com.intuit.playerui.android.reference.assets.test
+package com.intuit.playerui.android.testutils.asset
 
 import android.view.View
 import com.intuit.playerui.android.asset.RenderableAsset
@@ -10,7 +10,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 @OptIn(ExperimentalContracts::class)
-inline fun <reified T : RenderableAsset> Any?.shouldBeAsset(
+public inline fun <reified T : RenderableAsset> Any?.shouldBeAsset(
     block: T.() -> Unit = {},
 ): T {
     shouldBeInstanceOf<T>(this)
@@ -19,7 +19,7 @@ inline fun <reified T : RenderableAsset> Any?.shouldBeAsset(
 }
 
 @OptIn(ExperimentalContracts::class)
-inline fun <reified T : View> Any?.shouldBeView(assertions: T.() -> Unit = {}): T {
+public inline fun <reified T : View> Any?.shouldBeView(assertions: T.() -> Unit = {}): T {
     val view = if (T::class != SuspendableAsset.AsyncViewStub::class && this is SuspendableAsset.AsyncViewStub) {
         runBlocking {
             awaitView()
@@ -33,14 +33,14 @@ inline fun <reified T : View> Any?.shouldBeView(assertions: T.() -> Unit = {}): 
 }
 
 @OptIn(ExperimentalContracts::class)
-inline fun <reified T : PlayerFlowState> PlayerFlowState?.shouldBePlayerState(assertions: T.() -> Unit = {}): T {
+public inline fun <reified T : PlayerFlowState> PlayerFlowState?.shouldBePlayerState(assertions: T.() -> Unit = {}): T {
     shouldBeInstanceOf<T>(this)
     assertions()
     return this
 }
 
 @ExperimentalContracts
-inline fun <reified T> shouldBeInstanceOf(
+public inline fun <reified T> shouldBeInstanceOf(
     `this`: Any?,
 ) {
     contract {
