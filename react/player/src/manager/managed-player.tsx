@@ -59,7 +59,7 @@ class ManagedState {
 
     /** the config to use when creating a player */
     playerConfig: ReactPlayerOptions;
-  }) {
+  }): this {
     const initialState: ManagedPlayerState = {
       value: "not_started",
       context: {
@@ -75,7 +75,7 @@ class ManagedState {
   }
 
   /** reset starts from nothing */
-  public reset() {
+  public reset(): void {
     if (this.state?.value === "error") {
       const { playerConfig, manager } = this.state.context;
       this.start({ playerConfig, manager });
@@ -85,7 +85,7 @@ class ManagedState {
   }
 
   /** restart starts from the last result */
-  public restart() {
+  public restart(): void {
     if (this.state?.value === "error") {
       const { playerConfig, manager, prevResult, reactPlayer } =
         this.state.context;
@@ -208,6 +208,18 @@ const managedPlayerStateMachines = new WeakMap<
   ManagedState
 >();
 
+function getOrCreateNewManagedState(
+  key: ManagedPlayerStateKey,
+  middleware?: ManagerMiddleware,
+): ManagedState {
+  const newManagedState =
+    managedPlayerStateMachines.get(key) ??
+    new ManagedState({ middleware: middleware });
+  managedPlayerStateMachines.set(key, newManagedState);
+
+  return newManagedState;
+}
+
 /** Creates an x-state state machine that persists when this component is no longer renders (due to Suspense) */
 export const usePersistentStateMachine = (options: {
   /** the flow manager to use */
@@ -218,16 +230,29 @@ export const usePersistentStateMachine = (options: {
 
   /** Any middleware for the manager */
   middleware?: ManagerMiddleware;
-}) => {
+}): { state: ManagedPlayerState | undefined; managedState: ManagedState } => {
   const keyRef = React.useRef<ManagedPlayerStateKey>({
     _key: Symbol("managed-player"),
   });
 
-  const managedState =
-    managedPlayerStateMachines.get(keyRef.current) ??
-    new ManagedState({ middleware: options.middleware });
-  managedPlayerStateMachines.set(keyRef.current, managedState);
+  const initialManagedState = getOrCreateNewManagedState(
+    keyRef.current,
+    options.middleware,
+  );
+
+  const managedStateRef = React.useRef(initialManagedState);
+  let managedState = managedStateRef.current;
   const [state, setState] = React.useState(managedState.state);
+
+  React.useEffect(() => {
+    if (state?.value === "completed") {
+      const newManagedState = getOrCreateNewManagedState(
+        keyRef.current,
+        options.middleware,
+      );
+      managedState = newManagedState;
+    }
+  }, [options.manager, options.playerConfig]);
 
   React.useEffect(() => {
     const unsub = managedState.addListener({
@@ -241,9 +266,9 @@ export const usePersistentStateMachine = (options: {
     }
 
     return unsub;
-  }, []);
+  }, [managedState]);
 
-  return { managedState, state };
+  return { state, managedState };
 };
 
 /**
@@ -252,7 +277,9 @@ export const usePersistentStateMachine = (options: {
  *
  * `suspense` must be enabled to wait for results in flight.
  */
-export const ManagedPlayer = (props: ManagedPlayerProps) => {
+export const ManagedPlayer = (
+  props: ManagedPlayerProps,
+): React.ReactElement | null => {
   const { withRequestTime, RequestTimeMetricsPlugin } = useRequestTime();
 
   const { state, managedState } = usePersistentStateMachine({
