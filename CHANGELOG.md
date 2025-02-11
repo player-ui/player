@@ -1,3 +1,15 @@
+# 0.10.3-next.3 (Tue Feb 11 2025)
+
+#### 🐛 Bug Fix
+
+- Expose onStart player hook for Android [#587](https://github.com/player-ui/player/pull/587) ([@mrigankmg](https://github.com/mrigankmg))
+
+#### Authors: 1
+
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+
+---
+
 # 0.10.3-next.2 (Mon Feb 10 2025)
 
 #### 🐛 Bug Fix
