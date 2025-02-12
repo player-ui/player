@@ -24,9 +24,5 @@
     "lib": ["DOM", "ES2020"],
     "isolatedDeclarations": true,
     "noUncheckedIndexedAccess": true,
-  },
-  "include": [
-    "src/**/*.ts",
-    "src/snowflake-id.d.ts"
-  ]
+  }
 }
