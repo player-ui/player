@@ -1,25 +1,33 @@
 package com.intuit.playerui.core.data
 
+import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
-import com.intuit.playerui.core.bridge.getInvokable
+import com.intuit.playerui.core.bridge.serialization.serializers.Function1Serializer
+import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
+import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableFunction
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.playerui.core.data.DataModelWithParser.Serializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
 
 // TODO: Initial support for bindings as [String]s, expand this to support all [BindingLike] types
 // TODO: Evaluate the advantages between [Map] and [JsonObject]
 /** Data model handle that provides [get] and [set] functionality w/ binding resolution */
 @Serializable(Serializer::class)
 public class DataModelWithParser internal constructor(override val node: Node) : NodeWrapper {
+    private val get: Invokable<Any?>? by NodeSerializableFunction(Function1Serializer(String.serializer(), GenericSerializer()))
+    private val set: Invokable<Unit>? by NodeSerializableFunction(Function1Serializer(ListSerializer(ListSerializer(GenericSerializer())), GenericSerializer()))
+
     /** Retrieve specific section of the data model resolved from the [binding] */
     public fun get(binding: Binding): Any? {
-        return node.getInvokable<Any?>("get")?.invoke(binding)
+        return get?.invoke(binding)
     }
 
     /** [set] each of the [Binding]s contained in the [transaction] */
     public fun set(transaction: List<List<Any?>>) {
-        node.getInvokable<Unit>("set")?.invoke(transaction)
+        set?.invoke(transaction)
     }
 
     internal object Serializer : NodeWrapperSerializer<DataModelWithParser>(::DataModelWithParser)
