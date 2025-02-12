@@ -15,11 +15,10 @@ import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 
 /** Limited definition of the player data controller to enable data modification */
-@OptIn(InternalPlayerApi::class)
 @Serializable(with = Serializer::class)
 public class DataController internal constructor(override val node: Node) : NodeWrapper {
 
-    private val set: Invokable<Any?> by NodeSerializableFunction(
+    private val set: Invokable<Unit> by NodeSerializableFunction(
         Function1Serializer(MapSerializer(String.serializer(), GenericSerializer()), GenericSerializer()),
     )
 
