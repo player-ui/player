@@ -1,10 +1,8 @@
-import type { Meta } from "@storybook/react";
 import { PlayerStory } from "@player-ui/storybook";
-import { ChatMessageWrapper } from "@player-ui/reference-assets-plugin-react";
+import { Meta } from "@storybook/react";
 
-const meta: Meta<typeof ChatMessageWrapper> = {
+const meta: Meta = {
   title: "Reference Assets/ChatMessage",
-  component: ChatMessageWrapper,
 };
 
 export default meta;
@@ -14,4 +12,3 @@ export const Basic = () => (
     flow={() => import("@player-ui/mocks/chat-message/chat-message-basic.json")}
   />
 );
-

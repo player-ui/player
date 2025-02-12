@@ -23,6 +23,18 @@ describe("chatMessage transform", () => {
       ],
     );
 
-    expect(ref.current).toMatchSnapshot();
+    expect(ref.current).toMatchObject({
+      id: expect.any(String),
+      type: "collection",
+      values: [
+        {
+          asset: {
+            id: "1",
+            type: "text",
+            value: "Hello World!",
+          },
+        },
+      ],
+    });
   });
 });
