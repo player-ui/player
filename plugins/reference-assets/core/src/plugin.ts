@@ -15,6 +15,7 @@ import {
   imageTransform,
   infoTransform,
   choiceTransform,
+  chatMessageTransform,
 } from "./assets";
 
 /**
@@ -44,6 +45,7 @@ export class ReferenceAssetsPlugin
         [{ type: "image" }, imageTransform],
         [{ type: "info" }, infoTransform],
         [{ type: "choice" }, choiceTransform],
+        [{ type: "chat-message" }, chatMessageTransform],
       ]),
     );
   }

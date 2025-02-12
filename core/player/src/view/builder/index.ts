@@ -17,6 +17,13 @@ export class Builder {
     };
   }
 
+  static assetWrapper<T extends AnyAssetType>(value: T): Node.Value {
+    const asset = Builder.asset(value);
+    const valueNode = Builder.value();
+    Builder.addChild(valueNode, "asset", asset);
+    return valueNode;
+  }
+
   /**
    * Creates a value node
    *
@@ -36,7 +43,7 @@ export class Builder {
    * @param values - the value or applicability nodes to put in the multinode
    */
   static multiNode(
-    ...values: (Node.Value | Node.Applicability)[]
+    ...values: (Node.Value | Node.Applicability | Node.Asset | Node.Async)[]
   ): Node.MultiNode {
     const m: Node.MultiNode = {
       type: NodeType.MultiNode,
@@ -50,6 +57,25 @@ export class Builder {
     });
 
     return m;
+  }
+
+  /**
+   * Creates an async node
+   *
+   * @param id - the id of async node. It should be identical for each async node
+   */
+  static asyncNode(id: string): Node.Async {
+    return {
+      id,
+      type: NodeType.Async,
+      flatten: true,
+      value: {
+        type: NodeType.Value,
+        value: {
+          id,
+        },
+      },
+    };
   }
 
   /**

@@ -115,7 +115,11 @@ export declare namespace Node {
     /** The unique id of the node */
     id: string;
     /** The value representing the node */
-    value: Node;
+    value?: Node;
+    /**
+     * Should this list be flattened in resolver
+     */
+    flatten?: boolean;
   }
 
   export interface PluginOptions {
