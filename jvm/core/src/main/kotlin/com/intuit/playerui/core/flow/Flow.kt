@@ -8,6 +8,7 @@ import kotlinx.serialization.json.JsonNull
 @Serializable
 public data class Flow(
     val id: String = UNKNOWN_ID,
+    val topic: String? = null,
     val views: List<JsonElement>? = emptyList(),
     val schema: JsonElement = JsonNull,
     val data: JsonElement = JsonNull,
