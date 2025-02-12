@@ -19,7 +19,7 @@ internal class DataControllerTest : NodeBaseTest() {
 
     @BeforeEach
     fun setUpMocks() {
-        every { node.getInvokable<Unit>("set") } returns Invokable { args ->
+        every { node.getInvokable<Unit>("set", any()) } returns Invokable { args ->
             val arg = args[0] as Map<String, Any?>
             data = data + arg.keys.map { it to arg[it] }
         }
