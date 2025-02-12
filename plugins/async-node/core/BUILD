@@ -19,7 +19,6 @@ js_pipeline(
         "//:node_modules/queue-microtask",
         "//:node_modules/tapable-ts",
         "//:node_modules/timm",
-        "//:node_modules/uuid",
-        "//:node_modules/@types/uuid",
+        "//:node_modules/snowflake-id"
     ]
 )

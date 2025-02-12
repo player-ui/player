@@ -1,5 +1,5 @@
 import { Builder } from "@player-ui/player";
-import { v4 as uuid } from "uuid";
+import SnowflakeId from "snowflake-id";
 import type { AsyncTransformFunc } from "./types";
 
 export const asyncTransform: AsyncTransformFunc = (
@@ -7,7 +7,7 @@ export const asyncTransform: AsyncTransformFunc = (
   transformedAssetType,
   wrapperAssetType,
 ) => {
-  const id = uuid();
+  const id = new SnowflakeId().generate();
 
   const assetNode = Builder.assetWrapper({
     ...asset.value,

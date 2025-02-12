@@ -10,25 +10,6 @@ import { asyncTransform } from "@player-ui/async-node-plugin";
  * input: asset
  * @param asset - Asset to apply the transform to
  * @returns - multi-node with async node placeholder
- *
- * example:
- * input:
- * {
-  "asset": {
-    "id": "some-text",
-    "type": "continuous-text"
-    "value": "Hello World!"
-  }
-}
-* output:
- chat-message-wrapper {
-  id: "chat-message-wrapper",
-  type: 
-  values:[
-      { assetNode },
-      { asyncNode }
-    ]
-  }
  */
 
 export const transform: BeforeTransformFunction<ChatMessageAsset> = (asset) => {
