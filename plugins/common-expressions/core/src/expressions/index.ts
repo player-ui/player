@@ -53,12 +53,13 @@ export const isNotEmpty: ExpressionHandler<[unknown], boolean> = (ctx, val) => {
 
 export const concat = withoutContext((...args: Array<unknown>) => {
   if (args.every((v) => Array.isArray(v))) {
-    const arrayArgs = args as Array<Array<unknown>>;
+    const merged: Array<unknown> = [];
 
-    return arrayArgs.reduce((merged, next) => {
+    args.forEach((next) => {
       merged.push(...next);
-      return merged;
     });
+
+    return merged;
   }
 
   return args.reduce((merged: any, next) => merged + (next ?? ""), "");
