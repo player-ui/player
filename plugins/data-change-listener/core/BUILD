@@ -17,7 +17,7 @@ js_pipeline(
         ":node_modules/@player-ui/asset-transform-plugin",
         ":node_modules/@player-ui/common-types-plugin",
         ":node_modules/@player-ui/partial-match-registry",
-        ":node_modules/@player-ui/reference-assets-plugin-react",
+        ":node_modules/@player-ui/reference-assets-plugin",
         ":node_modules/@player-ui/common-expressions-plugin",
         "//:node_modules/@testing-library/react",
         "//:vitest_config",

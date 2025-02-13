@@ -9,7 +9,7 @@
     "@player-ui/partial-match-registry": "workspace:*",
     "@player-ui/asset-transform-plugin": "workspace:*",
     "@player-ui/common-types-plugin": "workspace:*",
-    "@player-ui/reference-assets-plugin-react": "workspace:*",
+    "@player-ui/reference-assets-plugin": "workspace:*",
     "@player-ui/common-expressions-plugin": "workspace:*"
   }
 }

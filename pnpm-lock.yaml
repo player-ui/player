@@ -823,9 +823,9 @@ importers:
       '@player-ui/partial-match-registry':
         specifier: workspace:*
         version: link:../../../core/partial-match-registry
-      '@player-ui/reference-assets-plugin-react':
+      '@player-ui/reference-assets-plugin':
         specifier: workspace:*
-        version: link:../../reference-assets/react
+        version: link:../../reference-assets/core
 
   plugins/data-filter/core:
     dependencies:

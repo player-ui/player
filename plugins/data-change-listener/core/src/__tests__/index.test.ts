@@ -10,7 +10,7 @@ import { CommonTypesPlugin } from "@player-ui/common-types-plugin";
 import { AssetTransformPlugin } from "@player-ui/asset-transform-plugin";
 import { Registry } from "@player-ui/partial-match-registry";
 import { DataChangeListenerPlugin } from "../index";
-import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin-react";
+import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin";
 import { CommonExpressionsPlugin } from "@player-ui/common-expressions-plugin";
 
 /** Test transform function to add validation to asset */
@@ -569,7 +569,7 @@ describe("Data-Change-Listener with array modification", () => {
     return player.getState() as InProgressState;
   }
 
-  it("should call expression evaluator when an array that is tracked changes", () => {
+  it("should call expression evaluator and data change listener when an array that is tracked changes", () => {
     player = new Player({
       plugins: [
         new CommonTypesPlugin(),
@@ -610,7 +610,7 @@ describe("Data-Change-Listener with array modification", () => {
     expect(testExpression).toHaveBeenCalledWith("array has changed 1,2,3,4");
   });
 
-  it("should call expression evaluator when count is tracked changes", () => {
+  it("should call expression evaluator and data change listener when count is changes", () => {
     player = new Player({
       plugins: [
         new CommonTypesPlugin(),
