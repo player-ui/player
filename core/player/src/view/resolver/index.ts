@@ -12,7 +12,11 @@ import { DependencyModel, withParser } from "../../data";
 import type { Logger } from "../../logger";
 import type { Node } from "../parser";
 import { NodeType } from "../parser";
-import { caresAboutDataChanges, toNodeResolveOptions } from "./utils";
+import {
+  caresAboutDataChanges,
+  toNodeResolveOptions,
+  unpackAndPush,
+} from "./utils";
 import type { Resolve } from "./types";
 import { getNodeID } from "../parser/utils";
 
@@ -152,6 +156,7 @@ export class Resolver {
     const prevASTMap = new Map(this.ASTMap);
     this.ASTMap.clear();
 
+    // when streaming new content, the resolved content is computed again
     const updated = this.computeTree(
       this.root,
       undefined,
@@ -163,7 +168,7 @@ export class Resolver {
     );
     this.resolveCache = resolveCache;
     this.hooks.afterUpdate.call(updated.value);
-
+    console.log("updated", updated);
     return updated.value;
   }
 
@@ -406,9 +411,21 @@ export class Resolver {
           resolvedAST,
           prevASTMap,
         );
-
+        // resolvedAST values is multinode mvalue is asset and async node
+        debugger;
         if (mTree.value !== undefined && mTree.value !== null) {
-          childValue.push(mTree.value);
+          if (
+            mValue.parent?.type === NodeType.MultiNode &&
+            mValue.parent?.values.filter((v) => v.type === "async" && v.flatten)
+              .length > 0 &&
+            Array.isArray(mTree.value)
+          ) {
+            mTree.value.forEach((v: any) => {
+              unpackAndPush(v, childValue);
+            });
+          } else {
+            childValue.push(mTree.value);
+          }
         }
 
         mTree.dependencies.forEach((bindingDep) =>

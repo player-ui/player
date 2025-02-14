@@ -35,9 +35,15 @@ describe("multiNode", () => {
 });
 
 test("async node", () => {
-  const result = Builder.asyncNode("1");
+  const result = Builder.asyncNode("1", false);
   expect(result.type).toBe(NodeType.Async);
   expect(result.id).toBe("1");
+  expect(result.flatten).toBe(false);
+
+  const result2 = Builder.asyncNode("2");
+  expect(result2.type).toBe(NodeType.Async);
+  expect(result2.id).toBe("2");
+  expect(result2.flatten).toBe(true);
 });
 
 test("asset wrapper", () => {

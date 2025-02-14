@@ -6,8 +6,8 @@
       "@player-ui/player": "workspace:*",
       "@player-ui/react": "workspace:*"
     },
-    "dependencies": {
-      "snowflake-id": "^1.0.0"
+    "devDependencies": {
+      "@player-ui/reference-assets-plugin": "workspace:*"
     }
   }
   

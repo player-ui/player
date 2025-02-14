@@ -474,9 +474,6 @@ importers:
       signale:
         specifier: ^1.4.0
         version: 1.4.0
-      snowflake-id:
-        specifier: ^1.0.0
-        version: 1.1.0
       sorted-array:
         specifier: ^2.0.4
         version: 2.0.4
@@ -667,9 +664,10 @@ importers:
       '@player-ui/react':
         specifier: workspace:*
         version: link:../../../react/player
-      snowflake-id:
-        specifier: ^1.0.0
-        version: 1.1.0
+    devDependencies:
+      '@player-ui/reference-assets-plugin':
+        specifier: workspace:*
+        version: link:../../reference-assets/core
 
   plugins/auto-scroll/react:
     dependencies:
@@ -949,6 +947,9 @@ importers:
       '@player-ui/player':
         specifier: workspace:*
         version: link:../../../core/player
+      snowflake-id:
+        specifier: 1.1.0
+        version: 1.1.0
     devDependencies:
       '@player-ui/asset-testing-library':
         specifier: workspace:*
