@@ -2,12 +2,10 @@ package com.intuit.playerui.android.reference.assets.text
 
 import android.widget.TextView
 import androidx.core.view.get
-import com.intuit.playerui.android.reference.assets.R
-import com.intuit.playerui.android.testutils.asset.AssetTest
-import com.intuit.playerui.android.testutils.asset.shouldBeView
 import com.intuit.playerui.android.reference.assets.collection.Collection
-import com.intuit.playerui.android.reference.assets.test.shouldBeAsset
-import com.intuit.playerui.android.reference.assets.test.shouldBeView
+import com.intuit.playerui.android.testutils.asset.AssetTest
+import com.intuit.playerui.android.testutils.asset.shouldBeAsset
+import com.intuit.playerui.android.testutils.asset.shouldBeView
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test

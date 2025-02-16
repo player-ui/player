@@ -361,7 +361,7 @@ To build your assets using Jetpack Compose, you can extend `ComposableAsset`. `C
 
 ```kotlin
  @Composable
-override fun content(data: Data) {
+override fun content(data: Data, modifier: Modifier) {
     Text(
         text = data.value,
         Modifier.testTag("text-composable"),

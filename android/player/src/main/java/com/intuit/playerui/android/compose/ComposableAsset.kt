@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.viewinterop.AndroidView
 import com.intuit.playerui.android.AssetContext
@@ -78,9 +79,9 @@ fun RenderableAsset.compose(
     styles: AssetStyle? = null,
     tag: String? = null,
 ) {
-    assetContext.withTag(tag ?: asset.id).build().run {
+    assetContext.withContext(LocalContext.current).withTag(tag ?: asset.id).build().run {
         when (this) {
-            is ComposableAsset<*> -> CompositionLocalProvider(LocalTextStyle provides (styles?.textStyle ?: TextStyle())) { compose() }
+            is ComposableAsset<*> -> CompositionLocalProvider(LocalTextStyle provides (styles?.textStyle ?: TextStyle())) { compose(modifier = modifier) }
             else -> composeAndroidView(modifier, styles?.xmlStyles)
         }
     }
@@ -92,8 +93,6 @@ private fun RenderableAsset.composeAndroidView(
     styles: Styles? = null,
 ) {
     AndroidView(factory = ::FrameLayout, modifier) {
-        assetContext.withContext(it.context).build().run {
-            render(styles)
-        } into it
+        render(styles) into it
     }
 }

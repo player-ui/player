@@ -1,18 +1,11 @@
 package com.intuit.playerui.android.reference.assets.action
 
-import android.widget.Button
 import androidx.core.view.get
-import com.intuit.playerui.android.reference.assets.R
 import com.intuit.playerui.android.reference.assets.collection.Collection
-import com.intuit.playerui.android.reference.assets.test.AssetTest
-import com.intuit.playerui.android.reference.assets.test.shouldBeAsset
-import com.intuit.playerui.android.reference.assets.test.shouldBePlayerState
-import com.intuit.playerui.android.reference.assets.test.shouldBeView
 import com.intuit.playerui.android.reference.assets.text.Text
 import com.intuit.playerui.android.testutils.asset.AssetTest
 import com.intuit.playerui.android.testutils.asset.shouldBeAsset
 import com.intuit.playerui.android.testutils.asset.shouldBePlayerState
-import com.intuit.playerui.android.testutils.asset.shouldBeView
 import com.intuit.playerui.core.player.state.CompletedState
 import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.core.player.state.InProgressState
@@ -25,23 +18,16 @@ class ActionTest : AssetTest("action") {
     @Test
     fun actionExpression() {
         launchMock("action-basic")
-
-        currentAssetTree.shouldBeAsset<Action> {
-            data.label.shouldBeAsset<Text> {
-                assertEquals("Count: 0", data.value)
+        runTest {
+            currentAssetTree.shouldBeAsset<Action> {
+                val actionData = getData()
+                repeat(10) {
+                    currentState.shouldBePlayerState<InProgressState> {
+                        assertEquals(it, dataModel.get("count"))
+                    }
+                    actionData.run()
+                }
             }
-        }
-
-        currentView.shouldBeView<Button> {
-            repeat(10) {
-                assertEquals("Count: $it", text.toString())
-                performClick()
-                blockUntilRendered()
-            }
-        }
-
-        currentState.shouldBePlayerState<InProgressState> {
-            assertEquals(10, dataModel.get("count"))
         }
     }
 
