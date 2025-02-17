@@ -10,6 +10,7 @@ import com.intuit.playerui.core.player.state.CompletedState
 import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.player.state.dataModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -45,9 +46,10 @@ class ActionTest : AssetTest("action") {
                     data.run()
                 }
             }
+            delay(2000)
         }
 
-        currentState.shouldBePlayerState<CompletedState> {
+        player.state.shouldBePlayerState<CompletedState> {
             assertEquals("done", endState.outcome)
         }
     }
@@ -69,7 +71,7 @@ class ActionTest : AssetTest("action") {
             }
         }
 
-        currentState.shouldBePlayerState<ErrorState> {
+        player.state.shouldBePlayerState<ErrorState> {
             assertEquals("Error: Unclosed brace after \"foo.bar..}\" at character 12", error.message)
         }
     }

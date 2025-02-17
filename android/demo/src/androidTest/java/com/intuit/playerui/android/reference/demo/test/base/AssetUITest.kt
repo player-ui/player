@@ -25,6 +25,7 @@ abstract class AssetUITest(val group: String? = null) {
     protected lateinit var viewModel: MainViewModel
 
     protected lateinit var playerViewModel: DemoPlayerViewModel
+    protected val player get() = playerViewModel.player
 
     protected val currentState: PlayerFlowState? get() = playerViewModel.playerFlowState.value
 

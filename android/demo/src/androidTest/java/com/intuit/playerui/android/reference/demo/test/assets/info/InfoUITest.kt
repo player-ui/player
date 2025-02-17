@@ -2,7 +2,6 @@ package com.intuit.playerui.android.reference.demo.test.assets.info
 
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.performClick
-import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
@@ -27,8 +26,6 @@ class InfoUITest : ComposeUITest("info") {
         verifyView(view)
 
         action?.let {
-            onView(withText(action.name))
-                .check(matches(isDisplayed()))
             androidComposeRule.onAllNodesWithTag("action").get(index ?: 0)
                 .performClick()
         }

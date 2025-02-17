@@ -9,6 +9,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.intuit.playerui.android.reference.demo.test.base.ComposeUITest
 import com.intuit.playerui.android.reference.demo.test.base.shouldBePlayerState
 import com.intuit.playerui.android.reference.demo.test.base.waitForViewInRoot
+import com.intuit.playerui.core.player.state.CompletedState
 import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.player.state.dataModel
@@ -45,6 +46,9 @@ class ActionUITest : ComposeUITest("action") {
             .check(matches(isDisplayed()))
         androidComposeRule.onAllNodesWithTag("action").get(0)
             .performClick()
+        player.state.shouldBePlayerState<CompletedState> {
+            assertEquals("done", endState.outcome)
+        }
     }
 
     @Test
@@ -56,7 +60,7 @@ class ActionUITest : ComposeUITest("action") {
             androidComposeRule.onAllNodesWithTag("action").get(1)
                 .performClick()
             delay(2000)
-            currentState.shouldBePlayerState<ErrorState> {
+            player.state.shouldBePlayerState<ErrorState> {
                 assertEquals("Error: Unclosed brace after \"foo.bar..}\" at character 12", error.message)
             }
         }
