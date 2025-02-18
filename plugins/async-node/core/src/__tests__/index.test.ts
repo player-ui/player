@@ -836,6 +836,7 @@ describe("view", () => {
 
     view = (player.getState() as InProgressState).controllers.view.currentView
       ?.lastUpdate;
+    console.log(view?.values[1])
 
     expect(view?.values[1].asset.type).toBe("text");
     expect(view?.values[1].asset.value).toBe("async content");
