@@ -7,9 +7,7 @@ export const asyncTransform: AsyncTransformFunc = (
   wrapperAssetType,
   flatten,
 ) => {
-  const timeStamp = new Date().valueOf();
-  // const id = timeStamp;
-  const id = asset.value.id;
+  const id = "async-" + asset.value.id;
 
   const assetNode = Builder.assetWrapper({
     ...asset.value,
@@ -20,7 +18,7 @@ export const asyncTransform: AsyncTransformFunc = (
   const multiNode = Builder.multiNode(assetNode, asyncNode);
 
   const wrapperAsset = Builder.asset({
-    id: wrapperAssetType + "-" + timeStamp,
+    id: wrapperAssetType + "-" + id,
     type: wrapperAssetType,
   });
 

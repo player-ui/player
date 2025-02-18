@@ -358,6 +358,7 @@ export class Resolver {
     dependencyModel.trackSubset("children");
 
     if ("children" in resolvedAST) {
+      debugger;
       const newChildren = resolvedAST.children?.map((child) => {
         const computedChildTree = this.computeTree(
           child.value,
@@ -376,7 +377,6 @@ export class Resolver {
         } = computedChildTree;
 
         childTreeDeps.forEach((binding) => childDependencies.add(binding));
-
         if (childValue) {
           if (childNode.type === NodeType.MultiNode && !childNode.override) {
             const arr = addLast(
@@ -411,18 +411,32 @@ export class Resolver {
           resolvedAST,
           prevASTMap,
         );
-        // resolvedAST values is multinode mvalue is asset and async node
+        // resolvedAST is multinode of collection1
+        // mValue is async-1
+        // cacheUpdate has entry of key: async-1 value: collection-2
+        // if check mValue flatten is true or parent multinode flatten is true
+        //
+
+        // if (mValue.type === "async" && mValue.flatten === true) {
+        //   childValue.push(mTree.value.values);
+        // }
+
         debugger;
         if (mTree.value !== undefined && mTree.value !== null) {
           if (
             mValue.parent?.type === NodeType.MultiNode &&
-            mValue.parent?.values.filter((v) => v.type === "async" && v.flatten)
-              .length > 0 &&
-            Array.isArray(mTree.value)
+            mValue.parent?.flatten && Array.isArray(mTree.value)
           ) {
-            mTree.value.forEach((v: any) => {
-              unpackAndPush(v, childValue);
-            });
+            if (Array.isArray(mTree.value)) {
+              mTree.value.forEach((v: any) => {
+                unpackAndPush(v, childValue);
+              });
+            }
+          } else if (mValue.parent?.type === NodeType.MultiNode &&
+              mValue.parent?.flatten && Array.isArray(mTree.value.asset.values)){
+              mTree.value.asset.values.forEach((v: any) => {
+                unpackAndPush(v, childValue);
+              });
           } else {
             childValue.push(mTree.value);
           }
