@@ -48,7 +48,6 @@ export class Builder {
     const m: Node.MultiNode = {
       type: NodeType.MultiNode,
       override: true,
-      flatten: true,
       values,
     };
 

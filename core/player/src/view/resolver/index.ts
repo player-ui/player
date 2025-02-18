@@ -414,8 +414,8 @@ export class Resolver {
 
         if (mTree.value !== undefined && mTree.value !== null) {
           if (
-            mValue.parent?.type === NodeType.MultiNode &&
-            mValue.parent?.flatten &&
+            mValue.type === NodeType.Async &&
+            mValue.flatten &&
             Array.isArray(mTree.value)
           ) {
             if (Array.isArray(mTree.value)) {
@@ -424,8 +424,8 @@ export class Resolver {
               });
             }
           } else if (
-            mValue.parent?.type === NodeType.MultiNode &&
-            mValue.parent?.flatten &&
+            mValue.type === NodeType.Async &&
+            mValue.flatten &&
             Array.isArray(mTree.value.asset.values)
           ) {
             mTree.value.asset.values.forEach((v: any) => {

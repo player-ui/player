@@ -94,8 +94,6 @@ export declare namespace Node {
 
     /** A list of values that comprise this node */
     values: Array<Node>;
-
-    flatten?: boolean;
   }
 
   export interface Switch extends Base<NodeType.Switch> {
