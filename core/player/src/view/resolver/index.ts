@@ -156,7 +156,6 @@ export class Resolver {
     const prevASTMap = new Map(this.ASTMap);
     this.ASTMap.clear();
 
-    // when streaming new content, the resolved content is computed again
     const updated = this.computeTree(
       this.root,
       undefined,
@@ -168,7 +167,6 @@ export class Resolver {
     );
     this.resolveCache = resolveCache;
     this.hooks.afterUpdate.call(updated.value);
-    console.log("updated", updated);
     return updated.value;
   }
 
