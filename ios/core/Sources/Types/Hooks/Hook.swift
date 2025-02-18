@@ -223,17 +223,16 @@ public class AsyncHook2<T, U>: BaseJSHook where T: CreatedFromJSValue, U: Create
 
 /**
  This class represents an object in the JS runtime that can be tapped into
- to receive JS events that has first parameter T and second parameter String and returns some value R
+ to receive JS events that has first parameter T and second generatic parameter U (that can be convert from JSValue using toObject) and returns some value R
  */
-public class SyncWaterfallHook2SecondStringJS<T, R>: BaseJSHook where T: CreatedFromJSValue, R: CreatedFromJSValue {
+public class SyncWaterfallHook2JS<T, R, U>: BaseJSHook where T: CreatedFromJSValue, R: CreatedFromJSValue {
 
-    public func tap(_ hook: @escaping (T, String) -> R) {
+    public func tap(_ hook: @escaping (T, U) -> R) {
         let tapMethod: @convention(block) (JSValue?, JSValue?) -> JSValue? = { value, value2 in
             guard let val = value,
                   let val2 = value2,
                   let hookValue = T.createInstance(value: val) as? T,
-                  let hookValue2 = val2.toString() else {
-                print("Failed to create instances from values.")
+                  let hookValue2 = val2.toObject() as? U else {
                 return nil
             }
 
@@ -259,7 +258,6 @@ public class SyncWaterfallHookJS<T, R>: BaseJSHook where T: CreatedFromJSValue, 
             guard let val = value,
                   let hookValue = T.createInstance(value: val) as? T
             else {
-                print("Failed to create instances from values.")
                 return nil
             }
 
