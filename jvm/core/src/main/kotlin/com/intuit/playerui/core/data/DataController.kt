@@ -14,7 +14,7 @@ import kotlinx.serialization.Serializable
 public class DataController internal constructor(override val node: Node) : NodeWrapper {
 
     private val set: Invokable<Unit>? by NodeSerializableFunction()
-    // private val get: Invokable<Any?>? by NodeSerializableFunction(Function1Serializer(String.serializer(), GenericSerializer()))
+    private val get: Invokable<Any?>? by NodeSerializableFunction()
 
     /** Apply [data] to the underlying data model */
     public fun set(data: Map<String, Any?>) {
@@ -27,7 +27,7 @@ public class DataController internal constructor(override val node: Node) : Node
         node.getInvokable<Unit>("set")?.invoke(transaction)
     }
 
-    public fun get(binding: Binding): Any? = node.getInvokable<Any?>("get")?.invoke(binding)
+    public fun get(binding: Binding): Any? = get?.invoke(binding)
 
     internal object Serializer : NodeWrapperSerializer<DataController>(::DataController)
 }
