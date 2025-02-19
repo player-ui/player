@@ -17,7 +17,7 @@ public class FlowController internal constructor(override val node: Node) : Node
     private val transition: Invokable<Unit>? by NodeSerializableFunction()
 
     override fun transition(state: String, options: TransitionOptions?) {
-        node.getInvokable<Unit>("transition")?.invoke(state, options)
+        transition?.invoke(state, options)
     }
 
     public val hooks: Hooks by NodeSerializableField(Hooks.serializer())
