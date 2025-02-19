@@ -12,6 +12,7 @@ import type { DataController } from "../data/controller";
 import { AssetTransformCorePlugin } from "./asset-transform";
 import type { TransformRegistry } from "./types";
 import type { BindingInstance } from "../../binding";
+import { FlagController } from "../flags";
 
 export interface ViewControllerOptions {
   /** Where to get data from */
@@ -22,11 +23,22 @@ export interface ViewControllerOptions {
 
   /** A flow-controller instance to listen for view changes */
   flowController: FlowController;
+
+  /** A FlagController instance to  */
+  flagController: FlagController;
 }
 
 /** A controller to manage updating/switching views */
 export class ViewController {
-  public readonly hooks = {
+  public readonly hooks: {
+    /** Do any processing before the `View` instance is created */
+    resolveView: SyncWaterfallHook<
+      [View | undefined, string, NavigationFlowViewState],
+      Record<string, any>
+    >;
+    // The hook right before the View starts resolving. Attach anything custom here
+    view: SyncHook<[ViewInstance], Record<string, any>>;
+  } = {
     /** Do any processing before the `View` instance is created */
     resolveView: new SyncWaterfallHook<
       [View | undefined, string, NavigationFlowViewState]
@@ -156,7 +168,7 @@ export class ViewController {
     }
   }
 
-  public onView(state: NavigationFlowViewState) {
+  public onView(state: NavigationFlowViewState): void {
     const viewId = state.ref;
 
     const source = this.hooks.resolveView.call(
