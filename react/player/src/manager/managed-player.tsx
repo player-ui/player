@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import type {
   FlowManager,
   ManagedPlayerProps,
   ManagedPlayerState,
   ManagerMiddleware,
   ManagedPlayerContext,
+  MiddlewareMethod,
 } from "./types";
 import { useRequestTime } from "./request-time";
 import type { ReactPlayerOptions } from "../player";
@@ -59,7 +60,7 @@ class ManagedState {
 
     /** the config to use when creating a player */
     playerConfig: ReactPlayerOptions;
-  }) {
+  }): this {
     const initialState: ManagedPlayerState = {
       value: "not_started",
       context: {
@@ -74,8 +75,27 @@ class ManagedState {
     return this;
   }
 
+  public sync(options: {
+    /** middleware to use in the managed player */
+    middleware?: ManagerMiddleware;
+
+    /** the config to use when creating a player */
+    playerConfig?: ReactPlayerOptions;
+  }): void {
+    if (options.middleware) {
+      this.middleware = options.middleware;
+    }
+
+    if (options.playerConfig) {
+      if (this?.state?.context) {
+        this.state.context.playerConfig = options.playerConfig;
+        this.state.context.reactPlayer = new ReactPlayer(options.playerConfig);
+      }
+    }
+  }
+
   /** reset starts from nothing */
-  public reset() {
+  public reset(): void {
     if (this.state?.value === "error") {
       const { playerConfig, manager } = this.state.context;
       this.start({ playerConfig, manager });
@@ -85,7 +105,7 @@ class ManagedState {
   }
 
   /** restart starts from the last result */
-  public restart() {
+  public restart(): void {
     if (this.state?.value === "error") {
       const { playerConfig, manager, prevResult, reactPlayer } =
         this.state.context;
@@ -218,7 +238,7 @@ export const usePersistentStateMachine = (options: {
 
   /** Any middleware for the manager */
   middleware?: ManagerMiddleware;
-}) => {
+}): { managedState: ManagedState; state?: ManagedPlayerState } => {
   const keyRef = React.useRef<ManagedPlayerStateKey>({
     _key: Symbol("managed-player"),
   });
@@ -246,23 +266,78 @@ export const usePersistentStateMachine = (options: {
   return { managedState, state };
 };
 
+function composeMiddleware<T>(...functions: MiddlewareMethod<T>[]) {
+  if (functions.length === 1) {
+    return functions[0];
+  }
+
+  const [fn, ...fns] = functions;
+
+  return fns.reduceRight(
+    (a, b) => (input) => {
+      return a(b(input));
+    },
+    fn as MiddlewareMethod<T>,
+  );
+}
+
+function usePrevious<T>(value: T): T | undefined {
+  const ref = useRef<T>();
+
+  useEffect(() => {
+    ref.current = value;
+  });
+
+  return ref.current;
+}
+
 /**
  * A ManagedPlayer is a component responsible for orchestrating multi-flow experiences using Player.
  * Provide a valid `FlowManager` to handle fetching the next flow.
  *
  * `suspense` must be enabled to wait for results in flight.
  */
-export const ManagedPlayer = (props: ManagedPlayerProps) => {
+export const ManagedPlayer = (
+  props: ManagedPlayerProps,
+): React.JSX.Element | null => {
   const { withRequestTime, RequestTimeMetricsPlugin } = useRequestTime();
+  const previousMiddleware = usePrevious(props.middleware);
+  const previousPlugins = usePrevious(props.plugins);
 
   const { state, managedState } = usePersistentStateMachine({
     manager: props.manager,
-    middleware: { next: withRequestTime },
+    middleware: {
+      next: composeMiddleware(
+        ...(props?.middleware ?? []),
+        withRequestTime,
+      ) as any,
+    },
     playerConfig: {
       plugins: [...(props?.plugins ?? []), RequestTimeMetricsPlugin],
       player: props.player,
     },
   });
+
+  if (state && state.value !== "running") {
+    if (previousMiddleware !== props.middleware) {
+      managedState.sync({
+        middleware: {
+          next: composeMiddleware(
+            ...(props?.middleware ?? []),
+            withRequestTime,
+          ) as any,
+        },
+      });
+    }
+
+    if (previousPlugins !== props.plugins) {
+      managedState.sync({
+        playerConfig: {
+          plugins: [...(props?.plugins ?? []), RequestTimeMetricsPlugin],
+        },
+      });
+    }
+  }
 
   React.useEffect(() => {
     if (state?.value === "ended") {
