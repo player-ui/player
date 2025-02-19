@@ -8,7 +8,6 @@ import com.intuit.playerui.core.bridge.hooks.NodeSyncHook1
 import com.intuit.playerui.core.bridge.hooks.NodeSyncHook2
 import com.intuit.playerui.core.bridge.hooks.NodeSyncWaterfallHook1
 import com.intuit.playerui.core.bridge.hooks.NodeSyncWaterfallHook2
-import com.intuit.playerui.core.bridge.serialization.serializers.Function2Serializer
 import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableFunction

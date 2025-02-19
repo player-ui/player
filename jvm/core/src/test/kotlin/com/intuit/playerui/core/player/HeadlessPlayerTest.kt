@@ -482,7 +482,7 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         constantsController.addConstants(data = data, namespace = "constants")
 
         val firstname = constantsController.getConstants(key = "firstname", namespace = "constants")
-        assertEquals("johnn", firstname)
+        assertEquals("john", firstname)
 
         val middleName = constantsController.getConstants(key = "middlename", namespace = "constants")
         assertNull(middleName)

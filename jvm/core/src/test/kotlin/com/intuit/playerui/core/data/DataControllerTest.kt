@@ -6,7 +6,6 @@ import com.intuit.playerui.core.bridge.getInvokable
 import com.intuit.playerui.core.bridge.serialization.format.RuntimeFormat
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import kotlinx.serialization.modules.EmptySerializersModule
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
