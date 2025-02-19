@@ -28,7 +28,7 @@ public class FlowInstance(override val node: Node) : NodeWrapper, Transition {
 
     public val currentState: NamedState? by NodeSerializableField(NamedState.serializer().nullable)
 
-    private val transition: Invokable<Unit>? by NodeSerializableFunction(Function2Serializer(String.serializer(), TransitionOptions.serializer(), GenericSerializer()))
+    private val transition: Invokable<Unit>? by NodeSerializableFunction()
 
     override fun transition(state: String, options: TransitionOptions?) {
         transition?.invoke(state, options)

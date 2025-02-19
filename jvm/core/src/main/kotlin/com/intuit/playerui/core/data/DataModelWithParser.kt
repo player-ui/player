@@ -17,8 +17,8 @@ import kotlinx.serialization.builtins.serializer
 /** Data model handle that provides [get] and [set] functionality w/ binding resolution */
 @Serializable(Serializer::class)
 public class DataModelWithParser internal constructor(override val node: Node) : NodeWrapper {
-    private val get: Invokable<Any?>? by NodeSerializableFunction(Function1Serializer(String.serializer(), GenericSerializer()))
-    private val set: Invokable<Unit>? by NodeSerializableFunction(Function1Serializer(ListSerializer(ListSerializer(GenericSerializer())), GenericSerializer()))
+    private val get: Invokable<Any?>? by NodeSerializableFunction()
+    private val set: Invokable<Unit>? by NodeSerializableFunction()
 
     /** Retrieve specific section of the data model resolved from the [binding] */
     public fun get(binding: Binding): Any? {

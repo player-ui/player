@@ -17,9 +17,7 @@ import kotlinx.serialization.builtins.serializer
 @Serializable(with = Serializer::class)
 public class DataController internal constructor(override val node: Node) : NodeWrapper {
 
-    private val set: Invokable<Unit>? by NodeSerializableFunction(
-        Function1Serializer(MapSerializer(String.serializer(), GenericSerializer()), GenericSerializer()),
-    )
+    private val set: Invokable<Unit>? by NodeSerializableFunction()
     // private val get: Invokable<Any?>? by NodeSerializableFunction(Function1Serializer(String.serializer(), GenericSerializer()))
 
     /** Apply [data] to the underlying data model */
