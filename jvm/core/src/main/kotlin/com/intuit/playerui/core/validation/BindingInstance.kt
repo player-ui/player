@@ -1,8 +1,9 @@
 package com.intuit.playerui.core.validation
 
+import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
-import com.intuit.playerui.core.bridge.getInvokable
+import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableFunction
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.playerui.core.validation.BindingInstance.Serializer
 import kotlinx.serialization.Serializable
@@ -10,9 +11,12 @@ import kotlinx.serialization.Serializable
 @Serializable(with = Serializer::class)
 public class BindingInstance(override val node: Node) : NodeWrapper {
 
-    public fun asString(): String = node.getInvokable<String>("asString")!!()
+    private val asString: Invokable<String> by NodeSerializableFunction()
+    private val parent: Invokable<BindingInstance>? by NodeSerializableFunction()
 
-    public fun parent(): BindingInstance? = node.getInvokable<BindingInstance>("parent")?.invoke()
+    public fun asString(): String = asString.invoke()
+
+    public fun parent(): BindingInstance? = parent?.invoke()
 
     override fun toString(): String = asString()
 
