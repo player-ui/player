@@ -35,7 +35,6 @@ class ReferenceAssetsPlugin : AndroidPlayerPlugin, JSPluginWrapper by Transforms
         androidPlayer.registerAsset("collection", ::Collection)
         androidPlayer.registerAsset("info", ::Info)
         androidPlayer.registerAsset("input", ::Input)
-        println("inside ref")
         /** The asset firing the async-node transform */
         androidPlayer.registerAsset("chat-message", ::ChatMessageAsset)
     }

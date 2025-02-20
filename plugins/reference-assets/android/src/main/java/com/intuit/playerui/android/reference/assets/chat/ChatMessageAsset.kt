@@ -20,7 +20,6 @@ public open class ChatMessageAsset(assetContext: AssetContext) : SuspendableAsse
     private var currentView: LinearLayout? = null
 
     override suspend fun initView(data: Data): LinearLayout {
-        println("ChatMessageAsset: initView called with data: $data")
         return LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             addView(TextView(context).apply {
@@ -33,7 +32,6 @@ public open class ChatMessageAsset(assetContext: AssetContext) : SuspendableAsse
     }
 
     override suspend fun View.hydrate(data: Data) {
-        println("ChatMessageAsset: hydrate called with data: $data")
         if (this is LinearLayout) {
             data.followUp?.let { followUpAssets ->
                 followUpAssets.forEach { asset ->
