@@ -5,6 +5,7 @@ main_deps = [
     "@maven//:org_robolectric_robolectric",
     "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_test",
     "//tools/mocks:jar",
+    "//jvm:kotlin_serialization",
     "@rules_robolectric//bazel:android-all",
     "//jvm/utils",
     "//plugins/common-types/jvm:common-types",

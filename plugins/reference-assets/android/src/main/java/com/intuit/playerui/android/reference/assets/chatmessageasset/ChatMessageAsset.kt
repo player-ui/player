@@ -7,10 +7,8 @@ import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.reference.assets.R
 import kotlinx.serialization.Serializable
 
-//public interface AsyncUpdatable {
-//    public suspend fun updateAsyncContent(newData: List<ChatMessageAsset.Data>)
-//}
-
+/** Asset that renders a chat message with optional follow up assets
+ * This asset is just a placeholder for the real implementation **/
 public open class ChatMessageAsset(assetContext: AssetContext) : SuspendableAsset<ChatMessageAsset.Data>(assetContext, Data.serializer()) {
 
     @Serializable
@@ -45,10 +43,4 @@ public open class ChatMessageAsset(assetContext: AssetContext) : SuspendableAsse
         }
     }
 
-//    override suspend fun updateAsyncContent(newData: List<Data>) {
-//        val view = currentView ?: return
-//        newData.forEach { data ->
-//            view.hydrate(data)
-//        }
-//    }
 }
