@@ -117,7 +117,7 @@ export declare namespace Node {
     /** The value representing the node */
     value: Node;
     /**
-     * Should this list be flattened in resolver
+     * Should the content streamed in be flattened during resolving
      */
     flatten?: boolean;
   }

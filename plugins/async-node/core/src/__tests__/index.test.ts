@@ -593,8 +593,10 @@ describe("view", () => {
 
     let updateNumber = 0;
 
+    const plugins = [plugin, new ReferenceAssetsPlugin()];
+
     const player = new Player({
-      plugins: [plugin, new ReferenceAssetsPlugin()],
+      plugins: plugins,
     });
 
     player.hooks.viewController.tap("async-node-test", (vc) => {
@@ -611,7 +613,7 @@ describe("view", () => {
       .currentView?.lastUpdate;
 
     expect(view).toBeDefined();
-    expect(view?.values.length).toBe(1);
+    expect(view?.values[0].asset.type).toBe("text");
     expect(updateNumber).toBe(1);
 
     await waitFor(() => {
@@ -644,7 +646,6 @@ describe("view", () => {
     view = (player.getState() as InProgressState).controllers.view.currentView
       ?.lastUpdate;
 
-    expect(view?.values[0].asset.type).toBe("text");
     expect(view?.values[1].asset.type).toBe("text");
     expect(view?.values[2].asset.type).toBe("text");
   });
@@ -664,8 +665,10 @@ describe("view", () => {
 
     let updateNumber = 0;
 
+    const plugins = [plugin, new ReferenceAssetsPlugin()];
+
     const player = new Player({
-      plugins: [plugin, new ReferenceAssetsPlugin()],
+      plugins: plugins,
     });
 
     player.hooks.viewController.tap("async-node-test", (vc) => {
@@ -682,7 +685,8 @@ describe("view", () => {
       .currentView?.lastUpdate;
 
     expect(view).toBeDefined();
-    expect(view?.values.length).toBe(1);
+    expect(view?.values[0].asset.type).toBe("text");
+    expect(view?.values[0].asset.value).toBe("Hello World!");
     expect(updateNumber).toBe(1);
 
     await waitFor(() => {
@@ -706,8 +710,8 @@ describe("view", () => {
     view = (player.getState() as InProgressState).controllers.view.currentView
       ?.lastUpdate;
 
-    expect(view?.values[0].asset.type).toBe("text");
     expect(view?.values[1].asset.type).toBe("text");
+    expect(view?.values[1].asset.value).toBe("async content");
   });
 
   test("chat-message asset - replaces async nodes with chat-message asset", async () => {
@@ -737,41 +741,14 @@ describe("view", () => {
       });
     });
 
-    const chatMessageContent = {
-      id: "chat",
-      views: [
-        {
-          id: "1",
-          type: "chat-message",
-          value: "Hello World!",
-        },
-      ],
-      navigation: {
-        BEGIN: "FLOW_1",
-        FLOW_1: {
-          startState: "VIEW_1",
-          VIEW_1: {
-            state_type: "VIEW",
-            ref: "1",
-            transitions: {
-              "*": "END_Done",
-            },
-          },
-          END_Done: {
-            state_type: "END",
-            outcome: "DONE",
-          },
-        },
-      },
-    };
-
     player.start(chatMessageContent as any);
 
     let view = (player.getState() as InProgressState).controllers.view
       .currentView?.lastUpdate;
 
     expect(view).toBeDefined();
-    expect(view?.values.length).toBe(1);
+    expect(view?.values[0].asset.type).toBe("text");
+    expect(view?.values[0].asset.value).toBe("Hello World!");
     expect(updateNumber).toBe(1);
 
     await waitFor(() => {
@@ -795,8 +772,6 @@ describe("view", () => {
     view = (player.getState() as InProgressState).controllers.view.currentView
       ?.lastUpdate;
 
-    expect(view?.values[0].asset.type).toBe("text");
-    expect(view?.values[0].asset.value).toBe("Hello World!");
     expect(view?.values[1].asset.type).toBe("text");
     expect(view?.values[1].asset.value).toBe("async content");
   });
@@ -816,8 +791,10 @@ describe("view", () => {
 
     let updateNumber = 0;
 
+    const plugins = [plugin, new ReferenceAssetsPlugin()];
+
     const player = new Player({
-      plugins: [plugin, new ReferenceAssetsPlugin()],
+      plugins: plugins,
     });
 
     player.hooks.viewController.tap("async-node-test", (vc) => {
@@ -831,10 +808,11 @@ describe("view", () => {
     player.start(chatMessageContent as any);
 
     let view = (player.getState() as InProgressState).controllers.view
-        .currentView?.lastUpdate;
+      .currentView?.lastUpdate;
 
     expect(view).toBeDefined();
-    expect(view?.values.length).toBe(1);
+    expect(view?.values[0].asset.type).toBe("text");
+    expect(view?.values[0].asset.value).toBe("Hello World!");
     expect(updateNumber).toBe(1);
 
     await waitFor(() => {
@@ -856,10 +834,8 @@ describe("view", () => {
     });
 
     view = (player.getState() as InProgressState).controllers.view.currentView
-        ?.lastUpdate;
+      ?.lastUpdate;
 
-    expect(view?.values[0].asset.type).toBe("text");
-    expect(view?.values[0].asset.value).toBe("Hello World!");
     expect(view?.values[1].asset.type).toBe("text");
     expect(view?.values[1].asset.value).toBe("async content");
 

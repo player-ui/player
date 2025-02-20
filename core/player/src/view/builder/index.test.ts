@@ -32,6 +32,18 @@ describe("multiNode", () => {
     expect(v1.parent).toBe(result);
     expect(v2.parent).toBe(result);
   });
+
+  test("multinode with async node", () => {
+    const v1 = Builder.asyncNode("1");
+    const v2 = Builder.asyncNode("2");
+    const result = Builder.multiNode(v1, v2);
+
+    expect(result.type).toBe(NodeType.MultiNode);
+    expect(result.values[0].id).toBe("1");
+    expect(result.values[1].id).toBe("2");
+    expect(v1.parent).toBe(result);
+    expect(v2.parent).toBe(result);
+  });
 });
 
 test("async node", () => {
@@ -47,11 +59,11 @@ test("async node", () => {
 });
 
 test("asset wrapper", () => {
-  const result = Builder.assetWrapper({ id: "asset", type: "text" });
+  const result = Builder.assetWrapper({ id: "1", type: "text" });
 
   expect(result.type).toBe(NodeType.Value);
   expect(result.children?.[0]?.value.type).toBe("asset");
-  expect(result.children?.[0]?.value.value.id).toBe("asset");
+  expect(result.children?.[0]?.value.value.id).toBe("1");
 });
 
 describe("addChild", () => {
