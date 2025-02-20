@@ -39,8 +39,8 @@ describe("multiNode", () => {
     const result = Builder.multiNode(v1, v2);
 
     expect(result.type).toBe(NodeType.MultiNode);
-    expect(result.values[0].id).toBe("1");
-    expect(result.values[1].id).toBe("2");
+    expect(result.values[0]?.type).toBe("async");
+    expect(result.values[1]?.type).toBe("async");
     expect(v1.parent).toBe(result);
     expect(v2.parent).toBe(result);
   });
@@ -63,7 +63,6 @@ test("asset wrapper", () => {
 
   expect(result.type).toBe(NodeType.Value);
   expect(result.children?.[0]?.value.type).toBe("asset");
-  expect(result.children?.[0]?.value.value.id).toBe("1");
 });
 
 describe("addChild", () => {

@@ -414,7 +414,7 @@ export class Resolver {
           /**
            * async nodes' parent is a multi-node
            * When the mValue is an async node and the flatten flag is true
-           * add the mTree.value(content streamed in) to the childValue of parent multi-node 
+           * add the mTree.value(content streamed in) to the childValue of parent multi-node
            * Array.isArray(mTree.value) is for the case where content streamed in is a multi-node
            * Array.isArray(mTree.value.asset.values) is the case where the content is an async asset
            */
