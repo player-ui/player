@@ -17,6 +17,8 @@ import com.intuit.playerui.core.view.ViewController
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.modules.EmptySerializersModule
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -68,7 +70,7 @@ internal class InProgressStateTest : NodeBaseTest() {
         every { node.getInvokable<Unit>("transition") } returns Invokable {
             lastTransition = it[0] as String
         }
-        every { node.getSerializable("flow", Flow.serializer()) } returns Flow("flowId")
+        every { node.getSerializable("flow", Flow.serializer()) } returns Flow.createFlow("flowId")
         every { node.getSerializable("dataModel", DataModelWithParser.serializer()) } returns DataModelWithParser(node)
         every { node.nativeReferenceEquals(any()) } returns false
     }

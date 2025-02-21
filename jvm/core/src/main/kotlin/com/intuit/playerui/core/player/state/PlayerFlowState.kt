@@ -83,14 +83,14 @@ public abstract class ErrorState : PlayerFlowState() {
     public companion object {
 
         /** Convenience method to easily construct a synthetic error message */
-        public fun from(exception: PlayerException, flow: Flow = Flow()): ErrorState = object : ErrorState() {
+        public fun from(exception: PlayerException, flow: Flow = Flow.createFlow()): ErrorState = object : ErrorState() {
             override val error: PlayerException = exception
             override val flow: Flow = flow
             override val node: Node = EmptyNode
         }
 
         /** Convenience method to easily construct a synthetic error message */
-        public fun from(message: String, flow: Flow = Flow()): ErrorState = from(PlayerException(message), flow)
+        public fun from(message: String, flow: Flow = Flow.createFlow()): ErrorState = from(PlayerException(message), flow)
     }
 }
 
@@ -99,7 +99,7 @@ internal class ErroneousState(override val node: Node) :
     ErrorState(),
     NodeWrapper {
 
-    override val flow: Flow by NodeSerializableField(Flow.serializer()) { Flow() }
+    override val flow: Flow by NodeSerializableField(Flow.serializer()) { Flow.createFlow() }
 
     override val error: PlayerException by NodeSerializableField(PlayerException.serializer()) {
         // TODO: Need to test this error handling strategy
@@ -204,7 +204,7 @@ public sealed class PlayerFlowExecutionState(override val node: Node) :
     NodeWrapper {
 
     /** The currently executing flow */
-    public val flow: Flow by NodeSerializableField(Flow.serializer()) { Flow() }
+    public val flow: Flow by NodeSerializableField(Flow.serializer()) { Flow.createFlow() }
 }
 
 // Set of *safe* convenience helpers for bounding state to concrete class
