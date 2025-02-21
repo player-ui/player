@@ -302,7 +302,6 @@ export const ManagedPlayer = (
 ): React.JSX.Element | null => {
   const { withRequestTime, RequestTimeMetricsPlugin } = useRequestTime();
   const previousMiddleware = usePrevious(props.middleware);
-  const previousPlugins = usePrevious(props.plugins);
 
   const { state, managedState } = usePersistentStateMachine({
     manager: props.manager,
@@ -326,14 +325,6 @@ export const ManagedPlayer = (
             ...(props?.middleware ?? []),
             withRequestTime,
           ) as any,
-        },
-      });
-    }
-
-    if (previousPlugins !== props.plugins) {
-      managedState.sync({
-        playerConfig: {
-          plugins: [...(props?.plugins ?? []), RequestTimeMetricsPlugin],
         },
       });
     }
