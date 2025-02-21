@@ -17,7 +17,7 @@ If the changes are larger (API design, architecture, etc), [opening an issue](ht
 * [Swift >= 5.5](https://www.swift.org/download/)
 * [Xcode 15.3](https://developer.apple.com/download/all/) 
 
-* [Android NDK 23.2.8568313](https://github.com/android/ndk/wiki/Unsupported-Downloads#r23c). You'll need to add `ANDROID_NDK_HOME` to your environment manually.
+* [Android NDK 27.1.12297006](https://github.com/android/ndk/releases/tag/r27b). You'll need to add `ANDROID_NDK_HOME` to your environment manually.
 * Python < 3 (recommended 2.7.18) - you can use [pyenv](https://realpython.com/intro-to-pyenv/) to manage different python versions with ease. 
 
 * [Signed Commits](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification). For convenience it is recommended to set git to sign all commits by default as mentioned [here](https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key)
