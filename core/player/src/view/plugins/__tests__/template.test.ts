@@ -9,6 +9,7 @@ import { ViewInstance } from "../../view";
 import type { Options } from "../options";
 import { TemplatePlugin, MultiNodePlugin, AssetPlugin } from "../";
 import { StringResolverPlugin, toNodeResolveOptions } from "../..";
+import type { View } from "@player-ui/types";
 
 const templateJoinValues = {
   id: "generated-flow",
@@ -343,7 +344,7 @@ describe("dynamic templates", () => {
     const evaluator = new ExpressionEvaluator({ model });
 
     it("Should show template item first when coming before values on lexical order", () => {
-      const view = new ViewInstance(templateJoinValues.views[0], {
+      const view = new ViewInstance(templateJoinValues.views[0] as View, {
         model,
         parseBinding,
         evaluator,
@@ -362,7 +363,7 @@ describe("dynamic templates", () => {
       expect(resolved.values).toMatchSnapshot();
     });
     it("Should show template item last when coming after values on lexical order", () => {
-      const view = new ViewInstance(templateJoinValues.views[1], {
+      const view = new ViewInstance(templateJoinValues.views[1] as View, {
         model,
         parseBinding,
         evaluator,
@@ -382,3 +383,53 @@ describe("dynamic templates", () => {
     });
   });
 });
+
+// describe("template placement", () => {
+//   let model: DataModelWithParser;
+//   let expressionEvaluator: ExpressionEvaluator;
+//   let options: Options;
+//   let parser: Parser;
+
+//   beforeEach(() => {
+//     model = withParser(new LocalModel(), parseBinding);
+//     expressionEvaluator = new ExpressionEvaluator({
+//       model,
+//     });
+//     parser = new Parser();
+//     options = {
+//       evaluate: expressionEvaluator.evaluate,
+//       schema: new SchemaController(),
+//       data: {
+//         format: (binding, val) => val,
+//         formatValue: (val) => val,
+//         model,
+//       },
+//     };
+//     new TemplatePlugin(options).applyParser(parser);
+//     new AssetPlugin().applyParser(parser);
+//   });
+
+//   it("works with template position prepend", () => {
+//     const testData = {
+//       id: "test-view",
+//       type: "collection",
+//       template: [
+//         {
+//           data: "items",
+//           output: "values",
+//           placement: "prepend",
+//           value: {
+//             value: "item-{{items._index_}}",
+//           },
+//         },
+//       ],
+//       values: [{ value: "existing-item" }],
+//     };
+
+//     model.set([["items", ["a", "b", "c"]]]);
+
+//     const parsed = parser.parseObject(testData);
+
+//     expect(parsed).toMatchSnapshot();
+//   });
+// });

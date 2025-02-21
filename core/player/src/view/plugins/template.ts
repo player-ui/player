@@ -11,6 +11,7 @@ import { ViewInstance, ViewPlugin } from "../view";
 import type { Options } from "./options";
 import type { Resolver } from "../resolver";
 import { hasTemplateKey } from "../parser/utils";
+import { ConsoleLogger } from "../../logger";
 
 export interface TemplateItemInfo {
   /** The index of the data for the current iteration of the template */
@@ -36,8 +37,14 @@ export type TemplateSubstitutionsFunc = (
 /** A view plugin to resolve/manage templates */
 export default class TemplatePlugin implements ViewPlugin {
   private readonly options: Options;
+  private readonly logger: ConsoleLogger;
 
-  hooks = {
+  hooks: {
+    resolveTemplateSubstitutions: SyncWaterfallHook<
+      [TemplateSubstitution[], TemplateItemInfo],
+      Record<string, any>
+    >;
+  } = {
     resolveTemplateSubstitutions: new SyncWaterfallHook<
       [TemplateSubstitution[], TemplateItemInfo]
     >(),
@@ -45,6 +52,7 @@ export default class TemplatePlugin implements ViewPlugin {
 
   constructor(options: Options) {
     this.options = options;
+    this.logger = new ConsoleLogger();
   }
 
   private parseTemplate(
@@ -98,6 +106,13 @@ export default class TemplatePlugin implements ViewPlugin {
       if (parsed) {
         values.push(parsed);
       }
+
+      if (!node.placement) {
+        this.logger.warn(
+          "Template node does not specify a position - Defaulting to 'append'.",
+        );
+        node.placement = "append";
+      }
     });
 
     const result: Node.MultiNode = {
@@ -109,7 +124,7 @@ export default class TemplatePlugin implements ViewPlugin {
     return result;
   }
 
-  applyParser(parser: Parser) {
+  applyParser(parser: Parser): void {
     parser.hooks.onCreateASTNode.tap("template", (node) => {
       if (node && node.type === NodeType.Template && !node.dynamic) {
         return this.parseTemplate(
@@ -163,7 +178,7 @@ export default class TemplatePlugin implements ViewPlugin {
     );
   }
 
-  applyResolverHooks(resolver: Resolver) {
+  applyResolverHooks(resolver: Resolver): void {
     resolver.hooks.beforeResolve.tap("template", (node, options) => {
       if (node && node.type === NodeType.Template && node.dynamic) {
         return this.parseTemplate(options.parseNode, node, options);
@@ -173,7 +188,7 @@ export default class TemplatePlugin implements ViewPlugin {
     });
   }
 
-  apply(view: ViewInstance) {
+  apply(view: ViewInstance): void {
     view.hooks.parser.tap("template", this.applyParser.bind(this));
     view.hooks.resolver.tap("template", this.applyResolverHooks.bind(this));
   }
