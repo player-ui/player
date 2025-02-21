@@ -520,6 +520,273 @@ class AsyncNodePluginTests: XCTestCase {
         XCTAssertEqual(expectedMultiNode3Text, "test")
         XCTAssertEqual(expectedMultiNode4Text, "undefined")
     }
+    
+    func testChatMessageReplaceAsyncNodeWithProvidedNode() {
+       let handlerExpectation = XCTestExpectation(description: "first data did not change")
+       
+       let context = JSContext()
+       var count = 0
+       
+       let resolve: AsyncHookHandler = { _,_ in
+           handlerExpectation.fulfill()
+           
+           if count == 1 {
+               return .singleNode(ReplacementNode.encodable(
+                   AssetPlaceholderNode(asset: PlaceholderNode(id: "text", type: "text", value: "new node"))
+               ))
+           }
+           
+           return .singleNode(ReplacementNode.concrete(context?.evaluateScript("") ?? JSValue()))
+       }
+       
+       let asyncNodePluginPlugin = AsyncNodePluginPlugin()
+       let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolve)
+       
+       plugin.context = context
+       
+       XCTAssertNotNil(asyncNodePluginPlugin.context)
+
+       let player = HeadlessPlayerImpl(plugins: [ReferenceAssetsPlugin(), plugin], context: context ?? JSContext())
+
+       let textExpectation = XCTestExpectation(description: "newText found")
+       
+       var expectedNode1Text: String = ""
+       
+       player.hooks?.viewController.tap({ (viewController) in
+           viewController.hooks.view.tap { (view) in
+               view.hooks.onUpdate.tap { val in
+                   count += 1
+                   
+                   if count == 2 {
+                       let newText1 = val
+                           .objectForKeyedSubscript("values")
+                           .objectAtIndexedSubscript(1)
+                           .objectForKeyedSubscript("asset")
+                           .objectForKeyedSubscript("value")
+                       guard let textString1 = newText1?.toString() else { return XCTFail("newText was not a string") }
+                       
+                       expectedNode1Text = textString1
+                       textExpectation.fulfill()
+                   }
+               }
+           }
+       })
+       
+       player.start(flow: .chatMessageJson, completion: { _ in})
+       
+       wait(for: [handlerExpectation, textExpectation], timeout: 5)
+       
+       XCTAssert(count == 2)
+       XCTAssertEqual(expectedNode1Text, "new node")
+    }
+
+    func testChatMessageReplaceAsyncNodeWithMultiNode() {
+       let handlerExpectation = XCTestExpectation(description: "first data did not change")
+       
+       let context = JSContext()
+       var count = 0
+       
+       let resolve: AsyncHookHandler = { _,_ in
+           handlerExpectation.fulfill()
+           
+           if count == 1 {
+               return .multiNode([
+                    ReplacementNode.encodable(AssetPlaceholderNode(asset: PlaceholderNode(id: "text-1", type: "text", value: "1st value in the multinode"))),
+                    ReplacementNode.encodable(AssetPlaceholderNode(asset: PlaceholderNode(id: "text-2", type: "text", value: "2nd value in the multinode"))),
+                ])
+           }
+           
+           return .singleNode(ReplacementNode.concrete(context?.evaluateScript("") ?? JSValue()))
+       }
+       
+       let asyncNodePluginPlugin = AsyncNodePluginPlugin()
+       let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolve)
+       
+       plugin.context = context
+       
+       XCTAssertNotNil(asyncNodePluginPlugin.context)
+
+       let player = HeadlessPlayerImpl(plugins: [ReferenceAssetsPlugin(), plugin], context: context ?? JSContext())
+       
+       let textExpectation = XCTestExpectation(description: "newText found")
+       
+       var expectedMultiNode1Text: String = ""
+       var expectedMultiNode2Text: String = ""
+       
+       player.hooks?.viewController.tap({ (viewController) in
+           viewController.hooks.view.tap { (view) in
+               view.hooks.onUpdate.tap { val in
+                   count += 1
+                   
+                   if count == 2 {
+                       let newText1 = val
+                           .objectForKeyedSubscript("values")
+                           .objectAtIndexedSubscript(1)
+                           .objectForKeyedSubscript("asset")
+                           .objectForKeyedSubscript("value")
+                       guard let textString1 = newText1?.toString() else { return XCTFail("newText was not a string") }
+                       expectedMultiNode1Text = textString1
+
+                       let newText2 = val
+                           .objectForKeyedSubscript("values")
+                           .objectAtIndexedSubscript(2)
+                           .objectForKeyedSubscript("asset")
+                           .objectForKeyedSubscript("value")
+                       guard let textString2 = newText2?.toString() else { return XCTFail("newText was not a string") }
+                       
+                       expectedMultiNode2Text = textString2
+                       textExpectation.fulfill()
+                   }
+               }
+           }
+       })
+       
+       player.start(flow: .chatMessageJson, completion: { _ in})
+       
+       wait(for: [handlerExpectation, textExpectation], timeout: 5)
+       
+       XCTAssert(count == 2)
+       XCTAssertEqual(expectedMultiNode1Text, "1st value in the multinode")
+       XCTAssertEqual(expectedMultiNode2Text, "2nd value in the multinode")
+    }
+    
+    func testChatMessageReplaceAsyncNodeWithChatMessageAsset() {
+        let handlerExpectation = XCTestExpectation(description: "first data did not change")
+        
+        let context = JSContext()
+        var count = 0
+        
+        let resolve: AsyncHookHandler = { _,_ in
+            handlerExpectation.fulfill()
+            
+            if count == 1 {
+                return .singleNode(ReplacementNode.encodable(
+                   AssetPlaceholderNode(asset: PlaceholderNode(id: "text", type: "chat-message", value: "chat message"))
+               ))
+            }
+            
+            return .singleNode(ReplacementNode.concrete(context?.evaluateScript("") ?? JSValue()))
+        }
+        
+        let asyncNodePluginPlugin = AsyncNodePluginPlugin()
+        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolve)
+        
+        plugin.context = context
+        
+        XCTAssertNotNil(asyncNodePluginPlugin.context)
+
+        let player = HeadlessPlayerImpl(plugins: [ReferenceAssetsPlugin(), plugin], context: context ?? JSContext())
+        
+        let textExpectation = XCTestExpectation(description: "newText found")
+        
+        var expectedNode1Text: String = ""
+        
+        player.hooks?.viewController.tap({ (viewController) in
+            viewController.hooks.view.tap { (view) in
+                view.hooks.onUpdate.tap { val in
+                    count += 1
+                    
+                    if count == 2 {
+                        let newText1 = val
+                            .objectForKeyedSubscript("values")
+                            .objectAtIndexedSubscript(1)
+                            .objectForKeyedSubscript("asset")
+                            .objectForKeyedSubscript("value")
+                        guard let textString1 = newText1?.toString() else { return XCTFail("newText was not a string") }
+                        
+                        expectedNode1Text = textString1
+                        textExpectation.fulfill()
+                    }
+                }
+            }
+        })
+        
+        player.start(flow: .chatMessageJson, completion: { _ in})
+        
+        wait(for: [handlerExpectation, textExpectation], timeout: 5)
+        
+        XCTAssert(count == 2)
+        XCTAssertEqual(expectedNode1Text, "chat message")
+    }
+    
+    func testChatMessageReplaceAsyncNodeWithChainedChatMessageAsset() {
+        let handlerExpectation = XCTestExpectation(description: "first data did not change")
+        
+        let context = JSContext()
+        var count = 0
+        
+        let resolve: AsyncHookHandler = { _,_ in
+            handlerExpectation.fulfill()
+            
+            if count == 1 {
+                return .singleNode(ReplacementNode.encodable(
+                   AssetPlaceholderNode(asset: PlaceholderNode(id: "chat", type: "chat-message", value: "chat message"))
+               ))
+            } else if count == 2 {
+                return .singleNode(ReplacementNode.encodable(
+                    AssetPlaceholderNode(asset: PlaceholderNode(id: "text", type: "text", value: "chained chat message"))
+                ))
+            }
+            
+            return .singleNode(ReplacementNode.concrete(context?.evaluateScript("") ?? JSValue()))
+        }
+        
+        let asyncNodePluginPlugin = AsyncNodePluginPlugin()
+        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolve)
+        
+        plugin.context = context
+        
+        XCTAssertNotNil(asyncNodePluginPlugin.context)
+
+        let player = HeadlessPlayerImpl(plugins: [ReferenceAssetsPlugin(), plugin], context: context ?? JSContext())
+        
+        let textExpectation = XCTestExpectation(description: "newText found")
+        let textExpectation2 = XCTestExpectation(description: "newText found")
+
+        var expectedNode1Text: String = ""
+        var expectedNode2Text: String = ""
+        
+        player.hooks?.viewController.tap({ (viewController) in
+            viewController.hooks.view.tap { (view) in
+                view.hooks.onUpdate.tap { val in
+                    count += 1
+                    
+                    if count == 2 {
+                        let newText1 = val
+                            .objectForKeyedSubscript("values")
+                            .objectAtIndexedSubscript(1)
+                            .objectForKeyedSubscript("asset")
+                            .objectForKeyedSubscript("value")
+                        guard let textString1 = newText1?.toString() else { return XCTFail("newText was not a string") }
+                        
+                        expectedNode1Text = textString1
+                        textExpectation.fulfill()
+                    }
+                    
+                    if count == 3 {
+                        let newText2 = val
+                            .objectForKeyedSubscript("values")
+                            .objectAtIndexedSubscript(2)
+                            .objectForKeyedSubscript("asset")
+                            .objectForKeyedSubscript("value")
+                        guard let textString2 = newText2?.toString() else { return XCTFail("newText was not a string") }
+                        
+                        expectedNode2Text = textString2
+                        textExpectation2.fulfill()
+                    }
+                }
+            }
+        })
+        
+        player.start(flow: .chatMessageJson, completion: { _ in})
+        
+        wait(for: [handlerExpectation, textExpectation], timeout: 5)
+        
+        XCTAssertEqual(expectedNode1Text, "chat message")
+
+        wait(for: [textExpectation2], timeout: 5)
+        XCTAssertEqual(expectedNode2Text, "chained chat message")
+    }
 }
 
 extension String {
@@ -563,6 +830,38 @@ extension String {
            "VIEW_1": {
              "state_type": "VIEW",
              "ref": "collection",
+             "transitions": {
+               "*": "END_Done"
+             }
+           },
+           "END_Done": {
+             "state_type": "END",
+             "outcome": "done"
+           }
+         }
+       }
+     }
+    """
+}
+
+extension String {
+    static let chatMessageJson = """
+     {
+       "id": "generated-flow",
+       "views": [
+         {
+            id: "1",
+            type: "chat-message",
+            value: "Hello World!",
+          },
+       ],
+       "navigation": {
+         "BEGIN": "FLOW_1",
+         "FLOW_1": {
+           "startState": "VIEW_1",
+           "VIEW_1": {
+             "state_type": "VIEW",
+             "ref": "1",
              "transitions": {
                "*": "END_Done"
              }
