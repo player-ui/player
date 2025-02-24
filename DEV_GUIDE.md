@@ -3,7 +3,7 @@
 ### Sections:
 1. [Setup](#Setup)
 2. [Adding a new plugin](#adding-a-new-plugin)
-2. [Dependencies](#Dependencies)
+3. [Dependencies](#Dependencies)
 
 ## Setup
 ### Demo Application
@@ -17,7 +17,7 @@ bazel run //docs/site:site
 Adding a new plugin is simple using predefined macros for `BUILD.bazel` files.
 
 ### Core vs React Plugins
-Core plugins provide shared functionality, usable on all platforms.
+Core plugins provide shared functionality, usable on all platforms i.e. as Player Core runs on every platform, any core Player plugin will also run on every platform which allows for shared functionality to be authored once and shared across every platform.
 
 React plugins add react specific functionality.
 
@@ -43,7 +43,7 @@ plugins/example
     └── package.json
 ```
 
-To scaffold your plugin, create a new create a new `core` or `react` folder in the appropriate plugin directory, with the appropriate folders, a package.json and a blank `BUILD.bazel`:
+To scaffold your plugin, create a new `core` or `react` folder in the appropriate plugin directory, with the appropriate folders, a package.json and a blank `BUILD.bazel`:
 
 For core plugins:
 ```bash
