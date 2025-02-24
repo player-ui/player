@@ -1,0 +1,61 @@
+---
+title: Data Change Listener
+---
+
+import PlatformTabs from "../../../../components/PlatformTabs.astro";
+
+This plugin enables users to subscribe to data-change events within a view, and run expressions when the target value changes. Expressions are added to a listeners property of the view, with events prefixed by `dataChange` and the target binding:
+
+```json
+{
+  "id": "example-view",
+  "type": "info",
+  "listeners": {
+    "dataChange.foo.bar": "helloWorld()",
+    "dataChange.foo.baz": ["helloWorld()", "doSomethingElseToo()"]
+  }
+}
+```
+
+## Installation
+
+<PlatformTabs>
+  <Fragment slot='core'>
+
+Add it to Player:
+
+```js
+import { Player } from "@player-ui/player";
+import { DataChangePlugin } from "@player-ui/data-change-plugin";
+
+const player = new Player({
+  plugins: [new DataChangePlugin()],
+});
+```
+
+  </Fragment>
+</PlatformTabs>
+
+## Usage
+
+The format of `dataChange.<binding>` will execute the _value_ (any valid expression or collection of expressions), anytime a value within the target binding's tree is updated (`foo.bar` and `foo.baz` in the example above).
+
+Registrations can be made for any partial binding path, and will be evaluated anytime that path, or any child path, is mutated. The above example registration of `dataChange.foo.bar` will be triggered by a change to `foo.bar`, `foo.bar.baz`, or any other child path. (it will not be triggered by a change to `foo.baz`).
+
+The subscriptions are tied to the lifecycle of the _view_ they're defined in. They will _not_ be called upon initial render of the view, and will expire when the view is no longer the active state (when transitioning to a new state in the flow).
+
+## Wildcard Placeholders
+
+To subscribe to a binding including a dynamic segment (array index, etc). Use a placeholder value of `_` in the binding.
+
+```json
+{
+  "listeners": {
+    "dataChange.foo._.bar": "helloWorld(_index_)"
+  }
+}
+```
+
+Similar to _template_ processing, any `_index_` reference in the expression will be replaced by the dynamic value. In the example above, a change from `foo.3.bar` will result in the `helloWorld()` expression being evaluated.
+
+Sub-paths that don't match the changed binding will not trigger the expression. Using the same example, a change from `foo.4.baz` will _not_ trigger the expression since `bar` does not match with `baz`.

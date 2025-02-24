@@ -1,0 +1,108 @@
+---
+title: Shared Constants
+---
+
+import PlatformTabs from "../../../../components/PlatformTabs.astro";
+
+The Shared Constants Plugin enables users to define and override commonly used static values. It can be leveraged by other plugins to enable localization.
+
+## Usage
+
+<PlatformTabs>
+  <Fragment slot='core'>
+    
+Create the plugin and add it to Player:
+
+```ts
+import { Player } from "@player-ui/player";
+import { ConstantsPlugin } from "@player-ui/shared-constants-plugin";
+
+const constantsPlugin = new ConstantsPlugin({
+  data: {
+    prop1: "A",
+    prop2: "B",
+  },
+  namespace: "constants",
+  dataPath: "data.props",
+});
+
+const player = new Player({
+  plugins: [constantsPlugin],
+});
+```
+
+You can then query the plugin to get the value of a particular key:
+
+```js
+constantsPlugin.getConstants("prop1"); // 'A'
+```
+
+  </Fragment>
+</PlatformTabs>
+
+### Overriding Values in Content
+
+By default, data can be provided in the `constants` path of the `data` object to override the constants that the plugin was initialized with. This can be overridden though via the `dataPath` configuration option. In the above example, `dataPath` was initialized with the path `data.props` therefore the following code snippet could be used to override the `prop1` constant:
+
+```json
+{
+  "data": {
+    "props": {
+      "prop1": "B"
+    }
+  }
+}
+```
+
+using a similar query for `prop1`, the value in the content takes precidence and would return `B`.
+
+If no `dataPath` is defined, then it defaults to `constants` and you can still do this
+```json
+{
+  "data": {
+    "constants": {
+      "prop1": "B"
+    }
+  }
+}
+```
+
+### Fallback Values
+
+Any query can also specify an optional _default_ value to return:
+
+```js
+constantsPlugin.getConstants("prop3", "default value"); // 'default value'
+```
+
+## Examples
+
+### Common Types Plugin
+
+The Common Types Plugin leverages this pattern to allow for global contextual message overrides. In order to override those messages you may use something like:
+
+```ts
+import { Player } from "@player-ui/player";
+import { ConstantsPlugin } from "@player-ui/constants-plugion";
+import { CommonTypesPlugin } from "@player-ui/common-types-plugin";
+
+const player = new Player({
+  plugins: [
+    new CommonTypesPlugin(),
+    new ConstantsPlugin({
+      namespace: "constants",
+      dataPath: "data.constants",
+      data: {
+        validation: {
+          lengthError: {
+            minimum: "Way too short",
+            maximum: "Way too long",
+          },
+        },
+      },
+    }),
+  ],
+});
+```
+
+Any triggerd validation for the `length` validation will now use the custom error messages. See the [Common Types Plugin](/plugins/core/common-types) for more information on the supported overrides and paths.

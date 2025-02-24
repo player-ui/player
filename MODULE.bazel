@@ -6,19 +6,18 @@ module(
 bazel_dep(name = "rules_player")
 
 archive_override(
-    module_name = "rules_player",
-    strip_prefix = "rules_player-1.1.4",
-    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v1.1.4.tar.gz"],
-    integrity = "sha256-5YsvzRBeBV2dVgRorGouQfdkb/lu1W8k24QAIModpLw=",
+  module_name = "rules_player",
+  strip_prefix = "rules_player-1.1.5",
+  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v1.1.5.tar.gz"],
+  integrity = "sha256-sotB/beOkcn7FD+NurO6Uqi2OoKbbXHd7ya4ZO9nBCg="
 )
 
 # local_path_override(module_name = "rules_player", path = "../rules_player")
-
-bazel_dep(name = "aspect_bazel_lib", version = "2.7.8")
-bazel_dep(name = "aspect_rules_js", version = "1.42.3")
+bazel_dep(name = "aspect_bazel_lib", version = "2.8.0")
+bazel_dep(name = "aspect_rules_js", version = "2.0.0")
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "rules_pkg", version = "1.0.1")
-bazel_dep(name = "aspect_rules_ts", version = "2.4.2")
+bazel_dep(name = "aspect_rules_ts", version = "3.0.0")
 
 # C++
 bazel_dep(name = "rules_foreign_cc", version = "0.11.1")
@@ -34,7 +33,7 @@ node.toolchain(node_version = "20.14.0")
 ###### Start iOS ######
 ## Rule Dependencies
 bazel_dep(name = "rules_apple", version = "3.5.1", repo_name = "build_bazel_rules_apple")
-bazel_dep(name = "rules_ios", version = "4.3.1", repo_name = "build_bazel_rules_ios")
+bazel_dep(name = "rules_ios", version = "4.8.2", repo_name = "build_bazel_rules_ios")
 bazel_dep(name = "rules_xcodeproj", version = "2.2.0")
 bazel_dep(name = "gazelle", version = "0.34.0", repo_name = "bazel_gazelle")
 bazel_dep(name = "rules_swift_package_manager", version = "0.22.0")
@@ -71,6 +70,7 @@ npm.npm_translate_lock(
     npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
     verify_node_modules_ignored = "//:.bazelignore",
+    npm_package_target_name = "{dirname}"
 )
 use_repo(npm, "npm")
 
@@ -139,7 +139,7 @@ maven.install(
         "com.intuit.hooks:hooks:0.15.0",
 
         # Testing
-        "io.mockk:mockk:1.9.3",
+        "io.mockk:mockk:1.12.0",
         "org.amshove.kluent:kluent:1.68",
         "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0",
 

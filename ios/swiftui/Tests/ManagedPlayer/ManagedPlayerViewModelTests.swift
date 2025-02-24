@@ -14,6 +14,7 @@ import JavaScriptCore
 @testable import PlayerUI
 @testable import PlayerUISwiftUI
 @testable import PlayerUIInternalTestUtilities
+@testable import PlayerUITestUtilitiesCore
 
 class ManagedPlayerViewModelTests: XCTestCase {
     let flow1 = FlowData.COUNTER
@@ -83,7 +84,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
         let viewModel = ManagedPlayerViewModel(manager: flowManager, onComplete: {_ in })
 
         await assertPublished(AnyPublisher(viewModel.$loadingState), condition: { state in
-            guard 
+            guard
                 case .failed(let error) = state,
                 let _ = error as? PlayerError
             else { return false }
@@ -278,6 +279,62 @@ class ManagedPlayerViewModelTests: XCTestCase {
             XCTAssertTrue(true)
         default:
             XCTFail("Should have entered idle state")
+        }
+    }
+
+    func testNextUpdatesLoadingStateOnMainNoFlows() async throws {
+        let model = ManagedPlayerViewModel(manager: ConstantFlowManager([], delay: 1/60), onComplete: {_ in})
+        try await checkNextUpdatesLoadingStateOnMain(model: model, expectedStateChangeCount: 1)
+    }
+
+    func testNextUpdatesLoadingStateOnMainOneFlow() async throws {
+        let model = ManagedPlayerViewModel(manager: ConstantFlowManager(["abc"], delay: 1/60), onComplete: {_ in})
+        try await checkNextUpdatesLoadingStateOnMain(model: model, nextCallCount: 2, expectedStateChangeCount: 4)
+    }
+
+    func testNextUpdatesLoadingStateOnMainMultipleFlows() async throws {
+        let model = ManagedPlayerViewModel(manager: ConstantFlowManager(["abc", "def", "ghi"], delay: 1/60), onComplete: {_ in})
+        try await checkNextUpdatesLoadingStateOnMain(model: model, nextCallCount: 3, expectedStateChangeCount: 6)
+    }
+
+    func testThrowingNextUpdatesLoadingStateOnMain() async throws {
+        let model = ManagedPlayerViewModel(manager: ThrowingFlowManager(), onComplete: {_ in})
+        try await checkNextUpdatesLoadingStateOnMain(model: model, expectedStateChangeCount: 2)
+    }
+
+    private func checkNextUpdatesLoadingStateOnMain(model: ManagedPlayerViewModel, nextCallCount: Int = 1, expectedStateChangeCount: Int) async throws {
+        let expect = (0..<expectedStateChangeCount).map {
+            expectation(description: "\($0)")
+        }
+        var stateChangeCount = 0
+        // the publisher emits immediately, we only care about changes
+        // from the `next` call(s) below, drop the first state received
+        let cancellable = model.$loadingState.dropFirst().sink { state in
+            XCTAssertTrue(Thread.isMainThread)
+            XCTAssertTrue(stateChangeCount < expect.count)
+            stateChangeCount += 1
+            expect[stateChangeCount - 1].fulfill()
+        }
+        await withTaskGroup(of: Void.self) { group in
+            group.addTask {
+                for _ in (0..<nextCallCount) {
+                    await model.next()
+                }
+            }
+            for await _ in group {}
+        }
+        await fulfillment(of: expect)
+        XCTAssertEqual(stateChangeCount, expectedStateChangeCount)
+        cancellable.cancel()
+    }
+
+    private struct ThrowingFlowManager: FlowManager {
+        func next(_: CompletedState?) async throws -> NextState {
+            throw Errors.failed
+        }
+
+        enum Errors: Error {
+            case failed
         }
     }
 }

@@ -22,7 +22,6 @@ exports_files([
     ".editorconfig",
     ".all-contributorsrc",
     "README.md",
-    # "patches/@chakra-ui__system@2.6.2.patch",
 ])
 
 js_library(
@@ -30,7 +29,7 @@ js_library(
     testonly = True,
     srcs = [
         "scripts/vitest.setup.ts",
-        "vitest.config.ts",
+        "vitest.config.mts",
     ],
     visibility = ["//visibility:public"],
     deps = [

@@ -1,0 +1,93 @@
+---
+title: Data Formatting and Deformatting
+---
+
+Formatting is simply a conversion (or middleware) for getting and setting data. It's often used to convey a different representation of the data to a user (like displaying a date).
+
+## References
+
+In order to attach a specific formatter to a part of the data-model, you need to supply a _reference_. These can be defined in the [schema](/content/schema) or a DataType.
+
+In either case, the reference to the applicable formatter looks identical:
+
+```json
+// An example of a formatter reference for a `date`
+{
+  "type": "date",
+  "format": "MM/DD/YYYY"
+}
+```
+
+The only _required_ property is the type. Any additional properties (`format` in this example) is passed to the formatter function as options. Not all formatters accept options, and they differ per format type.
+
+Each binding can be mapped to 1 format at most. Any reference set directly on an item in the schema, will override an inherited format from a parent type.
+
+## Formatting Lifecycle
+
+There are 2 main steps in the formatting lifecycle `formatting` and `deformatting`. Each format type may define either or both.
+
+Simply stated:
+
+- `formatting`: **Data Model** -> **User**
+- `deformatting`: **User** -> **Data Model**
+
+In cases where the data-type may change between the user and the data-model (think epoch to a formatted time, or integers to a comma number) you'll likely want to specify both, though either, both, or neither is also valid.
+
+## Using Formatted Data
+
+In order to get or set formatted values from the model, add `formatted: true` to the options of the data-model method. This is most often through the use of a [transform](/plugins/asset-transform).
+
+```javascript
+function assetTransform(value, options) {
+  return {
+    ...value,
+    formattedVersion: options.data.model.get('some binding', {
+      formatted: true,
+    }),
+  };
+}
+```
+
+This also works for setting data:
+
+```javascript
+options.data.model.set([['some binding', 'some value']], { formatted: true });
+```
+
+You can also use the `format` function directly from a transform:
+
+```javascript
+options.data.format('some binding', 'some value');
+```
+
+Using the `format` function will not mutate any data in the model.
+
+## Defining Custom formats
+
+### Creating a format-type
+
+A custom format-type is defined by an object with a `name`, an optional `format` handler, and an optional `deformat` handler.
+
+Each `format` or `deformat` function takes a `value` and some `options` (those defined in the format reference) and returns a new value to use. Format handlers should not contain any side-effects as they can be ran multiple times and are expected to be pure functions.
+
+### Registering a custom format
+
+The easiest way to add the custom format to the player is through the `types-provider` plugin.
+
+Create your format object, and add register it with the plugin:
+
+```javascript
+import { TypesProviderPlugin } from '@player-ui/types-provider-plugin';
+
+const provider = new TypesProviderPlugin({
+  formats: [
+    {
+      name: 'custom-formatter',
+      format: () => 'formatted-value',
+      deformat: () => 'deformatted-value',
+    },
+  ],
+});
+```
+
+Now any DataType or schema reference to `custom-formatter` will use this handler.

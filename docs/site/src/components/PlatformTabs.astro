@@ -1,0 +1,54 @@
+---
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+const slotNames = ["core", "react", "android", "ios"];
+const populatedSlots = Object.fromEntries(
+  slotNames.map((slotName) => [slotName, Astro.slots.has(slotName)])
+);
+---
+
+<style>
+  .card {
+    padding: 1rem;
+    border: 1px solid var(--sl-color-gray-5);
+  }
+</style>
+
+<Tabs syncKey="platform-type">
+  {
+    populatedSlots["core"] && (
+      <TabItem label="Core" icon="seti:javascript">
+        <div class="card">
+          <slot name="core" />
+        </div>
+      </TabItem>
+    )
+  }
+  {
+    populatedSlots["react"] && (
+      <TabItem label="React" icon="seti:react">
+        <div class="card">
+          <slot name="react" />
+        </div>
+      </TabItem>
+    )
+  }
+  {
+    populatedSlots["android"] && (
+      <TabItem label="Android" icon="linux">
+        <div class="card">
+          <slot name="android" />
+        </div>
+      </TabItem>
+    )
+  }
+  {
+    populatedSlots["ios"] && (
+      <TabItem label="iOS" icon="apple">
+        <div class="card">
+          <slot name="ios" />
+        </div>
+      </TabItem>
+    )
+  }
+</Tabs>

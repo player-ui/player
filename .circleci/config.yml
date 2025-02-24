@@ -30,7 +30,7 @@ executors:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   ios:
     working_directory: ~/player
-    resource_class: macos.m1.large.gen1
+    resource_class: m2pro.medium
     macos:
       xcode: 15.3.0
     environment:
@@ -99,10 +99,10 @@ jobs:
           echo "coverage --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
           if [ "${CIRCLE_BRANCH}" == "main" ]; then
             echo "Running on main"
-            echo 'common --//android/player:runtime=j2v8 >> .bazelrc.local
+            echo "common --//android/player:runtime=j2v8" >> .bazelrc.local
           else
             echo "Running on PR"
-            echo 'common --//android/player:runtime=j2v8-debug >> .bazelrc.local
+            echo "common --//android/player:runtime=j2v8-debug" >> .bazelrc.local
           fi
       - persist_to_workspace:
           root: .
@@ -215,11 +215,7 @@ jobs:
           when: always
           command: |
             mkdir -p _ios_coverage/lcov
-            mkdir -p _ios_coverage/html
             cp -r $(bazel info output_path)/_coverage/_coverage_report.dat _ios_coverage/lcov/
-            genhtml --branch-coverage --output-directory=_ios_coverage/html/ "$(bazel info output_path)/_coverage/_coverage_report.dat"
-            zip -r _ios_coverage/html.zip _ios_coverage/html/
-            rm -r _ios_coverage/html/
 
       - persist_to_workspace:
           root: .
@@ -500,10 +496,16 @@ workflows:
               only:
                 - main
                 - /version-.*/
+    
+      - bazelrc:
+          context:
+            - Build
+          requires:
+            - setup
 
       - build:
           requires:
-            - setup
+            - bazelrc
 
       - build_ios:
           requires:
@@ -526,11 +528,17 @@ workflows:
             - coverage
             - build_ios
 
-  release:
+  full_release:
     when:
       equal: [release, << pipeline.parameters.GHA_Action >>]
     jobs:
       - setup
+
+      - bazelrc:
+          context:
+            - Build
+          requires:
+            - setup
 
       - build:
           requires:
@@ -538,7 +546,7 @@ workflows:
 
       - build_ios:
           requires:
-            - build
+            - bazelrc
 
       - android_test:
           requires:

@@ -178,7 +178,7 @@ public val Runtime<*>.Promise: Promise.Api get() = getObject("Promise")?.let { p
 } ?: throw PlayerRuntimeException("'Promise' not defined in runtime")
 
 /** Helper to bridge complex [Promise] logic with the JS promise constructor */
-public fun <T : Any> Runtime<*>.Promise(block: suspend ((T) -> Unit, (Throwable) -> Unit) -> Unit): Promise {
+public fun <T : Any?> Runtime<*>.Promise(block: suspend ((T) -> Unit, (Throwable) -> Unit) -> Unit): Promise {
     val key = "promiseHandler_${UUID.randomUUID().toString().replace("-", "")}"
     add(key) { resolve: Invokable<Any?>, reject: Invokable<Any?> ->
         runtime.scope.launch {

@@ -166,6 +166,54 @@ class AnyTypeTests: XCTestCase {
         }
     }
 
+    func testAnyArray() {
+        let string = "[1, true]"
+        guard
+            let data = string.data(using: .utf8),
+            let anyType = try? AnyTypeDecodingContext(rawData: string.data(using: .utf8)!).inject(to: JSONDecoder()).decode(AnyType.self, from: data)
+        else { return XCTFail("could not decode") }
+        switch anyType {
+        case .anyArray(let result):
+            XCTAssertEqual(1, result[0] as? Int)
+            XCTAssertEqual(true, result[1] as? Bool)
+        default:
+            XCTFail("data was not anyArray")
+        }
+    }
+
+    func testAnyDictionaryDataWithArray() {
+        let string = "{\"key2\":1,\"key\":[false]}"
+        guard
+            let data = string.data(using: .utf8),
+            let anyType = try? AnyTypeDecodingContext(rawData: string.data(using: .utf8)!).inject(to: JSONDecoder()).decode(AnyType.self, from: data)
+        else { return XCTFail("could not decode") }
+        switch anyType {
+        case .anyDictionary(let result):
+            XCTAssertEqual(false, (result["key"] as? [Bool])?.first)
+            XCTAssertEqual(1, result["key2"] as? Double)
+        default:
+            XCTFail("data was not dictionary")
+        }
+    }
+
+    func testAnyDictionaryDataWithDeepNestedTypes() {
+        let string = "{\"container\":{\"key2\":1,\"key\":[{\"nestedKey\": \"nestedValue\"}]}}"
+        guard
+            let data = string.data(using: .utf8),
+            let anyType = try? AnyTypeDecodingContext(rawData: string.data(using: .utf8)!).inject(to: JSONDecoder()).decode(AnyType.self, from: data)
+        else { return XCTFail("could not decode") }
+        switch anyType {
+        case .anyDictionary(let result):
+            let container = result["container"] as? [String: Any]
+            let nestedArray = container?["key"] as? [Any]
+            let nestedDict = nestedArray?.first as? [String: Any]
+            XCTAssertEqual("nestedValue", nestedDict?["nestedKey"] as? String)
+            XCTAssertEqual(1, container?["key2"] as? Double)
+        default:
+            XCTFail("data was not dictionary")
+        }
+    }
+
     func testUnknownData() {
         let string = "{\"key\":\"value\", \"key2\": 2}"
         guard
@@ -203,6 +251,8 @@ class AnyTypeTests: XCTestCase {
         XCTAssertEqual("[1,2]", doEncode(AnyType.numberArray(data: [1, 2])))
         XCTAssertEqual("[false,true]", doEncode(AnyType.booleanArray(data: [false, true])))
         XCTAssertEqual("{\"a\":false,\"b\":1}", doEncode(AnyType.anyDictionary(data: ["a": false, "b": 1])))
+        XCTAssertEqual("[1,\"a\",true]", doEncode(AnyType.anyArray(data: [1, "a", true])))
+        XCTAssertEqual("{\"key\":[{\"nestedKey\":\"nestedValue\"},1,{}],\"key2\":1}", doEncode(AnyType.anyDictionary(data: ["key2": 1, "key": AnyType.anyArray(data: [["nestedKey": "nestedValue"], 1, [:] as Any])])))
     }
 
     func doEncode(_ data: AnyType) -> String? {
@@ -231,6 +281,7 @@ class AnyTypeTests: XCTestCase {
         XCTAssertNotEqual(AnyType.numberArray(data: [1, 2]).hashValue, 0)
         XCTAssertNotEqual(AnyType.booleanArray(data: [false, true]).hashValue, 0)
         XCTAssertNotEqual(AnyType.anyDictionary(data: ["key": false, "key2": 1]).hashValue, 0)
+        XCTAssertNotEqual(AnyType.anyArray(data: [1, "a", true]).hashValue, 0)
         XCTAssertNotEqual(AnyType.unknownData.hashValue, 0)
     }
 
@@ -247,6 +298,7 @@ class AnyTypeTests: XCTestCase {
         XCTAssertEqual(AnyType.numberArray(data: [1, 2]), AnyType.numberArray(data: [1, 2]))
         XCTAssertEqual(AnyType.booleanArray(data: [false, true]), AnyType.booleanArray(data: [false, true]))
         XCTAssertEqual(AnyType.anyDictionary(data: ["key": false, "key2": 1]), AnyType.anyDictionary(data: ["key": false, "key2": 1]))
+        XCTAssertEqual(AnyType.anyArray(data: [1, "a", true]), AnyType.anyArray(data: [1, "a", true]))
         XCTAssertNotEqual(AnyType.unknownData, AnyType.string(data: "test"))
     }
 

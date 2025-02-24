@@ -34,6 +34,8 @@ public enum AnyType: Hashable {
             hasher.combine(data)
         case .anyDictionary(let data):
             hasher.combine(data as NSDictionary)
+        case .anyArray(let data):
+            hasher.combine(data as NSArray)
         case .unknownData:
             return
         }
@@ -73,6 +75,13 @@ public enum AnyType: Hashable {
      */
     case anyDictionary(data: [String: Any])
 
+    /**
+     The underlying data was an array of varied value types
+
+     **This requires the decoder to add `AnyTypeDecodingContext` to the decoders userInfo**
+     */
+    case anyArray(data: [Any])
+
     /// The underlying data was not in a known format
     case unknownData
 }
@@ -91,6 +100,7 @@ extension AnyType: Equatable {
         case (.numberArray(let lhv), .numberArray(let rhv)): return lhv == rhv
         case (.booleanArray(let lhv), .booleanArray(let rhv)): return lhv == rhv
         case (.anyDictionary(let lhv), .anyDictionary(let rhv)): return (lhv as NSDictionary).isEqual(to: rhv)
+        case (.anyArray(let lhv), .anyArray(let rhv)): return (lhv as NSArray).isEqual(to: rhv)
         default: return false
         }
     }
@@ -139,6 +149,9 @@ extension AnyType: Decodable {
             if let dictionary = obj as? [String: Any] {
                 self = .anyDictionary(data: dictionary)
                 return
+            } else if let array = obj as? [Any] {
+                self = .anyArray(data: array)
+                return
             }
         }
         self = .unknownData
@@ -154,6 +167,12 @@ struct CustomEncodable: CodingKey {
         self.stringValue = key
         if let encodable = encodable as? Encodable {
             self.data = encodable
+        } else if
+            let encodable,
+            let data = try? JSONSerialization.data(withJSONObject: encodable, options: .fragmentsAllowed),
+            let decoded = try? AnyTypeDecodingContext(rawData: data).inject(to: JSONDecoder()).decode(AnyType.self, from: data)
+        {
+            self.data = decoded
         }
     }
     var stringValue: String
@@ -208,6 +227,15 @@ extension AnyType: Encodable {
                     try keyed.encode(value, forKey: customEncodable)
                 }
             }
+        case .anyArray(data: let array):
+            var indexed = encoder.unkeyedContainer()
+            for value in array {
+                let encodable = CustomEncodable(value, key: "")
+                if let data = encodable.data {
+                    try indexed.encode(data)
+                }
+            }
+
         default:
             try container.encodeNil()
             return

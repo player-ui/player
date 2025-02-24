@@ -1,9 +1,8 @@
 import { describe, test, vitest, expect, beforeEach } from "vitest";
-import React from "react";
+import React, { act } from "react";
 import {
   screen,
   render,
-  act,
   fireEvent,
   waitFor,
   configure,
@@ -150,8 +149,10 @@ describe("Integration tests", () => {
           fireEvent.click(itemNode);
         });
 
-        itemNode = await screen.findByTestId(item.id);
-        expect(itemNode.checked).toEqual(true);
+        await waitFor(async () => {
+          itemNode = await screen.findByTestId(item.id);
+          expect(itemNode.checked).toEqual(true);
+        });
       }
     });
   });

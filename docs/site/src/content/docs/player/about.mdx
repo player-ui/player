@@ -1,0 +1,25 @@
+---
+title: About
+---
+
+import Image from "../../../components/Image.astro";
+import darkLogo from "../../../assets/logo/logo-dark-large.png";
+import lightLogo from "../../../assets/logo/logo-light-large.png";
+
+<Image alt="Player logo" lightSrc={lightLogo} darkSrc={darkLogo} />
+
+## What Is Player?
+
+What is Player? Simply put, Player is a framework that enables users to natively render experiences across multiple platforms via a declarative content payload. At Intuit engineers use Player to accelerate the development of new experiences as Player allows them offload data/state management and fit seamlessly with other applications all with minimal configuration.
+
+## Why Did We Build It?
+
+Player is the second iteration of this kind of framework. The first iteration that was developed for internal use and worked well but had its limitations. With limited extensibility, limited platform support, and no type support the framework stated to rapidly show its age as we tried to move into newer spaces. It was then determined that we needed to take our learnings from the past few years and rearchitect it from the ground up. And that's how we got Player.
+
+## What Makes It Special?
+
+The first of the big changes with Player was using TypeScript over vanilla JavaScript. By leveraging TypeScript's strong typing system, we not only made it easier and safer to work on Player, but we were also able to expose our internal types in an easily consumable format. This paves the way for external tooling to be developed around Player.
+
+Now the biggest feature of Player: Plugins. This is discussed more in the Architecture section but at a high level, almost every component of Player exposes entry points to extend its functionality to make it work for your use case. We have included a handful of plugins we've developed alongside player but if none of those do what you need, the blueprint is there to build your own.
+
+Lastly, Player has iOS and JVM/Android clients. On these platforms you can create native experiences with minimal overhead and not just render a web view. Components can also be written in their native language allow someone with zero web dev experience to use Player.
