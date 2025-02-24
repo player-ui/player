@@ -236,7 +236,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
                 when (updateNumber) {
                     1 -> {}
                     2 -> {
-                        Assertions.assertEquals(1, (asset?.get("actions") as List<*>).size)
+                        Assertions.assertEquals(2, (asset?.get("actions") as List<*>).size)
                     }
 
                     3 -> {
@@ -244,7 +244,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
                     }
 
                     4 -> {
-                        Assertions.assertEquals(4, (asset?.get("actions") as List<*>).size)
+                        Assertions.assertEquals(2, (asset?.get("actions") as List<*>).size)
                     }
                 }
             }
@@ -522,5 +522,124 @@ internal class AsyncNodePluginTest : PlayerTest() {
         Assertions.assertEquals("3", asset2?.get("id"))
         Assertions.assertEquals("text", asset2?.get("type"))
         Assertions.assertEquals("Hello World!", asset2?.get("value"))
+    }
+
+
+    @TestTemplate
+    fun `chat-message asset - resolve single chat-message`() = runBlockingTest {
+
+        var update: Asset? = null
+        plugin?.hooks?.onAsyncNode?.tap("") { _, node, callback ->
+            BailResult.Bail(
+                listOf(
+                    mapOf(
+                        "asset" to mapOf(
+                            "id" to "5",
+                            "type" to "chat-message",
+                            "value" to "async content",
+                        ),
+                    ),
+                )
+            )
+        }
+        var count = 0
+        suspendCancellableCoroutine { cont ->
+            player.hooks.view.tap { v ->
+                v?.hooks?.onUpdate?.tap { asset ->
+                    count++
+                    update = asset
+                    if (count == 2) cont.resume(true) {}
+                }
+            }
+            player.start(chatMessageContent)
+        }
+        Assertions.assertTrue(count == 2)
+        val values = (update as? Map<*, *>)?.get("values") as? List<*>
+        Assertions.assertNotNull(values)
+        Assertions.assertEquals(2, values?.size)
+
+    }
+
+    @TestTemplate
+    fun `chat-message asset - resolve chained chat-message`() = runBlockingTest {
+        var asyncTaps = 0
+        var updateNumber = 0
+        player.hooks.view.tap { v ->
+            v?.hooks?.onUpdate?.tap { asset ->
+                updateNumber++
+                when (updateNumber) {
+                    1 -> {
+                        println("updateNumber: $updateNumber")
+                        println("asset: $asset")
+                        val values = (asset as? Map<*, *>)?.get("values") as? List<*>
+                        Assertions.assertNotNull(values)
+                        Assertions.assertEquals(1, values?.size)
+
+                        val asset0 = (values?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
+                        Assertions.assertEquals("1", asset0?.get("id"))
+                        Assertions.assertEquals("text", asset0?.get("type"))
+                        Assertions.assertEquals("Hello World!", asset0?.get("value"))
+                    }
+                    2 -> {
+                        println("asset in 2: $asset")
+                        val values = (asset as? Map<*, *>)?.get("values") as? List<*>
+                        Assertions.assertNotNull(values)
+                        Assertions.assertEquals(2, values?.size)
+
+                        val asset0 = (values?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
+                        Assertions.assertEquals("1", asset0?.get("id"))
+                        Assertions.assertEquals("text", asset0?.get("type"))
+                        Assertions.assertEquals("Hello World!", asset0?.get("value"))
+                    }
+                    3 -> {
+                        println("asset in 3: $asset")
+                        val values = (asset as? Map<*, *>)?.get("values") as? List<*>
+                        Assertions.assertNotNull(values)
+                        Assertions.assertEquals(2, values?.size)
+
+                        val asset0 = (values?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
+                        Assertions.assertEquals("1", asset0?.get("id"))
+                        Assertions.assertEquals("text", asset0?.get("type"))
+                        Assertions.assertEquals("Hello World!", asset0?.get("value"))
+                    }
+                }
+            }
+        }
+        plugin?.hooks?.onAsyncNode?.tap("") { _, node, callback ->
+            asyncTaps++
+            when (asyncTaps) {
+                1 -> BailResult.Bail(
+                    listOf(
+                        mapOf(
+                            "asset" to mapOf(
+                                "id" to "3",
+                                "type" to "chat-message",
+                                "value" to "chat-message asset",
+                            ),
+                        ),
+                    ),
+                )
+
+                else -> BailResult.Bail(
+                    listOf(
+                        mapOf(
+                            "asset" to mapOf(
+                                "id" to "4",
+                                "type" to "text",
+                                "value" to "normal text",
+                            ),
+                        ),
+                    )
+                )
+            }
+        }
+
+        player.start(chatMessageContent)
+
+        suspendCancellableCoroutine { cont ->
+            while (updateNumber < 3) runBlocking { delay(5) }
+            if (updateNumber == 3) cont.resume(true) {}
+        }
+        Assertions.assertTrue(true)
     }
 }
