@@ -230,4 +230,57 @@ public struct FlowData {
     }
 
     """
+
+    public static let flowControllerFlow = """
+{
+  "id": "generated-flow",
+  "views": [
+    {
+      "id": "view-1",
+      "type": "collection",
+      "label": {
+        "asset": {
+          "id": "title",
+          "type": "text",
+          "value": "Collections are used to group assets."
+        }
+      },
+      "values": [
+        {
+          "asset": {
+            "id": "text-1",
+            "type": "text",
+            "value": "This is the first item in the collection"
+          }
+        },
+        {
+          "asset": {
+            "id": "text-2",
+            "type": "text",
+            "value": "This is the second item in the collection"
+          }
+        }
+      ]
+    }
+  ],
+  "data": {},
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "view-1",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+"""
 }

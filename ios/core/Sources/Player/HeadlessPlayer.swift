@@ -59,6 +59,9 @@ public protocol CoreHooks {
     /// Fired when the state changes
     var state: Hook<BaseFlowState> { get }
 
+    /** A hook to access the current flow */
+    var onStart: Hook<FlowType> { get }
+
     /// Initialize hooks from reference to javascript core player
     init(from: JSValue)
 }

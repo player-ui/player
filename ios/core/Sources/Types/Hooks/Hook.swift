@@ -221,3 +221,53 @@ public class AsyncHook2<T, U>: BaseJSHook where T: CreatedFromJSValue, U: Create
     }
 }
 
+/**
+ This class represents an object in the JS runtime that can be tapped into
+ to receive JS events that has first parameter T and second generatic parameter U (that can be convert from JSValue using toObject) and returns some value R
+ */
+public class SyncWaterfallHook2JS<T, R, U>: BaseJSHook where T: CreatedFromJSValue, R: CreatedFromJSValue {
+
+    public func tap(_ hook: @escaping (T, U) -> R) {
+        let tapMethod: @convention(block) (JSValue?, JSValue?) -> JSValue? = { value, value2 in
+            guard let val = value,
+                  let val2 = value2,
+                  let hookValue = T.createInstance(value: val) as? T,
+                  let hookValue2 = val2.toObject() as? U else {
+                return nil
+            }
+
+            // Call the hook and get R
+            let returnValue = hook(hookValue, hookValue2)
+
+            // convert R to JSValue
+            return returnValue as? JSValue
+        }
+
+        self.hook.invokeMethod("tap", withArguments: [name, JSValue(object: tapMethod, in: context) as Any])
+    }
+}
+
+/**
+ This class represents an object in the JS runtime that can be tapped into
+ to receive JS events that has 1 parameter T and returns some value R
+ */
+public class SyncWaterfallHookJS<T, R>: BaseJSHook where T: CreatedFromJSValue, R: CreatedFromJSValue {
+
+    public func tap(_ hook: @escaping (T) -> R) {
+        let tapMethod: @convention(block) (JSValue?) -> JSValue? = { value in
+            guard let val = value,
+                  let hookValue = T.createInstance(value: val) as? T
+            else {
+                return nil
+            }
+
+            // Call the hook and get return value R
+            let returnValue = hook(hookValue)
+
+            // convert R to JSValue
+            return returnValue as? JSValue
+        }
+
+        self.hook.invokeMethod("tap", withArguments: [name, JSValue(object: tapMethod, in: context) as Any])
+    }
+}
