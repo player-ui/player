@@ -3,12 +3,10 @@ package com.intuit.playerui.core.player
 import com.intuit.hooks.BailResult
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.JSErrorException
-import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.PlayerRuntimeException
 import com.intuit.playerui.core.bridge.Promise
 import com.intuit.playerui.core.bridge.runtime.serialize
 import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
-import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializer
 import com.intuit.playerui.core.data.get
 import com.intuit.playerui.core.data.set
 import com.intuit.playerui.core.expressions.evaluate

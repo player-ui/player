@@ -9,8 +9,6 @@ import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.player.PlayerFlowStatus
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.KSerializer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -28,7 +26,7 @@ internal class ErrorStateTest : NodeBaseTest() {
         every { node.runtime } returns runtime
         every { runtime.containsKey("getSymbol") } returns true
         every { runtime.getInvokable<String?>("getSymbol") } returns Invokable { "Symbol(hello)" }
-        every { node.getSerializable("flow", Flow.serializer()) } returns Flow.createFlow("flowId")
+        every { node.getSerializable("flow", Flow.serializer()) } returns Flow("flowId")
         every { node.getSerializable("error", any<KSerializer<Throwable>>()) } returns null
         every { node.getString("error") } returns "hello"
         every { node.getObject("error") } returns null

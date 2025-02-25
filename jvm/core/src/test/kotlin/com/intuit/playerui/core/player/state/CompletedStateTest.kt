@@ -13,8 +13,6 @@ import com.intuit.playerui.core.player.PlayerFlowStatus
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonNull
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
@@ -46,7 +44,7 @@ internal class CompletedStateTest : NodeBaseTest() {
         every { node.getSerializable<Any>("controllers", any()) } returns controllerState
         every { node.getObject("data") } returns node
         every { node.getSerializable<Any>("data", any()) } returns DataController(node)
-        every { node.getSerializable("flow", Flow.serializer()) } returns Flow.createFlow("flowId")
+        every { node.getSerializable("flow", Flow.serializer()) } returns Flow("flowId")
         every { node.getSerializable("dataModel", DataModelWithParser.serializer()) } returns DataModelWithParser(node)
         every { node.getObject("dataModel") } returns mockDataModel
         every { node.getObject("flow") } returns null
