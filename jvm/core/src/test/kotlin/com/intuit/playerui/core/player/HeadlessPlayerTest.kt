@@ -3,10 +3,12 @@ package com.intuit.playerui.core.player
 import com.intuit.hooks.BailResult
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.JSErrorException
+import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.PlayerRuntimeException
 import com.intuit.playerui.core.bridge.Promise
 import com.intuit.playerui.core.bridge.runtime.serialize
 import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
+import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializer
 import com.intuit.playerui.core.data.get
 import com.intuit.playerui.core.data.set
 import com.intuit.playerui.core.expressions.evaluate
@@ -206,12 +208,16 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         assertNotNull(state.currentView)
 
         // remove evaluated nodes
-        val currentView = simpleFlow.views!![0].filterKeys("applicability")
+        val currentViewJson = Json.decodeFromJsonElement(
+            GenericSerializer(),
+            simpleFlow.views!![0].jsonObject
+                .filterKeys("applicability"),
+        )
 
         // remove transforms
         val withoutTransforms = state.lastViewUpdate!!.filterKeys("run")
 
-        assertEquals(currentView, withoutTransforms)
+        assertEquals(currentViewJson, withoutTransforms)
 
         val namedFlowState = state.currentFlowState
         val flowState = namedFlowState?.value
