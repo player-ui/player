@@ -1,3 +1,15 @@
+# 0.10.4-next.0 (Tue Feb 25 2025)
+
+#### 🐛 Bug Fix
+
+- Expose metrics plugin hooks android [#591](https://github.com/player-ui/player/pull/591) ([@mrigankmg](https://github.com/mrigankmg))
+
+#### Authors: 1
+
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+
+---
+
 # 0.10.3 (Tue Feb 25 2025)
 
 ### Release Notes
