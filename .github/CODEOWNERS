@@ -1,5 +1,5 @@
 # Fallback
-* @adierkens
+* @adierkens @hborawski @KetanReddy
 
 # Other
 /docs/ @KetanReddy @adierkens
@@ -10,8 +10,8 @@
 /android/ @sugarmanz @Brocollie08
 
 # iOS
-/xcode/ @hborawski
-/ios/ @hborawski
+/xcode/ @hborawski @nancywu1 
+/ios/ @hborawski @nancywu1
 
 # Web
 /react/ @spentacular @adierkens
