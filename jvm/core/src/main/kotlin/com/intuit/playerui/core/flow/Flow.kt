@@ -23,13 +23,13 @@ public class Flow(override val node: Node) : NodeWrapper {
     public val id: String by NodeSerializableField(String.serializer())
 
     @OptIn(ExperimentalPlayerApi::class)
-    public val views: List<JsonElement>? by NodeSerializableField(ListSerializer(JsonElement.serializer()).nullable)
+    public val views: List<Node>? by NodeSerializableField(ListSerializer(Node.serializer()).nullable)
 
     @OptIn(ExperimentalPlayerApi::class)
-    public val schema: JsonElement by NodeSerializableField(JsonElement.serializer())
+    public val schema: Node? by NodeSerializableField(Node.serializer().nullable)
 
     @OptIn(ExperimentalPlayerApi::class)
-    public val data: JsonElement by NodeSerializableField(JsonElement.serializer())
+    public val data: Node? by NodeSerializableField(Node.serializer().nullable)
 
     @OptIn(ExperimentalPlayerApi::class)
     public val navigation: Navigation? by NodeSerializableField(Navigation.serializer().nullable)
@@ -71,9 +71,9 @@ public class Flow(override val node: Node) : NodeWrapper {
 //        }
         public fun createFlow(
             id: String = UNKNOWN_ID,
-            views: List<JsonElement>? = emptyList(),
-            schema: JsonElement = JsonNull,
-            data: JsonElement = JsonNull,
+            views: List<Node>? = emptyList(),
+            schema: Node? = null,
+            data: Node? = null,
             navigation: Navigation? = null
         ): Flow {
             val jsonString = "{\"id\":\"$id\",\"views\":${views},\"schema\":$schema,\"data\":$data,\"navigation\":$navigation}"

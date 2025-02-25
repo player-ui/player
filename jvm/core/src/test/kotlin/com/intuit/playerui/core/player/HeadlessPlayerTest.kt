@@ -206,16 +206,12 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         assertNotNull(state.currentView)
 
         // remove evaluated nodes
-        val currentViewJson = Json.decodeFromJsonElement(
-            GenericSerializer(),
-            simpleFlow.views!![0].jsonObject
-                .filterKeys("applicability"),
-        )
+        val currentView = simpleFlow.views!![0].filterKeys("applicability")
 
         // remove transforms
         val withoutTransforms = state.lastViewUpdate!!.filterKeys("run")
 
-        assertEquals(currentViewJson, withoutTransforms)
+        assertEquals(currentView, withoutTransforms)
 
         val namedFlowState = state.currentFlowState
         val flowState = namedFlowState?.value
