@@ -52,3 +52,29 @@ public class NodeSyncHook2<T1, T2>(override val node: Node, private val serializ
         NodeSyncHook2(it, serializer1, serializer2)
     })
 }
+
+@Serializable(with = NodeSyncHook3.Serializer::class)
+public class NodeSyncHook3<T1, T2, T3>(override val node: Node, private val serializer1: KSerializer<T1>, private val serializer2: KSerializer<T2>, private val serializer3: KSerializer<T3>) : SyncHook<(HookContext, T1?, T2?, T3?) -> Unit>(), NodeHook<Unit> {
+
+    init { init(serializer1, serializer2, serializer3) }
+    override fun call(context: HookContext, serializedArgs: Array<Any?>) {
+        require(serializedArgs.size == 3)
+        val (p1, p2, p3) = serializedArgs
+        call { f, _ ->
+            f(
+                context,
+                p1 as? T1,
+                p2 as? T2,
+                p3 as? T3,
+            )
+        }
+    }
+    public fun tap(name: String, callback: (T1?, T2?, T3?) -> Unit): String? = super.tap(name) { _, p1, p2, p3 -> callback(p1, p2, p3) }
+    public inline fun tap(noinline callback: (T1?, T2?, T3?) -> Unit): String? = tap(callingStackTraceElement.toString(), callback)
+
+    public inline fun tap(noinline callback: (HookContext, T1?, T2?, T3?) -> Unit): String? = tap(callingStackTraceElement.toString(), callback)
+
+    internal class Serializer<T1, T2, T3>(private val serializer1: KSerializer<T1>, private val serializer2: KSerializer<T2>, private val serializer3: KSerializer<T3>) : NodeWrapperSerializer<NodeSyncHook3<T1, T2, T3>>({
+        NodeSyncHook3(it, serializer1, serializer2, serializer3)
+    })
+}
