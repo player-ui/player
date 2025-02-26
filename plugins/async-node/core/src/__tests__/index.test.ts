@@ -45,7 +45,11 @@ describe("view", () => {
       {
         id: "1",
         type: "chat-message",
-        value: "Hello World!",
+        value: {
+          id: "2",
+          type: "text",
+          value: "chat message",
+        },
       },
     ],
     navigation: {
@@ -646,8 +650,8 @@ describe("view", () => {
     view = (player.getState() as InProgressState).controllers.view.currentView
       ?.lastUpdate;
 
-    expect(view?.values[1].asset.type).toBe("text");
-    expect(view?.values[2].asset.type).toBe("text");
+    expect(view?.values[1][0].asset.type).toBe("text");
+    expect(view?.values[1][1].asset.type).toBe("text");
   });
 
   test("chat-message asset - replaces async nodes with provided node", async () => {
@@ -686,7 +690,7 @@ describe("view", () => {
 
     expect(view).toBeDefined();
     expect(view?.values[0].asset.type).toBe("text");
-    expect(view?.values[0].asset.value).toBe("Hello World!");
+    expect(view?.values[0].asset.value).toBe("chat message");
     expect(updateNumber).toBe(1);
 
     await waitFor(() => {
@@ -748,7 +752,7 @@ describe("view", () => {
 
     expect(view).toBeDefined();
     expect(view?.values[0].asset.type).toBe("text");
-    expect(view?.values[0].asset.value).toBe("Hello World!");
+    expect(view?.values[0].asset.value).toBe("chat message");
     expect(updateNumber).toBe(1);
 
     await waitFor(() => {
@@ -758,9 +762,13 @@ describe("view", () => {
     if (deferredResolve) {
       deferredResolve({
         asset: {
-          id: "2",
+          id: "3",
           type: "chat-message",
-          value: "async content",
+          value: {
+            id: "4",
+            type: "text",
+            value: "async content",
+          },
         },
       });
     }
@@ -812,7 +820,7 @@ describe("view", () => {
 
     expect(view).toBeDefined();
     expect(view?.values[0].asset.type).toBe("text");
-    expect(view?.values[0].asset.value).toBe("Hello World!");
+    expect(view?.values[0].asset.value).toBe("chat message");
     expect(updateNumber).toBe(1);
 
     await waitFor(() => {
@@ -822,9 +830,13 @@ describe("view", () => {
     if (deferredResolve) {
       deferredResolve({
         asset: {
-          id: "2",
+          id: "3",
           type: "chat-message",
-          value: "async content",
+          value: {
+            id: "4",
+            type: "text",
+            value: "async content",
+          },
         },
       });
     }
@@ -842,7 +854,7 @@ describe("view", () => {
     if (deferredResolve) {
       deferredResolve({
         asset: {
-          id: "3",
+          id: "5",
           type: "text",
           value: "chained async content",
         },

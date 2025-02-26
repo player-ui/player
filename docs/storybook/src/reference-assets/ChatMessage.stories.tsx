@@ -1,4 +1,4 @@
-import { PlayerStory } from "@player-ui/storybook";
+import { createDSLStory } from "@player-ui/storybook";
 import { Meta } from "@storybook/react";
 
 const meta: Meta = {
@@ -7,8 +7,9 @@ const meta: Meta = {
 
 export default meta;
 
-export const Basic = () => (
-  <PlayerStory
-    flow={() => import("@player-ui/mocks/chat-message/chat-message-basic.json")}
-  />
+export const Basic = createDSLStory(
+  () =>
+    import(
+      "!!raw-loader!@player-ui/mocks/chat-message/chat-message-basic.tsx"
+    ),
 );

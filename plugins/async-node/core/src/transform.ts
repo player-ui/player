@@ -6,25 +6,28 @@ import type { AsyncTransformFunc } from "./types";
  * @param asset - async asset to apply beforeResolve transform
  * @param transformedAssetType: transformed asset type for rendering
  * @param wrapperAssetType: container asset type
- * @param flatten: flatten the streamed in content or not
+ * @param flatten: flatten the streamed in content
  * @returns - wrapper asset with children of transformed asset and async node
  */
 
 export const asyncTransform: AsyncTransformFunc = (
-  asset,
-  transformedAssetType,
+  assetId,
   wrapperAssetType,
+  asset,
   flatten,
 ) => {
-  const id = "async-" + asset.value.id;
-
-  const assetNode = Builder.assetWrapper({
-    ...asset.value,
-    type: transformedAssetType,
-  });
+  const id = "async-" + assetId;
 
   const asyncNode = Builder.asyncNode(id, flatten);
-  const multiNode = Builder.multiNode(assetNode, asyncNode);
+  let multiNode;
+  let assetNode;
+
+  if (asset) {
+    assetNode = Builder.assetWrapper(asset);
+    multiNode = Builder.multiNode(assetNode, asyncNode);
+  } else {
+    multiNode = Builder.multiNode(asyncNode);
+  }
 
   const wrapperAsset = Builder.asset({
     id: wrapperAssetType + "-" + id,

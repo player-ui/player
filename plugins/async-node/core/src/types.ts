@@ -6,8 +6,8 @@ export type AsyncNodeHandler = (
 ) => void;
 
 export type AsyncTransformFunc = (
-  asset: Node.Asset | Node.View,
-  transformedAssetType: string,
+  id: string,
   wrapperAssetType: string,
+  asset?: Asset,
   flatten?: boolean,
 ) => Node.Node;

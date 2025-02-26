@@ -413,22 +413,14 @@ export class Resolver {
         if (mTree.value !== undefined && mTree.value !== null) {
           /**
            * async nodes' parent is a multi-node
-           * When the mValue is an async node and the flatten flag is true
-           * add the mTree.value(content streamed in) to the childValue of parent multi-node
-           * Array.isArray(mTree.value) is for the case where content streamed in is a multi-node
-           * Array.isArray(mTree.value.asset.values) is the case where the content is an async asset
+           * When the node to resolve is an async node and the flatten flag is true
+           * Add the content streamed in to the childValue of parent multi-node
+           * Array.isArray(mTree.value.asset.values) is the case when the content is an async asset
            */
           if (
             mValue.type === NodeType.Async &&
             mValue.flatten &&
-            Array.isArray(mTree.value)
-          ) {
-            mTree.value.forEach((v: any) => {
-              unpackAndPush(v, childValue);
-            });
-          } else if (
-            mValue.type === NodeType.Async &&
-            mValue.flatten &&
+            mTree.value.asset &&
             Array.isArray(mTree.value.asset.values)
           ) {
             mTree.value.asset.values.forEach((v: any) => {

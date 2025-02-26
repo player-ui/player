@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`asyncTransform > generates wrapper asset 1`] = `
+exports[`asyncTransform > generates wrapper asset with asset 1`] = `
 {
   "children": [
     {
@@ -22,9 +22,9 @@ exports[`asyncTransform > generates wrapper asset 1`] = `
                   "parent": [Circular],
                   "type": "asset",
                   "value": {
-                    "id": "1",
+                    "id": "2",
                     "type": "text",
-                    "value": "Hello World!",
+                    "value": "chat message",
                   },
                 },
               },

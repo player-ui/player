@@ -23,7 +23,11 @@ describe("chatMessage transform", () => {
       {
         type: "chat-message",
         id: "1",
-        value: "Hello World!",
+        value: {
+          id: "1",
+          type: "text",
+          value: "chat message",
+        },
       },
       [plugin],
     );
@@ -44,7 +48,7 @@ describe("chatMessage transform", () => {
           asset: {
             id: "1",
             type: "text",
-            value: "Hello World!",
+            value: "chat message",
           },
         },
       ],

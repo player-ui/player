@@ -3,26 +3,43 @@ import { asyncTransform } from "..";
 import { Builder } from "@player-ui/player";
 
 describe("asyncTransform", () => {
-  it("generates wrapper asset", async () => {
+  const asset = Builder.asset({
+    type: "chat-message",
+    id: "1",
+    value: {
+      id: "2",
+      type: "text",
+      value: "chat message",
+    },
+  });
+
+  it("generates wrapper asset with asset", async () => {
     const asset = Builder.asset({
       type: "chat-message",
       id: "1",
-      value: "Hello World!",
+      value: {
+        id: "2",
+        type: "text",
+        value: "chat message",
+      },
     });
 
-    const transformedAsset = asyncTransform(asset, "text", "collection");
+    const transformedAsset = asyncTransform(
+      "1",
+      "collection",
+      asset.value.value,
+    );
 
     expect(transformedAsset).toMatchSnapshot();
   });
 
   it("generates wrapper asset with flatten is false", async () => {
-    const asset = Builder.asset({
-      type: "chat-message",
-      id: "1",
-      value: "Hello World!",
-    });
-
-    const transformedAsset = asyncTransform(asset, "text", "collection", false);
+    const transformedAsset = asyncTransform(
+      "1",
+      "collection",
+      asset.value.value,
+      false,
+    );
 
     expect(transformedAsset.children[0].value.values[1].flatten).toBe(false);
   });
