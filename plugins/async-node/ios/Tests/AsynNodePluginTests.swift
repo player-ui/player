@@ -787,6 +787,137 @@ class AsyncNodePluginTests: XCTestCase {
         wait(for: [textExpectation2], timeout: 5)
         XCTAssertEqual(expectedNode2Text, "chained chat message")
     }
+    
+    
+    func testChatMessageHandleMultipleUpdatesThroughCallback() {
+        
+        let handlerExpectation = XCTestExpectation(description: "first data did not change")
+        
+        guard let context = JSContext() else {
+            XCTFail("JSContext initialization failed")
+            return
+        }
+        
+        var count = 0
+        var args: JSValue?
+        var callbackFunction: JSValue?
+        
+        let resolve: AsyncHookHandler = { node, callback in
+            handlerExpectation.fulfill()
+            callbackFunction = callback
+            
+            return .singleNode(.concrete(context.evaluateScript("""
+            (
+                {"asset": {"id": "text", "type": "text", "value":"new node from the hook 1"}}
+            )
+        """) ?? JSValue()))
+        }
+        
+        let asyncNodePluginPlugin = AsyncNodePluginPlugin()
+        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolve)
+        
+        plugin.context = context
+        
+        XCTAssertNotNil(asyncNodePluginPlugin.context)
+        
+        let player = HeadlessPlayerImpl(plugins: [ReferenceAssetsPlugin(), plugin], context: context)
+        
+        let textExpectation = XCTestExpectation(description: "newText found")
+        let textExpectation2 = XCTestExpectation(description: "newText found")
+        let textExpectation3 = XCTestExpectation(description: "newText found")
+        
+        var expectedMultiNode1Text: String = ""
+        var expectedMultiNode2Text: String = ""
+        var expectedMultiNode3Text: String = ""
+        var expectedMultiNode4Text: String = ""
+        
+        player.hooks?.viewController.tap({ (viewController) in
+            viewController.hooks.view.tap { (view) in
+                view.hooks.onUpdate.tap { val in
+                    count += 1
+                    
+                    if count == 2 {
+                        let newText1 = val
+                            .objectForKeyedSubscript("values")
+                            .objectAtIndexedSubscript(1)
+                            .objectForKeyedSubscript("asset")
+                            .objectForKeyedSubscript("value")
+                        guard let textString1 = newText1?.toString() else { return XCTFail("newText was not a string") }
+                        
+                        expectedMultiNode1Text = textString1
+                        textExpectation.fulfill()
+                    }
+                    
+                    if count == 3 {
+                        let newText2 = val
+                            .objectForKeyedSubscript("values")
+                            .objectAtIndexedSubscript(1)
+                            .objectForKeyedSubscript("asset")
+                            .objectForKeyedSubscript("value")
+                        guard let textString2 = newText2?.toString() else { return XCTFail("newText was not a string") }
+                        
+                        expectedMultiNode2Text = textString2
+                        textExpectation2.fulfill()
+                    }
+                    
+                    if count == 4 {
+                        
+                        let newText3 = val
+                            .objectForKeyedSubscript("values")
+                            .objectAtIndexedSubscript(0)
+                            .objectForKeyedSubscript("asset")
+                            .objectForKeyedSubscript("value")
+                        guard let textString3 = newText3?.toString() else { return XCTFail("newText was not a string") }
+                        
+                        let newText4 = val
+                            .objectForKeyedSubscript("values")
+                            .objectAtIndexedSubscript(1)
+                            .objectForKeyedSubscript("asset")
+                            .objectForKeyedSubscript("value")
+                        guard let textString4 = newText4?.toString() else { return XCTFail("newText was not a string") }
+                        
+                        expectedMultiNode3Text = textString3
+                        expectedMultiNode4Text = textString4
+                        textExpectation3.fulfill()
+                    }
+                }
+            }
+        })
+        
+        player.start(flow: .chatMessageJson, completion: { _ in})
+        
+        wait(for: [handlerExpectation, textExpectation], timeout: 5)
+        
+        XCTAssert(count == 2)
+        XCTAssertEqual(expectedMultiNode1Text, "new node from the hook 1")
+        
+        var replacementResult = AsyncNodeHandlerType.singleNode(.concrete(context.evaluateScript("""
+                (
+                    {"asset": {"id": "text", "type": "text", "value":"new node from the hook 2"}}
+                )
+            """) ?? JSValue()))
+        
+        args = replacementResult.handlerTypeToJSValue(context: context ?? JSContext())
+        
+        let _ = callbackFunction?.call(withArguments: [args])
+        
+        XCTAssert(count == 3)
+        XCTAssertEqual(expectedMultiNode2Text, "new node from the hook 2")
+        
+        
+        wait(for: [textExpectation2], timeout: 5)
+        
+        replacementResult = AsyncNodeHandlerType.emptyNode
+        
+        args = replacementResult.handlerTypeToJSValue(context: context ?? JSContext())
+        
+        _ = callbackFunction?.call(withArguments: [args])
+        
+        XCTAssert(count == 4)
+        // asset that the value at index 0 for the object
+        XCTAssertEqual(expectedMultiNode3Text, "Hello World!")
+        XCTAssertEqual(expectedMultiNode4Text, "undefined")
+    }
 }
 
 extension String {
