@@ -18,6 +18,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
 
+// TODO: This typing is not great - need to fix once web plugin is updated as currently web also supports type Any
 public typealias asyncNodeUpdate = Any?
 public class AsyncNodePlugin : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
 
