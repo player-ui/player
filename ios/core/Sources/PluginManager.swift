@@ -20,7 +20,9 @@ public class PluginManager {
     private func setupHooks() {
         // Registering the plugin
         hooks.registerPlugin.tap(name: "RegisterPluginAppend") { plugin in
-            self.plugins.append(plugin)
+            if !self.plugins.contains(where: { $0.pluginName == plugin.pluginName }) {
+                self.plugins.append(plugin)
+            }
         }
 
         // Finding the plugin
@@ -34,9 +36,7 @@ public class PluginManager {
 
     // Method to add a plugin to the Manager where pluginNames are unique
     public func registerPlugin(_ plugin: NativePlugin) {
-        if !plugins.contains(where: { $0.pluginName == plugin.pluginName }) {
-            self.hooks.registerPlugin.call(plugin)
-        }
+        self.hooks.registerPlugin.call(plugin)
     }
 
     // Method to retrieve a plugin by type
