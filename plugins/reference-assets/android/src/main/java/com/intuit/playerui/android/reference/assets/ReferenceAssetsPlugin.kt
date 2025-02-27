@@ -12,6 +12,8 @@ import com.intuit.playerui.android.reference.assets.collection.Collection
 import com.intuit.playerui.android.reference.assets.info.Info
 import com.intuit.playerui.android.reference.assets.input.Input
 import com.intuit.playerui.android.reference.assets.text.Text
+import com.intuit.playerui.android.reference.assets.chat.ChatMessageAsset
+
 import com.intuit.playerui.core.player.Player
 import com.intuit.playerui.core.plugins.JSPluginWrapper
 import com.intuit.playerui.core.plugins.findPlugin
@@ -33,6 +35,8 @@ class ReferenceAssetsPlugin : AndroidPlayerPlugin, JSPluginWrapper by Transforms
         androidPlayer.registerAsset("collection", ::Collection)
         androidPlayer.registerAsset("info", ::Info)
         androidPlayer.registerAsset("input", ::Input)
+        /** The asset firing the async-node transform */
+        androidPlayer.registerAsset("chat-message", ::ChatMessageAsset)
     }
 
     fun handleLink(ref: String, context: Context) = startActivity(

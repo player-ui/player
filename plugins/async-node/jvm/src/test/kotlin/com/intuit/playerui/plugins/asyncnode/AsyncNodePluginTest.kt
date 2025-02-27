@@ -1,6 +1,7 @@
 package com.intuit.playerui.plugins.asyncnode
 
 import com.intuit.hooks.BailResult
+import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.player.state.inProgressState
@@ -69,7 +70,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
         }
         """.trimMargin()
 
-    override val plugins = listOf(AsyncNodePlugin())
+    override val plugins = listOf(AsyncNodePlugin(), ReferenceAssetsPlugin())
 
     private val plugin get() = player.asyncNodePlugin!!
 
@@ -111,6 +112,81 @@ internal class AsyncNodePluginTest : PlayerTest() {
     }
 
     @TestTemplate
+    fun `async node hook is tappable for chat-message asset and replaces async nodes with provided node`() =
+        runBlockingTest {
+            val chatMessageContent =
+                """
+            {
+  "id": "chat",
+  "views": [
+      {
+      "id": "Text1",
+      "type": "chat-message",
+      "value": "Chat Message Robo!"
+      }
+  ],
+  "navigation": {
+      "BEGIN": "FLOW_1",
+      "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+          "state_type": "VIEW",
+          "ref": "Text1",
+          "transitions": {
+          "*": "END_Done"
+          }
+      },
+      "END_Done": {
+          "state_type": "END",
+          "outcome": "DONE"
+      }
+    }
+  }
+}
+                """.trimMargin()
+            var update: Asset? = null
+            plugin?.hooks?.onAsyncNode?.tap("") { _, node, callback ->
+                BailResult.Bail(
+                    listOf(
+                        mapOf(
+                            "asset" to mapOf(
+                                "id" to "Robo2",
+                                "type" to "text",
+                                "value" to "Hello Robo!",
+                            ),
+                        ),
+                    ),
+                )
+            }
+            var count = 0
+            suspendCancellableCoroutine { cont ->
+                player.hooks.view.tap { v ->
+                    v?.hooks?.onUpdate?.tap { asset ->
+                        count++
+                        update = asset
+                        if (count == 2) cont.resume(true) {}
+                    }
+                }
+
+                player.start(chatMessageContent)
+            }
+            Assertions.assertTrue(count == 2)
+            val values = (update as? Map<*, *>)?.get("values") as? List<*>
+            Assertions.assertNotNull(values)
+            Assertions.assertEquals(2, values?.size)
+
+            val asset0 = (values?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
+            val asset1 = (values?.get(1) as? Map<*, *>)?.get("asset") as? Map<*, *>
+
+            Assertions.assertEquals("text", asset0?.get("type"))
+            Assertions.assertEquals("Chat Message Robo!", asset0?.get("value"))
+
+            Assertions.assertEquals("Robo2", asset1?.get("id"))
+            Assertions.assertEquals("continuous-text", asset1?.get("type"))
+            Assertions.assertEquals("Hello Robo!", asset1?.get("value"))
+        }
+
+    @TestTemplate
     fun `replace async node with multiNode`() = runBlockingTest {
         var update: Asset? = null
         plugin?.hooks?.onAsyncNode?.tap("") { _, node, callback ->
@@ -145,7 +221,6 @@ internal class AsyncNodePluginTest : PlayerTest() {
             player.start(asyncNodeFlowSimple)
         }
         Assertions.assertTrue(count == 2)
-        print(update?.get("actions"))
         Assertions.assertEquals(2, update?.getList("actions")?.size)
         Assertions.assertEquals(2, update?.getList("actions")?.filterIsInstance<ArrayList<Node>>()?.get(0)?.size)
     }
@@ -300,7 +375,8 @@ internal class AsyncNodePluginTest : PlayerTest() {
         )
         Assertions.assertEquals(
             "action",
-            view.getList("actions")?.filterIsInstance<ArrayList<Node>>()?.get(0)?.get(0)?.getObject("asset")?.get("type"),
+            view.getList("actions")?.filterIsInstance<ArrayList<Node>>()?.get(0)?.get(0)?.getObject("asset")
+                ?.get("type"),
         )
         Assertions.assertEquals(2, view.getList("actions")?.size)
         Assertions.assertEquals(2, count)
@@ -386,5 +462,171 @@ internal class AsyncNodePluginTest : PlayerTest() {
             view!!.getList("actions")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("type"),
         )
         Assertions.assertEquals(1, view.getList("actions")?.size)
+    }
+
+    @TestTemplate
+    fun `chat-message asset replaces async nodes with multi node flattened`() = runBlockingTest {
+        val chatMessageContent =
+            """
+            {
+  "id": "chat",
+  "views": [
+      {
+      "id": "flatten1",
+      "type": "chat-message",
+      "value": "Hello Flatten!"
+      }
+  ],
+  "navigation": {
+      "BEGIN": "FLOW_1",
+      "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+          "state_type": "VIEW",
+          "ref": "flatten1",
+          "transitions": {
+          "*": "END_Done"
+          }
+      },
+      "END_Done": {
+          "state_type": "END",
+          "outcome": "DONE"
+      }
+    }
+  }
+}
+            """.trimMargin()
+        var update: Asset? = null
+        plugin?.hooks?.onAsyncNode?.tap("") { _, node, callback ->
+            BailResult.Bail(
+                listOf(
+                    mapOf(
+                        "asset" to mapOf(
+                            "id" to "2",
+                            "type" to "text",
+                            "value" to "Hello World!",
+                        ),
+                    ),
+                    mapOf(
+                        "asset" to mapOf(
+                            "id" to "3",
+                            "type" to "text",
+                            "value" to "Hello World!",
+                        ),
+                    ),
+                ),
+            )
+        }
+        var count = 0
+        suspendCancellableCoroutine { cont ->
+            player.hooks.view.tap { v ->
+                v?.hooks?.onUpdate?.tap { asset ->
+                    count++
+                    update = asset
+                    if (count == 2) cont.resume(true) {}
+                }
+            }
+
+            player.start(chatMessageContent)
+        }
+        Assertions.assertTrue(count == 2)
+        // Additional assertions
+        val values = (update as? Map<*, *>)?.get("values") as? List<*>
+        Assertions.assertNotNull(values)
+        Assertions.assertEquals(3, values?.size)
+
+        val asset0 = (values?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
+        val asset1 = (values?.get(1) as? Map<*, *>)?.get("asset") as? Map<*, *>
+        val asset2 = (values?.get(2) as? Map<*, *>)?.get("asset") as? Map<*, *>
+
+        Assertions.assertEquals("flatten1", asset0?.get("id"))
+        Assertions.assertEquals("text", asset0?.get("type"))
+        Assertions.assertEquals("Hello Flatten!", asset0?.get("value"))
+
+        Assertions.assertEquals("2", asset1?.get("id"))
+        Assertions.assertEquals("text", asset1?.get("type"))
+        Assertions.assertEquals("Hello World!", asset1?.get("value"))
+
+        Assertions.assertEquals("3", asset2?.get("id"))
+        Assertions.assertEquals("text", asset2?.get("type"))
+        Assertions.assertEquals("Hello World!", asset2?.get("value"))
+    }
+
+    @TestTemplate
+    fun `chat-message asset replaces async nodes with chat-message asset`() = runBlockingTest {
+        val chatMessageContent =
+            """
+        {
+            "id": "chat",
+            "views": [
+                {
+                    "id": "ai",
+                    "type": "chat-message",
+                    "value": "random content"
+                }
+            ],
+            "navigation": {
+                "BEGIN": "FLOW_1",
+                "FLOW_1": {
+                    "startState": "VIEW_1",
+                    "VIEW_1": {
+                        "state_type": "VIEW",
+                        "ref": "ai",
+                        "transitions": {
+                            "*": "END_Done"
+                        }
+                    },
+                    "END_Done": {
+                        "state_type": "END",
+                        "outcome": "DONE"
+                    }
+                }
+            }
+        }
+            """.trimMargin()
+        var update: Asset? = null
+        plugin?.hooks?.onAsyncNode?.tap("") { _, node, callback ->
+            BailResult.Bail(
+                listOf(
+                    mapOf(
+                        "asset" to mapOf(
+                            "id" to "unique-id-2",
+                            "type" to "chat-message",
+                            "value" to "async content-unique",
+                        ),
+                    ),
+                ),
+            )
+        }
+        var count = 0
+        suspendCancellableCoroutine { cont ->
+            player.hooks.view.tap { v ->
+                v?.hooks?.onUpdate?.tap { asset ->
+                    count++
+                    update = asset
+                    if (count == 2) cont.resume(true) {}
+                }
+            }
+
+            player.start(chatMessageContent)
+        }
+        Assertions.assertTrue(count == 2)
+        val values = (update as? Map<*, *>)?.get("values") as? List<*>
+        Assertions.assertNotNull(values)
+        Assertions.assertEquals(2, values?.size)
+
+        val asset1 = (values?.get(1) as? Map<*, *>)?.get("asset") as? Map<*, *>
+
+        Assertions.assertEquals("collection-async-2", asset1?.get("id"))
+        Assertions.assertEquals("collection", asset1?.get("type"))
+
+        val nestedValues = asset1?.get("values") as? List<*>
+        Assertions.assertNotNull(nestedValues)
+        Assertions.assertEquals(1, nestedValues?.size)
+
+        val nestedAsset = (nestedValues?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
+        Assertions.assertEquals("unique-id-2", nestedAsset?.get("id"))
+        Assertions.assertEquals("text", nestedAsset?.get("type"))
+        Assertions.assertEquals("async content-unique", nestedAsset?.get("value"))
     }
 }

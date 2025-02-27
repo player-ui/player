@@ -14,6 +14,7 @@ import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.player.state.PlayerFlowState
 import com.intuit.playerui.core.plugins.Plugin
+import com.intuit.playerui.plugins.asyncnode.AsyncNodePlugin
 import com.intuit.playerui.plugins.transactions.PendingTransactionPlugin
 import com.intuit.playerui.plugins.types.CommonTypesPlugin
 import com.intuit.playerui.utils.makeFlow
@@ -51,7 +52,7 @@ abstract class AssetTest(val group: String? = null) {
     @get:Rule
     val name = TestName()
 
-    open val plugins: List<Plugin> by lazy { listOf(ReferenceAssetsPlugin(), CommonTypesPlugin(), PendingTransactionPlugin()) }
+    open val plugins: List<Plugin> by lazy { listOf(ReferenceAssetsPlugin(), AsyncNodePlugin(), CommonTypesPlugin(), PendingTransactionPlugin()) }
 
     val context: Context get() = ApplicationProvider.getApplicationContext()
 
@@ -75,7 +76,7 @@ abstract class AssetTest(val group: String? = null) {
         throw AssertionError("Expected view to update, but it did not.", exception)
     }
 
-    var currentAssetTree: RenderableAsset? = null; private set(value) {
+    var currentAssetTree: RenderableAsset? = null; set(value) {
         // reset view on new asset
         currentView = null
 
@@ -89,11 +90,18 @@ abstract class AssetTest(val group: String? = null) {
         }
     }
 
-    var currentView: View? = null; get() = field ?: blockUntilRendered()
+    var currentView: View? = null
+        get() {
+            return field ?: blockUntilRendered().also {
+                println("blockUntilRendered called, currentView set to: $it")
+            }
+        }
         set(value) {
             field = value.also {
                 // reset replay cache to clear value if the current value is set to null
-                it ?: viewChannel.resetReplayCache()
+                it ?: viewChannel.resetReplayCache().also {
+                    println("viewChannel replay cache reset")
+                }
             }
         }
 
@@ -126,6 +134,12 @@ abstract class AssetTest(val group: String? = null) {
 
     fun launchMock(name: String) = launchMock(
         mocks.find { it.name == name || it.name == "$group-$name" }
+            ?.also { mock ->
+                val json = when (mock) {
+                    is ClassLoaderMock -> Json.encodeToString(mock.getFlow(context.classLoader))
+                    else -> throw IllegalArgumentException("mock of type ${mock::class.java.simpleName} not supported")
+                }
+            }
             ?: throw IllegalArgumentException("$name not found in mocks: ${mocks.map { "${it.group}/${it.name}" }}"),
     )
 
