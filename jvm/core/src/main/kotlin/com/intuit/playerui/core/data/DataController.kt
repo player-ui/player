@@ -1,8 +1,10 @@
 package com.intuit.playerui.core.data
 
+import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.core.bridge.getInvokable
+import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableFunction
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.playerui.core.data.DataController.Serializer
 import kotlinx.serialization.Serializable
@@ -10,17 +12,22 @@ import kotlinx.serialization.Serializable
 /** Limited definition of the player data controller to enable data modification */
 @Serializable(with = Serializer::class)
 public class DataController internal constructor(override val node: Node) : NodeWrapper {
+
+    private val set: Invokable<Unit>? by NodeSerializableFunction()
+    private val get: Invokable<Any?>? by NodeSerializableFunction()
+
     /** Apply [data] to the underlying data model */
     public fun set(data: Map<String, Any?>) {
-        node.getInvokable<Unit>("set")?.invoke(data)
+        set?.invoke(data)
     }
 
     /** [set] each of the [Binding]s contained in the [transaction] */
     public fun set(transaction: List<List<Any?>>) {
+        // TODO: this unfortunately doesn't work yet because it's also got the name "set"
         node.getInvokable<Unit>("set")?.invoke(transaction)
     }
 
-    public fun get(binding: Binding): Any? = node.getInvokable<Any?>("get")?.invoke(binding)
+    public fun get(binding: Binding): Any? = get?.invoke(binding)
 
     internal object Serializer : NodeWrapperSerializer<DataController>(::DataController)
 }

@@ -1,14 +1,15 @@
 package com.intuit.playerui.core.logger
 
 import com.intuit.hooks.HookContext
+import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
-import com.intuit.playerui.core.bridge.getInvokable
 import com.intuit.playerui.core.bridge.hooks.NodeSyncHook1
 import com.intuit.playerui.core.bridge.hooks.SyncHook1
 import com.intuit.playerui.core.bridge.runtime
 import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
+import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableFunction
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.playerui.core.plugins.LoggerPlugin
 import kotlinx.coroutines.launch
@@ -36,33 +37,39 @@ public class TapableLogger(override val node: Node) : LoggerPlugin, NodeWrapper 
 
     public val hooks: Hooks by NodeSerializableField(Hooks.serializer())
 
+    private val trace: Invokable<Unit> by NodeSerializableFunction()
+    private val debug: Invokable<Unit> by NodeSerializableFunction()
+    private val info: Invokable<Unit> by NodeSerializableFunction()
+    private val warn: Invokable<Unit> by NodeSerializableFunction()
+    private val error: Invokable<Unit> by NodeSerializableFunction()
+
     public override fun trace(vararg args: Any?) {
         runtime.scope.launch {
-            node.getInvokable<Unit>("trace")!!(*args)
+            trace.invoke(*args)
         }
     }
 
     public override fun debug(vararg args: Any?) {
         runtime.scope.launch {
-            node.getInvokable<Unit>("debug")!!(*args)
+            debug.invoke(*args)
         }
     }
 
     public override fun info(vararg args: Any?) {
         runtime.scope.launch {
-            node.getInvokable<Unit>("info")!!(*args)
+            info.invoke(*args)
         }
     }
 
     public override fun warn(vararg args: Any?) {
         runtime.scope.launch {
-            node.getInvokable<Unit>("warn")!!(*args)
+            warn.invoke(*args)
         }
     }
 
     public override fun error(vararg args: Any?) {
         runtime.scope.launch {
-            node.getInvokable<Unit>("error")!!(*args)
+            error.invoke(*args)
         }
     }
 
