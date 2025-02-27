@@ -117,9 +117,9 @@ jobs:
 
       - run: bazel build --config=ci -- $(bazel query 'filter("native_bundle$", //...)')
 
-      - run: bazel build --noremote_accept_cached --config=ci //jvm/hermes:hermes
+      - run: bazel build --config=ci //jvm/hermes:hermes
 
-      - run: bazel build --noremote_accept_cached --config=ci //jvm/hermes:hermes-android
+      - run: bazel build --config=ci //jvm/hermes:hermes-android
 
       - save_cache:
           paths:
@@ -235,11 +235,11 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel test --noremote_accept_cached --config=ci -- //third_party/hermes/hello:test
+      - run: bazel test --config=ci -- //third_party/hermes/hello:test
 
-      - run: bazel test --noremote_accept_cached --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
+      - run: bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
-      - run: bazel test --noremote_accept_cached --config=ci --//android/player:runtime=hermes -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
+      - run: bazel test --config=ci --//android/player:runtime=hermes -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
       - run:
           when: always
@@ -295,9 +295,9 @@ jobs:
           command: |
             circle-android wait-for-boot
 
-      - run: bazel test --noremote_accept_cached --config=ci -- //android/demo:android_instrumentation_test
+      - run: bazel test --config=ci -- //android/demo:android_instrumentation_test
 
-      - run: bazel test --noremote_accept_cached --config=ci --//android/player:runtime=hermes -- //android/demo:android_instrumentation_test
+      - run: bazel test --config=ci --//android/player:runtime=hermes -- //android/demo:android_instrumentation_test
 
       - run:
           when: always
