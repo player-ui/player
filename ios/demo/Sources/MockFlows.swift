@@ -1406,7 +1406,11 @@ static let chatMessageBasic: String = """
           {
           "id": "1",
           "type": "chat-message",
-          "value": "Hello World!"
+          "value": {
+                id: "text",
+                type: "text",
+                value: "chat message",
+              },
           }
       ],
       "navigation": {
