@@ -8,6 +8,7 @@ import type {
   TextAsset,
   CollectionAsset,
   ChoiceAsset,
+  ChatMessageAsset,
 } from "./assets";
 import {
   inputTransform,
@@ -31,6 +32,7 @@ export class ReferenceAssetsPlugin
         TextAsset,
         CollectionAsset,
         ChoiceAsset,
+        ChatMessageAsset,
       ],
       [InfoAsset]
     >
