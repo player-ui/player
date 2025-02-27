@@ -16,6 +16,7 @@ def kt_asset_test(
             "//tools/mocks:jar",
             "//android/testutils",
             "//jvm/j2v8:j2v8-all",
+            "//jvm/hermes:hermes-host",
         ],
         resources = [
         ],

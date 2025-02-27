@@ -9,7 +9,6 @@ kt_android_library(
     srcs = glob(["src/main/java/**/*.kt"]),
     custom_package = "com.intuit.playerui.android.testutils",
     manifest = ":src/main/AndroidManifest.xml",
-    resource_files = glob(["src/main/res/**"]),
     deps = main_deps,
 )
 
@@ -17,7 +16,6 @@ android_library(
     name = "testutils",
     custom_package = "com.intuit.playerui.android.testutils",
     manifest = ":src/main/AndroidManifest.xml",
-    resource_files = glob(["src/main/res/**"]),
     tags = ["maven_coordinates=com.intuit.playerui.android:testutils:aar:%s" % VERSION],
     visibility = ["//visibility:public"],
     exports = [":testutils_android"],
