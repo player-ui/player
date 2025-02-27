@@ -78,7 +78,11 @@ internal class AsyncNodePluginTest : PlayerTest() {
           {
           "id": "1",
           "type": "chat-message",
-          "value": "Hello World!"
+          value: {
+          id: "2",
+          type: "text",
+          value: "Hello World!",
+        },
           }
       ],
       "navigation": {
@@ -287,7 +291,8 @@ internal class AsyncNodePluginTest : PlayerTest() {
         )
         Assertions.assertEquals(
             "action",
-            view.getList("actions")?.filterIsInstance<ArrayList<Node>>()?.get(0)?.get(0)?.getObject("asset")?.get("type"),
+            view.getList("actions")?.filterIsInstance<ArrayList<Node>>()?.get(0)?.get(0)?.getObject("asset")
+                ?.get("type"),
         )
         Assertions.assertEquals(2, view.getList("actions")?.size)
         Assertions.assertEquals(2, count)
@@ -392,7 +397,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
                         "asset" to mapOf(
                             "id" to "3",
                             "type" to "text",
-                            "value" to "Hello World!",
+                            "value" to "Hello World 4",
                         ),
                     ),
                 ),
@@ -413,25 +418,30 @@ internal class AsyncNodePluginTest : PlayerTest() {
         Assertions.assertTrue(count == 2)
         // Additional assertions
         val values = (update as? Map<*, *>)?.get("values") as? List<*>
+
         Assertions.assertNotNull(values)
-        Assertions.assertEquals(3, values?.size)
+        Assertions.assertEquals(2, values?.size)
 
         val asset0 = (values?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
-        val asset1 = (values?.get(1) as? Map<*, *>)?.get("asset") as? Map<*, *>
-
-        Assertions.assertEquals("1", asset0?.get("id"))
+        Assertions.assertEquals("2", asset0?.get("id"))
         Assertions.assertEquals("text", asset0?.get("type"))
         Assertions.assertEquals("Hello World!", asset0?.get("value"))
 
-        Assertions.assertEquals("2", asset1?.get("id"))
-        Assertions.assertEquals("text", asset1?.get("type"))
-        Assertions.assertEquals("Hello World!", asset1?.get("value"))
+        val nestedValues = (values?.get(1) as? List<*>)?.get(0) as? Map<*, *>
+        Assertions.assertNotNull(nestedValues)
 
-        // Add the third asset check
-        val asset2 = (values?.get(2) as? Map<*, *>)?.get("asset") as? Map<*, *>
-        Assertions.assertEquals("3", asset2?.get("id"))
-        Assertions.assertEquals("text", asset2?.get("type"))
-        Assertions.assertEquals("Hello World!", asset2?.get("value"))
+        val assetWrapper = nestedValues?.get("asset") as? Map<*, *>
+        Assertions.assertEquals("2", assetWrapper?.get("id"))
+        Assertions.assertEquals("text", assetWrapper?.get("type"))
+        Assertions.assertEquals("Hello World!", assetWrapper?.get("value"))
+
+        val nestedValues1 = (values?.get(1) as? List<*>)?.get(1) as? Map<*, *>
+        Assertions.assertNotNull(nestedValues1)
+
+        val assetWrapper1 = nestedValues1?.get("asset") as? Map<*, *>
+        Assertions.assertEquals("3", assetWrapper1?.get("id"))
+        Assertions.assertEquals("text", assetWrapper1?.get("type"))
+        Assertions.assertEquals("Hello World 4", assetWrapper1?.get("value"))
     }
 
     @TestTemplate
@@ -448,22 +458,24 @@ internal class AsyncNodePluginTest : PlayerTest() {
                         Assertions.assertEquals(1, values?.size)
 
                         val asset0 = (values?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
-                        Assertions.assertEquals("1", asset0?.get("id"))
+                        Assertions.assertEquals("2", asset0?.get("id"))
                         Assertions.assertEquals("text", asset0?.get("type"))
                         Assertions.assertEquals("Hello World!", asset0?.get("value"))
                     }
-                    2 -> {
+
+                    else -> {
                         val values = (asset as? Map<*, *>)?.get("values") as? List<*>
+
                         Assertions.assertNotNull(values)
                         Assertions.assertEquals(2, values?.size)
 
                         val asset0 = (values?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
-                        Assertions.assertEquals("1", asset0?.get("id"))
+                        Assertions.assertEquals("2", asset0?.get("id"))
                         Assertions.assertEquals("text", asset0?.get("type"))
                         Assertions.assertEquals("Hello World!", asset0?.get("value"))
 
                         val asset1 = (values?.get(1) as? Map<*, *>)?.get("asset") as? Map<*, *>
-                        Assertions.assertEquals("5", asset1?.get("id"))
+                        Assertions.assertEquals("text2", asset1?.get("id"))
                         Assertions.assertEquals("text", asset1?.get("type"))
                         Assertions.assertEquals("async content", asset1?.get("value"))
                     }
@@ -475,9 +487,13 @@ internal class AsyncNodePluginTest : PlayerTest() {
             BailResult.Bail(
                 mapOf(
                     "asset" to mapOf(
-                        "id" to "5",
+                        "id" to "text3",
                         "type" to "chat-message",
-                        "value" to "async content",
+                        "value" to mapOf(
+                            "id" to "text2",
+                            "type" to "text",
+                            "value" to "async content",
+                        ),
                     ),
                 ),
             )
@@ -506,60 +522,45 @@ internal class AsyncNodePluginTest : PlayerTest() {
                         Assertions.assertEquals(1, values?.size)
 
                         val asset0 = (values?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
-                        Assertions.assertEquals("1", asset0?.get("id"))
+                        Assertions.assertEquals("2", asset0?.get("id"))
                         Assertions.assertEquals("text", asset0?.get("type"))
                         Assertions.assertEquals("Hello World!", asset0?.get("value"))
                     }
+
                     2 -> {
                         val values = (asset as? Map<*, *>)?.get("values") as? List<*>
                         Assertions.assertNotNull(values)
                         Assertions.assertEquals(2, values?.size)
 
                         val asset0 = (values?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
-                        Assertions.assertEquals("1", asset0?.get("id"))
+                        Assertions.assertEquals("2", asset0?.get("id"))
                         Assertions.assertEquals("text", asset0?.get("type"))
                         Assertions.assertEquals("Hello World!", asset0?.get("value"))
 
                         val asset1 = (values?.get(1) as? Map<*, *>)?.get("asset") as? Map<*, *>
-                        Assertions.assertEquals("collection-async-3", asset1?.get("id"))
-                        Assertions.assertEquals("collection", asset1?.get("type"))
-
-                        val nestedValues = asset1?.get("values") as? List<*>
-                        Assertions.assertNotNull(nestedValues)
-                        Assertions.assertEquals(1, nestedValues?.size)
-
-                        val nestedAsset0 = (nestedValues?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
-                        Assertions.assertEquals("3", nestedAsset0?.get("id"))
-                        Assertions.assertEquals("text", nestedAsset0?.get("type"))
-                        Assertions.assertEquals("chat-message asset", nestedAsset0?.get("value"))
+                        Assertions.assertEquals("text2", asset1?.get("id"))
+                        Assertions.assertEquals("text", asset1?.get("type"))
+                        Assertions.assertEquals("chat-message asset", asset1?.get("value"))
                     }
-                    3 -> {
+
+                    else -> {
                         val values = (asset as? Map<*, *>)?.get("values") as? List<*>
                         Assertions.assertNotNull(values)
-                        Assertions.assertEquals(2, values?.size)
-
+                        Assertions.assertEquals(3, values?.size)
                         val asset0 = (values?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
-                        Assertions.assertEquals("1", asset0?.get("id"))
+                        Assertions.assertEquals("2", asset0?.get("id"))
                         Assertions.assertEquals("text", asset0?.get("type"))
                         Assertions.assertEquals("Hello World!", asset0?.get("value"))
 
                         val asset1 = (values?.get(1) as? Map<*, *>)?.get("asset") as? Map<*, *>
-                        Assertions.assertEquals("collection-async-3", asset1?.get("id"))
-                        Assertions.assertEquals("collection", asset1?.get("type"))
+                        Assertions.assertEquals("text2", asset1?.get("id"))
+                        Assertions.assertEquals("text", asset1?.get("type"))
+                        Assertions.assertEquals("chat-message asset", asset1?.get("value"))
 
-                        val nestedValues = asset1?.get("values") as? List<*>
-                        Assertions.assertNotNull(nestedValues)
-                        Assertions.assertEquals(2, nestedValues?.size)
-
-                        val nestedAsset0 = (nestedValues?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
-                        Assertions.assertEquals("3", nestedAsset0?.get("id"))
-                        Assertions.assertEquals("text", nestedAsset0?.get("type"))
-                        Assertions.assertEquals("chat-message asset", nestedAsset0?.get("value"))
-
-                        val nestedAsset1 = (nestedValues?.get(1) as? Map<*, *>)?.get("asset") as? Map<*, *>
-                        Assertions.assertEquals("4", nestedAsset1?.get("id"))
-                        Assertions.assertEquals("text", nestedAsset1?.get("type"))
-                        Assertions.assertEquals("normal text", nestedAsset1?.get("value"))
+                        val asset2 = (values?.get(2) as? Map<*, *>)?.get("asset") as? Map<*, *>
+                        Assertions.assertEquals("4", asset2?.get("id"))
+                        Assertions.assertEquals("text", asset2?.get("type"))
+                        Assertions.assertEquals("normal text", asset2?.get("value"))
                     }
                 }
             }
@@ -568,25 +569,26 @@ internal class AsyncNodePluginTest : PlayerTest() {
             asyncTaps++
             when (asyncTaps) {
                 1 -> BailResult.Bail(
-                    listOf(
-                        mapOf(
-                            "asset" to mapOf(
-                                "id" to "3",
-                                "type" to "chat-message",
+                    mapOf(
+                        "asset" to mapOf(
+                            "id" to "3",
+                            "type" to "chat-message",
+                            "value" to mapOf(
+                                "id" to "text2",
+                                "type" to "text",
                                 "value" to "chat-message asset",
                             ),
                         ),
                     ),
+
                 )
 
                 else -> BailResult.Bail(
-                    listOf(
-                        mapOf(
-                            "asset" to mapOf(
-                                "id" to "4",
-                                "type" to "text",
-                                "value" to "normal text",
-                            ),
+                    mapOf(
+                        "asset" to mapOf(
+                            "id" to "4",
+                            "type" to "text",
+                            "value" to "normal text",
                         ),
                     ),
                 )
