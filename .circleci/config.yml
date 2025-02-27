@@ -117,9 +117,9 @@ jobs:
 
       - run: bazel build --config=ci -- $(bazel query 'filter("native_bundle$", //...)')
 
-      - run: bazel build --config=ci //android/demo:demo
+      - run: bazel build --config=ci //jvm/hermes:hermes
 
-      - run: bazel build --config=ci --//android/player:runtime=hermes //android/demo:demo
+      - run: bazel build --config=ci //jvm/hermes:hermes-android
 
       - save_cache:
           paths:
