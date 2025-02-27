@@ -11,7 +11,7 @@ import SwiftHooks
 public class PluginManager {
     private var plugins: [NativePlugin] = []
 
-    public var hooks: PluginManagerHooks?
+    public var hooks = PluginManagerHooks()
 
     public init() {
         setupHooks()
@@ -19,12 +19,12 @@ public class PluginManager {
 
     private func setupHooks() {
         // Registering the plugin
-        self.hooks?.registerPlugin.tap(name: "RegisterPlugin") { plugin in
+        hooks.registerPlugin.tap(name: "RegisterPluginAppend") { plugin in
             self.plugins.append(plugin)
         }
 
         // Finding the plugin
-        self.hooks?.findPlugin.tap(name: "FindPlugin") { pluginType in
+        hooks.findPlugin.tap(name: "FindPlugin") { pluginType in
             guard let match = self.plugins.first(where: { type(of: $0) == pluginType }) else {
                 return .skip
             }
@@ -35,13 +35,13 @@ public class PluginManager {
     // Method to add a plugin to the Manager where pluginNames are unique
     public func registerPlugin(_ plugin: NativePlugin) {
         if !plugins.contains(where: { $0.pluginName == plugin.pluginName }) {
-            self.hooks?.registerPlugin.call(plugin)
+            self.hooks.registerPlugin.call(plugin)
         }
     }
 
     // Method to retrieve a plugin by type
     public func findPlugin<T: NativePlugin>(ofType type: T.Type) -> T? {
-        return self.hooks?.findPlugin.call(type) as? T
+        return self.hooks.findPlugin.call(type) as? T
     }
 }
 

@@ -79,7 +79,7 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             DispatchQueue.main.async { self.result = nil }
 
             // To ensure plugin.apply gets called even if plugin were to get registered after player.start
-            pluginManager.hooks?.registerPlugin.tap(name: "RegisterPlugin") { plugin in
+            pluginManager.hooks.registerPlugin.tap(name: "RegisterPluginApply") { plugin in
                 plugin.apply(player: player)
             }
 
