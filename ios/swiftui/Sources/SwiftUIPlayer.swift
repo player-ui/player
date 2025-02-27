@@ -38,6 +38,8 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
         fileprivate(set) var hooks: SwiftUIPlayerHooks?
         fileprivate let registry = SwiftUIRegistry()
 
+        fileprivate let pluginManager = PluginManager()
+
         @Published fileprivate var result: Result<CompletedState, PlayerError>?
 
         /// Returns true iff there is a non-nil player. 
@@ -76,7 +78,15 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             self.hooks = hooks
             DispatchQueue.main.async { self.result = nil }
 
-            for plugin in allPlugins { plugin.apply(player: player) }
+            // To ensure plugin.apply gets called even if plugin were to get registered after player.start
+            pluginManager.hooks?.registerPlugin.tap(name: "RegisterPlugin") { plugin in
+                plugin.apply(player: player)
+            }
+
+            for plugin in allPlugins {
+                pluginManager.registerPlugin(plugin)
+            }
+
             registry.partialMatchRegistry = partialMatchPlugin
 
             hooks.viewController.tap { [weak self] controller in
@@ -177,6 +187,8 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
 
     /// The registry for registering assets to be used for rendering
     public var assetRegistry: SwiftUIRegistry { context.registry }
+
+    public var pluginManager: PluginManager { context.pluginManager }
 
     // For ViewInspector testing
     internal let inspection = Inspection<Self>()
