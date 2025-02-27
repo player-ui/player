@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat.startActivity
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AndroidPlayerPlugin
 import com.intuit.playerui.android.reference.assets.action.Action
+import com.intuit.playerui.android.reference.assets.badge.Badge
 import com.intuit.playerui.android.reference.assets.collection.Collection
 import com.intuit.playerui.android.reference.assets.info.Info
 import com.intuit.playerui.android.reference.assets.input.Input
@@ -32,6 +33,7 @@ class ReferenceAssetsPlugin : AndroidPlayerPlugin, JSPluginWrapper by Transforms
         androidPlayer.registerAsset("text", ::Text)
         androidPlayer.registerAsset("collection", ::Collection)
         androidPlayer.registerAsset("info", ::Info)
+        androidPlayer.registerAsset("badge", ::Badge)
         androidPlayer.registerAsset("input", ::Input)
     }
 
