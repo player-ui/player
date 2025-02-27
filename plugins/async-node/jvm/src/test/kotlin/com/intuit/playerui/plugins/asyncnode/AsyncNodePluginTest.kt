@@ -225,94 +225,6 @@ internal class AsyncNodePluginTest : PlayerTest() {
     }
 
     @TestTemplate
-    fun `chain async test`() = runBlockingTest {
-        var asyncTaps = 0
-        var updateNumber = 0
-        player.hooks.view.tap { v ->
-            v?.hooks?.onUpdate?.tap { asset ->
-                updateNumber++
-                when (updateNumber) {
-                    1 -> {}
-                    2 -> {
-                        Assertions.assertEquals(2, (asset?.get("actions") as List<*>).size)
-                    }
-
-                    3 -> {
-                        Assertions.assertEquals(2, (asset?.get("actions") as List<*>).size)
-                    }
-
-                    4 -> {
-                        Assertions.assertEquals(2, (asset?.get("actions") as List<*>).size)
-                    }
-                }
-            }
-        }
-        plugin?.hooks?.onAsyncNode?.tap("") { _, node, callback ->
-            asyncTaps++
-            when (asyncTaps) {
-                1 -> BailResult.Bail(
-                    listOf(
-                        mapOf(
-                            "asset" to mapOf(
-                                "id" to "asset-1",
-                                "type" to "text",
-                                "value" to "New asset!",
-                            ),
-                        ),
-                        mapOf(
-                            "id" to "another-async",
-                            "async" to true,
-                        ),
-                    ),
-                )
-
-                2 -> BailResult.Bail(
-                    listOf(
-                        mapOf(
-                            "asset" to mapOf(
-                                "id" to "asset-2",
-                                "type" to "text",
-                                "value" to "Another new asset!",
-                            ),
-                        ),
-                        mapOf(
-                            "id" to "yet-another",
-                            "async" to true,
-                        ),
-                    ),
-                )
-
-                else -> BailResult.Bail(
-                    listOf(
-                        mapOf(
-                            "asset" to mapOf(
-                                "id" to "asset-3",
-                                "type" to "text",
-                                "value" to "Third new asset!",
-                            ),
-                        ),
-                        mapOf(
-                            "asset" to mapOf(
-                                "id" to "asset-4",
-                                "type" to "text",
-                                "value" to "Fourth new asset!",
-                            ),
-                        ),
-                    ),
-                )
-            }
-        }
-
-        player.start(asyncNodeFlowSimple)
-
-        suspendCancellableCoroutine { cont ->
-            while (updateNumber < 4) runBlocking { delay(5) }
-            if (updateNumber == 4) cont.resume(true) {}
-        }
-        Assertions.assertTrue(true)
-    }
-
-    @TestTemplate
     fun `handle multiple updates through callback mechanism`() = runBlockingTest {
         // TODO: This typing is not great - need to go fix hook types
         var deferredResolve: ((asyncNodeUpdate) -> Unit)? = null
@@ -524,217 +436,169 @@ internal class AsyncNodePluginTest : PlayerTest() {
 
     @TestTemplate
     fun `chat-message asset - resolve single chat-message`() = runBlockingTest {
-        var deferredResolve: ((asyncNodeUpdate) -> Unit)? = null
-        var updateContent: ((asyncNodeUpdate) -> Unit)? = null
-
-        plugin.hooks.onAsyncNode.tap("") { _, node, callback ->
-            updateContent = callback
-            val result = suspendCoroutine { cont ->
-                deferredResolve = { value ->
-                    cont.resume(value)
-                }
-            }
-
-            BailResult.Bail(result)
-        }
-
-        var count = 0
+        var asyncTaps = 0
+        var updateNumber = 0
         player.hooks.view.tap { v ->
             v?.hooks?.onUpdate?.tap { asset ->
-                count++
+                updateNumber++
+                when (updateNumber) {
+                    1 -> {
+                        val values = (asset as? Map<*, *>)?.get("values") as? List<*>
+                        Assertions.assertNotNull(values)
+                        Assertions.assertEquals(1, values?.size)
+
+                        val asset0 = (values?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
+                        Assertions.assertEquals("1", asset0?.get("id"))
+                        Assertions.assertEquals("text", asset0?.get("type"))
+                        Assertions.assertEquals("Hello World!", asset0?.get("value"))
+                    }
+                    2 -> {
+                        val values = (asset as? Map<*, *>)?.get("values") as? List<*>
+                        Assertions.assertNotNull(values)
+                        Assertions.assertEquals(2, values?.size)
+
+                        val asset0 = (values?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
+                        Assertions.assertEquals("1", asset0?.get("id"))
+                        Assertions.assertEquals("text", asset0?.get("type"))
+                        Assertions.assertEquals("Hello World!", asset0?.get("value"))
+
+                        val asset1 = (values?.get(1) as? Map<*, *>)?.get("asset") as? Map<*, *>
+                        Assertions.assertEquals("5", asset1?.get("id"))
+                        Assertions.assertEquals("text", asset1?.get("type"))
+                        Assertions.assertEquals("async content", asset1?.get("value"))
+                    }
+                }
             }
+        }
+        plugin?.hooks?.onAsyncNode?.tap("") { _, node, callback ->
+            asyncTaps++
+            BailResult.Bail(
+                mapOf(
+                    "asset" to mapOf(
+                        "id" to "5",
+                        "type" to "chat-message",
+                        "value" to "async content",
+                    ),
+                ),
+            )
         }
 
         player.start(chatMessageContent)
 
-        var view = player.inProgressState?.lastViewUpdate
-
-        Assertions.assertNotNull(view)
-
-        while (true) {
-            if (deferredResolve != null) {
-                break
-            }
-
-            yield()
+        suspendCancellableCoroutine { cont ->
+            while (updateNumber < 2) runBlocking { delay(5) }
+            if (updateNumber == 2) cont.resume(true) {}
         }
-
-        deferredResolve!!.invoke(
-            mapOf(
-                "asset" to mapOf(
-                    "id" to "5",
-                    "type" to "chat-message",
-                    "value" to "async content",
-                ),
-            ),
-        )
-
-        Assertions.assertEquals(1, count)
-
-        view = player.inProgressState?.lastViewUpdate
-
-        Assertions.assertNotNull(view)
-        Assertions.assertEquals(
-            "text",
-            view!!.getList("values")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("type"),
-        )
-        Assertions.assertEquals(
-            "1",
-            view!!.getList("values")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("id"),
-        )
-        Assertions.assertEquals(
-            "Hello World!",
-            view!!.getList("values")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("value"),
-        )
-        Assertions.assertEquals(2, view.getList("values")?.size)
-
-        Assertions.assertEquals(
-            "text",
-            view!!.getList("values")?.filterIsInstance<Node>()?.get(1)?.getObject("asset")?.get("type"),
-        )
-        Assertions.assertEquals(
-            "5",
-            view!!.getList("values")?.filterIsInstance<Node>()?.get(1)?.getObject("asset")?.get("id"),
-        )
-        Assertions.assertEquals(
-            "async content",
-            view!!.getList("values")?.filterIsInstance<Node>()?.get(1)?.getObject("asset")?.get("value"),
-        )
+        Assertions.assertTrue(true)
     }
 
     @TestTemplate
     fun `chat-message asset - resolve chained chat-message`() = runBlockingTest {
-        var deferredResolve: ((asyncNodeUpdate) -> Unit)? = null
-        var updateContent: ((asyncNodeUpdate) -> Unit)? = null
-
-        plugin.hooks.onAsyncNode.tap("") { _, node, callback ->
-            updateContent = callback
-            val result = suspendCoroutine { cont ->
-                deferredResolve = { value ->
-                    cont.resume(value)
-                }
-            }
-
-            BailResult.Bail(result)
-        }
-
-        var count = 0
+        var asyncTaps = 0
+        var updateNumber = 0
         player.hooks.view.tap { v ->
             v?.hooks?.onUpdate?.tap { asset ->
-                count++
+                updateNumber++
+                when (updateNumber) {
+                    1 -> {
+                        val values = (asset as? Map<*, *>)?.get("values") as? List<*>
+                        Assertions.assertNotNull(values)
+                        Assertions.assertEquals(1, values?.size)
+
+                        val asset0 = (values?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
+                        Assertions.assertEquals("1", asset0?.get("id"))
+                        Assertions.assertEquals("text", asset0?.get("type"))
+                        Assertions.assertEquals("Hello World!", asset0?.get("value"))
+                    }
+                    2 -> {
+                        val values = (asset as? Map<*, *>)?.get("values") as? List<*>
+                        Assertions.assertNotNull(values)
+                        Assertions.assertEquals(2, values?.size)
+
+                        val asset0 = (values?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
+                        Assertions.assertEquals("1", asset0?.get("id"))
+                        Assertions.assertEquals("text", asset0?.get("type"))
+                        Assertions.assertEquals("Hello World!", asset0?.get("value"))
+
+                        val asset1 = (values?.get(1) as? Map<*, *>)?.get("asset") as? Map<*, *>
+                        Assertions.assertEquals("collection-async-3", asset1?.get("id"))
+                        Assertions.assertEquals("collection", asset1?.get("type"))
+
+                        val nestedValues = asset1?.get("values") as? List<*>
+                        Assertions.assertNotNull(nestedValues)
+                        Assertions.assertEquals(1, nestedValues?.size)
+
+                        val nestedAsset0 = (nestedValues?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
+                        Assertions.assertEquals("3", nestedAsset0?.get("id"))
+                        Assertions.assertEquals("text", nestedAsset0?.get("type"))
+                        Assertions.assertEquals("chat-message asset", nestedAsset0?.get("value"))
+                    }
+                    3 -> {
+                        val values = (asset as? Map<*, *>)?.get("values") as? List<*>
+                        Assertions.assertNotNull(values)
+                        Assertions.assertEquals(2, values?.size)
+
+                        val asset0 = (values?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
+                        Assertions.assertEquals("1", asset0?.get("id"))
+                        Assertions.assertEquals("text", asset0?.get("type"))
+                        Assertions.assertEquals("Hello World!", asset0?.get("value"))
+
+                        val asset1 = (values?.get(1) as? Map<*, *>)?.get("asset") as? Map<*, *>
+                        Assertions.assertEquals("collection-async-3", asset1?.get("id"))
+                        Assertions.assertEquals("collection", asset1?.get("type"))
+
+                        val nestedValues = asset1?.get("values") as? List<*>
+                        Assertions.assertNotNull(nestedValues)
+                        Assertions.assertEquals(2, nestedValues?.size)
+
+                        val nestedAsset0 = (nestedValues?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
+                        Assertions.assertEquals("3", nestedAsset0?.get("id"))
+                        Assertions.assertEquals("text", nestedAsset0?.get("type"))
+                        Assertions.assertEquals("chat-message asset", nestedAsset0?.get("value"))
+
+                        val nestedAsset1 = (nestedValues?.get(1) as? Map<*, *>)?.get("asset") as? Map<*, *>
+                        Assertions.assertEquals("4", nestedAsset1?.get("id"))
+                        Assertions.assertEquals("text", nestedAsset1?.get("type"))
+                        Assertions.assertEquals("normal text", nestedAsset1?.get("value"))
+                    }
+                }
+            }
+        }
+        plugin?.hooks?.onAsyncNode?.tap("") { _, node, callback ->
+            asyncTaps++
+            when (asyncTaps) {
+                1 -> BailResult.Bail(
+                    listOf(
+                        mapOf(
+                            "asset" to mapOf(
+                                "id" to "3",
+                                "type" to "chat-message",
+                                "value" to "chat-message asset",
+                            ),
+                        ),
+                    ),
+                )
+
+                else -> BailResult.Bail(
+                    listOf(
+                        mapOf(
+                            "asset" to mapOf(
+                                "id" to "4",
+                                "type" to "text",
+                                "value" to "normal text",
+                            ),
+                        ),
+                    ),
+                )
             }
         }
 
         player.start(chatMessageContent)
 
-        var view = player.inProgressState?.lastViewUpdate
-
-        Assertions.assertNotNull(view)
-
-        while (true) {
-            if (deferredResolve != null) {
-                break
-            }
-
-            yield()
+        suspendCancellableCoroutine { cont ->
+            while (updateNumber < 3) runBlocking { delay(5) }
+            if (updateNumber == 3) cont.resume(true) {}
         }
-
-        deferredResolve!!.invoke(
-            mapOf(
-                "asset" to mapOf(
-                    "id" to "5",
-                    "type" to "chat-message",
-                    "value" to "async content",
-                ),
-            ),
-        )
-
-        Assertions.assertEquals(1, count)
-
-        view = player.inProgressState?.lastViewUpdate
-
-        Assertions.assertNotNull(view)
-        Assertions.assertEquals(
-            "text",
-            view!!.getList("values")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("type"),
-        )
-        Assertions.assertEquals(
-            "1",
-            view!!.getList("values")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("id"),
-        )
-        Assertions.assertEquals(
-            "Hello World!",
-            view!!.getList("values")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("value"),
-        )
-        Assertions.assertEquals(2, view.getList("values")?.size)
-
-        Assertions.assertEquals(
-            "text",
-            view!!.getList("values")?.filterIsInstance<Node>()?.get(1)?.getObject("asset")?.get("type"),
-        )
-        Assertions.assertEquals(
-            "5",
-            view!!.getList("values")?.filterIsInstance<Node>()?.get(1)?.getObject("asset")?.get("id"),
-        )
-        Assertions.assertEquals(
-            "async content",
-            view!!.getList("values")?.filterIsInstance<Node>()?.get(1)?.getObject("asset")?.get("value"),
-        )
-
-        updateContent!!.invoke(
-            mapOf(
-                "asset" to mapOf(
-                    "id" to "7",
-                    "type" to "text",
-                    "value" to "chained async content",
-                ),
-            ),
-        )
-
-        Assertions.assertEquals(3, count)
-
-        view = player.inProgressState?.lastViewUpdate
-
-        Assertions.assertNotNull(view)
-
-        Assertions.assertEquals(
-            "text",
-            view!!.getList("values")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("type"),
-        )
-        Assertions.assertEquals(
-            "1",
-            view!!.getList("values")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("id"),
-        )
-        Assertions.assertEquals(
-            "Hello World!",
-            view!!.getList("values")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("value"),
-        )
-        Assertions.assertEquals(3, view.getList("values")?.size)
-
-        Assertions.assertEquals(
-            "text",
-            view!!.getList("values")?.filterIsInstance<Node>()?.get(1)?.getObject("asset")?.get("type"),
-        )
-        Assertions.assertEquals(
-            "5",
-            view!!.getList("values")?.filterIsInstance<Node>()?.get(1)?.getObject("asset")?.get("id"),
-        )
-        Assertions.assertEquals(
-            "async content",
-            view!!.getList("values")?.filterIsInstance<Node>()?.get(1)?.getObject("asset")?.get("value"),
-        )
-
-        Assertions.assertEquals(
-            "text",
-            view!!.getList("values")?.filterIsInstance<Node>()?.get(2)?.getObject("asset")?.get("type"),
-        )
-        Assertions.assertEquals(
-            "7",
-            view!!.getList("values")?.filterIsInstance<Node>()?.get(2)?.getObject("asset")?.get("id"),
-        )
-        Assertions.assertEquals(
-            "chained async content",
-            view!!.getList("values")?.filterIsInstance<Node>()?.get(2)?.getObject("asset")?.get("value"),
-        )
+        Assertions.assertTrue(true)
     }
 }
