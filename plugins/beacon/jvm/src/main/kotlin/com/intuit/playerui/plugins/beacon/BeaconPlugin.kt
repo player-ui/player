@@ -70,10 +70,14 @@ public open class BeaconPlugin(override val plugins: List<JSPluginWrapper>) : JS
         handlers.add(handler)
     }
 
+    private val beacon: Invokable<Any?> by lazy {
+        instance.getInvokable<Any?>("beacon")!!
+    }
+
     // TODO: Convert to suspend method to ensure view scope is captured in a non-blocking way
     /** Fire a beacon event */
     public fun beacon(action: String, element: String, asset: Asset, data: Any? = null) {
-        instance.getInvokable<Any?>("beacon")!!.invoke(
+        beacon.invoke(
             mapOf(
                 "action" to action,
                 "element" to element,
