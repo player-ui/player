@@ -117,6 +117,10 @@ jobs:
 
       - run: bazel build --config=ci -- $(bazel query 'filter("native_bundle$", //...)')
 
+      - run: bazel build --config=ci //android/demo:demo
+
+      - run: bazel build --config=ci --//android/player:runtime=hermes //android/demo:demo
+
       - save_cache:
           paths:
             - node_modules
@@ -350,6 +354,8 @@ jobs:
   maybe_release:
     executor: base
     steps:
+      - attach_workspace:
+          at: ~/player
       - run: echo "Should I release? (<< pipeline.parameters.should_release >>)"
       - when:
           condition: << pipeline.parameters.should_release >>
@@ -359,6 +365,8 @@ jobs:
   release:
     executor: base
     steps:
+      - attach_workspace:
+          at: ~/player
       - auto_shipit
 
 workflows:
