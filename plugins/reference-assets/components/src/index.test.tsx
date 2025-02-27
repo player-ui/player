@@ -1,7 +1,7 @@
 import React from "react";
 import { describe, test, expect } from "vitest";
 import { render, binding as b } from "@player-tools/dsl";
-import { Text, Action, Info, Collection, Input, Choice } from ".";
+import { Text, Action, Info, Collection, Input, Choice, ChatMessage } from ".";
 
 describe("JSON serialization", () => {
   describe("text", () => {
@@ -286,6 +286,39 @@ describe("JSON serialization", () => {
             },
           },
         ],
+      });
+    });
+  });
+
+  describe("chat message", () => {
+    test("works for chat-message value", async () => {
+      expect(
+        (
+          await render(
+            <ChatMessage id="1">
+              <ChatMessage.Value>
+                <Text>Hello World!</Text>
+              </ChatMessage.Value>
+            </ChatMessage>,
+          )
+        ).jsonValue,
+      ).toStrictEqual({
+        id: "1",
+        type: "chat-message",
+        value: {
+          id: "value",
+          type: "text",
+          value: "Hello World!",
+        },
+      });
+    });
+
+    test("works with value is null", async () => {
+      expect(
+        (await render(<ChatMessage id="1"></ChatMessage>)).jsonValue,
+      ).toStrictEqual({
+        id: "1",
+        type: "chat-message",
       });
     });
   });

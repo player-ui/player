@@ -116,6 +116,10 @@ export declare namespace Node {
     id: string;
     /** The value representing the node */
     value: Node;
+    /**
+     * Should the content streamed in be flattened during resolving
+     */
+    flatten?: boolean;
   }
 
   export interface PluginOptions {

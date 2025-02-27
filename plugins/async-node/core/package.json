@@ -4,6 +4,9 @@
     "main": "src/index.ts",
     "peerDependencies": {
       "@player-ui/player": "workspace:*"
+    },
+    "devDependencies": {
+      "@player-ui/reference-assets-plugin": "workspace:*"
     }
   }
   

@@ -7,27 +7,58 @@ import PlatformTabs from "../../../../components/PlatformTabs.astro";
 The AsyncNode Plugin is used to enable streaming additional content into a flow that has already been loaded and rendered.  
 A common use case for this plugin is conversational UI, as the users input more dialogue, new content must be streamed into Player in order to keep the UI up to date.
 
-The pillar that makes this possible is the concept of an `AsyncNode`. An `AsyncNode` is any tree node with the property `async: true`, it represents a placeholder node that will be replaced by a concrete node in the future.
+The pillar that makes this possible is the concept of an `AsyncNode`. An `AsyncNode` is any tree node with the property `async: true`, it represents a placeholder node that will be replaced by a concrete node in the future. `AsyncNode` is added to the AST tree during asset transform process(You can read more about what transform is [here](/assets/transforms)). In the example below, it shows the content and resolved result. 
 
-In the example below, node with the id "some-async-node" will not be rendered on first render, but will be replaced with a UI asset node at a later time:
+#### Content authoring:
 
+Value of `chat-message` is the asset to render
+- JSON content
 ```json
-{
-  "id": "flow-1",
-    "views": [
       {
-        "id": 'action',
-        "actions": [
-          {
-            "id": "some-async-node",
-            "async": true,
-          },
-        ],
+        "id": "chat-1",
+        "type": "chat-message",
+        "value": {
+          "id": "text-1",
+          "type": "text",
+          "value": "chat message",
+        },
       },
-    ],
-  ...
-}
 ```
+- DSL
+```typescript
+  <ChatMessage id="chat">
+    <ChatMessage.Value>
+      <Text>Hello World!</Text>
+    </ChatMessage.Value>
+  </ChatMessage>
+```
+
+#### Resolved
+
+`chat-message` asset is wrapped into a wrapper container with children including the `Text` asset in value and an `AsyncNode` in the associated asset transform before resolving. 
+```json
+    {
+      "id": "collection-async-chat-1",
+      "type": "collection",
+      "values": [
+        {
+          "asset": {
+            "id": "1",
+            "type": "text",
+            "value": "chat message",
+          },
+        },
+      ],
+    }
+```
+If there is no asset to display, there will be only one `AsyncNode` in resolved result and no content will be rendered.
+```json
+      {
+        "id": "chat-1",
+        "type": "chat-message",
+      },
+```
+
 
 The `AsyncNodePlugin` exposes an `onAsyncNode` hook on all platforms. The `onAsyncNode` hook will be invoked with the current node when the plugin is available and an `AsyncNode` is detected during the resolve process. The node used to call the hook with could contain metadata according to content spec.
 
@@ -218,3 +249,26 @@ AndroidPlayer(asyncNodePlugin)
 
   </Fragment>
 </PlatformTabs>
+
+
+### AsyncTransform function
+`AsyncTransform` is a helper function to create the transform for async asset. With the example below, 
+- id - `chat-message` asset id
+- asset - value asset to pass in
+- wrapperType - container asset type eg. `Collection`
+- flatte - default value is true. Determine if the content streamed in should be flattened. 
+
+```json
+      {
+        "id": "chat",
+        "type": "chat-message",
+        "value": {
+          "id": "text",
+          "type": "text",
+          "value": "chat message",
+        },
+      },
+```
+
+### Flatten
+Flatten is introduced to avoid nested structure caused by continuous streamning. eg. When a new `chat-message` asset is streamed in, in AST tree, instead of `[chat1, [chat2, asyncNode]]`, it's flattened into `[chat1, chat2, asyncNode]`

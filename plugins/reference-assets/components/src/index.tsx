@@ -29,6 +29,7 @@ import type {
   ImageAsset,
   ChoiceAsset,
   ChoiceItem as ChoiceItemType,
+  ChatMessageAsset,
 } from "@player-ui/reference-assets-plugin";
 import { dataTypes, validators } from "@player-ui/common-types-plugin";
 
@@ -81,7 +82,7 @@ const slotFactory = (name: string, isArray = false, wrapInAsset = true) =>
   });
 
 export const LabelSlot = slotFactory("label");
-export const ValueSlot = slotFactory("value");
+export const ValueSlot = slotFactory("value", false, false);
 export const TitleSlot = slotFactory("title");
 export const NoteSlot = slotFactory("note");
 export const SubtitleSlot = slotFactory("subtitle");
@@ -196,3 +197,19 @@ const ChoiceItem = (
 
 ChoiceItem.Label = LabelSlot;
 Choice.Item = ChoiceItem;
+
+export const ChatMessage = (
+  props: Omit<AssetPropsWithChildren<ChatMessageAsset>, "id"> & {
+    id: string;
+  },
+) => {
+  const { id, children } = props;
+  return (
+    <Asset type="chat-message">
+      <property name="id">{id}</property>
+      {children}
+    </Asset>
+  );
+};
+
+ChatMessage.Value = ValueSlot;

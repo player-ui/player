@@ -23,5 +23,6 @@ js_xlr_pipeline(
     deps = [
         ":node_modules/@player-ui/asset-transform-plugin",
         ":node_modules/@player-ui/beacon-plugin",
+        ":node_modules/@player-ui/async-node-plugin",
     ],
 )
