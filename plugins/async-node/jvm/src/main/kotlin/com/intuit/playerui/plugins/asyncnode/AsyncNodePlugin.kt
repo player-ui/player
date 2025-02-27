@@ -16,12 +16,10 @@ import com.intuit.playerui.core.plugins.JSScriptPluginWrapper
 import com.intuit.playerui.core.plugins.findPlugin
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.builtins.MapSerializer
-import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 
-public typealias asyncNodeUpdate = List<Map<String, Any?>>?
+// TODO: This typing is not great - need to fix once web plugin is updated as currently web also supports type Any
+public typealias asyncNodeUpdate = Any?
 public class AsyncNodePlugin : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
 
     public lateinit var hooks: Hooks
@@ -41,10 +39,10 @@ public class AsyncNodePlugin : JSScriptPluginWrapper(pluginName, sourcePath = bu
                 NodeAsyncParallelBailHook2.serializer(
                     NodeSerializer(),
                     Function1Serializer(
-                        ListSerializer(MapSerializer(String.serializer(), GenericSerializer())).nullable,
+                        GenericSerializer(),
                         GenericSerializer(),
                     ) as KSerializer<(asyncNodeUpdate) -> Unit>,
-                    ListSerializer(MapSerializer(String.serializer(), GenericSerializer())).nullable,
+                    GenericSerializer(),
                 ),
             )
 
