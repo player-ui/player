@@ -1398,6 +1398,41 @@ static let inputAssetPendingTransaction: String = """
   }
 }
 """
+    
+static let chatMessageBasic: String = """
+    {
+      "id": "chat",
+      "views": [
+          {
+          "id": "1",
+          "type": "chat-message",
+          "value": {
+                id: "text",
+                type: "text",
+                value: "chat message",
+              },
+          }
+      ],
+      "navigation": {
+          "BEGIN": "FLOW_1",
+          "FLOW_1": {
+          "startState": "VIEW_1",
+          "VIEW_1": {
+              "state_type": "VIEW",
+              "ref": "1",
+              "transitions": {
+              "*": "END_Done"
+              }
+          },
+          "END_Done": {
+              "state_type": "END",
+              "outcome": "DONE"
+          }
+        }
+      }
+    }
+
+    """
 
     public static let assetSections: [FlowLoader.FlowSection] = [
         (title: "action", flows: [
@@ -1429,6 +1464,9 @@ static let inputAssetPendingTransaction: String = """
         (title: "text", flows: [
             (name: "basic", flow: MockFlows.textBasic),
             (name: "with link", flow: MockFlows.textWithLink)
+        ]),
+        (title: "chat message", flows: [
+            (name: "basic", flow: MockFlows.chatMessageBasic),
         ])
     ]
 
