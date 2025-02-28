@@ -437,7 +437,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
                             ),
                         ),
                     ),
-                    )
+                )
                 else -> {
                     BailResult.Continue()
                 }
