@@ -127,9 +127,8 @@ public:
     static bool strictEquals(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b);
 
     explicit JJSIValue(std::shared_ptr<RuntimeScope> scope, Value&& value) : HybridClass(), scope_(scope) {
-        // internally creates unique ptr
         if (!std::is_fundamental<decltype(value)>::value && !value.isUndefined() && !value.isNull()) {
-            scope->trackValue(this, std::move(value));
+            weakRef_ = scope_->trackValue(std::move(value));
         } else {
             tracked = false;
             value_ = std::make_unique<Value>(std::move(value));
@@ -163,22 +162,19 @@ public:
 
     void release() override {
         if (!tracked && value_) value_.reset();
-        if (scope_) scope_->clearRef(this);
+        if (auto lock = weakRef_.lock()) {
+            weakRef_.reset();
+            lock.reset();
+        }
     }
 
     bool isReleased() override {
-        return (!tracked && value_ == nullptr) || scope_->getValue((void *)this) == nullptr;
+        return (tracked && weakRef_.expired()) || (!tracked && value_ == nullptr);
     }
 
     Value& get_value() const {
-        if (!tracked && value_) {
-            return *value_;
-        }
-        if (scope_) {
-            if (auto ref = scope_->getValue((void *)this)) {
-                return *ref;
-            }
-        }
+        if (!tracked && value_) return *value_;
+        if (auto lock = weakRef_.lock()) return *lock;
 
         throwNativeHandleReleasedException("Value");
     }
@@ -186,6 +182,7 @@ private:
     friend HybridBase;
     shared_ptr<RuntimeScope> scope_;
     bool tracked = true;
+    std::weak_ptr<Value> weakRef_;
     std::unique_ptr<Value> value_;
 };
 
@@ -199,7 +196,7 @@ public:
     static bool strictEquals(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b);
 
     explicit JJSIObject(shared_ptr<RuntimeScope> scope, Object&& object) : HybridClass(), scope_(scope) {
-        scope->trackObject(this, std::move(object));
+        weakRef_ = scope->trackObject(std::move(object));
     }
 
     bool instanceOf(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JJSIFunction_jhybridobject> ctor);
@@ -223,19 +220,18 @@ public:
     }
 
     void release() override {
-        if (scope_) scope_->clearRef(this);
+        if (auto lock = weakRef_.lock()) {
+            weakRef_.reset();
+            lock.reset();
+        }
     }
 
     bool isReleased() override {
-        return scope_->getObject((void *)this) == nullptr;
+        return weakRef_.expired();
     }
 
     Object& get_object() const {
-        if (scope_) {
-            if (auto ref = scope_->getObject((void *)this)) {
-                return *ref;
-            }
-        }
+        if (auto lock = weakRef_.lock()) return *lock;
 
         throwNativeHandleReleasedException("Object");
     }
@@ -243,6 +239,7 @@ private:
     friend HybridBase;
     friend class JJSIValue;
     std::shared_ptr<RuntimeScope> scope_;
+    std::weak_ptr<Object> weakRef_;
 };
 
 class JJSIArray : public JJSIArrayHybridClass {
@@ -253,7 +250,7 @@ public:
     static local_ref<jhybridobject> createWithElements(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> elements);
 
     explicit JJSIArray(shared_ptr<RuntimeScope> scope, Array&& array) : HybridClass(), scope_(scope) {
-        scope->trackArray(this, std::move(array));
+        weakRef_ = scope->trackArray(std::move(array));
     }
 
     int size(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime);
@@ -265,25 +262,25 @@ public:
     }
 
     void release() override {
-        if (scope_) scope_->clearRef(this);
+        if (auto lock = weakRef_.lock()) {
+            weakRef_.reset();
+            lock.reset();
+        }
     }
 
     bool isReleased() override {
-        return scope_->getArray((void *)this) == nullptr;
+        return weakRef_.expired();
     }
 
     Array& get_array() const {
-        if (scope_) {
-            if (auto ref = scope_->getArray((void *)this)) {
-                return *ref;
-            }
-        }
+        if (auto lock = weakRef_.lock()) return *lock;
 
         throwNativeHandleReleasedException("Array");
     }
 private:
     friend HybridBase;
     shared_ptr<RuntimeScope> scope_;
+    weak_ptr<Array> weakRef_;
 };
 
 struct JJSIHostFunction : JavaClass<JJSIHostFunction> {
@@ -305,7 +302,7 @@ public:
     static local_ref<jhybridobject> createFromHostFunction(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, std::string name, int paramCount, alias_ref<JJSIHostFunction> func);
 
     explicit JJSIFunction(shared_ptr<RuntimeScope> scope, Function&& function) : HybridClass(), scope_(scope) {
-        scope->trackFunction(this, std::move(function));
+        weakRef_ = scope->trackFunction(std::move(function));
     }
 
     local_ref<JJSIValue::jhybridobject> call(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<JArrayClass<JJSIValue::jhybridobject>> args);
@@ -318,25 +315,25 @@ public:
     }
 
     void release() override {
-        if (scope_) scope_->clearRef(this);
+        if (auto lock = weakRef_.lock()) {
+            weakRef_.reset();
+            lock.reset();
+        }
     }
 
     bool isReleased() override {
-        return scope_->getFunction((void *)this) == nullptr;
+        return weakRef_.expired();
     }
 
     Function& get_function() const {
-        if (scope_) {
-            if (auto ref = scope_->getFunction((void *)this)) {
-                return *ref;
-            }
-        }
+        if (auto lock = weakRef_.lock()) return *lock;
 
         throwNativeHandleReleasedException("Function");
     }
 private:
     friend HybridBase;
     shared_ptr<RuntimeScope> scope_;
+    weak_ptr<Function> weakRef_;
 };
 
 class JJSISymbol : public JJSISymbolHybridClass {
@@ -347,7 +344,7 @@ public:
     static bool strictEquals(alias_ref<jclass>, alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime, alias_ref<jhybridobject> a, alias_ref<jhybridobject> b);
 
     explicit JJSISymbol(shared_ptr<RuntimeScope> scope, Symbol&& symbol) : HybridClass(), scope_(scope) {
-        scope->trackSymbol(this, std::move(symbol));
+        weakRef_ = scope->trackSymbol(std::move(symbol));
     }
 
     std::string toString(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIRuntime::jhybridobject> jRuntime);
@@ -357,24 +354,24 @@ public:
     }
 
     void release() override {
-        if (scope_) scope_->clearRef(this);
+        if (auto lock = weakRef_.lock()) {
+            weakRef_.reset();
+            lock.reset();
+        }
     }
 
     bool isReleased() override {
-        return scope_->getSymbol((void *)this) == nullptr;
+        return weakRef_.expired();
     }
 
     Symbol& get_symbol() const {
-        if (scope_) {
-            if (auto ref = scope_->getSymbol((void *)this)) {
-                return *ref;
-            }
-        }
+        if (auto lock = weakRef_.lock()) return *lock;
 
         throwNativeHandleReleasedException("Symbol");
     }
 private:
     friend HybridBase;
     shared_ptr<RuntimeScope> scope_;
+    weak_ptr<Symbol> weakRef_;
 };
 };

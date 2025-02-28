@@ -1,8 +1,8 @@
 package com.intuit.playerui.core.flow
 
+import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
-import com.intuit.playerui.core.bridge.getInvokable
 import com.intuit.playerui.core.bridge.hooks.NodeSyncBailHook1
 import com.intuit.playerui.core.bridge.hooks.NodeSyncHook1
 import com.intuit.playerui.core.bridge.hooks.NodeSyncHook2
@@ -10,6 +10,7 @@ import com.intuit.playerui.core.bridge.hooks.NodeSyncWaterfallHook1
 import com.intuit.playerui.core.bridge.hooks.NodeSyncWaterfallHook2
 import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
+import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableFunction
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.playerui.core.flow.state.NavigationFlowState
 import com.intuit.playerui.core.player.state.NamedState
@@ -26,8 +27,10 @@ public class FlowInstance(override val node: Node) : NodeWrapper, Transition {
 
     public val currentState: NamedState? by NodeSerializableField(NamedState.serializer().nullable)
 
+    private val transition: Invokable<Unit>? by NodeSerializableFunction()
+
     override fun transition(state: String, options: TransitionOptions?) {
-        node.getInvokable<Unit>("transition")?.invoke(state, options)
+        transition?.invoke(state, options)
     }
 
     @Serializable(Hooks.Serializer::class)

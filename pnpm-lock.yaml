@@ -821,12 +821,18 @@ importers:
       '@player-ui/asset-transform-plugin':
         specifier: workspace:*
         version: link:../../asset-transform/core
+      '@player-ui/common-expressions-plugin':
+        specifier: workspace:*
+        version: link:../../common-expressions/core
       '@player-ui/common-types-plugin':
         specifier: workspace:*
         version: link:../../common-types/core
       '@player-ui/partial-match-registry':
         specifier: workspace:*
         version: link:../../../core/partial-match-registry
+      '@player-ui/reference-assets-plugin':
+        specifier: workspace:*
+        version: link:../../reference-assets/core
 
   plugins/data-filter/core:
     dependencies:

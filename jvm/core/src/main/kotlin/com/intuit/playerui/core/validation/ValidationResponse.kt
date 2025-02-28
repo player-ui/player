@@ -1,10 +1,11 @@
 package com.intuit.playerui.core.validation
 
+import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
-import com.intuit.playerui.core.bridge.getInvokable
 import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
+import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableFunction
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.playerui.core.experimental.RuntimeClassDiscriminator
 import com.intuit.playerui.core.validation.WarningValidationResponse.Serializer
@@ -25,10 +26,11 @@ public sealed class ValidationResponse : NodeWrapper {
 
 @Serializable(with = Serializer::class)
 public class WarningValidationResponse(override val node: Node) : ValidationResponse() {
+    private val dismiss: Invokable<Unit>? by NodeSerializableFunction()
 
     /** Warning validations can be dismissed without correcting the error */
     public fun dismiss() {
-        node.getInvokable<Unit>("dismiss")?.invoke()
+        dismiss?.invoke()
     }
 
     internal object Serializer : NodeWrapperSerializer<WarningValidationResponse>(::WarningValidationResponse, "warning")

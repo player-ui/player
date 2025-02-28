@@ -10,6 +10,8 @@ import { CommonTypesPlugin } from "@player-ui/common-types-plugin";
 import { AssetTransformPlugin } from "@player-ui/asset-transform-plugin";
 import { Registry } from "@player-ui/partial-match-registry";
 import { DataChangeListenerPlugin } from "../index";
+import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin";
+import { CommonExpressionsPlugin } from "@player-ui/common-expressions-plugin";
 
 /** Test transform function to add validation to asset */
 const transform: TransformFunction = (asset: any, options: any) => {
@@ -429,5 +431,221 @@ describe("Data-Change-Listener that are chained", () => {
       expect(dataController.get("name.second")).toStrictEqual("update 1");
       expect(dataController.get("name.third")).toStrictEqual("update 2");
     });
+  });
+});
+
+describe("Data-Change-Listener with array modification", () => {
+  let player: Player;
+  let testExpression: Mock<any, any>;
+
+  const flow = {
+    id: "action-with-expression",
+    views: [
+      {
+        id: "root",
+        type: "info",
+        listeners: {
+          "dataChange.array": ["test('array has changed ' + {{array}})"],
+        },
+        title: {
+          asset: {
+            id: "title",
+            type: "text",
+            value: "Hello",
+          },
+        },
+        primaryInfo: {
+          asset: {
+            id: "primaryInfo",
+            type: "text",
+            value: "Collection: [{{array}}]",
+          },
+        },
+        actions: [
+          {
+            asset: {
+              id: "action",
+              type: "action",
+              exp: "{{array}} = concat({{array}}, [4])",
+              label: {
+                asset: {
+                  id: "actions-0-label",
+                  type: "text",
+                  value: "Add to collection",
+                },
+              },
+            },
+          },
+        ],
+      },
+    ],
+    data: {
+      array: [1, 2, 3],
+    },
+    navigation: {
+      BEGIN: "FLOW_1",
+      FLOW_1: {
+        startState: "VIEW_1",
+        VIEW_1: {
+          state_type: "VIEW",
+          ref: "root",
+          transitions: {
+            "*": "END_Done",
+          },
+        },
+        END_Done: {
+          state_type: "END",
+          outcome: "done",
+        },
+      },
+    },
+  };
+
+  const flowNum = {
+    id: "action-with-expression",
+    views: [
+      {
+        id: "root",
+        type: "info",
+        listeners: {
+          "dataChange.count": ["test('count has changed ' + {{count}})"],
+        },
+        title: {
+          asset: {
+            id: "title",
+            type: "text",
+            value: "Hello",
+          },
+        },
+        primaryInfo: {
+          asset: {
+            id: "primaryInfo",
+            type: "text",
+            value: "Count: {{count}}\\",
+          },
+        },
+        actions: [
+          {
+            asset: {
+              id: "action",
+              type: "action",
+              exp: "{{count}} = {{count}} + 1",
+              label: {
+                asset: {
+                  id: "actions-0-label",
+                  type: "text",
+                  value: "Add to collection",
+                },
+              },
+            },
+          },
+        ],
+      },
+    ],
+    data: {
+      count: 0,
+    },
+    navigation: {
+      BEGIN: "FLOW_1",
+      FLOW_1: {
+        startState: "VIEW_1",
+        VIEW_1: {
+          state_type: "VIEW",
+          ref: "root",
+          transitions: {
+            "*": "END_Done",
+          },
+        },
+        END_Done: {
+          state_type: "END",
+          outcome: "done",
+        },
+      },
+    },
+  };
+
+  /** Helper function to get current Player state */
+  function getState() {
+    return player.getState() as InProgressState;
+  }
+
+  it("should call expression evaluator and data change listener when an array that is tracked changes", () => {
+    player = new Player({
+      plugins: [
+        new CommonTypesPlugin(),
+        new DataChangeListenerPlugin(),
+        new ReferenceAssetsPlugin(),
+        new CommonExpressionsPlugin(),
+      ],
+    });
+
+    testExpression = vitest.fn();
+
+    player.hooks.expressionEvaluator.tap("test", (ev) => {
+      ev.addExpressionFunction("test", (context, ...args) => {
+        testExpression(...args);
+      });
+    });
+
+    player.start(flow);
+
+    const getCurrent = () => {
+      const status = player.getState();
+      if (status.status === "in-progress") {
+        const view = status.controllers.view.currentView?.lastUpdate;
+        if (view) {
+          return view;
+        }
+      }
+    };
+
+    expect(getState().controllers.data.get("array")).toStrictEqual([1, 2, 3]);
+
+    getCurrent()?.actions[0].asset.run();
+
+    expect(getState().controllers.data.get("array")).toStrictEqual([
+      1, 2, 3, 4,
+    ]);
+
+    expect(testExpression).toHaveBeenCalledWith("array has changed 1,2,3,4");
+  });
+
+  it("should call expression evaluator and data change listener when count is changes", () => {
+    player = new Player({
+      plugins: [
+        new CommonTypesPlugin(),
+        new DataChangeListenerPlugin(),
+        new ReferenceAssetsPlugin(),
+        new CommonExpressionsPlugin(),
+      ],
+    });
+
+    testExpression = vitest.fn();
+
+    player.hooks.expressionEvaluator.tap("test", (ev) => {
+      ev.addExpressionFunction("test", (context, ...args) => {
+        testExpression(...args);
+      });
+    });
+
+    player.start(flowNum);
+
+    const getCurrent = () => {
+      const status = player.getState();
+      if (status.status === "in-progress") {
+        const view = status.controllers.view.currentView?.lastUpdate;
+        if (view) {
+          return view;
+        }
+      }
+    };
+
+    expect(getState().controllers.data.get("count")).toStrictEqual(0);
+
+    getCurrent()?.actions[0].asset.run();
+
+    expect(getState().controllers.data.get("count")).toStrictEqual(1);
+
+    expect(testExpression).toHaveBeenCalledWith("count has changed 1");
   });
 });

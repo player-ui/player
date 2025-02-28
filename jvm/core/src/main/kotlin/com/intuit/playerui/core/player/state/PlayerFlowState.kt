@@ -3,14 +3,15 @@ package com.intuit.playerui.core.player.state
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Completable
 import com.intuit.playerui.core.bridge.EmptyNode
+import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.core.bridge.Promise
 import com.intuit.playerui.core.bridge.deserialize
-import com.intuit.playerui.core.bridge.getInvokable
 import com.intuit.playerui.core.bridge.getSerializable
 import com.intuit.playerui.core.bridge.getSymbol
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
+import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableFunction
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.playerui.core.data.DataController
 import com.intuit.playerui.core.data.DataModelWithParser
@@ -125,6 +126,8 @@ public class InProgressState internal constructor(override val node: Node) :
 
     override val status: PlayerFlowStatus = IN_PROGRESS
 
+    private val fail: Invokable<Any> by NodeSerializableFunction()
+
     /** [FlowResult] value that will be available once the flow completes */
     // TODO: Make non-nullable if possible - requires Promise change
     public val flowResult: Completable<FlowResult?> get() = Promise(
@@ -134,7 +137,7 @@ public class InProgressState internal constructor(override val node: Node) :
     public val controllers: ControllerState by NodeSerializableField(ControllerState.serializer())
 
     public fun fail(error: Throwable) {
-        node.getInvokable<Any>("fail")!!.invoke(error)
+        fail.invoke(error)
     }
 
     internal object Serializer : NodeWrapperSerializer<InProgressState>(::InProgressState, IN_PROGRESS.value)

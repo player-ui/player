@@ -10,6 +10,7 @@ import com.intuit.playerui.core.constants.ConstantsController
 import com.intuit.playerui.core.data.DataController
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.expressions.ExpressionController
+import com.intuit.playerui.core.flow.Flow
 import com.intuit.playerui.core.flow.FlowController
 import com.intuit.playerui.core.flow.FlowResult
 import com.intuit.playerui.core.logger.TapableLogger
@@ -60,10 +61,14 @@ public abstract class Player : Pluggable {
         /** The hook that creates and manages data */
         public val dataController: NodeSyncHook1<DataController>
 
+        /** Manages validations (schema and x-field ) */
         public val validationController: NodeSyncHook1<ValidationController>
 
         /** A that's called for state changes in the flow execution */
         public val state: NodeSyncHook1<out PlayerFlowState>
+
+        /** A hook to access the current flow */
+        public val onStart: NodeSyncHook1<Flow>
 
         public companion object {
             internal interface HooksByNode : Hooks, NodeWrapper
@@ -77,6 +82,7 @@ public abstract class Player : Pluggable {
                 override val dataController: NodeSyncHook1<DataController> by NodeSerializableField(NodeSyncHook1.serializer(DataController.serializer()))
                 override val validationController: NodeSyncHook1<ValidationController> by NodeSerializableField(NodeSyncHook1.serializer(ValidationController.serializer()))
                 override val state: NodeSyncHook1<out PlayerFlowState> by NodeSerializableField(NodeSyncHook1.serializer(PlayerFlowState.serializer()))
+                override val onStart: NodeSyncHook1<Flow> by NodeSerializableField(NodeSyncHook1.serializer(Flow.serializer()))
             }
 
             internal object Serializer : KSerializer<Hooks> by NodeWrapperSerializer(Hooks::invoke) as KSerializer<Hooks>

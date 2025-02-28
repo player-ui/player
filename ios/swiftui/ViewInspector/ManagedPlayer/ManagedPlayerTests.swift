@@ -29,7 +29,7 @@ class ManagedPlayer14Tests: XCTestCase {
 
         waitOnChange(viewModel.$loadingState.eraseToAnyPublisher()) { $0 == ManagedPlayerViewModel.LoadingState.loading }
 
-        let text = try playerView.find(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).text(0)
+        let text = try playerView.find(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).zStack(0).text(0)
 
         XCTAssertEqual("Loading", try text.string())
     }
@@ -72,7 +72,8 @@ class ManagedPlayer14Tests: XCTestCase {
                 .find(ManagedPlayer14<Text, EmptyView>.self)
                 .vStack()
                 .group(0)
-                .view(SwiftUIPlayer.self, 0)
+                .zStack(0)
+                .find(SwiftUIPlayer.self)
                 .vStack()
                 .first?
                 .anyView()
@@ -84,6 +85,21 @@ class ManagedPlayer14Tests: XCTestCase {
         wait(for: [exp2], timeout: 10)
 
         ViewHosting.expel()
+    }
+
+    func testLoadingViewBeforeActionFlow() throws {
+        let viewModel = ManagedPlayerViewModel(manager: ActionLoaded(), onComplete: {_ in })
+        let player = ManagedPlayer(plugins: [], context: .init(), viewModel: viewModel, fallback: { _ in Text("Error")}, loading: { Text("Loading Flow")})
+
+        let playerView = try player.inspect()
+
+        try playerView.find(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).color(0).callOnAppear()
+
+        waitOnChange(viewModel.$loadingState.eraseToAnyPublisher()) { $0 == ManagedPlayerViewModel.LoadingState.loading }
+
+        let text = try playerView.find(ManagedPlayer14<Text, EmptyView>.self).vStack().group(0).zStack(0).text(0)
+
+        XCTAssertEqual("Loading Flow", try text.string())
     }
 
     func testFlowLoadsWithSuppliedScrollPlugin() throws {
@@ -108,7 +124,8 @@ class ManagedPlayer14Tests: XCTestCase {
                 .find(ManagedPlayer14<Text, EmptyView>.self)
                 .vStack()
                 .group(0)
-                .view(SwiftUIPlayer.self, 0)
+                .zStack(0)
+                .find(SwiftUIPlayer.self)
                 .vStack()
                 .first?
                 .anyView()
@@ -139,12 +156,13 @@ class ManagedPlayer14Tests: XCTestCase {
 
         ViewHosting.host(view: player)
 
-        let exp2 = player.inspection.inspect(after: 3) { view in
+        let exp2 = player.inspection.inspect(after: 5) { view in
             let view = try view
                 .find(ManagedPlayer14<Text, EmptyView>.self)
                 .vStack()
                 .group(0)
-                .view(SwiftUIPlayer.self, 0)
+                .zStack(0)
+                .find(SwiftUIPlayer.self)
                 .vStack()
                 .first?
                 .anyView()
@@ -177,6 +195,15 @@ class AlwaysLoaded: FlowManager {
     init() {}
     func next(_ result: CompletedState?) async throws -> NextState {
         return .flow(FlowData.COUNTER)
+    }
+}
+
+class ActionLoaded: FlowManager {
+    init() {}
+
+    func next(_ result: CompletedState?) async throws -> NextState {
+        try await Task.sleep(nanoseconds: 1_000_000_000 * 5)
+        return .flow(FlowData.flowAction)
     }
 }
 
