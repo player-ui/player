@@ -1,3 +1,16 @@
+# 0.10.4-next.1 (Fri Feb 28 2025)
+
+#### 🐛 Bug Fix
+
+- Execution Environment Resource Bump + Android TestUtils [#602](https://github.com/player-ui/player/pull/602) ([@brocollie08](https://github.com/brocollie08))
+- Hermes perf optimization [#598](https://github.com/player-ui/player/pull/598) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
 # 0.10.4-next.0 (Tue Feb 25 2025)
 
 #### 🐛 Bug Fix
