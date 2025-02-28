@@ -422,21 +422,26 @@ internal class AsyncNodePluginTest : PlayerTest() {
         }
         plugin?.hooks?.onAsyncNode?.tap("") { _, node, callback ->
             asyncTaps++
-            BailResult.Bail(
-                mapOf(
-                    "asset" to mapOf(
-                        "id" to "text3",
-                        "type" to "chat-message",
-                        "value" to mapOf(
-                            "asset" to mapOf(
-                                "id" to "text2",
-                                "type" to "text",
-                                "value" to "async content",
+            when (asyncTaps) {
+                1 -> BailResult.Bail(
+                    mapOf(
+                        "asset" to mapOf(
+                            "id" to "text3",
+                            "type" to "chat-message",
+                            "value" to mapOf(
+                                "asset" to mapOf(
+                                    "id" to "text2",
+                                    "type" to "text",
+                                    "value" to "async content",
+                                ),
                             ),
                         ),
                     ),
-                ),
-            )
+                    )
+                else -> {
+                    BailResult.Continue()
+                }
+            }
         }
 
         player.start(chatMessageContent)
