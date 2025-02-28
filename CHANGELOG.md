@@ -1,3 +1,16 @@
+# 0.10.4-next.2 (Fri Feb 28 2025)
+
+#### 🐛 Bug Fix
+
+- Convert Flow to NodeWrapper [#594](https://github.com/player-ui/player/pull/594) ([@mrigankmg](https://github.com/mrigankmg) [@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 2
+
+- [@brocollie08](https://github.com/brocollie08)
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+
+---
+
 # 0.10.4-next.1 (Fri Feb 28 2025)
 
 #### 🐛 Bug Fix
