@@ -79,10 +79,11 @@ internal class AsyncNodePluginTest : PlayerTest() {
           "id": "1",
           "type": "chat-message",
           "value": {
-            asset: {
-              id: "2",
-              type: "text",
-              value: "Hello World!",
+            "asset": {
+              "id": "2",
+              "type": "text",
+              "value": "Hello World!",
+              },
             },
           },
       ],

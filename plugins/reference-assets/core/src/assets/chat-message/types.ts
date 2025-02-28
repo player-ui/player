@@ -1,5 +1,5 @@
-import type { Asset } from "@player-ui/player";
+import type { AssetWrapper, Asset } from "@player-ui/player";
 
 export interface ChatMessageAsset extends Asset<"chat-message"> {
-  children?: Asset[];
+  value?: AssetWrapper;
 }
