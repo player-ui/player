@@ -46,9 +46,11 @@ describe("view", () => {
         id: "1",
         type: "chat-message",
         value: {
-          id: "2",
-          type: "text",
-          value: "chat message",
+          asset: {
+            id: "2",
+            type: "text",
+            value: "chat message",
+          },
         },
       },
     ],
@@ -765,9 +767,11 @@ describe("view", () => {
           id: "3",
           type: "chat-message",
           value: {
-            id: "4",
-            type: "text",
-            value: "async content",
+            asset: {
+              id: "4",
+              type: "text",
+              value: "async content",
+            },
           },
         },
       });
@@ -833,9 +837,11 @@ describe("view", () => {
           id: "3",
           type: "chat-message",
           value: {
-            id: "4",
-            type: "text",
-            value: "async content",
+            asset: {
+              id: "4",
+              type: "text",
+              value: "async content",
+            },
           },
         },
       });

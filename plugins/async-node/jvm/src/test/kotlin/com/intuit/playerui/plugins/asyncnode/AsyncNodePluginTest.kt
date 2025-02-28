@@ -78,12 +78,13 @@ internal class AsyncNodePluginTest : PlayerTest() {
           {
           "id": "1",
           "type": "chat-message",
-          value: {
-          id: "2",
-          type: "text",
-          value: "Hello World!",
-        },
-          }
+          "value": {
+            asset: {
+              id: "2",
+              type: "text",
+              value: "Hello World!",
+            },
+          },
       ],
       "navigation": {
           "BEGIN": "FLOW_1",
@@ -381,70 +382,6 @@ internal class AsyncNodePluginTest : PlayerTest() {
     }
 
     @TestTemplate
-    fun `chat-message asset replaces async nodes with multi node flattened`() = runBlockingTest {
-        var update: Asset? = null
-        plugin?.hooks?.onAsyncNode?.tap("") { _, node, callback ->
-            BailResult.Bail(
-                listOf(
-                    mapOf(
-                        "asset" to mapOf(
-                            "id" to "2",
-                            "type" to "text",
-                            "value" to "Hello World!",
-                        ),
-                    ),
-                    mapOf(
-                        "asset" to mapOf(
-                            "id" to "3",
-                            "type" to "text",
-                            "value" to "Hello World 4",
-                        ),
-                    ),
-                ),
-            )
-        }
-        var count = 0
-        suspendCancellableCoroutine { cont ->
-            player.hooks.view.tap { v ->
-                v?.hooks?.onUpdate?.tap { asset ->
-                    count++
-                    update = asset
-                    if (count == 2) cont.resume(true) {}
-                }
-            }
-
-            player.start(chatMessageContent)
-        }
-        Assertions.assertTrue(count == 2)
-        // Additional assertions
-        val values = (update as? Map<*, *>)?.get("values") as? List<*>
-
-        Assertions.assertNotNull(values)
-        Assertions.assertEquals(2, values?.size)
-
-        val asset0 = (values?.get(0) as? Map<*, *>)?.get("asset") as? Map<*, *>
-        Assertions.assertEquals("2", asset0?.get("id"))
-        Assertions.assertEquals("text", asset0?.get("type"))
-        Assertions.assertEquals("Hello World!", asset0?.get("value"))
-
-        val nestedValues = (values?.get(1) as? List<*>)?.get(0) as? Map<*, *>
-        Assertions.assertNotNull(nestedValues)
-
-        val assetWrapper = nestedValues?.get("asset") as? Map<*, *>
-        Assertions.assertEquals("2", assetWrapper?.get("id"))
-        Assertions.assertEquals("text", assetWrapper?.get("type"))
-        Assertions.assertEquals("Hello World!", assetWrapper?.get("value"))
-
-        val nestedValues1 = (values?.get(1) as? List<*>)?.get(1) as? Map<*, *>
-        Assertions.assertNotNull(nestedValues1)
-
-        val assetWrapper1 = nestedValues1?.get("asset") as? Map<*, *>
-        Assertions.assertEquals("3", assetWrapper1?.get("id"))
-        Assertions.assertEquals("text", assetWrapper1?.get("type"))
-        Assertions.assertEquals("Hello World 4", assetWrapper1?.get("value"))
-    }
-
-    @TestTemplate
     fun `chat-message asset - resolve single chat-message`() = runBlockingTest {
         var asyncTaps = 0
         var updateNumber = 0
@@ -490,9 +427,11 @@ internal class AsyncNodePluginTest : PlayerTest() {
                         "id" to "text3",
                         "type" to "chat-message",
                         "value" to mapOf(
-                            "id" to "text2",
-                            "type" to "text",
-                            "value" to "async content",
+                            "asset" to mapOf(
+                                "id" to "text2",
+                                "type" to "text",
+                                "value" to "async content",
+                            ),
                         ),
                     ),
                 ),
@@ -574,9 +513,11 @@ internal class AsyncNodePluginTest : PlayerTest() {
                             "id" to "3",
                             "type" to "chat-message",
                             "value" to mapOf(
-                                "id" to "text2",
-                                "type" to "text",
-                                "value" to "chat-message asset",
+                                "asset" to mapOf(
+                                    "id" to "text2",
+                                    "type" to "text",
+                                    "value" to "chat-message asset",
+                                ),
                             ),
                         ),
                     ),

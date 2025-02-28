@@ -1,4 +1,4 @@
-import type { Asset, Node } from "@player-ui/player";
+import type { Node } from "@player-ui/player";
 
 export type AsyncNodeHandler = (
   node: Node.Node,
@@ -8,6 +8,6 @@ export type AsyncNodeHandler = (
 export type AsyncTransformFunc = (
   id: string,
   wrapperAssetType: string,
-  asset?: Asset,
+  asset?: Node.Node,
   flatten?: boolean,
-) => Node.Node;
+) => Node.Asset;

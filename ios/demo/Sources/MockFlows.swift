@@ -1407,11 +1407,13 @@ static let chatMessageBasic: String = """
           "id": "1",
           "type": "chat-message",
           "value": {
-                id: "text",
-                type: "text",
-                value: "chat message",
+            "asset":{
+                "id": "text",
+                "type": "text",
+                "value": "chat message",
               },
-          }
+            },
+          },
       ],
       "navigation": {
           "BEGIN": "FLOW_1",

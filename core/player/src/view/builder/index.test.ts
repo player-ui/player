@@ -59,7 +59,14 @@ test("async node", () => {
 });
 
 test("asset wrapper", () => {
-  const result = Builder.assetWrapper({ id: "1", type: "text" });
+  const result = Builder.assetWrapper({
+    type: NodeType.Asset,
+    value: {
+      id: "1",
+      type: "text",
+      value: "chat message",
+    },
+  });
 
   expect(result.type).toBe(NodeType.Value);
   expect(result.children?.[0]?.value.type).toBe("asset");

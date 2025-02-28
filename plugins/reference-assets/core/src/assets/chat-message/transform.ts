@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import type {
   BeforeTransformFunction,
   TransformFunctions,
@@ -13,10 +14,12 @@ import { ChatMessageAsset } from "./types";
  * @returns - transformed asset with async node and asset node
  */
 export const transform: BeforeTransformFunction<ChatMessageAsset> = (asset) => {
-  if (!asset.value.value) {
+  const newAsset = asset.children?.[0]?.value;
+
+  if (!newAsset) {
     return asyncTransform(asset.value.id, "collection");
   }
-  return asyncTransform(asset.value.id, "collection", asset.value.value);
+  return asyncTransform(asset.value.id, "collection", newAsset);
 };
 
 export const chatMessageTransform: TransformFunctions = compose(

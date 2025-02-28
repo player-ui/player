@@ -592,22 +592,12 @@ class AsyncNodePluginTests: XCTestCase {
             if count == 1 {
                 return .singleNode(.concrete(context?.evaluateScript("""
                         ({"asset": {"id": "2", "type": "chat-message", "value": {
+                        "asset": {
                               "id": "text2",
                                "type": "text",
                                "value": "chat message2",
-                             }}})
+                             }}}})
                         """) ?? JSValue()))
-                
-//                
-//                return .singleNode(.concrete(context.evaluateScript("""
-//                (
-//                    {"asset": {"id": "1", "type": "chat-message", "value": {
-//                       "id": "text",
-//                       "type": "text",
-//                       "value": "chat message2",
-//                     }}}
-//                )
-//            """) ?? JSValue()))
             }
             
             return .singleNode(ReplacementNode.concrete(context?.evaluateScript("") ?? JSValue()))
@@ -666,10 +656,11 @@ class AsyncNodePluginTests: XCTestCase {
             if count == 1 {
                 return .singleNode(.concrete(context?.evaluateScript("""
                         ({"asset": {"id": "2", "type": "chat-message", "value": {
+                        "asset": {
                               "id": "text2",
                                "type": "text",
                                "value": "chat message2",
-                             }}})
+                             }}}})
                         """) ?? JSValue()))
 
             } else if count == 2 {
@@ -934,9 +925,11 @@ extension String {
             id: "1",
             type: "chat-message",
             value: {
-                id: "text",
-                type: "text",
-                value: "chat message",
+                asset: {
+                    id: "text",
+                    type: "text",
+                    value: "chat message",
+                },
               },
           },
        ],

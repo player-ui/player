@@ -24,9 +24,11 @@ describe("chatMessage transform", () => {
         type: "chat-message",
         id: "1",
         value: {
-          id: "1",
-          type: "text",
-          value: "chat message",
+          asset: {
+            id: "1",
+            type: "text",
+            value: "chat message",
+          },
         },
       },
       [plugin],

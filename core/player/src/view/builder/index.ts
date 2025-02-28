@@ -17,10 +17,9 @@ export class Builder {
     };
   }
 
-  static assetWrapper<T extends AnyAssetType>(value: T): Node.Value {
-    const asset = Builder.asset(value);
+  static assetWrapper<T extends Node.Node>(value: T): Node.Value {
     const valueNode = Builder.value();
-    Builder.addChild(valueNode, "asset", asset);
+    Builder.addChild(valueNode, "asset", value);
     return valueNode;
   }
 

@@ -82,7 +82,7 @@ const slotFactory = (name: string, isArray = false, wrapInAsset = true) =>
   });
 
 export const LabelSlot = slotFactory("label");
-export const ValueSlot = slotFactory("value", false, false);
+export const ValueSlot = slotFactory("value");
 export const TitleSlot = slotFactory("title");
 export const NoteSlot = slotFactory("note");
 export const SubtitleSlot = slotFactory("subtitle");

@@ -306,9 +306,11 @@ describe("JSON serialization", () => {
         id: "1",
         type: "chat-message",
         value: {
-          id: "value",
-          type: "text",
-          value: "Hello World!",
+          asset: {
+            id: "value",
+            type: "text",
+            value: "Hello World!",
+          },
         },
       });
     });
