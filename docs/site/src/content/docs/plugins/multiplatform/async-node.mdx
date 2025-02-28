@@ -255,7 +255,7 @@ AndroidPlayer(asyncNodePlugin)
 `AsyncTransform` is a helper function to create the transform for async asset. With the example below, 
 - id - `chat-message` asset id
 - wrapperType - container asset type eg. `Collection`
-- asset - value asset to pass in
+- asset - value asset to pass in (`Text` in example)
 - flatten - default value is true. Determine if the content streamed in should be flattened. 
 
 ```json
@@ -271,4 +271,4 @@ AndroidPlayer(asyncNodePlugin)
 ```
 
 ### Flatten
-Flatten is introduced to avoid nested structure caused by continuous streamning. eg. When a new `chat-message` asset is streamed in, in AST tree, instead of `[chat1, [chat2, asyncNode]]`, it's flattened into `[chat1, chat2, asyncNode]`
+Flatten is introduced to avoid nested structure caused by continuous streaming. eg. When a new `chat-message` asset is streamed in, in AST tree, instead of `[chat1, [chat2, asyncNode]]`, it's flattened into `[chat1, chat2, asyncNode]`
