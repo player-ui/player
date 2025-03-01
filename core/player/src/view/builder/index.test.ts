@@ -32,6 +32,44 @@ describe("multiNode", () => {
     expect(v1.parent).toBe(result);
     expect(v2.parent).toBe(result);
   });
+
+  test("multinode with async node", () => {
+    const v1 = Builder.asyncNode("1");
+    const v2 = Builder.asyncNode("2");
+    const result = Builder.multiNode(v1, v2);
+
+    expect(result.type).toBe(NodeType.MultiNode);
+    expect(result.values[0]?.type).toBe("async");
+    expect(result.values[1]?.type).toBe("async");
+    expect(v1.parent).toBe(result);
+    expect(v2.parent).toBe(result);
+  });
+});
+
+test("async node", () => {
+  const result = Builder.asyncNode("1", false);
+  expect(result.type).toBe(NodeType.Async);
+  expect(result.id).toBe("1");
+  expect(result.flatten).toBe(false);
+
+  const result2 = Builder.asyncNode("2");
+  expect(result2.type).toBe(NodeType.Async);
+  expect(result2.id).toBe("2");
+  expect(result2.flatten).toBe(true);
+});
+
+test("asset wrapper", () => {
+  const result = Builder.assetWrapper({
+    type: NodeType.Asset,
+    value: {
+      id: "1",
+      type: "text",
+      value: "chat message",
+    },
+  });
+
+  expect(result.type).toBe(NodeType.Value);
+  expect(result.children?.[0]?.value.type).toBe("asset");
 });
 
 describe("addChild", () => {

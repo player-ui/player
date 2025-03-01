@@ -1,0 +1,58 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`asyncTransform > generates wrapper asset with asset 1`] = `
+{
+  "children": [
+    {
+      "path": [
+        "values",
+      ],
+      "value": {
+        "override": true,
+        "parent": [Circular],
+        "type": "multi-node",
+        "values": [
+          {
+            "children": [
+              {
+                "path": [
+                  "asset",
+                ],
+                "value": {
+                  "parent": [Circular],
+                  "type": "asset",
+                  "value": {
+                    "id": "2",
+                    "type": "text",
+                    "value": "chat message",
+                  },
+                },
+              },
+            ],
+            "parent": [Circular],
+            "type": "value",
+            "value": undefined,
+          },
+          {
+            "flatten": true,
+            "id": "async-1",
+            "parent": [Circular],
+            "type": "async",
+            "value": {
+              "type": "value",
+              "value": {
+                "id": "async-1",
+              },
+            },
+          },
+        ],
+      },
+    },
+  ],
+  "type": "asset",
+  "value": {
+    "id": "collection-async-1",
+    "type": "collection",
+  },
+}
+`;
