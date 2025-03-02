@@ -21,6 +21,7 @@ const templateJoinValues = {
         {
           data: "foo",
           output: "values",
+          placement: "append",
           value: {
             asset: {
               id: "value-_index_",

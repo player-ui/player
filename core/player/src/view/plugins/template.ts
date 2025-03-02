@@ -11,7 +11,6 @@ import { ViewInstance, ViewPlugin } from "../view";
 import type { Options } from "./options";
 import type { Resolver } from "../resolver";
 import { hasTemplateKey } from "../parser/utils";
-import { ConsoleLogger } from "../../logger";
 
 export interface TemplateItemInfo {
   /** The index of the data for the current iteration of the template */
@@ -37,7 +36,6 @@ export type TemplateSubstitutionsFunc = (
 /** A view plugin to resolve/manage templates */
 export default class TemplatePlugin implements ViewPlugin {
   private readonly options: Options;
-  private readonly logger: ConsoleLogger;
 
   hooks: {
     resolveTemplateSubstitutions: SyncWaterfallHook<
@@ -52,7 +50,6 @@ export default class TemplatePlugin implements ViewPlugin {
 
   constructor(options: Options) {
     this.options = options;
-    this.logger = new ConsoleLogger();
   }
 
   private parseTemplate(
@@ -106,13 +103,6 @@ export default class TemplatePlugin implements ViewPlugin {
       if (parsed) {
         values.push(parsed);
       }
-
-      if (!node.placement) {
-        this.logger.warn(
-          "Template node does not specify a position - Defaulting to 'append'.",
-        );
-        node.placement = "append";
-      }
     });
 
     const result: Node.MultiNode = {
@@ -155,6 +145,7 @@ export default class TemplatePlugin implements ViewPlugin {
                   data: template.data,
                   template: template.value,
                   dynamic: template.dynamic ?? false,
+                  placement: template.placement,
                 },
                 template,
               );
@@ -165,6 +156,41 @@ export default class TemplatePlugin implements ViewPlugin {
                 templateAST.values.forEach((v) => {
                   v.parent = templateAST;
                 });
+
+                if (template.placement) {
+                  const outputKey = template.output;
+                  console.log("outputKey", outputKey);
+
+                  if (outputKey && childOptions.parentObj) {
+                    // Get the parent node
+                    const parentNode = childOptions.parentObj;
+                    console.log("parentNode", parentNode);
+
+                    if (parentNode) {
+                      // Access the property on the parent node using the output property as a key
+                      const nonTemplateData = (parentNode as any)[outputKey];
+                      console.log("nonTemplateData", nonTemplateData);
+
+                      // Make sure nonTemplateData is an array
+                      if (Array.isArray(nonTemplateData)) {
+                        // Apply placement logic
+                        if (template.placement === "prepend") {
+                          // For prepend, put the template values before the existing values
+                          (parentNode as any)[outputKey] = [
+                            ...templateAST.values,
+                            ...nonTemplateData,
+                          ];
+                        } else if (template.placement === "append") {
+                          // For append, put the template values after the existing values
+                          (parentNode as any)[outputKey] = [
+                            ...nonTemplateData,
+                            ...templateAST.values,
+                          ];
+                        }
+                      }
+                    }
+                  }
+                }
               }
 
               return {

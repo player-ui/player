@@ -77,7 +77,7 @@ export declare namespace Node {
     /** Should the template recompute when data changes */
     dynamic?: boolean;
 
-    /** Specifies the placement of the expanded template */
+    /** Specifies the template placement in relation to existing elements*/
     placement?: "prepend" | "append";
   }
 
