@@ -20,6 +20,7 @@ MOCK_DIRS = [
     "info",
     "input",
     "text",
+    "chat-message",
 ]
 
 DSL_SRCS = glob(["{}/*.tsx".format(d) for d in MOCK_DIRS])

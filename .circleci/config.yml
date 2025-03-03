@@ -350,6 +350,8 @@ jobs:
   maybe_release:
     executor: base
     steps:
+      - attach_workspace:
+          at: ~/player
       - run: echo "Should I release? (<< pipeline.parameters.should_release >>)"
       - when:
           condition: << pipeline.parameters.should_release >>
@@ -359,6 +361,8 @@ jobs:
   release:
     executor: base
     steps:
+      - attach_workspace:
+          at: ~/player
       - auto_shipit
 
 workflows:

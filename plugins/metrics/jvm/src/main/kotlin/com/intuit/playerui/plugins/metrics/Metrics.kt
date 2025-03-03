@@ -8,6 +8,7 @@ import com.intuit.playerui.core.bridge.serialization.serializers.PolymorphicNode
 import com.intuit.playerui.core.player.PlayerException
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 
@@ -59,6 +60,9 @@ public sealed class NodeMetrics(override val node: Node) : Timing(node) {
 public class RenderMetrics(override val node: Node) : NodeMetrics(node) {
     /** Timing representing the initial render */
     public val render: Timing by NodeSerializableField(Timing.serializer())
+
+    /** An array of timings representing updates to the view */
+    public val updates: List<Timing> by NodeSerializableField(ListSerializer(Timing.serializer()))
 
     internal object Serializer : NodeWrapperSerializer<RenderMetrics>(::RenderMetrics)
 }

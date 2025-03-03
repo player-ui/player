@@ -16,6 +16,10 @@ import type {
 } from "@player-ui/reference-assets-plugin";
 import { ReferenceAssetsPlugin as ReferenceAssetsCorePlugin } from "@player-ui/reference-assets-plugin";
 import { Input, Text, Collection, Action, Info, Image, Choice } from "./assets";
+import {
+  AsyncNodePlugin,
+  AsyncNodePluginPlugin,
+} from "@player-ui/async-node-plugin";
 
 /**
  * A plugin to register the base reference assets
@@ -45,6 +49,10 @@ export class ReferenceAssetsPlugin
   }
 
   apply(player: Player) {
+    const asyncNodePlugin = new AsyncNodePlugin({
+      plugins: [new AsyncNodePluginPlugin()],
+    });
+    player.registerPlugin(asyncNodePlugin);
     player.registerPlugin(new ReferenceAssetsCorePlugin());
   }
 }
