@@ -59,7 +59,7 @@ class ManagedState {
 
     /** the config to use when creating a player */
     playerConfig: ReactPlayerOptions;
-  }) {
+  }): this {
     const initialState: ManagedPlayerState = {
       value: "not_started",
       context: {
@@ -75,7 +75,7 @@ class ManagedState {
   }
 
   /** reset starts from nothing */
-  public reset() {
+  public reset(): void {
     if (this.state?.value === "error") {
       const { playerConfig, manager } = this.state.context;
       this.start({ playerConfig, manager });
@@ -85,7 +85,7 @@ class ManagedState {
   }
 
   /** restart starts from the last result */
-  public restart() {
+  public restart(): void {
     if (this.state?.value === "error") {
       const { playerConfig, manager, prevResult, reactPlayer } =
         this.state.context;
@@ -218,7 +218,7 @@ export const usePersistentStateMachine = (options: {
 
   /** Any middleware for the manager */
   middleware?: ManagerMiddleware;
-}) => {
+}): ManagedState => {
   const keyRef = React.useRef<ManagedPlayerStateKey>({
     _key: Symbol("managed-player"),
   });
@@ -227,23 +227,10 @@ export const usePersistentStateMachine = (options: {
     managedPlayerStateMachines.get(keyRef.current) ??
     new ManagedState({ middleware: options.middleware });
   managedPlayerStateMachines.set(keyRef.current, managedState);
-  const [state, setState] = React.useState(managedState.state);
 
-  React.useEffect(() => {
-    const unsub = managedState.addListener({
-      onState: (s) => {
-        setState(s);
-      },
-    });
+  managedState.start(options);
 
-    if (managedState.state === undefined) {
-      managedState.start(options);
-    }
-
-    return unsub;
-  }, []);
-
-  return { managedState, state };
+  return managedState;
 };
 
 /**
@@ -252,10 +239,12 @@ export const usePersistentStateMachine = (options: {
  *
  * `suspense` must be enabled to wait for results in flight.
  */
-export const ManagedPlayer = (props: ManagedPlayerProps) => {
+export const ManagedPlayer = (
+  props: ManagedPlayerProps,
+): React.JSX.Element | null => {
   const { withRequestTime, RequestTimeMetricsPlugin } = useRequestTime();
 
-  const { state, managedState } = usePersistentStateMachine({
+  const initialState = usePersistentStateMachine({
     manager: props.manager,
     middleware: { next: withRequestTime },
     playerConfig: {
@@ -263,6 +252,24 @@ export const ManagedPlayer = (props: ManagedPlayerProps) => {
       player: props.player,
     },
   });
+
+  const [managedState, setManagedState] = React.useState(initialState);
+  const [state, setState] = React.useState(managedState.state);
+
+  React.useEffect(() => {
+    if (state?.value === "ended" && props.manager !== state.context.manager) {
+      const newManagedState = usePersistentStateMachine({
+        manager: props.manager,
+        middleware: { next: withRequestTime },
+        playerConfig: {
+          plugins: [...(props?.plugins ?? []), RequestTimeMetricsPlugin],
+          player: props.player,
+        },
+      });
+      setManagedState(newManagedState);
+      setState(newManagedState.state);
+    }
+  }, [state]);
 
   React.useEffect(() => {
     if (state?.value === "ended") {
