@@ -208,27 +208,15 @@ const managedPlayerStateMachines = new WeakMap<
   ManagedState
 >();
 
-/** Creates an x-state state machine that persists when this component is no longer renders (due to Suspense) */
-export const usePersistentStateMachine = (options: {
-  /** the flow manager to use */
-  manager: FlowManager;
-
-  /** Player config  */
-  playerConfig: ReactPlayerOptions;
-
-  /** Any middleware for the manager */
-  middleware?: ManagerMiddleware;
-}): ManagedState => {
-  const keyRef = React.useRef<ManagedPlayerStateKey>({
-    _key: Symbol("managed-player"),
-  });
-
+/** Creates an x-state state machine that persists when this component is no longer rendered (due to Suspense) */
+export const createPersistentStateMachine = (
+  keyRef: React.MutableRefObject<ManagedPlayerStateKey>,
+  middleware?: ManagerMiddleware,
+): ManagedState => {
   const managedState =
     managedPlayerStateMachines.get(keyRef.current) ??
-    new ManagedState({ middleware: options.middleware });
+    new ManagedState({ middleware: middleware });
   managedPlayerStateMachines.set(keyRef.current, managedState);
-
-  managedState.start(options);
 
   return managedState;
 };
@@ -242,42 +230,51 @@ export const usePersistentStateMachine = (options: {
 export const ManagedPlayer = (
   props: ManagedPlayerProps,
 ): React.JSX.Element | null => {
+  const keyRef = React.useRef<ManagedPlayerStateKey>({
+    _key: Symbol("managed-player"),
+  });
+
   const { withRequestTime, RequestTimeMetricsPlugin } = useRequestTime();
 
-  const initialState = usePersistentStateMachine({
-    manager: props.manager,
-    middleware: { next: withRequestTime },
-    playerConfig: {
-      plugins: [...(props?.plugins ?? []), RequestTimeMetricsPlugin],
-      player: props.player,
-    },
+  const initialState = createPersistentStateMachine(keyRef, {
+    next: withRequestTime,
   });
 
   const [managedState, setManagedState] = React.useState(initialState);
   const [state, setState] = React.useState(managedState.state);
 
   React.useEffect(() => {
-    if (state?.value === "ended" && props.manager !== state.context.manager) {
-      const newManagedState = usePersistentStateMachine({
+    const unsub = managedState.addListener({
+      onState: (s) => {
+        setState(s);
+      },
+    });
+    return unsub;
+  }, []);
+
+  React.useEffect(() => {
+    if (state?.value === "ended") {
+      if (props.manager !== state.context.manager) {
+        const newManagedState = createPersistentStateMachine(keyRef, {
+          next: withRequestTime,
+        });
+        setManagedState(newManagedState);
+        setState(newManagedState.state);
+      } else {
+        props.onComplete?.(state?.context.result);
+      }
+    } else if (state?.value === "error") {
+      props.onError?.(state?.context.error);
+    } else if (state?.value === "running") {
+      props.onStartedFlow?.();
+    } else if (state === undefined) {
+      managedState.start({
         manager: props.manager,
-        middleware: { next: withRequestTime },
         playerConfig: {
           plugins: [...(props?.plugins ?? []), RequestTimeMetricsPlugin],
           player: props.player,
         },
       });
-      setManagedState(newManagedState);
-      setState(newManagedState.state);
-    }
-  }, [state]);
-
-  React.useEffect(() => {
-    if (state?.value === "ended") {
-      props.onComplete?.(state?.context.result);
-    } else if (state?.value === "error") {
-      props.onError?.(state?.context.error);
-    } else if (state?.value === "running") {
-      props.onStartedFlow?.();
     }
   }, [state]);
 
