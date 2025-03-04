@@ -7,6 +7,7 @@ import com.intuit.playerui.utils.test.PlayerTest
 import com.intuit.playerui.utils.test.runBlockingTest
 import com.intuit.playerui.utils.test.simpleFlowString
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.TestTemplate
 
@@ -16,6 +17,7 @@ internal class FlowControllerIntegrationTest : PlayerTest() {
     fun `test flow controller`() {
         var pendingTransition: Pair<NamedState?, String?>? = null
         var completedTransition: Pair<NamedState?, NamedState?>? = null
+        var flowInstanceAfterTransition: FlowInstance? = null
 
         player.hooks.flowController.tap { flowController ->
             flowController?.hooks?.flow?.tap { flow ->
@@ -30,6 +32,11 @@ internal class FlowControllerIntegrationTest : PlayerTest() {
                     // do code cov w/ from, to, & pendingTransaction.second
                     if (pendingTransition?.first?.name != from?.name) pendingTransition = null
                     completedTransition = from to to
+                }
+
+                flow?.hooks?.afterTransition?.tap { flowInstance ->
+                    player.logger.info("completed transition $flowInstance")
+                    flowInstanceAfterTransition = flowInstance
                 }
             }
         }
@@ -47,6 +54,7 @@ internal class FlowControllerIntegrationTest : PlayerTest() {
         assertEquals("*", pendingTransition?.second)
         assertEquals("VIEW_1", completedTransition?.first?.name)
         assertEquals("END_Done", completedTransition?.second?.name)
+        assertNotNull(flowInstanceAfterTransition)
     }
 
     @TestTemplate

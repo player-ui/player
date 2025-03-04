@@ -57,6 +57,9 @@ public class FlowInstance(override val node: Node) : NodeWrapper, Transition {
         public val transition: NodeSyncHook2<NamedState?, NamedState>
             by NodeSerializableField(NodeSyncHook2.serializer(NamedState.serializer().nullable, NamedState.serializer()))
 
+        public val afterTransition: NodeSyncHook1<FlowInstance>
+            by NodeSerializableField(NodeSyncHook1.serializer(FlowInstance.serializer()))
+
         internal object Serializer : NodeWrapperSerializer<Hooks>(::Hooks)
     }
 
