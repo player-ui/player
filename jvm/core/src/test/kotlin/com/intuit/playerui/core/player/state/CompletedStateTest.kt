@@ -13,6 +13,7 @@ import com.intuit.playerui.core.player.PlayerFlowStatus
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import kotlinx.serialization.modules.EmptySerializersModule
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
@@ -38,6 +39,8 @@ internal class CompletedStateTest : NodeBaseTest() {
     fun setUpMocks() {
         val runtime: Runtime<*> = mockk()
         every { node.runtime } returns runtime
+        every { node.format } returns format
+        every { format.serializersModule } returns EmptySerializersModule
         every { runtime.containsKey("getSymbol") } returns true
         every { runtime.getInvokable<String?>("getSymbol") } returns Invokable { "Symbol(hello)" }
         every { node.getObject("controllers") } returns node

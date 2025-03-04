@@ -12,7 +12,11 @@ import { DependencyModel, withParser } from "../../data";
 import type { Logger } from "../../logger";
 import type { Node } from "../parser";
 import { NodeType } from "../parser";
-import { caresAboutDataChanges, toNodeResolveOptions } from "./utils";
+import {
+  caresAboutDataChanges,
+  toNodeResolveOptions,
+  unpackAndPush,
+} from "./utils";
 import type { Resolve } from "./types";
 import { getNodeID } from "../parser/utils";
 
@@ -163,7 +167,6 @@ export class Resolver {
     );
     this.resolveCache = resolveCache;
     this.hooks.afterUpdate.call(updated.value);
-
     return updated.value;
   }
 
@@ -423,7 +426,24 @@ export class Resolver {
         );
 
         if (mTree.value !== undefined && mTree.value !== null) {
-          childValue.push(mTree.value);
+          /**
+           * async nodes' parent is a multi-node
+           * When the node to resolve is an async node and the flatten flag is true
+           * Add the content streamed in to the childValue of parent multi-node
+           * Array.isArray(mTree.value.asset.values) is the case when the content is an async asset
+           */
+          if (
+            mValue.type === NodeType.Async &&
+            mValue.flatten &&
+            mTree.value.asset &&
+            Array.isArray(mTree.value.asset.values)
+          ) {
+            mTree.value.asset.values.forEach((v: any) => {
+              unpackAndPush(v, childValue);
+            });
+          } else {
+            childValue.push(mTree.value);
+          }
         }
 
         mTree.dependencies.forEach((bindingDep) =>

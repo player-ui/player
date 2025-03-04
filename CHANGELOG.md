@@ -1,3 +1,181 @@
+# 0.10.5-next.0 (Tue Mar 04 2025)
+
+#### 🐛 Bug Fix
+
+- iOS: expose metrics plugin hooks [#607](https://github.com/player-ui/player/pull/607) ([@nancywu1](https://github.com/nancywu1))
+- Update CODEOWNERS File [#608](https://github.com/player-ui/player/pull/608) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- [@nancywu1](https://github.com/nancywu1)
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.10.4 (Mon Mar 03 2025)
+
+### Release Notes
+
+#### Example asset and transform for async content streaming ([#575](https://github.com/player-ui/player/pull/575))
+
+Player streaming enhancement
+1. Changes
+- Added new `chat-message` asset in `ReferenceAssetsPlugin` as async streaming example 
+- Added generic function in `AsyncNodePlugin` to generate async asset transform
+2. New functionality
+Instead of adding `{async: true}` in content, replace it with a special type of asset, eg. `chat-message` associated with a transform function to add asyncNode
+
+<!--
+In an effort to standardize our process and code, please make sure you include documentation and/or update any existing documentation.
+Please refer to our site https://player-ui.github.io/latest/about, and include any neccesary information that would be helpful to coders, developers, and learners.
+
+If you are unable to update the current documents, please create an issue for us to get back to it.
+
+-->
+
+<!--
+  To include release notes in the automatic changelong, just add a level 1 markdown header below
+  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
+
+  Example:
+
+  # Release Notes
+  Added new plugin, to use it:
+  ```typescript
+  const plugin = new Plugin(...)
+  ```
+-->
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#605](https://github.com/player-ui/player/pull/605) ([@intuit-svc](https://github.com/intuit-svc))
+- Example asset and transform for async content streaming [#575](https://github.com/player-ui/player/pull/575) ([@cehan-Chloe](https://github.com/cehan-Chloe) [@sakuntala-motukuri](https://github.com/sakuntala-motukuri) [@brocollie08](https://github.com/brocollie08))
+- Convert Flow to NodeWrapper [#594](https://github.com/player-ui/player/pull/594) ([@mrigankmg](https://github.com/mrigankmg) [@brocollie08](https://github.com/brocollie08))
+- Execution Environment Resource Bump + Android TestUtils [#602](https://github.com/player-ui/player/pull/602) ([@brocollie08](https://github.com/brocollie08))
+- Hermes perf optimization [#598](https://github.com/player-ui/player/pull/598) ([@brocollie08](https://github.com/brocollie08))
+- Expose metrics plugin hooks android [#591](https://github.com/player-ui/player/pull/591) ([@mrigankmg](https://github.com/mrigankmg))
+
+#### Authors: 5
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+- Niharika Motukuri ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+
+---
+
+# 0.10.4-next.2 (Fri Feb 28 2025)
+
+#### 🐛 Bug Fix
+
+- Convert Flow to NodeWrapper [#594](https://github.com/player-ui/player/pull/594) ([@mrigankmg](https://github.com/mrigankmg) [@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 2
+
+- [@brocollie08](https://github.com/brocollie08)
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+
+---
+
+# 0.10.4-next.1 (Fri Feb 28 2025)
+
+#### 🐛 Bug Fix
+
+- Execution Environment Resource Bump + Android TestUtils [#602](https://github.com/player-ui/player/pull/602) ([@brocollie08](https://github.com/brocollie08))
+- Hermes perf optimization [#598](https://github.com/player-ui/player/pull/598) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
+# 0.10.4-next.0 (Tue Feb 25 2025)
+
+#### 🐛 Bug Fix
+
+- Expose metrics plugin hooks android [#591](https://github.com/player-ui/player/pull/591) ([@mrigankmg](https://github.com/mrigankmg))
+
+#### Authors: 1
+
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+
+---
+
+# 0.10.3 (Tue Feb 25 2025)
+
+### Release Notes
+
+#### Data change listener fix ([#572](https://github.com/player-ui/player/pull/572))
+
+Fixed an issue in `common-exprssion-plugin` where the array update via concat didn't trigger the `data-change-listener`  and view update
+
+#### Update  to explicitly call out the default value for dataPath ([#584](https://github.com/player-ui/player/pull/584))
+
+Updated docs for Shared Constants Plugin to highlight the default dataPath used for overriding values
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#601](https://github.com/player-ui/player/pull/601) ([@intuit-svc](https://github.com/intuit-svc))
+- Added typescript plugins dev guide [#497](https://github.com/player-ui/player/pull/497) ([@mrigankmg](https://github.com/mrigankmg))
+- Update CONTRIBUTING.md [#596](https://github.com/player-ui/player/pull/596) ([@brocollie08](https://github.com/brocollie08))
+- Data change listener fix [#572](https://github.com/player-ui/player/pull/572) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Update CODEOWNERS [#592](https://github.com/player-ui/player/pull/592) ([@KetanReddy](https://github.com/KetanReddy))
+- Moved AssetTest and Assertions into an android testutils package [#586](https://github.com/player-ui/player/pull/586) ([@mrigankmg](https://github.com/mrigankmg))
+- Expose onStart player hook for Android [#587](https://github.com/player-ui/player/pull/587) ([@mrigankmg](https://github.com/mrigankmg))
+- Revert "vector common scope" [#587](https://github.com/player-ui/player/pull/587) ([@brocollie08](https://github.com/brocollie08))
+- Support Smoother Experience When Loading a Viewless Flow on iOS [#570](https://github.com/player-ui/player/pull/570) ([@nancywu1](https://github.com/nancywu1))
+- Update  to explicitly call out the default value for dataPath [#584](https://github.com/player-ui/player/pull/584) ([@A1shK](https://github.com/A1shK))
+- Hermes tracker update [#580](https://github.com/player-ui/player/pull/580) ([@brocollie08](https://github.com/brocollie08))
+
+#### ⚠️ Pushed to `main`
+
+- vector common scope ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 7
+
+- [@A1shK](https://github.com/A1shK)
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+
+---
+
+# 0.10.3-next.4 (Mon Feb 24 2025)
+
+### Release Notes
+
+#### Data change listener fix ([#572](https://github.com/player-ui/player/pull/572))
+
+Fixed an issue in `common-exprssion-plugin` where the array update via concat didn't trigger the `data-change-listener`  and view update
+
+---
+
+#### 🐛 Bug Fix
+
+- Added typescript plugins dev guide [#497](https://github.com/player-ui/player/pull/497) ([@mrigankmg](https://github.com/mrigankmg))
+- Update CONTRIBUTING.md [#596](https://github.com/player-ui/player/pull/596) ([@brocollie08](https://github.com/brocollie08))
+- Data change listener fix [#572](https://github.com/player-ui/player/pull/572) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Update CODEOWNERS [#592](https://github.com/player-ui/player/pull/592) ([@KetanReddy](https://github.com/KetanReddy))
+- Moved AssetTest and Assertions into an android testutils package [#586](https://github.com/player-ui/player/pull/586) ([@mrigankmg](https://github.com/mrigankmg))
+
+#### Authors: 4
+
+- [@brocollie08](https://github.com/brocollie08)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+
+---
+
 # 0.10.3-next.3 (Tue Feb 11 2025)
 
 #### 🐛 Bug Fix
