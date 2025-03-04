@@ -51,7 +51,7 @@ class ActionTest : AssetTest("action") {
 
             suspendCancellableCoroutine { cont ->
                 while (player.state is InProgressState) runBlocking { delay(5) }
-                if (player.state is CompletedState) cont.resume(Unit)
+                if (player.state is CompletedState) cont.resume(Unit) {}
             }
         }
 
