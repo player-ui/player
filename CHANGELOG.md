@@ -1,3 +1,17 @@
+# 0.10.5-next.0 (Tue Mar 04 2025)
+
+#### 🐛 Bug Fix
+
+- iOS: expose metrics plugin hooks [#607](https://github.com/player-ui/player/pull/607) ([@nancywu1](https://github.com/nancywu1))
+- Update CODEOWNERS File [#608](https://github.com/player-ui/player/pull/608) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- [@nancywu1](https://github.com/nancywu1)
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.10.4 (Mon Mar 03 2025)
 
 ### Release Notes
