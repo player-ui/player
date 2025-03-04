@@ -208,6 +208,15 @@ const managedPlayerStateMachines = new WeakMap<
   ManagedState
 >();
 
+/**
+ * Helper to make a unique symbol
+ */
+function createKey() {
+  return {
+    _key: Symbol("managed-player"),
+  };
+}
+
 /** Creates an x-state state machine that persists when this component is no longer rendered (due to Suspense) */
 export const createPersistentStateMachine = (
   keyRef: React.MutableRefObject<ManagedPlayerStateKey>,
@@ -230,10 +239,7 @@ export const createPersistentStateMachine = (
 export const ManagedPlayer = (
   props: ManagedPlayerProps,
 ): React.JSX.Element | null => {
-  const keyRef = React.useRef<ManagedPlayerStateKey>({
-    _key: Symbol("managed-player"),
-  });
-
+  const keyRef = React.useRef<ManagedPlayerStateKey>(createKey());
   const { withRequestTime, RequestTimeMetricsPlugin } = useRequestTime();
 
   const initialState = createPersistentStateMachine(keyRef, {
@@ -255,6 +261,7 @@ export const ManagedPlayer = (
   React.useEffect(() => {
     if (state?.value === "ended") {
       if (props.manager !== state.context.manager) {
+        keyRef.current = createKey();
         const newManagedState = createPersistentStateMachine(keyRef, {
           next: withRequestTime,
         });
