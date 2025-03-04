@@ -12,6 +12,8 @@ import type { Options } from "./options";
 import type { Resolver } from "../resolver";
 import { hasTemplateKey } from "../parser/utils";
 
+const templateSymbol = Symbol("template");
+
 export interface TemplateItemInfo {
   /** The index of the data for the current iteration of the template */
   index: number;
@@ -109,7 +111,10 @@ export default class TemplatePlugin implements ViewPlugin {
       type: NodeType.MultiNode,
       override: false,
       values,
-    };
+      [templateSymbol]: node.placement,
+    } as Node.MultiNode;
+
+    console.log("Parsed Template:", result);
 
     return result;
   }
@@ -122,6 +127,42 @@ export default class TemplatePlugin implements ViewPlugin {
           node,
           this.options,
         );
+      }
+
+      return node;
+    });
+
+    function getTemplateSymbolValue(obj: any): boolean | undefined {
+      return obj[templateSymbol];
+    }
+    parser.hooks.onCreateASTNode.tap("template", (node) => {
+      if (node && node.type === NodeType.View && Array.isArray(node.children)) {
+        node.children = node.children.sort((a, b) => {
+          const pathsEqual =
+            Array.isArray(a.path) && Array.isArray(b.path)
+              ? JSON.stringify(a.path) === JSON.stringify(b.path) // Compare array paths
+              : a.path === b.path;
+
+          // If they're going to the same destination
+          if (pathsEqual) {
+            console.log("A path: ", a.path, "B path: ", b.path);
+
+            const isATemplate = getTemplateSymbolValue(a.value);
+            const isBTemplate = getTemplateSymbolValue(b.value);
+
+            if (isATemplate !== undefined && isBTemplate === undefined) {
+              console.log("Template vs non-template ordering: should prepend");
+              console.log("isATemplate", isATemplate);
+              return isATemplate ? 1 : -1;
+            } else if (isBTemplate !== undefined && isATemplate === undefined) {
+              console.log("Template vs non-template ordering: should append");
+              console.log("isBTemplate", isBTemplate);
+              return isBTemplate ? -1 : 1;
+            }
+            return 0;
+          }
+          return 0;
+        });
       }
 
       return node;
@@ -156,41 +197,6 @@ export default class TemplatePlugin implements ViewPlugin {
                 templateAST.values.forEach((v) => {
                   v.parent = templateAST;
                 });
-
-                if (template.placement) {
-                  const outputKey = template.output;
-                  console.log("outputKey", outputKey);
-
-                  if (outputKey && childOptions.parentObj) {
-                    // Get the parent node
-                    const parentNode = childOptions.parentObj;
-                    console.log("parentNode", parentNode);
-
-                    if (parentNode) {
-                      // Access the property on the parent node using the output property as a key
-                      const nonTemplateData = (parentNode as any)[outputKey];
-                      console.log("nonTemplateData", nonTemplateData);
-
-                      // Make sure nonTemplateData is an array
-                      if (Array.isArray(nonTemplateData)) {
-                        // Apply placement logic
-                        if (template.placement === "prepend") {
-                          // For prepend, put the template values before the existing values
-                          (parentNode as any)[outputKey] = [
-                            ...templateAST.values,
-                            ...nonTemplateData,
-                          ];
-                        } else if (template.placement === "append") {
-                          // For append, put the template values after the existing values
-                          (parentNode as any)[outputKey] = [
-                            ...nonTemplateData,
-                            ...templateAST.values,
-                          ];
-                        }
-                      }
-                    }
-                  }
-                }
               }
 
               return {

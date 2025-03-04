@@ -382,55 +382,43 @@ describe("dynamic templates", () => {
       expect(resolved.values).toHaveLength(4);
       expect(resolved.values).toMatchSnapshot();
     });
+    it("Should show template item last when using placement append", () => {
+      const view = new ViewInstance(templateJoinValues.views[0] as View, {
+        model,
+        parseBinding,
+        evaluator,
+        schema: new SchemaController(),
+      });
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new AssetPlugin().apply(view);
+      new TemplatePlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
+      new MultiNodePlugin().apply(view);
+
+      const resolved = view.update();
+
+      expect(resolved.values).toHaveLength(4);
+      // Verify the order: first the non-template values, then the template values
+      expect(resolved.values[0].asset.id).toBe("value-2");
+      expect(resolved.values[0].asset.value).toBe(
+        "First value in the collection",
+      );
+
+      expect(resolved.values[1].asset.id).toBe("value-3");
+      expect(resolved.values[1].asset.value).toBe(
+        "Second value in the collection",
+      );
+
+      // Template values should come after non-template values
+      expect(resolved.values[2].asset.id).toBe("value-0");
+      expect(resolved.values[2].asset.value).toBe("item 1");
+
+      expect(resolved.values[3].asset.id).toBe("value-1");
+      expect(resolved.values[3].asset.value).toBe("item 2");
+
+      expect(resolved.values).toHaveLength(4);
+      expect(resolved.values).toMatchSnapshot();
+    });
   });
 });
-
-// describe("template placement", () => {
-//   let model: DataModelWithParser;
-//   let expressionEvaluator: ExpressionEvaluator;
-//   let options: Options;
-//   let parser: Parser;
-
-//   beforeEach(() => {
-//     model = withParser(new LocalModel(), parseBinding);
-//     expressionEvaluator = new ExpressionEvaluator({
-//       model,
-//     });
-//     parser = new Parser();
-//     options = {
-//       evaluate: expressionEvaluator.evaluate,
-//       schema: new SchemaController(),
-//       data: {
-//         format: (binding, val) => val,
-//         formatValue: (val) => val,
-//         model,
-//       },
-//     };
-//     new TemplatePlugin(options).applyParser(parser);
-//     new AssetPlugin().applyParser(parser);
-//   });
-
-//   it("works with template position prepend", () => {
-//     const testData = {
-//       id: "test-view",
-//       type: "collection",
-//       template: [
-//         {
-//           data: "items",
-//           output: "values",
-//           placement: "prepend",
-//           value: {
-//             value: "item-{{items._index_}}",
-//           },
-//         },
-//       ],
-//       values: [{ value: "existing-item" }],
-//     };
-
-//     model.set([["items", ["a", "b", "c"]]]);
-
-//     const parsed = parser.parseObject(testData);
-
-//     expect(parsed).toMatchSnapshot();
-//   });
-// });

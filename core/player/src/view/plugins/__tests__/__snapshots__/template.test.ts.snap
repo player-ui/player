@@ -4,6 +4,20 @@ exports[`dynamic templates > Works with template items plus value items > Should
 [
   {
     "asset": {
+      "id": "value-2",
+      "type": "text",
+      "value": "First value in the collection",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-3",
+      "type": "text",
+      "value": "Second value in the collection",
+    },
+  },
+  {
+    "asset": {
       "id": "value-0",
       "type": "text",
       "value": "item 1",
@@ -16,6 +30,11 @@ exports[`dynamic templates > Works with template items plus value items > Should
       "value": "item 2",
     },
   },
+]
+`;
+
+exports[`dynamic templates > Works with template items plus value items > Should show template item last when coming after values on lexical order 1`] = `
+[
   {
     "asset": {
       "id": "value-2",
@@ -30,10 +49,24 @@ exports[`dynamic templates > Works with template items plus value items > Should
       "value": "Second value in the collection",
     },
   },
+  {
+    "asset": {
+      "id": "value-0",
+      "type": "text",
+      "value": "item 1",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-1",
+      "type": "text",
+      "value": "item 2",
+    },
+  },
 ]
 `;
 
-exports[`dynamic templates > Works with template items plus value items > Should show template item last when coming after values on lexical order 1`] = `
+exports[`dynamic templates > Works with template items plus value items > Should show template item last when using placement append 1`] = `
 [
   {
     "asset": {
@@ -110,6 +143,7 @@ exports[`templates > works with nested templates 1`] = `
                             },
                           },
                         ],
+                        Symbol(template): undefined,
                       },
                     },
                   ],
@@ -158,6 +192,7 @@ exports[`templates > works with nested templates 1`] = `
                             },
                           },
                         ],
+                        Symbol(template): undefined,
                       },
                     },
                   ],
@@ -206,6 +241,7 @@ exports[`templates > works with nested templates 1`] = `
                             },
                           },
                         ],
+                        Symbol(template): undefined,
                       },
                     },
                   ],
@@ -223,6 +259,7 @@ exports[`templates > works with nested templates 1`] = `
             "value": undefined,
           },
         ],
+        Symbol(template): undefined,
       },
     },
   ],
@@ -268,6 +305,7 @@ exports[`templates > works with simple ones 1`] = `
             },
           },
         ],
+        Symbol(template): undefined,
       },
     },
   ],

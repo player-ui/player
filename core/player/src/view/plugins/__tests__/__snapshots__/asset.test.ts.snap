@@ -197,6 +197,7 @@ exports[`asset > template 1`] = `
                   },
                 },
               ],
+              Symbol(template): undefined,
             },
           },
         ],

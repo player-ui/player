@@ -1,5 +1,5 @@
 import { SyncWaterfallHook, SyncHook } from "tapable-ts";
-import { setIn, addLast, clone } from "timm";
+import { setIn, addLast, clone, addFirst } from "timm";
 import dlv from "dlv";
 import { dequal } from "dequal";
 import type { BindingInstance, BindingLike } from "../../binding";
@@ -373,6 +373,21 @@ export class Resolver {
         childTreeDeps.forEach((binding) => childDependencies.add(binding));
 
         if (childValue) {
+          if (childNode.type === NodeType.Template) {
+            if (childNode.placement === "append") {
+              const arr = addLast(
+                dlv(resolved, child.path as any[], []),
+                childValue,
+              );
+              resolved = setIn(resolved, child.path, arr);
+            } else if (childNode.placement === "prepend") {
+              const arr = addFirst(
+                dlv(resolved, child.path as any[], []),
+                childValue,
+              );
+              resolved = setIn(resolved, child.path, arr);
+            }
+          }
           if (childNode.type === NodeType.MultiNode && !childNode.override) {
             const arr = addLast(
               dlv(resolved, child.path as any[], []),
