@@ -21,7 +21,6 @@ const templateJoinValues = {
         {
           data: "foo",
           output: "values",
-          placement: "append",
           value: {
             asset: {
               id: "value-_index_",
@@ -187,9 +186,6 @@ describe("templates", () => {
       }),
     ).toMatchSnapshot();
   });
-});
-
-describe("dynamic templates", () => {
   it("static - nodes are not updated", () => {
     const petNames = ["Ginger", "Vokey"];
     const model = withParser(new LocalModel({}), parseBinding);
@@ -263,6 +259,102 @@ describe("dynamic templates", () => {
     });
   });
 
+  describe("Works with template items plus value items", () => {
+    const model = withParser(
+      new LocalModel(templateJoinValues.data),
+      parseBinding,
+    );
+    const evaluator = new ExpressionEvaluator({ model });
+
+    it("Should show template item first when coming before values on lexical order", () => {
+      const view = new ViewInstance(templateJoinValues.views[0] as View, {
+        model,
+        parseBinding,
+        evaluator,
+        schema: new SchemaController(),
+      });
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new AssetPlugin().apply(view);
+      new TemplatePlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
+      new MultiNodePlugin().apply(view);
+
+      const resolved = view.update();
+
+      expect(resolved.values).toHaveLength(4);
+      expect(resolved.values).toMatchSnapshot();
+    });
+    it("Should show template item last when coming after values on lexical order", () => {
+      const view = new ViewInstance(templateJoinValues.views[1] as View, {
+        model,
+        parseBinding,
+        evaluator,
+        schema: new SchemaController(),
+      });
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new AssetPlugin().apply(view);
+      new TemplatePlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
+      new MultiNodePlugin().apply(view);
+
+      const resolved = view.update();
+
+      expect(resolved.values).toHaveLength(4);
+      expect(resolved.values).toMatchSnapshot();
+    });
+    it("Should show template items last when using placement append", () => {
+      const viewWithAppend = {
+        ...templateJoinValues.views[0],
+        template: [
+          {
+            ...templateJoinValues.views[0]?.template[0],
+            placement: "append",
+          },
+        ],
+      };
+
+      const view = new ViewInstance(viewWithAppend as View, {
+        model,
+        parseBinding,
+        evaluator,
+        schema: new SchemaController(),
+      });
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new AssetPlugin().apply(view);
+      new TemplatePlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
+      new MultiNodePlugin().apply(view);
+
+      const resolved = view.update();
+
+      // Verify the order: first the non-template values, then the template values
+      expect(resolved.values[0].asset.id).toBe("value-2");
+      expect(resolved.values[0].asset.value).toBe(
+        "First value in the collection",
+      );
+
+      expect(resolved.values[1].asset.id).toBe("value-3");
+      expect(resolved.values[1].asset.value).toBe(
+        "Second value in the collection",
+      );
+
+      // Template values should come after non-template values
+      expect(resolved.values[2].asset.id).toBe("value-0");
+      expect(resolved.values[2].asset.value).toBe("item 1");
+
+      expect(resolved.values[3].asset.id).toBe("value-1");
+      expect(resolved.values[3].asset.value).toBe("item 2");
+
+      expect(resolved.values).toHaveLength(4);
+      expect(resolved.values).toMatchSnapshot();
+    });
+  });
+});
+
+describe("dynamic templates", () => {
   it("dynamic - nodes are updated", () => {
     const petNames = ["Ginger", "Vokey"];
     const model = withParser(new LocalModel({}), parseBinding);
@@ -334,91 +426,6 @@ describe("dynamic templates", () => {
         type: "collection",
         values: ["Nuri"].map((value) => ({ value })),
       },
-    });
-  });
-
-  describe("Works with template items plus value items", () => {
-    const model = withParser(
-      new LocalModel(templateJoinValues.data),
-      parseBinding,
-    );
-    const evaluator = new ExpressionEvaluator({ model });
-
-    it("Should show template item first when coming before values on lexical order", () => {
-      const view = new ViewInstance(templateJoinValues.views[0] as View, {
-        model,
-        parseBinding,
-        evaluator,
-        schema: new SchemaController(),
-      });
-
-      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
-      new AssetPlugin().apply(view);
-      new TemplatePlugin(pluginOptions).apply(view);
-      new StringResolverPlugin().apply(view);
-      new MultiNodePlugin().apply(view);
-
-      const resolved = view.update();
-
-      expect(resolved.values).toHaveLength(4);
-      expect(resolved.values).toMatchSnapshot();
-    });
-    it("Should show template item last when coming after values on lexical order", () => {
-      const view = new ViewInstance(templateJoinValues.views[1] as View, {
-        model,
-        parseBinding,
-        evaluator,
-        schema: new SchemaController(),
-      });
-
-      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
-      new AssetPlugin().apply(view);
-      new TemplatePlugin(pluginOptions).apply(view);
-      new StringResolverPlugin().apply(view);
-      new MultiNodePlugin().apply(view);
-
-      const resolved = view.update();
-
-      expect(resolved.values).toHaveLength(4);
-      expect(resolved.values).toMatchSnapshot();
-    });
-    it("Should show template item last when using placement append", () => {
-      const view = new ViewInstance(templateJoinValues.views[0] as View, {
-        model,
-        parseBinding,
-        evaluator,
-        schema: new SchemaController(),
-      });
-
-      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
-      new AssetPlugin().apply(view);
-      new TemplatePlugin(pluginOptions).apply(view);
-      new StringResolverPlugin().apply(view);
-      new MultiNodePlugin().apply(view);
-
-      const resolved = view.update();
-
-      expect(resolved.values).toHaveLength(4);
-      // Verify the order: first the non-template values, then the template values
-      expect(resolved.values[0].asset.id).toBe("value-2");
-      expect(resolved.values[0].asset.value).toBe(
-        "First value in the collection",
-      );
-
-      expect(resolved.values[1].asset.id).toBe("value-3");
-      expect(resolved.values[1].asset.value).toBe(
-        "Second value in the collection",
-      );
-
-      // Template values should come after non-template values
-      expect(resolved.values[2].asset.id).toBe("value-0");
-      expect(resolved.values[2].asset.value).toBe("item 1");
-
-      expect(resolved.values[3].asset.id).toBe("value-1");
-      expect(resolved.values[3].asset.value).toBe("item 2");
-
-      expect(resolved.values).toHaveLength(4);
-      expect(resolved.values).toMatchSnapshot();
     });
   });
 });

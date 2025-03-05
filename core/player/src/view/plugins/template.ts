@@ -132,32 +132,25 @@ export default class TemplatePlugin implements ViewPlugin {
       return node;
     });
 
-    function getTemplateSymbolValue(obj: any): boolean | undefined {
-      return obj[templateSymbol];
+    function getTemplateSymbolValue(node: any) {
+      return node[templateSymbol];
     }
     parser.hooks.onCreateASTNode.tap("template", (node) => {
       if (node && node.type === NodeType.View && Array.isArray(node.children)) {
         node.children = node.children.sort((a, b) => {
-          const pathsEqual =
-            Array.isArray(a.path) && Array.isArray(b.path)
-              ? JSON.stringify(a.path) === JSON.stringify(b.path) // Compare array paths
-              : a.path === b.path;
+          // compare template output with static values
+          const pathsEqual = a.path.join() === b.path.join();
 
-          // If they're going to the same destination
+          console.log("a path:", a.path.join(), "b path: ", b.path.join());
+          console.log("is Equal", pathsEqual);
           if (pathsEqual) {
-            console.log("A path: ", a.path, "B path: ", b.path);
+            const aPlacement = getTemplateSymbolValue(a.value);
+            const bPlacement = getTemplateSymbolValue(b.value);
 
-            const isATemplate = getTemplateSymbolValue(a.value);
-            const isBTemplate = getTemplateSymbolValue(b.value);
-
-            if (isATemplate !== undefined && isBTemplate === undefined) {
-              console.log("Template vs non-template ordering: should prepend");
-              console.log("isATemplate", isATemplate);
-              return isATemplate ? 1 : -1;
-            } else if (isBTemplate !== undefined && isATemplate === undefined) {
-              console.log("Template vs non-template ordering: should append");
-              console.log("isBTemplate", isBTemplate);
-              return isBTemplate ? -1 : 1;
+            if (aPlacement !== undefined && bPlacement === undefined) {
+              return aPlacement === "prepend" ? -1 : 1;
+            } else if (bPlacement !== undefined && aPlacement === undefined) {
+              return bPlacement === "prepend" ? 1 : -1;
             }
             return 0;
           }

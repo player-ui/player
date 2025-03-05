@@ -1,6 +1,39 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`dynamic templates > Works with template items plus value items > Should show template item first when coming before values on lexical order 1`] = `
+exports[`templates > Works with template items plus value items > Should show template item first when coming before values on lexical order 1`] = `
+[
+  {
+    "asset": {
+      "id": "value-0",
+      "type": "text",
+      "value": "item 1",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-1",
+      "type": "text",
+      "value": "item 2",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-2",
+      "type": "text",
+      "value": "First value in the collection",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-3",
+      "type": "text",
+      "value": "Second value in the collection",
+    },
+  },
+]
+`;
+
+exports[`templates > Works with template items plus value items > Should show template item last when coming after values on lexical order 1`] = `
 [
   {
     "asset": {
@@ -33,40 +66,7 @@ exports[`dynamic templates > Works with template items plus value items > Should
 ]
 `;
 
-exports[`dynamic templates > Works with template items plus value items > Should show template item last when coming after values on lexical order 1`] = `
-[
-  {
-    "asset": {
-      "id": "value-2",
-      "type": "text",
-      "value": "First value in the collection",
-    },
-  },
-  {
-    "asset": {
-      "id": "value-3",
-      "type": "text",
-      "value": "Second value in the collection",
-    },
-  },
-  {
-    "asset": {
-      "id": "value-0",
-      "type": "text",
-      "value": "item 1",
-    },
-  },
-  {
-    "asset": {
-      "id": "value-1",
-      "type": "text",
-      "value": "item 2",
-    },
-  },
-]
-`;
-
-exports[`dynamic templates > Works with template items plus value items > Should show template item last when using placement append 1`] = `
+exports[`templates > Works with template items plus value items > Should show template items last when using placement append 1`] = `
 [
   {
     "asset": {
