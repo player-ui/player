@@ -256,7 +256,7 @@ export const ManagedPlayer = (
       },
     });
     return unsub;
-  }, []);
+  }, [managedState]);
 
   React.useEffect(() => {
     if (state?.value === "ended") {
