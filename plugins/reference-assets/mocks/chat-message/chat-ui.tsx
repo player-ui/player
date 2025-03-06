@@ -29,12 +29,11 @@ const view1 = (
 
 const flow: DSLFlow = {
   id: "chat-ui",
-
+  data: {
+    content: "",
+  },
   views: [view1],
   navigation: {
-    data: {
-      content: "",
-    },
     BEGIN: "FLOW_1",
     FLOW_1: {
       startState: "VIEW_1",
