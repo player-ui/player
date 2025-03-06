@@ -122,6 +122,9 @@ public struct FlowData {
 {
   "id": "counter-flow",
   "views": [],
+  "data": {
+    "count": 0
+  },
   "navigation": {
     "BEGIN": "FLOW_1",
     "FLOW_1": {
