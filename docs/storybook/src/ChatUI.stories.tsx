@@ -23,7 +23,7 @@ const asyncNodePlugin = new AsyncNodePlugin({
 let deferredResolve: ((value: any) => void) | undefined;
 
 asyncNodePlugin.hooks.onAsyncNode.tap(
-  "async-chat",
+  "chat",
   async (node: Node.Async, update: (content: any) => void) => {
     const result = new Promise((resolve) => {
       deferredResolve = resolve;
@@ -57,10 +57,6 @@ const expPlugin = new ExpressionPlugin(
     [
       "send",
       (ctx, arg1) => {
-        console.log("ctx from exp:", ctx);
-        console.log("arg1 from exp:", arg1);
-
-        console.log("expression handler called");
         deferredResolve && deferredResolve(createAsset(arg1));
       },
     ],
@@ -75,74 +71,7 @@ export const ChatUI: StoryObj = {
       <SuspenseSpinner>
         <ManagedPlayer
           plugins={[new ReferenceAssetsPlugin(), asyncNodePlugin, expPlugin]}
-          manager={createFlowManager([
-            // {
-            //   id: "chat-ui",
-            //   views: [
-            //     {
-            //       id: "root",
-            //       type: "collection",
-            //       values: [
-            //         {
-            //           asset: {
-            //             id: "1",
-            //             type: "chat-message",
-            //             value: {
-            //               asset: {
-            //                 id: "values-0-value",
-            //                 type: "text",
-            //                 value: "Start chatting now!",
-            //               },
-            //             },
-            //           },
-            //         },
-            //         {
-            //           asset: {
-            //             id: "input",
-            //             type: "input",
-            //             binding: "content",
-            //           },
-            //         },
-            //         {
-            //           asset: {
-            //             id: "values-2",
-            //             type: "action",
-            //             exp: "send({{content}})",
-            //             label: {
-            //               asset: {
-            //                 id: "values-2-label",
-            //                 type: "text",
-            //                 value: " Send ",
-            //               },
-            //             },
-            //           },
-            //         },
-            //       ],
-            //     },
-            //   ],
-            //   navigation: {
-            //     BEGIN: "FLOW_1",
-            //     data: {
-            //       content: "",
-            //     },
-            //     FLOW_1: {
-            //       startState: "VIEW_1",
-            //       VIEW_1: {
-            //         state_type: "VIEW",
-            //         ref: "root",
-            //         transitions: {
-            //           "*": "END_Done",
-            //         },
-            //       },
-            //       END_Done: {
-            //         state_type: "END",
-            //         outcome: "DONE",
-            //       },
-            //     },
-            //   },
-            // },
-            chatFlow,
-          ])}
+          manager={createFlowManager([chatFlow])}
         />
       </SuspenseSpinner>
     );

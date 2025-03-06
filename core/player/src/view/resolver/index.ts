@@ -423,9 +423,7 @@ export class Resolver {
             mTree.value.asset &&
             Array.isArray(mTree.value.asset.values)
           ) {
-            mTree.value.asset.values.forEach((v: any) => {
-              unpackAndPush(v, childValue);
-            });
+            unpackAndPush(mTree.value, childValue);
           } else {
             childValue.push(mTree.value);
           }
