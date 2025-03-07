@@ -122,6 +122,15 @@ Similar to the bracket notation: `[]`. Paths can use brackets instead of dots fo
 colors[`getFavoriteColor()`].hex
 ```
 
+Expressions can also be nested inside other expression calls. This allows using the result of an expression call as an argument for another function. 
+For example if we wanted to use the result of the `getFavoriteColor()` expression but we wanted to call another expression, `capitalize()` to capitalize the result:
+
+```
+capitalize(getFavoriteColor())
+```
+
+This also works with expression templates.
+
 ## Expressions
 
 Expressions are callable functions that allow for dynamic behavior of Player and it's views.
