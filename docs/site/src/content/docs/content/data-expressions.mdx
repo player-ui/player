@@ -181,6 +181,8 @@ There are a few expressions built into Player. These are pretty basic, so if you
 | `setDataVal`    | Sets a value from the model. This is equivalent to using `{{foo.bar}} = 'value'`      | `binding`, `value`                         |
 | `deleteDataVal` | Clears a value from the model.                                                        | `binding`                                  |
 | `conditional`   | Execute expressions, or return data based on an expression condition                  | `condition`, `valueIfTrue`, `valueIfFalse` |
+| `log`           | Calls the `info` log method on Player's logger with the provided args                 | `...args`                                  |
+| `debug`         | Calls the `debug` log method on Player's logger with the provided args                | `...args`                                  |
 
 #### Examples
 
@@ -213,5 +215,21 @@ There are a few expressions built into Player. These are pretty basic, so if you
 ```json
 {
   "value": "It is @[ conditional({{foo.bar}} == 'DAY', 'daytime', 'nighttime') ]@."
+}
+```
+
+##### `log`
+
+```json
+{
+  "exp": "log('entered state 1 with binding being')"
+}
+```
+
+##### `debug`
+
+```json
+{
+  "exp": "debug('some.binding value is ', {{some.binding}})"
 }
 ```
