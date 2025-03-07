@@ -39,6 +39,12 @@ class FlowStateTests: XCTestCase {
     func testActionFlowState() {
         let player = HeadlessPlayerImpl(plugins: [])
         let hitActionNode = expectation(description: "ACTION state hit")
+
+        player.hooks?.onStart.tap { flow in
+            XCTAssertEqual(flow.id, "counter-flow")
+            XCTAssertEqual(flow.data as? [String: Int], ["count": 0])
+        }
+
         player.hooks?.flowController.tap({ flowController in
             flowController.hooks.flow.tap { flow in
                 flow.hooks.transition.tap { oldState, _ in
