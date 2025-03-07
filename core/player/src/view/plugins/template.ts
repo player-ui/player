@@ -170,6 +170,15 @@ export default class TemplatePlugin implements ViewPlugin {
           }
           return 0;
         });
+        // Clean up templateSymbol after sorting
+        node.children.forEach((child) => {
+          if (
+            child.value.type === NodeType.MultiNode &&
+            (child.value as any)[templateSymbol]
+          ) {
+            delete (child.value as any)[templateSymbol];
+          }
+        });
       }
 
       return node;

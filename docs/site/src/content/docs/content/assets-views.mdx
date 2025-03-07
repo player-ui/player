@@ -261,7 +261,9 @@ Within a template, the `_index_` string can be used to substitute the array-inde
 
 ### Template ordering
 
-When writing template content, the position of the template in relation to non-template content is not guaranteed when it gets transformed into its final JSON output. Because of this, templates support a `placement` property that specifies whether the template should expand before or after pre-existing content.
+When writing template content, JSX included in DSL preserves the order of templates in respect to non-template data, however the JSON specification itself doesn't guarantee preserving the key ordering.
+
+Because of this, templates support a `placement` property that specifies whether the template should expand before or after pre-existing content.
 
 `placement?: "prepend" | "append"`
 
@@ -272,6 +274,8 @@ The expansion logic will respect the following order:
 - prepend
 - existing data
 - append
+
+In the case that `placement` isn't included, there is fallback logic that will use the lexical order that the keys are in.
 
 **_Example_**
 
