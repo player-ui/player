@@ -42,6 +42,7 @@ export default defineConfig({
     }),
     starlight({
       title: "Player",
+      favicon: "/favicon.ico",
       logo: {
         dark: "./src/assets/logo/logo-dark-large.png",
         light: "./src/assets/logo/logo-light-large.png",
