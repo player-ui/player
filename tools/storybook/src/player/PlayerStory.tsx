@@ -283,14 +283,23 @@ export const DSLLocalPlayerStory = (
     dslContent: string;
   },
 ) => {
+  const { dslContent, ...other } = props;
+  const { plugins } = React.useContext(ReactPlayerPluginContext);
+
   const dslContext = React.useContext(DSLPluginContext);
   useContentKind("dsl");
 
-  useCompiledEditorValue(props.dslContent, {
+  useCompiledEditorValue(dslContent, {
     additionalModules: dslContext?.additionalModules,
   });
 
-  return <PlayerJsonEditorStory />;
+  return (
+    <ReactPlayerPluginContext.Provider
+      value={{ plugins: [...plugins, ...(other?.options?.plugins ?? [])] }}
+    >
+      <PlayerJsonEditorStory />{" "}
+    </ReactPlayerPluginContext.Provider>
+  );
 };
 
 export const toLazyStory = (
