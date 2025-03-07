@@ -130,17 +130,15 @@ public constructor(
 
         // we only have access to the logger after we have the player instance
         logger.info("Player created using $runtime")
-        if (runtime.config.debuggable) {
-            runtime.checkBlockingThread = {
-                if (name == "main") {
-                    scope.launch {
-                        logger.warn(
-                            "Main thread is blocking on JS runtime access: $this",
-                            stackTrace.joinToString("\n") {
-                                "\tat $it"
-                            }.replaceFirst("\tat ", "\n"),
-                        )
-                    }
+        runtime.checkBlockingThread = {
+            if (name == "main") {
+                scope.launch {
+                    logger.warn(
+                        "Main thread is blocking on JS runtime access: $this",
+                        stackTrace.joinToString("\n") {
+                            "\tat $it"
+                        }.replaceFirst("\tat ", "\n"),
+                    )
                 }
             }
         }
