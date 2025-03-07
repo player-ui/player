@@ -172,10 +172,7 @@ export default class TemplatePlugin implements ViewPlugin {
         });
         // Clean up templateSymbol after sorting
         node.children.forEach((child) => {
-          if (
-            child.value.type === NodeType.MultiNode &&
-            (child.value as any)[templateSymbol]
-          ) {
+          if (child.value.type === NodeType.MultiNode) {
             delete (child.value as any)[templateSymbol];
           }
         });
