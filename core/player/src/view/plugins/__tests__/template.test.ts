@@ -686,17 +686,20 @@ describe("templates", () => {
       const resolved = view.update();
       expect(resolved.asset.values).toHaveLength(6);
       expect(resolved.asset.values).toMatchSnapshot();
+      // Prepend first - static template
       expect(resolved.asset.values[0].asset.value).toBe("static Ginger");
       expect(resolved.asset.values[1].asset.value).toBe("static Vokey");
+      // Non-template data
       expect(resolved.asset.values[2].asset.value).toBe(
         "First value in the collection",
       );
       expect(resolved.asset.values[3].asset.value).toBe(
         "Second value in the collection",
       );
+      // Append last - dynamic template
       expect(resolved.asset.values[4].asset.value).toBe("dynamic Ginger");
       expect(resolved.asset.values[5].asset.value).toBe("dynamic Vokey");
-      // Test that dynamic updates maintain the correct order
+
       const barBinding = parseBinding("foo.bar");
       model.set([[barBinding, ["Louis", "Bob", "Nuri"]]]);
 
