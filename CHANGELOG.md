@@ -1,3 +1,15 @@
+# 0.10.5-next.1 (Fri Mar 07 2025)
+
+#### 🐛 Bug Fix
+
+- iOS: expose onStart hook [#612](https://github.com/player-ui/player/pull/612) ([@nancywu1](https://github.com/nancywu1))
+
+#### Authors: 1
+
+- [@nancywu1](https://github.com/nancywu1)
+
+---
+
 # 0.10.5-next.0 (Tue Mar 04 2025)
 
 #### 🐛 Bug Fix
