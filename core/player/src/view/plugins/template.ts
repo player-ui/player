@@ -114,8 +114,6 @@ export default class TemplatePlugin implements ViewPlugin {
       [templateSymbol]: node.placement,
     } as Node.MultiNode;
 
-    console.log("Parsed Template:", result);
-
     return result;
   }
 
@@ -132,17 +130,26 @@ export default class TemplatePlugin implements ViewPlugin {
       return node;
     });
 
-    function getTemplateSymbolValue(node: any) {
-      return node[templateSymbol];
+    // Get placement based on if template is static or dynamic
+    function getTemplateSymbolValue(node: Node.Node): string | undefined {
+      if (node.type === NodeType.MultiNode) {
+        return (node as any)[templateSymbol];
+      } else if (node.type === NodeType.Template) {
+        return node.placement;
+      }
+      return undefined;
     }
+
     parser.hooks.onCreateASTNode.tap("template", (node) => {
-      if (node && node.type === NodeType.View && Array.isArray(node.children)) {
+      if (
+        node &&
+        (node.type === NodeType.View || node.type === NodeType.Asset) &&
+        Array.isArray(node.children)
+      ) {
         node.children = node.children.sort((a, b) => {
           // compare template output with static values
           const pathsEqual = a.path.join() === b.path.join();
 
-          console.log("a path:", a.path.join(), "b path: ", b.path.join());
-          console.log("is Equal", pathsEqual);
           if (pathsEqual) {
             const aPlacement = getTemplateSymbolValue(a.value);
             const bPlacement = getTemplateSymbolValue(b.value);
@@ -151,6 +158,13 @@ export default class TemplatePlugin implements ViewPlugin {
               return aPlacement === "prepend" ? -1 : 1;
             } else if (bPlacement !== undefined && aPlacement === undefined) {
               return bPlacement === "prepend" ? 1 : -1;
+            } else if (aPlacement !== undefined && bPlacement !== undefined) {
+              // Both have placement values
+              if (aPlacement === bPlacement) {
+                return 0; // Same placement, no preference
+              }
+              // "prepend" should come before "append"
+              return aPlacement === "prepend" ? -1 : 1;
             }
             return 0;
           }
@@ -202,8 +216,8 @@ export default class TemplatePlugin implements ViewPlugin {
       },
     );
   }
-
   applyResolverHooks(resolver: Resolver): void {
+    // Transform dynamic templates into MultiNodes
     resolver.hooks.beforeResolve.tap("template", (node, options) => {
       if (node && node.type === NodeType.Template && node.dynamic) {
         return this.parseTemplate(options.parseNode, node, options);

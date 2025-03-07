@@ -1,6 +1,79 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`templates > Works with template items plus value items > Should show template item first when coming before values on lexical order 1`] = `
+exports[`templates > Works with template items plus value items > Should show dynamic template items first when using placement prepend 1`] = `
+[
+  {
+    "asset": {
+      "id": "dynamic-0",
+      "type": "text",
+      "value": "item Ginger",
+    },
+  },
+  {
+    "asset": {
+      "id": "dynamic-1",
+      "type": "text",
+      "value": "item Vokey",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-1",
+      "type": "text",
+      "value": "First value in the collection",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-2",
+      "type": "text",
+      "value": "Second value in the collection",
+    },
+  },
+]
+`;
+
+exports[`templates > Works with template items plus value items > Should show dynamic template items first when using placement prepend 2`] = `
+[
+  {
+    "asset": {
+      "id": "dynamic-0",
+      "type": "text",
+      "value": "item Louis",
+    },
+  },
+  {
+    "asset": {
+      "id": "dynamic-1",
+      "type": "text",
+      "value": "item Bob",
+    },
+  },
+  {
+    "asset": {
+      "id": "dynamic-2",
+      "type": "text",
+      "value": "item Nuri",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-1",
+      "type": "text",
+      "value": "First value in the collection",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-2",
+      "type": "text",
+      "value": "Second value in the collection",
+    },
+  },
+]
+`;
+
+exports[`templates > Works with template items plus value items > Should show static template item first when coming before values on lexical order 1`] = `
 [
   {
     "asset": {
@@ -33,7 +106,7 @@ exports[`templates > Works with template items plus value items > Should show te
 ]
 `;
 
-exports[`templates > Works with template items plus value items > Should show template item last when coming after values on lexical order 1`] = `
+exports[`templates > Works with template items plus value items > Should show static template item last when coming after values on lexical order 1`] = `
 [
   {
     "asset": {
@@ -66,7 +139,40 @@ exports[`templates > Works with template items plus value items > Should show te
 ]
 `;
 
-exports[`templates > Works with template items plus value items > Should show template items last when using placement append 1`] = `
+exports[`templates > Works with template items plus value items > Should show static template items first when using placement prepend 1`] = `
+[
+  {
+    "asset": {
+      "id": "value-0",
+      "type": "text",
+      "value": "item 1",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-1",
+      "type": "text",
+      "value": "item 2",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-2",
+      "type": "text",
+      "value": "First value in the collection",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-3",
+      "type": "text",
+      "value": "Second value in the collection",
+    },
+  },
+]
+`;
+
+exports[`templates > Works with template items plus value items > Should show static template items last when using placement append 1`] = `
 [
   {
     "asset": {
@@ -99,7 +205,154 @@ exports[`templates > Works with template items plus value items > Should show te
 ]
 `;
 
-exports[`templates > works with nested templates 1`] = `
+exports[`templates > Works with template items plus value items > Should support placement for both static and dynamic templates 1`] = `
+[
+  {
+    "asset": {
+      "id": "static-0",
+      "type": "text",
+      "value": "static Ginger",
+    },
+  },
+  {
+    "asset": {
+      "id": "static-1",
+      "type": "text",
+      "value": "static Vokey",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-1",
+      "type": "text",
+      "value": "First value in the collection",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-2",
+      "type": "text",
+      "value": "Second value in the collection",
+    },
+  },
+  {
+    "asset": {
+      "id": "dynamic-0",
+      "type": "text",
+      "value": "dynamic Ginger",
+    },
+  },
+  {
+    "asset": {
+      "id": "dynamic-1",
+      "type": "text",
+      "value": "dynamic Vokey",
+    },
+  },
+]
+`;
+
+exports[`templates > Works with template items plus value items > Should support placement for both static and dynamic templates 2`] = `
+[
+  {
+    "asset": {
+      "id": "static-0",
+      "type": "text",
+      "value": "static Louis",
+    },
+  },
+  {
+    "asset": {
+      "id": "static-1",
+      "type": "text",
+      "value": "static Bob",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-1",
+      "type": "text",
+      "value": "First value in the collection",
+    },
+  },
+  {
+    "asset": {
+      "id": "value-2",
+      "type": "text",
+      "value": "Second value in the collection",
+    },
+  },
+  {
+    "asset": {
+      "id": "dynamic-0",
+      "type": "text",
+      "value": "dynamic Louis",
+    },
+  },
+  {
+    "asset": {
+      "id": "dynamic-1",
+      "type": "text",
+      "value": "dynamic Bob",
+    },
+  },
+  {
+    "asset": {
+      "id": "dynamic-2",
+      "type": "text",
+      "value": "dynamic Nuri",
+    },
+  },
+]
+`;
+
+exports[`templates > works with simple ones 1`] = `
+{
+  "children": [
+    {
+      "path": [
+        "values",
+      ],
+      "value": {
+        "override": false,
+        "parent": [Circular],
+        "type": "multi-node",
+        "values": [
+          {
+            "parent": [Circular],
+            "type": "value",
+            "value": {
+              "value": "{{foo.bar.0}}",
+            },
+          },
+          {
+            "parent": [Circular],
+            "type": "value",
+            "value": {
+              "value": "{{foo.bar.1}}",
+            },
+          },
+          {
+            "parent": [Circular],
+            "type": "value",
+            "value": {
+              "value": "{{foo.bar.2}}",
+            },
+          },
+        ],
+        Symbol(template): undefined,
+      },
+    },
+  ],
+  "type": "value",
+  "value": {
+    "id": "foo",
+    "type": "collection",
+  },
+}
+`;
+
+exports[`templates > works with static nested templates 1`] = `
 {
   "children": [
     {
@@ -257,52 +510,6 @@ exports[`templates > works with nested templates 1`] = `
             "parent": [Circular],
             "type": "value",
             "value": undefined,
-          },
-        ],
-        Symbol(template): undefined,
-      },
-    },
-  ],
-  "type": "value",
-  "value": {
-    "id": "foo",
-    "type": "collection",
-  },
-}
-`;
-
-exports[`templates > works with simple ones 1`] = `
-{
-  "children": [
-    {
-      "path": [
-        "values",
-      ],
-      "value": {
-        "override": false,
-        "parent": [Circular],
-        "type": "multi-node",
-        "values": [
-          {
-            "parent": [Circular],
-            "type": "value",
-            "value": {
-              "value": "{{foo.bar.0}}",
-            },
-          },
-          {
-            "parent": [Circular],
-            "type": "value",
-            "value": {
-              "value": "{{foo.bar.1}}",
-            },
-          },
-          {
-            "parent": [Circular],
-            "type": "value",
-            "value": {
-              "value": "{{foo.bar.2}}",
-            },
           },
         ],
         Symbol(template): undefined,

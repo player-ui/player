@@ -151,7 +151,7 @@ describe("templates", () => {
     ).toMatchSnapshot();
   });
 
-  it("works with nested templates", () => {
+  it("works with static nested templates", () => {
     const petNames = ["Ginger", "Daisy", "Afra"];
     model.set([["foo.pets", petNames]]);
 
@@ -186,76 +186,152 @@ describe("templates", () => {
       }),
     ).toMatchSnapshot();
   });
-  it("static - nodes are not updated", () => {
-    const petNames = ["Ginger", "Vokey"];
-    const model = withParser(new LocalModel({}), parseBinding);
-    const evaluator = new ExpressionEvaluator({ model });
-    const schema = new SchemaController();
 
-    const view = new ViewInstance(
-      {
+  describe("works with data changes as expected", () => {
+    it("static - nodes are not updated", () => {
+      const petNames = ["Ginger", "Vokey"];
+      const model = withParser(new LocalModel({}), parseBinding);
+      const evaluator = new ExpressionEvaluator({ model });
+      const schema = new SchemaController();
+
+      const view = new ViewInstance(
+        {
+          id: "my-view",
+          asset: {
+            id: "foo",
+            type: "collection",
+            template: [
+              {
+                dynamic: false,
+                data: "foo.bar",
+                output: "values",
+                value: {
+                  value: "{{foo.bar._index_}}",
+                },
+              },
+            ],
+          },
+        } as any,
+        {
+          model,
+          parseBinding,
+          evaluator,
+          schema,
+        },
+      );
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new TemplatePlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
+
+      model.set([["foo.bar", petNames]]);
+
+      const resolved = view.update();
+
+      expect(resolved).toStrictEqual({
         id: "my-view",
         asset: {
           id: "foo",
           type: "collection",
-          template: [
-            {
-              dynamic: false,
-              data: "foo.bar",
-              output: "values",
-              value: {
-                value: "{{foo.bar._index_}}",
-              },
-            },
-          ],
+          values: ["Ginger", "Vokey"].map((value) => ({ value })),
         },
-      } as any,
-      {
-        model,
-        parseBinding,
-        evaluator,
-        schema,
-      },
-    );
+      });
 
-    const pluginOptions = toNodeResolveOptions(view.resolverOptions);
-    new TemplatePlugin(pluginOptions).apply(view);
-    new StringResolverPlugin().apply(view);
+      model.set([["foo.bar", ["Ginger", "Vokey", "Harry"]]]);
 
-    model.set([["foo.bar", petNames]]);
+      let updated = view.update();
+      expect(updated).toStrictEqual({
+        id: "my-view",
+        asset: {
+          id: "foo",
+          type: "collection",
+          values: ["Ginger", "Vokey"].map((value) => ({ value })),
+        },
+      });
 
-    const resolved = view.update();
-
-    expect(resolved).toStrictEqual({
-      id: "my-view",
-      asset: {
-        id: "foo",
-        type: "collection",
-        values: ["Ginger", "Vokey"].map((value) => ({ value })),
-      },
+      model.set([["foo.bar", ["Ginger"]]]);
+      updated = view.update();
+      expect(updated).toStrictEqual({
+        id: "my-view",
+        asset: {
+          id: "foo",
+          type: "collection",
+          values: ["Ginger", undefined].map((value) => ({ value })),
+        },
+      });
     });
+    it("dynamic - nodes are updated", () => {
+      const petNames = ["Ginger", "Vokey"];
+      const model = withParser(new LocalModel({}), parseBinding);
+      const evaluator = new ExpressionEvaluator({ model });
+      const schema = new SchemaController();
 
-    model.set([["foo.bar", ["Ginger", "Vokey", "Harry"]]]);
+      const view = new ViewInstance(
+        {
+          id: "my-view",
+          asset: {
+            id: "foo",
+            type: "collection",
+            template: [
+              {
+                dynamic: true,
+                data: "foo.bar",
+                output: "values",
+                value: {
+                  value: "{{foo.bar._index_}}",
+                },
+              },
+            ],
+          },
+        } as any,
+        {
+          model,
+          parseBinding,
+          evaluator,
+          schema,
+        },
+      );
 
-    let updated = view.update();
-    expect(updated).toStrictEqual({
-      id: "my-view",
-      asset: {
-        id: "foo",
-        type: "collection",
-        values: ["Ginger", "Vokey"].map((value) => ({ value })),
-      },
-    });
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new TemplatePlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
 
-    model.set([["foo.bar", ["Ginger"]]]);
-    updated = view.update();
-    expect(updated).toStrictEqual({
-      id: "my-view",
-      asset: {
-        id: "foo",
-        type: "collection",
-        values: ["Ginger", undefined].map((value) => ({ value })),
-      },
+      model.set([["foo.bar", petNames]]);
+
+      const resolved = view.update();
+
+      expect(resolved).toStrictEqual({
+        id: "my-view",
+        asset: {
+          id: "foo",
+          type: "collection",
+          values: ["Ginger", "Vokey"].map((value) => ({ value })),
+        },
+      });
+
+      const barBinding = parseBinding("foo.bar");
+      model.set([[barBinding, ["Vokey", "Louis", "Bob"]]]);
+
+      let updated = view.update();
+      expect(updated).toStrictEqual({
+        id: "my-view",
+        asset: {
+          id: "foo",
+          type: "collection",
+          values: ["Vokey", "Louis", "Bob"].map((value) => ({ value })),
+        },
+      });
+
+      model.set([[barBinding, ["Nuri"]]]);
+      updated = view.update();
+      expect(updated).toStrictEqual({
+        id: "my-view",
+        asset: {
+          id: "foo",
+          type: "collection",
+          values: ["Nuri"].map((value) => ({ value })),
+        },
+      });
     });
   });
 
@@ -266,7 +342,7 @@ describe("templates", () => {
     );
     const evaluator = new ExpressionEvaluator({ model });
 
-    it("Should show template item first when coming before values on lexical order", () => {
+    it("Should show static template item first when coming before values on lexical order", () => {
       const view = new ViewInstance(templateJoinValues.views[0] as View, {
         model,
         parseBinding,
@@ -285,7 +361,7 @@ describe("templates", () => {
       expect(resolved.values).toHaveLength(4);
       expect(resolved.values).toMatchSnapshot();
     });
-    it("Should show template item last when coming after values on lexical order", () => {
+    it("Should show static template item last when coming after values on lexical order", () => {
       const view = new ViewInstance(templateJoinValues.views[1] as View, {
         model,
         parseBinding,
@@ -304,7 +380,7 @@ describe("templates", () => {
       expect(resolved.values).toHaveLength(4);
       expect(resolved.values).toMatchSnapshot();
     });
-    it("Should show template items last when using placement append", () => {
+    it("Should show static template items last when using placement append", () => {
       const viewWithAppend = {
         ...templateJoinValues.views[0],
         template: [
@@ -341,91 +417,295 @@ describe("templates", () => {
         "Second value in the collection",
       );
 
-      // Template values should come after non-template values
-      expect(resolved.values[2].asset.id).toBe("value-0");
-      expect(resolved.values[2].asset.value).toBe("item 1");
+      expect(resolved.values).toHaveLength(4);
+      expect(resolved.values).toMatchSnapshot();
+    });
+    it("Should show static template items first when using placement prepend", () => {
+      const viewWithPrepend = {
+        ...templateJoinValues.views[1],
+        template: [
+          {
+            ...templateJoinValues.views[1]?.template[0],
+            placement: "prepend",
+          },
+        ],
+      };
 
-      expect(resolved.values[3].asset.id).toBe("value-1");
-      expect(resolved.values[3].asset.value).toBe("item 2");
+      const view = new ViewInstance(viewWithPrepend as View, {
+        model,
+        parseBinding,
+        evaluator,
+        schema: new SchemaController(),
+      });
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new AssetPlugin().apply(view);
+      new TemplatePlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
+      new MultiNodePlugin().apply(view);
+
+      const resolved = view.update();
+
+      // Verify the order: first the template values, then the non-template values
+      expect(resolved.values[0].asset.id).toBe("value-0");
+      expect(resolved.values[0].asset.value).toBe("item 1");
+
+      expect(resolved.values[1].asset.id).toBe("value-1");
+      expect(resolved.values[1].asset.value).toBe("item 2");
 
       expect(resolved.values).toHaveLength(4);
       expect(resolved.values).toMatchSnapshot();
     });
-  });
-});
+    it("Should show dynamic template items last when using placement append", () => {
+      const petNames = ["Ginger", "Vokey"];
+      const model = withParser(new LocalModel({}), parseBinding);
+      const evaluator = new ExpressionEvaluator({ model });
+      const schema = new SchemaController();
 
-describe("dynamic templates", () => {
-  it("dynamic - nodes are updated", () => {
-    const petNames = ["Ginger", "Vokey"];
-    const model = withParser(new LocalModel({}), parseBinding);
-    const evaluator = new ExpressionEvaluator({ model });
-    const schema = new SchemaController();
-
-    const view = new ViewInstance(
-      {
-        id: "my-view",
-        asset: {
-          id: "foo",
-          type: "collection",
-          template: [
-            {
-              dynamic: true,
-              data: "foo.bar",
-              output: "values",
-              value: {
-                value: "{{foo.bar._index_}}",
+      const view = new ViewInstance(
+        {
+          id: "my-view",
+          asset: {
+            id: "foo",
+            type: "collection",
+            template: [
+              {
+                dynamic: true,
+                data: "foo.bar",
+                output: "values",
+                placement: "append",
+                value: {
+                  asset: {
+                    id: "dynamic-_index_",
+                    type: "text",
+                    value: "item {{foo.bar._index_}}",
+                  },
+                },
               },
-            },
-          ],
+            ],
+            values: [
+              {
+                asset: {
+                  id: "value-1",
+                  type: "text",
+                  value: "First value in the collection",
+                },
+              },
+              {
+                asset: {
+                  id: "value-2",
+                  type: "text",
+                  value: "Second value in the collection",
+                },
+              },
+            ],
+          },
+        } as any,
+        {
+          model,
+          parseBinding,
+          evaluator,
+          schema,
         },
-      } as any,
-      {
-        model,
-        parseBinding,
-        evaluator,
-        schema,
-      },
-    );
+      );
 
-    const pluginOptions = toNodeResolveOptions(view.resolverOptions);
-    new TemplatePlugin(pluginOptions).apply(view);
-    new StringResolverPlugin().apply(view);
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new TemplatePlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
+      new AssetPlugin().apply(view);
+      new MultiNodePlugin().apply(view);
 
-    model.set([["foo.bar", petNames]]);
+      model.set([["foo.bar", petNames]]);
 
-    const resolved = view.update();
+      const resolved = view.update();
+      expect(resolved.asset.values).toHaveLength(4);
+      expect(resolved.asset.values[2].asset.value).toBe("item Ginger");
+      expect(resolved.asset.values[3].asset.value).toBe("item Vokey");
 
-    expect(resolved).toStrictEqual({
-      id: "my-view",
-      asset: {
-        id: "foo",
-        type: "collection",
-        values: ["Ginger", "Vokey"].map((value) => ({ value })),
-      },
+      const barBinding = parseBinding("foo.bar");
+      model.set([[barBinding, ["Louis", "Bob", "Nuri"]]]);
+
+      const updated = view.update();
+      expect(updated.asset.values).toHaveLength(5);
+      expect(updated.asset.values[2].asset.value).toBe("item Louis");
+      expect(updated.asset.values[3].asset.value).toBe("item Bob");
+      expect(updated.asset.values[4].asset.value).toBe("item Nuri");
     });
+    it("Should show dynamic template items first when using placement prepend", () => {
+      const petNames = ["Ginger", "Vokey"];
+      const model = withParser(new LocalModel({}), parseBinding);
+      const evaluator = new ExpressionEvaluator({ model });
+      const schema = new SchemaController();
 
-    const barBinding = parseBinding("foo.bar");
-    model.set([[barBinding, ["Vokey", "Louis", "Bob"]]]);
+      const view = new ViewInstance(
+        {
+          id: "my-view",
+          asset: {
+            id: "foo",
+            type: "collection",
+            values: [
+              {
+                asset: {
+                  id: "value-1",
+                  type: "text",
+                  value: "First value in the collection",
+                },
+              },
+              {
+                asset: {
+                  id: "value-2",
+                  type: "text",
+                  value: "Second value in the collection",
+                },
+              },
+            ],
+            template: [
+              {
+                dynamic: true,
+                data: "foo.bar",
+                output: "values",
+                placement: "prepend",
+                value: {
+                  asset: {
+                    id: "dynamic-_index_",
+                    type: "text",
+                    value: "item {{foo.bar._index_}}",
+                  },
+                },
+              },
+            ],
+          },
+        } as any,
+        {
+          model,
+          parseBinding,
+          evaluator,
+          schema,
+        },
+      );
 
-    let updated = view.update();
-    expect(updated).toStrictEqual({
-      id: "my-view",
-      asset: {
-        id: "foo",
-        type: "collection",
-        values: ["Vokey", "Louis", "Bob"].map((value) => ({ value })),
-      },
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new TemplatePlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
+      new AssetPlugin().apply(view);
+      new MultiNodePlugin().apply(view);
+
+      model.set([["foo.bar", petNames]]);
+
+      const resolved = view.update();
+      expect(resolved.asset.values).toHaveLength(4);
+      expect(resolved.asset.values).toMatchSnapshot();
+      expect(resolved.asset.values[0].asset.value).toBe("item Ginger");
+      expect(resolved.asset.values[1].asset.value).toBe("item Vokey");
+
+      // Test that dynamic updates maintain the correct order
+      const barBinding = parseBinding("foo.bar");
+      model.set([[barBinding, ["Louis", "Bob", "Nuri"]]]);
+
+      const updated = view.update();
+      expect(updated.asset.values).toMatchSnapshot();
+      expect(updated.asset.values).toHaveLength(5);
+      expect(updated.asset.values[0].asset.value).toBe("item Louis");
+      expect(updated.asset.values[1].asset.value).toBe("item Bob");
+      expect(updated.asset.values[2].asset.value).toBe("item Nuri");
     });
+    it("Should support placement for both static and dynamic templates", () => {
+      const petNames = ["Ginger", "Vokey"];
+      const model = withParser(new LocalModel({}), parseBinding);
+      const evaluator = new ExpressionEvaluator({ model });
+      const schema = new SchemaController();
 
-    model.set([[barBinding, ["Nuri"]]]);
-    updated = view.update();
-    expect(updated).toStrictEqual({
-      id: "my-view",
-      asset: {
-        id: "foo",
-        type: "collection",
-        values: ["Nuri"].map((value) => ({ value })),
-      },
+      const view = new ViewInstance(
+        {
+          id: "my-view",
+          asset: {
+            id: "foo",
+            type: "collection",
+            template: [
+              {
+                dynamic: true,
+                data: "foo.bar",
+                output: "values",
+                placement: "append",
+                value: {
+                  asset: {
+                    id: "dynamic-_index_",
+                    type: "text",
+                    value: "dynamic {{foo.bar._index_}}",
+                  },
+                },
+              },
+              {
+                dynamic: false,
+                data: "foo.bar",
+                output: "values",
+                placement: "prepend",
+                value: {
+                  asset: {
+                    id: "static-_index_",
+                    type: "text",
+                    value: "static {{foo.bar._index_}}",
+                  },
+                },
+              },
+            ],
+            values: [
+              {
+                asset: {
+                  id: "value-1",
+                  type: "text",
+                  value: "First value in the collection",
+                },
+              },
+              {
+                asset: {
+                  id: "value-2",
+                  type: "text",
+                  value: "Second value in the collection",
+                },
+              },
+            ],
+          },
+        } as any,
+        {
+          model,
+          parseBinding,
+          evaluator,
+          schema,
+        },
+      );
+
+      const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+      new TemplatePlugin(pluginOptions).apply(view);
+      new StringResolverPlugin().apply(view);
+      new AssetPlugin().apply(view);
+      new MultiNodePlugin().apply(view);
+
+      model.set([["foo.bar", petNames]]);
+
+      const resolved = view.update();
+      expect(resolved.asset.values).toHaveLength(6);
+      expect(resolved.asset.values).toMatchSnapshot();
+      expect(resolved.asset.values[0].asset.value).toBe("static Ginger");
+      expect(resolved.asset.values[1].asset.value).toBe("static Vokey");
+      expect(resolved.asset.values[2].asset.value).toBe(
+        "First value in the collection",
+      );
+      expect(resolved.asset.values[3].asset.value).toBe(
+        "Second value in the collection",
+      );
+      expect(resolved.asset.values[4].asset.value).toBe("dynamic Ginger");
+      expect(resolved.asset.values[5].asset.value).toBe("dynamic Vokey");
+      // Test that dynamic updates maintain the correct order
+      const barBinding = parseBinding("foo.bar");
+      model.set([[barBinding, ["Louis", "Bob", "Nuri"]]]);
+
+      const updated = view.update();
+      expect(updated.asset.values).toHaveLength(7);
+      expect(updated.asset.values).toMatchSnapshot();
+      expect(updated.asset.values[4].asset.value).toBe("dynamic Louis");
+      expect(updated.asset.values[5].asset.value).toBe("dynamic Bob");
+      expect(updated.asset.values[6].asset.value).toBe("dynamic Nuri");
     });
   });
 });
