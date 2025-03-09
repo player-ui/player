@@ -170,47 +170,6 @@ export default class TemplatePlugin implements ViewPlugin {
           }
           return 0;
         });
-        // After sorting is complete, recursively remove the Symbol
-        function removeSymbol(obj: any, visited = new Set()) {
-          if (!obj || typeof obj !== "object" || visited.has(obj)) {
-            return;
-          }
-
-          visited.add(obj);
-
-          // Use Object.getOwnPropertySymbols to find all symbols on the object
-          const symbols = Object.getOwnPropertySymbols(obj);
-          for (const symbol of symbols) {
-            if (symbol === templateSymbol) {
-              delete obj[symbol];
-            }
-          }
-
-          // Process all properties recursively
-          if (obj.children && Array.isArray(obj.children)) {
-            for (const child of obj.children) {
-              if (child && child.value) {
-                removeSymbol(child.value, visited);
-              }
-            }
-          }
-
-          if (obj.type === NodeType.MultiNode) {
-            for (const value of obj.values) {
-              removeSymbol(value, visited);
-            }
-          }
-
-          // Also process all enumerable properties
-          for (const key of Object.keys(obj)) {
-            if (typeof obj[key] === "object" && obj[key] !== null) {
-              removeSymbol(obj[key], visited);
-            }
-          }
-        }
-
-        // Start the recursive cleanup
-        removeSymbol(node);
       }
 
       return node;
