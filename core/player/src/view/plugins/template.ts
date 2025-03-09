@@ -114,11 +114,6 @@ export default class TemplatePlugin implements ViewPlugin {
       [templateSymbol]: node.placement,
     } as Node.MultiNode;
 
-    // // Only add the Symbol property if placement is defined
-    // if (node.placement !== undefined) {
-    //   (result as any)[templateSymbol] = node.placement;
-    // }
-
     return result;
   }
 
