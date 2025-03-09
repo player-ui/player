@@ -111,8 +111,12 @@ export default class TemplatePlugin implements ViewPlugin {
       type: NodeType.MultiNode,
       override: false,
       values,
-      [templateSymbol]: node.placement,
     } as Node.MultiNode;
+
+    // Only add the Symbol property if placement is defined
+    if (node.placement !== undefined) {
+      (result as any)[templateSymbol] = node.placement;
+    }
 
     return result;
   }
@@ -130,7 +134,7 @@ export default class TemplatePlugin implements ViewPlugin {
       return node;
     });
 
-    // Get placement based on if template is static or dynamic
+    // Define getTemplateSymbolValue outside of the hook to make it available throughout
     function getTemplateSymbolValue(node: Node.Node): string | undefined {
       if (node.type === NodeType.MultiNode) {
         return (node as any)[templateSymbol];
@@ -140,7 +144,7 @@ export default class TemplatePlugin implements ViewPlugin {
       return undefined;
     }
 
-    parser.hooks.onCreateASTNode.tap("template", (node) => {
+    parser.hooks.onCreateASTNode.tap("template-sort", (node) => {
       if (
         node &&
         (node.type === NodeType.View || node.type === NodeType.Asset) &&
@@ -169,12 +173,6 @@ export default class TemplatePlugin implements ViewPlugin {
             return 0;
           }
           return 0;
-        });
-        // Clean up templateSymbol after sorting
-        node.children.forEach((child) => {
-          if (child.value.type === NodeType.MultiNode) {
-            delete (child.value as any)[templateSymbol];
-          }
         });
       }
 
@@ -222,6 +220,7 @@ export default class TemplatePlugin implements ViewPlugin {
       },
     );
   }
+
   applyResolverHooks(resolver: Resolver): void {
     // Transform dynamic templates into MultiNodes
     resolver.hooks.beforeResolve.tap("template", (node, options) => {
@@ -236,5 +235,6 @@ export default class TemplatePlugin implements ViewPlugin {
   apply(view: ViewInstance): void {
     view.hooks.parser.tap("template", this.applyParser.bind(this));
     view.hooks.resolver.tap("template", this.applyResolverHooks.bind(this));
+    view.hooks.onTemplatePluginCreated.call(this);
   }
 }
