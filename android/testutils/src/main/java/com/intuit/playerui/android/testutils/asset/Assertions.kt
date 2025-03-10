@@ -3,6 +3,7 @@ package com.intuit.playerui.android.testutils.asset
 import android.view.View
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.SuspendableAsset
+import com.intuit.playerui.core.player.Player
 import com.intuit.playerui.core.player.state.PlayerFlowState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -36,13 +37,13 @@ public inline fun <reified T : View> Any?.shouldBeView(assertions: T.() -> Unit 
 }
 
 @OptIn(ExperimentalContracts::class)
-public inline fun <reified T : PlayerFlowState> PlayerFlowState?.shouldBePlayerState(assertions: T.() -> Unit = {}): T {
+public inline fun <reified T : PlayerFlowState> Player?.shouldBeAtState(assertions: T.() -> Unit = {}): T {
     runBlocking {
-        waitUntilState<T>(this@shouldBePlayerState)
+        waitUntilState<T>(this@shouldBeAtState?.state)
     }
-    shouldBeInstanceOf<T>(this)
-    assertions()
-    return this
+    shouldBeInstanceOf<T>(this?.state)
+    assertions.invoke(this?.state as T)
+    return this.state as T
 }
 
 suspend inline fun <reified T : PlayerFlowState> waitUntilState(state: PlayerFlowState?) {

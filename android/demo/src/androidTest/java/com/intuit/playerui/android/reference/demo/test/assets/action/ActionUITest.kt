@@ -7,7 +7,7 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.intuit.playerui.android.reference.demo.test.base.ComposeUITest
-import com.intuit.playerui.android.reference.demo.test.base.shouldBePlayerState
+import com.intuit.playerui.android.reference.demo.test.base.shouldBeAtState
 import com.intuit.playerui.android.reference.demo.test.base.waitForViewInRoot
 import com.intuit.playerui.core.player.state.CompletedState
 import com.intuit.playerui.core.player.state.ErrorState
@@ -33,7 +33,7 @@ class ActionUITest : ComposeUITest("action") {
                 .check(matches(isDisplayed()))
         }
 
-        currentState.shouldBePlayerState<InProgressState> {
+        player.shouldBeAtState<InProgressState> {
             assertEquals(10, dataModel.get("count"))
         }
     }
@@ -46,7 +46,7 @@ class ActionUITest : ComposeUITest("action") {
             .check(matches(isDisplayed()))
         androidComposeRule.onAllNodesWithTag("action").get(0)
             .performClick()
-        player.state.shouldBePlayerState<CompletedState> {
+        player.state.shouldBeAtState<CompletedState> {
             assertEquals("done", endState.outcome)
         }
     }
@@ -60,7 +60,7 @@ class ActionUITest : ComposeUITest("action") {
             androidComposeRule.onAllNodesWithTag("action").get(1)
                 .performClick()
             delay(2000)
-            player.state.shouldBePlayerState<ErrorState> {
+            player.state.shouldBeAtState<ErrorState> {
                 assertEquals("Error: Unclosed brace after \"foo.bar..}\" at character 12", error.message)
             }
         }

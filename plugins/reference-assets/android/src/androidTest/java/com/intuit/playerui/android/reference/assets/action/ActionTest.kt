@@ -5,7 +5,7 @@ import com.intuit.playerui.android.reference.assets.collection.Collection
 import com.intuit.playerui.android.reference.assets.text.Text
 import com.intuit.playerui.android.testutils.asset.AssetTest
 import com.intuit.playerui.android.testutils.asset.shouldBeAsset
-import com.intuit.playerui.android.testutils.asset.shouldBePlayerState
+import com.intuit.playerui.android.testutils.asset.shouldBeAtState
 import com.intuit.playerui.core.player.state.CompletedState
 import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.core.player.state.InProgressState
@@ -22,7 +22,7 @@ class ActionTest : AssetTest("action") {
             currentAssetTree.shouldBeAsset<Action> {
                 val actionData = getData()
                 repeat(10) {
-                    currentState.shouldBePlayerState<InProgressState> {
+                    player.shouldBeAtState<InProgressState> {
                         assertEquals(it, dataModel.get("count"))
                     }
                     actionData.run()
@@ -47,7 +47,7 @@ class ActionTest : AssetTest("action") {
             }
         }
 
-        player.state.shouldBePlayerState<CompletedState> {
+        player.shouldBeAtState<CompletedState> {
             assertEquals("done", endState.outcome)
         }
     }
@@ -69,7 +69,7 @@ class ActionTest : AssetTest("action") {
             }
         }
 
-        player.state.shouldBePlayerState<ErrorState> {
+        player.shouldBeAtState<ErrorState> {
             assertEquals("Error: Unclosed brace after \"foo.bar..}\" at character 12", error.message)
         }
     }

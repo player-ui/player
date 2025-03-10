@@ -4,7 +4,7 @@ import androidx.core.view.get
 import com.intuit.playerui.android.reference.assets.text.Text
 import com.intuit.playerui.android.testutils.asset.AssetTest
 import com.intuit.playerui.android.testutils.asset.shouldBeAsset
-import com.intuit.playerui.android.testutils.asset.shouldBePlayerState
+import com.intuit.playerui.android.testutils.asset.shouldBeAtState
 import com.intuit.playerui.core.player.state.InProgressState
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -34,6 +34,6 @@ class CollectionTest : AssetTest("collection") {
                 }
             }
         }
-        currentState.shouldBePlayerState<InProgressState>()
+        player.shouldBeAtState<InProgressState>()
     }
 }

@@ -7,7 +7,7 @@ import com.intuit.playerui.android.reference.assets.R
 import com.intuit.playerui.android.reference.assets.action.Action
 import com.intuit.playerui.android.testutils.asset.AssetTest
 import com.intuit.playerui.android.testutils.asset.shouldBeAsset
-import com.intuit.playerui.android.testutils.asset.shouldBePlayerState
+import com.intuit.playerui.android.testutils.asset.shouldBeAtState
 import com.intuit.playerui.android.testutils.asset.shouldBeView
 import com.intuit.playerui.core.player.state.InProgressState
 import kotlinx.coroutines.test.runTest
@@ -58,6 +58,6 @@ class InfoTest : AssetTest("info") {
         verifyAndProceed(3, PlayerAction.Next)
         verifyAndProceed(1)
 
-        currentState.shouldBePlayerState<InProgressState>()
+        player.shouldBeAtState<InProgressState>()
     }
 }

@@ -4,7 +4,7 @@ import com.intuit.playerui.android.reference.assets.collection.Collection
 import com.intuit.playerui.android.reference.assets.text.Text
 import com.intuit.playerui.android.testutils.asset.AssetTest
 import com.intuit.playerui.android.testutils.asset.shouldBeAsset
-import com.intuit.playerui.android.testutils.asset.shouldBePlayerState
+import com.intuit.playerui.android.testutils.asset.shouldBeAtState
 import com.intuit.playerui.core.player.state.InProgressState
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -26,7 +26,7 @@ public class ChatMessageAssetTest : AssetTest("chat-message") {
                 }
             }
 
-            currentState.shouldBePlayerState<InProgressState>()
+            player.shouldBeAtState<InProgressState>()
         }
     }
 }
