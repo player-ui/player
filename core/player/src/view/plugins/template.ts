@@ -12,6 +12,8 @@ import type { Options } from "./options";
 import type { Resolver } from "../resolver";
 import { hasTemplateKey } from "../parser/utils";
 
+const templateSymbol = Symbol("template");
+
 export interface TemplateItemInfo {
   /** The index of the data for the current iteration of the template */
   index: number;
@@ -37,7 +39,12 @@ export type TemplateSubstitutionsFunc = (
 export default class TemplatePlugin implements ViewPlugin {
   private readonly options: Options;
 
-  hooks = {
+  hooks: {
+    resolveTemplateSubstitutions: SyncWaterfallHook<
+      [TemplateSubstitution[], TemplateItemInfo],
+      Record<string, any>
+    >;
+  } = {
     resolveTemplateSubstitutions: new SyncWaterfallHook<
       [TemplateSubstitution[], TemplateItemInfo]
     >(),
@@ -104,12 +111,17 @@ export default class TemplatePlugin implements ViewPlugin {
       type: NodeType.MultiNode,
       override: false,
       values,
-    };
+    } as Node.MultiNode;
+
+    // Removes undefined Symbol property
+    if (node.placement !== undefined) {
+      (result as any)[templateSymbol] = node.placement;
+    }
 
     return result;
   }
 
-  applyParser(parser: Parser) {
+  applyParser(parser: Parser): void {
     parser.hooks.onCreateASTNode.tap("template", (node) => {
       if (node && node.type === NodeType.Template && !node.dynamic) {
         return this.parseTemplate(
@@ -117,6 +129,52 @@ export default class TemplatePlugin implements ViewPlugin {
           node,
           this.options,
         );
+      }
+
+      return node;
+    });
+
+    // Define getTemplateSymbolValue outside of the hook to make it available throughout
+    function getTemplateSymbolValue(node: Node.Node): string | undefined {
+      if (node.type === NodeType.MultiNode) {
+        return (node as any)[templateSymbol];
+      } else if (node.type === NodeType.Template) {
+        return node.placement;
+      }
+      return undefined;
+    }
+
+    parser.hooks.onCreateASTNode.tap("template-sort", (node) => {
+      if (
+        node &&
+        (node.type === NodeType.View || node.type === NodeType.Asset) &&
+        Array.isArray(node.children)
+      ) {
+        node.children = node.children.sort((a, b) => {
+          // compare template output with static values
+          const pathsEqual = a.path.join() === b.path.join();
+
+          if (pathsEqual) {
+            const aPlacement = getTemplateSymbolValue(a.value);
+            const bPlacement = getTemplateSymbolValue(b.value);
+
+            if (aPlacement !== undefined && bPlacement === undefined) {
+              return aPlacement === "prepend" ? -1 : 1;
+            } else if (bPlacement !== undefined && aPlacement === undefined) {
+              return bPlacement === "prepend" ? 1 : -1;
+            } else if (aPlacement !== undefined && bPlacement !== undefined) {
+              // Both have placement values
+              if (aPlacement === bPlacement) {
+                return 0; // Same placement, no preference
+              }
+              // "prepend" should come before "append"
+              return aPlacement === "prepend" ? -1 : 1;
+            }
+            return 0;
+          }
+          return 0;
+        });
+        // After sorting is complete, recursively remove the Symbol
       }
 
       return node;
@@ -140,6 +198,7 @@ export default class TemplatePlugin implements ViewPlugin {
                   data: template.data,
                   template: template.value,
                   dynamic: template.dynamic ?? false,
+                  placement: template.placement,
                 },
                 template,
               );
@@ -163,7 +222,8 @@ export default class TemplatePlugin implements ViewPlugin {
     );
   }
 
-  applyResolverHooks(resolver: Resolver) {
+  applyResolverHooks(resolver: Resolver): void {
+    // Transform dynamic templates into MultiNodes
     resolver.hooks.beforeResolve.tap("template", (node, options) => {
       if (node && node.type === NodeType.Template && node.dynamic) {
         return this.parseTemplate(options.parseNode, node, options);
@@ -173,8 +233,9 @@ export default class TemplatePlugin implements ViewPlugin {
     });
   }
 
-  apply(view: ViewInstance) {
+  apply(view: ViewInstance): void {
     view.hooks.parser.tap("template", this.applyParser.bind(this));
     view.hooks.resolver.tap("template", this.applyResolverHooks.bind(this));
+    view.hooks.onTemplatePluginCreated.call(this);
   }
 }
