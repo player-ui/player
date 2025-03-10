@@ -227,7 +227,8 @@ In order to render an asset a renderer for that type must be registered in the A
    2. [Define data structure](#accessing-data)
    3. [Nested assets](#nested-assets)
    4. [Styling](#styling)
-2. [Registering assets](#registering-your-asset)
+2. [Assets using Jetpack Compose](#assets-using-jetpack-compose) - Experimental
+3. [Registering assets](#registering-your-asset)
 
 ### Extending DecodableAsset
 
@@ -349,6 +350,56 @@ fun View.hydrate() {
         is TextView -> text = data.value
         else -> invalidateView()
     }
+}
+```
+
+### Assets using Jetpack Compose 
+
+NOTE: This is an experimental feature.
+
+To build your assets using Jetpack Compose, you can extend `ComposableAsset`. `ComposableAsset` is a subclass of `SuspendableAsset` designed for use with Jetpack Compose, Google's modern toolkit for building native UIs for Android. Extending `ComposableAsset` requires passing a `KSerializer<Data>` for the data class that represents the data for that asset. It also requires the implementation of an abstract `content` composable function which defines how the asset should be rendered with the data provided.
+
+```kotlin
+ @Composable
+override fun content(data: Data, modifier: Modifier) {
+    Text(
+        text = data.value,
+        Modifier.testTag("text-composable"),
+    )
+}
+```
+
+#### Nesting assets
+It is recommended to only nest `ComposableAsset` within another `ComposableAsset`. To render an asset within a `ComposableAsset`, you can simply use the `compose` function as follows
+
+```kotlin
+OutlinedTextField(
+    // ... other config
+    label = { data.label.compose() }
+)
+```
+
+Although not recommended, in cases where an Android View asset must be rendered within a Compose asset, you can use the same `compose` call as above and that asset would automatically be rendered within an [AndroidView](https://developer.android.com/develop/ui/compose/migrate/interoperability-apis/views-in-compose). 
+
+#### Styling
+To pass down styling from a parent asset to a child asset, we have provided an interface `AssetStyle`
+
+```kotlin
+interface AssetStyle {
+    val textStyle: TextStyle?
+    val xmlStyles: List<Style>?
+}
+```
+
+This interface optionally accepts compose TextStyle and xmlStyles. In order to reduce defining both these styles separately, we recommend implementing a custom converter that converts one style to another. 
+As an example, our reference assets implement an XmlStyleParser that parses an XML style and returns its equivalent Compose TextStyle. An instance of this style can be passed in the `compose` call to render child assets.
+
+#### Theming
+In order to support theming and allow consumers to set values in a CompositionLocalProvider, AndroidPlayer now exposes a hook called `compositionLocalProvidedValues`. As an example, you can use it to set LocalColorScheme as follows:
+
+```kotlin
+androidPlayer.hooks.compositionLocalProvidedValues.tap("Custom Theme") { _, updateProvidedValues ->
+    updateProvidedValues(listOf(LocalColorScheme provides customColorScheme))
 }
 ```
 

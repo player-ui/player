@@ -51,7 +51,7 @@ public fun AssetContext.withContext(context: Context): AssetContext = copy(conte
 public fun AssetContext.withStyles(@StyleRes vararg styles: Style?): AssetContext = withStyles(styles.filterNotNull())
 
 /** Create a new, styled [AssetContext] */
-public fun AssetContext.withStyles(@StyleRes styles: Styles): AssetContext = if (styles.isEmpty()) {
+public fun AssetContext.withStyles(@StyleRes styles: Styles?): AssetContext = if (styles.isNullOrEmpty()) {
     this
 } else {
     copy(
