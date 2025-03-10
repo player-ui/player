@@ -4,13 +4,13 @@ import android.view.View
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.core.player.Player
 import com.intuit.playerui.core.player.state.PlayerFlowState
-import org.junit.Assert.assertTrue
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
+import org.junit.Assert.assertTrue
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 @OptIn(ExperimentalContracts::class)
 inline fun <reified T : RenderableAsset> Any?.shouldBeAsset(
