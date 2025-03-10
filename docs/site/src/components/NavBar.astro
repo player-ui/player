@@ -3,37 +3,6 @@ import Default from "@astrojs/starlight/components/SocialIcons.astro";
 import type { Props } from "@astrojs/starlight/props";
 import VersionSelector from "./tools/VersionSelector";
 
-type SidebarEntry = (typeof Astro.props.sidebar)[number];
-
-function getFirstEntry(entry: SidebarEntry) {
-  if (entry.type === "group") {
-    if (entry.entries.length === 0) {
-      return;
-    }
-
-    return getFirstEntry(entry.entries[0]);
-  }
-
-  return entry;
-}
-
-function isCurrent(entry: SidebarEntry) {
-  if (entry.type === "link" && entry.isCurrent) {
-    return true;
-  }
-
-  if (entry.type === "group") {
-    return entry.entries.some((s): boolean => isCurrent(s));
-  }
-
-  return false;
-}
-
-const topEntries = Astro.props.sidebar.map((s) => ({
-  label: s.label,
-  href: getFirstEntry(s)?.href,
-  isCurrent: isCurrent(s),
-}));
 ---
 
 <style>
@@ -61,22 +30,5 @@ const topEntries = Astro.props.sidebar.map((s) => ({
 </style>
 
 <VersionSelector route={Astro.params.slug} client:only="react"/>
-
-<div class="flex flex-row flex-1 justify-end gap-2 ml-4">
-  {
-    topEntries.map((entry) => {
-      return (
-        <a
-          class:list={["nav-item", entry.isCurrent && "current"].filter(
-            Boolean
-          )}
-          href={entry.href}
-        >
-          {entry.label}
-        </a>
-      );
-    })
-  }
-</div>
 
 <Default {...Astro.props} />

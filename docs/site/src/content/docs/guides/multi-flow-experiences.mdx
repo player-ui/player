@@ -48,10 +48,15 @@ The `ManagedPlayer` component from the `@player-ui/react` module orchestrates ru
 Simply render the `ManagedPlayer` with a flow-manager:
 
 ```tsx
+import React from 'react'
 import { ManagedPlayer } from "@player-ui/react";
 
 export const App = () => {
-  return <ManagedPlayer manager={myFlowManager} />;
+  return (
+    <React.Suspense fallback={<div>Loading</div>}>
+      <ManagedPlayer manager={myFlowManager} />;
+    </React.Suspense>
+  )
 };
 ```
 
