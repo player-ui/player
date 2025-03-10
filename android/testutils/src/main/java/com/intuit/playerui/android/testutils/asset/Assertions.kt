@@ -4,7 +4,10 @@ import android.view.View
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.core.player.state.PlayerFlowState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertTrue
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -34,9 +37,21 @@ public inline fun <reified T : View> Any?.shouldBeView(assertions: T.() -> Unit 
 
 @OptIn(ExperimentalContracts::class)
 public inline fun <reified T : PlayerFlowState> PlayerFlowState?.shouldBePlayerState(assertions: T.() -> Unit = {}): T {
+    runBlocking {
+        waitUntilState<T>(this@shouldBePlayerState)
+    }
     shouldBeInstanceOf<T>(this)
     assertions()
     return this
+}
+
+suspend inline fun <reified T : PlayerFlowState> waitUntilState(state: PlayerFlowState?) {
+    withTimeout(10000) {
+        suspendCancellableCoroutine { continuation ->
+            if (state !is T) runBlocking { delay(5) }
+            continuation.resume(Unit) {}
+        }
+    }
 }
 
 @ExperimentalContracts

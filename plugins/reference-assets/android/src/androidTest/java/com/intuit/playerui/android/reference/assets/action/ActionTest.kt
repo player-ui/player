@@ -10,9 +10,6 @@ import com.intuit.playerui.core.player.state.CompletedState
 import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.player.state.dataModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -47,11 +44,6 @@ class ActionTest : AssetTest("action") {
                     }
                     data.run()
                 }
-            }
-
-            suspendCancellableCoroutine { cont ->
-                while (player.state is InProgressState) runBlocking { delay(5) }
-                if (player.state is CompletedState) cont.resume(Unit) {}
             }
         }
 
