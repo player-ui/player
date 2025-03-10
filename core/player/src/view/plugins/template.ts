@@ -111,8 +111,12 @@ export default class TemplatePlugin implements ViewPlugin {
       type: NodeType.MultiNode,
       override: false,
       values,
-      [templateSymbol]: node.placement,
     } as Node.MultiNode;
+
+    // Only add the Symbol property if placement is defined
+    if (node.placement !== undefined) {
+      (result as any)[templateSymbol] = node.placement;
+    }
 
     return result;
   }
@@ -170,6 +174,7 @@ export default class TemplatePlugin implements ViewPlugin {
           }
           return 0;
         });
+        // After sorting is complete, recursively remove the Symbol
       }
 
       return node;
