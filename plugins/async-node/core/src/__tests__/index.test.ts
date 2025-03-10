@@ -861,8 +861,14 @@ describe("view", () => {
       deferredResolve({
         asset: {
           id: "5",
-          type: "text",
-          value: "chained async content",
+          type: "chat-message",
+          value: {
+            asset: {
+              id: "6",
+              type: "text",
+              value: "chained async content",
+            },
+          },
         },
       });
     }
