@@ -1,3 +1,43 @@
+# 0.10.5-next.2 (Mon Mar 10 2025)
+
+#### 🐛 Bug Fix
+
+- enable blocking logs by default [#613](https://github.com/player-ui/player/pull/613) ([@brocollie08](https://github.com/brocollie08))
+- Expose FlowInstance afterTransition hook for jvm [#610](https://github.com/player-ui/player/pull/610) ([@mrigankmg](https://github.com/mrigankmg))
+
+#### Authors: 2
+
+- [@brocollie08](https://github.com/brocollie08)
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+
+---
+
+# 0.10.5-next.1 (Fri Mar 07 2025)
+
+#### 🐛 Bug Fix
+
+- iOS: expose onStart hook [#612](https://github.com/player-ui/player/pull/612) ([@nancywu1](https://github.com/nancywu1))
+
+#### Authors: 1
+
+- [@nancywu1](https://github.com/nancywu1)
+
+---
+
+# 0.10.5-next.0 (Tue Mar 04 2025)
+
+#### 🐛 Bug Fix
+
+- iOS: expose metrics plugin hooks [#607](https://github.com/player-ui/player/pull/607) ([@nancywu1](https://github.com/nancywu1))
+- Update CODEOWNERS File [#608](https://github.com/player-ui/player/pull/608) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- [@nancywu1](https://github.com/nancywu1)
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.10.4 (Mon Mar 03 2025)
 
 ### Release Notes
