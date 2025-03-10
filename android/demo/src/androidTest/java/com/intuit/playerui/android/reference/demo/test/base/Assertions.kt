@@ -2,12 +2,15 @@ package com.intuit.playerui.android.reference.demo.test.base
 
 import android.view.View
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.testutils.asset.shouldBeAtState
 import com.intuit.playerui.core.player.Player
 import com.intuit.playerui.core.player.state.PlayerFlowState
 import org.junit.Assert.assertTrue
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeout
 
 @OptIn(ExperimentalContracts::class)
 inline fun <reified T : RenderableAsset> Any?.shouldBeAsset(
@@ -30,7 +33,7 @@ inline fun <reified T : PlayerFlowState> Player?.shouldBeAtState(assertions: T.(
     runBlocking {
         waitUntilState<T>(this@shouldBeAtState?.state)
     }
-    com.intuit.playerui.android.testutils.asset.shouldBeInstanceOf<T>(this?.state)
+    shouldBeInstanceOf<T>(this?.state)
     assertions.invoke(this?.state as T)
     return this.state as T
 }

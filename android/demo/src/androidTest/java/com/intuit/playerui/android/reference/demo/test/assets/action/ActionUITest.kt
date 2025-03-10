@@ -46,7 +46,7 @@ class ActionUITest : ComposeUITest("action") {
             .check(matches(isDisplayed()))
         androidComposeRule.onAllNodesWithTag("action").get(0)
             .performClick()
-        player.state.shouldBeAtState<CompletedState> {
+        player.shouldBeAtState<CompletedState> {
             assertEquals("done", endState.outcome)
         }
     }
@@ -60,7 +60,7 @@ class ActionUITest : ComposeUITest("action") {
             androidComposeRule.onAllNodesWithTag("action").get(1)
                 .performClick()
             delay(2000)
-            player.state.shouldBeAtState<ErrorState> {
+            player.shouldBeAtState<ErrorState> {
                 assertEquals("Error: Unclosed brace after \"foo.bar..}\" at character 12", error.message)
             }
         }
