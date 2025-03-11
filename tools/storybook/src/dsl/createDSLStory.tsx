@@ -14,7 +14,7 @@ export function createDSLStory(
 ) {
   /** The story to render */
   const Comp = () => {
-    return <DSLPlayerStory dslContent={loader} />;
+    return <DSLPlayerStory dslContent={loader} options={options} />;
   };
 
   if (options?.args) {
