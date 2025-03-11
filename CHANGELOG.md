@@ -1,3 +1,17 @@
+# 0.10.5-next.2 (Mon Mar 10 2025)
+
+#### 🐛 Bug Fix
+
+- enable blocking logs by default [#613](https://github.com/player-ui/player/pull/613) ([@brocollie08](https://github.com/brocollie08))
+- Expose FlowInstance afterTransition hook for jvm [#610](https://github.com/player-ui/player/pull/610) ([@mrigankmg](https://github.com/mrigankmg))
+
+#### Authors: 2
+
+- [@brocollie08](https://github.com/brocollie08)
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+
+---
+
 # 0.10.5-next.1 (Fri Mar 07 2025)
 
 #### 🐛 Bug Fix
