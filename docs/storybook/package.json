@@ -12,6 +12,9 @@
     "@player-ui/reference-assets-plugin-components": "workspace:*",
     "@player-ui/mocks": "workspace:*",
     "@player-ui/react": "workspace:*",
-    "@player-ui/storybook": "workspace:*"
+    "@player-ui/storybook": "workspace:*",
+    "@player-ui/expression-plugin": "workspace:*",
+    "@player-ui/async-node-plugin": "workspace:*",
+    "@player-ui/player": "workspace:*"
   }
 }
