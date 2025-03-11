@@ -2,6 +2,7 @@ package com.intuit.playerui.android
 
 import android.content.Context
 import android.view.View
+import androidx.compose.runtime.ProvidedValue
 import com.intuit.hooks.BailResult
 import com.intuit.hooks.HookContext
 import com.intuit.hooks.SyncBailHook
@@ -122,8 +123,13 @@ public class AndroidPlayer private constructor(
             )
         }
 
+        public class CompositionLocalProvidedValuesHook : SyncHook<(HookContext, (List<ProvidedValue<*>>) -> Unit) -> Unit>() {
+            public fun call(hookContext: HookContext, updateProvidedValues: (List<ProvidedValue<*>>) -> Unit) = super.call { f, context -> f(context, updateProvidedValues) }
+        }
+
         public val context: ContextHook = ContextHook()
         public val update: UpdateHook = UpdateHook()
+        public val compositionLocalProvidedValues: CompositionLocalProvidedValuesHook = CompositionLocalProvidedValuesHook()
         internal val recycle: RecycleHook = RecycleHook()
         internal val release: ReleaseHook = ReleaseHook()
     }
@@ -205,6 +211,9 @@ public class AndroidPlayer private constructor(
     public fun getCachedStyledContext(context: Context, styles: Styles): Context = cachedContexts.getOrPut(context to styles) {
         context.overlayStyles(styles)
     }
+
+    /** List of provided values to pass into the CompositionLocalProvider that wraps all compose assets */
+    internal var providedValues: MutableList<ProvidedValue<*>> = mutableListOf()
 
     /**
      * Cache [AssetContext]-[View] pairs against the [AssetContext.id]. The [AssetContext] is

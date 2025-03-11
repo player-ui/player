@@ -186,7 +186,7 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
         .render()
 
     /** Render a [View] with specific [styles] */
-    public fun RenderableAsset.render(@StyleRes styles: Styles): View = assetContext
+    public fun RenderableAsset.render(@StyleRes styles: Styles?): View = assetContext
         .withContext(this@RenderableAsset.requireContext())
         .withStyles(styles)
         .build()
@@ -208,7 +208,7 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
         .render()
 
     /** Render a [View] with specific [styles] */
-    public fun RenderableAsset.render(@StyleRes styles: Styles, tag: String): View = assetContext
+    public fun RenderableAsset.render(@StyleRes styles: Styles?, tag: String): View = assetContext
         .withContext(this@RenderableAsset.requireContext())
         .withTag(tag)
         .withStyles(styles)
