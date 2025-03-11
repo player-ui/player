@@ -134,17 +134,16 @@ export default class TemplatePlugin implements ViewPlugin {
       return node;
     });
 
-    // Define getTemplateSymbolValue outside of the hook to make it available throughout
-    function getTemplateSymbolValue(node: Node.Node): string | undefined {
-      if (node.type === NodeType.MultiNode) {
-        return (node as any)[templateSymbol];
-      } else if (node.type === NodeType.Template) {
-        return node.placement;
-      }
-      return undefined;
-    }
-
     parser.hooks.onCreateASTNode.tap("template-sort", (node) => {
+      function getTemplateSymbolValue(node: Node.Node): string | undefined {
+        if (node.type === NodeType.MultiNode) {
+          return (node as any)[templateSymbol];
+        } else if (node.type === NodeType.Template) {
+          return node.placement;
+        }
+        return undefined;
+      }
+
       if (
         node &&
         (node.type === NodeType.View || node.type === NodeType.Asset) &&
@@ -174,7 +173,6 @@ export default class TemplatePlugin implements ViewPlugin {
           }
           return 0;
         });
-        // After sorting is complete, recursively remove the Symbol
       }
 
       return node;
@@ -236,6 +234,5 @@ export default class TemplatePlugin implements ViewPlugin {
   apply(view: ViewInstance): void {
     view.hooks.parser.tap("template", this.applyParser.bind(this));
     view.hooks.resolver.tap("template", this.applyResolverHooks.bind(this));
-    view.hooks.onTemplatePluginCreated.call(this);
   }
 }

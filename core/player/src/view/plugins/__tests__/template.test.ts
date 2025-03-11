@@ -420,6 +420,7 @@ describe("templates", () => {
       expect(resolved.values).toHaveLength(4);
       expect(resolved.values).toMatchSnapshot();
     });
+
     it("Should show static template items first when using placement prepend", () => {
       const viewWithPrepend = {
         ...templateJoinValues.views[1],
@@ -684,8 +685,8 @@ describe("templates", () => {
       model.set([["foo.bar", petNames]]);
 
       const resolved = view.update();
+      expect(resolved).toMatchSnapshot();
       expect(resolved.asset.values).toHaveLength(6);
-      expect(resolved.asset.values).toMatchSnapshot();
       // Prepend first - static template
       expect(resolved.asset.values[0].asset.value).toBe("static Ginger");
       expect(resolved.asset.values[1].asset.value).toBe("static Vokey");
@@ -704,8 +705,8 @@ describe("templates", () => {
       model.set([[barBinding, ["Louis", "Bob", "Nuri"]]]);
 
       const updated = view.update();
+      expect(updated).toMatchSnapshot();
       expect(updated.asset.values).toHaveLength(7);
-      expect(updated.asset.values).toMatchSnapshot();
       expect(updated.asset.values[4].asset.value).toBe("dynamic Louis");
       expect(updated.asset.values[5].asset.value).toBe("dynamic Bob");
       expect(updated.asset.values[6].asset.value).toBe("dynamic Nuri");

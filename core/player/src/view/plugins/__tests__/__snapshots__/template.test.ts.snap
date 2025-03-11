@@ -206,104 +206,118 @@ exports[`templates > Works with template items plus value items > Should show st
 `;
 
 exports[`templates > Works with template items plus value items > Should support placement for both static and dynamic templates 1`] = `
-[
-  {
-    "asset": {
-      "id": "static-0",
-      "type": "text",
-      "value": "static Ginger",
-    },
+{
+  "asset": {
+    "id": "foo",
+    "type": "collection",
+    "values": [
+      {
+        "asset": {
+          "id": "static-0",
+          "type": "text",
+          "value": "static Ginger",
+        },
+      },
+      {
+        "asset": {
+          "id": "static-1",
+          "type": "text",
+          "value": "static Vokey",
+        },
+      },
+      {
+        "asset": {
+          "id": "value-1",
+          "type": "text",
+          "value": "First value in the collection",
+        },
+      },
+      {
+        "asset": {
+          "id": "value-2",
+          "type": "text",
+          "value": "Second value in the collection",
+        },
+      },
+      {
+        "asset": {
+          "id": "dynamic-0",
+          "type": "text",
+          "value": "dynamic Ginger",
+        },
+      },
+      {
+        "asset": {
+          "id": "dynamic-1",
+          "type": "text",
+          "value": "dynamic Vokey",
+        },
+      },
+    ],
   },
-  {
-    "asset": {
-      "id": "static-1",
-      "type": "text",
-      "value": "static Vokey",
-    },
-  },
-  {
-    "asset": {
-      "id": "value-1",
-      "type": "text",
-      "value": "First value in the collection",
-    },
-  },
-  {
-    "asset": {
-      "id": "value-2",
-      "type": "text",
-      "value": "Second value in the collection",
-    },
-  },
-  {
-    "asset": {
-      "id": "dynamic-0",
-      "type": "text",
-      "value": "dynamic Ginger",
-    },
-  },
-  {
-    "asset": {
-      "id": "dynamic-1",
-      "type": "text",
-      "value": "dynamic Vokey",
-    },
-  },
-]
+  "id": "my-view",
+}
 `;
 
 exports[`templates > Works with template items plus value items > Should support placement for both static and dynamic templates 2`] = `
-[
-  {
-    "asset": {
-      "id": "static-0",
-      "type": "text",
-      "value": "static Louis",
-    },
+{
+  "asset": {
+    "id": "foo",
+    "type": "collection",
+    "values": [
+      {
+        "asset": {
+          "id": "static-0",
+          "type": "text",
+          "value": "static Louis",
+        },
+      },
+      {
+        "asset": {
+          "id": "static-1",
+          "type": "text",
+          "value": "static Bob",
+        },
+      },
+      {
+        "asset": {
+          "id": "value-1",
+          "type": "text",
+          "value": "First value in the collection",
+        },
+      },
+      {
+        "asset": {
+          "id": "value-2",
+          "type": "text",
+          "value": "Second value in the collection",
+        },
+      },
+      {
+        "asset": {
+          "id": "dynamic-0",
+          "type": "text",
+          "value": "dynamic Louis",
+        },
+      },
+      {
+        "asset": {
+          "id": "dynamic-1",
+          "type": "text",
+          "value": "dynamic Bob",
+        },
+      },
+      {
+        "asset": {
+          "id": "dynamic-2",
+          "type": "text",
+          "value": "dynamic Nuri",
+        },
+      },
+    ],
   },
-  {
-    "asset": {
-      "id": "static-1",
-      "type": "text",
-      "value": "static Bob",
-    },
-  },
-  {
-    "asset": {
-      "id": "value-1",
-      "type": "text",
-      "value": "First value in the collection",
-    },
-  },
-  {
-    "asset": {
-      "id": "value-2",
-      "type": "text",
-      "value": "Second value in the collection",
-    },
-  },
-  {
-    "asset": {
-      "id": "dynamic-0",
-      "type": "text",
-      "value": "dynamic Louis",
-    },
-  },
-  {
-    "asset": {
-      "id": "dynamic-1",
-      "type": "text",
-      "value": "dynamic Bob",
-    },
-  },
-  {
-    "asset": {
-      "id": "dynamic-2",
-      "type": "text",
-      "value": "dynamic Nuri",
-    },
-  },
-]
+  "id": "my-view",
+}
 `;
 
 exports[`templates > works with simple ones 1`] = `
