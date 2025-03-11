@@ -685,7 +685,7 @@ describe("templates", () => {
       model.set([["foo.bar", petNames]]);
 
       const resolved = view.update();
-      expect(resolved).toMatchSnapshot();
+      expect(resolved.asset.values).toMatchSnapshot();
       expect(resolved.asset.values).toHaveLength(6);
       // Prepend first - static template
       expect(resolved.asset.values[0].asset.value).toBe("static Ginger");
@@ -705,7 +705,7 @@ describe("templates", () => {
       model.set([[barBinding, ["Louis", "Bob", "Nuri"]]]);
 
       const updated = view.update();
-      expect(updated).toMatchSnapshot();
+      expect(updated.asset.values).toMatchSnapshot();
       expect(updated.asset.values).toHaveLength(7);
       expect(updated.asset.values[4].asset.value).toBe("dynamic Louis");
       expect(updated.asset.values[5].asset.value).toBe("dynamic Bob");
