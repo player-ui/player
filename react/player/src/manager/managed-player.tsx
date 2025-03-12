@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { MutableRefObject, useEffect, useRef } from "react";
 import type {
   FlowManager,
   ManagedPlayerProps,
@@ -32,13 +32,13 @@ export interface StateChangeCallback {
 class ManagedState {
   public state?: ManagedPlayerState;
   private callbacks: Array<StateChangeCallback>;
-  private middleware?: ManagerMiddleware;
+  private middleware?: React.MutableRefObject<ManagerMiddleware>;
 
   constructor({
     middleware,
   }: {
     /** middleware to use in the managed player */
-    middleware?: ManagerMiddleware;
+    middleware?: React.MutableRefObject<ManagerMiddleware>;
   }) {
     this.middleware = middleware;
     this.callbacks = [];
@@ -73,25 +73,6 @@ class ManagedState {
     this.setState(initialState);
 
     return this;
-  }
-
-  public sync(options: {
-    /** middleware to use in the managed player */
-    middleware?: ManagerMiddleware;
-
-    /** the config to use when creating a player */
-    playerConfig?: ReactPlayerOptions;
-  }): void {
-    if (options.middleware) {
-      this.middleware = options.middleware;
-    }
-
-    if (options.playerConfig) {
-      if (this?.state?.context) {
-        this.state.context.playerConfig = options.playerConfig;
-        this.state.context.reactPlayer = new ReactPlayer(options.playerConfig);
-      }
-    }
   }
 
   /** reset starts from nothing */
@@ -162,7 +143,7 @@ class ManagedState {
       const prevResult =
         state.value === "completed" ? state.context.result : undefined;
 
-      const middleware = this.middleware?.next ?? identityMiddleware;
+      const middleware = this.middleware?.current?.next ?? identityMiddleware;
 
       return {
         value: "pending",
@@ -237,7 +218,7 @@ export const usePersistentStateMachine = (options: {
   playerConfig: ReactPlayerOptions;
 
   /** Any middleware for the manager */
-  middleware?: ManagerMiddleware;
+  middleware?: React.MutableRefObject<ManagerMiddleware>;
 }): { managedState: ManagedState; state?: ManagedPlayerState } => {
   const keyRef = React.useRef<ManagedPlayerStateKey>({
     _key: Symbol("managed-player"),
@@ -281,14 +262,14 @@ function composeMiddleware<T>(...functions: MiddlewareMethod<T>[]) {
   );
 }
 
-function usePrevious<T>(value: T): T | undefined {
-  const ref = useRef<T>();
+function useLatest<T>(value: T): MutableRefObject<T> {
+  const ref = useRef<T>(value);
 
   useEffect(() => {
     ref.current = value;
   });
 
-  return ref.current;
+  return ref;
 }
 
 /**
@@ -301,34 +282,18 @@ export const ManagedPlayer = (
   props: ManagedPlayerProps,
 ): React.JSX.Element | null => {
   const { withRequestTime, RequestTimeMetricsPlugin } = useRequestTime();
-  const previousMiddleware = usePrevious(props.middleware);
+  const latestMiddleware = useLatest({
+    next: composeMiddleware(...(props?.middleware ?? []), withRequestTime),
+  } as ManagerMiddleware);
 
   const { state, managedState } = usePersistentStateMachine({
     manager: props.manager,
-    middleware: {
-      next: composeMiddleware(
-        ...(props?.middleware ?? []),
-        withRequestTime,
-      ) as any,
-    },
+    middleware: latestMiddleware,
     playerConfig: {
       plugins: [...(props?.plugins ?? []), RequestTimeMetricsPlugin],
       player: props.player,
     },
   });
-
-  if (state && state.value !== "running") {
-    if (previousMiddleware !== props.middleware) {
-      managedState.sync({
-        middleware: {
-          next: composeMiddleware(
-            ...(props?.middleware ?? []),
-            withRequestTime,
-          ) as any,
-        },
-      });
-    }
-  }
 
   React.useEffect(() => {
     if (state?.value === "ended") {
