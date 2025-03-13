@@ -94,7 +94,7 @@ and display it as a SwiftUI view comprised of registered assets.
     s.subspec name do |subspec|
       subspec.dependency 'PlayerUI/Core'
       subspec.source_files = "plugins/#{path}/ios/Sources/**/*"
-      if resources == TRUE
+      if resources == true
         subspec.resource_bundles = {
           "PlayerUI_#{name}" => ["plugins/#{path}/ios/Resources/**/*.js"]
         }
@@ -110,7 +110,7 @@ and display it as a SwiftUI view comprised of registered assets.
         subspec.dependency "PlayerUI/#{dep}"
       }
       subspec.source_files = "plugins/#{path}/swiftui/Sources/**/*"
-      if resources == TRUE
+      if resources == true
         subspec.resource_bundles = {
           "PlayerUI_#{name}" => ["plugins/#{path}/swiftui/Resources/**/*.js"]
         }
@@ -119,23 +119,23 @@ and display it as a SwiftUI view comprised of registered assets.
   }
 
   # <PLUGINS>
-  ios_plugin.call("BaseBeaconPlugin", "beacon", TRUE)
-  ios_plugin.call("CheckPathPlugin", "check-path", TRUE)
-  ios_plugin.call("CommonExpressionsPlugin", "common-expressions", TRUE)
-  ios_plugin.call("CommonTypesPlugin", "common-types", TRUE)
-  ios_plugin.call("ComputedPropertiesPlugin", "computed-properties", TRUE)
-  ios_plugin.call("ExpressionPlugin", "expression", TRUE)
-  ios_plugin.call("ExternalActionPlugin", "external-action", TRUE)
-  ios_plugin.call("PubSubPlugin", "pubsub", TRUE)
-  ios_plugin.call("StageRevertDataPlugin", "stage-revert-data", TRUE)
-  ios_plugin.call("TypesProviderPlugin", "types-provider", TRUE)
-  ios_plugin.call("PrintLoggerPlugin", "console-logger", FALSE)
+  ios_plugin.call("BaseBeaconPlugin", "beacon", true)
+  ios_plugin.call("CheckPathPlugin", "check-path", true)
+  ios_plugin.call("CommonExpressionsPlugin", "common-expressions", true)
+  ios_plugin.call("CommonTypesPlugin", "common-types", true)
+  ios_plugin.call("ComputedPropertiesPlugin", "computed-properties", true)
+  ios_plugin.call("ExpressionPlugin", "expression", true)
+  ios_plugin.call("ExternalActionPlugin", "external-action", true)
+  ios_plugin.call("PubSubPlugin", "pubsub", true)
+  ios_plugin.call("StageRevertDataPlugin", "stage-revert-data", true)
+  ios_plugin.call("TypesProviderPlugin", "types-provider", true)
+  ios_plugin.call("PrintLoggerPlugin", "console-logger", false)
 
-  swiftui_plugin.call("BeaconPlugin", "beacon", ["BaseBeaconPlugin"], FALSE)
-  swiftui_plugin.call("MetricsPlugin", "metrics", [], TRUE)
-  swiftui_plugin.call("SwiftUICheckPathPlugin", "check-path", ["CheckPathPlugin"], FALSE)
-  swiftui_plugin.call("ExternalActionViewModifierPlugin", "external-action", ["ExternalActionPlugin"], FALSE)
-  swiftui_plugin.call("SwiftUIPendingTransactionPlugin", "pending-transaction", [], FALSE)
-  swiftui_plugin.call("TransitionPlugin", "transition", [], FALSE)
+  swiftui_plugin.call("BeaconPlugin", "beacon", ["BaseBeaconPlugin"], false)
+  swiftui_plugin.call("MetricsPlugin", "metrics", [], true)
+  swiftui_plugin.call("SwiftUICheckPathPlugin", "check-path", ["CheckPathPlugin"], false)
+  swiftui_plugin.call("ExternalActionViewModifierPlugin", "external-action", ["ExternalActionPlugin"], false)
+  swiftui_plugin.call("SwiftUIPendingTransactionPlugin", "pending-transaction", [], false)
+  swiftui_plugin.call("TransitionPlugin", "transition", [], false)
   # </PLUGINS>
 end
