@@ -27,6 +27,25 @@ class AsyncNodePluginTests: XCTestCase {
         XCTAssertNotNil(plugin.pluginRef)
     }
     
+    func testContrucionAsyncPluginWithoutHandler() {
+        let context = JSContext()
+        let asyncNodePluginPlugin = AsyncNodePluginPlugin()
+        let resolveHandler: AsyncHookHandler = { _,_ in
+            return .singleNode(.concrete(JSValue()))
+        }
+        
+        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin])
+        
+        plugin.context = context
+        
+        plugin.hooks?.onAsyncNode.tap({ node, callback in
+            let replacementNode = try await (resolveHandler)(node, callback)
+            return replacementNode.handlerTypeToJSValue(context: context ?? JSContext()) ?? JSValue()
+        })
+        
+        XCTAssertNotNil(plugin.hooks?.onAsyncNode)
+    }
+
     func testConstructionAsyncPluginPlugin() {
         let context = JSContext()
         
@@ -56,9 +75,14 @@ class AsyncNodePluginTests: XCTestCase {
         }
         
         let asyncNodePluginPlugin = AsyncNodePluginPlugin()
-        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolveHandler)
+        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin])
         
         plugin.context = context
+        
+        plugin.hooks?.onAsyncNode.tap({ node, callback in
+            let replacementNode = try await (resolveHandler)(node, callback)
+            return replacementNode.handlerTypeToJSValue(context: context ?? JSContext()) ?? JSValue()
+        })
         
         XCTAssertNotNil(asyncNodePluginPlugin.context)
         
@@ -128,7 +152,7 @@ class AsyncNodePluginTests: XCTestCase {
         }
         
         let asyncNodePluginPlugin = AsyncNodePluginPlugin()
-        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolve)
+        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], asyncHookHandler: resolve)
         
         plugin.context = context
         
@@ -239,7 +263,7 @@ class AsyncNodePluginTests: XCTestCase {
         }
         
         let asyncNodePluginPlugin = AsyncNodePluginPlugin()
-        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolve)
+        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], asyncHookHandler: resolve)
         
         plugin.context = context
         
@@ -325,7 +349,7 @@ class AsyncNodePluginTests: XCTestCase {
         }
         
         let asyncNodePluginPlugin = AsyncNodePluginPlugin()
-        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolve)
+        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], asyncHookHandler: resolve)
         
         plugin.context = context
         
@@ -414,7 +438,7 @@ class AsyncNodePluginTests: XCTestCase {
         }
         
         let asyncNodePluginPlugin = AsyncNodePluginPlugin()
-        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolve)
+        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], asyncHookHandler: resolve)
         
         plugin.context = context
         
@@ -540,7 +564,7 @@ class AsyncNodePluginTests: XCTestCase {
        }
        
        let asyncNodePluginPlugin = AsyncNodePluginPlugin()
-       let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolve)
+        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], asyncHookHandler: resolve)
        
        plugin.context = context
        
@@ -604,7 +628,7 @@ class AsyncNodePluginTests: XCTestCase {
         }
         
         let asyncNodePluginPlugin = AsyncNodePluginPlugin()
-        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolve)
+        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], asyncHookHandler: resolve)
         
         plugin.context = context
         
@@ -673,7 +697,7 @@ class AsyncNodePluginTests: XCTestCase {
         }
         
         let asyncNodePluginPlugin = AsyncNodePluginPlugin()
-        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolve)
+        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], asyncHookHandler: resolve)
         
         plugin.context = context
         
@@ -755,7 +779,7 @@ class AsyncNodePluginTests: XCTestCase {
         }
         
         let asyncNodePluginPlugin = AsyncNodePluginPlugin()
-        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], resolve)
+        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin], asyncHookHandler: resolve)
         
         plugin.context = context
         
