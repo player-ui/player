@@ -1,5 +1,45 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`templates > Should preserve order when multiple templates have the same placement 1`] = `
+[
+  {
+    "asset": {
+      "id": "static-value",
+      "type": "text",
+      "value": "Static value in the collection",
+    },
+  },
+  {
+    "asset": {
+      "id": "first-0",
+      "type": "text",
+      "value": "first A",
+    },
+  },
+  {
+    "asset": {
+      "id": "first-1",
+      "type": "text",
+      "value": "first B",
+    },
+  },
+  {
+    "asset": {
+      "id": "second-0",
+      "type": "text",
+      "value": "second C",
+    },
+  },
+  {
+    "asset": {
+      "id": "second-1",
+      "type": "text",
+      "value": "second D",
+    },
+  },
+]
+`;
+
 exports[`templates > Works with template items plus value items > Should show dynamic template items first when using placement prepend 1`] = `
 [
   {

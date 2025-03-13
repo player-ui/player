@@ -712,4 +712,102 @@ describe("templates", () => {
       expect(updated.asset.values[6].asset.value).toBe("dynamic Nuri");
     });
   });
+
+  it("Should preserve order when multiple templates have the same placement", () => {
+    const model = withParser(new LocalModel({}), parseBinding);
+    const evaluator = new ExpressionEvaluator({ model });
+    const schema = new SchemaController();
+
+    const view = new ViewInstance(
+      {
+        id: "my-view",
+        asset: {
+          id: "foo",
+          type: "collection",
+          template: [
+            {
+              dynamic: true,
+              data: "first.data",
+              output: "values",
+              placement: "append", // Both templates have "append" placement
+              value: {
+                asset: {
+                  id: "first-_index_",
+                  type: "text",
+                  value: "first {{first.data._index_}}",
+                },
+              },
+            },
+            {
+              dynamic: true,
+              data: "second.data",
+              output: "values",
+              placement: "append", // Both templates have "append" placement
+              value: {
+                asset: {
+                  id: "second-_index_",
+                  type: "text",
+                  value: "second {{second.data._index_}}",
+                },
+              },
+            },
+          ],
+          values: [
+            {
+              asset: {
+                id: "static-value",
+                type: "text",
+                value: "Static value in the collection",
+              },
+            },
+          ],
+        },
+      } as any,
+      {
+        model,
+        parseBinding,
+        evaluator,
+        schema,
+      },
+    );
+
+    const pluginOptions = toNodeResolveOptions(view.resolverOptions);
+    new TemplatePlugin(pluginOptions).apply(view);
+    new StringResolverPlugin().apply(view);
+    new AssetPlugin().apply(view);
+    new MultiNodePlugin().apply(view);
+
+    // Set data for both template data sources
+    model.set([
+      ["first.data", ["A", "B"]],
+      ["second.data", ["C", "D"]],
+    ]);
+
+    const resolved = view.update();
+
+    // We should have 5 values total:
+    // 1 static value + 2 values from first.data + 2 values from second.data
+    expect(resolved.asset.values).toHaveLength(5);
+
+    // Static value should be first
+    expect(resolved.asset.values[0].asset.id).toBe("static-value");
+    expect(resolved.asset.values[0].asset.value).toBe(
+      "Static value in the collection",
+    );
+
+    // Then first.data template items (in their original order)
+    expect(resolved.asset.values[1].asset.id).toBe("first-0");
+    expect(resolved.asset.values[1].asset.value).toBe("first A");
+    expect(resolved.asset.values[2].asset.id).toBe("first-1");
+    expect(resolved.asset.values[2].asset.value).toBe("first B");
+
+    // Then second.data template items
+    expect(resolved.asset.values[3].asset.id).toBe("second-0");
+    expect(resolved.asset.values[3].asset.value).toBe("second C");
+    expect(resolved.asset.values[4].asset.id).toBe("second-1");
+    expect(resolved.asset.values[4].asset.value).toBe("second D");
+
+    // Make sure the ordering is preserved in the snapshot
+    expect(resolved.asset.values).toMatchSnapshot();
+  });
 });
