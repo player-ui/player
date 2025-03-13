@@ -1,4 +1,4 @@
-import { test, expect, vitest } from "vitest";
+import { test, expect, vitest, beforeEach } from "vitest";
 import React, { Suspense } from "react";
 import { makeFlow } from "@player-ui/make-flow";
 import { render, act, configure, waitFor } from "@testing-library/react";
@@ -21,9 +21,28 @@ vitest.mock("@player-ui/metrics-plugin", async () => {
   };
 });
 
+function defer() {
+  let resolve;
+  let reject;
+  const promise = new Promise((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return {
+    promise,
+    resolve,
+    reject,
+  };
+}
+
 configure({ testIdAttribute: "id" });
 
 const testOptions = { legacyRoot: true };
+
+beforeEach(() => {
+  // @ts-expect-error vitest mock
+  RequestTimeWebPlugin.mockClear();
+});
 
 test("requestTime should be available", async () => {
   const manager: FlowManager = {
@@ -451,4 +470,285 @@ test("handles terminating with data", async () => {
   await renderResult.findByTestId("flow-1");
   (renderResult as any).unmount();
   expect(manager.terminate).toBeCalledWith({ returns: { id: "123" } });
+});
+
+test("handles custom middleware", async () => {
+  const manager: FlowManager = {
+    next: vitest
+      .fn()
+      .mockReturnValueOnce(
+        Promise.resolve({
+          value: makeFlow({
+            id: "flow-1",
+            type: "collection",
+            values: [
+              {
+                asset: {
+                  id: "action",
+                  type: "action",
+                  value: "Next",
+                  label: "Continue",
+                },
+              },
+            ],
+          }),
+        }),
+      )
+      .mockReturnValueOnce(
+        Promise.resolve({
+          value: makeFlow({
+            id: "flow-2",
+            type: "collection",
+            values: [
+              {
+                asset: {
+                  id: "action",
+                  type: "action",
+                  value: "Next",
+                  label: "Continue",
+                },
+              },
+            ],
+          }),
+        }),
+      )
+      .mockReturnValue(Promise.resolve({ done: true })),
+  };
+
+  const onComplete = vitest.fn();
+  const onError = vitest.fn();
+  const middleware = vitest.fn((res: any) => res);
+
+  const container = render(
+    <Suspense fallback="loading">
+      <ManagedPlayer
+        manager={manager}
+        middleware={[middleware]}
+        plugins={[new SimpleAssetPlugin(), new MetricsCorePlugin()]}
+        onComplete={onComplete}
+        onError={onError}
+      />
+    </Suspense>,
+    testOptions,
+  );
+
+  expect(manager.next).toBeCalledWith(undefined);
+  const view = await container.findByTestId("flow-1");
+  expect(view).toBeInTheDocument();
+
+  await act(async () => {
+    const nextButton = await container.findByText("Continue");
+    nextButton.click();
+  });
+
+  expect(middleware).toBeCalledTimes(2);
+  expect(manager.next).toBeCalledTimes(2);
+
+  const view2 = await container.findByTestId("flow-2");
+  expect(view2).toBeInTheDocument();
+
+  await act(async () => {
+    const nextButton = await container.findByText("Continue");
+    nextButton.click();
+  });
+  const getRequestTime = (RequestTimeWebPlugin as any).mock.calls[0][0];
+  expect(getRequestTime()).toBeDefined();
+  expect(onComplete).toBeCalled();
+});
+
+test("updates middleware every render", async () => {
+  const manager: FlowManager = {
+    next: vitest
+      .fn()
+      .mockReturnValueOnce(
+        Promise.resolve({
+          value: makeFlow({
+            id: "flow-1",
+            type: "collection",
+            values: [
+              {
+                asset: {
+                  id: "action",
+                  type: "action",
+                  value: "Next",
+                  label: "Continue",
+                },
+              },
+            ],
+          }),
+        }),
+      )
+      .mockReturnValueOnce(
+        Promise.resolve({
+          value: makeFlow({
+            id: "flow-2",
+            type: "collection",
+            values: [
+              {
+                asset: {
+                  id: "action",
+                  type: "action",
+                  value: "Next",
+                  label: "Continue",
+                },
+              },
+            ],
+          }),
+        }),
+      )
+      .mockReturnValue(Promise.resolve({ done: true })),
+  };
+
+  const onComplete = vitest.fn();
+  const onError = vitest.fn();
+  const middleware = vitest.fn((res: any) => res);
+
+  const container = render(
+    <Suspense fallback="loading">
+      <ManagedPlayer
+        manager={manager}
+        middleware={[middleware]}
+        plugins={[new SimpleAssetPlugin(), new MetricsCorePlugin()]}
+        onComplete={onComplete}
+        onError={onError}
+      />
+    </Suspense>,
+    testOptions,
+  );
+
+  expect(middleware).toBeCalledTimes(1);
+  expect(manager.next).toBeCalledWith(undefined);
+  const view = await container.findByTestId("flow-1");
+  expect(view).toBeInTheDocument();
+
+  await act(async () => {
+    const nextButton = await container.findByText("Continue");
+    nextButton.click();
+  });
+
+  expect(middleware).toBeCalledTimes(2);
+  expect(manager.next).toBeCalledTimes(2);
+
+  const newMiddleware = vitest.fn((r: any) => r);
+
+  container.rerender(
+    <Suspense fallback="loading">
+      <ManagedPlayer
+        manager={manager}
+        middleware={[newMiddleware]}
+        plugins={[new SimpleAssetPlugin(), new MetricsCorePlugin()]}
+        onComplete={onComplete}
+        onError={onError}
+      />
+    </Suspense>,
+  );
+
+  expect(middleware).toBeCalledTimes(2);
+  expect(newMiddleware).toBeCalledTimes(0);
+  const view2 = await container.findByTestId("flow-2");
+  expect(view2).toBeInTheDocument();
+
+  await act(async () => {
+    const nextButton = await container.findByText("Continue");
+    nextButton.click();
+  });
+
+  expect(middleware).toBeCalledTimes(2);
+  expect(newMiddleware).toBeCalledTimes(1);
+  expect(onComplete).toBeCalled();
+});
+
+test("middleware can pause next", async () => {
+  const manager: FlowManager = {
+    next: vitest
+      .fn()
+      .mockReturnValueOnce(
+        Promise.resolve({
+          value: makeFlow({
+            id: "flow-1",
+            type: "collection",
+            values: [
+              {
+                asset: {
+                  id: "action",
+                  type: "action",
+                  value: "Next",
+                  label: "Continue",
+                },
+              },
+            ],
+          }),
+        }),
+      )
+      .mockReturnValueOnce(
+        Promise.resolve({
+          value: makeFlow({
+            id: "flow-2",
+            type: "collection",
+            values: [
+              {
+                asset: {
+                  id: "action",
+                  type: "action",
+                  value: "Next",
+                  label: "Continue",
+                },
+              },
+            ],
+          }),
+        }),
+      )
+      .mockReturnValue(Promise.resolve({ done: true })),
+  };
+
+  const { promise, resolve, reject } = defer();
+  const onComplete = vitest.fn();
+  const onError = vitest.fn();
+  const middleware = vitest.fn(async (res: any) => {
+    await res;
+    await promise;
+    return res;
+  });
+
+  const container = render(
+    <Suspense fallback="loading">
+      <ManagedPlayer
+        manager={manager}
+        middleware={[middleware]}
+        plugins={[new SimpleAssetPlugin()]}
+        onComplete={onComplete}
+        onError={onError}
+      />
+    </Suspense>,
+    testOptions,
+  );
+
+  expect(middleware).toBeCalledTimes(1);
+  expect(manager.next).toBeCalledWith(undefined);
+  expect(container.getByText("loading")).toBeInTheDocument();
+  await expect(container.findByTestId("flow-1")).rejects.toThrow();
+
+  // @ts-expect-error resolve
+  resolve();
+  const view = await container.findByTestId("flow-1");
+  expect(view).toBeInTheDocument();
+
+  await act(async () => {
+    const nextButton = await container.findByText("Continue");
+    nextButton.click();
+  });
+
+  expect(middleware).toBeCalledTimes(2);
+  expect(manager.next).toBeCalledTimes(2);
+
+  const view2 = await container.findByTestId("flow-2");
+  expect(view2).toBeInTheDocument();
+
+  await act(async () => {
+    const nextButton = await container.findByText("Continue");
+    nextButton.click();
+  });
+
+  expect(middleware).toBeCalledTimes(3);
+  expect(onComplete).toBeCalled();
 });
