@@ -1,0 +1,29 @@
+{
+    "id": "collection-badge",
+    "type": "collection",
+    "label": {
+        "asset": {
+        "id": "collection-label",
+        "type": "text",
+        "value": "Badge variants"
+        }
+    },
+    "values": [
+        {
+            "asset": {
+                "id": "item-1",
+                "type": "badge",
+                "label": "INFO",
+                "status": "info"
+            }
+        },
+        {
+            "asset": {
+                "id": "item-2",
+                "type": "badge",
+                "label": "ERROR",
+                "status": "error"
+            }
+        }
+    ]
+}

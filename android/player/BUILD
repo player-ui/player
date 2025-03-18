@@ -4,6 +4,7 @@ load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load("@rules_kotlin//kotlin:core.bzl", "kt_kotlinc_options")
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@rules_player//kotlin:defs.bzl", "kt_jvm_junit5_test", "lint")
+load("@rules_kotlin//kotlin:core.bzl", "kt_compiler_plugin")
 load("//jvm:defs.bzl", "distribution")
 load(":deps.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
 
@@ -39,7 +40,16 @@ kt_android_library(
     manifest = ":src/main/AndroidManifest.xml",
     resource_files = glob(["src/main/res/**"]),
     resources = main_resources,
+    plugins = [":jetpack_compose_compiler_plugin"],
     deps = main_deps,
+)
+
+kt_compiler_plugin(
+    name = "jetpack_compose_compiler_plugin",
+    id = "androidx.compose.compiler",
+    target_embedded_compiler = True,
+    visibility = ["//visibility:public"],
+    deps = ["@maven//:androidx_compose_compiler_compiler"],
 )
 
 android_library(

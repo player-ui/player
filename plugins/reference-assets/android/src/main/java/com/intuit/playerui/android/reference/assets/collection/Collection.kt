@@ -1,17 +1,22 @@
 package com.intuit.playerui.android.reference.assets.collection
 
-import android.view.LayoutInflater
-import android.view.View
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.asset.SuspendableAsset
-import com.intuit.playerui.android.extensions.into
+import com.intuit.playerui.android.compose.ComposableAsset
+import com.intuit.playerui.android.compose.compose
 import com.intuit.playerui.android.reference.assets.R
-import com.intuit.playerui.android.reference.assets.text.Text
+import com.intuit.playerui.android.reference.assets.XmlAssetStyleParser
 import kotlinx.serialization.Serializable
 
 /** Asset that renders a group of assets as children with little semantic meaning */
-open class Collection(assetContext: AssetContext) : SuspendableAsset<Collection.Data>(assetContext, Data.serializer()) {
+class Collection(assetContext: AssetContext) : ComposableAsset<Collection.Data>(assetContext, Data.serializer()) {
 
     @Serializable
     data class Data(
@@ -21,13 +26,20 @@ open class Collection(assetContext: AssetContext) : SuspendableAsset<Collection.
         val label: RenderableAsset? = null,
     )
 
-    override suspend fun initView(data: Data) = LayoutInflater.from(context).inflate(R.layout.collection, null).rootView
-
-    override suspend fun View.hydrate(data: Data) {
-        data.label?.render(Text.Styles.Label) into findViewById(R.id.collection_label)
-
-        data.values.map {
-            it.render()
-        } into findViewById(R.id.collection_values)
+    @Composable
+    override fun content(modifier: Modifier, data: Data) {
+        Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(20.dp)) {
+            data.label?.compose(
+                modifier = Modifier.padding(top = 10.dp).fillMaxWidth(),
+                styles = XmlAssetStyleParser(requireContext()).parse(R.style.Text_Label),
+            )
+            Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                data.values.map {
+                    it.compose(
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+        }
     }
 }
