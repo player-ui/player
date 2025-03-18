@@ -70,7 +70,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
         }
         """.trimMargin()
 
-    val chatMessageContent =
+    private val chatMessageContent =
         """
     {
       "id": "chat",
@@ -549,5 +549,119 @@ internal class AsyncNodePluginTest : PlayerTest() {
             if (updateNumber == 3) cont.resume(true) {}
         }
         Assertions.assertTrue(true)
+    }
+
+    @TestTemplate
+    fun `constructor test - pass in handler in constructor`() = runBlockingTest {
+        val handler = { node: Node, callback: ((result: Any?) -> Unit)? ->
+            mapOf(
+                "asset" to mapOf(
+                    "id" to "asset-1",
+                    "type" to "text",
+                    "value" to "New asset!",
+                ),
+            )
+        }
+
+        setupPlayer(listOf(AsyncNodePlugin(asyncHandler = handler), ReferenceAssetsPlugin()))
+
+        var update: Asset? = null
+
+        var count = 0
+        suspendCancellableCoroutine { cont ->
+            player.hooks.view.tap { v ->
+                v?.hooks?.onUpdate?.tap { asset ->
+                    count++
+                    update = asset
+                    if (count == 2) cont.resume(true) {}
+                }
+            }
+
+            player.start(asyncNodeFlowSimple)
+        }
+        Assertions.assertTrue(count == 2)
+        Assertions.assertTrue((update?.get("actions") as List<*>).isNotEmpty())
+    }
+
+    @TestTemplate
+    fun `constructor test - with callback function`() = runBlockingTest {
+        var deferredResolve: ((asyncNodeUpdate) -> Unit)? = null
+        var updateContent: ((asyncNodeUpdate) -> Unit)? = null
+
+        val handler = { node: Node, callback: ((result: Any?) -> Unit)? ->
+            updateContent = callback
+            suspendCoroutine { cont ->
+                deferredResolve = { value ->
+                    cont.resume(value)
+                }
+            }
+        }
+
+        setupPlayer(listOf(AsyncNodePlugin(handler), ReferenceAssetsPlugin()))
+
+        var count = 0
+
+        player.hooks.view.tap { v ->
+            v?.hooks?.onUpdate?.tap { asset ->
+                count++
+            }
+        }
+        player.start(asyncNodeFlowSimple)
+
+        var view = player.inProgressState?.lastViewUpdate
+        Assertions.assertNotNull(view)
+        Assertions.assertEquals(
+            "action",
+            view!!.getList("actions")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("type"),
+        )
+        Assertions.assertEquals(1, view.getList("actions")?.size)
+
+        while (true) {
+            if (deferredResolve != null) {
+                break
+            }
+
+            yield()
+        }
+
+        // create a view object to pass it to the deferred resolve
+        val viewObject = mapOf(
+            "asset" to mapOf(
+                "id" to "asset-1",
+                "type" to "action",
+                "value" to "New asset!",
+            ),
+        )
+
+        deferredResolve!!.invoke(listOf(viewObject))
+
+        Assertions.assertEquals(1, count)
+
+        view = player.inProgressState?.lastViewUpdate
+        Assertions.assertNotNull(view)
+
+        Assertions.assertEquals(
+            "action",
+            view!!.getList("actions")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("type"),
+        )
+        Assertions.assertEquals(
+            "action",
+            view.getList("actions")?.filterIsInstance<ArrayList<Node>>()?.get(0)?.get(0)?.getObject("asset")
+                ?.get("type"),
+        )
+        Assertions.assertEquals(2, view.getList("actions")?.size)
+        Assertions.assertEquals(2, count)
+
+        updateContent!!.invoke(null)
+
+        Assertions.assertEquals(3, count)
+        view = player.inProgressState?.lastViewUpdate
+
+        Assertions.assertNotNull(view)
+        Assertions.assertEquals(
+            "action",
+            view!!.getList("actions")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("type"),
+        )
+        Assertions.assertEquals(1, view.getList("actions")?.size)
     }
 }

@@ -246,6 +246,92 @@ describe("view", () => {
     expect(view?.actions[1]).toBeUndefined();
   });
 
+  test("can handle multiple updates through callback mechanism - init with handler", async () => {
+    let deferredResolve: ((value: any) => void) | undefined;
+
+    let updateContent: any;
+
+    const asyncHandler = (
+      node: Node.Async,
+      callback: (content: any) => void,
+    ) => {
+      const result = new Promise((resolve) => {
+        deferredResolve = resolve; // Promise would be resolved only once
+      });
+
+      updateContent = callback;
+      // Return the result to follow the same mechanism as before
+      return result;
+    };
+
+    const plugin = new AsyncNodePlugin(
+      {
+        plugins: [new AsyncNodePluginPlugin()],
+      },
+      asyncHandler,
+    );
+
+    let updateNumber = 0;
+
+    const player = new Player({ plugins: [plugin] });
+
+    player.hooks.viewController.tap("async-node-test", (vc) => {
+      vc.hooks.view.tap("async-node-test", (view) => {
+        view.hooks.onUpdate.tap("async-node-test", (update) => {
+          updateNumber++;
+        });
+      });
+    });
+
+    player.start(basicFRFWithActions as any);
+
+    let view = (player.getState() as InProgressState).controllers.view
+      .currentView?.lastUpdate;
+
+    expect(view).toBeDefined();
+    expect(view?.actions[1]).toBeUndefined();
+
+    await waitFor(() => {
+      expect(updateNumber).toBe(1);
+      expect(deferredResolve).toBeDefined();
+    });
+
+    if (deferredResolve) {
+      deferredResolve({
+        asset: {
+          id: "next-label-action",
+          type: "action",
+          value: "dummy value",
+        },
+      });
+    }
+
+    await waitFor(() => {
+      expect(updateNumber).toBe(2);
+    });
+
+    view = (player.getState() as InProgressState).controllers.view.currentView
+      ?.lastUpdate;
+
+    expect(view?.actions[0].asset.type).toBe("action");
+    expect(view?.actions[1].asset.type).toBe("action");
+    expect(updateNumber).toBe(2);
+
+    if (deferredResolve) {
+      updateContent(null);
+    }
+
+    await waitFor(() => {
+      expect(updateNumber).toBe(3);
+    });
+
+    view = (player.getState() as InProgressState).controllers.view.currentView
+      ?.lastUpdate;
+
+    expect(view?.actions[0].asset.type).toBe("action");
+    expect(view?.actions[1]).toBeUndefined();
+  });
+
   test("replaces async nodes with provided node", async () => {
     const plugin = new AsyncNodePlugin({
       plugins: [new AsyncNodePluginPlugin()],
@@ -258,6 +344,69 @@ describe("view", () => {
         deferredResolve = resolve;
       });
     });
+    let updateNumber = 0;
+
+    const player = new Player({ plugins: [plugin] });
+
+    player.hooks.viewController.tap("async-node-test", (vc) => {
+      vc.hooks.view.tap("async-node-test", (view) => {
+        view.hooks.onUpdate.tap("async-node-test", (update) => {
+          updateNumber++;
+        });
+      });
+    });
+
+    player.start(basicFRFWithActions as any);
+
+    let view = (player.getState() as InProgressState).controllers.view
+      .currentView?.lastUpdate;
+
+    expect(view).toBeDefined();
+    expect(view?.actions[0].asset.type).toBe("action");
+    expect(view?.actions[1]).toBeUndefined();
+    expect(updateNumber).toBe(1);
+
+    await waitFor(() => {
+      expect(deferredResolve).toBeDefined();
+    });
+
+    if (deferredResolve) {
+      deferredResolve({
+        asset: {
+          id: "next-label-action",
+          type: "action",
+          value: "dummy value",
+        },
+      });
+    }
+
+    await waitFor(() => {
+      expect(updateNumber).toBe(2);
+    });
+
+    view = (player.getState() as InProgressState).controllers.view.currentView
+      ?.lastUpdate;
+
+    expect(view?.actions[0].asset.type).toBe("action");
+    expect(view?.actions[1].asset.type).toBe("action");
+  });
+
+  test("init with handler", async () => {
+    let deferredResolve: ((value: any) => void) | undefined;
+
+    const asyncHandler = (node: Node.Async) => {
+      return new Promise((resolve) => {
+        deferredResolve = resolve;
+      });
+    };
+
+    const plugin = new AsyncNodePlugin(
+      {
+        plugins: [new AsyncNodePluginPlugin()],
+      },
+      asyncHandler,
+    );
+
     let updateNumber = 0;
 
     const player = new Player({ plugins: [plugin] });
