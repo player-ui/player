@@ -1,3 +1,43 @@
+# 0.11.0-next.0 (Tue Mar 18 2025)
+
+### Release Notes
+
+#### Doc Site Updates ([#615](https://github.com/player-ui/player/pull/615))
+
+Doc site: 
+- Fix dark mode styling of next button on landing page demo
+- Fix missing favicon
+- Add more custom styling
+- Close #574 
+- Close #493
+
+#### chat ui storybook ([#611](https://github.com/player-ui/player/pull/611))
+
+- Add new storybook for chat
+- Allow pass in custom plugins for DSL stories
+- fix flatten issue
+
+---
+
+#### 🚀 Enhancement
+
+- Jetpack Compose [#609](https://github.com/player-ui/player/pull/609) ([@A1shK](https://github.com/A1shK) [@brocollie08](https://github.com/brocollie08))
+
+#### 🐛 Bug Fix
+
+- Doc Site Updates [#615](https://github.com/player-ui/player/pull/615) ([@KetanReddy](https://github.com/KetanReddy) [@kharrop](https://github.com/kharrop))
+- chat ui storybook [#611](https://github.com/player-ui/player/pull/611) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+
+#### Authors: 5
+
+- [@A1shK](https://github.com/A1shK)
+- [@brocollie08](https://github.com/brocollie08)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.10.5-next.2 (Mon Mar 10 2025)
 
 #### 🐛 Bug Fix
