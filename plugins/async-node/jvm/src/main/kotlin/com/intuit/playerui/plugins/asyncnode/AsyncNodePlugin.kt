@@ -22,7 +22,7 @@ import kotlinx.serialization.builtins.serializer
 // TODO: This typing is not great - need to fix once web plugin is updated as currently web also supports type Any
 public typealias asyncNodeUpdate = Any?
 
-public typealias AsyncHandler = (node: Node, callback: ((result: Any?) -> Unit)?) -> Any?
+public typealias AsyncHandler = suspend (node: Node, callback: ((result: Any?) -> Unit)?) -> asyncNodeUpdate
 
 public class AsyncNodePlugin(private val asyncHandler: AsyncHandler? = null) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
 
@@ -36,7 +36,7 @@ public class AsyncNodePlugin(private val asyncHandler: AsyncHandler? = null) : J
 
         asyncHandler?.let { asyncHandler ->
             hooks.onAsyncNode.tap("") { _, node, callback ->
-                var result = asyncHandler(node, callback)
+                val result = asyncHandler(node, callback)
                 BailResult.Bail(result)
             }
         }

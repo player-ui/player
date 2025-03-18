@@ -588,8 +588,9 @@ internal class AsyncNodePluginTest : PlayerTest() {
         var deferredResolve: ((asyncNodeUpdate) -> Unit)? = null
         var updateContent: ((asyncNodeUpdate) -> Unit)? = null
 
-        val handler = { node: Node, callback: ((result: Any?) -> Unit)? ->
+        val handler: AsyncHandler = { node: Node, callback: ((result: Any?) -> Unit)? ->
             updateContent = callback
+
             suspendCoroutine { cont ->
                 deferredResolve = { value ->
                     cont.resume(value)
