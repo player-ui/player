@@ -1,39 +1,34 @@
 package com.intuit.playerui.android.reference.assets.action
 
-import android.view.View
-import android.widget.Button
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.SuspendableAsset
-import com.intuit.playerui.android.reference.assets.text.Text
+import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.compose.ComposableAsset
+import com.intuit.playerui.android.compose.compose
+import com.intuit.playerui.android.reference.assets.R
+import com.intuit.playerui.android.reference.assets.XmlAssetStyleParser
 import com.intuit.playerui.plugins.transactions.commitPendingTransaction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 
-class Action(assetContext: AssetContext) : SuspendableAsset<Action.Data>(assetContext, Data.serializer()) {
+class Action(assetContext: AssetContext) : ComposableAsset<Action.Data>(assetContext, Data.serializer()) {
 
     @Serializable
     data class Data(
-        /**
-         * Note: Defining concrete RenderableAsset implementations is **not** recommended.
-         * However, sometimes there are constraints that require certain asset slots to
-         * follow a certain representation. For example, the Android Button requires some
-         * text representation for the label. With this limited asset set, we can assert
-         * that the label is an instance of the Text asset so that we can get the underlying
-         * value of the asset.
-         *
-         * To that effect, deserializing into a concrete RenderableAsset implementation
-         * requires some overhead to discourage such uses. You must either add the
-         * ```
-         * @Serializable(ContextualSerializer::class)
-         * ```
-         * annotation to the concrete implementation class or add `@Contextual` to the
-         * actual value to ensure that the value is deserialized using a contextual
-         * serializer.
-         */
-        val label: @Contextual Text? = null,
+        val label: RenderableAsset? = null,
         private val run: () -> Unit,
     ) {
         suspend fun run() = withContext(Dispatchers.Default) {
@@ -41,20 +36,36 @@ class Action(assetContext: AssetContext) : SuspendableAsset<Action.Data>(assetCo
         }
     }
 
-    override suspend fun initView(data: Data) = Button(context)
+    @Composable
+    override fun content(modifier: Modifier, data: Data) {
+        val scope = rememberCoroutineScope()
+        Button(
+            onClick = {
+                beacon("clicked", "button")
+                player.commitPendingTransaction()
+                scope.launch {
+                    data.run()
+                }
+            },
+            modifier = Modifier.fillMaxWidth().testTag("action"),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.Blue,
+            ),
 
-    override suspend fun View.hydrate(data: Data) {
-        require(this is Button)
-
-        data.label?.let {
-            text = it.getData().value
-        }
-
-        setOnClickListener {
-            beacon("clicked", "button")
-            player.commitPendingTransaction()
-            hydrationScope.launch {
-                data.run()
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement =
+                Arrangement.spacedBy(
+                    8.dp,
+                    Alignment.CenterHorizontally,
+                ),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                data.label?.compose(
+                    modifier = Modifier.fillMaxWidth(),
+                    styles = XmlAssetStyleParser(requireContext()).parse(R.style.Text_Action),
+                )
             }
         }
     }

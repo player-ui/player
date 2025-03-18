@@ -6,7 +6,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.get
 import com.intuit.playerui.android.reference.assets.R
 import com.intuit.playerui.android.testutils.asset.AssetTest
-import com.intuit.playerui.android.testutils.asset.shouldBePlayerState
+import com.intuit.playerui.android.testutils.asset.shouldBeAtState
 import com.intuit.playerui.android.testutils.asset.shouldBeView
 import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.player.state.dataModel
@@ -38,13 +38,13 @@ class InputTest : AssetTest("input") {
             setText("text")
         }
 
-        currentState.shouldBePlayerState<InProgressState> {
+        player.shouldBeAtState<InProgressState> {
             assertEquals(null, dataModel.get("foo.bar"))
         }
 
         inputField.clearFocus()
 
-        currentState.shouldBePlayerState<InProgressState> {
+        player.shouldBeAtState<InProgressState> {
             assertEquals("text", dataModel.get("foo.bar"))
         }
     }
@@ -69,13 +69,13 @@ class InputTest : AssetTest("input") {
 
         inputField.type("t")
 
-        currentState.shouldBePlayerState<InProgressState> {
+        player.shouldBeAtState<InProgressState> {
             assertEquals(null, dataModel.get("foo.bar"))
         }
 
         inputField.type("30")
 
-        currentState.shouldBePlayerState<InProgressState> {
+        player.shouldBeAtState<InProgressState> {
             assertEquals(30, dataModel.get("foo.bar"))
         }
     }
