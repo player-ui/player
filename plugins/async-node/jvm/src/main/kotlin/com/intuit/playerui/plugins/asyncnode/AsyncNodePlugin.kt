@@ -1,5 +1,6 @@
 package com.intuit.playerui.plugins.asyncnode
 
+import com.intuit.hooks.BailResult
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.core.bridge.hooks.NodeAsyncParallelBailHook2
@@ -20,7 +21,10 @@ import kotlinx.serialization.builtins.serializer
 
 // TODO: This typing is not great - need to fix once web plugin is updated as currently web also supports type Any
 public typealias asyncNodeUpdate = Any?
-public class AsyncNodePlugin : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
+
+public typealias AsyncHandler = suspend (node: Node, callback: ((result: Any?) -> Unit)?) -> asyncNodeUpdate
+
+public class AsyncNodePlugin(private val asyncHandler: AsyncHandler? = null) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
 
     public lateinit var hooks: Hooks
 
@@ -29,6 +33,13 @@ public class AsyncNodePlugin : JSScriptPluginWrapper(pluginName, sourcePath = bu
         instance = runtime.buildInstance("(new $pluginName({plugins: [new AsyncNodePlugin.AsyncNodePluginPlugin()]}))")
         hooks = instance.getSerializable("hooks", Hooks.serializer())
             ?: throw PlayerException("AsyncNodePlugin is not loaded correctly")
+
+        asyncHandler?.let { asyncHandler ->
+            hooks.onAsyncNode.tap("") { _, node, callback ->
+                val result = asyncHandler(node, callback)
+                BailResult.Bail(result)
+            }
+        }
     }
 
     @Serializable(with = Hooks.Serializer::class)

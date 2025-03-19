@@ -78,10 +78,10 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
      - handler: The callback that is used to tap into the core `onAsyncNode` hook
      exposed to users of the plugin allowing them to supply the replacement node used in the tap callback
      */
-    public convenience init(plugins: [JSBasePlugin] = [AsyncNodePluginPlugin()], _ handler: @escaping AsyncHookHandler) {
+    public convenience init(plugins: [JSBasePlugin] = [AsyncNodePluginPlugin()], asyncHookHandler: AsyncHookHandler? = nil) {
 
         self.init(fileName: "AsyncNodePlugin.native", pluginName: "AsyncNodePlugin.AsyncNodePlugin")
-        self.asyncHookHandler = handler
+        self.asyncHookHandler = asyncHookHandler
         self.plugins = plugins
     }
 
@@ -91,16 +91,13 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
         if let pluginRef = pluginRef {
             self.hooks = AsyncNodeHook(onAsyncNode: AsyncHook2(baseValue: pluginRef, name: "onAsyncNode"))
         }
-
-        hooks?.onAsyncNode.tap({ node, callback in
-            // hook value is the original node
-            guard let asyncHookHandler = self.asyncHookHandler else {
-                return JSValue()
+        
+        if let asyncHookHandler = self.asyncHookHandler {
+            hooks?.onAsyncNode.tap { node, callback in
+                let replacementNode = try await asyncHookHandler(node, callback)
+                return replacementNode.handlerTypeToJSValue(context: context) ?? JSValue()
             }
-
-            let replacementNode = try await (asyncHookHandler)(node, callback)
-            return replacementNode.handlerTypeToJSValue(context:context) ?? JSValue()
-        })
+        }
     }
 
     /**
