@@ -13,8 +13,8 @@ import { ApplicabilityPlugin, MultiNodePlugin, StringResolverPlugin } from "..";
 const parseBinding = new BindingParser().parse;
 
 describe("applicability", () => {
-  let model: DataModelWithParser; // need
-  let expressionEvaluator: ExpressionEvaluator; // depends on how applicability is changed?
+  let model: DataModelWithParser;
+  let expressionEvaluator: ExpressionEvaluator;
   let resolverOptions: Resolve.ResolverOptions;
   let parser: Parser;
 
