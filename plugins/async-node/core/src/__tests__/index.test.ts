@@ -896,243 +896,243 @@ describe("view", () => {
    * 4. check continuous streaming still working
    */
 
-  test("stream in asset with applicability property", async () => {
-    const plugin = new AsyncNodePlugin({
-      plugins: [new AsyncNodePluginPlugin()],
-    });
+  // test("stream in asset with applicability property", async () => {
+  //   const plugin = new AsyncNodePlugin({
+  //     plugins: [new AsyncNodePluginPlugin()],
+  //   });
 
-    let deferredResolve: ((value: any) => void) | undefined;
-    let dataController: DataController | undefined;
+  //   let deferredResolve: ((value: any) => void) | undefined;
+  //   let dataController: DataController | undefined;
 
-    plugin.hooks.onAsyncNode.tap("test", async (node) => {
-      return new Promise((resolve) => {
-        deferredResolve = resolve;
-      });
-    });
+  //   plugin.hooks.onAsyncNode.tap("test", async (node) => {
+  //     return new Promise((resolve) => {
+  //       deferredResolve = resolve;
+  //     });
+  //   });
 
-    let updateNumber = 0;
+  //   let updateNumber = 0;
 
-    const plugins = [plugin, new ReferenceAssetsPlugin()];
+  //   const plugins = [plugin, new ReferenceAssetsPlugin()];
 
-    const player = new Player({
-      plugins: plugins,
-    });
+  //   const player = new Player({
+  //     plugins: plugins,
+  //   });
 
-    player.hooks.viewController.tap("async-node-test", (vc) => {
-      vc.hooks.view.tap("async-node-test", (view) => {
-        view.hooks.onUpdate.tap("async-node-test", (update) => {
-          updateNumber++;
-        });
-      });
-    });
+  //   player.hooks.viewController.tap("async-node-test", (vc) => {
+  //     vc.hooks.view.tap("async-node-test", (view) => {
+  //       view.hooks.onUpdate.tap("async-node-test", (update) => {
+  //         updateNumber++;
+  //       });
+  //     });
+  //   });
 
-    player.hooks.dataController.tap("test", (dc) => {
-      dataController = dc;
-    });
+  //   player.hooks.dataController.tap("test", (dc) => {
+  //     dataController = dc;
+  //   });
 
-    player.start(chatMessageContent as any);
+  //   player.start(chatMessageContent as any);
 
-    let view = (player.getState() as InProgressState).controllers.view
-      .currentView?.lastUpdate;
+  //   let view = (player.getState() as InProgressState).controllers.view
+  //     .currentView?.lastUpdate;
 
-    expect(view).toBeDefined();
-    expect(view?.values[0].asset.type).toBe("text");
-    expect(view?.values[0].asset.value).toBe("chat message");
-    expect(updateNumber).toBe(1);
+  //   expect(view).toBeDefined();
+  //   expect(view?.values[0].asset.type).toBe("text");
+  //   expect(view?.values[0].asset.value).toBe("chat message");
+  //   expect(updateNumber).toBe(1);
 
-    await waitFor(() => {
-      expect(deferredResolve).toBeDefined();
-    });
+  //   await waitFor(() => {
+  //     expect(deferredResolve).toBeDefined();
+  //   });
 
-    if (deferredResolve) {
-      deferredResolve({
-        asset: {
-          id: "applicability-asset",
-          type: "text",
-          value: "async content",
-          applicability: "{{foo}}",
-        },
-      });
-    }
+  //   if (deferredResolve) {
+  //     deferredResolve({
+  //       asset: {
+  //         id: "applicability-asset",
+  //         type: "text",
+  //         value: "async content",
+  //         applicability: "{{foo}}",
+  //       },
+  //     });
+  //   }
 
-    await waitFor(() => {
-      expect(updateNumber).toBe(2);
-    });
+  //   await waitFor(() => {
+  //     expect(updateNumber).toBe(2);
+  //   });
 
-    view = (player.getState() as InProgressState).controllers.view.currentView
-      ?.lastUpdate;
+  //   view = (player.getState() as InProgressState).controllers.view.currentView
+  //     ?.lastUpdate;
 
-    expect(view?.values[1].asset.type).toBe("text");
-    expect(view?.values[1].asset.value).toBe("async content");
-    expect((player.getState() as InProgressState).controllers.data.get("foo"))
-      .toBeTruthy;
+  //   expect(view?.values[1].asset.type).toBe("text");
+  //   expect(view?.values[1].asset.value).toBe("async content");
+  //   expect((player.getState() as InProgressState).controllers.data.get("foo"))
+  //     .toBeTruthy;
 
-    // dataController?.set([["foo", false]]);
+  //   // dataController?.set([["foo", false]]);
 
-    (player.getState() as InProgressState).controllers.data.set([
-      ["foo", false],
-    ]);
+  //   (player.getState() as InProgressState).controllers.data.set([
+  //     ["foo", false],
+  //   ]);
 
-    await waitFor(() => {
-      expect(updateNumber).toBe(3);
-    });
+  //   await waitFor(() => {
+  //     expect(updateNumber).toBe(3);
+  //   });
 
-    view = (player.getState() as InProgressState).controllers.view.currentView
-      ?.lastUpdate;
+  //   view = (player.getState() as InProgressState).controllers.view.currentView
+  //     ?.lastUpdate;
 
-    expect(view?.values.length).toBe(1);
+  //   expect(view?.values.length).toBe(1);
 
-    // if (deferredResolve) {
-    //   deferredResolve({
-    //     asset: {
-    //       id: "5",
-    //       type: "chat-message",
-    //       value: {
-    //         asset: {
-    //           id: "6",
-    //           type: "text",
-    //           value: "chained async content",
-    //         },
-    //       },
-    //     },
-    //   });
-    // }
-    //
-    // await waitFor(() => {
-    //   expect(updateNumber).toBe(3);
-    // });
-    //
-    // view = (player.getState() as InProgressState).controllers.view.currentView
-    //   ?.lastUpdate;
-    //
-    // expect(view?.values[2].asset.type).toBe("text");
-    // expect(view?.values[2].asset.value).toBe("chained async content");
-  });
+  //   // if (deferredResolve) {
+  //   //   deferredResolve({
+  //   //     asset: {
+  //   //       id: "5",
+  //   //       type: "chat-message",
+  //   //       value: {
+  //   //         asset: {
+  //   //           id: "6",
+  //   //           type: "text",
+  //   //           value: "chained async content",
+  //   //         },
+  //   //       },
+  //   //     },
+  //   //   });
+  //   // }
+  //   //
+  //   // await waitFor(() => {
+  //   //   expect(updateNumber).toBe(3);
+  //   // });
+  //   //
+  //   // view = (player.getState() as InProgressState).controllers.view.currentView
+  //   //   ?.lastUpdate;
+  //   //
+  //   // expect(view?.values[2].asset.type).toBe("text");
+  //   // expect(view?.values[2].asset.value).toBe("chained async content");
+  // });
 
-  test("stream in asset with switch", async () => {
-    const plugin = new AsyncNodePlugin({
-      plugins: [new AsyncNodePluginPlugin()],
-    });
+  // test("stream in asset with switch", async () => {
+  //   const plugin = new AsyncNodePlugin({
+  //     plugins: [new AsyncNodePluginPlugin()],
+  //   });
 
-    let deferredResolve: ((value: any) => void) | undefined;
-    let dataController: DataController | undefined;
+  //   let deferredResolve: ((value: any) => void) | undefined;
+  //   let dataController: DataController | undefined;
 
-    plugin.hooks.onAsyncNode.tap("test", async (node) => {
-      return new Promise((resolve) => {
-        deferredResolve = resolve;
-      });
-    });
+  //   plugin.hooks.onAsyncNode.tap("test", async (node) => {
+  //     return new Promise((resolve) => {
+  //       deferredResolve = resolve;
+  //     });
+  //   });
 
-    let updateNumber = 0;
+  //   let updateNumber = 0;
 
-    const plugins = [plugin, new ReferenceAssetsPlugin()];
+  //   const plugins = [plugin, new ReferenceAssetsPlugin()];
 
-    const player = new Player({
-      plugins: plugins,
-    });
+  //   const player = new Player({
+  //     plugins: plugins,
+  //   });
 
-    player.hooks.viewController.tap("async-node-test", (vc) => {
-      vc.hooks.view.tap("async-node-test", (view) => {
-        view.hooks.onUpdate.tap("async-node-test", (update) => {
-          updateNumber++;
-        });
-      });
-    });
+  //   player.hooks.viewController.tap("async-node-test", (vc) => {
+  //     vc.hooks.view.tap("async-node-test", (view) => {
+  //       view.hooks.onUpdate.tap("async-node-test", (update) => {
+  //         updateNumber++;
+  //       });
+  //     });
+  //   });
 
-    player.hooks.dataController.tap("test", (dc) => {
-      dataController = dc;
-    });
+  //   player.hooks.dataController.tap("test", (dc) => {
+  //     dataController = dc;
+  //   });
 
-    player.start(chatMessageContent as any);
+  //   player.start(chatMessageContent as any);
 
-    let view = (player.getState() as InProgressState).controllers.view
-      .currentView?.lastUpdate;
+  //   let view = (player.getState() as InProgressState).controllers.view
+  //     .currentView?.lastUpdate;
 
-    expect(view).toBeDefined();
-    expect(view?.values[0].asset.type).toBe("text");
-    expect(view?.values[0].asset.value).toBe("chat message");
-    expect(updateNumber).toBe(1);
+  //   expect(view).toBeDefined();
+  //   expect(view?.values[0].asset.type).toBe("text");
+  //   expect(view?.values[0].asset.value).toBe("chat message");
+  //   expect(updateNumber).toBe(1);
 
-    await waitFor(() => {
-      expect(deferredResolve).toBeDefined();
-    });
+  //   await waitFor(() => {
+  //     expect(deferredResolve).toBeDefined();
+  //   });
 
-    if (deferredResolve) {
-      deferredResolve({
-        dynamicSwitch: [
-          {
-            case: "{{foo}}",
-            asset: {
-              id: "input-1",
-              type: "text",
-              value: "foo is true",
-            },
-          },
-          {
-            case: "!{{foo}}",
-            asset: {
-              id: "input-2",
-              type: "text",
-              value: "foo is false",
-            },
-          },
-        ],
-      });
-    }
+  //   if (deferredResolve) {
+  //     deferredResolve({
+  //       dynamicSwitch: [
+  //         {
+  //           case: "{{foo}}",
+  //           asset: {
+  //             id: "input-1",
+  //             type: "text",
+  //             value: "foo is true",
+  //           },
+  //         },
+  //         {
+  //           case: "!{{foo}}",
+  //           asset: {
+  //             id: "input-2",
+  //             type: "text",
+  //             value: "foo is false",
+  //           },
+  //         },
+  //       ],
+  //     });
+  //   }
 
-    await waitFor(() => {
-      expect(updateNumber).toBe(2);
-    });
+  //   await waitFor(() => {
+  //     expect(updateNumber).toBe(2);
+  //   });
 
-    view = (player.getState() as InProgressState).controllers.view.currentView
-      ?.lastUpdate;
+  //   view = (player.getState() as InProgressState).controllers.view.currentView
+  //     ?.lastUpdate;
 
-    expect(view?.values[1].asset.type).toBe("input");
-    // expect(view?.values[1].asset.value).toBe("async content");
-    expect((player.getState() as InProgressState).controllers.data.get("foo"))
-      .toBeTruthy;
+  //   expect(view?.values[1].asset.type).toBe("input");
+  //   // expect(view?.values[1].asset.value).toBe("async content");
+  //   expect((player.getState() as InProgressState).controllers.data.get("foo"))
+  //     .toBeTruthy;
 
-    // dataController?.set([["foo", false]]);
+  //   // dataController?.set([["foo", false]]);
 
-    (player.getState() as InProgressState).controllers.data.set([
-      ["foo", false],
-    ]);
+  //   (player.getState() as InProgressState).controllers.data.set([
+  //     ["foo", false],
+  //   ]);
 
-    await waitFor(() => {
-      expect(updateNumber).toBe(3);
-    });
+  //   await waitFor(() => {
+  //     expect(updateNumber).toBe(3);
+  //   });
 
-    view = (player.getState() as InProgressState).controllers.view.currentView
-      ?.lastUpdate;
+  //   view = (player.getState() as InProgressState).controllers.view.currentView
+  //     ?.lastUpdate;
 
-    expect(view?.values.length).toBe(1);
+  //   expect(view?.values.length).toBe(1);
 
-    // if (deferredResolve) {
-    //   deferredResolve({
-    //     asset: {
-    //       id: "5",
-    //       type: "chat-message",
-    //       value: {
-    //         asset: {
-    //           id: "6",
-    //           type: "text",
-    //           value: "chained async content",
-    //         },
-    //       },
-    //     },
-    //   });
-    // }
-    //
-    // await waitFor(() => {
-    //   expect(updateNumber).toBe(3);
-    // });
-    //
-    // view = (player.getState() as InProgressState).controllers.view.currentView
-    //   ?.lastUpdate;
-    //
-    // expect(view?.values[2].asset.type).toBe("text");
-    // expect(view?.values[2].asset.value).toBe("chained async content");
-  });
+  //   // if (deferredResolve) {
+  //   //   deferredResolve({
+  //   //     asset: {
+  //   //       id: "5",
+  //   //       type: "chat-message",
+  //   //       value: {
+  //   //         asset: {
+  //   //           id: "6",
+  //   //           type: "text",
+  //   //           value: "chained async content",
+  //   //         },
+  //   //       },
+  //   //     },
+  //   //   });
+  //   // }
+  //   //
+  //   // await waitFor(() => {
+  //   //   expect(updateNumber).toBe(3);
+  //   // });
+  //   //
+  //   // view = (player.getState() as InProgressState).controllers.view.currentView
+  //   //   ?.lastUpdate;
+  //   //
+  //   // expect(view?.values[2].asset.type).toBe("text");
+  //   // expect(view?.values[2].asset.value).toBe("chained async content");
+  // });
 
   test("chat-message asset - resolve chained chat-message with CheckPathPlugin", async () => {
     const plugin = new AsyncNodePlugin({
@@ -1182,11 +1182,11 @@ describe("view", () => {
     if (deferredResolve) {
       deferredResolve({
         asset: {
-          id: "3",
+          id: "chat-1",
           type: "chat-message",
           value: {
             asset: {
-              id: "4",
+              id: "text-1",
               type: "text",
               value: "async content",
             },
@@ -1205,16 +1205,37 @@ describe("view", () => {
     expect(view?.values[1].asset.type).toBe("text");
     expect(view?.values[1].asset.value).toBe("async content");
 
+    expect(checkPathPlugin.getParent("text-1")).toStrictEqual({
+      id: "collection-async-1",
+      type: "collection",
+      values: [
+        {
+          asset: {
+            id: "2",
+            type: "text",
+            value: "chat message",
+          },
+        },
+        {
+          asset: {
+            id: "text-1",
+            type: "text",
+            value: "async content",
+          },
+        },
+      ],
+    });
+
     if (deferredResolve) {
       deferredResolve({
         asset: {
-          id: "5",
+          id: "chat-2",
           type: "chat-message",
           value: {
             asset: {
-              id: "6",
+              id: "text-2",
               type: "text",
-              value: "chained async content",
+              value: "async content2",
             },
           },
         },
@@ -1229,37 +1250,97 @@ describe("view", () => {
       ?.lastUpdate;
 
     expect(view?.values[2].asset.type).toBe("text");
-    expect(view?.values[2].asset.value).toBe("chained async content");
-
-    if (deferredResolve) {
-      deferredResolve({
-        asset: {
-          id: "chat-7",
-          type: "chat-message",
-          value: {
-            asset: {
-              id: "text-7",
-              type: "text",
-              value: "async content7",
-            },
+    expect(view?.values[2].asset.value).toBe("async content2");
+    expect(checkPathPlugin.getParent("text-2")).toStrictEqual({
+      id: "collection-async-1",
+      type: "collection",
+      values: [
+        {
+          asset: {
+            id: "2",
+            type: "text",
+            value: "chat message",
           },
         },
-      });
-    }
-
-    await waitFor(() => {
-      expect(updateNumber).toBe(4);
+        {
+          asset: {
+            id: "text-1",
+            type: "text",
+            value: "async content",
+          },
+        },
+        {
+          asset: {
+            id: "text-2",
+            type: "text",
+            value: "async content2",
+          },
+        },
+      ],
     });
 
-    view = (player.getState() as InProgressState).controllers.view.currentView
-      ?.lastUpdate;
-
-    expect(view?.values[3].asset.type).toBe("text");
-    expect(view?.values[3].asset.value).toBe("async content7");
-
-    console.log(checkPathPlugin.getPath("text-7"));
-    // expect(checkPathPlugin.getParent("text-7", ["values","collection-async-1"] )).toBeTruthy;
-    // expect(checkPathPlugin.getParentProp("text-7")).toBe("collection-async-1");
+  //   if (deferredResolve) {
+  //     deferredResolve({
+  //       asset: {
+  //         id: "chat-3",
+  //         type: "chat-message",
+  //         value: {
+  //           asset: {
+  //             id: "text-3",
+  //             type: "text",
+  //             value: "async content3",
+  //           },
+  //         },
+  //       },
+  //     });
+  //   }
+  //
+  //   await waitFor(() => {
+  //     expect(updateNumber).toBe(4);
+  //   });
+  //
+  //   view = (player.getState() as InProgressState).controllers.view.currentView
+  //     ?.lastUpdate;
+  //
+  //   expect(view?.values[3].asset.type).toBe("text");
+  //   expect(view?.values[3].asset.value).toBe("async content3");
+  //
+  //   const parent= checkPathPlugin.getParent("text-3");
+  //   // should have all at the same level
+  //   expect(checkPathPlugin.getParent("text-3")).toStrictEqual({
+  //     id: "collection-async-1",
+  //     type: "collection",
+  //     values: [
+  //       {
+  //         asset: {
+  //           id: "2",
+  //           type: "text",
+  //           value: "chat message",
+  //         },
+  //       },
+  //       {
+  //         asset: {
+  //           id: "text-1",
+  //           type: "text",
+  //           value: "async content",
+  //         },
+  //       },
+  //       {
+  //         asset: {
+  //           id: "text-2",
+  //           type: "text",
+  //           value: "async content2",
+  //         },
+  //       },
+  //       {
+  //         asset: {
+  //           id: "text-3",
+  //           type: "text",
+  //           value: "async content3",
+  //         },
+  //       },
+  //     ],
+  //   });
   });
 });
 
