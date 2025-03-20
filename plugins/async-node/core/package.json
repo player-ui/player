@@ -6,7 +6,8 @@
       "@player-ui/player": "workspace:*"
     },
     "devDependencies": {
-      "@player-ui/reference-assets-plugin": "workspace:*"
+      "@player-ui/reference-assets-plugin": "workspace:*", 
+      "@player-ui/check-path-plugin": "workspace:*"
     }
   }
   

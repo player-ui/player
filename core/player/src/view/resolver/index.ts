@@ -167,6 +167,7 @@ export class Resolver {
     );
     this.resolveCache = resolveCache;
     this.hooks.afterUpdate.call(updated.value);
+    // why multinode without switch
     return updated.value;
   }
 
@@ -205,6 +206,7 @@ export class Resolver {
       this.idCache.add(id);
     }
 
+    // resolveCache doesn't have the applicability mapping
     return this.resolveCache.get(node);
   }
 
@@ -269,6 +271,7 @@ export class Resolver {
       ...this.cloneNode(node),
       parent: partiallyResolvedParent,
     };
+    // call before resolve and get async node mapping from asyncnode plugin
     const resolvedAST = this.hooks.beforeResolve.call(
       clonedNode,
       resolveOptions,
@@ -440,6 +443,8 @@ export class Resolver {
 
       resolvedAST.values = newValues;
       resolved = childValue;
+    } else if (resolvedAST.type === NodeType.Switch) {
+
     }
 
     childDependencies.forEach((bindingDep) =>
