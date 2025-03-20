@@ -281,9 +281,13 @@ export class Resolver {
 
     const isNestedMultiNode =
       resolvedAST.type === NodeType.MultiNode &&
-      partiallyResolvedParent?.parent?.type === NodeType.MultiNode &&
-      partiallyResolvedParent.type === NodeType.Value;
+      partiallyResolvedParent?.parent?.parent?.type === NodeType.MultiNode &&
+      partiallyResolvedParent.parent.type === NodeType.Value;
 
+    // const isNestedMultiNode =
+    // resolvedAST.type === NodeType.MultiNode &&
+    // partiallyResolvedParent?.parent?.parent?.type === NodeType.MultiNode &&
+    // partiallyResolvedParent.parent.type === NodeType.Value;
     if (previousResult && shouldUseLastValue) {
       const update = {
         ...previousResult,
@@ -336,9 +340,11 @@ export class Resolver {
 
       return update;
     }
-
-    resolvedAST.parent = partiallyResolvedParent;
-
+    if (isNestedMultiNode) {
+      resolvedAST.parent = partiallyResolvedParent.parent;
+    } else {
+      resolvedAST.parent = partiallyResolvedParent;
+    }
     resolveOptions.node = resolvedAST;
 
     this.ASTMap.set(resolvedAST, node);
@@ -398,8 +404,9 @@ export class Resolver {
       resolvedAST.children = newChildren;
     } else if (resolvedAST.type === NodeType.MultiNode) {
       const childValue: any = [];
+      // change parent resolvedAST: [newAsset, async] -> for this case, we want to add each child to the root parent not multinode. partiallyResolvedParent: new collection asset then should be partiallyResolvedParent.parent.parent multinode
       const rawParentToPassIn = isNestedMultiNode
-        ? partiallyResolvedParent?.parent
+        ? partiallyResolvedParent?.parent?.parent
         : node;
 
       const newValues = resolvedAST.values.map((mValue) => {
@@ -426,7 +433,27 @@ export class Resolver {
             mTree.value.asset &&
             Array.isArray(mTree.value.asset.values)
           ) {
+            // this only changed the values not node structure
             unpackAndPush(mTree.value, childValue);
+            // // mtree node check - mtree node is generated collection
+            // if (mTree.node && mTree.node.children) {
+            //   // const childNode = this.cloneNode(mTree.node.children);
+            //   // flattenNode(mTree, mTree.node.parent);
+            //   mTree.node.children[0].value.children[0].value.values.forEach((i: any) => {
+            //     i.parent = mTree.node.parent
+            //   })
+            // }
+            // }
+            //
+            // // if (childNode.type === NodeType.MultiNode && !childNode.override) {
+            // //   const arr = addLast(
+            // //       dlv(resolved, child.path as any[], []),
+            // //       childValue,
+            // //   );
+            // //   resolved = setIn(resolved, child.path, arr);
+            // // } else {
+            // //   resolved = setIn(resolved, child.path, childValue);
+            // // }
           } else {
             childValue.push(mTree.value);
           }
@@ -443,8 +470,6 @@ export class Resolver {
 
       resolvedAST.values = newValues;
       resolved = childValue;
-    } else if (resolvedAST.type === NodeType.Switch) {
-
     }
 
     childDependencies.forEach((bindingDep) =>
@@ -472,9 +497,10 @@ export class Resolver {
       ]),
     };
 
+    // afternodeupdate what isNested using here?
     this.hooks.afterNodeUpdate.call(
       node,
-      isNestedMultiNode ? partiallyResolvedParent?.parent : rawParent,
+      isNestedMultiNode ? partiallyResolvedParent?.parent?.parent : rawParent,
       update,
     );
     cacheUpdate.set(node, update);

@@ -1,9 +1,10 @@
 import { expect, test, describe } from "vitest";
-import { Node, InProgressState } from "@player-ui/player";
-import { Player, Parser } from "@player-ui/player";
+import { Node, InProgressState, ViewInstance } from "@player-ui/player";
+import { Player, Parser, DataController } from "@player-ui/player";
 import { waitFor } from "@testing-library/react";
 import { AsyncNodePlugin, AsyncNodePluginPlugin } from "../index";
 import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin";
+import { CheckPathPlugin } from "@player-ui/check-path-plugin";
 
 describe("view", () => {
   const basicFRFWithActions = {
@@ -54,6 +55,9 @@ describe("view", () => {
         },
       },
     ],
+    data: {
+      foo: true,
+    },
     navigation: {
       BEGIN: "FLOW_1",
       FLOW_1: {
@@ -99,8 +103,11 @@ describe("view", () => {
 
     const player = new Player({ plugins: [plugin] });
 
+    let viewInstance: ViewInstance | undefined;
+
     player.hooks.viewController.tap("async-node-test", (vc) => {
       vc.hooks.view.tap("async-node-test", (view) => {
+        viewInstance = view;
         view.hooks.onUpdate.tap("async-node-test", () => {
           updateNumber++;
         });
@@ -243,92 +250,6 @@ describe("view", () => {
     expect(view?.actions[1]).toBeUndefined();
   });
 
-  test("can handle multiple updates through callback mechanism - init with handler", async () => {
-    let deferredResolve: ((value: any) => void) | undefined;
-
-    let updateContent: any;
-
-    const asyncHandler = (
-      node: Node.Async,
-      callback: (content: any) => void,
-    ) => {
-      const result = new Promise((resolve) => {
-        deferredResolve = resolve; // Promise would be resolved only once
-      });
-
-      updateContent = callback;
-      // Return the result to follow the same mechanism as before
-      return result;
-    };
-
-    const plugin = new AsyncNodePlugin(
-      {
-        plugins: [new AsyncNodePluginPlugin()],
-      },
-      asyncHandler,
-    );
-
-    let updateNumber = 0;
-
-    const player = new Player({ plugins: [plugin] });
-
-    player.hooks.viewController.tap("async-node-test", (vc) => {
-      vc.hooks.view.tap("async-node-test", (view) => {
-        view.hooks.onUpdate.tap("async-node-test", (update) => {
-          updateNumber++;
-        });
-      });
-    });
-
-    player.start(basicFRFWithActions as any);
-
-    let view = (player.getState() as InProgressState).controllers.view
-      .currentView?.lastUpdate;
-
-    expect(view).toBeDefined();
-    expect(view?.actions[1]).toBeUndefined();
-
-    await waitFor(() => {
-      expect(updateNumber).toBe(1);
-      expect(deferredResolve).toBeDefined();
-    });
-
-    if (deferredResolve) {
-      deferredResolve({
-        asset: {
-          id: "next-label-action",
-          type: "action",
-          value: "dummy value",
-        },
-      });
-    }
-
-    await waitFor(() => {
-      expect(updateNumber).toBe(2);
-    });
-
-    view = (player.getState() as InProgressState).controllers.view.currentView
-      ?.lastUpdate;
-
-    expect(view?.actions[0].asset.type).toBe("action");
-    expect(view?.actions[1].asset.type).toBe("action");
-    expect(updateNumber).toBe(2);
-
-    if (deferredResolve) {
-      updateContent(null);
-    }
-
-    await waitFor(() => {
-      expect(updateNumber).toBe(3);
-    });
-
-    view = (player.getState() as InProgressState).controllers.view.currentView
-      ?.lastUpdate;
-
-    expect(view?.actions[0].asset.type).toBe("action");
-    expect(view?.actions[1]).toBeUndefined();
-  });
-
   test("replaces async nodes with provided node", async () => {
     const plugin = new AsyncNodePlugin({
       plugins: [new AsyncNodePluginPlugin()],
@@ -341,69 +262,6 @@ describe("view", () => {
         deferredResolve = resolve;
       });
     });
-    let updateNumber = 0;
-
-    const player = new Player({ plugins: [plugin] });
-
-    player.hooks.viewController.tap("async-node-test", (vc) => {
-      vc.hooks.view.tap("async-node-test", (view) => {
-        view.hooks.onUpdate.tap("async-node-test", (update) => {
-          updateNumber++;
-        });
-      });
-    });
-
-    player.start(basicFRFWithActions as any);
-
-    let view = (player.getState() as InProgressState).controllers.view
-      .currentView?.lastUpdate;
-
-    expect(view).toBeDefined();
-    expect(view?.actions[0].asset.type).toBe("action");
-    expect(view?.actions[1]).toBeUndefined();
-    expect(updateNumber).toBe(1);
-
-    await waitFor(() => {
-      expect(deferredResolve).toBeDefined();
-    });
-
-    if (deferredResolve) {
-      deferredResolve({
-        asset: {
-          id: "next-label-action",
-          type: "action",
-          value: "dummy value",
-        },
-      });
-    }
-
-    await waitFor(() => {
-      expect(updateNumber).toBe(2);
-    });
-
-    view = (player.getState() as InProgressState).controllers.view.currentView
-      ?.lastUpdate;
-
-    expect(view?.actions[0].asset.type).toBe("action");
-    expect(view?.actions[1].asset.type).toBe("action");
-  });
-
-  test("init with handler", async () => {
-    let deferredResolve: ((value: any) => void) | undefined;
-
-    const asyncHandler = (node: Node.Async) => {
-      return new Promise((resolve) => {
-        deferredResolve = resolve;
-      });
-    };
-
-    const plugin = new AsyncNodePlugin(
-      {
-        plugins: [new AsyncNodePluginPlugin()],
-      },
-      asyncHandler,
-    );
-
     let updateNumber = 0;
 
     const player = new Player({ plugins: [plugin] });
@@ -1028,6 +886,461 @@ describe("view", () => {
 
     expect(view?.values[2].asset.type).toBe("text");
     expect(view?.values[2].asset.value).toBe("chained async content");
+  });
+
+  /**
+   * 0. test setup: applicability plugin - default plugin, how to access model and update - done
+   * 1. replace async nodes with an asset with applicability - done
+   * 2. update the binding of asset through data controller. hooks.datacontroller?
+   * 3. check what's in the view
+   * 4. check continuous streaming still working
+   */
+
+  // test("stream in asset with applicability property", async () => {
+  //   const plugin = new AsyncNodePlugin({
+  //     plugins: [new AsyncNodePluginPlugin()],
+  //   });
+
+  //   let deferredResolve: ((value: any) => void) | undefined;
+  //   let dataController: DataController | undefined;
+
+  //   plugin.hooks.onAsyncNode.tap("test", async (node) => {
+  //     return new Promise((resolve) => {
+  //       deferredResolve = resolve;
+  //     });
+  //   });
+
+  //   let updateNumber = 0;
+
+  //   const plugins = [plugin, new ReferenceAssetsPlugin()];
+
+  //   const player = new Player({
+  //     plugins: plugins,
+  //   });
+
+  //   player.hooks.viewController.tap("async-node-test", (vc) => {
+  //     vc.hooks.view.tap("async-node-test", (view) => {
+  //       view.hooks.onUpdate.tap("async-node-test", (update) => {
+  //         updateNumber++;
+  //       });
+  //     });
+  //   });
+
+  //   player.hooks.dataController.tap("test", (dc) => {
+  //     dataController = dc;
+  //   });
+
+  //   player.start(chatMessageContent as any);
+
+  //   let view = (player.getState() as InProgressState).controllers.view
+  //     .currentView?.lastUpdate;
+
+  //   expect(view).toBeDefined();
+  //   expect(view?.values[0].asset.type).toBe("text");
+  //   expect(view?.values[0].asset.value).toBe("chat message");
+  //   expect(updateNumber).toBe(1);
+
+  //   await waitFor(() => {
+  //     expect(deferredResolve).toBeDefined();
+  //   });
+
+  //   if (deferredResolve) {
+  //     deferredResolve({
+  //       asset: {
+  //         id: "applicability-asset",
+  //         type: "text",
+  //         value: "async content",
+  //         applicability: "{{foo}}",
+  //       },
+  //     });
+  //   }
+
+  //   await waitFor(() => {
+  //     expect(updateNumber).toBe(2);
+  //   });
+
+  //   view = (player.getState() as InProgressState).controllers.view.currentView
+  //     ?.lastUpdate;
+
+  //   expect(view?.values[1].asset.type).toBe("text");
+  //   expect(view?.values[1].asset.value).toBe("async content");
+  //   expect((player.getState() as InProgressState).controllers.data.get("foo"))
+  //     .toBeTruthy;
+
+  //   // dataController?.set([["foo", false]]);
+
+  //   (player.getState() as InProgressState).controllers.data.set([
+  //     ["foo", false],
+  //   ]);
+
+  //   await waitFor(() => {
+  //     expect(updateNumber).toBe(3);
+  //   });
+
+  //   view = (player.getState() as InProgressState).controllers.view.currentView
+  //     ?.lastUpdate;
+
+  //   expect(view?.values.length).toBe(1);
+
+  //   // if (deferredResolve) {
+  //   //   deferredResolve({
+  //   //     asset: {
+  //   //       id: "5",
+  //   //       type: "chat-message",
+  //   //       value: {
+  //   //         asset: {
+  //   //           id: "6",
+  //   //           type: "text",
+  //   //           value: "chained async content",
+  //   //         },
+  //   //       },
+  //   //     },
+  //   //   });
+  //   // }
+  //   //
+  //   // await waitFor(() => {
+  //   //   expect(updateNumber).toBe(3);
+  //   // });
+  //   //
+  //   // view = (player.getState() as InProgressState).controllers.view.currentView
+  //   //   ?.lastUpdate;
+  //   //
+  //   // expect(view?.values[2].asset.type).toBe("text");
+  //   // expect(view?.values[2].asset.value).toBe("chained async content");
+  // });
+
+  // test("stream in asset with switch", async () => {
+  //   const plugin = new AsyncNodePlugin({
+  //     plugins: [new AsyncNodePluginPlugin()],
+  //   });
+
+  //   let deferredResolve: ((value: any) => void) | undefined;
+  //   let dataController: DataController | undefined;
+
+  //   plugin.hooks.onAsyncNode.tap("test", async (node) => {
+  //     return new Promise((resolve) => {
+  //       deferredResolve = resolve;
+  //     });
+  //   });
+
+  //   let updateNumber = 0;
+
+  //   const plugins = [plugin, new ReferenceAssetsPlugin()];
+
+  //   const player = new Player({
+  //     plugins: plugins,
+  //   });
+
+  //   player.hooks.viewController.tap("async-node-test", (vc) => {
+  //     vc.hooks.view.tap("async-node-test", (view) => {
+  //       view.hooks.onUpdate.tap("async-node-test", (update) => {
+  //         updateNumber++;
+  //       });
+  //     });
+  //   });
+
+  //   player.hooks.dataController.tap("test", (dc) => {
+  //     dataController = dc;
+  //   });
+
+  //   player.start(chatMessageContent as any);
+
+  //   let view = (player.getState() as InProgressState).controllers.view
+  //     .currentView?.lastUpdate;
+
+  //   expect(view).toBeDefined();
+  //   expect(view?.values[0].asset.type).toBe("text");
+  //   expect(view?.values[0].asset.value).toBe("chat message");
+  //   expect(updateNumber).toBe(1);
+
+  //   await waitFor(() => {
+  //     expect(deferredResolve).toBeDefined();
+  //   });
+
+  //   if (deferredResolve) {
+  //     deferredResolve({
+  //       dynamicSwitch: [
+  //         {
+  //           case: "{{foo}}",
+  //           asset: {
+  //             id: "input-1",
+  //             type: "text",
+  //             value: "foo is true",
+  //           },
+  //         },
+  //         {
+  //           case: "!{{foo}}",
+  //           asset: {
+  //             id: "input-2",
+  //             type: "text",
+  //             value: "foo is false",
+  //           },
+  //         },
+  //       ],
+  //     });
+  //   }
+
+  //   await waitFor(() => {
+  //     expect(updateNumber).toBe(2);
+  //   });
+
+  //   view = (player.getState() as InProgressState).controllers.view.currentView
+  //     ?.lastUpdate;
+
+  //   expect(view?.values[1].asset.type).toBe("input");
+  //   // expect(view?.values[1].asset.value).toBe("async content");
+  //   expect((player.getState() as InProgressState).controllers.data.get("foo"))
+  //     .toBeTruthy;
+
+  //   // dataController?.set([["foo", false]]);
+
+  //   (player.getState() as InProgressState).controllers.data.set([
+  //     ["foo", false],
+  //   ]);
+
+  //   await waitFor(() => {
+  //     expect(updateNumber).toBe(3);
+  //   });
+
+  //   view = (player.getState() as InProgressState).controllers.view.currentView
+  //     ?.lastUpdate;
+
+  //   expect(view?.values.length).toBe(1);
+
+  //   // if (deferredResolve) {
+  //   //   deferredResolve({
+  //   //     asset: {
+  //   //       id: "5",
+  //   //       type: "chat-message",
+  //   //       value: {
+  //   //         asset: {
+  //   //           id: "6",
+  //   //           type: "text",
+  //   //           value: "chained async content",
+  //   //         },
+  //   //       },
+  //   //     },
+  //   //   });
+  //   // }
+  //   //
+  //   // await waitFor(() => {
+  //   //   expect(updateNumber).toBe(3);
+  //   // });
+  //   //
+  //   // view = (player.getState() as InProgressState).controllers.view.currentView
+  //   //   ?.lastUpdate;
+  //   //
+  //   // expect(view?.values[2].asset.type).toBe("text");
+  //   // expect(view?.values[2].asset.value).toBe("chained async content");
+  // });
+
+  test("chat-message asset - resolve chained chat-message with CheckPathPlugin", async () => {
+    const plugin = new AsyncNodePlugin({
+      plugins: [new AsyncNodePluginPlugin()],
+    });
+
+    let deferredResolve: ((value: any) => void) | undefined;
+
+    plugin.hooks.onAsyncNode.tap("test", async (node) => {
+      return new Promise((resolve) => {
+        deferredResolve = resolve;
+      });
+    });
+
+    let updateNumber = 0;
+
+    const checkPathPlugin = new CheckPathPlugin();
+
+    const plugins = [plugin, new ReferenceAssetsPlugin(), checkPathPlugin];
+
+    const player = new Player({
+      plugins: plugins,
+    });
+
+    player.hooks.viewController.tap("async-node-test", (vc) => {
+      vc.hooks.view.tap("async-node-test", (view) => {
+        view.hooks.onUpdate.tap("async-node-test", (update) => {
+          updateNumber++;
+        });
+      });
+    });
+
+    player.start(chatMessageContent as any);
+
+    let view = (player.getState() as InProgressState).controllers.view
+      .currentView?.lastUpdate;
+
+    expect(view).toBeDefined();
+    expect(view?.values[0].asset.type).toBe("text");
+    expect(view?.values[0].asset.value).toBe("chat message");
+    expect(updateNumber).toBe(1);
+
+    await waitFor(() => {
+      expect(deferredResolve).toBeDefined();
+    });
+
+    if (deferredResolve) {
+      deferredResolve({
+        asset: {
+          id: "chat-1",
+          type: "chat-message",
+          value: {
+            asset: {
+              id: "text-1",
+              type: "text",
+              value: "async content",
+            },
+          },
+        },
+      });
+    }
+
+    await waitFor(() => {
+      expect(updateNumber).toBe(2);
+    });
+
+    view = (player.getState() as InProgressState).controllers.view.currentView
+      ?.lastUpdate;
+
+    expect(view?.values[1].asset.type).toBe("text");
+    expect(view?.values[1].asset.value).toBe("async content");
+
+    expect(checkPathPlugin.getParent("text-1")).toStrictEqual({
+      id: "collection-async-1",
+      type: "collection",
+      values: [
+        {
+          asset: {
+            id: "2",
+            type: "text",
+            value: "chat message",
+          },
+        },
+        {
+          asset: {
+            id: "text-1",
+            type: "text",
+            value: "async content",
+          },
+        },
+      ],
+    });
+
+    if (deferredResolve) {
+      deferredResolve({
+        asset: {
+          id: "chat-2",
+          type: "chat-message",
+          value: {
+            asset: {
+              id: "text-2",
+              type: "text",
+              value: "async content2",
+            },
+          },
+        },
+      });
+    }
+
+    await waitFor(() => {
+      expect(updateNumber).toBe(3);
+    });
+
+    view = (player.getState() as InProgressState).controllers.view.currentView
+      ?.lastUpdate;
+
+    expect(view?.values[2].asset.type).toBe("text");
+    expect(view?.values[2].asset.value).toBe("async content2");
+    expect(checkPathPlugin.getParent("text-2")).toStrictEqual({
+      id: "collection-async-1",
+      type: "collection",
+      values: [
+        {
+          asset: {
+            id: "2",
+            type: "text",
+            value: "chat message",
+          },
+        },
+        {
+          asset: {
+            id: "text-1",
+            type: "text",
+            value: "async content",
+          },
+        },
+        {
+          asset: {
+            id: "text-2",
+            type: "text",
+            value: "async content2",
+          },
+        },
+      ],
+    });
+
+  //   if (deferredResolve) {
+  //     deferredResolve({
+  //       asset: {
+  //         id: "chat-3",
+  //         type: "chat-message",
+  //         value: {
+  //           asset: {
+  //             id: "text-3",
+  //             type: "text",
+  //             value: "async content3",
+  //           },
+  //         },
+  //       },
+  //     });
+  //   }
+  //
+  //   await waitFor(() => {
+  //     expect(updateNumber).toBe(4);
+  //   });
+  //
+  //   view = (player.getState() as InProgressState).controllers.view.currentView
+  //     ?.lastUpdate;
+  //
+  //   expect(view?.values[3].asset.type).toBe("text");
+  //   expect(view?.values[3].asset.value).toBe("async content3");
+  //
+  //   const parent= checkPathPlugin.getParent("text-3");
+  //   // should have all at the same level
+  //   expect(checkPathPlugin.getParent("text-3")).toStrictEqual({
+  //     id: "collection-async-1",
+  //     type: "collection",
+  //     values: [
+  //       {
+  //         asset: {
+  //           id: "2",
+  //           type: "text",
+  //           value: "chat message",
+  //         },
+  //       },
+  //       {
+  //         asset: {
+  //           id: "text-1",
+  //           type: "text",
+  //           value: "async content",
+  //         },
+  //       },
+  //       {
+  //         asset: {
+  //           id: "text-2",
+  //           type: "text",
+  //           value: "async content2",
+  //         },
+  //       },
+  //       {
+  //         asset: {
+  //           id: "text-3",
+  //           type: "text",
+  //           value: "async content3",
+  //         },
+  //       },
+  //     ],
+  //   });
   });
 });
 
