@@ -111,6 +111,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     const parsedNode =
       options.parseNode && result ? options.parseNode(result) : undefined;
 
+    // parsedNode is switch type
     if (this.resolvedMapping.get(node.id) !== parsedNode) {
       this.resolvedMapping.set(node.id, parsedNode ? parsedNode : node);
       view?.updateAsync();
@@ -134,7 +135,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
       } else {
         resolvedNode = null;
       }
-
+      // from async-node-plugin get mapping value of the async node
       const newNode = resolvedNode || node;
       if (!resolvedNode && node?.type === NodeType.Async) {
         queueMicrotask(async () => {

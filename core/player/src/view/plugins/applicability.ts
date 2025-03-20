@@ -70,6 +70,7 @@ export default class ApplicabilityPlugin implements ViewPlugin {
             return childOptions ? [] : null;
           }
 
+          // is this the reason? we are no longer
           if (applicabilityNode.type === NodeType.Applicability) {
             applicabilityNode.value.parent = applicabilityNode;
           }
