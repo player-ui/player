@@ -276,10 +276,17 @@ export class Resolver {
       type: NodeType.Empty,
     };
 
-    const isNestedMultiNode =
+    const isNestedMultiNodeWithAsync =
       resolvedAST.type === NodeType.MultiNode &&
       partiallyResolvedParent?.parent?.parent?.type === NodeType.MultiNode &&
-      partiallyResolvedParent.parent.type === NodeType.Value;
+      partiallyResolvedParent.parent.type === NodeType.Value &&
+      resolvedAST.parent?.type === NodeType.Asset &&
+      resolvedAST.parent.value.id.includes("async");
+
+    const isNestedMultiNode =
+      resolvedAST.type === NodeType.MultiNode &&
+      partiallyResolvedParent?.parent?.type === NodeType.MultiNode &&
+      partiallyResolvedParent.type === NodeType.Value;
 
     if (previousResult && shouldUseLastValue) {
       const update = {
@@ -333,7 +340,7 @@ export class Resolver {
 
       return update;
     }
-    if (isNestedMultiNode) {
+    if (isNestedMultiNodeWithAsync) {
       resolvedAST.parent = partiallyResolvedParent.parent;
     } else {
       resolvedAST.parent = partiallyResolvedParent;
@@ -398,7 +405,7 @@ export class Resolver {
     } else if (resolvedAST.type === NodeType.MultiNode) {
       const childValue: any = [];
       const rawParentToPassIn = isNestedMultiNode
-        ? partiallyResolvedParent?.parent?.parent
+        ? partiallyResolvedParent?.parent
         : node;
 
       const newValues = resolvedAST.values.map((mValue) => {
@@ -472,7 +479,7 @@ export class Resolver {
 
     this.hooks.afterNodeUpdate.call(
       node,
-      isNestedMultiNode ? partiallyResolvedParent?.parent?.parent : rawParent,
+      isNestedMultiNode ? partiallyResolvedParent?.parent : rawParent,
       update,
     );
     cacheUpdate.set(node, update);
