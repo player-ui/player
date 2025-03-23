@@ -1,7 +1,8 @@
-import type { BindingInstance, BindingLike } from "../../binding";
-import { isBinding } from "../../binding";
-import type { ExpressionType } from "../../expressions";
-import type { Resolve } from "./types";
+import type {BindingInstance, BindingLike} from "../../binding";
+import {isBinding} from "../../binding";
+import type {ExpressionType} from "../../expressions";
+import type {Resolve} from "./types";
+import {Node, NodeType} from "../parser";
 
 /** Check to see if and of the data-changes affect the given dependencies  */
 export function caresAboutDataChanges(
@@ -59,10 +60,27 @@ export function toNodeResolveOptions(
 /**
  * helper function to flatten a potential nested array and combine with initial array
  */
-export function unpackAndPush(item: any | any[], initial: any[]) {
+export function unpackAndPush(item: any | any[], initial: any[]): void {
   if (item.asset.values && Array.isArray(item.asset.values)) {
     item.asset.values.forEach((i: any) => {
+      console.log(i);
       unpackAndPush(i, initial);
+    });
+  } else {
+    initial.push(item);
+  }
+}
+
+export function unpackAndPushNode(item: Node.Node | Node.Node[], initial: Node.Node[]): void {
+  if (Array.isArray(item)) {
+    item.forEach(node => {
+      if ("children" in node && node.children?.at(0)?.value.type === NodeType.Asset && (node.children?.at(0)?.value as Node.Asset).children) {
+        if ((node.children?.at(0)?.value as Node.Asset).children!!.at(0)?.value.type === NodeType.MultiNode) {
+          unpackAndPushNode(((node.children?.at(0)?.value as Node.Asset).children!!.at(0)?.value as Node.MultiNode).values, initial)
+        }
+      } else {
+        initial.push(node)
+      }
     });
   } else {
     initial.push(item);
