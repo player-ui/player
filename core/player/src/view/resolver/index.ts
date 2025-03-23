@@ -287,21 +287,6 @@ export class Resolver {
       resolvedAST.type === NodeType.MultiNode &&
       partiallyResolvedParent?.parent?.type === NodeType.MultiNode &&
       partiallyResolvedParent.type === NodeType.Value;
-    const isAssetFromAsync =
-      resolvedAST.type === NodeType.Asset &&
-      resolvedAST.children?.[0]?.value.type === NodeType.MultiNode &&
-      partiallyResolvedParent?.parent?.type === NodeType.MultiNode &&
-      partiallyResolvedParent.parent.values.find(
-        (item) => item.type === NodeType.Async,
-      ) &&
-      partiallyResolvedParent.type === NodeType.Value;
-
-    const resolvedHasAsync =
-      resolvedAST.type === NodeType.Asset &&
-      resolvedAST.children?.[0]?.value.type === NodeType.MultiNode &&
-      (resolvedAST.children?.[0]?.value as Node.MultiNode).values.find(
-        (node) => node.type === NodeType.Async,
-      );
 
     if (previousResult && shouldUseLastValue) {
       const update = {
@@ -316,11 +301,6 @@ export class Resolver {
         ASTParent: Node.Node | undefined,
       ) => {
         const { node: resolvedASTLocal } = resolvedNode;
-        /*if (AST.type === NodeType.Asset && AST.value.type === "chat-message") {
-          console.log(`++++ repopulating from cache for id ${AST.value.id}`)
-          console.log(resolvedASTLocal)
-          console.log("fin ======")
-        }*/
         this.ASTMap.set(resolvedASTLocal, AST);
         const resolvedUpdate = {
           ...resolvedNode,
@@ -356,10 +336,6 @@ export class Resolver {
       // Point the root of the cached node to the new resolved node.
       previousResult.node.parent = partiallyResolvedParent;
 
-      /*console.log("++++++++++ repopulating from cache");
-      console.log(previousResult);
-      console.log(node);
-      console.log(rawParent);*/
       repopulateASTMapFromCache(previousResult, node, rawParent);
 
       return update;
@@ -373,11 +349,6 @@ export class Resolver {
 
     resolveOptions.node = resolvedAST;
 
-    /*if (node.type === NodeType.Asset && node.value.type === "chat-message") {
-      console.log(`++++ computed normally chat-message for id ${node.value.id}`)
-      console.log(resolvedAST);
-      console.log("fin ======");
-    }*/
     this.ASTMap.set(resolvedAST, node);
 
     let resolved = this.hooks.resolve.call(

@@ -63,7 +63,6 @@ export function toNodeResolveOptions(
 export function unpackAndPush(item: any | any[], initial: any[]): void {
   if (item.asset.values && Array.isArray(item.asset.values)) {
     item.asset.values.forEach((i: any) => {
-      console.log(i);
       unpackAndPush(i, initial);
     });
   } else {
