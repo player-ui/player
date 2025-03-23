@@ -79,16 +79,16 @@ export function unpackAndPushNode(
     item.forEach((node) => {
       if (
         "children" in node &&
-        node.children?.at(0)?.value.type === NodeType.Asset &&
-        (node.children?.at(0)?.value as Node.Asset).children
+        node.children?.[0]?.value.type === NodeType.Asset &&
+        (node.children?.[0]?.value as Node.Asset).children
       ) {
         if (
-          (node.children?.at(0)?.value as Node.Asset).children?.at(0)?.value
+          (node.children?.[0]?.value as Node.Asset).children?.[0]?.value
             .type === NodeType.MultiNode
         ) {
           unpackAndPushNode(
             (
-              (node.children?.at(0)?.value as Node.Asset).children?.at(0)
+              (node.children?.[0]?.value as Node.Asset).children?.[0]
                 ?.value as Node.MultiNode
             ).values,
             initial,

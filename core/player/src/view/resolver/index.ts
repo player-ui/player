@@ -289,7 +289,7 @@ export class Resolver {
       partiallyResolvedParent.type === NodeType.Value;
     const isAssetFromAsync =
       resolvedAST.type === NodeType.Asset &&
-      resolvedAST.children?.at(0)?.value.type === NodeType.MultiNode &&
+      resolvedAST.children?.[0]?.value.type === NodeType.MultiNode &&
       partiallyResolvedParent?.parent?.type === NodeType.MultiNode &&
       partiallyResolvedParent.parent.values.find(
         (item) => item.type === NodeType.Async,
@@ -298,8 +298,8 @@ export class Resolver {
 
     const resolvedHasAsync =
       resolvedAST.type === NodeType.Asset &&
-      resolvedAST.children?.at(0)?.value.type === NodeType.MultiNode &&
-      (resolvedAST.children?.at(0)?.value as Node.MultiNode).values.find(
+      resolvedAST.children?.[0]?.value.type === NodeType.MultiNode &&
+      (resolvedAST.children?.[0]?.value as Node.MultiNode).values.find(
         (node) => node.type === NodeType.Async,
       );
 
