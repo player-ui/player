@@ -1,8 +1,8 @@
-import type {BindingInstance, BindingLike} from "../../binding";
-import {isBinding} from "../../binding";
-import type {ExpressionType} from "../../expressions";
-import type {Resolve} from "./types";
-import {Node, NodeType} from "../parser";
+import type { BindingInstance, BindingLike } from "../../binding";
+import { isBinding } from "../../binding";
+import type { ExpressionType } from "../../expressions";
+import type { Resolve } from "./types";
+import { Node, NodeType } from "../parser";
 
 /** Check to see if and of the data-changes affect the given dependencies  */
 export function caresAboutDataChanges(
@@ -71,15 +71,31 @@ export function unpackAndPush(item: any | any[], initial: any[]): void {
   }
 }
 
-export function unpackAndPushNode(item: Node.Node | Node.Node[], initial: Node.Node[]): void {
+export function unpackAndPushNode(
+  item: Node.Node | Node.Node[],
+  initial: Node.Node[],
+): void {
   if (Array.isArray(item)) {
-    item.forEach(node => {
-      if ("children" in node && node.children?.at(0)?.value.type === NodeType.Asset && (node.children?.at(0)?.value as Node.Asset).children) {
-        if ((node.children?.at(0)?.value as Node.Asset).children!!.at(0)?.value.type === NodeType.MultiNode) {
-          unpackAndPushNode(((node.children?.at(0)?.value as Node.Asset).children!!.at(0)?.value as Node.MultiNode).values, initial)
+    item.forEach((node) => {
+      if (
+        "children" in node &&
+        node.children?.at(0)?.value.type === NodeType.Asset &&
+        (node.children?.at(0)?.value as Node.Asset).children
+      ) {
+        if (
+          (node.children?.at(0)?.value as Node.Asset).children?.at(0)?.value
+            .type === NodeType.MultiNode
+        ) {
+          unpackAndPushNode(
+            (
+              (node.children?.at(0)?.value as Node.Asset).children?.at(0)
+                ?.value as Node.MultiNode
+            ).values,
+            initial,
+          );
         }
       } else {
-        initial.push(node)
+        initial.push(node);
       }
     });
   } else {

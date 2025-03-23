@@ -1,15 +1,24 @@
-import {SyncHook, SyncWaterfallHook} from "tapable-ts";
-import {addLast, clone, setIn} from "timm";
+import { SyncHook, SyncWaterfallHook } from "tapable-ts";
+import { addLast, clone, setIn } from "timm";
 import dlv from "dlv";
-import {dequal} from "dequal";
-import type {BindingInstance, BindingLike} from "../../binding";
-import type {DataModelOptions, DataModelWithParser, Updates,} from "../../data";
-import {DependencyModel, withParser} from "../../data";
-import type {Logger} from "../../logger";
-import {Node, NodeType} from "../parser";
-import {caresAboutDataChanges, toNodeResolveOptions, unpackAndPush, unpackAndPushNode,} from "./utils";
-import type {Resolve} from "./types";
-import {getNodeID} from "../parser/utils";
+import { dequal } from "dequal";
+import type { BindingInstance, BindingLike } from "../../binding";
+import type {
+  DataModelOptions,
+  DataModelWithParser,
+  Updates,
+} from "../../data";
+import { DependencyModel, withParser } from "../../data";
+import type { Logger } from "../../logger";
+import { Node, NodeType } from "../parser";
+import {
+  caresAboutDataChanges,
+  toNodeResolveOptions,
+  unpackAndPush,
+  unpackAndPushNode,
+} from "./utils";
+import type { Resolve } from "./types";
+import { getNodeID } from "../parser/utils";
 
 export * from "./types";
 export * from "./utils";
@@ -282,12 +291,17 @@ export class Resolver {
       resolvedAST.type === NodeType.Asset &&
       resolvedAST.children?.at(0)?.value.type === NodeType.MultiNode &&
       partiallyResolvedParent?.parent?.type === NodeType.MultiNode &&
-      partiallyResolvedParent.parent.values.find(item => item.type === NodeType.Async) &&
+      partiallyResolvedParent.parent.values.find(
+        (item) => item.type === NodeType.Async,
+      ) &&
       partiallyResolvedParent.type === NodeType.Value;
 
-    const resolvedHasAsync = resolvedAST.type === NodeType.Asset &&
-        resolvedAST.children?.at(0)?.value.type === NodeType.MultiNode &&
-        (resolvedAST.children?.at(0)?.value as Node.MultiNode).values.find(node => node.type === NodeType.Async)
+    const resolvedHasAsync =
+      resolvedAST.type === NodeType.Asset &&
+      resolvedAST.children?.at(0)?.value.type === NodeType.MultiNode &&
+      (resolvedAST.children?.at(0)?.value as Node.MultiNode).values.find(
+        (node) => node.type === NodeType.Async,
+      );
 
     if (previousResult && shouldUseLastValue) {
       const update = {
@@ -302,11 +316,11 @@ export class Resolver {
         ASTParent: Node.Node | undefined,
       ) => {
         const { node: resolvedASTLocal } = resolvedNode;
-        if (AST.type === NodeType.Asset && AST.value.type === "chat-message") {
+        /*if (AST.type === NodeType.Asset && AST.value.type === "chat-message") {
           console.log(`++++ repopulating from cache for id ${AST.value.id}`)
           console.log(resolvedASTLocal)
           console.log("fin ======")
-        }
+        }*/
         this.ASTMap.set(resolvedASTLocal, AST);
         const resolvedUpdate = {
           ...resolvedNode,
@@ -359,11 +373,11 @@ export class Resolver {
 
     resolveOptions.node = resolvedAST;
 
-    if (node.type === NodeType.Asset && node.value.type === "chat-message") {
+    /*if (node.type === NodeType.Asset && node.value.type === "chat-message") {
       console.log(`++++ computed normally chat-message for id ${node.value.id}`)
-      console.log(resolvedAST)
-      console.log("fin ======")
-    }
+      console.log(resolvedAST);
+      console.log("fin ======");
+    }*/
     this.ASTMap.set(resolvedAST, node);
 
     let resolved = this.hooks.resolve.call(
@@ -425,7 +439,9 @@ export class Resolver {
         ? partiallyResolvedParent?.parent
         : node;
 
-      const hasAsync = resolvedAST.values.find(node => node.type === NodeType.Async)
+      const hasAsync = resolvedAST.values.find(
+        (node) => node.type === NodeType.Async,
+      );
 
       const newValues = resolvedAST.values.map((mValue) => {
         const mTree = this.computeTree(
@@ -469,7 +485,7 @@ export class Resolver {
 
       if (hasAsync) {
         // this likely turned into a nested multinode, attempt to flatten in node structure
-        const childNodes : any[] = [];
+        const childNodes: any[] = [];
         unpackAndPushNode(newValues, childNodes);
         resolvedAST.values = childNodes;
       } else {
