@@ -8,8 +8,8 @@ import {
 import { ExpressionPlugin } from "@player-ui/expression-plugin";
 import { Node } from "@player-ui/player";
 import {
-  ChatMessage,
-  Text,
+    ChatMessage, Collection,
+    Text,
 } from "@player-ui/reference-assets-plugin-components";
 import { AssetWrapper, render } from "@player-tools/dsl";
 
@@ -37,15 +37,22 @@ asyncNodePlugin.hooks.onAsyncNode.tap(
 );
 
 let count = 1;
+let count2 = 100;
 
 const createAsset = async (input: string) => {
   count++;
+  count2++;
   return (
     await render(
       <AssetWrapper>
         <ChatMessage id={count.toString()}>
           <ChatMessage.Value>
-            <Text> {input} </Text>
+              <Collection id={count2.toString()}>
+                  <Collection.Values>
+                      <Text>{input}</Text>
+                      <Text>This is the {count2} in the collection</Text>
+                  </Collection.Values>
+              </Collection>
           </ChatMessage.Value>
         </ChatMessage>
       </AssetWrapper>,
