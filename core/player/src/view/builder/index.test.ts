@@ -102,6 +102,40 @@ describe("addChild", () => {
     const value = Builder.value({ id: 2 });
     Builder.addChild(asset, ["path1", "path2"], value);
 
-    expect(asset.children?.[0].path).toStrictEqual(["path1", "path2"]);
+    expect(asset.children?.[0]?.path).toStrictEqual(["path1", "path2"]);
+  });
+});
+
+describe("updateChildrenByPath", () => {
+  test("updates children with matching path in the same order", () => {
+    const parent = Builder.value();
+    const child1 = Builder.value({ foo: "child1Value" });
+    const child2 = Builder.value({ foo: "child2Value" });
+    const child3 = Builder.value({ foo: "child3Value" });
+
+    Builder.addChild(parent, "child1", child1);
+    // Child 2 has the same path as child 1
+    Builder.addChild(parent, "child1", child2);
+    Builder.addChild(parent, "child3", child3);
+
+    // Update matching children
+    const updated = Builder.updateChildrenByPath(parent, ["child1"], (child) =>
+      Builder.value({
+        transformed: true,
+        original: (child as any).value?.foo,
+      }),
+    );
+
+    expect(updated.children).toHaveLength(3);
+    // Verify children are in the correct order
+    expect(updated.children?.[0]?.path).toStrictEqual(["child1"]);
+    expect(updated.children?.[1]?.path).toStrictEqual(["child1"]);
+    expect(updated.children?.[2]?.path).toStrictEqual(["child3"]);
+
+    // Expect child to have value foo based on Builder.addChild
+    expect(updated.children?.[0]?.value).toEqual({
+      transformed: true,
+      original: "child1Value",
+    });
   });
 });
