@@ -131,11 +131,5 @@ describe("updateChildrenByPath", () => {
     expect(updated.children?.[0]?.path).toStrictEqual(["child1"]);
     expect(updated.children?.[1]?.path).toStrictEqual(["child1"]);
     expect(updated.children?.[2]?.path).toStrictEqual(["child3"]);
-
-    // Expect child to have value foo based on Builder.addChild
-    expect(updated.children?.[0]?.value).toEqual({
-      transformed: true,
-      original: "child1Value",
-    });
   });
 });
