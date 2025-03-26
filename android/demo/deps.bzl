@@ -14,6 +14,7 @@ maven_main = [
 maven_test = [
     "@maven//:androidx_test_espresso_espresso_intents",
     "@maven//:androidx_test_ext_junit_ktx",
+    "@maven//:androidx_compose_ui_ui_test_junit4",
 ]
 
 main_deps = maven_main + [
