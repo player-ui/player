@@ -11,7 +11,6 @@ import {
   ChatMessage,
   Text,
 } from "@player-ui/reference-assets-plugin-components";
-import { binding as b } from "@player-tools/dsl";
 import { AssetWrapper, render } from "@player-tools/dsl";
 
 const meta: Meta = {
