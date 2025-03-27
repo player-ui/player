@@ -254,6 +254,9 @@ export interface Template<ValueType = unknown, Key extends string = string> {
    * If it already exists, values are appended to the end.
    */
   output: Key;
+
+  /** Specifies the template placement in relation to existing elements*/
+  placement?: "prepend" | "append";
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace

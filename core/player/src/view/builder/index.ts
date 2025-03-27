@@ -88,7 +88,7 @@ export class Builder {
     node: N,
     path: Node.PathSegment | Node.PathSegment[],
     child: Node.Node,
-  ) {
+  ): N {
     // eslint-disable-next-line no-param-reassign
     child.parent = node as Node.Node;
 
@@ -102,5 +102,33 @@ export class Builder {
     node.children.push(newChild);
 
     return node;
+  }
+
+  /**
+   * Updates children of a node of the same path and preserves order
+   *
+   * @param node - The node to update children for
+   * @param pathToMatch - The path to match against child paths
+   * @param mapFn - Function to transform matching children
+   */
+  static updateChildrenByPath<T extends Node.ViewOrAsset | Node.Value>(
+    node: T,
+    pathToMatch: Node.PathSegment[],
+    updateFn: (child: Node.Child) => Node.Node,
+  ): T {
+    if (!node.children) return node;
+
+    // Use map to preserve original order
+    const updatedChildren = node.children.map((child) =>
+      // Check if paths match exactly
+      child.path.join() === pathToMatch.join()
+        ? { ...child, value: updateFn(child) }
+        : child,
+    );
+
+    return {
+      ...node,
+      children: updatedChildren,
+    };
   }
 }
