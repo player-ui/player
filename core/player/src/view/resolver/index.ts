@@ -131,8 +131,6 @@ export class Resolver {
    */
   private logger?: Logger;
 
-  private depth = 0;
-
   constructor(root: Node.Node, options: Resolve.ResolverOptions) {
     this.root = root;
     this.options = options;
@@ -153,7 +151,6 @@ export class Resolver {
     const prevASTMap = new Map(this.ASTMap);
     this.ASTMap.clear();
 
-    this.depth = 0;
     const updated = this.computeTree(
       this.root,
       undefined,
@@ -230,9 +227,6 @@ export class Resolver {
     partiallyResolvedParent: Node.Node | undefined,
     prevASTMap: Map<Node.Node, Node.Node>,
   ): NodeUpdate {
-    this.depth++;
-    console.log("++++++ compute tree level");
-    console.log(this.depth);
     const dependencyModel = new DependencyModel(options.data.model);
 
     dependencyModel.trackSubset("core");
@@ -290,9 +284,6 @@ export class Resolver {
       partiallyResolvedParent.type === NodeType.Value;
 
     if (previousResult && shouldUseLastValue) {
-      this.depth++;
-      console.log("++++++");
-      console.log(this.depth);
       const update = {
         ...previousResult,
         updated: false,
@@ -514,37 +505,6 @@ function unpackAndPush(item: any | any[], initial: any[]): void {
   if (item.asset.values && Array.isArray(item.asset.values)) {
     item.asset.values.forEach((i: any) => {
       unpackAndPush(i, initial);
-    });
-  } else {
-    initial.push(item);
-  }
-}
-
-function unpackAndPushNode(
-  item: Node.Node | Node.Node[],
-  initial: Node.Node[],
-): void {
-  if (Array.isArray(item)) {
-    item.forEach((node) => {
-      if (
-        "children" in node &&
-        node.children?.[0]?.value.type === NodeType.Asset &&
-        (node.children?.[0]?.value as Node.Asset).children
-      ) {
-        if (
-          (node.children?.[0]?.value as Node.Asset).children?.[0]?.value
-            .type === NodeType.MultiNode
-        ) {
-          (
-            (node.children?.[0]?.value as Node.Asset).children?.[0]
-              ?.value as Node.MultiNode
-          ).values.forEach((value) => {
-            initial.push(value);
-          });
-        }
-      } else {
-        initial.push(node);
-      }
     });
   } else {
     initial.push(item);

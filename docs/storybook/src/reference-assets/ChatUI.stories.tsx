@@ -48,30 +48,13 @@ const createAsset = async (input: string) => {
   count2++;
   return (
     await render(
-      <AssetWrapper>
-        <ChatMessage id={count.toString()}>
-          <ChatMessage.Value>
-              <Collection id={count2.toString()}>
-                  <Collection.Values>
-                      <Text>{input}</Text>
-                      <Choice id="choice" binding={b`foo.bar`}>
-                          <Choice.Items>
-                              <Choice.Item id={count3.toString()} value="Item 1">
-                                  <Choice.Item.Label>Item 1</Choice.Item.Label>
-                              </Choice.Item>
-                              <Choice.Item id={count4.toString()} value="Item 2">
-                                  <Choice.Item.Label>Item 2</Choice.Item.Label>
-                              </Choice.Item>
-                              <Choice.Item id={count5.toString()} value="Item 3">
-                                  <Choice.Item.Label>Item 3</Choice.Item.Label>
-                              </Choice.Item>
-                          </Choice.Items>
-                      </Choice>
-                  </Collection.Values>
-              </Collection>
-          </ChatMessage.Value>
-        </ChatMessage>
-      </AssetWrapper>,
+        <AssetWrapper>
+            <ChatMessage id={count.toString()}>
+                <ChatMessage.Value>
+                    <Text> {input} </Text>
+                </ChatMessage.Value>
+            </ChatMessage>
+        </AssetWrapper>,
     )
   ).jsonValue;
 };
