@@ -134,6 +134,8 @@ export class Resolver {
    */
   private logger?: Logger;
 
+  private depth = 0;
+
   constructor(root: Node.Node, options: Resolve.ResolverOptions) {
     this.root = root;
     this.options = options;
@@ -154,6 +156,7 @@ export class Resolver {
     const prevASTMap = new Map(this.ASTMap);
     this.ASTMap.clear();
 
+    this.depth = 0;
     const updated = this.computeTree(
       this.root,
       undefined,
@@ -230,6 +233,9 @@ export class Resolver {
     partiallyResolvedParent: Node.Node | undefined,
     prevASTMap: Map<Node.Node, Node.Node>,
   ): NodeUpdate {
+    this.depth++;
+    console.log("++++++ compute tree level");
+    console.log(this.depth);
     const dependencyModel = new DependencyModel(options.data.model);
 
     dependencyModel.trackSubset("core");
@@ -287,6 +293,9 @@ export class Resolver {
       partiallyResolvedParent.type === NodeType.Value;
 
     if (previousResult && shouldUseLastValue) {
+      this.depth++;
+      console.log("++++++");
+      console.log(this.depth);
       const update = {
         ...previousResult,
         updated: false,
@@ -408,9 +417,8 @@ export class Resolver {
         ? partiallyResolvedParent?.parent
         : node;
 
-      const hasAsync = resolvedAST.values.find(
-        (node) => node.type === NodeType.Async,
-      );
+      const hasAsync = resolvedAST.values.map((value, index) => (value.type === NodeType.Async) ? index : -1)
+        .filter(index => index !== -1);
 
       const newValues = resolvedAST.values.map((mValue) => {
         const mTree = this.computeTree(
@@ -452,11 +460,11 @@ export class Resolver {
         return mTree.node;
       });
 
-      if (hasAsync) {
+      if (hasAsync.length > 0) {
         // this likely turned into a nested multinode, attempt to flatten in node structure
-        const childNodes: any[] = [];
-        unpackAndPushNode(newValues, childNodes);
-        resolvedAST.values = childNodes;
+        const copy = newValues;
+        hasAsync.forEach(index => copy.splice(index, 1, ...unpackNode(copy[index]!!)))
+        resolvedAST.values = copy;
       } else {
         resolvedAST.values = newValues;
       }
@@ -527,13 +535,12 @@ function unpackAndPushNode(
             (node.children?.[0]?.value as Node.Asset).children?.[0]?.value
                 .type === NodeType.MultiNode
         ) {
-          unpackAndPushNode(
-              (
-                  (node.children?.[0]?.value as Node.Asset).children?.[0]
-                      ?.value as Node.MultiNode
-              ).values,
-              initial,
-          );
+          (
+              (node.children?.[0]?.value as Node.Asset).children?.[0]
+                  ?.value as Node.MultiNode
+          ).values.forEach((value) => {
+            initial.push(value);
+          });
         }
       } else {
         initial.push(node);
@@ -542,4 +549,28 @@ function unpackAndPushNode(
   } else {
     initial.push(item);
   }
+}
+
+function unpackNode(item: Node.Node) {
+  const unpacked: Node.Node[] = [];
+  if (
+    "children" in item &&
+    item.children?.[0]?.value.type === NodeType.Asset &&
+    (item.children?.[0]?.value as Node.Asset).children
+  ) {
+    if (
+      (item.children?.[0]?.value as Node.Asset).children?.[0]?.value
+          .type === NodeType.MultiNode
+    ) {
+      (
+        (item.children?.[0]?.value as Node.Asset).children?.[0]
+            ?.value as Node.MultiNode
+      ).values.forEach((value) => {
+        unpacked.push(value);
+      });
+    }
+  } else {
+    unpacked.push(item)
+  }
+  return unpacked;
 }
