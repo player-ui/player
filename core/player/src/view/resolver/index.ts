@@ -11,10 +11,7 @@ import type {
 import { DependencyModel, withParser } from "../../data";
 import type { Logger } from "../../logger";
 import { Node, NodeType } from "../parser";
-import {
-  caresAboutDataChanges,
-  toNodeResolveOptions,
-} from "./utils";
+import { caresAboutDataChanges, toNodeResolveOptions } from "./utils";
 import type { Resolve } from "./types";
 import { getNodeID } from "../parser/utils";
 
@@ -417,8 +414,9 @@ export class Resolver {
         ? partiallyResolvedParent?.parent
         : node;
 
-      const hasAsync = resolvedAST.values.map((value, index) => (value.type === NodeType.Async) ? index : -1)
-        .filter(index => index !== -1);
+      const hasAsync = resolvedAST.values
+        .map((value, index) => (value.type === NodeType.Async ? index : -1))
+        .filter((index) => index !== -1);
 
       const newValues = resolvedAST.values.map((mValue) => {
         const mTree = this.computeTree(
@@ -463,7 +461,9 @@ export class Resolver {
       if (hasAsync.length > 0) {
         // this likely turned into a nested multinode, attempt to flatten in node structure
         const copy = newValues;
-        hasAsync.forEach(index => copy.splice(index, 1, ...unpackNode(copy[index]!!)))
+        hasAsync.forEach((index) => {
+          if (copy[index]) copy.splice(index, 1, ...unpackNode(copy[index]));
+        });
         resolvedAST.values = copy;
       } else {
         resolvedAST.values = newValues;
@@ -521,23 +521,23 @@ function unpackAndPush(item: any | any[], initial: any[]): void {
 }
 
 function unpackAndPushNode(
-    item: Node.Node | Node.Node[],
-    initial: Node.Node[],
+  item: Node.Node | Node.Node[],
+  initial: Node.Node[],
 ): void {
   if (Array.isArray(item)) {
     item.forEach((node) => {
       if (
-          "children" in node &&
-          node.children?.[0]?.value.type === NodeType.Asset &&
-          (node.children?.[0]?.value as Node.Asset).children
+        "children" in node &&
+        node.children?.[0]?.value.type === NodeType.Asset &&
+        (node.children?.[0]?.value as Node.Asset).children
       ) {
         if (
-            (node.children?.[0]?.value as Node.Asset).children?.[0]?.value
-                .type === NodeType.MultiNode
+          (node.children?.[0]?.value as Node.Asset).children?.[0]?.value
+            .type === NodeType.MultiNode
         ) {
           (
-              (node.children?.[0]?.value as Node.Asset).children?.[0]
-                  ?.value as Node.MultiNode
+            (node.children?.[0]?.value as Node.Asset).children?.[0]
+              ?.value as Node.MultiNode
           ).values.forEach((value) => {
             initial.push(value);
           });
@@ -559,18 +559,18 @@ function unpackNode(item: Node.Node) {
     (item.children?.[0]?.value as Node.Asset).children
   ) {
     if (
-      (item.children?.[0]?.value as Node.Asset).children?.[0]?.value
-          .type === NodeType.MultiNode
+      (item.children?.[0]?.value as Node.Asset).children?.[0]?.value.type ===
+      NodeType.MultiNode
     ) {
       (
         (item.children?.[0]?.value as Node.Asset).children?.[0]
-            ?.value as Node.MultiNode
+          ?.value as Node.MultiNode
       ).values.forEach((value) => {
         unpacked.push(value);
       });
     }
   } else {
-    unpacked.push(item)
+    unpacked.push(item);
   }
   return unpacked;
 }
