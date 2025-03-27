@@ -171,7 +171,9 @@ export default class TemplatePlugin implements ViewPlugin {
             }
             return 0;
           }
-          return 0;
+
+          // Trigger more sorting for nested assets
+          return a.path.join().localeCompare(b.path.join());
         });
       }
 

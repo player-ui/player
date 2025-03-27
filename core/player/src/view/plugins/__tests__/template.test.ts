@@ -30,6 +30,13 @@ const templateJoinValues = {
           },
         },
       ],
+      label: {
+        asset: {
+          id: "label-test",
+          value: "A text label",
+          type: "text",
+        },
+      },
       values: [
         {
           asset: {
@@ -66,6 +73,13 @@ const templateJoinValues = {
           },
         },
       ],
+      label: {
+        asset: {
+          id: "label-test",
+          value: "A text label",
+          type: "text",
+        },
+      },
       template: [
         {
           data: "foo",
@@ -484,6 +498,13 @@ describe("templates", () => {
                 },
               },
             ],
+            label: {
+              asset: {
+                id: "label-test",
+                value: "A text label",
+                type: "text",
+              },
+            },
             values: [
               {
                 asset: {
@@ -560,6 +581,13 @@ describe("templates", () => {
                 },
               },
             ],
+            label: {
+              asset: {
+                id: "label-test",
+                value: "A text label",
+                type: "text",
+              },
+            },
             template: [
               {
                 dynamic: true,
@@ -650,6 +678,13 @@ describe("templates", () => {
                 },
               },
             ],
+            label: {
+              asset: {
+                id: "label-test",
+                value: "A text label",
+                type: "text",
+              },
+            },
             values: [
               {
                 asset: {
