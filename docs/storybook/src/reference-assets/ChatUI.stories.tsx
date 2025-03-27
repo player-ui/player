@@ -8,8 +8,8 @@ import {
 import { ExpressionPlugin } from "@player-ui/expression-plugin";
 import { Node } from "@player-ui/player";
 import {
-    ChatMessage, Choice, Collection,
-    Text,
+  ChatMessage,
+  Text,
 } from "@player-ui/reference-assets-plugin-components";
 import { binding as b } from "@player-tools/dsl";
 import { AssetWrapper, render } from "@player-tools/dsl";
@@ -38,23 +38,18 @@ asyncNodePlugin.hooks.onAsyncNode.tap(
 );
 
 let count = 1;
-let count2 = 100;
-let count3 = 1000;
-let count4 = 10000;
-let count5 = 100000;
 
 const createAsset = async (input: string) => {
   count++;
-  count2++;
   return (
     await render(
-        <AssetWrapper>
-            <ChatMessage id={count.toString()}>
-                <ChatMessage.Value>
-                    <Text> {input} </Text>
-                </ChatMessage.Value>
-            </ChatMessage>
-        </AssetWrapper>,
+      <AssetWrapper>
+        <ChatMessage id={count.toString()}>
+          <ChatMessage.Value>
+            <Text> {input} </Text>
+          </ChatMessage.Value>
+        </ChatMessage>
+      </AssetWrapper>,
     )
   ).jsonValue;
 };
