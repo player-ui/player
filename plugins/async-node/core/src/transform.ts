@@ -1,4 +1,4 @@
-import { Builder, NodeType } from "@player-ui/player";
+import { Builder } from "@player-ui/player";
 import type { AsyncTransformFunc } from "./types";
 
 /**

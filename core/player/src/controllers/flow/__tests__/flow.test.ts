@@ -173,7 +173,7 @@ test("Fails to transition during another transition", async () => {
     try {
       flow.transition("Next");
       return "foo";
-    } catch (error: unknown) {
+    } catch (_error: unknown) {
       return "bar";
     }
   };

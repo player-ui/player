@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { fontFamily } from "tailwindcss/defaultTheme";
 
 /** @type {import('tailwindcss').Config} */

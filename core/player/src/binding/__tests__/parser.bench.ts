@@ -34,7 +34,7 @@ describe("binding creation benchmarks", () => {
             evaluate: () => undefined,
           },
         );
-        const bi = new BindingInstance(result.path);
+        new BindingInstance(result.path);
       });
     },
     { iterations: 10000 },

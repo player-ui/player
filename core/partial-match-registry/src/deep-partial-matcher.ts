@@ -15,7 +15,6 @@ function traverseObj(
   for (const key of Object.keys(object)) {
     const val: any = object[key];
     const nestedPath = [...path, key];
-    ("");
 
     if (typeof val === "object") {
       traverseObj(val, nestedPath, pairs);
