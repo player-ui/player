@@ -1316,7 +1316,9 @@ describe("validation", () => {
 
       expect(currentValidations).toHaveLength(5);
       expect(
-        currentValidations[0].validation.value[VALIDATION_PROVIDER_NAME_SYMBOL],
+        currentValidations[0]?.validation.value[
+          VALIDATION_PROVIDER_NAME_SYMBOL
+        ],
       ).toBe("schema");
     });
 
@@ -3006,22 +3008,10 @@ describe("Validations with multiple inputs", () => {
   });
 
   let player: Player;
-  let validationController: ValidationController;
-  let schema: SchemaController;
-  let parser: BindingParser;
 
   beforeEach(() => {
     player = new Player({
       plugins: [new TrackBindingPlugin(), new TestExpressionPlugin()],
-    });
-    player.hooks.validationController.tap("test", (vc) => {
-      validationController = vc;
-    });
-    player.hooks.schema.tap("test", (s) => {
-      schema = s;
-    });
-    player.hooks.bindingParser.tap("test", (p) => {
-      parser = p;
     });
 
     player.start(flowWithThings);
