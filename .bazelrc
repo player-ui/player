@@ -5,6 +5,7 @@ coverage --combined_report=lcov
 # TODO: Custom compiler version breaks embedded jdeps generator plugin - enable when removing custom kotlinc
 build --@rules_kotlin//kotlin/settings:jvm_emit_jdeps=False
 build --cxxopt=-std=c++17
+build --java_language_version=17 --tool_java_language_version=17 --java_runtime_version=remotejdk_17 --tool_java_runtime_version=remotejdk_17
 
 # Android databinding flags
 common --android_crosstool_top=@androidndk//:toolchain
