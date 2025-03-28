@@ -1,5 +1,5 @@
 import { expect, test, describe } from "vitest";
-import { Node, InProgressState, ViewInstance } from "@player-ui/player";
+import { Node, InProgressState } from "@player-ui/player";
 import { Player, Parser } from "@player-ui/player";
 import { waitFor } from "@testing-library/react";
 import { AsyncNodePlugin, AsyncNodePluginPlugin } from "../index";
@@ -99,11 +99,8 @@ describe("view", () => {
 
     const player = new Player({ plugins: [plugin] });
 
-    let viewInstance: ViewInstance | undefined;
-
     player.hooks.viewController.tap("async-node-test", (vc) => {
       vc.hooks.view.tap("async-node-test", (view) => {
-        viewInstance = view;
         view.hooks.onUpdate.tap("async-node-test", () => {
           updateNumber++;
         });

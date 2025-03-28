@@ -274,6 +274,7 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
 
         // remove listeners after extracting so that it does not get triggered in subsequent view updates
         viewController.hooks.resolveView.tap(this.name, (view) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { listeners, ...withoutListeners } = view as any;
           return withoutListeners;
         });
