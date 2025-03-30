@@ -26,6 +26,9 @@ import kotlinx.serialization.Serializable
 
 class Action(assetContext: AssetContext) : ComposableAsset<Action.Data>(assetContext, Data.serializer()) {
 
+    /** Actions should be full width  on native*/
+    override fun wrapContent(): Boolean = false
+
     @Serializable
     data class Data(
         val label: RenderableAsset? = null,
@@ -41,10 +44,12 @@ class Action(assetContext: AssetContext) : ComposableAsset<Action.Data>(assetCon
         val scope = rememberCoroutineScope()
         Button(
             onClick = {
-                beacon("clicked", "button")
-                player.commitPendingTransaction()
-                scope.launch {
-                    data.run()
+                composeHydrationScope?.launch { 
+                    withContext(Dispatchers.Default) {
+                        beacon("clicked", "button")
+                        player.commitPendingTransaction()
+                        data.run()
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth().testTag("action"),
