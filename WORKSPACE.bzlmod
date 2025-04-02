@@ -45,7 +45,7 @@ git_repository(
     remote = "https://github.com/facebookincubator/fbjni",
 )
 
-RN_VERSION = "0.74.1"
+RN_VERSION = "0.78.1"
 
 # Pull prefab Android Hermes built against React Native JSI
 http_archive(

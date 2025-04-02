@@ -14,9 +14,8 @@ public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/hermes/bridge/runtime/HermesRuntime$Config;";
     static void registerNatives();
 
-    static local_ref<jhybridobject> create(alias_ref<jclass>, bool intl = true, bool microtaskQueue = false) {
+    static local_ref<jhybridobject> create(alias_ref<jclass>, bool intl = false, bool microtaskQueue = false) {
         auto config = hermes::vm::RuntimeConfig::Builder()
-            .withIntl(intl)
             .withES6Class(true)
             .withMicrotaskQueue(microtaskQueue)
             .build();
