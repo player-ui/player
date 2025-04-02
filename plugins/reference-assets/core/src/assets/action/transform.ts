@@ -13,26 +13,6 @@ export function isBackAction(action: ActionAsset): boolean {
   return action.value === "Prev";
 }
 
-export default function swizzleLocaleCompare(): void {
-  const originalLocalCompare = String.prototype.localeCompare;
-  const compareStrings = (a: string, b: string, locales?: string | string[], options?: Intl.CollatorOptions) => {
-    if (a === b) {
-      return 0
-    } else if (a === '') {
-      return -1
-    } else if (b === '') {
-      return 1
-    } else {
-      return originalLocalCompare.call(a, b, locales, options)
-    }
-  }
-
-  String.prototype.localeCompare = (that: string, locales?: string | string[], options?: Intl.CollatorOptions) => {
-    // @ts-ignore
-    return compareStrings(this, that, locales, options);
-  }
-}
-
 /**
  * Attaches the methods to execute an action to an action
  */
@@ -44,9 +24,6 @@ const transform: TransformFunction<ActionAsset, TransformedAction> = (
     ...action,
     run() {
       if (action.exp) {
-        let text1 = "ab";
-        let text2 = "cd";
-        text1.localeCompare(text2);
         options.evaluate(action.exp);
       }
 
