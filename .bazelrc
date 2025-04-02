@@ -54,7 +54,7 @@ coverage --remote_download_toplevel
 coverage --remote_timeout=3600
 coverage --build_metadata=REPO_URL=https://github.com/player-ui/player.git
 
-common:ci --build_metadata=ROLE=CI --workspace_status_command=./scripts/workspace-status.sh
+common:ci --build_metadata=ROLE=CI
 
 # Circle xlarge has 8 CPU cores/16GB mem
 common:ci --local_cpu_resources=8
@@ -62,7 +62,6 @@ common:ci --local_ram_resources=15000
 common:ci --config="release"
 common:ci --experimental_remote_build_event_upload=minimal 
 common:ci --nolegacy_important_outputs
-common:ci --remote_upload_local_results
 
 # Only show progress every 60 seconds on CI.
 # We want to find a compromise between printing often enough to show that the build isn't stuck,
@@ -73,7 +72,7 @@ build:ci --show_progress_rate_limit=60
 # Circle macos.m1.large.gen1 8 cores 12gb ram
 common:ci-mac --config=ci --local_cpu_resources=4 --local_ram_resources=7000
 
-build:release --stamp --workspace_status_command=./scripts/workspace-status.sh
+common:release --config=ci --stamp --workspace_status_command=./scripts/workspace-status.sh
 build:release --//:cmake_build_type=MinSizeRel
 
 # Cache action outputs on disk so they persist across output_base and bazel shutdown (eg. changing branches)
