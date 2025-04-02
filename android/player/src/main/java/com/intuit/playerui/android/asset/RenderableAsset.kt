@@ -126,7 +126,6 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
             // implementation to throw [StaleViewException] to signify that the view is out of sync.
             // This can only be done from invalidateView, so we have a guarantee that the view has
             // already been removed from the cache.
-            // TODO: shows a warning of running on the JS thread
             !cachedAssetContext.asset.nativeReferenceEquals(asset) ->
                 try {
                     cachedView.also(::rehydrate)

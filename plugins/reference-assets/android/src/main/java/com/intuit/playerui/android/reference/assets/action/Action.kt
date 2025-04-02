@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,10 +40,9 @@ class Action(assetContext: AssetContext) : ComposableAsset<Action.Data>(assetCon
 
     @Composable
     override fun content(modifier: Modifier, data: Data) {
-        val scope = rememberCoroutineScope()
         Button(
             onClick = {
-                composeHydrationScope?.launch { 
+                composeHydrationScope?.launch {
                     withContext(Dispatchers.Default) {
                         beacon("clicked", "button")
                         player.commitPendingTransaction()
