@@ -117,6 +117,8 @@ jobs:
 
       - run: bazel build --config=ci -- $(bazel query 'filter("native_bundle$", //...)')
 
+      - run: bazel build --config=ci --//jvm/hermes/src/main/jni:include_jni //jvm/... //android/...
+
       - save_cache:
           paths:
             - node_modules
@@ -230,8 +232,6 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/player
-
-      - run: bazel test --config=ci -- //third_party/hermes/hello:test
 
       - run: bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
