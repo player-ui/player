@@ -120,6 +120,7 @@ private fun RenderableAsset.composeAndroidView(
             }
             withContext(Dispatchers.Main) {
                 renderedView into it
+
             }
         }
     }
