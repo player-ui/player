@@ -42,9 +42,6 @@ public class SetTimeoutPlugin(private val exceptionHandler: CoroutineExceptionHa
                 return@add
             }
         }
-        runtime.add("String.prototype.localeCompare") {
-            println("damn this works?")
-        }
 
         if (override || !runtime.contains("setImmediate")) {
             runtime.add("setImmediate", runtime.executeRaw("(callback => setTimeout(callback, 0))"))
