@@ -151,7 +151,10 @@ export default class TemplatePlugin implements ViewPlugin {
       ) {
         node.children = node.children.sort((a, b) => {
           // compare template output with static values
-          const pathsEqual = a.path.join() === b.path.join();
+          const aPath = a.path.join();
+          const bPath = b.path.join();
+
+          const pathsEqual = aPath === bPath;
 
           if (pathsEqual) {
             const aPlacement = getTemplateSymbolValue(a.value);
@@ -173,7 +176,7 @@ export default class TemplatePlugin implements ViewPlugin {
           }
 
           // Trigger more sorting for nested assets
-          return a.path.join().localeCompare(b.path.join());
+          return aPath > bPath ? 1 : -1;
         });
       }
 
