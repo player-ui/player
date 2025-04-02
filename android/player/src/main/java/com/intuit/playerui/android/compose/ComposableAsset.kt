@@ -26,6 +26,9 @@ import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withTag
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 
 /**
@@ -94,11 +97,11 @@ fun RenderableAsset.compose(
     assetContext.withContext(LocalContext.current).withTag(tag ?: asset.id).build().run {
         when (this) {
             is ComposableAsset<*> -> CompositionLocalProvider(
-                LocalTextStyle provides (styles?.textStyle ?: TextStyle())
-                ) {
-                    this.composeHydrationScope = renewHydrationScope("Creating compose view")
-                     compose(modifier = modifier) 
-                }
+                LocalTextStyle provides (styles?.textStyle ?: TextStyle()),
+            ) {
+                this.composeHydrationScope = renewHydrationScope("Creating compose view")
+                compose(modifier = modifier)
+            }
             else -> composeAndroidView(modifier, styles?.xmlStyles)
         }
     }
@@ -109,7 +112,12 @@ private fun RenderableAsset.composeAndroidView(
     modifier: Modifier = Modifier,
     styles: Styles? = null,
 ) {
+    val scope = rememberCoroutineScope()
     AndroidView(factory = ::FrameLayout, modifier) {
-        render(styles) into it
+        scope.launch {
+            withContext(Dispatchers.IO) {
+                render(styles) into it
+            }
+        }
     }
 }
