@@ -44,7 +44,7 @@ class Action(assetContext: AssetContext) : ComposableAsset<Action.Data>(assetCon
         val scope = rememberCoroutineScope()
         Button(
             onClick = {
-                composeHydrationScope?.launch { 
+                composeHydrationScope?.launch {
                     withContext(Dispatchers.Default) {
                         beacon("clicked", "button")
                         player.commitPendingTransaction()
