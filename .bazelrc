@@ -59,7 +59,6 @@ common:ci --build_metadata=ROLE=CI
 # Circle xlarge has 8 CPU cores/16GB mem
 common:ci --local_cpu_resources=8
 common:ci --local_ram_resources=15000
-common:ci --config="release"
 common:ci --experimental_remote_build_event_upload=minimal 
 common:ci --nolegacy_important_outputs
 
@@ -67,7 +66,7 @@ common:ci --nolegacy_important_outputs
 # We want to find a compromise between printing often enough to show that the build isn't stuck,
 # but not so often that we produce a long log file that requires a lot of scrolling.
 # https://bazel.build/reference/command-line-reference#flag--show_progress_rate_limit
-build:ci --show_progress_rate_limit=60
+common:ci --show_progress_rate_limit=60
 
 # Circle macos.m1.large.gen1 8 cores 12gb ram
 common:ci-mac --config=ci --local_cpu_resources=4 --local_ram_resources=7000
