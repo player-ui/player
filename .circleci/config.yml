@@ -117,7 +117,7 @@ jobs:
 
       - run: bazel build --config=ci -- $(bazel query 'filter("native_bundle$", //...)')
 
-      - run: bazel build --config=ci --//jvm/hermes/src/main/jni:include_jni //jvm/...
+      - run: bazel build --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
       - save_cache:
           paths:
