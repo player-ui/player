@@ -5,7 +5,16 @@ coverage --combined_report=lcov
 # TODO: Custom compiler version breaks embedded jdeps generator plugin - enable when removing custom kotlinc
 build --@rules_kotlin//kotlin/settings:jvm_emit_jdeps=False
 build --cxxopt=-std=c++17
-build --java_language_version=17 --tool_java_language_version=17 --java_runtime_version=remotejdk_17 --tool_java_runtime_version=remotejdk_17
+
+# Java Specific Configs
+build --java_language_version=17 
+build --tool_java_language_version=17 
+build --java_runtime_version=remotejdk_17 
+build --tool_java_runtime_version=remotejdk_17 
+build --repo_env=JAVA_HOME=../bazel_tools/jdk
+
+# Javascript Specific Configs
+common --@aspect_rules_ts//ts:skipLibCheck=always
 
 # Android databinding flags
 common --android_crosstool_top=@androidndk//:toolchain
@@ -53,6 +62,13 @@ common:ci --local_ram_resources=15000
 common:ci --config="release"
 common:ci --experimental_remote_build_event_upload=minimal 
 common:ci --nolegacy_important_outputs
+common:ci --remote_upload_local_results
+
+# Only show progress every 60 seconds on CI.
+# We want to find a compromise between printing often enough to show that the build isn't stuck,
+# but not so often that we produce a long log file that requires a lot of scrolling.
+# https://bazel.build/reference/command-line-reference#flag--show_progress_rate_limit
+build:ci --show_progress_rate_limit=60
 
 # Circle macos.m1.large.gen1 8 cores 12gb ram
 common:ci-mac --config=ci --local_cpu_resources=4 --local_ram_resources=7000
@@ -92,9 +108,5 @@ test:debug --test_output=streamed --test_strategy=exclusive --test_timeout=9999 
 run:debug --define=VERBOSE_LOGS=1 -- --node_options=--inspect-brk
 # The following option will change the build output of certain rules such as terser and may not be desirable in all cases
 build:debug --compilation_mode=dbg
-
-build --@aspect_rules_ts//ts:skipLibCheck=always
-fetch --@aspect_rules_ts//ts:skipLibCheck=always
-query --@aspect_rules_ts//ts:skipLibCheck=always
 
 try-import %workspace%/.bazelrc.local
