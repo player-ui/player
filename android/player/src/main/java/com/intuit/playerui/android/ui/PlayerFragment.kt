@@ -180,7 +180,7 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
      */
     protected open fun handleAssetUpdate(asset: RenderableAsset?, animateTransition: Boolean) {
         renderingJob?.cancel("handling new update")
-        renderingJob = lifecycleScope.launch(Dispatchers.Default) {
+        renderingJob = lifecycleScope.launch(if (asset is SuspendableAsset<*>) Dispatchers.Default else Dispatchers.Main) {
             whenStarted { // TODO: This'll go away when we can call a suspend version of this
                 try {
                     renderIntoPlayerCanvas(asset, animateTransition)
