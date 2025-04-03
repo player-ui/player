@@ -232,7 +232,7 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel test --config=ci -- //third_party/hermes/hello:test --cache_test_results=no
+      - run: bazel test --config=ci --cache_test_results=no -- //third_party/hermes/hello:test
 
       - run: bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
