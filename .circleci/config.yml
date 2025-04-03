@@ -118,7 +118,7 @@ jobs:
 
       - run: bazel build --config=ci -- $(bazel query 'filter("native_bundle$", //...)')
 
-      - run: bazel build --config=ci //jvm/hermes:hermes-host
+      - run: bazel build --config=ci //third_party/hermes:host
 
       - save_cache:
           paths:
