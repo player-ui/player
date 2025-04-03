@@ -12,9 +12,9 @@ class BadgeUITest : ComposeUITest("badge") {
     fun basic() {
         launchMock("badge-all")
 
-        androidComposeRule.onNodeWithText("INFO", useUnmergedTree = true)
+        androidComposeRule.onNodeWithText("INFO")
             .assertExists()
-        androidComposeRule.onNodeWithText("ERROR", useUnmergedTree = true)
+        androidComposeRule.onNodeWithText("ERROR")
             .assertExists()
         player.shouldBeAtState<InProgressState>()
     }
