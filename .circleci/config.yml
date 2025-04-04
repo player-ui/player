@@ -118,7 +118,7 @@ jobs:
 
       - run: bazel build --config=ci -- $(bazel query 'filter("native_bundle$", //...)')
 
-      - run: bazel build --config=ci --local_cpu_resources=6 --jobs=4 //third_party/hermes/hello:test
+      - run: bazel build //third_party/hermes/hello:test
 
       - save_cache:
           paths:

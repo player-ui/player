@@ -33,9 +33,7 @@ build --remote_cache=grpcs://remote.buildbuddy.io
 build --remote_instance_name=buildbuddy-cache-20250404
 build --experimental_remote_cache_compression
 build --experimental_remote_cache_async
-build --remote_download_minimal
-build --noremote_accept_cached
-build --remote_upload_local_results=true
+build --remote_download_toplevel
 build --remote_timeout=3600
 build --build_metadata=REPO_URL=https://github.com/player-ui/player.git
 
@@ -45,9 +43,7 @@ test --remote_cache=grpcs://remote.buildbuddy.io
 test --remote_instance_name=buildbuddy-cache-20250404
 test --experimental_remote_cache_compression
 test --experimental_remote_cache_async
-test --remote_download_minimal
-test --noremote_accept_cached
-test --remote_upload_local_results=true
+test --remote_download_toplevel
 test --remote_timeout=3600
 test --build_metadata=REPO_URL=https://github.com/player-ui/player.git
 
@@ -57,9 +53,7 @@ coverage --remote_cache=grpcs://remote.buildbuddy.io
 coverage --remote_instance_name=buildbuddy-cache-20250404
 coverage --experimental_remote_cache_compression
 coverage --experimental_remote_cache_async
-coverage --remote_download_minimal
-coverage --noremote_accept_cached
-coverage --remote_upload_local_results=true
+coverage --remote_download_toplevel
 coverage --remote_timeout=3600
 coverage --build_metadata=REPO_URL=https://github.com/player-ui/player.git
 
