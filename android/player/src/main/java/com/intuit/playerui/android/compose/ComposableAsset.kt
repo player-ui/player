@@ -115,8 +115,11 @@ private fun RenderableAsset.composeAndroidView(
     val scope = rememberCoroutineScope()
     AndroidView(factory = ::FrameLayout, modifier) {
         scope.launch {
-            withContext(Dispatchers.IO) {
-                render(styles) into it
+            val renderedView = withContext(Dispatchers.IO) {
+                render(styles)
+            }
+            withContext(Dispatchers.Main) {
+                renderedView into it
             }
         }
     }
