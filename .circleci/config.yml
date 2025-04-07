@@ -116,7 +116,7 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel build --config=ci -- $(bazel query 'filter("native_bundle$", //...)')
+      - run: bazel build --config=ci --local_ram_resources=2048 --worker_max_instances=0 --strategy=Javac=standalone -- $(bazel query 'filter("native_bundle$", //...)')
 
       - run: bazel build //third_party/hermes/hello:test
 
