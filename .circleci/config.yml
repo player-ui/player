@@ -118,8 +118,6 @@ jobs:
 
       - run: bazel build --config=ci -- $(bazel query 'filter("native_bundle$", //...)')
 
-      - run: bazel --batch build --config=ci --local_ram_resources=2048 --worker_max_instances=0 --strategy=Javac=standalone //third_party/hermes/hello:test
-
       - save_cache:
           paths:
             - node_modules
@@ -233,6 +231,8 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/player
+
+      - run: bazel --batch test --config=ci --local_ram_resources=2048 --worker_max_instances=0 --strategy=Javac=standalone //third_party/hermes/hello:test
 
       - run: bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
