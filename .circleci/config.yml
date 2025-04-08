@@ -232,9 +232,9 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel test --config=ci //third_party/hermes/hello:test
+      - run: bazel --batch build --config=ci --local_ram_resources=2048 --worker_max_instances=0 --strategy=Javac=standalone -- @hermes//:host
 
-      - run: bazel --batch test --config=ci --local_ram_resources="HOST_RAM*.5" --worker_max_instances=0 --strategy=Javac=standalone -- //jvm/core:test
+      - run: bazel test --config=ci //jvm/core:test
 
       - run: bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
