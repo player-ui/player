@@ -58,6 +58,9 @@ export interface ManagedPlayerProps extends ReactPlayerOptions {
   /** A callback for any errors */
   onError?: (e: Error) => void;
 
+  /** middleware to use in the managed player */
+  middleware?: MiddlewareMethod<unknown>[];
+
   /** A component to render when there are errors */
   fallbackComponent?: React.ComponentType<FallbackProps>;
 }
@@ -160,3 +163,5 @@ export interface ManagerMiddleware {
   /** Middleware for a response from the managed-player */
   next?: <Type>(nextPromise: Promise<Type>) => Promise<Type>;
 }
+
+export type MiddlewareMethod<T> = (value: Promise<T>) => Promise<T>;
