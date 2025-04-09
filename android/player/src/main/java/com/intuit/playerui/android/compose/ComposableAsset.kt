@@ -50,7 +50,6 @@ public abstract class ComposableAsset<Data> (
     override suspend fun initView(data: Data) = ComposeView(requireContext()).apply {
         if (wrapContent()) layoutParams = ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
 
-        composeHydrationScope = hydrationScope
         setContent {
             compose(data = data)
         }
@@ -61,7 +60,6 @@ public abstract class ComposableAsset<Data> (
         setContent {
             compose(data = data)
         }
-        composeHydrationScope = hydrationScope
     }
 
     fun updateProvidedValues(values: List<ProvidedValue<*>>) {
@@ -71,6 +69,7 @@ public abstract class ComposableAsset<Data> (
 
     @Composable
     fun compose(modifier: Modifier? = Modifier, data: Data? = null) {
+        composeHydrationScope = hydrationScope
         val data: Data? by produceState<Data?>(initialValue = data, key1 = this) {
             value = getData()
         }
@@ -112,6 +111,7 @@ private fun RenderableAsset.composeAndroidView(
     modifier: Modifier = Modifier,
     styles: Styles? = null,
 ) {
+    renewHydrationScope("Creating compose view")
     val scope = rememberCoroutineScope()
     AndroidView(factory = ::FrameLayout, modifier) {
         scope.launch {
