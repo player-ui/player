@@ -35,6 +35,8 @@ build --remote_local_fallback
 build --disk_cache=/tmp/local-cache
 build --noremote_upload_local_results
 build --noremote_accept_cached
+build --action_env=CC=clang
+build --action_env=CXX=clang++
 build --build_metadata=REPO_URL=https://github.com/player-ui/player.git
 
 test --bes_results_url=https://app.buildbuddy.io/invocation/
@@ -43,6 +45,8 @@ test --remote_local_fallback
 test --disk_cache=/tmp/local-cache
 test --noremote_upload_local_results
 test --noremote_accept_cached
+test --action_env=CC=clang
+test --action_env=CXX=clang++
 test --build_metadata=REPO_URL=https://github.com/player-ui/player.git
 
 coverage --bes_results_url=https://app.buildbuddy.io/invocation/
@@ -51,6 +55,8 @@ coverage --remote_local_fallback
 coverage --disk_cache=/tmp/local-cache
 coverage --noremote_upload_local_results
 coverage --noremote_accept_cached
+coverage --action_env=CC=clang
+coverage --action_env=CXX=clang++
 coverage --build_metadata=REPO_URL=https://github.com/player-ui/player.git
 
 common:ci --build_metadata=ROLE=CI
