@@ -168,9 +168,9 @@ jobs:
             - ~/android-tools
 
       - macos/preboot-simulator:
-          version: "17.4"
+          version: "18.1"
           platform: "iOS"
-          device: "iPhone 15"
+          device: "iPhone 16"
 
       - run: bazel build --config=ci-mac -- //ios/demo:PlayerUIDemo
 
