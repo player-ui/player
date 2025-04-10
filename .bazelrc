@@ -1,4 +1,5 @@
-startup --host_jvm_args=-Xmx2048m
+startup --host_jvm_args=-Xmx1024m
+startup --host_jvm_args=-Xms1024m
 
 common --enable_bzlmod
 test --test_output=errors
