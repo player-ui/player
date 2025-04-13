@@ -14,6 +14,7 @@ cmake(
     },
     env = {
         "CMAKE_BUILD_TYPE": "$(CMAKE_BUILD_TYPE)",
+        "CMAKE_BUILD_PARALLEL_LEVEL": "4"
     },
     generate_args = ["-G Ninja"],
     lib_name = "hermes",
@@ -45,6 +46,9 @@ cmake(
     name = "hermesc",
     generate_args = ["-G Ninja"],
     install = False,
+    env = {
+        "CMAKE_BUILD_PARALLEL_LEVEL": "4"
+    },
     lib_source = "working_directory",
     out_binaries = ["hermesc"],
     postfix_script = "cp -L $BUILD_TMPDIR/bin/hermesc $INSTALLDIR/bin",
@@ -75,6 +79,7 @@ cmake(
     ],
     env = {
         "CMAKE_BUILD_TYPE": "$(CMAKE_BUILD_TYPE)",
+        "CMAKE_BUILD_PARALLEL_LEVEL": "4"
     },
     generate_args = ["-G Ninja"],
     lib_name = "hermes",
