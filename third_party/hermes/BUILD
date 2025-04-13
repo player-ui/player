@@ -14,6 +14,7 @@ cmake(
     },
     env = {
         "CMAKE_BUILD_TYPE": "$(CMAKE_BUILD_TYPE)",
+        "CMAKE_BUILD_PARALLEL_LEVEL": "4"
     },
     generate_args = ["-G Ninja"],
     lib_name = "hermes",
