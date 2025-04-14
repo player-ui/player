@@ -51,7 +51,7 @@ RN_VERSION = "0.78.1"
 http_archive(
     name = "rn_hermes_android",
     build_file = "//third_party/rn:hermes_android.BUILD",
-    sha256 = "6647e7f85b6859705cf810a159303699e509869743147a4c532687859613e320",
+    sha256 = "e60a59daf0293fcee17877a715fcd26614c4348855a74365a9564cde9a0fbe7c",
     url = "https://repo1.maven.org/maven2/com/facebook/react/hermes-android/{}/hermes-android-{}-release.aar".format(RN_VERSION, RN_VERSION),
 )
 
