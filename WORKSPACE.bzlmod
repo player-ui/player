@@ -61,7 +61,7 @@ git_repository(
     build_file = "//third_party/rn:react_native.BUILD",
     patches = ["//patches:react_native.loosen_host_function_params.patch"],
     remote = "https://github.com/facebook/react-native",
-    commit = "31f9d45074f069151c155836335e0edff87f70bd"
+    commit = "1299ef7be0fe9daf8274b7b2a7c49078723fc533"
 )
 
 http_archive(
