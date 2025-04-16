@@ -50,7 +50,7 @@ export interface PlayerPlugin {
   apply: (player: Player) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface ExtendedPlayerPlugin<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Assets = void,

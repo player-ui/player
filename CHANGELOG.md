@@ -1,3 +1,66 @@
+# 0.11.0-next.1 (Wed Apr 16 2025)
+
+### Release Notes
+
+#### Hermes Build Fixes and Upgrade, Better Cache Uses, and ESLint v9 Upgrade ([#632](https://github.com/player-ui/player/pull/632))
+
+Update React Native JSI and Hermes binaries, compiled with `HERMES_UNICODE_LITE` flag to avoid Java `localeCompare` implementation. Change log for React Native from [here](https://github.com/facebook/react-native/blob/main/CHANGELOG.md#v0781) to [here](https://github.com/facebook/react-native/blob/main/CHANGELOG.md#v0742)
+
+---
+
+#### 🐛 Bug Fix
+
+- Hermes Build Fixes and Upgrade, Better Cache Uses, and ESLint v9 Upgrade [#632](https://github.com/player-ui/player/pull/632) ([@brocollie08](https://github.com/brocollie08) [@KetanReddy](https://github.com/KetanReddy))
+- a bit of docs for building hermes libs [#629](https://github.com/player-ui/player/pull/629) ([@brocollie08](https://github.com/brocollie08))
+- Update Bazel Docker Image [#620](https://github.com/player-ui/player/pull/620) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 2
+
+- [@brocollie08](https://github.com/brocollie08)
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.11.0-next.0 (Tue Mar 18 2025)
+
+### Release Notes
+
+#### Doc Site Updates ([#615](https://github.com/player-ui/player/pull/615))
+
+Doc site: 
+- Fix dark mode styling of next button on landing page demo
+- Fix missing favicon
+- Add more custom styling
+- Close #574 
+- Close #493
+
+#### chat ui storybook ([#611](https://github.com/player-ui/player/pull/611))
+
+- Add new storybook for chat
+- Allow pass in custom plugins for DSL stories
+- fix flatten issue
+
+---
+
+#### 🚀 Enhancement
+
+- Jetpack Compose [#609](https://github.com/player-ui/player/pull/609) ([@A1shK](https://github.com/A1shK) [@brocollie08](https://github.com/brocollie08))
+
+#### 🐛 Bug Fix
+
+- Doc Site Updates [#615](https://github.com/player-ui/player/pull/615) ([@KetanReddy](https://github.com/KetanReddy) [@kharrop](https://github.com/kharrop))
+- chat ui storybook [#611](https://github.com/player-ui/player/pull/611) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+
+#### Authors: 5
+
+- [@A1shK](https://github.com/A1shK)
+- [@brocollie08](https://github.com/brocollie08)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.10.5-next.2 (Mon Mar 10 2025)
 
 #### 🐛 Bug Fix

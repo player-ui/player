@@ -20,9 +20,12 @@ abstract class AssetUITest(val group: String? = null) {
     @get:Rule
     val rule = activityScenarioRule<MainActivity>()
 
+    open fun getActivityRule() = rule
+
     protected lateinit var viewModel: MainViewModel
 
     protected lateinit var playerViewModel: DemoPlayerViewModel
+    protected val player get() = playerViewModel.player
 
     protected val currentState: PlayerFlowState? get() = playerViewModel.playerFlowState.value
 
@@ -33,7 +36,7 @@ abstract class AssetUITest(val group: String? = null) {
     @Before
     fun before() {
         Intents.init()
-        rule.scenario.onActivity {
+        getActivityRule().scenario.onActivity {
             viewModel = it.viewModel
         }
     }
@@ -57,7 +60,7 @@ abstract class AssetUITest(val group: String? = null) {
     fun launchMock(mock: Mock<*>) {
         viewModel.launch(mock)
 
-        rule.scenario.onActivity {
+        getActivityRule().scenario.onActivity {
             playerViewModel = it.currentPlayer?.playerViewModel as? DemoPlayerViewModel
                 ?: throw IllegalStateException("player not found")
         }

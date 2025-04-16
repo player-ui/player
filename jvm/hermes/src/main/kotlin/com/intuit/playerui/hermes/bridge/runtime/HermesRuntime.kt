@@ -181,15 +181,13 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
             }
 
             @JvmStatic public external fun create(
-                intl: Boolean,
                 microtaskQueue: Boolean,
             ): Config
 
             // Pulling defaults from JSI RuntimeConfig defaults
             public operator fun invoke(
-                intl: Boolean = true,
                 microtaskQueue: Boolean = false,
-            ): Config = create(intl, microtaskQueue)
+            ): Config = create(microtaskQueue)
         }
     }
 }
