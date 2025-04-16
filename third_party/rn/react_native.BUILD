@@ -18,6 +18,9 @@ cmake(
     generate_args = ["-G Ninja"],
     lib_name = "jsi",
     lib_source = "jsi_sources",
+    env = {
+        "CMAKE_BUILD_PARALLEL_LEVEL": "4"
+    },
     out_shared_libs = ["libjsi.so"],
     visibility = ["//visibility:public"],
     #    copts = ["-std=c++_shared"],

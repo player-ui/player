@@ -51,7 +51,6 @@ export class Builder {
     };
 
     values.forEach((v) => {
-      // eslint-disable-next-line no-param-reassign
       v.parent = m;
     });
 
@@ -89,7 +88,6 @@ export class Builder {
     path: Node.PathSegment | Node.PathSegment[],
     child: Node.Node,
   ): N {
-    // eslint-disable-next-line no-param-reassign
     child.parent = node as Node.Node;
 
     const newChild: Node.Child = {
@@ -97,7 +95,6 @@ export class Builder {
       value: child,
     };
 
-    // eslint-disable-next-line no-param-reassign
     node.children = node.children || [];
     node.children.push(newChild);
 
