@@ -33,7 +33,6 @@ export interface PlayerUtils {
   findPlugin<Plugin = unknown>(symbol: symbol): Plugin | undefined;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
 export declare namespace Resolve {
   export interface Validation {
     /** Fetch the data-type for the given binding */

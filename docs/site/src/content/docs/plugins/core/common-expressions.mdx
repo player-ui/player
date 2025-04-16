@@ -71,7 +71,7 @@ var body: some View {
 
 ## General
 
-#### size
+### size
 
 > Gets the size of a value. This is the number of keys in an object, the length of a string, or the number of items in an array.
 
@@ -79,11 +79,11 @@ var body: some View {
 function size(value: string | array | object): number;
 ```
 
-#### length
+### length
 
 > Alias for `size`
 
-#### concat
+### concat
 
 > Concatenates arrays together, or strings into 1 value
 
@@ -95,7 +95,7 @@ function concat(...values: Array): Array;
 
 ## Strings
 
-#### trim
+### trim
 
 > Trims whitespace from the leading and trailing edges of a string
 
@@ -103,7 +103,7 @@ function concat(...values: Array): Array;
 function trim(value: string): string;
 ```
 
-#### upperCase
+### upperCase
 
 > Transforms the string to all uppercase.
 
@@ -111,7 +111,7 @@ function trim(value: string): string;
 function upperCase(value: string): string;
 ```
 
-#### lowerCase
+### lowerCase
 
 > Transforms the string to all lowercase.
 
@@ -119,7 +119,7 @@ function upperCase(value: string): string;
 function lowerCase(value: string): string;
 ```
 
-#### titleCase
+### titleCase
 
 > Transforms the string to title case. Each word is capitalized.
 
@@ -127,7 +127,7 @@ function lowerCase(value: string): string;
 function titleCase(value: string): string;
 ```
 
-#### sentenceCase
+### sentenceCase
 
 > Transforms the string to sentence case. The first word is capitalized.
 
@@ -135,7 +135,7 @@ function titleCase(value: string): string;
 function sentenceCase(value: string): string;
 ```
 
-#### replace
+### replace
 
 > Replaces all instances of pattern in string with replacement. The pattern can also be a regex.
 
@@ -147,7 +147,7 @@ function replace(
 ): string;
 ```
 
-#### containsAny
+### containsAny
 
 > Checks if a given string contains any keywords present in the given array.
 
@@ -159,7 +159,7 @@ function containsAny(value: string, keywords: Array<string>): boolean;
 
 ## Math
 
-#### number
+### number
 
 > Converts the given value to a number if possible. Will handle removing currency modifiers and comma delimitated values.
 
@@ -167,7 +167,7 @@ function containsAny(value: string, keywords: Array<string>): boolean;
 function number(value: string): number | undefined;
 ```
 
-#### round
+### round
 
 > Rounds the given number to the nearest integer.
 
@@ -175,7 +175,7 @@ function number(value: string): number | undefined;
 function round(value: number): number;
 ```
 
-#### floor
+### floor
 
 > Rounds the number down the the nearest integer
 
@@ -183,7 +183,7 @@ function round(value: number): number;
 function floor(value: number): number;
 ```
 
-#### ceil
+### ceil
 
 > Rounds the number up the the nearest integer
 
@@ -191,7 +191,7 @@ function floor(value: number): number;
 function ceil(value: number): number;
 ```
 
-#### sum
+### sum
 
 > Sums up all arguments
 
