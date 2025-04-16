@@ -1,3 +1,26 @@
+# 0.11.0-next.1 (Wed Apr 16 2025)
+
+### Release Notes
+
+#### Hermes Build Fixes and Upgrade, Better Cache Uses, and ESLint v9 Upgrade ([#632](https://github.com/player-ui/player/pull/632))
+
+Update React Native JSI and Hermes binaries, compiled with `HERMES_UNICODE_LITE` flag to avoid Java `localeCompare` implementation. Change log for React Native from [here](https://github.com/facebook/react-native/blob/main/CHANGELOG.md#v0781) to [here](https://github.com/facebook/react-native/blob/main/CHANGELOG.md#v0742)
+
+---
+
+#### 🐛 Bug Fix
+
+- Hermes Build Fixes and Upgrade, Better Cache Uses, and ESLint v9 Upgrade [#632](https://github.com/player-ui/player/pull/632) ([@brocollie08](https://github.com/brocollie08) [@KetanReddy](https://github.com/KetanReddy))
+- a bit of docs for building hermes libs [#629](https://github.com/player-ui/player/pull/629) ([@brocollie08](https://github.com/brocollie08))
+- Update Bazel Docker Image [#620](https://github.com/player-ui/player/pull/620) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 2
+
+- [@brocollie08](https://github.com/brocollie08)
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.11.0-next.0 (Tue Mar 18 2025)
 
 ### Release Notes
