@@ -32,7 +32,7 @@ executors:
     working_directory: ~/player
     resource_class: m2pro.medium
     macos:
-      xcode: 15.3.0
+      xcode: 16.0.0
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   android:
@@ -128,6 +128,9 @@ jobs:
           at: ~/player
 
       - macos/install-rosetta
+      - run:
+          name: List Available Simulators
+          command: xcrun simctl list devices available
 
       - run:
           name: Homebrew Dependencies
@@ -162,9 +165,9 @@ jobs:
             - ~/android-tools
 
       - macos/preboot-simulator:
-          version: "17.4"
+          version: "18.1"
           platform: "iOS"
-          device: "iPhone 15"
+          device: "iPhone 16 Pro"
 
       - run: bazel build --config=ci-mac -- //ios/demo:PlayerUIDemo
 
@@ -172,7 +175,7 @@ jobs:
           name: Test Prebuild
           command: |
             bazel build \
-              --config=ci-mac \
+              
               $(bazel query "kind(ios_unit_test, //ios/...)") \
               $(bazel query "kind(ios_unit_test, //plugins/...)") \
               $(bazel query "kind(ios_ui_test, //ios/...)") \
@@ -183,10 +186,7 @@ jobs:
           name: Tests
           command: |
             bazel coverage \
-              --config=ci-mac \
-              --jobs=1 \
-              --experimental_use_llvm_covmap \
-              --combined_report=lcov \
+           
               --test_output=all \
               --test_timeout=1800 \
               $(bazel query "kind(ios_unit_test, //ios/...)") \
