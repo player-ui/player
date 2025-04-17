@@ -74,7 +74,13 @@ class CrossfieldProvider implements ValidationProvider {
 
 /** A stateful view instance from an content */
 export class ViewInstance implements ValidationProvider {
-  public hooks = {
+  public hooks: {
+    onUpdate: SyncHook<[ViewType], Record<string, any>>;
+    parser: SyncHook<[Parser], Record<string, any>>;
+    resolver: SyncHook<[Resolver], Record<string, any>>;
+    onTemplatePluginCreated: SyncHook<[TemplatePlugin], Record<string, any>>;
+    templatePlugin: SyncHook<[TemplatePlugin], Record<string, any>>;
+  } = {
     onUpdate: new SyncHook<[ViewType]>(),
     parser: new SyncHook<[Parser]>(),
     resolver: new SyncHook<[Resolver]>(),
@@ -102,13 +108,13 @@ export class ViewInstance implements ValidationProvider {
     });
   }
 
-  public updateAsync() {
+  public updateAsync(): void {
     const update = this.resolver?.update();
     this.lastUpdate = update;
     this.hooks.onUpdate.call(update);
   }
 
-  public update(changes?: Set<BindingInstance>) {
+  public update(changes?: Set<BindingInstance>): any {
     if (this.rootNode === undefined) {
       /** On initialization of the view, also create a validation parser */
       this.validationProvider = new CrossfieldProvider(
@@ -148,7 +154,9 @@ export class ViewInstance implements ValidationProvider {
     return update;
   }
 
-  getValidationsForBinding(binding: BindingInstance) {
+  getValidationsForBinding(
+    binding: BindingInstance,
+  ): ValidationObject[] | undefined {
     return this.validationProvider?.getValidationsForBinding(binding);
   }
 }

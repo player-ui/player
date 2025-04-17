@@ -9,7 +9,7 @@ import type {
   Updates,
 } from "../../data";
 import { DependencyModel, withParser } from "../../data";
-import type { Logger } from "../../logger";
+import type { Logger, Severity } from "../../logger";
 import type { Node } from "../parser";
 import { NodeType } from "../parser";
 import {
@@ -19,6 +19,7 @@ import {
 } from "./utils";
 import type { Resolve } from "./types";
 import { getNodeID } from "../parser/utils";
+import { FlagController } from "../../controllers";
 
 export * from "./types";
 export * from "./utils";
@@ -62,7 +63,51 @@ const withContext = (model: DataModelWithParser): DataModelWithParser => {
  * It combines the ability to mutate ast nodes before resolving, as well as the mutating the resolved objects while parsing
  */
 export class Resolver {
-  public readonly hooks = {
+  public readonly hooks: {
+    /** A hook to allow skipping of the resolution tree for a specific node */
+    skipResolve: SyncWaterfallHook<
+      [boolean, Node.Node, Resolve.NodeResolveOptions],
+      Record<string, any>
+    >;
+    /** An event emitted before calculating the next update */
+    beforeUpdate: SyncHook<
+      [Set<BindingInstance> | undefined],
+      Record<string, any>
+    >;
+    /** An event emitted after calculating the next update */
+    afterUpdate: SyncHook<[any], Record<string, any>>;
+    /** The options passed to a node to resolve it to an object */
+    resolveOptions: SyncWaterfallHook<
+      [Resolve.NodeResolveOptions, Node.Node],
+      Record<string, any>
+    >;
+    /** A hook to transform the AST node into a new AST node before resolving it */
+    beforeResolve: SyncWaterfallHook<
+      [Node.Node | null, Resolve.NodeResolveOptions],
+      Record<string, any>
+    >;
+    /**
+     * A hook to transform an AST node into it's resolved value.
+     * This runs _before_ any children are resolved
+     */
+    resolve: SyncWaterfallHook<
+      [any, Node.Node, Resolve.NodeResolveOptions],
+      Record<string, any>
+    >;
+    /**
+     * A hook to transform the resolved value of an AST node.
+     * This runs _after_ all children nodes are resolved
+     */
+    afterResolve: SyncWaterfallHook<
+      [any, Node.Node, Resolve.NodeResolveOptions],
+      Record<string, any>
+    >;
+    /** Called at the very end of a node's tree being updated */
+    afterNodeUpdate: SyncHook<
+      [Node.Node, Node.Node | undefined, NodeUpdate],
+      Record<string, any>
+    >;
+  } = {
     /** A hook to allow skipping of the resolution tree for a specific node */
     skipResolve: new SyncWaterfallHook<
       [boolean, Node.Node, Resolve.NodeResolveOptions]
@@ -145,7 +190,7 @@ export class Resolver {
     this.idCache = new Set();
   }
 
-  public getSourceNode(convertedAST: Node.Node) {
+  public getSourceNode(convertedAST: Node.Node): Node.Node | undefined {
     return this.ASTMap.get(convertedAST);
   }
 
@@ -170,8 +215,26 @@ export class Resolver {
     return updated.value;
   }
 
-  public getResolveCache() {
+  public getResolveCache(): Map<Node.Node, Resolve.ResolvedNode> {
     return new Map(this.resolveCache);
+  }
+
+  /** Use flags to determine how to log the message */
+  private logCacheIssue(id: string, type: NodeType): void {
+    let message: string | undefined;
+    let loglevel: Severity | undefined;
+
+    if (type === NodeType.Asset || type === NodeType.View) {
+      loglevel = this.options.flagController.getFlag("duplicateIDLogLevel");
+      message = `Cache conflict: Found Asset/View nodes that have conflicting ids: ${id}, may cause cache issues.`;
+    } else if (type === NodeType.Value) {
+      loglevel = this.options.flagController.getFlag("cacheConflictLogLevel");
+      message = `Cache conflict: Found Value nodes that have conflicting ids: ${id}, may cause cache issues. To improve performance make value node IDs globally unique.`;
+    }
+
+    if (message && loglevel) {
+      this.logger?.[loglevel]?.(message);
+    }
   }
 
   private getPreviousResult(node: Node.Node): Resolve.ResolvedNode | undefined {
@@ -187,15 +250,7 @@ export class Resolver {
         // Only log this conflict once to cut down on noise
         // May want to swap this to logging when we first see the id -- which may not be the first render
         if (isFirstUpdate) {
-          if (node.type === NodeType.Asset || node.type === NodeType.View) {
-            this.logger?.error(
-              `Cache conflict: Found Asset/View nodes that have conflicting ids: ${id}, may cause cache issues.`,
-            );
-          } else if (node.type === NodeType.Value) {
-            this.logger?.info(
-              `Cache conflict: Found Value nodes that have conflicting ids: ${id}, may cause cache issues. To improve performance make value node IDs globally unique.`,
-            );
-          }
+          this.logCacheIssue(id, node.type);
         }
 
         // Don't use anything from a prev result if there's a duplicate id detected

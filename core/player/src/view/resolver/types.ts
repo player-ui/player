@@ -14,7 +14,7 @@ import type {
   DataModelOptions,
 } from "../../data";
 import type { ConstantsProvider } from "../../controllers/constants";
-import type { TransitionFunction } from "../../controllers";
+import type { FlagController, TransitionFunction } from "../../controllers";
 import type { ExpressionEvaluator, ExpressionType } from "../../expressions";
 import type { ValidationResponse } from "../../validator";
 import type { Logger } from "../../logger";
@@ -96,6 +96,9 @@ export declare namespace Resolve {
   export interface BaseOptions {
     /** A logger to use */
     logger?: Logger;
+
+    /** Used for getting runtime configuration */
+    flagController: FlagController;
 
     /** Utils for various useful operations */
     utils?: PlayerUtils;
