@@ -1,3 +1,15 @@
+# 0.11.0-next.3 (Thu Apr 17 2025)
+
+#### 🐛 Bug Fix
+
+- move renderIntoPlayerCanvas onto the correct thread [#633](https://github.com/player-ui/player/pull/633) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
 # 0.11.0-next.2 (Wed Apr 16 2025)
 
 ### Release Notes
