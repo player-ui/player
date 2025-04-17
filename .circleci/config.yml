@@ -98,13 +98,6 @@ jobs:
           echo "test --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
           echo "coverage --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
           echo "common --remote_upload_local_results" >> .bazelrc.local
-          if [ "${CIRCLE_BRANCH}" == "main" ]; then
-            echo "Running on main"
-            echo "common --//android/player:runtime=j2v8" >> .bazelrc.local
-          else
-            echo "Running on PR"
-            echo "common --//android/player:runtime=j2v8-debug" >> .bazelrc.local
-          fi
       - persist_to_workspace:
           root: .
           paths:
