@@ -1,6 +1,8 @@
 package com.intuit.playerui.android.compose
 
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.runtime.Composable
@@ -8,6 +10,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ProvidedValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
@@ -22,6 +25,10 @@ import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withTag
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 
 /**
@@ -35,8 +42,14 @@ public abstract class ComposableAsset<Data> (
     assetContext: AssetContext,
     serializer: KSerializer<Data>,
 ) : SuspendableAsset<Data>(assetContext, serializer) {
+    /** Set to false for assets that take full width. Defaults to true */
+    public open fun wrapContent(): Boolean = true
+
+    public lateinit var composeHydrationScope: CoroutineScope
 
     override suspend fun initView(data: Data) = ComposeView(requireContext()).apply {
+        if (wrapContent()) layoutParams = ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
+
         setContent {
             compose(data = data)
         }
@@ -56,6 +69,7 @@ public abstract class ComposableAsset<Data> (
 
     @Composable
     fun compose(modifier: Modifier? = Modifier, data: Data? = null) {
+        composeHydrationScope = hydrationScope
         val data: Data? by produceState<Data?>(initialValue = data, key1 = this) {
             value = getData()
         }
@@ -81,7 +95,12 @@ fun RenderableAsset.compose(
 ) {
     assetContext.withContext(LocalContext.current).withTag(tag ?: asset.id).build().run {
         when (this) {
-            is ComposableAsset<*> -> CompositionLocalProvider(LocalTextStyle provides (styles?.textStyle ?: TextStyle())) { compose(modifier = modifier) }
+            is ComposableAsset<*> -> CompositionLocalProvider(
+                LocalTextStyle provides (styles?.textStyle ?: TextStyle()),
+            ) {
+                this.composeHydrationScope = renewHydrationScope("Creating compose view")
+                compose(modifier = modifier)
+            }
             else -> composeAndroidView(modifier, styles?.xmlStyles)
         }
     }
@@ -92,7 +111,16 @@ private fun RenderableAsset.composeAndroidView(
     modifier: Modifier = Modifier,
     styles: Styles? = null,
 ) {
+    renewHydrationScope("Creating compose view")
+    val scope = rememberCoroutineScope()
     AndroidView(factory = ::FrameLayout, modifier) {
-        render(styles) into it
+        scope.launch {
+            val renderedView = withContext(Dispatchers.IO) {
+                render(styles)
+            }
+            withContext(Dispatchers.Main) {
+                renderedView into it
+            }
+        }
     }
 }
