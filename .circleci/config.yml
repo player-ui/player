@@ -135,6 +135,9 @@ jobs:
           at: ~/player
 
       - macos/install-rosetta
+      - run:
+          name: List Available Simulators
+          command: xcrun simctl list devices available
 
       - run:
           name: Homebrew Dependencies
@@ -179,7 +182,7 @@ jobs:
           name: Test Prebuild
           command: |
             bazel build \
-              --config=ci-mac \
+              
               $(bazel query "kind(ios_unit_test, //ios/...)") \
               $(bazel query "kind(ios_unit_test, //plugins/...)") \
               $(bazel query "kind(ios_ui_test, //ios/...)") \
@@ -190,10 +193,7 @@ jobs:
           name: Tests
           command: |
             bazel coverage \
-              --config=ci-mac \
-              --jobs=1 \
-              --experimental_use_llvm_covmap \
-              --combined_report=lcov \
+           
               --test_output=all \
               --test_timeout=1800 \
               $(bazel query "kind(ios_unit_test, //ios/...)") \
