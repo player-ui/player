@@ -276,6 +276,13 @@ export class Resolver {
       type: NodeType.Empty,
     };
 
+    const isNestedMultiNodeWithAsync =
+      resolvedAST.type === NodeType.MultiNode &&
+      partiallyResolvedParent?.parent?.parent?.type === NodeType.MultiNode &&
+      partiallyResolvedParent.parent.type === NodeType.Value &&
+      resolvedAST.parent?.type === NodeType.Asset &&
+      resolvedAST.parent.value.id.includes("async");
+
     const isNestedMultiNode =
       resolvedAST.type === NodeType.MultiNode &&
       partiallyResolvedParent?.parent?.type === NodeType.MultiNode &&
@@ -333,9 +340,11 @@ export class Resolver {
 
       return update;
     }
-
-    resolvedAST.parent = partiallyResolvedParent;
-
+    if (isNestedMultiNodeWithAsync) {
+      resolvedAST.parent = partiallyResolvedParent.parent;
+    } else {
+      resolvedAST.parent = partiallyResolvedParent;
+    }
     resolveOptions.node = resolvedAST;
 
     this.ASTMap.set(resolvedAST, node);
@@ -423,6 +432,7 @@ export class Resolver {
             mTree.value.asset &&
             Array.isArray(mTree.value.asset.values)
           ) {
+            // This flatten function only changed the values not node structure
             unpackAndPush(mTree.value, childValue);
           } else {
             childValue.push(mTree.value);
