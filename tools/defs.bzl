@@ -24,9 +24,9 @@ def vitest_config(name):
 
     expand_template(
         name = name,
-        out = "vitest.config.ts",
+        out = "vitest.config.mts",
         substitutions = {
             "%PREFIX%": prefix,
         },
-        template = "//tools:vitest.config.ts.tmpl",
+        template = "//tools:vitest.config.mts.tmpl",
     )

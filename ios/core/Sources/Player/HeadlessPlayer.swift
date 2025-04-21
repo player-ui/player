@@ -59,6 +59,9 @@ public protocol CoreHooks {
     /// Fired when the state changes
     var state: Hook<BaseFlowState> { get }
 
+    /// A hook to access the current flow
+    var onStart: Hook<FlowType> { get }
+
     /// Initialize hooks from reference to javascript core player
     init(from: JSValue)
 }
@@ -356,7 +359,11 @@ internal extension JSContext {
         var splitPath = path.split(separator: ".")
         var value = objectForKeyedSubscript(splitPath.remove(at: 0))
         for segment in splitPath {
-            value = value?.objectForKeyedSubscript(segment)
+            if value?.isUndefined != true, value?.hasProperty(segment) == true {
+                value = value?.objectForKeyedSubscript(segment)
+            } else {
+                return nil
+            }
         }
         return value
     }

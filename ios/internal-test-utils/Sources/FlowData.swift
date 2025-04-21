@@ -1,4 +1,51 @@
 public struct FlowData {
+
+    static let flowAction: String =
+        """
+                        {
+                          "id": "flow_2",
+                          "views": [
+                            {
+                              "id": "second_view",
+                              "type": "action",
+                              "exp": "{{foo.bar..}",
+                              "value": "end",
+                              "label": {
+                                "asset": {
+                                  "id": "next-view-label",
+                                  "type": "text",
+                                  "value": "End View 2"
+                                }
+                              }
+                            }
+                          ],
+                          "navigation": {
+                            "BEGIN": "flow_2",
+                            "flow_2": {
+                              "startState": "ACTION_2",
+                              "view_2": {
+                                "state_type": "VIEW",
+                                "ref": "second_view",
+                                "transitions": {
+                                  "*": "END_Done"
+                                }
+                              },
+                                     "ACTION_2": {
+                                       "state_type": "ACTION",
+                                       "exp": "{{foo}}",
+                                       "transitions": {
+                                         "*": "END_Done"
+                                       }
+                                     },
+                              "END_Done": {
+                                "state_type": "END",
+                                "outcome": "done"
+                              }
+                            }
+                          }
+                        }
+        """
+
     public static let COUNTER: String = """
 {
   "id": "counter-flow",
@@ -75,6 +122,9 @@ public struct FlowData {
 {
   "id": "counter-flow",
   "views": [],
+  "data": {
+    "count": 0
+  },
   "navigation": {
     "BEGIN": "FLOW_1",
     "FLOW_1": {

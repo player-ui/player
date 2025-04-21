@@ -27,6 +27,7 @@ import com.intuit.playerui.jsi.Value
 import com.intuit.playerui.jsi.serialization.format.JSIFormat
 import com.intuit.playerui.jsi.serialization.format.JSIFormatConfiguration
 import com.intuit.playerui.jsi.serialization.serializers.JSIValueContainerSerializer
+import com.intuit.playerui.plugins.consolelogger.ConsoleLoggerPlugin
 import com.intuit.playerui.plugins.settimeout.SetTimeoutPlugin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -180,15 +181,13 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
             }
 
             @JvmStatic public external fun create(
-                intl: Boolean,
                 microtaskQueue: Boolean,
             ): Config
 
             // Pulling defaults from JSI RuntimeConfig defaults
             public operator fun invoke(
-                intl: Boolean = true,
                 microtaskQueue: Boolean = false,
-            ): Config = create(intl, microtaskQueue)
+            ): Config = create(microtaskQueue)
         }
     }
 }
@@ -198,7 +197,7 @@ public object Hermes : PlayerRuntimeFactory<Config> {
         loadHermesJni()
         val config = Config().apply(block)
         // TODO: Move SetTimeoutPlugin to HeadlessPlayer init once cyclical dep is handled (split out headless impl)
-        return HermesRuntime.create(config).also(SetTimeoutPlugin(config.coroutineExceptionHandler)::apply)
+        return HermesRuntime.create(config).also(SetTimeoutPlugin(config.coroutineExceptionHandler)::apply).also(ConsoleLoggerPlugin(override = true)::apply)
     }
 
     override fun toString(): String = name

@@ -94,10 +94,13 @@ rules_kotlin_extensions = use_extension(
     "@rules_kotlin//src/main/starlark/core/repositories:bzlmod_setup.bzl",
     "rules_kotlin_extensions",
 )
+
+# sha256 values can be found here - https://github.com/JetBrains/kotlin/releases/tag/v1.7.20
 rules_kotlin_extensions.kotlinc_version(
-    sha256 = "9db4b467743c1aea8a21c08e1c286bc2aeb93f14c7ba2037dbd8f48adc357d83",
-    version = "1.7.22",
+    sha256 = "5e3c8d0f965410ff12e90d6f8dc5df2fc09fd595a684d514616851ce7e94ae7d",
+    version = "1.7.20",
 )
+
 use_repo(
     rules_kotlin_extensions,
     "com_github_jetbrains_kotlin",
@@ -139,20 +142,30 @@ maven.install(
         "com.intuit.hooks:hooks:0.15.0",
 
         # Testing
-        "io.mockk:mockk:1.9.3",
+        "io.mockk:mockk:1.12.0",
         "org.amshove.kluent:kluent:1.68",
         "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0",
 
         # Android
-        "androidx.databinding:viewbinding:7.2.2",
+        "androidx.databinding:viewbinding:8.0.0",
         "androidx.annotation:annotation:1.1.0",
 
+        # Compose
+        "androidx.compose.ui:ui:1.2.0",
+        "androidx.compose.ui:ui-tooling:1.2.0",
+        "androidx.compose.ui:ui-test-junit4:1.2.0",
+        "androidx.compose.runtime:runtime:1.2.0",
+        "androidx.compose.runtime:runtime:1.2.0",
+        "androidx.compose.compiler:compiler:1.3.2",
+        "androidx.compose.foundation:foundation:1.2.0",
+        "androidx.compose.material:material:1.2.0",
+
         # Android Demo
-        "androidx.navigation:navigation-runtime:2.3.3",
-        "androidx.navigation:navigation-ui-ktx:2.3.3",
-        "androidx.navigation:navigation-fragment-ktx:2.3.3",
+        "androidx.navigation:navigation-runtime:2.3.1",
+        "androidx.navigation:navigation-ui-ktx:2.3.1",
+        "androidx.navigation:navigation-fragment-ktx:2.3.1",
         "com.afollestad.material-dialogs:core:3.3.0",
-        "com.google.android.material:material:1.4.0",
+        "com.google.android.material:material:1.6.1",
 
         # Android Demo Testing
         "androidx.test.espresso:espresso-intents:3.3.0",
@@ -172,8 +185,8 @@ maven.install(
         "androidx.constraintlayout:constraintlayout:2.1.4",
 
         # AndroidX Resolutions
-        "androidx.activity:activity-ktx:1.2.3",
-        "androidx.fragment:fragment-ktx:1.3.4",
+        "androidx.activity:activity-ktx:1.3.0",
+        "androidx.fragment:fragment-ktx:1.4.1",
 
         # Graal
         "org.graalvm.js:js:21.2.0",

@@ -75,10 +75,12 @@ describe("commaNumber", () => {
     });
 
     it("handles out of bounds", () => {
+      // eslint-disable-next-line no-loss-of-precision
       expect(commaNumber.format?.(123456789123456789, { precision: 2 })).toBe(
         "1,234,567,891,234,567.00",
       );
 
+      // eslint-disable-next-line no-loss-of-precision
       expect(commaNumber.format?.(123456789123456789.0, { precision: 2 })).toBe(
         "1,234,567,891,234,567.00",
       );

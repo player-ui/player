@@ -10,9 +10,13 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.mockkObject
 import io.mockk.slot
 import io.mockk.verify
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.TestTemplate
 import org.junit.jupiter.api.extension.ExtendWith
+import kotlin.contracts.ExperimentalContracts
 import kotlin.test.assertEquals
 
 @ExtendWith(MockKExtension::class)
@@ -44,6 +48,69 @@ internal class MetricsPluginTest : PlayerTest() {
         player.start(simpleFlowString)
         player.inProgressState!!.transition("next")
         verify { renderEndHandler wasNot Called }
+    }
+
+    @OptIn(ExperimentalContracts::class)
+    @TestTemplate
+    fun `should trigger onFlowBegin hook`() {
+        var onFlowBeginTapped = false
+        var metricsVal: PlayerFlowMetrics? = null
+
+        plugin?.hooks?.onFlowBegin?.tap("test") { metrics ->
+            onFlowBeginTapped = true
+            metricsVal = metrics
+        }
+
+        player.start(simpleFlowString)
+        assertTrue(onFlowBeginTapped)
+        assertNotNull(metricsVal)
+    }
+
+    @OptIn(ExperimentalContracts::class)
+    @TestTemplate
+    fun `should trigger onFlowEnd hook`() = runBlockingTest {
+        var onFlowEndTapped = false
+        var metricsVal: PlayerFlowMetrics? = null
+
+        plugin?.hooks?.onFlowEnd?.tap("test") { metrics ->
+            onFlowEndTapped = true
+            metricsVal = metrics
+        }
+
+        val flow = player.start(simpleFlowString)
+        assertFalse(onFlowEndTapped)
+
+        player.inProgressState!!.transition("Next")
+        val result = flow.await()
+
+        assertEquals("DONE", result.endState.outcome)
+        assertTrue(onFlowEndTapped)
+        assertNotNull(metricsVal)
+    }
+
+    @OptIn(ExperimentalContracts::class)
+    @TestTemplate
+    fun `should trigger onRenderEnd hook`() {
+        var onRenderEndTapped = false
+        var timingVal: Timing? = null
+        var renderMetricsVal: RenderMetrics? = null
+        var playerFlowMetricsVal: PlayerFlowMetrics? = null
+
+        plugin?.hooks?.onRenderEnd?.tap("test") { timing, renderMetrics, playerFlowMetrics ->
+            onRenderEndTapped = true
+            timingVal = timing
+            renderMetricsVal = renderMetrics
+            playerFlowMetricsVal = playerFlowMetrics
+        }
+
+        player.start(simpleFlowString)
+        assertFalse(onRenderEndTapped)
+
+        plugin?.renderEnd()
+        assertTrue(onRenderEndTapped)
+        assertNotNull(timingVal)
+        assertNotNull(renderMetricsVal)
+        assertNotNull(playerFlowMetricsVal)
     }
 }
 

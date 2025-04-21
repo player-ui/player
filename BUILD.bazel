@@ -29,7 +29,7 @@ js_library(
     testonly = True,
     srcs = [
         "scripts/vitest.setup.ts",
-        "vitest.config.ts",
+        "vitest.config.mts",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -48,15 +48,17 @@ js_library(
     name = "eslint_config",
     testonly = True,
     srcs = [
-        ".eslintrc.js",
+        "eslint.config.mts",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":node_modules/@typescript-eslint/eslint-plugin",
-        ":node_modules/@typescript-eslint/parser",
+        ":node_modules/@eslint/js",
+        ":node_modules/typescript-eslint",
         ":node_modules/eslint",
         ":node_modules/eslint-plugin-prettier",
         ":node_modules/eslint-plugin-react",
+        ":node_modules/eslint-config-prettier",
+        ":node_modules/jiti"
     ],
 )
 

@@ -22,6 +22,7 @@
         "labels": "release"
       }
     ],
-    "./scripts/delete-old-prerelease.js"
+    "./scripts/delete-old-prerelease.js",
+    "./scripts/next-changelogs.js"
   ]
 }

@@ -184,6 +184,7 @@ internal class PlayerViewModelTest {
     fun `onCleared releases player`() = runBlocking {
         coEvery { flowIterator.terminate() } returns Unit
         viewModel.apply(runtime)
+        viewModel.player.start(SimpleAsset.sampleFlow.toString())
         viewModel.onCleared()
         assertPlayerState<ReleasedState>()
         assertTrue(

@@ -1,0 +1,103 @@
+---
+title: Multi-Flow Experiences
+---
+
+import PlatformTabs from "../../../components/PlatformTabs.astro";
+import Image from "../../../components/Image.astro";
+import flowManagerImage from "../../../assets/flow-manager.png";
+
+One large use-case for Player involves orchestrating experiences that span multiple screens that may need to communicate with a back-end between stages. This is commonly used for stepped-flows, onboarding workflows, etc, and manifests as using the response from one Player flow to determine the next one. To facilitate this back-and-forth, Player ships with support for creating a flow-manager.
+
+## Flow Manager
+
+A flow-manager is an interface for asynchronously stepping through a series of flows in a multi-flow experience. Its API mirrors that of the JavaScript [iteration protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols); each flow is loaded by calling `.next()` using the result of the previous flow (if one exists). Implementations are able to leverage this response to retrieve the _next_ flow in the series, or mark the cycle as complete by returning `done`.
+
+<Image darkModeInvert src={flowManagerImage} alt="Flow Manager" />
+
+The standardization of this contract allows any client to manage a series of Player flows without needing to repeat the underlying Player-side orchestration.
+
+An abridged version of the API is described below:
+
+```typescript
+interface FlowManager {
+  /**
+   * An iterator implementation that takes the result of the previous flow and returns a new one or completion marker.
+   * If `done: true` is returned, the multi-flow experience is completed.
+   *
+   * @param previousValue - The result of the previous flow.
+   */
+  next: (prevResponse: CompletedState) => Promise<FinalState | NextState<Flow>>;
+
+  /**
+   * Called when the flow is ended early (the react tree is torn down)
+   * Allows clients the opportunity to save-data before destroying the tree
+   */
+  terminate?: (player: Player) => void;
+}
+```
+
+Shown above is also an optional `terminate` callback. This is used when a flow is ended prematurely (user closes a view) as a means of gathering any critical information from the running player before shutting down.
+
+## Managed Player
+
+<PlatformTabs>
+  <Fragment slot='react'>
+
+The `ManagedPlayer` component from the `@player-ui/react` module orchestrates running flows through Player using a provided `flow-manager`. Any provided configuration/plugins will be passed along to the underlying `ReactPlayer` instance, and `React.Suspense` is used while awaiting the next `flow-manager` response.
+
+Simply render the `ManagedPlayer` with a flow-manager:
+
+```tsx
+import React from 'react'
+import { ManagedPlayer } from "@player-ui/react";
+
+export const App = () => {
+  return (
+    <React.Suspense fallback={<div>Loading</div>}>
+      <ManagedPlayer manager={myFlowManager} />;
+    </React.Suspense>
+  )
+};
+```
+
+### Callbacks and Error Handling
+
+The `ManagedPlayer` also includes callbacks for `onComplete` and `onError` to handle the completion of a multi-flow experience.
+
+The `fallbackComponent` is an optional prop that accepts a React component that will be rendered in case of an error. It's given access to the thrown `Error` object, as well as a `retry` and `reset` callback:
+
+- `retry` -- Retries the last failed request (the last call to `next()`)
+- `reset` -- Restarts the multi-flow from the begining, calling `next()` with an empty context.
+
+</Fragment>
+  <Fragment slot='ios'>
+
+The `ManagedPlayer` SwiftUI Component from the `PlayerUI/SwiftUI` subspec orchestrates running flows through Player using a provided `FlowManager`. Any provided configuration or plugins are passed along to the underlying `SwiftUIPlayer` instance.
+
+When constructing the `ManagedPlayer` you supply views to be used for error scenarios, as well as what is displayed while the FlowManager is fetching flows.
+
+### Error Handling
+
+The `fallback` parameter receives a `ManagedPlayerErrorContext` object when called, this object contains the `Error` that was thrown, as well as `retry` and `reset` functions.
+
+- `retry` -- Retries the last failed request (the last call to `next()`)
+- `reset` -- Restarts the multi-flow from the begining, calling `next()` with an empty context.
+
+```swift
+import PlayerUI
+
+struct App: View {
+    var body: some View {
+        ManagedPlayer(
+            plugins: [...],
+            flowManager: myFlowManager,
+            onComplete: { result in },
+            fallback: { errorContext in Text("Error!") },
+            loading: { Text("Loading...") }
+        )
+    }
+}
+```
+
+  </Fragment>
+</PlatformTabs>

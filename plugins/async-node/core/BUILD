@@ -25,4 +25,8 @@ js_pipeline(
         "//:node_modules/tapable-ts",
         "//:node_modules/timm",
     ],
+    test_deps = [
+        ":node_modules/@player-ui/reference-assets-plugin",
+        "//:vitest_config",
+    ]
 )

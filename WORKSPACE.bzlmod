@@ -45,12 +45,13 @@ git_repository(
     remote = "https://github.com/facebookincubator/fbjni",
 )
 
-RN_VERSION = "0.74.1"
+RN_VERSION = "0.78.1"
 
 # Pull prefab Android Hermes built against React Native JSI
 http_archive(
     name = "rn_hermes_android",
     build_file = "//third_party/rn:hermes_android.BUILD",
+    sha256 = "e60a59daf0293fcee17877a715fcd26614c4348855a74365a9564cde9a0fbe7c",
     url = "https://repo1.maven.org/maven2/com/facebook/react/hermes-android/{}/hermes-android-{}-release.aar".format(RN_VERSION, RN_VERSION),
 )
 
@@ -60,11 +61,12 @@ git_repository(
     build_file = "//third_party/rn:react_native.BUILD",
     patches = ["//patches:react_native.loosen_host_function_params.patch"],
     remote = "https://github.com/facebook/react-native",
-    tag = "v{}".format(RN_VERSION),
+    commit = "1299ef7be0fe9daf8274b7b2a7c49078723fc533"
 )
 
 http_archive(
     name = "fbjni_artifact",
     build_file = "//third_party/fbjni:artifact.BUILD",
     url = "https://repo1.maven.org/maven2/com/facebook/fbjni/fbjni/0.7.0/fbjni-0.7.0.aar",
+    sha256 = "7e319ae110ac5e5ef18904170aea5c3e753e915d196699d7fd39d36c8e1dfe36"
 )

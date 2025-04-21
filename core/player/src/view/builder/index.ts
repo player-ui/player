@@ -17,6 +17,12 @@ export class Builder {
     };
   }
 
+  static assetWrapper<T extends Node.Node>(value: T): Node.Value {
+    const valueNode = Builder.value();
+    Builder.addChild(valueNode, "asset", value);
+    return valueNode;
+  }
+
   /**
    * Creates a value node
    *
@@ -33,10 +39,10 @@ export class Builder {
    * Creates a multiNode and associates the multiNode as the parent
    * of all the value nodes
    *
-   * @param values - the value or applicability nodes to put in the multinode
+   * @param values - the value, applicability or async nodes to put in the multinode
    */
   static multiNode(
-    ...values: (Node.Value | Node.Applicability)[]
+    ...values: (Node.Value | Node.Applicability | Node.Async)[]
   ): Node.MultiNode {
     const m: Node.MultiNode = {
       type: NodeType.MultiNode,
@@ -45,11 +51,29 @@ export class Builder {
     };
 
     values.forEach((v) => {
-      // eslint-disable-next-line no-param-reassign
       v.parent = m;
     });
 
     return m;
+  }
+
+  /**
+   * Creates an async node
+   *
+   * @param id - the id of async node. It should be identical for each async node
+   */
+  static asyncNode(id: string, flatten = true): Node.Async {
+    return {
+      id,
+      type: NodeType.Async,
+      flatten: flatten,
+      value: {
+        type: NodeType.Value,
+        value: {
+          id,
+        },
+      },
+    };
   }
 
   /**
@@ -64,7 +88,6 @@ export class Builder {
     path: Node.PathSegment | Node.PathSegment[],
     child: Node.Node,
   ) {
-    // eslint-disable-next-line no-param-reassign
     child.parent = node as Node.Node;
 
     const newChild: Node.Child = {
@@ -72,7 +95,6 @@ export class Builder {
       value: child,
     };
 
-    // eslint-disable-next-line no-param-reassign
     node.children = node.children || [];
     node.children.push(newChild);
 

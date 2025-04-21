@@ -1,3 +1,887 @@
+# 0.11.0-next.3 (Thu Apr 17 2025)
+
+#### 🐛 Bug Fix
+
+- move renderIntoPlayerCanvas onto the correct thread [#633](https://github.com/player-ui/player/pull/633) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
+# 0.11.0-next.2 (Wed Apr 16 2025)
+
+### Release Notes
+
+#### Async node constructor consistency ([#618](https://github.com/player-ui/player/pull/618))
+
+Have consistent `AsyncNodePlugin` constructor api across all platforms allowing both tapping the handler to `onAsyncNode` hook after initializing `asyncNodePlugin` and initializing `asyncNodePlugin` with handlers
+
+
+<!--
+In an effort to standardize our process and code, please make sure you include documentation and/or update any existing documentation.
+Please refer to our site https://player-ui.github.io/latest/about, and include any neccesary information that would be helpful to coders, developers, and learners.
+
+If you are unable to update the current documents, please create an issue for us to get back to it.
+
+-->
+
+<!--
+  To include release notes in the automatic changelong, just add a level 1 markdown header below
+  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
+
+  Example:
+
+  # Release Notes
+  Added new plugin, to use it:
+  ```typescript
+  const plugin = new Plugin(...)
+  ```
+-->
+
+---
+
+#### 🐛 Bug Fix
+
+- Async node constructor consistency [#618](https://github.com/player-ui/player/pull/618) ([@cehan-Chloe](https://github.com/cehan-Chloe) [@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.11.0-next.1 (Wed Apr 16 2025)
+
+### Release Notes
+
+#### Hermes Build Fixes and Upgrade, Better Cache Uses, and ESLint v9 Upgrade ([#632](https://github.com/player-ui/player/pull/632))
+
+Update React Native JSI and Hermes binaries, compiled with `HERMES_UNICODE_LITE` flag to avoid Java `localeCompare` implementation. Change log for React Native from [here](https://github.com/facebook/react-native/blob/main/CHANGELOG.md#v0781) to [here](https://github.com/facebook/react-native/blob/main/CHANGELOG.md#v0742)
+
+---
+
+#### 🐛 Bug Fix
+
+- Hermes Build Fixes and Upgrade, Better Cache Uses, and ESLint v9 Upgrade [#632](https://github.com/player-ui/player/pull/632) ([@brocollie08](https://github.com/brocollie08) [@KetanReddy](https://github.com/KetanReddy))
+- a bit of docs for building hermes libs [#629](https://github.com/player-ui/player/pull/629) ([@brocollie08](https://github.com/brocollie08))
+- Update Bazel Docker Image [#620](https://github.com/player-ui/player/pull/620) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 2
+
+- [@brocollie08](https://github.com/brocollie08)
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.11.0-next.0 (Tue Mar 18 2025)
+
+### Release Notes
+
+#### Doc Site Updates ([#615](https://github.com/player-ui/player/pull/615))
+
+Doc site: 
+- Fix dark mode styling of next button on landing page demo
+- Fix missing favicon
+- Add more custom styling
+- Close #574 
+- Close #493
+
+#### chat ui storybook ([#611](https://github.com/player-ui/player/pull/611))
+
+- Add new storybook for chat
+- Allow pass in custom plugins for DSL stories
+- fix flatten issue
+
+---
+
+#### 🚀 Enhancement
+
+- Jetpack Compose [#609](https://github.com/player-ui/player/pull/609) ([@A1shK](https://github.com/A1shK) [@brocollie08](https://github.com/brocollie08))
+
+#### 🐛 Bug Fix
+
+- Doc Site Updates [#615](https://github.com/player-ui/player/pull/615) ([@KetanReddy](https://github.com/KetanReddy) [@kharrop](https://github.com/kharrop))
+- chat ui storybook [#611](https://github.com/player-ui/player/pull/611) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+
+#### Authors: 5
+
+- [@A1shK](https://github.com/A1shK)
+- [@brocollie08](https://github.com/brocollie08)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.10.5-next.2 (Mon Mar 10 2025)
+
+#### 🐛 Bug Fix
+
+- enable blocking logs by default [#613](https://github.com/player-ui/player/pull/613) ([@brocollie08](https://github.com/brocollie08))
+- Expose FlowInstance afterTransition hook for jvm [#610](https://github.com/player-ui/player/pull/610) ([@mrigankmg](https://github.com/mrigankmg))
+
+#### Authors: 2
+
+- [@brocollie08](https://github.com/brocollie08)
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+
+---
+
+# 0.10.5-next.1 (Fri Mar 07 2025)
+
+#### 🐛 Bug Fix
+
+- iOS: expose onStart hook [#612](https://github.com/player-ui/player/pull/612) ([@nancywu1](https://github.com/nancywu1))
+
+#### Authors: 1
+
+- [@nancywu1](https://github.com/nancywu1)
+
+---
+
+# 0.10.5-next.0 (Tue Mar 04 2025)
+
+#### 🐛 Bug Fix
+
+- iOS: expose metrics plugin hooks [#607](https://github.com/player-ui/player/pull/607) ([@nancywu1](https://github.com/nancywu1))
+- Update CODEOWNERS File [#608](https://github.com/player-ui/player/pull/608) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- [@nancywu1](https://github.com/nancywu1)
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.10.4 (Mon Mar 03 2025)
+
+### Release Notes
+
+#### Example asset and transform for async content streaming ([#575](https://github.com/player-ui/player/pull/575))
+
+Player streaming enhancement
+1. Changes
+- Added new `chat-message` asset in `ReferenceAssetsPlugin` as async streaming example 
+- Added generic function in `AsyncNodePlugin` to generate async asset transform
+2. New functionality
+Instead of adding `{async: true}` in content, replace it with a special type of asset, eg. `chat-message` associated with a transform function to add asyncNode
+
+<!--
+In an effort to standardize our process and code, please make sure you include documentation and/or update any existing documentation.
+Please refer to our site https://player-ui.github.io/latest/about, and include any neccesary information that would be helpful to coders, developers, and learners.
+
+If you are unable to update the current documents, please create an issue for us to get back to it.
+
+-->
+
+<!--
+  To include release notes in the automatic changelong, just add a level 1 markdown header below
+  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
+
+  Example:
+
+  # Release Notes
+  Added new plugin, to use it:
+  ```typescript
+  const plugin = new Plugin(...)
+  ```
+-->
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#605](https://github.com/player-ui/player/pull/605) ([@intuit-svc](https://github.com/intuit-svc))
+- Example asset and transform for async content streaming [#575](https://github.com/player-ui/player/pull/575) ([@cehan-Chloe](https://github.com/cehan-Chloe) [@sakuntala-motukuri](https://github.com/sakuntala-motukuri) [@brocollie08](https://github.com/brocollie08))
+- Convert Flow to NodeWrapper [#594](https://github.com/player-ui/player/pull/594) ([@mrigankmg](https://github.com/mrigankmg) [@brocollie08](https://github.com/brocollie08))
+- Execution Environment Resource Bump + Android TestUtils [#602](https://github.com/player-ui/player/pull/602) ([@brocollie08](https://github.com/brocollie08))
+- Hermes perf optimization [#598](https://github.com/player-ui/player/pull/598) ([@brocollie08](https://github.com/brocollie08))
+- Expose metrics plugin hooks android [#591](https://github.com/player-ui/player/pull/591) ([@mrigankmg](https://github.com/mrigankmg))
+
+#### Authors: 5
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+- Niharika Motukuri ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+
+---
+
+# 0.10.4-next.2 (Fri Feb 28 2025)
+
+#### 🐛 Bug Fix
+
+- Convert Flow to NodeWrapper [#594](https://github.com/player-ui/player/pull/594) ([@mrigankmg](https://github.com/mrigankmg) [@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 2
+
+- [@brocollie08](https://github.com/brocollie08)
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+
+---
+
+# 0.10.4-next.1 (Fri Feb 28 2025)
+
+#### 🐛 Bug Fix
+
+- Execution Environment Resource Bump + Android TestUtils [#602](https://github.com/player-ui/player/pull/602) ([@brocollie08](https://github.com/brocollie08))
+- Hermes perf optimization [#598](https://github.com/player-ui/player/pull/598) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
+# 0.10.4-next.0 (Tue Feb 25 2025)
+
+#### 🐛 Bug Fix
+
+- Expose metrics plugin hooks android [#591](https://github.com/player-ui/player/pull/591) ([@mrigankmg](https://github.com/mrigankmg))
+
+#### Authors: 1
+
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+
+---
+
+# 0.10.3 (Tue Feb 25 2025)
+
+### Release Notes
+
+#### Data change listener fix ([#572](https://github.com/player-ui/player/pull/572))
+
+Fixed an issue in `common-exprssion-plugin` where the array update via concat didn't trigger the `data-change-listener`  and view update
+
+#### Update  to explicitly call out the default value for dataPath ([#584](https://github.com/player-ui/player/pull/584))
+
+Updated docs for Shared Constants Plugin to highlight the default dataPath used for overriding values
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#601](https://github.com/player-ui/player/pull/601) ([@intuit-svc](https://github.com/intuit-svc))
+- Added typescript plugins dev guide [#497](https://github.com/player-ui/player/pull/497) ([@mrigankmg](https://github.com/mrigankmg))
+- Update CONTRIBUTING.md [#596](https://github.com/player-ui/player/pull/596) ([@brocollie08](https://github.com/brocollie08))
+- Data change listener fix [#572](https://github.com/player-ui/player/pull/572) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Update CODEOWNERS [#592](https://github.com/player-ui/player/pull/592) ([@KetanReddy](https://github.com/KetanReddy))
+- Moved AssetTest and Assertions into an android testutils package [#586](https://github.com/player-ui/player/pull/586) ([@mrigankmg](https://github.com/mrigankmg))
+- Expose onStart player hook for Android [#587](https://github.com/player-ui/player/pull/587) ([@mrigankmg](https://github.com/mrigankmg))
+- Revert "vector common scope" [#587](https://github.com/player-ui/player/pull/587) ([@brocollie08](https://github.com/brocollie08))
+- Support Smoother Experience When Loading a Viewless Flow on iOS [#570](https://github.com/player-ui/player/pull/570) ([@nancywu1](https://github.com/nancywu1))
+- Update  to explicitly call out the default value for dataPath [#584](https://github.com/player-ui/player/pull/584) ([@A1shK](https://github.com/A1shK))
+- Hermes tracker update [#580](https://github.com/player-ui/player/pull/580) ([@brocollie08](https://github.com/brocollie08))
+
+#### ⚠️ Pushed to `main`
+
+- vector common scope ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 7
+
+- [@A1shK](https://github.com/A1shK)
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+
+---
+
+# 0.10.3-next.4 (Mon Feb 24 2025)
+
+### Release Notes
+
+#### Data change listener fix ([#572](https://github.com/player-ui/player/pull/572))
+
+Fixed an issue in `common-exprssion-plugin` where the array update via concat didn't trigger the `data-change-listener`  and view update
+
+---
+
+#### 🐛 Bug Fix
+
+- Added typescript plugins dev guide [#497](https://github.com/player-ui/player/pull/497) ([@mrigankmg](https://github.com/mrigankmg))
+- Update CONTRIBUTING.md [#596](https://github.com/player-ui/player/pull/596) ([@brocollie08](https://github.com/brocollie08))
+- Data change listener fix [#572](https://github.com/player-ui/player/pull/572) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Update CODEOWNERS [#592](https://github.com/player-ui/player/pull/592) ([@KetanReddy](https://github.com/KetanReddy))
+- Moved AssetTest and Assertions into an android testutils package [#586](https://github.com/player-ui/player/pull/586) ([@mrigankmg](https://github.com/mrigankmg))
+
+#### Authors: 4
+
+- [@brocollie08](https://github.com/brocollie08)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+
+---
+
+# 0.10.3-next.3 (Tue Feb 11 2025)
+
+#### 🐛 Bug Fix
+
+- Expose onStart player hook for Android [#587](https://github.com/player-ui/player/pull/587) ([@mrigankmg](https://github.com/mrigankmg))
+
+#### Authors: 1
+
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+
+---
+
+# 0.10.3-next.2 (Mon Feb 10 2025)
+
+#### 🐛 Bug Fix
+
+- vector common scope ([@brocollie08](https://github.com/brocollie08))
+
+#### ⚠️ Pushed to `main`
+
+- Revert "vector common scope" ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
+# 0.10.3-next.1 (Tue Feb 04 2025)
+
+### Release Notes
+
+#### Update  to explicitly call out the default value for dataPath ([#584](https://github.com/player-ui/player/pull/584))
+
+Updated docs for Shared Constants Plugin to highlight the default dataPath used for overriding values
+
+---
+
+#### 🐛 Bug Fix
+
+- Support Smoother Experience When Loading a Viewless Flow on iOS [#570](https://github.com/player-ui/player/pull/570) ([@nancywu1](https://github.com/nancywu1))
+- Update  to explicitly call out the default value for dataPath [#584](https://github.com/player-ui/player/pull/584) ([@A1shK](https://github.com/A1shK))
+
+#### Authors: 2
+
+- [@A1shK](https://github.com/A1shK)
+- [@nancywu1](https://github.com/nancywu1)
+
+---
+
+# 0.10.3-next.0 (Fri Jan 31 2025)
+
+#### 🐛 Bug Fix
+
+- Hermes tracker update [#580](https://github.com/player-ui/player/pull/580) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
+# 0.10.2 (Wed Jan 29 2025)
+
+### Release Notes
+
+#### Fix Duplicate Date in Title for `next` Changelog Entries ([#569](https://github.com/player-ui/player/pull/569))
+
+fix duplicate date in title for next changelogs
+
+#### Fix Binding Instantiation of Escaped Numerical Bindings ([#565](https://github.com/player-ui/player/pull/565))
+
+Fixed instantiation of `BindingInstance`s with escaped numerical segments
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#581](https://github.com/player-ui/player/pull/581) ([@intuit-svc](https://github.com/intuit-svc))
+- Check scope active for awaiting player [#578](https://github.com/player-ui/player/pull/578) ([@brocollie08](https://github.com/brocollie08))
+- iOS: JavascriptCore Exceptions when finding classes [#577](https://github.com/player-ui/player/pull/577) ([@hborawski](https://github.com/hborawski))
+- Broken links fix for docs [#573](https://github.com/player-ui/player/pull/573) ([@chetanddesai](https://github.com/chetanddesai))
+- J2V8 Config from Consumer [#576](https://github.com/player-ui/player/pull/576) ([@brocollie08](https://github.com/brocollie08))
+- Only mutate ManagedPlayerViewModel.loadingState on main thread [#566](https://github.com/player-ui/player/pull/566) ([@ap-for-work](https://github.com/ap-for-work) [@hborawski](https://github.com/hborawski))
+- Fix Binding Instantiation of Escaped Numerical Bindings [#565](https://github.com/player-ui/player/pull/565) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 📝 Documentation
+
+- Fix Duplicate Date in Title for `next` Changelog Entries [#569](https://github.com/player-ui/player/pull/569) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 6
+
+- [@ap-for-work](https://github.com/ap-for-work)
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- Chetan Desai ([@chetanddesai](https://github.com/chetanddesai))
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.10.2-next.4 (Wed Jan 22 2025)
+
+#### 🐛 Bug Fix
+
+- Check scope active for awaiting player [#578](https://github.com/player-ui/player/pull/578) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
+# 0.10.2-next.3 (Tue Jan 21 2025)
+
+#### 🐛 Bug Fix
+
+- iOS: JavascriptCore Exceptions when finding classes [#577](https://github.com/player-ui/player/pull/577) ([@hborawski](https://github.com/hborawski))
+- Broken links fix for docs [#573](https://github.com/player-ui/player/pull/573) ([@chetanddesai](https://github.com/chetanddesai))
+
+#### Authors: 2
+
+- Chetan Desai ([@chetanddesai](https://github.com/chetanddesai))
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+
+---
+
+# 0.10.2-next.2 (Thu Jan 16 2025)
+
+#### 🐛 Bug Fix
+
+- J2V8 Config from Consumer [#576](https://github.com/player-ui/player/pull/576) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
+# 0.10.2-next.1 (Mon Jan 06 2025)
+
+### Release Notes
+
+#### Fix Duplicate Date in Title for `next` Changelog Entries ([#569](https://github.com/player-ui/player/pull/569))
+
+fix duplicate date in title for next changelogs
+
+---
+
+#### 🐛 Bug Fix
+
+- Only mutate ManagedPlayerViewModel.loadingState on main thread [#566](https://github.com/player-ui/player/pull/566) ([@ap-for-work](https://github.com/ap-for-work) [@hborawski](https://github.com/hborawski))
+
+#### 📝 Documentation
+
+- Fix Duplicate Date in Title for `next` Changelog Entries [#569](https://github.com/player-ui/player/pull/569) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 3
+
+- [@ap-for-work](https://github.com/ap-for-work)
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.10.2-next.0 (Fri Jan 03 2025)
+
+### Release Notes
+
+#### Fix Binding Instantiation of Escaped Numerical Bindings ([#565](https://github.com/player-ui/player/pull/565))
+
+Fixed instantiation of `BindingInstance`s with escaped numerical segments
+
+---
+
+#### 🐛 Bug Fix
+
+- Fix Binding Instantiation of Escaped Numerical Bindings [#565](https://github.com/player-ui/player/pull/565) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 1
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.10.1 (Thu Jan 02 2025)
+
+### Release Notes
+
+#### More Release Fixes ([#558](https://github.com/player-ui/player/pull/558))
+
+- Fix git push of changelog for next builds
+- Fix stamping of search config for latest doc site releases
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#568](https://github.com/player-ui/player/pull/568) ([@intuit-svc](https://github.com/intuit-svc))
+- Hermes reference tracking [#563](https://github.com/player-ui/player/pull/563) ([@sugarmanz](https://github.com/sugarmanz) [@brocollie08](https://github.com/brocollie08))
+- Use m2 Medium executor [#560](https://github.com/player-ui/player/pull/560) ([@KetanReddy](https://github.com/KetanReddy))
+- More Release Fixes [#558](https://github.com/player-ui/player/pull/558) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 📝 Documentation
+
+- Updated Authoring content section in docs.mdx [#567](https://github.com/player-ui/player/pull/567) ([@AkshayArora-repo](https://github.com/AkshayArora-repo))
+
+#### Authors: 5
+
+- [@AkshayArora-repo](https://github.com/AkshayArora-repo)
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.10.0 (Wed Dec 04 2024)
+
+### Release Notes
+
+#### Fix Releases ([#556](https://github.com/player-ui/player/pull/556))
+
+Push up new changelog before continuing release process so new version is tagged to a commit that exists
+
+### Change Type (required)
+Indicate the type of change your pull request is:
+
+<!-- 
+  We use semantic versioning: https://semver.org/. Review that documentation for 
+  more detailed guidelines.
+-->
+- [x] `patch`
+- [ ] `minor`
+- [ ] `major`
+- [ ] `N/A`
+
+
+### Does your PR have any documentation updates?
+- [ ] Updated docs
+- [x] No Update needed
+- [ ] Unable to update docs
+<!--
+In an effort to standardize our process and code, please make sure you include documentation and/or update any existing documentation.
+Please refer to our site https://player-ui.github.io/latest/about, and include any neccesary information that would be helpful to coders, developers, and learners.
+
+If you are unable to update the current documents, please create an issue for us to get back to it.
+
+-->
+
+<!--
+  To include release notes in the automatic changelong, just add a level 1 markdown header below
+  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
+
+  Example:
+
+  # Release Notes
+  Added new plugin, to use it:
+  ```typescript
+  const plugin = new Plugin(...)
+  ```
+-->
+
+#### Miscellaneous Maintainance Fixes ([#555](https://github.com/player-ui/player/pull/555))
+
+- Internal: Fix changelog creation for next releases
+- Internal: Align on test file location for js packages
+- Internal: Omit config files from coverage
+
+#### Add Changelogs from `next` releases to CHANGELOG.md file ([#554](https://github.com/player-ui/player/pull/554))
+
+Preserve `next` releases in CHANGELOG.md file
+
+#### Add Missing DSL Docs ([#548](https://github.com/player-ui/player/pull/548))
+
+Docs - Add DSL docs
+
+#### Applicability docs ([#544](https://github.com/player-ui/player/pull/544))
+
+- Update applicability docs to reflect desired patterns and behaviors
+- Fix flaky react reference asset test
+- Fix misc vitest issues when running outside of bazel (cjs environment, excluded directories) 
+
+### Change Type (required)
+Indicate the type of change your pull request is:
+
+<!-- 
+  We use semantic versioning: https://semver.org/. Review that documentation for 
+  more detailed guidelines.
+-->
+- [x] `patch`
+- [ ] `minor`
+- [ ] `major`
+
+<!--
+  To include release notes in the automatic changelong, just add a level 1 markdown header below
+  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
+
+  Example:
+
+  # Release Notes
+  Added new plugin, to use it:
+  ```typescript
+  const plugin = new Plugin(...)
+  ```
+-->
+
+
+### Does your PR have any documentation updates?
+- [x] Updated docs
+- [ ] No Update needed
+- [ ] Unable to update docs
+<!--
+In an effort to standardize our process and code, please make sure you include documentation and/or update any existing documentation.
+Please refer to our site https://player-ui.github.io/latest/about, and include any neccesary information that would be helpful to coders, developers, and learners.
+
+If you are unable to update the current documents, please create an issue for us to get back to it.
+
+-->
+
+#### Remove unneeded dependency on `pubsub-js` ([#547](https://github.com/player-ui/player/pull/547))
+
+Remove dead dependencies
+
+### Change Type (required)
+Indicate the type of change your pull request is:
+
+<!-- 
+  We use semantic versioning: https://semver.org/. Review that documentation for 
+  more detailed guidelines.
+-->
+- [ ] `patch`
+- [ ] `minor`
+- [ ] `major`
+
+<!--
+  To include release notes in the automatic changelong, just add a level 1 markdown header below
+  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
+
+  Example:
+
+  # Release Notes
+  Added new plugin, to use it:
+  ```typescript
+  const plugin = new Plugin(...)
+  ```
+-->
+
+
+### Does your PR have any documentation updates?
+- [ ] Updated docs
+- [ ] No Update needed
+- [ ] Unable to update docs
+<!--
+In an effort to standardize our process and code, please make sure you include documentation and/or update any existing documentation.
+Please refer to our site https://player-ui.github.io/latest/about, and include any neccesary information that would be helpful to coders, developers, and learners.
+
+If you are unable to update the current documents, please create an issue for us to get back to it.
+
+-->
+
+#### Minor Docs Fixes ([#538](https://github.com/player-ui/player/pull/538))
+
+- Fix search on `next` subdomain searching against and redirecting to `latest`
+- Update page description on the landing page
+
+### Change Type (required)
+Indicate the type of change your pull request is:
+
+<!-- 
+  We use semantic versioning: https://semver.org/. Review that documentation for 
+  more detailed guidelines.
+-->
+- [ ] `patch`
+- [ ] `minor`
+- [ ] `major`
+
+### Does your PR have any documentation updates?
+- [x] Updated docs
+- [ ] No Update needed
+- [ ] Unable to update docs
+<!--
+In an effort to standardize our process and code, please make sure you include documentation and/or update any existing documentation.
+Please refer to our site https://player-ui.github.io/latest/about, and include any neccesary information that would be helpful to coders, developers, and learners.
+
+If you are unable to update the current documents, please create an issue for us to get back to it.
+
+-->
+
+#### More Doc Fixes ([#532](https://github.com/player-ui/player/pull/532))
+
+- Fix links for `latest` and `next` pages
+- Add package manager tabs for js install instructions
+- Fix version selector breaking on main page
+
+### Change Type (required)
+Indicate the type of change your pull request is:
+
+<!-- 
+  We use semantic versioning: https://semver.org/. Review that documentation for 
+  more detailed guidelines.
+-->
+- [x] `patch`
+- [ ] `minor`
+- [ ] `major`
+
+<!--
+  To include release notes in the automatic changelong, just add a level 1 markdown header below
+  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
+
+  Example:
+
+  # Release Notes
+  Added new plugin, to use it:
+  ```typescript
+  const plugin = new Plugin(...)
+  ```
+-->
+
+
+### Does your PR have any documentation updates?
+- [ ] Updated docs
+- [ ] No Update needed
+- [ ] Unable to update docs
+<!--
+In an effort to standardize our process and code, please make sure you include documentation and/or update any existing documentation.
+Please refer to our site https://player-ui.github.io/latest/about, and include any neccesary information that would be helpful to coders, developers, and learners.
+
+If you are unable to update the current documents, please create an issue for us to get back to it.
+
+-->
+
+#### Fix docs build visibility ([#531](https://github.com/player-ui/player/pull/531))
+
+Fix visibility of docs build
+
+#### ios: enhance tapable logger to handle variadic args from the JS log ([#524](https://github.com/player-ui/player/pull/524))
+
+Prefixing message with the format `[Player] [\(logLevel)]:`  moved out of the Tapable logger and moved to PrintLoggerPlugin. Any consumers using their own LoggerPlugin will need to append the logLevel if they want to print it 
+
+Before
+```swift
+public class CustomLoggingPlugin: NativePlugin {
+    
+    public let pluginName = "CustomLoggingPlugin"
+
+    public func apply<P>(player: P) where P: HeadlessPlayer {
+        guard let player = player as? SwiftUIPlayer else { return }
+        player.logger.logLevel = .trace
+        player.logger.hooks.trace.tap(name: pluginName, { print("Custom message")\(($0))" ) })
+        ...
+    }
+```
+
+After
+```swift
+public class CustomLoggingPlugin: NativePlugin {
+    
+    public let pluginName = "CustomLoggingPlugin"
+
+    public func apply<P>(player: P) where P: HeadlessPlayer {
+        guard let player = player as? SwiftUIPlayer else { return }
+        player.logger.logLevel = .trace
+        let prefixedMessage = "[Player] [trace]: "
+        player.logger.hooks.trace.tap(name: pluginName, { print("\(prefixedMessage) Custom message \(($0))" ) })
+        ...
+    }
+```
+
+
+## Breaking Changes
+
+Any usage of the `player.logger.hooks` taps will have breaking changes in the callback because the calls have been changed to provide a `[Any]` type instead of `String` so it can be returned in the form of messages instead of a single message. Unless nothing is done in the callback to access the value but just to print it, there should be breaking changes
+
+
+Example:
+```swift
+
+// this should be no breaking change
+player.logger.hooks.trace.tap(name: "log", { print("\(($0))" ) })
+
+// if `values` should be accessed in anyway, i.e want the first value, or want to seperate the values
+ player.logger.hooks.debug.tap(name: "log") { values in
+            // values is of type [Any], if you want to print only the first value
+            print("\((message as? [String])?.first))" )
+        }
+```
+
+---
+
+#### 🚀 Enhancement
+
+- ios: enhance tapable logger to handle variadic args from the JS log [#524](https://github.com/player-ui/player/pull/524) ([@nancywu1](https://github.com/nancywu1))
+
+#### 🐛 Bug Fix
+
+- Release main [#557](https://github.com/player-ui/player/pull/557) ([@intuit-svc](https://github.com/intuit-svc))
+- Fix Releases [#556](https://github.com/player-ui/player/pull/556) ([@KetanReddy](https://github.com/KetanReddy))
+- Miscellaneous Maintainance Fixes [#555](https://github.com/player-ui/player/pull/555) ([@KetanReddy](https://github.com/KetanReddy))
+- Implemented cancelBeacon and buildBeacon hooks for Android [#542](https://github.com/player-ui/player/pull/542) ([@mrigankmg](https://github.com/mrigankmg) [@brocollie08](https://github.com/brocollie08))
+- Add Changelogs from `next` releases to CHANGELOG.md file [#554](https://github.com/player-ui/player/pull/554) ([@KetanReddy](https://github.com/KetanReddy))
+- iOS ExternalActionViewModifierPlugin: make apply func open [#539](https://github.com/player-ui/player/pull/539) ([@nancywu1](https://github.com/nancywu1))
+- JVM ConsoleLoggerPlugin [#552](https://github.com/player-ui/player/pull/552) ([@brocollie08](https://github.com/brocollie08))
+- Applicability docs [#544](https://github.com/player-ui/player/pull/544) ([@KetanReddy](https://github.com/KetanReddy) [@nancywu1](https://github.com/nancywu1))
+- iOS: Expose builldBeacon and cancelBeacon hooks inside of BaseBeaconPlugin and make BeaconPlugin open class [#536](https://github.com/player-ui/player/pull/536) ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+- Remove unneeded dependency on `pubsub-js` [#547](https://github.com/player-ui/player/pull/547) ([@KetanReddy](https://github.com/KetanReddy))
+- remove unneeded HTML report generation steps from build [#545](https://github.com/player-ui/player/pull/545) ([@nancywu1](https://github.com/nancywu1))
+- Fix parsing of Bindings with Escaped Numbers [#533](https://github.com/player-ui/player/pull/533) ([@KetanReddy](https://github.com/KetanReddy))
+- Update getting-started.mdx [#534](https://github.com/player-ui/player/pull/534) ([@aarora-pm](https://github.com/aarora-pm))
+- More Doc Fixes [#532](https://github.com/player-ui/player/pull/532) ([@KetanReddy](https://github.com/KetanReddy))
+- Fix docs build visibility [#531](https://github.com/player-ui/player/pull/531) ([@KetanReddy](https://github.com/KetanReddy))
+- Fix CJS support for React Player [#525](https://github.com/player-ui/player/pull/525) ([@KetanReddy](https://github.com/KetanReddy))
+- iOS: Expand AnyType to handle deeply nested AnyType for beacon encoding [#519](https://github.com/player-ui/player/pull/519) ([@hborawski](https://github.com/hborawski))
+- Updating Main Page Content [#508](https://github.com/player-ui/player/pull/508) ([@KetanReddy](https://github.com/KetanReddy) [@adierkens](https://github.com/adierkens))
+
+#### 🏠 Internal
+
+- Fix circleci badge in README [#480](https://github.com/player-ui/player/pull/480) ([@adierkens](https://github.com/adierkens) [@KetanReddy](https://github.com/KetanReddy))
+
+#### 📝 Documentation
+
+- Add Missing DSL Docs [#548](https://github.com/player-ui/player/pull/548) ([@KetanReddy](https://github.com/KetanReddy))
+- improve prominence of bazel build guidance for iOS targets [#546](https://github.com/player-ui/player/pull/546) ([@hborawski](https://github.com/hborawski))
+- Minor Docs Fixes [#538](https://github.com/player-ui/player/pull/538) ([@KetanReddy](https://github.com/KetanReddy))
+- fix exports in docs [#511](https://github.com/player-ui/player/pull/511) ([@spentacular](https://github.com/spentacular) [@KetanReddy](https://github.com/KetanReddy))
+- Docs refresh with Astro [#506](https://github.com/player-ui/player/pull/506) ([@adierkens](https://github.com/adierkens) [@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 10
+
+- [@aarora-pm](https://github.com/aarora-pm)
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Harris Borawski ([@hborawski](https://github.com/hborawski))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+- Niharika Motukuri ([@sakuntala-motukuri](https://github.com/sakuntala-motukuri))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.10.1 (Tue Dec 03 2024)
+
+### Release Notes
+
+#### Add Changelogs from `next` releases to CHANGELOG.md file ([#554](https://github.com/player-ui/player/pull/554))
+
+Preserve `next` releases in CHANGELOG.md file
+
+---
+
+#### 🐛 Bug Fix
+
+- Add Changelogs from `next` releases to CHANGELOG.md file [#554](https://github.com/player-ui/player/pull/554) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 1
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.9.1 (Thu Sep 26 2024)
 
 #### 🐛 Bug Fix

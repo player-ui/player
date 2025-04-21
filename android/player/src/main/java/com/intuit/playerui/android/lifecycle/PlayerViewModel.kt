@@ -168,7 +168,7 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
     }
 
     public fun release() {
-        player.release()
+        if (deferredPlayer.isCompleted) player.release()
     }
 
     internal fun logRenderTime(asset: RenderableAsset, completionTime: Long) {

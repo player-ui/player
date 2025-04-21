@@ -1,4 +1,7 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable */
 module.exports = {
-  plugins: [require("tailwindcss")(), require("autoprefixer")()],
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
 };

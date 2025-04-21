@@ -6,15 +6,15 @@ import { Separator } from "../../components/Separator";
 /** The info view type is used to show information to the user */
 export const Info = (props: InfoAssetTransform) => {
   return (
-    <div className="max-w-full">
-      <div className="flex flex-col gap-4">
+    <div className="player-max-w-full">
+      <div className="player-flex player-flex-col player-gap-4">
         {props.title && (
-          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+          <h1 className="player-scroll-m-20 player-text-4xl player-font-extrabold player-tracking-tight lg:player-text-5xl">
             <ReactAsset {...props.title} />
           </h1>
         )}
         {props.subTitle && (
-          <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+          <h3 className="player-scroll-m-20 player-text-2xl player-font-semibold player-tracking-tight">
             <ReactAsset {...props.subTitle} />
           </h3>
         )}
@@ -23,15 +23,15 @@ export const Info = (props: InfoAssetTransform) => {
             <ReactAsset {...props.primaryInfo} />
           </div>
         )}
-        <div className="flex flex-col gap-4">
+        <div className="player-flex player-flex-col player-gap-4">
           {props?.segmentedActions && <Separator />}
-          <div className="flex justify-between sm:flex-row flex-col-reverse gap-4">
-            <div className="flex gap-4">
+          <div className="player-flex player-justify-between sm:player-flex-row player-flex-col-reverse player-gap-4">
+            <div className="player-flex player-gap-4">
               {props?.segmentedActions?.prev?.map((a) => (
                 <ReactAsset key={a.asset.id} {...a} />
               ))}
             </div>
-            <div className="flex gap-4">
+            <div className="player-flex player-gap-4">
               {props?.segmentedActions?.next?.map((a) => (
                 <ReactAsset key={a.asset.id} {...a} />
               ))}

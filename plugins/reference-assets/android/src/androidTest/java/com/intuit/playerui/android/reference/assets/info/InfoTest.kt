@@ -1,15 +1,16 @@
 package com.intuit.playerui.android.reference.assets.info
 
-import android.widget.Button
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.get
 import com.intuit.playerui.android.reference.assets.R
-import com.intuit.playerui.android.reference.assets.test.AssetTest
-import com.intuit.playerui.android.reference.assets.test.shouldBePlayerState
-import com.intuit.playerui.android.reference.assets.test.shouldBeView
+import com.intuit.playerui.android.reference.assets.action.Action
+import com.intuit.playerui.android.testutils.asset.AssetTest
+import com.intuit.playerui.android.testutils.asset.shouldBeAsset
+import com.intuit.playerui.android.testutils.asset.shouldBeAtState
+import com.intuit.playerui.android.testutils.asset.shouldBeView
 import com.intuit.playerui.core.player.state.InProgressState
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -21,7 +22,6 @@ class InfoTest : AssetTest("info") {
 
     private fun verifyAndProceed(view: Int, action: PlayerAction? = null) {
         val infoTitle = currentView?.findViewById<FrameLayout>(R.id.info_title) ?: throw AssertionError("current view is null")
-        val infoActions = currentView?.findViewById<LinearLayout>(R.id.info_actions) ?: throw AssertionError("current view is null")
         val infoFooter =
             currentView?.findViewById<FrameLayout>(R.id.info_footer) ?: throw AssertionError("current view is null")
 
@@ -29,17 +29,21 @@ class InfoTest : AssetTest("info") {
             assertEquals("View $view", text.toString())
         }
 
-        action?.let {
-            val buttonOrdinal = if (action.ordinal != 1) 0 else action.ordinal
-            infoActions[buttonOrdinal].shouldBeView<Button> {
-                assertEquals(action.name, text.toString())
-                performClick()
-                blockUntilRendered()
-            }
-        }
+        runTest {
+            currentAssetTree.shouldBeAsset<Info> {
+                val infoActions = getData().actions
 
-        infoFooter[0].shouldBeView<TextView> {
-            assertEquals("Footer Text", text.toString())
+                action?.let {
+                    val buttonOrdinal = if (action.ordinal != 1) 0 else action.ordinal
+                    infoActions[buttonOrdinal].shouldBeAsset<Action> {
+                        val data = getData()
+                        data.run()
+                    }
+                }
+            }
+            infoFooter[0].shouldBeView<TextView> {
+                assertEquals("Footer Text", text.toString())
+            }
         }
     }
 
@@ -54,6 +58,6 @@ class InfoTest : AssetTest("info") {
         verifyAndProceed(3, PlayerAction.Next)
         verifyAndProceed(1)
 
-        currentState.shouldBePlayerState<InProgressState>()
+        player.shouldBeAtState<InProgressState>()
     }
 }

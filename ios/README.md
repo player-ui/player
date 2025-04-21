@@ -25,8 +25,12 @@ The demo app can also be built and launched in a simulator from the command line
 bazel run //ios/demo:PlayerUIDemo
 ```
 
-Note: 
-When building/testing targets with Bazel it is not recommended to build all targets under a package using `/...` because some targets such as those using `swift_library` for example `PlayerUIInternalTestUtilities` and `PlayerUIReferenceAssets` are not buildable due to running on MacOS. It is recommended to build the individual targets and build those that depend on the underlying targets using `swift_library`.
+
+> [!NOTE]
+> When building/testing targets with Bazel it is not recommended to build all targets under a package using `/...` as some targets such as those using `swift_library` for example `PlayerUIInternalTestUtilities` and `PlayerUIReferenceAssets` are not buildable due to running on MacOS, or requiring iOS SDKs.
+
+It is recommended to build the individual targets through those that depend on the underlying targets using `swift_library`. In practice, this primarily means build through test targets, or building the example application.
+
 For example, you can't build `PlayerUIInternalTestUtilities` but you can build `//ios/core:PlayerUITests` which builds `PlayerUIInternalTestUtilities` through it being a test dependency.
 
 It is not an issue to use `/...` when [querying](#Examining-Targets) all targets under a package because querying just lists targets and nothing is being built.

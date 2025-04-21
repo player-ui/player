@@ -1,21 +1,29 @@
 # Fallback
-* @adierkens
+* @adierkens @Brocollie08 @KetanReddy @spentacular 
 
 # Other
 /docs/ @KetanReddy @adierkens
 
 # Android/JVM
 
-/jvm/ @sugarmanz @Brocollie08
-/android/ @sugarmanz @Brocollie08
+/jvm/ @Brocollie08 @sugarmanz 
+/android/ @Brocollie08 @sugarmanz 
 
 # iOS
-/xcode/ @hborawski
-/ios/ @hborawski
+/xcode/ @nancywu1 
+/ios/ @nancywu1
 
 # Web
-/react/ @spentacular @adierkens
-/tools/storybook/ @adierkens
+/react/ @adierkens @spentacular
+/tools/storybook/ @adierkens @KetanReddy
 
 # Core
 /core/ @KetanReddy @adierkens
+
+# Plugins
+/plugins/*/core/ @Brocollie08 @KetanReddy @spentacular 
+/plugins/*/react/ @spentacular
+/plugins/*/jvm/ @Brocollie08 
+/plugins/*/android/ @Brocollie08 
+/plugins/*/ios/ @nancywu1
+/plugins/*/swiftui/ @nancywu1

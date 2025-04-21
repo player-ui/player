@@ -1,0 +1,34 @@
+---
+import Default from "@astrojs/starlight/components/SocialIcons.astro";
+import type { Props } from "@astrojs/starlight/props";
+import VersionSelector from "./tools/VersionSelector";
+
+---
+
+<style>
+  .nav-item {
+    font-size: var(--sl-text-base);
+    font-weight: 600;
+    color: var(--sl-color-gray-2);
+    border: 1px solid var(--sl-color-text-accent);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    border-radius: 0.25rem;
+    padding: 0 1rem;
+  }
+
+  .nav-item:hover {
+    background-color: var(--sl-color-text-accent);
+    color: var(--sl-color-text-invert);
+  }
+
+  .nav-item.current {
+    background-color: var(--sl-color-white);
+    color: var(--sl-color-text-invert);
+  }
+</style>
+
+<VersionSelector route={Astro.params.slug} client:only="react"/>
+
+<Default {...Astro.props} />

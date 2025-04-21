@@ -12,6 +12,7 @@ import JavaScriptCore
 import ViewInspector
 @testable import PlayerUI
 @testable import PlayerUIInternalTestUtilities
+@testable import PlayerUITestUtilitiesCore
 @testable import PlayerUISwiftUI
 @testable import PlayerUIMetricsPlugin
 @testable import PlayerUIReferenceAssets
@@ -81,6 +82,75 @@ class MetricsPluginTests: XCTestCase {
         ViewHosting.host(view: player)
 
         wait(for: [calledBack], timeout: 2)
+    }
+
+    func testOnRenderEndHook() throws {
+        let calledBackExpectation = expectation(description: "RenderEnd handler called")
+        let hookExpectation = XCTestExpectation(description: "onRenderEnd hook called")
+        let jsContext = JSContext()
+
+        let plugin = MetricsPlugin(trackRenderTime: true) { timing, nodeMetrics, flowMetrics in
+            XCTAssertNotNil(timing)
+            XCTAssertNotNil(nodeMetrics)
+            XCTAssertNotNil(flowMetrics)
+            calledBackExpectation.fulfill()
+        }
+
+        plugin.context = jsContext
+
+        let context = SwiftUIPlayer.Context { jsContext ?? JSContext() }
+
+        plugin.hooks?.onRenderEnd.tap { timing, nodeMetrics, flowMetrics in
+            XCTAssertNotNil(timing)
+            XCTAssertNotNil(nodeMetrics)
+            XCTAssertNotNil(flowMetrics)
+
+            hookExpectation.fulfill()
+        }
+
+        let player = SwiftUIPlayer(
+            flow: FlowData.COUNTER, plugins: [ReferenceAssetsPlugin(), plugin], context: context)
+
+        ViewHosting.host(view: player)
+
+        wait(for: [calledBackExpectation, hookExpectation], timeout: 5)
+    }
+
+    func testFlowBeginAndFlowEndHooks() {
+        let handlerExpectationFlowBegin = XCTestExpectation(description: "onFlowBegin tapped")
+        let handlerExpectationFlowEnd = XCTestExpectation(description: "onFlowEnd tapped")
+
+        let context = JSContext()
+        let plugin = MetricsPlugin()
+        plugin.context = context
+
+        XCTAssertNotNil(plugin.context)
+
+        let player = HeadlessPlayerImpl(plugins: [ReferenceAssetsPlugin(), plugin], context: context ?? JSContext())
+
+        plugin.hooks?.onFlowBegin.tap { flow in
+            XCTAssertEqual(flow.flow.completed, false)
+            XCTAssertEqual(flow.flow.id, "counter-flow")
+            handlerExpectationFlowBegin.fulfill()
+        }
+
+        plugin.hooks?.onFlowEnd.tap { flow in
+            XCTAssertEqual(flow.flow.completed, true)
+            XCTAssertEqual(flow.flow.id, "counter-flow")
+            handlerExpectationFlowEnd.fulfill()
+        }
+
+        player.start(flow: FlowData.COUNTER, completion: {_ in})
+
+        wait(for: [handlerExpectationFlowBegin], timeout: 5)
+
+        do {
+            try (player.state as? InProgressState)?.controllers?.flow.transition(with: "*")
+        } catch {
+            XCTFail("Transition with '*' failed")
+        }
+
+        wait(for: [handlerExpectationFlowEnd], timeout: 10)
     }
 }
 
