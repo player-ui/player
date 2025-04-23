@@ -2,6 +2,7 @@ package com.intuit.playerui.android.compose
 
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
 import androidx.compose.material.LocalTextStyle
@@ -42,13 +43,14 @@ public abstract class ComposableAsset<Data> (
     assetContext: AssetContext,
     serializer: KSerializer<Data>,
 ) : SuspendableAsset<Data>(assetContext, serializer) {
-    /** Set to false for assets that take full width. Defaults to true */
-    public open fun wrapContent(): Boolean = true
 
     public lateinit var composeHydrationScope: CoroutineScope
 
     override suspend fun initView(data: Data) = ComposeView(requireContext()).apply {
-        if (wrapContent()) layoutParams = ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
+        layoutParams =  if (asset is ViewportAsset)
+            ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+        else
+            ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
 
         setContent {
             compose(data = data)
@@ -115,7 +117,7 @@ private fun RenderableAsset.composeAndroidView(
     val scope = rememberCoroutineScope()
     AndroidView(factory = ::FrameLayout, modifier) {
         scope.launch {
-            val renderedView = withContext(Dispatchers.IO) {
+            val renderedView = withContext(Dispatchers.Default) {
                 render(styles)
             }
             withContext(Dispatchers.Main) {
@@ -124,4 +126,5 @@ private fun RenderableAsset.composeAndroidView(
             }
         }
     }
+
 }

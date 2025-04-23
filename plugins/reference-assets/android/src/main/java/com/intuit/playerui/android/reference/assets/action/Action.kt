@@ -23,10 +23,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 
-class Action(assetContext: AssetContext) : ComposableAsset<Action.Data>(assetContext, Data.serializer()) {
+class Action(assetContext: AssetContext) : ComposableAsset<Action.Data>(assetContext, Data.serializer()), RenderableAsset.ViewportAsset {
 
-    /** Actions should be full width  on native*/
-    override fun wrapContent(): Boolean = false
 
     @Serializable
     data class Data(
