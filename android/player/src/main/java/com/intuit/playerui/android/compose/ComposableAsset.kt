@@ -22,7 +22,6 @@ import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.build
 import com.intuit.playerui.android.extensions.Styles
-import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withTag
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
@@ -47,10 +46,11 @@ public abstract class ComposableAsset<Data> (
     public lateinit var composeHydrationScope: CoroutineScope
 
     override suspend fun initView(data: Data) = ComposeView(requireContext()).apply {
-        layoutParams =  if (asset is ViewportAsset)
+        layoutParams = if (asset is ViewportAsset) {
             ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-        else
+        } else {
             ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
+        }
 
         setContent {
             compose(data = data)
@@ -117,14 +117,15 @@ private fun RenderableAsset.composeAndroidView(
     val scope = rememberCoroutineScope()
     AndroidView(factory = ::FrameLayout, modifier) {
         scope.launch {
-            val renderedView = withContext(Dispatchers.Default) {
+            // Create and prepare the view in the background
+            val renderedView = withContext(Dispatchers.IO) {
                 render(styles)
             }
+            
             withContext(Dispatchers.Main) {
+                // maybe shouldn't use into here
                 renderedView into it
-
             }
         }
     }
-
 }
