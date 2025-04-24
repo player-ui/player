@@ -11,10 +11,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ProvidedValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.viewinterop.AndroidView
 import com.intuit.playerui.android.AssetContext
@@ -90,13 +90,14 @@ fun RenderableAsset.compose(
     styles: AssetStyle? = null,
     tag: String? = null,
 ) {
-    assetContext.withContext(LocalContext.current).withTag(tag ?: asset.id).build().run {
+    val assetTag = tag ?: asset.id
+    assetContext.withContext(LocalContext.current).withTag(assetTag).build().run {
         renewHydrationScope("Creating view within a ComposableAsset")
         when (this) {
             is ComposableAsset<*> -> CompositionLocalProvider(
                 LocalTextStyle provides (styles?.textStyle ?: TextStyle()),
             ) {
-                compose(modifier = modifier)
+                compose(modifier = Modifier.testTag(assetTag) then modifier)
             }
             else -> composeAndroidView(modifier, styles?.xmlStyles)
         }
@@ -108,7 +109,6 @@ private fun RenderableAsset.composeAndroidView(
     modifier: Modifier = Modifier,
     styles: Styles? = null,
 ) {
-    val scope = rememberCoroutineScope()
     AndroidView(factory = ::FrameLayout, modifier) {
         render(styles) into it
     }
