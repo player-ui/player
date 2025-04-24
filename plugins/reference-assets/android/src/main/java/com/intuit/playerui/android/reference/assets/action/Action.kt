@@ -25,7 +25,6 @@ import kotlinx.serialization.Serializable
 
 class Action(assetContext: AssetContext) : ComposableAsset<Action.Data>(assetContext, Data.serializer()), RenderableAsset.ViewportAsset {
 
-
     @Serializable
     data class Data(
         val label: RenderableAsset? = null,
@@ -40,7 +39,7 @@ class Action(assetContext: AssetContext) : ComposableAsset<Action.Data>(assetCon
     override fun content(modifier: Modifier, data: Data) {
         Button(
             onClick = {
-                composeHydrationScope.launch {
+                hydrationScope.launch {
                     withContext(Dispatchers.Default) {
                         beacon("clicked", "button")
                         player.commitPendingTransaction()

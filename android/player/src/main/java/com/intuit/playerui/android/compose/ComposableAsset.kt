@@ -26,9 +26,6 @@ import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withTag
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 
@@ -43,8 +40,6 @@ public abstract class ComposableAsset<Data> (
     assetContext: AssetContext,
     serializer: KSerializer<Data>,
 ) : SuspendableAsset<Data>(assetContext, serializer) {
-
-    public lateinit var composeHydrationScope: CoroutineScope
 
     override suspend fun initView(data: Data) = ComposeView(requireContext()).apply {
         layoutParams = if (asset is ViewportAsset) {
@@ -72,7 +67,6 @@ public abstract class ComposableAsset<Data> (
 
     @Composable
     fun compose(modifier: Modifier? = Modifier, data: Data? = null) {
-        composeHydrationScope = hydrationScope
         val data: Data? by produceState<Data?>(initialValue = data, key1 = this) {
             value = getData()
         }
@@ -97,11 +91,11 @@ fun RenderableAsset.compose(
     tag: String? = null,
 ) {
     assetContext.withContext(LocalContext.current).withTag(tag ?: asset.id).build().run {
+        renewHydrationScope("Creating view within a ComposableAsset")
         when (this) {
             is ComposableAsset<*> -> CompositionLocalProvider(
                 LocalTextStyle provides (styles?.textStyle ?: TextStyle()),
             ) {
-                this.composeHydrationScope = renewHydrationScope("Creating compose view")
                 compose(modifier = modifier)
             }
             else -> composeAndroidView(modifier, styles?.xmlStyles)
@@ -114,7 +108,6 @@ private fun RenderableAsset.composeAndroidView(
     modifier: Modifier = Modifier,
     styles: Styles? = null,
 ) {
-    renewHydrationScope("Creating compose view")
     val scope = rememberCoroutineScope()
     AndroidView(factory = ::FrameLayout, modifier) {
         render(styles) into it
