@@ -22,6 +22,7 @@ import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.build
 import com.intuit.playerui.android.extensions.Styles
+import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withTag
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
@@ -116,16 +117,6 @@ private fun RenderableAsset.composeAndroidView(
     renewHydrationScope("Creating compose view")
     val scope = rememberCoroutineScope()
     AndroidView(factory = ::FrameLayout, modifier) {
-        scope.launch {
-            // Create and prepare the view in the background
-            val renderedView = withContext(Dispatchers.IO) {
-                render(styles)
-            }
-            
-            withContext(Dispatchers.Main) {
-                // maybe shouldn't use into here
-                renderedView into it
-            }
-        }
+        render(styles) into it
     }
 }
