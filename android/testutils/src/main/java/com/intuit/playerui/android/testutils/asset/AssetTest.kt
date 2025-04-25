@@ -8,8 +8,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.R
+import com.intuit.playerui.android.asset.DecodableAsset
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.player.state.PlayerFlowState
@@ -82,9 +82,11 @@ public abstract class AssetTest(private val group: String? = null) {
         field = value
 
         field?.let {
-            when (val view = it.render(context)) {
-                is SuspendableAsset.AsyncViewStub -> view.onView(viewChannel::tryEmit)
-                else -> viewChannel.tryEmit(view)
+            runBlocking {
+                when (val view = it.render(context)) {
+                    is DecodableAsset.AsyncViewStub -> view.onView(viewChannel::tryEmit)
+                    else -> viewChannel.tryEmit(view)
+                }
             }
         }
     }
@@ -151,7 +153,7 @@ public abstract class AssetTest(private val group: String? = null) {
 
     /** Naive helper for suspending until hydration is complete, resolves async view stubs and recursively awaits all children for hydration */
     private suspend fun View.awaitCompleteHydration() {
-        if (this is SuspendableAsset.AsyncViewStub) { awaitView()?.awaitCompleteHydration(); return }
+        if (this is DecodableAsset.AsyncViewStub) { awaitView()?.awaitCompleteHydration(); return }
 
         while (getTag(R.bool.view_hydrated) == false) delay(25)
 

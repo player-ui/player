@@ -25,7 +25,10 @@ import com.intuit.playerui.core.player.state.inProgressState
 import com.intuit.playerui.plugins.beacon.beacon
 import com.intuit.playerui.plugins.coroutines.subScope
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.ContextualSerializer
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -88,7 +91,7 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
      * This scope will be cancelled on each re-render (i.e. whenever the data updates) and when
      * the [Player.flowScope] is cancelled.
      */
-    protected val hydrationScope: CoroutineScope get() = _hydrationScope
+    val hydrationScope: CoroutineScope get() = _hydrationScope
         ?: throw PlayerException("Attempted to use hydrationScope outside hydration context! Ensure usage remains within the RenderableAsset.hydrate function...")
 
     private var _hydrationScope: CoroutineScope?
@@ -109,34 +112,36 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
      * also automatically caches the instance of the [View] and detects
      * when it needs to reconstruct or rehydrate.
      */
-    private fun render(): View = cachedAssetView.let { (cachedAssetContext, cachedView) ->
-        requireContext()
-        when {
-            // View not found. Create and hydrate.
-            cachedView == null -> {
-                renewHydrationScope("recreating view")
-                initView().also { it.hydrate() }
-            } // View found, but contexts are out of sync. Remove cached view and create and hydrate.
-            cachedAssetContext?.context != context || cachedAssetContext?.asset?.type != asset.type -> {
-                renewHydrationScope("recreating view")
-                cachedView.removeSelf()
-                initView().also { it.hydrate() }
-            }
-            // View found, but assets are out of sync. Rehydrate. It is possible for the hydrate
-            // implementation to throw [StaleViewException] to signify that the view is out of sync.
-            // This can only be done from invalidateView, so we have a guarantee that the view has
-            // already been removed from the cache.
-            !cachedAssetContext.asset.nativeReferenceEquals(asset) ->
-                try {
-                    cachedView.also(::rehydrate)
-                } catch (exception: StaleViewException) {
-                    player.logger.info("re-rendering due to stale child: ${exception.assetContext.id}")
-                    render()
+    private suspend fun render(): View = withContext(Dispatchers.Default) {
+        cachedAssetView.let { (cachedAssetContext, cachedView) ->
+            requireContext()
+            when {
+                // View not found. Create and hydrate.
+                cachedView == null -> {
+                    renewHydrationScope("recreating view")
+                    initView().also { it.hydrate() }
+                } // View found, but contexts are out of sync. Remove cached view and create and hydrate.
+                cachedAssetContext?.context != context || cachedAssetContext?.asset?.type != asset.type -> {
+                    renewHydrationScope("recreating view")
+                    cachedView.removeSelf()
+                    initView().also { it.hydrate() }
                 }
-            // View found, everything is in sync. Do nothing.
-            else -> cachedView
-        }
-    }.also { if (it !is SuspendableAsset.AsyncViewStub) player.cacheAssetView(assetContext, it) }
+                // View found, but assets are out of sync. Rehydrate. It is possible for the hydrate
+                // implementation to throw [StaleViewException] to signify that the view is out of sync.
+                // This can only be done from invalidateView, so we have a guarantee that the view has
+                // already been removed from the cache.
+                !cachedAssetContext.asset.nativeReferenceEquals(asset) ->
+                    try {
+                        cachedView.also(::rehydrate)
+                    } catch (exception: StaleViewException) {
+                        player.logger.info("re-rendering due to stale child: ${exception.assetContext.id}")
+                        render()
+                    }
+                // View found, everything is in sync. Do nothing.
+                else -> cachedView
+            }
+        }.also { if (it !is DecodableAsset.AsyncViewStub) player.cacheAssetView(assetContext, it) }
+    }
 
     /** Invalidate view, causing a complete re-render of the current asset */
     public fun invalidateView() {
@@ -167,40 +172,40 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
      * Rendering of nested children assets should instead invoke the contextual [RenderableAsset.render] methods
      * to automatically pull [context] from their parents.
      */
-    public fun render(context: Context): View = assetContext
+    public suspend fun render(context: Context): View = assetContext
         .withContext(player.hooks.context.call(context))
         .build()
         .render()
 
     /** Render child asset from the context of a parent asset, ensuring that the [context] is passed down */
-    public fun RenderableAsset.render(): View = assetContext
+    public suspend fun RenderableAsset.render(): View = assetContext
         .withContext(this@RenderableAsset.requireContext())
         .build()
         .render()
 
     /** Render a [View] with specific [styles] */
-    public fun RenderableAsset.render(@StyleRes vararg styles: Style?): View = assetContext
+    public suspend fun RenderableAsset.render(@StyleRes vararg styles: Style?): View = assetContext
         .withContext(this@RenderableAsset.requireContext())
         .withStyles(*styles)
         .build()
         .render()
 
     /** Render a [View] with specific [styles] */
-    public fun RenderableAsset.render(@StyleRes styles: Styles?): View = assetContext
+    public suspend fun RenderableAsset.render(@StyleRes styles: Styles?): View = assetContext
         .withContext(this@RenderableAsset.requireContext())
         .withStyles(styles)
         .build()
         .render()
 
     /** Render a [View] with a specific [tag] through a new [RenderableAsset] created with a new [AssetContext] */
-    public fun RenderableAsset.render(tag: String): View = assetContext
+    public suspend fun RenderableAsset.render(tag: String): View = assetContext
         .withContext(this@RenderableAsset.requireContext())
         .withTag(tag)
         .build()
         .render()
 
     /** Render a [View] with specific [styles] */
-    public fun RenderableAsset.render(@StyleRes vararg styles: Style?, tag: String): View = assetContext
+    public suspend fun RenderableAsset.render(@StyleRes vararg styles: Style?, tag: String): View = assetContext
         .withContext(this@RenderableAsset.requireContext())
         .withTag(tag)
         .withStyles(*styles)
@@ -208,7 +213,7 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
         .render()
 
     /** Render a [View] with specific [styles] */
-    public fun RenderableAsset.render(@StyleRes styles: Styles?, tag: String): View = assetContext
+    public suspend fun RenderableAsset.render(@StyleRes styles: Styles?, tag: String): View = assetContext
         .withContext(this@RenderableAsset.requireContext())
         .withTag(tag)
         .withStyles(styles)
