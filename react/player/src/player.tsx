@@ -20,7 +20,7 @@ import PlayerComp from "./app";
 import OnUpdatePlugin from "./plugins/onupdate-plugin";
 
 // Variables injected at build time
-const WEB_PLAYER_VERSION = typeof __VERSION__ !== "undefined" ? __VERSION__ : "__VERSION__";
+const REACT_PLAYER_VERSION = typeof __VERSION__ !== "undefined" ? __VERSION__ : "__VERSION__";
 const COMMIT = typeof __GIT_COMMIT__ !== "undefined" ? __GIT_COMMIT__ : "__GIT_COMMIT__";
 
 export interface DevtoolsGlobals {
@@ -131,7 +131,7 @@ export class ReactPlayer {
     this.reactPlayerInfo = {
       playerVersion: this.player.getVersion(),
       playerCommit: this.player.getCommit(),
-      reactPlayerVersion: WEB_PLAYER_VERSION,
+      reactPlayerVersion: REACT_PLAYER_VERSION,
       reactPlayerCommit: COMMIT,
     };
   }
