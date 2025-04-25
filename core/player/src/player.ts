@@ -36,8 +36,10 @@ declare global {
 }
 
 // Variables injected at build time
-const PLAYER_VERSION = typeof __VERSION__ !== "undefined" ? __VERSION__ : "__VERSION__";
-const COMMIT = typeof __GIT_COMMIT__ !== "undefined" ? __GIT_COMMIT__ : "__GIT_COMMIT__";
+const PLAYER_VERSION =
+  typeof __VERSION__ !== "undefined" ? __VERSION__ : "__VERSION__";
+const COMMIT =
+  typeof __GIT_COMMIT__ !== "undefined" ? __GIT_COMMIT__ : "__GIT_COMMIT__";
 
 export interface PlayerPlugin {
   /**
