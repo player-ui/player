@@ -4,6 +4,8 @@ import android.widget.LinearLayout
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.DecodableAsset
+import com.intuit.playerui.android.asset.DecodableAsset.AsyncHydrationTrackerPlugin
+import com.intuit.playerui.android.asset.DecodableAsset.AsyncViewStub
 import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
 import com.intuit.playerui.android.utils.NestedAsset
 import com.intuit.playerui.android.utils.SimpleAsset
@@ -37,18 +39,18 @@ internal class NestedAssetTest : BaseRenderableAssetTest() {
     }
 
     @Test
-    fun `tested nested asset constructs`() = runBlocking {
+    fun `tested nested asset constructs`(): Unit = runBlocking {
         val nested = NestedAsset(assetContext).render(mockContext).let {
-            if (it is DecodableAsset.AsyncViewStub) it.awaitView() else it
+            if (it is AsyncViewStub) it.awaitView() else it
         }
         assertTrue(nested is LinearLayout)
     }
 
     @Test
-    fun `test nested asset context`() = runBlockingTest {
+    fun `test nested asset context`(): Unit = runBlockingTest {
         val asset = player.awaitFirstView(NestedAsset.sampleFlow)!! as NestedAsset
         asset.render(mockContext).let {
-            if (it is DecodableAsset.AsyncViewStub) it.awaitView() else it
+            if (it is AsyncViewStub) it.awaitView() else it
         }
         assertEquals(mockContext, NestedAsset.dummy?.context)
         NestedAsset.dummy2?.forEach {
@@ -58,7 +60,7 @@ internal class NestedAssetTest : BaseRenderableAssetTest() {
 
     @OptIn(ExperimentalPlayerApi::class)
     @Test
-    fun `test hydration tracker`() = runBlockingTest {
+    fun `test hydration tracker`(): Unit = runBlockingTest {
         val player = player
         val plugin = player.asyncHydrationTrackerPlugin!!
         var onHydrationStarted = false
@@ -74,7 +76,7 @@ internal class NestedAssetTest : BaseRenderableAssetTest() {
 
         assertFalse(onHydrationStarted)
         assertFalse(onHydrationCompleted)
-        val view = asset.render(mockContext) as DecodableAsset.AsyncViewStub
+        val view = asset.render(mockContext) as AsyncViewStub
         assertTrue(onHydrationStarted)
         assertFalse(onHydrationCompleted)
         view.awaitView()

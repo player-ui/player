@@ -10,7 +10,7 @@ import com.intuit.playerui.android.testutils.asset.shouldBeAsset
 import com.intuit.playerui.android.testutils.asset.shouldBeAtState
 import com.intuit.playerui.android.testutils.asset.shouldBeView
 import com.intuit.playerui.core.player.state.InProgressState
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
