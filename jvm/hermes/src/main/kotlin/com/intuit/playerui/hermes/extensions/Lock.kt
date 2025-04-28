@@ -63,6 +63,7 @@ internal fun <T> Runtime<*>.evaluateInJSThreadBlocking(
         block(currentRuntimeThreadContext)
     } else {
         try {
+            runtime.checkBlockingThread(Thread.currentThread())
             runBlocking {
                 evaluateInJSThread { block() }
             }

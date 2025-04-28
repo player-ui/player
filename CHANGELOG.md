@@ -1,3 +1,58 @@
+# 0.11.0-next.3 (Thu Apr 17 2025)
+
+#### 🐛 Bug Fix
+
+- move renderIntoPlayerCanvas onto the correct thread [#633](https://github.com/player-ui/player/pull/633) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
+# 0.11.0-next.2 (Wed Apr 16 2025)
+
+### Release Notes
+
+#### Async node constructor consistency ([#618](https://github.com/player-ui/player/pull/618))
+
+Have consistent `AsyncNodePlugin` constructor api across all platforms allowing both tapping the handler to `onAsyncNode` hook after initializing `asyncNodePlugin` and initializing `asyncNodePlugin` with handlers
+
+
+<!--
+In an effort to standardize our process and code, please make sure you include documentation and/or update any existing documentation.
+Please refer to our site https://player-ui.github.io/latest/about, and include any neccesary information that would be helpful to coders, developers, and learners.
+
+If you are unable to update the current documents, please create an issue for us to get back to it.
+
+-->
+
+<!--
+  To include release notes in the automatic changelong, just add a level 1 markdown header below
+  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
+
+  Example:
+
+  # Release Notes
+  Added new plugin, to use it:
+  ```typescript
+  const plugin = new Plugin(...)
+  ```
+-->
+
+---
+
+#### 🐛 Bug Fix
+
+- Async node constructor consistency [#618](https://github.com/player-ui/player/pull/618) ([@cehan-Chloe](https://github.com/cehan-Chloe) [@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.11.0-next.1 (Wed Apr 16 2025)
 
 ### Release Notes

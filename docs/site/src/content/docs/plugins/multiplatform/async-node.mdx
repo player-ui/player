@@ -114,6 +114,34 @@ const player = new Player({
 })
 ```
 
+or initialize plugin with async handler
+
+```js
+import { Player } from '@player-ui/player';
+import { AsyncNodePlugin, AsyncNodePluginPlugin } from '@player-ui/async-node-plugin';
+
+const asyncHandler = (
+  node: Node.Async,
+  callback: (content: any) => void,
+) => {
+  // do some async task to get content
+  return result;
+};
+
+const plugin = new AsyncNodePlugin(
+  {
+    plugins: [new AsyncNodePluginPlugin()],
+  },
+  asyncHandler,
+);
+
+const player = new Player({
+  plugins: [
+    asyncNodePlugin
+  ]
+})
+```
+
   </Fragment>
   <Fragment slot='react'>
 
@@ -155,7 +183,7 @@ var body: some View {
     SwiftUIPlayer(
         flow: flow,
         plugins: [
-          AsyncNodePlugin(plugins: [AsyncNodePluginPlugin()]) { node in
+          AsyncNodePlugin(plugins: [AsyncNodePluginPlugin()]), asyncHookHandler: { node in
               // Determine what to return either using the singleNode or multiNode case
               // Then JSON can be provided using the concrete case, see below for using the encodable case
               return .singleNode(.concrete(jsContext?.evaluateScript("""
@@ -174,6 +202,30 @@ var body: some View {
 
           }
         ],
+        result: $resultBinding
+    )
+}
+```
+or tapping asycHandler after initializing the plugin
+
+```swift
+var body: some View {
+    let asyncHandler: AsyncHookHandler = { _,_ in
+        return .singleNode(.concrete(JSValue()))
+    }
+
+    let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin])
+
+    plugin.context = context
+
+    plugin.hooks?.onAsyncNode.tap({ node, callback in
+        let replacementNode = try await (asyncHandler)(node, callback)
+        return replacementNode.handlerTypeToJSValue(context: context ?? JSContext()) ?? JSValue()
+    })
+    
+    SwiftUIPlayer(
+        flow: flow,
+        plugins: [plugin],
         result: $resultBinding
     )
 }
@@ -243,6 +295,27 @@ asyncNodePlugin.hooks.onAsyncNode.tap("handleAsync") { hookContext, node ->
     //  )
     // )
 }
+
+AndroidPlayer(asyncNodePlugin)
+```
+
+or initialize plugin with async handler
+
+```kotlin
+import com.intuit.playerui.plugins.asyncnode.AsyncNodePlugin
+// Configuring async node behaviour
+val asyncHandler = { node: Node, callback: ((result: Any?) -> Unit)? ->
+    mapOf(
+        "asset" to mapOf(
+            "id" to "asset-1",
+            "type" to "text",
+            "value" to "New asset!",
+        ),
+    )
+}
+
+
+val asyncNodePlugin = AsyncNodePlugin(plugins: [AsyncNodePluginPlugin(asyncHandler = handler)])
 
 AndroidPlayer(asyncNodePlugin)
 ```
