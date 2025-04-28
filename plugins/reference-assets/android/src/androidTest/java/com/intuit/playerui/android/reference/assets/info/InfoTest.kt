@@ -46,15 +46,17 @@ class InfoTest : AssetTest("info") {
     }
 
     @Test
-    fun infoBasic() = runBlocking {
+    fun infoBasic() {
         launchMock("info-modal-flow")
 
-        verifyAndProceed(1, PlayerAction.Continue)
-        verifyAndProceed(2, PlayerAction.Dismiss)
-        verifyAndProceed(1, PlayerAction.Continue)
-        verifyAndProceed(2, PlayerAction.Next)
-        verifyAndProceed(3, PlayerAction.Next)
-        verifyAndProceed(1)
+        runBlocking {
+            verifyAndProceed(1, PlayerAction.Continue)
+            verifyAndProceed(2, PlayerAction.Dismiss)
+            verifyAndProceed(1, PlayerAction.Continue)
+            verifyAndProceed(2, PlayerAction.Next)
+            verifyAndProceed(3, PlayerAction.Next)
+            verifyAndProceed(1)
+        }
 
         player.shouldBeAtState<InProgressState>()
     }
