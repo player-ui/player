@@ -35,6 +35,12 @@ import kotlin.coroutines.coroutineContext
 public abstract class DecodableAsset<Data>(assetContext: AssetContext, private val serializer: KSerializer<Data>) : RenderableAsset(assetContext) {
     /** Suspendable way to deserialize an instance of [Data] */
     public suspend fun getData(): Data = withContext(Dispatchers.Default) {
+        data
+    }
+
+    @Deprecated("Direct access to this property encourages blocking runtime access, use suspendable getData instead to ensure threads aren't blocked on data decoding.", ReplaceWith("getData()"))
+    /** Instance of [Data] is passed to [hydrate] */
+    public open val data: Data by lazy {
         try {
             asset.deserialize(serializer)
         } catch (exception: SerializationException) {
