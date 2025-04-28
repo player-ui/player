@@ -179,30 +179,27 @@ jobs:
       - run: bazel build --config=ci-mac -- //ios/demo:PlayerUIDemo
 
       - run:
-          name: Test Prebuild
+          name: Test Prebuild and Run Tests
           command: |
-            bazel build \
-              
-              $(bazel query "kind(ios_unit_test, //ios/...)") \
-              $(bazel query "kind(ios_unit_test, //plugins/...)") \
-              $(bazel query "kind(ios_ui_test, //ios/...)") \
-              $(bazel query "kind(ios_ui_test, //plugins/...)") \
-              $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
-              $(bazel query "attr(name, '.*SwiftLint', //plugins/...)")
-      - run:
-          name: Tests
-          command: |
-            bazel coverage \
-           
-              --test_output=all \
-              --test_timeout=1800 \
-              $(bazel query "kind(ios_unit_test, //ios/...)") \
-              $(bazel query "kind(ios_unit_test, //plugins/...)") \
-              $(bazel query "kind(ios_ui_test, //ios/...)") \
-              $(bazel query "kind(ios_ui_test, //plugins/...)") \
-              $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
-              $(bazel query "attr(name, '.*SwiftLint', //plugins/...)")
-
+             bazel build \
+                ${bazel_query_result_ios_unit_test} \
+                ${bazel_query_result_plugins_unit_test} \
+                ${bazel_query_result_ios_ui_test} \
+                ${bazel_query_result_plugins_ui_test} && \
+                $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
+                $(bazel query "attr(name, '.*SwiftLint', //plugins/...)") \
+              bazel coverage \
+                --jobs=1 \
+                --experimental_use_llvm_covmap \
+                --combined_report=lcov \
+                --test_output=all \
+                $(bazel query "kind(ios_unit_test, //ios/...)") \
+                $(bazel query "kind(ios_unit_test, //plugins/...)") \
+                $(bazel query "kind(ios_ui_test, //ios/...)") \
+                $(bazel query "kind(ios_ui_test, //plugins/...)") \
+                $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
+                $(bazel query "attr(name, '.*SwiftLint', //plugins/...)") 
+  
       - run:
           when: always
           command: |
