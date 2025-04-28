@@ -240,25 +240,29 @@ The `RenderableAsset` instance is _not_ guaranteed, meaning that state maintaine
 
 Some asset implementations may encounter a situation where the cached view is no longer the corresponding representation of the asset. Under this circumstance, the asset can request a full re-render by calling `invalidateView` from any point in the hydration context.
 
-#### Implementing `initView`
+#### Implementing `initView(data: Data)`
 
 ```kotlin
-fun initView(): View
+suspend fun initView(data: Data): View
 ```
 
 The only goal of `initView` is to build an Android View. This can be done through inflation, programmatic building, or some framework, as long as the View that is returned represents the corresponding asset. Top-level view creation and any one-time configuration operations should be done in this step. It is best practice to ensure that any access of the asset model is not done in this phase, as `initView` is not guaranteed to be called if the data changes.
 
-#### Implementing `hydrate`
+#### Implementing `hydrate(data: Data)`
 
 ```kotlin
-fun View.hydrate()
+suspend fun View.hydrate(data: Data)
 ```
 
 Hydration is the process responsible for populating the view with the data from the asset model. Any dependencies on the data model should be handled in this step. This includes accessing data, transform functions, or even nested assets. Any views created in `hydrate` will not be automatically cached, but will persist on the UI unless explicitly removed. It is necessary to be vigilant when constructing and removing these views.
 
+#### Suspension
+
+Both `initView` as well as `hydrate` are suspend functions by design. This is due to the blocking nature of Javascript execution, making these suspend functions enables non-blocking thread JS execution.
+
 #### Accessing Data
 
-In most cases, there is some additional data that is used to make the rendering more meaningful. For instance, the intent of the previous `text` asset example was to render a View that displayed the string contained in `value`. Access to such data will be provided through a `data` member on the `DecodableAsset`. This `data` member is a type specified when defining the subclass.
+In most cases, there is some additional data that is used to make the rendering more meaningful. For instance, the intent of the previous `text` asset example was to render a View that displayed the string contained in `value`. The data is provided as an argument to the above functions. Accessing data outside of the above methods should be done through the suspendable `getData` method to ensure data decoding is able to suspend instead of block the calling thread. This `data` returned is a type specified when defining the subclass.
 
 ```kotlin
 class TextAsset(assetContext: AssetContext) : DecodableAsset<TextAsset.Data>(Data.serializer()) {
