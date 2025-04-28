@@ -186,8 +186,6 @@ jobs:
                 ${bazel_query_result_plugins_unit_test} \
                 ${bazel_query_result_ios_ui_test} \
                 ${bazel_query_result_plugins_ui_test} && \
-                $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
-                $(bazel query "attr(name, '.*SwiftLint', //plugins/...)") \
               bazel coverage \
                 --jobs=1 \
                 --experimental_use_llvm_covmap \
@@ -196,10 +194,7 @@ jobs:
                 $(bazel query "kind(ios_unit_test, //ios/...)") \
                 $(bazel query "kind(ios_unit_test, //plugins/...)") \
                 $(bazel query "kind(ios_ui_test, //ios/...)") \
-                $(bazel query "kind(ios_ui_test, //plugins/...)") \
-                $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
-                $(bazel query "attr(name, '.*SwiftLint', //plugins/...)") 
-  
+                $(bazel query "kind(ios_ui_test, //plugins/...)") 
       - run:
           when: always
           command: |
