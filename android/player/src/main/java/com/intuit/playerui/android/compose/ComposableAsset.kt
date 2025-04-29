@@ -78,36 +78,36 @@ public abstract class ComposableAsset<Data> (
 
     @Composable
     abstract fun content(modifier: Modifier, data: Data)
-}
 
-@Composable
-fun RenderableAsset.compose(
-    modifier: Modifier = Modifier,
-    styles: AssetStyle? = null,
-    tag: String? = null,
-) {
-    val assetTag = tag ?: asset.id
-    assetContext.withContext(LocalContext.current).withTag(assetTag).build().run {
-        renewHydrationScope("Creating view within a ComposableAsset")
-        when (this) {
-            is ComposableAsset<*> -> CompositionLocalProvider(
-                LocalTextStyle provides (styles?.textStyle ?: TextStyle()),
-            ) {
-                compose(modifier = Modifier.testTag(assetTag) then modifier)
+    @Composable
+    private fun RenderableAsset.composeAndroidView(
+        modifier: Modifier = Modifier,
+        styles: Styles? = null,
+    ) {
+        AndroidView(factory = ::FrameLayout, modifier) {
+            hydrationScope.launch {
+                render(styles) into it
             }
-            else -> composeAndroidView(modifier, styles?.xmlStyles)
         }
     }
-}
 
-@Composable
-private fun RenderableAsset.composeAndroidView(
-    modifier: Modifier = Modifier,
-    styles: Styles? = null,
-) {
-    AndroidView(factory = ::FrameLayout, modifier) {
-        this.hydrationScope.launch {
-            render(styles) into it
+    @Composable
+    fun RenderableAsset.compose(
+        modifier: Modifier = Modifier,
+        styles: AssetStyle? = null,
+        tag: String? = null
+    ) {
+        val assetTag = tag ?: asset.id
+        assetContext.withContext(LocalContext.current).withTag(assetTag).build().run {
+            renewHydrationScope("Creating view within a ComposableAsset")
+            when (this) {
+                is ComposableAsset<*> -> CompositionLocalProvider(
+                    LocalTextStyle provides (styles?.textStyle ?: TextStyle()),
+                ) {
+                    compose(modifier = Modifier.testTag(assetTag) then modifier)
+                }
+                else -> composeAndroidView(modifier, styles?.xmlStyles)
+            }
         }
     }
 }

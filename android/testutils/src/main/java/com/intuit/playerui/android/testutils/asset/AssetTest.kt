@@ -1,6 +1,7 @@
 package com.intuit.playerui.android.testutils.asset
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.children
@@ -23,15 +24,19 @@ import com.intuit.playerui.utils.mocks.Mock
 import com.intuit.playerui.utils.mocks.getFlow
 import com.intuit.playerui.utils.start
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -46,7 +51,7 @@ import org.robolectric.annotation.Config
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [28])
 @OptIn(ExperimentalCoroutinesApi::class)
-public abstract class AssetTest(private val group: String? = null) {
+public abstract class AssetTest(private val group: String? = null) : CoroutineScope {
 
     @get:Rule
     public val name: TestName = TestName()
@@ -82,8 +87,9 @@ public abstract class AssetTest(private val group: String? = null) {
         field = value
 
         field?.let {
-            runBlocking {
-                when (val view = it.render(context)) {
+            testScope.launch {
+                val view = it.render(context)
+                when (view) {
                     is DecodableAsset.AsyncViewStub -> view.onView(viewChannel::tryEmit)
                     else -> viewChannel.tryEmit(view)
                 }
@@ -107,9 +113,13 @@ public abstract class AssetTest(private val group: String? = null) {
 
     private val emptyView = View(context)
 
+    private val testDispatcher = UnconfinedTestDispatcher()
+    private val testScope = TestScope(testDispatcher)
+    override val coroutineContext = testDispatcher + Job()
+
     @Before
     public fun beforeEach() {
-        Dispatchers.setMain(TestCoroutineDispatcher())
+        Dispatchers.setMain(testDispatcher)
         player.onUpdate { asset, _ -> currentAssetTree = asset }
         player.hooks.state.tap { state ->
             if (state !is InProgressState) {

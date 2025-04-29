@@ -90,7 +90,7 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
      * This scope will be cancelled on each re-render (i.e. whenever the data updates) and when
      * the [Player.flowScope] is cancelled.
      */
-    val hydrationScope: CoroutineScope get() = _hydrationScope
+    protected val hydrationScope: CoroutineScope get() = _hydrationScope
         ?: throw PlayerException("Attempted to use hydrationScope outside hydration context! Ensure usage remains within the RenderableAsset.hydrate function...")
 
     private var _hydrationScope: CoroutineScope?
