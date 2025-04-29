@@ -95,7 +95,7 @@ public abstract class ComposableAsset<Data> (
     fun RenderableAsset.compose(
         modifier: Modifier = Modifier,
         styles: AssetStyle? = null,
-        tag: String? = null
+        tag: String? = null,
     ) {
         val assetTag = tag ?: asset.id
         assetContext.withContext(LocalContext.current).withTag(assetTag).build().run {
