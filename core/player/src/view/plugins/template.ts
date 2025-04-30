@@ -111,7 +111,7 @@ export default class TemplatePlugin implements ViewPlugin {
       type: NodeType.MultiNode,
       override: false,
       values,
-    } as Node.MultiNode;
+    };
 
     // Removes undefined Symbol property
     if (node.placement !== undefined) {
@@ -134,7 +134,7 @@ export default class TemplatePlugin implements ViewPlugin {
       return node;
     });
 
-    parser.hooks.onCreateASTNode.tap("template-sort", (node) => {
+    parser.hooks.onCreateASTNode.tap("template", (node) => {
       function getTemplateSymbolValue(node: Node.Node): string | undefined {
         if (node.type === NodeType.MultiNode) {
           return (node as any)[templateSymbol];

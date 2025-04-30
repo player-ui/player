@@ -279,60 +279,35 @@ In the case that `placement` isn't included, there is fallback logic that will u
 
 **_Example_**
 
-The following content will:
+The following content has two collections that expands the template data based on if it appears before or after static data, and applies the corresponding placement value in the compiled JSON.
 
-- Place the expanded static template first, since it has `placement: prepend`
-- Then display content from the `values` array
-- Finally place the expanded dynamic template last, since it has `placement: append`
+```tsx
+<Collection>
+  <Collection.Label>This collection will display the template data first</Collection.Label>
+  <Collection.Values>
+    <Template data={b`foo`}>
+      <Text>Dynamic Item _index_</Text>
+    </Template>
+    <Text>Static Item</Text>
+  </Collection.Values>
+</Collection>
 
-```json
-{
-  "asset": {
-    "id": "top-level",
-    "type": "collection",
-    "values": [
-      {
-        "asset": {
-          "id": "existing-name",
-          "type": "text",
-          "value": "Something hard-coded"
-        }
-      }
-    ],
-    "template": [
-      {
-        "data": "list.of.names",
-        "output": "values",
-        "placement": "append",
-        "dynamic": true,
-        "value": {
-          "asset": {
-            "id": "dynamic-_index_",
-            "type": "text",
-            "value": "{{list.of.names._index_}}"
-          }
-        }
-      },
-      {
-        "data": "list.of.names",
-        "output": "values",
-        "placement": "prepend",
-        "value": {
-          "asset": {
-            "id": "static-_index_",
-            "type": "text",
-            "value": "{{list.of.names._index_}}"
-          }
-        }
-      }
-    ]
-  }
-}
+<Collection>
+  <Collection.Label>This collection will display the template data last</Collection.Label>
+  <Collection.Values>
+    <Text>Static Item</Text>
+    <Template data={b`foo`}>
+      <Text>Dynamic Item _index_</Text>
+    </Template>
+  </Collection.Values>
+</Collection>
 ```
+
+Note that since JSON order isn't guaranteed, the compiled JSON could still have order differences (with the correct `placement` logic) but the final rendered output will respect the placement logic.
 
 ### Multiple templates
 
-There's a few ways to leverage multiple templates within a single asset. Templates can be _nested_ or multiple used on a single node. These can also be combined to build out complicated nested expansion.
+There are a few ways to leverage multiple templates within a single asset. Templates can be _nested_ or multiple used on a single node. These can also be combined to build out complicated nested expansion.
 
 #### Nested Templates
 
