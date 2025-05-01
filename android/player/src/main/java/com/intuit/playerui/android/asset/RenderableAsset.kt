@@ -25,9 +25,7 @@ import com.intuit.playerui.core.player.state.inProgressState
 import com.intuit.playerui.plugins.beacon.beacon
 import com.intuit.playerui.plugins.coroutines.subScope
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.ContextualSerializer
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
