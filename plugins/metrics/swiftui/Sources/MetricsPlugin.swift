@@ -70,6 +70,8 @@ public class MetricsPlugin: JSBasePlugin, NativePlugin, WithSymbol {
 
     var onRenderEnd: RenderEndHandler?
 
+    public var hooks: MetricsHooks?
+
     var onRenderEndJSHandler: @convention(block) (JSValue?, JSValue?, JSValue?) -> Void {
         { [weak self] timing, nodeMetrics, flowMetrics in
             let decoder = JSONDecoder()
@@ -78,6 +80,14 @@ public class MetricsPlugin: JSBasePlugin, NativePlugin, WithSymbol {
                 try? decoder.decode(NodeRenderMetrics.self, from: nodeMetrics ?? JSValue()),
                 try? decoder.decode(PlayerFlowMetrics.self, from: flowMetrics ?? JSValue())
             )
+        }
+    }
+
+    override public func setup(context: JSContext) {
+        super.setup(context: context)
+
+        if let pluginRef = pluginRef {
+            self.hooks = MetricsHooks(onRenderEnd: Hook3Decode(baseValue: pluginRef, name: "onRenderEnd"), onFlowBegin: HookDecode(baseValue: pluginRef, name: "onFlowBegin"), onFlowEnd: HookDecode(baseValue: pluginRef, name: "onFlowEnd"))
         }
     }
 
@@ -129,6 +139,15 @@ public class MetricsPlugin: JSBasePlugin, NativePlugin, WithSymbol {
     public func renderEnd() {
         pluginRef?.invokeMethod("renderEnd", withArguments: [])
     }
+}
+
+public struct MetricsHooks {
+    /// Called when rendering for a node ends
+    public let onRenderEnd: Hook3Decode<MetricsTiming, NodeRenderMetrics, PlayerFlowMetrics>
+    /// Called when a flow starts
+    public let onFlowBegin: HookDecode<PlayerFlowMetrics>
+    /// Called when a flow ends 
+    public let onFlowEnd: HookDecode<PlayerFlowMetrics>
 }
 
 public struct MetricsTiming: Decodable {

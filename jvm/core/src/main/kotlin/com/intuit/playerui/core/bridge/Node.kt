@@ -4,12 +4,17 @@ import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.serialization.format.RuntimeFormat
 import com.intuit.playerui.core.bridge.serialization.format.serializer
+import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializer
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializer
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
+import kotlin.reflect.jvm.reflect
 
 /**
  * Read-only map-like structure to enable reading from a native
@@ -189,5 +194,49 @@ internal object EmptyNode : Node {
     override fun isReleased(): Boolean = false
     override fun isUndefined(): Boolean = false
     override fun nativeReferenceEquals(other: Any?): Boolean = other is EmptyNode
+    override val runtime: Runtime<*> get() = throw UnsupportedOperationException()
+}
+
+internal class MapBackedNode(private val map: Map<String, Any?>) : Node, Map<String, Any?> by map {
+
+    override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = get(key)?.let {
+        when (it) {
+            is Function<*> -> it
+            else -> null
+        }
+    }?.let {
+        Invokable { args ->
+            it::reflect.call(*args) as R
+        }
+    }
+
+    override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>): T = get(key)?.let { value ->
+        Json.decodeFromJsonElement(deserializer, Json.encodeToJsonElement(GenericSerializer(), value))
+    }!!
+
+    override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T =
+        Json.decodeFromJsonElement(
+            deserializer,
+            Json.encodeToJsonElement(MapSerializer(String.serializer(), GenericSerializer()), map),
+        )
+
+    override fun isReleased(): Boolean = false
+
+    override fun isUndefined(): Boolean = false
+
+    override fun equals(other: Any?): Boolean = when (other) {
+        is MapBackedNode -> other.map == map
+        is Map<*, *> -> other == this
+        else -> false
+    }
+
+    override fun hashCode(): Int = map.hashCode()
+
+    override fun nativeReferenceEquals(other: Any?): Boolean = when (other) {
+        is MapBackedNode -> other.map === map
+        is Map<*, *> -> other === this
+        else -> false
+    }
+
     override val runtime: Runtime<*> get() = throw UnsupportedOperationException()
 }

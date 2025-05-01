@@ -43,6 +43,10 @@ mvn-install:
 
 alias maven-install := mvn-install
 
+[doc('Build and run the Android demo app in an emulator')]
+start-android-demo:
+  bazel mobile-install //android/demo:demo
+
 [doc('Generate and open the xcodeproj for Player')]
 dev-ios:
   bazel run //ios:xcodeproj

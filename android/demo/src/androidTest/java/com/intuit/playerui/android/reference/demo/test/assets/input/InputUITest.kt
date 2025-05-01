@@ -12,7 +12,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.intuit.playerui.android.reference.demo.R
 import com.intuit.playerui.android.reference.demo.test.base.AssetUITest
-import com.intuit.playerui.android.reference.demo.test.base.shouldBePlayerState
+import com.intuit.playerui.android.reference.demo.test.base.shouldBeAtState
 import com.intuit.playerui.android.reference.demo.test.base.waitForViewInRoot
 import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.player.state.dataModel
@@ -39,7 +39,7 @@ class InputUITest : AssetUITest("input") {
             .perform(typeText("text"))
             .perform(pressImeActionButton())
 
-        currentState.shouldBePlayerState<InProgressState> {
+        player.shouldBeAtState<InProgressState> {
             assertEquals("text", dataModel.get("foo.bar"))
         }
     }
@@ -66,7 +66,7 @@ class InputUITest : AssetUITest("input") {
             .perform(typeText("t"))
             .perform(pressImeActionButton())
 
-        currentState.shouldBePlayerState<InProgressState> {
+        player.shouldBeAtState<InProgressState> {
             assertEquals(null, dataModel.get("foo.bar"))
         }
 
@@ -74,7 +74,7 @@ class InputUITest : AssetUITest("input") {
             .perform(typeText("30"))
             .perform(pressImeActionButton())
 
-        currentState.shouldBePlayerState<InProgressState> {
+        player.shouldBeAtState<InProgressState> {
             assertEquals(30, dataModel.get("foo.bar"))
         }
     }

@@ -16,12 +16,13 @@ def kt_asset_test(
             "//tools/mocks:jar",
             "//android/testutils",
             "//jvm/j2v8:j2v8-all",
+            # TODO: If we build a config for swapping between default android player runtimes,
+            #  we could dynamically depend on this and make sure we run all android player tests against all supported runtimes
+            "//jvm/hermes:hermes-host",
         ],
         resources = [
         ],
-        manifest_values = {
-            "minSdkVersion": "14",
-        },
+        manifest = "//plugins/reference-assets/android:src/main/AndroidManifest.xml",
     )
     lint(
         name = name,

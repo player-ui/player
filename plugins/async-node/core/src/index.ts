@@ -16,6 +16,7 @@ import queueMicrotask from "queue-microtask";
 import { omit } from "timm";
 
 export * from "./types";
+export * from "./transform";
 
 export interface AsyncNodePluginOptions {
   /** A set of plugins to load  */
@@ -28,6 +29,10 @@ export interface AsyncNodeViewPlugin extends ViewPlugin {
 
   asyncNode: AsyncParallelBailHook<[Node.Async, (result: any) => void], any>;
 }
+export type AsyncHandler = (
+  node: Node.Async,
+  callback?: (result: any) => void,
+) => Promise<any>;
 
 /**
  * Async node plugin used to resolve async nodes in the content
@@ -36,12 +41,21 @@ export interface AsyncNodeViewPlugin extends ViewPlugin {
 export class AsyncNodePlugin implements PlayerPlugin {
   private plugins: AsyncNodeViewPlugin[] | undefined;
 
-  constructor(options: AsyncNodePluginOptions) {
+  constructor(options: AsyncNodePluginOptions, asyncHandler?: AsyncHandler) {
     if (options?.plugins) {
       this.plugins = options.plugins;
       options.plugins.forEach((plugin) => {
         plugin.applyPlugin(this);
       });
+    }
+
+    if (asyncHandler) {
+      this.hooks.onAsyncNode.tap(
+        "async",
+        async (node: Node.Async, callback) => {
+          return await asyncHandler(node, callback);
+        },
+      );
     }
   }
 

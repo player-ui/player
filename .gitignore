@@ -50,6 +50,7 @@ _backup
 .eslintcache
 .next
 android-tools
+*.iml
 
 
 # Xcode
@@ -87,3 +88,4 @@ ios/*/*/Resources/**/*.js
 
 .bazelrc.local
 _ios_coverage/
+.qodo

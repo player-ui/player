@@ -6,7 +6,7 @@ import android.widget.TextView
 import androidx.test.platform.app.InstrumentationRegistry
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.core.asset.Asset
-import com.intuit.playerui.testutils.Node
+import com.intuit.playerui.core.bridge.MapBackedNode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -19,7 +19,7 @@ internal class AssetContextAndroidTest {
 
     private val player by lazy { AndroidPlayer() }
 
-    private fun Map<String, Any?>.toAsset(): Asset = Node(this).let(::Asset)
+    private fun Map<String, Any?>.toAsset(): Asset = MapBackedNode(this).let(::Asset)
 
     private val assetMap = mapOf("id" to "first", "type" to "rando")
 
@@ -38,7 +38,7 @@ internal class AssetContextAndroidTest {
     @Test
     fun testMapEquality() {
         assertTrue(mapOf("id" to "first", "type" to "rando") == mapOf("id" to "first", "type" to "rando"))
-        assertTrue(Node(mapOf("id" to "first", "type" to "rando")) == Node(mapOf("id" to "first", "type" to "rando")))
+        assertTrue(MapBackedNode(mapOf("id" to "first", "type" to "rando")) == MapBackedNode(mapOf("id" to "first", "type" to "rando")))
         assertTrue(mapOf("id" to "first", "type" to "rando").toAsset() == mapOf("id" to "first", "type" to "rando").toAsset())
     }
 

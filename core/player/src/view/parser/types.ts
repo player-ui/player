@@ -74,8 +74,11 @@ export declare namespace Node {
     /** The number of nested templates so far */
     depth: number;
 
-    /** should the template recomputed when data changes */
+    /** Should the template recompute when data changes */
     dynamic?: boolean;
+
+    /** Specifies the template placement in relation to existing elements*/
+    placement?: "prepend" | "append";
   }
 
   export interface Value
@@ -116,6 +119,10 @@ export declare namespace Node {
     id: string;
     /** The value representing the node */
     value: Node;
+    /**
+     * Should the content streamed in be flattened during resolving
+     */
+    flatten?: boolean;
   }
 
   export interface PluginOptions {

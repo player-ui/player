@@ -32,6 +32,44 @@ describe("multiNode", () => {
     expect(v1.parent).toBe(result);
     expect(v2.parent).toBe(result);
   });
+
+  test("multinode with async node", () => {
+    const v1 = Builder.asyncNode("1");
+    const v2 = Builder.asyncNode("2");
+    const result = Builder.multiNode(v1, v2);
+
+    expect(result.type).toBe(NodeType.MultiNode);
+    expect(result.values[0]?.type).toBe("async");
+    expect(result.values[1]?.type).toBe("async");
+    expect(v1.parent).toBe(result);
+    expect(v2.parent).toBe(result);
+  });
+});
+
+test("async node", () => {
+  const result = Builder.asyncNode("1", false);
+  expect(result.type).toBe(NodeType.Async);
+  expect(result.id).toBe("1");
+  expect(result.flatten).toBe(false);
+
+  const result2 = Builder.asyncNode("2");
+  expect(result2.type).toBe(NodeType.Async);
+  expect(result2.id).toBe("2");
+  expect(result2.flatten).toBe(true);
+});
+
+test("asset wrapper", () => {
+  const result = Builder.assetWrapper({
+    type: NodeType.Asset,
+    value: {
+      id: "1",
+      type: "text",
+      value: "chat message",
+    },
+  });
+
+  expect(result.type).toBe(NodeType.Value);
+  expect(result.children?.[0]?.value.type).toBe("asset");
 });
 
 describe("addChild", () => {
@@ -64,6 +102,34 @@ describe("addChild", () => {
     const value = Builder.value({ id: 2 });
     Builder.addChild(asset, ["path1", "path2"], value);
 
-    expect(asset.children?.[0].path).toStrictEqual(["path1", "path2"]);
+    expect(asset.children?.[0]?.path).toStrictEqual(["path1", "path2"]);
+  });
+});
+
+describe("updateChildrenByPath", () => {
+  test("updates children with matching path in the same order", () => {
+    const parent = Builder.value();
+    const child1 = Builder.value({ foo: "child1Value" });
+    const child2 = Builder.value({ foo: "child2Value" });
+    const child3 = Builder.value({ foo: "child3Value" });
+
+    Builder.addChild(parent, "child1", child1);
+    // Child 2 has the same path as child 1
+    Builder.addChild(parent, "child1", child2);
+    Builder.addChild(parent, "child3", child3);
+
+    // Update matching children
+    const updated = Builder.updateChildrenByPath(parent, ["child1"], (child) =>
+      Builder.value({
+        transformed: true,
+        original: (child as any).value?.foo,
+      }),
+    );
+
+    expect(updated.children).toHaveLength(3);
+    // Verify children are in the correct order
+    expect(updated.children?.[0]?.path).toStrictEqual(["child1"]);
+    expect(updated.children?.[1]?.path).toStrictEqual(["child1"]);
+    expect(updated.children?.[2]?.path).toStrictEqual(["child3"]);
   });
 });
