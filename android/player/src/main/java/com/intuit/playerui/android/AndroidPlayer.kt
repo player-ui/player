@@ -213,7 +213,7 @@ public class AndroidPlayer private constructor(
     }
 
     /** List of provided values to pass into the CompositionLocalProvider that wraps all compose assets */
-    internal var providedValues: MutableList<ProvidedValue<*>> = mutableListOf()
+    public var providedValues: MutableList<ProvidedValue<*>> = mutableListOf()
 
     /**
      * Cache [AssetContext]-[View] pairs against the [AssetContext.id]. The [AssetContext] is
