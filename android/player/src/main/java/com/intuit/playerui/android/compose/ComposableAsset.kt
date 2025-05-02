@@ -42,7 +42,7 @@ public abstract class ComposableAsset<Data> (
 ) : SuspendableAsset<Data>(assetContext, serializer) {
 
     override suspend fun initView(data: Data) = ComposeView(requireContext()).apply {
-        ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
+        layoutParams = ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
         setContent {
             compose(data = data)
         }
