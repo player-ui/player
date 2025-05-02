@@ -45,6 +45,7 @@ cmake(
         "CMAKE_BUILD_TYPE": "$(CMAKE_BUILD_TYPE)",
         # Resolves to fbjni/jni/include
         "JNI_HEADER": "$(rlocationpath :jni_include)",
+        "CMAKE_BUILD_PARALLEL_LEVEL": "4"
     },
     generate_args = ["-G Ninja"],
     lib_name = "fbjni",
@@ -66,6 +67,7 @@ cmake(
     },
     env = {
         "CMAKE_BUILD_TYPE": "$(CMAKE_BUILD_TYPE)",
+        "CMAKE_BUILD_PARALLEL_LEVEL": "4"
     },
     generate_args = ["-G Ninja"],
     lib_name = "fbjni",

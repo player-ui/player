@@ -180,14 +180,16 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
      */
     protected open fun handleAssetUpdate(asset: RenderableAsset?, animateTransition: Boolean) {
         renderingJob?.cancel("handling new update")
-        renderingJob = lifecycleScope.launch(if (asset is SuspendableAsset<*>) Dispatchers.Default else Dispatchers.Main) {
+        renderingJob = lifecycleScope.launch {
             whenStarted { // TODO: This'll go away when we can call a suspend version of this
-                try {
-                    renderIntoPlayerCanvas(asset, animateTransition)
-                } catch (exception: Exception) {
-                    if (exception is CancellationException) throw exception
-                    exception.printStackTrace()
-                    playerViewModel.fail("Error rendering asset", exception)
+                withContext(if (asset is SuspendableAsset<*>) Dispatchers.Default else Dispatchers.Main) {
+                    try {
+                        renderIntoPlayerCanvas(asset, animateTransition)
+                    } catch (exception: Exception) {
+                        if (exception is CancellationException) throw exception
+                        exception.printStackTrace()
+                        playerViewModel.fail("Error rendering asset", exception)
+                    }
                 }
             }
         }

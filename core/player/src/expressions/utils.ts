@@ -31,7 +31,6 @@ export function findClosestNodeAtPosition(
 ): ExpressionNode | undefined {
   // This is just mapping recursively over nodes in the tree
 
-  // eslint-disable-next-line default-case
   switch (node.type) {
     case "Modification":
     case "Assignment":

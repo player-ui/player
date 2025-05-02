@@ -1,3 +1,109 @@
+# 0.11.0-next.4 (Wed Apr 30 2025)
+
+### Release Notes
+
+#### Template ordering ([#614](https://github.com/player-ui/player/pull/614))
+
+Adds support so that content authors can pass in `placement: "append" | "prepend"` to templates so that they can specify the order they should expand in relation to non-template data when everything is transformed into JSON.
+
+This logic works for both static and dynamic templates.
+
+---
+
+#### 🚀 Enhancement
+
+- Template ordering [#614](https://github.com/player-ui/player/pull/614) ([@kharrop](https://github.com/kharrop) [@KetanReddy](https://github.com/KetanReddy))
+
+#### 🐛 Bug Fix
+
+- remove runtime specification [#634](https://github.com/player-ui/player/pull/634) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 3
+
+- [@brocollie08](https://github.com/brocollie08)
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.11.0-next.3 (Thu Apr 17 2025)
+
+#### 🐛 Bug Fix
+
+- move renderIntoPlayerCanvas onto the correct thread [#633](https://github.com/player-ui/player/pull/633) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
+# 0.11.0-next.2 (Wed Apr 16 2025)
+
+### Release Notes
+
+#### Async node constructor consistency ([#618](https://github.com/player-ui/player/pull/618))
+
+Have consistent `AsyncNodePlugin` constructor api across all platforms allowing both tapping the handler to `onAsyncNode` hook after initializing `asyncNodePlugin` and initializing `asyncNodePlugin` with handlers
+
+
+<!--
+In an effort to standardize our process and code, please make sure you include documentation and/or update any existing documentation.
+Please refer to our site https://player-ui.github.io/latest/about, and include any neccesary information that would be helpful to coders, developers, and learners.
+
+If you are unable to update the current documents, please create an issue for us to get back to it.
+
+-->
+
+<!--
+  To include release notes in the automatic changelong, just add a level 1 markdown header below
+  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
+
+  Example:
+
+  # Release Notes
+  Added new plugin, to use it:
+  ```typescript
+  const plugin = new Plugin(...)
+  ```
+-->
+
+---
+
+#### 🐛 Bug Fix
+
+- Async node constructor consistency [#618](https://github.com/player-ui/player/pull/618) ([@cehan-Chloe](https://github.com/cehan-Chloe) [@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.11.0-next.1 (Wed Apr 16 2025)
+
+### Release Notes
+
+#### Hermes Build Fixes and Upgrade, Better Cache Uses, and ESLint v9 Upgrade ([#632](https://github.com/player-ui/player/pull/632))
+
+Update React Native JSI and Hermes binaries, compiled with `HERMES_UNICODE_LITE` flag to avoid Java `localeCompare` implementation. Change log for React Native from [here](https://github.com/facebook/react-native/blob/main/CHANGELOG.md#v0781) to [here](https://github.com/facebook/react-native/blob/main/CHANGELOG.md#v0742)
+
+---
+
+#### 🐛 Bug Fix
+
+- Hermes Build Fixes and Upgrade, Better Cache Uses, and ESLint v9 Upgrade [#632](https://github.com/player-ui/player/pull/632) ([@brocollie08](https://github.com/brocollie08) [@KetanReddy](https://github.com/KetanReddy))
+- a bit of docs for building hermes libs [#629](https://github.com/player-ui/player/pull/629) ([@brocollie08](https://github.com/brocollie08))
+- Update Bazel Docker Image [#620](https://github.com/player-ui/player/pull/620) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 2
+
+- [@brocollie08](https://github.com/brocollie08)
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.11.0-next.0 (Tue Mar 18 2025)
 
 ### Release Notes

@@ -16,7 +16,7 @@ orbs:
 executors:
   base:
     docker:
-      - image: docker.io/playerui/bazel-docker:11
+      - image: docker.io/playerui/bazel-docker:13
     working_directory: ~/player
     resource_class: xlarge
     environment:
@@ -97,13 +97,7 @@ jobs:
           echo "build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
           echo "test --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
           echo "coverage --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
-          if [ "${CIRCLE_BRANCH}" == "main" ]; then
-            echo "Running on main"
-            echo "common --//android/player:runtime=j2v8" >> .bazelrc.local
-          else
-            echo "Running on PR"
-            echo "common --//android/player:runtime=j2v8-debug" >> .bazelrc.local
-          fi
+          echo "common --remote_upload_local_results" >> .bazelrc.local
       - persist_to_workspace:
           root: .
           paths:
@@ -231,11 +225,11 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel test --config=ci -- //third_party/hermes/hello:test
+      - run: bazel build --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
       - run: bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
-      - run: bazel test --config=ci --//android/player:runtime=hermes -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
+      - run: bazel test --config=ci --//android/player:runtime=hermes -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui|core|react", //...)') -//android/demo:android_instrumentation_test
 
       - run:
           when: always
@@ -266,6 +260,12 @@ jobs:
             sudo mkdir /opt/bazelisk-v1.11.0 && \
             sudo mv bazelisk /opt/bazelisk-v1.11.0 && \
             sudo ln -s /opt/bazelisk-v1.11.0/bazelisk /usr/local/bin/bazel
+      
+      - run: |
+          echo "build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
+          echo "test --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
+          echo "coverage --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
+          echo "common --remote_upload_local_results" >> .bazelrc.local
 
       - run:
           name: Install Android tools
@@ -458,11 +458,15 @@ workflows:
             branches:
               ignore:
                 - /pull\/.*/
+          context:
+            - Build
           requires:
             - build-trunk
 
       - android_test:
           name: android-test-fork
+          context:
+            - BuildFork
           filters:
             branches:
               only:
@@ -516,6 +520,8 @@ workflows:
             - build
 
       - android_test:
+          context:
+            - Build
           requires:
             - build
 
@@ -553,6 +559,8 @@ workflows:
             - bazelrc
 
       - android_test:
+          context:
+            - Build
           requires:
             - build
 
