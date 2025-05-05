@@ -1,3 +1,31 @@
+# 0.11.0-next.4 (Wed Apr 30 2025)
+
+### Release Notes
+
+#### Template ordering ([#614](https://github.com/player-ui/player/pull/614))
+
+Adds support so that content authors can pass in `placement: "append" | "prepend"` to templates so that they can specify the order they should expand in relation to non-template data when everything is transformed into JSON.
+
+This logic works for both static and dynamic templates.
+
+---
+
+#### 🚀 Enhancement
+
+- Template ordering [#614](https://github.com/player-ui/player/pull/614) ([@kharrop](https://github.com/kharrop) [@KetanReddy](https://github.com/KetanReddy))
+
+#### 🐛 Bug Fix
+
+- remove runtime specification [#634](https://github.com/player-ui/player/pull/634) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 3
+
+- [@brocollie08](https://github.com/brocollie08)
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.11.0-next.3 (Thu Apr 17 2025)
 
 #### 🐛 Bug Fix
