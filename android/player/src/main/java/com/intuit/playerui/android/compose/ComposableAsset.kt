@@ -55,11 +55,6 @@ public abstract class ComposableAsset<Data> (
         }
     }
 
-    fun updateProvidedValues(values: List<ProvidedValue<*>>) {
-        // Update the internal state or perform actions with the new values
-        player.providedValues.addAll(values)
-    }
-
     @Composable
     fun compose(data: Data? = null) {
         val data: Data? by produceState(initialValue = data, key1 = this) {
@@ -68,7 +63,7 @@ public abstract class ComposableAsset<Data> (
 
         data?.let {
             // Getting the local values provided by the plugin hook
-            player.hooks.compositionLocalProvidedValues.call(hashMapOf(), ::updateProvidedValues)
+            player.hooks.compositionLocalProvidedValues.call(hashMapOf(), player::updateProvidedValues)
             CompositionLocalProvider(*(player.providedValues).toTypedArray()) {
                 content(it)
             }

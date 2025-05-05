@@ -36,7 +36,7 @@ class Action(assetContext: AssetContext) : ComposableAsset<Action.Data>(assetCon
     }
 
     @Composable
-    override fun content(modifier: Modifier, data: Data) {
+    override fun content(data: Data) {
         Button(
             onClick = {
                 hydrationScope.launch {
