@@ -11,13 +11,14 @@ import { SchemaController } from "./schema";
 import { BindingParser } from "./binding";
 import type { ViewInstance } from "./view";
 import { resolveDataRefs } from "./string-resolver";
-import type { FlowInstance } from "./controllers";
+import type { FlowInstance, PlayerFlags } from "./controllers";
 import {
   ConstantsController,
   ViewController,
   DataController,
   ValidationController,
   FlowController,
+  FlagController,
 } from "./controllers";
 import { FlowExpPlugin } from "./plugins/flow-exp-plugin";
 import { DefaultExpPlugin } from "./plugins/default-exp-plugin";
@@ -68,6 +69,9 @@ export interface PlayerConfigOptions {
 
   /** A logger to use */
   logger?: Logger;
+
+  /** Flags to configure runtime Player behavior */
+  flags?: PlayerFlags;
 }
 
 export interface PlayerInfo {
@@ -87,12 +91,39 @@ export class Player {
     commit: COMMIT,
   };
 
-  public readonly logger = new TapableLogger();
-  public readonly constantsController = new ConstantsController();
+  public readonly logger: TapableLogger = new TapableLogger();
+  public readonly constantsController: ConstantsController =
+    new ConstantsController();
+  public readonly flagsController: FlagController;
   private config: PlayerConfigOptions;
   private state: PlayerFlowState = NOT_STARTED_STATE;
 
-  public readonly hooks = {
+  public readonly hooks: {
+    /** The hook that fires every time we create a new flowController (a new Content blob is passed in) */
+    flowController: SyncHook<[FlowController], Record<string, any>>;
+    /** The hook that updates/handles views */
+    viewController: SyncHook<[ViewController], Record<string, any>>;
+    /** A hook called every-time there's a new view. This is equivalent to the view hook on the view-controller */
+    view: SyncHook<[ViewInstance], Record<string, any>>;
+    /** Called when an expression evaluator was created */
+    expressionEvaluator: SyncHook<[ExpressionEvaluator], Record<string, any>>;
+    /** The hook that creates and manages data */
+    dataController: SyncHook<[DataController], Record<string, any>>;
+    /** Called after the schema is created for a flow */
+    schema: SyncHook<[SchemaController], Record<string, any>>;
+    /** Manages validations (schema and x-field ) */
+    validationController: SyncHook<[ValidationController], Record<string, any>>;
+    /** Manages parsing binding */
+    bindingParser: SyncHook<[BindingParser], Record<string, any>>;
+    /** A that's called for state changes in the flow execution */
+    state: SyncHook<[PlayerFlowState], Record<string, any>>;
+    /** A hook to access the current flow */
+    onStart: SyncHook<[FlowType], Record<string, any>>;
+    /** A hook for when the flow ends either in success or failure */
+    onEnd: SyncHook<[], Record<string, any>>;
+    /** Mutate the Content flow before starting */
+    resolveFlowContent: SyncWaterfallHook<[FlowType], Record<string, any>>;
+  } = {
     /** The hook that fires every time we create a new flowController (a new Content blob is passed in) */
     flowController: new SyncHook<[FlowController]>(),
 
@@ -125,6 +156,7 @@ export class Player {
 
     /** A hook for when the flow ends either in success or failure */
     onEnd: new SyncHook<[]>(),
+
     /** Mutate the Content flow before starting */
     resolveFlowContent: new SyncWaterfallHook<[FlowType]>(),
   };
@@ -133,6 +165,8 @@ export class Player {
     if (config?.logger) {
       this.logger.addHandler(config.logger);
     }
+
+    this.flagsController = new FlagController(config?.flags);
 
     this.config = config || {};
     this.config.plugins = [
@@ -171,7 +205,7 @@ export class Player {
   }
 
   /** Register and apply [Plugin] if one with the same symbol is not already registered. */
-  public registerPlugin(plugin: PlayerPlugin) {
+  public registerPlugin(plugin: PlayerPlugin): void {
     plugin.apply(this);
     this.config.plugins?.push(plugin);
   }
@@ -419,6 +453,7 @@ export class Player {
         type: (b) => schema.getType(parseBinding(b)),
       },
       constants: this.constantsController,
+      flagController: this.flagsController,
     });
     viewController.hooks.view.tap("player", (view) => {
       validationController.onView(view);

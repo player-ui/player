@@ -1,10 +1,10 @@
-import { describe, it, expect, vitest } from "vitest";
+import { describe, it, expect, vitest, MockedFunction } from "vitest";
 import { replaceAt, set, omit } from "timm";
 import { BindingParser } from "../../../binding";
 import { ExpressionEvaluator } from "../../../expressions";
 import { LocalModel, withParser } from "../../../data";
 import { SchemaController } from "../../../schema";
-import type { Logger } from "../../../logger";
+import type { Logger, LogFn } from "../../../logger";
 import { TapableLogger } from "../../../logger";
 import { Resolver } from "..";
 import type { Node } from "../../parser";
@@ -14,6 +14,7 @@ import {
   MultiNodePlugin,
   AssetPlugin,
 } from "../../plugins";
+import { FlagController } from "../../../controllers";
 
 describe("Dynamic AST Transforms", () => {
   const content = {
@@ -58,6 +59,7 @@ describe("Dynamic AST Transforms", () => {
         model: withParser(model, bindingParser.parse),
       }),
       schema: new SchemaController(),
+      flagController: new FlagController(),
     });
 
     // basic transform to change the asset
@@ -167,6 +169,7 @@ describe("Dynamic AST Transforms", () => {
         model: withParser(model, bindingParser.parse),
       }),
       schema: new SchemaController(),
+      flagController: new FlagController(),
     });
 
     resolver.update();
@@ -236,6 +239,7 @@ describe("Dynamic AST Transforms", () => {
         model: withParser(model, bindingParser.parse),
       }),
       schema: new SchemaController(),
+      flagController: new FlagController(),
     });
 
     let inputNode: Node.Node | undefined;
@@ -289,6 +293,7 @@ describe("Dynamic AST Transforms", () => {
         model: withParser(model, bindingParser.parse),
       }),
       schema: new SchemaController(),
+      flagController: new FlagController(),
     });
 
     let parent;
@@ -386,6 +391,7 @@ describe("Duplicate IDs", () => {
       }),
       schema: new SchemaController(),
       logger,
+      flagController: new FlagController(),
     });
 
     new StringResolverPlugin().applyResolver(resolver);
@@ -396,7 +402,7 @@ describe("Duplicate IDs", () => {
     expect(testLogger.error).toBeCalledWith(
       "Cache conflict: Found Asset/View nodes that have conflicting ids: action-1, may cause cache issues.",
     );
-    (testLogger.error as jest.Mock).mockClear();
+    (testLogger.error as MockedFunction<LogFn>).mockClear();
 
     expect(firstUpdate).toStrictEqual({
       id: "action",
@@ -483,6 +489,7 @@ describe("Duplicate IDs", () => {
       }),
       schema: new SchemaController(),
       logger,
+      flagController: new FlagController(),
     });
 
     new StringResolverPlugin().applyResolver(resolver);
@@ -493,7 +500,7 @@ describe("Duplicate IDs", () => {
     expect(testLogger.info).toBeCalledWith(
       "Cache conflict: Found Value nodes that have conflicting ids: value-1, may cause cache issues. To improve performance make value node IDs globally unique.",
     );
-    (testLogger.info as jest.Mock).mockClear();
+    (testLogger.info as MockedFunction<LogFn>).mockClear();
     expect(firstUpdate).toStrictEqual(content);
 
     resolver.update();
@@ -534,6 +541,7 @@ describe("AST caching", () => {
         model: withParser(model, bindingParser.parse),
       }),
       schema: new SchemaController(),
+      flagController: new FlagController(),
     });
 
     const resolvedNodes: any[] = [];
@@ -601,6 +609,7 @@ describe("Root AST Immutability", () => {
         model: withParser(model, bindingParser.parse),
       }),
       schema: new SchemaController(),
+      flagController: new FlagController(),
     });
     let finalNode;
 
