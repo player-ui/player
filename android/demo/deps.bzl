@@ -9,6 +9,13 @@ maven_main = [
     "@maven//:com_facebook_soloader_soloader",
     # For when j2v8-android _isn't_ included
     "@maven//:com_github_AlexTrotsenko_j2v8_debugger",
+    "@maven//:androidx_activity_activity_compose",
+    "@maven//:androidx_appcompat_appcompat",
+    "@maven//:androidx_compose_foundation_foundation",
+    "@maven//:androidx_compose_foundation_foundation_layout",
+    "@maven//:androidx_compose_runtime_runtime",
+    "@maven//:androidx_compose_ui_ui",
+    "@maven//:androidx_compose_ui_ui_tooling",
 ]
 
 maven_test = [
