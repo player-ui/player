@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -15,7 +14,6 @@ import androidx.compose.ui.unit.dp
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.compose.ComposableAsset
-import com.intuit.playerui.android.compose.compose
 import com.intuit.playerui.android.reference.assets.R
 import com.intuit.playerui.android.reference.assets.XmlAssetStyleParser
 import com.intuit.playerui.plugins.transactions.commitPendingTransaction
@@ -24,7 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 
-class Action(assetContext: AssetContext) : ComposableAsset<Action.Data>(assetContext, Data.serializer()) {
+class Action(assetContext: AssetContext) : ComposableAsset<Action.Data>(assetContext, Data.serializer()), RenderableAsset.ViewportAsset {
 
     @Serializable
     data class Data(
@@ -38,13 +36,14 @@ class Action(assetContext: AssetContext) : ComposableAsset<Action.Data>(assetCon
 
     @Composable
     override fun content(modifier: Modifier, data: Data) {
-        val scope = rememberCoroutineScope()
         Button(
             onClick = {
-                beacon("clicked", "button")
-                player.commitPendingTransaction()
-                scope.launch {
-                    data.run()
+                hydrationScope.launch {
+                    withContext(Dispatchers.Default) {
+                        beacon("clicked", "button")
+                        player.commitPendingTransaction()
+                        data.run()
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth().testTag("action"),

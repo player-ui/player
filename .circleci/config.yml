@@ -386,6 +386,16 @@ workflows:
           requires:
             - setup
 
+      - bazelrc_fork:
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          context:
+            - BuildFork
+          requires:
+            - setup
+
       - build:
           name: build-trunk
           filters:
@@ -403,6 +413,7 @@ workflows:
                 - /pull\/.*/
           requires:
             - setup
+            - bazelrc_fork
 
       - build_ios:
           name: build-ios-trunk
@@ -422,6 +433,7 @@ workflows:
                 - /pull\/.*/
           requires:
             - build-fork
+            - bazelrc_fork
 
       - maybe_release:
           filters:
