@@ -96,7 +96,6 @@ describe("Dynamic AST Transforms", () => {
           // We updated something, set the children of the newNode to have the correct parent
           newNode.children?.forEach((child) => {
             // Don't worry about mutating here any new children are ones we created above
-            // eslint-disable-next-line no-param-reassign
             child.value.parent = newNode;
           });
         }
@@ -608,7 +607,6 @@ describe("Root AST Immutability", () => {
     resolver.hooks.beforeResolve.tap("beforeResolve", (node) => {
       if (node?.type !== NodeType.View) return node;
 
-      // eslint-disable-next-line no-param-reassign
       node.value.type = "not-collection";
       return node;
     });
