@@ -386,7 +386,8 @@ workflows:
           requires:
             - setup
 
-      - bazelrc_fork:
+      - bazelrc:
+          name: bazelrc_fork
           filters:
             branches:
               only:
