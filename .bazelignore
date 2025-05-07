@@ -60,6 +60,7 @@ plugins/reference-assets/react/node_modules
 plugins/shared-constants/core/node_modules
 plugins/stage-revert-data/core/node_modules
 tools/asset-testing-library/core/node_modules
+plugins/flow-expressions/core/node_modules
 docs/storybook/node_modules
 plugins/reference-assets/mocks/node_modules
 tools/storybook/node_modules
