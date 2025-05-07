@@ -368,13 +368,16 @@ export class Player {
         }
       });
 
-      flow.hooks.afterTransition.tap("player", (flowInstance) => {
+      flow.hooks.afterTransition.tap("player", async (flowInstance) => {
         const value = flowInstance.currentState?.value;
         if (value && value.state_type === "ACTION") {
           const { exp } = value;
-          flowController?.transition(
-            String(expressionEvaluator?.evaluate(exp)),
-          );
+          try {
+            const result = await expressionEvaluator.evaluateAsync(exp);
+            flowController?.transition(String(result));
+          } catch (e) {
+            flowResultDeferred.reject(e);
+          }
         }
 
         expressionEvaluator.reset();
