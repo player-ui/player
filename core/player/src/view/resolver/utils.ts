@@ -2,6 +2,7 @@ import type { BindingInstance, BindingLike } from "../../binding";
 import { isBinding } from "../../binding";
 import type { ExpressionType } from "../../expressions";
 import type { Resolve } from "./types";
+import { Node, NodeType } from "../parser";
 
 /** Check to see if and of the data-changes affect the given dependencies  */
 export function caresAboutDataChanges(
@@ -54,17 +55,4 @@ export function toNodeResolveOptions(
     evaluate: (exp: ExpressionType) =>
       resolverOptions.evaluator.evaluate(exp, resolverOptions),
   };
-}
-
-/**
- * helper function to flatten a potential nested array and combine with initial array
- */
-export function unpackAndPush(item: any | any[], initial: any[]) {
-  if (item.asset.values && Array.isArray(item.asset.values)) {
-    item.asset.values.forEach((i: any) => {
-      unpackAndPush(i, initial);
-    });
-  } else {
-    initial.push(item);
-  }
 }
