@@ -701,7 +701,7 @@ test("middleware can pause next", async () => {
       .mockReturnValue(Promise.resolve({ done: true })),
   };
 
-  const { promise, resolve, reject } = defer();
+  const { promise, resolve } = defer();
   const onComplete = vitest.fn();
   const onError = vitest.fn();
   const middleware = vitest.fn(async (res: any) => {
