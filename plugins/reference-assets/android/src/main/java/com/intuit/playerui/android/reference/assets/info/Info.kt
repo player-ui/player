@@ -3,14 +3,14 @@ package com.intuit.playerui.android.reference.assets.info
 import android.view.LayoutInflater
 import android.view.View
 import com.intuit.playerui.android.AssetContext
+import com.intuit.playerui.android.asset.DecodableAsset
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.reference.assets.R
 import com.intuit.playerui.android.reference.assets.text.Text
 import kotlinx.serialization.Serializable
 
-class Info(assetContext: AssetContext) : SuspendableAsset<Info.Data>(assetContext, Data.serializer()) {
+class Info(assetContext: AssetContext) : DecodableAsset<Info.Data>(assetContext, Data.serializer()) {
 
     @Serializable
     data class Data(
