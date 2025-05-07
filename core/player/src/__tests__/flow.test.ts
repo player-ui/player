@@ -1,8 +1,9 @@
 import { test, vitest, expect } from "vitest";
-import type { FlowController } from "../controllers";
+import type { FlowController, NamedState } from "../controllers";
 import type { DataController } from "..";
 import { Player } from "..";
 import type { InProgressState } from "../types";
+import { waitFor } from "@testing-library/react";
 
 test("transitions on action nodes", async () => {
   const player = new Player();
@@ -308,5 +309,71 @@ test("works with iffe flows", async () => {
   expect((await flowResponse).endState).toStrictEqual({
     state_type: "END",
     outcome: "doneWithTopic",
+  });
+});
+
+test("works for async transitions", async () => {
+  const player = new Player();
+
+  player.hooks.expressionEvaluator.tap("test", (expEval) => {
+    expEval.addExpressionFunction("testAsync", async (ctx, name) => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(name);
+        }, 10);
+      });
+    });
+  });
+
+  player.start({
+    id: "test-flow",
+    data: {
+      my: {
+        puppy: "Ginger",
+      },
+    },
+    navigation: {
+      BEGIN: "FLOW_1",
+      FLOW_1: {
+        startState: "ACTION_1",
+        ACTION_1: {
+          state_type: "ACTION",
+          exp: "{{my.puppy}} = await(testAsync('Daisy'))",
+          transitions: {
+            Daisy: "EXTERNAL_1",
+          },
+        },
+        EXTERNAL_1: {
+          state_type: "EXTERNAL",
+          ref: "view_1",
+          param: {
+            best: "{{my.puppy}}",
+          },
+          transitions: {},
+        },
+      },
+    },
+  });
+
+  await vitest.waitFor(() =>
+    expect(player.getState().status).toBe("in-progress"),
+  );
+
+  let currentState: NamedState | undefined;
+
+  await waitFor(() => {
+    const state = player.getState();
+    currentState = (state as InProgressState).controllers.flow.current
+      ?.currentState;
+    expect(currentState?.name).toBe("EXTERNAL_1");
+  });
+
+  expect(currentState?.value).toStrictEqual({
+    state_type: "EXTERNAL",
+    ref: "view_1",
+    param: {
+      best: "Daisy",
+    },
+    transitions: {},
   });
 });

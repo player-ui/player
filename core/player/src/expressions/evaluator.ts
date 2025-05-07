@@ -81,6 +81,16 @@ export interface HookOptions extends ExpressionContext {
 
   /** Whether expressions should be parsed strictly or not */
   strict?: boolean;
+
+  /** Whether the expression should be evaluated asynchronously */
+  async?: boolean;
+}
+
+interface AsyncHookOptions extends HookOptions {
+  /** Given an expression node, return a promise that resolves to the value */
+  resolveNode: (node: ExpressionNode) => Promise<any>;
+  /** Whether the expression should be evaluated asynchronously */
+  async: true;
 }
 
 export type ExpressionEvaluatorOptions = Omit<
@@ -98,16 +108,18 @@ export type ExpressionEvaluatorFunction = (
  * */
 export class ExpressionEvaluator {
   private readonly vars: Record<string, any> = {};
-  public readonly hooks = {
+  public readonly hooks: {
+    resolve: SyncWaterfallHook<[any, ExpressionNode, HookOptions]>;
+    resolveOptions: SyncWaterfallHook<[HookOptions]>;
+    beforeEvaluate: SyncWaterfallHook<[ExpressionType, HookOptions]>;
+    onError: SyncBailHook<[Error], true>;
+  } = {
     /** Resolve an AST node for an expression to a value */
     resolve: new SyncWaterfallHook<[any, ExpressionNode, HookOptions]>(),
-
     /** Gets the options that will be passed in calls to the resolve hook */
     resolveOptions: new SyncWaterfallHook<[HookOptions]>(),
-
     /** Allows users to change the expression to be evaluated before processing */
     beforeEvaluate: new SyncWaterfallHook<[ExpressionType, HookOptions]>(),
-
     /**
      * An optional means of handling an error in the expression execution
      * Return true if handled, to stop propagation of the error
@@ -119,12 +131,21 @@ export class ExpressionEvaluator {
 
   private readonly defaultHookOptions: HookOptions;
 
-  public readonly operators = {
-    binary: new Map(Object.entries(DEFAULT_BINARY_OPERATORS)),
-    unary: new Map(Object.entries(DEFAULT_UNARY_OPERATORS)),
-    expressions: new Map<string, ExpressionHandler<any, any>>(
-      Object.entries(DEFAULT_EXPRESSION_HANDLERS),
+  public readonly operators: {
+    binary: Map<string, BinaryOperator>;
+    unary: Map<string, UnaryOperator>;
+    expressions: Map<string, ExpressionHandler<any, any>>;
+  } = {
+    binary: new Map<string, BinaryOperator>(
+      Object.entries(DEFAULT_BINARY_OPERATORS),
     ),
+    unary: new Map<string, UnaryOperator>(
+      Object.entries(DEFAULT_UNARY_OPERATORS),
+    ),
+    expressions: new Map<string, ExpressionHandler<any, any>>([
+      ...Object.entries(DEFAULT_EXPRESSION_HANDLERS),
+      ["await", DEFAULT_EXPRESSION_HANDLERS.waitFor],
+    ]),
   };
 
   public reset(): void {
@@ -139,7 +160,17 @@ export class ExpressionEvaluator {
         this._execAST(node, this.defaultHookOptions),
     };
 
-    this.hooks.resolve.tap("ExpressionEvaluator", this._resolveNode.bind(this));
+    this.hooks.resolve.tap("ExpressionEvaluator", (result, node, options) => {
+      if (options.async) {
+        return this._resolveNodeAsync(
+          result,
+          node,
+          options as AsyncHookOptions,
+        );
+      }
+
+      return this._resolveNode(result, node, options);
+    });
     this.evaluate = this.evaluate.bind(this);
   }
 
@@ -186,6 +217,13 @@ export class ExpressionEvaluator {
     return this._execString(String(expression), resolvedOpts);
   }
 
+  public evaluateAsync(
+    expr: ExpressionType,
+    options?: ExpressionEvaluatorOptions,
+  ): Promise<any> {
+    return this.evaluate(expr, { ...options, async: true } as any);
+  }
+
   public addExpressionFunction<T extends readonly unknown[], R>(
     name: string,
     handler: ExpressionHandler<T, R>,
@@ -193,15 +231,15 @@ export class ExpressionEvaluator {
     this.operators.expressions.set(name, handler);
   }
 
-  public addBinaryOperator(operator: string, handler: BinaryOperator) {
+  public addBinaryOperator(operator: string, handler: BinaryOperator): void {
     this.operators.binary.set(operator, handler);
   }
 
-  public addUnaryOperator(operator: string, handler: UnaryOperator) {
+  public addUnaryOperator(operator: string, handler: UnaryOperator): void {
     this.operators.unary.set(operator, handler);
   }
 
-  public setExpressionVariable(name: string, value: unknown) {
+  public setExpressionVariable(name: string, value: unknown): void {
     this.vars[name] = value;
   }
 
@@ -220,9 +258,11 @@ export class ExpressionEvaluator {
 
     const matches = exp.match(/^@\[(.*)\]@$/);
     let matchedExp = exp;
-
     if (matches) {
-      [, matchedExp] = Array.from(matches); // In case the expression was surrounded by @[ ]@
+      const [, matched] = Array.from(matches); // In case the expression was surrounded by @[ ]@
+      if (matched) {
+        matchedExp = matched;
+      }
     }
 
     let storedAST: ExpressionNode;
@@ -255,7 +295,7 @@ export class ExpressionEvaluator {
     _currentValue: any,
     node: ExpressionNode,
     options: HookOptions,
-  ) {
+  ): unknown {
     const { resolveNode, model } = options;
 
     const expressionContext: ExpressionContext = {
@@ -416,5 +456,176 @@ export class ExpressionEvaluator {
 
       return resolveNode(node.left);
     }
+  }
+
+  private async _resolveNodeAsync(
+    _currentValue: any,
+    node: ExpressionNode,
+    options: AsyncHookOptions,
+  ): Promise<unknown> {
+    const { resolveNode, model } = options;
+
+    const expressionContext: ExpressionContext = {
+      ...options,
+      evaluate: (expr) => this.evaluate(expr, options),
+    };
+
+    if (node.type === "BinaryExpression" || node.type === "LogicalExpression") {
+      const operator = this.operators.binary.get(node.operator);
+
+      if (operator) {
+        if ("resolveParams" in operator) {
+          if (operator.resolveParams === false) {
+            return operator(expressionContext, node.left, node.right);
+          }
+
+          return operator(
+            expressionContext,
+            await resolveNode(node.left),
+            await resolveNode(node.right),
+          );
+        }
+
+        return operator(
+          await resolveNode(node.left),
+          await resolveNode(node.right),
+        );
+      }
+
+      return;
+    }
+
+    if (node.type === "UnaryExpression") {
+      const operator = this.operators.unary.get(node.operator);
+
+      if (operator) {
+        if ("resolveParams" in operator) {
+          return operator(
+            expressionContext,
+            operator.resolveParams === false
+              ? node.argument
+              : await resolveNode(node.argument),
+          );
+        }
+
+        return operator(await resolveNode(node.argument));
+      }
+
+      return;
+    }
+
+    if (node.type === "Object") {
+      const { attributes } = node;
+      const resolvedAttributes: any = {};
+
+      await Promise.all(
+        attributes.map(async (attr) => {
+          const key = await resolveNode(attr.key);
+          const value = await resolveNode(attr.value);
+          resolvedAttributes[key] = value;
+        }),
+      );
+
+      return resolvedAttributes;
+    }
+
+    if (node.type === "CallExpression") {
+      const expressionName = node.callTarget.name;
+
+      const operator = this.operators.expressions.get(expressionName);
+
+      if (!operator) {
+        throw new Error(`Unknown expression function: ${expressionName}`);
+      }
+
+      if ("resolveParams" in operator && operator.resolveParams === false) {
+        return operator(expressionContext, ...node.args);
+      }
+
+      const args = await Promise.all(
+        node.args.map(async (n) => await resolveNode(n)),
+      );
+
+      return operator(expressionContext, ...args);
+    }
+
+    if (node.type === "ModelRef") {
+      return model.get(node.ref, { context: { model: options.model } });
+    }
+
+    if (node.type === "MemberExpression") {
+      const obj = await resolveNode(node.object);
+      const prop = await resolveNode(node.property);
+
+      return obj[prop];
+    }
+
+    if (node.type === "Assignment") {
+      if (node.left.type === "ModelRef") {
+        const value = await resolveNode(node.right);
+        model.set([[node.left.ref, value]]);
+
+        return value;
+      }
+
+      if (node.left.type === "Identifier") {
+        const value = await resolveNode(node.right);
+        this.vars[node.left.name] = value;
+        return value;
+      }
+
+      return;
+    }
+
+    if (node.type === "ConditionalExpression") {
+      const result = (await resolveNode(node.test))
+        ? node.consequent
+        : node.alternate;
+
+      return resolveNode(result);
+    }
+
+    if (node.type === "ArrayExpression") {
+      return Promise.all(
+        node.elements.map(async (ele) => await resolveNode(ele)),
+      );
+    }
+
+    if (node.type === "Modification") {
+      const operation = this.operators.binary.get(node.operator);
+
+      if (operation) {
+        let newValue;
+
+        if ("resolveParams" in operation) {
+          if (operation.resolveParams === false) {
+            newValue = operation(expressionContext, node.left, node.right);
+          } else {
+            newValue = operation(
+              expressionContext,
+              await resolveNode(node.left),
+              await resolveNode(node.right),
+            );
+          }
+        } else {
+          newValue = operation(
+            await resolveNode(node.left),
+            await resolveNode(node.right),
+          );
+        }
+
+        if (node.left.type === "ModelRef") {
+          model.set([[node.left.ref, newValue]]);
+        } else if (node.left.type === "Identifier") {
+          this.vars[node.left.name] = newValue;
+        }
+
+        return newValue;
+      }
+
+      return resolveNode(node.left);
+    }
+
+    return this._resolveNode(_currentValue, node, options);
   }
 }
