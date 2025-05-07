@@ -1,6 +1,9 @@
 package com.intuit.playerui.android.compose
 
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.runtime.Composable
@@ -11,17 +14,19 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.viewinterop.AndroidView
 import com.intuit.playerui.android.AssetContext
+import com.intuit.playerui.android.asset.DecodableAsset
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.build
 import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withTag
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
+import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
 
 /**
@@ -34,11 +39,13 @@ import kotlinx.serialization.KSerializer
 public abstract class ComposableAsset<Data> (
     assetContext: AssetContext,
     serializer: KSerializer<Data>,
-) : SuspendableAsset<Data>(assetContext, serializer) {
+) : DecodableAsset<Data>(assetContext, serializer) {
 
     override suspend fun initView(data: Data) = ComposeView(requireContext()).apply {
-        setContent {
-            compose(data = data)
+        layoutParams = if (asset is ViewportAsset) {
+            ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+        } else {
+            ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
         }
     }
 
@@ -71,28 +78,36 @@ public abstract class ComposableAsset<Data> (
 
     @Composable
     abstract fun content(modifier: Modifier, data: Data)
-}
 
-@Composable
-fun RenderableAsset.compose(
-    modifier: Modifier = Modifier,
-    styles: AssetStyle? = null,
-    tag: String? = null,
-) {
-    assetContext.withContext(LocalContext.current).withTag(tag ?: asset.id).build().run {
-        when (this) {
-            is ComposableAsset<*> -> CompositionLocalProvider(LocalTextStyle provides (styles?.textStyle ?: TextStyle())) { compose(modifier = modifier) }
-            else -> composeAndroidView(modifier, styles?.xmlStyles)
+    @Composable
+    private fun RenderableAsset.composeAndroidView(
+        modifier: Modifier = Modifier,
+        styles: Styles? = null,
+    ) {
+        AndroidView(factory = ::FrameLayout, modifier) {
+            hydrationScope.launch {
+                render(styles) into it
+            }
         }
     }
-}
 
-@Composable
-private fun RenderableAsset.composeAndroidView(
-    modifier: Modifier = Modifier,
-    styles: Styles? = null,
-) {
-    AndroidView(factory = ::FrameLayout, modifier) {
-        render(styles) into it
+    @Composable
+    fun RenderableAsset.compose(
+        modifier: Modifier = Modifier,
+        styles: AssetStyle? = null,
+        tag: String? = null,
+    ) {
+        val assetTag = tag ?: asset.id
+        assetContext.withContext(LocalContext.current).withTag(assetTag).build().run {
+            renewHydrationScope("Creating view within a ComposableAsset")
+            when (this) {
+                is ComposableAsset<*> -> CompositionLocalProvider(
+                    LocalTextStyle provides (styles?.textStyle ?: TextStyle()),
+                ) {
+                    compose(modifier = Modifier.testTag(assetTag) then modifier)
+                }
+                else -> composeAndroidView(modifier, styles?.xmlStyles)
+            }
+        }
     }
 }
