@@ -10,6 +10,8 @@ import com.intuit.playerui.android.testutils.asset.shouldBeAtState
 import com.intuit.playerui.android.testutils.asset.shouldBeView
 import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.player.state.dataModel
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -23,7 +25,7 @@ class InputTest : AssetTest("input") {
     }
 
     @Test
-    fun basic() {
+    fun basic() = runTest(UnconfinedTestDispatcher()) {
         launchMock("input-basic")
 
         val inputLabelContainer = currentView?.findViewById<FrameLayout>(R.id.input_label_container) ?: throw AssertionError("current view is null")
@@ -50,7 +52,7 @@ class InputTest : AssetTest("input") {
     }
 
     @Test
-    fun transition() {
+    fun transition() = runTest(UnconfinedTestDispatcher()) {
         launchMock("input-transition")
 
         val view = currentView.shouldBeView<ConstraintLayout>()

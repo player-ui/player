@@ -136,7 +136,7 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
             // View found, everything is in sync. Do nothing.
             else -> cachedView
         }
-    }.also { if (it !is SuspendableAsset.AsyncViewStub) player.cacheAssetView(assetContext, it) }
+    }.also { if (it !is DecodableAsset.AsyncViewStub) player.cacheAssetView(assetContext, it) }
 
     /** Invalidate view, causing a complete re-render of the current asset */
     public fun invalidateView() {
