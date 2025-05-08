@@ -102,6 +102,19 @@ jobs:
           root: .
           paths:
             - .
+  bazelrc_fork:
+    executor: minimal
+    steps:
+      - attach_workspace:
+          at: ~/player
+      - run: |
+          echo "common --bes_results_url=''" >> .bazelrc.local
+          echo "common --bes_backend=''" >> .bazelrc.local
+          echo "common --remote_cache=''" >> .bazelrc.local
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 
   build:
     executor: base
@@ -386,14 +399,11 @@ workflows:
           requires:
             - setup
 
-      - bazelrc:
-          name: bazelrc_fork
+      - bazelrc_fork:
           filters:
             branches:
               only:
                 - /pull\/.*/
-          context:
-            - BuildFork
           requires:
             - setup
 
