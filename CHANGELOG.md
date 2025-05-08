@@ -1,3 +1,36 @@
+# 0.11.0-next.5 (Thu May 08 2025)
+
+### Release Notes
+
+#### Pull in PRs 636 and 637 ([#646](https://github.com/player-ui/player/pull/646))
+
+- Add GA back to doc site
+- Fix stamping of variables during core/react builds
+
+---
+
+#### 🐛 Bug Fix
+
+- Pull in PRs 636 and 637 [#646](https://github.com/player-ui/player/pull/646) ([@adierkens](https://github.com/adierkens) [@KetanReddy](https://github.com/KetanReddy))
+- Fully disable cache for forked builds [#645](https://github.com/player-ui/player/pull/645) ([@KetanReddy](https://github.com/KetanReddy))
+- Fix name of forked bazelrc job [#643](https://github.com/player-ui/player/pull/643) ([@KetanReddy](https://github.com/KetanReddy))
+- Asset deprecation [#639](https://github.com/player-ui/player/pull/639) ([@A1shK](https://github.com/A1shK) [@brocollie08](https://github.com/brocollie08))
+- Bazel 6.5 [#641](https://github.com/player-ui/player/pull/641) ([@brocollie08](https://github.com/brocollie08))
+- Use Readonly Key for Forked Builds [#638](https://github.com/player-ui/player/pull/638) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 🏠 Internal
+
+- Merge branch 'fix-version-stamping' of github.com:adierkens/player into docs-analytics [#637](https://github.com/player-ui/player/pull/637) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 4
+
+- [@A1shK](https://github.com/A1shK)
+- [@brocollie08](https://github.com/brocollie08)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.11.0-next.4 (Wed Apr 30 2025)
 
 ### Release Notes
