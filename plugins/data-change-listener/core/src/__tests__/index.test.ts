@@ -37,8 +37,8 @@ const dataChangeFlow: Flow = {
   id: "test-flow",
   data: {
     name: {
-      first: "Adam",
-      last: "Dierkens",
+      first: "john",
+      last: "smith",
     },
   },
   views: [
@@ -148,7 +148,7 @@ describe("Data-Change-Listener", () => {
   });
 
   it("should not call evaluate if field does not change", () => {
-    dataController.set([["name.first", "Adam"]]);
+    dataController.set([["name.first", "john"]]);
     expect(testExpression).not.toHaveBeenCalled();
   });
 
@@ -171,13 +171,20 @@ describe("Data-Change-Listener", () => {
     const state = player.getState() as InProgressState;
     state.controllers.flow.transition("next");
 
+    await vitest.waitFor(() => {
+      expect(state.controllers.flow.current?.currentState?.name).toBe("VIEW_2");
+    });
+
     await vitest.waitFor(() => expect(testExpression).not.toHaveBeenCalled());
-    dataController.set([["name.last", "Dierkens"]], {
+    dataController.set([["name.last", "smith"]], {
       context: {
         model: dataController.getModel(),
       },
     });
-    expect(testExpression).toHaveBeenCalledWith("hello Dierkens");
+
+    await vitest.waitFor(() => {
+      expect(testExpression).toHaveBeenCalledWith("hello smith");
+    });
   });
 
   it("should call the listener for each item when a sub-item changes", () => {
@@ -217,8 +224,8 @@ describe("Data-Change-Listener with Validations", () => {
     id: "test-flow",
     data: {
       name: {
-        first: "Madam",
-        last: "Dierkens",
+        first: "Mjohn",
+        last: "smith",
       },
     },
     views: [
@@ -242,8 +249,8 @@ describe("Data-Change-Listener with Validations", () => {
           {
             ref: "name.first",
             type: "expression",
-            exp: '{{name.first}} == "Adam"',
-            message: "Adam is always the right option",
+            exp: '{{name.first}} == "john"',
+            message: "john is always the right option",
             trigger: "change",
           },
         ],
@@ -324,7 +331,7 @@ describe("Data-Change-Listener with Validations", () => {
   it("bindings with a value that failed validation do not trigger listeners", async () => {
     expect(getInputAsset().validation).toBe(undefined);
 
-    getInputAsset().set("AdamAdam");
+    getInputAsset().set("johnjohn");
     await vitest.waitFor(() => {
       expect(getInputAsset().validation).toBeDefined();
       expect(testExpression).not.toHaveBeenCalled();
@@ -334,7 +341,7 @@ describe("Data-Change-Listener with Validations", () => {
   it("bindings with a successful validation trigger listeners", async () => {
     expect(getInputAsset().validation).toBe(undefined);
 
-    getInputAsset().set("Adam");
+    getInputAsset().set("john");
     await vitest.waitFor(() => {
       expect(getInputAsset().validation).not.toBeDefined();
       expect(testExpression).toHaveBeenCalled();
