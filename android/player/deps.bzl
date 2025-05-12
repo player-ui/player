@@ -21,7 +21,7 @@ main_deps = main_exports + [
     "//plugins/coroutines/jvm:coroutines",
 
     # Compose deps (compile-only)
-    ":compose_compileonly",
+    ":compose_compile_only",
 ]
 
 main_resources = [
