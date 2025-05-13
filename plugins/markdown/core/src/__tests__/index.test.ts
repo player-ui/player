@@ -3,7 +3,7 @@ import type { InProgressState, Flow } from "@player-ui/player";
 import { Player } from "@player-ui/player";
 import { Registry } from "@player-ui/partial-match-registry";
 import { PartialMatchFingerprintPlugin } from "@player-ui/partial-match-fingerprint-plugin";
-import { mockMappers } from "./helpers";
+import { buildMockMappers } from "./helpers";
 import { MarkdownPlugin } from "..";
 
 describe("MarkdownPlugin", () => {
@@ -103,7 +103,7 @@ describe("MarkdownPlugin", () => {
 
     it("parses the flow containing markdown into valid FRF, based on the given mappers", () => {
       const player = new Player({
-        plugins: [new MarkdownPlugin(mockMappers)],
+        plugins: [new MarkdownPlugin(buildMockMappers())],
       });
       player.start(unparsedFlow);
 
@@ -120,19 +120,19 @@ describe("MarkdownPlugin", () => {
               "values": [
                 {
                   "asset": {
-                    "id": "markdown-primaryInfo-collection-bold-composite-7",
+                    "id": "markdown-primaryInfo-collection-bold-composite-3",
                     "type": "composite",
                     "values": [
                       {
                         "asset": {
-                          "id": "markdown-primaryInfo-collection-bold-text-4",
+                          "id": "markdown-primaryInfo-collection-bold-text-0",
                           "type": "text",
                           "value": "some ",
                         },
                       },
                       {
                         "asset": {
-                          "id": "markdown-primaryInfo-collection-bold-text-5",
+                          "id": "markdown-primaryInfo-collection-bold-text-1",
                           "modifiers": [
                             {
                               "type": "tag",
@@ -148,7 +148,7 @@ describe("MarkdownPlugin", () => {
                 },
                 {
                   "asset": {
-                    "id": "markdown-primaryInfo-collection-italic-text-8",
+                    "id": "markdown-primaryInfo-collection-italic-text-4",
                     "modifiers": [
                       {
                         "type": "tag",
@@ -161,7 +161,7 @@ describe("MarkdownPlugin", () => {
                 },
                 {
                   "asset": {
-                    "id": "markdown-primaryInfo-collection-orderd-list-list-20",
+                    "id": "markdown-primaryInfo-collection-orderd-list-list-16",
                     "metaData": {
                       "listType": "ordered",
                     },
@@ -169,21 +169,21 @@ describe("MarkdownPlugin", () => {
                     "values": [
                       {
                         "asset": {
-                          "id": "markdown-primaryInfo-collection-orderd-list-text-11",
+                          "id": "markdown-primaryInfo-collection-orderd-list-text-7",
                           "type": "text",
                           "value": "First",
                         },
                       },
                       {
                         "asset": {
-                          "id": "markdown-primaryInfo-collection-orderd-list-text-14",
+                          "id": "markdown-primaryInfo-collection-orderd-list-text-10",
                           "type": "text",
                           "value": "Second",
                         },
                       },
                       {
                         "asset": {
-                          "id": "markdown-primaryInfo-collection-orderd-list-text-17",
+                          "id": "markdown-primaryInfo-collection-orderd-list-text-13",
                           "type": "text",
                           "value": "Third",
                         },
@@ -193,12 +193,12 @@ describe("MarkdownPlugin", () => {
                 },
                 {
                   "asset": {
-                    "id": "markdown-primaryInfo-collection-unorderd-list-list-31",
+                    "id": "markdown-primaryInfo-collection-unorderd-list-list-27",
                     "type": "list",
                     "values": [
                       {
                         "asset": {
-                          "id": "markdown-primaryInfo-collection-unorderd-list-text-21",
+                          "id": "markdown-primaryInfo-collection-unorderd-list-text-17",
                           "modifiers": [
                             {
                               "metaData": {
@@ -213,14 +213,14 @@ describe("MarkdownPlugin", () => {
                       },
                       {
                         "asset": {
-                          "id": "markdown-primaryInfo-collection-unorderd-list-text-25",
+                          "id": "markdown-primaryInfo-collection-unorderd-list-text-21",
                           "type": "text",
                           "value": "Second",
                         },
                       },
                       {
                         "asset": {
-                          "id": "markdown-primaryInfo-collection-unorderd-list-text-28",
+                          "id": "markdown-primaryInfo-collection-unorderd-list-text-24",
                           "type": "text",
                           "value": "Third",
                         },
@@ -231,7 +231,7 @@ describe("MarkdownPlugin", () => {
                 {
                   "asset": {
                     "accessibility": "alt text",
-                    "id": "markdown-primaryInfo-collection-image-image-32",
+                    "id": "markdown-primaryInfo-collection-image-image-28",
                     "metaData": {
                       "ref": "image.png",
                     },
@@ -240,7 +240,7 @@ describe("MarkdownPlugin", () => {
                 },
                 {
                   "asset": {
-                    "id": "markdown-primaryInfo-collection-unsupported-text-34",
+                    "id": "markdown-primaryInfo-collection-unsupported-text-30",
                     "type": "text",
                     "value": "Highlights are ==not supported==",
                   },
@@ -250,19 +250,19 @@ describe("MarkdownPlugin", () => {
           },
           "title": {
             "asset": {
-              "id": "markdown-view-title-composite-3",
+              "id": "markdown-view-title-composite-35",
               "type": "composite",
               "values": [
                 {
                   "asset": {
-                    "id": "markdown-view-title-text-0",
+                    "id": "markdown-view-title-text-32",
                     "type": "text",
                     "value": "Learn more at ",
                   },
                 },
                 {
                   "asset": {
-                    "id": "markdown-view-title-text-1",
+                    "id": "markdown-view-title-text-33",
                     "modifiers": [
                       {
                         "metaData": {
@@ -287,9 +287,9 @@ describe("MarkdownPlugin", () => {
       const player = new Player({
         plugins: [
           new MarkdownPlugin({
-            text: mockMappers.text,
-            paragraph: mockMappers.paragraph,
-            collection: mockMappers.collection,
+            text: buildMockMappers().text,
+            paragraph: buildMockMappers().paragraph,
+            collection: buildMockMappers().collection,
           }),
         ],
       });
@@ -347,7 +347,7 @@ describe("MarkdownPlugin", () => {
                 },
                 {
                   "asset": {
-                    "id": "markdown-primaryInfo-collection-unsupported-text-36",
+                    "id": "markdown-primaryInfo-collection-unsupported-text-0",
                     "type": "text",
                     "value": "Highlights are ==not supported==",
                   },
@@ -377,7 +377,7 @@ describe("MarkdownPlugin", () => {
       fingerprint.register({ type: "composite" }, 2);
 
       const player = new Player({
-        plugins: [fingerprint, new MarkdownPlugin(mockMappers)],
+        plugins: [fingerprint, new MarkdownPlugin(buildMockMappers())],
       });
 
       player.start({
@@ -428,19 +428,19 @@ describe("MarkdownPlugin", () => {
           "id": "action",
           "label": {
             "asset": {
-              "id": "action-label-composite-41",
+              "id": "action-label-composite-3",
               "type": "composite",
               "values": [
                 {
                   "asset": {
-                    "id": "action-label-text-38",
+                    "id": "action-label-text-0",
                     "type": "text",
                     "value": "Clicked 0 ",
                   },
                 },
                 {
                   "asset": {
-                    "id": "action-label-text-39",
+                    "id": "action-label-text-1",
                     "modifiers": [
                       {
                         "type": "tag",
@@ -457,8 +457,8 @@ describe("MarkdownPlugin", () => {
           "type": "action",
         }
       `);
-      expect(fingerprint.get("action-label-text-38")).toBe(1);
-      expect(fingerprint.get("action-label-text-39")).toBe(1);
+      expect(fingerprint.get("action-label-text-0")).toBe(1);
+      expect(fingerprint.get("action-label-text-1")).toBe(1);
     });
   });
 });

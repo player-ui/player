@@ -8,8 +8,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.R
+import com.intuit.playerui.android.asset.DecodableAsset
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.player.state.PlayerFlowState
@@ -23,13 +23,17 @@ import com.intuit.playerui.utils.mocks.Mock
 import com.intuit.playerui.utils.mocks.getFlow
 import com.intuit.playerui.utils.start
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.withTimeout
@@ -46,7 +50,7 @@ import org.robolectric.annotation.Config
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [28])
 @OptIn(ExperimentalCoroutinesApi::class)
-public abstract class AssetTest(private val group: String? = null) {
+public abstract class AssetTest(private val group: String? = null) : CoroutineScope {
 
     @get:Rule
     public val name: TestName = TestName()
@@ -82,9 +86,12 @@ public abstract class AssetTest(private val group: String? = null) {
         field = value
 
         field?.let {
-            when (val view = it.render(context)) {
-                is SuspendableAsset.AsyncViewStub -> view.onView(viewChannel::tryEmit)
-                else -> viewChannel.tryEmit(view)
+            testScope.launch {
+                val view = it.render(context)
+                when (view) {
+                    is DecodableAsset.AsyncViewStub -> view.onView(viewChannel::tryEmit)
+                    else -> viewChannel.tryEmit(view)
+                }
             }
         }
     }
@@ -105,9 +112,13 @@ public abstract class AssetTest(private val group: String? = null) {
 
     private val emptyView = View(context)
 
+    private val testDispatcher = UnconfinedTestDispatcher()
+    private val testScope = TestScope(testDispatcher)
+    override val coroutineContext = testDispatcher + Job()
+
     @Before
     public fun beforeEach() {
-        Dispatchers.setMain(TestCoroutineDispatcher())
+        Dispatchers.setMain(testDispatcher)
         player.onUpdate { asset, _ -> currentAssetTree = asset }
         player.hooks.state.tap { state ->
             if (state !is InProgressState) {
@@ -151,7 +162,7 @@ public abstract class AssetTest(private val group: String? = null) {
 
     /** Naive helper for suspending until hydration is complete, resolves async view stubs and recursively awaits all children for hydration */
     private suspend fun View.awaitCompleteHydration() {
-        if (this is SuspendableAsset.AsyncViewStub) { awaitView()?.awaitCompleteHydration(); return }
+        if (this is DecodableAsset.AsyncViewStub) { awaitView()?.awaitCompleteHydration(); return }
 
         while (getTag(R.bool.view_hydrated) == false) delay(25)
 

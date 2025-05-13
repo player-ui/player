@@ -102,6 +102,19 @@ jobs:
           root: .
           paths:
             - .
+  bazelrc_fork:
+    executor: minimal
+    steps:
+      - attach_workspace:
+          at: ~/player
+      - run: |
+          echo "common --bes_results_url=''" >> .bazelrc.local
+          echo "common --bes_backend=''" >> .bazelrc.local
+          echo "common --remote_cache=''" >> .bazelrc.local
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 
   build:
     executor: base
@@ -260,12 +273,6 @@ jobs:
             sudo mkdir /opt/bazelisk-v1.11.0 && \
             sudo mv bazelisk /opt/bazelisk-v1.11.0 && \
             sudo ln -s /opt/bazelisk-v1.11.0/bazelisk /usr/local/bin/bazel
-      
-      - run: |
-          echo "build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
-          echo "test --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
-          echo "coverage --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.local
-          echo "common --remote_upload_local_results" >> .bazelrc.local
 
       - run:
           name: Install Android tools
@@ -386,6 +393,14 @@ workflows:
           requires:
             - setup
 
+      - bazelrc_fork:
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - setup
+
       - build:
           name: build-trunk
           filters:
@@ -403,6 +418,7 @@ workflows:
                 - /pull\/.*/
           requires:
             - setup
+            - bazelrc_fork
 
       - build_ios:
           name: build-ios-trunk
@@ -422,6 +438,7 @@ workflows:
                 - /pull\/.*/
           requires:
             - build-fork
+            - bazelrc_fork
 
       - maybe_release:
           filters:
