@@ -26,7 +26,6 @@ import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withTag
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.KSerializer
 
 /**
@@ -42,8 +41,8 @@ public abstract class ComposableAsset<Data> (
 ) : DecodableAsset<Data>(assetContext, serializer) {
 
     override suspend fun initView(data: Data) = ComposeView(requireContext()).apply {
-       layoutParams = ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
-       setContent {
+        layoutParams = ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
+        setContent {
             compose(data = data)
         }
     }
@@ -86,13 +85,13 @@ public abstract class ComposableAsset<Data> (
     }
 
     /**
-    * Extension function to render a [RenderableAsset] within a [ComposableAsset].
-    * The new asset can either be a [ComposableAsset] or an Android view.
-    *
-    * @param modifier The modifier to be applied to the container - a `Box()` for [ComposableAsset]s and an [AndroidView] for android views.
-    * @param styles The styles to be applied to the asset. Use the interface [AssetStyle] to define the styles.
-    * @param tag The tag to be used to differentiate between the assets with same id. If not provided, the asset ID will be used. Also, defaults as the test tag for the container
-    */
+     * Extension function to render a [RenderableAsset] within a [ComposableAsset].
+     * The new asset can either be a [ComposableAsset] or an Android view.
+     *
+     * @param modifier The modifier to be applied to the container - a `Box()` for [ComposableAsset]s and an [AndroidView] for android views.
+     * @param styles The styles to be applied to the asset. Use the interface [AssetStyle] to define the styles.
+     * @param tag The tag to be used to differentiate between the assets with same id. If not provided, the asset ID will be used. Also, defaults as the test tag for the container
+     */
     @Composable
     fun RenderableAsset.compose(
         modifier: Modifier = Modifier,
@@ -116,4 +115,3 @@ public abstract class ComposableAsset<Data> (
         }
     }
 }
-  
