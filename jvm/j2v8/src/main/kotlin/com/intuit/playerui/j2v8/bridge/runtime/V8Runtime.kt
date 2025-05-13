@@ -14,7 +14,6 @@ import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeFactory
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.ScriptContext
 import com.intuit.playerui.core.bridge.serialization.serializers.playerSerializersModule
-import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.utils.InternalPlayerApi
 import com.intuit.playerui.j2v8.V8Null
 import com.intuit.playerui.j2v8.V8Primitive
