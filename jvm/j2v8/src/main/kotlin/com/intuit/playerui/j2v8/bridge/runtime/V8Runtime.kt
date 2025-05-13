@@ -1,6 +1,5 @@
 package com.intuit.playerui.j2v8.bridge.runtime
 
-import com.alexii.j2v8debugger.ScriptSourceProvider
 import com.eclipsesource.v8.V8
 import com.eclipsesource.v8.V8Array
 import com.eclipsesource.v8.V8Function
@@ -9,7 +8,6 @@ import com.eclipsesource.v8.V8Value
 import com.eclipsesource.v8.utils.MemoryManager
 import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
-import com.intuit.playerui.core.bridge.PlayerRuntimeException
 import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeContainer
 import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeFactory
@@ -18,7 +16,6 @@ import com.intuit.playerui.core.bridge.runtime.ScriptContext
 import com.intuit.playerui.core.bridge.serialization.serializers.playerSerializersModule
 import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.utils.InternalPlayerApi
-import com.intuit.playerui.core.utils.await
 import com.intuit.playerui.j2v8.V8Null
 import com.intuit.playerui.j2v8.V8Primitive
 import com.intuit.playerui.j2v8.V8Value
@@ -61,7 +58,7 @@ public fun Runtime(globalAlias: String? = null, tempDir: Path? = null): Runtime<
 public fun Runtime(globalAlias: String? = null, tempDirPrefix: String? = null): Runtime<V8Value> =
     Runtime(globalAlias, tempDirPrefix?.let(::createTempDirectory))
 
-internal class V8Runtime(override val config: J2V8RuntimeConfig) : Runtime<V8Value>, ScriptSourceProvider {
+internal class V8Runtime(override val config: J2V8RuntimeConfig) : Runtime<V8Value> {
 
     lateinit var v8: V8; private set
 
@@ -101,15 +98,7 @@ internal class V8Runtime(override val config: J2V8RuntimeConfig) : Runtime<V8Val
         withContext(dispatcher) {
             v8 = config.runtime?.apply {
                 locker.acquire()
-            } ?: if (config.debuggable) {
-                try {
-                    com.alexii.j2v8debugger.V8Debugger.createDebuggableV8Runtime(config.executorService, "debuggableJ2v8", true).await()
-                } catch (e: ClassNotFoundException) {
-                    throw PlayerRuntimeException("V8Debugger not found. Ensure 'com.github.AlexTrotsenko:j2v8-debugger:0.2.3' is included on your classpath.", e)
-                }
-            } else {
-                V8.createV8Runtime()
-            }
+            } ?: V8.createV8Runtime()
             memoryScope = MemoryManager(v8)
         }
     }
@@ -163,10 +152,6 @@ internal class V8Runtime(override val config: J2V8RuntimeConfig) : Runtime<V8Val
     private val scriptMapping = mutableMapOf<String, String>()
 
     private val scriptIds: MutableSet<String> = mutableSetOf()
-    override val allScriptIds: Collection<String>
-        get() = scriptIds.toSet()
-
-    override fun getSource(scriptId: String): String = scriptMapping[scriptId] ?: throw PlayerException("Script with name $scriptId not available for debugging, was it loaded?")
 
     override fun toString(): String = "J2V8"
 

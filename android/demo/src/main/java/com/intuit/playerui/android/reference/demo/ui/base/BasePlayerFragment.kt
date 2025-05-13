@@ -29,15 +29,6 @@ abstract class BasePlayerFragment : PlayerFragment() {
 
     private val currentPlayerCanvas get() = binding.playerCanvas.getChildAt(0)
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        if (playerViewModel.isDebug) {
-            (playerViewModel.player.player.runtime as? com.alexii.j2v8debugger.ScriptSourceProvider)?.let {
-                com.alexii.j2v8debugger.StethoHelper.initializeDebugger(requireContext(), it)
-            }
-        }
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
-
     override fun buildFallbackView(exception: Exception): View? = currentPlayerCanvas
 
     override fun buildDoneView(): View? = currentPlayerCanvas
