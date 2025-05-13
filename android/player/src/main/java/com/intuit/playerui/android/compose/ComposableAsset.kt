@@ -42,9 +42,6 @@ public abstract class ComposableAsset<Data> (
 
     override suspend fun initView(data: Data) = ComposeView(requireContext()).apply {
         layoutParams = ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
-        setContent {
-            compose(data = data)
-        }
     }
 
     override suspend fun View.hydrate(data: Data) {
