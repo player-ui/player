@@ -12,8 +12,10 @@ import com.intuit.playerui.android.utils.TestAssetsPlugin
 import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.utils.start
+import com.intuit.playerui.utils.test.runBlockingTest
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -44,21 +46,23 @@ internal class BrokenAssetTest {
     @Test
     fun `invalidate view should fail on first render`() {
         assertThrows<StaleViewException> {
-            BrokenAsset(baseContext.copy(asset = runtime.asset(shouldFail = true))).render(mockContext)
+            runBlocking {
+                BrokenAsset(baseContext.copy(asset = runtime.asset(shouldFail = true))).render(mockContext)
+            }
         }
     }
 
     @Test
-    fun `invalidate view should handle gracefully in a rehydrate (if asset renders properly the second time)`() {
+    fun `invalidate view should handle gracefully in a rehydrate (if asset renders properly the second time)`(): Unit = runBlockingTest {
         assertTrue(BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Frame))).render(mockContext) is FrameLayout)
         assertTrue(BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Linear))).render(mockContext) is LinearLayout)
     }
 
     @Test
-    fun `manual rehydration should fail the player on invalidate view`() {
+    fun `manual rehydration should fail the player on invalidate view`(): Unit = runBlockingTest {
         BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Frame))).apply {
             assertTrue(render(mockContext) is FrameLayout)
-            data.layout = BrokenAsset.Layout.Linear
+            getData().layout = BrokenAsset.Layout.Linear
             rehydrate()
         }
         assertTrue(player.state is ErrorState)

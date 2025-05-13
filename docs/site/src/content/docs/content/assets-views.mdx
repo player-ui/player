@@ -259,9 +259,55 @@ Within a template, the `_index_` string can be used to substitute the array-inde
 }
 ```
 
+### Template ordering
+
+When writing template content, JSX included in DSL preserves the order of templates in respect to non-template data, however the JSON specification itself doesn't guarantee preserving the key ordering.
+
+Because of this, templates support a `placement` property that specifies whether the template should expand before or after pre-existing content.
+
+`placement?: "prepend" | "append"`
+
+Placement is supported on multiple templates, and will expand accordingly in relation to other templates and non-template data.
+
+The expansion logic will respect the following order:
+
+- prepend
+- existing data
+- append
+
+In the case that `placement` isn't included, there is fallback logic that will use the lexical order that the keys are in.
+
+**_Example_**
+
+The following content has two collections that expands the template data based on if it appears before or after static data, and applies the corresponding placement value in the compiled JSON.
+
+```tsx
+<Collection>
+  <Collection.Label>This collection will display the template data first</Collection.Label>
+  <Collection.Values>
+    <Template data={b`foo`}>
+      <Text>Dynamic Item _index_</Text>
+    </Template>
+    <Text>Static Item</Text>
+  </Collection.Values>
+</Collection>
+
+<Collection>
+  <Collection.Label>This collection will display the template data last</Collection.Label>
+  <Collection.Values>
+    <Text>Static Item</Text>
+    <Template data={b`foo`}>
+      <Text>Dynamic Item _index_</Text>
+    </Template>
+  </Collection.Values>
+</Collection>
+```
+
+Note that since JSON order isn't guaranteed, the compiled JSON could still have order differences (with the correct `placement` logic) but the final rendered output will respect the placement logic.
+
 ### Multiple templates
 
-There's a few ways to leverage multiple templates within a single asset. Templates can be _nested_ or multiple used on a single node. These can also be combined to build out complicated nested expansion.
+There are a few ways to leverage multiple templates within a single asset. Templates can be _nested_ or multiple used on a single node. These can also be combined to build out complicated nested expansion.
 
 #### Nested Templates
 
@@ -314,7 +360,7 @@ Both templates in the example below output to the `values` array on the parent o
 
 **_Example_**
 
-The template below will append it's values to the pre-existing `values` array.
+The template below will append its values to the pre-existing `values` array.
 
 ```json
 {

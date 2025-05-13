@@ -87,7 +87,7 @@ internal class V8Node(override val v8Object: V8Object, override val runtime: Run
     override fun nativeReferenceEquals(other: Any?): Boolean = when (other) {
         is NodeWrapper -> nativeReferenceEquals(other.node)
         is V8ObjectWrapper -> nativeReferenceEquals(other.v8Object)
-        is V8Object -> v8Object.evaluateInJSThreadBlocking(runtime) {
+        is V8Object -> v8Object.evaluateInJSThreadBlocking(runtime, true) {
             v8Object.strictEquals(other)
         }
         else -> false

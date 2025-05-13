@@ -148,6 +148,25 @@ export default defineConfig({
           ],
         },
       ],
+      head: [
+        // Adding google analytics
+        {
+          tag: 'script',
+          attrs: {
+            src: `https://www.googletagmanager.com/gtag/js?id=NEXT_PUBLIC_GA_MEASUREMENT_ID`,
+          },
+        },
+        {
+          tag: 'script',
+          content: `
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'NEXT_PUBLIC_GA_MEASUREMENT_ID');
+          `,
+        },
+      ],
     }),
   ],
   base: BASE_PREFIX,
