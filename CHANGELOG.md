@@ -1,3 +1,26 @@
+# 0.11.1-next.0 (Thu May 15 2025)
+
+### Release Notes
+
+#### Pull in PRs 636 and 637 ([#646](https://github.com/player-ui/player/pull/646))
+
+- Add GA back to doc site
+- Fix stamping of variables during core/react builds
+
+---
+
+#### 🐛 Bug Fix
+
+- Revert "Merge pull request #646 from player-ui/ops/merge-636-and-637" [#648](https://github.com/player-ui/player/pull/648) ([@KetanReddy](https://github.com/KetanReddy))
+- Pull in PRs 636 and 637 [#646](https://github.com/player-ui/player/pull/646) ([@adierkens](https://github.com/adierkens) [@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.11.0 (Mon May 12 2025)
 ### Release Notes
 
