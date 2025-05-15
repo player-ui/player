@@ -6,76 +6,13 @@ import path from "path";
 // https://github.com/reduxjs/redux/blob/c9e06506f88926e252daf5275495eba0c04bf8e3/tsup.config.ts#L2
 // https://blog.isquaredsoftware.com/2023/08/esm-modernization-lessons/
 
-/** Adds support for replacing process.env.* references with stamped values from bazel */
-function getStampedSubstitutions(): Record<string, string> {
-  const contextDir = path.join(
-    process.env.BAZEL_BINDIR ?? "",
-    process.env.BAZEL_PACKAGE ?? ""
-  );
-  const contextDirRelative = contextDir.split(path.sep).map(() => "..");
-  const rootDir = path.join(process.cwd(), ...contextDirRelative);
-
-  if (
-    !process.env.BAZEL_STABLE_STATUS_FILE ||
-    !process.env.BAZEL_VOLATILE_STATUS_FILE
-  ) {
-    return {};
-  }
-
-  const stableStatusFile = path.join(
-    rootDir,
-    process.env.BAZEL_STABLE_STATUS_FILE
-  );
-
-  const volatileStatusFile = path.join(
-    rootDir,
-    process.env.BAZEL_VOLATILE_STATUS_FILE
-  );
-
-  const customSubstitutions = {
-    __VERSION__: "{STABLE_VERSION}",
-    __GIT_COMMIT__: "{STABLE_GIT_COMMIT}"
-  }
-
-  const substitutions: Record<string, string> = {};
-
-  [stableStatusFile, volatileStatusFile].forEach((statusFile) => {
-    if (!fs.existsSync(statusFile)) {
-      return;
-    }
-
-    const contents = fs.readFileSync(statusFile, "utf-8");
-
-    contents.split("\n").forEach((statusLine) => {
-      if (!statusLine.trim()) {
-        return;
-      }
-
-      const firstSpace = statusLine.indexOf(" ");
-      const varName = statusLine.substring(0, firstSpace);
-      const varVal = statusLine.substring(firstSpace + 1);
-
-      substitutions[`process.env.${varName}`] = JSON.stringify(varVal);
-
-      Object.entries(customSubstitutions).forEach(([key, value]) => {
-        if (value === `{${varName}}`) {
-          substitutions[key] = JSON.stringify(varVal);
-        }
-      });
-    });
-  });
-
-  return substitutions;
-}
-
-export function createConfig(): ReturnType<typeof defineConfig> {
+export function createConfig() {
   return defineConfig((options: Options) => {
     const pkgJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
 
     const defaultOptions: Options = {
       entry: [pkgJson.main],
       sourcemap: true,
-      define: getStampedSubstitutions(),
       ...options,
     };
 
