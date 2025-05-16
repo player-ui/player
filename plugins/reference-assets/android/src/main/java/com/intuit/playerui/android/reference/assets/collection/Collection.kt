@@ -10,7 +10,6 @@ import androidx.compose.ui.unit.dp
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.compose.ComposableAsset
-import com.intuit.playerui.android.compose.compose
 import com.intuit.playerui.android.reference.assets.R
 import com.intuit.playerui.android.reference.assets.XmlAssetStyleParser
 import kotlinx.serialization.Serializable

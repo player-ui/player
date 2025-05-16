@@ -1,3 +1,169 @@
+# 0.11.1 (Thu May 15 2025)
+
+### Release Notes
+
+#### Pull in PRs 636 and 637 ([#646](https://github.com/player-ui/player/pull/646))
+
+- Add GA back to doc site
+- Fix stamping of variables during core/react builds
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#652](https://github.com/player-ui/player/pull/652) ([@intuit-svc](https://github.com/intuit-svc))
+- Revert "Merge pull request #646 from player-ui/ops/merge-636-and-637" [#648](https://github.com/player-ui/player/pull/648) ([@KetanReddy](https://github.com/KetanReddy))
+- Pull in PRs 636 and 637 [#646](https://github.com/player-ui/player/pull/646) ([@adierkens](https://github.com/adierkens) [@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 3
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.11.1-next.0 (Thu May 15 2025)
+
+### Release Notes
+
+#### Pull in PRs 636 and 637 ([#646](https://github.com/player-ui/player/pull/646))
+
+- Add GA back to doc site
+- Fix stamping of variables during core/react builds
+
+---
+
+#### 🐛 Bug Fix
+
+- Revert "Merge pull request #646 from player-ui/ops/merge-636-and-637" [#648](https://github.com/player-ui/player/pull/648) ([@KetanReddy](https://github.com/KetanReddy))
+- Pull in PRs 636 and 637 [#646](https://github.com/player-ui/player/pull/646) ([@adierkens](https://github.com/adierkens) [@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.11.0 (Mon May 12 2025)
+### Release Notes
+
+#### Pull in PRs 636 and 637 ([#646](https://github.com/player-ui/player/pull/646))
+
+- Add GA back to doc site
+- Fix stamping of variables during core/react builds
+
+#### Template ordering ([#614](https://github.com/player-ui/player/pull/614))
+
+Adds support so that content authors can pass in `placement: "append" | "prepend"` to templates so that they can specify the order they should expand in relation to non-template data when everything is transformed into JSON.
+
+This logic works for both static and dynamic templates.
+
+#### Async node constructor consistency ([#618](https://github.com/player-ui/player/pull/618))
+
+Have consistent `AsyncNodePlugin` constructor api across all platforms allowing both tapping the handler to `onAsyncNode` hook after initializing `asyncNodePlugin` and initializing `asyncNodePlugin` with handlers
+
+#### Hermes Build Fixes and Upgrade, Better Cache Uses, and ESLint v9 Upgrade ([#632](https://github.com/player-ui/player/pull/632))
+
+Update React Native JSI and Hermes binaries, compiled with `HERMES_UNICODE_LITE` flag to avoid Java `localeCompare` implementation. Change log for React Native from [here](https://github.com/facebook/react-native/blob/main/CHANGELOG.md#v0781) to [here](https://github.com/facebook/react-native/blob/main/CHANGELOG.md#v0742)
+
+#### Doc Site Updates ([#615](https://github.com/player-ui/player/pull/615))
+
+Doc site: 
+- Fix dark mode styling of next button on landing page demo
+- Fix missing favicon
+- Add more custom styling
+- Close #574 
+- Close #493
+
+#### chat ui storybook ([#611](https://github.com/player-ui/player/pull/611))
+
+- Add new storybook for chat
+- Allow pass in custom plugins for DSL stories
+- fix flatten issue
+
+---
+
+#### 🚀 Enhancement
+
+- Template ordering [#614](https://github.com/player-ui/player/pull/614) ([@kharrop](https://github.com/kharrop) [@KetanReddy](https://github.com/KetanReddy))
+- Jetpack Compose [#609](https://github.com/player-ui/player/pull/609) ([@A1shK](https://github.com/A1shK) [@brocollie08](https://github.com/brocollie08))
+
+#### 🐛 Bug Fix
+
+- Release main [#647](https://github.com/player-ui/player/pull/647) ([@intuit-svc](https://github.com/intuit-svc))
+- Pull in PRs 636 and 637 [#646](https://github.com/player-ui/player/pull/646) ([@adierkens](https://github.com/adierkens) [@KetanReddy](https://github.com/KetanReddy))
+- Fully disable cache for forked builds [#645](https://github.com/player-ui/player/pull/645) ([@KetanReddy](https://github.com/KetanReddy))
+- Fix name of forked bazelrc job [#643](https://github.com/player-ui/player/pull/643) ([@KetanReddy](https://github.com/KetanReddy))
+- Asset deprecation [#639](https://github.com/player-ui/player/pull/639) ([@A1shK](https://github.com/A1shK) [@brocollie08](https://github.com/brocollie08))
+- Bazel 6.5 [#641](https://github.com/player-ui/player/pull/641) ([@brocollie08](https://github.com/brocollie08))
+- Use Readonly Key for Forked Builds [#638](https://github.com/player-ui/player/pull/638) ([@KetanReddy](https://github.com/KetanReddy))
+- remove runtime specification [#634](https://github.com/player-ui/player/pull/634) ([@brocollie08](https://github.com/brocollie08))
+- move renderIntoPlayerCanvas onto the correct thread [#633](https://github.com/player-ui/player/pull/633) ([@brocollie08](https://github.com/brocollie08))
+- Async node constructor consistency [#618](https://github.com/player-ui/player/pull/618) ([@cehan-Chloe](https://github.com/cehan-Chloe) [@KetanReddy](https://github.com/KetanReddy))
+- Hermes Build Fixes and Upgrade, Better Cache Uses, and ESLint v9 Upgrade [#632](https://github.com/player-ui/player/pull/632) ([@brocollie08](https://github.com/brocollie08) [@KetanReddy](https://github.com/KetanReddy))
+- a bit of docs for building hermes libs [#629](https://github.com/player-ui/player/pull/629) ([@brocollie08](https://github.com/brocollie08))
+- Update Bazel Docker Image [#620](https://github.com/player-ui/player/pull/620) ([@brocollie08](https://github.com/brocollie08))
+- Doc Site Updates [#615](https://github.com/player-ui/player/pull/615) ([@KetanReddy](https://github.com/KetanReddy) [@kharrop](https://github.com/kharrop))
+- chat ui storybook [#611](https://github.com/player-ui/player/pull/611) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- enable blocking logs by default [#613](https://github.com/player-ui/player/pull/613) ([@brocollie08](https://github.com/brocollie08))
+- Expose FlowInstance afterTransition hook for jvm [#610](https://github.com/player-ui/player/pull/610) ([@mrigankmg](https://github.com/mrigankmg))
+- iOS: expose onStart hook [#612](https://github.com/player-ui/player/pull/612) ([@nancywu1](https://github.com/nancywu1))
+- iOS: expose metrics plugin hooks [#607](https://github.com/player-ui/player/pull/607) ([@nancywu1](https://github.com/nancywu1))
+- Update CODEOWNERS File [#608](https://github.com/player-ui/player/pull/608) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 🏠 Internal
+
+- Merge branch 'fix-version-stamping' of github.com:adierkens/player into docs-analytics [#637](https://github.com/player-ui/player/pull/637) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 9
+
+- [@A1shK](https://github.com/A1shK)
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Mrigank Mehta ([@mrigankmg](https://github.com/mrigankmg))
+
+---
+
+# 0.11.0-next.5 (Thu May 08 2025)
+
+### Release Notes
+
+#### Pull in PRs 636 and 637 ([#646](https://github.com/player-ui/player/pull/646))
+
+- Add GA back to doc site
+- Fix stamping of variables during core/react builds
+
+---
+
+#### 🐛 Bug Fix
+
+- Pull in PRs 636 and 637 [#646](https://github.com/player-ui/player/pull/646) ([@adierkens](https://github.com/adierkens) [@KetanReddy](https://github.com/KetanReddy))
+- Fully disable cache for forked builds [#645](https://github.com/player-ui/player/pull/645) ([@KetanReddy](https://github.com/KetanReddy))
+- Fix name of forked bazelrc job [#643](https://github.com/player-ui/player/pull/643) ([@KetanReddy](https://github.com/KetanReddy))
+- Asset deprecation [#639](https://github.com/player-ui/player/pull/639) ([@A1shK](https://github.com/A1shK) [@brocollie08](https://github.com/brocollie08))
+- Bazel 6.5 [#641](https://github.com/player-ui/player/pull/641) ([@brocollie08](https://github.com/brocollie08))
+- Use Readonly Key for Forked Builds [#638](https://github.com/player-ui/player/pull/638) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 🏠 Internal
+
+- Merge branch 'fix-version-stamping' of github.com:adierkens/player into docs-analytics [#637](https://github.com/player-ui/player/pull/637) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 4
+
+- [@A1shK](https://github.com/A1shK)
+- [@brocollie08](https://github.com/brocollie08)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.11.0-next.4 (Wed Apr 30 2025)
 
 ### Release Notes
