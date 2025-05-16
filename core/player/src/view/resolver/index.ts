@@ -1,5 +1,5 @@
-import { SyncWaterfallHook, SyncHook } from "tapable-ts";
-import { setIn, addLast, clone } from "timm";
+import { SyncHook, SyncWaterfallHook } from "tapable-ts";
+import { addLast, clone, setIn } from "timm";
 import dlv from "dlv";
 import { dequal } from "dequal";
 import type { BindingInstance, BindingLike } from "../../binding";
@@ -10,13 +10,8 @@ import type {
 } from "../../data";
 import { DependencyModel, withParser } from "../../data";
 import type { Logger } from "../../logger";
-import type { Node } from "../parser";
-import { NodeType } from "../parser";
-import {
-  caresAboutDataChanges,
-  toNodeResolveOptions,
-  unpackAndPush,
-} from "./utils";
+import { Node, NodeType } from "../parser";
+import { caresAboutDataChanges, toNodeResolveOptions } from "./utils";
 import type { Resolve } from "./types";
 import { getNodeID } from "../parser/utils";
 
@@ -340,11 +335,13 @@ export class Resolver {
 
       return update;
     }
+
     if (isNestedMultiNodeWithAsync) {
       resolvedAST.parent = partiallyResolvedParent.parent;
     } else {
       resolvedAST.parent = partiallyResolvedParent;
     }
+
     resolveOptions.node = resolvedAST;
 
     this.ASTMap.set(resolvedAST, node);
@@ -408,6 +405,10 @@ export class Resolver {
         ? partiallyResolvedParent?.parent
         : node;
 
+      const hasAsync = resolvedAST.values
+        .map((value, index) => (value.type === NodeType.Async ? index : -1))
+        .filter((index) => index !== -1);
+
       const newValues = resolvedAST.values.map((mValue) => {
         const mTree = this.computeTree(
           mValue,
@@ -448,7 +449,16 @@ export class Resolver {
         return mTree.node;
       });
 
-      resolvedAST.values = newValues;
+      if (hasAsync.length > 0) {
+        // this likely turned into a nested multinode, attempt to flatten in node structure
+        const copy = newValues;
+        hasAsync.forEach((index) => {
+          if (copy[index]) copy.splice(index, 1, ...unpackNode(copy[index]));
+        });
+        resolvedAST.values = copy;
+      } else {
+        resolvedAST.values = newValues;
+      }
       resolved = childValue;
     }
 
@@ -486,4 +496,41 @@ export class Resolver {
 
     return update;
   }
+}
+
+/**
+ * helper function to flatten a potential nested array and combine with initial array
+ */
+function unpackAndPush(item: any | any[], initial: any[]): void {
+  if (item.asset.values && Array.isArray(item.asset.values)) {
+    item.asset.values.forEach((i: any) => {
+      unpackAndPush(i, initial);
+    });
+  } else {
+    initial.push(item);
+  }
+}
+
+function unpackNode(item: Node.Node) {
+  const unpacked: Node.Node[] = [];
+  if (
+    "children" in item &&
+    item.children?.[0]?.value.type === NodeType.Asset &&
+    (item.children?.[0]?.value as Node.Asset).children
+  ) {
+    if (
+      (item.children?.[0]?.value as Node.Asset).children?.[0]?.value.type ===
+      NodeType.MultiNode
+    ) {
+      (
+        (item.children?.[0]?.value as Node.Asset).children?.[0]
+          ?.value as Node.MultiNode
+      ).values.forEach((value) => {
+        unpacked.push(value);
+      });
+    }
+  } else {
+    unpacked.push(item);
+  }
+  return unpacked;
 }
