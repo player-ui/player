@@ -207,7 +207,7 @@ public sealed class PlayerFlowExecutionState(override val node: Node) :
     NodeWrapper {
 
     /** The currently executing flow */
-    public val flow: Flow by NodeSerializableField(Flow.serializer()) { Flow() }
+    public val flow: Flow by NodeSerializableField(NodeSerializableField.CacheStrategy.Full, Flow.serializer()) { Flow() }
 }
 
 // Set of *safe* convenience helpers for bounding state to concrete class

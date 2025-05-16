@@ -2,7 +2,6 @@ import type { BindingInstance, BindingLike } from "../../binding";
 import { isBinding } from "../../binding";
 import type { ExpressionType } from "../../expressions";
 import type { Resolve } from "./types";
-import { Node, NodeType } from "../parser";
 
 /** Check to see if and of the data-changes affect the given dependencies  */
 export function caresAboutDataChanges(
