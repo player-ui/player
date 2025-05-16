@@ -15,11 +15,6 @@ kt_player_module(
     test_package = "com.intuit.playerui.j2v8",
 )
 
-kt_jvm_library(
-    name = "j2v8_script_provider",
-    srcs = ["src/main/kotlin/com/alexii/j2v8debugger/ScriptSourceProvider.kt"]
-)
-
 j2v8_platform("macos")
 
 j2v8_platform("linux")
