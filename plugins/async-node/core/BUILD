@@ -22,6 +22,7 @@ js_pipeline(
     ],
     test_deps = [
         ":node_modules/@player-ui/reference-assets-plugin",
+        ":node_modules/@player-ui/check-path-plugin",
         "//:vitest_config",
     ]
 )

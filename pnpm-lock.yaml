@@ -677,6 +677,9 @@ importers:
         specifier: workspace:*
         version: link:../../../core/player
     devDependencies:
+      '@player-ui/check-path-plugin':
+        specifier: workspace:*
+        version: link:../../check-path/core
       '@player-ui/reference-assets-plugin':
         specifier: workspace:*
         version: link:../../reference-assets/core
