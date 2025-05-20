@@ -4,6 +4,7 @@ import { Player, Parser } from "@player-ui/player";
 import { waitFor } from "@testing-library/react";
 import { AsyncNodePlugin, AsyncNodePluginPlugin } from "../index";
 import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin";
+import { CheckPathPlugin } from "@player-ui/check-path-plugin";
 
 describe("view", () => {
   const basicFRFWithActions = {
@@ -54,6 +55,9 @@ describe("view", () => {
         },
       },
     ],
+    data: {
+      foo: true,
+    },
     navigation: {
       BEGIN: "FLOW_1",
       FLOW_1: {
@@ -1028,6 +1032,213 @@ describe("view", () => {
 
     expect(view?.values[2].asset.type).toBe("text");
     expect(view?.values[2].asset.value).toBe("chained async content");
+  });
+
+  test("chat-message asset - resolve chained chat-message with CheckPathPlugin", async () => {
+    const plugin = new AsyncNodePlugin({
+      plugins: [new AsyncNodePluginPlugin()],
+    });
+
+    let deferredResolve: ((value: any) => void) | undefined;
+
+    plugin.hooks.onAsyncNode.tap("test", async (node) => {
+      return new Promise((resolve) => {
+        deferredResolve = resolve;
+      });
+    });
+
+    let updateNumber = 0;
+
+    const checkPathPlugin = new CheckPathPlugin();
+
+    const plugins = [plugin, new ReferenceAssetsPlugin(), checkPathPlugin];
+
+    const player = new Player({
+      plugins: plugins,
+    });
+
+    player.hooks.viewController.tap("async-node-test", (vc) => {
+      vc.hooks.view.tap("async-node-test", (view) => {
+        view.hooks.onUpdate.tap("async-node-test", (update) => {
+          updateNumber++;
+        });
+      });
+    });
+
+    player.start(chatMessageContent as any);
+
+    let view = (player.getState() as InProgressState).controllers.view
+      .currentView?.lastUpdate;
+
+    expect(view).toBeDefined();
+    expect(view?.values[0].asset.type).toBe("text");
+    expect(view?.values[0].asset.value).toBe("chat message");
+    expect(updateNumber).toBe(1);
+
+    await waitFor(() => {
+      expect(deferredResolve).toBeDefined();
+    });
+
+    if (deferredResolve) {
+      deferredResolve({
+        asset: {
+          id: "chat-1",
+          type: "chat-message",
+          value: {
+            asset: {
+              id: "text-1",
+              type: "text",
+              value: "async content",
+            },
+          },
+        },
+      });
+    }
+
+    await waitFor(() => {
+      expect(updateNumber).toBe(2);
+    });
+
+    view = (player.getState() as InProgressState).controllers.view.currentView
+      ?.lastUpdate;
+
+    expect(view?.values[1].asset.type).toBe("text");
+    expect(view?.values[1].asset.value).toBe("async content");
+
+    expect(checkPathPlugin.getParent("text-1")).toStrictEqual({
+      id: "collection-async-1",
+      type: "collection",
+      values: [
+        {
+          asset: {
+            id: "2",
+            type: "text",
+            value: "chat message",
+          },
+        },
+        {
+          asset: {
+            id: "text-1",
+            type: "text",
+            value: "async content",
+          },
+        },
+      ],
+    });
+
+    if (deferredResolve) {
+      deferredResolve({
+        asset: {
+          id: "chat-2",
+          type: "chat-message",
+          value: {
+            asset: {
+              id: "text-2",
+              type: "text",
+              value: "async content2",
+            },
+          },
+        },
+      });
+    }
+
+    await waitFor(() => {
+      expect(updateNumber).toBe(3);
+    });
+
+    view = (player.getState() as InProgressState).controllers.view.currentView
+      ?.lastUpdate;
+
+    expect(view?.values[2].asset.type).toBe("text");
+    expect(view?.values[2].asset.value).toBe("async content2");
+    expect(checkPathPlugin.getParent("text-2")).toStrictEqual({
+      id: "collection-async-1",
+      type: "collection",
+      values: [
+        {
+          asset: {
+            id: "2",
+            type: "text",
+            value: "chat message",
+          },
+        },
+        {
+          asset: {
+            id: "text-1",
+            type: "text",
+            value: "async content",
+          },
+        },
+        {
+          asset: {
+            id: "text-2",
+            type: "text",
+            value: "async content2",
+          },
+        },
+      ],
+    });
+
+    if (deferredResolve) {
+      deferredResolve({
+        asset: {
+          id: "chat-3",
+          type: "chat-message",
+          value: {
+            asset: {
+              id: "text-3",
+              type: "text",
+              value: "async content3",
+            },
+          },
+        },
+      });
+    }
+
+    await waitFor(() => {
+      expect(updateNumber).toBe(4);
+    });
+
+    view = (player.getState() as InProgressState).controllers.view.currentView
+      ?.lastUpdate;
+
+    expect(view?.values[3].asset.type).toBe("text");
+    expect(view?.values[3].asset.value).toBe("async content3");
+
+    expect(checkPathPlugin.getParent("text-3")).toStrictEqual({
+      id: "collection-async-1",
+      type: "collection",
+      values: [
+        {
+          asset: {
+            id: "2",
+            type: "text",
+            value: "chat message",
+          },
+        },
+        {
+          asset: {
+            id: "text-1",
+            type: "text",
+            value: "async content",
+          },
+        },
+        {
+          asset: {
+            id: "text-2",
+            type: "text",
+            value: "async content2",
+          },
+        },
+        {
+          asset: {
+            id: "text-3",
+            type: "text",
+            value: "async content3",
+          },
+        },
+      ],
+    });
   });
 });
 
