@@ -1,3 +1,15 @@
+# 0.11.2-next.1 (Wed May 21 2025)
+
+#### 🐛 Bug Fix
+
+- iOS Anytype make unknowndata equatable [#654](https://github.com/player-ui/player/pull/654) ([@nancywu1](https://github.com/nancywu1))
+
+#### Authors: 1
+
+- [@nancywu1](https://github.com/nancywu1)
+
+---
+
 # 0.11.2-next.0 (Tue May 20 2025)
 
 ### Release Notes
