@@ -22,6 +22,9 @@ import type {
   findProperty,
   containsAny,
 } from "./expressions";
+
+export { Expressions };
+
 /**
  * Exposes a lot of expressions to Player.
  */
@@ -55,7 +58,7 @@ export class CommonExpressionsPlugin
 {
   name = "CommonExpressions";
 
-  apply(player: Player) {
+  apply(player: Player): void {
     player.registerPlugin(
       new ExpressionPlugin(new Map(Object.entries(Expressions))),
     );
