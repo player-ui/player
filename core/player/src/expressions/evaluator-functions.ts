@@ -49,3 +49,10 @@ export const conditional: ExpressionHandler<
 };
 
 conditional.resolveParams = false;
+
+export const waitFor: ExpressionHandler<[Promise<any>], any> = async (
+  ctx,
+  promise,
+) => {
+  return await promise;
+};
