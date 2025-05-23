@@ -1,3 +1,86 @@
+# 0.11.2 (Thurs May 22 2025)
+### Release Notes
+
+#### fix: CheckPathPlugin throws error with chained AsyncNode ([#621](https://github.com/player-ui/player/pull/621))
+
+fix CheckPathPlugin throws error with chained AsyncNode
+
+<!--
+  To include release notes in the automatic changelong, just add a level 1 markdown header below
+  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
+
+  Example:
+
+  # Release Notes
+  Added new plugin, to use it:
+  ```typescript
+  const plugin = new Plugin(...)
+  ```
+-->
+
+---
+
+#### 🐛 Bug Fix
+
+- iOS Anytype make unknowndata equatable [#654](https://github.com/player-ui/player/pull/654) ([@nancywu1](https://github.com/nancywu1))
+- fix: CheckPathPlugin throws error with chained AsyncNode [#621](https://github.com/player-ui/player/pull/621) ([@cehan-Chloe](https://github.com/cehan-Chloe) [@brocollie08](https://github.com/brocollie08))
+- Async node structure reorg [#623](https://github.com/player-ui/player/pull/623) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 3
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@nancywu1](https://github.com/nancywu1)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+
+---
+
+# 0.11.2-next.1 (Wed May 21 2025)
+
+#### 🐛 Bug Fix
+
+- iOS Anytype make unknowndata equatable [#654](https://github.com/player-ui/player/pull/654) ([@nancywu1](https://github.com/nancywu1))
+
+#### Authors: 1
+
+- [@nancywu1](https://github.com/nancywu1)
+
+---
+
+# 0.11.2-next.0 (Tue May 20 2025)
+
+### Release Notes
+
+#### fix: CheckPathPlugin throws error with chained AsyncNode ([#621](https://github.com/player-ui/player/pull/621))
+
+fix CheckPathPlugin throws error with chained AsyncNode
+
+<!--
+  To include release notes in the automatic changelong, just add a level 1 markdown header below
+  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
+
+  Example:
+
+  # Release Notes
+  Added new plugin, to use it:
+  ```typescript
+  const plugin = new Plugin(...)
+  ```
+-->
+
+---
+
+#### 🐛 Bug Fix
+
+- fix: CheckPathPlugin throws error with chained AsyncNode [#621](https://github.com/player-ui/player/pull/621) ([@cehan-Chloe](https://github.com/cehan-Chloe) [@brocollie08](https://github.com/brocollie08))
+- Async node structure reorg [#623](https://github.com/player-ui/player/pull/623) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 2
+
+- [@brocollie08](https://github.com/brocollie08)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+
+---
+
 # 0.11.1 (Thu May 15 2025)
 
 ### Release Notes
