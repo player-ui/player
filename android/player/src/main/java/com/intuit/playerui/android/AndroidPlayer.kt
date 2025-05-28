@@ -20,6 +20,7 @@ import com.intuit.playerui.core.bridge.format
 import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.playerui.core.bridge.serialization.format.registerContextualSerializer
 import com.intuit.playerui.core.constants.ConstantsController
+import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.logger.TapableLogger
 import com.intuit.playerui.core.player.HeadlessPlayer
 import com.intuit.playerui.core.player.Player
@@ -214,6 +215,12 @@ public class AndroidPlayer private constructor(
 
     /** List of provided values to pass into the CompositionLocalProvider that wraps all compose assets */
     internal var providedValues: MutableList<ProvidedValue<*>> = mutableListOf()
+
+    /** Function to update ProvidedValue. This can be used by XML assets to pass down styles to [ComposableAsset]s */
+    @ExperimentalPlayerApi
+    public fun updateProvidedValues(values: List<ProvidedValue<*>>) {
+        providedValues.addAll(values)
+    }
 
     /**
      * Cache [AssetContext]-[View] pairs against the [AssetContext.id]. The [AssetContext] is

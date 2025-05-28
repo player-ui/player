@@ -1,3 +1,4 @@
+
 package com.intuit.playerui.android.reference.assets.badge
 
 import androidx.compose.foundation.background
@@ -27,11 +28,10 @@ internal class Badge(
     )
 
     @Composable
-    override fun content(modifier: Modifier, data: Data) {
+    override fun content(data: Data) {
         val label = data.label ?: ""
         Row(
-            modifier =
-            modifier
+            modifier = Modifier
                 .height(24.dp)
                 .wrapContentSize()
                 .background(color = if (data.status == "info") Color.Blue else Color.Red, RoundedCornerShape(4.dp))
