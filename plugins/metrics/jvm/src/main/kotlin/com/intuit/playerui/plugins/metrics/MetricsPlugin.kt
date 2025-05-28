@@ -51,7 +51,7 @@ public class MetricsPlugin(
     public class Hooks internal constructor(override val node: Node) : NodeWrapper {
         public val resolveRequestTime: NodeSyncBailHook<Int>
             by NodeSerializableField(NodeSyncBailHook.serializer(Int.serializer()))
-        
+
         public val onFlowBegin: NodeSyncHook1<PlayerFlowMetrics>
             by NodeSerializableField(NodeSyncHook1.serializer(PlayerFlowMetrics.serializer()))
 
