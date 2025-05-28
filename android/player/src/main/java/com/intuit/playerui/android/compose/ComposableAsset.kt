@@ -2,13 +2,12 @@ package com.intuit.playerui.android.compose
 
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.ProvidedValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
@@ -42,11 +41,7 @@ public abstract class ComposableAsset<Data> (
 ) : DecodableAsset<Data>(assetContext, serializer) {
 
     override suspend fun initView(data: Data) = ComposeView(requireContext()).apply {
-        layoutParams = if (asset is ViewportAsset) {
-            ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-        } else {
-            ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
-        }
+        layoutParams = ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
     }
 
     override suspend fun View.hydrate(data: Data) {
@@ -56,28 +51,23 @@ public abstract class ComposableAsset<Data> (
         }
     }
 
-    fun updateProvidedValues(values: List<ProvidedValue<*>>) {
-        // Update the internal state or perform actions with the new values
-        player.providedValues.addAll(values)
-    }
-
     @Composable
-    fun compose(modifier: Modifier? = Modifier, data: Data? = null) {
-        val data: Data? by produceState<Data?>(initialValue = data, key1 = this) {
+    fun compose(data: Data? = null) {
+        val data: Data? by produceState(initialValue = data, key1 = this) {
             value = getData()
         }
 
         data?.let {
             // Getting the local values provided by the plugin hook
-            player.hooks.compositionLocalProvidedValues.call(hashMapOf(), ::updateProvidedValues)
+            player.hooks.compositionLocalProvidedValues.call(hashMapOf(), player::updateProvidedValues)
             CompositionLocalProvider(*(player.providedValues).toTypedArray()) {
-                content(modifier ?: Modifier, it)
+                content(it)
             }
         }
     }
 
     @Composable
-    abstract fun content(modifier: Modifier, data: Data)
+    abstract fun content(data: Data)
 
     @Composable
     private fun RenderableAsset.composeAndroidView(
@@ -91,6 +81,14 @@ public abstract class ComposableAsset<Data> (
         }
     }
 
+    /**
+     * Extension function to render a [RenderableAsset] within a [ComposableAsset].
+     * The new asset can either be a [ComposableAsset] or an Android view.
+     *
+     * @param modifier The modifier to be applied to the container - a `Box()` for [ComposableAsset]s and an [AndroidView] for android views.
+     * @param styles The styles to be applied to the asset. Use the interface [AssetStyle] to define the styles.
+     * @param tag The tag to be used to differentiate between the assets with same id. If not provided, the asset ID will be used. Also, defaults as the test tag for the container
+     */
     @Composable
     fun RenderableAsset.compose(
         modifier: Modifier = Modifier,
@@ -98,15 +96,18 @@ public abstract class ComposableAsset<Data> (
         tag: String? = null,
     ) {
         val assetTag = tag ?: asset.id
+        val containerModifier = Modifier.testTag(assetTag) then modifier
         assetContext.withContext(LocalContext.current).withTag(assetTag).build().run {
             renewHydrationScope("Creating view within a ComposableAsset")
             when (this) {
                 is ComposableAsset<*> -> CompositionLocalProvider(
                     LocalTextStyle provides (styles?.textStyle ?: TextStyle()),
                 ) {
-                    compose(modifier = Modifier.testTag(assetTag) then modifier)
+                    Box(containerModifier) {
+                        compose()
+                    }
                 }
-                else -> composeAndroidView(modifier, styles?.xmlStyles)
+                else -> composeAndroidView(containerModifier, styles?.xmlStyles)
             }
         }
     }

@@ -1,3 +1,134 @@
+# 0.11.2 (Thurs May 22 2025)
+### Release Notes
+
+#### fix: CheckPathPlugin throws error with chained AsyncNode ([#621](https://github.com/player-ui/player/pull/621))
+
+fix CheckPathPlugin throws error with chained AsyncNode
+
+<!--
+  To include release notes in the automatic changelong, just add a level 1 markdown header below
+  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
+
+  Example:
+
+  # Release Notes
+  Added new plugin, to use it:
+  ```typescript
+  const plugin = new Plugin(...)
+  ```
+-->
+
+---
+
+#### 🐛 Bug Fix
+
+- iOS Anytype make unknowndata equatable [#654](https://github.com/player-ui/player/pull/654) ([@nancywu1](https://github.com/nancywu1))
+- fix: CheckPathPlugin throws error with chained AsyncNode [#621](https://github.com/player-ui/player/pull/621) ([@cehan-Chloe](https://github.com/cehan-Chloe) [@brocollie08](https://github.com/brocollie08))
+- Async node structure reorg [#623](https://github.com/player-ui/player/pull/623) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 3
+
+- [@brocollie08](https://github.com/brocollie08)
+- [@nancywu1](https://github.com/nancywu1)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+
+---
+
+# 0.11.2-next.1 (Wed May 21 2025)
+
+#### 🐛 Bug Fix
+
+- iOS Anytype make unknowndata equatable [#654](https://github.com/player-ui/player/pull/654) ([@nancywu1](https://github.com/nancywu1))
+
+#### Authors: 1
+
+- [@nancywu1](https://github.com/nancywu1)
+
+---
+
+# 0.11.2-next.0 (Tue May 20 2025)
+
+### Release Notes
+
+#### fix: CheckPathPlugin throws error with chained AsyncNode ([#621](https://github.com/player-ui/player/pull/621))
+
+fix CheckPathPlugin throws error with chained AsyncNode
+
+<!--
+  To include release notes in the automatic changelong, just add a level 1 markdown header below
+  and include any markdown notes to go into the changelog: https://intuit.github.io/auto/docs/generated/changelog#additional-release-notes
+
+  Example:
+
+  # Release Notes
+  Added new plugin, to use it:
+  ```typescript
+  const plugin = new Plugin(...)
+  ```
+-->
+
+---
+
+#### 🐛 Bug Fix
+
+- fix: CheckPathPlugin throws error with chained AsyncNode [#621](https://github.com/player-ui/player/pull/621) ([@cehan-Chloe](https://github.com/cehan-Chloe) [@brocollie08](https://github.com/brocollie08))
+- Async node structure reorg [#623](https://github.com/player-ui/player/pull/623) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 2
+
+- [@brocollie08](https://github.com/brocollie08)
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+
+---
+
+# 0.11.1 (Thu May 15 2025)
+
+### Release Notes
+
+#### Pull in PRs 636 and 637 ([#646](https://github.com/player-ui/player/pull/646))
+
+- Add GA back to doc site
+- Fix stamping of variables during core/react builds
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#652](https://github.com/player-ui/player/pull/652) ([@intuit-svc](https://github.com/intuit-svc))
+- Revert "Merge pull request #646 from player-ui/ops/merge-636-and-637" [#648](https://github.com/player-ui/player/pull/648) ([@KetanReddy](https://github.com/KetanReddy))
+- Pull in PRs 636 and 637 [#646](https://github.com/player-ui/player/pull/646) ([@adierkens](https://github.com/adierkens) [@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 3
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.11.1-next.0 (Thu May 15 2025)
+
+### Release Notes
+
+#### Pull in PRs 636 and 637 ([#646](https://github.com/player-ui/player/pull/646))
+
+- Add GA back to doc site
+- Fix stamping of variables during core/react builds
+
+---
+
+#### 🐛 Bug Fix
+
+- Revert "Merge pull request #646 from player-ui/ops/merge-636-and-637" [#648](https://github.com/player-ui/player/pull/648) ([@KetanReddy](https://github.com/KetanReddy))
+- Pull in PRs 636 and 637 [#646](https://github.com/player-ui/player/pull/646) ([@adierkens](https://github.com/adierkens) [@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.11.0 (Mon May 12 2025)
 ### Release Notes
 
