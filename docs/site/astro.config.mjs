@@ -35,6 +35,9 @@ export const BASE_PREFIX =
 
 // https://astro.build/config
 export default defineConfig({
+  redirects: {
+    "/plugins/common-types": "/plugins/core/common-types/",
+  },
   integrations: [
     react(),
     tailwind({
