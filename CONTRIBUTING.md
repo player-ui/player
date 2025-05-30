@@ -44,7 +44,7 @@ bazel run //docs/site:dev
 
 which will run an instance on `http://localhost:4321`.
 
-When a PR is merged, any `docs/site` changes will be deployed to the `latest` folder in [https://github.com/player-ui/player-ui.github.io](https://github.com/player-ui/player-ui.github.io), which stores the built files for the site.
+When a PR is merged, any `docs/site` changes will be deployed to the `next` folder in [https://github.com/player-ui/player-ui.github.io](https://github.com/player-ui/player-ui.github.io), which stores the built files for the site.
 
 The OSS site is deployed with the following route logic:
 
