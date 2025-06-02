@@ -26,8 +26,8 @@ class Collection(assetContext: AssetContext) : ComposableAsset<Collection.Data>(
     )
 
     @Composable
-    override fun content(modifier: Modifier, data: Data) {
-        Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(20.dp)) {
+    override fun content(data: Data) {
+        Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
             data.label?.compose(
                 modifier = Modifier.padding(top = 10.dp).fillMaxWidth(),
                 styles = XmlAssetStyleParser(requireContext()).parse(R.style.Text_Label),
