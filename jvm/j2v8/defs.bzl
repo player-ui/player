@@ -4,19 +4,15 @@ load("//jvm:defs.bzl", "DEFAULT_GROUP", "distribution")
 deps = {
     "macos": [
         "//jvm/j2v8/libs:j2v8_macos",
-        "//jvm/j2v8:j2v8_script_provider",
     ],
     "linux": [
         "//jvm/j2v8/libs:j2v8_linux",
-        "//jvm/j2v8:j2v8_script_provider",
     ],
     "android": [
         "@maven//:com_eclipsesource_j2v8_j2v8",
-        "//jvm/j2v8:j2v8_script_provider",
     ],
     "android-debug": [
-        "@maven//:com_eclipsesource_j2v8_j2v8",
-        "@maven//:com_github_AlexTrotsenko_j2v8_debugger",
+        "@maven//:com_eclipsesource_j2v8_j2v8"
     ],
     "all": [
         "//jvm/j2v8:j2v8-macos",

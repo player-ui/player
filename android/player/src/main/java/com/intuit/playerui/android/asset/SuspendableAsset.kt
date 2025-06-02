@@ -1,7 +1,6 @@
 package com.intuit.playerui.android.asset
 
 import android.view.View
-import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AndroidPlayerPlugin
 import com.intuit.playerui.android.AssetContext
 import kotlinx.serialization.KSerializer
@@ -15,11 +14,5 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
         ReplaceWith("DecodableAsset.AsyncHydrationTrackerPlugin"),
         DeprecationLevel.WARNING,
     )
-    public class AsyncHydrationTrackerPlugin : AndroidPlayerPlugin {
-        private val delegate = DecodableAsset.AsyncHydrationTrackerPlugin()
-
-        override fun apply(player: AndroidPlayer) {
-            delegate.apply(player)
-        }
-    }
+    public class AsyncHydrationTrackerPlugin : AndroidPlayerPlugin by DecodableAsset.AsyncHydrationTrackerPlugin()
 }
