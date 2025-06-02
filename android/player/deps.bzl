@@ -20,14 +20,8 @@ main_deps = main_exports + [
     "//plugins/pubsub/jvm:pubsub",
     "//plugins/coroutines/jvm:coroutines",
 
-    # Compose deps
-    "@maven//:androidx_activity_activity_compose",
-    "@maven//:androidx_appcompat_appcompat",
-    "@maven//:androidx_compose_foundation_foundation",
-    "@maven//:androidx_compose_foundation_foundation_layout",
-    "@maven//:androidx_compose_runtime_runtime",
-    "@maven//:androidx_compose_ui_ui",
-    "@maven//:androidx_compose_ui_ui_tooling",
+    # Compose deps (compile-only)
+    ":compose_compile_only",
 ]
 
 main_resources = [
