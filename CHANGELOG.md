@@ -1,3 +1,15 @@
+# 0.12.0-next.1 (Mon Jun 02 2025)
+
+#### 🐛 Bug Fix
+
+- Compose compile only [#642](https://github.com/player-ui/player/pull/642) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
 # 0.12.0-next.0 (Wed May 28 2025)
 
 #### 🚀 Enhancement
