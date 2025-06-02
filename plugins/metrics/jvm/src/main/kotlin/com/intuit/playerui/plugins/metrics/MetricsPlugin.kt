@@ -3,6 +3,7 @@ package com.intuit.playerui.plugins.metrics
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.core.bridge.getInvokable
+import com.intuit.playerui.core.bridge.hooks.NodeSyncBailHook
 import com.intuit.playerui.core.bridge.hooks.NodeSyncHook1
 import com.intuit.playerui.core.bridge.hooks.NodeSyncHook3
 import com.intuit.playerui.core.bridge.runtime.Runtime
@@ -48,6 +49,9 @@ public class MetricsPlugin(
 
     @Serializable(Hooks.Serializer::class)
     public class Hooks internal constructor(override val node: Node) : NodeWrapper {
+        public val resolveRequestTime: NodeSyncBailHook<Int>
+            by NodeSerializableField(NodeSyncBailHook.serializer(Int.serializer()))
+
         public val onFlowBegin: NodeSyncHook1<PlayerFlowMetrics>
             by NodeSerializableField(NodeSyncHook1.serializer(PlayerFlowMetrics.serializer()))
 
