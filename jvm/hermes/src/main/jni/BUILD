@@ -41,7 +41,10 @@ cc_library(
         # Host build
         ":should_include_jni": [],
         # Android build
-        "//conditions:default": ["-Wl,-z,max-page-size=16384"],
+        "//conditions:default": [
+            "-Wl,-z,max-page-size=16384",
+            "-lunwind"
+        ],
     }),
     visibility = ["//visibility:public"],
     deps = select({

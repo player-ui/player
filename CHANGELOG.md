@@ -1,3 +1,33 @@
+# 0.12.0-next.1 (Mon Jun 02 2025)
+
+#### 🐛 Bug Fix
+
+- Compose compile only [#642](https://github.com/player-ui/player/pull/642) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
+# 0.12.0-next.0 (Wed May 28 2025)
+
+#### 🚀 Enhancement
+
+- Renew hydration scope, wrap composableAsset and apply the modifiers to all assets through the compose call [#630](https://github.com/player-ui/player/pull/630) ([@A1shK](https://github.com/A1shK) [@brocollie08](https://github.com/brocollie08) [@nancywu1](https://github.com/nancywu1))
+
+#### 🐛 Bug Fix
+
+- remove new line at end of VERSION file [#659](https://github.com/player-ui/player/pull/659) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 3
+
+- [@A1shK](https://github.com/A1shK)
+- [@brocollie08](https://github.com/brocollie08)
+- [@nancywu1](https://github.com/nancywu1)
+
+---
+
 # 0.11.2 (Thurs May 22 2025)
 ### Release Notes
 
