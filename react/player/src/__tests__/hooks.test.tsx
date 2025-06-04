@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { renderHook } from "@testing-library/react-hooks";
+import { renderHook } from "@testing-library/react";
 import { useReactPlayer } from "..";
 
 test("reactPlayer hook", () => {

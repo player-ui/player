@@ -24,7 +24,7 @@ lint-js:
 
 [doc('Run a dev server of the main docs page')]
 start-docs:
-  bazel run //docs/site:start
+  bazel run //docs/site:dev
 
 [doc('Run a dev server of storybook')]
 start-storybook:
