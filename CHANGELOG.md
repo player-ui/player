@@ -1,3 +1,23 @@
+# 0.12.0-next.2 (Wed Jun 04 2025)
+
+### Release Notes
+
+#### Export Underlying Expressions from Common Expression Plugin ([#657](https://github.com/player-ui/player/pull/657))
+
+Update Common Expressions Plugin to export underlying functions to allow them to be converted to DSL functions as well as export them as XLRs for consumption by the XLR SDK.
+
+---
+
+#### 🐛 Bug Fix
+
+- Export Underlying Expressions from Common Expression Plugin [#657](https://github.com/player-ui/player/pull/657) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 1
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.12.0-next.1 (Mon Jun 02 2025)
 
 #### 🐛 Bug Fix
