@@ -36,15 +36,28 @@ export const deleteDataVal: ExpressionHandler<[Binding], void> = (
 export const conditional: ExpressionHandler<
   [ExpressionNode, ExpressionNode, ExpressionNode?]
 > = (ctx, condition, ifTrue, ifFalse) => {
-  const resolution = ctx.evaluate(condition);
-  if (resolution) {
-    return ctx.evaluate(ifTrue);
+  const testResult = ctx.evaluate(condition);
+
+  // Handle Promise case automatically (same pattern as ternary operator)
+  if (testResult instanceof Promise) {
+    return testResult.then((resolvedTest: any) => {
+      if (resolvedTest) {
+        return ctx.evaluate(ifTrue);
+      }
+      if (ifFalse) {
+        return ctx.evaluate(ifFalse);
+      }
+      return null;
+    });
   }
 
+  // Handle sync case
+  if (testResult) {
+    return ctx.evaluate(ifTrue);
+  }
   if (ifFalse) {
     return ctx.evaluate(ifFalse);
   }
-
   return null;
 };
 

@@ -247,13 +247,6 @@ export interface HookOptions extends ExpressionContext {
   async?: boolean;
 }
 
-interface AsyncHookOptions extends HookOptions {
-  /** Given an expression node, return a promise that resolves to the value */
-  resolveNode: (node: ExpressionNode) => Promise<any>;
-  /** Whether the expression should be evaluated asynchronously */
-  async: true;
-}
-
 export type ExpressionEvaluatorOptions = Omit<
   HookOptions,
   "resolveNode" | "evaluate"
@@ -322,14 +315,6 @@ export class ExpressionEvaluator {
     };
 
     this.hooks.resolve.tap("ExpressionEvaluator", (result, node, options) => {
-      if (options.async) {
-        return this._resolveNodeAsync(
-          result,
-          node,
-          options as AsyncHookOptions,
-        );
-      }
-
       return this._resolveNode(result, node, options);
     });
     this.evaluate = this.evaluate.bind(this);
@@ -485,14 +470,29 @@ export class ExpressionEvaluator {
             return operator(expressionContext, node.left, node.right);
           }
 
-          return operator(
-            expressionContext,
-            resolveNode(node.left),
-            resolveNode(node.right),
+          const left = resolveNode(node.left);
+          const right = resolveNode(node.right);
+
+          // Handle promises in binary operations
+          if (isPromiselike(left) || isPromiselike(right)) {
+            return Promise.all([left, right]).then(([leftVal, rightVal]) =>
+              operator(expressionContext, leftVal, rightVal),
+            );
+          }
+
+          return operator(expressionContext, left, right);
+        }
+
+        const left = resolveNode(node.left);
+        const right = resolveNode(node.right);
+
+        if (isPromiselike(left) || isPromiselike(right)) {
+          return Promise.all([left, right]).then(([leftVal, rightVal]) =>
+            operator(leftVal, rightVal),
           );
         }
 
-        return operator(resolveNode(node.left), resolveNode(node.right));
+        return operator(left, right);
       }
 
       return;
@@ -503,15 +503,26 @@ export class ExpressionEvaluator {
 
       if (operator) {
         if ("resolveParams" in operator) {
-          return operator(
-            expressionContext,
-            operator.resolveParams === false
-              ? node.argument
-              : resolveNode(node.argument),
-          );
+          if (operator.resolveParams === false) {
+            return operator(expressionContext, node.argument);
+          }
+
+          const arg = resolveNode(node.argument);
+
+          if (isPromiselike(arg)) {
+            return arg.then((argVal) => operator(expressionContext, argVal));
+          }
+
+          return operator(expressionContext, arg);
         }
 
-        return operator(resolveNode(node.argument));
+        const arg = resolveNode(node.argument);
+
+        if (isPromiselike(arg)) {
+          return arg.then((argVal) => operator(argVal));
+        }
+
+        return operator(arg);
       }
 
       return;
@@ -539,6 +550,15 @@ export class ExpressionEvaluator {
 
       const args = node.args.map((n) => resolveNode(n));
 
+      // Check if any arguments are promises
+      const hasPromises = args.some(isPromiselike);
+
+      if (hasPromises) {
+        return Promise.all(args).then((resolvedArgs) =>
+          operator(expressionContext, ...resolvedArgs),
+        );
+      }
+
       return operator(expressionContext, ...args);
     }
 
@@ -550,20 +570,41 @@ export class ExpressionEvaluator {
       const obj = resolveNode(node.object);
       const prop = resolveNode(node.property);
 
+      if (isPromiselike(obj) || isPromiselike(prop)) {
+        return Promise.all([obj, prop]).then(
+          ([objVal, propVal]) => objVal[propVal],
+        );
+      }
+
       return obj[prop];
     }
 
     if (node.type === "Assignment") {
       if (node.left.type === "ModelRef") {
         const value = resolveNode(node.right);
-        model.set([[node.left.ref, value]]);
 
+        if (isPromiselike(value)) {
+          return value.then((resolvedValue) => {
+            model.set([[(node.left as any).ref, resolvedValue]]);
+            return resolvedValue;
+          });
+        }
+
+        model.set([[(node.left as any).ref, value]]);
         return value;
       }
 
       if (node.left.type === "Identifier") {
         const value = resolveNode(node.right);
-        this.vars[node.left.name] = value;
+
+        if (isPromiselike(value)) {
+          return value.then((resolvedValue) => {
+            this.vars[(node.left as any).name] = resolvedValue;
+            return resolvedValue;
+          });
+        }
+
+        this.vars[(node.left as any).name] = value;
         return value;
       }
 
@@ -596,190 +637,47 @@ export class ExpressionEvaluator {
           if (operation.resolveParams === false) {
             newValue = operation(expressionContext, node.left, node.right);
           } else {
-            newValue = operation(
-              expressionContext,
-              resolveNode(node.left),
-              resolveNode(node.right),
-            );
+            const left = resolveNode(node.left);
+            const right = resolveNode(node.right);
+
+            if (isPromiselike(left) || isPromiselike(right)) {
+              newValue = Promise.all([left, right]).then(
+                ([leftVal, rightVal]) =>
+                  operation(expressionContext, leftVal, rightVal),
+              );
+            } else {
+              newValue = operation(expressionContext, left, right);
+            }
           }
         } else {
-          newValue = operation(resolveNode(node.left), resolveNode(node.right));
-        }
+          const left = resolveNode(node.left);
+          const right = resolveNode(node.right);
 
-        if (node.left.type === "ModelRef") {
-          model.set([[node.left.ref, newValue]]);
-        } else if (node.left.type === "Identifier") {
-          this.vars[node.left.name] = newValue;
-        }
-
-        return newValue;
-      }
-
-      return resolveNode(node.left);
-    }
-  }
-
-  private async _resolveNodeAsync(
-    _currentValue: any,
-    node: ExpressionNode,
-    options: AsyncHookOptions,
-  ): Promise<unknown> {
-    const { resolveNode, model } = options;
-
-    const expressionContext: ExpressionContext = {
-      ...options,
-      evaluate: (expr) => this.evaluate(expr, options),
-    };
-
-    if (node.type === "BinaryExpression" || node.type === "LogicalExpression") {
-      const operator = this.operators.binary.get(node.operator);
-
-      if (operator) {
-        if ("resolveParams" in operator) {
-          if (operator.resolveParams === false) {
-            return operator(expressionContext, node.left, node.right);
-          }
-
-          return operator(
-            expressionContext,
-            await resolveNode(node.left),
-            await resolveNode(node.right),
-          );
-        }
-
-        return operator(
-          await resolveNode(node.left),
-          await resolveNode(node.right),
-        );
-      }
-
-      return;
-    }
-
-    if (node.type === "UnaryExpression") {
-      const operator = this.operators.unary.get(node.operator);
-
-      if (operator) {
-        if ("resolveParams" in operator) {
-          return operator(
-            expressionContext,
-            operator.resolveParams === false
-              ? node.argument
-              : await resolveNode(node.argument),
-          );
-        }
-
-        return operator(await resolveNode(node.argument));
-      }
-
-      return;
-    }
-
-    if (node.type === "Object") {
-      const { attributes } = node;
-      const resolvedAttributes: any = {};
-
-      await Promise.all(
-        attributes.map(async (attr) => {
-          const key = await resolveNode(attr.key);
-          const value = await resolveNode(attr.value);
-          resolvedAttributes[key] = value;
-        }),
-      );
-
-      return resolvedAttributes;
-    }
-
-    if (node.type === "CallExpression") {
-      const expressionName = node.callTarget.name;
-
-      const operator = this.operators.expressions.get(expressionName);
-
-      if (!operator) {
-        throw new Error(`Unknown expression function: ${expressionName}`);
-      }
-
-      if ("resolveParams" in operator && operator.resolveParams === false) {
-        return operator(expressionContext, ...node.args);
-      }
-
-      const args = await Promise.all(
-        node.args.map(async (n) => await resolveNode(n)),
-      );
-
-      return operator(expressionContext, ...args);
-    }
-
-    if (node.type === "ModelRef") {
-      return model.get(node.ref, { context: { model: options.model } });
-    }
-
-    if (node.type === "MemberExpression") {
-      const obj = await resolveNode(node.object);
-      const prop = await resolveNode(node.property);
-
-      return obj[prop];
-    }
-
-    if (node.type === "Assignment") {
-      if (node.left.type === "ModelRef") {
-        const value = await resolveNode(node.right);
-        model.set([[node.left.ref, value]]);
-
-        return value;
-      }
-
-      if (node.left.type === "Identifier") {
-        const value = await resolveNode(node.right);
-        this.vars[node.left.name] = value;
-        return value;
-      }
-
-      return;
-    }
-
-    if (node.type === "ConditionalExpression") {
-      const testResult = await resolveNode(node.test);
-      const result = testResult ? node.consequent : node.alternate;
-
-      // Ensure branch result is properly awaited if it's a Promise
-      const branchResult = await resolveNode(result);
-      return branchResult;
-    }
-
-    if (node.type === "ArrayExpression") {
-      return Promise.all(
-        node.elements.map(async (ele) => await resolveNode(ele)),
-      );
-    }
-
-    if (node.type === "Modification") {
-      const operation = this.operators.binary.get(node.operator);
-
-      if (operation) {
-        let newValue;
-
-        if ("resolveParams" in operation) {
-          if (operation.resolveParams === false) {
-            newValue = operation(expressionContext, node.left, node.right);
+          if (isPromiselike(left) || isPromiselike(right)) {
+            newValue = Promise.all([left, right]).then(([leftVal, rightVal]) =>
+              operation(leftVal, rightVal),
+            );
           } else {
-            newValue = operation(
-              expressionContext,
-              await resolveNode(node.left),
-              await resolveNode(node.right),
-            );
+            newValue = operation(left, right);
           }
-        } else {
-          newValue = operation(
-            await resolveNode(node.left),
-            await resolveNode(node.right),
-          );
         }
 
         if (node.left.type === "ModelRef") {
-          model.set([[node.left.ref, newValue]]);
+          if (isPromiselike(newValue)) {
+            return newValue.then((resolvedValue) => {
+              model.set([[(node.left as any).ref, resolvedValue]]);
+              return resolvedValue;
+            });
+          }
+          model.set([[(node.left as any).ref, newValue]]);
         } else if (node.left.type === "Identifier") {
-          this.vars[node.left.name] = newValue;
+          if (isPromiselike(newValue)) {
+            return newValue.then((resolvedValue) => {
+              this.vars[(node.left as any).name] = resolvedValue;
+              return resolvedValue;
+            });
+          }
+          this.vars[(node.left as any).name] = newValue;
         }
 
         return newValue;
@@ -787,7 +685,5 @@ export class ExpressionEvaluator {
 
       return resolveNode(node.left);
     }
-
-    return this._resolveNode(_currentValue, node, options);
   }
 }

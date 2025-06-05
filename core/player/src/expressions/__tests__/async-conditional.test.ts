@@ -221,4 +221,26 @@ describe("async conditional expressions", () => {
     expect(result).toBeInstanceOf(Promise);
     expect(await result).toBe("correct");
   });
+
+  test("conditional function with evaluateAsync vs evaluate", async () => {
+    // Test with sync evaluate
+    model.set([["local.test", "bla"]]);
+    const syncResult = evaluator.evaluate(
+      "conditional(false,{{local.test}}='TRUE',{{local.test}}='FALSE')",
+      { model },
+    );
+    expect(syncResult).toBe("FALSE");
+    expect(model.get("local.test")).toBe("FALSE");
+
+    // Reset model
+    model.set([["local.test", "bla"]]);
+
+    // Test with async evaluateAsync
+    const asyncResult = await evaluator.evaluateAsync(
+      "conditional(false,{{local.test}}='TRUE',{{local.test}}='FALSE')",
+      { model },
+    );
+    expect(asyncResult).toBe("FALSE");
+    expect(model.get("local.test")).toBe("FALSE");
+  });
 });
