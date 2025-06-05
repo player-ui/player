@@ -15,16 +15,14 @@ import type {
 
 /** a && b -- but handles short cutting if the first value is false */
 const andandOperator: BinaryOperator = (ctx, a, b) => {
-  return ctx.evaluate(a) && ctx.evaluate(b);
+  return LogicalOperators.and(ctx, a, b);
 };
-
 andandOperator.resolveParams = false;
 
 /** a || b -- but with short cutting if first value is true */
 const ororOperator: BinaryOperator = (ctx, a, b) => {
-  return ctx.evaluate(a) || ctx.evaluate(b);
+  return LogicalOperators.or(ctx, a, b);
 };
-
 ororOperator.resolveParams = false;
 
 const DEFAULT_BINARY_OPERATORS: Record<string, BinaryOperator> = {
@@ -35,19 +33,20 @@ const DEFAULT_BINARY_OPERATORS: Record<string, BinaryOperator> = {
   "/": (a: any, b: any) => a / b,
   "%": (a: any, b: any) => a % b,
 
+  // Promise-aware comparison operators
   // eslint-disable-next-line
-  "==": (a: any, b: any) => a == b,
+  "==": makePromiseAwareBinaryOp((a: any, b: any) => a == b),
+  // eslint-disable-next-line
+  "!=": makePromiseAwareBinaryOp((a: any, b: any) => a != b),
+  ">": makePromiseAwareBinaryOp((a: any, b: any) => a > b),
+  ">=": makePromiseAwareBinaryOp((a: any, b: any) => a >= b),
+  "<": makePromiseAwareBinaryOp((a: any, b: any) => a < b),
+  "<=": makePromiseAwareBinaryOp((a: any, b: any) => a <= b),
+  "!==": makePromiseAwareBinaryOp((a: any, b: any) => a !== b),
+  "===": makePromiseAwareBinaryOp((a: any, b: any) => a === b),
 
-  // eslint-disable-next-line
-  "!=": (a: any, b: any) => a != b,
-  ">": (a: any, b: any) => a > b,
-  ">=": (a: any, b: any) => a >= b,
-  "<": (a: any, b: any) => a < b,
-  "<=": (a: any, b: any) => a <= b,
   "&&": andandOperator,
   "||": ororOperator,
-  "!==": (a: any, b: any) => a !== b,
-  "===": (a: any, b: any) => a === b,
 
   // eslint-disable-next-line
   "|": (a: any, b: any) => a | b,
@@ -67,7 +66,169 @@ const DEFAULT_BINARY_OPERATORS: Record<string, BinaryOperator> = {
 const DEFAULT_UNARY_OPERATORS: Record<string, UnaryOperator> = {
   "-": (a: any) => -a,
   "+": (a: any) => Number(a),
-  "!": (a: any) => !a,
+  "!": makePromiseAwareUnaryOp((a: any) => !a),
+};
+
+/**
+ * Promise detection that handles various Promise implementations
+ * and reduces false positives from objects with coincidental 'then' methods
+ */
+function isPromiselike(value: any): value is Promise<any> {
+  return (
+    value != null &&
+    typeof value === "object" &&
+    typeof value.then === "function" &&
+    // Additional safeguards against false positives
+    (value instanceof Promise ||
+      // Check for standard Promise constructor name
+      value.constructor?.name === "Promise" ||
+      // Verify it has other Promise-like methods to reduce false positives
+      (typeof value.catch === "function" &&
+        typeof value.finally === "function"))
+  );
+}
+
+/**
+ * Higher-order function that makes any binary operation Promise-aware
+ */
+function makePromiseAwareBinaryOp<T>(
+  operation: (a: any, b: any) => T,
+): (a: any, b: any) => T | Promise<T> {
+  return (a: any, b: any) => {
+    if (isPromiselike(a) || isPromiselike(b)) {
+      return Promise.all([Promise.resolve(a), Promise.resolve(b)]).then(
+        ([resolvedA, resolvedB]) => operation(resolvedA, resolvedB),
+      );
+    }
+    return operation(a, b);
+  };
+}
+
+/**
+ * Higher-order function that makes any unary operation Promise-aware
+ */
+function makePromiseAwareUnaryOp<T>(
+  operation: (a: any) => T,
+): (a: any) => T | Promise<T> {
+  return (a: any) => {
+    if (isPromiselike(a)) {
+      return a.then((resolved: any) => operation(resolved));
+    }
+    return operation(a);
+  };
+}
+
+/**
+ * Utility for handling conditional branching with Promises
+ */
+function handleConditionalBranching(
+  testValue: any,
+  getTrueBranch: () => any,
+  getFalseBranch: () => any,
+  resolveNode: (node: any) => any,
+): any {
+  if (isPromiselike(testValue)) {
+    return testValue.then((resolved: boolean) => {
+      const branch = resolved ? getTrueBranch() : getFalseBranch();
+      const branchResult = resolveNode(branch);
+      return isPromiselike(branchResult)
+        ? branchResult
+        : Promise.resolve(branchResult);
+    });
+  }
+
+  // Sync handling
+  const branch = testValue ? getTrueBranch() : getFalseBranch();
+  return resolveNode(branch);
+}
+
+/**
+ * Utility for handling collections (arrays/objects) with potential Promises
+ */
+const PromiseCollectionHandler = {
+  /**
+   * Handle array with potential Promise elements
+   */
+  handleArray<T>(items: T[]): T[] | Promise<T[]> {
+    const hasPromises = items.some((item) => isPromiselike(item));
+    return hasPromises ? Promise.all(items) : items;
+  },
+
+  /**
+   * Handle object with potential Promise keys/values
+   */
+  handleObject(
+    attributes: Array<{ key: any; value: any }>,
+    resolveNode: (node: any) => any,
+  ): Record<string, any> | Promise<Record<string, any>> {
+    const resolvedAttributes: Record<string, any> = {};
+    const promises: Promise<void>[] = [];
+    let hasPromises = false;
+
+    attributes.forEach((attr) => {
+      const key = resolveNode(attr.key);
+      const value = resolveNode(attr.value);
+
+      if (isPromiselike(key) || isPromiselike(value)) {
+        hasPromises = true;
+        const keyPromise = Promise.resolve(key);
+        const valuePromise = Promise.resolve(value);
+
+        promises.push(
+          Promise.all([keyPromise, valuePromise]).then(
+            ([resolvedKey, resolvedValue]) => {
+              resolvedAttributes[resolvedKey] = resolvedValue;
+            },
+          ),
+        );
+      } else {
+        resolvedAttributes[key] = value;
+      }
+    });
+
+    return hasPromises
+      ? Promise.all(promises).then(() => resolvedAttributes)
+      : resolvedAttributes;
+  },
+};
+
+/**
+ * Smart logical operators that handle short-circuiting with Promises
+ */
+const LogicalOperators = {
+  and: (ctx: any, leftNode: any, rightNode: any) => {
+    const leftResult = ctx.evaluate(leftNode);
+
+    if (isPromiselike(leftResult)) {
+      return leftResult.then((awaitedLeft: any) => {
+        if (!awaitedLeft) return awaitedLeft; // Short circuit
+        const rightResult = ctx.evaluate(rightNode);
+        return isPromiselike(rightResult)
+          ? rightResult
+          : Promise.resolve(rightResult);
+      });
+    }
+
+    // Sync short-circuiting
+    return leftResult && ctx.evaluate(rightNode);
+  },
+
+  or: (ctx: any, leftNode: any, rightNode: any) => {
+    const leftResult = ctx.evaluate(leftNode);
+
+    if (isPromiselike(leftResult)) {
+      return leftResult.then((awaitedLeft: any) => {
+        if (awaitedLeft) return awaitedLeft; // Short circuit
+        const rightResult = ctx.evaluate(rightNode);
+        return isPromiselike(rightResult)
+          ? rightResult
+          : Promise.resolve(rightResult);
+      });
+    }
+
+    // Sync short-circuiting
+    return leftResult || ctx.evaluate(rightNode);
+  },
 };
 
 export interface HookOptions extends ExpressionContext {
@@ -357,16 +518,10 @@ export class ExpressionEvaluator {
     }
 
     if (node.type === "Object") {
-      const { attributes } = node;
-      const resolvedAttributes: any = {};
-
-      attributes.forEach((attr) => {
-        const key = resolveNode(attr.key);
-        const value = resolveNode(attr.value);
-        resolvedAttributes[key] = value;
-      });
-
-      return resolvedAttributes;
+      return PromiseCollectionHandler.handleObject(
+        node.attributes,
+        resolveNode,
+      );
     }
 
     if (node.type === "CallExpression") {
@@ -416,13 +571,19 @@ export class ExpressionEvaluator {
     }
 
     if (node.type === "ConditionalExpression") {
-      const result = resolveNode(node.test) ? node.consequent : node.alternate;
+      const testResult = resolveNode(node.test);
 
-      return resolveNode(result);
+      return handleConditionalBranching(
+        testResult,
+        () => node.consequent,
+        () => node.alternate,
+        resolveNode,
+      );
     }
 
     if (node.type === "ArrayExpression") {
-      return node.elements.map((ele) => resolveNode(ele));
+      const results = node.elements.map((ele) => resolveNode(ele));
+      return PromiseCollectionHandler.handleArray(results);
     }
 
     if (node.type === "Modification") {
@@ -578,11 +739,12 @@ export class ExpressionEvaluator {
     }
 
     if (node.type === "ConditionalExpression") {
-      const result = (await resolveNode(node.test))
-        ? node.consequent
-        : node.alternate;
+      const testResult = await resolveNode(node.test);
+      const result = testResult ? node.consequent : node.alternate;
 
-      return resolveNode(result);
+      // Ensure branch result is properly awaited if it's a Promise
+      const branchResult = await resolveNode(result);
+      return branchResult;
     }
 
     if (node.type === "ArrayExpression") {
