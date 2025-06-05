@@ -26,6 +26,11 @@ export interface OperatorProcessingOptions {
    * This enables lazy evaluation of arguments
    */
   resolveParams: boolean;
+
+  /**
+   * Whether the expression should be allowed to be evaluated asynchronously
+   */
+  async?: boolean;
 }
 
 export type BinaryOperatorBasic = (left: any, right: any) => unknown;
