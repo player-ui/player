@@ -12,6 +12,13 @@ archive_override(
   integrity = "sha256-sotB/beOkcn7FD+NurO6Uqi2OoKbbXHd7ya4ZO9nBCg="
 )
 
+bazel_dep(name = "rules_python", version = "0.31.0")
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    ignore_root_user_error = True,
+    python_version = "3.11", # <-- Worked for me to generate XCode proj, feel free to change if you're getting Python version issues
+)
+
 # local_path_override(module_name = "rules_player", path = "../rules_player")
 bazel_dep(name = "aspect_bazel_lib", version = "2.8.0")
 bazel_dep(name = "aspect_rules_js", version = "2.0.0")
@@ -35,6 +42,7 @@ node.toolchain(node_version = "20.14.0")
 bazel_dep(name = "rules_apple", version = "3.5.1", repo_name = "build_bazel_rules_apple")
 bazel_dep(name = "rules_ios", version = "4.8.2", repo_name = "build_bazel_rules_ios")
 bazel_dep(name = "rules_xcodeproj", version = "2.2.0")
+# git_override(module_name = "rules_xcodeproj", remote = "https://github.com/sugarmanz/rules_xcodeproj", commit = "084ee5a6659ad2507d3cfffcda822d7fb5bad3a9")
 bazel_dep(name = "gazelle", version = "0.34.0", repo_name = "bazel_gazelle")
 bazel_dep(name = "rules_swift_package_manager", version = "0.22.0")
 bazel_dep(name = "swiftlint", version = "0.54.0", repo_name = "SwiftLint")
