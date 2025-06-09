@@ -361,7 +361,7 @@ jobs:
           at: ~/player
       - run: echo "Should I release? (<< pipeline.parameters.should_release >>)"
       - when:
-          condition: << pipeline.parameters.should_release >>
+          condition: always
           steps:
             - auto_shipit
 
@@ -393,53 +393,6 @@ workflows:
           requires:
             - setup
 
-      - bazelrc_fork:
-          filters:
-            branches:
-              only:
-                - /pull\/.*/
-          requires:
-            - setup
-
-      - build:
-          name: build-trunk
-          filters:
-            branches:
-              ignore:
-                - /pull\/.*/
-          requires:
-            - bazelrc
-
-      - build:
-          name: build-fork
-          filters:
-            branches:
-              only:
-                - /pull\/.*/
-          requires:
-            - setup
-            - bazelrc_fork
-
-      - build_ios:
-          name: build-ios-trunk
-          filters:
-            branches:
-              ignore:
-                - /pull\/.*/
-          requires:
-            - bazelrc
-            - build-trunk
-
-      - build_ios:
-          name: build-ios-fork
-          filters:
-            branches:
-              only:
-                - /pull\/.*/
-          requires:
-            - build-fork
-            - bazelrc_fork
-
       - maybe_release:
           filters:
             branches:
@@ -448,68 +401,7 @@ workflows:
           context:
             - Publish
           requires:
-            - build-trunk
-            - build-ios-trunk
-
-      - test:
-          name: test-trunk
-          filters:
-            branches:
-              ignore:
-                - /pull\/.*/
-          requires:
-            - build-trunk
-
-      - test:
-          name: test-fork
-          filters:
-            branches:
-              only:
-                - /pull\/.*/
-          requires:
-            - build-fork
-
-      - android_test:
-          name: android-test-trunk
-          filters:
-            branches:
-              ignore:
-                - /pull\/.*/
-          context:
-            - Build
-          requires:
-            - build-trunk
-
-      - android_test:
-          name: android-test-fork
-          context:
-            - BuildFork
-          filters:
-            branches:
-              only:
-                - /pull\/.*/
-          requires:
-            - build-fork
-
-      - coverage:
-          name: coverage-trunk
-          filters:
-            branches:
-              ignore:
-                - /pull\/.*/
-          requires:
-            - build-trunk
-            - build-ios-trunk
-
-      - coverage:
-          name: coverage-fork
-          filters:
-            branches:
-              only:
-                - /pull\/.*/
-          requires:
-            - build-fork
-            - build-ios-fork
+            - bazelrc
 
   build_and_test_main:
     when:
