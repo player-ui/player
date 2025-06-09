@@ -7,7 +7,7 @@ bazel_dep(name = "rules_player")
 
 git_override(
     module_name = "rules_player",
-    commit = "9130cf2fb09d9df6a4de96c2da62166c829005f9",
+    commit = "2bacc5ad491d3eb5228bcd4a7ad8ad9a74da204c",
     remote = "https://github.com/player-ui/rules_player.git",
 )
 
