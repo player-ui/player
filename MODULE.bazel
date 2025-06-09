@@ -7,9 +7,9 @@ bazel_dep(name = "rules_player")
 
 archive_override(
   module_name = "rules_player",
-  strip_prefix = "rules_player-1.1.5",
-  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v1.1.5.tar.gz"],
-  integrity = "sha256-sotB/beOkcn7FD+NurO6Uqi2OoKbbXHd7ya4ZO9nBCg="
+  strip_prefix = "rules_player-1.1.6",
+  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v1.1.6.tar.gz"],
+  integrity = "sha256-5Sa+Ssko8dJvEFegYdqgBpfLp1gQlPFxkmy2l8MLw/o="
 )
 
 # local_path_override(module_name = "rules_player", path = "../rules_player")
