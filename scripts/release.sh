@@ -39,7 +39,7 @@ elif [ "$RELEASE_TYPE" == "release" ] && [ "$CURRENT_BRANCH" == "main" ]; then
 fi
 
 echo "Publishing Maven Packages with release type: ${MVN_RELEASE_TYPE} on branch: ${CURRENT_BRANCH}"
-bazel run --config=release @rules_player//distribution:staged-maven-deploy -- "$MVN_RELEASE_TYPE" --package-group=com.intuit.playerui --legacy --client-timeout=600 --connect-timeout=600
+bazel run --config=release @rules_player//distribution:staged-maven-deploy -- "$MVN_RELEASE_TYPE" --package-group=com.intuit.playerui --client-timeout=600 --connect-timeout=600
 
 # Running this here because it will still have the pre-release version in the VERSION file before auto cleans it up
 # Make sure to re-stamp the outputs with the BASE_PATH so nextjs knows what to do with links

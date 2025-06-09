@@ -5,11 +5,10 @@ module(
 
 bazel_dep(name = "rules_player")
 
-archive_override(
-  module_name = "rules_player",
-  strip_prefix = "rules_player-1.1.5",
-  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v1.1.5.tar.gz"],
-  integrity = "sha256-sotB/beOkcn7FD+NurO6Uqi2OoKbbXHd7ya4ZO9nBCg="
+git_override(
+    module_name = "rules_player",
+    commit = "9130cf2fb09d9df6a4de96c2da62166c829005f9",
+    remote = "https://github.com/player-ui/rules_player.git",
 )
 
 # local_path_override(module_name = "rules_player", path = "../rules_player")
