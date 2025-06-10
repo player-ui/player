@@ -37,22 +37,23 @@ elif [ "$RELEASE_TYPE" == "release" ] && [ "$CURRENT_BRANCH" == "main" ]; then
   MVN_RELEASE_TYPE=release
 fi
 
-# Android/JVM Prepublish
-echo "Publishing Maven Packages with release type: ${MVN_RELEASE_TYPE} on branch: ${CURRENT_BRANCH}"
 bazel build --config=release @rules_player//distribution:staged-maven-deploy
 
 # Docs Prepublish
-bazel build --config=release //docs/...
+bazel build --config=release //docs:gh_deploy
 
 # NPM Publish
+echo "Publishing NPM Packages with release type: ${NPM_TAG} on branch: ${CURRENT_BRANCH}"
 for pkg in $PKG_NPM_LABELS ; do
   bazel run --config=release -- ${pkg}.npm-publish --access public --tag ${NPM_TAG}
 done
 
 # iOS Publish
+echo "Publishing iOS Packages"
 bazel run --config=release //:ios_publish
 
 # Android/JVM Publish
+echo "Publishing Maven Packages with release type: ${MVN_RELEASE_TYPE} on branch: ${CURRENT_BRANCH}"
 bazel run --config=release @rules_player//distribution:staged-maven-deploy -- "$MVN_RELEASE_TYPE" --package-group=com.intuit.playerui --legacy --client-timeout=600 --connect-timeout=600
 
 # Docs Publish
