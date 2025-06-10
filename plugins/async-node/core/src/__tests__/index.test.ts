@@ -1,5 +1,5 @@
-import { expect, test, describe } from "vitest";
-import { Node, InProgressState } from "@player-ui/player";
+import { expect, test, describe, vi, beforeEach } from "vitest";
+import { Node, InProgressState, ErrorState } from "@player-ui/player";
 import { Player, Parser } from "@player-ui/player";
 import { waitFor } from "@testing-library/react";
 import { AsyncNodePlugin, AsyncNodePluginPlugin } from "../index";
@@ -731,6 +731,83 @@ describe("view", () => {
     await waitFor(() => {
       expect(localNode.id).toStrictEqual("nodeId");
       expect(localNode.type).toStrictEqual("async");
+    });
+  });
+
+  describe("Async Node Error Handling", () => {
+    let failingAsyncNodePlugin: AsyncNodePlugin = new AsyncNodePlugin({});
+    const onAsyncNodeErrorCallback = vi.fn();
+
+    beforeEach(() => {
+      onAsyncNodeErrorCallback.mockReset();
+      const failingHandler = vi.fn();
+      failingHandler.mockRejectedValue("Promise Rejected");
+
+      failingAsyncNodePlugin = new AsyncNodePlugin(
+        {
+          plugins: [new AsyncNodePluginPlugin()],
+        },
+        failingHandler,
+      );
+
+      failingAsyncNodePlugin.hooks.onAsyncNodeError.tap(
+        "test",
+        onAsyncNodeErrorCallback,
+      );
+    });
+
+    test("should replace the async node with the result from the onAsyncNodeError hook when there is an error handling the async node", async () => {
+      onAsyncNodeErrorCallback.mockReturnValue({
+        type: "asset",
+        value: {
+          id: "async-text",
+          type: "text",
+          value: "Fallback Text",
+        },
+      });
+
+      const player = new Player({ plugins: [failingAsyncNodePlugin] });
+      player.start(basicFRFWithActions as any);
+
+      await waitFor(() => {
+        expect(onAsyncNodeErrorCallback).toHaveBeenCalledWith(
+          new Error("Promise Rejected"),
+          expect.anything(),
+        );
+
+        const playerState = player.getState();
+        expect(playerState.status).toBe("in-progress");
+        const inProgressState = playerState as InProgressState;
+        const lastViewUpdate =
+          inProgressState.controllers.view.currentView?.lastUpdate;
+
+        expect(lastViewUpdate?.actions[1]).toStrictEqual({
+          id: "async-text",
+          type: "text",
+          value: "Fallback Text",
+        });
+      });
+    });
+
+    test("should bubble up the error and cause player to fail when there is an error handling the async node and the onAsyncNodeError hook does not produce a fallback", async () => {
+      onAsyncNodeErrorCallback.mockReturnValue(undefined);
+
+      const player = new Player({ plugins: [failingAsyncNodePlugin] });
+      player.start(basicFRFWithActions as any).catch(() => {
+        /** Purposefully failing player in this test so catching the unresolved exception suppresses warnings from vitest */
+      });
+
+      await waitFor(() => {
+        expect(onAsyncNodeErrorCallback).toHaveBeenCalledWith(
+          new Error("Promise Rejected"),
+          expect.anything(),
+        );
+
+        const playerState = player.getState();
+        expect(playerState.status).toBe("error");
+        const errorState = playerState as ErrorState;
+        expect(errorState.error.message).toBe("Promise Rejected");
+      });
     });
   });
 
