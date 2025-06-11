@@ -1,3 +1,17 @@
+# 0.12.0-next.3 (Tue Jun 10 2025)
+
+#### 🐛 Bug Fix
+
+- Central Portal Migration [#662](https://github.com/player-ui/player/pull/662) ([@sugarmanz](https://github.com/sugarmanz))
+- Prebuild Publishing Targets to Miinimize Chances of Releases Breaking [#650](https://github.com/player-ui/player/pull/650) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.12.0-next.2 (Wed Jun 04 2025)
 
 ### Release Notes

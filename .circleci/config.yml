@@ -129,9 +129,15 @@ jobs:
       - attach_workspace:
           at: ~/player
       - run: |
-          echo "common --bes_results_url=''" >> .bazelrc.local
-          echo "common --bes_backend=''" >> .bazelrc.local
-          echo "common --remote_cache=''" >> .bazelrc.local
+          echo "build --bes_results_url=''" >> .bazelrc.local
+          echo "build --bes_backend=''" >> .bazelrc.local
+          echo "build --remote_cache=''" >> .bazelrc.local
+          echo "test --bes_results_url=''" >> .bazelrc.local
+          echo "test --bes_backend=''" >> .bazelrc.local
+          echo "test --remote_cache=''" >> .bazelrc.local
+          echo "coverage --bes_results_url=''" >> .bazelrc.local
+          echo "coverage --bes_backend=''" >> .bazelrc.local
+          echo "coverage --remote_cache=''" >> .bazelrc.local
       - persist_to_workspace:
           root: .
           paths:
