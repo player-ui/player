@@ -73,7 +73,7 @@ commands:
           bundle install
           npx auto shipit --only-graduate-with-release-label -vv
       - when:
-          condition: << pipeline.parameters.should_release >>
+          condition: << pipeline.parameters.should_release >> && << pipeline.git.branch >> != "main" && << pipeline.git.branch >> != "next"
           steps:
             - run:
                 name: Post version comment
@@ -81,7 +81,7 @@ commands:
                   source ~/.bashrc
 
                   PACKAGE_VERSION=$(npx auto shipit --dry-run --quiet)
-                  
+
                   BUILD_INFO="### Build Info
 
                   Your PR was successfully deployed by [CircleCI #$CIRCLE_BUILD_NUM](https://circleci.com/gh/player-ui/tools/$CIRCLE_BUILD_NUM) on \`$(date -u)\` with this version:"

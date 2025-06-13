@@ -96,6 +96,10 @@ When you're ready, submit a new pull request to the `main` branch and the team w
 
 When a PR is merged, it will generate a `next` release, so something like `0.12.0-next.0` which can then be used in your project. This is done so that you can consume the latest changes without having to wait for a release to be cut.
 
+### Canary Releases
+
+To trigger a canary release, add a `/canary` comment to any PR.
+
 ---
 
 Inspired by react's [How to Contribute](https://reactjs.org/docs/how-to-contribute.html)

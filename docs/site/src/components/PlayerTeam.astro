@@ -1,16 +1,6 @@
 ---
 const TeamData = [
   {
-    name: "Adam Dierkens",
-    domain: ["React", "Core"],
-    avatar: "https://avatars.githubusercontent.com/u/13004162?v=4",
-  },
-  {
-    name: "Harris Borawski",
-    domain: ["iOS"],
-    avatar: "https://avatars.githubusercontent.com/u/1325154?v=4",
-  },
-  {
     name: "Jeremiah Zucker",
     domain: ["Android"],
     avatar: "https://avatars.githubusercontent.com/u/9255651?&v=4",
@@ -46,26 +36,19 @@ const TeamData = [
     avatar: "https://avatars.githubusercontent.com/u/66387473?v=4",
   },
   {
-    name: "Niharika Motukuri ",
-    domain: ["React", "iOS", "Android"],
-    avatar: "https://avatars.githubusercontent.com/u/171299777?v=4",
-  },
-  {
     name: "Chloe Han",
     domain: ["React", "iOS", "Android"],
     avatar: "https://avatars.githubusercontent.com/u/15382804?v=4",
   },
   {
-    name: "Mrigank Mehta",
-    domain: ["React", "iOS", "Android"],
-    avatar: "https://avatars.githubusercontent.com/u/16272231?v=4",
+    name: "Kelly Harrop",
+    domain: ["React", "Tools"],
+    avatar: "https://avatars.githubusercontent.com/u/24794756?v=4",
   },
 ];
 ---
 
-<style>
-
-</style>
+<style></style>
 
 <div class="grid grid-cols-4 gap-4">
   {
@@ -80,9 +63,7 @@ const TeamData = [
         </div>
         <div class="min-w-24 text-center">
           <h6>{teamMember.name}</h6>
-          <h7 class="text-center">
-            {teamMember.domain.join(", ")}
-          </h7>
+          <h7 class="text-center">{teamMember.domain.join(", ")}</h7>
         </div>
       </div>
     ))
