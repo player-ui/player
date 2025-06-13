@@ -1,9 +1,12 @@
 package com.intuit.playerui.plugins.asyncnode
 
 import com.intuit.hooks.BailResult
+import com.intuit.playerui.core.bridge.JSErrorException
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.core.bridge.hooks.NodeAsyncParallelBailHook2
+import com.intuit.playerui.core.bridge.hooks.NodeSyncBailHook1
+import com.intuit.playerui.core.bridge.hooks.NodeSyncBailHook2
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.ScriptContext
 import com.intuit.playerui.core.bridge.serialization.serializers.Function1Serializer
@@ -11,6 +14,7 @@ import com.intuit.playerui.core.bridge.serialization.serializers.GenericSerializ
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializer
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
+import com.intuit.playerui.core.bridge.serialization.serializers.ThrowableSerializer
 import com.intuit.playerui.core.player.Player
 import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.plugins.JSScriptPluginWrapper
@@ -56,6 +60,16 @@ public class AsyncNodePlugin(private val asyncHandler: AsyncHandler? = null) : J
                     GenericSerializer(),
                 ),
             )
+
+        /** The hook after an error occurs in onAsyncNode */
+        public val onAsyncNodeError: NodeSyncBailHook2<PlayerException, Node, Any?> by
+            NodeSerializableField(
+                NodeSyncBailHook2.serializer(
+                    ThrowableSerializer() as KSerializer<PlayerException>,
+                NodeSerializer(),
+                    GenericSerializer(),
+            ),
+        )
 
         internal object Serializer : NodeWrapperSerializer<Hooks>(AsyncNodePlugin::Hooks)
     }
