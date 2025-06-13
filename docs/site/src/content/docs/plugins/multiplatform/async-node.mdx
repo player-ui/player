@@ -166,6 +166,22 @@ const player = new ReactPlayer({
   </Fragment>
   <Fragment slot='ios'>
 
+### Error Handling
+
+By default, errors happening during the `onAsyncNode` hook bubble up as player flow failures. These errors can come from the taps themselves, or from parsing the result of those taps within the core plugin. Use the `onAsyncNodeError` to catch these errors and handle them gracefully. Even if the error is handled, it will be logged by the player logger. The return on the hook will determine what gets rendered in the view. To render nothing, return `null`
+
+```js
+const asyncNodePlugin = new AsyncNodePlugin({
+  plugins: [new AsyncNodePluginPlugin()],
+});
+
+asyncNodePlugin.hooks.onAsyncNodeError.tap("handleAsyncError", (error, node) => {
+  // Do something to handle the error in the background
+
+  return null;
+});
+```
+
 ### CocoaPods
 
 Add the subspec to your `Podfile`
