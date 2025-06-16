@@ -4,8 +4,6 @@ import com.intuit.hooks.BailResult
 import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Node
-import com.intuit.playerui.core.player.PlayerFlowStatus
-import com.intuit.playerui.core.player.state.PlayerFlowState
 import com.intuit.playerui.core.player.state.inProgressState
 import com.intuit.playerui.core.player.state.lastViewUpdate
 import com.intuit.playerui.utils.test.PlayerTest
@@ -195,7 +193,6 @@ internal class AsyncNodePluginTest : PlayerTest() {
             Assertions.assertEquals("New", asset1?.get("value"))
         }
 
-
     @TestTemplate
     fun `async node error bubbles up and fails the player state`() =
         runBlockingTest {
@@ -219,21 +216,24 @@ internal class AsyncNodePluginTest : PlayerTest() {
             }
 
             plugin.hooks.onAsyncNodeError.tap("test") { _, error, node ->
-                BailResult.Bail(mapOf(
-                    "type" to "value",
-                    "children" to listOf(
-                        mapOf(
-                            "path" to listOf("asset"),
-                            "value" to mapOf("type" to "asset",
+                BailResult.Bail(
+                    mapOf(
+                        "type" to "value",
+                        "children" to listOf(
+                            mapOf(
+                                "path" to listOf("asset"),
                                 "value" to mapOf(
-                                    "type" to "text",
-                                    "value" to "Value",
-                                    "id" to "error-asset"
-                                )
+                                    "type" to "asset",
+                                    "value" to mapOf(
+                                        "type" to "text",
+                                        "value" to "Value",
+                                        "id" to "error-asset",
+                                    ),
+                                ),
                             ),
-                        )
-                    )
-                ))
+                        ),
+                    ),
+                )
             }
 
             var count = 0
