@@ -73,26 +73,34 @@ commands:
           bundle install
           npx auto shipit --only-graduate-with-release-label -vv
       - when:
-          condition: << pipeline.parameters.should_release >> && << pipeline.git.branch >> != "main" && << pipeline.git.branch >> != "next"
+          condition: << pipeline.parameters.should_release >>
           steps:
             - run:
-                name: Post version comment
+                name: Post canary version comment
                 command: |
                   source ~/.bashrc
 
-                  PACKAGE_VERSION=$(npx auto shipit --dry-run --quiet)
+                  # Get the release type from auto
+                  RELEASE_TYPE=$(npx auto version --quiet)
 
-                  BUILD_INFO="### Build Info
+                  # Only proceed if it's a canary release
+                  if [[ "$RELEASE_TYPE" == *"canary"* ]]; then
+                    PACKAGE_VERSION=$(npx auto shipit --dry-run --quiet)
 
-                  Your PR was successfully deployed by [CircleCI #$CIRCLE_BUILD_NUM](https://circleci.com/gh/player-ui/tools/$CIRCLE_BUILD_NUM) on \`$(date -u)\` with this version:"
-                  BUILD_INFO="$BUILD_INFO 
+                    BUILD_INFO="### Build Info
 
-                  \`\`\`
-                  $PACKAGE_VERSION
-                  \`\`\`"
+                    Your PR was successfully deployed by [CircleCI #$CIRCLE_BUILD_NUM](https://circleci.com/gh/player-ui/tools/$CIRCLE_BUILD_NUM) on \`$(date -u)\` with this version:"
+                    BUILD_INFO="$BUILD_INFO 
 
-                  # Post the build info as a comment to the PR
-                  npx auto comment --context "Build Info" --message "$BUILD_INFO" || true
+                    \`\`\`
+                    $PACKAGE_VERSION
+                    \`\`\`"
+
+                    # Post the build info as a comment to the PR
+                    npx auto comment --context "Build Info" --message "$BUILD_INFO" || true
+                  else
+                    echo "Not a canary release, skipping comment posting"
+                  fi
 
 jobs:
   setup:
