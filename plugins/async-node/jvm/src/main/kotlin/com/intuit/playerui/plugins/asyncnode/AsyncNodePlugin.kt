@@ -1,11 +1,9 @@
 package com.intuit.playerui.plugins.asyncnode
 
 import com.intuit.hooks.BailResult
-import com.intuit.playerui.core.bridge.JSErrorException
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.core.bridge.hooks.NodeAsyncParallelBailHook2
-import com.intuit.playerui.core.bridge.hooks.NodeSyncBailHook1
 import com.intuit.playerui.core.bridge.hooks.NodeSyncBailHook2
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.ScriptContext
@@ -21,7 +19,6 @@ import com.intuit.playerui.core.plugins.JSScriptPluginWrapper
 import com.intuit.playerui.core.plugins.findPlugin
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.serializer
 
 // TODO: This typing is not great - need to fix once web plugin is updated as currently web also supports type Any
 public typealias asyncNodeUpdate = Any?
@@ -66,10 +63,10 @@ public class AsyncNodePlugin(private val asyncHandler: AsyncHandler? = null) : J
             NodeSerializableField(
                 NodeSyncBailHook2.serializer(
                     ThrowableSerializer() as KSerializer<PlayerException>,
-                NodeSerializer(),
+                    NodeSerializer(),
                     GenericSerializer(),
-            ),
-        )
+                ),
+            )
 
         internal object Serializer : NodeWrapperSerializer<Hooks>(AsyncNodePlugin::Hooks)
     }
