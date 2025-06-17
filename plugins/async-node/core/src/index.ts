@@ -152,63 +152,53 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
    */
   applyResolver(resolver: Resolver): void {
     resolver.hooks.beforeResolve.tap(this.name, (node, options) => {
-      let resolvedNode;
-      if (this.isAsync(node)) {
-        const mappedValue = this.resolvedMapping.get(node.id);
-        if (mappedValue) {
-          resolvedNode = mappedValue;
-        }
-      } else {
-        resolvedNode = null;
-      }
-
-      const newNode = resolvedNode || node;
-      if (!resolvedNode && node?.type === NodeType.Async) {
-        queueMicrotask(async () => {
-          try {
-            const result = await this.basePlugin?.hooks.onAsyncNode.call(
-              node,
-              (result) => {
-                this.parseNodeAndUpdate(
-                  node,
-                  result,
-                  options,
-                  this.currentView,
-                );
-              },
-            );
-            this.parseNodeAndUpdate(node, result, options, this.currentView);
-          } catch (e: unknown) {
-            const error = e instanceof Error ? e : new Error(String(e));
-            const result = this.basePlugin?.hooks.onAsyncNodeError.call(
-              error,
-              node,
-            );
-
-            if (result === undefined) {
-              const playerState = this.basePlugin
-                ?.getPlayerInstance()
-                ?.getState();
-
-              if (playerState?.status === "in-progress") {
-                playerState.fail(error);
-              }
-
-              return;
-            }
-
-            options.logger?.error(
-              "Async node handling failed and resolved with a fallback. Error:",
-              error,
-            );
-            this.handleAsyncUpdate(node, result, this.currentView);
-          }
-        });
-
+      if (!this.isAsync(node)) {
         return node;
       }
-      return newNode;
+
+      const resolvedNode = this.resolvedMapping.get(node.id);
+      if (resolvedNode !== undefined) {
+        return resolvedNode;
+      }
+
+      queueMicrotask(() => this.runAsyncNode(node, options));
+
+      return node;
     });
+  }
+
+  private async runAsyncNode(
+    node: Node.Async,
+    options: Resolve.NodeResolveOptions,
+  ) {
+    try {
+      const result = await this.basePlugin?.hooks.onAsyncNode.call(
+        node,
+        (result) => {
+          this.parseNodeAndUpdate(node, result, options, this.currentView);
+        },
+      );
+      this.parseNodeAndUpdate(node, result, options, this.currentView);
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error(String(e));
+      const result = this.basePlugin?.hooks.onAsyncNodeError.call(error, node);
+
+      if (result === undefined) {
+        const playerState = this.basePlugin?.getPlayerInstance()?.getState();
+
+        if (playerState?.status === "in-progress") {
+          playerState.fail(error);
+        }
+
+        return;
+      }
+
+      options.logger?.error(
+        "Async node handling failed and resolved with a fallback. Error:",
+        error,
+      );
+      this.handleAsyncUpdate(node, result, this.currentView);
+    }
   }
 
   private isAsync(node: Node.Node | null): node is Node.Async {
