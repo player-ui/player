@@ -8,9 +8,9 @@ import type {
 import { ReactPlayer } from "@player-ui/react";
 import { BeaconPlugin } from "@player-ui/beacon-plugin-react";
 import { makeFlow } from "@player-ui/make-flow";
-import { Placeholder } from "@storybook/components";
+import { Placeholder } from "storybook/internal/components";
 import { useDispatch, useSelector } from "react-redux";
-import { addons } from "@storybook/preview-api";
+import { addons } from "storybook/internal/preview-api";
 import type {
   AsyncImportFactory,
   PlayerParametersType,

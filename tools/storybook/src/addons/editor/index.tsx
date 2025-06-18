@@ -1,7 +1,7 @@
 import React from "react";
 import { dequal } from "dequal";
 import Editor, { loader as monaco } from "@monaco-editor/react";
-import { Tabs, Placeholder } from "@storybook/components";
+import { Tabs, Placeholder } from "storybook/internal/components";
 import { useDispatch } from "react-redux";
 import type { CompilationErrorType } from "../../redux";
 import {
@@ -11,8 +11,7 @@ import {
   useDSLEditorValue,
   useJSONEditorValue,
 } from "../../redux";
-import { useDarkMode } from "../useDarkMode";
-import { API } from "@storybook/manager-api";
+import { API } from "storybook/internal/manager-api";
 
 if (typeof window !== "undefined") {
   monaco.init().then((m) => {
@@ -39,8 +38,6 @@ interface EditorPanelProps {
 
 /** the panel for the flow editor */
 export const JSONEditorPanel = (props: EditorPanelProps) => {
-  const darkMode = useDarkMode(props.api);
-
   const jsonEditorValue = useJSONEditorValue();
 
   const jsonValueAsString =
@@ -72,7 +69,6 @@ export const JSONEditorPanel = (props: EditorPanelProps) => {
 
   return (
     <Editor
-      theme={darkMode ? "dark" : "light"}
       value={jsonValueAsString}
       language="json"
       options={{
@@ -124,8 +120,6 @@ const CompileErrors = ({
 
 /** A panel with the TSX editor built-in */
 const DSLEditorPanel = (props: EditorPanelProps) => {
-  const darkMode = useDarkMode(props.api);
-
   const jsonEditorValue = useJSONEditorValue();
   const dslEditorValue = useDSLEditorValue();
   const dispatch = useDispatch();
@@ -174,7 +168,6 @@ const DSLEditorPanel = (props: EditorPanelProps) => {
           <>
             {compilationErrors && <CompileErrors errors={compilationErrors} />}
             <Editor
-              theme={darkMode ? "vs-dark" : "light"}
               value={editorValue}
               language="typescript"
               path="flow.tsx"
@@ -197,7 +190,6 @@ const DSLEditorPanel = (props: EditorPanelProps) => {
             options={{
               readOnly: true,
             }}
-            theme={darkMode ? "vs-dark" : "light"}
             path="flow.json"
             keepCurrentModel={true}
             value={flow ? JSON.stringify(flow, null, 2) : "{}"}

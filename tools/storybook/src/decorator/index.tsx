@@ -4,7 +4,7 @@ import type {
   PartialStoryFn,
   StoryContext,
   DecoratorFunction,
-} from "@storybook/types";
+} from "storybook/internal/types";
 import { useSelector } from "react-redux";
 import { StateProvider, type StateType } from "../redux";
 import {

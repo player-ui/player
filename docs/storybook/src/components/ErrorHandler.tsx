@@ -1,21 +1,16 @@
-import React from 'react';
-import { FallbackProps } from '@player-ui/react';
-import { ButtonGroup, Button, VStack, Code } from '@chakra-ui/react';
+import React from "react";
+import { FallbackProps } from "@player-ui/react";
 
-export const ErrorHandler = (props: FallbackProps) => {
+export const ErrorHandler = (props: FallbackProps): React.JSX.Element => {
   return (
-    <VStack gap="10">
-      <Code colorScheme="red">
+    <div>
+      <text>
         <pre>{props.error?.message}</pre>
-      </Code>
-      <ButtonGroup>
-        <Button variant="primary" onClick={props.retry}>
-          Retry
-        </Button>
-        <Button variant="primary" onClick={props.reset}>
-          Reset
-        </Button>
-      </ButtonGroup>
-    </VStack>
+      </text>
+      <div>
+        <button onClick={props.retry}>Retry</button>
+        <button onClick={props.reset}>Reset</button>
+      </div>
+    </div>
   );
 };

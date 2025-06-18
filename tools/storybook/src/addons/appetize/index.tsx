@@ -1,13 +1,13 @@
 import React from "react";
-import type { API } from "@storybook/manager-api";
-import { useParameter } from "@storybook/preview-api";
-import { STORY_CHANGED } from "@storybook/core-events";
+import type { API } from "storybook/internal/manager-api";
+import { useParameter } from "storybook/internal/preview-api";
+import { STORY_CHANGED } from "storybook/internal/core-events";
 import {
   IconButton,
-  Icons,
   WithTooltip,
   TooltipLinkList,
-} from "@storybook/components";
+} from "storybook/internal/components";
+import { BrowserIcon, MobileIcon } from "@storybook/icons";
 import { useDispatch, useSelector } from "react-redux";
 import type { StateType } from "../../redux";
 import { setPlatform } from "../../redux";
@@ -49,7 +49,7 @@ export const RenderSelection = ({ api }: RenderSelectionProps) => {
 
   return (
     <WithTooltip
-      closeOnClick
+      closeOnOutsideClick
       placement="top"
       trigger="click"
       tooltip={({ onHide }) => (
@@ -68,8 +68,8 @@ export const RenderSelection = ({ api }: RenderSelectionProps) => {
         />
       )}
     >
-      <IconButton title="Change the render target" placeholder="Render Target">
-        <Icons icon={selectedPlatform === "web" ? "browser" : "mobile"} />
+      <IconButton title="Change the render target" value="Render Target">
+        {selectedPlatform === "web" ? <BrowserIcon /> : <MobileIcon />}
       </IconButton>
     </WithTooltip>
   );

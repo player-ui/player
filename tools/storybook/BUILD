@@ -15,11 +15,8 @@ dependencies = [
     ":node_modules/@player-ui/beacon-plugin-react",
     ":node_modules/@player-ui/make-flow",
     ":node_modules/@player-ui/metrics-plugin-react",
-    "//:node_modules/storybook-dark-mode",
-    "//:node_modules/@storybook/manager-api",
-    "//:node_modules/@storybook/preview-api",
-    "//:node_modules/@storybook/types",
-    "//:node_modules/@storybook/components",
+    "//:node_modules/storybook",
+    "//:node_modules/@storybook/icons",
     "//:node_modules/@player-tools/xlr",
     "//:node_modules/@player-tools/xlr-utils",
     "//:node_modules/@types/react-redux",
@@ -48,8 +45,6 @@ dev_dependencies = [
 
 peer_deps = [
     "//:node_modules/typescript",
-    "//:node_modules/@storybook/manager",
-    "//:node_modules/@storybook/preview",
 ]
 
 tsup_name = name + "_tsup"

@@ -1,13 +1,12 @@
 import React from "react";
 import { Table, Head, HeadCell, Cell, Body, Row } from "@devtools-ds/table";
 import { useSelector } from "react-redux";
-import { Placeholder } from "@storybook/components";
+import { Placeholder } from "storybook/internal/components";
 import type { EventType } from "../../state";
 import type { StateType } from "../../redux";
 import { useContentKind } from "../../redux";
 
-import { useDarkMode } from "../useDarkMode";
-import { API } from "@storybook/manager-api";
+import { API } from "storybook/internal/manager-api";
 
 interface EventsPanelProps {
   /** if the panel is shown */
@@ -68,7 +67,6 @@ const ExtraCells = (event: EventType) => {
 export const EventsPanel = (props: EventsPanelProps) => {
   const events = useSelector<StateType, EventType[]>((state) => state.events);
   const contentType = useContentKind();
-  const darkMode = useDarkMode(props.api);
 
   if (!props.active) {
     return null;
@@ -84,7 +82,7 @@ export const EventsPanel = (props: EventsPanelProps) => {
 
   return (
     <div>
-      <Table colorScheme={darkMode ? "dark" : "light"}>
+      <Table>
         <Head>
           <Row>
             <HeadCell>Time</HeadCell>
