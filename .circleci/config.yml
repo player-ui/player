@@ -527,7 +527,6 @@ workflows:
               only:
                 - main
                 - /version-.*/
-
       - bazelrc:
           context:
             - Build

@@ -13,7 +13,7 @@ If the changes are larger (API design, architecture, etc), [opening an issue](ht
 ## Requirements
 
 - [bazelisk](https://github.com/bazelbuild/bazelisk)
-- [pnpm >= 8.0.0](https://pnpm.io/installation)
+- [pnpm >= 9.0.0](https://pnpm.io/installation)
 
 - [Swift >= 5.5](https://www.swift.org/download/)
 - [Xcode 15.3](https://developer.apple.com/download/all/)
