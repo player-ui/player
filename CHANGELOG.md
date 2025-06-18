@@ -1,3 +1,23 @@
+# 0.12.0-next.4 (Wed Jun 18 2025)
+
+### Release Notes
+
+#### Updated docs, platform param ([#660](https://github.com/player-ui/player/pull/660))
+
+Updated contributing docs to include information around how the docs site is generated, re-added platform param capability so that the URL updates based on platform tab, updated team page.
+
+---
+
+#### 🐛 Bug Fix
+
+- Updated docs, platform param [#660](https://github.com/player-ui/player/pull/660) ([@kharrop](https://github.com/kharrop))
+
+#### Authors: 1
+
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+
+---
+
 # 0.12.0-next.3 (Tue Jun 10 2025)
 
 #### 🐛 Bug Fix
