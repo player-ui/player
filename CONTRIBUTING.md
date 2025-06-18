@@ -98,7 +98,7 @@ When a PR is merged, it will generate a `next` release, so something like `0.12.
 
 ### Canary Releases
 
-To trigger a canary release, add a `/canary` comment to any PR.
+To trigger a canary release, collaborators can add a `/canary` comment to any PR. Note: Canary builds can only be requested by collaborators.
 
 ---
 

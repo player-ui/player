@@ -7,9 +7,6 @@ parameters:
   should_release:
     type: boolean
     default: false
-  is_canary:
-    type: boolean
-    default: false
 
 orbs:
   macos: circleci/macos@2
@@ -75,27 +72,7 @@ commands:
           source ~/.bashrc
           bundle install
           npx auto shipit --only-graduate-with-release-label -vv
-      - when:
-          condition: << pipeline.parameters.is_canary >>
-          steps:
-            - run:
-                name: Post canary version comment
-                command: |
-                  source ~/.bashrc
 
-                  PACKAGE_VERSION=$(npx auto shipit --dry-run --quiet)
-
-                  BUILD_INFO="### Build Info
-
-                  Your PR was successfully deployed by [CircleCI #$CIRCLE_BUILD_NUM](https://circleci.com/gh/player-ui/tools/$CIRCLE_BUILD_NUM) on \`$(date -u)\` with this version:"
-                  BUILD_INFO="$BUILD_INFO 
-
-                  \`\`\`
-                  $PACKAGE_VERSION
-                  \`\`\`"
-
-                  # Post the build info as a comment to the PR
-                  npx auto comment --context "Build Info" --message "$BUILD_INFO" || true
 jobs:
   setup:
     executor: minimal
@@ -131,9 +108,15 @@ jobs:
       - attach_workspace:
           at: ~/player
       - run: |
-          echo "common --bes_results_url=''" >> .bazelrc.local
-          echo "common --bes_backend=''" >> .bazelrc.local
-          echo "common --remote_cache=''" >> .bazelrc.local
+          echo "build --bes_results_url=''" >> .bazelrc.local
+          echo "build --bes_backend=''" >> .bazelrc.local
+          echo "build --remote_cache=''" >> .bazelrc.local
+          echo "test --bes_results_url=''" >> .bazelrc.local
+          echo "test --bes_backend=''" >> .bazelrc.local
+          echo "test --remote_cache=''" >> .bazelrc.local
+          echo "coverage --bes_results_url=''" >> .bazelrc.local
+          echo "coverage --bes_backend=''" >> .bazelrc.local
+          echo "coverage --remote_cache=''" >> .bazelrc.local
       - persist_to_workspace:
           root: .
           paths:
