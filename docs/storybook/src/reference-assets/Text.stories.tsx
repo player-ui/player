@@ -13,5 +13,5 @@ const meta: Meta<typeof Text> = {
 export default meta;
 
 export const Basic = createDSLStory(
-  () => import("!!raw-loader!@player-ui/mocks/text/text-basic.tsx"),
+  () => import("@player-ui/mocks/text/text-basic.tsx?raw"),
 );

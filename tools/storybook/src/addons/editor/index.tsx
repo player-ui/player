@@ -161,7 +161,7 @@ const DSLEditorPanel = (props: EditorPanelProps) => {
       </Tabs>
       <div
         style={{
-          height: "calc(100% - 60px)",
+          height: "100vh",
         }}
       >
         {selected === "tsx" && (

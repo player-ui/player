@@ -10,6 +10,6 @@ export default meta;
 export const ReactPlayer = createDSLStory(
   () =>
     import(
-      "!!raw-loader!@player-ui/mocks/action/action-basic.tsx"
+      "@player-ui/mocks/action/action-basic.tsx?raw"
     ),
 );

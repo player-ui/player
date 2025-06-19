@@ -11,14 +11,25 @@ const config: UserConfig = defineConfig({
         configFile: false,
       },
     }),
-    commonjs({
-      filter(id) {
-        if (id.includes(".css.js")) {
-          return true;
-        }
-      },
-    }),
   ],
+  optimizeDeps: {
+    include: [
+      "hoist-non-react-statics",
+      "sorted-array",
+      "timm",
+      "queue-microtask",
+      "ts-nested-error",
+      "p-defer",
+      "semver",
+      "@babel/runtime/helpers/objectSpread2",
+      "@babel/runtime/helpers/objectWithoutProperties",
+      "@babel/runtime/helpers/extends",
+      "lz-string",
+      "esbuild-wasm/lib/browser",
+      "typescript",
+      "redux-state-sync",
+    ],
+  },
   build: {
     rollupOptions: {
       external: ["@monaco-editor/react"],

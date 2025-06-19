@@ -13,5 +13,5 @@ const meta: Meta<typeof Collection> = {
 export default meta;
 
 export const Basic = createDSLStory(
-  () => import("!!raw-loader!@player-ui/mocks/collection/collection-basic.tsx"),
+  () => import("@player-ui/mocks/collection/collection-basic.tsx?raw"),
 );

@@ -13,17 +13,17 @@ const meta: Meta<typeof Info> = {
 export default meta;
 
 export const Basic = createDSLStory(
-  () => import("!!raw-loader!@player-ui/mocks/info/info-basic.tsx"),
+  () => import("@player-ui/mocks/info/info-basic.tsx?raw"),
 );
 
 export const DynamicFlow = createDSLStory(
-  () => import("!!raw-loader!@player-ui/mocks/info/info-dynamic-flow.tsx"),
+  () => import("@player-ui/mocks/info/info-dynamic-flow.tsx?raw"),
 );
 
 export const Footer = createDSLStory(
-  () => import("!!raw-loader!@player-ui/mocks/info/info-footer.tsx"),
+  () => import("@player-ui/mocks/info/info-footer.tsx?raw"),
 );
 
 export const ModalFlow = createDSLStory(
-  () => import("!!raw-loader!@player-ui/mocks/info/info-modal-flow.tsx"),
+  () => import("@player-ui/mocks/info/info-modal-flow.tsx?raw"),
 );

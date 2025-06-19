@@ -13,9 +13,9 @@ const meta: Meta<typeof Choice> = {
 export default meta;
 
 export const Basic = createDSLStory(
-  () => import("!!raw-loader!@player-ui/mocks/choice/choice-basic.tsx"),
+  () => import("@player-ui/mocks/choice/choice-basic.tsx?raw"),
 );
 
 export const Validation = createDSLStory(
-  () => import("!!raw-loader!@player-ui/mocks/choice/choice-validation.tsx"),
+  () => import("@player-ui/mocks/choice/choice-validation.tsx?raw"),
 );

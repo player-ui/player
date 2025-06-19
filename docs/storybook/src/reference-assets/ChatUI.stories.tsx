@@ -64,6 +64,6 @@ const expPlugin = new ExpressionPlugin(
 );
 
 export const ChatUI = createDSLStory(
-  () => import("!!raw-loader!@player-ui/mocks/chat-message/chat-ui.tsx"),
+  () => import("@player-ui/mocks/chat-message/chat-ui.tsx?raw"),
   { plugins: [asyncNodePlugin, expPlugin] },
 );
