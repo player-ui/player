@@ -1,5 +1,4 @@
 load("//tools/ios:util.bzl", "swiftui_plugin")
-load("@build_bazel_rules_ios//rules:test.bzl", "ios_ui_test")
 
 swiftui_plugin(
     name = "ReferenceAssets",
