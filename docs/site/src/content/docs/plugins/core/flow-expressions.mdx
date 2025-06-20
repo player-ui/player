@@ -1,0 +1,55 @@
+---
+title: Flow Expressions Plugin
+description: A plugin that makes flow-level expressions available as operators in the expression evaluator
+---
+
+# Flow Expressions Plugin
+
+The Flow Expressions Plugin allows you to define expressions at the flow level and use them as operators in your content. This is useful for creating reusable expressions that are specific to a particular flow.
+
+Consider using flow expressions for complex calculations or formatting that would be used multiple times in a flow.
+
+## Usage
+
+```typescript
+import { Player } from "@player-ui/player";
+import { FlowExpressionsPlugin } from "@player-ui/flow-expressions-plugin";
+
+const player = new Player({
+  plugins: [new FlowExpressionsPlugin()]
+});
+```
+
+## Configuration
+
+The plugin automatically reads expressions from your flow definition and makes them available as operators. No additional configuration is required.
+
+## Example
+
+Here's an example of how to use flow expressions in your flow:
+
+```json
+{
+  "id": "test-flow",
+  "expressions": {
+    "isValid": "{{data.value}} > 0",
+    "formatValue": "{{data.value}} + ' units'"
+  },
+  "views": [
+    {
+      "id": "main-view",
+      "type": "view",
+      "title": "Value: @[formatValue()]@",
+      "subtitle": "@[isValid() ? 'Valid' : 'Invalid']@"
+    }
+  ],
+  "data": {
+    "value": 42
+  }
+}
+```
+
+In this example:
+- `isValid` is an expression that checks if the value is greater than 0
+- `formatValue` is an expression that formats the value with units
+- Both expressions are used in the view's title and subtitle
