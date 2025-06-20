@@ -4,7 +4,6 @@ load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@rules_player//internal:defs.bzl", "stamp")
 load("@rules_player//ios:defs.bzl", "assemble_pod", "ios_publish")
-load("@rules_swift_package_manager//swiftpkg:defs.bzl", "swift_update_packages")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -253,15 +252,16 @@ gazelle_binary(
 #
 # The `swift_update_pkgs_to_latest` target should be run when you want to
 # update your Swift dependencies to their latest eligible version.
-swift_update_packages(
-    name = "swift_update_pkgs",
-    gazelle = ":gazelle_bin",
-    generate_swift_deps_for_workspace = True,
-    package_manifest = "./xcode/Package.swift",
-    swift_deps = "swift_deps.bzl",
-    swift_deps_index = "swift_deps_index.json",
-    update_bzlmod_stanzas = False,
-)
+# TODO: This was removed in 1.0.0 of rules_swift_package_manager
+# swift_update_packages(
+#     name = "swift_update_pkgs",
+#     gazelle = ":gazelle_bin",
+#     generate_swift_deps_for_workspace = True,
+#     package_manifest = "./xcode/Package.swift",
+#     swift_deps = "swift_deps.bzl",
+#     swift_deps_index = "swift_deps_index.json",
+#     update_bzlmod_stanzas = False,
+# )
 
 # This target updates the Bazel build files for your project. Run this target
 # whenever you add or remove source files from your project.
