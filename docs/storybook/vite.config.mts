@@ -1,6 +1,5 @@
 import { defineConfig, UserConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import commonjs from "vite-plugin-commonjs";
 
 const config: UserConfig = defineConfig({
   plugins: [

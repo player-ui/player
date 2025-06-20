@@ -20,6 +20,7 @@ js_pipeline(
         "//:node_modules/autoprefixer",
         "//:node_modules/postcss",
         "//:node_modules/tailwindcss",
+        "//:node_modules/@tailwindcss/postcss",
         "//:node_modules/tailwindcss-animate",
     ],
     peer_deps = [

@@ -4,10 +4,10 @@
   "main": "src/index.tsx",
   "dependencies": {
     "@player-ui/asset-provider-plugin-react": "workspace:*",
+    "@player-ui/async-node-plugin": "workspace:*",
     "@player-ui/beacon-plugin-react": "workspace:*",
     "@player-ui/partial-match-registry": "workspace:*",
-    "@player-ui/reference-assets-plugin": "workspace:*",
-    "@player-ui/async-node-plugin": "workspace:*"
+    "@player-ui/reference-assets-plugin": "workspace:*"
   },
   "devDependencies": {
     "@player-ui/make-flow": "workspace:*"

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { StrictMode } from "react";
 import { DSLPlayerStory } from "../player";
 
 /** Create a story */
@@ -14,7 +14,11 @@ export function createDSLStory(
 ) {
   /** The story to render */
   const Comp = () => {
-    return <DSLPlayerStory dslContent={loader} options={options} />;
+    return (
+      <StrictMode>
+        <DSLPlayerStory dslContent={loader} options={options} />
+      </StrictMode>
+    );
   };
 
   if (options?.args) {

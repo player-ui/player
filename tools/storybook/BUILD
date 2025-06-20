@@ -24,8 +24,6 @@ dependencies = [
     "//:node_modules/redux-state-sync",
     "//:node_modules/lz-string",
     "//:node_modules/dequal",
-    "//:node_modules/@babel/preset-typescript",
-    "//:node_modules/@babel/preset-env",
     "//:node_modules/uuid",
     "//:node_modules/clsx",
     "//:node_modules/@player-tools/dsl",
