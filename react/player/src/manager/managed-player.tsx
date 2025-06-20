@@ -1,10 +1,11 @@
-import React from "react";
+import React, { MutableRefObject, useEffect, useRef } from "react";
 import type {
   FlowManager,
   ManagedPlayerProps,
   ManagedPlayerState,
   ManagerMiddleware,
   ManagedPlayerContext,
+  MiddlewareMethod,
 } from "./types";
 import { useRequestTime } from "./request-time";
 import type { ReactPlayerOptions } from "../player";
@@ -31,13 +32,13 @@ export interface StateChangeCallback {
 class ManagedState {
   public state?: ManagedPlayerState;
   private callbacks: Array<StateChangeCallback>;
-  private middleware?: ManagerMiddleware;
+  private middleware?: React.MutableRefObject<ManagerMiddleware>;
 
   constructor({
     middleware,
   }: {
     /** middleware to use in the managed player */
-    middleware?: ManagerMiddleware;
+    middleware?: React.MutableRefObject<ManagerMiddleware>;
   }) {
     this.middleware = middleware;
     this.callbacks = [];
@@ -59,7 +60,7 @@ class ManagedState {
 
     /** the config to use when creating a player */
     playerConfig: ReactPlayerOptions;
-  }) {
+  }): this {
     const initialState: ManagedPlayerState = {
       value: "not_started",
       context: {
@@ -75,7 +76,7 @@ class ManagedState {
   }
 
   /** reset starts from nothing */
-  public reset() {
+  public reset(): void {
     if (this.state?.value === "error") {
       const { playerConfig, manager } = this.state.context;
       this.start({ playerConfig, manager });
@@ -85,7 +86,7 @@ class ManagedState {
   }
 
   /** restart starts from the last result */
-  public restart() {
+  public restart(): void {
     if (this.state?.value === "error") {
       const { playerConfig, manager, prevResult, reactPlayer } =
         this.state.context;
@@ -142,7 +143,7 @@ class ManagedState {
       const prevResult =
         state.value === "completed" ? state.context.result : undefined;
 
-      const middleware = this.middleware?.next ?? identityMiddleware;
+      const middleware = this.middleware?.current?.next ?? identityMiddleware;
 
       return {
         value: "pending",
@@ -217,8 +218,8 @@ export const usePersistentStateMachine = (options: {
   playerConfig: ReactPlayerOptions;
 
   /** Any middleware for the manager */
-  middleware?: ManagerMiddleware;
-}) => {
+  middleware?: React.MutableRefObject<ManagerMiddleware>;
+}): { managedState: ManagedState; state?: ManagedPlayerState } => {
   const keyRef = React.useRef<ManagedPlayerStateKey>({
     _key: Symbol("managed-player"),
   });
@@ -246,18 +247,48 @@ export const usePersistentStateMachine = (options: {
   return { managedState, state };
 };
 
+function composeMiddleware<T>(...functions: MiddlewareMethod<T>[]) {
+  if (functions.length === 1) {
+    return functions[0];
+  }
+
+  const [fn, ...fns] = functions;
+
+  return fns.reduceRight(
+    (a, b) => (input) => {
+      return a(b(input));
+    },
+    fn as MiddlewareMethod<T>,
+  );
+}
+
+function useLatest<T>(value: T): MutableRefObject<T> {
+  const ref = useRef<T>(value);
+
+  useEffect(() => {
+    ref.current = value;
+  });
+
+  return ref;
+}
+
 /**
  * A ManagedPlayer is a component responsible for orchestrating multi-flow experiences using Player.
  * Provide a valid `FlowManager` to handle fetching the next flow.
  *
  * `suspense` must be enabled to wait for results in flight.
  */
-export const ManagedPlayer = (props: ManagedPlayerProps) => {
+export const ManagedPlayer = (
+  props: ManagedPlayerProps,
+): React.JSX.Element | null => {
   const { withRequestTime, RequestTimeMetricsPlugin } = useRequestTime();
+  const latestMiddleware = useLatest({
+    next: composeMiddleware(...(props?.middleware ?? []), withRequestTime),
+  } as ManagerMiddleware);
 
   const { state, managedState } = usePersistentStateMachine({
     manager: props.manager,
-    middleware: { next: withRequestTime },
+    middleware: latestMiddleware,
     playerConfig: {
       plugins: [...(props?.plugins ?? []), RequestTimeMetricsPlugin],
       player: props.player,
