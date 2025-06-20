@@ -4,7 +4,7 @@ ios_pipeline(
     name = "PlayerUISwiftUI",
     resources = [],
     deps = [
-        "@swiftpkg_swift_hooks//:Sources_SwiftHooks",
+        "@swiftpkg_swift_hooks//:SwiftHooks",
         "//ios/core:PlayerUI"
     ],
     test_deps = [

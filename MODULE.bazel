@@ -5,14 +5,18 @@ module(
 
 bazel_dep(name = "rules_player")
 
-archive_override(
-  module_name = "rules_player",
-  strip_prefix = "rules_player-1.2.1",
-  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v1.2.1.tar.gz"],
-  integrity = "sha256-OXntU1P3916DJjYvboaRtuLUFfhb3SVkjj5tqSNju9M="
+# archive_override(
+#   module_name = "rules_player",
+#   strip_prefix = "rules_player-1.2.1",
+#   urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v1.2.1.tar.gz"],
+#   integrity = "sha256-OXntU1P3916DJjYvboaRtuLUFfhb3SVkjj5tqSNju9M="
+# )
+
+local_path_override(
+    module_name = "rules_player",
+    path = "../rules_player",
 )
 
-# local_path_override(module_name = "rules_player", path = "../rules_player")
 bazel_dep(name = "aspect_bazel_lib", version = "2.8.0")
 bazel_dep(name = "aspect_rules_js", version = "2.0.0")
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
@@ -32,20 +36,22 @@ node.toolchain(node_version = "20.14.0")
 
 ###### Start iOS ######
 ## Rule Dependencies
-bazel_dep(name = "rules_apple", version = "3.5.1", repo_name = "build_bazel_rules_apple")
-bazel_dep(name = "rules_ios", version = "4.8.2", repo_name = "build_bazel_rules_ios")
-bazel_dep(name = "rules_xcodeproj", version = "2.2.0")
+bazel_dep(name = "rules_xcodeproj", version = "2.12.1")
+bazel_dep(name = "rules_apple", version = "3.22.0", repo_name = "build_bazel_rules_apple")
+bazel_dep(name = "rules_swift", version = "2.9.0")
+bazel_dep(name = "rules_ios", version = "5.6.0", repo_name = "build_bazel_rules_ios")
 bazel_dep(name = "gazelle", version = "0.34.0", repo_name = "bazel_gazelle")
-bazel_dep(name = "rules_swift_package_manager", version = "0.22.0")
-bazel_dep(name = "swiftlint", version = "0.54.0", repo_name = "SwiftLint")
+bazel_dep(name = "rules_swift_package_manager", version = "1.0.0")
+bazel_dep(name = "swiftlint", version = "0.59.1", repo_name = "SwiftLint")
 
 ## This section is handled by rules_swift_package_manager
 swift_deps = use_extension(
     "@rules_swift_package_manager//:extensions.bzl",
     "swift_deps",
 )
-swift_deps.from_file(
-    deps_index = "//:swift_deps_index.json",
+swift_deps.from_package(
+    resolved = "//:xcode/Package.resolved",
+    swift = "//:xcode/Package.swift",
 )
 
 ## SPM Dependencies
@@ -54,6 +60,7 @@ swift_deps.from_file(
 ### before adding it here
 use_repo(
     swift_deps,
+    "swift_package",
     "swiftpkg_swift_hooks",
     "swiftpkg_swiftlint",
     "swiftpkg_viewinspector",
@@ -67,10 +74,10 @@ npm.npm_translate_lock(
         "//:package.json",
         "//:patches/@chakra-ui__system@2.6.2.patch",
     ],
+    npm_package_target_name = "{dirname}",
     npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
     verify_node_modules_ignored = "//:.bazelignore",
-    npm_package_target_name = "{dirname}"
 )
 use_repo(npm, "npm")
 
@@ -84,10 +91,6 @@ use_repo(rules_ts_ext, "npm_typescript")
 
 # Kotlin
 bazel_dep(name = "rules_kotlin", version = "1.9.1")
-single_version_override(
-    module_name = "rules_kotlin",
-    patches = ["//patches:rules_kotlin.context_receivers.patch"],
-)
 
 # TODO: Custom compiler version breaks embedded jdeps generator plugin - enable when removing custom kotlinc (see .bazelrc jvm_emit_jdeps)
 rules_kotlin_extensions = use_extension(
@@ -100,7 +103,6 @@ rules_kotlin_extensions.kotlinc_version(
     sha256 = "5e3c8d0f965410ff12e90d6f8dc5df2fc09fd595a684d514616851ce7e94ae7d",
     version = "1.7.20",
 )
-
 use_repo(
     rules_kotlin_extensions,
     "com_github_jetbrains_kotlin",
