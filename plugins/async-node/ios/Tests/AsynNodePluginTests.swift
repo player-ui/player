@@ -1029,20 +1029,14 @@ class AsyncNodePluginTests: XCTestCase {
         
         var count = 0
         
-        let resolveHandler: AsyncHookHandler = { _,_ in
-            handlerExpectation.fulfill()
-            
-            return AsyncNodeHandlerType.singleNode(.concrete(context?.evaluateScript("'unparsable node'") ?? JSValue()))
-        }
-        
         let asyncNodePluginPlugin = AsyncNodePluginPlugin()
         let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin])
         
         plugin.context = context
         
         plugin.hooks?.onAsyncNode.tap({ node, callback in
-            let replacementNode = try await (resolveHandler)(node, callback)
-            return replacementNode.handlerTypeToJSValue(context: context ?? JSContext()) ?? JSValue()
+            handlerExpectation.fulfill()
+            return JSValue(newErrorFromMessage: "Something has gone wrong", in: context)
         })
         
         plugin.hooks?.onAsyncNodeError.tap({ err, node in
