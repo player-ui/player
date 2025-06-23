@@ -1032,7 +1032,7 @@ class AsyncNodePluginTests: XCTestCase {
         let resolveHandler: AsyncHookHandler = { _,_ in
             handlerExpectation.fulfill()
             
-            throw PlayerError.playerNotInstantiated
+            return AsyncNodeHandlerType.singleNode(.concrete(context?.evaluateScript("'unparsable node'") ?? JSValue()))
         }
         
         let asyncNodePluginPlugin = AsyncNodePluginPlugin()
