@@ -1,3 +1,23 @@
+# 0.12.0-next.5 (Tue Jun 24 2025)
+
+### Release Notes
+
+#### Fix transforms on assets with `applicability` ([#668](https://github.com/player-ui/player/pull/668))
+
+Move `AssetTransformCorePlugin` application after `applicability` and `switch` view plugins to ensure transforms properly apply to conditional assets.
+
+---
+
+#### 🐛 Bug Fix
+
+- Fix transforms on assets with `applicability` [#668](https://github.com/player-ui/player/pull/668) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### Authors: 1
+
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+
+---
+
 # 0.12.0-next.4 (Wed Jun 18 2025)
 
 ### Release Notes
