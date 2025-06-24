@@ -20,7 +20,7 @@ function findUp(node: Node.Node, target: Node.Node): boolean {
  * A plugin to register custom transforms on certain asset types
  * This allows users to embed stateful data into transforms.
  */
-export class AssetTransformCorePlugin {
+export default class AssetTransformCorePlugin {
   public readonly stateStore: Map<Node.Node, LocalStateStore>;
   private readonly registry: TransformRegistry;
   private beforeResolveSymbol: symbol;
