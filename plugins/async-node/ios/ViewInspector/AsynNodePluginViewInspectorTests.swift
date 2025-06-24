@@ -20,6 +20,7 @@ import ViewInspector
 extension Inspection: InspectionEmissary { }
 
 class AsyncNodePluginViewInspectorTests: XCTestCase {
+    @MainActor
     func testAsyncNodeWithSwiftUIPlayerUsingJSValue() throws {
         let handlerExpectation = XCTestExpectation(description: "handler called")
         let jsContext = JSContext()

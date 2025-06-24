@@ -22,7 +22,7 @@ let package = Package(
         .package(url: "https://github.com/realm/SwiftLint.git", .upToNextMajor(from: "0.54.0")),
 
         // Testing Dependencies
-        .package(url: "https://github.com/nalexn/viewinspector.git", .upToNextMajor(from: "0.9.10"))
+        .package(url: "https://github.com/nalexn/viewinspector.git", .upToNextMajor(from: "0.10.0"))
     ],
     targets: []
 )
