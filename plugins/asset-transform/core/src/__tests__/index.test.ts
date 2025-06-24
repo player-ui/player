@@ -52,6 +52,7 @@ const basicFRFWithActionsAndExpressions = (asset = "action"): Flow<any> => ({
             type: asset,
             value: "{{foo.bar}}",
             example: ['{{foo.bar}} = "test"'],
+            applicability: true,
           },
         },
       ],
