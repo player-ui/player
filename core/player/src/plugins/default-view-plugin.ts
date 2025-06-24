@@ -23,7 +23,9 @@ export class DefaultViewPlugin implements PlayerPlugin {
         new AssetPlugin().apply(view);
         new SwitchPlugin(pluginOptions).apply(view);
         new ApplicabilityPlugin().apply(view);
-        new AssetTransformCorePlugin(viewController.transformRegistry).apply(view);
+        new AssetTransformCorePlugin(viewController.transformRegistry).apply(
+          view,
+        );
         new StringResolverPlugin().apply(view);
         const templatePlugin = new TemplatePlugin(pluginOptions);
         templatePlugin.apply(view);
