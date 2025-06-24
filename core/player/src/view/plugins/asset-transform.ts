@@ -1,7 +1,7 @@
-import type { Node, ViewInstance } from "../../view";
-import { NodeType } from "../../view";
-import { LocalStateStore } from "./store";
-import type { TransformRegistry } from "./types";
+import type { Node, ViewInstance } from "..";
+import { NodeType } from "..";
+import { LocalStateStore } from "../../controllers/view/store";
+import type { TransformRegistry } from "../../controllers/view/types";
 
 /** Traverse up the nodes until the target is found */
 function findUp(node: Node.Node, target: Node.Node): boolean {

@@ -1,8 +1,8 @@
-import { AssetTransformCorePlugin } from "../controllers";
 import type { Player, PlayerPlugin } from "../player";
 import {
   ApplicabilityPlugin,
   AssetPlugin,
+  AssetTransformCorePlugin,
   MultiNodePlugin,
   StringResolverPlugin,
   SwitchPlugin,
