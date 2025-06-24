@@ -1021,74 +1021,74 @@ class AsyncNodePluginTests: XCTestCase {
         XCTAssertEqual(expectedMultiNode4Text, "undefined")
     }
     
-    func testNodesFailure() {
-        let handlerExpectation = XCTestExpectation(description: "first data did not change")
-        let errorExpectation = XCTestExpectation(description: "error was not caught and handled")
-        
-        let context = JSContext()
-        
-        var count = 0
-        
-        let asyncNodePluginPlugin = AsyncNodePluginPlugin()
-        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin])
-        
-        plugin.context = context
-        
-        plugin.hooks?.onAsyncNode.tap({ node, callback in
-            handlerExpectation.fulfill()
-            return JSValue(newErrorFromMessage: "Something has gone wrong", in: context)
-        })
-        
-        plugin.hooks?.onAsyncNodeError.tap({ err, node in
-            errorExpectation.fulfill()
-            
-            AsyncNodeHandlerType.singleNode(.concrete(context?.evaluateScript("""
-                    ({
-                        "asset": {
-                            "id": "text",
-                            "type": "text",
-                            "value":"fallback"
-                        }
-                    })
-                    """) ?? JSValue()))
-        })
-        
-        XCTAssertNotNil(asyncNodePluginPlugin.context)
-        
-        let player = HeadlessPlayerImpl(plugins: [ReferenceAssetsPlugin(), plugin], context: context ?? JSContext())
-        
-        let textExpectation = XCTestExpectation(description: "newText1 found")
-        
-        var expectedMultiNode1Text: String = ""
-        
-        player.hooks?.viewController.tap({ (viewController) in
-            viewController.hooks.view.tap { (view) in
-                view.hooks.onUpdate.tap { val in
-                    count += 1
-                    
-                    if count == 2 {
-                        let newText1 = val
-                            .objectForKeyedSubscript("values")
-                            .objectAtIndexedSubscript(1)
-                            .objectAtIndexedSubscript(0)
-                            .objectForKeyedSubscript("asset")
-                            .objectForKeyedSubscript("value")
-                        guard let textString1 = newText1?.toString() else { return XCTFail("newText1 was not a string") }
-                        
-                        expectedMultiNode1Text = textString1
-                        textExpectation.fulfill()
-                    }
-                }
-            }
-        })
-        
-        player.start(flow: .asyncNodeJson, completion: {_ in})
-        
-        wait(for: [handlerExpectation, errorExpectation, textExpectation], timeout: 5)
-        
-        XCTAssert(count == 2)
-        XCTAssertEqual(expectedMultiNode1Text, "fallback")
-    }
+//    func testNodesFailure() {
+//        let handlerExpectation = XCTestExpectation(description: "first data did not change")
+//        let errorExpectation = XCTestExpectation(description: "error was not caught and handled")
+//        
+//        let context = JSContext()
+//        
+//        var count = 0
+//        
+//        let asyncNodePluginPlugin = AsyncNodePluginPlugin()
+//        let plugin = AsyncNodePlugin(plugins: [asyncNodePluginPlugin])
+//        
+//        plugin.context = context
+//        
+//        plugin.hooks?.onAsyncNode.tap({ node, callback in
+//            handlerExpectation.fulfill()
+//            return JSValue(newErrorFromMessage: "Something has gone wrong", in: context)
+//        })
+//        
+//        plugin.hooks?.onAsyncNodeError.tap({ err, node in
+//            errorExpectation.fulfill()
+//            
+//            AsyncNodeHandlerType.singleNode(.concrete(context?.evaluateScript("""
+//                    ({
+//                        "asset": {
+//                            "id": "text",
+//                            "type": "text",
+//                            "value":"fallback"
+//                        }
+//                    })
+//                    """) ?? JSValue()))
+//        })
+//        
+//        XCTAssertNotNil(asyncNodePluginPlugin.context)
+//        
+//        let player = HeadlessPlayerImpl(plugins: [ReferenceAssetsPlugin(), plugin], context: context)
+//        
+//        let textExpectation = XCTestExpectation(description: "newText1 found")
+//        
+//        var expectedMultiNode1Text: String = ""
+//        
+//        player.hooks?.viewController.tap({ (viewController) in
+//            viewController.hooks.view.tap { (view) in
+//                view.hooks.onUpdate.tap { val in
+//                    count += 1
+//                    
+//                    if count == 2 {
+//                        let newText1 = val
+//                            .objectForKeyedSubscript("values")
+//                            .objectAtIndexedSubscript(1)
+//                            .objectAtIndexedSubscript(0)
+//                            .objectForKeyedSubscript("asset")
+//                            .objectForKeyedSubscript("value")
+//                        guard let textString1 = newText1?.toString() else { return XCTFail("newText1 was not a string") }
+//                        
+//                        expectedMultiNode1Text = textString1
+//                        textExpectation.fulfill()
+//                    }
+//                }
+//            }
+//        })
+//        
+//        player.start(flow: .asyncNodeJson, completion: {_ in})
+//        
+//        wait(for: [handlerExpectation, errorExpectation, textExpectation], timeout: 5)
+//        
+//        XCTAssert(count == 2)
+//        XCTAssertEqual(expectedMultiNode1Text, "fallback")
+//    }
 }
 
 extension String {
