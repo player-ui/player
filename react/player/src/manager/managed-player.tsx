@@ -59,7 +59,7 @@ class ManagedState {
 
     /** the config to use when creating a player */
     playerConfig: ReactPlayerOptions;
-  }) {
+  }): this {
     const initialState: ManagedPlayerState = {
       value: "not_started",
       context: {
@@ -75,7 +75,7 @@ class ManagedState {
   }
 
   /** reset starts from nothing */
-  public reset() {
+  public reset(): void {
     if (this.state?.value === "error") {
       const { playerConfig, manager } = this.state.context;
       this.start({ playerConfig, manager });
@@ -85,7 +85,7 @@ class ManagedState {
   }
 
   /** restart starts from the last result */
-  public restart() {
+  public restart(): void {
     if (this.state?.value === "error") {
       const { playerConfig, manager, prevResult, reactPlayer } =
         this.state.context;
@@ -218,7 +218,7 @@ export const usePersistentStateMachine = (options: {
 
   /** Any middleware for the manager */
   middleware?: ManagerMiddleware;
-}) => {
+}): { managedState: ManagedState; state?: ManagedPlayerState } => {
   const keyRef = React.useRef<ManagedPlayerStateKey>({
     _key: Symbol("managed-player"),
   });
@@ -252,7 +252,9 @@ export const usePersistentStateMachine = (options: {
  *
  * `suspense` must be enabled to wait for results in flight.
  */
-export const ManagedPlayer = (props: ManagedPlayerProps) => {
+export const ManagedPlayer = (
+  props: ManagedPlayerProps,
+): React.JSX.Element | null => {
   const { withRequestTime, RequestTimeMetricsPlugin } = useRequestTime();
 
   const { state, managedState } = usePersistentStateMachine({
@@ -264,7 +266,9 @@ export const ManagedPlayer = (props: ManagedPlayerProps) => {
     },
   });
 
-  React.useEffect(() => {
+  const previousState = React.useRef<ManagedPlayerState | undefined>();
+
+  if (state?.value !== previousState.current?.value) {
     if (state?.value === "ended") {
       props.onComplete?.(state?.context.result);
     } else if (state?.value === "error") {
@@ -272,7 +276,9 @@ export const ManagedPlayer = (props: ManagedPlayerProps) => {
     } else if (state?.value === "running") {
       props.onStartedFlow?.();
     }
-  }, [state]);
+  }
+
+  previousState.current = state;
 
   React.useEffect(() => {
     return () => {
