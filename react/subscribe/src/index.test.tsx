@@ -1,6 +1,5 @@
-import { act } from "react";
 import { test, vitest, expect, describe, vi } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
 import { Subscribe, useSubscribedState } from ".";
 
 test("Passes events to subscriptions", async () => {
