@@ -169,7 +169,7 @@ export function useSubscribedState<T>(subscriber: Subscribe<T>): T | undefined {
       );
 
       return () => {
-        if (subscriber && id) {
+        if (subscriber) {
           subscriber.remove(id);
         }
       };
