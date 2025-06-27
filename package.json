@@ -9,9 +9,9 @@
   },
   "engines": {
     "node": "^20.14.0",
-    "pnpm": "^10.11.1"
+    "pnpm": "^9.7.0"
   },
-  "packageManager": "pnpm@10.11.1",
+  "packageManager": "pnpm@9.7.0",
   "dependencies": {
     "@astrojs/react": "^3.6.2",
     "@astrojs/starlight": "^0.28.3",
@@ -191,7 +191,7 @@
   },
   "volta": {
     "node": "20.17.0",
-    "pnpm": "10.11.1"
+    "pnpm": "9.7.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": []
