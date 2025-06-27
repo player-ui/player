@@ -19,7 +19,7 @@ xcodeproj(
         "//ios/test-utils:PlayerUITestUtilitiesViewInspectorTests",
 
         # plugins
-	"//plugins/async-node/ios:PlayerUIAsyncNodePluginTests",
+	    "//plugins/async-node/ios:PlayerUIAsyncNodePluginTests",
         "//plugins/async-node/ios:PlayerUIAsyncNodePluginViewInspectorTests",
 
         "//plugins/beacon/ios:PlayerUIBaseBeaconPluginTests",
