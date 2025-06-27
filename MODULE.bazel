@@ -41,7 +41,12 @@ register_toolchains("@my_local_config_sh//:local_sh_toolchain")
 ## Rule Dependencies
 bazel_dep(name = "rules_xcodeproj", version = "2.12.1")
 bazel_dep(name = "rules_shell", version = "0.5.0")
-bazel_dep(name = "rules_apple", version = "3.22.0", repo_name = "build_bazel_rules_apple")
+bazel_dep(name = "rules_apple", version = "4.0.1", repo_name = "build_bazel_rules_apple")
+git_override(
+    module_name = "rules_apple",
+    commit = "ed93c07c0698373b76577b63e265660941a417c2",
+    remote = "https://github.com/sugarmanz/rules_apple",
+)
 bazel_dep(name = "apple_support", version = "1.22.0", repo_name = "build_bazel_apple_support")
 bazel_dep(name = "rules_swift", version = "2.9.0")
 bazel_dep(name = "gazelle", version = "0.34.0", repo_name = "bazel_gazelle")

@@ -1,8 +1,6 @@
 test --test_output=errors
 coverage --combined_report=lcov
 
-common --action_cache_store_output_metadata --check_direct_dependencies=off --check_bazel_compatibility=off
-
 # TODO: Custom compiler version breaks embedded jdeps generator plugin - enable when removing custom kotlinc
 build --@rules_kotlin//kotlin/settings:jvm_emit_jdeps=False
 build --cxxopt=-std=c++17
@@ -27,6 +25,12 @@ common --experimental_google_legacy_api
 # Android demo app flags
 build --noincremental_dexing --fat_apk_cpu=armeabi-v7a,arm64-v8a,x86,x86_64
 mobile-install --start=warm
+
+#iOS Flags
+common --ios_simulator_device="iPhone 16 Pro"
+
+# Cache Flags
+common --action_cache_store_output_metadata --experimental_remote_cache_compression_threshold=100
 
 build --bes_results_url=https://app.buildbuddy.io/invocation/
 build --bes_backend=grpcs://remote.buildbuddy.io
@@ -55,12 +59,13 @@ coverage --remote_download_toplevel
 coverage --remote_timeout=3600
 coverage --build_metadata=REPO_URL=https://github.com/player-ui/player.git
 
+# Circle CI Flags (Linux)
 common:ci --build_metadata=ROLE=CI
 
 # Circle xlarge has 8 CPU cores/16GB mem
-common:ci --local_cpu_resources=8
-common:ci --local_ram_resources=15000
-common:ci --experimental_remote_build_event_upload=minimal 
+common:ci --local_resources=cpu=8
+common:ci --local_resources=memory=15000
+common:ci --remote_build_event_upload=minimal 
 common:ci --nolegacy_important_outputs
 
 # Only show progress every 60 seconds on CI.
@@ -69,9 +74,10 @@ common:ci --nolegacy_important_outputs
 # https://bazel.build/reference/command-line-reference#flag--show_progress_rate_limit
 common:ci --show_progress_rate_limit=60
 
-# Circle macos.m1.large.gen1 8 cores 12gb ram
-common:ci-mac --config=ci --local_cpu_resources=4 --local_ram_resources=7000
+# Circle CI Flags (Mac)
+common:ci-mac --config=ci --local_resources=cpu=4 --local_resources=memory=7000
 
+# Release Config
 common:release --config=ci --stamp --workspace_status_command=./scripts/workspace-status.sh
 build:release --//:cmake_build_type=MinSizeRel
 
