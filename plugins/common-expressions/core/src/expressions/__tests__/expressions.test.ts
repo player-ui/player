@@ -106,13 +106,28 @@ describe("expr functions", () => {
 
     test("split", () => {
       // Basic split functionality
-      expect(split(context, "hello,world,test", ",")).toEqual(["hello", "world", "test"]);
-      expect(split(context, "hello world test", " ")).toEqual(["hello", "world", "test"]);
+      expect(split(context, "hello,world,test", ",")).toEqual([
+        "hello",
+        "world",
+        "test",
+      ]);
+      expect(split(context, "hello world test", " ")).toEqual([
+        "hello",
+        "world",
+        "test",
+      ]);
       expect(split(context, "hello-world", "-")).toEqual(["hello", "world"]);
       // Split with limit
-      expect(split(context, "hello,world,test", ",", 2)).toEqual(["hello", "world"]);
+      expect(split(context, "hello,world,test", ",", 2)).toEqual([
+        "hello",
+        "world",
+      ]);
       expect(split(context, "hello world test", " ", 1)).toEqual(["hello"]);
-      expect(split(context, "hello,world,test", ",", 5)).toEqual(["hello", "world", "test"]);
+      expect(split(context, "hello,world,test", ",", 5)).toEqual([
+        "hello",
+        "world",
+        "test",
+      ]);
       // Edge cases
       expect(split(context, "hello", ",")).toEqual(["hello"]);
       expect(split(context, "", ",")).toEqual([""]);
@@ -124,9 +139,21 @@ describe("expr functions", () => {
       expect(split(context, undefined, ",")).toBe(undefined);
       expect(split(context, null, ",")).toBe(null);
       // Invalid limit parameter
-      expect(split(context, "hello,world,test", ",", "invalid")).toEqual(["hello", "world", "test"]);
-      expect(split(context, "hello,world,test", ",", -1)).toEqual(["hello", "world", "test"]);
-      expect(split(context, "hello,world,test", ",", 0)).toEqual(["hello", "world", "test"]);
+      expect(split(context, "hello,world,test", ",", "invalid")).toEqual([
+        "hello",
+        "world",
+        "test",
+      ]);
+      expect(split(context, "hello,world,test", ",", -1)).toEqual([
+        "hello",
+        "world",
+        "test",
+      ]);
+      expect(split(context, "hello,world,test", ",", 0)).toEqual([
+        "hello",
+        "world",
+        "test",
+      ]);
       // Empty separator
       expect(split(context, "hello", "")).toEqual(["hello"]);
       expect(split(context, "hello world", "")).toEqual(["hello world"]);

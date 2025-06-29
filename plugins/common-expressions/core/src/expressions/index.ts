@@ -109,12 +109,12 @@ export const split = withoutContext(
     }
 
     const separatorStr = String(separator);
-    
+
     // Handle empty separator - return the original string as a single element
     if (separatorStr === "") {
       return [str];
     }
-    
+
     const result = str.split(separatorStr);
 
     if (limit !== undefined && limit !== null) {
@@ -140,7 +140,8 @@ export const substr = withoutContext(
     }
 
     // Handle negative indices by converting to positive indices from the end
-    const actualStartIndex = startIndex < 0 ? str.length + startIndex : startIndex;
+    const actualStartIndex =
+      startIndex < 0 ? str.length + startIndex : startIndex;
 
     if (length !== undefined) {
       const lengthNum = typeof length === "number" ? length : toNum(length);
