@@ -13,6 +13,8 @@ import {
   replace,
   titleCase,
   sentenceCase,
+  split,
+  substr,
   isEmpty,
   isNotEmpty,
   findProperty,
@@ -100,6 +102,81 @@ describe("expr functions", () => {
 
     test("sentenceCase", () => {
       expect(sentenceCase(context, "foo Bar baz")).toBe("Foo Bar baz");
+    });
+
+    test("split", () => {
+      // Basic split functionality
+      expect(split(context, "hello,world,test", ",")).toEqual([
+        "hello",
+        "world",
+        "test",
+      ]);
+      expect(split(context, "hello world test", " ")).toEqual([
+        "hello",
+        "world",
+        "test",
+      ]);
+      expect(split(context, "hello-world", "-")).toEqual(["hello", "world"]);
+      // Split with limit
+      expect(split(context, "hello,world,test", ",", 2)).toEqual([
+        "hello",
+        "world",
+      ]);
+      expect(split(context, "hello world test", " ", 1)).toEqual(["hello"]);
+      expect(split(context, "hello,world,test", ",", 5)).toEqual([
+        "hello",
+        "world",
+        "test",
+      ]);
+      // Edge cases
+      expect(split(context, "hello", ",")).toEqual(["hello"]);
+      expect(split(context, "", ",")).toEqual([""]);
+      expect(split(context, "hello,world", "")).toEqual(["hello,world"]);
+      expect(split(context, "hello,world", undefined)).toEqual("hello,world");
+      expect(split(context, "hello,world", null)).toEqual("hello,world");
+      // Non-string inputs
+      expect(split(context, 123, ",")).toBe(123);
+      expect(split(context, undefined, ",")).toBe(undefined);
+      expect(split(context, null, ",")).toBe(null);
+      // Invalid limit parameter
+      expect(split(context, "hello,world,test", ",", "invalid")).toEqual([
+        "hello",
+        "world",
+        "test",
+      ]);
+      expect(split(context, "hello,world,test", ",", -1)).toEqual([
+        "hello",
+        "world",
+        "test",
+      ]);
+      expect(split(context, "hello,world,test", ",", 0)).toEqual([
+        "hello",
+        "world",
+        "test",
+      ]);
+      // Empty separator
+      expect(split(context, "hello", "")).toEqual(["hello"]);
+      expect(split(context, "hello world", "")).toEqual(["hello world"]);
+    });
+
+    test("substr", () => {
+      // Basic substring functionality
+      expect(substr(context, "hello world", 0, 5)).toBe("hello");
+      expect(substr(context, "hello world", 6)).toBe("world");
+      expect(substr(context, "hello world", 6, 3)).toBe("wor");
+      // Edge cases
+      expect(substr(context, "hello world", 0)).toBe("hello world");
+      expect(substr(context, "hello world", 100)).toBe("");
+      expect(substr(context, "hello world", 6, 100)).toBe("world");
+      expect(substr(context, "hello world", -3)).toBe("rld");
+      // Non-string inputs
+      expect(substr(context, 123, 0, 2)).toBe(123);
+      expect(substr(context, undefined, 0, 2)).toBe(undefined);
+      expect(substr(context, null, 0, 2)).toBe(null);
+      // Invalid start/length parameters
+      expect(substr(context, "hello world", "invalid", 5)).toBe("hello world");
+      expect(substr(context, "hello world", 0, "invalid")).toBe("hello world");
+      expect(substr(context, "hello world", undefined, 5)).toBe("hello world");
     });
   });
 

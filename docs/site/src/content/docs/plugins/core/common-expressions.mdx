@@ -147,6 +147,30 @@ function replace(
 ): string;
 ```
 
+### split
+
+> Splits a string into an array of substrings based on a separator. Optionally limits the number of splits.
+
+```ts
+function split(
+  value: string,
+  separator: string,
+  limit?: number,
+): Array<string>;
+```
+
+### substr
+
+> Extracts a substring from a string. Supports negative indices to count from the end of the string.
+
+```ts
+function substr(
+  value: string,
+  start: number,
+  length?: number,
+): string;
+```
+
 ### containsAny
 
 > Checks if a given string contains any keywords present in the given array.
