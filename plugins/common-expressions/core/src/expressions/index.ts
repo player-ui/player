@@ -98,6 +98,62 @@ export const sentenceCase = withoutContext(
   ifString((str) => str.replace(/\b[a-zA-Z]/, (word) => word.toUpperCase())),
 );
 
+export const split = withoutContext(
+  (str: unknown, separator: unknown, limit?: unknown) => {
+    if (typeof str !== "string") {
+      return str;
+    }
+
+    if (separator === undefined || separator === null) {
+      return str;
+    }
+
+    const separatorStr = String(separator);
+    
+    // Handle empty separator - return the original string as a single element
+    if (separatorStr === "") {
+      return [str];
+    }
+    
+    const result = str.split(separatorStr);
+
+    if (limit !== undefined && limit !== null) {
+      const limitNum = typeof limit === "number" ? limit : toNum(limit);
+      if (limitNum !== null && limitNum !== undefined && limitNum > 0) {
+        return result.slice(0, limitNum);
+      }
+    }
+
+    return result;
+  },
+);
+
+export const substr = withoutContext(
+  (str: unknown, start: unknown, length?: unknown) => {
+    if (typeof str !== "string") {
+      return str;
+    }
+
+    const startIndex = typeof start === "number" ? start : toNum(start);
+    if (startIndex === null || startIndex === undefined) {
+      return str;
+    }
+
+    // Handle negative indices by converting to positive indices from the end
+    const actualStartIndex = startIndex < 0 ? str.length + startIndex : startIndex;
+
+    if (length !== undefined) {
+      const lengthNum = typeof length === "number" ? length : toNum(length);
+      if (lengthNum === null || lengthNum === undefined) {
+        return str.substring(actualStartIndex);
+      }
+      return str.substring(actualStartIndex, actualStartIndex + lengthNum);
+    }
+
+    return str.substring(actualStartIndex);
+  },
+);
+
 /** Math Types */
 
 export const number = withoutContext(toNum);
