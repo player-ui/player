@@ -30,8 +30,7 @@ Since this repo uses Bazel to build cross-platform, it requires tools that you m
     <tr>
       <td>MacOS</td>
       <td>Sequoia 15.5</td>
-      <td>Update via System Settings. Bazel / Xcode / MacOS are extremely sensitive to each other.
-      Using this <b>exact</b> version is important for iOS development.</td>
+      <td>Update via System Settings. Bazel / Xcode / MacOS are extremely sensitive to each other. This is the version we develop with and know to work. Using versions beyond this might break.</td>
     </tr>
     <tr>
       <td><a href="https://github.com/bazelbuild/bazelisk">bazelisk</a></td>
@@ -52,16 +51,14 @@ Since this repo uses Bazel to build cross-platform, it requires tools that you m
       <td><a href="https://developer.apple.com/download/all/">Xcode</a></td>
       <td>16.3 or 16.4</td>
       <td>Download from Apple. Having this <b>exact</b> Xcode version is extremely important.
-      Bazel / Xcode / MacOS are extremely sensitive to each other. The project may not run
-      with a different version.
+      Bazel / Xcode / MacOS are extremely sensitive to each other. This is the version we develop with and know to work. Using versions beyond this might break.
       </td>
     </tr>
     <tr>
       <td><a href="https://github.com/android/ndk/releases">Android NDK</a></td>
       <td>Use the same version as used by <code>ANDROID_NDK_HOME</code> in our <a href="/.circleci/config.yml">.circleci/config.yml</a></td>
       <td>Find the ndk path. You the parent folder of the toolchains folder. Once you have the path, create or add to a <code>.bazelrc.local</code>:
-      <pre><code>common --repo_env=ANDROID_NDK_HOME="your-absolute-ndk-path-goes-here"
---incompatible_disallow_empty_glob=False</code></pre>
+      <pre><code>common --repo_env=ANDROID_NDK_HOME="your-absolute-ndk-path-goes-here"</code></pre>
     </tr>
     <tr>
       <td>Python</td>
@@ -149,13 +146,16 @@ iOS Development requires a bit more set-up.
 ### To Run
 
 1. Generate the `.xcodeproj` to open and work in Xcode.
-```bash
-bazel run //ios:xcodeproj
-```
+    ```bash
+    bazel run //ios:xcodeproj
+    ```
 1. Open the `.xcodeproj`. If Xcode is your default app for xcodeprojs, you can use this:
-```
-open ios/PlayerUI.xcodeproj/
-```
+    ```
+    open ios/PlayerUI.xcodeproj/
+    ```
+    > [!IMPORTANT]
+    > You may need to regenerate the project when adding new files or modifying targets.
+    > Close Xcode first, then regenerate and re-open.
 1. In Xcode, switch to the `PlayerUIDemo` target. Run the app.
 1. To run the tests, switch to the Test Navigator. You can run any suite directly from Xcode. 
 The Test Navigator may show 0 tests in each suite until you actually run the suite.
