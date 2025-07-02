@@ -16,6 +16,7 @@ import XCTest
 @testable import PlayerUIReferenceAssets
 @testable import PlayerUISwiftUI
 
+@MainActor
 class InfoAssetTests: SwiftUIAssetUnitTestCase {
     override open func plugins() -> [NativePlugin] { [ReferenceAssetsPlugin()] }
 
@@ -72,7 +73,7 @@ class InfoAssetTests: SwiftUIAssetUnitTestCase {
             ]
         )
         let model = AssetViewModel<InfoData>(data)
-        let view = await InfoAssetView(model: model)
+        let view = InfoAssetView(model: model)
 
         let stack = try view.inspect().vStack()
 

@@ -16,6 +16,7 @@ import SwiftUI
 @testable import PlayerUIReferenceAssets
 @testable import PlayerUISwiftUI
 
+@MainActor
 class CollectionAssetTests: SwiftUIAssetUnitTestCase {
     override open func plugins() -> [NativePlugin] { [ReferenceAssetsPlugin()] }
 
@@ -64,7 +65,7 @@ class CollectionAssetTests: SwiftUIAssetUnitTestCase {
             )
         )
 
-        let view = await CollectionAssetView(model: model)
+        let view = CollectionAssetView(model: model)
 
         let stack = try view.inspect().vStack()
 
