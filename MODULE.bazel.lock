@@ -1085,7 +1085,7 @@
         "bzlTransitiveDigest": "W7eunfkzF/jtE/mVzwd+egfU96/pcmOX6zS6ZKAwqD4=",
         "usagesDigest": "qO7yXJ2fkxAWTU2NfvwC9ZB4ovhfvgOcn5jlPeqsybs=",
         "recordedFileInputs": {
-          "@@//xcode/Package.resolved": "5f32b6abae2918b4a52420abffb5ccef6dbaf923747a155445b631f9701ee09b"
+          "@@//xcode/Package.resolved": "e4a85ea49ec895d354570c8c5022a632eb2fd940abdf7e38159c5014531891e7"
         },
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -1145,9 +1145,9 @@
             "repoRuleId": "@@rules_swift_package_manager+//swiftpkg/internal:swift_package.bzl%swift_package",
             "attributes": {
               "bazel_package_name": "swiftpkg_viewinspector",
-              "commit": "67319287749b83f39dcc2f20edd520c610c012fd",
+              "commit": "a6fcac8485bc8f57b2d2b55bb6d97138e8659e4b",
               "remote": "https://github.com/nalexn/ViewInspector",
-              "version": "0.9.10",
+              "version": "0.10.2",
               "env": {},
               "env_inherit": [],
               "init_submodules": false,
