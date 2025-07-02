@@ -29,15 +29,15 @@ class ManagedPlayerUITests: BaseTestCase {
         button1.tap()
 
         let button2 = app.buttons["second_view"].firstMatch
-
         waitFor(button2)
         button2.tap()
 
         let errorText = app.staticTexts["Unclosed brace after \"foo.bar..}\" at character 12"].firstMatch
         waitFor(errorText)
-
+        XCTAssert(errorText.exists, "Error message did not appear")
 
         let retryButton = app.buttons["Retry"].firstMatch
+        XCTAssert(retryButton.exists, "Retry button did not appear")
         retryButton.tap()
 
         waitFor(button2)
