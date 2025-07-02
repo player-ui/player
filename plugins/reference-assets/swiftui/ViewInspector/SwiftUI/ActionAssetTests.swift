@@ -17,12 +17,14 @@ import ViewInspector
 @testable import PlayerUISwiftUI
 @testable import PlayerUIBeaconPlugin
 
+@MainActor
 class ActionAssetTests: SwiftUIAssetUnitTestCase {
     override open func plugins() -> [NativePlugin] { [ReferenceAssetsPlugin()] }
 
     func setup() {
         XCUIApplication().terminate()
     }
+
     func testAssetDecoding() async throws {
         let json = """
         {
@@ -33,7 +35,7 @@ class ActionAssetTests: SwiftUIAssetUnitTestCase {
             "asset": {
               "id": "action-label",
               "type": "text",
-              "value": "Clicked {{count}} times"
+              "value": "Clickoed {{count}} times"
             }
           }
         }
@@ -65,7 +67,7 @@ class ActionAssetTests: SwiftUIAssetUnitTestCase {
 
         let model = AssetViewModel<ActionData>(data)
 
-        let view = await ActionAssetView(model: model)
+        let view = ActionAssetView(model: model)
 
         _ = try view.inspect().button()
 

@@ -18,7 +18,7 @@ import JavaScriptCore
 @testable import PlayerUIReferenceAssets
 @testable import PlayerUISwiftUI
 
-
+@MainActor
 class InputAssetTests: SwiftUIAssetUnitTestCase {
     override open func plugins() -> [NativePlugin] { [ReferenceAssetsPlugin()] }
 
