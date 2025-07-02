@@ -121,14 +121,14 @@ iOS Development requires a bit more set-up.
     You need Apple Silicon homebrew. This will let you run the project without Rosetta. Follow the next step.
 1. If you need to replace Intel homebrew, do the following. Keep in mind that this will remove everything you have installed through homebrew. E.g. existing installations of VSCode, xcodes, rsync, etc.
     1. Delete all your formulas and casks. This is to ensure no conflicts with the new homebrew. If you don’t feel comfortable deleting everything, delete at least bazelisk.
-    ```
-    brew remove --force $(brew list --formula)```
-    brew remove --cask --force $(brew list)
-    ```
+        ```
+        brew remove --force $(brew list --formula)```
+        brew remove --cask --force $(brew list)
+        ```
     1. Delete homebrew
-    ```
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
-    ```
+        ```
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
+        ```
     1. [Install homebrew](https://github.com/homebrew/install?tab=readme-ov-file#install-homebrew-on-macos-or-linux) again. Make sure to follow the steps to add homebrew to your `PATH`.
     1. Run `which brew` and make sure you now have `/opt/homebrew/bin/brew`
 1. (Optional) We recommend using [xcodes](https://github.com/XcodesOrg/xcodes?tab=readme-ov-file#installation) via homebrew to manage multiple Xcode versions. If you have multiple Xcode versions, select the needed version of Xcode:
