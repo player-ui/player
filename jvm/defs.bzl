@@ -1,5 +1,5 @@
 load("@rules_player//kotlin:defs.bzl", _distribution = "distribution", _kt_jvm = "kt_jvm")
-load("@build_constants//:constants.bzl", "VERSION")
+load("//:build_constants.bzl", "VERSION")
 load("//jvm/dependencies:common.bzl", common_main_deps = "main_deps", common_test_deps = "test_deps")
 
 DEFAULT_GROUP = "com.intuit.playerui"

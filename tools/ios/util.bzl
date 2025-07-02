@@ -1,5 +1,3 @@
-load("@rules_pkg//:pkg.bzl", "pkg_zip")
-load("@rules_pkg//:mappings.bzl", "pkg_files", "strip_prefix")
 load("@rules_player//ios:defs.bzl", "ios_pipeline")
 
 default_dependencies = ["//ios/core:PlayerUI"]
