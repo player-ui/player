@@ -30,7 +30,7 @@ executors:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   ios:
     working_directory: ~/player
-    resource_class: m2pro.medium
+    resource_class: m4pro.medium
     macos:
       xcode: 15.3.0
     environment:
