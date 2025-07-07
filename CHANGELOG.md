@@ -1,3 +1,25 @@
+# 0.12.0-next.6 (Mon Jul 07 2025)
+
+### Release Notes
+
+#### feat(common-expressions): add substr and split string functions ([#671](https://github.com/player-ui/player/pull/671))
+
+Added `substr` and `split` functions to common expressions plugin that mirror their javascript implementation
+
+---
+
+#### 🐛 Bug Fix
+
+- feat(common-expressions): add substr and split string functions [#671](https://github.com/player-ui/player/pull/671) ([@tusharagrawa](https://github.com/tusharagrawa) [@KetanReddy](https://github.com/KetanReddy))
+- Update Mac Build Executor to use M4 Pro Medium over M2 Pro Medium [#673](https://github.com/player-ui/player/pull/673) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Tushar Agrawal ([@tusharagrawa](https://github.com/tusharagrawa))
+
+---
+
 # 0.12.0-next.5 (Tue Jun 24 2025)
 
 ### Release Notes
