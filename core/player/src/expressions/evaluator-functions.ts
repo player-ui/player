@@ -64,9 +64,9 @@ export const conditional: ExpressionHandler<
 
 conditional.resolveParams = false;
 
-export const waitFor: ExpressionHandler<[Promise<any>], AwaitableResult<any>> = (
-  ctx,
-  promise,
-) => {
-  return makeAwaitable(promise)
+export const waitFor: ExpressionHandler<
+  [Promise<any>],
+  AwaitableResult<any>
+> = (ctx, promise) => {
+  return makeAwaitable(promise);
 };

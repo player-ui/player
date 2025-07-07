@@ -205,7 +205,7 @@ export interface NavigationFlowAsyncActionState
   exp: Expression;
 
   /** Whether the expression(s) should be awaited before transitioning */
-  await: boolean
+  await: boolean;
 }
 
 /**

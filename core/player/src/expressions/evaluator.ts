@@ -15,14 +15,14 @@ import type {
 } from "./types";
 
 /** a && b -- but handles short cutting if the first value is false */
-const andandOperator: BinaryOperator = (ctx, a, b) => {
-  return LogicalOperators.and(ctx, a, b);
+const andandOperator: BinaryOperator = (ctx, a, b, async) => {
+  return LogicalOperators.and(ctx, a, b, async);
 };
 andandOperator.resolveParams = false;
 
 /** a || b -- but with short cutting if first value is true */
-const ororOperator: BinaryOperator = (ctx, a, b) => {
-  return LogicalOperators.or(ctx, a, b);
+const ororOperator: BinaryOperator = (ctx, a, b, async) => {
+  return LogicalOperators.or(ctx, a, b, async);
 };
 ororOperator.resolveParams = false;
 
@@ -75,11 +75,14 @@ const DEFAULT_UNARY_OPERATORS: Record<string, UnaryOperator> = {
  */
 function makePromiseAwareBinaryOp<T>(
   operation: (a: any, b: any) => T,
-): (a: any, b: any) => T | Promise<T> {
-  return (a: any, b: any) => {
-    if (isAwaitable(a) || isAwaitable(b)) {
-      return collateAwaitable([Promise.resolve(a), Promise.resolve(b)]).awaitableThen(
-        ([resolvedA, resolvedB]) => operation(resolvedA, resolvedB),
+): (a: any, b: any, async: boolean) => T | Promise<T> {
+  return (a: any, b: any, async: boolean) => {
+    if (async && (isAwaitable(a) || isAwaitable(b))) {
+      return collateAwaitable([
+        Promise.resolve(a),
+        Promise.resolve(b),
+      ]).awaitableThen(([resolvedA, resolvedB]) =>
+        operation(resolvedA, resolvedB),
       );
     }
     return operation(a, b);
@@ -91,9 +94,9 @@ function makePromiseAwareBinaryOp<T>(
  */
 function makePromiseAwareUnaryOp<T>(
   operation: (a: any) => T,
-): (a: any) => T | Promise<T> {
-  return (a: any) => {
-    if (isAwaitable(a)) {
+): (a: any, async: boolean) => T | Promise<T> {
+  return (a: any, async: boolean) => {
+    if (async && isAwaitable(a)) {
       return a.awaitableThen((resolved: any) => operation(resolved));
     }
     return operation(a);
@@ -108,8 +111,9 @@ function handleConditionalBranching(
   getTrueBranch: () => any,
   getFalseBranch: () => any,
   resolveNode: (node: any) => any,
+  async: boolean,
 ): any {
-  if (isAwaitable(testValue)) {
+  if (async && isAwaitable(testValue)) {
     return testValue.awaitableThen((resolved: boolean) => {
       const branch = resolved ? getTrueBranch() : getFalseBranch();
       const branchResult = resolveNode(branch);
@@ -131,7 +135,10 @@ const PromiseCollectionHandler = {
   /**
    * Handle array with potential Promise elements
    */
-  handleArray<T>(items: T[]): T[] | Promise<T[]> {
+  handleArray<T>(items: T[], async: boolean): T[] | Promise<T[]> {
+    if (!async) {
+      return items;
+    }
     const hasPromises = items.some((item) => isAwaitable(item));
     return hasPromises ? collateAwaitable(items) : items;
   },
@@ -142,6 +149,7 @@ const PromiseCollectionHandler = {
   handleObject(
     attributes: Array<{ key: any; value: any }>,
     resolveNode: (node: any) => any,
+    async: boolean,
   ): Record<string, any> | Promise<Record<string, any>> {
     const resolvedAttributes: Record<string, any> = {};
     const promises: Promise<void>[] = [];
@@ -151,7 +159,7 @@ const PromiseCollectionHandler = {
       const key = resolveNode(attr.key);
       const value = resolveNode(attr.value);
 
-      if (isAwaitable(key) || isAwaitable(value)) {
+      if (async && (isAwaitable(key) || isAwaitable(value))) {
         hasPromises = true;
         const keyPromise = Promise.resolve(key);
         const valuePromise = Promise.resolve(value);
@@ -178,10 +186,10 @@ const PromiseCollectionHandler = {
  * Smart logical operators that handle short-circuiting with Promises
  */
 const LogicalOperators = {
-  and: (ctx: any, leftNode: any, rightNode: any) => {
+  and: (ctx: any, leftNode: any, rightNode: any, async: boolean) => {
     const leftResult = ctx.evaluate(leftNode);
 
-    if (isAwaitable(leftResult)) {
+    if (async && isAwaitable(leftResult)) {
       return leftResult.awaitableThen((awaitedLeft: any) => {
         if (!awaitedLeft) return awaitedLeft; // Short circuit
         const rightResult = ctx.evaluate(rightNode);
@@ -195,10 +203,10 @@ const LogicalOperators = {
     return leftResult && ctx.evaluate(rightNode);
   },
 
-  or: (ctx: any, leftNode: any, rightNode: any) => {
+  or: (ctx: any, leftNode: any, rightNode: any, async: boolean) => {
     const leftResult = ctx.evaluate(leftNode);
 
-    if (isAwaitable(leftResult)) {
+    if (async && isAwaitable(leftResult)) {
       return leftResult.awaitableThen((awaitedLeft: any) => {
         if (awaitedLeft) return awaitedLeft; // Short circuit
         const rightResult = ctx.evaluate(rightNode);
@@ -350,10 +358,12 @@ export class ExpressionEvaluator {
     options?: ExpressionEvaluatorOptions,
   ): Promise<any> {
     if (Array.isArray(expr)) {
-      return collateAwaitable( expr.map(
-        async (exp) => this.evaluate(exp, { ...options, async: true } as any)
-      )).awaitableThen((values) => {
-        return values.pop()
+      return collateAwaitable(
+        expr.map(async (exp) =>
+          this.evaluate(exp, { ...options, async: true } as any),
+        ),
+      ).awaitableThen((values) => {
+        return values.pop();
       });
     } else {
       return this.evaluate(expr, { ...options, async: true } as any);
@@ -433,6 +443,7 @@ export class ExpressionEvaluator {
     options: HookOptions,
   ): unknown {
     const { resolveNode, model } = options;
+    const isAsync = options.async ?? false;
 
     const expressionContext: ExpressionContext = {
       ...options,
@@ -457,32 +468,33 @@ export class ExpressionEvaluator {
       if (operator) {
         if ("resolveParams" in operator) {
           if (operator.resolveParams === false) {
-            return operator(expressionContext, node.left, node.right);
+            return operator(expressionContext, node.left, node.right, isAsync);
           }
 
           const left = resolveNode(node.left);
           const right = resolveNode(node.right);
 
           // Handle promises in binary operations
-          if (isAwaitable(left) || isAwaitable(right)) {
-            return collateAwaitable([left, right]).awaitableThen(([leftVal, rightVal]) =>
-              operator(expressionContext, leftVal, rightVal),
+          if (options.async && (isAwaitable(left) || isAwaitable(right))) {
+            return collateAwaitable([left, right]).awaitableThen(
+              ([leftVal, rightVal]) =>
+                operator(expressionContext, leftVal, rightVal, isAsync),
             );
           }
 
-          return operator(expressionContext, left, right);
+          return operator(expressionContext, left, right, isAsync);
         }
 
         const left = resolveNode(node.left);
         const right = resolveNode(node.right);
 
-        if (isAwaitable(left) || isAwaitable(right)) {
-          return collateAwaitable([left, right]).awaitableThen(([leftVal, rightVal]) =>
-            operator(leftVal, rightVal),
+        if (options.async && (isAwaitable(left) || isAwaitable(right))) {
+          return collateAwaitable([left, right]).awaitableThen(
+            ([leftVal, rightVal]) => operator(leftVal, rightVal, isAsync),
           );
         }
 
-        return operator(left, right);
+        return operator(left, right, isAsync);
       }
 
       return;
@@ -494,25 +506,27 @@ export class ExpressionEvaluator {
       if (operator) {
         if ("resolveParams" in operator) {
           if (operator.resolveParams === false) {
-            return operator(expressionContext, node.argument);
+            return operator(expressionContext, node.argument, isAsync);
           }
 
           const arg = resolveNode(node.argument);
 
-          if (isAwaitable(arg)) {
-            return arg.awaitableThen((argVal) => operator(expressionContext, argVal));
+          if (options.async && isAwaitable(arg)) {
+            return arg.awaitableThen((argVal) =>
+              operator(expressionContext, argVal, isAsync),
+            );
           }
 
-          return operator(expressionContext, arg);
+          return operator(expressionContext, arg, isAsync);
         }
 
         const arg = resolveNode(node.argument);
 
-        if (isAwaitable(arg)) {
-          return arg.awaitableThen((argVal) => operator(argVal));
+        if (options.async && isAwaitable(arg)) {
+          return arg.awaitableThen((argVal) => operator(argVal, isAsync));
         }
 
-        return operator(arg);
+        return operator(arg, isAsync);
       }
 
       return;
@@ -522,6 +536,7 @@ export class ExpressionEvaluator {
       return PromiseCollectionHandler.handleObject(
         node.attributes,
         resolveNode,
+        options.async || false,
       );
     }
 
@@ -534,8 +549,8 @@ export class ExpressionEvaluator {
         throw new Error(`Unknown expression function: ${expressionName}`);
       }
 
-      if(operator.name === "waitFor" && !options.async){
-        throw new Error('Usage of await outside of async context')
+      if (operator.name === "waitFor" && !options.async) {
+        throw new Error("Usage of await outside of async context");
       }
 
       if ("resolveParams" in operator && operator.resolveParams === false) {
@@ -545,12 +560,14 @@ export class ExpressionEvaluator {
       const args = node.args.map((n) => resolveNode(n));
 
       // Check if any arguments are promises
-      const hasPromises = args.some(isAwaitable);
+      if (options.async) {
+        const hasPromises = args.some(isAwaitable);
 
-      if (hasPromises) {
-        return collateAwaitable(args).awaitableThen((resolvedArgs) =>
-          operator(expressionContext, ...resolvedArgs),
-        );
+        if (hasPromises) {
+          return collateAwaitable(args).awaitableThen((resolvedArgs) =>
+            operator(expressionContext, ...resolvedArgs),
+          );
+        }
       }
 
       return operator(expressionContext, ...args);
@@ -564,7 +581,7 @@ export class ExpressionEvaluator {
       const obj = resolveNode(node.object);
       const prop = resolveNode(node.property);
 
-      if (isAwaitable(obj) || isAwaitable(prop)) {
+      if (options.async && (isAwaitable(obj) || isAwaitable(prop))) {
         return collateAwaitable([obj, prop]).awaitableThen(
           ([objVal, propVal]) => objVal[propVal],
         );
@@ -577,17 +594,18 @@ export class ExpressionEvaluator {
       if (node.left.type === "ModelRef") {
         const value = resolveNode(node.right);
 
-        if(isPromiselike(value)){
-          if (isAwaitable(value)) {
+        if (isPromiselike(value)) {
+          if (options.async && isAwaitable(value)) {
             return value.awaitableThen((resolvedValue) => {
               model.set([[(node.left as any).ref, resolvedValue]]);
               return resolvedValue;
             });
           } else {
-            options.logger?.warn("Unawaited promise written to mode, this behavior is undefined and may change in future releases")
+            options.logger?.warn(
+              "Unawaited promise written to mode, this behavior is undefined and may change in future releases",
+            );
           }
         }
-        
 
         model.set([[(node.left as any).ref, value]]);
         return value;
@@ -596,7 +614,7 @@ export class ExpressionEvaluator {
       if (node.left.type === "Identifier") {
         const value = resolveNode(node.right);
 
-        if (isAwaitable(value)) {
+        if (options.async && isAwaitable(value)) {
           return value.awaitableThen((resolvedValue) => {
             this.vars[(node.left as any).name] = resolvedValue;
             return resolvedValue;
@@ -618,12 +636,13 @@ export class ExpressionEvaluator {
         () => node.consequent,
         () => node.alternate,
         resolveNode,
+        isAsync,
       );
     }
 
     if (node.type === "ArrayExpression") {
       const results = node.elements.map((ele) => resolveNode(ele));
-      return PromiseCollectionHandler.handleArray(results);
+      return PromiseCollectionHandler.handleArray(results, isAsync);
     }
 
     if (node.type === "Modification") {
@@ -634,35 +653,40 @@ export class ExpressionEvaluator {
 
         if ("resolveParams" in operation) {
           if (operation.resolveParams === false) {
-            newValue = operation(expressionContext, node.left, node.right);
+            newValue = operation(
+              expressionContext,
+              node.left,
+              node.right,
+              isAsync,
+            );
           } else {
             const left = resolveNode(node.left);
             const right = resolveNode(node.right);
 
-            if (isAwaitable(left) || isAwaitable(right)) {
+            if (options.async && (isAwaitable(left) || isAwaitable(right))) {
               newValue = collateAwaitable([left, right]).awaitableThen(
                 ([leftVal, rightVal]) =>
-                  operation(expressionContext, leftVal, rightVal),
+                  operation(expressionContext, leftVal, rightVal, isAsync),
               );
             } else {
-              newValue = operation(expressionContext, left, right);
+              newValue = operation(expressionContext, left, right, isAsync);
             }
           }
         } else {
           const left = resolveNode(node.left);
           const right = resolveNode(node.right);
 
-          if (isAwaitable(left) || isAwaitable(right)) {
-            newValue = collateAwaitable([left, right]).awaitableThen(([leftVal, rightVal]) =>
-              operation(leftVal, rightVal),
+          if (options.async && (isAwaitable(left) || isAwaitable(right))) {
+            newValue = collateAwaitable([left, right]).awaitableThen(
+              ([leftVal, rightVal]) => operation(leftVal, rightVal, isAsync),
             );
           } else {
-            newValue = operation(left, right);
+            newValue = operation(left, right, isAsync);
           }
         }
 
         if (node.left.type === "ModelRef") {
-          if (isAwaitable(newValue)) {
+          if (options.async && isAwaitable(newValue)) {
             return newValue.awaitableThen((resolvedValue) => {
               model.set([[(node.left as any).ref, resolvedValue]]);
               return resolvedValue;
@@ -670,7 +694,7 @@ export class ExpressionEvaluator {
           }
           model.set([[(node.left as any).ref, newValue]]);
         } else if (node.left.type === "Identifier") {
-          if (isAwaitable(newValue)) {
+          if (options.async && isAwaitable(newValue)) {
             return newValue.awaitableThen((resolvedValue) => {
               this.vars[(node.left as any).name] = resolvedValue;
               return resolvedValue;
