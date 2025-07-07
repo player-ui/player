@@ -1,7 +1,9 @@
-import { describe, test, expect, beforeEach } from "vitest";
+import { describe, test, expect, beforeEach, vitest } from "vitest";
 import { ExpressionEvaluator } from "../evaluator";
 import { LocalModel, withParser } from "../../data";
 import { BindingParser } from "../../binding";
+import { AwaitableSymbol } from "../async";
+import { Logger } from "../../logger";
 
 describe("async conditional expressions", () => {
   let evaluator: ExpressionEvaluator;
@@ -33,12 +35,12 @@ describe("async conditional expressions", () => {
     });
 
     // Test with async false condition - should return Promise
-    const falseResult = evaluator.evaluate("asyncFalse() ? 'yes' : 'no'");
+    const falseResult = evaluator.evaluateAsync("await(asyncFalse()) ? 'yes' : 'no'");
     expect(falseResult).toBeInstanceOf(Promise);
     expect(await falseResult).toBe("no");
 
     // Test with async true condition - should return Promise
-    const trueResult = evaluator.evaluate("asyncTrue() ? 'yes' : 'no'");
+    const trueResult = evaluator.evaluateAsync("await(asyncTrue()) ? 'yes' : 'no'");
     expect(trueResult).toBeInstanceOf(Promise);
     expect(await trueResult).toBe("yes");
   });
@@ -69,24 +71,24 @@ describe("async conditional expressions", () => {
     });
 
     // Test && with async left side (false)
-    const andFalseResult = evaluator.evaluate("asyncFalse() && true");
+    const andFalseResult = evaluator.evaluateAsync("await(asyncFalse()) && true");
     expect(andFalseResult).toBeInstanceOf(Promise);
     expect(await andFalseResult).toBe(false);
 
     // Test && with async left side (true)
-    const andTrueResult = evaluator.evaluate("asyncTrue() && 'right-side'");
+    const andTrueResult = evaluator.evaluateAsync("await(asyncTrue()) && 'right-side'");
     expect(andTrueResult).toBeInstanceOf(Promise);
     expect(await andTrueResult).toBe("right-side");
 
     // Test || with async left side (true)
-    const orTrueResult = evaluator.evaluate(
-      "asyncTrue() || 'should-not-evaluate'",
+    const orTrueResult = evaluator.evaluateAsync(
+      "await(asyncTrue()) || 'should-not-evaluate'",
     );
     expect(orTrueResult).toBeInstanceOf(Promise);
     expect(await orTrueResult).toBe(true);
 
     // Test || with async left side (false)
-    const orFalseResult = evaluator.evaluate("asyncFalse() || 'right-side'");
+    const orFalseResult = evaluator.evaluateAsync("await(asyncFalse()) || 'right-side'");
     expect(orFalseResult).toBeInstanceOf(Promise);
     expect(await orFalseResult).toBe("right-side");
   });
@@ -100,8 +102,8 @@ describe("async conditional expressions", () => {
       return Promise.resolve(false);
     });
 
-    const result = evaluator.evaluate(
-      "asyncTrue() ? (asyncFalse() ? 'inner-true' : 'inner-false') : 'outer-false'",
+    const result = evaluator.evaluateAsync(
+      "await(asyncTrue()) ? (await(asyncFalse()) ? 'inner-true' : 'inner-false') : 'outer-false'",
     );
     expect(result).toBeInstanceOf(Promise);
     expect(await result).toBe("inner-false");
@@ -117,8 +119,8 @@ describe("async conditional expressions", () => {
       },
     );
 
-    const result = evaluator.evaluate(
-      "delayedValue(false, 1) && delayedValue(true, 1) ? delayedValue('should-not-reach', 1) : delayedValue('correct', 1)",
+    const result = evaluator.evaluateAsync(
+      "await(delayedValue(false, 1)) && await(delayedValue(true, 1)) ? await(delayedValue('should-not-reach', 1)) : await(delayedValue('correct', 1))",
     );
 
     expect(result).toBeInstanceOf(Promise);
@@ -135,11 +137,11 @@ describe("async conditional expressions", () => {
     });
 
     // Test !async
-    const notTrueResult = evaluator.evaluate("!asyncTrue()");
+    const notTrueResult = evaluator.evaluateAsync("!await(asyncTrue())");
     expect(notTrueResult).toBeInstanceOf(Promise);
     expect(await notTrueResult).toBe(false);
 
-    const notFalseResult = evaluator.evaluate("!asyncFalse()");
+    const notFalseResult = evaluator.evaluateAsync("!await(asyncFalse())");
     expect(notFalseResult).toBeInstanceOf(Promise);
     expect(await notFalseResult).toBe(true);
   });
@@ -150,22 +152,22 @@ describe("async conditional expressions", () => {
     });
 
     // Test equality
-    const eqResult = evaluator.evaluate("asyncValue(5) == 5");
+    const eqResult = evaluator.evaluateAsync("await(asyncValue(5)) == 5");
     expect(eqResult).toBeInstanceOf(Promise);
     expect(await eqResult).toBe(true);
 
     // Test strict equality
-    const strictEqResult = evaluator.evaluate("asyncValue(5) === 5");
+    const strictEqResult = evaluator.evaluateAsync("await(asyncValue(5)) === 5");
     expect(strictEqResult).toBeInstanceOf(Promise);
     expect(await strictEqResult).toBe(true);
 
     // Test greater than
-    const gtResult = evaluator.evaluate("asyncValue(10) > 5");
+    const gtResult = evaluator.evaluateAsync("await(asyncValue(10)) > 5");
     expect(gtResult).toBeInstanceOf(Promise);
     expect(await gtResult).toBe(true);
 
     // Test less than
-    const ltResult = evaluator.evaluate("asyncValue(3) < 5");
+    const ltResult = evaluator.evaluateAsync("await(asyncValue(3)) < 5");
     expect(ltResult).toBeInstanceOf(Promise);
     expect(await ltResult).toBe(true);
   });
@@ -175,7 +177,7 @@ describe("async conditional expressions", () => {
       return Promise.resolve(val);
     });
 
-    const result = evaluator.evaluate("[1, asyncValue(2), 3, asyncValue(4)]");
+    const result = evaluator.evaluateAsync("[1, await(asyncValue(2)), 3, await(asyncValue(4))]");
     expect(result).toBeInstanceOf(Promise);
     expect(await result).toEqual([1, 2, 3, 4]);
   });
@@ -185,7 +187,7 @@ describe("async conditional expressions", () => {
       return Promise.resolve(val);
     });
 
-    const result = evaluator.evaluate('{"sync": 1, "async": asyncValue(2)}');
+    const result = evaluator.evaluateAsync('{"sync": 1, "async": await(asyncValue(2))}');
     expect(result).toBeInstanceOf(Promise);
     expect(await result).toEqual({ sync: 1, async: 2 });
   });
@@ -200,8 +202,8 @@ describe("async conditional expressions", () => {
     });
 
     // Complex expression combining multiple async features
-    const result = evaluator.evaluate(
-      "asyncTrue() && asyncValue(5) > 3 ? [asyncValue(1), asyncValue(2)] : []",
+    const result = evaluator.evaluateAsync(
+      "await(asyncTrue()) && await(asyncValue(5)) > 3 ? [await(asyncValue(1)), await(asyncValue(2))] : []",
     );
 
     expect(result).toBeInstanceOf(Promise);
@@ -214,8 +216,8 @@ describe("async conditional expressions", () => {
     });
 
     // This should handle the case where some parts are async and others are sync
-    const result = evaluator.evaluate(
-      "true && asyncValue(false) ? 'should-not-reach' : 'correct'",
+    const result = evaluator.evaluateAsync(
+      "true && await(asyncValue(false)) ? 'should-not-reach' : 'correct'",
     );
 
     expect(result).toBeInstanceOf(Promise);
@@ -244,3 +246,62 @@ describe("async conditional expressions", () => {
     expect(model.get("local.test")).toBe("FALSE");
   });
 });
+
+describe('Async usage in sync evaluation', () => {
+    let evaluator: ExpressionEvaluator;
+  let model: any;
+
+  beforeEach(() => {
+    const bindingParser = new BindingParser();
+    model = withParser(
+      new LocalModel({}),
+      bindingParser.parse.bind(bindingParser),
+    );
+    evaluator = new ExpressionEvaluator({ model });
+  });
+
+  test('Expect await usage to throw an error', () => {
+     // Add an async function that returns false
+    evaluator.addExpressionFunction("asyncFalse", async () => {
+      return Promise.resolve(false);
+    });
+
+    expect(() => evaluator.evaluate("await(asyncFalse())")).toThrowErrorMatchingInlineSnapshot(`[NestedError: Error evaluating expression: await(asyncFalse())]`)
+  })
+
+})
+
+describe('Undefined behavior warnings', () => {
+  let evaluator: ExpressionEvaluator;
+  let model: any;
+  let mockLogger: Logger
+
+  beforeEach(() => {
+    mockLogger = {
+      trace: vitest.fn(),
+      debug: vitest.fn(),
+      info: vitest.fn(),
+      warn: vitest.fn(),
+      error: vitest.fn()
+    }
+
+    const bindingParser = new BindingParser();
+    model = withParser(
+      new LocalModel({}),
+      bindingParser.parse.bind(bindingParser),
+    );
+    evaluator = new ExpressionEvaluator({ model, logger: mockLogger });
+  });
+
+  test('Model assignment', () => {
+     // Add an async function that returns false
+    evaluator.addExpressionFunction("asyncFalse", async () => {
+      return Promise.resolve(false);
+    });
+
+    evaluator.evaluate("{{some.path}} = asyncFalse()")
+
+    expect(mockLogger.warn).toHaveBeenCalledWith("Unawaited promise written to mode, this behavior is undefined and may change in future releases")
+  })
+
+})

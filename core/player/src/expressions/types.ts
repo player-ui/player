@@ -61,7 +61,7 @@ export type ExpressionHandler<
 > = ((context: ExpressionContext, ...args: T) => R) &
   Partial<OperatorProcessingOptions>;
 
-export const ExpNodeOpaqueIdentifier = Symbol("Expression Node ID");
+export const ExpNodeOpaqueIdentifier: unique symbol = Symbol("Expression Node ID");
 
 /** Checks if the input is an already processed Expression node */
 export function isExpressionNode(x: any): x is ExpressionNode {

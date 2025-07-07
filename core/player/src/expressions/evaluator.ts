@@ -2,6 +2,7 @@ import { SyncWaterfallHook, SyncBailHook } from "tapable-ts";
 import { NestedError } from "ts-nested-error";
 import { parseExpression } from "./parser";
 import * as DEFAULT_EXPRESSION_HANDLERS from "./evaluator-functions";
+import { collateAwaitable, isAwaitable, isPromiselike } from "./async";
 import { isExpressionNode } from "./types";
 import { isObjectExpression } from "./utils";
 import type {
@@ -70,33 +71,14 @@ const DEFAULT_UNARY_OPERATORS: Record<string, UnaryOperator> = {
 };
 
 /**
- * Promise detection that handles various Promise implementations
- * and reduces false positives from objects with coincidental 'then' methods
- */
-function isPromiselike(value: any): value is Promise<any> {
-  return (
-    value != null &&
-    typeof value === "object" &&
-    typeof value.then === "function" &&
-    // Additional safeguards against false positives
-    (value instanceof Promise ||
-      // Check for standard Promise constructor name
-      value.constructor?.name === "Promise" ||
-      // Verify it has other Promise-like methods to reduce false positives
-      (typeof value.catch === "function" &&
-        typeof value.finally === "function"))
-  );
-}
-
-/**
  * Higher-order function that makes any binary operation Promise-aware
  */
 function makePromiseAwareBinaryOp<T>(
   operation: (a: any, b: any) => T,
 ): (a: any, b: any) => T | Promise<T> {
   return (a: any, b: any) => {
-    if (isPromiselike(a) || isPromiselike(b)) {
-      return Promise.all([Promise.resolve(a), Promise.resolve(b)]).then(
+    if (isAwaitable(a) || isAwaitable(b)) {
+      return collateAwaitable([Promise.resolve(a), Promise.resolve(b)]).awaitableThen(
         ([resolvedA, resolvedB]) => operation(resolvedA, resolvedB),
       );
     }
@@ -111,8 +93,8 @@ function makePromiseAwareUnaryOp<T>(
   operation: (a: any) => T,
 ): (a: any) => T | Promise<T> {
   return (a: any) => {
-    if (isPromiselike(a)) {
-      return a.then((resolved: any) => operation(resolved));
+    if (isAwaitable(a)) {
+      return a.awaitableThen((resolved: any) => operation(resolved));
     }
     return operation(a);
   };
@@ -127,13 +109,13 @@ function handleConditionalBranching(
   getFalseBranch: () => any,
   resolveNode: (node: any) => any,
 ): any {
-  if (isPromiselike(testValue)) {
-    return testValue.then((resolved: boolean) => {
+  if (isAwaitable(testValue)) {
+    return testValue.awaitableThen((resolved: boolean) => {
       const branch = resolved ? getTrueBranch() : getFalseBranch();
       const branchResult = resolveNode(branch);
-      return isPromiselike(branchResult)
-        ? branchResult
-        : Promise.resolve(branchResult);
+      return isAwaitable(branchResult)
+        ? Promise.resolve(branchResult)
+        : branchResult;
     });
   }
 
@@ -150,8 +132,8 @@ const PromiseCollectionHandler = {
    * Handle array with potential Promise elements
    */
   handleArray<T>(items: T[]): T[] | Promise<T[]> {
-    const hasPromises = items.some((item) => isPromiselike(item));
-    return hasPromises ? Promise.all(items) : items;
+    const hasPromises = items.some((item) => isAwaitable(item));
+    return hasPromises ? collateAwaitable(items) : items;
   },
 
   /**
@@ -169,13 +151,13 @@ const PromiseCollectionHandler = {
       const key = resolveNode(attr.key);
       const value = resolveNode(attr.value);
 
-      if (isPromiselike(key) || isPromiselike(value)) {
+      if (isAwaitable(key) || isAwaitable(value)) {
         hasPromises = true;
         const keyPromise = Promise.resolve(key);
         const valuePromise = Promise.resolve(value);
 
         promises.push(
-          Promise.all([keyPromise, valuePromise]).then(
+          collateAwaitable([keyPromise, valuePromise]).awaitableThen(
             ([resolvedKey, resolvedValue]) => {
               resolvedAttributes[resolvedKey] = resolvedValue;
             },
@@ -187,7 +169,7 @@ const PromiseCollectionHandler = {
     });
 
     return hasPromises
-      ? Promise.all(promises).then(() => resolvedAttributes)
+      ? collateAwaitable(promises).awaitableThen(() => resolvedAttributes)
       : resolvedAttributes;
   },
 };
@@ -199,11 +181,11 @@ const LogicalOperators = {
   and: (ctx: any, leftNode: any, rightNode: any) => {
     const leftResult = ctx.evaluate(leftNode);
 
-    if (isPromiselike(leftResult)) {
-      return leftResult.then((awaitedLeft: any) => {
+    if (isAwaitable(leftResult)) {
+      return leftResult.awaitableThen((awaitedLeft: any) => {
         if (!awaitedLeft) return awaitedLeft; // Short circuit
         const rightResult = ctx.evaluate(rightNode);
-        return isPromiselike(rightResult)
+        return isAwaitable(rightResult)
           ? rightResult
           : Promise.resolve(rightResult);
       });
@@ -216,11 +198,11 @@ const LogicalOperators = {
   or: (ctx: any, leftNode: any, rightNode: any) => {
     const leftResult = ctx.evaluate(leftNode);
 
-    if (isPromiselike(leftResult)) {
-      return leftResult.then((awaitedLeft: any) => {
+    if (isAwaitable(leftResult)) {
+      return leftResult.awaitableThen((awaitedLeft: any) => {
         if (awaitedLeft) return awaitedLeft; // Short circuit
         const rightResult = ctx.evaluate(rightNode);
-        return isPromiselike(rightResult)
+        return isAwaitable(rightResult)
           ? rightResult
           : Promise.resolve(rightResult);
       });
@@ -363,11 +345,19 @@ export class ExpressionEvaluator {
     return this._execString(String(expression), resolvedOpts);
   }
 
-  public evaluateAsync(
+  public async evaluateAsync(
     expr: ExpressionType,
     options?: ExpressionEvaluatorOptions,
   ): Promise<any> {
-    return this.evaluate(expr, { ...options, async: true } as any);
+    if (Array.isArray(expr)) {
+      return collateAwaitable( expr.map(
+        async (exp) => this.evaluate(exp, { ...options, async: true } as any)
+      )).awaitableThen((values) => {
+        return values.pop()
+      });
+    } else {
+      return this.evaluate(expr, { ...options, async: true } as any);
+    }
   }
 
   public addExpressionFunction<T extends readonly unknown[], R>(
@@ -474,8 +464,8 @@ export class ExpressionEvaluator {
           const right = resolveNode(node.right);
 
           // Handle promises in binary operations
-          if (isPromiselike(left) || isPromiselike(right)) {
-            return Promise.all([left, right]).then(([leftVal, rightVal]) =>
+          if (isAwaitable(left) || isAwaitable(right)) {
+            return collateAwaitable([left, right]).awaitableThen(([leftVal, rightVal]) =>
               operator(expressionContext, leftVal, rightVal),
             );
           }
@@ -486,8 +476,8 @@ export class ExpressionEvaluator {
         const left = resolveNode(node.left);
         const right = resolveNode(node.right);
 
-        if (isPromiselike(left) || isPromiselike(right)) {
-          return Promise.all([left, right]).then(([leftVal, rightVal]) =>
+        if (isAwaitable(left) || isAwaitable(right)) {
+          return collateAwaitable([left, right]).awaitableThen(([leftVal, rightVal]) =>
             operator(leftVal, rightVal),
           );
         }
@@ -509,8 +499,8 @@ export class ExpressionEvaluator {
 
           const arg = resolveNode(node.argument);
 
-          if (isPromiselike(arg)) {
-            return arg.then((argVal) => operator(expressionContext, argVal));
+          if (isAwaitable(arg)) {
+            return arg.awaitableThen((argVal) => operator(expressionContext, argVal));
           }
 
           return operator(expressionContext, arg);
@@ -518,8 +508,8 @@ export class ExpressionEvaluator {
 
         const arg = resolveNode(node.argument);
 
-        if (isPromiselike(arg)) {
-          return arg.then((argVal) => operator(argVal));
+        if (isAwaitable(arg)) {
+          return arg.awaitableThen((argVal) => operator(argVal));
         }
 
         return operator(arg);
@@ -544,6 +534,10 @@ export class ExpressionEvaluator {
         throw new Error(`Unknown expression function: ${expressionName}`);
       }
 
+      if(operator.name === "waitFor" && !options.async){
+        throw new Error('Usage of await outside of async context')
+      }
+
       if ("resolveParams" in operator && operator.resolveParams === false) {
         return operator(expressionContext, ...node.args);
       }
@@ -551,10 +545,10 @@ export class ExpressionEvaluator {
       const args = node.args.map((n) => resolveNode(n));
 
       // Check if any arguments are promises
-      const hasPromises = args.some(isPromiselike);
+      const hasPromises = args.some(isAwaitable);
 
       if (hasPromises) {
-        return Promise.all(args).then((resolvedArgs) =>
+        return collateAwaitable(args).awaitableThen((resolvedArgs) =>
           operator(expressionContext, ...resolvedArgs),
         );
       }
@@ -570,8 +564,8 @@ export class ExpressionEvaluator {
       const obj = resolveNode(node.object);
       const prop = resolveNode(node.property);
 
-      if (isPromiselike(obj) || isPromiselike(prop)) {
-        return Promise.all([obj, prop]).then(
+      if (isAwaitable(obj) || isAwaitable(prop)) {
+        return collateAwaitable([obj, prop]).awaitableThen(
           ([objVal, propVal]) => objVal[propVal],
         );
       }
@@ -583,12 +577,17 @@ export class ExpressionEvaluator {
       if (node.left.type === "ModelRef") {
         const value = resolveNode(node.right);
 
-        if (isPromiselike(value)) {
-          return value.then((resolvedValue) => {
-            model.set([[(node.left as any).ref, resolvedValue]]);
-            return resolvedValue;
-          });
+        if(isPromiselike(value)){
+          if (isAwaitable(value)) {
+            return value.awaitableThen((resolvedValue) => {
+              model.set([[(node.left as any).ref, resolvedValue]]);
+              return resolvedValue;
+            });
+          } else {
+            options.logger?.warn("Unawaited promise written to mode, this behavior is undefined and may change in future releases")
+          }
         }
+        
 
         model.set([[(node.left as any).ref, value]]);
         return value;
@@ -597,8 +596,8 @@ export class ExpressionEvaluator {
       if (node.left.type === "Identifier") {
         const value = resolveNode(node.right);
 
-        if (isPromiselike(value)) {
-          return value.then((resolvedValue) => {
+        if (isAwaitable(value)) {
+          return value.awaitableThen((resolvedValue) => {
             this.vars[(node.left as any).name] = resolvedValue;
             return resolvedValue;
           });
@@ -640,8 +639,8 @@ export class ExpressionEvaluator {
             const left = resolveNode(node.left);
             const right = resolveNode(node.right);
 
-            if (isPromiselike(left) || isPromiselike(right)) {
-              newValue = Promise.all([left, right]).then(
+            if (isAwaitable(left) || isAwaitable(right)) {
+              newValue = collateAwaitable([left, right]).awaitableThen(
                 ([leftVal, rightVal]) =>
                   operation(expressionContext, leftVal, rightVal),
               );
@@ -653,8 +652,8 @@ export class ExpressionEvaluator {
           const left = resolveNode(node.left);
           const right = resolveNode(node.right);
 
-          if (isPromiselike(left) || isPromiselike(right)) {
-            newValue = Promise.all([left, right]).then(([leftVal, rightVal]) =>
+          if (isAwaitable(left) || isAwaitable(right)) {
+            newValue = collateAwaitable([left, right]).awaitableThen(([leftVal, rightVal]) =>
               operation(leftVal, rightVal),
             );
           } else {
@@ -663,16 +662,16 @@ export class ExpressionEvaluator {
         }
 
         if (node.left.type === "ModelRef") {
-          if (isPromiselike(newValue)) {
-            return newValue.then((resolvedValue) => {
+          if (isAwaitable(newValue)) {
+            return newValue.awaitableThen((resolvedValue) => {
               model.set([[(node.left as any).ref, resolvedValue]]);
               return resolvedValue;
             });
           }
           model.set([[(node.left as any).ref, newValue]]);
         } else if (node.left.type === "Identifier") {
-          if (isPromiselike(newValue)) {
-            return newValue.then((resolvedValue) => {
+          if (isAwaitable(newValue)) {
+            return newValue.awaitableThen((resolvedValue) => {
               this.vars[(node.left as any).name] = resolvedValue;
               return resolvedValue;
             });

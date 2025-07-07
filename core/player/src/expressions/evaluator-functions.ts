@@ -6,6 +6,7 @@ import type {
   ExpressionContext,
   ExpressionNode,
 } from "./types";
+import { AwaitableResult, isAwaitable, makeAwaitable } from "./async";
 
 /** Sets a value to the data-model */
 export const setDataVal: ExpressionHandler<[Binding, any], any> = (
@@ -39,8 +40,8 @@ export const conditional: ExpressionHandler<
   const testResult = ctx.evaluate(condition);
 
   // Handle Promise case automatically (same pattern as ternary operator)
-  if (testResult instanceof Promise) {
-    return testResult.then((resolvedTest: any) => {
+  if (isAwaitable(testResult)) {
+    return testResult.awaitableThen((resolvedTest: any) => {
       if (resolvedTest) {
         return ctx.evaluate(ifTrue);
       }
@@ -63,9 +64,9 @@ export const conditional: ExpressionHandler<
 
 conditional.resolveParams = false;
 
-export const waitFor: ExpressionHandler<[Promise<any>], any> = async (
+export const waitFor: ExpressionHandler<[Promise<any>], AwaitableResult<any>> = (
   ctx,
   promise,
 ) => {
-  return await promise;
+  return makeAwaitable(promise)
 };
