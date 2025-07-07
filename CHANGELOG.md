@@ -1,3 +1,93 @@
+# 0.12.0-next.7 (Mon Jul 07 2025)
+
+#### 🐛 Bug Fix
+
+- Revert "Fix/react 18 cleanup" [#675](https://github.com/player-ui/player/pull/675) ([@spentacular](https://github.com/spentacular))
+- Fix/react 18 cleanup [#674](https://github.com/player-ui/player/pull/674) ([@spentacular](https://github.com/spentacular) [@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.12.0-next.6 (Mon Jul 07 2025)
+
+### Release Notes
+
+#### feat(common-expressions): add substr and split string functions ([#671](https://github.com/player-ui/player/pull/671))
+
+Added `substr` and `split` functions to common expressions plugin that mirror their javascript implementation
+
+---
+
+#### 🐛 Bug Fix
+
+- feat(common-expressions): add substr and split string functions [#671](https://github.com/player-ui/player/pull/671) ([@tusharagrawa](https://github.com/tusharagrawa) [@KetanReddy](https://github.com/KetanReddy))
+- Update Mac Build Executor to use M4 Pro Medium over M2 Pro Medium [#673](https://github.com/player-ui/player/pull/673) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Tushar Agrawal ([@tusharagrawa](https://github.com/tusharagrawa))
+
+---
+
+# 0.12.0-next.5 (Tue Jun 24 2025)
+
+### Release Notes
+
+#### Fix transforms on assets with `applicability` ([#668](https://github.com/player-ui/player/pull/668))
+
+Move `AssetTransformCorePlugin` application after `applicability` and `switch` view plugins to ensure transforms properly apply to conditional assets.
+
+---
+
+#### 🐛 Bug Fix
+
+- Fix transforms on assets with `applicability` [#668](https://github.com/player-ui/player/pull/668) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### Authors: 1
+
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+
+---
+
+# 0.12.0-next.4 (Wed Jun 18 2025)
+
+### Release Notes
+
+#### Updated docs, platform param ([#660](https://github.com/player-ui/player/pull/660))
+
+Updated contributing docs to include information around how the docs site is generated, re-added platform param capability so that the URL updates based on platform tab, updated team page.
+
+---
+
+#### 🐛 Bug Fix
+
+- Updated docs, platform param [#660](https://github.com/player-ui/player/pull/660) ([@kharrop](https://github.com/kharrop))
+
+#### Authors: 1
+
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+
+---
+
+# 0.12.0-next.3 (Tue Jun 10 2025)
+
+#### 🐛 Bug Fix
+
+- Central Portal Migration [#662](https://github.com/player-ui/player/pull/662) ([@sugarmanz](https://github.com/sugarmanz))
+- Prebuild Publishing Targets to Miinimize Chances of Releases Breaking [#650](https://github.com/player-ui/player/pull/650) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.12.0-next.2 (Wed Jun 04 2025)
 
 ### Release Notes
