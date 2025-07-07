@@ -1,3 +1,17 @@
+# 0.12.0-next.7 (Mon Jul 07 2025)
+
+#### 🐛 Bug Fix
+
+- Revert "Fix/react 18 cleanup" [#675](https://github.com/player-ui/player/pull/675) ([@spentacular](https://github.com/spentacular))
+- Fix/react 18 cleanup [#674](https://github.com/player-ui/player/pull/674) ([@spentacular](https://github.com/spentacular) [@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
 # 0.12.0-next.6 (Mon Jul 07 2025)
 
 ### Release Notes
