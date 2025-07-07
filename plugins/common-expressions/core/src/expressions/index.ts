@@ -98,6 +98,56 @@ export const sentenceCase = withoutContext(
   ifString((str) => str.replace(/\b[a-zA-Z]/, (word) => word.toUpperCase())),
 );
 
+// split: Splits a string into an array of substrings based on a separator.
+// Deviations from JS:
+// - If separator is undefined or null, returns the original string (JS would throw TypeError)
+// - If separator is an empty string, splits at every character (matches JS)
+export const split = withoutContext(
+  (str: string, separator: string, limit?: number) => {
+    // If separator is undefined or null, return the original string (custom: JS throws an error)
+    if (separator === undefined || separator === null) {
+      return str;
+    }
+
+    const separatorStr = String(separator);
+
+    // JS behavior: empty string separator splits at every character
+    if (separatorStr === "") {
+      const result = str.split("");
+      if (limit !== undefined && limit !== null && limit > 0) {
+        return result.slice(0, limit);
+      }
+      return result;
+    }
+
+    // Standard JS split behavior for non-empty separator
+    const result = str.split(separatorStr);
+
+    if (limit !== undefined && limit !== null && limit > 0) {
+      return result.slice(0, limit);
+    }
+
+    return result;
+  },
+);
+
+// substr: Extracts a substring from a string.
+// Deviations from JS:
+// - Negative start index counts from the end (JS substring does not support negative indices)
+// - Uses substring logic, not deprecated substr
+export const substr = withoutContext(
+  (str: string, start: number, length?: number) => {
+    // Custom: Negative start index counts from the end (matches array behavior, not JS substring)
+    const actualStartIndex = start < 0 ? str.length + start : start;
+
+    if (length !== undefined) {
+      return str.substring(actualStartIndex, actualStartIndex + length);
+    }
+
+    return str.substring(actualStartIndex);
+  },
+);
+
 /** Math Types */
 
 export const number = withoutContext(toNum);
