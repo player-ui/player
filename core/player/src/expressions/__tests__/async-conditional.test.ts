@@ -2,7 +2,6 @@ import { describe, test, expect, beforeEach, vitest } from "vitest";
 import { ExpressionEvaluator } from "../evaluator";
 import { LocalModel, withParser } from "../../data";
 import { BindingParser } from "../../binding";
-import { AwaitableSymbol } from "../async";
 import { Logger } from "../../logger";
 
 describe("async conditional expressions", () => {
@@ -35,12 +34,16 @@ describe("async conditional expressions", () => {
     });
 
     // Test with async false condition - should return Promise
-    const falseResult = evaluator.evaluateAsync("await(asyncFalse()) ? 'yes' : 'no'");
+    const falseResult = evaluator.evaluateAsync(
+      "await(asyncFalse()) ? 'yes' : 'no'",
+    );
     expect(falseResult).toBeInstanceOf(Promise);
     expect(await falseResult).toBe("no");
 
     // Test with async true condition - should return Promise
-    const trueResult = evaluator.evaluateAsync("await(asyncTrue()) ? 'yes' : 'no'");
+    const trueResult = evaluator.evaluateAsync(
+      "await(asyncTrue()) ? 'yes' : 'no'",
+    );
     expect(trueResult).toBeInstanceOf(Promise);
     expect(await trueResult).toBe("yes");
   });
@@ -71,12 +74,16 @@ describe("async conditional expressions", () => {
     });
 
     // Test && with async left side (false)
-    const andFalseResult = evaluator.evaluateAsync("await(asyncFalse()) && true");
+    const andFalseResult = evaluator.evaluateAsync(
+      "await(asyncFalse()) && true",
+    );
     expect(andFalseResult).toBeInstanceOf(Promise);
     expect(await andFalseResult).toBe(false);
 
     // Test && with async left side (true)
-    const andTrueResult = evaluator.evaluateAsync("await(asyncTrue()) && 'right-side'");
+    const andTrueResult = evaluator.evaluateAsync(
+      "await(asyncTrue()) && 'right-side'",
+    );
     expect(andTrueResult).toBeInstanceOf(Promise);
     expect(await andTrueResult).toBe("right-side");
 
@@ -88,7 +95,9 @@ describe("async conditional expressions", () => {
     expect(await orTrueResult).toBe(true);
 
     // Test || with async left side (false)
-    const orFalseResult = evaluator.evaluateAsync("await(asyncFalse()) || 'right-side'");
+    const orFalseResult = evaluator.evaluateAsync(
+      "await(asyncFalse()) || 'right-side'",
+    );
     expect(orFalseResult).toBeInstanceOf(Promise);
     expect(await orFalseResult).toBe("right-side");
   });
@@ -157,7 +166,9 @@ describe("async conditional expressions", () => {
     expect(await eqResult).toBe(true);
 
     // Test strict equality
-    const strictEqResult = evaluator.evaluateAsync("await(asyncValue(5)) === 5");
+    const strictEqResult = evaluator.evaluateAsync(
+      "await(asyncValue(5)) === 5",
+    );
     expect(strictEqResult).toBeInstanceOf(Promise);
     expect(await strictEqResult).toBe(true);
 
@@ -177,7 +188,9 @@ describe("async conditional expressions", () => {
       return Promise.resolve(val);
     });
 
-    const result = evaluator.evaluateAsync("[1, await(asyncValue(2)), 3, await(asyncValue(4))]");
+    const result = evaluator.evaluateAsync(
+      "[1, await(asyncValue(2)), 3, await(asyncValue(4))]",
+    );
     expect(result).toBeInstanceOf(Promise);
     expect(await result).toEqual([1, 2, 3, 4]);
   });
@@ -187,7 +200,9 @@ describe("async conditional expressions", () => {
       return Promise.resolve(val);
     });
 
-    const result = evaluator.evaluateAsync('{"sync": 1, "async": await(asyncValue(2))}');
+    const result = evaluator.evaluateAsync(
+      '{"sync": 1, "async": await(asyncValue(2))}',
+    );
     expect(result).toBeInstanceOf(Promise);
     expect(await result).toEqual({ sync: 1, async: 2 });
   });
@@ -247,8 +262,8 @@ describe("async conditional expressions", () => {
   });
 });
 
-describe('Async usage in sync evaluation', () => {
-    let evaluator: ExpressionEvaluator;
+describe("Async usage in sync evaluation", () => {
+  let evaluator: ExpressionEvaluator;
   let model: any;
 
   beforeEach(() => {
@@ -260,21 +275,24 @@ describe('Async usage in sync evaluation', () => {
     evaluator = new ExpressionEvaluator({ model });
   });
 
-  test('Expect await usage to throw an error', () => {
-     // Add an async function that returns false
+  test("Expect await usage to throw an error", () => {
+    // Add an async function that returns false
     evaluator.addExpressionFunction("asyncFalse", async () => {
       return Promise.resolve(false);
     });
 
-    expect(() => evaluator.evaluate("await(asyncFalse())")).toThrowErrorMatchingInlineSnapshot(`[NestedError: Error evaluating expression: await(asyncFalse())]`)
-  })
+    expect(() =>
+      evaluator.evaluate("await(asyncFalse())"),
+    ).toThrowErrorMatchingInlineSnapshot(
+      `[NestedError: Error evaluating expression: await(asyncFalse())]`,
+    );
+  });
+});
 
-})
-
-describe('Undefined behavior warnings', () => {
+describe("Undefined behavior warnings", () => {
   let evaluator: ExpressionEvaluator;
   let model: any;
-  let mockLogger: Logger
+  let mockLogger: Logger;
 
   beforeEach(() => {
     mockLogger = {
@@ -282,8 +300,8 @@ describe('Undefined behavior warnings', () => {
       debug: vitest.fn(),
       info: vitest.fn(),
       warn: vitest.fn(),
-      error: vitest.fn()
-    }
+      error: vitest.fn(),
+    };
 
     const bindingParser = new BindingParser();
     model = withParser(
@@ -293,15 +311,16 @@ describe('Undefined behavior warnings', () => {
     evaluator = new ExpressionEvaluator({ model, logger: mockLogger });
   });
 
-  test('Model assignment', () => {
-     // Add an async function that returns false
+  test("Model assignment", () => {
+    // Add an async function that returns false
     evaluator.addExpressionFunction("asyncFalse", async () => {
       return Promise.resolve(false);
     });
 
-    evaluator.evaluate("{{some.path}} = asyncFalse()")
+    evaluator.evaluate("{{some.path}} = asyncFalse()");
 
-    expect(mockLogger.warn).toHaveBeenCalledWith("Unawaited promise written to mode, this behavior is undefined and may change in future releases")
-  })
-
-})
+    expect(mockLogger.warn).toHaveBeenCalledWith(
+      "Unawaited promise written to mode, this behavior is undefined and may change in future releases",
+    );
+  });
+});

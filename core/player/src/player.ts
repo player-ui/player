@@ -6,7 +6,7 @@ import { SyncHook, SyncWaterfallHook } from "tapable-ts";
 import type { Logger } from "./logger";
 import { TapableLogger } from "./logger";
 import type { ExpressionType } from "./expressions";
-import { ExpressionEvaluator, isPromiselike, isAwaitable } from "./expressions";
+import { ExpressionEvaluator, isPromiselike } from "./expressions";
 import { SchemaController } from "./schema";
 import { BindingParser } from "./binding";
 import type { ViewInstance } from "./view";
@@ -88,7 +88,8 @@ export class Player {
   };
 
   public readonly logger: TapableLogger = new TapableLogger();
-  public readonly constantsController: ConstantsController = new ConstantsController();
+  public readonly constantsController: ConstantsController =
+    new ConstantsController();
   private config: PlayerConfigOptions;
   private state: PlayerFlowState = NOT_STARTED_STATE;
 
@@ -116,7 +117,10 @@ export class Player {
     /** A hook for when the flow ends either in success or failure */
     onEnd: SyncHook<[], Record<string, any>>;
     /** Mutate the Content flow before starting */
-    resolveFlowContent: SyncWaterfallHook<[FlowType<Asset<string>>], Record<string, any>>;
+    resolveFlowContent: SyncWaterfallHook<
+      [FlowType<Asset<string>>],
+      Record<string, any>
+    >;
   } = {
     /** The hook that fires every time we create a new flowController (a new Content blob is passed in) */
     flowController: new SyncHook<[FlowController]>(),
@@ -398,9 +402,11 @@ export class Player {
         const value = flowInstance.currentState?.value;
         if (value && value.state_type === "ACTION") {
           const { exp } = value;
-          let result = expressionEvaluator.evaluate(exp);
-          if(isPromiselike(result)){
-            this.logger.warn("Async expression used as return value in in non-async context, transitioning with '*' value")
+          const result = expressionEvaluator.evaluate(exp);
+          if (isPromiselike(result)) {
+            this.logger.warn(
+              "Async expression used as return value in in non-async context, transitioning with '*' value",
+            );
           }
           flowController?.transition(String(result));
         }
@@ -413,16 +419,20 @@ export class Player {
         const value = flowInstance.currentState?.value;
         if (value && value.state_type === "ASYNC_ACTION") {
           const { exp } = value;
-          try { 
+          try {
             let result = expressionEvaluator.evaluateAsync(exp);
-            if(isPromiselike(result)){
-              if(value.await){
-                result = await result
+            if (isPromiselike(result)) {
+              if (value.await) {
+                result = await result;
               } else {
-                this.logger.warn("Unawaited promise used as return value in in non-async context, transitioning with '*' value")
+                this.logger.warn(
+                  "Unawaited promise used as return value in in non-async context, transitioning with '*' value",
+                );
               }
             } else {
-              this.logger.warn("Non async expression used in async action node")
+              this.logger.warn(
+                "Non async expression used in async action node",
+              );
             }
             flowController?.transition(String(result));
           } catch (e) {
