@@ -39,7 +39,7 @@ type AsyncNodeHooks = {
   /** Async hook to get content for an async node */
   onAsyncNode: AsyncParallelBailHook<[Node.Async, (result: any) => void], any>;
   /** Sync hook to manage errors coming from the onAsyncNode hook. Return a fallback node or null to render a fallback. The first argument of passed in the call is the error thrown. */
-  onAsyncNodeError: SyncBailHook<[Error, Node.Async], Node.Node | null>;
+  onAsyncNodeError: SyncBailHook<[Error, Node.Async], any>;
 };
 
 /**
@@ -197,7 +197,8 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         "Async node handling failed and resolved with a fallback. Error:",
         error,
       );
-      this.handleAsyncUpdate(node, result, this.currentView);
+
+      this.parseNodeAndUpdate(node, result, options, this.currentView);
     }
   }
 
