@@ -199,8 +199,8 @@ public class AsyncHook<T>: BaseJSHook where T: CreatedFromJSValue {
                         DispatchQueue.main.async {
                             resolve(result as Any)
                         }
-                    } catch let e {
-                        let message = e.playerDescription
+                    } catch let error {
+                        let message = error.playerDescription
                         reject("Async hook threw with error '\(message)'")
                     }
                 }
@@ -248,8 +248,8 @@ public class AsyncHook2<T, U>: BaseJSHook where T: CreatedFromJSValue, U: Create
                         DispatchQueue.main.async {
                             resolve(result as Any)
                         }
-                    } catch let e {
-                        let message = e.playerDescription
+                    } catch let error {
+                        let message = error.playerDescription
                         reject("Async hook threw with error '\(message)'")
                     }
                 }
