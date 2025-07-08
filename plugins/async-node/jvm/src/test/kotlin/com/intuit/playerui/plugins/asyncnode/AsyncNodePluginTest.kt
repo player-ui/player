@@ -218,19 +218,10 @@ internal class AsyncNodePluginTest : PlayerTest() {
             plugin.hooks.onAsyncNodeError.tap("test") { _, error, node ->
                 BailResult.Bail(
                     mapOf(
-                        "type" to "value",
-                        "children" to listOf(
-                            mapOf(
-                                "path" to listOf("asset"),
-                                "value" to mapOf(
-                                    "type" to "asset",
-                                    "value" to mapOf(
-                                        "type" to "text",
-                                        "value" to "Value",
-                                        "id" to "error-asset",
-                                    ),
-                                ),
-                            ),
+                        "asset" to mapOf(
+                            "type" to "text",
+                            "id" to "error-asset",
+                            "value" to "Value",
                         ),
                     ),
                 )

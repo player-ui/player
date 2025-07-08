@@ -758,8 +758,7 @@ describe("view", () => {
 
     test("should replace the async node with the result from the onAsyncNodeError hook when there is an error handling the async node", async () => {
       onAsyncNodeErrorCallback.mockReturnValue({
-        type: "asset",
-        value: {
+        asset: {
           id: "async-text",
           type: "text",
           value: "Fallback Text",
@@ -782,9 +781,11 @@ describe("view", () => {
           inProgressState.controllers.view.currentView?.lastUpdate;
 
         expect(lastViewUpdate?.actions[1]).toStrictEqual({
-          id: "async-text",
-          type: "text",
-          value: "Fallback Text",
+          asset: {
+            id: "async-text",
+            type: "text",
+            value: "Fallback Text",
+          },
         });
       });
     });
