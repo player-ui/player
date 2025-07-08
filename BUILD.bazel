@@ -35,7 +35,6 @@ js_library(
     deps = [
         "//:node_modules/@testing-library/jest-dom",
         "//:node_modules/@testing-library/react",
-        "//:node_modules/@testing-library/react-hooks",
         "//:node_modules/@testing-library/user-event",
         "//:node_modules/@vitest/coverage-v8",
         "//:node_modules/happy-dom",
