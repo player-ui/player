@@ -313,6 +313,7 @@ public class AndroidPlayer private constructor(
         private val defaultLogger = AndroidLogger("AndroidPlayer")
 
         private fun buildDefaultPlugins() = listOf(
+            AsyncHydrationTrackerPlugin::class.java to AsyncHydrationTrackerPlugin(),
             PubSubPlugin::class.java to PubSubPlugin(),
             BeaconPlugin::class.java to BeaconPlugin(),
             RegistryPlugin::class.java to RegistryPlugin<(AssetContext) -> RenderableAsset>(),

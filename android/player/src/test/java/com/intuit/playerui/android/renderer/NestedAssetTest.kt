@@ -25,7 +25,7 @@ internal class NestedAssetTest : BaseRenderableAssetTest() {
 
     override val asset get() = NestedAsset.sampleAsset
 
-    override val player get() = AndroidPlayer(beaconPlugin, AsyncHydrationTrackerPlugin()).apply {
+    override val player get() = AndroidPlayer(beaconPlugin).apply {
         registerAsset("simple", ::SimpleAsset)
         registerAsset("nested", ::NestedAsset)
         val inProgressState = mockk<InProgressState>()

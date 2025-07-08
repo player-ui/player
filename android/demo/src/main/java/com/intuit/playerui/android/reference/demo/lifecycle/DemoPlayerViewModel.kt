@@ -2,7 +2,6 @@ package com.intuit.playerui.android.reference.demo.lifecycle
 
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AndroidPlayer.Config
-import com.intuit.playerui.android.asset.DecodableAsset.AsyncHydrationTrackerPlugin
 import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
 import com.intuit.playerui.android.lifecycle.PlayerViewModel
 import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin
@@ -21,7 +20,6 @@ class DemoPlayerViewModel(iterator: AsyncFlowIterator) : PlayerViewModel(iterato
         CommonTypesPlugin(),
         ReferenceAssetsPlugin(),
         PendingTransactionPlugin(),
-        AsyncHydrationTrackerPlugin(),
     )
 
     public val isDebug = false
