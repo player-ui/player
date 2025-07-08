@@ -114,9 +114,13 @@ public abstract class DecodableAsset<Data>(assetContext: AssetContext, private v
         }
 
         override fun apply(androidPlayer: AndroidPlayer) {
-            androidPlayer.onUpdate { _, _ ->
-                synchronized(trackedHydrations) {
-                    trackedHydrations.clear()
+            androidPlayer.hooks.viewController.tap { viewController ->
+                viewController?.hooks?.view?.tap { view ->
+                    view?.hooks?.onUpdate?.tap { _ ->
+                        synchronized(trackedHydrations) {
+                            trackedHydrations.clear()
+                        }
+                    }
                 }
             }
         }
