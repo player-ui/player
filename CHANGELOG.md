@@ -1,3 +1,25 @@
+# 0.12.0-next.8 (Tue Jul 08 2025)
+
+### Release Notes
+
+#### fix issues with react 18 suspense ([#670](https://github.com/player-ui/player/pull/670))
+
+- Fix dependencies using React 17 in Player
+- Fix `Suspense` staying triggered via `useEffect` callbacks
+- Convert `useSubscribedState` to use `useSyncExternalStore` instead of `useEffect` for callbacks
+
+---
+
+#### 🐛 Bug Fix
+
+- fix issues with react 18 suspense [#670](https://github.com/player-ui/player/pull/670) ([@spentacular](https://github.com/spentacular))
+
+#### Authors: 1
+
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
 # 0.12.0-next.7 (Mon Jul 07 2025)
 
 #### 🐛 Bug Fix
