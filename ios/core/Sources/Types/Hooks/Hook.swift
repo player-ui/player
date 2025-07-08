@@ -192,11 +192,16 @@ public class AsyncHook<T>: BaseJSHook where T: CreatedFromJSValue {
             else { return JSValue() }
             
             let promise =
-            JSUtilities.createPromise(context: self.context, handler: { (resolve, _) in
+            JSUtilities.createPromise(context: self.context, handler: { (resolve, reject) in
                 Task {
-                    let result = try await hook(hookValue)
-                    DispatchQueue.main.async {
-                        resolve(result as Any)
+                    do {
+                        let result = try await hook(hookValue)
+                        DispatchQueue.main.async {
+                            resolve(result as Any)
+                        }
+                    } catch let e {
+                        let message = e.playerDescription
+                        reject("Async hook threw with error '\(message)'")
                     }
                 }
             })
@@ -236,11 +241,16 @@ public class AsyncHook2<T, U>: BaseJSHook where T: CreatedFromJSValue, U: Create
             
             
             let promise =
-            JSUtilities.createPromise(context: self.context, handler: { (resolve, _) in
+            JSUtilities.createPromise(context: self.context, handler: { (resolve, reject) in
                 Task {
-                    let result = try await hook(hookValue, hookValue2)
-                    DispatchQueue.main.async {
-                        resolve(result as Any)
+                    do {
+                        let result = try await hook(hookValue, hookValue2)
+                        DispatchQueue.main.async {
+                            resolve(result as Any)
+                        }
+                    } catch let e {
+                        let message = e.playerDescription
+                        reject("Async hook threw with error '\(message)'")
                     }
                 }
             })

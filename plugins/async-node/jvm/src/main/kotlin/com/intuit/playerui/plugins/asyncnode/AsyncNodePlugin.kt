@@ -59,7 +59,7 @@ public class AsyncNodePlugin(private val asyncHandler: AsyncHandler? = null) : J
             )
 
         /** The hook after an error occurs in onAsyncNode */
-        public val onAsyncNodeError: NodeSyncBailHook2<PlayerException, Node, Any?> by
+        public val onAsyncNodeError: NodeSyncBailHook2<PlayerException, Node, asyncNodeUpdate> by
             NodeSerializableField(
                 NodeSyncBailHook2.serializer(
                     ThrowableSerializer() as KSerializer<PlayerException>,

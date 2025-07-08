@@ -45,6 +45,10 @@ test --remote_download_toplevel
 test --remote_timeout=3600
 test --build_metadata=REPO_URL=https://github.com/player-ui/player.git
 
+# Add standard iOS simulator device and version on tests to match pipeline
+test --ios_simulator_device="iPhone 15"
+test --ios_simulator_version="17.4"
+
 coverage --bes_results_url=https://app.buildbuddy.io/invocation/
 coverage --bes_backend=grpcs://remote.buildbuddy.io
 coverage --remote_cache=grpcs://remote.buildbuddy.io
