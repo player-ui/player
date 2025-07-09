@@ -8,8 +8,8 @@ import com.intuit.hooks.HookContext
 import com.intuit.hooks.SyncBailHook
 import com.intuit.hooks.SyncHook
 import com.intuit.hooks.SyncWaterfallHook
-import com.intuit.playerui.android.asset.SuspendableAsset.AsyncHydrationTrackerPlugin
 import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.asset.SuspendableAsset.AsyncHydrationTrackerPlugin
 import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.overlayStyles
 import com.intuit.playerui.android.extensions.removeSelf

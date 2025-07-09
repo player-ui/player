@@ -98,9 +98,13 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
         }
 
         override fun apply(androidPlayer: AndroidPlayer) {
-            androidPlayer.onUpdate { _, _ ->
-                synchronized(trackedHydrations) {
-                    trackedHydrations.clear()
+            androidPlayer.hooks.viewController.tap { viewController ->
+                viewController?.hooks?.view?.tap { view ->
+                    view?.hooks?.onUpdate?.tap { _ ->
+                        synchronized(trackedHydrations) {
+                            trackedHydrations.clear()
+                        }
+                    }
                 }
             }
         }

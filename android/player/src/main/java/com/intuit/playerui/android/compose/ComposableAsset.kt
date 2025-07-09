@@ -111,7 +111,6 @@ public abstract class ComposableAsset<Data> (
             }
         }
     }
-
 }
 
 // @Composable
