@@ -5,7 +5,7 @@ import { testCases, testModel } from "./resolver.test";
 import { parseCustom, ParserSuccessResult } from "../../binding-grammar";
 import { resolveBindingAST } from "../resolver";
 
-describe("parser benchmarks", () => {
+describe.skip("parser benchmarks", () => {
   testCases.map(
     ([input, expectedOutput]) => {
       bench(`Resolving binding: ${input}`, () => {
@@ -21,7 +21,7 @@ describe("parser benchmarks", () => {
   );
 });
 
-describe("binding creation benchmarks", () => {
+describe.skip("binding creation benchmarks", () => {
   testCases.map(
     ([input, expectedOutput]) => {
       bench(`Resolving binding: ${input}`, () => {

@@ -6,7 +6,7 @@ import type {
   ExpressionContext,
   ExpressionNode,
 } from "./types";
-import { AwaitableResult, isAwaitable, makeAwaitable } from "./async";
+import { Awaitable, isAwaitable, makeAwaitable } from "./async";
 
 /** Sets a value to the data-model */
 export const setDataVal: ExpressionHandler<[Binding, any], any> = (
@@ -64,9 +64,13 @@ export const conditional: ExpressionHandler<
 
 conditional.resolveParams = false;
 
-export const waitFor: ExpressionHandler<
-  [Promise<any>],
-  AwaitableResult<any>
-> = (ctx, promise) => {
+/**
+ * Internal await function
+ * This is technically registered as `await` but can't be called that due to conflicting with the keyword
+ */
+export const waitFor: ExpressionHandler<[Promise<any>], Awaitable<any>> = (
+  ctx,
+  promise,
+) => {
   return makeAwaitable(promise);
 };

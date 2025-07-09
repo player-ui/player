@@ -1,9 +1,15 @@
-import { describe, test, expect, beforeEach } from "vitest";
+import { describe, test, expect, beforeEach, vitest } from "vitest";
 import type { DataModelWithParser } from "../../data";
 import { LocalModel, withParser } from "../../data";
 import { BindingParser } from "../../binding";
-import { deleteDataVal, setDataVal, getDataVal } from "../evaluator-functions";
+import {
+  deleteDataVal,
+  setDataVal,
+  getDataVal,
+  waitFor,
+} from "../evaluator-functions";
 import type { ExpressionContext } from "../types";
+import { isAwaitable } from "../async";
 
 describe("eval functions", () => {
   let model: DataModelWithParser;
@@ -43,5 +49,10 @@ describe("eval functions", () => {
     model.set([["foo.bar", 2]]);
     expect(model.get("foo.bar")).toBe(2);
     expect(getDataVal(context, "foo.bar")).toBe(2);
+  });
+
+  test("waitFor/await", () => {
+    const test = waitFor({} as ExpressionContext, new Promise(vitest.fn()));
+    expect(isAwaitable(test)).toBe(true);
   });
 });

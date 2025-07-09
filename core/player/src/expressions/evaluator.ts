@@ -77,6 +77,7 @@ function makePromiseAwareBinaryOp<T>(
   operation: (a: any, b: any) => T,
 ): (a: any, b: any, async: boolean) => T | Promise<T> {
   return (a: any, b: any, async: boolean) => {
+    //async handler
     if (async && (isAwaitable(a) || isAwaitable(b))) {
       return collateAwaitable([
         Promise.resolve(a),
@@ -85,6 +86,7 @@ function makePromiseAwareBinaryOp<T>(
         operation(resolvedA, resolvedB),
       );
     }
+    //sync handler
     return operation(a, b);
   };
 }
@@ -96,9 +98,11 @@ function makePromiseAwareUnaryOp<T>(
   operation: (a: any) => T,
 ): (a: any, async: boolean) => T | Promise<T> {
   return (a: any, async: boolean) => {
+    //async handler
     if (async && isAwaitable(a)) {
       return a.awaitableThen((resolved: any) => operation(resolved));
     }
+    //sync handler
     return operation(a);
   };
 }
@@ -113,6 +117,7 @@ function handleConditionalBranching(
   resolveNode: (node: any) => any,
   async: boolean,
 ): any {
+  //async handler
   if (async && isAwaitable(testValue)) {
     return testValue.awaitableThen((resolved: boolean) => {
       const branch = resolved ? getTrueBranch() : getFalseBranch();
@@ -123,7 +128,7 @@ function handleConditionalBranching(
     });
   }
 
-  // Sync handling
+  // sync handler
   const branch = testValue ? getTrueBranch() : getFalseBranch();
   return resolveNode(branch);
 }
@@ -159,6 +164,7 @@ const PromiseCollectionHandler = {
       const key = resolveNode(attr.key);
       const value = resolveNode(attr.value);
 
+      //async handler
       if (async && (isAwaitable(key) || isAwaitable(value))) {
         hasPromises = true;
         const keyPromise = Promise.resolve(key);
@@ -353,10 +359,15 @@ export class ExpressionEvaluator {
     return this._execString(String(expression), resolvedOpts);
   }
 
-  public async evaluateAsync(
+  /**
+   * Evaluate functions in an async context
+   * @experimental These Player APIs are in active development and may change. Use with caution
+   */
+  public evaluateAsync(
     expr: ExpressionType,
     options?: ExpressionEvaluatorOptions,
   ): Promise<any> {
+    // handle async expression block
     if (Array.isArray(expr)) {
       return collateAwaitable(
         expr.map(async (exp) =>

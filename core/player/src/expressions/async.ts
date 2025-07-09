@@ -20,8 +20,12 @@ export function isPromiselike(value: any): value is Promise<any> {
 /** Unique private symbol to indicate async functions wrapped in Player's await function */
 export const AwaitableSymbol: unique symbol = Symbol("Awaitable");
 
-/** Wrapped promise that should be awaited */
-export interface AwaitableResult<T> extends Promise<T> {
+/**
+ * Wrapper for Promises that are generated from the `await` function with a unique symbol so we can
+ * determine when a promise should be awaited by us (as its returned by await) or a promise thats
+ * generated from any async function
+ */
+export interface Awaitable<T> extends Promise<T> {
   /** Prevent unwrapped then from being exposed from underlying promise */
   then: never;
   /** Internalally awaitable wrapper around underlying then function */
@@ -40,10 +44,9 @@ export interface AwaitableResult<T> extends Promise<T> {
 }
 
 /** Typeguard for AwaitableResult */
-export function isAwaitable(val: unknown): val is AwaitableResult<any> {
+export function isAwaitable(val: unknown): val is Awaitable<any> {
   return (
-    isPromiselike(val) &&
-    (val as AwaitableResult<any>)[AwaitableSymbol] !== undefined
+    isPromiselike(val) && (val as Awaitable<any>)[AwaitableSymbol] !== undefined
   );
 }
 
@@ -52,7 +55,7 @@ export function isAwaitable(val: unknown): val is AwaitableResult<any> {
  */
 export function collateAwaitable<T extends readonly unknown[] | []>(
   promises: T,
-): AwaitableResult<any> {
+): Awaitable<any> {
   const result = Promise.all(promises) as Promise<any>;
   return makeAwaitable(result);
 }
@@ -60,10 +63,10 @@ export function collateAwaitable<T extends readonly unknown[] | []>(
 /**
  * Add AwaitableSymbol to base promise and promise returned by then() function
  */
-export function makeAwaitable(promise: Promise<any>): AwaitableResult<any> {
-  (promise as AwaitableResult<any>)[AwaitableSymbol] = AwaitableSymbol;
+export function makeAwaitable(promise: Promise<any>): Awaitable<any> {
+  (promise as Awaitable<any>)[AwaitableSymbol] = AwaitableSymbol;
   (promise as any).awaitableThen = (arg: any) => {
     return makeAwaitable(promise.then(arg));
   };
-  return promise as AwaitableResult<any>;
+  return promise as Awaitable<any>;
 }
