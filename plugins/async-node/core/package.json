@@ -1,13 +1,12 @@
 {
-    "name": "@player-ui/async-node-plugin",
-    "version": "0.0.0-PLACEHOLDER",
-    "main": "src/index.ts",
-    "peerDependencies": {
-      "@player-ui/player": "workspace:*"
-    },
-    "devDependencies": {
-      "@player-ui/reference-assets-plugin": "workspace:*", 
-      "@player-ui/check-path-plugin": "workspace:*"
-    }
+  "name": "@player-ui/async-node-plugin",
+  "version": "0.0.0-PLACEHOLDER",
+  "main": "src/index.ts",
+  "peerDependencies": {
+    "@player-ui/player": "workspace:*"
+  },
+  "devDependencies": {
+    "@player-ui/check-path-plugin": "workspace:*",
+    "@player-ui/partial-match-registry": "workspace:*"
   }
-  
+}

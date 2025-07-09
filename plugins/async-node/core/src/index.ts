@@ -18,6 +18,11 @@ import { omit } from "timm";
 export * from "./types";
 export * from "./transform";
 
+type AsyncPluginContext = {
+  /** Map of async node id to resolved content */
+  nodeResolveCache: Map<string, any>;
+};
+
 export interface AsyncNodePluginOptions {
   /** A set of plugins to load  */
   plugins?: AsyncNodeViewPlugin[];
@@ -101,8 +106,6 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
   name = "AsyncNode";
 
-  private resolvedMapping = new Map<string, any>();
-
   private currentView: ViewInstance | undefined;
 
   /**
@@ -114,6 +117,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
    */
   private parseNodeAndUpdate(
     node: Node.Async,
+    context: AsyncPluginContext,
     result: any,
     options: Resolve.NodeResolveOptions,
     view: ViewInstance | undefined,
@@ -121,7 +125,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     const parsedNode =
       options.parseNode && result ? options.parseNode(result) : undefined;
 
-    this.handleAsyncUpdate(node, parsedNode, view);
+    this.handleAsyncUpdate(node, context, parsedNode, view);
   }
 
   /**
@@ -135,11 +139,13 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
    */
   private handleAsyncUpdate(
     node: Node.Async,
+    context: AsyncPluginContext,
     newNode?: Node.Node | null,
     view?: ViewInstance,
   ) {
-    if (this.resolvedMapping.get(node.id) !== newNode) {
-      this.resolvedMapping.set(node.id, newNode ? newNode : node);
+    const { nodeResolveCache } = context;
+    if (nodeResolveCache.get(node.id) !== newNode) {
+      nodeResolveCache.set(node.id, newNode ? newNode : node);
       view?.updateAsync();
     }
   }
@@ -150,18 +156,18 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
    * @param resolver The resolver instance to attach the hook to.
    * @param view
    */
-  applyResolver(resolver: Resolver): void {
+  applyResolver(resolver: Resolver, context: AsyncPluginContext): void {
     resolver.hooks.beforeResolve.tap(this.name, (node, options) => {
       if (!this.isAsync(node)) {
         return node;
       }
 
-      const resolvedNode = this.resolvedMapping.get(node.id);
+      const resolvedNode = context.nodeResolveCache.get(node.id);
       if (resolvedNode !== undefined) {
         return resolvedNode;
       }
 
-      queueMicrotask(() => this.runAsyncNode(node, options));
+      queueMicrotask(() => this.runAsyncNode(node, context, options));
 
       return node;
     });
@@ -169,16 +175,23 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
   private async runAsyncNode(
     node: Node.Async,
+    context: AsyncPluginContext,
     options: Resolve.NodeResolveOptions,
   ) {
     try {
       const result = await this.basePlugin?.hooks.onAsyncNode.call(
         node,
         (result) => {
-          this.parseNodeAndUpdate(node, result, options, this.currentView);
+          this.parseNodeAndUpdate(
+            node,
+            context,
+            result,
+            options,
+            this.currentView,
+          );
         },
       );
-      this.parseNodeAndUpdate(node, result, options, this.currentView);
+      this.parseNodeAndUpdate(node, context, result, options, this.currentView);
     } catch (e: unknown) {
       const error = e instanceof Error ? e : new Error(String(e));
       const result = this.basePlugin?.hooks.onAsyncNodeError.call(error, node);
@@ -198,7 +211,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         error,
       );
 
-      this.parseNodeAndUpdate(node, result, options, this.currentView);
+      this.parseNodeAndUpdate(node, context, result, options, this.currentView);
     }
   }
 
@@ -259,8 +272,14 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
   apply(view: ViewInstance): void {
     this.currentView = view;
+    const context: AsyncPluginContext = {
+      nodeResolveCache: new Map<string, any>(),
+    };
+
     view.hooks.parser.tap("async", this.applyParser.bind(this));
-    view.hooks.resolver.tap("async", this.applyResolver.bind(this));
+    view.hooks.resolver.tap("async", (resolver) => {
+      this.applyResolver(resolver, context);
+    });
   }
 
   applyPlugin(asyncNodePlugin: AsyncNodePlugin): void {
