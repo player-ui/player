@@ -12,6 +12,7 @@ class BadgeUITest : ComposeUITest("badge") {
     fun basic() {
         launchMock("badge-all")
 
+        androidComposeRule.waitForIdle()
         androidComposeRule.onNodeWithText("INFO")
             .assertExists()
         androidComposeRule.onNodeWithText("ERROR")
