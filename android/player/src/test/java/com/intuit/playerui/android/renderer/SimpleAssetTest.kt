@@ -7,7 +7,6 @@ import com.intuit.playerui.android.utils.SimpleAsset
 import com.intuit.playerui.android.utils.SimpleAsset.Companion.sampleFlow
 import com.intuit.playerui.android.utils.stringify
 import com.intuit.playerui.android.withContext
-import com.intuit.playerui.utils.test.runBlockingTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -22,13 +21,13 @@ internal class SimpleAssetTest : BaseRenderableAssetTest() {
     }
 
     @Test
-    fun `test rendering with no styles`(): Unit = runBlockingTest {
+    fun `test rendering with no styles`() {
         val simple = SimpleAsset(assetContext).render(mockContext)
         assertTrue(simple is TextView)
     }
 
     @Test
-    fun `test rendering with some styles`(): Unit = runBlockingTest {
+    fun `test rendering with some styles`() {
         val simple = SimpleAsset(assetContext.withContext(mockContext)).run {
             render(R.style.TextAppearance_AppCompat)
         }
@@ -36,7 +35,7 @@ internal class SimpleAssetTest : BaseRenderableAssetTest() {
     }
 
     @Test
-    fun `test rendering with some styles using another render method`(): Unit = runBlockingTest {
+    fun `test rendering with some styles using another render method`() {
         val simple = SimpleAsset(assetContext.withContext(mockContext)).run {
             render(listOf(R.style.TextAppearance_AppCompat))
         }
@@ -44,7 +43,7 @@ internal class SimpleAssetTest : BaseRenderableAssetTest() {
     }
 
     @Test
-    fun `test rendering with some styles and a tag`(): Unit = runBlockingTest {
+    fun `test rendering with some styles and a tag`() {
         val simple = SimpleAsset(assetContext.withContext(mockContext)).run {
             render(R.style.TextAppearance_AppCompat, tag = "tag")
         }
@@ -52,7 +51,7 @@ internal class SimpleAssetTest : BaseRenderableAssetTest() {
     }
 
     @Test
-    fun `test rendering with some styles and a tag using another render method`(): Unit = runBlockingTest {
+    fun `test rendering with some styles and a tag using another render method`() {
         val simple = SimpleAsset(assetContext.withContext(mockContext)).run {
             render(listOf(R.style.TextAppearance_AppCompat), "tag")
         }
@@ -60,7 +59,7 @@ internal class SimpleAssetTest : BaseRenderableAssetTest() {
     }
 
     @Test
-    fun `test rendering with tag`(): Unit = runBlockingTest {
+    fun `test rendering with tag`() {
         player.start(sampleFlow.stringify())
 
         val asset = SimpleAsset(assetContext.withContext(mockContext))

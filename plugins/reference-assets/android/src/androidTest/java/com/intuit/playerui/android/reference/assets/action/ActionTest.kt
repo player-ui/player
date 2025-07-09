@@ -10,7 +10,6 @@ import com.intuit.playerui.core.player.state.CompletedState
 import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.player.state.dataModel
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -19,7 +18,7 @@ class ActionTest : AssetTest("action") {
     @Test
     fun actionExpression() {
         launchMock("action-basic")
-        runTest(UnconfinedTestDispatcher()) {
+        runTest {
             currentAssetTree.shouldBeAsset<Action> {
                 val actionData = getData()
                 repeat(10) {
@@ -36,7 +35,7 @@ class ActionTest : AssetTest("action") {
     fun transitionToEndSuccess() {
         launchMock("action-transition-to-end")
 
-        runTest(UnconfinedTestDispatcher()) {
+        runTest {
             currentAssetTree.shouldBeAsset<Collection> {
                 getData().values[0].shouldBeAsset<Action> {
                     val data = getData()

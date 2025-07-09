@@ -17,8 +17,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.viewinterop.AndroidView
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.DecodableAsset
 import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.build
 import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.into
@@ -38,7 +38,7 @@ import kotlinx.serialization.KSerializer
 public abstract class ComposableAsset<Data> (
     assetContext: AssetContext,
     serializer: KSerializer<Data>,
-) : DecodableAsset<Data>(assetContext, serializer) {
+) : SuspendableAsset<Data>(assetContext, serializer) {
 
     override suspend fun initView(data: Data) = ComposeView(requireContext()).apply {
         layoutParams = ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
@@ -68,18 +68,6 @@ public abstract class ComposableAsset<Data> (
 
     @Composable
     abstract fun content(data: Data)
-
-    @Composable
-    private fun RenderableAsset.composeAndroidView(
-        modifier: Modifier = Modifier,
-        styles: Styles? = null,
-    ) {
-        AndroidView(factory = ::FrameLayout, modifier) {
-            hydrationScope.launch {
-                render(styles) into it
-            }
-        }
-    }
 
     /**
      * Extension function to render a [RenderableAsset] within a [ComposableAsset].
@@ -111,4 +99,30 @@ public abstract class ComposableAsset<Data> (
             }
         }
     }
+
+    @Composable
+    private fun RenderableAsset.composeAndroidView(
+        modifier: Modifier = Modifier,
+        styles: Styles? = null,
+    ) {
+        AndroidView(factory = ::FrameLayout, modifier) {
+            hydrationScope.launch {
+                render(styles) into it
+            }
+        }
+    }
 }
+
+// @Composable
+// fun RenderableAsset.compose(
+//     modifier: Modifier = Modifier,
+//     styles: AssetStyle? = null,
+//     tag: String? = null,
+// ) {
+//     assetContext.withContext(LocalContext.current).withTag(tag ?: asset.id).build().run {
+//         when (this) {
+//             is ComposableAsset<*> -> CompositionLocalProvider(LocalTextStyle provides (styles?.textStyle ?: TextStyle())) { compose(modifier = modifier) }
+//             else -> composeAndroidView(modifier, styles?.xmlStyles)
+//         }
+//     }
+// }

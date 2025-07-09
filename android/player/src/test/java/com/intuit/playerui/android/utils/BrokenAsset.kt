@@ -27,12 +27,12 @@ internal class BrokenAsset(assetContext: AssetContext) : DecodableAsset<BrokenAs
         Frame, Linear
     }
 
-    override suspend fun initView(data: Data) = when (data.layout) {
+    override fun initView() = when (data.layout) {
         Layout.Frame -> FrameLayout(requireContext())
         Layout.Linear -> LinearLayout(requireContext())
     }
 
-    override suspend fun View.hydrate(data: Data) {
+    override fun View.hydrate() {
         if (data.shouldFail || (
                 data.layout == Layout.Frame && this is LinearLayout
                 ) || (

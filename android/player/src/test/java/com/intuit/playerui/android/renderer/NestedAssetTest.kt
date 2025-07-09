@@ -3,7 +3,8 @@ package com.intuit.playerui.android.renderer
 import android.widget.LinearLayout
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.DecodableAsset.AsyncViewStub
+import com.intuit.playerui.android.asset.SuspendableAsset
+import com.intuit.playerui.android.asset.SuspendableAsset.AsyncViewStub
 import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
 import com.intuit.playerui.android.utils.NestedAsset
 import com.intuit.playerui.android.utils.SimpleAsset
@@ -37,18 +38,18 @@ internal class NestedAssetTest : BaseRenderableAssetTest() {
     }
 
     @Test
-    fun `tested nested asset constructs`(): Unit = runBlocking {
+    fun `tested nested asset constructs`() = runBlocking {
         val nested = NestedAsset(assetContext).render(mockContext).let {
-            if (it is AsyncViewStub) it.awaitView() else it
+            if (it is SuspendableAsset.AsyncViewStub) it.awaitView() else it
         }
         assertTrue(nested is LinearLayout)
     }
 
     @Test
-    fun `test nested asset context`(): Unit = runBlockingTest {
+    fun `test nested asset context`() = runBlockingTest {
         val asset = player.awaitFirstView(NestedAsset.sampleFlow)!! as NestedAsset
         asset.render(mockContext).let {
-            if (it is AsyncViewStub) it.awaitView() else it
+            if (it is SuspendableAsset.AsyncViewStub) it.awaitView() else it
         }
         assertEquals(mockContext, NestedAsset.dummy?.context)
         NestedAsset.dummy2?.forEach {
@@ -58,7 +59,7 @@ internal class NestedAssetTest : BaseRenderableAssetTest() {
 
     @OptIn(ExperimentalPlayerApi::class)
     @Test
-    fun `test hydration tracker`(): Unit = runBlockingTest {
+    fun `test hydration tracker`() = runBlockingTest {
         val player = player
         val plugin = player.asyncHydrationTrackerPlugin!!
         var onHydrationStarted = false
