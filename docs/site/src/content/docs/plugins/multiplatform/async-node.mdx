@@ -81,7 +81,7 @@ The `AsyncNodePluginPlugin` is provided as a default way of handling asset-async
 
 Add the plugin to Player:
 
-```js
+```typescript
 import { Player } from '@player-ui/player';
 import { AsyncNodePlugin, AsyncNodePluginPlugin } from '@player-ui/async-node-plugin';
 
@@ -116,7 +116,7 @@ const player = new Player({
 
 or initialize plugin with async handler
 
-```js
+```typescript
 import { Player } from '@player-ui/player';
 import { AsyncNodePlugin, AsyncNodePluginPlugin } from '@player-ui/async-node-plugin';
 
@@ -147,7 +147,7 @@ const player = new Player({
 
 The `react` version of the AsyncNodePlugin is identical to using the core plugin. Refer to core usage for handler configuration:
 
-```js
+```typescript
 import { ReactPlayer } from "@player-ui/react";
 import {
   AsyncNodePlugin,
@@ -170,7 +170,7 @@ const player = new ReactPlayer({
 
 By default, errors happening during the `onAsyncNode` hook bubble up as player flow failures. These errors can come from the taps themselves, or from parsing the result of those taps within the core plugin. Use the `onAsyncNodeError` to catch these errors and handle them gracefully. Even if the error is handled, it will be logged by the player logger. The return on the hook will determine what gets rendered in the view. To render nothing, return `null`
 
-```js
+```typescript
 const asyncNodePlugin = new AsyncNodePlugin({
   plugins: [new AsyncNodePluginPlugin()],
 });
