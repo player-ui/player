@@ -55,7 +55,6 @@ internal suspend fun <T> Runtime<*>.evaluateInJSThread(
 }
 
 internal fun <T> Runtime<*>.evaluateInJSThreadBlocking(
-    muteLog: Boolean = false,
     block: RuntimeThreadContext.() -> T,
 ): T {
     ensureNotReleased()
@@ -64,7 +63,7 @@ internal fun <T> Runtime<*>.evaluateInJSThreadBlocking(
         block(currentRuntimeThreadContext)
     } else {
         try {
-            if (!muteLog) runtime.checkBlockingThread(Thread.currentThread())
+            runtime.checkBlockingThread(Thread.currentThread())
             runBlocking {
                 evaluateInJSThread { block() }
             }

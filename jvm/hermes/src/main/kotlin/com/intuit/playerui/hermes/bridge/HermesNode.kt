@@ -105,10 +105,10 @@ public class HermesNode(private val jsiObject: Object, override val runtime: Her
     override fun isUndefined(): Boolean = false
 
     override fun nativeReferenceEquals(other: Any?): Boolean = when (other) {
-        is Object -> runtime.evaluateInJSThreadBlocking(true) {
+        is Object -> runtime.evaluateInJSThreadBlocking {
             Object.strictEquals(runtime, jsiObject, other)
         }
-        is Value -> other.isObject() && runtime.evaluateInJSThreadBlocking(true) {
+        is Value -> other.isObject() && runtime.evaluateInJSThreadBlocking {
             nativeReferenceEquals(other.asObject(runtime))
         }
         is HermesNode -> nativeReferenceEquals(other.jsiObject)

@@ -3,8 +3,8 @@ package com.intuit.playerui.android.utils
 import android.view.View
 import android.widget.LinearLayout
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.DecodableAsset
 import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Node
@@ -16,7 +16,7 @@ import com.intuit.playerui.utils.makeFlow
 import kotlinx.serialization.json.Json
 
 @Suppress("DEPRECATION_ERROR")
-internal class NestedAsset(assetContext: AssetContext) : DecodableAsset<Node>(assetContext, NodeSerializer()) {
+internal class NestedAsset(assetContext: AssetContext) : SuspendableAsset<Node>(assetContext, NodeSerializer()) {
 
     val nested = expand("nested")
     val nestedList = expandList("nestedAssets")

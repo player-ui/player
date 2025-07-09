@@ -21,7 +21,6 @@ internal suspend fun <Context : V8Value, T> Context.evaluateInJSThread(
 
 internal fun <Context : V8Value, T> Context.evaluateInJSThreadBlocking(
     runtime: Runtime<V8Value>,
-    muteLog: Boolean = false,
     block: Context.() -> T,
 ): T {
     if (runtime.isReleased()) throw PlayerRuntimeException(runtime, "Runtime object has been released!")
@@ -29,7 +28,7 @@ internal fun <Context : V8Value, T> Context.evaluateInJSThreadBlocking(
     return if (this@evaluateInJSThreadBlocking.runtime.locker.hasLock()) {
         block()
     } else {
-        if (!muteLog) runtime.checkBlockingThread(Thread.currentThread())
+        runtime.checkBlockingThread(Thread.currentThread())
         runBlocking {
             evaluateInJSThread(runtime, block)
         }
@@ -44,4 +43,4 @@ internal suspend fun <Context : V8Value, T> Context.evaluateInJSThreadIfDefined(
 internal fun <Context : V8Value, T> Context.evaluateInJSThreadIfDefinedBlocking(
     runtime: Runtime<V8Value>,
     block: Context.() -> T,
-): T? = mapUndefinedToNull()?.let { evaluateInJSThreadBlocking(runtime, false, block) }
+): T? = mapUndefinedToNull()?.let { evaluateInJSThreadBlocking(runtime, block) }
