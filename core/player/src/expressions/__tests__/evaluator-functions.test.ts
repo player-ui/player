@@ -52,10 +52,10 @@ describe("eval functions", () => {
   });
 
   test("waitFor/await", async () => {
-    const testFn = vitest.fn()
+    const testFn = vitest.fn();
     const testPromise = new Promise((resolve) => {
       setTimeout(() => {
-        testFn()
+        testFn();
         resolve("foo");
       }, 100);
     });
@@ -63,8 +63,8 @@ describe("eval functions", () => {
     const test = waitFor({} as ExpressionContext, testPromise);
     expect(isPromiseLike(test) && isAwaitable(test)).toBe(true);
     /** TS shows this unneeded because waitFor doesn't technically look like a promise */
-    const result = await test
-    expect(testFn).toBeCalled()
-    expect(result).toBe('foo')
+    const result = await test;
+    expect(testFn).toBeCalled();
+    expect(result).toBe("foo");
   });
 });
