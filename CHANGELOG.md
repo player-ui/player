@@ -1,3 +1,23 @@
+# 0.12.0-next.10 (Thu Jul 10 2025)
+
+### Release Notes
+
+#### Fix default-view-plugin sort order ([#679](https://github.com/player-ui/player/pull/679))
+
+Change how `player.hooks.view` `call` is handled to ensure tap order comes from default plugins first.
+
+---
+
+#### 🐛 Bug Fix
+
+- Fix default-view-plugin sort order [#679](https://github.com/player-ui/player/pull/679) ([@spentacular](https://github.com/spentacular))
+
+#### Authors: 1
+
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
 # 0.12.0-next.9 (Thu Jul 10 2025)
 
 ### Release Notes
