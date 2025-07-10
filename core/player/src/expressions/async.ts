@@ -2,7 +2,7 @@
  * Promise detection that handles various Promise implementations
  * and reduces false positives from objects with coincidental 'then' methods
  */
-export function isPromiselike(value: any): value is Promise<any> {
+export function isPromiseLike(value: any): value is Promise<any> {
   return (
     value != null &&
     typeof value === "object" &&
@@ -46,7 +46,7 @@ export interface Awaitable<T> extends Promise<T> {
 /** Typeguard for AwaitableResult */
 export function isAwaitable(val: unknown): val is Awaitable<any> {
   return (
-    isPromiselike(val) && (val as Awaitable<any>)[AwaitableSymbol] !== undefined
+    isPromiseLike(val) && (val as Awaitable<any>)[AwaitableSymbol] !== undefined
   );
 }
 

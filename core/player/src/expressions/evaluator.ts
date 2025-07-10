@@ -2,7 +2,7 @@ import { SyncWaterfallHook, SyncBailHook } from "tapable-ts";
 import { NestedError } from "ts-nested-error";
 import { parseExpression } from "./parser";
 import * as DEFAULT_EXPRESSION_HANDLERS from "./evaluator-functions";
-import { collateAwaitable, isAwaitable, isPromiselike } from "./async";
+import { collateAwaitable, isAwaitable, isPromiseLike } from "./async";
 import { isExpressionNode } from "./types";
 import { isObjectExpression } from "./utils";
 import type {
@@ -605,7 +605,7 @@ export class ExpressionEvaluator {
       if (node.left.type === "ModelRef") {
         const value = resolveNode(node.right);
 
-        if (isPromiselike(value)) {
+        if (isPromiseLike(value)) {
           if (options.async && isAwaitable(value)) {
             return value.awaitableThen((resolvedValue) => {
               model.set([[(node.left as any).ref, resolvedValue]]);

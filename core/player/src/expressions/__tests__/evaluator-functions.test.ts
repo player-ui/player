@@ -9,7 +9,7 @@ import {
   waitFor,
 } from "../evaluator-functions";
 import type { ExpressionContext } from "../types";
-import { isAwaitable } from "../async";
+import { isAwaitable, isPromiseLike } from "../async";
 
 describe("eval functions", () => {
   let model: DataModelWithParser;
@@ -51,8 +51,20 @@ describe("eval functions", () => {
     expect(getDataVal(context, "foo.bar")).toBe(2);
   });
 
-  test("waitFor/await", () => {
-    const test = waitFor({} as ExpressionContext, new Promise(vitest.fn()));
-    expect(isAwaitable(test)).toBe(true);
+  test("waitFor/await", async () => {
+    const testFn = vitest.fn()
+    const testPromise = new Promise((resolve) => {
+      setTimeout(() => {
+        testFn()
+        resolve("foo");
+      }, 100);
+    });
+
+    const test = waitFor({} as ExpressionContext, testPromise);
+    expect(isPromiseLike(test) && isAwaitable(test)).toBe(true);
+    /** TS shows this unneeded because waitFor doesn't technically look like a promise */
+    const result = await test
+    expect(testFn).toBeCalled()
+    expect(result).toBe('foo')
   });
 });

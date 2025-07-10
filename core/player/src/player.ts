@@ -6,7 +6,7 @@ import { SyncHook, SyncWaterfallHook } from "tapable-ts";
 import type { Logger } from "./logger";
 import { TapableLogger } from "./logger";
 import type { ExpressionType } from "./expressions";
-import { ExpressionEvaluator, isPromiselike } from "./expressions";
+import { ExpressionEvaluator, isPromiseLike } from "./expressions";
 import { SchemaController } from "./schema";
 import { BindingParser } from "./binding";
 import type { ViewInstance } from "./view";
@@ -403,7 +403,7 @@ export class Player {
         if (value && value.state_type === "ACTION") {
           const { exp } = value;
           const result = expressionEvaluator.evaluate(exp);
-          if (isPromiselike(result)) {
+          if (isPromiseLike(result)) {
             this.logger.warn(
               "Async expression used as return value in in non-async context, transitioning with '*' value",
             );
@@ -421,7 +421,7 @@ export class Player {
           const { exp } = value;
           try {
             let result = expressionEvaluator.evaluateAsync(exp);
-            if (isPromiselike(result)) {
+            if (isPromiseLike(result)) {
               if (value.await) {
                 result = await result;
               } else {
