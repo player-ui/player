@@ -1,5 +1,6 @@
 package com.intuit.playerui.android.reference.demo.test.assets.badge
 
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onNodeWithText
 import com.intuit.playerui.android.reference.demo.test.base.ComposeUITest
 import com.intuit.playerui.android.reference.demo.test.base.shouldBeAtState
@@ -12,8 +13,7 @@ class BadgeUITest : ComposeUITest("badge") {
     fun basic() {
         launchMock("badge-all")
 
-        androidComposeRule.onNodeWithText("INFO")
-            .assertExists()
+        androidComposeRule.waitUntilExactlyOneExists(hasText("INFO"))
         androidComposeRule.onNodeWithText("ERROR")
             .assertExists()
         player.shouldBeAtState<InProgressState>()
