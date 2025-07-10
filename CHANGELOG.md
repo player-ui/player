@@ -1,3 +1,81 @@
+# 0.12.0-next.8 (Tue Jul 08 2025)
+
+### Release Notes
+
+#### fix issues with react 18 suspense ([#670](https://github.com/player-ui/player/pull/670))
+
+- Fix dependencies using React 17 in Player
+- Fix `Suspense` staying triggered via `useEffect` callbacks
+- Convert `useSubscribedState` to use `useSyncExternalStore` instead of `useEffect` for callbacks
+
+---
+
+#### 🐛 Bug Fix
+
+- fix issues with react 18 suspense [#670](https://github.com/player-ui/player/pull/670) ([@spentacular](https://github.com/spentacular))
+
+#### Authors: 1
+
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.12.0-next.7 (Mon Jul 07 2025)
+
+#### 🐛 Bug Fix
+
+- Revert "Fix/react 18 cleanup" [#675](https://github.com/player-ui/player/pull/675) ([@spentacular](https://github.com/spentacular))
+- Fix/react 18 cleanup [#674](https://github.com/player-ui/player/pull/674) ([@spentacular](https://github.com/spentacular) [@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.12.0-next.6 (Mon Jul 07 2025)
+
+### Release Notes
+
+#### feat(common-expressions): add substr and split string functions ([#671](https://github.com/player-ui/player/pull/671))
+
+Added `substr` and `split` functions to common expressions plugin that mirror their javascript implementation
+
+---
+
+#### 🐛 Bug Fix
+
+- feat(common-expressions): add substr and split string functions [#671](https://github.com/player-ui/player/pull/671) ([@tusharagrawa](https://github.com/tusharagrawa) [@KetanReddy](https://github.com/KetanReddy))
+- Update Mac Build Executor to use M4 Pro Medium over M2 Pro Medium [#673](https://github.com/player-ui/player/pull/673) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Tushar Agrawal ([@tusharagrawa](https://github.com/tusharagrawa))
+
+---
+
+# 0.12.0-next.5 (Tue Jun 24 2025)
+
+### Release Notes
+
+#### Fix transforms on assets with `applicability` ([#668](https://github.com/player-ui/player/pull/668))
+
+Move `AssetTransformCorePlugin` application after `applicability` and `switch` view plugins to ensure transforms properly apply to conditional assets.
+
+---
+
+#### 🐛 Bug Fix
+
+- Fix transforms on assets with `applicability` [#668](https://github.com/player-ui/player/pull/668) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### Authors: 1
+
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+
+---
+
 # 0.12.0-next.4 (Wed Jun 18 2025)
 
 ### Release Notes
