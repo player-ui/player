@@ -21,8 +21,8 @@ js_pipeline(
         "//:node_modules/timm",
     ],
     test_deps = [
-        ":node_modules/@player-ui/reference-assets-plugin",
         ":node_modules/@player-ui/check-path-plugin",
+        ":node_modules/@player-ui/partial-match-registry",
         "//:vitest_config",
     ]
 )
