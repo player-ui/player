@@ -1,3 +1,24 @@
+# 0.12.0-next.9 (Thu Jul 10 2025)
+
+### Release Notes
+
+#### Revert "Asset deprecation (#639)" + add async hydration tracker plugin as default ([#676](https://github.com/player-ui/player/pull/676))
+
+- Revert #639 for performance reasons
+- `AsyncHydrationTrackerPlugin` is now a default `AndroidPlayerPlugin`
+
+---
+
+#### 🚀 Enhancement
+
+- Revert "Asset deprecation (#639)" + add async hydration tracker plugin as default [#676](https://github.com/player-ui/player/pull/676) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### Authors: 1
+
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+
+---
+
 # 0.12.0-next.8 (Tue Jul 08 2025)
 
 ### Release Notes
