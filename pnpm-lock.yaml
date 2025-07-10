@@ -871,6 +871,12 @@ importers:
         specifier: workspace:*
         version: link:../../../core/player
 
+  plugins/fancy/core:
+    dependencies:
+      '@player-ui/player':
+        specifier: workspace:*
+        version: link:../../../core/player
+
   plugins/markdown/core:
     dependencies:
       '@player-ui/player':

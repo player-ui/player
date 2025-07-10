@@ -55,3 +55,8 @@ dev-ios:
 [doc('Build and run the iOS demo app in a simulator')]
 start-ios-demo:
   bazel run //ios/demo:PlayerUIDemo
+
+clean: # Force delete all the cached bazel stuff. Be careful!
+    rm -rf .build
+    rm -rf .bazel-*
+    bazel clean --expunge
