@@ -15,9 +15,9 @@ import kotlinx.serialization.json.Json
 @Suppress("DEPRECATION_ERROR")
 internal class SimpleAsset(assetContext: AssetContext) : DecodableAsset<Node>(assetContext, Node.serializer()) {
 
-    override suspend fun initView(data: Node) = TextView(context)
+    override fun initView() = TextView(context)
 
-    override suspend fun View.hydrate(data: Node) = Unit
+    override fun View.hydrate() = Unit
 
     companion object {
         val sampleMap = mapOf(
