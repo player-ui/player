@@ -5,11 +5,16 @@ module(
 
 bazel_dep(name = "rules_player")
 
-archive_override(
-  module_name = "rules_player",
-  strip_prefix = "rules_player-1.2.0",
-  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v1.2.0.tar.gz"],
-  integrity = "sha256-uzODssC5XxwDKMGOGlWZTFpYpvCSzu6r3m7CGCc+zY0="
+# archive_override(
+#   module_name = "rules_player",
+#   strip_prefix = "rules_player-1.2.0",
+#   urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v1.2.0.tar.gz"],
+#   integrity = "sha256-uzODssC5XxwDKMGOGlWZTFpYpvCSzu6r3m7CGCc+zY0="
+# )
+git_override(
+    module_name = "rules_player",
+    commit = "f89b18d9f99228955a730e3a33bbaeeaea11af3d",
+    remote = "https://github.com/player-ui/rules_player",
 )
 
 # local_path_override(module_name = "rules_player", path = "../rules_player")
@@ -33,6 +38,7 @@ node.toolchain(node_version = "20.14.0")
 ###### Start iOS ######
 ## Rule Dependencies
 bazel_dep(name = "rules_apple", version = "3.5.1", repo_name = "build_bazel_rules_apple")
+# local_path_override(module_name = "rules_apple", path = "/Users/tmarmer/Repos/bazel_rules/rules_apple")
 bazel_dep(name = "rules_ios", version = "4.8.2", repo_name = "build_bazel_rules_ios")
 bazel_dep(name = "rules_xcodeproj", version = "2.2.0")
 bazel_dep(name = "gazelle", version = "0.34.0", repo_name = "bazel_gazelle")
