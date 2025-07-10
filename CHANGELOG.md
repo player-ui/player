@@ -1,3 +1,76 @@
+# 0.12.0 (Thu Jul 10 2025)
+
+### Release Notes
+
+#### Fix default-view-plugin sort order ([#679](https://github.com/player-ui/player/pull/679))
+
+Change how `player.hooks.view` `call` is handled to ensure tap order comes from default plugins first.
+
+#### Revert "Asset deprecation (#639)" + add async hydration tracker plugin as default ([#676](https://github.com/player-ui/player/pull/676))
+
+- Revert #639 for performance reasons
+- `AsyncHydrationTrackerPlugin` is now a default `AndroidPlayerPlugin`
+
+#### fix issues with react 18 suspense ([#670](https://github.com/player-ui/player/pull/670))
+
+- Fix dependencies using React 17 in Player
+- Fix `Suspense` staying triggered via `useEffect` callbacks
+- Convert `useSubscribedState` to use `useSyncExternalStore` instead of `useEffect` for callbacks
+
+#### feat(common-expressions): add substr and split string functions ([#671](https://github.com/player-ui/player/pull/671))
+
+Added `substr` and `split` functions to common expressions plugin that mirror their javascript implementation
+
+#### Fix transforms on assets with `applicability` ([#668](https://github.com/player-ui/player/pull/668))
+
+Move `AssetTransformCorePlugin` application after `applicability` and `switch` view plugins to ensure transforms properly apply to conditional assets.
+
+#### Updated docs, platform param ([#660](https://github.com/player-ui/player/pull/660))
+
+Updated contributing docs to include information around how the docs site is generated, re-added platform param capability so that the URL updates based on platform tab, updated team page.
+
+#### Export Underlying Expressions from Common Expression Plugin ([#657](https://github.com/player-ui/player/pull/657))
+
+Update Common Expressions Plugin to export underlying functions to allow them to be converted to DSL functions as well as export them as XLRs for consumption by the XLR SDK.
+
+---
+
+#### 🚀 Enhancement
+
+- Revert "Asset deprecation (#639)" + add async hydration tracker plugin as default [#676](https://github.com/player-ui/player/pull/676) ([@sugarmanz](https://github.com/sugarmanz))
+- Renew hydration scope, wrap composableAsset and apply the modifiers to all assets through the compose call [#630](https://github.com/player-ui/player/pull/630) ([@A1shK](https://github.com/A1shK) [@brocollie08](https://github.com/brocollie08) [@nancywu1](https://github.com/nancywu1))
+
+#### 🐛 Bug Fix
+
+- Release main [#681](https://github.com/player-ui/player/pull/681) ([@intuit-svc](https://github.com/intuit-svc))
+- Fix default-view-plugin sort order [#679](https://github.com/player-ui/player/pull/679) ([@spentacular](https://github.com/spentacular))
+- fix issues with react 18 suspense [#670](https://github.com/player-ui/player/pull/670) ([@spentacular](https://github.com/spentacular))
+- Revert "Fix/react 18 cleanup" [#675](https://github.com/player-ui/player/pull/675) ([@spentacular](https://github.com/spentacular))
+- Fix/react 18 cleanup [#674](https://github.com/player-ui/player/pull/674) ([@spentacular](https://github.com/spentacular) [@KetanReddy](https://github.com/KetanReddy))
+- feat(common-expressions): add substr and split string functions [#671](https://github.com/player-ui/player/pull/671) ([@tusharagrawa](https://github.com/tusharagrawa) [@KetanReddy](https://github.com/KetanReddy))
+- Update Mac Build Executor to use M4 Pro Medium over M2 Pro Medium [#673](https://github.com/player-ui/player/pull/673) ([@KetanReddy](https://github.com/KetanReddy))
+- Fix transforms on assets with `applicability` [#668](https://github.com/player-ui/player/pull/668) ([@sugarmanz](https://github.com/sugarmanz))
+- Updated docs, platform param [#660](https://github.com/player-ui/player/pull/660) ([@kharrop](https://github.com/kharrop))
+- Central Portal Migration [#662](https://github.com/player-ui/player/pull/662) ([@sugarmanz](https://github.com/sugarmanz))
+- Prebuild Publishing Targets to Miinimize Chances of Releases Breaking [#650](https://github.com/player-ui/player/pull/650) ([@KetanReddy](https://github.com/KetanReddy))
+- Export Underlying Expressions from Common Expression Plugin [#657](https://github.com/player-ui/player/pull/657) ([@KetanReddy](https://github.com/KetanReddy))
+- Compose compile only [#642](https://github.com/player-ui/player/pull/642) ([@brocollie08](https://github.com/brocollie08))
+- remove new line at end of VERSION file [#659](https://github.com/player-ui/player/pull/659) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 9
+
+- [@A1shK](https://github.com/A1shK)
+- [@brocollie08](https://github.com/brocollie08)
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+- Tushar Agrawal ([@tusharagrawa](https://github.com/tusharagrawa))
+
+---
+
 # 0.12.0-next.10 (Thu Jul 10 2025)
 
 ### Release Notes
