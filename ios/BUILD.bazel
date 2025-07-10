@@ -41,6 +41,8 @@ xcodeproj(
         "//plugins/external-action/ios:PlayerUIExternalActionPluginTests",
         "//plugins/external-action/swiftui:PlayerUIExternalActionViewModifierPluginViewInspectorTests",
 
+        "//plugins/fancy/swiftui:PlayerUIFancyPluginViewInspectorTests",
+
         "//plugins/metrics/swiftui:PlayerUIMetricsPluginViewInspectorTests",
 
         "//plugins/pending-transaction/swiftui:PlayerUISwiftUIPendingTransactionPluginViewInspectorTests",

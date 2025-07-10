@@ -1,6 +1,6 @@
 import { Player, PlayerPlugin } from "@player-ui/player";
 
-export default class FancyPlugin implements PlayerPlugin {
+export class FancyPlugin implements PlayerPlugin {
   name = 'fancy-plugin';
   private isFancy: boolean = true;
 
