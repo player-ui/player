@@ -132,6 +132,9 @@ public protocol HeadlessPlayer {
     associatedtype RegistryType: PlayerRegistry
     /// Registry for Assets
     var assetRegistry: RegistryType { get }
+
+    var pluginManager: PluginManager  { get }
+
     /// The current state of Player
     var state: BaseFlowState? { get }
     /// A reference to the core player in the JSContext
@@ -295,18 +298,6 @@ public extension HeadlessPlayer {
             let moreInfo = "in method \(String(describing: stacktrace))"
             logger.e("JavaScriptCore Exception: \(String(describing: value)) \(moreInfo)")
         }
-    }
-
-    func findPlugin<Plugin: WithSymbol>(_ plugin: Plugin.Type) -> JSValue? {
-        return jsPlayerReference?
-            .invokeMethod("findPlugin", withArguments: [
-                jsPlayerReference?.context.getSymbol(plugin.symbol) as Any
-            ])
-    }
-
-    func applyTo<Plugin: WithSymbol>(_ plugin: Plugin.Type, apply: @escaping (JSValue) -> Void) {
-        guard let plugin = findPlugin(plugin) else { return }
-        apply(plugin)
     }
 }
 
