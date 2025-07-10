@@ -231,7 +231,7 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
       });
     };
 
-    player.hooks.dataController.tap(this.name, (dc: DataController) =>
+    player.hooks.dataController.tap(this.name, (dc: DataController) => {
       dc.hooks.onUpdate.tap(this.name, (updates, options) => {
         const { silent = false } = options || {};
         if (silent) return;
@@ -241,8 +241,11 @@ export class DataChangeListenerPlugin implements PlayerPlugin {
             ?.getAll().length;
         });
         onFieldUpdateHandler(validUpdates.map((t) => t.binding));
-      }),
-    );
+      });
+      dc.hooks.onDelete.tap(this.name, (binding) => {
+        onFieldUpdateHandler([binding]);
+      });
+    });
 
     /**
      * Adding an interceptor instead of tapping to make intention clear.  This plugin is not going to change the resolution of a view
