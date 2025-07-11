@@ -292,13 +292,13 @@ export const usePersistentStateMachine = (options: {
     return managedState.state;
   }
 
-  const newState = useSyncExternalStore(
+  const state = useSyncExternalStore(
     subscription,
     getSnapshot,
     () => undefined,
   );
 
-  return { managedState, state: newState };
+  return { managedState, state };
 };
 
 /**
@@ -337,6 +337,7 @@ export const ManagedPlayer = (
 
   React.useEffect(() => {
     return () => {
+      // verify this only runs on unmount
       const playerState = state?.context.reactPlayer.player.getState();
 
       if (state?.value === "running" && playerState?.status === "in-progress") {

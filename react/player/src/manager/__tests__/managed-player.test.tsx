@@ -1,7 +1,13 @@
 import { test, expect, vitest } from "vitest";
 import React, { Suspense } from "react";
 import { makeFlow } from "@player-ui/make-flow";
-import { render, act, configure, waitFor } from "@testing-library/react";
+import {
+  render,
+  act,
+  configure,
+  waitFor,
+  screen,
+} from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import {
   MetricsCorePlugin,
@@ -404,7 +410,6 @@ test("handles flow error", async () => {
 });
 
 test("handles terminating with data", async () => {
-  vitest.useRealTimers();
   const manager: FlowManager = {
     next: vitest.fn().mockReturnValueOnce(
       Promise.resolve({
@@ -435,26 +440,24 @@ test("handles terminating with data", async () => {
   const onComplete = vitest.fn();
   const onError = vitest.fn();
 
-  let renderResult;
-  act(() => {
-    renderResult = render(
-      <Suspense fallback="loading">
-        <ManagedPlayer
-          manager={manager}
-          plugins={[new SimpleAssetPlugin()]}
-          onComplete={onComplete}
-          onError={onError}
-        />
-      </Suspense>,
-    );
-  });
+  const result = render(
+    <Suspense fallback="loading">
+      <ManagedPlayer
+        manager={manager}
+        plugins={[new SimpleAssetPlugin()]}
+        onComplete={onComplete}
+        onError={onError}
+      />
+    </Suspense>,
+    testOptions,
+  );
 
-  await renderResult.findByTestId("flow-1");
-  (renderResult as any).unmount();
+  await screen.findByTestId("flow-1");
+  result.unmount();
   expect(manager.terminate).toBeCalledWith({ returns: { id: "123" } });
 });
 
-test.only("handles new manager", async () => {
+test("handles new manager", async () => {
   const user = userEvent.setup();
 
   const makeManager = (num: number): FlowManager => {
@@ -519,6 +522,7 @@ test.only("handles new manager", async () => {
     return (
       <div>
         <button
+          id="newManager"
           type="button"
           onClick={() =>
             setCount((c) => {
@@ -529,7 +533,7 @@ test.only("handles new manager", async () => {
             })
           }
         >
-          New Manager
+          New Manager {count}
         </button>
         <ManagedPlayer
           manager={manager}
@@ -552,7 +556,7 @@ test.only("handles new manager", async () => {
   const view = await screen.findByTestId("flow-1-1");
   expect(view).toBeInTheDocument();
 
-  let newManagerBtn = await screen.findByText("New Manager");
+  let newManagerBtn = await screen.findByTestId("newManager");
   await user.click(newManagerBtn);
 
   expect(previousManager.current.terminate).toBeCalledWith({});
@@ -560,7 +564,7 @@ test.only("handles new manager", async () => {
   expect(manager.next).toBeCalledTimes(1);
   await screen.findByTestId("flow-1-2");
 
-  newManagerBtn = await screen.findByText("New Manager");
+  newManagerBtn = await screen.findByTestId("newManager");
   await user.click(newManagerBtn);
 
   const prevMan = previousManager.current;
