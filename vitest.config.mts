@@ -14,8 +14,7 @@ export default defineConfig({
       "bazel-testlogs",
     ],
     reporters: [
-      "default",
-      process.env.XML_OUTPUT_FILE ? "junit" : "basic",
+      ...(process.env.XML_OUTPUT_FILE ? ["junit", "default"] : ["default"]),
       path.join(__dirname, "tools", "vitest_coverage_mapper.ts"),
     ],
     benchmark: {
