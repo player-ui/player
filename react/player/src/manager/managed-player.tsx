@@ -349,7 +349,6 @@ export const ManagedPlayer = (
 
   React.useEffect(() => {
     return () => {
-      // verify this only runs on unmount
       const playerState = state?.context.reactPlayer.player.getState();
 
       if (state?.value === "running" && playerState?.status === "in-progress") {
