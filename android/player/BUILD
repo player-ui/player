@@ -89,8 +89,8 @@ java_import(
     neverlink = True,
     tags = ["maven:compile-only"],
     deps = [
-        "@maven//:androidx_activity_activity_compose",
         "@maven//:androidx_appcompat_appcompat",
+        "@maven//:androidx_activity_activity_compose",
         "@maven//:androidx_compose_foundation_foundation",
         "@maven//:androidx_compose_foundation_foundation_layout",
         "@maven//:androidx_compose_runtime_runtime",

@@ -595,3 +595,54 @@ describe("failure cases", () => {
     await expect(response).rejects.toThrowError("Custom Error");
   });
 });
+
+test("it applies default-view-plugins first", () => {
+  let taps: Array<{ [key: string]: any; name: string }> = [];
+  class TestPlugin {
+    name = "test-plugin";
+
+    apply(player: Player) {
+      player.hooks.view.tap(this.name, (view) => {
+        view.hooks.resolver.tap(this.name, () => {
+          return;
+        });
+        // @ts-expect-error private property
+        taps = view.hooks.resolver!.taps;
+      });
+    }
+  }
+  const player = new Player({ plugins: [new TestPlugin()] });
+
+  player.start(makeFlow({ type: "text", id: "text", value: "View" }));
+
+  const tapsByName = taps.map((tap) => tap!.name);
+  expect(tapsByName.pop()).toBe("test-plugin");
+});
+
+test("allows custom plugin to move before default", () => {
+  let taps: Array<{ [key: string]: any; name: string }> = [];
+  class TestPlugin {
+    name = "test-plugin";
+
+    apply(player: Player) {
+      player.hooks.view.tap(this.name, (view) => {
+        view.hooks.resolver.tap(
+          { name: this.name, before: "applicability" },
+          () => {
+            return;
+          },
+        );
+        // @ts-expect-error private property
+        taps = view.hooks.resolver!.taps;
+      });
+    }
+  }
+  const player = new Player({ plugins: [new TestPlugin()] });
+
+  player.start(makeFlow({ type: "text", id: "text", value: "View" }));
+
+  const tapsByName = taps.map((tap) => tap!.name);
+  expect(tapsByName.indexOf("test-plugin")).toBeLessThan(
+    tapsByName.indexOf("applicability"),
+  );
+});

@@ -8,13 +8,13 @@ import androidx.annotation.StyleRes
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
 import com.intuit.playerui.android.AssetContext
-import com.intuit.playerui.android.asset.DecodableAsset
+import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.reference.assets.R
 import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin.Companion.referenceAssetsPlugin
 import com.intuit.playerui.core.player.Player
 import kotlinx.serialization.Serializable
 
-class Text(assetContext: AssetContext) : DecodableAsset<Text.Data>(assetContext, Data.serializer()) {
+class Text(assetContext: AssetContext) : SuspendableAsset<Text.Data>(assetContext, Data.serializer()) {
 
     object Styles {
         @StyleRes val Default = R.style.Text

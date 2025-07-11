@@ -483,9 +483,12 @@ export class Player {
       },
       constants: this.constantsController,
     });
-    viewController.hooks.view.tap("player", (view) => {
-      validationController.onView(view);
-      this.hooks.view.call(view);
+
+    this.hooks.viewController.tap("player", (vc) => {
+      vc.hooks.view.tap("player", (view) => {
+        validationController.onView(view);
+        this.hooks.view.call(view);
+      });
     });
     this.hooks.viewController.call(viewController);
 

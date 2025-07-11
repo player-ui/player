@@ -9,6 +9,7 @@ import com.intuit.hooks.SyncBailHook
 import com.intuit.hooks.SyncHook
 import com.intuit.hooks.SyncWaterfallHook
 import com.intuit.playerui.android.asset.RenderableAsset
+import com.intuit.playerui.android.asset.SuspendableAsset.AsyncHydrationTrackerPlugin
 import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.overlayStyles
 import com.intuit.playerui.android.extensions.removeSelf
@@ -313,6 +314,7 @@ public class AndroidPlayer private constructor(
         private val defaultLogger = AndroidLogger("AndroidPlayer")
 
         private fun buildDefaultPlugins() = listOf(
+            AsyncHydrationTrackerPlugin::class.java to AsyncHydrationTrackerPlugin(),
             PubSubPlugin::class.java to PubSubPlugin(),
             BeaconPlugin::class.java to BeaconPlugin(),
             RegistryPlugin::class.java to RegistryPlugin<(AssetContext) -> RenderableAsset>(),

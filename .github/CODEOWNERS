@@ -1,29 +1,18 @@
 # Fallback
-* @adierkens @Brocollie08 @KetanReddy @spentacular 
-
-# Other
-/docs/ @KetanReddy @adierkens
-
-# Android/JVM
-
-/jvm/ @Brocollie08 @sugarmanz 
-/android/ @Brocollie08 @sugarmanz 
-
-# iOS
-/xcode/ @nancywu1 
-/ios/ @nancywu1
-
-# Web
-/react/ @adierkens @spentacular
-/tools/storybook/ @adierkens @KetanReddy
+* @player-ui/reviewers
 
 # Core
-/core/ @KetanReddy @adierkens
+**/core @player-ui/reviewers
 
-# Plugins
-/plugins/*/core/ @Brocollie08 @KetanReddy @spentacular 
-/plugins/*/react/ @spentacular
-/plugins/*/jvm/ @Brocollie08 
-/plugins/*/android/ @Brocollie08 
-/plugins/*/ios/ @nancywu1
-/plugins/*/swiftui/ @nancywu1
+# Android/JVM
+**/jvm @player-ui/android-reviewers
+**/android @player-ui/android-reviewers
+
+# iOS
+/xcode/ @player-ui/ios-reviewers
+**/ios @player-ui/ios-reviewers
+**/swiftui @player-ui/ios-reviewers
+
+# Web
+**/react @player-ui/web-reviewers
+**/storybook @player-ui/web-reviewers
