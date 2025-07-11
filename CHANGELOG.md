@@ -1,3 +1,24 @@
+# 0.12.1-next.0 (Fri Jul 11 2025)
+
+### Release Notes
+
+#### Fixes for manager becoming stale ([#683](https://github.com/player-ui/player/pull/683))
+
+Updates to the React Managed Player to ensure updates to the `manager` terminate the running instance and start a brand new instance.
+
+---
+
+#### 🐛 Bug Fix
+
+- Fixes for manager becoming stale [#683](https://github.com/player-ui/player/pull/683) ([@spentacular](https://github.com/spentacular))
+- update codeowners file with teams [#682](https://github.com/player-ui/player/pull/682) ([@spentacular](https://github.com/spentacular))
+
+#### Authors: 1
+
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
 # 0.12.0 (Thu Jul 10 2025)
 
 ### Release Notes
