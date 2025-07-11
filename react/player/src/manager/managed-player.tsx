@@ -240,6 +240,10 @@ export const usePersistentStateMachine = (options: {
   if (previousManager.current !== options.manager) {
     const oldManagedState = managedPlayerStateMachines.get(keyRef.current);
 
+    /**
+     * We have to handle terminate here as well as the useEffect in the
+     * ManagedPlayer since it won't have the instance of the previous manager
+     */
     if (oldManagedState) {
       const playerState =
         oldManagedState.state?.context.reactPlayer.player.getState();
@@ -268,12 +272,12 @@ export const usePersistentStateMachine = (options: {
   const managedState =
     managedPlayerStateMachines.get(keyRef.current) ?? managedStateRef.current;
 
-  if (managedState.state === undefined) {
-    managedState.start(options);
-  }
-
+  /**
+   * There are times where the managedState the external store references no
+   * longer exists, so we have to wrap instead of calling addListener directly.
+   */
   function subscription(callback: (val?: ManagedPlayerState) => void) {
-    try {
+    if (managedState) {
       const unsub = managedState.addListener((s) => {
         callback(s);
       });
@@ -283,9 +287,9 @@ export const usePersistentStateMachine = (options: {
           unsub();
         }
       };
-    } catch (error) {
-      return () => {};
     }
+
+    return () => {};
   }
 
   function getSnapshot() {
@@ -297,6 +301,14 @@ export const usePersistentStateMachine = (options: {
     getSnapshot,
     () => undefined,
   );
+
+  /**
+   * This needs to come after useSyncExternalStore, otherwise it causes
+   * a weird state update and none of the refs in this hook persist
+   */
+  if (managedState.state === undefined) {
+    managedState.start(options);
+  }
 
   return { managedState, state };
 };
