@@ -2,6 +2,7 @@ import { test, expect, vitest } from "vitest";
 import React, { Suspense } from "react";
 import { makeFlow } from "@player-ui/make-flow";
 import { render, act, configure, waitFor } from "@testing-library/react";
+import { userEvent } from "@testing-library/user-event";
 import {
   MetricsCorePlugin,
   RequestTimeWebPlugin,
@@ -451,4 +452,144 @@ test("handles terminating with data", async () => {
   await renderResult.findByTestId("flow-1");
   (renderResult as any).unmount();
   expect(manager.terminate).toBeCalledWith({ returns: { id: "123" } });
+});
+
+test.only("handles new manager", async () => {
+  const user = userEvent.setup();
+
+  const makeManager = (num: number): FlowManager => {
+    return {
+      terminate: vitest.fn(),
+      next: vitest
+        .fn()
+        .mockReturnValueOnce(
+          Promise.resolve({
+            value: makeFlow({
+              id: `flow-1-${num}`,
+              type: "collection",
+              values: [
+                {
+                  asset: {
+                    id: "action",
+                    type: "action",
+                    value: "Next",
+                    label: "Continue",
+                  },
+                },
+              ],
+            }),
+          }),
+        )
+        .mockReturnValueOnce(
+          Promise.resolve({
+            value: {
+              ...makeFlow({
+                id: `flow-2-${num}`,
+                type: "collection",
+                values: [
+                  {
+                    asset: {
+                      id: "action",
+                      type: "action",
+                      value: "Next",
+                      label: "Continue",
+                    },
+                  },
+                ],
+              }),
+              data: { foo: "bar" },
+            },
+          }),
+        )
+        .mockReturnValue(Promise.resolve({ done: true })),
+    };
+  };
+
+  let manager = makeManager(1);
+  const previousManager = {
+    current: manager,
+  };
+
+  const onComplete = vitest.fn();
+  const onError = vitest.fn();
+
+  const Wrapper = () => {
+    const [count, setCount] = React.useState(1);
+
+    return (
+      <div>
+        <button
+          type="button"
+          onClick={() =>
+            setCount((c) => {
+              const newVal = c + 1;
+              previousManager.current = manager;
+              manager = makeManager(newVal);
+              return newVal;
+            })
+          }
+        >
+          New Manager
+        </button>
+        <ManagedPlayer
+          manager={manager}
+          plugins={[new SimpleAssetPlugin()]}
+          onComplete={onComplete}
+          onError={onError}
+        />
+      </div>
+    );
+  };
+
+  const screen = render(
+    <Suspense fallback="loading">
+      <Wrapper />
+    </Suspense>,
+    testOptions,
+  );
+
+  expect(manager.next).toBeCalledWith(undefined);
+  const view = await screen.findByTestId("flow-1-1");
+  expect(view).toBeInTheDocument();
+
+  let newManagerBtn = await screen.findByText("New Manager");
+  await user.click(newManagerBtn);
+
+  expect(previousManager.current.terminate).toBeCalledWith({});
+  expect(previousManager.current.next).toBeCalledTimes(1);
+  expect(manager.next).toBeCalledTimes(1);
+  await screen.findByTestId("flow-1-2");
+
+  newManagerBtn = await screen.findByText("New Manager");
+  await user.click(newManagerBtn);
+
+  const prevMan = previousManager.current;
+  expect(prevMan.terminate).toBeCalledWith({});
+  expect(prevMan.next).toBeCalledTimes(1);
+  expect(manager.next).toBeCalledTimes(1);
+  await screen.findByTestId("flow-1-3");
+
+  let nextButton = await screen.findByText("Continue");
+  await user.click(nextButton);
+
+  expect(prevMan).toEqual(previousManager.current);
+  expect(previousManager.current.next).toBeCalledTimes(1);
+  expect(manager.next).toBeCalledTimes(2);
+
+  const view2 = await screen.findByTestId("flow-2-3");
+  expect(view2).toBeInTheDocument();
+
+  nextButton = await screen.findByText("Continue");
+  await user.click(nextButton);
+
+  expect(prevMan).toEqual(previousManager.current);
+  expect(previousManager.current.next).toBeCalledTimes(1);
+  expect(manager.next).toBeCalledTimes(3);
+
+  expect(onComplete).toBeCalledWith(
+    expect.objectContaining({
+      status: "completed",
+      data: { foo: "bar" },
+    }),
+  );
 });

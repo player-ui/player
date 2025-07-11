@@ -1,4 +1,5 @@
 import React from "react";
+import { useSyncExternalStore } from "use-sync-external-store/shim";
 import type {
   FlowManager,
   ManagedPlayerProps,
@@ -20,10 +21,7 @@ interface ManagedPlayerStateKey {
   _key: symbol;
 }
 
-export interface StateChangeCallback {
-  /** Trigger for state changes */
-  onState: (s: ManagedPlayerState) => void;
-}
+export type StateChangeCallback = (state?: ManagedPlayerState) => void;
 
 /**
  * An object to store the state of the managed player
@@ -106,7 +104,9 @@ class ManagedState {
   private async setState(state: ManagedPlayerState) {
     this.state = state;
     this.callbacks.forEach((c) => {
-      c.onState(state);
+      if (c && typeof c === "function") {
+        c(this.state);
+      }
     });
 
     const { manager, reactPlayer, playerConfig } = state.context;
@@ -208,6 +208,12 @@ const managedPlayerStateMachines = new WeakMap<
   ManagedState
 >();
 
+function createKey(): ManagedPlayerStateKey {
+  return {
+    _key: Symbol("managed-player"),
+  };
+}
+
 /** Creates an x-state state machine that persists when this component is no longer renders (due to Suspense) */
 export const usePersistentStateMachine = (options: {
   /** the flow manager to use */
@@ -219,31 +225,80 @@ export const usePersistentStateMachine = (options: {
   /** Any middleware for the manager */
   middleware?: ManagerMiddleware;
 }): { managedState: ManagedState; state?: ManagedPlayerState } => {
-  const keyRef = React.useRef<ManagedPlayerStateKey>({
-    _key: Symbol("managed-player"),
-  });
+  const mounted = React.useRef(false);
+  const previousManager = React.useRef(options.manager);
+  const keyRef = React.useRef<ManagedPlayerStateKey>(createKey());
+  const managedStateRef = React.useRef(
+    new ManagedState({ middleware: options.middleware }),
+  );
 
-  const managedState =
-    managedPlayerStateMachines.get(keyRef.current) ??
-    new ManagedState({ middleware: options.middleware });
-  managedPlayerStateMachines.set(keyRef.current, managedState);
-  const [state, setState] = React.useState(managedState.state);
+  if (!mounted.current) {
+    managedPlayerStateMachines.set(keyRef.current, managedStateRef.current);
+    mounted.current = true;
+  }
 
-  React.useEffect(() => {
-    const unsub = managedState.addListener({
-      onState: (s) => {
-        setState(s);
-      },
-    });
+  if (previousManager.current !== options.manager) {
+    const oldManagedState = managedPlayerStateMachines.get(keyRef.current);
 
-    if (managedState.state === undefined) {
-      managedState.start(options);
+    if (oldManagedState) {
+      const playerState =
+        oldManagedState.state?.context.reactPlayer.player.getState();
+
+      if (
+        oldManagedState.state?.value === "running" &&
+        playerState?.status === "in-progress"
+      ) {
+        previousManager.current.terminate?.(
+          playerState.controllers.data.serialize(),
+        );
+      }
     }
 
-    return unsub;
-  }, []);
+    const newKey = createKey();
+    const newManagedState = new ManagedState({
+      middleware: options.middleware,
+    });
 
-  return { managedState, state };
+    managedPlayerStateMachines.set(newKey, newManagedState);
+    keyRef.current = newKey;
+    managedStateRef.current = newManagedState;
+    previousManager.current = options.manager;
+  }
+
+  const managedState =
+    managedPlayerStateMachines.get(keyRef.current) ?? managedStateRef.current;
+
+  if (managedState.state === undefined) {
+    managedState.start(options);
+  }
+
+  function subscription(callback: (val?: ManagedPlayerState) => void) {
+    try {
+      const unsub = managedState.addListener((s) => {
+        callback(s);
+      });
+
+      return () => {
+        if (managedState) {
+          unsub();
+        }
+      };
+    } catch (error) {
+      return () => {};
+    }
+  }
+
+  function getSnapshot() {
+    return managedState.state;
+  }
+
+  const newState = useSyncExternalStore(
+    subscription,
+    getSnapshot,
+    () => undefined,
+  );
+
+  return { managedState, state: newState };
 };
 
 /**
