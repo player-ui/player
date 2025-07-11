@@ -9,9 +9,9 @@ parameters:
     default: false
 
 orbs:
-  macos: circleci/macos@2
-  android: circleci/android@2.0
-  codecov: codecov/codecov@3.3.0
+  macos: circleci/macos@2.5.4
+  android: circleci/android@3.1.0
+  codecov: codecov/codecov@5.4.3
 
 executors:
   base:
@@ -146,14 +146,10 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - macos/install-rosetta
-
       - run:
           name: Homebrew Dependencies
           command: |
             HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk lcov
-            wget -P /tmp/temurin https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u422-b05/OpenJDK8U-jdk_x64_mac_hotspot_8u422b05.pkg
-            sudo installer -pkg /tmp/temurin/OpenJDK8U-jdk_x64_mac_hotspot_8u422b05.pkg -target /
 
       - restore_cache:
           keys:
@@ -211,7 +207,12 @@ jobs:
               $(bazel query "kind(ios_unit_test, //ios/...)") \
               $(bazel query "kind(ios_unit_test, //plugins/...)") \
               $(bazel query "kind(ios_ui_test, //ios/...)") \
-              $(bazel query "kind(ios_ui_test, //plugins/...)") \
+              $(bazel query "kind(ios_ui_test, //plugins/...)") 
+      - run:
+          name: Lint
+          command: |
+            bazel test \
+              --config=ci-mac \
               $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
               $(bazel query "attr(name, '.*SwiftLint', //plugins/...)")
 
@@ -355,10 +356,7 @@ jobs:
           path: _test_results
 
       - codecov/upload:
-          file: ./bazel-out/_coverage/_coverage_report.dat
-
-      - codecov/upload:
-          file: _ios_coverage/lcov/_coverage_report.dat
+          files: ./bazel-out/_coverage/_coverage_report.dat, _ios_coverage/lcov/_coverage_report.dat
 
   maybe_release:
     executor: base
