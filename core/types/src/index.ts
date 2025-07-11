@@ -146,7 +146,7 @@ export interface NavigationBaseState<T extends string> extends CommentBase {
    * TS gets really confused with both the ActionState and the onStart state both declaring the `exp` property
    * So this explicity says there should never be an exp prop on a state node that's not of type 'ACTION'
    */
-  exp?: T extends "ACTION" ? Expression : never;
+  exp?: T extends "ACTION" | "ASYNC_ACTION" ? Expression : never;
 }
 
 /** A generic state that can transition to another state */
@@ -195,6 +195,19 @@ export interface NavigationFlowActionState
   exp: Expression;
 }
 
+/** Action states execute an expression to determine the next state to transition to */
+export interface NavigationFlowAsyncActionState
+  extends NavigationFlowTransitionableState<"ASYNC_ACTION"> {
+  /**
+   * An expression to execute.
+   * The return value determines the transition to take
+   */
+  exp: Expression;
+
+  /** Whether the expression(s) should be awaited before transitioning */
+  await: boolean;
+}
+
 /**
  * External Flow states represent states in the FSM that can't be resolved internally in Player.
  * The flow will wait for the embedded application to manage moving to the next state via a transition
@@ -218,6 +231,7 @@ export type NavigationFlowState =
   | NavigationFlowEndState
   | NavigationFlowFlowState
   | NavigationFlowActionState
+  | NavigationFlowAsyncActionState
   | NavigationFlowExternalState;
 
 /** The data at the end of a flow */

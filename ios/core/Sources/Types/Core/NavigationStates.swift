@@ -15,6 +15,7 @@ open class NavigationBaseState: CreatedFromJSValue {
         switch base.stateType {
         case "VIEW": return NavigationFlowViewState(value)
         case "ACTION": return NavigationFlowActionState(value)
+        case "ASYNC_ACTION": return NavigationFlowAsyncActionState(value)
         case "FLOW": return NavigationFlowFlowState(value)
         case "EXTERNAL": return NavigationFlowExternalState(value)
         case "END": return NavigationFlowEndState(value)
@@ -102,6 +103,25 @@ public class NavigationFlowActionState: NavigationFlowTransitionableState {
             return .single(exp: rawValue.objectForKeyedSubscript("exp").toString())
         }
     }
+
+    public enum Expression {
+        case single(exp: String)
+        case multi(exp: [String])
+    }
+}
+
+/// Similar to NavigationFlowActionState, this state enabled the use of asynchronous expressions
+public class NavigationFlowAsyncActionState: NavigationFlowTransitionableState {
+    /// An expression to execute. The return value determines the transition to take
+    public var exp: Expression {
+        if let multi = rawValue.objectForKeyedSubscript("exp").toObject() as? [String] {
+            return .multi(exp: multi)
+        } else {
+            return .single(exp: rawValue.objectForKeyedSubscript("exp").toString())
+        }
+    }
+
+    public var await: Bool { rawValue.objectForKeyedSubscript("await").toBool() }
 
     public enum Expression {
         case single(exp: String)

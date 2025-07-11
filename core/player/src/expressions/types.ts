@@ -26,17 +26,26 @@ export interface OperatorProcessingOptions {
    * This enables lazy evaluation of arguments
    */
   resolveParams: boolean;
+
+  /**
+   * Whether the expression should be allowed to be evaluated asynchronously
+   */
+  async?: boolean;
 }
 
-export type BinaryOperatorBasic = (left: any, right: any) => unknown;
+export type BinaryOperatorBasic = (
+  left: any,
+  right: any,
+  async: boolean,
+) => unknown;
 export type BinaryOperatorAdvanced = OperatorProcessingOptions &
-  ((ctx: ExpressionContext, left: any, right: any) => unknown);
+  ((ctx: ExpressionContext, left: any, right: any, async: boolean) => unknown);
 
 export type BinaryOperator = BinaryOperatorAdvanced | BinaryOperatorBasic;
 
 export type UnaryOperator =
-  | ((arg: any) => unknown)
-  | (((ctx: ExpressionContext, arg: any) => unknown) &
+  | ((arg: any, async: boolean) => unknown)
+  | (((ctx: ExpressionContext, arg: any, async: boolean) => unknown) &
       OperatorProcessingOptions);
 
 export interface ExpressionContext {
@@ -56,7 +65,8 @@ export type ExpressionHandler<
 > = ((context: ExpressionContext, ...args: T) => R) &
   Partial<OperatorProcessingOptions>;
 
-export const ExpNodeOpaqueIdentifier = Symbol("Expression Node ID");
+export const ExpNodeOpaqueIdentifier: unique symbol =
+  Symbol("Expression Node ID");
 
 /** Checks if the input is an already processed Expression node */
 export function isExpressionNode(x: any): x is ExpressionNode {

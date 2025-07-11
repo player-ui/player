@@ -4,6 +4,7 @@ title: Navigation
 
 import Image from "../../../components/Image.astro";
 import simpleFlowImage from "../../../assets/simple-flow.png";
+import { Badge } from '@astrojs/starlight/components';
 
 The `navigation` section of the content describes the path the user goes through as they progress. In simple terms, this can be thought of as a set of finite state machines, and the user progresses through each state until they hit a `DONE` node.
 
@@ -48,6 +49,22 @@ An action node allows users to evaluate one of more expressions before proceedin
     "false": "VIEW_2"
   }
 }
+```
+
+### `ASYNC_ACTION` <Badge text="Experimental" variant="caution" />
+
+Similar to an `ACTION` node, this node allows for the use of the internal `await` function to await the execution of an asynchronous function. The state also has a top level `await` property for if the expression as a whole should be awaited.
+
+```json
+{
+  "state_type": "ASYNC_ACTION",
+  "exp": "conditional(await(someAsyncFunction()), true, false)",
+  "transitions": {
+    "true": "VIEW_1",
+    "false": "VIEW_2",
+  },
+  "await": true,
+},
 ```
 
 ### `END`

@@ -1,8 +1,9 @@
 import { test, vitest, expect } from "vitest";
-import type { FlowController } from "../controllers";
+import type { FlowController, NamedState } from "../controllers";
 import type { DataController } from "..";
 import { Player } from "..";
 import type { InProgressState } from "../types";
+import { waitFor } from "@testing-library/react";
 
 test("transitions on action nodes", async () => {
   const player = new Player();
@@ -308,5 +309,139 @@ test("works with iffe flows", async () => {
   expect((await flowResponse).endState).toStrictEqual({
     state_type: "END",
     outcome: "doneWithTopic",
+  });
+});
+
+test("awaited async transitions", async () => {
+  const player = new Player();
+
+  player.hooks.expressionEvaluator.tap("test", (expEval) => {
+    expEval.addExpressionFunction("testAsync", async (ctx, name) => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(name);
+        }, 10);
+      });
+    });
+  });
+
+  player.start({
+    id: "test-flow",
+    data: {
+      my: {
+        puppy: "Ginger",
+      },
+    },
+    navigation: {
+      BEGIN: "FLOW_1",
+      FLOW_1: {
+        startState: "ACTION_1",
+        ACTION_1: {
+          state_type: "ASYNC_ACTION",
+          exp: "{{my.puppy}} = await(testAsync('Daisy'))",
+          transitions: {
+            Daisy: "EXTERNAL_1",
+          },
+          await: true,
+        },
+        EXTERNAL_1: {
+          state_type: "EXTERNAL",
+          ref: "view_1",
+          param: {
+            best: "{{my.puppy}}",
+          },
+          transitions: {},
+        },
+      },
+    },
+  });
+
+  await vitest.waitFor(() =>
+    expect(player.getState().status).toBe("in-progress"),
+  );
+
+  let currentState: NamedState | undefined;
+
+  await waitFor(() => {
+    const state = player.getState();
+    currentState = (state as InProgressState).controllers.flow.current
+      ?.currentState;
+    expect(currentState?.name).toBe("EXTERNAL_1");
+  });
+
+  expect(currentState?.value).toStrictEqual({
+    state_type: "EXTERNAL",
+    ref: "view_1",
+    param: {
+      best: "Daisy",
+    },
+    transitions: {},
+  });
+});
+
+test("unawaited async transitions", async () => {
+  const player = new Player();
+
+  const mockFn1 = vitest.fn();
+  const mockFn2 = vitest.fn();
+
+  player.hooks.expressionEvaluator.tap("test", (expEval) => {
+    expEval.addExpressionFunction("testAsync", async (ctx, name) => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(true);
+        }, 10);
+      });
+    });
+    expEval.addExpressionFunction("testTrue", mockFn1);
+    expEval.addExpressionFunction("testFalse", mockFn2);
+  });
+
+  player.start({
+    id: "test-flow",
+    data: {
+      my: {
+        puppy: "Ginger",
+      },
+    },
+    navigation: {
+      BEGIN: "FLOW_1",
+      FLOW_1: {
+        startState: "ACTION_1",
+        ACTION_1: {
+          state_type: "ASYNC_ACTION",
+          exp: "conditional(await(testAsync()), testTrue(), testFalse())",
+          transitions: {
+            "*": "EXTERNAL_1",
+          },
+          await: false,
+        },
+        EXTERNAL_1: {
+          state_type: "EXTERNAL",
+          ref: "view_1",
+          transitions: {},
+        },
+      },
+    },
+  });
+
+  await vitest.waitFor(() =>
+    expect(player.getState().status).toBe("in-progress"),
+  );
+
+  let currentState: NamedState | undefined;
+
+  await waitFor(() => {
+    const state = player.getState();
+    currentState = (state as InProgressState).controllers.flow.current
+      ?.currentState;
+    expect(currentState?.name).toBe("EXTERNAL_1");
+    expect(mockFn1).not.toHaveBeenCalled();
+    expect(mockFn2).not.toHaveBeenCalled();
+  });
+
+  await waitFor(() => {
+    expect(mockFn1).toHaveBeenCalled();
+    expect(mockFn2).not.toHaveBeenCalled();
   });
 });

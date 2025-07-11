@@ -2,6 +2,8 @@
 title: Data & Expressions
 ---
 
+import { Badge } from '@astrojs/starlight/components';
+
 ## Data
 
 Data is central to a lot of the functionality and features of Player. The easiest way to deal with data is to supply it in the initial payload when starting a flow. This will _seed_ the model with data and allow you to easily reference values
@@ -135,9 +137,13 @@ This also works with expression templates.
 
 Expressions are callable functions that allow for dynamic behavior of Player and it's views.
 
-These functions can be used in `ACTION` nodes in the navigation section, calculated values in a property of an asset, or anywhere else expressions are valid.
+These functions can be used in `ACTION`/`ASYNC_ACTION` nodes in the navigation section, calculated values in a property of an asset, or anywhere else expressions are valid.
 
 Check out the [Expression Plugin](/plugins/core/expression) for registering custom functions.
+
+### Asynchronous Expressions <Badge text="Experimental" variant="caution" />
+
+Player expressions don't have to be synchronous. While Player doesn't supply any asynchronous expressions, custom asynchronous expression handlers can be registered for use with a custom integration. Player does supply a built in `await` expression that is similar to JavaScript's await functionality to allow expression evaluation to wait for async functions to be completed before continuing. Currently, asynchronous expressions can be used anywhere but only can be awaited in [Asynchronous Action States](/content/navigation#async_action).
 
 ### Using Expressions and Data in a View
 
@@ -192,6 +198,7 @@ There are a few expressions built into Player. These are pretty basic, so if you
 | `conditional`   | Execute expressions, or return data based on an expression condition                  | `condition`, `valueIfTrue`, `valueIfFalse` |
 | `log`           | Calls the `info` log method on Player's logger with the provided args                 | `...args`                                  |
 | `debug`         | Calls the `debug` log method on Player's logger with the provided args                | `...args`                                  |
+| `await`         | Used to indicate that the underlying expression is asynchronous and should be awaited | `expression`                               |
 
 #### Examples
 
@@ -242,3 +249,12 @@ There are a few expressions built into Player. These are pretty basic, so if you
   "exp": "debug('some.binding value is ', {{some.binding}})"
 }
 ```
+
+##### `await`
+
+```json
+{
+  "exp": "await(someAsyncFunction('arg1', true))"
+}
+```
+
