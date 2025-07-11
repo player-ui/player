@@ -5,6 +5,7 @@ import rehypeMermaid from "rehype-mermaid";
 import react from "@astrojs/react";
 import starlightDocSearch from "@astrojs/starlight-docsearch";
 import { visit } from "unist-util-visit";
+import pagefind from "astro-pagefind";
 
 export const rehypeLinks = (options) => {
   let base = options?.base;
@@ -152,6 +153,7 @@ export default defineConfig({
         },
       ],
     }),
+    pagefind(),
   ],
   base: BASE_PREFIX,
   vite: {

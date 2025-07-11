@@ -222,6 +222,9 @@ importers:
       astro:
         specifier: ^4.16.7
         version: 4.16.7(@types/node@20.19.4)(rollup@4.28.1)(terser@5.31.0)(typescript@5.5.3)
+      astro-pagefind:
+        specifier: ^1.8.3
+        version: 1.8.3(astro@4.16.7(@types/node@20.19.4)(rollup@4.28.1)(terser@5.31.0)(typescript@5.5.3))
       auto:
         specifier: ^11.2.0
         version: 11.2.0(@swc/core@1.5.7(@swc/helpers@0.5.2))(@types/node@20.19.4)(typescript@5.5.3)
@@ -348,6 +351,9 @@ importers:
       p-defer:
         specifier: ^3.0.0
         version: 3.0.0
+      pagefind:
+        specifier: ^1.3.0
+        version: 1.3.0
       parsimmon:
         specifier: ^1.12.0
         version: 1.18.1
@@ -2322,12 +2328,12 @@ packages:
   '@chakra-ui/react-children-utils@2.0.6':
     resolution: {integrity: sha512-QVR2RC7QsOsbWwEnq9YduhpqSFnZGvjjGREV8ygKi8ADhXh93C8azLECCUVgRJF2Wc+So1fgxmjLcbZfY2VmBA==, tarball: https://registry.npmjs.org/@chakra-ui/react-children-utils/-/react-children-utils-2.0.6.tgz}
     peerDependencies:
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/react-context@2.1.0':
     resolution: {integrity: sha512-iahyStvzQ4AOwKwdPReLGfDesGG+vWJfEsn0X/NoGph/SkN+HXtv2sCfYFFR9k7bb+Kvc6YfpLlSuLvKMHi2+w==, tarball: https://registry.npmjs.org/@chakra-ui/react-context/-/react-context-2.1.0.tgz}
     peerDependencies:
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/react-env@3.1.0':
     resolution: {integrity: sha512-Vr96GV2LNBth3+IKzr/rq1IcnkXv+MLmwjQH6C8BRtn3sNskgDFD5vLkVXcEhagzZMCh8FR3V/bzZPojBOyNhw==, tarball: https://registry.npmjs.org/@chakra-ui/react-env/-/react-env-3.1.0.tgz}
@@ -2337,7 +2343,7 @@ packages:
   '@chakra-ui/react-types@2.0.7':
     resolution: {integrity: sha512-12zv2qIZ8EHwiytggtGvo4iLT0APris7T0qaAWqzpUGS0cdUtR8W+V1BJ5Ocq+7tA6dzQ/7+w5hmXih61TuhWQ==, tarball: https://registry.npmjs.org/@chakra-ui/react-types/-/react-types-2.0.7.tgz}
     peerDependencies:
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/react-use-animation-state@2.1.0':
     resolution: {integrity: sha512-CFZkQU3gmDBwhqy0vC1ryf90BVHxVN8cTLpSyCpdmExUEtSEInSCGMydj2fvn7QXsz/za8JNdO2xxgJwxpLMtg==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-animation-state/-/react-use-animation-state-2.1.0.tgz}
@@ -2347,12 +2353,12 @@ packages:
   '@chakra-ui/react-use-callback-ref@2.1.0':
     resolution: {integrity: sha512-efnJrBtGDa4YaxDzDE90EnKD3Vkh5a1t3w7PhnRQmsphLy3g2UieasoKTlT2Hn118TwDjIv5ZjHJW6HbzXA9wQ==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-callback-ref/-/react-use-callback-ref-2.1.0.tgz}
     peerDependencies:
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/react-use-controllable-state@2.1.0':
     resolution: {integrity: sha512-QR/8fKNokxZUs4PfxjXuwl0fj/d71WPrmLJvEpCTkHjnzu7LnYvzoe2wB867IdooQJL0G1zBxl0Dq+6W1P3jpg==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-controllable-state/-/react-use-controllable-state-2.1.0.tgz}
     peerDependencies:
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/react-use-disclosure@2.1.0':
     resolution: {integrity: sha512-Ax4pmxA9LBGMyEZJhhUZobg9C0t3qFE4jVF1tGBsrLDcdBeLR9fwOogIPY9Hf0/wqSlAryAimICbr5hkpa5GSw==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-disclosure/-/react-use-disclosure-2.1.0.tgz}
@@ -2362,7 +2368,7 @@ packages:
   '@chakra-ui/react-use-event-listener@2.1.0':
     resolution: {integrity: sha512-U5greryDLS8ISP69DKDsYcsXRtAdnTQT+jjIlRYZ49K/XhUR/AqVZCK5BkR1spTDmO9H8SPhgeNKI70ODuDU/Q==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-event-listener/-/react-use-event-listener-2.1.0.tgz}
     peerDependencies:
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/react-use-focus-effect@2.1.0':
     resolution: {integrity: sha512-xzVboNy7J64xveLcxTIJ3jv+lUJKDwRM7Szwn9tNzUIPD94O3qwjV7DDCUzN2490nSYDF4OBMt/wuDBtaR3kUQ==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-focus-effect/-/react-use-focus-effect-2.1.0.tgz}
@@ -2372,7 +2378,7 @@ packages:
   '@chakra-ui/react-use-focus-on-pointer-down@2.1.0':
     resolution: {integrity: sha512-2jzrUZ+aiCG/cfanrolsnSMDykCAbv9EK/4iUyZno6BYb3vziucmvgKuoXbMPAzWNtwUwtuMhkby8rc61Ue+Lg==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-focus-on-pointer-down/-/react-use-focus-on-pointer-down-2.1.0.tgz}
     peerDependencies:
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/react-use-interval@2.1.0':
     resolution: {integrity: sha512-8iWj+I/+A0J08pgEXP1J1flcvhLBHkk0ln7ZvGIyXiEyM6XagOTJpwNhiu+Bmk59t3HoV/VyvyJTa+44sEApuw==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-interval/-/react-use-interval-2.1.0.tgz}
@@ -2387,7 +2393,7 @@ packages:
   '@chakra-ui/react-use-merge-refs@2.1.0':
     resolution: {integrity: sha512-lERa6AWF1cjEtWSGjxWTaSMvneccnAVH4V4ozh8SYiN9fSPZLlSG3kNxfNzdFvMEhM7dnP60vynF7WjGdTgQbQ==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-merge-refs/-/react-use-merge-refs-2.1.0.tgz}
     peerDependencies:
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/react-use-outside-click@2.2.0':
     resolution: {integrity: sha512-PNX+s/JEaMneijbgAM4iFL+f3m1ga9+6QK0E5Yh4s8KZJQ/bLwZzdhMz8J/+mL+XEXQ5J0N8ivZN28B82N1kNw==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-outside-click/-/react-use-outside-click-2.2.0.tgz}
@@ -2407,7 +2413,7 @@ packages:
   '@chakra-ui/react-use-safe-layout-effect@2.1.0':
     resolution: {integrity: sha512-Knbrrx/bcPwVS1TorFdzrK/zWA8yuU/eaXDkNj24IrKoRlQrSBFarcgAEzlCHtzuhufP3OULPkELTzz91b0tCw==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-safe-layout-effect/-/react-use-safe-layout-effect-2.1.0.tgz}
     peerDependencies:
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/react-use-size@2.1.0':
     resolution: {integrity: sha512-tbLqrQhbnqOjzTaMlYytp7wY8BW1JpL78iG7Ru1DlV4EWGiAmXFGvtnEt9HftU0NJ0aJyjgymkxfVGI55/1Z4A==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-size/-/react-use-size-2.1.0.tgz}
@@ -2422,7 +2428,7 @@ packages:
   '@chakra-ui/react-use-update-effect@2.1.0':
     resolution: {integrity: sha512-ND4Q23tETaR2Qd3zwCKYOOS1dfssojPLJMLvUtUbW5M9uW1ejYWgGUobeAiOVfSplownG8QYMmHTP86p/v0lbA==, tarball: https://registry.npmjs.org/@chakra-ui/react-use-update-effect/-/react-use-update-effect-2.1.0.tgz}
     peerDependencies:
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/react-utils@2.0.12':
     resolution: {integrity: sha512-GbSfVb283+YA3kA8w8xWmzbjNWk14uhNpntnipHCftBibl0lxtQ9YqMFQLwuFOO0U2gYVocszqqDWX+XNKq9hw==, tarball: https://registry.npmjs.org/@chakra-ui/react-utils/-/react-utils-2.0.12.tgz}
@@ -2498,7 +2504,7 @@ packages:
     peerDependencies:
       '@emotion/react': ^11.0.0
       '@emotion/styled': ^11.0.0
-      react: '>=18'
+      react: ^18.2.0
 
   '@chakra-ui/table@2.1.0':
     resolution: {integrity: sha512-o5OrjoHCh5uCLdiUb0Oc0vq9rIAeHSIRScc2ExTC9Qg/uVZl2ygLrjToCaKfaaKl1oQexIeAcZDKvPG8tVkHyQ==, tarball: https://registry.npmjs.org/@chakra-ui/table/-/table-2.1.0.tgz}
@@ -2584,8 +2590,8 @@ packages:
     resolution: {integrity: sha512-Y/d2Zzr+JJfN6u1gbuBUb1ufBuLMJJRZQk+dRmw8GaTpqKx5uf7cGUYGTwN02dIb3I+Tf+cW8jcGBTRiFxdYFg==, tarball: https://registry.npmjs.org/@design-systems/utils/-/utils-2.12.0.tgz}
     peerDependencies:
       '@types/react': '*'
-      react: '>= 16.8.6'
-      react-dom: '>= 16.8.6'
+      react: ^18.2.0
+      react-dom: ^18.2.0
 
   '@devtools-ds/table@1.2.1':
     resolution: {integrity: sha512-wib8YqZIVU9Y74/jCh6PRPYHQQJl0jrECgxA0hnnfEp4NXCWXcND58RFNKWdr3/QSyMaVjitHy2n34YjxfBNJw==, tarball: https://registry.npmjs.org/@devtools-ds/table/-/table-1.2.1.tgz}
@@ -3331,31 +3337,34 @@ packages:
   '@oslojs/encoding@1.1.0':
     resolution: {integrity: sha512-70wQhgYmndg4GCPxPPxPGevRKqTIJ2Nh4OkiMWmDAVYsTQ+Ta7Sq+rPevXyXGdzr30/qZBnyOalCszoMxlyldQ==, tarball: https://registry.npmjs.org/@oslojs/encoding/-/encoding-1.1.0.tgz}
 
-  '@pagefind/darwin-arm64@1.1.1':
-    resolution: {integrity: sha512-tZ9tysUmQpFs2EqWG2+E1gc+opDAhSyZSsgKmFzhnWfkK02YHZhvL5XJXEZDqYy3s1FAKhwjTg8XDxneuBlDZQ==, tarball: https://registry.npmjs.org/@pagefind/darwin-arm64/-/darwin-arm64-1.1.1.tgz}
+  '@pagefind/darwin-arm64@1.3.0':
+    resolution: {integrity: sha512-365BEGl6ChOsauRjyVpBjXybflXAOvoMROw3TucAROHIcdBvXk9/2AmEvGFU0r75+vdQI4LJdJdpH4Y6Yqaj4A==, tarball: https://registry.npmjs.org/@pagefind/darwin-arm64/-/darwin-arm64-1.3.0.tgz}
     cpu: [arm64]
     os: [darwin]
 
-  '@pagefind/darwin-x64@1.1.1':
-    resolution: {integrity: sha512-ChohLQ39dLwaxQv0jIQB/SavP3TM5K5ENfDTqIdzLkmfs3+JlzSDyQKcJFjTHYcCzQOZVeieeGq8PdqvLJxJxQ==, tarball: https://registry.npmjs.org/@pagefind/darwin-x64/-/darwin-x64-1.1.1.tgz}
+  '@pagefind/darwin-x64@1.3.0':
+    resolution: {integrity: sha512-zlGHA23uuXmS8z3XxEGmbHpWDxXfPZ47QS06tGUq0HDcZjXjXHeLG+cboOy828QIV5FXsm9MjfkP5e4ZNbOkow==, tarball: https://registry.npmjs.org/@pagefind/darwin-x64/-/darwin-x64-1.3.0.tgz}
     cpu: [x64]
     os: [darwin]
 
   '@pagefind/default-ui@1.1.1':
     resolution: {integrity: sha512-ZM0zDatWDnac/VGHhQCiM7UgA4ca8jpjA+VfuTJyHJBaxGqZMQnm4WoTz9E0KFcue1Bh9kxpu7uWFZfwpZZk0A==, tarball: https://registry.npmjs.org/@pagefind/default-ui/-/default-ui-1.1.1.tgz}
 
-  '@pagefind/linux-arm64@1.1.1':
-    resolution: {integrity: sha512-H5P6wDoCoAbdsWp0Zx0DxnLUrwTGWGLu/VI1rcN2CyFdY2EGSvPQsbGBMrseKRNuIrJDFtxHHHyjZ7UbzaM9EA==, tarball: https://registry.npmjs.org/@pagefind/linux-arm64/-/linux-arm64-1.1.1.tgz}
+  '@pagefind/default-ui@1.3.0':
+    resolution: {integrity: sha512-CGKT9ccd3+oRK6STXGgfH+m0DbOKayX6QGlq38TfE1ZfUcPc5+ulTuzDbZUnMo+bubsEOIypm4Pl2iEyzZ1cNg==, tarball: https://registry.npmjs.org/@pagefind/default-ui/-/default-ui-1.3.0.tgz}
+
+  '@pagefind/linux-arm64@1.3.0':
+    resolution: {integrity: sha512-8lsxNAiBRUk72JvetSBXs4WRpYrQrVJXjlRRnOL6UCdBN9Nlsz0t7hWstRk36+JqHpGWOKYiuHLzGYqYAqoOnQ==, tarball: https://registry.npmjs.org/@pagefind/linux-arm64/-/linux-arm64-1.3.0.tgz}
     cpu: [arm64]
     os: [linux]
 
-  '@pagefind/linux-x64@1.1.1':
-    resolution: {integrity: sha512-yJs7tTYbL2MI3HT+ngs9E1BfUbY9M4/YzA0yEM5xBo4Xl8Yu8Qg2xZTOQ1/F6gwvMrjCUFo8EoACs6LRDhtMrQ==, tarball: https://registry.npmjs.org/@pagefind/linux-x64/-/linux-x64-1.1.1.tgz}
+  '@pagefind/linux-x64@1.3.0':
+    resolution: {integrity: sha512-hAvqdPJv7A20Ucb6FQGE6jhjqy+vZ6pf+s2tFMNtMBG+fzcdc91uTw7aP/1Vo5plD0dAOHwdxfkyw0ugal4kcQ==, tarball: https://registry.npmjs.org/@pagefind/linux-x64/-/linux-x64-1.3.0.tgz}
     cpu: [x64]
     os: [linux]
 
-  '@pagefind/windows-x64@1.1.1':
-    resolution: {integrity: sha512-b7/qPqgIl+lMzkQ8fJt51SfguB396xbIIR+VZ3YrL2tLuyifDJ1wL5mEm+ddmHxJ2Fki340paPcDan9en5OmAw==, tarball: https://registry.npmjs.org/@pagefind/windows-x64/-/windows-x64-1.1.1.tgz}
+  '@pagefind/windows-x64@1.3.0':
+    resolution: {integrity: sha512-BR1bIRWOMqkf8IoU576YDhij1Wd/Zf2kX/kCI0b2qzCKC8wcc2GQJaaRMCpzvCCrmliO4vtJ6RITp/AnoYUUmQ==, tarball: https://registry.npmjs.org/@pagefind/windows-x64/-/windows-x64-1.3.0.tgz}
     cpu: [x64]
     os: [win32]
 
@@ -3442,6 +3451,9 @@ packages:
         optional: true
       webpack-plugin-serve:
         optional: true
+
+  '@polka/url@1.0.0-next.29':
+    resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==, tarball: https://registry.npmjs.org/@polka/url/-/url-1.0.0-next.29.tgz}
 
   '@popperjs/core@2.11.8':
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==, tarball: https://registry.npmjs.org/@popperjs/core/-/core-2.11.8.tgz}
@@ -5091,6 +5103,11 @@ packages:
     resolution: {integrity: sha512-1U4KrvFuodaCV3z4I1bIR16SdhQlPkolGsYTtiANxPZUVv/KitGSCTjzksrkPonn1XuwVqvnwmUUVzTLWngnBA==, tarball: https://registry.npmjs.org/astro-expressive-code/-/astro-expressive-code-0.35.6.tgz}
     peerDependencies:
       astro: ^4.0.0-beta || ^3.3.0
+
+  astro-pagefind@1.8.3:
+    resolution: {integrity: sha512-Nfo1TdlEHdkXTiI0KpimLqX6awK3qWTil7IOJvk5Q8x+0VBTpIEp9QvGgoAxXDe3upAHLVsg4y7U1uUPm7GC9w==, tarball: https://registry.npmjs.org/astro-pagefind/-/astro-pagefind-1.8.3.tgz}
+    peerDependencies:
+      astro: ^2.0.4 || ^3 || ^4 || ^5
 
   astro@4.16.7:
     resolution: {integrity: sha512-nON+8MUEkWTFwXbS4zsQIq4t0Fs42eulM4x236AL+qNnWfqNAOOqAnFxO1dxfJ1q+XopIBbbT9Mtev+0zH47PQ==, tarball: https://registry.npmjs.org/astro/-/astro-4.16.7.tgz}
@@ -9126,8 +9143,8 @@ packages:
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==, tarball: https://registry.npmjs.org/package-json-from-dist/-/package-json-from-dist-1.0.1.tgz}
 
-  pagefind@1.1.1:
-    resolution: {integrity: sha512-U2YR0dQN5B2fbIXrLtt/UXNS0yWSSYfePaad1KcBPTi0p+zRtsVjwmoPaMQgTks5DnHNbmDxyJUL5TGaLljK3A==, tarball: https://registry.npmjs.org/pagefind/-/pagefind-1.1.1.tgz}
+  pagefind@1.3.0:
+    resolution: {integrity: sha512-8KPLGT5g9s+olKMRTU9LFekLizkVIu9tes90O1/aigJ0T5LmyPqTzGJrETnSw3meSYg58YH7JTzhTTW/3z6VAw==, tarball: https://registry.npmjs.org/pagefind/-/pagefind-1.3.0.tgz}
     hasBin: true
 
   pako@0.2.9:
@@ -10329,6 +10346,10 @@ packages:
   simple-swizzle@0.2.2:
     resolution: {integrity: sha512-JA//kQgZtbuY83m+xT+tXJkmJncGMTFT+C+g2h2R9uxkYIrE2yy9sgmcLhCnw57/WSD+Eh3J97FPEDFnbXnDUg==, tarball: https://registry.npmjs.org/simple-swizzle/-/simple-swizzle-0.2.2.tgz}
 
+  sirv@3.0.1:
+    resolution: {integrity: sha512-FoqMu0NCGBLCcAkS1qA+XJIQTR6/JHfQXl+uGteNCQ76T91DMUjPa9xfmeqMY3z80nLSg9yQmNjK0Px6RWsH/A==, tarball: https://registry.npmjs.org/sirv/-/sirv-3.0.1.tgz}
+    engines: {node: '>=18'}
+
   sisteransi@1.0.5:
     resolution: {integrity: sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==, tarball: https://registry.npmjs.org/sisteransi/-/sisteransi-1.0.5.tgz}
 
@@ -10860,6 +10881,10 @@ packages:
 
   toml@3.0.0:
     resolution: {integrity: sha512-y/mWCZinnvxjTKYhJ+pYxwD0mRLVvOtdS2Awbgxln6iEnt4rk0yBxeSBHkGJcPucRiG0e55mwWp+g/05rsrd6w==, tarball: https://registry.npmjs.org/toml/-/toml-3.0.0.tgz}
+
+  totalist@3.0.1:
+    resolution: {integrity: sha512-sf4i37nQ2LBx4m3wB74y+ubopq6W/dIzXg0FDGjsYnZHVa1Da8FH853wlL2gtUhg+xJXjfk3kUZS3BRoQeoQBQ==, tarball: https://registry.npmjs.org/totalist/-/totalist-3.0.1.tgz}
+    engines: {node: '>=6'}
 
   tr46@0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==, tarball: https://registry.npmjs.org/tr46/-/tr46-0.0.3.tgz}
@@ -12112,7 +12137,7 @@ snapshots:
       mdast-util-directive: 3.0.0
       mdast-util-to-markdown: 2.1.0
       mdast-util-to-string: 4.0.0
-      pagefind: 1.1.1
+      pagefind: 1.3.0
       rehype: 13.0.1
       rehype-format: 5.0.0
       remark-directive: 3.0.0
@@ -15552,21 +15577,23 @@ snapshots:
 
   '@oslojs/encoding@1.1.0': {}
 
-  '@pagefind/darwin-arm64@1.1.1':
+  '@pagefind/darwin-arm64@1.3.0':
     optional: true
 
-  '@pagefind/darwin-x64@1.1.1':
+  '@pagefind/darwin-x64@1.3.0':
     optional: true
 
   '@pagefind/default-ui@1.1.1': {}
 
-  '@pagefind/linux-arm64@1.1.1':
+  '@pagefind/default-ui@1.3.0': {}
+
+  '@pagefind/linux-arm64@1.3.0':
     optional: true
 
-  '@pagefind/linux-x64@1.1.1':
+  '@pagefind/linux-x64@1.3.0':
     optional: true
 
-  '@pagefind/windows-x64@1.1.1':
+  '@pagefind/windows-x64@1.3.0':
     optional: true
 
   '@pkgjs/parseargs@0.11.0':
@@ -15758,6 +15785,8 @@ snapshots:
       type-fest: 4.26.1
       webpack-dev-server: 5.0.4(webpack-cli@5.1.4)(webpack@5.91.0)
       webpack-hot-middleware: 2.26.1
+
+  '@polka/url@1.0.0-next.29': {}
 
   '@popperjs/core@2.11.8': {}
 
@@ -17926,6 +17955,13 @@ snapshots:
     dependencies:
       astro: 4.16.7(@types/node@20.19.4)(rollup@4.28.1)(terser@5.31.0)(typescript@5.5.3)
       rehype-expressive-code: 0.35.6
+
+  astro-pagefind@1.8.3(astro@4.16.7(@types/node@20.19.4)(rollup@4.28.1)(terser@5.31.0)(typescript@5.5.3)):
+    dependencies:
+      '@pagefind/default-ui': 1.3.0
+      astro: 4.16.7(@types/node@20.19.4)(rollup@4.28.1)(terser@5.31.0)(typescript@5.5.3)
+      pagefind: 1.3.0
+      sirv: 3.0.1
 
   astro@4.16.7(@types/node@20.19.4)(rollup@4.28.1)(terser@5.31.0)(typescript@5.5.3):
     dependencies:
@@ -22757,7 +22793,7 @@ snapshots:
       '@next/env': 14.0.2
       '@swc/helpers': 0.5.2
       busboy: 1.6.0
-      caniuse-lite: 1.0.30001620
+      caniuse-lite: 1.0.30001669
       postcss: 8.4.31
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -23096,13 +23132,13 @@ snapshots:
 
   package-json-from-dist@1.0.1: {}
 
-  pagefind@1.1.1:
+  pagefind@1.3.0:
     optionalDependencies:
-      '@pagefind/darwin-arm64': 1.1.1
-      '@pagefind/darwin-x64': 1.1.1
-      '@pagefind/linux-arm64': 1.1.1
-      '@pagefind/linux-x64': 1.1.1
-      '@pagefind/windows-x64': 1.1.1
+      '@pagefind/darwin-arm64': 1.3.0
+      '@pagefind/darwin-x64': 1.3.0
+      '@pagefind/linux-arm64': 1.3.0
+      '@pagefind/linux-x64': 1.3.0
+      '@pagefind/windows-x64': 1.3.0
 
   pako@0.2.9: {}
 
@@ -24658,6 +24694,12 @@ snapshots:
     dependencies:
       is-arrayish: 0.3.2
 
+  sirv@3.0.1:
+    dependencies:
+      '@polka/url': 1.0.0-next.29
+      mrmime: 2.0.0
+      totalist: 3.0.1
+
   sisteransi@1.0.5: {}
 
   sitemap@7.1.2:
@@ -25259,6 +25301,8 @@ snapshots:
       ieee754: 1.2.1
 
   toml@3.0.0: {}
+
+  totalist@3.0.1: {}
 
   tr46@0.0.3: {}
 
