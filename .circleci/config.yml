@@ -356,7 +356,7 @@ jobs:
           path: _test_results
 
       - codecov/upload:
-          files: ./bazel-out/_coverage/_coverage_report.dat, _ios_coverage/lcov/_coverage_report.dat
+          files: ./bazel-out/_coverage/_coverage_report.dat,./_ios_coverage/lcov/_coverage_report.dat
 
   maybe_release:
     executor: base
