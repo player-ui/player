@@ -560,7 +560,10 @@ export class ExpressionEvaluator {
         throw new Error(`Unknown expression function: ${expressionName}`);
       }
 
-      if (operator.name === "waitFor" && !options.async) {
+      if (
+        operator.name === DEFAULT_EXPRESSION_HANDLERS.waitFor.name &&
+        !options.async
+      ) {
         throw new Error("Usage of await outside of async context");
       }
 

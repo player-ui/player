@@ -1,6 +1,6 @@
 import { setIn } from "timm";
 import deferred from "p-defer";
-import type { Flow as FlowType, FlowResult, Asset } from "@player-ui/types";
+import type { Flow, FlowResult } from "@player-ui/types";
 
 import { SyncHook, SyncWaterfallHook } from "tapable-ts";
 import type { Logger } from "./logger";
@@ -26,6 +26,7 @@ import type {
   InProgressState,
   CompletedState,
   ErrorState,
+  PlayerHooks,
 } from "./types";
 import { NOT_STARTED_STATE } from "./types";
 import { DefaultViewPlugin } from "./plugins/default-view-plugin";
@@ -93,69 +94,19 @@ export class Player {
   private config: PlayerConfigOptions;
   private state: PlayerFlowState = NOT_STARTED_STATE;
 
-  public readonly hooks: {
-    /** The hook that fires every time we create a new flowController (a new Content blob is passed in) */
-    flowController: SyncHook<[FlowController], Record<string, any>>;
-    /** The hook that updates/handles views */
-    viewController: SyncHook<[ViewController], Record<string, any>>;
-    /** A hook called every-time there's a new view. This is equivalent to the view hook on the view-controller */
-    view: SyncHook<[ViewInstance], Record<string, any>>;
-    /** Called when an expression evaluator was created */
-    expressionEvaluator: SyncHook<[ExpressionEvaluator], Record<string, any>>;
-    /** The hook that creates and manages data */
-    dataController: SyncHook<[DataController], Record<string, any>>;
-    /** Called after the schema is created for a flow */
-    schema: SyncHook<[SchemaController], Record<string, any>>;
-    /** Manages validations (schema and x-field ) */
-    validationController: SyncHook<[ValidationController], Record<string, any>>;
-    /** Manages parsing binding */
-    bindingParser: SyncHook<[BindingParser], Record<string, any>>;
-    /** A that's called for state changes in the flow execution */
-    state: SyncHook<[PlayerFlowState], Record<string, any>>;
-    /** A hook to access the current flow */
-    onStart: SyncHook<[FlowType<Asset<string>>], Record<string, any>>;
-    /** A hook for when the flow ends either in success or failure */
-    onEnd: SyncHook<[], Record<string, any>>;
-    /** Mutate the Content flow before starting */
-    resolveFlowContent: SyncWaterfallHook<
-      [FlowType<Asset<string>>],
-      Record<string, any>
-    >;
-  } = {
-    /** The hook that fires every time we create a new flowController (a new Content blob is passed in) */
+  public readonly hooks: PlayerHooks = {
     flowController: new SyncHook<[FlowController]>(),
-
-    /** The hook that updates/handles views */
     viewController: new SyncHook<[ViewController]>(),
-
-    /** A hook called every-time there's a new view. This is equivalent to the view hook on the view-controller */
     view: new SyncHook<[ViewInstance]>(),
-
-    /** Called when an expression evaluator was created */
     expressionEvaluator: new SyncHook<[ExpressionEvaluator]>(),
-
-    /** The hook that creates and manages data */
     dataController: new SyncHook<[DataController]>(),
-
-    /** Called after the schema is created for a flow */
     schema: new SyncHook<[SchemaController]>(),
-
-    /** Manages validations (schema and x-field ) */
     validationController: new SyncHook<[ValidationController]>(),
-
-    /** Manages parsing binding */
     bindingParser: new SyncHook<[BindingParser]>(),
-
-    /** A that's called for state changes in the flow execution */
     state: new SyncHook<[PlayerFlowState]>(),
-
-    /** A hook to access the current flow */
-    onStart: new SyncHook<[FlowType]>(),
-
-    /** A hook for when the flow ends either in success or failure */
+    onStart: new SyncHook<[Flow]>(),
     onEnd: new SyncHook<[]>(),
-    /** Mutate the Content flow before starting */
-    resolveFlowContent: new SyncWaterfallHook<[FlowType]>(),
+    resolveFlowContent: new SyncWaterfallHook<[Flow]>(),
   };
 
   constructor(config?: PlayerConfigOptions) {
@@ -234,7 +185,7 @@ export class Player {
   }
 
   /** Start Player with the given flow */
-  private setupFlow(userContent: FlowType): {
+  private setupFlow(userContent: Flow): {
     /** a callback to _actually_ start the flow */
     start: () => void;
 
@@ -531,7 +482,7 @@ export class Player {
     };
   }
 
-  public async start(payload: FlowType): Promise<CompletedState> {
+  public async start(payload: Flow): Promise<CompletedState> {
     const ref = Symbol(payload?.id ?? "payload");
 
     /** A check to avoid updating the state for a flow that's not the current one */
