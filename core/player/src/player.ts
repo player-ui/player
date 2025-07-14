@@ -109,6 +109,7 @@ export class Player {
     resolveFlowContent: new SyncWaterfallHook<[Flow]>(),
   };
 
+  private readonly untapFns: Array<() => void> = [];
   constructor(config?: PlayerConfigOptions) {
     if (config?.logger) {
       this.logger.addHandler(config.logger);
@@ -435,12 +436,15 @@ export class Player {
       constants: this.constantsController,
     });
 
-    this.hooks.viewController.tap("player", (vc) => {
+    const viewControllerTap = this.hooks.viewController.tap("player", (vc) => {
       vc.hooks.view.tap("player", (view) => {
         validationController.onView(view);
         this.hooks.view.call(view);
       });
     });
+    this.untapFns.push(() =>
+      this.hooks.viewController.untap(viewControllerTap),
+    );
     this.hooks.viewController.call(viewController);
 
     return {
@@ -482,6 +486,11 @@ export class Player {
     };
   }
 
+  private cleanup(): void {
+    this.untapFns.forEach((fn) => fn());
+    this.untapFns.splice(0, this.untapFns.length);
+  }
+
   public async start(payload: Flow): Promise<CompletedState> {
     const ref = Symbol(payload?.id ?? "payload");
 
@@ -506,6 +515,7 @@ export class Player {
     });
 
     try {
+      this.cleanup();
       const { state, start } = this.setupFlow(payload);
       this.setState({
         ref,
