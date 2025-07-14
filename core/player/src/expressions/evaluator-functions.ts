@@ -6,6 +6,7 @@ import type {
   ExpressionContext,
   ExpressionNode,
 } from "./types";
+import { Awaitable, isAwaitable, makeAwaitable } from "./async";
 
 /** Sets a value to the data-model */
 export const setDataVal: ExpressionHandler<[Binding, any], any> = (
@@ -36,16 +37,40 @@ export const deleteDataVal: ExpressionHandler<[Binding], void> = (
 export const conditional: ExpressionHandler<
   [ExpressionNode, ExpressionNode, ExpressionNode?]
 > = (ctx, condition, ifTrue, ifFalse) => {
-  const resolution = ctx.evaluate(condition);
-  if (resolution) {
-    return ctx.evaluate(ifTrue);
+  const testResult = ctx.evaluate(condition);
+
+  // Handle Promise case automatically (same pattern as ternary operator)
+  if (isAwaitable(testResult)) {
+    return testResult.awaitableThen((resolvedTest: any) => {
+      if (resolvedTest) {
+        return ctx.evaluate(ifTrue);
+      }
+      if (ifFalse) {
+        return ctx.evaluate(ifFalse);
+      }
+      return null;
+    });
   }
 
+  // Handle sync case
+  if (testResult) {
+    return ctx.evaluate(ifTrue);
+  }
   if (ifFalse) {
     return ctx.evaluate(ifFalse);
   }
-
   return null;
 };
 
 conditional.resolveParams = false;
+
+/**
+ * Internal await function
+ * This is technically registered as `await` but can't be called that due to conflicting with the keyword
+ */
+export const waitFor: ExpressionHandler<[Promise<any>], Awaitable<any>> = (
+  ctx,
+  promise,
+) => {
+  return makeAwaitable(promise);
+};

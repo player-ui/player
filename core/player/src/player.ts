@@ -1,12 +1,12 @@
 import { setIn } from "timm";
 import deferred from "p-defer";
-import type { Flow as FlowType, FlowResult } from "@player-ui/types";
+import type { Flow, FlowResult } from "@player-ui/types";
 
 import { SyncHook, SyncWaterfallHook } from "tapable-ts";
 import type { Logger } from "./logger";
 import { TapableLogger } from "./logger";
 import type { ExpressionType } from "./expressions";
-import { ExpressionEvaluator } from "./expressions";
+import { ExpressionEvaluator, isPromiseLike } from "./expressions";
 import { SchemaController } from "./schema";
 import { BindingParser } from "./binding";
 import type { ViewInstance } from "./view";
@@ -26,6 +26,7 @@ import type {
   InProgressState,
   CompletedState,
   ErrorState,
+  PlayerHooks,
 } from "./types";
 import { NOT_STARTED_STATE } from "./types";
 import { DefaultViewPlugin } from "./plugins/default-view-plugin";
@@ -87,46 +88,25 @@ export class Player {
     commit: COMMIT,
   };
 
-  public readonly logger = new TapableLogger();
-  public readonly constantsController = new ConstantsController();
+  public readonly logger: TapableLogger = new TapableLogger();
+  public readonly constantsController: ConstantsController =
+    new ConstantsController();
   private config: PlayerConfigOptions;
   private state: PlayerFlowState = NOT_STARTED_STATE;
 
-  public readonly hooks = {
-    /** The hook that fires every time we create a new flowController (a new Content blob is passed in) */
+  public readonly hooks: PlayerHooks = {
     flowController: new SyncHook<[FlowController]>(),
-
-    /** The hook that updates/handles views */
     viewController: new SyncHook<[ViewController]>(),
-
-    /** A hook called every-time there's a new view. This is equivalent to the view hook on the view-controller */
     view: new SyncHook<[ViewInstance]>(),
-
-    /** Called when an expression evaluator was created */
     expressionEvaluator: new SyncHook<[ExpressionEvaluator]>(),
-
-    /** The hook that creates and manages data */
     dataController: new SyncHook<[DataController]>(),
-
-    /** Called after the schema is created for a flow */
     schema: new SyncHook<[SchemaController]>(),
-
-    /** Manages validations (schema and x-field ) */
     validationController: new SyncHook<[ValidationController]>(),
-
-    /** Manages parsing binding */
     bindingParser: new SyncHook<[BindingParser]>(),
-
-    /** A that's called for state changes in the flow execution */
     state: new SyncHook<[PlayerFlowState]>(),
-
-    /** A hook to access the current flow */
-    onStart: new SyncHook<[FlowType]>(),
-
-    /** A hook for when the flow ends either in success or failure */
+    onStart: new SyncHook<[Flow]>(),
     onEnd: new SyncHook<[]>(),
-    /** Mutate the Content flow before starting */
-    resolveFlowContent: new SyncWaterfallHook<[FlowType]>(),
+    resolveFlowContent: new SyncWaterfallHook<[Flow]>(),
   };
 
   constructor(config?: PlayerConfigOptions) {
@@ -171,7 +151,7 @@ export class Player {
   }
 
   /** Register and apply [Plugin] if one with the same symbol is not already registered. */
-  public registerPlugin(plugin: PlayerPlugin) {
+  public registerPlugin(plugin: PlayerPlugin): void {
     plugin.apply(this);
     this.config.plugins?.push(plugin);
   }
@@ -205,7 +185,7 @@ export class Player {
   }
 
   /** Start Player with the given flow */
-  private setupFlow(userContent: FlowType): {
+  private setupFlow(userContent: Flow): {
     /** a callback to _actually_ start the flow */
     start: () => void;
 
@@ -368,13 +348,47 @@ export class Player {
         }
       });
 
+      // Tap for synchronous action states
       flow.hooks.afterTransition.tap("player", (flowInstance) => {
         const value = flowInstance.currentState?.value;
         if (value && value.state_type === "ACTION") {
           const { exp } = value;
-          flowController?.transition(
-            String(expressionEvaluator?.evaluate(exp)),
-          );
+          const result = expressionEvaluator.evaluate(exp);
+          if (isPromiseLike(result)) {
+            this.logger.warn(
+              "Async expression used as return value in in non-async context, transitioning with '*' value",
+            );
+          }
+          flowController?.transition(String(result));
+        }
+
+        expressionEvaluator.reset();
+      });
+
+      // Tap for async action states
+      flow.hooks.afterTransition.tap("player", async (flowInstance) => {
+        const value = flowInstance.currentState?.value;
+        if (value && value.state_type === "ASYNC_ACTION") {
+          const { exp } = value;
+          try {
+            let result = expressionEvaluator.evaluateAsync(exp);
+            if (isPromiseLike(result)) {
+              if (value.await) {
+                result = await result;
+              } else {
+                this.logger.warn(
+                  "Unawaited promise used as return value in in non-async context, transitioning with '*' value",
+                );
+              }
+            } else {
+              this.logger.warn(
+                "Non async expression used in async action node",
+              );
+            }
+            flowController?.transition(String(result));
+          } catch (e) {
+            flowResultDeferred.reject(e);
+          }
         }
 
         expressionEvaluator.reset();
@@ -468,7 +482,7 @@ export class Player {
     };
   }
 
-  public async start(payload: FlowType): Promise<CompletedState> {
+  public async start(payload: Flow): Promise<CompletedState> {
     const ref = Symbol(payload?.id ?? "payload");
 
     /** A check to avoid updating the state for a flow that's not the current one */
