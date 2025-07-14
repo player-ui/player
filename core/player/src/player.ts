@@ -109,7 +109,9 @@ export class Player {
     resolveFlowContent: new SyncWaterfallHook<[Flow]>(),
   };
 
+  /** Array of functions to untap all tracked taps. Used in a cleanup step before starting a new flow. */
   private readonly untapFns: Array<() => void> = [];
+
   constructor(config?: PlayerConfigOptions) {
     if (config?.logger) {
       this.logger.addHandler(config.logger);
@@ -486,6 +488,7 @@ export class Player {
     };
   }
 
+  /** Cleanup step before starting a new flow. Removes taps as necessary to prevent issues with old taps causing the new flow to throw errors. */
   private cleanup(): void {
     this.untapFns.forEach((fn) => fn());
     this.untapFns.splice(0, this.untapFns.length);
