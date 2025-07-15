@@ -480,7 +480,7 @@ export class Player {
     };
   }
 
-  public async start(payload: FlowType): Promise<CompletedState> {
+  public async start(payload: Flow): Promise<CompletedState> {
     const ref = Symbol(payload?.id ?? "payload");
 
     /** A check to avoid updating the state for a flow that's not the current one */
