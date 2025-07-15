@@ -109,9 +109,6 @@ export class Player {
     resolveFlowContent: new SyncWaterfallHook<[Flow]>(),
   };
 
-  /** Array of functions to untap all tracked taps. Used in a cleanup step before starting a new flow. */
-  private readonly untapFns: Array<() => void> = [];
-
   constructor(config?: PlayerConfigOptions) {
     if (config?.logger) {
       this.logger.addHandler(config.logger);
@@ -438,16 +435,11 @@ export class Player {
       constants: this.constantsController,
     });
 
-    const viewControllerTap = this.hooks.viewController.tap("player", (vc) => {
-      vc.hooks.view.tap("player", (view) => {
-        validationController.onView(view);
-        this.hooks.view.call(view);
-      });
-    });
-    this.untapFns.push(() =>
-      this.hooks.viewController.untap(viewControllerTap),
-    );
     this.hooks.viewController.call(viewController);
+    viewController.hooks.view.tap("player", (view) => {
+      validationController.onView(view);
+      this.hooks.view.call(view);
+    });
 
     return {
       start: () => {
@@ -488,13 +480,7 @@ export class Player {
     };
   }
 
-  /** Cleanup step before starting a new flow. Removes taps as necessary to prevent issues with old taps causing the new flow to throw errors. */
-  private cleanup(): void {
-    this.untapFns.forEach((fn) => fn());
-    this.untapFns.splice(0, this.untapFns.length);
-  }
-
-  public async start(payload: Flow): Promise<CompletedState> {
+  public async start(payload: FlowType): Promise<CompletedState> {
     const ref = Symbol(payload?.id ?? "payload");
 
     /** A check to avoid updating the state for a flow that's not the current one */
@@ -518,7 +504,6 @@ export class Player {
     });
 
     try {
-      this.cleanup();
       const { state, start } = this.setupFlow(payload);
       this.setState({
         ref,
