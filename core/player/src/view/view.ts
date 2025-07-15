@@ -72,14 +72,24 @@ class CrossfieldProvider implements ValidationProvider {
   }
 }
 
+type ViewHooks = {
+  /** Hook every time there is an update to this view instance */
+  onUpdate: SyncHook<[ViewType]>;
+  /** Hook to retrieve the parser used for this view */
+  parser: SyncHook<[Parser]>;
+  /** Hook to retrieve the resolver used for this view */
+  resolver: SyncHook<[Resolver]>;
+  /** Hook to retrieve the template plugin used for this view */
+  templatePlugin: SyncHook<[TemplatePlugin]>;
+};
+
 /** A stateful view instance from an content */
 export class ViewInstance implements ValidationProvider {
-  public hooks = {
-    onUpdate: new SyncHook<[ViewType]>(),
-    parser: new SyncHook<[Parser]>(),
-    resolver: new SyncHook<[Resolver]>(),
-    onTemplatePluginCreated: new SyncHook<[TemplatePlugin]>(),
-    templatePlugin: new SyncHook<[TemplatePlugin]>(),
+  public hooks: ViewHooks = {
+    onUpdate: new SyncHook(),
+    parser: new SyncHook(),
+    resolver: new SyncHook(),
+    templatePlugin: new SyncHook(),
   };
 
   private resolver?: Resolver;
@@ -97,18 +107,15 @@ export class ViewInstance implements ValidationProvider {
   constructor(initialView: ViewType, resolverOptions: Resolve.ResolverOptions) {
     this.initialView = initialView;
     this.resolverOptions = resolverOptions;
-    this.hooks.onTemplatePluginCreated.tap("view", (templatePlugin) => {
-      this.templatePlugin = templatePlugin;
-    });
   }
 
-  public updateAsync() {
+  public updateAsync(): void {
     const update = this.resolver?.update();
     this.lastUpdate = update;
     this.hooks.onUpdate.call(update);
   }
 
-  public update(changes?: Set<BindingInstance>) {
+  public update(changes?: Set<BindingInstance>): any {
     if (this.rootNode === undefined) {
       /** On initialization of the view, also create a validation parser */
       this.validationProvider = new CrossfieldProvider(
@@ -148,8 +155,14 @@ export class ViewInstance implements ValidationProvider {
     return update;
   }
 
-  getValidationsForBinding(binding: BindingInstance) {
+  getValidationsForBinding(
+    binding: BindingInstance,
+  ): Array<ValidationObject> | undefined {
     return this.validationProvider?.getValidationsForBinding(binding);
+  }
+
+  public setTemplatePlugin(plugin: TemplatePlugin): void {
+    this.templatePlugin = plugin;
   }
 }
 
