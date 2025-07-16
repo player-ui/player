@@ -1,3 +1,24 @@
+# 0.13.0-next.1 (Wed Jul 16 2025)
+
+### Release Notes
+
+#### remove DefaultViewPlugins and move implementation into ViewController ([#689](https://github.com/player-ui/player/pull/689))
+
+- Remove `DefaultViewPlugins` and add all plugins it uses into the `ViewController`
+- Add and export types for the hooks on the `ViewController` and `ViewInstance`
+
+---
+
+#### 🐛 Bug Fix
+
+- remove DefaultViewPlugins and move implementation into ViewController [#689](https://github.com/player-ui/player/pull/689) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 1
+
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
 # 0.13.0-next.0 (Wed Jul 16 2025)
 
 ### Release Notes
