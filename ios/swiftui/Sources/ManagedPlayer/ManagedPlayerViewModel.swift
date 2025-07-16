@@ -127,7 +127,7 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
         switch result {
         case .success(let completed):
             self.prevResult = completed
-            Task { await self.next(completed) }
+            Task { [weak self] in await self?.next(completed) }
         case .failure(let error):
             self.loadingState = .failed(error)
         }
