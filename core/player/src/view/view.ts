@@ -72,7 +72,7 @@ class CrossfieldProvider implements ValidationProvider {
   }
 }
 
-type ViewHooks = {
+export type ViewHooks = {
   /** Hook every time there is an update to this view instance */
   onUpdate: SyncHook<[ViewType]>;
   /** Hook to retrieve the parser used for this view */

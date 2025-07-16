@@ -33,7 +33,7 @@ export interface ViewControllerOptions {
   flowController: FlowController;
 }
 
-type ViewControllerHooks = {
+export type ViewControllerHooks = {
   /** Do any processing before the `View` instance is created */
   resolveView: SyncWaterfallHook<
     [View | undefined, string, NavigationFlowViewState]
