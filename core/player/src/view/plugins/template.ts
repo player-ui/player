@@ -239,5 +239,6 @@ export default class TemplatePlugin implements ViewPlugin {
   apply(view: ViewInstance): void {
     view.hooks.parser.tap("template", this.applyParser.bind(this));
     view.hooks.resolver.tap("template", this.applyResolverHooks.bind(this));
+    view.setTemplatePlugin(this);
   }
 }
