@@ -1,3 +1,32 @@
+# 0.13.0-next.0 (Wed Jul 16 2025)
+
+### Release Notes
+
+#### Async Expression Support ([#649](https://github.com/player-ui/player/pull/649))
+
+Adds experimental support for asynchronous expressions within Player.  This functionality should be consider in beta and effectively an unstable API, however the API of the `ASYNC_ACTION` itself should be considered stable. 
+
+The new built-in expression `await` can be used to block execution of expressions until the underlying Promise is resolved. The `await`  expression can only be used when the expression-evaluator enables _async_ expressions to be evaluated, which is currently only supported on `ASYNC_ACTION` navigation nodes. Async expressions can be used in a regular `ACTION` node but they can not be awaited on. Using `await` in an `ACTION` node will cause a runtime exception.
+
+---
+
+#### 🚀 Enhancement
+
+- Async Expression Support [#649](https://github.com/player-ui/player/pull/649) ([@adierkens](https://github.com/adierkens) [@rafbcampos](https://github.com/rafbcampos) [@KetanReddy](https://github.com/KetanReddy))
+
+#### 🐛 Bug Fix
+
+- fix iOS ManagedPlayerViewModel memory leak [#688](https://github.com/player-ui/player/pull/688) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+
+#### Authors: 4
+
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Rafael Campos ([@rafbcampos](https://github.com/rafbcampos))
+
+---
+
 # 0.12.1-next.0 (Fri Jul 11 2025)
 
 ### Release Notes
