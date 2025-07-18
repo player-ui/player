@@ -123,6 +123,8 @@ export declare namespace Node {
      * Should the content streamed in be flattened during resolving
      */
     flatten?: boolean;
+    /** The path in the object to extract the async content. */
+    extractionPath?: string[];
   }
 
   export interface PluginOptions {

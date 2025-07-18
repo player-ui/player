@@ -1,4 +1,4 @@
-import { NodeType, getNodeID } from "@player-ui/player";
+import { Builder, NodeType, getNodeID } from "@player-ui/player";
 import type {
   Player,
   PlayerPlugin,
@@ -13,7 +13,6 @@ import type {
 } from "@player-ui/player";
 import { AsyncParallelBailHook, SyncBailHook } from "tapable-ts";
 import queueMicrotask from "queue-microtask";
-import { omit } from "timm";
 
 export * from "./types";
 export * from "./transform";
@@ -45,6 +44,13 @@ export type AsyncHandler = (
   node: Node.Async,
   callback?: (result: any) => void,
 ) => Promise<any>;
+
+export type AsyncContent = {
+  async: true;
+  flatten?: boolean;
+  extractionPath?: string[];
+  [key: string]: unknown;
+};
 
 /** Hook declaration for the AsyncNodePlugin */
 type AsyncNodeHooks = {
@@ -131,8 +137,17 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     result: any,
     options: Resolve.NodeResolveOptions,
   ) {
-    const parsedNode =
+    let parsedNode =
       options.parseNode && result ? options.parseNode(result) : undefined;
+
+    // TODO: Remove this from here and add either an option to `parseNode` to allow for multi-nodes or introduce `parseMultiNode`
+    if (Array.isArray(result) && parsedNode?.type === NodeType.Value) {
+      const innerNodes = [...(parsedNode.children ?? [])]
+        .sort((a, b) => Number(a.path[0]) - Number(b.path[0]))
+        .map(this.extractThing) as any[];
+
+      parsedNode = Builder.multiNode(...innerNodes);
+    }
 
     this.handleAsyncUpdate(node, context, parsedNode);
   }
@@ -156,6 +171,15 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
       nodeResolveCache.set(node.id, newNode ? newNode : node);
       view.updateAsync();
     }
+  }
+
+  private extractThing(child: Node.Child): Node.Node {
+    if (child.path.length < 2) {
+      return child.value;
+    }
+
+    const valueNode = Builder.value();
+    return Builder.addChild(valueNode, child.path.slice(1), child.value);
   }
 
   /**
@@ -186,6 +210,34 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
       });
 
       return node;
+    });
+
+    resolver.hooks.afterResolve.tap(this.name, (value, resolvedAST) => {
+      // TODO: Move this to `beforeResolve` and use `followNodePath`
+      const node = resolver.getSourceNode(resolvedAST);
+      if (
+        !node ||
+        !this.isAsync(node) ||
+        this.isDeterminedAsync(value) ||
+        node.extractionPath === undefined
+      ) {
+        return value;
+      }
+
+      let currentValue = value;
+      for (const pathSegment of node.extractionPath) {
+        if (
+          typeof currentValue === "object" &&
+          currentValue !== null &&
+          !Array.isArray(currentValue)
+        ) {
+          currentValue = currentValue[pathSegment];
+        } else {
+          return undefined;
+        }
+      }
+
+      return currentValue;
     });
   }
 
@@ -234,8 +286,12 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     return node?.type === NodeType.Async;
   }
 
-  private isDeterminedAsync(obj: any) {
-    return obj && Object.prototype.hasOwnProperty.call(obj, "async");
+  private isDeterminedAsync(obj: unknown): obj is AsyncContent {
+    return (
+      typeof obj === "object" &&
+      obj !== null &&
+      Object.prototype.hasOwnProperty.call(obj, "async")
+    );
   }
 
   applyParser(parser: Parser): void {
@@ -248,11 +304,9 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         childOptions?: ParseObjectChildOptions,
       ) => {
         if (this.isDeterminedAsync(obj)) {
-          const parsedAsync = parser.parseObject(
-            omit(obj, "async"),
-            nodeType,
-            options,
-          );
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { async, flatten, extractionPath, ...rest } = obj;
+          const parsedAsync = parser.parseObject(rest, nodeType, options);
           const parsedNodeId = getNodeID(parsedAsync);
 
           if (parsedAsync === null || !parsedNodeId) {
@@ -264,6 +318,8 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
               id: parsedNodeId,
               type: NodeType.Async,
               value: parsedAsync,
+              flatten,
+              extractionPath,
             },
             obj,
           );
@@ -302,3 +358,58 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     this.basePlugin = asyncNodePlugin;
   }
 }
+
+const followNodePath = (
+  node: Node.Node,
+  path?: string[],
+): Node.Node | undefined => {
+  if (path === undefined || path.length === 0) {
+    return node;
+  }
+
+  if (!("children" in node && node.children)) {
+    return undefined;
+  }
+
+  let matchResult = 0;
+  let bestMatch: Node.Child | undefined;
+  for (const child of node.children) {
+    const matchValue = getMatchValue(child.path, path);
+    if (matchValue > matchResult) {
+      matchResult = matchValue;
+      bestMatch = child;
+    }
+  }
+
+  if (!bestMatch) {
+    return undefined;
+  }
+
+  if (matchResult >= path.length) {
+    return bestMatch.value;
+  }
+
+  return (
+    followNodePath(bestMatch.value, path.slice(matchResult)) ?? bestMatch.value
+  );
+};
+
+const getMatchValue = (
+  pathA: Node.PathSegment[],
+  pathB: Node.PathSegment[],
+): number => {
+  if (pathA.length > pathB.length) {
+    return 0;
+  }
+
+  let matchCount = 0;
+  for (let i = 0; i < pathA.length; i++) {
+    if (pathA[i] === pathB[i]) {
+      matchCount++;
+    } else {
+      return matchCount;
+    }
+  }
+
+  return matchCount;
+};

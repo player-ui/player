@@ -14,11 +14,12 @@ export const asyncTransform: AsyncTransformFunc = (
   assetId,
   wrapperAssetType,
   asset,
-  flatten,
+  flatten = true,
 ) => {
   const id = "async-" + assetId;
 
-  const asyncNode = Builder.asyncNode(id, flatten);
+  // TODO: Make path an option instead of constant
+  const asyncNode = Builder.asyncNode(id, flatten, ["asset", "values"]);
   let multiNode;
   let assetNode;
 
