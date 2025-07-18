@@ -852,7 +852,7 @@ describe("view", () => {
 
     let deferredResolve: ((value: any) => void) | undefined;
 
-    plugin.hooks.onAsyncNode.tap("test", async (node) => {
+    plugin.hooks.onAsyncNode.tap("test", async () => {
       return new Promise((resolve) => {
         deferredResolve = resolve;
       });
@@ -868,7 +868,7 @@ describe("view", () => {
 
     player.hooks.viewController.tap("async-node-test", (vc) => {
       vc.hooks.view.tap("async-node-test", (view) => {
-        view.hooks.onUpdate.tap("async-node-test", (update) => {
+        view.hooks.onUpdate.tap("async-node-test", () => {
           updateNumber++;
         });
       });
@@ -913,8 +913,8 @@ describe("view", () => {
     view = (player.getState() as InProgressState).controllers.view.currentView
       ?.lastUpdate;
 
-    expect(view?.values[1][0].asset.type).toBe("text");
-    expect(view?.values[1][1].asset.type).toBe("text");
+    expect(view?.values[1].asset.type).toBe("text");
+    expect(view?.values[2].asset.type).toBe("text");
   });
 
   test("chat-message asset - replaces async nodes with provided node", async () => {

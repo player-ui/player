@@ -34,6 +34,10 @@ exports[`asyncTransform > generates wrapper asset with asset 1`] = `
             "value": undefined,
           },
           {
+            "extractionPath": [
+              "asset",
+              "values",
+            ],
             "flatten": true,
             "id": "async-1",
             "parent": [Circular],

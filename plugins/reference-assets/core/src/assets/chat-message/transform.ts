@@ -14,10 +14,6 @@ import { ChatMessageAsset } from "./types";
  */
 export const transform: BeforeTransformFunction<ChatMessageAsset> = (asset) => {
   const newAsset = asset.children?.[0]?.value;
-
-  if (!newAsset) {
-    return asyncTransform(asset.value.id, "collection");
-  }
   return asyncTransform(asset.value.id, "collection", newAsset);
 };
 
