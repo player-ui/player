@@ -33,7 +33,6 @@ node.toolchain(node_version = "20.14.0")
 ###### Start iOS ######
 ## Rule Dependencies
 bazel_dep(name = "rules_apple", version = "3.5.1", repo_name = "build_bazel_rules_apple")
-# local_path_override(module_name = "rules_apple", path = "/Users/tmarmer/Repos/bazel_rules/rules_apple")
 bazel_dep(name = "rules_ios", version = "4.8.2", repo_name = "build_bazel_rules_ios")
 bazel_dep(name = "rules_xcodeproj", version = "2.2.0")
 bazel_dep(name = "gazelle", version = "0.34.0", repo_name = "bazel_gazelle")
