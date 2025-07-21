@@ -391,7 +391,7 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel query 'filter(".*_vitest_bench$", //...)' --output label 2>/dev/null | tr '\n' ' ' | xargs -n 1 bazel run --config=ci
+      - run: bazel query 'filter(".*_vitest_bench$", //...)' --output label 2>/dev/null | tr '\n' ' ' | xargs -n 1 bazel run --config=ci-medium
 
 workflows:
   build_and_test_pr:
