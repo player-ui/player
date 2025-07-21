@@ -71,8 +71,8 @@ common:ci --config=ci-base --local_cpu_resources=8 --local_ram_resources=15000
 # Circle macos.m1.large.gen1 6 cores 28gb ram
 common:ci-mac --config=ci-base --local_cpu_resources=5 --local_ram_resources=26000
 
-# For bench tests we are using a medium resource_class which has 2 cpus and 4GB RAM
-common:ci-medium --config=ci-base --local_cpu_resources=2 --local_ram_resources=3000
+# For bench tests we are using a medium+ resource_class which has 3 cpu cores and 6GB RAM
+common:ci-medium-plus --config=ci-base --local_cpu_resources=3 --local_ram_resources=5000
 
 common:release --config=ci --stamp --workspace_status_command=./scripts/workspace-status.sh
 build:release --//:cmake_build_type=MinSizeRel
