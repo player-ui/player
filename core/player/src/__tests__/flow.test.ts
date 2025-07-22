@@ -314,9 +314,10 @@ test("works with iffe flows", async () => {
 
 test("awaited async transitions", async () => {
   const player = new Player();
-
+  let counter = 0;
   player.hooks.expressionEvaluator.tap("test", (expEval) => {
     expEval.addExpressionFunction("testAsync", async (ctx, name) => {
+      counter += 1;
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve(name);
@@ -377,6 +378,8 @@ test("awaited async transitions", async () => {
     },
     transitions: {},
   });
+
+  expect(counter).toEqual(1);
 });
 
 test("unawaited async transitions", async () => {

@@ -470,6 +470,16 @@ describe("async evaluator", () => {
     expect(await result).toBe("truthy");
   });
 
+  test("Async functions are only called once", async () => {
+    const mockHandler = vitest.fn().mockReturnValue(Promise.resolve(true));
+    evaluator.addExpressionFunction("asyncTest", mockHandler);
+
+    const result = evaluator.evaluateAsync("await(asyncTest())");
+    expect(result).toBeInstanceOf(Promise);
+    expect(await result).toBe(true);
+    expect(mockHandler).toBeCalledTimes(1);
+  });
+
   test("logical operators with async values", async () => {
     evaluator.addExpressionFunction("asyncTrue", async () => {
       return Promise.resolve(true);
