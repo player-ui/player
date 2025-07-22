@@ -1,4 +1,4 @@
-import { Builder, NodeType, getNodeID } from "@player-ui/player";
+import { NodeType, getNodeID } from "@player-ui/player";
 import type {
   Player,
   PlayerPlugin,
@@ -137,16 +137,12 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     result: any,
     options: Resolve.NodeResolveOptions,
   ) {
-    let parsedNode =
-      options.parseNode && result ? options.parseNode(result) : undefined;
+    let parsedNode: Node.Node | undefined;
 
-    // TODO: Remove this from here and add either an option to `parseNode` to allow for multi-nodes or introduce `parseMultiNode`
-    if (Array.isArray(result) && parsedNode?.type === NodeType.Value) {
-      const innerNodes = [...(parsedNode.children ?? [])]
-        .sort((a, b) => Number(a.path[0]) - Number(b.path[0]))
-        .map(this.extractThing) as any[];
-
-      parsedNode = Builder.multiNode(...innerNodes);
+    if (Array.isArray(result) && options.parseMultiNode) {
+      parsedNode = options.parseMultiNode(result) ?? undefined;
+    } else if (options.parseNode && result) {
+      parsedNode = options.parseNode(result) ?? undefined;
     }
 
     this.handleAsyncUpdate(node, context, parsedNode);
@@ -171,15 +167,6 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
       nodeResolveCache.set(node.id, newNode ? newNode : node);
       view.updateAsync();
     }
-  }
-
-  private extractThing(child: Node.Child): Node.Node {
-    if (child.path.length < 2) {
-      return child.value;
-    }
-
-    const valueNode = Builder.value();
-    return Builder.addChild(valueNode, child.path.slice(1), child.value);
   }
 
   /**
@@ -213,7 +200,6 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     });
 
     resolver.hooks.afterResolve.tap(this.name, (value, resolvedAST) => {
-      // TODO: Move this to `beforeResolve` and use `followNodePath`
       const node = resolver.getSourceNode(resolvedAST);
       if (
         !node ||
@@ -358,58 +344,3 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     this.basePlugin = asyncNodePlugin;
   }
 }
-
-const followNodePath = (
-  node: Node.Node,
-  path?: string[],
-): Node.Node | undefined => {
-  if (path === undefined || path.length === 0) {
-    return node;
-  }
-
-  if (!("children" in node && node.children)) {
-    return undefined;
-  }
-
-  let matchResult = 0;
-  let bestMatch: Node.Child | undefined;
-  for (const child of node.children) {
-    const matchValue = getMatchValue(child.path, path);
-    if (matchValue > matchResult) {
-      matchResult = matchValue;
-      bestMatch = child;
-    }
-  }
-
-  if (!bestMatch) {
-    return undefined;
-  }
-
-  if (matchResult >= path.length) {
-    return bestMatch.value;
-  }
-
-  return (
-    followNodePath(bestMatch.value, path.slice(matchResult)) ?? bestMatch.value
-  );
-};
-
-const getMatchValue = (
-  pathA: Node.PathSegment[],
-  pathB: Node.PathSegment[],
-): number => {
-  if (pathA.length > pathB.length) {
-    return 0;
-  }
-
-  let matchCount = 0;
-  for (let i = 0; i < pathA.length; i++) {
-    if (pathA[i] === pathB[i]) {
-      matchCount++;
-    } else {
-      return matchCount;
-    }
-  }
-
-  return matchCount;
-};
