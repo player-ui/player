@@ -10,4 +10,5 @@ export type AsyncTransformFunc = (
   wrapperAssetType: string,
   asset?: Node.Node,
   flatten?: boolean,
+  path?: string[],
 ) => Node.Asset;
