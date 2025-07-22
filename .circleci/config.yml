@@ -42,6 +42,13 @@ executors:
     resource_class: large
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
+  benchmarks:
+    docker:
+      - image: docker.io/playerui/bazel-docker:13
+    working_directory: ~/player
+    resource_class: medium+
+    environment:
+      TZ: "/usr/share/zoneinfo/America/Los_Angeles"
 
 commands:
   auto_shipit:
@@ -378,6 +385,14 @@ jobs:
           at: ~/player
       - auto_shipit
 
+  bench_js:
+    executor: benchmarks
+    steps:
+      - attach_workspace:
+          at: ~/player
+
+      - run: bazel query 'filter(".*_vitest_bench$", //...)' --output label 2>/dev/null | tr '\n' ' ' | xargs -n 1 bazel run --config=ci-medium-plus
+
 workflows:
   build_and_test_pr:
     jobs:
@@ -516,6 +531,24 @@ workflows:
           requires:
             - build-fork
             - build-ios-fork
+
+      - bench_js:
+          name: js-benchmark-tests-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          requires:
+            - build-trunk
+      
+      - bench_js:
+          name: js-benchmark-tests-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - build-fork
 
   build_and_test_main:
     when:
