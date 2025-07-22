@@ -31,6 +31,31 @@ open class BaseJSHook {
     }
 }
 
+/// A base for implementing JS backed async hooks with promise support
+open class BaseAsyncJSHook: BaseJSHook {
+    /// Creates a promise with common error handling for async operations
+    /// - Parameter asyncWork: The async work to execute
+    /// - Returns: A JavaScript promise
+    internal func createAsyncPromise<Result>(_ asyncWork: @escaping () async throws -> Result) -> JSValue {
+        let promise = JSUtilities.createPromise(context: self.context) { (resolve, reject) in
+            Task {
+                do {
+                    let result = try await asyncWork()
+                    DispatchQueue.main.async {
+                        resolve(result as Any)
+                    }
+                } catch let error {
+                    let message = error.playerDescription
+                    DispatchQueue.main.async {
+                        reject("Async hook threw with error '\(message)'")
+                    }
+                }
+            }
+        }
+        return promise ?? JSValue()
+    }
+}
+
 /**
  This class represents an object in the JS runtime that can be tapped into
  to receive JS events
@@ -172,9 +197,7 @@ public class Hook3Decode<T, U, S>: BaseJSHook where T: Decodable, U: Decodable, 
  This class represents an object in the JS runtime that can be tapped into
  and returns a promise that resolves when the asynchronous task is completed
  */
-public class AsyncHook<T>: BaseJSHook where T: CreatedFromJSValue {
-    private var handler: AsyncHookHandler?
-    
+public class AsyncHook<T>: BaseAsyncJSHook where T: CreatedFromJSValue {
     public typealias AsyncHookHandler = (T) async throws -> JSValue?
     
     /**
@@ -191,22 +214,9 @@ public class AsyncHook<T>: BaseJSHook where T: CreatedFromJSValue {
                 let hookValue = T.createInstance(value: val) as? T
             else { return JSValue() }
             
-            let promise =
-            JSUtilities.createPromise(context: self.context, handler: { (resolve, reject) in
-                Task {
-                    do {
-                        let result = try await hook(hookValue)
-                        DispatchQueue.main.async {
-                            resolve(result as Any)
-                        }
-                    } catch let error {
-                        let message = error.playerDescription
-                        reject("Async hook threw with error '\(message)'")
-                    }
-                }
-            })
-            
-            return promise ?? JSValue()
+            return self.createAsyncPromise {
+                try await hook(hookValue)
+            }
         }
         
         self.hook.invokeMethod("tap", withArguments: [name, JSValue(object: tapMethod, in: context) as Any])
@@ -218,9 +228,7 @@ public class AsyncHook<T>: BaseJSHook where T: CreatedFromJSValue {
  to receive JS events that has 2 parameters and
  returns a promise that resolves when the asynchronous task is completed
  */
-public class AsyncHook2<T, U>: BaseJSHook where T: CreatedFromJSValue, U: CreatedFromJSValue {
-    private var handler: AsyncHookHandler?
-    
+public class AsyncHook2<T, U>: BaseAsyncJSHook where T: CreatedFromJSValue, U: CreatedFromJSValue {
     public typealias AsyncHookHandler = (T, U) async throws -> JSValue?
     
     /**
@@ -239,23 +247,9 @@ public class AsyncHook2<T, U>: BaseJSHook where T: CreatedFromJSValue, U: Create
                 let hookValue2 = U.createInstance(value: val2) as? U
             else { return JSValue() }
             
-            
-            let promise =
-            JSUtilities.createPromise(context: self.context, handler: { (resolve, reject) in
-                Task {
-                    do {
-                        let result = try await hook(hookValue, hookValue2)
-                        DispatchQueue.main.async {
-                            resolve(result as Any)
-                        }
-                    } catch let error {
-                        let message = error.playerDescription
-                        reject("Async hook threw with error '\(message)'")
-                    }
-                }
-            })
-            
-            return promise ?? JSValue()
+            return self.createAsyncPromise {
+                try await hook(hookValue, hookValue2)
+            }
         }
         
         self.hook.invokeMethod("tap", withArguments: [name, JSValue(object: tapMethod, in: context) as Any])
