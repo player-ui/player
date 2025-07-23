@@ -610,7 +610,7 @@ describe("failure cases", () => {
           startState: "ActionState",
           ActionState: {
             state_type: "ASYNC_ACTION",
-            exp: "{{something}} == await(testAsync('test'))",
+            exp: "await(testAsync('test'))",
             transitions: {
               test: "ViewState",
             },

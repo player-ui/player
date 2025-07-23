@@ -1,7 +1,12 @@
 import { SyncHook, SyncWaterfallHook } from "tapable-ts";
 import queueMicrotask from "queue-microtask";
 import { Registry } from "@player-ui/partial-match-registry";
-import type { View, NavigationFlowViewState } from "@player-ui/types";
+import type {
+  View,
+  NavigationFlowViewState,
+  Asset,
+  Validation,
+} from "@player-ui/types";
 
 import { resolveDataRefsInString } from "../../string-resolver";
 import type { Resolve } from "../../view";
@@ -23,15 +28,31 @@ export interface ViewControllerOptions {
   flowController: FlowController;
 }
 
+export interface ViewControllerHooks {
+  /** Do any processing before the `View` instance is created */
+  resolveView: SyncWaterfallHook<
+    [
+      (
+        | (Asset<string> & {
+            validation?: Array<Validation.CrossfieldReference>;
+          })
+        | undefined
+      ),
+      string,
+      NavigationFlowViewState,
+    ],
+    Record<string, any>
+  >;
+  // The hook right before the View starts resolving. Attach anything custom here
+  view: SyncHook<[ViewInstance], Record<string, any>>;
+}
+
 /** A controller to manage updating/switching views */
 export class ViewController {
-  public readonly hooks = {
-    /** Do any processing before the `View` instance is created */
+  public readonly hooks: ViewControllerHooks = {
     resolveView: new SyncWaterfallHook<
       [View | undefined, string, NavigationFlowViewState]
     >(),
-
-    // The hook right before the View starts resolving. Attach anything custom here
     view: new SyncHook<[ViewInstance]>(),
   };
 
@@ -55,7 +76,6 @@ export class ViewController {
     this.viewOptions = options;
     this.viewMap = initialViews.reduce<Record<string, View>>(
       (viewMap, view) => {
-        // eslint-disable-next-line no-param-reassign
         viewMap[view.id] = view;
         return viewMap;
       },
@@ -153,7 +173,7 @@ export class ViewController {
     }
   }
 
-  public onView(state: NavigationFlowViewState) {
+  public onView(state: NavigationFlowViewState): void {
     const viewId = state.ref;
 
     const source = this.hooks.resolveView.call(
