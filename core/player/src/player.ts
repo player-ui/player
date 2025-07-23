@@ -348,33 +348,19 @@ export class Player {
         }
       });
 
-      // Tap for synchronous action states
-      flow.hooks.afterTransition.tap("player", (flowInstance) => {
-        const value = flowInstance.currentState?.value;
-        if (value && value.state_type === "ACTION") {
-          const { exp } = value;
-          const result = expressionEvaluator.evaluate(exp);
-          if (isPromiseLike(result)) {
-            this.logger.warn(
-              "Async expression used as return value in in non-async context, transitioning with '*' value",
-            );
-          }
-          flowController?.transition(String(result));
-        }
-
-        expressionEvaluator.reset();
-      });
-
-      // Tap for async action states
-      flow.hooks.afterTransition.tap("player", async (flowInstance) => {
+      // Tap for action states
+      flow.hooks.afterTransition.tap("player-action-states", (flowInstance) => {
         const value = flowInstance.currentState?.value;
         if (value && value.state_type === "ASYNC_ACTION") {
           const { exp } = value;
+          // defer async execution to next tick to allow transition to settle
           try {
-            let result = expressionEvaluator.evaluateAsync(exp);
+            const result = expressionEvaluator.evaluateAsync(exp);
             if (isPromiseLike(result)) {
               if (value.await) {
-                result = await result;
+                result
+                  .then((r) => flowController?.transition(String(r)))
+                  .catch(flowResultDeferred.reject);
               } else {
                 this.logger.warn(
                   "Unawaited promise used as return value in in non-async context, transitioning with '*' value",
@@ -389,6 +375,16 @@ export class Player {
           } catch (e) {
             flowResultDeferred.reject(e);
           }
+        } else if (value && value.state_type === "ACTION") {
+          // handle sync actions
+          const { exp } = value;
+          const result = expressionEvaluator.evaluate(exp);
+          if (isPromiseLike(result)) {
+            this.logger.warn(
+              "Async expression used as return value in in non-async context, transitioning with '*' value",
+            );
+          }
+          flowController?.transition(String(result));
         }
 
         expressionEvaluator.reset();
