@@ -1,16 +1,21 @@
 import { SyncHook, SyncWaterfallHook } from "tapable-ts";
 import queueMicrotask from "queue-microtask";
 import { Registry } from "@player-ui/partial-match-registry";
-import type {
-  View,
-  NavigationFlowViewState,
-  Asset,
-  Validation,
-} from "@player-ui/types";
+import type { View, NavigationFlowViewState } from "@player-ui/types";
 
 import { resolveDataRefsInString } from "../../string-resolver";
-import type { Resolve } from "../../view";
-import { ViewInstance } from "../../view";
+import type { Resolve, ViewPlugin } from "../../view";
+import {
+  ApplicabilityPlugin,
+  AssetPlugin,
+  AssetTransformCorePlugin,
+  MultiNodePlugin,
+  StringResolverPlugin,
+  SwitchPlugin,
+  TemplatePlugin,
+  toNodeResolveOptions,
+  ViewInstance,
+} from "../../view";
 import type { Logger } from "../../logger";
 import type { FlowInstance, FlowController } from "../flow";
 import type { DataController } from "../data/controller";
@@ -28,32 +33,21 @@ export interface ViewControllerOptions {
   flowController: FlowController;
 }
 
-export interface ViewControllerHooks {
+export type ViewControllerHooks = {
   /** Do any processing before the `View` instance is created */
   resolveView: SyncWaterfallHook<
-    [
-      (
-        | (Asset<string> & {
-            validation?: Array<Validation.CrossfieldReference>;
-          })
-        | undefined
-      ),
-      string,
-      NavigationFlowViewState,
-    ],
-    Record<string, any>
+    [View | undefined, string, NavigationFlowViewState]
   >;
-  // The hook right before the View starts resolving. Attach anything custom here
-  view: SyncHook<[ViewInstance], Record<string, any>>;
-}
+
+  /** The hook right before the View starts resolving. Attach anything custom here */
+  view: SyncHook<[ViewInstance]>;
+};
 
 /** A controller to manage updating/switching views */
 export class ViewController {
   public readonly hooks: ViewControllerHooks = {
-    resolveView: new SyncWaterfallHook<
-      [View | undefined, string, NavigationFlowViewState]
-    >(),
-    view: new SyncHook<[ViewInstance]>(),
+    resolveView: new SyncWaterfallHook(),
+    view: new SyncHook(),
   };
 
   private readonly viewMap: Record<string, View>;
@@ -64,6 +58,7 @@ export class ViewController {
     /** Whether we have a microtask queued to handle this pending update */
     scheduled?: boolean;
   };
+  private readonly viewPlugins: Array<ViewPlugin>;
 
   public currentView?: ViewInstance;
   public transformRegistry: TransformRegistry = new Registry();
@@ -127,6 +122,8 @@ export class ViewController {
         update(new Set([binding]));
       }
     });
+
+    this.viewPlugins = this.createViewPlugins();
   }
 
   private queueUpdate(bindings: Set<BindingInstance>, silent = false) {
@@ -191,7 +188,27 @@ export class ViewController {
 
     // Give people a chance to attach their
     // own listeners to the view before we resolve it
+    this.applyViewPlugins(view);
     this.hooks.view.call(view);
     view.update();
+  }
+
+  private applyViewPlugins(view: ViewInstance): void {
+    for (const plugin of this.viewPlugins) {
+      plugin.apply(view);
+    }
+  }
+
+  private createViewPlugins(): Array<ViewPlugin> {
+    const pluginOptions = toNodeResolveOptions(this.viewOptions);
+    return [
+      new AssetPlugin(),
+      new SwitchPlugin(pluginOptions),
+      new ApplicabilityPlugin(),
+      new AssetTransformCorePlugin(this.transformRegistry),
+      new StringResolverPlugin(),
+      new TemplatePlugin(pluginOptions),
+      new MultiNodePlugin(),
+    ];
   }
 }

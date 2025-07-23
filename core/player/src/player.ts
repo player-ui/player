@@ -29,7 +29,6 @@ import type {
   PlayerHooks,
 } from "./types";
 import { NOT_STARTED_STATE } from "./types";
-import { DefaultViewPlugin } from "./plugins/default-view-plugin";
 
 // Variables injected at build time
 const PLAYER_VERSION = "__VERSION__";
@@ -117,7 +116,6 @@ export class Player {
     this.config = config || {};
     this.config.plugins = [
       new DefaultExpPlugin(),
-      new DefaultViewPlugin(),
       ...(this.config.plugins || []),
       new FlowExpPlugin(),
     ];
@@ -431,11 +429,9 @@ export class Player {
       constants: this.constantsController,
     });
 
-    this.hooks.viewController.tap("player", (vc) => {
-      vc.hooks.view.tap("player", (view) => {
-        validationController.onView(view);
-        this.hooks.view.call(view);
-      });
+    viewController.hooks.view.tap("player", (view) => {
+      validationController.onView(view);
+      this.hooks.view.call(view);
     });
     this.hooks.viewController.call(viewController);
 

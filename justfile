@@ -55,3 +55,7 @@ dev-ios:
 [doc('Build and run the iOS demo app in a simulator')]
 start-ios-demo:
   bazel run //ios/demo:PlayerUIDemo
+
+[doc('Run all the js benchmarks')]
+benchmark-js:
+   bazel query 'filter(".*_vitest_bench$", //...)' --output label 2>/dev/null | tr '\n' ' ' | xargs -n 1 bazel run

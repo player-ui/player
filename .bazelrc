@@ -54,22 +54,25 @@ coverage --remote_download_toplevel
 coverage --remote_timeout=3600
 coverage --build_metadata=REPO_URL=https://github.com/player-ui/player.git
 
-common:ci --build_metadata=ROLE=CI
-
-# Circle xlarge has 8 CPU cores/16GB mem
-common:ci --local_cpu_resources=8
-common:ci --local_ram_resources=15000
-common:ci --experimental_remote_build_event_upload=minimal 
-common:ci --nolegacy_important_outputs
+# Base ci config for all executors. Other ci configs should inherit from this and add resource limitations.
+common:ci-base --build_metadata=ROLE=CI
+common:ci-base --experimental_remote_build_event_upload=minimal 
+common:ci-base --nolegacy_important_outputs
 
 # Only show progress every 60 seconds on CI.
 # We want to find a compromise between printing often enough to show that the build isn't stuck,
 # but not so often that we produce a long log file that requires a lot of scrolling.
 # https://bazel.build/reference/command-line-reference#flag--show_progress_rate_limit
-common:ci --show_progress_rate_limit=60
+common:ci-base --show_progress_rate_limit=60
+
+# Circle xlarge has 8 CPU cores/16GB mem
+common:ci --config=ci-base --local_cpu_resources=8 --local_ram_resources=15000
 
 # Circle macos.m1.large.gen1 6 cores 28gb ram
-common:ci-mac --config=ci --local_cpu_resources=5 --local_ram_resources=26000
+common:ci-mac --config=ci-base --local_cpu_resources=5 --local_ram_resources=26000
+
+# For bench tests we are using a medium+ resource_class which has 3 cpu cores and 6GB RAM
+common:ci-medium-plus --config=ci-base --local_cpu_resources=3 --local_ram_resources=5000
 
 common:release --config=ci --stamp --workspace_status_command=./scripts/workspace-status.sh
 build:release --//:cmake_build_type=MinSizeRel

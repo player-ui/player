@@ -696,3 +696,29 @@ test("allows custom plugin to move before default", () => {
     tapsByName.indexOf("applicability"),
   );
 });
+
+test("view trigger once when moving between views", async () => {
+  const viewTap = vitest.fn();
+  class TestPlugin {
+    name = "test-plugin";
+
+    apply(player: Player) {
+      player.hooks.view.tap(this.name, viewTap);
+    }
+  }
+  const player = new Player({ plugins: [new TestPlugin()] });
+
+  player.start(makeFlow({ type: "text", id: "text", value: "View" }));
+
+  await vitest.waitFor(() => {
+    expect(viewTap).toHaveBeenCalledOnce();
+  });
+
+  viewTap.mockClear();
+
+  player.start(makeFlow({ type: "text", id: "text", value: "View" }));
+
+  await vitest.waitFor(() => {
+    expect(viewTap).toHaveBeenCalledOnce();
+  });
+});
