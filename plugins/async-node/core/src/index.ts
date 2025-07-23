@@ -26,6 +26,8 @@ type AsyncPluginContext = {
   nodeResolveCache: Map<string, any>;
   /** The view instance this context is attached to. */
   view: ViewInstance;
+  /** Map of async node id to promises being used to resolve them */
+  inProgressNodes: Set<string>;
 };
 
 export interface AsyncNodePluginOptions {
@@ -168,7 +170,15 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         return resolvedNode;
       }
 
-      queueMicrotask(() => this.runAsyncNode(node, context, options));
+      if (context.inProgressNodes.has(node.id)) {
+        return node;
+      }
+
+      // Track that the node is in progress.
+      context.inProgressNodes.add(node.id);
+      queueMicrotask(() => {
+        this.runAsyncNode(node, context, options).finally();
+      });
 
       return node;
     });
@@ -186,6 +196,9 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
           this.parseNodeAndUpdate(node, context, result, options);
         },
       );
+
+      // Stop tracking before the next update is triggered
+      context.inProgressNodes.delete(node.id);
       this.parseNodeAndUpdate(node, context, result, options);
     } catch (e: unknown) {
       const error = e instanceof Error ? e : new Error(String(e));
@@ -206,6 +219,8 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         error,
       );
 
+      // Stop tracking before the next update is triggered
+      context.inProgressNodes.delete(node.id);
       this.parseNodeAndUpdate(node, context, result, options);
     }
   }
@@ -267,7 +282,8 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
   apply(view: ViewInstance): void {
     const context: AsyncPluginContext = {
-      nodeResolveCache: new Map<string, any>(),
+      nodeResolveCache: new Map(),
+      inProgressNodes: new Set(),
       view,
     };
 
