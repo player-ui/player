@@ -199,10 +199,14 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
    */
   applyResolver(resolver: Resolver, context: AsyncPluginContext): void {
     resolver.hooks.beforeResolve.tap(this.name, (node, options) => {
+      // TODO: Can clean this up after rebasing when other pr is merged
       if (node) {
+        // Extract and flatten resolved async nodes that are children of the current node or a value of the current multi-node
+        // TODO: I think this might need to run against the resolved node in case the current node is async, and has async children :thinkspin:
         const asyncNodesResolved: string[] = [];
         node.asyncNodesResolved = asyncNodesResolved;
         if (node.type === NodeType.MultiNode) {
+          // Using a while loop lets us catch when async nodes produce more async nodes that need to be flattened further
           let index = 0;
           while (index < node.values.length) {
             const childNode = node.values[index];
@@ -232,6 +236,8 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
           return node;
         } else if ("children" in node) {
           node.children?.forEach((c) => {
+            // Similar to above, using a while loop lets us handle when async nodes produce more async nodes.
+            // TODO: Check if there is a way in cases like that to just change the highest order of async node? Might be challenging/impossible when considering cases where someone may be using the `update` function regardless of nesting...
             while (
               c.value.type === NodeType.Async &&
               this.hasValidMapping(c.value)
@@ -267,33 +273,6 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
       return node;
     });
-
-    // resolver.hooks.afterResolve.tap(this.name, (value, resolvedAST) => {
-    //   const node = resolver.getSourceNode(resolvedAST);
-    //   if (
-    //     !node ||
-    //     !this.isAsync(node) ||
-    //     this.isDeterminedAsync(value) ||
-    //     node.extractionPath === undefined
-    //   ) {
-    //     return value;
-    //   }
-
-    //   let currentValue = value;
-    //   for (const pathSegment of node.extractionPath) {
-    //     if (
-    //       typeof currentValue === "object" &&
-    //       currentValue !== null &&
-    //       !Array.isArray(currentValue)
-    //     ) {
-    //       currentValue = currentValue[pathSegment];
-    //     } else {
-    //       return undefined;
-    //     }
-    //   }
-
-    //   return currentValue;
-    // });
   }
 
   private async runAsyncNode(
@@ -413,58 +392,3 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     this.basePlugin = asyncNodePlugin;
   }
 }
-
-// /** Follows the given path and returns the node. If there is no match, returns undefined */
-// const extractNodeFromPath = (
-//   node: Node.Node,
-//   path?: string[],
-// ): Node.Node | undefined => {
-//   if (path === undefined || path.length === 0) {
-//     return node;
-//   }
-
-//   if (!("children" in node && node.children)) {
-//     return undefined;
-//   }
-
-//   let matchResult = 0;
-//   let bestMatch: Node.Child | undefined;
-//   for (const child of node.children) {
-//     const matchValue = getMatchValue(child.path, path);
-//     if (matchValue > matchResult) {
-//       matchResult = matchValue;
-//       bestMatch = child;
-//     }
-//   }
-
-//   if (!bestMatch) {
-//     return undefined;
-//   }
-
-//   if (matchResult >= path.length) {
-//     return bestMatch.value;
-//   }
-
-//   return extractNodeFromPath(bestMatch.value, path.slice(matchResult));
-// };
-
-// /** Matches 2 segments where pathA matches or is a subset of pathB. Returns the number of matching segments */
-// const getMatchValue = (
-//   pathA: Node.PathSegment[],
-//   pathB: Node.PathSegment[],
-// ): number => {
-//   if (pathA.length > pathB.length) {
-//     return 0;
-//   }
-
-//   let matchCount = 0;
-//   for (let i = 0; i < pathA.length; i++) {
-//     if (pathA[i] === pathB[i]) {
-//       matchCount++;
-//     } else {
-//       return matchCount;
-//     }
-//   }
-
-//   return matchCount;
-// };
