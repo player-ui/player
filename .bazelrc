@@ -72,7 +72,7 @@ common:ci --config=ci-base --local_cpu_resources=8 --local_ram_resources=15000
 common:ci-mac --config=ci-base --local_cpu_resources=5 --local_ram_resources=26000
 
 # For bench tests we are using a large resource_class which has 4 cpu cores and 8GB RAM
-common:ci-bechmark --config=ci-base --local_cpu_resources=4 --local_ram_resources=8000
+common:ci-benchmark --config=ci-base --local_cpu_resources=4 --local_ram_resources=8000
 
 common:release --config=ci --stamp --workspace_status_command=./scripts/workspace-status.sh
 build:release --//:cmake_build_type=MinSizeRel
