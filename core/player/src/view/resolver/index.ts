@@ -106,6 +106,10 @@ export class Resolver {
    */
   private readonly ASTMap: Map<Node.Node, Node.Node>;
   /**
+   * The AST tree after beforeResolve is ran mapped to the AST before beforeResolve is ran
+   */
+  private readonly AsyncIdMap: Map<string, Node.Node>;
+  /**
    * The root node in the AST tree we want to resolve
    */
   public readonly root: Node.Node;
@@ -138,18 +142,33 @@ export class Resolver {
     this.ASTMap = new Map();
     this.logger = options.logger;
     this.idCache = new Set();
+    this.AsyncIdMap = new Map();
   }
 
   public getSourceNode(convertedAST: Node.Node) {
     return this.ASTMap.get(convertedAST);
   }
 
-  public update(changes?: Set<BindingInstance>): any {
+  public update(
+    changes?: Set<BindingInstance>,
+    asyncChanges?: Set<string>,
+  ): any {
     this.hooks.beforeUpdate.call(changes);
     const resolveCache = new Map<Node.Node, Resolve.ResolvedNode>();
     this.idCache.clear();
     const prevASTMap = new Map(this.ASTMap);
     this.ASTMap.clear();
+
+    asyncChanges?.forEach((id) => {
+      let current: Node.Node | undefined = this.AsyncIdMap.get(id);
+      while (current && prevASTMap.has(current)) {
+        const next = prevASTMap.get(current);
+        if (next && this.resolveCache.has(next)) {
+          this.resolveCache.delete(next);
+        }
+        current = current.parent;
+      }
+    });
 
     const updated = this.computeTree(
       this.root,
@@ -258,31 +277,6 @@ export class Resolver {
       resolveOptions,
     );
 
-    // Shallow clone the node so that changes to it during the resolve steps don't impact the original.
-    // We are trusting that this becomes a deep clone once the whole node tree has been traversed.
-    const clonedNode = {
-      ...this.cloneNode(node),
-      parent: partiallyResolvedParent,
-    };
-    const resolvedAST = this.hooks.beforeResolve.call(
-      clonedNode,
-      resolveOptions,
-    ) ?? {
-      type: NodeType.Empty,
-    };
-
-    const isNestedMultiNodeWithAsync =
-      resolvedAST.type === NodeType.MultiNode &&
-      partiallyResolvedParent?.parent?.parent?.type === NodeType.MultiNode &&
-      partiallyResolvedParent.parent.type === NodeType.Value &&
-      resolvedAST.parent?.type === NodeType.Asset &&
-      resolvedAST.parent.value.id.includes("async");
-
-    const isNestedMultiNode =
-      resolvedAST.type === NodeType.MultiNode &&
-      partiallyResolvedParent?.parent?.type === NodeType.MultiNode &&
-      partiallyResolvedParent.type === NodeType.Value;
-
     if (previousResult && shouldUseLastValue) {
       const update = {
         ...previousResult,
@@ -336,10 +330,42 @@ export class Resolver {
       return update;
     }
 
-    if (isNestedMultiNodeWithAsync) {
-      resolvedAST.parent = partiallyResolvedParent.parent;
-    } else {
-      resolvedAST.parent = partiallyResolvedParent;
+    // Shallow clone the node so that changes to it during the resolve steps don't impact the original.
+    // We are trusting that this becomes a deep clone once the whole node tree has been traversed.
+    const clonedNode: Node.Node = {
+      ...this.cloneNode(node),
+      parent: partiallyResolvedParent,
+    };
+    const resolvedAST = this.hooks.beforeResolve.call(
+      clonedNode,
+      resolveOptions,
+    ) ?? {
+      type: NodeType.Empty,
+    };
+
+    // const isNestedMultiNodeWithAsync =
+    //   resolvedAST.type === NodeType.MultiNode &&
+    //   partiallyResolvedParent?.parent?.parent?.type === NodeType.MultiNode &&
+    //   partiallyResolvedParent.parent.type === NodeType.Value &&
+    //   resolvedAST.parent?.type === NodeType.Asset &&
+    //   resolvedAST.parent.value.id.includes("async");
+
+    // const isNestedMultiNode =
+    //   resolvedAST.type === NodeType.MultiNode &&
+    //   partiallyResolvedParent?.parent?.type === NodeType.MultiNode &&
+    //   partiallyResolvedParent.type === NodeType.Value;
+
+    // if (isNestedMultiNodeWithAsync) {
+    //   resolvedAST.parent = partiallyResolvedParent.parent;
+    // } else {
+    resolvedAST.parent = partiallyResolvedParent;
+    // }
+
+    if (resolvedAST.type === NodeType.Async) {
+      this.AsyncIdMap.set(resolvedAST.id, resolvedAST);
+    }
+    for (const id of resolvedAST.asyncNodesResolved ?? []) {
+      this.AsyncIdMap.set(id, resolvedAST);
     }
 
     resolveOptions.node = resolvedAST;
@@ -401,9 +427,10 @@ export class Resolver {
       resolvedAST.children = newChildren;
     } else if (resolvedAST.type === NodeType.MultiNode) {
       const childValue: any = [];
-      const rawParentToPassIn = isNestedMultiNode
-        ? partiallyResolvedParent?.parent
-        : node;
+      const rawParentToPassIn = node;
+      // isNestedMultiNode
+      //   ? partiallyResolvedParent?.parent
+      //   : node;
 
       resolvedAST.values = resolvedAST.values.flatMap((mValue) => {
         const mTree = this.computeTree(
@@ -429,25 +456,25 @@ export class Resolver {
            * Add the content streamed in to the childValue of parent multi-node
            * Array.isArray(mTree.value.asset.values) is the case when the content is an async asset
            */
-          if (
-            mValue.type === NodeType.Async &&
-            mValue.flatten &&
-            Array.isArray(mTree.value)
-          ) {
-            childValue.push(...mTree.value);
+          // if (
+          //   mValue.type === NodeType.Async &&
+          //   mValue.flatten &&
+          //   Array.isArray(mTree.value)
+          // ) {
+          //   childValue.push(...mTree.value);
 
-            const extractedNode = extractNodeFromPath(
-              mTree.node,
-              mValue.extractionPath,
-            );
+          //   const extractedNode = extractNodeFromPath(
+          //     mTree.node,
+          //     mValue.extractionPath,
+          //   );
 
-            if (extractedNode?.type === NodeType.MultiNode) {
-              extractedNode.values.forEach((n) => (n.parent = resolvedAST));
-              return extractedNode.values;
-            }
-          } else {
-            childValue.push(mTree.value);
-          }
+          //   if (extractedNode?.type === NodeType.MultiNode) {
+          //     extractedNode.values.forEach((n) => (n.parent = resolvedAST));
+          //     return extractedNode.values;
+          //   }
+          // } else {
+          childValue.push(mTree.value);
+          // }
         }
 
         return mTree.node;
@@ -483,7 +510,7 @@ export class Resolver {
 
     this.hooks.afterNodeUpdate.call(
       node,
-      isNestedMultiNode ? partiallyResolvedParent?.parent : rawParent,
+      rawParent, // isNestedMultiNode ? partiallyResolvedParent?.parent : rawParent,
       update,
     );
     cacheUpdate.set(node, update);
@@ -492,57 +519,57 @@ export class Resolver {
   }
 }
 
-/** Follows the given path and returns the node. If there is no match, returns undefined */
-const extractNodeFromPath = (
-  node: Node.Node,
-  path?: string[],
-): Node.Node | undefined => {
-  if (path === undefined || path.length === 0) {
-    return node;
-  }
+// /** Follows the given path and returns the node. If there is no match, returns undefined */
+// const extractNodeFromPath = (
+//   node: Node.Node,
+//   path?: string[],
+// ): Node.Node | undefined => {
+//   if (path === undefined || path.length === 0) {
+//     return node;
+//   }
 
-  if (!("children" in node && node.children)) {
-    return undefined;
-  }
+//   if (!("children" in node && node.children)) {
+//     return undefined;
+//   }
 
-  let matchResult = 0;
-  let bestMatch: Node.Child | undefined;
-  for (const child of node.children) {
-    const matchValue = getMatchValue(child.path, path);
-    if (matchValue > matchResult) {
-      matchResult = matchValue;
-      bestMatch = child;
-    }
-  }
+//   let matchResult = 0;
+//   let bestMatch: Node.Child | undefined;
+//   for (const child of node.children) {
+//     const matchValue = getMatchValue(child.path, path);
+//     if (matchValue > matchResult) {
+//       matchResult = matchValue;
+//       bestMatch = child;
+//     }
+//   }
 
-  if (!bestMatch) {
-    return undefined;
-  }
+//   if (!bestMatch) {
+//     return undefined;
+//   }
 
-  if (matchResult >= path.length) {
-    return bestMatch.value;
-  }
+//   if (matchResult >= path.length) {
+//     return bestMatch.value;
+//   }
 
-  return extractNodeFromPath(bestMatch.value, path.slice(matchResult));
-};
+//   return extractNodeFromPath(bestMatch.value, path.slice(matchResult));
+// };
 
-/** Matches 2 segments where pathA matches or is a subset of pathB. Returns the number of matching segments */
-const getMatchValue = (
-  pathA: Node.PathSegment[],
-  pathB: Node.PathSegment[],
-): number => {
-  if (pathA.length > pathB.length) {
-    return 0;
-  }
+// /** Matches 2 segments where pathA matches or is a subset of pathB. Returns the number of matching segments */
+// const getMatchValue = (
+//   pathA: Node.PathSegment[],
+//   pathB: Node.PathSegment[],
+// ): number => {
+//   if (pathA.length > pathB.length) {
+//     return 0;
+//   }
 
-  let matchCount = 0;
-  for (let i = 0; i < pathA.length; i++) {
-    if (pathA[i] === pathB[i]) {
-      matchCount++;
-    } else {
-      return matchCount;
-    }
-  }
+//   let matchCount = 0;
+//   for (let i = 0; i < pathA.length; i++) {
+//     if (pathA[i] === pathB[i]) {
+//       matchCount++;
+//     } else {
+//       return matchCount;
+//     }
+//   }
 
-  return matchCount;
-};
+//   return matchCount;
+// };
