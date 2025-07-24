@@ -184,7 +184,7 @@ export class Resolver {
     return updated.value;
   }
 
-  public getResolveCache() {
+  public getResolveCache(): Map<Node.Node, Resolve.ResolvedNode> {
     return new Map(this.resolveCache);
   }
 
@@ -343,23 +343,7 @@ export class Resolver {
       type: NodeType.Empty,
     };
 
-    // const isNestedMultiNodeWithAsync =
-    //   resolvedAST.type === NodeType.MultiNode &&
-    //   partiallyResolvedParent?.parent?.parent?.type === NodeType.MultiNode &&
-    //   partiallyResolvedParent.parent.type === NodeType.Value &&
-    //   resolvedAST.parent?.type === NodeType.Asset &&
-    //   resolvedAST.parent.value.id.includes("async");
-
-    // const isNestedMultiNode =
-    //   resolvedAST.type === NodeType.MultiNode &&
-    //   partiallyResolvedParent?.parent?.type === NodeType.MultiNode &&
-    //   partiallyResolvedParent.type === NodeType.Value;
-
-    // if (isNestedMultiNodeWithAsync) {
-    //   resolvedAST.parent = partiallyResolvedParent.parent;
-    // } else {
     resolvedAST.parent = partiallyResolvedParent;
-    // }
 
     if (resolvedAST.type === NodeType.Async) {
       this.AsyncIdMap.set(resolvedAST.id, resolvedAST);
@@ -428,9 +412,6 @@ export class Resolver {
     } else if (resolvedAST.type === NodeType.MultiNode) {
       const childValue: any = [];
       const rawParentToPassIn = node;
-      // isNestedMultiNode
-      //   ? partiallyResolvedParent?.parent
-      //   : node;
 
       resolvedAST.values = resolvedAST.values.flatMap((mValue) => {
         const mTree = this.computeTree(
@@ -449,32 +430,7 @@ export class Resolver {
           );
 
           updated = updated || mTree.updated;
-
-          /**
-           * async nodes' parent is a multi-node
-           * When the node to resolve is an async node and the flatten flag is true
-           * Add the content streamed in to the childValue of parent multi-node
-           * Array.isArray(mTree.value.asset.values) is the case when the content is an async asset
-           */
-          // if (
-          //   mValue.type === NodeType.Async &&
-          //   mValue.flatten &&
-          //   Array.isArray(mTree.value)
-          // ) {
-          //   childValue.push(...mTree.value);
-
-          //   const extractedNode = extractNodeFromPath(
-          //     mTree.node,
-          //     mValue.extractionPath,
-          //   );
-
-          //   if (extractedNode?.type === NodeType.MultiNode) {
-          //     extractedNode.values.forEach((n) => (n.parent = resolvedAST));
-          //     return extractedNode.values;
-          //   }
-          // } else {
           childValue.push(mTree.value);
-          // }
         }
 
         return mTree.node;
@@ -508,68 +464,9 @@ export class Resolver {
       ]),
     };
 
-    this.hooks.afterNodeUpdate.call(
-      node,
-      rawParent, // isNestedMultiNode ? partiallyResolvedParent?.parent : rawParent,
-      update,
-    );
+    this.hooks.afterNodeUpdate.call(node, rawParent, update);
     cacheUpdate.set(node, update);
 
     return update;
   }
 }
-
-// /** Follows the given path and returns the node. If there is no match, returns undefined */
-// const extractNodeFromPath = (
-//   node: Node.Node,
-//   path?: string[],
-// ): Node.Node | undefined => {
-//   if (path === undefined || path.length === 0) {
-//     return node;
-//   }
-
-//   if (!("children" in node && node.children)) {
-//     return undefined;
-//   }
-
-//   let matchResult = 0;
-//   let bestMatch: Node.Child | undefined;
-//   for (const child of node.children) {
-//     const matchValue = getMatchValue(child.path, path);
-//     if (matchValue > matchResult) {
-//       matchResult = matchValue;
-//       bestMatch = child;
-//     }
-//   }
-
-//   if (!bestMatch) {
-//     return undefined;
-//   }
-
-//   if (matchResult >= path.length) {
-//     return bestMatch.value;
-//   }
-
-//   return extractNodeFromPath(bestMatch.value, path.slice(matchResult));
-// };
-
-// /** Matches 2 segments where pathA matches or is a subset of pathB. Returns the number of matching segments */
-// const getMatchValue = (
-//   pathA: Node.PathSegment[],
-//   pathB: Node.PathSegment[],
-// ): number => {
-//   if (pathA.length > pathB.length) {
-//     return 0;
-//   }
-
-//   let matchCount = 0;
-//   for (let i = 0; i < pathA.length; i++) {
-//     if (pathA[i] === pathB[i]) {
-//       matchCount++;
-//     } else {
-//       return matchCount;
-//     }
-//   }
-
-//   return matchCount;
-// };
