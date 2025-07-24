@@ -1,3 +1,30 @@
+# 0.13.0-next.2 (Thu Jul 24 2025)
+
+### Release Notes
+
+#### Fix `ASYNC_ACTION` Expressions Being Fired Multiple Times ([#691](https://github.com/player-ui/player/pull/691))
+
+Fix Issue with awaited `ASYNC_ACTION` state's expressions being fired multiple times if the Previous State was as `ACTION` state by deferring the awaited execution results rather than handling them in an async tap
+
+#### add bench test for streaming player ([#680](https://github.com/player-ui/player/pull/680))
+
+- Add initial bench test to async-node plugin
+- Add step to run bench tests in `just` and in CI.
+
+---
+
+#### 🐛 Bug Fix
+
+- Fix `ASYNC_ACTION` Expressions Being Fired Multiple Times [#691](https://github.com/player-ui/player/pull/691) ([@KetanReddy](https://github.com/KetanReddy))
+- add bench test for streaming player [#680](https://github.com/player-ui/player/pull/680) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 2
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
 # 0.13.0-next.1 (Wed Jul 16 2025)
 
 ### Release Notes
