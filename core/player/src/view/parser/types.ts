@@ -22,6 +22,9 @@ export declare namespace Node {
 
     /** Every node (outside of the root) contains a reference to it's parent */
     parent?: Node;
+
+    /**  */
+    asyncNodesResolved?: string[];
   }
 
   export type PathSegment = string | number;
@@ -125,6 +128,8 @@ export declare namespace Node {
     flatten?: boolean;
     /** The path in the object to extract the async content. */
     extractionPath?: string[];
+    /** Test */
+    onValueReceived?: (node: Node.Node) => Node.Node;
   }
 
   export interface PluginOptions {

@@ -109,8 +109,8 @@ export class ViewInstance implements ValidationProvider {
     this.resolverOptions = resolverOptions;
   }
 
-  public updateAsync(): void {
-    const update = this.resolver?.update();
+  public updateAsync(asyncNode: string): void {
+    const update = this.resolver?.update(new Set(), new Set([asyncNode]));
     this.lastUpdate = update;
     this.hooks.onUpdate.call(update);
   }

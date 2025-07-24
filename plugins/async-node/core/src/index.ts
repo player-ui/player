@@ -145,6 +145,14 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
       parsedNode = options.parseNode(result) ?? undefined;
     }
 
+    if (parsedNode && node.onValueReceived) {
+      parsedNode = node.onValueReceived(parsedNode);
+    }
+
+    // if (parsedNode && node.extractionPath) {
+    //   parsedNode = extractNodeFromPath(parsedNode, node.extractionPath);
+    // }
+
     this.handleAsyncUpdate(node, context, parsedNode);
   }
 
@@ -165,8 +173,22 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     const { nodeResolveCache, view } = context;
     if (nodeResolveCache.get(node.id) !== newNode) {
       nodeResolveCache.set(node.id, newNode ? newNode : node);
-      view.updateAsync();
+      view.updateAsync(node.id);
     }
+  }
+
+  private hasValidMapping(node: Node.Async): boolean {
+    return (
+      this.resolvedMapping.has(node.id) &&
+      this.resolvedMapping.get(node.id) !== node
+    );
+  }
+
+  private hasValidMapping(node: Node.Async): boolean {
+    return (
+      this.resolvedMapping.has(node.id) &&
+      this.resolvedMapping.get(node.id) !== node
+    );
   }
 
   /**
@@ -177,6 +199,53 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
    */
   applyResolver(resolver: Resolver, context: AsyncPluginContext): void {
     resolver.hooks.beforeResolve.tap(this.name, (node, options) => {
+      if (node) {
+        const asyncNodesResolved: string[] = [];
+        node.asyncNodesResolved = asyncNodesResolved;
+        if (node.type === NodeType.MultiNode) {
+          let index = 0;
+          while (index < node.values.length) {
+            const childNode = node.values[index];
+            if (
+              childNode?.type !== NodeType.Async ||
+              !this.hasValidMapping(childNode)
+            ) {
+              index++;
+              continue;
+            }
+
+            const mappedNode = this.resolvedMapping.get(childNode.id);
+            asyncNodesResolved.push(childNode.id);
+            if (mappedNode.type === NodeType.MultiNode && childNode.flatten) {
+              mappedNode.values.forEach((v: Node.Node) => (v.parent = node));
+              node.values = [
+                ...node.values.slice(0, index),
+                ...mappedNode.values,
+                ...node.values.slice(index + 1),
+              ];
+            } else {
+              node.values[index] = mappedNode;
+              mappedNode.parent = node;
+            }
+          }
+
+          return node;
+        } else if ("children" in node) {
+          node.children?.forEach((c) => {
+            while (
+              c.value.type === NodeType.Async &&
+              this.hasValidMapping(c.value)
+            ) {
+              asyncNodesResolved.push(c.value.id);
+              c.value = this.resolvedMapping.get(c.value.id);
+              c.value.parent = node;
+            }
+          });
+
+          return node;
+        }
+      }
+
       if (!this.isAsync(node)) {
         return node;
       }
@@ -199,32 +268,32 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
       return node;
     });
 
-    resolver.hooks.afterResolve.tap(this.name, (value, resolvedAST) => {
-      const node = resolver.getSourceNode(resolvedAST);
-      if (
-        !node ||
-        !this.isAsync(node) ||
-        this.isDeterminedAsync(value) ||
-        node.extractionPath === undefined
-      ) {
-        return value;
-      }
+    // resolver.hooks.afterResolve.tap(this.name, (value, resolvedAST) => {
+    //   const node = resolver.getSourceNode(resolvedAST);
+    //   if (
+    //     !node ||
+    //     !this.isAsync(node) ||
+    //     this.isDeterminedAsync(value) ||
+    //     node.extractionPath === undefined
+    //   ) {
+    //     return value;
+    //   }
 
-      let currentValue = value;
-      for (const pathSegment of node.extractionPath) {
-        if (
-          typeof currentValue === "object" &&
-          currentValue !== null &&
-          !Array.isArray(currentValue)
-        ) {
-          currentValue = currentValue[pathSegment];
-        } else {
-          return undefined;
-        }
-      }
+    //   let currentValue = value;
+    //   for (const pathSegment of node.extractionPath) {
+    //     if (
+    //       typeof currentValue === "object" &&
+    //       currentValue !== null &&
+    //       !Array.isArray(currentValue)
+    //     ) {
+    //       currentValue = currentValue[pathSegment];
+    //     } else {
+    //       return undefined;
+    //     }
+    //   }
 
-      return currentValue;
-    });
+    //   return currentValue;
+    // });
   }
 
   private async runAsyncNode(
@@ -344,3 +413,58 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     this.basePlugin = asyncNodePlugin;
   }
 }
+
+// /** Follows the given path and returns the node. If there is no match, returns undefined */
+// const extractNodeFromPath = (
+//   node: Node.Node,
+//   path?: string[],
+// ): Node.Node | undefined => {
+//   if (path === undefined || path.length === 0) {
+//     return node;
+//   }
+
+//   if (!("children" in node && node.children)) {
+//     return undefined;
+//   }
+
+//   let matchResult = 0;
+//   let bestMatch: Node.Child | undefined;
+//   for (const child of node.children) {
+//     const matchValue = getMatchValue(child.path, path);
+//     if (matchValue > matchResult) {
+//       matchResult = matchValue;
+//       bestMatch = child;
+//     }
+//   }
+
+//   if (!bestMatch) {
+//     return undefined;
+//   }
+
+//   if (matchResult >= path.length) {
+//     return bestMatch.value;
+//   }
+
+//   return extractNodeFromPath(bestMatch.value, path.slice(matchResult));
+// };
+
+// /** Matches 2 segments where pathA matches or is a subset of pathB. Returns the number of matching segments */
+// const getMatchValue = (
+//   pathA: Node.PathSegment[],
+//   pathB: Node.PathSegment[],
+// ): number => {
+//   if (pathA.length > pathB.length) {
+//     return 0;
+//   }
+
+//   let matchCount = 0;
+//   for (let i = 0; i < pathA.length; i++) {
+//     if (pathA[i] === pathB[i]) {
+//       matchCount++;
+//     } else {
+//       return matchCount;
+//     }
+//   }
+
+//   return matchCount;
+// };

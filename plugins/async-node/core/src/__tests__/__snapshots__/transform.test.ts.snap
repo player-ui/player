@@ -40,6 +40,7 @@ exports[`asyncTransform > generates wrapper asset with asset 1`] = `
             ],
             "flatten": true,
             "id": "async-1",
+            "onValueReceived": [Function],
             "parent": [Circular],
             "type": "async",
             "value": {

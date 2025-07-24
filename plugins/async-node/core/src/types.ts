@@ -1,4 +1,4 @@
-import type { Node } from "@player-ui/player";
+import type { BeforeTransformFunction, Node } from "@player-ui/player";
 
 export type AsyncNodeHandler = (
   node: Node.Node,
@@ -11,4 +11,5 @@ export type AsyncTransformFunc = (
   asset?: Node.Node,
   flatten?: boolean,
   path?: string[],
+  me?: BeforeTransformFunction<any>,
 ) => Node.Asset;

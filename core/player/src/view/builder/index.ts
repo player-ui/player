@@ -66,12 +66,14 @@ export class Builder {
     id: string,
     flatten = true,
     extractionPath?: string[],
+    onValueReceived?: (node: Node.Node) => Node.Node,
   ): Node.Async {
     return {
       id,
       type: NodeType.Async,
       flatten: flatten,
       extractionPath,
+      onValueReceived,
       value: {
         type: NodeType.Value,
         value: {
