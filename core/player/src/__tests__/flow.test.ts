@@ -533,4 +533,79 @@ describe("edge cases", () => {
     expect(asyncCounter).toEqual(1);
     expect(syncCounter).toEqual(2);
   });
+
+  test("async action nodes only transition when the async action is resolved", async () => {
+    const player = new Player();
+    let expressionResolve: (val: any) => void;
+
+    player.hooks.expressionEvaluator.tap("test", (expEval) => {
+      expEval.addExpressionFunction("testAsync", async (ctx, name) => {
+        return new Promise((resolve) => {
+          expressionResolve = resolve;
+        });
+      });
+    });
+
+    player.start({
+      id: "test-flow",
+      views: [
+        {
+          id: "test",
+          type: "test",
+        },
+      ],
+      data: {
+        my: {
+          puppy: "Ginger",
+        },
+      },
+      navigation: {
+        BEGIN: "FLOW_1",
+        FLOW_1: {
+          startState: "ACTION_1",
+          ACTION_1: {
+            state_type: "ASYNC_ACTION",
+            exp: "{{my.puppy}} = await(testAsync('Daisy'))",
+            transitions: {
+              "*": "VIEW_1",
+            },
+            await: true,
+          },
+          VIEW_1: {
+            state_type: "VIEW",
+            ref: "test",
+            transitions: {
+              "*": "END",
+            },
+          },
+          END: {
+            state_type: "END",
+            outcome: "done",
+          },
+        },
+      },
+    });
+
+    await vitest.waitFor(() =>
+      expect(player.getState().status).toBe("in-progress"),
+    );
+
+    let currentState: NamedState | undefined;
+
+    await waitFor(() => {
+      const state = player.getState();
+      expect(state.status).toBe("in-progress");
+      currentState = (state as InProgressState).controllers.flow.current
+        ?.currentState;
+      expect(currentState?.name).toBe("ACTION_1");
+      expressionResolve("foo");
+    });
+
+    await waitFor(() => {
+      const state = player.getState();
+      currentState = (state as InProgressState).controllers.flow.current
+        ?.currentState;
+      expect(currentState?.name).toBe("VIEW_1");
+    });
+  });
 });

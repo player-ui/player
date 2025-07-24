@@ -356,24 +356,23 @@ export class Player {
             const result = expressionEvaluator.evaluateAsync(exp);
             if (isPromiseLike(result)) {
               if (value.await) {
-                queueMicrotask(async () => {
-                  try {
-                    flowController?.transition(String(await result));
-                  } catch (e) {
-                    flowResultDeferred.reject(e);
-                  }
+                queueMicrotask(() => {
+                  result
+                    .then((r) => flowController?.transition(String(r)))
+                    .catch(flowResultDeferred.reject);
                 });
               } else {
                 this.logger.warn(
                   "Unawaited promise used as return value in in non-async context, transitioning with '*' value",
                 );
+                flowController?.transition(String(result));
               }
             } else {
               this.logger.warn(
                 "Non async expression used in async action node",
               );
+              flowController?.transition(String(result));
             }
-            flowController?.transition(String(result));
           } catch (e) {
             flowResultDeferred.reject(e);
           }
