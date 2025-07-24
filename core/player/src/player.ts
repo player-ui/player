@@ -346,10 +346,38 @@ export class Player {
         }
       });
 
-      // Tap for synchronous action states
-      flow.hooks.afterTransition.tap("player", (flowInstance) => {
+      // Tap for action states
+      flow.hooks.afterTransition.tap("player-action-states", (flowInstance) => {
         const value = flowInstance.currentState?.value;
-        if (value && value.state_type === "ACTION") {
+        if (value && value.state_type === "ASYNC_ACTION") {
+          const { exp } = value;
+          // defer async execution to next tick to allow transition to settle
+          try {
+            const result = expressionEvaluator.evaluateAsync(exp);
+            if (isPromiseLike(result)) {
+              if (value.await) {
+                queueMicrotask(() => {
+                  result
+                    .then((r) => flowController?.transition(String(r)))
+                    .catch(flowResultDeferred.reject);
+                });
+              } else {
+                this.logger.warn(
+                  "Unawaited promise used as return value in in non-async context, transitioning with '*' value",
+                );
+                flowController?.transition(String(result));
+              }
+            } else {
+              this.logger.warn(
+                "Non async expression used in async action node",
+              );
+              flowController?.transition(String(result));
+            }
+          } catch (e) {
+            flowResultDeferred.reject(e);
+          }
+        } else if (value && value.state_type === "ACTION") {
+          // handle sync actions
           const { exp } = value;
           const result = expressionEvaluator.evaluate(exp);
           if (isPromiseLike(result)) {
@@ -358,35 +386,6 @@ export class Player {
             );
           }
           flowController?.transition(String(result));
-        }
-
-        expressionEvaluator.reset();
-      });
-
-      // Tap for async action states
-      flow.hooks.afterTransition.tap("player", async (flowInstance) => {
-        const value = flowInstance.currentState?.value;
-        if (value && value.state_type === "ASYNC_ACTION") {
-          const { exp } = value;
-          try {
-            let result = expressionEvaluator.evaluateAsync(exp);
-            if (isPromiseLike(result)) {
-              if (value.await) {
-                result = await result;
-              } else {
-                this.logger.warn(
-                  "Unawaited promise used as return value in in non-async context, transitioning with '*' value",
-                );
-              }
-            } else {
-              this.logger.warn(
-                "Non async expression used in async action node",
-              );
-            }
-            flowController?.transition(String(result));
-          } catch (e) {
-            flowResultDeferred.reject(e);
-          }
         }
 
         expressionEvaluator.reset();
