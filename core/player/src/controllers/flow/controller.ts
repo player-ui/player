@@ -4,9 +4,13 @@ import type { Logger } from "../../logger";
 import type { TransitionOptions } from "./flow";
 import { FlowInstance } from "./flow";
 
+export interface FlowControllerHooks {
+  flow: SyncHook<[FlowInstance], Record<string, any>>;
+}
+
 /** A manager for the navigation section of a Content blob */
 export class FlowController {
-  public readonly hooks = {
+  public readonly hooks: FlowControllerHooks = {
     flow: new SyncHook<[FlowInstance]>(),
   };
 
@@ -33,7 +37,10 @@ export class FlowController {
   }
 
   /** Navigate to another state in the state-machine */
-  public transition(stateTransition: string, options?: TransitionOptions) {
+  public transition(
+    stateTransition: string,
+    options?: TransitionOptions,
+  ): void {
     if (this.current === undefined) {
       throw new Error("Not currently in a flow. Cannot transition.");
     }

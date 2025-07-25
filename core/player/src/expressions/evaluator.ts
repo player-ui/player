@@ -2,6 +2,7 @@ import { SyncWaterfallHook, SyncBailHook } from "tapable-ts";
 import { NestedError } from "ts-nested-error";
 import { parseExpression } from "./parser";
 import * as DEFAULT_EXPRESSION_HANDLERS from "./evaluator-functions";
+import { collateAwaitable, isAwaitable, isPromiseLike } from "./async";
 import { isExpressionNode } from "./types";
 import { isObjectExpression } from "./utils";
 import type {
@@ -14,17 +15,15 @@ import type {
 } from "./types";
 
 /** a && b -- but handles short cutting if the first value is false */
-const andandOperator: BinaryOperator = (ctx, a, b) => {
-  return ctx.evaluate(a) && ctx.evaluate(b);
+const andandOperator: BinaryOperator = (ctx, a, b, async) => {
+  return LogicalOperators.and(ctx, a, b, async);
 };
-
 andandOperator.resolveParams = false;
 
 /** a || b -- but with short cutting if first value is true */
-const ororOperator: BinaryOperator = (ctx, a, b) => {
-  return ctx.evaluate(a) || ctx.evaluate(b);
+const ororOperator: BinaryOperator = (ctx, a, b, async) => {
+  return LogicalOperators.or(ctx, a, b, async);
 };
-
 ororOperator.resolveParams = false;
 
 const DEFAULT_BINARY_OPERATORS: Record<string, BinaryOperator> = {
@@ -35,19 +34,20 @@ const DEFAULT_BINARY_OPERATORS: Record<string, BinaryOperator> = {
   "/": (a: any, b: any) => a / b,
   "%": (a: any, b: any) => a % b,
 
+  // Promise-aware comparison operators
   // eslint-disable-next-line
-  "==": (a: any, b: any) => a == b,
+  "==": makePromiseAwareBinaryOp((a: any, b: any) => a == b),
+  // eslint-disable-next-line
+  "!=": makePromiseAwareBinaryOp((a: any, b: any) => a != b),
+  ">": makePromiseAwareBinaryOp((a: any, b: any) => a > b),
+  ">=": makePromiseAwareBinaryOp((a: any, b: any) => a >= b),
+  "<": makePromiseAwareBinaryOp((a: any, b: any) => a < b),
+  "<=": makePromiseAwareBinaryOp((a: any, b: any) => a <= b),
+  "!==": makePromiseAwareBinaryOp((a: any, b: any) => a !== b),
+  "===": makePromiseAwareBinaryOp((a: any, b: any) => a === b),
 
-  // eslint-disable-next-line
-  "!=": (a: any, b: any) => a != b,
-  ">": (a: any, b: any) => a > b,
-  ">=": (a: any, b: any) => a >= b,
-  "<": (a: any, b: any) => a < b,
-  "<=": (a: any, b: any) => a <= b,
   "&&": andandOperator,
   "||": ororOperator,
-  "!==": (a: any, b: any) => a !== b,
-  "===": (a: any, b: any) => a === b,
 
   // eslint-disable-next-line
   "|": (a: any, b: any) => a | b,
@@ -67,7 +67,164 @@ const DEFAULT_BINARY_OPERATORS: Record<string, BinaryOperator> = {
 const DEFAULT_UNARY_OPERATORS: Record<string, UnaryOperator> = {
   "-": (a: any) => -a,
   "+": (a: any) => Number(a),
-  "!": (a: any) => !a,
+  "!": makePromiseAwareUnaryOp((a: any) => !a),
+};
+
+/**
+ * Higher-order function that makes any binary operation Promise-aware
+ */
+function makePromiseAwareBinaryOp<T>(
+  operation: (a: any, b: any) => T,
+): (a: any, b: any, async: boolean) => T | Promise<T> {
+  return (a: any, b: any, async: boolean) => {
+    //async handler
+    if (async && (isAwaitable(a) || isAwaitable(b))) {
+      return collateAwaitable([
+        Promise.resolve(a),
+        Promise.resolve(b),
+      ]).awaitableThen(([resolvedA, resolvedB]) =>
+        operation(resolvedA, resolvedB),
+      );
+    }
+    //sync handler
+    return operation(a, b);
+  };
+}
+
+/**
+ * Higher-order function that makes any unary operation Promise-aware
+ */
+function makePromiseAwareUnaryOp<T>(
+  operation: (a: any) => T,
+): (a: any, async: boolean) => T | Promise<T> {
+  return (a: any, async: boolean) => {
+    //async handler
+    if (async && isAwaitable(a)) {
+      return a.awaitableThen((resolved: any) => operation(resolved));
+    }
+    //sync handler
+    return operation(a);
+  };
+}
+
+/**
+ * Utility for handling conditional branching with Promises
+ */
+function handleConditionalBranching(
+  testValue: any,
+  getTrueBranch: () => any,
+  getFalseBranch: () => any,
+  resolveNode: (node: any) => any,
+  async: boolean,
+): any {
+  //async handler
+  if (async && isAwaitable(testValue)) {
+    return testValue.awaitableThen((resolved: boolean) => {
+      const branch = resolved ? getTrueBranch() : getFalseBranch();
+      const branchResult = resolveNode(branch);
+      return isAwaitable(branchResult)
+        ? Promise.resolve(branchResult)
+        : branchResult;
+    });
+  }
+
+  // sync handler
+  const branch = testValue ? getTrueBranch() : getFalseBranch();
+  return resolveNode(branch);
+}
+
+/**
+ * Utility for handling collections (arrays/objects) with potential Promises
+ */
+const PromiseCollectionHandler = {
+  /**
+   * Handle array with potential Promise elements
+   */
+  handleArray<T>(items: T[], async: boolean): T[] | Promise<T[]> {
+    if (!async) {
+      return items;
+    }
+    const hasPromises = items.some((item) => isAwaitable(item));
+    return hasPromises ? collateAwaitable(items) : items;
+  },
+
+  /**
+   * Handle object with potential Promise keys/values
+   */
+  handleObject(
+    attributes: Array<{ key: any; value: any }>,
+    resolveNode: (node: any) => any,
+    async: boolean,
+  ): Record<string, any> | Promise<Record<string, any>> {
+    const resolvedAttributes: Record<string, any> = {};
+    const promises: Promise<void>[] = [];
+    let hasPromises = false;
+
+    attributes.forEach((attr) => {
+      const key = resolveNode(attr.key);
+      const value = resolveNode(attr.value);
+
+      //async handler
+      if (async && (isAwaitable(key) || isAwaitable(value))) {
+        hasPromises = true;
+        const keyPromise = Promise.resolve(key);
+        const valuePromise = Promise.resolve(value);
+
+        promises.push(
+          collateAwaitable([keyPromise, valuePromise]).awaitableThen(
+            ([resolvedKey, resolvedValue]) => {
+              resolvedAttributes[resolvedKey] = resolvedValue;
+            },
+          ),
+        );
+      } else {
+        resolvedAttributes[key] = value;
+      }
+    });
+
+    return hasPromises
+      ? collateAwaitable(promises).awaitableThen(() => resolvedAttributes)
+      : resolvedAttributes;
+  },
+};
+
+/**
+ * Smart logical operators that handle short-circuiting with Promises
+ */
+const LogicalOperators = {
+  and: (ctx: any, leftNode: any, rightNode: any, async: boolean) => {
+    const leftResult = ctx.evaluate(leftNode);
+
+    if (async && isAwaitable(leftResult)) {
+      return leftResult.awaitableThen((awaitedLeft: any) => {
+        if (!awaitedLeft) return awaitedLeft; // Short circuit
+        const rightResult = ctx.evaluate(rightNode);
+        return isAwaitable(rightResult)
+          ? rightResult
+          : Promise.resolve(rightResult);
+      });
+    }
+
+    // Sync short-circuiting
+    return leftResult && ctx.evaluate(rightNode);
+  },
+
+  or: (ctx: any, leftNode: any, rightNode: any, async: boolean) => {
+    const leftResult = ctx.evaluate(leftNode);
+
+    if (async && isAwaitable(leftResult)) {
+      return leftResult.awaitableThen((awaitedLeft: any) => {
+        if (awaitedLeft) return awaitedLeft; // Short circuit
+        const rightResult = ctx.evaluate(rightNode);
+        return isAwaitable(rightResult)
+          ? rightResult
+          : Promise.resolve(rightResult);
+      });
+    }
+
+    // Sync short-circuiting
+    return leftResult || ctx.evaluate(rightNode);
+  },
 };
 
 export interface HookOptions extends ExpressionContext {
@@ -81,6 +238,9 @@ export interface HookOptions extends ExpressionContext {
 
   /** Whether expressions should be parsed strictly or not */
   strict?: boolean;
+
+  /** Whether the expression should be evaluated asynchronously */
+  async?: boolean;
 }
 
 export type ExpressionEvaluatorOptions = Omit<
@@ -98,16 +258,18 @@ export type ExpressionEvaluatorFunction = (
  * */
 export class ExpressionEvaluator {
   private readonly vars: Record<string, any> = {};
-  public readonly hooks = {
+  public readonly hooks: {
+    resolve: SyncWaterfallHook<[any, ExpressionNode, HookOptions]>;
+    resolveOptions: SyncWaterfallHook<[HookOptions]>;
+    beforeEvaluate: SyncWaterfallHook<[ExpressionType, HookOptions]>;
+    onError: SyncBailHook<[Error], true>;
+  } = {
     /** Resolve an AST node for an expression to a value */
     resolve: new SyncWaterfallHook<[any, ExpressionNode, HookOptions]>(),
-
     /** Gets the options that will be passed in calls to the resolve hook */
     resolveOptions: new SyncWaterfallHook<[HookOptions]>(),
-
     /** Allows users to change the expression to be evaluated before processing */
     beforeEvaluate: new SyncWaterfallHook<[ExpressionType, HookOptions]>(),
-
     /**
      * An optional means of handling an error in the expression execution
      * Return true if handled, to stop propagation of the error
@@ -119,12 +281,21 @@ export class ExpressionEvaluator {
 
   private readonly defaultHookOptions: HookOptions;
 
-  public readonly operators = {
-    binary: new Map(Object.entries(DEFAULT_BINARY_OPERATORS)),
-    unary: new Map(Object.entries(DEFAULT_UNARY_OPERATORS)),
-    expressions: new Map<string, ExpressionHandler<any, any>>(
-      Object.entries(DEFAULT_EXPRESSION_HANDLERS),
+  public readonly operators: {
+    binary: Map<string, BinaryOperator>;
+    unary: Map<string, UnaryOperator>;
+    expressions: Map<string, ExpressionHandler<any, any>>;
+  } = {
+    binary: new Map<string, BinaryOperator>(
+      Object.entries(DEFAULT_BINARY_OPERATORS),
     ),
+    unary: new Map<string, UnaryOperator>(
+      Object.entries(DEFAULT_UNARY_OPERATORS),
+    ),
+    expressions: new Map<string, ExpressionHandler<any, any>>([
+      ...Object.entries(DEFAULT_EXPRESSION_HANDLERS),
+      ["await", DEFAULT_EXPRESSION_HANDLERS.waitFor],
+    ]),
   };
 
   public reset(): void {
@@ -139,7 +310,9 @@ export class ExpressionEvaluator {
         this._execAST(node, this.defaultHookOptions),
     };
 
-    this.hooks.resolve.tap("ExpressionEvaluator", this._resolveNode.bind(this));
+    this.hooks.resolve.tap("ExpressionEvaluator", (result, node, options) => {
+      return this._resolveNode(result, node, options);
+    });
     this.evaluate = this.evaluate.bind(this);
   }
 
@@ -186,6 +359,28 @@ export class ExpressionEvaluator {
     return this._execString(String(expression), resolvedOpts);
   }
 
+  /**
+   * Evaluate functions in an async context
+   * @experimental These Player APIs are in active development and may change. Use with caution
+   */
+  public evaluateAsync(
+    expr: ExpressionType,
+    options?: ExpressionEvaluatorOptions,
+  ): Promise<any> {
+    // handle async expression block
+    if (Array.isArray(expr)) {
+      return collateAwaitable(
+        expr.map(async (exp) =>
+          this.evaluate(exp, { ...options, async: true } as any),
+        ),
+      ).awaitableThen((values) => {
+        return values.pop();
+      });
+    } else {
+      return this.evaluate(expr, { ...options, async: true } as any);
+    }
+  }
+
   public addExpressionFunction<T extends readonly unknown[], R>(
     name: string,
     handler: ExpressionHandler<T, R>,
@@ -193,15 +388,15 @@ export class ExpressionEvaluator {
     this.operators.expressions.set(name, handler);
   }
 
-  public addBinaryOperator(operator: string, handler: BinaryOperator) {
+  public addBinaryOperator(operator: string, handler: BinaryOperator): void {
     this.operators.binary.set(operator, handler);
   }
 
-  public addUnaryOperator(operator: string, handler: UnaryOperator) {
+  public addUnaryOperator(operator: string, handler: UnaryOperator): void {
     this.operators.unary.set(operator, handler);
   }
 
-  public setExpressionVariable(name: string, value: unknown) {
+  public setExpressionVariable(name: string, value: unknown): void {
     this.vars[name] = value;
   }
 
@@ -220,9 +415,11 @@ export class ExpressionEvaluator {
 
     const matches = exp.match(/^@\[(.*)\]@$/);
     let matchedExp = exp;
-
     if (matches) {
-      [, matchedExp] = Array.from(matches); // In case the expression was surrounded by @[ ]@
+      const [, matched] = Array.from(matches); // In case the expression was surrounded by @[ ]@
+      if (matched) {
+        matchedExp = matched;
+      }
     }
 
     let storedAST: ExpressionNode;
@@ -255,8 +452,9 @@ export class ExpressionEvaluator {
     _currentValue: any,
     node: ExpressionNode,
     options: HookOptions,
-  ) {
+  ): unknown {
     const { resolveNode, model } = options;
+    const isAsync = options.async ?? false;
 
     const expressionContext: ExpressionContext = {
       ...options,
@@ -281,17 +479,33 @@ export class ExpressionEvaluator {
       if (operator) {
         if ("resolveParams" in operator) {
           if (operator.resolveParams === false) {
-            return operator(expressionContext, node.left, node.right);
+            return operator(expressionContext, node.left, node.right, isAsync);
           }
 
-          return operator(
-            expressionContext,
-            resolveNode(node.left),
-            resolveNode(node.right),
+          const left = resolveNode(node.left);
+          const right = resolveNode(node.right);
+
+          // Handle promises in binary operations
+          if (options.async && (isAwaitable(left) || isAwaitable(right))) {
+            return collateAwaitable([left, right]).awaitableThen(
+              ([leftVal, rightVal]) =>
+                operator(expressionContext, leftVal, rightVal, isAsync),
+            );
+          }
+
+          return operator(expressionContext, left, right, isAsync);
+        }
+
+        const left = resolveNode(node.left);
+        const right = resolveNode(node.right);
+
+        if (options.async && (isAwaitable(left) || isAwaitable(right))) {
+          return collateAwaitable([left, right]).awaitableThen(
+            ([leftVal, rightVal]) => operator(leftVal, rightVal, isAsync),
           );
         }
 
-        return operator(resolveNode(node.left), resolveNode(node.right));
+        return operator(left, right, isAsync);
       }
 
       return;
@@ -302,31 +516,39 @@ export class ExpressionEvaluator {
 
       if (operator) {
         if ("resolveParams" in operator) {
-          return operator(
-            expressionContext,
-            operator.resolveParams === false
-              ? node.argument
-              : resolveNode(node.argument),
-          );
+          if (operator.resolveParams === false) {
+            return operator(expressionContext, node.argument, isAsync);
+          }
+
+          const arg = resolveNode(node.argument);
+
+          if (options.async && isAwaitable(arg)) {
+            return arg.awaitableThen((argVal) =>
+              operator(expressionContext, argVal, isAsync),
+            );
+          }
+
+          return operator(expressionContext, arg, isAsync);
         }
 
-        return operator(resolveNode(node.argument));
+        const arg = resolveNode(node.argument);
+
+        if (options.async && isAwaitable(arg)) {
+          return arg.awaitableThen((argVal) => operator(argVal, isAsync));
+        }
+
+        return operator(arg, isAsync);
       }
 
       return;
     }
 
     if (node.type === "Object") {
-      const { attributes } = node;
-      const resolvedAttributes: any = {};
-
-      attributes.forEach((attr) => {
-        const key = resolveNode(attr.key);
-        const value = resolveNode(attr.value);
-        resolvedAttributes[key] = value;
-      });
-
-      return resolvedAttributes;
+      return PromiseCollectionHandler.handleObject(
+        node.attributes,
+        resolveNode,
+        options.async || false,
+      );
     }
 
     if (node.type === "CallExpression") {
@@ -338,11 +560,29 @@ export class ExpressionEvaluator {
         throw new Error(`Unknown expression function: ${expressionName}`);
       }
 
+      if (
+        operator.name === DEFAULT_EXPRESSION_HANDLERS.waitFor.name &&
+        !options.async
+      ) {
+        throw new Error("Usage of await outside of async context");
+      }
+
       if ("resolveParams" in operator && operator.resolveParams === false) {
         return operator(expressionContext, ...node.args);
       }
 
       const args = node.args.map((n) => resolveNode(n));
+
+      // Check if any arguments are promises
+      if (options.async) {
+        const hasPromises = args.some(isAwaitable);
+
+        if (hasPromises) {
+          return collateAwaitable(args).awaitableThen((resolvedArgs) =>
+            operator(expressionContext, ...resolvedArgs),
+          );
+        }
+      }
 
       return operator(expressionContext, ...args);
     }
@@ -355,20 +595,47 @@ export class ExpressionEvaluator {
       const obj = resolveNode(node.object);
       const prop = resolveNode(node.property);
 
+      if (options.async && (isAwaitable(obj) || isAwaitable(prop))) {
+        return collateAwaitable([obj, prop]).awaitableThen(
+          ([objVal, propVal]) => objVal[propVal],
+        );
+      }
+
       return obj[prop];
     }
 
     if (node.type === "Assignment") {
       if (node.left.type === "ModelRef") {
         const value = resolveNode(node.right);
-        model.set([[node.left.ref, value]]);
 
+        if (isPromiseLike(value)) {
+          if (options.async && isAwaitable(value)) {
+            return value.awaitableThen((resolvedValue) => {
+              model.set([[(node.left as any).ref, resolvedValue]]);
+              return resolvedValue;
+            });
+          } else {
+            options.logger?.warn(
+              "Unawaited promise written to mode, this behavior is undefined and may change in future releases",
+            );
+          }
+        }
+
+        model.set([[(node.left as any).ref, value]]);
         return value;
       }
 
       if (node.left.type === "Identifier") {
         const value = resolveNode(node.right);
-        this.vars[node.left.name] = value;
+
+        if (options.async && isAwaitable(value)) {
+          return value.awaitableThen((resolvedValue) => {
+            this.vars[(node.left as any).name] = resolvedValue;
+            return resolvedValue;
+          });
+        }
+
+        this.vars[(node.left as any).name] = value;
         return value;
       }
 
@@ -376,13 +643,20 @@ export class ExpressionEvaluator {
     }
 
     if (node.type === "ConditionalExpression") {
-      const result = resolveNode(node.test) ? node.consequent : node.alternate;
+      const testResult = resolveNode(node.test);
 
-      return resolveNode(result);
+      return handleConditionalBranching(
+        testResult,
+        () => node.consequent,
+        () => node.alternate,
+        resolveNode,
+        isAsync,
+      );
     }
 
     if (node.type === "ArrayExpression") {
-      return node.elements.map((ele) => resolveNode(ele));
+      const results = node.elements.map((ele) => resolveNode(ele));
+      return PromiseCollectionHandler.handleArray(results, isAsync);
     }
 
     if (node.type === "Modification") {
@@ -393,22 +667,54 @@ export class ExpressionEvaluator {
 
         if ("resolveParams" in operation) {
           if (operation.resolveParams === false) {
-            newValue = operation(expressionContext, node.left, node.right);
-          } else {
             newValue = operation(
               expressionContext,
-              resolveNode(node.left),
-              resolveNode(node.right),
+              node.left,
+              node.right,
+              isAsync,
             );
+          } else {
+            const left = resolveNode(node.left);
+            const right = resolveNode(node.right);
+
+            if (options.async && (isAwaitable(left) || isAwaitable(right))) {
+              newValue = collateAwaitable([left, right]).awaitableThen(
+                ([leftVal, rightVal]) =>
+                  operation(expressionContext, leftVal, rightVal, isAsync),
+              );
+            } else {
+              newValue = operation(expressionContext, left, right, isAsync);
+            }
           }
         } else {
-          newValue = operation(resolveNode(node.left), resolveNode(node.right));
+          const left = resolveNode(node.left);
+          const right = resolveNode(node.right);
+
+          if (options.async && (isAwaitable(left) || isAwaitable(right))) {
+            newValue = collateAwaitable([left, right]).awaitableThen(
+              ([leftVal, rightVal]) => operation(leftVal, rightVal, isAsync),
+            );
+          } else {
+            newValue = operation(left, right, isAsync);
+          }
         }
 
         if (node.left.type === "ModelRef") {
-          model.set([[node.left.ref, newValue]]);
+          if (options.async && isAwaitable(newValue)) {
+            return newValue.awaitableThen((resolvedValue) => {
+              model.set([[(node.left as any).ref, resolvedValue]]);
+              return resolvedValue;
+            });
+          }
+          model.set([[(node.left as any).ref, newValue]]);
         } else if (node.left.type === "Identifier") {
-          this.vars[node.left.name] = newValue;
+          if (options.async && isAwaitable(newValue)) {
+            return newValue.awaitableThen((resolvedValue) => {
+              this.vars[(node.left as any).name] = resolvedValue;
+              return resolvedValue;
+            });
+          }
+          this.vars[(node.left as any).name] = newValue;
         }
 
         return newValue;

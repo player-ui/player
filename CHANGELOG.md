@@ -1,3 +1,101 @@
+# 0.13.0-next.2 (Thu Jul 24 2025)
+
+### Release Notes
+
+#### Fix `ASYNC_ACTION` Expressions Being Fired Multiple Times ([#691](https://github.com/player-ui/player/pull/691))
+
+Fix Issue with awaited `ASYNC_ACTION` state's expressions being fired multiple times if the Previous State was as `ACTION` state by deferring the awaited execution results rather than handling them in an async tap
+
+#### add bench test for streaming player ([#680](https://github.com/player-ui/player/pull/680))
+
+- Add initial bench test to async-node plugin
+- Add step to run bench tests in `just` and in CI.
+
+---
+
+#### 🐛 Bug Fix
+
+- Fix `ASYNC_ACTION` Expressions Being Fired Multiple Times [#691](https://github.com/player-ui/player/pull/691) ([@KetanReddy](https://github.com/KetanReddy))
+- add bench test for streaming player [#680](https://github.com/player-ui/player/pull/680) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 2
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.13.0-next.1 (Wed Jul 16 2025)
+
+### Release Notes
+
+#### remove DefaultViewPlugins and move implementation into ViewController ([#689](https://github.com/player-ui/player/pull/689))
+
+- Remove `DefaultViewPlugins` and add all plugins it uses into the `ViewController`
+- Add and export types for the hooks on the `ViewController` and `ViewInstance`
+
+---
+
+#### 🐛 Bug Fix
+
+- remove DefaultViewPlugins and move implementation into ViewController [#689](https://github.com/player-ui/player/pull/689) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 1
+
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.13.0-next.0 (Wed Jul 16 2025)
+
+### Release Notes
+
+#### Async Expression Support ([#649](https://github.com/player-ui/player/pull/649))
+
+Adds experimental support for asynchronous expressions within Player.  This functionality should be consider in beta and effectively an unstable API, however the API of the `ASYNC_ACTION` itself should be considered stable. 
+
+The new built-in expression `await` can be used to block execution of expressions until the underlying Promise is resolved. The `await`  expression can only be used when the expression-evaluator enables _async_ expressions to be evaluated, which is currently only supported on `ASYNC_ACTION` navigation nodes. Async expressions can be used in a regular `ACTION` node but they can not be awaited on. Using `await` in an `ACTION` node will cause a runtime exception.
+
+---
+
+#### 🚀 Enhancement
+
+- Async Expression Support [#649](https://github.com/player-ui/player/pull/649) ([@adierkens](https://github.com/adierkens) [@rafbcampos](https://github.com/rafbcampos) [@KetanReddy](https://github.com/KetanReddy))
+
+#### 🐛 Bug Fix
+
+- fix iOS ManagedPlayerViewModel memory leak [#688](https://github.com/player-ui/player/pull/688) ([@cehan-Chloe](https://github.com/cehan-Chloe))
+
+#### Authors: 4
+
+- Adam Dierkens ([@adierkens](https://github.com/adierkens))
+- Chloeeeeeee ([@cehan-Chloe](https://github.com/cehan-Chloe))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Rafael Campos ([@rafbcampos](https://github.com/rafbcampos))
+
+---
+
+# 0.12.1-next.0 (Fri Jul 11 2025)
+
+### Release Notes
+
+#### Fixes for manager becoming stale ([#683](https://github.com/player-ui/player/pull/683))
+
+Updates to the React Managed Player to ensure updates to the `manager` terminate the running instance and start a brand new instance.
+
+---
+
+#### 🐛 Bug Fix
+
+- Fixes for manager becoming stale [#683](https://github.com/player-ui/player/pull/683) ([@spentacular](https://github.com/spentacular))
+- update codeowners file with teams [#682](https://github.com/player-ui/player/pull/682) ([@spentacular](https://github.com/spentacular))
+
+#### Authors: 1
+
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
 # 0.12.0 (Thu Jul 10 2025)
 
 ### Release Notes

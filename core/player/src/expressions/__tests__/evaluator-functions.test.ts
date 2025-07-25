@@ -1,9 +1,15 @@
-import { describe, test, expect, beforeEach } from "vitest";
+import { describe, test, expect, beforeEach, vitest } from "vitest";
 import type { DataModelWithParser } from "../../data";
 import { LocalModel, withParser } from "../../data";
 import { BindingParser } from "../../binding";
-import { deleteDataVal, setDataVal, getDataVal } from "../evaluator-functions";
+import {
+  deleteDataVal,
+  setDataVal,
+  getDataVal,
+  waitFor,
+} from "../evaluator-functions";
 import type { ExpressionContext } from "../types";
+import { isAwaitable, isPromiseLike } from "../async";
 
 describe("eval functions", () => {
   let model: DataModelWithParser;
@@ -43,5 +49,22 @@ describe("eval functions", () => {
     model.set([["foo.bar", 2]]);
     expect(model.get("foo.bar")).toBe(2);
     expect(getDataVal(context, "foo.bar")).toBe(2);
+  });
+
+  test("waitFor/await", async () => {
+    const testFn = vitest.fn();
+    const testPromise = new Promise((resolve) => {
+      setTimeout(() => {
+        testFn();
+        resolve("foo");
+      }, 100);
+    });
+
+    const test = waitFor({} as ExpressionContext, testPromise);
+    expect(isPromiseLike(test) && isAwaitable(test)).toBe(true);
+    /** TS shows this unneeded because waitFor doesn't technically look like a promise */
+    const result = await test;
+    expect(testFn).toBeCalled();
+    expect(result).toBe("foo");
   });
 });
