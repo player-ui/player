@@ -1,6 +1,62 @@
 import { Builder, NodeType, Node } from "@player-ui/player";
 import type { AsyncTransformFunc } from "./types";
 
+const replaceNode = (node: Node.Node): Node.Node => {
+  let result = node;
+  if (result.type === NodeType.Value) {
+    const child = result.children?.find(
+      (x) => x.path.length === 1 && x.path[0] === "asset",
+    );
+
+    if (!child) {
+      return node;
+    }
+
+    result = child.value;
+  }
+
+  if (
+    result.type !== NodeType.Asset ||
+    result.value.type !== "chat-message" //TODO: Replace this check
+  ) {
+    return node;
+  }
+
+  const newAsset = result.children?.[0]?.value;
+  result = asyncTransform(result.value.id, "collection", newAsset);
+  return extractNodeFromPath(result, ["values"]) ?? node;
+};
+
+// TODO: How to not need all this?
+// Problem this solves: Now that async nodes are resolved a bit earlier in order to work better with caching, this transform step needs to happen as soon as the content is resolved in order to turn the "chat-message" asset into the multi-node it needs to be.
+const replacer = (node: Node.Node): Node.Node => {
+  if (node.type === NodeType.MultiNode) {
+    let index = 0;
+    while (index < node.values.length) {
+      const child = node.values[index];
+      if (!child) {
+        index++;
+        continue;
+      }
+
+      const result = replaceNode(child);
+      if (result.type === NodeType.MultiNode) {
+        result.values.forEach((v: Node.Node) => (v.parent = node));
+        node.values = [
+          ...node.values.slice(0, index),
+          ...result.values,
+          ...node.values.slice(index + 1),
+        ];
+      } else {
+        node.values[index] = result;
+        index++;
+      }
+    }
+  }
+
+  return replaceNode(node);
+};
+
 /**
  * Util function to generate transform function for async asset
  * @param asset - async asset to apply beforeResolve transform
@@ -17,51 +73,14 @@ export const asyncTransform: AsyncTransformFunc = (
   asset,
   flatten = true,
   path = ["values"],
-  me,
 ) => {
   const id = "async-" + assetId;
-
-  const replaceNode = (node: Node.Node): Node.Node => {
-    let result = node;
-    if (result.type === NodeType.Value) {
-      const child = result.children?.find(
-        (x) => x.path.length === 1 && x.path[0] === "asset",
-      );
-
-      if (!child) {
-        return node;
-      }
-
-      result = child.value;
-    }
-
-    if (
-      result.type !== NodeType.Asset ||
-      result.value.type !== "chat-message" //TODO: Replace this check
-    ) {
-      return node;
-    }
-
-    result = me?.(result, {} as any, {} as any) ?? result;
-    return extractNodeFromPath(result, path) ?? node;
-  };
 
   const asyncNode = Builder.asyncNode(
     id,
     flatten,
     ["asset", ...path],
-    // TODO: How to not need all this?
-    // Problem this solves: Now that async nodes are resolved a bit earlier in order to work better with caching, this transform step needs to happen as soon as the content is resolved in order to turn the "chat-message" asset into the multi-node it needs to be.
-    (node) => {
-      if (node.type === NodeType.MultiNode) {
-        return {
-          ...node,
-          values: node.values.map(replaceNode),
-        };
-      }
-
-      return replaceNode(node);
-    },
+    replacer,
   );
 
   let multiNode;
