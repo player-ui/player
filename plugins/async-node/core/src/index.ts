@@ -18,9 +18,14 @@ import { omit } from "timm";
 export * from "./types";
 export * from "./transform";
 
+/** Object type for storing data related to a single `apply` of the `AsyncNodePluginPlugin`
+ * This object should be setup once per ViewInstance to keep any cached info just for that view to avoid conflicts of shared async node ids across different view states.
+ */
 type AsyncPluginContext = {
   /** Map of async node id to resolved content */
   nodeResolveCache: Map<string, any>;
+  /** The view instance this context is attached to. */
+  view: ViewInstance;
 };
 
 export interface AsyncNodePluginOptions {
@@ -106,8 +111,6 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
   name = "AsyncNode";
 
-  private currentView: ViewInstance | undefined;
-
   /**
    * Parses the node from the result and triggers an asynchronous view update if necessary.
    * @param node The asynchronous node that might be updated.
@@ -120,12 +123,11 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     context: AsyncPluginContext,
     result: any,
     options: Resolve.NodeResolveOptions,
-    view: ViewInstance | undefined,
   ) {
     const parsedNode =
       options.parseNode && result ? options.parseNode(result) : undefined;
 
-    this.handleAsyncUpdate(node, context, parsedNode, view);
+    this.handleAsyncUpdate(node, context, parsedNode);
   }
 
   /**
@@ -141,12 +143,11 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     node: Node.Async,
     context: AsyncPluginContext,
     newNode?: Node.Node | null,
-    view?: ViewInstance,
   ) {
-    const { nodeResolveCache } = context;
+    const { nodeResolveCache, view } = context;
     if (nodeResolveCache.get(node.id) !== newNode) {
       nodeResolveCache.set(node.id, newNode ? newNode : node);
-      view?.updateAsync();
+      view.updateAsync();
     }
   }
 
@@ -182,16 +183,10 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
       const result = await this.basePlugin?.hooks.onAsyncNode.call(
         node,
         (result) => {
-          this.parseNodeAndUpdate(
-            node,
-            context,
-            result,
-            options,
-            this.currentView,
-          );
+          this.parseNodeAndUpdate(node, context, result, options);
         },
       );
-      this.parseNodeAndUpdate(node, context, result, options, this.currentView);
+      this.parseNodeAndUpdate(node, context, result, options);
     } catch (e: unknown) {
       const error = e instanceof Error ? e : new Error(String(e));
       const result = this.basePlugin?.hooks.onAsyncNodeError.call(error, node);
@@ -211,7 +206,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         error,
       );
 
-      this.parseNodeAndUpdate(node, context, result, options, this.currentView);
+      this.parseNodeAndUpdate(node, context, result, options);
     }
   }
 
@@ -271,9 +266,9 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
   }
 
   apply(view: ViewInstance): void {
-    this.currentView = view;
     const context: AsyncPluginContext = {
       nodeResolveCache: new Map<string, any>(),
+      view,
     };
 
     view.hooks.parser.tap("async", this.applyParser.bind(this));
