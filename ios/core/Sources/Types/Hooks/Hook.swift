@@ -32,7 +32,7 @@ open class BaseJSHook {
 }
 
 /// A base for implementing JS backed async hooks with promise support
-open class BaseAsyncJSHook: BaseJSHook {
+public class BaseAsyncJSHook: BaseJSHook {
     /// Creates a promise with common error handling for async operations
     /// - Parameter asyncWork: The async work to execute
     /// - Returns: A JavaScript promise
