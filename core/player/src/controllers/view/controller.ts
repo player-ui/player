@@ -71,7 +71,6 @@ export class ViewController {
     this.viewOptions = options;
     this.viewMap = initialViews.reduce<Record<string, View>>(
       (viewMap, view) => {
-        // eslint-disable-next-line no-param-reassign
         viewMap[view.id] = view;
         return viewMap;
       },
@@ -171,7 +170,7 @@ export class ViewController {
     }
   }
 
-  public onView(state: NavigationFlowViewState) {
+  public onView(state: NavigationFlowViewState): void {
     const viewId = state.ref;
 
     const source = this.hooks.resolveView.call(

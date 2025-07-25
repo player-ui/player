@@ -5,6 +5,11 @@ import type {
   NavigationFlow,
   NavigationFlowState,
   NavigationFlowEndState,
+  NavigationFlowActionState,
+  NavigationFlowAsyncActionState,
+  NavigationFlowExternalState,
+  NavigationFlowFlowState,
+  NavigationFlowViewState,
 } from "@player-ui/types";
 import type { Logger } from "../../logger";
 
@@ -25,6 +30,50 @@ export type TransitionFunction = (
   options?: TransitionOptions,
 ) => void;
 
+export interface FlowInstanceHooks {
+  beforeStart: SyncBailHook<
+    [NavigationFlow],
+    NavigationFlow,
+    Record<string, any>
+  >;
+  /** A callback when the onStart node was present */
+  onStart: SyncHook<[any], Record<string, any>>;
+  /** A callback when the onEnd node was present */
+  onEnd: SyncHook<[any], Record<string, any>>;
+  /** A hook to intercept and block a transition */
+  skipTransition: SyncBailHook<
+    [NamedState | undefined],
+    boolean | undefined,
+    Record<string, any>
+  >;
+  /** A chance to manipulate the flow-node used to calculate the given transition used  */
+  beforeTransition: SyncWaterfallHook<
+    [
+      (
+        | NavigationFlowViewState
+        | NavigationFlowFlowState
+        | NavigationFlowActionState
+        | NavigationFlowAsyncActionState
+        | NavigationFlowExternalState
+      ),
+      string,
+    ],
+    Record<string, any>
+  >;
+  /** A chance to manipulate the flow-node calculated after a transition */
+  resolveTransitionNode: SyncWaterfallHook<
+    [NavigationFlowState],
+    Record<string, any>
+  >;
+  /** A callback when a transition from 1 state to another was made */
+  transition: SyncHook<
+    [NamedState | undefined, NamedState],
+    Record<string, any>
+  >;
+  /** A callback to run actions after a transition occurs */
+  afterTransition: SyncHook<[FlowInstance], Record<string, any>>;
+}
+
 /** The Content navigation state machine */
 export class FlowInstance {
   private flow: NavigationFlow;
@@ -34,33 +83,19 @@ export class FlowInstance {
   private flowPromise?: DeferredPromise<NavigationFlowEndState>;
   public readonly id: string;
   public currentState?: NamedState;
-  public readonly hooks = {
+  public readonly hooks: FlowInstanceHooks = {
     beforeStart: new SyncBailHook<[NavigationFlow], NavigationFlow>(),
-
-    /** A callback when the onStart node was present */
     onStart: new SyncHook<[any]>(),
-
-    /** A callback when the onEnd node was present */
     onEnd: new SyncHook<[any]>(),
-
-    /** A hook to intercept and block a transition */
     skipTransition: new SyncBailHook<
       [NamedState | undefined],
       boolean | undefined
     >(),
-
-    /** A chance to manipulate the flow-node used to calculate the given transition used  */
     beforeTransition: new SyncWaterfallHook<
       [Exclude<NavigationFlowState, NavigationFlowEndState>, string]
     >(),
-
-    /** A chance to manipulate the flow-node calculated after a transition */
     resolveTransitionNode: new SyncWaterfallHook<[NavigationFlowState]>(),
-
-    /** A callback when a transition from 1 state to another was made */
     transition: new SyncHook<[NamedState | undefined, NamedState]>(),
-
-    /** A callback to run actions after a transition occurs */
     afterTransition: new SyncHook<[FlowInstance]>(),
   };
 
@@ -115,7 +150,10 @@ export class FlowInstance {
     return this.flowPromise.promise;
   }
 
-  public transition(transitionValue: string, options?: TransitionOptions) {
+  public transition(
+    transitionValue: string,
+    options?: TransitionOptions,
+  ): void {
     if (this.isTransitioning) {
       throw new Error(
         `Transitioning while ongoing transition from ${this.currentState?.name} is in progress is not supported`,
