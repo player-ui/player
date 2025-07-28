@@ -76,12 +76,7 @@ export const asyncTransform: AsyncTransformFunc = (
 ) => {
   const id = "async-" + assetId;
 
-  const asyncNode = Builder.asyncNode(
-    id,
-    flatten,
-    ["asset", ...path],
-    replacer,
-  );
+  const asyncNode = Builder.asyncNode(id, flatten, replacer);
 
   let multiNode;
   let assetNode;
