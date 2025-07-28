@@ -1,10 +1,43 @@
-import { expect, test, describe } from "vitest";
-import { Node, InProgressState } from "@player-ui/player";
+import { expect, test, describe, vi, beforeEach } from "vitest";
+import {
+  Node,
+  InProgressState,
+  ErrorState,
+  PlayerPlugin,
+  AssetTransformCorePlugin,
+  BeforeTransformFunction,
+} from "@player-ui/player";
 import { Player, Parser } from "@player-ui/player";
 import { waitFor } from "@testing-library/react";
-import { AsyncNodePlugin, AsyncNodePluginPlugin } from "../index";
-import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin";
+import {
+  AsyncNodePlugin,
+  AsyncNodePluginPlugin,
+  asyncTransform,
+} from "../index";
 import { CheckPathPlugin } from "@player-ui/check-path-plugin";
+import { Registry } from "@player-ui/partial-match-registry";
+
+const transform: BeforeTransformFunction = (asset) => {
+  const newAsset = asset.children?.[0]?.value;
+
+  if (!newAsset) {
+    return asyncTransform(asset.value.id, "collection");
+  }
+  return asyncTransform(asset.value.id, "collection", newAsset);
+};
+
+const transformPlugin = new AssetTransformCorePlugin(
+  new Registry([[{ type: "chat-message" }, { beforeResolve: transform }]]),
+);
+
+class TestAsyncPlugin implements PlayerPlugin {
+  name = "test-async";
+  apply(player: Player) {
+    player.hooks.view.tap("test-async", (view) => {
+      transformPlugin.apply(view);
+    });
+  }
+}
 
 describe("view", () => {
   const basicFRFWithActions = {
@@ -734,6 +767,84 @@ describe("view", () => {
     });
   });
 
+  describe("Async Node Error Handling", () => {
+    let failingAsyncNodePlugin: AsyncNodePlugin = new AsyncNodePlugin({});
+    const onAsyncNodeErrorCallback = vi.fn();
+
+    beforeEach(() => {
+      onAsyncNodeErrorCallback.mockReset();
+      const failingHandler = vi.fn();
+      failingHandler.mockRejectedValue("Promise Rejected");
+
+      failingAsyncNodePlugin = new AsyncNodePlugin(
+        {
+          plugins: [new AsyncNodePluginPlugin()],
+        },
+        failingHandler,
+      );
+
+      failingAsyncNodePlugin.hooks.onAsyncNodeError.tap(
+        "test",
+        onAsyncNodeErrorCallback,
+      );
+    });
+
+    test("should replace the async node with the result from the onAsyncNodeError hook when there is an error handling the async node", async () => {
+      onAsyncNodeErrorCallback.mockReturnValue({
+        asset: {
+          id: "async-text",
+          type: "text",
+          value: "Fallback Text",
+        },
+      });
+
+      const player = new Player({ plugins: [failingAsyncNodePlugin] });
+      player.start(basicFRFWithActions as any);
+
+      await waitFor(() => {
+        expect(onAsyncNodeErrorCallback).toHaveBeenCalledWith(
+          new Error("Promise Rejected"),
+          expect.anything(),
+        );
+
+        const playerState = player.getState();
+        expect(playerState.status).toBe("in-progress");
+        const inProgressState = playerState as InProgressState;
+        const lastViewUpdate =
+          inProgressState.controllers.view.currentView?.lastUpdate;
+
+        expect(lastViewUpdate?.actions[1]).toStrictEqual({
+          asset: {
+            id: "async-text",
+            type: "text",
+            value: "Fallback Text",
+          },
+        });
+      });
+    });
+
+    test("should bubble up the error and cause player to fail when there is an error handling the async node and the onAsyncNodeError hook does not produce a fallback", async () => {
+      onAsyncNodeErrorCallback.mockReturnValue(undefined);
+
+      const player = new Player({ plugins: [failingAsyncNodePlugin] });
+      player.start(basicFRFWithActions as any).catch(() => {
+        /** Purposefully failing player in this test so catching the unresolved exception suppresses warnings from vitest */
+      });
+
+      await waitFor(() => {
+        expect(onAsyncNodeErrorCallback).toHaveBeenCalledWith(
+          new Error("Promise Rejected"),
+          expect.anything(),
+        );
+
+        const playerState = player.getState();
+        expect(playerState.status).toBe("error");
+        const errorState = playerState as ErrorState;
+        expect(errorState.error.message).toBe("Promise Rejected");
+      });
+    });
+  });
+
   test("chat-message asset - replaces async nodes with multi node flattened", async () => {
     const plugin = new AsyncNodePlugin({
       plugins: [new AsyncNodePluginPlugin()],
@@ -749,7 +860,7 @@ describe("view", () => {
 
     let updateNumber = 0;
 
-    const plugins = [plugin, new ReferenceAssetsPlugin()];
+    const plugins = [plugin, new TestAsyncPlugin()];
 
     const player = new Player({
       plugins: plugins,
@@ -821,7 +932,7 @@ describe("view", () => {
 
     let updateNumber = 0;
 
-    const plugins = [plugin, new ReferenceAssetsPlugin()];
+    const plugins = [plugin, new TestAsyncPlugin()];
 
     const player = new Player({
       plugins: plugins,
@@ -886,7 +997,7 @@ describe("view", () => {
     let updateNumber = 0;
 
     const player = new Player({
-      plugins: [plugin, new ReferenceAssetsPlugin()],
+      plugins: [plugin, new TestAsyncPlugin()],
     });
 
     player.hooks.viewController.tap("async-node-test", (vc) => {
@@ -953,7 +1064,7 @@ describe("view", () => {
 
     let updateNumber = 0;
 
-    const plugins = [plugin, new ReferenceAssetsPlugin()];
+    const plugins = [plugin, new TestAsyncPlugin()];
 
     const player = new Player({
       plugins: plugins,
@@ -1051,7 +1162,7 @@ describe("view", () => {
 
     const checkPathPlugin = new CheckPathPlugin();
 
-    const plugins = [plugin, new ReferenceAssetsPlugin(), checkPathPlugin];
+    const plugins = [plugin, new TestAsyncPlugin(), checkPathPlugin];
 
     const player = new Player({
       plugins: plugins,
@@ -1238,6 +1349,93 @@ describe("view", () => {
           },
         },
       ],
+    });
+  });
+
+  describe("multi-view cache", () => {
+    let asyncNodePlugin: AsyncNodePlugin = new AsyncNodePlugin({});
+    const deferHandler = vi.fn();
+    let deferredResolve = (value: any) => {};
+
+    beforeEach(() => {
+      deferHandler.mockReset();
+      deferHandler.mockImplementation(
+        () =>
+          new Promise((res) => {
+            deferredResolve = res;
+          }),
+      );
+
+      asyncNodePlugin = new AsyncNodePlugin(
+        {
+          plugins: [new AsyncNodePluginPlugin()],
+        },
+        deferHandler,
+      );
+    });
+
+    test("clear cache between views", async () => {
+      const player = new Player({ plugins: [asyncNodePlugin] });
+      player.start(basicFRFWithActions as any);
+
+      await waitFor(() => {
+        expect(deferHandler).toHaveBeenCalledOnce();
+      });
+
+      deferredResolve({
+        asset: {
+          id: "async-text",
+          type: "text",
+          value: "Fallback Text",
+        },
+      });
+
+      await waitFor(() => {
+        const playerState = player.getState();
+        expect(playerState.status).toBe("in-progress");
+        const inProgressState = playerState as InProgressState;
+        const lastViewUpdate =
+          inProgressState.controllers.view.currentView?.lastUpdate;
+
+        expect(lastViewUpdate?.actions[1]).toStrictEqual({
+          asset: {
+            id: "async-text",
+            type: "text",
+            value: "Fallback Text",
+          },
+        });
+      });
+
+      deferHandler.mockClear();
+      player.start(basicFRFWithActions as any);
+
+      await waitFor(() => {
+        expect(deferHandler).toHaveBeenCalledOnce();
+      });
+
+      deferredResolve({
+        asset: {
+          id: "async-text",
+          type: "text",
+          value: "New Fallback Text",
+        },
+      });
+
+      await waitFor(() => {
+        const playerState = player.getState();
+        expect(playerState.status).toBe("in-progress");
+        const inProgressState = playerState as InProgressState;
+        const lastViewUpdate =
+          inProgressState.controllers.view.currentView?.lastUpdate;
+
+        expect(lastViewUpdate?.actions[1]).toStrictEqual({
+          asset: {
+            id: "async-text",
+            type: "text",
+            value: "New Fallback Text",
+          },
+        });
+      });
     });
   });
 });
