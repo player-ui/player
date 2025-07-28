@@ -8,7 +8,7 @@ import {
   Player,
   PlayerPlugin,
 } from "@player-ui/player";
-import { Registry } from "../../../../../core/partial-match-registry/src"; // TODO: fix this import after rebasing
+import { Registry } from "@player-ui/partial-match-registry";
 
 const asyncBenchFlow: Flow = {
   id: "test-flow",

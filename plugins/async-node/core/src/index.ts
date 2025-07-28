@@ -48,12 +48,11 @@ export type AsyncHandler = (
 export type AsyncContent = {
   async: true;
   flatten?: boolean;
-  extractionPath?: string[];
   [key: string]: unknown;
 };
 
 /** Hook declaration for the AsyncNodePlugin */
-type AsyncNodeHooks = {
+export type AsyncNodeHooks = {
   /** Async hook to get content for an async node */
   onAsyncNode: AsyncParallelBailHook<[Node.Async, (result: any) => void], any>;
   /** Sync hook to manage errors coming from the onAsyncNode hook. Return a fallback node or null to render a fallback. The first argument of passed in the call is the error thrown. */
@@ -149,10 +148,6 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
       parsedNode = node.onValueReceived(parsedNode);
     }
 
-    // if (parsedNode && node.extractionPath) {
-    //   parsedNode = extractNodeFromPath(parsedNode, node.extractionPath);
-    // }
-
     this.handleAsyncUpdate(node, context, parsedNode);
   }
 
@@ -177,17 +172,13 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     }
   }
 
-  private hasValidMapping(node: Node.Async): boolean {
+  private hasValidMapping(
+    node: Node.Async,
+    context: AsyncPluginContext,
+  ): boolean {
+    const { nodeResolveCache } = context;
     return (
-      this.resolvedMapping.has(node.id) &&
-      this.resolvedMapping.get(node.id) !== node
-    );
-  }
-
-  private hasValidMapping(node: Node.Async): boolean {
-    return (
-      this.resolvedMapping.has(node.id) &&
-      this.resolvedMapping.get(node.id) !== node
+      nodeResolveCache.has(node.id) && nodeResolveCache.get(node.id) !== node
     );
   }
 
@@ -199,61 +190,8 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
    */
   applyResolver(resolver: Resolver, context: AsyncPluginContext): void {
     resolver.hooks.beforeResolve.tap(this.name, (node, options) => {
-      // TODO: Can clean this up after rebasing when other pr is merged
-      if (node) {
-        // Extract and flatten resolved async nodes that are children of the current node or a value of the current multi-node
-        // TODO: I think this might need to run against the resolved node in case the current node is async, and has async children :thinkspin:
-        const asyncNodesResolved: string[] = [];
-        node.asyncNodesResolved = asyncNodesResolved;
-        if (node.type === NodeType.MultiNode) {
-          // Using a while loop lets us catch when async nodes produce more async nodes that need to be flattened further
-          let index = 0;
-          while (index < node.values.length) {
-            const childNode = node.values[index];
-            if (
-              childNode?.type !== NodeType.Async ||
-              !this.hasValidMapping(childNode)
-            ) {
-              index++;
-              continue;
-            }
-
-            const mappedNode = this.resolvedMapping.get(childNode.id);
-            asyncNodesResolved.push(childNode.id);
-            if (mappedNode.type === NodeType.MultiNode && childNode.flatten) {
-              mappedNode.values.forEach((v: Node.Node) => (v.parent = node));
-              node.values = [
-                ...node.values.slice(0, index),
-                ...mappedNode.values,
-                ...node.values.slice(index + 1),
-              ];
-            } else {
-              node.values[index] = mappedNode;
-              mappedNode.parent = node;
-            }
-          }
-
-          return node;
-        } else if ("children" in node) {
-          node.children?.forEach((c) => {
-            // Similar to above, using a while loop lets us handle when async nodes produce more async nodes.
-            // TODO: Check if there is a way in cases like that to just change the highest order of async node? Might be challenging/impossible when considering cases where someone may be using the `update` function regardless of nesting...
-            while (
-              c.value.type === NodeType.Async &&
-              this.hasValidMapping(c.value)
-            ) {
-              asyncNodesResolved.push(c.value.id);
-              c.value = this.resolvedMapping.get(c.value.id);
-              c.value.parent = node;
-            }
-          });
-
-          return node;
-        }
-      }
-
       if (!this.isAsync(node)) {
-        return node;
+        return node === null ? node : this.resolveAsyncChildren(node, context);
       }
 
       const resolvedNode = context.nodeResolveCache.get(node.id);
@@ -271,8 +209,58 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         this.runAsyncNode(node, context, options).finally();
       });
 
-      return node;
+      return this.resolveAsyncChildren(node, context);
     });
+  }
+
+  private resolveAsyncChildren(
+    node: Node.Node,
+    context: AsyncPluginContext,
+  ): Node.Node {
+    const asyncNodesResolved: string[] = [];
+    node.asyncNodesResolved = asyncNodesResolved;
+    if (node.type === NodeType.MultiNode) {
+      // Using a while loop lets us catch when async nodes produce more async nodes that need to be flattened further
+      let index = 0;
+      while (index < node.values.length) {
+        const childNode = node.values[index];
+        if (
+          childNode?.type !== NodeType.Async ||
+          !this.hasValidMapping(childNode, context)
+        ) {
+          index++;
+          continue;
+        }
+
+        const mappedNode = context.nodeResolveCache.get(childNode.id);
+        asyncNodesResolved.push(childNode.id);
+        if (mappedNode.type === NodeType.MultiNode && childNode.flatten) {
+          mappedNode.values.forEach((v: Node.Node) => (v.parent = node));
+          node.values = [
+            ...node.values.slice(0, index),
+            ...mappedNode.values,
+            ...node.values.slice(index + 1),
+          ];
+        } else {
+          node.values[index] = mappedNode;
+          mappedNode.parent = node;
+        }
+      }
+    } else if ("children" in node) {
+      node.children?.forEach((c) => {
+        // Similar to above, using a while loop lets us handle when async nodes produce more async nodes.
+        while (
+          c.value.type === NodeType.Async &&
+          this.hasValidMapping(c.value, context)
+        ) {
+          asyncNodesResolved.push(c.value.id);
+          c.value = context.nodeResolveCache.get(c.value.id);
+          c.value.parent = node;
+        }
+      });
+    }
+
+    return node;
   }
 
   private async runAsyncNode(
@@ -339,7 +327,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
       ) => {
         if (this.isDeterminedAsync(obj)) {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { async, flatten, extractionPath, ...rest } = obj;
+          const { async, flatten, ...rest } = obj;
           const parsedAsync = parser.parseObject(rest, nodeType, options);
           const parsedNodeId = getNodeID(parsedAsync);
 
@@ -353,7 +341,6 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
               type: NodeType.Async,
               value: parsedAsync,
               flatten,
-              extractionPath,
             },
             obj,
           );
