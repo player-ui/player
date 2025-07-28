@@ -1,6 +1,7 @@
 import { setIn } from "timm";
 import deferred from "p-defer";
 import type { Flow, FlowResult } from "@player-ui/types";
+import queueMicrotask from "queue-microtask";
 
 import { SyncHook, SyncWaterfallHook } from "tapable-ts";
 import type { Logger } from "./logger";
