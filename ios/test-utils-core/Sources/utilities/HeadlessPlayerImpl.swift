@@ -10,6 +10,8 @@ open class HeadlessPlayerImpl: HeadlessPlayer {
     public var hooks: HeadlessHooks?
     public var logger = TapableLogger()
 
+    public var pluginManager = PluginManager()
+
     public var jsPlayerReference: JSValue?
 
     let match = PartialMatchFingerprintPlugin()
