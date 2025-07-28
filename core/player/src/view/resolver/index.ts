@@ -52,53 +52,56 @@ const withContext = (model: DataModelWithParser): DataModelWithParser => {
   };
 };
 
+export type ResolverHooks = {
+  /** A hook to allow skipping of the resolution tree for a specific node */
+  skipResolve: SyncWaterfallHook<
+    [boolean, Node.Node, Resolve.NodeResolveOptions]
+  >;
+
+  /** An event emitted before calculating the next update */
+  beforeUpdate: SyncHook<[Set<BindingInstance> | undefined]>;
+
+  /** An event emitted after calculating the next update */
+  afterUpdate: SyncHook<[any]>;
+
+  /** The options passed to a node to resolve it to an object */
+  resolveOptions: SyncWaterfallHook<[Resolve.NodeResolveOptions, Node.Node]>;
+
+  /** A hook to transform the AST node into a new AST node before resolving it */
+  beforeResolve: SyncWaterfallHook<
+    [Node.Node | null, Resolve.NodeResolveOptions]
+  >;
+
+  /**
+   * A hook to transform an AST node into it's resolved value.
+   * This runs _before_ any children are resolved
+   */
+  resolve: SyncWaterfallHook<[any, Node.Node, Resolve.NodeResolveOptions]>;
+
+  /**
+   * A hook to transform the resolved value of an AST node.
+   * This runs _after_ all children nodes are resolved
+   */
+  afterResolve: SyncWaterfallHook<[any, Node.Node, Resolve.NodeResolveOptions]>;
+
+  /** Called at the very end of a node's tree being updated */
+  afterNodeUpdate: SyncHook<[Node.Node, Node.Node | undefined, NodeUpdate]>;
+};
+
 /**
  * The Resolver is the way to take a parsed AST graph of a view and resolve it to a concrete representation of the current user state
  * It combines the ability to mutate ast nodes before resolving, as well as the mutating the resolved objects while parsing
  */
 export class Resolver {
-  public readonly hooks = {
-    /** A hook to allow skipping of the resolution tree for a specific node */
-    skipResolve: new SyncWaterfallHook<
-      [boolean, Node.Node, Resolve.NodeResolveOptions]
-    >(),
-
-    /** An event emitted before calculating the next update */
-    beforeUpdate: new SyncHook<[Set<BindingInstance> | undefined]>(),
-
-    /** An event emitted after calculating the next update */
-    afterUpdate: new SyncHook<[any]>(),
-
-    /** The options passed to a node to resolve it to an object */
-    resolveOptions: new SyncWaterfallHook<
-      [Resolve.NodeResolveOptions, Node.Node]
-    >(),
-
-    /** A hook to transform the AST node into a new AST node before resolving it */
-    beforeResolve: new SyncWaterfallHook<
-      [Node.Node | null, Resolve.NodeResolveOptions]
-    >(),
-
-    /**
-     * A hook to transform an AST node into it's resolved value.
-     * This runs _before_ any children are resolved
-     */
-    resolve: new SyncWaterfallHook<
-      [any, Node.Node, Resolve.NodeResolveOptions]
-    >(),
-
-    /**
-     * A hook to transform the resolved value of an AST node.
-     * This runs _after_ all children nodes are resolved
-     */
-    afterResolve: new SyncWaterfallHook<
-      [any, Node.Node, Resolve.NodeResolveOptions]
-    >(),
-
-    /** Called at the very end of a node's tree being updated */
-    afterNodeUpdate: new SyncHook<
-      [Node.Node, Node.Node | undefined, NodeUpdate]
-    >(),
+  public readonly hooks: ResolverHooks = {
+    skipResolve: new SyncWaterfallHook(),
+    beforeUpdate: new SyncHook(),
+    afterUpdate: new SyncHook(),
+    resolveOptions: new SyncWaterfallHook(),
+    beforeResolve: new SyncWaterfallHook(),
+    resolve: new SyncWaterfallHook(),
+    afterResolve: new SyncWaterfallHook(),
+    afterNodeUpdate: new SyncHook(),
   };
 
   /**
@@ -145,7 +148,7 @@ export class Resolver {
     this.AsyncIdMap = new Map();
   }
 
-  public getSourceNode(convertedAST: Node.Node) {
+  public getSourceNode(convertedAST: Node.Node): Node.Node | undefined {
     return this.ASTMap.get(convertedAST);
   }
 
