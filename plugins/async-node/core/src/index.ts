@@ -196,7 +196,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
       const resolvedNode = context.nodeResolveCache.get(node.id);
       if (resolvedNode !== undefined) {
-        return resolvedNode;
+        return this.resolveAsyncChildren(resolvedNode, context);
       }
 
       if (context.inProgressNodes.has(node.id)) {
@@ -209,10 +209,17 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         this.runAsyncNode(node, context, options).finally();
       });
 
-      return this.resolveAsyncChildren(node, context);
+      return node;
     });
   }
 
+  /**
+   * Replaces child async nodes with their resolved content and flattens when necessary. Resolving the children directly helps manage the `parent` reference without needing as much work within the resolver itself.
+   * Handles async node chains as well to make sure all applicable nodes can get flattened.
+   * @param node - The node whose children need to be resolved.
+   * @param context - the async plugin context needed to reach into the cache
+   * @returns The same node but with async node children mapped to their resolved AST.
+   */
   private resolveAsyncChildren(
     node: Node.Node,
     context: AsyncPluginContext,
