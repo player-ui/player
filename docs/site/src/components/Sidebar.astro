@@ -9,12 +9,6 @@ const { sidebar, id } = Astro.locals.starlightRoute;
 
 type SidebarEntry = (typeof sidebar)[number];
 
-export type SidebarData = {
-  isCurrentSidebar: boolean;
-  starlightProps: Props;
-  labelEntry: (typeof sidebar)[number];
-};
-
 /** Get the icon for a group. Update the icon names in the array to change the icons associated with a group. */
 const getIcon = (index: number) =>
   (["seti:video", "puzzle", "setting"] as const)[index];
@@ -43,13 +37,15 @@ function isCurrent(entry: SidebarEntry) {
   return false;
 }
 
+// Create tab data
 const tabs = sidebar.map((s) => ({
   label: s.label,
   href: getFirstEntry(s)?.href,
   isCurrent: isCurrent(s),
 }));
 
-const multiSidebarData: Array<SidebarData> = sidebar.map((entry) => {
+// Create sidebar data for each tab
+const sidebarData = sidebar.map((entry) => {
   if (entry.type !== "group") {
     throw new AstroError(
       `\`${entry.label}\` cannot be used with multi-sidebar.
@@ -70,27 +66,32 @@ const multiSidebarData: Array<SidebarData> = sidebar.map((entry) => {
 
   const isCurrentPage = findIfIsCurrent(entry);
 
+  // Create the sidebar data for this tab
+  let sidebarEntries = entry.entries;
+
   return {
-    isCurrentSidebar: isCurrentPage,
-    starlightProps: { ...Astro.props, sidebar: [...entry.entries] },
-    labelEntry: entry,
+    index: sidebar.indexOf(entry),
+    label: entry.label,
+    isCurrent: isCurrentPage,
+    sidebar: sidebarEntries,
   };
 });
 
-// If the current page being built is not on a sidebar then set the first sidebar to be shown
-if (
-  multiSidebarData[0] &&
-  !multiSidebarData.some(({ isCurrentSidebar }) => isCurrentSidebar)
-) {
-  multiSidebarData[0].isCurrentSidebar = true;
-}
+// Find the current sidebar based on the current page
+const currentSidebarIndex = sidebarData.findIndex((s) => s.isCurrent);
+const activeSidebar = sidebarData[currentSidebarIndex] || sidebarData[0];
 
-const activeSidebar =
-  multiSidebarData.find((s) => s.isCurrentSidebar) ?? multiSidebarData[0];
+// Override the sidebar data that the Default component will use
+Astro.locals.starlightRoute.sidebar = activeSidebar.sidebar;
 
-if (activeSidebar.labelEntry.type === "group") {
-  activeSidebar.labelEntry.entries.forEach((entry) => {});
-}
+// Debug: Log what sidebar data we're passing
+console.log("Current sidebar index:", currentSidebarIndex);
+console.log("Active sidebar:", activeSidebar);
+console.log("Sidebar entries being passed:", activeSidebar.sidebar);
+console.log(
+  "Modified Astro.locals.starlightRoute.sidebar:",
+  Astro.locals.starlightRoute.sidebar,
+);
 ---
 
 <style>
@@ -225,4 +226,5 @@ if (activeSidebar.labelEntry.type === "group") {
   </ul>
 </tabbed-content>
 
-<Default {...Astro.props} sidebar={(activeSidebar.labelEntry as any).entries} />
+<!-- Render the sidebar with filtered data using the Default component -->
+<Default {...Astro.props} />
