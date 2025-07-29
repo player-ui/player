@@ -106,9 +106,6 @@ export declare namespace Resolve {
     /** Parse a raw valy into an AST node */
     parseNode?: (node: any) => Node.Node | null;
 
-    /** Parse an array of values into a multi-node AST */
-    parseMultiNode?: (nodes: any[]) => Node.Node | null;
-
     /** A function to move the state to a new place */
     transition?: TransitionFunction;
 

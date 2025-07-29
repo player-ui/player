@@ -111,7 +111,7 @@ export class Resolver {
   /**
    * The AST tree after beforeResolve is ran mapped to the AST before beforeResolve is ran
    */
-  private readonly AsyncIdMap: Map<string, Node.Node>;
+  private AsyncIdMap: Map<string, Node.Node>;
   /**
    * The root node in the AST tree we want to resolve
    */
@@ -162,8 +162,10 @@ export class Resolver {
     const prevASTMap = new Map(this.ASTMap);
     this.ASTMap.clear();
 
+    const prevAsyncIdMap = new Map(this.AsyncIdMap);
+    const nextAsyncIdMap = new Map<string, Node.Node>();
     asyncChanges?.forEach((id) => {
-      let current: Node.Node | undefined = this.AsyncIdMap.get(id);
+      let current: Node.Node | undefined = prevAsyncIdMap.get(id);
       while (current && prevASTMap.has(current)) {
         const next = prevASTMap.get(current);
         if (next && this.resolveCache.has(next)) {
@@ -181,7 +183,9 @@ export class Resolver {
       toNodeResolveOptions(this.options),
       undefined,
       prevASTMap,
+      nextAsyncIdMap,
     );
+    this.AsyncIdMap = nextAsyncIdMap;
     this.resolveCache = resolveCache;
     this.hooks.afterUpdate.call(updated.value);
     return updated.value;
@@ -248,6 +252,7 @@ export class Resolver {
     options: Resolve.NodeResolveOptions,
     partiallyResolvedParent: Node.Node | undefined,
     prevASTMap: Map<Node.Node, Node.Node>,
+    nextAsyncIdMap: Map<string, Node.Node>,
   ): NodeUpdate {
     const dependencyModel = new DependencyModel(options.data.model);
 
@@ -299,6 +304,12 @@ export class Resolver {
           updated: false,
         };
         cacheUpdate.set(AST, resolvedUpdate);
+        if (resolvedUpdate.node.type === NodeType.Async) {
+          nextAsyncIdMap.set(resolvedUpdate.node.id, resolvedUpdate.node);
+        }
+        for (const key of resolvedUpdate.node.asyncNodesResolved ?? []) {
+          nextAsyncIdMap.set(key, resolvedUpdate.node);
+        }
 
         /** Helper function for recursing over child node */
         const handleChildNode = (childNode: Node.Node) => {
@@ -349,10 +360,10 @@ export class Resolver {
     resolvedAST.parent = partiallyResolvedParent;
 
     if (resolvedAST.type === NodeType.Async) {
-      this.AsyncIdMap.set(resolvedAST.id, resolvedAST);
+      nextAsyncIdMap.set(resolvedAST.id, resolvedAST);
     }
     for (const id of resolvedAST.asyncNodesResolved ?? []) {
-      this.AsyncIdMap.set(id, resolvedAST);
+      nextAsyncIdMap.set(id, resolvedAST);
     }
 
     resolveOptions.node = resolvedAST;
@@ -384,6 +395,7 @@ export class Resolver {
           resolveOptions,
           resolvedAST,
           prevASTMap,
+          nextAsyncIdMap,
         );
         const {
           dependencies: childTreeDeps,
@@ -425,6 +437,7 @@ export class Resolver {
           resolveOptions,
           resolvedAST,
           prevASTMap,
+          nextAsyncIdMap,
         );
 
         if (mTree.value !== undefined && mTree.value !== null) {
