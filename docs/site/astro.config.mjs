@@ -6,6 +6,9 @@ import react from "@astrojs/react";
 import starlightDocSearch from "@astrojs/starlight-docsearch";
 import { visit } from "unist-util-visit";
 
+// Add process import for Node.js environment
+const process = globalThis.process;
+
 export const rehypeLinks = (options) => {
   let base = options?.base;
 
@@ -156,6 +159,15 @@ export default defineConfig({
   vite: {
     ssr: {
       noExternal: ["@astrojs/react"],
+    },
+    css: {
+      devSourcemap: false,
+    },
+    build: {
+      sourcemap: false,
+    },
+    optimizeDeps: {
+      exclude: ["@player-ui/reference-assets-plugin-react"],
     },
   },
   markdown: {
