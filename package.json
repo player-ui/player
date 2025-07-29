@@ -14,7 +14,7 @@
   "packageManager": "pnpm@9.7.0",
   "dependencies": {
     "@astrojs/react": "^4.0.0",
-    "@astrojs/starlight": "^0.35.1",
+    "@astrojs/starlight": "^0.34.4",
     "@astrojs/starlight-docsearch": "^0.3.0",
     "@astrojs/starlight-tailwind": "^3.0.1",
     "@astrojs/tailwind": "^6.0.2",
