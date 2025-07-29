@@ -273,7 +273,6 @@ export interface Template<ValueType = unknown, Key extends string = string> {
   placement?: "prepend" | "append";
 }
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
 /**
  * The Schema organizes all content related to Data and it's types
  */
@@ -340,7 +339,6 @@ export declare namespace Schema {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
 /** Namespace to wrap up core functionality to be used by the Language Service */
 export declare namespace Language {
   /**
@@ -352,7 +350,6 @@ export declare namespace Language {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
 /** A spot for formatting */
 export declare namespace Formatting {
   /** A reference to a specific formatter */
@@ -365,7 +362,6 @@ export declare namespace Formatting {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
 /** A space for all thing validation */
 export declare namespace Validation {
   /**

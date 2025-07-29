@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { DataController } from ".";
 import type { Logger } from "../../logger";
 import type { BindingLike } from "../../binding";

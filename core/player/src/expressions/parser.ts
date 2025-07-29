@@ -1,4 +1,3 @@
-/* eslint @typescript-eslint/no-use-before-define: 0 */
 /**
  * An expression to AST parser based on JSEP: http://jsep.from.so/
  */
