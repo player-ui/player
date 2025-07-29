@@ -14,14 +14,7 @@ import { ChatMessageAsset } from "./types";
  */
 export const transform: BeforeTransformFunction<ChatMessageAsset> = (asset) => {
   const newAsset = asset.children?.[0]?.value;
-  return asyncTransform(
-    asset.value.id,
-    "collection",
-    newAsset,
-    undefined,
-    undefined,
-    transform,
-  );
+  return asyncTransform(asset.value.id, "collection", newAsset);
 };
 
 export const chatMessageTransform: TransformFunctions = compose(
