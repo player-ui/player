@@ -1,8 +1,30 @@
 import { bench, BenchOptions, describe } from "vitest";
-import { AsyncNodePlugin, AsyncNodePluginPlugin } from "..";
-import { Flow, Player } from "@player-ui/player";
+import { AsyncNodePlugin, AsyncNodePluginPlugin, asyncTransform } from "..";
+import {
+  Asset,
+  AssetTransformCorePlugin,
+  BeforeTransformFunction,
+  Flow,
+  Player,
+  PlayerPlugin,
+} from "@player-ui/player";
+import { Registry } from "@player-ui/partial-match-registry";
 
-const asyncBenchFlow: Flow = {
+export const transform: BeforeTransformFunction<Asset<"chat-message">> = (
+  asset,
+) => {
+  const newAsset = asset.children?.[0]?.value;
+  return asyncTransform(
+    asset.value.id,
+    "collection",
+    newAsset,
+    undefined,
+    undefined,
+    transform,
+  );
+};
+
+const asyncTransformBenchFlow: Flow = {
   id: "test-flow",
   views: [
     {
@@ -10,9 +32,17 @@ const asyncBenchFlow: Flow = {
       type: "view",
       values: [
         {
-          id: "nodeId",
-          async: "true",
-          flatten: true,
+          asset: {
+            id: "chat",
+            type: "chat-message",
+            value: {
+              asset: {
+                type: "text",
+                id: "original-text",
+                value: "TEST",
+              },
+            },
+          },
         },
       ],
     },
@@ -36,9 +66,20 @@ const asyncBenchFlow: Flow = {
   },
 };
 
-// Benchmark tests for async node resolution. Each test spins up player and resolves all but the last async node to be setup.
-// This is to make tests results easier to compare. If test results across different node counts are similar than we know that resolving additional async nodes will not have significant performance impact.
-describe("async node benchmarks", () => {
+const transformPlugin = new AssetTransformCorePlugin(
+  new Registry([[{ type: "chat-message" }, { beforeResolve: transform }]]),
+);
+
+class TestAsyncPlugin implements PlayerPlugin {
+  name = "test-async";
+  apply(player: Player) {
+    player.hooks.view.tap("test-async", (view) => {
+      transformPlugin.apply(view);
+    });
+  }
+}
+
+describe("async transform benchmarks", () => {
   const asyncNodes = [1, 5, 10, 50, 100];
 
   asyncNodes.forEach((nodeCount) => {
@@ -69,14 +110,16 @@ describe("async node benchmarks", () => {
             resolve([
               {
                 asset: {
-                  id: `bench-${nodeNumber}`,
-                  type: "text",
+                  id: `chat-${nodeNumber}`,
+                  type: "chat-message",
+                  value: {
+                    asset: {
+                      type: "text",
+                      id: `chat-label-${nodeNumber}`,
+                      value: "Test",
+                    },
+                  },
                 },
-              },
-              {
-                id: `another-async-${nodeNumber}`,
-                async: true,
-                flatten: true,
               },
             ]);
           };
@@ -90,7 +133,9 @@ describe("async node benchmarks", () => {
         });
       });
 
-      const player = new Player({ plugins: [asyncNodePlugin] });
+      const player = new Player({
+        plugins: [asyncNodePlugin, new TestAsyncPlugin()],
+      });
 
       player.hooks.view.tap("bench", (fc) => {
         fc.hooks.onUpdate.tap("bench", () => {
@@ -109,7 +154,7 @@ describe("async node benchmarks", () => {
         });
       });
 
-      playerCompletePromise = player.start(asyncBenchFlow);
+      playerCompletePromise = player.start(asyncTransformBenchFlow);
 
       return setupPromise;
     };
