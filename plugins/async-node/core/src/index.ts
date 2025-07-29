@@ -136,13 +136,8 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     result: any,
     options: Resolve.NodeResolveOptions,
   ) {
-    let parsedNode: Node.Node | undefined;
-
-    if (Array.isArray(result) && options.parseMultiNode) {
-      parsedNode = options.parseMultiNode(result) ?? undefined;
-    } else if (options.parseNode && result) {
-      parsedNode = options.parseNode(result) ?? undefined;
-    }
+    let parsedNode =
+      options.parseNode && result ? options.parseNode(result) : undefined;
 
     if (parsedNode && node.onValueReceived) {
       parsedNode = node.onValueReceived(parsedNode);

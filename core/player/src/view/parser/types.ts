@@ -23,7 +23,7 @@ export declare namespace Node {
     /** Every node (outside of the root) contains a reference to it's parent */
     parent?: Node;
 
-    /**  */
+    /** The ids of async nodes resolved within this node */
     asyncNodesResolved?: string[];
   }
 

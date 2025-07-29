@@ -139,7 +139,6 @@ export class ViewInstance implements ValidationProvider {
       this.resolver = new Resolver(this.rootNode, {
         ...this.resolverOptions,
         parseNode: parser.parseObject.bind(parser),
-        parseMultiNode: parser.parseMultiNode.bind(parser),
       });
       this.hooks.resolver.call(this.resolver);
     }

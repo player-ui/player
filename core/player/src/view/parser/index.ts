@@ -2,7 +2,6 @@ import { setIn } from "timm";
 import { SyncBailHook, SyncWaterfallHook } from "tapable-ts";
 import type { AnyAssetType, Node } from "./types";
 import { NodeType } from "./types";
-import { Builder } from "../builder";
 
 export * from "./types";
 export * from "./utils";
@@ -88,30 +87,6 @@ export class Parser {
     }
 
     return viewNode as Node.View;
-  }
-
-  public parseMultiNode(
-    nodes: Array<object>,
-    options: ParseObjectOptions = { templateDepth: 0 },
-  ): Node.Node | null {
-    const parsedNode = this.hooks.parseNode.call(
-      nodes,
-      NodeType.Value,
-      options,
-    ) as Node.Node | null;
-
-    if (parsedNode || parsedNode === null) {
-      return parsedNode;
-    }
-
-    const values = nodes
-      .map((item) => this.parseObject(item, NodeType.Value, options))
-      .filter(
-        (child): child is Node.Value | Node.Applicability | Node.Async =>
-          !!child,
-      );
-
-    return Builder.multiNode(...values);
   }
 
   public createASTNode(node: Node.Node | null, value: any): Node.Node | null {
