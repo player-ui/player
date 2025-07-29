@@ -33,6 +33,86 @@ export const rehypeLinks = (options) => {
 export const BASE_PREFIX =
   process.env.NODE_ENV === "production" ? "DOCS_BASE_PATH" : undefined;
 
+// Export the sidebar configuration for use in components
+export const sidebarConfig = [
+  {
+    label: "Player",
+    items: [
+      {
+        label: "Player",
+        autogenerate: { directory: "player" },
+      },
+      {
+        label: "Guides",
+        autogenerate: { directory: "guides" },
+      },
+      {
+        label: "Authoring",
+        autogenerate: { directory: "authoring" },
+      },
+      {
+        label: "Content",
+        autogenerate: { directory: "content" },
+      },
+      {
+        label: "Assets",
+        autogenerate: { directory: "assets" },
+      },
+      {
+        label: "XLR",
+        autogenerate: { directory: "xlr" },
+      },
+    ],
+  },
+  {
+    label: "Plugins",
+    items: [
+      {
+        label: "Plugins",
+        items: [
+          {
+            label: "Plugins Overview",
+            slug: "plugins",
+          },
+          {
+            label: "Android/JVM Plugins",
+            autogenerate: { directory: "plugins/android" },
+          },
+          {
+            label: "Core Plugins",
+            autogenerate: { directory: "plugins/core" },
+          },
+          {
+            label: "iOS Plugins",
+            autogenerate: { directory: "plugins/iOS" },
+          },
+          {
+            label: "React Plugins",
+            autogenerate: { directory: "plugins/react" },
+          },
+          {
+            label: "Multiplatform Plugins",
+            autogenerate: { directory: "plugins/multiplatform" },
+          },
+        ],
+      },
+    ],
+  },
+  {
+    label: "Tools",
+    items: [
+      {
+        label: "View AST Explorer",
+        link: "/tools/view-ast-explorer",
+      },
+      {
+        label: "DSL Content Playground",
+        link: "/tools/dsl-content-playground",
+      },
+    ],
+  },
+];
+
 // https://astro.build/config
 export default defineConfig({
   redirects: {
@@ -51,9 +131,13 @@ export default defineConfig({
         light: "./src/assets/logo/logo-light-large.png",
         replacesTitle: true,
       },
-      social: {
-        github: "https://github.com/player-ui/player",
-      },
+      social: [
+        {
+          icon: "github",
+          label: "GitHub",
+          href: "https://github.com/player-ui/player",
+        },
+      ],
       editLink: {
         baseUrl: "https://github.com/player-ui/player/edit/main/docs/site",
       },
@@ -92,10 +176,6 @@ export default defineConfig({
             {
               label: "Assets",
               autogenerate: { directory: "assets" },
-            },
-            {
-              label: "Tools",
-              autogenerate: { directory: "tools" },
             },
             {
               label: "XLR",
@@ -158,6 +238,7 @@ export default defineConfig({
     ssr: {
       noExternal: ["@astrojs/react"],
     },
+    logLevel: "error", // Suppress warnings
   },
   markdown: {
     rehypePlugins: [

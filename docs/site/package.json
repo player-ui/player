@@ -4,6 +4,12 @@
   "homepage": "https://player-ui.github.io",
   "type": "module",
   "dependencies": {
+    "@astrojs/react": "^4.0.0",
+    "@astrojs/starlight": "^0.35.1",
+    "@astrojs/starlight-docsearch": "^0.3.0",
+    "@astrojs/starlight-tailwind": "^3.0.1",
+    "@astrojs/tailwind": "^6.0.2",
+    "astro": "^5.12.4",
     "@player-ui/player": "workspace:*",
     "@player-ui/react": "workspace:*",
     "@player-ui/reference-assets-plugin-components": "workspace:*",
