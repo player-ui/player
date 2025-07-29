@@ -83,15 +83,6 @@ const activeSidebar = sidebarData[currentSidebarIndex] || sidebarData[0];
 
 // Override the sidebar data that the Default component will use
 Astro.locals.starlightRoute.sidebar = activeSidebar.sidebar;
-
-// Debug: Log what sidebar data we're passing
-console.log("Current sidebar index:", currentSidebarIndex);
-console.log("Active sidebar:", activeSidebar);
-console.log("Sidebar entries being passed:", activeSidebar.sidebar);
-console.log(
-  "Modified Astro.locals.starlightRoute.sidebar:",
-  Astro.locals.starlightRoute.sidebar,
-);
 ---
 
 <style>

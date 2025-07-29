@@ -98,8 +98,8 @@ export default defineConfig({
               autogenerate: { directory: "assets" },
             },
             {
-              label: "Tools",
-              autogenerate: { directory: "tools" },
+              label: "Capabilities",
+              autogenerate: { directory: "capabilities" },
             },
             {
               label: "XLR",
