@@ -5,7 +5,7 @@ import Default from "@astrojs/starlight/components/Sidebar.astro";
 import type { Props } from "@astrojs/starlight/props";
 import { AstroError } from "astro/errors";
 
-const { sidebar, id } = Astro.locals.starlightRoute;
+const { sidebar } = Astro.locals.starlightRoute;
 
 type SidebarEntry = (typeof sidebar)[number];
 

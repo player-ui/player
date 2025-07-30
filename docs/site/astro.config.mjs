@@ -39,6 +39,7 @@ export const BASE_PREFIX =
 // https://astro.build/config
 export default defineConfig({
   redirects: {
+    "/guides/getting-started": "/getting-started",
     "/plugins/common-types": "/plugins/core/common-types/",
   },
   integrations: [
@@ -80,6 +81,10 @@ export default defineConfig({
         {
           label: "Player",
           items: [
+            {
+              label: "Getting Started",
+              slug: "getting-started",
+            },
             {
               label: "Player",
               autogenerate: { directory: "player" },
