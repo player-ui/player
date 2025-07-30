@@ -222,6 +222,9 @@ importers:
       astro:
         specifier: ^5.12.4
         version: 5.12.4(@types/node@20.19.4)(jiti@2.4.2)(rollup@4.46.1)(terser@5.31.0)(typescript@5.5.3)(yaml@2.8.0)
+      astro-pagefind:
+        specifier: ^1.8.3
+        version: 1.8.3(astro@5.12.4(@types/node@20.19.4)(jiti@2.4.2)(rollup@4.46.1)(terser@5.31.0)(typescript@5.5.3)(yaml@2.8.0))
       auto:
         specifier: ^11.2.0
         version: 11.2.0(@swc/core@1.5.7(@swc/helpers@0.5.17))(@types/node@20.19.4)(typescript@5.5.3)
@@ -348,6 +351,9 @@ importers:
       p-defer:
         specifier: ^3.0.0
         version: 3.0.0
+      pagefind:
+        specifier: ^1.3.0
+        version: 1.3.0
       parsimmon:
         specifier: ^1.12.0
         version: 1.18.1
@@ -3550,6 +3556,9 @@ packages:
       webpack-plugin-serve:
         optional: true
 
+  '@polka/url@1.0.0-next.29':
+    resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==, tarball: https://registry.npmjs.org/@polka/url/-/url-1.0.0-next.29.tgz}
+
   '@popperjs/core@2.11.8':
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==, tarball: https://registry.npmjs.org/@popperjs/core/-/core-2.11.8.tgz}
 
@@ -5308,6 +5317,11 @@ packages:
     resolution: {integrity: sha512-u+zHMqo/QNLE2eqYRCrK3+XMlKakv33Bzuz+56V1gs8H0y6TZ0hIi3VNbIxeTn51NLn+mJfUV/A0kMNfE4rANw==, tarball: https://registry.npmjs.org/astro-expressive-code/-/astro-expressive-code-0.41.3.tgz}
     peerDependencies:
       astro: ^4.0.0-beta || ^5.0.0-beta || ^3.3.0
+
+  astro-pagefind@1.8.3:
+    resolution: {integrity: sha512-Nfo1TdlEHdkXTiI0KpimLqX6awK3qWTil7IOJvk5Q8x+0VBTpIEp9QvGgoAxXDe3upAHLVsg4y7U1uUPm7GC9w==, tarball: https://registry.npmjs.org/astro-pagefind/-/astro-pagefind-1.8.3.tgz}
+    peerDependencies:
+      astro: ^2.0.4 || ^3 || ^4 || ^5
 
   astro@5.12.4:
     resolution: {integrity: sha512-ns+/KpfWToKvVf2DJTj4EIa4U59/XVBXeeq6VZUr5DXe6OZJFs8NfJi+W20nRm5nduIeBZGRzaoxPFq9lm4WEg==, tarball: https://registry.npmjs.org/astro/-/astro-5.12.4.tgz}
@@ -10683,6 +10697,10 @@ packages:
   simple-swizzle@0.2.2:
     resolution: {integrity: sha512-JA//kQgZtbuY83m+xT+tXJkmJncGMTFT+C+g2h2R9uxkYIrE2yy9sgmcLhCnw57/WSD+Eh3J97FPEDFnbXnDUg==, tarball: https://registry.npmjs.org/simple-swizzle/-/simple-swizzle-0.2.2.tgz}
 
+  sirv@3.0.1:
+    resolution: {integrity: sha512-FoqMu0NCGBLCcAkS1qA+XJIQTR6/JHfQXl+uGteNCQ76T91DMUjPa9xfmeqMY3z80nLSg9yQmNjK0Px6RWsH/A==, tarball: https://registry.npmjs.org/sirv/-/sirv-3.0.1.tgz}
+    engines: {node: '>=18'}
+
   sisteransi@1.0.5:
     resolution: {integrity: sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==, tarball: https://registry.npmjs.org/sisteransi/-/sisteransi-1.0.5.tgz}
 
@@ -11232,6 +11250,10 @@ packages:
 
   toml@3.0.0:
     resolution: {integrity: sha512-y/mWCZinnvxjTKYhJ+pYxwD0mRLVvOtdS2Awbgxln6iEnt4rk0yBxeSBHkGJcPucRiG0e55mwWp+g/05rsrd6w==, tarball: https://registry.npmjs.org/toml/-/toml-3.0.0.tgz}
+
+  totalist@3.0.1:
+    resolution: {integrity: sha512-sf4i37nQ2LBx4m3wB74y+ubopq6W/dIzXg0FDGjsYnZHVa1Da8FH853wlL2gtUhg+xJXjfk3kUZS3BRoQeoQBQ==, tarball: https://registry.npmjs.org/totalist/-/totalist-3.0.1.tgz}
+    engines: {node: '>=6'}
 
   tr46@0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==, tarball: https://registry.npmjs.org/tr46/-/tr46-0.0.3.tgz}
@@ -16422,6 +16444,8 @@ snapshots:
       webpack-dev-server: 5.0.4(webpack-cli@5.1.4)(webpack@5.91.0)
       webpack-hot-middleware: 2.26.1
 
+  '@polka/url@1.0.0-next.29': {}
+
   '@popperjs/core@2.11.8': {}
 
   '@radix-ui/number@1.0.1':
@@ -18674,6 +18698,13 @@ snapshots:
     dependencies:
       astro: 5.12.4(@types/node@20.19.4)(jiti@2.4.2)(rollup@4.46.1)(terser@5.31.0)(typescript@5.5.4)(yaml@2.8.0)
       rehype-expressive-code: 0.41.3
+
+  astro-pagefind@1.8.3(astro@5.12.4(@types/node@20.19.4)(jiti@2.4.2)(rollup@4.46.1)(terser@5.31.0)(typescript@5.5.3)(yaml@2.8.0)):
+    dependencies:
+      '@pagefind/default-ui': 1.3.0
+      astro: 5.12.4(@types/node@20.19.4)(jiti@2.4.2)(rollup@4.46.1)(terser@5.31.0)(typescript@5.5.3)(yaml@2.8.0)
+      pagefind: 1.3.0
+      sirv: 3.0.1
 
   astro@5.12.4(@types/node@20.19.4)(jiti@2.4.2)(rollup@4.46.1)(terser@5.31.0)(typescript@5.5.3)(yaml@2.8.0):
     dependencies:
@@ -25732,6 +25763,12 @@ snapshots:
     dependencies:
       is-arrayish: 0.3.2
 
+  sirv@3.0.1:
+    dependencies:
+      '@polka/url': 1.0.0-next.29
+      mrmime: 2.0.1
+      totalist: 3.0.1
+
   sisteransi@1.0.5: {}
 
   sitemap@8.0.0:
@@ -26373,6 +26410,8 @@ snapshots:
       ieee754: 1.2.1
 
   toml@3.0.0: {}
+
+  totalist@3.0.1: {}
 
   tr46@0.0.3: {}
 

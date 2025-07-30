@@ -5,6 +5,7 @@ import rehypeMermaid from "rehype-mermaid";
 import react from "@astrojs/react";
 import starlightDocSearch from "@astrojs/starlight-docsearch";
 import { visit } from "unist-util-visit";
+import pagefind from "astro-pagefind";
 
 // Add process import for Node.js environment
 const process = globalThis.process;
@@ -159,6 +160,7 @@ export default defineConfig({
         },
       ],
     }),
+    pagefind(),
   ],
   base: BASE_PREFIX,
   vite: {
