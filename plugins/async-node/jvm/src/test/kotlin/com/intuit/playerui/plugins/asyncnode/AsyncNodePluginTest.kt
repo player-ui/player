@@ -13,8 +13,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.yield
+import org.amshove.kluent.internal.assertEquals
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.TestTemplate
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -189,6 +191,65 @@ internal class AsyncNodePluginTest : PlayerTest() {
             Assertions.assertEquals("6", asset1?.get("id"))
             Assertions.assertEquals("text", asset1?.get("type"))
             Assertions.assertEquals("New", asset1?.get("value"))
+        }
+
+    @TestTemplate
+    fun `async node error bubbles up and fails the player state`() =
+        runBlockingTest {
+            plugin.hooks.onAsyncNode.tap("test") { _, node, callback ->
+                throw Exception("This is an error message from onAsyncNode")
+            }
+
+            val errorMessage = assertThrows<Exception> {
+                runBlockingTest {
+                    player.start(chatMessageContent).await()
+                }
+            }.message
+            assertEquals("This is an error message from onAsyncNode", errorMessage)
+        }
+
+    @TestTemplate
+    fun `async node error hook catches and gracefully handles the error`() =
+        runBlockingTest {
+            plugin.hooks.onAsyncNode.tap("test") { _, node, callback ->
+                throw Exception("This is an error message from onAsyncNode")
+            }
+
+            plugin.hooks.onAsyncNodeError.tap("test") { _, error, node ->
+                BailResult.Bail(
+                    mapOf(
+                        "asset" to mapOf(
+                            "type" to "text",
+                            "id" to "error-asset",
+                            "value" to "Value",
+                        ),
+                    ),
+                )
+            }
+
+            var count = 0
+            var update: Asset? = null
+            suspendCancellableCoroutine { cont ->
+                player.hooks.view.tap { v ->
+                    v?.hooks?.onUpdate?.tap { asset ->
+                        count++
+                        update = asset
+                        if (count == 2) cont.resume(true) {}
+                    }
+                }
+
+                player.start(chatMessageContent)
+            }
+
+            val values = (update as? Map<*, *>)?.get("values") as? List<*>
+            Assertions.assertNotNull(values)
+            Assertions.assertEquals(2, values?.size)
+
+            val asset0 = (values?.get(1) as? Map<*, *>)?.get("asset") as? Map<*, *>
+            Assertions.assertNotNull(asset0)
+            Assertions.assertEquals("text", asset0?.get("type"))
+            Assertions.assertEquals("Value", asset0?.get("value"))
+            Assertions.assertEquals("error-asset", asset0?.get("id"))
         }
 
     @TestTemplate

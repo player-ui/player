@@ -1,3 +1,40 @@
+# 0.13.0-next.3 (Mon Jul 28 2025)
+
+### Release Notes
+
+#### update core async node plugins to catch and handle errors ([#666](https://github.com/player-ui/player/pull/666))
+
+- Update the `AsyncNodePlugin` to include a new hook `onAsyncNodeError` for catching errors triggered when resolving async nodes.
+- Not using the hook or failing to return fallback content will allow the error to bubble up and fail the player state.
+- Fix cyclic deps between `//plugins/async-node/core` and `//plugins/reference-assets/core`
+- Scope the content cache on the `async-node` to the view that generated it to prevent re-use of the cache across views, flows or player instances.
+
+#### Build Tweaks ([#685](https://github.com/player-ui/player/pull/685))
+
+- Update codecov and android orb to latest
+- Run iOS lint as a separate parallel step
+- Remove rosetta and JDK install from mac stage
+
+---
+
+#### 🚀 Enhancement
+
+- update core async node plugins to catch and handle errors [#666](https://github.com/player-ui/player/pull/666) ([@tmarmer](https://github.com/tmarmer) [@KetanReddy](https://github.com/KetanReddy))
+
+#### 🐛 Bug Fix
+
+- fix: import queueMicrotask [#696](https://github.com/player-ui/player/pull/696) ([@sugarmanz](https://github.com/sugarmanz))
+- Fix iOS Build Stage [#695](https://github.com/player-ui/player/pull/695) ([@KetanReddy](https://github.com/KetanReddy))
+- Build Tweaks [#685](https://github.com/player-ui/player/pull/685) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 3
+
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
 # 0.13.0-next.2 (Thu Jul 24 2025)
 
 ### Release Notes

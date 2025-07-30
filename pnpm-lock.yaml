@@ -677,9 +677,9 @@ importers:
       '@player-ui/check-path-plugin':
         specifier: workspace:*
         version: link:../../check-path/core
-      '@player-ui/reference-assets-plugin':
+      '@player-ui/partial-match-registry':
         specifier: workspace:*
-        version: link:../../reference-assets/core
+        version: link:../../../core/partial-match-registry
 
   plugins/auto-scroll/react:
     dependencies:

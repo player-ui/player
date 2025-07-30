@@ -89,7 +89,7 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
         super.setup(context: context)
 
         if let pluginRef = pluginRef {
-            self.hooks = AsyncNodeHook(onAsyncNode: AsyncHook2(baseValue: pluginRef, name: "onAsyncNode"))
+            self.hooks = AsyncNodeHook(onAsyncNode: AsyncHook2(baseValue: pluginRef, name: "onAsyncNode"), onAsyncNodeError: Hook2(baseValue: pluginRef, name: "onAsyncNodeError"))
         }
         
         if let asyncHookHandler = self.asyncHookHandler {
@@ -129,6 +129,7 @@ public class AsyncNodePlugin: JSBasePlugin, NativePlugin {
 
 public struct AsyncNodeHook {
     public let onAsyncNode: AsyncHook2<JSValue, JSValue>
+    public let onAsyncNodeError: Hook2<JSValue, JSValue>
 }
 
 /**
