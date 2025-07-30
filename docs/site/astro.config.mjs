@@ -42,6 +42,8 @@ export default defineConfig({
   redirects: {
     "/guides/getting-started": "/getting-started",
     "/plugins/common-types": "/plugins/core/common-types/",
+    "/tools/cli": "/capabilities/cli/",
+    "/tools/storybook": "/capabilities/storybook/",
   },
   integrations: [
     react(),
@@ -166,15 +168,6 @@ export default defineConfig({
   vite: {
     ssr: {
       noExternal: ["@astrojs/react"],
-    },
-    css: {
-      devSourcemap: false,
-    },
-    build: {
-      sourcemap: false,
-    },
-    optimizeDeps: {
-      exclude: ["@player-ui/reference-assets-plugin-react"],
     },
   },
   markdown: {
