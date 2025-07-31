@@ -7,9 +7,9 @@ associates = []
 # Main dependencies
 main_exports = [
     "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_core",
-    "//jvm:kotlin_serialization",
+    
 ]
-main_deps = main_exports + [
+main_deps = main_exports + ["//jvm:kotlin_serialization",
     "@maven//:org_jetbrains_kotlin_kotlin_reflect",
 ]
 main_runtime_deps = []

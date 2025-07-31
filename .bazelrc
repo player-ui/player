@@ -2,32 +2,36 @@ test --test_output=errors
 coverage --combined_report=lcov
 
 # TODO: Custom compiler version breaks embedded jdeps generator plugin - enable when removing custom kotlinc
-build --@rules_kotlin//kotlin/settings:jvm_emit_jdeps=False
+# build --@rules_kotlin//kotlin/settings:jvm_emit_jdeps=False
 build --cxxopt=-std=c++17
 
 # Java Specific Configs
-build --java_language_version=17 
-build --tool_java_language_version=17 
-build --java_runtime_version=remotejdk_17 
-build --tool_java_runtime_version=remotejdk_17 
-build --repo_env=JAVA_HOME=../bazel_tools/jdk
+common --java_language_version=17 
+common --tool_java_language_version=17 
+common --tool_java_language_version=17
+common --tool_java_runtime_version=17
+# build --java_runtime_version=remotejdk_17 
+# build --tool_java_runtime_version=remotejdk_17
+# build --repo_env=JAVA_HOME=../bazel_tools/jdk
 
 # Javascript Specific Configs
 common --@aspect_rules_ts//ts:skipLibCheck=always
 
 # Android databinding flags
-common --android_crosstool_top=@androidndk//:toolchain
-common --experimental_android_databinding_v2
-common --android_databinding_use_v3_4_args
-common --android_databinding_use_androidx
-common --experimental_google_legacy_api
+# common --android_crosstool_top=@androidndk//:toolchain
+# common --experimental_android_databinding_v2
+# common --android_databinding_use_v3_4_args
+# common --android_databinding_use_androidx
+# common --experimental_google_legacy_api
 
 # Android demo app flags
-build --noincremental_dexing --fat_apk_cpu=armeabi-v7a,arm64-v8a,x86,x86_64
+# build --noincremental_dexing
+common --android_platforms=@rules_android//:x86,@rules_android//:x86_64,@rules_android//:armeabi-v7a,@rules_android//:arm64-v8a
 mobile-install --start=warm
 
 #iOS Flags
 common --ios_simulator_device="iPhone 16 Pro"
+common --ios_simulator_version="17.4"
 
 # Cache Flags
 common --action_cache_store_output_metadata --experimental_remote_cache_compression_threshold=100
@@ -49,10 +53,6 @@ test --remote_cache_async
 test --remote_download_toplevel
 test --remote_timeout=3600
 test --build_metadata=REPO_URL=https://github.com/player-ui/player.git
-
-# Add standard iOS simulator device and version on tests to match pipeline
-common --ios_simulator_device="iPhone 15"
-common --ios_simulator_version="17.4"
 
 coverage --bes_results_url=https://app.buildbuddy.io/invocation/
 coverage --bes_backend=grpcs://remote.buildbuddy.io
