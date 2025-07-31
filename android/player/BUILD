@@ -1,10 +1,10 @@
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 load("@build_constants//:constants.bzl", "VERSION")
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
-load("@rules_kotlin//kotlin:core.bzl", "kt_kotlinc_options")
-load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
-load("@rules_player//kotlin:defs.bzl", "kt_jvm_junit5_test", "lint")
 load("@rules_kotlin//kotlin:core.bzl", "kt_compiler_plugin")
+load("@rules_player//kotlin:defs.bzl", "kt_jvm_junit5_test", "lint")
+load("@rules_jvm_external//:defs.bzl", "artifact")
+
 load("//jvm:defs.bzl", "distribution")
 load(":deps.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
 
@@ -46,11 +46,21 @@ kt_android_library(
 
 kt_compiler_plugin(
     name = "jetpack_compose_compiler_plugin",
-    id = "androidx.compose.compiler",
+    id = "androidx.compose.compiler.plugins.kotlin",
+    options = {"sourceInformation": "true"},
     target_embedded_compiler = True,
     visibility = ["//visibility:public"],
-    deps = ["@maven//:androidx_compose_compiler_compiler"],
+    deps = [artifact("org.jetbrains.kotlin:kotlin-compose-compiler-plugin-embeddable")],
 )
+
+
+# kt_compiler_plugin(
+#     name = "jetpack_compose_compiler_plugin",
+#     id = "androidx.compose.compiler",
+#     target_embedded_compiler = True,
+#     visibility = ["//visibility:public"],
+#     deps = ["@maven//:androidx_compose_compiler_compiler"],
+# )
 
 android_library(
     name = "player",
@@ -83,18 +93,18 @@ lint(
     lint_config = "//jvm:lint_config",
 )
 
-java_import(
-    name = "compose_compile_only",
-    jars = [],
-    neverlink = True,
-    tags = ["maven:compile-only"],
-    deps = [
-        "@maven//:androidx_appcompat_appcompat",
-        "@maven//:androidx_activity_activity_compose",
-        "@maven//:androidx_compose_foundation_foundation",
-        "@maven//:androidx_compose_foundation_foundation_layout",
-        "@maven//:androidx_compose_runtime_runtime",
-        "@maven//:androidx_compose_ui_ui",
-        "@maven//:androidx_compose_ui_ui_tooling",
-    ]
-)
+# java_import(
+#     name = "compose_compile_only",
+#     jars = [],
+#     neverlink = True,
+#     tags = ["maven:compile-only"],
+#     deps = [
+#         "@maven//:androidx_appcompat_appcompat",
+#         "@maven//:androidx_activity_activity_compose",
+#         "@maven//:androidx_compose_foundation_foundation",
+#         "@maven//:androidx_compose_foundation_foundation_layout",
+#         "@maven//:androidx_compose_runtime_runtime",
+#         "@maven//:androidx_compose_ui_ui",
+#         "@maven//:androidx_compose_ui_ui_tooling",
+#     ]
+# )

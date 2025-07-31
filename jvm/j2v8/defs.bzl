@@ -1,5 +1,5 @@
-load("@build_constants//:constants.bzl", "VERSION")
-load("//jvm:defs.bzl", "DEFAULT_GROUP", "distribution")
+load("@build_constants//:constants.bzl", "GROUP", "VERSION")
+load("//jvm:defs.bzl", "distribution")
 
 deps = {
     "macos": [
@@ -12,7 +12,7 @@ deps = {
         "@maven//:com_eclipsesource_j2v8_j2v8",
     ],
     "android-debug": [
-        "@maven//:com_eclipsesource_j2v8_j2v8"
+        "@maven//:com_eclipsesource_j2v8_j2v8",
     ],
     "all": [
         "//jvm/j2v8:j2v8-macos",
@@ -21,7 +21,7 @@ deps = {
     ],
 }
 
-def j2v8_platform(platform, group = DEFAULT_GROUP, version = VERSION):
+def j2v8_platform(platform, group = GROUP, version = VERSION):
     if platform not in deps:
         fail("platform must be defined in " + deps.keys())
 

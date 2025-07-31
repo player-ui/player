@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Reference Assets Player Demo</string>
+    <!-- <string name="app_name">Reference Assets Player Demo</string> -->
     <string name="title_activity_main">Reference Assets Player Demo</string>
     <!-- Strings used for fragments for navigation -->
     <string name="player_fragment_label">Player</string>

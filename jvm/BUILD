@@ -21,7 +21,6 @@ kt_jvm_library(
     name = "kotlin_serialization",
     srcs = [],
     exported_compiler_plugins = [":serialization_plugin"],
-    tags = ["maven_coordinates=org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:%s" % versions.kotlin.serialization],
     visibility = ["//visibility:public"],
     exports = [
         "@maven//:org_jetbrains_kotlinx_kotlinx_serialization_core_jvm",

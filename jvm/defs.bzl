@@ -1,14 +1,6 @@
 load("@rules_player//kotlin:defs.bzl", _distribution = "distribution", _kt_jvm = "kt_jvm")
-load("//:build_constants.bzl", "VERSION")
+load("@build_constants//:constants.bzl", "VERSION", "GROUP")
 load("//jvm/dependencies:common.bzl", common_main_deps = "main_deps", common_test_deps = "test_deps")
-
-DEFAULT_GROUP = "com.intuit.playerui"
-DEFAULT_PROJECT_NAME = "Player"
-DEFAUTL_PROJECT_DESCRIPTION = "A cross-platform semantic rendering engine"
-DEFAULT_DEVELOPERS = {
-    "sugarmanz": ["name=Jeremiah Zucker", "email=zucker.jeremiah@gmail.com"],
-    "brocollie08": ["name=Tony Lin", "email=sentony93@gmail.com"],
-}
 
 def kt_player_module(
         *,
@@ -20,7 +12,7 @@ def kt_player_module(
         include_common_deps = True,
 
         # Distribution config
-        group = DEFAULT_GROUP,
+        group = GROUP,
         deploy_env = None,
         excluded_workspaces = None,
 

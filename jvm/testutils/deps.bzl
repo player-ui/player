@@ -5,12 +5,13 @@ maven = [
 ]
 
 main_exports = [
+    "//jvm:kotlin_serialization",
     "@maven//:org_junit_jupiter_junit_jupiter_api",
     "//jvm/core",
     "//jvm/utils",
     "//jvm/j2v8:j2v8-all",
     "//jvm/graaljs",
-    "//jvm/hermes",
+    # "//jvm/hermes",
     "//plugins/common-types/jvm:common-types",
     "//plugins/reference-assets/jvm:reference-assets",
     "//tools/mocks:jar",
