@@ -7,9 +7,6 @@ import starlightDocSearch from "@astrojs/starlight-docsearch";
 import { visit } from "unist-util-visit";
 import pagefind from "astro-pagefind";
 
-// Add process import for Node.js environment
-const process = globalThis.process;
-
 export const rehypeLinks = (options) => {
   let base = options?.base;
 
@@ -35,6 +32,7 @@ export const rehypeLinks = (options) => {
 };
 
 export const BASE_PREFIX =
+  // eslint-disable-next-line no-undef
   process.env.NODE_ENV === "production" ? "DOCS_BASE_PATH" : undefined;
 
 // https://astro.build/config
