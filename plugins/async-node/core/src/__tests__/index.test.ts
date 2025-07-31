@@ -6,6 +6,7 @@ import {
   PlayerPlugin,
   AssetTransformCorePlugin,
   BeforeTransformFunction,
+  Flow,
 } from "@player-ui/player";
 import { Player, Parser } from "@player-ui/player";
 import { waitFor } from "@testing-library/react";
@@ -19,10 +20,6 @@ import { Registry } from "@player-ui/partial-match-registry";
 
 const transform: BeforeTransformFunction = (asset) => {
   const newAsset = asset.children?.[0]?.value;
-
-  if (!newAsset) {
-    return asyncTransform(asset.value.id, "collection");
-  }
   return asyncTransform(asset.value.id, "collection", newAsset);
 };
 
@@ -110,6 +107,31 @@ describe("view", () => {
     },
   };
 
+  const simpleAsyncContent: Flow = {
+    id: "test-flow",
+    views: [
+      {
+        type: "view",
+        id: "my-view",
+        values: {
+          async: true,
+          id: "async-values",
+        },
+      },
+    ],
+    navigation: {
+      BEGIN: "FLOW_1",
+      FLOW_1: {
+        startState: "VIEW_1",
+        VIEW_1: {
+          state_type: "VIEW",
+          ref: "my-view",
+          transitions: {},
+        },
+      },
+    },
+  };
+
   const asyncNodeTest = async (resolvedValue: any) => {
     const plugin = new AsyncNodePlugin({
       plugins: [new AsyncNodePluginPlugin()],
@@ -188,6 +210,64 @@ describe("view", () => {
     expect(view?.actions[0].asset.type).toBe("action");
     expect(view?.actions.length).toBe(1);
   };
+
+  test("should resolve async content children", async () => {
+    const plugin = new AsyncNodePlugin({
+      plugins: [new AsyncNodePluginPlugin()],
+    });
+
+    const asyncNodeHandler = vi.fn();
+    asyncNodeHandler.mockResolvedValue([
+      {
+        asset: {
+          id: "test-1",
+          type: "text",
+          value: "Test 1",
+        },
+      },
+      {
+        asset: {
+          id: "test-2",
+          type: "text",
+          value: "Test 2",
+        },
+      },
+    ]);
+
+    plugin.hooks.onAsyncNode.tap("test", asyncNodeHandler);
+    const player = new Player({ plugins: [plugin] });
+
+    player.start(simpleAsyncContent);
+
+    await waitFor(() => {
+      expect(asyncNodeHandler).toHaveBeenCalled();
+      const playerState = player.getState();
+      expect(playerState.status).toBe("in-progress");
+      expect(
+        (playerState as InProgressState).controllers.view.currentView
+          ?.lastUpdate,
+      ).toStrictEqual(
+        expect.objectContaining({
+          values: [
+            {
+              asset: {
+                id: "test-1",
+                type: "text",
+                value: "Test 1",
+              },
+            },
+            {
+              asset: {
+                id: "test-2",
+                type: "text",
+                value: "Test 2",
+              },
+            },
+          ],
+        }),
+      );
+    });
+  });
 
   test("should return current node view when the resolved node is null", async () => {
     await asyncNodeTest(null);
@@ -852,7 +932,7 @@ describe("view", () => {
 
     let deferredResolve: ((value: any) => void) | undefined;
 
-    plugin.hooks.onAsyncNode.tap("test", async (node) => {
+    plugin.hooks.onAsyncNode.tap("test", async () => {
       return new Promise((resolve) => {
         deferredResolve = resolve;
       });
@@ -868,7 +948,7 @@ describe("view", () => {
 
     player.hooks.viewController.tap("async-node-test", (vc) => {
       vc.hooks.view.tap("async-node-test", (view) => {
-        view.hooks.onUpdate.tap("async-node-test", (update) => {
+        view.hooks.onUpdate.tap("async-node-test", () => {
           updateNumber++;
         });
       });
@@ -913,8 +993,8 @@ describe("view", () => {
     view = (player.getState() as InProgressState).controllers.view.currentView
       ?.lastUpdate;
 
-    expect(view?.values[1][0].asset.type).toBe("text");
-    expect(view?.values[1][1].asset.type).toBe("text");
+    expect(view?.values[1].asset.type).toBe("text");
+    expect(view?.values[2].asset.type).toBe("text");
   });
 
   test("chat-message asset - replaces async nodes with provided node", async () => {

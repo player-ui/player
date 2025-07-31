@@ -62,11 +62,16 @@ export class Builder {
    *
    * @param id - the id of async node. It should be identical for each async node
    */
-  static asyncNode(id: string, flatten = true): Node.Async {
+  static asyncNode(
+    id: string,
+    flatten = true,
+    onValueReceived?: (node: Node.Node) => Node.Node,
+  ): Node.Async {
     return {
       id,
       type: NodeType.Async,
       flatten: flatten,
+      onValueReceived,
       value: {
         type: NodeType.Value,
         value: {
