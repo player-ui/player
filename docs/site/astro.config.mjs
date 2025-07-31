@@ -83,12 +83,12 @@ export default defineConfig({
           label: "Player",
           items: [
             {
-              label: "Getting Started",
-              slug: "getting-started",
-            },
-            {
               label: "Player",
               autogenerate: { directory: "player" },
+            },
+            {
+              label: "Getting Started",
+              slug: "getting-started",
             },
             {
               label: "Guides",
