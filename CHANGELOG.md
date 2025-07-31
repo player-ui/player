@@ -1,3 +1,24 @@
+# 0.13.0-next.5 (Thu Jul 31 2025)
+
+### Release Notes
+
+#### Docs: Updating Astro/Starlight, PageFind, Sidebar Enhancements ([#698](https://github.com/player-ui/player/pull/698))
+
+Updating Astro and Starlight to support linkable headers and other features, updating pagefind to support search enhancements, and updated sidebar navigation to simplify logic and highlight getting started.
+
+---
+
+#### 🐛 Bug Fix
+
+- Docs: Updating Astro/Starlight, PageFind, Sidebar Enhancements [#698](https://github.com/player-ui/player/pull/698) ([@KetanReddy](https://github.com/KetanReddy) [@kharrop](https://github.com/kharrop))
+
+#### Authors: 2
+
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.13.0-next.4 (Wed Jul 30 2025)
 
 ### Release Notes
