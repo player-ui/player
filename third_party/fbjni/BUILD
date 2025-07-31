@@ -24,13 +24,16 @@ filegroup(
     }),
 )
 
-genrule(
-    name = "jni_include",
-    srcs = [":jni"],
-    outs = ["jni/include"],
-    cmd = "mkdir $(OUTS) && cp $(SRCS) $$_",
-    tags = ["no-cache"],
-)
+# genrule(
+#     name = "jni_include",
+#     srcs = [":jni"],
+#     outs = [
+#         "jni/include/jni.h",
+#         "jni/include/asdf"
+#     ],
+#     cmd = "cp $(SRCS) $(RULEDIR)/jni/include",
+#     tags = ["no-cache"],
+# )
 
 cmake(
     name = "host",
@@ -40,11 +43,11 @@ cmake(
         "JNI_HEADER": "$(realpath ../../$JNI_HEADER)",
         "FBJNI_SKIP_TESTS": "true",
     },
-    data = [":jni_include"],
+    data = ["@bazel_tools//tools/jdk:jni_header"],
     env = {
         "CMAKE_BUILD_TYPE": "$(CMAKE_BUILD_TYPE)",
         # Resolves to fbjni/jni/include
-        "JNI_HEADER": "$(rlocationpath :jni_include)",
+        "JNI_HEADER": "$(rlocationpath @bazel_tools//tools/jdk:jni_header)",
         "CMAKE_BUILD_PARALLEL_LEVEL": "4"
     },
     generate_args = ["-G Ninja"],

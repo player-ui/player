@@ -23,7 +23,7 @@ kt_jvm_library(
     deps = [
         "//jvm/core",
         "//jvm/graaljs",
-        "//jvm/hermes:hermes-host",
+        # "//jvm/hermes:hermes-host",
         "//jvm/j2v8:j2v8-all",
         "//tools/mocks:jar",
         "@maven//:org_openjdk_jmh_jmh_core",
