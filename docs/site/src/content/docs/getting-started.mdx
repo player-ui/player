@@ -1,0 +1,173 @@
+---
+title: "Getting Started"
+---
+
+import PlatformTabs from "../../components/PlatformTabs.astro";
+import { PackageManagers } from "starlight-package-managers";
+
+Getting started with Player is simple.
+
+### Install Dependencies
+
+The first dependency you'll need to pull in is the Player itself. Additionally, you'll need an assets plugin to define any UI -- we'll use the reference assets as an example.
+
+<PlatformTabs>
+  <Fragment slot='react'>
+
+You can do this by installing the React Player and Reference Assets Packages
+
+<PackageManagers pkg="@player-ui/react @player-ui/reference-assets-plugin-react" />
+
+  </Fragment>
+  <Fragment slot='ios'>
+
+Add the following to your `Package.swift` dependencies:
+
+```swift
+.package(name: "PlayerUI", url: "https://github.com/player-ui/player.git", from: "0.2.0"),
+.package(name: "PlayerUIReferenceAssets", url: "https://github.com/player-ui/player.git", from: "0.2.0")
+```
+
+And to your target's dependencies:
+
+```swift
+.product(name: "PlayerUI", package: "PlayerUI"),
+.product(name: "PlayerUIReferenceAssets", package: "PlayerUIReferenceAssets")
+```
+
+  </Fragment>
+  <Fragment slot='android'>
+
+Add the Player dependency to your `build.gradle` file:
+
+```kotlin
+dependencies {
+    implementation("com.intuit.playerui:player:$PLAYER_VERSION")
+    implementation("com.intuit.playerui:reference-assets:$PLAYER_VERSION")
+}
+```
+
+  </Fragment>
+</PlatformTabs>
+
+### Create Your First Flow
+
+Player content is defined using a JSON structure that describes the user experience. Here's a simple example:
+
+```json
+{
+  "id": "my-first-flow",
+  "views": [
+    {
+      "id": "welcome",
+      "type": "info",
+      "title": {
+        "asset": {
+          "id": "welcome-title",
+          "type": "text",
+          "value": "Welcome to Player!"
+        }
+      },
+      "primaryInfo": {
+        "asset": {
+          "id": "welcome-message",
+          "type": "text",
+          "value": "This is your first Player experience."
+        }
+      },
+      "actions": [
+        {
+          "asset": {
+            "id": "continue-btn",
+            "type": "action",
+            "value": "Continue",
+            "label": {
+              "asset": {
+                "id": "continue-label",
+                "type": "text",
+                "value": "Continue"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "welcome",
+        "transitions": {
+          "continue": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+```
+
+### Initialize the Player
+
+<PlatformTabs>
+  <Fragment slot='react'>
+
+```tsx
+import React from "react";
+import { ReactPlayer } from "@player-ui/react";
+import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin-react";
+
+const flow = {
+  /* your flow JSON here */
+};
+
+export default function App() {
+  return <ReactPlayer plugins={[new ReferenceAssetsPlugin()]} flow={flow} />;
+}
+```
+
+  </Fragment>
+  <Fragment slot='ios'>
+
+```swift
+import SwiftUI
+import PlayerUI
+import PlayerUIReferenceAssets
+
+struct ContentView: View {
+    var body: some View {
+        SwiftUIPlayer(
+            flow: flow,
+            plugins: [ReferenceAssetsPlugin()]
+        )
+    }
+}
+```
+
+  </Fragment>
+  <Fragment slot='android'>
+
+```kotlin
+import com.intuit.playerui.core.player.Player
+import com.intuit.playerui.plugins.reference.ReferenceAssetsPlugin
+
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val player = Player(listOf(ReferenceAssetsPlugin()))
+        player.start(flow)
+    }
+}
+```
+
+  </Fragment>
+</PlatformTabs>
+
+That's it! You now have a basic Player experience running. Check out the other guides to learn more about building complex flows and customizing your experiences.
