@@ -42,7 +42,6 @@ export function findInArray<T extends Record<string | number, object>>(
   return array.findIndex((obj) => {
     if (obj && typeof obj === "object") {
       // Intentional double-equals because we want '4' to be coerced to 4
-      // eslint-disable-next-line eqeqeq
       return obj[key] == value;
     }
 

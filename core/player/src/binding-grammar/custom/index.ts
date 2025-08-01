@@ -70,7 +70,6 @@ export const parse: Parser = (path) => {
 
   /** gobble all whitespace */
   const whitespace = () => {
-    /* eslint-disable no-unmodified-loop-condition */
     while (ch === " ") {
       next();
     }
@@ -149,7 +148,6 @@ export const parse: Parser = (path) => {
       next(OPEN_CURL);
       next(OPEN_CURL);
 
-      /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
       const modelRef = parsePath();
       next(CLOSE_CURL);
       next(CLOSE_CURL);

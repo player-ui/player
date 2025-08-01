@@ -1,4 +1,3 @@
-/* eslint-disable react/no-this-in-sfc */
 import React from "react";
 import { SyncWaterfallHook, AsyncParallelHook } from "tapable-ts";
 import { Subscribe, useSubscribedState } from "@player-ui/react-subscribe";
