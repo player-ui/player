@@ -19,7 +19,7 @@ kt_jvm_library(
     srcs = ["src/main/kotlin/com/intuit/playerui/perf/jmh/PlayerPerf.kt"],
     kotlinc_opts = "//jvm:test_options",
     plugins = [":jmh_annotation_processor"],
-    resources = glob(["src/main/resources/*.json"]),
+    resources = glob(["src/main/resources/*.json"], allow_empty=True),
     deps = [
         "//jvm/core",
         "//jvm/graaljs",
