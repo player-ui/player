@@ -7,7 +7,7 @@ filegroup(
 
 cc_library(
     name = "libfbjni_headers",
-    hdrs = glob(["cxx/fbjni/**/*.h"]),
+    hdrs = glob(["cxx/fbjni/**/*.h"], allow_empty=True),
     strip_include_prefix = "cxx",
     visibility = ["//visibility:public"],
 )

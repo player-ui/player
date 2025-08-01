@@ -1,5 +1,4 @@
-load(":generate_dsl_targets.bzl", "generate_all_dsl_mocks")
-load(":generate_mocks_manifest.bzl", "generate_mocks_manifest")
+load("@rules_player//player:defs.bzl", generate_mocks_manifest = "generate_mocks_manifest")
 load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 
 PLUGIN_MOCKS = [
@@ -8,10 +7,10 @@ PLUGIN_MOCKS = [
     "pubsub",
     "reference-assets",
 ]
-
 filegroup(
     name = "all_mocks",
     srcs = ["//plugins/{}/mocks".format(plugin) for plugin in PLUGIN_MOCKS],
+    visibility = ["//visibility:public"],
 )
 
 generate_mocks_manifest(
