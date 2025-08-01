@@ -159,9 +159,9 @@ jobs:
             HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk lcov
 
       - macos/preboot-simulator:
-          version: "17.5"
+          version: "18.0"
           platform: "iOS"
-          device: "iPhone 15"
+          device: "iPhone 16 Pro"
 
       - run: bazel build --config=ci-mac -- //ios/demo:PlayerUIDemo
 
