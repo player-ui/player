@@ -19,11 +19,11 @@ kt_jvm_library(
     srcs = ["src/main/kotlin/com/intuit/playerui/perf/jmh/PlayerPerf.kt"],
     kotlinc_opts = "//jvm:test_options",
     plugins = [":jmh_annotation_processor"],
-    resources = glob(["src/main/resources/*.json"]),
+    resources = glob(["src/main/resources/*.json"], allow_empty=True),
     deps = [
         "//jvm/core",
         "//jvm/graaljs",
-        "//jvm/hermes:hermes-host",
+        # "//jvm/hermes:hermes-host",
         "//jvm/j2v8:j2v8-all",
         "//tools/mocks:jar",
         "@maven//:org_openjdk_jmh_jmh_core",

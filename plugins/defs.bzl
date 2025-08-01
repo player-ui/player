@@ -1,4 +1,5 @@
-load("//jvm:defs.bzl", "DEFAULT_GROUP", _kt_player_module = "kt_player_module")
+load("@build_constants//:constants.bzl", "GROUP")
+load("//jvm:defs.bzl", _kt_player_module = "kt_player_module")
 load("//jvm/dependencies:common.bzl", "test_deps")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 
@@ -32,7 +33,7 @@ def kt_player_plugin(
     _kt_player_module(
         name = name,
         include_common_deps = include_common_deps,
-        group = DEFAULT_GROUP + ".plugins",
+        group = GROUP + ".plugins",
 
         # Package level config
         module_name = module_name,
