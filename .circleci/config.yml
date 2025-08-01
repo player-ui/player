@@ -153,8 +153,6 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - macos/install-rosetta
-
       - run:
           name: Homebrew Dependencies
           command: |

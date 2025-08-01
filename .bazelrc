@@ -65,7 +65,7 @@ coverage --build_metadata=REPO_URL=https://github.com/player-ui/player.git
 
 # Base ci config for all executors. Other ci configs should inherit from this and add resource limitations.
 common:ci-base --build_metadata=ROLE=CI
-common:ci-base --experimental_remote_build_event_upload=minimal 
+common:ci-base --remote_build_event_upload=minimal 
 common:ci-base --nolegacy_important_outputs
 # Only show progress every 60 seconds on CI.
 # We want to find a compromise between printing often enough to show that the build isn't stuck,
@@ -74,13 +74,13 @@ common:ci-base --nolegacy_important_outputs
 common:ci-base --show_progress_rate_limit=60
 
 # Circle xlarge has 8 CPU cores/16GB mem
-common:ci --config=ci-base --local_cpu_resources=8 --local_ram_resources=15000
+common:ci --config=ci-base --local_resources=cpu=8 --local_resources=memory=15000
 
-# Circle macos.m1.large.gen1 6 cores 28gb ram (?)
-common:ci-mac --config=ci-base --local_cpu_resources=4 --local_ram_resources=7000
+# Circle m4pro.medium 6 cores 28gb ram (?)
+common:ci-mac --config=ci-base --local_resources=cpu=4 --local_resources=memory=26000
 
 # For bench tests we are using a large resource_class which has 4 cpu cores and 8GB RAM
-common:ci-benchmark --config=ci-base --local_cpu_resources=4 --local_ram_resources=8000
+common:ci-benchmark --config=ci-base --local_resources=cpu=4 --local_resources=memory=8000
 
 # Release Config
 common:release --config=ci --stamp --workspace_status_command=./scripts/workspace-status.sh
