@@ -159,36 +159,9 @@ jobs:
           name: Homebrew Dependencies
           command: |
             HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk lcov
-            wget -P /tmp/temurin https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u422-b05/OpenJDK8U-jdk_x64_mac_hotspot_8u422b05.pkg
-            sudo installer -pkg /tmp/temurin/OpenJDK8U-jdk_x64_mac_hotspot_8u422b05.pkg -target /
-
-      - restore_cache:
-          keys:
-            - android-tools-{{ arch }}-{{ checksum "scripts/install-android-tools.sh" }}
-
-      - run: echo 'export ANDROID_HOME=~/android-tools'  >> $BASH_ENV
-
-      - run:
-          name: Install Android tools
-          command: |
-            sh scripts/install-android-tools.sh
-            echo 'export ANDROID_SDK_HOME=$ANDROID_HOME'  >> $BASH_ENV
-            echo 'export ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk/23.2.8568313'  >> $BASH_ENV
-            echo 'export PATH=$ANDROID_SDK_HOME/tools/bin:$PATH'  >> $BASH_ENV
-            echo 'export PATH=$ANDROID_SDK_HOME/tools:$PATH'  >> $BASH_ENV
-            echo 'export PATH=$ANDROID_SDK_HOME/platform-tools:$PATH'  >> $BASH_ENV
-            echo 'export PATH=$ANDROID_SDK_HOME/emulator:$PATH'  >> $BASH_ENV
-            source $BASH_ENV
-          environment:
-            JAVA_HOME: /Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home
-
-      - save_cache:
-          key: android-tools-{{ arch }}-{{ checksum "scripts/install-android-tools.sh" }}
-          paths:
-            - ~/android-tools
 
       - macos/preboot-simulator:
-          version: "17.4"
+          version: "17.5"
           platform: "iOS"
           device: "iPhone 15"
 
