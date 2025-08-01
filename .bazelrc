@@ -31,7 +31,7 @@ mobile-install --start=warm
 
 #iOS Flags
 common --ios_simulator_device="iPhone 16 Pro"
-common --ios_simulator_version="18.0"
+common --ios_simulator_version="18.5"
 
 # Cache Flags
 common --action_cache_store_output_metadata --experimental_remote_cache_compression_threshold=100
