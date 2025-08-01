@@ -1,5 +1,6 @@
 package com.intuit.playerui.plugins.metrics
 
+import com.intuit.hooks.BailResult
 import com.intuit.playerui.core.player.state.inProgressState
 import com.intuit.playerui.core.plugins.Plugin
 import com.intuit.playerui.utils.test.PlayerTest
@@ -48,6 +49,21 @@ internal class MetricsPluginTest : PlayerTest() {
         player.start(simpleFlowString)
         player.inProgressState!!.transition("next")
         verify { renderEndHandler wasNot Called }
+    }
+
+    @OptIn(ExperimentalContracts::class)
+    @TestTemplate
+    fun `should trigger resolveRequestTime hook`() {
+        val expectedRequestTime = 1
+        var actualRequestTime = 0
+
+        plugin?.hooks?.resolveRequestTime?.tap { ->
+            actualRequestTime = expectedRequestTime
+            BailResult.Bail(actualRequestTime)
+        }
+
+        player.start(simpleFlowString)
+        assertEquals(expectedRequestTime, actualRequestTime)
     }
 
     @OptIn(ExperimentalContracts::class)
