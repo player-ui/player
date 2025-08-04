@@ -1438,6 +1438,73 @@ describe("view", () => {
       });
     });
   });
+
+  // For tests dealing with the startup and cleanup of promises for async nodes.
+  describe("Promise Management", () => {
+    test("should not start async node handling if process has already started", async () => {
+      const plugin = new AsyncNodePlugin({
+        plugins: [new AsyncNodePluginPlugin()],
+      });
+
+      // Create a promise that won't be resolved.
+      const asyncTapFn = vi.fn();
+      asyncTapFn.mockReturnValue(new Promise(() => {}));
+
+      plugin.hooks.onAsyncNode.tap("test", asyncTapFn);
+
+      const player = new Player({ plugins: [plugin] });
+      player.start(basicFRFWithActions as any);
+
+      await vi.waitFor(() => {
+        expect(asyncTapFn).toHaveBeenCalledOnce();
+      });
+
+      // Clear the one call since it has already been checked.
+      asyncTapFn.mockClear();
+      const playerState = player.getState();
+      expect(playerState.status).toBe("in-progress");
+      // force an update while ignoring the cache.
+      (playerState as InProgressState).controllers.view.currentView?.update();
+
+      // Should not be called again.
+      expect(
+        vi.waitFor(() => {
+          expect(asyncTapFn).toHaveBeenCalledOnce();
+        }),
+      ).rejects.toThrowError();
+    });
+
+    test("should allow for handling to start again if the promise completes", async () => {
+      const plugin = new AsyncNodePlugin({
+        plugins: [new AsyncNodePluginPlugin()],
+      });
+
+      // Create a promise that won't be resolved.
+      const asyncTapFn = vi.fn();
+      asyncTapFn.mockResolvedValue(null);
+
+      plugin.hooks.onAsyncNode.tap("test", asyncTapFn);
+
+      const player = new Player({ plugins: [plugin] });
+      player.start(basicFRFWithActions as any);
+
+      await vi.waitFor(() => {
+        expect(asyncTapFn).toHaveBeenCalledOnce();
+      });
+
+      // Clear the one call since it has already been checked.
+      asyncTapFn.mockClear();
+      const playerState = player.getState();
+      expect(playerState.status).toBe("in-progress");
+      // force an update while ignoring the cache.
+      (playerState as InProgressState).controllers.view.currentView?.update();
+
+      // Should be called again.
+      vi.waitFor(() => {
+        expect(asyncTapFn).toHaveBeenCalledOnce();
+      });
+    });
+  });
 });
 
 describe("parser", () => {

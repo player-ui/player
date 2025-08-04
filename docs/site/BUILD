@@ -1,5 +1,7 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//:astro/package_json.bzl", astro_bin = "bin")
+load("@npm//:pagefind/package_json.bzl", pagefind_bin = "bin")
+
 
 npm_link_all_packages(
     name = "node_modules",
@@ -38,6 +40,8 @@ build_deps = [
     "//:node_modules/dlv",
     "//:node_modules/unist-util-visit",
     "//:node_modules/starlight-package-managers",
+    "//:node_modules/astro-pagefind",
+    "//:node_modules/pagefind",
     ":node_modules/@player-ui/player",
     ":node_modules/@player-ui/react",
     ":node_modules/@player-ui/reference-assets-plugin-components",
@@ -61,5 +65,13 @@ astro_bin.astro_binary(
     tags = [
         "ibazel_notify_changes",
     ],
+    visibility = ["//visibility:public"],
+)
+
+astro_bin.astro_binary(
+    name = "preview",
+    args = ["preview"],
+    chdir = package_name(),
+    data = srcs + build_deps + [":site"],
     visibility = ["//visibility:public"],
 )
