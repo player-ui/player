@@ -428,7 +428,7 @@ export class Resolver {
       const childValue: any = [];
       const rawParentToPassIn = node;
 
-      resolvedAST.values = resolvedAST.values.flatMap((mValue) => {
+      resolvedAST.values = resolvedAST.values.map((mValue) => {
         const mTree = this.computeTree(
           mValue,
           rawParentToPassIn,
