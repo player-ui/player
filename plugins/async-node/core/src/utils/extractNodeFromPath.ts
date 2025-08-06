@@ -14,7 +14,7 @@ const getMatchValue = (
     if (pathA[i] === pathB[i]) {
       matchCount++;
     } else {
-      return matchCount;
+      return 0;
     }
   }
 
