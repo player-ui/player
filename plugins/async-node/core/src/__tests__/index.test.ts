@@ -13,15 +13,16 @@ import { waitFor } from "@testing-library/react";
 import {
   AsyncNodePlugin,
   AsyncNodePluginPlugin,
-  asyncTransform,
+  createAsyncTransform,
 } from "../index";
 import { CheckPathPlugin } from "@player-ui/check-path-plugin";
 import { Registry } from "@player-ui/partial-match-registry";
 
-const transform: BeforeTransformFunction = (asset) => {
-  const newAsset = asset.children?.[0]?.value;
-  return asyncTransform(asset.value.id, "collection", newAsset);
-};
+const transform: BeforeTransformFunction = createAsyncTransform({
+  transformAssetType: "chat-message",
+  wrapperAssetType: "collection",
+  getNestedAsset: (node) => node.children?.[0]?.value,
+});
 
 const transformPlugin = new AssetTransformCorePlugin(
   new Registry([[{ type: "chat-message" }, { beforeResolve: transform }]]),

@@ -16,6 +16,7 @@ import queueMicrotask from "queue-microtask";
 
 export * from "./types";
 export * from "./transform";
+export * from "./createAsyncTransform";
 
 /** Object type for storing data related to a single `apply` of the `AsyncNodePluginPlugin`
  * This object should be setup once per ViewInstance to keep any cached info just for that view to avoid conflicts of shared async node ids across different view states.
