@@ -144,7 +144,8 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             let playerValue = expectedPlayer
             view.hooks.onUpdate.tap { [weak self] value in
                 Task { @MainActor in
-                    guard let self = self, self.player == playerValue else { return }
+                    guard let player = playerValue else { return }
+                    guard let self = self, self.player == player else { return }
                     self.onUpdate(value)
                 }
             }
