@@ -1,5 +1,9 @@
 import { bench, BenchOptions, describe } from "vitest";
-import { AsyncNodePlugin, AsyncNodePluginPlugin, asyncTransform } from "..";
+import {
+  AsyncNodePlugin,
+  AsyncNodePluginPlugin,
+  createAsyncTransform,
+} from "..";
 import {
   Asset,
   AssetTransformCorePlugin,
@@ -10,19 +14,12 @@ import {
 } from "@player-ui/player";
 import { Registry } from "@player-ui/partial-match-registry";
 
-export const transform: BeforeTransformFunction<Asset<"chat-message">> = (
-  asset,
-) => {
-  const newAsset = asset.children?.[0]?.value;
-  return asyncTransform(
-    asset.value.id,
-    "collection",
-    newAsset,
-    undefined,
-    undefined,
-    transform,
-  );
-};
+export const transform: BeforeTransformFunction<Asset<"chat-message">> =
+  createAsyncTransform({
+    transformAssetType: "chat-message",
+    wrapperAssetType: "collection",
+    getNestedAsset: (node) => node.children?.[0]?.value,
+  });
 
 const asyncTransformBenchFlow: Flow = {
   id: "test-flow",
