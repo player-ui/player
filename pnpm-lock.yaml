@@ -975,9 +975,6 @@ importers:
       '@player-ui/asset-provider-plugin-react':
         specifier: workspace:*
         version: link:../../asset-provider/react
-      '@player-ui/async-node-plugin':
-        specifier: workspace:*
-        version: link:../../async-node/core
       '@player-ui/beacon-plugin-react':
         specifier: workspace:*
         version: link:../../beacon/react
