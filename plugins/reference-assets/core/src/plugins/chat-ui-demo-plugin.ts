@@ -37,7 +37,7 @@ export class ChatUiDemoPlugin implements ExtendedPlayerPlugin<[], [], [send]> {
     }
 
     let deferredPromises: Record<string, (val: string) => void> = {};
-    let lastPromiseKey: string | undefined;
+    let allPromiseKeys: string[] = [];
     let counter = 0;
 
     const sendMessage: send = (
@@ -45,32 +45,50 @@ export class ChatUiDemoPlugin implements ExtendedPlayerPlugin<[], [], [send]> {
       message: string,
       nodeId?: string,
     ): void => {
-      const content = createContentFromMessage(message, `message-${counter++}`);
-      const id = nodeId ?? lastPromiseKey;
-
-      if (!id || !(id in deferredPromises)) {
+      if (nodeId && !(nodeId in deferredPromises)) {
         context.logger?.warn(
-          "Could not send message because there are no async nodes.",
+          `'send' expression called with unrecognized id '${nodeId}'`,
         );
         return;
       }
 
-      const resolveFunction = deferredPromises[id];
-      resolveFunction?.(content);
-      delete deferredPromises[id];
+      if (!nodeId && allPromiseKeys.length === 0) {
+        context.logger?.warn(`'send' called with no waiting async nodes`);
+        return;
+      }
+
+      // Either resolve the node by the id or resolve all of them if no id provided
+      const keys = nodeId ? [nodeId] : allPromiseKeys;
+
+      for (const id of keys) {
+        const content = createContentFromMessage(
+          message,
+          `message-${counter++}`,
+        );
+        const resolveFunction = deferredPromises[id];
+        resolveFunction?.(content);
+        delete deferredPromises[id];
+      }
+
+      if (nodeId) {
+        const index = allPromiseKeys.indexOf(nodeId);
+        allPromiseKeys.splice(index, 1);
+      } else {
+        allPromiseKeys = [];
+      }
     };
 
     asyncNodePlugin.hooks.onAsyncNode.tap(this.name, (node) => {
       return new Promise((res) => {
         deferredPromises[node.id] = res;
-        lastPromiseKey = node.id;
+        allPromiseKeys.push(node.id);
       });
     });
 
     // Reset at the start of a new view.
     player.hooks.view.tap(this.name, (_) => {
       deferredPromises = {};
-      lastPromiseKey = undefined;
+      allPromiseKeys = [];
       counter = 0;
     });
 
