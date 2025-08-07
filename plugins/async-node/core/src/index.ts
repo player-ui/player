@@ -54,6 +54,8 @@ type AsyncNodeHooks = {
   onAsyncNodeError: SyncBailHook<[Error, Node.Async], any>;
 };
 
+export const AsyncNodePluginSymbol: symbol = Symbol.for("AsyncNodePlugin");
+
 /**
  * Async node plugin used to resolve async nodes in the content
  * If an async node is present, allow users to provide a replacement node to be rendered when ready
@@ -61,6 +63,9 @@ type AsyncNodeHooks = {
 export class AsyncNodePlugin implements PlayerPlugin {
   private plugins: AsyncNodeViewPlugin[] | undefined;
   private playerInstance: Player | undefined;
+
+  static Symbol: symbol = AsyncNodePluginSymbol;
+  public readonly symbol: symbol = AsyncNodePlugin.Symbol;
 
   constructor(options: AsyncNodePluginOptions, asyncHandler?: AsyncHandler) {
     if (options?.plugins) {
