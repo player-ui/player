@@ -11,7 +11,7 @@ main_exports = [
 ]
 
 main_deps = main_exports + [
-    "//jvm:kotlin_serialization",
+    # "//jvm:kotlin_serialization",
     "@maven//:org_graalvm_js_js",
     "@maven//:org_graalvm_js_js_scriptengine",
     "@maven//:org_graalvm_sdk_graal_sdk",
@@ -22,5 +22,5 @@ main_resources = [
 ]
 
 test_deps = [
-    "//jvm:kotlin_serialization",
+    # "//jvm:kotlin_serialization",
 ]

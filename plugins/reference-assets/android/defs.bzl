@@ -18,7 +18,7 @@ def kt_asset_test(
             "//jvm/j2v8:j2v8-all",
             # TODO: If we build a config for swapping between default android player runtimes,
             #  we could dynamically depend on this and make sure we run all android player tests against all supported runtimes
-            "//jvm/hermes:hermes-host",
+            # "//jvm/hermes:hermes-host",
         ],
         resources = [
         ],

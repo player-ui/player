@@ -8,7 +8,7 @@
 import Foundation
 import XCTest
 import SwiftUI
-import Combine
+@preconcurrency import Combine
 import ViewInspector
 
 @testable import PlayerUI
@@ -16,7 +16,8 @@ import ViewInspector
 @testable import PlayerUIInternalTestUtilities
 @testable import PlayerUIReferenceAssets
 
-extension Inspection: InspectionEmissary { }
+extension Inspection: @retroactive @unchecked Sendable {}
+extension Inspection: @retroactive InspectionEmissary { }
 
 class ManagedPlayer14Tests: XCTestCase {
     func testLoadingView() throws {
@@ -51,7 +52,7 @@ class ManagedPlayer14Tests: XCTestCase {
         XCTAssertEqual(text, "Error")
     }
 
-    func testFlowLoadsWithAnimation() throws {
+    @MainActor func testFlowLoadsWithAnimation() throws {
         let player = ManagedPlayer(
             plugins: [ReferenceAssetsPlugin()],
             flowManager: AlwaysLoaded(),
@@ -102,7 +103,7 @@ class ManagedPlayer14Tests: XCTestCase {
         XCTAssertEqual("Loading Flow", try text.string())
     }
 
-    func testFlowLoadsWithSuppliedScrollPlugin() throws {
+    @MainActor func testFlowLoadsWithSuppliedScrollPlugin() throws {
         let player = ManagedPlayer(
             plugins: [ReferenceAssetsPlugin(), ScrollPlugin()],
             flowManager: AlwaysLoaded(),
@@ -139,7 +140,7 @@ class ManagedPlayer14Tests: XCTestCase {
         ViewHosting.expel()
     }
 
-    func testFlowLoadsWithoutScrollView() throws {
+    @MainActor func testFlowLoadsWithoutScrollView() throws {
         let player = ManagedPlayer(
             plugins: [ReferenceAssetsPlugin()],
             flowManager: AlwaysLoaded(),
