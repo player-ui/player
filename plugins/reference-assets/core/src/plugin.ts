@@ -1,54 +1,26 @@
-import type { Player, ExtendedPlayerPlugin } from "@player-ui/player";
-import { AssetTransformPlugin } from "@player-ui/asset-transform-plugin";
-import type {
-  ActionAsset,
-  InputAsset,
-  ImageAsset,
-  InfoAsset,
-  TextAsset,
-  CollectionAsset,
-  ChoiceAsset,
-  ChatMessageAsset,
-} from "./assets";
+import type { Player, PlayerPlugin } from "@player-ui/player";
+import { MetaPlugin } from "@player-ui/meta-plugin";
+import { ChatUiDemoPlugin, ReferenceAssetsTransformPlugin } from "./plugins";
 import {
-  inputTransform,
-  actionTransform,
-  imageTransform,
-  infoTransform,
-  choiceTransform,
-  chatMessageTransform,
-} from "./assets";
+  AsyncNodePlugin,
+  AsyncNodePluginPlugin,
+} from "@player-ui/async-node-plugin";
 
 /**
  * A plugin to add transforms for the reference assets
  */
-export class ReferenceAssetsPlugin
-  implements
-    ExtendedPlayerPlugin<
-      [
-        ActionAsset,
-        InputAsset,
-        ImageAsset,
-        TextAsset,
-        CollectionAsset,
-        ChoiceAsset,
-        ChatMessageAsset,
-      ],
-      [InfoAsset]
-    >
-{
-  name = "reference-assets-transforms";
+export class ReferenceAssetsPlugin implements PlayerPlugin {
+  name = "reference-assets-plugin";
 
-  apply(player: Player) {
-    player.registerPlugin(
-      new AssetTransformPlugin([
-        [{ type: "action" }, actionTransform],
-        [{ type: "input" }, inputTransform],
-        [{ type: "image" }, imageTransform],
-        [{ type: "info" }, infoTransform],
-        [{ type: "choice" }, choiceTransform],
-        [{ type: "chat-message" }, chatMessageTransform],
-      ]),
-    );
+  private readonly metaPlugin = new MetaPlugin([
+    new AsyncNodePlugin({
+      plugins: [new AsyncNodePluginPlugin()],
+    }),
+    new ReferenceAssetsTransformPlugin(),
+    new ChatUiDemoPlugin(),
+  ]);
+
+  apply(player: Player): void {
+    player.registerPlugin(this.metaPlugin);
   }
 }
