@@ -152,7 +152,7 @@ describe("createAsyncTransform", () => {
       }
     });
 
-    it("should add an onValueReceived function to the async node that turns if flatten is true", () => {
+    it("should add an onValueReceived function to the async node if flatten is true", () => {
       expect(transformedAsset).toStrictEqual({
         type: NodeType.Asset,
         children: [
@@ -188,7 +188,7 @@ describe("createAsyncTransform", () => {
       expect(onValueReceivedFuncion).toBeDefined();
     });
 
-    it("should add an onValueReceived function to the async node that turns if flatten is true", () => {
+    it("should add an onValueReceivedFunction that transforms the result into a chained asset on the same type into a multi-node", () => {
       const result = onValueReceivedFuncion?.(asset);
       expect(result).toStrictEqual({
         override: true,
