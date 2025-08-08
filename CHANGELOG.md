@@ -1,3 +1,29 @@
+# 0.13.0-next.6 (Fri Aug 08 2025)
+
+### Release Notes
+
+#### update reference assets to support chat-ui demo from core plugin ([#702](https://github.com/player-ui/player/pull/702))
+
+- Update core reference assets plugin to handle chat-ui mock across platforms, including setup the async node plugin at the core level
+
+#### add option to report unused disable directives in eslint ([#697](https://github.com/player-ui/player/pull/697))
+
+- add `linterOptions.reportUnusedDisableDirectives: "error"` to eslint config
+
+---
+
+#### 🐛 Bug Fix
+
+- update reference assets to support chat-ui demo from core plugin [#702](https://github.com/player-ui/player/pull/702) ([@tmarmer](https://github.com/tmarmer))
+- add option to report unused disable directives in eslint [#697](https://github.com/player-ui/player/pull/697) ([@tmarmer](https://github.com/tmarmer) [@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
 # 0.13.0-next.5 (Thu Jul 31 2025)
 
 ### Release Notes
