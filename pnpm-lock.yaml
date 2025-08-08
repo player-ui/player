@@ -944,6 +944,12 @@ importers:
       '@player-ui/beacon-plugin':
         specifier: workspace:*
         version: link:../../beacon/core
+      '@player-ui/expression-plugin':
+        specifier: workspace:*
+        version: link:../../expression/core
+      '@player-ui/meta-plugin':
+        specifier: workspace:*
+        version: link:../../meta-plugin/core
       '@player-ui/player':
         specifier: workspace:*
         version: link:../../../core/player
@@ -969,9 +975,6 @@ importers:
       '@player-ui/asset-provider-plugin-react':
         specifier: workspace:*
         version: link:../../asset-provider/react
-      '@player-ui/async-node-plugin':
-        specifier: workspace:*
-        version: link:../../async-node/core
       '@player-ui/beacon-plugin-react':
         specifier: workspace:*
         version: link:../../beacon/react

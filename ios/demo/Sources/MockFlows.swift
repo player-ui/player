@@ -1436,6 +1436,74 @@ static let chatMessageBasic: String = """
 
     """
 
+    static let chatUi: String = """
+    {
+  "id": "chat-ui",
+  "data": {
+    "content": ""
+  },
+  "views": [
+    {
+      "id": "root",
+      "type": "collection",
+      "values": [
+        {
+          "asset": {
+            "id": "1",
+            "type": "chat-message",
+            "value": {
+              "asset": {
+                "id": "values-0-value",
+                "type": "text",
+                "value": "Start chatting now!"
+              }
+            }
+          }
+        },
+        {
+          "asset": {
+            "id": "input",
+            "type": "input",
+            "binding": "content"
+          }
+        },
+        {
+          "asset": {
+            "id": "values-2",
+            "type": "action",
+            "exp": "send({{content}})",
+            "label": {
+              "asset": {
+                "id": "values-2-label",
+                "type": "text",
+                "value": " Send "
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "root",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "DONE"
+      }
+    }
+  }
+}
+"""
+
     public static let assetSections: [FlowLoader.FlowSection] = [
         (title: "action", flows: [
             (name: "counter", flow: MockFlows.actionCounter),
@@ -1469,6 +1537,7 @@ static let chatMessageBasic: String = """
         ]),
         (title: "chat message", flows: [
             (name: "basic", flow: MockFlows.chatMessageBasic),
+            (name: "chat-ui", flow: MockFlows.chatUi),
         ])
     ]
 
