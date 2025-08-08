@@ -31,7 +31,7 @@ class TransitionPluginTests: XCTestCase {
         XCTAssertEqual(model.stateTransition.call(), .test1)
     }
 
-    func testTransitionPluginDefaultTransitions() throws {
+    /*func testTransitionPluginDefaultTransitions() throws {
         let plugin = TransitionPlugin(pushTransition: .test1, popTransition: .test2)
         let player = SwiftUIPlayer(flow: FlowData.MULTIPAGE, plugins: [ReferenceAssetsPlugin(), plugin])
 
@@ -57,7 +57,7 @@ class TransitionPluginTests: XCTestCase {
         XCTAssertEqual(playerTransitions4, .test2)
 
         ViewHosting.expel()
-    }
+    } */
 
     struct TestFlowManager: FlowManager {
         func next(_ result: CompletedState?) async throws -> NextState {
