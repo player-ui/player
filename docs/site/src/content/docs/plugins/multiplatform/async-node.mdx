@@ -340,24 +340,59 @@ AndroidPlayer(asyncNodePlugin)
 </PlatformTabs>
 
 
-### AsyncTransform function
-`AsyncTransform` is a helper function to create the transform for async asset. With the example below, 
-- id - `chat-message` asset id
-- wrapperType - container asset type eg. `Collection` with `values` as children that will be resolved asynchronously 
-- asset - value asset to pass in (`Text` in example)
-- flatten - default value is true. Determine if the content streamed in should be flattened. 
+### AsyncTransform
+`createAsyncTransform` is a helper function to create the transform for async asset. The function takes a set of options that help adjust the transform generated to your needs:
+- flatten (Optional. Default: true) - Whether or not to flatten chained results of the same asset type into a single container.
+- path (Optional. Default: ["values"]) - The path to the array within the `wrapperAssetType` that will contain the async content.
+- transformAssetType (Required) - The asset type that the transform is matching against.
+- wrapperAssetType (Required) - The asset type that will contain the async content.
+- getNestedAsset (Optional) - Function to get any nested asset that will need to be extracted and kept when creating the wrapper asset. This is useful when combined with `flatten: true` to help chain async content with a single asset type.
+- getAsyncNodeId (Optional) - Function to get the id for the generated async node. By default it uses a format of `async-{asset.id}`
+
+#### Usage
+
+Setting up a transform like below:
+
+```ts
+const beforeResolve = createAsyncTransform({
+  transformAssetType: "chat-message",
+  wrapperAssetType: "collection",
+  getNestedAsset: (node) => node.children?.[0]?.value
+})
+```
+
+transforms the following content:
 
 ```json
-      {
-        "id": "chat",
-        "type": "chat-message",
-        "value": {
-          "id": "text",
-          "type": "text",
-          "value": "chat message",
-        },
-      },
+{
+  "id": "chat",
+  "type": "chat-message",
+  "value": {
+    "id": "text",
+    "type": "text",
+    "value": "chat message",
+  },
+},
 ```
+
+into: 
+
+```json
+{
+  "id": "collection-async-chat",
+  "type": "collection",
+  "values": [
+    {
+      "id": "text",
+      "type": "text",
+      "value": "chat message",
+    },
+    { /** async content managed by your handler */ }
+  ],
+},
+```
+
+And using additional `chat-message` assets in the async content will flatten itself into this top level collection.
 
 ### Flatten
 Flatten is introduced to avoid nested structure caused by continuous streaming. eg. When a new `chat-message` asset is streamed in, in AST tree, instead of `[chat1, [chat2, asyncNode]]`, it's flattened into `[chat1, chat2, asyncNode]`

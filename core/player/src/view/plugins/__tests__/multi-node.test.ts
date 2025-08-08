@@ -35,4 +35,40 @@ describe("multi-node", () => {
       }),
     ).toMatchSnapshot();
   });
+
+  it("should parse an array into a multi node", () => {
+    expect(
+      parser.parseObject([
+        {
+          asset: {
+            type: "type",
+            id: "asset-1",
+          },
+        },
+      ]),
+    ).toStrictEqual({
+      override: false,
+      type: "multi-node",
+      values: [
+        {
+          type: "value",
+          value: undefined,
+          parent: expect.anything(),
+          children: [
+            {
+              path: ["asset"],
+              value: {
+                type: "asset",
+                parent: expect.anything(),
+                value: {
+                  id: "asset-1",
+                  type: "type",
+                },
+              },
+            },
+          ],
+        },
+      ],
+    });
+  });
 });

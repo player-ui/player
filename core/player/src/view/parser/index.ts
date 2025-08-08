@@ -21,6 +21,47 @@ export interface ParseObjectChildOptions {
   parentObj: object;
 }
 
+export type ParserHooks = {
+  /**
+   * A hook to interact with an object _before_ parsing it into an AST
+   *
+   * @param value - The object we're are about to parse
+   * @returns - A new value to parse.
+   *  If undefined, the original value is used.
+   *  If null, we stop parsing this node.
+   */
+  onParseObject: SyncWaterfallHook<[object, NodeType]>;
+  /**
+   * A callback to interact with an AST _after_ we parse it into the AST
+   *
+   * @param value - The object we parsed
+   * @param node - The AST node we generated
+   * @returns - A new AST node to use
+   *   If undefined, the original value is used.
+   *   If null, we ignore this node all together
+   */
+  onCreateASTNode: SyncWaterfallHook<[Node.Node | undefined | null, object]>;
+  /** A hook to call when parsing an object into an AST node
+   *
+   * @param obj - The object we're are about to parse
+   * @param nodeType - The type of node we're parsing
+   * @param parseOptions - Additional options when parsing
+   * @param childOptions - Additional options that are populated when the node being parsed is a child of another node
+   * @returns - A new AST node to use
+   *   If undefined, the original value is used.
+   *   If null, we ignore this node all together
+   */
+  parseNode: SyncBailHook<
+    [
+      obj: object,
+      nodeType: Node.ChildrenTypes,
+      parseOptions: ParseObjectOptions,
+      childOptions?: ParseObjectChildOptions,
+    ],
+    Node.Node | Node.Child[]
+  >;
+};
+
 interface NestedObj {
   /** The values of a nested local object */
   children: Node.Child[];
@@ -32,39 +73,10 @@ interface NestedObj {
  * It provides a few ways to interact with the parsing, including mutating an object before and after creation of an AST node
  */
 export class Parser {
-  public readonly hooks = {
-    /**
-     * A hook to interact with an object _before_ parsing it into an AST
-     *
-     * @param value - The object we're are about to parse
-     * @returns - A new value to parse.
-     *  If undefined, the original value is used.
-     *  If null, we stop parsing this node.
-     */
-    onParseObject: new SyncWaterfallHook<[object, NodeType]>(),
-
-    /**
-     * A callback to interact with an AST _after_ we parse it into the AST
-     *
-     * @param value - The object we parsed
-     * @param node - The AST node we generated
-     * @returns - A new AST node to use
-     *   If undefined, the original value is used.
-     *   If null, we ignore this node all together
-     */
-    onCreateASTNode: new SyncWaterfallHook<
-      [Node.Node | undefined | null, object]
-    >(),
-
-    parseNode: new SyncBailHook<
-      [
-        obj: object,
-        nodeType: Node.ChildrenTypes,
-        parseOptions: ParseObjectOptions,
-        childOptions?: ParseObjectChildOptions,
-      ],
-      Node.Node | Node.Child[]
-    >(),
+  public readonly hooks: ParserHooks = {
+    onParseObject: new SyncWaterfallHook(),
+    onCreateASTNode: new SyncWaterfallHook(),
+    parseNode: new SyncBailHook(),
   };
 
   public parseView(value: AnyAssetType): Node.View {
