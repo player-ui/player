@@ -21,6 +21,7 @@ class ManagedPlayerUITests: BaseTestCase {
         waitFor(completedText)
     }
 
+    // NOTE: This test flakes occassionally, but pretty rarely.
     func testErrorContentFlow() {
         openFlow("Error Content Flow")
 
