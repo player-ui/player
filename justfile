@@ -73,9 +73,7 @@ start-android-demo:
 
 ### 🍎 Start iOS ###
 
-[doc('Generate and open the xcodeproj for Player. This requires your Xcode to be named "Xcode". 
-As opposed to "Xcode-16.1.0", for example, which might be the case if you have multiple versions 
-of Xcode installed.
+[doc('Generate and open the xcodeproj for Player. This requires Xcode to be your default for opening .xcodeproj files.
 
 Run "build-core-native" first because Xcode willl not handle that automatically like bazel commands will.')]
 dev-ios: build-core-native
@@ -86,13 +84,16 @@ dev-ios: build-core-native
 start-ios-demo:
   bazel run //ios/demo:PlayerUIDemo
 
-[doc('Test all iOS targets')]
-test-ios:
-  bazel test \
-  --test_output=all \
-  --test_timeout=1800 \
-  $(bazel query "kind(ios_unit_test, //...)") \
-  $(bazel query "kind(ios_ui_test, //...)") 
+[doc("List all test iOS targets. You should run them individually with `bazel test` locally or they won't pass.
+
+If you run them all at once locally, too many simulators will open and they'll all time out and fail.
+")]
+list-test-ios:
+  echo '🍎 Unit tests:'
+  bazel query "kind(ios_unit_test, //...)"
+  echo ''
+  echo '🍎 UI tests:'
+  bazel query "kind(ios_ui_test, //...)"
 
 clean: # Force delete all the local cached bazel stuff. Be careful!
   # Delete all the bazel build artifacts
