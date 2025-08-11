@@ -22,8 +22,9 @@ import com.intuit.playerui.plugins.assets.ReferenceAssetsPlugin as Transforms
  * The [ReferenceAssetsPlugin] is a set of reference assets for use with the Android player.
  * They serve as both a code sample and an easy way to get started using the Android player.
  */
-class ReferenceAssetsPlugin : AndroidPlayerPlugin, JSPluginWrapper by Transforms() {
-
+class ReferenceAssetsPlugin :
+    AndroidPlayerPlugin,
+    JSPluginWrapper by Transforms() {
     private lateinit var player: AndroidPlayer
 
     /** register core assets */
@@ -37,7 +38,10 @@ class ReferenceAssetsPlugin : AndroidPlayerPlugin, JSPluginWrapper by Transforms
         androidPlayer.registerAsset("input", ::Input)
     }
 
-    fun handleLink(ref: String, context: Context) = startActivity(
+    fun handleLink(
+        ref: String,
+        context: Context,
+    ) = startActivity(
         context,
         Intent(Intent.ACTION_VIEW, Uri.parse(ref)).apply {
             flags += FLAG_ACTIVITY_NEW_TASK

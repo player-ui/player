@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 
 /** Simple [PlayerFragment] example that builds a [DemoPlayerViewModel] w/ a single flow iterator */
 abstract class BasePlayerFragment : PlayerFragment() {
-
     abstract val flow: String
 
     override val playerViewModel by viewModels<DemoPlayerViewModel> {
@@ -31,7 +30,12 @@ abstract class BasePlayerFragment : PlayerFragment() {
     override fun buildDoneView(): View? = currentPlayerCanvas
 
     override fun onDone(doneState: ManagedPlayerState.Done) {
-        val message = doneState.completedState?.endState?.node?.toJson()?.prettify()
+        val message =
+            doneState.completedState
+                ?.endState
+                ?.node
+                ?.toJson()
+                ?.prettify()
         showDialog {
             title(text = "Flows completed successfully!")
             message(text = message)
