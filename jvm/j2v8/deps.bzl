@@ -3,7 +3,6 @@ main_exports = [
 ]
 
 main_deps = main_exports + [
-    # "//jvm:kotlin_serialization",
     "//jvm/j2v8/libs:j2v8_empty_compile_only",
 ]
 
@@ -12,6 +11,4 @@ main_resources = [
     "//core/player:player_native_bundle",
 ]
 
-test_deps = [
-    # "//jvm:kotlin_serialization",
-]
+test_deps = []
