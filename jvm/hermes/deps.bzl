@@ -3,7 +3,7 @@ main_exports = [
 ]
 
 main_deps = main_exports + [
-    # "//jvm:kotlin_serialization",
+    "//jvm:kotlin_serialization",
     "@maven//:com_facebook_fbjni_fbjni_java_only",
     "@maven//:com_facebook_soloader_soloader",
     "//plugins/set-time-out/jvm:set-time-out",
@@ -16,5 +16,4 @@ main_resources = [
 ]
 
 test_deps = [
-    # "//jvm:kotlin_serialization",
 ]

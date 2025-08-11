@@ -69,6 +69,14 @@ alias maven-install := mvn-install
 start-android-demo:
   bazel run //android/demo:install
 
+[doc('Test all Android targets')]
+test-android:
+  bazel test $(bazel query "kind('kt_jvm_test|kt_android_local_test', //...)" --output label 2>/dev/null | tr '\n' ' ')
+
+[doc('Format all Android targets with the linter. This will fix all lint errors that can be autocorrected.')]
+lint-fix-android:
+  bazel run -- $(bazel query "attr(name, 'lint-fix', //...)" --output label 2>/dev/null | tr '\n' ' ') 
+
 ### 🤖 End Android ###
 
 ### 🍎 Start iOS ###
@@ -86,8 +94,7 @@ start-ios-demo:
 
 [doc("List all test iOS targets. You should run them individually with `bazel test` locally or they won't pass.
 
-If you run them all at once locally, too many simulators will open and they'll all time out and fail.
-")]
+If you run them all at once locally, too many simulators will open and they'll all time out and fail.")]
 list-test-ios:
   echo '🍎 Unit tests:'
   bazel query "kind(ios_unit_test, //...)"
