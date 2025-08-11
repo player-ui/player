@@ -10,8 +10,9 @@ import com.intuit.playerui.android.reference.assets.R
 import com.intuit.playerui.android.reference.assets.text.Text
 import kotlinx.serialization.Serializable
 
-class Info(assetContext: AssetContext) : SuspendableAsset<Info.Data>(assetContext, Data.serializer()) {
-
+class Info(
+    assetContext: AssetContext,
+) : SuspendableAsset<Info.Data>(assetContext, Data.serializer()) {
     @Serializable
     data class Data(
         val title: RenderableAsset? = null,

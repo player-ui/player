@@ -18,7 +18,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class ActionUITest : ComposeUITest("action") {
-
     @Test
     fun basic() {
         launchMock("action-basic")
@@ -43,7 +42,9 @@ class ActionUITest : ComposeUITest("action") {
 
         waitForViewInRoot(withText("End the flow (success)"))
             .check(matches(isDisplayed()))
-        androidComposeRule.onAllNodesWithTag("action").get(0)
+        androidComposeRule
+            .onAllNodesWithTag("action")
+            .get(0)
             .performClick()
         player.shouldBeAtState<CompletedState> {
             assertEquals("done", endState.outcome)
@@ -56,7 +57,9 @@ class ActionUITest : ComposeUITest("action") {
         runTest {
             waitForViewInRoot(withText("End the flow (error)"))
                 .check(matches(isDisplayed()))
-            androidComposeRule.onAllNodesWithTag("action").get(1)
+            androidComposeRule
+                .onAllNodesWithTag("action")
+                .get(1)
                 .performClick()
             player.shouldBeAtState<ErrorState> {
                 assertEquals("Error: Unclosed brace after \"foo.bar..}\" at character 12", error.message)

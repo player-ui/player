@@ -32,19 +32,22 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
-
     private lateinit var drawerLayout: DrawerLayout
     private val navConfig by lazy { AppBarConfiguration(navController.graph, drawerLayout) }
     private val navController get() = findNavController(R.id.nav_host_fragment)
 
-    val currentPlayer get() = supportFragmentManager.fragments.filterIsInstance<NavHostFragment>().single().childFragmentManager.fragments.filterIsInstance<PlayerFragment>().firstOrNull()
+    val currentPlayer get() =
+        supportFragmentManager.fragments
+            .filterIsInstance<NavHostFragment>()
+            .single()
+            .childFragmentManager.fragments
+            .filterIsInstance<PlayerFragment>()
+            .firstOrNull()
     val viewModel by lazy {
         ViewModelProvider(this).get(MainViewModel::class.java)
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp(navConfig) || super.onSupportNavigateUp()
-    }
+    override fun onSupportNavigateUp(): Boolean = navController.navigateUp(navConfig) || super.onSupportNavigateUp()
 
     init {
         lifecycleScope.launch {
@@ -79,34 +82,40 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem) =
-        item.onNavDestinationSelected(navController) || when (item.itemId) {
-            R.id.action_reset -> {
-                currentPlayer?.reset()
-                true
+        item.onNavDestinationSelected(navController) ||
+            when (item.itemId) {
+                R.id.action_reset -> {
+                    currentPlayer?.reset()
+                    true
+                }
+                else -> super.onOptionsItemSelected(item)
             }
-            else -> super.onOptionsItemSelected(item)
-        }
 
     override fun onStart() {
         super.onStart()
 
         // This is for deep linking
-        val json = intent?.data?.getQueryParameter("json")
-            ?: intent.getStringExtra("json")
+        val json =
+            intent?.data?.getQueryParameter("json")
+                ?: intent.getStringExtra("json")
         json?.let { viewModel.launch(json) }
     }
 
-    private fun startFlow(mock: Mock<*>) = launchFlow(
-        when (mock) {
-            is ClassLoaderMock -> mock.getFlow(this.classLoader)
-            is AssetMock -> mock.getFlow(this.assets)
-            is StringMock -> mock.getFlow("")
-            else -> throw IllegalArgumentException("mock of type ${mock::class}[$mock] not supported")
-        },
-        mock.name,
-    )
+    private fun startFlow(mock: Mock<*>) =
+        launchFlow(
+            when (mock) {
+                is ClassLoaderMock -> mock.getFlow(this.classLoader)
+                is AssetMock -> mock.getFlow(this.assets)
+                is StringMock -> mock.getFlow("")
+                else -> throw IllegalArgumentException("mock of type ${mock::class}[$mock] not supported")
+            },
+            mock.name,
+        )
 
-    private fun launchFlow(flow: String, name: String?) {
+    private fun launchFlow(
+        flow: String,
+        name: String?,
+    ) {
         drawerLayout.closeDrawer(GravityCompat.START)
         navController.navigate(
             R.id.action_launch_player,
