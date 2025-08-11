@@ -53,15 +53,6 @@ kt_compiler_plugin(
     deps = [artifact("org.jetbrains.kotlin:kotlin-compose-compiler-plugin-embeddable")],
 )
 
-
-# kt_compiler_plugin(
-#     name = "jetpack_compose_compiler_plugin",
-#     id = "androidx.compose.compiler",
-#     target_embedded_compiler = True,
-#     visibility = ["//visibility:public"],
-#     deps = ["@maven//:androidx_compose_compiler_compiler"],
-# )
-
 android_library(
     name = "player",
     custom_package = "com.intuit.playerui.android",
@@ -92,19 +83,3 @@ lint(
     srcs = glob(["src/**/*.kt"]),
     lint_config = "//jvm:lint_config",
 )
-
-# java_import(
-#     name = "compose_compile_only",
-#     jars = [],
-#     neverlink = True,
-#     tags = ["maven:compile-only"],
-#     deps = [
-#         "@maven//:androidx_appcompat_appcompat",
-#         "@maven//:androidx_activity_activity_compose",
-#         "@maven//:androidx_compose_foundation_foundation",
-#         "@maven//:androidx_compose_foundation_foundation_layout",
-#         "@maven//:androidx_compose_runtime_runtime",
-#         "@maven//:androidx_compose_ui_ui",
-#         "@maven//:androidx_compose_ui_ui_tooling",
-#     ]
-# )
