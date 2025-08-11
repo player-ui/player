@@ -13,18 +13,20 @@ data class ParsedAssetStyle(
     override val xmlStyles: List<Style>,
 ) : AssetStyle
 
-class XmlAssetStyleParser(private val context: Context) {
-
+class XmlAssetStyleParser(
+    private val context: Context,
+) {
     fun parse(xmlResourceId: Int): AssetStyle {
-        val typedArray = context.obtainStyledAttributes(
-            xmlResourceId,
-            intArrayOf(
-                /* Add the styleable attributes here */
-                android.R.attr.textSize,
-                android.R.attr.textStyle,
-                android.R.attr.textColor,
-            ),
-        )
+        val typedArray =
+            context.obtainStyledAttributes(
+                xmlResourceId,
+                intArrayOf(
+                    // Add the styleable attributes here
+                    android.R.attr.textSize,
+                    android.R.attr.textStyle,
+                    android.R.attr.textColor,
+                ),
+            )
 
         // Extract values from TypedArray
         val textSize = typedArray.getDimensionPixelSize(0, 0).toFloat() // Default is 0
@@ -34,17 +36,19 @@ class XmlAssetStyleParser(private val context: Context) {
         typedArray.recycle()
 
         // Convert to Compose TextStyle
-        val fontWeight = when (textStyle) {
-            1 -> FontWeight.Bold // bold
-            else -> FontWeight.Normal // normal
-        }
+        val fontWeight =
+            when (textStyle) {
+                1 -> FontWeight.Bold // bold
+                else -> FontWeight.Normal // normal
+            }
 
-        val textStyleCompose = TextStyle(
-            fontSize = textSize.sp,
-            fontWeight = fontWeight,
-            color = Color(textColor),
-            // Add other properties as needed
-        )
+        val textStyleCompose =
+            TextStyle(
+                fontSize = textSize.sp,
+                fontWeight = fontWeight,
+                color = Color(textColor),
+                // Add other properties as needed
+            )
 
         // Return the AssetStyle with parsed values
         return ParsedAssetStyle(

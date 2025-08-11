@@ -14,8 +14,9 @@ import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin.Compan
 import com.intuit.playerui.core.player.Player
 import kotlinx.serialization.Serializable
 
-class Text(assetContext: AssetContext) : SuspendableAsset<Text.Data>(assetContext, Data.serializer()) {
-
+class Text(
+    assetContext: AssetContext,
+) : SuspendableAsset<Text.Data>(assetContext, Data.serializer()) {
     object Styles {
         @StyleRes val Default = R.style.Text
 
@@ -45,31 +46,40 @@ class Text(assetContext: AssetContext) : SuspendableAsset<Text.Data>(assetContex
             )
         }
 
-        val ref: String? get() = modifiers.firstOrNull {
-            it.type == "link"
-        }?.metaData?.ref
+        val ref: String? get() =
+            modifiers
+                .firstOrNull {
+                    it.type == "link"
+                }?.metaData
+                ?.ref
     }
 
-    override suspend fun initView(data: Data) = TextView(context).apply {
-        data.ref?.let {
-            movementMethod = LinkMovementMethod.getInstance()
+    override suspend fun initView(data: Data) =
+        TextView(context).apply {
+            data.ref?.let {
+                movementMethod = LinkMovementMethod.getInstance()
+            }
         }
-    }
 
     override suspend fun View.hydrate(data: Data) {
         when (this) {
-            is TextView -> text = buildSpannedString {
-                data.ref?.let {
-                    inSpans(refSpan(it)) { append(data.value) }
-                } ?: append(data.value)
-            }
+            is TextView ->
+                text =
+                    buildSpannedString {
+                        data.ref?.let {
+                            inSpans(refSpan(it)) { append(data.value) }
+                        } ?: append(data.value)
+                    }
             else -> invalidateView()
         }
     }
 
     private fun refSpan(ref: String) = RefSpan(player, ref)
 
-    class RefSpan(val player: Player, val ref: String) : ClickableSpan() {
+    class RefSpan(
+        val player: Player,
+        val ref: String,
+    ) : ClickableSpan() {
         override fun onClick(widget: View) {
             player.referenceAssetsPlugin.handleLink(ref, widget.context)
         }

@@ -12,9 +12,10 @@ import com.intuit.playerui.core.player.state.InProgressState
 import org.junit.Test
 
 class InfoUITest : ComposeUITest("info") {
-
     enum class Action {
-        Next, Dismiss, Continue
+        Next,
+        Dismiss,
+        Continue,
     }
 
     fun verifyView(view: Int) {
@@ -22,11 +23,17 @@ class InfoUITest : ComposeUITest("info") {
             .check(matches(isDisplayed()))
     }
 
-    fun verifyAndProceed(view: Int, action: Action? = null, index: Int? = null) {
+    fun verifyAndProceed(
+        view: Int,
+        action: Action? = null,
+        index: Int? = null,
+    ) {
         verifyView(view)
 
         action?.let {
-            androidComposeRule.onAllNodesWithTag("action").get(index ?: 0)
+            androidComposeRule
+                .onAllNodesWithTag("action")
+                .get(index ?: 0)
                 .performClick()
         }
     }
