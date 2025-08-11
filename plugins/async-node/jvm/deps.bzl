@@ -3,7 +3,7 @@ main_exports = [
 ]
 
 main_deps = main_exports + [
-    # "//jvm:kotlin_serialization",
+    "//jvm:kotlin_serialization",
 ]
 
 test_deps = [
