@@ -76,7 +76,7 @@ export const parse: Parser = (path) => {
   };
 
   /** get an identifier if you can */
-  const identifier = (): ValueNode | undefined => {
+  const identifier = (allowBoolValue = false): ValueNode | undefined => {
     if (!isIdentifierChar(ch)) {
       return;
     }
@@ -89,6 +89,15 @@ export const parse: Parser = (path) => {
       }
 
       value += ch;
+    }
+
+    if (allowBoolValue) {
+      if (value === "true") {
+        return toValue(true);
+      }
+      if (value === "false") {
+        return toValue(false);
+      }
     }
 
     if (value) {
@@ -156,7 +165,8 @@ export const parse: Parser = (path) => {
   };
 
   /** get a simple segment node */
-  const simpleSegment = () => nestedPath() ?? expression() ?? identifier();
+  const simpleSegment = (allowBoolValue = false) =>
+    nestedPath() ?? expression() ?? identifier(allowBoolValue);
 
   /** Parse a segment */
   const segment = ():
@@ -182,11 +192,9 @@ export const parse: Parser = (path) => {
   };
 
   /** get an optionally quoted block */
-  const optionallyQuotedSegment = ():
-    | ValueNode
-    | PathNode
-    | ExpressionNode
-    | undefined => {
+  const optionallyQuotedSegment = (
+    allowBoolValue = false,
+  ): ValueNode | PathNode | ExpressionNode | undefined => {
     whitespace();
 
     // see if we have a quote
@@ -199,7 +207,7 @@ export const parse: Parser = (path) => {
       return id;
     }
 
-    return simpleSegment();
+    return simpleSegment(allowBoolValue);
   };
 
   /** eat equals signs */
@@ -231,7 +239,7 @@ export const parse: Parser = (path) => {
         whitespace();
         if (equals()) {
           whitespace();
-          const second = optionallyQuotedSegment();
+          const second = optionallyQuotedSegment(true);
           value = toQuery(value, second);
           whitespace();
         }
