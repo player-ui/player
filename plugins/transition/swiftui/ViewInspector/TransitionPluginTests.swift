@@ -37,24 +37,42 @@ class TransitionPluginTests: XCTestCase {
 
         ViewHosting.host(view: player)
 
-        let playerTransition1 = player.hooks?.transition.call()
-        XCTAssertEqual(playerTransition1, .identity)
+        func callTransitionAndAssert(expectedTransition: PlayerViewTransition, description: String) {
+            let transitionExpectation = XCTestExpectation(description: "Waiting for \(description)")
+            var capturedTransition: PlayerViewTransition?
+
+            DispatchQueue.main.async {
+                capturedTransition = player.hooks?.transition.call()
+                // Delay the assertion to allow for any post-call processing
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    XCTAssertEqual(capturedTransition, expectedTransition, "Transition for \(description) should be \(expectedTransition)")
+                    transitionExpectation.fulfill()
+                }
+            }
+            wait(for: [transitionExpectation], timeout: 3.0)
+        }
+
+
+        // Check initial transition
+        callTransitionAndAssert(expectedTransition: .identity, description: "initial state")
+
         do {
             try (player.state as? InProgressState)?.controllers?.flow.transition(with: "next")
         } catch {
             XCTFail("Transition with 'next' failed")
         }
 
-        let playerTransitions3 = player.hooks?.transition.call()
-        XCTAssertEqual(playerTransitions3, .test1)
+        // Check transition after "next"
+        callTransitionAndAssert(expectedTransition: .test1, description: "push transition")
+
         do {
             try (player.state as? InProgressState)?.controllers?.flow.transition(with: "prev")
         } catch {
             XCTFail("Transition with 'prev' failed")
         }
 
-        let playerTransitions4 = player.hooks?.transition.call()
-        XCTAssertEqual(playerTransitions4, .test2)
+        // Check transition after "prev"
+        callTransitionAndAssert(expectedTransition: .test2, description: "pop transition")
 
         ViewHosting.expel()
     }
