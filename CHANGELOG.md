@@ -1,3 +1,17 @@
+# 0.13.0-next.7 (Wed Aug 13 2025)
+
+#### 🐛 Bug Fix
+
+- iOS: calling onupdate in main thread [#701](https://github.com/player-ui/player/pull/701) ([@nancywu1](https://github.com/nancywu1) [@tmarmer](https://github.com/tmarmer) [@intuit-svc](https://github.com/intuit-svc))
+
+#### Authors: 3
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
 # 0.13.0-next.6 (Fri Aug 08 2025)
 
 ### Release Notes
