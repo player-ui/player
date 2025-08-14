@@ -27,7 +27,7 @@ export interface QueryNode extends Node<"Query"> {
 /** A simple segment */
 export interface ValueNode extends Node<"Value"> {
   /** The segment value */
-  value: string | number;
+  value: string | number | boolean;
 }
 
 /** A nested expression */
@@ -37,7 +37,7 @@ export interface ExpressionNode extends Node<"Expression"> {
 }
 
 /** Helper to create a value node */
-export const toValue = (value: string | number): ValueNode => ({
+export const toValue = (value: string | number | boolean): ValueNode => ({
   name: "Value",
   value,
 });
