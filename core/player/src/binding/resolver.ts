@@ -107,7 +107,11 @@ export function resolveBindingAST(
         break;
 
       case "Value":
-        appendPathSegments(resolvedNode.value);
+        appendPathSegments(
+          typeof resolvedNode.value === "boolean"
+            ? String(resolvedNode.value)
+            : resolvedNode.value,
+        );
         break;
 
       case "Query": {

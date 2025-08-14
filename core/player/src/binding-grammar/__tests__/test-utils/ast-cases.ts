@@ -54,6 +54,31 @@ export const VALID_AST_PARSER_TESTS: Array<[string, PathNode]> = [
       toQuery(toValue("Month"), toValue("New[.]]Mo,nth.")),
     ]),
   ],
+  // Boolean values only treated as bools for query compare values
+  [
+    `foo.true['true'=true]`,
+    toPath([
+      toValue("foo"),
+      toValue("true"),
+      toQuery(toValue("true"), toValue(true)),
+    ]),
+  ],
+  [
+    `foo.false['false'=false]`,
+    toPath([
+      toValue("foo"),
+      toValue("false"),
+      toQuery(toValue("false"), toValue(false)),
+    ]),
+  ],
+  [
+    `foo.bar[baz == true]`,
+    toPath([
+      toValue("foo"),
+      toValue("bar"),
+      toQuery(toValue("baz"), toValue(true)),
+    ]),
+  ],
 
   // Nested Paths
   ["{{foo}}", toPath([toPath([toValue("foo")])])],
@@ -175,6 +200,12 @@ export const VALID_AST_PARSER_TESTS: Array<[string, PathNode]> = [
       toQuery(toValue("readonly"), toExpression("foo() == bar()")),
       toValue("baz"),
     ]),
+  ],
+
+  // With numbers
+  [
+    "foo.0[1=2]",
+    toPath([toValue("foo"), toValue(0), toQuery(toValue(1), toValue(2))]),
   ],
 ];
 
