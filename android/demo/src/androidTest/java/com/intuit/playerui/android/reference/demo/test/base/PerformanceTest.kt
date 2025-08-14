@@ -15,6 +15,7 @@ import java.io.InputStreamReader
 import java.util.regex.Pattern
 
 interface PerformanceTest<T : Activity> {
+
     @get:Rule
     val activityRule: ActivityScenarioRule<T>
 
@@ -80,10 +81,7 @@ interface PerformanceTest<T : Activity> {
         return bundle
     }
 
-    fun calculateAverage(
-        stats: String,
-        totalFrames: Int,
-    ): Int {
+    fun calculateAverage(stats: String, totalFrames: Int): Int {
         require(totalFrames != 0) { "0 Total Frames" }
 
         val pattern = Pattern.compile("(\\d*)ms=(\\d)")
@@ -101,11 +99,8 @@ interface PerformanceTest<T : Activity> {
     }
 
     fun executeShellCommand(command: String): InputStream {
-        val stdout =
-            InstrumentationRegistry
-                .getInstrumentation()
-                .uiAutomation
-                .executeShellCommand(command)
+        val stdout = InstrumentationRegistry.getInstrumentation().uiAutomation
+            .executeShellCommand(command)
         return ParcelFileDescriptor.AutoCloseInputStream(stdout)
     }
 

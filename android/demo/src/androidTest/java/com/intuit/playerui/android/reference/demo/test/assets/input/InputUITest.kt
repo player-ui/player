@@ -22,9 +22,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class InputUITest : AssetUITest("input") {
-    fun verifyIsDisplayed(matcher: Matcher<View>) =
-        waitForViewInRoot(matcher)
-            .check(matches(isDisplayed()))
+
+    fun verifyIsDisplayed(matcher: Matcher<View>) = waitForViewInRoot(matcher)
+        .check(matches(isDisplayed()))
 
     @Test
     fun basic() {

@@ -15,23 +15,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class DemoPlayerViewModel(
-    iterator: AsyncFlowIterator,
-) : PlayerViewModel(iterator) {
-    override val plugins =
-        listOf(
-            CommonTypesPlugin(),
-            ReferenceAssetsPlugin(),
-            PendingTransactionPlugin(),
-            AsyncHydrationTrackerPlugin(),
-        )
+class DemoPlayerViewModel(iterator: AsyncFlowIterator) : PlayerViewModel(iterator) {
+
+    override val plugins = listOf(
+        CommonTypesPlugin(),
+        ReferenceAssetsPlugin(),
+        PendingTransactionPlugin(),
+        AsyncHydrationTrackerPlugin(),
+    )
 
     public val isDebug = false
 
-    override val config: Config =
-        Config(
-            debuggable = isDebug,
-        )
+    override val config: Config = Config(
+        debuggable = isDebug,
+    )
 
     private val _playerFlowState = MutableStateFlow<PlayerFlowState?>(null)
 

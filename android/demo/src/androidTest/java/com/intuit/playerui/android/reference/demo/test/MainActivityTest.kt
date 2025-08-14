@@ -14,6 +14,7 @@ import org.junit.Rule
 import org.junit.Test
 
 class MainActivityTest : PerformanceTest<MainActivity> {
+
     @get:Rule override val activityRule = activityScenarioRule<MainActivity>()
 
     @get:Rule
@@ -24,8 +25,7 @@ class MainActivityTest : PerformanceTest<MainActivity> {
         waitForViewInRoot(withText("Android Reference Assets"))
             .check(matches(isDisplayed()))
 
-        androidComposeRule
-            .onNodeWithTag("action")
+        androidComposeRule.onNodeWithTag("action")
             .performClick()
     }
 }
