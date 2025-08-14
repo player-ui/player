@@ -71,6 +71,14 @@ export const VALID_AST_PARSER_TESTS: Array<[string, PathNode]> = [
       toQuery(toValue("false"), toValue(false)),
     ]),
   ],
+  [
+    `foo.bar[baz == true]`,
+    toPath([
+      toValue("foo"),
+      toValue("bar"),
+      toQuery(toValue("baz"), toValue(true)),
+    ]),
+  ],
 
   // Nested Paths
   ["{{foo}}", toPath([toPath([toValue("foo")])])],
