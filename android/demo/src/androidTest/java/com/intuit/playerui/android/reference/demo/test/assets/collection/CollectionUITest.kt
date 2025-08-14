@@ -11,6 +11,7 @@ import com.intuit.playerui.core.player.state.InProgressState
 import org.junit.Test
 
 class CollectionUITest : ComposeUITest("collection") {
+
     @Test
     fun basic() {
         launchMock("collection-basic")

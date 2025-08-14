@@ -23,18 +23,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 
-class Action(
-    assetContext: AssetContext,
-) : ComposableAsset<Action.Data>(assetContext, Data.serializer()) {
+class Action(assetContext: AssetContext) : ComposableAsset<Action.Data>(assetContext, Data.serializer()) {
+
     @Serializable
     data class Data(
         val label: RenderableAsset? = null,
         private val run: () -> Unit,
     ) {
-        suspend fun run() =
-            withContext(Dispatchers.Default) {
-                run.invoke()
-            }
+        suspend fun run() = withContext(Dispatchers.Default) {
+            run.invoke()
+        }
     }
 
     @Composable
@@ -49,18 +47,18 @@ class Action(
                 }
             },
             modifier = Modifier.fillMaxWidth().testTag("action"),
-            colors =
-                ButtonDefaults.buttonColors(
-                    backgroundColor = Color.Blue,
-                ),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.Blue,
+            ),
+
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement =
-                    Arrangement.spacedBy(
-                        8.dp,
-                        Alignment.CenterHorizontally,
-                    ),
+                Arrangement.spacedBy(
+                    8.dp,
+                    Alignment.CenterHorizontally,
+                ),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 data.label?.compose(

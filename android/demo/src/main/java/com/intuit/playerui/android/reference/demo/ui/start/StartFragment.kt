@@ -25,10 +25,9 @@ class StartFragment : BasePlayerFragment() {
         savedInstanceState: Bundle?,
     ) = super.onCreateView(inflater, container, savedInstanceState).apply {
         when (val state = playerViewModel.state.value) {
-            is ManagedPlayerState.Running ->
-                lifecycleScope.launch(Dispatchers.Default) {
-                    handleAssetUpdate(state.asset, state.animateViewTransition)
-                }
+            is ManagedPlayerState.Running -> lifecycleScope.launch(Dispatchers.Default) {
+                handleAssetUpdate(state.asset, state.animateViewTransition)
+            }
 
             is ManagedPlayerState.Done,
             is ManagedPlayerState.Error,

@@ -7,13 +7,13 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.intuit.playerui.android.reference.demo.ui.main.MainActivity
 import org.junit.Rule
 
-abstract class ComposeUITest(
-    group: String? = null,
-) : AssetUITest(group) {
+abstract class ComposeUITest(group: String? = null) : AssetUITest(group) {
     @get:Rule
     val androidComposeRule = createAndroidComposeRule<MainActivity>()
 
-    override fun getActivityRule(): ActivityScenarioRule<MainActivity> = androidComposeRule.activityRule
+    override fun getActivityRule(): ActivityScenarioRule<MainActivity> {
+        return androidComposeRule.activityRule
+    }
 
     // From androidx.compose.ui:ui-test:1.4.0
     // https://android.googlesource.com/platform/frameworks/support/+/androidx-main/compose/ui/ui-test/src/commonMain/kotlin/androidx/compose/ui/test/ComposeUiTest.kt#207
@@ -39,8 +39,6 @@ abstract class ComposeUITest(
         timeoutMillis: Long = 1_000L,
     ) = waitUntilNodeCount(matcher, 1, timeoutMillis)
 
-    fun ComposeTestRule.waitUntilDoesNotExist(
-        matcher: SemanticsMatcher,
-        timeoutMillis: Long = 1_000L,
-    ) = waitUntilNodeCount(matcher, 0, timeoutMillis)
+    fun ComposeTestRule.waitUntilDoesNotExist(matcher: SemanticsMatcher, timeoutMillis: Long = 1_000L) =
+        waitUntilNodeCount(matcher, 0, timeoutMillis)
 }

@@ -8,13 +8,13 @@ import com.intuit.playerui.core.player.state.InProgressState
 import org.junit.Test
 
 class BadgeUITest : ComposeUITest("badge") {
+
     @Test
     fun basic() {
         launchMock("badge-all")
 
         androidComposeRule.waitUntilExactlyOneExists(hasText("INFO"))
-        androidComposeRule
-            .onNodeWithText("ERROR")
+        androidComposeRule.onNodeWithText("ERROR")
             .assertExists()
         player.shouldBeAtState<InProgressState>()
     }

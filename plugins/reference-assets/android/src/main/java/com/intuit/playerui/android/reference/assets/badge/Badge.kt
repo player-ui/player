@@ -20,6 +20,7 @@ import kotlinx.serialization.Serializable
 internal class Badge(
     assetContext: AssetContext,
 ) : ComposableAsset<Badge.Data>(assetContext, Data.serializer()) {
+
     @Serializable
     data class Data(
         val label: String? = null,
@@ -30,15 +31,14 @@ internal class Badge(
     override fun content(data: Data) {
         val label = data.label ?: ""
         Row(
-            modifier =
-                Modifier
-                    .height(24.dp)
-                    .wrapContentSize()
-                    .background(color = if (data.status == "info") Color.Blue else Color.Red, RoundedCornerShape(4.dp))
-                    .padding(
-                        horizontal = 4.dp,
-                        vertical = 2.dp,
-                    ),
+            modifier = Modifier
+                .height(24.dp)
+                .wrapContentSize()
+                .background(color = if (data.status == "info") Color.Blue else Color.Red, RoundedCornerShape(4.dp))
+                .padding(
+                    horizontal = 4.dp,
+                    vertical = 2.dp,
+                ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (label.isNotEmpty()) {

@@ -12,9 +12,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TestName
 
-abstract class AssetUITest(
-    val group: String? = null,
-) {
+abstract class AssetUITest(val group: String? = null) {
+
     @get:Rule
     val name = TestName()
 
@@ -30,10 +29,9 @@ abstract class AssetUITest(
 
     protected val currentState: PlayerFlowState? get() = playerViewModel.playerFlowState.value
 
-    protected val mocks get() =
-        viewModel.mocks.filter {
-            group == null || group == it.group
-        }
+    protected val mocks get() = viewModel.mocks.filter {
+        group == null || group == it.group
+    }
 
     @Before
     fun before() {

@@ -8,9 +8,8 @@ open class AssetMock(
     override val name: String,
     override val path: String,
 ) : Mock<AssetManager> {
-    override fun read(source: AssetManager) =
-        source
-            .open(normalizedPath)
-            .bufferedReader()
-            .use { it.readText() }
+    override fun read(source: AssetManager) = source
+        .open(normalizedPath)
+        .bufferedReader()
+        .use { it.readText() }
 }

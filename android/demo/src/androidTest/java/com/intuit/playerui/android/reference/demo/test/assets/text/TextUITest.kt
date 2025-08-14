@@ -17,6 +17,7 @@ import org.hamcrest.Matchers.allOf
 import org.junit.Test
 
 class TextUITest : AssetUITest("text") {
+
     @Test
     fun basic() {
         launchMock("text-basic")
@@ -29,11 +30,10 @@ class TextUITest : AssetUITest("text") {
     fun link() {
         launchMock("text-with-link")
 
-        val openLink =
-            allOf(
-                hasAction(ACTION_VIEW),
-                hasData("https://www.intuit.com"),
-            )
+        val openLink = allOf(
+            hasAction(ACTION_VIEW),
+            hasData("https://www.intuit.com"),
+        )
 
         intending(openLink).respondWith(ActivityResult(RESULT_CANCELED, null))
 

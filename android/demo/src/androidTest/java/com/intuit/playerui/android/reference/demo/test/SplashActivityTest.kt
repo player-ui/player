@@ -20,6 +20,7 @@ import org.junit.Test
  * update testFilter inclusion list in buildConfig.yml
  */
 class SplashActivityTest {
+
     private val json by lazy {
         makeFlow(
             """
