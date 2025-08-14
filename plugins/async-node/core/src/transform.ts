@@ -15,7 +15,7 @@ export const asyncTransform: AsyncTransformFunc = (
   assetId,
   wrapperAssetType,
   asset,
-  flatten = true,
+  flatten,
   path = ["values"],
 ) => {
   const id = "async-" + assetId;
