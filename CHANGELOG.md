@@ -1,3 +1,33 @@
+# 0.14.0-next.0 (Fri Aug 15 2025)
+
+### Release Notes
+
+#### improve async node flattening and apply resolver cache to async nodes ([#694](https://github.com/player-ui/player/pull/694))
+
+- Simplify async node flattening to just check for multi-nodes inside multi-nodes after async nodes are resolved.
+- Introduce async node id cache in the resolver to allow async nodes to be marked as dirty and limit scope of resolver update to the specific node and use cache for the rest of the update.
+
+#### support boolean values in binding queries ([#703](https://github.com/player-ui/player/pull/703))
+
+- Update binding parser to allow for boolean value nodes
+- Only use boolean values in query values as parts of the path should always be strings or numbers
+
+---
+
+#### 🚀 Enhancement
+
+- improve async node flattening and apply resolver cache to async nodes [#694](https://github.com/player-ui/player/pull/694) ([@tmarmer](https://github.com/tmarmer))
+
+#### 🐛 Bug Fix
+
+- support boolean values in binding queries [#703](https://github.com/player-ui/player/pull/703) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 1
+
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
 # 0.13.0 (Wed Aug 13 2025)
 
 ### Release Notes
