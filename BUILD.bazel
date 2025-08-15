@@ -1,6 +1,5 @@
 load("@aspect_rules_js//js:defs.bzl", "js_library")
-load("@bazel_gazelle//:def.bzl", "gazelle_binary", "gazelle")
-load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag", "int_flag")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@rules_player//internal:defs.bzl", "stamp")
 load("@rules_player//ios:defs.bzl", "assemble_pod", "ios_publish")
@@ -233,6 +232,12 @@ java_plugin(
 )
 
 # Native platform settings
+
+int_flag(
+    name = "cmake_build_parallel_level",
+    build_setting_default = 4,
+    make_variable = "CMAKE_BUILD_PARALLEL_LEVEL",
+)
 
 string_flag(
     name = "cmake_build_type",
