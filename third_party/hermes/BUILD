@@ -10,11 +10,10 @@ cmake(
     name = "host",
     cache_entries = {
         "HERMES_BUILD_APPLE_FRAMEWORK": "OFF",
-        "CMAKE_BUILD_TYPE": "$CMAKE_BUILD_TYPE",
+        "CMAKE_BUILD_TYPE": "$(CMAKE_BUILD_TYPE)",
     },
     env = {
-        "CMAKE_BUILD_TYPE": "$(CMAKE_BUILD_TYPE)",
-        "CMAKE_BUILD_PARALLEL_LEVEL": "4"
+        "CMAKE_BUILD_PARALLEL_LEVEL": "$(CMAKE_BUILD_PARALLEL_LEVEL)",
     },
     generate_args = ["-G Ninja"],
     lib_name = "hermes",
@@ -32,10 +31,13 @@ cmake(
 
     # NOTE: Uses vars set by build script from rule to "install" JSI lib
     postfix_script = select({
-        "@bazel_tools//src/conditions:darwin": "cp -L $BUILD_TMPDIR/jsi/libjsi.dylib $INSTALLDIR/lib",
-        "//conditions:default": "cp -L $BUILD_TMPDIR/jsi/libjsi.so $INSTALLDIR/lib",
+        "@bazel_tools//src/conditions:darwin": "cp -L $$BUILD_TMPDIR/jsi/libjsi.dylib $$INSTALLDIR/lib",
+        "//conditions:default": "cp -L $$BUILD_TMPDIR/jsi/libjsi.so $$INSTALLDIR/lib",
     }),
-    toolchains = ["@player//:cmake_build_type"],
+    toolchains = [
+        "@player//:cmake_build_type",
+        "@player//:cmake_build_parallel_level",
+    ],
     visibility = ["//visibility:public"],
 )
 
@@ -44,25 +46,28 @@ cmake(
 ## 1. Compile hermesc against host
 cmake(
     name = "hermesc",
+    env = {
+        "CMAKE_BUILD_PARALLEL_LEVEL": "$(CMAKE_BUILD_PARALLEL_LEVEL)",
+    },
     generate_args = ["-G Ninja"],
     install = False,
-    env = {
-        "CMAKE_BUILD_PARALLEL_LEVEL": "4"
-    },
     lib_source = "working_directory",
     out_binaries = ["hermesc"],
-    postfix_script = "cp -L $BUILD_TMPDIR/bin/hermesc $INSTALLDIR/bin",
+    postfix_script = "cp -L $$BUILD_TMPDIR/bin/hermesc $$INSTALLDIR/bin",
     tags = ["no-sandbox"],
     targets = ["hermesc"],
     # Specifically build for host, always
-    toolchains = ["@bazel_tools//tools/cpp:toolchain"],
+    toolchains = [
+        "@bazel_tools//tools/cpp:toolchain",
+        "@player//:cmake_build_parallel_level",
+    ],
 )
 
 ## 2. X-compile hermes for Android referencing host built hermesc
 cmake(
     name = "android",
     cache_entries = {
-        "CMAKE_BUILD_TYPE": "$CMAKE_BUILD_TYPE",
+        "CMAKE_BUILD_TYPE": "$(CMAKE_BUILD_TYPE)",
         "HERMES_IS_ANDROID": "True",
         "IMPORT_HERMESC": "$(location :hermesc)",  # TODO: Link unproven since I couldn't figure out host compile
         "HERMES_BUILD_SHARED_JSI": "True",
@@ -78,8 +83,7 @@ cmake(
         "-DANDROID_PIE=True",
     ],
     env = {
-        "CMAKE_BUILD_TYPE": "$(CMAKE_BUILD_TYPE)",
-        "CMAKE_BUILD_PARALLEL_LEVEL": "4"
+        "CMAKE_BUILD_PARALLEL_LEVEL": "$(CMAKE_BUILD_PARALLEL_LEVEL)",
     },
     generate_args = ["-G Ninja"],
     lib_name = "hermes",
@@ -90,9 +94,12 @@ cmake(
         "libjsi.so",  # TODO: Might not be produced
     ],
     # NOTE: Uses vars set by build script from rule to "install" JSI lib
-    postfix_script = "cp -L $BUILD_TMPDIR/jsi/libjsi.so $INSTALLDIR/lib",
+    postfix_script = "cp -L $$BUILD_TMPDIR/jsi/libjsi.so $$INSTALLDIR/lib",
     tags = ["no-sandbox"],
-    toolchains = ["@player//:cmake_build_type"],
+    toolchains = [
+        "@player//:cmake_build_type",
+        "@player//:cmake_build_parallel_level",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":hermesc",
