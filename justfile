@@ -75,7 +75,7 @@ start-android-demo:
 
 [doc('Generate and open the xcodeproj for Player. This requires Xcode to be your default for opening .xcodeproj files.
 
-Run "build-core-native" first because Xcode willl not handle that automatically like bazel commands will.')]
+Run "build-core-native" first because Xcode will not handle that automatically like bazel commands will.')]
 dev-ios: build-core-native
   bazel run //ios:xcodeproj
   open ios/PlayerUI.xcodeproj/

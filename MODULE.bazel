@@ -18,7 +18,7 @@ bazel_dep(name = "rules_pkg", version = "1.1.0")
 bazel_dep(name = "aspect_rules_ts", version = "3.6.3")
 
 # C++
-bazel_dep(name = "rules_foreign_cc", version = "0.11.1")
+bazel_dep(name = "rules_foreign_cc", version = "0.15.0")
 bazel_dep(name = "googletest", version = "1.14.0.bcr.1")
 
 ####### Node.js version #########
@@ -99,6 +99,7 @@ build_constants(
     version_file = "//:VERSION",
 )
 
+bazel_dep(name = "rules_java", version = "7.2.0")
 bazel_dep(name = "rules_kotlin", version = "2.1.8")
 
 # TODO: Custom compiler version breaks embedded jdeps generator plugin - enable when removing custom kotlinc (see .bazelrc jvm_emit_jdeps)
