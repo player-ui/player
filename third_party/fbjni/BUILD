@@ -8,7 +8,10 @@ filegroup(
 
 cc_library(
     name = "libfbjni_headers",
-    hdrs = glob(["cxx/fbjni/**/*.h"], allow_empty=True),
+    hdrs = glob(
+        ["cxx/fbjni/**/*.h"],
+        allow_empty = True,
+    ),
     strip_include_prefix = "cxx",
     visibility = ["//visibility:public"],
 )
@@ -27,8 +30,7 @@ cmake(
     },
     data = [":jni"],
     env = {
-        # TODO: Pull this from a build config, like CMAKE_BUILD_TYPE
-        "CMAKE_BUILD_PARALLEL_LEVEL": "4"
+        "CMAKE_BUILD_PARALLEL_LEVEL": "$(CMAKE_BUILD_PARALLEL_LEVEL)",
     },
     generate_args = ["-G Ninja"],
     lib_name = "fbjni",
@@ -37,7 +39,10 @@ cmake(
         "@bazel_tools//src/conditions:darwin": ["libfbjni.dylib"],
         "//conditions:default": ["libfbjni.so"],
     }),
-    toolchains = ["@player//:cmake_build_type"],
+    toolchains = [
+        "@player//:cmake_build_type",
+        "@player//:cmake_build_parallel_level",
+    ],
     visibility = ["//visibility:public"],
 )
 
@@ -45,17 +50,19 @@ cmake(
     name = "android",
     cache_entries = {
         "ANDROID_ABI": "True",
-        "CMAKE_BUILD_TYPE": "$CMAKE_BUILD_TYPE",
+        "CMAKE_BUILD_TYPE": "$(CMAKE_BUILD_TYPE)",
         "FBJNI_SKIP_TESTS": "true",
     },
     env = {
-        "CMAKE_BUILD_TYPE": "$(CMAKE_BUILD_TYPE)",
-        "CMAKE_BUILD_PARALLEL_LEVEL": "4"
+        "CMAKE_BUILD_PARALLEL_LEVEL": "$(CMAKE_BUILD_PARALLEL_LEVEL)",
     },
     generate_args = ["-G Ninja"],
     lib_name = "fbjni",
     lib_source = "working_directory",
     out_shared_libs = ["libfbjni.dylib"],
-    toolchains = ["@player//:cmake_build_type"],
+    toolchains = [
+        "@player//:cmake_build_type",
+        "@player//:cmake_build_parallel_level",
+    ],
     visibility = ["//visibility:public"],
 )
