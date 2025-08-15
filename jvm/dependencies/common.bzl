@@ -1,3 +1,4 @@
+# TODO: Delete file
 load("//jvm/dependencies:versions.bzl", "versions")
 
 maven = [

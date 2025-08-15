@@ -60,7 +60,7 @@ ktlint_config(
 
 define_kt_toolchain(
     name = "kotlin_toolchain",
-    api_version = "1.7",
+    api_version = "1.8",
     kotlinc_options = ":test_options",
-    language_version = "1.7",
+    language_version = "1.8",
 )

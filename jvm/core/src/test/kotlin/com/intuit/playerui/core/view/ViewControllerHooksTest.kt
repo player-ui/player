@@ -7,7 +7,7 @@ import com.intuit.playerui.core.bridge.hooks.NodeSyncHook1
 import io.mockk.every
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
+import org.junit.jupiter.api.Assertions.assertEquals
 
 internal class ViewControllerHooksTest : NodeBaseTest() {
 

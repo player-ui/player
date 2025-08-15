@@ -1,6 +1,5 @@
 load("@rules_player//kotlin:defs.bzl", _distribution = "distribution", _kt_jvm = "kt_jvm")
 load("@build_constants//:constants.bzl", "VERSION", "GROUP")
-load("//jvm/dependencies:common.bzl", common_main_deps = "main_deps", common_test_deps = "test_deps")
 
 def kt_player_module(
         *,
@@ -9,7 +8,6 @@ def kt_player_module(
         name,
 
         # Project level config
-        include_common_deps = True,
 
         # Distribution config
         group = GROUP,
@@ -49,7 +47,7 @@ def kt_player_module(
         main_resource_jars = main_resource_jars,
         main_resource_strip_prefix = main_resource_strip_prefix,
         main_associates = main_associates,
-        main_deps = (common_main_deps if include_common_deps else []) + (main_deps if main_deps else []),
+        main_deps = main_deps if main_deps else [],
         main_exports = main_exports,
         main_runtime_deps = main_runtime_deps,
         test_package = test_package,
@@ -59,7 +57,7 @@ def kt_player_module(
         test_resource_jars = test_resource_jars,
         test_resource_strip_prefix = test_resource_strip_prefix,
         test_associates = test_associates,
-        test_deps = (common_test_deps if include_common_deps else []) + (test_deps if test_deps else []),
+        test_deps = test_deps if test_deps else [],
         test_runtime_deps = test_runtime_deps,
     )
 
