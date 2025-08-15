@@ -220,7 +220,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     node: Node.Node,
     context: AsyncPluginContext,
   ): Node.Node {
-    const asyncNodesResolved: string[] = [];
+    const asyncNodesResolved: string[] = node.asyncNodesResolved ?? [];
     node.asyncNodesResolved = asyncNodesResolved;
     if (node.type === NodeType.MultiNode) {
       // Using a while loop lets us catch when async nodes produce more async nodes that need to be flattened further
