@@ -4,13 +4,16 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
+import org.junit.jupiter.api.TestTemplate
+import com.intuit.playerui.utils.test.RuntimeTest
 
-class MakeFlowTests {
+class MakeFlowTests : RuntimeTest() {
 
-    @Test fun `can make flow`() {
+    @TestTemplate fun `can make flow`() {
+        MakeFlowModule.apply(runtime)
+
         val flow = makeFlow(
             buildJsonObject {
                 put("id", "some-id")

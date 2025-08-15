@@ -10,7 +10,6 @@ def kt_player_plugin(
         name,
 
         # Project level config
-        include_common_deps = True,
 
         # Package level config
         module_name = None,
@@ -32,7 +31,6 @@ def kt_player_plugin(
         test_runtime_deps = None):
     _kt_player_module(
         name = name,
-        include_common_deps = include_common_deps,
         group = GROUP + ".plugins",
 
         # Package level config
@@ -81,7 +79,6 @@ def kt_player_plugin_wrapper(
 
     kt_player_plugin(
         name = name,
-        include_common_deps = False,
         main_srcs = ["%s-gen" % name],
         main_deps = ["//jvm/core"],
         main_exports = ["//jvm/core"],
