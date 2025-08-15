@@ -1,4 +1,5 @@
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
+load("@player//third_party/fbjni:extract_headers.bzl", "extract_headers")
 
 filegroup(
     name = "working_directory",
@@ -12,42 +13,21 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
-filegroup(
+extract_headers(
     name = "jni",
-    srcs = ["@bazel_tools//tools/jdk:jni_header"] + select({
-        "@bazel_tools//src/conditions:darwin": ["@bazel_tools//tools/jdk:jni_md_header-darwin"],
-        "@bazel_tools//src/conditions:freebsd": ["@bazel_tools//tools/jdk:jni_md_header-freebsd"],
-        "@bazel_tools//src/conditions:openbsd": ["@bazel_tools//tools/jdk:jni_md_header-openbsd"],
-        "@bazel_tools//src/conditions:windows": ["@bazel_tools//tools/jdk:jni_md_header-windows"],
-        "@bazel_tools//src/conditions:linux": ["@bazel_tools//tools/jdk:jni_md_header-linux"],
-        "//conditions:default": [],
-    }),
+    lib = "@rules_java//toolchains:jni",
 )
-
-# genrule(
-#     name = "jni_include",
-#     srcs = [":jni"],
-#     outs = [
-#         "jni/include/jni.h",
-#         "jni/include/asdf"
-#     ],
-#     cmd = "cp $(SRCS) $(RULEDIR)/jni/include",
-#     tags = ["no-cache"],
-# )
 
 cmake(
     name = "host",
     cache_entries = {
-        "CMAKE_BUILD_TYPE": "$CMAKE_BUILD_TYPE",
-        # Normalize path relative to fbjni.build_tmpdir
-        "JNI_HEADER": "$(realpath ../../$JNI_HEADER)",
+        "CMAKE_BUILD_TYPE": "$(CMAKE_BUILD_TYPE)",
+        "JNI_HEADER": "$(execpath :jni)",
         "FBJNI_SKIP_TESTS": "true",
     },
-    data = ["@bazel_tools//tools/jdk:jni_header"],
+    data = [":jni"],
     env = {
-        "CMAKE_BUILD_TYPE": "$(CMAKE_BUILD_TYPE)",
-        # Resolves to fbjni/jni/include
-        "JNI_HEADER": "$(rlocationpath @bazel_tools//tools/jdk:jni_header)",
+        # TODO: Pull this from a build config, like CMAKE_BUILD_TYPE
         "CMAKE_BUILD_PARALLEL_LEVEL": "4"
     },
     generate_args = ["-G Ninja"],
