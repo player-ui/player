@@ -22,6 +22,9 @@ export declare namespace Node {
 
     /** Every node (outside of the root) contains a reference to it's parent */
     parent?: Node;
+
+    /** The ids of async nodes resolved within this node */
+    asyncNodesResolved?: string[];
   }
 
   export type PathSegment = string | number;
@@ -123,6 +126,8 @@ export declare namespace Node {
      * Should the content streamed in be flattened during resolving
      */
     flatten?: boolean;
+    /** Function to run against parsed content from the node to manipulate the content before resolving it. */
+    onValueReceived?: (node: Node.Node) => Node.Node;
   }
 
   export interface PluginOptions {

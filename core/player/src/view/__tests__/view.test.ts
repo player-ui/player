@@ -1,4 +1,4 @@
-import { describe, it, expect, test } from "vitest";
+import { describe, it, expect, test, vi } from "vitest";
 import { LocalModel, withParser } from "../../data";
 import { ExpressionEvaluator } from "../../expressions";
 import { BindingParser } from "../../binding";
@@ -1013,5 +1013,65 @@ describe("view", () => {
     );
 
     expect(view).toBeDefined();
+  });
+
+  test("should call onUpdate with undefined when triggering an async update with no resolver", () => {
+    const model = withParser(new LocalModel({}), parseBinding);
+    const evaluator = new ExpressionEvaluator({ model });
+    const schema = new SchemaController();
+
+    const view = new ViewInstance(
+      {
+        id: "view",
+        type: "asset",
+      },
+      {
+        model,
+        parseBinding,
+        evaluator,
+        schema,
+      },
+    );
+    new StringResolverPlugin().apply(view);
+
+    const onUpdateTap = vi.fn();
+    view.hooks.onUpdate.tap("test", onUpdateTap);
+
+    view.updateAsync("test");
+
+    expect(onUpdateTap).toHaveBeenCalledWith(undefined);
+  });
+
+  test("should call onUpdate with the view when triggering an async update with a resolver", () => {
+    const model = withParser(new LocalModel({}), parseBinding);
+    const evaluator = new ExpressionEvaluator({ model });
+    const schema = new SchemaController();
+
+    const view = new ViewInstance(
+      {
+        id: "view",
+        type: "asset",
+      },
+      {
+        model,
+        parseBinding,
+        evaluator,
+        schema,
+      },
+    );
+
+    new StringResolverPlugin().apply(view);
+
+    const onUpdateTap = vi.fn();
+
+    // Trigger first update to get resolver ready.
+    view.update();
+
+    view.hooks.onUpdate.tap("test", onUpdateTap);
+    view.updateAsync("test");
+    expect(onUpdateTap).toHaveBeenCalledWith({
+      id: "view",
+      type: "asset",
+    });
   });
 });

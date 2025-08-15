@@ -52,59 +52,66 @@ const withContext = (model: DataModelWithParser): DataModelWithParser => {
   };
 };
 
+export type ResolverHooks = {
+  /** A hook to allow skipping of the resolution tree for a specific node */
+  skipResolve: SyncWaterfallHook<
+    [boolean, Node.Node, Resolve.NodeResolveOptions]
+  >;
+
+  /** An event emitted before calculating the next update */
+  beforeUpdate: SyncHook<[Set<BindingInstance> | undefined]>;
+
+  /** An event emitted after calculating the next update */
+  afterUpdate: SyncHook<[any]>;
+
+  /** The options passed to a node to resolve it to an object */
+  resolveOptions: SyncWaterfallHook<[Resolve.NodeResolveOptions, Node.Node]>;
+
+  /** A hook to transform the AST node into a new AST node before resolving it */
+  beforeResolve: SyncWaterfallHook<
+    [Node.Node | null, Resolve.NodeResolveOptions]
+  >;
+
+  /**
+   * A hook to transform an AST node into it's resolved value.
+   * This runs _before_ any children are resolved
+   */
+  resolve: SyncWaterfallHook<[any, Node.Node, Resolve.NodeResolveOptions]>;
+
+  /**
+   * A hook to transform the resolved value of an AST node.
+   * This runs _after_ all children nodes are resolved
+   */
+  afterResolve: SyncWaterfallHook<[any, Node.Node, Resolve.NodeResolveOptions]>;
+
+  /** Called at the very end of a node's tree being updated */
+  afterNodeUpdate: SyncHook<[Node.Node, Node.Node | undefined, NodeUpdate]>;
+};
+
 /**
  * The Resolver is the way to take a parsed AST graph of a view and resolve it to a concrete representation of the current user state
  * It combines the ability to mutate ast nodes before resolving, as well as the mutating the resolved objects while parsing
  */
 export class Resolver {
-  public readonly hooks = {
-    /** A hook to allow skipping of the resolution tree for a specific node */
-    skipResolve: new SyncWaterfallHook<
-      [boolean, Node.Node, Resolve.NodeResolveOptions]
-    >(),
-
-    /** An event emitted before calculating the next update */
-    beforeUpdate: new SyncHook<[Set<BindingInstance> | undefined]>(),
-
-    /** An event emitted after calculating the next update */
-    afterUpdate: new SyncHook<[any]>(),
-
-    /** The options passed to a node to resolve it to an object */
-    resolveOptions: new SyncWaterfallHook<
-      [Resolve.NodeResolveOptions, Node.Node]
-    >(),
-
-    /** A hook to transform the AST node into a new AST node before resolving it */
-    beforeResolve: new SyncWaterfallHook<
-      [Node.Node | null, Resolve.NodeResolveOptions]
-    >(),
-
-    /**
-     * A hook to transform an AST node into it's resolved value.
-     * This runs _before_ any children are resolved
-     */
-    resolve: new SyncWaterfallHook<
-      [any, Node.Node, Resolve.NodeResolveOptions]
-    >(),
-
-    /**
-     * A hook to transform the resolved value of an AST node.
-     * This runs _after_ all children nodes are resolved
-     */
-    afterResolve: new SyncWaterfallHook<
-      [any, Node.Node, Resolve.NodeResolveOptions]
-    >(),
-
-    /** Called at the very end of a node's tree being updated */
-    afterNodeUpdate: new SyncHook<
-      [Node.Node, Node.Node | undefined, NodeUpdate]
-    >(),
+  public readonly hooks: ResolverHooks = {
+    skipResolve: new SyncWaterfallHook(),
+    beforeUpdate: new SyncHook(),
+    afterUpdate: new SyncHook(),
+    resolveOptions: new SyncWaterfallHook(),
+    beforeResolve: new SyncWaterfallHook(),
+    resolve: new SyncWaterfallHook(),
+    afterResolve: new SyncWaterfallHook(),
+    afterNodeUpdate: new SyncHook(),
   };
 
   /**
    * The AST tree after beforeResolve is ran mapped to the AST before beforeResolve is ran
    */
   private readonly ASTMap: Map<Node.Node, Node.Node>;
+  /**
+   * The AST tree after beforeResolve is ran mapped to the AST before beforeResolve is ran
+   */
+  private AsyncIdMap: Map<string, Node.Node>;
   /**
    * The root node in the AST tree we want to resolve
    */
@@ -138,18 +145,35 @@ export class Resolver {
     this.ASTMap = new Map();
     this.logger = options.logger;
     this.idCache = new Set();
+    this.AsyncIdMap = new Map();
   }
 
-  public getSourceNode(convertedAST: Node.Node) {
+  public getSourceNode(convertedAST: Node.Node): Node.Node | undefined {
     return this.ASTMap.get(convertedAST);
   }
 
-  public update(changes?: Set<BindingInstance>): any {
+  public update(
+    changes?: Set<BindingInstance>,
+    asyncChanges?: Set<string>,
+  ): any {
     this.hooks.beforeUpdate.call(changes);
     const resolveCache = new Map<Node.Node, Resolve.ResolvedNode>();
     this.idCache.clear();
     const prevASTMap = new Map(this.ASTMap);
     this.ASTMap.clear();
+
+    const prevAsyncIdMap = new Map(this.AsyncIdMap);
+    const nextAsyncIdMap = new Map<string, Node.Node>();
+    asyncChanges?.forEach((id) => {
+      let current: Node.Node | undefined = prevAsyncIdMap.get(id);
+      while (current && prevASTMap.has(current)) {
+        const next = prevASTMap.get(current);
+        if (next && this.resolveCache.has(next)) {
+          this.resolveCache.delete(next);
+        }
+        current = current.parent;
+      }
+    });
 
     const updated = this.computeTree(
       this.root,
@@ -159,13 +183,15 @@ export class Resolver {
       toNodeResolveOptions(this.options),
       undefined,
       prevASTMap,
+      nextAsyncIdMap,
     );
+    this.AsyncIdMap = nextAsyncIdMap;
     this.resolveCache = resolveCache;
     this.hooks.afterUpdate.call(updated.value);
     return updated.value;
   }
 
-  public getResolveCache() {
+  public getResolveCache(): Map<Node.Node, Resolve.ResolvedNode> {
     return new Map(this.resolveCache);
   }
 
@@ -226,6 +252,7 @@ export class Resolver {
     options: Resolve.NodeResolveOptions,
     partiallyResolvedParent: Node.Node | undefined,
     prevASTMap: Map<Node.Node, Node.Node>,
+    nextAsyncIdMap: Map<string, Node.Node>,
   ): NodeUpdate {
     const dependencyModel = new DependencyModel(options.data.model);
 
@@ -258,31 +285,6 @@ export class Resolver {
       resolveOptions,
     );
 
-    // Shallow clone the node so that changes to it during the resolve steps don't impact the original.
-    // We are trusting that this becomes a deep clone once the whole node tree has been traversed.
-    const clonedNode = {
-      ...this.cloneNode(node),
-      parent: partiallyResolvedParent,
-    };
-    const resolvedAST = this.hooks.beforeResolve.call(
-      clonedNode,
-      resolveOptions,
-    ) ?? {
-      type: NodeType.Empty,
-    };
-
-    const isNestedMultiNodeWithAsync =
-      resolvedAST.type === NodeType.MultiNode &&
-      partiallyResolvedParent?.parent?.parent?.type === NodeType.MultiNode &&
-      partiallyResolvedParent.parent.type === NodeType.Value &&
-      resolvedAST.parent?.type === NodeType.Asset &&
-      resolvedAST.parent.value.id.includes("async");
-
-    const isNestedMultiNode =
-      resolvedAST.type === NodeType.MultiNode &&
-      partiallyResolvedParent?.parent?.type === NodeType.MultiNode &&
-      partiallyResolvedParent.type === NodeType.Value;
-
     if (previousResult && shouldUseLastValue) {
       const update = {
         ...previousResult,
@@ -302,6 +304,12 @@ export class Resolver {
           updated: false,
         };
         cacheUpdate.set(AST, resolvedUpdate);
+        if (resolvedUpdate.node.type === NodeType.Async) {
+          nextAsyncIdMap.set(resolvedUpdate.node.id, resolvedUpdate.node);
+        }
+        for (const key of resolvedUpdate.node.asyncNodesResolved ?? []) {
+          nextAsyncIdMap.set(key, resolvedUpdate.node);
+        }
 
         /** Helper function for recursing over child node */
         const handleChildNode = (childNode: Node.Node) => {
@@ -336,10 +344,26 @@ export class Resolver {
       return update;
     }
 
-    if (isNestedMultiNodeWithAsync) {
-      resolvedAST.parent = partiallyResolvedParent.parent;
-    } else {
-      resolvedAST.parent = partiallyResolvedParent;
+    // Shallow clone the node so that changes to it during the resolve steps don't impact the original.
+    // We are trusting that this becomes a deep clone once the whole node tree has been traversed.
+    const clonedNode: Node.Node = {
+      ...this.cloneNode(node),
+      parent: partiallyResolvedParent,
+    };
+    const resolvedAST = this.hooks.beforeResolve.call(
+      clonedNode,
+      resolveOptions,
+    ) ?? {
+      type: NodeType.Empty,
+    };
+
+    resolvedAST.parent = partiallyResolvedParent;
+
+    if (resolvedAST.type === NodeType.Async) {
+      nextAsyncIdMap.set(resolvedAST.id, resolvedAST);
+    }
+    for (const id of resolvedAST.asyncNodesResolved ?? []) {
+      nextAsyncIdMap.set(id, resolvedAST);
     }
 
     resolveOptions.node = resolvedAST;
@@ -371,6 +395,7 @@ export class Resolver {
           resolveOptions,
           resolvedAST,
           prevASTMap,
+          nextAsyncIdMap,
         );
         const {
           dependencies: childTreeDeps,
@@ -401,15 +426,9 @@ export class Resolver {
       resolvedAST.children = newChildren;
     } else if (resolvedAST.type === NodeType.MultiNode) {
       const childValue: any = [];
-      const rawParentToPassIn = isNestedMultiNode
-        ? partiallyResolvedParent?.parent
-        : node;
+      const rawParentToPassIn = node;
 
-      const hasAsync = resolvedAST.values
-        .map((value, index) => (value.type === NodeType.Async ? index : -1))
-        .filter((index) => index !== -1);
-
-      const newValues = resolvedAST.values.map((mValue) => {
+      resolvedAST.values = resolvedAST.values.map((mValue) => {
         const mTree = this.computeTree(
           mValue,
           rawParentToPassIn,
@@ -418,47 +437,21 @@ export class Resolver {
           resolveOptions,
           resolvedAST,
           prevASTMap,
+          nextAsyncIdMap,
         );
 
         if (mTree.value !== undefined && mTree.value !== null) {
-          /**
-           * async nodes' parent is a multi-node
-           * When the node to resolve is an async node and the flatten flag is true
-           * Add the content streamed in to the childValue of parent multi-node
-           * Array.isArray(mTree.value.asset.values) is the case when the content is an async asset
-           */
-          if (
-            mValue.type === NodeType.Async &&
-            mValue.flatten &&
-            mTree.value.asset &&
-            Array.isArray(mTree.value.asset.values)
-          ) {
-            // This flatten function only changed the values not node structure
-            unpackAndPush(mTree.value, childValue);
-          } else {
-            childValue.push(mTree.value);
-          }
+          mTree.dependencies.forEach((bindingDep) =>
+            childDependencies.add(bindingDep),
+          );
+
+          updated = updated || mTree.updated;
+          childValue.push(mTree.value);
         }
-
-        mTree.dependencies.forEach((bindingDep) =>
-          childDependencies.add(bindingDep),
-        );
-
-        updated = updated || mTree.updated;
 
         return mTree.node;
       });
 
-      if (hasAsync.length > 0) {
-        // this likely turned into a nested multinode, attempt to flatten in node structure
-        const copy = newValues;
-        hasAsync.forEach((index) => {
-          if (copy[index]) copy.splice(index, 1, ...unpackNode(copy[index]));
-        });
-        resolvedAST.values = copy;
-      } else {
-        resolvedAST.values = newValues;
-      }
       resolved = childValue;
     }
 
@@ -487,50 +480,9 @@ export class Resolver {
       ]),
     };
 
-    this.hooks.afterNodeUpdate.call(
-      node,
-      isNestedMultiNode ? partiallyResolvedParent?.parent : rawParent,
-      update,
-    );
+    this.hooks.afterNodeUpdate.call(node, rawParent, update);
     cacheUpdate.set(node, update);
 
     return update;
   }
-}
-
-/**
- * helper function to flatten a potential nested array and combine with initial array
- */
-function unpackAndPush(item: any | any[], initial: any[]): void {
-  if (item.asset.values && Array.isArray(item.asset.values)) {
-    item.asset.values.forEach((i: any) => {
-      unpackAndPush(i, initial);
-    });
-  } else {
-    initial.push(item);
-  }
-}
-
-function unpackNode(item: Node.Node) {
-  const unpacked: Node.Node[] = [];
-  if (
-    "children" in item &&
-    item.children?.[0]?.value.type === NodeType.Asset &&
-    (item.children?.[0]?.value as Node.Asset).children
-  ) {
-    if (
-      (item.children?.[0]?.value as Node.Asset).children?.[0]?.value.type ===
-      NodeType.MultiNode
-    ) {
-      (
-        (item.children?.[0]?.value as Node.Asset).children?.[0]
-          ?.value as Node.MultiNode
-      ).values.forEach((value) => {
-        unpacked.push(value);
-      });
-    }
-  } else {
-    unpacked.push(item);
-  }
-  return unpacked;
 }

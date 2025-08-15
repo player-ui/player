@@ -13,10 +13,10 @@ import type {
 } from "@player-ui/player";
 import { AsyncParallelBailHook, SyncBailHook } from "tapable-ts";
 import queueMicrotask from "queue-microtask";
-import { omit } from "timm";
 
 export * from "./types";
 export * from "./transform";
+export * from "./createAsyncTransform";
 
 /** Object type for storing data related to a single `apply` of the `AsyncNodePluginPlugin`
  * This object should be setup once per ViewInstance to keep any cached info just for that view to avoid conflicts of shared async node ids across different view states.
@@ -46,8 +46,14 @@ export type AsyncHandler = (
   callback?: (result: any) => void,
 ) => Promise<any>;
 
+export type AsyncContent = {
+  async: true;
+  flatten?: boolean;
+  [key: string]: unknown;
+};
+
 /** Hook declaration for the AsyncNodePlugin */
-type AsyncNodeHooks = {
+export type AsyncNodeHooks = {
   /** Async hook to get content for an async node */
   onAsyncNode: AsyncParallelBailHook<[Node.Async, (result: any) => void], any>;
   /** Sync hook to manage errors coming from the onAsyncNode hook. Return a fallback node or null to render a fallback. The first argument of passed in the call is the error thrown. */
@@ -131,8 +137,12 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     result: any,
     options: Resolve.NodeResolveOptions,
   ) {
-    const parsedNode =
+    let parsedNode =
       options.parseNode && result ? options.parseNode(result) : undefined;
+
+    if (parsedNode && node.onValueReceived) {
+      parsedNode = node.onValueReceived(parsedNode);
+    }
 
     this.handleAsyncUpdate(node, context, parsedNode);
   }
@@ -154,8 +164,18 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     const { nodeResolveCache, view } = context;
     if (nodeResolveCache.get(node.id) !== newNode) {
       nodeResolveCache.set(node.id, newNode ? newNode : node);
-      view.updateAsync();
+      view.updateAsync(node.id);
     }
+  }
+
+  private hasValidMapping(
+    node: Node.Async,
+    context: AsyncPluginContext,
+  ): boolean {
+    const { nodeResolveCache } = context;
+    return (
+      nodeResolveCache.has(node.id) && nodeResolveCache.get(node.id) !== node
+    );
   }
 
   /**
@@ -167,12 +187,12 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
   applyResolver(resolver: Resolver, context: AsyncPluginContext): void {
     resolver.hooks.beforeResolve.tap(this.name, (node, options) => {
       if (!this.isAsync(node)) {
-        return node;
+        return node === null ? node : this.resolveAsyncChildren(node, context);
       }
 
       const resolvedNode = context.nodeResolveCache.get(node.id);
       if (resolvedNode !== undefined) {
-        return resolvedNode;
+        return this.resolveAsyncChildren(resolvedNode, context);
       }
 
       if (context.inProgressNodes.has(node.id)) {
@@ -187,6 +207,63 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
       return node;
     });
+  }
+
+  /**
+   * Replaces child async nodes with their resolved content and flattens when necessary. Resolving the children directly helps manage the `parent` reference without needing as much work within the resolver itself.
+   * Handles async node chains as well to make sure all applicable nodes can get flattened.
+   * @param node - The node whose children need to be resolved.
+   * @param context - the async plugin context needed to reach into the cache
+   * @returns The same node but with async node children mapped to their resolved AST.
+   */
+  private resolveAsyncChildren(
+    node: Node.Node,
+    context: AsyncPluginContext,
+  ): Node.Node {
+    const asyncNodesResolved: string[] = node.asyncNodesResolved ?? [];
+    node.asyncNodesResolved = asyncNodesResolved;
+    if (node.type === NodeType.MultiNode) {
+      // Using a while loop lets us catch when async nodes produce more async nodes that need to be flattened further
+      let index = 0;
+      while (index < node.values.length) {
+        const childNode = node.values[index];
+        if (
+          childNode?.type !== NodeType.Async ||
+          !this.hasValidMapping(childNode, context)
+        ) {
+          index++;
+          continue;
+        }
+
+        const mappedNode = context.nodeResolveCache.get(childNode.id);
+        asyncNodesResolved.push(childNode.id);
+        if (mappedNode.type === NodeType.MultiNode && childNode.flatten) {
+          mappedNode.values.forEach((v: Node.Node) => (v.parent = node));
+          node.values = [
+            ...node.values.slice(0, index),
+            ...mappedNode.values,
+            ...node.values.slice(index + 1),
+          ];
+        } else {
+          node.values[index] = mappedNode;
+          mappedNode.parent = node;
+        }
+      }
+    } else if ("children" in node) {
+      node.children?.forEach((c) => {
+        // Similar to above, using a while loop lets us handle when async nodes produce more async nodes.
+        while (
+          c.value.type === NodeType.Async &&
+          this.hasValidMapping(c.value, context)
+        ) {
+          asyncNodesResolved.push(c.value.id);
+          c.value = context.nodeResolveCache.get(c.value.id);
+          c.value.parent = node;
+        }
+      });
+    }
+
+    return node;
   }
 
   private async runAsyncNode(
@@ -234,8 +311,12 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     return node?.type === NodeType.Async;
   }
 
-  private isDeterminedAsync(obj: any) {
-    return obj && Object.prototype.hasOwnProperty.call(obj, "async");
+  private isDeterminedAsync(obj: unknown): obj is AsyncContent {
+    return (
+      typeof obj === "object" &&
+      obj !== null &&
+      Object.prototype.hasOwnProperty.call(obj, "async")
+    );
   }
 
   applyParser(parser: Parser): void {
@@ -248,11 +329,9 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         childOptions?: ParseObjectChildOptions,
       ) => {
         if (this.isDeterminedAsync(obj)) {
-          const parsedAsync = parser.parseObject(
-            omit(obj, "async"),
-            nodeType,
-            options,
-          );
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { async, flatten, ...rest } = obj;
+          const parsedAsync = parser.parseObject(rest, nodeType, options);
           const parsedNodeId = getNodeID(parsedAsync);
 
           if (parsedAsync === null || !parsedNodeId) {
@@ -264,6 +343,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
               id: parsedNodeId,
               type: NodeType.Async,
               value: parsedAsync,
+              flatten,
             },
             obj,
           );

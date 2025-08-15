@@ -10,7 +10,7 @@ import { hasTemplateValues, hasTemplateKey } from "../parser/utils";
 
 /** A view plugin to resolve multi nodes */
 export default class MultiNodePlugin implements ViewPlugin {
-  applyParser(parser: Parser) {
+  applyParser(parser: Parser): void {
     parser.hooks.parseNode.tap(
       "multi-node",
       (
@@ -20,8 +20,7 @@ export default class MultiNodePlugin implements ViewPlugin {
         childOptions?: ParseObjectChildOptions,
       ) => {
         if (
-          childOptions &&
-          !hasTemplateKey(childOptions.key) &&
+          (childOptions === undefined || !hasTemplateKey(childOptions.key)) &&
           Array.isArray(obj)
         ) {
           const values = obj
@@ -37,10 +36,9 @@ export default class MultiNodePlugin implements ViewPlugin {
           const multiNode = parser.createASTNode(
             {
               type: NodeType.MultiNode,
-              override: !hasTemplateValues(
-                childOptions.parentObj,
-                childOptions.key,
-              ),
+              override:
+                childOptions !== undefined &&
+                !hasTemplateValues(childOptions.parentObj, childOptions.key),
               values,
             },
             obj,
@@ -56,18 +54,20 @@ export default class MultiNodePlugin implements ViewPlugin {
             });
           }
 
-          return [
-            {
-              path: [...childOptions.path, childOptions.key],
-              value: multiNode,
-            },
-          ];
+          return childOptions === undefined
+            ? multiNode
+            : [
+                {
+                  path: [...childOptions.path, childOptions.key],
+                  value: multiNode,
+                },
+              ];
         }
       },
     );
   }
 
-  apply(view: ViewInstance) {
+  apply(view: ViewInstance): void {
     view.hooks.parser.tap("multi-node", this.applyParser.bind(this));
   }
 }
