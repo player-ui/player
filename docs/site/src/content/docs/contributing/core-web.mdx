@@ -3,7 +3,7 @@ title: Core & Web Development Guide
 description: Complete guide for Core and Web development with Player
 ---
 
-# Core & Web Development Guide
+import { Aside, Steps, Card, CardGrid, FileTree, Tabs, TabItem } from '@astrojs/starlight/components';
 
 This guide covers everything you need to know for developing Player plugins and core functionality using TypeScript and JavaScript.
 
@@ -32,68 +32,75 @@ Adding a new plugin is straightforward using predefined macros for `BUILD.bazel`
 
 All plugins follow a common structure:
 
-```bash
-plugins/example
-├── react
-│   ├── BUILD.bazel
-│   ├── src
-│   │   ├── index.tsx
-│   │   └── __tests__
-│   │       └── index.test.tsx
-│   └── package.json
-└── core
-    ├── BUILD.bazel
-    ├── src
-    │   ├── index.ts
-    │   └── __tests__
-    │       └── index.test.ts
-    └── package.json
-```
+<FileTree>
+- plugins/example
+  - react/
+    - BUILD.bazel
+    - src/
+      - index.tsx
+      - __tests__/
+        - index.test.tsx
+    - package.json
+  - core/
+    - BUILD.bazel
+    - src/
+      - index.ts
+      - __tests__/
+        - index.test.ts
+    - package.json
+</FileTree>
 
 ### Scaffolding a New Plugin
 
 To scaffold your plugin, create a new `core` or `react` folder in the appropriate plugin directory, with the appropriate folders, a `package.json`, and a blank `BUILD.bazel`:
 
-**For core plugins:**
-```bash
-mkdir -p plugins/example-plugin/core/src
-cd plugins/example-plugin/core
-pnpm init
-touch BUILD.bazel
-```
-
-**For React plugins:**
-```bash
-mkdir -p plugins/example-plugin/react/src
-cd plugins/example-plugin/react
-pnpm init
-touch BUILD.bazel
-```
+<Tabs>
+  <TabItem label="Core Plugin">
+    ```bash
+    mkdir -p plugins/example-plugin/core/src
+    cd plugins/example-plugin/core
+    pnpm init
+    touch BUILD.bazel
+    ```
+  </TabItem>
+  <TabItem label="React Plugin">
+    ```bash
+    mkdir -p plugins/example-plugin/react/src
+    cd plugins/example-plugin/react
+    pnpm init
+    touch BUILD.bazel
+    ```
+  </TabItem>
+</Tabs>
 
 ### Package Configuration
 
 Set the name, version, and entry point of the package in the `package.json`:
 
-**For core plugins:**
-```json
-{
-  "name": "@player-ui/example-plugin-core",
-  "version": "0.0.0-PLACEHOLDER",
-  "main": "src/index.ts"
-}
-```
+<Tabs>
+  <TabItem label="Core Plugin">
+    ```json
+    {
+      "name": "@player-ui/example-plugin-core",
+      "version": "0.0.0-PLACEHOLDER",
+      "main": "src/index.ts"
+    }
+    ```
+  </TabItem>
+  <TabItem label="React Plugin">
+    ```json
+    {
+      "name": "@player-ui/example-plugin-react",
+      "version": "0.0.0-PLACEHOLDER",
+      "main": "src/index.tsx"
+    }
+    ```
+  </TabItem>
+</Tabs>
 
-**For React plugins:**
-```json
-{
-  "name": "@player-ui/example-plugin-react",
-  "version": "0.0.0-PLACEHOLDER",
-  "main": "src/index.tsx"
-}
-```
-
-> [!NOTE]
-> The package follows a naming convention of `@player-ui/{description}-plugin-{platform}`.
+<Aside type="note">
+  The package follows a naming convention of <code>@player-ui/&#123;description&#125;-plugin-&#123;platform&#125;</code>.
+</Aside>
 
 ### BUILD Configuration
 
@@ -158,9 +165,16 @@ js_pipeline(
 )
 ```
 
-> [!NOTE]
-> - **External dependencies** are specified as `//:node_modules/...` with the leading `//`
-> - **Internal dependencies** are specified as `:node_modules/...` without the leading `//`
+<Aside type="note">
+  <ul>
+    <li>
+      <strong>External dependencies</strong> are specified as <code>//:node_modules/...</code> with the leading <code>//</code>
+    </li>
+    <li>
+      <strong>Internal dependencies</strong> are specified as <code>:node_modules/...</code> without the leading <code>//</code>
+    </li>
+  </ul>
+</Aside>
 
 ### Package.json Dependencies
 
@@ -188,96 +202,3 @@ Add the new package's `node_modules` directory to `.bazelignore`:
 plugins/example-plugin/core/node_modules
 plugins/example-plugin/react/node_modules
 ```
-
-## Development Workflow
-
-### Building Your Plugin
-
-```bash
-# Build a specific plugin
-bazel build //plugins/example-plugin/core
-
-# Build all plugins
-bazel build //plugins/...
-```
-
-### Running Tests
-
-```bash
-# Test a specific plugin
-bazel test //plugins/example-plugin/core:test
-
-# Test all plugins
-bazel test //plugins/...
-```
-
-### Local Development
-
-For rapid development, you can use watch mode:
-
-```bash
-# Watch and rebuild on changes
-bazel run //plugins/example-plugin/core:dev
-```
-
-## Best Practices
-
-### Code Organization
-
-- **Keep core logic platform-agnostic** in core plugins
-- **Separate React-specific code** into React plugins
-- **Use TypeScript** for better type safety and developer experience
-- **Write comprehensive tests** for all functionality
-
-### Testing Guidelines
-
-- **Unit tests** for individual functions and classes
-- **Integration tests** for plugin interactions
-- **Use `vitest`** for consistent testing across the project
-- **Mock external dependencies** appropriately
-
-### Performance Considerations
-
-- **Tree-shake unused code** using proper ES module exports
-- **Minimize bundle size** for React plugins
-- **Use lazy loading** for heavy functionality
-- **Profile and optimize** critical paths
-
-## Common Patterns
-
-### Plugin Registration
-
-```typescript
-// Core plugin
-export class ExamplePlugin implements Plugin {
-  name = 'example-plugin';
-  
-  apply(player: Player) {
-    // Plugin logic here
-  }
-}
-
-// React plugin
-export const ExampleComponent: React.FC<Props> = (props) => {
-  // Component logic here
-};
-```
-
-### Dependency Injection
-
-```typescript
-// Using hooks for dependency injection
-export const useExamplePlugin = () => {
-  const player = usePlayer();
-  return player.getPlugin('example-plugin');
-};
-```
-
-## Troubleshooting
-
-For common Core & Web development issues, see the [Troubleshooting Guide](/contributing/troubleshooting).
-
-## Related Resources
-
-- [Main Contributing Guide](/contributing/) - General contributing guidelines
-- [Troubleshooting Guide](/contributing/troubleshooting/) - Solutions to common development issues

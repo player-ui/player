@@ -3,122 +3,181 @@ title: New Contributors Guide
 description: Welcome guide for first-time contributors to Player
 ---
 
+import { Steps, Card, CardGrid, Badge, FileTree } from '@astrojs/starlight/components';
+
 # Welcome, New Contributors!
 
 Thank you for your interest in contributing to Player! This guide will help you get started with your first contribution.
 
 ## Getting Started
 
-1. **Fork the Repository**
-   - Visit the [Player repository on GitHub](https://github.com/player-ui/player)
-   - Click the "Fork" button to create your own copy
+<Steps>
 
-2. **Clone Your Fork**
+1. **Fork the Repository**
+   
+   The git workflow for forking is slightly different than the normal branch workflow. Rather than cloning the main repo and pushing a new branch, each person works off of their own fork and pushes their own branches there. This helps limit the need (especially for non-team members) to give out access rights to the repo to push up a branch, and also helps keep the main repo clean from stale branches.
+
+   The easiest way to maintain your own fork is via the GitHub CLI, which you can easily install through Homebrew. After you've gone through the initial setup, the CLI gives us a few powerful commands that do most of the legwork for us when working with a fork.
+
+2. **Clone and Set Up Fork**
+   
+   Start by cloning the repo you'd like to contribute to:
+   
    ```bash
-   git clone https://github.com/YOUR_USERNAME/player.git
+   git clone https://github.com/player-ui/player.git
    cd player
+   ```
+   
+   From there, leverage the GitHub CLI to create and set up your fork:
+   
+   ```bash
+   gh repo fork
+   ```
+   
+   This command creates the fork for us from the repo we've cloned, sets up a new remote to publish to, and renames the previous remote so we can easily reference it:
+   
+   ```bash
+   $ git remote -v
+   origin  https://github.com/YOUR_USERNAME/player.git (fetch)
+   origin  https://github.com/YOUR_USERNAME/player.git (push)
+   upstream        https://github.com/player-ui/player.git (fetch)
+   upstream        https://github.com/player-ui/player.git (push)
    ```
 
 3. **Set Up Development Environment**
-   - Follow the [requirements setup](/contributing/#requirements)
-   - Install the necessary tools and dependencies
+   
+   Follow the [requirements setup](/contributing/#requirements) and install the necessary tools and dependencies.
 
 4. **Choose Your Platform**
-   - **Core & Web Development**: See the [Core & Web Development Guide](/contributing/core-web)
-   - **Android Development**: See the [Android Development Guide](/contributing/android)
-   - **iOS Development**: See the [iOS Development Guide](/contributing/ios)
+   
+   <CardGrid>
+     <Card title="Core & Web Development" icon="seti:javascript">
+       TypeScript/JavaScript plugin development
+     </Card>
+     <Card title="Android Development" icon="seti:kotlin">
+       Native Android development
+     </Card>
+     <Card title="iOS Development" icon="seti:swift">
+       Native iOS development
+     </Card>
+   </CardGrid>
 
 5. **Need Help?**
-   - Check the [Troubleshooting Guide](/contributing/troubleshooting) for common issues and solutions
+   
+   Check the [Troubleshooting Guide](/contributing/troubleshooting) for common issues and solutions.
+
+</Steps>
+
+## Keeping Your Fork Updated
+
+To keep your fork in sync with the main repository, you can leverage the upstream remote that was created when you set up your fork:
+
+```bash
+# Make sure we're on main branch first
+git checkout main
+git pull upstream main
+git push origin main
+```
+
+This allows you to quickly take everything that the main repo has on main and push it back up to your fork. You should do this anytime you want to contribute to ensure you don't have a stale branch with outdated files.
+
+> **Alternative Method**: You can also create forks and PRs through [GitHub's web interface](https://github.com/player-ui/player) if you prefer not to use the CLI.
+
 
 ## Making Your First Contribution
 
 ### Good First Issues
 
 Look for issues labeled with:
-- `good first issue` - Perfect for newcomers
-- `help wanted` - Community contributions welcome
-- `documentation` - Great for getting familiar with the codebase
-
-### Types of Contributions
-
-- **Bug Fixes**: Fix issues in existing functionality
-- **Documentation**: Improve guides, API docs, or examples
-- **New Features**: Add new capabilities (discuss in an issue first)
-- **Tests**: Add or improve test coverage
-- **Examples**: Create new demo applications or examples
+- <Badge text="good first issue" variant="tip" /> - Perfect for newcomers
+- <Badge text="help wanted" variant="note" /> - Community contributions welcome
+- <Badge text="documentation" variant="caution" /> - Great for getting familiar with the codebase
 
 ### Development Workflow
 
+<Steps>
+
 1. **Create a Branch**
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
 
 2. **Make Your Changes**
+
    - Write your code
    - Add or update tests
    - Update documentation if needed
 
 3. **Test Your Changes**
+
    ```bash
    # Run relevant tests
    bazel test //path/to/your:tests
-   
+
    # For broader testing
    bazel test //...
    ```
 
 4. **Commit Your Changes**
+
    ```bash
    git add .
    git commit -S -m "feat: add your feature description"
    ```
-   
+
    > Note: The `-S` flag signs your commit, which is required for this project.
 
 5. **Push and Create Pull Request**
+
    ```bash
    git push origin feature/your-feature-name
    ```
+
+   When you're ready to submit a Pull Request, there's a great CLI command for that too:
+
+   ```bash
+   gh pr create
+   ```
    
-   Then create a pull request on GitHub.
+   This will guide you through writing your PR and creating it for the repo. You can also quickly monitor the status of the CI checks with:
+
+   ```bash
+   gh pr checks
+   ```
+   
+   This will show all checks that have run on your PR and if they have passed or failed, and additionally add any links to quickly jump to the checks to debug.
+
+</Steps>
 
 ## Getting Help
 
 ### Community Resources
 
-- **GitHub Issues**: Ask questions or report problems
-- **Discussions**: General questions and community chat
+- **[GitHub Issues](https://github.com/player-ui/player/issues)**: Ask questions or report problems
+- **[GitHub Discussions](https://github.com/player-ui/player/discussions)**: General questions and community chat  
 - **Pull Request Reviews**: Get feedback on your code
 
 ### Code Review Process
 
-1. Automated checks will run on your PR
+1. Automated checks will run on your PR (tests, linting, builds)
 2. A maintainer will review your code
-3. Address any feedback
+3. Address any feedback from reviewers
 4. Once approved, your PR will be merged!
-
-### Tips for Success
-
-- **Start Small**: Begin with small, focused changes
-- **Ask Questions**: Don't hesitate to ask for help or clarification
-- **Be Patient**: Code review takes time, and that's normal
-- **Learn from Feedback**: Use review comments to improve your skills
 
 ## Understanding the Codebase
 
 ### Project Structure
 
-```
-player/
-├── android/          # Android-specific code
-├── ios/             # iOS-specific code  
-├── core/            # Core Player functionality
-├── plugins/         # Plugin implementations
-├── docs/            # Documentation site
-└── tools/           # Build tools and utilities
-```
+<FileTree>
+- player/
+  - android/          # Android-specific code
+  - ios/             # iOS-specific code  
+  - core/            # Core Player functionality
+  - plugins/         # Plugin implementations
+  - docs/            # Documentation site
+  - tools/           # Build tools and utilities89
+</FileTree>
 
 ### Key Technologies
 
@@ -127,13 +186,6 @@ player/
 - **Swift**: iOS implementation
 - **Kotlin**: Android implementation
 - **React**: Web implementation
-
-## Next Steps
-
-1. **Explore the Codebase**: Browse the code to understand the architecture
-2. **Run the Examples**: Get the demo apps running on your platform
-3. **Find an Issue**: Look for something you'd like to work on
-4. **Join the Community**: Engage with other contributors
 
 Welcome to the Player community! We're excited to see what you'll build. 🎉
 

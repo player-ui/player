@@ -3,7 +3,7 @@ title: iOS Development Guide
 description: Complete guide for iOS development with Player
 ---
 
-# iOS Development Guide
+import { Aside, FileTree } from '@astrojs/starlight/components';
 
 This comprehensive guide covers everything you need to know for iOS development with Player, from basic setup to advanced plugin development.
 
@@ -32,8 +32,9 @@ bazel run //ios/demo:PlayerUIDemo
 
 ## Important Build Notes
 
-> [!NOTE]
-> When building/testing targets with Bazel, it is not recommended to build all targets under a package using `/...` as some targets such as those using `swift_library` (e.g., `PlayerUIInternalTestUtilities` and `PlayerUIReferenceAssets`) are not buildable due to running on MacOS or requiring iOS SDKs.
+<Aside type="note">
+  When building or testing targets with Bazel, it is not recommended to build all targets under a package using <code>/...</code> as some targets—such as those using <code>swift_library</code> (e.g., <code>PlayerUIInternalTestUtilities</code> and <code>PlayerUIReferenceAssets</code>)—are not buildable due to running on macOS or requiring iOS SDKs.
+</Aside>
 
 **Best Practice:** Build individual targets through those that depend on the underlying targets using `swift_library`. In practice, this primarily means building through test targets or the example application.
 
@@ -55,21 +56,21 @@ Adding new plugins is straightforward using predefined macros for `BUILD.bazel` 
 
 All iOS plugins follow a common structure:
 
-```bash
-plugins/example
-├── ios
-│   ├── BUILD.bazel
-│   ├── Sources
-│   │   └── ExamplePlugin.swift
-│   └── Tests
-│       └── ExamplePluginTests.swift
-└── swiftui
-    ├── BUILD.bazel
-    ├── Sources
-    │   └── ExamplePlugin.swift
-    └── ViewInspector
-        └── ExamplePluginViewInspectorTests.swift
-```
+<FileTree>
+- plugins/example
+  - ios/
+    - BUILD.bazel
+    - Sources/
+      - ExamplePlugin.swift
+    - Tests/
+      - ExamplePluginTests.swift
+  - swiftui/
+    - BUILD.bazel
+    - Sources/
+      - ExamplePlugin.swift
+    - ViewInspector/
+      - ExamplePluginViewInspectorTests.swift
+</FileTree>
 
 ### Scaffolding a New Plugin
 
@@ -144,15 +145,16 @@ swiftui_plugin(
 
 This creates a resource bundle with the provided name and necessary runtime files for accessing `Bundle.module` from bazel. These resource bundles and extensions are only ever created at runtime by bazel - they can be viewed in Xcode, but the project needs to be built first to generate the files.
 
-> [!TIP]
-> For iOS plugins, the `js_pipeline` for the core plugin should have `native_bundle` set to match the `name` in the `ios_plugin`:
-> 
-> ```python
-> js_pipeline(
->     native_bundle = "ExamplePlugin"
->     ...
-> )
-> ```
+<Aside type="tip">
+  For iOS plugins, the <code>js_pipeline</code> for the core plugin should have <code>native_bundle</code> set to match the <code>name</code> in the <code>ios_plugin</code>:
+
+  ```python
+  js_pipeline(
+      native_bundle = "ExamplePlugin"
+      ...
+  )
+  ```
+</Aside>
 
 #### Examining Targets
 
@@ -251,8 +253,9 @@ assemble_pod(
 
 ### External Dependencies
 
-> [!NOTE]
-> As `PlayerUI` is published as both a Swift Package and a CocoaPod, external dependencies must be available on both package managers.
+<Aside type="note">
+  As <code>PlayerUI</code> is published as both a Swift Package and a CocoaPod, external dependencies must be available on both package managers.
+</Aside>
 
 #### Bazel Configuration
 
@@ -261,8 +264,9 @@ Bazel resolution of external Swift dependencies is done with [rules_swift_packag
 1. **Add dependencies to Package.swift files:**
    - Add to both the main `Package.swift` (for final consumer users) and to `xcode/Package.swift` (for workspace use)
    
-   > [!TIP]
-   > With `Package.swift` manifest files, dependencies for consuming users are resolved regardless of whether or not the consuming user relies on the product with that dependency. Due to this, test packages and developer tooling can conflict with consuming users. To avoid this potential conflict, project level dependencies are redeclared in `xcode/Package.swift`. This allows the main `Package.swift` to contain dependencies only for the library targets, and no testing or tooling dependencies.
+   <Aside type="tip">
+     With <code>Package.swift</code> manifest files, dependencies for consuming users are resolved regardless of whether or not the consuming user relies on the product with that dependency. Due to this, test packages and developer tooling can conflict with consuming users. To avoid this potential conflict, project level dependencies are redeclared in <code>xcode/Package.swift</code>. This allows the main <code>Package.swift</code> to contain dependencies only for the library targets, and no testing or tooling dependencies.
+   </Aside>
 
 2. **Regenerate the dependency index:**
    ```bash
@@ -279,8 +283,9 @@ Bazel resolution of external Swift dependencies is done with [rules_swift_packag
    )
    ```
    
-   > [!NOTE]
-   > Package names are converted to snake case. If you are unsure what name to use, open `swift_deps.bzl` and search for the git repository for that dependency to find its entry and name.
+   <Aside type="note">
+     Package names are converted to snake case. If you are unsure what name to use, open <code>swift_deps.bzl</code> and search for the git repository for that dependency to find its entry and name.
+   </Aside>
 
 4. **Use the dependency in bazel targets:**
    ```
@@ -315,21 +320,11 @@ ios_pipeline(
 
 Both `ios_plugin` and `swiftui_plugin` call the same `ios_pipeline` macro and hardcode some of the parameters to that pipeline. For more complex use cases, `ios_pipeline` can be used directly to generate tests for packages that have both regular unit tests as well as SwiftUI ViewInspector based tests.
 
-> [!NOTE]
-> The `ios_pipeline` macro is a common macro loaded from the `rules_player` repo. It requires a few peer dependencies that must be added in this main repo in order to work with the `ios_pipeline`, including SwiftLint and ViewInspector (SPM dependencies) and `build_bazel_rules_apple` and `build_bazel_rules_ios` (Rule dependencies).
+<Aside type="note">
+  The <code>ios_pipeline</code> macro is a common macro loaded from the <code>rules_player</code> repo. It requires a few peer dependencies that must be added in this main repo in order to work with the <code>ios_pipeline</code>, including SwiftLint and ViewInspector (SPM dependencies) and <code>build_bazel_rules_apple</code> and <code>build_bazel_rules_ios</code> (Rule dependencies).
+</Aside>
 
 ## FAQ
-
-### Why do the new ViewInspector tests I added keep crashing?
-
-ViewInspector requires the tests to be running on the main thread in a few different cases. To fix this, add `@MainActor` to the test class:
-
-```swift
-@MainActor
-class MyPluginViewInspectorTests: XCTestCase {
-    // Your ViewInspector tests here
-}
-```
 
 ### How do I debug issues with resource bundles?
 
@@ -350,11 +345,7 @@ Some targets using `swift_library` (like `PlayerUIInternalTestUtilities`) are no
 ## Development Tips
 
 - Always regenerate the Xcode project after making changes to BUILD files
-- Use `bazel query` to explore available targets
-- Test both through Xcode and bazel to ensure consistency
 - Resource bundles are generated at runtime by bazel - build first to see them in Xcode
-- Add `@MainActor` to ViewInspector test classes to avoid crashes
-- Use individual bazel targets rather than `/...` patterns for building
 
 ## Related Resources
 
