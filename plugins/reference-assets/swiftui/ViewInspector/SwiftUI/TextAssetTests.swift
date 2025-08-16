@@ -15,6 +15,7 @@ import SwiftUI
 @testable import PlayerUISwiftUI
 @testable import PlayerUITestUtilities
 
+@MainActor
 class TextAssetTests: SwiftUIAssetUnitTestCase {
     override open func plugins() -> [NativePlugin] { [ReferenceAssetsPlugin()] }
 

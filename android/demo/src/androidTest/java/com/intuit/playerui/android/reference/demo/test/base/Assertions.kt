@@ -13,9 +13,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 @OptIn(ExperimentalContracts::class)
-inline fun <reified T : RenderableAsset> Any?.shouldBeAsset(
-    block: T.() -> Unit = {},
-): T {
+inline fun <reified T : RenderableAsset> Any?.shouldBeAsset(block: T.() -> Unit = {}): T {
     shouldBeInstanceOf<T>(this)
     block()
     return this
@@ -48,9 +46,7 @@ suspend inline fun <reified T : PlayerFlowState> waitUntilState(state: PlayerFlo
 }
 
 @ExperimentalContracts
-inline fun <reified T> shouldBeInstanceOf(
-    `this`: Any?,
-) {
+inline fun <reified T> shouldBeInstanceOf(`this`: Any?) {
     contract {
         returns() implies (`this` is T)
     }

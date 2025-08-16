@@ -16,5 +16,4 @@ main_resources = [
 ]
 
 test_deps = [
-    "//jvm:kotlin_serialization",
 ]

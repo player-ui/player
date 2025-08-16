@@ -17,8 +17,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 
-class Input(assetContext: AssetContext) : SuspendableAsset<Input.Data>(assetContext, Data.serializer()) {
-
+class Input(
+    assetContext: AssetContext,
+) : SuspendableAsset<Input.Data>(assetContext, Data.serializer()) {
     @Serializable
     data class Validation(
         val message: String,
@@ -28,36 +29,38 @@ class Input(assetContext: AssetContext) : SuspendableAsset<Input.Data>(assetCont
     data class Data(
         private val set: (String?) -> Unit,
         private val format: (String?) -> String?,
-
         /** Optional [label] that gives some semantic meaning to the field asset */
         val label: RenderableAsset? = null,
-
         val note: RenderableAsset? = null,
-
         /** The current value of the input from the data-model */
         val value: String? = null,
-
         val validation: Validation? = null,
     ) {
-        suspend fun set(value: String) = withContext(Dispatchers.Default) {
-            set.invoke(value)
-        }
+        suspend fun set(value: String) =
+            withContext(Dispatchers.Default) {
+                set.invoke(value)
+            }
 
-        suspend fun format(value: String): String? = withContext(Dispatchers.Default) {
-            format.invoke(value)
-        }
+        suspend fun format(value: String): String? =
+            withContext(Dispatchers.Default) {
+                format.invoke(value)
+            }
     }
 
-    override suspend fun initView(data: Data): View = LayoutInflater.from(context).inflate(R.layout.input, null).apply {
-        findViewById<FormattedEditText>(R.id.input_field).run {
-            setOnEditorActionListener { _, actionId, _ ->
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    clearFocus()
+    override suspend fun initView(data: Data): View =
+        LayoutInflater
+            .from(context)
+            .inflate(R.layout.input, null)
+            .apply {
+                findViewById<FormattedEditText>(R.id.input_field).run {
+                    setOnEditorActionListener { _, actionId, _ ->
+                        if (actionId == EditorInfo.IME_ACTION_DONE) {
+                            clearFocus()
+                        }
+                        false
+                    }
                 }
-                false
-            }
-        }
-    }.rootView
+            }.rootView
 
     override suspend fun View.hydrate(data: Data) {
         data.label?.render(Text.Styles.Label) into findViewById(R.id.input_label_container)

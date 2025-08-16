@@ -52,7 +52,6 @@ class ActionTest : AssetTest("action") {
         }
     }
 
-    // TODO: Fix invalid expression not throwing error in core
     @Test
     fun transitionToEndError() {
         launchMock("action-transition-to-end")

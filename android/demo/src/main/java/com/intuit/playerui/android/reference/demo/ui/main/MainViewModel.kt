@@ -14,8 +14,9 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import java.io.FileNotFoundException
 
-class MainViewModel(private val context: Application) : AndroidViewModel(context) {
-
+class MainViewModel(
+    private val context: Application,
+) : AndroidViewModel(context) {
     val mocks: List<Mock<out Any?>> by lazy {
         readMocksFromClasspath() + readMocksFromAssets()
     }
@@ -31,28 +32,31 @@ class MainViewModel(private val context: Application) : AndroidViewModel(context
 
     fun launch(json: String) = launch(StringMock(json))
 
-    fun launch(mock: Mock<*>) = viewModelScope.launch {
-        _currentMock.emit(mock)
-    }
+    fun launch(mock: Mock<*>) =
+        viewModelScope.launch {
+            _currentMock.emit(mock)
+        }
 
     private fun readMocksFromClasspath() = ClassLoaderMocksReader(MainViewModel::class.java.classLoader!!).mocks
 
-    private fun readMocksFromAssets(path: String = "mocks"): List<Mock<*>> = context.assets
-        .list(path)
-        ?.map { if (path.isEmpty()) it else "$path/$it" }
-        ?.flatMap { file ->
-            try {
-                // Check if file can be opened
-                context.assets.open(file).close()
-                val (group, name) = "/$file".removeSuffix(".json").split("/").takeLast(2)
-                listOf(AssetMock(group, name, file))
-            } catch (e: FileNotFoundException) {
-                readMocksFromAssets(file)
-            }
-        } ?: emptyList()
+    private fun readMocksFromAssets(path: String = "mocks"): List<Mock<*>> =
+        context.assets
+            .list(path)
+            ?.map { if (path.isEmpty()) it else "$path/$it" }
+            ?.flatMap { file ->
+                try {
+                    // Check if file can be opened
+                    context.assets.open(file).close()
+                    val (group, name) = "/$file".removeSuffix(".json").split("/").takeLast(2)
+                    listOf(AssetMock(group, name, file))
+                } catch (e: FileNotFoundException) {
+                    readMocksFromAssets(file)
+                }
+            } ?: emptyList()
 
     fun groupMocks(menu: Menu) {
-        mocks.groupBy { it.group }
+        mocks
+            .groupBy { it.group }
             .map { (group, mocks) -> menu.addSubMenu(group) to mocks }
             .map { (group, mocks) ->
                 mocks.mapIndexed { index, mock ->
