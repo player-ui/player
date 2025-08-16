@@ -1,0 +1,291 @@
+---
+title: Troubleshooting Guide
+description: Common issues and solutions for Player development
+---
+
+# Troubleshooting Guide
+
+This guide covers common issues you might encounter when developing with Player and their solutions.
+
+## General Issues
+
+### Build System Issues
+
+#### Bazel Cache Problems
+**Symptoms:** Inconsistent build failures, stale artifacts, or unexpected build errors
+
+**Solution:**
+```bash
+# Clean bazel cache
+bazel clean
+
+# For more thorough cleaning
+bazel clean --expunge
+```
+
+#### Permission Issues
+**Symptoms:** Build failures due to file permission errors
+
+**Solution:**
+- Ensure your workspace directory has proper read/write permissions
+- Check that bazel has permission to write to its cache directories
+- On macOS, you may need to grant Terminal/IDE full disk access in System Preferences
+
+## Android Development Issues
+
+### 1. Toolchain and SDK Issues
+
+**Symptoms:** 
+- Errors related to Android toolchain, SDK, or NDK versions
+- Build failures with Android-specific targets
+
+**Solution:**
+- Check your SDK and NDK versions in Android Studio's SDK Manager
+- Verify your environment variables in your bash or zsh profile:
+  - `ANDROID_HOME` should point to your Android SDK directory
+  - `ANDROID_NDK_HOME` should point to your NDK directory
+- Ensure `ANDROID_HOME` and `ANDROID_NDK_HOME` are properly set
+- Restart your terminal/IDE after setting environment variables
+
+### 2. Babel Dependencies
+
+**Symptoms:**
+```
+could not find dependency @babel/helper-string-parser of @babel.plugin-transform-react-jsx/node_modules/@babel/types
+Error: Analysis of target '//android/demo:demo' failed; build aborted.
+```
+
+**Solution:**
+Make sure you have run `bundle install` in the project root.
+
+### 3. ResourceProcessorBusyBox Errors
+
+**Symptoms:**
+```
+ResourceProcessorBusyBox failed: error executing command bazel-out/darwin-opt-exec-2B5CBBC6/bin/external/bazel_tools/src/tools/android/java/com/google/devtools/build/android/ResourceProcessorBusyBox --tool LINK_STATIC_LIBRARY -- --aapt2 ... (remaining 17 arguments skipped)
+```
+
+**Solution:**
+- Check your SDK and NDK versions in Android Studio's SDK Manager
+- Verify your `ANDROID_HOME` and `ANDROID_NDK_HOME` environment variables
+- Run `ls $ANDROID_HOME/platforms` and ensure there are no SDK versions higher than 30
+- Make sure you have only the required SDK versions installed (Android API 33)
+
+### 4. Python Module Errors
+
+**Symptoms:**
+```
+ModuleNotFoundError: No module named 'six.moves'
+...
+from six.moves import range  # pylint: disable=redefined-builtin
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+```
+
+**Solution:**
+- Check that your Python version is less than 3 (recommended: 2.7.18) using `python --version`
+- If you're still getting the error with Python 2.7, try running bazel commands with the flag:
+  ```bash
+  --incompatible_use_python_toolchains=false
+  ```
+- Consider using [pyenv](https://realpython.com/intro-to-pyenv/) to manage Python versions
+
+### 5. Android Emulator Issues
+
+**Symptoms:**
+- APK installation fails
+- Emulator not starting
+- App not visible after installation
+
+**Solution:**
+- Ensure the Android emulator is running before executing bazel run commands
+- Try manually installing the APK:
+  1. Find the APK at: `bazel-bin/android/demo/install.runfiles/player/android/demo/demo.apk`
+  2. Drag this APK file onto your emulated Android device
+  3. Swipe on the device to see the installed application
+- Check emulator system image compatibility (use Sv2 system images)
+
+## iOS Development Issues
+
+### 1. Swift Compiler Metadata Errors
+
+**Symptoms:**
+```
+Unable to parse compiler-emitted metadata at `file:///path/to/Wrappers.swiftconstvalues`: The file "Wrappers.swiftconstvalues" couldn't be opened because there is no such file.
+```
+
+**Solution:**
+This occurs when Xcode tries to compile Swift files directly instead of using Bazel's pre-built outputs.
+
+1. **Regenerate the Xcode project:**
+   ```bash
+   bazel clean
+   bazel run //ios:xcodeproj
+   ```
+
+2. **Use the correct scheme:** Ensure you're using the "PlayerUIDemo" scheme in Xcode (not individual library schemes)
+
+3. **Clean Xcode build folder:** In Xcode, go to Product → Clean Build Folder
+
+### 2. Xcode Project Generation Issues
+
+**Symptoms:**
+- Xcode project won't open
+- Missing targets in Xcode
+- Build failures in Xcode but not in Bazel
+
+**Solution:**
+- Always regenerate the Xcode project after making changes to BUILD files:
+  ```bash
+  bazel run //ios:xcodeproj
+  ```
+- Ensure you've built the project with Bazel first (Xcode relies on Bazel's outputs)
+- Check that all dependencies are properly configured in BUILD files
+
+### 3. Swift Package Manager Issues
+
+**Symptoms:**
+- External dependencies not found
+- Package resolution failures
+- Module import errors
+
+**Solution:**
+1. **Update package dependencies:**
+   ```bash
+   bazel run //:swift_update_pkgs
+   ```
+
+2. **Check MODULE.bazel:** Ensure new dependencies are listed in the `use_repo` call
+
+3. **Verify Package.swift:** Make sure dependencies are added to both the main `Package.swift` and `xcode/Package.swift`
+
+### 4. iOS Simulator Issues
+
+**Symptoms:**
+- App won't launch in simulator
+- Simulator not found
+- Wrong simulator version
+
+**Solution:**
+- Check simulator configuration in `.bazelrc`:
+  ```bash
+  common --ios_simulator_device="iPhone 16 Pro"
+  common --ios_simulator_version="18.5"
+  ```
+- Ensure the specified simulator is installed in Xcode
+- Try running with a different simulator:
+  ```bash
+  bazel run //ios/demo:PlayerUIDemo --ios_simulator_device="iPhone 15"
+  ```
+
+### 5. Build Target Issues
+
+**Symptoms:**
+- Can't build certain targets with `/...`
+- `swift_library` targets fail to build directly
+
+**Solution:**
+- Don't use `/...` for building - use individual targets instead
+- Build through test targets or the demo application rather than library targets directly
+- Example: Build `//ios/core:PlayerUITests` instead of trying to build `PlayerUIInternalTestUtilities` directly
+
+## Web/Core Development Issues
+
+### 1. Node.js Version Issues
+
+**Symptoms:**
+- npm/pnpm installation failures
+- Build failures with JavaScript/TypeScript code
+
+**Solution:**
+- Ensure you're using the correct Node.js version (check `.nvmrc` if present)
+- Use Node Version Manager (nvm) to switch versions:
+  ```bash
+  nvm use
+  ```
+
+### 2. pnpm Issues
+
+**Symptoms:**
+- Package installation failures
+- Lock file conflicts
+
+**Solution:**
+- Ensure you're using pnpm >= 9.0.0:
+  ```bash
+  pnpm --version
+  ```
+- Clear pnpm cache and reinstall:
+  ```bash
+  pnpm store prune
+  pnpm install
+  ```
+
+### 3. TypeScript Compilation Issues
+
+**Symptoms:**
+- Type checking errors
+- Module resolution failures
+
+**Solution:**
+- Check TypeScript configuration in relevant `tsconfig.json` files
+- Ensure all dependencies are properly installed
+- Try cleaning and rebuilding:
+  ```bash
+  bazel clean
+  bazel build //path/to/target
+  ```
+
+## Documentation Site Issues
+
+### 1. Astro Development Server Issues
+
+**Symptoms:**
+- Dev server won't start
+- Build failures for docs site
+
+**Solution:**
+- Ensure you have the Android NDK installed (required for docs site)
+- Check that all dependencies are installed:
+  ```bash
+  cd docs/site
+  pnpm install
+  ```
+- Try running the dev server directly:
+  ```bash
+  bazel run //docs/site:dev
+  ```
+
+### 2. MDX Content Issues
+
+**Symptoms:**
+- MDX files not rendering properly
+- Frontmatter errors
+
+**Solution:**
+- Verify MDX frontmatter syntax is correct
+- Check for proper file extensions (`.mdx` not `.md`)
+- Ensure content follows MDX syntax rules
+
+## Getting Help
+
+If you're still experiencing issues after trying these solutions:
+
+1. **Search existing issues:** Check the [GitHub issues](https://github.com/player-ui/player/issues) for similar problems
+2. **Create a new issue:** If you can't find a solution, [create a new issue](https://github.com/player-ui/player/issues/new/choose) with:
+   - Detailed description of the problem
+   - Steps to reproduce
+   - Your environment details (OS, versions, etc.)
+   - Error messages or logs
+3. **Join discussions:** Ask questions in [GitHub Discussions](https://github.com/player-ui/player/discussions)
+
+## Prevention Tips
+
+- **Keep dependencies updated:** Regularly update your development tools
+- **Use recommended versions:** Stick to the versions specified in the [requirements](/contributing/#requirements)
+- **Clean builds:** When in doubt, try a clean build first
+- **Environment consistency:** Use the same environment setup across your team
+- **Documentation:** Keep your local setup documented for easy troubleshooting
+
+For platform-specific setup guides, see:
+- [Android Development Guide](/contributing/android)
+- [iOS Development Guide](/contributing/ios)
