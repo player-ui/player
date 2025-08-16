@@ -69,8 +69,6 @@ js_library(
     visibility = ["//visibility:public"],
     deps = [
         ":node_modules/@types/node",
-        ":node_modules/@types/react",
-        ":node_modules/react",
         ":node_modules/tsup",
         ":node_modules/typescript",
         ":node_modules/vitest",
