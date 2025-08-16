@@ -11,7 +11,7 @@ type SidebarEntry = (typeof sidebar)[number];
 
 /** Get the icon for a group. Update the icon names in the array to change the icons associated with a group. */
 const getIcon = (index: number) =>
-  (["seti:video", "puzzle", "setting"] as const)[index];
+  (["seti:video", "pencil", "puzzle", "setting"] as const)[index];
 
 function getFirstEntry(entry: SidebarEntry) {
   if (entry.type === "group") {
