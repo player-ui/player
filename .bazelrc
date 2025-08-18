@@ -27,6 +27,8 @@ common --experimental_google_legacy_api
 build --noincremental_dexing --fat_apk_cpu=armeabi-v7a,arm64-v8a,x86,x86_64
 mobile-install --start=warm
 
+# Cache Config for Build: the cache occassionally becomes corrupted. Comment out this block to disable caching.
+# Then build (wait for success), uncomment the block, and build again. This should fix the issue.
 build --bes_results_url=https://app.buildbuddy.io/invocation/
 build --bes_backend=grpcs://remote.buildbuddy.io
 build --remote_cache=grpcs://remote.buildbuddy.io

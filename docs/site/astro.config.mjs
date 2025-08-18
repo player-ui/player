@@ -117,6 +117,15 @@ export default defineConfig({
           ],
         },
         {
+          label: "Contributing",
+          items: [
+            {
+              label: "Contributing",
+              autogenerate: { directory: "contributing" },
+            },
+          ],
+        },
+        {
           label: "Plugins",
           items: [
             {

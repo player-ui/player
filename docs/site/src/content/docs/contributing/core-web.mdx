@@ -1,0 +1,203 @@
+---
+title: Core & Web Development Guide
+description: Complete guide for Core and Web development with Player
+---
+
+import { Aside, Steps, Card, CardGrid, FileTree, Tabs, TabItem } from '@astrojs/starlight/components';
+
+This guide covers everything you need to know for developing Player plugins and core functionality using TypeScript and JavaScript.
+
+## Quick Start
+
+### Demo Application
+
+The demo app can be built and launched from the command line with Bazel:
+
+```bash
+bazel build //docs/site:site
+bazel run //docs/site:site
+```
+
+## Plugin Development
+
+Adding a new plugin is straightforward using predefined macros for `BUILD.bazel` files.
+
+### Core vs React Plugins
+
+- **Core plugins** provide shared functionality usable on all platforms. Since Player Core runs on every platform, any core Player plugin will also run on every platform, allowing shared functionality to be authored once and used everywhere.
+
+- **React plugins** add React-specific functionality and components.
+
+### Plugin Structure
+
+All plugins follow a common structure:
+
+<FileTree>
+- plugins/example
+  - react/
+    - BUILD.bazel
+    - src/
+      - index.tsx
+      - __tests__/
+        - index.test.tsx
+    - package.json
+  - core/
+    - BUILD.bazel
+    - src/
+      - index.ts
+      - __tests__/
+        - index.test.ts
+    - package.json
+</FileTree>
+
+### Scaffolding a New Plugin
+
+To scaffold your plugin, create a new `core` or `react` folder in the appropriate plugin directory, with the appropriate folders, a `package.json`, and a blank `BUILD.bazel`:
+
+<Tabs>
+  <TabItem label="Core Plugin">
+    ```bash
+    mkdir -p plugins/example-plugin/core/src
+    cd plugins/example-plugin/core
+    pnpm init
+    touch BUILD.bazel
+    ```
+  </TabItem>
+  <TabItem label="React Plugin">
+    ```bash
+    mkdir -p plugins/example-plugin/react/src
+    cd plugins/example-plugin/react
+    pnpm init
+    touch BUILD.bazel
+    ```
+  </TabItem>
+</Tabs>
+
+### Package Configuration
+
+Set the name, version, and entry point of the package in the `package.json`:
+
+<Tabs>
+  <TabItem label="Core Plugin">
+    ```json
+    {
+      "name": "@player-ui/example-plugin-core",
+      "version": "0.0.0-PLACEHOLDER",
+      "main": "src/index.ts"
+    }
+    ```
+  </TabItem>
+  <TabItem label="React Plugin">
+    ```json
+    {
+      "name": "@player-ui/example-plugin-react",
+      "version": "0.0.0-PLACEHOLDER",
+      "main": "src/index.tsx"
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  The package follows a naming convention of <code>@player-ui/&#123;description&#125;-plugin-&#123;platform&#125;</code>.
+</Aside>
+
+### BUILD Configuration
+
+The `js_pipeline` macro handles the full build process:
+
+```python
+load("@rules_player//javascript:defs.bzl", "js_pipeline")
+
+js_pipeline(package_name = "@player-ui/example-plugin-core")
+```
+
+#### Adding Bundling Support
+
+To use the `tsup` bundler, add `tsup_config` to the `BUILD.bazel` file:
+
+```python
+load("//tools:defs.bzl", "tsup_config")
+
+tsup_config(name = "tsup_config")
+```
+
+#### Adding Testing Support
+
+All plugins leverage `vitest` for testing. To use `vitest`, add `vitest_config` to the `BUILD.bazel` file:
+
+```python
+load("//tools:defs.bzl", "vitest_config")
+
+vitest_config(name = "vitest_config")
+```
+
+## Dependency Management
+
+Since each package can have different external dependencies, they each need their own `node_modules`. `pnpm` supports a single lock file for multiple packages by setting up a `pnpm-workspace.yaml`. The resulting lock file can be used by `rules_js` to set up a Bazel workspace with multiple packages that each get their own `node_modules` folder in the bin tree.
+
+### Setting Up Node Modules
+
+The `npm_link_all_packages` rule automatically sets up the correct `node_modules` folder based on the Bazel package name and the `pnpm-lock.yaml`. Add the following to your `BUILD.bazel` file:
+
+```python
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+```
+
+### Specifying Dependencies
+
+`js_pipeline` takes `deps`, `test_deps`, and `peer_deps` to allow specifying dependencies:
+
+```python
+js_pipeline(
+    package_name = "@player-ui/example-plugin-core",
+    peer_deps = [
+        "//:node_modules/react",
+    ],
+    deps = [
+        ":node_modules/@player-ui/react-subscribe",
+    ],
+    test_deps = [
+        ":node_modules/@player-ui/common-types-plugin",
+    ],
+)
+```
+
+<Aside type="note">
+  <ul>
+    <li>
+      <strong>External dependencies</strong> are specified as <code>//:node_modules/...</code> with the leading <code>//</code>
+    </li>
+    <li>
+      <strong>Internal dependencies</strong> are specified as <code>:node_modules/...</code> without the leading <code>//</code>
+    </li>
+  </ul>
+</Aside>
+
+### Package.json Dependencies
+
+Internal dependencies also need to be added to the `package.json` as a dependency, dev dependency, or peer dependency:
+
+```json
+{
+  ...
+  "dependencies": {
+    "@player-ui/react-subscribe": "workspace:*",
+  },
+  "devDependencies": {
+    "@player-ui/common-types-plugin": "workspace:*",
+  }
+  ...
+}
+```
+
+### Bazel Ignore Configuration
+
+Add the new package's `node_modules` directory to `.bazelignore`:
+
+```
+plugins/example-plugin/core/node_modules
+plugins/example-plugin/react/node_modules
+```

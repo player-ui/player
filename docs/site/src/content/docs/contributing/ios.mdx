@@ -1,0 +1,353 @@
+---
+title: iOS Development Guide
+description: Complete guide for iOS development with Player
+---
+
+import { Aside, FileTree } from '@astrojs/starlight/components';
+
+This comprehensive guide covers everything you need to know for iOS development with Player, from basic setup to advanced plugin development.
+
+## Quick Start
+
+### Xcode Project Generation
+
+Generate the `.xcodeproj` to open and work in Xcode. Builds and tests will be executed through bazel to ensure behavioral parity.
+
+```bash
+bazel run //ios:xcodeproj
+open -a Xcode ios/PlayerUI.xcodeproj/
+```
+
+### Demo Application
+
+#### Running in Xcode
+The first time the Xcode project is generated, the default selected target is `PlayerUI`. For a runnable target, select `PlayerUIDemo` to run the demo application in the simulator.
+
+#### Running with Bazel
+The demo app can also be built and launched in a simulator from the command line:
+
+```bash
+bazel run //ios/demo:PlayerUIDemo
+```
+
+## Important Build Notes
+
+<Aside type="note">
+  When building or testing targets with Bazel, it is not recommended to build all targets under a package using <code>/...</code> as some targets—such as those using <code>swift_library</code> (e.g., <code>PlayerUIInternalTestUtilities</code> and <code>PlayerUIReferenceAssets</code>)—are not buildable due to running on macOS or requiring iOS SDKs.
+</Aside>
+
+**Best Practice:** Build individual targets through those that depend on the underlying targets using `swift_library`. In practice, this primarily means building through test targets or the example application.
+
+**Example:** You can't build `PlayerUIInternalTestUtilities` directly, but you can build `//ios/core:PlayerUITests` which builds `PlayerUIInternalTestUtilities` through it being a test dependency.
+
+**Note:** It's perfectly fine to use `/...` when [querying targets](#examining-targets) because querying just lists targets without building anything.
+
+## Plugin Development
+
+Adding new plugins is straightforward using predefined macros for `BUILD.bazel` files. Additional steps are required to include new code in final artifacts and the Xcode project.
+
+### iOS vs SwiftUI Plugins
+
+- **iOS plugins** provide generic functionality to any Player implementation on iOS. Generally these plugins load core JavaScript plugin functionality into Swift and provide Swift APIs.
+
+- **SwiftUI plugins** are targeted at the specific `SwiftUIPlayer` implementation and typically link Player functionality into the SwiftUI environment.
+
+### Plugin Structure
+
+All iOS plugins follow a common structure:
+
+<FileTree>
+- plugins/example
+  - ios/
+    - BUILD.bazel
+    - Sources/
+      - ExamplePlugin.swift
+    - Tests/
+      - ExamplePluginTests.swift
+  - swiftui/
+    - BUILD.bazel
+    - Sources/
+      - ExamplePlugin.swift
+    - ViewInspector/
+      - ExamplePluginViewInspectorTests.swift
+</FileTree>
+
+### Scaffolding a New Plugin
+
+**For iOS plugins:**
+```bash
+mkdir -p plugins/example/ios/Sources
+mkdir -p plugins/example/ios/Tests
+touch plugins/example/ios/BUILD.bazel
+```
+
+**For SwiftUI plugins:**
+```bash
+mkdir -p plugins/example/swiftui/Sources
+mkdir -p plugins/example/swiftui/ViewInspector
+touch plugins/example/swiftui/BUILD.bazel
+```
+
+### BUILD Configuration
+
+#### iOS Plugin BUILD.bazel
+```python
+load("//tools/ios:util.bzl", "ios_plugin")
+
+ios_plugin(name = "ExamplePlugin")
+```
+
+#### SwiftUI Plugin BUILD.bazel
+```python
+load("//tools/ios:util.bzl", "swiftui_plugin")
+
+swiftui_plugin(
+    name = "ExamplePlugin",
+    resources = [],
+    deps = [
+        "//ios/swiftui:PlayerUISwiftUI"
+    ]
+)
+```
+
+#### Adding Dependencies
+
+Both `ios_plugin` and `swiftui_plugin` accept `deps` and `test_deps`:
+
+```python
+swiftui_plugin(
+    name = "ExamplePlugin",
+    resources = [],
+    deps = [
+        "//ios/swiftui:PlayerUISwiftUI"
+    ],
+    test_deps = [
+        "//plugins/reference-assets/swiftui:PlayerUIReferenceAssets",
+    ]
+)
+```
+
+#### JavaScript Resources
+
+Many iOS plugins are built on top of core JavaScript plugin functionality. Include JS resources easily:
+
+```python
+ios_plugin(
+    name = "ExamplePlugin",
+    resources = ["//plugins/example/core:core_native_bundle"]
+)
+
+swiftui_plugin(
+    name = "ExamplePlugin",
+    resources = ["//plugins/example/core:core_native_bundle"]
+)
+```
+
+This creates a resource bundle with the provided name and necessary runtime files for accessing `Bundle.module` from bazel. These resource bundles and extensions are only ever created at runtime by bazel - they can be viewed in Xcode, but the project needs to be built first to generate the files.
+
+<Aside type="tip">
+  For iOS plugins, the <code>js_pipeline</code> for the core plugin should have <code>native_bundle</code> set to match the <code>name</code> in the <code>ios_plugin</code>:
+
+  ```python
+  js_pipeline(
+      native_bundle = "ExamplePlugin"
+      ...
+  )
+  ```
+</Aside>
+
+#### Examining Targets
+
+List all targets exposed from any `BUILD.bazel` file:
+
+```bash
+bazel query //plugins/example/ios/...
+```
+
+The `name` passed into `ios_plugin` or `swiftui_plugin` is prefixed with `PlayerUI` by default:
+
+```python
+ios_plugin(name = "ExamplePlugin")  # Creates "PlayerUIExamplePlugin"
+```
+
+### Xcode Integration
+
+Add new plugins to be visible and testable in Xcode by adding the test target to `ios/BUILD.bazel`:
+
+```python
+xcodeproj(
+    name = "xcodeproj",
+    project_name = "PlayerUI",
+    tags = ["manual"],
+    top_level_targets = [
+        ...,
+        "//plugins/example/ios:PlayerUIExamplePluginTests",
+        # or for swiftui
+        "//plugins/example/swiftui:PlayerUIExamplePluginViewInspectorTests",
+    ],
+)
+```
+
+After adding the target, regenerate the Xcode project:
+```bash
+bazel run //ios:xcodeproj
+```
+
+### Package Manager Integration
+
+#### Package.swift
+
+Add new plugins to the appropriate array in `Package.swift`:
+
+```swift
+let ios_plugins: [SwiftPlugin] = [
+    ...,
+    (name: "ExamplePlugin", path: "example", resources: true)
+]
+```
+
+**For utility packages** that don't fit the plugin pattern:
+```swift
+products: [
+    ...,
+    .playerPackage("PlayerUIUtilityPackage")
+]
+```
+
+#### PlayerUI.podspec
+
+In `PlayerUI.podspec`, subspecs are listed in a single location, and there are `ios_plugin` and `swiftui_plugin` functions to generate the subspec entries:
+
+```ruby
+# Plugin Name, Path, Resources
+ios_plugin.call("ExamplePlugin", "example", FALSE)
+# Plugin Name, Path, Dependencies, Resources
+swiftui_plugin.call("ExamplePlugin", "example", ["OtherPlugin"], FALSE)
+```
+
+##### Adding Utility Packages
+
+For packages that do not fit the plugin pattern, subspecs must be manually specified to set the appropriate file paths for Sources and Resources.
+
+### Final Artifacts
+
+Add new plugins to the root `BUILD.bazel` for code artifacts:
+
+```python
+assemble_pod(
+    name = "PlayerUI_Pod",
+    srcs = glob([
+        "LICENSE",
+        "Package.swift",
+    ]),
+    data = {
+        ...,
+        "//plugins/example/ios:PlayerUIExamplePlugin_Sources": "plugins/example/ios/",
+        "//plugins/example/core:core_native_bundle": "plugins/example/ios/Resources/"
+    },
+    podspec = ":PlayerUI.podspec",
+)
+```
+
+## Advanced Usage
+
+### External Dependencies
+
+<Aside type="note">
+  As <code>PlayerUI</code> is published as both a Swift Package and a CocoaPod, external dependencies must be available on both package managers.
+</Aside>
+
+#### Bazel Configuration
+
+Bazel resolution of external Swift dependencies is done with [rules_swift_package_manager](https://github.com/cgrindel/rules_swift_package_manager).
+
+1. **Add dependencies to Package.swift files:**
+   - Add to both the main `Package.swift` (for final consumer users) and to `xcode/Package.swift` (for workspace use)
+   
+   <Aside type="tip">
+     With <code>Package.swift</code> manifest files, dependencies for consuming users are resolved regardless of whether or not the consuming user relies on the product with that dependency. Due to this, test packages and developer tooling can conflict with consuming users. To avoid this potential conflict, project level dependencies are redeclared in <code>xcode/Package.swift</code>. This allows the main <code>Package.swift</code> to contain dependencies only for the library targets, and no testing or tooling dependencies.
+   </Aside>
+
+2. **Regenerate the dependency index:**
+   ```bash
+   bazel run //:swift_update_pkgs
+   ```
+
+3. **Update `MODULE.bazel` to expose the package:**
+   ```python
+   use_repo(
+       swift_deps,
+       "swiftpkg_swift_hooks",
+       ...,
+       "swiftpkg_<package_name>"
+   )
+   ```
+   
+   <Aside type="note">
+     Package names are converted to snake case. If you are unsure what name to use, open <code>swift_deps.bzl</code> and search for the git repository for that dependency to find its entry and name.
+   </Aside>
+
+4. **Use the dependency in bazel targets:**
+   ```
+   @swiftpkg_<package_name>//:Sources_<PackageName>
+   ```
+
+### Custom Bazel Macros
+
+For complex use cases, use `ios_pipeline` directly instead of `ios_plugin` or `swiftui_plugin`:
+
+```python
+load("@rules_player//ios:defs.bzl", "ios_pipeline")
+
+ios_pipeline(
+    name = "PlayerUITestUtilitiesCore",
+    resources = ["//core/make-flow:make-flow_native_bundle"],
+    deps = [
+        "//ios/core:PlayerUI",
+        "//ios/swiftui:PlayerUISwiftUI",
+        "//ios/logger:PlayerUILogger"
+    ],
+    test_deps = [
+        "//plugins/reference-assets/swiftui:PlayerUIReferenceAssets",
+        "//ios/internal-test-utils:PlayerUIInternalTestUtilities"
+    ],
+    hasUnitTests = True,
+    hasViewInspectorTests = True
+)
+```
+
+### Custom Bazel Macros - Advanced Details
+
+Both `ios_plugin` and `swiftui_plugin` call the same `ios_pipeline` macro and hardcode some of the parameters to that pipeline. For more complex use cases, `ios_pipeline` can be used directly to generate tests for packages that have both regular unit tests as well as SwiftUI ViewInspector based tests.
+
+<Aside type="note">
+  The <code>ios_pipeline</code> macro is a common macro loaded from the <code>rules_player</code> repo. It requires a few peer dependencies that must be added in this main repo in order to work with the <code>ios_pipeline</code>, including SwiftLint and ViewInspector (SPM dependencies) and <code>build_bazel_rules_apple</code> and <code>build_bazel_rules_ios</code> (Rule dependencies).
+</Aside>
+
+## FAQ
+
+### How do I debug issues with resource bundles?
+
+Resource bundles are generated at runtime by Bazel. If you're having issues:
+
+1. **Build first**: Always build your target with Bazel before trying to access resources in Xcode
+2. **Check bundle paths**: Verify that the resource paths in your BUILD files match the actual file locations
+3. **Regenerate Xcode project**: After changing resource configurations, regenerate the Xcode project
+
+### Why can't I build certain targets directly with Bazel?
+
+Some targets using `swift_library` (like `PlayerUIInternalTestUtilities`) are not buildable directly due to platform requirements. Instead:
+
+- Build through test targets that depend on them
+- Build through the demo application
+- Use `bazel query` to explore targets without building them
+
+## Development Tips
+
+- Always regenerate the Xcode project after making changes to BUILD files
+- Resource bundles are generated at runtime by bazel - build first to see them in Xcode
+
+## Related Resources
+
+- [Main Contributing Guide](/contributing/) - General contributing guidelines
+- [Troubleshooting Guide](/contributing/troubleshooting/) - Solutions to common iOS development issues

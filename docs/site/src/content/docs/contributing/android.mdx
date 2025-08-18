@@ -1,0 +1,66 @@
+---
+title: Android Development Guide
+description: Complete guide for Android development with Player
+---
+
+This guide covers everything you need to know for contributing to Player on Android, from initial setup to troubleshooting common issues.
+
+## Local Development with Android Studio
+
+This setup has been tested on Android Studio Chipmunk (2021.2.1) and Android Studio Giraffe (2022.3.1), though other versions may work as well.
+
+### Prerequisites
+
+Make sure you have read the [main contributing requirements](/contributing/#requirements) first.
+
+### Setup Steps
+
+1. **Install Required SDKs**
+   - Once you have Android Studio installed, go to **Tools → SDK Manager → SDK Platforms**
+   - Make sure you have **only** the following SDK installed: **Android API 33**
+
+2. **Configure SDK Build Tools and NDK**
+   - Click on the **SDK Tools** tab
+   - Make sure you have only the following versions installed:
+     - **30.0.3** (SDK Build Tools)
+     - **27.1.12297006** (NDK)
+
+3. **Create Android Emulator**
+   - Click on **Device Manager** and create a new device
+   - You will need to download an **Sv2** system image
+   - You should now be able to click the play button to start your emulator
+
+4. **Build the Project**
+   ```bash
+   bazel build //android/demo
+   ```
+
+5. **Run the Demo App**
+   
+   You have several options to install and run the APK on your device:
+
+   **Option 1: Direct run (recommended)**
+   ```bash
+   bazel run //android:demo
+   ```
+
+   **Option 2: Install command**
+   ```bash
+   bazel run //android/demo:install
+   ```
+
+   **Option 3: Manual installation**
+   If the above commands don't work, you can manually install the APK:
+   1. Find the APK at: `bazel-bin/android/demo/install.runfiles/player/android/demo/demo.apk`
+   2. Drag this APK file onto your emulated Android device
+   3. This will install the app (you may need to swipe on the device to see the application)
+
+## Troubleshooting
+
+If you encounter issues during setup or development, check the [Troubleshooting Guide](/contributing/troubleshooting) for solutions to common Android development problems.
+
+## Development Tips
+
+- The Android emulator needs to be running before executing bazel run commands
+
+For general contributing guidelines, see the [main contributing guide](/contributing/).

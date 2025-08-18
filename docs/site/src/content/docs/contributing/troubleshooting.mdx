@@ -1,0 +1,77 @@
+---
+title: Troubleshooting Guide
+description: Common issues and solutions for Player development
+---
+
+import { Card, CardGrid, Aside } from '@astrojs/starlight/components';
+
+This guide covers documented issues that developers have encountered when contributing to Player and their solutions.
+
+<Aside type="tip" title="Quick Help">
+  Can't find your issue? Try searching for error messages or check our [GitHub Issues](https://github.com/player-ui/player/issues) for similar problems.
+</Aside>
+
+## Web & Core Development Issues
+<Aside type="note" title="No Issues Yet!">
+  🎉 Hooray! There are currently no documented issues. If you run into something tricky, let us know so we can help future contributors!
+</Aside>
+
+
+## Android Development Issues 
+<Aside type="note" title="No Issues Yet!">
+  🎉 Hooray! There are currently no documented issues. If you run into something tricky, let us know so we can help future contributors!
+</Aside>
+
+## iOS Development Issues
+
+### 1. iOS Builds Fail
+
+#### **Symptoms**
+The iOS build fails due to a `tsup` error even though the core files definitely exist. You may see an error like this:
+```
+/Users/---/dev/GitHub/player/core/types/BUILD:11:16: tsup core/types/dist/index.mjs failed: (Exit 1): types_tsup_build_tsup_bin failed: error executing tsup command (from target //core/types:types_tsup_build)
+```
+
+#### **Solution / Workaround**
+The most likely cause is a rare cache corruption.
+1. Go to `.bazelrc` and comment out the “Cache Config for Build” block.
+1. Run the command you were trying again. Wait for it to succeed.
+1. Uncomment the cache block.
+1. Run the command again. It should work properly now.
+
+
+### 2. ViewInspector Test Crashes
+
+**Symptoms:**
+- New ViewInspector tests crash when running
+- Test failures with threading-related errors
+
+**Solution:**
+ViewInspector requires the tests to be running on the main thread in a few different cases. To fix this, add `@MainActor` to the test class:
+
+```swift
+@MainActor
+class MyPluginViewInspectorTests: XCTestCase {
+    // Your ViewInspector tests here
+}
+```
+
+### 3. Swift Compiler Metadata Errors
+
+**Symptoms:**
+```
+Unable to parse compiler-emitted metadata at `file:///path/to/Wrappers.swiftconstvalues`: The file "Wrappers.swiftconstvalues" couldn't be opened because there is no such file.
+```
+
+**Solution:**
+This occurs when Xcode tries to compile Swift files directly instead of using Bazel's pre-built outputs.
+
+1. **Regenerate the Xcode project:**
+   ```bash
+   bazel clean
+   bazel run //ios:xcodeproj
+   ```
+
+2. **Use the correct scheme:** Ensure you're using the "PlayerUIDemo" scheme in Xcode (not individual library schemes)
+
+3. **Clean Xcode build folder:** In Xcode, go to Product → Clean Build Folder
