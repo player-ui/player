@@ -46,15 +46,33 @@ start-storybook:
 
 ### 📚 End Docs ###
 
+### Start Kotlin ###
+
+[doc('Test KT for lint errors')]
+test-kt:
+  bazel test $(bazel query --noshow_progress --output=label "kind('ktlint_test rule', ${2:-//...})" | tr '\n' ' ')
+
+[doc('Fix all auto-fixable KT lint errors')]
+format-kt:
+  #!/usr/bin/env bash
+  set -u -e -o pipefail
+
+  for target in $(bazel query --noshow_progress --output=label "kind('ktlint_fix rule', ${2:-//...})"); do
+    bazel run "$target"
+  done
+
+### End Kotlin ###
+
 ### 📦 Start Maven ###
 
-[doc('Install all generated artifacts into the system .m2 repository')]
+[doc('Install all Maven artifacts into the system .m2 repository')]
 mvn-install:
   #!/usr/bin/env bash
   set -u -e -o pipefail
 
   # Find all the maven packages in the repo
   readonly DEPLOY_LABELS=$(bazel query --output=label 'kind("maven_publish rule", //...) - attr("tags", "\[.*do-not-publish.*\]", //...)')
+  bazel build $DEPLOY_LABELS
   for pkg in $DEPLOY_LABELS ; do
     bazel run "$pkg" --define=maven_repo="file://$HOME/.m2/repository"
   done
