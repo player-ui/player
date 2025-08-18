@@ -1,25 +1,31 @@
-load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
-load("@rules_player//kotlin:defs.bzl", "lint")
-load(":deps.bzl", "main_deps", "main_exports")
+load("@rules_jvm_external//:defs.bzl", "artifact")
+load("@rules_player//kotlin:defs.bzl", "kt_android")
 
-exports_files([
-    "src/main/AndroidManifest.xml"
-])
+main_exports = [
+    "//android/player",
+]
 
-kt_android_library(
-    name = "assets",
-    srcs = glob(["src/main/java/**/*.kt"]),
-    custom_package = "com.intuit.playerui.android.reference.assets",
-    manifest = ":src/main/AndroidManifest.xml",
-    resource_files = glob(["src/main/res/**"]),
-    deps = main_deps,
-    exports = main_exports,
+main_deps = main_exports + [
+    "//plugins/pending-transaction/jvm:pending-transaction",
+    "//plugins/reference-assets/jvm:reference-assets",
+    # TODO: Somehow not including any of this is fine
+    # artifact("androidx.activity:activity-compose"),
+    # artifact("androidx.appcompat:appcompat"),
+    # artifact("androidx.compose.foundation:foundation"),
+    # artifact("androidx.compose.foundation:foundation-layout"),
+    # artifact("androidx.compose.runtime:runtime"),
+    # artifact("androidx.compose.ui:ui"),
+    # artifact("androidx.compose.ui:ui-tooling"),
+]
+
+instrumented_test_deps = [
+    "//android/testutils",
+]
+
+kt_android(
+    name = "reference-assets-android",
+    instrumented_test_deps = instrumented_test_deps,
+    main_deps = main_deps,
+    main_exports = main_exports,
     plugins = ["//android/player:jetpack_compose_compiler_plugin"],
-    visibility = ["//visibility:public"],
-)
-
-lint(
-    name = "assets",
-    srcs = glob(["src/main/**/*.kt"]),
-    lint_config = "//jvm:lint_config",
 )
