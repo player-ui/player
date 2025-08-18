@@ -20,6 +20,10 @@ main_deps = main_exports + [
 
 instrumented_test_deps = [
     "//android/testutils",
+    "//jvm/j2v8:j2v8-all",
+    # TODO: If we build a config for swapping between default android player runtimes,
+    #  we could dynamically depend on this and make sure we run all android player tests against all supported runtimes
+    # "//jvm/hermes:hermes-host",
 ]
 
 kt_android(
@@ -27,5 +31,5 @@ kt_android(
     instrumented_test_deps = instrumented_test_deps,
     main_deps = main_deps,
     main_exports = main_exports,
-    plugins = ["//android/player:jetpack_compose_compiler_plugin"],
+    plugins = ["//android:jetpack_compose_compiler_plugin"],
 )
