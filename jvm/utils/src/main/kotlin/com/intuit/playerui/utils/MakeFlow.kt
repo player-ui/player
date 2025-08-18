@@ -24,7 +24,6 @@ public open class MakeFlowModule internal constructor() : JSScriptPluginWrapper(
 
     public fun makeFlow(flow: String): JsonElement {
         ensureInitialized()
-        // TODO: Test this fails each runtime
         return makeFlow(instance.runtime.execute("($flow)") as Node)
     }
 

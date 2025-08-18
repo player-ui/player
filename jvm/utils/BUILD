@@ -2,7 +2,6 @@ load("//jvm:defs.bzl", "kt_player_module")
 
 main_deps = [
     "//jvm/core",
-    # "//jvm:kotlin_serialization"
 ]
 
 kt_player_module(
