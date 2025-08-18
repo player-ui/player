@@ -26,6 +26,7 @@ test_deps = [
 
 # TODO: Sources jar for src/main/kotlin includes main/kotlin
 kt_player_module(
+    # TODO: Maybe rename to player
     name = "core",
     main_deps = main_deps,
     main_exports = main_exports,
