@@ -99,7 +99,7 @@ build_constants(
     version_file = "//:VERSION",
 )
 
-bazel_dep(name = "rules_java", version = "7.2.0")
+bazel_dep(name = "rules_java", version = "8.13.0")
 bazel_dep(name = "rules_kotlin", version = "2.1.8")
 archive_override(
     module_name = "rules_kotlin", 
