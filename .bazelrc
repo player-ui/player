@@ -1,18 +1,14 @@
 test --test_output=errors
 coverage --combined_report=lcov
 
-# TODO: Custom compiler version breaks embedded jdeps generator plugin - enable when removing custom kotlinc
-# build --@rules_kotlin//kotlin/settings:jvm_emit_jdeps=False
-build --cxxopt=-std=c++17
+# C++ Specific Configs
+common --cxxopt=-std=c++17
 
 # Java Specific Configs
 common --java_language_version=17 
 common --tool_java_language_version=17 
 common --tool_java_language_version=17
 common --tool_java_runtime_version=17
-# build --java_runtime_version=remotejdk_17 
-# build --tool_java_runtime_version=remotejdk_17
-# build --repo_env=JAVA_HOME=../bazel_tools/jdk
 
 # Javascript Specific Configs
 common --@aspect_rules_ts//ts:skipLibCheck=always
@@ -29,7 +25,7 @@ common --@aspect_rules_ts//ts:skipLibCheck=always
 common --android_platforms=@rules_android//:x86,@rules_android//:x86_64,@rules_android//:armeabi-v7a,@rules_android//:arm64-v8a
 mobile-install --start=warm
 
-#iOS Flags
+# iOS Flags
 common --ios_simulator_device="iPhone 16 Pro"
 common --ios_simulator_version="18.5"
 
