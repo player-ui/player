@@ -1,7 +1,6 @@
 load("@rules_kotlin//kotlin:core.bzl", "define_kt_toolchain", "kt_compiler_plugin", "kt_kotlinc_options")
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@rules_kotlin//kotlin:lint.bzl", "ktlint_config")
-load("//jvm/dependencies:versions.bzl", "versions")
 
 exports_files([
     "pom.tpl",
