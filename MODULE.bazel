@@ -101,6 +101,11 @@ build_constants(
 
 bazel_dep(name = "rules_java", version = "7.2.0")
 bazel_dep(name = "rules_kotlin", version = "2.1.8")
+archive_override(
+    module_name = "rules_kotlin", 
+    urls = ["https://github.com/bazelbuild/rules_kotlin/releases/download/v2.1.8/rules_kotlin-v2.1.8.tar.gz"],
+    patches = ["//patches:rules_kotlin.allow_dupe_plugins.patch"],
+)
 
 # TODO: Custom compiler version breaks embedded jdeps generator plugin - enable when removing custom kotlinc (see .bazelrc jvm_emit_jdeps)
 # rules_kotlin_extensions = use_extension(
