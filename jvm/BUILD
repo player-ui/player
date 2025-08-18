@@ -1,3 +1,4 @@
+load("@rules_jvm_external//:defs.bzl", "artifact")
 load("@rules_kotlin//kotlin:core.bzl", "define_kt_toolchain", "kt_compiler_plugin", "kt_kotlinc_options")
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@rules_kotlin//kotlin:lint.bzl", "ktlint_config")
@@ -12,6 +13,7 @@ kt_compiler_plugin(
     id = "org.jetbrains.kotlin.serialization",
     stubs_phase = True,
     deps = [
+        # TODO: Can we just use this straight up?
         "@rules_kotlin//kotlin/compiler:kotlinx-serialization-compiler-plugin",
     ],
 )
@@ -22,7 +24,7 @@ kt_jvm_library(
     exported_compiler_plugins = [":serialization_plugin"],
     visibility = ["//visibility:public"],
     exports = [
-        "@maven//:org_jetbrains_kotlinx_kotlinx_serialization_core_jvm",
+        artifact("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm"),
     ],
 )
 

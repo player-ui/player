@@ -1,4 +1,5 @@
 load("@build_constants//:constants.bzl", "GROUP", "VERSION")
+load("@rules_java//java:java_library.bzl", "java_library")
 load("//jvm:defs.bzl", "distribution")
 
 deps = {
@@ -26,7 +27,7 @@ def j2v8_platform(platform, group = GROUP, version = VERSION):
         fail("platform must be defined in " + deps.keys())
 
     name = "j2v8-%s" % platform
-    native.java_library(
+    java_library(
         name = name,
         exports = [":j2v8"] + deps[platform],
         tags = ["maven_coordinates=%s:%s:%s" % (group, name, version)],

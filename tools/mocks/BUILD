@@ -1,3 +1,4 @@
+load("@rules_java//java:java_library.bzl", "java_library")
 load("@rules_player//player:defs.bzl", generate_mocks_manifest = "generate_mocks_manifest")
 load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 

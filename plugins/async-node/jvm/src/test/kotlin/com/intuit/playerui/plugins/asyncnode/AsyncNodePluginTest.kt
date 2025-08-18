@@ -1,7 +1,7 @@
 package com.intuit.playerui.plugins.asyncnode
 
 import com.intuit.hooks.BailResult
-import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin
+import com.intuit.playerui.plugins.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.player.state.inProgressState

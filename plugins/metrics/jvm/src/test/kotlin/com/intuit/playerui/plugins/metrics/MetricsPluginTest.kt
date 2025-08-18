@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.TestTemplate
 import org.junit.jupiter.api.extension.ExtendWith
 import kotlin.contracts.ExperimentalContracts
-import kotlin.test.assertEquals
 
 @ExtendWith(MockKExtension::class)
 internal class MetricsPluginTest : PlayerTest() {
