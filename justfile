@@ -65,6 +65,10 @@ format-kt:
 
 ### 📦 Start Maven ###
 
+[doc('Resolve Maven lockfile after modifying @maven dependencies')]
+mvn-pin-lockfile:
+  REPIN=1 bazel run @maven//:pin
+
 [doc('Install all Maven artifacts into the system .m2 repository')]
 mvn-install:
   #!/usr/bin/env bash
