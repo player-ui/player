@@ -4,11 +4,16 @@ module(
 )
 
 bazel_dep(name = "rules_player")
-archive_override(
+# archive_override(
+#     module_name = "rules_player",
+#     integrity = "sha256-xpjuz+HPnzovpdZoRnFuLipvhVDWFlLQzH1YSWsFrT0=",
+#     strip_prefix = "rules_player-2.0.0",
+#     urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v2.0.0.tar.gz"],
+# )
+git_override(
     module_name = "rules_player",
-    integrity = "sha256-xpjuz+HPnzovpdZoRnFuLipvhVDWFlLQzH1YSWsFrT0=",
-    strip_prefix = "rules_player-2.0.0",
-    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v2.0.0.tar.gz"],
+    remote = "https://github.com/player-ui/rules_player",
+    commit = "a52f82b614938c66070d4d7d6c1c18ec7d2b9b5a"
 )
 
 bazel_dep(name = "aspect_bazel_lib", version = "2.19.4")
