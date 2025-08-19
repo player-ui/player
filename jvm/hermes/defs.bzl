@@ -30,9 +30,6 @@ def _merge_jni_into_android_library_impl(context):
         source_lib[OutputGroupInfo],
         AndroidLibraryAarInfo(
             aar = merged_aar,
-            manifest = merged_aar,
-            aars_from_deps = [],
-            defines_local_resources = True,
         ),
     ]
 
