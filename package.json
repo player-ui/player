@@ -120,7 +120,7 @@
     "lucide-react": "^0.316.0",
     "lunr": "^2.3.9",
     "lz-string": "^1.4.4",
-    "mdast-util-from-markdown": "^2.0.0",
+    "mdast-util-from-markdown": "2.0.0",
     "mdast-util-toc": "^6.1.0",
     "mini-css-extract-plugin": "^2.8.1",
     "monaco-editor": "^0.51.0",
