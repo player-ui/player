@@ -6,7 +6,7 @@ main_exports = [
 ]
 
 main_deps = main_exports + [
-    "//plugins/set-time-out/jvm:set-time-out",
+    "//plugins/set-time-out/jvm",
 ]
 
 main_resources = [

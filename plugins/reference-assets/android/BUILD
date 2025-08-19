@@ -1,13 +1,13 @@
 load("@rules_jvm_external//:defs.bzl", "artifact")
-load("@rules_player//kotlin:defs.bzl", "kt_android")
+load("//android:defs.bzl", "kt_android")
 
 main_exports = [
     "//android/player",
 ]
 
 main_deps = main_exports + [
-    "//plugins/pending-transaction/jvm:pending-transaction",
-    "//plugins/reference-assets/jvm:reference-assets",
+    "//plugins/pending-transaction/jvm",
+    "//plugins/reference-assets/jvm",
     # TODO: Somehow not including any of this is fine
     # artifact("androidx.activity:activity-compose"),
     # artifact("androidx.appcompat:appcompat"),
@@ -32,4 +32,6 @@ kt_android(
     main_deps = main_deps,
     main_exports = main_exports,
     plugins = ["//android:jetpack_compose_compiler_plugin"],
+    # Disable explicit API mode for reference module
+    main_opts = "//jvm:test_options",
 )

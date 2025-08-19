@@ -1,6 +1,6 @@
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 load("@rules_jvm_external//:defs.bzl", "artifact")
-load("@rules_player//kotlin:defs.bzl", "kt_android")
+load("//android:defs.bzl", "kt_android")
 
 string_flag(
     name = "runtime",
@@ -45,9 +45,9 @@ main_deps = main_exports + [
     "@maven//:androidx_constraintlayout_constraintlayout",
 
     # JVM plugin deps
-    "//plugins/beacon/jvm:beacon",
-    "//plugins/pubsub/jvm:pubsub",
-    "//plugins/coroutines/jvm:coroutines",
+    "//plugins/beacon/jvm",
+    "//plugins/pubsub/jvm",
+    "//plugins/coroutines/jvm",
 
     # Compose deps (compile-only)
     # ":compose_compile_only",
@@ -92,13 +92,6 @@ kt_android(
     instrumented_test_deps = instrumented_test_deps,
     plugins = ["//android:jetpack_compose_compiler_plugin"],
     unit_test_package = "com.intuit.playerui.android",
-)
-
-# TODO: Put in macro
-alias(
-    name = "player",
-    actual = "android",
-    visibility = ["//visibility:public"],
 )
 
 # java_import(

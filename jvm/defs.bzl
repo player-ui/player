@@ -61,6 +61,16 @@ def kt_player_module(
         test_runtime_deps = test_runtime_deps,
     )
 
+    (package, platform) = native.package_name().split("/")[-2:]
+    if name == package or name == "%s-%s" % (package, platform):
+        native.alias(
+            name = platform,
+            actual = name,
+            visibility = ["//visibility:public"],
+        )
+
+        # TODO: If test, alias test, etc. Requires upleveling
+
 def distribution(
         *,
         name,

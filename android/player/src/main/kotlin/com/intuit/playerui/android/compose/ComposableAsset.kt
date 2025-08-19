@@ -40,7 +40,7 @@ public abstract class ComposableAsset<Data> (
     serializer: KSerializer<Data>,
 ) : SuspendableAsset<Data>(assetContext, serializer) {
 
-    override suspend fun initView(data: Data) = ComposeView(requireContext()).apply {
+    override suspend fun initView(data: Data): View = ComposeView(requireContext()).apply {
         layoutParams = ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
     }
 
@@ -52,7 +52,7 @@ public abstract class ComposableAsset<Data> (
     }
 
     @Composable
-    fun compose(data: Data? = null) {
+    public fun compose(data: Data? = null) {
         val data: Data? by produceState(initialValue = data, key1 = this) {
             value = getData()
         }
@@ -67,7 +67,7 @@ public abstract class ComposableAsset<Data> (
     }
 
     @Composable
-    abstract fun content(data: Data)
+    public abstract fun content(data: Data)
 
     /**
      * Extension function to render a [RenderableAsset] within a [ComposableAsset].
@@ -78,7 +78,7 @@ public abstract class ComposableAsset<Data> (
      * @param tag The tag to be used to differentiate between the assets with same id. If not provided, the asset ID will be used. Also, defaults as the test tag for the container
      */
     @Composable
-    fun RenderableAsset.compose(
+    public fun RenderableAsset.compose(
         modifier: Modifier = Modifier,
         styles: AssetStyle? = null,
         tag: String? = null,

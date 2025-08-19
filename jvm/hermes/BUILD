@@ -10,8 +10,8 @@ main_exports = [
 ]
 
 main_deps = main_exports + [
-    "//plugins/console-logger/jvm:console-logger",
-    "//plugins/set-time-out/jvm:set-time-out",
+    "//plugins/console-logger/jvm",
+    "//plugins/set-time-out/jvm",
     artifact("com.facebook.fbjni:fbjni-java-only"),
     artifact("com.facebook.soloader:soloader"),
 ]
