@@ -30,6 +30,8 @@ npm_package(
     tags = ["do-not-publish"],
 )
 
+# TODO: This is being bundled where-ever relied on,
+#  should publish or not include in transitive scope
 java_library(
     name = "jar",
     resource_strip_prefix = "tools",

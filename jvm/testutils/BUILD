@@ -11,7 +11,8 @@ main_exports = [
 main_deps = main_exports + [
     # TODO: We probably shouldn't include all runtimes by default, runtime test target is a per-integration decision
     "//jvm/j2v8:j2v8-all",
-    "//jvm/graaljs",
+    # MARK: Disable GraalJS testing
+    # "//jvm/graaljs",
     "//jvm/hermes",
     "//jvm/hermes:hermes-host",
     "//tools/mocks:jar",
