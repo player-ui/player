@@ -41,10 +41,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TestName
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
-@Config(sdk = [28])
 @OptIn(ExperimentalCoroutinesApi::class)
 public abstract class AssetTest(private val group: String? = null) {
 

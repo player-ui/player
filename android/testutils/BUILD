@@ -21,7 +21,6 @@ main_deps = main_exports + [
     artifact("androidx.test:core"),
     artifact("androidx.test:runner"),
     artifact("org.jetbrains.kotlinx:kotlinx-coroutines-test"),
-    artifact("org.robolectric:robolectric"),
 ]
 
 kt_android(
