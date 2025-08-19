@@ -17,9 +17,9 @@ main_deps = main_exports + [
 # Test dependencies
 test_deps = [
     "//jvm/testutils",
-    "//plugins/beacon/jvm:beacon",
-    "//plugins/common-types/jvm:common-types",
-    "//plugins/reference-assets/jvm:reference-assets",
+    "//plugins/beacon/jvm",
+    "//plugins/common-types/jvm",
+    "//plugins/reference-assets/jvm",
     artifact("io.mockk:mockk"),
     artifact("org.amshove.kluent:kluent"),
 ]

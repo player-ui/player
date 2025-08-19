@@ -19,9 +19,9 @@ maven_test = [
 
 main_deps = maven_main + [
     "//jvm/utils",
-    "//plugins/reference-assets/android:assets",
-    "//plugins/common-types/jvm:common-types",
-    "//plugins/pending-transaction/jvm:pending-transaction",
+    "//plugins/reference-assets/android",
+    "//plugins/common-types/jvm",
+    "//plugins/pending-transaction/jvm",
     "//tools/mocks:jar",
 ]
 

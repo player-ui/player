@@ -126,7 +126,7 @@ public class AndroidPlayer private constructor(
         }
 
         public class CompositionLocalProvidedValuesHook : SyncHook<(HookContext, (List<ProvidedValue<*>>) -> Unit) -> Unit>() {
-            public fun call(hookContext: HookContext, updateProvidedValues: (List<ProvidedValue<*>>) -> Unit) = super.call { f, context -> f(context, updateProvidedValues) }
+            public fun call(hookContext: HookContext, updateProvidedValues: (List<ProvidedValue<*>>) -> Unit): Unit = super.call { f, context -> f(context, updateProvidedValues) }
         }
 
         public val context: ContextHook = ContextHook()

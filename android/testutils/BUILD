@@ -12,9 +12,9 @@ main_deps = [
     "//tools/mocks:jar",
     "@rules_robolectric//bazel:android-all",
     "//jvm/utils",
-    "//plugins/common-types/jvm:common-types",
-    "//plugins/pending-transaction/jvm:pending-transaction",
-    "//plugins/reference-assets/android:reference-assets-android",
+    "//plugins/common-types/jvm",
+    "//plugins/pending-transaction/jvm",
+    "//plugins/reference-assets/android",
 ]
 
 kt_android_library(
