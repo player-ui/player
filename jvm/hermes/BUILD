@@ -43,6 +43,8 @@ kt_jvm_library(
         ":hermes",
         "//jvm/hermes/src/main/jni:resources",
     ],
+    # TODO: Hack - avoid publishing and depending on hermes-host, but configure it for use in this repo
+    tags = ["maven_coordinates=%s:%s:%s" % (GROUP, "hermes", VERSION)],
 )
 
 android_library(

@@ -13,6 +13,7 @@ main_deps = main_exports + [
     "//jvm/j2v8:j2v8-all",
     "//jvm/graaljs",
     "//jvm/hermes",
+    "//jvm/hermes:hermes-host",
     "//tools/mocks:jar",
 ]
 
