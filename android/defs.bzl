@@ -4,7 +4,6 @@ load("@rules_player//kotlin:defs.bzl", _kt_android = "kt_android")
 
 DEFAULT_INSTRUMENTED_DEPS = [
     "@rules_robolectric//bazel:android-all",
-    artifact("org.robolectric:robolectric"),
 ]
 
 def kt_android(

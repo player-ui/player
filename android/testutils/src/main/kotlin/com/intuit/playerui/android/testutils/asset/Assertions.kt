@@ -46,7 +46,7 @@ public inline fun <reified T : PlayerFlowState> Player?.shouldBeAtState(assertio
     return this.state as T
 }
 
-suspend inline fun <reified T : PlayerFlowState> waitUntilState(state: PlayerFlowState?) {
+public suspend inline fun <reified T : PlayerFlowState> waitUntilState(state: PlayerFlowState?) {
     withTimeout(10000) {
         suspendCancellableCoroutine { continuation ->
             if (state !is T) runBlocking { delay(5) }

@@ -5,6 +5,7 @@ load("@rules_kotlin//kotlin:lint.bzl", "ktlint_config")
 
 exports_files([
     "pom.tpl",
+    "empty.jar",
 ])
 
 kt_compiler_plugin(

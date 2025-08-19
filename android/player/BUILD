@@ -1,4 +1,5 @@
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+load("@rules_java//java:java_import.bzl", "java_import")
 load("@rules_jvm_external//:defs.bzl", "artifact")
 load("//android:defs.bzl", "kt_android")
 
@@ -27,8 +28,23 @@ config_setting(
     flag_values = {":runtime": "hermes"},
 )
 
-# TODO: Runtime dependencies should probably not be exports
-main_exports = ["//jvm/core"] + select({
+# TODO: Hack for compile-only deps
+java_import(
+    name = "compose_compile_only",
+    jars = ["//jvm:empty.jar"],
+    neverlink = True,
+    tags = ["maven:compile-only"],
+    deps = [
+        artifact("androidx.compose.material:material"),
+    ]
+)
+
+main_exports = [
+    "//jvm/core",
+
+    artifact("androidx.databinding:viewbinding"),
+    artifact("androidx.transition:transition"),
+] + select({ # TODO: Runtime dependencies should probably not be exports
     "//android/player:j2v8_runtime": ["//jvm/j2v8:j2v8-android"],
     "//android/player:j2v8_debug_runtime": ["//jvm/j2v8:j2v8-android-debug"],
     "//android/player:hermes_runtime": ["//jvm/hermes:hermes-android"],
@@ -36,30 +52,18 @@ main_exports = ["//jvm/core"] + select({
 })
 
 main_deps = main_exports + [
-    "@maven//:androidx_databinding_viewbinding",
-    "@maven//:androidx_annotation_annotation",
-    "@maven//:androidx_core_core_ktx",
-    "@maven//:androidx_transition_transition",
-    "@maven//:androidx_lifecycle_lifecycle_runtime_ktx",
-    "@maven//:androidx_lifecycle_lifecycle_viewmodel_ktx",
-    "@maven//:androidx_constraintlayout_constraintlayout",
-
     # JVM plugin deps
     "//plugins/beacon/jvm",
     "//plugins/pubsub/jvm",
     "//plugins/coroutines/jvm",
 
+    artifact("androidx.constraintlayout:constraintlayout"),
+    artifact("androidx.lifecycle:lifecycle-viewmodel-ktx"),
+    artifact("androidx.lifecycle:lifecycle-runtime-ktx"),
+
     # Compose deps (compile-only)
-    # ":compose_compile_only",
-
-
-    "@maven//:androidx_appcompat_appcompat",
-    "@maven//:androidx_activity_activity_compose",
-    "@maven//:androidx_compose_foundation_foundation",
-    "@maven//:androidx_compose_foundation_foundation_layout",
-    "@maven//:androidx_compose_runtime_runtime",
-    "@maven//:androidx_compose_ui_ui",
-    "@maven//:androidx_compose_ui_ui_tooling",
+    # TODO: Split out into actual compose module to link properly
+    ":compose_compile_only",
 ]
 
 main_resources = [
@@ -73,7 +77,7 @@ main_resources = [
 unit_test_deps = [
     "//jvm/testutils",
     artifact("io.mockk:mockk"),
-    artifact("org.jetbrains.kotlinx:kotlinx-coroutines-test")
+    artifact("org.jetbrains.kotlinx:kotlinx-coroutines-test"),
 ]
 
 instrumented_test_deps = [
@@ -93,19 +97,3 @@ kt_android(
     plugins = ["//android:jetpack_compose_compiler_plugin"],
     unit_test_package = "com.intuit.playerui.android",
 )
-
-# java_import(
-#     name = "compose_compile_only",
-#     jars = [],
-#     neverlink = True,
-#     tags = ["maven:compile-only"],
-#     deps = [
-#         "@maven//:androidx_appcompat_appcompat",
-#         "@maven//:androidx_activity_activity_compose",
-#         "@maven//:androidx_compose_foundation_foundation",
-#         "@maven//:androidx_compose_foundation_foundation_layout",
-#         "@maven//:androidx_compose_runtime_runtime",
-#         "@maven//:androidx_compose_ui_ui",
-#         "@maven//:androidx_compose_ui_ui_tooling",
-#     ]
-# )
