@@ -9,7 +9,7 @@ main_exports = [
     artifact("org.jetbrains.kotlinx:kotlinx-serialization-json"),
 ]
 main_deps = main_exports + [
-    # TODO: Try pulling from @rules_kotlin -- might upgrade Kotlin :( should be kept in sync in the future
+    # TODO: Pull from rules_kotlin when compiler version reflects Kotlin version
     # "@rules_kotlin//kotlin/compiler:kotlin-reflect"
     artifact("org.jetbrains.kotlin:kotlin-reflect"),
 ]

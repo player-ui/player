@@ -20,7 +20,7 @@ main_deps = [
 ]
 
 test_deps = [
-    "//jvm/utils",
+    "//android/testutils",
 
     artifact("androidx.test.espresso:espresso-intents"),
     artifact("androidx.test.ext:junit-ktx"),

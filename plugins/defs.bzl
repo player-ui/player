@@ -94,5 +94,3 @@ def kt_player_plugin_wrapper(
             actual = name,
             visibility = ["//visibility:public"],
         )
-
-        # TODO: If test, alias test, etc. Requires upleveling

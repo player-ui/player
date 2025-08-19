@@ -14,7 +14,6 @@ kt_compiler_plugin(
     id = "org.jetbrains.kotlin.serialization",
     stubs_phase = True,
     deps = [
-        # TODO: Can we just use this straight up?
         "@rules_kotlin//kotlin/compiler:kotlinx-serialization-compiler-plugin",
     ],
 )

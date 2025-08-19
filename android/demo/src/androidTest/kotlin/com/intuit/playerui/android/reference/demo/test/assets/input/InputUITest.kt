@@ -12,7 +12,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.intuit.playerui.android.reference.demo.R
 import com.intuit.playerui.android.reference.demo.test.base.AssetUITest
-import com.intuit.playerui.android.reference.demo.test.base.shouldBeAtState
+import com.intuit.playerui.android.testutils.asset.shouldBeAtState
 import com.intuit.playerui.android.reference.demo.test.base.waitForViewInRoot
 import com.intuit.playerui.core.player.state.InProgressState
 import com.intuit.playerui.core.player.state.dataModel
