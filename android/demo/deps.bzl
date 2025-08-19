@@ -7,8 +7,6 @@ maven_main = [
     #"@maven//:com_squareup_leakcanary_leakcanary_android",
     # For when hermes-android _isn't_ included
     "@maven//:com_facebook_soloader_soloader",
-    # For when j2v8-android _isn't_ included
-    "@maven//:com_github_AlexTrotsenko_j2v8_debugger",
 ]
 
 maven_test = [

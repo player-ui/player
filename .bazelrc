@@ -23,7 +23,8 @@ common --@aspect_rules_ts//ts:skipLibCheck=always
 # Android demo app flags
 # build --noincremental_dexing
 common --android_platforms=@rules_android//:x86,@rules_android//:x86_64,@rules_android//:armeabi-v7a,@rules_android//:arm64-v8a
-mobile-install --start=warm
+mobile-install --mobile_install_aspect=@rules_android//mobile_install:mi.bzl --mobile_install_supported_rules=android_binary
+
 
 # iOS Flags
 common --ios_simulator_device="iPhone 16 Pro"

@@ -85,7 +85,13 @@ alias maven-install := mvn-install
 
 [doc('Build and run the Android demo app in an emulator')]
 start-android-demo:
-  bazel run //android/demo:install
+  bazel mobile-install //android/demo
+
+[doc('If start-android-demo is failing, this approach will build the APK and use ADB manually to install the app')]
+start-android-demo-manual:
+  bazel build //android/demo
+  adb install -r -d bazel-bin/android/demo/demo.apk
+  adb shell monkey -p com.intuit.playerui.android.reference.demo 1
 
 ### 🤖 End Android ###
 

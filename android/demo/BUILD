@@ -1,6 +1,5 @@
-load("@rules_android//android:rules.bzl", "android_binary", "android_library")
+load("@rules_android//android:rules.bzl", "android_binary")
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
-load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_import")
 load("@rules_player//kotlin:defs.bzl", "lint")
 load(":deps.bzl", "main_deps", "test_deps")
 
@@ -38,13 +37,6 @@ android_binary(
     instruments = ":demo",
     manifest = ":src/androidTest/AndroidManifest.xml",
     deps = ["demo_ui_test"],
-)
-
-sh_binary(
-    name = "install",
-    srcs = ["scripts/androidinstall.sh"],
-    data = [":demo"],
-    deps = [],
 )
 
 sh_test(
