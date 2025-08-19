@@ -9,7 +9,6 @@ main_deps = main_exports + [
     "//plugins/pending-transaction/jvm",
     "//plugins/reference-assets/jvm",
     artifact("androidx.compose.material:material"),
-    artifact("androidx.compose.ui:ui"),
 ]
 
 instrumented_test_deps = [
