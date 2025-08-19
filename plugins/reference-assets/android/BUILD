@@ -8,14 +8,8 @@ main_exports = [
 main_deps = main_exports + [
     "//plugins/pending-transaction/jvm",
     "//plugins/reference-assets/jvm",
-    # TODO: Somehow not including any of this is fine
-    # artifact("androidx.activity:activity-compose"),
-    # artifact("androidx.appcompat:appcompat"),
-    # artifact("androidx.compose.foundation:foundation"),
-    # artifact("androidx.compose.foundation:foundation-layout"),
-    # artifact("androidx.compose.runtime:runtime"),
-    # artifact("androidx.compose.ui:ui"),
-    # artifact("androidx.compose.ui:ui-tooling"),
+    artifact("androidx.compose.material:material"),
+    artifact("androidx.compose.ui:ui"),
 ]
 
 instrumented_test_deps = [
@@ -24,6 +18,7 @@ instrumented_test_deps = [
     # TODO: If we build a config for swapping between default android player runtimes,
     #  we could dynamically depend on this and make sure we run all android player tests against all supported runtimes
     # "//jvm/hermes:hermes-host",
+    "//tools/mocks:jar",
 ]
 
 kt_android(
