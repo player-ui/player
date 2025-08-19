@@ -55,7 +55,7 @@ lint-kt:
 [doc('Fix all auto-fixable KT lint errors')]
 format-kt:
   #!/usr/bin/env bash
-  set -u -e -o pipefail
+  set -u +e -o pipefail
 
   for target in $(bazel query --noshow_progress --output=label "kind('ktlint_fix rule', ${2:-//...})"); do
     bazel run "$target"
