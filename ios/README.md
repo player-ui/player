@@ -311,3 +311,20 @@ ios_pipeline(
     hasViewInspectorTests = True
 )
 ```
+
+## Troubleshooting
+
+### 1. iOS Builds Fail
+
+#### **Symptoms**
+The iOS build fails due to a `tsup` error even though the core files definitely exist. You may see an error like this:
+```
+/Users/---/dev/GitHub/player/core/types/BUILD:11:16: tsup core/types/dist/index.mjs failed: (Exit 1): types_tsup_build_tsup_bin failed: error executing tsup command (from target //core/types:types_tsup_build)
+```
+
+#### **Solution / Workaround**
+The most likely cause is a rare cache corruption.
+1. Go to `.bazelrc` and comment out the “Cache Config for Build” block.
+1. Run the command you were trying again. Wait for it to succeed.
+1. Uncomment the cache block.
+1. Run the command again. It should work properly now.
