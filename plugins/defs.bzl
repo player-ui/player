@@ -86,3 +86,13 @@ def kt_player_plugin_wrapper(
         main_opts = "//jvm:main_options",
         test_opts = "//jvm:test_options",
     )
+
+    (package, platform) = native.package_name().split("/")[-2:]
+    if name == package or name == "%s-%s" % (package, platform):
+        native.alias(
+            name = platform,
+            actual = name,
+            visibility = ["//visibility:public"],
+        )
+
+        # TODO: If test, alias test, etc. Requires upleveling

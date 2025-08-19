@@ -1,47 +1,30 @@
-load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
-load("@rules_player//kotlin:defs.bzl", "lint")
-load("@build_constants//:constants.bzl", "VERSION")
-load("//jvm:defs.bzl", "distribution")
+load("@rules_jvm_external//:defs.bzl", "artifact")
+load("//android:defs.bzl", "kt_android")
 
-main_deps = [
-    "@maven//:androidx_test_core",
-    "@maven//:androidx_test_runner",
-    "@maven//:junit_junit",
-    "@maven//:org_robolectric_robolectric",
-    "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_test",
-    "//tools/mocks:jar",
-    "@rules_robolectric//bazel:android-all",
+main_exports = [
+    "//android/player",
     "//jvm/utils",
+
+    artifact("junit:junit"),
+]
+
+main_deps = main_exports + [
+    # TODO: We probably shouldn't include all runtimes by default, runtime test target is a per-integration decision
+    "//jvm/j2v8:j2v8-all",
+    "//jvm/graaljs",
+    "//jvm/hermes",
+
     "//plugins/common-types/jvm",
     "//plugins/pending-transaction/jvm",
     "//plugins/reference-assets/android",
+
+    artifact("androidx.test:core"),
+    artifact("androidx.test:runner"),
+    artifact("org.jetbrains.kotlinx:kotlinx-coroutines-test"),
+    artifact("org.robolectric:robolectric"),
 ]
 
-kt_android_library(
-    name = "testutils_android",
-    srcs = glob(["src/main/java/**/*.kt"]),
-    custom_package = "com.intuit.playerui.android.testutils",
-    manifest = ":src/main/AndroidManifest.xml",
-    deps = main_deps,
-)
-
-android_library(
+kt_android(
     name = "testutils",
-    custom_package = "com.intuit.playerui.android.testutils",
-    manifest = ":src/main/AndroidManifest.xml",
-    tags = ["maven_coordinates=com.intuit.playerui.android:testutils:aar:%s" % VERSION],
-    visibility = ["//visibility:public"],
-    exports = [":testutils_android"],
-    deps = main_deps,
-)
-
-distribution(
-    name = "testutils",
-    maven_coordinates = "com.intuit.playerui.android:testutils:%s" % VERSION,
-)
-
-lint(
-    name = "testutils",
-    srcs = glob(["src/main/**/*.kt"]),
-    lint_config = "//jvm:lint_config",
+    main_deps = main_deps,
 )

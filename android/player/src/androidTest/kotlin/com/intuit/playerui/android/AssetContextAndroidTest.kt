@@ -11,8 +11,11 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.runner.RunWith
+import androidx.test.runner.AndroidJUnit4
 
-internal class AssetContextAndroidTest {
+@RunWith(AndroidJUnit4::class)
+class AssetContextAndroidTest {
 
     private val context: Context get() =
         InstrumentationRegistry.getInstrumentation().targetContext
@@ -28,7 +31,10 @@ internal class AssetContextAndroidTest {
         override fun initView() = TextView(context)
         override fun View.hydrate() = Unit
     }
-    private val assetContext = AssetContext(context, assetMap.toAsset(), player, ::renderableAsset)
+
+    private val assetContext by lazy {
+        AssetContext(context, assetMap.toAsset(), player, ::renderableAsset)
+    }
 
     @Test
     fun testAssetContextEquality() {
