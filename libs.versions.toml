@@ -1,10 +1,12 @@
 [versions]
 androidx-activity = "1.7.0"
+androidx-appcompat = "1.3.0"
 androidx-collection = "1.4.0"
 androidx-fragment = "1.3.6"
-androidx-lifecycle = "2.4.0"
+androidx-lifecycle = "2.5.0"
 androidx-navigation = "2.3.1"
 androidx-test = "1.3.0"
+compose = "1.2.0"
 graalvm = "21.2.0"
 jmh = "1.21"
 kotlin = "1.7.10"
@@ -30,9 +32,8 @@ google-material = { module = "com.google.android.material:material", version = "
 
 # Compose
 compose-compiler = { module = "org.jetbrains.kotlin:kotlin-compose-compiler-plugin-embeddable", version = "2.1.20" } # Version should match Kotlin compiler pulled from rules_kotlin
-compose-bom = { module = "androidx.compose:compose-bom", version = "2025.04.00" }
-compose-material = { module = "androidx.compose.material:material" } # Compose BOM
-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" } # Compose BOM
+compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
+compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose" }
 
 # Graal
 graalvm-js = { module = "org.graalvm.js:js", version.ref = "graalvm" }
@@ -78,6 +79,7 @@ jmh-core = { module = "org.openjdk.jmh:jmh-core", version.ref = "jmh" }
 jmh-generator-annprocess = { module = "org.openjdk.jmh:jmh-generator-annprocess", version.ref = "jmh" }
 
 # Resolutions
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
 androidx-activity-kt = { module = "androidx.activity:activity-ktx", version.ref = "androidx-activity" }
 androidx-collection = { module = "androidx.collection:collection", version.ref = "androidx-collection" }
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "androidx-fragment" }

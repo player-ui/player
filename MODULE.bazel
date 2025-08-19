@@ -146,7 +146,6 @@ maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.from_toml(
     bom_modules = [
         "org.junit:junit-bom",
-        "androidx.compose:compose-bom",
     ],
     libs_versions_toml = "//:libs.versions.toml",
 )

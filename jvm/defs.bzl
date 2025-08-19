@@ -69,8 +69,6 @@ def kt_player_module(
             visibility = ["//visibility:public"],
         )
 
-        # TODO: If test, alias test, etc. Requires upleveling
-
 def distribution(
         *,
         name,

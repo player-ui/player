@@ -28,9 +28,7 @@ def _merge_jni_into_android_library_impl(context):
         source_lib[JavaInfo],
         source_lib[DefaultInfo],
         source_lib[OutputGroupInfo],
-        AndroidLibraryAarInfo(
-            aar = merged_aar,
-        ),
+        AndroidLibraryAarInfo(aar = merged_aar),
     ]
 
 _merge_jni_into_android_library = rule(
