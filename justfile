@@ -49,7 +49,7 @@ start-storybook:
 ### Start Kotlin ###
 
 [doc('Test KT for lint errors')]
-test-kt:
+lint-kt:
   bazel test $(bazel query --noshow_progress --output=label "kind('ktlint_test rule', ${2:-//...})" | tr '\n' ' ')
 
 [doc('Fix all auto-fixable KT lint errors')]
