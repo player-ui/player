@@ -56,6 +56,7 @@ kt_kotlinc_options(
 
 ktlint_config(
     name = "lint_config",
+    editorconfig = "//:.editorconfig",
     visibility = ["//visibility:public"],
 )
 
