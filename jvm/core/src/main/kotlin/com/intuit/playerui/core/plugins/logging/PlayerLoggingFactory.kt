@@ -13,9 +13,7 @@ public interface PlayerLoggingFactory<out T : PlayerLoggingConfig> {
  * Creates a new [PlayerRuntimeFactory] based on this one
  * with further configurations from the [nested] block.
  */
-public fun <T : PlayerLoggingConfig> PlayerLoggingFactory<T>.config(
-    nested: T.() -> Unit,
-): PlayerLoggingFactory<T> {
+public fun <T : PlayerLoggingConfig> PlayerLoggingFactory<T>.config(nested: T.() -> Unit): PlayerLoggingFactory<T> {
     val parent = this
 
     return object : PlayerLoggingFactory<T> {

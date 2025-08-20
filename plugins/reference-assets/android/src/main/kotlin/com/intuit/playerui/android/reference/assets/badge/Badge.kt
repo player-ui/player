@@ -20,7 +20,6 @@ import kotlinx.serialization.Serializable
 internal class Badge(
     assetContext: AssetContext,
 ) : ComposableAsset<Badge.Data>(assetContext, Data.serializer()) {
-
     @Serializable
     data class Data(
         val label: String? = null,

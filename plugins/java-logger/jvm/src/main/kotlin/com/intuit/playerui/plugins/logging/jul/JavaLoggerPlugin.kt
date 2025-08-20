@@ -7,8 +7,9 @@ import com.intuit.playerui.core.plugins.logging.PlayerLoggingFactory
 import java.util.logging.Logger
 
 /** Basic Java Logger player plugin */
-public class JavaLoggerPlugin(public val config: JavaLoggerConfig) : LoggerPlugin {
-
+public class JavaLoggerPlugin(
+    public val config: JavaLoggerConfig,
+) : LoggerPlugin {
     public val logger: Logger = Logger.getLogger(config.name).apply(config.logger)
 
     override fun trace(vararg args: Any?) {
@@ -38,8 +39,7 @@ public class JavaLoggerConfig(
 ) : PlayerLoggingConfig()
 
 public object JavaLoggerFactory : PlayerLoggingFactory<JavaLoggerConfig> {
-    override fun create(block: JavaLoggerConfig.() -> Unit): JavaLoggerPlugin =
-        JavaLoggerPlugin(JavaLoggerConfig().apply(block))
+    override fun create(block: JavaLoggerConfig.() -> Unit): JavaLoggerPlugin = JavaLoggerPlugin(JavaLoggerConfig().apply(block))
 
     override fun toString(): String = "JavaLogger"
 }

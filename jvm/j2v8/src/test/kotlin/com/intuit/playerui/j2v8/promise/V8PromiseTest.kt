@@ -7,8 +7,9 @@ import com.intuit.playerui.utils.test.PromiseUtils
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-internal class V8PromiseTest : J2V8Test(), PromiseUtils {
-
+internal class V8PromiseTest :
+    J2V8Test(),
+    PromiseUtils {
     override val thenChain = mutableListOf<Any?>()
     override val catchChain = mutableListOf<Any?>()
 
@@ -16,11 +17,11 @@ internal class V8PromiseTest : J2V8Test(), PromiseUtils {
     fun testErrorStacktraceFromJSError() {
         val (promise) = runtime.execute(
             """
-           (function() {
-               var resolver;
-               const promise = new Promise(function(resolve, reject) { asdf.asdf.asdf.asdf });
-               return [promise, resolver];
-           })();
+            (function() {
+                var resolver;
+                const promise = new Promise(function(resolve, reject) { asdf.asdf.asdf.asdf });
+                return [promise, resolver];
+            })();
             """.trimIndent(),
         ) as List<*>
 

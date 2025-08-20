@@ -11,7 +11,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class TextTest : AssetTest("text") {
-
     @Test
     fun basic() {
         launchMock("text-basic")

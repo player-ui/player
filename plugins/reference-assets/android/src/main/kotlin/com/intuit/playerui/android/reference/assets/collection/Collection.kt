@@ -15,8 +15,9 @@ import com.intuit.playerui.android.reference.assets.XmlAssetStyleParser
 import kotlinx.serialization.Serializable
 
 /** Asset that renders a group of assets as children with little semantic meaning */
-class Collection(assetContext: AssetContext) : ComposableAsset<Collection.Data>(assetContext, Data.serializer()) {
-
+class Collection(
+    assetContext: AssetContext,
+) : ComposableAsset<Collection.Data>(assetContext, Data.serializer()) {
     @Serializable
     data class Data(
         /** Required [values] is the collection of asset */

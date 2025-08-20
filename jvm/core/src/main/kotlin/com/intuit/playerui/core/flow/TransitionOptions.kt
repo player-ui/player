@@ -7,7 +7,6 @@ import kotlinx.serialization.Serializable
 public data class TransitionOptions(
     val force: Boolean = false,
 ) {
-
     public companion object {
         /** Singleton instance of [TransitionOptions] to force a transition */
         public val ForceTransition: TransitionOptions = TransitionOptions(true)

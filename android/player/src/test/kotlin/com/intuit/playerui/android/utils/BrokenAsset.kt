@@ -14,8 +14,9 @@ import com.intuit.playerui.utils.makeFlow
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
-internal class BrokenAsset(assetContext: AssetContext) : DecodableAsset<BrokenAsset.Data>(assetContext, Data.serializer()) {
-
+internal class BrokenAsset(
+    assetContext: AssetContext,
+) : DecodableAsset<BrokenAsset.Data>(assetContext, Data.serializer()) {
     @Serializable
     data class Data(
         var layout: Layout,
@@ -24,7 +25,8 @@ internal class BrokenAsset(assetContext: AssetContext) : DecodableAsset<BrokenAs
 
     @Serializable
     enum class Layout {
-        Frame, Linear
+        Frame,
+        Linear,
     }
 
     override fun initView() = when (data.layout) {
@@ -33,11 +35,9 @@ internal class BrokenAsset(assetContext: AssetContext) : DecodableAsset<BrokenAs
     }
 
     override fun View.hydrate() {
-        if (data.shouldFail || (
-                data.layout == Layout.Frame && this is LinearLayout
-                ) || (
-                data.layout == Layout.Linear && this is FrameLayout
-                )
+        if (data.shouldFail ||
+            (data.layout == Layout.Frame && this is LinearLayout) ||
+            (data.layout == Layout.Linear && this is FrameLayout)
         ) {
             invalidateView()
         }
@@ -50,8 +50,10 @@ internal class BrokenAsset(assetContext: AssetContext) : DecodableAsset<BrokenAs
             "layout" to "Frame",
             "shouldFail" to false,
         )
+
         fun Runtime<*>.asset(layout: Layout = Layout.Frame, shouldFail: Boolean = false): Asset =
             serialize(sampleMap + mapOf("layout" to layout.toString(), "shouldFail" to shouldFail)) as Asset
+
         val runtime = J2V8.create()
         val sampleAsset = runtime.serialize(sampleMap) as Asset
         val sampleJson = Json.encodeToJsonElement(GenericSerializer(), sampleMap)

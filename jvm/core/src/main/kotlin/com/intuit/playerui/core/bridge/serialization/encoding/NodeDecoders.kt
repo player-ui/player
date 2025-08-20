@@ -14,8 +14,9 @@ import kotlinx.serialization.encoding.Encoder
 import kotlin.reflect.KCallable
 
 /** Simple extension of a [Decoder] to provide serializers a way to decode a [Node] */
-public interface NodeDecoder : Decoder, FunctionDecoder {
-
+public interface NodeDecoder :
+    Decoder,
+    FunctionDecoder {
     /** Decodes a [Node] value, where [Node] represents a Map-like structure */
     public fun decodeNode(): Node
 
@@ -27,8 +28,9 @@ public fun Decoder.requireNodeDecoder(): NodeDecoder = this as? NodeDecoder
     ?: throw RuntimeDecodingException("operation requires a NodeDecoder: ${this::class.simpleName}")
 
 /** Simple extension of an [Encoder] to provide serializers a way to encode a backing [Node] */
-public interface NodeEncoder : Encoder, FunctionEncoder {
-
+public interface NodeEncoder :
+    Encoder,
+    FunctionEncoder {
     public fun encodeValue(value: Any)
 
     public fun encodeNode(value: Node)
@@ -38,7 +40,6 @@ public fun Encoder.requireNodeEncoder(): NodeEncoder = this as? NodeEncoder
     ?: throw RuntimeEncodingException("operation requires a NodeEncoder: ${this::class.simpleName}")
 
 public interface FunctionEncoder : Encoder {
-
     // TODO: Can we encodeFunctions such that we can get the original function instance back on decode?
     //       We actually can by checking if it's a host function (then we could probably get the actual
     //       host function impl back, maybe even the method reference if it's enhanced
@@ -65,7 +66,6 @@ public interface FunctionDecoder : Decoder {
 
 @InternalPlayerApi
 public interface RuntimeValueDecoder<T> : NodeDecoder {
-
     /** Format the contains current configuration for decoding the [value] */
     public val format: RuntimeFormat<T>
 

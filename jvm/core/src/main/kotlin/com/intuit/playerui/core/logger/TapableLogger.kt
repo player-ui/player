@@ -17,10 +17,14 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 
 @Serializable(with = TapableLogger.Serializer::class)
-public class TapableLogger(override val node: Node) : LoggerPlugin, NodeWrapper {
-
+public class TapableLogger(
+    override val node: Node,
+) : LoggerPlugin,
+    NodeWrapper {
     @Serializable(Hooks.Serializer::class)
-    public class Hooks internal constructor(override val node: Node) : NodeWrapper {
+    public class Hooks internal constructor(
+        override val node: Node,
+    ) : NodeWrapper {
         public val trace: SyncHook1<Array<Any?>> = loggerHook("trace")
         public val debug: SyncHook1<Array<Any?>> = loggerHook("debug")
         public val info: SyncHook1<Array<Any?>> = loggerHook("info")

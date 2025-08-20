@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 
 /** Simple [PlayerFragment] example that builds a [DemoPlayerViewModel] w/ a single flow iterator */
 abstract class BasePlayerFragment : PlayerFragment() {
-
     abstract val flow: String
 
     override val playerViewModel by viewModels<DemoPlayerViewModel> {

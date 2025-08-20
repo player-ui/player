@@ -13,13 +13,14 @@ data class ParsedAssetStyle(
     override val xmlStyles: List<Style>,
 ) : AssetStyle
 
-class XmlAssetStyleParser(private val context: Context) {
-
+class XmlAssetStyleParser(
+    private val context: Context,
+) {
     fun parse(xmlResourceId: Int): AssetStyle {
         val typedArray = context.obtainStyledAttributes(
             xmlResourceId,
             intArrayOf(
-                /* Add the styleable attributes here */
+                // Add the styleable attributes here
                 android.R.attr.textSize,
                 android.R.attr.textStyle,
                 android.R.attr.textColor,

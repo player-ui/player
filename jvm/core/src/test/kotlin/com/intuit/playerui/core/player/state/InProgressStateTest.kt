@@ -26,7 +26,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 internal class InProgressStateTest : NodeBaseTest() {
-
     var lastTransition: String? = null
     private val inProgressState by lazy {
         InProgressState(node)

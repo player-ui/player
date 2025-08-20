@@ -10,14 +10,23 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /** Wrapper of an [AsyncIterator] that captures iterations within a [StateFlow] */
-public class AsyncIterationManager<Item : Any, Result : Any>(public val iterator: AsyncIterator<Item, Result>) {
-
+public class AsyncIterationManager<Item : Any, Result : Any>(
+    public val iterator: AsyncIterator<Item, Result>,
+) {
     public sealed class State {
         public object NotStarted : State()
+
         public object Done : State()
+
         public object Pending : State()
-        public class Item<T : Any>(public val value: T) : State()
-        public class Error(public val error: Exception) : State()
+
+        public class Item<T : Any>(
+            public val value: T,
+        ) : State()
+
+        public class Error(
+            public val error: Exception,
+        ) : State()
     }
 
     private val _state = MutableStateFlow<State>(NotStarted)

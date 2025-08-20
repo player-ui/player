@@ -2,7 +2,6 @@ package com.intuit.playerui.core.plugins
 
 /** Describes a construct that is inherently configurable via [Plugin]s */
 public interface Pluggable {
-
     /** Collection of [Plugin]s that are registered to this instance */
     public val plugins: List<Plugin>
 }

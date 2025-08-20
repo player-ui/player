@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 internal class SimpleAssetTest : BaseRenderableAssetTest() {
-
     override val asset get() = SimpleAsset.sampleAsset
 
     override val assetContext: AssetContext by lazy {

@@ -20,7 +20,6 @@ import kotlin.contracts.ExperimentalContracts
 
 @ExtendWith(MockKExtension::class)
 internal class MetricsPluginTest : PlayerTest() {
-
     private val renderEndHandler: RenderEndHandler = { _, _, _ -> }
 
     override val plugins = getMetricPlugin()

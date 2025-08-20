@@ -55,8 +55,10 @@ private fun loadHermesJni() {
     NativeLoader.loadLibrary("hermes_jni")
 }
 
-public class HermesRuntime private constructor(mHybridData: HybridData) : Runtime<Value>, JSIRuntime(mHybridData) {
-
+public class HermesRuntime private constructor(
+    mHybridData: HybridData,
+) : JSIRuntime(mHybridData),
+    Runtime<Value> {
     public companion object {
         init {
             loadHermesJni()
@@ -67,16 +69,18 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
         @JvmStatic public external fun create(runtimeConfig: Config): HermesRuntime
 
         public operator fun invoke(): HermesRuntime = create()
+
         public operator fun invoke(runtimeConfig: Config): HermesRuntime = create(runtimeConfig)
     }
 
     override val config: Config external get
 
-    override val dispatcher: ExecutorCoroutineDispatcher = Executors.newSingleThreadExecutor {
-        Executors.defaultThreadFactory().newThread(it).apply {
-            name = "hermes-runtime"
-        }
-    }.asCoroutineDispatcher()
+    override val dispatcher: ExecutorCoroutineDispatcher = Executors
+        .newSingleThreadExecutor {
+            Executors.defaultThreadFactory().newThread(it).apply {
+                name = "hermes-runtime"
+            }
+        }.asCoroutineDispatcher()
 
     override val format: JSIFormat = JSIFormat(
         JSIFormatConfiguration(
@@ -97,7 +101,11 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
         CoroutineScope(Dispatchers.Default + SupervisorJob() + (config.coroutineExceptionHandler ?: EmptyCoroutineContext))
     }
 
-    private external fun evaluateJavaScriptWithSourceMap(script: String, sourceMap: String, sourceURL: String): Value
+    private external fun evaluateJavaScriptWithSourceMap(
+        script: String,
+        sourceMap: String,
+        sourceURL: String,
+    ): Value
 
     @OptIn(ExperimentalPlayerApi::class)
     override fun executeRaw(script: String): Value = evaluateInJSThreadBlocking {
@@ -154,40 +162,55 @@ public class HermesRuntime private constructor(mHybridData: HybridData) : Runtim
     override val keys: Set<String> by backingNode::keys
     override val size: Int by backingNode::size
     override val values: Collection<Any?> by backingNode::values
+
     override fun containsKey(key: String): Boolean = backingNode.containsKey(key)
+
     override fun containsValue(value: Any?): Boolean = backingNode.containsValue(value)
+
     override fun get(key: String): Any? = backingNode[key]
+
     override fun isEmpty(): Boolean = backingNode.isEmpty()
+
     override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>): T? =
         backingNode.getSerializable(key, deserializer)
 
     override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T = backingNode.deserialize(deserializer)
+
     override fun isUndefined(): Boolean = backingNode.isUndefined()
+
     override fun nativeReferenceEquals(other: Any?): Boolean = backingNode.nativeReferenceEquals(other)
+
     override fun getString(key: String): String? = backingNode.getString(key)
+
     override fun getInt(key: String): Int? = backingNode.getInt(key)
+
     override fun getDouble(key: String): Double? = backingNode.getDouble(key)
+
     override fun getLong(key: String): Long? = backingNode.getLong(key)
+
     override fun getBoolean(key: String): Boolean? = backingNode.getBoolean(key)
-    override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = backingNode.getInvokable(key, deserializationStrategy)
+
+    override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? =
+        backingNode.getInvokable(key, deserializationStrategy)
+
     override fun <R> getFunction(key: String): Invokable<R>? = backingNode.getFunction(key)
+
     override fun getList(key: String): List<*>? = backingNode.getList(key)
+
     override fun getObject(key: String): Node? = backingNode.getObject(key)
 
-    public class Config private constructor(@DoNotStrip private val mHybridData: HybridData) : PlayerRuntimeConfig() {
+    public class Config private constructor(
+        @DoNotStrip private val mHybridData: HybridData,
+    ) : PlayerRuntimeConfig() {
         public companion object {
             init {
                 loadHermesJni()
             }
 
-            @JvmStatic public external fun create(
-                microtaskQueue: Boolean,
-            ): Config
+            @JvmStatic public external fun create(microtaskQueue: Boolean): Config
 
             // Pulling defaults from JSI RuntimeConfig defaults
-            public operator fun invoke(
-                microtaskQueue: Boolean = false,
-            ): Config = create(microtaskQueue)
+            public operator fun invoke(microtaskQueue: Boolean = false): Config = create(microtaskQueue)
         }
     }
 }
@@ -197,7 +220,11 @@ public object Hermes : PlayerRuntimeFactory<Config> {
         loadHermesJni()
         val config = Config().apply(block)
         // TODO: Move SetTimeoutPlugin to HeadlessPlayer init once cyclical dep is handled (split out headless impl)
-        return HermesRuntime.create(config).also(SetTimeoutPlugin(config.coroutineExceptionHandler)::apply).also(ConsoleLoggerPlugin(override = true)::apply)
+        return HermesRuntime
+            .create(
+                config,
+            ).also(SetTimeoutPlugin(config.coroutineExceptionHandler)::apply)
+            .also(ConsoleLoggerPlugin(override = true)::apply)
     }
 
     override fun toString(): String = name
@@ -207,5 +234,6 @@ public object Hermes : PlayerRuntimeFactory<Config> {
 
 public class HermesRuntimeContainer : PlayerRuntimeContainer {
     override val factory: Hermes = Hermes
+
     override fun toString(): String = "Hermes"
 }

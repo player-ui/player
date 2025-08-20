@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test
 
 /** Legacy tests for decoding values from J2V8 */
 internal class V8EncoderTest : J2V8Test() {
-
     @Test
     fun testArray() {
         v8.evaluateInJSThreadBlocking(runtime) {
@@ -69,7 +68,8 @@ internal class V8EncoderTest : J2V8Test() {
         v8.evaluateInJSThreadBlocking(runtime) {
             val retVal = "this is my return"
             val v8Function = V8Function(format) { args ->
-                println(args.get(0)); retVal
+                println(args.get(0))
+                retVal
             }
             assertEquals(retVal, v8Function(format, "this is my arg"))
 
@@ -85,7 +85,8 @@ internal class V8EncoderTest : J2V8Test() {
             add(
                 "func",
                 V8Function(format) { args ->
-                    println(args.get(0)); retVal
+                    println(args.get(0))
+                    retVal
                 },
             )
             val functionContainer = executeObjectScript("""({ log: func })""")

@@ -23,8 +23,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 
-class Action(assetContext: AssetContext) : ComposableAsset<Action.Data>(assetContext, Data.serializer()) {
-
+class Action(
+    assetContext: AssetContext,
+) : ComposableAsset<Action.Data>(assetContext, Data.serializer()) {
     @Serializable
     data class Data(
         val label: RenderableAsset? = null,
@@ -50,12 +51,10 @@ class Action(assetContext: AssetContext) : ComposableAsset<Action.Data>(assetCon
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = Color.Blue,
             ),
-
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement =
-                Arrangement.spacedBy(
+                horizontalArrangement = Arrangement.spacedBy(
                     8.dp,
                     Alignment.CenterHorizontally,
                 ),

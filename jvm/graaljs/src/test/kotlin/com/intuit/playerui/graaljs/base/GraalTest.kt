@@ -20,13 +20,16 @@ import org.graalvm.polyglot.Context
 import org.graalvm.polyglot.Value
 import org.junit.jupiter.api.Assertions
 
-internal abstract class GraalTest(val graal: Context = PlayerContextFactory.buildPlayerContext()) : PromiseUtils, ThreadUtils {
-
+internal abstract class GraalTest(
+    val graal: Context = PlayerContextFactory.buildPlayerContext(),
+) : PromiseUtils,
+    ThreadUtils {
     private val TAG get() = this::class.java.simpleName
     val runtime = Runtime(graal)
     val format = (runtime as GraalRuntime).format
 
     fun buildNodeFromMap(vararg entries: Pair<String, Any?>) = buildNodeObjectFromMap(mapOf(*entries))
+
     fun buildV8Object(jsonElement: JsonElement = buildJsonObject {}) = buildV8ObjectFromMap(
         Json.decodeFromJsonElement(
             MapSerializer(String.serializer(), GenericSerializer()),
@@ -35,6 +38,7 @@ internal abstract class GraalTest(val graal: Context = PlayerContextFactory.buil
     )
 
     fun buildV8ObjectFromMap(map: Map<String, Any?>): Value = format.encodeToGraalValue(map)
+
     fun buildNodeObjectFromMap(map: Map<String, Any?>): Node = format.encodeToGraalValue(map).let(format::decodeFromGraalValue)
 
     // PromiseUtils

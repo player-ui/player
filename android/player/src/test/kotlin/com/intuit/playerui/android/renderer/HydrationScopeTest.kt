@@ -30,10 +30,11 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 internal class HydrationScopeTest : BaseRenderableAssetTest() {
-
     private var completed: Boolean = false
 
-    inner class TestAsset(assetContext: AssetContext) : SuspendableAsset<Node>(assetContext, NodeSerializer()) {
+    inner class TestAsset(
+        assetContext: AssetContext,
+    ) : SuspendableAsset<Node>(assetContext, NodeSerializer()) {
         override suspend fun initView(data: Node): View = TextView(context)
 
         override suspend fun View.hydrate(data: Node) {
@@ -133,7 +134,11 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
         waitForCondition(count, delay) { completed }
     }
 
-    private fun waitForCondition(count: Int = 5, delay: Long = 500, conditions: () -> Boolean = { true }) {
+    private fun waitForCondition(
+        count: Int = 5,
+        delay: Long = 500,
+        conditions: () -> Boolean = { true },
+    ) {
         var counter = 0
         while (!conditions() && counter++ < count) runBlockingTest { delay(delay) }
         assertTrue(conditions())

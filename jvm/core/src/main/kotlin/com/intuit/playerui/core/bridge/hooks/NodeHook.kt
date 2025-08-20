@@ -13,7 +13,6 @@ import kotlinx.serialization.descriptors.capturedKClass
 
 /** Contains common logic for configuring a [NodeHook] to tap any JS hook */
 internal interface NodeHook<R> : NodeWrapper {
-
     @OptIn(ExperimentalSerializationApi::class)
     fun init(vararg serializers: KSerializer<*>) {
         node.getInvokable<Any?>("tap")?.invoke(

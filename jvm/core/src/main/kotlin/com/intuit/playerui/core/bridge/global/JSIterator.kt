@@ -7,10 +7,11 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 
 @Serializable(JSIterator.Serializer::class)
-public class JSIterator<T>(override val node: Node, public val itemSerializer: KSerializer<T>) :
-    Iterator<T>,
+public class JSIterator<T>(
+    override val node: Node,
+    public val itemSerializer: KSerializer<T>,
+) : Iterator<T>,
     NodeWrapper {
-
     @Serializable
     private data class NextResult<T>(
         val done: Boolean = false,
@@ -29,7 +30,9 @@ public class JSIterator<T>(override val node: Node, public val itemSerializer: K
         current = getNext()
     }!!
 
-    public class Serializer<T>(public val itemSerializer: KSerializer<T>) : NodeWrapperSerializer<JSIterator<T>>({
-        JSIterator(it, itemSerializer)
-    })
+    public class Serializer<T>(
+        public val itemSerializer: KSerializer<T>,
+    ) : NodeWrapperSerializer<JSIterator<T>>({
+            JSIterator(it, itemSerializer)
+        })
 }

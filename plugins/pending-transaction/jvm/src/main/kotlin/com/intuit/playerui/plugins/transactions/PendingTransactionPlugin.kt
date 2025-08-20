@@ -11,14 +11,15 @@ public fun interface PendingTransaction {
 }
 
 public class PendingTransactionPlugin : Plugin {
-
     public class PendingTransactionHooks {
         public class RegisterHook : SyncHook<(HookContext) -> Unit>() {
             public fun call(): Unit = super.call { f, hookCtx -> f(hookCtx) }
         }
-        public class CommitHook : SyncHook<(HookContext) -> Unit> () {
+
+        public class CommitHook : SyncHook<(HookContext) -> Unit>() {
             public fun call(): Unit = super.call { f, hookCtx -> f(hookCtx) }
         }
+
         public val register: RegisterHook = RegisterHook()
         public val commit: CommitHook = CommitHook()
     }

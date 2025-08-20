@@ -25,7 +25,9 @@ public sealed class ValidationResponse : NodeWrapper {
 }
 
 @Serializable(with = Serializer::class)
-public class WarningValidationResponse(override val node: Node) : ValidationResponse() {
+public class WarningValidationResponse(
+    override val node: Node,
+) : ValidationResponse() {
     private val dismiss: Invokable<Unit>? by NodeSerializableFunction()
 
     /** Warning validations can be dismissed without correcting the error */
@@ -37,6 +39,8 @@ public class WarningValidationResponse(override val node: Node) : ValidationResp
 }
 
 @Serializable(with = ErrorValidationResponse.Serializer::class)
-public class ErrorValidationResponse(override val node: Node) : ValidationResponse() {
+public class ErrorValidationResponse(
+    override val node: Node,
+) : ValidationResponse() {
     internal object Serializer : NodeWrapperSerializer<ErrorValidationResponse>(::ErrorValidationResponse, "error")
 }

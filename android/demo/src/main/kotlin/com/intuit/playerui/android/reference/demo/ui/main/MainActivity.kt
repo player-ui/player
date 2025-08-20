@@ -32,19 +32,21 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
-
     private lateinit var drawerLayout: DrawerLayout
     private val navConfig by lazy { AppBarConfiguration(navController.graph, drawerLayout) }
     private val navController get() = findNavController(R.id.nav_host_fragment)
 
-    val currentPlayer get() = supportFragmentManager.fragments.filterIsInstance<NavHostFragment>().single().childFragmentManager.fragments.filterIsInstance<PlayerFragment>().firstOrNull()
+    val currentPlayer get() = supportFragmentManager.fragments
+        .filterIsInstance<NavHostFragment>()
+        .single()
+        .childFragmentManager.fragments
+        .filterIsInstance<PlayerFragment>()
+        .firstOrNull()
     val viewModel by lazy {
         ViewModelProvider(this).get(MainViewModel::class.java)
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp(navConfig) || super.onSupportNavigateUp()
-    }
+    override fun onSupportNavigateUp(): Boolean = navController.navigateUp(navConfig) || super.onSupportNavigateUp()
 
     init {
         lifecycleScope.launch {
@@ -78,8 +80,8 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) =
-        item.onNavDestinationSelected(navController) || when (item.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem) = item.onNavDestinationSelected(navController) ||
+        when (item.itemId) {
             R.id.action_reset -> {
                 currentPlayer?.reset()
                 true

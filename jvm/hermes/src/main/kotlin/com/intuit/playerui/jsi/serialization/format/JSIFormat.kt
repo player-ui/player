@@ -17,19 +17,16 @@ import kotlinx.serialization.modules.SerializersModule
 public class JSIFormat(
     config: JSIFormatConfiguration,
 ) : AbstractRuntimeFormat<Value>(config) {
-
     override val runtime: HermesRuntime by lazy {
         config.runtime as HermesRuntime
     }
 
-    override fun <T> encodeToRuntimeValue(serializer: SerializationStrategy<T>, value: T): Value =
-        writeToValue(value, serializer)
+    override fun <T> encodeToRuntimeValue(serializer: SerializationStrategy<T>, value: T): Value = writeToValue(value, serializer)
 
     override fun <T> decodeFromRuntimeValue(deserializer: DeserializationStrategy<T>, element: Value): T =
         readFromValue(element, deserializer)
 
-    override fun parseToRuntimeValue(string: String): Value =
-        runtime.executeRaw("($string)")
+    override fun parseToRuntimeValue(string: String): Value = runtime.executeRaw("($string)")
 
     override fun <T> encodeToString(serializer: SerializationStrategy<T>, value: T): String = when (value) {
         is JSIValueContainer -> runtime.evaluateInJSThreadBlocking {
@@ -44,8 +41,6 @@ public data class JSIFormatConfiguration internal constructor(
     override val serializersModule: SerializersModule,
 ) : RuntimeFormatConfiguration<Value>
 
-internal inline fun <reified T> JSIFormat.encodeToValue(value: T): Value =
-    encodeToRuntimeValue(serializer(), value)
+internal inline fun <reified T> JSIFormat.encodeToValue(value: T): Value = encodeToRuntimeValue(serializer(), value)
 
-internal inline fun <reified T> JSIFormat.decodeFromValue(value: Value): T =
-    decodeFromRuntimeValue(serializer(), value)
+internal inline fun <reified T> JSIFormat.decodeFromValue(value: Value): T = decodeFromRuntimeValue(serializer(), value)

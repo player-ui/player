@@ -63,8 +63,9 @@ import org.junit.jupiter.api.TestTemplate
 import kotlin.concurrent.thread
 import kotlin.coroutines.resume
 
-internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
-
+internal class HeadlessPlayerTest :
+    PlayerTest(),
+    ThreadUtils {
     // ThreadUtils
     override val threads = mutableListOf<Thread>()
     override val exceptions = mutableListOf<Throwable>()
@@ -208,7 +209,8 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         // remove evaluated nodes
         val currentViewJson = Json.decodeFromJsonElement(
             GenericSerializer(),
-            simpleFlow.views!![0].jsonObject
+            simpleFlow.views!![0]
+                .jsonObject
                 .filterKeys("applicability"),
         )
 
@@ -266,7 +268,10 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
 
         exception.printStackTrace()
         player.errorState?.error?.printStackTrace()
-        assertEquals(exception.stackTrace.normalizeStackTraceElements(), player.errorState?.error?.stackTrace?.normalizeStackTraceElements())
+        assertEquals(
+            exception.stackTrace.normalizeStackTraceElements(),
+            player.errorState?.error?.stackTrace?.normalizeStackTraceElements(),
+        )
     }
 
     @TestTemplate
@@ -578,8 +583,10 @@ internal class HeadlessPlayerTest : PlayerTest(), ThreadUtils {
         }
 
         beaconPlugin.beacon(action, element, asset) shouldBe Unit
-        while (beaconed == null || logger == null) runBlocking {
-            delay(100)
+        while (beaconed == null || logger == null) {
+            runBlocking {
+                delay(100)
+            }
         }
         assertLogger(logger!!)
     }

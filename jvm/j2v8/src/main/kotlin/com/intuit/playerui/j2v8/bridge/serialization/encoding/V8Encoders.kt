@@ -51,11 +51,13 @@ internal fun <T> J2V8Format.writeV8(value: T, serializer: SerializationStrategy<
     return result
 }
 
-internal open class V8ValueEncoder(private val format: J2V8Format, private val mode: Mode, private val consumer: (V8Value) -> Unit) :
-    AbstractEncoder(),
+internal open class V8ValueEncoder(
+    private val format: J2V8Format,
+    private val mode: Mode,
+    private val consumer: (V8Value) -> Unit,
+) : AbstractEncoder(),
     NodeEncoder,
     FunctionEncoder {
-
     internal constructor(format: J2V8Format, consumer: (V8Value) -> Unit) : this(format, Mode.UNDECIDED, consumer)
 
     override val serializersModule: SerializersModule by format::serializersModule
@@ -157,9 +159,7 @@ internal open class V8ValueEncoder(private val format: J2V8Format, private val m
         this.tag = null
     }
 
-    override fun beginStructure(
-        descriptor: SerialDescriptor,
-    ): CompositeEncoder {
+    override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder {
         val consumer = when (mode) {
             Mode.LIST,
             Mode.MAP,
@@ -182,6 +182,7 @@ internal open class V8ValueEncoder(private val format: J2V8Format, private val m
     }
 
     override fun endStructure(descriptor: SerialDescriptor): Unit = endEncode()
+
     protected fun endEncode() = consumer.invoke(currentContent)
 
     override fun encodeValue(value: Any): Unit = putContent(
@@ -259,34 +260,35 @@ internal open class V8ValueEncoder(private val format: J2V8Format, private val m
             val encodedArgs = (0 until args.length())
                 .map { args[it].handleValue(format) }
             var index = 0
-            val matchedArgs = kCallable.valueParameters.map { kParam ->
-                // vararg support, all input args of that type will be included in vararg array
-                if (kParam.isVararg) {
-                    val start = index
-                    while (index in encodedArgs.indices) {
-                        val currValue = encodedArgs.getOrNull(index)
+            val matchedArgs = kCallable.valueParameters
+                .map { kParam ->
+                    // vararg support, all input args of that type will be included in vararg array
+                    if (kParam.isVararg) {
+                        val start = index
+                        while (index in encodedArgs.indices) {
+                            val currValue = encodedArgs.getOrNull(index)
 
-                        // check if type is nullable and value is null
-                        if ((
-                                currValue == null &&
-                                    // base type or type argument could be marked nullable
-                                    (kParam.type.isMarkedNullable || kParam.type.arguments[0].type?.isMarkedNullable == true)
+                            // check if type is nullable and value is null
+                            if ((
+                                    currValue == null &&
+                                        // base type or type argument could be marked nullable
+                                        (kParam.type.isMarkedNullable || kParam.type.arguments[0].type?.isMarkedNullable == true)
                                 ) ||
-                            // otherwise check if arg matches type if not null
-                            (currValue != null && currValue::class.isSubclassOf(kParam.type.arguments[0].type?.classifier as KClass<*>))
-                        ) {
-                            index++
-                        } else {
-                            break
+                                // otherwise check if arg matches type if not null
+                                (currValue != null && currValue::class.isSubclassOf(kParam.type.arguments[0].type?.classifier as KClass<*>))
+                            ) {
+                                index++
+                            } else {
+                                break
+                            }
                         }
+                        // only take matching args
+                        encodedArgs.slice(start until index).toTypedArray()
+                    } else {
+                        // not matching arg types here, just relying on order
+                        if (index in encodedArgs.indices) encodedArgs[index++] else null
                     }
-                    // only take matching args
-                    encodedArgs.slice(start until index).toTypedArray()
-                } else {
-                    // not matching arg types here, just relying on order
-                    if (index in encodedArgs.indices) encodedArgs[index++] else null
-                }
-            }.toTypedArray()
+                }.toTypedArray()
 
             handleInvocation(kCallable::class, matchedArgs) {
                 kCallable.call(*it)
@@ -335,7 +337,11 @@ internal open class V8ValueEncoder(private val format: J2V8Format, private val m
         )
     }
 
-    private fun handleInvocation(reference: KClass<*>, args: Array<Any?>, block: (Array<Any?>) -> Any?) = try {
+    private fun handleInvocation(
+        reference: KClass<*>,
+        args: Array<Any?>,
+        block: (Array<Any?>) -> Any?,
+    ) = try {
         block(args)
     } catch (e: Throwable) {
         when (e) {
@@ -346,8 +352,10 @@ internal open class V8ValueEncoder(private val format: J2V8Format, private val m
     }
 }
 
-internal class V8ExceptionEncoder(format: J2V8Format, consumer: (V8Value) -> Unit) : V8ValueEncoder(format, Mode.MAP, consumer) {
-
+internal class V8ExceptionEncoder(
+    format: J2V8Format,
+    consumer: (V8Value) -> Unit,
+) : V8ValueEncoder(format, Mode.MAP, consumer) {
     override val contentMap by lazy {
         format.v8.evaluateInJSThreadBlocking(format.runtime) {
             executeObjectScript("""(new Error())""")

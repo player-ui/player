@@ -4,7 +4,6 @@ import com.intuit.playerui.core.player.state.CompletedState
 
 /** Generic async iterator that uses some [Result] to determine the next [Item] in the iteration */
 public interface AsyncIterator<Item : Any, Result : Any> {
-
     /**
      * [next] enables consumers to advance the iterator. The [result] of each item should be passed here to
      * give the iterator enough context to determine the next item. Passing null will restart the iterator.
@@ -24,19 +23,21 @@ public interface AsyncIterator<Item : Any, Result : Any> {
      * into a iterator to be consumed as an [AsyncIterator].
      */
     public companion object {
-        public operator fun <Item : Any, Result : Any> invoke(vararg items: Item): AsyncIterator<Item, Result> = AsyncIterator(items.toList())
+        public operator fun <Item : Any, Result : Any> invoke(vararg items: Item): AsyncIterator<Item, Result> =
+            AsyncIterator(items.toList())
 
-        public operator fun <Item : Any, Result : Any> invoke(items: List<Item>): AsyncIterator<Item, Result> = object : AsyncIterator<Item, Result> {
-            private var index = 0
+        public operator fun <Item : Any, Result : Any> invoke(items: List<Item>): AsyncIterator<Item, Result> =
+            object : AsyncIterator<Item, Result> {
+                private var index = 0
 
-            override suspend fun next(result: Result?): Item? {
-                result ?: run {
-                    index = 0
+                override suspend fun next(result: Result?): Item? {
+                    result ?: run {
+                        index = 0
+                    }
+
+                    return if (index < items.size) items[index++] else null
                 }
-
-                return if (index < items.size) items[index++] else null
             }
-        }
     }
 }
 

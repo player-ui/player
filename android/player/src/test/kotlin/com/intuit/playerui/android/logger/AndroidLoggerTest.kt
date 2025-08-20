@@ -57,18 +57,19 @@ internal class AndroidLoggerTest {
         assertError(tag)
     }
 
-    private fun assertTrace(tag: String = defaultTag, msg: String = trace) =
-        v.assertLogged("TRACE", tag, msg)
+    private fun assertTrace(tag: String = defaultTag, msg: String = trace) = v.assertLogged("TRACE", tag, msg)
 
-    private fun assertDebug(tag: String = defaultTag, msg: String = debug) =
-        d.assertLogged("DEBUG", tag, msg)
-    private fun assertInfo(tag: String = defaultTag, msg: String = info) =
-        i.assertLogged("INFO", tag, msg)
-    private fun assertWarn(tag: String = defaultTag, msg: String = warn) =
-        w.assertLogged("WARN", tag, msg)
-    private fun assertError(tag: String = defaultTag, msg: String = error) =
-        e.assertLogged("ERROR", tag, msg)
+    private fun assertDebug(tag: String = defaultTag, msg: String = debug) = d.assertLogged("DEBUG", tag, msg)
 
-    private fun List<String>.assertLogged(level: String, tag: String, msg: String) =
-        assertTrue(this.contains("$level: $tag: $msg"))
+    private fun assertInfo(tag: String = defaultTag, msg: String = info) = i.assertLogged("INFO", tag, msg)
+
+    private fun assertWarn(tag: String = defaultTag, msg: String = warn) = w.assertLogged("WARN", tag, msg)
+
+    private fun assertError(tag: String = defaultTag, msg: String = error) = e.assertLogged("ERROR", tag, msg)
+
+    private fun List<String>.assertLogged(
+        level: String,
+        tag: String,
+        msg: String,
+    ) = assertTrue(this.contains("$level: $tag: $msg"))
 }

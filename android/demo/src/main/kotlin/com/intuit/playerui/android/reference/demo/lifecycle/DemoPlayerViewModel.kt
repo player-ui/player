@@ -15,8 +15,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class DemoPlayerViewModel(iterator: AsyncFlowIterator) : PlayerViewModel(iterator) {
-
+class DemoPlayerViewModel(
+    iterator: AsyncFlowIterator,
+) : PlayerViewModel(iterator) {
     override val plugins = listOf(
         CommonTypesPlugin(),
         ReferenceAssetsPlugin(),

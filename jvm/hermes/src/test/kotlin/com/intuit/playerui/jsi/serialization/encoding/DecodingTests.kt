@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class PrimitiveDecodingTests : HermesTest() {
-
     @Test
     fun `decode string primitive`() = runtime.evaluateInJSThreadBlocking {
         assertEquals("hello", format.decodeFromValue<String>(Value.from(runtime, "hello")))
@@ -45,7 +44,6 @@ internal class PrimitiveDecodingTests : HermesTest() {
 }
 
 internal class FunctionDecodingTests : HermesTest() {
-
     @Test fun `decode typed lambda`() = runtime.evaluateInJSThreadBlocking {
         val function = Function.createFromHostFunction(runtime) { runtime, args ->
             // TODO: I'm sad that this doesn't error out -- we likely need to experiment with @DslMarker more

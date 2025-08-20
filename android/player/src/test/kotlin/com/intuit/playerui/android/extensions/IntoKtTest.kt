@@ -13,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
 internal class IntoKtTest {
-
     @MockK
     lateinit var view1: View
 

@@ -16,7 +16,9 @@ import kotlinx.serialization.json.JsonNull
 
 /** Structure shaping the JSON payload the player expects */
 @Serializable(with = Flow.Serializer::class)
-public class Flow private constructor(override val node: Node) : NodeWrapper {
+public class Flow private constructor(
+    override val node: Node,
+) : NodeWrapper {
     public val id: String by NodeSerializableField(String.serializer()) { UNKNOWN_ID }
 
     public val views: List<Asset>? by NodeSerializableField(ListSerializer(Asset.serializer()).nullable) { emptyList() }
@@ -31,6 +33,7 @@ public class Flow private constructor(override val node: Node) : NodeWrapper {
 
     public companion object {
         public const val UNKNOWN_ID: String = "unknown-id"
+
         public operator fun invoke(
             id: String = UNKNOWN_ID,
             views: List<Asset>? = emptyList(),

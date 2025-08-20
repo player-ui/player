@@ -15,8 +15,10 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
 
-internal abstract class HermesTest(val runtime: HermesRuntime = Hermes.create()) : PromiseUtils, ThreadUtils {
-
+internal abstract class HermesTest(
+    val runtime: HermesRuntime = Hermes.create(),
+) : PromiseUtils,
+    ThreadUtils {
     val format = runtime.format
 
     // PromiseUtils
@@ -31,7 +33,8 @@ internal abstract class HermesTest(val runtime: HermesRuntime = Hermes.create())
         Assertions.assertEquals(format.decodeFromValue<Any?>(a), format.decodeFromValue<Any?>(b))
     }
 
-    context(RuntimeThreadContext) fun assertEquivalent(a: Object, b: Object) {
+    context(RuntimeThreadContext)
+    fun assertEquivalent(a: Object, b: Object) {
         // verify that all missing keys from another are null or undefined
         val aKeys = HermesNode(a, runtime).keys
         val bKeys = HermesNode(b, runtime).keys

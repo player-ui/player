@@ -44,8 +44,9 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalCoroutinesApi::class)
-public abstract class AssetTest(private val group: String? = null) {
-
+public abstract class AssetTest(
+    private val group: String? = null,
+) {
     @get:Rule
     public val name: TestName = TestName()
 
@@ -73,21 +74,23 @@ public abstract class AssetTest(private val group: String? = null) {
         throw AssertionError("Expected view to update, but it did not.", exception)
     }
 
-    protected var currentAssetTree: RenderableAsset? = null; private set(value) {
-        // reset view on new asset
-        currentView = null
+    protected var currentAssetTree: RenderableAsset? = null
+        private set(value) {
+            // reset view on new asset
+            currentView = null
 
-        field = value
+            field = value
 
-        field?.let {
-            when (val view = it.render(context)) {
-                is SuspendableAsset.AsyncViewStub -> view.onView(viewChannel::tryEmit)
-                else -> viewChannel.tryEmit(view)
+            field?.let {
+                when (val view = it.render(context)) {
+                    is SuspendableAsset.AsyncViewStub -> view.onView(viewChannel::tryEmit)
+                    else -> viewChannel.tryEmit(view)
+                }
             }
         }
-    }
 
-    protected var currentView: View? = null; get() = field ?: blockUntilRendered()
+    protected var currentView: View? = null
+        get() = field ?: blockUntilRendered()
         set(value) {
             field = value.also {
                 // reset replay cache to clear value if the current value is set to null
@@ -149,7 +152,10 @@ public abstract class AssetTest(private val group: String? = null) {
 
     /** Naive helper for suspending until hydration is complete, resolves async view stubs and recursively awaits all children for hydration */
     private suspend fun View.awaitCompleteHydration() {
-        if (this is SuspendableAsset.AsyncViewStub) { awaitView()?.awaitCompleteHydration(); return }
+        if (this is SuspendableAsset.AsyncViewStub) {
+            awaitView()?.awaitCompleteHydration()
+            return
+        }
 
         while (getTag(R.bool.view_hydrated) == false) delay(25)
 

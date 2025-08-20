@@ -6,7 +6,6 @@ import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.plugins.JSPluginWrapper
 
 internal class RegistryPlugin<T> : JSPluginWrapper {
-
     override lateinit var instance: Node private set
 
     private val registry = mutableListOf<T>()

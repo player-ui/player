@@ -3,12 +3,11 @@ package com.intuit.playerui.core.bridge
 import kotlin.jvm.functions.FunctionN
 
 public fun <R> Invokable(block: (args: Array<out Any?>) -> R): Invokable<R> = object : Invokable<R> {
-    override fun invoke(vararg args: Any?): R {
-        return block(args)
-    }
+    override fun invoke(vararg args: Any?): R = block(args)
 }
 
 /** [Function] extension that provides loosely-typed vararg [invoke] signature */
+@Suppress("ktlint:standard:max-line-length", "ktlint:standard:class-signature", "ktlint:standard:function-signature", "ktlint:standard:argument-list-wrapping", "ktlint:standard:parameter-list-wrapping", "ktlint:standard:blank-line-before-declaration")
 public interface Invokable<R> : Function<R>, Function0<R>, Function1<Any?, R>, Function2<Any?, Any?, R>, Function3<Any?, Any?, Any?, R>, Function4<Any?, Any?, Any?, Any?, R>, Function5<Any?, Any?, Any?, Any?, Any?, R>, Function6<Any?, Any?, Any?, Any?, Any?, Any?, R>, Function7<Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function8<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function9<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function10<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function11<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function12<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function13<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function14<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function15<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function16<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function17<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function18<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function19<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function20<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function21<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R>, Function22<Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, Any?, R> {
     public operator fun invoke(vararg args: Any?): R
     override fun invoke(): R = invoke(*arrayOf())
@@ -41,6 +40,7 @@ public interface Invokable<R> : Function<R>, Function0<R>, Function1<Any?, R>, F
     "Invokable extend Functions automatically",
     level = DeprecationLevel.ERROR,
 )
+@Suppress("ktlint:standard:max-line-length", "ktlint:standard:function-signature", "ktlint:standard:argument-list-wrapping", "ktlint:standard:parameter-list-wrapping", "ktlint:standard:chain-method-continuation", "ktlint:standard:blank-line-before-declaration")
 public fun <R> Invokable<R>.toFunction(functionTypeName: String): Function<R> = when (functionTypeName) {
     "Function0" -> object : Function0<R> {
         override fun invoke() = this@toFunction()
@@ -127,7 +127,7 @@ public fun <R> Invokable<R>.toFunction(functionTypeName: String): Function<R> = 
  * Ugly solution, awaiting advice:
  * https://discuss.kotlinlang.org/t/dynamically-invoke-function-r/17242
  */
-@Suppress("UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST", "ktlint:standard:max-line-length", "ktlint:standard:argument-list-wrapping", "ktlint:standard:chain-method-continuation")
 public fun Function<*>.invokeVararg(vararg args: Any?): Any? = when (this) {
     is Invokable -> this(*args)
     is Function0 -> this()

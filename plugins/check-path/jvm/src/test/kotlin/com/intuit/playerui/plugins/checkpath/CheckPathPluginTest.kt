@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestTemplate
 
 internal class CheckPathPluginTest : PlayerTest() {
-
     override val plugins by lazy {
         listOf(CheckPathPlugin())
     }

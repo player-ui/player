@@ -24,7 +24,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(MockKExtension::class)
 @ExtendWith(CoroutineTestDispatcherExtension::class)
 internal abstract class BaseRenderableAssetTest {
-
     data class BeaconArgs(
         val action: String,
         val element: String,
@@ -34,8 +33,10 @@ internal abstract class BaseRenderableAssetTest {
 
     var beaconPlugin: BeaconPlugin = spyk(BeaconPlugin())
 
-    var beaconCount = 0; private set
-    var lastBeaconed: BeaconArgs? = null; private set
+    var beaconCount = 0
+        private set
+    var lastBeaconed: BeaconArgs? = null
+        private set
 
     @BeforeEach
     fun mockBeaconPlugin() {

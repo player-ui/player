@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class PrimitiveEncodingTests : HermesTest() {
-
     @Test fun `encode string primitive`() = runtime.evaluateInJSThreadBlocking {
         assertEquals(Value.from(runtime, "hello"), format.encodeToValue("hello"))
     }
@@ -40,7 +39,6 @@ internal class PrimitiveEncodingTests : HermesTest() {
 }
 
 internal class FunctionEncodingTests : HermesTest() {
-
     @Test fun `encode typed lambda`() = runtime.evaluateInJSThreadBlocking {
         val callback = { p0: String, p1: Int -> "$p0: $p1" }
         val function = format.encodeToValue(callback).asObject(runtime).asFunction(runtime)

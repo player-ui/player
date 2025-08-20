@@ -8,7 +8,6 @@ public data class ClassLoaderMock(
     override val name: String,
     override val path: String,
 ) : Mock<ClassLoader> {
-
     /** Helper to provide default [ClassLoader] overload of [read] */
     public fun read(): String = read(ClassLoader.getSystemClassLoader())
 
@@ -17,6 +16,7 @@ public data class ClassLoaderMock(
         .readText()
 
     // TODO: Eventually, this should return an actual [Flow]
+
     /** Helper to provide default [ClassLoader] overload of [getFlow] */
     public fun getFlow(): String = getFlow(ClassLoader.getSystemClassLoader())
 }

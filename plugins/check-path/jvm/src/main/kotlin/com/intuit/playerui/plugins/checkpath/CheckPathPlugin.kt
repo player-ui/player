@@ -8,7 +8,6 @@ import com.intuit.playerui.core.plugins.findPlugin
 
 /** Reduced wrapper of the core check-path plugin for relative asset querying */
 public class CheckPathPlugin : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
-
     /** Get the [Asset] represented by the [id] */
     public fun getAsset(id: String): Asset? = instance.getInvokable<Any?>("getAsset")?.invoke(id) as? Asset
 

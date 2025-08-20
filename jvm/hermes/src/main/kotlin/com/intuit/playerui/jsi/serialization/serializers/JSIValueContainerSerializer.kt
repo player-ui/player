@@ -13,7 +13,6 @@ import kotlinx.serialization.encoding.Encoder
 
 @Serializer(forClass = JSIValueContainer::class)
 internal object JSIValueContainerSerializer : KSerializer<JSIValueContainer> {
-
     fun <T : JSIValueContainer> conform(): KSerializer<T> = this as KSerializer<T>
 
     override val descriptor: SerialDescriptor =
@@ -23,6 +22,5 @@ internal object JSIValueContainerSerializer : KSerializer<JSIValueContainer> {
         .requireNodeEncoder()
         .encodeValue(value)
 
-    override fun deserialize(decoder: Decoder): Value =
-        (decoder as AbstractJSIValueDecoder).value
+    override fun deserialize(decoder: Decoder): Value = (decoder as AbstractJSIValueDecoder).value
 }

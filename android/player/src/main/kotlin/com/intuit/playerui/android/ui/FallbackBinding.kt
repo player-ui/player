@@ -20,9 +20,7 @@ public class FallbackBinding private constructor(
     public val retry: Button,
     public val title: TextView,
 ) : ViewBinding {
-    override fun getRoot(): ConstraintLayout {
-        return rootView
-    }
+    override fun getRoot(): ConstraintLayout = rootView
 
     public companion object {
         @JvmOverloads

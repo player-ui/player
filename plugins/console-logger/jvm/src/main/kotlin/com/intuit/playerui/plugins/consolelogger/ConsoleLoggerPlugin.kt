@@ -9,9 +9,11 @@ import com.intuit.playerui.core.plugins.PlayerPlugin
 import com.intuit.playerui.core.plugins.RuntimePlugin
 
 /** [RuntimePlugin] that adds a `console.log` implementation into a the [Runtime] if it doesn't exist */
-public class ConsoleLoggerPlugin(private val logger: LoggerPlugin? = null, private val override: Boolean = false) :
-    RuntimePlugin, PlayerPlugin {
-
+public class ConsoleLoggerPlugin(
+    private val logger: LoggerPlugin? = null,
+    private val override: Boolean = false,
+) : RuntimePlugin,
+    PlayerPlugin {
     private var player: Player? = null
 
     override fun apply(runtime: Runtime<*>) {

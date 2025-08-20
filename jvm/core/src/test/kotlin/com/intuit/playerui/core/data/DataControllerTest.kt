@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 internal class DataControllerTest : NodeBaseTest() {
-
     var data: Map<String, Any?> = mapOf(
         "key" to "initial value",
     )
