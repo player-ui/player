@@ -41,7 +41,6 @@ graalvm-js-scriptengine = { module = "org.graalvm.js:js-scriptengine", version.r
 graalvm-sdk = { module = "org.graalvm.sdk:graal-sdk", version.ref = "graalvm" }
 
 # J2V8
-# TODO: Can I use a classifier instead?
 j2v8 = { module = "com.eclipsesource.j2v8:j2v8:aar", version = "6.1.0" }
 j2v8-debugger = { module = "com.github.AlexTrotsenko:j2v8-debugger", version = "0.2.3" }
 
