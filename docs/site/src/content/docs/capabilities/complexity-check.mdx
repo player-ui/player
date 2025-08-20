@@ -1,0 +1,34 @@
+---
+title: Complexity Check Plugin
+---
+
+import { PackageManagers } from "starlight-package-managers";
+
+Generate diagnostics for content complexity using `@player-tools/complexity-check-plugin`.
+
+## Install
+
+<PackageManagers pkg="@player-tools/complexity-check-plugin" />
+
+## Usage
+
+```js
+const COMPLEXITY_WARNING_THRESHOLD = 1000;
+
+export default {
+  plugins: [
+    new ComplexityCheck({
+      maxAcceptableComplexity: 20000,
+      maxWarningLevel: COMPLEXITY_WARNING_THRESHOLD,
+      // optional: weights per asset type
+      typeWeights: { text: 8, image: 7.5 },
+    }),
+  ],
+};
+```
+
+This produces diagnostics like `Content complexity is 640` which can be consumed by the [Metrics Output Plugin](/docs/capabilities/metrics-output).
+
+```js
+complexity: extractFromDiagnostics(/Content complexity is (\d+)/, Number);
+```
