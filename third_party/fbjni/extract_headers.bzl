@@ -9,7 +9,9 @@ def _extract_headers_impl(ctx):
         outputs = [out_dir],
         command = """
         mkdir -p "{out}"
-        rsync -a {headers} "{out}/"
+        for f in {headers}; do
+            cp "$f" "{out}/$(basename $f)"
+        done
         """.format(out = out_dir.path, headers = header_paths),
     )
 
