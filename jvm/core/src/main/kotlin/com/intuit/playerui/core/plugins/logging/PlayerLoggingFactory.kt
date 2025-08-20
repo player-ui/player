@@ -1,7 +1,7 @@
 package com.intuit.playerui.core.plugins.logging
 
 import com.intuit.playerui.core.plugins.LoggerPlugin
-import java.util.*
+import java.util.ServiceLoader
 
 /** Factory of [Logging] with a specific [T] of [PlayerLoggingConfig] */
 public interface PlayerLoggingFactory<out T : PlayerLoggingConfig> {

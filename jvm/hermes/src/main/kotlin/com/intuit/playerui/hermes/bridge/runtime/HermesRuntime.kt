@@ -227,9 +227,9 @@ public object Hermes : PlayerRuntimeFactory<Config> {
             .also(ConsoleLoggerPlugin(override = true)::apply)
     }
 
-    override fun toString(): String = name
+    override fun toString(): String = NAME
 
-    public const val name: String = "Hermes"
+    public const val NAME: String = "Hermes"
 }
 
 public class HermesRuntimeContainer : PlayerRuntimeContainer {

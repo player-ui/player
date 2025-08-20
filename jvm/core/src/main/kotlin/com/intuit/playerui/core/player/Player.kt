@@ -102,13 +102,14 @@ public abstract class Player : Pluggable {
     /** [CoroutineScope] to be used for launching coroutines that should be cancelled once the Player is released */
     public abstract val scope: CoroutineScope
 
+    // TODO: With the ambiguity between [Completable] and [Deferred],
+    //  potentially simplest solution is to make [start] suspend.
+
     /**
      * Asynchronously [start] the [flow] represented as a [String]. The
      * [FlowResult] can be obtained by subscribing the the [Completable.onComplete]
      * or by blocking on [Completable.await].
      */
-    // TODO: With the ambiguity between [Completable] and [Deferred],
-    //  potentially simplest solution is to make [start] suspend.
     public abstract fun start(flow: String): Completable<CompletedState>
 
     /**

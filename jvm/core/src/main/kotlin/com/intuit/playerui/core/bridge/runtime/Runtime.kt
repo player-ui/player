@@ -34,11 +34,12 @@ public interface Runtime<Value> : Node {
     /** Serialize and assign some [value] to [name] within the [Runtime] */
     public fun add(name: String, value: Value)
 
+    // TODO: This potentially should return [Value] but we need an avenue for decoding then encoding
+
     /**
      * Serialize some [value] into the [Runtime] memory using the [serializer] and return
      * a JVM representation of the runtime object (i.e. serializing a map will return a [Node].
      */
-    // TODO: This potentially should return [Value] but we need an avenue for decoding then encoding
     public fun <T> serialize(serializer: SerializationStrategy<T>, value: T): Any?
 
     /** Close the [Runtime] and release any resources */

@@ -36,9 +36,11 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(MockKExtension::class)
 @ExtendWith(CoroutineTestDispatcherExtension::class)
 internal class PlayerViewModelTest {
-    private val validFlow = "{\"id\": \"id\",\"navigation\": {\"BEGIN\": \"FLOW_1\",\"FLOW_1\": {\"startState\": \"END_Done\",\"END_Done\": {\"state_type\": \"END\",\"outcome\": \"done\"}}}}"
+    private val validFlow =
+        "{\"id\": \"id\",\"navigation\": {\"BEGIN\": \"FLOW_1\",\"FLOW_1\": {\"startState\": \"END_Done\",\"END_Done\": {\"state_type\": \"END\",\"outcome\": \"done\"}}}}"
 
-    private val invalidFlow = "{\"id\": \"id\",\"navigation\": {\"BEGIN\": \"FLOW\",\"FLOW_1\": {\"startState\": \"END_Done\",\"END_Done\": {\"state_type\": \"END\",\"outcome\": \"done\"}}}}"
+    private val invalidFlow =
+        "{\"id\": \"id\",\"navigation\": {\"BEGIN\": \"FLOW\",\"FLOW_1\": {\"startState\": \"END_Done\",\"END_Done\": {\"state_type\": \"END\",\"outcome\": \"done\"}}}}"
 
     @MockK lateinit var flowIterator: AsyncFlowIterator
 

@@ -126,8 +126,9 @@ public class InProgressState internal constructor(
 
     private val fail: Invokable<Any> by NodeSerializableFunction()
 
-    /** [FlowResult] value that will be available once the flow completes */
     // TODO: Make non-nullable if possible - requires Promise change
+
+    /** [FlowResult] value that will be available once the flow completes */
     public val flowResult: Completable<FlowResult?> get() = Promise(
         node.getObject("flowResult")!!,
     ).toCompletable(FlowResult.serializer())

@@ -19,14 +19,15 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import java.util.*
+import java.util.UUID
 import kotlin.coroutines.resumeWithException
+
+// TODO: Potentially make Promise code in core internal
 
 /**
  * [Node] backed [Promise] implementation
  * Provides hooks into JS promise then and catch to maintain the JS promise API.
  */
-// TODO: Potentially make Promise code in core internal
 @InternalPlayerApi
 @Serializable(with = Promise.Serializer::class)
 public class Promise(

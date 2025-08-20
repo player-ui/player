@@ -110,7 +110,7 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
         runtime.load(
             ScriptContext(
                 if (runtime.config.debuggable) debugSource.readText() else source.readText(),
-                bundledSourcePath,
+                BUNDLED_SOURCE_PATH,
                 sourceMap.readText(),
             ),
         )
@@ -181,21 +181,21 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
     }
 
     internal companion object {
-        private const val bundledSourcePath = "core/player/dist/Player.native.js"
+        private const val BUNDLED_SOURCE_PATH = "core/player/dist/Player.native.js"
 
-        private const val debugSourcePath = "core/player/dist/Player.native.js"
+        private const val DEBUG_SOURCE_PATH = "core/player/dist/Player.native.js"
 
         /** Gets [URL] of the bundled source */
         private val bundledSource get() = this::class.java
             .classLoader
-            .getResource(bundledSourcePath)!!
+            .getResource(BUNDLED_SOURCE_PATH)!!
 
         private val debugSource get() = this::class.java
             .classLoader
-            .getResource(debugSourcePath)!!
+            .getResource(DEBUG_SOURCE_PATH)!!
 
         private val sourceMap get() = this::class.java
             .classLoader
-            .getResource("$bundledSourcePath.map")
+            .getResource("$BUNDLED_SOURCE_PATH.map")
     }
 }

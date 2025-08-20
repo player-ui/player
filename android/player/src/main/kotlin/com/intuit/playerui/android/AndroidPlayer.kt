@@ -255,11 +255,12 @@ public class AndroidPlayer private constructor(
         cachedAssetViews.remove(assetContext.id)?.second?.removeSelf()
     }
 
-    /** Cache current [CoroutineScope]s against [AssetContext.id] */
     // TODO: This excessive caching strategy at the AndroidPlayer level is getting out of control
     //  Remedying this should be considered with regards to the RenderableAsset lifecycle, i.e. 1..1 per AssetContext
     //  At the very least, we can scale this to a context pattern where arbitrary things can be cached at
     //  the player level instead of burdening this AndroidPlayer with this knowledge explicitly
+
+    /** Cache current [CoroutineScope]s against [AssetContext.id] */
     private val cachedHydrationScopes: MutableMap<String, CoroutineScope> = mutableMapOf()
 
     /** Retrieve the hydration [CoroutineScope] for the [assetContext] */
@@ -298,12 +299,13 @@ public class AndroidPlayer private constructor(
         hooks.release.call()
     }
 
+    // TODO: Do we even need context as a param anymore?
+
     /**
      * Method used for transforming [Asset]s into [RenderableAsset]s. The [context]
      * parameter is configurable to allow for styles to cascade down through the
      * [Asset] tree.
      */
-    // TODO: Do we even need context as a param anymore?
     internal fun expandAsset(asset: Asset?, context: Context? = null): RenderableAsset? = asset?.let { (id, type) ->
         val factory = assetRegistry[id] ?: run {
             logger.warn("Warning in flow: $id of type $type is not registered")

@@ -26,7 +26,7 @@ public fun interface ExternalActionHandler {
 /** Core plugin wrapper providing external action support for the JVM Player */
 public class ExternalActionPlugin(
     private var handler: ExternalActionHandler? = null,
-) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath),
+) : JSScriptPluginWrapper(PLUGIN_NAME, sourcePath = BUNDLED_SOURCE_PATH),
     PlayerPlugin {
     private lateinit var player: Player
 
@@ -36,7 +36,7 @@ public class ExternalActionPlugin(
 
     override fun apply(runtime: Runtime<*>) {
         SetTimeoutPlugin().apply(runtime)
-        runtime.load(ScriptContext(script, bundledSourcePath))
+        runtime.load(ScriptContext(script, BUNDLED_SOURCE_PATH))
         runtime.add("externalActionHandler") externalActionHandler@{ state: Node, options: Node ->
             val state = state.deserialize(NavigationFlowState.serializer())
                 as? NavigationFlowExternalState ?: return@externalActionHandler null
@@ -55,8 +55,8 @@ public class ExternalActionPlugin(
     }
 
     private companion object {
-        private const val pluginName = "ExternalActionPlugin.ExternalActionPlugin"
-        private const val bundledSourcePath = "plugins/external-action/core/dist/ExternalActionPlugin.native.js"
+        private const val PLUGIN_NAME = "ExternalActionPlugin.ExternalActionPlugin"
+        private const val BUNDLED_SOURCE_PATH = "plugins/external-action/core/dist/ExternalActionPlugin.native.js"
     }
 }
 
