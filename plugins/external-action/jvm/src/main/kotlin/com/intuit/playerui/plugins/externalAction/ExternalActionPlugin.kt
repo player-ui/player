@@ -16,14 +16,18 @@ import com.intuit.playerui.plugins.settimeout.SetTimeoutPlugin
 
 /** Function definition of an external action handler */
 public fun interface ExternalActionHandler {
-    public fun onExternalState(state: NavigationFlowExternalState, options: ControllerState, transition: (String) -> Unit)
+    public fun onExternalState(
+        state: NavigationFlowExternalState,
+        options: ControllerState,
+        transition: (String) -> Unit,
+    )
 }
 
 /** Core plugin wrapper providing external action support for the JVM Player */
 public class ExternalActionPlugin(
     private var handler: ExternalActionHandler? = null,
-) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath), PlayerPlugin {
-
+) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath),
+    PlayerPlugin {
     private lateinit var player: Player
 
     override fun apply(player: Player) {

@@ -17,9 +17,7 @@ public class PlayerBinding private constructor(
     public val playerCanvas: FrameLayout,
     public val scrollContainer: ScrollView,
 ) : ViewBinding {
-    override fun getRoot(): ScrollView {
-        return rootView
-    }
+    override fun getRoot(): ScrollView = rootView
 
     public companion object {
         @JvmOverloads

@@ -50,7 +50,6 @@ public class AndroidPlayer private constructor(
     public val player: HeadlessPlayer,
     override val plugins: List<Plugin> = player.plugins,
 ) : Player() {
-
     /** Convenience constructor to provide vararg style [plugins] parameter */
     public constructor(
         vararg plugins: Plugin,
@@ -95,7 +94,9 @@ public class AndroidPlayer private constructor(
 
     override val constantsController: ConstantsController by player::constantsController
 
-    public class Hooks internal constructor(hooks: Player.Hooks) : Player.Hooks by hooks {
+    public class Hooks internal constructor(
+        hooks: Player.Hooks,
+    ) : Player.Hooks by hooks {
         public class ContextHook : SyncWaterfallHook<(HookContext, Context) -> Context, Context>() {
             public fun call(context: Context): Context = super.call(
                 context,
@@ -126,7 +127,8 @@ public class AndroidPlayer private constructor(
         }
 
         public class CompositionLocalProvidedValuesHook : SyncHook<(HookContext, (List<ProvidedValue<*>>) -> Unit) -> Unit>() {
-            public fun call(hookContext: HookContext, updateProvidedValues: (List<ProvidedValue<*>>) -> Unit): Unit = super.call { f, context -> f(context, updateProvidedValues) }
+            public fun call(hookContext: HookContext, updateProvidedValues: (List<ProvidedValue<*>>) -> Unit): Unit =
+                super.call { f, context -> f(context, updateProvidedValues) }
         }
 
         public val context: ContextHook = ContextHook()
@@ -153,7 +155,11 @@ public class AndroidPlayer private constructor(
         registerAsset(T::class, type, factory)
 
     /** Helper provided to reduce overhead for simple asset registrations */
-    public fun <T : RenderableAsset> registerAsset(klass: KClass<T>, type: String, factory: (AssetContext) -> T) {
+    public fun <T : RenderableAsset> registerAsset(
+        klass: KClass<T>,
+        type: String,
+        factory: (AssetContext) -> T,
+    ) {
         registerAsset(klass, mapOf(TYPE to type), factory)
     }
 
@@ -161,7 +167,11 @@ public class AndroidPlayer private constructor(
         registerAsset(T::class, props, factory)
 
     /** Helper provided to reduce overhead for asset registrations with metaData */
-    public fun <T : RenderableAsset> registerAsset(klass: KClass<T>, props: Map<String, Any>, factory: (AssetContext) -> RenderableAsset) {
+    public fun <T : RenderableAsset> registerAsset(
+        klass: KClass<T>,
+        props: Map<String, Any>,
+        factory: (AssetContext) -> RenderableAsset,
+    ) {
         assetRegistry.register(props, factory)
         if (player.format.serializersModule.getContextual(klass) == null) {
             player.format.registerContextualSerializer(klass, assetSerializer.conform(klass))
@@ -305,9 +315,15 @@ public class AndroidPlayer private constructor(
 
     /** Wrapper class for values that are only supposed to be consumed once before
      * resetting to default */
-    internal class SingleAccessValue<T>(private val default: T) {
+    internal class SingleAccessValue<T>(
+        private val default: T,
+    ) {
         var value: T = default
-            get() = try { field } finally { field = default }
+            get() = try {
+                field
+            } finally {
+                field = default
+            }
     }
 
     private companion object {

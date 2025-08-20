@@ -25,13 +25,16 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 
-internal abstract class J2V8Test(val v8: V8 = V8.createV8Runtime().unlock()) : PromiseUtils, ThreadUtils {
-
+internal abstract class J2V8Test(
+    val v8: V8 = V8.createV8Runtime().unlock(),
+) : PromiseUtils,
+    ThreadUtils {
     private val TAG get() = this::class.java.simpleName
     val runtime = Runtime(v8)
     val format = (runtime as V8Runtime).format
 
     fun buildNodeFromMap(vararg entries: Pair<String, Any?>) = buildNodeObjectFromMap(mapOf(*entries))
+
     fun buildV8Object(jsonElement: JsonElement = buildJsonObject {}) = buildV8ObjectFromMap(
         Json.decodeFromJsonElement(
             MapSerializer(String.serializer(), GenericSerializer()),
@@ -40,6 +43,7 @@ internal abstract class J2V8Test(val v8: V8 = V8.createV8Runtime().unlock()) : P
     )
 
     fun buildV8ObjectFromMap(map: Map<String, Any?>): V8Object = format.encodeToV8Value(map).v8Object
+
     fun buildNodeObjectFromMap(map: Map<String, Any?>): Node = format.encodeToV8Value(map).v8Object.let(format::decodeFromV8Value)
 
     // PromiseUtils

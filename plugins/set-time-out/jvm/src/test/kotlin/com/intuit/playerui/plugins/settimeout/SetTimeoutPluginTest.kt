@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.TestTemplate
 
 internal class SetTimeoutPluginTest : RuntimeTest() {
-
     @TestTemplate fun `works as intended`() = runBlockingTest {
         val exceptions = mutableListOf<Throwable>()
         SetTimeoutPlugin(
@@ -33,18 +32,18 @@ internal class SetTimeoutPluginTest : RuntimeTest() {
         val promise = (
             runtime.execute(
                 """
-            (function() {
-                flag = false;
-                return new Promise((res) => {
-                    setTimeout(() => {
-                        flag = true;
-                        res(flag);
-                    }, 500);
-                });
-            }());
+                (function() {
+                    flag = false;
+                    return new Promise((res) => {
+                        setTimeout(() => {
+                            flag = true;
+                            res(flag);
+                        }, 500);
+                    });
+                }());
                 """.trimIndent(),
             ) as Node
-            ).deserialize<Promise>()
+        ).deserialize<Promise>()
         Assertions.assertFalse(runtime.getBoolean("flag")!!)
         delay(1000)
         Assertions.assertTrue(promise.toCompletable<Boolean>().await()!!)
@@ -114,7 +113,6 @@ internal class SetTimeoutPluginTest : RuntimeTest() {
 }
 
 internal class SetTimeoutPlayerPluginTest : PlayerTest() {
-
     override val plugins: List<Plugin> = listOf(SetTimeoutPlugin())
 
     @TestTemplate fun `forward errors to player`() = runBlockingTest {

@@ -31,8 +31,10 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.coroutineContext
 
 /** Extension of [DecodableAsset] that provides suspendable [initView] and [hydrate] APIs that will provide an instance of [Data] to use during [View] updates */
-public abstract class SuspendableAsset<Data>(assetContext: AssetContext, serializer: KSerializer<Data>) : DecodableAsset<Data>(assetContext, serializer) {
-
+public abstract class SuspendableAsset<Data>(
+    assetContext: AssetContext,
+    serializer: KSerializer<Data>,
+) : DecodableAsset<Data>(assetContext, serializer) {
     // To be launched in Dispatchers.Default
     public abstract suspend fun initView(data: Data): View
 
@@ -43,7 +45,10 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
             hydrationScope,
             hydrationScope.async { doInitView() },
             requireContext(),
-        ) { doHydrate(); player.cacheAssetView(assetContext, this) }
+        ) {
+            doHydrate()
+            player.cacheAssetView(assetContext, this)
+        }
     }
 
     private suspend fun doInitView() = withContext(Dispatchers.Default) {
@@ -67,7 +72,12 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
             setTag(R.bool.view_hydrated, true)
         } catch (exception: StaleViewException) {
             // b/c we're launched in a scope that isn't cared about anymore, we can't appropriately handle this, so just fast fail
-            player.inProgressState?.fail(PlayerException("SuspendableAssets can't appropriately handle invalidateViews currently, this should be handled in a future major", exception))
+            player.inProgressState?.fail(
+                PlayerException(
+                    "SuspendableAssets can't appropriately handle invalidateViews currently, this should be handled in a future major",
+                    exception,
+                ),
+            )
         } finally {
             player.asyncHydrationTrackerPlugin?.hydrationDone(this@SuspendableAsset)
         }
@@ -128,7 +138,8 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
     }
 
     /** ViewStub derivative that will replace itself in the view tree once the [view] has resolved */
-    @SuppressLint("ViewConstructor")
+    @Suppress("ktlint:standard:annotation") // To prevent class from being double indented
+    @SuppressLint("ViewConstructor") // TODO: Do we need this one?
     @InternalPlayerApi
     public class AsyncViewStub @JvmOverloads constructor(
         private val scope: CoroutineScope,
@@ -137,10 +148,12 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
         attrs: AttributeSet? = null,
         defStyle: Int = 0,
         private val onView: suspend View.() -> Unit = {},
-    ) : View(context, attrs, defStyle), View.OnAttachStateChangeListener {
+    ) : View(context, attrs, defStyle),
+        View.OnAttachStateChangeListener {
         private val hydratedView: Deferred<View> = scope.async {
             view.await().also { onView(it) }
         }
+
         init {
             addOnAttachStateChangeListener(this)
         }
@@ -171,12 +184,15 @@ public abstract class SuspendableAsset<Data>(assetContext: AssetContext, seriali
                 awaitView()?.let(handler)
             }
         }
+
         override fun onViewAttachedToWindow(v: View) {
             scope.launch(Dispatchers.Main) {
                 awaitView()
             }
         }
+
         override fun onViewDetachedFromWindow(v: View) {}
+
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
             setMeasuredDimension(0, 0)
         }

@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 internal class NestedAssetTest : BaseRenderableAssetTest() {
-
     override val asset get() = NestedAsset.sampleAsset
 
     override val player get() = AndroidPlayer(beaconPlugin).apply {

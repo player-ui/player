@@ -25,7 +25,6 @@ import kotlin.concurrent.thread
 
 /** Each method should test correct get, incorrect type, and key not found */
 internal class V8NodeTest : J2V8Test() {
-
     @Test
     fun get() = v8.evaluateInJSThreadBlocking(runtime) {
         val node = buildNodeFromMap(
@@ -178,11 +177,12 @@ internal class V8NodeTest : J2V8Test() {
 
     @Test
     fun toJson() {
-        val node = format.v8Object {
-            this["beacon"] = v8Object {
-                this["key"] = "value"
-            }
-        }.handleValue(format) as Node
+        val node = format
+            .v8Object {
+                this["beacon"] = v8Object {
+                    this["key"] = "value"
+                }
+            }.handleValue(format) as Node
 
         assertEquals(
             buildJsonObject {

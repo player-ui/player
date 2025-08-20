@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 internal class AssetTest : NodeBaseTest() {
-
     companion object {
         const val ID = "testId"
         const val TYPE = "testType"

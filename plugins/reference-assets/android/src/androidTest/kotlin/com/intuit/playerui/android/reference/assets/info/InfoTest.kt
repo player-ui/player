@@ -15,9 +15,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class InfoTest : AssetTest("info") {
-
     enum class PlayerAction {
-        Continue, Dismiss, Next
+        Continue,
+        Dismiss,
+        Next,
     }
 
     private fun verifyAndProceed(view: Int, action: PlayerAction? = null) {

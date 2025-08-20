@@ -51,9 +51,9 @@ public sealed class PlayerFlowState : NodeWrapper {
 
 /** Player state describing when a flow completed successfully */
 @Serializable(with = CompletedState.Serializer::class)
-public class CompletedState(override val node: Node) :
-    PlayerFlowExecutionState(node) {
-
+public class CompletedState(
+    override val node: Node,
+) : PlayerFlowExecutionState(node) {
     override val status: PlayerFlowStatus = COMPLETED
 
     public val endState: NavigationFlowEndState by NodeSerializableField(NavigationFlowEndState.serializer())
@@ -72,7 +72,6 @@ public class CompletedState(override val node: Node) :
 
 /** Player state describing when a flow finished but not successfully */
 public abstract class ErrorState : PlayerFlowState() {
-
     override val status: PlayerFlowStatus = ERROR
 
     /** The currently executing flow */
@@ -82,7 +81,6 @@ public abstract class ErrorState : PlayerFlowState() {
     public abstract val error: PlayerException
 
     public companion object {
-
         /** Convenience method to easily construct a synthetic error message */
         public fun from(exception: PlayerException, flow: Flow = Flow()): ErrorState = object : ErrorState() {
             override val error: PlayerException = exception
@@ -96,10 +94,10 @@ public abstract class ErrorState : PlayerFlowState() {
 }
 
 @Serializable(with = ErroneousState.Serializer::class)
-internal class ErroneousState(override val node: Node) :
-    ErrorState(),
+internal class ErroneousState(
+    override val node: Node,
+) : ErrorState(),
     NodeWrapper {
-
     override val flow: Flow by NodeSerializableField(Flow.serializer()) { Flow() }
 
     override val error: PlayerException by NodeSerializableField(PlayerException.serializer()) {
@@ -118,12 +116,12 @@ internal class ErroneousState(override val node: Node) :
 
 /** [InProgressState] is for when a flow is currently executing */
 @Serializable(with = InProgressState.Serializer::class)
-public class InProgressState internal constructor(override val node: Node) :
-    PlayerFlowExecutionState(node),
+public class InProgressState internal constructor(
+    override val node: Node,
+) : PlayerFlowExecutionState(node),
     NodeWrapper,
     ExpressionEvaluator by node.getSerializable<ControllerState>("controllers")!!.expression,
     Transition by node.getSerializable<ControllerState>("controllers")!!.flow {
-
     override val status: PlayerFlowStatus = IN_PROGRESS
 
     private val fail: Invokable<Any> by NodeSerializableFunction()
@@ -158,7 +156,9 @@ public val InProgressState.currentFlowState: NamedState? get() = controllers.flo
 public val InProgressState.dataModel: DataController get() = controllers.data
 
 @Serializable(ControllerState.Serializer::class)
-public class ControllerState internal constructor(override val node: Node) : NodeWrapper {
+public class ControllerState internal constructor(
+    override val node: Node,
+) : NodeWrapper {
     /** The manager for data for a flow */
     public val data: DataController by NodeSerializableField(DataController.serializer())
 
@@ -179,10 +179,10 @@ public class ControllerState internal constructor(override val node: Node) : Nod
 
 /** Player state describing when the player has not yet started any flow */
 @Serializable(with = NotStartedState.Serializer::class)
-public class NotStartedState internal constructor(override val node: Node) :
-    PlayerFlowState(),
+public class NotStartedState internal constructor(
+    override val node: Node,
+) : PlayerFlowState(),
     NodeWrapper {
-
     override val status: PlayerFlowStatus = NOT_STARTED
 
     internal object Serializer : NodeWrapperSerializer<NotStartedState>(::NotStartedState, NOT_STARTED.value)
@@ -202,10 +202,10 @@ public object ReleasedState : PlayerFlowState(), NodeWrapper {
  * Abstract in-execution state containing shared properties for a flow
  * (in-progress or completed successfully)
  */
-public sealed class PlayerFlowExecutionState(override val node: Node) :
-    PlayerFlowState(),
+public sealed class PlayerFlowExecutionState(
+    override val node: Node,
+) : PlayerFlowState(),
     NodeWrapper {
-
     /** The currently executing flow */
     public val flow: Flow by NodeSerializableField(Flow.serializer()) { Flow() }
 }

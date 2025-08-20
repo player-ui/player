@@ -18,19 +18,15 @@ import kotlinx.serialization.modules.SerializersModule
 public class J2V8Format(
     config: J2V8FormatConfiguration,
 ) : AbstractRuntimeFormat<V8Value>(config) {
-
     public val v8: V8 by lazy {
         (config.runtime as V8Runtime).v8
     }
 
-    override fun <T> encodeToRuntimeValue(serializer: SerializationStrategy<T>, value: T): V8Value =
-        writeV8(value, serializer)
+    override fun <T> encodeToRuntimeValue(serializer: SerializationStrategy<T>, value: T): V8Value = writeV8(value, serializer)
 
-    override fun <T> decodeFromRuntimeValue(deserializer: DeserializationStrategy<T>, element: V8Value): T =
-        readV8(element, deserializer)
+    override fun <T> decodeFromRuntimeValue(deserializer: DeserializationStrategy<T>, element: V8Value): T = readV8(element, deserializer)
 
-    public fun parseToV8Value(string: String): V8Value =
-        parseToRuntimeValue(string)
+    public fun parseToV8Value(string: String): V8Value = parseToRuntimeValue(string)
 
     override fun parseToRuntimeValue(string: String): V8Value = v8.evaluateInJSThreadBlocking(runtime) {
         executeScript("($string)").let(::V8Value)
@@ -42,8 +38,6 @@ public data class J2V8FormatConfiguration internal constructor(
     override val serializersModule: SerializersModule,
 ) : RuntimeFormatConfiguration<V8Value>
 
-internal inline fun <reified T> J2V8Format.encodeToV8Value(value: T): V8Value =
-    encodeToRuntimeValue(serializer(), value)
+internal inline fun <reified T> J2V8Format.encodeToV8Value(value: T): V8Value = encodeToRuntimeValue(serializer(), value)
 
-internal inline fun <reified T> J2V8Format.decodeFromV8Value(value: V8Value): T =
-    decodeFromRuntimeValue(serializer(), value)
+internal inline fun <reified T> J2V8Format.decodeFromV8Value(value: V8Value): T = decodeFromRuntimeValue(serializer(), value)

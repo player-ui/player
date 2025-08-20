@@ -13,8 +13,9 @@ import com.intuit.playerui.utils.makeFlow
 import kotlinx.serialization.json.Json
 
 @Suppress("DEPRECATION_ERROR")
-internal class SimpleAsset(assetContext: AssetContext) : DecodableAsset<Node>(assetContext, Node.serializer()) {
-
+internal class SimpleAsset(
+    assetContext: AssetContext,
+) : DecodableAsset<Node>(assetContext, Node.serializer()) {
     override fun initView() = TextView(context)
 
     override fun View.hydrate() = Unit

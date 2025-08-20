@@ -54,15 +54,15 @@ internal typealias CachedAssetView = Pair<AssetContext?, View?>
  * to a new instance. However, it is recommended just propagate the
  * [AssetContext] in the constructor as to keep asset registration simple.
  */
+@Suppress("ktlint:standard:annotation") // To prevent class from being double indented
 @Serializable(RenderableAsset.ContextualSerializer::class)
-public abstract class RenderableAsset
-@Deprecated(
+public abstract class RenderableAsset @Deprecated(
     "RenderableAssets should be migrated to DecodableAsset",
     ReplaceWith("DecodableAsset(assetContext, serializer)"),
     DeprecationLevel.ERROR,
-)
-public constructor(public val assetContext: AssetContext) : NodeWrapper {
-
+) public constructor(
+    public val assetContext: AssetContext,
+) : NodeWrapper {
     /**
      * Helper to get the current cached [AssetContext] and [View].
      * Will return empty pair if not found.
@@ -89,7 +89,9 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
      * the [Player.flowScope] is cancelled.
      */
     protected val hydrationScope: CoroutineScope get() = _hydrationScope
-        ?: throw PlayerException("Attempted to use hydrationScope outside hydration context! Ensure usage remains within the RenderableAsset.hydrate function...")
+        ?: throw PlayerException(
+            "Attempted to use hydrationScope outside hydration context! Ensure usage remains within the RenderableAsset.hydrate function...",
+        )
 
     private var _hydrationScope: CoroutineScope?
         get() = player.getCachedHydrationScope(assetContext)
@@ -109,34 +111,35 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
      * also automatically caches the instance of the [View] and detects
      * when it needs to reconstruct or rehydrate.
      */
-    private fun render(): View = cachedAssetView.let { (cachedAssetContext, cachedView) ->
-        requireContext()
-        when {
-            // View not found. Create and hydrate.
-            cachedView == null -> {
-                renewHydrationScope("recreating view")
-                initView().also { it.hydrate() }
-            } // View found, but contexts are out of sync. Remove cached view and create and hydrate.
-            cachedAssetContext?.context != context || cachedAssetContext?.asset?.type != asset.type -> {
-                renewHydrationScope("recreating view")
-                cachedView.removeSelf()
-                initView().also { it.hydrate() }
-            }
-            // View found, but assets are out of sync. Rehydrate. It is possible for the hydrate
-            // implementation to throw [StaleViewException] to signify that the view is out of sync.
-            // This can only be done from invalidateView, so we have a guarantee that the view has
-            // already been removed from the cache.
-            !cachedAssetContext.asset.nativeReferenceEquals(asset) ->
-                try {
-                    cachedView.also(::rehydrate)
-                } catch (exception: StaleViewException) {
-                    player.logger.info("re-rendering due to stale child: ${exception.assetContext.id}")
-                    render()
+    private fun render(): View = cachedAssetView
+        .let { (cachedAssetContext, cachedView) ->
+            requireContext()
+            when {
+                // View not found. Create and hydrate.
+                cachedView == null -> {
+                    renewHydrationScope("recreating view")
+                    initView().also { it.hydrate() }
+                } // View found, but contexts are out of sync. Remove cached view and create and hydrate.
+                cachedAssetContext?.context != context || cachedAssetContext?.asset?.type != asset.type -> {
+                    renewHydrationScope("recreating view")
+                    cachedView.removeSelf()
+                    initView().also { it.hydrate() }
                 }
-            // View found, everything is in sync. Do nothing.
-            else -> cachedView
-        }
-    }.also { if (it !is SuspendableAsset.AsyncViewStub) player.cacheAssetView(assetContext, it) }
+                // View found, but assets are out of sync. Rehydrate. It is possible for the hydrate
+                // implementation to throw [StaleViewException] to signify that the view is out of sync.
+                // This can only be done from invalidateView, so we have a guarantee that the view has
+                // already been removed from the cache.
+                !cachedAssetContext.asset.nativeReferenceEquals(asset) ->
+                    try {
+                        cachedView.also(::rehydrate)
+                    } catch (exception: StaleViewException) {
+                        player.logger.info("re-rendering due to stale child: ${exception.assetContext.id}")
+                        render()
+                    }
+                // View found, everything is in sync. Do nothing.
+                else -> cachedView
+            }
+        }.also { if (it !is SuspendableAsset.AsyncViewStub) player.cacheAssetView(assetContext, it) }
 
     /** Invalidate view, causing a complete re-render of the current asset */
     public fun invalidateView() {
@@ -179,14 +182,18 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
         .render()
 
     /** Render a [View] with specific [styles] */
-    public fun RenderableAsset.render(@StyleRes vararg styles: Style?): View = assetContext
+    public fun RenderableAsset.render(
+        @StyleRes vararg styles: Style?,
+    ): View = assetContext
         .withContext(this@RenderableAsset.requireContext())
         .withStyles(*styles)
         .build()
         .render()
 
     /** Render a [View] with specific [styles] */
-    public fun RenderableAsset.render(@StyleRes styles: Styles?): View = assetContext
+    public fun RenderableAsset.render(
+        @StyleRes styles: Styles?,
+    ): View = assetContext
         .withContext(this@RenderableAsset.requireContext())
         .withStyles(styles)
         .build()
@@ -200,7 +207,10 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
         .render()
 
     /** Render a [View] with specific [styles] */
-    public fun RenderableAsset.render(@StyleRes vararg styles: Style?, tag: String): View = assetContext
+    public fun RenderableAsset.render(
+        @StyleRes vararg styles: Style?,
+        tag: String,
+    ): View = assetContext
         .withContext(this@RenderableAsset.requireContext())
         .withTag(tag)
         .withStyles(*styles)
@@ -208,14 +218,17 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
         .render()
 
     /** Render a [View] with specific [styles] */
-    public fun RenderableAsset.render(@StyleRes styles: Styles?, tag: String): View = assetContext
+    public fun RenderableAsset.render(
+        @StyleRes styles: Styles?,
+        tag: String,
+    ): View = assetContext
         .withContext(this@RenderableAsset.requireContext())
         .withTag(tag)
         .withStyles(styles)
         .build()
         .render()
 
-    /** Expansion helpers */
+    // Expansion helpers
 
     /** Unwraps the [AssetWrapper] extracting [asset] as a [RenderableAsset] */
     public fun AssetWrapper.asRenderableAsset(): RenderableAsset? = player.expandAsset(this.asset)
@@ -240,7 +253,8 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
     /** Expand [name] as a collection of [RenderableAsset]s from the base [asset] */
     @Deprecated(DEPRECATED_WITH_DECODABLEASSET, level = DeprecationLevel.ERROR)
     @Suppress("DEPRECATION_ERROR")
-    public fun expandList(name: String, context: Context? = this@RenderableAsset.context): List<RenderableAsset> = asset.expandList(name, context)
+    public fun expandList(name: String, context: Context? = this@RenderableAsset.context): List<RenderableAsset> =
+        asset.expandList(name, context)
 
     /** Expand [name] as a collection of [RenderableAsset]s from [this] specific [Node] */
     @Deprecated(DEPRECATED_WITH_DECODABLEASSET, level = DeprecationLevel.ERROR)
@@ -273,12 +287,14 @@ public constructor(public val assetContext: AssetContext) : NodeWrapper {
         private val cachedAssetViewNotFound: Pair<AssetContext?, View?> = null to null
     }
 
-    public class Serializer(private val player: AndroidPlayer) : KSerializer<RenderableAsset?> {
-
+    public class Serializer(
+        private val player: AndroidPlayer,
+    ) : KSerializer<RenderableAsset?> {
         override val descriptor: SerialDescriptor = buildClassSerialDescriptor("com.intuit.playerui.android.asset.RenderableAsset")
 
         /** Deserialize using the expansion process */
-        override fun deserialize(decoder: Decoder): RenderableAsset? = decoder.requireNodeDecoder()
+        override fun deserialize(decoder: Decoder): RenderableAsset? = decoder
+            .requireNodeDecoder()
             .decodeNode()
             .let(::AssetWrapper)
             .asset

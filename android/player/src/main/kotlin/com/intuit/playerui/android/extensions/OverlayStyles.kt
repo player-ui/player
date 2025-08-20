@@ -25,8 +25,9 @@ public fun Context.overlayStyles(
     @StyleRes baseStyle: Style?,
 ): Context = overlayStyles(baseStyle.toStyles(), additionalStyles.toList())
 
-public fun Context.overlayStyles(@StyleRes vararg additionalStyles: Style): Context =
-    overlayStyles(additionalStyles = additionalStyles.toList())
+public fun Context.overlayStyles(
+    @StyleRes vararg additionalStyles: Style,
+): Context = overlayStyles(additionalStyles = additionalStyles.toList())
 
 /**
  * Helper method to overlay a collection of [Style]s onto the [Context]

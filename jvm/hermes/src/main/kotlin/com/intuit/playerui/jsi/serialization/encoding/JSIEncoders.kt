@@ -38,11 +38,13 @@ internal fun <T> JSIFormat.writeToValue(value: T, serializer: SerializationStrat
     return result
 }
 
-internal open class JSIValueEncoder(private val format: JSIFormat, private val mode: Mode, private val consumer: (Value) -> Unit) :
-    AbstractEncoder(),
+internal open class JSIValueEncoder(
+    private val format: JSIFormat,
+    private val mode: Mode,
+    private val consumer: (Value) -> Unit,
+) : AbstractEncoder(),
     NodeEncoder,
     FunctionEncoder {
-
     internal constructor(format: JSIFormat, consumer: (Value) -> Unit) : this(format, Mode.UNDECIDED, consumer)
 
     protected val runtime: HermesRuntime by format::runtime
@@ -110,9 +112,7 @@ internal open class JSIValueEncoder(private val format: JSIFormat, private val m
         }
     }
 
-    override fun beginStructure(
-        descriptor: SerialDescriptor,
-    ): CompositeEncoder {
+    override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder {
         val consumer = when (mode) {
             Mode.LIST,
             Mode.MAP,
@@ -135,6 +135,7 @@ internal open class JSIValueEncoder(private val format: JSIFormat, private val m
     }
 
     override fun endStructure(descriptor: SerialDescriptor): Unit = endEncode()
+
     protected fun endEncode() = consumer.invoke(currentContent)
 
     override fun encodeValue(value: Any): Unit = putContent(
@@ -199,11 +200,14 @@ internal open class JSIValueEncoder(private val format: JSIFormat, private val m
     }
 }
 
-internal class JSIExceptionEncoder(format: JSIFormat, consumer: (Value) -> Unit) : JSIValueEncoder(format, Mode.MAP, consumer) {
-
+internal class JSIExceptionEncoder(
+    format: JSIFormat,
+    consumer: (Value) -> Unit,
+) : JSIValueEncoder(format, Mode.MAP, consumer) {
     override val contentMap by lazy {
         runtime.evaluateInJSThreadBlocking {
-            runtime.global()
+            runtime
+                .global()
                 .getPropertyAsFunction(runtime, "Error")
                 .callAsConstructor(runtime)
                 .asObject(runtime)

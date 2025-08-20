@@ -20,7 +20,6 @@ public typealias ExpressionHandler = (List<Any?>) -> Any?
 public class ExpressionPlugin(
     public val map: Map<String, ExpressionHandler>,
 ) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
-
     public constructor(vararg expressions: Pair<String, ExpressionHandler>) : this(expressions.toMap())
 
     override fun apply(runtime: Runtime<*>) {

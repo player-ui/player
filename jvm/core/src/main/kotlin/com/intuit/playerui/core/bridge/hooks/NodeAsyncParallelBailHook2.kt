@@ -15,8 +15,8 @@ public class NodeAsyncParallelBailHook2<T1, T2, R : Any?>(
     override val node: Node,
     serializer1: KSerializer<T1>,
     serializer2: KSerializer<T2>,
-) : AsyncParallelBailHook<suspend (HookContext, T1, T2) -> BailResult<R>, R>(), AsyncNodeHook<R> {
-
+) : AsyncParallelBailHook<suspend (HookContext, T1, T2) -> BailResult<R>, R>(),
+    AsyncNodeHook<R> {
     init {
         init(serializer1, serializer2)
     }
@@ -35,6 +35,6 @@ public class NodeAsyncParallelBailHook2<T1, T2, R : Any?>(
         private val serializer2: KSerializer<T2>,
         `_`: KSerializer<R>,
     ) : NodeWrapperSerializer<NodeAsyncParallelBailHook2<T1, T2, R>>({
-        NodeAsyncParallelBailHook2(it, serializer1, serializer2)
-    })
+            NodeAsyncParallelBailHook2(it, serializer1, serializer2)
+        })
 }

@@ -46,16 +46,14 @@ import java.net.URL
  *  - [JSPluginWrapper]
  *  - [PlayerPlugin]
  */
-public class HeadlessPlayer
-@ExperimentalPlayerApi
-@JvmOverloads
-public constructor(
+@Suppress("ktlint:standard:annotation") // To prevent class from being double indented
+public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public constructor(
     override val plugins: List<Plugin>,
     explicitRuntime: Runtime<*>? = null,
     private val source: URL = bundledSource,
     config: PlayerRuntimeConfig = PlayerRuntimeConfig(),
-) : Player(), NodeWrapper {
-
+) : Player(),
+    NodeWrapper {
     /** Convenience constructor to allow [plugins] to be passed as varargs */
     @ExperimentalPlayerApi @JvmOverloads
     public constructor(
@@ -78,7 +76,10 @@ public constructor(
 
     override val hooks: Hooks by NodeSerializableField(Hooks.serializer(), NodeSerializableField.CacheStrategy.Full)
 
-    override val constantsController: ConstantsController by NodeSerializableField(ConstantsController.serializer(), NodeSerializableField.CacheStrategy.Full)
+    override val constantsController: ConstantsController by NodeSerializableField(
+        ConstantsController.serializer(),
+        NodeSerializableField.CacheStrategy.Full,
+    )
 
     override val state: PlayerFlowState get() = if (player.isReleased()) {
         ReleasedState
@@ -93,9 +94,10 @@ public constructor(
             if (state !is ReleasedState) {
                 inProgressState?.fail(throwable) ?: logger.error(
                     "Exception caught in Player scope: ${throwable.message}",
-                    throwable.stackTrace.joinToString("\n") {
-                        "\tat $it"
-                    }.replaceFirst("\tat ", "\n"),
+                    throwable.stackTrace
+                        .joinToString("\n") {
+                            "\tat $it"
+                        }.replaceFirst("\tat ", "\n"),
                 )
             }
         }
@@ -105,7 +107,13 @@ public constructor(
 
     init {
         /** 1. load source into the [runtime] and release lock */
-        runtime.load(ScriptContext(if (runtime.config.debuggable) debugSource.readText() else source.readText(), bundledSourcePath, sourceMap.readText()))
+        runtime.load(
+            ScriptContext(
+                if (runtime.config.debuggable) debugSource.readText() else source.readText(),
+                bundledSourcePath,
+                sourceMap.readText(),
+            ),
+        )
 
         /** 2. merge explicit [LoggerPlugin]s with ones created by service loader */
         val loggerPlugins = plugins.filterIsInstance<LoggerPlugin>().let { explicitLoggers ->
@@ -135,9 +143,10 @@ public constructor(
                 scope.launch {
                     logger.warn(
                         "Main thread is blocking on JS runtime access: $this",
-                        stackTrace.joinToString("\n") {
-                            "\tat $it"
-                        }.replaceFirst("\tat ", "\n"),
+                        stackTrace
+                            .joinToString("\n") {
+                                "\tat $it"
+                            }.replaceFirst("\tat ", "\n"),
                     )
                 }
             }
@@ -160,10 +169,9 @@ public constructor(
     public fun start(flow: Node): Completable<CompletedState> = PlayerCompletable(player.getInvokable<Node>("start")!!.invoke(flow))
 
     /** Start a [flow] and subscribe to the result */
-    public fun start(flow: Node, onComplete: (Result<CompletedState>) -> Unit): Completable<CompletedState> =
-        start(flow).apply {
-            onComplete(onComplete)
-        }
+    public fun start(flow: Node, onComplete: (Result<CompletedState>) -> Unit): Completable<CompletedState> = start(flow).apply {
+        onComplete(onComplete)
+    }
 
     override fun release() {
         if (!runtime.isReleased()) {
@@ -173,19 +181,21 @@ public constructor(
     }
 
     internal companion object {
-
         private const val bundledSourcePath = "core/player/dist/Player.native.js"
 
         private const val debugSourcePath = "core/player/dist/Player.native.js"
 
         /** Gets [URL] of the bundled source */
         private val bundledSource get() = this::class.java
-            .classLoader.getResource(bundledSourcePath)!!
+            .classLoader
+            .getResource(bundledSourcePath)!!
 
         private val debugSource get() = this::class.java
-            .classLoader.getResource(debugSourcePath)!!
+            .classLoader
+            .getResource(debugSourcePath)!!
 
         private val sourceMap get() = this::class.java
-            .classLoader.getResource("$bundledSourcePath.map")
+            .classLoader
+            .getResource("$bundledSourcePath.map")
     }
 }

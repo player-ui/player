@@ -25,8 +25,9 @@ public typealias asyncNodeUpdate = Any?
 
 public typealias AsyncHandler = suspend (node: Node, callback: ((result: Any?) -> Unit)?) -> asyncNodeUpdate
 
-public class AsyncNodePlugin(private val asyncHandler: AsyncHandler? = null) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
-
+public class AsyncNodePlugin(
+    private val asyncHandler: AsyncHandler? = null,
+) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
     public lateinit var hooks: Hooks
 
     override fun apply(runtime: Runtime<*>) {
@@ -44,7 +45,9 @@ public class AsyncNodePlugin(private val asyncHandler: AsyncHandler? = null) : J
     }
 
     @Serializable(with = Hooks.Serializer::class)
-    public class Hooks internal constructor(override val node: Node) : NodeWrapper {
+    public class Hooks internal constructor(
+        override val node: Node,
+    ) : NodeWrapper {
         /** The hook right before the View starts resolving. Attach anything custom here */
         public val onAsyncNode: NodeAsyncParallelBailHook2<Node, (asyncNodeUpdate) -> Unit, asyncNodeUpdate> by
             NodeSerializableField(

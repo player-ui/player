@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 internal class JavaLoggerPluginTest {
-
     @Test
     fun `test default name`() {
         Assertions.assertEquals("JavaLogger", JavaLoggerFactory.create().config.name)
@@ -15,9 +14,10 @@ internal class JavaLoggerPluginTest {
     fun `test logger can be customized`() {
         Assertions.assertEquals(
             "MyLogger",
-            JavaLoggerFactory.create {
-                name = "MyLogger"
-            }.logger.name,
+            JavaLoggerFactory
+                .create {
+                    name = "MyLogger"
+                }.logger.name,
         )
     }
 

@@ -11,7 +11,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class CollectionTest : AssetTest("collection") {
-
     @Test
     fun basic() {
         launchMock("collection-basic")

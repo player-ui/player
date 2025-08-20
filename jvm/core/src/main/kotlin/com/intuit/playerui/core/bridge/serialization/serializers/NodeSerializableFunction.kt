@@ -16,7 +16,6 @@ internal class NodeSerializableFunction<R> private constructor(
     internal val strategy: CacheStrategy,
     private val name: String?,
 ) {
-
     /** Caching strategy for determining how to pull the value from [Node] on subsequent attempts */
     public enum class CacheStrategy {
         None,
@@ -24,13 +23,14 @@ internal class NodeSerializableFunction<R> private constructor(
     }
 
     /** Cache of container [Node] that will reset the [value] cache if out-of-date with the [provider] */
-    private var cache: Node = provider(); get() {
-        val provided = provider()
-        field = provided
-        value = null
+    private var cache: Node = provider()
+        get() {
+            val provided = provider()
+            field = provided
+            value = null
 
-        return field
-    }
+            return field
+        }
 
     /** Cache of the [T] value, along with the backing [Node] for objects */
     private var value: Invokable<R>? = null
@@ -51,7 +51,6 @@ internal class NodeSerializableFunction<R> private constructor(
     }
 
     public companion object {
-
         /** Smart constructor responsible for determining the correct [CacheStrategy] and [defaultValue] from the [serializer], if either are not provided */
         @ExperimentalPlayerApi
         public operator fun <R> invoke(

@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.intuit.playerui.android.reference.demo.ui.main.MainActivity
 
 class SplashActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

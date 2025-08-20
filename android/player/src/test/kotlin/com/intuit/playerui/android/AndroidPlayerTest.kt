@@ -27,7 +27,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
 internal class AndroidPlayerTest {
-
     @MockK lateinit var mockContext: Context
 
     @Test

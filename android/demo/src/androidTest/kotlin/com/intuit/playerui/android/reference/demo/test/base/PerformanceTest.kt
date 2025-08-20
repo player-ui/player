@@ -15,7 +15,6 @@ import java.io.InputStreamReader
 import java.util.regex.Pattern
 
 interface PerformanceTest<T : Activity> {
-
     @get:Rule
     val activityRule: ActivityScenarioRule<T>
 
@@ -99,7 +98,9 @@ interface PerformanceTest<T : Activity> {
     }
 
     fun executeShellCommand(command: String): InputStream {
-        val stdout = InstrumentationRegistry.getInstrumentation().uiAutomation
+        val stdout = InstrumentationRegistry
+            .getInstrumentation()
+            .uiAutomation
             .executeShellCommand(command)
         return ParcelFileDescriptor.AutoCloseInputStream(stdout)
     }

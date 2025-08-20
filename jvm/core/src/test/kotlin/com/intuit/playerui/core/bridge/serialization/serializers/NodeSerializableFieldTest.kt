@@ -29,7 +29,9 @@ data class Structured(
 )
 
 @Serializable(Wrapper.Serializer::class)
-class Wrapper(override val node: Node) : NodeWrapper {
+class Wrapper(
+    override val node: Node,
+) : NodeWrapper {
     val nested: Structured by NodeSerializableField()
     val primitive: Int by NodeSerializableField()
 
@@ -37,7 +39,6 @@ class Wrapper(override val node: Node) : NodeWrapper {
 }
 
 internal class NodeSerializableFieldTest : RuntimeTest() {
-
     private val data = buildJsonObject {
         put("primitive", 10)
         put(
@@ -160,7 +161,10 @@ internal class NodeSerializableFieldTest : RuntimeTest() {
 
     @TestTemplate fun `JsonNull is unfortunately not handled automatically`() {
         var callCount = 0
-        val json: JsonElement by NodeSerializableField({ runtime }) { callCount++; JsonNull }
+        val json: JsonElement by NodeSerializableField({ runtime }) {
+            callCount++
+            JsonNull
+        }
         assertEquals(JsonNull, json)
 
         runtime.execute("var json = 20;")

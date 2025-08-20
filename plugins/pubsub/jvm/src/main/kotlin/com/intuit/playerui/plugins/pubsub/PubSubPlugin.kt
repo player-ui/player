@@ -10,8 +10,9 @@ import com.intuit.playerui.core.plugins.findPlugin
 import kotlinx.serialization.Serializable
 
 /** Core plugin wrapper providing pub-sub support to the JVM player */
-public class PubSubPlugin(public val config: Config? = null) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
-
+public class PubSubPlugin(
+    public val config: Config? = null,
+) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
     override fun apply(runtime: Runtime<*>) {
         config?.let {
             runtime.load(ScriptContext(script, bundledSourcePath))

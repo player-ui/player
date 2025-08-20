@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestTemplate
 
 internal class DataControllerIntegrationTest : PlayerTest() {
-
     @TestTemplate
     fun `test data controller from state`() {
         player.start(simpleFlowString)

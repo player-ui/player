@@ -14,7 +14,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class InputTest : AssetTest("input") {
-
     private fun FormattedEditText.type(text: String) {
         requestFocus()
         setText(text)
@@ -26,7 +25,8 @@ class InputTest : AssetTest("input") {
     fun basic() {
         launchMock("input-basic")
 
-        val inputLabelContainer = currentView?.findViewById<FrameLayout>(R.id.input_label_container) ?: throw AssertionError("current view is null")
+        val inputLabelContainer = currentView?.findViewById<FrameLayout>(R.id.input_label_container)
+            ?: throw AssertionError("current view is null")
         val inputField = currentView?.findViewById<FormattedEditText>(R.id.input_field) ?: throw AssertionError("current view is null")
 
         inputLabelContainer[0].shouldBeView<TextView> {

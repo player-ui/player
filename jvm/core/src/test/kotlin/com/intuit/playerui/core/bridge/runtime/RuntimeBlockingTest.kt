@@ -23,7 +23,6 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 
 internal class RuntimeBlockingTest : RuntimeTest() {
-
     private lateinit var handles: HashMap<String, Continuation<Unit>>
     private lateinit var jobs: HashMap<String, Deferred<Unit>>
     private val blockOnJvm by NodeSerializableField<(key: String) -> Unit>(::runtime)
@@ -35,16 +34,27 @@ internal class RuntimeBlockingTest : RuntimeTest() {
         Assertions.assertTrue(isCompleted)
     }
 
-    private fun CoroutineScope.doOnJvmAsync(key: String, block: suspend Deferred<Unit>.(Continuation<Unit>) -> Unit, job: suspend () -> Unit): Pair<Deferred<Unit>, Deferred<Continuation<Unit>>> = async { job() }.also { jobs[key] = it } to async {
+    private fun CoroutineScope.doOnJvmAsync(
+        key: String,
+        block: suspend Deferred<Unit>.(Continuation<Unit>) -> Unit,
+        job: suspend () -> Unit,
+    ): Pair<Deferred<Unit>, Deferred<Continuation<Unit>>> = async { job() }.also { jobs[key] = it } to async {
         while (handles[key] == null) delay(50)
         (handles[key] ?: error("handle shouldn't be null"))
             .also { (jobs[key] ?: error("job shouldn't be null")).block(it) }
     }
 
-    private fun CoroutineScope.blockOnJvmAsync(key: String = UUID.randomUUID().toString(), block: suspend Deferred<Unit>.(Continuation<Unit>) -> Unit = {}): Pair<Deferred<Unit>, Deferred<Continuation<Unit>>> =
-        doOnJvmAsync(key, block) { blockOnJvm(key) }
+    private fun CoroutineScope.blockOnJvmAsync(
+        key: String = UUID.randomUUID().toString(),
+        block: suspend Deferred<Unit>.(Continuation<Unit>) -> Unit = {
+        },
+    ): Pair<Deferred<Unit>, Deferred<Continuation<Unit>>> = doOnJvmAsync(key, block) { blockOnJvm(key) }
 
-    private fun CoroutineScope.promiseOnJvmAsync(key: String = UUID.randomUUID().toString(), block: suspend Deferred<Unit>.(Continuation<Unit>) -> Unit = {}): Pair<Deferred<Unit>, Deferred<Continuation<Unit>>> =
+    private fun CoroutineScope.promiseOnJvmAsync(
+        key: String = UUID.randomUUID().toString(),
+        block: suspend Deferred<Unit>.(Continuation<Unit>) -> Unit = {
+        },
+    ): Pair<Deferred<Unit>, Deferred<Continuation<Unit>>> =
         doOnJvmAsync(key, block) { promiseOnJvm(key).let(::Promise).toCompletable<Unit>().await() ?: Unit }
 
     private suspend fun suspendOnHandler(key: String) = suspendCancellableCoroutine<Unit> { continuation ->

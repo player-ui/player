@@ -23,7 +23,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
 internal class BrokenAssetTest {
-
     private val runtime = BrokenAsset.runtime
 
     @MockK
@@ -50,8 +49,12 @@ internal class BrokenAssetTest {
 
     @Test
     fun `invalidate view should handle gracefully in a rehydrate (if asset renders properly the second time)`() {
-        assertTrue(BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Frame))).render(mockContext) is FrameLayout)
-        assertTrue(BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Linear))).render(mockContext) is LinearLayout)
+        assertTrue(
+            BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Frame))).render(mockContext) is FrameLayout,
+        )
+        assertTrue(
+            BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Linear))).render(mockContext) is LinearLayout,
+        )
     }
 
     @Test

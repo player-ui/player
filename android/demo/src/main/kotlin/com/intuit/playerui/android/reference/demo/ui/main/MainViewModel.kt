@@ -14,8 +14,9 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import java.io.FileNotFoundException
 
-class MainViewModel(private val context: Application) : AndroidViewModel(context) {
-
+class MainViewModel(
+    private val context: Application,
+) : AndroidViewModel(context) {
     val mocks: List<Mock<out Any?>> by lazy {
         readMocksFromClasspath() + readMocksFromAssets()
     }
@@ -52,7 +53,8 @@ class MainViewModel(private val context: Application) : AndroidViewModel(context
         } ?: emptyList()
 
     fun groupMocks(menu: Menu) {
-        mocks.groupBy { it.group }
+        mocks
+            .groupBy { it.group }
             .map { (group, mocks) -> menu.addSubMenu(group) to mocks }
             .map { (group, mocks) ->
                 mocks.mapIndexed { index, mock ->

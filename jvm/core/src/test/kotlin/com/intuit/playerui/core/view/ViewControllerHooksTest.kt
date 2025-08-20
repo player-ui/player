@@ -5,12 +5,11 @@ import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.getInvokable
 import com.intuit.playerui.core.bridge.hooks.NodeSyncHook1
 import io.mockk.every
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions.assertEquals
 
 internal class ViewControllerHooksTest : NodeBaseTest() {
-
     private val view by lazy {
         NodeSyncHook1(node, View.serializer())
     }

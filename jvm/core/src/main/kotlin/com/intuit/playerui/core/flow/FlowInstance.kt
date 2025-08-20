@@ -19,8 +19,10 @@ import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 
 @Serializable(FlowInstance.Serializer::class)
-public class FlowInstance(override val node: Node) : NodeWrapper, Transition {
-
+public class FlowInstance(
+    override val node: Node,
+) : NodeWrapper,
+    Transition {
     public val id: String by NodeSerializableField(String.serializer())
 
     public val hooks: Hooks by NodeSerializableField(Hooks.serializer())
@@ -34,7 +36,9 @@ public class FlowInstance(override val node: Node) : NodeWrapper, Transition {
     }
 
     @Serializable(Hooks.Serializer::class)
-    public class Hooks internal constructor(override val node: Node) : NodeWrapper {
+    public class Hooks internal constructor(
+        override val node: Node,
+    ) : NodeWrapper {
         /** A callback when the onStart node was present */
         public val onStart: NodeSyncHook1<Any?> by NodeSerializableField(NodeSyncHook1.serializer(GenericSerializer()))
 

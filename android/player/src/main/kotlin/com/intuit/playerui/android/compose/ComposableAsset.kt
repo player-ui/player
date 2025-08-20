@@ -35,11 +35,10 @@ import kotlinx.serialization.KSerializer
  * @param serializer The serializer for the Data type.
  */
 @ExperimentalPlayerApi
-public abstract class ComposableAsset<Data> (
+public abstract class ComposableAsset<Data>(
     assetContext: AssetContext,
     serializer: KSerializer<Data>,
 ) : SuspendableAsset<Data>(assetContext, serializer) {
-
     override suspend fun initView(data: Data): View = ComposeView(requireContext()).apply {
         layoutParams = ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
     }
@@ -101,10 +100,7 @@ public abstract class ComposableAsset<Data> (
     }
 
     @Composable
-    private fun RenderableAsset.composeAndroidView(
-        modifier: Modifier = Modifier,
-        styles: Styles? = null,
-    ) {
+    private fun RenderableAsset.composeAndroidView(modifier: Modifier = Modifier, styles: Styles? = null) {
         AndroidView(factory = ::FrameLayout, modifier) {
             hydrationScope.launch {
                 render(styles) into it

@@ -16,8 +16,9 @@ import com.intuit.playerui.utils.makeFlow
 import kotlinx.serialization.json.Json
 
 @Suppress("DEPRECATION_ERROR")
-internal class NestedAsset(assetContext: AssetContext) : SuspendableAsset<Node>(assetContext, NodeSerializer()) {
-
+internal class NestedAsset(
+    assetContext: AssetContext,
+) : SuspendableAsset<Node>(assetContext, NodeSerializer()) {
     val nested = expand("nested")
     val nestedList = expandList("nestedAssets")
 
@@ -27,9 +28,10 @@ internal class NestedAsset(assetContext: AssetContext) : SuspendableAsset<Node>(
         require(this is LinearLayout)
         nested?.render() into this
         dummy = nested
-        nestedList.map {
-            it.render(0)
-        }.forEach { it into this }
+        nestedList
+            .map {
+                it.render(0)
+            }.forEach { it into this }
         dummy2 = nestedList
     }
 

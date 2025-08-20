@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class JSIFormatTest : HermesTest() {
-
     @Test fun `encode simple map into Value with explicit serializers`() = runtime.evaluateInJSThreadBlocking {
         val map = mapOf(
             "one" to 1,
@@ -79,10 +78,12 @@ internal class JSIFormatTest : HermesTest() {
 
         val simple = format.decodeFromRuntimeValue(
             Simple.serializer(),
-            Object.create(runtime).apply {
-                setProperty(runtime, "one", Value.from(3))
-                setProperty(runtime, "two", Value.from(4))
-            }.asValue(runtime),
+            Object
+                .create(runtime)
+                .apply {
+                    setProperty(runtime, "one", Value.from(3))
+                    setProperty(runtime, "two", Value.from(4))
+                }.asValue(runtime),
         )
 
         assertEquals(3, simple.one)
@@ -90,21 +91,26 @@ internal class JSIFormatTest : HermesTest() {
     }
 
     @Test fun `decode into Node backed serializable`() = runtime.evaluateInJSThreadBlocking {
-        data class Simple(override val node: Node) : NodeWrapper {
+        data class Simple(
+            override val node: Node,
+        ) : NodeWrapper {
             fun increment(value: Int) = node.getInvokable<Int>("increment")!!(value)
         }
 
         val simple = format.decodeFromRuntimeValue(
             NodeWrapperSerializer(::Simple),
-            Object.create(runtime).apply {
-                setProperty(
-                    runtime,
-                    "increment",
-                    Function.createFromHostFunction(runtime) { args ->
-                        Value.from(args[0].asNumber() + 1)
-                    }.asValue(runtime),
-                )
-            }.asValue(runtime),
+            Object
+                .create(runtime)
+                .apply {
+                    setProperty(
+                        runtime,
+                        "increment",
+                        Function
+                            .createFromHostFunction(runtime) { args ->
+                                Value.from(args[0].asNumber() + 1)
+                            }.asValue(runtime),
+                    )
+                }.asValue(runtime),
         )
 
         assertEquals(1, simple.increment(0))
@@ -119,16 +125,19 @@ internal class JSIFormatTest : HermesTest() {
 
         val simple = format.decodeFromRuntimeValue(
             Data.serializer(),
-            Object.create(runtime).apply {
-                setProperty(runtime, "one", Value.from(3))
-                setProperty(
-                    runtime,
-                    "increment",
-                    Function.createFromHostFunction(runtime) { args ->
-                        Value.from(args[0].asNumber() + 1)
-                    }.asValue(runtime),
-                )
-            }.asValue(runtime),
+            Object
+                .create(runtime)
+                .apply {
+                    setProperty(runtime, "one", Value.from(3))
+                    setProperty(
+                        runtime,
+                        "increment",
+                        Function
+                            .createFromHostFunction(runtime) { args ->
+                                Value.from(args[0].asNumber() + 1)
+                            }.asValue(runtime),
+                    )
+                }.asValue(runtime),
         )
 
         assertEquals(3, simple.one)

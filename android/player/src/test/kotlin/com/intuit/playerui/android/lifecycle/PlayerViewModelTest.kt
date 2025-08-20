@@ -36,7 +36,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(MockKExtension::class)
 @ExtendWith(CoroutineTestDispatcherExtension::class)
 internal class PlayerViewModelTest {
-
     private val validFlow = "{\"id\": \"id\",\"navigation\": {\"BEGIN\": \"FLOW_1\",\"FLOW_1\": {\"startState\": \"END_Done\",\"END_Done\": {\"state_type\": \"END\",\"outcome\": \"done\"}}}}"
 
     private val invalidFlow = "{\"id\": \"id\",\"navigation\": {\"BEGIN\": \"FLOW\",\"FLOW_1\": {\"startState\": \"END_Done\",\"END_Done\": {\"state_type\": \"END\",\"outcome\": \"done\"}}}}"
@@ -48,7 +47,12 @@ internal class PlayerViewModelTest {
     lateinit var viewModel: PlayerViewModel
 
     // TODO: This likely doesn't need to happen if we can inject a test dispatcher effectively
-    private suspend fun <T> suspendUntilCondition(timeout: Long = 5000, getValue: () -> T, condition: (T) -> Boolean, messageSupplier: (T) -> String): T = try {
+    private suspend fun <T> suspendUntilCondition(
+        timeout: Long = 5000,
+        getValue: () -> T,
+        condition: (T) -> Boolean,
+        messageSupplier: (T) -> String,
+    ): T = try {
         withTimeout(timeout) {
             var result: T = getValue()
             while (!condition(result)) {
@@ -62,7 +66,11 @@ internal class PlayerViewModelTest {
         throw AssertionError(messageSupplier(getValue()))
     }
 
-    private suspend fun Level.assertLogged(value: String, times: Int = 1, timeout: Long = 5000) {
+    private suspend fun Level.assertLogged(
+        value: String,
+        times: Int = 1,
+        timeout: Long = 5000,
+    ) {
         suspendUntilCondition(
             timeout,
             this::getLogs,
@@ -100,9 +108,10 @@ internal class PlayerViewModelTest {
     @Test
     fun `test factory`() {
         assertNotNull(
-            PlayerViewModel.Factory(flowIterator) {
-                PlayerViewModel(it)
-            }.create(PlayerViewModel::class.java),
+            PlayerViewModel
+                .Factory(flowIterator) {
+                    PlayerViewModel(it)
+                }.create(PlayerViewModel::class.java),
         )
     }
 

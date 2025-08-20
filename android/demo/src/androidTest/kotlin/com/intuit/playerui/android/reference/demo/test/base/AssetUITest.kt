@@ -12,8 +12,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TestName
 
-abstract class AssetUITest(val group: String? = null) {
-
+abstract class AssetUITest(
+    val group: String? = null,
+) {
     @get:Rule
     val name = TestName()
 

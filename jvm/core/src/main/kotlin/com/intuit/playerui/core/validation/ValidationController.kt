@@ -10,7 +10,9 @@ import kotlinx.serialization.Serializable
 
 /** Limited definition of the player validationController to enable validating the current view */
 @Serializable(with = Serializer::class)
-public class ValidationController internal constructor(override val node: Node) : NodeWrapper {
+public class ValidationController internal constructor(
+    override val node: Node,
+) : NodeWrapper {
     private val validateView: Invokable<ValidationInfo> by NodeSerializableFunction()
 
     /** Get information on whether transition is allowed along with potential blocking validations */

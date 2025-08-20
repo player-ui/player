@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import android.widget.TextView
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.MapBackedNode
@@ -12,11 +13,9 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.runner.AndroidJUnit4
 
 @RunWith(AndroidJUnit4::class)
 class AssetContextAndroidTest {
-
     private val context: Context get() =
         InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -29,6 +28,7 @@ class AssetContextAndroidTest {
     @Suppress("DEPRECATION_ERROR")
     private fun renderableAsset(assetContext: AssetContext) = object : RenderableAsset(assetContext) {
         override fun initView() = TextView(context)
+
         override fun View.hydrate() = Unit
     }
 

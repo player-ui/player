@@ -4,8 +4,9 @@ import android.util.Log
 import com.intuit.playerui.core.plugins.LoggerPlugin
 
 /** Default Android logger */
-internal class AndroidLogger(val name: String = TAG) : LoggerPlugin {
-
+internal class AndroidLogger(
+    val name: String = TAG,
+) : LoggerPlugin {
     companion object {
         private val TAG = AndroidLogger::class.java.simpleName
     }

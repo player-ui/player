@@ -23,7 +23,6 @@ public typealias RenderEndHandler = (Timing?, RenderMetrics?, PlayerFlowMetrics?
 public class MetricsPlugin(
     private val handler: RenderEndHandler,
 ) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
-
     public lateinit var hooks: Hooks
 
     override fun apply(runtime: Runtime<*>) {
@@ -47,7 +46,9 @@ public class MetricsPlugin(
     }
 
     @Serializable(Hooks.Serializer::class)
-    public class Hooks internal constructor(override val node: Node) : NodeWrapper {
+    public class Hooks internal constructor(
+        override val node: Node,
+    ) : NodeWrapper {
         public val onFlowBegin: NodeSyncHook1<PlayerFlowMetrics>
             by NodeSerializableField(NodeSyncHook1.serializer(PlayerFlowMetrics.serializer()))
 
@@ -55,7 +56,13 @@ public class MetricsPlugin(
             by NodeSerializableField(NodeSyncHook1.serializer(PlayerFlowMetrics.serializer()))
 
         public val onRenderEnd: NodeSyncHook3<Timing, RenderMetrics, PlayerFlowMetrics>
-            by NodeSerializableField(NodeSyncHook3.serializer(Timing.serializer(), RenderMetrics.serializer(), PlayerFlowMetrics.serializer()))
+            by NodeSerializableField(
+                NodeSyncHook3.serializer(
+                    Timing.serializer(),
+                    RenderMetrics.serializer(),
+                    PlayerFlowMetrics.serializer(),
+                ),
+            )
 
         internal object Serializer : NodeWrapperSerializer<Hooks>(::Hooks)
     }
@@ -77,7 +84,6 @@ public typealias RequestTimeClosure = () -> Int
 internal class RequestTimeWebPlugin(
     private val getRequestTime: RequestTimeClosure,
 ) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
-
     override fun apply(runtime: Runtime<*>) {
         if (!runtime.contains(name)) {
             runtime.execute(script)
@@ -104,6 +110,7 @@ public class RequestTimePlugin(
     private val getRequestTime: RequestTimeClosure,
 ) : PlayerPlugin {
     private val requestTimeWebPlugin = RequestTimeWebPlugin(getRequestTime)
+
     override fun apply(player: Player) {
         player.metricsPlugin?.let(requestTimeWebPlugin::apply)
     }

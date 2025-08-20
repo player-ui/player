@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 //  store the unknown key-values. This is preventing the
 //  player from reasonably assuming the start API can rely
 //  on the entire flow being deserialized properly.
+
 /** The navigation section of the flow describes a State Machine for the user */
 @Serializable
 public data class Navigation(

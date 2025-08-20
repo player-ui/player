@@ -65,8 +65,9 @@ import kotlinx.coroutines.withContext
  * to enable consumers to plug-n-play, but can be overridden to customize
  * the UI in these states.
  */
-public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
-
+public abstract class PlayerFragment :
+    Fragment(),
+    ManagedPlayerState.Listener {
     /** [LifecycleCoroutineScope.launchWhenStarted] extension for waiting on [AndroidPlayer] instance */
     @ExperimentalPlayerApi
     protected fun LifecycleCoroutineScope.launchWhenReady(block: suspend CoroutineScope.(player: AndroidPlayer) -> Unit) {
@@ -96,15 +97,16 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
         lifecycleScope.launch {
             repeatOnLifecycle(State.STARTED) {
                 // forward state events to callbacks
-                playerViewModel.state.onEach {
-                    when (it) {
-                        NotStarted -> onNotStarted()
-                        Pending -> onPending()
-                        is Running -> onRunning(it)
-                        is Error -> onError(it)
-                        is Done -> onDone(it)
-                    }
-                }.launchIn(this + Dispatchers.Default)
+                playerViewModel.state
+                    .onEach {
+                        when (it) {
+                            NotStarted -> onNotStarted()
+                            Pending -> onPending()
+                            is Running -> onRunning(it)
+                            is Error -> onError(it)
+                            is Done -> onDone(it)
+                        }
+                    }.launchIn(this + Dispatchers.Default)
 
                 // update UI for latest state
                 playerViewModel.state.collectLatest {
@@ -181,7 +183,8 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
     protected open fun handleAssetUpdate(asset: RenderableAsset?, animateTransition: Boolean) {
         renderingJob?.cancel("handling new update")
         renderingJob = lifecycleScope.launch {
-            whenStarted { // TODO: This'll go away when we can call a suspend version of this
+            whenStarted {
+                // TODO: This'll go away when we can call a suspend version of this
                 withContext(if (asset is SuspendableAsset<*>) Dispatchers.Default else Dispatchers.Main) {
                     try {
                         renderIntoPlayerCanvas(asset, animateTransition)
@@ -208,8 +211,9 @@ public abstract class PlayerFragment : Fragment(), ManagedPlayerState.Listener {
      * Builder method to provide a fallback [View] to be shown when the
      * [PlayerViewModel] encounters an [exception]. Defaults to an instance of [FallbackBinding].
      */
-    public open fun buildFallbackView(exception: Exception): View? =
-        FallbackBinding.inflate(layoutInflater).apply {
+    public open fun buildFallbackView(exception: Exception): View? = FallbackBinding
+        .inflate(layoutInflater)
+        .apply {
             this.error.text = exception.localizedMessage
 
             retry.setOnClickListener {

@@ -17,7 +17,6 @@ import org.hamcrest.Matchers.allOf
 import org.junit.Test
 
 class TextUITest : AssetUITest("text") {
-
     @Test
     fun basic() {
         launchMock("text-basic")

@@ -52,8 +52,11 @@ import kotlinx.coroutines.runBlocking
  * the super method unless, explicitly modifying the existing behaviors.
  */
 @OptIn(ExperimentalPlayerApi::class)
-public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), AndroidPlayerPlugin, RuntimePlugin {
-
+public open class PlayerViewModel(
+    flows: AsyncFlowIterator,
+) : ViewModel(),
+    AndroidPlayerPlugin,
+    RuntimePlugin {
     /**
      * Collection of [Plugin]s to configure the [player] with.
      *
@@ -68,7 +71,9 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
     @ExperimentalPlayerApi
     public val deferredPlayer: Deferred<AndroidPlayer> = viewModelScope.async(Dispatchers.Default) {
         // this is unfortunate, but is essentially for ensuring view model has completely initialized
-        while (plugins == null) { delay(5) }
+        while (plugins == null) {
+            delay(5)
+        }
         AndroidPlayer(plugins + this@PlayerViewModel, config)
     }
 
@@ -215,10 +220,7 @@ public open class PlayerViewModel(flows: AsyncFlowIterator) : ViewModel(), Andro
         private val iterator: AsyncFlowIterator,
         private val factory: (AsyncFlowIterator) -> T = { i -> PlayerViewModel(i) as T },
     ) : ViewModelProvider.Factory {
-
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return factory(iterator).apply(PlayerViewModel::start) as T
-        }
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = factory(iterator).apply(PlayerViewModel::start) as T
     }
 }
 

@@ -22,8 +22,9 @@ public interface Builder<T> {
 
 @InternalPlayerApi
 @RuntimeBuilderDsl
-public class RuntimeObjectBuilder<T>(override val format: RuntimeFormat<T>) : Builder<T> {
-
+public class RuntimeObjectBuilder<T>(
+    override val format: RuntimeFormat<T>,
+) : Builder<T> {
     private val content: MutableMap<String, Any?> = linkedMapOf()
 
     public operator fun set(key: String, value: Any?) {
@@ -35,8 +36,9 @@ public class RuntimeObjectBuilder<T>(override val format: RuntimeFormat<T>) : Bu
 
 @InternalPlayerApi
 @RuntimeBuilderDsl
-public class RuntimeArrayBuilder<T>(override val format: RuntimeFormat<T>) : Builder<T> {
-
+public class RuntimeArrayBuilder<T>(
+    override val format: RuntimeFormat<T>,
+) : Builder<T> {
     private val content: MutableList<Any?> = arrayListOf()
 
     public fun append(value: Any?) {
