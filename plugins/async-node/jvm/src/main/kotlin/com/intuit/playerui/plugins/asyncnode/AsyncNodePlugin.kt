@@ -27,12 +27,12 @@ public typealias AsyncHandler = suspend (node: Node, callback: ((result: Any?) -
 
 public class AsyncNodePlugin(
     private val asyncHandler: AsyncHandler? = null,
-) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
+) : JSScriptPluginWrapper(PLUGIN_NAME, sourcePath = BUNDLED_SOURCE_PATH) {
     public lateinit var hooks: Hooks
 
     override fun apply(runtime: Runtime<*>) {
-        runtime.load(ScriptContext(script, bundledSourcePath))
-        instance = runtime.buildInstance("(new $pluginName({plugins: [new AsyncNodePlugin.AsyncNodePluginPlugin()]}))")
+        runtime.load(ScriptContext(script, BUNDLED_SOURCE_PATH))
+        instance = runtime.buildInstance("(new $PLUGIN_NAME({plugins: [new AsyncNodePlugin.AsyncNodePluginPlugin()]}))")
         hooks = instance.getSerializable("hooks", Hooks.serializer())
             ?: throw PlayerException("AsyncNodePlugin is not loaded correctly")
 
@@ -75,8 +75,8 @@ public class AsyncNodePlugin(
     }
 
     private companion object {
-        private const val bundledSourcePath = "plugins/async-node/core/dist/AsyncNodePlugin.native.js"
-        private const val pluginName = "AsyncNodePlugin.AsyncNodePlugin"
+        private const val BUNDLED_SOURCE_PATH = "plugins/async-node/core/dist/AsyncNodePlugin.native.js"
+        private const val PLUGIN_NAME = "AsyncNodePlugin.AsyncNodePlugin"
     }
 }
 

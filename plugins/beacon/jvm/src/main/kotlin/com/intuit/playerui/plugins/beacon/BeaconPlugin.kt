@@ -32,7 +32,7 @@ import kotlinx.serialization.json.Json
  */
 public open class BeaconPlugin(
     override val plugins: List<JSPluginWrapper>,
-) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath),
+) : JSScriptPluginWrapper(PLUGIN_NAME, sourcePath = BUNDLED_SOURCE_PATH),
     Pluggable {
     public constructor(vararg plugins: JSPluginWrapper) : this(plugins.toList())
 
@@ -58,7 +58,7 @@ public open class BeaconPlugin(
                 }
             }
 
-        runtime.load(ScriptContext(script, bundledSourcePath))
+        runtime.load(ScriptContext(script, BUNDLED_SOURCE_PATH))
         runtime.add("beaconOptions", config)
         instance = runtime.buildInstance("(new $name.$name(beaconOptions))")
         hooks = instance.getSerializable("hooks", Hooks.serializer())
@@ -148,8 +148,8 @@ public open class BeaconPlugin(
     }
 
     private companion object {
-        private const val pluginName = "BeaconPlugin"
-        private const val bundledSourcePath = "plugins/beacon/core/dist/BeaconPlugin.native.js"
+        private const val PLUGIN_NAME = "BeaconPlugin"
+        private const val BUNDLED_SOURCE_PATH = "plugins/beacon/core/dist/BeaconPlugin.native.js"
     }
 
     @Serializable

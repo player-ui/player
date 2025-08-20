@@ -532,7 +532,7 @@ internal class V8DecoderTest : J2V8Test() {
 
     @Serializable
     class LoggerAsMethod {
-        var TAG = "Logger As Method"
+        const var TAG = "Logger As Method"
         private val retVal = "this is my return"
 
         fun log(message: String?): String {

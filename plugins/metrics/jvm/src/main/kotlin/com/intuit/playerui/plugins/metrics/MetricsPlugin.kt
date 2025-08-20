@@ -22,11 +22,11 @@ public typealias RenderEndHandler = (Timing?, RenderMetrics?, PlayerFlowMetrics?
 
 public class MetricsPlugin(
     private val handler: RenderEndHandler,
-) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
+) : JSScriptPluginWrapper(PLUGIN_NAME, sourcePath = BUNDLED_SOURCE_PATH) {
     public lateinit var hooks: Hooks
 
     override fun apply(runtime: Runtime<*>) {
-        runtime.load(ScriptContext(script, bundledSourcePath))
+        runtime.load(ScriptContext(script, BUNDLED_SOURCE_PATH))
         runtime.add(
             "handlers",
             mapOf(
@@ -70,8 +70,8 @@ public class MetricsPlugin(
     public fun renderEnd(): Unit = instance.getInvokable<Unit>("renderEnd")!!()
 
     private companion object {
-        private const val bundledSourcePath = "plugins/metrics/core/dist/MetricsPlugin.native.js"
-        private const val pluginName = "MetricsPlugin.MetricsCorePlugin"
+        private const val BUNDLED_SOURCE_PATH = "plugins/metrics/core/dist/MetricsPlugin.native.js"
+        private const val PLUGIN_NAME = "MetricsPlugin.MetricsCorePlugin"
     }
 }
 
@@ -83,7 +83,7 @@ public typealias RequestTimeClosure = () -> Int
 /** Wrapper around RequestTimeWebPlugin, which needs to apply to MetricsPlugin */
 internal class RequestTimeWebPlugin(
     private val getRequestTime: RequestTimeClosure,
-) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
+) : JSScriptPluginWrapper(PLUGIN_NAME, sourcePath = BUNDLED_SOURCE_PATH) {
     override fun apply(runtime: Runtime<*>) {
         if (!runtime.contains(name)) {
             runtime.execute(script)
@@ -100,8 +100,8 @@ internal class RequestTimeWebPlugin(
     }
 
     private companion object {
-        private const val bundledSourcePath = "plugins/metrics/core/dist/MetricsPlugin.native.js"
-        private const val pluginName = "MetricsPlugin.RequestTimeWebPlugin"
+        private const val BUNDLED_SOURCE_PATH = "plugins/metrics/core/dist/MetricsPlugin.native.js"
+        private const val PLUGIN_NAME = "MetricsPlugin.RequestTimeWebPlugin"
     }
 }
 

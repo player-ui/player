@@ -22,7 +22,6 @@ import kotlin.reflect.jvm.reflect
  * interface.
  */
 public interface Node : Map<String, Any?> {
-    // Typed APIs
     /**
      * Returns the value corresponding to the given [key] as a [String],
      * or `null` if such a key is not present in the node or if the value is not a [String]

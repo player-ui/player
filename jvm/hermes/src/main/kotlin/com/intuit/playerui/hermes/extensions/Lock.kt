@@ -25,7 +25,8 @@ public sealed interface RuntimeThreadContext : CoroutineContext.Element {
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.CONSTRUCTOR)
 @RequiresOptIn(
-    message = "This API needs to be executed on the dedicated JS thread, which isn't guaranteed int this context. If you opt-in, make sure you understand where this code is being executed.",
+    message =
+        "This API needs to be executed on the dedicated JS thread, which isn't guaranteed int this context. If you opt-in, make sure you understand where this code is being executed.",
     level = RequiresOptIn.Level.ERROR,
 )
 public annotation class UnsafeRuntimeThreadAPI

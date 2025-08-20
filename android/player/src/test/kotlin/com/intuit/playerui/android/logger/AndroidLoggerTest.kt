@@ -13,12 +13,12 @@ import org.junit.jupiter.api.Test
 
 internal class AndroidLoggerTest {
     companion object {
-        const val defaultTag = "AndroidLogger"
-        const val trace = "this is very verbose"
-        const val debug = "this is useful for debugging"
-        const val info = "this is informative"
-        const val warn = "this is a warning"
-        const val error = "this is an error"
+        const val DEFAULT_TAG = "AndroidLogger"
+        const val TRACE = "this is very verbose"
+        const val DEBUG = "this is useful for debugging"
+        const val INFO = "this is informative"
+        const val WARN = "this is a warning"
+        const val ERROR = "this is an error"
     }
 
     @AfterEach
@@ -27,16 +27,16 @@ internal class AndroidLoggerTest {
     @Test
     fun `test log methods`() {
         val logger = AndroidLogger()
-        assertEquals(defaultTag, logger.name)
-        logger.trace(trace)
+        assertEquals(DEFAULT_TAG, logger.name)
+        logger.trace(TRACE)
         assertTrace()
-        logger.debug(debug)
+        logger.debug(DEBUG)
         assertDebug()
-        logger.info(info)
+        logger.info(INFO)
         assertInfo()
-        logger.warn(warn)
+        logger.warn(WARN)
         assertWarn()
-        logger.error(error)
+        logger.error(ERROR)
         assertError()
     }
 
@@ -45,27 +45,27 @@ internal class AndroidLoggerTest {
         val tag = "Logger"
         val logger = AndroidLogger(tag)
         assertEquals(tag, logger.name)
-        logger.trace(trace)
+        logger.trace(TRACE)
         assertTrace(tag)
-        logger.debug(debug)
+        logger.debug(DEBUG)
         assertDebug(tag)
-        logger.info(info)
+        logger.info(INFO)
         assertInfo(tag)
-        logger.warn(warn)
+        logger.warn(WARN)
         assertWarn(tag)
-        logger.error(error)
+        logger.error(ERROR)
         assertError(tag)
     }
 
-    private fun assertTrace(tag: String = defaultTag, msg: String = trace) = v.assertLogged("TRACE", tag, msg)
+    private fun assertTrace(tag: String = DEFAULT_TAG, msg: String = TRACE) = v.assertLogged("TRACE", tag, msg)
 
-    private fun assertDebug(tag: String = defaultTag, msg: String = debug) = d.assertLogged("DEBUG", tag, msg)
+    private fun assertDebug(tag: String = DEFAULT_TAG, msg: String = DEBUG) = d.assertLogged("DEBUG", tag, msg)
 
-    private fun assertInfo(tag: String = defaultTag, msg: String = info) = i.assertLogged("INFO", tag, msg)
+    private fun assertInfo(tag: String = DEFAULT_TAG, msg: String = INFO) = i.assertLogged("INFO", tag, msg)
 
-    private fun assertWarn(tag: String = defaultTag, msg: String = warn) = w.assertLogged("WARN", tag, msg)
+    private fun assertWarn(tag: String = DEFAULT_TAG, msg: String = WARN) = w.assertLogged("WARN", tag, msg)
 
-    private fun assertError(tag: String = defaultTag, msg: String = error) = e.assertLogged("ERROR", tag, msg)
+    private fun assertError(tag: String = DEFAULT_TAG, msg: String = ERROR) = e.assertLogged("ERROR", tag, msg)
 
     private fun List<String>.assertLogged(
         level: String,

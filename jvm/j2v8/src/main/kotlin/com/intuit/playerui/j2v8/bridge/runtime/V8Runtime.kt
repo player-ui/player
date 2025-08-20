@@ -207,9 +207,9 @@ internal class V8Runtime(
 public object J2V8 : PlayerRuntimeFactory<J2V8RuntimeConfig> {
     override fun create(block: J2V8RuntimeConfig.() -> Unit): Runtime<V8Value> = V8Runtime(J2V8RuntimeConfig().apply(block))
 
-    override fun toString(): String = name
+    override fun toString(): String = NAME
 
-    public const val name: String = "J2V8"
+    public const val NAME: String = "J2V8"
 }
 
 public data class J2V8RuntimeConfig(
