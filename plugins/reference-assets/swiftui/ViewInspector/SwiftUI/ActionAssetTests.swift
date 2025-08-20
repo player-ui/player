@@ -35,7 +35,7 @@ class ActionAssetTests: SwiftUIAssetUnitTestCase {
             "asset": {
               "id": "action-label",
               "type": "text",
-              "value": "Clickoed {{count}} times"
+              "value": "Clicked {{count}} times"
             }
           }
         }

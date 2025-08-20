@@ -13,18 +13,9 @@ common --tool_java_runtime_version=17
 # Javascript Specific Configs
 common --@aspect_rules_ts//ts:skipLibCheck=always
 
-# Android databinding flags
-# common --android_crosstool_top=@androidndk//:toolchain
-# common --experimental_android_databinding_v2
-# common --android_databinding_use_v3_4_args
-# common --android_databinding_use_androidx
-# common --experimental_google_legacy_api
-
 # Android demo app flags
-# build --noincremental_dexing
 common --android_platforms=@rules_android//:x86,@rules_android//:x86_64,@rules_android//:armeabi-v7a,@rules_android//:arm64-v8a
 mobile-install --mobile_install_aspect=@rules_android//mobile_install:mi.bzl --mobile_install_supported_rules=android_binary
-
 
 # iOS Flags
 common --ios_simulator_device="iPhone 16 Pro"
