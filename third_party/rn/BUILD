@@ -6,11 +6,10 @@ exports_files([
 alias(
     name = "libhermes",
     actual = select({
-        "//:arm64-v8a": "//third_party/rn/arm64-v8a:libhermes",
-        "//:armeabi-v7a": "//third_party/rn/armeabi-v7a:libhermes",
-        "//:x86": "//third_party/rn/x86:libhermes",
-        "//:x86_64": "//third_party/rn/x86_64:libhermes",
-        "//conditions:default": "empty",
+        "//:android-arm64-v8a": "//third_party/rn/arm64-v8a:libhermes",
+        "//:android-armeabi-v7a": "//third_party/rn/armeabi-v7a:libhermes",
+        "//:android-x86": "//third_party/rn/x86:libhermes",
+        "//:android-x86_64": "//third_party/rn/x86_64:libhermes",
     }),
     visibility = ["//visibility:public"],
 )
@@ -18,11 +17,10 @@ alias(
 alias(
     name = "libjsi",
     actual = select({
-        "//:arm64-v8a": "//third_party/rn/arm64-v8a:libjsi",
-        "//:armeabi-v7a": "//third_party/rn/armeabi-v7a:libjsi",
-        "//:x86": "//third_party/rn/x86:libjsi",
-        "//:x86_64": "//third_party/rn/x86_64:libjsi",
-        "//conditions:default": "empty",
+        "//:android-arm64-v8a": "//third_party/rn/arm64-v8a:libjsi",
+        "//:android-armeabi-v7a": "//third_party/rn/armeabi-v7a:libjsi",
+        "//:android-x86": "//third_party/rn/x86:libjsi",
+        "//:android-x86_64": "//third_party/rn/x86_64:libjsi",
     }),
     visibility = ["//visibility:public"],
 )

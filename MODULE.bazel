@@ -15,7 +15,7 @@ git_override(
     remote = "https://github.com/player-ui/rules_player",
     commit = "0c31872b6c210e6cb2494867049dba1a88eb30e9"
 )
-
+bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "aspect_bazel_lib", version = "2.19.4")
 bazel_dep(name = "aspect_rules_js", version = "2.3.8")
 bazel_dep(name = "bazel_skylib", version = "1.8.1")

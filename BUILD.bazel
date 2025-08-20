@@ -279,23 +279,34 @@ config_setting(
     },
 )
 
-# TODO: Enable platform support for detecting Android OS as well as cpu
 config_setting(
-    name = "arm64-v8a",
-    values = {"cpu": "arm64-v8a"},
+    name = "android-arm64-v8a",
+    constraint_values = [
+        "@platforms//cpu:arm64",
+        "@platforms//os:android",
+    ],
 )
 
 config_setting(
-    name = "armeabi-v7a",
-    values = {"cpu": "armeabi-v7a"},
+    name = "android-armeabi-v7a",
+    constraint_values = [
+        "@platforms//os:android",
+        "@platforms//cpu:armv7",
+    ],
 )
 
 config_setting(
-    name = "x86",
-    values = {"cpu": "x86"},
+    name = "android-x86",
+    constraint_values = [
+        "@platforms//os:android",
+        "@platforms//cpu:x86_32",
+    ],
 )
 
 config_setting(
-    name = "x86_64",
-    values = {"cpu": "x86_64"},
+    name = "android-x86_64",
+    constraint_values = [
+        "@platforms//os:android",
+        "@platforms//cpu:x86_64",
+    ],
 )
