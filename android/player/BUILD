@@ -81,7 +81,8 @@ unit_test_deps = [
 ]
 
 instrumented_test_deps = [
-    "//android/testutils"
+    "//android/testutils",
+    "//jvm/hermes:hermes-host",
 ]
 
 
