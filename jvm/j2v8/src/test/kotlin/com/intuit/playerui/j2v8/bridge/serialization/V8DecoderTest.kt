@@ -509,11 +509,11 @@ internal class V8DecoderTest : J2V8Test() {
 
     @Serializable
     class LoggerAsValue(
-        var TAG: String = "Logger As Value",
+        var tag: String = "Logger As Value",
     ) {
         private val retVal = "this is my return"
         val log: ((String?) -> String)? = {
-            println(TAG)
+            println(tag)
             println(it)
             retVal
         }
@@ -522,7 +522,7 @@ internal class V8DecoderTest : J2V8Test() {
             Int,
             String,
         ) -> String = { arg1, arg2, arg3 ->
-            println(TAG)
+            println(tag)
             println(arg1)
             println(arg2)
             println(arg3)
@@ -532,17 +532,17 @@ internal class V8DecoderTest : J2V8Test() {
 
     @Serializable
     class LoggerAsMethod {
-        const var TAG = "Logger As Method"
+        var tag = "Logger As Method"
         private val retVal = "this is my return"
 
         fun log(message: String?): String {
-            println(TAG)
+            println(tag)
             println(message)
             return retVal
         }
 
         fun logAndReturn(message: String): String {
-            println(TAG)
+            println(tag)
             println(message)
             return message
         }

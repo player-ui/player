@@ -34,7 +34,7 @@ interface PerformanceTest<T : Activity> {
         val histogram = results.getString(FrameStats.HISTOGRAM.toString(), "")
         val averageTime = calculateAverage(histogram, totalFrames)
         assertTrue(
-            "Over a total of $TOTAL_FRAMES frames, the slowest, median and average time it took for frames to render was  ${maxTime}ms, ${medianTime}ms, and ${averageTime}ms respectively",
+            "Over a total of $totalFrames frames, the slowest, median and average time it took for frames to render was  ${maxTime}ms, ${medianTime}ms, and ${averageTime}ms respectively",
             (maxTime < 250 && medianTime < 32 && averageTime < 24) || true,
         )
         activityRule.scenario.close()
@@ -43,7 +43,7 @@ interface PerformanceTest<T : Activity> {
     enum class FrameStats constructor(
         val pattern: Pattern,
     ) {
-        TOTAL_FRAMES(Pattern.compile("\\s*$TOTAL_FRAMES: (\\d+)")),
+        TOTAL_FRAMES(Pattern.compile("\\s*$TOTAL_FRAMES_RENDERED: (\\d+)")),
         FIFTY_PERCENTILE(Pattern.compile("\\s*$FIFTIETH_PERCENTILE: (\\d+)ms")),
         NINETY_PERCENTILE(Pattern.compile("\\s*$NINETIETH_PERCENTILE: (\\d+)ms")),
         NINETY_FIVE_PERCENTILE(Pattern.compile("\\s*$NINETY_FIFTH_PERCENTILE: (\\d+)ms")),
@@ -107,7 +107,7 @@ interface PerformanceTest<T : Activity> {
 
     companion object {
         const val PKG = "com.intuit.playerui.android.reference.demo"
-        const val TOTAL_FRAMES = "Total frames rendered"
+        const val TOTAL_FRAMES_RENDERED = "Total frames rendered"
         const val FIFTIETH_PERCENTILE = "50th percentile"
         const val NINETIETH_PERCENTILE = "90th percentile"
         const val NINETY_FIFTH_PERCENTILE = "95th percentile"

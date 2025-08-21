@@ -48,16 +48,20 @@ start-storybook:
 
 ### Start Kotlin ###
 
+[doc('Test all Kotlin unit tests (kt_jvm_test)')]
+test-kt:
+  bazel test $(bazel query --noshow_progress --output=label "kind('kt_jvm_test rule', //...)" | tr '\n' ' ')
+
 [doc('Test KT for lint errors')]
 lint-kt:
-  bazel test $(bazel query --noshow_progress --output=label "kind('ktlint_test rule', ${2:-//...})" | tr '\n' ' ')
+  bazel test $(bazel query --noshow_progress --output=label "kind('ktlint_test rule', //...)" | tr '\n' ' ')
 
 [doc('Fix all auto-fixable KT lint errors')]
 format-kt:
   #!/usr/bin/env bash
   set -u +e -o pipefail
 
-  for target in $(bazel query --noshow_progress --output=label "kind('ktlint_fix rule', ${2:-//...})"); do
+  for target in $(bazel query --noshow_progress --output=label "kind('ktlint_fix rule', //...)"); do
     bazel run "$target"
   done
 
@@ -86,6 +90,16 @@ alias maven-install := mvn-install
 ### 📦 End Maven ###
 
 ### 🤖Start Android ###
+
+[doc('Test headless Android instrumented tests (kt_android_local_test)')]
+test-android-local:
+  bazel test $(bazel query --noshow_progress --output=label "kind('kt_android_local_test rule', //...)" | tr '\n' ' ')
+
+[doc('Test all UI Android instrumented tests (sh_test -- requires adb connection)')]
+test-android-ui:
+  bazel test $(bazel query --noshow_progress --output=label "kind('sh_test rule', //...) except filter('ios|swiftui', //...)" | tr '\n' ' ')
+
+test-android: test-android-local test-android-ui
 
 [doc('Build and run the Android demo app in an emulator')]
 start-android-demo:
