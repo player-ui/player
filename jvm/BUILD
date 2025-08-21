@@ -65,4 +65,5 @@ define_kt_toolchain(
     api_version = "1.8",
     kotlinc_options = ":test_options",
     language_version = "1.8",
+    experimental_use_abi_jars = True,
 )
