@@ -320,7 +320,7 @@ jobs:
             - v1-bazel-cache-core-main
 
       - run: |
-          BUNDLE_TARGETS=$(bazel query "kind(js_test, //...)" --output label 2>/dev/null | tr '\n' ' ')
+          BUNDLE_TARGETS=$(bazel query "kind(.*_test, //...) except filter("android|ios|swiftui", //...)" --output label 2>/dev/null | tr '\n' ' ')
           bazel coverage --combined_report=lcov --config=ci -- $BUNDLE_TARGETS
 
       - run:
