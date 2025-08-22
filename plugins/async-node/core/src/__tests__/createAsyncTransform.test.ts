@@ -1,6 +1,18 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createAsyncTransform } from "..";
 import { Builder, NodeType, Node } from "@player-ui/player";
+import {
+  extractNodeFromPath,
+  requiresAssetWrapper,
+  traverseAndReplace,
+  unwrapAsset,
+} from "../utils";
+
+vi.mock("../utils");
+
+beforeEach(() => {
+  vi.mocked(requiresAssetWrapper).mockReturnValue(true);
+});
 
 describe("createAsyncTransform", () => {
   const asset = Builder.asset({
@@ -128,6 +140,198 @@ describe("createAsyncTransform", () => {
     });
   });
 
+  describe("getNestedAsset - different node types", () => {
+    it("should add the async node to an existing multi node", () => {
+      vi.mocked(requiresAssetWrapper).mockReturnValue(false);
+      const nodeIdFn = vi.fn();
+      nodeIdFn.mockReturnValue("async-node");
+
+      const nestedAssetFn = vi.fn();
+      const nestedAsset: Node.MultiNode = {
+        type: NodeType.MultiNode,
+        values: [
+          {
+            type: NodeType.Value,
+            value: undefined,
+            children: [
+              {
+                path: ["asset"],
+                value: {
+                  type: NodeType.Asset,
+                  value: {
+                    type: "text",
+                    id: "first-asset",
+                  },
+                },
+              },
+            ],
+          },
+          {
+            type: NodeType.Value,
+            value: undefined,
+            children: [
+              {
+                path: ["asset"],
+                value: {
+                  type: NodeType.Asset,
+                  value: {
+                    type: "text",
+                    id: "second-asset",
+                  },
+                },
+              },
+            ],
+          },
+        ],
+      };
+      nestedAssetFn.mockReturnValue(nestedAsset);
+
+      const transform = createAsyncTransform({
+        transformAssetType: "chat-message",
+        wrapperAssetType: "collection",
+        flatten: false,
+        path: ["array"],
+        getAsyncNodeId: nodeIdFn,
+        getNestedAsset: nestedAssetFn,
+      });
+
+      const result = transform(asset, {} as any, {} as any);
+
+      expect(result).toStrictEqual({
+        type: NodeType.Asset,
+        children: [
+          {
+            path: ["array"],
+            value: {
+              type: NodeType.MultiNode,
+              override: true,
+              parent: expect.anything(),
+              values: [
+                {
+                  parent: expect.anything(),
+                  type: NodeType.Value,
+                  value: undefined,
+                  children: [
+                    {
+                      path: ["asset"],
+                      value: {
+                        type: NodeType.Asset,
+                        value: {
+                          type: "text",
+                          id: "first-asset",
+                        },
+                      },
+                    },
+                  ],
+                },
+                {
+                  parent: expect.anything(),
+                  type: NodeType.Value,
+                  value: undefined,
+                  children: [
+                    {
+                      path: ["asset"],
+                      value: {
+                        type: NodeType.Asset,
+                        value: {
+                          type: "text",
+                          id: "second-asset",
+                        },
+                      },
+                    },
+                  ],
+                },
+                {
+                  parent: expect.anything(),
+                  type: NodeType.Async,
+                  flatten: false,
+                  onValueReceived: undefined,
+                  id: "async-node",
+                  value: {
+                    type: NodeType.Value,
+                    value: {
+                      id: "async-node",
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        ],
+        value: {
+          id: "collection-async-node",
+          type: "collection",
+        },
+      });
+    });
+
+    it("should default to adding the node as-is", () => {
+      vi.mocked(requiresAssetWrapper).mockReturnValue(false);
+      const nodeIdFn = vi.fn();
+      nodeIdFn.mockReturnValue("async-node");
+
+      const nestedAssetFn = vi.fn();
+      const nestedAsset: Node.Value = {
+        type: NodeType.Value,
+        value: {
+          prop: "value",
+        },
+      };
+      nestedAssetFn.mockReturnValue(nestedAsset);
+
+      const transform = createAsyncTransform({
+        transformAssetType: "chat-message",
+        wrapperAssetType: "collection",
+        flatten: false,
+        path: ["array"],
+        getAsyncNodeId: nodeIdFn,
+        getNestedAsset: nestedAssetFn,
+      });
+
+      const result = transform(asset, {} as any, {} as any);
+
+      expect(result).toStrictEqual({
+        type: NodeType.Asset,
+        children: [
+          {
+            path: ["array"],
+            value: {
+              type: NodeType.MultiNode,
+              override: true,
+              parent: expect.anything(),
+              values: [
+                {
+                  parent: expect.anything(),
+                  type: NodeType.Value,
+                  value: {
+                    prop: "value",
+                  },
+                },
+                {
+                  parent: expect.anything(),
+                  type: NodeType.Async,
+                  flatten: false,
+                  onValueReceived: undefined,
+                  id: "async-node",
+                  value: {
+                    type: NodeType.Value,
+                    value: {
+                      id: "async-node",
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        ],
+        value: {
+          id: "collection-async-node",
+          type: "collection",
+        },
+      });
+    });
+  });
+
   describe("onValueReceived callback setup", () => {
     let transformedAsset: Node.Node;
     let onValueReceivedFuncion: ((node: Node.Node) => Node.Node) | undefined;
@@ -188,7 +392,19 @@ describe("createAsyncTransform", () => {
       expect(onValueReceivedFuncion).toBeDefined();
     });
 
-    it("should add an onValueReceivedFunction that transforms the result into a chained asset on the same type into a multi-node", () => {
+    it("should use traverseAndReplace as the onValueReceived callback", async () => {
+      const actualImplementation =
+        await vi.importActual<typeof import("../utils")>("../utils");
+
+      vi.mocked(traverseAndReplace).mockImplementation(
+        actualImplementation.traverseAndReplace,
+      );
+      vi.mocked(unwrapAsset).mockImplementation(
+        actualImplementation.unwrapAsset,
+      );
+      vi.mocked(extractNodeFromPath).mockImplementation(
+        actualImplementation.extractNodeFromPath,
+      );
       const result = onValueReceivedFuncion?.(asset);
       expect(result).toStrictEqual({
         override: true,
