@@ -263,33 +263,38 @@ jobs:
             sudo mv bazelisk /opt/bazelisk-v1.11.0 && \
             sudo ln -s /opt/bazelisk-v1.11.0/bazelisk /usr/local/bin/bazel
 
-      # - run:
-      #     name: Install Android tools
-      #     command: |
-      #       rm -rf $ANDROID_HOME/build-tools/*
-      #       JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64 \
-      #         $ANDROID_HOME/tools/bin/sdkmanager "build-tools;33.0.1"\
-      #         "ndk;23.2.8568313" \
-      #         "system-images;android-33;default;x86_64"
-      #       echo "export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/23.2.8568313"  >> $BASH_ENV
-      #       source $BASH_ENV
-      #       echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-33;default;x86_64" -g default
-      #        source $BASH_ENV
 
       - run:
-          name: Launch emulator
+          name: Execute Android tests
           command: |
-            emulator -avd test -delay-adb -verbose -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          background: true
+            EMULATOR_READY=false
+            EMULATOR_IMG="system-images;android-33;default;x86_64"
+            create_and_wait_for_emulator() {
+              if [ $EMULATOR_READY -eq "false" ]; then
+                echo "Creating emulator..."
+                sdkmanager "$EMULATOR_IMG"
+                echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-33;default;x86_64" -g default
+                emulator -avd test -delay-adb -verbose -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+                circle-android wait-for-boot
+                EMULATOR_READY=true
+              else
+                echo "Emulator already ready..."
+              fi
+            }
 
-      - run:
-          name: Wait for emulator to start
-          command: |
-            circle-android wait-for-boot
+            bazel_test() {
+              # Only test for if tests are relevant, cached means it will pass
+              bash -c "bazel test --config=ci -- $@"
+              if [ $? -eq 0 ]; then
+                echo "'$@' was cached - no emulator required"
+              elif [ $EMULATOR_READY -eq "false" ]; then
+                create_and_wait_for_emulator()
+              fi
+              bazel test --config=ci "$@"
+            }
 
-      - run: bazel test --config=ci -- //android/demo:android_instrumentation_test
-
-      - run: bazel test --config=ci --//android/player:runtime=hermes -- //android/demo:android_instrumentation_test
+            bazel_test //android/demo:android_instrumentation_test
+            bazel_test --//android/player:runtime=hermes //android/demo:android_instrumentation_test
 
       - run:
           when: always
