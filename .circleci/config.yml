@@ -270,12 +270,13 @@ jobs:
             EMULATOR_READY=false
             EMULATOR_IMG="system-images;android-33;default;x86_64"
             create_and_wait_for_emulator() {
-              if [ $EMULATOR_READY -eq "false" ]; then
+              if [ $EMULATOR_READY = "false" ]; then
                 echo "Creating emulator..."
                 sdkmanager "$EMULATOR_IMG"
                 echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-33;default;x86_64" -g default
                 emulator -avd test -delay-adb -verbose -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
                 circle-android wait-for-boot
+                echo "Emulator ready..."
                 EMULATOR_READY=true
               else
                 echo "Emulator already ready..."
@@ -287,8 +288,8 @@ jobs:
               bash -c "bazel test --config=ci -- $@"
               if [ $? -eq 0 ]; then
                 echo "'$@' was cached - no emulator required"
-              elif [ $EMULATOR_READY -eq "false" ]; then
-                create_and_wait_for_emulator()
+              else
+                create_and_wait_for_emulator
               fi
               bazel test --config=ci "$@"
             }
