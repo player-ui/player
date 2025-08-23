@@ -286,7 +286,7 @@ jobs:
             bazel_test() {
               echo "Checking if '$@' is cached!"
               # Only test for if tests are relevant, cached means it will pass
-              bash -c "bazel test --config=ci $@"
+              bash -c 'bazel test --config=ci "$@"' bash "$@"
               if [ $? -eq 0 ]; then
                 echo "'$@' was cached - no emulator required"
               else
