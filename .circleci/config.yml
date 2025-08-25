@@ -263,19 +263,19 @@ jobs:
             sudo mv bazelisk /opt/bazelisk-v1.11.0 && \
             sudo ln -s /opt/bazelisk-v1.11.0/bazelisk /usr/local/bin/bazel
 
-      - run: bazel build --config=ci //android/demo:android_instrumentation_test
-
       - run:
           name: Execute Android tests
           command: |
+            # Defer installing, creating, and booting an emulator unless required
             EMULATOR_READY=false
             EMULATOR_IMG="system-images;android-33;default;x86_64"
+
             create_and_wait_for_emulator() {
               if [ $EMULATOR_READY = "false" ]; then
                 echo "Creating emulator..."
                 sdkmanager "$EMULATOR_IMG"
                 echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-33;default;x86_64" -g default
-                emulator -avd test -delay-adb -verbose -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim &
+                nohup emulator -avd test -delay-adb -verbose -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim &
                 circle-android wait-for-boot
                 echo "Emulator ready..."
                 EMULATOR_READY=true
@@ -285,17 +285,22 @@ jobs:
             }
 
             bazel_test() {
-              echo "Checking if '$@' is cached!"
-              set +e
-              # Only test for if tests are relevant, cached means it will pass
-              bash -c 'bazel test --config=ci "$@"' bash "$@"
-              if [ $? -eq 0 ]; then
-                echo "'$@' was cached - no emulator required"
-              else
+              # Only need to test for cached tests if the emulator isn't setup
+              if [ $EMULATOR_READY = "false" ]; then
+                set +e
+                echo "Checking if '$@' is cached!"
+                # Only check if tests are relevant, cached means it will pass
+                bash -c 'bazel test --config=ci "$@" 2> /dev/null' bash "$@"
+                # 0 exit code means the test passed
+                if [ $? -eq 0 ]; then
+                  echo "'$@' was cached - no emulator required"
+                else
+                  set -e
+                  create_and_wait_for_emulator
+                fi
                 set -e
-                create_and_wait_for_emulator
               fi
-              set -e
+              # Trigger test w/ logs & -e to propagate failure
               bazel test --config=ci "$@"
             }
 
