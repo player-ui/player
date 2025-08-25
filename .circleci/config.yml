@@ -275,7 +275,7 @@ jobs:
                 echo "Creating emulator..."
                 sdkmanager "$EMULATOR_IMG"
                 echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-33;default;x86_64" -g default
-                emulator -avd test -delay-adb -verbose -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+                emulator -avd test -delay-adb -verbose -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim &
                 circle-android wait-for-boot
                 echo "Emulator ready..."
                 EMULATOR_READY=true
