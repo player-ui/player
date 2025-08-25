@@ -43,6 +43,7 @@ class StartFragment : BasePlayerFragment() {
         when (doneState.completedState?.endState?.outcome) {
             "dismiss" -> binding.playerCanvas.removeAllViews()
             "randomize" -> mainViewModel.randomize()
+            else -> Unit
         }
     }
 }
