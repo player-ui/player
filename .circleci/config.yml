@@ -288,13 +288,14 @@ jobs:
               echo "Checking if '$@' is cached!"
               set +e
               # Only test for if tests are relevant, cached means it will pass
-              bash -c 'bazel test --config=ci --noshow_progress "$@"' bash "$@"
-              set -e
+              bash -c 'bazel test --config=ci "$@"' bash "$@"
               if [ $? -eq 0 ]; then
                 echo "'$@' was cached - no emulator required"
               else
+                set -e
                 create_and_wait_for_emulator
               fi
+              set -e
               bazel test --config=ci "$@"
             }
 
