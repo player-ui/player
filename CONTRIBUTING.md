@@ -16,7 +16,7 @@ If the changes are larger (API design, architecture, etc), [opening an issue](ht
 > The owners of this repo develop on MacOS with Apple Silicon chips.
 > All recommendations are based on that build environment.
 
-Since this repo uses Bazel to build cross-platform, it requires tools that you may not use directly. E.g. you will need an Android NDK even if you don't touch the Android code. Please set-up all required tools.
+Since this repo uses Bazel to build cross-platform, it requires tools that you may not use directly. Please set-up all required tools.
 
 <table>
   <thead>
@@ -55,12 +55,6 @@ Since this repo uses Bazel to build cross-platform, it requires tools that you m
       </td>
     </tr>
     <tr>
-      <td><a href="https://github.com/android/ndk/releases">Android NDK</a></td>
-      <td>Use the same version as used by <code>ANDROID_NDK_HOME</code> in our <a href="/.circleci/config.yml">.circleci/config.yml</a></td>
-      <td>Find the ndk path. You the parent folder of the toolchains folder. Once you have the path, create or add to a <code>.bazelrc.local</code>:
-      <pre><code>common --repo_env=ANDROID_NDK_HOME="your-absolute-ndk-path-goes-here"</code></pre>
-    </tr>
-    <tr>
       <td>Python</td>
       <td>>= 2.7.18</td>
       <td>Use <a href="https://realpython.com/intro-to-pyenv/">pyenv</a> to manage versions</td>
@@ -85,7 +79,6 @@ After forking the repo, run builds using bazel to test, build and run:
 
 ## Docs Sites
 
-These require the [Android NDK](https://developer.android.com/ndk).
 The docs site can be run locally using:
 
 ```bash
@@ -105,9 +98,9 @@ The OSS site is deployed with the following route logic:
 - The `0` route contains the docs for the last `0.x.x` release.
   For every major release, we preserve the doc site for the last version released for it to allow folks who can't upgrade immediately to still have access to docs that are relevant for them.
 
-## For Android Only Builds
+## For Android
 
-If you are interested in only contributing for android, follow our [android guide](https://github.com/player-ui/player/blob/main/android/demo/README.md)
+If you are interested in contributing for android, follow our [android guide](https://github.com/player-ui/player/blob/main/android/demo/README.md)
 
 ## For iOS
 
