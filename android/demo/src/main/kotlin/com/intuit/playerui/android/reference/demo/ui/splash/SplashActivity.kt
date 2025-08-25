@@ -12,7 +12,7 @@ class SplashActivity : AppCompatActivity() {
         val newIntent = Intent(this, MainActivity::class.java).apply {
             data = intent.data
             action = intent.action
-            addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+            // addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
         }
         startActivity(newIntent)
         finish()
