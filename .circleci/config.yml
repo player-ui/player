@@ -263,6 +263,7 @@ jobs:
             sudo mv bazelisk /opt/bazelisk-v1.11.0 && \
             sudo ln -s /opt/bazelisk-v1.11.0/bazelisk /usr/local/bin/bazel
 
+      - run: bazel build --config=ci //android/demo:android_instrumentation_test
 
       - run:
           name: Execute Android tests
@@ -285,8 +286,10 @@ jobs:
 
             bazel_test() {
               echo "Checking if '$@' is cached!"
+              set +e
               # Only test for if tests are relevant, cached means it will pass
-              bash -c 'bazel test --config=ci "$@"' bash "$@"
+              bash -c 'bazel test --config=ci --noshow_progress "$@"' bash "$@"
+              set -e
               if [ $? -eq 0 ]; then
                 echo "'$@' was cached - no emulator required"
               else
