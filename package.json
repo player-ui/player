@@ -9,9 +9,9 @@
   },
   "engines": {
     "node": "^20.14.0",
-    "pnpm": "^9.7.0"
+    "pnpm": "^10.12.1"
   },
-  "packageManager": "pnpm@9.7.0",
+  "packageManager": "pnpm@10.12.1",
   "dependencies": {
     "@astrojs/react": "^4.0.0",
     "@astrojs/starlight": "^0.35.2",
@@ -36,9 +36,9 @@
     "@emotion/styled": "^11.11.0",
     "@eslint/js": "^9.22.0",
     "@monaco-editor/react": "^4.6.0",
-    "@player-tools/cli": "0.8.1",
-    "@player-tools/dsl": "0.8.1",
-    "@player-tools/xlr": "0.8.1",
+    "@player-tools/cli": "0.12.0",
+    "@player-tools/dsl": "0.12.0",
+    "@player-tools/xlr": "0.12.0",
     "@player-tools/xlr-utils": "0.6.1-next.2",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-separator": "^1.0.3",
@@ -120,7 +120,7 @@
     "lucide-react": "^0.316.0",
     "lunr": "^2.3.9",
     "lz-string": "^1.4.4",
-    "mdast-util-from-markdown": "^2.0.0",
+    "mdast-util-from-markdown": "2.0.0",
     "mdast-util-toc": "^6.1.0",
     "mini-css-extract-plugin": "^2.8.1",
     "monaco-editor": "^0.51.0",
@@ -194,8 +194,8 @@
     "webpack-dev-server": "^5.0.4"
   },
   "volta": {
-    "node": "20.17.0",
-    "pnpm": "9.7.0"
+    "node": "22.15.1",
+    "pnpm": "10.12.1"
   },
   "pnpm": {
     "onlyBuiltDependencies": []

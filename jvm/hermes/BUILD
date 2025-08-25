@@ -1,14 +1,36 @@
-load("@build_constants//:constants.bzl", "VERSION")
-load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_binary", "kt_jvm_library")
-load("//jvm:defs.bzl", "DEFAULT_GROUP", "distribution", "kt_player_module")
+load("@build_constants//:constants.bzl", "GROUP", "VERSION")
+load("@rules_android//android:rules.bzl", "android_library")
+load("@rules_jvm_external//:defs.bzl", "artifact")
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+load("//jvm:defs.bzl", "distribution", "kt_player_module")
 load(":defs.bzl", "merge_jni_into_android_library")
-load(":deps.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
+
+main_exports = [
+    "//jvm/core",
+]
+
+main_deps = main_exports + [
+    "//plugins/console-logger/jvm",
+    "//plugins/set-time-out/jvm",
+    artifact("com.facebook.fbjni:fbjni-java-only"),
+    artifact("com.facebook.soloader:soloader"),
+]
+
+main_resources = glob(["src/main/resources/**"]) + [
+    # TODO: These should probably just be dependencies of headless
+    "//core/player:player_native_bundle",
+]
+
+test_deps = [
+    "@rules_kotlin//kotlin/compiler:kotlin-test",
+    "//jvm/testutils",
+]
 
 kt_player_module(
     name = "hermes",
     main_deps = main_deps,
     main_exports = main_exports,
-    main_resources = main_resources + glob(["src/main/resources/**"]),
+    main_resources = main_resources,
     test_deps = test_deps,
     test_package = "com.intuit.playerui",
 )
@@ -21,6 +43,8 @@ kt_jvm_library(
         ":hermes",
         "//jvm/hermes/src/main/jni:resources",
     ],
+    # TODO: Hack - avoid publishing and depending on hermes-host, but configure it for use in this repo
+    tags = ["maven_coordinates=%s:%s:%s" % (GROUP, "hermes", VERSION)],
 )
 
 android_library(
@@ -43,12 +67,12 @@ merge_jni_into_android_library(
         "//third_party/rn:libhermes",
     ],
     cc_name = "hermes_jni",
-    tags = ["maven_coordinates=%s:%s:aar:%s" % (DEFAULT_GROUP, "hermes-android", VERSION)],
+    tags = ["maven_coordinates=%s:%s:aar:%s" % (GROUP, "hermes-android", VERSION)],
     exports = [":hermes"],
 )
 
 distribution(
     name = "hermes-android",
     lib_name = "hermes-android-merged",
-    maven_coordinates = "%s:%s:%s" % (DEFAULT_GROUP, "hermes-android", VERSION),
+    maven_coordinates = "%s:%s:%s" % (GROUP, "hermes-android", VERSION),
 )

@@ -7,8 +7,9 @@ import com.intuit.playerui.utils.test.PromiseUtils
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-internal class GraalPromiseTest : GraalTest(), PromiseUtils {
-
+internal class GraalPromiseTest :
+    GraalTest(),
+    PromiseUtils {
     override val thenChain = mutableListOf<Any?>()
     override val catchChain = mutableListOf<Any?>()
 
@@ -16,11 +17,11 @@ internal class GraalPromiseTest : GraalTest(), PromiseUtils {
     fun testErrorStacktraceFromJSError() {
         val (promise) = runtime.execute(
             """
-           (function() {
-               var resolver;
-               const promise = new Promise(function(resolve, reject) { asdf.asdf.asdf.asdf });
-               return [promise, resolver];
-           })();
+            (function() {
+                var resolver;
+                const promise = new Promise(function(resolve, reject) { asdf.asdf.asdf.asdf });
+                return [promise, resolver];
+            })();
             """.trimIndent(),
         ) as List<*>
 

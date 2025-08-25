@@ -39,29 +39,3 @@ If those command do not run, you can find the apk in `bazelbin/android/demo/inst
 Check your SDK and NDK versions in SDK Manager in Android Studio. As well as your `ANDROID_HOME` and `ANDROID_NDK_HOME` in your bash or zsh profiles to make sure they are properly set.
 
 
-### 2. If you are seeing Errors around babel:
-```
-could not find dependency @babel/helper-string-parser of @babel.plugin-transform-react-jsx/noode_modules/@babel/types
-Error: Analysis of target '//android/demo:demo' failed; build aborted.
-```
-Make sure you have done a `bundle install`
-
-
-
-### 3. Error Message :
-```
- ResourceProcessorBusyBox failed: error executing command bazel-out/darwin-opt-exec-2B5CBBC6/bin/external/bazel_tools/src/tools/android/java/com/google/devtools/build/android/ResourceProcessorBusyBox --tool LINK_STATIC_LIBRARY -- --aapt2 ... (remaining 17 arguments skipped)
-```
-**Possible Solution:** Check your SDK and NDK versions in SDK Manager in Android Studio. As well as your `ANDROID_HOME` and `ANDROID_NDK_HOME` in your bash or zsh profiles to make sure they are properly set.
-
-You can also do `ls $ANDROID_HOME/platforms` and make sure that there are no versions higher than 30.
-
-### 3. Error Message :
-```
-ModuleNotFoundError: No module named 'six.moves'
-...
-from six.moves import range  # pylint: disable=redefined-builtin
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-```
-**Possible Solution:** Check your `python --version` is less than 3 (recommended 2.7.18). If it is and you are still getting the error try running you bazel commands with the flag `--incompatible_use_python_toolchains=false`
-

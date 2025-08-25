@@ -8,16 +8,14 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 
-internal suspend fun <Context : V8Value, T> Context.evaluateInJSThread(
-    runtime: Runtime<V8Value>,
-    block: suspend Context.() -> T,
-): T = withTimeout(runtime.config.timeout) {
-    if (runtime.isReleased()) throw PlayerRuntimeException(runtime, "Runtime object has been released!")
-    withContext(runtime.dispatcher) {
-        runtime.scope.ensureActive()
-        block()
+internal suspend fun <Context : V8Value, T> Context.evaluateInJSThread(runtime: Runtime<V8Value>, block: suspend Context.() -> T): T =
+    withTimeout(runtime.config.timeout) {
+        if (runtime.isReleased()) throw PlayerRuntimeException(runtime, "Runtime object has been released!")
+        withContext(runtime.dispatcher) {
+            runtime.scope.ensureActive()
+            block()
+        }
     }
-}
 
 internal fun <Context : V8Value, T> Context.evaluateInJSThreadBlocking(
     runtime: Runtime<V8Value>,
@@ -41,7 +39,5 @@ internal suspend fun <Context : V8Value, T> Context.evaluateInJSThreadIfDefined(
     block: suspend Context.() -> T,
 ): T? = mapUndefinedToNull()?.let { evaluateInJSThread(runtime, block) }
 
-internal fun <Context : V8Value, T> Context.evaluateInJSThreadIfDefinedBlocking(
-    runtime: Runtime<V8Value>,
-    block: Context.() -> T,
-): T? = mapUndefinedToNull()?.let { evaluateInJSThreadBlocking(runtime, false, block) }
+internal fun <Context : V8Value, T> Context.evaluateInJSThreadIfDefinedBlocking(runtime: Runtime<V8Value>, block: Context.() -> T): T? =
+    mapUndefinedToNull()?.let { evaluateInJSThreadBlocking(runtime, false, block) }

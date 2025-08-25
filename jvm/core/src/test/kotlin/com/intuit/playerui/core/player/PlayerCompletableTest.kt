@@ -12,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
 internal class PlayerCompletableTest {
-
     lateinit var playerCompletable: PlayerCompletable
 
     @MockK lateinit var node: Node

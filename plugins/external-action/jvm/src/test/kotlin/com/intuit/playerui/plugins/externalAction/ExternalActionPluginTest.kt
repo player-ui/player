@@ -11,7 +11,6 @@ import org.junit.jupiter.api.TestTemplate
 import org.junit.jupiter.api.assertThrows
 
 internal class ExternalActionPluginTest : PlayerTest() {
-
     override val plugins = listOf(ExternalActionPlugin())
 
     private val plugin get() = player.externalActionPlugin!!

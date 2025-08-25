@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestTemplate
 
 internal class ExpressionSerializationTest : RuntimeTest() {
-
     private val singleString = "some expression"
     private val single = Expression.Single(singleString)
     private val genericSingleString = "generic expression"

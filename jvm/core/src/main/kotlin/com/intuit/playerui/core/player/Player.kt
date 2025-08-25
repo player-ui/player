@@ -32,7 +32,6 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 /** Agnostic [Pluggable] [Player] to provide the core API */
 public abstract class Player : Pluggable {
-
     public abstract val logger: TapableLogger
 
     public abstract val constantsController: ConstantsController
@@ -71,17 +70,25 @@ public abstract class Player : Pluggable {
         public val onStart: NodeSyncHook1<Flow>
 
         public companion object {
-            internal interface HooksByNode : Hooks, NodeWrapper
-            public fun serializer(): KSerializer<Hooks> = Serializer
+            internal interface HooksByNode :
+                Hooks,
+                NodeWrapper
+
             internal operator fun invoke(node: Node): HooksByNode = object : HooksByNode {
                 override val node: Node = node
-                override val flowController: NodeSyncHook1<FlowController> by NodeSerializableField(NodeSyncHook1.serializer(FlowController.serializer()))
-                override val viewController: NodeSyncHook1<ViewController> by NodeSerializableField(NodeSyncHook1.serializer(ViewController.serializer()))
+                override val flowController: NodeSyncHook1<FlowController>
+                    by NodeSerializableField(NodeSyncHook1.serializer(FlowController.serializer()))
+                override val viewController: NodeSyncHook1<ViewController>
+                    by NodeSerializableField(NodeSyncHook1.serializer(ViewController.serializer()))
                 override val view: NodeSyncHook1<View> by NodeSerializableField(NodeSyncHook1.serializer(View.serializer()))
-                override val expressionEvaluator: NodeSyncHook1<ExpressionController> by NodeSerializableField(NodeSyncHook1.serializer(ExpressionController.serializer()))
-                override val dataController: NodeSyncHook1<DataController> by NodeSerializableField(NodeSyncHook1.serializer(DataController.serializer()))
-                override val validationController: NodeSyncHook1<ValidationController> by NodeSerializableField(NodeSyncHook1.serializer(ValidationController.serializer()))
-                override val state: NodeSyncHook1<out PlayerFlowState> by NodeSerializableField(NodeSyncHook1.serializer(PlayerFlowState.serializer()))
+                override val expressionEvaluator: NodeSyncHook1<ExpressionController>
+                    by NodeSerializableField(NodeSyncHook1.serializer(ExpressionController.serializer()))
+                override val dataController: NodeSyncHook1<DataController>
+                    by NodeSerializableField(NodeSyncHook1.serializer(DataController.serializer()))
+                override val validationController: NodeSyncHook1<ValidationController>
+                    by NodeSerializableField(NodeSyncHook1.serializer(ValidationController.serializer()))
+                override val state: NodeSyncHook1<out PlayerFlowState>
+                    by NodeSerializableField(NodeSyncHook1.serializer(PlayerFlowState.serializer()))
                 override val onStart: NodeSyncHook1<Flow> by NodeSerializableField(NodeSyncHook1.serializer(Flow.serializer()))
             }
 
@@ -95,13 +102,14 @@ public abstract class Player : Pluggable {
     /** [CoroutineScope] to be used for launching coroutines that should be cancelled once the Player is released */
     public abstract val scope: CoroutineScope
 
+    // TODO: With the ambiguity between [Completable] and [Deferred],
+    //  potentially simplest solution is to make [start] suspend.
+
     /**
      * Asynchronously [start] the [flow] represented as a [String]. The
      * [FlowResult] can be obtained by subscribing the the [Completable.onComplete]
      * or by blocking on [Completable.await].
      */
-    // TODO: With the ambiguity between [Completable] and [Deferred],
-    //  potentially simplest solution is to make [start] suspend.
     public abstract fun start(flow: String): Completable<CompletedState>
 
     /**

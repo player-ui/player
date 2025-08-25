@@ -3,7 +3,6 @@ package com.intuit.playerui.graaljs.player
 import org.graalvm.polyglot.Context
 
 internal object PlayerContextFactory {
-
     val context get() = buildPlayerContext()
 
     fun buildPlayerContext(): Context = Context

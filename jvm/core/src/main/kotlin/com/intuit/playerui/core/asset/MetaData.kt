@@ -16,8 +16,9 @@ import kotlinx.serialization.json.JsonNull
  * This could also be done by extending this class.
  */
 @Serializable(MetaData.Serializer::class)
-public open class MetaData(override val node: Node) : NodeWrapper {
-
+public open class MetaData(
+    override val node: Node,
+) : NodeWrapper {
     /** [JsonElement] representation of some [beacon] description */
     public val beacon: JsonElement by NodeSerializableField(JsonElement.serializer()) { JsonNull }
 

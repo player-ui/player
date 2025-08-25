@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class InvokeTest : J2V8Test() {
-
     @Test
     fun `test V8Function vararg invoke`() {
         v8.evaluateInJSThreadBlocking(runtime) {

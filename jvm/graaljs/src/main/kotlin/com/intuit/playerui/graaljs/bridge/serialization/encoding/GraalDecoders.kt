@@ -29,7 +29,6 @@ internal sealed class AbstractGraalDecoder(
     override val format: GraalFormat,
     override val value: Value,
 ) : AbstractRuntimeValueDecoder<Value>() {
-
     override fun decodeValue(): Any? = currentValue.handleValue(format)
 
     override fun decodeNotNullMark(): Boolean = !currentValue.isNull && currentValue != format.context.undefined
@@ -42,14 +41,21 @@ internal sealed class AbstractGraalDecoder(
         else -> error("Runtime format decoders can't decode kinds of (${descriptor.kind}) into structures for $descriptor")
     }
 
-    override fun <R> decodeFunction(returnTypeSerializer: KSerializer<R>): Invokable<R> {
-        return currentValue.toInvokable(format, returnTypeSerializer) ?: error("Unable to decode Graal function using return type serializer ${returnTypeSerializer.descriptor}")
-    }
+    override fun <R> decodeFunction(returnTypeSerializer: KSerializer<R>): Invokable<R> =
+        currentValue.toInvokable(format, returnTypeSerializer)
+            ?: error("Unable to decode Graal function using return type serializer ${returnTypeSerializer.descriptor}")
 }
 
-internal class GraalValueDecoder(format: GraalFormat, value: Value) : AbstractGraalDecoder(format, value)
+internal class GraalValueDecoder(
+    format: GraalFormat,
+    value: Value,
+) : AbstractGraalDecoder(format, value)
 
-internal class GraalObjectMapDecoder(override val format: GraalFormat, override val value: Value) : AbstractRuntimeObjectMapDecoder<Value>(), NodeDecoder by GraalValueDecoder(format, value) {
+internal class GraalObjectMapDecoder(
+    override val format: GraalFormat,
+    override val value: Value,
+) : AbstractRuntimeObjectMapDecoder<Value>(),
+    NodeDecoder by GraalValueDecoder(format, value) {
     override fun getElementAtIndex(index: Int): Value = value.blockingLock {
         getMember(getKeyAtIndex(index))
     }
@@ -76,7 +82,11 @@ internal class GraalObjectMapDecoder(override val format: GraalFormat, override 
     }
 }
 
-internal class GraalArrayListDecoder(override val format: GraalFormat, override val value: Value) : AbstractRuntimeArrayListDecoder<Value>(), NodeDecoder by GraalValueDecoder(format, value) {
+internal class GraalArrayListDecoder(
+    override val format: GraalFormat,
+    override val value: Value,
+) : AbstractRuntimeArrayListDecoder<Value>(),
+    NodeDecoder by GraalValueDecoder(format, value) {
     override fun getElementAtIndex(index: Int): Value = value.blockingLock {
         getArrayElement(index.toLong())
     }
@@ -85,18 +95,20 @@ internal class GraalArrayListDecoder(override val format: GraalFormat, override 
         (0 until arraySize).map { it.toInt() }
     }
 
-    override fun decodeValueElement(descriptor: SerialDescriptor, index: Int): Any? =
-        decodeElement(descriptor, index).handleValue(format)
+    override fun decodeValueElement(descriptor: SerialDescriptor, index: Int): Any? = decodeElement(descriptor, index).handleValue(format)
 
     override fun <T> buildDecoderForSerializableElement(
         descriptor: SerialDescriptor,
         index: Int,
         deserializer: DeserializationStrategy<T>,
-    ): Decoder =
-        GraalValueDecoder(format, decodeElement(descriptor, index))
+    ): Decoder = GraalValueDecoder(format, decodeElement(descriptor, index))
 }
 
-internal class GraalObjectClassDecoder(override val format: GraalFormat, override val value: Value) : AbstractRuntimeObjectClassDecoder<Value>(), NodeDecoder by GraalValueDecoder(format, value) {
+internal class GraalObjectClassDecoder(
+    override val format: GraalFormat,
+    override val value: Value,
+) : AbstractRuntimeObjectClassDecoder<Value>(),
+    NodeDecoder by GraalValueDecoder(format, value) {
     override fun getElementAtIndex(index: Int): Value = value.blockingLock {
         getMember(getKeyAtIndex(index))
     }
@@ -105,8 +117,7 @@ internal class GraalObjectClassDecoder(override val format: GraalFormat, overrid
         memberKeys.toList().filter { getMember(it) != context.undefined }
     }
 
-    override fun decodeValueElement(descriptor: SerialDescriptor, index: Int): Any? =
-        decodeElement(descriptor, index).handleValue(format)
+    override fun decodeValueElement(descriptor: SerialDescriptor, index: Int): Any? = decodeElement(descriptor, index).handleValue(format)
 
     override fun decodeElement(descriptor: SerialDescriptor, index: Int): Value = value.blockingLock {
         getMember(descriptor.getElementName(index))
@@ -119,12 +130,18 @@ internal class GraalObjectClassDecoder(override val format: GraalFormat, overrid
     ): Decoder = GraalValueDecoder(format, decodeElement(descriptor, index))
 }
 
-internal class GraalSealedClassDecoder(override val format: GraalFormat, override val value: Value) : AbstractRuntimeObjectClassDecoder<Value>(), NodeDecoder by GraalValueDecoder(format, value) {
-    override fun getElementAtIndex(index: Int): Value = throw GraalDecodingException("GraalSealedClassDecoder should not be used to decode any elements")
+internal class GraalSealedClassDecoder(
+    override val format: GraalFormat,
+    override val value: Value,
+) : AbstractRuntimeObjectClassDecoder<Value>(),
+    NodeDecoder by GraalValueDecoder(format, value) {
+    override fun getElementAtIndex(index: Int): Value =
+        throw GraalDecodingException("GraalSealedClassDecoder should not be used to decode any elements")
 
     override val keys: List<String> = listOf("type", "value")
 
-    override fun decodeElement(descriptor: SerialDescriptor, index: Int): Value = throw GraalDecodingException("GraalSealedClassDecoder should not be used to decode any elements")
+    override fun decodeElement(descriptor: SerialDescriptor, index: Int): Value =
+        throw GraalDecodingException("GraalSealedClassDecoder should not be used to decode any elements")
 
     override fun <T> buildDecoderForSerializableElement(
         descriptor: SerialDescriptor,
@@ -137,7 +154,7 @@ internal class GraalSealedClassDecoder(override val format: GraalFormat, overrid
             descriptor.annotations.firstOrNull {
                 it is RuntimeClassDiscriminator
             } as? RuntimeClassDiscriminator
-            )?.discriminator ?: format.config.discriminator
+        )?.discriminator ?: format.config.discriminator
 
         return value.getMember(discriminator).handleValue(format)
     }

@@ -19,7 +19,6 @@ public class NodeSerializableField<T> private constructor(
     private val name: String?,
     private val defaultValue: Node.(String) -> T,
 ) {
-
     /** Caching strategy for determining how to pull the value from [Node] on subsequent attempts */
     public enum class CacheStrategy {
         None,
@@ -28,17 +27,18 @@ public class NodeSerializableField<T> private constructor(
     }
 
     /** Cache of container [Node] that will reset the [value] cache if out-of-date with the [provider] */
-    private var cache: Node = provider(); get() {
-        val provided = provider()
-        if (provided.nativeReferenceEquals(field)) {
-            field
-        } else {
-            field = provided
-            value = null
-        }
+    private var cache: Node = provider()
+        get() {
+            val provided = provider()
+            if (provided.nativeReferenceEquals(field)) {
+                field
+            } else {
+                field = provided
+                value = null
+            }
 
-        return field
-    }
+            return field
+        }
 
     /** Cache of the [T] value, along with the backing [Node] for objects */
     private var value: Pair<Node?, T>? = null
@@ -55,7 +55,8 @@ public class NodeSerializableField<T> private constructor(
         val node = cache
 
         // early exit if we have a value still and referentially match the backing [Node]
-        value?.takeIf { strategy == CacheStrategy.Smart }
+        value
+            ?.takeIf { strategy == CacheStrategy.Smart }
             ?.takeIf { (backing) -> backing?.nativeReferenceEquals(node[key]) == true }
             ?.let { (_, value) -> return value }
 
@@ -67,7 +68,6 @@ public class NodeSerializableField<T> private constructor(
     }
 
     public companion object {
-
         /** Smart constructor responsible for determining the correct [CacheStrategy] and [defaultValue] from the [serializer], if either are not provided */
         @ExperimentalPlayerApi
         public operator fun <T> invoke(

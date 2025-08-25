@@ -30,10 +30,14 @@ public interface RuntimeFormat<Value> : SerialFormat {
     public fun parseToRuntimeValue(string: String): Value
 }
 
-public abstract class AbstractRuntimeFormat<Value>(public val config: RuntimeFormatConfiguration<Value>) : RuntimeFormat<Value>, StringFormat {
+public abstract class AbstractRuntimeFormat<Value>(
+    public val config: RuntimeFormatConfiguration<Value>,
+) : RuntimeFormat<Value>,
+    StringFormat {
     override val runtime: Runtime<Value> get() = config.runtime
 
-    final override var serializersModule: SerializersModule = config.serializersModule; private set
+    final override var serializersModule: SerializersModule = config.serializersModule
+        private set
 
     override fun registerSerializersModule(serializersModule: SerializersModule) {
         this.serializersModule += serializersModule
@@ -42,8 +46,7 @@ public abstract class AbstractRuntimeFormat<Value>(public val config: RuntimeFor
     override fun <T> decodeFromString(deserializer: DeserializationStrategy<T>, string: String): T =
         this.decodeFromRuntimeValue(deserializer, parseToRuntimeValue(string))
 
-    override fun <T> encodeToString(serializer: SerializationStrategy<T>, value: T): String =
-        PrettyJson.encodeToString(serializer, value)
+    override fun <T> encodeToString(serializer: SerializationStrategy<T>, value: T): String = PrettyJson.encodeToString(serializer, value)
 }
 
 public fun RuntimeFormat<*>.registerSerializersModule(block: SerializersModuleBuilder.() -> Unit) {
@@ -52,13 +55,15 @@ public fun RuntimeFormat<*>.registerSerializersModule(block: SerializersModuleBu
     }.also(::registerSerializersModule)
 }
 
-public inline fun <reified T : Any> RuntimeFormat<*>.registerContextualSerializer(serializer: KSerializer<T>): Unit = registerSerializersModule {
-    contextual(serializer)
-}
+public inline fun <reified T : Any> RuntimeFormat<*>.registerContextualSerializer(serializer: KSerializer<T>): Unit =
+    registerSerializersModule {
+        contextual(serializer)
+    }
 
-public fun <T : Any> RuntimeFormat<*>.registerContextualSerializer(klass: KClass<T>, serializer: KSerializer<T>): Unit = registerSerializersModule {
-    contextual(klass, serializer)
-}
+public fun <T : Any> RuntimeFormat<*>.registerContextualSerializer(klass: KClass<T>, serializer: KSerializer<T>): Unit =
+    registerSerializersModule {
+        contextual(klass, serializer)
+    }
 
 /** [RuntimeFormat] specific [KSerializer] lookup for [T] type that handles special cases before delegating to the [serializersModule] */
 public inline fun <reified T> RuntimeFormat<*>.serializer(): KSerializer<T> = when {
@@ -67,14 +72,12 @@ public inline fun <reified T> RuntimeFormat<*>.serializer(): KSerializer<T> = wh
     else -> serializersModule.serializer()
 }
 
-public inline fun <reified T, Value> RuntimeFormat<Value>.encodeToRuntimeValue(value: T): Value =
-    encodeToRuntimeValue(serializer(), value)
+public inline fun <reified T, Value> RuntimeFormat<Value>.encodeToRuntimeValue(value: T): Value = encodeToRuntimeValue(serializer(), value)
 
 public inline fun <reified T, Value> RuntimeFormat<Value>.decodeFromRuntimeValue(value: Value): T =
     decodeFromRuntimeValue(serializer(), value)
 
 public interface RuntimeFormatConfiguration<Value> {
-
     public val runtime: Runtime<Value>
 
     public val serializersModule: SerializersModule

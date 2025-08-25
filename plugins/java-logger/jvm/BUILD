@@ -1,5 +1,10 @@
 load("//plugins:defs.bzl", "kt_player_plugin")
-load(":deps.bzl", "main_deps", "main_exports")
+
+main_exports = [
+    "//jvm/core",
+]
+
+main_deps = main_exports
 
 kt_player_plugin(
     name = "java-logger",

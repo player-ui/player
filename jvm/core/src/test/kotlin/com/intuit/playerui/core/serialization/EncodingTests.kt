@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.TestTemplate
 
 internal class StructureEncoding : RuntimeTest() {
-
     @TestTemplate
     fun `encode concretely typed flat map`() {
         val runtimeObject = format.runtimeObject {
@@ -185,7 +184,6 @@ internal class StructureEncoding : RuntimeTest() {
 }
 
 internal class ClassEncoding : RuntimeTest() {
-
     @Serializable
     data class PrimitiveData(
         val int: Int = 0,

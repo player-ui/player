@@ -43,11 +43,13 @@ internal fun <T> GraalFormat.writeValue(value: T, serializer: SerializationStrat
     return result
 }
 
-internal open class GraalValueEncoder(private val format: GraalFormat, private val mode: Mode, private val consumer: (Value) -> Unit) :
-    AbstractEncoder(),
+internal open class GraalValueEncoder(
+    private val format: GraalFormat,
+    private val mode: Mode,
+    private val consumer: (Value) -> Unit,
+) : AbstractEncoder(),
     NodeEncoder,
     FunctionEncoder {
-
     internal constructor(format: GraalFormat, consumer: (Value) -> Unit) : this(format, Mode.UNDECIDED, consumer)
 
     override val serializersModule: SerializersModule by format::serializersModule
@@ -95,9 +97,7 @@ internal open class GraalValueEncoder(private val format: GraalFormat, private v
             else -> error("cannot get map unless in MAP mode")
         }
 
-    override fun beginStructure(
-        descriptor: SerialDescriptor,
-    ): CompositeEncoder {
+    override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder {
         val consumer = when (mode) {
             Mode.LIST,
             Mode.MAP,
@@ -120,6 +120,7 @@ internal open class GraalValueEncoder(private val format: GraalFormat, private v
     }
 
     override fun endStructure(descriptor: SerialDescriptor): Unit = endEncode()
+
     protected fun endEncode() = consumer.invoke(currentContent)
 
     override fun encodeValue(value: Any) = putContent(
@@ -157,34 +158,35 @@ internal open class GraalValueEncoder(private val format: GraalFormat, private v
         ProxyExecutable { args ->
             val encodedArgs = (args.indices).map { args[it].handleValue(format) }
             var index = 0
-            val matchedArgs = kCallable.valueParameters.map { kParam ->
-                // vararg support, all input args of that type will be included in vararg array
-                if (kParam.isVararg) {
-                    val start = index
-                    while (index in encodedArgs.indices) {
-                        val currValue = encodedArgs.getOrNull(index)
+            val matchedArgs = kCallable.valueParameters
+                .map { kParam ->
+                    // vararg support, all input args of that type will be included in vararg array
+                    if (kParam.isVararg) {
+                        val start = index
+                        while (index in encodedArgs.indices) {
+                            val currValue = encodedArgs.getOrNull(index)
 
-                        // check if type is nullable and value is null
-                        if ((
-                                currValue == null &&
-                                    // base type or type argument could be marked nullable
-                                    (kParam.type.isMarkedNullable || kParam.type.arguments[0].type?.isMarkedNullable == true)
+                            // check if type is nullable and value is null
+                            if ((
+                                    currValue == null &&
+                                        // base type or type argument could be marked nullable
+                                        (kParam.type.isMarkedNullable || kParam.type.arguments[0].type?.isMarkedNullable == true)
                                 ) ||
-                            // otherwise check if arg matches type if not null
-                            (currValue != null && currValue::class.isSubclassOf(kParam.type.arguments[0].type?.classifier as KClass<*>))
-                        ) {
-                            index++
-                        } else {
-                            break
+                                // otherwise check if arg matches type if not null
+                                (currValue != null && currValue::class.isSubclassOf(kParam.type.arguments[0].type?.classifier as KClass<*>))
+                            ) {
+                                index++
+                            } else {
+                                break
+                            }
                         }
+                        // only take matching args
+                        encodedArgs.slice(start until index).toTypedArray()
+                    } else {
+                        // not matching arg types here, just relying on order
+                        if (index in encodedArgs.indices) encodedArgs[index++] else null
                     }
-                    // only take matching args
-                    encodedArgs.slice(start until index).toTypedArray()
-                } else {
-                    // not matching arg types here, just relying on order
-                    if (index in encodedArgs.indices) encodedArgs[index++] else null
-                }
-            }.toTypedArray()
+                }.toTypedArray()
             format.encodeToGraalValue(kCallable.call(*matchedArgs))
         },
     )
@@ -286,12 +288,14 @@ internal open class GraalValueEncoder(private val format: GraalFormat, private v
     }
 }
 
-internal class GraalExceptionEncoder(format: GraalFormat, consumer: (Value) -> Unit) : GraalValueEncoder(
-    format,
-    Mode.MAP,
-    consumer,
-) {
-
+internal class GraalExceptionEncoder(
+    format: GraalFormat,
+    consumer: (Value) -> Unit,
+) : GraalValueEncoder(
+        format,
+        Mode.MAP,
+        consumer,
+    ) {
     override val contentMap by lazy {
         format.context.blockingLock {
             eval("js", "new Error()")

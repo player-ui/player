@@ -17,7 +17,9 @@ import com.intuit.playerui.j2v8.extensions.evaluateInJSThreadBlocking
  * read [V8Value]s. This provides some semantic structure for serialization and limits
  * the burden on consumers for checking data types.
  */
-internal open class V8Primitive internal constructor(val value: Any?) : V8Value() {
+internal open class V8Primitive internal constructor(
+    val value: Any?,
+) : V8Value() {
     override fun isUndefined(): Boolean = value == V8.getUndefined()
 
     override fun isReleased(): Boolean = false
@@ -40,8 +42,11 @@ internal object V8Null : V8Primitive(null)
 
 // instance helpers for creating valid [V8Primitive]s
 internal fun V8Primitive(content: String): V8Primitive = V8Primitive(content as Any)
+
 internal fun V8Primitive(content: Int): V8Primitive = V8Primitive(content as Any)
+
 internal fun V8Primitive(content: Double): V8Primitive = V8Primitive(content as Any)
+
 internal fun V8Primitive(content: Boolean): V8Primitive = V8Primitive(content as Any)
 
 // [V8Value] helpers for constraining to a certain subclass of [V8Value]
@@ -61,6 +66,7 @@ internal val <Context : V8Value> Context.v8Function: V8Function get() = this as?
 internal fun V8Object.getV8Value(runtime: Runtime<V8Value>, key: String): V8Value = evaluateInJSThreadBlocking(runtime) {
     get(key).let(::V8Value)
 }
+
 internal fun V8Array.getV8Value(runtime: Runtime<V8Value>, index: Int): V8Value = evaluateInJSThreadBlocking(runtime) {
     get(index).let(::V8Value)
 }
@@ -90,19 +96,21 @@ internal fun V8Object.addPrimitive(key: String, value: V8Primitive) = when (val 
 }
 
 internal fun <Context : V8Value> Context.V8Object(block: V8Object.() -> Unit = {}): V8Object = V8Object(runtime).apply(block)
+
 internal fun <Context : V8Value> Context.V8Array(block: V8Array.() -> Unit = {}): V8Array = V8Array(runtime).apply(block)
 
 /**
  * This _should_ be the main entry point for creating [V8Function]s within this module b/c it takes into account
  * runtime locking and ensuring that the return value can be appropriately handled by J2V8
  */
-internal inline fun <reified T> V8Function(format: J2V8Format, crossinline block: V8Object.(args: V8Array) -> T): V8Function = format.v8.evaluateInJSThreadBlocking(format.runtime) {
-    V8Function(this) { receiver, args ->
-        receiver.evaluateInJSThreadBlocking(format.runtime) {
-            when (val retVal = format.encodeToV8Value(block(args))) {
-                is V8Primitive -> retVal.value
-                else -> retVal
+internal inline fun <reified T> V8Function(format: J2V8Format, crossinline block: V8Object.(args: V8Array) -> T): V8Function =
+    format.v8.evaluateInJSThreadBlocking(format.runtime) {
+        V8Function(this) { receiver, args ->
+            receiver.evaluateInJSThreadBlocking(format.runtime) {
+                when (val retVal = format.encodeToV8Value(block(args))) {
+                    is V8Primitive -> retVal.value
+                    else -> retVal
+                }
             }
         }
     }
-}

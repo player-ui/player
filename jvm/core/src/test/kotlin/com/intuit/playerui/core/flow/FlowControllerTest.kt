@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class FlowControllerTest : NodeBaseTest() {
-
     val flowController by lazy {
         FlowController(node)
     }

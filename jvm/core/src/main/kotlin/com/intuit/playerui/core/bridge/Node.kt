@@ -22,8 +22,6 @@ import kotlin.reflect.jvm.reflect
  * interface.
  */
 public interface Node : Map<String, Any?> {
-
-    // Typed APIs
     /**
      * Returns the value corresponding to the given [key] as a [String],
      * or `null` if such a key is not present in the node or if the value is not a [String]
@@ -182,43 +180,55 @@ private inline fun <reified T> Any?.safeCast(): T? = this as? T
 
 internal object EmptyNode : Node {
     override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>): T? = null
+
     override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T = throw UnsupportedOperationException()
+
     override val entries: Set<Map.Entry<String, Any?>> = emptySet()
     override val keys: Set<String> = emptySet()
     override val size: Int = 0
     override val values: Collection<Any?> = emptySet()
+
     override fun containsKey(key: String): Boolean = false
+
     override fun containsValue(value: Any?): Boolean = false
+
     override fun get(key: String): Any? = null
+
     override fun isEmpty(): Boolean = true
+
     override fun isReleased(): Boolean = false
+
     override fun isUndefined(): Boolean = false
+
     override fun nativeReferenceEquals(other: Any?): Boolean = other is EmptyNode
+
     override val runtime: Runtime<*> get() = throw UnsupportedOperationException()
 }
 
-internal class MapBackedNode(private val map: Map<String, Any?>) : Node, Map<String, Any?> by map {
-
-    override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = get(key)?.let {
-        when (it) {
-            is Function<*> -> it
-            else -> null
+internal class MapBackedNode(
+    private val map: Map<String, Any?>,
+) : Node,
+    Map<String, Any?> by map {
+    override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = get(key)
+        ?.let {
+            when (it) {
+                is Function<*> -> it
+                else -> null
+            }
+        }?.let {
+            Invokable { args ->
+                it::reflect.call(*args) as R
+            }
         }
-    }?.let {
-        Invokable { args ->
-            it::reflect.call(*args) as R
-        }
-    }
 
     override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>): T = get(key)?.let { value ->
         Json.decodeFromJsonElement(deserializer, Json.encodeToJsonElement(GenericSerializer(), value))
     }!!
 
-    override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T =
-        Json.decodeFromJsonElement(
-            deserializer,
-            Json.encodeToJsonElement(MapSerializer(String.serializer(), GenericSerializer()), map),
-        )
+    override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T = Json.decodeFromJsonElement(
+        deserializer,
+        Json.encodeToJsonElement(MapSerializer(String.serializer(), GenericSerializer()), map),
+    )
 
     override fun isReleased(): Boolean = false
 

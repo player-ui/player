@@ -12,9 +12,11 @@ import kotlinx.serialization.Serializable
 public class NodeSyncBailHook1<T, R>(
     override val node: Node,
     private val serializer1: KSerializer<T>,
-) : SyncBailHook<(HookContext, T) -> BailResult<R>, R>(), NodeHook<R?> {
-
-    init { init(serializer1) }
+) : SyncBailHook<(HookContext, T) -> BailResult<R>, R>(),
+    NodeHook<R?> {
+    init {
+        init(serializer1)
+    }
 
     override fun call(context: HookContext, serializedArgs: Array<Any?>): R? {
         require(serializedArgs.size == 1)
@@ -28,9 +30,13 @@ public class NodeSyncBailHook1<T, R>(
 
     public inline fun tap(noinline callback: (T?) -> BailResult<R>): String? = tap(callingStackTraceElement.toString(), callback)
 
-    public inline fun tap(noinline callback: (HookContext, T?) -> BailResult<R>): String? = tap(callingStackTraceElement.toString(), callback)
+    public inline fun tap(noinline callback: (HookContext, T?) -> BailResult<R>): String? =
+        tap(callingStackTraceElement.toString(), callback)
 
-    internal class Serializer<T, R>(private val serializer1: KSerializer<T>, private val serializer2: KSerializer<R>) : NodeWrapperSerializer<NodeSyncBailHook1<T, R>>({
-        NodeSyncBailHook1(it, serializer1)
-    })
+    internal class Serializer<T, R>(
+        private val serializer1: KSerializer<T>,
+        private val serializer2: KSerializer<R>,
+    ) : NodeWrapperSerializer<NodeSyncBailHook1<T, R>>({
+            NodeSyncBailHook1(it, serializer1)
+        })
 }

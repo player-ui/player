@@ -15,7 +15,6 @@ import kotlinx.serialization.descriptors.SerialKind
  */
 @InternalPlayerApi
 public fun defer(deferred: () -> SerialDescriptor): SerialDescriptor = object : SerialDescriptor {
-
     private val original: SerialDescriptor by lazy(deferred)
 
     override val serialName: String
@@ -26,8 +25,12 @@ public fun defer(deferred: () -> SerialDescriptor): SerialDescriptor = object : 
         get() = original.elementsCount
 
     override fun getElementName(index: Int): String = original.getElementName(index)
+
     override fun getElementIndex(name: String): Int = original.getElementIndex(name)
+
     override fun getElementAnnotations(index: Int): List<Annotation> = original.getElementAnnotations(index)
+
     override fun getElementDescriptor(index: Int): SerialDescriptor = original.getElementDescriptor(index)
+
     override fun isElementOptional(index: Int): Boolean = original.isElementOptional(index)
 }

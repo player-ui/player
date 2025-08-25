@@ -33,8 +33,9 @@ import kotlinx.serialization.serializerOrNull
  * methods for decoding unknown structures.
  */
 @InternalPlayerApi
-public open class GenericSerializer(private val typeSerializers: List<KSerializer<*>>? = null) : KSerializer<Any?> {
-
+public open class GenericSerializer(
+    private val typeSerializers: List<KSerializer<*>>? = null,
+) : KSerializer<Any?> {
     public fun <T> conform(): KSerializer<T> = this as KSerializer<T>
 
     // This needs to be a [PrimitiveKind] descriptor to ensure that existing formats [Json] doesn't mind using this

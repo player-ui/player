@@ -1,18 +1,34 @@
 load("//jvm:defs.bzl", "kt_player_module")
-load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
-load(":deps.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
 load(":defs.bzl", "j2v8_platform")
+
+main_exports = [
+    "//jvm/core",
+]
+
+main_deps = main_exports + [
+    "//jvm/j2v8/libs:j2v8_empty_compile_only",
+    "//jvm/j2v8/libs:j2v8_debugger_compile_only",
+]
+
+# TODO: These should probably just be dependencies of headless
+main_resources = glob(["src/main/resources/**"]) + [
+    "//core/player:player_native_bundle",
+]
+
+test_deps = [
+    "//jvm/testutils"
+]
+
 
 # TODO: Add core as associates and remove InternalPlayerApi?
 #       May require creating shared module_name space.
 kt_player_module(
     name = "j2v8",
-    main_srcs = glob(["src/main/kotlin/com/intuit/**/*.kt"]),
     main_deps = main_deps,
     main_exports = main_exports,
-    main_resources = main_resources + glob(["src/main/resources/**"]),
+    main_resources = main_resources,
     test_deps = test_deps,
-    test_package = "com.intuit.playerui.j2v8",
+    test_package = "com.intuit.playerui.j2v8.bridge",
 )
 
 j2v8_platform("macos")

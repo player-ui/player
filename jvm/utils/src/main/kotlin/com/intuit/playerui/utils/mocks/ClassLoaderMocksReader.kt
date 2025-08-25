@@ -8,7 +8,6 @@ public class ClassLoaderMocksReader(
     private val classLoader: ClassLoader = ClassLoader.getSystemClassLoader(),
     private val manifestPath: String = "mocks/manifest.json",
 ) {
-
     /**
      * Manifest is a JSON blob published by the player plugin mocks package declaring
      * the names, groupings, and paths for each of the bundled mocks. This property

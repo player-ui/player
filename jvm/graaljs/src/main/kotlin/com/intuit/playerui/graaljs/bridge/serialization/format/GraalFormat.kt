@@ -16,17 +16,13 @@ import org.graalvm.polyglot.Value
 public class GraalFormat(
     config: GraalFormatConfiguration,
 ) : AbstractRuntimeFormat<Value>(config) {
-
     public val context: Context = (config.runtime as GraalRuntime).context
 
-    override fun <T> encodeToRuntimeValue(serializer: SerializationStrategy<T>, value: T): Value =
-        writeValue(value, serializer)
+    override fun <T> encodeToRuntimeValue(serializer: SerializationStrategy<T>, value: T): Value = writeValue(value, serializer)
 
-    override fun <T> decodeFromRuntimeValue(deserializer: DeserializationStrategy<T>, element: Value): T =
-        readValue(element, deserializer)
+    override fun <T> decodeFromRuntimeValue(deserializer: DeserializationStrategy<T>, element: Value): T = readValue(element, deserializer)
 
-    override fun parseToRuntimeValue(string: String): Value =
-        context.eval("js", string)
+    override fun parseToRuntimeValue(string: String): Value = context.eval("js", string)
 }
 
 public data class GraalFormatConfiguration internal constructor(
@@ -34,8 +30,6 @@ public data class GraalFormatConfiguration internal constructor(
     override val serializersModule: SerializersModule,
 ) : RuntimeFormatConfiguration<Value>
 
-internal inline fun <reified T> GraalFormat.encodeToGraalValue(value: T): Value =
-    encodeToRuntimeValue(serializer(), value)
+internal inline fun <reified T> GraalFormat.encodeToGraalValue(value: T): Value = encodeToRuntimeValue(serializer(), value)
 
-internal inline fun <reified T> GraalFormat.decodeFromGraalValue(value: Value): T =
-    decodeFromRuntimeValue(serializer(), value)
+internal inline fun <reified T> GraalFormat.decodeFromGraalValue(value: Value): T = decodeFromRuntimeValue(serializer(), value)

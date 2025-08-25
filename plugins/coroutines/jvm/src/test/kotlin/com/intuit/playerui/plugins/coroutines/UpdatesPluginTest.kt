@@ -8,7 +8,6 @@ import org.junit.jupiter.api.TestTemplate
 import kotlin.concurrent.thread
 
 internal class UpdatesPluginTest : PlayerTest() {
-
     override val plugins: List<Plugin> = listOf(UpdatesPlugin())
 
     @TestTemplate

@@ -1,3 +1,5 @@
+load("@rules_java//java:java_import.bzl", "java_import")
+
 package(default_visibility = ["//jvm/j2v8:__pkg__"])
 
 java_import(
@@ -22,7 +24,7 @@ java_import(
 
 java_import(
     name = "j2v8_debugger_compile_only",
-    jars = [],
+    jars = ["//jvm:empty.jar"],
     neverlink = True,
     tags = ["maven:compile-only"],
     deps = ["@maven//:com_github_AlexTrotsenko_j2v8_debugger"],

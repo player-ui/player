@@ -15,9 +15,9 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 /** Simple [PlayerPlugin] that provides a [CoroutineScope] reflective of the current [Flow] */
 public class FlowScopePlugin : PlayerPlugin {
-
     /** [CoroutineScope] reflective of the [Player]s current [Flow] */
-    public var flowScope: CoroutineScope? = null; private set
+    public var flowScope: CoroutineScope? = null
+        private set
 
     override fun apply(player: Player) {
         player.hooks.state.tap { state ->
@@ -36,8 +36,9 @@ public class FlowScopePlugin : PlayerPlugin {
     }
 
     /** [CoroutineContext.Element] that contains the [Flow] bound to the current [CoroutineContext] */
-    public class FlowContext(public val flow: Flow) : CoroutineContext.Element {
-
+    public class FlowContext(
+        public val flow: Flow,
+    ) : CoroutineContext.Element {
         override val key: CoroutineContext.Key<FlowContext> = Key
 
         public companion object Key : CoroutineContext.Key<FlowContext>
