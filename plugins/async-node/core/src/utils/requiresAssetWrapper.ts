@@ -1,7 +1,9 @@
 import { NodeType } from "@player-ui/player";
 import type { Node } from "@player-ui/player";
 
-export const requiresAssetWrapper = (node: Node.Node): boolean => {
+export const requiresAssetWrapper = (
+  node: Node.Node,
+): node is Node.Applicability | Node.Asset => {
   if (node.type === NodeType.Asset) {
     return true;
   }
