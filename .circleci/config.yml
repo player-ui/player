@@ -39,7 +39,7 @@ executors:
     machine:
       image: android:2024.04.1
     working_directory: ~/player
-    resource_class: large
+    resource_class: xlarge
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   benchmarks:
