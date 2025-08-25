@@ -4,7 +4,12 @@ import {
   Node,
   NodeType,
 } from "@player-ui/player";
-import { extractNodeFromPath, traverseAndReplace, unwrapAsset } from "./utils";
+import {
+  extractNodeFromPath,
+  requiresAssetWrapper,
+  traverseAndReplace,
+  unwrapAsset,
+} from "./utils";
 
 export type AsyncTransformOptions = {
   /** Whether or not to flatten the results into its container. Defaults to true */
@@ -69,10 +74,15 @@ export const createAsyncTransform = (
     const asyncNode = Builder.asyncNode(id, flatten, replaceFunction);
 
     let multiNode: Node.MultiNode | undefined;
-
     if (asset) {
-      const assetNode = Builder.assetWrapper(asset);
-      multiNode = Builder.multiNode(assetNode, asyncNode);
+      if (requiresAssetWrapper(asset)) {
+        const assetWrappedNode = Builder.assetWrapper(asset);
+        multiNode = Builder.multiNode(assetWrappedNode, asyncNode);
+      } else if (asset.type === NodeType.MultiNode) {
+        multiNode = Builder.multiNode(...(asset.values as any[]), asyncNode);
+      } else {
+        multiNode = Builder.multiNode(asset as any, asyncNode);
+      }
     } else {
       multiNode = Builder.multiNode(asyncNode);
     }
