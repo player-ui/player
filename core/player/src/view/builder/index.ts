@@ -39,9 +39,11 @@ export class Builder {
    * Creates a multiNode and associates the multiNode as the parent
    * of all the value nodes
    *
-   * @param values - the nodes to put in the multinode
+   * @param values - the value, applicability or async nodes to put in the multinode
    */
-  static multiNode(...values: Node.Node[]): Node.MultiNode {
+  static multiNode(
+    ...values: (Node.Value | Node.Applicability | Node.Async)[]
+  ): Node.MultiNode {
     const m: Node.MultiNode = {
       type: NodeType.MultiNode,
       override: true,
