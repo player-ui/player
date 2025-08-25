@@ -21,14 +21,7 @@ export type AsyncTransformOptions = {
   /** The asset type that will contain the async content. */
   wrapperAssetType: string;
   /** Function to get any nested asset that will need to be extracted and kept when creating the wrapper asset. */
-  getNestedAsset?: (
-    node: Node.ViewOrAsset,
-  ) =>
-    | Node.Asset
-    | Node.Value
-    | Node.Applicability
-    | Node.MultiNode
-    | undefined;
+  getNestedAsset?: (node: Node.ViewOrAsset) => Node.Node | undefined;
   /** Function to get the id for the async node being generated. Defaults to creating an id with the format of async-<ASSET.ID> */
   getAsyncNodeId?: (node: Node.ViewOrAsset) => string;
 };
@@ -88,7 +81,7 @@ export const createAsyncTransform = (
       } else if (asset.type === NodeType.MultiNode) {
         multiNode = Builder.multiNode(...(asset.values as any[]), asyncNode);
       } else {
-        multiNode = Builder.multiNode(asset, asyncNode);
+        multiNode = Builder.multiNode(asset as any, asyncNode);
       }
     } else {
       multiNode = Builder.multiNode(asyncNode);
