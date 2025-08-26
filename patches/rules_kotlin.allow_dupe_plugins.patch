@@ -7,7 +7,7 @@ index e598fe3f..a093836c 100644
          if plugin.id in all_plugins:
              # This need a more robust error messaging.
 -            fail("has multiple plugins with the same id: %s." % plugin.id)
-+            print("has multiple plugins with the same id: %s." % plugin.id)
++            pass
          all_plugins[plugin.id] = plugin
  
      if plugins_without_phase:
