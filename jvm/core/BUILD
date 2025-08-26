@@ -14,6 +14,10 @@ main_deps = main_exports + [
     artifact("org.jetbrains.kotlin:kotlin-reflect"),
 ]
 
+main_resources = [
+    "//core/player:player_native_bundle",
+]
+
 # Test dependencies
 test_deps = [
     "//jvm/testutils",
@@ -30,6 +34,7 @@ kt_player_module(
     name = "core",
     main_deps = main_deps,
     main_exports = main_exports,
+    main_resources = main_resources,
     test_deps = test_deps,
     test_package = "com.intuit.playerui.core",
 )
