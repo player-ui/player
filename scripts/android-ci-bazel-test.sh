@@ -6,7 +6,7 @@ set -eo pipefail # exit immediately if any command fails.
 EMULATOR_IMG="system-images;android-33;default;x86_64"
 
 create_and_wait_for_emulator() {
-  if [ $EMULATOR_READY != "true" ]; then
+  if [ "$EMULATOR_READY" != "true" ]; then
     echo "Creating emulator..."
     sdkmanager "$EMULATOR_IMG"
     echo "no" | avdmanager --verbose create avd -n test -k "$EMULATOR_IMG" -g default
@@ -20,7 +20,7 @@ create_and_wait_for_emulator() {
 }
 
 # Only need to test for cached tests if the emulator isn't setup
-if [ $EMULATOR_READY != "true" ]; then
+if [ "$EMULATOR_READY" != "true" ]; then
   set +e
   echo "Checking if '$@' is cached!"
   # Only check if tests are relevant, cached means it will pass
