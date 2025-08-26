@@ -28,10 +28,10 @@ node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 node.toolchain(node_version = "22.15.1")
 
 #################################
-sh_config_ext = use_extension("//:shell.bzl", "my_sh_config_extension")
-use_repo(sh_config_ext, "my_local_config_sh")
+sh_config_ext = use_extension("@rules_player//shell:defs.bzl", "sh_configure")
+use_repo(sh_config_ext, "local_shell_config")
 
-register_toolchains("@my_local_config_sh//:local_sh_toolchain")
+register_toolchains("@local_shell_config//:local_sh_toolchain")
 
 ###### Start iOS ######
 ## Rule Dependencies

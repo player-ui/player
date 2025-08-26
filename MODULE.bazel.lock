@@ -279,22 +279,6 @@
   },
   "selectedYankedVersions": {},
   "moduleExtensions": {
-    "//:shell.bzl%my_sh_config_extension": {
-      "general": {
-        "bzlTransitiveDigest": "3gXGH2pfYztvXqEConVAifiD7iBunxbjexbh5LzHVrM=",
-        "usagesDigest": "UDE2W6uipa2GME2iNiloIVBIFdpCYrRLg3OVpnF+ZTs=",
-        "recordedFileInputs": {},
-        "recordedDirentsInputs": {},
-        "envVariables": {},
-        "generatedRepoSpecs": {
-          "my_local_config_sh": {
-            "repoRuleId": "@@//:shell.bzl%my_sh_config",
-            "attributes": {}
-          }
-        },
-        "recordedRepoMappingEntries": []
-      }
-    },
     "@@apple_support+//crosstool:setup.bzl%apple_cc_configure_extension": {
       "general": {
         "bzlTransitiveDigest": "gv4nokEMGNye4Jvoh7Tw0Lzs63zfklj+n4t0UegI7Ms=",
@@ -1143,6 +1127,22 @@
             "attributes": {
               "user_node_repository_name": "nodejs"
             }
+          }
+        },
+        "recordedRepoMappingEntries": []
+      }
+    },
+    "@@rules_player+//shell:defs.bzl%sh_configure": {
+      "general": {
+        "bzlTransitiveDigest": "hHBMsvBPNv+aexlCP8obaLYRtsEzjIRKeVm1n2HpZ5s=",
+        "usagesDigest": "FvNRioCd0dtjtR47Ztimkr1bJxMqGbIZ3X4CaLoutVs=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "local_shell_config": {
+            "repoRuleId": "@@rules_player+//shell/private:shell.bzl%local_shell_config",
+            "attributes": {}
           }
         },
         "recordedRepoMappingEntries": []
