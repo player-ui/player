@@ -4,6 +4,7 @@ set -eo pipefail # exit immediately if any command fails.
 
 # Defer installing, creating, and booting an emulator unless required
 EMULATOR_IMG="system-images;android-33;default;x86_64"
+EMULATOR_READY=$([ "$(adb devices | tail -n +2 | grep -w "device" | wc -l)" -gt 0 ] && echo "true" || echo "false")
 
 create_and_wait_for_emulator() {
   if [ "$EMULATOR_READY" != "true" ]; then
@@ -13,7 +14,7 @@ create_and_wait_for_emulator() {
     nohup emulator -avd test -delay-adb -verbose -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim &
     circle-android wait-for-boot
     echo "Emulator ready..."
-    export EMULATOR_READY=true
+    EMULATOR_READY=true
   else
     echo "Emulator already ready..."
   fi
@@ -22,7 +23,7 @@ create_and_wait_for_emulator() {
 # Only need to test for cached tests if the emulator isn't setup
 if [ "$EMULATOR_READY" != "true" ]; then
   set +e
-  echo "Checking if '$@' is cached!"
+  echo "Checking if '$@' is cached..."
   # Only check if tests are relevant, cached means it will pass
   bash -c 'bazel test --config=ci "$@" &> /dev/null' bash "$@"
   # 0 exit code means the test passed
