@@ -11,10 +11,6 @@ main_deps = main_exports + [
     artifact("org.graalvm.sdk:graal-sdk"),
 ]
 
-main_resources = glob(["src/main/resources/**"]) + [
-    "//core/player:player_native_bundle"
-]
-
 test_deps = [
     "//jvm/testutils"
 ]
@@ -23,7 +19,6 @@ kt_player_module(
     name = "graaljs",
     main_deps = main_deps,
     main_exports = main_exports,
-    main_resources = main_resources,
     test_deps = test_deps,
     test_package = "com.intuit.playerui.graaljs",
 )

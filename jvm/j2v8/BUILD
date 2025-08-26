@@ -9,11 +9,6 @@ main_deps = main_exports + [
     "//jvm/j2v8/libs:j2v8_empty_compile_only",
 ]
 
-# TODO: These should probably just be dependencies of headless
-main_resources = glob(["src/main/resources/**"]) + [
-    "//core/player:player_native_bundle",
-]
-
 test_deps = [
     "//jvm/testutils"
 ]
@@ -25,7 +20,6 @@ kt_player_module(
     name = "j2v8",
     main_deps = main_deps,
     main_exports = main_exports,
-    main_resources = main_resources,
     test_deps = test_deps,
     test_package = "com.intuit.playerui.j2v8.bridge",
 )
