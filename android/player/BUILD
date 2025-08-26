@@ -3,31 +3,6 @@ load("@rules_java//java:java_import.bzl", "java_import")
 load("@rules_jvm_external//:defs.bzl", "artifact")
 load("//android:defs.bzl", "kt_android")
 
-string_flag(
-    name = "runtime",
-    build_setting_default = "j2v8",
-    values = [
-        "j2v8",
-        "j2v8-debug",
-        "hermes",
-    ],
-)
-
-config_setting(
-    name = "j2v8_runtime",
-    flag_values = {":runtime": "j2v8"},
-)
-
-config_setting(
-    name = "j2v8_debug_runtime",
-    flag_values = {":runtime": "j2v8-debug"},
-)
-
-config_setting(
-    name = "hermes_runtime",
-    flag_values = {":runtime": "hermes"},
-)
-
 # TODO: Hack for compile-only deps
 java_import(
     name = "compose_compile_only",
@@ -44,12 +19,7 @@ main_exports = [
 
     artifact("androidx.databinding:viewbinding"),
     artifact("androidx.transition:transition"),
-] + select({ # TODO: Runtime dependencies should probably not be exports
-    "//android/player:j2v8_runtime": ["//jvm/j2v8:j2v8-android"],
-    "//android/player:j2v8_debug_runtime": ["//jvm/j2v8:j2v8-android-debug"],
-    "//android/player:hermes_runtime": ["//jvm/hermes:hermes-android"],
-    "//conditions:default": [],
-})
+]
 
 main_deps = main_exports + [
     # JVM plugin deps
