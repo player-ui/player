@@ -38,10 +38,10 @@ export const BASE_PREFIX =
 // https://astro.build/config
 export default defineConfig({
   redirects: {
-    "/guides/getting-started": "/getting-started",
-    "/plugins/common-types": "/plugins/core/common-types/",
-    "/tools/cli": "/capabilities/cli/",
-    "/tools/storybook": "/capabilities/storybook/",
+    "/guides/getting-started": `${BASE_PREFIX ? `/${BASE_PREFIX}` : ""}/getting-started/`,
+    "/plugins/common-types": `${BASE_PREFIX ? `/${BASE_PREFIX}` : ""}/plugins/core/common-types/`,
+    "/tools/cli": `${BASE_PREFIX ? `/${BASE_PREFIX}` : ""}/capabilities/cli/`,
+    "/tools/storybook": `${BASE_PREFIX ? `/${BASE_PREFIX}` : ""}/capabilities/storybook/`,
   },
   integrations: [
     react(),
