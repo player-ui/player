@@ -49,7 +49,7 @@ kt_jvm_library(
 
 android_library(
     name = "hermes-android-lib",
-    custom_package = "com.intuit.playerui.hermes",
+    custom_package = "com.intuit.playerui.hermes.bridge",
     manifest = ":AndroidManifest.xml",
     visibility = ["//visibility:public"],
     # Kotlin Hermes JNI Runtime
