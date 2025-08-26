@@ -26,7 +26,7 @@ internal class ResourceLoaderDelegate : NativeLoaderDelegate {
             ?: getResourceAsStream("$shortName/lib/lib$shortName.so")
             ?: getResourceAsStream("$shortName/lib/lib$shortName.dylib")
             ?: throw UnsatisfiedLinkError(
-                "Unable to load resouasdfasdfadfsdfdfssfdasdfrce for $shortName. This is a fallback used when the NativeLoader is not initialized. If this is in an Android context, make sure you initialize with SoLoader in your application, or containing activity. Otherwise, ensure you have provided the host-compatible Hermes libraries as resources (i.e. //jvm/hermes:hermes-host).",
+                "Unable to load resouasdfasdfadfsdfdfasdfasdfsaffasdssfdasdfrce for $shortName. This is a fallback used when the NativeLoader is not initialized. If this is in an Android context, make sure you initialize with SoLoader in your application, or containing activity. Otherwise, ensure you have provided the host-compatible Hermes libraries as resources (i.e. //jvm/hermes:hermes-host).",
             )
 
         val rewritten = resource.writeTemp("lib$shortName", ".so")

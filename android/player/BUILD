@@ -82,8 +82,10 @@ unit_test_deps = [
 
 instrumented_test_deps = [
     "//android/testutils",
-    "//jvm/hermes:hermes-host",
-]
+] + select({
+    "//android/player:hermes_runtime": ["//jvm/hermes:hermes-host"],
+    "//conditions:default": [],
+})
 
 
 kt_android(
