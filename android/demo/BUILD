@@ -3,6 +3,25 @@ load("@rules_jvm_external//:defs.bzl", "artifact")
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load("//android:defs.bzl", "kt_android")
 
+string_flag(
+    name = "runtime",
+    build_setting_default = "hermes",
+    values = [
+        "j2v8",
+        "hermes",
+    ],
+)
+
+config_setting(
+    name = "j2v8_runtime",
+    flag_values = {":runtime": "j2v8"},
+)
+
+config_setting(
+    name = "hermes_runtime",
+    flag_values = {":runtime": "hermes"},
+)
+
 main_deps = [
     "//jvm/utils",
     "//plugins/reference-assets/android",
@@ -17,7 +36,11 @@ main_deps = [
     # For when hermes-android _isn't_ included
     artifact("com.facebook.soloader:soloader"),
     artifact("com.google.android.material:material"),
-]
+] + select({
+    "//android/player:j2v8_runtime": ["//jvm/j2v8:j2v8-android"],
+    "//android/player:hermes_runtime": ["//jvm/hermes:hermes-android"],
+    "//conditions:default": [],
+})
 
 test_deps = [
     "//android/testutils",
