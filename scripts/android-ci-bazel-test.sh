@@ -13,7 +13,7 @@ create_and_wait_for_emulator() {
     nohup emulator -avd test -delay-adb -verbose -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim &
     circle-android wait-for-boot
     echo "Emulator ready..."
-    EMULATOR_READY=true
+    export EMULATOR_READY=true
   else
     echo "Emulator already ready..."
   fi
