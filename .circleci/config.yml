@@ -263,9 +263,9 @@ jobs:
             sudo mv bazelisk /opt/bazelisk-v1.11.0 && \
             sudo ln -s /opt/bazelisk-v1.11.0/bazelisk /usr/local/bin/bazel
 
-      - run: ./scripts/android-ci-bazel-test.sh --cache_test_results=no //android/demo:android_instrumentation_test
+      - run: ./scripts/android-ci-bazel-test.sh //android/demo:android_instrumentation_test
 
-      - run: ./scripts/android-ci-bazel-test.sh --//android/player:runtime=hermes //android/demo:android_instrumentation_test
+      - run: ./scripts/android-ci-bazel-test.sh --cache_test_results=no --//android/player:runtime=hermes //android/demo:android_instrumentation_test
 
       - run:
           when: always
