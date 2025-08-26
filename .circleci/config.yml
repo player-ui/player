@@ -265,7 +265,7 @@ jobs:
 
       - run: ./scripts/android-ci-bazel-test.sh //android/demo:android_instrumentation_test
 
-      - run: ./scripts/android-ci-bazel-test.sh --cache_test_results=no --//android/player:runtime=hermes //android/demo:android_instrumentation_test
+      - run: ./scripts/android-ci-bazel-test.sh --//android/player:runtime=hermes //android/demo:android_instrumentation_test
 
       - run:
           when: always
