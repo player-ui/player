@@ -141,6 +141,10 @@ export default defineConfig({
               autogenerate: { directory: "plugins/iOS" },
             },
             {
+              label: "Language Plugins",
+              autogenerate: { directory: "plugins/language" },
+            },
+            {
               label: "React Plugins",
               autogenerate: { directory: "plugins/react" },
             },

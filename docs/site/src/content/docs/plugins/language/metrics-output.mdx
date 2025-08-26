@@ -4,101 +4,71 @@ title: Metrics Output Plugin
 
 import { PackageManagers } from "starlight-package-managers";
 
-Generate a JSON file of metrics using `@player-tools/metrics-output-plugin`.
+Generate a JSON file of metrics using `@player-tools/metrics-output-plugin`. The plugin consumes diagnostics from LSP plugins and produces a single JSON file with per-file metrics and optional project-level metadata.
 
-- Produces a single JSON file (default name: `metrics.json`)
-- Per-file entries under `content[path/to/file]`
-- Optional project-level `rootProperties`
-
-## Install
+## Usage
 
 Install the plugin:
 
 <PackageManagers pkg="@player-tools/metrics-output-plugin" />
 
-## Usage
+### Basic Configuration
 
 Use `fileName` and `outputDir` to configure where the JSON file is written, and `rootProperties` to add top-level metadata.
 
-Then you can specify per-file stats and features, which are aggregated each time the plugin is run.
+```js
+[
+  "@player-tools/metrics-output-plugin",
+  {
+    outputDir: "dist", // default: current dir
+    fileName: "metrics", // default: metrics
+    rootProperties: {
+      timestamp: new Date().toISOString(),
+    },
+  },
+];
+```
 
-### Stats
+### Stats and Features
 
-- Diagnostics-driven numbers/objects (run LSP diagnostic plugins before metrics)
-- Map messages with `extractFromDiagnostics` (e.g., `Content complexity is 640`)
-- Read symbol/key-tagged values with `extractByData` (e.g., asset counts)
+Specify per-file stats and features, which are aggregated each time the plugin is run:
 
-### Features
+```js
+stats: {
+  // Extract numbers from diagnostic messages
+  complexity: extractFromDiagnostics(/Content complexity is (\d+)/, Number),
+  // Read symbol-tagged values
+  assets: (diagnostics) => extractByData(ASSET_COUNT_SYMBOL, diagnostics),
+},
+features: (diagnostics) => extractByData(SOURCE_TYPE_SYMBOL, diagnostics)
+```
 
-- Extra per-file metadata you compute (not always from content)
-- Common examples: `sourceType` (DSL vs JSON)
-
-### Example Implementation
+### Complete Example
 
 ```js
 import {
   extractFromDiagnostics,
   extractByData,
 } from "@player-tools/metrics-output-plugin";
-// Symbols and LSP plugins exported by your diagnostics-producing package
-import {
-  ASSET_COUNT_SYMBOL,
-  TYPE_TRACKER_SYMBOL,
-  SOURCE_TYPE_SYMBOL,
-  AssetCountPlugin,
-  TypeTrackerPlugin,
-  SourceTypePlugin,
-} from "your-lsp-plugin";
-
-const COMPLEXITY_WARNING_THRESHOLD = 1000;
-
-// Minimal matcher example for tracking image references
-const imageMatcher = (viewNode) => {
-  const metaDataProp = viewNode?.properties?.find(
-    (prop) => prop?.keyNode?.value === "metaData",
-  );
-  const refProp = metaDataProp?.valueNode?.properties?.find(
-    (prop) => prop?.keyNode?.value === "ref",
-  );
-  return refProp?.valueNode?.type === "string" ? [refProp.valueNode.value] : [];
-};
 
 export default {
   plugins: [
     // LSP plugins that produce diagnostics should come first
-    new TypeTrackerPlugin([
-      { assetType: "image", matcher: imageMatcher, name: "images" },
-    ]),
-    new AssetCountPlugin(),
-    new SourceTypePlugin(),
-    new ComplexityCheck({ maxWarningLevel: COMPLEXITY_WARNING_THRESHOLD }),
+    new ComplexityCheck({ maxWarningLevel: 1000 }),
 
     // Metrics output consumes diagnostics and writes a single JSON file
     [
       "@player-tools/metrics-output-plugin",
       {
-        outputDir: "dist", // default: current dir
-        fileName: "metrics", // default: metrics
-
-        // Per-file values from diagnostics
+        outputDir: "dist",
+        fileName: "metrics",
         stats: {
-          // Example: pull number from messages like "Content complexity is 18"
           complexity: extractFromDiagnostics(
             /Content complexity is (\d+)/,
             Number,
           ),
-          // Share the same threshold used by ComplexityCheck
-          complexityThreshold: COMPLEXITY_WARNING_THRESHOLD,
-          // Pull data tagged by prior plugins using symbols/keys
-          assets: (diagnostics) =>
-            extractByData(ASSET_COUNT_SYMBOL, diagnostics),
-          types: (diagnostics) =>
-            extractByData(TYPE_TRACKER_SYMBOL, diagnostics),
+          complexityThreshold: 1000,
         },
-        features: (diagnostics) =>
-          extractByData(SOURCE_TYPE_SYMBOL, diagnostics),
-
-        // Optional root-level values on the output JSON
         rootProperties: {
           timestamp: new Date().toISOString(),
         },
@@ -108,7 +78,9 @@ export default {
 };
 ```
 
-## Example JSON Output
+## Output Format
+
+The plugin produces a JSON file with per-file entries under `content[path/to/file]` and optional project-level `rootProperties`.
 
 ```json
 {
@@ -116,29 +88,7 @@ export default {
     "src/content/flow-1.json": {
       "stats": {
         "complexity": 1823,
-        "complexityThreshold": 1000,
-        "assets": 12,
-        "types": {
-          "image": ["hero.png", "logo.svg"],
-          "input": ["firstName", "email"]
-        }
-      },
-      "features": {
-        "sourceType": "dsl"
-      }
-    },
-    "src/content/flow-2.json": {
-      "stats": {
-        "complexity": 640,
-        "complexityThreshold": 1000,
-        "assets": 4,
-        "types": {
-          "image": ["footer.png"],
-          "text": ["welcome", "details"]
-        }
-      },
-      "features": {
-        "sourceType": "json"
+        "complexityThreshold": 1000
       }
     }
   },
@@ -146,29 +96,21 @@ export default {
 }
 ```
 
-## Writing Custom Plugins
+## Writing LSP Plugins
 
-You can generate your own diagnostics that the metrics plugin can consume.
-
-### Example AssetCount LSP Plugin
-
-Emit a per-file diagnostic with a symbol-tagged count that `extractByData` can read.
+You can generate your own diagnostics that the metrics plugin can consume by creating custom plugins that emit symbol-tagged data.
 
 ```ts
-// your-lsp-plugin
 export const ASSET_COUNT_SYMBOL = Symbol("asset-count");
 
 export class AssetCountPlugin {
   name = "AssetCountPlugin";
   apply(lsp) {
     lsp.hooks.validate.tap(this.name, (doc) => {
-      const count = countAssets(doc); // implement for your content
+      const count = countAssets(doc);
       return [
         {
           message: `Asset count: ${count}`,
-          range: {
-            /* minimal range for the file */
-          },
           severity: 3, // info
           data: { [ASSET_COUNT_SYMBOL]: count },
         },
@@ -178,60 +120,10 @@ export class AssetCountPlugin {
 }
 ```
 
-Those diagnostics are then picked up by the config:
+Then consume it in your metrics config:
 
 ```ts
-assets: (diagnostics) => extractByData(ASSET_COUNT_SYMBOL, diagnostics);
-```
-
-### Example BuildInfoPlugin CLI Plugin
-
-Useful for including additional root-level metadata to the metrics JSON file. Note: Metrics Output consumes diagnostics from the LSP pipeline only; CLI plugins are not consumed in the same run. To add project-level data, write to the same metrics file ahead of time and Metrics Output will aggregate on the next run.
-
-```js
-// your-cli-plugin
-import fs from "node:fs";
-import path from "node:path";
-
-export class BuildInfoPlugin {
-  name = "BuildInfoPlugin";
-  constructor({ outDir = "dist", fileName = "metrics" } = {}) {
-    this.outDir = outDir;
-    this.fileName = fileName; // should match Metrics Output config
-  }
-  apply(cli) {
-    cli.hooks.run.tapPromise(this.name, async () => {
-      // Compute project-level metadata (not per file)
-      const rootFields = {
-        buildInfo: {
-          version: process.env.BUILD_VERSION ?? "local",
-          commit: process.env.GIT_SHA ?? "dev",
-        },
-      };
-
-      fs.mkdirSync(this.outDir, { recursive: true });
-      const target = path.join(this.outDir, `${this.fileName}.json`);
-
-      // Read existing metrics if present
-      let existing = {};
-      if (fs.existsSync(target)) {
-        try {
-          existing = JSON.parse(fs.readFileSync(target, "utf8"));
-        } catch {
-          existing = {};
-        }
-      }
-
-      // Prepend root fields above existing content by creating a new object first
-      const merged = {
-        ...rootFields,
-        ...existing,
-      };
-
-      fs.writeFileSync(target, JSON.stringify(merged, null, 2));
-    });
-  }
+stats: {
+  assets: (diagnostics) => extractByData(ASSET_COUNT_SYMBOL, diagnostics),
 }
 ```
-
-Assuming the directory and fileName match your MetricsOuputPlugin config settings, the build info from the CLI plugin would then be prepended to the same metrics JSON file when the CLI plugin is run.
