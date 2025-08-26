@@ -60,6 +60,13 @@ new ComplexityCheck({
 - **`maxAcceptableComplexity`**: Maximum complexity before error (default: 10000)
 - **`maxWarningLevel`**: Complexity level that triggers warnings (default: 1000)
 - **`typeWeights`**: Custom complexity weights for different asset types
+- **`baseWeightOverrides`**: Override base complexity weights
+
+### Verbose Mode
+
+Enable verbose mode to see a detailed breakdown: `yarn run player json validate -v trace`
+
+This will output detailed information about how complexity is calculated.
 
 ## Integration
 
