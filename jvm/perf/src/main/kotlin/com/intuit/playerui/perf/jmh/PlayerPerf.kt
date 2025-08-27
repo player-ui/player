@@ -79,7 +79,7 @@ private fun readResource(path: String): String = classLoader.getResource(path)?.
 @State(Scope.Thread)
 public abstract class RuntimePerformance {
 
-    @Param(Hermes.name, J2V8.name)
+    @Param(Hermes.NAME, J2V8.NAME)
     protected lateinit var runtimeName: String; private set
 
     private lateinit var factory: PlayerRuntimeFactory<*>

@@ -20,7 +20,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 internal class CompletedStateTest : NodeBaseTest() {
-
     private val completedState by lazy {
         CompletedState(node)
     }

@@ -18,7 +18,6 @@ import org.junit.jupiter.api.assertThrows
 
 // / Set of tests for the JSI JNI wrappers - uses Hermes as the basis for testing against APIs that require a runtime
 internal class RuntimeTests : HermesTest() {
-
     @Test fun `evaluate valid js and get the result`() = runtime.evaluateInJSThreadBlocking {
         val result = runtime.evaluateJavaScript("2 + 2")
         assertEquals(4.0, result.asNumber())
@@ -175,7 +174,8 @@ internal class ObjectTests : HermesTest() {
 
 internal class ArrayTests : HermesTest() {
     // helper for asserting the same values within an Array constructed by arbitrary means
-    context(RuntimeThreadContext) private fun Array.assertValues() {
+    context(RuntimeThreadContext)
+    private fun Array.assertValues() {
         assertEquals(3, size(runtime))
 
         val first = getValueAtIndex(runtime, 0)
@@ -209,12 +209,16 @@ internal class ArrayTests : HermesTest() {
     }
 
     @Test fun `asValue works for object subclasses`() = runtime.evaluateInJSThreadBlocking {
-        Array.createWithElements(
-            runtime,
-            Value.from(1),
-            Value.from(runtime, "two"),
-            Value.from(runtime, 3L),
-        ).asValue(runtime).asObject(runtime).asArray(runtime).assertValues()
+        Array
+            .createWithElements(
+                runtime,
+                Value.from(1),
+                Value.from(runtime, "two"),
+                Value.from(runtime, 3L),
+            ).asValue(runtime)
+            .asObject(runtime)
+            .asArray(runtime)
+            .assertValues()
     }
 }
 
@@ -239,9 +243,12 @@ internal class FunctionTests : HermesTest() {
     }
 
     @Test fun `asValue works for object subclasses`() = runtime.evaluateInJSThreadBlocking {
-        val multiply = Function.createFromHostFunction(format) { args ->
-            args.filterIsInstance<Number>().fold(1.0) { acc, value -> acc * value.toDouble() }
-        }.asValue(runtime).asObject(runtime).asFunction(runtime)
+        val multiply = Function
+            .createFromHostFunction(format) { args ->
+                args.filterIsInstance<Number>().fold(1.0) { acc, value -> acc * value.toDouble() }
+            }.asValue(runtime)
+            .asObject(runtime)
+            .asFunction(runtime)
         assertTrue(multiply.isHostFunction(runtime))
         assertEquals(6, multiply.call(runtime, Value.from(2), Value.from(3.0)).asNumber().toInt())
     }
@@ -256,6 +263,12 @@ internal class SymbolTests : HermesTest() {
         val symbol1 = runtime.evaluateJavaScript("Symbol('a')").asSymbol(runtime)
         val symbol2 = runtime.evaluateJavaScript("Symbol('a')").asSymbol(runtime)
         assertFalse(Symbol.strictEquals(runtime, symbol1, symbol2))
-        assertTrue(Symbol.strictEquals(runtime, symbol.asSymbol(runtime), runtime.evaluateJavaScript("Symbol.for('hello-world')").asSymbol(runtime)))
+        assertTrue(
+            Symbol.strictEquals(
+                runtime,
+                symbol.asSymbol(runtime),
+                runtime.evaluateJavaScript("Symbol.for('hello-world')").asSymbol(runtime),
+            ),
+        )
     }
 }

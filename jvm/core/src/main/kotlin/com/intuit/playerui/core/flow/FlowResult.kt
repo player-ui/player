@@ -10,8 +10,9 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 
 @Serializable(with = FlowResult.Serializer::class)
-public class FlowResult(override val node: Node) : NodeWrapper {
-
+public class FlowResult(
+    override val node: Node,
+) : NodeWrapper {
     /** End state describing _how_ the flow ended (forwards, backwards, etc) */
     public val endState: NavigationFlowEndState by NodeSerializableField(NavigationFlowEndState.serializer())
 

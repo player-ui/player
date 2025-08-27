@@ -6,4 +6,9 @@ import kotlinx.serialization.Serializable
 /** Generic exception for any errors encountered in the scope of the [Player] */
 @Suppress("SERIALIZER_TYPE_INCOMPATIBLE")
 @Serializable(ThrowableSerializer::class)
-public open class PlayerException @JvmOverloads constructor(message: String, cause: Throwable? = null) : Exception(message, cause)
+public open class PlayerException
+    @JvmOverloads
+    constructor(
+        message: String,
+        cause: Throwable? = null,
+    ) : Exception(message, cause)

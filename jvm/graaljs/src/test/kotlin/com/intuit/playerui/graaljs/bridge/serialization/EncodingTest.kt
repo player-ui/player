@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 internal class PrimitiveEncoding : GraalTest() {
-
     @Test
     fun `encode string primitive`() = format.context.blockingLock {
         eval("js", "'hello'").assertEquivalent(format.encodeToGraalValue("hello"))
@@ -46,7 +45,6 @@ internal class PrimitiveEncoding : GraalTest() {
 }
 
 internal class FunctionEncoding : GraalTest() {
-
     @Test fun `encode typed lambda`() = format.context.blockingLock {
         val callback = { p0: String, p1: Int -> "$p0: $p1" }
 

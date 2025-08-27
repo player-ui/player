@@ -1,3 +1,5 @@
+load("@rules_android//providers:providers.bzl", "AndroidLibraryAarInfo", "ApkInfo")
+
 def _merge_jni_into_android_library_impl(context):
     merged_aar = context.outputs.aar
     source_lib = context.attr.android_library
@@ -26,12 +28,7 @@ def _merge_jni_into_android_library_impl(context):
         source_lib[JavaInfo],
         source_lib[DefaultInfo],
         source_lib[OutputGroupInfo],
-        AndroidLibraryAarInfo(
-            aar = merged_aar,
-            manifest = merged_aar,
-            aars_from_deps = [],
-            defines_local_resources = True,
-        ),
+        AndroidLibraryAarInfo(aar = merged_aar),
     ]
 
 _merge_jni_into_android_library = rule(

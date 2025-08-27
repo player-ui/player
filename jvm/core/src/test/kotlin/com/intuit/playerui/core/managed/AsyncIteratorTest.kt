@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class AsyncIteratorTest {
-
     @Test fun `iterator progresses through predefined items`() = runBlocking {
         val items = arrayOf("first", "second", "third")
         val iterator = AsyncIterator<String, Boolean>(*items)

@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 internal class GraalFormatTest : GraalTest() {
-
     @Test
     fun `encode simple map into Value with explicit serializers`() = format.context.blockingLock {
         val map = mapOf(
@@ -96,7 +95,9 @@ internal class GraalFormatTest : GraalTest() {
 
     @Test
     fun `decode into Node backed serializable`() = format.context.blockingLock {
-        data class Simple(override val node: Node) : NodeWrapper {
+        data class Simple(
+            override val node: Node,
+        ) : NodeWrapper {
             fun increment(value: Int) = node.getInvokable<Int>("increment")!!(value)
         }
 

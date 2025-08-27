@@ -1,4 +1,4 @@
-@file:Suppress("UNUSED_PARAMETER")
+@file:Suppress("UNUSED_PARAMETER", "ktlint:standard:max-line-length", "ktlint:standard:blank-line-before-declaration", "ktlint:standard:class-signature", "ktlint:standard:argument-list-wrapping", "ktlint:standard:parameter-list-wrapping")
 
 package com.intuit.playerui.core.bridge.serialization.serializers
 
@@ -16,12 +16,9 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlin.reflect.KCallable
 
 public sealed class FunctionLikeSerializer<T>(private val serializer: KSerializer<*>) : KSerializer<T> {
-
     final override val descriptor: SerialDescriptor = FunctionLikeSerializer.descriptor
 
-    override fun deserialize(decoder: Decoder): T {
-        return decoder.requireNodeDecoder().decodeFunction(serializer) as T
-    }
+    override fun deserialize(decoder: Decoder): T = decoder.requireNodeDecoder().decodeFunction(serializer) as T
 
     override fun serialize(encoder: Encoder, value: T) {
         encoder.requireNodeEncoder().encodeFunction(value)

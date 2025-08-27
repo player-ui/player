@@ -19,18 +19,20 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import java.util.*
+import java.util.UUID
 import kotlin.coroutines.resumeWithException
+
+// TODO: Potentially make Promise code in core internal
 
 /**
  * [Node] backed [Promise] implementation
  * Provides hooks into JS promise then and catch to maintain the JS promise API.
  */
-// TODO: Potentially make Promise code in core internal
 @InternalPlayerApi
 @Serializable(with = Promise.Serializer::class)
-public class Promise(override val node: Node) : NodeWrapper {
-
+public class Promise(
+    override val node: Node,
+) : NodeWrapper {
     /**
      * then -- handle JS promise resolved values
      *
@@ -88,67 +90,68 @@ public class Promise(override val node: Node) : NodeWrapper {
      *
      * @return [Promise] chained after this catch
      */
-    public fun <Next : Any> catch(block: (Throwable) -> Next?): Promise =
-        Promise(
-            node.getInvokable<Node>("catch")?.invoke(
-                { arg: Any? ->
-                    try {
-                        // Attempt to dynamically build exception from JS error
-                        if (arg is Exception) {
-                            block(arg)
-                        } else {
-                            block((arg as Node).deserialize())
-                        }
-                    } catch (e: Exception) {
-                        // fallback to simple String representation of error
-                        // if you are debugging and the stacktrace leads you
-                        // here, chances are, the rest of the stacktrace won't
-                        // be very helpful
-                        block(PromiseException(arg.toString()))
+    public fun <Next : Any> catch(block: (Throwable) -> Next?): Promise = Promise(
+        node.getInvokable<Node>("catch")?.invoke(
+            { arg: Any? ->
+                try {
+                    // Attempt to dynamically build exception from JS error
+                    if (arg is Exception) {
+                        block(arg)
+                    } else {
+                        block((arg as Node).deserialize())
                     }
-                },
-            ) ?: throw PromiseException("then did not return valid Promise"),
-        )
+                } catch (e: Exception) {
+                    // fallback to simple String representation of error
+                    // if you are debugging and the stacktrace leads you
+                    // here, chances are, the rest of the stacktrace won't
+                    // be very helpful
+                    block(PromiseException(arg.toString()))
+                }
+            },
+        ) ?: throw PromiseException("then did not return valid Promise"),
+    )
 
     /** Converts the [Promise] into a [Completable] to enable awaiting it to resolve or reject  */
-    public fun <Expected : Any> toCompletable(deserializer: DeserializationStrategy<Expected>): Completable<Expected?> = object : Completable<Expected?> {
-        override fun onComplete(block: (Result<Expected?>) -> Unit) {
-            then(deserializer) {
-                block(Result.success(it))
-            }.catch {
-                block(Result.failure(it))
-            }
-        }
-
-        @ExperimentalCoroutinesApi
-        override suspend fun asFlow(): Flow<Expected?> = callbackFlow {
-            try {
-                onComplete {
-                    when {
-                        it.isSuccess -> trySend(it.getOrNull())
-                        it.isFailure -> close(it.exceptionOrNull())
-                    }
+    public fun <Expected : Any> toCompletable(deserializer: DeserializationStrategy<Expected>): Completable<Expected?> =
+        object : Completable<Expected?> {
+            override fun onComplete(block: (Result<Expected?>) -> Unit) {
+                then(deserializer) {
+                    block(Result.success(it))
+                }.catch {
+                    block(Result.failure(it))
                 }
-            } catch (e: Throwable) {
-                close(e)
-            } finally {
-                close()
             }
-            awaitClose { cancel() }
-        }
 
-        override suspend fun await(): Expected? = suspendCancellableCoroutine { cont ->
-            try {
-                onComplete(cont::resumeWith)
-            } catch (e: Throwable) {
-                cont.resumeWithException(e)
+            @ExperimentalCoroutinesApi
+            override suspend fun asFlow(): Flow<Expected?> = callbackFlow {
+                try {
+                    onComplete {
+                        when {
+                            it.isSuccess -> trySend(it.getOrNull())
+                            it.isFailure -> close(it.exceptionOrNull())
+                        }
+                    }
+                } catch (e: Throwable) {
+                    close(e)
+                } finally {
+                    close()
+                }
+                awaitClose { cancel() }
+            }
+
+            override suspend fun await(): Expected? = suspendCancellableCoroutine { cont ->
+                try {
+                    onComplete(cont::resumeWith)
+                } catch (e: Throwable) {
+                    cont.resumeWithException(e)
+                }
             }
         }
-    }
 
     /** Static API defined for Promise in a [Runtime] */
     public interface Api {
         public fun <T : Any> resolve(vararg values: T): Promise
+
         public fun <T : Any> reject(vararg values: T): Promise
     }
 
@@ -158,8 +161,7 @@ public class Promise(override val node: Node) : NodeWrapper {
 public inline fun <reified Expected : Any> Promise.then(noinline block: (Expected?) -> Any?): Promise =
     then(node.format.serializer(), block)
 
-public inline fun <reified Expected : Any> Promise.toCompletable(): Completable<Expected?> =
-    toCompletable(node.format.serializer())
+public inline fun <reified Expected : Any> Promise.toCompletable(): Completable<Expected?> = toCompletable(node.format.serializer())
 
 public val NodeWrapper.Promise: Promise.Api get() = node.Promise
 
@@ -168,11 +170,15 @@ public val Node.Promise: Promise.Api get() = runtime.Promise
 public val Runtime<*>.Promise: Promise.Api get() = getObject("Promise")?.let { promise ->
     object : Promise.Api {
         override fun <T : Any> resolve(vararg values: T): Promise = promise
-            .getInvokable<Node>("resolve")?.invoke(*values)?.let(::Promise)
+            .getInvokable<Node>("resolve")
+            ?.invoke(*values)
+            ?.let(::Promise)
             ?: throw PromiseException("Could not resolve with values: $values")
 
         override fun <T : Any> reject(vararg values: T): Promise = promise
-            .getInvokable<Node>("reject")?.invoke(*values)?.let(::Promise)
+            .getInvokable<Node>("reject")
+            ?.invoke(*values)
+            ?.let(::Promise)
             ?: throw PromiseException("Could not reject with values: $values")
     }
 } ?: throw PlayerRuntimeException("'Promise' not defined in runtime")
@@ -183,7 +189,13 @@ public fun <T : Any?> Runtime<*>.Promise(block: suspend ((T) -> Unit, (Throwable
     add(key) { resolve: Invokable<Any?>, reject: Invokable<Any?> ->
         runtime.scope.launch {
             try {
-                block({ runtime.scope.ensureActive(); resolve(it) }, { runtime.scope.ensureActive(); reject(it) })
+                block({
+                    runtime.scope.ensureActive()
+                    resolve(it)
+                }, {
+                    runtime.scope.ensureActive()
+                    reject(it)
+                })
             } catch (e: Throwable) {
                 runtime.scope.ensureActive()
                 reject(e)

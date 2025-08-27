@@ -4,56 +4,62 @@ module(
 )
 
 bazel_dep(name = "rules_player")
-
 archive_override(
-  module_name = "rules_player",
-  strip_prefix = "rules_player-1.2.1",
-  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v1.2.1.tar.gz"],
-  integrity = "sha256-OXntU1P3916DJjYvboaRtuLUFfhb3SVkjj5tqSNju9M="
+    module_name = "rules_player",
+    integrity = "sha256-7m/eHQy+Gc0y+EBnEugRGrPw0ss9wz3xTCsr5qHBFIU=",
+    strip_prefix = "rules_player-2.0.1",
+    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v2.0.1.tar.gz"],
 )
-
-# local_path_override(module_name = "rules_player", path = "../rules_player")
-bazel_dep(name = "aspect_bazel_lib", version = "2.8.0")
-bazel_dep(name = "aspect_rules_js", version = "2.0.0")
-bazel_dep(name = "bazel_skylib", version = "1.7.1")
-bazel_dep(name = "rules_pkg", version = "1.0.1")
-bazel_dep(name = "aspect_rules_ts", version = "3.0.0")
+bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "aspect_bazel_lib", version = "2.19.4")
+bazel_dep(name = "aspect_rules_js", version = "2.3.8")
+bazel_dep(name = "bazel_skylib", version = "1.8.1")
+bazel_dep(name = "rules_pkg", version = "1.1.0")
+bazel_dep(name = "aspect_rules_ts", version = "3.6.3")
 
 # C++
-bazel_dep(name = "rules_foreign_cc", version = "0.11.1")
-bazel_dep(name = "googletest", version = "1.14.0")
+bazel_dep(name = "rules_foreign_cc", version = "0.15.0")
+bazel_dep(name = "googletest", version = "1.14.0.bcr.1")
 
 ####### Node.js version #########
-bazel_dep(name = "rules_nodejs", version = "6.2.0")
+bazel_dep(name = "rules_nodejs", version = "6.4.0")
 
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
-node.toolchain(node_version = "20.14.0")
+node.toolchain(node_version = "22.15.1")
+
 #################################
+sh_config_ext = use_extension("@rules_player//shell:defs.bzl", "sh_configure")
+use_repo(sh_config_ext, "local_shell_config")
+
+register_toolchains("@local_shell_config//:local_sh_toolchain")
 
 ###### Start iOS ######
 ## Rule Dependencies
-bazel_dep(name = "rules_apple", version = "3.5.1", repo_name = "build_bazel_rules_apple")
-bazel_dep(name = "rules_ios", version = "4.8.2", repo_name = "build_bazel_rules_ios")
-bazel_dep(name = "rules_xcodeproj", version = "2.2.0")
-bazel_dep(name = "gazelle", version = "0.34.0", repo_name = "bazel_gazelle")
-bazel_dep(name = "rules_swift_package_manager", version = "0.22.0")
-bazel_dep(name = "swiftlint", version = "0.54.0", repo_name = "SwiftLint")
+bazel_dep(name = "rules_xcodeproj", version = "2.12.1")
+bazel_dep(name = "rules_shell", version = "0.5.0")
+bazel_dep(name = "rules_apple", version = "4.1.0", repo_name = "build_bazel_rules_apple")
+bazel_dep(name = "apple_support", version = "1.22.0", repo_name = "build_bazel_apple_support")
+bazel_dep(name = "rules_swift", version = "2.9.0")
+bazel_dep(name = "gazelle", version = "0.42.0", repo_name = "bazel_gazelle")
+bazel_dep(name = "rules_swift_package_manager", version = "1.0.0")
+bazel_dep(name = "swiftlint", version = "0.59.1", repo_name = "SwiftLint")
 
 ## This section is handled by rules_swift_package_manager
 swift_deps = use_extension(
     "@rules_swift_package_manager//:extensions.bzl",
     "swift_deps",
 )
-swift_deps.from_file(
-    deps_index = "//:swift_deps_index.json",
+swift_deps.from_package(
+    resolved = "//:xcode/Package.resolved",
+    swift = "//:xcode/Package.swift",
 )
 
 ## SPM Dependencies
-### need to be listed here to be available as a target in BUILD files
-### Add dependency in xcode/Package.swift and then run `bazel run //:update_swift_pkgs`
-### before adding it here
+### Packages need to be listed here to be available as a target in BUILD files.
+### Run `bazel mod tidy` to update this list automatically.
 use_repo(
     swift_deps,
+    "swift_package",
     "swiftpkg_swift_hooks",
     "swiftpkg_swiftlint",
     "swiftpkg_viewinspector",
@@ -67,10 +73,10 @@ npm.npm_translate_lock(
         "//:package.json",
         "//:patches/@chakra-ui__system@2.6.2.patch",
     ],
+    npm_package_target_name = "{dirname}",
     npmrc = "//:.npmrc",
     pnpm_lock = "//:pnpm-lock.yaml",
     verify_node_modules_ignored = "//:.bazelignore",
-    npm_package_target_name = "{dirname}"
 )
 use_repo(npm, "npm")
 
@@ -83,38 +89,33 @@ rules_ts_ext.deps()
 use_repo(rules_ts_ext, "npm_typescript")
 
 # Kotlin
-bazel_dep(name = "rules_kotlin", version = "1.9.1")
-single_version_override(
-    module_name = "rules_kotlin",
-    patches = ["//patches:rules_kotlin.context_receivers.patch"],
+build_constants = use_repo_rule("@rules_player//distribution:defs.bzl", "build_constants")
+
+build_constants(
+    name = "build_constants",
+    constants = {
+        "GROUP": "com.intuit.playerui",
+    },
+    version_file = "//:VERSION",
 )
 
-# TODO: Custom compiler version breaks embedded jdeps generator plugin - enable when removing custom kotlinc (see .bazelrc jvm_emit_jdeps)
-rules_kotlin_extensions = use_extension(
-    "@rules_kotlin//src/main/starlark/core/repositories:bzlmod_setup.bzl",
-    "rules_kotlin_extensions",
-)
-
-# sha256 values can be found here - https://github.com/JetBrains/kotlin/releases/tag/v1.7.20
-rules_kotlin_extensions.kotlinc_version(
-    sha256 = "5e3c8d0f965410ff12e90d6f8dc5df2fc09fd595a684d514616851ce7e94ae7d",
-    version = "1.7.20",
-)
-
-use_repo(
-    rules_kotlin_extensions,
-    "com_github_jetbrains_kotlin",
+bazel_dep(name = "rules_java", version = "8.13.0")
+bazel_dep(name = "rules_kotlin", version = "2.1.8")
+archive_override(
+    module_name = "rules_kotlin", 
+    urls = ["https://github.com/bazelbuild/rules_kotlin/releases/download/v2.1.8/rules_kotlin-v2.1.8.tar.gz"],
+    patches = ["//patches:rules_kotlin.allow_dupe_plugins.patch"],
 )
 
 register_toolchains("//jvm:kotlin_toolchain")
 
 # Android
-bazel_dep(name = "rules_android", version = "0.1.1")
-bazel_dep(name = "rules_android_ndk")
+bazel_dep(name = "rules_android", version = "0.6.5")
+bazel_dep(name = "rules_android_ndk", version = "0.1.3")
 git_override(
     module_name = "rules_android_ndk",
-    commit = "d5c9d46a471e8fcd80e7ec5521b78bb2df48f4e0",
-    remote = "https://github.com/bazelbuild/rules_android_ndk",
+    commit = "3377db4d8306363b4a4ce65aa678814dd90e4ee6",
+    remote = "https://github.com/sugarmanz/rules_android_ndk.git",
 )
 
 android_ndk_repository_extension = use_extension("@rules_android_ndk//:extension.bzl", "android_ndk_repository_extension")
@@ -126,119 +127,30 @@ remote_android_extensions = use_extension("@bazel_tools//tools/android:android_e
 use_repo(remote_android_extensions, "android_gmaven_r8")
 
 # Maven
-bazel_dep(name = "rules_jvm_external")
+bazel_dep(name = "rules_jvm_external", version = "6.8")
+
+# Override for AAR publishing support
 git_override(
     module_name = "rules_jvm_external",
-    commit = "73b63ba801f14d1bde7807994cc8c15db226ceec",
+    # branch = "maven-export-aar-6.8",
+    commit = "0dc1a97c0403de02e0bf9a03244212a15dae3333",
     remote = "https://github.com/sugarmanz/rules_jvm_external.git",
 )
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
-maven.install(
-    artifacts = [
-        "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0",
-        "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0",
-        "org.jetbrains.kotlin:kotlin-reflect:1.7.10",
-        "com.intuit.hooks:hooks:0.15.0",
-
-        # Testing
-        "io.mockk:mockk:1.12.0",
-        "org.amshove.kluent:kluent:1.68",
-        "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0",
-
-        # Android
-        "androidx.databinding:viewbinding:8.0.0",
-        "androidx.annotation:annotation:1.1.0",
-
-        # Compose
-        "androidx.compose.ui:ui:1.2.0",
-        "androidx.compose.ui:ui-tooling:1.2.0",
-        "androidx.compose.ui:ui-test-junit4:1.2.0",
-        "androidx.compose.runtime:runtime:1.2.0",
-        "androidx.compose.runtime:runtime:1.2.0",
-        "androidx.compose.compiler:compiler:1.3.2",
-        "androidx.compose.foundation:foundation:1.2.0",
-        "androidx.compose.material:material:1.2.0",
-
-        # Android Demo
-        "androidx.navigation:navigation-runtime:2.3.1",
-        "androidx.navigation:navigation-ui-ktx:2.3.1",
-        "androidx.navigation:navigation-fragment-ktx:2.3.1",
-        "com.afollestad.material-dialogs:core:3.3.0",
-        "com.google.android.material:material:1.6.1",
-
-        # Android Demo Testing
-        "androidx.test.espresso:espresso-intents:3.3.0",
-        "androidx.test.ext:junit-ktx:1.1.3",
-
-        # Reference Assets Testing
-        "androidx.test:core:1.3.0",
-        "androidx.test:runner:1.3.0",
-        "org.robolectric:robolectric:4.11.1",
-
-        # Android Player
-        "androidx.core:core-ktx:1.6.0",
-        "androidx.appcompat:appcompat:1.3.0",
-        "androidx.transition:transition:1.4.1",
-        "androidx.lifecycle:lifecycle-runtime-ktx:2.4.0",
-        "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0",
-        "androidx.constraintlayout:constraintlayout:2.1.4",
-
-        # AndroidX Resolutions
-        "androidx.activity:activity-ktx:1.3.0",
-        "androidx.fragment:fragment-ktx:1.4.1",
-
-        # Graal
-        "org.graalvm.js:js:21.2.0",
-        "org.graalvm.js:js-scriptengine:21.2.0",
-        "org.graalvm.sdk:graal-sdk:21.2.0",
-
-        # J2V8
-        "com.eclipsesource.j2v8:j2v8:aar:6.1.0",
-        "com.github.AlexTrotsenko:j2v8-debugger:0.2.3",
-        "com.facebook.stetho:stetho:1.5.1",
-
-        # Hermes
-        "com.facebook.fbjni:fbjni-java-only:0.6.0",
-        "com.facebook.fbjni:fbjni:0.6.0",
-        "com.facebook.soloader:soloader:0.11.0",
-
-        # Test utils
-        "org.junit.jupiter:junit-jupiter-api:5.6.0",
-
-        # Perf
-        "org.openjdk.jmh:jmh-core:1.21",
-        "org.openjdk.jmh:jmh-generator-annprocess:1.21",
-
-        # Distribution
-        "com.eclipsesource.minimal-json:minimal-json:0.9.5",
-        "com.electronwill.night-config:core:3.6.5",
-        "com.electronwill.night-config:toml:3.6.5",
-        "com.google.http-client:google-http-client:1.34.2",
-        "info.picocli:picocli:4.3.2",
-        "org.apache.commons:commons-compress:1.21",
-        "org.zeroturnaround:zt-exec:1.10",
-        "com.github.ajalt.clikt:clikt-jvm:3.4.0",
-        "io.github.gradle-nexus:publish-plugin:1.1.0",
-        "ch.qos.logback:logback-classic:1.2.11",
-
-        # slf4j
-        "org.slf4j:slf4j-api:1.7.36",
-        "ch.qos.logback:logback-classic:1.2.10",
-
-        # Junit5
-        "org.junit.platform:junit-platform-commons:1.7.2",
-        "org.junit.platform:junit-platform-console:1.7.2",
-        "org.junit.platform:junit-platform-engine:1.7.2",
-        "org.junit.platform:junit-platform-launcher:1.7.2",
-        "org.junit.platform:junit-platform-suite-api:1.7.2",
-        "org.apiguardian:apiguardian-api:1.0.0",
-        "org.opentest4j:opentest4j:1.1.1",
-        "org.junit.jupiter:junit-jupiter-api:5.6.0",
-        "org.junit.jupiter:junit-jupiter-engine:5.6.0",
-        "org.junit.jupiter:junit-jupiter-params:5.6.0",
+maven.from_toml(
+    bom_modules = [
+        "org.junit:junit-bom",
     ],
+    libs_versions_toml = "//:libs.versions.toml",
+)
+maven.install(
     fetch_sources = True,
+    known_contributing_modules = [
+        "bazel_worker_java",
+        "player",
+    ],
+    lock_file = "//:maven-lock.json",
     repositories = [
         "https://repo1.maven.org/maven2",
         "https://maven.google.com/",
@@ -246,7 +158,69 @@ maven.install(
         "https://jcenter.bintray.com/",
         "https://jitpack.io/",
     ],
+    version_conflict_policy = "pinned",
 )
 use_repo(maven, "maven")
 
-bazel_dep(name = "rules_robolectric", version = "4.11.1")
+bazel_dep(name = "rules_robolectric", version = "4.15.1")
+
+http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+
+http_file(
+    name = "android_test_orchestrator_apk",
+    sha256 = "b7a2e7d0184b03e12c7357f3914d539da40b52a11e90815edff1022c655f459b",
+    url = "https://dl.google.com/android/maven2/androidx/test/orchestrator/1.4.2/orchestrator-1.4.2.apk",
+)
+
+http_file(
+    name = "android_test_services_apk",
+    sha256 = "c6bc74268b29bdabad8da962e00e2f6fd613c24b42c69e81b258397b4819f156",
+    url = "https://dl.google.com/android/maven2/androidx/test/services/test-services/1.4.2/test-services-1.4.2.apk",
+)
+
+# All things Hermes
+git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+git_repository(
+    name = "hermes",
+    build_file = "//third_party/hermes:BUILD",
+    commit = "c16bd411cdb20d424f843ea8623c00fa3d493a6c",
+    patches = ["//patches:hermes.loosen_host_function_params.patch"],
+    remote = "https://github.com/facebook/hermes",
+)
+
+git_repository(
+    name = "fbjni",
+    build_file = "//third_party/fbjni:BUILD",
+    # this is not the same release as the fbjni AAR due to this change breaking exception handling in C++ https://github.com/facebookincubator/fbjni/commit/cd6e61a96129bdf70dc1e3c967c5ec29f4d4eeb1
+    commit = "1cf763714e99d45c23dfb316d702ebfa8290af64",
+    patches = ["//patches:fbjni.install_headers.patch"],
+    remote = "https://github.com/facebookincubator/fbjni",
+)
+
+RN_VERSION = "0.78.1"
+
+# Pull prefab Android Hermes built against React Native JSI
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "rn_hermes_android",
+    build_file = "//third_party/rn:hermes_android.BUILD",
+    sha256 = "e60a59daf0293fcee17877a715fcd26614c4348855a74365a9564cde9a0fbe7c",
+    url = "https://repo1.maven.org/maven2/com/facebook/react/hermes-android/{}/hermes-android-{}-release.aar".format(RN_VERSION, RN_VERSION),
+)
+
+git_repository(
+    name = "react_native",
+    build_file = "//third_party/rn:react_native.BUILD",
+    commit = "1299ef7be0fe9daf8274b7b2a7c49078723fc533",
+    patches = ["//patches:react_native.loosen_host_function_params.patch"],
+    remote = "https://github.com/facebook/react-native",
+)
+
+http_archive(
+    name = "fbjni_artifact",
+    build_file = "//third_party/fbjni:artifact.BUILD",
+    sha256 = "7e319ae110ac5e5ef18904170aea5c3e753e915d196699d7fd39d36c8e1dfe36",
+    url = "https://repo1.maven.org/maven2/com/facebook/fbjni/fbjni/0.7.0/fbjni-0.7.0.aar",
+)

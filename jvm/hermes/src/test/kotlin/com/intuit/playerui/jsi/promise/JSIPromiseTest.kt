@@ -12,16 +12,15 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 internal class JSIPromiseTest : HermesTest(HermesRuntime.create().apply(SetTimeoutPlugin()::apply)) {
-
     @Test
     fun testErrorStacktraceFromJSError() {
         val (promiseInstance) = runtime.execute(
             """
-           (function() {
-               var resolver;
-               const promise = new Promise(function(resolve, reject) { asdf.asdf.asdf.asdf });
-               return [promise, resolver];
-           })();
+            (function() {
+                var resolver;
+                const promise = new Promise(function(resolve, reject) { asdf.asdf.asdf.asdf });
+                return [promise, resolver];
+            })();
             """.trimIndent(),
         ) as List<*>
 

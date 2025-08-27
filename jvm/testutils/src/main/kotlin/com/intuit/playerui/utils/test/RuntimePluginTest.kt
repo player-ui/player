@@ -12,7 +12,6 @@ import org.junit.jupiter.api.TestTemplate
  * [Test]s will just be executed once.
  */
 public abstract class RuntimePluginTest<Plugin : RuntimePlugin> : RuntimeTest() {
-
     protected lateinit var plugin: Plugin private set
 
     @BeforeEach

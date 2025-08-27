@@ -11,8 +11,11 @@ import com.intuit.playerui.core.bridge.runtime.ScriptContext
  * can be passed in directly as a [String], or can be passed as a classpath location
  * and be read from the provided [ClassLoader].
  */
-public abstract class JSScriptPluginWrapper(public val name: String, protected val script: String, private val sourcePath: String? = null) : JSPluginWrapper {
-
+public abstract class JSScriptPluginWrapper(
+    public val name: String,
+    protected val script: String,
+    private val sourcePath: String? = null,
+) : JSPluginWrapper {
     public constructor(name: String, sourcePath: String, classLoader: ClassLoader = JSScriptPluginWrapper::class.java.classLoader) :
         this(name, classLoader.getResource(sourcePath)!!.readText(), sourcePath)
 
@@ -30,7 +33,11 @@ public abstract class JSScriptPluginWrapper(public val name: String, protected v
 
     public companion object {
         /** Convenience helper to expose constructor as an anonymous builder */
-        public fun from(name: String, sourcePath: String, classLoader: ClassLoader = JSScriptPluginWrapper::class.java.classLoader): JSScriptPluginWrapper = object : JSScriptPluginWrapper(name, sourcePath, classLoader) {}
+        public fun from(
+            name: String,
+            sourcePath: String,
+            classLoader: ClassLoader = JSScriptPluginWrapper::class.java.classLoader,
+        ): JSScriptPluginWrapper = object : JSScriptPluginWrapper(name, sourcePath, classLoader) {}
 
         /** Convenience helper to expose constructor as an anonymous builder */
         public fun from(name: String, script: String): JSScriptPluginWrapper = object : JSScriptPluginWrapper(name, script = script) {}

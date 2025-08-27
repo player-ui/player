@@ -10,7 +10,9 @@ import kotlinx.serialization.Serializable
  * underlying [Node] that represents the instantiated JS plugin.
  */
 @Serializable(with = JSPluginWrapper.Serializer::class)
-public interface JSPluginWrapper : RuntimePlugin, NodeWrapper {
+public interface JSPluginWrapper :
+    RuntimePlugin,
+    NodeWrapper {
     public val instance: Node
 
     override val node: Node get() = instance

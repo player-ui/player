@@ -21,10 +21,10 @@ import kotlinx.serialization.encoding.Encoder
  */
 @Serializable(with = Expression.Serializer::class)
 public sealed class Expression {
-
     @Serializable(with = Single.Serializer::class)
-    public data class Single(val expression: String) : Expression() {
-
+    public data class Single(
+        val expression: String,
+    ) : Expression() {
         internal object Serializer : KSerializer<Single> {
             private val serializer: KSerializer<String> =
                 String.serializer()
@@ -34,17 +34,16 @@ public sealed class Expression {
                 PrimitiveKind.STRING,
             )
 
-            override fun serialize(encoder: Encoder, value: Single) =
-                serializer.serialize(encoder, value.expression)
+            override fun serialize(encoder: Encoder, value: Single) = serializer.serialize(encoder, value.expression)
 
-            override fun deserialize(decoder: Decoder) =
-                Single(serializer.deserialize(decoder))
+            override fun deserialize(decoder: Decoder) = Single(serializer.deserialize(decoder))
         }
     }
 
     @Serializable(with = Collection.Serializer::class)
-    public data class Collection(val expressions: List<String>) : Expression() {
-
+    public data class Collection(
+        val expressions: List<String>,
+    ) : Expression() {
         public constructor(vararg expressions: String) : this(expressions.toList())
 
         internal object Serializer : KSerializer<Collection> {
@@ -53,16 +52,13 @@ public sealed class Expression {
 
             override val descriptor = listSerialDescriptor<String>()
 
-            override fun serialize(encoder: Encoder, value: Collection) =
-                serializer.serialize(encoder, value.expressions)
+            override fun serialize(encoder: Encoder, value: Collection) = serializer.serialize(encoder, value.expressions)
 
-            override fun deserialize(decoder: Decoder) =
-                Collection(serializer.deserialize(decoder))
+            override fun deserialize(decoder: Decoder) = Collection(serializer.deserialize(decoder))
         }
     }
 
     internal object Serializer : KSerializer<Expression> {
-
         /**
          * This is a really problematic [descriptor]. It really
          * should not be a [PrimitiveKind.STRING], rather a [PolymorphicKind.SEALED].

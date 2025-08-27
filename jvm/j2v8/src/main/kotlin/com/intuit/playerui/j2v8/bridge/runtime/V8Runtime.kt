@@ -46,8 +46,7 @@ import kotlin.io.path.createTempDirectory
 import kotlin.io.path.pathString
 
 @JvmOverloads
-public fun Runtime(runtime: V8, config: J2V8RuntimeConfig = J2V8RuntimeConfig(runtime)): Runtime<V8Value> =
-    V8Runtime(config)
+public fun Runtime(runtime: V8, config: J2V8RuntimeConfig = J2V8RuntimeConfig(runtime)): Runtime<V8Value> = V8Runtime(config)
 
 public fun Runtime(globalAlias: String? = null, tempDir: Path? = null): Runtime<V8Value> =
     Runtime(V8.createV8Runtime(globalAlias, tempDir?.pathString).unlock())
@@ -57,9 +56,11 @@ public fun Runtime(globalAlias: String? = null, tempDir: Path? = null): Runtime<
 public fun Runtime(globalAlias: String? = null, tempDirPrefix: String? = null): Runtime<V8Value> =
     Runtime(globalAlias, tempDirPrefix?.let(::createTempDirectory))
 
-internal class V8Runtime(override val config: J2V8RuntimeConfig) : Runtime<V8Value> {
-
-    lateinit var v8: V8; private set
+internal class V8Runtime(
+    override val config: J2V8RuntimeConfig,
+) : Runtime<V8Value> {
+    lateinit var v8: V8
+        private set
 
     override val dispatcher: ExecutorCoroutineDispatcher = config.executorService.asCoroutineDispatcher()
 
@@ -77,7 +78,8 @@ internal class V8Runtime(override val config: J2V8RuntimeConfig) : Runtime<V8Val
         ),
     )
 
-    private lateinit var memoryScope: MemoryManager; private set
+    private lateinit var memoryScope: MemoryManager
+        private set
 
     override val scope: CoroutineScope by lazy {
         // explicitly not using the JS specific dispatcher to avoid clogging up that thread
@@ -162,34 +164,52 @@ internal class V8Runtime(override val config: J2V8RuntimeConfig) : Runtime<V8Val
     override val keys: Set<String> by backingNode::keys
     override val size: Int by backingNode::size
     override val values: Collection<Any?> by backingNode::values
+
     override fun containsKey(key: String): Boolean = backingNode.containsKey(key)
+
     override fun containsValue(value: Any?): Boolean = backingNode.containsValue(value)
+
     override fun get(key: String): Any? = backingNode[key]
+
     override fun isEmpty(): Boolean = backingNode.isEmpty()
+
     override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>): T? =
         backingNode.getSerializable(key, deserializer)
 
     override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T = backingNode.deserialize(deserializer)
+
     override fun isReleased(): Boolean = backingNode.isReleased()
+
     override fun isUndefined(): Boolean = backingNode.isUndefined()
+
     override fun nativeReferenceEquals(other: Any?): Boolean = backingNode.nativeReferenceEquals(other)
+
     override fun getString(key: String): String? = backingNode.getString(key)
+
     override fun getInt(key: String): Int? = backingNode.getInt(key)
+
     override fun getDouble(key: String): Double? = backingNode.getDouble(key)
+
     override fun getLong(key: String): Long? = backingNode.getLong(key)
+
     override fun getBoolean(key: String): Boolean? = backingNode.getBoolean(key)
-    override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = backingNode.getInvokable(key, deserializationStrategy)
+
+    override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? =
+        backingNode.getInvokable(key, deserializationStrategy)
+
     override fun <R> getFunction(key: String): Invokable<R>? = backingNode.getFunction(key)
+
     override fun getList(key: String): List<*>? = backingNode.getList(key)
+
     override fun getObject(key: String): Node? = backingNode.getObject(key)
 }
 
 public object J2V8 : PlayerRuntimeFactory<J2V8RuntimeConfig> {
-    override fun create(block: J2V8RuntimeConfig.() -> Unit): Runtime<V8Value> =
-        V8Runtime(J2V8RuntimeConfig().apply(block))
+    override fun create(block: J2V8RuntimeConfig.() -> Unit): Runtime<V8Value> = V8Runtime(J2V8RuntimeConfig().apply(block))
 
-    override fun toString(): String = name
-    public const val name: String = "J2V8"
+    override fun toString(): String = NAME
+
+    public const val NAME: String = "J2V8"
 }
 
 public data class J2V8RuntimeConfig(

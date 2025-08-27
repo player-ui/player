@@ -1,7 +1,7 @@
 package com.intuit.playerui.core.plugins.logging
 
 import com.intuit.playerui.core.plugins.LoggerPlugin
-import java.util.*
+import java.util.ServiceLoader
 
 /** Factory of [Logging] with a specific [T] of [PlayerLoggingConfig] */
 public interface PlayerLoggingFactory<out T : PlayerLoggingConfig> {
@@ -13,9 +13,7 @@ public interface PlayerLoggingFactory<out T : PlayerLoggingConfig> {
  * Creates a new [PlayerRuntimeFactory] based on this one
  * with further configurations from the [nested] block.
  */
-public fun <T : PlayerLoggingConfig> PlayerLoggingFactory<T>.config(
-    nested: T.() -> Unit,
-): PlayerLoggingFactory<T> {
+public fun <T : PlayerLoggingConfig> PlayerLoggingFactory<T>.config(nested: T.() -> Unit): PlayerLoggingFactory<T> {
     val parent = this
 
     return object : PlayerLoggingFactory<T> {

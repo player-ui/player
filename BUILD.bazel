@@ -1,10 +1,8 @@
 load("@aspect_rules_js//js:defs.bzl", "js_library")
-load("@bazel_gazelle//:def.bzl", "gazelle_binary", "gazelle")
-load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag", "int_flag")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@rules_player//internal:defs.bzl", "stamp")
 load("@rules_player//ios:defs.bzl", "assemble_pod", "ios_publish")
-load("@rules_swift_package_manager//swiftpkg:defs.bzl", "swift_update_packages")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -85,7 +83,10 @@ js_library(
     visibility = ["//visibility:public"],
 )
 
-# # Update the version in the podspec
+
+##### Start iOS #####
+
+# Update the version in the podspec
 stamp(
     name = "PlayerUI_Podspec",
     files = ["//:PlayerUI.podspec"],
@@ -209,85 +210,18 @@ ios_publish(
     ],
 )
 
-# # Push podspec to specs repo
-# # tag must exist in github first
-# pod_push(
-#     name = "PlayerUI_Pod_Push",
-#     executable = "bundle exec pod",
-#     globalFlags = [],
-#     podspec = ":PlayerUI_Podspec",
-#     pushFlags = [
-#         # skip tests because it never runs them right
-#         # and they're run as part of the build pipeline anyway
-#         "--skip-tests",
-#     ],
-# )
-
-# Ignore the `.build` folder that is created by running Swift package manager
-# commands. The Swift Gazelle plugin executes some Swift package manager
-# commands to resolve external dependencies. This results in a `.build` file
-# being created.
-# NOTE: Swift package manager is not used to build any of the external packages.
-# The `.build` directory should be ignored. Be sure to configure your source
-# control to ignore it (i.e., add it to your `.gitignore`).
-# gazelle:exclude .build
-
-# This declaration builds a Gazelle binary that incorporates all of the Gazelle
-# plugins for the languages that you use in your workspace. In this example, we
-# are only listing the Gazelle plugin for Swift from rules_swift_package_manager.
-gazelle_binary(
-    name = "gazelle_bin",
-    languages = [
-        "@rules_swift_package_manager//gazelle",
-    ],
-)
-
-# This macro defines two targets: `swift_update_pkgs` and
-# `swift_update_pkgs_to_latest`.
-#
-# The `swift_update_pkgs` target should be run whenever the list of external
-# dependencies is updated in the `Package.swift`. Running this target will
-# populate the `swift_deps.bzl` with `swift_package` declarations for all of
-# the direct and transitive Swift packages that your project uses.
-#
-# The `swift_update_pkgs_to_latest` target should be run when you want to
-# update your Swift dependencies to their latest eligible version.
-swift_update_packages(
-    name = "swift_update_pkgs",
-    gazelle = ":gazelle_bin",
-    generate_swift_deps_for_workspace = True,
-    package_manifest = "./xcode/Package.swift",
-    swift_deps = "swift_deps.bzl",
-    swift_deps_index = "swift_deps_index.json",
-    update_bzlmod_stanzas = False,
-)
-
-# This target updates the Bazel build files for your project. Run this target
-# whenever you add or remove source files from your project.
-gazelle(
-    name = "update_build_files",
-    gazelle = ":gazelle_bin",
-)
-
-alias(
-    name = "android_tools",
-    actual = "@bazel_tools//src/tools/android/java/com/google/devtools/build/android:all_android_tools",
-    visibility = ["//visibility:public"],
-)
-
-java_plugin(
-    name = "compiler_annotation_processor",
-    generates_api = False,
-    processor_class = "android.databinding.annotationprocessor.ProcessDataBinding",
-    visibility = ["//visibility:public"],
-    deps = [
-        ":android_tools",
-    ],
-)
-#SwiftLint
+# SwiftLint
 exports_files([".swiftlint.yml"])
 
+##### End iOS #####
+
 # Native platform settings
+
+int_flag(
+    name = "cmake_build_parallel_level",
+    build_setting_default = 4,
+    make_variable = "CMAKE_BUILD_PARALLEL_LEVEL",
+)
 
 string_flag(
     name = "cmake_build_type",
@@ -329,23 +263,34 @@ config_setting(
     },
 )
 
-# TODO: Enable platform support for detecting Android OS as well as cpu
 config_setting(
-    name = "arm64-v8a",
-    values = {"cpu": "arm64-v8a"},
+    name = "android-arm64-v8a",
+    constraint_values = [
+        "@platforms//cpu:arm64",
+        "@platforms//os:android",
+    ],
 )
 
 config_setting(
-    name = "armeabi-v7a",
-    values = {"cpu": "armeabi-v7a"},
+    name = "android-armeabi-v7a",
+    constraint_values = [
+        "@platforms//os:android",
+        "@platforms//cpu:armv7",
+    ],
 )
 
 config_setting(
-    name = "x86",
-    values = {"cpu": "x86"},
+    name = "android-x86",
+    constraint_values = [
+        "@platforms//os:android",
+        "@platforms//cpu:x86_32",
+    ],
 )
 
 config_setting(
-    name = "x86_64",
-    values = {"cpu": "x86_64"},
+    name = "android-x86_64",
+    constraint_values = [
+        "@platforms//os:android",
+        "@platforms//cpu:x86_64",
+    ],
 )

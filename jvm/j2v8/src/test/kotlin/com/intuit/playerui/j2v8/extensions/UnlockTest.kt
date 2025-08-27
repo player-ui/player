@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test
 import kotlin.concurrent.thread
 
 internal class UnlockTest : J2V8Test() {
-
     @Test
     fun `cannot unlock when another thread has the lock`() {
         thread { v8.locker.acquire() }.join()

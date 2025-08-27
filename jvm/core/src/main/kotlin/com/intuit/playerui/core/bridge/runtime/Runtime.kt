@@ -13,7 +13,6 @@ import kotlinx.serialization.SerializationStrategy
 
 /** Special [Node] that represents the JS runtime */
 public interface Runtime<Value> : Node {
-
     public val dispatcher: CoroutineDispatcher
 
     public val config: PlayerRuntimeConfig
@@ -35,11 +34,12 @@ public interface Runtime<Value> : Node {
     /** Serialize and assign some [value] to [name] within the [Runtime] */
     public fun add(name: String, value: Value)
 
+    // TODO: This potentially should return [Value] but we need an avenue for decoding then encoding
+
     /**
      * Serialize some [value] into the [Runtime] memory using the [serializer] and return
      * a JVM representation of the runtime object (i.e. serializing a map will return a [Node].
      */
-    // TODO: This potentially should return [Value] but we need an avenue for decoding then encoding
     public fun <T> serialize(serializer: SerializationStrategy<T>, value: T): Any?
 
     /** Close the [Runtime] and release any resources */
@@ -50,12 +50,10 @@ public interface Runtime<Value> : Node {
     public var checkBlockingThread: Thread.() -> Unit
 }
 
-public inline fun <reified T, Value> Runtime<Value>.add(name: String, value: T): Unit =
-    add(name, format.encodeToRuntimeValue(value))
+public inline fun <reified T, Value> Runtime<Value>.add(name: String, value: T): Unit = add(name, format.encodeToRuntimeValue(value))
 
 /** Helper method to [serialize] the [value] with the [KSerializer] found within the [serializersModule] */
-public inline fun <reified T> Runtime<*>.serialize(value: T): Any? =
-    serialize(format.serializer(), value)
+public inline fun <reified T> Runtime<*>.serialize(value: T): Any? = serialize(format.serializer(), value)
 
 public inline fun <reified T> Runtime<*>.serialize(serializer: SerializationStrategy<T>?, value: T): Any? = serializer?.let {
     serialize(it, value)

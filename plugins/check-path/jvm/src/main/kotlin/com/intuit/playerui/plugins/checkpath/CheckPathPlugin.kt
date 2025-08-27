@@ -7,14 +7,13 @@ import com.intuit.playerui.core.plugins.JSScriptPluginWrapper
 import com.intuit.playerui.core.plugins.findPlugin
 
 /** Reduced wrapper of the core check-path plugin for relative asset querying */
-public class CheckPathPlugin : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
-
+public class CheckPathPlugin : JSScriptPluginWrapper(PLUGIN_NAME, sourcePath = BUNDLED_SOURCE_PATH) {
     /** Get the [Asset] represented by the [id] */
     public fun getAsset(id: String): Asset? = instance.getInvokable<Any?>("getAsset")?.invoke(id) as? Asset
 
     private companion object {
-        private const val bundledSourcePath = "plugins/check-path/core/dist/CheckPathPlugin.native.js"
-        private const val pluginName = "CheckPathPlugin.CheckPathPlugin"
+        private const val BUNDLED_SOURCE_PATH = "plugins/check-path/core/dist/CheckPathPlugin.native.js"
+        private const val PLUGIN_NAME = "CheckPathPlugin.CheckPathPlugin"
     }
 }
 
