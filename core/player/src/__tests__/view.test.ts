@@ -5,6 +5,7 @@ import TrackBindingPlugin from "./helpers/binding.plugin";
 import type { InProgressState } from "../types";
 import { Player } from "..";
 import { ActionExpPlugin } from "./helpers/action-exp.plugin";
+import { makeFlow } from "@player-ui/make-flow";
 
 const minimal: Flow = {
   id: "minimal-flow",
@@ -126,6 +127,52 @@ describe("state node expression tests", () => {
         },
       }),
     );
+  });
+
+  test("should remove empty multi-nodes", async () => {
+    player.start(
+      makeFlow({
+        type: "view",
+        id: "view",
+        values: [
+          [
+            {
+              asset: {
+                applicability: "false",
+                type: "asset",
+                id: "nope",
+              },
+            },
+          ],
+          [
+            {
+              asset: {
+                applicability: "true",
+                type: "asset",
+                id: "yes",
+              },
+            },
+          ],
+        ],
+      }),
+    );
+
+    expect(getView()).toMatchInlineSnapshot(`
+      {
+        "id": "view",
+        "type": "view",
+        "values": [
+          [
+            {
+              "asset": {
+                "id": "yes",
+                "type": "asset",
+              },
+            },
+          ],
+        ],
+      }
+    `);
   });
 
   test("evaluates exp for action nodes", async () => {
