@@ -1,5 +1,6 @@
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
-load("//:cmake.bzl", "CMAKE_BUILD_TYPE_COPTS", "CMAKE_BUILD_TYPE_COPT_MAPPINGS")
+load("@rules_java//java:java_library.bzl", "java_library")
+load("//:cmake.bzl", "CMAKE_BUILD_TYPE_COPTS")
 load(":cc_binary_host_jni.bzl", "cc_library_host_jni")
 load(":copy_shared_lib.bzl", "copy_shared_lib")
 

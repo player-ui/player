@@ -17,10 +17,10 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlin.reflect.full.isSubclassOf
 
 // TODO: Better support for nullish values
+
 /** Common decoder base implementation to support decoding [T] runtime objects */
 @InternalPlayerApi
 public abstract class AbstractRuntimeValueDecoder<T> : RuntimeValueDecoder<T> {
-
     override val serializersModule: SerializersModule get() = format.serializersModule
 
     @Suppress("UNCHECKED_CAST")
@@ -41,15 +41,25 @@ public abstract class AbstractRuntimeValueDecoder<T> : RuntimeValueDecoder<T> {
     }
 
     override fun decodeNull(): Nothing? = null
+
     override fun decodeBoolean(): Boolean = decode()
+
     override fun decodeByte(): Byte = decode()
+
     override fun decodeChar(): Char = decode()
+
     override fun decodeDouble(): Double = decode<Number>().toDouble()
+
     override fun decodeFloat(): Float = decode<Number>().toFloat()
+
     override fun decodeInt(): Int = decode<Number>().toInt()
+
     override fun decodeLong(): Long = decode<Number>().toLong()
+
     override fun decodeShort(): Short = decode<Number>().toShort()
+
     override fun decodeString(): String = decode()
+
     override fun decodeNode(): Node = decode()
 
     override fun decodeEnum(enumDescriptor: SerialDescriptor): Int = enumDescriptor.getElementIndex(decode())
@@ -62,14 +72,15 @@ public abstract class AbstractRuntimeValueDecoder<T> : RuntimeValueDecoder<T> {
         else -> error("value ($value) cannot be decoded as ${T::class.simpleName}")
     }
 
-    protected inline fun error(message: String?, cause: Throwable? = null): Nothing =
-        throw RuntimeDecodingException(message, cause)
+    protected inline fun error(message: String?, cause: Throwable? = null): Nothing = throw RuntimeDecodingException(message, cause)
 }
 
 /** Generic base class extending the standardized decoding constructs required for composite decoding */
 @InternalPlayerApi
-public sealed class AbstractRuntimeValueCompositeDecoder<T, K> : RuntimeValueCompositeDecoder<T>, CompositeDecoder, NodeDecoder {
-
+public sealed class AbstractRuntimeValueCompositeDecoder<T, K> :
+    RuntimeValueCompositeDecoder<T>,
+    CompositeDecoder,
+    NodeDecoder {
     /** Represents the current index in the [value] to decode */
     protected var currentIndex: Int = -1
 
@@ -109,35 +120,56 @@ public sealed class AbstractRuntimeValueCompositeDecoder<T, K> : RuntimeValueCom
     public abstract fun decodeElement(descriptor: SerialDescriptor, index: Int): T
 
     override fun decodeBooleanElement(descriptor: SerialDescriptor, index: Int): Boolean = decode(descriptor, index)
+
     override fun decodeByteElement(descriptor: SerialDescriptor, index: Int): Byte = decode(descriptor, index)
+
     override fun decodeCharElement(descriptor: SerialDescriptor, index: Int): Char = decode(descriptor, index)
+
     override fun decodeDoubleElement(descriptor: SerialDescriptor, index: Int): Double = decode<Number>(descriptor, index).toDouble()
+
     override fun decodeFloatElement(descriptor: SerialDescriptor, index: Int): Float = decode<Number>(descriptor, index).toFloat()
+
     override fun decodeIntElement(descriptor: SerialDescriptor, index: Int): Int = decode<Number>(descriptor, index).toInt()
+
     override fun decodeLongElement(descriptor: SerialDescriptor, index: Int): Long = decode<Number>(descriptor, index).toLong()
+
     override fun decodeShortElement(descriptor: SerialDescriptor, index: Int): Short = decode<Number>(descriptor, index).toShort()
+
     override fun decodeStringElement(descriptor: SerialDescriptor, index: Int): String = decode(descriptor, index)
+
     override fun endStructure(descriptor: SerialDescriptor): Unit = Unit
 
     /** Build a decoder for the [currentIndex], which could be for [currentKey] or [currentValue] */
-    public abstract fun <T> buildDecoderForSerializableElement(descriptor: SerialDescriptor, index: Int, deserializer: DeserializationStrategy<T>): Decoder
+    public abstract fun <T> buildDecoderForSerializableElement(
+        descriptor: SerialDescriptor,
+        index: Int,
+        deserializer: DeserializationStrategy<T>,
+    ): Decoder
 
-    override fun <T> decodeSerializableElement(descriptor: SerialDescriptor, index: Int, deserializer: DeserializationStrategy<T>, previousValue: T?): T =
-        buildDecoderForSerializableElement(descriptor, index, deserializer).decodeSerializableValue(deserializer)
+    override fun <T> decodeSerializableElement(
+        descriptor: SerialDescriptor,
+        index: Int,
+        deserializer: DeserializationStrategy<T>,
+        previousValue: T?,
+    ): T = buildDecoderForSerializableElement(descriptor, index, deserializer).decodeSerializableValue(deserializer)
 
-    override fun <T : Any> decodeNullableSerializableElement(descriptor: SerialDescriptor, index: Int, deserializer: DeserializationStrategy<T?>, previousValue: T?): T? =
-        buildDecoderForSerializableElement(descriptor, index, deserializer).decodeNullableSerializableValue(deserializer)
+    override fun <T : Any> decodeNullableSerializableElement(
+        descriptor: SerialDescriptor,
+        index: Int,
+        deserializer: DeserializationStrategy<T?>,
+        previousValue: T?,
+    ): T? = buildDecoderForSerializableElement(descriptor, index, deserializer).decodeNullableSerializableValue(deserializer)
 
     override fun decodeInlineElement(descriptor: SerialDescriptor, index: Int): Decoder = decodeInline(descriptor)
 
     /** Helper for decoding certain types for the value at [index] within the [descriptor] */
-    protected inline fun <reified T> decode(descriptor: SerialDescriptor, index: Int): T = when (val value = decodeValueElement(descriptor, index)) {
-        is T -> value
-        else -> error("value ($value) cannot be decoded as ${T::class.simpleName}")
-    }
+    protected inline fun <reified T> decode(descriptor: SerialDescriptor, index: Int): T =
+        when (val value = decodeValueElement(descriptor, index)) {
+            is T -> value
+            else -> error("value ($value) cannot be decoded as ${T::class.simpleName}")
+        }
 
-    protected inline fun error(message: String?, cause: Throwable? = null): Nothing =
-        throw RuntimeDecodingException(message, cause)
+    protected inline fun error(message: String?, cause: Throwable? = null): Nothing = throw RuntimeDecodingException(message, cause)
 }
 
 /** Map-like [value] composite decoder which handles decoding keys & values */
@@ -155,8 +187,7 @@ public abstract class AbstractRuntimeObjectMapDecoder<T> : AbstractRuntimeValueC
 /** List-like [value] composite decoder which handles decoding values at [Int] indexes */
 @InternalPlayerApi
 public abstract class AbstractRuntimeArrayListDecoder<T> : AbstractRuntimeValueCompositeDecoder<T, Int>() {
-    override fun decodeElement(descriptor: SerialDescriptor, index: Int): T =
-        getElementAtIndex(index)
+    override fun decodeElement(descriptor: SerialDescriptor, index: Int): T = getElementAtIndex(index)
 }
 
 /** Map-like [value] composite decoder which strictly handles class-based serializers for decoding values into named members */

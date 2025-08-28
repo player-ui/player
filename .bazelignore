@@ -24,6 +24,10 @@ DerivedData
 *.hmap
 *.ipa
 
+# Ignore for iOS. Otherwise Bazel will try to load packages for it when it shouldn't and everything will crash.
+xcode/.build
+
+# Ignore all node_modules directories. Otherwise Bazel will try to load packages for them when it shouldn't and everything will crash.
 core/make-flow/node_modules
 core/types/node_modules
 core/partial-match-registry/node_modules

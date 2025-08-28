@@ -11,7 +11,9 @@ import kotlinx.serialization.Serializable
 
 /** Limited definition of the player validation object exposed by [Resolver.Hooks.resolveOptions] */
 @Serializable(with = Serializer::class)
-public class Validation internal constructor(override val node: Node) : NodeWrapper {
+public class Validation internal constructor(
+    override val node: Node,
+) : NodeWrapper {
     private val getAll: Invokable<ValidationMapping?> by NodeSerializableFunction()
 
     /** get all outstanding validations on current flow */

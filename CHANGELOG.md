@@ -1,3 +1,39 @@
+# 0.14.0-next.1 (Thu Aug 28 2025)
+
+### Release Notes
+
+#### update createAsyncTransform to allow for different node types ([#708](https://github.com/player-ui/player/pull/708))
+
+- Update the `createAsyncTransform` util to consider different incoming node types coming from `getNestedAsset` option. Originally, this assumed that it would always be an `asset` node type and would asset-wrap the node, but to allow for some additional flexibility, the following rules are applied:
+  - Asset nodes and Applicability nodes with a value that is an asset node get asset wrapped like before.
+  - multi-nodes have their values spread into the initialized multi-node to keep the structure flat
+  - everything else gets added to the initialized multi-node as-is.
+
+#### Migrate to Bazel 8 ([#700](https://github.com/player-ui/player/pull/700))
+
+- Update to Bazel 8
+- Android SDK/NDK now only needed for Android targets
+  - Applicable to CI and local development
+- Coverage for JVM modules
+- Updated `just` commands and documentation
+
+---
+
+#### 🐛 Bug Fix
+
+- update createAsyncTransform to allow for different node types [#708](https://github.com/player-ui/player/pull/708) ([@tmarmer](https://github.com/tmarmer))
+- Migrate to Bazel 8 [#700](https://github.com/player-ui/player/pull/700) ([@sugarmanz](https://github.com/sugarmanz) [@KetanReddy](https://github.com/KetanReddy) [@KVSRoyal](https://github.com/KVSRoyal))
+- Document common iOS Cache error and how to fix it [#706](https://github.com/player-ui/player/pull/706) ([@KVSRoyal](https://github.com/KVSRoyal))
+
+#### Authors: 4
+
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
 # 0.14.0-next.0 (Fri Aug 15 2025)
 
 ### Release Notes

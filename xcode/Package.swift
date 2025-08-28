@@ -3,6 +3,12 @@
 
 import PackageDescription
 
+// ⚠️⚠️⚠️⚠️⚠️⚠️⚠️ //
+// NOTE: When this file is changed, run the following commands for the changes to take effect:
+// swift package update
+// bazel mod tidy
+// ⚠️⚠️⚠️⚠️⚠️⚠️⚠️ //
+
 // SPM doesn't isolate dependencies that are not used by products
 // So relying on a tool, like SwiftLint, a consuming user will still need to resolve that
 // even though they would not use it
@@ -22,7 +28,7 @@ let package = Package(
         .package(url: "https://github.com/realm/SwiftLint.git", .upToNextMajor(from: "0.54.0")),
 
         // Testing Dependencies
-        .package(url: "https://github.com/nalexn/viewinspector.git", .upToNextMajor(from: "0.9.10"))
+        .package(url: "https://github.com/nalexn/viewinspector.git", .upToNextMajor(from: "0.10.2"))
     ],
     targets: []
 )

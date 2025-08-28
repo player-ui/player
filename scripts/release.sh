@@ -22,9 +22,7 @@ fi
 echo "Publishing NPM Packages using tag: ${NPM_TAG} from release type: ${RELEASE_TYPE} on branch: ${CURRENT_BRANCH}"
 readonly PKG_NPM_LABELS=`bazel query --output=label 'kind("npm_package rule", //...) - attr("tags", "\[.*do-not-publish.*\]", //...)'`
 
-for pkg in $PKG_NPM_LABELS ; do
-  bazel build --config=release
-done
+bazel build --config=release $PKG_NPM_LABELS
 
 # iOS Prepublish
 bazel build --config=release //:PlayerUI_Podspec //:PlayerUI_Pod

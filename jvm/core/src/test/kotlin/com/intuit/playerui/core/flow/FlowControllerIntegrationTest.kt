@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.TestTemplate
 
 internal class FlowControllerIntegrationTest : PlayerTest() {
-
     @TestTemplate
     fun `test flow controller`() {
         var pendingTransition: Pair<NamedState?, String?>? = null

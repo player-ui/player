@@ -25,7 +25,6 @@ import kotlinx.serialization.encoding.encodeStructure
 // and _how_ to deconstruct a `Throwable` into primitives to serialize
 @Serializer(forClass = Throwable::class)
 public class ThrowableSerializer : KSerializer<Throwable> {
-
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("kotlin.Throwable") {
         element("serialized", Boolean.serializer().descriptor.nullable, isOptional = true)
         element("message", String.serializer().descriptor.nullable, isOptional = true)
@@ -50,7 +49,9 @@ public class ThrowableSerializer : KSerializer<Throwable> {
             var stackTrace: Array<StackTraceElement> = emptyArray()
             var cause: Throwable? = null
 
-            fun decodeStackTraceFromStack(stack: String? = decodeNullableSerializableElement(descriptor, 2, String.serializer().nullable)): Array<StackTraceElement> = stack
+            fun decodeStackTraceFromStack(
+                stack: String? = decodeNullableSerializableElement(descriptor, 2, String.serializer().nullable),
+            ): Array<StackTraceElement> = stack
                 ?.split("\n")
                 ?.mapNotNull(errorStackReg::find)
                 ?.map(MatchResult::destructured)
@@ -58,10 +59,11 @@ public class ThrowableSerializer : KSerializer<Throwable> {
                     StackTraceElement(className, methodName, fileName, lineNumber.toIntOrNull() ?: -2)
                 }?.toTypedArray() ?: emptyArray()
 
-            fun decodeSerializedStackTrace(): Array<StackTraceElement> = decodeNullableSerializableElement(descriptor, 3, serializedStackTraceSerializer.nullable)
-                ?.map { (className, methodName, fileName, lineNumber) ->
-                    StackTraceElement(className, methodName, fileName, lineNumber)
-                }?.toTypedArray() ?: emptyArray()
+            fun decodeSerializedStackTrace(): Array<StackTraceElement> =
+                decodeNullableSerializableElement(descriptor, 3, serializedStackTraceSerializer.nullable)
+                    ?.map { (className, methodName, fileName, lineNumber) ->
+                        StackTraceElement(className, methodName, fileName, lineNumber)
+                    }?.toTypedArray() ?: emptyArray()
 
             if (decodeSequentially()) {
                 serialized = decodeNullableSerializableElement(descriptor, 0, Boolean.serializer().nullable) ?: false
@@ -133,9 +135,10 @@ public class ThrowableSerializer : KSerializer<Throwable> {
 
     public companion object {
         private val errorStackReg: Regex =
-            """(?<=at )(?<class>[A-z\d\s.<>$]*(?=\.))?\.?(?<method>[A-z\d\s.<>$]*(?= ))? ?\(?(?:.*, )?(?<file>[A-z\d\s.<>$]*)?:?(?<line>[A-z\d\s.<>$]*)?:?(?<column>[A-z\d\s.<>$]*)?\)?$""".toRegex(
-                RegexOption.MULTILINE,
-            )
+            """(?<=at )(?<class>[A-z\d\s.<>$]*(?=\.))?\.?(?<method>[A-z\d\s.<>$]*(?= ))? ?\(?(?:.*, )?(?<file>[A-z\d\s.<>$]*)?:?(?<line>[A-z\d\s.<>$]*)?:?(?<column>[A-z\d\s.<>$]*)?\)?$"""
+                .toRegex(
+                    RegexOption.MULTILINE,
+                )
 
         private val serializedStackTraceSerializer = ListSerializer(SerializableStackTraceElement.serializer())
     }

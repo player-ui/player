@@ -14,7 +14,6 @@ import org.amshove.kluent.`should not be null`
 import org.junit.jupiter.api.TestTemplate
 
 internal class ExpressionPluginTest : PlayerTest() {
-
     override val plugins: List<Plugin> = listOf(
         ExpressionPlugin(
             "myExpression" to { args ->

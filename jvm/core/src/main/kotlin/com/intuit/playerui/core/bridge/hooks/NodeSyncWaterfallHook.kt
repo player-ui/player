@@ -20,9 +20,14 @@ import kotlinx.serialization.Serializable
  * object from within the tapped function.
  */
 @Serializable(NodeSyncWaterfallHook1.Serializer::class)
-public class NodeSyncWaterfallHook1<T1>(override val node: Node, private val serializer1: KSerializer<T1>) : SyncWaterfallHook<(HookContext, T1?) -> T1?, T1?>(), NodeHook<T1?> {
-
-    init { init(serializer1) }
+public class NodeSyncWaterfallHook1<T1>(
+    override val node: Node,
+    private val serializer1: KSerializer<T1>,
+) : SyncWaterfallHook<(HookContext, T1?) -> T1?, T1?>(),
+    NodeHook<T1?> {
+    init {
+        init(serializer1)
+    }
 
     override fun call(context: HookContext, serializedArgs: Array<Any?>): T1? {
         require(serializedArgs.size == 1)
@@ -40,9 +45,11 @@ public class NodeSyncWaterfallHook1<T1>(override val node: Node, private val ser
 
     public inline fun tap(noinline callback: (HookContext, T1?) -> T1?): String? = tap(callingStackTraceElement.toString(), callback)
 
-    internal class Serializer<T1>(private val serializer1: KSerializer<T1>) : NodeWrapperSerializer<NodeSyncWaterfallHook1<T1>>({
-        NodeSyncWaterfallHook1(it, serializer1)
-    })
+    internal class Serializer<T1>(
+        private val serializer1: KSerializer<T1>,
+    ) : NodeWrapperSerializer<NodeSyncWaterfallHook1<T1>>({
+            NodeSyncWaterfallHook1(it, serializer1)
+        })
 }
 
 @Serializable(NodeSyncWaterfallHook2.Serializer::class)
@@ -50,9 +57,11 @@ public class NodeSyncWaterfallHook2<T1, T2>(
     override val node: Node,
     private val serializer1: KSerializer<T1>,
     private val serializer2: KSerializer<T2>,
-) : SyncWaterfallHook<(HookContext, T1?, T2?) -> T1?, T1?>(), NodeHook<T1?> {
-
-    init { init(serializer1, serializer2) }
+) : SyncWaterfallHook<(HookContext, T1?, T2?) -> T1?, T1?>(),
+    NodeHook<T1?> {
+    init {
+        init(serializer1, serializer2)
+    }
 
     override fun call(context: HookContext, serializedArgs: Array<Any?>): T1? {
         require(serializedArgs.size == 2)
@@ -71,7 +80,10 @@ public class NodeSyncWaterfallHook2<T1, T2>(
 
     public inline fun tap(noinline callback: (HookContext, T1?, T2?) -> T1?): String? = tap(callingStackTraceElement.toString(), callback)
 
-    internal class Serializer<T1, T2>(private val serializer1: KSerializer<T1>, private val serializer2: KSerializer<T2>) : NodeWrapperSerializer<NodeSyncWaterfallHook2<T1, T2>>({
-        NodeSyncWaterfallHook2(it, serializer1, serializer2)
-    })
+    internal class Serializer<T1, T2>(
+        private val serializer1: KSerializer<T1>,
+        private val serializer2: KSerializer<T2>,
+    ) : NodeWrapperSerializer<NodeSyncWaterfallHook2<T1, T2>>({
+            NodeSyncWaterfallHook2(it, serializer1, serializer2)
+        })
 }

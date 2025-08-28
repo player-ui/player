@@ -14,9 +14,11 @@ public class NodeAsyncWaterfallHook2<T1, T2>(
     override val node: Node,
     private val serializer1: KSerializer<T1>,
     private val serializer2: KSerializer<T2>,
-) : AsyncSeriesWaterfallHook<(HookContext, T1?, T2?) -> T1?, T1?>(), AsyncNodeHook<T1?> {
-
-    init { init(serializer1, serializer2) }
+) : AsyncSeriesWaterfallHook<(HookContext, T1?, T2?) -> T1?, T1?>(),
+    AsyncNodeHook<T1?> {
+    init {
+        init(serializer1, serializer2)
+    }
 
     override suspend fun callAsync(context: HookContext, serializedArgs: Array<Any?>): T1? {
         require(serializedArgs.size == 2) { "Expected exactly two arguments, but got ${serializedArgs.size}" }
@@ -29,7 +31,10 @@ public class NodeAsyncWaterfallHook2<T1, T2>(
         )
     }
 
-    internal class Serializer<T1, T2>(private val serializer1: KSerializer<T1>, private val serializer2: KSerializer<T2>) : NodeWrapperSerializer<NodeAsyncWaterfallHook2<T1, T2>>({
-        NodeAsyncWaterfallHook2(it, serializer1, serializer2)
-    })
+    internal class Serializer<T1, T2>(
+        private val serializer1: KSerializer<T1>,
+        private val serializer2: KSerializer<T2>,
+    ) : NodeWrapperSerializer<NodeAsyncWaterfallHook2<T1, T2>>({
+            NodeAsyncWaterfallHook2(it, serializer1, serializer2)
+        })
 }

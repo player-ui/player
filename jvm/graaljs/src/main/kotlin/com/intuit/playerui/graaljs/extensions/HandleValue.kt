@@ -31,7 +31,11 @@ private fun Value.transform(format: RuntimeFormat<Value>): Any? = when {
     metaObject.toString() == "symbol" -> null // this is also awful, but consistent w/ j2v8
     else -> when (this.`as`(Any::class.java)) {
         is Int -> asInt()
-        is Double, is Long -> try { asInt() } catch (e: Exception) { asDouble() }
+        is Double, is Long -> try {
+            asInt()
+        } catch (e: Exception) {
+            asDouble()
+        }
         is String -> asString()
         is Boolean -> asBoolean()
         /**
@@ -65,28 +69,33 @@ internal fun Value.toNode(format: RuntimeFormat<Value>): Node? = if (isNull || !
     }
 }
 
-internal fun <R> Value.toInvokable(format: RuntimeFormat<Value>, deserializationStrategy: DeserializationStrategy<R>?): Invokable<R>? = if (isNull || !canExecute()) {
-    null
-} else {
-    lockIfDefined {
-        Invokable { args ->
-            blockingLock {
-                when (
-                    val result =
-                        this.execute(
-                            *format.encodeToRuntimeValue(
-                                args as Array<Any?>,
-                            ).`as`(List::class.java).toTypedArray(),
-                        ).handleValue(format)
-                ) {
-                    is Node -> deserializationStrategy?.let {
-                        result.deserialize(deserializationStrategy)
-                    } ?: run {
-                        result as R
+internal fun <R> Value.toInvokable(format: RuntimeFormat<Value>, deserializationStrategy: DeserializationStrategy<R>?): Invokable<R>? =
+    if (isNull ||
+        !canExecute()
+    ) {
+        null
+    } else {
+        lockIfDefined {
+            Invokable { args ->
+                blockingLock {
+                    when (
+                        val result =
+                            execute(
+                                *format
+                                    .encodeToRuntimeValue(
+                                        args as Array<Any?>,
+                                    ).`as`(List::class.java)
+                                    .toTypedArray(),
+                            ).handleValue(format)
+                    ) {
+                        is Node -> deserializationStrategy?.let {
+                            result.deserialize(deserializationStrategy)
+                        } ?: run {
+                            result as R
+                        }
+                        else -> result as R
                     }
-                    else -> result as R
                 }
             }
         }
     }
-}

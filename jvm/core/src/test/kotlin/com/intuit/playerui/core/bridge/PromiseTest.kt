@@ -22,26 +22,30 @@ import org.junit.jupiter.api.TestTemplate
 
 private inline fun currentStackTrace() = Exception().stackTrace
 
-internal class PromiseTest : RuntimeTest(), PromiseUtils {
+internal class PromiseTest :
+    RuntimeTest(),
+    PromiseUtils {
+    override val thenChain = mutableListOf<Any?>()
+        get() = runBlocking {
+            // TODO: Rework delay into a proper suspension mechanism
+            delay(100)
+            field
+        }
 
-    override val thenChain = mutableListOf<Any?>(); get() = runBlocking {
-        // TODO: Rework delay into a proper suspension mechanism
-        delay(100)
-        field
-    }
-
-    override val catchChain = mutableListOf<Any?>(); get() = runBlocking {
-        // TODO: Rework delay into a proper suspension mechanism
-        delay(100)
-        field
-    }
+    override val catchChain = mutableListOf<Any?>()
+        get() = runBlocking {
+            // TODO: Rework delay into a proper suspension mechanism
+            delay(100)
+            field
+        }
 
     /**
      * Anti-test case since old test existed to prove the Json conversions forced Ints as Longs.
      */
     @TestTemplate
     fun testIntToLong() = with(runtime) {
-        Promise.resolve(42)
+        Promise
+            .resolve(42)
             .thenRecord
             .then<Any> { listOf(42) }
             .thenRecord
@@ -56,7 +60,8 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
         val list = listOf(1, 2, 3)
         val mapFlow = mapOf("outcome" to "doneWithTopic")
 
-        runtime.Promise.resolve(42)
+        runtime.Promise
+            .resolve(42)
             .thenRecord
             .then<Any> { null }
             .thenRecord
@@ -108,7 +113,8 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
             ) as Node,
         )
 
-        runtime.Promise.resolve(42)
+        runtime.Promise
+            .resolve(42)
             .then<Any> { jsonFlow }
             .thenRecord(JsonElement.serializer())
             .then<Any> { flow }
@@ -126,11 +132,11 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
     fun testExplicitResolve() {
         val (promise, resolver) = runtime.execute(
             """
-           (function() {
-               var resolver;
-               const promise = new Promise(function(resolve, reject) { resolver = resolve });
-               return [promise, resolver];
-           })();
+            (function() {
+                var resolver;
+                const promise = new Promise(function(resolve, reject) { resolver = resolve });
+                return [promise, resolver];
+            })();
             """.trimIndent(),
         ) as List<*>
 
@@ -145,9 +151,10 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
 
     @TestTemplate
     fun testNewPromiseCreationResolve() {
-        runtime.Promise<Int> { resolve, _ ->
-            resolve(42)
-        }.thenRecord.catchRecord
+        runtime
+            .Promise<Int> { resolve, _ ->
+                resolve(42)
+            }.thenRecord.catchRecord
 
         assertCatch()
         assertThen(42)
@@ -155,9 +162,10 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
 
     @TestTemplate
     fun testNewPromiseCreationReject() {
-        runtime.Promise<Int> { _, reject ->
-            reject(PlayerException("84"))
-        }.thenRecord.catchRecord
+        runtime
+            .Promise<Int> { _, reject ->
+                reject(PlayerException("84"))
+            }.thenRecord.catchRecord
 
         assertCatch("84")
         assertThen()
@@ -177,7 +185,8 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
             stackTrace = arrayOf(currentStackTrace().first())
         }
 
-        runtime.Promise.resolve(42)
+        runtime.Promise
+            .resolve(42)
             .then<Any> { throw exception }
             .thenRecord.catchRecord
 
@@ -194,9 +203,10 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
             stackTrace = arrayOf(currentStackTrace().first())
         }
 
-        runtime.Promise<Int> { _, _ ->
-            throw exception
-        }.thenRecord.catchRecord
+        runtime
+            .Promise<Int> { _, _ ->
+                throw exception
+            }.thenRecord.catchRecord
 
         val (caught) = catchChain
         assertTrue(caught is Throwable)
@@ -212,9 +222,10 @@ internal class PromiseTest : RuntimeTest(), PromiseUtils {
             stackTrace = arrayOf(currentStackTrace().first())
         }
 
-        runtime.Promise<Int> { _, reject ->
-            reject(exception)
-        }.thenRecord.catchRecord
+        runtime
+            .Promise<Int> { _, reject ->
+                reject(exception)
+            }.thenRecord.catchRecord
 
         val (caught) = catchChain
         assertTrue(caught is Throwable)

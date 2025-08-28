@@ -23,8 +23,11 @@ public interface JSIValueWrapper {
     public val value: Value
 }
 
-public class HermesNode(private val jsiObject: Object, override val runtime: HermesRuntime) : Node, JSIValueWrapper {
-
+public class HermesNode(
+    private val jsiObject: Object,
+    override val runtime: HermesRuntime,
+) : Node,
+    JSIValueWrapper {
     override val value: Value by lazy {
         runtime.evaluateInJSThreadBlocking {
             jsiObject.asValue(runtime)
@@ -57,17 +60,21 @@ public class HermesNode(private val jsiObject: Object, override val runtime: Her
 
     override fun isEmpty(): Boolean = size == 0
 
-    context(RuntimeThreadContext) private fun getJSIValue(key: String): Value = jsiObject.getProperty(runtime, key)
+    context(RuntimeThreadContext)
+    private fun getJSIValue(key: String): Value = jsiObject.getProperty(runtime, key)
 
-    context(RuntimeThreadContext) private fun getJSIObject(key: String): Object? = getJSIValue(key)
+    context(RuntimeThreadContext)
+    private fun getJSIObject(key: String): Object? = getJSIValue(key)
         .takeIf(Value::isObject)
         ?.asObject(runtime)
 
-    context(RuntimeThreadContext) private fun getJSIArray(key: String): Array? = getJSIObject(key)
+    context(RuntimeThreadContext)
+    private fun getJSIArray(key: String): Array? = getJSIObject(key)
         ?.takeIf { it.isArray(runtime) }
         ?.asArray(runtime)
 
-    context(RuntimeThreadContext) private fun getJSIFunction(key: String): Function? = getJSIObject(key)
+    context(RuntimeThreadContext)
+    private fun getJSIFunction(key: String): Function? = getJSIObject(key)
         ?.takeIf { it.isFunction(runtime) }
         ?.asFunction(runtime)
 
@@ -75,29 +82,35 @@ public class HermesNode(private val jsiObject: Object, override val runtime: Her
         jsiObject.getProperty(runtime, key).handleValue(format)
     }
 
-    override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = runtime.evaluateInJSThreadBlocking {
-        getJSIFunction(key)
-    }?.toInvokable(format, jsiObject, deserializationStrategy)
+    override fun <R> getInvokable(key: String, deserializationStrategy: DeserializationStrategy<R>): Invokable<R>? = runtime
+        .evaluateInJSThreadBlocking {
+            getJSIFunction(key)
+        }?.toInvokable(format, jsiObject, deserializationStrategy)
 
-    override fun <R> getFunction(key: String): Invokable<R>? = runtime.evaluateInJSThreadBlocking {
-        getJSIFunction(key)
-    }?.toInvokable(format, jsiObject, null)
+    override fun <R> getFunction(key: String): Invokable<R>? = runtime
+        .evaluateInJSThreadBlocking {
+            getJSIFunction(key)
+        }?.toInvokable(format, jsiObject, null)
 
     override fun getList(key: String): List<*>? = runtime.evaluateInJSThreadBlocking {
         getJSIArray(key)?.toList(format)
     }
 
-    override fun getObject(key: String): Node? = runtime.evaluateInJSThreadBlocking {
-        getJSIObject(key)
-    }?.toNode(format)
+    override fun getObject(key: String): Node? = runtime
+        .evaluateInJSThreadBlocking {
+            getJSIObject(key)
+        }?.toNode(format)
 
-    override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>): T? = runtime.evaluateInJSThreadBlocking {
-        getJSIValue(key)
-    }.mapUndefinedToNull()?.let { format.decodeFromRuntimeValue(deserializer, it) }
+    override fun <T> getSerializable(key: String, deserializer: DeserializationStrategy<T>): T? = runtime
+        .evaluateInJSThreadBlocking {
+            getJSIValue(key)
+        }.mapUndefinedToNull()
+        ?.let { format.decodeFromRuntimeValue(deserializer, it) }
 
-    override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T = runtime.evaluateInJSThreadBlocking {
-        jsiObject.asValue(runtime)
-    }.let { format.decodeFromRuntimeValue(deserializer, it) }
+    override fun <T> deserialize(deserializer: DeserializationStrategy<T>): T = runtime
+        .evaluateInJSThreadBlocking {
+            jsiObject.asValue(runtime)
+        }.let { format.decodeFromRuntimeValue(deserializer, it) }
 
     override fun isReleased(): Boolean = runtime.isReleased()
 
@@ -108,9 +121,10 @@ public class HermesNode(private val jsiObject: Object, override val runtime: Her
         is Object -> runtime.evaluateInJSThreadBlocking(true) {
             Object.strictEquals(runtime, jsiObject, other)
         }
-        is Value -> other.isObject() && runtime.evaluateInJSThreadBlocking(true) {
-            nativeReferenceEquals(other.asObject(runtime))
-        }
+        is Value -> other.isObject() &&
+            runtime.evaluateInJSThreadBlocking(true) {
+                nativeReferenceEquals(other.asObject(runtime))
+            }
         is HermesNode -> nativeReferenceEquals(other.jsiObject)
         is JSIValueWrapper -> nativeReferenceEquals(other.value)
         is NodeWrapper -> nativeReferenceEquals(other.node)
@@ -118,9 +132,11 @@ public class HermesNode(private val jsiObject: Object, override val runtime: Her
     }
 
     override fun equals(other: Any?): Boolean = when (other) {
-        is Map<*, *> -> keys == other.keys && keys.all {
-            get(it) == other[it]
-        }
+        is Map<*, *> ->
+            keys == other.keys &&
+                keys.all {
+                    get(it) == other[it]
+                }
         is NodeWrapper -> equals(other.node)
         is Object -> equals(HermesNode(other, runtime))
         else -> false

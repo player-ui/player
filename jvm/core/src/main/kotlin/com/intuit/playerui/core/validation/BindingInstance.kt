@@ -9,8 +9,9 @@ import com.intuit.playerui.core.validation.BindingInstance.Serializer
 import kotlinx.serialization.Serializable
 
 @Serializable(with = Serializer::class)
-public class BindingInstance(override val node: Node) : NodeWrapper {
-
+public class BindingInstance(
+    override val node: Node,
+) : NodeWrapper {
     private val asString: Invokable<String> by NodeSerializableFunction()
     private val parent: Invokable<BindingInstance>? by NodeSerializableFunction()
 

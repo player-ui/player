@@ -8,8 +8,9 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /** Basic Slf4j Java Logger player plugin */
-public class Slf4jLoggerPlugin(public val config: Slf4jLoggerConfig) : LoggerPlugin {
-
+public class Slf4jLoggerPlugin(
+    public val config: Slf4jLoggerConfig,
+) : LoggerPlugin {
     public val logger: Logger = LoggerFactory.getLogger(config.name)
 
     override fun trace(vararg args: Any?) {
@@ -39,8 +40,7 @@ public class Slf4jLoggerConfig(
 ) : PlayerLoggingConfig()
 
 public object Slf4jLoggerFactory : PlayerLoggingFactory<Slf4jLoggerConfig> {
-    override fun create(block: Slf4jLoggerConfig.() -> Unit): Slf4jLoggerPlugin =
-        Slf4jLoggerPlugin(Slf4jLoggerConfig().apply(block))
+    override fun create(block: Slf4jLoggerConfig.() -> Unit): Slf4jLoggerPlugin = Slf4jLoggerPlugin(Slf4jLoggerConfig().apply(block))
 
     override fun toString(): String = "Slf4jLogger"
 }

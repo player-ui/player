@@ -1,0 +1,63 @@
+import type { DSLFlow } from "@player-tools/dsl";
+
+// This is not a proper DSL flow. However, proper DSL will catch the invalid expression
+// before the test does.
+const flow: DSLFlow = {
+  id: "generated-flow",
+  views: [
+    {
+      id: "collection",
+      type: "collection",
+      values: [
+        {
+          asset: {
+            id: "action-good",
+            type: "action",
+            value: "Next",
+            label: {
+              asset: {
+                id: "action-good-label",
+                type: "text",
+                value: "End the flow (success)"
+              }
+            }
+          }
+        },
+        {
+          asset: {
+            id: "action-bad",
+            type: "action",
+            exp: "{{foo.bar..}", // Invalid expression
+            label: {
+              asset: {
+                id: "action-bad-label",
+                type: "text",
+                value: "End the flow (error)"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  data: {},
+  navigation: {
+    BEGIN: "FLOW_1",
+    FLOW_1: {
+      startState: "VIEW_1",
+      VIEW_1: {
+        state_type: "VIEW",
+        ref: "collection",
+        transitions: {
+          "*": "END_Done",
+        },
+      },
+      END_Done: {
+        state_type: "END",
+        outcome: "done",
+      },
+    },
+  },
+};
+
+export default flow;

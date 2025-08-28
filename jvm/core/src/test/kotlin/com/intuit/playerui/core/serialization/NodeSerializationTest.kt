@@ -32,12 +32,20 @@ data class SomeDataWithDefaults(
 )
 
 internal class NodeSerializationTest : RuntimeTest() {
-
     private val name get() = "some name"
     private val node get() = runtime.serialize(mapOf("hello" to "world")) as Node
-    private val genericInvokable: Invokable<Any?> get() = Invokable { p1 -> println(p1); 2 }
-    private val specificInvokable: (Int, String) -> Int get() = { p1, p2 -> println("p1: $p1; p2: $p2"); 3 }
-    private val specificInvokableWithNode: (Node) -> Map<String, *> get() = { p1 -> println(p1); p1 }
+    private val genericInvokable: Invokable<Any?> get() = Invokable { p1 ->
+        println(p1)
+        2
+    }
+    private val specificInvokable: (Int, String) -> Int get() = { p1, p2 ->
+        println("p1: $p1; p2: $p2")
+        3
+    }
+    private val specificInvokableWithNode: (Node) -> Map<String, *> get() = { p1 ->
+        println(p1)
+        p1
+    }
     private val specificNonPrimitiveInvokable: (String) -> SomeDataWithDefaults? get() = {
         SomeDataWithDefaults(it)
     }

@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class PrimitiveEncoding : J2V8Test() {
-
     @Test fun `encode string primitive`() = format.v8.evaluateInJSThreadBlocking(runtime) {
         assertEquals(V8Primitive("hello"), format.encodeToV8Value("hello"))
     }
@@ -44,19 +43,36 @@ internal class PrimitiveEncoding : J2V8Test() {
 }
 
 internal class FunctionEncoding : J2V8Test() {
-
     @Test fun `encode typed lambda`() = v8.evaluateInJSThreadBlocking(runtime) {
         val callback = { p0: String, p1: Int -> "$p0: $p1" }
 
         assertEquals("PLAYER: 1", callback("PLAYER", 1))
-        assertEquals("PLAYER: 2", format.encodeToV8Value(callback).v8Function.call(this, V8Array { push("PLAYER"); push(2) }))
+        assertEquals(
+            "PLAYER: 2",
+            format.encodeToV8Value(callback).v8Function.call(
+                this,
+                V8Array {
+                    push("PLAYER")
+                    push(2)
+                },
+            ),
+        )
     }
 
     @Test fun `encode invokable`() = v8.evaluateInJSThreadBlocking(runtime) {
         val callback = Invokable { (p0, p1) -> "$p0: $p1" }
 
         assertEquals("PLAYER: 1", callback("PLAYER", 1))
-        assertEquals("PLAYER: 2", format.encodeToV8Value(callback).v8Function.call(this, V8Array { push("PLAYER"); push(2) }))
+        assertEquals(
+            "PLAYER: 2",
+            format.encodeToV8Value(callback).v8Function.call(
+                this,
+                V8Array {
+                    push("PLAYER")
+                    push(2)
+                },
+            ),
+        )
     }
 
     @Test fun `encode kcallable`() = v8.evaluateInJSThreadBlocking(runtime) {
@@ -67,6 +83,15 @@ internal class FunctionEncoding : J2V8Test() {
         val callback = Container()::callback
 
         assertEquals("PLAYER: 1", callback("PLAYER", 1))
-        assertEquals("PLAYER: 2", format.encodeToV8Value(callback).v8Function.call(this, V8Array { push("PLAYER"); push(2) }))
+        assertEquals(
+            "PLAYER: 2",
+            format.encodeToV8Value(callback).v8Function.call(
+                this,
+                V8Array {
+                    push("PLAYER")
+                    push(2)
+                },
+            ),
+        )
     }
 }

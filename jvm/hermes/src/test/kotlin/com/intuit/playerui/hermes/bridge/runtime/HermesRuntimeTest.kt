@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 internal class HermesRuntimeTest : HermesTest() {
-
     @Test fun `execute arbitrary JS`() = runtime.evaluateInJSThreadBlocking {
         assertTrue(Value.strictEquals(runtime, Value.from(4), runtime.evaluateJavaScript("2 + 2")))
     }

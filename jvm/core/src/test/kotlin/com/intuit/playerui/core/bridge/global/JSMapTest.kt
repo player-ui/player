@@ -18,7 +18,6 @@ data class Value(
 )
 
 internal class JSMapTest : RuntimeTest() {
-
     @TestTemplate
     fun `like real use case`() {
         val node = runtime.execute(

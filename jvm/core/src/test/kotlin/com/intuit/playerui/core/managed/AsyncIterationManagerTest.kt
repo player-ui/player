@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test
 import kotlin.coroutines.resume
 
 internal class AsyncIterationManagerTest {
-
     @Test fun `test progresses through predefined flows`(): Unit = runBlocking {
         val completedState = mockk<CompletedState>()
         val manager = FlowManager(AsyncFlowIterator("first", "second", "third"))
@@ -32,9 +31,7 @@ internal class AsyncIterationManagerTest {
     @Test fun `test handles errors`(): Unit = runBlocking {
         val manager = AsyncIterationManager(
             object : AsyncIterator<String, Boolean> {
-                override suspend fun next(result: Boolean?): String? {
-                    throw PlayerException("expected")
-                }
+                override suspend fun next(result: Boolean?): String? = throw PlayerException("expected")
             },
         )
         assertEquals(AsyncIterationManager.State.NotStarted, manager.state.value)

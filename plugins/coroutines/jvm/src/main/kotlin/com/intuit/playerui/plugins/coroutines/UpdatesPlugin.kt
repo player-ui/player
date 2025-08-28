@@ -13,7 +13,6 @@ import kotlinx.coroutines.withTimeout
 
 /** [PlayerPlugin] that converts view updates to a [ReceiveChannel] and provides functionality for waiting for an update */
 public class UpdatesPlugin : PlayerPlugin {
-
     private val _updates: Channel<Asset?> = Channel()
 
     public val updates: ReceiveChannel<Asset?> by ::_updates

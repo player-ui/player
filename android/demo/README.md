@@ -1,67 +1,183 @@
-# Android Demo App
+# Local Android Development
 
-# Local Development with Android Studio
+### Setup
 
-This will be a getting started guide on contributing to Player on Android.
+The following tools should only be required if you're building Android related targets -- and can be installed through the [sdkmanager CLI](https://developer.android.com/tools/sdkmanager) or the [Android Studio SDK Manager](https://developer.android.com/studio/intro/update#sdk-manager).
 
-It's been tested on Andriod Studio Chipmunk(2021.2.1) and Android Studio Giraffe(2022.3.1). Although other versions may work as well.
+> [!TIP]
+> If you're encountering _unexpected_ errors due to missing SDK/NDK, ensure you're not including Android targets implicitly, such as through [target pattern](https://bazel.build/run/build#specifying-build-targets) `//...` expansion or as a dependency of the explicit target to be built
 
-Assuming you have read the [requirements on the root contributing guide](https://github.com/player-ui/player/blob/main/CONTRIBUTING.md).
+<table>
+  <thead>
+    <tr>
+      <th>Tool</th>
+      <th>Version</th>
+      <th>Recommendations</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <a href="https://developer.android.com/tools/releases/platforms">
+          Android SDK
+        </a>
+      </td>
+      <td>&gt;= 35</td>
+      <td>
+        Unless the SDK path is manually configured via the `android_sdk_repository` rule, the `ANDROID_HOME` environment variable should be defined when you're invoking build targets that require the SDK. SDK support is provided by [rules_android](https://github.com/bazelbuild/rules_android), see their README for more information.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <a href="https://github.com/android/ndk/releases">Android NDK</a>
+      </td>
+      <td>&gt;= 25b</td>
+      <td>
+        Unless the NDK path is manually configured via the `android_ndk_repository`, the `ANDROID_NDK_HOME` environment variable should be defined when you're invoking build targets that require the NDK. NDK support is provided by [rules_android_ndk](https://github.com/bazelbuild/rules_android_ndk), see their README for more information, including NDK version compatibility.
+      </td>
+    </tr>
+  </tbody>
+</table>
 
-1. Once you have Android Studio installed, you will need to go to tools->SDK Manager->SDK Platforms.
-   1.  Make sure you have **only** the following SDK installed: Android API 33.
-2. The next step will be to make sure you have the right (and _only_ the right) SDK Build tools and NDK. Click on the SDK Tools tab and make sure you have only the following clicked:
-   1. 30.0.3
-   2. 27.1.12297006
-3. You will now need to create an android device for emulation. Click on Device Manager and do create new device.
-   1. You will need to download an Sv2.
-   2. You should now be able to click the play button to start up your device.
-4. You should now be able to run  `bazel build //android/demo`
-5. The following are different ways to run the apk on your device. If the following methods do not work, we can manually drop the APK that gets generated from the build command to the emulated android device.
+### Building & `just` Cheat-sheet
+
+Several [`just`](https://github.com/casey/just) commands have been provided to make invoking Android related build steps easier -- take a look at the [`justfile`](/justfile) to better understand what they're doing.
+
+#### Querying
+
+For all the below context, it might be helpful to understand what targets actual exist for a given Bazel package. The following command will list all the targets (and what rule they actually are) under `//path/to/package`:
+
+```bash
+bazel query 'kind(".*", //path/to/package/...)' --output=label_kind
+```
+
+#### Building
+
+Building actually doesn't have a `just` command, since building is typically in the context of something you're trying to do. Typically, it's advised to perform that action instead (i.e. linting, testing, publishing, installing) to ensure all the context is available for building.
+
+A great example of a target that isn't buildable on it's own is `//jvm/hermes/src/main/jni:hermes_jni_lib` -- it relies on _where_ it's being consumed from to provide the JNI context to build with. While you might not attempt to build that target explicitly, it can still implicitly fail your Bazel command, i.e. `bazel test //jvm/hermes/...`.
+
+> [!IMPORTANT]
+> If you must aggregate targets through `//...` expansion, it's best to query or filter on targets that actually match what you're looking for. The `justfile` uses this pattern for running all tests of a certain type.
+
+#### Testing
+
+To run _all_ Kotlin unit tests:
+```bash
+just test-kt
+```
+
+To run _all_ _local_ Android instrumented tests (no emulator required):
+```bash
+just test-android-local
+```
+
+To run _all_ _remote_ Android instrumented tests (emulator required):
+```bash
+just test-android-ui
+```
+
+To run _all_ Android tests (emulator required):
+```bash
+just test-android
+```
+
+#### Linting
+
+Kotlin linting is powered by [ktlint](https://github.com/pinterest/ktlint), and is configured through the [`.editorconfig`](/.editorconfig).
+
+To lint _all_ Kotlin sources:
+```bash
+just lint-kt
+```
+
+To fix _all_ Kotlin lint issues:
+```bash
+just format-kt
+```
+
+#### Publishing
+
+To publish _all_ Maven packages locally:
+```bash
+just mvn-install
+```
+
+#### Installing Demo App
+
+The Android demo application is built to showcase the broad functionality of Player, as well as some of the foundational plugins contained in this repo.
+
+To run:
+1. Ensure you have a device connected to adb, can verify with:
+   ```bash
+   adb devices
+   ```
+
+2. Configure `mobile-install` with installed `adb`, if not `/usr/bin/adb`, for example:
+   ```
+   # .bazelrc.local
+   mobile-install --adb=/Users/{user}/Library/Android/sdk/platform-tools/adb
+   ```
+
+3. Install the demo app with:
+   ```bash
+   just start-android-demo
+   ```
+
+   > [!NOTE]
+   > This is enough to pick up _any_ new changes since the app last installed. Additionally, the APK file can be found at `bazel-bin/android/demo/demo.apk`, which can be distributed and installed manually through ADB or dragging to your emulator
+
+### Troubleshooting
+
+#### SDK Troubleshooting
+
+If your SDK isn't setup correctly, you should see an error like this:
 
 ```
-bazel run //android:demo
+every rule of type android_toolchain implicitly depends upon the target '@@rules_androi++android_sdk_repository_extension+androidsdk//:fail'
 ```
 
+Verify `ANDROID_HOME` is properly set to the SDK root (ex: `/Users/{user}/Library/Android/sdk`) -- it should contain `platforms/android-xx` if an SDK is actually installed.
+
+#### NDK Troubleshooting
+
+If your NDK isn't setup correctly, you might see an error like this:
+
 ```
-bazel run //android/demo:install
+Either the ANDROID_NDK_HOME environment variable or the path attribute of android_ndk_repository must be set.
 ```
 
-If those command do not run, you can find the apk in `bazelbin/android/demo/install.runfiles/player/android/demo/demo.apk` and drag this apk onto the emulated device. This will install it. ( you may need to swipe on the device to see the application)
+Verify `ANDROID_NDK_HOME` is properly set to the NDK root (ex: `/Users/{user}/Library/Android/sdk/ndk/26.1.10909125/`).
 
+#### Android Demo app failed to install
 
+If `just start-android-demo` (`bazel mobile-install //android/demo`) fails, there may be a few causes.
 
-## Troubleshooting Guide
+1. No devices connected to `adb`
 
-
-
-### 1. If you are seeing issues around Toolchain and sdk
-Check your SDK and NDK versions in SDK Manager in Android Studio. As well as your `ANDROID_HOME` and `ANDROID_NDK_HOME` in your bash or zsh profiles to make sure they are properly set.
-
-
-### 2. If you are seeing Errors around babel:
+Error:
 ```
-could not find dependency @babel/helper-string-parser of @babel.plugin-transform-react-jsx/noode_modules/@babel/types
-Error: Analysis of target '//android/demo:demo' failed; build aborted.
+Error: No device connected to ddmlib
 ```
-Make sure you have done a `bundle install`
 
+Solution:
+Ensure an emulator, or real device, is running and connected to `adb`. Should be listed when `adb devices` is invoked.
 
+2. `mobile-install` `adb` is not configured properly
 
-### 3. Error Message :
+Error:
 ```
- ResourceProcessorBusyBox failed: error executing command bazel-out/darwin-opt-exec-2B5CBBC6/bin/external/bazel_tools/src/tools/android/java/com/google/devtools/build/android/ResourceProcessorBusyBox --tool LINK_STATIC_LIBRARY -- --aapt2 ... (remaining 17 arguments skipped)
+E/adb: Cannot run program "/usr/bin/adb": error=2, No such file or directory
+Got error installing using the Android Studio deployer: exit status 1
 ```
-**Possible Solution:** Check your SDK and NDK versions in SDK Manager in Android Studio. As well as your `ANDROID_HOME` and `ANDROID_NDK_HOME` in your bash or zsh profiles to make sure they are properly set.
 
-You can also do `ls $ANDROID_HOME/platforms` and make sure that there are no versions higher than 30.
+Solution:
+Follow step 2 of [Installing Demo App](#installing-demo-app) from above.
 
-### 3. Error Message :
+3. Failed to install
+
+Occasionally, the `mobile-install` command will yield an invalid APK -- this is usually remedied by changing a file to force a rebuild, but if persistent, the app can be installed manually through `adb`.
+
+```bash
+just start-android-demo-manual
 ```
-ModuleNotFoundError: No module named 'six.moves'
-...
-from six.moves import range  # pylint: disable=redefined-builtin
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-```
-**Possible Solution:** Check your `python --version` is less than 3 (recommended 2.7.18). If it is and you are still getting the error try running you bazel commands with the flag `--incompatible_use_python_toolchains=false`
-

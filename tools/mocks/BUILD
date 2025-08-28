@@ -1,5 +1,5 @@
-load(":generate_dsl_targets.bzl", "generate_all_dsl_mocks")
-load(":generate_mocks_manifest.bzl", "generate_mocks_manifest")
+load("@rules_java//java:java_library.bzl", "java_library")
+load("@rules_player//player:defs.bzl", generate_mocks_manifest = "generate_mocks_manifest")
 load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 
 PLUGIN_MOCKS = [
@@ -8,10 +8,10 @@ PLUGIN_MOCKS = [
     "pubsub",
     "reference-assets",
 ]
-
 filegroup(
     name = "all_mocks",
     srcs = ["//plugins/{}/mocks".format(plugin) for plugin in PLUGIN_MOCKS],
+    visibility = ["//visibility:public"],
 )
 
 generate_mocks_manifest(
@@ -30,6 +30,8 @@ npm_package(
     tags = ["do-not-publish"],
 )
 
+# TODO: This is being bundled where-ever relied on,
+#  should publish or not include in transitive scope
 java_library(
     name = "jar",
     resource_strip_prefix = "tools",

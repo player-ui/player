@@ -15,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 internal class ErrorStateTest : NodeBaseTest() {
-
     private val errorState by lazy {
         ErroneousState(node)
     }

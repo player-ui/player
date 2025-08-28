@@ -1,12 +1,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
-load("@build_constants//:constants.bzl", "VERSION")
-load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
-load("@rules_kotlin//kotlin:core.bzl", "kt_kotlinc_options")
-load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
-load("@rules_player//kotlin:defs.bzl", "kt_jvm_junit5_test", "lint")
-load("@rules_kotlin//kotlin:core.bzl", "kt_compiler_plugin")
-load("//jvm:defs.bzl", "distribution")
-load(":deps.bzl", "main_deps", "main_exports", "main_resources", "test_deps")
+load("@rules_java//java:java_import.bzl", "java_import")
+load("@rules_jvm_external//:defs.bzl", "artifact")
+load("//android:defs.bzl", "kt_android")
 
 string_flag(
     name = "runtime",
@@ -33,68 +28,73 @@ config_setting(
     flag_values = {":runtime": "hermes"},
 )
 
-kt_android_library(
-    name = "player_android",
-    srcs = glob(["src/main/java/**/*.kt"]),
-    custom_package = "com.intuit.playerui.android",
-    manifest = ":src/main/AndroidManifest.xml",
-    resource_files = glob(["src/main/res/**"]),
-    resources = main_resources,
-    plugins = [":jetpack_compose_compiler_plugin"],
-    deps = main_deps,
-)
-
-kt_compiler_plugin(
-    name = "jetpack_compose_compiler_plugin",
-    id = "androidx.compose.compiler",
-    target_embedded_compiler = True,
-    visibility = ["//visibility:public"],
-    deps = ["@maven//:androidx_compose_compiler_compiler"],
-)
-
-android_library(
-    name = "player",
-    custom_package = "com.intuit.playerui.android",
-    manifest = ":src/main/AndroidManifest.xml",
-    resource_files = glob(["src/main/res/**"]),
-    tags = ["maven_coordinates=com.intuit.playerui:android:aar:%s" % VERSION],
-    visibility = ["//visibility:public"],
-    exports = [":player_android"] + main_exports,
-    deps = main_deps,
-)
-
-distribution(
-    name = "player",
-    maven_coordinates = "com.intuit.playerui:android:%s" % VERSION,
-)
-
-kt_jvm_junit5_test(
-    name = "player-tests",
-    srcs = glob(["src/test/java/**"]),
-    associates = [":player_android_kt"],
-    kotlinc_opts = "//jvm:test_options",
-    test_package = "com.intuit.playerui.android",
-    deps = [":player"] + test_deps,
-)
-
-lint(
-    name = "player",
-    srcs = glob(["src/**/*.kt"]),
-    lint_config = "//jvm:lint_config",
-)
-
+# TODO: Hack for compile-only deps
 java_import(
     name = "compose_compile_only",
-    jars = [],
+    jars = ["//jvm:empty.jar"],
     neverlink = True,
     tags = ["maven:compile-only"],
     deps = [
-        "@maven//:androidx_appcompat_appcompat",
-        "@maven//:androidx_activity_activity_compose",
-        "@maven//:androidx_compose_foundation_foundation",
-        "@maven//:androidx_compose_foundation_foundation_layout",
-        "@maven//:androidx_compose_runtime_runtime",
-        "@maven//:androidx_compose_ui_ui",
-        "@maven//:androidx_compose_ui_ui_tooling",
+        artifact("androidx.compose.material:material"),
     ]
+)
+
+main_exports = [
+    "//jvm/core",
+
+    artifact("androidx.databinding:viewbinding"),
+    artifact("androidx.transition:transition"),
+] + select({ # TODO: Runtime dependencies should probably not be exports
+    "//android/player:j2v8_runtime": ["//jvm/j2v8:j2v8-android"],
+    "//android/player:j2v8_debug_runtime": ["//jvm/j2v8:j2v8-android-debug"],
+    "//android/player:hermes_runtime": ["//jvm/hermes:hermes-android"],
+    "//conditions:default": [],
+})
+
+main_deps = main_exports + [
+    # JVM plugin deps
+    "//plugins/beacon/jvm",
+    "//plugins/pubsub/jvm",
+    "//plugins/coroutines/jvm",
+
+    artifact("androidx.constraintlayout:constraintlayout"),
+    artifact("androidx.lifecycle:lifecycle-viewmodel-ktx"),
+    artifact("androidx.lifecycle:lifecycle-runtime-ktx"),
+
+    # Compose deps (compile-only)
+    # TODO: Split out into actual compose module to link properly
+    ":compose_compile_only",
+]
+
+main_resources = [
+    # TS core deps
+    # TODO: Wrap as it's own plugin
+    "//plugins/partial-match-fingerprint/core:core_native_bundle",
+    # TODO: Wrap as it's own plugin
+    "//core/partial-match-registry:partial-match-registry_native_bundle",
+]
+
+unit_test_deps = [
+    "//jvm/testutils",
+    artifact("io.mockk:mockk"),
+    artifact("org.jetbrains.kotlinx:kotlinx-coroutines-test"),
+]
+
+instrumented_test_deps = [
+    "//android/testutils",
+    "//jvm/hermes:hermes-host",
+]
+
+
+kt_android(
+    # TODO: Maybe rename to player-android
+    name = "android",
+
+    main_deps = main_deps,
+    main_exports = main_exports,
+    main_resources = main_resources,
+    unit_test_deps = unit_test_deps,
+    instrumented_test_deps = instrumented_test_deps,
+    plugins = ["//android:jetpack_compose_compiler_plugin"],
+    unit_test_package = "com.intuit.playerui.android",
 )

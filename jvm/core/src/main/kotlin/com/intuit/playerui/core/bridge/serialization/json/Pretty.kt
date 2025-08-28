@@ -17,9 +17,13 @@ public val PrettyJson: Json = Json {
 }
 
 @InternalPlayerApi
-public inline fun <reified T> T.prettify(serializer: KSerializer<T> = PrettyJson.serializersModule.serializer()): String = PrettyJson.encodeToString(serializer, this)
+public inline fun <reified T> T.prettify(serializer: KSerializer<T> = PrettyJson.serializersModule.serializer()): String =
+    PrettyJson.encodeToString(serializer, this)
 
 @InternalPlayerApi
-public inline fun <reified T> T.prettyPrint(serializer: KSerializer<T> = PrettyJson.serializersModule.serializer(), printer: (String) -> Unit = ::println) {
+public inline fun <reified T> T.prettyPrint(
+    serializer: KSerializer<T> = PrettyJson.serializersModule.serializer(),
+    printer: (String) -> Unit = ::println,
+) {
     printer(prettify(serializer))
 }
