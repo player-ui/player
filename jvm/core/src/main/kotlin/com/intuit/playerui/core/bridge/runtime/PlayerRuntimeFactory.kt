@@ -2,6 +2,9 @@ package com.intuit.playerui.core.bridge.runtime
 
 import java.util.ServiceLoader
 
+internal const val RUNTIME_DETAILS_MSG =
+    "See https://player-ui.github.io/latest/getting-started?lang=android#js-runtime for more details"
+
 /** Factory of [Runtime] with a specific [T] of [PlayerRuntimeConfig] */
 public interface PlayerRuntimeFactory<out T : PlayerRuntimeConfig> {
     /** Creates a new [Runtime] optionally specifying a [block] configuring [T] */
@@ -32,6 +35,3 @@ public val runtimeContainers: List<PlayerRuntimeContainer> = PlayerRuntimeContai
 public val runtimeFactory: PlayerRuntimeFactory<*> = runtimeContainers.firstOrNull()?.factory ?: error(
     "Failed to find JS Player runtime implementation in the classpath: consider adding player runtime dependency. $RUNTIME_DETAILS_MSG"
 )
-
-internal const val RUNTIME_DETAILS_MSG =
-    "See https://player-ui.github.io/latest/getting-started?lang=android#js-runtime for more details"

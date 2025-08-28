@@ -8,6 +8,7 @@ main_exports = [
     artifact("org.jetbrains.kotlinx:kotlinx-coroutines-core"),
     artifact("org.jetbrains.kotlinx:kotlinx-serialization-json"),
 ]
+
 main_deps = main_exports + [
     # TODO: Pull from rules_kotlin when compiler version reflects Kotlin version
     # "@rules_kotlin//kotlin/compiler:kotlin-reflect"
@@ -20,7 +21,7 @@ main_resources = [
 
 # Test dependencies
 test_deps = [
-    "//jvm/testutils",
+    "//jvm/testutils:with-runtimes",
     "//plugins/beacon/jvm",
     "//plugins/common-types/jvm",
     "//plugins/reference-assets/jvm",

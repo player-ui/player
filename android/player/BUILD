@@ -1,4 +1,3 @@
-load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 load("@rules_java//java:java_import.bzl", "java_import")
 load("@rules_jvm_external//:defs.bzl", "artifact")
 load("//android:defs.bzl", "kt_android")
@@ -11,7 +10,7 @@ java_import(
     tags = ["maven:compile-only"],
     deps = [
         artifact("androidx.compose.material:material"),
-    ]
+    ],
 )
 
 main_exports = [
@@ -45,16 +44,14 @@ main_resources = [
 ]
 
 unit_test_deps = [
-    "//jvm/testutils",
+    "//jvm/testutils:with-runtimes",
     artifact("io.mockk:mockk"),
     artifact("org.jetbrains.kotlinx:kotlinx-coroutines-test"),
 ]
 
 instrumented_test_deps = [
-    "//android/testutils",
-    "//jvm/hermes:hermes-host",
+    "//android/testutils:with-runtimes",
 ]
-
 
 kt_android(
     # TODO: Maybe rename to player-android

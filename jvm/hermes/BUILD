@@ -19,6 +19,7 @@ main_deps = main_exports + [
 test_deps = [
     "@rules_kotlin//kotlin/compiler:kotlin-test",
     "//jvm/testutils",
+    ":hermes-host",
 ]
 
 kt_player_module(
