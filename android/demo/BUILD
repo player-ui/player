@@ -32,15 +32,15 @@ main_deps = [
     artifact("androidx.navigation:navigation-ui-ktx"),
     artifact("androidx.navigation:navigation-fragment-ktx"),
     artifact("com.afollestad.material-dialogs:core"),
-    # Unfortunately, native libs aren't included if this isn't specified (Bazel only issue)
-    artifact("com.eclipsesource.j2v8:j2v8"),
-    # For when hermes-android _isn't_ included
     artifact("com.facebook.soloader:soloader"),
     artifact("com.google.android.material:material"),
 ] + select({
-    "//android/player:j2v8_runtime": ["//jvm/j2v8:j2v8-android"],
-    "//android/player:hermes_runtime": ["//jvm/hermes:hermes-android"],
-    "//conditions:default": [],
+    ":j2v8_runtime": [
+        "//jvm/j2v8:j2v8-android",
+        # Unfortunately, native libs aren't included if this isn't specified (Bazel only issue)
+        artifact("com.eclipsesource.j2v8:j2v8"),
+    ],
+    ":hermes_runtime": ["//jvm/hermes:hermes-android"],
 })
 
 test_deps = [
