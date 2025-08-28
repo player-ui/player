@@ -1,18 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createAsyncTransform } from "..";
 import { Builder, NodeType, Node } from "@player-ui/player";
-import {
-  extractNodeFromPath,
-  requiresAssetWrapper,
-  traverseAndReplace,
-  unwrapAsset,
-} from "../utils";
-
-vi.mock("../utils");
-
-beforeEach(() => {
-  vi.mocked(requiresAssetWrapper).mockReturnValue(true);
-});
 
 describe("createAsyncTransform", () => {
   const asset = Builder.asset({
@@ -142,7 +130,6 @@ describe("createAsyncTransform", () => {
 
   describe("getNestedAsset - different node types", () => {
     it("should add the async node to an existing multi node", () => {
-      vi.mocked(requiresAssetWrapper).mockReturnValue(false);
       const nodeIdFn = vi.fn();
       nodeIdFn.mockReturnValue("async-node");
 
@@ -266,7 +253,6 @@ describe("createAsyncTransform", () => {
     });
 
     it("should default to adding the node as-is", () => {
-      vi.mocked(requiresAssetWrapper).mockReturnValue(false);
       const nodeIdFn = vi.fn();
       nodeIdFn.mockReturnValue("async-node");
 
@@ -392,19 +378,7 @@ describe("createAsyncTransform", () => {
       expect(onValueReceivedFuncion).toBeDefined();
     });
 
-    it("should use traverseAndReplace as the onValueReceived callback", async () => {
-      const actualImplementation =
-        await vi.importActual<typeof import("../utils")>("../utils");
-
-      vi.mocked(traverseAndReplace).mockImplementation(
-        actualImplementation.traverseAndReplace,
-      );
-      vi.mocked(unwrapAsset).mockImplementation(
-        actualImplementation.unwrapAsset,
-      );
-      vi.mocked(extractNodeFromPath).mockImplementation(
-        actualImplementation.extractNodeFromPath,
-      );
+    it("should use traverseAndReplace as the onValueReceived callback", () => {
       const result = onValueReceivedFuncion?.(asset);
       expect(result).toStrictEqual({
         override: true,
