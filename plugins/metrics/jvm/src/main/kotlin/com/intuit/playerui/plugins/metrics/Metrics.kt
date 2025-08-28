@@ -13,23 +13,25 @@ import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 
 internal class TimingSerializer : PolymorphicNodeWrapperSerializer<Timing>() {
-    override fun selectDeserializer(node: Node): KSerializer<out Timing> {
-        return when (node.getBoolean("completed")) {
-            true -> CompletedTiming.serializer()
-            false -> IncompleteTiming.serializer()
-            else -> throw PlayerException("Timing for metrics must either be completed or incomplete")
-        }
+    override fun selectDeserializer(node: Node): KSerializer<out Timing> = when (node.getBoolean("completed")) {
+        true -> CompletedTiming.serializer()
+        false -> IncompleteTiming.serializer()
+        else -> throw PlayerException("Timing for metrics must either be completed or incomplete")
     }
 }
 
 @Serializable(with = TimingSerializer::class)
-public sealed class Timing(override val node: Node) : NodeWrapper {
+public sealed class Timing(
+    override val node: Node,
+) : NodeWrapper {
     /** Time this duration started (ms) */
     public val startTime: Double? by NodeSerializableField(Double.serializer().nullable)
 }
 
 @Serializable(with = CompletedTiming.Serializer::class)
-public class CompletedTiming internal constructor(override val node: Node) : Timing(node) {
+public class CompletedTiming internal constructor(
+    override val node: Node,
+) : Timing(node) {
     public val completed: Boolean = true
 
     /** The time in (ms) that the process ended */
@@ -42,13 +44,17 @@ public class CompletedTiming internal constructor(override val node: Node) : Tim
 }
 
 @Serializable(with = IncompleteTiming.Serializer::class)
-public class IncompleteTiming internal constructor(override val node: Node) : Timing(node) {
+public class IncompleteTiming internal constructor(
+    override val node: Node,
+) : Timing(node) {
     public val completed: Boolean = false
+
     internal object Serializer : NodeWrapperSerializer<IncompleteTiming>(::IncompleteTiming)
 }
 
-public sealed class NodeMetrics(override val node: Node) : Timing(node) {
-
+public sealed class NodeMetrics(
+    override val node: Node,
+) : Timing(node) {
     /** The type of the flow-state  */
     public val stateType: String by NodeSerializableField(String.serializer())
 
@@ -57,7 +63,9 @@ public sealed class NodeMetrics(override val node: Node) : Timing(node) {
 }
 
 @Serializable(with = RenderMetrics.Serializer::class)
-public class RenderMetrics(override val node: Node) : NodeMetrics(node) {
+public class RenderMetrics(
+    override val node: Node,
+) : NodeMetrics(node) {
     /** Timing representing the initial render */
     public val render: Timing by NodeSerializableField(Timing.serializer())
 
@@ -68,7 +76,9 @@ public class RenderMetrics(override val node: Node) : NodeMetrics(node) {
 }
 
 @Serializable(with = MetricsFlow.Serializer::class)
-public class MetricsFlow(override val node: Node) : NodeWrapper {
+public class MetricsFlow(
+    override val node: Node,
+) : NodeWrapper {
     /** The id of the flow these metrics are for */
     public val id: String? by NodeSerializableField(String.serializer().nullable)
 
@@ -82,8 +92,11 @@ public class MetricsFlow(override val node: Node) : NodeWrapper {
 }
 
 @Serializable(with = PlayerFlowMetrics.Serializer::class)
-public class PlayerFlowMetrics(override val node: Node) : Timing(node) {
+public class PlayerFlowMetrics(
+    override val node: Node,
+) : Timing(node) {
     /** All metrics about a running flow */
     public val flow: MetricsFlow by NodeSerializableField(MetricsFlow.serializer())
+
     internal object Serializer : NodeWrapperSerializer<PlayerFlowMetrics>(::PlayerFlowMetrics)
 }

@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 
 internal class InvokableTest {
-
     private fun generateVarargs(n: Int) = (0 until n).map { 1 }.toTypedArray()
 
+    @Suppress("ktlint:standard:max-line-length", "ktlint:standard:function-literal", "ktlint:standard:binary-expression-wrapping", "ktlint:standard:argument-list-wrapping", "ktlint:standard:chain-method-continuation")
     @Test
     fun `test invokeVararg all the arities`() {
         assertEquals(0, { 0 }.invokeVararg(*generateVarargs(0)))

@@ -5,9 +5,13 @@ import com.intuit.playerui.core.player.Player
 /** Player logger interface */
 public interface LoggerPlugin : PlayerPlugin {
     public fun trace(vararg args: Any?)
+
     public fun debug(vararg args: Any?)
+
     public fun info(vararg args: Any?)
+
     public fun warn(vararg args: Any?)
+
     public fun error(vararg args: Any?)
 
     override fun apply(player: Player) {}

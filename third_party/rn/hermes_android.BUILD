@@ -26,11 +26,10 @@ cc_import(
 alias(
     name = "libhermes_pulled",
     actual = select({
-        "@player//:arm64-v8a": ":arm64-v8a_libhermes",
-        "@player//:armeabi-v7a": ":armeabi-v7a_libhermes",
-        "@player//:x86": ":x86_libhermes",
-        "@player//:x86_64": ":x86_64_libhermes",
-        "//conditions:default": ":empty",
+        "@player//:android-arm64-v8a": ":arm64-v8a_libhermes",
+        "@player//:android-armeabi-v7a": ":armeabi-v7a_libhermes",
+        "@player//:android-x86": ":x86_libhermes",
+        "@player//:android-x86_64": ":x86_64_libhermes",
     }),
     visibility = ["//visibility:public"],
 )

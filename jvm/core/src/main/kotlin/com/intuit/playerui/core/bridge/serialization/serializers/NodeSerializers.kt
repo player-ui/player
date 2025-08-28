@@ -14,7 +14,6 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
 public class NodeSerializer : KSerializer<Node> {
-
     private val structureSerializer = MapSerializer(String.serializer(), GenericSerializer())
 
     override val descriptor: SerialDescriptor = structureSerializer.descriptor
@@ -41,13 +40,13 @@ public open class NodeWrapperSerializer<T : NodeWrapper>(
     final override fun serialize(encoder: Encoder, value: T): Unit = NodeSerializer().serialize(encoder, value.node)
 
     public companion object {
-        public operator fun <T : NodeWrapper> invoke(factory: (Node) -> T): NodeWrapperSerializer<T> = object : NodeWrapperSerializer<T>(factory) {}
+        public operator fun <T : NodeWrapper> invoke(factory: (Node) -> T): NodeWrapperSerializer<T> =
+            object : NodeWrapperSerializer<T>(factory) {}
     }
 }
 
 public abstract class PolymorphicNodeWrapperSerializer<T : NodeWrapper> :
     NodeWrapperSerializer<T>({ throw SerializationException("factory should never be used for polymorphic node deserialization") }) {
-
     final override fun deserialize(decoder: Decoder): T = decoder
         .requireNodeDecoder()
         .decodeNode()

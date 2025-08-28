@@ -12,8 +12,7 @@ import org.graalvm.polyglot.Value
 
 @Serializer(forClass = Value::class)
 internal object GraalValueSerializer : KSerializer<Value> {
-    override fun deserialize(decoder: Decoder): Value =
-        (decoder as AbstractGraalDecoder).value
+    override fun deserialize(decoder: Decoder): Value = (decoder as AbstractGraalDecoder).value
 
     override val descriptor: SerialDescriptor =
         buildClassSerialDescriptor("org.graalvm.polyglot.Value")

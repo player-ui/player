@@ -9,8 +9,9 @@ import com.intuit.playerui.core.player.state.PlayerFlowState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-internal class PlayerCompletable(private val completable: Completable<PlayerFlowState?>) : Completable<CompletedState> {
-
+internal class PlayerCompletable(
+    private val completable: Completable<PlayerFlowState?>,
+) : Completable<CompletedState> {
     constructor(promise: Node) : this(Promise(promise))
 
     constructor(promise: Promise) : this(promise.toCompletable(PlayerFlowState.serializer()))

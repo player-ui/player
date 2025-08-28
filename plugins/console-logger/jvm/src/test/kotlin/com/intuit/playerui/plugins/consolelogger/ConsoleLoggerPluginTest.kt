@@ -12,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
 internal class ConsoleLoggerPluginTest : RuntimeTest() {
-
     @MockK(relaxed = true)
     lateinit var logger: LoggerPlugin
 

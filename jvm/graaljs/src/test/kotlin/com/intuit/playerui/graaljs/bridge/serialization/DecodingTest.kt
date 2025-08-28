@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 internal class PrimitiveDecoding : GraalTest() {
-
     @Test
     fun `decode string primitive`() = format.context.blockingLock {
         Assertions.assertEquals("hello", format.decodeFromGraalValue(eval("js", "'hello'")))
@@ -43,7 +42,6 @@ internal class PrimitiveDecoding : GraalTest() {
 }
 
 internal class FunctionDecoding : GraalTest() {
-
     @Test fun `decode typed lambda`() = format.context.blockingLock {
         val function = ProxyExecutable {
             "${it[0].asString()}: ${it[1].asInt()}"
@@ -87,11 +85,12 @@ internal class FunctionDecoding : GraalTest() {
         Assertions.assertEquals("PLAYER: 1", function.execute(eval("js", "'PLAYER'"), eval("js", "1")))
         Assertions.assertEquals(
             "PLAYER: 2",
-            format.decodeFromGraalValue<Container>(
-                eval("js", "new Object()").also {
-                    it.putMember("method", function)
-                },
-            ).method("PLAYER", 2),
+            format
+                .decodeFromGraalValue<Container>(
+                    eval("js", "new Object()").also {
+                        it.putMember("method", function)
+                    },
+                ).method("PLAYER", 2),
         )
     }
 }

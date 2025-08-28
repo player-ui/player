@@ -46,11 +46,10 @@ cc_import(
 alias(
     name = "libfbjni",
     actual = select({
-        "@player//:arm64-v8a": ":arm64-v8a_libfbjni",
-        "@player//:armeabi-v7a": ":armeabi-v7a_libfbjni",
-        "@player//:x86": ":x86_libfbjni",
-        "@player//:x86_64": ":x86_64_libfbjni",
-        "//conditions:default": ":empty",
+        "@player//:android-arm64-v8a": ":arm64-v8a_libfbjni",
+        "@player//:android-armeabi-v7a": ":armeabi-v7a_libfbjni",
+        "@player//:android-x86": ":x86_libfbjni",
+        "@player//:android-x86_64": ":x86_64_libfbjni",
     }),
     visibility = ["//visibility:public"],
 )
@@ -58,11 +57,10 @@ alias(
 alias(
     name = "libc++_shared",
     actual = select({
-        "@player//:arm64-v8a": ":arm64-v8a_libc++_shared",
-        "@player//:armeabi-v7a": ":armeabi-v7a_libc++_shared",
-        "@player//:x86": ":x86_libc++_shared",
-        "@player//:x86_64": ":x86_64_libc++_shared",
-        "//conditions:default": ":empty",
+        "@player//:android-arm64-v8a": ":arm64-v8a_libc++_shared",
+        "@player//:android-armeabi-v7a": ":armeabi-v7a_libc++_shared",
+        "@player//:android-x86": ":x86_libc++_shared",
+        "@player//:android-x86_64": ":x86_64_libc++_shared",
     }),
     visibility = ["//visibility:public"],
 )

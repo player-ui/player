@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test
 
 @ExperimentalCoroutinesApi
 internal class PlayerHooksIntegrationTest : PlayerTest() {
-
     @Test fun `test hook integration`() = runBlockingTest {
         var didTapSuccessfully = false
 

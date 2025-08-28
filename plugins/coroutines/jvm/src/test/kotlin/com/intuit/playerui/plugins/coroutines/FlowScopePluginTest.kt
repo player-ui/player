@@ -26,7 +26,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
 internal class FlowScopePluginTest {
-
     private val scope = CoroutineScope(Dispatchers.Default)
 
     @MockK lateinit var player: Player
@@ -52,7 +51,9 @@ internal class FlowScopePluginTest {
     }
 
     private fun transitionToInProgress() = stateTap.invoke(inProgressState)
+
     private fun transitionToEnd() = stateTap.invoke(completedState)
+
     private fun transitionToReleased() = stateTap.invoke(ReleasedState)
 
     @Test fun testNewScope() {

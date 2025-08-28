@@ -10,7 +10,9 @@ export const Collection = (props: CollectionAsset) => {
           <ReactAsset {...props.label} />
         </h3>
       )}
-      {props.values?.map((a) => <ReactAsset key={a.asset.id} {...a} />)}
+      {props.values?.map((a) => (
+        <ReactAsset key={a.asset.id} {...a} />
+      ))}
     </div>
   );
 };

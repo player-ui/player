@@ -1,7 +1,5 @@
-load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("@rules_player//player:defs.bzl", create_base_dsl_config = "create_base_config")
-load("//tools/mocks:generate_dsl_targets.bzl", "generate_all_dsl_mocks")
+load("@rules_player//player:defs.bzl", create_base_dsl_config = "create_base_config", compile_mocks = "compile_mocks")
 
 npm_link_all_packages(name = "node_modules")
 
@@ -12,39 +10,21 @@ create_base_dsl_config(
     ],
 )
 
-MOCK_DIRS = [
-    "action",
-    "choice",
-    "collection",
-    "image",
-    "info",
-    "input",
-    "text",
-    "chat-message",
-]
-
-DSL_SRCS = glob(["{}/*.tsx".format(d) for d in MOCK_DIRS])
-
-generate_all_dsl_mocks(MOCK_DIRS)
-
-filegroup(
-    name = "compiled_mocks",
-    srcs = [":dsl_mocks_" + mock_dir for mock_dir in MOCK_DIRS],
-)
-
-filegroup(
-    name = "json_mocks",
-    srcs = glob(
-        ["**/*.json"],
-        exclude = ["package.json"],
-    ),
-)
-
-filegroup(
+compile_mocks(
     name = "mocks",
-    srcs = [
-        ":compiled_mocks",
-        ":json_mocks"
-    ] + DSL_SRCS,
-    visibility = ["//visibility:public"]
+    mock_dirs = [
+        "action",
+        "choice",
+        "collection",
+        "image",
+        "info",
+        "input",
+        "text",
+        "chat-message",
+    ],
+    dsl_config = ":dsl_config",
+    data = [
+        ":node_modules/@player-ui/reference-assets-cli-preset",
+        ":node_modules/@player-ui/reference-assets-plugin-components",
+    ]
 )

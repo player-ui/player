@@ -7,7 +7,9 @@ import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSeri
 import kotlinx.serialization.Serializable
 
 @Serializable(with = ConstantsController.Serializer::class)
-public class ConstantsController(override val node: Node) : NodeWrapper {
+public class ConstantsController(
+    override val node: Node,
+) : NodeWrapper {
     private val addConstants: Invokable<Unit>? by NodeSerializableFunction()
     private val getConstants: Invokable<Any?>? by NodeSerializableFunction()
     private val setTemporaryValues: Invokable<Unit>? by NodeSerializableFunction()
@@ -28,9 +30,11 @@ public class ConstantsController(override val node: Node) : NodeWrapper {
      * @param namespace namespace values were loaded under (defined in the plugin)
      * @param fallback Optional - if key doesn't exist in namespace what to return (will return unknown if not provided)
      */
-    public fun getConstants(key: String, namespace: String, fallback: Any? = null): Any? {
-        return getConstants?.invoke(key, namespace, fallback)
-    }
+    public fun getConstants(
+        key: String,
+        namespace: String,
+        fallback: Any? = null,
+    ): Any? = getConstants?.invoke(key, namespace, fallback)
 
     /**
      * Function to set values to temporarily override certain keys in the permanent store

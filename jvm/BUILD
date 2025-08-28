@@ -1,10 +1,11 @@
+load("@rules_jvm_external//:defs.bzl", "artifact")
 load("@rules_kotlin//kotlin:core.bzl", "define_kt_toolchain", "kt_compiler_plugin", "kt_kotlinc_options")
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@rules_kotlin//kotlin:lint.bzl", "ktlint_config")
-load("//jvm/dependencies:versions.bzl", "versions")
 
 exports_files([
     "pom.tpl",
+    "empty.jar",
 ])
 
 kt_compiler_plugin(
@@ -21,10 +22,9 @@ kt_jvm_library(
     name = "kotlin_serialization",
     srcs = [],
     exported_compiler_plugins = [":serialization_plugin"],
-    tags = ["maven_coordinates=org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:%s" % versions.kotlin.serialization],
     visibility = ["//visibility:public"],
     exports = [
-        "@maven//:org_jetbrains_kotlinx_kotlinx_serialization_core_jvm",
+        artifact("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm"),
     ],
 )
 
@@ -56,12 +56,14 @@ kt_kotlinc_options(
 
 ktlint_config(
     name = "lint_config",
+    editorconfig = "//:.editorconfig",
     visibility = ["//visibility:public"],
 )
 
 define_kt_toolchain(
     name = "kotlin_toolchain",
-    api_version = "1.7",
+    api_version = "1.8",
     kotlinc_options = ":test_options",
-    language_version = "1.7",
+    language_version = "1.8",
+    experimental_use_abi_jars = True,
 )

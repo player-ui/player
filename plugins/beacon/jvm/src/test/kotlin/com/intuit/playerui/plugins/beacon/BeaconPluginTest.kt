@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestTemplate
 
 internal class BeaconPluginTest : RuntimePluginTest<BeaconPlugin>() {
-
     override fun buildPlugin() = BeaconPlugin()
 
     @TestTemplate
@@ -174,8 +173,12 @@ internal class BeaconPluginTest : RuntimePluginTest<BeaconPlugin>() {
         var beaconed: JsonElement? = null
         var beaconed2: JsonElement? = null
 
-        plugin.registerHandler { beaconed = Json.parseToJsonElement(it.replace(Regex("\"timestamp\":[0-9]*,"), "\"timestamp\":\"TIMESTAMP\",")) }
-        plugin.registerHandler { beaconed2 = Json.parseToJsonElement(it.replace(Regex("\"timestamp\":[0-9]*,"), "\"timestamp\":\"TIMESTAMP\",")) }
+        plugin.registerHandler {
+            beaconed = Json.parseToJsonElement(it.replace(Regex("\"timestamp\":[0-9]*,"), "\"timestamp\":\"TIMESTAMP\","))
+        }
+        plugin.registerHandler {
+            beaconed2 = Json.parseToJsonElement(it.replace(Regex("\"timestamp\":[0-9]*,"), "\"timestamp\":\"TIMESTAMP\","))
+        }
 
         val action = "clicked"
         val element = "button"

@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class J2V8FormatTest : J2V8Test() {
-
     @Test fun `encode simple map into V8Object with explicit serializers`() = format.v8.evaluateInJSThreadBlocking(runtime) {
         val map = mapOf(
             "one" to 1,
@@ -91,7 +90,9 @@ internal class J2V8FormatTest : J2V8Test() {
     }
 
     @Test fun `decode into Node backed serializable`() = format.v8.evaluateInJSThreadBlocking(runtime) {
-        data class Simple(override val node: Node) : NodeWrapper {
+        data class Simple(
+            override val node: Node,
+        ) : NodeWrapper {
             fun increment(value: Int) = node.getInvokable<Int>("increment")!!(value)
         }
 

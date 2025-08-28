@@ -13,9 +13,11 @@ public class NodeSyncBailHook2<T1, T2, R>(
     override val node: Node,
     private val serializer1: KSerializer<T1>,
     private val serializer2: KSerializer<T2>,
-) : SyncBailHook<(HookContext, T1, T2) -> BailResult<R>, R>(), NodeHook<R?> {
-
-    init { init(serializer1, serializer2) }
+) : SyncBailHook<(HookContext, T1, T2) -> BailResult<R>, R>(),
+    NodeHook<R?> {
+    init {
+        init(serializer1, serializer2)
+    }
 
     override fun call(context: HookContext, serializedArgs: Array<Any?>): R? {
         require(serializedArgs.size == 2)
@@ -29,13 +31,14 @@ public class NodeSyncBailHook2<T1, T2, R>(
 
     public inline fun tap(noinline callback: (T1?, T2?) -> BailResult<R>): String? = tap(callingStackTraceElement.toString(), callback)
 
-    public inline fun tap(noinline callback: (HookContext, T1?, T2?) -> BailResult<R>): String? = tap(callingStackTraceElement.toString(), callback)
+    public inline fun tap(noinline callback: (HookContext, T1?, T2?) -> BailResult<R>): String? =
+        tap(callingStackTraceElement.toString(), callback)
 
     internal class Serializer<T1, T2, R>(
         private val serializer1: KSerializer<T1>,
         private val serializer2: KSerializer<T2>,
         private val `_`: KSerializer<R>,
     ) : NodeWrapperSerializer<NodeSyncBailHook2<T1, T2, R>>({
-        NodeSyncBailHook2(it, serializer1, serializer2)
-    })
+            NodeSyncBailHook2(it, serializer1, serializer2)
+        })
 }

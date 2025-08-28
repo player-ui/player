@@ -198,7 +198,7 @@ and like this in the final schema:
 
 A `DSLSchema` Type is provided in order be able to customize a set of the acceptable data types and validator functions to be used for authoring the DSL data schema in your workspace. This is useful as it allows content authors to get realtime feedback on their data schema. It can catch any structural issues that may produce an invalid schema at compile time or produce a schema that uses functionality thats not available at runtime.
 
-_Note: A ready-to-use DSLSchema type is shipped with `@player-ui/reference-assets-components`. This type is predefined with the `DataType` and `ValidatorFunction` references inferred from the `@player-ui/common-types-plugin`. Next, you'll be presented the steps in its creation for reference._
+_Note: A ready-to-use DSLSchema type is shipped with `@player-ui/reference-assets-plugin-components`. This type is predefined with the `DataType` and `ValidatorFunction` references inferred from the `@player-ui/common-types-plugin`. Next, you'll be presented the steps in its creation for reference._
 
 The first step to fill in the `DSLSchema` type with your integration specific values is importing the `DSLSchema` type and the relevant helper types and utilities from `@player-tools/dsl`. For this example we are importing the `@player-ui/common-types-plugin` in order to use its data types and validators. Our first step is to generate the `DataType` and `ValidatorFunction` object types and references:
 

@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.TestTemplate
 
 internal class RuntimePerfTest : JSEngineTest() {
-
     @TestTemplate
     fun runObjectScript() {
         var name: String? = null

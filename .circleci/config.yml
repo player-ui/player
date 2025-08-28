@@ -32,14 +32,14 @@ executors:
     working_directory: ~/player
     resource_class: m4pro.medium
     macos:
-      xcode: 15.3.0
+      xcode: 16.4.0
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   android:
     machine:
       image: android:2024.04.1
     working_directory: ~/player
-    resource_class: large
+    resource_class: xlarge
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   benchmarks:
@@ -153,44 +153,15 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - macos/install-rosetta
-
       - run:
           name: Homebrew Dependencies
           command: |
             HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk lcov
-            wget -P /tmp/temurin https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u422-b05/OpenJDK8U-jdk_x64_mac_hotspot_8u422b05.pkg
-            sudo installer -pkg /tmp/temurin/OpenJDK8U-jdk_x64_mac_hotspot_8u422b05.pkg -target /
-
-      - restore_cache:
-          keys:
-            - android-tools-{{ arch }}-{{ checksum "scripts/install-android-tools.sh" }}
-
-      - run: echo 'export ANDROID_HOME=~/android-tools'  >> $BASH_ENV
-
-      - run:
-          name: Install Android tools
-          command: |
-            sh scripts/install-android-tools.sh
-            echo 'export ANDROID_SDK_HOME=$ANDROID_HOME'  >> $BASH_ENV
-            echo 'export ANDROID_NDK_HOME=$ANDROID_SDK_HOME/ndk/23.2.8568313'  >> $BASH_ENV
-            echo 'export PATH=$ANDROID_SDK_HOME/tools/bin:$PATH'  >> $BASH_ENV
-            echo 'export PATH=$ANDROID_SDK_HOME/tools:$PATH'  >> $BASH_ENV
-            echo 'export PATH=$ANDROID_SDK_HOME/platform-tools:$PATH'  >> $BASH_ENV
-            echo 'export PATH=$ANDROID_SDK_HOME/emulator:$PATH'  >> $BASH_ENV
-            source $BASH_ENV
-          environment:
-            JAVA_HOME: /Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home
-
-      - save_cache:
-          key: android-tools-{{ arch }}-{{ checksum "scripts/install-android-tools.sh" }}
-          paths:
-            - ~/android-tools
 
       - macos/preboot-simulator:
-          version: "17.4"
+          version: "18.5"
           platform: "iOS"
-          device: "iPhone 15"
+          device: "iPhone 16 Pro"
 
       - run: bazel build --config=ci-mac -- //ios/demo:PlayerUIDemo
 
@@ -292,33 +263,9 @@ jobs:
             sudo mv bazelisk /opt/bazelisk-v1.11.0 && \
             sudo ln -s /opt/bazelisk-v1.11.0/bazelisk /usr/local/bin/bazel
 
-      - run:
-          name: Install Android tools
-          command: |
-            rm -rf $ANDROID_HOME/build-tools/*
-            JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64 \
-              $ANDROID_HOME/tools/bin/sdkmanager "build-tools;33.0.1"\
-              "ndk;23.2.8568313" \
-              "system-images;android-33;default;x86_64"
-            echo "export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/23.2.8568313"  >> $BASH_ENV
-            source $BASH_ENV
-            echo "no" | avdmanager --verbose create avd -n test -k "system-images;android-33;default;x86_64" -g default
-             source $BASH_ENV
+      - run: ./scripts/android-ci-bazel-test.sh //android/demo:android_instrumentation_test
 
-      - run:
-          name: Launch emulator
-          command: |
-            emulator -avd test -delay-adb -verbose -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          background: true
-
-      - run:
-          name: Wait for emulator to start
-          command: |
-            circle-android wait-for-boot
-
-      - run: bazel test --config=ci -- //android/demo:android_instrumentation_test
-
-      - run: bazel test --config=ci --//android/player:runtime=hermes -- //android/demo:android_instrumentation_test
+      - run: ./scripts/android-ci-bazel-test.sh --//android/player:runtime=hermes //android/demo:android_instrumentation_test
 
       - run:
           when: always
@@ -348,9 +295,8 @@ jobs:
             - v1-bazel-cache-core-{{ .Branch }}
             - v1-bazel-cache-core-main
 
-      # union the bundle targets until //... doesnt explode analyzing jvm/android targets
       - run: |
-          BUNDLE_TARGETS=$(bazel query "kind(js_test, //plugins/...) union kind(js_test, //react/...) union kind(js_test, //core/...)" --output label 2>/dev/null | tr '\n' ' ')
+          BUNDLE_TARGETS=$(bazel query "kind(.*_test, //...) except filter('android|ios|swiftui', //...)" --output label 2>/dev/null | tr '\n' ' ')
           bazel coverage --combined_report=lcov --config=ci -- $BUNDLE_TARGETS
 
       - run:

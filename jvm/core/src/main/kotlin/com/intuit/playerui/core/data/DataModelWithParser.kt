@@ -10,16 +10,17 @@ import kotlinx.serialization.Serializable
 
 // TODO: Initial support for bindings as [String]s, expand this to support all [BindingLike] types
 // TODO: Evaluate the advantages between [Map] and [JsonObject]
+
 /** Data model handle that provides [get] and [set] functionality w/ binding resolution */
 @Serializable(Serializer::class)
-public class DataModelWithParser internal constructor(override val node: Node) : NodeWrapper {
+public class DataModelWithParser internal constructor(
+    override val node: Node,
+) : NodeWrapper {
     private val get: Invokable<Any?>? by NodeSerializableFunction()
     private val set: Invokable<Unit>? by NodeSerializableFunction()
 
     /** Retrieve specific section of the data model resolved from the [binding] */
-    public fun get(binding: Binding): Any? {
-        return get?.invoke(binding)
-    }
+    public fun get(binding: Binding): Any? = get?.invoke(binding)
 
     /** [set] each of the [Binding]s contained in the [transaction] */
     public fun set(transaction: List<List<Any?>>) {

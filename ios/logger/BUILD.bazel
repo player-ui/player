@@ -3,7 +3,7 @@ load("@rules_player//ios:defs.bzl", "ios_pipeline")
 ios_pipeline(
     name = "PlayerUILogger",
     resources = [],
-    deps = ["@swiftpkg_swift_hooks//:Sources_SwiftHooks"],
+    deps = ["@swiftpkg_swift_hooks//:SwiftHooks"],
     test_deps = [],
     hasUnitTests = True,
     hasViewInspectorTests = False,

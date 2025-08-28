@@ -12,7 +12,6 @@ import kotlinx.serialization.encoding.Encoder
 
 @Serializer(forClass = V8Value::class)
 internal object V8ValueSerializer : KSerializer<V8Value> {
-
     fun <T> conform(): KSerializer<T> = this as KSerializer<T>
 
     override val descriptor: SerialDescriptor =
@@ -22,6 +21,5 @@ internal object V8ValueSerializer : KSerializer<V8Value> {
         .requireNodeEncoder()
         .encodeValue(value)
 
-    override fun deserialize(decoder: Decoder): V8Value =
-        (decoder as AbstractV8Decoder).value
+    override fun deserialize(decoder: Decoder): V8Value = (decoder as AbstractV8Decoder).value
 }

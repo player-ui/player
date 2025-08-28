@@ -9,7 +9,6 @@ import kotlinx.serialization.Serializable
 
 /** Exists to provide a consistent interface for any structure that provides expression evaluation */
 public interface ExpressionEvaluator {
-
     /** Evaluate each of the [expressions] and return the result of the last [Expression] */
     public fun evaluate(expressions: List<String>): Any?
 }
@@ -30,8 +29,12 @@ public fun ExpressionEvaluator.evaluate(expression: Expression): Any? = when (ex
 }
 
 @Serializable(ExpressionController.Serializer::class)
-public class ExpressionController(override val node: Node) : NodeWrapper, ExpressionEvaluator {
+public class ExpressionController(
+    override val node: Node,
+) : NodeWrapper,
+    ExpressionEvaluator {
     private val evaluate: Invokable<Any>? by NodeSerializableFunction()
+
     override fun evaluate(expressions: List<String>): Any? = evaluate?.invoke(expressions)
 
     internal object Serializer : NodeWrapperSerializer<ExpressionController>(::ExpressionController)

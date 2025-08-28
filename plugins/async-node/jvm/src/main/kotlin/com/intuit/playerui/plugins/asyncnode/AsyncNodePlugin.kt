@@ -25,13 +25,14 @@ public typealias asyncNodeUpdate = Any?
 
 public typealias AsyncHandler = suspend (node: Node, callback: ((result: Any?) -> Unit)?) -> asyncNodeUpdate
 
-public class AsyncNodePlugin(private val asyncHandler: AsyncHandler? = null) : JSScriptPluginWrapper(pluginName, sourcePath = bundledSourcePath) {
-
+public class AsyncNodePlugin(
+    private val asyncHandler: AsyncHandler? = null,
+) : JSScriptPluginWrapper(PLUGIN_NAME, sourcePath = BUNDLED_SOURCE_PATH) {
     public lateinit var hooks: Hooks
 
     override fun apply(runtime: Runtime<*>) {
-        runtime.load(ScriptContext(script, bundledSourcePath))
-        instance = runtime.buildInstance("(new $pluginName({plugins: [new AsyncNodePlugin.AsyncNodePluginPlugin()]}))")
+        runtime.load(ScriptContext(script, BUNDLED_SOURCE_PATH))
+        instance = runtime.buildInstance("(new $PLUGIN_NAME({plugins: [new AsyncNodePlugin.AsyncNodePluginPlugin()]}))")
         hooks = instance.getSerializable("hooks", Hooks.serializer())
             ?: throw PlayerException("AsyncNodePlugin is not loaded correctly")
 
@@ -44,7 +45,9 @@ public class AsyncNodePlugin(private val asyncHandler: AsyncHandler? = null) : J
     }
 
     @Serializable(with = Hooks.Serializer::class)
-    public class Hooks internal constructor(override val node: Node) : NodeWrapper {
+    public class Hooks internal constructor(
+        override val node: Node,
+    ) : NodeWrapper {
         /** The hook right before the View starts resolving. Attach anything custom here */
         public val onAsyncNode: NodeAsyncParallelBailHook2<Node, (asyncNodeUpdate) -> Unit, asyncNodeUpdate> by
             NodeSerializableField(
@@ -72,8 +75,8 @@ public class AsyncNodePlugin(private val asyncHandler: AsyncHandler? = null) : J
     }
 
     private companion object {
-        private const val bundledSourcePath = "plugins/async-node/core/dist/AsyncNodePlugin.native.js"
-        private const val pluginName = "AsyncNodePlugin.AsyncNodePlugin"
+        private const val BUNDLED_SOURCE_PATH = "plugins/async-node/core/dist/AsyncNodePlugin.native.js"
+        private const val PLUGIN_NAME = "AsyncNodePlugin.AsyncNodePlugin"
     }
 }
 

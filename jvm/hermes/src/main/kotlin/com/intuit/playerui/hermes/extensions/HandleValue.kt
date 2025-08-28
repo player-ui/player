@@ -19,12 +19,14 @@ import kotlinx.serialization.DeserializationStrategy
 // thread, rather than these methods trying to figure out when they should defer to evaluateInJSThread, which should
 // help prevent inefficiencies trying to, possibly redundantly, defer to the runtime thread when the APIs require.
 
-context(RuntimeThreadContext) internal fun Any?.handleValue(format: JSIFormat): Any? = when (this) {
+context(RuntimeThreadContext)
+internal fun Any?.handleValue(format: JSIFormat): Any? = when (this) {
     is Value -> transform(format)
     else -> this
 }
 
-context(RuntimeThreadContext) private fun Value.transform(format: JSIFormat): Any? = when {
+context(RuntimeThreadContext)
+private fun Value.transform(format: JSIFormat): Any? = when {
     isUndefined() -> null
     isNull() -> null
     isBoolean() -> asBoolean()
@@ -39,7 +41,8 @@ context(RuntimeThreadContext) private fun Value.transform(format: JSIFormat): An
     else -> null
 }
 
-context(RuntimeThreadContext) internal fun Object.transform(format: JSIFormat): Any = format.runtime.evaluateInJSThreadBlocking {
+context(RuntimeThreadContext)
+internal fun Object.transform(format: JSIFormat): Any = format.runtime.evaluateInJSThreadBlocking {
     when {
         isArray(format.runtime) -> asArray(format.runtime).toList(format)
         isFunction(format.runtime) -> asFunction(format.runtime).toInvokable<Any?>(format, this@transform, format.serializer())
@@ -47,11 +50,13 @@ context(RuntimeThreadContext) internal fun Object.transform(format: JSIFormat): 
     }
 }
 
-context(RuntimeThreadContext) internal fun Object.filteredKeys(runtime: Runtime): Set<String> {
+context(RuntimeThreadContext)
+internal fun Object.filteredKeys(runtime: Runtime): Set<String> {
     val names = getPropertyNames(runtime)
     val size = names.size(runtime)
 
-    return (0 until size).map { i -> names.getValueAtIndex(runtime, i) }
+    return (0 until size)
+        .map { i -> names.getValueAtIndex(runtime, i) }
         // NOTE: since we don't have proper propname support, we just toString it - this may not be suitable for all use cases
         .map { it.toString(runtime) }
         .filter { !getProperty(runtime, it).isUndefined() }
@@ -64,11 +69,16 @@ internal fun Object.toNode(format: JSIFormat): Node = HermesNode(this, format.ru
     if (it.containsKey("id") && it.containsKey("type")) Asset(it) else it
 }
 
-context(RuntimeThreadContext) internal fun Array.toList(format: JSIFormat): List<Any?> = (0 until size(format.runtime))
+context(RuntimeThreadContext)
+internal fun Array.toList(format: JSIFormat): List<Any?> = (0 until size(format.runtime))
     .map { i -> getValueAtIndex(format.runtime, i) }
     .map { it.transform(format) }
 
-internal fun <R> Function.toInvokable(format: JSIFormat, thisVal: Object, deserializationStrategy: DeserializationStrategy<R>?): Invokable<R> = Invokable { args ->
+internal fun <R> Function.toInvokable(
+    format: JSIFormat,
+    thisVal: Object,
+    deserializationStrategy: DeserializationStrategy<R>?,
+): Invokable<R> = Invokable { args ->
     format.runtime.evaluateInJSThreadBlocking {
         try {
             val encodedArgs = args.map { format.encodeToRuntimeValue(it) }.toTypedArray()
@@ -82,7 +92,11 @@ internal fun <R> Function.toInvokable(format: JSIFormat, thisVal: Object, deseri
             }
         } catch (e: Throwable) {
             e.printStackTrace()
-            throw PlayerRuntimeException(format.runtime, "Error invoking JS function (${asValue(format.runtime).toString(format.runtime)}) with args (${args.joinToString(",")})", e)
+            throw PlayerRuntimeException(
+                format.runtime,
+                "Error invoking JS function (${asValue(format.runtime).toString(format.runtime)}) with args (${args.joinToString(",")})",
+                e,
+            )
         }
     }
 }
