@@ -12,7 +12,7 @@ main_resources = [
 ]
 
 test_deps = [
-    "//jvm/testutils",
+    "//jvm/testutils:with-runtimes",
     artifact("io.mockk:mockk"),
 ]
 

@@ -63,7 +63,19 @@ ktlint_config(
 define_kt_toolchain(
     name = "kotlin_toolchain",
     api_version = "1.8",
+    experimental_use_abi_jars = True,
     kotlinc_options = ":test_options",
     language_version = "1.8",
-    experimental_use_abi_jars = True,
+)
+
+# target encapsulating supported runtimes to test against
+kt_jvm_library(
+    name = "supported_runtimes",
+    visibility = ["//visibility:public"],
+    exports = [
+        # MARK: Disable GraalJS testing
+        # "//jvm/graaljs",
+        "//jvm/hermes:hermes-host",
+        "//jvm/j2v8:j2v8-all",
+    ],
 )

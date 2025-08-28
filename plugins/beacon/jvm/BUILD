@@ -14,10 +14,9 @@ main_resources = [
 ]
 
 test_deps = [
-    "//jvm/testutils",
+    "//jvm/testutils:with-runtimes",
     artifact("org.amshove.kluent:kluent"),
 ]
-
 
 kt_player_plugin(
     name = "beacon",
