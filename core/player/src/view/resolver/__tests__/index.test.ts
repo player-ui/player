@@ -58,7 +58,7 @@ describe("Async Node Resolution", () => {
     };
   });
 
-  it("should", () => {
+  it("should clear the cache for the async node and its parent when it is updated", () => {
     const beforeResolveFunction = vi.fn((node: Node.Node | null) => node);
 
     const resolver = new Resolver(simpleViewWithAsync, resolverOptions);
@@ -106,7 +106,7 @@ describe("Async Node Resolution", () => {
     );
   });
 
-  it("should also", () => {
+  it("should clear the cache for anything with a matching async node in its resolved list on update", () => {
     const beforeResolveFunction = vi.fn((node: Node.Node | null) => {
       // Add asyncNodesResolved to view to test tracking and invalidation of just the view.
       if (node?.type === NodeType.View) {
