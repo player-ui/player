@@ -1,3 +1,4 @@
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 load("@rules_android//android:rules.bzl", "android_binary")
 load("@rules_jvm_external//:defs.bzl", "artifact")
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
@@ -86,8 +87,8 @@ android_binary(
 kt_android_library(
     name = "demo_ui_test",
     srcs = glob(["src/androidTest/**/*.kt"]),
-    deps = test_deps + [":demo_lib"],
     kotlinc_opts = "//jvm:test_options",
+    deps = test_deps + [":demo_lib"],
 )
 
 android_binary(

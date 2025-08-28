@@ -124,8 +124,8 @@ To run:
    just start-android-demo
    ```
 
-   > [!NOTE]
-   > This is enough to pick up _any_ new changes since the app last installed. Additionally, the APK file can be found at `bazel-bin/android/demo/demo.apk`, which can be distributed and installed manually through ADB or dragging to your emulator
+> [!NOTE]
+> This is enough to pick up _any_ new changes since the app last installed. Additionally, the APK file can be found at `bazel-bin/android/demo/demo.apk`, which can be distributed and installed manually through ADB or dragging to your emulator
 
 ### Troubleshooting
 
