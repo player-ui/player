@@ -348,6 +348,7 @@ AndroidPlayer(asyncNodePlugin)
 - wrapperAssetType (Required) - The asset type that will contain the async content.
 - getNestedAsset (Optional) - Function to get any nested asset that will need to be extracted and kept when creating the wrapper asset. This is useful when combined with `flatten: true` to help chain async content with a single asset type.
 - getAsyncNodeId (Optional) - Function to get the id for the generated async node. By default it uses a format of `async-{asset.id}`
+- asyncNodePosition (Optional) - Where to place the async node relative to the asset from `getNestedAsset`. Defaults to `"last"`
 
 #### Usage
 
