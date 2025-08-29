@@ -35,13 +35,18 @@ export const BASE_PREFIX =
   // eslint-disable-next-line no-undef
   process.env.NODE_ENV === "production" ? "DOCS_BASE_PATH" : undefined;
 
+// Helper function to build paths with BASE_PREFIX when available
+const resolvedPath = (path) => {
+  return `${BASE_PREFIX ? `/${BASE_PREFIX}` : ""}${path}`;
+};
+
 // https://astro.build/config
 export default defineConfig({
   redirects: {
-    "/guides/getting-started": "/getting-started",
-    "/plugins/common-types": "/plugins/core/common-types/",
-    "/tools/cli": "/capabilities/cli/",
-    "/tools/storybook": "/capabilities/storybook/",
+    "/guides/getting-started": resolvedPath("/getting-started/"),
+    "/plugins/common-types": resolvedPath("/plugins/core/common-types/"),
+    "/tools/cli": resolvedPath("/capabilities/cli/"),
+    "/tools/storybook": resolvedPath("/capabilities/storybook/"),
   },
   integrations: [
     react(),
@@ -134,6 +139,10 @@ export default defineConfig({
             {
               label: "iOS Plugins",
               autogenerate: { directory: "plugins/iOS" },
+            },
+            {
+              label: "Language Plugins",
+              autogenerate: { directory: "plugins/language" },
             },
             {
               label: "React Plugins",

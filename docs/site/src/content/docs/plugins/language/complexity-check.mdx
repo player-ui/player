@@ -1,0 +1,80 @@
+---
+title: Complexity Check Plugin
+---
+
+import { PackageManagers } from "starlight-package-managers";
+
+Generate diagnostics for content complexity using `@player-tools/complexity-check-plugin`. The plugin analyzes your Player Content and calculates complexity based on asset types, nesting depth, and overall structure to provide a single complexity score per file.
+
+## Usage
+
+Install the plugin:
+
+<PackageManagers pkg="@player-tools/complexity-check-plugin" />
+
+### Basic Configuration
+
+```js
+const COMPLEXITY_WARNING_THRESHOLD = 1000;
+
+export default {
+  plugins: [
+    new ComplexityCheck({
+      maxAcceptableComplexity: 20000,
+      maxWarningLevel: COMPLEXITY_WARNING_THRESHOLD,
+    }),
+  ],
+};
+```
+
+### Custom Asset Weights
+
+Override the default complexity weights for different asset types:
+
+```js
+new ComplexityCheck({
+  typeWeights: {
+    text: 5, // Add 5 for each text asset found
+    action: 25, // Add 25 for each action asset found
+  },
+});
+```
+
+### Default Weights
+
+The plugin uses base weights for different complexity factors. See the [complete list of weights](https://github.com/player-ui/tools/blob/main/language/complexity-check-plugin/src/complexity-check.ts#L18) in the source code.
+
+You can override these base weights using `baseWeightOverrides`:
+
+```js
+new ComplexityCheck({
+  baseWeightOverrides: {
+    modelGet: 8, // Increase model get complexity
+    template: 2, // Increase template complexity
+  },
+});
+```
+
+### Configuration Options
+
+- **`maxAcceptableComplexity`**: Maximum complexity before error (default: 10000)
+- **`maxWarningLevel`**: Complexity level that triggers warnings (default: 1000)
+- **`typeWeights`**: Custom complexity weights for different asset types
+- **`baseWeightOverrides`**: Override base complexity weights
+
+### Verbose Mode
+
+Enable verbose mode to see a detailed breakdown: `yarn run player json validate -v trace`
+
+This will output detailed information about how complexity is calculated.
+
+## Integration
+
+The ComplexityCheck plugin produces diagnostics like `Content complexity is 640` which can be consumed by the [Metrics Output Plugin](/plugins/language/metrics-output).
+
+```js
+// In your MetricsOutputPlugin configuration
+stats: {
+  complexity: extractFromDiagnostics(/Content complexity is (\d+)/, Number),
+}
+```
