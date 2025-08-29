@@ -24,6 +24,8 @@ export type AsyncTransformOptions = {
   getNestedAsset?: (node: Node.ViewOrAsset) => Node.Node | undefined;
   /** Function to get the id for the async node being generated. Defaults to creating an id with the format of async-<ASSET.ID> */
   getAsyncNodeId?: (node: Node.ViewOrAsset) => string;
+  /** Where to place the async node relative to the asset from `getNestedAsset`. Defaults to "last" */
+  asyncNodePosition?: "first" | "last";
 };
 
 const defaultGetNodeId = (node: Node.ViewOrAsset): string => {
@@ -47,6 +49,7 @@ export const createAsyncTransform = (
     getAsyncNodeId = defaultGetNodeId,
     path = ["values"],
     flatten = true,
+    asyncNodePosition = "last",
   } = options;
 
   const replaceNode = (node: Node.Node): Node.Node => {
@@ -73,19 +76,24 @@ export const createAsyncTransform = (
     const replaceFunction = flatten ? replacer : undefined;
     const asyncNode = Builder.asyncNode(id, flatten, replaceFunction);
 
-    let multiNode: Node.MultiNode | undefined;
+    let values: Node.Node[] = [asyncNode];
     if (asset) {
+      const otherValues = [];
       if (requiresAssetWrapper(asset)) {
-        const assetWrappedNode = Builder.assetWrapper(asset);
-        multiNode = Builder.multiNode(assetWrappedNode, asyncNode);
+        otherValues.push(Builder.assetWrapper(asset));
       } else if (asset.type === NodeType.MultiNode) {
-        multiNode = Builder.multiNode(...(asset.values as any[]), asyncNode);
+        otherValues.push(...asset.values);
       } else {
-        multiNode = Builder.multiNode(asset as any, asyncNode);
+        otherValues.push(asset);
       }
-    } else {
-      multiNode = Builder.multiNode(asyncNode);
+
+      values =
+        asyncNodePosition === "first"
+          ? [...values, ...otherValues]
+          : [...otherValues, ...values];
     }
+
+    const multiNode = Builder.multiNode(...(values as any[]));
 
     const wrapperAsset: Node.ViewOrAsset = Builder.asset({
       id: wrapperAssetType + "-" + id,
