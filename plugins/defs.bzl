@@ -75,7 +75,7 @@ def kt_player_plugin_wrapper(
         # deps
         main_exports = ["//jvm/core"],
         main_deps = ["//jvm/core"],
-        test_deps = ["//jvm/testutils"],
+        test_deps = ["//jvm/testutils:with-runtimes"],
 
         # distribution
         group = GROUP,
