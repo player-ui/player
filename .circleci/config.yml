@@ -16,7 +16,7 @@ orbs:
 executors:
   base:
     docker:
-      - image: docker.io/playerui/bazel-docker:13
+      - image: docker.io/playerui/bazel-docker:15
     working_directory: ~/player
     resource_class: xlarge
     environment:
@@ -44,7 +44,7 @@ executors:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   benchmarks:
     docker:
-      - image: docker.io/playerui/bazel-docker:13
+      - image: docker.io/playerui/bazel-docker:15
     working_directory: ~/player
     resource_class: large
     environment:
