@@ -1,3 +1,17 @@
+# 0.14.0-next.2 (Fri Aug 29 2025)
+
+#### 🐛 Bug Fix
+
+- Fix Android publishing [#715](https://github.com/player-ui/player/pull/715) ([@sugarmanz](https://github.com/sugarmanz))
+- Docs: Adding pages for complexity and metrics plugins, fixing redirects, restoring getting-started content [#707](https://github.com/player-ui/player/pull/707) ([@kharrop](https://github.com/kharrop))
+
+#### Authors: 2
+
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+
+---
+
 # 0.14.0-next.1 (Thu Aug 28 2025)
 
 ### Release Notes
