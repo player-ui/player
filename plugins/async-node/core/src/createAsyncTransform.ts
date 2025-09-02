@@ -76,7 +76,7 @@ export const createAsyncTransform = (
     const replaceFunction = flatten ? replacer : undefined;
     const asyncNode = Builder.asyncNode(id, flatten, replaceFunction);
 
-    let values: Node.Node[] = [asyncNode];
+    const values: Node.Node[] = [asyncNode];
     if (asset) {
       const otherValues = [];
       if (requiresAssetWrapper(asset)) {
@@ -87,10 +87,11 @@ export const createAsyncTransform = (
         otherValues.push(asset);
       }
 
-      values =
-        asyncNodePosition === "prepend"
-          ? [...values, ...otherValues]
-          : [...otherValues, ...values];
+      if (asyncNodePosition === "prepend") {
+        values.unshift(...otherValues);
+      } else {
+        values.push(...otherValues);
+      }
     }
 
     const multiNode = Builder.multiNode(...(values as any[]));
