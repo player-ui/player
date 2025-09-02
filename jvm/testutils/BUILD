@@ -19,6 +19,7 @@ kt_player_module(
     main_exports = main_exports,
 )
 
+# For use locally, to automatically pull in *all* runtimes that should be tested against
 kt_jvm_library(
     name = "with-runtimes",
     visibility = ["//visibility:public"],

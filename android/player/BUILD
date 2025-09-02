@@ -50,7 +50,7 @@ unit_test_deps = [
 ]
 
 instrumented_test_deps = [
-    "//android/testutils:with-runtimes",
+    "//android/testutils:with-runtime",
 ]
 
 kt_android(

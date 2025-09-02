@@ -12,7 +12,7 @@ main_deps = main_exports + [
 ]
 
 instrumented_test_deps = [
-    "//android/testutils:with-runtimes",
+    "//android/testutils:with-runtime",
     "//tools/mocks:jar",
 ]
 
