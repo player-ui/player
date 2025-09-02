@@ -1,27 +1,7 @@
-load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 load("@rules_android//android:rules.bzl", "android_binary")
 load("@rules_jvm_external//:defs.bzl", "artifact")
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load("//android:defs.bzl", "kt_android")
-
-string_flag(
-    name = "runtime",
-    build_setting_default = "hermes",
-    values = [
-        "j2v8",
-        "hermes",
-    ],
-)
-
-config_setting(
-    name = "j2v8_runtime",
-    flag_values = {":runtime": "j2v8"},
-)
-
-config_setting(
-    name = "hermes_runtime",
-    flag_values = {":runtime": "hermes"},
-)
 
 main_deps = [
     "//jvm/utils",
@@ -34,16 +14,10 @@ main_deps = [
     artifact("com.afollestad.material-dialogs:core"),
     artifact("com.facebook.soloader:soloader"),
     artifact("com.google.android.material:material"),
-] + select({
-    ":j2v8_runtime": [
-        "//jvm/j2v8:j2v8-android",
-        # Unfortunately, native libs aren't included if this isn't specified (Bazel only issue)
-        artifact("com.eclipsesource.j2v8:j2v8"),
-    ],
-    ":hermes_runtime": ["//jvm/hermes:hermes-android"],
-})
+]
 
 test_deps = [
+    # Don't pull in runtime, that'll be included by the app
     "//android/testutils",
 
     artifact("androidx.test.espresso:espresso-intents"),
@@ -81,7 +55,14 @@ android_binary(
         ["src/main/res/**"],
         allow_empty = True,
     ),
-    deps = [":demo_lib"],
+    deps = [":demo_lib"] + select({
+        "//android:j2v8_runtime": [
+            "//jvm/j2v8:j2v8-android",
+            # Unfortunately, native libs aren't included if this isn't specified (Bazel only issue)
+            artifact("com.eclipsesource.j2v8:j2v8"),
+        ],
+        "//android:hermes_runtime": ["//jvm/hermes:hermes-android"],
+    }),
 )
 
 kt_android_library(
