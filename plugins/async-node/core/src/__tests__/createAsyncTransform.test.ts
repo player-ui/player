@@ -319,7 +319,7 @@ describe("createAsyncTransform", () => {
   });
 
   describe("async node position", () => {
-    it("should place the async node before the inner asset node when the asyncNodePosition is 'first'", () => {
+    it("should place the async node before the inner asset node when the asyncNodePosition is 'prepend'", () => {
       const transform = createAsyncTransform({
         transformAssetType: "chat-message",
         wrapperAssetType: "collection",
@@ -329,7 +329,7 @@ describe("createAsyncTransform", () => {
           type: NodeType.Empty,
         }),
         getAsyncNodeId: () => "async-node",
-        asyncNodePosition: "first",
+        asyncNodePosition: "prepend",
       });
       const result = transform(asset, {} as any, {} as any);
 
@@ -371,9 +371,9 @@ describe("createAsyncTransform", () => {
       });
     });
 
-    const options = ["last", undefined] as const;
+    const options = ["append", undefined] as const;
     it.each(options)(
-      "should place the async node after the inner asset node when the asyncNodePosition is 'last' or undefined",
+      "should place the async node after the inner asset node when the asyncNodePosition is 'append' or undefined",
       (position) => {
         const transform = createAsyncTransform({
           transformAssetType: "chat-message",

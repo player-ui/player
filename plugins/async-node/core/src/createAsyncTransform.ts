@@ -87,7 +87,7 @@ export const createAsyncTransform = (
         otherValues.push(asset);
       }
 
-      if (asyncNodePosition === "prepend") {
+      if (asyncNodePosition === "append") {
         values.unshift(...otherValues);
       } else {
         values.push(...otherValues);
