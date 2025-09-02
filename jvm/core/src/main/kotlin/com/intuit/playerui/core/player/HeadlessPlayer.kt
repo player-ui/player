@@ -145,7 +145,7 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
                 """Player created its own runtime ($runtime), but multiple runtimes are on the classpath: $runtimeContainers
                     |To avoid ambiguity, explicitly provide a runtime or remove extra runtime dependencies that could be bloating your app.
                     |$RUNTIME_DETAILS_MSG
-                """.trimMargin()
+                """.trimMargin(),
             )
         }
         runtime.checkBlockingThread = {
