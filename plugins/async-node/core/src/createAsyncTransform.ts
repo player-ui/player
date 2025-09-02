@@ -24,8 +24,8 @@ export type AsyncTransformOptions = {
   getNestedAsset?: (node: Node.ViewOrAsset) => Node.Node | undefined;
   /** Function to get the id for the async node being generated. Defaults to creating an id with the format of async-<ASSET.ID> */
   getAsyncNodeId?: (node: Node.ViewOrAsset) => string;
-  /** Where to place the async node relative to the asset from `getNestedAsset`. Defaults to "last" */
-  asyncNodePosition?: "first" | "last";
+  /** Where to place the async node relative to the asset from `getNestedAsset`. Defaults to "append" */
+  asyncNodePosition?: "append" | "prepend";
 };
 
 const defaultGetNodeId = (node: Node.ViewOrAsset): string => {
@@ -49,7 +49,7 @@ export const createAsyncTransform = (
     getAsyncNodeId = defaultGetNodeId,
     path = ["values"],
     flatten = true,
-    asyncNodePosition = "last",
+    asyncNodePosition = "append",
   } = options;
 
   const replaceNode = (node: Node.Node): Node.Node => {
@@ -88,7 +88,7 @@ export const createAsyncTransform = (
       }
 
       values =
-        asyncNodePosition === "first"
+        asyncNodePosition === "prepend"
           ? [...values, ...otherValues]
           : [...otherValues, ...values];
     }
