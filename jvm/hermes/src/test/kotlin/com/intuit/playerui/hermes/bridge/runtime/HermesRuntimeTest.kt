@@ -19,7 +19,7 @@ internal class HermesRuntimeTest : HermesTest() {
         runtime.release()
 
         assertEquals(
-            "[HermesRuntime] Runtime object has been released!",
+            "[Hermes] Runtime object has been released!",
             assertThrows<PlayerRuntimeException> {
                 runtime.execute("2 + 2")
             }.message,

@@ -21,11 +21,3 @@ java_import(
     name = "j2v8_linux",
     jars = [":j2v8_linux_x86_64-6.1.0.jar"],
 )
-
-java_import(
-    name = "j2v8_debugger_compile_only",
-    jars = ["//jvm:empty.jar"],
-    neverlink = True,
-    tags = ["maven:compile-only"],
-    deps = ["@maven//:com_github_AlexTrotsenko_j2v8_debugger"],
-)

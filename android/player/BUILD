@@ -1,32 +1,6 @@
-load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 load("@rules_java//java:java_import.bzl", "java_import")
 load("@rules_jvm_external//:defs.bzl", "artifact")
 load("//android:defs.bzl", "kt_android")
-
-string_flag(
-    name = "runtime",
-    build_setting_default = "j2v8",
-    values = [
-        "j2v8",
-        "j2v8-debug",
-        "hermes",
-    ],
-)
-
-config_setting(
-    name = "j2v8_runtime",
-    flag_values = {":runtime": "j2v8"},
-)
-
-config_setting(
-    name = "j2v8_debug_runtime",
-    flag_values = {":runtime": "j2v8-debug"},
-)
-
-config_setting(
-    name = "hermes_runtime",
-    flag_values = {":runtime": "hermes"},
-)
 
 # TODO: Hack for compile-only deps
 java_import(
@@ -36,7 +10,7 @@ java_import(
     tags = ["maven:compile-only"],
     deps = [
         artifact("androidx.compose.material:material"),
-    ]
+    ],
 )
 
 main_exports = [
@@ -44,12 +18,7 @@ main_exports = [
 
     artifact("androidx.databinding:viewbinding"),
     artifact("androidx.transition:transition"),
-] + select({ # TODO: Runtime dependencies should probably not be exports
-    "//android/player:j2v8_runtime": ["//jvm/j2v8:j2v8-android"],
-    "//android/player:j2v8_debug_runtime": ["//jvm/j2v8:j2v8-android-debug"],
-    "//android/player:hermes_runtime": ["//jvm/hermes:hermes-android"],
-    "//conditions:default": [],
-})
+]
 
 main_deps = main_exports + [
     # JVM plugin deps
@@ -75,16 +44,14 @@ main_resources = [
 ]
 
 unit_test_deps = [
-    "//jvm/testutils",
+    "//jvm/testutils:with-runtimes",
     artifact("io.mockk:mockk"),
     artifact("org.jetbrains.kotlinx:kotlinx-coroutines-test"),
 ]
 
 instrumented_test_deps = [
-    "//android/testutils",
-    "//jvm/hermes:hermes-host",
+    "//android/testutils:with-runtime",
 ]
-
 
 kt_android(
     # TODO: Maybe rename to player-android
