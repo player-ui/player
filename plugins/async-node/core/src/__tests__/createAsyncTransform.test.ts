@@ -318,6 +318,116 @@ describe("createAsyncTransform", () => {
     });
   });
 
+  describe("async node position", () => {
+    it("should place the async node before the inner asset node when the asyncNodePosition is 'prepend'", () => {
+      const transform = createAsyncTransform({
+        transformAssetType: "chat-message",
+        wrapperAssetType: "collection",
+        flatten: false,
+        path: ["array"],
+        getNestedAsset: () => ({
+          type: NodeType.Empty,
+        }),
+        getAsyncNodeId: () => "async-node",
+        asyncNodePosition: "prepend",
+      });
+      const result = transform(asset, {} as any, {} as any);
+
+      expect(result).toStrictEqual({
+        type: NodeType.Asset,
+        children: [
+          {
+            path: ["array"],
+            value: {
+              type: NodeType.MultiNode,
+              override: true,
+              parent: expect.anything(),
+              values: [
+                {
+                  parent: expect.anything(),
+                  type: NodeType.Async,
+                  flatten: false,
+                  onValueReceived: undefined,
+                  id: "async-node",
+                  value: {
+                    type: NodeType.Value,
+                    value: {
+                      id: "async-node",
+                    },
+                  },
+                },
+                {
+                  parent: expect.anything(),
+                  type: NodeType.Empty,
+                },
+              ],
+            },
+          },
+        ],
+        value: {
+          id: "collection-async-node",
+          type: "collection",
+        },
+      });
+    });
+
+    const options = ["append", undefined] as const;
+    it.each(options)(
+      "should place the async node after the inner asset node when the asyncNodePosition is 'append' or undefined",
+      (position) => {
+        const transform = createAsyncTransform({
+          transformAssetType: "chat-message",
+          wrapperAssetType: "collection",
+          flatten: false,
+          path: ["array"],
+          getNestedAsset: () => ({
+            type: NodeType.Empty,
+          }),
+          getAsyncNodeId: () => "async-node",
+          asyncNodePosition: position,
+        });
+        const result = transform(asset, {} as any, {} as any);
+
+        expect(result).toStrictEqual({
+          type: NodeType.Asset,
+          children: [
+            {
+              path: ["array"],
+              value: {
+                type: NodeType.MultiNode,
+                override: true,
+                parent: expect.anything(),
+                values: [
+                  {
+                    parent: expect.anything(),
+                    type: NodeType.Empty,
+                  },
+                  {
+                    parent: expect.anything(),
+                    type: NodeType.Async,
+                    flatten: false,
+                    onValueReceived: undefined,
+                    id: "async-node",
+                    value: {
+                      type: NodeType.Value,
+                      value: {
+                        id: "async-node",
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+          value: {
+            id: "collection-async-node",
+            type: "collection",
+          },
+        });
+      },
+    );
+  });
+
   describe("onValueReceived callback setup", () => {
     let transformedAsset: Node.Node;
     let onValueReceivedFuncion: ((node: Node.Node) => Node.Node) | undefined;
