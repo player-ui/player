@@ -1,3 +1,23 @@
+# 0.14.0-next.3 (Thu Sep 04 2025)
+
+### Release Notes
+
+#### add asyncNodePosition to createAsyncTransform options ([#714](https://github.com/player-ui/player/pull/714))
+
+- Added `asyncNodePosition` as an option to `createAsyncTransform`. This lets user choose if the generated async node goes to the top or bottom of the generated multi-node.
+
+---
+
+#### 🐛 Bug Fix
+
+- add asyncNodePosition to createAsyncTransform options [#714](https://github.com/player-ui/player/pull/714) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 1
+
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
 # 0.14.0-next.2 (Fri Aug 29 2025)
 
 #### 🐛 Bug Fix
