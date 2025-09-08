@@ -11,7 +11,7 @@ main_resources = [
 ]
 
 test_deps = [
-    "//jvm/testutils",
+    "//jvm/testutils:with-runtimes",
 ]
 
 kt_player_plugin(

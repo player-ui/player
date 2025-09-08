@@ -16,21 +16,16 @@ main_deps = main_exports + [
     artifact("com.facebook.soloader:soloader"),
 ]
 
-main_resources = glob(["src/main/resources/**"]) + [
-    # TODO: These should probably just be dependencies of headless
-    "//core/player:player_native_bundle",
-]
-
 test_deps = [
     "@rules_kotlin//kotlin/compiler:kotlin-test",
     "//jvm/testutils",
+    ":hermes-host",
 ]
 
 kt_player_module(
     name = "hermes",
     main_deps = main_deps,
     main_exports = main_exports,
-    main_resources = main_resources,
     test_deps = test_deps,
     test_package = "com.intuit.playerui",
 )

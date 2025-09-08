@@ -12,7 +12,7 @@ main_resources = [
 ]
 
 test_deps = [
-    "//jvm/testutils",
+    "//jvm/testutils:with-runtimes",
     artifact("org.amshove.kluent:kluent"),
 ]
 
@@ -20,7 +20,7 @@ kt_player_plugin(
     name = "expression",
     main_deps = main_deps,
     main_exports = main_exports,
-    main_resources = main_resources,    
+    main_resources = main_resources,
     test_deps = test_deps,
     test_package = "com.intuit.playerui.plugins.expression",
 )
