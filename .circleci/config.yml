@@ -231,8 +231,6 @@ jobs:
 
       - run: bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
-      - run: bazel test --config=ci --//android:runtime=j2v8 -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui|core|react", //...)') -//android/demo:android_instrumentation_test
-
       - run:
           when: always
           command: |
@@ -264,8 +262,6 @@ jobs:
             sudo ln -s /opt/bazelisk-v1.11.0/bazelisk /usr/local/bin/bazel
 
       - run: ./scripts/android-ci-bazel-test.sh //android/demo:android_instrumentation_test
-
-      - run: ./scripts/android-ci-bazel-test.sh --//android:runtime=j2v8 //android/demo:android_instrumentation_test
 
       - run:
           when: always

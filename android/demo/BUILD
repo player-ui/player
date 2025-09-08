@@ -4,6 +4,7 @@ load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load("//android:defs.bzl", "kt_android")
 
 main_deps = [
+    "//jvm/hermes:hermes-android",
     "//jvm/utils",
     "//plugins/reference-assets/android",
     "//plugins/common-types/jvm",
@@ -55,14 +56,7 @@ android_binary(
         ["src/main/res/**"],
         allow_empty = True,
     ),
-    deps = [":demo_lib"] + select({
-        "//android:j2v8_runtime": [
-            "//jvm/j2v8:j2v8-android",
-            # Unfortunately, native libs aren't included if this isn't specified (Bazel only issue)
-            artifact("com.eclipsesource.j2v8:j2v8"),
-        ],
-        "//android:hermes_runtime": ["//jvm/hermes:hermes-android"],
-    }),
+    deps = [":demo_lib"]
 )
 
 kt_android_library(
