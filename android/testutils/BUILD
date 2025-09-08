@@ -28,8 +28,8 @@ kt_android(
 kt_jvm_library(
     name = "with-runtime",
     visibility = ["//visibility:public"],
-    exports = [":testutils"] + select({
-        "//android:j2v8_runtime": ["//jvm/j2v8:j2v8-all"],
-        "//android:hermes_runtime": ["//jvm/hermes:hermes-host"],
-    }),
+    exports = [
+        ":testutils",
+        "//jvm/hermes:hermes-host",
+    ],
 )
