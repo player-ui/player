@@ -148,20 +148,6 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
                 """.trimMargin(),
             )
         }
-        runtime.checkBlockingThread = {
-            // TODO: Can we check for main dispatcher to mute logs?
-            if (name == "main") {
-                scope.launch {
-                    logger.warn(
-                        "Main thread is blocking on JS runtime access: $this",
-                        stackTrace
-                            .joinToString("\n") {
-                                "\tat $it"
-                            }.replaceFirst("\tat ", "\n"),
-                    )
-                }
-            }
-        }
 
         /** 5. apply to player plugins */
         plugins
