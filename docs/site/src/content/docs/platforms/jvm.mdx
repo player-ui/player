@@ -1,0 +1,80 @@
+---
+title: JVM
+---
+
+## JavaScript Runtime
+
+As the core Player is written in TypeScript, we need a JVM compatible JavaScript runtime to power a JVM based Player. There are several options to choose from, however, deciding on a specific runtime implementation is challenging to do at the library layer. Different use cases may demand different trade-offs regarding supporting multiple platforms, size, and speed. Thus, the base JVM Player implementation was done with a custom runtime abstraction (similar to React Natives [JavaScript Interface](https://github.com/react-native-community/discussions-and-proposals/issues/91)), powered by [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization), to enable consumers to choose the runtime based on their needs.
+
+### Choosing a runtime
+
+Currently, Player provides support for two runtimes that span the majority of use cases, Android and desktop:
+
+| Runtimes                                      | Platforms                   |
+| --------------------------------------------- | --------------------------- |
+| [Hermes](https://github.com/facebook/hermes)  | `android`                   |
+| [J2V8](https://github.com/eclipsesource/J2V8) | `linux`, `macos`            |
+
+:::note
+Each of the artifacts for the above are defined as `com.intuit.playerui:$runtime-$platform`, i.e. `com.intuit.playerui:hermes-android`
+:::
+
+All that is required to choose a runtime, is to ensure that runtime dependency is on the classpath. For example, an Android module containing unit tests that execute headless Player tests might look like:
+```kotlin
+dependencies {
+    // Primary Android Player dependency
+    api("com.intuit.playerui", "android", $PLAYER_VERSION)
+
+    // Runtime: only include for Android use cases
+    implementation("com.intuit.playerui", "hermes-android", $PLAYER_VERSION)
+
+    // Runtime: only include for desktop use cases
+    testImplementation("com.intuit.playerui", "j2v8-all", $PLAYER_VERSION)
+}
+```
+
+When choosing a runtime, the mobile JS bundle requirements can change. Ensure you check the associated runtime documentation below for more information on how to appropriately build your core code for mobile.
+
+By design, our Bazel [`js_pipeline` rule](https://github.com/player-ui/rules_player/blob/main/docs/javascript.md#js_pipeline) guarantees support for all our supported runtimes, and will likely come with some future iterations to provide better support for runtime-specific requirements.
+
+### Hermes
+
+[Hermes](https://github.com/facebook/hermes) is a JS engine built for the React Native use case, optimized for JS execution on mobile devices. As such, it stands out as an excellent option for our use case. Upon further investigation, compared to its predecessor, it boasted a ~70% app size reduction, 10% runtime performance boost, better support for modern JS, and active maintenance relied on by another community.
+
+:::note
+When using Hermes, ensure your mobile JS bundles are compiled according to ES6 specification. There may be some ES6 features still required to be transpiled, but should decrease over time. More information on ES6 feature progress can be found [here](https://github.com/facebook/hermes/blob/main/doc/Features.md).
+:::
+
+### J2V8
+
+[J2V8](https://github.com/eclipsesource/J2V8) was actually the original JS runtime for the Android use cases -- it was chosen for its relative performance and Android support when this project had started. However, it comes with a large app size cost (~6 MB) and lack of maintenance has prevented it from being compatible with newer Android versions ([16 KB page size](https://android-developers.googleblog.com/2025/05/prepare-play-apps-for-devices-with-16kb-page-size.html)) and newer JS features.
+
+Starting in `0.14.0`, `j2v8-android` has been superseded by Hermes and will no longer be published. That said, `j2v8-all` (includes `j2v8-macos` and `j2v8-linux`) is still available to power desktop JVM use cases, such as headless testing.
+
+:::note
+When using J2V8, ensure your mobile JS bundles are compiled according to ES5 specification. Specifically, the J2V8 version we consume is built on V8 version [8.6.405](https://v8.dev/blog/v8-release-86).
+:::
+
+### GraalJS
+
+While intriguing, the GraalJS only exists today to provide Windows support -- it is known to be much less performant than J2V8 or Hermes. There are likely some further optimizations that could be done, but without an explicit need, won't be prioritized.
+
+### Other runtimes
+
+The Player project has implemented this layer for several runtimes, described below.
+
+To support alternative runtime implementations, there needs to be code connecting the runtime constructs to the Player runtime abstraction. It is possible to define your own, but the abstraction definition is not yet final, and therefore not appropriately documented. You can take inspiration from the existing implementations or file an issue for a runtime you wish to see supported by our team.
+
+## Memory Management
+
+:::note
+While an important concept, unless integrating with `HeadlessPlayer`, or `AndroidPlayer` directly, release management should ideally be taken care of for you ([`PlayerFragment` & `PlayerViewModel`](/platforms/android#viewmodel) for Android).
+:::
+
+Due to the technologies used and the constraints of the JVM garbage collector, `player.release()` must be invoked to collect all the native runtime memory used for instantiating the player and running the flow. This can be done from any of the Android lifecycle methods that signifies a that the player manager will be destroyed, such as `onDestroy` for Fragments or `onCleared` for ViewModels. Be aware that calling `release` will cause the player to enter a terminal state where most API access will result in a `PlayerException`. You can verify if a player has been released by checking if `player.state is ReleasedState`.
+
+:::caution
+Once Player is in a `ReleasedState`, it can no longer be used, as the resources backing functionality no longer exist. Attempting to use Player constructs after release, _including Player rendered views_, is dangerous and prone to failure.
+:::
+
+Additionally, the Android Player caches some lifecycle-sensitive constructs, which can leak if the context is backgrounded or added to the back-stack. `player.recycle()` should be invoked in these situations to prevent these leaks by clearing all cached data. `onDestroyView` is a good example of when this should be called. Invoking `recycle` will not interrupt player state or flow execution, which enables flows to persist beyond fragment or activity changes. However, this does depend on what Android context the player was configured with. To ensure the player can persist for the entire length of the app, the application context should be used.

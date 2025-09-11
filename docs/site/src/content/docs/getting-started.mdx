@@ -46,27 +46,6 @@ dependencies {
     implementation("com.intuit.playerui.plugins:reference-assets:$playerVersion")
 }
 ```
-
-#### Release Optimization
-
-The Android Player dependency automatically pulls in both the `dev` as well as the `prod` versions of the underlying JS scripts.
-
-The `dev` scripts are handy for debugging shared JS code through the JS debugger in debug builds, but they are not necessary for consumer facing release builds.
-
-To optimize the release bundles, it is highly recommended to exclude the `dev` scripts, as well as enabling V8 to strip out unused code from the final bundle.
-
-```kotlin
-buildTypes {
-    getByName("release") {
-        isMinifyEnabled = true
-        isShrinkResources = true
-        packagingOptions {
-            exclude("**/*.dev.js")
-        }
-    }
-}
-```
-
   </Fragment>
 </PlatformTabs>
 
@@ -114,10 +93,8 @@ var body: some View {
 ```kotlin
 // create Android Player with reference assets plugin
 val player = AndroidPlayer(
-    listOf(
-        ReferenceAssetsPlugin(),
-        // Any other plugins
-    )
+    ReferenceAssetsPlugin(),
+    // Any other plugins
 )
 ```
 
@@ -197,72 +174,7 @@ When you're done with Player, release any native runtime memory used to instanti
 player.release()
 ```
 
-Creating your own `AndroidPlayer` instance is fairly simple, but it grows in complexity when considering proper resources management and app orchestration. We provide a Fragment/ViewModel integration to make it easier to properly integrate into your app and account for these concerns.
-
-#### ViewModel
-
-With the `PlayerViewModel` and `PlayerFragment`, the above orchestration is done for you. All that is needed is to provide concrete implementations of each and add the fragment to your app.
-
-##### PlayerViewModel
-
-The `PlayerViewModel` requires an `AsyncFlowIterator` to be supplied in the constructor. The AsyncFlowIterator is what tells Player which flows to run. This can be hardcoded into the view model or expected as an argument, as shown below.
-
-```kotlin
-class SimplePlayerViewModel(flows: AsyncFlowIterator) : PlayerViewModel(flows) {
-    override val plugins = listOf(ReferenceAssetsPlugin())
-}
-```
-
-##### PlayerFragment
-
-The `PlayerFragment` is a simple Android `Fragment` that only requires a specific `PlayerViewModel` to be defined. If your view model requires the `AsyncFlowIterator` to be passed as part of the constructor, you can leverage the `PlayerViewModel.Factory` to produce it, as shown below.
-
-Specifically, this fragment takes a flow as an argument to the constructor and creates a single-flow `AsyncFlowIterator` instance using the pseudo-constructor helper.
-
-```kotlin
-class SimplePlayerFragment(override val flow: String) : PlayerFragment() {
-    override val playerViewModel by viewModels<SimplePlayerViewModel> {
-        PlayerViewModel.Factory(AsyncFlowIterator(flow), ::SimplePlayerViewModel)
-    }
-}
-```
-
-#### JS Runtime
-
-As the core Player is written in TypeScript, we need a JVM compatible JavaScript runtime to power a JVM based Player. There are several options to choose from, however, deciding on a specific runtime implementation is difficult to do at the library layer. Different use cases may demand different trade-offs regarding supporting multiple platforms, size, and speed. Thus, the base JVM Player implementation was done with a custom runtime abstraction, powered by [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization), to enable consumers to choose the runtime based on their needs.
-
-To support a specific runtime implementation, there needs to be code connecting the runtime constructs to the Player runtime abstraction. The Player project has implemented this layer for several runtimes, described below. It is possible to define your own, but the abstraction definition is not yet final, and therefore not appropriately documented. You can take inspiration from the existing implementations, or file an issue for a runtime you wish to see supported by our team.
-
-| Runtimes                                      | Platforms                   |
-| --------------------------------------------- | --------------------------- |
-| [J2V8](https://github.com/eclipsesource/J2V8) | `android`, `linux`, `macos` |
-| [Hermes](https://github.com/facebook/hermes)  | `android`                   |
-| [GraalJS](https://github.com/oracle/graaljs)  | `linux`, `macos`, `win`     |
-
-:::note
-Each of the artifacts for the above are defined as `com.intuit.playerui:$runtime-$platform`, i.e. `com.intuit.playerui:j2v8-android`
-:::
-
-The `HeadlessPlayer` does not define a hard dependency on any specific runtime, however, the `AndroidPlayer` does transitively depends on the `j2v8` runtime, as the first class approach. To override, the transitive dependency would need to be explicitly excluded and the actual runtime dependency would need to be added:
-
-```kotlin
-dependencies {
-    // Android Player dependency
-    implementation("com.intuit.playerui", "android", PLAYER_VERSION) {
-        // J2V8 included for release versions
-        exclude(group = "com.intuit.playerui", module = "j2v8-android")
-        // Debuggable J2V8 included for canary versions
-        exclude(group = "com.intuit.playerui", module = "j2v8-android-debug")
-    }
-    // Override with Hermes runtime for example
-    implementation("com.intuit.playerui", "hermes-android", PLAYER_VERSION)
-}
-```
-
-:::caution
-If your application includes dependencies that may transitively depend on `com.intuit.playerui:android`, you would likely need to ensure the default runtime is transitively excluded from those as well, either manually or as a global strategy.
-:::
-
+Creating your own `AndroidPlayer` instance is fairly simple, but it grows in complexity when considering proper resources management and app orchestration. We provide a [Fragment/ViewModel integration](/platforms/android#viewmodel) to make it easier to properly integrate into your app and account for these concerns.
   </Fragment>
 </PlatformTabs>
 
