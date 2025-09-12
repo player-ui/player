@@ -350,8 +350,6 @@ jobs:
           pr_number=${CIRCLE_PULL_REQUEST##*/}
           chmod +x scripts/deploy-canary-docs.sh
           ./scripts/deploy-canary-docs.sh $pr_number
-        environment:
-          GH_TOKEN: GH_TOKEN
 
   bench_js:
     executor: benchmarks
