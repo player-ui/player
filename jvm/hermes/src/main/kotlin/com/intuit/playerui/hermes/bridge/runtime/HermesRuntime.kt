@@ -150,7 +150,7 @@ public class HermesRuntime private constructor(
     @InternalPlayerApi
     override var checkBlockingThread: Thread.() -> Unit = {}
 
-    override fun toString(): String = "HermesRuntime"
+    override fun toString(): String = "Hermes"
 
     // Delegated Node members
     private val backingNode: Node by lazy {

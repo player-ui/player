@@ -8,7 +8,7 @@ main_exports = [
 main_deps = main_exports
 
 test_deps = [
-    "//jvm/testutils",
+    "//jvm/testutils:with-runtimes",
     artifact("io.mockk:mockk"),
 ]
 

@@ -9,16 +9,9 @@ deps = {
     "linux": [
         "//jvm/j2v8/libs:j2v8_linux",
     ],
-    "android": [
-        "@maven//:com_eclipsesource_j2v8_j2v8",
-    ],
-    "android-debug": [
-        "@maven//:com_eclipsesource_j2v8_j2v8",
-    ],
     "all": [
         "//jvm/j2v8:j2v8-macos",
         "//jvm/j2v8:j2v8-linux",
-        "//jvm/j2v8:j2v8-android",
     ],
 }
 

@@ -8,15 +8,20 @@ main_exports = [
     artifact("org.jetbrains.kotlinx:kotlinx-coroutines-core"),
     artifact("org.jetbrains.kotlinx:kotlinx-serialization-json"),
 ]
+
 main_deps = main_exports + [
     # TODO: Pull from rules_kotlin when compiler version reflects Kotlin version
     # "@rules_kotlin//kotlin/compiler:kotlin-reflect"
     artifact("org.jetbrains.kotlin:kotlin-reflect"),
 ]
 
+main_resources = [
+    "//core/player:player_native_bundle",
+]
+
 # Test dependencies
 test_deps = [
-    "//jvm/testutils",
+    "//jvm/testutils:with-runtimes",
     "//plugins/beacon/jvm",
     "//plugins/common-types/jvm",
     "//plugins/reference-assets/jvm",
@@ -30,6 +35,7 @@ kt_player_module(
     name = "core",
     main_deps = main_deps,
     main_exports = main_exports,
+    main_resources = main_resources,
     test_deps = test_deps,
     test_package = "com.intuit.playerui.core",
 )

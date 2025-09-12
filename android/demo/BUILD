@@ -4,6 +4,7 @@ load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load("//android:defs.bzl", "kt_android")
 
 main_deps = [
+    "//jvm/hermes:hermes-android",
     "//jvm/utils",
     "//plugins/reference-assets/android",
     "//plugins/common-types/jvm",
@@ -12,14 +13,12 @@ main_deps = [
     artifact("androidx.navigation:navigation-ui-ktx"),
     artifact("androidx.navigation:navigation-fragment-ktx"),
     artifact("com.afollestad.material-dialogs:core"),
-    # Unfortunately, native libs aren't included if this isn't specified (Bazel only issue)
-    artifact("com.eclipsesource.j2v8:j2v8"),
-    # For when hermes-android _isn't_ included
     artifact("com.facebook.soloader:soloader"),
     artifact("com.google.android.material:material"),
 ]
 
 test_deps = [
+    # Don't pull in runtime, that'll be included by the app
     "//android/testutils",
 
     artifact("androidx.test.espresso:espresso-intents"),
@@ -57,14 +56,14 @@ android_binary(
         ["src/main/res/**"],
         allow_empty = True,
     ),
-    deps = [":demo_lib"],
+    deps = [":demo_lib"]
 )
 
 kt_android_library(
     name = "demo_ui_test",
     srcs = glob(["src/androidTest/**/*.kt"]),
-    deps = test_deps + [":demo_lib"],
     kotlinc_opts = "//jvm:test_options",
+    deps = test_deps + [":demo_lib"],
 )
 
 android_binary(
