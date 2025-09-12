@@ -339,6 +339,13 @@ jobs:
   deploy_canary_docs:
     executor: base
     steps:
+      - run:
+          name: Check canary_release parameter
+          command: |
+            if [ "<< pipeline.parameters.canary_release >>" != "true" ]; then
+              echo "Skipping canary docs deployment - canary_release is not true"
+              exit 0
+            fi
       - attach_workspace:
           at: ~/player
       - restore_cache:
@@ -447,8 +454,6 @@ workflows:
             - Publish
           requires:
             - maybe_release
-          when:
-            condition: << pipeline.parameters.canary_release >>
 
       - test:
           name: test-trunk
