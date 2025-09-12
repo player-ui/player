@@ -100,7 +100,7 @@ val player = AndroidPlayer(
 
 Apart from providing a list of plugins while setting up `AndroidPlayer`, you can also provide a `config` object that has the following options:
 
-- `debuggable` - Indicates if the runtime is debuggable on android through chromium devtools, enabling this would let you set breakpoints in js code as you're running it on android.
+- `debuggable` - Indicates Player should instrument its `debuggable` constructs
 - `coroutineExceptionHandler` - [CoroutineExceptionHandler](https://kotlinlang.org/docs/exception-handling.html#coroutineexceptionhandler) should handle all uncaught exceptions while using the runtime coroutine scope.
 - `timeout` - Timeout for the JS thread. If none is provided then it is set as `if (debuggable) Int.MAX_VALUE.toLong() else 5000`.
 
@@ -166,12 +166,6 @@ player.onUpdate { asset: RenderableAsset? ->
 
 // start Player
 player.start(content)
-```
-
-When you're done with Player, release any native runtime memory used to instantiate Player or run the flow.
-
-```kotlin
-player.release()
 ```
 
 Creating your own `AndroidPlayer` instance is fairly simple, but it grows in complexity when considering proper resources management and app orchestration. We provide a [Fragment/ViewModel integration](/platforms/android#viewmodel) to make it easier to properly integrate into your app and account for these concerns.

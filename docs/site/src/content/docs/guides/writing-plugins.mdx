@@ -142,23 +142,7 @@ class EnvironmentPlugin: NativePlugin {
 }
 ```
 
-#### Asset Registration
-
-Likely the most common usecase for plugins is to register assets:
-
-```swift
-import PlayerUI
-
-class ExampleAssetPlugin: NativePlugin {
-    let pluginName = "ExampleAssetPlugin"
-
-    func apply<P>(player: P) where P: HeadlessPlayer {
-      guard let player = player as? SwiftUIPlayer else { return }
-      player.assetRegistry.register("text", asset: TextAsset.self)
-      player.assetRegistry.register("action", asset: ActionAsset.self)
-    }
-}
-```
+Likely the most common usecase for plugins is to provide UI through assets. More information can be found in the [Custom Assets guide](/assets/custom).
 
 ### JSBasePlugin
 
@@ -226,30 +210,13 @@ For all types of plugins, the `apply(instance: T)` signature is the standard way
 
 ### Android Player Plugins
 
-Android Player plugins must implement the `AndroidPlayerPlugin` interface, which will give them access to an `AndroidPlayer` instance through the `apply` method. Plugins can use this instance to register UI assets, apply themes, or even access the [Player hooks](#jvm-player-plugins).
+Android Player plugins must implement the `AndroidPlayerPlugin` interface, which will give them access to an `AndroidPlayer` instance through the `apply` method. Plugins can use this instance to register UI assets, apply themes, or even access the [Player hooks](#jvm-player-plugins). 
 
-Below is an example of an Android Player plugin that registers two UI asset implementations using the `registerAsset` method. The first line is a simple asset registration that provides a factory for the `myCoolAsset` type. The factory signature is `(AssetContext) -> RenderableAsset`, which can simply be the `RenderableAsset` implementation provided it takes an `AssetContext`. More about creating custom assets can be found [here](/assets/custom/).
-
-Note that the second registration adds an additional metadata `role` to provide an different asset implementation for `myCoolAsset`s that have the `cooler` role. This functionality allows for deeper matches for more meaningful asset implementations.
-
-```kotlin
-object MyAssetsPlugin : AndroidPlayerPlugin {
-    override fun apply(androidPlayer: AndroidPlayer) {
-        // Register MyCoolAsset constructor as factory for `myCoolAsset` types
-        androidPlayer.registerAsset("myCoolAsset", ::MyCoolAsset)
-
-         // Register MyCoolerAsset constructor as factory for `myCoolAsset` types if they have the `cooler` role
-         androidPlayer.registerAsset(mapOf(
-             "type" to "myCoolAsset",
-             "metaData" to mapOf("role" to "cooler")
-         ), ::MyCoolerAsset)
-    }
-}
-```
+Likely the most common usecase for plugins is to provide UI through assets. More information can be found in the [Custom Assets guide](/assets/custom).
 
 ### JVM Player Plugins
 
-Core plugins that aren't necessarily required for cross-platform, or are specific to the JVM, implement the `PlayerPlugin` interface. This provides a _limited_ `Player` wrapper of the core JS Player, which are exposed through the Player `hooks`. Basic example of `PlayerPlugin` to handle errors:
+Player plugins that are only required for the JVM use cases should implement the `PlayerPlugin` interface. This provides a _limited_ `Player` wrapper of the core JS Player, which are exposed through the Player `hooks`. A basic example of `PlayerPlugin` to handle errors:
 
 ```kotlin
 class HandleErrorPlayerPlugin : PlayerPlugin {
@@ -262,6 +229,8 @@ class HandleErrorPlayerPlugin : PlayerPlugin {
     }
 }
 ```
+
+For more practical examples, take a look at the [coroutines plugins](/plugins/android/coroutines/) which tie asynchronous Player paradigms to [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html) constructs.
 
 :::note
 The `AndroidPlayer` also extends the "core" JVM `Player`, which means that Android Player plugins already have access to everything the `PlayerPlugin` provides.
