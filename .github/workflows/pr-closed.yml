@@ -1,0 +1,35 @@
+name: PR closed
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  pr_closed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout player-ui.github.io
+        uses: actions/checkout@v4
+        with:
+          repository: player-ui/player-ui.github.io
+          token: ${{ secrets.GH_TOKEN }}
+          path: docs-site
+
+      - name: Remove canary docs folder
+        run: |
+          pr_number=${{ github.event.number }}
+          canary_folder="docs-site/canary-$pr_number"
+
+          if [ -d "$canary_folder" ]; then
+            echo "Removing canary docs folder: canary-$pr_number"
+            rm -rf "$canary_folder"
+            
+            cd docs-site
+            git config user.name "intuit-svc"
+            git config user.email "opensource-svc@intuit.com"
+            git add .
+            git commit -m "Remove canary docs for PR #$pr_number" || echo "No changes to commit"
+            git push origin main
+          else
+            echo "Canary docs folder canary-$pr_number not found, nothing to clean up"
+          fi
