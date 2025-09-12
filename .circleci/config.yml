@@ -7,9 +7,6 @@ parameters:
   should_release:
     type: boolean
     default: false
-  canary_release:
-    type: boolean
-    default: true
 
 orbs:
   macos: circleci/macos@2.5.4
@@ -336,28 +333,6 @@ jobs:
           at: ~/player
       - auto_shipit
 
-  deploy_canary_docs:
-    executor: base
-    steps:
-      - run:
-          name: Check canary_release parameter
-          command: |
-            if [ "<< pipeline.parameters.canary_release >>" != "true" ]; then
-              echo "Skipping canary docs deployment - canary_release is not true"
-              exit 0
-            fi
-      - attach_workspace:
-          at: ~/player
-      - restore_cache:
-          keys:
-            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
-            - v1-bazel-cache-core-{{ .Branch }}
-            - v1-bazel-cache-core-main
-      - run: |
-          pr_number=${CIRCLE_PULL_REQUEST##*/}
-          chmod +x scripts/deploy-canary-docs.sh
-          ./scripts/deploy-canary-docs.sh $pr_number
-
   bench_js:
     executor: benchmarks
     steps:
@@ -444,16 +419,6 @@ workflows:
           requires:
             - build-trunk
             - build-ios-trunk
-
-      - deploy_canary_docs:
-          filters:
-            branches:
-              ignore:
-                - /pull\/.*/
-          context:
-            - Publish
-          requires:
-            - maybe_release
 
       - test:
           name: test-trunk

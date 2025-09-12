@@ -8,7 +8,7 @@ on:
 jobs:
   check_auth:
     runs-on: ubuntu-latest
-    if: ${{ github.event.issue.pull_request && github.event.comment.body == '/canary' && github.event.issue.state != 'closed' }}
+    if: ${{ github.event.issue.pull_request && github.event.comment.body == '/canary' }}
     steps:
       - name: Check auth
         id: check_auth
@@ -71,8 +71,7 @@ jobs:
             --header 'content-type: application/json' \
             --header 'x-attribution-login: ${{ github.actor }}' \
             --header 'x-attribution-actor-id: ${{ github.actor }}' \
-            --data '{ "branch": "${{ needs.check_auth.outputs.branch }}", "parameters": { "should_release": true, "canary_release": true }}'
-
+            --data '{ "branch": "${{ needs.check_auth.outputs.branch }}", "parameters": { "should_release": true }}'
       - name: Trigger success
         uses: actions/github-script@v6
         with:
