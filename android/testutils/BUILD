@@ -1,4 +1,5 @@
 load("@rules_jvm_external//:defs.bzl", "artifact")
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("//android:defs.bzl", "kt_android")
 
 main_exports = [
@@ -9,11 +10,6 @@ main_exports = [
 ]
 
 main_deps = main_exports + [
-    # TODO: We probably shouldn't include all runtimes by default, runtime test target is a per-integration decision
-    "//jvm/j2v8:j2v8-all",
-    "//jvm/graaljs",
-    "//jvm/hermes",
-
     "//plugins/common-types/jvm",
     "//plugins/pending-transaction/jvm",
     "//plugins/reference-assets/android",
@@ -26,4 +22,14 @@ main_deps = main_exports + [
 kt_android(
     name = "testutils",
     main_deps = main_deps,
+)
+
+# For use locally, to automatically pull in the *singular* configured runtime that should be tested against
+kt_jvm_library(
+    name = "with-runtime",
+    visibility = ["//visibility:public"],
+    exports = [
+        ":testutils",
+        "//jvm/hermes:hermes-host",
+    ],
 )

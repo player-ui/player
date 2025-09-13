@@ -6,6 +6,7 @@ kt_player_module(
     name = "perf_tests",
     main_deps = ["//jvm/testutils"],
     main_srcs = ["src/main/kotlin/com/intuit/playerui/perf/junit/JSEngineTest.kt"],
+    test_deps = ["//jvm/testutils:with-runtimes"],
     test_package = "com.intuit.playerui.perf",
 )
 
@@ -20,12 +21,12 @@ kt_jvm_library(
     srcs = ["src/main/kotlin/com/intuit/playerui/perf/jmh/PlayerPerf.kt"],
     kotlinc_opts = "//jvm:test_options",
     plugins = [":jmh_annotation_processor"],
-    resources = glob(["src/main/resources/*.json"], allow_empty=True),
+    resources = glob(
+        ["src/main/resources/*.json"],
+        allow_empty = True,
+    ),
     deps = [
-        "//jvm/core",
-        "//jvm/graaljs",
-        "//jvm/hermes:hermes-host",
-        "//jvm/j2v8:j2v8-all",
+        "//jvm:supported_runtimes",
         "//tools/mocks:jar",
         artifact("org.openjdk.jmh:jmh-core"),
     ],

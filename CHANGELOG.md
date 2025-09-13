@@ -1,3 +1,30 @@
+# 0.14.0-next.4 (Mon Sep 08 2025)
+
+### Release Notes
+
+#### Remove support for J2V8 on Android ([#712](https://github.com/player-ui/player/pull/712))
+
+With the [Android 15 16 KB page size requirement](https://android-developers.googleblog.com/2025/05/prepare-play-apps-for-devices-with-16kb-page-size.html), Android Player is dropping support for [J2V8](https://github.com/eclipsesource/J2V8) as it fails to meet those requirements. It will no longer be a transitive dependency, requiring the desired runtime module to be declared explicitly as a dependency of the app.
+
+For example, [Hermes](https://github.com/facebook/hermes) is now the recommended runtime for Android Player use cases, and can be configured simply via including the dependency:
+```kotlin
+dependencies {
+    implementation("com.intuit.playerui", "hermes-android", $PLAYER_VERSION)
+}
+```
+
+---
+
+#### 🚀 Enhancement
+
+- Remove support for J2V8 on Android [#712](https://github.com/player-ui/player/pull/712) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### Authors: 1
+
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+
+---
+
 # 0.14.0-next.3 (Thu Sep 04 2025)
 
 ### Release Notes

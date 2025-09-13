@@ -6,9 +6,11 @@ import com.intuit.playerui.core.bridge.NodeWrapper
 import com.intuit.playerui.core.bridge.Promise
 import com.intuit.playerui.core.bridge.getInvokable
 import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeConfig
+import com.intuit.playerui.core.bridge.runtime.RUNTIME_DETAILS_MSG
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.ScriptContext
 import com.intuit.playerui.core.bridge.runtime.add
+import com.intuit.playerui.core.bridge.runtime.runtimeContainers
 import com.intuit.playerui.core.bridge.runtime.runtimeFactory
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableField
 import com.intuit.playerui.core.constants.ConstantsController
@@ -138,7 +140,16 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
 
         // we only have access to the logger after we have the player instance
         logger.info("Player created using $runtime")
+        if (explicitRuntime == null && runtimeContainers.size > 1) {
+            logger.warn(
+                """Player created its own runtime ($runtime), but multiple runtimes are on the classpath: $runtimeContainers
+                    |To avoid ambiguity, explicitly provide a runtime or remove extra runtime dependencies that could be bloating your app.
+                    |$RUNTIME_DETAILS_MSG
+                """.trimMargin(),
+            )
+        }
         runtime.checkBlockingThread = {
+            // TODO: Can we check for main dispatcher to mute logs?
             if (name == "main") {
                 scope.launch {
                     logger.warn(

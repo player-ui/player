@@ -8,7 +8,7 @@ main_exports = [
 main_deps = main_exports
 
 test_deps = [
-    "//jvm/testutils",
+    "//jvm/testutils:with-runtimes",
     "//plugins/reference-assets/jvm",
     artifact("io.mockk:mockk"),
     artifact("org.amshove.kluent:kluent"),
