@@ -73,6 +73,9 @@ elif [ "$NPM_TAG" == "canary" ] && [ -n "${CIRCLE_PULL_REQUEST:-}" ]; then
   PR_NUMBER=${CIRCLE_PULL_REQUEST##*/}
   echo "Deploying canary docs for PR #$PR_NUMBER"
   STABLE_DOCS_BASE_PATH="canary-$PR_NUMBER" \
+  STABLE_ALGOLIA_SEARCH_API_KEY=$ALGOLIA_NEXT_SEARCH_API_KEY \
+  STABLE_ALGOLIA_SEARCH_APPID="D477I7TDXB" \
+  STABLE_ALGOLIA_SEARCH_INDEX="crawler_Player (Next)" \
   bazel run --config=release //docs:gh_deploy -- --dest_dir "canary-$PR_NUMBER"
 fi
 
