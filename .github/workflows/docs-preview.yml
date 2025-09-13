@@ -14,9 +14,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Bazel
-        uses: bazelbuild/setup-bazelisk@v2
+        run: |
+          wget -q https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-linux-amd64 -O bazelisk
+          chmod +x bazelisk
+          echo "$(pwd)" >> $GITHUB_PATH
 
       - name: Build and Deploy Docs Preview
+        id: deploy
         run: |
           PR_NUMBER=${{ github.event.number }}
           echo "Deploying docs preview for PR #$PR_NUMBER"
@@ -25,10 +29,12 @@ jobs:
           STABLE_ALGOLIA_SEARCH_APPID="D477I7TDXB" \
           STABLE_ALGOLIA_SEARCH_INDEX="crawler_Player (Next)" \
           bazel run --config=release //docs:gh_deploy -- --dest_dir "pr-$PR_NUMBER"
+          echo "deployment_success=true" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Comment on PR
+        if: steps.deploy.outputs.deployment_success == 'true'
         uses: actions/github-script@v6
         with:
           script: |
