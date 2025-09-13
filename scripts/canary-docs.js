@@ -54,16 +54,20 @@ class CanaryDocs {
       );
 
       try {
+        // Get current date
+        const currentDate = new Date().toLocaleDateString();
+
         // Comment on the PR
-        const message = `📚 **Documentation Preview Available**
+        let versionMessage = `Your PR was successfully deployed on \`${currentDate}\` with this version:\n\n`;
 
-**Canary Version:** \`${newVersion}\`
+        versionMessage += "```\n";
+        versionMessage += `${newVersion}\n`;
+        versionMessage += "```\n\n";
 
-Your canary documentation changes are now available at:
-https://player-ui.github.io/canary-${prNumber}/`;
+        versionMessage += `See a docs preview at: https://player-ui.github.io/canary-${prNumber}/`;
 
         await auto.comment({
-          message,
+          message: versionMessage,
           context: "canary-docs",
         });
 
