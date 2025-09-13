@@ -58,7 +58,8 @@ class CanaryDocs {
         const currentDate = new Date().toLocaleDateString();
 
         // Comment on the PR
-        let versionMessage = `Your PR was successfully deployed on \`${currentDate}\` with this version:\n\n`;
+        let versionMessage = `## Canary Release\n\n`;
+        versionMessage += `Your PR was successfully deployed on \`${currentDate}\` with this version:\n\n`;
 
         versionMessage += "```\n";
         versionMessage += `${newVersion}\n`;
