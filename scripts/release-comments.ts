@@ -1,14 +1,24 @@
+import { Auto, IPlugin } from "@auto-it/core";
+
 /**
- * Auto plugin that comments on PRs for canary releases
+ * The object passed to afterShipIt
  */
-class CanaryDocs {
+interface ReleaseInfo {
+  newVersion?: string;
+  context: string;
+}
+
+/**
+ * Auto plugin that comments on PRs for releases
+ */
+class ReleaseCommentsPlugin implements IPlugin {
   /** The name of the plugin */
-  name = "canary-docs";
+  name = "release-comments";
 
   /** Apply the plugin to the Auto instance */
-  apply(auto) {
+  apply(auto: Auto): void {
     // Handle canary releases through afterShipIt hook
-    auto.hooks.afterShipIt.tap(this.name, async (release) => {
+    auto.hooks.afterShipIt.tap(this.name, async (release: ReleaseInfo) => {
       const { newVersion, context: releaseContext } = release;
 
       if (!newVersion) {
@@ -55,21 +65,30 @@ class CanaryDocs {
 
       try {
         // Get current date
-        const currentDate = new Date().toLocaleDateString();
+        const currentDate = new Date().toUTCString();
+
+        // Get CircleCI build URL and number
+        const circleBuildUrl = process.env.CIRCLE_BUILD_URL;
+        const buildNumber = circleBuildUrl
+          ? circleBuildUrl.split("/").pop()
+          : null;
+        const buildLink = buildNumber
+          ? `CircleCI [#${buildNumber}](${circleBuildUrl})`
+          : "CircleCI";
 
         // Comment on the PR
-        let versionMessage = `## Canary Release\n\n`;
-        versionMessage += `Your PR was successfully deployed on \`${currentDate}\` with this version:\n\n`;
+        let versionMessage = `### Canary Release\n\n`;
+        versionMessage += `Your PR was deployed by ${buildLink} on \`${currentDate}\` with this version:\n\n`;
 
         versionMessage += "```\n";
         versionMessage += `${newVersion}\n`;
         versionMessage += "```\n\n";
 
-        versionMessage += `See a docs preview at: https://player-ui.github.io/canary-${prNumber}/`;
+        versionMessage += `📦 NPM packages published: ${newVersion}`;
 
         await auto.comment({
           message: versionMessage,
-          context: "canary-docs",
+          context: "canary-release",
         });
 
         auto.logger.verbose.info("Successfully posted canary docs comment");
@@ -93,4 +112,4 @@ class CanaryDocs {
   }
 }
 
-module.exports = CanaryDocs;
+export default ReleaseCommentsPlugin;

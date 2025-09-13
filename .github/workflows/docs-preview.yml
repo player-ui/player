@@ -1,0 +1,48 @@
+name: Deploy Docs Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - "docs/**"
+
+jobs:
+  deploy-docs-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bazel
+        uses: bazelbuild/setup-bazelisk@v2
+
+      - name: Build and Deploy Docs Preview
+        run: |
+          PR_NUMBER=${{ github.event.number }}
+          echo "Deploying docs preview for PR #$PR_NUMBER"
+          STABLE_DOCS_BASE_PATH="pr-$PR_NUMBER" \
+          STABLE_ALGOLIA_SEARCH_API_KEY=${{ secrets.ALGOLIA_NEXT_SEARCH_API_KEY }} \
+          STABLE_ALGOLIA_SEARCH_APPID="D477I7TDXB" \
+          STABLE_ALGOLIA_SEARCH_INDEX="crawler_Player (Next)" \
+          bazel run --config=release //docs:gh_deploy -- --dest_dir "pr-$PR_NUMBER"
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Comment on PR
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const currentDate = new Date().toUTCString();
+            const prNumber = context.issue.number;
+            const buildUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            let comment = `### Docs Preview\n\n`;
+            comment += `Your PR docs changes were deployed to the [Player Docs Repo](https://github.com/player-ui/player-ui.github.io/tree/main/pr-${prNumber}) on \`${currentDate}\`\n\n`;
+            comment += `📚 https://player-ui.github.io/pr-${prNumber}/`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

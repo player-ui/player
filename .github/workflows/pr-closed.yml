@@ -15,21 +15,21 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           path: docs-site
 
-      - name: Remove canary docs folder
+      - name: Remove PR docs folder
         run: |
           pr_number=${{ github.event.number }}
-          canary_folder="docs-site/canary-$pr_number"
+          pr_folder="docs-site/pr-$pr_number"
 
-          if [ -d "$canary_folder" ]; then
-            echo "Removing canary docs folder: canary-$pr_number"
-            rm -rf "$canary_folder"
+          if [ -d "$pr_folder" ]; then
+            echo "Removing PR docs folder: pr-$pr_number"
+            rm -rf "$pr_folder"
             
             cd docs-site
             git config user.name "intuit-svc"
             git config user.email "opensource-svc@intuit.com"
             git add .
-            git commit -m "Remove canary docs for PR #$pr_number" || echo "No changes to commit"
+            git commit -m "Remove docs preview for PR #$pr_number" || echo "No changes to commit"
             git push origin main
           else
-            echo "Canary docs folder canary-$pr_number not found, nothing to clean up"
+            echo "PR docs folder pr-$pr_number not found, nothing to clean up"
           fi
