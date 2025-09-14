@@ -42,13 +42,34 @@ jobs:
             const prNumber = context.issue.number;
             const buildUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
 
-            let comment = `### Docs Preview\n\n`;
+            const commentId = `docs-preview-${prNumber}`;
+            let comment = `<!-- ${commentId} -->\n### Docs Preview\n\n`;
             comment += `Your PR docs changes were deployed to the [Player Docs Repo](https://github.com/player-ui/player-ui.github.io/tree/main/pr-${prNumber}) on \`${currentDate}\`\n\n`;
-            comment += `📚 https://player-ui.github.io/pr-${prNumber}/`;
+            comment += `🚀 https://player-ui.github.io/pr-${prNumber}/`;
 
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
+            // Find and update existing comment or create new one
+            const comments = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: comment
+              issue_number: context.issue.number
             });
+
+            const existingComment = comments.data.find(c => 
+              c.body.includes(`<!-- ${commentId} -->`)
+            );
+
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }

@@ -11,9 +11,9 @@ interface ReleaseInfo {
 /**
  * Auto plugin that comments on PRs for releases
  */
-class ReleaseCommentsPlugin implements IPlugin {
+class ReleaseCommentPlugin implements IPlugin {
   /** The name of the plugin */
-  name = "release-comments";
+  name = "release-comment";
 
   /** Apply the plugin to the Auto instance */
   apply(auto: Auto): void {
@@ -112,4 +112,4 @@ class ReleaseCommentsPlugin implements IPlugin {
   }
 }
 
-export default ReleaseCommentsPlugin;
+export default ReleaseCommentPlugin;
