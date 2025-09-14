@@ -87,7 +87,15 @@ bazel run //docs/site:dev
 
 which will run an instance on `http://localhost:4321`.
 
-When a collaborator comments `/canary` on a PR, it will trigger a canary release. After the packages are built and published, documentation will be deployed to a preview URL and a comment will be added to the PR with the link.
+### Documentation Previews
+
+When you make changes to files in the `docs/` directory, a GitHub Actions workflow automatically builds and deploys a docs preview to `pr-{PR_NUMBER}` folders. A comment will be added to the PR with the preview link.
+
+### Canary Releases
+
+When a collaborator comments `/canary` on a PR, it will trigger a canary release that publishes NPM packages with a canary version. A comment will be added to the PR with the version information.
+
+### Production Documentation
 
 When a PR is merged, any `docs/site` changes will be deployed to the `next` folder in [https://github.com/player-ui/player-ui.github.io](https://github.com/player-ui/player-ui.github.io), which stores the built files for the site.
 
