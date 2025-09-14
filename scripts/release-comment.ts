@@ -82,9 +82,7 @@ class ReleaseCommentPlugin implements IPlugin {
 
         versionMessage += "```\n";
         versionMessage += `${newVersion}\n`;
-        versionMessage += "```\n\n";
-
-        versionMessage += `📦 NPM packages published: ${newVersion}`;
+        versionMessage += "```";
 
         await auto.comment({
           message: versionMessage,
