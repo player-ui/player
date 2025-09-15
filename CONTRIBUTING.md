@@ -89,9 +89,9 @@ which will run an instance on `http://localhost:4321`.
 
 ### Documentation Previews
 
-To trigger a docs preview, collaborators can add a `/docs` comment to any PR. This will build and deploy a docs preview to `pr/{PR_NUMBER}` in the [Player Docs Repo](https://github.com/player-ui/player-ui.github.io). A comment will be added to the PR with the preview link.
+To trigger a docs preview, collaborators can add a `/docs` comment to any PR. This will build and deploy a docs preview to the [Player Docs Repo](https://github.com/player-ui/player-ui.github.io) in the `pr/{PR_NUMBER}` folder structure. A comment will be added to the PR with the preview link.
 
-> **Note:** Docs previews can only be requested by collaborators.
+The docs preview will be available at: `https://player-ui.github.io/pr/{PR_NUMBER}/`
 
 ### Canary Releases
 

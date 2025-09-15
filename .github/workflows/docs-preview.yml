@@ -92,7 +92,7 @@ jobs:
 
             const commentId = `docs-preview-${prNumber}`;
             let comment = `<!-- ${commentId} -->\n### Docs Preview\n\n`;
-            comment += `Your PR docs changes were deployed to [pr/${prNumber}](https://github.com/player-ui/player-ui.github.io/tree/main/pr/${prNumber}) on \`${currentDate}\`\n\n`;
+            comment += `Your PR docs changes were deployed on \`${currentDate}\`\n\n`;
             comment += `🚀 https://player-ui.github.io/pr/${prNumber}/`;
 
             // Find and update existing comment or create new one
