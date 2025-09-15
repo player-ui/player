@@ -1,3 +1,24 @@
+# 0.14.0-next.5 (Mon Sep 15 2025)
+
+#### 🐛 Bug Fix
+
+- Release main [#721](https://github.com/player-ui/player/pull/721) ([@intuit-svc](https://github.com/intuit-svc))
+
+#### ⚠️ Pushed to `main`
+
+- fix docs build ([@sugarmanz](https://github.com/sugarmanz))
+
+#### 📝 Documentation
+
+- Supplement Android + JVM platform documentation [#719](https://github.com/player-ui/player/pull/719) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### Authors: 2
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+
+---
+
 # 0.14.0-next.4 (Mon Sep 08 2025)
 
 ### Release Notes
