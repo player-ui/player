@@ -72,11 +72,11 @@ jobs:
         run: |
           PR_NUMBER=${{ needs.check_auth.outputs.pr_number }}
           echo "Deploying docs preview for PR #$PR_NUMBER"
-          STABLE_DOCS_BASE_PATH="pr-$PR_NUMBER" \
+          STABLE_DOCS_BASE_PATH="pr/$PR_NUMBER" \
           STABLE_ALGOLIA_SEARCH_API_KEY=${{ secrets.ALGOLIA_NEXT_SEARCH_API_KEY }} \
           STABLE_ALGOLIA_SEARCH_APPID="D477I7TDXB" \
           STABLE_ALGOLIA_SEARCH_INDEX="crawler_Player (Next)" \
-          bazel run --config=release //docs:gh_deploy -- --dest_dir "pr-$PR_NUMBER"
+          bazel run --config=release //docs:gh_deploy -- --dest_dir "pr/$PR_NUMBER"
           echo "deployment_success=true" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -92,8 +92,8 @@ jobs:
 
             const commentId = `docs-preview-${prNumber}`;
             let comment = `<!-- ${commentId} -->\n### Docs Preview\n\n`;
-            comment += `Your PR docs changes were deployed to [pr-${prNumber}](https://github.com/player-ui/player-ui.github.io/tree/main/pr-${prNumber}) on \`${currentDate}\`\n\n`;
-            comment += `🚀 https://player-ui.github.io/pr-${prNumber}/`;
+            comment += `Your PR docs changes were deployed to [pr/${prNumber}](https://github.com/player-ui/player-ui.github.io/tree/main/pr/${prNumber}) on \`${currentDate}\`\n\n`;
+            comment += `🚀 https://player-ui.github.io/pr/${prNumber}/`;
 
             // Find and update existing comment or create new one
             const comments = await github.rest.issues.listComments({

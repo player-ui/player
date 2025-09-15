@@ -18,10 +18,10 @@ jobs:
       - name: Remove PR docs folder
         run: |
           pr_number=${{ github.event.number }}
-          pr_folder="docs-site/pr-$pr_number"
+          pr_folder="docs-site/pr/$pr_number"
 
           if [ -d "$pr_folder" ]; then
-            echo "Removing PR docs folder: pr-$pr_number"
+            echo "Removing PR docs folder: pr/$pr_number"
             rm -rf "$pr_folder"
             
             cd docs-site
@@ -31,5 +31,5 @@ jobs:
             git commit -m "Remove docs preview for PR #$pr_number" || echo "No changes to commit"
             git push origin main
           else
-            echo "PR docs folder pr-$pr_number not found, nothing to clean up"
+            echo "PR docs folder pr/$pr_number not found, nothing to clean up"
           fi
