@@ -1,3 +1,85 @@
+# 0.14.0 (Mon Sep 15 2025)
+
+### Release Notes
+
+#### Remove support for J2V8 on Android ([#712](https://github.com/player-ui/player/pull/712))
+
+With the [Android 15 16 KB page size requirement](https://android-developers.googleblog.com/2025/05/prepare-play-apps-for-devices-with-16kb-page-size.html), Android Player is dropping support for [J2V8](https://github.com/eclipsesource/J2V8) as it fails to meet those requirements. It will no longer be a transitive dependency, requiring the desired runtime module to be declared explicitly as a dependency of the app.
+
+For example, [Hermes](https://github.com/facebook/hermes) is now the recommended runtime for Android Player use cases, and can be configured simply via including the dependency:
+```kotlin
+dependencies {
+    implementation("com.intuit.playerui", "hermes-android", $PLAYER_VERSION)
+}
+```
+
+#### add asyncNodePosition to createAsyncTransform options ([#714](https://github.com/player-ui/player/pull/714))
+
+- Added `asyncNodePosition` as an option to `createAsyncTransform`. This lets user choose if the generated async node goes to the top or bottom of the generated multi-node.
+
+#### update createAsyncTransform to allow for different node types ([#708](https://github.com/player-ui/player/pull/708))
+
+- Update the `createAsyncTransform` util to consider different incoming node types coming from `getNestedAsset` option. Originally, this assumed that it would always be an `asset` node type and would asset-wrap the node, but to allow for some additional flexibility, the following rules are applied:
+  - Asset nodes and Applicability nodes with a value that is an asset node get asset wrapped like before.
+  - multi-nodes have their values spread into the initialized multi-node to keep the structure flat
+  - everything else gets added to the initialized multi-node as-is.
+
+#### Migrate to Bazel 8 ([#700](https://github.com/player-ui/player/pull/700))
+
+- Update to Bazel 8
+- Android SDK/NDK now only needed for Android targets
+  - Applicable to CI and local development
+- Coverage for JVM modules
+- Updated `just` commands and documentation
+
+#### improve async node flattening and apply resolver cache to async nodes ([#694](https://github.com/player-ui/player/pull/694))
+
+- Simplify async node flattening to just check for multi-nodes inside multi-nodes after async nodes are resolved.
+- Introduce async node id cache in the resolver to allow async nodes to be marked as dirty and limit scope of resolver update to the specific node and use cache for the rest of the update.
+
+#### support boolean values in binding queries ([#703](https://github.com/player-ui/player/pull/703))
+
+- Update binding parser to allow for boolean value nodes
+- Only use boolean values in query values as parts of the path should always be strings or numbers
+
+---
+
+#### 🚀 Enhancement
+
+- Remove support for J2V8 on Android [#712](https://github.com/player-ui/player/pull/712) ([@sugarmanz](https://github.com/sugarmanz))
+- improve async node flattening and apply resolver cache to async nodes [#694](https://github.com/player-ui/player/pull/694) ([@tmarmer](https://github.com/tmarmer))
+
+#### 🐛 Bug Fix
+
+- Release main [#722](https://github.com/player-ui/player/pull/722) ([@intuit-svc](https://github.com/intuit-svc))
+- Release main [#721](https://github.com/player-ui/player/pull/721) ([@intuit-svc](https://github.com/intuit-svc))
+- add asyncNodePosition to createAsyncTransform options [#714](https://github.com/player-ui/player/pull/714) ([@tmarmer](https://github.com/tmarmer))
+- Fix Android publishing [#715](https://github.com/player-ui/player/pull/715) ([@sugarmanz](https://github.com/sugarmanz))
+- Docs: Adding pages for complexity and metrics plugins, fixing redirects, restoring getting-started content [#707](https://github.com/player-ui/player/pull/707) ([@kharrop](https://github.com/kharrop))
+- update createAsyncTransform to allow for different node types [#708](https://github.com/player-ui/player/pull/708) ([@tmarmer](https://github.com/tmarmer))
+- Migrate to Bazel 8 [#700](https://github.com/player-ui/player/pull/700) ([@sugarmanz](https://github.com/sugarmanz) [@KetanReddy](https://github.com/KetanReddy) [@KVSRoyal](https://github.com/KVSRoyal))
+- Document common iOS Cache error and how to fix it [#706](https://github.com/player-ui/player/pull/706) ([@KVSRoyal](https://github.com/KVSRoyal))
+- support boolean values in binding queries [#703](https://github.com/player-ui/player/pull/703) ([@tmarmer](https://github.com/tmarmer))
+
+#### ⚠️ Pushed to `main`
+
+- fix docs build ([@sugarmanz](https://github.com/sugarmanz))
+
+#### 📝 Documentation
+
+- Supplement Android + JVM platform documentation [#719](https://github.com/player-ui/player/pull/719) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### Authors: 6
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
 # 0.14.0-next.5 (Mon Sep 15 2025)
 
 #### 🐛 Bug Fix
