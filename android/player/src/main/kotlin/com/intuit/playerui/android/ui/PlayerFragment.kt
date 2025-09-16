@@ -15,6 +15,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.whenStarted
 import androidx.transition.Transition
 import com.intuit.playerui.android.AndroidPlayer
+import com.intuit.playerui.core.player.state.ReleasedState
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.extensions.into
@@ -99,7 +100,7 @@ public abstract class PlayerFragment :
                 // forward state events to callbacks
                 playerViewModel.state
                     .onEach {
-                        when (it) {
+                        if (playerViewModel.player.state !is ReleasedState) when (it) {
                             NotStarted -> onNotStarted()
                             Pending -> onPending()
                             is Running -> onRunning(it)
