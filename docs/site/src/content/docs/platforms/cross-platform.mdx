@@ -1,8 +1,12 @@
 ---
 title: Using Player Across Multiple Platforms
+sidebar:
+  order: 0
 ---
 
-One of the major benefits of adopting Player for rendering a UI is it's ability to function across all the platforms Player supports (React, Android, iOS) using the same content. In order to facilitate this, and get the most out of Player's architecture, here's a few things to keep in mind as you integrate Player into multiple platforms.
+One of the major benefits of adopting Player for rendering a UI is its ability to function across all the platforms Player supports (React, Android, iOS) using the same content. Rather than implementing Player many times for each platform, a shared TypeScript "core" is leveraged to consolidate logic for execution on all platforms. In addition to reducing the maintenance burden, this also helps limit platform disparity and platform-specific bugs. For the mobile platforms, the intent is to hide reliance on a JavaScript runtime behind clean, idiomatic APIs -- if you see any area of opportunity, don't hesitate to leave us an [issue](https://github.com/player-ui/player/issues/new/choose)!
+
+More on platform nuance can be found in the platform-specific docs, but to get the most out of Player's architecture, here's a few general things to keep in mind as you integrate Player into multiple platforms.
 
 ## Use Core Plugins to Share Functionality
 
