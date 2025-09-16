@@ -4,6 +4,8 @@ platform: core,react
 ---
 
 import PlatformTabs from "../../../components/PlatformTabs.astro";
+import Image from "../../../components/Image.astro";
+import pluginsOOO from "../../../assets/plugin-ooo.png";
 
 While we have published a majority of the plugins we have developed, there will always be new use cases that may require new functionality. Writing a plugin in the easiest way to extend Player functionality for these cases. Plugins work slightly differently on each platform so in this guide we will cover how to write a plugin for each platform.
 
@@ -56,6 +58,9 @@ For a more comprehensive guide on plugins, check out this [Plugin Implementation
 
 _Note: For the React Player you can import and load the plugin the same way you would a React Player Plugin but for the iOS and Android Players you will need to wrap the javascript bundle in a iOS/Android plugin to ensure it is available on your platform._
 
+:::caution
+Even though core plugins are written in TypeScript, they're not targeting web environments, which limits the common [global web APIs](https://developer.mozilla.org/en-US/docs/Web/API) that TS developers are typically used to. Avoid web-specific APIs in core plugins unless absolutely necessary -- polyfills, or native implementations may be required for the core plugin to function on mobile platforms.
+:::
   </Fragment>
   <Fragment slot='react'>
 
@@ -105,6 +110,8 @@ Lastly React plugins can also act as a core plugin in cases where core functiona
 
   </Fragment>
   <Fragment slot='ios'>
+## iOS Plugins
+
 iOS Player Plugins are very similar to core and react plugins in both their composition and use.
 
 ### NativePlugin
@@ -135,23 +142,7 @@ class EnvironmentPlugin: NativePlugin {
 }
 ```
 
-#### Asset Registration
-
-Likely the most common usecase for plugins is to register assets:
-
-```swift
-import PlayerUI
-
-class ExampleAssetPlugin: NativePlugin {
-    let pluginName = "ExampleAssetPlugin"
-
-    func apply<P>(player: P) where P: HeadlessPlayer {
-      guard let player = player as? SwiftUIPlayer else { return }
-      player.assetRegistry.register("text", asset: TextAsset.self)
-      player.assetRegistry.register("action", asset: ActionAsset.self)
-    }
-}
-```
+Likely the most common usecase for plugins is to provide UI through assets. More information can be found in the [Custom Assets guide](/assets/custom).
 
 ### JSBasePlugin
 
@@ -210,6 +201,70 @@ class SharedJSPlugin: JSBasePlugin {
 **Note**: As `JavaScriptCore` cannot resolve dependencies at runtime, using a module bundler such as [tsup](https://github.com/egoist/tsup) is required.
 
 **Note**: `JSBasePlugin` implementations do not necessarily need to be a `PlayerPlugin`, for example, the [BeaconPlugin](https://github.com/player-ui/player/blob/main/plugins/beacon/ios/Sources/BaseBeaconPlugin.swift#L59) can take plugins in it's constructor, that are not `PlayerPlugin`.
+
+  </Fragment>
+ <Fragment slot="android">
+## Android Plugins
+
+For all types of plugins, the `apply(instance: T)` signature is the standard way of getting the instance of whatever the plugin is applying to. It is best practice that this method remains idempotent, but that doesn't mean that plugins can't maintain state to hold a reference to said `instance`. Different types of plugins are handled at different stages of initialization, but the order of the same types of plugins will be preserved when applying the plugins.
+
+### Android Player Plugins
+
+Android Player plugins must implement the `AndroidPlayerPlugin` interface, which will give them access to an `AndroidPlayer` instance through the `apply` method. Plugins can use this instance to register UI assets, apply themes, or even access the [Player hooks](#jvm-player-plugins). 
+
+Likely the most common usecase for plugins is to provide UI through assets. More information can be found in the [Custom Assets guide](/assets/custom).
+
+### JVM Player Plugins
+
+Player plugins that are only required for the JVM use cases should implement the `PlayerPlugin` interface. This provides a _limited_ `Player` wrapper of the core JS Player, which are exposed through the Player `hooks`. A basic example of `PlayerPlugin` to handle errors:
+
+```kotlin
+class HandleErrorPlayerPlugin : PlayerPlugin {
+    override fun apply(player: Player) {
+        player.hooks.state.tap { state ->
+            if (state is ErrorState) {
+                // handle error
+            }
+        }
+    }
+}
+```
+
+For more practical examples, take a look at the [coroutines plugins](/plugins/android/coroutines/) which tie asynchronous Player paradigms to [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html) constructs.
+
+:::note
+The `AndroidPlayer` also extends the "core" JVM `Player`, which means that Android Player plugins already have access to everything the `PlayerPlugin` provides.
+:::
+
+### JS Player Plugins
+
+Given the core Player is written in TypeScript incidentally means that most Player plugins will also be written in TypeScript. Loading these on the JVM platform requires some additional setup. At the very least, the plugin will need to be bundled with its dependencies and transpiled according the the target [JS runtime](/platforms/jvm#javascript-runtime).
+
+Once you have your bundle, all that is left is implementing the wrapper on the JVM. The plugin wrapper should implement the `JSPluginWrapper`, which includes an `apply(runtime: Runtime)` method to provide the `Runtime` in which to instantiate the JS Player plugin within.
+
+For plugins that do not have any constructor arguments, the `JSScriptPluginWrapper` can be used to simplify the overhead of instantiated that plugin. It is an abstract class that implements of the `JSPluginWrapper`. This can be instantiated with the loaded bundle as a string or the location of the bundle on the classpath and will automatically read the bundle and instantiate the plugin within the JS runtime.
+
+```kotlin
+class MyCorePlugin : JSScriptPluginWrapper("MyCorePluginName", sourcePath = "path/to/source.js") {
+    // Expose a member of the core instance
+    public val someField: String by NodeSerializableField(String.serializer())
+
+    // Privately declare loosely typed-function of the core instance
+    private val someFunc: Invokable<String> by NodeSerializableFunction()
+    // Expose strictly typed method for consumption
+    public fun someFunc(p1: String): String = someFunc(p1)
+}
+```
+
+### Runtime Plugins
+
+`RuntimePlugin`s are supertypes of the `JSPluginWrapper` for JS Player plugin wrappers. At this layer, they can be used to add non-player specific functionality to the JS runtime. For example, the [`BeaconPlugin`](/plugins/multiplatform/beacon/) requires the `setTimeout` global method, which does not exist by default in some runtimes. Thus, the `BeaconPlugin` applies the `SetTimeoutPlugin`, which is a `RuntimePlugin`, before it instantiates the actual JS Player beacon plugin.
+
+### Plugin Order of Operations
+
+With all these different types of plugins, it may be difficult to understand how they are treated and when each is applied. Each of these plugin types implements the base `Plugin` interface, which provides a bounding layer for any type of plugin. Both the Android and JVM Players accept a collection of `Plugin`s, which may or may not be specific to that Player. This allows non-player plugins, such as the `RuntimePlugin` to be passed into the instantiation of either Player, simplifying the overhead of using such plugins. During the different layers of initialization, the internals will handle each type of plugin that it cares about. Because the internals are expecting certain types of plugins, any direct implementation of the base `Plugin` is certainly an error. Below is a detailed sequence diagram describing the order in which plugins are applied.
+
+<Image darkModeInvert src={pluginsOOO} alt="Plugin Order of Operations" />
 
   </Fragment>
  </PlatformTabs>
