@@ -10,7 +10,9 @@ PLUGIN_MOCKS = [
 ]
 filegroup(
     name = "all_mocks",
-    srcs = ["//plugins/{}/mocks".format(plugin) for plugin in PLUGIN_MOCKS],
+    srcs = ["//plugins/{}/mocks".format(plugin) for plugin in PLUGIN_MOCKS] + [
+        "//plugins/reference-assets/mocks:flow-manager",
+    ],
     visibility = ["//visibility:public"],
 )
 
