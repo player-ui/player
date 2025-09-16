@@ -11,7 +11,7 @@ interface ReleaseInfo {
 /**
  * Auto plugin that comments on PRs for releases
  */
-class ReleaseCommentPlugin implements IPlugin {
+class BuildPreviewPlugin implements IPlugin {
   /** The name of the plugin */
   name = "release-comment";
 
@@ -67,26 +67,22 @@ class ReleaseCommentPlugin implements IPlugin {
         // Get current date
         const currentDate = new Date().toUTCString();
 
-        // Get CircleCI build URL and number
-        const circleBuildUrl = process.env.CIRCLE_BUILD_URL;
-        const buildNumber = circleBuildUrl
-          ? circleBuildUrl.split("/").pop()
-          : null;
-        const buildLink = buildNumber
-          ? `CircleCI [#${buildNumber}](${circleBuildUrl})`
-          : "CircleCI";
+        // Get PR number for docs URL
+        const docsUrl = `https://player-ui.github.io/pr/${prNumber}/`;
 
-        // Comment on the PR
-        let versionMessage = `### Canary Release\n\n`;
-        versionMessage += `Your PR was deployed by ${buildLink} on \`${currentDate}\` with this version:\n\n`;
+        // Comment on the PR with unified context
+        let versionMessage = `### Build Preview\n\n`;
+        versionMessage += `Canary version updated on \`${currentDate}\`:\n\n`;
 
         versionMessage += "```\n";
         versionMessage += `${newVersion}\n`;
-        versionMessage += "```";
+        versionMessage += "```\n\n";
+
+        versionMessage += `🚀 Docs preview: ${docsUrl}\n`;
 
         await auto.comment({
           message: versionMessage,
-          context: "canary-release",
+          context: "build-preview",
         });
 
         auto.logger.verbose.info("Successfully posted canary docs comment");
@@ -110,4 +106,4 @@ class ReleaseCommentPlugin implements IPlugin {
   }
 }
 
-export default ReleaseCommentPlugin;
+export default BuildPreviewPlugin;

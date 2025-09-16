@@ -22,6 +22,7 @@
     "resolveJsonModule": true,
     "composite": true,
     "lib": ["DOM", "ES2020"],
+    "isolatedDeclarations": true,
     "noUncheckedIndexedAccess": true
   }
 }

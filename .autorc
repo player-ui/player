@@ -26,6 +26,6 @@
     ],
     "./scripts/delete-old-prerelease.js",
     "./scripts/next-changelogs.js",
-    "./scripts/release-comment.ts"
+    "./scripts/build-preview.ts"
   ]
 }
