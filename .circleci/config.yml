@@ -152,13 +152,14 @@ commands:
           # Only post comment if this is NOT a canary release
           # Canary releases will post comment after auto_shipit completes
           if [ "<< pipeline.parameters.should_release >>" != "true" ]; then
-            npx auto comment --message "### Build Preview
+            MESSAGE="### Build Preview
 
 Docs updated on \`$(date -u +"%a, %d %b %Y %H:%M:%S GMT")\`:
 
 🚀 Docs preview: $PR_URL
 
-<!-- build-preview-$PR_NUMBER -->" --context "build-preview"
+<!-- build-preview-$PR_NUMBER -->"
+            npx auto comment --message "$MESSAGE" --context "build-preview"
           else
             echo "Skipping docs comment - canary release will post comment after auto_shipit"
           fi
@@ -477,11 +478,12 @@ jobs:
           command: |
             PR_NUMBER=$(echo "{{ .Branch }}" | sed 's/pull\///')
             # Use auto comment to post the error message
-            npx auto comment --message "### Build Preview Failed
+            ERROR_MESSAGE="### Build Preview Failed
 
 ❌ Docs preview deployment failed. Please check the [CircleCI logs](https://circleci.com/gh/player-ui/player/{{ .BuildNum }}) for details.
 
-<!-- build-preview-$PR_NUMBER -->" --context "build-preview-error"
+<!-- build-preview-$PR_NUMBER -->"
+            npx auto comment --message "$ERROR_MESSAGE" --context "build-preview-error"
             
             echo "Posted docs preview failure comment to PR #$PR_NUMBER"
 
