@@ -1,4 +1,4 @@
-import { Auto, IPlugin } from "@auto-it/core";
+import type { Auto } from "@auto-it/core";
 
 /**
  * The object passed to afterShipIt
@@ -11,7 +11,7 @@ interface ReleaseInfo {
 /**
  * Auto plugin that comments on PRs for releases
  */
-class BuildPreviewPlugin implements IPlugin {
+class BuildPreviewPlugin {
   /** The name of the plugin */
   name = "release-comment";
 

@@ -629,10 +629,6 @@ workflows:
             - build-fork
 
       - docs_preview:
-          filters:
-            branches:
-              only:
-                - /pull\/.*/
           context:
             - Publish
           requires:
