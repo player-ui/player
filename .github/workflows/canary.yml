@@ -71,7 +71,7 @@ jobs:
             --header 'content-type: application/json' \
             --header 'x-attribution-login: ${{ github.actor }}' \
             --header 'x-attribution-actor-id: ${{ github.actor }}' \
-            --data '{ "branch": "${{ needs.check_auth.outputs.branch }}", "parameters": { "should_release": true }}'
+            --data '{ "branch": "${{ needs.check_auth.outputs.branch }}", "parameters": { "should_release": true, "GHA_Action": "canary" }}'
       - name: Trigger success
         uses: actions/github-script@v6
         with:
