@@ -341,10 +341,8 @@ jobs:
       - run: |
           bazel query 'filter(".*_vitest_bench$", //...)' --output label 2>/dev/null | tr '\n' ' ' | xargs -r -n 1 bazel run --config=ci-benchmark
 
-  docs_pr_deploy:
+  build_docs:
     executor: base
-    environment:
-      GHA_ACTION: << pipeline.parameters.GHA_Action >>
     steps:
       - attach_workspace:
           at: ~/player
@@ -353,6 +351,18 @@ jobs:
             - "v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}"
             - "v1-bazel-cache-core-{{ .Branch }}"
             - "v1-bazel-cache-core-main"
+
+      - run:
+          name: Build docs
+          command: |
+            # Only run if triggered by GitHub Actions
+            if [ -z "<< pipeline.parameters.GHA_Action >>" ]; then
+              echo "Not triggered by GitHub Actions - skipping docs build"
+              exit 0
+            fi
+
+            echo "GitHub Action triggered - building docs"
+            bazel build --config=release //docs:gh_deploy
 
       - add_ssh_keys:
           fingerprints:
@@ -369,10 +379,10 @@ jobs:
           command: git config --global user.email "opensource-svc@intuit.com"
 
       - run:
-          name: Deploy docs preview for PR
+          name: Deploy docs preview
           command: |
             # Only run if triggered by GitHub Actions
-            if [ -z "${GHA_ACTION}" ]; then
+            if [ -z "<< pipeline.parameters.GHA_Action >>" ]; then
               echo "Not triggered by GitHub Actions - skipping docs deployment"
               exit 0
             fi
@@ -385,16 +395,6 @@ jobs:
             fi
             echo "Deploying docs preview for PR #$PR_NUMBER"
 
-            # Check if docs were already built by release.sh (for canary releases)
-            # If not, build them now (for docs-only commands)
-            if [ "${CIRCLE_PIPELINE_PARAMETERS_SHOULD_RELEASE:-false}" = "true" ]; then
-              echo "Canary release detected - docs should already be built by release.sh"
-              echo "Just deploying docs to pr/$PR_NUMBER directory"
-            else
-              echo "Docs-only command - building docs first"
-              bazel build --config=release //docs:gh_deploy
-            fi
-
             # Deploy docs to pr/NUMBER directory
             STABLE_DOCS_BASE_PATH="pr/$PR_NUMBER" \
             STABLE_ALGOLIA_SEARCH_API_KEY="$ALGOLIA_NEXT_SEARCH_API_KEY" \
@@ -404,36 +404,11 @@ jobs:
 
             echo "Docs preview deployed to: https://player-ui.github.io/pr/$PR_NUMBER/"
 
-            echo "Docs deployment completed for PR #$PR_NUMBER"
-
-      - run:
-          name: Handle docs preview failure
-          when: on_fail
-          command: |
-            PR_NUMBER=$(echo "$CIRCLE_BRANCH" | sed -E 's|^pull/([0-9]+).*|\1|')
-            if [ -z "$PR_NUMBER" ]; then
-              echo "Could not extract PR number from branch: $CIRCLE_BRANCH"
-              exit 1
-            fi
-            # Use auto comment to post the error message
-            npx auto comment --message "### Build Preview Failed
-
-            ❌ Docs preview deployment failed. Please check the [CircleCI logs](https://circleci.com/gh/player-ui/player/${CIRCLE_BUILD_NUM}) for details." --context "build-preview-error"
-
-            echo "Posted docs preview failure comment to PR #$PR_NUMBER"
-
-  docs_comment:
-    executor: base
-    environment:
-      GHA_ACTION: << pipeline.parameters.GHA_Action >>
-    steps:
-      - attach_workspace:
-          at: ~/player
       - run:
           name: Post docs-only PR comment
           command: |
             # Only run if triggered by GitHub Actions
-            if [ -z "${GHA_ACTION}" ]; then
+            if [ -z "<< pipeline.parameters.GHA_Action >>" ]; then
               echo "Not triggered by GitHub Actions - skipping docs comment"
               exit 0
             fi
@@ -442,7 +417,7 @@ jobs:
             bundle install
 
             # Only post comment for docs-only commands
-            # Canary releases will post comment after auto_shipit completes via build-preview.ts plugin
+            # Canary releases will post comment after auto_shipit completes via build-preview.js plugin
             if [ "${CIRCLE_PIPELINE_PARAMETERS_SHOULD_RELEASE:-false}" != "true" ]; then
               # Extract PR number from branch name
               PR_NUMBER=$(echo "$CIRCLE_BRANCH" | sed -E 's|^pull/([0-9]+).*|\1|')
@@ -461,6 +436,22 @@ jobs:
             else
               echo "Skipping docs comment - canary release will post comment after auto_shipit"
             fi
+
+      - run:
+          name: Handle docs preview failure
+          when: on_fail
+          command: |
+            PR_NUMBER=$(echo "$CIRCLE_BRANCH" | sed -E 's|^pull/([0-9]+).*|\1|')
+            if [ -z "$PR_NUMBER" ]; then
+              echo "Could not extract PR number from branch: $CIRCLE_BRANCH"
+              exit 1
+            fi
+            # Use auto comment to post the error message
+            npx auto comment --message "### Build Preview Failed
+
+            ❌ Docs preview deployment failed. Please check the [CircleCI logs](https://circleci.com/gh/player-ui/player/${CIRCLE_BUILD_NUM}) for details." --context "build-preview-error"
+
+            echo "Posted docs preview failure comment to PR #$PR_NUMBER"
 
   docs_release:
     executor: base
@@ -657,18 +648,19 @@ workflows:
           requires:
             - build-fork
 
-      - docs_pr_deploy:
+      - build_docs:
+          name: build-docs-fork
           context:
             - Publish
           requires:
-            - build-fork
-            - test-fork
+            - bazelrc_fork
 
-      - docs_comment:
+      - build_docs:
+          name: build-docs-trunk
           context:
             - Publish
           requires:
-            - docs_pr_deploy
+            - bazelrc
 
   build_and_test_main:
     when:
@@ -713,18 +705,12 @@ workflows:
             - coverage
             - build_ios
 
-      - docs_pr_deploy:
+      - build_docs:
+          name: build-docs-trunk
           context:
             - Publish
           requires:
-            - build
-            - build_ios
-
-      - docs_comment:
-          context:
-            - Publish
-          requires:
-            - docs_pr_deploy
+            - bazelrc
 
   full_release:
     when:
