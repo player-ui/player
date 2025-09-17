@@ -343,6 +343,8 @@ jobs:
 
   build_docs:
     executor: base
+    environment:
+      GHA_ACTION: << pipeline.parameters.GHA_Action >>
     steps:
       - attach_workspace:
           at: ~/player
@@ -355,13 +357,22 @@ jobs:
       - run:
           name: Build docs
           command: |
-            # Only run if triggered by GitHub Actions
-            if [ -z "<< pipeline.parameters.GHA_Action >>" ]; then
+            # Debug: Show what GHA_ACTION is set to
+            echo "GHA_ACTION is set to: '${GHA_ACTION}'"
+
+            # Only run if triggered by GitHub Actions for PR previews
+            if [ -z "${GHA_ACTION}" ]; then
               echo "Not triggered by GitHub Actions - skipping docs build"
               exit 0
             fi
 
-            echo "GitHub Action triggered - building docs"
+            # Skip docs building for production releases (they'll be built in release.sh)
+            if [ "${CIRCLE_PIPELINE_PARAMETERS_SHOULD_RELEASE:-false}" = "true" ] && [ "${GHA_ACTION}" != "canary" ]; then
+              echo "Production release detected - docs will be built in release.sh, skipping here"
+              exit 0
+            fi
+
+            echo "PR preview detected - building docs in CircleCI"
             bazel build --config=release //docs:gh_deploy
 
       - add_ssh_keys:
@@ -382,7 +393,7 @@ jobs:
           name: Deploy docs preview
           command: |
             # Only run if triggered by GitHub Actions
-            if [ -z "<< pipeline.parameters.GHA_Action >>" ]; then
+            if [ -z "${GHA_ACTION}" ]; then
               echo "Not triggered by GitHub Actions - skipping docs deployment"
               exit 0
             fi
@@ -408,7 +419,7 @@ jobs:
           name: Post docs-only PR comment
           command: |
             # Only run if triggered by GitHub Actions
-            if [ -z "<< pipeline.parameters.GHA_Action >>" ]; then
+            if [ -z "${GHA_ACTION}" ]; then
               echo "Not triggered by GitHub Actions - skipping docs comment"
               exit 0
             fi
