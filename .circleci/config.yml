@@ -341,7 +341,7 @@ jobs:
       - run: |
           bazel query 'filter(".*_vitest_bench$", //...)' --output label 2>/dev/null | tr '\n' ' ' | xargs -r -n 1 bazel run --config=ci-benchmark
 
-  docs_preview:
+  docs_pr_deploy:
     executor: base
     steps:
       - attach_workspace:
@@ -369,6 +369,12 @@ jobs:
       - run:
           name: Deploy docs preview for PR
           command: |
+            # Only run if triggered by GitHub Actions
+            if [ -z "${CIRCLE_PIPELINE_PARAMETERS_GHA_ACTION:-}" ]; then
+              echo "Not triggered by GitHub Actions - skipping docs deployment"
+              exit 0
+            fi
+
             # Extract PR number from branch name
             PR_NUMBER=$(echo "$CIRCLE_BRANCH" | sed -E 's|^pull/([0-9]+).*|\1|')
             if [ -z "$PR_NUMBER" ]; then
@@ -396,26 +402,7 @@ jobs:
 
             echo "Docs preview deployed to: https://player-ui.github.io/pr/$PR_NUMBER/"
 
-            echo "Docs preview deployment completed for PR #$PR_NUMBER"
-
-      - run:
-          name: Post PR comment
-          command: |
-            source ~/.bashrc
-            bundle install
-
-            # Only post comment for docs-only commands
-            # Canary releases will post comment after auto_shipit completes
-            if [ "${CIRCLE_PIPELINE_PARAMETERS_SHOULD_RELEASE:-false}" != "true" ]; then
-              PR_URL="https://player-ui.github.io/pr/$PR_NUMBER/"
-              npx auto comment --message "### Build Preview
-
-              Docs updated on \`$(date -u +\"%a, %d %b %Y %H:%M:%S GMT\")\`:
-
-              🚀 Docs preview: $PR_URL" --context "build-preview"
-            else
-              echo "Skipping docs comment - canary release will post comment after auto_shipit"
-            fi
+            echo "Docs deployment completed for PR #$PR_NUMBER"
 
       - run:
           name: Handle docs preview failure
@@ -432,6 +419,44 @@ jobs:
             ❌ Docs preview deployment failed. Please check the [CircleCI logs](https://circleci.com/gh/player-ui/player/${CIRCLE_BUILD_NUM}) for details." --context "build-preview-error"
 
             echo "Posted docs preview failure comment to PR #$PR_NUMBER"
+
+  docs_comment:
+    executor: base
+    steps:
+      - attach_workspace:
+          at: ~/player
+      - run:
+          name: Post docs-only PR comment
+          command: |
+            # Only run if triggered by GitHub Actions
+            if [ -z "${CIRCLE_PIPELINE_PARAMETERS_GHA_ACTION:-}" ]; then
+              echo "Not triggered by GitHub Actions - skipping docs comment"
+              exit 0
+            fi
+
+            source ~/.bashrc
+            bundle install
+
+            # Only post comment for docs-only commands
+            # Canary releases will post comment after auto_shipit completes via build-preview.ts plugin
+            if [ "${CIRCLE_PIPELINE_PARAMETERS_SHOULD_RELEASE:-false}" != "true" ]; then
+              # Extract PR number from branch name
+              PR_NUMBER=$(echo "$CIRCLE_BRANCH" | sed -E 's|^pull/([0-9]+).*|\1|')
+              if [ -z "$PR_NUMBER" ]; then
+                echo "Could not extract PR number from branch: $CIRCLE_BRANCH"
+                exit 1
+              fi
+              
+              # Post docs-only PR comment
+              PR_URL="https://player-ui.github.io/pr/$PR_NUMBER/"
+              npx auto comment --message "### Build Preview
+
+              Docs updated on \`$(date -u +\"%a, %d %b %Y %H:%M:%S GMT\")\`:
+
+              🚀 Docs preview: $PR_URL" --context "build-preview"
+            else
+              echo "Skipping docs comment - canary release will post comment after auto_shipit"
+            fi
 
   docs_release:
     executor: base
@@ -628,13 +653,18 @@ workflows:
           requires:
             - build-fork
 
-      - docs_preview:
+      - docs_pr_deploy:
           context:
             - Publish
           requires:
             - build-fork
             - test-fork
-            - maybe_release
+
+      - docs_comment:
+          context:
+            - Publish
+          requires:
+            - docs_pr_deploy
 
   build_and_test_main:
     when:
