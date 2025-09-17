@@ -27,9 +27,6 @@ importers:
       '@astrojs/tailwind':
         specifier: ^6.0.2
         version: 6.0.2(astro@5.12.9(@types/node@20.19.10)(jiti@2.5.1)(rollup@4.46.2)(terser@5.43.1)(typescript@5.5.3)(yaml@2.8.1))(tailwindcss@3.4.17(ts-node@10.9.2(@swc/core@1.13.3(@swc/helpers@0.5.17))(@types/node@20.19.10)(typescript@5.5.3)))(ts-node@10.9.2(@swc/core@1.13.3(@swc/helpers@0.5.17))(@types/node@20.19.10)(typescript@5.5.3))
-      '@auto-it/core':
-        specifier: ^11.2.0
-        version: 11.3.0(@swc/core@1.13.3(@swc/helpers@0.5.17))(@types/node@20.19.10)(typescript@5.5.3)
       '@auto-it/omit-release-notes':
         specifier: ^11.2.0
         version: 11.3.0(@swc/core@1.13.3(@swc/helpers@0.5.17))(@types/node@20.19.10)(typescript@5.5.3)

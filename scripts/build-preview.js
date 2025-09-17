@@ -1,24 +1,17 @@
-import type { Auto } from "@auto-it/core";
-
-/**
- * The object passed to afterShipIt
- */
-interface ReleaseInfo {
-  newVersion?: string;
-  context: string;
-}
-
 /**
  * Auto plugin that comments on PRs for releases
  */
 class BuildPreviewPlugin {
-  /** The name of the plugin */
-  name = "release-comment";
+  constructor() {
+    this.name = "release-comment";
+  }
 
-  /** Apply the plugin to the Auto instance */
-  apply(auto: Auto): void {
+  /**
+   * Apply the plugin to the Auto instance
+   */
+  apply(auto) {
     // Handle canary releases through afterShipIt hook
-    auto.hooks.afterShipIt.tap(this.name, async (release: ReleaseInfo) => {
+    auto.hooks.afterShipIt.tap(this.name, async (release) => {
       const { newVersion, context: releaseContext } = release;
 
       if (!newVersion) {
@@ -41,6 +34,7 @@ class BuildPreviewPlugin {
       }
 
       // Get PR number - extract from CIRCLE_PULL_REQUEST like in release.sh
+      // eslint-disable-next-line no-undef
       const circlePullRequest = process.env.CIRCLE_PULL_REQUEST;
       const prNumber = circlePullRequest
         ? circlePullRequest.split("/").pop()
@@ -48,13 +42,12 @@ class BuildPreviewPlugin {
 
       // Debug logging
       auto.logger.verbose.info(
-        `Debug: CIRCLE_PULL_REQUEST = ${circlePullRequest}, extracted PR number = ${prNumber}`,
+        `CIRCLE_PULL_REQUEST: ${circlePullRequest}, extracted PR number: ${prNumber}`,
       );
-      auto.logger.verbose.info(`Debug: Release context = ${releaseContext}`);
 
       if (!prNumber) {
         auto.logger.verbose.info(
-          "No PR number found, skipping canary docs comment",
+          "No PR number found in CIRCLE_PULL_REQUEST, skipping canary docs comment",
         );
         return;
       }
