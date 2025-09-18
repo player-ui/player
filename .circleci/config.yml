@@ -343,9 +343,18 @@ jobs:
 
   build_docs:
     executor: base
-    environment:
-      GHA_ACTION: << pipeline.parameters.GHA_Action >>
     steps:
+      - run:
+          name: Check if GitHub Action triggered
+          command: echo "Checking if this is a GitHub Action trigger"
+      - when:
+          condition: << pipeline.parameters.GHA_Action >>
+          steps:
+            - run:
+                name: Build docs for preview
+                command: |
+                  echo "GitHub Action triggered - building docs for PR preview"
+                  bazel build --config=release //docs:gh_deploy
       - attach_workspace:
           at: ~/player
       - restore_cache:
@@ -353,27 +362,6 @@ jobs:
             - "v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}"
             - "v1-bazel-cache-core-{{ .Branch }}"
             - "v1-bazel-cache-core-main"
-
-      - run:
-          name: Build docs
-          command: |
-            # Debug: Show what GHA_ACTION is set to
-            echo "GHA_ACTION is set to: '${GHA_ACTION}'"
-
-            # Only run if triggered by GitHub Actions for PR previews
-            if [ -z "${GHA_ACTION}" ]; then
-              echo "Not triggered by GitHub Actions - skipping docs build"
-              exit 0
-            fi
-
-            # Skip docs building for production releases (they'll be built in release.sh)
-            if [ "${CIRCLE_PIPELINE_PARAMETERS_SHOULD_RELEASE:-false}" = "true" ] && [ "${GHA_ACTION}" != "canary" ]; then
-              echo "Production release detected - docs will be built in release.sh, skipping here"
-              exit 0
-            fi
-
-            echo "PR preview detected - building docs in CircleCI"
-            bazel build --config=release //docs:gh_deploy
 
       - add_ssh_keys:
           fingerprints:
@@ -392,11 +380,7 @@ jobs:
       - run:
           name: Deploy docs preview
           command: |
-            # Only run if triggered by GitHub Actions
-            if [ -z "${GHA_ACTION}" ]; then
-              echo "Not triggered by GitHub Actions - skipping docs deployment"
-              exit 0
-            fi
+            echo "Deploying docs preview"
 
             # Extract PR number from branch name
             PR_NUMBER=$(echo "$CIRCLE_BRANCH" | sed -E 's|^pull/([0-9]+).*|\1|')
@@ -418,18 +402,12 @@ jobs:
       - run:
           name: Post docs-only PR comment
           command: |
-            # Only run if triggered by GitHub Actions
-            if [ -z "${GHA_ACTION}" ]; then
-              echo "Not triggered by GitHub Actions - skipping docs comment"
-              exit 0
-            fi
-
             source ~/.bashrc
             bundle install
 
             # Only post comment for docs-only commands
             # Canary releases will post comment after auto_shipit completes via build-preview.js plugin
-            if [ "${CIRCLE_PIPELINE_PARAMETERS_SHOULD_RELEASE:-false}" != "true" ]; then
+            if [ "${SHOULD_RELEASE:-false}" != "true" ]; then
               # Extract PR number from branch name
               PR_NUMBER=$(echo "$CIRCLE_BRANCH" | sed -E 's|^pull/([0-9]+).*|\1|')
               if [ -z "$PR_NUMBER" ]; then
@@ -665,6 +643,10 @@ workflows:
             - Publish
           requires:
             - bazelrc_fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
 
       - build_docs:
           name: build-docs-trunk
@@ -672,6 +654,10 @@ workflows:
             - Publish
           requires:
             - bazelrc
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
 
   build_and_test_main:
     when:
