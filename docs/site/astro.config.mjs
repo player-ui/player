@@ -47,6 +47,7 @@ export default defineConfig({
     "/plugins/common-types": resolvedPath("/plugins/core/common-types/"),
     "/tools/cli": resolvedPath("/capabilities/cli/"),
     "/tools/storybook": resolvedPath("/capabilities/storybook/"),
+    "/assets/cross-platform/": resolvedPath("/platforms/cross-platform"),
   },
   integrations: [
     react(),
@@ -98,6 +99,10 @@ export default defineConfig({
             {
               label: "Guides",
               autogenerate: { directory: "guides" },
+            },
+            {
+              label: "Platforms",
+              autogenerate: { directory: "platforms" },
             },
             {
               label: "Authoring",

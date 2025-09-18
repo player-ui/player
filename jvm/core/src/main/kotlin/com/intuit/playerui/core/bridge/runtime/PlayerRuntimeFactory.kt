@@ -3,7 +3,7 @@ package com.intuit.playerui.core.bridge.runtime
 import java.util.ServiceLoader
 
 internal const val RUNTIME_DETAILS_MSG =
-    "See https://player-ui.github.io/latest/getting-started?lang=android#js-runtime for more details"
+    "See https://player-ui.github.io/latest/platforms/jvm#javascript-runtime for more details"
 
 /** Factory of [Runtime] with a specific [T] of [PlayerRuntimeConfig] */
 public interface PlayerRuntimeFactory<out T : PlayerRuntimeConfig> {

@@ -28,3 +28,9 @@ compile_mocks(
         ":node_modules/@player-ui/reference-assets-plugin-components",
     ]
 )
+
+filegroup(
+    name = "flow-manager",
+    srcs = glob(["flow-manager/**/*.json"]),
+    visibility = ["//visibility:public"],
+)
