@@ -346,15 +346,26 @@ jobs:
     steps:
       - run:
           name: Check if GitHub Action triggered
-          command: echo "Checking if this is a GitHub Action trigger"
-      - when:
-          condition: << pipeline.parameters.GHA_Action >>
-          steps:
-            - run:
-                name: Build docs for preview
-                command: |
-                  echo "GitHub Action triggered - building docs for PR preview"
-                  bazel build --config=release //docs:gh_deploy
+          command: |
+            echo "GHA_Action: '<< pipeline.parameters.GHA_Action >>'"
+            echo "Should I release? (<< pipeline.parameters.should_release >>)"
+            echo "Should I release docs? (<< pipeline.parameters.should_release_docs >>)"
+            if [ "<< pipeline.parameters.GHA_Action >>" != "" ]; then
+              echo "GHA_Action is set - proceeding with docs building"
+              echo "GHA_ACTION_SET=true" >> $BASH_ENV
+            else
+              echo "GHA_Action is empty - skipping docs building"
+              echo "GHA_ACTION_SET=false" >> $BASH_ENV
+            fi
+      - run:
+          name: Build docs for preview
+          command: |
+            if [ "${GHA_ACTION_SET}" = "true" ]; then
+              echo "GitHub Action triggered - building docs for PR preview"
+              bazel build --config=release //docs:gh_deploy
+            else
+              echo "Skipping docs build - not triggered by GitHub Action"
+            fi
       - attach_workspace:
           at: ~/player
       - restore_cache:
@@ -380,12 +391,13 @@ jobs:
       - run:
           name: Deploy docs preview
           command: |
-            echo "Deploying docs preview"
+            if [ "${GHA_ACTION_SET}" = "true" ]; then
+              echo "Deploying docs preview"
 
-            # Extract PR number from branch name
-            PR_NUMBER=$(echo "$CIRCLE_BRANCH" | sed -E 's|^pull/([0-9]+).*|\1|')
+            # Extract PR number from CIRCLE_PULL_REQUEST
+            PR_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | sed -E 's|.*/pull/([0-9]+).*|\1|')
             if [ -z "$PR_NUMBER" ]; then
-              echo "Could not extract PR number from branch: $CIRCLE_BRANCH"
+              echo "Could not extract PR number from CIRCLE_PULL_REQUEST: $CIRCLE_PULL_REQUEST"
               exit 1
             fi
             echo "Deploying docs preview for PR #$PR_NUMBER"
@@ -398,20 +410,24 @@ jobs:
             bazel run --config=release //docs:gh_deploy -- --dest_dir "pr/$PR_NUMBER"
 
             echo "Docs preview deployed to: https://player-ui.github.io/pr/$PR_NUMBER/"
+            else
+              echo "Skipping docs deployment - not triggered by GitHub Action"
+            fi
 
       - run:
           name: Post docs-only PR comment
           command: |
-            source ~/.bashrc
-            bundle install
+            if [ "${GHA_ACTION_SET}" = "true" ]; then
+              source ~/.bashrc
+              bundle install
 
-            # Only post comment for docs-only commands
-            # Canary releases will post comment after auto_shipit completes via build-preview.js plugin
-            if [ "${SHOULD_RELEASE:-false}" != "true" ]; then
-              # Extract PR number from branch name
-              PR_NUMBER=$(echo "$CIRCLE_BRANCH" | sed -E 's|^pull/([0-9]+).*|\1|')
+              # Only post comment for docs-only commands
+              # Canary releases will post comment after auto_shipit completes via build-preview.js plugin
+              if [ "${SHOULD_RELEASE:-false}" != "true" ]; then
+              # Extract PR number from CIRCLE_PULL_REQUEST
+              PR_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | sed -E 's|.*/pull/([0-9]+).*|\1|')
               if [ -z "$PR_NUMBER" ]; then
-                echo "Could not extract PR number from branch: $CIRCLE_BRANCH"
+                echo "Could not extract PR number from CIRCLE_PULL_REQUEST: $CIRCLE_PULL_REQUEST"
                 exit 1
               fi
               
@@ -422,8 +438,11 @@ jobs:
               Docs updated on \`$(date -u +\"%a, %d %b %Y %H:%M:%S GMT\")\`:
 
               🚀 Docs preview: $PR_URL" --context "build-preview"
+              else
+                echo "Skipping docs comment - canary release will post comment after auto_shipit"
+              fi
             else
-              echo "Skipping docs comment - canary release will post comment after auto_shipit"
+              echo "Skipping docs comment - not triggered by GitHub Action"
             fi
 
       - run:
