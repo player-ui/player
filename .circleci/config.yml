@@ -7,6 +7,9 @@ parameters:
   should_release:
     type: boolean
     default: false
+  should_release_docs:
+    type: boolean
+    default: false
 
 orbs:
   macos: circleci/macos@2.5.4
@@ -58,11 +61,11 @@ commands:
           at: ~/player
       - restore_cache:
           keys:
-            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
-            - v1-bazel-cache-core-{{ .Branch }}
-            - v1-bazel-cache-core-main
-            - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
-            - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
+            - "v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}"
+            - "v1-bazel-cache-core-{{ .Branch }}"
+            - "v1-bazel-cache-core-main"
+            - 'gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}'
+            - 'gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}'
 
       - add_ssh_keys:
           fingerprints:
@@ -73,7 +76,7 @@ commands:
       - run: git config --global user.name "Intuit Service"
       - run: git config --global user.email "opensource-svc@intuit.com"
       - run: |
-          echo -e $GPG_KEY | gpg --import --batch
+          echo -e "$GPG_KEY" | gpg --import --batch
           echo -e "pinentry-mode loopback\npassphrase $DEPLOY_MAVEN_GPG_PASSPHRASE" > ~/.gnupg/gpg.conf
       - run: |
           source ~/.bashrc
@@ -88,7 +91,7 @@ jobs:
 
       - restore_cache:
           keys:
-            - v1-dependencies-{ { checksum "package.json" }}
+            - 'v1-dependencies-{{ checksum "package.json" }}'
 
       - persist_to_workspace:
           root: .
@@ -140,7 +143,7 @@ jobs:
       - save_cache:
           paths:
             - node_modules
-          key: v1-dependencies-{ { checksum "package.json" }}
+          key: 'v1-dependencies-{{ checksum "package.json" }}'
 
       - persist_to_workspace:
           root: .
@@ -287,9 +290,9 @@ jobs:
 
       - restore_cache:
           keys:
-            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
-            - v1-bazel-cache-core-{{ .Branch }}
-            - v1-bazel-cache-core-main
+            - "v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}"
+            - "v1-bazel-cache-core-{{ .Branch }}"
+            - "v1-bazel-cache-core-main"
 
       - run: |
           BUNDLE_TARGETS=$(bazel query "kind(.*_test, //...) except filter('android|ios|swiftui', //...)" --output label 2>/dev/null | tr '\n' ' ')
@@ -335,7 +338,238 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel query 'filter(".*_vitest_bench$", //...)' --output label 2>/dev/null | tr '\n' ' ' | xargs -n 1 bazel run --config=ci-benchmark
+      - run: |
+          bazel query 'filter(".*_vitest_bench$", //...)' --output label 2>/dev/null | tr '\n' ' ' | xargs -r -n 1 bazel run --config=ci-benchmark
+
+  build_docs:
+    executor: base
+    steps:
+      - run:
+          name: Check docs build conditions
+          command: |
+            echo "GHA_Action: << pipeline.parameters.GHA_Action >>"
+            echo "Should I build and deploy docs preview? << pipeline.parameters.should_release >>"
+            if [ "<< pipeline.parameters.should_release >>" = "true" ] || [ "<< pipeline.parameters.GHA_Action >>" = "docs" ]; then
+              echo "✅ Docs build conditions met - proceeding with docs building"
+            else
+              echo "⏭️ Skipping docs build - should_release is false and GHA_Action is not docs"
+            fi
+      - when:
+          condition: << pipeline.parameters.should_release >>
+          steps:
+            - attach_workspace:
+                at: ~/player
+            - run:
+                name: Build docs for preview (release)
+                command: |
+                  echo "Building docs for release"
+                  bazel build --config=release //docs:gh_deploy
+            - restore_cache:
+                keys:
+                  - "v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}"
+                  - "v1-bazel-cache-core-{{ .Branch }}"
+                  - "v1-bazel-cache-core-main"
+            - add_ssh_keys:
+                fingerprints:
+                  - "SHA256:hUAWVYdfSW5ml6ufbfyEHUcuPwUJ88xVhsZc21b2lA8"
+            - run:
+                name: Setup SSH config
+                command: mkdir -p ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+            - run:
+                name: Setup Git user
+                command: git config --global user.name "Intuit Service"
+            - run:
+                name: Setup Git email
+                command: git config --global user.email "opensource-svc@intuit.com"
+            - run:
+                name: Deploy docs preview
+                command: |
+                  echo "Deploying docs preview"
+
+                  # Extract PR number from CIRCLE_PULL_REQUEST
+                  PR_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | sed -E 's|.*/pull/([0-9]+).*|\1|')
+                  if [ -z "$PR_NUMBER" ]; then
+                    echo "Could not extract PR number from CIRCLE_PULL_REQUEST: $CIRCLE_PULL_REQUEST"
+                    exit 1
+                  fi
+                  echo "Deploying docs preview for PR #$PR_NUMBER"
+
+                  # Deploy docs to pr/NUMBER directory
+                  STABLE_DOCS_BASE_PATH="pr/$PR_NUMBER" \
+                  STABLE_ALGOLIA_SEARCH_API_KEY="$ALGOLIA_NEXT_SEARCH_API_KEY" \
+                  STABLE_ALGOLIA_SEARCH_APPID="D477I7TDXB" \
+                  STABLE_ALGOLIA_SEARCH_INDEX="crawler_Player (Next)" \
+                  bazel run --config=release //docs:gh_deploy -- --dest_dir "pr/$PR_NUMBER"
+
+                  echo "Docs preview deployed to: https://player-ui.github.io/pr/$PR_NUMBER/"
+            - run:
+                name: Post docs-only PR comment
+                command: |
+                  source ~/.bashrc
+                  bundle install
+
+                  # Only post comment for docs-only commands
+                  # Canary releases will post comment after auto_shipit completes via build-preview.js plugin
+                  if [ "<< pipeline.parameters.GHA_Action >>" = "docs" ]; then
+                  # Extract PR number from CIRCLE_PULL_REQUEST
+                  PR_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | sed -E 's|.*/pull/([0-9]+).*|\1|')
+                  if [ -z "$PR_NUMBER" ]; then
+                    echo "Could not extract PR number from CIRCLE_PULL_REQUEST: $CIRCLE_PULL_REQUEST"
+                    exit 1
+                  fi
+
+                  # Post docs-only PR comment
+                  PR_URL="https://player-ui.github.io/pr/$PR_NUMBER/"
+                  npx auto comment --message "### Build Preview
+
+                  🚀 Docs preview: $PR_URL" --context "build-preview"
+                  else
+                    echo "Skipping docs comment - canary release will post comment after auto_shipit"
+                  fi
+            - run:
+                name: Handle docs preview failure
+                when: on_fail
+                command: |
+                  PR_NUMBER=$(echo "$CIRCLE_BRANCH" | sed -E 's|^pull/([0-9]+).*|\1|')
+                  if [ -z "$PR_NUMBER" ]; then
+                    echo "Could not extract PR number from branch: $CIRCLE_BRANCH"
+                    exit 1
+                  fi
+                  # Use auto comment to post the error message
+                  npx auto comment --message "### Build Preview Failed
+
+                  ❌ Docs preview deployment failed. Please check the [CircleCI logs](https://circleci.com/gh/player-ui/player/${CIRCLE_BUILD_NUM}) for details." --context "build-preview-error"
+
+                  echo "Posted docs preview failure comment to PR #$PR_NUMBER"
+      - when:
+          condition: << pipeline.parameters.GHA_Action >>
+          steps:
+            - attach_workspace:
+                at: ~/player
+            - run:
+                name: Build docs for preview (docs command)
+                command: |
+                  echo "Building docs for docs command"
+                  bazel build --config=release //docs:gh_deploy
+            - restore_cache:
+                keys:
+                  - "v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}"
+                  - "v1-bazel-cache-core-{{ .Branch }}"
+                  - "v1-bazel-cache-core-main"
+            - add_ssh_keys:
+                fingerprints:
+                  - "SHA256:hUAWVYdfSW5ml6ufbfyEHUcuPwUJ88xVhsZc21b2lA8"
+            - run:
+                name: Setup SSH config
+                command: mkdir -p ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+            - run:
+                name: Setup Git user
+                command: git config --global user.name "Intuit Service"
+            - run:
+                name: Setup Git email
+                command: git config --global user.email "opensource-svc@intuit.com"
+            - run:
+                name: Deploy docs preview
+                command: |
+                  echo "Deploying docs preview"
+
+                  # Extract PR number from CIRCLE_PULL_REQUEST
+                  PR_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | sed -E 's|.*/pull/([0-9]+).*|\1|')
+                  if [ -z "$PR_NUMBER" ]; then
+                    echo "Could not extract PR number from CIRCLE_PULL_REQUEST: $CIRCLE_PULL_REQUEST"
+                    exit 1
+                  fi
+                  echo "Deploying docs preview for PR #$PR_NUMBER"
+
+                  # Deploy docs to pr/NUMBER directory
+                  STABLE_DOCS_BASE_PATH="pr/$PR_NUMBER" \
+                  STABLE_ALGOLIA_SEARCH_API_KEY="$ALGOLIA_NEXT_SEARCH_API_KEY" \
+                  STABLE_ALGOLIA_SEARCH_APPID="D477I7TDXB" \
+                  STABLE_ALGOLIA_SEARCH_INDEX="crawler_Player (Next)" \
+                  bazel run --config=release //docs:gh_deploy -- --dest_dir "pr/$PR_NUMBER"
+
+                  echo "Docs preview deployed to: https://player-ui.github.io/pr/$PR_NUMBER/"
+            - run:
+                name: Post docs-only PR comment
+                command: |
+                  source ~/.bashrc
+                  bundle install
+
+                  # Only post comment for docs-only commands
+                  # Canary releases will post comment after auto_shipit completes via build-preview.js plugin
+                  if [ "<< pipeline.parameters.GHA_Action >>" = "docs" ]; then
+                  # Extract PR number from CIRCLE_PULL_REQUEST
+                  PR_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | sed -E 's|.*/pull/([0-9]+).*|\1|')
+                  if [ -z "$PR_NUMBER" ]; then
+                    echo "Could not extract PR number from CIRCLE_PULL_REQUEST: $CIRCLE_PULL_REQUEST"
+                    exit 1
+                  fi
+
+                  # Post docs-only PR comment
+                  PR_URL="https://player-ui.github.io/pr/$PR_NUMBER/"
+                  npx auto comment --message "### Build Preview
+
+                  🚀 Docs preview: $PR_URL" --context "build-preview"
+                  else
+                    echo "Skipping docs comment - canary release will post comment after auto_shipit"
+                  fi
+            - run:
+                name: Handle docs preview failure
+                when: on_fail
+                command: |
+                  PR_NUMBER=$(echo "$CIRCLE_BRANCH" | sed -E 's|^pull/([0-9]+).*|\1|')
+                  if [ -z "$PR_NUMBER" ]; then
+                    echo "Could not extract PR number from branch: $CIRCLE_BRANCH"
+                    exit 1
+                  fi
+                  # Use auto comment to post the error message
+                  npx auto comment --message "### Build Preview Failed
+
+                  ❌ Docs preview deployment failed. Please check the [CircleCI logs](https://circleci.com/gh/player-ui/player/${CIRCLE_BUILD_NUM}) for details." --context "build-preview-error"
+
+                  echo "Posted docs preview failure comment to PR #$PR_NUMBER"
+
+  docs_release:
+    executor: base
+    steps:
+      - attach_workspace:
+          at: ~/player
+      - restore_cache:
+          keys:
+            - "v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}"
+            - "v1-bazel-cache-core-{{ .Branch }}"
+            - "v1-bazel-cache-core-main"
+
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:hUAWVYdfSW5ml6ufbfyEHUcuPwUJ88xVhsZc21b2lA8"
+
+      - run: mkdir -p ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+      - run: git config --global user.name "Intuit Service"
+      - run: git config --global user.email "opensource-svc@intuit.com"
+
+      - run: |
+          echo "Deploying docs for release"
+
+          # Deploy to latest (same as release.sh for main releases)
+          STABLE_DOCS_BASE_PATH="latest" \
+          STABLE_ALGOLIA_SEARCH_API_KEY=$ALGOLIA_SEARCH_API_KEY \
+          STABLE_ALGOLIA_SEARCH_APPID="OX3UZKXCOH" \
+          STABLE_ALGOLIA_SEARCH_INDEX="player-ui" \
+          bazel run --config=release //docs:gh_deploy -- --dest_dir "latest"
+
+          echo "Docs deployed to: https://player-ui.github.io/latest/"
+
+          # Also deploy to versioned folder
+          SEMVER_MAJOR=$(cat VERSION | cut -d. -f1)
+          echo "Deploying versioned docs to: $SEMVER_MAJOR"
+          STABLE_DOCS_BASE_PATH="$SEMVER_MAJOR" \
+          STABLE_ALGOLIA_SEARCH_API_KEY=$ALGOLIA_SEARCH_API_KEY \
+          STABLE_ALGOLIA_SEARCH_APPID="OX3UZKXCOH" \
+          STABLE_ALGOLIA_SEARCH_INDEX="player-ui" \
+          bazel run --config=release //docs:gh_deploy -- --dest_dir "$SEMVER_MAJOR"
+
+          echo "Versioned docs deployed to: https://player-ui.github.io/$SEMVER_MAJOR/"
 
 workflows:
   build_and_test_pr:
@@ -406,10 +640,6 @@ workflows:
             - bazelrc_fork
 
       - maybe_release:
-          filters:
-            branches:
-              ignore:
-                - /pull\/.*/
           context:
             - Publish
           requires:
@@ -494,6 +724,28 @@ workflows:
           requires:
             - build-fork
 
+      - build_docs:
+          name: build-docs-fork
+          context:
+            - Publish
+          requires:
+            - bazelrc_fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+
+      - build_docs:
+          name: build-docs-trunk
+          context:
+            - Publish
+          requires:
+            - bazelrc
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+
   build_and_test_main:
     when:
       equal: ["", << pipeline.parameters.GHA_Action >>]
@@ -537,6 +789,13 @@ workflows:
             - coverage
             - build_ios
 
+      - build_docs:
+          name: build-docs-trunk
+          context:
+            - Publish
+          requires:
+            - bazelrc
+
   full_release:
     when:
       equal: [release, << pipeline.parameters.GHA_Action >>]
@@ -574,3 +833,8 @@ workflows:
             - android_test
             - coverage
             - build_ios
+      - docs_release:
+          context:
+            - Publish
+          requires:
+            - setup
