@@ -63,9 +63,21 @@ class BuildPreviewPlugin {
         // Get PR number for docs URL
         const docsUrl = `https://player-ui.github.io/pr/${prNumber}/`;
 
+        // Get CircleCI build number for link
+        // eslint-disable-next-line no-undef
+        const circleBuildNum = process.env.CIRCLE_BUILD_NUM;
+        const circleciUrl = circleBuildNum
+          ? `https://circleci.com/gh/player-ui/player/${circleBuildNum}`
+          : null;
+
         // Comment on the PR with unified context
         let versionMessage = `### Build Preview\n\n`;
-        versionMessage += `Canary version updated on \`${currentDate}\`:\n\n`;
+
+        if (circleciUrl) {
+          versionMessage += `Your PR was deployed by [CircleCI #${circleBuildNum}](${circleciUrl}) on \`${currentDate}\` with this canary version:\n\n`;
+        } else {
+          versionMessage += `Your PR was deployed on \`${currentDate}\` with this canary version:\n\n`;
+        }
 
         versionMessage += "```\n";
         versionMessage += `${newVersion}\n`;
