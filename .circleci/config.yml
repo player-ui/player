@@ -345,7 +345,13 @@ jobs:
     executor: base
     steps:
       - run: 'echo "GHA_Action: << pipeline.parameters.GHA_Action >>"'
-      - run: 'echo "Should I release? << pipeline.parameters.should_release >>"'
+      - run: 'echo "Should I build and deploy docs preview? << pipeline.parameters.should_release >>"'
+      - run: |
+          if [ "<< pipeline.parameters.should_release >>" = "true" ] || [ "<< pipeline.parameters.GHA_Action >>" = "docs" ]; then
+            echo "✅ Docs build conditions met - proceeding with docs building"
+          else
+            echo "⏭️ Skipping docs build - should_release is false and GHA_Action is not docs"
+          fi
       - when:
           condition: << pipeline.parameters.should_release >>
           steps:
