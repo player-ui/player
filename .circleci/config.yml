@@ -357,13 +357,13 @@ jobs:
       - when:
           condition: << pipeline.parameters.should_release >>
           steps:
+            - attach_workspace:
+                at: ~/player
             - run:
                 name: Build docs for preview (release)
                 command: |
                   echo "Building docs for release"
                   bazel build --config=release //docs:gh_deploy
-            - attach_workspace:
-                at: ~/player
             - restore_cache:
                 keys:
                   - "v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}"
@@ -444,13 +444,13 @@ jobs:
       - when:
           condition: << pipeline.parameters.GHA_Action >>
           steps:
+            - attach_workspace:
+                at: ~/player
             - run:
                 name: Build docs for preview (docs command)
                 command: |
                   echo "Building docs for docs command"
                   bazel build --config=release //docs:gh_deploy
-            - attach_workspace:
-                at: ~/player
             - restore_cache:
                 keys:
                   - "v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}"
