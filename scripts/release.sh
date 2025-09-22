@@ -37,9 +37,6 @@ fi
 
 bazel build --config=release @rules_player//distribution:staged-maven-deploy
 
-# Docs Prepublish
-bazel build --config=release //docs:gh_deploy
-
 # NPM Publish
 echo "Publishing NPM Packages with release type: ${NPM_TAG} on branch: ${CURRENT_BRANCH}"
 for pkg in $PKG_NPM_LABELS ; do
@@ -53,4 +50,5 @@ bazel run --config=release //:ios_publish
 # Android/JVM Publish
 echo "Publishing Maven Packages with release type: ${MVN_RELEASE_TYPE} on branch: ${CURRENT_BRANCH}"
 bazel run --config=release @rules_player//distribution:staged-maven-deploy -- "$MVN_RELEASE_TYPE" --package-group=com.intuit.playerui --client-timeout=600 --connect-timeout=600
+
 

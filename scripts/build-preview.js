@@ -74,9 +74,9 @@ class BuildPreviewPlugin {
         let versionMessage = `### Build Preview\n\n`;
 
         if (circleciUrl) {
-          versionMessage += `Your PR was deployed by [CircleCI #${circleBuildNum}](${circleciUrl}) on \`${currentDate}\` with this canary version:\n\n`;
+          versionMessage += `Your PR was deployed by CircleCI [#${circleBuildNum}](${circleciUrl}) on \`${currentDate}\` with this version:\n\n`;
         } else {
-          versionMessage += `Your PR was deployed on \`${currentDate}\` with this canary version:\n\n`;
+          versionMessage += `Your PR was deployed on \`${currentDate}\` with this version:\n\n`;
         }
 
         versionMessage += "```\n";

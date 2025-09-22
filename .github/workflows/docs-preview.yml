@@ -1,10 +1,9 @@
-name: Docs Publishing
+name: Docs Preview
 
 on:
   issue_comment:
-    types: [created]
-  release:
-    types: [published]
+    types:
+      - created
 
 jobs:
   check_auth:
@@ -99,17 +98,3 @@ jobs:
               comment_id: context.payload.comment.id,
               content: "confused",
             });
-
-  trigger_docs_release:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'release'
-    steps:
-      - name: Trigger docs release
-        run: |
-          curl --no-progress-meter --fail --request POST \
-            --url https://circleci.com/api/v2/project/gh/${{ github.repository }}/pipeline \
-            --header 'Circle-Token: ${{ secrets.CCI_TOKEN }}' \
-            --header 'content-type: application/json' \
-            --header 'x-attribution-login: ${{ github.actor }}' \
-            --header 'x-attribution-actor-id: ${{ github.actor }}' \
-            --data '{ "branch": "main", "parameters": { "should_release_docs": true }}'

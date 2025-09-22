@@ -7,9 +7,6 @@ parameters:
   should_release:
     type: boolean
     default: false
-  should_release_docs:
-    type: boolean
-    default: false
 
 orbs:
   macos: circleci/macos@2.5.4
@@ -360,7 +357,7 @@ jobs:
             - attach_workspace:
                 at: ~/player
             - run:
-                name: Build docs for preview (release)
+                name: Build docs for release
                 command: |
                   echo "Building docs for release"
                   bazel build --config=release //docs:gh_deploy
@@ -442,7 +439,7 @@ jobs:
 
                   echo "Posted docs preview failure comment to PR #$PR_NUMBER"
       - when:
-          condition: << pipeline.parameters.GHA_Action >>
+          condition: << pipeline.parameters.GHA_Action >> == "docs"
           steps:
             - attach_workspace:
                 at: ~/player
@@ -551,25 +548,42 @@ jobs:
       - run: |
           echo "Deploying docs for release"
 
-          # Deploy to latest (same as release.sh for main releases)
-          STABLE_DOCS_BASE_PATH="latest" \
-          STABLE_ALGOLIA_SEARCH_API_KEY=$ALGOLIA_SEARCH_API_KEY \
-          STABLE_ALGOLIA_SEARCH_APPID="OX3UZKXCOH" \
-          STABLE_ALGOLIA_SEARCH_INDEX="player-ui" \
-          bazel run --config=release //docs:gh_deploy -- --dest_dir "latest"
+          # If GHA_Action = "release" + main branch -> full release (deploy to latest/)
+          # If GHA_Action = "" + main branch -> next release (deploy to next/)
+          if [ "<< pipeline.parameters.GHA_Action >>" = "release" ] && [ "$CIRCLE_BRANCH" = "main" ]; then
+            echo "Full release detected - deploying to latest/"
+            STABLE_DOCS_BASE_PATH="latest" \
+            STABLE_ALGOLIA_SEARCH_API_KEY=$ALGOLIA_SEARCH_API_KEY \
+            STABLE_ALGOLIA_SEARCH_APPID="OX3UZKXCOH" \
+            STABLE_ALGOLIA_SEARCH_INDEX="player-ui" \
+            bazel run --config=release //docs:gh_deploy -- --dest_dir "latest"
+            
+            echo "Docs deployed to: https://player-ui.github.io/latest/"
+          elif [ "<< pipeline.parameters.GHA_Action >>" = "" ] && [ "$CIRCLE_BRANCH" = "main" ]; then
+            echo "Next release detected - deploying to next/"
+            STABLE_DOCS_BASE_PATH="next" \
+            STABLE_ALGOLIA_SEARCH_API_KEY="$ALGOLIA_NEXT_SEARCH_API_KEY" \
+            STABLE_ALGOLIA_SEARCH_APPID="D477I7TDXB" \
+            STABLE_ALGOLIA_SEARCH_INDEX="crawler_Player (Next)" \
+            bazel run --config=release //docs:gh_deploy -- --dest_dir "next"
+            
+            echo "Docs deployed to: https://player-ui.github.io/next/"
+          else
+            echo "No docs deployment needed for this context"
+          fi
 
-          echo "Docs deployed to: https://player-ui.github.io/latest/"
-
-          # Also deploy to versioned folder
-          SEMVER_MAJOR=$(cat VERSION | cut -d. -f1)
-          echo "Deploying versioned docs to: $SEMVER_MAJOR"
-          STABLE_DOCS_BASE_PATH="$SEMVER_MAJOR" \
-          STABLE_ALGOLIA_SEARCH_API_KEY=$ALGOLIA_SEARCH_API_KEY \
-          STABLE_ALGOLIA_SEARCH_APPID="OX3UZKXCOH" \
-          STABLE_ALGOLIA_SEARCH_INDEX="player-ui" \
-          bazel run --config=release //docs:gh_deploy -- --dest_dir "$SEMVER_MAJOR"
-
-          echo "Versioned docs deployed to: https://player-ui.github.io/$SEMVER_MAJOR/"
+          # Also deploy to the versioned folder for releases
+          if [ "<< pipeline.parameters.GHA_Action >>" = "release" ]; then
+            SEMVER_MAJOR=$(cat VERSION | cut -d. -f1)
+            echo "Deploying versioned docs to: $SEMVER_MAJOR"
+            STABLE_DOCS_BASE_PATH="$SEMVER_MAJOR" \
+            STABLE_ALGOLIA_SEARCH_API_KEY=$ALGOLIA_SEARCH_API_KEY \
+            STABLE_ALGOLIA_SEARCH_APPID="OX3UZKXCOH" \
+            STABLE_ALGOLIA_SEARCH_INDEX="player-ui" \
+            bazel run --config=release //docs:gh_deploy -- --dest_dir "$SEMVER_MAJOR"
+            
+            echo "Versioned docs deployed to: https://player-ui.github.io/$SEMVER_MAJOR/"
+          fi
 
 workflows:
   build_and_test_pr:
@@ -795,6 +809,12 @@ workflows:
             - Publish
           requires:
             - bazelrc
+
+      - docs_release:
+          context:
+            - Publish
+          requires:
+            - setup
 
   full_release:
     when:
