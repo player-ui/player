@@ -350,6 +350,8 @@ jobs:
               echo "✅ Docs build conditions met - proceeding with docs building"
             else
               echo "⏭️ Skipping docs build - should_release is false and GHA_Action is not docs"
+              echo "Exiting early - no docs deployment needed"
+              exit 0
             fi
       - when:
           condition: << pipeline.parameters.should_release >>
