@@ -7,6 +7,7 @@ import {
   AssetTransformCorePlugin,
   BeforeTransformFunction,
   Flow,
+  NodeType,
 } from "@player-ui/player";
 import { Player, Parser } from "@player-ui/player";
 import { waitFor } from "@testing-library/react";
@@ -25,7 +26,25 @@ const transform: BeforeTransformFunction = createAsyncTransform({
 });
 
 const transformPlugin = new AssetTransformCorePlugin(
-  new Registry([[{ type: "chat-message" }, { beforeResolve: transform }]]),
+  new Registry([
+    [{ type: "chat-message" }, { beforeResolve: transform }],
+    [
+      { type: "async-asset" },
+      {
+        beforeResolve: (asset: Node.ViewOrAsset): Node.Async => ({
+          type: NodeType.Async,
+          flatten: true,
+          id: asset.value.id,
+          value: {
+            type: NodeType.Value,
+            value: {
+              id: asset.value.id,
+            },
+          },
+        }),
+      },
+    ],
+  ]),
 );
 
 class TestAsyncPlugin implements PlayerPlugin {
@@ -36,6 +55,35 @@ class TestAsyncPlugin implements PlayerPlugin {
     });
   }
 }
+
+const asyncAssetFrf: Flow = {
+  id: "test-flow",
+  views: [
+    {
+      id: "my-view",
+      type: "view",
+      actions: [
+        {
+          asset: {
+            id: "async-0",
+            type: "async-asset",
+          },
+        },
+      ],
+    },
+  ],
+  navigation: {
+    BEGIN: "FLOW_1",
+    FLOW_1: {
+      startState: "VIEW_1",
+      VIEW_1: {
+        state_type: "VIEW",
+        ref: "my-view",
+        transitions: {},
+      },
+    },
+  },
+};
 
 describe("view", () => {
   const basicFRFWithActions = {
@@ -1430,6 +1478,85 @@ describe("view", () => {
           },
         },
       ],
+    });
+  });
+
+  test("should add resolved async node to its own list of resolved async nodes", async () => {
+    const plugin = new AsyncNodePlugin({
+      plugins: [new AsyncNodePluginPlugin()],
+    });
+
+    let asyncUpdate: ((value: any) => void) | undefined;
+
+    plugin.hooks.onAsyncNode.tap("test", async (node, update) => {
+      asyncUpdate = update;
+      return new Promise(() => {});
+    });
+
+    const plugins = [plugin, new TestAsyncPlugin()];
+
+    const player = new Player({
+      plugins: plugins,
+    });
+
+    player.start(asyncAssetFrf);
+
+    await vi.waitFor(() => {
+      expect(asyncUpdate).toBeDefined();
+    });
+
+    asyncUpdate!({
+      type: "text",
+      value: "value",
+      id: "id-0",
+    });
+
+    await vi.waitFor(() => {
+      const state = player.getState();
+      expect(state.status).toBe("in-progress");
+
+      expect(
+        (state as InProgressState).controllers.view.currentView?.lastUpdate,
+      ).toStrictEqual({
+        id: "my-view",
+        type: "view",
+        actions: [
+          {
+            asset: {
+              type: "text",
+              value: "value",
+              id: "id-0",
+            },
+          },
+        ],
+      });
+    });
+
+    asyncUpdate!({
+      type: "another-text",
+      value: "value 2",
+      id: "id-1",
+    });
+
+    await vi.waitFor(() => {
+      const state = player.getState();
+      expect(state.status).toBe("in-progress");
+
+      expect(
+        (state as InProgressState).controllers.view.currentView?.lastUpdate,
+      ).toStrictEqual({
+        id: "my-view",
+        type: "view",
+        actions: [
+          {
+            asset: {
+              type: "another-text",
+              value: "value 2",
+              id: "id-1",
+            },
+          },
+        ],
+      });
     });
   });
 
