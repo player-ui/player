@@ -344,17 +344,13 @@ jobs:
       - run:
           name: Check docs build conditions
           command: |
-            echo "GHA_Action: << pipeline.parameters.GHA_Action >>"
-            echo "Should I build and deploy docs preview? << pipeline.parameters.should_release >>"
             if [ "<< pipeline.parameters.should_release >>" = "true" ] || [ "<< pipeline.parameters.GHA_Action >>" = "docs" ]; then
-              echo "✅ Docs build conditions met - proceeding with docs building"
+              echo "Building docs"
             else
-              echo "⏭️ Skipping docs build - should_release is false and GHA_Action is not docs"
-              echo "Exiting early - no docs deployment needed"
-              exit 0
+              echo "Skipping docs build"
             fi
       - when:
-          condition: << pipeline.parameters.should_release >>
+          condition: << pipeline.parameters.should_release >> = "true" || << pipeline.parameters.GHA_Action >> = "docs"
           steps:
             - attach_workspace:
                 at: ~/player
@@ -362,93 +358,6 @@ jobs:
                 name: Build docs for release
                 command: |
                   echo "Building docs for release"
-                  bazel build --config=release //docs:gh_deploy
-            - restore_cache:
-                keys:
-                  - "v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}"
-                  - "v1-bazel-cache-core-{{ .Branch }}"
-                  - "v1-bazel-cache-core-main"
-            - add_ssh_keys:
-                fingerprints:
-                  - "SHA256:hUAWVYdfSW5ml6ufbfyEHUcuPwUJ88xVhsZc21b2lA8"
-            - run:
-                name: Setup SSH config
-                command: mkdir -p ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            - run:
-                name: Setup Git user
-                command: git config --global user.name "Intuit Service"
-            - run:
-                name: Setup Git email
-                command: git config --global user.email "opensource-svc@intuit.com"
-            - run:
-                name: Deploy docs preview
-                command: |
-                  echo "Deploying docs preview"
-
-                  # Extract PR number from CIRCLE_PULL_REQUEST
-                  PR_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | sed -E 's|.*/pull/([0-9]+).*|\1|')
-                  if [ -z "$PR_NUMBER" ]; then
-                    echo "Could not extract PR number from CIRCLE_PULL_REQUEST: $CIRCLE_PULL_REQUEST"
-                    exit 1
-                  fi
-                  echo "Deploying docs preview for PR #$PR_NUMBER"
-
-                  # Deploy docs to pr/NUMBER directory
-                  STABLE_DOCS_BASE_PATH="pr/$PR_NUMBER" \
-                  STABLE_ALGOLIA_SEARCH_API_KEY="$ALGOLIA_NEXT_SEARCH_API_KEY" \
-                  STABLE_ALGOLIA_SEARCH_APPID="D477I7TDXB" \
-                  STABLE_ALGOLIA_SEARCH_INDEX="crawler_Player (Next)" \
-                  bazel run --config=release //docs:gh_deploy -- --dest_dir "pr/$PR_NUMBER"
-
-                  echo "Docs preview deployed to: https://player-ui.github.io/pr/$PR_NUMBER/"
-            - run:
-                name: Post docs-only PR comment
-                command: |
-                  source ~/.bashrc
-                  bundle install
-
-                  # Only post comment for docs-only commands
-                  # Canary releases will post comment after auto_shipit completes via build-preview.js plugin
-                  if [ "<< pipeline.parameters.GHA_Action >>" = "docs" ]; then
-                  # Extract PR number from CIRCLE_PULL_REQUEST
-                  PR_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | sed -E 's|.*/pull/([0-9]+).*|\1|')
-                  if [ -z "$PR_NUMBER" ]; then
-                    echo "Could not extract PR number from CIRCLE_PULL_REQUEST: $CIRCLE_PULL_REQUEST"
-                    exit 1
-                  fi
-
-                  # Post docs-only PR comment
-                  PR_URL="https://player-ui.github.io/pr/$PR_NUMBER/"
-                  npx auto comment --message "### Build Preview
-
-                  🚀 Docs preview: $PR_URL" --context "build-preview"
-                  else
-                    echo "Skipping docs comment - canary release will post comment after auto_shipit"
-                  fi
-            - run:
-                name: Handle docs preview failure
-                when: on_fail
-                command: |
-                  PR_NUMBER=$(echo "$CIRCLE_BRANCH" | sed -E 's|^pull/([0-9]+).*|\1|')
-                  if [ -z "$PR_NUMBER" ]; then
-                    echo "Could not extract PR number from branch: $CIRCLE_BRANCH"
-                    exit 1
-                  fi
-                  # Use auto comment to post the error message
-                  npx auto comment --message "### Build Preview Failed
-
-                  ❌ Docs preview deployment failed. Please check the [CircleCI logs](https://circleci.com/gh/player-ui/player/${CIRCLE_BUILD_NUM}) for details." --context "build-preview-error"
-
-                  echo "Posted docs preview failure comment to PR #$PR_NUMBER"
-      - when:
-          condition: << pipeline.parameters.GHA_Action >> == "docs"
-          steps:
-            - attach_workspace:
-                at: ~/player
-            - run:
-                name: Build docs for preview (docs command)
-                command: |
-                  echo "Building docs for docs command"
                   bazel build --config=release //docs:gh_deploy
             - restore_cache:
                 keys:
