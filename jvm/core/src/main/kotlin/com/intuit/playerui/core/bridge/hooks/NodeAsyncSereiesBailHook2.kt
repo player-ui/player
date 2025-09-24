@@ -26,7 +26,7 @@ public class NodeAsyncSeriesBailHook2<T1, T2, R : Any?>(
         val (p1, p2) = serializedArgs
         return call(
             { f, _ -> f(context, p1 as T1, p2 as T2) },
-            null
+            null,
         ) as R
     }
 
