@@ -16,7 +16,7 @@ const makeFlow = (asyncNodeCount: number): Flow => ({
   id: "flow-with-async",
   views: [
     {
-      id: "view",
+      id: "collection-async-chat-demo",
       type: "view",
       values: Array.from({ length: asyncNodeCount }, (_, index) => ({
         async: true,
@@ -30,7 +30,7 @@ const makeFlow = (asyncNodeCount: number): Flow => ({
       startState: "VIEW_1",
       VIEW_1: {
         state_type: "VIEW",
-        ref: "view",
+        ref: "collection-async-chat-demo",
         transitions: {
           "*": "END_DONE",
         },
@@ -126,11 +126,11 @@ describe("ReferenceAssetsPlugin", () => {
               {
                 asset: {
                   type: "collection",
-                  id: "collection-async-message-0",
+                  id: "collection-async-chat-demo-0",
                   values: [
                     {
                       asset: {
-                        id: "message-0-value",
+                        id: "chat-demo-0-value",
                         type: "text",
                         value: "message",
                       },
@@ -141,11 +141,11 @@ describe("ReferenceAssetsPlugin", () => {
               {
                 asset: {
                   type: "collection",
-                  id: "collection-async-message-1",
+                  id: "collection-async-chat-demo-1",
                   values: [
                     {
                       asset: {
-                        id: "message-1-value",
+                        id: "chat-demo-1-value",
                         type: "text",
                         value: "message",
                       },
@@ -192,11 +192,11 @@ describe("ReferenceAssetsPlugin", () => {
               {
                 asset: {
                   type: "collection",
-                  id: "collection-async-message-0",
+                  id: "collection-async-chat-demo-0",
                   values: [
                     {
                       asset: {
-                        id: "message-0-value",
+                        id: "chat-demo-0-value",
                         type: "text",
                         value: "first resolve",
                       },
@@ -230,11 +230,11 @@ describe("ReferenceAssetsPlugin", () => {
               {
                 asset: {
                   type: "collection",
-                  id: "collection-async-message-1",
+                  id: "collection-async-chat-demo-1",
                   values: [
                     {
                       asset: {
-                        id: "message-1-value",
+                        id: "chat-demo-1-value",
                         type: "text",
                         value: "second resolve",
                       },
@@ -245,18 +245,18 @@ describe("ReferenceAssetsPlugin", () => {
               {
                 asset: {
                   type: "collection",
-                  id: "collection-async-message-0",
+                  id: "collection-async-chat-demo-0",
                   values: [
                     {
                       asset: {
-                        id: "message-0-value",
+                        id: "chat-demo-0-value",
                         type: "text",
                         value: "first resolve",
                       },
                     },
                     {
                       asset: {
-                        id: "message-2-value",
+                        id: "chat-demo-2-value",
                         type: "text",
                         value: "second resolve",
                       },
