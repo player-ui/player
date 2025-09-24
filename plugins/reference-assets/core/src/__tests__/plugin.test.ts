@@ -12,11 +12,11 @@ const mockLogger = (): Logger => ({
   warn: vi.fn(),
 });
 
-const makeFlow = (asyncNodeCount: number): Flow => ({
+const makeFlow = (asyncNodeCount: number, useDemoId = true): Flow => ({
   id: "flow-with-async",
   views: [
     {
-      id: "collection-async-chat-demo",
+      id: useDemoId ? "collection-async-chat-demo" : "view",
       type: "view",
       values: Array.from({ length: asyncNodeCount }, (_, index) => ({
         async: true,
@@ -30,7 +30,7 @@ const makeFlow = (asyncNodeCount: number): Flow => ({
       startState: "VIEW_1",
       VIEW_1: {
         state_type: "VIEW",
-        ref: "collection-async-chat-demo",
+        ref: useDemoId ? "collection-async-chat-demo" : "view",
         transitions: {
           "*": "END_DONE",
         },
@@ -267,6 +267,21 @@ describe("ReferenceAssetsPlugin", () => {
             ],
           }),
         );
+      });
+    });
+
+    it("should not setup a deferred resolve when the parent id does not start with ''", async () => {
+      const asyncHookTap = vi.fn();
+      asyncPlugin.hooks.onAsyncNode.intercept({
+        context: false,
+        done: asyncHookTap,
+      });
+      // start player without the ids to match the chat ui demo case.
+      player.start(makeFlow(1, false));
+
+      // tap should complete immediately
+      await vi.waitFor(() => {
+        expect(asyncHookTap).toHaveBeenCalled();
       });
     });
   });
