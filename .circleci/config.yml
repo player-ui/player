@@ -586,7 +586,7 @@ workflows:
             - build-trunk
 
       - build_docs:
-          name: build-docs-fork
+          name: build-docs-trunk
           context:
             - Publish
           requires:
@@ -640,7 +640,7 @@ workflows:
             - build_ios
 
       - build_docs:
-          name: build-docs-trunk
+          name: build-docs-main
           context:
             - Publish
           requires:
