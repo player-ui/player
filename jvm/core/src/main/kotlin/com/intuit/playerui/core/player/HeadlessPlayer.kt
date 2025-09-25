@@ -197,7 +197,7 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
 
         private const val DEBUG_SOURCE_PATH = "core/player/dist/Player.native.js"
 
-        private const val hbcSourcePath = "core/player/dist/Player.native.js.hbc"
+        private const val hbcSourcePath = "core/player/Player.native.js.hbc"
 
         /** Gets [URL] of the bundled source */
         private val bundledSource get() = this::class.java

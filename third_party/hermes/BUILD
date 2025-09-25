@@ -59,7 +59,6 @@ cmake(
     targets = ["hermesc"],
     # Specifically build for host, always
     toolchains = [
-        "@bazel_tools//tools/cpp:toolchain",
         "@player//:cmake_build_parallel_level",
     ],
 )
