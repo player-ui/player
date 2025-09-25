@@ -270,7 +270,7 @@ describe("ReferenceAssetsPlugin", () => {
       });
     });
 
-    it("should not setup a deferred resolve when the parent id does not start with ''", async () => {
+    it("should not setup a deferred resolve when the parent id does not start with 'async-chat-demo'", async () => {
       const asyncHookTap = vi.fn();
       asyncPlugin.hooks.onAsyncNode.intercept({
         context: false,
