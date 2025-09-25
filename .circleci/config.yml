@@ -590,11 +590,14 @@ workflows:
           context:
             - Publish
           requires:
+            - bazelrc
+
+      - build_docs:
+          name: build-docs-fork
+          context:
+            - Publish
+          requires:
             - bazelrc_fork
-          filters:
-            branches:
-              only:
-                - /pull\/.*/
 
   build_and_test_main:
     when:
