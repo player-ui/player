@@ -117,11 +117,18 @@ public class HermesRuntime private constructor(
     override fun load(scriptContext: ScriptContext): Any? = evaluateInJSThreadBlocking {
         val sourceMap = scriptContext.sourceMap
         val hbc = scriptContext.preCompiledScript
-        if (hbc != null) {
-            TODO("Need to call into Hermes runtime to load HBC (loadSegment?)")
+        if (hbc.isNotEmpty()) {
+            println("+++ loading hbc")
+            try {
+                evaluateHermesBytecode(hbc, scriptContext.id)
+            } catch (e: Exception) {
+                println(e)
+            }
         } else if (sourceMap != null) {
+            println("+++ loading with sourcemap")
             evaluateJavaScriptWithSourceMap(scriptContext.script, sourceMap, scriptContext.id)
         } else {
+            println("+++ loading script")
             evaluateJavaScript(scriptContext.script, scriptContext.id)
         }.handleValue(format)
     }
