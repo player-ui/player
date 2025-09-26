@@ -14,6 +14,18 @@ namespace intuit::playerui {
 
 [[noreturn]] void throwNativeHandleReleasedException(std::string nativeHandle);
 
+class ByteArrayBuffer : public Buffer {
+public:
+    ByteArrayBuffer(const void* data, size_t size) : data_(reinterpret_cast<const uint8_t*>(data)), size_(size) {}
+
+    size_t size() const override { return size_; }
+    const uint8_t* data() const override { return data_; }
+
+private:
+    const uint8_t* data_;
+    size_t size_;
+};
+
 class JHybridClass : public HybridClass<JHybridClass> {
 public:
     static constexpr auto kJavaDescriptor = "Lcom/intuit/playerui/jsi/HybridClass;";
@@ -68,6 +80,7 @@ public:
     static void registerNatives();
 
     local_ref<JJSIValue_jhybridobject> evaluateJavaScript(alias_ref<JRuntimeThreadContext>, std::string script, std::string sourceURL);
+    local_ref<JJSIValue_jhybridobject> evaluateHermesBytecode(alias_ref<JRuntimeThreadContext>, alias_ref<jbyteArray> byteArray,std::string sourceURL);
     local_ref<JJSIPreparedJavaScript::jhybridobject> prepareJavaScript(alias_ref<JRuntimeThreadContext>, std::string script, std::string sourceURL);
     local_ref<JJSIValue_jhybridobject> evaluatePreparedJavaScript(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIPreparedJavaScript::jhybridobject> js);
 

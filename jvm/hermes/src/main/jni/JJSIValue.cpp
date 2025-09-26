@@ -32,6 +32,12 @@ local_ref<JJSIValue::jhybridobject> JJSIRuntime::evaluateJavaScript(alias_ref<JR
     return JJSIValue::newObjectCxxArgs(this->get_scope(), get_runtime().evaluateJavaScript(std::make_shared<StringBuffer>(script), sourceURL));;
 }
 
+local_ref<JJSIValue::jhybridobject> JJSIRuntime::evaluateHermesBytecode(alias_ref<JRuntimeThreadContext>, alias_ref<jbyteArray> byteArray, std::string sourceURL) {
+    auto size = byteArray->size();
+    auto region = byteArray->getRegion(0, size);
+    return JJSIValue::newObjectCxxArgs(this->get_scope(), get_runtime().evaluateJavaScript(std::make_shared<ByteArrayBuffer>(region.get(), size), sourceURL));
+}
+
 local_ref<JJSIPreparedJavaScript::jhybridobject> JJSIRuntime::prepareJavaScript(alias_ref<JRuntimeThreadContext>, std::string script, std::string sourceURL) {
     return JJSIPreparedJavaScript::newObjectCxxArgs(get_runtime().prepareJavaScript(std::make_shared<StringBuffer>(script), sourceURL));
 }
@@ -61,6 +67,7 @@ std::string JJSIRuntime::description(alias_ref<JRuntimeThreadContext>) {
 void JJSIRuntime::registerNatives() {
     registerHybrid({
         makeNativeMethod("evaluateJavaScript", JJSIRuntime::evaluateJavaScript),
+        makeNativeMethod("evaluateHermesBytecode", JJSIRuntime::evaluateHermesBytecode),
         makeNativeMethod("prepareJavaScript", JJSIRuntime::prepareJavaScript),
         makeNativeMethod("evaluatePreparedJavaScript", JJSIRuntime::evaluatePreparedJavaScript),
 #ifdef JSI_MICROTASK

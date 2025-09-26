@@ -114,7 +114,7 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
                 if (runtime.config.debuggable) debugSource.readText() else source.readText(),
                 BUNDLED_SOURCE_PATH,
                 sourceMap.readText(),
-                precompiledSource.readText()
+                precompiledSource.readBytes()
             )
         )
 

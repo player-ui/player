@@ -44,6 +44,9 @@ public open class Runtime(
     public external fun evaluateJavaScript(script: String, sourceURL: String = "unknown"): Value
 
     context(RuntimeThreadContext)
+    public external fun evaluateHermesBytecode(bytecode: ByteArray, sourceURL: String = "unknown"): Value
+
+    context(RuntimeThreadContext)
     public external fun prepareJavaScript(script: String, sourceURL: String = "unknown"): PreparedJavaScript
 
     context(RuntimeThreadContext)
