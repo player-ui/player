@@ -83,7 +83,7 @@ class BuildPreviewPlugin {
         versionMessage += `${newVersion}\n`;
         versionMessage += "```\n\n";
 
-        versionMessage += `🚀 Docs preview: ${docsUrl}\n`;
+        versionMessage += `🚀 Docs: ${docsUrl}\n`;
 
         await auto.comment({
           message: versionMessage,
