@@ -70,20 +70,45 @@ class BuildPreviewPlugin {
           ? `https://circleci.com/gh/player-ui/player/${circleBuildNum}`
           : null;
 
-        // Comment on the PR with unified context
-        let versionMessage = `### Build Preview\n\n`;
-
-        if (circleciUrl) {
-          versionMessage += `Your PR was deployed by CircleCI [#${circleBuildNum}](${circleciUrl}) on \`${currentDate}\` with this version:\n\n`;
-        } else {
-          versionMessage += `Your PR was deployed on \`${currentDate}\` with this version:\n\n`;
+        // Get existing comment to prepend canary version
+        let existingComment = "";
+        try {
+          const comments = await auto.git.getComments(prNumber);
+          const buildPreviewComment = comments.find(
+            (comment) =>
+              comment.body.includes("### Build Preview") &&
+              comment.user.login === "intuit-svc",
+          );
+          if (buildPreviewComment) {
+            // Extract everything after the first line (remove "### Build Preview")
+            const lines = buildPreviewComment.body.split("\n");
+            existingComment = lines.slice(1).join("\n").trim();
+          }
+        } catch (error) {
+          auto.logger.verbose.info(
+            "Could not fetch existing comment, will create new one",
+          );
         }
 
-        versionMessage += "```\n";
-        versionMessage += `${newVersion}\n`;
-        versionMessage += "```\n\n";
+        // Build the canary version section
+        let canarySection = "";
+        if (circleciUrl) {
+          canarySection += `Your PR was deployed by CircleCI [#${circleBuildNum}](${circleciUrl}) on \`${currentDate}\` with this version:\n\n`;
+        } else {
+          canarySection += `Your PR was deployed on \`${currentDate}\` with this version:\n\n`;
+        }
 
-        versionMessage += `🚀 Docs: ${docsUrl}\n`;
+        canarySection += "```\n";
+        canarySection += `${newVersion}\n`;
+        canarySection += "```\n\n";
+
+        // Combine canary section with existing comment
+        let versionMessage = `### Build Preview\n\n${canarySection}`;
+        if (existingComment) {
+          versionMessage += existingComment;
+        } else {
+          versionMessage += `🚀 [Docs](${docsUrl})`;
+        }
 
         await auto.comment({
           message: versionMessage,

@@ -351,9 +351,15 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "SHA256:hUAWVYdfSW5ml6ufbfyEHUcuPwUJ88xVhsZc21b2lA8"
-      - run: mkdir -p ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-      - run: git config --global user.name "Intuit Service"
-      - run: git config --global user.email "opensource-svc@intuit.com"
+      - run:
+          name: Setup SSH config
+          command: mkdir -p ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+      - run:
+          name: Setup Git user
+          command: git config --global user.name "Intuit Service"
+      - run:
+          name: Setup Git email
+          command: git config --global user.email "opensource-svc@intuit.com"
       - run:
           name: Build and deploy docs
           command: |
