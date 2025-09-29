@@ -369,7 +369,7 @@ jobs:
               
               bazel build --config=release //docs:gh_deploy
 
-              # Only deploy and comment if this is a PR
+              # Only deploy if this is a PR
               if [ -n "$CIRCLE_PULL_REQUEST" ]; then
                 PR_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | sed -E 's|.*/pull/([0-9]+).*|\1|')
                 STABLE_DOCS_BASE_PATH="pr/$PR_NUMBER" \
@@ -377,19 +377,7 @@ jobs:
                 STABLE_ALGOLIA_SEARCH_APPID="D477I7TDXB" \
                 STABLE_ALGOLIA_SEARCH_INDEX="crawler_Player (Next)" \
                 bazel run --config=release //docs:gh_deploy -- --dest_dir "pr/$PR_NUMBER"
-                PR_URL="https://player-ui.github.io/pr/$PR_NUMBER/"
-                
-                # Get changed docs pages using shared utility
-                CHANGED_PAGES=$(node scripts/get-changed-docs.js)
-                
-                # Build the message
-                MESSAGE="## Build Preview\n\nYour PR was deployed by CircleCI [#$CIRCLE_BUILD_NUM](https://circleci.com/gh/player-ui/player/$CIRCLE_BUILD_NUM) on \`$(date -u +'%a, %d %b %Y %H:%M:%S GMT')\` with this version:\n\n\`\`\`\n$VERSION\n\`\`\`\n\n### 📖 Docs ([View site]($PR_URL))"
-                
-                MESSAGE="$MESSAGE\n$CHANGED_PAGES"
-                
-                source ~/.bashrc
-                bundle install
-                npx auto comment --message "$MESSAGE" --context "build-preview"
+                echo "Docs deployed to: https://player-ui.github.io/pr/$PR_NUMBER/"
               else
                 echo "Non-PR branch - docs built, deployment handled by docs_release job"
               fi
