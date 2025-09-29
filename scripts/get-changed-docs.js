@@ -5,7 +5,10 @@
  * Usage: node scripts/get-changed-docs.js [base-branch]
  */
 
-import { execSync } from "child_process";
+/* eslint-env node */
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable no-undef */
+const { execSync } = require("child_process");
 
 function getChangedDocsPages(baseBranch = "origin/main") {
   try {
@@ -64,7 +67,7 @@ function formatChangedPages(pages, prUrl) {
 }
 
 // If run directly, output the changed pages
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (require.main === module) {
   const baseBranch = process.argv[2] || "origin/main";
   const pages = getChangedDocsPages(baseBranch);
 
@@ -80,4 +83,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   }
 }
 
-export { getChangedDocsPages, formatChangedPages };
+module.exports = { getChangedDocsPages, formatChangedPages };
