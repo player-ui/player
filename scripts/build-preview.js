@@ -1,6 +1,9 @@
 /**
  * Auto plugin that comments on PRs for releases
  */
+
+import { getChangedDocsPages, formatChangedPages } from "./get-changed-docs.js";
+
 class BuildPreviewPlugin {
   constructor() {
     this.name = "release-comment";
@@ -70,26 +73,6 @@ class BuildPreviewPlugin {
           ? `https://circleci.com/gh/player-ui/player/${circleBuildNum}`
           : null;
 
-        // Get existing comment to prepend canary version
-        let existingComment = "";
-        try {
-          const comments = await auto.git.getComments(prNumber);
-          const buildPreviewComment = comments.find(
-            (comment) =>
-              comment.body.includes("### Build Preview") &&
-              comment.user.login === "intuit-svc",
-          );
-          if (buildPreviewComment) {
-            // Extract everything after the first line (remove "### Build Preview")
-            const lines = buildPreviewComment.body.split("\n");
-            existingComment = lines.slice(1).join("\n").trim();
-          }
-        } catch (error) {
-          auto.logger.verbose.info(
-            "Could not fetch existing comment, will create new one",
-          );
-        }
-
         // Build the canary version section
         let canarySection = "";
         if (circleciUrl) {
@@ -102,13 +85,12 @@ class BuildPreviewPlugin {
         canarySection += `${newVersion}\n`;
         canarySection += "```\n\n";
 
-        // Combine canary section with existing comment
-        let versionMessage = `### Build Preview\n\n${canarySection}`;
-        if (existingComment) {
-          versionMessage += existingComment;
-        } else {
-          versionMessage += `🚀 [Docs](${docsUrl})`;
-        }
+        // Get changed docs pages using shared utility
+        const changedPages = getChangedDocsPages();
+        const changedPagesList = formatChangedPages(changedPages, docsUrl);
+
+        // Build the complete message
+        const versionMessage = `### Build Preview\n\n${canarySection}🚀 Docs: ${docsUrl}${changedPagesList}`;
 
         await auto.comment({
           message: versionMessage,

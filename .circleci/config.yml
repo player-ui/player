@@ -348,6 +348,8 @@ jobs:
             - "v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}"
             - "v1-bazel-cache-core-{{ .Branch }}"
             - "v1-bazel-cache-core-main"
+            - 'gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}'
+            - 'gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}'
       - add_ssh_keys:
           fingerprints:
             - "SHA256:hUAWVYdfSW5ml6ufbfyEHUcuPwUJ88xVhsZc21b2lA8"
@@ -376,11 +378,20 @@ jobs:
                 STABLE_ALGOLIA_SEARCH_INDEX="crawler_Player (Next)" \
                 bazel run --config=release //docs:gh_deploy -- --dest_dir "pr/$PR_NUMBER"
                 PR_URL="https://player-ui.github.io/pr/$PR_NUMBER/"
+                
+                # Get changed docs pages using shared utility
+                CHANGED_PAGES=$(node scripts/get-changed-docs.js)
+                
+                # Build the message
+                MESSAGE="### Build Preview\n\n🚀 Docs: $PR_URL"
+                
+                if [ -n "$CHANGED_PAGES" ]; then
+                  MESSAGE="$MESSAGE\n\n**Changed pages:**\n$CHANGED_PAGES"
+                fi
+                
                 source ~/.bashrc
                 bundle install
-                npx auto comment --message "### Build Preview
-
-                🚀 Docs preview: $PR_URL" --context "build-preview"
+                npx auto comment --message "$MESSAGE" --context "build-preview"
               else
                 echo "Non-PR branch - docs built, deployment handled by docs_release job"
               fi
