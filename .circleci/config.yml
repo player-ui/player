@@ -355,34 +355,39 @@ jobs:
       - run: git config --global user.name "Intuit Service"
       - run: git config --global user.email "opensource-svc@intuit.com"
       - run:
-          name: Check if docs should build
+          name: Build and deploy docs
           command: |
+            # Debug: Show parameter values
+            echo "GHA_Action: '<< pipeline.parameters.GHA_Action >>'"
+            echo "should_release: '<< pipeline.parameters.should_release >>'"
+
+            # Check if docs should build
             if [ "<< pipeline.parameters.GHA_Action >>" = "docs" ] || [ "<< pipeline.parameters.should_release >>" = "true" ]; then
               echo "Building docs for << pipeline.parameters.GHA_Action >>"
+              
+              bazel build --config=release //docs:gh_deploy
+
+              # Only deploy and comment if this is a PR
+              if [ -n "$CIRCLE_PULL_REQUEST" ]; then
+                PR_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | sed -E 's|.*/pull/([0-9]+).*|\1|')
+                STABLE_DOCS_BASE_PATH="pr/$PR_NUMBER" \
+                STABLE_ALGOLIA_SEARCH_API_KEY="$ALGOLIA_NEXT_SEARCH_API_KEY" \
+                STABLE_ALGOLIA_SEARCH_APPID="D477I7TDXB" \
+                STABLE_ALGOLIA_SEARCH_INDEX="crawler_Player (Next)" \
+                bazel run --config=release //docs:gh_deploy -- --dest_dir "pr/$PR_NUMBER"
+                PR_URL="https://player-ui.github.io/pr/$PR_NUMBER/"
+                source ~/.bashrc
+                bundle install
+                npx auto comment --message "### Build Preview
+
+                🚀 Docs preview: $PR_URL" --context "build-preview"
+              else
+                echo "Non-PR branch - docs built, deployment handled by docs_release job"
+              fi
             else
               echo "Skipping docs build - not requested"
               exit 0
             fi
-      - run: |
-          bazel build --config=release //docs:gh_deploy
-
-          # Only deploy and comment if this is a PR
-          if [ -n "$CIRCLE_PULL_REQUEST" ]; then
-            PR_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | sed -E 's|.*/pull/([0-9]+).*|\1|')
-            STABLE_DOCS_BASE_PATH="pr/$PR_NUMBER" \
-            STABLE_ALGOLIA_SEARCH_API_KEY="$ALGOLIA_NEXT_SEARCH_API_KEY" \
-            STABLE_ALGOLIA_SEARCH_APPID="D477I7TDXB" \
-            STABLE_ALGOLIA_SEARCH_INDEX="crawler_Player (Next)" \
-            bazel run --config=release //docs:gh_deploy -- --dest_dir "pr/$PR_NUMBER"
-            PR_URL="https://player-ui.github.io/pr/$PR_NUMBER/"
-            source ~/.bashrc
-            bundle install
-            npx auto comment --message "### Build Preview
-
-            🚀 Docs preview: $PR_URL" --context "build-preview"
-          else
-            echo "Non-PR branch - docs built, deployment handled by docs_release job"
-          fi
 
   docs_release:
     executor: base
