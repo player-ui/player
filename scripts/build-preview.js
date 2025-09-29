@@ -90,7 +90,7 @@ class BuildPreviewPlugin {
         const changedPagesList = formatChangedPages(changedPages, docsUrl);
 
         // Build the complete message
-        const versionMessage = `### Build Preview\n\n${canarySection}🚀 Docs: ${docsUrl}${changedPagesList}`;
+        const versionMessage = `## Build Preview\n\n${canarySection}### 📖 Docs ([View site](${docsUrl}))${changedPagesList}`;
 
         await auto.comment({
           message: versionMessage,

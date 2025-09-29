@@ -383,11 +383,9 @@ jobs:
                 CHANGED_PAGES=$(node scripts/get-changed-docs.js)
                 
                 # Build the message
-                MESSAGE="### Build Preview\n\n🚀 Docs: $PR_URL"
+                MESSAGE="## Build Preview\n\nYour PR was deployed by CircleCI [#$CIRCLE_BUILD_NUM](https://circleci.com/gh/player-ui/player/$CIRCLE_BUILD_NUM) on \`$(date -u +'%a, %d %b %Y %H:%M:%S GMT')\` with this version:\n\n\`\`\`\n$VERSION\n\`\`\`\n\n### 📖 Docs ([View site]($PR_URL))"
                 
-                if [ -n "$CHANGED_PAGES" ]; then
-                  MESSAGE="$MESSAGE\n\n**Changed pages:**\n$CHANGED_PAGES"
-                fi
+                MESSAGE="$MESSAGE\n$CHANGED_PAGES"
                 
                 source ~/.bashrc
                 bundle install

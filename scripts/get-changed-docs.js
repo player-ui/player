@@ -56,14 +56,14 @@ function getChangedDocsPages(baseBranch = "origin/main") {
 
 function formatChangedPages(pages, prUrl) {
   if (!pages || pages.length === 0) {
-    return "";
+    return "\nNo docs changes found";
   }
 
   const pageList = pages
     .map((page) => `- [${page.name}](${prUrl}${page.url}/)`)
     .join("\n");
 
-  return `\n\n**Changed pages:**\n${pageList}`;
+  return `\n**Updated pages:**\n${pageList}`;
 }
 
 // If run directly, output the changed pages
@@ -72,14 +72,15 @@ if (require.main === module) {
   const pages = getChangedDocsPages(baseBranch);
 
   if (pages.length > 0) {
-    console.log("Changed docs pages:");
-    pages.forEach((page) => {
-      console.log(
-        `- [${page.name}](https://player-ui.github.io/pr/720/${page.url}/)`,
-      );
-    });
+    const pageList = pages
+      .map(
+        (page) =>
+          `- [${page.name}](https://player-ui.github.io/pr/720/${page.url}/)`,
+      )
+      .join("\n");
+    console.log(pageList);
   } else {
-    console.log("No docs pages changed");
+    console.log("No docs changes found");
   }
 }
 
