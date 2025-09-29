@@ -1,15 +1,12 @@
-#!/usr/bin/env node
-
-/**
- * Utility to get changed docs pages for PR comments
- * Usage: node scripts/get-changed-docs.js [base-branch]
- */
-
 /* eslint-env node */
 /* eslint-disable @typescript-eslint/no-require-imports */
 /* eslint-disable no-undef */
 const { execSync } = require("child_process");
 
+/**
+ * Utility to get changed docs pages for PR comments
+ * Usage: node scripts/get-changed-docs.js [base-branch]
+ */
 function getChangedDocsPages(baseBranch = "origin/main") {
   try {
     // Get changed files that are in the docs directory

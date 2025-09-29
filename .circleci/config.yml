@@ -377,7 +377,17 @@ jobs:
                 STABLE_ALGOLIA_SEARCH_APPID="D477I7TDXB" \
                 STABLE_ALGOLIA_SEARCH_INDEX="crawler_Player (Next)" \
                 bazel run --config=release //docs:gh_deploy -- --dest_dir "pr/$PR_NUMBER"
-                echo "Docs deployed to: https://player-ui.github.io/pr/$PR_NUMBER/"
+                PR_URL="https://player-ui.github.io/pr/$PR_NUMBER/"
+                
+                # Get changed docs pages using shared utility
+                CHANGED_PAGES=$(node scripts/get-changed-docs.js)
+                
+                # Build the message
+                MESSAGE="## Build Preview\n\nYour PR was deployed by CircleCI [#$CIRCLE_BUILD_NUM](https://circleci.com/gh/player-ui/player/$CIRCLE_BUILD_NUM) on \`$(date -u +'%a, %d %b %Y %H:%M:%S GMT')\`\n\n### 📖 Docs ([View site]($PR_URL))"
+                
+                MESSAGE="$MESSAGE\n$CHANGED_PAGES"
+                
+                npx auto comment --message "$MESSAGE" --context "build-preview"
               else
                 echo "Non-PR branch - docs built, deployment handled by docs_release job"
               fi
@@ -645,6 +655,7 @@ workflows:
             - android_test
             - coverage
             - build_ios
+            - docs_release
 
       - build_docs:
           name: build-docs-main
@@ -696,6 +707,7 @@ workflows:
             - android_test
             - coverage
             - build_ios
+            - docs_release
       - docs_release:
           context:
             - Publish

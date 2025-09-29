@@ -1,9 +1,10 @@
-/**
- * Auto plugin that comments on PRs for releases
- */
+/* eslint-disable no-restricted-syntax */
 
 import { getChangedDocsPages, formatChangedPages } from "./get-changed-docs.js";
 
+/**
+ * Auto plugin that comments on PRs for releases
+ */
 class BuildPreviewPlugin {
   constructor() {
     this.name = "release-comment";
