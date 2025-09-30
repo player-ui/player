@@ -15,7 +15,11 @@ public open class MakeFlowModule internal constructor(
 ) : JSScriptPluginWrapper("MakeFlow", sourcePath = "core/make-flow/dist/MakeFlow.native.js") {
     override fun apply(runtime: Runtime<*>) {
         runtime.execute(script)
-        instance = runtime.buildInstance(name)
+        instance = runtime.execute("""
+        ({
+            makeFlow: typeof makeFlow !== 'undefined' ? makeFlow : MakeFlow.makeFlow
+        })
+        """) as Node
     }
 
     public fun makeFlow(flow: Node): JsonElement {
