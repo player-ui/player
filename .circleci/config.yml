@@ -387,7 +387,7 @@ jobs:
                 
                 MESSAGE="$MESSAGE\n$CHANGED_PAGES"
                 
-                npx auto comment --message "$MESSAGE" --context "build-preview"
+                npx auto comment --message "$(printf "$MESSAGE")" --context "build-preview"
               else
                 echo "Non-PR branch - docs built, deployment handled by docs_release job"
               fi
@@ -416,7 +416,10 @@ jobs:
       - run: git config --global user.email "opensource-svc@intuit.com"
 
       - run: |
-          echo "Deploying docs for release"
+          echo "Building and deploying docs for release"
+
+          # Build the docs first
+          bazel build --config=release //docs:gh_deploy
 
           # If GHA_Action = "release" + main branch -> full release (deploy to latest/)
           # If GHA_Action = "" + main branch -> next release (deploy to next/)
