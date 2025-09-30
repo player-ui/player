@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 
-import { getChangedDocsPages, formatChangedPages } from "./get-changed-docs.js";
+import { getChangedDocsPages } from "./get-changed-docs.js";
 
 /**
  * Auto plugin that comments on PRs for releases
@@ -88,7 +88,13 @@ class BuildPreviewPlugin {
 
         // Get changed docs pages using shared utility
         const changedPages = getChangedDocsPages();
-        const changedPagesList = formatChangedPages(changedPages, docsUrl);
+        const changedPagesList =
+          changedPages.length > 0
+            ? "\n" +
+              changedPages
+                .map((page) => `- [${page.name}](${docsUrl}${page.url}/)`)
+                .join("\n")
+            : "";
 
         // Build the complete message
         const versionMessage = `## Build Preview\n\n${canarySection}### 📖 Docs ([View site](${docsUrl}))${changedPagesList}`;

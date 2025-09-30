@@ -51,18 +51,6 @@ function getChangedDocsPages(baseBranch = "origin/main") {
   }
 }
 
-function formatChangedPages(pages, prUrl) {
-  if (!pages || pages.length === 0) {
-    return "\nNo docs changes found";
-  }
-
-  const pageList = pages
-    .map((page) => `- [${page.name}](${prUrl}${page.url}/)`)
-    .join("\n");
-
-  return `\n**Updated pages:**\n${pageList}`;
-}
-
 // If run directly, output the changed pages
 if (require.main === module) {
   const baseBranch = process.argv[2] || "origin/main";
@@ -76,9 +64,7 @@ if (require.main === module) {
       )
       .join("\n");
     console.log(pageList);
-  } else {
-    console.log("No docs changes found");
   }
 }
 
-module.exports = { getChangedDocsPages, formatChangedPages };
+module.exports = { getChangedDocsPages };
