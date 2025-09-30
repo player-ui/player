@@ -357,7 +357,7 @@ jobs:
       - run: git config --global user.name "Intuit Service"
       - run: git config --global user.email "opensource-svc@intuit.com"
       - run:
-          name: Build and deploy docs
+          name: Build and deploy docs preview
           command: |
             # Debug: Show parameter values
             echo "GHA_Action: '<< pipeline.parameters.GHA_Action >>'"
