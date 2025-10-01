@@ -58,9 +58,9 @@ commands:
           at: ~/player
       - restore_cache:
           keys:
-            - "v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}"
-            - "v1-bazel-cache-core-{{ .Branch }}"
-            - "v1-bazel-cache-core-main"
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+            - v1-bazel-cache-core-{{ .Branch }}
+            - v1-bazel-cache-core-main
             - 'gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}'
             - 'gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}'
 
@@ -88,7 +88,7 @@ jobs:
 
       - restore_cache:
           keys:
-            - 'v1-dependencies-{{ checksum "package.json" }}'
+            - v1-dependencies-{{ checksum "package.json" }}
 
       - persist_to_workspace:
           root: .
@@ -140,7 +140,7 @@ jobs:
       - save_cache:
           paths:
             - node_modules
-          key: 'v1-dependencies-{{ checksum "package.json" }}'
+          key: v1-dependencies-{{ checksum "package.json" }}
 
       - persist_to_workspace:
           root: .
@@ -287,9 +287,9 @@ jobs:
 
       - restore_cache:
           keys:
-            - "v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}"
-            - "v1-bazel-cache-core-{{ .Branch }}"
-            - "v1-bazel-cache-core-main"
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+            - v1-bazel-cache-core-{{ .Branch }}
+            - v1-bazel-cache-core-main
 
       - run: |
           BUNDLE_TARGETS=$(bazel query "kind(.*_test, //...) except filter('android|ios|swiftui', //...)" --output label 2>/dev/null | tr '\n' ' ')
@@ -345,9 +345,9 @@ jobs:
           at: ~/player
       - restore_cache:
           keys:
-            - "v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}"
-            - "v1-bazel-cache-core-{{ .Branch }}"
-            - "v1-bazel-cache-core-main"
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+            - v1-bazel-cache-core-{{ .Branch }}
+            - v1-bazel-cache-core-main
             - 'gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}'
             - 'gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}'
       - add_ssh_keys:
@@ -403,9 +403,9 @@ jobs:
           at: ~/player
       - restore_cache:
           keys:
-            - "v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}"
-            - "v1-bazel-cache-core-{{ .Branch }}"
-            - "v1-bazel-cache-core-main"
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+            - v1-bazel-cache-core-{{ .Branch }}
+            - v1-bazel-cache-core-main
 
       - add_ssh_keys:
           fingerprints:
@@ -607,7 +607,8 @@ workflows:
           context:
             - Publish
           requires:
-            - bazelrc
+            - build-trunk
+            - build-ios-trunk
 
       - build_docs:
           name: build-docs-fork
@@ -658,20 +659,14 @@ workflows:
             - android_test
             - coverage
             - build_ios
-            - docs_release
-
-      - build_docs:
-          name: build-docs-main
-          context:
-            - Publish
-          requires:
-            - bazelrc
 
       - docs_release:
           context:
             - Publish
           requires:
-            - setup
+            - android_test
+            - coverage
+            - build_ios
 
   full_release:
     when:
@@ -710,9 +705,10 @@ workflows:
             - android_test
             - coverage
             - build_ios
-            - docs_release
       - docs_release:
           context:
             - Publish
           requires:
-            - setup
+            - android_test
+            - coverage
+            - build_ios
