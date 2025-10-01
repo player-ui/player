@@ -408,7 +408,7 @@ jobs:
 
       - setup_auth
 
-      - run: ./scripts/deploy-docs.sh "<< pipeline.parameters.GHA_Action >>"
+      - run: ./scripts/preview-docs.sh "<< pipeline.parameters.GHA_Action >>"
 
 workflows:
   build_and_test_pr:
