@@ -186,8 +186,10 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
       const resolvedNode = context.nodeResolveCache.get(node.id);
       if (resolvedNode !== undefined) {
-        const existingResolvedNodes = node.asyncNodesResolved ?? [];
-        resolvedNode.asyncNodesResolved = [...existingResolvedNodes, node.id];
+        if (resolvedNode.asyncNodesResolved === undefined) {
+          resolvedNode.asyncNodesResolved = [];
+        }
+        resolvedNode.asyncNodesResolved.push(node.id);
         return this.resolveAsyncChildren(resolvedNode, context);
       }
 
