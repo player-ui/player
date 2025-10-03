@@ -358,26 +358,9 @@ jobs:
       - run:
           name: Build docs
           command: |
-            # Debug: Show parameter values
-            echo "GHA_Action: '<< pipeline.parameters.GHA_Action >>'"
-            echo "should_release: '<< pipeline.parameters.should_release >>'"
-            echo "Branch: '$CIRCLE_BRANCH'"
-
-            # Skip docs build for release-main branches (placeholder PRs)
-            if [[ "$CIRCLE_BRANCH" =~ ^release-main ]]; then
-              echo "Skipping docs build for release-main branch"
-              exit 0
-            fi
-
-            # Check if docs should build
-            if [ "<< pipeline.parameters.GHA_Action >>" = "docs" ] || [ "<< pipeline.parameters.should_release >>" = "true" ]; then
-              echo "Building docs for << pipeline.parameters.GHA_Action >>"
-              bazel build --config=release //docs:gh_deploy
-              echo "Docs built successfully"
-            else
-              echo "Skipping docs build - not requested"
-              exit 0
-            fi
+            echo "Building docs for << pipeline.parameters.GHA_Action >>"
+            bazel build --config=release //docs:gh_deploy
+            echo "Docs built successfully"
 
   deploy_docs_preview:
     executor: base
@@ -394,13 +377,8 @@ jobs:
       - run:
           name: Deploy preview docs
           command: |
-            # Deploy for /docs comments or release builds (including canary)
-            if [ "<< pipeline.parameters.GHA_Action >>" = "docs" ] || [ "<< pipeline.parameters.should_release >>" = "true" ]; then
-              echo "Deploying docs for preview build"
-              ./scripts/deploy-docs.sh "<< pipeline.parameters.GHA_Action >>"
-            else
-              echo "Not a docs/release build - skipping docs deployment"
-            fi
+            echo "Deploying docs for preview build"
+            ./scripts/deploy-docs.sh "<< pipeline.parameters.GHA_Action >>"
 
   deploy_docs_release:
     executor: base
@@ -565,12 +543,86 @@ workflows:
           requires:
             - build-trunk
 
+  docs_operations:
+    when:
+      or:
+        - equal: ["docs", << pipeline.parameters.GHA_Action >>]
+        - equal: [true, << pipeline.parameters.should_release >>]
+    jobs:
+      - setup:
+          filters:
+            branches:
+              ignore:
+                - main
+                - /version-.*/
+            tags:
+              ignore: /.*/
+      - bazelrc:
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          context:
+            - Build
+          requires:
+            - setup
+
+      - bazelrc_fork:
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - setup
+
+      - build:
+          name: build-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          requires:
+            - bazelrc
+
+      - build:
+          name: build-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - setup
+            - bazelrc_fork
+
+      - test:
+          name: test-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          requires:
+            - build-trunk
+
+      - test:
+          name: test-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - build-fork
+
       - build_docs:
           name: build-docs-trunk
           context:
             - Publish
           requires:
             - test-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+                - /^release-main.*/
 
       - build_docs:
           name: build-docs-fork
@@ -578,6 +630,10 @@ workflows:
             - Publish
           requires:
             - test-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
 
       - deploy_docs_preview:
           name: deploy-docs-trunk
@@ -585,6 +641,11 @@ workflows:
             - Publish
           requires:
             - build-docs-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+                - /^release-main.*/
 
       - deploy_docs_preview:
           name: deploy-docs-fork
@@ -592,6 +653,20 @@ workflows:
             - Publish
           requires:
             - build-docs-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+
+      - maybe_release:
+          context:
+            - Publish
+          requires:
+            - build-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
 
   build_and_test_main:
     when:
