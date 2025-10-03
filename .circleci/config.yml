@@ -356,46 +356,30 @@ jobs:
             - 'gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}'
       - setup_auth
       - run:
-          name: Build and deploy docs preview
+          name: Build docs
           command: |
             # Debug: Show parameter values
             echo "GHA_Action: '<< pipeline.parameters.GHA_Action >>'"
             echo "should_release: '<< pipeline.parameters.should_release >>'"
+            echo "Branch: '$CIRCLE_BRANCH'"
+
+            # Skip docs build for release-main branches (placeholder PRs)
+            if [[ "$CIRCLE_BRANCH" =~ ^release-main ]]; then
+              echo "Skipping docs build for release-main branch"
+              exit 0
+            fi
 
             # Check if docs should build
             if [ "<< pipeline.parameters.GHA_Action >>" = "docs" ] || [ "<< pipeline.parameters.should_release >>" = "true" ]; then
               echo "Building docs for << pipeline.parameters.GHA_Action >>"
-              
               bazel build --config=release //docs:gh_deploy
-
-              # Only deploy if this is a PR
-              if [ -n "$CIRCLE_PULL_REQUEST" ]; then
-                PR_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | sed -E 's|.*/pull/([0-9]+).*|\1|')
-                STABLE_DOCS_BASE_PATH="pr/$PR_NUMBER" \
-                STABLE_ALGOLIA_SEARCH_API_KEY="$ALGOLIA_NEXT_SEARCH_API_KEY" \
-                STABLE_ALGOLIA_SEARCH_APPID="D477I7TDXB" \
-                STABLE_ALGOLIA_SEARCH_INDEX="crawler_Player (Next)" \
-                bazel run --config=release //docs:gh_deploy -- --dest_dir "pr/$PR_NUMBER"
-                PR_URL="https://player-ui.github.io/pr/$PR_NUMBER/"
-                
-                # Get changed docs pages using shared utility
-                CHANGED_PAGES=$(node scripts/get-changed-docs.js)
-                
-                # Build the message
-                MESSAGE="## Build Preview\n\nA preview of your PR docs was deployed by CircleCI [#$CIRCLE_BUILD_NUM](https://circleci.com/gh/player-ui/player/$CIRCLE_BUILD_NUM) on \`$(date -u +'%a, %d %b %Y %H:%M:%S GMT')\`\n\n### 📖 Docs ([View site]($PR_URL))"
-                
-                MESSAGE="$MESSAGE\n$CHANGED_PAGES"
-                
-                npx auto comment --message "$(printf "$MESSAGE")" --context "build-preview"
-              else
-                echo "Non-PR branch - docs built, deployment handled by docs_release job"
-              fi
+              echo "Docs built successfully"
             else
               echo "Skipping docs build - not requested"
               exit 0
             fi
 
-  docs_release:
+  deploy_docs_preview:
     executor: base
     steps:
       - attach_workspace:
@@ -407,8 +391,34 @@ jobs:
             - v1-bazel-cache-core-main
 
       - setup_auth
+      - run:
+          name: Deploy preview docs
+          command: |
+            # Deploy for /docs comments or release builds (including canary)
+            if [ "<< pipeline.parameters.GHA_Action >>" = "docs" ] || [ "<< pipeline.parameters.should_release >>" = "true" ]; then
+              echo "Deploying docs for preview build"
+              ./scripts/deploy-docs.sh "<< pipeline.parameters.GHA_Action >>"
+            else
+              echo "Not a docs/release build - skipping docs deployment"
+            fi
 
-      - run: ./scripts/preview-docs.sh "<< pipeline.parameters.GHA_Action >>"
+  deploy_docs_release:
+    executor: base
+    steps:
+      - attach_workspace:
+          at: ~/player
+      - restore_cache:
+          keys:
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+            - v1-bazel-cache-core-{{ .Branch }}
+            - v1-bazel-cache-core-main
+
+      - setup_auth
+      - run:
+          name: Deploy release docs
+          command: |
+            echo "Deploying docs for release build"
+            ./scripts/deploy-docs.sh "<< pipeline.parameters.GHA_Action >>"
 
 workflows:
   build_and_test_pr:
@@ -484,6 +494,7 @@ workflows:
           requires:
             - build-trunk
             - build-ios-trunk
+            - android-test-trunk
 
       - test:
           name: test-trunk
@@ -559,15 +570,28 @@ workflows:
           context:
             - Publish
           requires:
-            - build-trunk
-            - build-ios-trunk
+            - test-trunk
 
       - build_docs:
           name: build-docs-fork
           context:
             - Publish
           requires:
-            - bazelrc_fork
+            - test-fork
+
+      - deploy_docs_preview:
+          name: deploy-docs-trunk
+          context:
+            - Publish
+          requires:
+            - build-docs-trunk
+
+      - deploy_docs_preview:
+          name: deploy-docs-fork
+          context:
+            - Publish
+          requires:
+            - build-docs-fork
 
   build_and_test_main:
     when:
@@ -604,6 +628,14 @@ workflows:
             - build
             - build_ios
 
+      - build_docs:
+          context:
+            - Publish
+          requires:
+            - android_test
+            - coverage
+            - build_ios
+
       - release:
           context:
             - Publish
@@ -612,13 +644,15 @@ workflows:
             - coverage
             - build_ios
 
-      - docs_release:
+      - deploy_docs_release:
           context:
             - Publish
           requires:
             - android_test
             - coverage
             - build_ios
+            - build_docs
+            - release
 
   full_release:
     when:
@@ -650,6 +684,14 @@ workflows:
           requires:
             - build
 
+      - build_docs:
+          context:
+            - Publish
+          requires:
+            - android_test
+            - coverage
+            - build_ios
+
       - release:
           context:
             - Publish
@@ -657,10 +699,12 @@ workflows:
             - android_test
             - coverage
             - build_ios
-      - docs_release:
+      - deploy_docs_release:
           context:
             - Publish
           requires:
             - android_test
             - coverage
             - build_ios
+            - build_docs
+            - release

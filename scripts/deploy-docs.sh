@@ -1,17 +1,52 @@
 #!/usr/bin/env bash
-# Deploy documentation based on release type and branch
+# Deploy documentation for both PR previews and releases
 
 set -u -o pipefail
 
 readonly GHA_ACTION="${1:-}"
 readonly CIRCLE_BRANCH="${CIRCLE_BRANCH:-}"
 
-echo "Building and deploying docs for release"
+echo "Deploying docs"
 echo "GHA_Action: '$GHA_ACTION'"
 echo "Branch: '$CIRCLE_BRANCH'"
+echo "Pull Request: '$CIRCLE_PULL_REQUEST'"
 
-# Build the docs first
-bazel build --config=release //docs:gh_deploy
+# For PR builds, deploy to pr directory
+if [ -n "$CIRCLE_PULL_REQUEST" ]; then
+  PR_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | sed -E 's|.*/pull/([0-9]+).*|\1|')
+  echo "Deploying PR docs to pr/$PR_NUMBER"
+  
+  STABLE_DOCS_BASE_PATH="pr/$PR_NUMBER" \
+  STABLE_ALGOLIA_SEARCH_API_KEY="$ALGOLIA_NEXT_SEARCH_API_KEY" \
+  STABLE_ALGOLIA_SEARCH_APPID="D477I7TDXB" \
+  STABLE_ALGOLIA_SEARCH_INDEX="crawler_Player (Next)" \
+  bazel run --config=release //docs:gh_deploy -- --dest_dir "pr/$PR_NUMBER"
+  
+  PR_URL="https://player-ui.github.io/pr/$PR_NUMBER/"
+  
+  # Only post PR comment for docs-only previews, not for canary builds
+  # (canary builds will have their own comment posted by auto shipit)
+  if [ "$GHA_ACTION" = "docs" ]; then
+    # Get changed docs pages using shared utility
+    CHANGED_PAGES=$(node scripts/get-changed-docs.js)
+    
+    # Build the message
+    MESSAGE="## Build Preview\n\nA preview of your PR docs was deployed by CircleCI [#$CIRCLE_BUILD_NUM](https://circleci.com/gh/player-ui/player/$CIRCLE_BUILD_NUM) on \`$(date -u +'%a, %d %b %Y %H:%M:%S GMT')\`\n\n### 📖 Docs ([View site]($PR_URL))"
+    
+    MESSAGE="$MESSAGE\n$CHANGED_PAGES"
+    
+    npx auto comment --message "$(printf "$MESSAGE")" --context "build-preview"
+    echo "PR comment posted for docs preview"
+  else
+    echo "Skipping PR comment - canary build will post its own comment"
+  fi
+  
+  echo "PR docs deployed to: $PR_URL"
+  exit 0
+fi
+
+# For non-PR releases, deploy to next/latest/versioned
+echo "Deploying release docs"
 
 # If GHA_Action = "release" + main branch -> full release (deploy to latest/)
 # If GHA_Action = "" + main branch -> next release (deploy to next/)

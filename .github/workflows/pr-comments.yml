@@ -1,4 +1,4 @@
-name: Publish canary on PR comment
+name: PR Comment Workflow
 
 on:
   issue_comment:
@@ -8,7 +8,7 @@ on:
 jobs:
   check_auth:
     runs-on: ubuntu-latest
-    if: ${{ github.event.issue.pull_request && github.event.comment.body == '/canary' }}
+    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/') }}
     steps:
       - name: Check auth
         id: check_auth
@@ -19,6 +19,8 @@ jobs:
           script: |
             const { owner, repo } = context.issue;
             const { login: username } = context.payload.comment.user;
+            const commentBody = context.payload.comment.body;
+
             await github.rest.repos.checkCollaborator({
               owner,
               repo,
@@ -36,7 +38,7 @@ jobs:
               repo,
               pull_number,
             });
-            return branch;
+            return JSON.stringify({ branch, commentType: commentBody });
       - name: Not a collaborator
         if: ${{ failure() }}
         uses: actions/github-script@v6
@@ -44,34 +46,82 @@ jobs:
           github-token: ${{ secrets.GH_TOKEN }}
           script: |
             const { owner, repo, number: issue_number } = context.issue;
+            const commentBody = context.payload.comment.body;
+
             github.rest.reactions.createForIssueComment({
               owner,
               repo,
               comment_id: context.payload.comment.id,
               content: "-1",
             });
+
+            const message = 'Comment-based workflows can only be requested by collaborators. Please tag a maintainer to request this action. ❌';
+
             github.rest.issues.createComment({
               owner,
               repo,
               issue_number,
-              body: 'Canary builds can only be requested by collaborators. Please tag a maintainer to request a canary build. ❌',
+              body: message,
             });
     outputs:
-      branch: ${{ steps.check_auth.outputs.result }}
+      branch: ${{ fromJson(steps.check_auth.outputs.result).branch }}
+      comment_type: ${{ fromJson(steps.check_auth.outputs.result).commentType }}
 
-  trigger_canary:
+  trigger_action:
     runs-on: ubuntu-latest
     needs: check_auth
+    if: github.event_name == 'issue_comment'
     steps:
-      - name: Trigger canary build
-        run: |
-          curl --no-progress-meter --fail --request POST \
-            --url https://circleci.com/api/v2/project/gh/${{ github.repository }}/pipeline \
-            --header 'Circle-Token: ${{ secrets.CCI_TOKEN }}' \
-            --header 'content-type: application/json' \
-            --header 'x-attribution-login: ${{ github.actor }}' \
-            --header 'x-attribution-actor-id: ${{ github.actor }}' \
-            --data '{ "branch": "${{ needs.check_auth.outputs.branch }}", "parameters": { "should_release": true }}'
+      - name: Trigger CircleCI pipeline
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          script: |
+            const commentType = '${{ needs.check_auth.outputs.comment_type }}';
+
+            // Define action configurations
+            const actions = {
+              '/docs': {
+                should_release: false,
+                GHA_Action: 'docs'
+              },
+              '/canary': {
+                should_release: true
+              }
+            };
+
+            const config = actions[commentType];
+
+            if (!config) {
+              console.log(`Unknown command: ${commentType}`);
+              return;
+            }
+
+            const params = JSON.stringify(config);
+            const data = JSON.stringify({
+              branch: '${{ needs.check_auth.outputs.branch }}',
+              parameters: config
+            });
+
+            const response = await fetch(`https://circleci.com/api/v2/project/gh/${{ github.repository }}/pipeline`, {
+              method: 'POST',
+              headers: {
+                'Circle-Token': process.env.CCI_TOKEN,
+                'content-type': 'application/json',
+                'x-attribution-login': '${{ github.actor }}',
+                'x-attribution-actor-id': '${{ github.actor }}'
+              },
+              body: data
+            });
+
+            if (!response.ok) {
+              throw new Error(`CircleCI API call failed: ${response.status}`);
+            }
+
+            console.log(`Successfully triggered ${commentType} action`);
+        env:
+          CCI_TOKEN: ${{ secrets.CCI_TOKEN }}
+
       - name: Trigger success
         uses: actions/github-script@v6
         with:
@@ -84,6 +134,7 @@ jobs:
               comment_id: context.payload.comment.id,
               content: "rocket",
             });
+
       - name: Trigger failed
         if: ${{ failure() }}
         uses: actions/github-script@v6
