@@ -6,6 +6,7 @@ import react from "@astrojs/react";
 import starlightDocSearch from "@astrojs/starlight-docsearch";
 import { visit } from "unist-util-visit";
 import pagefind from "astro-pagefind";
+import { remarkModifiedTime } from "./remark-modified-time.mjs";
 
 export const rehypeLinks = (options) => {
   let base = options?.base;
@@ -62,6 +63,7 @@ export default defineConfig({
         light: "./src/assets/logo/logo-light-large.png",
         replacesTitle: true,
       },
+      lastUpdated: true,
       social: [
         {
           icon: "github",
@@ -183,6 +185,7 @@ export default defineConfig({
     },
   },
   markdown: {
+    remarkPlugins: [remarkModifiedTime],
     rehypePlugins: [
       [rehypeMermaid, { strategy: "img-svg", dark: true }],
       [rehypeLinks, { base: BASE_PREFIX }],

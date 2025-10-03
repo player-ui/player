@@ -87,6 +87,18 @@ bazel run //docs/site:dev
 
 which will run an instance on `http://localhost:4321`.
 
+### Documentation Previews
+
+To trigger a docs preview, collaborators can add a `/docs` comment to any PR. This will build and deploy a docs preview to the [Player Docs Repo](https://github.com/player-ui/player-ui.github.io) in the `pr/{PR_NUMBER}` folder structure. A comment will be added to the PR with the preview link.
+
+The docs preview will be available at: `https://player-ui.github.io/pr/{PR_NUMBER}/`
+
+### Canary Releases
+
+When a collaborator comments `/canary` on a PR, it will trigger a canary release that publishes NPM packages with a canary version. A comment will be added to the PR with the version information.
+
+### Production Documentation
+
 When a PR is merged, any `docs/site` changes will be deployed to the `next` folder in [https://github.com/player-ui/player-ui.github.io](https://github.com/player-ui/player-ui.github.io), which stores the built files for the site.
 
 The OSS site is deployed with the following route logic:
@@ -107,51 +119,67 @@ If you are interested in contributing for android, follow our [android guide](ht
 Once you have done the set-up below, please refer to [our iOS Dev Wiki page](https://github.com/player-ui/player/wiki/iOS-Development-Guide) for more advanced iOS development info.
 
 ### Additional Set-up
+
 iOS Development requires a bit more set-up.
 
 1. In the terminal, run `which brew`. You should have `/opt/homebrew/bin/brew`.
-    - If you instead have `/usr/local` or something similar, you have the Intel chip homebrew. 
-    You need Apple Silicon homebrew. This will let you run the project without Rosetta. Follow the next step.
+   - If you instead have `/usr/local` or something similar, you have the Intel chip homebrew.
+     You need Apple Silicon homebrew. This will let you run the project without Rosetta. Follow the next step.
 1. If you need to replace Intel homebrew, do the following. Keep in mind that this will remove everything you have installed through homebrew. E.g. existing installations of VSCode, xcodes, rsync, etc.
-    1. Delete all your formulas and casks. This is to ensure no conflicts with the new homebrew. If you don’t feel comfortable deleting everything, delete at least bazelisk.
-        ```
-        brew remove --force $(brew list --formula)```
-        brew remove --cask --force $(brew list)
-        ```
-    1. Delete homebrew
-        ```
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
-        ```
-    1. [Install homebrew](https://github.com/homebrew/install?tab=readme-ov-file#install-homebrew-on-macos-or-linux) again. Make sure to follow the steps to add homebrew to your `PATH`.
-    1. Run `which brew` and make sure you now have `/opt/homebrew/bin/brew`
+
+   1. Delete all your formulas and casks. This is to ensure no conflicts with the new homebrew. If you don’t feel comfortable deleting everything, delete at least bazelisk.
+
+      ````bash
+      brew remove --force $(brew list --formula)```
+      brew remove --cask --force $(brew list)
+      ````
+
+   1. Delete homebrew
+
+      ```bash
+      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
+      ```
+
+   1. [Install homebrew](https://github.com/homebrew/install?tab=readme-ov-file#install-homebrew-on-macos-or-linux) again. Make sure to follow the steps to add homebrew to your `PATH`.
+   1. Run `which brew` and make sure you now have `/opt/homebrew/bin/brew`
+
 1. (Optional) We recommend using [xcodes](https://github.com/XcodesOrg/xcodes?tab=readme-ov-file#installation) via homebrew to manage multiple Xcode versions. If you have multiple Xcode versions, select the needed version of Xcode:
-    ```
-    xcodes select {version}
-    ```
-    E.g.
-    ```
-    xcodes select 16.3
-    ```
+
+   ```bash
+   xcodes select {version}
+   ```
+
+   E.g.
+
+   ```bash
+   xcodes select 16.3
+   ```
+
 1. `brew install rsync`. This fixes a bunch of permission denied issues.
-    1. Close and re-open the terminal. 
-    1. Run `which rsync` to make sure you’re using the homebrew one. If it’s not the homebrew rsync, something is wrong and needs to be fixed.
+   1. Close and re-open the terminal.
+   1. Run `which rsync` to make sure you’re using the homebrew one. If it’s not the homebrew rsync, something is wrong and needs to be fixed.
 
 ### To Run
 
 1. Generate the `.xcodeproj` to open and work in Xcode.
-    ```bash
-    bazel run //ios:xcodeproj
-    ```
+
+   ```bash
+   bazel run //ios:xcodeproj
+   ```
+
 1. Open the `.xcodeproj`. If Xcode is your default app for xcodeprojs, you can use this:
-    ```
-    open ios/PlayerUI.xcodeproj/
-    ```
-    > [!IMPORTANT]
-    > You may need to regenerate the project when adding new files or modifying targets.
-    > Close Xcode first, then regenerate and re-open.
+
+   ```bash
+   open ios/PlayerUI.xcodeproj/
+   ```
+
+   > [!IMPORTANT]
+   > You may need to regenerate the project when adding new files or modifying targets.
+   > Close Xcode first, then regenerate and re-open.
+
 1. In Xcode, switch to the `PlayerUIDemo` target. Run the app.
-1. To run the tests, switch to the Test Navigator. You can run any suite directly from Xcode. 
-The Test Navigator may show 0 tests in each suite until you actually run the suite.
+1. To run the tests, switch to the Test Navigator. You can run any suite directly from Xcode.
+   The Test Navigator may show 0 tests in each suite until you actually run the suite.
 
 #### Bazel
 

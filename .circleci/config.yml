@@ -51,6 +51,16 @@ executors:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
 
 commands:
+  setup_auth:
+    description: Configure authentication for deployments
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:hUAWVYdfSW5ml6ufbfyEHUcuPwUJ88xVhsZc21b2lA8"
+      - run: mkdir -p ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+      - run: git config --global user.name "Intuit Service"
+      - run: git config --global user.email "opensource-svc@intuit.com"
+
   auto_shipit:
     description: Perform Auto shipit
     steps:
@@ -61,19 +71,13 @@ commands:
             - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
             - v1-bazel-cache-core-{{ .Branch }}
             - v1-bazel-cache-core-main
-            - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
-            - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
+            - 'gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}'
+            - 'gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}'
 
-      - add_ssh_keys:
-          fingerprints:
-            - "SHA256:hUAWVYdfSW5ml6ufbfyEHUcuPwUJ88xVhsZc21b2lA8"
-
-      - run: mkdir -p ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+      - setup_auth
       - run: echo "//registry.npmjs.com/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      - run: git config --global user.name "Intuit Service"
-      - run: git config --global user.email "opensource-svc@intuit.com"
       - run: |
-          echo -e $GPG_KEY | gpg --import --batch
+          echo -e "$GPG_KEY" | gpg --import --batch
           echo -e "pinentry-mode loopback\npassphrase $DEPLOY_MAVEN_GPG_PASSPHRASE" > ~/.gnupg/gpg.conf
       - run: |
           source ~/.bashrc
@@ -88,7 +92,7 @@ jobs:
 
       - restore_cache:
           keys:
-            - v1-dependencies-{ { checksum "package.json" }}
+            - v1-dependencies-{{ checksum "package.json" }}
 
       - persist_to_workspace:
           root: .
@@ -140,7 +144,7 @@ jobs:
       - save_cache:
           paths:
             - node_modules
-          key: v1-dependencies-{ { checksum "package.json" }}
+          key: v1-dependencies-{{ checksum "package.json" }}
 
       - persist_to_workspace:
           root: .
@@ -335,7 +339,64 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel query 'filter(".*_vitest_bench$", //...)' --output label 2>/dev/null | tr '\n' ' ' | xargs -n 1 bazel run --config=ci-benchmark
+      - run: |
+          bazel query 'filter(".*_vitest_bench$", //...)' --output label 2>/dev/null | tr '\n' ' ' | xargs -r -n 1 bazel run --config=ci-benchmark
+
+  build_docs:
+    executor: base
+    steps:
+      - attach_workspace:
+          at: ~/player
+      - restore_cache:
+          keys:
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+            - v1-bazel-cache-core-{{ .Branch }}
+            - v1-bazel-cache-core-main
+            - 'gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}'
+            - 'gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}'
+      - setup_auth
+      - run:
+          name: Build docs
+          command: |
+            echo "Building docs for << pipeline.parameters.GHA_Action >>"
+            bazel build --config=release //docs:gh_deploy
+            echo "Docs built successfully"
+
+  deploy_docs_preview:
+    executor: base
+    steps:
+      - attach_workspace:
+          at: ~/player
+      - restore_cache:
+          keys:
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+            - v1-bazel-cache-core-{{ .Branch }}
+            - v1-bazel-cache-core-main
+
+      - setup_auth
+      - run:
+          name: Deploy preview docs
+          command: |
+            echo "Deploying docs for preview build"
+            ./scripts/deploy-docs.sh "<< pipeline.parameters.GHA_Action >>"
+
+  deploy_docs_release:
+    executor: base
+    steps:
+      - attach_workspace:
+          at: ~/player
+      - restore_cache:
+          keys:
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+            - v1-bazel-cache-core-{{ .Branch }}
+            - v1-bazel-cache-core-main
+
+      - setup_auth
+      - run:
+          name: Deploy release docs
+          command: |
+            echo "Deploying docs for release build"
+            ./scripts/deploy-docs.sh "<< pipeline.parameters.GHA_Action >>"
 
 workflows:
   build_and_test_pr:
@@ -406,15 +467,12 @@ workflows:
             - bazelrc_fork
 
       - maybe_release:
-          filters:
-            branches:
-              ignore:
-                - /pull\/.*/
           context:
             - Publish
           requires:
             - build-trunk
             - build-ios-trunk
+            - android-test-trunk
 
       - test:
           name: test-trunk
@@ -485,14 +543,130 @@ workflows:
           requires:
             - build-trunk
 
-      - bench_js:
-          name: js-benchmark-tests-fork
+  docs_operations:
+    when:
+      or:
+        - equal: ["docs", << pipeline.parameters.GHA_Action >>]
+        - equal: [true, << pipeline.parameters.should_release >>]
+    jobs:
+      - setup:
+          filters:
+            branches:
+              ignore:
+                - main
+                - /version-.*/
+            tags:
+              ignore: /.*/
+      - bazelrc:
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          context:
+            - Build
+          requires:
+            - setup
+
+      - bazelrc_fork:
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - setup
+
+      - build:
+          name: build-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          requires:
+            - bazelrc
+
+      - build:
+          name: build-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - setup
+            - bazelrc_fork
+
+      - test:
+          name: test-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          requires:
+            - build-trunk
+
+      - test:
+          name: test-fork
           filters:
             branches:
               only:
                 - /pull\/.*/
           requires:
             - build-fork
+
+      - build_docs:
+          name: build-docs-trunk
+          context:
+            - Publish
+          requires:
+            - test-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+                - /^release-main.*/
+
+      - build_docs:
+          name: build-docs-fork
+          context:
+            - Publish
+          requires:
+            - test-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+
+      - deploy_docs_preview:
+          name: deploy-docs-trunk
+          context:
+            - Publish
+          requires:
+            - build-docs-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+                - /^release-main.*/
+
+      - deploy_docs_preview:
+          name: deploy-docs-fork
+          context:
+            - Publish
+          requires:
+            - build-docs-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+
+      - maybe_release:
+          context:
+            - Publish
+          requires:
+            - build-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
 
   build_and_test_main:
     when:
@@ -529,6 +703,14 @@ workflows:
             - build
             - build_ios
 
+      - build_docs:
+          context:
+            - Publish
+          requires:
+            - android_test
+            - coverage
+            - build_ios
+
       - release:
           context:
             - Publish
@@ -536,6 +718,16 @@ workflows:
             - android_test
             - coverage
             - build_ios
+
+      - deploy_docs_release:
+          context:
+            - Publish
+          requires:
+            - android_test
+            - coverage
+            - build_ios
+            - build_docs
+            - release
 
   full_release:
     when:
@@ -567,6 +759,14 @@ workflows:
           requires:
             - build
 
+      - build_docs:
+          context:
+            - Publish
+          requires:
+            - android_test
+            - coverage
+            - build_ios
+
       - release:
           context:
             - Publish
@@ -574,3 +774,12 @@ workflows:
             - android_test
             - coverage
             - build_ios
+      - deploy_docs_release:
+          context:
+            - Publish
+          requires:
+            - android_test
+            - coverage
+            - build_ios
+            - build_docs
+            - release
