@@ -38,8 +38,6 @@ export interface AsyncNodePluginOptions {
 export interface AsyncNodeViewPlugin extends ViewPlugin {
   /** Use this to tap into the async node plugin hooks */
   applyPlugin: (asyncNodePlugin: AsyncNodePlugin) => void;
-
-  asyncNode: AsyncParallelBailHook<[Node.Async, (result: any) => void], any>;
 }
 export type AsyncHandler = (
   node: Node.Async,
@@ -116,10 +114,6 @@ export class AsyncNodePlugin implements PlayerPlugin {
 }
 
 export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
-  public asyncNode: AsyncParallelBailHook<
-    [Node.Async, (result: any) => void],
-    any
-  > = new AsyncParallelBailHook();
   private basePlugin: AsyncNodePlugin | undefined;
 
   name = "AsyncNode";
@@ -192,6 +186,10 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
 
       const resolvedNode = context.nodeResolveCache.get(node.id);
       if (resolvedNode !== undefined) {
+        if (resolvedNode.asyncNodesResolved === undefined) {
+          resolvedNode.asyncNodesResolved = [];
+        }
+        resolvedNode.asyncNodesResolved.push(node.id);
         return this.resolveAsyncChildren(resolvedNode, context);
       }
 
