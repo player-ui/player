@@ -2,6 +2,7 @@ import { AsyncNodePlugin } from "@player-ui/async-node-plugin";
 import {
   ExpressionContext,
   ExtendedPlayerPlugin,
+  NodeType,
   Player,
 } from "@player-ui/player";
 import { ExpressionPlugin } from "@player-ui/expression-plugin";
@@ -63,7 +64,7 @@ export class ChatUiDemoPlugin implements ExtendedPlayerPlugin<[], [], [send]> {
       for (const id of keys) {
         const content = createContentFromMessage(
           message,
-          `message-${counter++}`,
+          `chat-demo-${counter++}`,
         );
         const resolveFunction = deferredPromises[id];
         resolveFunction?.(content);
@@ -79,6 +80,15 @@ export class ChatUiDemoPlugin implements ExtendedPlayerPlugin<[], [], [send]> {
     };
 
     asyncNodePlugin.hooks.onAsyncNode.tap(this.name, (node) => {
+      // Ensure this is only used on the chat-ui.tsx mock to prevent the promise from setting up during tests.
+      if (
+        (node.parent?.parent?.type !== NodeType.Asset &&
+          node.parent?.parent?.type !== NodeType.View) ||
+        !node.parent.parent.value.id.startsWith("collection-async-chat-demo")
+      ) {
+        return Promise.resolve(undefined);
+      }
+
       return new Promise((res) => {
         deferredPromises[node.id] = res;
         allPromiseKeys.push(node.id);

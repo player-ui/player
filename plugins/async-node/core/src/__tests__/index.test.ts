@@ -1647,6 +1647,71 @@ describe("view", () => {
     });
   });
 
+  test("should not start async node handling if process has already started", async () => {
+    const plugin = new AsyncNodePlugin({
+      plugins: [new AsyncNodePluginPlugin()],
+    });
+
+    const doNothingTap = vi.fn();
+    doNothingTap.mockReturnValue(undefined);
+    const asyncTapFn = vi.fn();
+    let deferredResolve = (_?: any) => {};
+    asyncTapFn.mockReturnValue(
+      new Promise((res) => {
+        deferredResolve = () => {
+          res({
+            asset: {
+              type: "text",
+              id: "async-text",
+              value: "text",
+            },
+          });
+        };
+      }),
+    );
+
+    plugin.hooks.onAsyncNode.tap("test", doNothingTap);
+    plugin.hooks.onAsyncNode.tap("test", asyncTapFn);
+
+    const player = new Player({ plugins: [plugin] });
+    player.start(simpleAsyncContent);
+
+    await vi.waitFor(() => {
+      expect(asyncTapFn).toHaveBeenCalledOnce();
+      expect(doNothingTap).toHaveBeenCalledOnce();
+    });
+
+    const playerState = player.getState();
+    expect(playerState.status).toBe("in-progress");
+    // force an update while ignoring the cache.
+    const firstRender = (playerState as InProgressState).controllers.view
+      .currentView?.lastUpdate;
+
+    // Should not be called again.
+    expect(firstRender).toStrictEqual({
+      type: "view",
+      id: "my-view",
+    });
+
+    deferredResolve();
+
+    vi.waitFor(() => {
+      const currentView = (playerState as InProgressState).controllers.view
+        .currentView?.lastUpdate;
+      expect(currentView).toStrictEqual({
+        type: "view",
+        id: "my-view",
+        values: {
+          asset: {
+            type: "text",
+            id: "async-text",
+            value: "text",
+          },
+        },
+      });
+    });
+  });
+
   // For tests dealing with the startup and cleanup of promises for async nodes.
   describe("Promise Management", () => {
     test("should not start async node handling if process has already started", async () => {

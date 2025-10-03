@@ -11,7 +11,7 @@ import type {
   Resolver,
   Resolve,
 } from "@player-ui/player";
-import { AsyncParallelBailHook, SyncBailHook } from "tapable-ts";
+import { AsyncSeriesBailHook, SyncBailHook } from "tapable-ts";
 import queueMicrotask from "queue-microtask";
 
 export * from "./types";
@@ -53,7 +53,7 @@ export type AsyncContent = {
 /** Hook declaration for the AsyncNodePlugin */
 export type AsyncNodeHooks = {
   /** Async hook to get content for an async node */
-  onAsyncNode: AsyncParallelBailHook<[Node.Async, (result: any) => void], any>;
+  onAsyncNode: AsyncSeriesBailHook<[Node.Async, (result: any) => void], any>;
   /** Sync hook to manage errors coming from the onAsyncNode hook. Return a fallback node or null to render a fallback. The first argument of passed in the call is the error thrown. */
   onAsyncNodeError: SyncBailHook<[Error, Node.Async], any>;
 };
@@ -90,7 +90,7 @@ export class AsyncNodePlugin implements PlayerPlugin {
   }
 
   public readonly hooks: AsyncNodeHooks = {
-    onAsyncNode: new AsyncParallelBailHook(),
+    onAsyncNode: new AsyncSeriesBailHook(),
     onAsyncNodeError: new SyncBailHook(),
   };
 
