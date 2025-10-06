@@ -340,7 +340,7 @@ jobs:
             - 'gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}'
       - setup_auth
       - run:
-          name: Build and deploy preview docs
+          name: Check if docs should run
           command: |
             # Skip docs for release-main branches (placeholder PRs)
             if [[ "$CIRCLE_BRANCH" =~ ^release-main ]]; then
@@ -350,16 +350,24 @@ jobs:
 
             # Check if docs should build and deploy
             if [ "<< pipeline.parameters.GHA_Action >>" = "docs" ] || [ "<< pipeline.parameters.should_release >>" = "true" ]; then
-              echo "Building docs for << pipeline.parameters.GHA_Action >>"
-              bazel build --config=release //docs:gh_deploy
-              echo "Docs built successfully"
-              
-              echo "Deploying PR preview docs (next/release docs handled by release-docs.js plugin)"
-              ./scripts/preview-docs.sh "<< pipeline.parameters.GHA_Action >>"
+              echo "Docs build/deploy will proceed"
             else
               echo "Skipping docs - not requested"
-              exit 0
+              circleci-agent step halt
             fi
+
+      - run:
+          name: Build preview docs
+          command: |
+            echo "Building docs for << pipeline.parameters.GHA_Action >>"
+            bazel build --config=release //docs:gh_deploy
+            echo "Docs built successfully"
+
+      - run:
+          name: Deploy preview docs
+          command: |
+            echo "Deploying PR preview docs (next/release docs handled by release-docs.js plugin)"
+            ./scripts/preview-docs.sh "<< pipeline.parameters.GHA_Action >>"
 
   build_docs:
     executor: benchmarks
