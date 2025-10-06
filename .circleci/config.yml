@@ -338,7 +338,6 @@ jobs:
             - v1-bazel-cache-core-main
             - 'gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}'
             - 'gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}'
-      - setup_auth
       - run:
           name: Build docs
           command: |
