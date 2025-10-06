@@ -3,11 +3,11 @@
 import { getChangedDocsPages } from "./get-changed-docs.js";
 
 /**
- * Auto plugin that comments on PRs for releases
+ * Auto plugin that comments on PRs with canary version information
  */
-class BuildPreviewPlugin {
+class VersionCommentPlugin {
   constructor() {
-    this.name = "release-comment";
+    this.name = "version-comment";
   }
 
   /**
@@ -102,6 +102,8 @@ class BuildPreviewPlugin {
         await auto.comment({
           message: versionMessage,
           context: "build-preview",
+          pr: prNumber,
+          edit: true,
         });
 
         auto.logger.verbose.info("Successfully posted canary docs comment");
@@ -125,4 +127,4 @@ class BuildPreviewPlugin {
   }
 }
 
-export default BuildPreviewPlugin;
+export default VersionCommentPlugin;
