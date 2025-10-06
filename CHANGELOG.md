@@ -1,3 +1,23 @@
+# 0.14.1-next.0 (Fri Oct 03 2025)
+
+### Release Notes
+
+#### fix caching issues with resolved async nodes. ([#716](https://github.com/player-ui/player/pull/716))
+
+- fix an issue where resolving async nodes directly would sometimes not track correctly for the purpose of invalidating the cache.
+
+---
+
+#### 🐛 Bug Fix
+
+- fix caching issues with resolved async nodes. [#716](https://github.com/player-ui/player/pull/716) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 1
+
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
 # 0.14.0 (Mon Sep 15 2025)
 
 ### Release Notes
