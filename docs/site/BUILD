@@ -14,6 +14,7 @@ srcs = glob([
     "package.json",
     "tsconfig.json",
     "astro.config.mjs",
+    "remark-modified-time.mjs",
     "tailwind.config.mjs",
 ]
 

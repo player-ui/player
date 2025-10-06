@@ -22,6 +22,7 @@ function getChangedDocsPages(baseBranch = "origin/main") {
     const pages = changedFiles
       .split("\n")
       .filter((file) => file.trim())
+      .filter((file) => file.startsWith("site/src/content/docs/")) // Only include docs pages
       .slice(0, 10) // Limit to 10 pages
       .map((file) => {
         // Convert file path to a more readable format

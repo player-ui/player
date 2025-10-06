@@ -326,6 +326,60 @@ jobs:
           steps:
             - auto_shipit
 
+  build_docs:
+    executor: benchmarks
+    steps:
+      - attach_workspace:
+          at: ~/player
+      - restore_cache:
+          keys:
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+            - v1-bazel-cache-core-{{ .Branch }}
+            - v1-bazel-cache-core-main
+            - 'gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}'
+            - 'gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}'
+      - setup_auth
+      - run:
+          name: Build docs
+          command: |
+            # Skip docs build for release-main branches (placeholder PRs)
+            if [[ "$CIRCLE_BRANCH" =~ ^release-main ]]; then
+              echo "Skipping docs build for release-main branch"
+              exit 0
+            fi
+
+            # Check if docs should build
+            if [ "<< pipeline.parameters.GHA_Action >>" = "docs" ] || [ "<< pipeline.parameters.should_release >>" = "true" ]; then
+              echo "Building docs for << pipeline.parameters.GHA_Action >>"
+              bazel build --config=release //docs:gh_deploy
+              echo "Docs built successfully"
+            else
+              echo "Skipping docs build - not requested"
+              exit 0
+            fi
+
+  deploy_docs_preview:
+    executor: benchmarks
+    steps:
+      - attach_workspace:
+          at: ~/player
+      - restore_cache:
+          keys:
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+            - v1-bazel-cache-core-{{ .Branch }}
+            - v1-bazel-cache-core-main
+      - setup_auth
+      - run:
+          name: Deploy preview docs
+          command: |
+            # Deploy for /docs comments or release builds (including canary)
+            if [ "<< pipeline.parameters.GHA_Action >>" = "docs" ] || [ "<< pipeline.parameters.should_release >>" = "true" ]; then
+              echo "Deploying docs for preview build"
+              ./scripts/deploy-docs.sh "<< pipeline.parameters.GHA_Action >>"
+            else
+              echo "Not a docs/release build - skipping docs deployment"
+            fi
+
   release:
     executor: base
     steps:
@@ -342,46 +396,8 @@ jobs:
       - run: |
           bazel query 'filter(".*_vitest_bench$", //...)' --output label 2>/dev/null | tr '\n' ' ' | xargs -r -n 1 bazel run --config=ci-benchmark
 
-  build_docs:
-    executor: base
-    steps:
-      - attach_workspace:
-          at: ~/player
-      - restore_cache:
-          keys:
-            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
-            - v1-bazel-cache-core-{{ .Branch }}
-            - v1-bazel-cache-core-main
-            - 'gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}'
-            - 'gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}'
-      - setup_auth
-      - run:
-          name: Build docs
-          command: |
-            echo "Building docs for << pipeline.parameters.GHA_Action >>"
-            bazel build --config=release //docs:gh_deploy
-            echo "Docs built successfully"
-
-  deploy_docs_preview:
-    executor: base
-    steps:
-      - attach_workspace:
-          at: ~/player
-      - restore_cache:
-          keys:
-            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
-            - v1-bazel-cache-core-{{ .Branch }}
-            - v1-bazel-cache-core-main
-
-      - setup_auth
-      - run:
-          name: Deploy preview docs
-          command: |
-            echo "Deploying docs for preview build"
-            ./scripts/deploy-docs.sh "<< pipeline.parameters.GHA_Action >>"
-
   deploy_docs_release:
-    executor: base
+    executor: benchmarks
     steps:
       - attach_workspace:
           at: ~/player
@@ -543,130 +559,49 @@ workflows:
           requires:
             - build-trunk
 
-  docs_operations:
-    when:
-      or:
-        - equal: ["docs", << pipeline.parameters.GHA_Action >>]
-        - equal: [true, << pipeline.parameters.should_release >>]
-    jobs:
-      - setup:
-          filters:
-            branches:
-              ignore:
-                - main
-                - /version-.*/
-            tags:
-              ignore: /.*/
-      - bazelrc:
-          filters:
-            branches:
-              ignore:
-                - /pull\/.*/
-          context:
-            - Build
-          requires:
-            - setup
-
-      - bazelrc_fork:
-          filters:
-            branches:
-              only:
-                - /pull\/.*/
-          requires:
-            - setup
-
-      - build:
-          name: build-trunk
-          filters:
-            branches:
-              ignore:
-                - /pull\/.*/
-          requires:
-            - bazelrc
-
-      - build:
-          name: build-fork
-          filters:
-            branches:
-              only:
-                - /pull\/.*/
-          requires:
-            - setup
-            - bazelrc_fork
-
-      - test:
-          name: test-trunk
-          filters:
-            branches:
-              ignore:
-                - /pull\/.*/
-          requires:
-            - build-trunk
-
-      - test:
-          name: test-fork
-          filters:
-            branches:
-              only:
-                - /pull\/.*/
-          requires:
-            - build-fork
-
       - build_docs:
           name: build-docs-trunk
           context:
             - Publish
-          requires:
-            - test-trunk
           filters:
             branches:
               ignore:
                 - /pull\/.*/
-                - /^release-main.*/
+          requires:
+            - test-trunk
 
       - build_docs:
           name: build-docs-fork
           context:
             - Publish
-          requires:
-            - test-fork
           filters:
             branches:
               only:
                 - /pull\/.*/
+          requires:
+            - test-fork
 
       - deploy_docs_preview:
           name: deploy-docs-trunk
           context:
             - Publish
-          requires:
-            - build-docs-trunk
           filters:
             branches:
               ignore:
                 - /pull\/.*/
-                - /^release-main.*/
+          requires:
+            - build-docs-trunk
 
       - deploy_docs_preview:
           name: deploy-docs-fork
           context:
             - Publish
-          requires:
-            - build-docs-fork
           filters:
             branches:
               only:
                 - /pull\/.*/
-
-      - maybe_release:
-          context:
-            - Publish
           requires:
-            - build-trunk
-          filters:
-            branches:
-              ignore:
-                - /pull\/.*/
+            - build-docs-fork
 
   build_and_test_main:
     when:
