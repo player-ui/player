@@ -560,7 +560,7 @@ workflows:
             - build-trunk
 
       - build_and_deploy_docs_preview:
-          name: build-deploy-docs-trunk
+          name: preview-docs-trunk
           context:
             - Publish
           filters:
@@ -571,7 +571,7 @@ workflows:
             - test-trunk
 
       - build_and_deploy_docs_preview:
-          name: build-deploy-docs-fork
+          name: preview-docs-fork
           context:
             - Publish
           filters:
@@ -633,6 +633,7 @@ workflows:
             - build_ios
 
       - deploy_docs_release:
+          name: deploy-docs
           context:
             - Publish
           requires:
@@ -688,6 +689,7 @@ workflows:
             - coverage
             - build_ios
       - deploy_docs_release:
+          name: deploy-docs
           context:
             - Publish
           requires:
