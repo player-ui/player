@@ -7,6 +7,30 @@ npm_link_all_packages(
     name = "node_modules",
 )
 
+# Generate git-dates.json from Git history
+# Must run outside sandbox to access .git directory
+# Note: This depends on git history, not just file contents, so we use no-cache
+# to ensure dates are always fresh
+genrule(
+    name = "git_dates",
+    srcs = ["generate-git-dates.mjs"],
+    outs = ["git-dates.json"],
+    cmd = """
+        # Resolve workspace root from script location
+        SCRIPT_PATH=$$(realpath $(location generate-git-dates.mjs))
+        WS=$$(dirname $$(dirname $$(dirname $$SCRIPT_PATH)))
+        
+        # Run from the real workspace where .git exists
+        cd "$$WS"
+        BUILD_WORKSPACE_DIRECTORY="$$WS" node "$$SCRIPT_PATH"
+        
+        # Copy generated file to Bazel output location
+        cp docs/site/git-dates.json "$@"
+    """,
+    local = 1,
+    tags = ["no-sandbox", "no-cache"],
+)
+
 srcs = glob([
     "public/**/*",
     "src/**/*",
@@ -14,8 +38,8 @@ srcs = glob([
     "package.json",
     "tsconfig.json",
     "astro.config.mjs",
-    "remark-modified-time.mjs",
     "tailwind.config.mjs",
+    ":git_dates",
 ]
 
 build_deps = [
