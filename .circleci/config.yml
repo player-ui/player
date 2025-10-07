@@ -213,13 +213,13 @@ jobs:
             mkdir -p _ios_coverage/lcov
             cp -r $(bazel info output_path)/_coverage/_coverage_report.dat _ios_coverage/lcov/
 
+      - store_test_results:
+          path: _test_results
+
       - persist_to_workspace:
           root: .
           paths:
-            - _ios_coverage
-
-      - store_test_results:
-          path: _test_results
+            - .
 
   test:
     executor: base
@@ -243,6 +243,11 @@ jobs:
 
       - store_test_results:
           path: _test_results
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 
   android_test:
     executor: android
@@ -278,6 +283,11 @@ jobs:
 
       - store_artifacts:
           path: screenshots
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 
   coverage:
     executor: base
