@@ -278,6 +278,8 @@ jobs:
               cp $line $RESULTS_DIR/$(dirname $line)
             done
 
+      - run: bazel build //jvm/core
+
       - auto_shipit
 
       - store_test_results:
