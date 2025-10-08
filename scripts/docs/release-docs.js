@@ -1,3 +1,5 @@
+import { buildDocsDeployCommand, getDocsUrl } from "./docs-config.js";
+
 /**
  * Auto plugin that deploys documentation for releases
  * Handles deploying to next/, latest/, and versioned directories via afterShipIt hook
@@ -43,17 +45,9 @@ class ReleaseDocsPlugin {
         if (releaseContext === "next") {
           // Deploy to next/
           auto.logger.verbose.info("Deploying docs to next/");
-          execSync(
-            `STABLE_DOCS_BASE_PATH="next" \
-STABLE_ALGOLIA_SEARCH_API_KEY=$ALGOLIA_NEXT_SEARCH_API_KEY \
-STABLE_ALGOLIA_SEARCH_APPID="D477I7TDXB" \
-STABLE_ALGOLIA_SEARCH_INDEX="crawler_Player (Next)" \
-bazel run --config=release //docs:gh_deploy -- --dest_dir "next"`,
-            { stdio: "inherit" },
-          );
-          auto.logger.verbose.info(
-            "✓ Docs deployed to: https://player-ui.github.io/next/",
-          );
+          const command = buildDocsDeployCommand("next", "preview");
+          execSync(command, { stdio: "inherit" });
+          auto.logger.verbose.info(`✓ Docs deployed to: ${getDocsUrl("next")}`);
         } else if (releaseContext === "latest") {
           // Read VERSION file to get the major version
           const version = fs.readFileSync("VERSION", "utf8").trim();
@@ -65,32 +59,23 @@ bazel run --config=release //docs:gh_deploy -- --dest_dir "next"`,
 
           // Deploy to latest/
           auto.logger.verbose.info("Deploying docs to latest/");
-          execSync(
-            `STABLE_DOCS_BASE_PATH="latest" \
-STABLE_ALGOLIA_SEARCH_API_KEY=$ALGOLIA_SEARCH_API_KEY \
-STABLE_ALGOLIA_SEARCH_APPID="OX3UZKXCOH" \
-STABLE_ALGOLIA_SEARCH_INDEX="player-ui" \
-bazel run --config=release //docs:gh_deploy -- --dest_dir "latest"`,
-            { stdio: "inherit" },
-          );
+          const latestCommand = buildDocsDeployCommand("latest", "production");
+          execSync(latestCommand, { stdio: "inherit" });
           auto.logger.verbose.info(
-            "✓ Docs deployed to: https://player-ui.github.io/latest/",
+            `✓ Docs deployed to: ${getDocsUrl("latest")}`,
           );
 
           // Deploy to versioned folder (e.g., "7/")
           auto.logger.verbose.info(
             `Deploying versioned docs to ${majorVersion}/`,
           );
-          execSync(
-            `STABLE_DOCS_BASE_PATH="${majorVersion}" \
-STABLE_ALGOLIA_SEARCH_API_KEY=$ALGOLIA_SEARCH_API_KEY \
-STABLE_ALGOLIA_SEARCH_APPID="OX3UZKXCOH" \
-STABLE_ALGOLIA_SEARCH_INDEX="player-ui" \
-bazel run --config=release //docs:gh_deploy -- --dest_dir "${majorVersion}"`,
-            { stdio: "inherit" },
+          const versionCommand = buildDocsDeployCommand(
+            majorVersion,
+            "production",
           );
+          execSync(versionCommand, { stdio: "inherit" });
           auto.logger.verbose.info(
-            `✓ Versioned docs deployed to: https://player-ui.github.io/${majorVersion}/`,
+            `✓ Versioned docs deployed to: ${getDocsUrl(majorVersion)}`,
           );
         }
 

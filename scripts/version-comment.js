@@ -1,6 +1,4 @@
-/* eslint-disable no-restricted-syntax */
-
-import { getChangedDocsPages } from "./get-changed-docs.js";
+import { getChangedDocsPages } from "./docs/get-changed-docs.js";
 
 /**
  * Auto plugin that comments on PRs with canary version information

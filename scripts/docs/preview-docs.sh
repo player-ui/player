@@ -20,19 +20,26 @@ fi
 PR_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | sed -E 's|.*/pull/([0-9]+).*|\1|')
 echo "Deploying PR docs to pr/$PR_NUMBER"
 
-STABLE_DOCS_BASE_PATH="pr/$PR_NUMBER" \
-STABLE_ALGOLIA_SEARCH_API_KEY="$ALGOLIA_NEXT_SEARCH_API_KEY" \
-STABLE_ALGOLIA_SEARCH_APPID="D477I7TDXB" \
-STABLE_ALGOLIA_SEARCH_INDEX="crawler_Player (Next)" \
-bazel run --config=release //docs:gh_deploy -- --dest_dir "pr/$PR_NUMBER"
+# Use shared docs-config to build the deployment command
+DEPLOY_CMD=$(node --input-type=module -e "
+  import { buildDocsDeployCommand } from './scripts/docs/docs-config.js';
+  console.log(buildDocsDeployCommand('pr/$PR_NUMBER', 'preview'));
+")
 
-PR_URL="https://player-ui.github.io/pr/$PR_NUMBER/"
+# Execute the deployment command
+eval "$DEPLOY_CMD"
+
+# Use shared docs-config to get the URL
+PR_URL=$(node --input-type=module -e "
+  import { getDocsUrl } from './scripts/docs/docs-config.js';
+  console.log(getDocsUrl('pr/$PR_NUMBER'));
+")
 
 # Only post PR comment for docs-only previews, not for canary builds
 # (canary builds will have their own comment posted by auto shipit)
 if [ "$GHA_ACTION" = "docs" ]; then
-  # Get changed docs pages using shared utility
-  CHANGED_PAGES=$(node scripts/get-changed-docs.js)
+  # Get changed docs pages using shared utility (passing PR number)
+  CHANGED_PAGES=$(node scripts/docs/get-changed-docs.js origin/main "$PR_NUMBER")
   
   # Build the message
   MESSAGE="## Build Preview\n\nA preview of your PR docs was deployed by CircleCI [#$CIRCLE_BUILD_NUM](https://circleci.com/gh/player-ui/player/$CIRCLE_BUILD_NUM) on \`$(date -u +'%a, %d %b %Y %H:%M:%S GMT')\`\n\n### 📖 Docs ([View site]($PR_URL))"

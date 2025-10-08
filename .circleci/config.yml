@@ -367,7 +367,7 @@ jobs:
           name: Deploy preview docs
           command: |
             echo "Deploying PR preview docs (next/release docs handled by release-docs.js plugin)"
-            ./scripts/preview-docs.sh "<< pipeline.parameters.GHA_Action >>"
+            ./scripts/docs/preview-docs.sh "<< pipeline.parameters.GHA_Action >>"
 
   build_docs:
     executor: benchmarks
