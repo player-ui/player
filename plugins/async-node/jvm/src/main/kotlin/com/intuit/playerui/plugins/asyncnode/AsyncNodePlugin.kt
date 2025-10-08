@@ -3,7 +3,7 @@ package com.intuit.playerui.plugins.asyncnode
 import com.intuit.hooks.BailResult
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.NodeWrapper
-import com.intuit.playerui.core.bridge.hooks.NodeAsyncParallelBailHook2
+import com.intuit.playerui.core.bridge.hooks.NodeAsyncSeriesBailHook2
 import com.intuit.playerui.core.bridge.hooks.NodeSyncBailHook2
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.ScriptContext
@@ -49,9 +49,9 @@ public class AsyncNodePlugin(
         override val node: Node,
     ) : NodeWrapper {
         /** The hook right before the View starts resolving. Attach anything custom here */
-        public val onAsyncNode: NodeAsyncParallelBailHook2<Node, (asyncNodeUpdate) -> Unit, asyncNodeUpdate> by
+        public val onAsyncNode: NodeAsyncSeriesBailHook2<Node, (asyncNodeUpdate) -> Unit, asyncNodeUpdate> by
             NodeSerializableField(
-                NodeAsyncParallelBailHook2.serializer(
+                NodeAsyncSeriesBailHook2.serializer(
                     NodeSerializer(),
                     Function1Serializer(
                         GenericSerializer(),

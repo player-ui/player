@@ -13,7 +13,7 @@ import { expression as e } from "@player-tools/dsl";
 const view1 = (
   <Collection>
     <Collection.Values>
-      <ChatMessage id="1">
+      <ChatMessage id="chat-demo">
         <ChatMessage.Value>
           <Text>Start chatting now!</Text>
         </ChatMessage.Value>
