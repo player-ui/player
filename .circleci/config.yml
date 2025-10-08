@@ -333,6 +333,9 @@ jobs:
           at: ~/player
       - restore_cache:
           keys:
+            - v1-bazel-binary-{{ checksum ".bazelversion" }}
+      - restore_cache:
+          keys:
             - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
             - v1-bazel-cache-core-{{ .Branch }}
             - v1-bazel-cache-core-main
@@ -361,6 +364,11 @@ jobs:
             bazel build --config=release //docs:gh_deploy
             echo "Docs built successfully"
 
+      - save_cache:
+          key: v1-bazel-binary-{{ checksum ".bazelversion" }}
+          paths:
+            - ~/.cache/bazel/_bazel_circleci/install
+
       - run:
           name: Deploy preview docs
           command: |
@@ -374,6 +382,9 @@ jobs:
           at: ~/player
       - restore_cache:
           keys:
+            - v1-bazel-binary-{{ checksum ".bazelversion" }}
+      - restore_cache:
+          keys:
             - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
             - v1-bazel-cache-core-{{ .Branch }}
             - v1-bazel-cache-core-main
@@ -383,6 +394,11 @@ jobs:
             echo "Building docs for release"
             bazel build --config=release //docs:gh_deploy
             echo "Docs built successfully"
+
+      - save_cache:
+          key: v1-bazel-binary-{{ checksum ".bazelversion" }}
+          paths:
+            - ~/.cache/bazel/_bazel_circleci/install
 
   release:
     executor: base
