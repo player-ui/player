@@ -336,8 +336,6 @@ jobs:
             - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
             - v1-bazel-cache-core-{{ .Branch }}
             - v1-bazel-cache-core-main
-            - 'gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}'
-            - 'gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}'
       - setup_auth
       - run:
           name: Check if docs should run
@@ -379,8 +377,6 @@ jobs:
             - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
             - v1-bazel-cache-core-{{ .Branch }}
             - v1-bazel-cache-core-main
-            - 'gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}'
-            - 'gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}'
       - run:
           name: Build docs
           command: |
