@@ -20,12 +20,8 @@ genrule(
         SCRIPT_PATH=$$(realpath $(location generate-git-dates.mjs))
         WS=$$(dirname $$(dirname $$(dirname $$SCRIPT_PATH)))
         
-        # Run from the real workspace where .git exists
-        cd "$$WS"
-        BUILD_WORKSPACE_DIRECTORY="$$WS" node "$$SCRIPT_PATH"
-        
-        # Copy generated file to Bazel output location
-        cp docs/site/git-dates.json "$@"
+        # Run from the real workspace where .git exists and write directly to output
+        cd "$$WS" && BUILD_WORKSPACE_DIRECTORY="$$WS" node "$$SCRIPT_PATH" "$@"
     """,
     local = 1,
     tags = ["no-sandbox", "no-cache"],

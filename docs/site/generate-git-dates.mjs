@@ -54,8 +54,8 @@ for (const relPath of mdFiles) {
   }
 }
 
-// Write to a JSON file in the docs/site directory
-const outputPath = join(gitCwd, "docs/site/git-dates.json");
+// Write to output path (from command line arg or default location)
+const outputPath = process.argv[2] || join(gitCwd, "docs/site/git-dates.json");
 writeFileSync(outputPath, JSON.stringify(gitDates, null, 2));
 
 console.log(
