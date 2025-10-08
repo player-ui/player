@@ -1,3 +1,23 @@
+# 0.14.1-next.1 (Wed Oct 08 2025)
+
+### Release Notes
+
+#### allow for arrays of expressions in reference action asset dsl ([#726](https://github.com/player-ui/player/pull/726))
+
+- Extend type on `Action` dsl component props to allow for `exp` to be an array of expressions.
+
+---
+
+#### 🐛 Bug Fix
+
+- allow for arrays of expressions in reference action asset dsl [#726](https://github.com/player-ui/player/pull/726) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 1
+
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
 # 0.14.1-next.0 (Fri Oct 03 2025)
 
 ### Release Notes
