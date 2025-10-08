@@ -278,6 +278,8 @@ jobs:
               cp $line $RESULTS_DIR/$(dirname $line)
             done
 
+      - auto_shipit
+
       - store_test_results:
           path: _test_results
 
