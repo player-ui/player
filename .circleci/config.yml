@@ -331,11 +331,6 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/player
-      - restore_cache:
-          keys:
-            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
-            - v1-bazel-cache-core-{{ .Branch }}
-            - v1-bazel-cache-core-main
       - setup_auth
       - run:
           name: Check if docs should run
@@ -355,7 +350,7 @@ jobs:
             fi
 
       - run:
-          name: Build preview docs
+          name: Build docs
           command: |
             echo "Building docs for << pipeline.parameters.GHA_Action >>"
             bazel build --config=release //docs:gh_deploy
@@ -364,7 +359,7 @@ jobs:
       - run:
           name: Deploy preview docs
           command: |
-            echo "Deploying PR preview docs (next/release docs handled by release-docs.js plugin)"
+            echo "Deploying PR preview docs (next/release docs handled by release-docs.js script)"
             ./scripts/docs/preview-docs.sh "<< pipeline.parameters.GHA_Action >>"
 
   build_docs:
@@ -372,11 +367,6 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/player
-      - restore_cache:
-          keys:
-            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
-            - v1-bazel-cache-core-{{ .Branch }}
-            - v1-bazel-cache-core-main
       - run:
           name: Build docs
           command: |
@@ -399,10 +389,6 @@ jobs:
 
       - run: |
           bazel query 'filter(".*_vitest_bench$", //...)' --output label 2>/dev/null | tr '\n' ' ' | xargs -r -n 1 bazel run --config=ci-benchmark
-
-  # Note: Release docs deployment is now handled by the release-docs.js auto plugin
-  # via afterShipIt hook during the release job. This eliminates the need for a
-  # separate deploy_docs_release job.
 
 workflows:
   build_and_test_pr:
