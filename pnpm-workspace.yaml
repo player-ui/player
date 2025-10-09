@@ -5,3 +5,18 @@ packages:
   - "tools/*/*"
   - "tools/*"
   - "docs/*"
+
+onlyBuiltDependencies:
+  - "@swc/core"
+  - esbuild
+  - sharp
+
+ignoredBuiltDependencies:
+  - core-js-pure
+  - yarn
+
+strictDepBuilds: true
+# One week minimum for dependency versions
+minimumReleaseAge: 10080
+minimumReleaseAgeExclude:
+  - "@player-tools/*"
