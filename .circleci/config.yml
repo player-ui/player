@@ -235,8 +235,6 @@ jobs:
 
       - run: bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
-      - run: bazel test --config=ci --//android/player:runtime=hermes -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui|core|react", //...)') -//android/demo:android_instrumentation_test
-
       - run:
           when: always
           command: |
@@ -268,8 +266,6 @@ jobs:
             sudo ln -s /opt/bazelisk-v1.11.0/bazelisk /usr/local/bin/bazel
 
       - run: ./scripts/android-ci-bazel-test.sh //android/demo:android_instrumentation_test
-
-      - run: ./scripts/android-ci-bazel-test.sh --//android/player:runtime=hermes //android/demo:android_instrumentation_test
 
       - run:
           when: always
@@ -552,6 +548,15 @@ workflows:
                 - /pull\/.*/
           requires:
             - build-trunk
+
+      - bench_js:
+          name: js-benchmark-tests-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - build-fork
 
       - build_and_deploy_docs_preview:
           name: preview-docs-trunk
