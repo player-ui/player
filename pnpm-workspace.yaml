@@ -16,7 +16,6 @@ ignoredBuiltDependencies:
   - yarn
 
 strictDepBuilds: true
-# One week minimum for dependency versions
-minimumReleaseAge: 10080
+minimumReleaseAge: 4320 # 3 days
 minimumReleaseAgeExclude:
   - "@player-tools/*"
