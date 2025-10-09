@@ -331,6 +331,11 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/player
+      - restore_cache:
+          keys:
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+            - v1-bazel-cache-core-{{ .Branch }}
+            - v1-bazel-cache-core-main
       - setup_auth
       - run:
           name: Check if docs should run
@@ -367,6 +372,11 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/player
+      - restore_cache:
+          keys:
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+            - v1-bazel-cache-core-{{ .Branch }}
+            - v1-bazel-cache-core-main
       - run:
           name: Build docs
           command: |

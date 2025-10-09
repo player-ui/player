@@ -46,7 +46,7 @@ if [ "$GHA_ACTION" = "docs" ]; then
   
   MESSAGE="$MESSAGE\n$CHANGED_PAGES"
   
-  npx auto comment --message "$(printf "$MESSAGE")" --context "build-preview"
+  npx auto comment --pr "$PR_NUMBER" --context "build-preview" --edit --message "$(printf "$MESSAGE")"
   echo "PR comment posted for docs preview"
 else
   echo "Skipping PR comment - canary build will post its own comment"
