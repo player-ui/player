@@ -197,6 +197,17 @@
     "node": "22.15.1",
     "pnpm": "10.18.1"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@swc/core",
+      "esbuild",
+      "sharp"
+    ],
+    "ignoredBuiltDependencies": [
+      "core-js-pure",
+      "yarn"
+    ]
+  },
   "resolutions": {
     "esbuild": "0.19.8",
     "jackspeak": "2.1.1"

@@ -6,15 +6,6 @@ packages:
   - "tools/*"
   - "docs/*"
 
-onlyBuiltDependencies:
-  - "@swc/core"
-  - esbuild
-  - sharp
-
-ignoredBuiltDependencies:
-  - core-js-pure
-  - yarn
-
 strictDepBuilds: true
 minimumReleaseAge: 4320 # 3 days
 minimumReleaseAgeExclude:

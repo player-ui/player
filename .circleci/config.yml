@@ -90,8 +90,6 @@ jobs:
           keys:
             - v1-dependencies-{ { checksum "package.json" }}
 
-      - run: pnpm -v
-
       - persist_to_workspace:
           root: .
           paths:
