@@ -71,13 +71,13 @@ commands:
             - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
             - v1-bazel-cache-core-{{ .Branch }}
             - v1-bazel-cache-core-main
-            - 'gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}'
-            - 'gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}'
+            - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+            - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
 
       - setup_auth
       - run: echo "//registry.npmjs.com/:_authToken=$NPM_TOKEN" >> ~/.npmrc
       - run: |
-          echo -e "$GPG_KEY" | gpg --import --batch
+          echo -e $GPG_KEY | gpg --import --batch
           echo -e "pinentry-mode loopback\npassphrase $DEPLOY_MAVEN_GPG_PASSPHRASE" > ~/.gnupg/gpg.conf
       - run: |
           source ~/.bashrc
@@ -235,6 +235,8 @@ jobs:
 
       - run: bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
 
+      - run: bazel test --config=ci --//android/player:runtime=hermes -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui|core|react", //...)') -//android/demo:android_instrumentation_test
+
       - run:
           when: always
           command: |
@@ -266,6 +268,8 @@ jobs:
             sudo ln -s /opt/bazelisk-v1.11.0/bazelisk /usr/local/bin/bazel
 
       - run: ./scripts/android-ci-bazel-test.sh //android/demo:android_instrumentation_test
+
+      - run: ./scripts/android-ci-bazel-test.sh --//android/player:runtime=hermes //android/demo:android_instrumentation_test
 
       - run:
           when: always
@@ -469,6 +473,10 @@ workflows:
             - bazelrc_fork
 
       - maybe_release:
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
           context:
             - Publish
           requires:
