@@ -142,7 +142,7 @@ iOS Development requires a bit more set-up.
     ```bash
     bazel run //ios:xcodeproj
     ```
-    **Note:** Ensure you are connected to **Intuit Guest** wifi or not on **Intuit VPN** to successfully download external dependencies during project generation.
+    **Note:** Ensure you are connected to wifi or not on **Intuit VPN** to successfully download external dependencies during project generation.
    
 1. Open the `.xcodeproj`. If Xcode is your default app for xcodeprojs, you can use this:
     ```
