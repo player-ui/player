@@ -20,10 +20,13 @@ fi
 PR_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | sed -E 's|.*/pull/([0-9]+).*|\1|')
 echo "Deploying PR docs to pr/$PR_NUMBER"
 
-# Use shared docs-config to build the deployment command
+# Build version string for commit message: try auto version for canary, else use PR+build number
+VERSION_STRING=$(npx auto cat version 2>/dev/null || echo "pr-${PR_NUMBER}-build-${CIRCLE_BUILD_NUM}")
+
+# Use shared docs-config to build the deployment command with version
 DEPLOY_CMD=$(node --input-type=module -e "
   import { buildDocsDeployCommand } from './scripts/docs/docs-config.js';
-  console.log(buildDocsDeployCommand('pr/$PR_NUMBER', 'preview'));
+  console.log(buildDocsDeployCommand('pr/$PR_NUMBER', 'preview', '$VERSION_STRING'));
 ")
 
 # Execute the deployment command

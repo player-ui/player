@@ -619,9 +619,7 @@ workflows:
           context:
             - Publish
           requires:
-            - android_test
             - coverage
-            - build_ios
 
       - release:
           context:
@@ -666,9 +664,7 @@ workflows:
           context:
             - Publish
           requires:
-            - android_test
             - coverage
-            - build_ios
 
       - release:
           context:

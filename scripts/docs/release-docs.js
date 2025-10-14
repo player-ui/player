@@ -40,7 +40,6 @@ class ReleaseDocsPlugin {
 
       try {
         const { execSync } = await import("child_process");
-        const fs = await import("fs");
 
         if (releaseContext === "next") {
           // Deploy to next/
@@ -49,9 +48,8 @@ class ReleaseDocsPlugin {
           execSync(command, { stdio: "inherit" });
           auto.logger.verbose.info(`✓ Docs deployed to: ${getDocsUrl("next")}`);
         } else if (releaseContext === "latest") {
-          // Read VERSION file to get the major version
-          const version = fs.readFileSync("VERSION", "utf8").trim();
-          const majorVersion = version.split(".")[0];
+          // Get major version from newVersion
+          const majorVersion = newVersion.split(".")[0];
 
           auto.logger.verbose.info(
             `Deploying release docs for version ${newVersion} (major: ${majorVersion})`,
