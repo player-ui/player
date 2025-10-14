@@ -42,21 +42,18 @@ export function getDocsEnvVars(destDir, algoliaConfig = "preview") {
  * Build the Bazel command to deploy docs
  * @param {string} destDir - The destination directory (e.g., "next", "latest", "pr/123")
  * @param {'preview'|'production'} algoliaConfig - Which Algolia config to use
- * @param {string} version - Optional version string for commit message (defaults to reading VERSION file)
  * @returns {string} The complete command to execute
  */
-export function buildDocsDeployCommand(
-  destDir,
-  algoliaConfig = "preview",
-  version = null,
-) {
+export function buildDocsDeployCommand(destDir, algoliaConfig = "preview") {
   const envVars = getDocsEnvVars(destDir, algoliaConfig);
 
   const envString = Object.entries(envVars)
     .map(([key, value]) => `${key}="${value}"`)
     .join(" \\\n");
 
-  const versionArg = version ? ` --version "${version}"` : "";
+  // Get version from auto (or use fallback if auto is not available)
+  const versionCmd = `$(npx auto version 2>/dev/null || cat VERSION)`;
+  const versionArg = ` --version "${versionCmd}"`;
 
   return `${envString} \\\nbazel run --config=release //docs:gh_deploy -- --dest_dir "${destDir}"${versionArg}`;
 }
