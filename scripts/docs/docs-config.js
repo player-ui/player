@@ -51,11 +51,11 @@ export function buildDocsDeployCommand(destDir, algoliaConfig = "preview") {
     .map(([key, value]) => `${key}="${value}"`)
     .join(" \\\n");
 
-  // Get version from auto (or use fallback if auto is not available)
-  const versionCmd = `$(npx auto version 2>/dev/null || cat VERSION)`;
-  const versionArg = ` --version "${versionCmd}"`;
+  // Update VERSION file with auto version, which will be read by the BUILD rule
+  // This avoids command line arg conflicts while still using the auto version
+  const updateVersionCmd = `npx auto version 2>/dev/null > VERSION || true`;
 
-  return `${envString} \\\nbazel run --config=release //docs:gh_deploy -- --dest_dir "${destDir}"${versionArg}`;
+  return `${updateVersionCmd} && ${envString} \\\nbazel run --config=release //docs:gh_deploy -- --dest_dir "${destDir}"`;
 }
 
 /**

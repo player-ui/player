@@ -80,7 +80,20 @@ export function formatChangedPagesMarkdown(
 
   const baseUrl = getDocsUrl(destDir);
   return pages
-    .map((page) => `- [${page.name}](${baseUrl}${page.url}/)`)
+    .map((page) => {
+      // Special case: index pages should link to their directory, not /index/
+      let url = page.url;
+      if (url.endsWith("/index")) {
+        url = url.slice(0, -6); // Remove "/index"
+      } else if (url === "index") {
+        url = ""; // Root index
+      }
+      // Add trailing slash for non-root URLs
+      if (url && !url.endsWith("/")) {
+        url += "/";
+      }
+      return `- [${page.name}](${baseUrl}${url})`;
+    })
     .join("\n");
 }
 
