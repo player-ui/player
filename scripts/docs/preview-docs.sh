@@ -2,7 +2,7 @@
 # Deploy documentation for PR previews only
 # Next and release docs are handled by the release-docs.js auto plugin via afterShipIt
 
-set -u -o pipefail
+set -e -u -o pipefail
 
 readonly GHA_ACTION="${1:-}"
 
@@ -26,8 +26,8 @@ VERSION_STRING=$(npx auto cat version 2>/dev/null || echo "pr-${PR_NUMBER}-build
 # Use shared docs-config to build the deployment command with version
 DEPLOY_CMD=$(node --input-type=module -e "
   import { buildDocsDeployCommand } from './scripts/docs/docs-config.js';
-  console.log(buildDocsDeployCommand('pr/$PR_NUMBER', 'preview', '$VERSION_STRING'));
-")
+  console.log(buildDocsDeployCommand('pr/$PR_NUMBER', 'preview', process.argv[1]));
+" "$VERSION_STRING")
 
 # Execute the deployment command
 eval "$DEPLOY_CMD"
