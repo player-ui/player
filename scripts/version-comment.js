@@ -90,7 +90,7 @@ class VersionCommentPlugin {
           changedPages.length > 0
             ? "\n" +
               changedPages
-                .map((page) => `- [${page.name}](${docsUrl}${page.url}/)`)
+                .map((page) => `- [${page.name}](${docsUrl}${page.url})`)
                 .join("\n")
             : "";
 
