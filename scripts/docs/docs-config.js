@@ -56,9 +56,7 @@ export function buildDocsDeployCommand(
     .map(([key, value]) => `${key}="${value}"`)
     .join(" \\\n");
 
-  // For PR previews, optionally override VERSION file for better commit messages
-  // This won't be committed to the player repo - only used for gh-pages deployment
-  // For releases, auto's version-file plugin has already updated VERSION
+  // For doc previews, override VERSION file for better commit messages
   const versionCmd = versionOverride
     ? `echo "${versionOverride}" > VERSION && `
     : "";
