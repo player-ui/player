@@ -47,7 +47,7 @@ export function getChangedDocsPages(baseBranch = "origin/main") {
           .replace("site/", "")
           .replace(".mdx", "")
           .replace(".md", "")
-          .replace(/\/index$/, ""); // Remove "/index" suffix for landing pages
+          .replace(/\/?index$/, ""); // Remove "/index" or "index" suffix for landing pages
 
         return {
           name: pageName,
