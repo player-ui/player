@@ -21,10 +21,14 @@ PR_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | sed -E 's|.*/pull/([0-9]+).*|\1|')
 echo "Deploying PR docs to pr/$PR_NUMBER"
 
 # Use shared docs-config to build the deployment command
-# Version is automatically determined by docs-config using npx auto version
+# Pass PR URL as version override for better commit messages
+export PR_NUMBER
+export CIRCLE_PULL_REQUEST
 DEPLOY_CMD=$(node --input-type=module -e "
   import { buildDocsDeployCommand } from './scripts/docs/docs-config.js';
-  console.log(buildDocsDeployCommand('pr/$PR_NUMBER', 'preview'));
+  const prUrl = process.env.CIRCLE_PULL_REQUEST;
+  const prNum = process.env.PR_NUMBER;
+  console.log(buildDocsDeployCommand(\`pr/\${prNum}\`, 'preview', prUrl));
 ")
 
 # Execute the deployment command
@@ -33,7 +37,8 @@ eval "$DEPLOY_CMD"
 # Use shared docs-config to get the URL
 PR_URL=$(node --input-type=module -e "
   import { getDocsUrl } from './scripts/docs/docs-config.js';
-  console.log(getDocsUrl('pr/$PR_NUMBER'));
+  const prNum = process.env.PR_NUMBER;
+  console.log(getDocsUrl(\`pr/\${prNum}\`));
 ")
 
 # Only post PR comment for docs-only previews, not for canary builds

@@ -41,12 +41,13 @@ export function getChangedDocsPages(baseBranch = "origin/main") {
           .replace(".mdx", "")
           .replace(".md", "");
 
-        // Create URL path (keep slashes for nested pages)
+        // Create URL path (keep slashes for nested pages, strip index files)
         const pageUrl = file
           .replace("src/content/docs/", "")
           .replace("site/", "")
           .replace(".mdx", "")
-          .replace(".md", "");
+          .replace(".md", "")
+          .replace(/index$/, ""); // Remove "index" suffix for landing pages
 
         return {
           name: pageName,
@@ -81,18 +82,7 @@ export function formatChangedPagesMarkdown(
   const baseUrl = getDocsUrl(destDir);
   return pages
     .map((page) => {
-      // Special case: index pages should link to their directory, not /index/
-      let url = page.url;
-      if (url.endsWith("/index")) {
-        url = url.slice(0, -6); // Remove "/index"
-      } else if (url === "index") {
-        url = ""; // Root index
-      }
-      // Add trailing slash for non-root URLs
-      if (url && !url.endsWith("/")) {
-        url += "/";
-      }
-      return `- [${page.name}](${baseUrl}${url})`;
+      return `- [${page.name}](${baseUrl}${page.url})`;
     })
     .join("\n");
 }
