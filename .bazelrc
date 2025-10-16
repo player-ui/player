@@ -23,6 +23,7 @@ common --ios_simulator_version="18.5"
 
 # Cache Flags
 common --action_cache_store_output_metadata --experimental_remote_cache_compression_threshold=100
+common --noslim_profile --experimental_profile_include_target_label --experimental_profile_include_primary_output
 
 build --bes_results_url=https://app.buildbuddy.io/invocation/
 build --bes_backend=grpcs://remote.buildbuddy.io
