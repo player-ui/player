@@ -4,7 +4,7 @@ import { severities } from "./types";
 export type ConsoleHandler = Pick<typeof console, "log" | "warn" | "error">;
 
 /** A Logger implementation that uses console */
-export default class ConsoleLogger implements Logger {
+export class ConsoleLogger implements Logger {
   private severity: Severity;
   private _console: ConsoleHandler;
 

@@ -1,6 +1,6 @@
 import { test, expect, vitest } from "vitest";
 import type { Logger } from "../types";
-import ProxyLogger from "../proxyLogger";
+import { ProxyLogger } from "../proxyLogger";
 
 test("proxyLogger works with no logger", () => {
   const proxyLogger = new ProxyLogger(() => undefined);

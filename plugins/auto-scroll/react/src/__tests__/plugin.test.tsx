@@ -16,7 +16,7 @@ import { Info, Action, Input } from "@player-ui/reference-assets-plugin-react";
 import { CommonTypesPlugin } from "@player-ui/common-types-plugin";
 import { AssetTransformPlugin } from "@player-ui/asset-transform-plugin";
 
-import scrollIntoViewWithOffset from "../scrollIntoViewWithOffset";
+import { scrollIntoViewWithOffset } from "../scrollIntoViewWithOffset";
 
 import {
   AutoScrollManagerPlugin,

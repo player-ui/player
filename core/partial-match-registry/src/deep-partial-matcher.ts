@@ -26,8 +26,12 @@ function traverseObj(
   return pairs;
 }
 
-/** Given an object, create a function that compares any set key/value pairs in the given object against a new value */
-export default function createMatcher(partialObj: object): Matcher {
+/**
+ * Given a partial object, create a matcher function that checks if another object matches the specified properties
+ * @param partialObj The partial object to match against
+ * @returns A matcher function that checks if an object matches the partial object
+ */
+export function createObjectMatcher(partialObj: object): Matcher {
   // Convert the partial object into a list of [key, value] pairs;
   const pairs = traverseObj(partialObj);
 

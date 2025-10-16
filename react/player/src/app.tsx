@@ -12,8 +12,6 @@ export interface ReactPlayerProps {
 /**
  * The entry for the ReactPlayer's React tree
  */
-const ReactPlayer = ({ view }: ReactPlayerProps) => {
+export const ReactPlayer = ({ view }: ReactPlayerProps) => {
   return <ReactAsset {...view} />;
 };
-
-export default ReactPlayer;

@@ -17,7 +17,7 @@ Core plugins are the easiest way to extend Player functionality regardless of wh
 The first step for creating a plugin is making our plugin class, making sure it implements the `PlayerPlugin` interface from `@player-ui/player`. By convention, a name attribute with the dash-cased name of your plugin should be defined.
 
 ```typescript
-export default class ExamplePlayerPlugin implements PlayerPlugin {
+export class ExamplePlayerPlugin implements PlayerPlugin {
   name = 'example-player-plugin';
 
   {/* A constructor can go here */}
@@ -61,6 +61,7 @@ _Note: For the React Player you can import and load the plugin the same way you 
 :::caution
 Even though core plugins are written in TypeScript, they're not targeting web environments, which limits the common [global web APIs](https://developer.mozilla.org/en-US/docs/Web/API) that TS developers are typically used to. Avoid web-specific APIs in core plugins unless absolutely necessary -- polyfills, or native implementations may be required for the core plugin to function on mobile platforms.
 :::
+
   </Fragment>
   <Fragment slot='react'>
 
@@ -210,7 +211,7 @@ For all types of plugins, the `apply(instance: T)` signature is the standard way
 
 ### Android Player Plugins
 
-Android Player plugins must implement the `AndroidPlayerPlugin` interface, which will give them access to an `AndroidPlayer` instance through the `apply` method. Plugins can use this instance to register UI assets, apply themes, or even access the [Player hooks](#jvm-player-plugins). 
+Android Player plugins must implement the `AndroidPlayerPlugin` interface, which will give them access to an `AndroidPlayer` instance through the `apply` method. Plugins can use this instance to register UI assets, apply themes, or even access the [Player hooks](#jvm-player-plugins).
 
 Likely the most common usecase for plugins is to provide UI through assets. More information can be found in the [Custom Assets guide](/assets/custom).
 

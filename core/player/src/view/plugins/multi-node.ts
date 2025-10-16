@@ -9,7 +9,7 @@ import { NodeType } from "../parser";
 import { hasTemplateValues, hasTemplateKey } from "../parser/utils";
 
 /** A view plugin to resolve multi nodes */
-export default class MultiNodePlugin implements ViewPlugin {
+export class MultiNodePlugin implements ViewPlugin {
   applyParser(parser: Parser): void {
     parser.hooks.parseNode.tap(
       "multi-node",
