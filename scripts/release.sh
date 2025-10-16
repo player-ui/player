@@ -37,9 +37,6 @@ fi
 
 bazel build --config=release @rules_player//distribution:staged-maven-deploy
 
-# Docs Prepublish
-bazel build --config=release //docs:gh_deploy
-
 # NPM Publish
 echo "Publishing NPM Packages with release type: ${NPM_TAG} on branch: ${CURRENT_BRANCH}"
 for pkg in $PKG_NPM_LABELS ; do
@@ -54,28 +51,4 @@ bazel run --config=release //:ios_publish
 echo "Publishing Maven Packages with release type: ${MVN_RELEASE_TYPE} on branch: ${CURRENT_BRANCH}"
 bazel run --config=release @rules_player//distribution:staged-maven-deploy -- "$MVN_RELEASE_TYPE" --package-group=com.intuit.playerui --client-timeout=600 --connect-timeout=600
 
-# Docs Publish
-echo "Publishing Docs with release type: ${RELEASE_TYPE} on branch: ${CURRENT_BRANCH}"
-if [ "$RELEASE_TYPE" == "next" ] && [ "$CURRENT_BRANCH" == "main" ]; then 
- STABLE_DOCS_BASE_PATH="next" \
- STABLE_ALGOLIA_SEARCH_API_KEY=$ALGOLIA_NEXT_SEARCH_API_KEY \
- STABLE_ALGOLIA_SEARCH_APPID="D477I7TDXB" \
- STABLE_ALGOLIA_SEARCH_INDEX="crawler_Player (Next)" \
- bazel run --config=release //docs:gh_deploy -- --dest_dir next
-elif [ "$RELEASE_TYPE" == "release" ] && [ "$CURRENT_BRANCH" == "main" ]; then
- STABLE_DOCS_BASE_PATH="latest" \
- STABLE_ALGOLIA_SEARCH_API_KEY=$ALGOLIA_SEARCH_API_KEY \
- STABLE_ALGOLIA_SEARCH_APPID="OX3UZKXCOH" \
- STABLE_ALGOLIA_SEARCH_INDEX="player-ui" \
- bazel run --config=release //docs:gh_deploy -- --dest_dir latest
-fi
 
-# Also deploy to the versioned folder for main releases
-if [ "$RELEASE_TYPE" == "release" ]; then
-  SEMVER_MAJOR=$(cat VERSION | cut -d. -f1)
-  STABLE_DOCS_BASE_PATH=$SEMVER_MAJOR \ 
-  STABLE_ALGOLIA_SEARCH_API_KEY=$ALGOLIA_SEARCH_API_KEY \
-  STABLE_ALGOLIA_SEARCH_APPID="OX3UZKXCOH" \
-  STABLE_ALGOLIA_SEARCH_INDEX="player-ui" \
-  bazel run --config=release //docs:gh_deploy -- --dest_dir "$SEMVER_MAJOR"
-fi
