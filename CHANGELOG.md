@@ -1,3 +1,24 @@
+# 0.14.1-next.2 (Thu Oct 16 2025)
+
+### Release Notes
+
+#### replace parallel hook with series hook in async node ([#718](https://github.com/player-ui/player/pull/718))
+
+- make the `onAsyncNode` hook of `AsyncNodePlugin` an `AsyncSeriesBailHook` to allow taps to return `undefined` in order to skip resolving the node.
+- Remove `asyncNode` hook from `AsyncNodePluginPlugin` because it never gets called or tapped.
+
+---
+
+#### 🐛 Bug Fix
+
+- replace parallel hook with series hook in async node [#718](https://github.com/player-ui/player/pull/718) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 1
+
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
 # 0.14.1-next.1 (Wed Oct 08 2025)
 
 ### Release Notes
