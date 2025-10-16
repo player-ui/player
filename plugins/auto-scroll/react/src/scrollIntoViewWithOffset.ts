@@ -1,17 +1,16 @@
-/**
- * Scroll to the given element
--* @param node Element to scroll to
--* @param baseElement Container element used to calculate offset
--* @param offset Additional offset
- */
-
 import { scrollTo } from "seamless-scroll-polyfill";
 
-export default (
+/**
+ * Scroll to the given element with an offset
+ * @param node Element to scroll to
+ * @param baseElement Container element used to calculate offset
+ * @param offset Additional offset
+ */
+export function scrollIntoViewWithOffset(
   node: HTMLElement,
   baseElement: HTMLElement,
   offset: number,
-) => {
+) {
   scrollTo(window, {
     behavior: "smooth",
     top:
@@ -19,4 +18,4 @@ export default (
       baseElement.getBoundingClientRect().top -
       offset,
   });
-};
+}

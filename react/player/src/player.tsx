@@ -15,8 +15,8 @@ import { AssetContext } from "./asset";
 import { PlayerContext } from "./utils";
 
 import type { ReactPlayerProps } from "./app";
-import PlayerComp from "./app";
-import OnUpdatePlugin from "./plugins/onupdate-plugin";
+import { ReactPlayer as PlayerComp } from "./app";
+import { OnUpdatePlugin } from "./plugins/onupdate-plugin";
 
 const WEB_PLAYER_VERSION = "__VERSION__";
 const COMMIT = "__GIT_COMMIT__";
