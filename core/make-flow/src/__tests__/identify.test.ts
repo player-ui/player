@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import identify, { ObjType } from "../identify";
+import { identify, ObjType } from "../identify";
 
 test("finds an asset", () => {
   expect(
