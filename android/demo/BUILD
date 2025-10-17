@@ -9,18 +9,21 @@ main_deps = [
     "//plugins/reference-assets/android",
     "//plugins/common-types/jvm",
     "//tools/mocks:jar",
-
     artifact("androidx.navigation:navigation-ui-ktx"),
     artifact("androidx.navigation:navigation-fragment-ktx"),
     artifact("com.afollestad.material-dialogs:core"),
     artifact("com.facebook.soloader:soloader"),
     artifact("com.google.android.material:material"),
+
+    # Devtools
+    artifact("com.intuit.playerui.plugins.devtools.basic:plugin-android"),
+    artifact("com.facebook.flipper:flipper"),
+    #     artifact("com.android.ndk.thirdparty:openssl"),
 ]
 
 test_deps = [
     # Don't pull in runtime, that'll be included by the app
     "//android/testutils",
-
     artifact("androidx.test.espresso:espresso-intents"),
     artifact("androidx.test.ext:junit-ktx"),
     artifact("androidx.compose.ui:ui-test-junit4"),

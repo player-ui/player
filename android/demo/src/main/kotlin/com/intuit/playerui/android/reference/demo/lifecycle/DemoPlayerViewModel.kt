@@ -9,6 +9,7 @@ import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.managed.AsyncFlowIterator
 import com.intuit.playerui.core.player.state.PlayerFlowState
+import com.intuit.playerui.plugins.devtools.basic.BasicAndroidDevtoolsPlugin
 import com.intuit.playerui.plugins.transactions.PendingTransactionPlugin
 import com.intuit.playerui.plugins.types.CommonTypesPlugin
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +24,7 @@ class DemoPlayerViewModel(
         ReferenceAssetsPlugin(),
         PendingTransactionPlugin(),
         AsyncHydrationTrackerPlugin(),
+        BasicAndroidDevtoolsPlugin("android-demo-app"),
     )
 
     public val isDebug = false

@@ -18,6 +18,9 @@ kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref =
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 hooks = { module = "com.intuit.hooks:hooks", version = "0.15.0" }
+devtools = { module = "com.intuit.playerui.plugins.devtools.basic:plugin-android", version = "0.0.39-SNAPSHOT" }
+flipper = { module = "com.facebook.flipper:flipper", version = "0.212.0" }
+openssl = { module = "com.android.ndk.thirdparty:openssl:aar", version = "1.1.1l-beta-1" }
 
 # Android
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version = "2.1.4" }
@@ -42,7 +45,7 @@ graalvm-sdk = { module = "org.graalvm.sdk:graal-sdk", version.ref = "graalvm" }
 
 # Hermes
 fbjni-java-only = { module = "com.facebook.fbjni:fbjni-java-only", version = "0.6.0" }
-soloader = { module = "com.facebook.soloader:soloader", version = "0.11.0" }
+soloader = { module = "com.facebook.soloader:soloader:aar", version = "0.11.0" }
 
 # slf4j
 slf4j-api = { module = "org.slf4j:slf4j-api", version = "1.7.36" }

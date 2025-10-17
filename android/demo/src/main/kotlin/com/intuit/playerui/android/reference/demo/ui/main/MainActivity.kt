@@ -19,12 +19,15 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.facebook.flipper.android.AndroidFlipperClient
 import com.facebook.soloader.SoLoader
 import com.google.android.material.navigation.NavigationView
 import com.intuit.playerui.android.reference.demo.R
 import com.intuit.playerui.android.reference.demo.model.AssetMock
 import com.intuit.playerui.android.reference.demo.model.StringMock
 import com.intuit.playerui.android.ui.PlayerFragment
+import com.intuit.playerui.devtools.PlayerDevtoolsFlipperPlugin
+import com.intuit.playerui.plugins.devtools.basic.BasicAndroidDevtoolsPlugin
 import com.intuit.playerui.utils.mocks.ClassLoaderMock
 import com.intuit.playerui.utils.mocks.Mock
 import com.intuit.playerui.utils.mocks.getFlow
@@ -62,6 +65,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         SoLoader.init(this, false)
+        val flipperClient = AndroidFlipperClient.getInstance(application)
+        flipperClient.addPlugin(PlayerDevtoolsFlipperPlugin())
+        flipperClient.start()
 
         setContentView(R.layout.activity_main)
 

@@ -102,7 +102,7 @@ build_constants(
 bazel_dep(name = "rules_java", version = "8.13.0")
 bazel_dep(name = "rules_kotlin", version = "2.1.8")
 archive_override(
-    module_name = "rules_kotlin", 
+    module_name = "rules_kotlin",
     urls = ["https://github.com/bazelbuild/rules_kotlin/releases/download/v2.1.8/rules_kotlin-v2.1.8.tar.gz"],
     patches = ["//patches:rules_kotlin.allow_dupe_plugins.patch"],
 )
@@ -144,6 +144,20 @@ maven.from_toml(
     ],
     libs_versions_toml = "//:libs.versions.toml",
 )
+maven.amend_artifact(
+    coordinates = "com.intuit.playerui.plugins.devtools.basic:plugin-android",
+    exclusions = [
+        "com.facebook.flipper:flipper",
+    ],
+)
+maven.amend_artifact(
+    coordinates = "com.facebook.flipper:flipper",
+    exclusions = [
+        "com.facebook.soloader:soloader",
+        "com.android.ndk.thirdparty:openssl",
+        "com.facebook.fbjni:fbjni"
+    ],
+)
 maven.install(
     fetch_sources = True,
     known_contributing_modules = [
@@ -152,6 +166,7 @@ maven.install(
     ],
     lock_file = "//:maven-lock.json",
     repositories = [
+        "m2Local",
         "https://repo1.maven.org/maven2",
         "https://maven.google.com/",
         "https://plugins.gradle.org/m2/",
