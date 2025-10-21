@@ -64,8 +64,8 @@ jobs:
               body: message,
             });
     outputs:
-      branch: ${{ fromJson(steps.check_auth.outputs.result).branch }}
-      comment_type: ${{ fromJson(steps.check_auth.outputs.result).commentType }}
+      branch: ${{ steps.check_auth.outputs.result && fromJson(steps.check_auth.outputs.result).branch || '' }}
+      comment_type: ${{ steps.check_auth.outputs.result && fromJson(steps.check_auth.outputs.result).commentType || '' }}
 
   trigger_action:
     runs-on: ubuntu-latest
@@ -73,6 +73,7 @@ jobs:
     if: github.event_name == 'issue_comment'
     steps:
       - name: Trigger CircleCI pipeline
+        id: trigger
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GH_TOKEN }}
@@ -94,7 +95,14 @@ jobs:
 
             if (!config) {
               console.log(`Unknown command: ${commentType}`);
-              return;
+              const { owner, repo } = context.issue;
+              await github.rest.reactions.createForIssueComment({
+                owner,
+                repo,
+                comment_id: context.payload.comment.id,
+                content: "confused",
+              });
+              return 'unknown';
             }
 
             const params = JSON.stringify(config);
@@ -119,10 +127,12 @@ jobs:
             }
 
             console.log(`Successfully triggered ${commentType} action`);
+            return 'success';
         env:
           CCI_TOKEN: ${{ secrets.CCI_TOKEN }}
 
       - name: Trigger success
+        if: ${{ steps.trigger.outputs.result == 'success' }}
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GH_TOKEN }}

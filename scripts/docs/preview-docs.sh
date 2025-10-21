@@ -48,11 +48,11 @@ if [ "$GHA_ACTION" = "docs" ]; then
   CHANGED_PAGES=$(node scripts/docs/get-changed-docs.js origin/main "$PR_NUMBER")
   
   # Build the message
-  MESSAGE="## Build Preview\n\nA preview of your PR docs was deployed by CircleCI [#$CIRCLE_BUILD_NUM](https://circleci.com/gh/player-ui/player/$CIRCLE_BUILD_NUM) on \`$(date -u +'%a, %d %b %Y %H:%M:%S GMT')\`\n\n### 📖 Docs ([View site]($PR_URL))"
+  MESSAGE="## Docs Preview\n\nA preview of your PR docs was deployed by CircleCI [#$CIRCLE_BUILD_NUM](https://circleci.com/gh/player-ui/player/$CIRCLE_BUILD_NUM) on \`$(date -u +'%a, %d %b %Y %H:%M:%S GMT')\`\n\n### 📖 Docs ([View site]($PR_URL))"
   
   MESSAGE="$MESSAGE\n$CHANGED_PAGES"
   
-  npx auto comment --pr "$PR_NUMBER" --context "build-preview" --edit --message "$(printf "$MESSAGE")"
+  npx auto comment --pr "$PR_NUMBER" --context "docs-preview" --edit --message "$(printf "$MESSAGE")"
   echo "PR comment posted for docs preview"
 else
   echo "Skipping PR comment - canary build will post its own comment"

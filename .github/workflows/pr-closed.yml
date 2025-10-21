@@ -1,6 +1,7 @@
 name: PR closed
 
 on:
+  # Performs cleanup once a PR is closed
   pull_request:
     types: [closed]
 
