@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 readonly JS_PACKAGES=`bazel query --output=package 'kind("npm_package rule", //...) - attr("tags", "\[.*do-not-publish.*\]", //...)'`
-readonly JS_BUILD_TARGETS=`bazel query --output=label 'kind("ts_project rule", //...) - attr("tags", "\[.*do-not-publish.*\]", //...)'`
+readonly JS_BUILD_TARGETS=`bazel query --output=label 'kind("js_library rule", //...) intersect attr(name, "_library$", //...) - attr("tags", "\[.*do-not-publish.*\]", //...)'`
 
 bazel build -- $JS_BUILD_TARGETS
 
