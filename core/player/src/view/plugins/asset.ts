@@ -8,7 +8,7 @@ import type {
 import { NodeType } from "../parser";
 
 /** A view plugin to resolve assets */
-export default class AssetPlugin implements ViewPlugin {
+export class AssetPlugin implements ViewPlugin {
   applyParser(parser: Parser) {
     parser.hooks.parseNode.tap(
       "asset",

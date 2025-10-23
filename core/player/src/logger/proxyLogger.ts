@@ -3,7 +3,7 @@ import type { Logger, Severity, LoggerProvider } from "./types";
 /**
  * The ProxyLogger allows a user to log to another Logger instance that may not exist yet
  */
-export default class ProxyLogger implements Logger {
+export class ProxyLogger implements Logger {
   private proxiedLoggerProvider: LoggerProvider;
 
   constructor(loggerProvider: LoggerProvider) {

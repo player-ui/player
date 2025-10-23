@@ -36,7 +36,7 @@ export type TemplateSubstitutionsFunc = (
 ) => TemplateSubstitution[];
 
 /** A view plugin to resolve/manage templates */
-export default class TemplatePlugin implements ViewPlugin {
+export class TemplatePlugin implements ViewPlugin {
   private readonly options: Options;
 
   hooks: {

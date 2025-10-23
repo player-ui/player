@@ -5,7 +5,7 @@ export type OnUpdateCallback = (update: any) => void;
 /**
  * A plugin that listens for view updates and publishes an event for when a view is updated
  */
-export default class OnUpdatePlugin implements PlayerPlugin {
+export class OnUpdatePlugin implements PlayerPlugin {
   name = "view-update";
 
   private readonly onUpdateCallback: OnUpdateCallback;

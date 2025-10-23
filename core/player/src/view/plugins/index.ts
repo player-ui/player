@@ -1,7 +1,7 @@
-export { default as TemplatePlugin } from "./template";
-export { default as StringResolverPlugin } from "./string-resolver";
-export { default as ApplicabilityPlugin } from "./applicability";
-export { default as SwitchPlugin } from "./switch";
-export { default as MultiNodePlugin } from "./multi-node";
-export { default as AssetPlugin } from "./asset";
-export { default as AssetTransformCorePlugin } from "./asset-transform";
+export { TemplatePlugin } from "./template";
+export { StringResolverPlugin } from "./string-resolver";
+export { ApplicabilityPlugin } from "./applicability";
+export { SwitchPlugin } from "./switch";
+export { MultiNodePlugin } from "./multi-node";
+export { AssetPlugin } from "./asset";
+export { AssetTransformCorePlugin } from "./asset-transform";
