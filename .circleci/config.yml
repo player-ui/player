@@ -315,6 +315,20 @@ jobs:
       - codecov/upload:
           files: ./bazel-out/_coverage/_coverage_report.dat,./_ios_coverage/lcov/_coverage_report.dat
 
+  bundle_analyze:
+    executor: base
+    steps:
+      - attach_workspace:
+          at: ~/player
+
+      - restore_cache:
+          keys:
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+            - v1-bazel-cache-core-{{ .Branch }}
+            - v1-bazel-cache-core-main
+      
+      - run: ./scripts/bundle-analyze.sh
+
   maybe_release:
     executor: base
     steps:
@@ -480,6 +494,26 @@ workflows:
             - build-fork
             - build-ios-fork
 
+      - bundle_analyze:
+          name: bundle-analyze-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          requires:
+            - test-trunk
+            - build-ios-trunk
+
+      - bundle_analyze:
+          name: bundle-analyze-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - test-fork
+            - build-ios-fork
+
       - bench_js:
           name: js-benchmark-tests-trunk
           filters:
@@ -533,12 +567,18 @@ workflows:
             - build
             - build_ios
 
+      - bundle_analyze:
+          name: bundle-analyze
+          requires:
+            - coverage
+
       - release:
           context:
             - Publish
           requires:
             - android_test
             - coverage
+            - bundle-analyze
             - build_ios
 
   full_release:
@@ -571,10 +611,16 @@ workflows:
           requires:
             - build
 
+      - bundle_analyze:
+          name: bundle-analyze
+          requires:
+            - coverage
+
       - release:
           context:
             - Publish
           requires:
             - android_test
             - coverage
+            - bundle_analyze
             - build_ios
