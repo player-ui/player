@@ -308,6 +308,10 @@ jobs:
       - store_test_results:
           path: _test_results
 
+      - run:
+          when: always
+          command: ./scripts/bundle-analyze.sh
+
       - codecov/upload:
           files: ./bazel-out/_coverage/_coverage_report.dat,./_ios_coverage/lcov/_coverage_report.dat
 
