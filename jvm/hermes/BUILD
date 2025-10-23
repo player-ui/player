@@ -7,13 +7,13 @@ load(":defs.bzl", "merge_jni_into_android_library")
 
 main_exports = [
     "//jvm/core",
+    artifact("com.facebook.soloader:soloader"),
 ]
 
 main_deps = main_exports + [
     "//plugins/console-logger/jvm",
     "//plugins/set-time-out/jvm",
     artifact("com.facebook.fbjni:fbjni-java-only"),
-    artifact("com.facebook.soloader:soloader"),
 ]
 
 test_deps = [
