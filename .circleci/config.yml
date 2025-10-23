@@ -502,7 +502,6 @@ workflows:
                 - /pull\/.*/
           requires:
             - test-trunk
-            - build-ios-trunk
 
       - bundle_analyze:
           name: bundle-analyze-fork
@@ -512,7 +511,6 @@ workflows:
                 - /pull\/.*/
           requires:
             - test-fork
-            - build-ios-fork
 
       - bench_js:
           name: js-benchmark-tests-trunk
