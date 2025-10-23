@@ -1,0 +1,36 @@
+name: PR closed
+
+on:
+  # Performs cleanup once a PR is closed
+  pull_request:
+    types: [closed]
+
+jobs:
+  pr_closed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout player-ui.github.io
+        uses: actions/checkout@v4
+        with:
+          repository: player-ui/player-ui.github.io
+          token: ${{ secrets.GH_TOKEN }}
+          path: docs-site
+
+      - name: Remove PR docs folder
+        run: |
+          pr_number=${{ github.event.number }}
+          pr_folder="docs-site/pr/$pr_number"
+
+          if [ -d "$pr_folder" ]; then
+            echo "Removing PR docs folder: pr/$pr_number"
+            rm -rf "$pr_folder"
+            
+            cd docs-site
+            git config user.name "intuit-svc"
+            git config user.email "opensource-svc@intuit.com"
+            git add .
+            git commit -m "Remove docs preview for PR #$pr_number" || echo "No changes to commit"
+            git push origin main
+          else
+            echo "PR docs folder pr/$pr_number not found, nothing to clean up"
+          fi
