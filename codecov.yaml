@@ -1,0 +1,4 @@
+# Post comment if there are changes in bundle size increases more than 1Mb
+comment:
+     require_bundle_changes: "bundle_increase"
+     bundle_change_threshold: "1Kb"

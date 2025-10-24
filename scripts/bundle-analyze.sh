@@ -5,5 +5,5 @@ readonly JS_BUILD_TARGETS=`bazel query --output=label 'kind("js_library rule", /
 bazel build -- $JS_BUILD_TARGETS
 
 for pkg in $JS_PACKAGES ; do
-    npx @codecov/bundle-analyzer ./bazel-bin/${pkg}/dist --bundle-name=${pkg} --upload-token=$CODECOV_TOKEN
+    npx @codecov/bundle-analyzer ./bazel-bin/${pkg}/dist --bundle-name=${pkg} --ignore-patterns="*.map" --upload-token=$CODECOV_TOKEN
 done
