@@ -1,3 +1,23 @@
+# 0.14.1-next.3 (Thu Oct 23 2025)
+
+### Release Notes
+
+#### export soloader from hermes ([#733](https://github.com/player-ui/player/pull/733))
+
+Export `com.facebook.soloader:soloader` from `hermes` artifacts
+
+---
+
+#### 🐛 Bug Fix
+
+- export soloader from hermes [#733](https://github.com/player-ui/player/pull/733) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### Authors: 1
+
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+
+---
+
 # 0.14.1-next.2 (Thu Oct 16 2025)
 
 ### Release Notes
