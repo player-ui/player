@@ -1,4 +1,6 @@
-# Post comment if there are changes in bundle size increases more than 1Mb
+codecov:
+  require_ci_to_pass: no
+# Post comment if there are changes in bundle size increases more than 1Kb
 comment:
      require_bundle_changes: "bundle_increase"
      bundle_change_threshold: "1Kb"
