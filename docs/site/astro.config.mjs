@@ -62,6 +62,7 @@ export default defineConfig({
         light: "./src/assets/logo/logo-light-large.png",
         replacesTitle: true,
       },
+      lastUpdated: true, // Using custom component that reads from remark plugin for Bazel compatibility
       social: [
         {
           icon: "github",
@@ -76,6 +77,7 @@ export default defineConfig({
       components: {
         Sidebar: "./src/components/Sidebar.astro",
         SocialIcons: "./src/components/NavBar.astro",
+        LastUpdated: "./src/components/LastUpdated.astro",
       },
       plugins: [
         starlightDocSearch({

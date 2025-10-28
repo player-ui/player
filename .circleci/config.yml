@@ -51,6 +51,16 @@ executors:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
 
 commands:
+  setup_auth:
+    description: Configure authentication for deployments
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:hUAWVYdfSW5ml6ufbfyEHUcuPwUJ88xVhsZc21b2lA8"
+      - run: mkdir -p ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+      - run: git config --global user.name "Intuit Service"
+      - run: git config --global user.email "opensource-svc@intuit.com"
+
   auto_shipit:
     description: Perform Auto shipit
     steps:
@@ -64,14 +74,8 @@ commands:
             - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
             - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
 
-      - add_ssh_keys:
-          fingerprints:
-            - "SHA256:hUAWVYdfSW5ml6ufbfyEHUcuPwUJ88xVhsZc21b2lA8"
-
-      - run: mkdir -p ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+      - setup_auth
       - run: echo "//registry.npmjs.com/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      - run: git config --global user.name "Intuit Service"
-      - run: git config --global user.email "opensource-svc@intuit.com"
       - run: |
           echo -e $GPG_KEY | gpg --import --batch
           echo -e "pinentry-mode loopback\npassphrase $DEPLOY_MAVEN_GPG_PASSPHRASE" > ~/.gnupg/gpg.conf
@@ -88,7 +92,7 @@ jobs:
 
       - restore_cache:
           keys:
-            - v1-dependencies-{ { checksum "package.json" }}
+            - v1-dependencies-{{ checksum "package.json" }}
 
       - persist_to_workspace:
           root: .
@@ -140,7 +144,7 @@ jobs:
       - save_cache:
           paths:
             - node_modules
-          key: v1-dependencies-{ { checksum "package.json" }}
+          key: v1-dependencies-{{ checksum "package.json" }}
 
       - persist_to_workspace:
           root: .
@@ -322,6 +326,64 @@ jobs:
           steps:
             - auto_shipit
 
+  build_and_deploy_docs_preview:
+    executor: benchmarks
+    steps:
+      - attach_workspace:
+          at: ~/player
+      - restore_cache:
+          keys:
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+            - v1-bazel-cache-core-{{ .Branch }}
+            - v1-bazel-cache-core-main
+      - setup_auth
+      - run:
+          name: Check if docs should run
+          command: |
+            # Skip docs for release-main branches (placeholder PRs)
+            if [[ "$CIRCLE_BRANCH" =~ ^release-main ]]; then
+              echo "Skipping docs for release-main branch"
+              exit 0
+            fi
+
+            # Check if docs should build and deploy
+            if [ "<< pipeline.parameters.GHA_Action >>" = "docs" ] || [ "<< pipeline.parameters.should_release >>" = "true" ]; then
+              echo "Docs build/deploy will proceed"
+            else
+              echo "Skipping docs - not requested"
+              circleci-agent step halt
+            fi
+
+      - run:
+          name: Build docs
+          command: |
+            echo "Building docs for << pipeline.parameters.GHA_Action >>"
+            bazel build --config=release //docs:gh_deploy
+            echo "Docs built successfully"
+
+      - run:
+          name: Deploy preview docs
+          command: |
+            echo "Deploying PR preview docs (next/release docs handled by release-docs.js script)"
+            ./scripts/docs/preview-docs.sh "<< pipeline.parameters.GHA_Action >>"
+
+  build_docs:
+    executor: benchmarks
+    steps:
+      - attach_workspace:
+          at: ~/player
+      - restore_cache:
+          keys:
+            - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
+            - v1-bazel-cache-core-{{ .Branch }}
+            - v1-bazel-cache-core-main
+      - run:
+          name: Build docs
+          command: |
+            echo "Building docs for release"
+            bazel build --config=release //docs:gh_deploy
+            echo "Docs built successfully"
+
   release:
     executor: base
     steps:
@@ -335,7 +397,8 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel query 'filter(".*_vitest_bench$", //...)' --output label 2>/dev/null | tr '\n' ' ' | xargs -n 1 bazel run --config=ci-benchmark
+      - run: |
+          bazel query 'filter(".*_vitest_bench$", //...)' --output label 2>/dev/null | tr '\n' ' ' | xargs -r -n 1 bazel run --config=ci-benchmark
 
 workflows:
   build_and_test_pr:
@@ -415,6 +478,7 @@ workflows:
           requires:
             - build-trunk
             - build-ios-trunk
+            - android-test-trunk
 
       - test:
           name: test-trunk
@@ -494,6 +558,28 @@ workflows:
           requires:
             - build-fork
 
+      - build_and_deploy_docs_preview:
+          name: preview-docs-trunk
+          context:
+            - Publish
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          requires:
+            - test-trunk
+
+      - build_and_deploy_docs_preview:
+          name: preview-docs-fork
+          context:
+            - Publish
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - test-fork
+
   build_and_test_main:
     when:
       equal: ["", << pipeline.parameters.GHA_Action >>]
@@ -529,6 +615,12 @@ workflows:
             - build
             - build_ios
 
+      - build_docs:
+          context:
+            - Publish
+          requires:
+            - coverage
+
       - release:
           context:
             - Publish
@@ -536,6 +628,7 @@ workflows:
             - android_test
             - coverage
             - build_ios
+            - build_docs
 
   full_release:
     when:
@@ -567,6 +660,12 @@ workflows:
           requires:
             - build
 
+      - build_docs:
+          context:
+            - Publish
+          requires:
+            - coverage
+
       - release:
           context:
             - Publish
@@ -574,3 +673,4 @@ workflows:
             - android_test
             - coverage
             - build_ios
+            - build_docs
