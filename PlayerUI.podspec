@@ -119,6 +119,7 @@ and display it as a SwiftUI view comprised of registered assets.
   }
 
   # <PLUGINS>
+  ios_plugin.call("AsyncNodePlugin", "async-node", true)
   ios_plugin.call("BaseBeaconPlugin", "beacon", true)
   ios_plugin.call("CheckPathPlugin", "check-path", true)
   ios_plugin.call("CommonExpressionsPlugin", "common-expressions", true)

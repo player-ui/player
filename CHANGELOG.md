@@ -1,3 +1,16 @@
+# 0.14.1-next.4 (Fri Oct 24 2025)
+
+#### 🐛 Bug Fix
+
+- add asyncnodeplugin to podspec and package.swift [#734](https://github.com/player-ui/player/pull/734) ([@nancywu1](https://github.com/nancywu1) [@spentacular](https://github.com/spentacular))
+
+#### Authors: 2
+
+- [@nancywu1](https://github.com/nancywu1)
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
 # 0.14.1-next.3 (Thu Oct 23 2025)
 
 ### Release Notes
