@@ -4,6 +4,7 @@ title: "Getting Started"
 
 import PlatformTabs from "../../components/PlatformTabs.astro";
 import { PackageManagers } from "starlight-package-managers";
+import { Aside } from "@astrojs/starlight/components";
 
 Getting started with Player is simple.
 
@@ -21,6 +22,8 @@ You can do this by installing the React Player and Reference Assets Packages
   </Fragment>
   <Fragment slot='ios'>
 
+### CocoaPods
+
 In your `Podfile` you'll need to add `PlayerUI` as a dependency and the `ReferenceAssets` plugin to use the base set of assets.
 
 ```ruby
@@ -31,6 +34,30 @@ target 'MyApp' do
   pod 'PlayerUI'
   pod 'PlayerUI/ReferenceAssets' # For example only
 end
+```
+
+### Swift Package Manager
+
+In your `Package.swift` you'll need to add `PlayerUI` as a dependency and the `ReferenceAssets` plugin to use the base set of assets.
+
+<Aside title="Different SPM Repo">The SPM package is maintained in a separate auto-generated repo. You must use that git URL, not the git URL for the main Player repo.</Aside>
+
+```swift
+let package = Package(
+    name: "MyApp",
+    dependencies: [
+        .package(url: "https://github.com/player-ui/playerui-swift-package.git", from: "0.6.0"),
+    ],
+    targets: [
+        .target(
+            name: "MyApp",
+            dependencies: [
+                .product(name: "PlayerUI", package: "playerui-swift-package"),
+                .product(name: "PlayerUIReferenceAssets", package: "playerui-swift-package"),
+            ]
+        ),
+    ]
+)
 ```
 
   </Fragment>
