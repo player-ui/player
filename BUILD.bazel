@@ -127,6 +127,10 @@ assemble_pod(
 
         # Plugins #
 
+        # Async Node
+        "//plugins/async-node/ios:PlayerUIAsyncNodePlugin_Sources": "plugins/async-node/ios/",
+        "//plugins/async-node/core:core_native_bundle": "plugins/async-node/ios/Resources/",
+
         # Beacon
         "//plugins/beacon/ios:PlayerUIBaseBeaconPlugin_Sources": "plugins/beacon/ios/",
         "//plugins/beacon/swiftui:PlayerUIBeaconPlugin_Sources": "plugins/beacon/swiftui/",

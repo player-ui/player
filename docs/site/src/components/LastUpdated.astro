@@ -1,0 +1,50 @@
+---
+// Custom LastUpdated component that reads from git-dates.json
+// This is necessary because Starlight's Git integration doesn't work in Bazel's sandbox
+
+import { readFileSync } from "fs";
+import { resolve, dirname, join } from "path";
+
+const starlightRoute = Astro.locals.starlightRoute;
+let lastUpdated =
+  starlightRoute?.lastUpdated || starlightRoute?.entry?.data?.lastUpdated;
+
+// If no date from Starlight, try to load from git-dates.json
+if (!lastUpdated && starlightRoute?.entry?.filePath) {
+  try {
+    // Load git-dates.json from the docs/site directory
+    const gitDatesPath = join(process.cwd(), "git-dates.json");
+    const content = readFileSync(gitDatesPath, "utf8");
+    const gitDates = JSON.parse(content);
+
+    // Extract just the filename from the entry's file path
+    const filename = starlightRoute.entry.filePath.split("/").pop();
+
+    // Find matching entry in git-dates.json
+    for (const [path, date] of Object.entries(gitDates)) {
+      if (path.endsWith(filename)) {
+        lastUpdated = new Date(date);
+        break;
+      }
+    }
+  } catch (error) {
+    // Silently ignore - git-dates.json might not exist in dev mode
+  }
+}
+
+const lang = starlightRoute?.lang || "en";
+---
+
+{
+  lastUpdated && (
+    <p>
+      Last updated:{" "}
+      <time datetime={new Date(lastUpdated).toISOString()}>
+        {new Date(lastUpdated).toLocaleDateString(lang, {
+          dateStyle: "medium",
+          timeZone: "UTC",
+        })}
+      </time>
+    </p>
+  )
+}
