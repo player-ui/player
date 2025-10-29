@@ -21,7 +21,7 @@ In general, the pipeline for user-content is something like:
 
 <Image darkModeInvert src={assetPipelineImage} alt="Simple Asset Pipeline" />
 
-Player will do minimal processing of each asset in the tree, resolving [data in strings](/content/data-and-expressions), [applicability](/content/assets-views#applicability) and any other generic processing it can. The processed tree is then sent to the rendering layer, where it is turned into a native component on the system Player is running on.
+Player will do minimal processing of each asset in the tree, resolving [data in strings](../../content/data-expressions), [applicability](../../content/assets-views#applicability) and any other generic processing it can. The processed tree is then sent to the rendering layer, where it is turned into a native component on the system Player is running on.
 
 For simple Assets, like text, there's no need for any asset specific processing. The output of Player is enough to successfully render and display the content to the user.
 
