@@ -3,6 +3,7 @@ title: Console Logger
 ---
 
 import PlatformTabs from "../../../../components/PlatformTabs.astro";
+import PodAndPackage from "../../../../components/PodAndPackage.astro";
 
 A plugin to easily enable logs to be written to the JS console. Extremely helpful for local Player development and debugging.
 
@@ -33,13 +34,7 @@ consoleLogger.setSeverity("warn");
   </Fragment>
   <Fragment slot='ios'>
 
-### CocoaPods
-
-Add the subspec to your `Podfile`
-
-```ruby
-pod 'PlayerUI/PrintLoggerPlugin'
-```
+<PodAndPackage product="PrintLoggerPlugin" />
 
 ### Swift Usage
 

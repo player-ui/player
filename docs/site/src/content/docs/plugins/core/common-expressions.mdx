@@ -4,6 +4,7 @@ title: Common Expressions
 
 import PlatformTabs from "../../../../components/PlatformTabs.astro";
 import { PackageManagers } from 'starlight-package-managers'
+import PodAndPackage from "../../../../components/PodAndPackage.astro";
 
 This plugin exposes some basic expressions into Player content.
 
@@ -36,15 +37,7 @@ This will allow any included expressions or custom expressions to be used in the
 
 <Fragment slot='ios'>
 
-### CocoaPods
-
-Add the subspec to your `Podfile`
-
-```ruby
-
-pod 'PlayerUI/CommonExpressionsPlugin'
-
-```
+<PodAndPackage product="CommonExpressionsPlugin" />
 
 ### Swift Usage
 

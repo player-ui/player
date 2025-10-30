@@ -3,6 +3,7 @@ title: Check Path Plugin
 ---
 
 import PlatformTabs from "../../../../components/PlatformTabs.astro";
+import PodAndPackage from "../../../../components/PodAndPackage.astro";
 import { PackageManagers } from 'starlight-package-managers'
 
 The Check Path Plugin enables users to query segments of the view tree for contextual rendering or behavior.
@@ -62,13 +63,7 @@ This will automatically create the underlying _core_ version of the `CheckPathPl
 
 <Fragment slot='ios'>
 
-### CocoaPods
-
-Add the subspec to your `Podfile`
-
-```ruby
-pod 'PlayerUI/SwiftUICheckPathPlugin'
-```
+<PodAndPackage product="SwiftUICheckPathPlugin" />
 
 ### Swift Usage
 

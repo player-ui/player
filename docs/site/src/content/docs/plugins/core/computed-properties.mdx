@@ -3,6 +3,7 @@ title: Computed Properties
 ---
 
 import PlatformTabs from "../../../../components/PlatformTabs.astro";
+import PodAndPackage from "../../../../components/PodAndPackage.astro";
 
 This plugin allows users to specify a path in the data-model (binding) as a computed property in the schema.
 Anytime this binding is read from, the given expression will be evaluated and returned instead of the it being read from the actual model. Writes to the binding will be prevented, and an error will be thrown.
@@ -27,13 +28,7 @@ const player = new Player({
 
   <Fragment slot='ios'>
 
-### CocoaPods
-
-Add the subspec to your `Podfile`
-
-```ruby
-pod 'PlayerUI/ComputedPropertiesPlugin'
-```
+<PodAndPackage product="ComputedPropertiesPlugin" />
 
 ### Swift Usage
 

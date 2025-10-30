@@ -3,6 +3,7 @@ title: AsyncNode Plugin
 ---
 
 import PlatformTabs from "../../../../components/PlatformTabs.astro";
+import PodAndPackage from "../../../../components/PodAndPackage.astro";
 
 The AsyncNode Plugin is used to enable streaming additional content into a flow that has already been loaded and rendered.  
 A common use case for this plugin is conversational UI, as the users input more dialogue, new content must be streamed into Player in order to keep the UI up to date.
@@ -182,13 +183,7 @@ asyncNodePlugin.hooks.onAsyncNodeError.tap("handleAsyncError", (error, node) => 
 });
 ```
 
-### CocoaPods
-
-Add the subspec to your `Podfile`
-
-```ruby
-pod 'PlayerUI/AsyncNodePlugin'
-```
+<PodAndPackage product="AsyncNodePlugin" />
 
 ### Swift Usage
 
