@@ -1,6 +1,11 @@
 # Fallback
 * @player-ui/reviewers
 
+# Docs
+/docs/ @player-ui/docs-reviewers
+*.md @player-ui/player
+*.mdx @player-ui/player
+
 # Core
 **/core @player-ui/reviewers
 
@@ -14,5 +19,6 @@
 **/swiftui @player-ui/ios-reviewers
 
 # Web
+*.tsx @player-ui/web-reviewers
 **/react @player-ui/web-reviewers
 **/storybook @player-ui/web-reviewers
