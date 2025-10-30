@@ -47,7 +47,8 @@ export function getChangedDocsPages(baseBranch = "origin/main") {
           .replace("site/", "")
           .replace(".mdx", "")
           .replace(".md", "")
-          .replace(/\/?index$/, ""); // Remove "/index" or "index" suffix for landing pages
+          .replace(/\/?index$/, "") // Remove "/index" or "index" suffix for landing pages
+          .toLowerCase(); // Docs Preview URLs are case sensitive and need to be lower case
 
         return {
           name: pageName,
