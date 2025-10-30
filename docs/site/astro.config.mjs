@@ -145,7 +145,7 @@ export default defineConfig({
             },
             {
               label: "iOS Plugins",
-              autogenerate: { directory: "plugins/iOS" },
+              autogenerate: { directory: "plugins/ios" },
             },
             {
               label: "Language Plugins",
