@@ -18,6 +18,7 @@
     "@astrojs/starlight-docsearch": "^0.3.0",
     "@astrojs/starlight-tailwind": "^3.0.1",
     "@astrojs/tailwind": "^6.0.2",
+    "@auto-it/all-contributors": "^11.2.0",
     "@auto-it/omit-release-notes": "^11.2.0",
     "@auto-it/upload-assets": "^11.2.0",
     "@auto-it/version-file": "^11.2.0",
