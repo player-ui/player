@@ -1,8 +1,8 @@
 import SortedArray from "sorted-array";
 import type { Matcher } from "./deep-partial-matcher";
-import createObjectMatcher from "./deep-partial-matcher";
+import { createObjectMatcher } from "./deep-partial-matcher";
 
-export { default as createObjectMatcher } from "./deep-partial-matcher";
+export { createObjectMatcher } from "./deep-partial-matcher";
 
 /** create a matcher function that matches exactly */
 function createBasicMatcher(seed: any): Matcher {

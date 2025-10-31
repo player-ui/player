@@ -11,7 +11,7 @@ import { NodeType } from "../parser";
 import { ViewInstance, ViewPlugin } from "../view";
 
 /** A view plugin to remove inapplicable assets from the tree */
-export default class ApplicabilityPlugin implements ViewPlugin {
+export class ApplicabilityPlugin implements ViewPlugin {
   private isApplicability(obj: any) {
     return obj && Object.prototype.hasOwnProperty.call(obj, "applicability");
   }
