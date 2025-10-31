@@ -25,7 +25,7 @@ if [ "$EMULATOR_READY" != "true" ]; then
   set +e
   echo "Checking if '$@' is cached..."
   # Only check if tests are relevant, cached means it will pass
-  bash -c 'bazel test --config=ci "$@" &> /dev/null' bash "$@"
+  bash -c 'bazel test --config=ci "$@"' bash "$@"
   # 0 exit code means the test passed
   if [ $? -eq 0 ]; then
     echo "'$@' was cached - no emulator required"
