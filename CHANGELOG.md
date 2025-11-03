@@ -1,3 +1,44 @@
+# 0.14.1-next.7 (Mon Nov 03 2025)
+
+### Release Notes
+
+#### iOS ManagedPlayer only call unload in loading state ([#749](https://github.com/player-ui/player/pull/749))
+
+#### iOS Managed Player fix for SwiftuiPlayer's context unload being called in loaded state
+- Fix: Only call context.unload if we are in a loading state not when its in loaded state
+
+#### refactor: replace default exports with named exports ([#732](https://github.com/player-ui/player/pull/732))
+
+All default exports have been replaced with named exports across core packages, plugins, and React components. 
+
+Affected packages:
+- `@player-ui/make-flow`: identify function
+- `@player-ui/partial-match-registry`: createObjectMatcher function
+- `@player-ui/player`: Logger classes and view plugins
+- `@player-ui/react`: ReactPlayer component and OnUpdatePlugin
+- `@player-ui/metrics-plugin`: MetricsCorePlugin class
+- `@player-ui/auto-scroll-manager-plugin-react`: scrollIntoViewWithOffset
+
+---
+
+#### 🐛 Bug Fix
+
+- iOS ManagedPlayer only call unload in loading state [#749](https://github.com/player-ui/player/pull/749) ([@nancywu1](https://github.com/nancywu1))
+- enable logs during cache check for android tests [#747](https://github.com/player-ui/player/pull/747) ([@sugarmanz](https://github.com/sugarmanz))
+- Improve PNPM security for installing packages [#729](https://github.com/player-ui/player/pull/729) ([@spentacular](https://github.com/spentacular) [@KetanReddy](https://github.com/KetanReddy) [@KVSRoyal](https://github.com/KVSRoyal))
+- refactor: replace default exports with named exports [#732](https://github.com/player-ui/player/pull/732) ([@dtychshenko](https://github.com/dtychshenko))
+
+#### Authors: 6
+
+- [@nancywu1](https://github.com/nancywu1)
+- Dmitriy Tychshenko ([@dtychshenko](https://github.com/dtychshenko))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
 # 0.14.1-next.4 (Fri Oct 24 2025)
 
 #### 🐛 Bug Fix
