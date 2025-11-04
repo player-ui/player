@@ -42,36 +42,32 @@ export function parseAssetMarkdownContent({
   // No markdown content: return an empty text asset
   if (children.length === 0) {
     return createEmptyText();
-  } else if (children.length === 1) {
-    const first = children[0];
-    const transformer = transformers[first.type];
-    const content = transformer({
-      astNode: first,
+  }
+
+  // Map all children to their transformed content
+  const value = children.map((node) => {
+    const transformer = transformers[node.type];
+    if (!transformer) {
+      return mappers.text({ originalAsset: asset, value: "" });
+    }
+    return transformer({
+      astNode: node,
       asset,
       mappers,
       transformers,
     });
+  });
 
-    return parser?.(content, NodeType.Asset) || null;
-  } else {
-    const value = children.map((node) => {
-      const transformer = transformers[node.type];
-      if (!transformer) {
-        return mappers.text({ originalAsset: asset, value: "" });
-      }
-      return transformer({
-        astNode: node,
-        asset,
-        mappers,
-        transformers,
-      });
-    });
-
-    const collection = mappers.collection({
-      originalAsset: asset,
-      value,
-    });
-
-    return parser?.(collection, NodeType.Asset) || null;
+  // If only one item, return it directly; otherwise wrap in collection
+  if (value.length === 1) {
+    const [first] = value;
+    return parser?.(first!, NodeType.Asset) || null;
   }
+
+  const collection = mappers.collection({
+    originalAsset: asset,
+    value,
+  });
+
+  return parser?.(collection, NodeType.Asset) || null;
 }
