@@ -16,7 +16,6 @@ exports_files([
     "tsconfig.json",
     "package.json",
     "jest.config.js",
-    "webpack.config.js",
     ".editorconfig",
     ".all-contributorsrc",
     "README.md",
