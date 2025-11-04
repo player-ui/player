@@ -34,14 +34,10 @@ export function parseAssetMarkdownContent({
   const input = asset.value ?? "";
   const { children } = fromMarkdown(input);
 
-  const createEmptyText = () => {
-    const empty = mappers.text({ originalAsset: asset, value: "" });
-    return parser?.(empty, NodeType.Asset) || null;
-  };
-
   // No markdown content: return an empty text asset
   if (children.length === 0) {
-    return createEmptyText();
+    const empty = mappers.text({ originalAsset: asset, value: "" });
+    return parser?.(empty, NodeType.Asset) || null;
   }
 
   // Map all children to their transformed content
