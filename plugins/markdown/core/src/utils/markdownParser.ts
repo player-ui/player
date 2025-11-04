@@ -44,12 +44,12 @@ export function parseAssetMarkdownContent({
 
   if (isMultiParagraph) {
     const value = children.map((node) => {
-      const transformer = transformers[node.type as keyof typeof transformers];
+      const transformer = transformers[node.type];
       if (!transformer) {
         return mappers.text({ originalAsset: asset, value: "" });
       }
       return transformer({
-        astNode: node as unknown,
+        astNode: node,
         asset,
         mappers,
         transformers,
@@ -70,14 +70,14 @@ export function parseAssetMarkdownContent({
     return parser?.(empty, NodeType.Asset) || null;
   }
 
-  const transformer = transformers[first.type as keyof typeof transformers];
+  const transformer = transformers[first.type];
   if (!transformer) {
     const empty = mappers.text({ originalAsset: asset, value: "" });
     return parser?.(empty, NodeType.Asset) || null;
   }
 
   const content = transformer({
-    astNode: first as unknown,
+    astNode: first,
     asset,
     mappers,
     transformers,
