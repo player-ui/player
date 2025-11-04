@@ -41,7 +41,7 @@ export function parseAssetMarkdownContent({
   }
 
   // Map all children to their transformed content
-  const mapped: Array<Asset | null> = children.map((node) => {
+  const mapped = children.map((node) => {
     const transformer = transformers[node.type];
     if (!transformer) {
       // Unsupported AST node: drop it (null)
