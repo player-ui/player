@@ -368,7 +368,7 @@ describe("MarkdownPlugin", () => {
     });
   });
 
-  it("handles undefined markdown values by outputting an empty text asset", () => {
+  it("handles undefined markdown values by returning a null node", () => {
     const player = new Player({
       plugins: [new MarkdownPlugin(buildMockMappers())],
     });
@@ -412,12 +412,11 @@ describe("MarkdownPlugin", () => {
     const view = (player.getState() as InProgressState).controllers.view
       .currentView?.lastUpdate as any;
 
-    // Expect plugin not to throw and to produce a text asset with empty value
-    expect(view?.label?.asset?.type).toBe("text");
-    expect(view?.label?.asset?.value).toBe("");
+    // Expect plugin not to throw and to remove the asset (null node)
+    expect(view?.label?.asset).toBeUndefined();
   });
 
-  it("handles empty string markdown values by outputting an empty text asset", () => {
+  it("handles empty string markdown values by returning a null node", () => {
     const player = new Player({
       plugins: [new MarkdownPlugin(buildMockMappers())],
     });
@@ -461,8 +460,7 @@ describe("MarkdownPlugin", () => {
     const view = (player.getState() as InProgressState).controllers.view
       .currentView?.lastUpdate as any;
 
-    expect(view?.label?.asset?.type).toBe("text");
-    expect(view?.label?.asset?.value).toBe("");
+    expect(view?.label?.asset).toBeUndefined();
   });
 
   describe("Interactions with Asset Registry", () => {

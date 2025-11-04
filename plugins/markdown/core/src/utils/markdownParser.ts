@@ -2,6 +2,7 @@ import type { Node, ParseObjectOptions } from "@player-ui/player";
 import { NodeType } from "@player-ui/player";
 import { fromMarkdown } from "mdast-util-from-markdown";
 import type { Mappers, MarkdownAsset } from "../types";
+import type { Asset } from "@player-ui/types";
 import { transformers } from "./transformers";
 
 /**
@@ -34,17 +35,17 @@ export function parseAssetMarkdownContent({
   const input = asset.value ?? "";
   const { children } = fromMarkdown(input);
 
-  // No markdown content: return an empty text asset
+  // No markdown content: return null node
   if (children.length === 0) {
-    const empty = mappers.text({ originalAsset: asset, value: "" });
-    return parser?.(empty, NodeType.Asset) || null;
+    return null;
   }
 
   // Map all children to their transformed content
-  const value = children.map((node) => {
+  const mapped: Array<Asset | null> = children.map((node) => {
     const transformer = transformers[node.type];
     if (!transformer) {
-      return mappers.text({ originalAsset: asset, value: "" });
+      // Unsupported AST node: drop it (null)
+      return null;
     }
     return transformer({
       astNode: node,
@@ -53,6 +54,14 @@ export function parseAssetMarkdownContent({
       transformers,
     });
   });
+
+  // Filter out nulls from unsupported nodes
+  const value = mapped.filter((v): v is Asset => v != null);
+
+  // If resulting content is empty, return null
+  if (value.length === 0) {
+    return null;
+  }
 
   // If only one item, return it directly; otherwise wrap in collection
   if (value.length === 1) {
