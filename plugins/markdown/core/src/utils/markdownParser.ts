@@ -34,15 +34,26 @@ export function parseAssetMarkdownContent({
   const input = asset.value ?? "";
   const { children } = fromMarkdown(input);
 
-  // No markdown content: return an empty text asset
-  if (!children || children.length === 0) {
+  const createEmptyText = () => {
     const empty = mappers.text({ originalAsset: asset, value: "" });
     return parser?.(empty, NodeType.Asset) || null;
-  }
+  };
 
-  const isMultiParagraph = children.length > 1;
+  // No markdown content: return an empty text asset
+  if (children.length === 0) {
+    return createEmptyText();
+  } else if (children.length === 1) {
+    const first = children[0];
+    const transformer = transformers[first.type];
+    const content = transformer({
+      astNode: first,
+      asset,
+      mappers,
+      transformers,
+    });
 
-  if (isMultiParagraph) {
+    return parser?.(content, NodeType.Asset) || null;
+  } else {
     const value = children.map((node) => {
       const transformer = transformers[node.type];
       if (!transformer) {
@@ -63,25 +74,4 @@ export function parseAssetMarkdownContent({
 
     return parser?.(collection, NodeType.Asset) || null;
   }
-
-  const first = children[0];
-  if (!first) {
-    const empty = mappers.text({ originalAsset: asset, value: "" });
-    return parser?.(empty, NodeType.Asset) || null;
-  }
-
-  const transformer = transformers[first.type];
-  if (!transformer) {
-    const empty = mappers.text({ originalAsset: asset, value: "" });
-    return parser?.(empty, NodeType.Asset) || null;
-  }
-
-  const content = transformer({
-    astNode: first,
-    asset,
-    mappers,
-    transformers,
-  });
-
-  return parser?.(content, NodeType.Asset) || null;
 }
