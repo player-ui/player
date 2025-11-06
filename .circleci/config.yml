@@ -82,7 +82,7 @@ commands:
       - run: |
           source ~/.bashrc
           bundle install
-          npx auto shipit --only-graduate-with-release-label -vv
+          npx auto shipit --only-graduate-with-release-label
 
 jobs:
   setup:
