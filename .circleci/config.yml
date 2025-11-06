@@ -88,7 +88,8 @@ jobs:
   setup:
     executor: minimal
     steps:
-      - checkout
+      - checkout:
+          method: full
 
       - restore_cache:
           keys:
@@ -251,7 +252,8 @@ jobs:
   android_test:
     executor: android
     steps:
-      - checkout
+      - checkout:
+          method: full
 
       - attach_workspace:
           at: ~/player
@@ -326,7 +328,7 @@ jobs:
             - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
             - v1-bazel-cache-core-{{ .Branch }}
             - v1-bazel-cache-core-main
-      
+
       - run: ./scripts/bundle-analyze.sh
 
   maybe_release:
@@ -702,7 +704,7 @@ workflows:
           name: bundle-analyze
           requires:
             - coverage
-            
+
       - build_docs:
           context:
             - Publish
