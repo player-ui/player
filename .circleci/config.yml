@@ -252,8 +252,7 @@ jobs:
   android_test:
     executor: android
     steps:
-      - checkout:
-          method: full
+      - checkout
 
       - attach_workspace:
           at: ~/player
