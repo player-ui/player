@@ -1,8 +1,8 @@
 import type { Node, ParseObjectOptions } from "@player-ui/player";
 import { NodeType } from "@player-ui/player";
-import type { Asset } from "@player-ui/types";
 import { fromMarkdown } from "mdast-util-from-markdown";
-import type { Mappers } from "../types";
+import type { Mappers, MarkdownAsset } from "../types";
+import type { Asset } from "@player-ui/types";
 import { transformers } from "./transformers";
 
 /**
@@ -16,7 +16,7 @@ export function parseAssetMarkdownContent({
   /**
    * Asset to be parsed
    */
-  asset: Asset;
+  asset: MarkdownAsset;
   /**
    * Mappers record of AST Node to Player Content
    *
@@ -32,36 +32,47 @@ export function parseAssetMarkdownContent({
     options?: ParseObjectOptions,
   ) => Node.Node | null;
 }): Node.Node | null {
-  const { children } = fromMarkdown(asset.value as string);
-  const isMultiParagraph = children.length > 1;
+  const input = asset.value ?? "";
+  const { children } = fromMarkdown(input);
 
-  if (isMultiParagraph) {
-    const value = children.map((node) => {
-      const transformer = transformers[node.type as keyof typeof transformers];
-      return transformer({
-        astNode: node as any,
-        asset,
-        mappers,
-        transformers,
-      });
-    });
-
-    const collection = mappers.collection({
-      originalAsset: asset,
-      value,
-    });
-
-    return parser?.(collection, NodeType.Asset) || null;
+  // No markdown content: return null node
+  if (children.length === 0) {
+    return null;
   }
 
-  const transformer =
-    transformers[children[0].type as keyof typeof transformers];
-  const content = transformer({
-    astNode: children[0] as any,
-    asset,
-    mappers,
-    transformers,
+  // Map all children to their transformed content
+  const mapped = children.map((node) => {
+    const transformer = transformers[node.type];
+    if (!transformer) {
+      // Unsupported AST node: drop it (null)
+      return null;
+    }
+    return transformer({
+      astNode: node,
+      asset,
+      mappers,
+      transformers,
+    });
   });
 
-  return parser?.(content, NodeType.Asset) || null;
+  // Filter out nulls from unsupported nodes
+  const value = mapped.filter((v): v is Asset => v != null);
+
+  // If resulting content is empty, return null
+  if (value.length === 0) {
+    return null;
+  }
+
+  // If only one item, return it directly; otherwise wrap in collection
+  if (value.length === 1) {
+    const [first] = value;
+    return parser?.(first!, NodeType.Asset) || null;
+  }
+
+  const collection = mappers.collection({
+    originalAsset: asset,
+    value,
+  });
+
+  return parser?.(collection, NodeType.Asset) || null;
 }

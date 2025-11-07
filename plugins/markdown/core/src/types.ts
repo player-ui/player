@@ -1,5 +1,13 @@
 import type { Asset } from "@player-ui/types";
 
+/**
+ * A markdown asset authored in flows.
+ * The value may be undefined or a string.
+ */
+export interface MarkdownAsset extends Asset<"markdown"> {
+  value?: string;
+}
+
 export interface BaseArgs {
   /**
    * Unparsed Asset
