@@ -1,3 +1,15 @@
+# 0.14.1 (Thu Nov 06 2025)
+
+#### 🐛 Bug Fix
+
+- Release main [#751](https://github.com/player-ui/player/pull/751) ([@intuit-svc](https://github.com/intuit-svc))
+
+#### Authors: 1
+
+- [@intuit-svc](https://github.com/intuit-svc)
+
+---
+
 # 0.14.1 (Tue Nov 04 2025)
 
 #### 🐛 Bug Fix
