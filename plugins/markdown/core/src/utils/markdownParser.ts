@@ -44,7 +44,11 @@ export function parseAssetMarkdownContent({
   const value = children.map((node) => {
     const transformer = transformers[node.type];
     if (!transformer) {
-      return mappers.text({ originalAsset: asset, value: "" });
+      if (mappers.null){
+        mappers?.null({ originalAsset: asset });
+      } else {
+        return null;
+      }
     }
     return transformer({
       astNode: node,
