@@ -368,6 +368,103 @@ describe("MarkdownPlugin", () => {
     });
   });
 
+  it("handles undefined markdown values by outputting an empty text asset", () => {
+    const player = new Player({
+      plugins: [new MarkdownPlugin(buildMockMappers())],
+    });
+
+    const flowWithUndefined: Flow = {
+      id: "markdown-undefined-flow",
+      views: [
+        {
+          id: "action",
+          type: "action",
+          label: {
+            asset: {
+              id: "md-undefined",
+              type: "markdown",
+              // intentionally no `value` provided
+            } as any,
+          },
+        },
+      ],
+      navigation: {
+        BEGIN: "FLOW_1",
+        FLOW_1: {
+          startState: "VIEW_1",
+          VIEW_1: {
+            state_type: "VIEW",
+            ref: "action",
+            transitions: {
+              "*": "END_Done",
+            },
+          },
+          END_Done: {
+            state_type: "END",
+            outcome: "done",
+          },
+        },
+      },
+    };
+
+    player.start(flowWithUndefined);
+
+    const view = (player.getState() as InProgressState).controllers.view
+      .currentView?.lastUpdate as any;
+
+    // Expect plugin not to throw and to produce a text asset with empty value
+    expect(view?.label?.asset?.type).toBe("text");
+    expect(view?.label?.asset?.value).toBe("");
+  });
+
+  it("handles empty string markdown values by outputting an empty text asset", () => {
+    const player = new Player({
+      plugins: [new MarkdownPlugin(buildMockMappers())],
+    });
+
+    const flowWithEmpty: Flow = {
+      id: "markdown-empty-flow",
+      views: [
+        {
+          id: "action",
+          type: "action",
+          label: {
+            asset: {
+              id: "md-empty",
+              type: "markdown",
+              value: "",
+            },
+          },
+        },
+      ],
+      navigation: {
+        BEGIN: "FLOW_1",
+        FLOW_1: {
+          startState: "VIEW_1",
+          VIEW_1: {
+            state_type: "VIEW",
+            ref: "action",
+            transitions: {
+              "*": "END_Done",
+            },
+          },
+          END_Done: {
+            state_type: "END",
+            outcome: "done",
+          },
+        },
+      },
+    };
+
+    player.start(flowWithEmpty);
+
+    const view = (player.getState() as InProgressState).controllers.view
+      .currentView?.lastUpdate as any;
+
+    expect(view?.label?.asset?.type).toBe("text");
+    expect(view?.label?.asset?.value).toBe("");
+  });
+
   describe("Interactions with Asset Registry", () => {
     it("parses regular flow and maps assets", () => {
       const fingerprint = new PartialMatchFingerprintPlugin(new Registry());
