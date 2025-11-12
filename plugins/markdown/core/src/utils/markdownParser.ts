@@ -41,22 +41,24 @@ export function parseAssetMarkdownContent({
   }
 
   // Map all children to their transformed content
-  const value = children.map((node) => {
-    const transformer = transformers[node.type];
-    if (!transformer) {
-      if (mappers.null){
-        mappers?.null({ originalAsset: asset });
-      } else {
-        return null;
+  const value = children
+    .map((node) => {
+      const transformer = transformers[node.type];
+      if (!transformer) {
+        if (mappers.null) {
+          return mappers?.null({ originalAsset: asset });
+        } else {
+          return null;
+        }
       }
-    }
-    return transformer({
-      astNode: node,
-      asset,
-      mappers,
-      transformers,
-    });
-  });
+      return transformer({
+        astNode: node,
+        asset,
+        mappers,
+        transformers,
+      });
+    })
+    .filter((x) => x !== null);
 
   // If only one item, return it directly; otherwise wrap in collection
   if (value.length === 1) {
