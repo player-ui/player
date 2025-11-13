@@ -1,3 +1,37 @@
+# 0.15.0-next.0 (Thu Nov 13 2025)
+
+### Release Notes
+
+#### Markdown handle empty ([#752](https://github.com/player-ui/player/pull/752))
+
+Add option to provide a handler for when where nothing is returned from the markdown mapping.
+
+#### Maintainance: Dependency Updates ([#745](https://github.com/player-ui/player/pull/745))
+
+Minor dependency updates to address security bulletins
+
+---
+
+#### 🚀 Enhancement
+
+- Markdown handle empty [#752](https://github.com/player-ui/player/pull/752) ([@shahabdsh](https://github.com/shahabdsh) [@KetanReddy](https://github.com/KetanReddy))
+
+#### 🐛 Bug Fix
+
+- Turn verbose back on for publishing while pipeline is unstable [#759](https://github.com/player-ui/player/pull/759) ([@KetanReddy](https://github.com/KetanReddy))
+- Set timeout of publish stage to 40m [#758](https://github.com/player-ui/player/pull/758) ([@KetanReddy](https://github.com/KetanReddy))
+- add full checkout for both stages and remove all contribs from auto [#757](https://github.com/player-ui/player/pull/757) ([@spentacular](https://github.com/spentacular))
+- fix circle checkout to not use blobless [#756](https://github.com/player-ui/player/pull/756) ([@spentacular](https://github.com/spentacular))
+- Maintainance: Dependency Updates [#745](https://github.com/player-ui/player/pull/745) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 3
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Shahab Deljoo ([@shahabdsh](https://github.com/shahabdsh))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
 # 0.14.1 (Mon Nov 03 2025)
 
 ### Release Notes
