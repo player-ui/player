@@ -83,7 +83,7 @@ commands:
           command: |
             source ~/.bashrc
             bundle install
-            npx auto shipit --only-graduate-with-release-label
+            npx auto shipit -vv --only-graduate-with-release-label
           no_output_timeout: 40m
 
 jobs:
