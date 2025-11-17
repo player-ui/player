@@ -33,36 +33,16 @@ struct TextAssetView: View {
     /// The viewModel with decoded data, supplied by `TextAsset`
     @ObservedObject var model: AssetViewModel<TextData>
 
-    @ViewBuilder
     var body: some View {
         if let link = model.data.modifiers?.first(where: { $0.type == "link" })?.metaData?.ref {
-            Text(model.data.value.stringValue ?? "").bold().modifier(LinkModifier(link)).accessibility(identifier: model.data.id)
+            Link(destination: URL(string: link)!) {
+                let text = model.data.value.stringValue ?? ""
+                Text(text)
+                    .bold()
+                    .foregroundColor(Color(red: 0.000, green: 0.467, blue: 0.773))
+            }.accessibility(identifier: model.data.id)
         } else {
             Text(model.data.value.stringValue ?? "").accessibility(identifier: model.data.id)
         }
-    }
-}
-
-/**
- A `ViewModifier` to make a `View` open a string URL
- */
-struct LinkModifier: ViewModifier {
-    /// The URL location to visit
-    let destination: URL
-    /**
-     Constructs a `LinkModifier` with a string destination
-     - parameters:
-        - destination: A string URL destination
-     */
-    init(_ destination: String) {
-        self.destination = URL(string: destination)!
-    }
-
-    func body(content: Content) -> some View {
-        content
-            .onTapGesture {
-                UIApplication.shared.open(destination)
-            }
-            .foregroundColor(Color(red: 0.000, green: 0.467, blue: 0.773))
     }
 }

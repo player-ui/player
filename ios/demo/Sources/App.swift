@@ -66,7 +66,7 @@ struct MainView: View {
             pluginSections: MockFlows.pluginSections,
             result: $result
         )
-        .navigationBarTitleDisplayMode(.inline)
+//        .navigationBarTitleDisplayMode(.inline)
         .alert(isPresented: showAlert, content: {
             return Alert(
                 title: Text("Flow Finished"),

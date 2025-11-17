@@ -79,6 +79,8 @@ public struct FlowManagerView: View {
                     }
                 }
             }
-        }.navigationBarTitle(Text(navTitle))
+        }
+//        .navigationBarTitle(Text(navTitle))
+        .navigationTitle(navTitle)
     }
 }

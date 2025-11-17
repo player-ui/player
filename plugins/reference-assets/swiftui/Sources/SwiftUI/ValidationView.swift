@@ -48,11 +48,9 @@ extension ValidationSeverity {
     }
 
     /// The icon of this severity
-    public var icon: UIImage? {
-        return InternalAssets.getSVGOfSize(
-            name: self.rawValue,
-            size: CGSize(width: 16, height: 16)
-        )
+    public var icon: Image? { 
+        let systemName: String = self == .warning ? "exclamationmark.triangle.fill" : "xmark.octagon.fill" 
+        return Image(systemName: systemName)
     }
 }
 
@@ -84,7 +82,7 @@ struct ValidationView: View {
     @ViewBuilder
     var body: some View {
         HStack {
-            Image(uiImage: severity.icon ?? UIImage()).foregroundColor(severity.color)
+            severity.icon?.foregroundColor(severity.color)
             Text(message).foregroundColor(severity.textColor).font(.system(size: 14)).italic().bold()
             if let dismissAction = dismiss {
                 Spacer()

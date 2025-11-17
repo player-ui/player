@@ -33,13 +33,13 @@ struct CollectionAssetView: View {
     /// The viewModel with decoded data, supplied by `CollectionAsset`
     @ObservedObject var model: AssetViewModel<CollectionData>
 
-    @ViewBuilder
     var body: some View {
         VStack {
             ForEach(model.data.values.compactMap({ $0?.asset })) { asset in
                 asset.view
             }
         }
+        .frame(maxWidth: .infinity)
         .accessibilityElement(children: .contain)
         .accessibility(identifier: model.data.id)
     }

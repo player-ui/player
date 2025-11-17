@@ -79,7 +79,8 @@ public struct PluginsAndPlayerCollection: View {
             }
         }
         .accessibility(identifier: "Player")
-        .navigationBarTitle(Text("Player"))
+        .navigationTitle("Player")
+//        .navigationBarTitle(Text("Player"))
     }
 
     var pluginFlows: some View {
@@ -114,7 +115,8 @@ public struct PluginsAndPlayerCollection: View {
                     NavigationLink(flow.name) {
                         AssetFlowView(flow: flow.flow, plugins: plugins + [externalActionPlugin, beaconPlugin, pubsubPlugin], completion: completion(result:))
                             .padding(padding)
-                            .navigationBarTitle(Text(flow.name))
+                            .navigationTitle(flow.name)
+//                            .navigationBarTitle(Text(flow.name))
                             .modifier(
                                 AlertViewModifier(
                                     alertPresented: $alertPresented,

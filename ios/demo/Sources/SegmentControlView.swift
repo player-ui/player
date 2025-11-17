@@ -86,7 +86,8 @@ public struct SegmentControlView: View {
             result: result
         )
         .accessibility(identifier: "AssetCollection")
-        .navigationBarTitle(Text("Flows"))
+        .navigationTitle("Flows")
+//        .navigationBarTitle(Text("Flows"))
         .alert(isPresented: $doneFlow, content: {
             Alert(title: Text("FlowFinished"),
                     message: Text("Outcome: \(outcome)"),
