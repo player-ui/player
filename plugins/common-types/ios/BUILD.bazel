@@ -1,6 +1,0 @@
-load("//tools/ios:util.bzl", "ios_plugin")
-
-ios_plugin(
-    name = "CommonTypesPlugin",
-    resources = ["//plugins/common-types/core:core_native_bundle"]
-)

@@ -170,18 +170,18 @@ jobs:
           platform: "iOS"
           device: "iPhone 16 Pro"
 
-      - run: bazel build --config=ci-mac -- //ios/demo:PlayerUIDemo
+      - run: bazel build --config=ci-mac -- //apple/demo:PlayerUIDemo
 
       - run:
           name: Test Prebuild
           command: |
             bazel build \
               --config=ci-mac \
-              $(bazel query "kind(ios_unit_test, //ios/...)") \
+              $(bazel query "kind(ios_unit_test, //apple/...)") \
               $(bazel query "kind(ios_unit_test, //plugins/...)") \
-              $(bazel query "kind(ios_ui_test, //ios/...)") \
+              $(bazel query "kind(ios_ui_test, //apple/...)") \
               $(bazel query "kind(ios_ui_test, //plugins/...)") \
-              $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
+              $(bazel query "attr(name, '.*SwiftLint', //apple/...)") \
               $(bazel query "attr(name, '.*SwiftLint', //plugins/...)")
       - run:
           name: Tests
@@ -193,16 +193,16 @@ jobs:
               --combined_report=lcov \
               --test_output=all \
               --test_timeout=1800 \
-              $(bazel query "kind(ios_unit_test, //ios/...)") \
+              $(bazel query "kind(ios_unit_test, //apple/...)") \
               $(bazel query "kind(ios_unit_test, //plugins/...)") \
-              $(bazel query "kind(ios_ui_test, //ios/...)") \
+              $(bazel query "kind(ios_ui_test, //apple/...)") \
               $(bazel query "kind(ios_ui_test, //plugins/...)")
       - run:
           name: Lint
           command: |
             bazel test \
               --config=ci-mac \
-              $(bazel query "attr(name, '.*SwiftLint', //ios/...)") \
+              $(bazel query "attr(name, '.*SwiftLint', //apple/...)") \
               $(bazel query "attr(name, '.*SwiftLint', //plugins/...)")
 
       - run:
@@ -234,9 +234,9 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel build --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
+      - run: bazel build --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("apple", //...)') -//android/demo:android_instrumentation_test
 
-      - run: bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("ios|swiftui", //...)') -//android/demo:android_instrumentation_test
+      - run: bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("apple", //...)') -//android/demo:android_instrumentation_test
 
       - run:
           when: always
@@ -300,7 +300,7 @@ jobs:
             - v1-bazel-cache-core-main
 
       - run: |
-          BUNDLE_TARGETS=$(bazel query "kind(.*_test, //...) except filter('android|ios|swiftui', //...)" --output label 2>/dev/null | tr '\n' ' ')
+          BUNDLE_TARGETS=$(bazel query "kind(.*_test, //...) except filter('android|apple|ios', //...)" --output label 2>/dev/null | tr '\n' ' ')
           bazel coverage --combined_report=lcov --config=ci -- $BUNDLE_TARGETS
 
       - run:

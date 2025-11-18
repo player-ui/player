@@ -1,0 +1,6 @@
+load("//tools/apple:util.bzl", "ios_plugin")
+
+ios_plugin(
+    name = "PubSubPlugin",
+    resources = ["//plugins/pubsub/core:core_native_bundle"]
+)

@@ -1,6 +1,13 @@
-load("//tools/ios:util.bzl", "ios_plugin")
+load("//tools/apple:util.bzl", "swiftui_plugin")
 
-ios_plugin(
-    name = "BaseBeaconPlugin",
-    resources = ["//plugins/beacon/core:core_native_bundle"]
+swiftui_plugin(
+    name = "BeaconPlugin",
+    resources = [],
+    deps = [
+        "//apple/ios:PlayerUISwiftUI",
+        "//plugins/beacon/apple:PlayerUIBaseBeaconPlugin"  
+    ],
+    test_deps = [
+        "//plugins/reference-assets/ios:PlayerUIReferenceAssets",
+    ]
 )

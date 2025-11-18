@@ -78,10 +78,10 @@ xcui.json
 #SPM
 .build
 .swiftpm
-ios/PlayerUI.xcodeproj
+apple/PlayerUI.xcodeproj
 
 # Bundles used by cocoapods for development
-ios/*/*/Resources/**/*.js
+apple/*/*/Resources/**/*.js
 
 # File used in CI to pass build number between iOS and release stage
 .ios-build-number

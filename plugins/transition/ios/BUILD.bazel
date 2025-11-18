@@ -1,11 +1,10 @@
 load("//tools/apple:util.bzl", "swiftui_plugin")
 
 swiftui_plugin(
-    name = "ExternalActionViewModifierPlugin",
+    name = "TransitionPlugin",
     resources = [],
     deps = [
         "//apple/ios:PlayerUISwiftUI",
-        "//plugins/external-action/apple:PlayerUIExternalActionPlugin"
     ],
     test_deps = [
         "//plugins/reference-assets/ios:PlayerUIReferenceAssets",
