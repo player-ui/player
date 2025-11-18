@@ -1,0 +1,20 @@
+load("@rules_player//ios:defs.bzl", "ios_pipeline")
+
+ios_pipeline(
+    name = "PlayerUITestUtilities",
+    resources = [],
+    deps = [
+        "//apple/core:PlayerUI", 
+        "//apple/ios:PlayerUISwiftUI", 
+        "//apple/logger:PlayerUILogger",
+        "//apple/test-utils-core:PlayerUITestUtilitiesCore"
+    ],
+    test_deps = [
+        "//apple/internal-test-utils:PlayerUIInternalTestUtilities",
+        "//plugins/reference-assets/ios:PlayerUIReferenceAssets"
+    ],
+    hasUnitTests = True,
+    hasViewInspectorTests = True,
+    needsXCTest = True,
+    test_host = "//apple/demo:PlayerUIDemo"
+)

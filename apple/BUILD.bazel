@@ -1,0 +1,58 @@
+load(
+    "@rules_xcodeproj//xcodeproj:defs.bzl",
+    "top_level_target",
+    "xcodeproj",
+)
+
+xcodeproj(
+    name = "xcodeproj",
+    project_name = "PlayerUI",
+    tags = ["manual"],
+    top_level_targets = [
+        top_level_target("//apple/demo:PlayerUIDemo", target_environments = ["simulator"]),
+        "//apple/core:PlayerUITests",
+        "//apple/logger:PlayerUILoggerTests",
+        "//apple/ios:PlayerUISwiftUITests",
+        "//apple/ios:PlayerUISwiftUIViewInspectorTests",
+        "//apple/test-utils-core:PlayerUITestUtilitiesCoreTests",
+        "//apple/test-utils:PlayerUITestUtilitiesTests",
+        "//apple/test-utils:PlayerUITestUtilitiesViewInspectorTests",
+
+        # plugins
+	    "//plugins/async-node/apple:PlayerUIAsyncNodePluginTests",
+        "//plugins/async-node/apple:PlayerUIAsyncNodePluginViewInspectorTests",
+
+        "//plugins/beacon/apple:PlayerUIBaseBeaconPluginTests",
+        "//plugins/beacon/ios:PlayerUIBeaconPluginViewInspectorTests",
+
+        "//plugins/check-path/apple:PlayerUICheckPathPluginTests",
+        "//plugins/check-path/ios:PlayerUISwiftUICheckPathPluginViewInspectorTests",
+
+        "//plugins/common-expressions/apple:PlayerUICommonExpressionsPluginTests",
+
+        "//plugins/common-types/apple:PlayerUICommonTypesPluginTests",
+
+        "//plugins/computed-properties/apple:PlayerUIComputedPropertiesPluginTests",
+
+        "//plugins/console-logger/apple:PlayerUIPrintLoggerPluginTests",
+
+        "//plugins/expression/apple:PlayerUIExpressionPluginTests",
+
+        "//plugins/external-action/apple:PlayerUIExternalActionPluginTests",
+        "//plugins/external-action/ios:PlayerUIExternalActionViewModifierPluginViewInspectorTests",
+
+        "//plugins/metrics/ios:PlayerUIMetricsPluginViewInspectorTests",
+
+        "//plugins/pending-transaction/ios:PlayerUISwiftUIPendingTransactionPluginViewInspectorTests",
+
+        "//plugins/pubsub/apple:PlayerUIPubSubPluginTests",
+
+        "//plugins/reference-assets/ios:PlayerUIReferenceAssetsViewInspectorTests",
+        "//plugins/reference-assets/ios:PlayerUIReferenceAssetsUITests",
+
+        "//plugins/stage-revert-data/apple:PlayerUIStageRevertDataPluginTests",
+
+        "//plugins/transition/ios:PlayerUITransitionPluginViewInspectorTests",
+        "//plugins/types-provider/apple:PlayerUITypesProviderPluginTests"
+    ],
+)

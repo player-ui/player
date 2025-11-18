@@ -1,7 +1,0 @@
-load("//tools/ios:util.bzl", "ios_plugin")
-
-ios_plugin(
-    name = "PrintLoggerPlugin",
-    resources = [],
-    deps = ["//ios/logger:PlayerUILogger"]
-)
