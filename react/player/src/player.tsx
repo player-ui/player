@@ -7,6 +7,7 @@ import type {
   PlayerPlugin,
   Flow,
   View,
+  PlayerInfo,
 } from "@player-ui/player";
 import { Player } from "@player-ui/player";
 import { ErrorBoundary } from "react-error-boundary";
@@ -17,11 +18,6 @@ import { PlayerContext } from "./utils";
 import type { ReactPlayerProps } from "./app";
 import { ReactPlayer as PlayerComp } from "./app";
 import { OnUpdatePlugin } from "./plugins/onupdate-plugin";
-
-const REACT_PLAYER_VERSION =
-  typeof __VERSION__ !== "undefined" ? __VERSION__ : "__VERSION__";
-const COMMIT =
-  typeof __GIT_COMMIT__ !== "undefined" ? __GIT_COMMIT__ : "__GIT_COMMIT__";
 
 export interface DevtoolsGlobals {
   /** A global for a plugin to load to Player for devtools */
@@ -35,19 +31,8 @@ export type DevtoolsWindow = typeof window & DevtoolsGlobals;
 const _window: DevtoolsWindow | undefined =
   typeof window === "undefined" ? undefined : window;
 
-export interface ReactPlayerInfo {
-  /** Version of the running player */
-  playerVersion: string;
-
-  /** Version of the running reactPlayer */
-  reactPlayerVersion: string;
-
-  /** Hash of the HEAD commit used to build the current player version */
-  playerCommit: string;
-
-  /** Hash of the HEAD commit used to build the current reactPlayer version */
-  reactPlayerCommit: string;
-}
+// Alias until more properties are added
+export type ReactPlayerInfo = PlayerInfo;
 
 export interface ReactPlayerPlugin extends Partial<PlayerPlugin> {
   /** The name of this plugin */
@@ -145,21 +130,19 @@ export class ReactPlayer {
 
     this.Component = this.createReactPlayerComponent();
     this.reactPlayerInfo = {
-      playerVersion: this.player.getVersion(),
-      playerCommit: this.player.getCommit(),
-      reactPlayerVersion: REACT_PLAYER_VERSION,
-      reactPlayerCommit: COMMIT,
+      version: this.player.getVersion(),
+      commit: this.player.getCommit(),
     };
   }
 
-  /** Returns the current version of the underlying core Player */
+  /** Returns the current version Player */
   public getPlayerVersion(): string {
-    return this.reactPlayerInfo.playerVersion;
+    return this.reactPlayerInfo.version;
   }
 
-  /** Returns the git commit used to build this core Player version */
+  /** Returns the git commit used to build this Player version */
   public getPlayerCommit(): string {
-    return this.reactPlayerInfo.playerCommit;
+    return this.reactPlayerInfo.commit;
   }
 
   /** Find instance of [Plugin] that has been registered to the web player */
@@ -177,14 +160,20 @@ export class ReactPlayer {
     this.options.plugins?.push(plugin);
   }
 
-  /** Returns the current version of the running React Player */
+  /**
+   * Returns the current version of the running React Player
+   * @deprecated use `getPlayerVersion()` instead. Will be removed next major
+   */
   public getReactPlayerVersion(): string {
-    return this.reactPlayerInfo.reactPlayerVersion;
+    return this.reactPlayerInfo.version;
   }
 
-  /** Returns the git commit used to build the React Player version */
+  /**
+   * Returns the git commit used to build the React Player version
+   * @deprecated use `getPlayerCommit()` instead. Will be removed next major
+   */
   public getReactPlayerCommit(): string {
-    return this.reactPlayerInfo.reactPlayerCommit;
+    return this.reactPlayerInfo.commit;
   }
 
   private createReactPlayerComponent(): React.ComponentType<ReactPlayerComponentProps> {

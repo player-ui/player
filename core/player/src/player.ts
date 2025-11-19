@@ -31,16 +31,21 @@ import type {
 } from "./types";
 import { NOT_STARTED_STATE } from "./types";
 
+/**
+Variables injected at build time
+*/
 declare global {
   const __VERSION__: string;
   const __GIT_COMMIT__: string;
 }
 
-// Variables injected at build time
-const PLAYER_VERSION =
-  typeof __VERSION__ !== "undefined" ? __VERSION__ : "__VERSION__";
-const COMMIT =
-  typeof __GIT_COMMIT__ !== "undefined" ? __GIT_COMMIT__ : "__GIT_COMMIT__";
+// Version of Player at buildtime
+const PLAYER_VERSION: string =
+  typeof __VERSION__ !== "undefined" ? __VERSION__ : "unknown";
+
+// HEAD commit used to build Player
+const COMMIT: string =
+  typeof __GIT_COMMIT__ !== "undefined" ? __GIT_COMMIT__ : "unknown";
 
 export interface PlayerPlugin {
   /**
@@ -80,10 +85,10 @@ export interface PlayerConfigOptions {
 
 export interface PlayerInfo {
   /** Version of the running player */
-  version: string;
+  version: typeof PLAYER_VERSION;
 
   /** Hash of the HEAD commit used to build the current version */
-  commit: string;
+  commit: typeof COMMIT;
 }
 
 /**
