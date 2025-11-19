@@ -40,6 +40,8 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.plus
+import java.io.File
+import java.io.FileOutputStream
 import java.util.concurrent.Executors
 import kotlin.coroutines.EmptyCoroutineContext
 import com.intuit.playerui.jsi.Runtime as JSIRuntime
@@ -114,6 +116,30 @@ public class HermesRuntime private constructor(
 
     override fun execute(script: String): Any? = evaluateInJSThreadBlocking { executeRaw(script).handleValue(format) }
 
+    private fun saveBytecodeToFile(bytecode: ByteArray, scriptId: String) {
+        try {
+            // Create a safe filename from the script ID
+            val safeFilename = scriptId.replace("[^a-zA-Z0-9._-]".toRegex(), "_")
+            
+            // Use system temp directory (works on Android)
+            val tempDir = System.getProperty("java.io.tmpdir") ?: "/data/local/tmp"
+            val outputFile = File(tempDir, "${safeFilename}.hbc")
+            
+            // Ensure parent directory exists
+            outputFile.parentFile?.mkdirs()
+            
+            FileOutputStream(outputFile).use { fos ->
+                fos.write(bytecode)
+            }
+            
+            println("+++ Saved bytecode to: ${outputFile.absolutePath} (${bytecode.size} bytes)")
+            println("+++ To retrieve: adb pull ${outputFile.absolutePath} .")
+        } catch (e: Exception) {
+            System.err.println("Failed to save bytecode: ${e.message}")
+            e.printStackTrace()
+        }
+    }
+
     override fun load(scriptContext: ScriptContext): Any? = evaluateInJSThreadBlocking {
         val sourceMap = scriptContext.sourceMap
         val hbc = scriptContext.preCompiledScript
@@ -121,6 +147,8 @@ public class HermesRuntime private constructor(
             println("+++ loading precompiled hbc++")
             val barray = extractBytecodeFromJS(scriptContext.script, scriptContext.id)
             barray?.let {
+                // Save bytecode to file for later use
+                saveBytecodeToFile(it, scriptContext.id)
                 println("+++ evaluating freshly compiled bytecode")
                 evaluateHermesBytecode(it, scriptContext.id)
             } ?: throw Exception("+++ couldn't create barray")
