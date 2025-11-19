@@ -234,9 +234,9 @@ jobs:
       - attach_workspace:
           at: ~/player
 
-      - run: bazel build --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("apple", //...)') -//android/demo:android_instrumentation_test
+      - run: bazel build --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("apple|ios", //...)') -//android/demo:android_instrumentation_test
 
-      - run: bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("apple", //...)') -//android/demo:android_instrumentation_test
+      - run: bazel test --config=ci -- $(bazel query 'kind(".*_test", //...) except filter("apple|ios", //...)') -//android/demo:android_instrumentation_test
 
       - run:
           when: always
