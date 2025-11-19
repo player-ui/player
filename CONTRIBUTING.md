@@ -161,16 +161,28 @@ iOS Development requires a bit more set-up.
 
 ### To Run
 
+1. Generate the core files that the Apple platforms depend on.
+
+   Without `just`:
+   ```bash
+   bazel build -- $(bazel query "attr(name, 'native_bundle', //...)" --output label 2>/dev/null | tr '\n' ' ')
+   ```
+
+   With `just`:
+   ```bash
+   just build-core-native
+   ```
+   
 1. Generate the `.xcodeproj` to open and work in Xcode.
 
    ```bash
-   bazel run //ios:xcodeproj
+   bazel run //apple:xcodeproj
    ```
 
 1. Open the `.xcodeproj`. If Xcode is your default app for xcodeprojs, you can use this:
 
    ```bash
-   open ios/PlayerUI.xcodeproj/
+   open apple/PlayerUI.xcodeproj/
    ```
 
    > [!IMPORTANT]
@@ -186,7 +198,7 @@ iOS Development requires a bit more set-up.
 The demo app can also be built and launched in a simulator from the command line with bazel:
 
 ```bash
-bazel run //ios/demo:PlayerUIDemo
+bazel run //apple/demo:PlayerUIDemo
 ```
 
 ## Submitting a Pull Request

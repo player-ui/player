@@ -9,7 +9,7 @@ test-core:
   bazel test //core/...
 
 [doc('Build all core files required for native development')]
-build-core-native:
+build-core-native: build-core
   bazel build -- $(bazel query "attr(name, 'native_bundle', //...)" --output label 2>/dev/null | tr '\n' ' ')
 
 ### 🪢 End Core ###
@@ -97,7 +97,7 @@ test-android-local:
 
 [doc('Test all UI Android instrumented tests (sh_test -- requires adb connection)')]
 test-android-ui:
-  bazel test $(bazel query --noshow_progress --output=label "kind('sh_test rule', //...) except filter('ios|swiftui', //...)" | tr '\n' ' ')
+  bazel test $(bazel query --noshow_progress --output=label "kind('sh_test rule', //...) except filter('apple|ios', //...)" | tr '\n' ' ')
 
 test-android: test-android-local test-android-ui
 
@@ -119,12 +119,12 @@ start-android-demo-manual:
 
 Run "build-core-native" first because Xcode will not handle that automatically like bazel commands will.')]
 dev-ios: build-core-native
-  bazel run //ios:xcodeproj
-  open ios/PlayerUI.xcodeproj/
+  bazel run //apple:xcodeproj
+  open apple/PlayerUI.xcodeproj/
 
 [doc('Build and run the iOS demo app in a simulator')]
 start-ios-demo:
-  bazel run //ios/demo:PlayerUIDemo
+  bazel run //apple/demo:PlayerUIDemo
 
 [doc("List all test iOS targets. You should run them individually with `bazel test` locally or they won't pass.
 
@@ -147,9 +147,9 @@ clean: # Force delete all the local cached bazel stuff. Be careful!
   pnpm install
 
   # Delete iOS stuff
-  rm -rf ios/demo/.build
-  rm -rf ios/demo/.swiftpm
-  rm -rf ios/PlayerUI.xcodeproj
+  rm -rf apple/demo/.build
+  rm -rf apple/demo/.swiftpm
+  rm -rf apple/PlayerUI.xcodeproj
   rm -rf .swiftpm/
 
   # Then expunge for good measure

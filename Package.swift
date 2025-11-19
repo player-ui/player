@@ -70,7 +70,7 @@ let package = Package(
                 .product(name: "SwiftHooks", package: "swift-hooks"),
                 .target(name: "PlayerUILogger")
             ],
-            path: "ios/core",
+            path: "apple/core",
             resources: [
                 .process("Resources")
             ]
@@ -81,14 +81,14 @@ let package = Package(
                 .product(name: "SwiftHooks", package: "swift-hooks"),
                 .target(name: "PlayerUI")
             ],
-            path: "ios/swiftui"
+            path: "apple/ios"
         ),
         .target(
             name: "PlayerUILogger",
             dependencies: [
                 .product(name: "SwiftHooks", package: "swift-hooks"),
             ],
-            path: "ios/logger"
+            path: "apple/logger"
         ),
         .target(
             name: "PlayerUIReferenceAssets",
@@ -98,7 +98,7 @@ let package = Package(
                 .target(name: "PlayerUIBeaconPlugin"),
                 .target(name: "PlayerUISwiftUIPendingTransactionPlugin")
             ],
-            path: "plugins/reference-assets/swiftui",
+            path: "plugins/reference-assets/ios",
             resources: [
                 .process("Resources")
             ]
@@ -109,7 +109,7 @@ let package = Package(
                 .target(name: "PlayerUI"),
                 .target(name: "PlayerUISwiftUI")
             ],
-            path: "ios/test-utils-core",
+            path: "apple/test-utils-core",
             resources: [
                 .process("Resources")
             ]
@@ -120,7 +120,7 @@ let package = Package(
                 .target(name: "PlayerUI"),
                 .target(name: "PlayerUITestUtilitiesCore")
             ],
-            path: "ios/test-utils",
+            path: "apple/test-utils",
             linkerSettings: [.linkedFramework("XCTest")]
         )
     ] + plugins.map(\.0)
@@ -143,7 +143,7 @@ extension Target {
             dependencies: [
                 .target(name: "PlayerUI")
             ],
-            path: "plugins/\(plugin.path)/ios",
+            path: "plugins/\(plugin.path)/apple",
             resources: resources
         )
     }
@@ -156,7 +156,7 @@ extension Target {
                 .target(name: "PlayerUI"),
                 .target(name: "PlayerUISwiftUI")
             ]  + plugin.dependencies.map { Dependency.target(name: "PlayerUI\($0)") },
-            path: "plugins/\(plugin.path)/swiftui",
+            path: "plugins/\(plugin.path)/ios",
             resources: resources
         )
     }

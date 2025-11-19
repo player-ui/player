@@ -1,0 +1,7 @@
+load("//tools/apple:util.bzl", "ios_plugin")
+
+ios_plugin(
+    name = "PrintLoggerPlugin",
+    resources = [],
+    deps = ["//apple/logger:PlayerUILogger"]
+)
