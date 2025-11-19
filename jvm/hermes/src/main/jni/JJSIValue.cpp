@@ -2,8 +2,19 @@
 #include "JJSIValue.h"
 
 #include <iostream>
+#include <hermes/hermes.h>
+#include <hermes/CompileJS.h>
 
 namespace intuit::playerui {
+
+using facebook::jsi::Runtime;
+using facebook::jsi::Value;
+using facebook::jsi::Object;
+using facebook::jsi::Array;
+using facebook::jsi::Function;
+using facebook::jsi::String;
+using facebook::jsi::Symbol;
+using facebook::jsi::BigInt;
 
 [[noreturn]] void throwNativeHandleReleasedException(std::string nativeHandle) {
     // TODO: create a new exception type for this to hook into PlayerRuntimeException
@@ -38,6 +49,44 @@ local_ref<JJSIValue::jhybridobject> JJSIRuntime::evaluateHermesBytecode(alias_re
     return JJSIValue::newObjectCxxArgs(this->get_scope(), get_runtime().evaluateJavaScript(std::make_shared<ByteArrayBuffer>(region.get(), size), sourceURL));
 }
 
+local_ref<jbyteArray> JJSIRuntime::extractBytecodeFromJS(alias_ref<JRuntimeThreadContext>, std::string script, std::string sourceURL) {
+    try {
+        std::string bytecode;
+        
+        // Use Hermes public API to compile JS to bytecode
+        // This uses the SAME internal compiler as the runtime, guaranteeing compatibility!
+        bool success = hermes::compileJS(
+            script,
+            sourceURL,
+            bytecode,
+            true,  // optimize
+            false, // emitAsyncBreakCheck
+            nullptr // diagHandler (no error reporting for now)
+        );
+        
+        if (!success || bytecode.empty()) {
+            std::cerr << "Failed to compile JavaScript to bytecode" << std::endl;
+            return nullptr;
+        }
+        
+        // Create Java byte array and copy bytecode
+        auto jbyteArray = Environment::current()->NewByteArray(static_cast<jsize>(bytecode.size()));
+        Environment::current()->SetByteArrayRegion(
+            jbyteArray, 0, static_cast<jsize>(bytecode.size()),
+            reinterpret_cast<const jbyte*>(bytecode.data())
+        );
+        
+        return make_local(jbyteArray);
+        
+    } catch (const std::exception& e) {
+        std::cerr << "Failed to extract bytecode: " << e.what() << std::endl;
+        return nullptr;
+    } catch (...) {
+        std::cerr << "Failed to extract bytecode with unknown error" << std::endl;
+        return nullptr;
+    }
+}
+
 local_ref<JJSIPreparedJavaScript::jhybridobject> JJSIRuntime::prepareJavaScript(alias_ref<JRuntimeThreadContext>, std::string script, std::string sourceURL) {
     return JJSIPreparedJavaScript::newObjectCxxArgs(get_runtime().prepareJavaScript(std::make_shared<StringBuffer>(script), sourceURL));
 }
@@ -68,6 +117,7 @@ void JJSIRuntime::registerNatives() {
     registerHybrid({
         makeNativeMethod("evaluateJavaScript", JJSIRuntime::evaluateJavaScript),
         makeNativeMethod("evaluateHermesBytecode", JJSIRuntime::evaluateHermesBytecode),
+        makeNativeMethod("extractBytecodeFromJS", JJSIRuntime::extractBytecodeFromJS),
         makeNativeMethod("prepareJavaScript", JJSIRuntime::prepareJavaScript),
         makeNativeMethod("evaluatePreparedJavaScript", JJSIRuntime::evaluatePreparedJavaScript),
 #ifdef JSI_MICROTASK

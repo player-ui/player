@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
+#include <cstring>
 #include <jsi/jsi.h>
 #include <fbjni/fbjni.h>
 #include <fbjni/ByteBuffer.h>
@@ -16,13 +18,17 @@ namespace intuit::playerui {
 
 class ByteArrayBuffer : public Buffer {
 public:
-    ByteArrayBuffer(const void* data, size_t size) : data_(reinterpret_cast<const uint8_t*>(data)), size_(size) {}
+    ByteArrayBuffer(const void* data, size_t size) : size_(size) {
+        // Copy the data to ensure ownership, otherwise leads to segfault
+        buffer_.resize(size);
+        std::memcpy(buffer_.data(), data, size);
+    }
 
     size_t size() const override { return size_; }
-    const uint8_t* data() const override { return data_; }
+    const uint8_t* data() const override { return buffer_.data(); }
 
 private:
-    const uint8_t* data_;
+    std::vector<uint8_t> buffer_;
     size_t size_;
 };
 
@@ -81,6 +87,7 @@ public:
 
     local_ref<JJSIValue_jhybridobject> evaluateJavaScript(alias_ref<JRuntimeThreadContext>, std::string script, std::string sourceURL);
     local_ref<JJSIValue_jhybridobject> evaluateHermesBytecode(alias_ref<JRuntimeThreadContext>, alias_ref<jbyteArray> byteArray,std::string sourceURL);
+    local_ref<jbyteArray> extractBytecodeFromJS(alias_ref<JRuntimeThreadContext>, std::string script, std::string sourceURL);
     local_ref<JJSIPreparedJavaScript::jhybridobject> prepareJavaScript(alias_ref<JRuntimeThreadContext>, std::string script, std::string sourceURL);
     local_ref<JJSIValue_jhybridobject> evaluatePreparedJavaScript(alias_ref<JRuntimeThreadContext>, alias_ref<JJSIPreparedJavaScript::jhybridobject> js);
 
