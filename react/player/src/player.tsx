@@ -18,8 +18,10 @@ import type { ReactPlayerProps } from "./app";
 import { ReactPlayer as PlayerComp } from "./app";
 import { OnUpdatePlugin } from "./plugins/onupdate-plugin";
 
-const WEB_PLAYER_VERSION = "__VERSION__";
-const COMMIT = "__GIT_COMMIT__";
+const REACT_PLAYER_VERSION =
+  typeof __VERSION__ !== "undefined" ? __VERSION__ : "__VERSION__";
+const COMMIT =
+  typeof __GIT_COMMIT__ !== "undefined" ? __GIT_COMMIT__ : "__GIT_COMMIT__";
 
 export interface DevtoolsGlobals {
   /** A global for a plugin to load to Player for devtools */
@@ -73,7 +75,28 @@ export class ReactPlayer {
   public readonly player: Player;
   public readonly assetRegistry: AssetRegistryType = new Registry();
   public readonly Component: React.ComponentType<ReactPlayerComponentProps>;
-  public readonly hooks = {
+  public readonly hooks: {
+    /**
+     * A hook to create a React Component to be used for Player, regardless of the current flow state
+     */
+    webComponent: SyncWaterfallHook<
+      [React.ComponentType<{}>],
+      Record<string, any>
+    >;
+    /**
+     * A hook to create a React Component that's used to render a specific view.
+     * It will be called for each view update from the core player.
+     * Typically this will just be `Asset`
+     */
+    playerComponent: SyncWaterfallHook<
+      [React.ComponentType<ReactPlayerProps>],
+      Record<string, any>
+    >;
+    /**
+     * A hook to execute async tasks before the view resets to undefined
+     */
+    onBeforeViewReset: AsyncParallelHook<[], Record<string, any>>;
+  } = {
     /**
      * A hook to create a React Component to be used for Player, regardless of the current flow state
      */
@@ -129,7 +152,7 @@ export class ReactPlayer {
     this.reactPlayerInfo = {
       playerVersion: this.player.getVersion(),
       playerCommit: this.player.getCommit(),
-      reactPlayerVersion: WEB_PLAYER_VERSION,
+      reactPlayerVersion: REACT_PLAYER_VERSION,
       reactPlayerCommit: COMMIT,
     };
   }
@@ -221,7 +244,7 @@ export class ReactPlayer {
    * Call this method to force the ReactPlayer to wait for the next view-update before performing the next render.
    * If the `suspense` option is set, this will suspend while an update is pending, otherwise nothing will be rendered.
    */
-  public setWaitForNextViewUpdate() {
+  public setWaitForNextViewUpdate(): Promise<void> {
     const shouldCallResetHook = this.hooks.onBeforeViewReset.isUsed();
 
     return this.viewUpdateSubscription.reset(
@@ -239,4 +262,4 @@ export class ReactPlayer {
 }
 
 // For compatibility
-export const WebPlayer = ReactPlayer;
+export const WebPlayer: typeof ReactPlayer = ReactPlayer;

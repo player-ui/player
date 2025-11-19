@@ -31,9 +31,16 @@ import type {
 } from "./types";
 import { NOT_STARTED_STATE } from "./types";
 
+declare global {
+  const __VERSION__: string;
+  const __GIT_COMMIT__: string;
+}
+
 // Variables injected at build time
-const PLAYER_VERSION = "__VERSION__";
-const COMMIT = "__GIT_COMMIT__";
+const PLAYER_VERSION =
+  typeof __VERSION__ !== "undefined" ? __VERSION__ : "__VERSION__";
+const COMMIT =
+  typeof __GIT_COMMIT__ !== "undefined" ? __GIT_COMMIT__ : "__GIT_COMMIT__";
 
 export interface PlayerPlugin {
   /**
