@@ -91,6 +91,7 @@ export function createConfig(): ReturnType<typeof defineConfig> {
           globalName: bundleEntryName,
           external: [],
           define: {
+            ...defaultOptions.define,
             "process.env.NODE_ENV": JSON.stringify("production"),
           },
           target: "es5",
@@ -127,6 +128,7 @@ export function createConfig(): ReturnType<typeof defineConfig> {
       {
         ...defaultOptions,
         define: {
+          ...defaultOptions.define,
           "process.env.NODE_ENV": JSON.stringify("production"),
         },
         format: ["esm"],
