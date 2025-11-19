@@ -79,10 +79,7 @@ export class ReactPlayer {
     /**
      * A hook to create a React Component to be used for Player, regardless of the current flow state
      */
-    webComponent: SyncWaterfallHook<
-      [React.ComponentType<{}>],
-      Record<string, any>
-    >;
+    webComponent: SyncWaterfallHook<[React.ComponentType], Record<string, any>>;
     /**
      * A hook to create a React Component that's used to render a specific view.
      * It will be called for each view update from the core player.
@@ -100,21 +97,19 @@ export class ReactPlayer {
     /**
      * A hook to create a React Component to be used for Player, regardless of the current flow state
      */
-    webComponent: new SyncWaterfallHook<[React.ComponentType]>(),
+    webComponent: new SyncWaterfallHook(),
 
     /**
      * A hook to create a React Component that's used to render a specific view.
      * It will be called for each view update from the core player.
      * Typically this will just be `Asset`
      */
-    playerComponent: new SyncWaterfallHook<
-      [React.ComponentType<ReactPlayerProps>]
-    >(),
+    playerComponent: new SyncWaterfallHook(),
 
     /**
      * A hook to execute async tasks before the view resets to undefined
      */
-    onBeforeViewReset: new AsyncParallelHook<[]>(),
+    onBeforeViewReset: new AsyncParallelHook(),
   };
 
   private viewUpdateSubscription = new Subscribe<View>();
