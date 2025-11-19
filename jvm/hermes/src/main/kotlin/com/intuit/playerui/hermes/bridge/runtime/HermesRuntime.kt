@@ -118,17 +118,15 @@ public class HermesRuntime private constructor(
         val sourceMap = scriptContext.sourceMap
         val hbc = scriptContext.preCompiledScript
         if (hbc.isNotEmpty()) {
-            println("+++ loading hbc")
-            try {
-                evaluateHermesBytecode(hbc, scriptContext.id)
-            } catch (e: Exception) {
-                println(e)
-            }
+            println("+++ loading precompiled hbc++")
+            val barray = extractBytecodeFromJS(scriptContext.script, scriptContext.id)
+            barray?.let {
+                println("+++ evaluating freshly compiled bytecode")
+                evaluateHermesBytecode(it, scriptContext.id)
+            } ?: throw Exception("+++ couldn't create barray")
         } else if (sourceMap != null) {
-            println("+++ loading with sourcemap")
             evaluateJavaScriptWithSourceMap(scriptContext.script, sourceMap, scriptContext.id)
         } else {
-            println("+++ loading script")
             evaluateJavaScript(scriptContext.script, scriptContext.id)
         }.handleValue(format)
     }
