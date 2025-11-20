@@ -1,6 +1,10 @@
-import { API, useParameter } from "@storybook/manager-api";
+import { API, useParameter } from "storybook/manager-api";
 import type { NamedType, NodeType, ObjectType } from "@player-tools/xlr";
-import { WithTooltip, SyntaxHighlighter, Link } from "@storybook/components";
+import {
+  WithTooltip,
+  SyntaxHighlighter,
+  Link,
+} from "storybook/internal/components";
 import ts from "typescript";
 import React from "react";
 import { isPrimitiveTypeNode, TSWriter } from "./ts-convert";
@@ -57,7 +61,7 @@ function XLRObjectDocs(props: {
     "",
     ts.ScriptTarget.ES2017,
     false, // setParentNodes
-    ts.ScriptKind.TS
+    ts.ScriptKind.TS,
   );
 
   return (
@@ -78,11 +82,11 @@ function XLRObjectDocs(props: {
           {Object.entries(props.xlr.properties)
             .sort((a, b) =>
               // bubble up the required props first
-              a[1].required === b[1].required ? 0 : a[1].required ? -1 : 1
+              a[1].required === b[1].required ? 0 : a[1].required ? -1 : 1,
             )
             .map(([propKey, propType]) => {
               let nodeText: React.JSX.Element | string = getKeyName(
-                propType.node
+                propType.node,
               );
 
               if (nodeText === "object") {
@@ -106,7 +110,7 @@ function XLRObjectDocs(props: {
                 const tsText = printer.printNode(
                   ts.EmitHint.Unspecified,
                   tsType.type,
-                  resultFile
+                  resultFile,
                 );
 
                 nodeText = (
@@ -142,10 +146,10 @@ function XLRObjectDocs(props: {
 /** Panel to show doc info about asset props */
 export function DocsPanel(props: DocsPanelProps) {
   const assetDocsToRender = useParameter<Array<string> | undefined>(
-    "assetDocs"
+    "assetDocs",
   );
   const defaultXLRSources = useParameter<Array<any> | undefined>(
-    "assetXLRSources"
+    "assetXLRSources",
   );
 
   const darkMode = useDarkMode(props.api);
@@ -191,7 +195,7 @@ export function DocsPanel(props: DocsPanelProps) {
             xlr={assetXLR}
             darkMode={Boolean(darkMode)}
           />
-        )
+        ),
       )}
     </div>
   );

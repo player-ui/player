@@ -1,5 +1,6 @@
 import React from "react";
-import { IconButton, Icons, Separator } from "@storybook/components";
+import { Separator, IconButton } from "storybook/internal/components";
+import { SyncIcon } from "@storybook/icons";
 import { useDispatch } from "react-redux";
 import { resetEditor } from "../../redux";
 
@@ -11,15 +12,12 @@ export const FlowRefresh = () => {
     <>
       <Separator />
       <IconButton
-        placeholder="Flow Reset"
         title="Reset the current flow"
-        onPointerEnterCapture={() => {}}
-        onPointerLeaveCapture={() => {}}
         onClick={() => {
           dispatch(resetEditor());
         }}
       >
-        <Icons icon="sync" />
+        <SyncIcon />
       </IconButton>
     </>
   );

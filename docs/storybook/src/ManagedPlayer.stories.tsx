@@ -1,6 +1,6 @@
 import React from "react";
 import { SuspenseSpinner } from "@player-ui/storybook";
-import { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react-vite";
 import { ManagedPlayer } from "@player-ui/react";
 import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin-react";
 import {

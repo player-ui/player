@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 import React from "react";
 import type { Flow } from "@player-ui/react";
 import { DSLCompiler } from "@player-tools/dsl";
@@ -209,11 +208,11 @@ const flowEditorReducer = createReducer<{
     builder.addCase(setCompiledEditorResult, (state, action) => {
       if (state.dsl?.state === "loaded") {
         state.dsl.needsCompile = false;
-        state.dsl.compilationErrors = action.payload.errors;
+        state.dsl.compilationErrors = (action.payload as any).errors;
       }
 
-      if (action.payload.result) {
-        state.json = { state: "loaded", value: action.payload.result };
+      if ((action.payload as any).result) {
+        state.json = { state: "loaded", value: (action.payload as any).result };
       }
     });
 

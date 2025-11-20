@@ -1,39 +1,53 @@
-import type { StorybookConfig } from "@storybook/react-webpack5";
-import path from "path";
+// This file has been automatically migrated to valid ESM format by Storybook.
+import { fileURLToPath } from "node:url";
+import type { StorybookConfig } from "@storybook/react-vite";
+import path, { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const config: StorybookConfig = {
   stories: ["../src/**/*.@(stories.@(js|tsx|ts))", "../src/**/*.mdx"],
   addons: [
-    "storybook-dark-mode",
     "@storybook/addon-docs",
     "@player-ui/storybook",
-    "@storybook/addon-webpack5-compiler-babel",
+    "@vueless/storybook-dark-mode",
   ],
   typescript: {
     reactDocgen: false,
   },
   framework: {
-    name: "@storybook/react-webpack5",
+    name: "@storybook/react-vite",
     options: {},
   },
-  webpackFinal(config) {
-    if (config.resolve) {
-      config.resolve.alias = {
-        ...config.resolve.alias,
-
-        // storybook + pnpm issue
-        // https://github.com/storybookjs/storybook/discussions/22650#discussioncomment-6414161
-        react: path.resolve(__dirname, "../../../node_modules/react"),
-        "react-dom": path.resolve(__dirname, "../../../node_modules/react-dom"),
-      };
-    }
-    return config;
-  },
-  refs: {
-    "@chakra-ui/react": {
-      disable: true,
-    },
+  viteFinal(config) {
+    return {
+      ...config,
+      optimizeDeps: {
+        ...config.optimizeDeps,
+        force: true,
+        include: [
+          ...(config.optimizeDeps?.include ?? []),
+          "react-redux > prop-types",
+          "react-is",
+          "sorted-array",
+          "timm",
+          "queue-microtask",
+          "nested-error",
+          "ts-nested-error",
+          "p-defer",
+          "react-json-reconciler",
+          "@player-tools/dsl",
+          "storybook > semver",
+          "@player-ui/partial-match-registry",
+          "@player-ui/common-types-plugin",
+          "@player-ui/data-change-listener-plugin",
+          "@player-ui/computed-properties-plugin",
+          "@player-ui/reference-assets-plugin-components",
+        ],
+      },
+    };
   },
 };
 
-module.exports = config;
+export default config;

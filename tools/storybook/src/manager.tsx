@@ -1,20 +1,17 @@
 import React from "react";
-import {} from "@storybook/preview-api";
-import { addons } from "@storybook/manager-api";
-import { Addon_TypesEnum } from "@storybook/types";
+import { addons } from "storybook/manager-api";
+import { Addon_TypesEnum } from "storybook/internal/types";
 import {
   ADDON_ID,
   EVENT_PANEL_ID,
   FLOW_PANEL_ID,
   DOCS_PANEL_ID,
   FLOW_REFRESH_TOOL_ID,
-  RENDER_SELECT_TOOL_ID,
 } from "./addons/constants";
 import { EditorPanel } from "./addons/editor";
 import { EventsPanel } from "./addons/events";
 import { DocsPanel } from "./addons/docs";
 import { FlowRefresh } from "./addons/refresh";
-import { RenderSelection } from "./addons/appetize";
 import { StateProvider } from "./redux";
 
 export const register = () => {

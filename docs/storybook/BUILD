@@ -20,12 +20,9 @@ deps = [
     ":node_modules/@player-ui/expression-plugin",
     ":node_modules/@player-ui/player",
     "//:node_modules/typescript",
-    "//:node_modules/@babel/preset-typescript",
-    "//:node_modules/@babel/preset-env",
-    "//:node_modules/@storybook/react-webpack5",
     "//:node_modules/@storybook/addon-docs",
-    "//:node_modules/@storybook/components",
-    "//:node_modules/@storybook/manager-api",
+    "//:node_modules/@storybook/react-vite",
+    "//:node_modules/@vueless/storybook-dark-mode",
     "//:node_modules/@types/react-redux",
     "//:node_modules/react-redux",
     "//:node_modules/redux-state-sync",
@@ -44,11 +41,9 @@ deps = [
     "//:node_modules/raw-loader",
     "//:node_modules/react",
     "//:node_modules/react-dom",
-    "//:node_modules/@storybook/addon-webpack5-compiler-babel",
     "//:typings",
     "tsconfig.json",
     "package.json",
-    "babel.config.json",
 ]
 
 storybook_bin.storybook(

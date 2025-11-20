@@ -1,7 +1,7 @@
 import React from "react";
 import { dequal } from "dequal";
 import Editor, { loader as monaco } from "@monaco-editor/react";
-import { Tabs, Placeholder } from "@storybook/components";
+import { Tabs, Placeholder } from "storybook/internal/components";
 import { useDispatch } from "react-redux";
 import type { CompilationErrorType } from "../../redux";
 import {
@@ -12,7 +12,7 @@ import {
   useJSONEditorValue,
 } from "../../redux";
 import { useDarkMode } from "../useDarkMode";
-import { API } from "@storybook/manager-api";
+import { API } from "storybook/manager-api";
 
 if (typeof window !== "undefined") {
   monaco.init().then((m) => {
@@ -114,7 +114,9 @@ const CompileErrors = ({
       }}
     >
       <h3>Errors</h3>
-      {errors.compileErrors?.map((e) => <pre key={e.message}>{e.message}</pre>)}
+      {errors.compileErrors?.map((e) => (
+        <pre key={e.message}>{e.message}</pre>
+      ))}
       {errors.transpileErrors?.map((e) => (
         <pre key={e.message}>{e.message}</pre>
       ))}
