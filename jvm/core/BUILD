@@ -1,6 +1,13 @@
 load("@rules_jvm_external//:defs.bzl", "artifact")
 load("//jvm:defs.bzl", "kt_player_module")
 
+# Custom HBC bytecode from resources
+filegroup(
+    name = "custom_hbc",
+    srcs = ["src/main/resources/core/player/Player.native.js.hbc"],
+    visibility = ["//visibility:public"],
+)
+
 # Main dependencies
 main_exports = [
     "//jvm:kotlin_serialization",
@@ -17,7 +24,7 @@ main_deps = main_exports + [
 
 main_resources = [
     "//core/player:player_native_bundle",
-    "//core/player:hbc",
+    ":custom_hbc",
 ]
 
 # Test dependencies
