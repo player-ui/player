@@ -1,3 +1,23 @@
+# 0.15.0-next.1 (Fri Nov 21 2025)
+
+### Release Notes
+
+#### Add Back in Stamping for JavaScript Builds ([#761](https://github.com/player-ui/player/pull/761))
+
+Fix stamping in core/react builds for Player version and commit used to build the bundle
+
+---
+
+#### 🐛 Bug Fix
+
+- Add Back in Stamping for JavaScript Builds [#761](https://github.com/player-ui/player/pull/761) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 1
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.15.0-next.0 (Thu Nov 13 2025)
 
 ### Release Notes
