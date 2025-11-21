@@ -5,10 +5,10 @@ module(
 
 bazel_dep(name = "rules_player")
 archive_override(
-    module_name = "rules_player",
-    integrity = "sha256-90jZ8zCyOrUIwYMPH5kb4renSuDeZQ8vXciKhYC7khM=",
-    strip_prefix = "rules_player-2.1.1",
-    urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v2.1.1.tar.gz"],
+  module_name = "rules_player",
+  strip_prefix = "rules_player-2.2.1",
+  urls = ["https://github.com/player-ui/rules_player/archive/refs/tags/v2.2.1.tar.gz"],
+  integrity = "sha256-vRyADsmF6vA865X9euZw5Z4KnGgpht5qzaa/vLxSkYQ="
 )
 bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "aspect_bazel_lib", version = "2.19.4")

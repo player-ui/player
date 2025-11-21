@@ -30,7 +30,7 @@ build --remote_cache=grpcs://remote.buildbuddy.io
 build --remote_cache_compression
 build --remote_cache_async
 build --remote_download_toplevel
-build --remote_timeout=3600
+build --remote_timeout=60
 build --build_metadata=REPO_URL=https://github.com/player-ui/player.git
 
 test --bes_results_url=https://app.buildbuddy.io/invocation/

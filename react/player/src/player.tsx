@@ -7,6 +7,7 @@ import type {
   PlayerPlugin,
   Flow,
   View,
+  PlayerInfo,
 } from "@player-ui/player";
 import { Player } from "@player-ui/player";
 import { ErrorBoundary } from "react-error-boundary";
@@ -17,9 +18,6 @@ import { PlayerContext } from "./utils";
 import type { ReactPlayerProps } from "./app";
 import { ReactPlayer as PlayerComp } from "./app";
 import { OnUpdatePlugin } from "./plugins/onupdate-plugin";
-
-const WEB_PLAYER_VERSION = "__VERSION__";
-const COMMIT = "__GIT_COMMIT__";
 
 export interface DevtoolsGlobals {
   /** A global for a plugin to load to Player for devtools */
@@ -33,19 +31,8 @@ export type DevtoolsWindow = typeof window & DevtoolsGlobals;
 const _window: DevtoolsWindow | undefined =
   typeof window === "undefined" ? undefined : window;
 
-export interface ReactPlayerInfo {
-  /** Version of the running player */
-  playerVersion: string;
-
-  /** Version of the running reactPlayer */
-  reactPlayerVersion: string;
-
-  /** Hash of the HEAD commit used to build the current player version */
-  playerCommit: string;
-
-  /** Hash of the HEAD commit used to build the current reactPlayer version */
-  reactPlayerCommit: string;
-}
+// Alias until more properties are added
+export type ReactPlayerInfo = PlayerInfo;
 
 export interface ReactPlayerPlugin extends Partial<PlayerPlugin> {
   /** The name of this plugin */
@@ -73,25 +60,41 @@ export class ReactPlayer {
   public readonly player: Player;
   public readonly assetRegistry: AssetRegistryType = new Registry();
   public readonly Component: React.ComponentType<ReactPlayerComponentProps>;
-  public readonly hooks = {
+  public readonly hooks: {
     /**
      * A hook to create a React Component to be used for Player, regardless of the current flow state
      */
-    webComponent: new SyncWaterfallHook<[React.ComponentType]>(),
+    webComponent: SyncWaterfallHook<[React.ComponentType], Record<string, any>>;
+    /**
+     * A hook to create a React Component that's used to render a specific view.
+     * It will be called for each view update from the core player.
+     * Typically this will just be `Asset`
+     */
+    playerComponent: SyncWaterfallHook<
+      [React.ComponentType<ReactPlayerProps>],
+      Record<string, any>
+    >;
+    /**
+     * A hook to execute async tasks before the view resets to undefined
+     */
+    onBeforeViewReset: AsyncParallelHook<[], Record<string, any>>;
+  } = {
+    /**
+     * A hook to create a React Component to be used for Player, regardless of the current flow state
+     */
+    webComponent: new SyncWaterfallHook(),
 
     /**
      * A hook to create a React Component that's used to render a specific view.
      * It will be called for each view update from the core player.
      * Typically this will just be `Asset`
      */
-    playerComponent: new SyncWaterfallHook<
-      [React.ComponentType<ReactPlayerProps>]
-    >(),
+    playerComponent: new SyncWaterfallHook(),
 
     /**
      * A hook to execute async tasks before the view resets to undefined
      */
-    onBeforeViewReset: new AsyncParallelHook<[]>(),
+    onBeforeViewReset: new AsyncParallelHook(),
   };
 
   private viewUpdateSubscription = new Subscribe<View>();
@@ -127,21 +130,19 @@ export class ReactPlayer {
 
     this.Component = this.createReactPlayerComponent();
     this.reactPlayerInfo = {
-      playerVersion: this.player.getVersion(),
-      playerCommit: this.player.getCommit(),
-      reactPlayerVersion: WEB_PLAYER_VERSION,
-      reactPlayerCommit: COMMIT,
+      version: this.player.getVersion(),
+      commit: this.player.getCommit(),
     };
   }
 
-  /** Returns the current version of the underlying core Player */
+  /** Returns the current version Player */
   public getPlayerVersion(): string {
-    return this.reactPlayerInfo.playerVersion;
+    return this.reactPlayerInfo.version;
   }
 
-  /** Returns the git commit used to build this core Player version */
+  /** Returns the git commit used to build this Player version */
   public getPlayerCommit(): string {
-    return this.reactPlayerInfo.playerCommit;
+    return this.reactPlayerInfo.commit;
   }
 
   /** Find instance of [Plugin] that has been registered to the web player */
@@ -159,14 +160,20 @@ export class ReactPlayer {
     this.options.plugins?.push(plugin);
   }
 
-  /** Returns the current version of the running React Player */
+  /**
+   * Returns the current version of the running React Player
+   * @deprecated use `getPlayerVersion()` instead. Will be removed next major
+   */
   public getReactPlayerVersion(): string {
-    return this.reactPlayerInfo.reactPlayerVersion;
+    return this.reactPlayerInfo.version;
   }
 
-  /** Returns the git commit used to build the React Player version */
+  /**
+   * Returns the git commit used to build the React Player version
+   * @deprecated use `getPlayerCommit()` instead. Will be removed next major
+   */
   public getReactPlayerCommit(): string {
-    return this.reactPlayerInfo.reactPlayerCommit;
+    return this.reactPlayerInfo.commit;
   }
 
   private createReactPlayerComponent(): React.ComponentType<ReactPlayerComponentProps> {
@@ -221,7 +228,7 @@ export class ReactPlayer {
    * Call this method to force the ReactPlayer to wait for the next view-update before performing the next render.
    * If the `suspense` option is set, this will suspend while an update is pending, otherwise nothing will be rendered.
    */
-  public setWaitForNextViewUpdate() {
+  public setWaitForNextViewUpdate(): Promise<void> {
     const shouldCallResetHook = this.hooks.onBeforeViewReset.isUsed();
 
     return this.viewUpdateSubscription.reset(
@@ -239,4 +246,4 @@ export class ReactPlayer {
 }
 
 // For compatibility
-export const WebPlayer = ReactPlayer;
+export const WebPlayer: typeof ReactPlayer = ReactPlayer;
