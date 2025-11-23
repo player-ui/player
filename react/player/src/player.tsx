@@ -94,7 +94,7 @@ export class ReactPlayer {
     onBeforeViewReset: new AsyncParallelHook<[]>(),
   };
 
-  private viewUpdateSubscription = new Subscribe<View>();
+  public readonly viewUpdateSubscription = new Subscribe<View>();
   private reactPlayerInfo: ReactPlayerInfo;
 
   constructor(options?: ReactPlayerOptions) {
