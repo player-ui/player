@@ -3,6 +3,7 @@ title: Expression
 ---
 
 import PlatformTabs from "../../../../components/PlatformTabs.astro";
+import PodAndPackage from "../../../../components/PodAndPackage.astro";
 
 This plugin assists with exposing custom expressions to Player content.
 
@@ -52,13 +53,7 @@ Any calls to `myCustomFunction()` within the flow will utilize the newly registe
   </Fragment>
   <Fragment slot='ios'>
 
-### CocoaPods
-
-Add the subspec to your `Podfile`
-
-```ruby
-pod 'PlayerUI/ExpressionPlugin'
-```
+<PodAndPackage product="ExpressionPlugin" />
 
 ### Swift Usage
 

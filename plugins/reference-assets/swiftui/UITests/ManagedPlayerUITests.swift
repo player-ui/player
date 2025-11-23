@@ -17,7 +17,6 @@ class ManagedPlayerUITests: BaseTestCase {
         button2.tap()
 
         let completedText = app.staticTexts["Flow Completed"]
-
         waitFor(completedText)
     }
 
@@ -34,11 +33,11 @@ class ManagedPlayerUITests: BaseTestCase {
         button2.tap()
 
         let errorText = app.staticTexts["Unclosed brace after \"foo.bar..}\" at character 12"].firstMatch
-        waitFor(errorText)
+        waitFor(errorText, timeout: 10)
         XCTAssert(errorText.exists, "Error message did not appear")
 
         let retryButton = app.buttons["Retry"].firstMatch
-        XCTAssert(retryButton.exists, "Retry button did not appear")
+        waitFor(retryButton)
         retryButton.tap()
 
         waitFor(button2)
@@ -51,11 +50,10 @@ class ManagedPlayerUITests: BaseTestCase {
         button1.tap()
 
         let errorText = app.staticTexts["PlayerUI.DecodingError.typeNotRegistered(type: \"error\")"].firstMatch
-
         waitFor(errorText)
 
-
         let resetButton = app.buttons["Reset"]
+        waitFor(resetButton)
         resetButton.tap()
 
         waitFor(button1)

@@ -1,3 +1,226 @@
+# 0.15.0-next.1 (Fri Nov 21 2025)
+
+### Release Notes
+
+#### Add Back in Stamping for JavaScript Builds ([#761](https://github.com/player-ui/player/pull/761))
+
+Fix stamping in core/react builds for Player version and commit used to build the bundle
+
+---
+
+#### 🐛 Bug Fix
+
+- Add Back in Stamping for JavaScript Builds [#761](https://github.com/player-ui/player/pull/761) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 1
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
+# 0.15.0-next.0 (Thu Nov 13 2025)
+
+### Release Notes
+
+#### Markdown handle empty ([#752](https://github.com/player-ui/player/pull/752))
+
+Add option to provide a handler for when where nothing is returned from the markdown mapping.
+
+#### Maintainance: Dependency Updates ([#745](https://github.com/player-ui/player/pull/745))
+
+Minor dependency updates to address security bulletins
+
+---
+
+#### 🚀 Enhancement
+
+- Markdown handle empty [#752](https://github.com/player-ui/player/pull/752) ([@shahabdsh](https://github.com/shahabdsh) [@KetanReddy](https://github.com/KetanReddy))
+
+#### 🐛 Bug Fix
+
+- Turn verbose back on for publishing while pipeline is unstable [#759](https://github.com/player-ui/player/pull/759) ([@KetanReddy](https://github.com/KetanReddy))
+- Set timeout of publish stage to 40m [#758](https://github.com/player-ui/player/pull/758) ([@KetanReddy](https://github.com/KetanReddy))
+- add full checkout for both stages and remove all contribs from auto [#757](https://github.com/player-ui/player/pull/757) ([@spentacular](https://github.com/spentacular))
+- fix circle checkout to not use blobless [#756](https://github.com/player-ui/player/pull/756) ([@spentacular](https://github.com/spentacular))
+- Maintainance: Dependency Updates [#745](https://github.com/player-ui/player/pull/745) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 3
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Shahab Deljoo ([@shahabdsh](https://github.com/shahabdsh))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.14.1 (Mon Nov 03 2025)
+
+### Release Notes
+
+#### iOS ManagedPlayer only call unload in loading state ([#749](https://github.com/player-ui/player/pull/749))
+
+#### iOS Managed Player fix for SwiftuiPlayer's context unload being called in loaded state
+- Fix: Only call context.unload if we are in a loading state not when its in loaded state
+
+#### refactor: replace default exports with named exports ([#732](https://github.com/player-ui/player/pull/732))
+
+All default exports have been replaced with named exports across core packages, plugins, and React components. 
+
+Affected packages:
+- `@player-ui/make-flow`: identify function
+- `@player-ui/partial-match-registry`: createObjectMatcher function
+- `@player-ui/player`: Logger classes and view plugins
+- `@player-ui/react`: ReactPlayer component and OnUpdatePlugin
+- `@player-ui/metrics-plugin`: MetricsCorePlugin class
+- `@player-ui/auto-scroll-manager-plugin-react`: scrollIntoViewWithOffset
+
+#### Fix Broken Links in Doc Site ([#737](https://github.com/player-ui/player/pull/737))
+
+Fix a handful of broken links on the doc site
+
+#### Codecov Bundle Analysis for JS Targets ([#736](https://github.com/player-ui/player/pull/736))
+
+Upload JS bundle size analysis to codecov
+
+#### Adding docs-preview workflow, Canary release PR comments ([#720](https://github.com/player-ui/player/pull/720))
+
+This PR contains a few docs-related quality of life improvements, details below:
+
+- Adds a **pr-comment workflow** that supports command-triggered PR comments - including: `/canary`, `/docs`
+- Adds a **docs preview workflow** that is triggered when a collaborator adds a comment including `/docs`, similar to our `/canary` workflow. This workflow will push static docs files to https://github.com/player-ui/player-ui.github.io and publish a URL that includes PR docs changes. 
+- Adds a **pr-closed workflow** that will run when a PR is either closed manually or merged, which will automatically clean up the pr folder in the https://github.com/player-ui/player-ui.github.io. This workflow can be expanded on in the future if needed.
+- Adds a PR comment that includes Canary release information after the "/canary" workflow is done and a new release becomes available, making it more clear to users which version is tied to when the command was run.
+- Updated full release job to be dependent on docs build success
+- Updated maybe_release to depend on android tests as well
+
+#### export soloader from hermes ([#733](https://github.com/player-ui/player/pull/733))
+
+Export `com.facebook.soloader:soloader` from `hermes` artifacts
+
+#### replace parallel hook with series hook in async node ([#718](https://github.com/player-ui/player/pull/718))
+
+- make the `onAsyncNode` hook of `AsyncNodePlugin` an `AsyncSeriesBailHook` to allow taps to return `undefined` in order to skip resolving the node.
+- Remove `asyncNode` hook from `AsyncNodePluginPlugin` because it never gets called or tapped.
+
+#### allow for arrays of expressions in reference action asset dsl ([#726](https://github.com/player-ui/player/pull/726))
+
+- Extend type on `Action` dsl component props to allow for `exp` to be an array of expressions.
+
+#### fix caching issues with resolved async nodes. ([#716](https://github.com/player-ui/player/pull/716))
+
+- fix an issue where resolving async nodes directly would sometimes not track correctly for the purpose of invalidating the cache.
+
+---
+
+#### 🐛 Bug Fix
+
+- Release main [#751](https://github.com/player-ui/player/pull/751) ([@intuit-svc](https://github.com/intuit-svc))
+- iOS ManagedPlayer only call unload in loading state [#749](https://github.com/player-ui/player/pull/749) ([@nancywu1](https://github.com/nancywu1))
+- enable logs during cache check for android tests [#747](https://github.com/player-ui/player/pull/747) ([@sugarmanz](https://github.com/sugarmanz))
+- Improve PNPM security for installing packages [#729](https://github.com/player-ui/player/pull/729) ([@spentacular](https://github.com/spentacular) [@KetanReddy](https://github.com/KetanReddy) [@KVSRoyal](https://github.com/KVSRoyal))
+- refactor: replace default exports with named exports [#732](https://github.com/player-ui/player/pull/732) ([@dtychshenko](https://github.com/dtychshenko))
+- Add docs for consuming Swift package [#739](https://github.com/player-ui/player/pull/739) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Update codeowners [#743](https://github.com/player-ui/player/pull/743) ([@spentacular](https://github.com/spentacular))
+- Lowercase URLs for docs preview [#741](https://github.com/player-ui/player/pull/741) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Codecov Bundle Analysis for JS Targets [#736](https://github.com/player-ui/player/pull/736) ([@KetanReddy](https://github.com/KetanReddy))
+- Adding docs-preview workflow, Canary release PR comments [#720](https://github.com/player-ui/player/pull/720) ([@kharrop](https://github.com/kharrop))
+- add asyncnodeplugin to podspec and package.swift [#734](https://github.com/player-ui/player/pull/734) ([@nancywu1](https://github.com/nancywu1) [@spentacular](https://github.com/spentacular))
+- export soloader from hermes [#733](https://github.com/player-ui/player/pull/733) ([@sugarmanz](https://github.com/sugarmanz))
+- replace parallel hook with series hook in async node [#718](https://github.com/player-ui/player/pull/718) ([@tmarmer](https://github.com/tmarmer))
+- allow for arrays of expressions in reference action asset dsl [#726](https://github.com/player-ui/player/pull/726) ([@tmarmer](https://github.com/tmarmer))
+- fix caching issues with resolved async nodes. [#716](https://github.com/player-ui/player/pull/716) ([@tmarmer](https://github.com/tmarmer))
+
+#### 📝 Documentation
+
+- Fix Broken Links in Doc Site [#737](https://github.com/player-ui/player/pull/737) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 9
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Dmitriy Tychshenko ([@dtychshenko](https://github.com/dtychshenko))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.14.1-next.7 (Mon Nov 03 2025)
+
+### Release Notes
+
+#### iOS ManagedPlayer only call unload in loading state ([#749](https://github.com/player-ui/player/pull/749))
+
+#### iOS Managed Player fix for SwiftuiPlayer's context unload being called in loaded state
+- Fix: Only call context.unload if we are in a loading state not when its in loaded state
+
+#### refactor: replace default exports with named exports ([#732](https://github.com/player-ui/player/pull/732))
+
+All default exports have been replaced with named exports across core packages, plugins, and React components. 
+
+Affected packages:
+- `@player-ui/make-flow`: identify function
+- `@player-ui/partial-match-registry`: createObjectMatcher function
+- `@player-ui/player`: Logger classes and view plugins
+- `@player-ui/react`: ReactPlayer component and OnUpdatePlugin
+- `@player-ui/metrics-plugin`: MetricsCorePlugin class
+- `@player-ui/auto-scroll-manager-plugin-react`: scrollIntoViewWithOffset
+
+---
+
+#### 🐛 Bug Fix
+
+- iOS ManagedPlayer only call unload in loading state [#749](https://github.com/player-ui/player/pull/749) ([@nancywu1](https://github.com/nancywu1))
+- enable logs during cache check for android tests [#747](https://github.com/player-ui/player/pull/747) ([@sugarmanz](https://github.com/sugarmanz))
+- Improve PNPM security for installing packages [#729](https://github.com/player-ui/player/pull/729) ([@spentacular](https://github.com/spentacular) [@KetanReddy](https://github.com/KetanReddy) [@KVSRoyal](https://github.com/KVSRoyal))
+- refactor: replace default exports with named exports [#732](https://github.com/player-ui/player/pull/732) ([@dtychshenko](https://github.com/dtychshenko))
+
+#### Authors: 6
+
+- [@nancywu1](https://github.com/nancywu1)
+- Dmitriy Tychshenko ([@dtychshenko](https://github.com/dtychshenko))
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.14.1-next.4 (Fri Oct 24 2025)
+
+#### 🐛 Bug Fix
+
+- add asyncnodeplugin to podspec and package.swift [#734](https://github.com/player-ui/player/pull/734) ([@nancywu1](https://github.com/nancywu1) [@spentacular](https://github.com/spentacular))
+
+#### Authors: 2
+
+- [@nancywu1](https://github.com/nancywu1)
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
+# 0.14.1-next.3 (Thu Oct 23 2025)
+
+### Release Notes
+
+#### export soloader from hermes ([#733](https://github.com/player-ui/player/pull/733))
+
+Export `com.facebook.soloader:soloader` from `hermes` artifacts
+
+---
+
+#### 🐛 Bug Fix
+
+- export soloader from hermes [#733](https://github.com/player-ui/player/pull/733) ([@sugarmanz](https://github.com/sugarmanz))
+
+#### Authors: 1
+
+- Jeremiah Zucker ([@sugarmanz](https://github.com/sugarmanz))
+
+---
+
 # 0.14.1-next.2 (Thu Oct 16 2025)
 
 ### Release Notes

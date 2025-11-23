@@ -4,6 +4,7 @@ platform: core
 ---
 
 import PlatformTabs from "../../../../components/PlatformTabs.astro";
+import PodAndPackage from "../../../../components/PodAndPackage.astro";
 
 This plugin enables users to temporarily stage data changes before committing to the actual data model
 
@@ -46,13 +47,7 @@ const player = new Player({
   </Fragment>
   <Fragment slot='ios'>
 
-### CocoaPods
-
-Add the subspec to your `Podfile`
-
-```ruby
-pod 'PlayerUI/StageRevertDataPlugin'
-```
+<PodAndPackage product="StageRevertDataPlugin" />
 
 ### Swift Usage
 

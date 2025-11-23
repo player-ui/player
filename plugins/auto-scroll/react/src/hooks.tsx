@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 import React, { useEffect, useState } from "react";
-import scrollIntoViewWithOffset from "./scrollIntoViewWithOffset";
+import { scrollIntoViewWithOffset } from "./scrollIntoViewWithOffset";
 import type { ScrollType } from "./index";
 
 export interface AutoScrollProviderProps {

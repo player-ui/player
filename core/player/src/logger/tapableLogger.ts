@@ -2,7 +2,7 @@ import { SyncHook } from "tapable-ts";
 import type { Logger, Severity } from "./types";
 
 /** A logger that has a tapable subscriptions to callbacks */
-export default class TapableLogger implements Logger {
+export class TapableLogger implements Logger {
   public readonly hooks = {
     trace: new SyncHook<[Array<any>]>(),
     debug: new SyncHook<[Array<any>]>(),

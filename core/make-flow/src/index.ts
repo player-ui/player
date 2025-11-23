@@ -5,10 +5,9 @@ import type {
   NavigationFlow,
   NavigationFlowEndState,
 } from "@player-ui/types";
-import identify, { ObjType } from "./identify";
+import { identify, ObjType } from "./identify";
 
 export * from "./identify";
-export { identify };
 
 interface JSend<T> {
   /** The status of the JSEND wrapper */

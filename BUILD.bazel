@@ -16,7 +16,6 @@ exports_files([
     "tsconfig.json",
     "package.json",
     "jest.config.js",
-    "webpack.config.js",
     ".editorconfig",
     ".all-contributorsrc",
     "README.md",
@@ -126,6 +125,10 @@ assemble_pod(
         "//core/make-flow:make-flow_native_bundle": "ios/test-utils-core/Resources/",
 
         # Plugins #
+
+        # Async Node
+        "//plugins/async-node/ios:PlayerUIAsyncNodePlugin_Sources": "plugins/async-node/ios/",
+        "//plugins/async-node/core:core_native_bundle": "plugins/async-node/ios/Resources/",
 
         # Beacon
         "//plugins/beacon/ios:PlayerUIBaseBeaconPlugin_Sources": "plugins/beacon/ios/",

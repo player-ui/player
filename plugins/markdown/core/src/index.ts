@@ -1,9 +1,17 @@
-import type { Player, PlayerPlugin } from "@player-ui/player";
+import type { Player, PlayerPlugin, Node } from "@player-ui/player";
 import { resolveDataRefsInString, NodeType } from "@player-ui/player";
-import type { Mappers } from "./types";
+import type { Mappers, MarkdownAsset } from "./types";
 import { parseAssetMarkdownContent } from "./utils";
 
 export * from "./types";
+
+/** Type guard to identify a markdown asset node */
+function isMarkdownAssetNode(
+  node: Node.Node,
+): node is Node.Asset<MarkdownAsset> {
+  if (node.type !== NodeType.Asset) return false;
+  return node.value.type === "markdown";
+}
 
 /**
  * A plugin that parses markdown written into text assets using the given converters for markdown features into existing assets.
@@ -17,18 +25,17 @@ export class MarkdownPlugin implements PlayerPlugin {
     this.mappers = mappers;
   }
 
-  apply(player: Player) {
+  apply(player: Player): void {
     player.hooks.view.tap(this.name, (view) => {
       view.hooks.resolver.tap(this.name, (resolver) => {
         resolver.hooks.beforeResolve.tap(this.name, (node, options) => {
-          if (node?.type === NodeType.Asset && node.value.type === "markdown") {
-            const resolvedContent = resolveDataRefsInString(
-              node.value.value as string,
-              {
-                evaluate: options.evaluate,
-                model: options.data.model,
-              },
-            );
+          if (node && isMarkdownAssetNode(node)) {
+            const rawValue = node.value.value ?? "";
+
+            const resolvedContent = resolveDataRefsInString(rawValue, {
+              evaluate: options.evaluate,
+              model: options.data.model,
+            });
 
             const parsed = parseAssetMarkdownContent({
               asset: {

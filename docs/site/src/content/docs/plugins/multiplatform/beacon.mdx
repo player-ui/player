@@ -3,6 +3,7 @@ title: Beacon Plugin
 ---
 
 import PlatformTabs from "../../../../components/PlatformTabs.astro";
+import PodAndPackage from "../../../../components/PodAndPackage.astro";
 
 The beacon plugin enables users to send and/or collect beaconing information from assets in a normalized API. It exposes a common API for publishing beacons from an asset library, and will automatically attach itself to the current view, enabling additional meta-data to be added to each event.
 
@@ -93,13 +94,7 @@ This will add additional React Context to the running player for the producers f
   </Fragment>
   <Fragment slot='ios'>
 
-### CocoaPods
-
-Add the subspec to your `Podfile`
-
-```ruby
-pod 'PlayerUI/BeaconPlugin'
-```
+<PodAndPackage product="BeaconPlugin" />
 
 ### Swift Usage
 

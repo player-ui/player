@@ -12,7 +12,9 @@
         "versionFile": "./VERSION",
         "publishScript": "./scripts/release.sh",
         "publishScriptReleaseTypeArgs": {
-          "next": ["next"]
+          "next": [
+            "next"
+          ]
         }
       }
     ],
@@ -23,6 +25,8 @@
       }
     ],
     "./scripts/delete-old-prerelease.js",
-    "./scripts/next-changelogs.js"
+    "./scripts/next-changelogs.js",
+    "./scripts/version-comment.js",
+    "./scripts/docs/release-docs.js"
   ]
 }
