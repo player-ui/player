@@ -269,3 +269,43 @@ With all these different types of plugins, it may be difficult to understand how
 
   </Fragment>
  </PlatformTabs>
+
+### Rendering Alternative Components
+
+Sometimes you may want to replace the entire Player component with an alternative view based on some external event or state. The `ReactPlayer` exposes a `viewUpdateSubscription` that can be used to trigger updates and pass data to your plugin.
+
+Here is an example of how to use `viewUpdateSubscription` to render an alternative component:
+
+```tsx
+import { ReactPlayer, ReactPlayerPlugin } from "@player-ui/react";
+import { useSubscribedState } from "@player-ui/react-subscribe";
+
+export class AlternativeComponentPlugin implements ReactPlayerPlugin {
+  name = "alternative-component-plugin";
+
+  applyReact(rp: ReactPlayer) {
+    rp.hooks.webComponent.tap(this.name, (Comp) => {
+      return () => {
+        const view = useSubscribedState(rp.viewUpdateSubscription);
+
+        // Alternatively, without a hook:
+        // rp.viewUpdateSubscription.get().type === "alternative-component"
+
+        if (view?.type === "alternative-component") {
+          return <div>Alternative Component</div>;
+        }
+
+        return <Comp />;
+      };
+    });
+  }
+}
+
+// Usage
+const player = new ReactPlayer({
+  plugins: [new AlternativeComponentPlugin()],
+});
+
+// Trigger the alternative component
+player.viewUpdateSubscription.publish({ type: "alternative-component" });
+```
