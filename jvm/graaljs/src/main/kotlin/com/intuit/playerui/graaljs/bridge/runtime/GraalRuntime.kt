@@ -8,6 +8,7 @@ import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeFactory
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.bridge.runtime.ScriptContext
 import com.intuit.playerui.core.bridge.serialization.serializers.playerSerializersModule
+import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.utils.InternalPlayerApi
 import com.intuit.playerui.graaljs.bridge.GraalNode
@@ -69,6 +70,11 @@ internal class GraalRuntime(
 
     override val scope: CoroutineScope by lazy {
         CoroutineScope(Dispatchers.Default + SupervisorJob() + (config.coroutineExceptionHandler ?: EmptyCoroutineContext))
+    }
+
+    @ExperimentalPlayerApi
+    override fun executeRaw(script: String): Value = context.blockingLock {
+        context.eval("js", script)
     }
 
     override fun execute(script: String): Any? = context.blockingLock {
