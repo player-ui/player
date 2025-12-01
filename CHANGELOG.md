@@ -1,3 +1,15 @@
+# 0.15.0-next.2 (Mon Dec 01 2025)
+
+#### 🐛 Bug Fix
+
+- fix(react-player): expose viewUpdateSubscription to render alt comp's [#762](https://github.com/player-ui/player/pull/762) ([@dtychshenko](https://github.com/dtychshenko))
+
+#### Authors: 1
+
+- Dmitriy Tychshenko ([@dtychshenko](https://github.com/dtychshenko))
+
+---
+
 # 0.15.0-next.1 (Fri Nov 21 2025)
 
 ### Release Notes
