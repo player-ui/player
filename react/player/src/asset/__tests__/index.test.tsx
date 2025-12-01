@@ -181,3 +181,38 @@ test("throw an error for no assets in registry", () => {
       2. You might have mismatching versions of React Asset Registry Context. \n
       See https://player-ui.github.io/latest/tools/cli#player-dependency-versions-check for tips about how to debug and fix this problem`);
 });
+
+test("throws an AssetRenderError if the asset implementation throws an error", () => {
+  const assetDef = {
+    id: "foo",
+    type: "foo",
+    asset: {
+      id: "bar",
+      type: "bar",
+    },
+  };
+
+  const registry: AssetRegistryType = new Registry([
+    [
+      { type: "foo" },
+      (props: { asset: AssetType }) => <ReactAsset {...props.asset} />,
+    ],
+    [
+      { type: "bar" },
+      () => {
+        throw new Error("a problem");
+      },
+    ],
+  ]);
+
+  expect(() =>
+    render(
+      <AssetContext.Provider value={{ registry }}>
+        <ReactAsset {...assetDef} />
+      </AssetContext.Provider>,
+    ),
+  ).toThrowError(`Failed to render asset
+Caused by: a problem
+Exception occurred in asset with id 'bar' of type 'bar'
+\tFound in (id: 'foo', type: 'foo')`);
+});
