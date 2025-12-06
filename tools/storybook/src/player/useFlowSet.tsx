@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import type { Channel } from "@storybook/channels";
+import type { Channel } from "storybook/internal/channels";
 import { setJSONEditorValue } from "../redux";
 
 /** A flow to listen for the global `@@player/flow/set` cmd and update the flow accordingly */

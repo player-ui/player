@@ -1,6 +1,6 @@
-import type { Meta } from "@storybook/react";
-import { createDSLStory, PlayerStory } from "@player-ui/storybook";
 import { Action } from "@player-ui/reference-assets-plugin-react";
+import { createDSLStory, PlayerStory } from "@player-ui/storybook";
+import type { Meta } from "@storybook/react-webpack5";
 
 const meta: Meta<typeof Action> = {
   title: "Reference Assets/Action",

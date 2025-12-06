@@ -1,6 +1,10 @@
-import { API, useParameter } from "@storybook/manager-api";
+import { API, useParameter } from "storybook/manager-api";
 import type { NamedType, NodeType, ObjectType } from "@player-tools/xlr";
-import { WithTooltip, SyntaxHighlighter, Link } from "@storybook/components";
+import {
+  WithTooltip,
+  SyntaxHighlighter,
+  Link,
+} from "storybook/internal/components";
 import ts from "typescript";
 import React from "react";
 import { isPrimitiveTypeNode, TSWriter } from "./ts-convert";

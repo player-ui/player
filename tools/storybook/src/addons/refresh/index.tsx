@@ -1,6 +1,7 @@
+import { SyncIcon } from "@storybook/icons";
 import React from "react";
-import { IconButton, Icons, Separator } from "@storybook/components";
 import { useDispatch } from "react-redux";
+import { Button, Separator } from "storybook/internal/components";
 import { resetEditor } from "../../redux";
 
 /** BUtton to refresh the current player flow */
@@ -10,17 +11,17 @@ export const FlowRefresh = () => {
   return (
     <>
       <Separator />
-      <IconButton
-        placeholder="Flow Reset"
+      <Button
+        variant="ghost"
+        padding="small"
+        ariaLabel="Reset the current flow"
         title="Reset the current flow"
-        onPointerEnterCapture={() => {}}
-        onPointerLeaveCapture={() => {}}
         onClick={() => {
           dispatch(resetEditor());
         }}
       >
-        <Icons icon="sync" />
-      </IconButton>
+        <SyncIcon />
+      </Button>
     </>
   );
 };
