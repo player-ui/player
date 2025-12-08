@@ -8,8 +8,8 @@
     "url": "https://github.com/player-ui/player.git"
   },
   "engines": {
-    "node": ">=20.19.0",
-    "pnpm": ">=10.18.1"
+    "node": "^20.19.0 || ^22.12.0 || >=24",
+    "pnpm": "^10.18.1"
   },
   "packageManager": "pnpm@10.18.1",
   "dependencies": {
