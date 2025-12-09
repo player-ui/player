@@ -9,16 +9,16 @@ export enum ErrorSeverity {
 
 /** Known error types for Player */
 export const ErrorTypes = {
-  EXPRESSION: "expression", 
-  BINDING: "binding", 
-  VIEW: "view", 
-  ASSET: "asset", 
-  NAVIGATION: "navigation", 
-  VALIDATION: "validation", 
-  DATA: "data", 
-  SCHEMA: "schema", 
-  NETWORK: "network", 
-  PLUGIN: "plugin", 
+  EXPRESSION: "expression",
+  BINDING: "binding",
+  VIEW: "view",
+  ASSET: "asset",
+  NAVIGATION: "navigation",
+  VALIDATION: "validation",
+  DATA: "data",
+  SCHEMA: "schema",
+  NETWORK: "network",
+  PLUGIN: "plugin",
 } as const;
 
 export interface AssetErrorContext {
