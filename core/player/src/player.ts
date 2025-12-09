@@ -219,7 +219,6 @@ export class Player {
     let expressionEvaluator: ExpressionEvaluator;
     // eslint-disable-next-line prefer-const
     let dataController: DataController;
-    // eslint-disable-next-line prefer-const
     let errorController: ErrorController;
 
     const pathResolver = new BindingParser({
@@ -268,20 +267,13 @@ export class Player {
       (binding) => schema.getApparentType(binding)?.default,
     );
 
-    // Initialize ErrorController with DataController reference
+    // eslint-disable-next-line prefer-const
     errorController = new ErrorController({
       logger: this.logger,
       dataController,
     });
 
     this.hooks.errorController.call(errorController);
-
-    flowController.hooks.flow.tap("error-controller-cleanup", (flowInstance) => {
-      flowInstance.hooks.transition.tap("error-controller-cleanup", () => {
-        errorController.clearCurrentError();
-        dataController.delete("errorState");
-      });
-    });
 
     // eslint-disable-next-line prefer-const
     let viewController: ViewController;

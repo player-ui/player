@@ -25,8 +25,6 @@ export interface ErrorControllerOptions {
 interface FormattedError {
   message: string;
   name: string;
-  state?: string;
-  timestamp?: number;
   errorType?: string;
   severity?: ErrorSeverity;
   assetId?: string;
@@ -99,8 +97,6 @@ export class ErrorController {
     return {
       message: error.message,
       name: error.name,
-      state: metadata.state,
-      timestamp: metadata.timestamp,
       errorType: metadata.errorType,
       severity: metadata.severity,
       assetId: metadata.assetContext?.asset?.id,

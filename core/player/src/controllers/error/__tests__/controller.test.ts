@@ -105,8 +105,6 @@ describe("ErrorController", () => {
         name: "Error",
         errorType: ErrorTypes.VIEW,
         severity: ErrorSeverity.ERROR,
-        state: "VIEW_Test",
-        timestamp: expect.any(Number),
         assetId: undefined,
         assetType: undefined,
         bindingPath: undefined,
@@ -256,4 +254,3 @@ describe("ErrorController", () => {
     });
   });
 });
-
