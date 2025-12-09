@@ -19,6 +19,7 @@ import {
   DataController,
   ValidationController,
   FlowController,
+  ErrorController,
 } from "./controllers";
 import { FlowExpPlugin } from "./plugins/flow-exp-plugin";
 import { DefaultExpPlugin } from "./plugins/default-exp-plugin";
@@ -119,6 +120,7 @@ export class Player {
     schema: new SyncHook<[SchemaController]>(),
     validationController: new SyncHook<[ValidationController]>(),
     bindingParser: new SyncHook<[BindingParser]>(),
+    errorController: new SyncHook<[ErrorController]>(),
     state: new SyncHook<[PlayerFlowState]>(),
     onStart: new SyncHook<[Flow]>(),
     onEnd: new SyncHook<[]>(),
@@ -221,6 +223,8 @@ export class Player {
     let expressionEvaluator: ExpressionEvaluator;
     // eslint-disable-next-line prefer-const
     let dataController: DataController;
+    // eslint-disable-next-line prefer-const
+    let errorController: ErrorController;
 
     const pathResolver = new BindingParser({
       get: (binding) => {
@@ -267,6 +271,21 @@ export class Player {
       "player",
       (binding) => schema.getApparentType(binding)?.default,
     );
+
+    // Initialize ErrorController with DataController reference
+    errorController = new ErrorController({
+      logger: this.logger,
+      dataController,
+    });
+
+    this.hooks.errorController.call(errorController);
+
+    flowController.hooks.flow.tap("error-controller-cleanup", (flowInstance) => {
+      flowInstance.hooks.transition.tap("error-controller-cleanup", () => {
+        errorController.clearCurrentError();
+        dataController.delete("errorState");
+      });
+    });
 
     // eslint-disable-next-line prefer-const
     let viewController: ViewController;
@@ -486,6 +505,7 @@ export class Player {
           expression: expressionEvaluator,
           binding: pathResolver,
           validation: validationController,
+          error: errorController,
         },
         fail: flowResultDeferred.reject,
         flow: userFlow,
