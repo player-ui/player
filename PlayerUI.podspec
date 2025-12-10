@@ -30,23 +30,23 @@ and display it as a SwiftUI view comprised of registered assets.
 
   # <PACKAGES>
   s.subspec 'Core' do |core|
-    core.source_files = 'ios/core/Sources/**/*'
+    core.source_files = 'apple/core/Sources/**/*'
     core.dependency 'SwiftHooks', '~> 0', '>= 0.1.0'
     core.dependency 'PlayerUI/Logger'
     core.resource_bundles = {
-      'PlayerUI' => ['ios/core/Resources/**/*.js']
+      'PlayerUI' => ['apple/core/Resources/**/*.js']
     }
   end
 
   s.subspec 'SwiftUI' do |swiftui|
     swiftui.dependency 'PlayerUI/Core'
 
-    swiftui.source_files = 'ios/swiftui/Sources/**/*'
+    swiftui.source_files = 'apple/ios/Sources/**/*'
   end
 
   s.subspec 'Logger' do |pkg|
     pkg.dependency 'SwiftHooks', '~> 0', '>= 0.1.0'
-    pkg.source_files = 'ios/logger/Sources/**/*'
+    pkg.source_files = 'apple/logger/Sources/**/*'
   end
 
   s.subspec 'ReferenceAssets' do |assets|
@@ -55,12 +55,12 @@ and display it as a SwiftUI view comprised of registered assets.
     assets.dependency 'PlayerUI/BeaconPlugin'
     assets.dependency 'PlayerUI/SwiftUIPendingTransactionPlugin'
 
-    assets.source_files = 'plugins/reference-assets/swiftui/Sources/**/*'
+    assets.source_files = 'plugins/reference-assets/ios/Sources/**/*'
     assets.resource_bundles = {
       'ReferenceAssets' => [
-        'plugins/reference-assets/swiftui/Resources/js/**/*.js',
-        'plugins/reference-assets/swiftui/Resources/svg/*.xcassets',
-        'plugins/reference-assets/swiftui/Resources/svg/*.xcassets/**/*'
+        'plugins/reference-assets/ios/Resources/js/**/*.js',
+        'plugins/reference-assets/ios/Resources/svg/*.xcassets',
+        'plugins/reference-assets/ios/Resources/svg/*.xcassets/**/*'
       ]
     }
   end
@@ -69,9 +69,9 @@ and display it as a SwiftUI view comprised of registered assets.
     utils.dependency 'PlayerUI/Core'
     utils.dependency 'PlayerUI/SwiftUI'
 
-    utils.source_files = 'ios/test-utils-core/Sources/**/*'
+    utils.source_files = 'apple/test-utils-core/Sources/**/*'
     utils.resource_bundles = {
-      'TestUtilities' => ['ios/test-utils-core/Resources/**/*.js']
+      'TestUtilities' => ['apple/test-utils-core/Resources/**/*.js']
     }
   end
 
@@ -80,7 +80,7 @@ and display it as a SwiftUI view comprised of registered assets.
     utils.dependency 'PlayerUI/SwiftUI'
     utils.dependency 'PlayerUI/TestUtilitiesCore'
 
-    utils.source_files = 'ios/test-utils/Sources/**/*'
+    utils.source_files = 'apple/test-utils/Sources/**/*'
 
     utils.weak_framework = 'XCTest'
     utils.pod_target_xcconfig = {
@@ -93,10 +93,10 @@ and display it as a SwiftUI view comprised of registered assets.
   ios_plugin = lambda { |name, path, resources|
     s.subspec name do |subspec|
       subspec.dependency 'PlayerUI/Core'
-      subspec.source_files = "plugins/#{path}/ios/Sources/**/*"
+      subspec.source_files = "plugins/#{path}/apple/Sources/**/*"
       if resources == true
         subspec.resource_bundles = {
-          "PlayerUI_#{name}" => ["plugins/#{path}/ios/Resources/**/*.js"]
+          "PlayerUI_#{name}" => ["plugins/#{path}/apple/Resources/**/*.js"]
         }
       end
     end
@@ -109,10 +109,10 @@ and display it as a SwiftUI view comprised of registered assets.
       deps.each { |dep|
         subspec.dependency "PlayerUI/#{dep}"
       }
-      subspec.source_files = "plugins/#{path}/swiftui/Sources/**/*"
+      subspec.source_files = "plugins/#{path}/ios/Sources/**/*"
       if resources == true
         subspec.resource_bundles = {
-          "PlayerUI_#{name}" => ["plugins/#{path}/swiftui/Resources/**/*.js"]
+          "PlayerUI_#{name}" => ["plugins/#{path}/ios/Resources/**/*.js"]
         }
       end
     end

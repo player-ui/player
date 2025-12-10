@@ -1,6 +1,13 @@
-load("//tools/ios:util.bzl", "ios_plugin")
+load("//tools/apple:util.bzl", "ios_plugin")
 
 ios_plugin(
-    name = "ExternalActionPlugin",
-    resources = ["//plugins/external-action/core:core_native_bundle"]
+    name = "ExternalActionViewModifierPlugin",
+    resources = [],
+    deps = [
+        "//apple/ios:PlayerUISwiftUI",
+        "//plugins/external-action/apple:PlayerUIExternalActionPlugin"
+    ],
+    test_deps = [
+        "//plugins/reference-assets/ios:PlayerUIReferenceAssets",
+    ]
 )

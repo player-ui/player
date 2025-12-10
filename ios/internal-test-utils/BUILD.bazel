@@ -1,9 +1,0 @@
-load("@rules_player//ios:defs.bzl", "swift_library")
-
-swift_library(
-    name = "PlayerUIInternalTestUtilities",
-    module_name = "PlayerUIInternalTestUtilities",
-    srcs = glob(["Sources/**/*.swift"]),
-    visibility = ["//visibility:public"],
-    deps = ["//ios/core:PlayerUI", "//ios/logger:PlayerUILogger"]
-)

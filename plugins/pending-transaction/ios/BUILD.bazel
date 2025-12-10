@@ -1,11 +1,10 @@
 load("//tools/apple:util.bzl", "ios_plugin")
 
 ios_plugin(
-    name = "SwiftUICheckPathPlugin",
+    name = "SwiftUIPendingTransactionPlugin",
     resources = [],
     deps = [
         "//apple/ios:PlayerUISwiftUI",
-        "//plugins/check-path/apple:PlayerUICheckPathPlugin"
     ],
     test_deps = []
 )

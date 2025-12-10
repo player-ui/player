@@ -1,0 +1,6 @@
+load("//tools/apple:util.bzl", "apple_plugin")
+
+apple_plugin(
+    name = "CheckPathPlugin",
+    resources = ["//plugins/check-path/core:core_native_bundle"]
+)

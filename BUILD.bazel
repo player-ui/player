@@ -108,88 +108,88 @@ assemble_pod(
     ]),
     data = {
         # Core
-        "//ios/core:PlayerUI_Sources": "ios/core/",
-        "//core/player:player_native_bundle": "ios/core/Resources/",
-        "//plugins/partial-match-fingerprint/core:core_native_bundle": "ios/core/Resources/",
-        "//core/partial-match-registry:partial-match-registry_native_bundle": "ios/core/Resources/",
+        "//apple/core:PlayerUI_Sources": "apple/core/",
+        "//core/player:player_native_bundle": "apple/core/Resources/",
+        "//plugins/partial-match-fingerprint/core:core_native_bundle": "apple/core/Resources/",
+        "//core/partial-match-registry:partial-match-registry_native_bundle": "apple/core/Resources/",
 
         # SwiftUI
-        "//ios/swiftui:PlayerUISwiftUI_Sources": "ios/swiftui/",
+        "//apple/ios:PlayerUISwiftUI_Sources": "apple/ios/",
 
         # Logger
-        "//ios/logger:PlayerUILogger_Sources": "ios/logger/",
+        "//apple/logger:PlayerUILogger_Sources": "apple/logger/",
 
         # Test Utilities
-        "//ios/test-utils-core:PlayerUITestUtilitiesCore_Sources": "ios/test-utils-core/",
-        "//ios/test-utils:PlayerUITestUtilities_Sources": "ios/test-utils/",
-        "//core/make-flow:make-flow_native_bundle": "ios/test-utils-core/Resources/",
+        "//apple/test-utils-core:PlayerUITestUtilitiesCore_Sources": "apple/test-utils-core/",
+        "//apple/test-utils:PlayerUITestUtilities_Sources": "apple/test-utils/",
+        "//core/make-flow:make-flow_native_bundle": "apple/test-utils-core/Resources/",
 
         # Plugins #
 
         # Async Node
-        "//plugins/async-node/ios:PlayerUIAsyncNodePlugin_Sources": "plugins/async-node/ios/",
-        "//plugins/async-node/core:core_native_bundle": "plugins/async-node/ios/Resources/",
+        "//plugins/async-node/apple:PlayerUIAsyncNodePlugin_Sources": "plugins/async-node/apple/",
+        "//plugins/async-node/core:core_native_bundle": "plugins/async-node/apple/Resources/",
 
         # Beacon
-        "//plugins/beacon/ios:PlayerUIBaseBeaconPlugin_Sources": "plugins/beacon/ios/",
-        "//plugins/beacon/swiftui:PlayerUIBeaconPlugin_Sources": "plugins/beacon/swiftui/",
-        "//plugins/beacon/core:core_native_bundle": "plugins/beacon/ios/Resources/",
+        "//plugins/beacon/apple:PlayerUIBaseBeaconPlugin_Sources": "plugins/beacon/apple/",
+        "//plugins/beacon/ios:PlayerUIBeaconPlugin_Sources": "plugins/beacon/ios/",
+        "//plugins/beacon/core:core_native_bundle": "plugins/beacon/apple/Resources/",
 
         # Check Path
-        "//plugins/check-path/ios:PlayerUICheckPathPlugin_Sources": "plugins/check-path/ios/",
-        "//plugins/check-path/swiftui:PlayerUISwiftUICheckPathPlugin_Sources": "plugins/check-path/swiftui/",
-        "//plugins/check-path/core:core_native_bundle": "plugins/check-path/ios/Resources/",
+        "//plugins/check-path/apple:PlayerUICheckPathPlugin_Sources": "plugins/check-path/apple/",
+        "//plugins/check-path/ios:PlayerUISwiftUICheckPathPlugin_Sources": "plugins/check-path/ios/",
+        "//plugins/check-path/core:core_native_bundle": "plugins/check-path/apple/Resources/",
 
         # Common Expressions
-        "//plugins/common-expressions/ios:PlayerUICommonExpressionsPlugin_Sources": "plugins/common-expressions/ios/",
-        "//plugins/common-expressions/core:core_native_bundle": "plugins/common-expressions/ios/Resources/",
+        "//plugins/common-expressions/apple:PlayerUICommonExpressionsPlugin_Sources": "plugins/common-expressions/apple/",
+        "//plugins/common-expressions/core:core_native_bundle": "plugins/common-expressions/apple/Resources/",
 
         # Common Types
-        "//plugins/common-types/ios:PlayerUICommonTypesPlugin_Sources": "plugins/common-types/ios/",
-        "//plugins/common-types/core:core_native_bundle": "plugins/common-types/ios/Resources/",
+        "//plugins/common-types/apple:PlayerUICommonTypesPlugin_Sources": "plugins/common-types/apple/",
+        "//plugins/common-types/core:core_native_bundle": "plugins/common-types/apple/Resources/",
 
         # Computed Properties
-        "//plugins/computed-properties/ios:PlayerUIComputedPropertiesPlugin_Sources": "plugins/computed-properties/ios/",
-        "//plugins/computed-properties/core:core_native_bundle": "plugins/computed-properties/ios/Resources/",
+        "//plugins/computed-properties/apple:PlayerUIComputedPropertiesPlugin_Sources": "plugins/computed-properties/apple/",
+        "//plugins/computed-properties/core:core_native_bundle": "plugins/computed-properties/apple/Resources/",
 
         # Console Logger (PrintLoggerPlugin)
-        "//plugins/console-logger/ios:PlayerUIPrintLoggerPlugin_Sources": "plugins/console-logger/ios/",
+        "//plugins/console-logger/apple:PlayerUIPrintLoggerPlugin_Sources": "plugins/console-logger/apple/",
 
         # Expression
-        "//plugins/expression/ios:PlayerUIExpressionPlugin_Sources": "plugins/expression/ios/",
-        "//plugins/expression/core:core_native_bundle": "plugins/expression/ios/Resources/",
+        "//plugins/expression/apple:PlayerUIExpressionPlugin_Sources": "plugins/expression/apple/",
+        "//plugins/expression/core:core_native_bundle": "plugins/expression/apple/Resources/",
 
         # External Action
-        "//plugins/external-action/ios:PlayerUIExternalActionPlugin_Sources": "plugins/external-action/ios/",
-        "//plugins/external-action/swiftui:PlayerUIExternalActionViewModifierPlugin_Sources": "plugins/external-action/swiftui/",
-        "//plugins/external-action/core:core_native_bundle": "plugins/external-action/ios/Resources/",
+        "//plugins/external-action/apple:PlayerUIExternalActionPlugin_Sources": "plugins/external-action/apple/",
+        "//plugins/external-action/ios:PlayerUIExternalActionViewModifierPlugin_Sources": "plugins/external-action/ios/",
+        "//plugins/external-action/core:core_native_bundle": "plugins/external-action/apple/Resources/",
 
         # Metrics
-        "//plugins/metrics/swiftui:PlayerUIMetricsPlugin_Sources": "plugins/metrics/swiftui/",
-        "//plugins/metrics/core:core_native_bundle": "plugins/metrics/swiftui/Resources/",
+        "//plugins/metrics/ios:PlayerUIMetricsPlugin_Sources": "plugins/metrics/ios/",
+        "//plugins/metrics/core:core_native_bundle": "plugins/metrics/ios/Resources/",
 
         # Pending Transaction
-        "//plugins/pending-transaction/swiftui:PlayerUISwiftUIPendingTransactionPlugin_Sources": "plugins/pending-transaction/swiftui/",
+        "//plugins/pending-transaction/ios:PlayerUISwiftUIPendingTransactionPlugin_Sources": "plugins/pending-transaction/ios/",
 
         # PubSub
-        "//plugins/pubsub/ios:PlayerUIPubSubPlugin_Sources": "plugins/pubsub/ios/",
-        "//plugins/pubsub/core:core_native_bundle": "plugins/pubsub/ios/Resources/",
+        "//plugins/pubsub/apple:PlayerUIPubSubPlugin_Sources": "plugins/pubsub/apple/",
+        "//plugins/pubsub/core:core_native_bundle": "plugins/pubsub/apple/Resources/",
 
         # Reference Assets
-        "//plugins/reference-assets/swiftui:PlayerUIReferenceAssets_Sources": "plugins/reference-assets/swiftui/",
-        "//plugins/reference-assets/swiftui/Resources:PlayerUIReferenceAssets_Resources": "plugins/reference-assets/swiftui/Resources/",
-        "//plugins/reference-assets/core:core_native_bundle": "plugins/reference-assets/swiftui/Resources/js/",
+        "//plugins/reference-assets/ios:PlayerUIReferenceAssets_Sources": "plugins/reference-assets/ios/",
+        "//plugins/reference-assets/ios/Resources:PlayerUIReferenceAssets_Resources": "plugins/reference-assets/ios/Resources/",
+        "//plugins/reference-assets/core:core_native_bundle": "plugins/reference-assets/ios/Resources/js/",
 
         # Stage Revert Data
-        "//plugins/stage-revert-data/ios:PlayerUIStageRevertDataPlugin_Sources": "plugins/stage-revert-data/ios/",
-        "//plugins/stage-revert-data/core:core_native_bundle": "plugins/stage-revert-data/ios/Resources/",
+        "//plugins/stage-revert-data/apple:PlayerUIStageRevertDataPlugin_Sources": "plugins/stage-revert-data/apple/",
+        "//plugins/stage-revert-data/core:core_native_bundle": "plugins/stage-revert-data/apple/Resources/",
 
         # Transition
-        "//plugins/transition/swiftui:PlayerUITransitionPlugin_Sources": "plugins/transition/swiftui",
+        "//plugins/transition/ios:PlayerUITransitionPlugin_Sources": "plugins/transition/ios",
 
         # Types Provider
-        "//plugins/types-provider/ios:PlayerUITypesProviderPlugin_Sources": "plugins/types-provider/ios/",
-        "//plugins/types-provider/core:core_native_bundle": "plugins/types-provider/ios/Resources/",
+        "//plugins/types-provider/apple:PlayerUITypesProviderPlugin_Sources": "plugins/types-provider/apple/",
+        "//plugins/types-provider/core:core_native_bundle": "plugins/types-provider/apple/Resources/",
     },
     podspec = ":PlayerUI_Podspec",
 )

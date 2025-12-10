@@ -1,11 +1,10 @@
 load("//tools/apple:util.bzl", "ios_plugin")
 
 ios_plugin(
-    name = "BeaconPlugin",
+    name = "TransitionPlugin",
     resources = [],
     deps = [
         "//apple/ios:PlayerUISwiftUI",
-        "//plugins/beacon/apple:PlayerUIBaseBeaconPlugin"  
     ],
     test_deps = [
         "//plugins/reference-assets/ios:PlayerUIReferenceAssets",

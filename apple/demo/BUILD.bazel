@@ -1,0 +1,48 @@
+load("@rules_player//ios:defs.bzl", "swift_library")
+load("@build_bazel_rules_apple//apple:ios.bzl", "ios_application")
+
+swift_library(
+    name = "PlayerUIDemoSources",
+    srcs = glob(["Sources/**/*.swift"]),
+    deps = [
+        "//apple/core:PlayerUI",
+        "//apple/ios:PlayerUISwiftUI",
+        "//apple/logger:PlayerUILogger",
+
+        "//apple/test-utils-core:PlayerUITestUtilitiesCore",
+
+        "//plugins/reference-assets/ios:PlayerUIReferenceAssets",
+
+        "//plugins/beacon/ios:PlayerUIBeaconPlugin",
+        "//plugins/common-types/apple:PlayerUICommonTypesPlugin",
+        "//plugins/common-expressions/apple:PlayerUICommonExpressionsPlugin",
+        "//plugins/expression/apple:PlayerUIExpressionPlugin",
+        "//plugins/external-action/apple:PlayerUIExternalActionPlugin",
+        "//plugins/external-action/ios:PlayerUIExternalActionViewModifierPlugin",
+        "//plugins/metrics/ios:PlayerUIMetricsPlugin",
+        "//plugins/console-logger/apple:PlayerUIPrintLoggerPlugin",
+        "//plugins/pending-transaction/ios:PlayerUISwiftUIPendingTransactionPlugin",
+        "//plugins/pubsub/apple:PlayerUIPubSubPlugin",
+        "//plugins/transition/ios:PlayerUITransitionPlugin",
+        "//plugins/types-provider/apple:PlayerUITypesProviderPlugin",
+    ]
+)
+
+ios_application(
+    name = "PlayerUIDemo",
+    bundle_id = "com.intuit.ios.player",
+    families = [
+        "iphone",
+        "ipad",
+    ],
+    infoplists = [":InfoPlist"],
+    minimum_os_version = "14.0",
+    visibility = ["//visibility:public"],
+    deps = [":PlayerUIDemoSources"],
+)
+
+filegroup(
+    name = "InfoPlist",
+    srcs = ["Resources/Info.plist"],
+    visibility = ["//visibility:public"],
+)

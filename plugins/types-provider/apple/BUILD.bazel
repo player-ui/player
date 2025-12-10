@@ -1,0 +1,6 @@
+load("//tools/apple:util.bzl", "apple_plugin")
+
+apple_plugin(
+    name = "TypesProviderPlugin",
+    resources = ["//plugins/types-provider/core:core_native_bundle"]
+)

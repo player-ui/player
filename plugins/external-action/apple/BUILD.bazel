@@ -1,0 +1,6 @@
+load("//tools/apple:util.bzl", "apple_plugin")
+
+apple_plugin(
+    name = "ExternalActionPlugin",
+    resources = ["//plugins/external-action/core:core_native_bundle"]
+)
