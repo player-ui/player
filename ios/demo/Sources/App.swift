@@ -16,6 +16,7 @@ import PlayerUIPubSubPlugin
 import PlayerUISwiftUIPendingTransactionPlugin
 import PlayerUITransitionPlugin
 import PlayerUITypesProviderPlugin
+import PlayerUIReproPlugin
 
 @main
 struct BazelApp: App {
@@ -57,7 +58,8 @@ struct MainView: View {
         TypesProviderPlugin(types: [], validators: [], formats: []),
         TransitionPlugin(popTransition: .pop),
         BeaconPlugin<DefaultBeacon> { print(String(describing: $0)) },
-        SwiftUIPendingTransactionPlugin<PendingTransactionPhases>()
+        SwiftUIPendingTransactionPlugin<PendingTransactionPhases>(),
+        ReproPlugin()
     ]
     var body: some View {
         SegmentControlView(

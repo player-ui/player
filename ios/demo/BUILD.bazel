@@ -25,6 +25,7 @@ swift_library(
         "//plugins/pubsub/ios:PlayerUIPubSubPlugin",
         "//plugins/transition/swiftui:PlayerUITransitionPlugin",
         "//plugins/types-provider/ios:PlayerUITypesProviderPlugin",
+        "//plugins/repro/swiftui:PlayerUIReproPlugin"
     ]
 )
 

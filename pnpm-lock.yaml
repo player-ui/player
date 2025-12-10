@@ -980,6 +980,15 @@ importers:
         specifier: workspace:*
         version: link:../../../core/make-flow
 
+  plugins/repro/core:
+    dependencies:
+      '@player-ui/player':
+        specifier: workspace:*
+        version: link:../../../core/player
+      '@player-ui/types':
+        specifier: workspace:*
+        version: link:../../../core/types
+
   plugins/shared-constants/core:
     dependencies:
       '@player-ui/player':
