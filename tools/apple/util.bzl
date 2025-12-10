@@ -4,8 +4,8 @@ default_dependencies = ["//apple/core:PlayerUI"]
 default_test_dependencies = ["//apple/internal-test-utils:PlayerUIInternalTestUtilities", "//apple/test-utils-core:PlayerUITestUtilitiesCore"]
 test_host = "//apple/demo:PlayerUIDemo"
 
-def ios_plugin(name, resources = [], deps = [], test_deps = []):
-  """Packages source files, creates swift library and tests for an iOS PlayerUI plugin
+def apple_plugin(name, resources = [], deps = [], test_deps = []):
+  """Packages source files, creates swift library and tests for an Apple PlayerUI plugin
 
   Args:
     name: The base name of this package
@@ -17,18 +17,18 @@ def ios_plugin(name, resources = [], deps = [], test_deps = []):
   """
   ios_pipeline(
       name = "PlayerUI" + name,
-      resources = resources, 
+      resources = resources,
       deps = deps + default_dependencies,
       test_deps = test_deps + default_test_dependencies,
-      hasUnitTests = True, 
+      hasUnitTests = True,
       hasViewInspectorTests = False,
       test_host = test_host,
       needsXCTest = False,
       bundle_name = name
   )
 
-def swiftui_plugin(name, resources = [], deps = [], test_deps = [], hasUITests = False):
-  """Packages source files, creates swift library and tests for a SwiftUI PlayerUI plugin
+def ios_plugin(name, resources = [], deps = [], test_deps = [], hasUITests = False):
+  """Packages source files, creates swift library and tests for an iOS (SwiftUI) PlayerUI plugin
 
   Args:
     name: The base name of this package
@@ -40,10 +40,10 @@ def swiftui_plugin(name, resources = [], deps = [], test_deps = [], hasUITests =
   """
   ios_pipeline(
       name = "PlayerUI" + name,
-      resources = resources, 
+      resources = resources,
       deps = deps + default_dependencies,
       test_deps = test_deps + default_test_dependencies,
-      hasUnitTests = False, 
+      hasUnitTests = False,
       hasViewInspectorTests = True,
       test_host = test_host,
       hasUITests = hasUITests,

@@ -1,6 +1,6 @@
-load("//tools/apple:util.bzl", "swiftui_plugin")
+load("//tools/apple:util.bzl", "ios_plugin")
 
-swiftui_plugin(
+ios_plugin(
     name = "SwiftUIPendingTransactionPlugin",
     resources = [],
     deps = [
