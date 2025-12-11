@@ -26,7 +26,7 @@ describe("ErrorController", () => {
 
     errorController = new ErrorController({
       logger: mockLogger,
-      dataController: mockDataController,
+      model: mockDataController,
     });
   });
 
@@ -171,6 +171,24 @@ describe("ErrorController", () => {
       expect(errorController.getCurrentError()).toBeUndefined();
       expect(errorController.getErrors()).toEqual([]);
     });
+
+    it("should delete errorState from data model", () => {
+      errorController.captureError(new Error("Test error"));
+
+      // Reset mock to track only clearErrors call
+      vitest.clearAllMocks();
+
+      errorController.clearErrors();
+
+      expect(mockDataController.delete).toHaveBeenCalledWith("errorState");
+    });
+
+    it("should handle missing data controller gracefully", () => {
+      const controller = new ErrorController({ logger: mockLogger });
+      controller.captureError(new Error("Test error"));
+
+      expect(() => controller.clearErrors()).not.toThrow();
+    });
   });
 
   describe("clearCurrentError", () => {
@@ -185,6 +203,24 @@ describe("ErrorController", () => {
 
       expect(errorController.getCurrentError()).toBeUndefined();
       expect(errorController.getErrors()).toHaveLength(2);
+    });
+
+    it("should delete errorState from data model", () => {
+      errorController.captureError(new Error("Test error"));
+
+      // Reset mock to track only clearCurrentError call
+      vitest.clearAllMocks();
+
+      errorController.clearCurrentError();
+
+      expect(mockDataController.delete).toHaveBeenCalledWith("errorState");
+    });
+
+    it("should handle missing data controller gracefully", () => {
+      const controller = new ErrorController({ logger: mockLogger });
+      controller.captureError(new Error("Test error"));
+
+      expect(() => controller.clearCurrentError()).not.toThrow();
     });
   });
 
@@ -251,6 +287,24 @@ describe("ErrorController", () => {
 
       const formatted = errorController.formatErrorForData(playerError);
       expect(formatted.errorType).toBe("my-custom-plugin");
+    });
+  });
+
+  describe("integration with middleware", () => {
+    it("should use middleware to protect errorState from external deletes", () => {
+      const middleware = errorController.getDataMiddleware();
+
+      // Middleware should block deletes by default
+      expect(middleware.name).toBe("error-state-middleware");
+
+      // Capture an error (sets errorState)
+      errorController.captureError(new Error("Test error"));
+      expect(mockDataController.set).toHaveBeenCalled();
+
+      // Clear error should delete via middleware
+      vitest.clearAllMocks();
+      errorController.clearCurrentError();
+      expect(mockDataController.delete).toHaveBeenCalledWith("errorState");
     });
   });
 });
