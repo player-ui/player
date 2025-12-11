@@ -2,6 +2,7 @@ import { SyncBailHook } from "tapable-ts";
 import type { Logger } from "../../logger";
 import type { DataController } from "../data/controller";
 import type { PlayerError, ErrorMetadata, ErrorSeverity } from "./types";
+import { ErrorStateMiddleware } from "./middleware";
 
 export interface ErrorControllerHooks {
   /**
@@ -17,8 +18,18 @@ export interface ErrorControllerHooks {
 export interface ErrorControllerOptions {
   /** Optional logger for error operations */
   logger?: Logger;
-  /** Required for setting data.errorState */
-  dataController?: DataController;
+  /** Data model for setting errorState */
+  model?: DataController;
+}
+
+/**
+ * Get the middleware for protecting errorState from external writes
+ * Should be added to DataController's middleware array
+ */
+export function getErrorStateMiddleware(options?: {
+  logger?: Logger;
+}): ErrorStateMiddleware {
+  return new ErrorStateMiddleware(options);
 }
 
 /** Default error format for data.errorState  */
@@ -39,14 +50,34 @@ export class ErrorController {
     onError: new SyncBailHook<[PlayerError], boolean | undefined>(),
   };
 
-  private readonly log?: Logger;
-  private readonly dataController?: DataController;
+  private options?: ErrorControllerOptions;
+  private readonly middleware: ErrorStateMiddleware;
+  /**
+   * Complete history of all captured errors in chronological order
+   * Newest errors are APPENDED to the end of the array
+   */
   private errorHistory: PlayerError[] = [];
   private currentError?: PlayerError;
 
   constructor(options: ErrorControllerOptions = {}) {
-    this.log = options.logger;
-    this.dataController = options.dataController;
+    this.options = options;
+
+    this.middleware = getErrorStateMiddleware({ logger: options.logger });
+  }
+
+  /**
+   * Get the middleware for protecting errorState
+   * This should be added to DataController's middleware array
+   */
+  public getDataMiddleware(): ErrorStateMiddleware {
+    return this.middleware;
+  }
+
+  /**
+   * Set options after initialization (e.g., to inject DataController and logger)
+   */
+  public setOptions(options: ErrorControllerOptions): void {
+    this.options = options;
   }
 
   /**
@@ -67,17 +98,17 @@ export class ErrorController {
     // Set as current error
     this.currentError = playerError;
 
-    this.log?.debug(
+    this.options?.logger?.debug(
       `[ErrorController] Captured error: ${error.message}`,
       playerError.metadata,
     );
 
     // Notify listeners and check if navigation should be skipped
     // Plugins can observe the error and optionally return true to bail
-    const shouldSkip = this.hooks.onError.call(playerError);
+    const shouldSkip = this.hooks.onError.call(playerError) ?? false;
 
     if (shouldSkip) {
-      this.log?.debug(
+      this.options?.logger?.debug(
         "[ErrorController] Error state navigation skipped by plugin",
       );
       return playerError;
@@ -121,39 +152,78 @@ export class ErrorController {
   }
 
   /**
-   * Clear all errors (history + current)
+   * Clear all errors (history + current + data model)
    */
   public clearErrors(): void {
     this.errorHistory = [];
     this.currentError = undefined;
-    this.log?.debug("[ErrorController] All errors cleared");
+    this.deleteErrorFromDataModel();
+    this.options?.logger?.debug("[ErrorController] All errors cleared");
   }
 
   /**
-   * Clear only current error, preserve history
+   * Clear only current error and remove from data model, preserve history
    */
   public clearCurrentError(): void {
     this.currentError = undefined;
-    this.log?.debug("[ErrorController] Current error cleared");
+    this.deleteErrorFromDataModel();
+    this.options?.logger?.debug("[ErrorController] Current error cleared");
   }
 
   /**
    * Write error to data model errorState
    */
   private setErrorInDataModel(playerError: PlayerError): void {
-    if (!this.dataController) {
-      this.log?.warn("[ErrorController] No DataController available");
+    if (!this.options?.model) {
+      this.options?.logger?.warn(
+        "[ErrorController] No DataController available",
+      );
       return;
     }
 
     try {
       const formattedError = this.formatErrorForData(playerError);
-      this.dataController.set([["errorState", formattedError]]);
-      this.log?.debug(
+
+      // Temporarily allow writes to errorState
+      this.middleware?.enableWrites();
+      this.options.model.set([["errorState", formattedError]]);
+      this.middleware?.disableWrites();
+
+      this.options?.logger?.debug(
         "[ErrorController] Error set in data model at 'data.errorState'",
       );
     } catch (e) {
-      this.log?.error("[ErrorController] Failed to set error in data model", e);
+      this.middleware?.disableWrites();
+      this.options?.logger?.error(
+        "[ErrorController] Failed to set error in data model",
+        e,
+      );
+    }
+  }
+
+  /**
+   * Remove errorState from data model
+   */
+  private deleteErrorFromDataModel(): void {
+    if (!this.options?.model) {
+      return;
+    }
+
+    try {
+      // Temporarily allow deletes to errorState
+      this.middleware?.enableWrites();
+      this.options.model.delete("errorState");
+      this.middleware?.disableWrites();
+
+      this.options?.logger?.debug(
+        "[ErrorController] errorState deleted from data model",
+      );
+    } catch (e) {
+      this.middleware?.disableWrites();
+      this.options?.logger?.error(
+        "[ErrorController] Failed to delete errorState from data model",
+        e,
+      );
     }
   }
 }
