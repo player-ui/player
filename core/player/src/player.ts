@@ -219,7 +219,6 @@ export class Player {
     let expressionEvaluator: ExpressionEvaluator;
     // eslint-disable-next-line prefer-const
     let dataController: DataController;
-    let errorController: ErrorController;
 
     const pathResolver = new BindingParser({
       get: (binding) => {
@@ -244,9 +243,16 @@ export class Player {
 
     this.hooks.validationController.call(validationController);
 
+    const errorController = new ErrorController();
+
+    this.hooks.errorController.call(errorController);
+
     dataController = new DataController(userFlow.data, {
       pathResolver,
-      middleware: validationController.getDataMiddleware(),
+      middleware: [
+        ...validationController.getDataMiddleware(),
+        errorController.getDataMiddleware(),
+      ],
       logger: this.logger,
     });
 
@@ -267,13 +273,10 @@ export class Player {
       (binding) => schema.getApparentType(binding)?.default,
     );
 
-    // eslint-disable-next-line prefer-const
-    errorController = new ErrorController({
+    errorController.setOptions({
+      model: dataController,
       logger: this.logger,
-      dataController,
     });
-
-    this.hooks.errorController.call(errorController);
 
     // eslint-disable-next-line prefer-const
     let viewController: ViewController;
