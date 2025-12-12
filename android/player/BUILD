@@ -47,11 +47,19 @@ unit_test_deps = [
     "//jvm/testutils:with-runtimes",
     artifact("io.mockk:mockk"),
     artifact("org.jetbrains.kotlinx:kotlinx-coroutines-test"),
+    artifact("androidx.test:core"),
 ]
 
 instrumented_test_deps = [
+    "//jvm/testutils:with-runtimes",
     "//android/testutils:with-runtime",
+    artifact("io.mockk:mockk"),
+    artifact("org.jetbrains.kotlinx:kotlinx-coroutines-test"),
+    artifact("androidx.test:core"),
+    "//jvm:kotlin_serialization"
 ]
+
+instrumented_test_classes = ['com.intuit.playerui.android.AndroidPlayerTest', 'com.intuit.playerui.android.AssetContextTest', 'com.intuit.playerui.android.AssetContextAndroidTest', 'com.intuit.playerui.android.renderer.NestedAssetTest', 'com.intuit.playerui.android.renderer.HydrationScopeTest', 'com.intuit.playerui.android.renderer.SimpleAssetTest', 'com.intuit.playerui.android.renderer.BrokenAssetTest', 'com.intuit.playerui.android.extensions.IntoKtTest', 'com.intuit.playerui.android.registry.RegistryPluginTest']
 
 kt_android(
     # TODO: Maybe rename to player-android
@@ -61,7 +69,9 @@ kt_android(
     main_exports = main_exports,
     main_resources = main_resources,
     unit_test_deps = unit_test_deps,
+    main_opts = "//jvm:test_options",
     instrumented_test_deps = instrumented_test_deps,
+    instrumented_test_classes = instrumented_test_classes,
     plugins = ["//android:jetpack_compose_compiler_plugin"],
-    unit_test_package = "com.intuit.playerui.android",
+    unit_test_package = "com.intuit.playerui.android"
 )

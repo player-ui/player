@@ -2,6 +2,7 @@ package com.intuit.playerui.android.renderer
 
 import android.view.View
 import android.widget.TextView
+import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.SuspendableAsset
@@ -22,13 +23,15 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json.Default.encodeToString
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNotEquals
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 internal class HydrationScopeTest : BaseRenderableAssetTest() {
     private var completed: Boolean = false
 
@@ -64,7 +67,8 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
         AssetContext(mockContext, asset, player, ::TestAsset)
     }
 
-    @BeforeEach fun setup() {
+    @Before
+    fun setup() {
         // Need to start flow for flowScope to be valid
         player.start(makeFlow(encodeToString(NodeSerializer(), asset)))
     }

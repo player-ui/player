@@ -1,6 +1,7 @@
 package com.intuit.playerui.android
 
 import android.content.Context
+import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.utils.SimpleAsset
 import com.intuit.playerui.core.asset.Asset
@@ -9,15 +10,21 @@ import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.utils.start
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.junit4.MockKRule
 import io.mockk.mockk
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotEquals
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+import org.junit.Assert.assertThrows
+import org.junit.Rule
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 internal class AssetContextTest {
+    @get:Rule
+    val mockkrule = MockKRule(this)
     @MockK lateinit var context: Context
 
     @MockK lateinit var context2: Context
@@ -27,7 +34,7 @@ internal class AssetContextTest {
     private val factory = { _: AssetContext -> renderable }
     lateinit var assetContext: AssetContext
 
-    @BeforeEach
+    @Before
     fun setup() {
         every { asset.id } returns "some-id"
         assetContext = AssetContext(
@@ -72,7 +79,7 @@ internal class AssetContextTest {
         val player = AndroidPlayer().apply {
             start(SimpleAsset.sampleFlow)
         }
-        assertThrows<PlayerException> {
+        assertThrows(PlayerException::class.java) {
             AssetContext(null, asset, player, factory).withStyles(R.style.TextAppearance_AppCompat)
         }
         assertTrue(player.state is ErrorState)

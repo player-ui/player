@@ -1,17 +1,20 @@
 package com.intuit.playerui.android.renderer
 
 import android.widget.TextView
+import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.R
 import com.intuit.playerui.android.utils.SimpleAsset
 import com.intuit.playerui.android.utils.SimpleAsset.Companion.sampleFlow
 import com.intuit.playerui.android.utils.stringify
 import com.intuit.playerui.android.withContext
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotEquals
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 internal class SimpleAssetTest : BaseRenderableAssetTest() {
     override val asset get() = SimpleAsset.sampleAsset
 

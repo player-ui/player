@@ -3,16 +3,21 @@ package com.intuit.playerui.android.extensions
 import android.view.View
 import android.view.View.GONE
 import android.view.ViewGroup
+import androidx.test.runner.AndroidJUnit4
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.junit5.MockKExtension
+import io.mockk.junit4.MockKRule
 import io.mockk.verify
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
 
-@ExtendWith(MockKExtension::class)
+@RunWith(AndroidJUnit4::class)
 internal class IntoKtTest {
+    @get:Rule
+    val mockkRule = MockKRule(this)
+
     @MockK
     lateinit var view1: View
 
@@ -28,7 +33,7 @@ internal class IntoKtTest {
     @MockK(relaxed = true)
     lateinit var rootView: ViewGroup
 
-    @BeforeEach
+    @Before
     fun setup() {
         every { view1.parent } answers { rootView }
         every { view2.parent } answers { rootView }

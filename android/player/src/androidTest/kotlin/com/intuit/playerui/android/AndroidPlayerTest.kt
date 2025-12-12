@@ -1,6 +1,7 @@
 package com.intuit.playerui.android
 
 import android.content.Context
+import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.utils.SimpleAsset
 import com.intuit.playerui.android.utils.TestAssetsPlugin
@@ -14,19 +15,22 @@ import com.intuit.playerui.plugins.pubsub.pubSubPlugin
 import com.intuit.playerui.utils.start
 import com.intuit.playerui.utils.test.runBlockingTest
 import io.mockk.impl.annotations.MockK
-import io.mockk.junit5.MockKExtension
+import io.mockk.junit4.MockKRule
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
 
-@ExtendWith(MockKExtension::class)
+@RunWith(AndroidJUnit4::class)
 internal class AndroidPlayerTest {
+    @get:Rule
+    val mockkrule = MockKRule(this)
     @MockK lateinit var mockContext: Context
 
     @Test
@@ -103,7 +107,7 @@ internal class AndroidPlayerTest {
     fun `release puts player in unusable state`() {
         val player = AndroidPlayer()
         player.release()
-        assertThrows<PlayerRuntimeException> {
+        assertThrows(PlayerRuntimeException::class.java) {
             player.start(SimpleAsset.sampleFlow)
         }
     }
@@ -129,7 +133,7 @@ internal class AndroidPlayerTest {
         val asset = player.awaitFirstView(SimpleAsset.sampleFlow)!!
         assertEquals(
             "DecodableAsset.Serializer.serialize is not supported",
-            assertThrows<SerializationException> {
+            assertThrows(SerializationException::class.java) {
                 Json.encodeToString(serializer, asset)
             }.message,
         )

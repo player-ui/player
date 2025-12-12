@@ -3,6 +3,8 @@ package com.intuit.playerui.android.renderer
 import android.content.Context
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.StaleViewException
@@ -13,16 +15,19 @@ import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.utils.start
 import io.mockk.impl.annotations.MockK
-import io.mockk.junit5.MockKExtension
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
+import io.mockk.junit4.MockKRule
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
 
-@ExtendWith(MockKExtension::class)
+@RunWith(AndroidJUnit4::class)
 internal class BrokenAssetTest {
+    @get:Rule
+    val mockkrule = MockKRule(this)
     private val runtime = BrokenAsset.runtime
 
     @MockK
@@ -36,13 +41,14 @@ internal class BrokenAssetTest {
         AssetContext(null, runtime.asset(), player, ::BrokenAsset)
     }
 
-    @BeforeEach fun setup() {
+    @Before
+    fun setup() {
         player.start(BrokenAsset.sampleFlow)
     }
 
     @Test
     fun `invalidate view should fail on first render`() {
-        assertThrows<StaleViewException> {
+        assertThrows(StaleViewException::class.java) {
             BrokenAsset(baseContext.copy(asset = runtime.asset(shouldFail = true))).render(mockContext)
         }
     }
@@ -71,7 +77,7 @@ internal class BrokenAssetTest {
     fun `cannot render without a context`() {
         assertEquals(
             "Android context not found! Ensure the asset is rendered with a valid Android context.",
-            assertThrows<PlayerException> {
+            assertThrows(PlayerException::class.java) {
                 BrokenAsset(baseContext).requireContext()
             }.message,
         )
