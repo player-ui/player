@@ -64,7 +64,7 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
     }
 
     override val assetContext: AssetContext by lazy {
-        AssetContext(mockContext, asset, player, ::TestAsset)
+        AssetContext(appContext, asset, player, ::TestAsset)
     }
 
     @Before
@@ -76,7 +76,7 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
     @Test
     fun `test awaiting async view stub doesn't cancel parent scope`() = runBlocking {
         val test = TestAsset(assetContext)
-        val asyncView = test.render(mockContext) as SuspendableAsset.AsyncViewStub
+        val asyncView = test.render(appContext) as SuspendableAsset.AsyncViewStub
         test.currentHydrationScope.cancel("hello")
         assertNull(asyncView.awaitView())
     }
@@ -84,7 +84,7 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
     @Test
     fun `test hydration scope can launch coroutines`() = runBlocking {
         val test = TestAsset(assetContext)
-        val asyncView = test.render(mockContext) as SuspendableAsset.AsyncViewStub
+        val asyncView = test.render(appContext) as SuspendableAsset.AsyncViewStub
         asyncView.awaitView()
         waitForCompleted()
     }
@@ -92,22 +92,22 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
     @Test
     fun `test existing hydration scope is cancelled on re-render`() = runBlocking {
         val test = TestAsset(assetContext)
-        test.render(mockContext)
+        test.render(appContext)
         val currentHydrationScope = test.currentHydrationScope
         assertTrue(currentHydrationScope.isActive)
         player.recycle()
-        test.render(mockContext)
+        test.render(appContext)
         assertFalse(currentHydrationScope.isActive)
     }
 
     @Test
     fun `test hydration scope is refreshed on re-render`() = runBlocking {
         val test = TestAsset(assetContext)
-        test.render(mockContext)
+        test.render(appContext)
         val firstHydrationScope = test.currentHydrationScope
         assertTrue(firstHydrationScope.isActive)
         player.recycle()
-        test.render(mockContext)
+        test.render(appContext)
         val secondHydrationScope = test.currentHydrationScope
         assertTrue(secondHydrationScope.isActive)
         assertFalse(firstHydrationScope.isActive)
@@ -117,8 +117,9 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
     @Test
     fun `test hydration scope is cancelled on flow end`() = runBlocking {
         val test = TestAsset(assetContext)
-        test.render(mockContext)
+        test.render(appContext)
         player.inProgressState?.forceTransition("")
+        waitForCondition { !player.flowScope!!.isActive }
         assertFalse(player.flowScope!!.isActive)
         assertFalse(test.currentHydrationScope.isActive)
         assertFalse(completed)
@@ -127,7 +128,7 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
     @Test
     fun `test hydration scope is cancelled on player release`() = runBlocking {
         val test = TestAsset(assetContext)
-        test.render(mockContext)
+        test.render(appContext)
         player.release()
         assertFalse(player.flowScope!!.isActive)
         assertFalse(test.currentHydrationScope.isActive)

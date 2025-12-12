@@ -14,24 +14,18 @@ import com.intuit.playerui.android.utils.TestAssetsPlugin
 import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.utils.start
-import io.mockk.impl.annotations.MockK
-import io.mockk.junit4.MockKRule
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 internal class BrokenAssetTest {
-    @get:Rule
-    val mockkrule = MockKRule(this)
     private val runtime = BrokenAsset.runtime
 
-    @MockK
-    lateinit var mockContext: Context
+    val appContext: Context = ApplicationProvider.getApplicationContext()
 
     val player: AndroidPlayer by lazy {
         AndroidPlayer(TestAssetsPlugin)
@@ -49,24 +43,24 @@ internal class BrokenAssetTest {
     @Test
     fun `invalidate view should fail on first render`() {
         assertThrows(StaleViewException::class.java) {
-            BrokenAsset(baseContext.copy(asset = runtime.asset(shouldFail = true))).render(mockContext)
+            BrokenAsset(baseContext.copy(asset = runtime.asset(shouldFail = true))).render(appContext)
         }
     }
 
     @Test
     fun `invalidate view should handle gracefully in a rehydrate (if asset renders properly the second time)`() {
         assertTrue(
-            BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Frame))).render(mockContext) is FrameLayout,
+            BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Frame))).render(appContext) is FrameLayout,
         )
         assertTrue(
-            BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Linear))).render(mockContext) is LinearLayout,
+            BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Linear))).render(appContext) is LinearLayout,
         )
     }
 
     @Test
     fun `manual rehydration should fail the player on invalidate view`() {
         BrokenAsset(baseContext.copy(asset = runtime.asset(layout = BrokenAsset.Layout.Frame))).apply {
-            assertTrue(render(mockContext) is FrameLayout)
+            assertTrue(render(appContext) is FrameLayout)
             data.layout = BrokenAsset.Layout.Linear
             rehydrate()
         }

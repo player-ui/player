@@ -35,12 +35,12 @@ internal class NestedAssetTest : BaseRenderableAssetTest() {
     }
 
     override val assetContext: AssetContext by lazy {
-        AssetContext(mockContext, asset, player, ::NestedAsset)
+        AssetContext(appContext, asset, player, ::NestedAsset)
     }
 
     @Test
     fun `tested nested asset constructs`() = runBlocking {
-        val nested = NestedAsset(assetContext).render(mockContext).let {
+        val nested = NestedAsset(assetContext).render(appContext).let {
             if (it is AsyncViewStub) it.awaitView() else it
         }
         assertTrue(nested is LinearLayout)
@@ -49,12 +49,12 @@ internal class NestedAssetTest : BaseRenderableAssetTest() {
     @Test
     fun `test nested asset context`() = runBlockingTest {
         val asset = player.awaitFirstView(NestedAsset.sampleFlow)!! as NestedAsset
-        asset.render(mockContext).let {
+        asset.render(appContext).let {
             if (it is AsyncViewStub) it.awaitView() else it
         }
-        assertEquals(mockContext, NestedAsset.dummy?.context)
+        assertEquals(appContext, NestedAsset.dummy?.context)
         NestedAsset.dummy2?.forEach {
-            assertEquals(mockContext, it?.context)
+            assertEquals(appContext, it?.context)
         } ?: Unit
     }
 
@@ -76,7 +76,7 @@ internal class NestedAssetTest : BaseRenderableAssetTest() {
 
         assertFalse(onHydrationStarted)
         assertFalse(onHydrationCompleted)
-        val view = asset.render(mockContext) as AsyncViewStub
+        val view = asset.render(appContext) as AsyncViewStub
         assertTrue(onHydrationStarted)
         assertFalse(onHydrationCompleted)
         view.awaitView()

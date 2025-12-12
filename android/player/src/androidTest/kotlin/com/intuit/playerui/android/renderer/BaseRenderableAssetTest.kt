@@ -2,6 +2,7 @@ package com.intuit.playerui.android.renderer
 
 import android.content.Context
 import android.widget.TextView
+import androidx.test.core.app.ApplicationProvider
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.RenderableAsset
@@ -50,11 +51,10 @@ internal abstract class BaseRenderableAssetTest {
             lastBeaconed = BeaconArgs(action as String, element as String, asset as Asset, data)
         }
 
-        coEvery { mockRenderableAsset.render(any()) } returns TextView(mockContext)
+        coEvery { mockRenderableAsset.render(any()) } returns TextView(appContext)
     }
 
-    @MockK
-    lateinit var mockContext: Context
+    val appContext: Context = ApplicationProvider.getApplicationContext()
 
     @MockK
     lateinit var mockRenderableAsset: RenderableAsset
@@ -72,7 +72,7 @@ internal abstract class BaseRenderableAssetTest {
     }
 
     open val assetContext by lazy {
-        AssetContext(mockContext, asset, player) { mockRenderableAsset }
+        AssetContext(appContext, asset, player) { mockRenderableAsset }
     }
 
     abstract val asset: Asset
