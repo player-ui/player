@@ -8,11 +8,11 @@ import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Node
+import com.intuit.playerui.core.bridge.runtime.runtimeFactory
 import com.intuit.playerui.core.bridge.runtime.serialize
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializer
 import com.intuit.playerui.core.flow.forceTransition
 import com.intuit.playerui.core.player.state.inProgressState
-import com.intuit.playerui.j2v8.bridge.runtime.J2V8
 import com.intuit.playerui.plugins.coroutines.flowScope
 import com.intuit.playerui.utils.makeFlow
 import com.intuit.playerui.utils.start
@@ -50,7 +50,7 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
         val currentHydrationScope get() = hydrationScope
     }
 
-    override val asset: Asset = J2V8.create().serialize(
+    override val asset: Asset = runtimeFactory.create().serialize(
         mapOf(
             "id" to "some-id",
             "type" to "test",
@@ -130,6 +130,7 @@ internal class HydrationScopeTest : BaseRenderableAssetTest() {
         val test = TestAsset(assetContext)
         test.render(appContext)
         player.release()
+        waitForCondition { !player.flowScope!!.isActive }
         assertFalse(player.flowScope!!.isActive)
         assertFalse(test.currentHydrationScope.isActive)
         assertFalse(completed)

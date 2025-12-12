@@ -14,17 +14,18 @@ import io.mockk.junit4.MockKRule
 import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Test
-import org.junit.Assert.assertThrows
 import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 internal class AssetContextTest {
     @get:Rule
     val mockkrule = MockKRule(this)
+
     @MockK lateinit var context: Context
 
     @MockK lateinit var context2: Context

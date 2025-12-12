@@ -51,7 +51,7 @@ unit_test_deps = [
 ]
 
 instrumented_test_deps = [
-    "//jvm/testutils:with-runtimes",
+    "//jvm/testutils",
     "//android/testutils:with-runtime",
     artifact("io.mockk:mockk"),
     artifact("org.jetbrains.kotlinx:kotlinx-coroutines-test"),
@@ -59,6 +59,7 @@ instrumented_test_deps = [
     "//jvm:kotlin_serialization"
 ]
 
+# TODO: Update this to be updated automatically instead of maintaining a list manually
 instrumented_test_classes = ['com.intuit.playerui.android.AndroidPlayerTest', 'com.intuit.playerui.android.AssetContextTest', 'com.intuit.playerui.android.AssetContextAndroidTest', 'com.intuit.playerui.android.renderer.NestedAssetTest', 'com.intuit.playerui.android.renderer.HydrationScopeTest', 'com.intuit.playerui.android.renderer.SimpleAssetTest', 'com.intuit.playerui.android.renderer.BrokenAssetTest', 'com.intuit.playerui.android.extensions.IntoKtTest', 'com.intuit.playerui.android.registry.RegistryPluginTest']
 
 kt_android(
