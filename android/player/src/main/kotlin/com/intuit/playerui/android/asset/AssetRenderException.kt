@@ -3,7 +3,7 @@ package com.intuit.playerui.android.asset
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.core.player.PlayerException
 
-internal class AssetRenderException : PlayerException {
+class AssetRenderException : PlayerException {
     private val assetParentPath = mutableListOf<AssetContext>()
 
     val rootAsset: AssetContext
