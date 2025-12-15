@@ -2,10 +2,11 @@ package com.intuit.playerui.android.renderer
 
 import android.content.Context
 import android.widget.TextView
+import androidx.test.core.app.ApplicationProvider
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.android.extensions.CoroutineTestDispatcherExtension
+import com.intuit.playerui.android.utils.CoroutineTestDispatcherRule
 import com.intuit.playerui.android.utils.TestAssetsPlugin
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.flow.Flow
@@ -15,15 +16,19 @@ import com.intuit.playerui.plugins.beacon.BeaconPlugin
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.junit5.MockKExtension
+import io.mockk.junit4.MockKRule
 import io.mockk.mockk
 import io.mockk.spyk
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.Before
+import org.junit.Rule
 
-@ExtendWith(MockKExtension::class)
-@ExtendWith(CoroutineTestDispatcherExtension::class)
 internal abstract class BaseRenderableAssetTest {
+    @get:Rule
+    val mockKRule = MockKRule(this)
+
+    @get:Rule
+    val coroutineRule = CoroutineTestDispatcherRule()
+
     data class BeaconArgs(
         val action: String,
         val element: String,
@@ -38,7 +43,7 @@ internal abstract class BaseRenderableAssetTest {
     var lastBeaconed: BeaconArgs? = null
         private set
 
-    @BeforeEach
+    @Before
     fun mockBeaconPlugin() {
         every { beaconPlugin.beacon(any(), any(), any(), any()) } answers {
             val (action, element, asset, data) = args
@@ -46,11 +51,10 @@ internal abstract class BaseRenderableAssetTest {
             lastBeaconed = BeaconArgs(action as String, element as String, asset as Asset, data)
         }
 
-        coEvery { mockRenderableAsset.render(any()) } returns TextView(mockContext)
+        coEvery { mockRenderableAsset.render(any()) } returns TextView(appContext)
     }
 
-    @MockK
-    lateinit var mockContext: Context
+    val appContext: Context = ApplicationProvider.getApplicationContext()
 
     @MockK
     lateinit var mockRenderableAsset: RenderableAsset
@@ -68,7 +72,7 @@ internal abstract class BaseRenderableAssetTest {
     }
 
     open val assetContext by lazy {
-        AssetContext(mockContext, asset, player) { mockRenderableAsset }
+        AssetContext(appContext, asset, player) { mockRenderableAsset }
     }
 
     abstract val asset: Asset

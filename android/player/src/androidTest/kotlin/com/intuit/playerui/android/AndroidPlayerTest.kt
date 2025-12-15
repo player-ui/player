@@ -1,6 +1,7 @@
 package com.intuit.playerui.android
 
-import android.content.Context
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.utils.SimpleAsset
 import com.intuit.playerui.android.utils.TestAssetsPlugin
@@ -13,27 +14,23 @@ import com.intuit.playerui.plugins.pubsub.PubSubPlugin
 import com.intuit.playerui.plugins.pubsub.pubSubPlugin
 import com.intuit.playerui.utils.start
 import com.intuit.playerui.utils.test.runBlockingTest
-import io.mockk.impl.annotations.MockK
-import io.mockk.junit5.MockKExtension
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import org.junit.runner.RunWith
 
-@ExtendWith(MockKExtension::class)
+@RunWith(AndroidJUnit4::class)
 internal class AndroidPlayerTest {
-    @MockK lateinit var mockContext: Context
-
     @Test
     fun `test list constructor`() {
         val player = AndroidPlayer(listOf())
 
-        assertEquals(5, player.plugins.size)
+        assertEquals(6, player.plugins.size)
         assertNotNull(player.beaconPlugin)
         assertNotNull(player.pubSubPlugin)
     }
@@ -42,7 +39,7 @@ internal class AndroidPlayerTest {
     fun `injects default plugins with self-contained headless player`() {
         val player = AndroidPlayer()
 
-        assertEquals(5, player.plugins.size)
+        assertEquals(6, player.plugins.size)
         assertNotNull(player.beaconPlugin)
         assertNotNull(player.pubSubPlugin)
     }
@@ -63,7 +60,7 @@ internal class AndroidPlayerTest {
         val beaconPlugin = BeaconPlugin()
         val player = AndroidPlayer(pubSubPlugin, beaconPlugin)
 
-        assertEquals(5, player.plugins.size)
+        assertEquals(6, player.plugins.size)
         assertEquals(beaconPlugin, player.beaconPlugin)
         assertEquals(pubSubPlugin, player.pubSubPlugin)
     }
@@ -103,7 +100,7 @@ internal class AndroidPlayerTest {
     fun `release puts player in unusable state`() {
         val player = AndroidPlayer()
         player.release()
-        assertThrows<PlayerRuntimeException> {
+        assertThrows(PlayerRuntimeException::class.java) {
             player.start(SimpleAsset.sampleFlow)
         }
     }
@@ -114,7 +111,7 @@ internal class AndroidPlayerTest {
         player.registerAsset("simple", ::SimpleAsset)
         val asset = player.awaitFirstView(SimpleAsset.sampleFlow)!!
         assertNull(player.getCachedAssetView(asset.assetContext))
-        assertNotNull(asset.render(mockContext))
+        assertNotNull(asset.render(ApplicationProvider.getApplicationContext()))
         assertNotNull(player.getCachedAssetView(asset.assetContext))
         player.recycle()
         assertNull(player.getCachedAssetView(asset.assetContext))
@@ -129,7 +126,7 @@ internal class AndroidPlayerTest {
         val asset = player.awaitFirstView(SimpleAsset.sampleFlow)!!
         assertEquals(
             "DecodableAsset.Serializer.serialize is not supported",
-            assertThrows<SerializationException> {
+            assertThrows(SerializationException::class.java) {
                 Json.encodeToString(serializer, asset)
             }.message,
         )

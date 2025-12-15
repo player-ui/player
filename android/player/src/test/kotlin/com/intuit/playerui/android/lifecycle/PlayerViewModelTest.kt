@@ -2,7 +2,7 @@ package com.intuit.playerui.android.lifecycle
 
 import android.util.Level
 import android.util.clearLogs
-import com.intuit.playerui.android.extensions.CoroutineTestDispatcherExtension
+import com.intuit.playerui.android.utils.CoroutineTestDispatcherExtension
 import com.intuit.playerui.android.utils.SimpleAsset
 import com.intuit.playerui.core.bridge.PlayerRuntimeException
 import com.intuit.playerui.core.bridge.runtime.Runtime
