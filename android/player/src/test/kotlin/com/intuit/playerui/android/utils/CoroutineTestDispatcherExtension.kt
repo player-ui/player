@@ -1,4 +1,4 @@
-package com.intuit.playerui.android.extensions
+package com.intuit.playerui.android.utils
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
