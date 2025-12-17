@@ -111,11 +111,37 @@ class ControlledAssetTests: XCTestCase {
         XCTAssertFalse(model === model2)
         watchData.cancel()
     }
+    
+    func testDecoderError() throws {
+        class SomeAsset: ControlledAsset<SomeData, AssetViewModel<SomeData>> {}
+        
+        let val = context.evaluateScript("({id: 'someId', type: 'someType', value: 123 })")
+        let partialMatch = PartialMatchFingerprintPlugin()
+        partialMatch.context = context
+        partialMatch.setMapping(assetId: "someId", index: 0)
+        let registry = SwiftUIRegistry(logger: TapableLogger())
+        registry.register("someType", asset: SomeAsset.self)
+        registry.partialMatchRegistry = partialMatch
+        
+        guard let value = val else { return XCTFail("value should not have been nil") }
+        
+        var thrownError: Error?
+        
+        do {
+            try registry.decode(value)
+        } catch {
+            thrownError = error
+        }
+        
+        guard let err = thrownError else { return XCTFail("expected asset to throw error while decoding") }
+        XCTAssertTrue(err.playerDescription.contains("Exception occurred in asset with id 'someId' of type 'someType'"))
+    }
 }
 
 private extension Data {
     static let asset11 = String.asset11.data(using: .utf8)!
     static let asset12 = String.asset12.data(using: .utf8)!
+    static let asset13 = String.asset13.data(using: .utf8)!
 }
 
 private extension String {
@@ -125,6 +151,10 @@ private extension String {
 
     static let asset12 = """
     { "id": "abc", "type": "Equatable", "value": "value2" }
+    """
+    
+    static let asset13 = """
+    { "id": 12, "type": { "value": "Equatable" } }
     """
 }
 

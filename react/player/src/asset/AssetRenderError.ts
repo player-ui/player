@@ -23,6 +23,8 @@ export class AssetRenderError extends Error {
         this.innerExceptionMessage,
       );
     }
+
+    this.message = this.initialMessage;
   }
 
   private updateMessage() {
