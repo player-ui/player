@@ -3,17 +3,18 @@
   "version": "0.0.0-PLACEHOLDER",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./src/index.ts",
       "node": "./dist/index.js",
       "require": "./dist/index.js",
-      "import": "./dist/index.mjs"
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.js"
     },
     "./dist/index.css": "./dist/index.css",
     "./manager": "./manager.mjs",
     "./preview": "./preview.mjs",
     "./package.json": "./package.json"
   },
-  "main": "./src/index.ts",
+  "main": "./dist/index.js",
   "files": [
     "src",
     "dist",

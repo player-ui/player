@@ -1,11 +1,13 @@
+import type { Preview } from "@storybook/react-webpack5";
 import { PlayerDecorator } from "@player-ui/storybook";
 import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin-react";
 import { CommonTypesPlugin } from "@player-ui/common-types-plugin";
 import { DataChangeListenerPlugin } from "@player-ui/data-change-listener-plugin";
 import { ComputedPropertiesPlugin } from "@player-ui/computed-properties-plugin";
 import * as dslRefComponents from "@player-ui/reference-assets-plugin-components";
-import RefXLR from "@player-ui/reference-assets-plugin/dist/xlr/manifest.js";
 
+// @ts-expect-error referencing the pre-built output
+import RefXLR from "@player-ui/reference-assets-plugin/dist/xlr/manifest.js";
 import "@player-ui/reference-assets-plugin-react/dist/index.css";
 
 const reactPlayerPlugins = [
@@ -38,7 +40,7 @@ export const parameters = {
   },
 };
 
-const preview = {
+const preview: Preview = {
   parameters,
   decorators: [PlayerDecorator],
 };

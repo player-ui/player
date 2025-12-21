@@ -335,7 +335,7 @@ static let imageBasic: String = """
       "id": "image-1",
       "type": "image",
       "metaData": {
-        "ref": "https://player-ui.github.io/latest/logo/logo-light-large.png"
+        "ref": "https://raw.githubusercontent.com/player-ui/player/refs/tags/0.14.1/docs/site/src/assets/logo/logo-light-large.png"
       }
     }
   ],
@@ -367,7 +367,7 @@ static let imageWithAccessibility: String = """
       "id": "image-1",
       "type": "image",
       "metaData": {
-        "ref": "https://player-ui.github.io/latest/logo/logo-light-large.png",
+        "ref": "https://raw.githubusercontent.com/player-ui/player/refs/tags/0.14.1/docs/site/src/assets/logo/logo-light-large.png",
         "accessibility": "This is accessibility text for an image"
       },
       "placeholder": "This is placeholder text for an image"
@@ -401,7 +401,7 @@ static let imageWithCaption: String = """
       "id": "image-1",
       "type": "image",
       "metaData": {
-        "ref": "https://player-ui.github.io/latest/logo/logo-light-large.png"
+        "ref": "https://raw.githubusercontent.com/player-ui/player/refs/tags/0.14.1/docs/site/src/assets/logo/logo-light-large.png"
       },
       "caption": {
         "asset": {
@@ -440,7 +440,7 @@ static let imageWithPlaceholder: String = """
       "id": "image-1",
       "type": "image",
       "metaData": {
-        "ref": "https://player-ui.github.io/latest/logo/logo-light-large.png"
+        "ref": "https://raw.githubusercontent.com/player-ui/player/refs/tags/0.14.1/docs/site/src/assets/logo/logo-light-large.png"
       },
       "placeholder": "This is placeholder text for an image"
     }

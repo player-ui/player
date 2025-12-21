@@ -316,7 +316,7 @@ export const imageFlow = makeFlow({
   id: 'image-basic',
   type: 'image',
   metaData: {
-    ref: 'https://player-ui.github.io/latest/logo/logo-light-large.png',
+    ref: 'https://raw.githubusercontent.com/player-ui/player/refs/tags/0.14.1/docs/site/src/assets/logo/logo-light-large.png',
   },
 });
 
@@ -324,7 +324,7 @@ export const imageCaptionFlow = makeFlow({
   id: 'image-caption',
   type: 'image',
   metaData: {
-    ref: 'https://player-ui.github.io/latest/logo/logo-light-large.png',
+    ref: 'https://raw.githubusercontent.com/player-ui/player/refs/tags/0.14.1/docs/site/src/assets/logo/logo-light-large.png',
   },
   caption: {
     asset: {
@@ -339,7 +339,7 @@ export const imageAccessibilityFlow = makeFlow({
   id: 'image-accessibility',
   type: 'image',
   metaData: {
-    ref: 'https://player-ui.github.io/latest/logo/logo-light-large.png',
+    ref: 'https://raw.githubusercontent.com/player-ui/player/refs/tags/0.14.1/docs/site/src/assets/logo/logo-light-large.png',
     accessibility: 'This is accessibility text for an image',
   },
   placeholder: 'This is placeholder text for an image',
@@ -349,7 +349,7 @@ export const imagePlaceholderFlow = makeFlow({
   id: 'image-placeholder',
   type: 'image',
   metaData: {
-    ref: 'https://player-ui.github.io/latest/logo/logo-light-large.png',
+    ref: 'https://raw.githubusercontent.com/player-ui/player/refs/tags/0.14.1/docs/site/src/assets/logo/logo-light-large.png',
   },
   placeholder: 'This is placeholder text for an image',
 });
