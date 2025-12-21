@@ -1,3 +1,28 @@
+# 0.15.0-next.3 (Sun Dec 21 2025)
+
+### Release Notes
+
+#### feat(storybook): upgrade to version 10.1.4 ([#767](https://github.com/player-ui/player/pull/767))
+
+Upgraded Storybook from version `7.6.10` to latest `10.1.4`. Also fixed broken images within stories and initial value for dark mode for the editors.
+
+---
+
+#### 🚀 Enhancement
+
+- feat(storybook): upgrade to version 10.1.4 [#767](https://github.com/player-ui/player/pull/767) ([@dtychshenko](https://github.com/dtychshenko))
+
+#### 🐛 Bug Fix
+
+- fix tests with broken context mocks in android/player [#774](https://github.com/player-ui/player/pull/774) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 2
+
+- Dmitriy Tychshenko ([@dtychshenko](https://github.com/dtychshenko))
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
 # 0.15.0-next.2 (Mon Dec 01 2025)
 
 #### 🐛 Bug Fix
