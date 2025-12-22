@@ -10,6 +10,7 @@ import type {
   NavigationFlowExternalState,
   NavigationFlowFlowState,
   NavigationFlowViewState,
+  ErrorStateTransition,
 } from "@player-ui/types";
 import type { Logger } from "../../logger";
 
@@ -148,6 +149,46 @@ export class FlowInstance {
     this.pushHistory(initialState);
 
     return this.flowPromise.promise;
+  }
+
+  /**
+   * Navigate to flow-level errorState (fallback when node-level fails)
+   * Uses direct navigation, bypassing transition map lookup
+   * @param errorType Optional error type for dictionary-based error transition
+   * @returns true if navigation succeeded, false if errorState not defined or navigation failed
+   */
+  public transitionToErrorState(errorType?: string): boolean {
+    const errorStateConfig: ErrorStateTransition | undefined =
+      this.flow.errorState;
+
+    if (!errorStateConfig) {
+      return false;
+    }
+
+    // Resolve errorState (handle string or dictionary)
+    let errorStateName: string | undefined;
+
+    if (typeof errorStateConfig === "string") {
+      errorStateName = errorStateConfig;
+    } else {
+      errorStateName =
+        (errorType && errorStateConfig[errorType]) || errorStateConfig["*"];
+    }
+
+    if (!errorStateName) {
+      this.log?.debug(
+        `[FlowInstance] No matching flow-level errorState found for errorType: ${errorType}`,
+      );
+      return false;
+    }
+
+    this.log?.debug(
+      `[FlowInstance] Navigating to flow-level errorState: ${errorStateName}` +
+        (errorType ? ` (errorType: ${errorType})` : ""),
+    );
+
+    this.pushHistory(errorStateName);
+    return true;
   }
 
   public transition(

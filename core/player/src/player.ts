@@ -276,6 +276,8 @@ export class Player {
     errorController.setOptions({
       model: dataController,
       logger: this.logger,
+      flow: flowController,
+      fail: flowResultDeferred.reject,
     });
 
     // eslint-disable-next-line prefer-const

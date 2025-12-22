@@ -1,6 +1,8 @@
 import { SyncBailHook } from "tapable-ts";
+import type { ErrorStateTransition } from "@player-ui/types";
 import type { Logger } from "../../logger";
 import type { DataController } from "../data/controller";
+import type { FlowController } from "../flow/controller";
 import type { PlayerError, ErrorMetadata, ErrorSeverity } from "./types";
 import { ErrorStateMiddleware } from "./middleware";
 
@@ -20,6 +22,10 @@ export interface ErrorControllerOptions {
   logger?: Logger;
   /** Data model for setting errorState */
   model?: DataController;
+  /** Flow controller for error navigation */
+  flow?: FlowController;
+  /** Callback to fail/reject the flow */
+  fail?: (error: Error) => void;
 }
 
 /**
@@ -81,7 +87,7 @@ export class ErrorController {
   }
 
   /**
-   * Capture error with metadata, add to history, fire hooks, update data model
+   * Capture error with metadata, add to history, fire hooks, update data model, and navigate
    */
   public captureError(error: Error, metadata: ErrorMetadata = {}): PlayerError {
     const playerError: PlayerError = {
@@ -114,7 +120,11 @@ export class ErrorController {
       return playerError;
     }
 
+    // Set error in data model
     this.setErrorInDataModel(playerError);
+
+    // Navigate to error state
+    this.navigateToErrorState(playerError);
 
     return playerError;
   }
@@ -223,6 +233,98 @@ export class ErrorController {
       this.options?.logger?.error(
         "[ErrorController] Failed to delete errorState from data model",
         e,
+      );
+    }
+  }
+
+  /**
+   * Resolve errorState configuration to a specific state name
+   * Handles both string and dictionary-based error transition
+   */
+  private resolveErrorState(
+    errorState: ErrorStateTransition | undefined,
+    errorType?: string,
+  ): string | undefined {
+    if (!errorState) {
+      return undefined;
+    }
+
+    if (typeof errorState === "string") {
+      return errorState;
+    }
+
+    if (typeof errorState === "object" && errorState !== null) {
+      const dict = errorState as Record<string, string>;
+      return (errorType && dict[errorType]) || dict["*"];
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Navigate to error state
+   * Node-level errorState (uses transition)
+   * Flow-level errorState (direct navigation)
+   * Reject flow (fallback)
+   */
+  private navigateToErrorState(playerError: PlayerError): void {
+    const flowInstance = this.options?.flow?.current;
+
+    if (!flowInstance) {
+      this.options?.logger?.warn(
+        "[ErrorController] No active flow instance for error navigation",
+      );
+      return;
+    }
+
+    // Node-level errorState
+    const currentState = flowInstance.currentState;
+    const nodeErrorStateConfig = currentState?.value.errorState as
+      | ErrorStateTransition
+      | undefined;
+    const nodeErrorState = this.resolveErrorState(
+      nodeErrorStateConfig,
+      playerError.metadata.errorType,
+    );
+
+    if (nodeErrorState) {
+      try {
+        this.options?.logger?.debug(
+          `[ErrorController] Node-level: Navigating to errorState "${nodeErrorState}" (errorType: ${playerError.metadata.errorType || "none"})`,
+        );
+        flowInstance.transition(nodeErrorState);
+        return;
+      } catch (e) {
+        this.options?.logger?.error(
+          `[ErrorController] Node-level navigation failed: ${e}`,
+        );
+      }
+    }
+
+    // Flow-level errorState
+    const flowErrorState = flowInstance.transitionToErrorState(
+      playerError.metadata.errorType,
+    );
+
+    if (flowErrorState) {
+      this.options?.logger?.debug(
+        `[ErrorController] Navigated to flow-level errorState (errorType: ${playerError.metadata.errorType || "none"})`,
+      );
+      return;
+    }
+
+    this.options?.logger?.debug(
+      "[ErrorController] No flow-level errorState defined or no match found",
+    );
+
+    // Reject flow (fallback)
+    this.options?.logger?.debug("[ErrorController] Rejecting flow with error");
+
+    if (this.options?.fail) {
+      this.options.fail(playerError.error);
+    } else {
+      this.options?.logger?.error(
+        "[ErrorController] No fail callback available to reject flow",
       );
     }
   }
