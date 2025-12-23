@@ -32,18 +32,6 @@ export function getErrorStateMiddleware(options?: {
   return new ErrorStateMiddleware(options);
 }
 
-/** Default error format for data.errorState  */
-interface FormattedError {
-  message: string;
-  name: string;
-  errorType?: string;
-  severity?: ErrorSeverity;
-  assetId?: string;
-  assetType?: string;
-  bindingPath?: string;
-  context?: Record<string, unknown>;
-}
-
 /** The orchestrator for player error handling */
 export class ErrorController {
   public hooks: ErrorControllerHooks = {
@@ -83,13 +71,17 @@ export class ErrorController {
   /**
    * Capture error with metadata, add to history, fire hooks, update data model
    */
-  public captureError(error: Error, metadata: ErrorMetadata = {}): PlayerError {
+  public captureError(
+    error: Error,
+    errorType: string,
+    severity?: ErrorSeverity,
+    metadata?: ErrorMetadata,
+  ): PlayerError {
     const playerError: PlayerError = {
       error,
-      metadata: {
-        ...metadata,
-        timestamp: metadata.timestamp ?? Date.now(),
-      },
+      errorType,
+      severity,
+      metadata,
     };
 
     // Add to history
@@ -100,7 +92,7 @@ export class ErrorController {
 
     this.options?.logger?.debug(
       `[ErrorController] Captured error: ${error.message}`,
-      playerError.metadata,
+      { errorType, severity, metadata },
     );
 
     // Notify listeners and check if navigation should be skipped
@@ -117,24 +109,6 @@ export class ErrorController {
     this.setErrorInDataModel(playerError);
 
     return playerError;
-  }
-
-  /**
-   * Format error for content binding
-   */
-  public formatErrorForData(playerError: PlayerError): FormattedError {
-    const { error, metadata } = playerError;
-
-    return {
-      message: error.message,
-      name: error.name,
-      errorType: metadata.errorType,
-      severity: metadata.severity,
-      assetId: metadata.assetContext?.asset?.id,
-      assetType: metadata.assetContext?.asset?.type,
-      bindingPath: metadata.assetContext?.bindingPath,
-      context: metadata.context,
-    };
   }
 
   /**
@@ -182,11 +156,22 @@ export class ErrorController {
     }
 
     try {
-      const formattedError = this.formatErrorForData(playerError);
+      const { error, errorType, severity, metadata } = playerError;
 
       // Temporarily allow writes to errorState
       this.middleware?.enableWrites();
-      this.options.model.set([["errorState", formattedError]]);
+      this.options.model.set([
+        [
+          "errorState",
+          {
+            message: error.message,
+            name: error.name,
+            errorType,
+            severity,
+            ...metadata,
+          },
+        ],
+      ]);
       this.middleware?.disableWrites();
 
       this.options?.logger?.debug(
