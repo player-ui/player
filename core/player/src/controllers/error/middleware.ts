@@ -82,7 +82,7 @@ export class ErrorStateMiddleware implements DataModelMiddleware {
     binding: BindingInstance,
     options?: DataModelOptions,
     next?: DataModelImpl,
-  ) {
+  ): unknown {
     return next?.get(binding, options);
   }
 
@@ -90,10 +90,10 @@ export class ErrorStateMiddleware implements DataModelMiddleware {
     binding: BindingInstance,
     options?: DataModelOptions,
     next?: DataModelImpl,
-  ) {
+  ): boolean {
     // If writes are allowed (from ErrorController), pass through
     if (this.allowWrites) {
-      return next?.delete(binding, options);
+      return next?.delete(binding, options) ?? false;
     }
 
     const path = binding.asString();
@@ -103,9 +103,9 @@ export class ErrorStateMiddleware implements DataModelMiddleware {
       this.logger?.warn(
         `[ErrorStateMiddleware] Blocked delete of protected path: ${path}`,
       );
-      return;
+      return false;
     }
 
-    return next?.delete(binding, options);
+    return next?.delete(binding, options) ?? false;
   }
 }
