@@ -1,5 +1,3 @@
-import type { Asset } from "@player-ui/types";
-
 /** Severity levels */
 export enum ErrorSeverity {
   FATAL = "fatal", // Cannot continue, flow must end
@@ -21,24 +19,10 @@ export const ErrorTypes = {
   PLUGIN: "plugin",
 } as const;
 
-export interface AssetErrorContext {
-  asset?: Asset;
-  bindingPath?: string;
-}
-
+/**
+ * Error metadata
+ */
 export interface ErrorMetadata {
-  /** Flow state name when error occurred */
-  state?: string;
-  /** Additional context (transition name, view ref, etc) */
-  context?: Record<string, unknown>;
-  /** timestamp */
-  timestamp?: number;
-  /** Error category (use ErrorTypes constants or custom plugin types) */
-  errorType?: string;
-  /** Impact level */
-  severity?: ErrorSeverity;
-  /** Asset-specific details */
-  assetContext?: AssetErrorContext;
   /** Allow custom fields for domain-specific information */
   [key: string]: unknown;
 }
@@ -46,6 +30,10 @@ export interface ErrorMetadata {
 export interface PlayerError {
   /** Native Error object */
   error: Error;
-  /** Error metadata */
-  metadata: ErrorMetadata;
+  /** Error category (use ErrorTypes constants or custom plugin types) */
+  errorType: string;
+  /** Impact level */
+  severity?: ErrorSeverity;
+  /** Additional metadata */
+  metadata?: ErrorMetadata;
 }
