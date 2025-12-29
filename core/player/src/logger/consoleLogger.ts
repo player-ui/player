@@ -1,4 +1,4 @@
-import type { Logger, Severity } from "./types";
+import type { LogFn, Logger, Severity } from "./types";
 import { severities } from "./types";
 
 export type ConsoleHandler = Pick<typeof console, "log" | "warn" | "error">;
@@ -13,7 +13,7 @@ export class ConsoleLogger implements Logger {
     this._console = _console;
   }
 
-  public setSeverity(severity: Severity) {
+  public setSeverity(severity: Severity): void {
     this.severity = severity;
   }
 
@@ -30,7 +30,7 @@ export class ConsoleLogger implements Logger {
     }
   }
 
-  private createHandler(severity: Severity): (...args: any[]) => void {
+  private createHandler(severity: Severity): LogFn {
     return (...args: any[]) => {
       const sevIndex = severities.indexOf(severity);
       const sevConf = severities.indexOf(this.severity);
@@ -41,9 +41,9 @@ export class ConsoleLogger implements Logger {
     };
   }
 
-  public readonly trace = this.createHandler("trace");
-  public readonly debug = this.createHandler("debug");
-  public readonly info = this.createHandler("info");
-  public readonly warn = this.createHandler("warn");
-  public readonly error = this.createHandler("error");
+  public readonly trace: LogFn = this.createHandler("trace");
+  public readonly debug: LogFn = this.createHandler("debug");
+  public readonly info: LogFn = this.createHandler("info");
+  public readonly warn: LogFn = this.createHandler("warn");
+  public readonly error: LogFn = this.createHandler("error");
 }

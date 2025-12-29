@@ -1,13 +1,13 @@
-import type { Logger } from "./types";
+import type { LogFn, Logger } from "./types";
 
 /** An empty function so the logger ignore everything */
-const noop = () => {};
+const noop = (): void => {};
 
 /** A logger implementation that goes nowhere */
 export class NoopLogger implements Logger {
-  public readonly trace = noop;
-  public readonly debug = noop;
-  public readonly info = noop;
-  public readonly warn = noop;
-  public readonly error = noop;
+  public readonly trace: LogFn = noop;
+  public readonly debug: LogFn = noop;
+  public readonly info: LogFn = noop;
+  public readonly warn: LogFn = noop;
+  public readonly error: LogFn = noop;
 }
