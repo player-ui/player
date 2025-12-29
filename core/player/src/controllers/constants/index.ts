@@ -1,6 +1,27 @@
 import { LocalModel } from "../../data";
 import { BindingInstance } from "../../binding";
 import { objectToBatchSet } from "./utils";
+import { PlayerRuntimeConfig } from "../../types";
+
+export interface ConfigProvider {
+  /**
+   * returns a single configuration value
+   * @param key config path to read
+   */
+  getConfigValue<T extends keyof PlayerRuntimeConfig>(
+    key: T,
+  ): PlayerRuntimeConfig[T];
+
+  /**
+   * Override a specific configuration item.
+   * @param key config path to set
+   * @param value value to set it to
+   */
+  overrideConfigValue<T extends keyof PlayerRuntimeConfig>(
+    key: T,
+    value: PlayerRuntimeConfig[T],
+  ): void;
+}
 
 export interface ConstantsProvider {
   /**
@@ -33,7 +54,12 @@ export interface ConstantsProvider {
 /**
  * Key/Value store for constants and context for Player
  */
-export class ConstantsController implements ConstantsProvider {
+export class ConstantsController implements ConstantsProvider, ConfigProvider {
+  /**
+   * Dedicated data store for Player's runtime config to isolate it from other constants
+   */
+  private config: LocalModel;
+
   /**
    * Data store is basically a map of namespaces to DataModels to provide some data isolation
    */
@@ -46,9 +72,22 @@ export class ConstantsController implements ConstantsProvider {
    */
   private tempStore: Map<string, LocalModel>;
 
-  constructor() {
+  constructor(runtimeConfig?: Record<string, any>) {
     this.store = new Map();
     this.tempStore = new Map();
+    this.config = new LocalModel(runtimeConfig);
+  }
+  overrideConfigValue<T extends keyof PlayerRuntimeConfig>(
+    key: T,
+    value: PlayerRuntimeConfig[T],
+  ): void {
+    this.config.set([[new BindingInstance(key), value]]);
+  }
+
+  getConfigValue<T extends keyof PlayerRuntimeConfig>(
+    key: T | string,
+  ): PlayerRuntimeConfig[T] {
+    return this.config.get(new BindingInstance(key)) ?? null;
   }
 
   addConstants(data: any, namespace: string): void {

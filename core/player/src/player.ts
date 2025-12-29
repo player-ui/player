@@ -28,8 +28,10 @@ import type {
   CompletedState,
   ErrorState,
   PlayerHooks,
+  PlayerRuntimeConfig,
 } from "./types";
 import { NOT_STARTED_STATE } from "./types";
+import { DEFAULT_RUNTIME_CONFIG } from "./constants";
 
 /**
 Variables injected at build time
@@ -81,6 +83,9 @@ export interface PlayerConfigOptions {
 
   /** A logger to use */
   logger?: Logger;
+
+  /** Initial Runtime Config */
+  runtimeConfig?: Partial<PlayerRuntimeConfig>;
 }
 
 export interface PlayerInfo {
@@ -101,8 +106,7 @@ export class Player {
   };
 
   public readonly logger: TapableLogger = new TapableLogger();
-  public readonly constantsController: ConstantsController =
-    new ConstantsController();
+  public readonly constantsController: ConstantsController;
   private config: PlayerConfigOptions;
   private state: PlayerFlowState = NOT_STARTED_STATE;
 
@@ -125,6 +129,12 @@ export class Player {
     if (config?.logger) {
       this.logger.addHandler(config.logger);
     }
+
+    // Set initial runtime config with defaults for missing keys
+    this.constantsController = new ConstantsController({
+      DEFAULT_RUNTIME_CONFIG,
+      ...config?.runtimeConfig,
+    });
 
     this.config = config || {};
     this.config.plugins = [
