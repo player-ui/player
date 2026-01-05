@@ -1,6 +1,6 @@
-import React from 'react';
-import { FallbackProps } from '@player-ui/react';
-import { ButtonGroup, Button, VStack, Code } from '@chakra-ui/react';
+import { Button, ButtonGroup, Code, VStack } from "@chakra-ui/react";
+import { FallbackProps } from "@player-ui/react";
+import React from "react";
 
 export const ErrorHandler = (props: FallbackProps) => {
   return (
