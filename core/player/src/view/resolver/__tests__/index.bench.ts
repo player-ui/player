@@ -66,55 +66,55 @@ describe("resolver benchmarks", () => {
   let view: ViewInstance;
   let bindingChanges: Set<BindingInstance>;
 
-  // bench(
-  //   `Resolving from cache`,
-  //   () => {
-  //     view.update(bindingChanges);
-  //   },
-  //   {
-  //     setup: () => {
-  //       view = setupView(10, 10, getOptions());
-  //       bindingChanges = new Set();
-  //     },
-  //   },
-  // );
+  bench(
+    `Resolving from cache`,
+    () => {
+      view.update(bindingChanges);
+    },
+    {
+      setup: () => {
+        view = setupView(10, 10, getOptions());
+        bindingChanges = new Set();
+      },
+    },
+  );
 
-  // bench(
-  //   `initial resolve`,
-  //   () => {
-  //     view.update();
-  //   },
-  //   {
-  //     setup: () => {
-  //       view = setupView(10, 10, getOptions());
-  //     },
-  //     throws: true,
-  //   },
-  // );
+  bench(
+    `initial resolve`,
+    () => {
+      view.update();
+    },
+    {
+      setup: () => {
+        view = setupView(10, 10, getOptions());
+      },
+      throws: true,
+    },
+  );
 
-  // bench(
-  //   `data changes`,
-  //   () => {
-  //     view.update(bindingChanges);
-  //   },
-  //   {
-  //     setup: () => {
-  //       const options = getOptions();
-  //       view = setupView(10, 10, options);
+  bench(
+    `data changes`,
+    () => {
+      view.update(bindingChanges);
+    },
+    {
+      setup: () => {
+        const options = getOptions();
+        view = setupView(10, 10, options);
 
-  //       const { parseBinding } = options;
-  //       bindingChanges = new Set([
-  //         parseBinding("binding.9.10.9.8.7"),
-  //         parseBinding("binding.9.10.9"),
-  //         parseBinding("binding.9.10.9.8.7.6.5"),
-  //         parseBinding("binding.9.10.9.8"),
-  //         parseBinding("binding.9.10"),
-  //         parseBinding("binding.9.10.9.8.7.6.5.4.3.2"),
-  //       ]);
-  //     },
-  //     throws: true,
-  //   },
-  // );
+        const { parseBinding } = options;
+        bindingChanges = new Set([
+          parseBinding("binding.9.10.9.8.7"),
+          parseBinding("binding.9.10.9"),
+          parseBinding("binding.9.10.9.8.7.6.5"),
+          parseBinding("binding.9.10.9.8"),
+          parseBinding("binding.9.10"),
+          parseBinding("binding.9.10.9.8.7.6.5.4.3.2"),
+        ]);
+      },
+      throws: true,
+    },
+  );
 
   bench(
     `data changes slow`,

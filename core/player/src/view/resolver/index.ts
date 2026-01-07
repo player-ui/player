@@ -193,10 +193,7 @@ export class Resolver {
     return new Map(this.resolveCache);
   }
 
-  private getPreviousResult(
-    node: Node.Node,
-    ignoreIdCache: boolean,
-  ): Resolve.ResolvedNode | undefined {
+  private getPreviousResult(node: Node.Node): Resolve.ResolvedNode | undefined {
     if (!node) {
       return;
     }
@@ -245,70 +242,6 @@ export class Resolver {
     return clonedNode;
   }
 
-  private getFromCache(
-    node: Node.Node,
-    options: Resolve.NodeResolveOptions,
-    skipStuff: boolean,
-    dataChanges: Set<BindingInstance> | undefined,
-    nodeChanges: Set<Node.Node>,
-  ): Resolve.ResolvedNode | undefined {
-    if (nodeChanges?.has(node)) {
-      return undefined;
-    }
-
-    const previousResult = this.getPreviousResult(node, skipStuff);
-    if (skipStuff) {
-      return previousResult;
-    }
-
-    if (!previousResult) {
-      return undefined;
-    }
-
-    const previousDeps = previousResult.dependencies;
-
-    const dataChanged = caresAboutDataChanges(
-      dataChanges,
-      previousDeps,
-      previousResult.depsTree,
-    );
-    const shouldUseLastValue = this.hooks.skipResolve.call(
-      !dataChanged,
-      node,
-      options,
-    );
-
-    if (!shouldUseLastValue) {
-      return undefined;
-    }
-
-    return previousResult;
-  }
-
-  private someOtherHelper(
-    node: Node.Node,
-    options: Resolve.NodeResolveOptions,
-    prevResultChecks: Map<Node.Node, boolean>,
-    dataChanges: Set<BindingInstance> | undefined,
-    nodeChanges: Set<Node.Node>,
-  ): Resolve.ResolvedNode | undefined {
-    const previousHadResult = prevResultChecks.get(node);
-    if (previousHadResult === false) {
-      return undefined;
-    }
-
-    const cacheResult = this.getFromCache(
-      node,
-      options,
-      previousHadResult ?? false,
-      dataChanges,
-      nodeChanges,
-    );
-    prevResultChecks.set(node, cacheResult !== undefined);
-
-    return cacheResult;
-  }
-
   private computeTree(
     node: Node.Node,
     rawParent: Node.Node | undefined,
@@ -341,15 +274,17 @@ export class Resolver {
       node,
     );
 
-    const previousResult = this.someOtherHelper(
+    const previousResult = this.getPreviousResult(node);
+    const previousDeps = previousResult?.dependencies;
+
+    const dataChanged = caresAboutDataChanges(dataChanges, previousDeps);
+    const shouldUseLastValue = this.hooks.skipResolve.call(
+      !dataChanged,
       node,
       resolveOptions,
-      cacheCheckResults,
-      dataChanges,
-      nodeChanges,
     );
 
-    if (previousResult !== undefined) {
+    if (previousResult && shouldUseLastValue) {
       const update = {
         ...previousResult,
         updated: false,
@@ -360,7 +295,7 @@ export class Resolver {
         resolvedNode: Resolve.ResolvedNode,
         AST: Node.Node,
         ASTParent: Node.Node | undefined,
-      ): boolean => {
+      ) => {
         const { node: resolvedASTLocal } = resolvedNode;
         this.ASTMap.set(resolvedASTLocal, AST);
         const resolvedUpdate = {
@@ -370,67 +305,39 @@ export class Resolver {
         cacheUpdate.set(AST, resolvedUpdate);
 
         /** Helper function for recursing over child node */
-        const handleChildNode = (childNode: Node.Node): boolean => {
+        const handleChildNode = (childNode: Node.Node) => {
           // In order to get the correct results, we need to use the node references from the last update.
           const originalChildNode = prevASTMap.get(childNode) ?? childNode;
           const previousChildResult = this.getPreviousResult(
             originalChildNode,
             false,
-          ); // this.someOtherHelper(
-          //   originalChildNode,
-          //   resolveOptions,
-          //   cacheCheckResults,
-          //   dataChanges,
-          //   nodeChanges,
-          // );
-          if (!previousChildResult) {
-            return false;
-          }
+          );
+          if (!previousChildResult) return;
 
-          return repopulateASTMapFromCache(
+          repopulateASTMapFromCache(
             previousChildResult,
             originalChildNode,
             AST,
           );
         };
 
-        if (
-          "children" in resolvedASTLocal &&
-          resolvedASTLocal.children !== undefined
-        ) {
-          for (const childAST of resolvedASTLocal.children) {
-            const didUseCache = handleChildNode(childAST.value);
-            // if (!didUseCache) {
-            //   cacheCheckResults.set(AST, false);
-            //   return false;
-            // }
-          }
+        if ("children" in resolvedASTLocal) {
+          resolvedASTLocal.children?.forEach(({ value: childAST }) =>
+            handleChildNode(childAST),
+          );
         } else if (resolvedASTLocal.type === NodeType.MultiNode) {
-          for (const childAST of resolvedASTLocal.values) {
-            const didUseCache = handleChildNode(childAST);
-            // if (!didUseCache) {
-            //   cacheCheckResults.set(AST, false);
-            //   return false;
-            // }
-          }
+          resolvedASTLocal.values.forEach(handleChildNode);
         }
 
         this.hooks.afterNodeUpdate.call(AST, ASTParent, resolvedUpdate);
-        return true;
       };
 
       // Point the root of the cached node to the new resolved node.
       previousResult.node.parent = partiallyResolvedParent;
-      const cacheSuccessful = repopulateASTMapFromCache(
-        previousResult,
-        node,
-        rawParent,
-      );
-      // if (cacheSuccessful) {
-      return update;
-      // }
 
-      // cacheCheckResults.set(node, false);
+      repopulateASTMapFromCache(previousResult, node, rawParent);
+
+      return update;
     }
 
     // Shallow clone the node so that changes to it during the resolve steps don't impact the original.
@@ -562,7 +469,6 @@ export class Resolver {
         ...dependencyModel.getDependencies(),
         ...childDependencies,
       ]),
-      depsTree: dependencyModel.getDepsTree(),
     };
 
     this.hooks.afterNodeUpdate.call(node, rawParent, update);
