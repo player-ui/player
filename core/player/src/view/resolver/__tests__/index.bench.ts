@@ -46,6 +46,7 @@ const getOptions = (): Resolve.ResolverOptions => ({
   schema: {} as any,
 });
 
+/** creates a view with values containing {{breadth}} number of assets, each with nested assets {{depth}} deep */
 const setupView = (
   depth: number,
   breadth: number,
@@ -66,19 +67,7 @@ describe("resolver benchmarks", () => {
   let view: ViewInstance;
   let bindingChanges: Set<BindingInstance>;
 
-  bench(
-    `Resolving from cache`,
-    () => {
-      view.update(bindingChanges);
-    },
-    {
-      setup: () => {
-        view = setupView(10, 10, getOptions());
-        bindingChanges = new Set();
-      },
-    },
-  );
-
+  /** Test the time it takes to resolve a view for the first time. */
   bench(
     `initial resolve`,
     () => {
@@ -92,6 +81,21 @@ describe("resolver benchmarks", () => {
     },
   );
 
+  /** Test the time it takes to update a view that has received no changes. */
+  bench(
+    `Resolving from cache`,
+    () => {
+      view.update(bindingChanges);
+    },
+    {
+      setup: () => {
+        view = setupView(10, 10, getOptions());
+        bindingChanges = new Set();
+      },
+    },
+  );
+
+  /** Test the time it takes to update a view with some changes for more nested assets. */
   bench(
     `data changes`,
     () => {
@@ -116,6 +120,7 @@ describe("resolver benchmarks", () => {
     },
   );
 
+  /** Test the time it takes to update a view if the data changes require the whole view to update. */
   bench(
     `data changes slow`,
     () => {

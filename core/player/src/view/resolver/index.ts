@@ -308,10 +308,7 @@ export class Resolver {
         const handleChildNode = (childNode: Node.Node) => {
           // In order to get the correct results, we need to use the node references from the last update.
           const originalChildNode = prevASTMap.get(childNode) ?? childNode;
-          const previousChildResult = this.getPreviousResult(
-            originalChildNode,
-            false,
-          );
+          const previousChildResult = this.getPreviousResult(originalChildNode);
           if (!previousChildResult) return;
 
           repopulateASTMapFromCache(
