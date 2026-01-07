@@ -201,7 +201,7 @@ export class Resolver {
     const isFirstUpdate = this.resolveCache.size === 0;
     const id = getNodeID(node);
 
-    if (id && !ignoreIdCache) {
+    if (id) {
       if (this.idCache.has(id)) {
         // Only log this conflict once to cut down on noise
         // May want to swap this to logging when we first see the id -- which may not be the first render
