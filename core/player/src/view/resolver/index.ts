@@ -109,10 +109,6 @@ export class Resolver {
    */
   private readonly ASTMap: Map<Node.Node, Node.Node>;
   /**
-   * The AST tree after beforeResolve is ran mapped to the AST before beforeResolve is ran
-   */
-  private AsyncIdMap: Map<string, Node.Node>;
-  /**
    * The root node in the AST tree we want to resolve
    */
   public readonly root: Node.Node;
@@ -145,7 +141,6 @@ export class Resolver {
     this.ASTMap = new Map();
     this.logger = options.logger;
     this.idCache = new Set();
-    this.AsyncIdMap = new Map();
   }
 
   public getSourceNode(convertedAST: Node.Node): Node.Node | undefined {
@@ -153,39 +148,42 @@ export class Resolver {
   }
 
   public update(
-    changes?: Set<BindingInstance>,
-    asyncChanges?: Set<string>,
+    dataChanges?: Set<BindingInstance>,
+    nodeChanges?: Set<Node.Node>,
   ): any {
-    this.hooks.beforeUpdate.call(changes);
+    this.hooks.beforeUpdate.call(dataChanges);
     const resolveCache = new Map<Node.Node, Resolve.ResolvedNode>();
     this.idCache.clear();
     const prevASTMap = new Map(this.ASTMap);
     this.ASTMap.clear();
 
-    const prevAsyncIdMap = new Map(this.AsyncIdMap);
-    const nextAsyncIdMap = new Map<string, Node.Node>();
-    asyncChanges?.forEach((id) => {
-      let current: Node.Node | undefined = prevAsyncIdMap.get(id);
-      while (current && prevASTMap.has(current)) {
-        const next = prevASTMap.get(current);
-        if (next && this.resolveCache.has(next)) {
-          this.resolveCache.delete(next);
+    // Optimization: Prefill node changes with parents to reduce time spent evaluating the cache validity in computeTree
+    const realNodeChanges = new Set<Node.Node>();
+    for (const node of nodeChanges?.values() ?? []) {
+      let current: Node.Node | undefined = node;
+      while (current) {
+        const original = prevASTMap.get(current) ?? current;
+        // Break early to avoid going up the tree on guaranteed duplicates.
+        if (realNodeChanges.has(original)) {
+          break;
         }
+
+        realNodeChanges.add(original);
         current = current.parent;
       }
-    });
+    }
 
     const updated = this.computeTree(
       this.root,
       undefined,
-      changes,
+      dataChanges,
       resolveCache,
       toNodeResolveOptions(this.options),
       undefined,
       prevASTMap,
-      nextAsyncIdMap,
+      realNodeChanges,
+      new Map(),
     );
-    this.AsyncIdMap = nextAsyncIdMap;
     this.resolveCache = resolveCache;
     this.hooks.afterUpdate.call(updated.value);
     return updated.value;
@@ -195,7 +193,10 @@ export class Resolver {
     return new Map(this.resolveCache);
   }
 
-  private getPreviousResult(node: Node.Node): Resolve.ResolvedNode | undefined {
+  private getPreviousResult(
+    node: Node.Node,
+    ignoreIdCache: boolean,
+  ): Resolve.ResolvedNode | undefined {
     if (!node) {
       return;
     }
@@ -203,7 +204,7 @@ export class Resolver {
     const isFirstUpdate = this.resolveCache.size === 0;
     const id = getNodeID(node);
 
-    if (id) {
+    if (id && !ignoreIdCache) {
       if (this.idCache.has(id)) {
         // Only log this conflict once to cut down on noise
         // May want to swap this to logging when we first see the id -- which may not be the first render
@@ -244,6 +245,70 @@ export class Resolver {
     return clonedNode;
   }
 
+  private getFromCache(
+    node: Node.Node,
+    options: Resolve.NodeResolveOptions,
+    skipStuff: boolean,
+    dataChanges: Set<BindingInstance> | undefined,
+    nodeChanges: Set<Node.Node>,
+  ): Resolve.ResolvedNode | undefined {
+    if (nodeChanges?.has(node)) {
+      return undefined;
+    }
+
+    const previousResult = this.getPreviousResult(node, skipStuff);
+    if (skipStuff) {
+      return previousResult;
+    }
+
+    if (!previousResult) {
+      return undefined;
+    }
+
+    const previousDeps = previousResult.dependencies;
+
+    const dataChanged = caresAboutDataChanges(
+      dataChanges,
+      previousDeps,
+      previousResult.depsTree,
+    );
+    const shouldUseLastValue = this.hooks.skipResolve.call(
+      !dataChanged,
+      node,
+      options,
+    );
+
+    if (!shouldUseLastValue) {
+      return undefined;
+    }
+
+    return previousResult;
+  }
+
+  private someOtherHelper(
+    node: Node.Node,
+    options: Resolve.NodeResolveOptions,
+    prevResultChecks: Map<Node.Node, boolean>,
+    dataChanges: Set<BindingInstance> | undefined,
+    nodeChanges: Set<Node.Node>,
+  ): Resolve.ResolvedNode | undefined {
+    const previousHadResult = prevResultChecks.get(node);
+    if (previousHadResult === false) {
+      return undefined;
+    }
+
+    const cacheResult = this.getFromCache(
+      node,
+      options,
+      previousHadResult ?? false,
+      dataChanges,
+      nodeChanges,
+    );
+    prevResultChecks.set(node, cacheResult !== undefined);
+
+    return cacheResult;
+  }
+
   private computeTree(
     node: Node.Node,
     rawParent: Node.Node | undefined,
@@ -252,7 +317,8 @@ export class Resolver {
     options: Resolve.NodeResolveOptions,
     partiallyResolvedParent: Node.Node | undefined,
     prevASTMap: Map<Node.Node, Node.Node>,
-    nextAsyncIdMap: Map<string, Node.Node>,
+    nodeChanges: Set<Node.Node>,
+    cacheCheckResults: Map<Node.Node, boolean>,
   ): NodeUpdate {
     const dependencyModel = new DependencyModel(options.data.model);
 
@@ -275,17 +341,15 @@ export class Resolver {
       node,
     );
 
-    const previousResult = this.getPreviousResult(node);
-    const previousDeps = previousResult?.dependencies;
-
-    const dataChanged = caresAboutDataChanges(dataChanges, previousDeps);
-    const shouldUseLastValue = this.hooks.skipResolve.call(
-      !dataChanged,
+    const previousResult = this.someOtherHelper(
       node,
       resolveOptions,
+      cacheCheckResults,
+      dataChanges,
+      nodeChanges,
     );
 
-    if (previousResult && shouldUseLastValue) {
+    if (previousResult !== undefined) {
       const update = {
         ...previousResult,
         updated: false,
@@ -296,7 +360,7 @@ export class Resolver {
         resolvedNode: Resolve.ResolvedNode,
         AST: Node.Node,
         ASTParent: Node.Node | undefined,
-      ) => {
+      ): boolean => {
         const { node: resolvedASTLocal } = resolvedNode;
         this.ASTMap.set(resolvedASTLocal, AST);
         const resolvedUpdate = {
@@ -304,44 +368,69 @@ export class Resolver {
           updated: false,
         };
         cacheUpdate.set(AST, resolvedUpdate);
-        if (resolvedUpdate.node.type === NodeType.Async) {
-          nextAsyncIdMap.set(resolvedUpdate.node.id, resolvedUpdate.node);
-        }
-        for (const key of resolvedUpdate.node.asyncNodesResolved ?? []) {
-          nextAsyncIdMap.set(key, resolvedUpdate.node);
-        }
 
         /** Helper function for recursing over child node */
-        const handleChildNode = (childNode: Node.Node) => {
+        const handleChildNode = (childNode: Node.Node): boolean => {
           // In order to get the correct results, we need to use the node references from the last update.
           const originalChildNode = prevASTMap.get(childNode) ?? childNode;
-          const previousChildResult = this.getPreviousResult(originalChildNode);
-          if (!previousChildResult) return;
+          const previousChildResult = this.getPreviousResult(
+            originalChildNode,
+            false,
+          ); // this.someOtherHelper(
+          //   originalChildNode,
+          //   resolveOptions,
+          //   cacheCheckResults,
+          //   dataChanges,
+          //   nodeChanges,
+          // );
+          if (!previousChildResult) {
+            return false;
+          }
 
-          repopulateASTMapFromCache(
+          return repopulateASTMapFromCache(
             previousChildResult,
             originalChildNode,
             AST,
           );
         };
 
-        if ("children" in resolvedASTLocal) {
-          resolvedASTLocal.children?.forEach(({ value: childAST }) =>
-            handleChildNode(childAST),
-          );
+        if (
+          "children" in resolvedASTLocal &&
+          resolvedASTLocal.children !== undefined
+        ) {
+          for (const childAST of resolvedASTLocal.children) {
+            const didUseCache = handleChildNode(childAST.value);
+            // if (!didUseCache) {
+            //   cacheCheckResults.set(AST, false);
+            //   return false;
+            // }
+          }
         } else if (resolvedASTLocal.type === NodeType.MultiNode) {
-          resolvedASTLocal.values.forEach(handleChildNode);
+          for (const childAST of resolvedASTLocal.values) {
+            const didUseCache = handleChildNode(childAST);
+            // if (!didUseCache) {
+            //   cacheCheckResults.set(AST, false);
+            //   return false;
+            // }
+          }
         }
 
         this.hooks.afterNodeUpdate.call(AST, ASTParent, resolvedUpdate);
+        return true;
       };
 
       // Point the root of the cached node to the new resolved node.
       previousResult.node.parent = partiallyResolvedParent;
-
-      repopulateASTMapFromCache(previousResult, node, rawParent);
-
+      const cacheSuccessful = repopulateASTMapFromCache(
+        previousResult,
+        node,
+        rawParent,
+      );
+      // if (cacheSuccessful) {
       return update;
+      // }
+
+      // cacheCheckResults.set(node, false);
     }
 
     // Shallow clone the node so that changes to it during the resolve steps don't impact the original.
@@ -358,13 +447,6 @@ export class Resolver {
     };
 
     resolvedAST.parent = partiallyResolvedParent;
-
-    if (resolvedAST.type === NodeType.Async) {
-      nextAsyncIdMap.set(resolvedAST.id, resolvedAST);
-    }
-    for (const id of resolvedAST.asyncNodesResolved ?? []) {
-      nextAsyncIdMap.set(id, resolvedAST);
-    }
 
     resolveOptions.node = resolvedAST;
 
@@ -395,7 +477,8 @@ export class Resolver {
           resolveOptions,
           resolvedAST,
           prevASTMap,
-          nextAsyncIdMap,
+          nodeChanges,
+          cacheCheckResults,
         );
         const {
           dependencies: childTreeDeps,
@@ -437,7 +520,8 @@ export class Resolver {
           resolveOptions,
           resolvedAST,
           prevASTMap,
-          nextAsyncIdMap,
+          nodeChanges,
+          cacheCheckResults,
         );
 
         if (mTree.value !== undefined && mTree.value !== null) {
@@ -478,6 +562,7 @@ export class Resolver {
         ...dependencyModel.getDependencies(),
         ...childDependencies,
       ]),
+      depsTree: dependencyModel.getDepsTree(),
     };
 
     this.hooks.afterNodeUpdate.call(node, rawParent, update);

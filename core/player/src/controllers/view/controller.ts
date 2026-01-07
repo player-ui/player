@@ -21,6 +21,7 @@ import type { FlowInstance, FlowController } from "../flow";
 import type { DataController } from "../data/controller";
 import type { TransformRegistry } from "./types";
 import type { BindingInstance } from "../../binding";
+import type { Node } from "../../view";
 
 export interface ViewControllerOptions {
   /** Where to get data from */
@@ -55,6 +56,8 @@ export class ViewController {
   private pendingUpdate?: {
     /** pending data binding changes */
     changedBindings?: Set<BindingInstance>;
+    /** pending changes to view nodes */
+    changedNodes?: Set<Node.Node>;
     /** Whether we have a microtask queued to handle this pending update */
     scheduled?: boolean;
   };
@@ -94,7 +97,7 @@ export class ViewController {
     const update = (updates: Set<BindingInstance>, silent = false) => {
       if (this.currentView) {
         if (this.optimizeUpdates) {
-          this.queueUpdate(updates, silent);
+          this.queueUpdate(updates, undefined, silent);
         } else {
           this.currentView.update();
         }
@@ -126,25 +129,31 @@ export class ViewController {
     this.viewPlugins = this.createViewPlugins();
   }
 
-  private queueUpdate(bindings: Set<BindingInstance>, silent = false) {
-    if (this.pendingUpdate?.changedBindings) {
-      // If there's already a pending update, just add to it don't worry about silent updates here yet
-      this.pendingUpdate.changedBindings = new Set([
-        ...this.pendingUpdate.changedBindings,
-        ...bindings,
-      ]);
-    } else {
-      this.pendingUpdate = { changedBindings: bindings, scheduled: false };
+  private queueUpdate(
+    bindings?: Set<BindingInstance>,
+    nodes?: Set<Node.Node>,
+    silent = false,
+  ) {
+    if (!this.pendingUpdate) {
+      this.pendingUpdate = {
+        scheduled: false,
+      };
     }
+
+    this.pendingUpdate = {
+      ...this.pendingUpdate,
+      changedBindings: mergeSets(this.pendingUpdate.changedBindings, bindings),
+      changedNodes: mergeSets(this.pendingUpdate.changedNodes, nodes),
+    };
 
     // If there's no pending update, schedule one only if this one isn't silent
     // otherwise if this is silent, we'll just wait for the next non-silent update and make sure our bindings are included
     if (!this.pendingUpdate.scheduled && !silent) {
       this.pendingUpdate.scheduled = true;
       queueMicrotask(() => {
-        const updates = this.pendingUpdate?.changedBindings;
+        const { changedBindings, changedNodes } = this.pendingUpdate ?? {};
         this.pendingUpdate = undefined;
-        this.currentView?.update(updates);
+        this.currentView?.update(changedBindings, changedNodes);
       });
     }
   }
@@ -211,4 +220,12 @@ export class ViewController {
       new MultiNodePlugin(),
     ];
   }
+
+  public markAsChanged(nodes: Set<Node.Node>): void {
+    this.queueUpdate(undefined, nodes);
+  }
 }
+
+const mergeSets = <T>(setA?: Set<T>, setB?: Set<T>): Set<T> => {
+  return new Set<T>([...(setA?.values() ?? []), ...(setB?.values() ?? [])]);
+};

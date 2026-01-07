@@ -109,13 +109,17 @@ export class ViewInstance implements ValidationProvider {
     this.resolverOptions = resolverOptions;
   }
 
+  /** @deprecated use ViewController.markAsChanged */
   public updateAsync(asyncNode: string): void {
-    const update = this.resolver?.update(new Set(), new Set([asyncNode]));
+    const update = this.resolver?.update();
     this.lastUpdate = update;
     this.hooks.onUpdate.call(update);
   }
 
-  public update(changes?: Set<BindingInstance>): any {
+  public update(
+    changes?: Set<BindingInstance>,
+    nodeChanges?: Set<Node.Node>,
+  ): any {
     if (this.rootNode === undefined) {
       /** On initialization of the view, also create a validation parser */
       this.validationProvider = new CrossfieldProvider(
@@ -143,7 +147,7 @@ export class ViewInstance implements ValidationProvider {
       this.hooks.resolver.call(this.resolver);
     }
 
-    const update = this.resolver?.update(changes);
+    const update = this.resolver?.update(changes, nodeChanges);
 
     if (this.lastUpdate === update) {
       return this.lastUpdate;
