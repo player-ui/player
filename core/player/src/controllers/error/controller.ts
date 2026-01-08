@@ -4,6 +4,14 @@ import type { DataController } from "../data/controller";
 import type { PlayerError, ErrorMetadata, ErrorSeverity } from "./types";
 import { ErrorStateMiddleware } from "./middleware";
 
+/**
+ * Private symbol used to authorize ErrorController's writes to errorState
+ * Only ErrorController has access to this symbol
+ */
+const ERROR_CONTROLLER_AUTH_SYMBOL: unique symbol = Symbol(
+  "ERROR_CONTROLLER_AUTH",
+);
+
 export interface ErrorControllerHooks {
   /**
    * Fired when any error is captured
@@ -20,16 +28,6 @@ export interface ErrorControllerOptions {
   logger?: Logger;
   /** Data model for setting errorState */
   model?: DataController;
-}
-
-/**
- * Get the middleware for protecting errorState from external writes
- * Should be added to DataController's middleware array
- */
-export function getErrorStateMiddleware(options?: {
-  logger?: Logger;
-}): ErrorStateMiddleware {
-  return new ErrorStateMiddleware(options);
 }
 
 /** The orchestrator for player error handling */
@@ -50,7 +48,10 @@ export class ErrorController {
   constructor(options: ErrorControllerOptions = {}) {
     this.options = options;
 
-    this.middleware = getErrorStateMiddleware({ logger: options.logger });
+    this.middleware = new ErrorStateMiddleware({
+      logger: options.logger,
+      authSymbol: ERROR_CONTROLLER_AUTH_SYMBOL,
+    });
   }
 
   /**
@@ -158,27 +159,27 @@ export class ErrorController {
     try {
       const { error, errorType, severity, metadata } = playerError;
 
-      // Temporarily allow writes to errorState
-      this.middleware?.enableWrites();
-      this.options.model.set([
+      // Pass auth token to authorize write through middleware
+      this.options.model.set(
         [
-          "errorState",
-          {
-            message: error.message,
-            name: error.name,
-            errorType,
-            severity,
-            ...metadata,
-          },
+          [
+            "errorState",
+            {
+              message: error.message,
+              name: error.name,
+              errorType,
+              severity,
+              ...metadata,
+            },
+          ],
         ],
-      ]);
-      this.middleware?.disableWrites();
+        { authToken: ERROR_CONTROLLER_AUTH_SYMBOL },
+      );
 
       this.options?.logger?.debug(
         "[ErrorController] Error set in data model at 'data.errorState'",
       );
     } catch (e) {
-      this.middleware?.disableWrites();
       this.options?.logger?.error(
         "[ErrorController] Failed to set error in data model",
         e,
@@ -195,16 +196,15 @@ export class ErrorController {
     }
 
     try {
-      // Temporarily allow deletes to errorState
-      this.middleware?.enableWrites();
-      this.options.model.delete("errorState");
-      this.middleware?.disableWrites();
+      // Pass auth token to authorize delete through middleware
+      this.options.model.delete("errorState", {
+        authToken: ERROR_CONTROLLER_AUTH_SYMBOL,
+      });
 
       this.options?.logger?.debug(
         "[ErrorController] errorState deleted from data model",
       );
     } catch (e) {
-      this.middleware?.disableWrites();
       this.options?.logger?.error(
         "[ErrorController] Failed to delete errorState from data model",
         e,
