@@ -33,27 +33,26 @@ describe("ErrorController", () => {
   describe("captureError", () => {
     it("should capture error with metadata", () => {
       const error = new Error("Test error");
-      const metadata = {
-        errorType: ErrorTypes.EXPRESSION,
-        severity: ErrorSeverity.ERROR,
-        state: "VIEW_Test",
-      };
 
-      const playerError = errorController.captureError(error, metadata);
+      const playerError = errorController.captureError(
+        error,
+        ErrorTypes.EXPRESSION,
+        ErrorSeverity.ERROR,
+        { state: "VIEW_Test" },
+      );
 
       expect(playerError.error).toBe(error);
-      expect(playerError.metadata.errorType).toBe(ErrorTypes.EXPRESSION);
-      expect(playerError.metadata.severity).toBe(ErrorSeverity.ERROR);
-      expect(playerError.metadata.state).toBe("VIEW_Test");
-      expect(playerError.metadata.timestamp).toBeDefined();
+      expect(playerError.errorType).toBe(ErrorTypes.EXPRESSION);
+      expect(playerError.severity).toBe(ErrorSeverity.ERROR);
+      expect(playerError.metadata?.state).toBe("VIEW_Test");
     });
 
     it("should add error to history", () => {
       const error1 = new Error("Error 1");
       const error2 = new Error("Error 2");
 
-      errorController.captureError(error1);
-      errorController.captureError(error2);
+      errorController.captureError(error1, "test-error-1");
+      errorController.captureError(error2, "test-error-2");
 
       const history = errorController.getErrors();
       expect(history).toHaveLength(2);
@@ -63,7 +62,7 @@ describe("ErrorController", () => {
 
     it("should set as current error", () => {
       const error = new Error("Test error");
-      errorController.captureError(error);
+      errorController.captureError(error, "test-error");
 
       const currentError = errorController.getCurrentError();
       expect(currentError?.error).toBe(error);
@@ -71,61 +70,23 @@ describe("ErrorController", () => {
 
     it("should write to data model", () => {
       const error = new Error("Test error");
-      errorController.captureError(error, {
-        errorType: ErrorTypes.EXPRESSION,
-      });
+      errorController.captureError(error, ErrorTypes.EXPRESSION);
 
-      expect(mockDataController.set).toHaveBeenCalledWith([
+      expect(mockDataController.set).toHaveBeenCalledWith(
         [
-          "errorState",
-          expect.objectContaining({
-            message: "Test error",
-            name: "Error",
-            errorType: ErrorTypes.EXPRESSION,
-          }),
+          [
+            "errorState",
+            expect.objectContaining({
+              message: "Test error",
+              name: "Error",
+              errorType: ErrorTypes.EXPRESSION,
+            }),
+          ],
         ],
-      ]);
-    });
-  });
-
-  describe("formatErrorForData", () => {
-    it("should format error with default formatter", () => {
-      const error = new Error("Test error");
-      const playerError = errorController.captureError(error, {
-        errorType: ErrorTypes.VIEW,
-        severity: ErrorSeverity.ERROR,
-        state: "VIEW_Test",
-        context: { viewId: "test-view" },
-      });
-
-      const formatted = errorController.formatErrorForData(playerError);
-
-      expect(formatted).toEqual({
-        message: "Test error",
-        name: "Error",
-        errorType: ErrorTypes.VIEW,
-        severity: ErrorSeverity.ERROR,
-        assetId: undefined,
-        assetType: undefined,
-        bindingPath: undefined,
-        context: { viewId: "test-view" },
-      });
-    });
-
-    it("should include asset context", () => {
-      const error = new Error("Test error");
-      const playerError = errorController.captureError(error, {
-        assetContext: {
-          asset: { id: "test-asset", type: "form" } as any,
-          bindingPath: "user.email",
-        },
-      });
-
-      const formatted = errorController.formatErrorForData(playerError);
-
-      expect(formatted.assetId).toBe("test-asset");
-      expect(formatted.assetType).toBe("form");
-      expect(formatted.bindingPath).toBe("user.email");
+        expect.objectContaining({
+          authToken: expect.any(Symbol),
+        }),
+      );
     });
   });
 
@@ -136,7 +97,7 @@ describe("ErrorController", () => {
 
     it("should return current error", () => {
       const error = new Error("Test error");
-      errorController.captureError(error);
+      errorController.captureError(error, "test-error");
 
       expect(errorController.getCurrentError()?.error).toBe(error);
     });
@@ -151,8 +112,8 @@ describe("ErrorController", () => {
       const error1 = new Error("Error 1");
       const error2 = new Error("Error 2");
 
-      errorController.captureError(error1);
-      errorController.captureError(error2);
+      errorController.captureError(error1, "error-1");
+      errorController.captureError(error2, "error-2");
 
       const errors = errorController.getErrors();
       expect(errors).toHaveLength(2);
@@ -163,8 +124,8 @@ describe("ErrorController", () => {
 
   describe("clearErrors", () => {
     it("should clear all errors and history", () => {
-      errorController.captureError(new Error("Error 1"));
-      errorController.captureError(new Error("Error 2"));
+      errorController.captureError(new Error("Error 1"), "error-1");
+      errorController.captureError(new Error("Error 2"), "error-2");
 
       errorController.clearErrors();
 
@@ -173,19 +134,24 @@ describe("ErrorController", () => {
     });
 
     it("should delete errorState from data model", () => {
-      errorController.captureError(new Error("Test error"));
+      errorController.captureError(new Error("Test error"), "test-error");
 
       // Reset mock to track only clearErrors call
       vitest.clearAllMocks();
 
       errorController.clearErrors();
 
-      expect(mockDataController.delete).toHaveBeenCalledWith("errorState");
+      expect(mockDataController.delete).toHaveBeenCalledWith(
+        "errorState",
+        expect.objectContaining({
+          authToken: expect.any(Symbol),
+        }),
+      );
     });
 
     it("should handle missing data controller gracefully", () => {
       const controller = new ErrorController({ logger: mockLogger });
-      controller.captureError(new Error("Test error"));
+      controller.captureError(new Error("Test error"), "test-error");
 
       expect(() => controller.clearErrors()).not.toThrow();
     });
@@ -196,8 +162,8 @@ describe("ErrorController", () => {
       const error1 = new Error("Error 1");
       const error2 = new Error("Error 2");
 
-      errorController.captureError(error1);
-      errorController.captureError(error2);
+      errorController.captureError(error1, "error-1");
+      errorController.captureError(error2, "error-2");
 
       errorController.clearCurrentError();
 
@@ -206,19 +172,24 @@ describe("ErrorController", () => {
     });
 
     it("should delete errorState from data model", () => {
-      errorController.captureError(new Error("Test error"));
+      errorController.captureError(new Error("Test error"), "test-error");
 
       // Reset mock to track only clearCurrentError call
       vitest.clearAllMocks();
 
       errorController.clearCurrentError();
 
-      expect(mockDataController.delete).toHaveBeenCalledWith("errorState");
+      expect(mockDataController.delete).toHaveBeenCalledWith(
+        "errorState",
+        expect.objectContaining({
+          authToken: expect.any(Symbol),
+        }),
+      );
     });
 
     it("should handle missing data controller gracefully", () => {
       const controller = new ErrorController({ logger: mockLogger });
-      controller.captureError(new Error("Test error"));
+      controller.captureError(new Error("Test error"), "test-error");
 
       expect(() => controller.clearCurrentError()).not.toThrow();
     });
@@ -230,7 +201,7 @@ describe("ErrorController", () => {
       errorController.hooks.onError.tap("test", onErrorSpy);
 
       const error = new Error("Test error");
-      errorController.captureError(error);
+      errorController.captureError(error, "test-error");
 
       expect(onErrorSpy).toHaveBeenCalledTimes(1);
       expect(onErrorSpy).toHaveBeenCalledWith(
@@ -250,7 +221,7 @@ describe("ErrorController", () => {
       errorController.hooks.onError.tap("observer2", observer2);
 
       const error = new Error("Test error");
-      const playerError = errorController.captureError(error);
+      const playerError = errorController.captureError(error, "test-error");
 
       expect(observer1).toHaveBeenCalledTimes(1);
       expect(skipPlugin).toHaveBeenCalledWith(playerError);
@@ -266,7 +237,7 @@ describe("ErrorController", () => {
       errorController.hooks.onError.tap("observer2", observer2);
 
       const error = new Error("Test error");
-      errorController.captureError(error);
+      errorController.captureError(error, "test-error");
 
       expect(observer1).toHaveBeenCalledTimes(1);
       expect(observer2).toHaveBeenCalledTimes(1);
@@ -278,15 +249,14 @@ describe("ErrorController", () => {
   describe("custom error types", () => {
     it("should allow custom plugin error types", () => {
       const error = new Error("Custom plugin error");
-      const playerError = errorController.captureError(error, {
-        errorType: "my-custom-plugin",
-        severity: ErrorSeverity.WARNING,
-      });
+      const playerError = errorController.captureError(
+        error,
+        "my-custom-plugin",
+        ErrorSeverity.WARNING,
+      );
 
-      expect(playerError.metadata.errorType).toBe("my-custom-plugin");
-
-      const formatted = errorController.formatErrorForData(playerError);
-      expect(formatted.errorType).toBe("my-custom-plugin");
+      expect(playerError.errorType).toBe("my-custom-plugin");
+      expect(playerError.severity).toBe(ErrorSeverity.WARNING);
     });
   });
 
@@ -301,10 +271,15 @@ describe("ErrorController", () => {
       errorController.captureError(new Error("Test error"));
       expect(mockDataController.set).toHaveBeenCalled();
 
-      // Clear error should delete via middleware
+      // Clear error should delete via middleware with authToken
       vitest.clearAllMocks();
       errorController.clearCurrentError();
-      expect(mockDataController.delete).toHaveBeenCalledWith("errorState");
+      expect(mockDataController.delete).toHaveBeenCalledWith(
+        "errorState",
+        expect.objectContaining({
+          authToken: expect.any(Symbol),
+        }),
+      );
     });
   });
 });

@@ -46,6 +46,12 @@ export interface DataModelOptions {
    */
   silent?: boolean;
 
+  /**
+   * Authorization token for internal middleware operations
+   * Middleware can use this to verify the caller has permission for protected operations
+   */
+  authToken?: symbol;
+
   /** Other context associated with this request */
   context?: {
     /** The data model to use when getting other data from the context of this request */
