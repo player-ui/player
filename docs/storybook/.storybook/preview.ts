@@ -35,9 +35,6 @@ export const parameters = {
       ],
     },
   },
-  chakra: {
-    theme: {},
-  },
 };
 
 const preview: Preview = {
