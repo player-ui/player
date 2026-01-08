@@ -10,6 +10,7 @@ describe("ErrorStateMiddleware", () => {
   let baseDataModel: DataModelImpl;
   let mockLogger: Logger;
   let parser: BindingParser;
+  let authSymbol: symbol;
 
   beforeEach(() => {
     mockLogger = {
@@ -20,7 +21,11 @@ describe("ErrorStateMiddleware", () => {
       error: vitest.fn(),
     };
 
-    middleware = new ErrorStateMiddleware({ logger: mockLogger });
+    authSymbol = Symbol("test-auth");
+    middleware = new ErrorStateMiddleware({
+      logger: mockLogger,
+      authSymbol,
+    });
     baseDataModel = new LocalModel({ foo: "bar" });
 
     parser = new BindingParser({
@@ -31,7 +36,7 @@ describe("ErrorStateMiddleware", () => {
   });
 
   describe("set", () => {
-    it("should block writes to errorState by default", () => {
+    it("should block writes to errorState without authToken", () => {
       const binding = parser.parse("errorState");
       const updates = middleware.set(
         [[binding, { message: "test" }]],
@@ -49,7 +54,9 @@ describe("ErrorStateMiddleware", () => {
 
       // Should return no-op update
       expect(updates.length).toBe(1);
-      expect(updates[0].binding).toBe(binding);
+      expect(updates[0]!.binding).toBe(binding);
+      expect(updates[0]!.newValue).toBeUndefined();
+      expect(updates[0]!.oldValue).toBeUndefined();
     });
 
     it("should block writes to nested errorState paths", () => {
@@ -75,40 +82,64 @@ describe("ErrorStateMiddleware", () => {
       expect(baseDataModel.get(binding)).toBe("newValue");
       expect(mockLogger.warn).not.toHaveBeenCalled();
       expect(updates.length).toBe(1);
-      expect(updates[0].newValue).toBe("newValue");
+      expect(updates[0]!.newValue).toBe("newValue");
     });
 
-    it("should allow writes when enabled", () => {
+    it("should allow writes when authorized with authToken", () => {
       const binding = parser.parse("errorState");
 
-      middleware.enableWrites();
       const updates = middleware.set(
         [[binding, { message: "test" }]],
-        undefined,
+        { authToken: authSymbol },
         baseDataModel,
       );
-      middleware.disableWrites();
 
       expect(baseDataModel.get(binding)).toEqual({ message: "test" });
       expect(mockLogger.warn).not.toHaveBeenCalled();
       expect(updates.length).toBe(1);
-      expect(updates[0].newValue).toEqual({ message: "test" });
+      expect(updates[0]!.newValue).toEqual({ message: "test" });
     });
 
-    it("should block writes after disabling", () => {
+    it("should block writes with wrong authToken", () => {
       const binding = parser.parse("errorState");
-
-      middleware.enableWrites();
-      middleware.disableWrites();
+      const wrongSymbol = Symbol("wrong-auth");
 
       middleware.set(
         [[binding, { message: "test" }]],
-        undefined,
+        { authToken: wrongSymbol },
         baseDataModel,
       );
 
       expect(baseDataModel.get(binding)).toBeUndefined();
       expect(mockLogger.warn).toHaveBeenCalled();
+    });
+
+    it("should handle mixed transactions with blocked and allowed paths", () => {
+      const errorBinding = parser.parse("errorState");
+      const fooBinding = parser.parse("foo");
+
+      const updates = middleware.set(
+        [
+          [errorBinding, { message: "blocked" }],
+          [fooBinding, "allowed"],
+        ],
+        undefined,
+        baseDataModel,
+      );
+
+      // foo should be updated
+      expect(baseDataModel.get(fooBinding)).toBe("allowed");
+
+      // errorState should not be updated
+      expect(baseDataModel.get(errorBinding)).toBeUndefined();
+
+      // Should have logged warning for errorState
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        expect.stringContaining("Blocked write to protected path: errorState"),
+      );
+
+      // Should have updates for both paths
+      expect(updates.length).toBe(2);
     });
   });
 
@@ -125,7 +156,7 @@ describe("ErrorStateMiddleware", () => {
   });
 
   describe("delete", () => {
-    it("should block deletes to errorState by default", () => {
+    it("should block deletes to errorState without authToken", () => {
       const binding = parser.parse("errorState");
 
       // Set value first
@@ -140,24 +171,49 @@ describe("ErrorStateMiddleware", () => {
       );
     });
 
-    it("should allow deletes when enabled", () => {
+    it("should allow deletes when authorized with authToken", () => {
       const binding = parser.parse("errorState");
 
       // Set value first
       baseDataModel.set([[binding, { message: "test" }]]);
 
-      middleware.enableWrites();
-      middleware.delete(binding, undefined, baseDataModel);
-      middleware.disableWrites();
+      middleware.delete(binding, { authToken: authSymbol }, baseDataModel);
 
       expect(baseDataModel.get(binding)).toBeUndefined();
       expect(mockLogger.warn).not.toHaveBeenCalled();
+    });
+
+    it("should block deletes with wrong authToken", () => {
+      const binding = parser.parse("errorState");
+      const wrongSymbol = Symbol("wrong-auth");
+
+      // Set value first
+      baseDataModel.set([[binding, { message: "test" }]]);
+
+      middleware.delete(binding, { authToken: wrongSymbol }, baseDataModel);
+
+      expect(baseDataModel.get(binding)).toEqual({ message: "test" });
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        expect.stringContaining("Blocked delete of protected path: errorState"),
+      );
     });
 
     it("should allow deletes to other paths", () => {
       const binding = parser.parse("foo");
 
       middleware.delete(binding, undefined, baseDataModel);
+
+      expect(baseDataModel.get(binding)).toBeUndefined();
+      expect(mockLogger.warn).not.toHaveBeenCalled();
+    });
+
+    it("should allow deletes to nested errorState paths when authorized", () => {
+      const binding = parser.parse("errorState.nested.path");
+
+      // Set value first
+      baseDataModel.set([[binding, "test"]]);
+
+      middleware.delete(binding, { authToken: authSymbol }, baseDataModel);
 
       expect(baseDataModel.get(binding)).toBeUndefined();
       expect(mockLogger.warn).not.toHaveBeenCalled();

@@ -71,7 +71,6 @@ npm.npm_translate_lock(
     name = "npm",
     data = [
         "//:package.json",
-        "//:patches/@chakra-ui__system@2.6.2.patch",
     ],
     npm_package_target_name = "{dirname}",
     npmrc = "//:.npmrc",
