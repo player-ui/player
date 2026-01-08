@@ -269,13 +269,13 @@ export class ErrorController {
       | undefined;
     const nodeErrorState = this.resolveErrorState(
       nodeErrorStateConfig,
-      playerError.metadata.errorType,
+      playerError.errorType,
     );
 
     if (nodeErrorState) {
       try {
         this.options?.logger?.debug(
-          `[ErrorController] Node-level: Navigating to errorState "${nodeErrorState}" (errorType: ${playerError.metadata.errorType || "none"})`,
+          `[ErrorController] Node-level: Navigating to errorState "${nodeErrorState}" (errorType: ${playerError.errorType || "none"})`,
         );
         flowInstance.transition(nodeErrorState);
         return;
@@ -288,12 +288,12 @@ export class ErrorController {
 
     // Flow-level errorState
     const flowErrorState = flowInstance.transitionToErrorState(
-      playerError.metadata.errorType,
+      playerError.errorType,
     );
 
     if (flowErrorState) {
       this.options?.logger?.debug(
-        `[ErrorController] Navigated to flow-level errorState (errorType: ${playerError.metadata.errorType || "none"})`,
+        `[ErrorController] Navigated to flow-level errorState (errorType: ${playerError.errorType || "none"})`,
       );
       return;
     }

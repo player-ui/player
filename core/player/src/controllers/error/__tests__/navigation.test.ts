@@ -69,9 +69,7 @@ describe("ErrorController Navigation", () => {
       mockFlowInstance.currentState!.value.errorState = "error";
 
       const error = new Error("Test error");
-      errorController.captureError(error, {
-        errorType: ErrorTypes.VIEW,
-      });
+      errorController.captureError(error, ErrorTypes.VIEW);
 
       // Should call transition with the errorState value
       expect(mockFlowInstance.transition).toHaveBeenCalledWith("error");
@@ -197,9 +195,7 @@ describe("ErrorController Navigation", () => {
         validation: "validation_error",
       };
 
-      errorController.captureError(new Error("Binding failed"), {
-        errorType: "binding",
-      });
+      errorController.captureError(new Error("Binding failed"), "binding");
 
       expect(mockFlowInstance.transition).toHaveBeenCalledWith("binding_error");
     });
@@ -210,9 +206,7 @@ describe("ErrorController Navigation", () => {
         "*": "generic_error",
       };
 
-      errorController.captureError(new Error("Unknown error"), {
-        errorType: "unknown",
-      });
+      errorController.captureError(new Error("Unknown error"), "unknown");
 
       expect(mockFlowInstance.transition).toHaveBeenCalledWith("generic_error");
     });
@@ -224,9 +218,7 @@ describe("ErrorController Navigation", () => {
 
       mockFlowInstance.flow.errorState = "flow_error";
 
-      errorController.captureError(new Error("Expression error"), {
-        errorType: "expression",
-      });
+      errorController.captureError(new Error("Expression error"), "expression");
 
       // Should fall through to flow-level
       expect(mockFlowInstance.transition).not.toHaveBeenCalled();
@@ -245,9 +237,7 @@ describe("ErrorController Navigation", () => {
 
       mockFlowInstance.transitionToErrorState.mockClear().mockReturnValue(true);
 
-      errorController.captureError(new Error("Network timeout"), {
-        errorType: "network",
-      });
+      errorController.captureError(new Error("Network timeout"), "network");
 
       expect(mockFlowInstance.transitionToErrorState).toHaveBeenCalledWith(
         "network",
@@ -263,9 +253,7 @@ describe("ErrorController Navigation", () => {
 
       mockFlowInstance.transitionToErrorState.mockClear().mockReturnValue(true);
 
-      errorController.captureError(new Error("Unknown error"), {
-        errorType: "unknown",
-      });
+      errorController.captureError(new Error("Unknown error"), "unknown");
 
       expect(mockFlowInstance.transitionToErrorState).toHaveBeenCalledWith(
         "unknown",
@@ -286,9 +274,7 @@ describe("ErrorController Navigation", () => {
     it("should preserve string-based errorState behavior", () => {
       mockFlowInstance.currentState!.value.errorState = "simple_error";
 
-      errorController.captureError(new Error("Any error"), {
-        errorType: "binding",
-      });
+      errorController.captureError(new Error("Any error"), "binding");
 
       expect(mockFlowInstance.transition).toHaveBeenCalledWith("simple_error");
     });
