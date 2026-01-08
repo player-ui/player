@@ -10,30 +10,17 @@ import type { Logger } from "../../logger";
 
 /**
  * Middleware that prevents external writes to errorState
- * Only ErrorController should write to this path
+ * Only authorized callers (with the auth symbol) can write to this path
  */
 export class ErrorStateMiddleware implements DataModelMiddleware {
   name = "error-state-middleware";
 
   private logger?: Logger;
-  private allowWrites = false;
+  private authSymbol: symbol;
 
-  constructor(options?: { logger?: Logger }) {
-    this.logger = options?.logger;
-  }
-
-  /**
-   * Allow ErrorController to temporarily bypass protection
-   */
-  public enableWrites(): void {
-    this.allowWrites = true;
-  }
-
-  /**
-   * Re-enable protection after ErrorController write
-   */
-  public disableWrites(): void {
-    this.allowWrites = false;
+  constructor(options: { logger?: Logger; authSymbol: symbol }) {
+    this.logger = options.logger;
+    this.authSymbol = options.authSymbol;
   }
 
   public set(
@@ -41,8 +28,8 @@ export class ErrorStateMiddleware implements DataModelMiddleware {
     options?: DataModelOptions,
     next?: DataModelImpl,
   ): Updates {
-    // If writes are allowed (from ErrorController), pass through
-    if (this.allowWrites) {
+    // Check if this write is authorized by comparing the auth tokens
+    if (options?.authToken === this.authSymbol) {
       return next?.set(transaction, options) ?? [];
     }
 
@@ -90,10 +77,11 @@ export class ErrorStateMiddleware implements DataModelMiddleware {
     binding: BindingInstance,
     options?: DataModelOptions,
     next?: DataModelImpl,
-  ): boolean {
-    // If writes are allowed (from ErrorController), pass through
-    if (this.allowWrites) {
-      return next?.delete(binding, options) ?? false;
+  ): void {
+    // Check if this delete is authorized by comparing the auth tokens
+    if (options?.authToken === this.authSymbol) {
+      next?.delete(binding, options);
+      return;
     }
 
     const path = binding.asString();
@@ -103,9 +91,9 @@ export class ErrorStateMiddleware implements DataModelMiddleware {
       this.logger?.warn(
         `[ErrorStateMiddleware] Blocked delete of protected path: ${path}`,
       );
-      return false;
+      return;
     }
 
-    return next?.delete(binding, options) ?? false;
+    next?.delete(binding, options);
   }
 }
