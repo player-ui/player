@@ -182,7 +182,6 @@ export class Resolver {
       undefined,
       prevASTMap,
       realNodeChanges,
-      new Map(),
     );
     this.resolveCache = resolveCache;
     this.hooks.afterUpdate.call(updated.value);
@@ -251,7 +250,6 @@ export class Resolver {
     partiallyResolvedParent: Node.Node | undefined,
     prevASTMap: Map<Node.Node, Node.Node>,
     nodeChanges: Set<Node.Node>,
-    cacheCheckResults: Map<Node.Node, boolean>,
   ): NodeUpdate {
     const dependencyModel = new DependencyModel(options.data.model);
 
@@ -277,9 +275,10 @@ export class Resolver {
     const previousResult = this.getPreviousResult(node);
     const previousDeps = previousResult?.dependencies;
 
+    const isChanged = nodeChanges.has(node);
     const dataChanged = caresAboutDataChanges(dataChanges, previousDeps);
     const shouldUseLastValue = this.hooks.skipResolve.call(
-      !dataChanged,
+      !dataChanged && !isChanged,
       node,
       resolveOptions,
     );
@@ -382,7 +381,6 @@ export class Resolver {
           resolvedAST,
           prevASTMap,
           nodeChanges,
-          cacheCheckResults,
         );
         const {
           dependencies: childTreeDeps,
@@ -425,7 +423,6 @@ export class Resolver {
           resolvedAST,
           prevASTMap,
           nodeChanges,
-          cacheCheckResults,
         );
 
         if (mTree.value !== undefined && mTree.value !== null) {

@@ -44,6 +44,11 @@ export type ViewControllerHooks = {
   view: SyncHook<[ViewInstance]>;
 };
 
+/** Merge two optional sets into a new set. Returns an empty set if both are undefined. */
+const mergeSets = <T>(setA?: Set<T>, setB?: Set<T>): Set<T> => {
+  return new Set<T>([...(setA?.values() ?? []), ...(setB?.values() ?? [])]);
+};
+
 /** A controller to manage updating/switching views */
 export class ViewController {
   public readonly hooks: ViewControllerHooks = {
@@ -225,7 +230,3 @@ export class ViewController {
     this.queueUpdate(undefined, nodes);
   }
 }
-
-const mergeSets = <T>(setA?: Set<T>, setB?: Set<T>): Set<T> => {
-  return new Set<T>([...(setA?.values() ?? []), ...(setB?.values() ?? [])]);
-};
