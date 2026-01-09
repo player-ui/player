@@ -34,11 +34,6 @@ const config: StorybookConfig = {
     }
     return config;
   },
-  refs: {
-    "@chakra-ui/react": {
-      disable: true,
-    },
-  },
 };
 
 export default config;
