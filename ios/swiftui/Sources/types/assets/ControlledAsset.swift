@@ -14,17 +14,17 @@ import PlayerUI
 
 public enum AssetRenderError: Error {
     // Thrown when the asset fails to decode its data from the JS runtime into its swift data type
-    case decodingFailure(innerError: Error, asset: AssetData? = nil)
+    case decodingFailure(innerError: Error, asset: AssetData? = nil, pathToAsset: [AssetData])
 }
 
-extension AssetRenderError: CustomStringConvertible {
-    public var description: String {
+extension AssetRenderError: CustomDebugStringConvertible {
+    public var debugDescription: String {
         switch self {
-        case .decodingFailure(let innerError, let asset):
+        case .decodingFailure(let innerError, let asset, let pathToAsset):
             return """
 An error occured while decoding an asset.
 Caused by: \(innerError.playerDescription)
-Exception occurred in asset with id '\(asset?.id ?? "UNKNOWN")' of type '\(asset?.type ?? "UNKNOWN")'
+Exception occurred in asset with id '\(asset?.id ?? "UNKNOWN")' of type '\(asset?.type ?? "UNKNOWN")'\(pathToAsset.map({ "\n\tFound in (id: '\($0.id)', type: '\($0.type)')" }).joined())
 """
         }
     }
@@ -116,9 +116,19 @@ open class ControlledAsset<DataType: AssetData, ModelType>: SwiftUIAsset where M
             }
             
             try super.init(from: decoder)
-        } catch {
+        }
+        catch AssetRenderError.decodingFailure(let innerError, let asset, let pathToAsset) {
             let basicData = try? decoder.singleValueContainer().decode(MinimumAssetData.self)
-            throw AssetRenderError.decodingFailure(innerError: error, asset: basicData)
+            var newPath = pathToAsset
+            if let basicData {
+                newPath = pathToAsset + [basicData]
+            }
+            throw AssetRenderError.decodingFailure(innerError: innerError, asset: asset, pathToAsset: newPath)
+            
+        }
+        catch {
+            let basicData = try? decoder.singleValueContainer().decode(MinimumAssetData.self)
+            throw AssetRenderError.decodingFailure(innerError: error, asset: basicData, pathToAsset: [])
         }
     }
 }

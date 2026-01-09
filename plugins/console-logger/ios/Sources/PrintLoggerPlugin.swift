@@ -28,6 +28,28 @@ public class PrintLoggerPlugin: NativePlugin {
     public init(level: LogLevel = .error) {
         self.logLevel = level
     }
+    
+    private func logPrefix(_ level: LogLevel) -> String {
+        let playerPrefix = "[Player]"
+        switch level {
+            case .trace:
+                return "\(playerPrefix) [trace]: "
+            case .debug:
+                return "\(playerPrefix) [debug]: "
+            case .info:
+                return "\(playerPrefix) [info]: "
+            case .warning:
+                return "\(playerPrefix) [warn]: "
+            case .error:
+                return "\(playerPrefix) [error]: "
+        }
+    }
+    
+    private func printMessage(level: LogLevel, items: [Any]) {
+        print(self.logPrefix(level), terminator: "")
+        items.compactMap({ $0 }).forEach({ print($0, terminator: "") })
+        print()
+    }
 
     /**
      Applies itself to Player
@@ -35,14 +57,16 @@ public class PrintLoggerPlugin: NativePlugin {
     public func apply<P>(player: P) where P: HeadlessPlayer {
         player.logger.logLevel = logLevel
 
-        /// logging prefix for a given log level before the log message
-        let prefixedMessage = "[Player] [\(logLevel)]: "
-
-        player.logger.hooks.trace.tap(name: pluginName, { print("\(prefixedMessage)\(($0))" ) })
-        player.logger.hooks.debug.tap(name: pluginName, { print("\(prefixedMessage)\(($0))" ) })
-        player.logger.hooks.info.tap(name: pluginName, { print("\(prefixedMessage)\(($0))" ) })
-        player.logger.hooks.warn.tap(name: pluginName, { print("\(prefixedMessage)\(($0))" ) })
-        player.logger.hooks.error.tap(name: pluginName, { print("\(prefixedMessage)\((String(describing: $0)))", $1?.localizedDescription ?? "") })
+        player.logger.hooks.trace.tap(name: pluginName, { self.printMessage(level: .trace, items: $0) })
+        player.logger.hooks.debug.tap(name: pluginName, { self.printMessage(level: .debug, items: $0) })
+        player.logger.hooks.info.tap(name: pluginName, { self.printMessage(level: .info, items: $0) })
+        player.logger.hooks.warn.tap(name: pluginName, { self.printMessage(level: .warning, items: $0) })
+        player.logger.hooks.error.tap(name: pluginName, {
+            var items = $0.message ?? []
+            if let err = $0.error {
+                items = items + [err.localizedDescription]
+            }
+            self.printMessage(level: .error, items: items)
+        })
     }
 }
-
