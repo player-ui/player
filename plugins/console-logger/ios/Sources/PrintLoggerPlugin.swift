@@ -29,24 +29,8 @@ public class PrintLoggerPlugin: NativePlugin {
         self.logLevel = level
     }
     
-    private func logPrefix(_ level: LogLevel) -> String {
-        let playerPrefix = "[Player]"
-        switch level {
-            case .trace:
-                return "\(playerPrefix) [trace]: "
-            case .debug:
-                return "\(playerPrefix) [debug]: "
-            case .info:
-                return "\(playerPrefix) [info]: "
-            case .warning:
-                return "\(playerPrefix) [warn]: "
-            case .error:
-                return "\(playerPrefix) [error]: "
-        }
-    }
-    
     private func printMessage(level: LogLevel, items: [Any]) {
-        print(self.logPrefix(level), terminator: "")
+        print("[Player] [\(level.description)]", terminator: "")
         items.compactMap({ $0 }).forEach({ print($0, terminator: "") })
         print()
     }
@@ -64,7 +48,7 @@ public class PrintLoggerPlugin: NativePlugin {
         player.logger.hooks.error.tap(name: pluginName, {
             var items = $0.message ?? []
             if let err = $0.error {
-                items = items + [err.localizedDescription]
+                items += [err.localizedDescription]
             }
             self.printMessage(level: .error, items: items)
         })
