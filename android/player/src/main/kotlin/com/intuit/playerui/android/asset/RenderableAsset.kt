@@ -143,7 +143,7 @@ public abstract class RenderableAsset @Deprecated(
             }.also { if (it !is SuspendableAsset.AsyncViewStub) player.cacheAssetView(assetContext, it) }
     } catch (exception: Throwable) {
         if (exception is AssetRenderException) {
-            exception.addAssetParent(assetContext)
+            exception.assetParentPath += assetContext
             throw exception
         } else {
             throw AssetRenderException(assetContext, "Failed to render asset", exception)

@@ -80,7 +80,7 @@ public abstract class SuspendableAsset<Data>(
             )
         } catch (exception: Throwable) {
             if (exception is AssetRenderException) {
-                exception.addAssetParent(assetContext)
+                exception.assetParentPath += assetContext
                 throw exception
             } else {
                 throw AssetRenderException(assetContext, "Failed to render asset", exception)
