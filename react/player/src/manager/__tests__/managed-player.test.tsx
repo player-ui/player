@@ -692,24 +692,27 @@ describe.each([
     const callOrder: string[] = [];
 
     const manager: FlowManager = {
-      next: vitest.fn().mockReturnValueOnce(
-        Promise.resolve({
-          value: makeFlow({
-            id: "flow-1",
-            type: "collection",
-            values: [
-              {
-                asset: {
-                  id: "action",
-                  type: "action",
-                  value: "Next",
-                  label: "Continue",
+      next: vitest
+        .fn()
+        .mockReturnValueOnce(
+          Promise.resolve({
+            value: makeFlow({
+              id: "flow-1",
+              type: "collection",
+              values: [
+                {
+                  asset: {
+                    id: "action",
+                    type: "action",
+                    value: "Next",
+                    label: "Continue",
+                  },
                 },
-              },
-            ],
+              ],
+            }),
           }),
-        }),
-      ).mockReturnValue(Promise.resolve({ done: true })),
+        )
+        .mockReturnValue(Promise.resolve({ done: true })),
     };
 
     const onPending = vitest.fn(() => {
