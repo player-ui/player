@@ -598,4 +598,148 @@ describe.each([
       }),
     );
   });
+
+  test("calls onPending and onLoaded callbacks", async () => {
+    const manager: FlowManager = {
+      next: vitest
+        .fn()
+        .mockReturnValueOnce(
+          Promise.resolve({
+            value: makeFlow({
+              id: "flow-1",
+              type: "collection",
+              values: [
+                {
+                  asset: {
+                    id: "action",
+                    type: "action",
+                    value: "Next",
+                    label: "Continue",
+                  },
+                },
+              ],
+            }),
+          }),
+        )
+        .mockReturnValueOnce(
+          Promise.resolve({
+            value: makeFlow({
+              id: "flow-2",
+              type: "collection",
+              values: [
+                {
+                  asset: {
+                    id: "action",
+                    type: "action",
+                    value: "Next",
+                    label: "Continue",
+                  },
+                },
+              ],
+            }),
+          }),
+        )
+        .mockReturnValue(Promise.resolve({ done: true })),
+    };
+
+    const onPending = vitest.fn();
+    const onLoaded = vitest.fn();
+    const onComplete = vitest.fn();
+
+    const container = render(
+      <Suspense fallback="loading">
+        <ManagedPlayer
+          manager={manager}
+          plugins={[new SimpleAssetPlugin()]}
+          onPending={onPending}
+          onLoaded={onLoaded}
+          onComplete={onComplete}
+        />
+      </Suspense>,
+      { legacyRoot },
+    );
+
+    // First flow should trigger onPending and onLoaded
+    await waitFor(() => expect(onPending).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(onLoaded).toHaveBeenCalledTimes(1));
+
+    const view = await container.findByTestId("flow-1");
+    expect(view).toBeInTheDocument();
+
+    await act(async () => {
+      const nextButton = await container.findByText("Continue");
+      nextButton.click();
+    });
+
+    // Second flow should trigger onPending and onLoaded again
+    await waitFor(() => expect(onPending).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(onLoaded).toHaveBeenCalledTimes(2));
+
+    const view2 = await container.findByTestId("flow-2");
+    expect(view2).toBeInTheDocument();
+
+    await act(async () => {
+      const nextButton = await container.findByText("Continue");
+      nextButton.click();
+    });
+
+    // After completion, onPending should be called one more time
+    await waitFor(() => expect(onPending).toHaveBeenCalledTimes(3));
+    expect(onComplete).toHaveBeenCalled();
+  });
+
+  test("onPending called before onLoaded", async () => {
+    const callOrder: string[] = [];
+
+    const manager: FlowManager = {
+      next: vitest.fn().mockReturnValueOnce(
+        Promise.resolve({
+          value: makeFlow({
+            id: "flow-1",
+            type: "collection",
+            values: [
+              {
+                asset: {
+                  id: "action",
+                  type: "action",
+                  value: "Next",
+                  label: "Continue",
+                },
+              },
+            ],
+          }),
+        }),
+      ).mockReturnValue(Promise.resolve({ done: true })),
+    };
+
+    const onPending = vitest.fn(() => {
+      callOrder.push("pending");
+    });
+    const onLoaded = vitest.fn(() => {
+      callOrder.push("loaded");
+    });
+    const onStartedFlow = vitest.fn(() => {
+      callOrder.push("started");
+    });
+
+    render(
+      <Suspense fallback="loading">
+        <ManagedPlayer
+          manager={manager}
+          plugins={[new SimpleAssetPlugin()]}
+          onPending={onPending}
+          onLoaded={onLoaded}
+          onStartedFlow={onStartedFlow}
+        />
+      </Suspense>,
+      { legacyRoot },
+    );
+
+    await waitFor(() => expect(onStartedFlow).toHaveBeenCalled());
+
+    expect(callOrder).toEqual(["pending", "loaded", "started"]);
+    expect(onPending).toHaveBeenCalledTimes(1);
+    expect(onLoaded).toHaveBeenCalledTimes(1);
+    expect(onStartedFlow).toHaveBeenCalledTimes(1);
+  });
 });
