@@ -1,0 +1,97 @@
+---
+title: Plugin Architecture
+description: A concise guide to Player’s controller lifecycle and hook surfaces, for plugin authors.
+---
+
+This page is for **plugin authors** who want to understand _where to tap_ and _what the runtime looks like_ without reading the core source.
+
+## What Plugin Architecture Means
+
+When you write a plugin, you’re typically interacting with:
+
+- **hooks**: Tapable-style extension points on `Player` and its controllers
+- **controllers**: the runtime subsystems created for a given `player.start(flow)` run (flow/view/data/etc)
+
+The key idea: **controllers are created per-run**. Don’t assume they live forever.
+
+## Per-Flow Lifecycle
+
+On each `player.start(flow)` call, Player creates a new controller set and publishes them through hooks.
+
+For plugin authors, this means:
+
+- If you store `dataController`, `flowController`, etc, **overwrite them on each run**
+- Prefer tapping hooks to observe lifecycle moments vs “holding on” to objects long-term
+
+## Main Hook Surfaces
+
+This is the set of **top-level hook entry points** exposed by the core `Player` object. Plugins tap these hooks to get access to the corresponding controller instances for a run.
+
+| Hook                                                        | Gives you                                                                      | Use it when…                                                                                 |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| `player.hooks.state`                                        | Player lifecycle state (`not-started` / `in-progress` / `completed` / `error`) | You want a single place to grab the active run controllers (`state.controllers`).            |
+| `player.hooks.flowController`                               | `FlowController`                                                               | You want to observe or affect navigation transitions (via nested flow hooks).                |
+| `player.hooks.viewController`                               | `ViewController`                                                               | You want to react to view changes or update behavior.                                        |
+| `player.hooks.view`                                         | `ViewInstance`                                                                 | You want to attach view-scoped behavior when a new view is entered.                          |
+| `player.hooks.dataController`                               | `DataController`                                                               | You want to observe or augment data pipeline behavior (sets, defaults, formatting, updates). |
+| `player.hooks.expressionEvaluator`                          | `ExpressionEvaluator`                                                          | You want to add/override expression functions or observe evaluation errors.                  |
+| `player.hooks.schema` / `player.hooks.validationController` | schema + validation controllers                                                | You need schema-driven formatting or validation behavior.                                    |
+| `player.hooks.bindingParser`                                | `BindingParser`                                                                | You need custom binding parsing/routing or to wrap parse/evaluate plumbing.                  |
+
+## Getting Controllers in One Place
+
+If you want a single “entry point” that gives you the current controllers for the active run, tap `player.hooks.state` and look for `in-progress`:
+
+```ts
+import type { Player, PlayerPlugin, InProgressState } from "@player-ui/player";
+
+export class MyPlugin implements PlayerPlugin {
+  name = "my-plugin";
+
+  apply(player: Player) {
+    player.hooks.state.tap(this.name, (state) => {
+      if (state.status !== "in-progress") return;
+
+      const controllers = (state as InProgressState).controllers;
+      // controllers.data / controllers.view / controllers.flow / ...
+    });
+  }
+}
+```
+
+Notes:
+
+- After completion, Player exposes only a **read-only** data controller in the completed state.
+- In core Player, these hooks are implemented with `tapable-ts` sync hooks (`SyncHook`, `SyncWaterfallHook`, `SyncBailHook`), so handlers run synchronously.
+
+## Nested Hooks
+
+Some lifecycle points are nested a level down:
+
+```ts
+apply(player: Player) {
+  player.hooks.flowController.tap(this.name, (flowController) => {
+    flowController.hooks.flow.tap(this.name, (flow) => {
+      flow.hooks.transition.tap(this.name, (from, to) => {
+        player.logger.debug("Transition %s -> %s", from?.name, to.name);
+      });
+    });
+  });
+}
+```
+
+This is a common shape in Player plugins: “tap a controller hook to access a deeper hook surface”.
+
+## Tools
+
+- **View AST Explorer** (`/tools/view-ast-explorer`)
+  - Preview the internal AST representation of a view (often referenced during the transform phase).
+- **DSL Content Playground** (`/tools/dsl-content-playground`)
+  - Explore authoring content using the DSL and the reference assets.
+- **Storybook integration** (`/capabilities/storybook`)
+  - The Events panel shows logs, render/update metrics, data mutations, and more as a flow is processed.
+
+## Next Steps
+
+- **How to write a plugin**: [Writing a Plugin](/guides/writing-plugins)
+- **A worked example**: [Plugin Implementation](/guides/plugin-implementation)

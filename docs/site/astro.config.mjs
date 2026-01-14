@@ -136,6 +136,10 @@ export default defineConfig({
               slug: "plugins",
             },
             {
+              label: "Plugin Architecture",
+              slug: "plugins/architecture",
+            },
+            {
               label: "Android/JVM Plugins",
               autogenerate: { directory: "plugins/android" },
             },
