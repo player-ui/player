@@ -342,6 +342,10 @@ export const ManagedPlayer = (
       props.onError?.(state?.context.error);
     } else if (state?.value === "running") {
       props.onStartedFlow?.();
+    } else if (state?.value === "pending") {
+      props?.onPending?.();
+    } else if (state?.value === "loaded") {
+      props?.onLoaded?.();
     }
   }
 

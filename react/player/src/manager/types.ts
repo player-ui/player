@@ -58,6 +58,12 @@ export interface ManagedPlayerProps extends ReactPlayerOptions {
   /** A callback for any errors */
   onError?: (e: Error) => void;
 
+  /** A callback for before the flow manager is called */
+  onPending?: () => void;
+
+  /** A callback for when the flow manager has been resolved */
+  onLoaded?: () => void;
+
   /** A component to render when there are errors */
   fallbackComponent?: React.ComponentType<FallbackProps>;
 }
