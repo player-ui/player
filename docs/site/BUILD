@@ -1,6 +1,5 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//:astro/package_json.bzl", astro_bin = "bin")
-load("@npm//:pagefind/package_json.bzl", pagefind_bin = "bin")
 
 
 npm_link_all_packages(
@@ -27,22 +26,6 @@ genrule(
     tags = ["no-sandbox", "no-cache"],
 )
 
-genrule(
-    name = "hooks_docs",
-    srcs = [
-        "//:scripts/docs/generate-hooks-docs.mjs",
-        "//core/player:hook_sources",
-    ],
-    outs = ["src/content/docs/plugins/hooks.mdx"],
-    # Ensure node can resolve repo dependencies (typescript, globby, etc).
-    tools = ["//:node_modules"],
-    cmd = """
-        node $(location //:scripts/docs/generate-hooks-docs.mjs) \
-          --roots core/player/src \
-          --out "$@"
-    """,
-)
-
 srcs = glob([
     "public/**/*",
     "src/**/*",
@@ -52,7 +35,6 @@ srcs = glob([
     "astro.config.mjs",
     "tailwind.config.mjs",
     ":git_dates",
-    ":hooks_docs",
 ]
 
 build_deps = [

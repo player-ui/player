@@ -12,6 +12,9 @@
     "pnpm": "^10.18.1"
   },
   "packageManager": "pnpm@10.18.1",
+  "scripts": {
+    "docs:hooks": "node scripts/docs/generate-hooks-docs.mjs"
+  },
   "dependencies": {
     "@astrojs/react": "^4.0.0",
     "@astrojs/starlight": "^0.35.2",
