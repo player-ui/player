@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/krzyzanowskim/CryptoSwift.git",
       "state" : {
-        "revision" : "c9c3df6ab812de32bae61fc0cd1bf6d45170ebf0",
-        "version" : "1.8.2"
+        "revision" : "e45a26384239e028ec87fbcc788f513b67e10d8f",
+        "version" : "1.9.0"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/jpsim/SourceKitten.git",
       "state" : {
-        "revision" : "b6dc09ee51dfb0c66e042d2328c017483a1a5d56",
-        "version" : "0.34.1"
+        "revision" : "6529c17fe80dd94843a3df7ed3e6a239790d5c91",
+        "version" : "0.37.3"
       }
     },
     {
@@ -32,8 +32,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser.git",
       "state" : {
-        "revision" : "8f4d2753f0e4778c76d5f05ad16c74f707390531",
-        "version" : "1.2.3"
+        "revision" : "626b5b7b2f45e1b0b1c6f4a309296d1d21d7311b",
+        "version" : "1.7.1"
+      }
+    },
+    {
+      "identity" : "swift-filename-matcher",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ileitch/swift-filename-matcher",
+      "state" : {
+        "revision" : "eef5ac0b6b3cdc64b3039b037bed2def8a1edaeb",
+        "version" : "2.0.1"
       }
     },
     {
@@ -48,10 +57,10 @@
     {
       "identity" : "swift-syntax",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-syntax.git",
+      "location" : "https://github.com/swiftlang/swift-syntax.git",
       "state" : {
-        "revision" : "6ad4ea24b01559dde0773e3d091f1b9e36175036",
-        "version" : "509.0.2"
+        "revision" : "65b02a90ad2cc213e09309faeb7f6909e0a8577a",
+        "version" : "604.0.0-prerelease-2026-01-20"
       }
     },
     {
@@ -59,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/realm/SwiftLint.git",
       "state" : {
-        "revision" : "f17a4f9dfb6a6afb0408426354e4180daaf49cee",
-        "version" : "0.54.0"
+        "revision" : "88952528a590ed366c6f76f6bfb980b5ebdcefc1",
+        "version" : "0.63.2"
       }
     },
     {
@@ -86,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/nalexn/ViewInspector",
       "state" : {
-        "revision" : "a6fcac8485bc8f57b2d2b55bb6d97138e8659e4b",
-        "version" : "0.10.2"
+        "revision" : "e9a06346499a3a889165647e3f23f8a7b2609a1c",
+        "version" : "0.10.3"
       }
     },
     {
@@ -95,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/jpsim/Yams.git",
       "state" : {
-        "revision" : "9234124cff5e22e178988c18d8b95a8ae8007f76",
-        "version" : "5.1.2"
+        "revision" : "deaf82e867fa2cbd3cd865978b079bfcf384ac28",
+        "version" : "6.2.1"
       }
     }
   ],
