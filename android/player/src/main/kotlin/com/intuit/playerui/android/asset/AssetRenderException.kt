@@ -4,7 +4,6 @@ import com.intuit.playerui.android.AssetContext
 import com.intuit.playerui.core.player.PlayerException
 
 class AssetRenderException : PlayerException {
-
     private var _assetParentPath: List<AssetContext> = emptyList()
     var assetParentPath: List<AssetContext>
         get() = _assetParentPath
