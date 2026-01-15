@@ -32,7 +32,7 @@ executors:
     working_directory: ~/player
     resource_class: m4pro.medium
     macos:
-      xcode: 16.4.0
+      xcode: 26.2.0
     environment:
       TZ: "/usr/share/zoneinfo/America/Los_Angeles"
   android:
@@ -166,9 +166,9 @@ jobs:
             HOMEBREW_NO_AUTO_UPDATE=1 brew install bazelisk lcov
 
       - macos/preboot-simulator:
-          version: "18.5"
+          version: "26.2"
           platform: "iOS"
-          device: "iPhone 16 Pro"
+          device: "iPhone 17 Pro"
 
       - run: bazel build --config=ci-mac -- //ios/demo:PlayerUIDemo
 
