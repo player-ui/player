@@ -21,6 +21,7 @@ class ControlledAssetTests: XCTestCase {
         var id: String
         var type: String
         var value: String
+        var nested: WrappedAsset?
     }
 
     struct SomeOtherData: AssetData {
@@ -135,6 +136,33 @@ class ControlledAssetTests: XCTestCase {
         
         guard let err = thrownError else { return XCTFail("expected asset to throw error while decoding") }
         XCTAssertTrue(err.playerDescription.contains("Exception occurred in asset with id 'someId' of type 'someType'"))
+    }
+    
+    func testNestedDecoderError() throws {
+        class SomeAsset: ControlledAsset<SomeData, AssetViewModel<SomeData>> {}
+        
+        let val = context.evaluateScript("({id: 'someId', type: 'someType', value: '123', nested: { asset: { id: 'nestedId', type: 'someType', value: 123  }}})")
+        let partialMatch = PartialMatchFingerprintPlugin()
+        partialMatch.context = context
+        partialMatch.setMapping(assetId: "someId", index: 0)
+        partialMatch.setMapping(assetId: "nestedId", index: 0)
+        let registry = SwiftUIRegistry(logger: TapableLogger())
+        registry.register("someType", asset: SomeAsset.self)
+        registry.partialMatchRegistry = partialMatch
+        
+        guard let value = val else { return XCTFail("value should not have been nil") }
+        
+        var thrownError: Error?
+        
+        do {
+            try registry.decode(value)
+        } catch {
+            thrownError = error
+        }
+        
+        guard let err = thrownError else { return XCTFail("expected asset to throw error while decoding") }
+        XCTAssertTrue(err.playerDescription.contains("Exception occurred in asset with id 'nestedId' of type 'someType'"), err.playerDescription)
+        XCTAssertTrue(err.playerDescription.contains("Found in (id: 'someId', type: 'someType')"), err.playerDescription)
     }
 }
 

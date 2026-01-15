@@ -30,7 +30,7 @@ Exception occurred in asset with id '\(asset?.id ?? "UNKNOWN")' of type '\(asset
     }
 }
 
-class MinimumAssetData: AssetData {
+struct MinimumAssetData: AssetData {
     public var id: String
     public var type: String
 }

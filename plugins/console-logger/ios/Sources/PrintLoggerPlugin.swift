@@ -30,9 +30,8 @@ public class PrintLoggerPlugin: NativePlugin {
     }
     
     private func printMessage(level: LogLevel, items: [Any]) {
-        print("[Player] [\(level.description)]", terminator: "")
-        items.compactMap({ $0 }).forEach({ print($0, terminator: "") })
-        print()
+        let message = items.compactMap { $0 }.map { "\($0)" }.joined()
+        print("[Player] [\(level.description)]: \(message)")
     }
 
     /**
