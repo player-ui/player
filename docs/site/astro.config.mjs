@@ -136,8 +136,8 @@ export default defineConfig({
               slug: "plugins",
             },
             {
-              label: "Plugin Architecture",
-              slug: "plugins/architecture",
+              label: "Hooks",
+              slug: "plugins/hooks",
             },
             {
               label: "Android/JVM Plugins",

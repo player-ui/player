@@ -52,6 +52,8 @@ _backup
 android-tools
 *.iml
 
+docs/site/src/content/docs/plugins/hooks.mdx
+
 
 # Xcode
 build/
