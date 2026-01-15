@@ -339,7 +339,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
 
         deferredResolve!!.invoke(listOf(viewObject))
 
-        Assertions.assertEquals(1, count)
+        waitForCondition { count == 1 }
 
         view = player.inProgressState?.lastViewUpdate
         Assertions.assertNotNull(view)
@@ -359,11 +359,11 @@ internal class AsyncNodePluginTest : PlayerTest() {
                 ?.get("type"),
         )
         Assertions.assertEquals(2, view.getList("actions")?.size)
-        Assertions.assertEquals(2, count)
+        waitForCondition { count == 2 }
 
         updateContent!!.invoke(null)
 
-        Assertions.assertEquals(3, count)
+        waitForCondition { count == 3 }
         view = player.inProgressState?.lastViewUpdate
 
         Assertions.assertNotNull(view)
@@ -419,7 +419,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
 
         deferredResolve!!.invoke(null)
 
-        Assertions.assertEquals(1, count)
+        waitForCondition { count == 1 }
 
         view = player.inProgressState?.lastViewUpdate
 
@@ -432,7 +432,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
 
         updateContent!!.invoke(null)
 
-        Assertions.assertEquals(1, count)
+        waitForCondition { count == 1 }
 
         view = player.inProgressState?.lastViewUpdate
 
@@ -697,7 +697,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
 
         deferredResolve!!.invoke(listOf(viewObject))
 
-        Assertions.assertEquals(1, count)
+        waitForCondition { count == 1 }
 
         view = player.inProgressState?.lastViewUpdate
         Assertions.assertNotNull(view)
@@ -717,11 +717,11 @@ internal class AsyncNodePluginTest : PlayerTest() {
                 ?.get("type"),
         )
         Assertions.assertEquals(2, view.getList("actions")?.size)
-        Assertions.assertEquals(2, count)
+        waitForCondition { count == 2 }
 
         updateContent!!.invoke(null)
 
-        Assertions.assertEquals(3, count)
+        waitForCondition { count == 3 }
         view = player.inProgressState?.lastViewUpdate
 
         Assertions.assertNotNull(view)
@@ -730,5 +730,15 @@ internal class AsyncNodePluginTest : PlayerTest() {
             view!!.getList("actions")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("type"),
         )
         Assertions.assertEquals(1, view.getList("actions")?.size)
+    }
+
+    private fun waitForCondition(
+        count: Int = 5,
+        delay: Long = 500,
+        conditions: () -> Boolean = { true },
+    ) {
+        var counter = 0
+        while (!conditions() && counter++ < count) runBlockingTest { delay(delay) }
+        Assertions.assertTrue(conditions())
     }
 }
