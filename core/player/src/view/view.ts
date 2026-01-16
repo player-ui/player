@@ -109,7 +109,7 @@ export class ViewInstance implements ValidationProvider {
     this.resolverOptions = resolverOptions;
   }
 
-  /** @deprecated use ViewController.markAsChanged */
+  /** @deprecated use ViewController.updateViewAST */
   public updateAsync(asyncNode: string): void {
     const update = this.resolver?.update();
     this.lastUpdate = update;
