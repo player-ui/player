@@ -226,7 +226,11 @@ export class ViewController {
     ];
   }
 
-  public markAsChanged(nodes: Set<Node.Node>): void {
+  /** Marks all AST nodes in `nodes` as changed, triggering the view to update and re-resolve these nodes. View updates are triggered asynchronously and many calls to this in a short time will batch into a single update.
+   *
+   * NOTE: In most cases view updates are handled automatically by changes to data or any other built-in functionality that would require a view update. Only call this function if absolutely necessary.
+   */
+  public updateViewAST(nodes: Set<Node.Node>): void {
     this.queueUpdate(undefined, nodes);
   }
 }

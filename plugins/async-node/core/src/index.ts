@@ -31,8 +31,10 @@ type AsyncPluginContext = {
   viewController: ViewController;
   /** Map of async node id to promises being used to resolve them */
   inProgressNodes: Set<string>;
-  /** node things */
-  nodeThings: Map<string, Node.Node>;
+  /** Map of async node ids to the original node they represent.
+   * In some cases, async nodes are transformed into from other node types so the original reference is needed in order to trigger an update on the view when the async node changes.
+   */
+  originalNodeCache: Map<string, Node.Node>;
 };
 
 export interface AsyncNodePluginOptions {
@@ -166,11 +168,11 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     context: AsyncPluginContext,
     newNode?: Node.Node | null,
   ) {
-    const { nodeResolveCache, viewController, nodeThings } = context;
+    const { nodeResolveCache, viewController, originalNodeCache } = context;
     if (nodeResolveCache.get(node.id) !== newNode) {
       nodeResolveCache.set(node.id, newNode ? newNode : node);
-      const originalNode = nodeThings.get(node.id) ?? node;
-      viewController.markAsChanged(new Set([originalNode]));
+      const originalNode = originalNodeCache.get(node.id) ?? node;
+      viewController.updateViewAST(new Set([originalNode]));
     }
   }
 
@@ -196,7 +198,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         return node === null ? node : this.resolveAsyncChildren(node, context);
       }
       if (options.node) {
-        context.nodeThings.set(node.id, options.node);
+        context.originalNodeCache.set(node.id, options.node);
       }
 
       const resolvedNode = context.nodeResolveCache.get(node.id);
@@ -243,7 +245,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         }
 
         const mappedNode = context.nodeResolveCache.get(childNode.id)!;
-        context.nodeThings.set(childNode.id, mappedNode);
+        context.originalNodeCache.set(childNode.id, mappedNode);
         if (mappedNode.type === NodeType.MultiNode && childNode.flatten) {
           mappedNode.values.forEach((v: Node.Node) => (v.parent = node));
           node.values = [
@@ -264,7 +266,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
           this.hasValidMapping(c.value, context)
         ) {
           const mappedNode = context.nodeResolveCache.get(c.value.id)!;
-          context.nodeThings.set(c.value.id, mappedNode);
+          context.originalNodeCache.set(c.value.id, mappedNode);
           c.value = mappedNode;
           c.value.parent = node;
         }
@@ -385,7 +387,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
           inProgressNodes: new Set(),
           view,
           viewController,
-          nodeThings: new Map(),
+          originalNodeCache: new Map(),
         };
 
         view.hooks.resolver.tap("async", (resolver) => {
