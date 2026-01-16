@@ -9,8 +9,10 @@ import Foundation
 
 /**
  A union type to match the JS core players any type
+ 
+ This type is `Sendable` and uses recursive cases for complex types.
  */
-public enum AnyType: Hashable {
+public enum AnyType: Hashable, Sendable {
     // swiftlint:disable cyclomatic_complexity
     public func hash(into hasher: inout Hasher) {
         switch self {
@@ -33,9 +35,13 @@ public enum AnyType: Hashable {
         case .booleanArray(let data):
             hasher.combine(data)
         case .anyDictionary(let data):
-            hasher.combine(data as NSDictionary)
+            // Hash the dictionary by combining sorted keys and their values
+            for key in data.keys.sorted() {
+                hasher.combine(key)
+                hasher.combine(data[key])
+            }
         case .anyArray(let data):
-            hasher.combine(data as NSArray)
+            hasher.combine(data)
         case .unknownData:
             return
         }
@@ -72,18 +78,242 @@ public enum AnyType: Hashable {
      The underlying data was a dictionary of varied value types
 
      **This requires the decoder to add `AnyTypeDecodingContext` to the decoders userInfo**
+     
+     - Note: This case now uses recursive `AnyType` values instead of `Any` to maintain `Sendable` conformance.
+     Use the `asAnyDictionary` property for backward compatibility with `[String: Any]`.
      */
-    case anyDictionary(data: [String: Any])
+    case anyDictionary(data: [String: AnyType])
 
     /**
      The underlying data was an array of varied value types
 
      **This requires the decoder to add `AnyTypeDecodingContext` to the decoders userInfo**
+     
+     - Note: This case now uses recursive `AnyType` values instead of `Any` to maintain `Sendable` conformance.
+     Use the `asAnyArray` property for backward compatibility with `[Any]`.
      */
-    case anyArray(data: [Any])
+    case anyArray(data: [AnyType])
 
     /// The underlying data was not in a known format
     case unknownData
+}
+
+// MARK: - Backward Compatibility & Conversion Helpers
+
+extension AnyType {
+    /**
+     Create an AnyType from a legacy `[String: Any]` dictionary.
+     
+     This initializer recursively converts the dictionary values to AnyType.
+     - Parameter anyDictionary: A dictionary with Any values
+     */
+    public init(anyDictionary: [String: Any]) {
+        let converted = anyDictionary.mapValues { value -> AnyType in
+            AnyType(from: value)
+        }
+        self = .anyDictionary(data: converted)
+    }
+    
+    /**
+     Create an AnyType from a legacy `[Any]` array.
+     
+     This initializer recursively converts the array elements to AnyType.
+     - Parameter anyArray: An array with Any elements
+     */
+    public init(anyArray: [Any]) {
+        let converted = anyArray.map { value -> AnyType in
+            AnyType(from: value)
+        }
+        self = .anyArray(data: converted)
+    }
+    
+    /**
+     Convert an `Any` value to AnyType.
+     
+     This method attempts to match the value to the most specific AnyType case.
+     - Parameter value: The value to convert
+     */
+    public init(from value: Any) {
+        switch value {
+        case let str as String:
+            self = .string(data: str)
+        case let bool as Bool:
+            self = .bool(data: bool)
+        case let num as NSNumber:
+            // NSNumber from JSONSerialization - check if it's actually a bool
+            if CFNumberGetType(num as CFNumber) == .charType {
+                // This is actually a boolean
+                self = .bool(data: num.boolValue)
+            } else {
+                self = .number(data: num.doubleValue)
+            }
+        case let num as Double:
+            self = .number(data: num)
+        case let num as Int:
+            self = .number(data: Double(num))
+        case let num as Float:
+            self = .number(data: Double(num))
+        case let dict as [String: String]:
+            self = .dictionary(data: dict)
+        case let dict as [String: Double]:
+            self = .numberDictionary(data: dict)
+        case let dict as [String: Bool]:
+            self = .booleanDictionary(data: dict)
+        case let dict as [String: Any]:
+            self = .init(anyDictionary: dict)
+        case let arr as [String]:
+            self = .array(data: arr)
+        case let arr as [Double]:
+            self = .numberArray(data: arr)
+        case let arr as [Bool]:
+            self = .booleanArray(data: arr)
+        case let arr as [Any]:
+            self = .init(anyArray: arr)
+        default:
+            self = .unknownData
+        }
+    }
+    
+    /**
+     Access the anyDictionary case as `[String: Any]` for backward compatibility.
+     
+     - Returns: The dictionary as `[String: Any]`, or `nil` if not an anyDictionary case.
+     */
+    public var asAnyDictionary: [String: Any]? {
+        guard case .anyDictionary(let data) = self else { return nil }
+        return data.mapValues { $0.asAny }
+    }
+    
+    /**
+     Access the anyArray case as `[Any]` for backward compatibility.
+     
+     - Returns: The array as `[Any]`, or `nil` if not an anyArray case.
+     */
+    public var asAnyArray: [Any]? {
+        guard case .anyArray(let data) = self else { return nil }
+        return data.map { $0.asAny }
+    }
+    
+    /**
+     Convert this AnyType back to an `Any` value.
+     
+     This is useful for interoperating with APIs that expect `Any`.
+     */
+    public var asAny: Any {
+        switch self {
+        case .string(let data): return data
+        case .bool(let data): return data
+        case .number(let data): return data
+        case .dictionary(let data): return data
+        case .numberDictionary(let data): return data
+        case .booleanDictionary(let data): return data
+        case .array(let data): return data
+        case .numberArray(let data): return data
+        case .booleanArray(let data): return data
+        case .anyDictionary(let data): return data.mapValues { $0.asAny }
+        case .anyArray(let data): return data.map { $0.asAny }
+        case .unknownData: return NSNull()
+        }
+    }
+    
+    /**
+     Pattern match on anyDictionary with a legacy `[String: Any]` handler.
+     
+     - Parameter handler: Closure to execute if this is an anyDictionary case
+     */
+    public func matchAnyDictionary(_ handler: ([String: Any]) -> Void) {
+        if let dict = asAnyDictionary {
+            handler(dict)
+        }
+    }
+    
+    /**
+     Pattern match on anyArray with a legacy `[Any]` handler.
+     
+     - Parameter handler: Closure to execute if this is an anyArray case
+     */
+    public func matchAnyArray(_ handler: ([Any]) -> Void) {
+        if let arr = asAnyArray {
+            handler(arr)
+        }
+    }
+}
+
+// MARK: - Reflection Support
+
+extension AnyType {
+    /**
+     Access the underlying value as a dynamic `Any` type for reflection purposes.
+     
+     This property allows you to access the raw value without pattern matching,
+     useful for dynamic type casting and reflection scenarios.
+     
+     - Returns: The underlying value as `Any`. For `anyDictionary` and `anyArray`,
+                returns `[String: Any]` and `[Any]` respectively for backward compatibility.
+     
+     - Example:
+     ```swift
+     let anyType = AnyType.string(data: "Hello")
+     let value = anyType.dynamicValue // "Hello" as Any
+     ```
+     */
+    public var dynamicValue: Any {
+        return asAny
+    }
+    
+    /**
+     Cast to expected type automatically.
+     
+     This method provides a convenient way to cast the underlying value to a specific type
+     without explicit pattern matching or type checking.
+     
+     - Parameter type: The target type to cast to
+     - Returns: The value cast to the specified type, or `nil` if the cast fails
+     
+     - Example:
+     ```swift
+     let anyType = AnyType.string(data: "Hello")
+     let title: String? = anyType.as(String.self)  // "Hello"
+     
+     // Usage in dictionaries
+     let envelope: AnyType = // ... some AnyType
+     let title: String? = envelope["title"]?.as(String.self)
+     ```
+     */
+    public func `as`<T>(_ type: T.Type) -> T? {
+        return dynamicValue as? T
+    }
+    
+    /**
+     Subscript access for dictionary-like `AnyType` values.
+     
+     Provides convenient access to values in `anyDictionary`, `dictionary`, `numberDictionary`,
+     and `booleanDictionary` cases.
+     
+     - Parameter key: The key to look up
+     - Returns: The value associated with the key, or `nil` if the key doesn't exist
+               or if this is not a dictionary-like case
+     
+     - Example:
+     ```swift
+     let dict = AnyType.anyDictionary(data: ["title": .string(data: "Hello")])
+     let title: String? = dict["title"]?.as(String.self)
+     ```
+     */
+    public subscript(key: String) -> AnyType? {
+        switch self {
+        case .dictionary(let data):
+            return data[key].map { .string(data: $0) }
+        case .numberDictionary(let data):
+            return data[key].map { .number(data: $0) }
+        case .booleanDictionary(let data):
+            return data[key].map { .bool(data: $0) }
+        case .anyDictionary(let data):
+            return data[key]
+        default:
+            return nil
+        }
+    }
 }
 
 extension AnyType: Equatable {
@@ -99,8 +329,8 @@ extension AnyType: Equatable {
         case (.array(let lhv), .array(let rhv)): return lhv == rhv
         case (.numberArray(let lhv), .numberArray(let rhv)): return lhv == rhv
         case (.booleanArray(let lhv), .booleanArray(let rhv)): return lhv == rhv
-        case (.anyDictionary(let lhv), .anyDictionary(let rhv)): return (lhv as NSDictionary).isEqual(to: rhv)
-        case (.anyArray(let lhv), .anyArray(let rhv)): return (lhv as NSArray).isEqual(to: rhv)
+        case (.anyDictionary(let lhv), .anyDictionary(let rhv)): return lhv == rhv
+        case (.anyArray(let lhv), .anyArray(let rhv)): return lhv == rhv
         case (.unknownData, .unknownData): return true
         default: return false
         }
@@ -148,10 +378,12 @@ extension AnyType: Decodable {
         } else if let context = decoder.userInfo[AnyTypeDecodingContext.key] as? AnyTypeDecodingContext {
             let obj = try context.objectFor(path: decoder.singleValueContainer().codingPath)
             if let dictionary = obj as? [String: Any] {
-                self = .anyDictionary(data: dictionary)
+                // Convert [String: Any] to [String: AnyType] recursively
+                self = AnyType(anyDictionary: dictionary)
                 return
             } else if let array = obj as? [Any] {
-                self = .anyArray(data: array)
+                // Convert [Any] to [AnyType] recursively
+                self = AnyType(anyArray: array)
                 return
             }
         }
@@ -223,7 +455,7 @@ extension AnyType: Encodable {
         case .anyDictionary(data: let dictionary):
             var keyed = encoder.container(keyedBy: CustomEncodable.self)
             for key in dictionary.keys {
-                let customEncodable = CustomEncodable(dictionary[key], key: key)
+                let customEncodable = CustomEncodable(dictionary[key]?.asAny, key: key)
                 if let value = customEncodable.data {
                     try keyed.encode(value, forKey: customEncodable)
                 }
@@ -231,7 +463,7 @@ extension AnyType: Encodable {
         case .anyArray(data: let array):
             var indexed = encoder.unkeyedContainer()
             for value in array {
-                let encodable = CustomEncodable(value, key: "")
+                let encodable = CustomEncodable(value.asAny, key: "")
                 if let data = encodable.data {
                     try indexed.encode(data)
                 }
