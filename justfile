@@ -153,6 +153,6 @@ clean: # Force delete all the local cached bazel stuff. Be careful!
   rm -rf .swiftpm/
 
   # Then expunge for good measure
-  bazel clean --expunge
+  bazel clean --expunge --async
 
 ### 🍎 End iOS ###
