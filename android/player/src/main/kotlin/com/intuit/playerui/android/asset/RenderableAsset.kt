@@ -111,35 +111,44 @@ public abstract class RenderableAsset @Deprecated(
      * also automatically caches the instance of the [View] and detects
      * when it needs to reconstruct or rehydrate.
      */
-    private fun render(): View = cachedAssetView
-        .let { (cachedAssetContext, cachedView) ->
-            requireContext()
-            when {
-                // View not found. Create and hydrate.
-                cachedView == null -> {
-                    renewHydrationScope("recreating view")
-                    initView().also { it.hydrate() }
-                } // View found, but contexts are out of sync. Remove cached view and create and hydrate.
-                cachedAssetContext?.context != context || cachedAssetContext?.asset?.type != asset.type -> {
-                    renewHydrationScope("recreating view")
-                    cachedView.removeSelf()
-                    initView().also { it.hydrate() }
-                }
-                // View found, but assets are out of sync. Rehydrate. It is possible for the hydrate
-                // implementation to throw [StaleViewException] to signify that the view is out of sync.
-                // This can only be done from invalidateView, so we have a guarantee that the view has
-                // already been removed from the cache.
-                !cachedAssetContext.asset.nativeReferenceEquals(asset) ->
-                    try {
-                        cachedView.also(::rehydrate)
-                    } catch (exception: StaleViewException) {
-                        player.logger.info("re-rendering due to stale child: ${exception.assetContext.id}")
-                        render()
+    private fun render(): View = try {
+        cachedAssetView
+            .let { (cachedAssetContext, cachedView) ->
+                requireContext()
+                when {
+                    // View not found. Create and hydrate.
+                    cachedView == null -> {
+                        renewHydrationScope("recreating view")
+                        initView().also { it.hydrate() }
+                    } // View found, but contexts are out of sync. Remove cached view and create and hydrate.
+                    cachedAssetContext?.context != context || cachedAssetContext?.asset?.type != asset.type -> {
+                        renewHydrationScope("recreating view")
+                        cachedView.removeSelf()
+                        initView().also { it.hydrate() }
                     }
-                // View found, everything is in sync. Do nothing.
-                else -> cachedView
-            }
-        }.also { if (it !is SuspendableAsset.AsyncViewStub) player.cacheAssetView(assetContext, it) }
+                    // View found, but assets are out of sync. Rehydrate. It is possible for the hydrate
+                    // implementation to throw [StaleViewException] to signify that the view is out of sync.
+                    // This can only be done from invalidateView, so we have a guarantee that the view has
+                    // already been removed from the cache.
+                    !cachedAssetContext.asset.nativeReferenceEquals(asset) ->
+                        try {
+                            cachedView.also(::rehydrate)
+                        } catch (exception: StaleViewException) {
+                            player.logger.info("re-rendering due to stale child: ${exception.assetContext.id}")
+                            render()
+                        }
+                    // View found, everything is in sync. Do nothing.
+                    else -> cachedView
+                }
+            }.also { if (it !is SuspendableAsset.AsyncViewStub) player.cacheAssetView(assetContext, it) }
+    } catch (exception: Throwable) {
+        if (exception is AssetRenderException) {
+            exception.assetParentPath += assetContext
+            throw exception
+        } else {
+            throw AssetRenderException(assetContext, "Failed to render asset", exception)
+        }
+    }
 
     /** Invalidate view, causing a complete re-render of the current asset */
     public fun invalidateView() {

@@ -1,3 +1,28 @@
+# 0.15.0-next.4 (Fri Jan 16 2026)
+
+### Release Notes
+
+#### Remove chakra/emotion and unused Storybook components ([#776](https://github.com/player-ui/player/pull/776))
+
+- Remove Chakra/Emotion dependencies in Storybook.
+
+---
+
+#### 🚀 Enhancement
+
+- add asset render errors to each platform [#765](https://github.com/player-ui/player/pull/765) ([@tmarmer](https://github.com/tmarmer))
+
+#### 🐛 Bug Fix
+
+- Remove chakra/emotion and unused Storybook components [#776](https://github.com/player-ui/player/pull/776) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### Authors: 2
+
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
 # 0.15.0-next.3 (Sun Dec 21 2025)
 
 ### Release Notes

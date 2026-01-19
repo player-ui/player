@@ -2,6 +2,10 @@ import React from "react";
 import leven from "leven";
 import type { Asset as AssetType, AssetWrapper } from "@player-ui/player";
 import type { Registry } from "@player-ui/partial-match-registry";
+import { ErrorBoundary } from "react-error-boundary";
+import { AssetRenderError } from "./AssetRenderError";
+
+export * from "./AssetRenderError";
 
 export type AssetRegistryType = Registry<React.ComponentType<any>>;
 
@@ -12,22 +16,29 @@ export interface ContextType {
   registry?: AssetRegistryType;
 }
 
-export const AssetContext = React.createContext<ContextType>({});
+export const AssetContext: React.Context<ContextType> =
+  React.createContext<ContextType>({});
+
+const isAssetUnwrapped = (
+  props: AssetType<string> | AssetWrapper<AssetType<string>>,
+): props is AssetType<string> => {
+  return "type" in props && "id" in props;
+};
 
 /**
  * A React Component that looks up an implementation from a registry
  */
 export const ReactAsset = (
   props: AssetType<string> | AssetWrapper<AssetType<string>>,
-) => {
+): React.ReactElement => {
   const { registry } = React.useContext(AssetContext);
 
-  let unwrapped;
+  let unwrapped: AssetType<string> | undefined;
 
-  if ("type" in props && "id" in props) {
+  if (isAssetUnwrapped(props)) {
     unwrapped = props;
   } else if ("asset" in props) {
-    unwrapped = (props as unknown as AssetWrapper).asset;
+    unwrapped = props.asset;
   }
 
   if (!unwrapped) {
@@ -90,5 +101,23 @@ export const ReactAsset = (
     );
   }
 
-  return <Impl key={unwrapped.id} {...unwrapped} />;
+  return (
+    <ErrorBoundary
+      fallbackRender={(props) => {
+        const { error } = props;
+        if (error instanceof AssetRenderError) {
+          error.addAssetParent(unwrapped);
+          throw error;
+        } else {
+          throw new AssetRenderError(
+            unwrapped,
+            "Failed to render asset",
+            error,
+          );
+        }
+      }}
+    >
+      <Impl key={unwrapped.id} {...unwrapped} />
+    </ErrorBoundary>
+  );
 };
