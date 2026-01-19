@@ -7,6 +7,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.runner.AndroidJUnit4
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AssetContext
+import com.intuit.playerui.android.asset.AssetRenderException
 import com.intuit.playerui.android.asset.StaleViewException
 import com.intuit.playerui.android.utils.BrokenAsset
 import com.intuit.playerui.android.utils.BrokenAsset.Companion.asset
@@ -15,6 +16,7 @@ import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.player.state.ErrorState
 import com.intuit.playerui.utils.start
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -42,9 +44,16 @@ internal class BrokenAssetTest {
 
     @Test
     fun `invalidate view should fail on first render`() {
-        assertThrows(StaleViewException::class.java) {
+        var thrown: Throwable? = null
+        try {
             BrokenAsset(baseContext.copy(asset = runtime.asset(shouldFail = true))).render(appContext)
+        } catch (exception: Throwable) {
+            thrown = exception
         }
+
+        assertNotNull(thrown)
+        assertTrue(thrown is AssetRenderException)
+        assertTrue((thrown as AssetRenderException).cause is StaleViewException)
     }
 
     @Test

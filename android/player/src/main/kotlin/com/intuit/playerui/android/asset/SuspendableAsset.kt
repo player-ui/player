@@ -78,6 +78,13 @@ public abstract class SuspendableAsset<Data>(
                     exception,
                 ),
             )
+        } catch (exception: Throwable) {
+            if (exception is AssetRenderException) {
+                exception.assetParentPath += assetContext
+                throw exception
+            } else {
+                throw AssetRenderException(assetContext, "Failed to render asset", exception)
+            }
         } finally {
             player.asyncHydrationTrackerPlugin?.hydrationDone(this@SuspendableAsset)
         }
