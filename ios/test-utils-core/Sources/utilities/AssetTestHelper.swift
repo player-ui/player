@@ -17,7 +17,7 @@ extension JSContext {
         guard objectForKeyedSubscript("MakeFlow").isUndefined else { return }
         guard
             let url = bundleUrl,
-            let contents = try? String(contentsOf: url)
+            let contents = try? String(contentsOf: url, encoding: .utf8)
         else { return }
         evaluateScript(contents)
     }

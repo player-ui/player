@@ -186,8 +186,16 @@ class PubSubPluginTests: XCTestCase {
             switch eventData {
             case .anyDictionary(let dict):
                 XCTAssertEqual(2, dict.keys.count)
-                XCTAssertEqual("example", dict["data"] as? String)
-                XCTAssertEqual(3, dict["value"] as? Double)
+                if case .string(let dataValue) = dict["data"] {
+                    XCTAssertEqual("example", dataValue)
+                } else {
+                    XCTFail("data was not a string")
+                }
+                if case .number(let valueNum) = dict["value"] {
+                    XCTAssertEqual(3, valueNum)
+                } else {
+                    XCTFail("value was not a number")
+                }
             default:
                 XCTFail("data was not anyDictionary")
             }
@@ -197,7 +205,7 @@ class PubSubPluginTests: XCTestCase {
         let plugin = PubSubPlugin([subscription])
         plugin.context = context
 
-        plugin.publish(eventName: "test", eventData: .anyDictionary(data: ["data": "example", "value": 3]))
+        plugin.publish(eventName: "test", eventData: .anyDictionary(data: ["data": .string(data: "example"), "value": .number(data: 3)]))
         wait(for: [expectation], timeout: 2)
     }
 }
