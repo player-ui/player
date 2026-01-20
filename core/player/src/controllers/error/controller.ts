@@ -70,7 +70,7 @@ export class ErrorController {
   }
 
   /**
-   * Set the DataController after initialization 
+   * Set the DataController after initialization
    */
   public setOptions(options: Pick<ErrorControllerOptions, "model">): void {
     this.options.model = options.model;
@@ -161,9 +161,7 @@ export class ErrorController {
    */
   private setErrorInDataModel(playerError: PlayerError): void {
     if (!this.options.model) {
-      this.options.logger.warn(
-        "[ErrorController] No DataController available",
-      );
+      this.options.logger.warn("[ErrorController] No DataController available");
       return;
     }
 
