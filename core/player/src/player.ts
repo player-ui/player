@@ -243,7 +243,11 @@ export class Player {
 
     this.hooks.validationController.call(validationController);
 
-    const errorController = new ErrorController();
+    const errorController = new ErrorController({
+      logger: this.logger,
+      flow: flowController,
+      fail: flowResultDeferred.reject,
+    });
 
     this.hooks.errorController.call(errorController);
 
@@ -275,9 +279,6 @@ export class Player {
 
     errorController.setOptions({
       model: dataController,
-      logger: this.logger,
-      flow: flowController,
-      fail: flowResultDeferred.reject,
     });
 
     // eslint-disable-next-line prefer-const

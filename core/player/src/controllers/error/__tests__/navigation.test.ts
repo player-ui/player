@@ -138,24 +138,8 @@ describe("ErrorController Navigation", () => {
       errorController.captureError(error);
 
       expect(mockFail).toHaveBeenCalledWith(error);
-    });
-
-    it("should log error when fail callback not available", () => {
-      const controllerWithoutFail = new ErrorController({
-        logger: mockLogger,
-        model: mockDataController,
-        flow: mockFlowController,
-      });
-
-      mockFlowInstance.currentState!.value.errorState = undefined;
-      mockFlowInstance.transitionToErrorState = vitest
-        .fn()
-        .mockReturnValue(false);
-
-      controllerWithoutFail.captureError(new Error("Test error"));
-
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        expect.stringContaining("No fail callback available"),
+      expect(mockLogger.debug).toHaveBeenCalledWith(
+        expect.stringContaining("Rejecting flow with error"),
       );
     });
   });

@@ -13,6 +13,7 @@ import type {
   ErrorStateTransition,
 } from "@player-ui/types";
 import type { Logger } from "../../logger";
+import { resolveErrorState } from "../error/utils";
 
 export interface NamedState {
   /** The name of the navigation node */
@@ -166,14 +167,7 @@ export class FlowInstance {
     }
 
     // Resolve errorState (handle string or dictionary)
-    let errorStateName: string | undefined;
-
-    if (typeof errorStateConfig === "string") {
-      errorStateName = errorStateConfig;
-    } else {
-      errorStateName =
-        (errorType && errorStateConfig[errorType]) || errorStateConfig["*"];
-    }
+    const errorStateName = resolveErrorState(errorStateConfig, errorType);
 
     if (!errorStateName) {
       this.log?.debug(

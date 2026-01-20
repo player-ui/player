@@ -5,6 +5,7 @@ import type { DataController } from "../data/controller";
 import type { FlowController } from "../flow/controller";
 import type { PlayerError, ErrorMetadata, ErrorSeverity } from "./types";
 import { ErrorStateMiddleware } from "./middleware";
+import { isRecord, resolveErrorState } from "./utils";
 
 /**
  * Private symbol used to authorize ErrorController's writes to errorState
@@ -26,14 +27,14 @@ export interface ErrorControllerHooks {
 }
 
 export interface ErrorControllerOptions {
-  /** Optional logger for error operations */
-  logger?: Logger;
-  /** Data model for setting errorState */
-  model?: DataController;
+  /** Logger for error operations */
+  logger: Logger;
   /** Flow controller for error navigation */
-  flow?: FlowController;
+  flow: FlowController;
   /** Callback to fail/reject the flow */
-  fail?: (error: Error) => void;
+  fail: (error: Error) => void;
+  /** Data model for setting errorState (can be set later via setOptions) */
+  model?: DataController;
 }
 
 /** The orchestrator for player error handling */
@@ -42,7 +43,7 @@ export class ErrorController {
     onError: new SyncBailHook<[PlayerError], boolean | undefined>(),
   };
 
-  private options?: ErrorControllerOptions;
+  private options: ErrorControllerOptions;
   private readonly middleware: ErrorStateMiddleware;
   /**
    * Complete history of all captured errors in chronological order
@@ -51,7 +52,7 @@ export class ErrorController {
   private errorHistory: PlayerError[] = [];
   private currentError?: PlayerError;
 
-  constructor(options: ErrorControllerOptions = {}) {
+  constructor(options: ErrorControllerOptions) {
     this.options = options;
 
     this.middleware = new ErrorStateMiddleware({
@@ -69,10 +70,10 @@ export class ErrorController {
   }
 
   /**
-   * Set options after initialization (e.g., to inject DataController and logger)
+   * Set the DataController after initialization 
    */
-  public setOptions(options: ErrorControllerOptions): void {
-    this.options = options;
+  public setOptions(options: Pick<ErrorControllerOptions, "model">): void {
+    this.options.model = options.model;
   }
 
   /**
@@ -97,7 +98,7 @@ export class ErrorController {
     // Set as current error
     this.currentError = playerError;
 
-    this.options?.logger?.debug(
+    this.options.logger.debug(
       `[ErrorController] Captured error: ${error.message}`,
       { errorType, severity, metadata },
     );
@@ -107,7 +108,7 @@ export class ErrorController {
     const shouldSkip = this.hooks.onError.call(playerError) ?? false;
 
     if (shouldSkip) {
-      this.options?.logger?.debug(
+      this.options.logger.debug(
         "[ErrorController] Error state navigation skipped by plugin",
       );
       return playerError;
@@ -143,7 +144,7 @@ export class ErrorController {
     this.errorHistory = [];
     this.currentError = undefined;
     this.deleteErrorFromDataModel();
-    this.options?.logger?.debug("[ErrorController] All errors cleared");
+    this.options.logger.debug("[ErrorController] All errors cleared");
   }
 
   /**
@@ -152,15 +153,15 @@ export class ErrorController {
   public clearCurrentError(): void {
     this.currentError = undefined;
     this.deleteErrorFromDataModel();
-    this.options?.logger?.debug("[ErrorController] Current error cleared");
+    this.options.logger.debug("[ErrorController] Current error cleared");
   }
 
   /**
    * Write error to data model errorState
    */
   private setErrorInDataModel(playerError: PlayerError): void {
-    if (!this.options?.model) {
-      this.options?.logger?.warn(
+    if (!this.options.model) {
+      this.options.logger.warn(
         "[ErrorController] No DataController available",
       );
       return;
@@ -186,11 +187,11 @@ export class ErrorController {
         { authToken: ERROR_CONTROLLER_AUTH_SYMBOL },
       );
 
-      this.options?.logger?.debug(
+      this.options.logger.debug(
         "[ErrorController] Error set in data model at 'data.errorState'",
       );
     } catch (e) {
-      this.options?.logger?.error(
+      this.options.logger.error(
         "[ErrorController] Failed to set error in data model",
         e,
       );
@@ -201,7 +202,7 @@ export class ErrorController {
    * Remove errorState from data model
    */
   private deleteErrorFromDataModel(): void {
-    if (!this.options?.model) {
+    if (!this.options.model) {
       return;
     }
 
@@ -211,39 +212,15 @@ export class ErrorController {
         authToken: ERROR_CONTROLLER_AUTH_SYMBOL,
       });
 
-      this.options?.logger?.debug(
+      this.options.logger.debug(
         "[ErrorController] errorState deleted from data model",
       );
     } catch (e) {
-      this.options?.logger?.error(
+      this.options.logger.error(
         "[ErrorController] Failed to delete errorState from data model",
         e,
       );
     }
-  }
-
-  /**
-   * Resolve errorState configuration to a specific state name
-   * Handles both string and dictionary-based error transition
-   */
-  private resolveErrorState(
-    errorState: ErrorStateTransition | undefined,
-    errorType?: string,
-  ): string | undefined {
-    if (!errorState) {
-      return undefined;
-    }
-
-    if (typeof errorState === "string") {
-      return errorState;
-    }
-
-    if (typeof errorState === "object" && errorState !== null) {
-      const dict = errorState as Record<string, string>;
-      return (errorType && dict[errorType]) || dict["*"];
-    }
-
-    return undefined;
   }
 
   /**
@@ -253,10 +230,10 @@ export class ErrorController {
    * Reject flow (fallback)
    */
   private navigateToErrorState(playerError: PlayerError): void {
-    const flowInstance = this.options?.flow?.current;
+    const flowInstance = this.options.flow.current;
 
     if (!flowInstance) {
-      this.options?.logger?.warn(
+      this.options.logger.warn(
         "[ErrorController] No active flow instance for error navigation",
       );
       return;
@@ -264,23 +241,25 @@ export class ErrorController {
 
     // Node-level errorState
     const currentState = flowInstance.currentState;
-    const nodeErrorStateConfig = currentState?.value.errorState as
-      | ErrorStateTransition
-      | undefined;
-    const nodeErrorState = this.resolveErrorState(
+    const rawErrorState = currentState?.value.errorState;
+    const nodeErrorStateConfig =
+      typeof rawErrorState === "string" || isRecord(rawErrorState)
+        ? (rawErrorState as ErrorStateTransition)
+        : undefined;
+    const nodeErrorState = resolveErrorState(
       nodeErrorStateConfig,
       playerError.errorType,
     );
 
     if (nodeErrorState) {
       try {
-        this.options?.logger?.debug(
+        this.options.logger.debug(
           `[ErrorController] Node-level: Navigating to errorState "${nodeErrorState}" (errorType: ${playerError.errorType || "none"})`,
         );
         flowInstance.transition(nodeErrorState);
         return;
       } catch (e) {
-        this.options?.logger?.error(
+        this.options.logger.error(
           `[ErrorController] Node-level navigation failed: ${e}`,
         );
       }
@@ -292,25 +271,19 @@ export class ErrorController {
     );
 
     if (flowErrorState) {
-      this.options?.logger?.debug(
+      this.options.logger.debug(
         `[ErrorController] Navigated to flow-level errorState (errorType: ${playerError.errorType || "none"})`,
       );
       return;
     }
 
-    this.options?.logger?.debug(
+    this.options.logger.debug(
       "[ErrorController] No flow-level errorState defined or no match found",
     );
 
     // Reject flow (fallback)
-    this.options?.logger?.debug("[ErrorController] Rejecting flow with error");
+    this.options.logger.debug("[ErrorController] Rejecting flow with error");
 
-    if (this.options?.fail) {
-      this.options.fail(playerError.error);
-    } else {
-      this.options?.logger?.error(
-        "[ErrorController] No fail callback available to reject flow",
-      );
-    }
+    this.options.fail(playerError.error);
   }
 }
