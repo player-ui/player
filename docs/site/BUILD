@@ -6,6 +6,34 @@ npm_link_all_packages(
     name = "node_modules",
 )
 
+# Generate hooks.mdx during the docs build so it doesn't need to be committed.
+genrule(
+    name = "hooks_docs_mdx",
+    srcs = [
+        "//:scripts/docs/generate-hooks-docs.mjs",
+        "//:node_modules/typescript",
+    ],
+    outs = ["src/content/docs/plugins/hooks.mdx"],
+    cmd = """
+        # Resolve workspace root from script location
+        SCRIPT_PATH=$$(realpath $(location //:scripts/docs/generate-hooks-docs.mjs))
+        WS=$$(dirname $$(dirname $$(dirname $$SCRIPT_PATH)))
+
+        # typescript target may expand to multiple paths depending on rules_js layout; pick a directory.
+        TS_PATHS="$$(printf "%s\n" $(locations //:node_modules/typescript))"
+        TS_DIR_CANDIDATE="$$(echo "$$TS_PATHS" | head -n 1)"
+        TS_DIR=$$(realpath "$$TS_DIR_CANDIDATE")
+
+        cd "$$WS" && BUILD_WORKSPACE_DIRECTORY="$$WS" node "$$SCRIPT_PATH" \\
+          --out "$@" \\
+          --roots core/player/src \\
+          --roots plugins \\
+          --typescript-path "$$TS_DIR"
+    """,
+    local = 1,
+    tags = ["no-sandbox", "no-cache"],
+)
+
 # Generate git-dates.json from Git history
 # Must run outside sandbox to access .git directory
 # Note: This depends on git history, not just file contents, so we use no-cache
@@ -35,6 +63,7 @@ srcs = glob([
     "astro.config.mjs",
     "tailwind.config.mjs",
     ":git_dates",
+    ":hooks_docs_mdx",
 ]
 
 build_deps = [
