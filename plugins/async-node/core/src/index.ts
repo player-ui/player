@@ -34,7 +34,7 @@ type AsyncPluginContext = {
   /** Map of async node ids to the original node they represent.
    * In some cases, async nodes are transformed into from other node types so the original reference is needed in order to trigger an update on the view when the async node changes.
    */
-  originalNodeCache: Map<string, Node.Node>;
+  originalNodeCache: Map<string, Set<Node.Node>>;
 };
 
 export interface AsyncNodePluginOptions {
@@ -171,8 +171,8 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     const { nodeResolveCache, viewController, originalNodeCache } = context;
     if (nodeResolveCache.get(node.id) !== newNode) {
       nodeResolveCache.set(node.id, newNode ? newNode : node);
-      const originalNode = originalNodeCache.get(node.id) ?? node;
-      viewController.updateViewAST(new Set([originalNode]));
+      const originalNode = originalNodeCache.get(node.id) ?? new Set([node]);
+      viewController.updateViewAST(originalNode);
     }
   }
 
@@ -198,7 +198,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         return node === null ? node : this.resolveAsyncChildren(node, context);
       }
       if (options.node) {
-        context.originalNodeCache.set(node.id, options.node);
+        context.originalNodeCache.set(node.id, new Set([options.node]));
       }
 
       const resolvedNode = context.nodeResolveCache.get(node.id);
@@ -245,9 +245,12 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         }
 
         const mappedNode = context.nodeResolveCache.get(childNode.id)!;
-        context.originalNodeCache.set(childNode.id, mappedNode);
+        const nodeSet = new Set<Node.Node>();
         if (mappedNode.type === NodeType.MultiNode && childNode.flatten) {
-          mappedNode.values.forEach((v: Node.Node) => (v.parent = node));
+          mappedNode.values.forEach((v: Node.Node) => {
+            v.parent = node;
+            nodeSet.add(v);
+          });
           node.values = [
             ...node.values.slice(0, index),
             ...mappedNode.values,
@@ -256,7 +259,9 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         } else {
           node.values[index] = mappedNode;
           mappedNode.parent = node;
+          nodeSet.add(mappedNode);
         }
+        context.originalNodeCache.set(childNode.id, nodeSet);
       }
     } else if ("children" in node) {
       node.children?.forEach((c) => {
@@ -266,7 +271,7 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
           this.hasValidMapping(c.value, context)
         ) {
           const mappedNode = context.nodeResolveCache.get(c.value.id)!;
-          context.originalNodeCache.set(c.value.id, mappedNode);
+          context.originalNodeCache.set(c.value.id, new Set([mappedNode]));
           c.value = mappedNode;
           c.value.parent = node;
         }
