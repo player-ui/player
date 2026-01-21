@@ -1,5 +1,4 @@
 import { SyncBailHook } from "tapable-ts";
-import type { ErrorStateTransition } from "@player-ui/types";
 import type { Logger } from "../../logger";
 import type { DataController } from "../data/controller";
 import type { FlowController } from "../flow/controller";
@@ -243,7 +242,10 @@ export class ErrorController {
       currentState !== undefined && currentState.value.state_type !== "END"
         ? currentState.value.errorState
         : undefined;
-    const nodeErrorState = resolveErrorState(rawErrorState, playerError.errorType);
+    const nodeErrorState = resolveErrorState(
+      rawErrorState,
+      playerError.errorType,
+    );
 
     if (nodeErrorState) {
       try {
