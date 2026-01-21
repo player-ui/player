@@ -1,0 +1,152 @@
+---
+title: Validating Player Content
+---
+
+import { PackageManagers } from 'starlight-package-managers'
+
+As described in the [validation](../xlr/usage/sdk#type-validation) section of the XLR usage guide, XLRs can be used to validate if authored Player content is semantically valid. While this doesn't guarantee that the content will actually run, as the validator is just a semantic check, it does allow common issues to be found before content is published. As the underlying validation architecture is built around XLRs allowing it to work for any Player integration that publishes XLRs. In order to minimize the complexity of orchestrating the various XLR/CLI/Plugin pieces for content author, the following guide outlines how to setup the pieces to allow for validation. 
+
+## Step 1: Export XLRs
+
+The first step to setting up validation is exporting the XLRs for the Assets in the integration. Follow the guide in the [export](../xlr/usage/export) section.
+
+## Step 2: Create A CLI Preset
+
+To provide a singular package used to wrap up validation, DSL content transformations, and any other build time content functionality, we recommend creating a "CLI Preset" to integrate all the CLI/LSP plugins you may need. For the player reference assets, we provide a [cli preset](https://github.com/player-ui/player/tree/main/plugins/reference-assets/cli-preset) that can be used as a reference. 
+
+For validation, a `LSPAssetsPlugin` should be used to point to where the exported XLRs are for both the Assets, and the `@player-ui/types` package to ensure that the base Player constructs used for validation match the same version that will be used at runtime. A very basic example of this would look like.
+
+```typescript
+import type { PlayerConfigFileShape } from "@player-tools/cli";
+import { LSPAssetsPlugin } from "@player-tools/cli";
+
+const config: PlayerConfigFileShape = {
+  plugins: [
+    new LSPAssetsPlugin([
+      {
+        type: "module",
+        manifest: require("@player-ui/types/xlr") as any,
+      },
+      {
+        type: "module",
+        manifest: require("<player-plugin-package>/xlr") as any,
+      },
+    ]),
+  ],
+};
+
+export default config;
+```
+
+The use of the `xlr` import path assumes that the package they are exported from has that export defined in its `package.json`. XLR enabled packages produced from our Player rules automatically add that export. For packages produced without our rules, that export will need to be defined manually or, a relative path to the root of the package can be defined via different config shape. Under the hood, it will look for the manifest file at `/xlr/manifest.json`.
+
+
+```typescript
+const config: PlayerConfigFileShape = {
+  plugins: [
+    new LSPAssetsPlugin([
+      {
+        type: "manifest",
+        manifest:  path.join(
+          require.resolve('<some package>'),
+          '..',
+          '..'
+        ),
+      }
+    ]),
+  ],
+};
+```
+
+With this, you'll now have a package that can be integrated into content builds.
+
+## Step 3: Integrate into Content Build
+
+The first step in validating content is to add your CLI preset as a dependency to the repository/project where the content lives. You'll also want to add the `@player-tools/cli`, `react`, and `@types/react` packages as a dependencies which will also pull in the underlying dependencies and make the tooling available to run. 
+
+### Bazel
+
+If you're using Bazel, you will want to use the `create_base_dsl_config` macro from `rules_player` to create a usable DSL config.
+
+```starlark
+load("@rules_player//player:defs.bzl", create_base_dsl_config = "create_base_config")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+create_base_dsl_config(
+    name = "dsl_config",
+    presets = [
+        ":node_modules/<cli preset package>",
+    ],
+)
+```
+
+### Non-Bazel
+
+If you're not using Bazel, you'll want to add some configuration to your `package.json` for the CLI. 
+```json
+{
+"player": {
+    "presets": [
+      "<your CLI preset package>"
+    ],
+    "dsl": {
+      "src": "<DSL source Directory>",
+      "outDir": "<DSL output directory>"
+    },
+  }
+}
+```
+This indicates to the CLI what Player integration the preset to load (and thus, the XLRs to use for validation). The JSON resulting content from DSL builds are automatically validated and doesn't need any extra configuration. If you have content authored/generated directly into JSON, you'll want to add a key `player.json.src` to the config to point the CLI to where the JSON files live. 
+
+```json
+{
+    "player": {
+        "json": {
+            "src": "<path to where your JSON content is>"
+        }
+    }
+}
+```
+## Step 4: Running Validation
+
+As mentioned previously, DSL that is compiled via the CLI is validated by default (unless disabled). JSON content will have to be manually validated. 
+
+### Bazel
+
+DSL should be compiled by using the `compile` macro exported from the Player rules and the previously mentioned DSL config stage. This macro will create a test target for running validation for build graph optimization purposes. 
+
+```starlark
+load("@rules_player//player:defs.bzl", create_base_dsl_config = "create_base_config", compile_dsl = "compile")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+create_base_dsl_config(
+    name = "dsl_config",
+    presets = [
+        ":node_modules/<cli preset package>",
+    ],
+)
+
+compile_dsl(
+    name = "content",
+    srcs = native.glob("<content source directory>/*.tsx"),
+    input_dir = "<content source directory>",
+    output_dir = "<content outout directory>",
+    config = ":dsl_config",
+    data = [
+        "//:node_modules/@player-tools/dsl",
+        "//:node_modules/@types/react",
+        "//:node_modules/react",
+        ...
+    ],
+)
+```
+
+### Non-Bazel
+
+To manually run validation on compiled DSL or authored JSON, you can use the `json validate` command from the Player CLI. Any arguments provided here will supersede the configuration provided in the `package.json`
+
+<PackageManagers type="run" args="player json validate"/>
