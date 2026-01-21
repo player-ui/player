@@ -18,19 +18,31 @@ import { getDocsUrl } from "./docs-config.js";
  */
 export function getChangedDocsPages(baseBranch = "origin/main") {
   try {
-    // Get changed files that are in the docs directory
-    const diffCommand = `git diff --name-only ${baseBranch}...HEAD | grep -E '^docs/' | sed 's|^docs/||'`;
+    const diffCommand = `git diff --name-only ${baseBranch}...HEAD`;
+    const changedFilesRaw = execSync(diffCommand, {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+    const changedFiles = changedFilesRaw
+      ? changedFilesRaw
+          .split("\n")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
 
-    const changedFiles = execSync(diffCommand, { encoding: "utf8" }).trim();
+    const hookSourceChanged = changedFiles.some((file) => {
+      // Hooks docs are generated during the Bazel docs build and not tracked in git anymore.
+      // To keep PR preview comments useful, we flag the Hooks page when hook *sources* might have changed.
+      return (
+        file.startsWith("core/player/src/") ||
+        /^plugins\/[^/]+\/core\/src\//.test(file)
+      );
+    });
 
-    if (!changedFiles) {
-      return [];
-    }
-
-    // Parse the files and create readable page names with URLs
-    const pages = changedFiles
-      .split("\n")
-      .filter((file) => file.trim())
+    // Parse docs files and create readable page names with URLs
+    const docPages = changedFiles
+      .filter((file) => file.startsWith("docs/"))
+      .map((file) => file.replace(/^docs\//, ""))
       .filter((file) => file.startsWith("site/src/content/docs/")) // Only include docs pages
       .slice(0, 10) // Limit to 10 pages
       .map((file) => {
@@ -56,8 +68,21 @@ export function getChangedDocsPages(baseBranch = "origin/main") {
         };
       });
 
+    const pages = [];
+
+    if (hookSourceChanged) {
+      pages.push({ name: "plugins/hooks", url: "plugins/hooks" });
+    }
+
+    // Keep output concise, but always prefer including Hooks if it was detected.
+    for (const p of docPages) {
+      if (pages.length >= 10) break;
+      pages.push(p);
+    }
+
     return pages;
   } catch (error) {
+    // Best-effort: if git diff can't run (e.g., missing base ref), don't fail PR comments.
     console.error("Error getting changed docs pages:", error.message);
     return [];
   }
