@@ -5,7 +5,7 @@ import type { DataController } from "../data/controller";
 import type { FlowController } from "../flow/controller";
 import type { PlayerError, ErrorMetadata, ErrorSeverity } from "./types";
 import { ErrorStateMiddleware } from "./middleware";
-import { isRecord, resolveErrorState } from "./utils";
+import { resolveErrorState } from "./utils";
 
 /**
  * Private symbol used to authorize ErrorController's writes to errorState
@@ -239,15 +239,11 @@ export class ErrorController {
 
     // Node-level errorState
     const currentState = flowInstance.currentState;
-    const rawErrorState = currentState?.value.errorState;
-    const nodeErrorStateConfig =
-      typeof rawErrorState === "string" || isRecord(rawErrorState)
-        ? (rawErrorState as ErrorStateTransition)
+    const rawErrorState =
+      currentState !== undefined && currentState.value.state_type !== "END"
+        ? currentState.value.errorState
         : undefined;
-    const nodeErrorState = resolveErrorState(
-      nodeErrorStateConfig,
-      playerError.errorType,
-    );
+    const nodeErrorState = resolveErrorState(rawErrorState, playerError.errorType);
 
     if (nodeErrorState) {
       try {
