@@ -60,7 +60,7 @@ instrumented_test_deps = [
 ]
 
 # TODO: Update this to be updated automatically instead of maintaining a list manually
-instrumented_test_classes = ['com.intuit.playerui.android.AndroidPlayerTest', 'com.intuit.playerui.android.AssetContextTest', 'com.intuit.playerui.android.AssetContextAndroidTest', 'com.intuit.playerui.android.renderer.NestedAssetTest', 'com.intuit.playerui.android.renderer.HydrationScopeTest', 'com.intuit.playerui.android.renderer.SimpleAssetTest', 'com.intuit.playerui.android.renderer.BrokenAssetTest', 'com.intuit.playerui.android.extensions.IntoKtTest', 'com.intuit.playerui.android.registry.RegistryPluginTest']
+instrumented_test_classes = ['com.intuit.playerui.android.AndroidPlayerTest', 'com.intuit.playerui.android.AssetContextTest', 'com.intuit.playerui.android.AssetContextAndroidTest', 'com.intuit.playerui.android.renderer.NestedAssetTest', 'com.intuit.playerui.android.renderer.ThrowingAssetTest', 'com.intuit.playerui.android.renderer.HydrationScopeTest', 'com.intuit.playerui.android.renderer.SimpleAssetTest', 'com.intuit.playerui.android.renderer.BrokenAssetTest', 'com.intuit.playerui.android.extensions.IntoKtTest', 'com.intuit.playerui.android.registry.RegistryPluginTest']
 
 kt_android(
     # TODO: Maybe rename to player-android
