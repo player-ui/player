@@ -23,6 +23,7 @@ public class TestPlayer<WrapperType: AssetContainer, RegistryType: BaseAssetRegi
     public var hooks: TestHooks?
 
     public var logger = TapableLogger()
+    public var pluginManager = PluginManager()
 
     public let assetRegistry: RegistryType
 
