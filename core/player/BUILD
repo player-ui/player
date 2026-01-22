@@ -35,3 +35,17 @@ js_pipeline(
         "//:node_modules/ts-nested-error",
     ],
 )
+
+# Source files consumed by docs generation (e.g., hooks reference).
+filegroup(
+    name = "hook_sources",
+    srcs = glob(
+        ["src/**/*.ts"],
+        exclude = [
+            "src/**/__tests__/**",
+            "src/**/*.test.ts",
+            "src/**/*.spec.ts",
+        ],
+    ),
+    visibility = ["//visibility:public"],
+)

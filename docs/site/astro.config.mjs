@@ -136,6 +136,10 @@ export default defineConfig({
               slug: "plugins",
             },
             {
+              label: "Hooks",
+              slug: "plugins/hooks",
+            },
+            {
               label: "Android/JVM Plugins",
               autogenerate: { directory: "plugins/android" },
             },
