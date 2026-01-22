@@ -126,6 +126,10 @@ export default defineConfig({
               label: "XLR",
               autogenerate: { directory: "xlr" },
             },
+            {
+              label: "Announcements",
+              autogenerate: { directory: "announcements" },
+            },
           ],
         },
         {
