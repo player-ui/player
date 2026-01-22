@@ -16,6 +16,7 @@ exports_files([
     "tsconfig.json",
     "package.json",
     "jest.config.js",
+    "scripts/docs/generate-hooks-docs.mjs",
     ".editorconfig",
     ".all-contributorsrc",
     "README.md",
