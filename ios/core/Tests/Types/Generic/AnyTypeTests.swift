@@ -583,44 +583,36 @@ class AnyTypeTests: XCTestCase {
         XCTAssertTrue(AnyType.unknownData.asAny is NSNull)
     }
     
-    func testMatchAnyDictionary() {
-        // Test pattern matching helper
+    func testAsAnyDictionary() {
+        // Test backwards compatibility property
         let dict: [String: Any] = ["key": "value"]
         let anyType = AnyType(anyDictionary: dict)
         
-        var matchedValue: String?
-        anyType.matchAnyDictionary { dict in
-            matchedValue = dict["key"] as? String
+        // Test extraction
+        if let extractedDict = anyType.asAnyDictionary {
+            XCTAssertEqual("value", extractedDict["key"] as? String)
+        } else {
+            XCTFail("Expected to extract anyDictionary")
         }
         
-        XCTAssertEqual("value", matchedValue)
-        
-        // Test non-anyDictionary case doesn't call handler
-        var wasCalled = false
-        AnyType.string(data: "test").matchAnyDictionary { _ in
-            wasCalled = true
-        }
-        XCTAssertFalse(wasCalled)
+        // Test non-anyDictionary case returns nil
+        XCTAssertNil(AnyType.string(data: "test").asAnyDictionary)
     }
     
-    func testMatchAnyArray() {
-        // Test pattern matching helper
+    func testAsAnyArray() {
+        // Test backwards compatibility property
         let array: [Any] = [1, 2, 3]
         let anyType = AnyType(anyArray: array)
         
-        var matchedCount: Int?
-        anyType.matchAnyArray { arr in
-            matchedCount = arr.count
+        // Test extraction
+        if let extractedArray = anyType.asAnyArray {
+            XCTAssertEqual(3, extractedArray.count)
+        } else {
+            XCTFail("Expected to extract anyArray")
         }
         
-        XCTAssertEqual(3, matchedCount)
-        
-        // Test non-anyArray case doesn't call handler
-        var wasCalled = false
-        AnyType.string(data: "test").matchAnyArray { _ in
-            wasCalled = true
-        }
-        XCTAssertFalse(wasCalled)
+        // Test non-anyArray case returns nil
+        XCTAssertNil(AnyType.string(data: "test").asAnyArray)
     }
     
     func testEmptyCollections() {
@@ -677,34 +669,34 @@ class AnyTypeTests: XCTestCase {
     
     // MARK: - Reflection Support Tests
     
-    func testDynamicValue() {
-        // Test dynamicValue for different types
+    func testAsAnyConversion() {
+        // Test asAny conversion for different types
         let stringType = AnyType.string(data: "Hello")
-        XCTAssertEqual("Hello", stringType.dynamicValue as? String)
+        XCTAssertEqual("Hello", stringType.asAny as? String)
         
         let numberType = AnyType.number(data: 42)
-        XCTAssertEqual(42, numberType.dynamicValue as? Double)
+        XCTAssertEqual(42, numberType.asAny as? Double)
         
         let boolType = AnyType.bool(data: true)
-        XCTAssertEqual(true, boolType.dynamicValue as? Bool)
+        XCTAssertEqual(true, boolType.asAny as? Bool)
         
         let arrayType = AnyType.array(data: ["a", "b", "c"])
-        XCTAssertEqual(["a", "b", "c"], arrayType.dynamicValue as? [String])
+        XCTAssertEqual(["a", "b", "c"], arrayType.asAny as? [String])
         
         let dictType = AnyType.dictionary(data: ["key": "value"])
-        XCTAssertEqual(["key": "value"], dictType.dynamicValue as? [String: String])
+        XCTAssertEqual(["key": "value"], dictType.asAny as? [String: String])
         
         let unknownType = AnyType.unknownData
-        XCTAssertTrue(unknownType.dynamicValue is NSNull)
+        XCTAssertTrue(unknownType.asAny is NSNull)
     }
     
-    func testDynamicValueWithAnyTypes() {
-        // Test dynamicValue with anyDictionary and anyArray
+    func testAsAnyWithComplexTypes() {
+        // Test asAny conversion with anyDictionary and anyArray
         let anyDict: [String: Any] = ["name": "Alice", "age": 30]
         let anyDictType = AnyType(anyDictionary: anyDict)
         
-        guard let retrievedDict = anyDictType.dynamicValue as? [String: Any] else {
-            return XCTFail("dynamicValue should return [String: Any]")
+        guard let retrievedDict = anyDictType.asAny as? [String: Any] else {
+            return XCTFail("asAny should return [String: Any]")
         }
         
         XCTAssertEqual("Alice", retrievedDict["name"] as? String)
@@ -712,8 +704,8 @@ class AnyTypeTests: XCTestCase {
         let anyArr: [Any] = [1, "test", true]
         let anyArrType = AnyType(anyArray: anyArr)
         
-        guard let retrievedArr = anyArrType.dynamicValue as? [Any] else {
-            return XCTFail("dynamicValue should return [Any]")
+        guard let retrievedArr = anyArrType.asAny as? [Any] else {
+            return XCTFail("asAny should return [Any]")
         }
         
         XCTAssertEqual(3, retrievedArr.count)

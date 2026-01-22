@@ -216,51 +216,11 @@ extension AnyType {
         }
     }
     
-    /**
-     Pattern match on anyDictionary with a legacy `[String: Any]` handler.
-     
-     - Parameter handler: Closure to execute if this is an anyDictionary case
-     */
-    public func matchAnyDictionary(_ handler: ([String: Any]) -> Void) {
-        if let dict = asAnyDictionary {
-            handler(dict)
-        }
-    }
-    
-    /**
-     Pattern match on anyArray with a legacy `[Any]` handler.
-     
-     - Parameter handler: Closure to execute if this is an anyArray case
-     */
-    public func matchAnyArray(_ handler: ([Any]) -> Void) {
-        if let arr = asAnyArray {
-            handler(arr)
-        }
-    }
 }
 
 // MARK: - Reflection Support
 
 extension AnyType {
-    /**
-     Access the underlying value as a dynamic `Any` type for reflection purposes.
-     
-     This property allows you to access the raw value without pattern matching,
-     useful for dynamic type casting and reflection scenarios.
-     
-     - Returns: The underlying value as `Any`. For `anyDictionary` and `anyArray`,
-                returns `[String: Any]` and `[Any]` respectively for backward compatibility.
-     
-     - Example:
-     ```swift
-     let anyType = AnyType.string(data: "Hello")
-     let value = anyType.dynamicValue // "Hello" as Any
-     ```
-     */
-    public var dynamicValue: Any {
-        return asAny
-    }
-    
     /**
      Cast to expected type automatically.
      
@@ -281,7 +241,7 @@ extension AnyType {
      ```
      */
     public func `as`<T>(_ type: T.Type) -> T? {
-        return dynamicValue as? T
+        return asAny as? T
     }
     
     /**
