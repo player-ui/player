@@ -1,15 +1,11 @@
 import type { DataController } from ".";
 import type { Logger } from "../../logger";
 import type { BindingLike } from "../../binding";
-import type {
-  DataModelWithParser,
-  DataModelOptions,
-  Updates,
-} from "../../data";
+import type { DataModelWithParser, DataModelOptions } from "../../data";
 
 /** Wrapper for the Data Controller Class that prevents writes */
 export class ReadOnlyDataController
-  implements DataModelWithParser<DataModelOptions>
+  implements Pick<DataModelWithParser<DataModelOptions>, "get" | "delete">
 {
   private controller: DataController;
   private logger?: Logger;
@@ -21,16 +17,6 @@ export class ReadOnlyDataController
 
   get(binding: BindingLike, options?: DataModelOptions | undefined) {
     return this.controller.get(binding, options);
-  }
-
-  set(
-    transaction: [BindingLike, any][],
-    options?: DataModelOptions | undefined,
-  ): Updates {
-    this.logger?.error(
-      "Error: Tried to set in a read only instance of the DataController",
-    );
-    return [];
   }
 
   delete(binding: BindingLike, options?: DataModelOptions | undefined): void {
