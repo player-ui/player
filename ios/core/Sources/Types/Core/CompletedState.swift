@@ -123,6 +123,14 @@ public class CompletedState: BaseFlowState, PlayerFlowExecutionData {
     /// The local data from the flow
     public var data: [String: Any]
 
+    /// Read-only controllers to allow data access after the flow has ended
+    public var controllers: Controllers
+
+    public struct Controllers {
+        /// A read only instance of the Data Controller
+        public var data: ReadOnlyDataController
+    }
+
     /**
      Create an instance of `CompletedState` from a JSValue
      - parameters:
@@ -131,19 +139,29 @@ public class CompletedState: BaseFlowState, PlayerFlowExecutionData {
      */
     public static func createInstance(from value: JSValue?) -> CompletedState? {
         guard
-            let flow = value?.objectForKeyedSubscript("flow")
+            let flow = value?.objectForKeyedSubscript("flow"),
+            let controllersJSValue = value?.objectForKeyedSubscript("controllers"),
+            let dataControllerJSValue = controllersJSValue.objectForKeyedSubscript("data")
         else { return nil }
+
         return CompletedState(
             flow: Flow.createInstance(value: flow),
             endState: value.map { NavigationFlowEndState($0.objectForKeyedSubscript("endState")) },
-            data: value?.objectForKeyedSubscript("data")?.toObject() as? [String: Any] ?? [:]
+            data: value?.objectForKeyedSubscript("data")?.toObject() as? [String: Any] ?? [:],
+            controllers: Controllers(data: .createInstance(value: dataControllerJSValue))
         )
     }
 
-    private init(flow: Flow, endState: NavigationFlowEndState?, data: [String: Any]) {
+    private init(
+        flow: Flow,
+        endState: NavigationFlowEndState?,
+        data: [String: Any],
+        controllers: Controllers
+    ) {
         self.flow = flow
         self.endState = endState
         self.data = data
+        self.controllers = controllers
         super.init(status: .completed)
     }
 }

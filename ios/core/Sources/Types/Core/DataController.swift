@@ -57,6 +57,12 @@ open class BaseDataController {
     public func get(binding: RawBinding) -> Any? {
         return self.value.invokeMethod("get", withArguments: [binding])?.toObject()
     }
+
+    /// Return a read-only version of this Data Controller to provide player functionality after the flow has ended
+    public func makeReadOnly() -> ReadOnlyDataController? {
+        value.invokeMethod("makeReadOnly", withArguments: [])
+            .map { .createInstance(value: $0) }
+    }
 }
 /// A dictionary representing a transaction
 public typealias RawSetTransaction = [String: Any]
@@ -85,5 +91,28 @@ public class DataController: BaseDataController, CreatedFromJSValue {
     */
     public override init(_ value: JSValue) {
         super.init(value)
+    }
+}
+
+/// A read-only version of the Data Controller
+public class ReadOnlyDataController: CreatedFromJSValue {
+    public typealias T = ReadOnlyDataController
+
+    private let value: JSValue
+    /// Construct a ReadOnlyDataController from a JSValue
+    private init(_ value: JSValue) { self.value = value }
+
+    static public func createInstance(value: JSValue) -> ReadOnlyDataController {
+        ReadOnlyDataController(value)
+    }
+
+    /**
+     Gets the value of a given binding
+     - parameters:
+        - binding: The binding to fetch data for
+     - returns: The data for the binding
+     */
+    public func get(binding: RawBinding) -> Any? {
+        value.invokeMethod("get", withArguments: [binding])?.toObject()
     }
 }
