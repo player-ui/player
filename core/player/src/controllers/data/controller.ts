@@ -243,6 +243,6 @@ export class DataController implements DataModelWithParser<DataModelOptions> {
   }
 
   public makeReadOnly(): ReadOnlyDataController {
-    return new ReadOnlyDataController(this, this.logger);
+    return new ReadOnlyDataController(this);
   }
 }
