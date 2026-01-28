@@ -4,9 +4,9 @@ title: Player Language Service
 
 import { Aside, Steps, Badge } from '@astrojs/starlight/components';
 
-The `PlayerLanguageService` is the foundation of all Player Content. It conforms to the Language Server Protocol standards, and the docs refer to this `PlayerLanguageService` as The LSP. The LSP parses Player's DSL to JSON and then to a manipulable Abstract Syntax Tree (AST). It also provides features like Content validation (i.e. linting).
+The `PlayerLanguageService` is the foundation of all Player Content. It conforms to the Language Server Protocol standards, and the docs refer to this `PlayerLanguageService` as The LSP. The LSP parses JSON to a manipulable Abstract Syntax Tree (AST). It also provides features like Content validation (i.e. linting).
 
-As a user of Player, you will not create your own LSP. You will use the LSP that is created for you by the Player or Player CLI. However, you may use a DSL / CLI Plugin to interact with the LSP and modify its behavior. How to create and use DSL / CLI plugins is described in the [Plugins](./plugins) section.
+As a user of Player, you will not create your own LSP. The Player CLI instantiates an LSP for you. Plugins that manipulate the LSP can be added to the Player CLI (i.e. DSL / CLI plugins). How to create and use DSL / CLI plugins is described in the [Plugins](./plugins) section.
 
 You may interact with an LSP in the following ways:
 
@@ -18,7 +18,7 @@ You may interact with an LSP in the following ways:
 
 ### `XLRService`
 
-The XLR (eXtensible Language Runtime) service that handles type information and transformations for Player Content. For more information on XLR, see the [XLR documentation](../xlr/intro).
+The XLR (Cross Language Representation) service that handles type information and transformations for Player Content. For more information on XLR, see the [XLR documentation](../xlr/intro).
 
 Access the XLR service to add custom transforms or work with type definitions.
 
