@@ -124,7 +124,20 @@ export default defineConfig({
             },
             {
               label: "XLR",
-              autogenerate: { directory: "xlr" },
+              items: [
+                {
+                  label: "Intro",
+                  slug: "xlr/intro",
+                },
+                {
+                  label: "Concepts",
+                  slug: "xlr/concepts",
+                },
+                {
+                  label: "Usage",
+                  autogenerate: { directory: "xlr/usage" },
+                },
+              ],
             },
           ],
         },

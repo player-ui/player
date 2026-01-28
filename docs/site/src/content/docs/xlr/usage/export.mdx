@@ -1,0 +1,69 @@
+---
+title: Exporting XLRs
+---
+
+import { PackageManagers } from 'starlight-package-managers'
+
+XLR creation is done through the Player CLI which can be added to your project like so:
+
+<PackageManagers pkg="@player-tools/cli" />
+
+
+## Exporting Base Type Definitions
+
+If you want to compile all exported interfaces/types and are using our Bazel rules, you will want to use the `js_xlr_pipeline` macro and set the `xlr_mode` option to `"types"`. 
+
+```starlark
+js_xlr_pipeline(
+    package_name = "<package name>",
+    xlr_mode = "types",
+)
+```
+
+If you are not using our Bazel rules, run the Player CLI as part of your build
+
+```bash
+player xlr compile -m types <other options>
+```
+
+## Exporting Plugin Capabilities
+
+If you are writing a Player Plugin, you'll first need to have your plugin extend the `ExtendedPlayerPlugin` interface and fill in the generics with an array of the interfaces/types for each Capability. In order, the generics denote:
+
+- Assets
+- Views
+- Expressions
+- Data Types
+
+For example, you can see how its done below in the [core reference assets plugin](https://github.com/player-ui/player/blob/main/plugins/reference-assets/core/src/plugin.ts)
+
+```typescript
+export class ReferenceAssetsPlugin
+  implements
+    PlayerPlugin,
+    ExtendedPlayerPlugin<
+      [InputAsset, TextAsset, ActionAsset, InfoAsset, CollectionAsset]
+    >
+```
+
+### Bazel
+
+If you are using our Bazel rules, you will want to use the same `js_xlr_pipeline` macro. The default mode is `"plugin"` so the `xlr_mode` option can be omitted or explicitly set if desired.
+
+```starlark
+js_xlr_pipeline(
+    package_name = "<package name>",
+    build_deps = [...],
+    peer_deps = [...],
+    test_deps = [...],
+    deps = [...],
+    xlr_mode = "plugin"
+)
+```
+
+### Non-Bazel
+Otherwise, if you are not using Bazel then run the following command as part of your build
+
+```shell
+player xlr compile -m plugin <other options>
+```
