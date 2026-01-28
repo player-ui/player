@@ -1,0 +1,242 @@
+---
+title: Adding Custom LSP Validations
+---
+
+import { PackageManagers } from 'starlight-package-managers'
+
+The [Player Language Service (LSP)](../../capabilities/lsp) provides a powerful validation system that can be extended with custom validation rules. This guide will walk you through creating custom validation plugins to enforce project-specific rules and best practices in your Player content.
+
+## Understanding the Validation Hook
+
+The LSP exposes a `validate` hook that runs during document validation. This hook provides access to:
+- **DocumentContext**: The parsed Player content and document information
+- **ValidationContext**: Methods to add violations, register AST visitors, and report diagnostics
+
+## Creating a Basic Validation Plugin
+
+Consider this **hypothetical** scenario:
+
+Users of the HypotheticalPlayerPlugin are currently allowed to define "action" Assets without the `asset` property. Like this:
+
+```json
+{
+  "type": "action",
+  ...
+}
+```
+
+However, you, the owners of the HypotheticalPlayerPlugin, want to enforce a new rule that all "action" Assets must be wrapped in an `asset` property. For example: 
+
+```json
+{
+  "asset": {
+    "type": "action",
+    ...
+  }
+}
+```
+
+Let's create a validation plugin that handles this hypothetical scenario. The plugin will detect this legacy pattern and automatically convert it to the modern format. 
+
+This example demonstrates how to build validation rules with automatic fixes.
+
+### Step 1: Define the Plugin Structure
+
+Create a new file for your validation plugin:
+
+```typescript
+import { DiagnosticSeverity } from 'vscode-languageserver-types';
+// These are the imports we know we'll need
+import type {
+  PlayerLanguageService,
+  PlayerLanguageServicePlugin,
+  ASTNode,
+  ASTVisitor,
+  ValidationContext
+} from '@player-tools/json-language-service';
+import { getNodeValue } from '@player-tools/json-language-service';
+
+export class LegacyActionPlugin implements PlayerLanguageServicePlugin {
+  name = 'legacy-action';
+
+  apply(service: PlayerLanguageService) {
+    service.hooks.validate.tap(this.name, async (documentContext, validationContext) => {
+      // Plugin implementation will go here
+    });
+  }
+}
+```
+
+### Step 2: Stub out the AST Visitor
+
+The `validate` hook provides access to a `ValidationContext` that can be used to report violations and register AST visitors. We will create an AST visitor to traverse the AST and detect legacy actions. This visitor will use the `ValidationContext` to report violations and provide automatic fixes.
+
+We will create an AST visitor that will traverse the AST and detect legacy actions. This visitor will leverage its `ValidationContext` to report violations and provide automatic fixes.
+
+First, let's stub out the ASTVisitor. Actions can only exist on `ViewNode` objects, so we'll target that node type. Then we'll register our visitor with the `ValidationContext`.
+
+```typescript
+/** AST visitor for detecting legacy actions in views */
+apply(service: PlayerLanguageService) {
+  service.hooks.validate.tap(this.name, async (documentContext, validationContext) => {
+    const legacyActionVisitor: ASTVisitor = {
+      ViewNode: (viewNode) => {
+        // Implementation will go here
+      }
+    };
+
+    // Register visitor
+    validationContext.useASTVisitor(legacyActionVisitor);
+  });
+}
+```
+
+### Step 3: Implement the Visitor
+
+This is the meat of our validation plugin. It is broken down into sections providing examples of different validation tasks. You can use this pattern to create any validation rule you need.
+
+#### Inspecting Nodes
+First, we will create a helper function to check if a node is already using the modern asset format:
+
+```typescript
+/** Check if a node is already using the modern asset format */
+function isModernAsset(node: ASTNode): boolean {
+  if (node.type === 'asset') {
+    return true;
+  }
+
+  if (node.type === 'object') {
+    return node.properties.some(
+      (p) =>
+        p.keyNode.value === 'asset' ||
+        p.keyNode.value === 'dynamicSwitch' ||
+        p.keyNode.value === 'staticSwitch'
+    );
+  }
+
+  return false;
+}
+```
+
+#### Creating Automatic Fixes
+Then, we create a function to generate the automatic fix for legacy actions:
+
+```typescript
+/** Create an automatic fix to convert legacy action to modern asset format */
+function createLegacyActionFix(node: ASTNode) {
+  return () => {
+    // getNodeValue will return the value of the node as a JS object
+    const currentValue = getNodeValue(node);
+    
+    const newActionAsset = {
+      asset: {
+        type: 'action',
+        ...currentValue
+      }
+    };
+
+    return {
+      name: 'Convert to Asset',
+      edit: {
+        type: 'replace',
+        node,
+        value: JSON.stringify(newActionAsset, null, 2)
+      }
+    };
+  };
+}
+```
+
+#### Adding Violations
+Finally, we combine these into one function to validate individual action nodes:
+
+```typescript
+/** Check if an action node needs to be migrated to the modern format */
+function validateActionNode(node: ASTNode, context: ValidationContext): void {
+  if (isModernAsset(node)) {
+    return;
+  }
+
+  if (node.type === 'object') {
+    context.addViolation({
+      message: '"action" with id=${node.id} is deprecated. All "action" assets must be wrapped in an "asset" property',
+      node,
+      severity: DiagnosticSeverity.Warning,
+      fix: createLegacyActionFix(node)
+    });
+  }
+}
+```
+
+### Step 4: Finish Implementing the Plugin
+
+At this point, we have everything needed to implement our plugin:
+
+```typescript
+/** AST visitor for detecting legacy actions in views */
+apply(service: PlayerLanguageService) {
+  service.hooks.validate.tap(this.name, async (documentContext, validationContext) => {
+    const legacyActionVisitor: ASTVisitor = {
+      ViewNode: (viewNode) => {
+        // Find the actions property in a view
+        const actionsProp = viewNode.properties.find(
+          (p) => p.keyNode.value === 'actions'
+        );
+
+        // If the actions property is not present or is not an array, return
+        if (!actionsProp || actionsProp.valueNode?.type !== 'array') {
+          return;
+        }
+
+        // Validate each action in the array
+        actionsProp.valueNode.children.forEach((action) => {
+          validateActionNode(action, validationContext);
+        });
+      }
+    };
+
+    validationContext.useASTVisitor(legacyActionVisitor);
+  });
+}
+```
+
+## Integrating with the Player CLI
+
+Once you've created your validation plugin, one usage option is to integrate it with the Player CLI.
+
+### Step 1: Create a CLI Config
+
+Create a new [CLI config](../../capabilities/cli#config) or update your existing CLI config to include your validation plugin:
+
+```typescript
+import type { PlayerConfigFileShape } from "@player-tools/cli";
+import { LSPPluginPlugin, LSPAssetsPlugin } from "@player-tools/cli";
+import { LegacyActionPlugin } from "./plugins/validation/legacy-action-plugins";
+import path from 'path';
+
+const config: PlayerConfigFileShape = {
+  plugins: [
+    // Load asset types for validation
+    new LSPAssetsPlugin(
+      path.join(require.resolve('@player-ui/types'), '..', '..'),
+    ),
+
+    // Add your custom validation plugin
+    new LSPPluginPlugin([
+      new LegacyActionPlugin(),
+    ]),
+  ],
+};
+
+export default config;
+```
+
+### Step 2: Run Validation
+
+Validation will run automatically when compiling DSL Content:
+
+<PackageManagers type="run" args="player dsl compile -i ./src/content -o ./dist/content"/>
+
+Or validate JSON directly:
+
+<PackageManagers type="run" args="player json validate -f './content/**/*.json'"/>
