@@ -2,18 +2,25 @@ import { describe, it, beforeEach, expect, vitest } from "vitest";
 import { ErrorController } from "../controller";
 import { ErrorSeverity, ErrorTypes } from "../types";
 import type { DataController } from "../../data/controller";
+import type { FlowController } from "../../flow/controller";
 import type { Logger } from "../../../logger";
 
 describe("ErrorController", () => {
   let errorController: ErrorController;
   let mockDataController: DataController;
+  let mockFlowController: FlowController;
   let mockLogger: Logger;
+  let mockFail: ReturnType<typeof vitest.fn>;
 
   beforeEach(() => {
     mockDataController = {
       set: vitest.fn(),
       get: vitest.fn(),
       delete: vitest.fn(),
+    } as any;
+
+    mockFlowController = {
+      current: undefined,
     } as any;
 
     mockLogger = {
@@ -24,8 +31,12 @@ describe("ErrorController", () => {
       error: vitest.fn(),
     };
 
+    mockFail = vitest.fn();
+
     errorController = new ErrorController({
       logger: mockLogger,
+      flow: mockFlowController,
+      fail: mockFail,
       model: mockDataController,
     });
   });
@@ -150,7 +161,11 @@ describe("ErrorController", () => {
     });
 
     it("should handle missing data controller gracefully", () => {
-      const controller = new ErrorController({ logger: mockLogger });
+      const controller = new ErrorController({
+        logger: mockLogger,
+        flow: mockFlowController,
+        fail: mockFail,
+      });
       controller.captureError(new Error("Test error"), "test-error");
 
       expect(() => controller.clearErrors()).not.toThrow();
@@ -188,7 +203,11 @@ describe("ErrorController", () => {
     });
 
     it("should handle missing data controller gracefully", () => {
-      const controller = new ErrorController({ logger: mockLogger });
+      const controller = new ErrorController({
+        logger: mockLogger,
+        flow: mockFlowController,
+        fail: mockFail,
+      });
       controller.captureError(new Error("Test error"), "test-error");
 
       expect(() => controller.clearCurrentError()).not.toThrow();
