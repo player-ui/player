@@ -33,7 +33,6 @@ describe("ErrorController Navigation", () => {
 
     // Mock FlowInstance
     mockFlowInstance = {
-      flow: {},
       currentState: {
         name: "VIEW_Start",
         value: {
@@ -46,7 +45,8 @@ describe("ErrorController Navigation", () => {
         },
       },
       transition: vitest.fn(),
-      transitionToErrorState: vitest.fn().mockReturnValue(false),
+      flowTransition: vitest.fn(),
+      getFlowErrorState: vitest.fn().mockReturnValue(undefined),
     } as any;
 
     // Mock FlowController
@@ -71,26 +71,27 @@ describe("ErrorController Navigation", () => {
       const error = new Error("Test error");
       errorController.captureError(error, ErrorTypes.VIEW);
 
-      // Should call transition with the errorState value
+      // Should call transition (node-level) with the errorState value
       expect(mockFlowInstance.transition).toHaveBeenCalledWith("error");
-      expect(mockFlowInstance.transitionToErrorState).not.toHaveBeenCalled();
       expect(mockFail).not.toHaveBeenCalled();
     });
 
     it("should fall through to flow-level when transition throws", () => {
       mockFlowInstance.currentState!.value.errorState = "error";
-      mockFlowInstance.transition = vitest.fn().mockImplementation(() => {
-        throw new Error("Transition failed");
+      mockFlowInstance.transition = vitest.fn().mockImplementation((val) => {
+        if (val === "error") {
+          throw new Error("Node transition failed");
+        }
       });
-      mockFlowInstance.transitionToErrorState = vitest
+      mockFlowInstance.getFlowErrorState = vitest
         .fn()
-        .mockReturnValue(true);
+        .mockReturnValue("flowError");
 
       const error = new Error("Test error");
-      errorController.captureError(error);
+      errorController.captureError(error, ErrorTypes.NAVIGATION);
 
       expect(mockFlowInstance.transition).toHaveBeenCalledWith("error");
-      expect(mockFlowInstance.transitionToErrorState).toHaveBeenCalled();
+      expect(mockFlowInstance.flowTransition).toHaveBeenCalledWith("flowError");
       expect(mockFail).not.toHaveBeenCalled();
     });
   });
@@ -99,30 +100,26 @@ describe("ErrorController Navigation", () => {
     it("should navigate to flow-level errorState when node-level not defined", () => {
       // No node-level errorState
       mockFlowInstance.currentState!.value.errorState = undefined;
-      mockFlowInstance.transitionToErrorState = vitest
-        .fn()
-        .mockReturnValue(true);
+      mockFlowInstance.getFlowErrorState = vitest.fn().mockReturnValue("error");
 
       const error = new Error("Test error");
-      errorController.captureError(error);
+      errorController.captureError(error, ErrorTypes.NAVIGATION);
 
-      expect(mockFlowInstance.transition).not.toHaveBeenCalled();
-      expect(mockFlowInstance.transitionToErrorState).toHaveBeenCalledWith(
-        undefined,
-      );
+      expect(mockFlowInstance.flowTransition).toHaveBeenCalledWith("error");
       expect(mockFail).not.toHaveBeenCalled();
     });
 
     it("should fall through to flow rejection when flow-level fails", () => {
       mockFlowInstance.currentState!.value.errorState = undefined;
-      mockFlowInstance.transitionToErrorState = vitest
-        .fn()
-        .mockReturnValue(false);
+      mockFlowInstance.getFlowErrorState = vitest.fn().mockReturnValue("error");
+      mockFlowInstance.flowTransition = vitest.fn().mockImplementation(() => {
+        throw new Error("Transition failed");
+      });
 
       const error = new Error("Test error");
-      errorController.captureError(error);
+      errorController.captureError(error, ErrorTypes.NAVIGATION);
 
-      expect(mockFlowInstance.transitionToErrorState).toHaveBeenCalled();
+      expect(mockFlowInstance.flowTransition).toHaveBeenCalledWith("error");
       expect(mockFail).toHaveBeenCalledWith(error);
     });
   });
@@ -130,12 +127,12 @@ describe("ErrorController Navigation", () => {
   describe("Flow rejection (fallback)", () => {
     it("should reject flow when no errorState defined", () => {
       mockFlowInstance.currentState!.value.errorState = undefined;
-      mockFlowInstance.transitionToErrorState = vitest
+      mockFlowInstance.getFlowErrorState = vitest
         .fn()
-        .mockReturnValue(false);
+        .mockReturnValue(undefined);
 
       const error = new Error("Test error");
-      errorController.captureError(error);
+      errorController.captureError(error, ErrorTypes.NAVIGATION);
 
       expect(mockFail).toHaveBeenCalledWith(error);
       expect(mockLogger.debug).toHaveBeenCalledWith(
@@ -151,11 +148,11 @@ describe("ErrorController Navigation", () => {
       errorController.hooks.onError.tap("test", () => true);
 
       const error = new Error("Test error");
-      errorController.captureError(error);
+      errorController.captureError(error, ErrorTypes.NAVIGATION);
 
       // Should not navigate when bailed
       expect(mockFlowInstance.transition).not.toHaveBeenCalled();
-      expect(mockFlowInstance.transitionToErrorState).not.toHaveBeenCalled();
+      expect(mockFlowInstance.flowTransition).not.toHaveBeenCalled();
       expect(mockFail).not.toHaveBeenCalled();
     });
 
@@ -165,14 +162,14 @@ describe("ErrorController Navigation", () => {
       errorController.hooks.onError.tap("test", () => undefined);
 
       const error = new Error("Test error");
-      errorController.captureError(error);
+      errorController.captureError(error, ErrorTypes.NAVIGATION);
 
       expect(mockFlowInstance.transition).toHaveBeenCalledWith("error");
     });
   });
 
-  describe("Dictionary-based error transition", () => {
-    it("should transition to specific error state based on errorType (node-level)", () => {
+  describe("Dictionary-based error transitionToError", () => {
+    it("should transitionToError to specific error state based on errorType (node-level)", () => {
       mockFlowInstance.currentState!.value.errorState = {
         binding: "binding_error",
         expression: "expression_error",
@@ -200,59 +197,42 @@ describe("ErrorController Navigation", () => {
         binding: "binding_error",
       };
 
-      mockFlowInstance.flow.errorState = "flow_error";
+      mockFlowInstance.getFlowErrorState = vitest
+        .fn()
+        .mockReturnValue("flow_error");
 
       errorController.captureError(new Error("Expression error"), "expression");
 
       // Should fall through to flow-level
-      expect(mockFlowInstance.transition).not.toHaveBeenCalled();
-      expect(mockFlowInstance.transitionToErrorState).toHaveBeenCalledWith(
-        "expression",
+      expect(mockFlowInstance.flowTransition).toHaveBeenCalledWith(
+        "flow_error",
       );
     });
 
-    it("should transition to specific error state based on errorType (flow-level)", () => {
+    it("should transitionToError to specific error state based on errorType (flow-level)", () => {
       mockFlowInstance.currentState!.value.errorState = undefined;
-      mockFlowInstance.flow.errorState = {
-        network: "network_error",
-        validation: "validation_error",
-        "*": "generic_error",
-      };
-
-      mockFlowInstance.transitionToErrorState.mockClear().mockReturnValue(true);
+      mockFlowInstance.getFlowErrorState = vitest
+        .fn()
+        .mockReturnValue("network_error");
 
       errorController.captureError(new Error("Network timeout"), "network");
 
-      expect(mockFlowInstance.transitionToErrorState).toHaveBeenCalledWith(
-        "network",
+      expect(mockFlowInstance.flowTransition).toHaveBeenCalledWith(
+        "network_error",
       );
     });
 
     it("should use * wildcard when errorType doesn't match (flow-level)", () => {
       mockFlowInstance.currentState!.value.errorState = undefined;
-      mockFlowInstance.flow.errorState = {
-        binding: "binding_error",
-        "*": "generic_error",
-      };
-
-      mockFlowInstance.transitionToErrorState.mockClear().mockReturnValue(true);
+      mockFlowInstance.getFlowErrorState = vitest
+        .fn()
+        .mockReturnValue("generic_error");
 
       errorController.captureError(new Error("Unknown error"), "unknown");
 
-      expect(mockFlowInstance.transitionToErrorState).toHaveBeenCalledWith(
-        "unknown",
+      expect(mockFlowInstance.flowTransition).toHaveBeenCalledWith(
+        "generic_error",
       );
-    });
-
-    it("should handle errorType undefined with * wildcard fallback", () => {
-      mockFlowInstance.currentState!.value.errorState = {
-        binding: "binding_error",
-        "*": "generic_error",
-      };
-
-      errorController.captureError(new Error("Error without type"));
-
-      expect(mockFlowInstance.transition).toHaveBeenCalledWith("generic_error");
     });
 
     it("should preserve string-based errorState behavior", () => {

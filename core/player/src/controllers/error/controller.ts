@@ -123,6 +123,79 @@ export class ErrorController {
   }
 
   /**
+   * Navigate to error state
+   * Node-level errorState
+   * Flow-level errorState
+   * Reject flow (fallback)
+   */
+  private navigateToErrorState(playerError: PlayerError): void {
+    const flowInstance = this.options.flow.current;
+
+    if (!flowInstance) {
+      this.options.logger.warn(
+        "[ErrorController] No active flow instance for error navigation",
+      );
+      return;
+    }
+
+    // Node-level errorState
+    const currentState = flowInstance.currentState;
+    const rawErrorState =
+      currentState !== undefined && currentState.value.state_type !== "END"
+        ? currentState.value.errorState
+        : undefined;
+    const nodeErrorState = resolveErrorState(
+      rawErrorState,
+      playerError.errorType,
+    );
+
+    if (nodeErrorState) {
+      this.options.logger.debug(
+        `[ErrorController] Node-level: Navigating to errorState "${nodeErrorState}" (errorType: ${playerError.errorType || "none"})`,
+      );
+
+      try {
+        flowInstance.transition(nodeErrorState);
+        return;
+      } catch (e) {
+        this.options.logger.debug(
+          `[ErrorController] Node-level transition "${nodeErrorState}" failed: ${e}`,
+        );
+      }
+    }
+
+    // Flow-level errorState
+    const flowErrorTransition = resolveErrorState(
+      flowInstance.getFlowErrorState(),
+      playerError.errorType,
+    );
+
+    if (flowErrorTransition) {
+      this.options.logger.debug(
+        `[ErrorController] Flow-level: Navigating to errorState via "${flowErrorTransition}" (errorType: ${playerError.errorType || "none"})`,
+      );
+
+      try {
+        flowInstance.flowTransition(flowErrorTransition);
+        return;
+      } catch (e) {
+        this.options.logger.debug(
+          `[ErrorController] Flow-level transition "${flowErrorTransition}" failed: ${e}`,
+        );
+      }
+    }
+
+    this.options.logger.debug(
+      "[ErrorController] No flow-level errorState defined or no match found",
+    );
+
+    // Reject flow (fallback)
+    this.options.logger.debug("[ErrorController] Rejecting flow with error");
+
+    this.options.fail(playerError.error);
+  }
+
+  /**
    * Get most recent error
    */
   public getCurrentError(): PlayerError | undefined {
@@ -218,68 +291,5 @@ export class ErrorController {
         e,
       );
     }
-  }
-
-  /**
-   * Navigate to error state
-   * Node-level errorState (uses transition)
-   * Flow-level errorState (direct navigation)
-   * Reject flow (fallback)
-   */
-  private navigateToErrorState(playerError: PlayerError): void {
-    const flowInstance = this.options.flow.current;
-
-    if (!flowInstance) {
-      this.options.logger.warn(
-        "[ErrorController] No active flow instance for error navigation",
-      );
-      return;
-    }
-
-    // Node-level errorState
-    const currentState = flowInstance.currentState;
-    const rawErrorState =
-      currentState !== undefined && currentState.value.state_type !== "END"
-        ? currentState.value.errorState
-        : undefined;
-    const nodeErrorState = resolveErrorState(
-      rawErrorState,
-      playerError.errorType,
-    );
-
-    if (nodeErrorState) {
-      try {
-        this.options.logger.debug(
-          `[ErrorController] Node-level: Navigating to errorState "${nodeErrorState}" (errorType: ${playerError.errorType || "none"})`,
-        );
-        flowInstance.transition(nodeErrorState);
-        return;
-      } catch (e) {
-        this.options.logger.error(
-          `[ErrorController] Node-level navigation failed: ${e}`,
-        );
-      }
-    }
-
-    // Flow-level errorState
-    const flowErrorState = flowInstance.transitionToErrorState(
-      playerError.errorType,
-    );
-
-    if (flowErrorState) {
-      this.options.logger.debug(
-        `[ErrorController] Navigated to flow-level errorState (errorType: ${playerError.errorType || "none"})`,
-      );
-      return;
-    }
-
-    this.options.logger.debug(
-      "[ErrorController] No flow-level errorState defined or no match found",
-    );
-
-    // Reject flow (fallback)
-    this.options.logger.debug("[ErrorController] Rejecting flow with error");
-
-    this.options.fail(playerError.error);
   }
 }
