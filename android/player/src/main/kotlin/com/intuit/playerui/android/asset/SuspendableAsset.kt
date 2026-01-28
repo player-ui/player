@@ -1,4 +1,4 @@
- fpackage com.intuit.playerui.android.asset
+package com.intuit.playerui.android.asset
 
 import android.annotation.SuppressLint
 import android.content.Context
