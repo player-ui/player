@@ -6,9 +6,12 @@ import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.player.state.inProgressState
 import com.intuit.playerui.core.player.state.lastViewUpdate
 import com.intuit.playerui.plugins.assets.ReferenceAssetsPlugin
+import com.intuit.playerui.plugins.coroutines.UpdatesPlugin
+import com.intuit.playerui.plugins.coroutines.waitForUpdates
 import com.intuit.playerui.utils.test.PlayerTest
 import com.intuit.playerui.utils.test.runBlockingTest
 import io.mockk.junit5.MockKExtension
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -108,7 +111,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
     }
         """.trimMargin()
 
-    override val plugins = listOf(AsyncNodePlugin(), ReferenceAssetsPlugin())
+    override val plugins = listOf(AsyncNodePlugin(), ReferenceAssetsPlugin(), UpdatesPlugin())
 
     private val plugin get() = player.asyncNodePlugin!!
 
@@ -337,11 +340,10 @@ internal class AsyncNodePluginTest : PlayerTest() {
             ),
         )
 
-        deferredResolve!!.invoke(listOf(viewObject))
+        view = player.waitForUpdates {
+            deferredResolve!!.invoke(listOf(viewObject))
+        }
 
-        waitForCondition { count == 1 }
-
-        view = player.inProgressState?.lastViewUpdate
         Assertions.assertNotNull(view)
 
         Assertions.assertEquals(
@@ -359,12 +361,10 @@ internal class AsyncNodePluginTest : PlayerTest() {
                 ?.get("type"),
         )
         Assertions.assertEquals(2, view.getList("actions")?.size)
-        waitForCondition { count == 2 }
 
-        updateContent!!.invoke(null)
-
-        waitForCondition { count == 3 }
-        view = player.inProgressState?.lastViewUpdate
+        view = player.waitForUpdates {
+            updateContent!!.invoke(null)
+        }
 
         Assertions.assertNotNull(view)
         Assertions.assertEquals(
@@ -391,13 +391,6 @@ internal class AsyncNodePluginTest : PlayerTest() {
             BailResult.Bail(result)
         }
 
-        var count = 0
-        player.hooks.view.tap { v ->
-            v?.hooks?.onUpdate?.tap { asset ->
-                count++
-            }
-        }
-
         player.start(asyncNodeFlowSimple)
 
         var view = player.inProgressState?.lastViewUpdate
@@ -417,10 +410,12 @@ internal class AsyncNodePluginTest : PlayerTest() {
             yield()
         }
 
-        deferredResolve!!.invoke(null)
-
-        waitForCondition { count == 1 }
-
+        // Check that update does not happen after making no changes
+        Assertions.assertThrows(TimeoutCancellationException::class.java) {
+            view = player.waitForUpdates {
+                deferredResolve!!.invoke(null)
+            }
+        }
         view = player.inProgressState?.lastViewUpdate
 
         Assertions.assertNotNull(view)
@@ -428,12 +423,13 @@ internal class AsyncNodePluginTest : PlayerTest() {
             "action",
             view!!.getList("actions")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("type"),
         )
-        Assertions.assertEquals(1, view.getList("actions")?.size)
+        Assertions.assertEquals(1, view!!.getList("actions")?.size)
 
-        updateContent!!.invoke(null)
-
-        waitForCondition { count == 1 }
-
+        Assertions.assertThrows(TimeoutCancellationException::class.java) {
+            player.waitForUpdates {
+                updateContent!!.invoke(null)
+            }
+        }
         view = player.inProgressState?.lastViewUpdate
 
         Assertions.assertNotNull(view)
@@ -441,7 +437,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
             "action",
             view!!.getList("actions")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("type"),
         )
-        Assertions.assertEquals(1, view.getList("actions")?.size)
+        Assertions.assertEquals(1, view!!.getList("actions")?.size)
     }
 
     @TestTemplate
@@ -659,15 +655,7 @@ internal class AsyncNodePluginTest : PlayerTest() {
             }
         }
 
-        setupPlayer(listOf(AsyncNodePlugin(handler), ReferenceAssetsPlugin()))
-
-        var count = 0
-
-        player.hooks.view.tap { v ->
-            v?.hooks?.onUpdate?.tap { asset ->
-                count++
-            }
-        }
+        setupPlayer(listOf(AsyncNodePlugin(handler), ReferenceAssetsPlugin(), UpdatesPlugin()))
         player.start(asyncNodeFlowSimple)
 
         var view = player.inProgressState?.lastViewUpdate
@@ -695,13 +683,9 @@ internal class AsyncNodePluginTest : PlayerTest() {
             ),
         )
 
-        deferredResolve!!.invoke(listOf(viewObject))
+        view = player.waitForUpdates { deferredResolve!!.invoke(listOf(viewObject)) }
 
-        waitForCondition { count == 1 }
-
-        view = player.inProgressState?.lastViewUpdate
         Assertions.assertNotNull(view)
-
         Assertions.assertEquals(
             "action",
             view!!.getList("actions")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("type"),
@@ -717,12 +701,8 @@ internal class AsyncNodePluginTest : PlayerTest() {
                 ?.get("type"),
         )
         Assertions.assertEquals(2, view.getList("actions")?.size)
-        waitForCondition { count == 2 }
 
-        updateContent!!.invoke(null)
-
-        waitForCondition { count == 3 }
-        view = player.inProgressState?.lastViewUpdate
+        view = player.waitForUpdates { updateContent!!.invoke(null) }
 
         Assertions.assertNotNull(view)
         Assertions.assertEquals(
@@ -730,15 +710,5 @@ internal class AsyncNodePluginTest : PlayerTest() {
             view!!.getList("actions")?.filterIsInstance<Node>()?.get(0)?.getObject("asset")?.get("type"),
         )
         Assertions.assertEquals(1, view.getList("actions")?.size)
-    }
-
-    private fun waitForCondition(
-        count: Int = 5,
-        delay: Long = 500,
-        conditions: () -> Boolean = { true },
-    ) {
-        var counter = 0
-        while (!conditions() && counter++ < count) runBlockingTest { delay(delay) }
-        Assertions.assertTrue(conditions())
     }
 }
