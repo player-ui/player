@@ -42,9 +42,11 @@ export type TransformFunction = (
 Here is an example of a transform function that adds a new `transformed` property to all objects that are part of the `Assets` capability:
 
 ```typescript
+import type { TransformFunction } from "@player-tools/xlr";
+
 const transformFunction: TransformFunction = (input, capability) => {
   if (capability === "Assets" && input.type === "object") {
-    const copyOfNode = { ...input };
+    const copyOfNode = structuredClone(input);
     copyOfNode.properties.transformed = {
       required: false,
       node: { type: "boolean", const: true },

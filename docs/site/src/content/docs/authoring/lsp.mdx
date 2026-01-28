@@ -4,15 +4,19 @@ title: Player Language Service
 
 import { Aside, Steps, Badge } from '@astrojs/starlight/components';
 
-The `PlayerLanguageService` is the foundation of all Player Content. It conforms to the Language Server Protocol standards, and the docs refer to this `PlayerLanguageService` as The LSP. The LSP parses JSON to a manipulable Abstract Syntax Tree (AST). It also provides features like Content validation (i.e. linting).
+The `PlayerLanguageService` is the foundation of all Player Content. It conforms to the Language Server Protocol standards, and the docs refer to this `PlayerLanguageService` as The LSP. The LSP parses JSON to a manipulable Abstract Syntax Tree (AST). It also provides features like Content validation.
 
-As a user of Player, you will not create your own LSP. The Player CLI instantiates an LSP for you. Plugins that manipulate the LSP can be added to the Player CLI (i.e. DSL / CLI plugins). How to create and use DSL / CLI plugins is described in the [Plugins](./plugins) section.
+As a user of Player, you will not create your own LSP. The [Player CLI](../capabilities/cli) instantiates an LSP for you. Plugins that manipulate the LSP can be added to the Player CLI (i.e. DSL / CLI plugins). How to create and use DSL / CLI plugins is described in the [Plugins](./plugins) section.
 
-You may interact with an LSP in the following ways:
+You may interact with an LSP (via a DSL / CLI plugin) in the following ways:
 
 - Use its [public properties](#public-properties)
-- Call its [public functions](#public-functions-to-use)
-- Tap into its [hooks](#hooks-to-tap)
+- Tap into its hooks
+    - [Hooks to extend LSP functionality](#hooks-to-extend-lsp-functionality)
+    - [LSP-Standard hooks](#lsp-standard-hooks)
+- Call its functions
+    - [Functions to configure the LSP](#functions-to-configure-the-lsp)
+    - [LSP-Standard functions](#lsp-standard-functions)
 
 ## Public Properties
 
@@ -34,7 +38,7 @@ lsp.XLRService.XLRSDK.hasType('InputAsset');
 
 ### `hooks`
 
-An object containing all the tapable hooks that plugins can use to extend LSP functionality. See the [Hooks To Tap](#hooks-to-tap) and [Hooks To NOT Tap](#hooks-to-not-tap) sections for detailed information about each hook.
+An object containing all the tapable hooks that plugins can use to extend LSP functionality. See the [Hooks to Extend LSP Functionality](#hooks-to-extend-lsp-functionality) or [LSP-Standard hooks](#lsp-standard-hooks) section for detailed information about each hook.
 
 **Type:** Object with 6 hooks (readonly)
 - `onDocumentUpdate`: SyncHook
@@ -52,7 +56,143 @@ lsp.hooks.validate.tap("MyPlugin", (docContext, validationContext) => {
 });
 ```
 
-## Public Functions To Use
+## Hooks to Extend LSP Functionality
+
+These are hooks that can be used to extend the LSP functionality.
+
+### `onValidateEnd`
+
+<Badge text="SyncWaterfallHook" />
+
+Called synchronously after validation completes. Allows plugins to modify, filter, or add to the final list of diagnostics. Each tap receives the result of the previous tap (waterfall pattern).
+
+**Parameters:**
+1. `Diagnostic[]`: Array of diagnostics collected during validation
+2. Object with:
+   - `documentContext`: A `DocumentContext` object with:
+     - `log` (Logger): Logger for messages
+     - `document` (TextDocument): The underlying text document
+     - `PlayerContent` (PlayerContent): The parsed Player Content AST
+   - `addFixableViolation` (function): Callback to associate a fix with a diagnostic
+     - Parameters: `(diag: Diagnostic, violation: Violation) => void`
+
+**Returns:** `Diagnostic[]`
+
+**When Called:** At the end of `validateTextDocument()` after all validation and AST walking is complete
+
+---
+
+### `validate`
+
+<Badge text="AsyncParallelHook" />
+
+Called asynchronously in parallel to validate the document. Plugins can add validation rules, register AST visitors to walk the syntax tree, and report violations or diagnostics. All taps run in parallel.
+
+**Parameters:**
+1. `DocumentContext`: A `DocumentContext` object with:
+   - `log` (Logger): Logger for messages
+   - `document` (TextDocument): The underlying text document
+   - `PlayerContent` (PlayerContent): The parsed Player Content AST
+2. `ValidationContext`: A `ValidationContext` object with:
+   - `addViolation` (function): Add a validation violation
+     - Parameters: `(violation: Violation) => void`
+   - `useASTVisitor` (function): Register an AST visitor to walk the syntax tree
+     - Parameters: `(visitor: ASTVisitor) => void`
+   - `addDiagnostic` (function): Add a diagnostic directly
+     - Parameters: `(diagnostic: Diagnostic) => void`
+
+**Returns:** `void`
+
+**When Called:** During `validateTextDocument()` after syntax errors are collected
+
+
+## LSP-Standard Hooks
+
+These are functions that are part of the LSP standard. They provide useful features that may be leveraged by the Player CLI, or that could be used in an IDE setting (like autocomplete, find definition, etc.), but are not typically relevant for DSL / CLI plugin authors.
+
+### `complete`
+
+<Badge text="AsyncParallelHook" />
+
+Called asynchronously in parallel to provide code completion suggestions at a specific position. Plugins can analyze the context and add relevant completion items. All taps run in parallel.
+
+**Parameters:**
+1. `EnhancedDocumentContextWithPosition`: An `EnhancedDocumentContextWithPosition` object with:
+   - `log` (Logger): Logger for messages
+   - `document` (TextDocument): The underlying text document
+   - `PlayerContent` (PlayerContent): The parsed Player Content AST
+   - `position` (Position): The cursor position
+   - `node` (ASTNode): The AST node at the cursor position
+   - `XLR` (XLRContext, optional): XLR type information for the node
+2. `CompletionContext`: A `CompletionContext` object with:
+   - `addCompletionItem` (function): Add a completion suggestion
+     - Parameters: `(item: CompletionItem) => void`
+
+**Returns:** `void`
+
+**When Called:** During `getCompletionsAtPosition()` when the user requests completions
+
+---
+
+### `definition`
+
+<Badge text="SyncBailHook" />
+
+Called synchronously to provide "go to definition" functionality. The first tap that returns a non-undefined value will stop execution (bail pattern), and that location will be used as the definition target.
+
+**Parameters:**
+1. `EnhancedDocumentContextWithPosition`: An `EnhancedDocumentContextWithPosition` object with:
+   - `log` (Logger): Logger for messages
+   - `document` (TextDocument): The underlying text document
+   - `PlayerContent` (PlayerContent): The parsed Player Content AST
+   - `position` (Position): The cursor position
+   - `node` (ASTNode): The AST node at the cursor position
+   - `XLR` (XLRContext, optional): XLR type information for the node
+
+**Returns:** `Location | undefined`
+
+**When Called:** During `getDefinitionAtPosition()` when the user requests to go to a definition
+
+---
+
+### `hover`
+
+<Badge text="SyncBailHook" />
+
+Called synchronously to provide hover information at a specific position. The first tap that returns a non-undefined value will stop execution (bail pattern), and that value will be used as the hover result.
+
+**Parameters:**
+1. `EnhancedDocumentContextWithPosition`: An `EnhancedDocumentContextWithPosition` object with:
+   - `log` (Logger): Logger for messages
+   - `document` (TextDocument): The underlying text document
+   - `PlayerContent` (PlayerContent): The parsed Player Content AST
+   - `position` (Position): The cursor position
+   - `node` (ASTNode): The AST node at the cursor position
+   - `XLR` (XLRContext, optional): XLR type information for the node
+
+**Returns:** `Hover | undefined`
+
+**When Called:** During `getHoverInfoAtPosition()` when the user hovers over code
+
+---
+
+### `onDocumentUpdate`
+
+<Badge text="SyncHook" />
+
+Called synchronously when a document is updated or parsed. Use this hook to react to document changes and perform any necessary setup or state updates.
+
+**Parameters:**
+1. `DocumentContext`: A `DocumentContext` object with:
+   - `log` (Logger): Logger for messages
+   - `document` (TextDocument): The underlying text document
+   - `PlayerContent` (PlayerContent): The parsed Player Content AST
+
+**Returns:** `void`
+
+**When Called:** After parsing a document in `updateSource()`
+
+## Functions to Configure the LSP
 
 These are functions that plugin authors may use to extend and configure the language service.
 
@@ -198,20 +338,11 @@ await lsp.setAssetTypesFromModule([
 ]);
 ```
 
-## Public Functions To NOT Use
+## LSP-Standard Functions
 
-These functions are part of the public API but are designed to be called by infrastructure code (Player CLI, LSP wrappers, etc.), not by plugin authors.
-
-**Why you should not call these directly:**
-- They are called automatically by the Player CLI or LSP server infrastructure at the appropriate times
-- Calling them directly bypasses the normal lifecycle and may cause unexpected behavior
-
-**What should you do instead:**
-If you need to alter how the LSP works, you should use the [Hooks To Tap](#hooks-to-tap), [Public Properties](#public-properties), or [Public Functions To Use](#public-functions-to-use).
+These are functions that are part of the LSP standard. They provide useful features that are leveraged by the Player CLI, or that can be used for IDE tooling (not yet used by the Player), but are not typically relevant for DSL / CLI plugin authors.
 
 ### `formatTextDocument`
-
-<Badge text="DO NOT USE" variant="danger" />
 
 Formats a text document (or a range within it) according to formatting options.
 
@@ -237,8 +368,6 @@ formatTextDocument(
 
 ### `getCodeActionsInRange`
 
-<Badge text="DO NOT USE" variant="danger" />
-
 Returns available code actions (quick fixes) for diagnostics in a document.
 
 **Signature:**
@@ -259,8 +388,6 @@ getCodeActionsInRange(
 ---
 
 ### `getCompletionsAtPosition`
-
-<Badge text="DO NOT USE" variant="danger" />
 
 Returns code completion suggestions at a specific position.
 
@@ -284,8 +411,6 @@ getCompletionsAtPosition(
 
 ### `getDefinitionAtPosition`
 
-<Badge text="DO NOT USE" variant="danger" />
-
 Returns the definition location for a symbol at a specific position.
 
 **Signature:**
@@ -307,8 +432,6 @@ getDefinitionAtPosition(
 ---
 
 ### `getHoverInfoAtPosition`
-
-<Badge text="DO NOT USE" variant="danger" />
 
 Returns hover information at a specific position.
 
@@ -332,8 +455,6 @@ getHoverInfoAtPosition(
 
 ### `onClose`
 
-<Badge text="DO NOT USE" variant="danger" />
-
 Cleans up cached data for a closed document.
 
 **Signature:**
@@ -347,8 +468,6 @@ onClose(document: TextDocument): void
 ---
 
 ### `resolveCompletionItem`
-
-<Badge text="DO NOT USE" variant="danger" />
 
 Resolves additional information for a completion item. Currently, this method just returns the item unchanged.
 
@@ -368,8 +487,6 @@ resolveCompletionItem(
 
 ### `validateTextDocument`
 
-<Badge text="DO NOT USE" variant="danger" />
-
 Validates a document and returns diagnostics (errors, warnings, etc.).
 
 **Signature:**
@@ -383,141 +500,3 @@ validateTextDocument(
 - `document`: A `TextDocument` object representing the text document to validate
 
 **Returns:** Array of diagnostics, or undefined
-
-## Hooks To Tap
-
-These are hooks that provide useful functionality.
-
-### `onValidateEnd`
-
-<Badge text="SyncWaterfallHook" />
-
-Called synchronously after validation completes. Allows plugins to modify, filter, or add to the final list of diagnostics. Each tap receives the result of the previous tap (waterfall pattern).
-
-**Parameters:**
-1. `Diagnostic[]`: Array of diagnostics collected during validation
-2. Object with:
-   - `documentContext`: A `DocumentContext` object with:
-     - `log` (Logger): Logger for messages
-     - `document` (TextDocument): The underlying text document
-     - `PlayerContent` (PlayerContent): The parsed Player Content AST
-   - `addFixableViolation` (function): Callback to associate a fix with a diagnostic
-     - Parameters: `(diag: Diagnostic, violation: Violation) => void`
-
-**Returns:** `Diagnostic[]`
-
-**When Called:** At the end of `validateTextDocument()` after all validation and AST walking is complete
-
----
-
-### `validate`
-
-<Badge text="AsyncParallelHook" />
-
-Called asynchronously in parallel to validate the document. Plugins can add validation rules, register AST visitors to walk the syntax tree, and report violations or diagnostics. All taps run in parallel.
-
-**Parameters:**
-1. `DocumentContext`: A `DocumentContext` object with:
-   - `log` (Logger): Logger for messages
-   - `document` (TextDocument): The underlying text document
-   - `PlayerContent` (PlayerContent): The parsed Player Content AST
-2. `ValidationContext`: A `ValidationContext` object with:
-   - `addViolation` (function): Add a validation violation
-     - Parameters: `(violation: Violation) => void`
-   - `useASTVisitor` (function): Register an AST visitor to walk the syntax tree
-     - Parameters: `(visitor: ASTVisitor) => void`
-   - `addDiagnostic` (function): Add a diagnostic directly
-     - Parameters: `(diagnostic: Diagnostic) => void`
-
-**Returns:** `void`
-
-**When Called:** During `validateTextDocument()` after syntax errors are collected
-
-
-## Hooks To NOT Tap
-
-These are hooks into behaviour that is standard for a Language Server Protocol. However, we do not currently use them. These hooks provide functionality intended to be used in an IDE setting (like autocomplete, find definition, etc.) which are not relevant for the Player CLI.
-
-We do not recommend tapping into these hooks when authoring a DSL / CLI Plugin.
-
-### `complete`
-
-<Badge text="DO NOT USE" variant="danger" /> <Badge text="AsyncParallelHook" />
-
-Called asynchronously in parallel to provide code completion suggestions at a specific position. Plugins can analyze the context and add relevant completion items. All taps run in parallel.
-
-**Parameters:**
-1. `EnhancedDocumentContextWithPosition`: An `EnhancedDocumentContextWithPosition` object with:
-   - `log` (Logger): Logger for messages
-   - `document` (TextDocument): The underlying text document
-   - `PlayerContent` (PlayerContent): The parsed Player Content AST
-   - `position` (Position): The cursor position
-   - `node` (ASTNode): The AST node at the cursor position
-   - `XLR` (XLRContext, optional): XLR type information for the node
-2. `CompletionContext`: A `CompletionContext` object with:
-   - `addCompletionItem` (function): Add a completion suggestion
-     - Parameters: `(item: CompletionItem) => void`
-
-**Returns:** `void`
-
-**When Called:** During `getCompletionsAtPosition()` when the user requests completions
-
----
-
-### `definition`
-
-<Badge text="DO NOT USE" variant="danger" /> <Badge text="SyncBailHook" />
-
-Called synchronously to provide "go to definition" functionality. The first tap that returns a non-undefined value will stop execution (bail pattern), and that location will be used as the definition target.
-
-**Parameters:**
-1. `EnhancedDocumentContextWithPosition`: An `EnhancedDocumentContextWithPosition` object with:
-   - `log` (Logger): Logger for messages
-   - `document` (TextDocument): The underlying text document
-   - `PlayerContent` (PlayerContent): The parsed Player Content AST
-   - `position` (Position): The cursor position
-   - `node` (ASTNode): The AST node at the cursor position
-   - `XLR` (XLRContext, optional): XLR type information for the node
-
-**Returns:** `Location | undefined`
-
-**When Called:** During `getDefinitionAtPosition()` when the user requests to go to a definition
-
----
-
-### `hover`
-
-<Badge text="DO NOT USE" variant="danger" /> <Badge text="SyncBailHook" />
-
-Called synchronously to provide hover information at a specific position. The first tap that returns a non-undefined value will stop execution (bail pattern), and that value will be used as the hover result.
-
-**Parameters:**
-1. `EnhancedDocumentContextWithPosition`: An `EnhancedDocumentContextWithPosition` object with:
-   - `log` (Logger): Logger for messages
-   - `document` (TextDocument): The underlying text document
-   - `PlayerContent` (PlayerContent): The parsed Player Content AST
-   - `position` (Position): The cursor position
-   - `node` (ASTNode): The AST node at the cursor position
-   - `XLR` (XLRContext, optional): XLR type information for the node
-
-**Returns:** `Hover | undefined`
-
-**When Called:** During `getHoverInfoAtPosition()` when the user hovers over code
-
----
-
-### `onDocumentUpdate`
-
-<Badge text="DO NOT USE" variant="danger" /> <Badge text="SyncHook" />
-
-Called synchronously when a document is updated or parsed. Use this hook to react to document changes and perform any necessary setup or state updates.
-
-**Parameters:**
-1. `DocumentContext`: A `DocumentContext` object with:
-   - `log` (Logger): Logger for messages
-   - `document` (TextDocument): The underlying text document
-   - `PlayerContent` (PlayerContent): The parsed Player Content AST
-
-**Returns:** `void`
-
-**When Called:** After parsing a document in `updateSource()`
