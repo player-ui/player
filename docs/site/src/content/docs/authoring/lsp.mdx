@@ -1,0 +1,523 @@
+---
+title: Player Language Service
+---
+
+import { Aside, Steps, Badge } from '@astrojs/starlight/components';
+
+The `PlayerLanguageService` is the foundation of all Player Content. It conforms to the Language Server Protocol standards, and the docs refer to this `PlayerLanguageService` as The LSP. The LSP parses Player's DSL to JSON and then to a manipulable Abstract Syntax Tree (AST). It also provides features like Content validation (i.e. linting).
+
+As a user of Player, you will not create your own LSP. You will use the LSP that is created for you by the Player or Player CLI. However, you may use a DSL / CLI Plugin to interact with the LSP and modify its behavior. How to create and use DSL / CLI plugins is described in the [Plugins](./plugins) section.
+
+You may interact with an LSP in the following ways:
+
+- Use its [public properties](#public-properties)
+- Call its [public functions](#public-functions-to-use)
+- Tap into its [hooks](#hooks-to-tap)
+
+## Public Properties
+
+### `XLRService`
+
+The XLR (eXtensible Language Runtime) service that handles type information and transformations for Player Content. For more information on XLR, see the [XLR documentation](../xlr/intro).
+
+Access the XLR service to add custom transforms or work with type definitions.
+
+**Type:** `XLRService` (readonly)
+
+**Example:** 
+
+```typescript
+lsp.XLRService.XLRSDK.hasType('InputAsset');
+```
+
+---
+
+### `hooks`
+
+An object containing all the tapable hooks that plugins can use to extend LSP functionality. See the [Hooks To Tap](#hooks-to-tap) and [Hooks To NOT Tap](#hooks-to-not-tap) sections for detailed information about each hook.
+
+**Type:** Object with 6 hooks (readonly)
+- `onDocumentUpdate`: SyncHook
+- `validate`: AsyncParallelHook
+- `onValidateEnd`: SyncWaterfallHook
+- `complete`: AsyncParallelHook
+- `hover`: SyncBailHook
+- `definition`: SyncBailHook
+
+**Example:**
+
+```typescript
+lsp.hooks.validate.tap("MyPlugin", (docContext, validationContext) => {
+  // Add custom validation logic
+});
+```
+
+## Public Functions To Use
+
+These are functions that plugin authors may use to extend and configure the language service.
+
+### `addLSPPlugin`
+
+Multiple taps of the LSP hooks and complex logic can be bundled together into a single `PlayerLanguageServicePlugin`. That plugin can then be added to the LSP using this function.
+
+<Aside>
+
+The `LSPPluginPlugin` can be applied to the Player DSL/CLI config to achieve the same functionality. Like this:
+
+```typescript
+import { LSPPluginPlugin } from "@player-ui/language-service";
+
+const config = {
+  plugins: [
+    new LSPPluginPlugin([customPlugin1, customPlugin2])
+  ]
+};
+```
+
+</Aside>
+
+**Signature:**
+```typescript
+addLSPPlugin(plugin: PlayerLanguageServicePlugin): void
+```
+
+**Parameters:**
+- `plugin`: A `PlayerLanguageServicePlugin` object with:
+  - `name` (string): The name of the plugin
+  - `apply(languageService: PlayerLanguageService)` (function): Function that receives the language service instance and applies the plugin's functionality
+
+**Example:**
+```typescript
+lsp.addLSPPlugin({
+  name: "MyCustomPlugin",
+  apply(languageService: PlayerLanguageService) {
+    languageService.hooks.validate.tap("MyCustomPlugin", (doc, ctx) => {
+      // Custom validation logic
+    });
+  }
+});
+```
+
+---
+
+### `addXLRTransforms`
+
+Adds custom XLR transform functions to the XLR service. For more information on XLR transforms, see the [XLR documentation](../xlr/concepts#transform-functions).
+
+<Aside>
+
+The `LSPTransformsPlugin` can be applied to the Player DSL/CLI config to achieve the same functionality. Like this:
+
+```typescript
+import { LSPTransformsPlugin } from "@player-ui/language-service";
+
+const config = {
+  plugins: [
+    new LSPTransformsPlugin({
+      "exampleTransform1": exampleTransform1Fn,
+      "exampleTransform2": exampleTransform2Fn,
+    })
+  ]
+};
+```
+
+</Aside>
+
+**Signature:**
+```typescript
+addXLRTransforms(transforms: Record<string, TransformFunction>): void
+```
+
+**Parameters:**
+- `transforms`: An object mapping transform names to `TransformFunction`s. For more details on `TransformFunction`s, see the [XLR documentation](../xlr/concepts#transform-functions).
+
+**Example:**
+```typescript
+lsp.addXLRTransforms({
+  "exampleTransform1": exampleTransform1Fn,
+  "exampleTransform2": exampleTransform2Fn,
+});
+```
+
+---
+
+### `setAssetTypes`
+
+Loads type definitions from file paths on disk. These types define the complete set of assets and data types available for your Player project.
+
+<Aside>
+
+The `LSPAssetsPlugin` can be applied to the Player DSL/CLI config to achieve the same functionality. [Like this](https://github.com/player-ui/player/blob/2b9bd35adb632e7de010989b492c5fd1b8aebe9e/plugins/reference-assets/cli-preset/src/index.ts#L5-L16).
+
+</Aside>
+
+**Signature:**
+```typescript
+setAssetTypes(typeFiles: Array<string>): Promise<void>
+```
+
+**Parameters:**
+- `typeFiles`: Array of file paths to TypeScript definition files
+
+**Example:**
+```typescript
+await lsp.setAssetTypes([
+  "./types/custom-types.ts",
+  "./types/plugin-types.ts"
+]);
+```
+
+PlayerUI provides an excellent example of what a definition file looks like [here](https://github.com/player-ui/player/blob/main/core/types/src/index.ts).
+
+---
+
+### `setAssetTypesFromModule`
+
+Loads type definitions from TypeScript manifests.
+
+**Signature:**
+```typescript
+setAssetTypesFromModule(manifest: Array<TSManifest>): Promise<void>
+```
+
+**Parameters:**
+- `manifest`: Array of TypeScript manifest objects containing type information
+
+**Example:**
+This example is taken directly from [the player-ui/tools repo tests](https://github.com/player-ui/tools/blob/ee81bb095147cf935f42cf7670b057086505db55/language/metrics-output-plugin/src/__tests__/metrics-output-plugin.test.ts#L380-L383).
+
+```typescript
+import {
+  ReferenceAssetsWebPluginManifest,
+  Types,
+} from "@player-tools/static-xlrs";
+
+await lsp.setAssetTypesFromModule([
+  Types, 
+  ReferenceAssetsWebPluginManifest
+]);
+```
+
+## Public Functions To NOT Use
+
+These functions are part of the public API but are designed to be called by infrastructure code (Player CLI, LSP wrappers, etc.), not by plugin authors.
+
+**Why you should not call these directly:**
+- They are called automatically by the Player CLI or LSP server infrastructure at the appropriate times
+- Calling them directly bypasses the normal lifecycle and may cause unexpected behavior
+
+**What should you do instead:**
+If you need to alter how the LSP works, you should use the [Hooks To Tap](#hooks-to-tap), [Public Properties](#public-properties), or [Public Functions To Use](#public-functions-to-use).
+
+### `formatTextDocument`
+
+<Badge text="DO NOT USE" variant="danger" />
+
+Formats a text document (or a range within it) according to formatting options.
+
+**Signature:**
+```typescript
+formatTextDocument(
+  document: TextDocument,
+  options: FormattingOptions,
+  range?: Range
+): Promise<Array<TextEdit> | undefined>
+```
+
+**Parameters:**
+- `document`: A `TextDocument` object representing the text document to format
+- `options`: A `FormattingOptions` object with:
+  - `tabSize` (number): Size of a tab in spaces
+  - `insertSpaces` (boolean): Prefer spaces over tabs
+- `range`: Optional `Range` object to format (if not provided, formats entire document)
+
+**Returns:** Array of text edits to apply, or undefined
+
+---
+
+### `getCodeActionsInRange`
+
+<Badge text="DO NOT USE" variant="danger" />
+
+Returns available code actions (quick fixes) for diagnostics in a document.
+
+**Signature:**
+```typescript
+getCodeActionsInRange(
+  document: TextDocument,
+  context: CodeActionContext
+): Promise<CodeAction[]>
+```
+
+**Parameters:**
+- `document`: A `TextDocument` object representing the text document
+- `context`: A `CodeActionContext` object with:
+  - `diagnostics` (Diagnostic[]): Array of diagnostics to provide fixes for
+
+**Returns:** Array of available code actions
+
+---
+
+### `getCompletionsAtPosition`
+
+<Badge text="DO NOT USE" variant="danger" />
+
+Returns code completion suggestions at a specific position.
+
+**Signature:**
+```typescript
+getCompletionsAtPosition(
+  document: TextDocument,
+  position: Position
+): Promise<CompletionList>
+```
+
+**Parameters:**
+- `document`: A `TextDocument` object representing the text document
+- `position`: A `Position` object with:
+  - `line` (number): Line position (zero-based)
+  - `character` (number): Character offset on a line (zero-based)
+
+**Returns:** A completion list with suggestions
+
+---
+
+### `getDefinitionAtPosition`
+
+<Badge text="DO NOT USE" variant="danger" />
+
+Returns the definition location for a symbol at a specific position.
+
+**Signature:**
+```typescript
+getDefinitionAtPosition(
+  document: TextDocument,
+  position: Position
+): Promise<Location | undefined | null>
+```
+
+**Parameters:**
+- `document`: A `TextDocument` object representing the text document
+- `position`: A `Position` object with:
+  - `line` (number): Line position (zero-based)
+  - `character` (number): Character offset on a line (zero-based)
+
+**Returns:** The location of the definition, or undefined/null if not found
+
+---
+
+### `getHoverInfoAtPosition`
+
+<Badge text="DO NOT USE" variant="danger" />
+
+Returns hover information at a specific position.
+
+**Signature:**
+```typescript
+getHoverInfoAtPosition(
+  document: TextDocument,
+  position: Position
+): Promise<Hover | undefined | null>
+```
+
+**Parameters:**
+- `document`: A `TextDocument` object representing the text document
+- `position`: A `Position` object with:
+  - `line` (number): Line position (zero-based)
+  - `character` (number): Character offset on a line (zero-based)
+
+**Returns:** Hover information, or undefined/null if none available
+
+---
+
+### `onClose`
+
+<Badge text="DO NOT USE" variant="danger" />
+
+Cleans up cached data for a closed document.
+
+**Signature:**
+```typescript
+onClose(document: TextDocument): void
+```
+
+**Parameters:**
+- `document`: A `TextDocument` object representing the text document being closed
+
+---
+
+### `resolveCompletionItem`
+
+<Badge text="DO NOT USE" variant="danger" />
+
+Resolves additional information for a completion item. Currently, this method just returns the item unchanged.
+
+**Signature:**
+```typescript
+resolveCompletionItem(
+  completionItem: CompletionItem
+): Promise<CompletionItem>
+```
+
+**Parameters:**
+- `completionItem`: A `CompletionItem` object to resolve
+
+**Returns:** The resolved completion item (currently unchanged)
+
+---
+
+### `validateTextDocument`
+
+<Badge text="DO NOT USE" variant="danger" />
+
+Validates a document and returns diagnostics (errors, warnings, etc.).
+
+**Signature:**
+```typescript
+validateTextDocument(
+  document: TextDocument
+): Promise<Array<Diagnostic> | undefined>
+```
+
+**Parameters:**
+- `document`: A `TextDocument` object representing the text document to validate
+
+**Returns:** Array of diagnostics, or undefined
+
+## Hooks To Tap
+
+These are hooks that provide useful functionality.
+
+### `onValidateEnd`
+
+<Badge text="SyncWaterfallHook" />
+
+Called synchronously after validation completes. Allows plugins to modify, filter, or add to the final list of diagnostics. Each tap receives the result of the previous tap (waterfall pattern).
+
+**Parameters:**
+1. `Diagnostic[]`: Array of diagnostics collected during validation
+2. Object with:
+   - `documentContext`: A `DocumentContext` object with:
+     - `log` (Logger): Logger for messages
+     - `document` (TextDocument): The underlying text document
+     - `PlayerContent` (PlayerContent): The parsed Player Content AST
+   - `addFixableViolation` (function): Callback to associate a fix with a diagnostic
+     - Parameters: `(diag: Diagnostic, violation: Violation) => void`
+
+**Returns:** `Diagnostic[]`
+
+**When Called:** At the end of `validateTextDocument()` after all validation and AST walking is complete
+
+---
+
+### `validate`
+
+<Badge text="AsyncParallelHook" />
+
+Called asynchronously in parallel to validate the document. Plugins can add validation rules, register AST visitors to walk the syntax tree, and report violations or diagnostics. All taps run in parallel.
+
+**Parameters:**
+1. `DocumentContext`: A `DocumentContext` object with:
+   - `log` (Logger): Logger for messages
+   - `document` (TextDocument): The underlying text document
+   - `PlayerContent` (PlayerContent): The parsed Player Content AST
+2. `ValidationContext`: A `ValidationContext` object with:
+   - `addViolation` (function): Add a validation violation
+     - Parameters: `(violation: Violation) => void`
+   - `useASTVisitor` (function): Register an AST visitor to walk the syntax tree
+     - Parameters: `(visitor: ASTVisitor) => void`
+   - `addDiagnostic` (function): Add a diagnostic directly
+     - Parameters: `(diagnostic: Diagnostic) => void`
+
+**Returns:** `void`
+
+**When Called:** During `validateTextDocument()` after syntax errors are collected
+
+
+## Hooks To NOT Tap
+
+These are hooks into behaviour that is standard for a Language Server Protocol. However, we do not currently use them. These hooks provide functionality intended to be used in an IDE setting (like autocomplete, find definition, etc.) which are not relevant for the Player CLI.
+
+We do not recommend tapping into these hooks when authoring a DSL / CLI Plugin.
+
+### `complete`
+
+<Badge text="DO NOT USE" variant="danger" /> <Badge text="AsyncParallelHook" />
+
+Called asynchronously in parallel to provide code completion suggestions at a specific position. Plugins can analyze the context and add relevant completion items. All taps run in parallel.
+
+**Parameters:**
+1. `EnhancedDocumentContextWithPosition`: An `EnhancedDocumentContextWithPosition` object with:
+   - `log` (Logger): Logger for messages
+   - `document` (TextDocument): The underlying text document
+   - `PlayerContent` (PlayerContent): The parsed Player Content AST
+   - `position` (Position): The cursor position
+   - `node` (ASTNode): The AST node at the cursor position
+   - `XLR` (XLRContext, optional): XLR type information for the node
+2. `CompletionContext`: A `CompletionContext` object with:
+   - `addCompletionItem` (function): Add a completion suggestion
+     - Parameters: `(item: CompletionItem) => void`
+
+**Returns:** `void`
+
+**When Called:** During `getCompletionsAtPosition()` when the user requests completions
+
+---
+
+### `definition`
+
+<Badge text="DO NOT USE" variant="danger" /> <Badge text="SyncBailHook" />
+
+Called synchronously to provide "go to definition" functionality. The first tap that returns a non-undefined value will stop execution (bail pattern), and that location will be used as the definition target.
+
+**Parameters:**
+1. `EnhancedDocumentContextWithPosition`: An `EnhancedDocumentContextWithPosition` object with:
+   - `log` (Logger): Logger for messages
+   - `document` (TextDocument): The underlying text document
+   - `PlayerContent` (PlayerContent): The parsed Player Content AST
+   - `position` (Position): The cursor position
+   - `node` (ASTNode): The AST node at the cursor position
+   - `XLR` (XLRContext, optional): XLR type information for the node
+
+**Returns:** `Location | undefined`
+
+**When Called:** During `getDefinitionAtPosition()` when the user requests to go to a definition
+
+---
+
+### `hover`
+
+<Badge text="DO NOT USE" variant="danger" /> <Badge text="SyncBailHook" />
+
+Called synchronously to provide hover information at a specific position. The first tap that returns a non-undefined value will stop execution (bail pattern), and that value will be used as the hover result.
+
+**Parameters:**
+1. `EnhancedDocumentContextWithPosition`: An `EnhancedDocumentContextWithPosition` object with:
+   - `log` (Logger): Logger for messages
+   - `document` (TextDocument): The underlying text document
+   - `PlayerContent` (PlayerContent): The parsed Player Content AST
+   - `position` (Position): The cursor position
+   - `node` (ASTNode): The AST node at the cursor position
+   - `XLR` (XLRContext, optional): XLR type information for the node
+
+**Returns:** `Hover | undefined`
+
+**When Called:** During `getHoverInfoAtPosition()` when the user hovers over code
+
+---
+
+### `onDocumentUpdate`
+
+<Badge text="DO NOT USE" variant="danger" /> <Badge text="SyncHook" />
+
+Called synchronously when a document is updated or parsed. Use this hook to react to document changes and perform any necessary setup or state updates.
+
+**Parameters:**
+1. `DocumentContext`: A `DocumentContext` object with:
+   - `log` (Logger): Logger for messages
+   - `document` (TextDocument): The underlying text document
+   - `PlayerContent` (PlayerContent): The parsed Player Content AST
+
+**Returns:** `void`
+
+**When Called:** After parsing a document in `updateSource()`
