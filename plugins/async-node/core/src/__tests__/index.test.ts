@@ -181,6 +181,34 @@ describe("view", () => {
     },
   };
 
+  const simpleAsyncMultiNode: Flow = {
+    id: "test-flow",
+    views: [
+      {
+        type: "view",
+        id: "my-view",
+        values: [
+          {
+            async: true,
+            id: "async-values",
+            flatten: true,
+          },
+        ],
+      },
+    ],
+    navigation: {
+      BEGIN: "FLOW_1",
+      FLOW_1: {
+        startState: "VIEW_1",
+        VIEW_1: {
+          state_type: "VIEW",
+          ref: "my-view",
+          transitions: {},
+        },
+      },
+    },
+  };
+
   const asyncNodeTest = async (resolvedValue: any) => {
     const plugin = new AsyncNodePlugin({
       plugins: [new AsyncNodePluginPlugin()],
@@ -310,6 +338,121 @@ describe("view", () => {
                 id: "test-2",
                 type: "text",
                 value: "Test 2",
+              },
+            },
+          ],
+        }),
+      );
+    });
+  });
+
+  test("should update flattened multi-nodes", async () => {
+    const plugin = new AsyncNodePlugin({
+      plugins: [new AsyncNodePluginPlugin()],
+    });
+
+    let updateFn: ((content: unknown) => void) | undefined;
+    const asyncNodeHandler = vi.fn((_, update) => {
+      updateFn = update;
+
+      return new Promise(() => {});
+    });
+
+    plugin.hooks.onAsyncNode.tap("test", asyncNodeHandler);
+    const player = new Player({ plugins: [plugin] });
+
+    player.start(simpleAsyncMultiNode);
+
+    await waitFor(() => {
+      expect(asyncNodeHandler).toHaveBeenCalled();
+      expect(updateFn).toBeDefined();
+    });
+
+    // Initial update. Check after that content is flattened
+    updateFn?.([
+      {
+        asset: {
+          id: "test-1",
+          type: "text",
+          value: "Test 1",
+        },
+      },
+      {
+        asset: {
+          id: "test-2",
+          type: "text",
+          value: "Test 2",
+        },
+      },
+    ]);
+
+    await waitFor(() => {
+      const playerState = player.getState();
+      expect(playerState.status).toBe("in-progress");
+      expect(
+        (playerState as InProgressState).controllers.view.currentView
+          ?.lastUpdate,
+      ).toStrictEqual(
+        expect.objectContaining({
+          values: [
+            {
+              asset: {
+                id: "test-1",
+                type: "text",
+                value: "Test 1",
+              },
+            },
+            {
+              asset: {
+                id: "test-2",
+                type: "text",
+                value: "Test 2",
+              },
+            },
+          ],
+        }),
+      );
+    });
+
+    // Second update. Check that it is properly updated and flattened.
+    updateFn?.([
+      {
+        asset: {
+          id: "test-1",
+          type: "text",
+          value: "Test 1 (updated)",
+        },
+      },
+      {
+        asset: {
+          id: "test-2",
+          type: "text",
+          value: "Test 2 (updated)",
+        },
+      },
+    ]);
+
+    await waitFor(() => {
+      const playerState = player.getState();
+      expect(playerState.status).toBe("in-progress");
+      expect(
+        (playerState as InProgressState).controllers.view.currentView
+          ?.lastUpdate,
+      ).toStrictEqual(
+        expect.objectContaining({
+          values: [
+            {
+              asset: {
+                id: "test-1",
+                type: "text",
+                value: "Test 1 (updated)",
+              },
+            },
+            {
+              asset: {
+                id: "test-2",
+                type: "text",
+                value: "Test 2 (updated)",
               },
             },
           ],

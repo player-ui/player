@@ -7,7 +7,27 @@ import { Resolve, Resolver } from "..";
 import type { Node } from "../../parser";
 import { NodeType, Parser } from "../../parser";
 
-const simpleViewWithAsync: Node.View = {
+const withParents = <T extends Node.Node>(node: T, parent?: Node.Node): T => {
+  const result: T = {
+    ...node,
+    parent,
+  };
+
+  if ("children" in result) {
+    result.children = result.children?.map((c) => ({
+      ...c,
+      value: withParents(c.value, result),
+    }));
+  }
+
+  if (result.type === NodeType.MultiNode) {
+    result.values = result.values.map((v) => withParents(v, result));
+  }
+
+  return result;
+};
+
+const simpleViewWithAsync: Node.View = withParents({
   type: NodeType.View,
   children: [
     {
@@ -37,9 +57,9 @@ const simpleViewWithAsync: Node.View = {
     type: "view",
     id: "view",
   },
-};
+});
 
-describe("Async Node Resolution", () => {
+describe("Node cache updates", () => {
   let resolverOptions: Resolve.ResolverOptions;
 
   beforeEach(() => {
@@ -58,8 +78,17 @@ describe("Async Node Resolution", () => {
     };
   });
 
-  it("should clear the cache for the async node and its parent when it is updated", () => {
-    const beforeResolveFunction = vi.fn((node: Node.Node | null) => node);
+  it("should clear the cache for the node and its parents when it is updated", () => {
+    let asyncNodeRef: Node.Async | undefined;
+    const beforeResolveFunction = vi.fn(
+      (node: Node.Node | null, options: Resolve.NodeResolveOptions) => {
+        if (options.node?.type === NodeType.Async) {
+          asyncNodeRef = options.node;
+        }
+
+        return node;
+      },
+    );
 
     const resolver = new Resolver(simpleViewWithAsync, resolverOptions);
     resolver.hooks.beforeResolve.tap("test", beforeResolveFunction);
@@ -68,6 +97,8 @@ describe("Async Node Resolution", () => {
     resolver.update();
     // Should call beforeResolve once for each node.
     expect(beforeResolveFunction).toHaveBeenCalledTimes(3);
+    // Should assign the asyncNodeRef to the one async node in the view.
+    expect(asyncNodeRef).toBeDefined();
 
     // Clear call information before next update.
     beforeResolveFunction.mockClear();
@@ -78,7 +109,7 @@ describe("Async Node Resolution", () => {
     expect(beforeResolveFunction).toHaveBeenCalledTimes(0);
 
     // Updating with changes marked on "async-node". Should invalidate cache for itself and its parent.
-    resolver.update(new Set(), new Set(["async-node"]));
+    resolver.update(new Set(), new Set([asyncNodeRef!]));
     // Should be called for the async node and the view parent.
     expect(beforeResolveFunction).toHaveBeenCalledTimes(2);
     expect(beforeResolveFunction).toHaveBeenCalledWith(
@@ -100,51 +131,6 @@ describe("Async Node Resolution", () => {
           value: {
             id: "async-node",
           },
-        },
-      }),
-      expect.anything(),
-    );
-  });
-
-  it("should clear the cache for anything with a matching async node in its resolved list on update", () => {
-    const beforeResolveFunction = vi.fn((node: Node.Node | null) => {
-      // Add asyncNodesResolved to view to test tracking and invalidation of just the view.
-      if (node?.type === NodeType.View) {
-        return {
-          ...node,
-          asyncNodesResolved: ["other-async-id"],
-        };
-      }
-
-      return node;
-    });
-
-    const resolver = new Resolver(simpleViewWithAsync, resolverOptions);
-    resolver.hooks.beforeResolve.tap("test", beforeResolveFunction);
-
-    // Update once to setup cache
-    resolver.update();
-    // Should call beforeResolve once for each node.
-    expect(beforeResolveFunction).toHaveBeenCalledTimes(3);
-
-    // Clear call information before next update.
-    beforeResolveFunction.mockClear();
-
-    // Confirm cache by running another update with no changes.
-    resolver.update(new Set());
-    // Should not need to call before resolve on cached nodes.
-    expect(beforeResolveFunction).toHaveBeenCalledTimes(0);
-
-    // Updating with changes marked on "async-node". Should invalidate cache for itself and its parent.
-    resolver.update(new Set(), new Set(["other-async-id"]));
-    // Should be called just for the view.
-    expect(beforeResolveFunction).toHaveBeenCalledOnce();
-    expect(beforeResolveFunction).toHaveBeenCalledWith(
-      expect.objectContaining({
-        type: NodeType.View,
-        value: {
-          type: "view",
-          id: "view",
         },
       }),
       expect.anything(),
