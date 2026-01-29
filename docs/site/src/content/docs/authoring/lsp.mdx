@@ -283,13 +283,27 @@ lsp.addXLRTransforms({
 
 ### `setAssetTypes`
 
-Loads type definitions from file paths on disk. These types define the complete set of assets and data types available for your Player project.
-
 <Aside>
 
 The `LSPAssetsPlugin` can be applied to the Player DSL/CLI config to achieve the same functionality. [Like this](https://github.com/player-ui/player/blob/2b9bd35adb632e7de010989b492c5fd1b8aebe9e/plugins/reference-assets/cli-preset/src/index.ts#L5-L16).
 
 </Aside>
+
+<Aside type="tip">
+
+Use `setAssetTypesFromModule` instead of `setAssetTypes` if you are using this in a bundled application.
+
+</Aside>
+
+
+Loads type definitions from file paths on disk. These types define the complete set of assets and data types available for your Player project.
+
+This function will:
+- Load `/xlr/manifest.json` from the provided paths. E.g. if you provide `./example` as the path, it will load `./example/xlr/manifest.json`.
+- If the path does NOT have `"types"` in the name, some default filters and transforms will be applied. They are defined [here](https://github.com/player-ui/tools/blob/ee81bb095147cf935f42cf7670b057086505db55/language/json-language-service/src/constants.ts#L29-L38).
+- If the path DOES have `"types"` in the name, these filters and transforms will NOT be applied.
+
+For information on how to generated the `manifest.json`, see the [XLR documentation](../xlr/usage/export#exporting-base-type-definitions).
 
 **Signature:**
 ```typescript
@@ -297,13 +311,13 @@ setAssetTypes(typeFiles: Array<string>): Promise<void>
 ```
 
 **Parameters:**
-- `typeFiles`: Array of file paths to TypeScript definition files
+- `typeFiles`: Path to the directory to load. This can be a local path or the path to a package.
 
 **Example:**
 ```typescript
 await lsp.setAssetTypes([
-  "./types/custom-types.ts",
-  "./types/plugin-types.ts"
+  "./types", // A local path
+  path.join(require.resolve('@player-ui/types'), '..', '..'), // A package path
 ]);
 ```
 
@@ -313,7 +327,17 @@ PlayerUI provides an excellent example of what a definition file looks like [her
 
 ### `setAssetTypesFromModule`
 
-Loads type definitions from TypeScript manifests.
+<Aside type="tip">
+
+Use this instead of `setAssetTypes` if you are using this in a bundled application.
+
+</Aside>
+
+Loads type definitions from TypeScript manifests into the language service. This method processes each manifest and loads its XLR definitions into the XLRSDK.
+
+If the manifest has a "Types" capability, some default filters and transforms will be applied. They are defined [here](https://github.com/player-ui/tools/blob/ee81bb095147cf935f42cf7670b057086505db55/language/json-language-service/src/constants.ts#L29-L38). If the manifest does NOT have a "Types" capability, no filters or transforms will be applied.
+
+For information on how to generated the `TSManifest`, see the [XLR documentation](../xlr/usage/export#exporting-plugin-capabilities).
 
 **Signature:**
 ```typescript
@@ -321,21 +345,22 @@ setAssetTypesFromModule(manifest: Array<TSManifest>): Promise<void>
 ```
 
 **Parameters:**
-- `manifest`: Array of TypeScript manifest objects containing type information
+- `manifest` (Array\<TSManifest\>): Array of TypeScript manifest objects, where each TSManifest contains:
+  - `pluginName` (string): Name of the plugin
+  - `capabilities` (string: Array\<NamedType\>): Index of capabilities provided by the plugin to the name of the XLR for the capabilities
+    - Each key is a capability name (string)
+    - Each value is an array of NamedType objects
+
+**Returns:** Promise\<void\>
 
 **Example:**
-This example is taken directly from [the player-ui/tools repo tests](https://github.com/player-ui/tools/blob/ee81bb095147cf935f42cf7670b057086505db55/language/metrics-output-plugin/src/__tests__/metrics-output-plugin.test.ts#L380-L383).
 
 ```typescript
-import {
-  ReferenceAssetsWebPluginManifest,
-  Types,
-} from "@player-tools/static-xlrs";
+import type { TSManifest } from "@player-tools/xlr";
+import Manifest from "@player-ui/types/xlr";
 
-await lsp.setAssetTypesFromModule([
-  Types, 
-  ReferenceAssetsWebPluginManifest
-]);
+// Load the manifest into the language service
+await lsp.setAssetTypesFromModule([Manifest]);
 ```
 
 ## LSP-Standard Functions
