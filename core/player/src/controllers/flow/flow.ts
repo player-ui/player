@@ -10,7 +10,6 @@ import type {
   NavigationFlowExternalState,
   NavigationFlowFlowState,
   NavigationFlowViewState,
-  ErrorStateTransition,
 } from "@player-ui/types";
 import type { Logger } from "../../logger";
 
@@ -152,48 +151,100 @@ export class FlowInstance {
   }
 
   /**
-   * Get the flow-level error state configuration
+   * Get the flow-level error transitions map
    */
-  public getFlowErrorState(): ErrorStateTransition | undefined {
-    return this.flow.errorState;
+  public getFlowErrorTransitions(): Record<string, string> | undefined {
+    return this.flow.errorTransitions;
   }
 
   /**
-   * Internal helper to validate transition preconditions.
-   * @throws Error if transitioning is not allowed
+   * Helper to lookup a key in a map with wildcard fallback
    */
-  private validateTransitionPreconditions(transitionValue: string): void {
-    if (this.isTransitioning) {
-      throw new Error(
-        `Transitioning while ongoing transition from ${this.currentState?.name} is in progress is not supported`,
-      );
-    }
+  private lookupInMap(
+    map: Record<string, string> | undefined,
+    key: string,
+  ): string | undefined {
+    if (!map) return undefined;
+    return map[key] || map["*"];
+  }
 
+  /**
+   * Navigate using errorTransitions map.
+   * Tries node-level first, then falls back to flow-level.
+   * Bypasses validation hooks and expression resolution.
+   * @throws Error if errorTransitions references a non-existent state
+   */
+  public errorTransition(errorType: string): void {
+    // Can't navigate from END state
     if (this.currentState?.value.state_type === "END") {
-      this.log?.warn(
-        `Skipping transition using ${transitionValue}. Already at END state`,
-      );
-      throw new Error("Already at END state");
+      this.log?.warn("Cannot error transition from END state");
+      return;
     }
 
-    if (this.currentState === undefined) {
-      throw new Error("Cannot transition when there's no current state");
+    // Try node-level errorTransitions (only if we have a current state)
+    if (this.currentState) {
+      const nodeState = this.lookupInMap(
+        this.currentState.value.errorTransitions,
+        errorType,
+      );
+
+      if (nodeState) {
+        if (!Object.prototype.hasOwnProperty.call(this.flow, nodeState)) {
+          this.log?.debug(
+            `Node-level errorTransition references non-existent state "${nodeState}", trying flow-level fallback`,
+          );
+          // Fall through to try flow-level
+        } else {
+          this.log?.debug(
+            `Error transition (node-level) from ${this.currentState.name} to ${nodeState} using ${errorType}`,
+          );
+          return this.pushHistory(nodeState);
+        }
+      }
     }
+
+    // Try flow-level errorTransitions
+    const flowState = this.lookupInMap(this.flow.errorTransitions, errorType);
+
+    if (flowState) {
+      // Validate state exists before navigating
+      if (!Object.prototype.hasOwnProperty.call(this.flow, flowState)) {
+        this.log?.debug(
+          `Flow-level errorTransition references non-existent state "${flowState}"`,
+        );
+        // No valid transition found, will warn below
+      } else {
+        this.log?.debug(
+          `Error transition (flow-level) to ${flowState} using ${errorType}${this.currentState ? ` from ${this.currentState.name}` : ""}`,
+        );
+        return this.pushHistory(flowState);
+      }
+    }
+
+    // No match found
+    this.log?.warn(
+      `No errorTransition found for ${errorType} (checked node and flow level)`,
+    );
   }
 
   /**
-   * Transition using flow-level transitions only.
+   * Transition using flow-level transitions map only.
    * This ONLY looks at flow.transitions (not node-level transitions).
-   * Used by ErrorController as fallback when node-level error navigation fails.
    */
   public flowTransition(transitionValue: string): void {
-    try {
-      this.validateTransitionPreconditions(transitionValue);
-    } catch (e) {
-      if (e instanceof Error && e.message === "Already at END state") {
-        return; // Silent return for END state
-      }
-      throw e;
+    // Can't transition while another transition is in progress
+    if (this.isTransitioning) {
+      throw new Error(
+        `Transitioning while ongoing transition is in progress is not supported`,
+      );
+    }
+
+    // Can't transition from END state
+    if (this.currentState?.value.state_type === "END") {
+      this.log?.warn(
+        `Skipping flow transition using ${transitionValue}. Already at END state`,
+      );
+      return;
     }
 
     // Look up in flow-level transitions
@@ -206,14 +257,12 @@ export class FlowInstance {
       this.flow.transitions[transitionValue] || this.flow.transitions["*"];
 
     if (nextState === undefined) {
-      this.log?.warn(
-        `No flow-level transition for ${transitionValue} or * in flow`,
-      );
+      this.log?.warn(`No flow-level transition for ${transitionValue} or *`);
       return;
     }
 
     this.log?.debug(
-      `Flow-level transition from ${this.currentState!.name} to ${nextState} using ${transitionValue}`,
+      `Flow-level transition to ${nextState} using ${transitionValue}${this.currentState ? ` from ${this.currentState.name}` : ""}`,
     );
 
     return this.pushHistory(nextState);
@@ -223,38 +272,47 @@ export class FlowInstance {
     transitionValue: string,
     options?: TransitionOptions,
   ): void {
-    try {
-      this.validateTransitionPreconditions(transitionValue);
-    } catch (e) {
-      if (e instanceof Error && e.message === "Already at END state") {
-        return; // Silent return for END state
-      }
-      throw e;
+    // Check if we can transition
+    if (this.isTransitioning) {
+      throw new Error(
+        `Transitioning while ongoing transition from ${this.currentState?.name} is in progress is not supported`,
+      );
     }
 
+    if (this.currentState?.value.state_type === "END") {
+      this.log?.warn(
+        `Skipping transition using ${transitionValue}. Already at END state`,
+      );
+      return;
+    }
+
+    if (this.currentState === undefined) {
+      throw new Error("Cannot transition when there's no current state");
+    }
+
+    const currentState = this.currentState.value;
+
+    // For normal transitions: use hooks
     if (options?.force) {
       this.log?.debug(`Forced transition. Skipping validation checks`);
     } else {
-      const skipTransition = this.hooks.skipTransition.call(this.currentState!);
+      const skipTransition = this.hooks.skipTransition.call(this.currentState);
 
       if (skipTransition) {
         this.log?.debug(
-          `Skipping transition from ${this.currentState!.name} b/c hook told us to`,
+          `Skipping transition from ${this.currentState.name} b/c hook told us to`,
         );
         return;
       }
     }
 
     const state = this.hooks.beforeTransition.call(
-      this.currentState!.value as Exclude<
-        NavigationFlowState,
-        NavigationFlowEndState
-      >,
+      currentState as Exclude<NavigationFlowState, NavigationFlowEndState>,
       transitionValue,
     );
 
     if (!("transitions" in state)) {
-      throw new Error(`No transitions defined for ${this.currentState!.value}`);
+      throw new Error(`No transitions defined for ${this.currentState.value}`);
     }
 
     const { transitions } = state;
@@ -262,14 +320,14 @@ export class FlowInstance {
 
     if (nextState === undefined) {
       this.log?.warn(
-        `No transition from ${this.currentState!.name} using ${transitionValue} or *`,
+        `No transition from ${this.currentState.name} using ${transitionValue} or *`,
       );
 
       return;
     }
 
     this.log?.debug(
-      `Transitioning from ${this.currentState!.name} to ${nextState} using ${transitionValue} `,
+      `Transitioning from ${this.currentState.name} to ${nextState} using ${transitionValue} `,
     );
 
     return this.pushHistory(nextState, options);

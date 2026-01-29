@@ -123,10 +123,10 @@ export interface NavigationFlow {
   transitions?: NavigationFlowTransition;
 
   /**
-   * An optional flow-level error state (fallback when node-level is not defined).
-   * Can be a string or a dictionary mapping error types to transition values.
+   * Optional flow-level error transitions map.
+   * Maps error types directly to state names (no indirection through transitions map).
    */
-  errorState?: ErrorStateTransition;
+  errorTransitions?: Record<string, string>;
 
   [key: string]:
     | undefined
@@ -135,16 +135,10 @@ export interface NavigationFlow {
     | ExpressionObject
     | NavigationFlowState
     | NavigationFlowTransition
-    | ErrorStateTransition;
+    | Record<string, string>;
 }
 
 export type NavigationFlowTransition = Record<string, string>;
-
-/**
- * Error state transition configuration
- * Can be a string or a dictionary mapping error types to transition values
- */
-export type ErrorStateTransition = string | Record<string, string>;
 
 interface CommentBase {
   /** Add comments that will not be processing, but are useful for code explanation */
@@ -176,10 +170,10 @@ export interface NavigationFlowTransitionableState<T extends string>
   transitions: NavigationFlowTransition;
 
   /**
-   * Optional error transition to take when an error occurs in this state.
-   * Can be a string or a dictionary mapping error types to transition values.
+   * Optional error transitions map.
+   * Maps error types directly to state names (no indirection through transitions map).
    */
-  errorState?: ErrorStateTransition;
+  errorTransitions?: Record<string, string>;
 }
 
 /** A state representing a view  */
