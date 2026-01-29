@@ -1,3 +1,28 @@
+# 0.15.0-next.5 (Thu Jan 29 2026)
+
+### Release Notes
+
+#### Expand Docs on Using XLRs for Validations ([#784](https://github.com/player-ui/player/pull/784))
+
+Docs: Expanded content validation Docs
+
+---
+
+#### 🐛 Bug Fix
+
+- Expand Docs on Using XLRs for Validations [#784](https://github.com/player-ui/player/pull/784) ([@KetanReddy](https://github.com/KetanReddy) [@kharrop](https://github.com/kharrop))
+
+#### 📝 Documentation
+
+- Docs: Plugin Architecture/Hooks + Landing Page Fix [#780](https://github.com/player-ui/player/pull/780) ([@kharrop](https://github.com/kharrop))
+
+#### Authors: 2
+
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.15.0-next.4 (Fri Jan 16 2026)
 
 ### Release Notes

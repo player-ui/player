@@ -1,47 +1,9 @@
 ---
-title: Using XLR
+title: Using XLRs
 ---
-
 import { PackageManagers } from 'starlight-package-managers'
 
-
-# Part 1 - Creating XLRs
-
-XLR creation is done through the Player CLI which can be added to your project like so:
-
-<PackageManagers pkg="@player-tools/cli" />
-
-
-## Exporting Base Type Definitions
-
-If you want to compile all exported interfaces/types to XLRs run the following command as part of your build
-
-```bash
-player xlr compile -m types <other options>
-```
-
-## Exporting Plugin Capabilities
-
-If you are writing a Player Plugin, you'll first need to have your plugin extend the `ExtendedPlayerPlugin` interface and fill in the generics with an array of the interfaces/types for each Capability. For example, you can see how its done below in the [core reference assets plugin](https://github.com/player-ui/player/blob/main/plugins/reference-assets/core/src/plugin.ts)
-
-```typescript
-export class ReferenceAssetsPlugin
-  implements
-    PlayerPlugin,
-    ExtendedPlayerPlugin<
-      [InputAsset, TextAsset, ActionAsset, InfoAsset, CollectionAsset]
-    >
-```
-
-Then run the following command as part of your build
-
-```shell
-player xlr compile -m plugin <other options>
-```
-
-# Part 2 - Using XLRs 
-
-## SDK: Initialization
+## SDK Initialization
 
 To start using the XLR SDK you'll need to install the SDK package
 
@@ -72,7 +34,7 @@ import { customRegistry } from "./customRegistry"
 const sdk = new XLRSDK(customRegistry);
 ```
 
-## SDK: Loading Types
+## Loading Types into the SDK
 
 If you want to load XLR types from disk, you can use the `loadDefinitionsFromDisk` function and pass it the path to parent folder of the `xlr` directory.
 
@@ -91,7 +53,7 @@ sdk.loadDefinitionsFromModule(require("@player-ui/reference-assets-plugin").path
 - If you want to filter any of the types that are being loaded, you can supply a `Filters` object as the *second* arguments
 - If you want to apply any transform functions to the modules that you load, you can supply a list of `TransformFunction` as the *third* argument
 
-## SDK: Usage
+## Usage
 
 After the types are loaded into the SDK there are a couple ways to interact with them.
 
