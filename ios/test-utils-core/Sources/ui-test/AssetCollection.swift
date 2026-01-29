@@ -50,7 +50,7 @@ public struct AssetCollection: View {
                         NavigationLink(flow.name) {
                             AssetFlowView(flow: flow.flow, plugins: plugins, result: result)
                                 .padding(padding)
-                                .navigationTitle(Text(flow.name))
+                                .navigationBarTitle(Text(flow.name))
                         }
                         .accessibility(identifier: "\(section.title) \(flow.name)")
                     }
@@ -61,7 +61,7 @@ public struct AssetCollection: View {
             }
         }
         .accessibility(identifier: "AssetCollection")
-        .navigationTitle(Text("Flows"))
+        .navigationBarTitle(Text("Flows"))
     }
 }
 

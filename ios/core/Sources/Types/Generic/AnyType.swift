@@ -76,21 +76,19 @@ public enum AnyType: Hashable, Sendable {
 
     /**
      The underlying data was a dictionary of varied value types
-
-     **This requires the decoder to add `AnyTypeDecodingContext` to the decoders userInfo**
      
-     - Note: This case now uses recursive `AnyType` values instead of `Any` to maintain `Sendable` conformance.
-     Use the `asAnyDictionary` property for backward compatibility with `[String: Any]`.
+     This case uses recursive `AnyType` values to maintain `Sendable` conformance.
+
+     - Note: This requires the decoder to add `AnyTypeDecodingContext` to the decoder's userInfo
      */
     case anyDictionary(data: [String: AnyType])
 
     /**
      The underlying data was an array of varied value types
-
-     **This requires the decoder to add `AnyTypeDecodingContext` to the decoders userInfo**
      
-     - Note: This case now uses recursive `AnyType` values instead of `Any` to maintain `Sendable` conformance.
-     Use the `asAnyArray` property for backward compatibility with `[Any]`.
+     This case uses recursive `AnyType` values to maintain `Sendable` conformance.
+
+     - Note: This requires the decoder to add `AnyTypeDecodingContext` to the decoder's userInfo
      */
     case anyArray(data: [AnyType])
 
@@ -98,134 +96,14 @@ public enum AnyType: Hashable, Sendable {
     case unknownData
 }
 
-// MARK: - Backward Compatibility & Conversion Helpers
-
-extension AnyType {
-    /**
-     Create an AnyType from a legacy `[String: Any]` dictionary.
-     
-     This initializer recursively converts the dictionary values to AnyType.
-     - Parameter anyDictionary: A dictionary with Any values
-     */
-    public init(anyDictionary: [String: Any]) {
-        let converted = anyDictionary.mapValues { value -> AnyType in
-            AnyType(from: value)
-        }
-        self = .anyDictionary(data: converted)
-    }
-    
-    /**
-     Create an AnyType from a legacy `[Any]` array.
-     
-     This initializer recursively converts the array elements to AnyType.
-     - Parameter anyArray: An array with Any elements
-     */
-    public init(anyArray: [Any]) {
-        let converted = anyArray.map { value -> AnyType in
-            AnyType(from: value)
-        }
-        self = .anyArray(data: converted)
-    }
-    
-    /**
-     Convert an `Any` value to AnyType.
-     
-     This method attempts to match the value to the most specific AnyType case.
-     - Parameter value: The value to convert
-     */
-    public init(from value: Any) {
-        switch value {
-        case let str as String:
-            self = .string(data: str)
-        case let bool as Bool:
-            self = .bool(data: bool)
-        case let num as NSNumber:
-            // NSNumber from JSONSerialization - check if it's actually a bool
-            if CFNumberGetType(num as CFNumber) == .charType {
-                // This is actually a boolean
-                self = .bool(data: num.boolValue)
-            } else {
-                self = .number(data: num.doubleValue)
-            }
-        case let num as Double:
-            self = .number(data: num)
-        case let num as Int:
-            self = .number(data: Double(num))
-        case let num as Float:
-            self = .number(data: Double(num))
-        case let dict as [String: String]:
-            self = .dictionary(data: dict)
-        case let dict as [String: Double]:
-            self = .numberDictionary(data: dict)
-        case let dict as [String: Bool]:
-            self = .booleanDictionary(data: dict)
-        case let dict as [String: Any]:
-            self = .init(anyDictionary: dict)
-        case let arr as [String]:
-            self = .array(data: arr)
-        case let arr as [Double]:
-            self = .numberArray(data: arr)
-        case let arr as [Bool]:
-            self = .booleanArray(data: arr)
-        case let arr as [Any]:
-            self = .init(anyArray: arr)
-        default:
-            self = .unknownData
-        }
-    }
-    
-    /**
-     Access the anyDictionary case as `[String: Any]` for backward compatibility.
-     
-     - Returns: The dictionary as `[String: Any]`, or `nil` if not an anyDictionary case.
-     */
-    public var asAnyDictionary: [String: Any]? {
-        guard case .anyDictionary(let data) = self else { return nil }
-        return data.mapValues { $0.asAny }
-    }
-    
-    /**
-     Access the anyArray case as `[Any]` for backward compatibility.
-     
-     - Returns: The array as `[Any]`, or `nil` if not an anyArray case.
-     */
-    public var asAnyArray: [Any]? {
-        guard case .anyArray(let data) = self else { return nil }
-        return data.map { $0.asAny }
-    }
-    
-    /**
-     Convert this AnyType back to an `Any` value.
-     
-     This is useful for interoperating with APIs that expect `Any`.
-     */
-    public var asAny: Any {
-        switch self {
-        case .string(let data): return data
-        case .bool(let data): return data
-        case .number(let data): return data
-        case .dictionary(let data): return data
-        case .numberDictionary(let data): return data
-        case .booleanDictionary(let data): return data
-        case .array(let data): return data
-        case .numberArray(let data): return data
-        case .booleanArray(let data): return data
-        case .anyDictionary(let data): return data.mapValues { $0.asAny }
-        case .anyArray(let data): return data.map { $0.asAny }
-        case .unknownData: return NSNull()
-        }
-    }
-    
-}
-
-// MARK: - Reflection Support
+// MARK: - Value Extraction
 
 extension AnyType {
     /**
      Cast to expected type automatically.
      
-     This method provides a convenient way to cast the underlying value to a specific type
-     without explicit pattern matching or type checking.
+     This method provides a convenient way to extract the underlying value and cast it to a specific type
+     without explicit pattern matching on each case.
      
      - Parameter type: The target type to cast to
      - Returns: The value cast to the specified type, or `nil` if the cast fails
@@ -235,13 +113,38 @@ extension AnyType {
      let anyType = AnyType.string(data: "Hello")
      let title: String? = anyType.as(String.self)  // "Hello"
      
-     // Usage in dictionaries
-     let envelope: AnyType = // ... some AnyType
-     let title: String? = envelope["title"]?.as(String.self)
+     // Usage with subscripts
+     let dict = AnyType.anyDictionary(data: ["title": .string(data: "Hello")])
+     let title: String? = dict["title"]?.as(String.self)
      ```
      */
     public func `as`<T>(_ type: T.Type) -> T? {
-        return asAny as? T
+        switch self {
+        case .string(let data):
+            return data as? T
+        case .bool(let data):
+            return data as? T
+        case .number(let data):
+            return data as? T
+        case .dictionary(let data):
+            return data as? T
+        case .numberDictionary(let data):
+            return data as? T
+        case .booleanDictionary(let data):
+            return data as? T
+        case .array(let data):
+            return data as? T
+        case .numberArray(let data):
+            return data as? T
+        case .booleanArray(let data):
+            return data as? T
+        case .anyDictionary(let data):
+            return data as? T
+        case .anyArray(let data):
+            return data as? T
+        case .unknownData:
+            return nil
+        }
     }
     
     /**
@@ -335,51 +238,30 @@ extension AnyType: Decodable {
         } else if let number = try? decoder.singleValueContainer().decode(Double.self) {
             self = .number(data: number)
             return
-        } else if let context = decoder.userInfo[AnyTypeDecodingContext.key] as? AnyTypeDecodingContext {
-            let obj = try context.objectFor(path: decoder.singleValueContainer().codingPath)
-            if let dictionary = obj as? [String: Any] {
-                // Convert [String: Any] to [String: AnyType] recursively
-                self = AnyType(anyDictionary: dictionary)
-                return
-            } else if let array = obj as? [Any] {
-                // Convert [Any] to [AnyType] recursively
-                self = AnyType(anyArray: array)
-                return
-            }
+        } else if decoder.userInfo[AnyTypeDecodingContext.key] is AnyTypeDecodingContext {
+            // Note: Mixed-type collections (anyDictionary and anyArray) cannot be decoded
+            // through standard JSON decoding due to their heterogeneous nature.
+            // Use AnyTypeDecodingContext when decoding JSON containing mixed types.
         }
         self = .unknownData
         return
     }
 }
 
-// Custom CodingKey for dynamic key name
-// and to try to coerce `Any` into `Encodable`
+/// Custom CodingKey implementation for encoding anyDictionary cases with dynamic keys
 struct CustomEncodable: CodingKey {
-    var data: Encodable?
-    init(_ encodable: Any?, key: String) {
-        self.stringValue = key
-        if let encodable = encodable as? Encodable {
-            self.data = encodable
-        } else if
-            let encodable,
-            let data = try? JSONSerialization.data(withJSONObject: encodable, options: .fragmentsAllowed),
-            let decoded = try? AnyTypeDecodingContext(rawData: data).inject(to: JSONDecoder()).decode(AnyType.self, from: data)
-        {
-            self.data = decoded
-        }
-    }
     var stringValue: String
 
     init?(stringValue: String) {
-        return nil
+        self.stringValue = stringValue
     }
 
     var intValue: Int?
 
+    // Required by CodingKey protocol but not used since anyArray uses unkeyedContainer
     init?(intValue: Int) {
         return nil
     }
-
 }
 
 /**
@@ -414,28 +296,30 @@ extension AnyType: Encodable {
             try container.encode(dictionary)
         case .anyDictionary(data: let dictionary):
             var keyed = encoder.container(keyedBy: CustomEncodable.self)
-            for key in dictionary.keys {
-                let customEncodable = CustomEncodable(dictionary[key]?.asAny, key: key)
-                if let value = customEncodable.data {
-                    try keyed.encode(value, forKey: customEncodable)
+            for (key, value) in dictionary {
+                if let codingKey = CustomEncodable(stringValue: key) {
+                    try keyed.encode(value, forKey: codingKey)
                 }
             }
         case .anyArray(data: let array):
             var indexed = encoder.unkeyedContainer()
             for value in array {
-                let encodable = CustomEncodable(value.asAny, key: "")
-                if let data = encodable.data {
-                    try indexed.encode(data)
-                }
+                try indexed.encode(value)
             }
-
-        default:
+        case .unknownData:
             try container.encodeNil()
-            return
         }
     }
 }
 
+/**
+ Context for decoding mixed-type collections (anyDictionary and anyArray)
+ 
+ This context provides access to the raw JSON data to enable decoding of heterogeneous
+ collections that cannot be directly decoded through Swift's standard Codable system.
+ 
+ - Note: Required when decoding JSON containing mixed-type arrays or dictionaries
+ */
 public struct AnyTypeDecodingContext {
     static let key = CodingUserInfoKey(rawValue: "AnyTypeDecodingContext")!
 
@@ -445,11 +329,13 @@ public struct AnyTypeDecodingContext {
         self.rawData = rawData
     }
 
+    /// Retrieves the object at the given coding path from the raw JSON data
     public func objectFor(path: [CodingKey]) throws -> Any {
         let jsonData = try JSONSerialization.jsonObject(with: rawData)
         return traverse(path: path, in: jsonData)
     }
 
+    /// Traverses the JSON object tree following the coding path
     private func traverse(path: [CodingKey], in obj: Any) -> Any {
         path.reduce(obj) { partialResult, key in
             if let index = key.intValue {
@@ -459,6 +345,7 @@ public struct AnyTypeDecodingContext {
         }
     }
 
+    /// Injects this context into a JSONDecoder's userInfo for use during decoding
     public func inject(to decoder: JSONDecoder) -> JSONDecoder {
         decoder.userInfo[AnyTypeDecodingContext.key] = self
         return decoder
