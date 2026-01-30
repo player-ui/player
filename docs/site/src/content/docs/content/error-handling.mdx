@@ -172,79 +172,35 @@ errorController.hooks.onError.tap(name: "logger") { errorInfo in
 
 ## Error Navigation Pattern
 
-Errors can trigger automatic navigation using the `errorState` property at node or flow level.
+Errors can trigger automatic navigation using the `errorTransitions` map at node or flow level. This provides a dedicated error routing mechanism separate from regular transitions.
 
-### ErrorState Property Formats
+### errorTransitions Map
 
-The `errorState` property supports two formats:
-
-1. **String** - Navigate to a single error state for all error types
-   ```json
-   "errorState": "ERROR_VIEW"
-   ```
-
-2. **Object (Mapping)** - Navigate to different states based on error type
-   ```json
-   "errorState": {
-     "binding": "BINDING_ERROR_VIEW",
-     "validation": "VALIDATION_ERROR_VIEW",
-     "*": "GENERIC_ERROR_VIEW"
-   }
-   ```
-
-Both formats can be used at node-level or flow-level.
-
-### Navigation Fallback Pattern
-
-The navigation follows a hierarchical fallback pattern:
-
-1. **Node-level `errorState`** - If defined, transition to the specified state
-2. **Flow-level `errorState`** - If node-level not defined or no match found, use flow-level error state
-3. **Flow rejection** - If neither defined, reject/fail the flow
-
-### String Format (Single Error State)
-
-Use a string to navigate to the same error state for all error types:
+The `errorTransitions` property maps error types directly to state names:
 
 ```json
 {
-  "navigation": {
-    "BEGIN": "FLOW_1",
-    "FLOW_1": {
-      "startState": "VIEW_1",
-      "VIEW_1": {
-        "state_type": "VIEW",
-        "ref": "main-view",
-        "errorState": "ERROR_VIEW",
-        "transitions": {
-          "*": "END_Done"
-        }
-      },
-      "ERROR_VIEW": {
-        "state_type": "VIEW",
-        "ref": "error-view",
-        "transitions": {
-          "*": "END_Error"
-        }
-      },
-      "END_Done": {
-        "state_type": "END",
-        "outcome": "done"
-      },
-      "END_Error": {
-        "state_type": "END",
-        "outcome": "error"
-      }
-    }
+  "errorTransitions": {
+    "binding": "BINDING_ERROR_VIEW",
+    "validation": "VALIDATION_ERROR_VIEW",
+    "*": "GENERIC_ERROR_VIEW"
   }
 }
 ```
 
-When an error is captured while on `VIEW_1`, Player will automatically call `transition("ERROR_VIEW")` for any error type.
+The `"*"` wildcard matches any error type not explicitly defined.
 
-### Object Format (Error Type Mapping)
+### Navigation Fallback Pattern
 
-Use an object to navigate to different states based on the error type:
+When an error is captured, the ErrorController uses `errorTransition()` to navigate following this hierarchical fallback:
+
+1. **Node-level `errorTransitions`** - If defined on the current state, navigate to the mapped state for the error type
+2. **Flow-level `errorTransitions`** - If node-level not found or current state doesn't have a match, use flow-level mapping
+3. **No Navigation** - If neither level has a match, log a warning and stay on the current state (or reject flow if critical)
+
+### Node-Level Error Transitions
+
+Define `errorTransitions` on individual states to handle errors specific to that state:
 
 ```json
 {
@@ -255,7 +211,7 @@ Use an object to navigate to different states based on the error type:
       "VIEW_1": {
         "state_type": "VIEW",
         "ref": "main-view",
-        "errorState": {
+        "errorTransitions": {
           "binding": "BINDING_ERROR_VIEW",
           "validation": "VALIDATION_ERROR_VIEW",
           "*": "GENERIC_ERROR_VIEW"
@@ -278,17 +234,25 @@ Use an object to navigate to different states based on the error type:
         "state_type": "VIEW",
         "ref": "generic-error-view",
         "transitions": { "*": "END_Error" }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      },
+      "END_Error": {
+        "state_type": "END",
+        "outcome": "error"
       }
     }
   }
 }
 ```
 
-The `"*"` wildcard matches any error type not explicitly defined. If an error type doesn't match and no wildcard is defined, it falls through to the flow-level `errorState`.
+When a `binding` error is captured on `VIEW_1`, Player automatically navigates to `BINDING_ERROR_VIEW`.
 
-### Flow-Level Error Navigation
+### Flow-Level Error Transitions
 
-Define `errorState` at the flow level as a fallback for states without their own `errorState`:
+Define `errorTransitions` at the flow level as a fallback for states without their own error handling:
 
 ```json
 {
@@ -296,7 +260,11 @@ Define `errorState` at the flow level as a fallback for states without their own
     "BEGIN": "FLOW_1",
     "FLOW_1": {
       "startState": "VIEW_1",
-      "errorState": "ERROR_VIEW",
+      "errorTransitions": {
+        "binding": "BINDING_ERROR_VIEW",
+        "validation": "VALIDATION_ERROR_VIEW",
+        "*": "GENERIC_ERROR_VIEW"
+      },
       "VIEW_1": {
         "state_type": "VIEW",
         "ref": "main-view",
@@ -311,16 +279,122 @@ Define `errorState` at the flow level as a fallback for states without their own
           "*": "END_Done"
         }
       },
-      "ERROR_VIEW": {
+      "BINDING_ERROR_VIEW": {
         "state_type": "VIEW",
-        "ref": "error-view",
+        "ref": "binding-error-view",
         "transitions": {
           "*": "END_Error"
         }
+      },
+      "VALIDATION_ERROR_VIEW": {
+        "state_type": "VIEW",
+        "ref": "validation-error-view",
+        "transitions": {
+          "*": "END_Error"
+        }
+      },
+      "GENERIC_ERROR_VIEW": {
+        "state_type": "VIEW",
+        "ref": "generic-error-view",
+        "transitions": {
+          "*": "END_Error"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      },
+      "END_Error": {
+        "state_type": "END",
+        "outcome": "error"
       }
     }
   }
 }
 ```
 
-Flow-level `errorState` can also use the object format for error type mapping.
+Any error captured on `VIEW_1` or `VIEW_2` will use the flow-level `errorTransitions` since they don't define their own.
+
+### Wildcard Support
+
+The `"*"` wildcard matches any error type not explicitly mapped:
+
+```json
+{
+  "errorTransitions": {
+    "network": "NETWORK_ERROR_VIEW",
+    "validation": "VALIDATION_ERROR_VIEW",
+    "*": "GENERIC_ERROR_VIEW"
+  }
+}
+```
+
+A `binding` error would navigate to `GENERIC_ERROR_VIEW` via the wildcard.
+
+### Combining Node and Flow Level
+
+Node-level takes precedence, with flow-level as fallback:
+
+```json
+{
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "VIEW_1",
+      "errorTransitions": {
+        "*": "GENERIC_ERROR_VIEW"
+      },
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "main-view",
+        "errorTransitions": {
+          "validation": "CUSTOM_VALIDATION_ERROR"
+        },
+        "transitions": {
+          "*": "VIEW_2"
+        }
+      },
+      "VIEW_2": {
+        "state_type": "VIEW",
+        "ref": "second-view",
+        "transitions": {
+          "*": "END_Done"
+        }
+      },
+      "CUSTOM_VALIDATION_ERROR": {
+        "state_type": "VIEW",
+        "ref": "custom-validation-error",
+        "transitions": { "*": "END_Error" }
+      },
+      "GENERIC_ERROR_VIEW": {
+        "state_type": "VIEW",
+        "ref": "generic-error-view",
+        "transitions": { "*": "END_Error" }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      },
+      "END_Error": {
+        "state_type": "END",
+        "outcome": "error"
+      }
+    }
+  }
+}
+```
+
+**Behavior:**
+- On `VIEW_1`: `validation` error → `CUSTOM_VALIDATION_ERROR` (node-level)
+- On `VIEW_1`: `binding` error → `GENERIC_ERROR_VIEW` (flow-level fallback)
+- On `VIEW_2`: any error → `GENERIC_ERROR_VIEW` (flow-level fallback)
+
+### Key Differences from Regular Transitions
+
+`errorTransitions` differs from regular `transitions`:
+
+1. **Direct Navigation**: Maps error types directly to state names (no intermediate transition values)
+2. **Bypasses Hooks**: Skips `skipTransition` and `beforeTransition` hooks for immediate error handling
+3. **No Expression Resolution**: State names are used as-is without expression evaluation
+4. **Two-Level Fallback**: Supports both node-level and flow-level with automatic fallback
+5. **Protected Writes**: ErrorController writes to `errorState` in the data model using protected middleware
