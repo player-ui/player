@@ -50,18 +50,9 @@ export function getChangedDocsPages(baseBranch = "origin/main") {
     const hookSourceChanged = changedFiles.some((file) => {
       // Hooks docs are generated during the Bazel docs build and not tracked in git anymore.
       // To keep PR preview comments useful, flag the Hooks page when hook-related paths change.
-      // We consider hooks docs potentially impacted if:
-      // - core player TS sources change
-      // - plugin core TS sources change
-      // - any path segment named "hooks" changes
       return (
-        file.startsWith("core/player/src/") ||
-        /^plugins\/[^/]+\/core\/src\//.test(file) ||
-        /(^|\/)[Hh]ooks(\/|$)/.test(file) ||
-        // If the generator or its Bazel wiring changes, the Hooks page output likely changes too.
-        file === "docs/site/BUILD" ||
-        file === "scripts/docs/generate-hooks-docs.mjs" ||
-        file.startsWith("scripts/docs/")
+        // Only: any path segment named "hooks" changes (case-insensitive).
+        /(^|\/)[Hh]ooks(\/|$)/.test(file)
       );
     });
 
