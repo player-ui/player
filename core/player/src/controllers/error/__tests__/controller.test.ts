@@ -95,7 +95,7 @@ describe("ErrorController", () => {
           ],
         ],
         expect.objectContaining({
-          authToken: expect.any(Symbol),
+          writeSymbol: expect.any(Symbol),
         }),
       );
     });
@@ -155,7 +155,7 @@ describe("ErrorController", () => {
       expect(mockDataController.delete).toHaveBeenCalledWith(
         "errorState",
         expect.objectContaining({
-          authToken: expect.any(Symbol),
+          writeSymbol: expect.any(Symbol),
         }),
       );
     });
@@ -197,7 +197,7 @@ describe("ErrorController", () => {
       expect(mockDataController.delete).toHaveBeenCalledWith(
         "errorState",
         expect.objectContaining({
-          authToken: expect.any(Symbol),
+          writeSymbol: expect.any(Symbol),
         }),
       );
     });
@@ -290,13 +290,13 @@ describe("ErrorController", () => {
       errorController.captureError(new Error("Test error"));
       expect(mockDataController.set).toHaveBeenCalled();
 
-      // Clear error should delete via middleware with authToken
+      // Clear error should delete via middleware with writeSymbol
       vitest.clearAllMocks();
       errorController.clearCurrentError();
       expect(mockDataController.delete).toHaveBeenCalledWith(
         "errorState",
         expect.objectContaining({
-          authToken: expect.any(Symbol),
+          writeSymbol: expect.any(Symbol),
         }),
       );
     });

@@ -10,17 +10,17 @@ import type { Logger } from "../../logger";
 
 /**
  * Middleware that prevents external writes to errorState
- * Only authorized callers (with the auth symbol) can write to this path
+ * Only authorized callers (with the write symbol) can write to this path
  */
 export class ErrorStateMiddleware implements DataModelMiddleware {
   name = "error-state-middleware";
 
   private logger?: Logger;
-  private authSymbol: symbol;
+  private writeSymbol: symbol;
 
-  constructor(options: { logger?: Logger; authSymbol: symbol }) {
+  constructor(options: { logger?: Logger; writeSymbol: symbol }) {
     this.logger = options.logger;
-    this.authSymbol = options.authSymbol;
+    this.writeSymbol = options.writeSymbol;
   }
 
   public set(
@@ -28,8 +28,8 @@ export class ErrorStateMiddleware implements DataModelMiddleware {
     options?: DataModelOptions,
     next?: DataModelImpl,
   ): Updates {
-    // Check if this write is authorized by comparing the auth tokens
-    if (options?.authToken === this.authSymbol) {
+    // Check if this write is authorized by comparing the write symbols
+    if (options?.writeSymbol === this.writeSymbol) {
       return next?.set(transaction, options) ?? [];
     }
 
@@ -78,8 +78,8 @@ export class ErrorStateMiddleware implements DataModelMiddleware {
     options?: DataModelOptions,
     next?: DataModelImpl,
   ): void {
-    // Check if this delete is authorized by comparing the auth tokens
-    if (options?.authToken === this.authSymbol) {
+    // Check if this delete is authorized by comparing the write symbols
+    if (options?.writeSymbol === this.writeSymbol) {
       next?.delete(binding, options);
       return;
     }

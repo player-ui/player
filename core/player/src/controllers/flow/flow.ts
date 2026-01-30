@@ -227,47 +227,6 @@ export class FlowInstance {
     );
   }
 
-  /**
-   * Transition using flow-level transitions map only.
-   * This ONLY looks at flow.transitions (not node-level transitions).
-   */
-  public flowTransition(transitionValue: string): void {
-    // Can't transition while another transition is in progress
-    if (this.isTransitioning) {
-      throw new Error(
-        `Transitioning while ongoing transition is in progress is not supported`,
-      );
-    }
-
-    // Can't transition from END state
-    if (this.currentState?.value.state_type === "END") {
-      this.log?.warn(
-        `Skipping flow transition using ${transitionValue}. Already at END state`,
-      );
-      return;
-    }
-
-    // Look up in flow-level transitions
-    if (!this.flow.transitions) {
-      this.log?.warn("No flow-level transitions defined");
-      return;
-    }
-
-    const nextState =
-      this.flow.transitions[transitionValue] || this.flow.transitions["*"];
-
-    if (nextState === undefined) {
-      this.log?.warn(`No flow-level transition for ${transitionValue} or *`);
-      return;
-    }
-
-    this.log?.debug(
-      `Flow-level transition to ${nextState} using ${transitionValue}${this.currentState ? ` from ${this.currentState.name}` : ""}`,
-    );
-
-    return this.pushHistory(nextState);
-  }
-
   public transition(
     transitionValue: string,
     options?: TransitionOptions,

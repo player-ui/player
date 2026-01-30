@@ -9,8 +9,8 @@ import { ErrorStateMiddleware } from "./middleware";
  * Private symbol used to authorize ErrorController's writes to errorState
  * Only ErrorController has access to this symbol
  */
-const ERROR_CONTROLLER_AUTH_SYMBOL: unique symbol = Symbol(
-  "ERROR_CONTROLLER_AUTH",
+const errorControllerWriteSymbol: unique symbol = Symbol(
+  "errorControllerWrite",
 );
 
 export interface ErrorControllerHooks {
@@ -55,7 +55,7 @@ export class ErrorController {
 
     this.middleware = new ErrorStateMiddleware({
       logger: options.logger,
-      authSymbol: ERROR_CONTROLLER_AUTH_SYMBOL,
+      writeSymbol: errorControllerWriteSymbol,
     });
   }
 
@@ -193,7 +193,7 @@ export class ErrorController {
     try {
       const { error, errorType, severity, metadata } = playerError;
 
-      // Pass auth token to authorize write through middleware
+      // Pass write symbol to authorize write through middleware
       this.options.model.set(
         [
           [
@@ -207,7 +207,7 @@ export class ErrorController {
             },
           ],
         ],
-        { authToken: ERROR_CONTROLLER_AUTH_SYMBOL },
+        { writeSymbol: errorControllerWriteSymbol },
       );
 
       this.options.logger.debug(
@@ -230,9 +230,9 @@ export class ErrorController {
     }
 
     try {
-      // Pass auth token to authorize delete through middleware
+      // Pass write symbol to authorize delete through middleware
       this.options.model.delete("errorState", {
-        authToken: ERROR_CONTROLLER_AUTH_SYMBOL,
+        writeSymbol: errorControllerWriteSymbol,
       });
 
       this.options.logger.debug(

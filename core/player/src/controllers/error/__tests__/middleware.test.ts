@@ -10,7 +10,7 @@ describe("ErrorStateMiddleware", () => {
   let baseDataModel: DataModelImpl;
   let mockLogger: Logger;
   let parser: BindingParser;
-  let authSymbol: symbol;
+  let writeSymbol: symbol;
 
   beforeEach(() => {
     mockLogger = {
@@ -21,10 +21,10 @@ describe("ErrorStateMiddleware", () => {
       error: vitest.fn(),
     };
 
-    authSymbol = Symbol("test-auth");
+    writeSymbol = Symbol("test-write");
     middleware = new ErrorStateMiddleware({
       logger: mockLogger,
-      authSymbol,
+      writeSymbol,
     });
     baseDataModel = new LocalModel({ foo: "bar" });
 
@@ -36,7 +36,7 @@ describe("ErrorStateMiddleware", () => {
   });
 
   describe("set", () => {
-    it("should block writes to errorState without authToken", () => {
+    it("should block writes to errorState without writeSymbol", () => {
       const binding = parser.parse("errorState");
       const updates = middleware.set(
         [[binding, { message: "test" }]],
@@ -85,12 +85,12 @@ describe("ErrorStateMiddleware", () => {
       expect(updates[0]!.newValue).toBe("newValue");
     });
 
-    it("should allow writes when authorized with authToken", () => {
+    it("should allow writes when authorized with writeSymbol", () => {
       const binding = parser.parse("errorState");
 
       const updates = middleware.set(
         [[binding, { message: "test" }]],
-        { authToken: authSymbol },
+        { writeSymbol: writeSymbol },
         baseDataModel,
       );
 
@@ -100,13 +100,13 @@ describe("ErrorStateMiddleware", () => {
       expect(updates[0]!.newValue).toEqual({ message: "test" });
     });
 
-    it("should block writes with wrong authToken", () => {
+    it("should block writes with wrong writeSymbol", () => {
       const binding = parser.parse("errorState");
       const wrongSymbol = Symbol("wrong-auth");
 
       middleware.set(
         [[binding, { message: "test" }]],
-        { authToken: wrongSymbol },
+        { writeSymbol: wrongSymbol },
         baseDataModel,
       );
 
@@ -156,7 +156,7 @@ describe("ErrorStateMiddleware", () => {
   });
 
   describe("delete", () => {
-    it("should block deletes to errorState without authToken", () => {
+    it("should block deletes to errorState without writeSymbol", () => {
       const binding = parser.parse("errorState");
 
       // Set value first
@@ -171,26 +171,26 @@ describe("ErrorStateMiddleware", () => {
       );
     });
 
-    it("should allow deletes when authorized with authToken", () => {
+    it("should allow deletes when authorized with writeSymbol", () => {
       const binding = parser.parse("errorState");
 
       // Set value first
       baseDataModel.set([[binding, { message: "test" }]]);
 
-      middleware.delete(binding, { authToken: authSymbol }, baseDataModel);
+      middleware.delete(binding, { writeSymbol: writeSymbol }, baseDataModel);
 
       expect(baseDataModel.get(binding)).toBeUndefined();
       expect(mockLogger.warn).not.toHaveBeenCalled();
     });
 
-    it("should block deletes with wrong authToken", () => {
+    it("should block deletes with wrong writeSymbol", () => {
       const binding = parser.parse("errorState");
       const wrongSymbol = Symbol("wrong-auth");
 
       // Set value first
       baseDataModel.set([[binding, { message: "test" }]]);
 
-      middleware.delete(binding, { authToken: wrongSymbol }, baseDataModel);
+      middleware.delete(binding, { writeSymbol: wrongSymbol }, baseDataModel);
 
       expect(baseDataModel.get(binding)).toEqual({ message: "test" });
       expect(mockLogger.warn).toHaveBeenCalledWith(
@@ -213,7 +213,7 @@ describe("ErrorStateMiddleware", () => {
       // Set value first
       baseDataModel.set([[binding, "test"]]);
 
-      middleware.delete(binding, { authToken: authSymbol }, baseDataModel);
+      middleware.delete(binding, { writeSymbol: writeSymbol }, baseDataModel);
 
       expect(baseDataModel.get(binding)).toBeUndefined();
       expect(mockLogger.warn).not.toHaveBeenCalled();
