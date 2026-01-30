@@ -134,8 +134,7 @@ export interface NavigationFlow {
     | Expression
     | ExpressionObject
     | NavigationFlowState
-    | NavigationFlowTransition
-    | Record<string, string>;
+    | NavigationFlowTransition;
 }
 
 export type NavigationFlowTransition = Record<string, string>;
