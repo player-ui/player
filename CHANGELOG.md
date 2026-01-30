@@ -1,3 +1,52 @@
+# 0.15.0-next.6 (Thu Jan 29 2026)
+
+### Release Notes
+
+#### Remove async node tracking from core and rely on node-based caching ([#777](https://github.com/player-ui/player/pull/777))
+
+- Remove async node references from player core resolver.
+- Allow the resolver to update using node changes instead of just data changes
+- Add `markAsChanged` function to the `ViewController` to support triggering updates caused by node changes.
+- Update `AsyncNodePlugin` and `AsyncNodePluginPlugin` to make use of the above.
+- Fixed a bug causing assets loaded using the `AsyncNodePlugin` to crash on android
+
+---
+
+#### 🐛 Bug Fix
+
+- Remove async node tracking from core and rely on node-based caching [#777](https://github.com/player-ui/player/pull/777) ([@tmarmer](https://github.com/tmarmer))
+
+#### Authors: 1
+
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.15.0-next.5 (Thu Jan 29 2026)
+
+### Release Notes
+
+#### Expand Docs on Using XLRs for Validations ([#784](https://github.com/player-ui/player/pull/784))
+
+Docs: Expanded content validation Docs
+
+---
+
+#### 🐛 Bug Fix
+
+- Expand Docs on Using XLRs for Validations [#784](https://github.com/player-ui/player/pull/784) ([@KetanReddy](https://github.com/KetanReddy) [@kharrop](https://github.com/kharrop))
+
+#### 📝 Documentation
+
+- Docs: Plugin Architecture/Hooks + Landing Page Fix [#780](https://github.com/player-ui/player/pull/780) ([@kharrop](https://github.com/kharrop))
+
+#### Authors: 2
+
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+
+---
+
 # 0.15.0-next.4 (Fri Jan 16 2026)
 
 ### Release Notes

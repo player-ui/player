@@ -1437,7 +1437,7 @@ static let chatMessageBasic: String = """
     """
 
     static let chatUi: String = """
-    {
+{
   "id": "chat-ui",
   "data": {
     "content": ""
@@ -1449,7 +1449,7 @@ static let chatMessageBasic: String = """
       "values": [
         {
           "asset": {
-            "id": "1",
+            "id": "chat-demo",
             "type": "chat-message",
             "value": {
               "asset": {

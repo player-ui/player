@@ -8,6 +8,8 @@ on:
 jobs:
   pr_closed:
     runs-on: ubuntu-latest
+    # Only run for PRs whose head branch is in this repo (skip forks).
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
     steps:
       - name: Checkout player-ui.github.io
         uses: actions/checkout@v4

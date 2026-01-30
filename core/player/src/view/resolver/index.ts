@@ -109,10 +109,6 @@ export class Resolver {
    */
   private readonly ASTMap: Map<Node.Node, Node.Node>;
   /**
-   * The AST tree after beforeResolve is ran mapped to the AST before beforeResolve is ran
-   */
-  private AsyncIdMap: Map<string, Node.Node>;
-  /**
    * The root node in the AST tree we want to resolve
    */
   public readonly root: Node.Node;
@@ -145,7 +141,6 @@ export class Resolver {
     this.ASTMap = new Map();
     this.logger = options.logger;
     this.idCache = new Set();
-    this.AsyncIdMap = new Map();
   }
 
   public getSourceNode(convertedAST: Node.Node): Node.Node | undefined {
@@ -153,39 +148,41 @@ export class Resolver {
   }
 
   public update(
-    changes?: Set<BindingInstance>,
-    asyncChanges?: Set<string>,
+    dataChanges?: Set<BindingInstance>,
+    nodeChanges?: Set<Node.Node>,
   ): any {
-    this.hooks.beforeUpdate.call(changes);
+    this.hooks.beforeUpdate.call(dataChanges);
     const resolveCache = new Map<Node.Node, Resolve.ResolvedNode>();
     this.idCache.clear();
     const prevASTMap = new Map(this.ASTMap);
     this.ASTMap.clear();
 
-    const prevAsyncIdMap = new Map(this.AsyncIdMap);
-    const nextAsyncIdMap = new Map<string, Node.Node>();
-    asyncChanges?.forEach((id) => {
-      let current: Node.Node | undefined = prevAsyncIdMap.get(id);
-      while (current && prevASTMap.has(current)) {
-        const next = prevASTMap.get(current);
-        if (next && this.resolveCache.has(next)) {
-          this.resolveCache.delete(next);
+    // Optimization: Prefill node changes with parents to reduce time spent evaluating the cache validity in computeTree
+    const realNodeChanges = new Set<Node.Node>();
+    for (const node of nodeChanges?.values() ?? []) {
+      let current: Node.Node | undefined = node;
+      while (current) {
+        const original = prevASTMap.get(current) ?? current;
+        // Break early to avoid going up the tree on guaranteed duplicates.
+        if (realNodeChanges.has(original)) {
+          break;
         }
+
+        realNodeChanges.add(original);
         current = current.parent;
       }
-    });
+    }
 
     const updated = this.computeTree(
       this.root,
       undefined,
-      changes,
+      dataChanges,
       resolveCache,
       toNodeResolveOptions(this.options),
       undefined,
       prevASTMap,
-      nextAsyncIdMap,
+      realNodeChanges,
     );
-    this.AsyncIdMap = nextAsyncIdMap;
     this.resolveCache = resolveCache;
     this.hooks.afterUpdate.call(updated.value);
     return updated.value;
@@ -252,7 +249,7 @@ export class Resolver {
     options: Resolve.NodeResolveOptions,
     partiallyResolvedParent: Node.Node | undefined,
     prevASTMap: Map<Node.Node, Node.Node>,
-    nextAsyncIdMap: Map<string, Node.Node>,
+    nodeChanges: Set<Node.Node>,
   ): NodeUpdate {
     const dependencyModel = new DependencyModel(options.data.model);
 
@@ -278,9 +275,10 @@ export class Resolver {
     const previousResult = this.getPreviousResult(node);
     const previousDeps = previousResult?.dependencies;
 
+    const isChanged = nodeChanges.has(node);
     const dataChanged = caresAboutDataChanges(dataChanges, previousDeps);
     const shouldUseLastValue = this.hooks.skipResolve.call(
-      !dataChanged,
+      !dataChanged && !isChanged,
       node,
       resolveOptions,
     );
@@ -304,12 +302,6 @@ export class Resolver {
           updated: false,
         };
         cacheUpdate.set(AST, resolvedUpdate);
-        if (resolvedUpdate.node.type === NodeType.Async) {
-          nextAsyncIdMap.set(resolvedUpdate.node.id, resolvedUpdate.node);
-        }
-        for (const key of resolvedUpdate.node.asyncNodesResolved ?? []) {
-          nextAsyncIdMap.set(key, resolvedUpdate.node);
-        }
 
         /** Helper function for recursing over child node */
         const handleChildNode = (childNode: Node.Node) => {
@@ -359,13 +351,6 @@ export class Resolver {
 
     resolvedAST.parent = partiallyResolvedParent;
 
-    if (resolvedAST.type === NodeType.Async) {
-      nextAsyncIdMap.set(resolvedAST.id, resolvedAST);
-    }
-    for (const id of resolvedAST.asyncNodesResolved ?? []) {
-      nextAsyncIdMap.set(id, resolvedAST);
-    }
-
     resolveOptions.node = resolvedAST;
 
     this.ASTMap.set(resolvedAST, node);
@@ -395,7 +380,7 @@ export class Resolver {
           resolveOptions,
           resolvedAST,
           prevASTMap,
-          nextAsyncIdMap,
+          nodeChanges,
         );
         const {
           dependencies: childTreeDeps,
@@ -437,7 +422,7 @@ export class Resolver {
           resolveOptions,
           resolvedAST,
           prevASTMap,
-          nextAsyncIdMap,
+          nodeChanges,
         );
 
         if (mTree.value !== undefined && mTree.value !== null) {
