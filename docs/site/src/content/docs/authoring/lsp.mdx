@@ -1,14 +1,16 @@
 ---
-title: Player Language Service
+title: Player Language Service (LSP)
 ---
 
 import { Aside, Steps, Badge } from '@astrojs/starlight/components';
 
-The `PlayerLanguageService` is the foundation of all Player Content. It conforms to the Language Server Protocol standards, and the docs refer to this `PlayerLanguageService` as The LSP. The LSP parses JSON to a manipulable Abstract Syntax Tree (AST). It also provides features like Content validation.
+The `PlayerLanguageService` is the foundation for interacting with Player Content. It conforms to the Language Server Protocol standards, and the docs refer to this `PlayerLanguageService` as "The LSP". The LSP parses JSON to a manipulable Abstract Syntax Tree (AST). It also provides features like validating Player Content adheres to both Player semantics and the specifics of the Player integration.
 
-As a user of Player, you will not create your own LSP. The [Player CLI](../capabilities/cli) instantiates an LSP for you. Plugins that manipulate the LSP can be added to the Player CLI (i.e. DSL / CLI plugins). How to create and use DSL / CLI plugins is described in the [Plugins](./plugins) section.
+As a user of Player, you will typically not create your own LSP, rather you'll use one that already integrated into a tool. For example, the [Player CLI](../capabilities/cli) instantiates an LSP for use with content based operations. 
 
-You may interact with an LSP (via a DSL / CLI plugin) in the following ways:
+Plugins that manipulate the LSP can be added to the Player CLI. How to create and use DSL / CLI plugins is described in the [Plugins](./plugins) section.
+
+You may interact with an LSP in the following ways:
 
 - Use its [public properties](#public-properties)
 - Tap into its hooks
@@ -22,7 +24,7 @@ You may interact with an LSP (via a DSL / CLI plugin) in the following ways:
 
 ### `XLRService`
 
-The XLR (Cross Language Representation) service that handles type information and transformations for Player Content. For more information on XLR, see the [XLR documentation](../xlr/intro).
+The XLR (Cross Language Representation) service that handles type information and transformations for XLRs that are used by the LSP. For more information on XLR, see the [XLR documentation](../xlr/intro).
 
 Access the XLR service to add custom transforms or work with type definitions.
 
@@ -300,7 +302,7 @@ Loads type definitions from file paths on disk. These types define the complete 
 
 This function will:
 - Load `/xlr/manifest.json` from the provided paths. E.g. if you provide `./example` as the path, it will load `./example/xlr/manifest.json`.
-- If the path does NOT have `"types"` in the name, some default filters and transforms will be applied. They are defined [here](https://github.com/player-ui/tools/blob/ee81bb095147cf935f42cf7670b057086505db55/language/json-language-service/src/constants.ts#L29-L38).
+- If the path does NOT have `"types"` in the name, some default filters and transforms will be applied. They are defined [here](https://github.com/player-ui/tools/blob/ee81bb095147cf935f42cf7670b057086505db55/language/json-language-service/src/constants.ts#L29-L38). This special handling should be used when you want to load/modify the definition of the base Player types.
 - If the path DOES have `"types"` in the name, these filters and transforms will NOT be applied.
 
 For information on how to generated the `manifest.json`, see the [XLR documentation](../xlr/usage/export#exporting-base-type-definitions).
@@ -335,7 +337,9 @@ Use this instead of `setAssetTypes` if you are using this in a bundled applicati
 
 Loads type definitions from TypeScript manifests into the language service. This method processes each manifest and loads its XLR definitions into the XLRSDK.
 
-If the manifest has a "Types" capability, some default filters and transforms will be applied. They are defined [here](https://github.com/player-ui/tools/blob/ee81bb095147cf935f42cf7670b057086505db55/language/json-language-service/src/constants.ts#L29-L38). If the manifest does NOT have a "Types" capability, no filters or transforms will be applied.
+If the manifest does NOT have a "Types" capability, some default filters and transforms will be applied. They are defined [here](https://github.com/player-ui/tools/blob/ee81bb095147cf935f42cf7670b057086505db55/language/json-language-service/src/constants.ts#L29-L38). This special handling should be used when you want to load/modify the definition of the base Player types.
+
+If the manifest DOES have a "Types" capability, no filters or transforms will be applied. 
 
 For information on how to generated the `TSManifest`, see the [XLR documentation](../xlr/usage/export#exporting-plugin-capabilities).
 
