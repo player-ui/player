@@ -18,11 +18,28 @@ import { getDocsUrl } from "./docs-config.js";
  */
 export function getChangedDocsPages(baseBranch = "origin/main") {
   try {
-    const diffCommand = `git diff --name-only ${baseBranch}...HEAD`;
-    const changedFilesRaw = execSync(diffCommand, {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
-    }).trim();
+    const getChangedFilesRaw = () => {
+      const diffCommand = `git diff --name-only ${baseBranch}...HEAD`;
+      return execSync(diffCommand, {
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "ignore"],
+      }).trim();
+    };
+
+    let changedFilesRaw = "";
+    try {
+      changedFilesRaw = getChangedFilesRaw();
+    } catch {
+      // Best-effort: if the base ref isn't available locally (common in CI), fetch and retry.
+      try {
+        execSync("git fetch --no-tags --quiet origin main", {
+          stdio: ["ignore", "ignore", "ignore"],
+        });
+      } catch {
+        // ignore
+      }
+      changedFilesRaw = getChangedFilesRaw();
+    }
     const changedFiles = changedFilesRaw
       ? changedFilesRaw
           .split("\n")
@@ -32,10 +49,10 @@ export function getChangedDocsPages(baseBranch = "origin/main") {
 
     const hookSourceChanged = changedFiles.some((file) => {
       // Hooks docs are generated during the Bazel docs build and not tracked in git anymore.
-      // To keep PR preview comments useful, we flag the Hooks page when hook *sources* might have changed.
+      // To keep PR preview comments useful, flag the Hooks page when hook-related paths change.
       return (
-        file.startsWith("core/player/src/") ||
-        /^plugins\/[^/]+\/core\/src\//.test(file)
+        // Only: any path segment named "hooks" changes (case-insensitive).
+        /(^|\/)[Hh]ooks(\/|$)/.test(file)
       );
     });
 

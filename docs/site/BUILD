@@ -31,8 +31,9 @@ genrule(
           --typescript-path "$$TS_DIR"
     """,
     local = 1,
-    # Disable remote caching so hooks.mdx reflects current hook sources in CI
-    tags = ["no-sandbox", "no-cache", "no-remote-cache"],
+    # Disable remote caching so hooks.mdx reflects current hook sources in CI.
+    # Avoid `no-cache` here: it can unnecessarily invalidate downstream caching in large docs builds.
+    tags = ["no-sandbox", "no-remote-cache"],
 )
 
 # Generate git-dates.json from Git history
