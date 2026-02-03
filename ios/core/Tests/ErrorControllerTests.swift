@@ -217,7 +217,7 @@ class ErrorControllerTests: XCTestCase {
         
         // Initially no current error
         let initialError = errorController?.getCurrentError()
-        XCTAssertTrue(initialError?.isUndefined ?? true)
+        XCTAssertTrue(initialError?.isUndefined ?? false)
         
         // Capture an error
         let testError = NSError(
@@ -277,7 +277,7 @@ class ErrorControllerTests: XCTestCase {
         XCTAssertEqual(errorsAfterCount, 0)
         
         let currentErrorAfter = errorController?.getCurrentError()
-        XCTAssertTrue(currentErrorAfter?.isUndefined ?? true)
+        XCTAssertTrue(currentErrorAfter?.isUndefined ?? false)
     }
     
     func testClearCurrentError() {
@@ -314,7 +314,7 @@ class ErrorControllerTests: XCTestCase {
         
         // Current error should be cleared
         let currentErrorAfter = errorController?.getCurrentError()
-        XCTAssertTrue(currentErrorAfter?.isUndefined ?? true)
+        XCTAssertTrue(currentErrorAfter?.isUndefined ?? false)
     }
 
     // MARK: - PlayerControllers Integration Test

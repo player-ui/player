@@ -94,12 +94,20 @@ public class BailHook<T>: BaseJSHook where T: CreatedFromJSValue {
      - hook: A function to run when the JS hook is fired, return Bool? to bail (return nil to continue)
      */
     public func tap(_ hook: @escaping (T) -> Bool?) {
-        let tapMethod: @convention(block) (JSValue?) -> Any? = { value in
+        let tapMethod: @convention(block) (JSValue?) -> JSValue? = { [weak self] value in
             guard
+                let self = self,
                 let val = value,
                 let hookValue = T.createInstance(value: val) as? T
             else { return nil }
-            return hook(hookValue)
+            
+            let result = hook(hookValue)
+            if let boolResult = result {
+                // Return JS true/false to bail
+                return JSValue(bool: boolResult, in: self.context)
+            }
+            // Return JS undefined to continue
+            return JSValue(undefinedIn: self.context)
         }
         
         self.hook.invokeMethod("tap", withArguments: [name, JSValue(object: tapMethod, in: context) as Any])
