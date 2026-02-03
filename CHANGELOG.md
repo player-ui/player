@@ -1,3 +1,15 @@
+# 0.15.0-next.7 (Tue Feb 03 2026)
+
+#### 🐛 Bug Fix
+
+- Fix: CI Timeout During Docs Build [#794](https://github.com/player-ui/player/pull/794) ([@kharrop](https://github.com/kharrop))
+
+#### Authors: 1
+
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+
+---
+
 # 0.15.0-next.6 (Thu Jan 29 2026)
 
 ### Release Notes
