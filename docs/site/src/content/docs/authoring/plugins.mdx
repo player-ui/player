@@ -6,11 +6,12 @@ import { Aside, Badge, Steps, Tabs, TabItem } from '@astrojs/starlight/component
 
 # DSL Plugins
 
-Much like the rest of Player, Player's Domain Specific Language (DSL) compilation supports plugins that influence how DSL Content gets compiled into JSON Content. A DSL Plugin is a type of [CLI Plugin](../capabilities/cli#plugins) that uses either:
-1. The hooks available on the CLI itself
-2. The hooks available on the DSL compiler instance created by the CLI.
+Much like the rest of Player, Player's Domain Specific Language (DSL) compilation supports plugins that influence how DSL Content gets compiled into JSON that Player ingests. A DSL Plugin is a type of [CLI Plugin](../../capabilities/cli#plugins) that uses either:
 
-Unlike plugins for the Player, DSL plugins are not implemented per platform. DSL plugins are implemented only once in JSX or TSX.
+1. [The hooks available on the CLI itself](#cli-hooks)
+2. [The hooks available on the DSL compiler instance created by the CLI](#dsl-compiler-hooks)
+
+Unlike plugins for the Player, DSL plugins are not implemented per platform. DSL plugins are implemented only once.
 
 ## Create a DSL Plugin
 
@@ -25,7 +26,7 @@ The class should then implement at least one of the following functions.
 
 ### `onCreateLanguageService`
 
-`onCreateLanguageService` is called right after the [LSP](../lsp) is created, before any validation or compilation has occurred. It allows you to tap into the [LSP's hooks](../lsp#hooks-to-extend-lsp-functionality).
+`onCreateLanguageService` is called right after the [LSP](lsp) is created, before any validation or compilation has occurred. It allows you to tap into the [LSP's hooks](lsp#hooks-to-extend-lsp-functionality).
 
 Here is the function signature:
 
@@ -100,7 +101,7 @@ export class ExampleCLIPlugin implements PlayerCLIPlugin {
 
 ### `onConvertXLR`
 
-`onConvertXLR` is called when [XLRs (Cross Language Representations)](../xlr/intro) are being converted to a language-specific representation. It allows you to add custom transform functions that will be applied during the conversion process.
+`onConvertXLR` is called when [XLRs (Cross Language Representations)](../../xlr/intro) are being converted to a language-specific representation. It allows you to add custom transform functions that will be applied during the conversion process.
 
 Here is the function signature:
 
@@ -176,7 +177,7 @@ export class ExampleCLIPlugin implements PlayerCLIPlugin {
 
 1. Install the plugin package as a dependency in your content project.
 
-2. Create a [CLI config file](../capabilities/cli/#config) in the root of your content project. The Player CLI uses [cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to automatically discover configuration files. See the [CLI documentation](../capabilities/cli/#config) for a complete list of supported config file names and formats.
+2. Create a [CLI config file](../../capabilities/cli/#config) in the root of your content project. The Player CLI uses [cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to automatically discover configuration files. See the [CLI documentation](../../capabilities/cli/#config) for a complete list of supported config file names and formats.
 
 3. Configure your plugin in the config file. The format depends on whether you're using a [JavaScript/TypeScript file](#javascripttypescript-config-files) or a [JSON/YAML file](#jsonyaml-config-files). Instructions for each format are below.
 
