@@ -11,12 +11,31 @@ Config files are able to customize the behavior of the CLI commands without requ
 To resolve a full configuration, the `extension` is taken as the base, the `presets` are applied in order, then local `plugins`.
 The format is similar to `eslint`, `babel` and other .rc/json/js based approaches.
 
-Config files are searched using cosmiconfig, which will look for:
+Config files are searched using [cosmiconfig](https://github.com/cosmiconfig/cosmiconfig), which will look for the following files in order:
 
-- a `player` property in package.json
-- a `.playerrc` file in JSON or YAML format
-- a `.player.json`, `.playerrc.yaml`, `.playerrc.yml`, `.playerrc.js`, or `.playerrc.cjs` file
-- a `player.config.js` or `player.config.cjs` CommonJS module exporting an object
+| File Name | Format |
+|-----------|--------|
+| `package.json` | JSON with a `player` property |
+| `.playerrc` | JSON or YAML |
+| `.playerrc.json` | JSON |
+| `.playerrc.yaml` | YAML |
+| `.playerrc.yml` | YAML |
+| `.playerrc.js` | JavaScript (CommonJS) module exporting an object |
+| `.playerrc.ts` | TypeScript module exporting an object |
+| `.playerrc.mjs` | JavaScript (ES Module) module exporting an object |
+| `.playerrc.cjs` | JavaScript (CommonJS) module exporting an object |
+| `.config/playerrc` | JSON or YAML |
+| `.config/playerrc.json` | JSON |
+| `.config/playerrc.yaml` | YAML |
+| `.config/playerrc.yml` | YAML |
+| `.config/playerrc.js` | JavaScript (CommonJS) module exporting an object |
+| `.config/playerrc.ts` | TypeScript module exporting an object |
+| `.config/playerrc.mjs` | JavaScript (ES Module) module exporting an object |
+| `.config/playerrc.cjs` | JavaScript (CommonJS) module exporting an object |
+| `player.config.js` | JavaScript (CommonJS) module exporting an object |
+| `player.config.ts` | TypeScript module exporting an object |
+| `player.config.mjs` | JavaScript (ES Module) module exporting an object |
+| `player.config.cjs` | JavaScript (CommonJS) module exporting an object |
 
 Example:
 
