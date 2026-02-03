@@ -6,9 +6,9 @@ import { Aside, Steps, Badge } from '@astrojs/starlight/components';
 
 The `PlayerLanguageService` is the foundation for interacting with Player Content. It conforms to the Language Server Protocol standards, and the docs refer to this `PlayerLanguageService` as "The LSP". The LSP parses JSON to a manipulable Abstract Syntax Tree (AST). It also provides features like validating Player Content adheres to both Player semantics and the specifics of the Player integration.
 
-As a user of Player, you will typically not create your own LSP, rather you'll use one that already integrated into a tool. For example, the [Player CLI](../capabilities/cli) instantiates an LSP for use with content based operations. 
+As a user of Player, you will typically not create your own LSP, rather you'll use one that already integrated into a tool. For example, the [Player CLI](../../capabilities/cli) instantiates an LSP for use with content based operations. 
 
-Plugins that manipulate the LSP can be added to the Player CLI. How to create and use DSL / CLI plugins is described in the [Plugins](./plugins) section.
+Plugins that manipulate the LSP can be added to the Player CLI. How to create and use DSL / CLI plugins is described in the [Plugins](../plugins) section.
 
 You may interact with an LSP in the following ways:
 
@@ -24,7 +24,7 @@ You may interact with an LSP in the following ways:
 
 ### `XLRService`
 
-The XLR (Cross Language Representation) service that handles type information and transformations for XLRs that are used by the LSP. For more information on XLR, see the [XLR documentation](../xlr/intro).
+The XLR (Cross Language Representation) service that handles type information and transformations for XLRs that are used by the LSP. For more information on XLR, see the [XLR documentation](../../xlr/intro).
 
 Access the XLR service to add custom transforms or work with type definitions.
 
@@ -244,7 +244,7 @@ lsp.addLSPPlugin({
 
 ### `addXLRTransforms`
 
-Adds custom XLR transform functions to the XLR service. For more information on XLR transforms, see the [XLR documentation](../xlr/concepts#transform-functions).
+Adds custom XLR transform functions to the XLR service. For more information on XLR transforms, see the [XLR documentation](../../xlr/concepts#transform-functions).
 
 <Aside>
 
@@ -271,7 +271,7 @@ addXLRTransforms(transforms: Record<string, TransformFunction>): void
 ```
 
 **Parameters:**
-- `transforms`: An object mapping transform names to `TransformFunction`s. For more details on `TransformFunction`s, see the [XLR documentation](../xlr/concepts#transform-functions).
+- `transforms`: An object mapping transform names to `TransformFunction`s. For more details on `TransformFunction`s, see the [XLR documentation](../../xlr/concepts#transform-functions).
 
 **Example:**
 ```typescript
@@ -305,7 +305,7 @@ This function will:
 - If the path does NOT have `"types"` in the name, some default filters and transforms will be applied. They are defined [here](https://github.com/player-ui/tools/blob/ee81bb095147cf935f42cf7670b057086505db55/language/json-language-service/src/constants.ts#L29-L38). This special handling should be used when you want to load/modify the definition of the base Player types.
 - If the path DOES have `"types"` in the name, these filters and transforms will NOT be applied.
 
-For information on how to generated the `manifest.json`, see the [XLR documentation](../xlr/usage/export#exporting-base-type-definitions).
+For information on how to generated the `manifest.json`, see the [XLR documentation](../../xlr/usage/export#exporting-base-type-definitions).
 
 **Signature:**
 ```typescript
@@ -318,7 +318,7 @@ setAssetTypes(typeFiles: Array<string>): Promise<void>
 **Example:**
 ```typescript
 await lsp.setAssetTypes([
-  "./types", // A local path
+  "../types", // A local path
   path.join(require.resolve('@player-ui/types'), '..', '..'), // A package path
 ]);
 ```
@@ -341,7 +341,7 @@ If the manifest does NOT have a "Types" capability, some default filters and tra
 
 If the manifest DOES have a "Types" capability, no filters or transforms will be applied. 
 
-For information on how to generated the `TSManifest`, see the [XLR documentation](../xlr/usage/export#exporting-plugin-capabilities).
+For information on how to generated the `TSManifest`, see the [XLR documentation](../../xlr/usage/export#exporting-plugin-capabilities).
 
 **Signature:**
 ```typescript
