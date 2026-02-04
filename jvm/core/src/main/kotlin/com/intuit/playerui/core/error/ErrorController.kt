@@ -8,6 +8,7 @@ import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializabl
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializableFunction
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 
 /** Severity levels for errors */
@@ -45,17 +46,19 @@ public object ErrorTypes {
 public class PlayerErrorInfo internal constructor(
     override val node: Node,
 ) : NodeWrapper {
+    /** Nested error object containing message and name */
+    private val error: Node? by NodeSerializableField(Node.serializer().nullable)
+
     /** The error message */
     public val message: String
-        get() = node.getObject("error")?.getString("message") ?: ""
+        get() = error?.getString("message") ?: ""
 
     /** The error name */
     public val name: String
-        get() = node.getObject("error")?.getString("name") ?: ""
+        get() = error?.getString("name") ?: ""
 
     /** Error category */
-    public val errorType: String
-        get() = node.getString("errorType") ?: ""
+    public val errorType: String by NodeSerializableField(String.serializer()) { "" }
 
     /** Impact level */
     public val severity: ErrorSeverity?
