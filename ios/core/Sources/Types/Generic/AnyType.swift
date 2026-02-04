@@ -92,7 +92,7 @@ public enum AnyType: Hashable, Sendable {
      */
     case anyArray(data: [AnyType])
 
-    /// The underlying data was not in a known format
+    /// The underlying data was not in a known format. For example, it was a "null".
     case unknownData
 }
 
@@ -238,13 +238,17 @@ extension AnyType: Decodable {
         } else if let number = try? decoder.singleValueContainer().decode(Double.self) {
             self = .number(data: number)
             return
-        } else if decoder.userInfo[AnyTypeDecodingContext.key] is AnyTypeDecodingContext {
-            // Note: Mixed-type collections (anyDictionary and anyArray) cannot be decoded
-            // through standard JSON decoding due to their heterogeneous nature.
-            // Use AnyTypeDecodingContext when decoding JSON containing mixed types.
         }
-        self = .unknownData
-        return
+        
+        // anyArray, anyDictionary, or "null" (which becomes unknownData)
+        guard let context = decoder.userInfo[AnyTypeDecodingContext.key] as? AnyTypeDecodingContext else {
+            throw AnyTypeDecodingError.missingDecodingContext
+        }
+
+        /* Handle mixed-type collections using the context. We could handle every case with this,
+         but it would be slower because of the JSON serialization. So we only use this for anyArray
+         and anyDictionary */
+        self = try context.decode(path: decoder.codingPath)
     }
 }
 
@@ -314,23 +318,35 @@ extension AnyType: Encodable {
 
 /**
  Context for decoding mixed-type collections (anyDictionary and anyArray)
- 
- This context provides access to the raw JSON data to enable decoding of heterogeneous
+
+ This context turns serializes the data into JSON data to enable decoding of heterogeneous
  collections that cannot be directly decoded through Swift's standard Codable system.
- 
+
  - Note: Required when decoding JSON containing mixed-type arrays or dictionaries
  */
 public struct AnyTypeDecodingContext {
     static let key = CodingUserInfoKey(rawValue: "AnyTypeDecodingContext")!
 
-    public var rawData: Data
+    private var rawData: Data
 
     public init(rawData: Data) {
         self.rawData = rawData
     }
 
+    /// Injects this context into a JSONDecoder's userInfo for use during decoding
+    public func inject(to decoder: JSONDecoder) -> JSONDecoder {
+        decoder.userInfo[AnyTypeDecodingContext.key] = self
+        return decoder
+    }
+
+    /// Decodes the raw JSON data at the given coding path to AnyType
+    func decode(path: [CodingKey]) throws -> AnyType {
+        let obj = try objectFor(path: path)
+        return Self.decode(from: obj)
+    }
+
     /// Retrieves the object at the given coding path from the raw JSON data
-    public func objectFor(path: [CodingKey]) throws -> Any {
+    private func objectFor(path: [CodingKey]) throws -> Any {
         let jsonData = try JSONSerialization.jsonObject(with: rawData)
         return traverse(path: path, in: jsonData)
     }
@@ -345,9 +361,63 @@ public struct AnyTypeDecodingContext {
         }
     }
 
-    /// Injects this context into a JSONDecoder's userInfo for use during decoding
-    public func inject(to decoder: JSONDecoder) -> JSONDecoder {
-        decoder.userInfo[AnyTypeDecodingContext.key] = self
-        return decoder
+    /// Decodes a raw JSON object to AnyType
+    private static func decode(from value: Any) -> AnyType {
+        // Handle primitives
+        if let string = value as? String {
+            return .string(data: string)
+        } else if let bool = value as? Bool {
+            return .bool(data: bool)
+        } else if let number = value as? Double {
+            return .number(data: number)
+        } else if let number = value as? Int {
+            return .number(data: Double(number))
+        } else if let dict = value as? [String: Any] {
+            // Check if it's a homogeneous dictionary first (better performance)
+            if let stringDict = dict as? [String: String] {
+                return .dictionary(data: stringDict)
+            } else if let numberDict = dict as? [String: Double] {
+                return .numberDictionary(data: numberDict)
+            } else if let boolDict = dict as? [String: Bool] {
+                return .booleanDictionary(data: boolDict)
+            }
+            // Mixed dictionary - recurse
+            var result: [String: AnyType] = [:]
+            for (key, val) in dict {
+                result[key] = decode(from: val)
+            }
+            return .anyDictionary(data: result)
+        } else if let array = value as? [Any] {
+            // Check if it's a homogeneous array first (better performance)
+            if let stringArray = array as? [String] {
+                return .array(data: stringArray)
+            } else if let numberArray = array as? [Double] {
+                return .numberArray(data: numberArray)
+            } else if let boolArray = array as? [Bool] {
+                return .booleanArray(data: boolArray)
+            }
+            // Mixed array - recurse
+            var result: [AnyType] = []
+            for val in array {
+                result.append(decode(from: val))
+            }
+            return .anyArray(data: result)
+        }
+        return .unknownData
+    }
+}
+
+public enum AnyTypeDecodingError: Error {
+    case missingDecodingContext
+
+    public var localizedDescription: String {
+        switch self {
+        case .missingDecodingContext:
+            return """
+            Attempted to decode data as an AnyType.anyArray, AnyType.anyDictionary, or AnyType.unknownData but `AnyTypeDecodingContext` is missing.
+            Create a context with `let context = AnyTypeDecodingContext(rawData: data)`.
+            Add the context to the decoder's userInfo by calling `context.inject(to: decoder)`.
+            """
+        }
     }
 }
