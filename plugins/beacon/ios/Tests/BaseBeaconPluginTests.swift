@@ -119,8 +119,8 @@ class BaseBeaconPluginTests: XCTestCase {
             switch beacon.data {
             case .anyDictionary(let dict):
                 XCTAssertEqual(2, dict.keys.count)
-                XCTAssertEqual("example", dict["data"] as? String)
-                XCTAssertEqual(3, dict["value"] as? Double)
+                XCTAssertEqual("example", dict["data"]?.as(String.self))
+                XCTAssertEqual(3, dict["value"]?.as(Double.self))
             default:
                 XCTFail("beacon data was not anyDictionary")
             }
@@ -132,7 +132,7 @@ class BaseBeaconPluginTests: XCTestCase {
             action: BeaconAction.clicked.rawValue,
             element: BeaconElement.button.rawValue,
             asset: BeaconableAsset(id: "test"),
-            data: .anyDictionary(data: ["data": "example", "value": 3])
+            data: .anyDictionary(data: ["data": .string(data: "example"), "value": .number(data: 3)])
         ))
         wait(for: [expectation], timeout: 2)
     }
