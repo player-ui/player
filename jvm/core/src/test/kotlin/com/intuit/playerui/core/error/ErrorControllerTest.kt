@@ -156,8 +156,9 @@ internal class ErrorControllerTest : PlayerTest() {
     fun `get current error`() {
         // Initially no current error
         val initialError = errorController.getCurrentError()
-        // In JS, getCurrentError returns undefined when no error, which becomes null in Kotlin
-        assertTrue(initialError == null || initialError.isUndefined())
+        // In JS, getCurrentError returns undefined when no error
+        assertNotNull(initialError)
+        assertTrue(initialError!!.isUndefined())
 
         // Capture an error
         errorController.captureError(
@@ -169,7 +170,7 @@ internal class ErrorControllerTest : PlayerTest() {
         // Now should have a current error
         val currentError = errorController.getCurrentError()
         assertNotNull(currentError)
-        assertFalse(currentError.isUndefined())
+        assertFalse(currentError!!.isUndefined())
 
         val errorInfo = PlayerErrorInfo(currentError)
         assertEquals("Current error", errorInfo.message)
@@ -193,16 +194,18 @@ internal class ErrorControllerTest : PlayerTest() {
 
         val currentErrorBeforeClear = errorController.getCurrentError()
         assertNotNull(currentErrorBeforeClear)
-        assertFalse(currentErrorBeforeClear.isUndefined())
+        assertFalse(currentErrorBeforeClear!!.isUndefined())
 
         // Clear all errors
         errorController.clearErrors()
 
         val errorsAfterClear = errorController.getErrors()
-        assertTrue(errorsAfterClear?.isEmpty() ?: true)
+        assertNotNull(errorsAfterClear)
+        assertTrue(errorsAfterClear!!.isEmpty())
 
         val currentErrorAfterClear = errorController.getCurrentError()
-        assertTrue(currentErrorAfterClear == null || currentErrorAfterClear.isUndefined())
+        assertNotNull(currentErrorAfterClear)
+        assertTrue(currentErrorAfterClear!!.isUndefined())
     }
 
     @TestTemplate
@@ -222,7 +225,7 @@ internal class ErrorControllerTest : PlayerTest() {
 
         val currentErrorBeforeClear = errorController.getCurrentError()
         assertNotNull(currentErrorBeforeClear)
-        assertFalse(currentErrorBeforeClear.isUndefined())
+        assertFalse(currentErrorBeforeClear!!.isUndefined())
 
         // Clear only current error
         errorController.clearCurrentError()
@@ -233,7 +236,8 @@ internal class ErrorControllerTest : PlayerTest() {
 
         // Current error should be cleared
         val currentErrorAfterClear = errorController.getCurrentError()
-        assertTrue(currentErrorAfterClear == null || currentErrorAfterClear.isUndefined())
+        assertNotNull(currentErrorAfterClear)
+        assertTrue(currentErrorAfterClear!!.isUndefined())
     }
 
     @TestTemplate
