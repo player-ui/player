@@ -156,9 +156,7 @@ internal class ErrorControllerTest : PlayerTest() {
     fun `get current error`() {
         // Initially no current error
         val initialError = errorController.getCurrentError()
-        // In JS, getCurrentError returns undefined when no error
-        assertNotNull(initialError)
-        assertTrue(initialError!!.isUndefined())
+        assertNull(initialError)
 
         // Capture an error
         errorController.captureError(
@@ -204,8 +202,7 @@ internal class ErrorControllerTest : PlayerTest() {
         assertTrue(errorsAfterClear!!.isEmpty())
 
         val currentErrorAfterClear = errorController.getCurrentError()
-        assertNotNull(currentErrorAfterClear)
-        assertTrue(currentErrorAfterClear!!.isUndefined())
+        assertNull(currentErrorAfterClear)
     }
 
     @TestTemplate
@@ -236,15 +233,14 @@ internal class ErrorControllerTest : PlayerTest() {
 
         // Current error should be cleared
         val currentErrorAfterClear = errorController.getCurrentError()
-        assertNotNull(currentErrorAfterClear)
-        assertTrue(currentErrorAfterClear!!.isUndefined())
+        assertNull(currentErrorAfterClear)
     }
 
     @TestTemplate
     fun `error controller accessible via controllers`() {
         val state = player.state as InProgressState
         val controllers = state.controllers
-        
+
         assertNotNull(controllers.data)
         assertNotNull(controllers.flow)
         assertNotNull(controllers.view)
