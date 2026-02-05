@@ -9,3 +9,69 @@ TBA
 ## Breaking Changes
 
 Below is a detailed guide explaining all the breaking changes we have made as part of this 1.0 release. 
+
+### `.anyArray` and `.anyDictionary` use `AnyType`
+
+The `AnyType` enum now conforms to `Sendable` protocol and is concurrency-safe. This required removing all APIs that depended on the `Any` type:
+
+```swift
+// Before
+case anyDictionary(data: [String: Any])
+case anyArray(data: [Any])
+
+// After  
+case anyDictionary(data: [String: AnyType])
+case anyArray(data: [AnyType])
+```
+
+#### Migration
+Use `AnyType` cases directly instead of converting from/to `Any`:
+
+```swift
+// Old (removed)
+let anyType = AnyType.anyDictionary(data: ["key": "value"])
+let anyArray = AnyType.anyArray(data: ["key", 2])
+
+// New (Sendable-safe)  
+let anyType = AnyType.anyDictionary(data: ["key": .string(data: "value")])
+let anyArray = AnyType.anyArray(data: [.string(data: "key"), .number(data: 2)])
+```
+
+### `AnyType` will only decode `.unknownData` with `AnyTypeDecodingContext`
+
+Users are required to provide `AnyTypeDecodingContext` when attempting to decode `anyArray` or `anyDictionary`. The decoder will throw if we need the context but one is not provided. As a side effect of this, `.unknownData` will only be returned when a context is provided. For example:
+
+```swift
+// Before, decoding data = "null"
+let anyType = try? JSONDecoder() // no context
+    .decode(AnyType.self, from: data) // This will return .unknownData
+
+// After, decoding data = "null"
+let anyType = try? JSONDecoder() // no context
+    .decode(AnyType.self, from: data) // This will throw an error
+
+let anyType = try? AnyTypeDecodingContext(rawData: data) // with context
+            .inject(to: JSONDecoder())
+            .decode(AnyType.self, from: data) // This will return .unknownData
+```
+
+### `AnyTypeDecodingContext.objectFor` is no longer `public`.
+
+All decoding of `AnyType` is now handled internally. So `AnyTypeDecodingContext.objectFor(path: [CodingKey]) throws -> Any` is no longer exposed to users.
+
+## New Features
+
+### Convenience Methods for `AnyType`
+
+Added `as<T>(_:)` convenience method and `AnyType` (`anyDictionary`) subscripting for type-safe value extraction:
+
+```swift
+// Before
+if case let .anyDictionary(myDict) = anyType,
+    let title = myDict["title"] as? String {
+    // Do a thing
+}
+
+// After
+let title: String? = anyType["title"]?.as(String.self)
+```
