@@ -150,10 +150,88 @@ export class FlowInstance {
     return this.flowPromise.promise;
   }
 
+  /**
+   * Get the flow-level error transitions map
+   */
+  public getFlowErrorTransitions(): Record<string, string> | undefined {
+    return this.flow.errorTransitions;
+  }
+
+  /**
+   * Helper to lookup a key in a map with wildcard fallback
+   */
+  private lookupInMap(
+    map: Record<string, string> | undefined,
+    key: string,
+  ): string | undefined {
+    if (!map) return undefined;
+    return map[key] || map["*"];
+  }
+
+  /**
+   * Navigate using errorTransitions map.
+   * Tries node-level first, then falls back to flow-level.
+   * Bypasses validation hooks and expression resolution.
+   * @throws Error if errorTransitions references a non-existent state
+   */
+  public errorTransition(errorType: string): void {
+    // Can't navigate from END state
+    if (this.currentState?.value.state_type === "END") {
+      this.log?.warn("Cannot error transition from END state");
+      return;
+    }
+
+    // Try node-level errorTransitions (only if we have a current state)
+    if (this.currentState) {
+      const nodeState = this.lookupInMap(
+        this.currentState.value.errorTransitions,
+        errorType,
+      );
+
+      if (nodeState) {
+        if (!Object.prototype.hasOwnProperty.call(this.flow, nodeState)) {
+          this.log?.debug(
+            `Node-level errorTransition references non-existent state "${nodeState}", trying flow-level fallback`,
+          );
+          // Fall through to try flow-level
+        } else {
+          this.log?.debug(
+            `Error transition (node-level) from ${this.currentState.name} to ${nodeState} using ${errorType}`,
+          );
+          return this.pushHistory(nodeState);
+        }
+      }
+    }
+
+    // Try flow-level errorTransitions
+    const flowState = this.lookupInMap(this.flow.errorTransitions, errorType);
+
+    if (flowState) {
+      // Validate state exists before navigating
+      if (!Object.prototype.hasOwnProperty.call(this.flow, flowState)) {
+        this.log?.debug(
+          `Flow-level errorTransition references non-existent state "${flowState}"`,
+        );
+        // No valid transition found, will warn below
+      } else {
+        this.log?.debug(
+          `Error transition (flow-level) to ${flowState} using ${errorType}${this.currentState ? ` from ${this.currentState.name}` : ""}`,
+        );
+        return this.pushHistory(flowState);
+      }
+    }
+
+    // No match found
+    this.log?.warn(
+      `No errorTransition found for ${errorType} (checked node and flow level)`,
+    );
+  }
+
   public transition(
     transitionValue: string,
     options?: TransitionOptions,
   ): void {
+    // Check if we can transition
     if (this.isTransitioning) {
       throw new Error(
         `Transitioning while ongoing transition from ${this.currentState?.name} is in progress is not supported`,
@@ -162,9 +240,8 @@ export class FlowInstance {
 
     if (this.currentState?.value.state_type === "END") {
       this.log?.warn(
-        `Skipping transition using ${transitionValue}. Already at and END state`,
+        `Skipping transition using ${transitionValue}. Already at END state`,
       );
-
       return;
     }
 
@@ -172,6 +249,9 @@ export class FlowInstance {
       throw new Error("Cannot transition when there's no current state");
     }
 
+    const currentState = this.currentState.value;
+
+    // For normal transitions: use hooks
     if (options?.force) {
       this.log?.debug(`Forced transition. Skipping validation checks`);
     } else {
@@ -186,7 +266,7 @@ export class FlowInstance {
     }
 
     const state = this.hooks.beforeTransition.call(
-      this.currentState.value,
+      currentState as Exclude<NavigationFlowState, NavigationFlowEndState>,
       transitionValue,
     );
 
@@ -232,7 +312,9 @@ export class FlowInstance {
     const prevState = this.currentState;
 
     this.isTransitioning = true;
-    nextState = this.hooks.resolveTransitionNode.call(nextState);
+    nextState = this.hooks.resolveTransitionNode.call(
+      nextState as NavigationFlowState,
+    );
 
     const newCurrentState = {
       name: stateName,
