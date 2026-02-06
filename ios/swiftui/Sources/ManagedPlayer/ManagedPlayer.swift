@@ -178,6 +178,7 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
                 case .loading, .loaded:
                     /// to prevent alternative between loaded and loading state when flows reach multiple non VIEW states after another causing flickering of the loading spinner, change the opacity to show either the loading view or the player view
                     ZStack {
+                        // use isViewLoaded to determine when the loader is shown instead of checking for .loading case
                         loading().opacity(isViewLoaded ? 0 : 1)
                         
                         if case .loaded(let flow) = viewModel.loadingState {
