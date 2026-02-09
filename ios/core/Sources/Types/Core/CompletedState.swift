@@ -26,6 +26,9 @@ public class PlayerControllers {
     /// The ExpressionEvaluator for the current flow
     public let expression: ExpressionEvaluator
 
+    /// The ErrorController for the current flow
+    public let error: ErrorController
+
     public init?(from value: JSValue?) {
         guard let controllers = value else { return nil }
         rawValue = controllers
@@ -33,6 +36,7 @@ public class PlayerControllers {
         flow = FlowController.createInstance(value: rawValue.objectForKeyedSubscript("flow"))
         view = ViewController.createInstance(value: rawValue.objectForKeyedSubscript("view"))
         expression = ExpressionEvaluator.createInstance(value: rawValue.objectForKeyedSubscript("expression"))
+        error = ErrorController.createInstance(value: rawValue.objectForKeyedSubscript("error"))
     }
 }
 
