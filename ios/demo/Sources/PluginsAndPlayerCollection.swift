@@ -61,7 +61,7 @@ public struct PluginsAndPlayerCollection: View {
                 }.accessibility(identifier: "Reuse already loaded flow")
                 
                 NavigationLink("Simple Flows") {
-                    FlowManagerView(flowSequence: [.firstFlow, .firstFlow], navTitle: "Simple Flows")
+                    FlowManagerView(flowSequence: [.firstFlow, .secondFlow], navTitle: "Simple Flows")
                         .padding(padding)
                 }.accessibility(identifier: "Simple Flows")
                 NavigationLink("Error Content Flow") {

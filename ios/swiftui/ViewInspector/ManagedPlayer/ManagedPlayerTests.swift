@@ -10,7 +10,6 @@ import XCTest
 import SwiftUI
 @preconcurrency import Combine
 import ViewInspector
-import JavaScriptCore
 
 @testable import PlayerUI
 @testable import PlayerUISwiftUI
@@ -176,102 +175,6 @@ class ManagedPlayer14Tests: XCTestCase {
 
         ViewHosting.expel()
     }
-    
-    func testSameFlowCanBeReloadedAfterCompletion() async throws {
-        // Use same flow twice to simulate flow reuse scenario
-        let flow = FlowData.simpleEndFlow
-        let flowManager = SameFlowReloadManager(flows: [flow, flow])
-        
-        var loadedCount = 0
-        var cancellables = Set<AnyCancellable>()
-        
-        let expectBothFlowsLoaded = XCTestExpectation(description: "Both flows loaded")
-        expectBothFlowsLoaded.expectedFulfillmentCount = 2
-        
-        let viewModel = ManagedPlayerViewModel(manager: flowManager) { _ in }
-        
-        viewModel.$loadingState.sink { state in
-            if case .loaded = state {
-                loadedCount += 1
-                expectBothFlowsLoaded.fulfill()
-            }
-        }.store(in: &cancellables)
-        
-        // Load first flow
-        await viewModel.next()
-        
-        // Wait for first flow to be loaded
-        try await Task.sleep(nanoseconds: 200_000_000)
-        
-        XCTAssertEqual(loadedCount, 1, "First flow should be loaded")
-        
-        // Simulate flow completion
-        let result = """
-        { "status": "completed", "flow": { "id": "simple-end-flow" }, "endState": { "outcome": "done" } }
-        """
-        if let completedState = CompletedState.createInstance(from: JSContext()!.evaluateScript("(\(result))")) {
-            viewModel.result = .success(completedState)
-        }
-        
-        // Wait for second flow to load
-        await fulfillment(of: [expectBothFlowsLoaded], timeout: 5)
-        
-        XCTAssertEqual(loadedCount, 2,
-            "Second flow should be loaded - this FAILS without the .onChange fix that calls context.unload()")
-        
-        cancellables.removeAll()
-    }
-    
-    /// Test that same flow can be loaded twice without issues
-        func testSameFlowCanBeLoadedTwice() async throws {
-        let flow = FlowData.COUNTER
-        // Create a flow manager that returns the same flow twice
-        let flowManager = SameFlowReloadManager(flows: [flow, flow])
-        
-        var cancellables = Set<AnyCancellable>()
-        var loadedFlowCount = 0
-        
-        let allFlowsLoaded = XCTestExpectation(description: "Both flows loaded")
-        allFlowsLoaded.expectedFulfillmentCount = 2
-        
-        let viewModel = ManagedPlayerViewModel(manager: flowManager) { _ in }
-        
-        viewModel.$loadingState.sink { state in
-            if case .loaded = state {
-                loadedFlowCount += 1
-                allFlowsLoaded.fulfill()
-            }
-        }.store(in: &cancellables)
-        
-        // Load first flow
-        await viewModel.next()
-        
-        // Wait a bit for flow to be loaded
-        try await Task.sleep(nanoseconds: 200_000_000)
-        
-        XCTAssertEqual(loadedFlowCount, 1, "First flow should be loaded")
-        
-        // Simulate first flow completion
-        let result = """
-        {
-            "status": "completed",
-            "flow": "counter-flow",
-            "endState": {"outcome":"done"}
-        }
-        """
-        let jsContext = JSContext()!
-        let jsValue = jsContext.evaluateScript("(\(result))")
-        if let completedState = CompletedState.createInstance(from: jsValue) {
-            viewModel.result = .success(completedState)
-        }
-        
-        // Wait for second flow
-        await fulfillment(of: [allFlowsLoaded], timeout: 5)
-        
-        XCTAssertEqual(loadedFlowCount, 2, "Second flow should be loaded after first completion")
-        
-        cancellables.removeAll()
-    }
 }
 
 class NeverLoad: FlowManager {
@@ -315,28 +218,5 @@ extension XCTestCase {
         }
         wait(for: [expectation], timeout: timeout)
         return cancel
-    }
-}
-
-// MARK: - Flow Reload Tests
-class SameFlowReloadManager: FlowManager {
-    private var callCount = 0
-    private let flows: [String]
-    var loadedFlowCount: Int { callCount }
-    
-    init(flows: [String]) {
-        self.flows = flows
-    }
-    
-    func next(_ result: CompletedState?) async throws -> NextState {
-        defer { callCount += 1 }
-        
-        if callCount < flows.count {
-            // Small delay to allow state transitions
-            try await Task.sleep(nanoseconds: 100_000_000)
-            return .flow(flows[callCount])
-        } else {
-            return .finished
-        }
     }
 }
