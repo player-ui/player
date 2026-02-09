@@ -180,26 +180,26 @@ internal struct ManagedPlayer14<Loading: View, Fallback: View>: View {
                     ZStack {
                         // use isViewLoaded to determine when the loader is shown instead of checking for .loading case
                         loading().onAppear {
-                                                    guard case .loading = viewModel.loadingState else {
-                                                        return
-                                                    }
-                                                    
-                                                    // only call unload if were in loading state
-                                                    context.unload()
-                                                }.opacity(isViewLoaded ? 0 : 1)
+                            guard case .loading = viewModel.loadingState else {
+                                return
+                            }
+                            
+                            // only call unload if were in loading state
+                            context.unload()
+                        }.opacity(isViewLoaded ? 0 : 1)
                         if case .loaded(let flow) = viewModel.loadingState {
                             makePlayerView(flow: flow).opacity(isViewLoaded ? 1 : 0)
                         }
                     }
                     /*.onChange(of: viewModel.loadingState) { newState in
-                        if case .loading = newState {
-                            context.logger.d("loadingState changed to .loading - calling context.unload()")
-                            // only call unload if were in loading state
-                            context.unload()
-                        } else if case .loaded(let flow) = newState {
-                            context.logger.d("loadingState changed to .loaded")
-                        }
-                    } */
+                     if case .loading = newState {
+                     context.logger.d("loadingState changed to .loading - calling context.unload()")
+                     // only call unload if were in loading state
+                     context.unload()
+                     } else if case .loaded(let flow) = newState {
+                     context.logger.d("loadingState changed to .loaded")
+                     }
+                     } */
                 }
             }
         }
