@@ -52,8 +52,16 @@ public struct PluginsAndPlayerCollection: View {
 
             // Managed Player flows
             Section {
+                NavigationLink("Reuse already loaded flow") {
+                    FlowManagerView(
+                        flowSequence: [MockFlows.endStateReproFlow, MockFlows.endStateReproFlow],
+                        navTitle: "Reuse already loaded flow"
+                    )
+                    .padding(padding)
+                }.accessibility(identifier: "Reuse already loaded flow")
+                
                 NavigationLink("Simple Flows") {
-                    FlowManagerView(flowSequence: [.firstFlow, .secondFlow], navTitle: "Simple Flows")
+                    FlowManagerView(flowSequence: [.firstFlow, .firstFlow], navTitle: "Simple Flows")
                         .padding(padding)
                 }.accessibility(identifier: "Simple Flows")
                 NavigationLink("Error Content Flow") {

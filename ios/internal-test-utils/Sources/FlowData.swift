@@ -233,4 +233,56 @@ public struct FlowData {
     }
 
     """
+    
+    static let simpleEndFlow: String = """
+    {
+      "id": "simple-end-flow",
+      "views": [
+        {
+          "id": "view-1",
+          "type": "collection",
+          "label": {
+            "asset": {
+              "id": "title",
+              "type": "text",
+              "value": "Click End to complete"
+            }
+          },
+          "values": [
+            {
+              "asset": {
+                "id": "action-end",
+                "type": "action",
+                "value": "End",
+                "label": {
+                  "asset": {
+                    "id": "action-end-label",
+                    "type": "text",
+                    "value": "End Flow"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "navigation": {
+        "BEGIN": "FLOW_1",
+        "FLOW_1": {
+          "startState": "VIEW_1",
+          "VIEW_1": {
+            "state_type": "VIEW",
+            "ref": "view-1",
+            "transitions": {
+              "End": "END_Done"
+            }
+          },
+          "END_Done": {
+            "state_type": "END",
+            "outcome": "done"
+          }
+        }
+      }
+    }
+    """
 }
