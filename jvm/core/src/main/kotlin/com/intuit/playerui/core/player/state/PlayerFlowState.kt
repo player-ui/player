@@ -15,6 +15,8 @@ import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializabl
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.playerui.core.data.DataController
 import com.intuit.playerui.core.data.ReadOnlyDataController
+import com.intuit.playerui.core.data.DataModelWithParser
+import com.intuit.playerui.core.error.ErrorController
 import com.intuit.playerui.core.experimental.RuntimeClassDiscriminator
 import com.intuit.playerui.core.expressions.ExpressionController
 import com.intuit.playerui.core.expressions.ExpressionEvaluator
@@ -175,6 +177,9 @@ public class ControllerState internal constructor(
 
     /** the manager for the flow state machine */
     public val flow: FlowController by NodeSerializableField(FlowController.serializer())
+
+    /** The manager for error handling */
+    public val error: ErrorController by NodeSerializableField(ErrorController.serializer())
 
     internal object Serializer : NodeWrapperSerializer<ControllerState>(::ControllerState)
 }
