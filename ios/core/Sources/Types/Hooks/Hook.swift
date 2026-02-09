@@ -82,6 +82,39 @@ public class Hook<T>: BaseJSHook where T: CreatedFromJSValue {
 }
 
 /**
+ This class represents a SyncBailHook in the JS runtime that can be tapped into
+ to receive JS events and optionally return a value to bail/stop further execution
+ */
+public class BailHook<T>: BaseJSHook where T: CreatedFromJSValue {
+    /**
+     Attach a closure to the hook, so when the hook is fired in the JS runtime
+     we receive the event in the native runtime and can return a value to bail
+     
+     - parameters:
+     - hook: A function to run when the JS hook is fired, return Bool? to bail (return nil to continue)
+     */
+    public func tap(_ hook: @escaping (T) -> Bool?) {
+        let tapMethod: @convention(block) (JSValue?) -> JSValue? = { [weak self] value in
+            guard
+                let self = self,
+                let val = value,
+                let hookValue = T.createInstance(value: val) as? T
+            else { return nil }
+            
+            let result = hook(hookValue)
+            if let boolResult = result {
+                // Return JS true/false to bail
+                return JSValue(bool: boolResult, in: self.context)
+            }
+            // Return JS undefined to continue
+            return JSValue(undefinedIn: self.context)
+        }
+        
+        self.hook.invokeMethod("tap", withArguments: [name, JSValue(object: tapMethod, in: context) as Any])
+    }
+}
+
+/**
  This class represents an object in the JS runtime that can be tapped into
  to receive JS events that has 2 parameters
  */

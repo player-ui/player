@@ -8,6 +8,7 @@ import com.intuit.playerui.core.bridge.serialization.serializers.NodeSerializabl
 import com.intuit.playerui.core.bridge.serialization.serializers.NodeWrapperSerializer
 import com.intuit.playerui.core.constants.ConstantsController
 import com.intuit.playerui.core.data.DataController
+import com.intuit.playerui.core.error.ErrorController
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.expressions.ExpressionController
 import com.intuit.playerui.core.flow.Flow
@@ -63,6 +64,9 @@ public abstract class Player : Pluggable {
         /** Manages validations (schema and x-field ) */
         public val validationController: NodeSyncHook1<ValidationController>
 
+        /** Manages error handling and captures errors from all subsystems */
+        public val errorController: NodeSyncHook1<ErrorController>
+
         /** A that's called for state changes in the flow execution */
         public val state: NodeSyncHook1<out PlayerFlowState>
 
@@ -87,6 +91,8 @@ public abstract class Player : Pluggable {
                     by NodeSerializableField(NodeSyncHook1.serializer(DataController.serializer()))
                 override val validationController: NodeSyncHook1<ValidationController>
                     by NodeSerializableField(NodeSyncHook1.serializer(ValidationController.serializer()))
+                override val errorController: NodeSyncHook1<ErrorController>
+                    by NodeSerializableField(NodeSyncHook1.serializer(ErrorController.serializer()))
                 override val state: NodeSyncHook1<out PlayerFlowState>
                     by NodeSerializableField(NodeSyncHook1.serializer(PlayerFlowState.serializer()))
                 override val onStart: NodeSyncHook1<Flow> by NodeSerializableField(NodeSyncHook1.serializer(Flow.serializer()))
