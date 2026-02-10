@@ -14,15 +14,15 @@ const meta: Meta<typeof Action> = {
 export default meta;
 
 export const Basic = createDSLStory(
-  () => import("!!raw-loader!@player-ui/mocks/action/action-basic.tsx"),
+  () => import("@player-ui/mocks/action/action-basic.tsx?raw"),
 );
 
 export const Expression = createDSLStory(
-  () => import("!!raw-loader!@player-ui/mocks/action/action-counter.tsx"),
+  () => import("@player-ui/mocks/action/action-counter.tsx?raw"),
 );
 
 export const Navigation = createDSLStory(
-  () => import("!!raw-loader!@player-ui/mocks/action/action-navigation.tsx"),
+  () => import("@player-ui/mocks/action/action-navigation.tsx?raw"),
 );
 
 export const TransitionToEnd = () => (
