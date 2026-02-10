@@ -1,3 +1,15 @@
+# 0.15.0-next.8 (Tue Feb 10 2026)
+
+#### 🐛 Bug Fix
+
+- fix ios player not detecting view change when same flow reloads [#796](https://github.com/player-ui/player/pull/796) ([@nancywu1](https://github.com/nancywu1))
+
+#### Authors: 1
+
+- [@nancywu1](https://github.com/nancywu1)
+
+---
+
 # 0.15.0-next.7 (Tue Feb 03 2026)
 
 #### 🐛 Bug Fix
