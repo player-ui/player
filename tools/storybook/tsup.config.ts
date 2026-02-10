@@ -1,5 +1,6 @@
 // Based on https://github.com/storybookjs/addon-kit/blob/main/tsup.config.ts
 
+import { builtinModules } from "node:module";
 import { defineConfig, type Options } from "tsup";
 import { globalPackages as globalManagerPackages } from "storybook/internal/manager/globals";
 import { globalPackages as globalPreviewPackages } from "storybook/internal/preview/globals";
@@ -37,7 +38,7 @@ export default defineConfig(async (options) => {
       format: ["esm", "cjs"],
       target: [...BROWSER_TARGET, ...NODE_TARGET],
       platform: "neutral",
-      external: [...globalManagerPackages, ...globalPreviewPackages],
+      external: [...globalManagerPackages, ...globalPreviewPackages, ...builtinModules, ...builtinModules.map((m) => `node:${m}`)],
     });
   }
 

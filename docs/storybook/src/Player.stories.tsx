@@ -1,5 +1,5 @@
 import { createDSLStory } from "@player-ui/storybook";
-import { Meta } from "@storybook/react-webpack5";
+import { Meta } from "@storybook/react-vite";
 
 const meta: Meta = {
   title: "React Player",
@@ -8,5 +8,5 @@ const meta: Meta = {
 export default meta;
 
 export const ReactPlayer = createDSLStory(
-  () => import("!!raw-loader!@player-ui/mocks/action/action-basic.tsx"),
+  () => import("@player-ui/mocks/action/action-basic.tsx?raw"),
 );
