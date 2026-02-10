@@ -1,4 +1,4 @@
-import type { Meta } from "@storybook/react-webpack5";
+import type { Meta } from "@storybook/react-vite";
 import { createDSLStory } from "@player-ui/storybook";
 import { Text } from "@player-ui/reference-assets-plugin-react";
 

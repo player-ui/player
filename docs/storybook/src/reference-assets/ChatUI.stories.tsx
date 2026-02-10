@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-webpack5";
+import { Meta } from "@storybook/react-vite";
 import { createDSLStory } from "@player-ui/storybook";
 
 const meta: Meta = {
