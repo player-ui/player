@@ -6,9 +6,9 @@ import { Aside, Steps, Badge } from '@astrojs/starlight/components';
 
 The `PlayerLanguageService` is the foundation for interacting with Player Content. It conforms to the Language Server Protocol standards, and the docs refer to this `PlayerLanguageService` as "The LSP". The LSP parses JSON to a manipulable Abstract Syntax Tree (AST). It also provides features like validating that Player Content adheres to both Player semantics and the specifics of the Player integration.
 
-As a user of Player, you will typically not create your own LSP, rather you'll use one that already integrated into a tool. For example, the [Player CLI](../../capabilities/cli) instantiates an LSP for use with content based operations. 
+As a user of Player, you will typically not create your own LSP, rather you'll use one that already integrated into a tool. For example, the [Player CLI](../cli) instantiates an LSP for use with content based operations. 
 
-Plugins that manipulate the LSP can be added to the Player CLI. How to create and use CLI plugins is described in the [CLI Pugins](../../capabilities/cli#plugins) section.
+Plugins that manipulate the LSP can be added to the Player CLI. How to create and use CLI plugins is described in the [CLI Plugins](../cli#plugins) section.
 
 You may interact with an LSP in the following ways:
 
@@ -204,7 +204,7 @@ Multiple taps of the LSP hooks and complex logic can be bundled together into a 
 
 <Aside>
 
-The `LSPPluginPlugin` can be applied to the [Player CLI](../../capabilities/cli#lsppluginplugin) config to achieve the same functionality.
+The `LSPPluginPlugin` can be applied to the [Player CLI](../cli#lsppluginplugin) config to achieve the same functionality.
 
 </Aside>
 
@@ -238,7 +238,7 @@ Adds custom XLR transform functions to the XLR service. For more information on 
 
 <Aside>
 
-The `LSPTransformsPlugin` can be applied to the [Player CLI](../../capabilities/cli#lsptransformsplugin) config to achieve the same functionality.
+The `LSPTransformsPlugin` can be applied to the [Player CLI](../cli#lsptransformsplugin) config to achieve the same functionality.
 
 </Aside>
 
@@ -264,7 +264,7 @@ lsp.addXLRTransforms({
 
 <Aside>
 
-The `LSPAssetsPlugin` can be applied to the [Player CLI](../../cli#lspassetsplugin) config to achieve the same functionality.
+The `LSPAssetsPlugin` can be applied to the [Player CLI](../cli#lspassetsplugin) config to achieve the same functionality.
 
 </Aside>
 
