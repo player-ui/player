@@ -71,22 +71,24 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
     override val plugins: List<Plugin>,
     explicitRuntime: Runtime<*>? = null,
     private val source: URL = bundledSource,
-    config: HeadlessPlayerRuntimeConfig = HeadlessPlayerRuntimeConfig(),
+    config: PlayerRuntimeConfig = PlayerRuntimeConfig(),
+    realConfig: HeadlessPlayerRuntimeConfig = HeadlessPlayerRuntimeConfig(config),
 ) : Player(),
     NodeWrapper {
     /** Convenience constructor to allow [plugins] to be passed as varargs */
     @ExperimentalPlayerApi @JvmOverloads
     public constructor(
         vararg plugins: Plugin,
-        config: HeadlessPlayerRuntimeConfig = HeadlessPlayerRuntimeConfig(),
+        config: PlayerRuntimeConfig = PlayerRuntimeConfig(),
         explicitRuntime: Runtime<*>? = null,
         source: URL = bundledSource,
+        realConfig: HeadlessPlayerRuntimeConfig? = null,
     ) : this(plugins.toList(), explicitRuntime, source, config)
 
     public constructor(
         explicitRuntime: Runtime<*>,
         vararg plugins: Plugin,
-    ) : this(plugins.toList(), explicitRuntime, config = HeadlessPlayerRuntimeConfig(explicitRuntime.config))
+    ) : this(plugins.toList(), explicitRuntime, config = explicitRuntime.config)
 
     private val player: Node
 
@@ -108,10 +110,10 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
     }
 
     public val runtime: Runtime<*> = explicitRuntime ?: runtimeFactory.create {
-        debuggable = config.debuggable
-        timeout = config.timeout
+        debuggable = realConfig.debuggable
+        timeout = realConfig.timeout
         coroutineExceptionHandler =
-            config.coroutineExceptionHandler?.invoke(this@HeadlessPlayer) ?: CoroutineExceptionHandler { _, throwable ->
+            realConfig.coroutineExceptionHandler?.invoke(this@HeadlessPlayer) ?: CoroutineExceptionHandler { _, throwable ->
                 if (state !is ReleasedState) {
                     logger.error("[HeadlessPlayer]: Error has been found")
                     inProgressState?.fail(throwable) ?: logger.error(

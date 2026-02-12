@@ -69,7 +69,7 @@ public class AndroidPlayer private constructor(
     public constructor(
         plugins: List<Plugin>,
         config: Config = Config(),
-    ) : this(HeadlessPlayer(plugins.injectDefaultPlugins(), config = config))
+    ) : this(HeadlessPlayer(plugins.injectDefaultPlugins(), realConfig = config))
 
     /**
      * Allow the [AndroidPlayer] to be built on top of a pre-existing

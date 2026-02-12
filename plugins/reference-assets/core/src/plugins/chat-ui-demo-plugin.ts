@@ -63,7 +63,7 @@ export class ChatUiDemoPlugin implements ExtendedPlayerPlugin<[], [], [send]> {
     const sendMessage = (
       context: ExpressionContext,
       nodeId?: string,
-      content?: any,
+      getContent?: () => any,
     ): void => {
       if (nodeId && !(nodeId in deferredPromises)) {
         context.logger?.warn(
@@ -82,7 +82,7 @@ export class ChatUiDemoPlugin implements ExtendedPlayerPlugin<[], [], [send]> {
 
       for (const id of keys) {
         const resolveFunction = deferredPromises[id];
-        resolveFunction?.(content);
+        resolveFunction?.(getContent?.());
         delete deferredPromises[id];
       }
 
@@ -115,9 +115,7 @@ export class ChatUiDemoPlugin implements ExtendedPlayerPlugin<[], [], [send]> {
       message: string,
       nodeId?: string,
     ) => {
-      return sendMessage(
-        context,
-        nodeId,
+      return sendMessage(context, nodeId, () =>
         createContentFromMessage(message, `chat-demo-${counter++}`),
       );
     };
@@ -127,9 +125,7 @@ export class ChatUiDemoPlugin implements ExtendedPlayerPlugin<[], [], [send]> {
       message: string,
       nodeId?: string,
     ) => {
-      return sendMessage(
-        context,
-        nodeId,
+      return sendMessage(context, nodeId, () =>
         createBrokenContentFromMessage(
           message,
           `chat-demo-${counter++}`,
@@ -143,9 +139,7 @@ export class ChatUiDemoPlugin implements ExtendedPlayerPlugin<[], [], [send]> {
       message: string,
       nodeId?: string,
     ) => {
-      return sendMessage(
-        context,
-        nodeId,
+      return sendMessage(context, nodeId, () =>
         createBrokenContentFromMessage(
           message,
           `chat-demo-${counter++}`,
