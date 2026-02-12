@@ -7,6 +7,7 @@ import {
   imageTransform,
   infoTransform,
   inputTransform,
+  throwingTransform,
 } from "../assets";
 import type {
   ActionAsset,
@@ -17,23 +18,22 @@ import type {
   InfoAsset,
   InputAsset,
   TextAsset,
+  ThrowingAsset,
 } from "../assets";
 
-export class ReferenceAssetsTransformPlugin
-  implements
-    ExtendedPlayerPlugin<
-      [
-        ActionAsset,
-        InputAsset,
-        ImageAsset,
-        TextAsset,
-        CollectionAsset,
-        ChoiceAsset,
-        ChatMessageAsset,
-      ],
-      [InfoAsset]
-    >
-{
+export class ReferenceAssetsTransformPlugin implements ExtendedPlayerPlugin<
+  [
+    ActionAsset,
+    InputAsset,
+    ImageAsset,
+    TextAsset,
+    CollectionAsset,
+    ChoiceAsset,
+    ChatMessageAsset,
+    ThrowingAsset,
+  ],
+  [InfoAsset]
+> {
   name = "reference-assets-transforms";
 
   apply(player: Player): void {
@@ -45,6 +45,7 @@ export class ReferenceAssetsTransformPlugin
         [{ type: "info" }, infoTransform],
         [{ type: "choice" }, choiceTransform],
         [{ type: "chat-message" }, chatMessageTransform],
+        [{ type: "throwing" }, throwingTransform],
       ]),
     );
   }

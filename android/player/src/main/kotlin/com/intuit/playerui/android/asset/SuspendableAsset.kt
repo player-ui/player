@@ -52,7 +52,22 @@ public abstract class SuspendableAsset<Data>(
     }
 
     private suspend fun doInitView() = withContext(Dispatchers.Default) {
-        initView(getData()).apply { setTag(R.bool.view_hydrated, false) }
+        // TODO: Centralize some of this error handling so that it can be repeated easily.
+        try {
+            initView(getData()).apply { setTag(R.bool.view_hydrated, false) }
+        } catch (exception: Throwable) {
+            // ignore cancellation exceptions because those are used to rehydrate the view
+            if (exception is CancellationException) {
+                throw exception
+            }
+
+            if (exception is AssetRenderException) {
+                exception.assetParentPath += assetContext
+                throw exception
+            } else {
+                throw AssetRenderException(assetContext, "Failed to render asset", exception)
+            }
+        }
     }
 
     // To be launched in Dispatchers.Main

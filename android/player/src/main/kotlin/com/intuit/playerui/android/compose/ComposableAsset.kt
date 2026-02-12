@@ -24,7 +24,10 @@ import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withTag
+import com.intuit.playerui.core.error.ErrorSeverity
+import com.intuit.playerui.core.error.ErrorTypes
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
+import com.intuit.playerui.core.player.state.inProgressState
 import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
 
@@ -53,7 +56,19 @@ public abstract class ComposableAsset<Data>(
     @Composable
     public fun compose(data: Data? = null) {
         val data: Data? by produceState(initialValue = data, key1 = this) {
-            value = getData()
+            try {
+                value = getData()
+            } catch (error: Throwable) {
+                player.inProgressState?.controllers?.error?.captureError(
+                    error,
+                    ErrorTypes.RENDER,
+                    ErrorSeverity.ERROR,
+                    mapOf(
+                        "assetId" to assetContext.asset.id,
+                    ),
+                )
+                null
+            }
         }
 
         data?.let {
@@ -84,6 +99,7 @@ public abstract class ComposableAsset<Data>(
     ) {
         val assetTag = tag ?: asset.id
         val containerModifier = Modifier.testTag(assetTag) then modifier
+        // TODO: Conditionally call withTag only if tag is provided
         assetContext.withContext(LocalContext.current).withTag(assetTag).build().run {
             renewHydrationScope("Creating view within a ComposableAsset")
             when (this) {

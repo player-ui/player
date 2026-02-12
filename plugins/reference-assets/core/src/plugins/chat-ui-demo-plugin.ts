@@ -22,6 +22,25 @@ const createContentFromMessage = (message: string, id: string): any => ({
   },
 });
 
+const createBrokenContentFromMessage = (
+  message: string,
+  id: string,
+  timing: "render" | "transform",
+): any => ({
+  asset: {
+    type: "chat-message",
+    id,
+    value: {
+      asset: {
+        type: "throwing",
+        id: `${id}-value`,
+        value: message,
+        timing,
+      },
+    },
+  },
+});
+
 export class ChatUiDemoPlugin implements ExtendedPlayerPlugin<[], [], [send]> {
   public readonly name = "chat-ui-demo-plugin";
 
@@ -41,10 +60,10 @@ export class ChatUiDemoPlugin implements ExtendedPlayerPlugin<[], [], [send]> {
     let allPromiseKeys: string[] = [];
     let counter = 0;
 
-    const sendMessage: send = (
+    const sendMessage = (
       context: ExpressionContext,
-      message: string,
       nodeId?: string,
+      content?: any,
     ): void => {
       if (nodeId && !(nodeId in deferredPromises)) {
         context.logger?.warn(
@@ -62,10 +81,6 @@ export class ChatUiDemoPlugin implements ExtendedPlayerPlugin<[], [], [send]> {
       const keys = nodeId ? [nodeId] : allPromiseKeys;
 
       for (const id of keys) {
-        const content = createContentFromMessage(
-          message,
-          `chat-demo-${counter++}`,
-        );
         const resolveFunction = deferredPromises[id];
         resolveFunction?.(content);
         delete deferredPromises[id];
@@ -95,6 +110,50 @@ export class ChatUiDemoPlugin implements ExtendedPlayerPlugin<[], [], [send]> {
       });
     });
 
+    const sendRealMessage: send = (
+      context: ExpressionContext,
+      message: string,
+      nodeId?: string,
+    ) => {
+      return sendMessage(
+        context,
+        nodeId,
+        createContentFromMessage(message, `chat-demo-${counter++}`),
+      );
+    };
+
+    const sendBrokenMessage: send = (
+      context: ExpressionContext,
+      message: string,
+      nodeId?: string,
+    ) => {
+      return sendMessage(
+        context,
+        nodeId,
+        createBrokenContentFromMessage(
+          message,
+          `chat-demo-${counter++}`,
+          "render",
+        ),
+      );
+    };
+
+    const sendBrokenTransformMessage: send = (
+      context: ExpressionContext,
+      message: string,
+      nodeId?: string,
+    ) => {
+      return sendMessage(
+        context,
+        nodeId,
+        createBrokenContentFromMessage(
+          message,
+          `chat-demo-${counter++}`,
+          "transform",
+        ),
+      );
+    };
+
     // Reset at the start of a new view.
     player.hooks.view.tap(this.name, (_) => {
       deferredPromises = {};
@@ -104,7 +163,11 @@ export class ChatUiDemoPlugin implements ExtendedPlayerPlugin<[], [], [send]> {
 
     // Register 'send' expression
     const expressionPlugin = new ExpressionPlugin(
-      new Map([["send", sendMessage]]),
+      new Map([
+        ["send", sendRealMessage],
+        ["sendBroken", sendBrokenMessage],
+        ["sendBrokenTransform", sendBrokenTransformMessage],
+      ]),
     );
     player.registerPlugin(expressionPlugin);
   }

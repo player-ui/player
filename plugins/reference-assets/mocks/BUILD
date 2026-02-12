@@ -21,6 +21,7 @@ compile_mocks(
         "input",
         "text",
         "chat-message",
+        "throwing"
     ],
     dsl_config = ":dsl_config",
     data = [

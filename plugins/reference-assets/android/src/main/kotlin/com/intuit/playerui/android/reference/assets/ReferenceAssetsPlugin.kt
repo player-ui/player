@@ -13,6 +13,7 @@ import com.intuit.playerui.android.reference.assets.collection.Collection
 import com.intuit.playerui.android.reference.assets.info.Info
 import com.intuit.playerui.android.reference.assets.input.Input
 import com.intuit.playerui.android.reference.assets.text.Text
+import com.intuit.playerui.android.reference.assets.throwing.Throwing
 import com.intuit.playerui.core.player.Player
 import com.intuit.playerui.core.plugins.JSPluginWrapper
 import com.intuit.playerui.core.plugins.findPlugin
@@ -36,6 +37,7 @@ class ReferenceAssetsPlugin :
         androidPlayer.registerAsset("info", ::Info)
         androidPlayer.registerAsset("badge", ::Badge)
         androidPlayer.registerAsset("input", ::Input)
+        androidPlayer.registerAsset("throwing", ::Throwing)
     }
 
     fun handleLink(ref: String, context: Context) = startActivity(

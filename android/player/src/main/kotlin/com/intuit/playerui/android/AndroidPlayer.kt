@@ -8,6 +8,7 @@ import com.intuit.hooks.HookContext
 import com.intuit.hooks.SyncBailHook
 import com.intuit.hooks.SyncHook
 import com.intuit.hooks.SyncWaterfallHook
+import com.intuit.playerui.android.asset.AssetRenderException
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.SuspendableAsset.AsyncHydrationTrackerPlugin
 import com.intuit.playerui.android.extensions.Styles
@@ -18,12 +19,15 @@ import com.intuit.playerui.android.registry.RegistryPlugin
 import com.intuit.playerui.core.asset.Asset
 import com.intuit.playerui.core.bridge.Completable
 import com.intuit.playerui.core.bridge.format
-import com.intuit.playerui.core.bridge.runtime.PlayerRuntimeConfig
 import com.intuit.playerui.core.bridge.serialization.format.registerContextualSerializer
 import com.intuit.playerui.core.constants.ConstantsController
+import com.intuit.playerui.core.error.ErrorSeverity
+import com.intuit.playerui.core.error.ErrorTypes
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.logger.TapableLogger
+import com.intuit.playerui.core.player.GetCoroutineFunction
 import com.intuit.playerui.core.player.HeadlessPlayer
+import com.intuit.playerui.core.player.HeadlessPlayerRuntimeConfig
 import com.intuit.playerui.core.player.Player
 import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.player.state.CompletedState
@@ -353,7 +357,25 @@ public class AndroidPlayer private constructor(
 
     public data class Config(
         override var debuggable: Boolean = false,
-        override var coroutineExceptionHandler: CoroutineExceptionHandler? = null,
+        // TODO: Find an alternative to changing the type here or improve the API to make a little more sense
+        override var coroutineExceptionHandler: GetCoroutineFunction? = { player ->
+            CoroutineExceptionHandler { _, throwable ->
+                var metadata: Map<String, Any?>? = null
+                if (throwable is AssetRenderException) {
+                    metadata = mapOf(
+                        "assetId" to throwable.rootAsset.asset.id,
+                    )
+                }
+                player.inProgressState?.controllers?.error?.captureError(throwable, ErrorTypes.RENDER, ErrorSeverity.ERROR, metadata)
+                    ?: player.logger.error(
+                        "Exception caught in Player scope: ${throwable.message}",
+                        throwable.stackTrace
+                            .joinToString("\n") {
+                                "\tat $it"
+                            }.replaceFirst("\tat ", "\n"),
+                    )
+            }
+        },
         override var timeout: Long = if (debuggable) Int.MAX_VALUE.toLong() else 5000,
-    ) : PlayerRuntimeConfig()
+    ) : HeadlessPlayerRuntimeConfig()
 }

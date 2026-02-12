@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { SyncWaterfallHook, AsyncParallelHook } from "tapable-ts";
 import { Subscribe, useSubscribedState } from "@player-ui/react-subscribe";
 import { Registry } from "@player-ui/partial-match-registry";
@@ -9,10 +9,10 @@ import type {
   View,
   PlayerInfo,
 } from "@player-ui/player";
-import { Player } from "@player-ui/player";
-import { ErrorBoundary } from "react-error-boundary";
+import { ErrorSeverity, ErrorTypes, Player } from "@player-ui/player";
+import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 import type { AssetRegistryType } from "./asset";
-import { AssetContext } from "./asset";
+import { AssetContext, AssetRenderError } from "./asset";
 import { PlayerContext } from "./utils";
 
 import type { ReactPlayerProps } from "./app";
@@ -183,13 +183,47 @@ export class ReactPlayer {
     const ReactPlayerComponent = (props: ReactPlayerComponentProps) => {
       return (
         <ErrorBoundary
-          fallbackRender={() => null}
-          onError={(err) => {
-            const playerState = this.player.getState();
+          FallbackComponent={(pops: FallbackProps) => {
+            const { error, resetErrorBoundary } = pops;
+            const pErr = React.useMemo(() => {
+              const playerState = this.player.getState();
 
-            if (playerState.status === "in-progress") {
-              playerState.fail(err);
+              if (playerState.status === "in-progress") {
+                const id = this.viewUpdateSubscription.add(
+                  () => {
+                    this.viewUpdateSubscription.remove(id);
+                    resetErrorBoundary();
+                  },
+                  {
+                    initializeWithPreviousValue: false,
+                  },
+                );
+
+                const assetId =
+                  error instanceof AssetRenderError
+                    ? error.rootAsset.id
+                    : undefined;
+
+                return playerState.controllers.error.captureError(
+                  error,
+                  ErrorTypes.RENDER,
+                  ErrorSeverity.ERROR,
+                  {
+                    assetId,
+                  },
+                );
+              }
+
+              return undefined;
+            }, [error]);
+
+            // If error unhandled or will be handled with a transition show nothing
+            if (!pErr?.skipped) {
+              return <div>WE ARE NOT RECOVERING</div>;
             }
+
+            // If error handled through onError hook, I dunno, show something
+            return <div>WE ARE RECOVERING</div>;
           }}
         >
           <PlayerContext.Provider value={{ player: this.player }}>

@@ -6,8 +6,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.AndroidPlayerPlugin
+import com.intuit.playerui.android.asset.AssetRenderException
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.core.bridge.runtime.Runtime
+import com.intuit.playerui.core.error.ErrorSeverity
+import com.intuit.playerui.core.error.ErrorTypes
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.managed.AsyncFlowIterator
 import com.intuit.playerui.core.managed.AsyncIterationManager
@@ -206,8 +209,21 @@ public open class PlayerViewModel(
         }
     }
 
-    public fun fail(cause: Throwable) {
-        player.inProgressState?.fail(cause)
+    public fun fail(throwable: Throwable) {
+        val cause = throwable.cause
+        // TODO: Replace type check with general exception that can have the metadata or other properties needed.
+        if (cause is AssetRenderException) {
+            player.inProgressState?.controllers?.error?.captureError(
+                cause,
+                ErrorTypes.RENDER,
+                ErrorSeverity.ERROR,
+                mapOf(
+                    "assetId" to cause.rootAsset.asset.id,
+                ),
+            )
+        } else {
+            player.inProgressState?.fail(throwable)
+        }
     }
 
     /** Helper to progress the [FlowManager] in within the [viewModelScope] */

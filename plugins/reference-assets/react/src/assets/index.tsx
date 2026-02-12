@@ -5,3 +5,4 @@ export * from "./action";
 export * from "./info";
 export * from "./image";
 export * from "./choice";
+export * from "./throwing";
