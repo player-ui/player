@@ -40,6 +40,71 @@ Options defined via the CLI arguments will take precedence over the config files
 
 Plugins are the way to change runtime behavior of the CLI actions. This includes augmenting the behavior of the DSL compiler, language-service, and more.
 
+### LSPPluginPlugin
+
+The `LSPPluginPlugin` allows you to add custom [Language Service Plugins](../lsp#addlspplugin) to the Player CLI configuration. This enables you to extend the LSP functionality with custom validation, completion, hover information, and more.
+
+**Usage:**
+
+```typescript
+import { LSPPluginPlugin } from "@player-ui/language-service";
+
+const config = {
+  plugins: [
+    new LSPPluginPlugin([customPlugin1, customPlugin2])
+  ]
+};
+```
+
+For more information on creating Language Service Plugins, see the [LSP documentation](../lsp#addlspplugin).
+
+### LSPTransformsPlugin
+
+The `LSPTransformsPlugin` allows you to add custom [XLR transform functions](../lsp#addxlrtransforms) to the Player CLI configuration. This enables you to modify the types that are loaded into the LSP's SDK. This may be useful if there is functionality that is available via a Plugin but isn't part of core type definitions.
+
+**Usage:**
+
+```typescript
+import { LSPTransformsPlugin } from "@player-ui/language-service";
+
+const config = {
+  plugins: [
+    new LSPTransformsPlugin({
+      "exampleTransform1": exampleTransform1Fn,
+      "exampleTransform2": exampleTransform2Fn,
+    })
+  ]
+};
+```
+
+For more information on XLR transforms, see the [XLR documentation](../../xlr/concepts#transform-functions).
+
+### LSPAssetsPlugin
+
+The `LSPAssetsPlugin` allows you to load asset type definitions from packages into the Player CLI configuration. This enables the LSP to provide type checking, validation, and autocomplete for your custom assets and data types.
+
+**Usage:**
+
+```typescript
+import { LSPAssetsPlugin } from "@player-tools/cli";
+import path from "path";
+
+const config = {
+  plugins: [
+    new LSPAssetsPlugin(
+      ["@player-ui/types", "@player-ui/reference-assets-plugin"].map((pkg) => ({
+        path: path.join(
+          path.dirname(require.resolve(`${pkg}/package.json`)),
+          "dist",
+        ),
+      })),
+    ),
+  ],
+};
+```
+
+For more information on loading asset types, see the [LSP documentation](../lsp#setassettypes).
+
 ## Commands
 
 - [`player dsl compile`](#player-dsl-compile)
