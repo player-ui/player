@@ -1,0 +1,486 @@
+---
+title: CLI Plugins
+---
+
+import { Aside, Badge, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+# CLI Plugins
+
+Much like the rest of Player, Player's CLI supports plugins that alter its behaviour. Unlike plugins for the Player, CLI plugins are not implemented per platform. CLI plugins are implemented only once.
+
+## Create a CLI Plugin
+
+To create a CLI Plugin, create a class that implements `PlayerCLIPlugin`. Example:
+
+```typescript
+import { PlayerCLIPlugin } from '@player-tools/cli';
+export class ExampleCLIPlugin implements PlayerCLIPlugin {}
+```
+
+The class should then implement at least one of the following functions.
+
+### `onCreateLanguageService`
+
+`onCreateLanguageService` is called right after the [LSP](../lsp) is created, before any validation has occurred. It allows you to tap into the [LSP's hooks](../lsp#hooks-to-extend-lsp-functionality).
+
+Here is the function signature:
+
+```typescript
+onCreateLanguageService?: (
+  lsp: PlayerLanguageService,
+  exp: boolean,
+) => void | Promise<void>;
+```
+
+#### Parameters
+
+1. `lsp` (`PlayerLanguageService`): The Player Language Service instance. You can tap into its hooks.
+1. `exp` (`boolean`): A boolean indicating whether experimental mode is enabled. This flag has no inherent effects. It is entirely up to the user to decide what "experimental" means in their specific use case.
+
+    <Aside title="How to set exp">
+    To set the "experimental" flag to true, pass the `--exp` flag to the CLI:
+
+    ```bash
+    player dsl compile --exp
+    player json compile --exp
+    ```
+    </Aside>
+
+#### Example
+
+```typescript
+import { PlayerCLIPlugin } from "@player-tools/cli";
+
+export class ExampleCLIPlugin implements PlayerCLIPlugin {
+  onCreateLanguageService(
+    lsp: PlayerLanguageService,
+    exp: boolean,
+  ): void {
+    lsp.addLSPPlugin(someCustomPlugin);
+  }
+}
+```
+
+For a fully implemented example, check out the [`LSPAssetsPlugin`](https://github.com/player-ui/tools/blob/main/cli/src/plugins/LSPAssetsPlugin.ts).
+
+### `onCreateDSLCompiler`
+
+`onCreateDSLCompiler` is called right after the DSL compiler instance is created, before any compilation has occurred. It allows you to tap into the [DSL compiler's hooks](#oncreatedslcompiler-hooks). to modify how DSL content is compiled.
+
+Here is the function signature:
+
+```typescript
+onCreateDSLCompiler?: (compiler: DSLCompiler) => void | Promise<void>;
+```
+
+#### Parameters
+
+1. `compiler` (`DSLCompiler`): The DSL compiler instance. You can tap into its hooks to modify compilation behavior.
+
+#### Example
+
+```typescript
+import { PlayerCLIPlugin } from "@player-tools/cli";
+
+export class ExampleCLIPlugin implements PlayerCLIPlugin {
+  onCreateDSLCompiler(compiler: DSLCompiler): void {
+    compiler.hooks.preProcessFlow.tap("ExamplePlugin", (flow) => {
+      // Modify the flow before compilation
+      return flow;
+    });
+  }
+}
+```
+
+---
+
+### `onConvertXLR`
+
+`onConvertXLR` is called when [XLRs (Cross Language Representations)](../../xlr/intro) are being converted to a language-specific representation. It allows you to add custom transform functions that will be applied during the conversion process.
+
+Here is the function signature:
+
+```typescript
+onConvertXLR?: (
+  format: ExportTypes,
+  transforms: Array<TransformFunction>,
+) => void | Promise<void>;
+```
+
+#### Parameters
+
+1. `format` (`ExportTypes`): The target export format; currently always "TypeScript". This indicates which language the XLRs are being converted to.
+2. `transforms` (`Array<TransformFunction>`): An array of transform functions. You can append your custom transforms to this array to modify how types are converted.
+
+#### Example
+
+```typescript
+import { PlayerCLIPlugin } from "@player-tools/cli";
+import type { ExportTypes } from "@player-tools/xlr-sdk";
+import type { TransformFunction } from "@player-tools/xlr";
+
+export class ExampleCLIPlugin implements PlayerCLIPlugin {
+  onConvertXLR(
+    format: ExportTypes,
+    transforms: Array<TransformFunction>,
+  ): void {
+    transforms.push(myCustomTransform);
+  }
+}
+```
+
+---
+
+### `createCompilerContext`
+
+`createCompilerContext` is called to expose hooks that influence how content is compiled. It provides access to the `CompilationContext` instance. The `CompilationContext` manages the context around DSL compilation and exposes [hooks](#createcompilercontext-hooks) for customizing the compilation process.
+
+Here is the function signature:
+
+```typescript
+createCompilerContext?: (context: CompilationContext) => void | Promise<void>;
+```
+
+#### Parameters
+
+1. `context` (`CompilationContext`): The compilation context instance. You can tap into its hooks to customize content type identification and compilation logic.
+
+#### Example
+
+```typescript
+import { PlayerCLIPlugin } from "@player-tools/cli";
+import type { CompilationContext } from "@player-tools/cli";
+
+export class ExampleCLIPlugin implements PlayerCLIPlugin {
+  createCompilerContext(context: CompilationContext): void {
+    // Customize how content types are identified
+    context.hooks.identifyContentType.tap(
+      "ExamplePlugin",
+      (fileName, content) => {
+        if (fileName.endsWith(".custom")) {
+          return { type: "custom", extension: ".json" };
+        }
+      }
+    );
+  }
+}
+```
+
+## Usage
+
+<Steps>
+
+1. Install the plugin package as a dependency in your content project.
+
+2. Create a [CLI config file](../cli#config) in the root of your content project. The Player CLI uses [cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to automatically discover configuration files. See the [CLI documentation](../cli#config) for a complete list of supported config file names and formats.
+
+3. Configure your plugin in the [config file](../cli#config).
+
+4. Use the Player CLI commands as normal. The CLI will automatically discover and load your config file.
+
+</Steps>
+
+## `createCompilerContext` Hooks
+
+The [`createCompilerContext` function](#createcompilercontext) available to plugins that extend the `PlayerCLIPlugin` class gives access to the `CompilationContext` instance. This class manages the context around compilation and exposes two related hooks.
+
+### `identifyContentType`
+
+<Badge text="AsyncSeriesBailHook" />
+
+Allows plugins to inject custom behavior around detecting what kind of file is being compiled.
+
+By default there are three types of content the CLI is aware of (`view`, `flow`, and `schema`). Its methods for detecting which kind of content is contained within a file is very rudimentary (the logic can be found [here](https://github.com/player-ui/tools/blob/main/language/dsl/src/compiler/utils.ts#L5)).
+
+**Use cases:**
+- Support custom content types
+- Orchestrate the compilation of custom file types, e.g. a `".topic"` extension.
+
+**Parameters:**
+1. `fileName` (`string`): The relative name of the file being compiled
+2. `content` (`any`): The contents of the file
+
+**Returns:** Object with the following properties:
+- `type` (`string`): The identified content type (e.g., `view`, `flow`, `schema`, or custom type)
+- `extension` (`string`): The file extension for the compiled output (e.g., `.json`)
+
+Or `undefined` to continue to the next tap
+
+**When Called:** During file compilation when the CLI needs to determine the content type of a file
+
+**Example:**
+
+```typescript
+import { PlayerCLIPlugin } from "@player-tools/cli";
+import type { CompilationContext } from "@player-tools/cli";
+
+export class ExampleCLIPlugin implements PlayerCLIPlugin {
+  createCompilerContext(context: CompilationContext): void {
+    context.hooks.identifyContentType.tap(
+      "ExamplePlugin",
+      async (fileName, content) => {
+        // Custom logic to identify content type
+        if (fileName.endsWith(".topic")) {
+          return { type: "custom", extension: ".json" };
+        }
+        // Return undefined to let other taps handle it
+        return undefined;
+      }
+    );
+  }
+}
+```
+
+---
+
+### `compileContent`
+
+<Badge text="AsyncSeriesBailHook" />
+
+Allows custom compilation logic for any identified file type. This hook will take the first result returned from a tap that successfully compiles the given file to the identified type. If no external logic is added, the hook will attempt to compile any of its known content types with the built-in compiler instance.
+
+**Use cases:**
+- Handle custom content types introduced by `identifyContentType`
+- Override default compilation behavior for known types
+
+**Parameters:**
+1. `context` (`compileContentArgs`): Object with:
+   - `type` (`string`): The content type from `identifyContentType`
+2. `content` (`any`): The contents of the file
+3. `fileName` (`string`): The relative name of the file being compiled
+
+**Returns:** Object with the following properties:
+- `value` (`string`): The compiled JSON as a string
+- `sourceMap` (`string`, optional): The source map for the compiled content
+
+Or `undefined` to continue to the next tap
+
+**When Called:** During file compilation after the content type has been identified by `identifyContentType`
+
+**Example:**
+
+```typescript
+import { PlayerCLIPlugin } from "@player-tools/cli";
+import type { CompilationContext } from "@player-tools/cli";
+
+export class ExampleCLIPlugin implements PlayerCLIPlugin {
+  createCompilerContext(context: CompilationContext): void {
+    context.hooks.compileContent.tap(
+      "ExamplePlugin",
+      async ({ type }, content, fileName) => {
+        // Custom compilation for custom content type
+        if (type === "custom") {
+          const compiled = {
+            id: "custom-flow",
+            type: type,
+            content: content
+          };
+
+          return {
+            value: JSON.stringify(compiled, null, 2)
+          };
+        }
+        // Return undefined to let other taps handle it
+        return undefined;
+      }
+    );
+  }
+}
+```
+
+## `onCreateDSLCompiler` Hooks
+
+The CLI will initialize an instance of the `DSLCompiler` and provide a reference to it via the [`onCreateDSLCompiler`](#oncreatedslcompiler) function available to plugins that extend the `PlayerCLIPlugin` class. On the compiler itself, the following hooks are available to modify the behavior of how DSL content is compiled.
+
+### `preProcessFlow`
+
+<Badge text="SyncWaterfallHook" />
+
+<p>
+<Aside>
+This hook only applies to `view` and `flow` content. It is not called for `schema` content.
+</Aside>
+</p>
+
+Called synchronously before DSL content is compiled. Allows transformations on the object before it is serialized to JSON. Each tap receives the result of the previous tap (waterfall pattern).
+
+**Use cases:**
+- Inject additional data into the flow
+- Resolve integration-specific conventions into compiler-compatible structures
+- Collect information about what is being compiled for later use
+
+**Parameters:**
+1. `flow` (`object`): The pre-compilation flow or view object
+
+**Returns:** `object`: The modified flow or view object
+
+**When Called:** Before DSL content is serialized to JSON during compilation
+
+**Example:**
+
+```typescript
+import { PlayerCLIPlugin } from "@player-tools/cli";
+
+export class ExampleCLIPlugin implements PlayerCLIPlugin {
+  onCreateDSLCompiler(compiler: DSLCompiler): void {
+    compiler.hooks.preProcessFlow.tap("ExamplePlugin", (flow) => {
+      // Add custom metadata to the flow object
+      return {
+        ...flow,
+        customMetadata: { version: "1.0.0" }
+      };
+    });
+  }
+}
+```
+
+---
+
+### `postProcessFlow`
+
+<Badge text="SyncWaterfallHook" />
+
+<p>
+<Aside>
+This hook only applies to `view` and `flow` content. It is not called for `schema` content.
+</Aside>
+</p>
+
+Called synchronously after DSL content is compiled to JSON. Allows modifications to the compiled JSON output. Each tap receives the result of the previous tap (waterfall pattern).
+
+**Use cases:**
+- Modify the compiled JSON output by manipulating JSON structures (often easier than manipulating React trees)
+
+**Parameters:**
+1. `compiledFlow` (`Flow`): The compiled JSON representation of the flow or view
+
+**Returns:** `Flow`: The modified JSON object
+
+**When Called:** After DSL content is compiled to JSON during compilation
+
+**Example:**
+
+```typescript
+import { PlayerCLIPlugin } from "@player-tools/cli";
+
+export class ExampleCLIPlugin implements PlayerCLIPlugin {
+  onCreateDSLCompiler(compiler: DSLCompiler): void {
+    compiler.hooks.postProcessFlow.tap("ExamplePlugin", (compiledFlow) => {
+      // Add a timestamp to all compiled flows
+      return {
+        ...compiledFlow,
+        compiledAt: new Date().toISOString()
+      };
+    });
+  }
+}
+```
+
+---
+
+### `schemaGenerator`
+
+<Badge text="SyncHook" />
+
+Provides access to the internal `SchemaGenerator` object which is responsible for compiling schema definitions. The schema generator itself exposes additional hooks for fine-grained control over schema compilation.
+
+**Parameters:**
+1. `schemaGenerator` (`SchemaGenerator`): The schema generator instance with its own hooks:
+    - `createSchemaNode` <Badge text="SyncWaterfallHook" />: Called synchronously when individual schema nodes are generated during schema compilation. Each tap receives the result of the previous tap (waterfall pattern). Allows custom logic for processing, validating, or augmenting schema nodes as they are created.
+
+        **Receives**:
+
+        - `node` (`Schema.DataType`): The schema node being created
+        - `originalProperty` (`Record<string | symbol, unknown>`): The original property object from which the schema node is being generated
+
+        **Returns**: `Record<string, any>`: The schema node (modified or unmodified)
+
+**Use cases:**
+- Add arbitrary properties to schema nodes statically or dynamically
+- Inject integration-specific semantic conventions into the schema
+- Modify the schema tree based on specific symbols or patterns
+
+**When Called:** During schema compilation when the DSL compiler processes schema content
+
+**Example:**
+
+```typescript
+import { PlayerCLIPlugin } from "@player-tools/cli";
+
+export class ExampleCLIPlugin implements PlayerCLIPlugin {
+  onCreateDSLCompiler(compiler: DSLCompiler): void {
+    compiler.hooks.schemaGenerator.tap("ExamplePlugin", (schemaGenerator) => {
+      schemaGenerator.hooks.createSchemaNode.tap(
+        "ExamplePlugin",
+        (node, originalProperty) => {
+          // Add custom validation rules to specific schema nodes
+          if (node.type === "string") {
+            return {
+              ...node,
+              customValidation: true
+            };
+          }
+          return node;
+        }
+      );
+    });
+  }
+}
+```
+
+---
+
+### `onEnd`
+
+<Badge text="AsyncSeriesHook" />
+
+Called after the compilation of all files has been completed. Allows post-processing on the compilation output as a whole.
+
+**Use cases:**
+- Move or bundle compilation results
+- Write new files based on information collected during compilation
+- Generate summary reports or manifests
+- Perform cleanup operations
+
+**Parameters:**
+1. `arg` (`OnEndArg`): Object with:
+   - `output` (`string`): The target output directory
+
+**Returns:** `void | Promise<void>`
+
+**When Called:** After all files have been compiled and all other hooks have completed
+
+**Example:**
+
+```typescript
+import { PlayerCLIPlugin } from "@player-tools/cli";
+import fs from "fs";
+import path from "path";
+
+export class ExampleCLIPlugin implements PlayerCLIPlugin {
+  private compiledFiles: string[] = [];
+
+  onCreateDSLCompiler(compiler: DSLCompiler): void {
+    // Track compiled files
+    compiler.hooks.postProcessFlow.tap("ExamplePlugin", (flow) => {
+      this.compiledFiles.push(flow.id);
+      return flow;
+    });
+
+    // Generate a manifest after all files are compiled
+    compiler.hooks.onEnd.tap("ExamplePlugin", async ({ output }) => {
+      const manifest = {
+        compiledAt: new Date().toISOString(),
+        files: this.compiledFiles,
+        count: this.compiledFiles.length,
+        outputDirectory: output
+      };
+
+      await fs.promises.writeFile(
+        path.join(output, "compilation-manifest.json"),
+        JSON.stringify(manifest, null, 2)
+      );
+    });
+  }
+}
+```
