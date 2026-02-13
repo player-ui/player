@@ -88,4 +88,7 @@ ios/*/*/Resources/**/*.js
 
 .bazelrc.local
 _ios_coverage/
+
+# AI
 .qodo
+.augment

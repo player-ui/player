@@ -2,6 +2,8 @@
 title: CLI
 ---
 
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
 The `CLI` package is a simple way for users to interact with some of the build/validation tooling. As new capabilities are added to the ecosystem, they may be exposed via this cli to use of use for developers.
 
 ## Config
@@ -11,12 +13,7 @@ Config files are able to customize the behavior of the CLI commands without requ
 To resolve a full configuration, the `extension` is taken as the base, the `presets` are applied in order, then local `plugins`.
 The format is similar to `eslint`, `babel` and other .rc/json/js based approaches.
 
-Config files are searched using cosmiconfig, which will look for:
-
-- a `player` property in package.json
-- a `.playerrc` file in JSON or YAML format
-- a `.player.json`, `.playerrc.yaml`, `.playerrc.yml`, `.playerrc.js`, or `.playerrc.cjs` file
-- a `player.config.js` or `player.config.cjs` CommonJS module exporting an object
+Config files are searched using [cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) with "player" as the module name for cosmiconfig purposes.
 
 Example:
 
@@ -36,9 +33,89 @@ module.exports = {
 
 Options defined via the CLI arguments will take precedence over the config files (for things that overlap).
 
+### JavaScript/TypeScript Config Files
+
+JavaScript and TypeScript config files (`playerrc.js`, `player.config.ts`, `config/playerrc.mjs`, etc.) support three plugin formats:
+
+**Option A: Package name (string)**
+```js
+module.exports = {
+  plugins: [
+    "@fancy-dog/dsl-plugin",
+  ],
+};
+```
+
+**Option B: Package name with options (array)**
+```js
+module.exports = {
+  plugins: [
+    ["@fancy-dog/dsl-plugin", { customOption: "value" }],
+  ],
+};
+```
+
+**Option C: Direct plugin instance (object)**
+```js
+const { FancyDogPlugin } = require("@fancy-dog/dsl-plugin");
+
+module.exports = {
+  plugins: [
+    new FancyDogPlugin({ customOption: "value" }),
+  ],
+};
+```
+
+### JSON/YAML Config Files
+
+JSON and YAML config files (`.playerrc`, `.playerrc.json`, `.playerrc.yaml`, `package.json`, etc.) only support string and array formats (you cannot instantiate plugin classes in JSON):
+
+**String format:**
+
+<Tabs>
+<TabItem label="JSON">
+```json
+{
+  "plugins": [
+    "@fancy-dog/dsl-plugin"
+  ]
+}
+```
+</TabItem>
+<TabItem label="YAML">
+```yaml
+plugins:
+  - "@fancy-dog/dsl-plugin"
+```
+</TabItem>
+</Tabs>
+
+**Array with options format:**
+
+<Tabs>
+<TabItem label="JSON">
+```json
+{
+  "plugins": [
+    ["@fancy-dog/dsl-plugin", { "customOption": "value" }]
+  ]
+}
+```
+</TabItem>
+<TabItem label="YAML">
+```yaml
+plugins:
+  - - "@fancy-dog/dsl-plugin"
+    - customOption: "value"
+```
+</TabItem>
+</Tabs>
+
 ## Plugins
 
-Plugins are the way to change runtime behavior of the CLI actions. This includes augmenting the behavior of the DSL compiler, language-service, and more.
+Plugins are the way to change runtime behavior of the CLI actions. This includes augmenting the behavior of the DSL compiler, language-service, and more. For detailed information on creating and using CLI plugins, see the [CLI Plugins](./cli-plugins) documentation.
+
+Below are some plugins made available to you for your convenience.
 
 ### LSPPluginPlugin
 
