@@ -35,6 +35,23 @@ export interface ErrorControllerOptions {
   model?: DataController;
 }
 
+type ReplacerFunction = (key: string, value: any) => any;
+
+const makeJsonStringifyReplacer = (): ReplacerFunction => {
+  const cache = new Set();
+  return (_: string, value: any) => {
+    if (typeof value === "object" && value !== null) {
+      if (cache.has(value)) {
+        // Circular reference found, discard key
+        return "[CIRCULAR]";
+      }
+      // Store value in our collection
+      cache.add(value);
+    }
+    return value;
+  };
+};
+
 /** The orchestrator for player error handling */
 export class ErrorController {
   public hooks: ErrorControllerHooks = {
@@ -88,6 +105,7 @@ export class ErrorController {
       errorType,
       severity,
       metadata,
+      skipped: false,
     };
 
     // Add to history
@@ -98,7 +116,11 @@ export class ErrorController {
 
     this.options.logger.debug(
       `[ErrorController] Captured error: ${error.message}`,
-      { errorType, severity, metadata },
+      // TODO: Find a better way to do this. Either centralize the stringify replacer in the print plugin or something else.
+      JSON.stringify(
+        { errorType, severity, metadata },
+        makeJsonStringifyReplacer(),
+      ),
     );
 
     // Notify listeners and check if navigation should be skipped
@@ -106,6 +128,7 @@ export class ErrorController {
     const shouldSkip = this.hooks.onError.call(playerError) ?? false;
 
     if (shouldSkip) {
+      playerError.skipped = true;
       this.options.logger.debug(
         "[ErrorController] Error state navigation skipped by plugin",
       );

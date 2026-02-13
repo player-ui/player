@@ -6,3 +6,4 @@ export * from "./text";
 export * from "./image";
 export * from "./choice";
 export * from "./chat-message";
+export * from "./throwing";

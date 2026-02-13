@@ -4,10 +4,16 @@ import type { BindingInstance, BindingFactory } from "../binding";
 import type { ValidationProvider, ValidationObject } from "../validator";
 import type { Logger } from "../logger";
 import type { Resolve } from "./resolver";
-import { Resolver } from "./resolver";
+import { Resolver, ResolverError } from "./resolver";
 import type { Node } from "./parser";
 import { Parser } from "./parser";
 import { TemplatePlugin } from "./plugins";
+import {
+  ErrorController,
+  ErrorMetadata,
+  ErrorSeverity,
+  ErrorTypes,
+} from "../controllers";
 
 /**
  * Manages the view level validations
@@ -96,6 +102,7 @@ export class ViewInstance implements ValidationProvider {
   public readonly initialView: ViewType;
   public readonly resolverOptions: Resolve.ResolverOptions;
   private rootNode?: Node.Node;
+  private readonly errorController: ErrorController | undefined;
 
   private validationProvider?: CrossfieldProvider;
 
@@ -104,9 +111,14 @@ export class ViewInstance implements ValidationProvider {
   // TODO might want to add a version/timestamp to this to compare updates
   public lastUpdate: Record<string, any> | undefined;
 
-  constructor(initialView: ViewType, resolverOptions: Resolve.ResolverOptions) {
+  constructor(
+    initialView: ViewType,
+    resolverOptions: Resolve.ResolverOptions,
+    errorController?: ErrorController,
+  ) {
     this.initialView = initialView;
     this.resolverOptions = resolverOptions;
+    this.errorController = errorController;
   }
 
   /** @deprecated use ViewController.updateViewAST */
@@ -147,16 +159,38 @@ export class ViewInstance implements ValidationProvider {
       this.hooks.resolver.call(this.resolver);
     }
 
-    const update = this.resolver?.update(changes, nodeChanges);
+    try {
+      const update = this.resolver?.update(changes, nodeChanges);
 
-    if (this.lastUpdate === update) {
+      if (this.lastUpdate === update) {
+        return this.lastUpdate;
+      }
+
+      this.lastUpdate = update;
+      this.hooks.onUpdate.call(update);
+
+      return update;
+    } catch (err: unknown) {
+      // TODO: Just let error bubble up so nothing needs to be returned here.
+      if (!this.errorController) {
+        throw err;
+      }
+
+      const error = err instanceof Error ? err : new Error(String(err));
+      const metadata: ErrorMetadata = {};
+      if (error instanceof ResolverError) {
+        metadata.node = error.node;
+      }
+      this.errorController.captureError(
+        error,
+        ErrorTypes.VIEW,
+        ErrorSeverity.ERROR,
+        metadata,
+      );
+
+      // Return previous update while error controller decides the next course of action.
       return this.lastUpdate;
     }
-
-    this.lastUpdate = update;
-    this.hooks.onUpdate.call(update);
-
-    return update;
   }
 
   getValidationsForBinding(

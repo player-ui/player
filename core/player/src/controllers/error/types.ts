@@ -17,6 +17,7 @@ export const ErrorTypes = {
   SCHEMA: "schema",
   NETWORK: "network",
   PLUGIN: "plugin",
+  RENDER: "render",
 } as const;
 
 /**
@@ -36,4 +37,6 @@ export interface PlayerError {
   severity?: ErrorSeverity;
   /** Additional metadata */
   metadata?: ErrorMetadata;
+  /** Whether or not the error was skipped. */
+  skipped: boolean;
 }

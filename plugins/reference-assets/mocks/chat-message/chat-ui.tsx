@@ -23,6 +23,12 @@ const view1 = (
       <Action exp={e`send({{content}})`}>
         <Action.Label> Send </Action.Label>
       </Action>
+      <Action exp={e`sendBroken({{content}})`}>
+        <Action.Label> Send Broken Render Asset </Action.Label>
+      </Action>
+      <Action exp={e`sendBrokenTransform({{content}})`}>
+        <Action.Label> Send Broken Transform Asset </Action.Label>
+      </Action>
     </Collection.Values>
   </Collection>
 );

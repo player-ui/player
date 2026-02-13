@@ -251,223 +251,254 @@ export class Resolver {
     prevASTMap: Map<Node.Node, Node.Node>,
     nodeChanges: Set<Node.Node>,
   ): NodeUpdate {
-    const dependencyModel = new DependencyModel(options.data.model);
+    try {
+      const dependencyModel = new DependencyModel(options.data.model);
+      dependencyModel.trackSubset("core");
+      const depModelWithParser = withContext(
+        withParser(dependencyModel, this.options.parseBinding),
+      );
 
-    dependencyModel.trackSubset("core");
-    const depModelWithParser = withContext(
-      withParser(dependencyModel, this.options.parseBinding),
-    );
-
-    const resolveOptions = this.hooks.resolveOptions.call(
-      {
-        ...options,
-        data: {
-          ...options.data,
-          model: depModelWithParser,
+      const resolveOptions = this.hooks.resolveOptions.call(
+        {
+          ...options,
+          data: {
+            ...options.data,
+            model: depModelWithParser,
+          },
+          evaluate: (exp) =>
+            this.options.evaluator.evaluate(exp, { model: depModelWithParser }),
+          node,
         },
-        evaluate: (exp) =>
-          this.options.evaluator.evaluate(exp, { model: depModelWithParser }),
         node,
-      },
-      node,
-    );
+      );
 
-    const previousResult = this.getPreviousResult(node);
-    const previousDeps = previousResult?.dependencies;
+      const previousResult = this.getPreviousResult(node);
+      const previousDeps = previousResult?.dependencies;
 
-    const isChanged = nodeChanges.has(node);
-    const dataChanged = caresAboutDataChanges(dataChanges, previousDeps);
-    const shouldUseLastValue = this.hooks.skipResolve.call(
-      !dataChanged && !isChanged,
-      node,
-      resolveOptions,
-    );
+      const isChanged = nodeChanges.has(node);
+      const dataChanged = caresAboutDataChanges(dataChanges, previousDeps);
+      const shouldUseLastValue = this.hooks.skipResolve.call(
+        !dataChanged && !isChanged,
+        node,
+        resolveOptions,
+      );
 
-    if (previousResult && shouldUseLastValue) {
-      const update = {
-        ...previousResult,
-        updated: false,
-      };
-
-      /** Recursively repopulate the AST map given some AST Node and it's resolved AST representation */
-      const repopulateASTMapFromCache = (
-        resolvedNode: Resolve.ResolvedNode,
-        AST: Node.Node,
-        ASTParent: Node.Node | undefined,
-      ) => {
-        const { node: resolvedASTLocal } = resolvedNode;
-        this.ASTMap.set(resolvedASTLocal, AST);
-        const resolvedUpdate = {
-          ...resolvedNode,
+      if (previousResult && shouldUseLastValue) {
+        const update = {
+          ...previousResult,
           updated: false,
         };
-        cacheUpdate.set(AST, resolvedUpdate);
 
-        /** Helper function for recursing over child node */
-        const handleChildNode = (childNode: Node.Node) => {
-          // In order to get the correct results, we need to use the node references from the last update.
-          const originalChildNode = prevASTMap.get(childNode) ?? childNode;
-          const previousChildResult = this.getPreviousResult(originalChildNode);
-          if (!previousChildResult) return;
+        /** Recursively repopulate the AST map given some AST Node and it's resolved AST representation */
+        const repopulateASTMapFromCache = (
+          resolvedNode: Resolve.ResolvedNode,
+          AST: Node.Node,
+          ASTParent: Node.Node | undefined,
+        ) => {
+          const { node: resolvedASTLocal } = resolvedNode;
+          this.ASTMap.set(resolvedASTLocal, AST);
+          const resolvedUpdate = {
+            ...resolvedNode,
+            updated: false,
+          };
+          cacheUpdate.set(AST, resolvedUpdate);
 
-          repopulateASTMapFromCache(
-            previousChildResult,
-            originalChildNode,
-            AST,
-          );
+          /** Helper function for recursing over child node */
+          const handleChildNode = (childNode: Node.Node) => {
+            // In order to get the correct results, we need to use the node references from the last update.
+            const originalChildNode = prevASTMap.get(childNode) ?? childNode;
+            const previousChildResult =
+              this.getPreviousResult(originalChildNode);
+            if (!previousChildResult) return;
+
+            repopulateASTMapFromCache(
+              previousChildResult,
+              originalChildNode,
+              AST,
+            );
+          };
+
+          if ("children" in resolvedASTLocal) {
+            resolvedASTLocal.children?.forEach(({ value: childAST }) =>
+              handleChildNode(childAST),
+            );
+          } else if (resolvedASTLocal.type === NodeType.MultiNode) {
+            resolvedASTLocal.values.forEach(handleChildNode);
+          }
+
+          this.hooks.afterNodeUpdate.call(AST, ASTParent, resolvedUpdate);
         };
 
-        if ("children" in resolvedASTLocal) {
-          resolvedASTLocal.children?.forEach(({ value: childAST }) =>
-            handleChildNode(childAST),
-          );
-        } else if (resolvedASTLocal.type === NodeType.MultiNode) {
-          resolvedASTLocal.values.forEach(handleChildNode);
-        }
+        // Point the root of the cached node to the new resolved node.
+        previousResult.node.parent = partiallyResolvedParent;
 
-        this.hooks.afterNodeUpdate.call(AST, ASTParent, resolvedUpdate);
+        repopulateASTMapFromCache(previousResult, node, rawParent);
+
+        return update;
+      }
+
+      // Shallow clone the node so that changes to it during the resolve steps don't impact the original.
+      // We are trusting that this becomes a deep clone once the whole node tree has been traversed.
+      const clonedNode: Node.Node = {
+        ...this.cloneNode(node),
+        parent: partiallyResolvedParent,
+      };
+      const resolvedAST = this.hooks.beforeResolve.call(
+        clonedNode,
+        resolveOptions,
+      ) ?? {
+        type: NodeType.Empty,
       };
 
-      // Point the root of the cached node to the new resolved node.
-      previousResult.node.parent = partiallyResolvedParent;
+      resolvedAST.parent = partiallyResolvedParent;
 
-      repopulateASTMapFromCache(previousResult, node, rawParent);
+      resolveOptions.node = resolvedAST;
 
-      return update;
-    }
+      this.ASTMap.set(resolvedAST, node);
 
-    // Shallow clone the node so that changes to it during the resolve steps don't impact the original.
-    // We are trusting that this becomes a deep clone once the whole node tree has been traversed.
-    const clonedNode: Node.Node = {
-      ...this.cloneNode(node),
-      parent: partiallyResolvedParent,
-    };
-    const resolvedAST = this.hooks.beforeResolve.call(
-      clonedNode,
-      resolveOptions,
-    ) ?? {
-      type: NodeType.Empty,
-    };
+      let resolved = this.hooks.resolve.call(
+        undefined,
+        resolvedAST,
+        resolveOptions,
+      );
 
-    resolvedAST.parent = partiallyResolvedParent;
+      let updated = !dequal(previousResult?.value, resolved);
 
-    resolveOptions.node = resolvedAST;
+      if (previousResult && !updated) {
+        resolved = previousResult?.value;
+      }
 
-    this.ASTMap.set(resolvedAST, node);
+      const childDependencies = new Set<BindingInstance>();
+      dependencyModel.trackSubset("children");
 
-    let resolved = this.hooks.resolve.call(
-      undefined,
-      resolvedAST,
-      resolveOptions,
-    );
+      if ("children" in resolvedAST) {
+        const newChildren = resolvedAST.children?.map((child) => {
+          const computedChildTree = this.computeTree(
+            child.value,
+            node,
+            dataChanges,
+            cacheUpdate,
+            resolveOptions,
+            resolvedAST,
+            prevASTMap,
+            nodeChanges,
+          );
+          const {
+            dependencies: childTreeDeps,
+            node: childNode,
+            updated: childUpdated,
+            value: childValue,
+          } = computedChildTree;
 
-    let updated = !dequal(previousResult?.value, resolved);
+          childTreeDeps.forEach((binding) => childDependencies.add(binding));
 
-    if (previousResult && !updated) {
-      resolved = previousResult?.value;
-    }
-
-    const childDependencies = new Set<BindingInstance>();
-    dependencyModel.trackSubset("children");
-
-    if ("children" in resolvedAST) {
-      const newChildren = resolvedAST.children?.map((child) => {
-        const computedChildTree = this.computeTree(
-          child.value,
-          node,
-          dataChanges,
-          cacheUpdate,
-          resolveOptions,
-          resolvedAST,
-          prevASTMap,
-          nodeChanges,
-        );
-        const {
-          dependencies: childTreeDeps,
-          node: childNode,
-          updated: childUpdated,
-          value: childValue,
-        } = computedChildTree;
-
-        childTreeDeps.forEach((binding) => childDependencies.add(binding));
-
-        if (childValue) {
-          if (childNode.type === NodeType.MultiNode && !childNode.override) {
-            const arr = addLast(
-              dlv(resolved, child.path as any[], []),
-              childValue,
-            );
-            resolved = setIn(resolved, child.path, arr);
-          } else {
-            resolved = setIn(resolved, child.path, childValue);
+          if (childValue) {
+            if (childNode.type === NodeType.MultiNode && !childNode.override) {
+              const arr = addLast(
+                dlv(resolved, child.path as any[], []),
+                childValue,
+              );
+              resolved = setIn(resolved, child.path, arr);
+            } else {
+              resolved = setIn(resolved, child.path, childValue);
+            }
           }
-        }
 
-        updated = updated || childUpdated;
+          updated = updated || childUpdated;
 
-        return { ...child, value: childNode };
-      });
+          return { ...child, value: childNode };
+        });
 
-      resolvedAST.children = newChildren;
-    } else if (resolvedAST.type === NodeType.MultiNode) {
-      const childValue: any = [];
-      const rawParentToPassIn = node;
+        resolvedAST.children = newChildren;
+      } else if (resolvedAST.type === NodeType.MultiNode) {
+        const childValue: any = [];
+        const rawParentToPassIn = node;
 
-      resolvedAST.values = resolvedAST.values.map((mValue) => {
-        const mTree = this.computeTree(
-          mValue,
-          rawParentToPassIn,
-          dataChanges,
-          cacheUpdate,
-          resolveOptions,
-          resolvedAST,
-          prevASTMap,
-          nodeChanges,
-        );
-
-        if (mTree.value !== undefined && mTree.value !== null) {
-          mTree.dependencies.forEach((bindingDep) =>
-            childDependencies.add(bindingDep),
+        resolvedAST.values = resolvedAST.values.map((mValue) => {
+          const mTree = this.computeTree(
+            mValue,
+            rawParentToPassIn,
+            dataChanges,
+            cacheUpdate,
+            resolveOptions,
+            resolvedAST,
+            prevASTMap,
+            nodeChanges,
           );
 
-          updated = updated || mTree.updated;
-          childValue.push(mTree.value);
-        }
+          if (mTree.value !== undefined && mTree.value !== null) {
+            mTree.dependencies.forEach((bindingDep) =>
+              childDependencies.add(bindingDep),
+            );
 
-        return mTree.node;
+            updated = updated || mTree.updated;
+            childValue.push(mTree.value);
+          }
+
+          return mTree.node;
+        });
+
+        resolved = childValue;
+      }
+
+      childDependencies.forEach((bindingDep) =>
+        dependencyModel.addChildReadDep(bindingDep),
+      );
+
+      dependencyModel.trackSubset("core");
+      if (previousResult && !updated) {
+        resolved = previousResult?.value;
+      }
+
+      resolved = this.hooks.afterResolve.call(resolved, resolvedAST, {
+        ...resolveOptions,
+        getDependencies: (scope?: "core" | "children") =>
+          dependencyModel.getDependencies(scope),
       });
 
-      resolved = childValue;
+      const update: NodeUpdate = {
+        node: resolvedAST,
+        updated,
+        value: resolved,
+        dependencies: new Set([
+          ...dependencyModel.getDependencies(),
+          ...childDependencies,
+        ]),
+      };
+
+      this.hooks.afterNodeUpdate.call(node, rawParent, update);
+      cacheUpdate.set(node, update);
+
+      return update;
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+
+      const resolverError =
+        error instanceof ResolverError
+          ? error
+          : new ResolverError(error, ResolverStages.BeforeResolve, node);
+
+      throw resolverError;
     }
+  }
+}
 
-    childDependencies.forEach((bindingDep) =>
-      dependencyModel.addChildReadDep(bindingDep),
-    );
+export const ResolverStages = {
+  ResolveOptions: "resolve-options",
+  BeforeResolve: "before-resolve",
+} as const;
 
-    dependencyModel.trackSubset("core");
-    if (previousResult && !updated) {
-      resolved = previousResult?.value;
-    }
-
-    resolved = this.hooks.afterResolve.call(resolved, resolvedAST, {
-      ...resolveOptions,
-      getDependencies: (scope?: "core" | "children") =>
-        dependencyModel.getDependencies(scope),
-    });
-
-    const update: NodeUpdate = {
-      node: resolvedAST,
-      updated,
-      value: resolved,
-      dependencies: new Set([
-        ...dependencyModel.getDependencies(),
-        ...childDependencies,
-      ]),
-    };
-
-    this.hooks.afterNodeUpdate.call(node, rawParent, update);
-    cacheUpdate.set(node, update);
-
-    return update;
+export type ResolverStage =
+  (typeof ResolverStages)[keyof typeof ResolverStages];
+export class ResolverError extends Error {
+  /**
+   *
+   */
+  constructor(
+    public readonly cause: Error,
+    public readonly stage: ResolverStage,
+    public readonly node: Node.Node,
+  ) {
+    super(`An error in the resolver occurred at stage '${stage}'`);
   }
 }
