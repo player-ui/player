@@ -21,7 +21,7 @@ The class should then implement at least one of the following functions.
 
 ### `onCreateLanguageService`
 
-`onCreateLanguageService` is called right after the [LSP](lsp) is created, before any validation has occurred. It allows you to tap into the [LSP's hooks](lsp#hooks-to-extend-lsp-functionality).
+`onCreateLanguageService` is called right after the [LSP](../lsp) is created, before any validation has occurred. It allows you to tap into the [LSP's hooks](../lsp#hooks-to-extend-lsp-functionality).
 
 Here is the function signature:
 
@@ -172,9 +172,9 @@ export class ExampleCLIPlugin implements PlayerCLIPlugin {
 
 1. Install the plugin package as a dependency in your content project.
 
-2. Create a [CLI config file](../cli/#config) in the root of your content project. The Player CLI uses [cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to automatically discover configuration files. See the [CLI documentation](../cli/#config) for a complete list of supported config file names and formats.
+2. Create a [CLI config file](../cli#config) in the root of your content project. The Player CLI uses [cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to automatically discover configuration files. See the [CLI documentation](../cli#config) for a complete list of supported config file names and formats.
 
-3. Configure your plugin in the [config file](../cli/#config).
+3. Configure your plugin in the [config file](../cli#config).
 
 4. Use the Player CLI commands as normal. The CLI will automatically discover and load your config file.
 
@@ -340,9 +340,11 @@ export class ExampleCLIPlugin implements PlayerCLIPlugin {
 
 <Badge text="SyncWaterfallHook" />
 
+<p>
 <Aside>
 This hook only applies to `view` and `flow` content. It is not called for `schema` content.
 </Aside>
+</p>
 
 Called synchronously after DSL content is compiled to JSON. Allows modifications to the compiled JSON output. Each tap receives the result of the previous tap (waterfall pattern).
 
