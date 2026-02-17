@@ -104,4 +104,54 @@ class FlowStateTests: XCTestCase {
         wait(for: [endStateHit], timeout: 1)
 
     }
+
+    /// Mirrors JVM FlowControllerIntegrationTest: beforeTransition, transition, and afterTransition hooks fire as expected.
+    func testFlowControllerBeforeTransitionHook() {
+        let player = HeadlessPlayerImpl(plugins: [])
+        var pendingTransition: (NamedState?, String)?
+        var completedTransition: (NamedState?, NamedState)?
+        var flowInstanceAfterTransition: Flow?
+
+        player.hooks?.flowController.tap { flowController in
+            flowController.hooks.flow.tap { flow in
+                flow.hooks.beforeTransition.tapTyped { state, transitionValue in
+                    pendingTransition = (flow.currentState, transitionValue)
+                    return state
+                }
+                flow.hooks.transition.tap { from, to in
+                    if pendingTransition?.0?.name != from?.name { pendingTransition = nil }
+                    completedTransition = (from, to)
+                }
+                flow.hooks.afterTransition.tap { flowInstance in
+                    flowInstanceAfterTransition = flowInstance
+                }
+            }
+        }
+
+        let inProgress = expectation(description: "in progress")
+        player.hooks?.state.tap { newState in
+            if newState is InProgressState { inProgress.fulfill() }
+        }
+
+        player.start(flow: FlowData.COUNTER) { _ in }
+
+        wait(for: [inProgress], timeout: 2)
+
+        XCTAssertNil(pendingTransition)
+        XCTAssertNil(completedTransition?.0)
+        XCTAssertEqual((completedTransition?.1)?.name, "VIEW_1")
+
+        do {
+            try (player.state as? InProgressState)?.controllers?.flow.transition(with: "*")
+        } catch {
+            XCTFail("Transition failed: \(error)")
+        }
+
+        let pendingFrom = pendingTransition?.0?.value as? NavigationFlowViewState
+        XCTAssertEqual(pendingFrom?.ref, "action")
+        XCTAssertEqual(pendingTransition?.1, "*")
+        XCTAssertEqual(completedTransition?.0?.name, "VIEW_1")
+        XCTAssertEqual((completedTransition?.1)?.name, "END_Done")
+        XCTAssertNotNil(flowInstanceAfterTransition)
+    }
 }
