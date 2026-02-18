@@ -73,8 +73,7 @@ kt_jvm_library(
     name = "supported_runtimes",
     visibility = ["//visibility:public"],
     exports = [
-        # MARK: Disable GraalJS testing
-        # "//jvm/graaljs",
+        "//jvm/graaljs",
         "//jvm/hermes:hermes-host",
         "//jvm/j2v8:j2v8-all",
     ],
