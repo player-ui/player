@@ -1,13 +1,7 @@
 import { test, expect, vitest, describe, beforeEach } from "vitest";
 import React, { Suspense } from "react";
 import { makeFlow } from "@player-ui/make-flow";
-import {
-  render,
-  act,
-  configure,
-  waitFor,
-  screen,
-} from "@testing-library/react";
+import { render, act, configure, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import {
   MetricsCorePlugin,
@@ -83,6 +77,7 @@ describe.each([
 
     const onComplete = vitest.fn();
     const onError = vitest.fn();
+    const onStartedFlow = vitest.fn();
 
     const container = render(
       <Suspense fallback="loading">
@@ -91,6 +86,7 @@ describe.each([
           plugins={[new SimpleAssetPlugin(), new MetricsCorePlugin()]}
           onComplete={onComplete}
           onError={onError}
+          onStartedFlow={onStartedFlow}
         />
       </Suspense>,
       { legacyRoot },
@@ -98,22 +94,26 @@ describe.each([
 
     expect(manager.next).toBeCalledWith(undefined);
     const view = await container.findByTestId("flow-1");
+    expect(onStartedFlow).toBeCalledTimes(1);
     expect(view).toBeInTheDocument();
+    const nextButton = await container.findByText("Continue");
 
-    await act(async () => {
-      const nextButton = await container.findByText("Continue");
+    act(() => {
       nextButton.click();
     });
-
-    expect(manager.next).toBeCalledTimes(2);
 
     const view2 = await container.findByTestId("flow-2");
     expect(view2).toBeInTheDocument();
+    expect(manager.next).toBeCalledTimes(2);
+    expect(onStartedFlow).toBeCalledTimes(2);
 
-    await act(async () => {
-      const nextButton = await container.findByText("Continue");
-      nextButton.click();
+    const nextButton2 = await container.findByText("Continue");
+
+    act(() => {
+      nextButton2.click();
     });
+
+    await container.findByText("loading");
     const getRequestTime = (RequestTimeWebPlugin as any).mock.calls[0][0];
     expect(getRequestTime()).toBeDefined();
     expect(onComplete).toBeCalled();
@@ -183,21 +183,23 @@ describe.each([
     expect(manager.next).toBeCalledWith(undefined);
     const view = await screen.findByTestId("flow-1");
     expect(view).toBeInTheDocument();
+    const nextButton = await screen.findByText("Continue");
 
-    await act(async () => {
-      const nextButton = await screen.findByText("Continue");
+    act(() => {
       nextButton.click();
     });
-
-    expect(manager.next).toBeCalledTimes(2);
 
     const view2 = await screen.findByTestId("flow-2");
     expect(view2).toBeInTheDocument();
+    expect(manager.next).toBeCalledTimes(2);
 
-    await act(async () => {
-      const nextButton = await screen.findByText("Continue");
-      nextButton.click();
+    const nextButton2 = await screen.findByText("Continue");
+
+    act(() => {
+      nextButton2.click();
     });
+
+    await screen.findByText("loading");
     expect(onComplete).toBeCalledWith(
       expect.objectContaining({
         status: "completed",
@@ -240,9 +242,7 @@ describe.each([
 
     const onComplete = vitest.fn();
     const onError = vitest.fn();
-    /**
-     *
-     */
+
     const MyFallback = (props: FallbackProps) => (
       <div>
         <button type="button" onClick={props?.retry}>
@@ -336,9 +336,6 @@ describe.each([
     const onComplete = vitest.fn();
     const onError = vitest.fn();
 
-    /**
-     *
-     */
     const MyFallback = (props: FallbackProps) => (
       <div>
         <button type="button" onClick={props?.retry}>
@@ -366,25 +363,24 @@ describe.each([
     expect(manager.next).toBeCalledWith(undefined);
     const view = await screen.findByTestId("flow-1");
     expect(view).toBeInTheDocument();
+    const nextButton = await screen.findByText("Continue");
 
-    await act(async () => {
-      const nextButton = await screen.findByText("Continue");
+    act(() => {
       nextButton.click();
     });
 
-    await waitFor(() => expect(manager.next).toBeCalledTimes(2));
-
     const view2 = await screen.findByTestId("flow-2");
     expect(view2).toBeInTheDocument();
+    expect(manager.next).toBeCalledTimes(2);
 
-    await act(async () => {
+    act(() => {
       view2.click();
     });
 
     const retryButton = await screen.findByText("Retry");
     expect(retryButton).toBeInTheDocument();
 
-    await act(async () => {
+    act(() => {
       retryButton.click();
     });
 
@@ -393,17 +389,18 @@ describe.each([
     const view3 = await screen.findByTestId("flow-2");
     expect(view3).toBeInTheDocument();
 
-    await act(async () => {
+    act(() => {
       view3.click();
     });
 
     const resetButton = await screen.findByText("Retry");
     expect(resetButton).toBeInTheDocument();
 
-    await act(async () => {
+    act(() => {
       resetButton.click();
     });
 
+    await screen.findByText("loading");
     expect(manager.next).toBeCalledTimes(4);
     expect(onError).toBeCalledTimes(2);
 
