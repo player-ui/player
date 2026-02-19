@@ -1,13 +1,7 @@
 import { test, expect, vitest, describe, beforeEach } from "vitest";
 import React, { Suspense } from "react";
 import { makeFlow } from "@player-ui/make-flow";
-import {
-  render,
-  act,
-  configure,
-  waitFor,
-  screen,
-} from "@testing-library/react";
+import { render, act, configure, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import {
   MetricsCorePlugin,
