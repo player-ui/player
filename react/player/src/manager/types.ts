@@ -1,5 +1,5 @@
 import type React from "react";
-import type { CompletedState, Flow, FlowResult } from "@player-ui/player";
+import type { CompletedState, Flow, InProgressState } from "@player-ui/player";
 import type { ReactPlayer, ReactPlayerOptions } from "../player";
 
 export interface FinalState {
@@ -31,7 +31,7 @@ export interface FlowManager {
    * Called when the flow is ended early (the react tree is torn down)
    * Allows clients the opportunity to save-data before destroying the tree
    */
-  terminate?: (data?: FlowResult["data"]) => void;
+  terminate?: (state?: InProgressState) => void;
 }
 
 export interface FallbackProps {
