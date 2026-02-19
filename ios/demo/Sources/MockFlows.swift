@@ -1504,6 +1504,65 @@ static let chatMessageBasic: String = """
 }
 """
 
+    static let endStateReproFlow: String = """
+{
+  "id": "end-state-repro-flow-1",
+  "views": [
+    {
+      "id": "view-1",
+      "type": "collection",
+      "label": {
+        "asset": {
+          "id": "title",
+          "type": "text",
+          "value": "Flow 1 - Click End to complete this flow"
+        }
+      },
+      "values": [
+        {
+          "asset": {
+            "id": "action-end",
+            "type": "action",
+            "value": "End",
+            "label": {
+              "asset": {
+                "id": "action-end-label",
+                "type": "text",
+                "value": "End Flow 1 (loads Flow 2 next)"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "startState": "ACTION_1",
+      "ACTION_1": {
+        "state_type": "ACTION",
+        "exp": "{{foo}} = 1",
+        "transitions": {
+          "*": "VIEW_1"
+        }
+      },
+      "VIEW_1": {
+        "state_type": "VIEW",
+        "ref": "view-1",
+        "transitions": {
+          "End": "END_Done"
+        }
+      },
+      "END_Done": {
+        "state_type": "END",
+        "outcome": "done"
+      }
+    }
+  }
+}
+"""
+
     public static let assetSections: [FlowLoader.FlowSection] = [
         (title: "action", flows: [
             (name: "counter", flow: MockFlows.actionCounter),

@@ -1,3 +1,93 @@
+# 0.15.0 (Tue Feb 10 2026)
+
+### Release Notes
+
+#### Remove async node tracking from core and rely on node-based caching ([#777](https://github.com/player-ui/player/pull/777))
+
+- Remove async node references from player core resolver.
+- Allow the resolver to update using node changes instead of just data changes
+- Add `markAsChanged` function to the `ViewController` to support triggering updates caused by node changes.
+- Update `AsyncNodePlugin` and `AsyncNodePluginPlugin` to make use of the above.
+- Fixed a bug causing assets loaded using the `AsyncNodePlugin` to crash on android
+
+#### Expand Docs on Using XLRs for Validations ([#784](https://github.com/player-ui/player/pull/784))
+
+Docs: Expanded content validation Docs
+
+#### Remove chakra/emotion and unused Storybook components ([#776](https://github.com/player-ui/player/pull/776))
+
+- Remove Chakra/Emotion dependencies in Storybook.
+
+#### feat(storybook): upgrade to version 10.1.4 ([#767](https://github.com/player-ui/player/pull/767))
+
+Upgraded Storybook from version `7.6.10` to latest `10.1.4`. Also fixed broken images within stories and initial value for dark mode for the editors.
+
+#### Add Back in Stamping for JavaScript Builds ([#761](https://github.com/player-ui/player/pull/761))
+
+Fix stamping in core/react builds for Player version and commit used to build the bundle
+
+#### Markdown handle empty ([#752](https://github.com/player-ui/player/pull/752))
+
+Add option to provide a handler for when where nothing is returned from the markdown mapping.
+
+#### Maintainance: Dependency Updates ([#745](https://github.com/player-ui/player/pull/745))
+
+Minor dependency updates to address security bulletins
+
+---
+
+#### 🚀 Enhancement
+
+- add asset render errors to each platform [#765](https://github.com/player-ui/player/pull/765) ([@tmarmer](https://github.com/tmarmer))
+- feat(storybook): upgrade to version 10.1.4 [#767](https://github.com/player-ui/player/pull/767) ([@dtychshenko](https://github.com/dtychshenko))
+- Markdown handle empty [#752](https://github.com/player-ui/player/pull/752) ([@shahabdsh](https://github.com/shahabdsh) [@KetanReddy](https://github.com/KetanReddy))
+
+#### 🐛 Bug Fix
+
+- Release main [#799](https://github.com/player-ui/player/pull/799) ([@intuit-svc](https://github.com/intuit-svc))
+- fix ios player not detecting view change when same flow reloads [#796](https://github.com/player-ui/player/pull/796) ([@nancywu1](https://github.com/nancywu1))
+- Fix: CI Timeout During Docs Build [#794](https://github.com/player-ui/player/pull/794) ([@kharrop](https://github.com/kharrop))
+- Remove async node tracking from core and rely on node-based caching [#777](https://github.com/player-ui/player/pull/777) ([@tmarmer](https://github.com/tmarmer))
+- Expand Docs on Using XLRs for Validations [#784](https://github.com/player-ui/player/pull/784) ([@KetanReddy](https://github.com/KetanReddy) [@kharrop](https://github.com/kharrop))
+- Remove chakra/emotion and unused Storybook components [#776](https://github.com/player-ui/player/pull/776) ([@KetanReddy](https://github.com/KetanReddy))
+- fix tests with broken context mocks in android/player [#774](https://github.com/player-ui/player/pull/774) ([@tmarmer](https://github.com/tmarmer))
+- fix(react-player): expose viewUpdateSubscription to render alt comp's [#762](https://github.com/player-ui/player/pull/762) ([@dtychshenko](https://github.com/dtychshenko))
+- Add Back in Stamping for JavaScript Builds [#761](https://github.com/player-ui/player/pull/761) ([@KetanReddy](https://github.com/KetanReddy))
+- Turn verbose back on for publishing while pipeline is unstable [#759](https://github.com/player-ui/player/pull/759) ([@KetanReddy](https://github.com/KetanReddy))
+- Set timeout of publish stage to 40m [#758](https://github.com/player-ui/player/pull/758) ([@KetanReddy](https://github.com/KetanReddy))
+- add full checkout for both stages and remove all contribs from auto [#757](https://github.com/player-ui/player/pull/757) ([@spentacular](https://github.com/spentacular))
+- fix circle checkout to not use blobless [#756](https://github.com/player-ui/player/pull/756) ([@spentacular](https://github.com/spentacular))
+- Maintainance: Dependency Updates [#745](https://github.com/player-ui/player/pull/745) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 📝 Documentation
+
+- Docs: Plugin Architecture/Hooks + Landing Page Fix [#780](https://github.com/player-ui/player/pull/780) ([@kharrop](https://github.com/kharrop))
+
+#### Authors: 8
+
+- [@intuit-svc](https://github.com/intuit-svc)
+- [@nancywu1](https://github.com/nancywu1)
+- Dmitriy Tychshenko ([@dtychshenko](https://github.com/dtychshenko))
+- Kelly Harrop ([@kharrop](https://github.com/kharrop))
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Shahab Deljoo ([@shahabdsh](https://github.com/shahabdsh))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+- Thomas Marmer ([@tmarmer](https://github.com/tmarmer))
+
+---
+
+# 0.15.0-next.8 (Tue Feb 10 2026)
+
+#### 🐛 Bug Fix
+
+- fix ios player not detecting view change when same flow reloads [#796](https://github.com/player-ui/player/pull/796) ([@nancywu1](https://github.com/nancywu1))
+
+#### Authors: 1
+
+- [@nancywu1](https://github.com/nancywu1)
+
+---
+
 # 0.15.0-next.7 (Tue Feb 03 2026)
 
 #### 🐛 Bug Fix

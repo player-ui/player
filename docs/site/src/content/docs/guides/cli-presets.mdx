@@ -1,0 +1,149 @@
+---
+title: Creating CLI Presets
+---
+
+import { PackageManagers } from 'starlight-package-managers';
+import { Aside, Badge, FileTree, Steps } from '@astrojs/starlight/components';
+
+CLI Presets are [CLI Configs](../../capabilities/cli#config) that are intended to be reused. They bundle together plugins, settings, and dependencies to provide a consistent development experience across projects. CLI Presets are benefical for teams that author Content. Adjacent Content authoring teams often wish to share CLI settings.
+
+## Creating a CLI Preset
+
+This example will demonstrate a common use case of CLI presets: bundling common plugins and type definitions.
+
+Consider this **hypothetical** scenario:
+
+You are a developer on a team with a super popular Player Plugin. There are many teams who write Content that leverage your plugin. You want to create a CLI Preset that will be used across all of these Content projects. This preset will include the necessary plugins and type definitions to provide a consistent development experience.
+
+### Step 1: Create Package Structure
+
+Create a new Node.js package with the following structure:
+
+<FileTree>
+- my-cli-preset/
+  - package.json
+  - src/
+    - index.ts
+</FileTree>
+
+### Step 2: Create Package Configuration
+
+Set up your `package.json` with the necessary dependencies, using appropriate versions:
+
+```json
+{
+  "name": "@my-org/player-cli-preset",
+  ...
+  "dependencies": {
+    "@player-tools/cli": "^0.12.0",
+    "@player-ui/types": "^0.15.0",
+    "@my-org/player-plugin-assets": "^1.0.0"
+  },
+  ...
+}
+```
+
+This example includes the following dependencies:
+
+- `@player-tools/cli` <Badge text="required"/>: The Player CLI package. It is required to define any CLI preset.
+- `@player-ui/types` <Badge text="required"/>: The Player UI types package. This provides type definitions (e.g. `Asset`, `Flow`, etc.) that serve as the foundation for the Player ecosystem. We will add it to the config in this example. Every Content project will want these type definitions for compilation and validation, so it's an excellent addition to the reusable config.
+
+    Strictly speaking, you can exclude this package and provide your own type definitions package. However, this is not recommended, as you would have to ensure your custom types were compatible with other Player plugins and tools.
+
+    <Aside>
+    `player-ui/types` used by the CLI preset should be the same version as the `player-ui/types` used at runtime. This ensures that the Player types being used for validation and compilation are the same as the types used when actually running content.
+    </Aside>
+- `@my-org/player-plugin-assets` <Badge text="example-only" variant="caution"/>: A custom plugin package that, in this scenario, your team has written. [This package exports XLR (Cross-Language Representation) types](../../xlr/usage/export). We will add it to the config in this example to provide basic asset types. In this scenario, every Content project is using these asset types, so it's an excellent addition to the reusable config for compilation & validation.
+
+### Step 3: Define CLI Preset
+
+Create your configuration (`PlayerConfigFileShape`) in `src/index.ts`:
+
+```typescript
+import type { PlayerConfigFileShape } from "@player-tools/cli";
+import { LSPAssetsPlugin, LSPPluginPlugin } from "@player-tools/cli";
+import path from "path";
+
+const config: PlayerConfigFileShape = {
+  plugins: [
+    // LSP Assets Plugin for validation and type checking
+    new LSPAssetsPlugin(
+      [
+        // Include base Player types
+        "@player-ui/types",
+        // Include your custom plugin package
+        "@my-org/player-plugin-assets"
+      ].map((pkg) => ({
+        path: path.join(
+          path.dirname(require.resolve(`${pkg}/package.json`)),
+          "dist"
+        ),
+      }))
+    ),
+    new LSPPluginPlugin(
+      // Include your custom local plugin
+      [new ExampleValidationPlugin()]
+    ),
+  ],
+};
+
+export default config;
+```
+
+Here in the config, we:
+- Register the type and asset definitions with the `LSPAssetsPlugin`, so the validator and compiler can leverage them. It is common to register the shared types and assets in a CLI Preset, since it reduces redundant CLI configuration across projects.
+- Add a custom `ExampleValidationPlugin` to the config. `ExampleValidationPlugin`, in this scenario, is a `PlayerLanguageServicePlugin` your team has written. (See [Adding Custom LSP Validations](../custom-lsp-validations) for an example of how and why one might want to write a custom plugin.) It is common to add custom validation plugins to the CLI Preset, since it reduces redundant CLI configuration across projects.
+
+## Using CLI Presets
+
+### With Bazel
+
+If using Bazel, create a DSL config target:
+
+```python
+load("@rules_player//player:defs.bzl", create_base_dsl_config = "create_base_config")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+create_base_dsl_config(
+    name = "dsl_config",
+    presets = [
+        ":node_modules/@my-org/player-cli-preset",
+    ],
+)
+```
+
+### Without Bazel
+
+To consume a CLI Preset without Bazel:
+
+<Steps>
+
+1. Add it to your project's dependencies. For example, in `package.json`, add:
+
+    ```json
+    {
+      ...
+      "dependencies": {
+        "@my-org/player-cli-preset": "^1.0.0"
+      },
+      ...
+    }
+    ```
+
+2. Add the CLI Preset under `presets` as part of your config file. There are many ways to do this, described [here](../../capabilities/cli#config). Here is one example, where the config is added to the `package.json`:
+
+    ```json
+    {
+      ...
+      "player": {
+        "presets": [
+          "@my-org/player-cli-preset"
+        ]
+      },
+      ...
+    }
+    ```
+
+</Steps>
