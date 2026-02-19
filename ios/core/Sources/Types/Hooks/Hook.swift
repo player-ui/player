@@ -109,6 +109,42 @@ public class Hook2<T, U>: BaseJSHook where T: CreatedFromJSValue, U: CreatedFrom
 }
 
 /**
+ A waterfall hook with 2 parameters. The handler receives (state, transitionValue) and must return
+ the state (as JSValue) so the JS runtime can pass it to the next tap or use it as the result.
+ Used for flow hooks like beforeTransition where the return value is the (possibly modified) state.
+ */
+public class WaterfallHook2: BaseJSHook {
+    /**
+     Attach a closure to the hook. When the hook is fired in the JS runtime, the handler receives
+     the state as JSValue and the transition value as String. The handler must return the state
+     as JSValue (typically the same reference to pass through, or a modified state).
+     - parameters:
+       - hook: A function (state, transitionValue) -> state JSValue
+     */
+    public func tap(_ hook: @escaping (JSValue, String) -> JSValue) {
+        let tapMethod: @convention(block) (JSValue?, JSValue?) -> JSValue? = { value, value2 in
+            guard let val = value, let val2 = value2 else { return nil }
+            let transitionValue = val2.toString() ?? ""
+            return hook(val, transitionValue)
+        }
+        self.hook.invokeMethod("tap", withArguments: [name, JSValue(object: tapMethod, in: context) as Any])
+    }
+
+    /**
+     Typed overload matching JVM's beforeTransition: (NavigationFlowState, String) -> NavigationFlowState.
+     The handler receives the current state as NavigationBaseState? and the transition value;
+     return the state (pass-through or modified) or nil to pass through the original state.
+     Use this to avoid ambiguous use of tap when you want a typed state.
+     */
+    public func tapTyped(_ hook: @escaping (NavigationBaseState?, String) -> NavigationBaseState?) {
+        tap { state, transitionValue in
+            let typedState = NavigationBaseState.createInstance(value: state)
+            return hook(typedState, transitionValue)?.jsValue ?? state
+        }
+    }
+}
+
+/**
  This class represents an object in the JS runtime that can be tapped into
  to receive JS events
  */

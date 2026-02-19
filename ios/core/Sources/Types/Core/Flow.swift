@@ -44,11 +44,19 @@ public class Flow: CreatedFromJSValue {
     */
     public init(_ value: JSValue) {
         self.value = value
-        hooks = FlowHooks(transition: Hook2(baseValue: value, name: "transition"), afterTransition: Hook(baseValue: value, name: "afterTransition"))
+        hooks = FlowHooks(
+            beforeTransition: WaterfallHook2(baseValue: value, name: "beforeTransition"),
+            transition: Hook2(baseValue: value, name: "transition"),
+            afterTransition: Hook(baseValue: value, name: "afterTransition")
+        )
     }
 }
 
 public struct FlowHooks {
+    /// A hook that fires before a transition, with the current state and transition value. The handler receives
+    /// (state as JSValue, transitionValue as String) and must return the state as JSValue (pass-through or modified).
+    public var beforeTransition: WaterfallHook2
+
     /// A hook that fires when transitioning states and giving the old and new states as parameters
     public var transition: Hook2<NamedState?, NamedState>
 
