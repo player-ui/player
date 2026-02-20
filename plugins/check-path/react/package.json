@@ -3,12 +3,12 @@
   "version": "0.0.0-PLACEHOLDER",
   "main": "src/index.tsx",
   "peerDependencies": {
-    "@player-ui/react": "workspace:*"
+    "@player-ui/react": "workspace:^"
   },
   "devDependencies": {
-    "@player-ui/make-flow": "workspace:*"
+    "@player-ui/make-flow": "workspace:^"
   },
   "dependencies": {
-    "@player-ui/check-path-plugin": "workspace:*"
+    "@player-ui/check-path-plugin": "workspace:^"
   }
 }

@@ -3,10 +3,10 @@
   "version": "0.0.0-PLACEHOLDER",
   "main": "src/index.ts",
   "peerDependencies": {
-    "@player-ui/player": "workspace:*"
+    "@player-ui/player": "workspace:^"
   },
   "devDependencies": {
-    "@player-ui/check-path-plugin": "workspace:*",
-    "@player-ui/partial-match-registry": "workspace:*"
+    "@player-ui/check-path-plugin": "workspace:^",
+    "@player-ui/partial-match-registry": "workspace:^"
   }
 }
