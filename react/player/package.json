@@ -3,12 +3,12 @@
   "version": "0.0.0-PLACEHOLDER",
   "main": "src/index.tsx",
   "dependencies": {
-    "@player-ui/metrics-plugin": "workspace:*",
-    "@player-ui/partial-match-registry": "workspace:*",
-    "@player-ui/player": "workspace:*",
-    "@player-ui/react-subscribe": "workspace:*"
+    "@player-ui/metrics-plugin": "workspace:^",
+    "@player-ui/partial-match-registry": "workspace:^",
+    "@player-ui/player": "workspace:^",
+    "@player-ui/react-subscribe": "workspace:^"
   },
   "devDependencies": {
-    "@player-ui/make-flow": "workspace:*"
+    "@player-ui/make-flow": "workspace:^"
   }
 }

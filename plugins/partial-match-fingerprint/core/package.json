@@ -3,12 +3,12 @@
   "version": "0.0.0-PLACEHOLDER",
   "main": "src/index.ts",
   "dependencies": {
-    "@player-ui/partial-match-registry": "workspace:*"
+    "@player-ui/partial-match-registry": "workspace:^"
   },
   "devDependencies": {
-    "@player-ui/make-flow": "workspace:*"
+    "@player-ui/make-flow": "workspace:^"
   },
   "peerDependencies": {
-    "@player-ui/player": "workspace:*"
+    "@player-ui/player": "workspace:^"
   }
 }

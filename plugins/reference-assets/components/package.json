@@ -3,10 +3,10 @@
   "version": "0.0.0-PLACEHOLDER",
   "main": "src/index.tsx",
   "peerDependencies": {
-    "@player-ui/player": "workspace:*"
+    "@player-ui/player": "workspace:^"
   },
   "dependencies": {
-    "@player-ui/common-types-plugin": "workspace:*",
-    "@player-ui/reference-assets-plugin": "workspace:*"
+    "@player-ui/common-types-plugin": "workspace:^",
+    "@player-ui/reference-assets-plugin": "workspace:^"
   }
 }
