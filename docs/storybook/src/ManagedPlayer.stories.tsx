@@ -1,7 +1,7 @@
 import { ManagedPlayer } from "@player-ui/react";
 import { ReferenceAssetsPlugin } from "@player-ui/reference-assets-plugin-react";
 import { SuspenseSpinner } from "@player-ui/storybook";
-import { Meta, StoryObj } from "@storybook/react-webpack5";
+import { Meta, StoryObj } from "@storybook/react-vite";
 import React from "react";
 import {
     createFlowManager,

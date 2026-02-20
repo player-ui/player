@@ -1,4 +1,4 @@
-import type { Meta } from "@storybook/react-webpack5";
+import type { Meta } from "@storybook/react-vite";
 import { createDSLStory } from "@player-ui/storybook";
 import { Input } from "@player-ui/reference-assets-plugin-react";
 
@@ -13,9 +13,9 @@ const meta: Meta<typeof Input> = {
 export default meta;
 
 export const Basic = createDSLStory(
-  () => import("!!raw-loader!@player-ui/mocks/input/input-basic.tsx"),
+  () => import("@player-ui/mocks/input/input-basic.tsx?raw"),
 );
 
 export const Validation = createDSLStory(
-  () => import("!!raw-loader!@player-ui/mocks/input/input-transition.tsx"),
+  () => import("@player-ui/mocks/input/input-transition.tsx?raw"),
 );

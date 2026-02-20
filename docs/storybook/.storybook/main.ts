@@ -1,5 +1,4 @@
-import type { StorybookConfig } from "@storybook/react-webpack5";
-import type { Configuration as WebpackConfig } from "webpack";
+import type { StorybookConfig } from "@storybook/react-vite";
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -12,26 +11,24 @@ const config: StorybookConfig = {
     "@vueless/storybook-dark-mode",
     "@storybook/addon-docs",
     "@player-ui/storybook",
-    "@storybook/addon-webpack5-compiler-babel",
   ],
   typescript: {
     reactDocgen: false,
   },
   framework: {
-    name: "@storybook/react-webpack5",
+    name: "@storybook/react-vite",
     options: {},
   },
-  webpackFinal(config: WebpackConfig) {
-    if (config.resolve) {
-      config.resolve.alias = {
-        ...config.resolve.alias,
+  viteFinal(config) {
+    config.resolve = config.resolve || {};
+    config.resolve.alias = {
+      ...config.resolve.alias,
 
-        // storybook + pnpm issue
-        // https://github.com/storybookjs/storybook/discussions/22650#discussioncomment-6414161
-        react: path.resolve(thisDir, "../../../node_modules/react"),
-        "react-dom": path.resolve(thisDir, "../../../node_modules/react-dom"),
-      };
-    }
+      // storybook + pnpm issue
+      // https://github.com/storybookjs/storybook/discussions/22650#discussioncomment-6414161
+      react: path.resolve(thisDir, "../../../node_modules/react"),
+      "react-dom": path.resolve(thisDir, "../../../node_modules/react-dom"),
+    };
     return config;
   },
 };
