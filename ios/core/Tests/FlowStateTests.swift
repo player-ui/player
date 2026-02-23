@@ -114,7 +114,7 @@ class FlowStateTests: XCTestCase {
 
         player.hooks?.flowController.tap { flowController in
             flowController.hooks.flow.tap { flow in
-                flow.hooks.beforeTransition.tapTyped { state, transitionValue in
+                flow.hooks.beforeTransition.tap { state, transitionValue in
                     pendingTransition = (flow.currentState, transitionValue)
                     return state
                 }
