@@ -9,9 +9,9 @@ import com.intuit.playerui.android.AndroidPlayerPlugin
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.core.bridge.runtime.Runtime
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
-import com.intuit.playerui.core.managed.AsyncFlowIterator
 import com.intuit.playerui.core.managed.AsyncIterationManager
 import com.intuit.playerui.core.managed.FlowManager
+import com.intuit.playerui.core.managed.AsyncIterationManager
 import com.intuit.playerui.core.player.PlayerException
 import com.intuit.playerui.core.player.state.CompletedState
 import com.intuit.playerui.core.player.state.ErrorState
@@ -28,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -53,7 +54,7 @@ import kotlinx.coroutines.runBlocking
  */
 @OptIn(ExperimentalPlayerApi::class)
 public open class PlayerViewModel(
-    flows: AsyncFlowIterator,
+    manager: FlowManager,
 ) : ViewModel(),
     AndroidPlayerPlugin,
     RuntimePlugin {
@@ -88,7 +89,7 @@ public open class PlayerViewModel(
         }
     }
 
-    protected val manager: FlowManager = FlowManager(flows)
+    protected val internalManager = AsyncIterationManager(manager)
 
     private var runtime: Runtime<*>? = null
 
@@ -101,7 +102,7 @@ public open class PlayerViewModel(
     init {
         // next() TODO: If we fix the non-final field error, we can prefetch here
         viewModelScope.launch(Dispatchers.Default) {
-            manager.state.collect {
+            internalManager.state.collect {
                 when (it) {
                     AsyncIterationManager.State.NotStarted -> _state.emit(ManagedPlayerState.NotStarted)
                     AsyncIterationManager.State.Pending -> _state.emit(ManagedPlayerState.Pending)
@@ -147,7 +148,7 @@ public open class PlayerViewModel(
                 is NotStartedState -> _state.tryEmit(ManagedPlayerState.NotStarted)
                 // When player completes, we try to get the next flow from the manager,
                 // which will either start a new flow or transition to done
-                is CompletedState -> manager.next(state)
+                is CompletedState -> internalManager.next(state)
                 is ErrorState -> _state.tryEmit(ManagedPlayerState.Error(state.error))
                 is InProgressState, ReleasedState, null -> Unit
             }
@@ -159,9 +160,9 @@ public open class PlayerViewModel(
     }
 
     public override fun onCleared() {
-        if (manager.state.value != AsyncIterationManager.State.Done) {
+        if (internalManager.state.value != AsyncIterationManager.State.Done) {
             runBlocking {
-                manager.iterator.terminate()
+                internalManager.iterator.terminate(player.inProgressState)
             }
         }
 
@@ -182,20 +183,20 @@ public open class PlayerViewModel(
 
     /** Start the [manager] from the first flow */
     public fun start() {
-        manager.next()
+        internalManager.next()
     }
 
     /** Reruns the current flow, in the case of an error. Has no effect once the iterator has finished or is currently pending an item */
     public fun retry() {
         when (state.value) {
-            ManagedPlayerState.NotStarted -> manager.next()
+            ManagedPlayerState.NotStarted -> internalManager.next()
             is ManagedPlayerState.Error,
             is ManagedPlayerState.Running,
-            -> when (manager.state.value) {
-                AsyncIterationManager.State.NotStarted -> manager.next()
+            -> when (internalManager.state.value) {
+                AsyncIterationManager.State.NotStarted -> internalManager.next()
                 is AsyncIterationManager.State.Item<*>,
                 is AsyncIterationManager.State.Error,
-                -> manager.next(player.completedState)
+                -> internalManager.next(player.completedState)
                 AsyncIterationManager.State.Done,
                 AsyncIterationManager.State.Pending,
                 -> Unit
@@ -211,16 +212,16 @@ public open class PlayerViewModel(
     }
 
     /** Helper to progress the [FlowManager] in within the [viewModelScope] */
-    private fun FlowManager.next(completedState: CompletedState? = null) {
+    private fun AsyncIterationManager<String, CompletedState, InProgressState>.next(completedState: CompletedState? = null) {
         viewModelScope.next(completedState)
     }
 
-    /** Generic [ViewModelProvider.AndroidViewModelFactory] to conveniently construct some [T] with an [Application] and [AsyncFlowIterator] */
+    /** Generic [ViewModelProvider.AndroidViewModelFactory] to conveniently construct some [T] with an [Application] and [FlowManager] */
     public class Factory<T : PlayerViewModel>(
-        private val iterator: AsyncFlowIterator,
-        private val factory: (AsyncFlowIterator) -> T = { i -> PlayerViewModel(i) as T },
+        private val manager: FlowManager,
+        private val factory: (FlowManager) -> T = { i -> PlayerViewModel(i) as T },
     ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T = factory(iterator).apply(PlayerViewModel::start) as T
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = factory(manager).apply(PlayerViewModel::start) as T
     }
 }
 

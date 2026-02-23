@@ -16,7 +16,7 @@ import kotlin.coroutines.resume
 internal class AsyncIterationManagerTest {
     @Test fun `test progresses through predefined flows`(): Unit = runBlocking {
         val completedState = mockk<CompletedState>()
-        val manager = FlowManager(AsyncFlowIterator("first", "second", "third"))
+        val manager = AsyncIterationManager(FlowManager("first", "second", "third"))
         assertEquals(AsyncIterationManager.State.NotStarted, manager.state.value)
         manager.next()
         assertEquals("first", manager.state.value.item)
@@ -30,7 +30,7 @@ internal class AsyncIterationManagerTest {
 
     @Test fun `test handles errors`(): Unit = runBlocking {
         val manager = AsyncIterationManager(
-            object : AsyncIterator<String, Boolean> {
+            object : AsyncIterator<String, Boolean, Boolean> {
                 override suspend fun next(result: Boolean?): String? = throw PlayerException("expected")
             },
         )
@@ -40,7 +40,7 @@ internal class AsyncIterationManagerTest {
     }
 
     @Test fun `test pends until item is provided`(): Unit = runBlocking {
-        class MockIterator : AsyncIterator<String, Boolean> {
+        class MockIterator : AsyncIterator<String, Boolean, Boolean> {
             private var readyToEmit = false
 
             override suspend fun next(result: Boolean?): String? {
@@ -80,7 +80,7 @@ internal class AsyncIterationManagerTest {
     private val AsyncIterationManager.State.error get() =
         (this as AsyncIterationManager.State.Error).error.message
 
-    private fun <Result : Any> AsyncIterationManager<*, Result>.next(completedState: Result? = null) = runBlocking {
+    private fun <Result : Any> AsyncIterationManager<*, Result, *>.next(completedState: Result? = null) = runBlocking {
         next(completedState)
     }
 }
