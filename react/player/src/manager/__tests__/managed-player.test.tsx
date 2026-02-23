@@ -454,7 +454,8 @@ describe.each([
     await screen.findByTestId("flow-1");
     result.unmount();
 
-    const terminateArgument: InProgressState = manager.terminate?.mock.calls[0][0];
+    const terminateArgument: InProgressState =
+      manager.terminate?.mock.calls[0][0];
     expect(terminateArgument.flow).toMatchSnapshot();
     expect(terminateArgument.status).toBe("in-progress");
   });
@@ -560,10 +561,11 @@ describe.each([
 
     let newManagerBtn = await screen.findByTestId("newManager");
     await user.click(newManagerBtn);
-    
+
     // terminate should receive an InProgressState
     expect(previousManager.current.terminate).toBeCalled();
-    const terminateArgument1: InProgressState = previousManager.current.terminate?.mock.calls[0][0]
+    const terminateArgument1: InProgressState =
+      previousManager.current.terminate?.mock.calls[0][0];
     expect(terminateArgument1.flow).toMatchSnapshot();
     expect(terminateArgument1.status).toBe("in-progress");
 
@@ -577,7 +579,8 @@ describe.each([
     const prevMan = previousManager.current;
     // terminate should receive an InProgressState
     expect(prevMan.terminate).toBeCalled();
-    const terminateArgument2: InProgressState = prevMan.terminate?.mock.calls[0][0]
+    const terminateArgument2: InProgressState =
+      prevMan.terminate?.mock.calls[0][0];
     expect(terminateArgument2.flow).toMatchSnapshot();
     expect(terminateArgument2.status).toBe("in-progress");
 

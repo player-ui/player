@@ -19,20 +19,23 @@ The standardization of this contract allows any client to manage a series of Pla
 An abridged version of the API is described below:
 
 ```typescript
-interface FlowManager {
+export interface FlowManager {
   /**
    * An iterator implementation that takes the result of the previous flow and returns a new one or completion marker.
+   *
    * If `done: true` is returned, the multi-flow experience is completed.
    *
-   * @param previousValue - The result of the previous flow.
+   * @param result - The result of the previous flow.
    */
-  next: (prevResponse: CompletedState) => Promise<FinalState | NextState<Flow>>;
+  next: (
+    result?: CompletedState,
+  ) => Promise<FinalState | NextState>;
 
   /**
    * Called when the flow is ended early (the react tree is torn down)
    * Allows clients the opportunity to save-data before destroying the tree
    */
-  terminate?: (player: Player) => void;
+  terminate?: (state?: InProgressState) => void;
 }
 ```
 

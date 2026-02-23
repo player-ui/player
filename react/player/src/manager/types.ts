@@ -7,14 +7,16 @@ export interface FinalState {
   done: true;
 }
 
-export interface NextState<T> {
+export interface NextState {
   /** Optional mark the iteration as _not_ completed */
-  done?: false;
+  done: false;
 
   /** The next value in the iteration */
-  value: T;
+  value: Flow;
 }
 
+/** A JS Iterator that returns a new flow or completion marker
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator */
 export interface FlowManager {
   /**
    * An iterator implementation that takes the result of the previous flow and returns a new one or completion marker.
@@ -23,9 +25,7 @@ export interface FlowManager {
    *
    * @param previousValue - The result of the previous flow.
    */
-  next: (
-    previousValue?: CompletedState,
-  ) => Promise<FinalState | NextState<Flow>>;
+  next: (result?: CompletedState) => Promise<FinalState | NextState>;
 
   /**
    * Called when the flow is ended early (the react tree is torn down)
@@ -91,7 +91,7 @@ export type ManagedPlayerState =
         prevResult?: CompletedState;
 
         /** A promise from the flow manager for the next state */
-        next: Promise<FinalState | NextState<Flow>>;
+        next: Promise<FinalState | NextState>;
       };
     }
   | {
