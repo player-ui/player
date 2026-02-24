@@ -22,6 +22,7 @@ import type { DataController } from "../data/controller";
 import type { TransformRegistry } from "./types";
 import type { BindingInstance } from "../../binding";
 import type { Node } from "../../view";
+import { ErrorController } from "../error";
 
 export interface ViewControllerOptions {
   /** Where to get data from */
@@ -32,6 +33,9 @@ export interface ViewControllerOptions {
 
   /** A flow-controller instance to listen for view changes */
   flowController: FlowController;
+
+  /** Error controller to use when managing view-level errors */
+  errorController: ErrorController;
 }
 
 export type ViewControllerHooks = {
@@ -197,7 +201,11 @@ export class ViewController {
       throw new Error(`No view with id ${viewId}`);
     }
 
-    const view = new ViewInstance(source, this.viewOptions);
+    const view = new ViewInstance(
+      source,
+      this.viewOptions,
+      this.viewOptions.errorController,
+    );
     this.currentView = view;
 
     // Give people a chance to attach their

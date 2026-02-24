@@ -460,6 +460,7 @@ export class Player {
         type: (b) => schema.getType(parseBinding(b)),
       },
       constants: this.constantsController,
+      errorController,
     });
 
     viewController.hooks.view.tap("player", (view) => {

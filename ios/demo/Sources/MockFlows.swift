@@ -1480,6 +1480,34 @@ static let chatMessageBasic: String = """
               }
             }
           }
+        },
+        {
+          "asset": {
+            "id": "values-3",
+            "type": "action",
+            "exp": "sendBroken({{content}})",
+            "label": {
+              "asset": {
+                "id": "values-3-label",
+                "type": "text",
+                "value": " Send Broken Render Asset "
+              }
+            }
+          }
+        },
+        {
+          "asset": {
+            "id": "values-4",
+            "type": "action",
+            "exp": "sendBrokenTransform({{content}})",
+            "label": {
+              "asset": {
+                "id": "values-4-label",
+                "type": "text",
+                "value": " Send Broken Transform Asset "
+              }
+            }
+          }
         }
       ]
     }

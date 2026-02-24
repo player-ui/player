@@ -12,9 +12,19 @@ import type {
   ActionAsset,
   InfoAsset,
   ChoiceAsset,
+  ThrowingAsset,
 } from "@player-ui/reference-assets-plugin";
 import { ReferenceAssetsPlugin as ReferenceAssetsCorePlugin } from "@player-ui/reference-assets-plugin";
-import { Input, Text, Collection, Action, Info, Image, Choice } from "./assets";
+import {
+  Input,
+  Text,
+  Collection,
+  Action,
+  Info,
+  Image,
+  Choice,
+  Throwing,
+} from "./assets";
 
 /**
  * A plugin to register the base reference assets
@@ -23,7 +33,14 @@ export class ReferenceAssetsPlugin
   implements
     ReactPlayerPlugin,
     ExtendedPlayerPlugin<
-      [InputAsset, TextAsset, ActionAsset, CollectionAsset, ChoiceAsset],
+      [
+        InputAsset,
+        TextAsset,
+        ActionAsset,
+        CollectionAsset,
+        ChoiceAsset,
+        ThrowingAsset,
+      ],
       [InfoAsset]
     >
 {
@@ -39,6 +56,7 @@ export class ReferenceAssetsPlugin
         ["collection", Collection],
         ["image", Image],
         ["choice", Choice],
+        ["throwing", Throwing],
       ]),
     );
   }

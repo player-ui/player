@@ -31,6 +31,7 @@ import type {
   ChoiceAsset,
   ChoiceItem as ChoiceItemType,
   ChatMessageAsset,
+  ThrowingAsset,
 } from "@player-ui/reference-assets-plugin";
 import { dataTypes, validators } from "@player-ui/common-types-plugin";
 
@@ -218,3 +219,9 @@ export const ChatMessage = (
 };
 
 ChatMessage.Value = ValueSlot;
+
+export const Throwing = (
+  props: AssetPropsWithChildren<ThrowingAsset>,
+): React.ReactElement => {
+  return <Asset type="throwing" {...props} />;
+};

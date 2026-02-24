@@ -33,6 +33,24 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.net.URL
 
+public typealias GetCoroutineFunction = (Player) -> CoroutineExceptionHandler
+
+public open class HeadlessPlayerRuntimeConfig {
+    public constructor()
+
+    public constructor(config: PlayerRuntimeConfig) {
+        debuggable = config.debuggable
+        coroutineExceptionHandler = config.coroutineExceptionHandler?.let<CoroutineExceptionHandler, GetCoroutineFunction> { h ->
+            { _: Player -> h }
+        }
+        timeout = config.timeout
+    }
+
+    public open var debuggable: Boolean = false
+    public open var coroutineExceptionHandler: GetCoroutineFunction? = null
+    public open var timeout: Long = if (debuggable) Int.MAX_VALUE.toLong() else 5000
+}
+
 /**
  * Headless [Player] wrapping a core JS player with a [Runtime]. The [player]
  * will be instantiated from the [bundledSource] unless supplied with
@@ -54,6 +72,7 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
     explicitRuntime: Runtime<*>? = null,
     private val source: URL = bundledSource,
     config: PlayerRuntimeConfig = PlayerRuntimeConfig(),
+    realConfig: HeadlessPlayerRuntimeConfig = HeadlessPlayerRuntimeConfig(config),
 ) : Player(),
     NodeWrapper {
     /** Convenience constructor to allow [plugins] to be passed as varargs */
@@ -63,6 +82,7 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
         config: PlayerRuntimeConfig = PlayerRuntimeConfig(),
         explicitRuntime: Runtime<*>? = null,
         source: URL = bundledSource,
+        realConfig: HeadlessPlayerRuntimeConfig? = null,
     ) : this(plugins.toList(), explicitRuntime, source, config)
 
     public constructor(
@@ -90,19 +110,21 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
     }
 
     public val runtime: Runtime<*> = explicitRuntime ?: runtimeFactory.create {
-        debuggable = config.debuggable
-        timeout = config.timeout
-        coroutineExceptionHandler = config.coroutineExceptionHandler ?: CoroutineExceptionHandler { _, throwable ->
-            if (state !is ReleasedState) {
-                inProgressState?.fail(throwable) ?: logger.error(
-                    "Exception caught in Player scope: ${throwable.message}",
-                    throwable.stackTrace
-                        .joinToString("\n") {
-                            "\tat $it"
-                        }.replaceFirst("\tat ", "\n"),
-                )
+        debuggable = realConfig.debuggable
+        timeout = realConfig.timeout
+        coroutineExceptionHandler =
+            realConfig.coroutineExceptionHandler?.invoke(this@HeadlessPlayer) ?: CoroutineExceptionHandler { _, throwable ->
+                if (state !is ReleasedState) {
+                    logger.error("[HeadlessPlayer]: Error has been found")
+                    inProgressState?.fail(throwable) ?: logger.error(
+                        "Exception caught in Player scope: ${throwable.message}",
+                        throwable.stackTrace
+                            .joinToString("\n") {
+                                "\tat $it"
+                            }.replaceFirst("\tat ", "\n"),
+                    )
+                }
             }
-        }
     }
 
     override val scope: CoroutineScope by runtime::scope

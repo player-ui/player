@@ -37,6 +37,7 @@ public object ErrorTypes {
     public const val SCHEMA: String = "schema"
     public const val NETWORK: String = "network"
     public const val PLUGIN: String = "plugin"
+    public const val RENDER: String = "render"
 }
 
 /**

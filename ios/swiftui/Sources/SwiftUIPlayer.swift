@@ -160,7 +160,15 @@ public struct SwiftUIPlayer: View, HeadlessPlayer {
             do {
                 try registry.decode(value: value)
             } catch {
-                (state as? InProgressState)?.fail(PlayerError.unknownResponse(error))
+                if let assetErr = error as? AssetRenderError {
+                    switch assetErr {
+                        case .decodingFailure(let innerError, let asset, let pathToAsset):
+                        (state as? InProgressState)?.controllers?.error.captureError(error: assetErr, errorType: ErrorTypes.render, severity: .error, metadata: ["assetId": asset?.id ?? ""])
+                            break;
+                    }
+                } else {
+                    (state as? InProgressState)?.fail(PlayerError.unknownResponse(error))
+                }
             }
         }
     }
