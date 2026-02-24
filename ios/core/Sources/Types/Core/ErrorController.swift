@@ -34,6 +34,7 @@ public struct ErrorTypes {
     public static let schema = "schema"
     public static let network = "network"
     public static let plugin = "plugin"
+    public static let render = "render"
 }
 
 /**

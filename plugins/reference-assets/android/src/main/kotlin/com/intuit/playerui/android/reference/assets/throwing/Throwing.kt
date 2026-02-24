@@ -7,19 +7,24 @@ import com.intuit.playerui.android.compose.ComposableAsset
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
 
+/** Timing for the throwing asset to throw. Excludes 'render' to force deserialization error for that case. */
+enum class ThrowTiming(val value: String) {
+    /** throw an error during the afterResolve transform */
+    Transform("transform")
+}
+
 class Throwing(
     assetContext: AssetContext,
 ) : ComposableAsset<Throwing.Data>(assetContext, Data.serializer()) {
     @Serializable
     data class Data(
         val value: String?,
-        val timing: String,
-        val somethingToBreakWith: String,
+        val timing: ThrowTiming,
     )
 
     @Composable
     override fun content(data: Data) {
-        if (data.timing == "render") {
+        if (data.timing != ThrowTiming.Transform) {
             throw Error("Throwing asset is throwing at render time")
         }
 
