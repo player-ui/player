@@ -47,9 +47,6 @@ public open class Runtime(
     public external fun evaluateHermesBytecode(bytecode: ByteArray, sourceURL: String = "unknown"): Value
 
     context(RuntimeThreadContext)
-    public external fun extractBytecodeFromJS(script: String, sourceURL: String = "unknown"): ByteArray?
-
-    context(RuntimeThreadContext)
     public external fun prepareJavaScript(script: String, sourceURL: String = "unknown"): PreparedJavaScript
 
     context(RuntimeThreadContext)
