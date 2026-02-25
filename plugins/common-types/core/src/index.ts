@@ -42,7 +42,7 @@ export class CommonTypesPlugin
 {
   name = "CommonTypes";
 
-  apply(player: Player) {
+  apply(player: Player): void {
     player.registerPlugin(
       new TypesProviderPlugin({
         types: Object.values(dataTypes),
