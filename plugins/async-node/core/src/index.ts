@@ -10,6 +10,7 @@ import type {
   ViewPlugin,
   Resolver,
   Resolve,
+  ViewController,
 } from "@player-ui/player";
 import { AsyncSeriesBailHook, SyncBailHook } from "tapable-ts";
 import queueMicrotask from "queue-microtask";
@@ -23,11 +24,17 @@ export * from "./createAsyncTransform";
  */
 type AsyncPluginContext = {
   /** Map of async node id to resolved content */
-  nodeResolveCache: Map<string, any>;
+  nodeResolveCache: Map<string, Node.Node>;
   /** The view instance this context is attached to. */
   view: ViewInstance;
+  /** The view controller this context is attached to. */
+  viewController: ViewController;
   /** Map of async node id to promises being used to resolve them */
   inProgressNodes: Set<string>;
+  /** Map of async node ids to the original node they represent.
+   * In some cases, async nodes are transformed into from other node types so the original reference is needed in order to trigger an update on the view when the async node changes.
+   */
+  originalNodeCache: Map<string, Set<Node.Node>>;
 };
 
 export interface AsyncNodePluginOptions {
@@ -38,6 +45,8 @@ export interface AsyncNodePluginOptions {
 export interface AsyncNodeViewPlugin extends ViewPlugin {
   /** Use this to tap into the async node plugin hooks */
   applyPlugin: (asyncNodePlugin: AsyncNodePlugin) => void;
+
+  applyPlayer?: (player: Player) => void;
 }
 export type AsyncHandler = (
   node: Node.Async,
@@ -103,6 +112,10 @@ export class AsyncNodePlugin implements PlayerPlugin {
   apply(player: Player): void {
     this.playerInstance = player;
 
+    this.plugins?.forEach((plugin) => {
+      plugin.applyPlayer?.(player);
+    });
+
     player.hooks.viewController.tap(this.name, (viewController) => {
       viewController.hooks.view.tap(this.name, (view) => {
         this.plugins?.forEach((plugin) => {
@@ -155,10 +168,11 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     context: AsyncPluginContext,
     newNode?: Node.Node | null,
   ) {
-    const { nodeResolveCache, view } = context;
+    const { nodeResolveCache, viewController, originalNodeCache } = context;
     if (nodeResolveCache.get(node.id) !== newNode) {
       nodeResolveCache.set(node.id, newNode ? newNode : node);
-      view.updateAsync(node.id);
+      const originalNode = originalNodeCache.get(node.id) ?? new Set([node]);
+      viewController.updateViewAST(originalNode);
     }
   }
 
@@ -183,13 +197,12 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
       if (!this.isAsync(node)) {
         return node === null ? node : this.resolveAsyncChildren(node, context);
       }
+      if (options.node) {
+        context.originalNodeCache.set(node.id, new Set([options.node]));
+      }
 
       const resolvedNode = context.nodeResolveCache.get(node.id);
       if (resolvedNode !== undefined) {
-        if (resolvedNode.asyncNodesResolved === undefined) {
-          resolvedNode.asyncNodesResolved = [];
-        }
-        resolvedNode.asyncNodesResolved.push(node.id);
         return this.resolveAsyncChildren(resolvedNode, context);
       }
 
@@ -218,8 +231,6 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
     node: Node.Node,
     context: AsyncPluginContext,
   ): Node.Node {
-    const asyncNodesResolved: string[] = node.asyncNodesResolved ?? [];
-    node.asyncNodesResolved = asyncNodesResolved;
     if (node.type === NodeType.MultiNode) {
       // Using a while loop lets us catch when async nodes produce more async nodes that need to be flattened further
       let index = 0;
@@ -233,10 +244,13 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
           continue;
         }
 
-        const mappedNode = context.nodeResolveCache.get(childNode.id);
-        asyncNodesResolved.push(childNode.id);
+        const mappedNode = context.nodeResolveCache.get(childNode.id)!;
+        const nodeSet = new Set<Node.Node>();
         if (mappedNode.type === NodeType.MultiNode && childNode.flatten) {
-          mappedNode.values.forEach((v: Node.Node) => (v.parent = node));
+          mappedNode.values.forEach((v: Node.Node) => {
+            v.parent = node;
+            nodeSet.add(v);
+          });
           node.values = [
             ...node.values.slice(0, index),
             ...mappedNode.values,
@@ -245,7 +259,9 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
         } else {
           node.values[index] = mappedNode;
           mappedNode.parent = node;
+          nodeSet.add(mappedNode);
         }
+        context.originalNodeCache.set(childNode.id, nodeSet);
       }
     } else if ("children" in node) {
       node.children?.forEach((c) => {
@@ -254,8 +270,9 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
           c.value.type === NodeType.Async &&
           this.hasValidMapping(c.value, context)
         ) {
-          asyncNodesResolved.push(c.value.id);
-          c.value = context.nodeResolveCache.get(c.value.id);
+          const mappedNode = context.nodeResolveCache.get(c.value.id)!;
+          context.originalNodeCache.set(c.value.id, new Set([mappedNode]));
+          c.value = mappedNode;
           c.value.parent = node;
         }
       });
@@ -364,15 +381,24 @@ export class AsyncNodePluginPlugin implements AsyncNodeViewPlugin {
   }
 
   apply(view: ViewInstance): void {
-    const context: AsyncPluginContext = {
-      nodeResolveCache: new Map(),
-      inProgressNodes: new Set(),
-      view,
-    };
-
     view.hooks.parser.tap("async", this.applyParser.bind(this));
-    view.hooks.resolver.tap("async", (resolver) => {
-      this.applyResolver(resolver, context);
+  }
+
+  applyPlayer(player: Player): void {
+    player.hooks.viewController.tap("async", (viewController) => {
+      viewController.hooks.view.tap("async", (view) => {
+        const context: AsyncPluginContext = {
+          nodeResolveCache: new Map(),
+          inProgressNodes: new Set(),
+          view,
+          viewController,
+          originalNodeCache: new Map(),
+        };
+
+        view.hooks.resolver.tap("async", (resolver) => {
+          this.applyResolver(resolver, context);
+        });
+      });
     });
   }
 

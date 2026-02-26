@@ -79,6 +79,11 @@ public abstract class SuspendableAsset<Data>(
                 ),
             )
         } catch (exception: Throwable) {
+            // ignore cancellation exceptions because those are used to rehydrate the view
+            if (exception is CancellationException) {
+                throw exception
+            }
+
             if (exception is AssetRenderException) {
                 exception.assetParentPath += assetContext
                 throw exception

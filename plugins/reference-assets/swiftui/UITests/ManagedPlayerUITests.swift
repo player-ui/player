@@ -58,4 +58,14 @@ class ManagedPlayerUITests: BaseTestCase {
 
         waitFor(button1)
     }
+    
+    func testReuseAlreadyLoadedFlow() {
+        openFlow("Reuse already loaded flow")
+        let button1 = app.buttons["action-end"].firstMatch
+        waitFor(button1)
+        button1.tap()
+
+        // the same view should reload properly
+        waitFor(button1)
+    }
 }

@@ -2,6 +2,8 @@
 title: CLI
 ---
 
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
 The `CLI` package is a simple way for users to interact with some of the build/validation tooling. As new capabilities are added to the ecosystem, they may be exposed via this cli to use of use for developers.
 
 ## Config
@@ -11,12 +13,7 @@ Config files are able to customize the behavior of the CLI commands without requ
 To resolve a full configuration, the `extension` is taken as the base, the `presets` are applied in order, then local `plugins`.
 The format is similar to `eslint`, `babel` and other .rc/json/js based approaches.
 
-Config files are searched using cosmiconfig, which will look for:
-
-- a `player` property in package.json
-- a `.playerrc` file in JSON or YAML format
-- a `.player.json`, `.playerrc.yaml`, `.playerrc.yml`, `.playerrc.js`, or `.playerrc.cjs` file
-- a `player.config.js` or `player.config.cjs` CommonJS module exporting an object
+Config files are searched using [cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) with "player" as the module name for cosmiconfig purposes.
 
 Example:
 
@@ -36,13 +33,158 @@ module.exports = {
 
 Options defined via the CLI arguments will take precedence over the config files (for things that overlap).
 
+### JavaScript/TypeScript Config Files
+
+JavaScript and TypeScript config files (`playerrc.js`, `player.config.ts`, `config/playerrc.mjs`, etc.) support three plugin formats:
+
+**Option A: Package name (string)**
+```js
+module.exports = {
+  plugins: [
+    "@fancy-dog/dsl-plugin",
+  ],
+};
+```
+
+**Option B: Package name with options (array)**
+```js
+module.exports = {
+  plugins: [
+    ["@fancy-dog/dsl-plugin", { customOption: "value" }],
+  ],
+};
+```
+
+**Option C: Direct plugin instance (object)**
+```js
+const { FancyDogPlugin } = require("@fancy-dog/dsl-plugin");
+
+module.exports = {
+  plugins: [
+    new FancyDogPlugin({ customOption: "value" }),
+  ],
+};
+```
+
+### JSON/YAML Config Files
+
+JSON and YAML config files (`.playerrc`, `.playerrc.json`, `.playerrc.yaml`, `package.json`, etc.) only support string and array formats (you cannot instantiate plugin classes in JSON):
+
+**String format:**
+
+<Tabs>
+<TabItem label="JSON">
+```json
+{
+  "plugins": [
+    "@fancy-dog/dsl-plugin"
+  ]
+}
+```
+</TabItem>
+<TabItem label="YAML">
+```yaml
+plugins:
+  - "@fancy-dog/dsl-plugin"
+```
+</TabItem>
+</Tabs>
+
+**Array with options format:**
+
+<Tabs>
+<TabItem label="JSON">
+```json
+{
+  "plugins": [
+    ["@fancy-dog/dsl-plugin", { "customOption": "value" }]
+  ]
+}
+```
+</TabItem>
+<TabItem label="YAML">
+```yaml
+plugins:
+  - - "@fancy-dog/dsl-plugin"
+    - customOption: "value"
+```
+</TabItem>
+</Tabs>
+
 ## Plugins
 
-Plugins are the way to change runtime behavior of the CLI actions. This includes augmenting the behavior of the DSL compiler, language-service, and more.
+Plugins are the way to change runtime behavior of the CLI actions. This includes augmenting the behavior of the DSL compiler, language-service, and more. For detailed information on creating and using CLI plugins, see the [CLI Plugins](../cli-plugins) documentation.
+
+Below are some plugins made available to you for your convenience.
+
+### LSPPluginPlugin
+
+The `LSPPluginPlugin` allows you to add custom [Language Service Plugins](../lsp#addlspplugin) to the Player CLI configuration. This enables you to extend the LSP functionality with custom validation, completion, hover information, and more.
+
+**Usage:**
+
+```typescript
+import { LSPPluginPlugin } from "@player-ui/language-service";
+
+const config = {
+  plugins: [
+    new LSPPluginPlugin([customPlugin1, customPlugin2])
+  ]
+};
+```
+
+For more information on creating Language Service Plugins, see the [LSP documentation](../lsp#addlspplugin).
+
+### LSPTransformsPlugin
+
+The `LSPTransformsPlugin` allows you to add custom [XLR transform functions](../lsp#addxlrtransforms) to the Player CLI configuration. This enables you to modify the types that are loaded into the LSP's SDK. This may be useful if there is functionality that is available via a Plugin but isn't part of core type definitions.
+
+**Usage:**
+
+```typescript
+import { LSPTransformsPlugin } from "@player-ui/language-service";
+
+const config = {
+  plugins: [
+    new LSPTransformsPlugin({
+      "exampleTransform1": exampleTransform1Fn,
+      "exampleTransform2": exampleTransform2Fn,
+    })
+  ]
+};
+```
+
+For more information on XLR transforms, see the [XLR documentation](../../xlr/concepts#transform-functions).
+
+### LSPAssetsPlugin
+
+The `LSPAssetsPlugin` allows you to load asset type definitions from packages into the Player CLI configuration. This enables the LSP to provide type checking, validation, and autocomplete for your custom assets and data types.
+
+**Usage:**
+
+```typescript
+import { LSPAssetsPlugin } from "@player-tools/cli";
+import path from "path";
+
+const config = {
+  plugins: [
+    new LSPAssetsPlugin(
+      ["@player-ui/types", "@player-ui/reference-assets-plugin"].map((pkg) => ({
+        path: path.join(
+          path.dirname(require.resolve(`${pkg}/package.json`)),
+          "dist",
+        ),
+      })),
+    ),
+  ],
+};
+```
+
+For more information on loading asset types, see the [LSP documentation](../lsp#setassettypes).
 
 ## Commands
 
-- [`player dsl compile`](#player-dsl-compile)
+- `player dsl compile`
   Compile Player DSL files into JSON after running TSC compiler against Typescript files
 
 ```
@@ -61,7 +203,7 @@ DESCRIPTION
   Compile Player DSL files into JSON after running TSC compiler against Typescript files
 ```
 
-- [`player dsl validate`](#player-dsl-validate)
+- `player dsl validate`
   Runs isolated TSC compiler on authored Player DSL Typescript files.
 
 ```
@@ -77,7 +219,7 @@ DESCRIPTION
   Runs isolated TSC compiler on authored Player DSL Typescript files.
 ```
 
-- [`player json validate`](#player-json-validate)
+- `player json validate`
   Validate Player JSON content
 
 ```
@@ -93,7 +235,7 @@ DESCRIPTION
   Validate Player JSON content
 ```
 
-- [`player dependency-versions check`](#player-dependency-versions-check)
+- `player dependency-versions check`
   Checks for `@player-ui/@player-tools` dependency version mismatches and issues warnings/solutions accordingly
 
 ```
