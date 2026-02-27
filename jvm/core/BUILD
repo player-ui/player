@@ -9,14 +9,6 @@ main_exports = [
     artifact("org.jetbrains.kotlinx:kotlinx-serialization-json"),
 ]
 
-# Custom HBC bytecode from resources
-filegroup(
-    name = "custom_hbc",
-    srcs = ["src/main/resources/core/player/Player.native.js.hbc"],
-    visibility = ["//visibility:public"],
-)
-
-
 main_deps = main_exports + [
     # TODO: Pull from rules_kotlin when compiler version reflects Kotlin version
     # "@rules_kotlin//kotlin/compiler:kotlin-reflect"
@@ -25,7 +17,7 @@ main_deps = main_exports + [
 
 main_resources = [
     "//core/player:player_native_bundle",
-    ":custom_hbc",
+    "//core/player:hbc",
 ]
 
 # Test dependencies
