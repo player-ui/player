@@ -7,7 +7,7 @@ import com.intuit.playerui.android.asset.asyncHydrationTrackerPlugin
 import com.intuit.playerui.android.lifecycle.PlayerViewModel
 import com.intuit.playerui.android.reference.assets.ReferenceAssetsPlugin
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
-import com.intuit.playerui.core.managed.AsyncFlowIterator
+import com.intuit.playerui.core.managed.FlowManager
 import com.intuit.playerui.core.player.state.PlayerFlowState
 import com.intuit.playerui.plugins.transactions.PendingTransactionPlugin
 import com.intuit.playerui.plugins.types.CommonTypesPlugin
@@ -16,8 +16,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class DemoPlayerViewModel(
-    iterator: AsyncFlowIterator,
-) : PlayerViewModel(iterator) {
+    manager: FlowManager,
+) : PlayerViewModel(manager) {
     override val plugins = listOf(
         CommonTypesPlugin(),
         ReferenceAssetsPlugin(),

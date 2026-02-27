@@ -59,6 +59,140 @@ let anyType = try? AnyTypeDecodingContext(rawData: data) // with context
 
 All decoding of `AnyType` is now handled internally. So `AnyTypeDecodingContext.objectFor(path: [CodingKey]) throws -> Any` is no longer exposed to users.
 
+### `FlowManager` alignment
+
+#### 1. All platforms have same `FlowManager`
+    
+All platforms now have a user-facing `FlowManager` with an aligned API.
+
+Android previously aliased `AsyncIterationManager` to `FlowManager`. However, Android's actual `FlowManager` equivalent was `AsyncIterator`. `AsyncIterator` with appropriate types is now aliased as `FlowManager` to match the other platforms.
+
+**Migration:** In Kotlin, use the `FlowManager` type with `PlayerViewModel` instead of any `AsyncIterator`. E.g.
+
+```
+// Before
+PlayerViewModel(flows = someAsyncFlowIterator)
+
+// After
+PlayerViewModel(manager: someFlowManager)
+```
+
+#### 2. `next(...)`
+
+- The parameter of `next` is now named `result` across all platforms.
+- Swift and Kotlin now both return the simpler `String?` (null/nil = done); React returns an object object to fit the [JS `Iterator` protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator#:~:text=An%20Iterator%20object%20is%20an%20object%20that,method%20that%20returns%20an%20iterator%20result%20object.)
+
+<table>
+  <thead>
+    <tr>
+      <th>Platform</th>
+      <th>Before</th>
+      <th>After</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>React</strong></td>
+      <td>
+<pre><code class="language-tsx">next: (
+  previousValue?: CompletedState,
+) => Promise&lt;FinalState | NextState&lt;Flow&gt;&gt;;
+</code></pre>
+      </td>
+      <td>
+<pre><code class="language-tsx">next: (
+  result?: CompletedState,
+) => Promise&lt;FinalState | NextState&gt;
+</code></pre>
+<br><strong>Migration:</strong> Change the function signature to match.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Swift</strong></td>
+      <td>
+<pre><code class="language-swift">func next(_ state: CompletedState?) async throws -> NextState
+</code></pre>
+      </td>
+      <td>
+<pre><code class="language-swift">func next(result: CompletedState?) async throws -> String?</code></pre>
+<br><strong>Migration:</strong> Instead of <code>.flow(someString)</code>, return the <code>String</code> directly. Instead of <code>.finished</code>, return <code>nil</code>.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Kotlin</strong></td>
+      <td>
+<pre><code class="language-kotlin">suspend fun next(result: CompletedState?): String?</code></pre>
+      </td>
+      <td>Unchanged</td>
+    </tr>
+  </tbody>
+</table>
+
+#### 3. `terminate(...)`
+
+This API is now the same across all platforms. It accepts an optional `InProgressState`.
+
+<table>
+  <thead>
+    <tr>
+      <th>Platform</th>
+      <th>Before</th>
+      <th>After</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>React</strong></td>
+      <td>
+<pre><code>terminate?: (data?: FlowResult["data"]) =&gt; void</code></td></pre>
+      <td>
+<pre><code>terminate?: (state?: InProgressState) =&gt; void</code></pre>
+<br><strong>Migration:</strong> Call terminate with the <code>InProgressState</code> instead of the flow data. This may look like: 
+<pre>
+<code>const state = reactPlayer.player.getState();
+if (playerState?.status === "in-progress") {
+    flowManager.terminate(playerState)
+}
+</code></pre>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Swift</strong></td>
+      <td><pre><code>func terminate(state: InProgressState?)</code></pre></td>
+      <td>Unchanged</td>
+    </tr>
+    <tr>
+      <td><strong>Kotlin</strong></td>
+      <td><pre><code>suspend fun terminate()</code></pre>
+      <em>(on <code>AsyncFlowIterator</code>)</em></td>
+      <td><pre><code>suspend fun terminate(data: InProgressState? = null)</code></pre>
+      <em>(on <code>FlowManager</code>)</em><br>
+      <br><strong>Migration:</strong> Call terminate with the <code>InProgressState</code>. This may look like:
+      <pre>
+<code>// In PlayerViewModel.kt:
+val playerState = player.inProgressState
+flowManager.terminate(playerState)</code></pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+#### 4. (Kotlin-only) `AsyncIterator` takes 3 types
+
+The generic `AsyncIterator` now accepts 3 types instead of 2:
+
+```kotlin
+public interface AsyncIterator<Item : Any, Result : Any, Data : Any>
+```
+
+The 3rd type defines the parameter for `terminate`:
+
+```kotlin
+public suspend fun terminate(data: Data? = null) {}
+```
+
+**Migration**: Provide the `Data` type appropriate for your use case. If `terminate` will always be called with `nill`, use `Nothing`.
+
 ## New Features
 
 ### Convenience Methods for `AnyType`

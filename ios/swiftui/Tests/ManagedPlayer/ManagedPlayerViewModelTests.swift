@@ -75,7 +75,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
     func testViewModelManagerError() async {
         struct ErrorFlowManager: FlowManager {
-            func next(_: CompletedState?) async throws -> NextState {
+            func next(result: CompletedState?) async throws -> String? {
                 throw PlayerError.jsConversionFailure
             }
         }
@@ -252,7 +252,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
     func testLoadingStateFailureEmptyFlow() {
         let model = ManagedPlayerViewModel(manager: ConstantFlowManager([FlowData.COUNTER]), onComplete: {_ in})
 
-        model.handleNextState(.flow(""))
+        model.handleNextFlow("")
 
         switch model.loadingState {
         case .failed(let error):
@@ -264,7 +264,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
 
     func testRetryIdleState() {
         let model = ManagedPlayerViewModel(manager: ConstantFlowManager([]), onComplete: {_ in})
-        model.handleNextState(.flow(FlowData.COUNTER))
+        model.handleNextFlow(FlowData.COUNTER)
 
         switch model.loadingState {
         case .loaded(let flow):
@@ -329,7 +329,7 @@ class ManagedPlayerViewModelTests: XCTestCase {
     }
 
     private struct ThrowingFlowManager: FlowManager {
-        func next(_: CompletedState?) async throws -> NextState {
+        func next(result: CompletedState?) async throws -> String? {
             throw Errors.failed
         }
 
@@ -340,8 +340,8 @@ class ManagedPlayerViewModelTests: XCTestCase {
 }
 
 class TerminatingManager: FlowManager {
-    func next(_ result: CompletedState?) async throws -> NextState {
-        return .flow(FlowData.COUNTER)
+    func next(result: CompletedState?) async throws -> String? {
+        return FlowData.COUNTER
     }
     private var terminateFn: (InProgressState?) -> Void
     init(_ terminate: @escaping (InProgressState?) -> Void ) {

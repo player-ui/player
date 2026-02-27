@@ -84,8 +84,6 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
     /// The last completed state
     private var prevResult: CompletedState?
 
-    private var prevState: NextState?
-
     private var onComplete: (CompletedState) -> Void
 
     /// The `FlowManager` that is used for this instance
@@ -139,25 +137,23 @@ public class ManagedPlayerViewModel: ObservableObject, NativePlugin {
             self.flow = nil
 
             do {
-                let nextState = try await self.manager.next(state)
-                self.handleNextState(nextState)
+                let nextFlow = try await self.manager.next(result: state)
+                self.handleNextFlow(nextFlow)
             } catch {
                 self.loadingState = .failed(error)
             }
         }
     }
 
-    func handleNextState(_ state: NextState) {
-        prevState = state
-        switch state {
-        case .flow(let flow):
+    func handleNextFlow(_ nextFlow: String?) {
+        if let flow = nextFlow {
             if !flow.isEmpty {
                 self.flow = flow
                 loadingState = .loaded(flow)
             } else {
                 loadingState = .failed(ManagedPlayerError.emptyFlow)
             }
-        case .finished:
+        } else {
             guard let finalState = prevResult else { return }
             onComplete(finalState)
         }
