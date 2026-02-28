@@ -32,7 +32,7 @@ import {
   required,
   string,
   zip,
-} from "./validators/index"
+} from "./validators/index";
 
 export { validators, dataTypes, formats };
 
