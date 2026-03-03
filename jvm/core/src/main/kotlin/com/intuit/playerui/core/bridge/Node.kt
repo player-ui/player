@@ -172,6 +172,7 @@ public fun Node.snapshot(): Map<String, Any?> = entries.associate { (key, value)
     key to when (value) {
         is Node -> value.snapshot()
         is Function<*> -> null
+        is List<*> -> value.map { (it as? Node)?.snapshot() ?: it }
         else -> value
     }
 }
