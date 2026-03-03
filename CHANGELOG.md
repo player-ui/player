@@ -1,3 +1,26 @@
+# 0.15.1-next.0 (Wed Feb 25 2026)
+
+#### 🐛 Bug Fix
+
+- Publicize Node.snapshot API [#806](https://github.com/player-ui/player/pull/806) ([@brocollie08](https://github.com/brocollie08))
+- Cleanup Managed Player tests and remove async act [#795](https://github.com/player-ui/player/pull/795) ([@spentacular](https://github.com/spentacular))
+- Add Player Base Image for Codespaces [#800](https://github.com/player-ui/player/pull/800) ([@KetanReddy](https://github.com/KetanReddy))
+
+#### 📝 Documentation
+
+- Add guide to creating a CLI Preset [#801](https://github.com/player-ui/player/pull/801) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Document guide to writing DSL Plugin and Player CLI Plugin [#792](https://github.com/player-ui/player/pull/792) ([@KVSRoyal](https://github.com/KVSRoyal))
+- Document `PlayerLanguageService` [#787](https://github.com/player-ui/player/pull/787) ([@KVSRoyal](https://github.com/KVSRoyal))
+
+#### Authors: 4
+
+- [@brocollie08](https://github.com/brocollie08)
+- Ketan Reddy ([@KetanReddy](https://github.com/KetanReddy))
+- Koriann South ([@KVSRoyal](https://github.com/KVSRoyal))
+- Spencer Hamm ([@spentacular](https://github.com/spentacular))
+
+---
+
 # 0.15.0 (Tue Feb 10 2026)
 
 ### Release Notes
