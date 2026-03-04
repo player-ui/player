@@ -73,6 +73,10 @@ export interface ExtendedPlayerPlugin<
   Expressions = void,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   DataTypes = void,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  Formatters = void,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  Validators = void,
 > {}
 
 export interface PlayerConfigOptions {
