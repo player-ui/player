@@ -379,3 +379,227 @@ test("fails if transitioning to unknown state", () => {
   flow.transition("Next");
   expect(flow.currentState?.name).toBe("View1");
 });
+
+describe("errorTransition", () => {
+  test("navigates using node-level errorTransitions", () => {
+    const flow = new FlowInstance("flow", {
+      startState: "View1",
+      View1: {
+        state_type: "VIEW",
+        ref: "view-1",
+        transitions: {
+          next: "End",
+        },
+        errorTransitions: {
+          network: "NetworkError",
+          validation: "ValidationError",
+        },
+      },
+      NetworkError: {
+        state_type: "VIEW",
+        ref: "network-error",
+        transitions: {},
+      },
+      ValidationError: {
+        state_type: "VIEW",
+        ref: "validation-error",
+        transitions: {},
+      },
+      End: {
+        state_type: "END",
+        outcome: "done",
+      },
+    });
+
+    flow.start();
+    flow.errorTransition("network");
+
+    expect(flow.currentState?.name).toBe("NetworkError");
+  });
+
+  test("uses wildcard in node-level errorTransitions", () => {
+    const flow = new FlowInstance("flow", {
+      startState: "View1",
+      View1: {
+        state_type: "VIEW",
+        ref: "view-1",
+        transitions: {},
+        errorTransitions: {
+          network: "NetworkError",
+          "*": "GenericError",
+        },
+      },
+      NetworkError: {
+        state_type: "VIEW",
+        ref: "network-error",
+        transitions: {},
+      },
+      GenericError: {
+        state_type: "VIEW",
+        ref: "generic-error",
+        transitions: {},
+      },
+    });
+
+    flow.start();
+    flow.errorTransition("unknown");
+
+    expect(flow.currentState?.name).toBe("GenericError");
+  });
+
+  test("falls back to flow-level errorTransitions", () => {
+    const flow = new FlowInstance("flow", {
+      startState: "View1",
+      errorTransitions: {
+        network: "NetworkError",
+        "*": "GenericError",
+      },
+      View1: {
+        state_type: "VIEW",
+        ref: "view-1",
+        transitions: {},
+      },
+      NetworkError: {
+        state_type: "VIEW",
+        ref: "network-error",
+        transitions: {},
+      },
+      GenericError: {
+        state_type: "VIEW",
+        ref: "generic-error",
+        transitions: {},
+      },
+    });
+
+    flow.start();
+    flow.errorTransition("network");
+
+    expect(flow.currentState?.name).toBe("NetworkError");
+  });
+
+  test("node-level errorTransitions takes priority over flow-level", () => {
+    const flow = new FlowInstance("flow", {
+      startState: "View1",
+      errorTransitions: {
+        network: "FlowNetworkError",
+      },
+      View1: {
+        state_type: "VIEW",
+        ref: "view-1",
+        transitions: {},
+        errorTransitions: {
+          network: "NodeNetworkError",
+        },
+      },
+      NodeNetworkError: {
+        state_type: "VIEW",
+        ref: "node-network-error",
+        transitions: {},
+      },
+      FlowNetworkError: {
+        state_type: "VIEW",
+        ref: "flow-network-error",
+        transitions: {},
+      },
+    });
+
+    flow.start();
+    flow.errorTransition("network");
+
+    expect(flow.currentState?.name).toBe("NodeNetworkError");
+  });
+
+  test("warns when no errorTransitions match", () => {
+    const logger = {
+      trace: vitest.fn(),
+      debug: vitest.fn(),
+      info: vitest.fn(),
+      warn: vitest.fn(),
+      error: vitest.fn(),
+    };
+
+    const flow = new FlowInstance(
+      "flow",
+      {
+        startState: "View1",
+        View1: {
+          state_type: "VIEW",
+          ref: "view-1",
+          transitions: {},
+        },
+      },
+      { logger },
+    );
+
+    flow.start();
+    flow.errorTransition("network");
+
+    expect(logger.warn).toHaveBeenCalledWith(
+      expect.stringContaining("No errorTransition found"),
+    );
+    expect(flow.currentState?.name).toBe("View1");
+  });
+
+  test("cannot transition from END state", () => {
+    const logger = {
+      trace: vitest.fn(),
+      debug: vitest.fn(),
+      info: vitest.fn(),
+      warn: vitest.fn(),
+      error: vitest.fn(),
+    };
+
+    const flow = new FlowInstance(
+      "flow",
+      {
+        startState: "End",
+        errorTransitions: {
+          network: "ErrorView",
+        },
+        End: {
+          state_type: "END",
+          outcome: "done",
+        },
+        ErrorView: {
+          state_type: "VIEW",
+          ref: "error-view",
+          transitions: {},
+        },
+      },
+      { logger },
+    );
+
+    flow.start();
+    flow.errorTransition("network");
+
+    expect(logger.warn).toHaveBeenCalledWith(
+      "Cannot error transition from END state",
+    );
+    expect(flow.currentState?.name).toBe("End");
+  });
+
+  test("uses flow-level errorTransitions when no currentState", () => {
+    const flow = new FlowInstance("flow", {
+      startState: "View1",
+      errorTransitions: {
+        init: "ErrorView",
+      },
+      View1: {
+        state_type: "VIEW",
+        ref: "view-1",
+        transitions: {},
+      },
+      ErrorView: {
+        state_type: "VIEW",
+        ref: "error-view",
+        transitions: {},
+      },
+    });
+
+    // Don't call flow.start() - no currentState
+    flow.errorTransition("init");
+
+    // Should navigate to ErrorView via flow-level errorTransitions
+    expect(flow.currentState?.name).toBe("ErrorView");
+  });
+});

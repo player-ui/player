@@ -56,6 +56,9 @@ public protocol CoreHooks {
     /// Fired when the DataController changes
     var dataController: Hook<DataControllerType> { get }
 
+    /// Fired when the ErrorController changes
+    var errorController: Hook<ErrorController> { get }
+
     /// Fired when the state changes
     var state: Hook<BaseFlowState> { get }
 
