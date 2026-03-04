@@ -1,3 +1,15 @@
+# 0.15.1-next.1 (Wed Mar 04 2026)
+
+#### 🐛 Bug Fix
+
+- Snapshot API nested list recursive processing [#809](https://github.com/player-ui/player/pull/809) ([@brocollie08](https://github.com/brocollie08))
+
+#### Authors: 1
+
+- [@brocollie08](https://github.com/brocollie08)
+
+---
+
 # 0.15.1-next.0 (Wed Feb 25 2026)
 
 #### 🐛 Bug Fix
