@@ -3,8 +3,8 @@
   "version": "0.0.0-PLACEHOLDER",
   "main": "src/index.ts",
   "dependencies": {
-    "@player-ui/player": "workspace:*",
-    "@player-ui/make-flow": "workspace:*",
-    "@player-ui/asset-transform-plugin": "workspace:*"
+    "@player-ui/player": "workspace:^",
+    "@player-ui/make-flow": "workspace:^",
+    "@player-ui/asset-transform-plugin": "workspace:^"
   }
 }
