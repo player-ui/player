@@ -1,4 +1,4 @@
-import { Meta } from "@storybook/react-webpack5";
+import { Meta } from "@storybook/react-vite";
 import { createDSLStory } from "@player-ui/storybook";
 
 const meta: Meta = {
@@ -8,5 +8,5 @@ const meta: Meta = {
 export default meta;
 
 export const ChatUI = createDSLStory(
-  () => import("!!raw-loader!@player-ui/mocks/chat-message/chat-ui.tsx"),
+  () => import("@player-ui/mocks/chat-message/chat-ui.tsx?raw"),
 );

@@ -1,4 +1,4 @@
-import type { Meta } from "@storybook/react-webpack5";
+import type { Meta } from "@storybook/react-vite";
 import { createDSLStory } from "@player-ui/storybook";
 import { Collection } from "@player-ui/reference-assets-plugin-react";
 
@@ -13,5 +13,5 @@ const meta: Meta<typeof Collection> = {
 export default meta;
 
 export const Basic = createDSLStory(
-  () => import("!!raw-loader!@player-ui/mocks/collection/collection-basic.tsx"),
+  () => import("@player-ui/mocks/collection/collection-basic.tsx?raw"),
 );
