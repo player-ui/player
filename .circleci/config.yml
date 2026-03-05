@@ -233,7 +233,7 @@ jobs:
             done
 
       - codecov/upload:
-          files: ./bazel-out/_coverage/_coverage_report.dat,
+          files: ./bazel-out/_coverage/_coverage_report.dat
 
       - store_test_results:
           path: _test_results
