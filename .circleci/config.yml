@@ -174,7 +174,6 @@ jobs:
               --config=ci-mac \
               --jobs=1 \
               --experimental_use_llvm_covmap \
-              --combined_report=lcov \
               --test_output=all \
               --test_timeout=1800 \
               $(bazel query "kind(ios_unit_test, //ios/...)") \
@@ -198,14 +197,9 @@ jobs:
               mkdir -p $RESULTS_DIR/$(dirname $line)
               cp $line $RESULTS_DIR/$(dirname $line)
             done
-      - run:
-          when: always
-          command: |
-            mkdir -p _ios_coverage/lcov
-            cp -r $(bazel info output_path)/_coverage/_coverage_report.dat _ios_coverage/lcov/
 
       - codecov/upload:
-          files: _ios_coverage/lcov/_coverage_report.dat
+          files: ./bazel-out/_coverage/_coverage_report.dat
 
       - store_test_results:
           path: _test_results
