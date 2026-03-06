@@ -14,6 +14,8 @@ struct CollectionData: AssetData {
     var id: String
     /// The Type of the asset
     var type: String
+    /// An optional label to title the collection
+    var label: WrappedAsset?
     /// The assets to be rendered in this collection
     var values: [WrappedAsset?]
 }
@@ -35,9 +37,17 @@ struct CollectionAssetView: View {
 
     @ViewBuilder
     var body: some View {
-        VStack {
-            ForEach(model.data.values.compactMap({ $0?.asset })) { asset in
+        VStack(spacing: 8) {
+            if let asset = model.data.label?.asset {
                 asset.view
+                    .font(.headline)
+                    .padding(.top, 10)
+                    .padding(.bottom, 12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            ForEach(model.data.values.compactMap({ $0?.asset })) { asset in
+                    asset.view
+                        .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .accessibilityElement(children: .contain)
