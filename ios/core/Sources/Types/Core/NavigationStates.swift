@@ -10,6 +10,9 @@ open class NavigationBaseState: CreatedFromJSValue {
 
     internal let rawValue: JSValue
 
+    /// The backing JSValue. Use when returning this state from a waterfall hook (e.g. beforeTransition).
+    public var jsValue: JSValue { rawValue }
+
     public static func createInstance(value: JSValue) -> NavigationBaseState {
         let base = NavigationBaseState(value)
         switch base.stateType {
