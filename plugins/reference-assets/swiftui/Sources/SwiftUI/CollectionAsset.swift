@@ -37,17 +37,15 @@ struct CollectionAssetView: View {
 
     @ViewBuilder
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: 8) {
             if let asset = model.data.label?.asset {
                 asset.view
                     .font(.headline)
-                    .padding(.top, 10)
-                    .padding(.bottom, 12)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 12)
             }
             ForEach(model.data.values.compactMap({ $0?.asset })) { asset in
                     asset.view
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    .font(.body)
             }
         }
         .accessibilityElement(children: .contain)
