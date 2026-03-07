@@ -7,8 +7,8 @@ class CollectionAssetUITests: BaseTestCase {
         waitFor(app.otherElements["view-1"])
 
         // Verify the optional label asset is rendered with the correct text
-        XCTAssertTrue(app.staticTexts["view-1-label"].exists, "Label should be displayed")
-        XCTAssertEqual(app.staticTexts["view-1-label"].label, "Collections are used to group assets.")
+        XCTAssertTrue(app.staticTexts["title"].exists, "Label should be displayed")
+        XCTAssertEqual(app.staticTexts["title"].label, "Collections are used to group assets.")
 
         // Verify both value assets in the collection are rendered
         let value1 = app.staticTexts["text-1"].label
