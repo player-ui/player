@@ -1,0 +1,164 @@
+{
+  "version": "1.0.0",
+  "description": "Model-optimized knowledge artifacts for Player UI packages",
+  "packages": {
+    "@player-ui/types": {
+      "category": "core",
+      "tags": [
+        "types",
+        "definitions",
+        "flow",
+        "asset",
+        "navigation",
+        "binding",
+        "expression",
+        "schema",
+        "validation"
+      ],
+      "dependencies": [],
+      "knowledgeFile": "core/types.md",
+      "estimatedTokens": 1800,
+      "exports": [
+        "Asset",
+        "AssetWrapper",
+        "Flow",
+        "View",
+        "Navigation",
+        "NavigationFlow",
+        "NavigationFlowViewState",
+        "NavigationFlowActionState",
+        "NavigationFlowEndState",
+        "NavigationFlowExternalState",
+        "NavigationFlowFlowState",
+        "Binding",
+        "BindingRef",
+        "Expression",
+        "ExpressionRef",
+        "DataModel",
+        "Schema",
+        "Validation",
+        "Formatting",
+        "Template",
+        "Switch",
+        "SwitchCase",
+        "FlowResult"
+      ],
+      "description": "Pure TypeScript type definitions for Player UI's core concepts. Foundation package with no runtime code."
+    },
+    "@player-ui/player": {
+      "category": "core",
+      "tags": [
+        "runtime",
+        "engine",
+        "player",
+        "controller",
+        "data",
+        "flow",
+        "view",
+        "validation",
+        "schema",
+        "binding",
+        "expression",
+        "plugin"
+      ],
+      "dependencies": [
+        "@player-ui/types",
+        "@player-ui/partial-match-registry",
+        "@player-ui/make-flow"
+      ],
+      "knowledgeFile": "core/player.md",
+      "estimatedTokens": 2600,
+      "exports": [
+        "Player",
+        "PlayerPlugin",
+        "PlayerFlowState",
+        "InProgressState",
+        "CompletedState",
+        "ErrorState",
+        "DataController",
+        "FlowController",
+        "ViewController",
+        "ValidationController",
+        "SchemaController",
+        "BindingInstance",
+        "BindingParser",
+        "ExpressionEvaluator",
+        "ViewInstance",
+        "Logger"
+      ],
+      "description": "Core runtime engine that executes Player UI flows. Provides controllers, plugin system, and extensibility hooks."
+    },
+    "@player-ui/react": {
+      "category": "platform",
+      "tags": [
+        "react",
+        "ui",
+        "components",
+        "hooks",
+        "asset-registry",
+        "managed-player",
+        "suspense"
+      ],
+      "dependencies": [
+        "@player-ui/player",
+        "@player-ui/types",
+        "@player-ui/partial-match-registry",
+        "@player-ui/react-subscribe"
+      ],
+      "peerDependencies": ["react"],
+      "knowledgeFile": "react/player.md",
+      "estimatedTokens": 2750,
+      "exports": [
+        "ReactPlayer",
+        "ReactPlayerPlugin",
+        "useReactPlayer",
+        "usePlayer",
+        "useLogger",
+        "useAssetProps",
+        "useGetConstant",
+        "ManagedPlayer",
+        "ReactAsset",
+        "Subscribe",
+        "FlowManager"
+      ],
+      "description": "React integration for Player UI. Provides hooks, components, and asset rendering system."
+    }
+  },
+  "dependencyGraph": {
+    "@player-ui/types": {
+      "depth": 0,
+      "dependents": ["@player-ui/player", "@player-ui/react"]
+    },
+    "@player-ui/player": {
+      "depth": 1,
+      "dependents": ["@player-ui/react"],
+      "requires": ["@player-ui/types"]
+    },
+    "@player-ui/react": {
+      "depth": 2,
+      "requires": ["@player-ui/player", "@player-ui/types"]
+    }
+  },
+  "searchIndex": {
+    "data binding": ["@player-ui/types", "@player-ui/player"],
+    "validation": ["@player-ui/types", "@player-ui/player"],
+    "schema": ["@player-ui/types", "@player-ui/player"],
+    "expression": ["@player-ui/types", "@player-ui/player"],
+    "navigation": ["@player-ui/types", "@player-ui/player"],
+    "flow": ["@player-ui/types", "@player-ui/player"],
+    "asset": ["@player-ui/types", "@player-ui/player", "@player-ui/react"],
+    "plugin": ["@player-ui/player", "@player-ui/react"],
+    "controller": ["@player-ui/player"],
+    "react": ["@player-ui/react"],
+    "hooks": ["@player-ui/player", "@player-ui/react"],
+    "components": ["@player-ui/react"],
+    "suspense": ["@player-ui/react"],
+    "managed": ["@player-ui/react"],
+    "error boundary": ["@player-ui/react"],
+    "middleware": ["@player-ui/player"],
+    "debugging": ["@player-ui/player", "@player-ui/react"],
+    "testing": ["@player-ui/react"],
+    "template": ["@player-ui/types"],
+    "switch": ["@player-ui/types"]
+  }
+}

@@ -69,5 +69,6 @@ plugins/reference-assets/mocks/node_modules
 tools/storybook/node_modules
 tools/components/node_modules
 tools/mocks/node_modules
+tools/mcp-server/node_modules
 docs/site/node_modules
 docs/astro/node_modules
