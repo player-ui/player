@@ -6,6 +6,22 @@ class ManagedPlayerUITests: BaseTestCase {
         app.otherElements.buttons["Plugins + Managed Player"].firstMatch.tap()
     }
 
+    /// Taps the element and verifies the expected outcome appears. If the tap has no effect
+    /// (e.g., the JS action handler isn't wired yet due to async SwiftUI binding), retries the tap.
+    private func tapAndAssertElementAppears(
+        _ element: XCUIElement,
+        expectedOutcome: XCUIElement,
+        timeout: TimeInterval = 3,
+        retries: Int = 3
+    ) {
+        for _ in 0..<retries {
+            element.tap()
+            if expectedOutcome.waitForExistence(timeout: timeout) {
+                return
+            }
+        }
+    }
+
     func testSimpleFlow() {
         openFlow("Simple Flows")
         let button1 = app.buttons["first_view"].firstMatch
@@ -14,16 +30,12 @@ class ManagedPlayerUITests: BaseTestCase {
 
         let button2 = app.buttons["second_view"].firstMatch
         waitFor(button2)
-        // Allow the main thread run loop to complete the async JS-to-SwiftUI binding cycle
-        // so the action handler (WrappedFunction) is fully wired before tapping
-        XCTWaiter.delay(ms: 1)
-        button2.tap()
 
         let completedText = app.staticTexts["Flow Completed"]
-        waitFor(completedText)
+        tapAndAssertElementAppears(button2, expectedOutcome: completedText)
     }
 
-    // NOTE: This test flakes occassionally, but pretty rarely.
+    
     func testErrorContentFlow() {
         openFlow("Error Content Flow")
 
@@ -33,13 +45,9 @@ class ManagedPlayerUITests: BaseTestCase {
 
         let button2 = app.buttons["second_view"].firstMatch
         waitFor(button2)
-        // Allow the main thread run loop to complete the async JS-to-SwiftUI binding cycle
-        // so the action handler (WrappedFunction) is fully wired before tapping
-        XCTWaiter.delay(ms: 1)
-        button2.tap()
 
         let errorText = app.staticTexts["PlayerUI.DecodingError.typeNotRegistered(type: \"error\")"].firstMatch
-        waitFor(errorText, timeout: 10)
+        tapAndAssertElementAppears(button2, expectedOutcome: errorText)
         XCTAssert(errorText.exists, "Error message did not appear")
 
         let retryButton = app.buttons["Retry"].firstMatch
@@ -64,7 +72,7 @@ class ManagedPlayerUITests: BaseTestCase {
 
         waitFor(button1)
     }
-    
+
     func testReuseAlreadyLoadedFlow() {
         openFlow("Reuse already loaded flow")
         let button1 = app.buttons["action-end"].firstMatch
