@@ -5,7 +5,9 @@ import com.intuit.playerui.core.bridge.Invokable
 import com.intuit.playerui.core.bridge.Node
 import com.intuit.playerui.core.bridge.getInvokable
 import com.intuit.playerui.core.bridge.getJson
+import com.intuit.playerui.core.bridge.snapshot
 import com.intuit.playerui.core.bridge.toJson
+import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.flow.Flow
 import com.intuit.playerui.hermes.base.HermesTest
 import com.intuit.playerui.hermes.extensions.evaluateInJSThreadBlocking
@@ -305,5 +307,79 @@ internal class HermesNodeTest : HermesTest() {
                 }
             }.toNode(format)
         assertEquals("testId", node.getSerializable("flow", Flow.serializer())?.id)
+    }
+
+    @OptIn(ExperimentalPlayerApi::class)
+    @Test
+    fun snapshot() {
+        val node = runtime
+            .evaluateInJSThreadBlocking {
+                format.`object` {
+                    set("title", "Player Flow")
+                    set("count", 42)
+                    set("rate", 3.5)
+                    set("isActive", true)
+                    set("nothing", null)
+                    set("callback", Invokable { "should be nulled" })
+                    set(
+                        "settings",
+                        mapOf(
+                            "theme" to "dark",
+                            "nested" to mapOf(
+                                "level" to 2,
+                                "tags" to listOf("a", "b"),
+                            ),
+                        ),
+                    )
+                    set(
+                        "items",
+                        listOf(
+                            mapOf("id" to "item1", "label" to "First"),
+                            mapOf("id" to "item2", "label" to "Second"),
+                            "plainString",
+                            100,
+                            null,
+                            mapOf(
+                                "id" to "item3",
+                                "children" to listOf(
+                                    mapOf("id" to "child1", "value" to "deep"),
+                                ),
+                            ),
+                        ),
+                    )
+                    set("emptyList", listOf<Any>())
+                }
+            }.toNode(format)
+        val snapshot = node.snapshot()
+        // primitives
+        assertEquals("Player Flow", snapshot["title"])
+        assertEquals(42, snapshot["count"])
+        assertEquals(3.5, snapshot["rate"])
+        assertEquals(true, snapshot["isActive"])
+        assertNull(snapshot["nothing"])
+        // functions become null
+        assertNull(snapshot["callback"])
+        // nested nodes are recursively snapshotted into plain maps
+        val settings = snapshot["settings"] as Map<*, *>
+        assertEquals("dark", settings["theme"])
+        val nested = settings["nested"] as Map<*, *>
+        assertEquals(2, nested["level"])
+        assertEquals(listOf("a", "b"), nested["tags"])
+        // lists with mixed content: nodes, primitives, and nulls
+        val items = snapshot["items"] as List<*>
+        assertEquals(6, items.size)
+        assertEquals(mapOf("id" to "item1", "label" to "First"), items[0])
+        assertEquals(mapOf("id" to "item2", "label" to "Second"), items[1])
+        assertEquals("plainString", items[2])
+        assertEquals(100, items[3])
+        assertNull(items[4])
+        // deeply nested: node inside list with its own list of nodes
+        val item3 = items[5] as Map<*, *>
+        assertEquals("item3", item3["id"])
+        val children = item3["children"] as List<*>
+        assertEquals(1, children.size)
+        assertEquals(mapOf("id" to "child1", "value" to "deep"), children[0])
+        // empty list preserved
+        assertEquals(emptyList<Any>(), snapshot["emptyList"])
     }
 }
