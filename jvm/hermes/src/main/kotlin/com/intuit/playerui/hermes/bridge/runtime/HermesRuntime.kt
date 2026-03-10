@@ -118,7 +118,6 @@ public class HermesRuntime private constructor(
         val sourceMap = scriptContext.sourceMap
         val hbc = scriptContext.preCompiledScript
         if (hbc.isNotEmpty()) {
-            println("+++ loading precompiled hbc (${hbc.size} bytes)++")
             evaluateHermesBytecode(hbc, scriptContext.id)
         } else if (sourceMap != null) {
             evaluateJavaScriptWithSourceMap(scriptContext.script, sourceMap, scriptContext.id)
