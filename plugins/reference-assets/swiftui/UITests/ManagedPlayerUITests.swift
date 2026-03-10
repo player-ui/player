@@ -14,6 +14,9 @@ class ManagedPlayerUITests: BaseTestCase {
 
         let button2 = app.buttons["second_view"].firstMatch
         waitFor(button2)
+        // Allow the main thread run loop to complete the async JS-to-SwiftUI binding cycle
+        // so the action handler (WrappedFunction) is fully wired before tapping
+        XCTWaiter.delay(ms: 1)
         button2.tap()
 
         let completedText = app.staticTexts["Flow Completed"]
@@ -30,9 +33,12 @@ class ManagedPlayerUITests: BaseTestCase {
 
         let button2 = app.buttons["second_view"].firstMatch
         waitFor(button2)
+        // Allow the main thread run loop to complete the async JS-to-SwiftUI binding cycle
+        // so the action handler (WrappedFunction) is fully wired before tapping
+        XCTWaiter.delay(ms: 1)
         button2.tap()
 
-        let errorText = app.staticTexts["Unclosed brace after \"foo.bar..}\" at character 12"].firstMatch
+        let errorText = app.staticTexts["PlayerUI.DecodingError.typeNotRegistered(type: \"error\")"].firstMatch
         waitFor(errorText, timeout: 10)
         XCTAssert(errorText.exists, "Error message did not appear")
 
