@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.viewinterop.AndroidView
 import com.intuit.playerui.android.AssetContext
+import com.intuit.playerui.android.asset.AssetRenderException
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.SuspendableAsset
 import com.intuit.playerui.android.build
@@ -24,7 +25,6 @@ import com.intuit.playerui.android.extensions.Styles
 import com.intuit.playerui.android.extensions.into
 import com.intuit.playerui.android.withContext
 import com.intuit.playerui.android.withTag
-import com.intuit.playerui.core.error.ErrorSeverity
 import com.intuit.playerui.core.error.ErrorTypes
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.player.state.inProgressState
@@ -60,12 +60,8 @@ public abstract class ComposableAsset<Data>(
                 value = getData()
             } catch (error: Throwable) {
                 player.inProgressState?.controllers?.error?.captureError(
-                    error,
+                    AssetRenderException(assetContext, "Error fetching data while rendering asset. See cause for details", error),
                     ErrorTypes.RENDER,
-                    ErrorSeverity.ERROR,
-                    mapOf(
-                        "assetId" to assetContext.asset.id,
-                    ),
                 )
                 null
             }

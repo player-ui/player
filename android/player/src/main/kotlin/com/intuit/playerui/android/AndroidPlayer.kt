@@ -8,7 +8,6 @@ import com.intuit.hooks.HookContext
 import com.intuit.hooks.SyncBailHook
 import com.intuit.hooks.SyncHook
 import com.intuit.hooks.SyncWaterfallHook
-import com.intuit.playerui.android.asset.AssetRenderException
 import com.intuit.playerui.android.asset.RenderableAsset
 import com.intuit.playerui.android.asset.SuspendableAsset.AsyncHydrationTrackerPlugin
 import com.intuit.playerui.android.extensions.Styles
@@ -21,7 +20,6 @@ import com.intuit.playerui.core.bridge.Completable
 import com.intuit.playerui.core.bridge.format
 import com.intuit.playerui.core.bridge.serialization.format.registerContextualSerializer
 import com.intuit.playerui.core.constants.ConstantsController
-import com.intuit.playerui.core.error.ErrorSeverity
 import com.intuit.playerui.core.error.ErrorTypes
 import com.intuit.playerui.core.experimental.ExperimentalPlayerApi
 import com.intuit.playerui.core.logger.TapableLogger
@@ -360,13 +358,7 @@ public class AndroidPlayer private constructor(
         // TODO: Find an alternative to changing the type here or improve the API to make a little more sense
         override var coroutineExceptionHandler: GetCoroutineFunction? = { player ->
             CoroutineExceptionHandler { _, throwable ->
-                var metadata: Map<String, Any?>? = null
-                if (throwable is AssetRenderException) {
-                    metadata = mapOf(
-                        "assetId" to throwable.rootAsset.asset.id,
-                    )
-                }
-                player.inProgressState?.controllers?.error?.captureError(throwable, ErrorTypes.RENDER, ErrorSeverity.ERROR, metadata)
+                player.inProgressState?.controllers?.error?.captureError(throwable, ErrorTypes.RENDER)
                     ?: player.logger.error(
                         "Exception caught in Player scope: ${throwable.message}",
                         throwable.stackTrace

@@ -2,7 +2,12 @@ import { SyncBailHook } from "tapable-ts";
 import type { Logger } from "../../logger";
 import type { DataController } from "../data/controller";
 import type { FlowController } from "../flow/controller";
-import type { PlayerError, ErrorMetadata, ErrorSeverity } from "./types";
+import {
+  type PlayerError,
+  type ErrorMetadata,
+  type ErrorSeverity,
+  isErrorWithMetadata,
+} from "./types";
 import { ErrorStateMiddleware } from "./middleware";
 
 /**
@@ -37,6 +42,7 @@ export interface ErrorControllerOptions {
 
 type ReplacerFunction = (key: string, value: any) => any;
 
+/** Returns a function to be used as the `replacer` for JSON.stringify that tracks and ignores circular references. */
 const makeJsonStringifyReplacer = (): ReplacerFunction => {
   const cache = new Set();
   return (_: string, value: any) => {
@@ -100,6 +106,7 @@ export class ErrorController {
     severity?: ErrorSeverity,
     metadata?: ErrorMetadata,
   ): PlayerError {
+    this.options.logger.debug("[ErrorController]: Capturing error");
     const playerError: PlayerError = {
       error,
       errorType,
@@ -107,6 +114,16 @@ export class ErrorController {
       metadata,
       skipped: false,
     };
+
+    if (isErrorWithMetadata(error)) {
+      this.options.logger.debug("[ErrorController]: Error has metadata");
+      playerError.errorType = error.type;
+      playerError.severity = error.severity ?? playerError.severity;
+      playerError.metadata = {
+        ...error.metadata,
+        ...playerError.metadata,
+      };
+    }
 
     // Add to history
     this.errorHistory.push(playerError);
@@ -118,7 +135,11 @@ export class ErrorController {
       `[ErrorController] Captured error: ${error.message}`,
       // TODO: Find a better way to do this. Either centralize the stringify replacer in the print plugin or something else.
       JSON.stringify(
-        { errorType, severity, metadata },
+        {
+          errorType: playerError.errorType,
+          severity: playerError.severity,
+          metadata: playerError.metadata,
+        },
         makeJsonStringifyReplacer(),
       ),
     );

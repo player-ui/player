@@ -1075,7 +1075,7 @@ describe("view", () => {
 
       await waitFor(() => {
         expect(onAsyncNodeErrorCallback).toHaveBeenCalledWith(
-          new Error("Promise Rejected"),
+          expect.objectContaining({ cause: new Error("Promise Rejected") }),
           expect.anything(),
         );
 
@@ -1105,7 +1105,7 @@ describe("view", () => {
 
       await waitFor(() => {
         expect(onAsyncNodeErrorCallback).toHaveBeenCalledWith(
-          new Error("Promise Rejected"),
+          expect.objectContaining({ cause: new Error("Promise Rejected") }),
           expect.anything(),
         );
 

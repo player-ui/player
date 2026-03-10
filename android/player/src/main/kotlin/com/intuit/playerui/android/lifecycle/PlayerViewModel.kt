@@ -210,20 +210,10 @@ public open class PlayerViewModel(
     }
 
     public fun fail(throwable: Throwable) {
-        val cause = throwable.cause
-        // TODO: Replace type check with general exception that can have the metadata or other properties needed.
-        if (cause is AssetRenderException) {
-            player.inProgressState?.controllers?.error?.captureError(
-                cause,
-                ErrorTypes.RENDER,
-                ErrorSeverity.ERROR,
-                mapOf(
-                    "assetId" to cause.rootAsset.asset.id,
-                ),
-            )
-        } else {
-            player.inProgressState?.fail(throwable)
-        }
+        player.inProgressState?.controllers?.error?.captureError(
+            cause,
+                ErrorTypes.RENDER
+            )        }
     }
 
     /** Helper to progress the [FlowManager] in within the [viewModelScope] */
@@ -241,5 +231,6 @@ public open class PlayerViewModel(
 }
 
 public inline fun PlayerViewModel.fail(message: String, cause: Throwable? = null) {
-    fail(PlayerException(message, cause))
+    val playerException = cause as? PlayerException ?: PlayerException(message, cause)
+    fail(playerException)
 }

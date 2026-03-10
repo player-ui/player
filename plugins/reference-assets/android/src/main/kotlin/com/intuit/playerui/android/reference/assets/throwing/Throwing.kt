@@ -8,11 +8,14 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
 
 /** Timing for the throwing asset to throw. Excludes 'render' to force deserialization error for that case. */
-enum class ThrowTiming(val value: String) {
+enum class ThrowTiming(
+    val value: String,
+) {
     /** throw an error during the afterResolve transform */
-    Transform("transform")
+    Transform("transform"),
 }
 
+/** Example asset for throwing at runtime to show error recovery options */
 class Throwing(
     assetContext: AssetContext,
 ) : ComposableAsset<Throwing.Data>(assetContext, Data.serializer()) {

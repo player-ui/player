@@ -1,6 +1,10 @@
 import React from "react";
 import { SyncWaterfallHook, AsyncParallelHook } from "tapable-ts";
-import { Subscribe, useSubscribedState } from "@player-ui/react-subscribe";
+import {
+  Subscribe,
+  useSubscribedState,
+  useSubscriber,
+} from "@player-ui/react-subscribe";
 import { Registry } from "@player-ui/partial-match-registry";
 import type {
   CompletedState,
@@ -9,10 +13,10 @@ import type {
   View,
   PlayerInfo,
 } from "@player-ui/player";
-import { ErrorSeverity, ErrorTypes, Player } from "@player-ui/player";
+import { ErrorTypes, Player } from "@player-ui/player";
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 import type { AssetRegistryType } from "./asset";
-import { AssetContext, AssetRenderError } from "./asset";
+import { AssetContext } from "./asset";
 import { PlayerContext } from "./utils";
 
 import type { ReactPlayerProps } from "./app";
@@ -185,13 +189,15 @@ export class ReactPlayer {
         <ErrorBoundary
           FallbackComponent={(pops: FallbackProps) => {
             const { error, resetErrorBoundary } = pops;
+            const { subscribe } = useSubscriber(this.viewUpdateSubscription);
+
             const pErr = React.useMemo(() => {
               const playerState = this.player.getState();
 
               if (playerState.status === "in-progress") {
-                const id = this.viewUpdateSubscription.add(
-                  () => {
-                    this.viewUpdateSubscription.remove(id);
+                subscribe(
+                  (_, unsubscribe) => {
+                    unsubscribe();
                     resetErrorBoundary();
                   },
                   {
@@ -199,18 +205,9 @@ export class ReactPlayer {
                   },
                 );
 
-                const assetId =
-                  error instanceof AssetRenderError
-                    ? error.rootAsset.id
-                    : undefined;
-
                 return playerState.controllers.error.captureError(
                   error,
                   ErrorTypes.RENDER,
-                  ErrorSeverity.ERROR,
-                  {
-                    assetId,
-                  },
                 );
               }
 
@@ -219,10 +216,12 @@ export class ReactPlayer {
 
             // If error unhandled or will be handled with a transition show nothing
             if (!pErr?.skipped) {
+              // TODO: For unrecoverable errors, show nothing.
               return <div>WE ARE NOT RECOVERING</div>;
             }
 
             // If error handled through onError hook, I dunno, show something
+            // TODO: What do we even show here? Should it be the previous successful view?
             return <div>WE ARE RECOVERING</div>;
           }}
         >

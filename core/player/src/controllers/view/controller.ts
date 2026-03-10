@@ -22,7 +22,7 @@ import type { DataController } from "../data/controller";
 import type { TransformRegistry } from "./types";
 import type { BindingInstance } from "../../binding";
 import type { Node } from "../../view";
-import { ErrorController } from "../error";
+import { ErrorController, ErrorTypes } from "../error";
 
 export interface ViewControllerOptions {
   /** Where to get data from */
@@ -108,7 +108,7 @@ export class ViewController {
         if (this.optimizeUpdates) {
           this.queueUpdate(updates, undefined, silent);
         } else {
-          this.currentView.update();
+          this.updateView();
         }
       }
     };
@@ -162,8 +162,23 @@ export class ViewController {
       queueMicrotask(() => {
         const { changedBindings, changedNodes } = this.pendingUpdate ?? {};
         this.pendingUpdate = undefined;
-        this.currentView?.update(changedBindings, changedNodes);
+        this.updateView(changedBindings, changedNodes);
       });
+    }
+  }
+
+  private updateView(
+    changedBindings?: Set<BindingInstance>,
+    changedNodes?: Set<Node.Node>,
+  ) {
+    try {
+      this.currentView?.update(changedBindings, changedNodes);
+    } catch (exception: unknown) {
+      const err =
+        exception instanceof Error ? exception : new Error(String(exception));
+      // Can't assume any node or binding changes were consumed correctly during the update, so trigger a silent update to ensure that any additional update triggered to recover still updates everything.
+      this.queueUpdate(changedBindings, changedNodes, true);
+      this.viewOptions.errorController.captureError(err, ErrorTypes.VIEW);
     }
   }
 
@@ -201,18 +216,14 @@ export class ViewController {
       throw new Error(`No view with id ${viewId}`);
     }
 
-    const view = new ViewInstance(
-      source,
-      this.viewOptions,
-      this.viewOptions.errorController,
-    );
+    const view = new ViewInstance(source, this.viewOptions);
     this.currentView = view;
 
     // Give people a chance to attach their
     // own listeners to the view before we resolve it
     this.applyViewPlugins(view);
     this.hooks.view.call(view);
-    view.update();
+    this.updateView();
   }
 
   private applyViewPlugins(view: ViewInstance): void {

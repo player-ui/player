@@ -200,3 +200,19 @@ export declare namespace Resolve {
     afterResolve?: NodeResolveFunction;
   }
 }
+
+export const ResolverStages = {
+  ResolveOptions: "resolve-options",
+  SkipResolve: "skip-resolve",
+  BeforeResolve: "before-resolve",
+  Resolve: "resolve",
+  AfterResolve: "after-resolve",
+  AfterNodeUpdate: "after-node-update",
+} as const;
+
+export type ResolverStage =
+  (typeof ResolverStages)[keyof typeof ResolverStages];
+
+export type ResolverErrorMetadata = {
+  node: Node.Node;
+};
