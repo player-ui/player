@@ -1,6 +1,6 @@
 package com.intuit.playerui.core.managed
 
-import com.intuit.playerui.core.managed.AsyncIterationManager.State.NotStarted
+import com.intuit.playerui.core.managed.AsyncIterationFlow.State.NotStarted
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /** Wrapper of an [AsyncIterator] that captures iterations within a [StateFlow] */
-public class AsyncIterationManager<Item : Any, Result : Any, Data : Any>(
+public class AsyncIterationFlow<Item : Any, Result : Any, Data : Any>(
     public val iterator: AsyncIterator<Item, Result, Data>,
 ) {
     public sealed class State {

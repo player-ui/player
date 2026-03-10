@@ -22,7 +22,7 @@ public protocol FlowManager {
      A function called to fetch the next flow. If the flow is complete, return `nil`.
      `CompletedState` will be `nil` if it is asking for the first state
      - parameters:
-        - state: The `CompletedState` from the previous flow if there was one
+        - result: The `CompletedState` from the previous flow if there was one
     */
     func next(result: CompletedState?) async throws -> String?
 

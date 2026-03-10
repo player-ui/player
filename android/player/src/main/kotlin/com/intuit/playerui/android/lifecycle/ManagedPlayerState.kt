@@ -2,11 +2,10 @@ package com.intuit.playerui.android.lifecycle
 
 import com.intuit.playerui.android.AndroidPlayer
 import com.intuit.playerui.android.asset.RenderableAsset
-import com.intuit.playerui.core.managed.AsyncIterationManager
 import com.intuit.playerui.core.player.state.CompletedState
 import com.intuit.playerui.core.player.state.PlayerFlowState
 
-/** State of a managed player which serves as an aggregation of the players [state][PlayerFlowState] and the managers [state][AsyncIterationManager.State] */
+/** State of a managed player which serves as an aggregation of the players [state][PlayerFlowState] and the managers [state][AsyncIterationFlow.State] */
 public sealed class ManagedPlayerState {
     /** Initial state of the [PlayerViewModel] */
     public object NotStarted : ManagedPlayerState()
