@@ -27,6 +27,7 @@ cc_library(
         "RuntimeScope.cpp",
     ],
     hdrs = [
+        "Buffers.h",
         "JHermesRuntime.h",
         "JJSIValue.h",
         "RuntimeScope.h",

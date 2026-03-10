@@ -6,6 +6,7 @@
 #include <jsi/jsi.h>
 #include <fbjni/fbjni.h>
 #include <fbjni/ByteBuffer.h>
+#include "Buffers.h"
 #include "RuntimeScope.h"
 
 using namespace facebook::jni;
@@ -15,22 +16,6 @@ using namespace std;
 namespace intuit::playerui {
 
 [[noreturn]] void throwNativeHandleReleasedException(std::string nativeHandle);
-
-class ByteArrayBuffer : public Buffer {
-public:
-    ByteArrayBuffer(const void* data, size_t size) : size_(size) {
-        // Copy the data to ensure ownership, otherwise leads to segfault
-        buffer_.resize(size);
-        std::memcpy(buffer_.data(), data, size);
-    }
-
-    size_t size() const override { return size_; }
-    const uint8_t* data() const override { return buffer_.data(); }
-
-private:
-    std::vector<uint8_t> buffer_;
-    size_t size_;
-};
 
 class JHybridClass : public HybridClass<JHybridClass> {
 public:
