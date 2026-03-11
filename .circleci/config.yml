@@ -454,7 +454,7 @@ workflows:
           context:
             - Publish
           requires:
-            - build-trunk
+            - test-trunk
             - build-ios-trunk
             - android-test-trunk
 
