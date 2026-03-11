@@ -1,0 +1,249 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ManagedPlayer with React 17 > handles new manager 1`] = `
+{
+  "data": {},
+  "id": "generated-flow",
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "END_Done": {
+        "outcome": "done",
+        "state_type": "END",
+      },
+      "VIEW_1": {
+        "ref": "flow-1-1",
+        "state_type": "VIEW",
+        "transitions": {
+          "*": "END_Done",
+        },
+      },
+      "startState": "VIEW_1",
+    },
+  },
+  "views": [
+    {
+      "id": "flow-1-1",
+      "type": "collection",
+      "values": [
+        {
+          "asset": {
+            "id": "action",
+            "label": "Continue",
+            "type": "action",
+            "value": "Next",
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`ManagedPlayer with React 17 > handles new manager 2`] = `
+{
+  "data": {},
+  "id": "generated-flow",
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "END_Done": {
+        "outcome": "done",
+        "state_type": "END",
+      },
+      "VIEW_1": {
+        "ref": "flow-1-2",
+        "state_type": "VIEW",
+        "transitions": {
+          "*": "END_Done",
+        },
+      },
+      "startState": "VIEW_1",
+    },
+  },
+  "views": [
+    {
+      "id": "flow-1-2",
+      "type": "collection",
+      "values": [
+        {
+          "asset": {
+            "id": "action",
+            "label": "Continue",
+            "type": "action",
+            "value": "Next",
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`ManagedPlayer with React 17 > handles terminating with data 1`] = `
+{
+  "data": {
+    "returns": {
+      "id": "123",
+    },
+  },
+  "id": "generated-flow",
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "END_Done": {
+        "outcome": "done",
+        "state_type": "END",
+      },
+      "VIEW_1": {
+        "ref": "flow-1",
+        "state_type": "VIEW",
+        "transitions": {
+          "*": "END_Done",
+        },
+      },
+      "startState": "VIEW_1",
+    },
+  },
+  "views": [
+    {
+      "id": "flow-1",
+      "type": "collection",
+      "values": [
+        {
+          "asset": {
+            "id": "action",
+            "label": "Continue",
+            "type": "action",
+            "value": "Next",
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`ManagedPlayer with React 18 > handles new manager 1`] = `
+{
+  "data": {},
+  "id": "generated-flow",
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "END_Done": {
+        "outcome": "done",
+        "state_type": "END",
+      },
+      "VIEW_1": {
+        "ref": "flow-1-1",
+        "state_type": "VIEW",
+        "transitions": {
+          "*": "END_Done",
+        },
+      },
+      "startState": "VIEW_1",
+    },
+  },
+  "views": [
+    {
+      "id": "flow-1-1",
+      "type": "collection",
+      "values": [
+        {
+          "asset": {
+            "id": "action",
+            "label": "Continue",
+            "type": "action",
+            "value": "Next",
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`ManagedPlayer with React 18 > handles new manager 2`] = `
+{
+  "data": {},
+  "id": "generated-flow",
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "END_Done": {
+        "outcome": "done",
+        "state_type": "END",
+      },
+      "VIEW_1": {
+        "ref": "flow-1-2",
+        "state_type": "VIEW",
+        "transitions": {
+          "*": "END_Done",
+        },
+      },
+      "startState": "VIEW_1",
+    },
+  },
+  "views": [
+    {
+      "id": "flow-1-2",
+      "type": "collection",
+      "values": [
+        {
+          "asset": {
+            "id": "action",
+            "label": "Continue",
+            "type": "action",
+            "value": "Next",
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`ManagedPlayer with React 18 > handles terminating with data 1`] = `
+{
+  "data": {
+    "returns": {
+      "id": "123",
+    },
+  },
+  "id": "generated-flow",
+  "navigation": {
+    "BEGIN": "FLOW_1",
+    "FLOW_1": {
+      "END_Done": {
+        "outcome": "done",
+        "state_type": "END",
+      },
+      "VIEW_1": {
+        "ref": "flow-1",
+        "state_type": "VIEW",
+        "transitions": {
+          "*": "END_Done",
+        },
+      },
+      "startState": "VIEW_1",
+    },
+  },
+  "views": [
+    {
+      "id": "flow-1",
+      "type": "collection",
+      "values": [
+        {
+          "asset": {
+            "id": "action",
+            "label": "Continue",
+            "type": "action",
+            "value": "Next",
+          },
+        },
+      ],
+    },
+  ],
+}
+`;

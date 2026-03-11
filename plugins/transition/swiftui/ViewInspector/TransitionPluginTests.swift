@@ -78,8 +78,8 @@ class TransitionPluginTests: XCTestCase {
     }
 
     struct TestFlowManager: FlowManager {
-        func next(_ result: CompletedState?) async throws -> NextState {
-            return .flow("")
+        func next(result: CompletedState?) async throws -> String? {
+            return ""
         }
     }
 }

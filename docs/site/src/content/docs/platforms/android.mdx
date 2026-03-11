@@ -16,24 +16,24 @@ The [`ManagedPlayer`](/guides/multi-flow-experiences#managed-player) paradigm wa
 
 ### PlayerViewModel
 
-The `PlayerViewModel` requires an `AsyncFlowIterator` to be supplied in the constructor. The `AsyncFlowIterator` (aka [`FlowManager`](/guides/multi-flow-experiences#flow-manager)) is what tells Player which flows to run. This can be hardcoded into the view model or expected as an argument, as shown below.
+The `PlayerViewModel` requires a `FlowManager` to be supplied in the constructor. The [`FlowManager`](/guides/multi-flow-experiences#flow-manager) is what tells Player which flows to run. This can be hardcoded into the view model or expected as an argument, as shown below.
 
 ```kotlin
-class SimplePlayerViewModel(flows: AsyncFlowIterator) : PlayerViewModel(flows) {
+class SimplePlayerViewModel(manager: FlowManager) : PlayerViewModel(flows) {
     override val plugins = listOf(ReferenceAssetsPlugin())
 }
 ```
 
 ### `PlayerFragment`
 
-The `PlayerFragment` is a simple Android `Fragment` that only requires a specific `PlayerViewModel` to be defined. If your view model requires the `AsyncFlowIterator` to be passed as part of the constructor, you can leverage the `PlayerViewModel.Factory` to produce it, as shown below.
+The `PlayerFragment` is a simple Android `Fragment` that only requires a specific `PlayerViewModel` to be defined. If your view model requires the `FlowManager` to be passed as part of the constructor, you can leverage the `PlayerViewModel.Factory` to produce it, as shown below.
 
-Specifically, this fragment takes a flow as an argument to the constructor and creates a single-flow `AsyncFlowIterator` instance using the pseudo-constructor helper.
+Specifically, this fragment takes a flow as an argument to the constructor and creates a single-flow `FlowManager` instance using the pseudo-constructor helper.
 
 ```kotlin
 class SimplePlayerFragment(override val flow: String) : PlayerFragment() {
     override val playerViewModel by viewModels<SimplePlayerViewModel> {
-        PlayerViewModel.Factory(AsyncFlowIterator(flow), ::SimplePlayerViewModel)
+        PlayerViewModel.Factory(FlowManager(flow), ::SimplePlayerViewModel)
     }
 }
 ```
