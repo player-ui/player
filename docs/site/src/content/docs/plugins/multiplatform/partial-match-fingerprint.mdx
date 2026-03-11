@@ -3,7 +3,7 @@ title: Partial Match
 ---
 
 import PlatformTabs from "../../../../components/PlatformTabs.astro";
-import PodAndPackage from "../../../../components/PodAndPackage.astro";
+import SPM from "../../../../components/SPM.astro";
 
 This plugin enables users to map matches of assets to any arbitrary value in a partial-match-registry.
 For each asset in a resolved view, the matches will be computed.
@@ -45,7 +45,7 @@ const value = matchPlugin.get("asset-id"); // 'ABC'
 
 This plugin is used by `BaseAssetRegistry` to handle matching resolved asset nodes with their native implementation, to decode for rendering. It is unlikely to be needed to be used directly in iOS use cases.
 
-<PodAndPackage product="PlayerUI" />
+<SPM product="PlayerUI" />
 
 ### Swift Usage
 

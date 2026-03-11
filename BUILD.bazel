@@ -1,8 +1,7 @@
 load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag", "int_flag")
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("@rules_player//internal:defs.bzl", "stamp")
-load("@rules_player//ios:defs.bzl", "assemble_pod", "ios_publish")
+load("@rules_player//ios:defs.bzl", "assemble_ios_release", "spm_publish")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -20,6 +19,8 @@ exports_files([
     ".editorconfig",
     ".all-contributorsrc",
     "README.md",
+    "LICENSE",
+    "Package.swift",
 ])
 
 js_library(
@@ -86,28 +87,13 @@ js_library(
 
 ##### Start iOS #####
 
-# Update the version in the podspec
-stamp(
-    name = "PlayerUI_Podspec",
-    files = ["//:PlayerUI.podspec"],
-    stable = True,
-    stamp = -1,
-    substitutions = {
-        "0.0.1-placeholder": "{STABLE_VERSION}",
-    },
-)
-
-exports_files([
-    "PlayerUI.podspec",
-])
-
-assemble_pod(
-    name = "PlayerUI_Pod",
-    srcs = glob([
-        "LICENSE",
-        "Package.swift",
-    ]),
+assemble_ios_release(
+    name = "PlayerUI_SPM",
     data = {
+        # Root level files
+        "//:LICENSE": "",
+        "//:Package.swift": "",
+
         # Core
         "//ios/core:PlayerUI_Sources": "ios/core/",
         "//core/player:player_native_bundle": "ios/core/Resources/",
@@ -192,26 +178,13 @@ assemble_pod(
         "//plugins/types-provider/ios:PlayerUITypesProviderPlugin_Sources": "plugins/types-provider/ios/",
         "//plugins/types-provider/core:core_native_bundle": "plugins/types-provider/ios/Resources/",
     },
-    podspec = ":PlayerUI_Podspec",
 )
 
-ios_publish(
+spm_publish(
     name = "ios_publish",
-    zip = ":PlayerUI_Pod",
+    zip = ":PlayerUI_SPM",
     # SPM Release Repo
     repository = "git@github.com:player-ui/playerui-swift-package.git",
-    # CocoaPods
-    podspec = ":PlayerUI_Podspec",
-    executable = "bundle exec pod",
-    globalFlags = [
-        # because jenkins runs as root
-        "--allow-root",
-    ],
-    pushFlags = [
-        # skip tests because it never runs them right
-        # and they're run as part of the build pipeline anyway
-        "--skip-tests",
-    ],
 )
 
 # SwiftLint
