@@ -193,6 +193,25 @@ public suspend fun terminate(data: Data? = null) {}
 
 **Migration**: Provide the `Data` type appropriate for your use case. If `terminate` will always be called with `nill`, use `Nothing`.
 
+### Dropped CocoaPods Support
+
+Since CocoaPods is in maintenance mode, we are dropping support in favour of using Swift Package Manager (SPM) only. Please leverage the Swift Package, e.g.
+
+```
+// In your Package.swift
+.dependencies: [
+    .package(url: "https://github.com/player-ui/playerui-swift-package.git", from: "0.13.0"),
+],
+targets: [
+    .target(
+        name: "SomeExampleTarget",
+        dependencies: [
+            .product(name: "PlayerUI", package: "playerui-swift-package"),
+        ],
+    ),
+]
+```
+
 ## New Features
 
 ### Convenience Methods for `AnyType`
