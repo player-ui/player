@@ -211,9 +211,9 @@ public open class PlayerViewModel(
 
     public fun fail(throwable: Throwable) {
         player.inProgressState?.controllers?.error?.captureError(
-            cause,
+            throwable,
                 ErrorTypes.RENDER
-            )        }
+            )
     }
 
     /** Helper to progress the [FlowManager] in within the [viewModelScope] */
