@@ -314,16 +314,9 @@ public protocol WithSymbol {
     static var symbol: String { get }
 }
 
-// Needed to reference the resource bundle, can't use a protocol for referencing
-internal class ResourceBundleShim {}
-
 internal extension JSContext {
     var coreBundle: URL? {
-        #if SWIFT_PACKAGE
         return ResourceUtilities.urlForFile(name: "Player.native", ext: "js", bundle: Bundle.module)
-        #else
-        return ResourceUtilities.urlForFile(name: "Player.native", ext: "js", bundle: Bundle(for: ResourceBundleShim.self), pathComponent: "PlayerUI.bundle")
-        #endif
     }
     /// Loads the core player bundle into the give JSContext
     func loadCore() {

@@ -127,13 +127,8 @@ class CustomBeaconPlugin: JSBasePlugin {
     self.init(fileName: "custom-beacon", pluginName: "CustomBeaconPlugin")
   }
   override open func getUrlForFile(fileName: String) -> URL? {
-        ResourceUtilities.urlForFile(
-          name: fileName,
-          ext: "js",
-          bundle: Bundle(for: <YourMainPodClass>.self),
-          pathComponent: "<YourResourceBundleName>.bundle"
-        )
-    }
+    ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
+  }
 }
 
 // In some SwiftUI View

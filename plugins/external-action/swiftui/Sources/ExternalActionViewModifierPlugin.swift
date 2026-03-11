@@ -98,18 +98,10 @@ open class ExternalActionViewModifierPlugin<ModifierType: ExternalStateViewModif
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        #if SWIFT_PACKAGE
         ResourceUtilities.urlForFile(
             name: fileName, ext: "js",
             bundle: ExternalActionPlugin.bundle
         )
-        #else
-        ResourceUtilities.urlForFile(
-            name: fileName, ext: "js",
-            bundle: Bundle(for: ExternalActionPlugin.self),
-            pathComponent: "PlayerUI_ExternalActionPlugin.bundle"
-        )
-        #endif
     }
 }
 

@@ -15,14 +15,14 @@ public class ResourceUtilities {
      Gets the URL for a file in the bundle
      Example:
      ```
-     ResourceUtilities.urlForFile(name: "plugin", ext: "js", bundle: Bundle(for: SomeClass.self), pathComponent: "MyPodName.bundle")
+     ResourceUtilities.urlForFile(name: "plugin", ext: "js", bundle: Bundle.module)
      ```
 
      - parameters:
         - name: The name of the file
         - ext: The extension of the file
         - bundle: The bundle to load URLs from
-        - pathComponent: The string bundle path to append to the bundle resource URL
+        - pathComponent: Optional path component to append (legacy support)
      - returns:
         A URL to the file if the bundle can be loaded
      */

@@ -16,15 +16,6 @@ public class ComputedPropertiesPlugin: JSBasePlugin, NativePlugin {
     }
 
     override open func getUrlForFile(fileName: String) -> URL? {
-        #if SWIFT_PACKAGE
         ResourceUtilities.urlForFile(name: fileName, ext: "js", bundle: Bundle.module)
-        #else
-        ResourceUtilities.urlForFile(
-            name: fileName,
-            ext: "js",
-            bundle: Bundle(for: ComputedPropertiesPlugin.self),
-            pathComponent: "PlayerUI_ComputedPropertiesPlugin.bundle"
-        )
-        #endif
     }
 }
