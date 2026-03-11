@@ -147,13 +147,18 @@ public class ErrorController: CreatedFromJSValue {
         severity: ErrorSeverity? = nil,
         metadata: [String: Any]? = nil
     ) -> JSValue? {
-        var args: [Any] = [
-            [
+        var args: [Any] = []
+        
+        if let err = error as? JSConvertibleError & Error {
+            args.append(value.context.error(for: err) as Any)
+        } else {
+            args.append([
                 "message": error.localizedDescription,
                 "name": String(describing: type(of: error))
-            ] as [String: Any],
-            errorType
-        ]
+            ] as [String: Any])
+        }
+        
+        args.append(errorType)
         
         if let severity = severity {
             args.append(severity.rawValue)
