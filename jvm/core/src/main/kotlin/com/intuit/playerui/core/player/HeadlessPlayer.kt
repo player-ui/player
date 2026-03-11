@@ -114,8 +114,9 @@ public class HeadlessPlayer @ExperimentalPlayerApi @JvmOverloads public construc
                 if (runtime.config.debuggable) debugSource.readText() else source.readText(),
                 BUNDLED_SOURCE_PATH,
                 sourceMap.readText(),
-                precompiledSource.readBytes(),
-            ),
+            ).apply {
+                preCompiledScript = precompiledSource?.readBytes()
+            },
         )
 
         /** 2. merge explicit [LoggerPlugin]s with ones created by service loader */
