@@ -71,8 +71,6 @@ commands:
             - v1-bazel-cache-core-{{ .Branch }}-{{ .Revision }}
             - v1-bazel-cache-core-{{ .Branch }}
             - v1-bazel-cache-core-main
-            - gem-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
-            - gem-v1-{{ arch }}-main-{{ checksum "Gemfile.lock" }}
 
       - setup_auth
       - run: echo "//registry.npmjs.com/:_authToken=$NPM_TOKEN" >> ~/.npmrc
@@ -82,7 +80,6 @@ commands:
       - run:
           command: |
             source ~/.bashrc
-            bundle install
             npx auto shipit -vv --only-graduate-with-release-label
           no_output_timeout: 40m
 
