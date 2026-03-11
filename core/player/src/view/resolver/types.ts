@@ -201,17 +201,14 @@ export declare namespace Resolve {
   }
 }
 
-export const ResolverStages = {
-  ResolveOptions: "resolve-options",
-  SkipResolve: "skip-resolve",
-  BeforeResolve: "before-resolve",
-  Resolve: "resolve",
-  AfterResolve: "after-resolve",
-  AfterNodeUpdate: "after-node-update",
-} as const;
-
-export type ResolverStage =
-  (typeof ResolverStages)[keyof typeof ResolverStages];
+export enum ResolverStage {
+  ResolveOptions = "resolveOptions",
+  SkipResolve = "skipResolve",
+  BeforeResolve = "beforeResolve",
+  Resolve = "resolve",
+  AfterResolve = "afterResolve",
+  AfterNodeUpdate = "afterNodeUpdate",
+}
 
 export type ResolverErrorMetadata = {
   node: Node.Node;

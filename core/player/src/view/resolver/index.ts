@@ -12,7 +12,7 @@ import { DependencyModel, withParser } from "../../data";
 import type { Logger } from "../../logger";
 import { Node, NodeType } from "../parser";
 import { caresAboutDataChanges, toNodeResolveOptions } from "./utils";
-import { ResolverStages, type Resolve } from "./types";
+import { ResolverStage, type Resolve } from "./types";
 import { getNodeID } from "../parser/utils";
 import { ResolverError } from "./ResolverError";
 
@@ -272,7 +272,7 @@ export class Resolver {
     try {
       resolveOptions = this.hooks.resolveOptions.call(resolveOptions, node);
     } catch (err: unknown) {
-      throw new ResolverError(err, ResolverStages.ResolveOptions, node);
+      throw new ResolverError(err, ResolverStage.ResolveOptions, node);
     }
 
     const previousResult = this.getPreviousResult(node);
@@ -289,7 +289,7 @@ export class Resolver {
         resolveOptions,
       );
     } catch (err: unknown) {
-      throw new ResolverError(err, ResolverStages.SkipResolve, node);
+      throw new ResolverError(err, ResolverStage.SkipResolve, node);
     }
 
     if (previousResult && shouldUseLastValue) {
@@ -337,7 +337,7 @@ export class Resolver {
         try {
           this.hooks.afterNodeUpdate.call(AST, ASTParent, resolvedUpdate);
         } catch (err: unknown) {
-          throw new ResolverError(err, ResolverStages.AfterNodeUpdate, node);
+          throw new ResolverError(err, ResolverStage.AfterNodeUpdate, node);
         }
       };
 
@@ -363,7 +363,7 @@ export class Resolver {
         type: NodeType.Empty,
       };
     } catch (err: unknown) {
-      throw new ResolverError(err, ResolverStages.BeforeResolve, node);
+      throw new ResolverError(err, ResolverStage.BeforeResolve, node);
     }
 
     resolvedAST.parent = partiallyResolvedParent;
@@ -380,7 +380,7 @@ export class Resolver {
         resolveOptions,
       );
     } catch (err: unknown) {
-      throw new ResolverError(err, ResolverStages.Resolve, node);
+      throw new ResolverError(err, ResolverStage.Resolve, node);
     }
 
     let updated = !dequal(previousResult?.value, resolved);
@@ -478,7 +478,7 @@ export class Resolver {
           dependencyModel.getDependencies(scope),
       });
     } catch (err: unknown) {
-      throw new ResolverError(err, ResolverStages.AfterResolve, node);
+      throw new ResolverError(err, ResolverStage.AfterResolve, node);
     }
 
     const update: NodeUpdate = {
@@ -494,7 +494,7 @@ export class Resolver {
     try {
       this.hooks.afterNodeUpdate.call(node, rawParent, update);
     } catch (err: unknown) {
-      throw new ResolverError(err, ResolverStages.AfterNodeUpdate, node);
+      throw new ResolverError(err, ResolverStage.AfterNodeUpdate, node);
     }
     cacheUpdate.set(node, update);
 
