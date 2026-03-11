@@ -198,8 +198,17 @@ jobs:
               cp $line $RESULTS_DIR/$(dirname $line)
             done
 
-      - codecov/upload:
-          files: ./bazel-out/_coverage/_coverage_report.dat
+      - run:
+          name: Collect iOS coverage
+          when: always
+          command: |
+            mkdir -p coverage
+            cp ./bazel-out/_coverage/_coverage_report.dat coverage/ios_coverage.dat
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - coverage/ios_coverage.dat
 
       - store_test_results:
           path: _test_results
@@ -226,11 +235,29 @@ jobs:
               cp $line $RESULTS_DIR/$(dirname $line)
             done
 
-      - codecov/upload:
-          files: ./bazel-out/_coverage/_coverage_report.dat
+      - run:
+          name: Collect JS/JVM coverage
+          when: always
+          command: |
+            mkdir -p coverage
+            cp ./bazel-out/_coverage/_coverage_report.dat coverage/js_jvm_coverage.dat
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - coverage/js_jvm_coverage.dat
 
       - store_test_results:
           path: _test_results
+
+  upload_coverage:
+    executor: minimal
+    steps:
+      - attach_workspace:
+          at: ~/player
+
+      - codecov/upload:
+          files: coverage/ios_coverage.dat,coverage/js_jvm_coverage.dat
 
   android_test:
     executor: android
@@ -471,6 +498,26 @@ workflows:
           requires:
             - build-fork
 
+      - upload_coverage:
+          name: upload-coverage-trunk
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+          requires:
+            - test-trunk
+            - build-ios-trunk
+
+      - upload_coverage:
+          name: upload-coverage-fork
+          filters:
+            branches:
+              only:
+                - /pull\/.*/
+          requires:
+            - test-fork
+            - build-ios-fork
+
       - bundle_analyze:
           name: bundle-analyze-trunk
           filters:
@@ -479,15 +526,6 @@ workflows:
                 - /pull\/.*/
           requires:
             - test-trunk
-
-      - bundle_analyze:
-          name: bundle-analyze-fork
-          filters:
-            branches:
-              only:
-                - /pull\/.*/
-          requires:
-            - test-fork
 
       - bench_js:
           name: js-benchmark-tests-trunk
@@ -564,6 +602,10 @@ workflows:
             - build
             - build_and_test_ios
 
+      - upload_coverage:
+          requires:
+            - test
+
       - bundle_analyze:
           name: bundle-analyze
           requires:
@@ -614,6 +656,10 @@ workflows:
       - test:
           requires:
             - build
+
+      - upload_coverage:
+          requires:
+            - test
 
       - bundle_analyze:
           name: bundle-analyze
