@@ -216,8 +216,7 @@ export class ReactPlayer {
 
             // If error unhandled or will be handled with a transition show nothing
             if (!pErr?.skipped) {
-              // TODO: For unrecoverable errors, show nothing.
-              return <div>WE ARE NOT RECOVERING</div>;
+              return null;
             }
 
             // If error handled through onError hook, I dunno, show something

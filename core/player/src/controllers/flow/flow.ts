@@ -168,6 +168,18 @@ export class FlowInstance {
     return map[key] || map["*"];
   }
 
+  /** Check if the flow has a transition for the given error type in its current state. */
+  public hasTransitionForError(errorType: string): boolean {
+    if (!this.currentState || this.currentState.value.state_type === "END") {
+      return false;
+    }
+
+    return (
+      this.lookupInMap(this.currentState.value.errorTransitions, errorType) !==
+      undefined
+    );
+  }
+
   /**
    * Navigate using errorTransitions map.
    * Tries node-level first, then falls back to flow-level.

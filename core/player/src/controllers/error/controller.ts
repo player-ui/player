@@ -2,13 +2,9 @@ import { SyncBailHook } from "tapable-ts";
 import type { Logger } from "../../logger";
 import type { DataController } from "../data/controller";
 import type { FlowController } from "../flow/controller";
-import {
-  type PlayerError,
-  type ErrorMetadata,
-  type ErrorSeverity,
-  isErrorWithMetadata,
-} from "./types";
+import type { PlayerError, ErrorMetadata, ErrorSeverity } from "./types";
 import { ErrorStateMiddleware } from "./middleware";
+import { isErrorWithMetadata } from "./utils";
 
 /**
  * Private symbol used to authorize ErrorController's writes to errorState
@@ -106,7 +102,6 @@ export class ErrorController {
     severity?: ErrorSeverity,
     metadata?: ErrorMetadata,
   ): PlayerError {
-    this.options.logger.debug("[ErrorController]: Capturing error");
     const playerError: PlayerError = {
       error,
       errorType,
@@ -116,7 +111,6 @@ export class ErrorController {
     };
 
     if (isErrorWithMetadata(error)) {
-      this.options.logger.debug("[ErrorController]: Error has metadata");
       playerError.errorType = error.type;
       playerError.severity = error.severity ?? playerError.severity;
       playerError.metadata = {
@@ -176,6 +170,11 @@ export class ErrorController {
       this.options.logger.warn(
         "[ErrorController] No active flow instance for error navigation",
       );
+      return;
+    }
+
+    if (!flowInstance.hasTransitionForError(playerError.errorType)) {
+      this.options.fail(playerError.error);
       return;
     }
 

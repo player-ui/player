@@ -5,8 +5,6 @@ export enum ErrorSeverity {
   WARNING = "warning", // Non-blocking, logged for telemetry
 }
 
-const SEVERITY_SET = new Set<string>(Object.values(ErrorSeverity));
-
 /** Known error types for Player */
 export const ErrorTypes = {
   EXPRESSION: "expression",
@@ -44,34 +42,9 @@ export interface PlayerError {
 }
 
 export interface PlayerErrorMetadata<
-  TMetadata extends ErrorMetadata = ErrorMetadata,
+  ErrorMetadataType extends ErrorMetadata = ErrorMetadata,
 > {
   type: string;
   severity?: ErrorSeverity;
-  metadata?: TMetadata;
+  metadata?: ErrorMetadataType;
 }
-
-export const isErrorWithMetadata = (
-  error: Error,
-): error is Error & PlayerErrorMetadata => {
-  // 1. "type" property must be present and a string
-  if (!("type" in error) || typeof error.type !== "string") {
-    return false;
-  }
-
-  // 2. "severity" property is optional. If presesnt, must be a string within the set of severity options
-  if (
-    "severity" in error &&
-    (typeof error.severity !== "string" || !SEVERITY_SET.has(error.severity))
-  ) {
-    return false;
-  }
-
-  // 3. "metadata" property is optional. If present, must be a non-array object.
-  return (
-    !("metadata" in error) ||
-    (typeof error.metadata === "object" &&
-      error.metadata !== null &&
-      !Array.isArray(error.metadata))
-  );
-};
